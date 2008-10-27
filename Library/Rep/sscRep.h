@@ -10,7 +10,7 @@ class View;
 
 /**
  * Rep (Representation) is the interface that all Representations in ssc must
- * implement. 
+ * implement.
  * The default implementation can be found in RepImpl. Inherit from that when
  * implementing concrete classes.
  */
@@ -20,15 +20,15 @@ public:
 	virtual ~Rep() {}
 
 	/**\return a string identifying the Rep type. Each suclass implement
-	 * this with its own class name. Subclasses from other namespaces 
-	 * (such as cx and snw) should add that namespace as a prefix. 
+	 * this with its own class name. Subclasses from other namespaces
+	 * (such as cx and snw) should add that namespace as a prefix.
 	 */
 	virtual std::string getType() const = 0;
 
 	/**
 	 * Do not use this method! It is only used by ssc::View to set up an
 	 * internal connection between the two.
-	 * 
+	 *
 	 * \param theView The view to add this representation to.
 	 * \return
 	 */
@@ -37,7 +37,7 @@ public:
 	/**
 	 * Do not use this method! It is only used by ssc::View to tear down an
 	 * internal connection between the two.
-	 * 
+	 *
 	 * \param theView The view to disconnect from.
 	 * \return
 	 */
@@ -63,9 +63,12 @@ public:
 	virtual std::string getName() const = 0;
 	/**Return an unique id for this instance, i.e. unique
 	 * over all Rep instances.
-	 * \return the unique id. 
+	 * \return the unique id.
 	 */
 	virtual std::string getUid() const = 0;
+
+protected:
+	virtual void addRepActorsToViewRenderer(View* view) = 0;
 };
 
 } // namespace ssc
