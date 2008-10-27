@@ -35,6 +35,7 @@ bool RepImpl::isConnectedToView(View * theView) const
 void RepImpl::connectToView(View *theView)
 {
 	mViews.insert(theView);
+	this->addRepActorsToViewRenderer(theView);
 }
 
 void RepImpl::disconnectFromView(View *theView)
