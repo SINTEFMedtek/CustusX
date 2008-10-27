@@ -14,12 +14,12 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 	reader->SetFileName(filename.c_str());
 	reader->Update();
 	vtkImageDataPtr imageData = reader->GetOutput();
-	
+
 //		ImagePtr image(new Image());
 //		image->setVtkImageData(imageData);
-//		return image;		
+//		return image;
 	return ImagePtr(new Image(filename, imageData));
-	
+
 }
 
 // --------------------------------------------------------
@@ -52,13 +52,14 @@ ImagePtr DataManager::loadImage(const std::string& filename, READER_TYPE type)
 		// do special stuff
 		return ImagePtr();
 	}
-	
-	// identify type 
+
+	// identify type
 	ImagePtr current = mImageReaders[type]->load(filename);
 	if (current)
 	{
 		mImages[current->getUid()] = current;
-	}	
+	}
+	return current;
 }
 
 
