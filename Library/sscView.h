@@ -15,9 +15,9 @@ typedef boost::shared_ptr<class Rep> RepPtr;
 
 /**
  * Base widget for displaying lists of Rep.
- * 
+ *
  * The View class inherits a QVTKWidget but creates its own vtkRenderer and
- * vtkRenderWindow. 
+ * vtkRenderWindow.
  */
 class View : public QVTKWidget
 {
@@ -26,24 +26,25 @@ class View : public QVTKWidget
 public:
   enum Type
   {
+	VIEW,
     VIEW_2D,
     VIEW_3D,
   };
   /**\return the View type, indicating display dimension.
    */
-  virtual Type getType() const = 0;
+  virtual Type getType() const {VIEW;};
 
   View(QWidget *parent = NULL, Qt::WFlags f = 0);
   virtual ~View();
   /**
    * Get the renderer used by this \a View.
-   * 
+   *
    * \return The renderer used in this \a View
    */
   virtual vtkRendererPtr  getRenderer() const;
   /**
    * Get the vtkRenderWindow used by this \a View.
-   * 
+   *
    * \return The rendererwindow used in this \a View
    */
   virtual vtkRenderWindowPtr getRenderWindow() const;
@@ -54,14 +55,14 @@ public:
    * If it is, this function does nothing. If not, the Rep is
    * connected to this \a View with the \a Rep::connectToView()
    * method and added to this \a View `s vector of Reps
-   * 
+   *
    * \param rep The \a Rep to add to the \a View.
    */
   virtual void addRep(const RepPtr& rep);
   /**
    * Remove all other \a Rep objects from this \a View and add
    * the provided Rep to this \a View.
-   * 
+   *
    * \param rep The Rep to show in this \a View.
    */
   virtual void setRep(const RepPtr& rep);
@@ -73,13 +74,13 @@ public:
    * also removed from this \a View object's list of Rep.
    * If no matching \a Rep obejct is found, this function does
    * nothing.
-   * \param rep The Rep to remove. 
+   * \param rep The Rep to remove.
    */
   virtual void removeRep(const RepPtr& rep);
   /**
    * Check to see if this \a View has the given \a Rep in it's
    * internal list.
-   * \param rep The Rep to search for. 
+   * \param rep The Rep to search for.
    * \return true if the \a Rep is found, false otherwise.
    */
   virtual bool hasRep(const RepPtr& rep) const;
@@ -90,7 +91,7 @@ public:
    */
   virtual void removeReps();
 
-private:
+protected:
 	vtkRendererPtr  mRenderer;
 	vtkRenderWindowPtr mRenderWindow;
 	std::vector<RepPtr> mReps; ///< storage for internal reps.
