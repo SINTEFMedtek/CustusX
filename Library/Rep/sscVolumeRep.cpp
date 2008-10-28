@@ -1,5 +1,8 @@
 #include "sscVolumeRep.h"
 
+#include <vtkPiecewiseFunction.h>
+#include <vtkColorTransferFunction.h>
+#include <vtkVolumeProperty.h>
 #include <vtkVolumeTextureMapper3D.h>
 #include <vtkImageData.h>
 #include <vtkVolume.h>
@@ -10,15 +13,29 @@ namespace ssc
 {
 
 VolumeRep::VolumeRep(const std::string& uid, const std::string& name, ImagePtr image) : 
-	RepImpl(uid, name)
+	RepImpl(uid, name),
+	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
+	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
+	mVolumeProperty(vtkVolumePropertyPtr::New())
 {
 	//mProxy->setImage(image);
+	
+	mOpacityTransferFunction->AddPoint(0.0, 0.0);
+	mOpacityTransferFunction->AddPoint(255, 1.0);
+
+	mColorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
+	mColorTransferFunction->AddRGBPoint(255.0, 1.0, 1.0, 1.0);
+
+	mVolumeProperty->SetColor(mColorTransferFunction);
+	mVolumeProperty->SetScalarOpacity(mOpacityTransferFunction);
+	mVolumeProperty->SetInterpolationTypeToLinear();
 
 	mTextureMapper3D = vtkVolumeTextureMapper3DPtr::New();
-	mVolume = vtkVolumePtr::New();
+	mTextureMapper3D->SetInput( image->getVtkImageData() );
 
-	mTextureMapper3D->SetInput ( image->getVtkImageData() );	
-	mVolume->SetMapper ( mTextureMapper3D );
+	mVolume = vtkVolumePtr::New();
+	mVolume->SetProperty( mVolumeProperty );
+	mVolume->SetMapper( mTextureMapper3D );
 }
 
 VolumeRep::~VolumeRep()

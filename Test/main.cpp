@@ -15,7 +15,9 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 	QMainWindow mainwindow;
 
-	std::string testFile = "/Users/jbake/jbake/dev/ssc/Test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd";
+	std::string testFile = //"/Users/frankl/fl/dev/Repository/data/nevro/MetaImage/3DT1.mhd";
+	                       "/Users/frankl/fl/dev2/cvsStable/ssc/Test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd";
+						   //"/Users/jbake/jbake/dev/ssc/Test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd";
 	                       //"/home/christiana/snw2_trunk/C_code/SonowandSintefCooperation/test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd"
 	ssc::ImagePtr imagePtr = ssc::DataManager::instance()->loadImage(testFile, ssc::rtMETAIMAGE);
 

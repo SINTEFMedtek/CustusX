@@ -2,6 +2,9 @@
 #define SSCVOLUMEREP_H_
 
 #include "vtkSmartPointer.h"
+typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
+typedef	vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
+typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
 typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
 typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 
@@ -25,6 +28,9 @@ protected:
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 	
+	vtkPiecewiseFunctionPtr mOpacityTransferFunction;
+	vtkColorTransferFunctionPtr mColorTransferFunction;
+	vtkVolumePropertyPtr mVolumeProperty;
 	vtkVolumeTextureMapper3DPtr mTextureMapper3D;
 	vtkVolumePtr mVolume;
 	ImageProxyPtr mProxy;
