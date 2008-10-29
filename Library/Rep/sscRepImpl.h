@@ -9,17 +9,16 @@ namespace ssc
 
 /**
  * Default implementation of Rep. Subclass from here to get a concrete class.
- * 
+ *
  * The connection to View is handled here, but subclasses must implement
- * at least: 
+ * at least:
  * - getType()
- * - addRepActorsToViewRenderer() 
- * - removeRepActorsFromViewRenderer(). 
+ * - addRepActorsToViewRenderer()
+ * - removeRepActorsFromViewRenderer().
  */
 class RepImpl : public Rep
 {
 public:
-
 	RepImpl(const std::string& uid, const std::string& name="");
 	virtual ~RepImpl();
 	virtual std::string getType() const = 0;
@@ -34,6 +33,7 @@ protected:
 	std::set<View *> mViews;
 	std::string mName;
 	std::string mUid;
+	RepWeakPtr mSelf;
 	//typedef std::vector<View *>::iterator ViewsIter;
 
 	virtual void addRepActorsToViewRenderer(View* view) = 0;

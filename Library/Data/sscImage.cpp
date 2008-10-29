@@ -3,12 +3,12 @@
 namespace ssc
 {
 
-Image::~Image() 
+Image::~Image()
 {
 }
 
 Image::Image(const std::string& uid, const vtkImageDataPtr& data) : mUid(uid), mName(uid), mImageData(data)
-{	
+{
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
@@ -34,15 +34,15 @@ std::string Image::getName() const
 {
 	return mName;
 }
- 
+
 Transform3D Image::getTransform() const
 {
 	return mTransform;
 }
- 
+
 REGISTRATION_STATUS Image::getRegistrationStatus() const
 {
-	return rsNOT_REGISTRATED; 
+	return rsNOT_REGISTRATED;
 }
 
 vtkImageDataPtr Image::getVtkImageData()
@@ -54,15 +54,12 @@ vtkPointsPtr Image::getLandmarks()
 {
 	return mLandmarks;
 }
-
-//void ImageconnectProxy(ImageProxyWeakPtr proxy)
-//{
-//	mProxies.insert(proxy);	
-//}
-//
-//void ImagedisconnectProxy(ImageProxyWeakPtr proxy)
-//{
-//	mProxies.remove(proxy);	
-//}
-
+void Image::connectRep(const RepWeakPtr& rep)
+{
+	mReps.insert(rep);
+}
+void Image::disconnectRep(const RepWeakPtr& rep)
+{
+	mReps.erase(rep);
+}
 } // namespace ssc

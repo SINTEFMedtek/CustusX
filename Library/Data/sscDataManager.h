@@ -12,7 +12,7 @@
 namespace ssc
 {
 
-enum READER_TYPE 
+enum READER_TYPE
 {
 	rtDICOM,
 	rtSONOWAND_M3D,
@@ -38,28 +38,28 @@ public:
 class DataManager
 {
 public:
-	DataManager();
-	virtual ~DataManager();
-	
 	static DataManager* instance();
-	
+
 	// core interface
 	ImagePtr loadImage(const std::string& filename, READER_TYPE type);
 	std::map<std::string, ImagePtr> getImages();
 	// convenience interface
 	ImagePtr getImage(const std::string& uid);
-	std::map<std::string, std::string> getImageUidsAndNames() const; 
+	std::map<std::string, std::string> getImageUidsAndNames() const;
 	std::vector<std::string> getImageNames() const;
-	std::vector<std::string> getImageUids() const; 
-		
+	std::vector<std::string> getImageUids() const;
+
 	// ditto for meshes
-	
+
 private:
+	DataManager();
+	virtual ~DataManager();
+
 	static DataManager* mInstance;
 	std::map<READER_TYPE, ImageReaderPtr> mImageReaders;
 	std::map<std::string, ImagePtr> mImages;
 	std::map<std::string, MeshPtr> mMeshes;
-	
+
 };
 
 } // namespace ssc

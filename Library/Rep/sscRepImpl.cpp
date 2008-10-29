@@ -41,6 +41,7 @@ void RepImpl::connectToView(View *theView)
 void RepImpl::disconnectFromView(View *theView)
 {
 	mViews.erase(theView);
+	this->removeRepActorsFromViewRenderer(theView);
 }
 
 } // namespace ssc

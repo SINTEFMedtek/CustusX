@@ -54,7 +54,7 @@ SET( SNW_SOURCE_FILES
     Utilities/sscTransform3D.cpp 
     sscView.cpp
     Rep/sscRepImpl.cpp
-    Rep/sscVolumeRep.cpp
+    Rep/sscVolumetricRep.cpp
     Rep/sscTool3DRep.cpp
     Data/sscImage.cpp
     Data/sscDataManager.cpp

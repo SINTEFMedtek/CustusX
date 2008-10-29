@@ -1,6 +1,8 @@
 #ifndef SSCIMAGE_H_
 #define SSCIMAGE_H_
 
+#include <set>
+
 #include <boost/shared_ptr.hpp>
 
 #include "vtkSmartPointer.h"
@@ -8,6 +10,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 
 #include "sscData.h"
+#include "sscRep.h"
 
 namespace ssc
 {
@@ -26,25 +29,25 @@ public:
 
 	void setName(const std::string& name);
 	void setTransform(const Transform3D& trans);
-	
+
 	virtual std::string getUid() const;
-	virtual std::string getName() const; 
-	virtual Transform3D getTransform() const; 
-	virtual REGISTRATION_STATUS getRegistrationStatus() const;	
-	
+	virtual std::string getName() const;
+	virtual Transform3D getTransform() const;
+	virtual REGISTRATION_STATUS getRegistrationStatus() const;
+
 	virtual vtkImageDataPtr getVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
-	virtual vtkPointsPtr getLandmarks(); ///< \return all landmarks defined on the image. 
+	virtual vtkPointsPtr getLandmarks(); ///< \return all landmarks defined on the image.
 //	virtual vtkLookupTablePtr getLut() const = 0;
-	
-	//void connectProxy(ImageProxyWeakPtr proxy); ///< called by ImageProxy when connecting to an Image
-	//void disconnectProxy(ImageProxyWeakPtr proxy); ///< called by ImageProxy when disconnecting from an Image
+
+	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
+	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 private:
 	std::string mUid;
 	std::string mName;
 	Transform3D mTransform;
-	
-	//std::set<ImageProxyWeakPtr> mProxies; ///< links to Rep users.
-	
+
+	std::set<RepWeakPtr> mReps; ///< links to Rep users.
+
 	vtkImageDataPtr mImageData;
 	vtkPointsPtr mLandmarks;
 };

@@ -26,7 +26,7 @@ struct Data
 {
 	virtual ~Data() {}
 	virtual std::string getUid() const = 0; ///< \return unique id for this instance
-	virtual std::string getName() const = 0; /// \return a descriptive name for this instance 
+	virtual std::string getName() const = 0; /// \return a descriptive name for this instance
 	virtual Transform3D getTransform() const = 0; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
 	virtual REGISTRATION_STATUS getRegistrationStatus() const = 0; ///< \return what kind of registration that has been performed on this data object.
 };

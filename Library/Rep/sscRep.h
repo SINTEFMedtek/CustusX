@@ -3,8 +3,13 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+
 namespace ssc
 {
+typedef boost::shared_ptr<class Rep> RepPtr;
+typedef boost::weak_ptr<class Rep> RepWeakPtr;
 
 class View;
 
@@ -66,9 +71,6 @@ public:
 	 * \return the unique id.
 	 */
 	virtual std::string getUid() const = 0;
-
-protected:
-	virtual void addRepActorsToViewRenderer(View* view) = 0;
 };
 
 } // namespace ssc

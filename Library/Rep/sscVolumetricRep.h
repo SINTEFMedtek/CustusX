@@ -13,27 +13,35 @@ typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 
 namespace ssc
 {
+typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 /**Represenation for one Image.
- * Use this to render volumetric image data in a 3D scene. 
+ * Use this to render volumetric image data in a 3D scene.
  */
-class VolumeRep : public RepImpl
+class VolumetricRep : public RepImpl
 {
 public:
-	VolumeRep(const std::string& uid, const std::string& name, ImagePtr image);
-	VolumeRep();
-	virtual ~VolumeRep();
+	virtual ~VolumetricRep();
+
+	static VolumetricRepPtr create(const std::string& uid);
+
 	virtual std::string getType() const { return "ssc::VolumeRep"; }
+	void setImage(ImagePtr image);
+	//void addImage(ImagePtr image);
+	//void removeImage(ImagePtr image);
+	bool hasImage(ImagePtr image) const;
 protected:
+	VolumetricRep(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
-	
+
 	vtkPiecewiseFunctionPtr mOpacityTransferFunction;
 	vtkColorTransferFunctionPtr mColorTransferFunction;
 	vtkVolumePropertyPtr mVolumeProperty;
 	vtkVolumeTextureMapper3DPtr mTextureMapper3D;
 	vtkVolumePtr mVolume;
-	ImageProxyPtr mProxy;
+
+	ImagePtr mImage;
 };
 
 } // namespace ssc

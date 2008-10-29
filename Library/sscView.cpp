@@ -37,10 +37,9 @@ void View::addRep(const RepPtr& rep)
 	{
 		return;
 	}
-	
+
 	rep->connectToView(this);
 	mReps.push_back(rep);
-	//mRenderWindow->Render();
 }
 
 void View::setRep(const RepPtr& rep)

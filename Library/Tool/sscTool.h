@@ -12,14 +12,14 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 namespace ssc
 {
 
-/**Interface to a tool, 
+/**Interface to a tool,
  * i.e. a pointer, US probe or similar.
- * 
+ *
  * The tool position is defined in its own space (as given
  * by the tool's transform) as follows:
  *  - the origin is the tool tip
  * 	- the z axis points in the acting direction (us probe ray dir or pointing dir).
- *  - the y axis points to the left side of the tool. 
+ *  - the y axis points to the left side of the tool.
  */
 class Tool : public vtkObject
 {
@@ -34,8 +34,8 @@ public:
 		TOOL_US_PROBE
 	};
 	virtual Type getType() const = 0;
-	
-	/**Events available from the object, via 
+
+	/**Events available from the object, via
 	 * the vtk event mechanism.
 	 */
 	enum
@@ -62,9 +62,9 @@ public:
 	 * usprobe_12L.stl for the SolidWorks format.
 	 * \sa getGraphicsPolyData().
 	 */
-	virtual std::string getGraphicsFileName() const = 0; 
+	virtual std::string getGraphicsFileName() const = 0;
 	/**Get a pointer to the tools graphical data in the form of vtkPolyData,
-	 * if any. Either getGraphicsPolyData() or getGraphicsFileName() or both 
+	 * if any. Either getGraphicsPolyData() or getGraphicsFileName() or both
 	 * should return valid data. \sa getGraphicsFileName().
 	 */
 	virtual vtkPolyDataPtr getGraphicsPolyData() const = 0;
@@ -74,14 +74,15 @@ public:
 	/**Which file to use when calling saveTransformsAndTimestamps().
 	 */
 	virtual void setTransformSaveFile(const std::string& filename) = 0;
-	virtual Transform3D getTransform() const = 0; ///< \return the tool position, represented as the transform M_rt from the tool space (t) to the reference space (r).
+	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
+	//virtual bool getConnected() const = 0; ///< tool is connected to hardware
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
 };
 
 typedef boost::shared_ptr<Tool> ToolPtr;
 
-} // namespace ssc 
+} // namespace ssc
 
 #endif /*SSCTOOL_H_*/
