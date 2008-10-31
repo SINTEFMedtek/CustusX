@@ -24,7 +24,8 @@ SET( SNW_QT_MOC_HEADER_FILES
     sscView.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
-    Tool/sscDummyTool.h 
+    Tool/sscDummyTool.h
+    Tool/sscDummyToolManager.h
     Rep/sscRep.h
     Rep/sscToolRep3D.h
     )
@@ -34,7 +35,6 @@ SET( SNW_HEADER_FILES
     sscRep.h 
     sscRepImpl.h 
     sscVolumeRep.h
-    sscDummyToolManager.h
     )
 
 set( SNW_INCLUDE_DIRS

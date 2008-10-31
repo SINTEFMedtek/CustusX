@@ -37,11 +37,6 @@ public:
 	void startTracking();
 	void stopTracking();
 
-signals:
-	virtual void toolTransformAndTimestamp(Tool::TransformAndTimestampEventArgumentPtr payload);
-	virtual void toolVisible(Tool::VisibleEventArgumentPtr visible);
-
-
 private slots:
 	virtual void sendTransform();
 

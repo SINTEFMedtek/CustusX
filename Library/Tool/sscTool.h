@@ -88,6 +88,10 @@ public:
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
 
+signals:
+	void toolTransformAndTimestamp(Tool::TransformAndTimestampEventArgumentPtr payload);
+	void toolVisible(Tool::VisibleEventArgumentPtr visible);
+
 protected:
 	std::string mUid;
 	std::string mName;

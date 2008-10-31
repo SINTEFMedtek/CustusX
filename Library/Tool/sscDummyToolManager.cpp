@@ -42,14 +42,17 @@ bool DummyToolManager::isTracking() const
 void DummyToolManager::configure()
 {
 	mConfigured = true;
+	emit configured();
 }
 void DummyToolManager::initialize()
 {
 	mInitialized = true;
+	emit initialized();
 }
 void DummyToolManager::startTracking()
 {
 	mIsTracking = true;
+	emit trackingStarted();
 
 	DummyToolSetIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
@@ -62,6 +65,7 @@ void DummyToolManager::startTracking()
 void DummyToolManager::stopTracking()
 {
 	mIsTracking = false;
+	emit trackingStopped();
 
 	DummyToolSetIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())

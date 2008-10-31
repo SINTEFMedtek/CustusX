@@ -17,6 +17,7 @@ namespace ssc
 {
 class DummyToolManager : public ToolManager
 {
+	Q_OBJECT
 public:
 	typedef std::set<DummyToolPtr> DummyToolSet;
 
