@@ -3,7 +3,7 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include <vtkObject.h>
+#include <QObject>
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
@@ -11,7 +11,6 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 
 namespace ssc
 {
-
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
  *
@@ -21,9 +20,16 @@ namespace ssc
  * 	- the z axis points in the acting direction (us probe ray dir or pointing dir).
  *  - the y axis points to the left side of the tool.
  */
-class Tool : public vtkObject
+class Tool : public QObject
 {
+	Q_OBJECT
 public:
+	Tool() :
+		mUid(""),
+		mName("")
+	{};
+	~Tool(){};
+
 	/**Enumerates the general type of tool.
 	 */
 	enum Type
@@ -50,12 +56,14 @@ public:
 		Transform3D matrix;
 		double timestamp; ///< TODO format ???
 	};
+	typedef boost::shared_ptr<TransformAndTimestampEventArgument> TransformAndTimestampEventArgumentPtr;
 	/**Argument for the event TOOL_VISIBLE_EVENT
 	 */
 	struct VisibleEventArgument
 	{
 		bool visible;
 	};
+	typedef boost::shared_ptr<VisibleEventArgument> VisibleEventArgumentPtr;
 
 	/**\return a file containing a graphical description of the tool,
 	 * if any. The file format is given by the file extension, for example
@@ -74,15 +82,17 @@ public:
 	/**Which file to use when calling saveTransformsAndTimestamps().
 	 */
 	virtual void setTransformSaveFile(const std::string& filename) = 0;
-	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
+	virtual Transform3DPtr get_prMt() const = 0; ///< \return transform from tool to patient ref space
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	//virtual bool getConnected() const = 0; ///< tool is connected to hardware
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
+
+protected:
+	std::string mUid;
+	std::string mName;
 };
-
 typedef boost::shared_ptr<Tool> ToolPtr;
-
 } // namespace ssc
 
 #endif /*SSCTOOL_H_*/

@@ -21,7 +21,12 @@ set( SNW_PROJECT_NAME SSC )
 set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
 
 SET( SNW_QT_MOC_HEADER_FILES
-    sscView.h 
+    sscView.h
+    Tool/sscToolManager.h
+    Tool/sscTool.h 
+    Tool/sscDummyTool.h 
+    Rep/sscRep.h
+    Rep/sscToolRep3D.h
     )
 
 SET( SNW_HEADER_FILES
@@ -29,7 +34,7 @@ SET( SNW_HEADER_FILES
     sscRep.h 
     sscRepImpl.h 
     sscVolumeRep.h
-    sscTool3DRep.h
+    sscDummyToolManager.h
     )
 
 set( SNW_INCLUDE_DIRS
@@ -55,9 +60,11 @@ SET( SNW_SOURCE_FILES
     sscView.cpp
     Rep/sscRepImpl.cpp
     Rep/sscVolumetricRep.cpp
-    Rep/sscTool3DRep.cpp
+    Rep/sscToolRep3D.cpp
     Data/sscImage.cpp
     Data/sscDataManager.cpp
+    Tool/sscDummyToolManager.cpp
+    Tool/sscDummyTool.cpp
 	) 
 	
 # =========================================================

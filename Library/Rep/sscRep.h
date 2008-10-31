@@ -6,6 +6,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 
+#include <QObject>
+
 namespace ssc
 {
 typedef boost::shared_ptr<class Rep> RepPtr;
@@ -19,8 +21,9 @@ class View;
  * The default implementation can be found in RepImpl. Inherit from that when
  * implementing concrete classes.
  */
-class Rep
+class Rep :public QObject
 {
+	Q_OBJECT
 public:
 	virtual ~Rep() {}
 
@@ -57,7 +60,7 @@ public:
 	 * false otherwise.
 	 */
 	virtual bool isConnectedToView(View *theView) const = 0;
-	/* Set the name of this Rep. This is useful for context-menus in
+	/** Set the name of this Rep. This is useful for context-menus in
 	 * Views and other user interaction constructs.
 	 *
 	 * \param name The user-friendly name for this instance.
