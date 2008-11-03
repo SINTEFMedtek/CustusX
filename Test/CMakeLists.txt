@@ -21,6 +21,7 @@ set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
 message(STATUS ${PROJECT_SOURCE_DIR}/..)
 
 SET( SNW_QT_MOC_HEADER_FILES
+    sscTestInterface.h
     )
 
 SET( SNW_HEADER_FILES
@@ -46,6 +47,7 @@ set( SNW_LIBRARIES
 
 # library
 SET( SNW_SOURCE_FILES
+    sscTestInterface.cpp
     main.cpp
 	) 
 	
