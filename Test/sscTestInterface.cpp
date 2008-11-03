@@ -127,8 +127,6 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 			this, SLOT(setImage(int)));
 	QPushButton* imageButton2 = new QPushButton(tr("Image2"),this);
 	imageButton2->setCheckable(true);
-	connect(imageGroup, SIGNAL(buttonClicked(int)),
-			this, SLOT(setImage(int)));
 	imageGroup->addButton(imageButton1,1);
 	imageGroup->addButton(imageButton2,2);
 
@@ -142,8 +140,6 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 			this, SLOT(setRep(int)));
 	QPushButton* repButton2 = new QPushButton(tr("Rep2"),this);
 	repButton2->setCheckable(true);
-	connect(repGroup, SIGNAL(buttonClicked(int)),
-			this, SLOT(setRep(int)));
 	repGroup->addButton(repButton1,1);
 	repGroup->addButton(repButton2,2);
 
@@ -157,8 +153,6 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 			this, SLOT(setView(int)));
 	QPushButton* viewButton2 = new QPushButton(tr("View2"),this);
 	viewButton2->setCheckable(true);
-	connect(viewGroup, SIGNAL(buttonClicked(int)),
-			this, SLOT(setView(int)));
 	viewGroup->addButton(viewButton1,1);
 	viewGroup->addButton(viewButton2,2);
 
