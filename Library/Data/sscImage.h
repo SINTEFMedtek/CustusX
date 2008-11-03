@@ -15,7 +15,7 @@ typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 namespace ssc
 {
 
-typedef boost::weak_ptr<class ImageProxy> ImageProxyWeakPtr;
+//typedef boost::weak_ptr<class ImageProxy> ImageProxyWeakPtr;
 
 /**One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.

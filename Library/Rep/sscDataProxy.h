@@ -6,7 +6,7 @@
 
 #include "sscImage.h"
 
-namespace ssc 
+namespace ssc
 {
 
 typedef boost::shared_ptr<class Image> ImagePtr;
@@ -20,7 +20,7 @@ public:
 	void hasImage(ImagePtr image) const;
 //	std::vector<ImagePtr> getImages();
 //	void removeImages();
-	
+
 private:
 	ImagePtr mImage;
 };

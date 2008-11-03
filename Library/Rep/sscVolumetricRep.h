@@ -9,7 +9,7 @@ typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3D
 typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 
 #include "sscRepImpl.h"
-#include "sscDataProxy.h"
+#include "sscImage.h"
 
 namespace ssc
 {

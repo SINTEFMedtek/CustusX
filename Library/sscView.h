@@ -97,7 +97,7 @@ protected:
 	std::vector<RepPtr> mReps; ///< storage for internal reps.
 	typedef std::vector<RepPtr>::iterator RepsIter; ///< iterator typedef for the internal rep vector.
 };
-
+typedef boost::shared_ptr<View> ViewPtr;
 } // namespace ssc
 
 

@@ -21,7 +21,6 @@ public:
 	{
 		mInstance = instance;
 	};
-	//static ToolManager* getInstance() = 0;
 
 	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready

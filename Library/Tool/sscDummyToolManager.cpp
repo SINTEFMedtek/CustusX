@@ -3,26 +3,27 @@
 namespace ssc
 {
 ToolManager* ToolManager::mInstance = NULL;
-//void DummyToolManager::setInstance(ToolManager* instance)
-//{}
-//ToolManager* DummyToolManager::getInstance()
-//{}
+
+ToolManager* DummyToolManager::getInstance()
+{
+	if(ToolManager::mInstance == NULL)
+	{
+		ToolManager::mInstance = new DummyToolManager();
+	}
+	return ToolManager::mInstance;
+}
 DummyToolManager::DummyToolManager() :
 	mConfigured(false),
 	mInitialized(false),
 	mIsTracking(false),
 	m_rMpr(new Transform3D())
 {
-	//ToolPtr referenceTool(new DummyTool());
 	DummyToolPtr tool1(new DummyTool());
-	//ToolPtr tool2(new DummyTool());
 
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
 
-	//mTools.insert(referenceTool);
 	mDummyTools.insert(tool1);
-	//mTools.insert(tool2);
 }
 DummyToolManager::~ DummyToolManager()
 {}

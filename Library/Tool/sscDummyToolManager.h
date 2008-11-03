@@ -21,15 +21,7 @@ class DummyToolManager : public ToolManager
 public:
 	typedef std::set<DummyToolPtr> DummyToolSet;
 
-//	static void setInstance(DummyToolManager* instance);
-	static ToolManager* getInstance()
-	{
-		if(ToolManager::mInstance == NULL)
-		{
-			ToolManager::mInstance = new DummyToolManager();
-		}
-		return ToolManager::mInstance;
-	};
+	static ToolManager* getInstance();
 
 	virtual bool isConfigured() const;
 	virtual bool isInitialized() const;
