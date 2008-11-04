@@ -56,6 +56,9 @@ SET( SNW_SOURCE_FILES
 include(${SNW_SOURCE_ROOT_DIR}/CMake/snwAddExecutable.cmake )
 # =========================================================
 
+add_executable(TestDataManager sscTestDataManager.cpp)
+add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
+#add_test(TestDataManager ${PROJECT_BINARY_DIR}/TestDataManager)
 
 
 

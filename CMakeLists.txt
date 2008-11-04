@@ -8,5 +8,7 @@ endif(COMMAND cmake_policy)
 # Sonowand Sintef Cooperation C++ Library 
 # =========================================================
 
+enable_testing()
+
 add_subdirectory(Library)
 add_subdirectory(Test)
