@@ -11,6 +11,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkRenderWindowInteractor.h>
 
+#include "sscTestUtilities.h"
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscVolumetricRep.h"
@@ -87,11 +88,8 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 	widget->setLayout(layout);
 
 	//Create the objects
-	std::string testFile1 = //"/Users/frankl/fl/dev/Repository/data/nevro/MetaImage/3DT1.mhd";
-	                       //"/Users/frankl/fl/dev2/cvsStable/ssc/Test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd";
-	                       "/Users/jbake/jbake/dev/ssc/Test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd";
-	                       //"/home/christiana/snw2_trunk/C_code/SonowandSintefCooperation/test/TestData/Fantomer/Kaisa/MetaImage/Kaisa.mhd"
-	std::string testFile2 =  "/Users/jbake/jbake/dev/CustusXData/nevro/MetaImage/3DT1.mhd";
+	std::string testFile1 = TestUtilities::ExpandDataFileName("/Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	std::string testFile2 = TestUtilities::ExpandDataFileName("/MetaImage/20070309T105136_MRT1.mhd");
 
 	mImagePtr1 = DataManager::instance()->loadImage(testFile1, rtMETAIMAGE);
 	mImagePtr2 = DataManager::instance()->loadImage(testFile2, rtMETAIMAGE);

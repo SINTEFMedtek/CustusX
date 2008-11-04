@@ -71,7 +71,7 @@ else( QT_USE_FILE )
 endif( QT_USE_FILE )
 
 
-include_directories( ${SNW_INCLUDE_DIRS} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
+include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
 link_directories( ${SNW_LIBRARY_DIRS} )
 
 # clear variables; Qt appends to these vars
@@ -86,7 +86,17 @@ QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SNW_QT_RESOURCE_FILES} )
 # =========================================================
 # stuff
 # =========================================================
-
+# Configure the default SSC_DATA_ROOT for the location of SSCData.
+FIND_PATH(SSC_DATA_ROOT SSCData.readme 
+  ${SSC_SOURCE_DIR}/Test/TestData
+  ${SSC_SOURCE_DIR}/../Test/TestData
+  ${SSC_SOURCE_DIR}/../../Test/TestData 
+  $ENV{SSC_DATA_ROOT})
+  
+configure_file(
+  "${SSC_SOURCE_DIR}/Utilities/sscConfig.h.in"
+  "${SSC_BINARY_DIR}/sscConfig.h"
+  )
 
 # =========================================================
 # create output variables
