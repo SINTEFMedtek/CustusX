@@ -1,2 +1,0 @@
-#define SSC_DATA_ROOT "${PROJECT_SOURCE_DIR}/Test/TestData/"
-
