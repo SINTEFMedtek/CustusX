@@ -3,8 +3,12 @@
 
 #include "sscTestUtilities.h"
 
-/** Test app for SSC
- */
+//#include "sscDataManager.h"
+//#include "sscImage.h"
+
+//namespace ssc
+//{
+
 int main(int argc, char **argv)
 {
 
@@ -17,6 +21,9 @@ int main(int argc, char **argv)
 	std::cout << testFile2 << std::endl;
 	std::cout << testFile3 << std::endl;
 
+	//ImagePtr image1 = DataManager::instance()->loadImage(testFile1, rtMETAIMAGE);
 
 	return 0;
 }
+
+//}//namespace ssc
