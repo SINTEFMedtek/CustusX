@@ -10,7 +10,7 @@ typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 
 namespace ssc
 {
-typedef boost::shared_ptr<class ToolRep3D> ToolRepPtr;
+typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 
 class ToolRep3D : public RepImpl
 {
