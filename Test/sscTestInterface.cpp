@@ -70,7 +70,7 @@ void TestInterface::testDummyToolAndDummyToolManager()
 
 	ToolPtr tool = mToolmanager->getDominantTool();
 
-	ToolRepPtr toolRep = ToolRepPtr(new ToolRep3D(tool->getUid(),tool->getName(),tool));
+	ToolRep3DPtr toolRep = ToolRep3DPtr(new ToolRep3D(tool->getUid(),tool->getName(),tool));
 
 	mView1->setRep(toolRep);
 
@@ -209,7 +209,6 @@ void TestInterface::setRep(int i)
 }
 void TestInterface::setView(int i)
 {
-	std::cout << "setView(" << i << ")" << std::endl;
 	switch (i)
 	{
 	case 1:

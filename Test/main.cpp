@@ -2,7 +2,6 @@
 
 #include <QApplication>
 
-#include "sscTestUtilities.h"
 #include "sscTestInterface.h"
 
 /** Test app for SSC
