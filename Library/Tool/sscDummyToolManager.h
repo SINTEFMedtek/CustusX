@@ -19,7 +19,7 @@ class DummyToolManager : public ToolManager
 {
 	Q_OBJECT
 public:
-	typedef std::set<DummyToolPtr> DummyToolSet;
+	typedef std::map<std::string, DummyToolPtr> DummyToolMap;
 
 	static ToolManager* getInstance();
 
@@ -32,8 +32,8 @@ public:
 	virtual void startTracking();
 	virtual void stopTracking();
 
-	virtual ToolSet getConfiguredTools();
-	virtual ToolSet getTools();
+	virtual ToolMap getConfiguredTools();
+	virtual ToolMap getTools();
 	virtual ToolPtr getTool(const std::string& uid);
 
 	virtual ToolPtr getDominantTool();
@@ -48,12 +48,13 @@ public:
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "");
 
 private:
-	typedef DummyToolSet::iterator DummyToolSetIter;
+	typedef DummyToolMap::iterator DummyToolMapIter;
+	typedef DummyToolMap::const_iterator DummyToolMapConstIter;
 
 	DummyToolManager();
 	~DummyToolManager();
 
-	DummyToolSet mDummyTools;
+	DummyToolMap mDummyTools;
 	DummyToolPtr mDominantTool;
 	DummyToolPtr mReferenceTool;
 

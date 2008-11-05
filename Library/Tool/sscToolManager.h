@@ -1,7 +1,6 @@
 #ifndef SSCTOOLMANAGER_H_
 #define SSCTOOLMANAGER_H_
 
-#include <set>
 #include <map>
 #include <vector>
 #include <QObject>
@@ -15,7 +14,7 @@ class ToolManager : public QObject
 {
 	Q_OBJECT
 public:
-	typedef std::set<ToolPtr> ToolSet;
+	typedef std::map<std::string, ToolPtr> ToolMap;
 
 	static void setInstance(ToolManager* instance)
 	{
@@ -31,8 +30,8 @@ public:
 	virtual void startTracking() = 0;
 	virtual void stopTracking() = 0;
 
-	virtual ToolSet getConfiguredTools() = 0; ///< get all configured tools
-	virtual ToolSet getTools() = 0; ///< get connected tools
+	virtual ToolMap getConfiguredTools() = 0; ///< get all configured tools
+	virtual ToolMap getTools() = 0; ///< get connected tools
 	virtual ToolPtr getTool(const std::string& uid) = 0;
 
 	virtual ToolPtr getDominantTool() = 0;

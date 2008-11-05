@@ -23,7 +23,8 @@ DummyToolManager::DummyToolManager() :
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
 
-	mDummyTools.insert(tool1);
+	mDummyTools.insert(std::pair<std::string, DummyToolPtr>(tool1->getUid(),
+                                                            tool1));
 }
 DummyToolManager::~ DummyToolManager()
 {}
@@ -55,10 +56,10 @@ void DummyToolManager::startTracking()
 	mIsTracking = true;
 	emit trackingStarted();
 
-	DummyToolSetIter it = mDummyTools.begin();
+	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
-		(*it)->startTracking();
+		((*it).second)->startTracking();
 		it++;
 	}
 
@@ -68,33 +69,44 @@ void DummyToolManager::stopTracking()
 	mIsTracking = false;
 	emit trackingStopped();
 
-	DummyToolSetIter it = mDummyTools.begin();
+	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
-		(*it)->stopTracking();
+		((*it).second)->stopTracking();
 		it++;
 	}
 }
 
-ToolManager::ToolSet DummyToolManager::getConfiguredTools()
+ToolManager::ToolMap DummyToolManager::getConfiguredTools()
 {
-	//return mDummyTools;
+	//Is there a better way to do this?
+	ToolMap retval;
+	DummyToolMapIter it = mDummyTools.begin();
+	while(it != mDummyTools.end())
+	{
+		retval.insert(std::pair<std::string, ToolPtr>
+                     (((*it).first), (ToolPtr)((*it).second)));
+		it++;
+	}
+	return retval;
 }
-ToolManager::ToolSet DummyToolManager::getTools()
+ToolManager::ToolMap DummyToolManager::getTools()
 {
-	//return mDummyTools;
+	//Is there a better way to do this?
+	ToolMap retval;
+	DummyToolMapIter it = mDummyTools.begin();
+	while(it != mDummyTools.end())
+	{
+		retval.insert(std::pair<std::string, ToolPtr>
+                     (((*it).first), (ToolPtr)((*it).second)));
+		it++;
+	}
+	return retval;
 }
 ToolPtr DummyToolManager::getTool(const std::string& uid)
 {
-	DummyToolSetIter it = mDummyTools.begin();
-	while(it != mDummyTools.end())
-	{
-		if((*it)->getUid() == uid)
-		{
-			return (*it);
-		}
-		it++;
-	}
+	DummyToolMapConstIter it = mDummyTools.find(uid);
+	return (*it).second;
 }
 
 ToolPtr DummyToolManager::getDominantTool()
@@ -103,24 +115,19 @@ ToolPtr DummyToolManager::getDominantTool()
 }
 void DummyToolManager::setDominantTool(const std::string& uid)
 {
-	DummyToolSetIter it = mDummyTools.begin();
-	while(it != mDummyTools.end())
-	{
-		if((*it)->getUid() == uid)
-		{
-			mDominantTool = (*it);
-		}
-		it++;
-	}
+	DummyToolMapConstIter it = mDummyTools.find(uid);
+	mDominantTool = (*it).second;
 }
 
 std::map<std::string, std::string> DummyToolManager::getToolUidsAndNames() const
 {
 	std::map<std::string, std::string> uidsAndNames;
-	DummyToolSetIter it = mDummyTools.begin();
+
+	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
-		uidsAndNames.insert(std::pair<std::string, std::string>((*it)->getUid(), (*it)->getName()));
+		uidsAndNames.insert(std::pair<std::string, std::string>(
+                           ((*it).second)->getUid(),((*it).second)->getName()));
 		it++;
 	}
 	return uidsAndNames;
@@ -128,10 +135,10 @@ std::map<std::string, std::string> DummyToolManager::getToolUidsAndNames() const
 std::vector<std::string> DummyToolManager::getToolNames() const
 {
 	std::vector<std::string> names;
-	DummyToolSetIter it = mDummyTools.begin();
+	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
-		names.push_back((*it)->getName());
+		names.push_back(((*it).second)->getName());
 		it++;
 	}
 	return names;
@@ -139,10 +146,10 @@ std::vector<std::string> DummyToolManager::getToolNames() const
 std::vector<std::string> DummyToolManager::getToolUids() const
 {
 	std::vector<std::string> uids;
-	DummyToolSetIter it = mDummyTools.begin();
+	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
-		uids.push_back((*it)->getUid());
+		uids.push_back(((*it).second)->getUid());
 		it++;
 	}
 	return uids;
@@ -158,10 +165,10 @@ ToolPtr DummyToolManager::getReferenceTool() const
 }
 void DummyToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
 {
-	DummyToolSetIter it = mDummyTools.begin();
+	DummyToolMapConstIter it = mDummyTools.begin();
 	while(it != mDummyTools.end())
 	{
-		(*it)->saveTransformsAndTimestamps();
+		((*it).second)->saveTransformsAndTimestamps();
 		it++;
 	}
 }
