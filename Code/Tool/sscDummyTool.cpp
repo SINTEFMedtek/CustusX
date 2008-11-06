@@ -65,8 +65,6 @@ bool DummyTool::getVisible() const
 {
 	return mVisible;
 }
-//bool DummyTool::getConnected() const
-//{}
 std::string DummyTool::getUid() const
 {
 	return mUid;
@@ -79,8 +77,7 @@ void DummyTool::startTracking()
 {
 	mTimer->start(33);
 
-	VisibleEventArgumentPtr visible(new Tool::VisibleEventArgument());
-	visible->visible = true;
+	bool visible = true;
 
 	emit toolVisible(visible);
 }
@@ -88,19 +85,17 @@ void DummyTool::stopTracking()
 {
 	mTimer->stop();
 
-	VisibleEventArgumentPtr visible(new Tool::VisibleEventArgument());
-	visible->visible = false;
+	bool visible = false;
 	emit toolVisible(visible);
 }
 void DummyTool::sendTransform()
 {
 	QDateTime time;
 
-	TransformAndTimestampEventArgumentPtr payload(new Tool::TransformAndTimestampEventArgument);
-	payload->matrix = *getNextTransform();
-	payload->timestamp = (double) time.time().msec();
+	Transform3D matrix = *getNextTransform();
+	double timestamp = (double) time.time().msec();
 
-	emit toolTransformAndTimestamp(payload);
+	emit toolTransformAndTimestamp(matrix, timestamp);
 }
 void DummyTool::createPolyData()
 {

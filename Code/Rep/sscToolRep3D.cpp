@@ -44,12 +44,12 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mToolActor.GetPointer());
 }
-void ToolRep3D::receiveTransforms(Tool::TransformAndTimestampEventArgumentPtr payload)
+void ToolRep3D::receiveTransforms(Transform3D matrix, double timestamp)
 {
-	mToolActor->SetUserMatrix(payload->matrix.matrix().GetPointer());
+	mToolActor->SetUserMatrix(matrix.matrix().GetPointer());
 }
-void ToolRep3D::receiveVisible(Tool::VisibleEventArgumentPtr visible)
+void ToolRep3D::receiveVisible(bool visible)
 {
-	mToolActor->SetVisibility(visible->visible);
+	mToolActor->SetVisibility(visible);
 }
 } // namespace ssc

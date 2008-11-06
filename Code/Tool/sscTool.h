@@ -40,31 +40,6 @@ public:
 		TOOL_US_PROBE
 	};
 	virtual Type getType() const = 0;
-
-	/**Events available from the object, via
-	 * the vtk event mechanism.
-	 */
-	enum
-	{
-		TOOL_TRANSFORM_AND_TIMESTAMP_EVENT = 1200,
-		TOOL_VISIBLE_EVENT,
-	} Event;
-	/**Argument for the event TOOL_TRANSFORM_AND_TIMESTAMP_EVENT
-	 */
-	struct TransformAndTimestampEventArgument
-	{
-		Transform3D matrix;
-		double timestamp; ///< TODO format ???
-	};
-	typedef boost::shared_ptr<TransformAndTimestampEventArgument> TransformAndTimestampEventArgumentPtr;
-	/**Argument for the event TOOL_VISIBLE_EVENT
-	 */
-	struct VisibleEventArgument
-	{
-		bool visible;
-	};
-	typedef boost::shared_ptr<VisibleEventArgument> VisibleEventArgumentPtr;
-
 	/**\return a file containing a graphical description of the tool,
 	 * if any. The file format is given by the file extension, for example
 	 * usprobe_12L.stl for the SolidWorks format.
@@ -84,13 +59,12 @@ public:
 	virtual void setTransformSaveFile(const std::string& filename) = 0;
 	virtual Transform3DPtr get_prMt() const = 0; ///< \return transform from tool to patient ref space
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
-	//virtual bool getConnected() const = 0; ///< tool is connected to hardware
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
 
 signals:
-	void toolTransformAndTimestamp(Tool::TransformAndTimestampEventArgumentPtr payload);
-	void toolVisible(Tool::VisibleEventArgumentPtr visible);
+	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
+	void toolVisible(bool visible);
 
 protected:
 	std::string mUid;

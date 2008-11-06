@@ -16,6 +16,7 @@ class ToolManager : public QObject
 public:
 	typedef std::map<std::string, ToolPtr> ToolMap;
 
+	/** not sure if this is needed? we have getInstance in subclasses...*/
 	static void setInstance(ToolManager* instance)
 	{
 		mInstance = instance;
@@ -25,37 +26,38 @@ public:
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
 	virtual bool isTracking() const = 0; ///< system is tracking
 
-	virtual void configure() = 0;
-	virtual void initialize() = 0;
-	virtual void startTracking() = 0;
-	virtual void stopTracking() = 0;
+	virtual void configure() = 0; ///< get the system ready without connecting to the tracking hardware
+	virtual void initialize() = 0; ///< connect the system to the tracking hardware
+	virtual void startTracking() = 0; ///< start tracking
+	virtual void stopTracking() = 0; ///< stop tracking
 
 	virtual ToolMap getConfiguredTools() = 0; ///< get all configured tools
 	virtual ToolMap getTools() = 0; ///< get connected tools
-	virtual ToolPtr getTool(const std::string& uid) = 0;
+	virtual ToolPtr getTool(const std::string& uid) = 0; ///< get a tool
 
-	virtual ToolPtr getDominantTool() = 0;
-	virtual void setDominantTool(const std::string& uid) = 0;
+	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking
+	virtual void setDominantTool(const std::string& uid) = 0; ///< set a tool to be the dominant tool
 
-	virtual std::map<std::string, std::string> getToolUidsAndNames() const = 0;
-	virtual std::vector<std::string> getToolNames() const = 0;
-	virtual std::vector<std::string> getToolUids() const = 0;
+	virtual std::map<std::string, std::string> getToolUidsAndNames() const = 0; ///< get all tools uids and names
+	virtual std::vector<std::string> getToolNames() const = 0; ///< get the name of all tools
+	virtual std::vector<std::string> getToolUids() const = 0; ///< get the uid of all the tools
 
 	virtual Transform3DPtr get_rMpr() const = 0; ///< transform from patient ref to ref space
-	virtual ToolPtr getReferenceTool() const = 0;
+	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
+	/** write to file all recorded transforms and timestamps */
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "") = 0;
 
 signals:
-	void configured();
-	void initialized();
-	void trackingStarted();
-	void trackingStopped();
+	void configured(); ///< signal emitted when the system is configured
+	void initialized(); ///< signal emitted when the system is initialized
+	void trackingStarted(); ///< signal emitted when the system starts tracking
+	void trackingStopped(); ///< signal emitted when the system stops tracking
 
 protected:
-	ToolManager(){};
-	~ToolManager(){};
+	ToolManager(){}; ///< Empty on purpose
+	~ToolManager(){}; ///< Empty on purpose
 
-	static ToolManager* mInstance;
+	static ToolManager* mInstance; ///< The only instance of this class that can exist.
 };
 
 //M_r_tool = toolManager->get_M_ref_pat() * currentTool->get_M_pat_tool();

@@ -30,7 +30,6 @@ public:
 	virtual void setTransformSaveFile(const std::string& filename);
 	virtual Transform3DPtr get_prMt() const;
 	virtual bool getVisible() const;
-	//virtual bool getConnected() const;
 	virtual std::string getUid() const;
 	virtual std::string getName() const;
 
@@ -43,7 +42,7 @@ private slots:
 private:
 	void createPolyData();
 	std::vector<Transform3D> createToolPositionMovement() const;
-	Transform3D* getNextTransform();
+	Transform3D* DummyTool::getNextTransform();
 
 	vtkPolyDataPtr mPolyData;
 

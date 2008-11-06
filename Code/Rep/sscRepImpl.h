@@ -26,8 +26,8 @@ public:
 	virtual void disconnectFromView(View *theView);
 	virtual bool isConnectedToView(View *theView) const;
 	void setName(std::string name);
-	std::string getName() const;
-	std::string getUid() const;
+	std::string getName() const; ///< \return a reps name
+	std::string getUid() const; ///< \return a reps unique id
 
 protected:
 	std::set<View *> mViews;
