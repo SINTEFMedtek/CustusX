@@ -17,8 +17,12 @@ project( SSCTestApp )
 # which I cannot get to work properly
 set( SNW_PROJECT_NAME SSCTestApp ) 
 
-set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
+set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/../.. )
 message(STATUS ${PROJECT_SOURCE_DIR}/..)
+
+SET( SNW_QT_MOC_HEADER_FILES
+    sscTestInterface.h
+    )
 
 SET( SNW_HEADER_FILES
     ${SNW_QT_MOC_HEADER_FILES}
@@ -41,19 +45,17 @@ set( SNW_LIBRARIES
     SSC    
      )
 
+# library
+SET( SNW_SOURCE_FILES
+    sscTestInterface.cpp
+    main.cpp
+	) 
 	
 # =========================================================
 # create an executable
-include(${SNW_SOURCE_ROOT_DIR}/CMake/snwPrepareProject.cmake )
+include(${SNW_SOURCE_ROOT_DIR}/CMake/snwAddExecutable.cmake )
 # =========================================================
 
-
-add_executable(TestDataManager sscTestDataManager.cpp)
-target_link_libraries( TestDataManager ${SNW_GENERATED_LIBRARIES} )
-
-	
-add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
-#add_test(TestDataManager ${PROJECT_BINARY_DIR}/TestDataManager)
 
 
 
