@@ -25,7 +25,9 @@ SET( SNW_QT_MOC_HEADER_FILES
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
+    #Tool/cxTool.h  #remove when moved to custusx
     Tool/sscDummyToolManager.h
+    #Tool/cxToolManager.h #remove when moved to custusx
     Rep/sscRep.h
     Rep/sscToolRep3D.h
     )
@@ -65,6 +67,8 @@ SET( SNW_SOURCE_FILES
     Data/sscDataManager.cpp
     Tool/sscDummyToolManager.cpp
     Tool/sscDummyTool.cpp
+    #Tool/cxTool.cpp #remove when moved to custusx
+    #Tool/cxToolManager.cpp #remove when moved to custusx
 	) 
 	
 # =========================================================
