@@ -29,11 +29,11 @@ SET( SNW_HEADER_FILES
     )
 
 set( SNW_INCLUDE_DIRS
-    ${SNW_SOURCE_ROOT_DIR}/Library/
-    ${SNW_SOURCE_ROOT_DIR}/Library/Data/
-    ${SNW_SOURCE_ROOT_DIR}/Library/Rep/
-    ${SNW_SOURCE_ROOT_DIR}/Library/Tool/
-    ${SNW_SOURCE_ROOT_DIR}/Library/Utilities/
+    ${SNW_SOURCE_ROOT_DIR}/Code/
+    ${SNW_SOURCE_ROOT_DIR}/Code/Data/
+    ${SNW_SOURCE_ROOT_DIR}/Code/Rep/
+    ${SNW_SOURCE_ROOT_DIR}/Code/Tool/
+    ${SNW_SOURCE_ROOT_DIR}/Code/Utilities/
     ) 
 message(STATUS ${SNW_SOURCE_ROOT_DIR}/Data/)
 

@@ -10,5 +10,5 @@ endif(COMMAND cmake_policy)
 
 enable_testing()
 
-add_subdirectory(Library)
-add_subdirectory(Test)
+add_subdirectory(Code)
+add_subdirectory(Testing)
