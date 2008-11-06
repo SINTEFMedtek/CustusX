@@ -1,1 +1,1 @@
-#define SSC_DATA_ROOT "@SSC_DATA_ROOT@"
+#define SSC_DATA_ROOT "@SSC_DATA_ROOT@/"
