@@ -88,9 +88,7 @@ QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SNW_QT_RESOURCE_FILES} )
 # =========================================================
 # Configure the default SSC_DATA_ROOT for the location of SSCData.
 FIND_PATH(SSC_DATA_ROOT SSCData.readme 
-  ${SSC_SOURCE_DIR}/Test/TestData
-  ${SSC_SOURCE_DIR}/../Test/TestData
-  ${SSC_SOURCE_DIR}/../../Test/TestData 
+  ${SSC_SOURCE_DIR}/TestData 
   $ENV{SSC_DATA_ROOT})
   
 configure_file(
