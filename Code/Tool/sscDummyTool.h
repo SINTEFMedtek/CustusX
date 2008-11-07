@@ -42,7 +42,7 @@ private slots:
 private:
 	void createPolyData();
 	std::vector<Transform3D> createToolPositionMovement() const;
-	Transform3D* DummyTool::getNextTransform();
+	Transform3D* getNextTransform();
 
 	vtkPolyDataPtr mPolyData;
 

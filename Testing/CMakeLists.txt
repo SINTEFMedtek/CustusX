@@ -5,55 +5,18 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # =========================================================
-# Sonowand Sintef Cooperation C++ Test App 
-# =========================================================
-project( SSCTestApp )
-
-# =========================================================
-# Define variables for paths and include files.
+# Sonowand Sintef Cooperation C++ automated testing directory
 # =========================================================
 
-# Must be the same as the project name. Replaces CMAKE_PROJECT_NAME,
-# which I cannot get to work properly
-set( SNW_PROJECT_NAME SSCTestApp ) 
-
-set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
-message(STATUS ${PROJECT_SOURCE_DIR}/..)
-
-SET( SNW_HEADER_FILES
-    ${SNW_QT_MOC_HEADER_FILES}
-    )
-
-set( SNW_INCLUDE_DIRS
-    ${SNW_SOURCE_ROOT_DIR}/Code/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Data/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Rep/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Tool/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Utilities/
-    ) 
-message(STATUS ${SNW_SOURCE_ROOT_DIR}/Data/)
-
-set(SNW_LIBRARY_DIRS 
-    ${SNW_SOURCE_ROOT_DIR}/
-    )    
-
-set( SNW_LIBRARIES 
-    SSC    
-     )
-
+find_package(SSC REQUIRED)
+include (${SSC_USE_FILE})
 	
-# =========================================================
-# create an executable
-include(${SNW_SOURCE_ROOT_DIR}/CMake/snwPrepareProject.cmake )
-# =========================================================
-
+include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 
 add_executable(TestDataManager sscTestDataManager.cpp)
-target_link_libraries( TestDataManager ${SNW_GENERATED_LIBRARIES} )
-
+target_link_libraries( TestDataManager SSC )
 	
 add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
-#add_test(TestDataManager ${PROJECT_BINARY_DIR}/TestDataManager)
 
 
 

@@ -8,19 +8,17 @@ endif(COMMAND cmake_policy)
 # Sonowand Sintef Cooperation C++ Library 
 # =========================================================
 
-project( SSC )
-
 # =========================================================
 # Define variables for paths and include files.
 # =========================================================
 
 # Must be the same as the project name. Replaces CMAKE_PROJECT_NAME,
 # which I cannot get to work properly
-set( SNW_PROJECT_NAME SSC ) 
+#set( SSC_PROJECT_NAME SSC ) 
 
-set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
+#set( SSC_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
 
-SET( SNW_QT_MOC_HEADER_FILES
+SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
@@ -32,30 +30,39 @@ SET( SNW_QT_MOC_HEADER_FILES
     Rep/sscToolRep3D.h
     )
 
-SET( SNW_HEADER_FILES
-    ${SNW_QT_MOC_HEADER_FILES}
+SET( SSC_HEADER_FILES
+    ${SSC_QT_MOC_HEADER_FILES}
     sscRep.h 
     sscRepImpl.h 
     sscVolumeRep.h
     )
 
-set( SNW_INCLUDE_DIRS
-    .
-    Data
-    Rep
-    Tool
-    Utilities
+
+set( SSC_INCLUDE_DIRS
+    ${SSC_SOURCE_DIR}/Code/  
+    ${SSC_SOURCE_DIR}/Code/Data/
+    ${SSC_SOURCE_DIR}/Code/Rep/
+    ${SSC_SOURCE_DIR}/Code/Tool/
+    ${SSC_SOURCE_DIR}/Code/Utilities/
     ) 
 
-set(SNW_LIBRARY_DIRS 
+#set( SSC_INCLUDE_DIRS
+#    .
+#    Data
+#    Rep
+#    Tool
+#    Utilities
+#    ) 
+
+set(SSC_LIBRARY_DIRS 
     )    
 
-set( SNW_LIBRARIES 
+set( SSC_LIBRARIES 
     QVTK    
      )
 
 # library
-SET( SNW_SOURCE_FILES
+SET( SSC_SOURCE_FILES
     Utilities/sscBoundingBox3D.cpp
     Utilities/sscVector3D.cpp
     Utilities/sscTransform3D.cpp 
@@ -72,8 +79,106 @@ SET( SNW_SOURCE_FILES
 	) 
 	
 # =========================================================
-# create a library
-include(${SNW_SOURCE_ROOT_DIR}/CMake/snwAddLibrary.cmake )
+# =========================================================
+#message( STATUS "processing project " ${SSC_PROJECT_NAME} "...")
+
+# add gcc definitions for all projects
+add_definitions( -g  )
+
+# boost
+find_package( Boost REQUIRED )
+
+# =========================================================
+# vtk
+# =========================================================
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
+set( SSC_VTK_LIBRARIES 
+    vtkIO 
+    vtkRendering 
+    vtkImaging 
+    vtkCommon 
+    vtkHybrid 
+    vtkWidgets 
+    vtkFiltering 
+    vtkVolumeRendering  
+    )
+
+# =========================================================
+# qt
+# =========================================================
+find_package( Qt4 REQUIRED )
+set(QT_USE_QTNETWORK 1)
+set(QT_USE_QTXML 1)
+include( ${QT_USE_FILE} )
+
+# clear variables; Qt appends to these vars
+set( UI_HEADER_FILES )
+set( MOC_HEADER_FILES )
+set( GENERATED_RESOURCES )
+
+QT4_WRAP_UI( UI_HEADER_FILES ${SSC_QT_UI_FILES} )
+QT4_WRAP_CPP( MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} )
+QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SSC_QT_RESOURCE_FILES} )
+
+# =========================================================
+# stuff
+# =========================================================
+# Configure the default SSC_DATA_ROOT for the location of SSCData.
+FIND_PATH(SSC_DATA_ROOT sscData.readme 
+  ${SSC_SOURCE_DIR}/Data
+  $ENV{SSC_DATA_ROOT})
+  
+configure_file(
+  "${SSC_SOURCE_DIR}/Code/Utilities/sscConfig.h.in"
+  "${SSC_BINARY_DIR}/sscConfig.h"
+  )
+
+# =========================================================
+# create output variables
+# =========================================================
+
+set( SSC_GENERATED_SOURCE_FILES
+	${UI_HEADER_FILES} 
+	${MOC_HEADER_FILES} 
+	${SSC_SOURCE_FILES} 
+	${GENERATED_RESOURCES} )
+
+set( SSC_GENERATED_LIBRARIES
+	${QT_LIBRARIES} 
+	${SSC_VTK_LIBRARIES}
+	${SSC_LIBRARIES} )
+# =========================================================
+
+include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
+link_directories( ${SSC_LIBRARY_DIRS} )
+
+# =========================================================
+# create the target
+add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
+target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
+# =========================================================
+# =========================================================
+
+
+# =========================================================
+# 
+# Configure the file describing how to use SSC
+#get_target_property (SSC_LIBRARY SSC LOCATION)
+#set (SSC_INCLUDE ${PROJECT_BINARY_DIR}/include)
+
+set (SSC_DIR ${SSC_BINARY_DIR} CACHE PATH "where to find the SSC cmake")
+
+configure_file (
+	"${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
+	"${PROJECT_BINARY_DIR}/SSCConfig.cmake"
+	)
+# Export our build settings and library dependencies
+include (CMakeExportBuildSettings)
+cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)
+export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
+
 # =========================================================
 
 

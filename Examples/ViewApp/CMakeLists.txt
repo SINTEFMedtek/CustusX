@@ -7,55 +7,31 @@ endif(COMMAND cmake_policy)
 # =========================================================
 # Sonowand Sintef Cooperation C++ Test App 
 # =========================================================
-project( SSCTestApp )
 
-# =========================================================
-# Define variables for paths and include files.
-# =========================================================
+find_package(SSC REQUIRED)
+include (${SSC_USE_FILE})
 
-# Must be the same as the project name. Replaces CMAKE_PROJECT_NAME,
-# which I cannot get to work properly
-set( SNW_PROJECT_NAME SSCTestApp ) 
-
-set( SNW_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/../.. )
-message(STATUS ${PROJECT_SOURCE_DIR}/..)
-
-SET( SNW_QT_MOC_HEADER_FILES
+SET( SSCTestApp_QT_MOC_HEADER_FILES
     sscTestInterface.h
     )
 
-SET( SNW_HEADER_FILES
-    ${SNW_QT_MOC_HEADER_FILES}
-    )
-
-set( SNW_INCLUDE_DIRS
-    ${SNW_SOURCE_ROOT_DIR}/Code/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Data/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Rep/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Tool/
-    ${SNW_SOURCE_ROOT_DIR}/Code/Utilities/
-    ) 
-message(STATUS ${SNW_SOURCE_ROOT_DIR}/Data/)
-
-set(SNW_LIBRARY_DIRS 
-    ${SNW_SOURCE_ROOT_DIR}/
-    )    
-
-set( SNW_LIBRARIES 
-    SSC    
-     )
-
 # library
-SET( SNW_SOURCE_FILES
+SET( SSCTestApp_SOURCE_FILES
     sscTestInterface.cpp
     main.cpp
 	) 
 	
+include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
+	
+# clear variables; Qt appends to these vars
+set( MOC_HEADER_FILES )
+QT4_WRAP_CPP( MOC_HEADER_FILES ${SSCTestApp_QT_MOC_HEADER_FILES} )
+		
 # =========================================================
-# create an executable
-include(${SNW_SOURCE_ROOT_DIR}/CMake/snwAddExecutable.cmake )
+# create the target
+add_executable( SSCTestApp ${MOC_HEADER_FILES} ${SSCTestApp_SOURCE_FILES} )
+target_link_libraries( SSCTestApp SSC )
 # =========================================================
-
 
 
 

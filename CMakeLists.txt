@@ -8,6 +8,8 @@ endif(COMMAND cmake_policy)
 # Sonowand Sintef Cooperation C++ Library 
 # =========================================================
 
+project( SSC )
+
 enable_testing()
 
 add_subdirectory(Code)
