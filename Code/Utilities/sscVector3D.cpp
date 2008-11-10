@@ -98,7 +98,7 @@ Vector3D Vector3D::normal() const
  */
 double Vector3D::length() const
 {
-	double tmp;
+	double tmp = 0.0;
 	for (const_iterator i=begin(); i!=end(); ++i)
 	tmp += (*i) * (*i);
 	return sqrt(tmp);
