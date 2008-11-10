@@ -59,7 +59,7 @@ void DummyTool::setTransformSaveFile(const std::string& filename)
 {
 	mTransformSaveFileName = filename;
 }
-Transform3DPtr DummyTool::get_prMt() const
+Transform3D DummyTool::get_prMt() const
 {}
 bool DummyTool::getVisible() const
 {

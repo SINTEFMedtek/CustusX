@@ -28,7 +28,7 @@ public:
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps();
 	virtual void setTransformSaveFile(const std::string& filename);
-	virtual Transform3DPtr get_prMt() const;
+	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
 	virtual std::string getUid() const;
 	virtual std::string getName() const;

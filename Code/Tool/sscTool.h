@@ -57,7 +57,7 @@ public:
 	/**Which file to use when calling saveTransformsAndTimestamps().
 	 */
 	virtual void setTransformSaveFile(const std::string& filename) = 0;
-	virtual Transform3DPtr get_prMt() const = 0; ///< \return transform from tool to patient ref space
+	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
