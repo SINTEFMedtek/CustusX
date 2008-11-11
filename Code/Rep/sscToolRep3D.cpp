@@ -22,11 +22,11 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name, ToolPtr to
 	mPolyDataMapper->SetInput(mTool->getGraphicsPolyData());
 	mToolActor->SetMapper(mPolyDataMapper);
 
-	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Tool::TransformAndTimestampEventArgumentPtr)),
-			this, SLOT(receiveTransforms(Tool::TransformAndTimestampEventArgumentPtr)));
+	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+			this, SLOT(receiveTransforms(Transform3D, double)));
 
-	connect(mTool.get(), SIGNAL(toolVisible(Tool::VisibleEventArgumentPtr)),
-			this, SLOT(receiveVisible(Tool::VisibleEventArgumentPtr)));
+	connect(mTool.get(), SIGNAL(toolVisible(bool)),
+			this, SLOT(receiveVisible(bool)));
 }
 
 ToolRep3D::~ToolRep3D()

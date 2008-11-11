@@ -3,6 +3,7 @@
 
 #include <map>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "sscTransform3D.h"
 #include "sscTool.h"
@@ -15,6 +16,7 @@ class ToolManager : public QObject
 	Q_OBJECT
 public:
 	typedef std::map<std::string, ToolPtr> ToolMap;
+	typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
 	/** not sure if this is needed? we have getInstance in subclasses...*/
 	static void setInstance(ToolManager* instance)
@@ -31,8 +33,8 @@ public:
 	virtual void startTracking() = 0; ///< start tracking
 	virtual void stopTracking() = 0; ///< stop tracking
 
-	virtual ToolMap getConfiguredTools() = 0; ///< get all configured tools
-	virtual ToolMap getTools() = 0; ///< get connected tools
+	virtual ToolMapPtr getConfiguredTools() = 0; ///< get all configured tools
+	virtual ToolMapPtr getTools() = 0; ///< get connected tools
 	virtual ToolPtr getTool(const std::string& uid) = 0; ///< get a tool
 
 	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking

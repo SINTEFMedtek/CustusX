@@ -38,9 +38,6 @@ DummyTool::~DummyTool()
 {}
 Tool::Type DummyTool::getType() const
 {
-	//TODO: Where is it determined what Type a tool is?
-	//Inheritance?
-	//setType()?
 	return TOOL_NONE;
 }
 std::string DummyTool::getGraphicsFileName() const

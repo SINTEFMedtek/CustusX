@@ -20,6 +20,7 @@ class DummyToolManager : public ToolManager
 	Q_OBJECT
 public:
 	typedef std::map<std::string, DummyToolPtr> DummyToolMap;
+	typedef boost::shared_ptr<DummyToolMap> DummyToolMapPtr;
 
 	static ToolManager* getInstance();
 
@@ -32,8 +33,8 @@ public:
 	virtual void startTracking();
 	virtual void stopTracking();
 
-	virtual ToolMap getConfiguredTools();
-	virtual ToolMap getTools();
+	virtual ToolMapPtr getConfiguredTools();
+	virtual ToolMapPtr getTools();
 	virtual ToolPtr getTool(const std::string& uid);
 
 	virtual ToolPtr getDominantTool();
@@ -54,7 +55,7 @@ private:
 	DummyToolManager();
 	~DummyToolManager();
 
-	DummyToolMap mDummyTools;
+	DummyToolMapPtr mDummyTools;
 	DummyToolPtr mDominantTool;
 	DummyToolPtr mReferenceTool;
 
