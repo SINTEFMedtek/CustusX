@@ -1,6 +1,9 @@
 #ifndef SSCUTILHELPERS_H_
 #define SSCUTILHELPERS_H_
 
+#include <sstream>
+#include <iomanip>
+
 /**stream the range |begin,end> to the ostream.
  * insert separator between each element..
  */
@@ -8,10 +11,17 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 {
 	if (begin==end)
 		return s;
-	s << *begin;
+
+	std::ostringstream ss; // avoid changing state of input stream
+	ss << std::setprecision(3) << std::fixed;
+	
+	ss << std::setw(10) << *begin;
 	++begin;
 	for (; begin!=end; ++begin)
-		s << separator << *begin;
+		ss << separator << std::setw(10) << *begin;
+	
+	s << ss.str();
+	
 	return s;
 }
 // --------------------------------------------------------

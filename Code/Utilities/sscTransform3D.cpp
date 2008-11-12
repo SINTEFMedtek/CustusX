@@ -92,18 +92,23 @@ std::ostream& Transform3D::put(std::ostream& s, int indent, char newline) const
 {
 	std::string ind(indent, ' ');
 
+	std::ostringstream ss; // avoid changing state of input stream
+	ss << setprecision(3) << std::fixed;
+	
 	for (unsigned i=0; i<4; ++i)
 	{
-		s << ind;
+		ss << ind;
 		for (unsigned j=0; j<4; ++j)
 		{
-			s << mMatrix->GetElement(i,j) << " ";
+			ss << setw(10) << mMatrix->GetElement(i,j) << " ";
 		}
 		if (i!=3)
 		{
-			s << newline;
+			ss << newline;
 		}
 	}
+	
+	s << ss.str();
 	
 	return s;
 }
