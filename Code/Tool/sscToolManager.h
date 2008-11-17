@@ -20,9 +20,10 @@ public:
 
 	/** not sure if this is needed? we have getInstance in subclasses...*/
 	static void setInstance(ToolManager* instance)
-	{
+	{	
 		mInstance = instance;
 	};
+	static ToolManager* getInstance() { return mInstance; }	
 
 	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
@@ -54,7 +55,8 @@ signals:
 	void initialized(); ///< signal emitted when the system is initialized
 	void trackingStarted(); ///< signal emitted when the system starts tracking
 	void trackingStopped(); ///< signal emitted when the system stops tracking
-
+	void dominantToolChanged(const std::string& uId); ///<signal for change of dominant tool
+	
 protected:
 	ToolManager(){}; ///< Empty on purpose
 	~ToolManager(){}; ///< Empty on purpose
