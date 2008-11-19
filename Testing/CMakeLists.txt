@@ -13,10 +13,12 @@ include (${SSC_USE_FILE})
 	
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 
-add_executable(TestDataManager sscTestDataManager.cpp)
-target_link_libraries( TestDataManager SSC )
-	
-add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
+add_executable(TestRender sscTestRender.cpp)
+target_link_libraries( TestRender SSC )	
+add_test(TestRender ${EXECUTABLE_OUTPUT_PATH}/TestRender)
 
+add_executable(TestDataManager sscTestDataManager.cpp)
+target_link_libraries( TestDataManager SSC )	
+add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
 
 
