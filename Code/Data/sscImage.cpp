@@ -1,5 +1,11 @@
 #include "sscImage.h"
 
+#include <vtkImageReslice.h>
+#include <vtkImageData.h>
+#include <vtkMatrix4x4.h>
+
+//#define USE_TRANSFORM_RESCLICER
+
 namespace ssc
 {
 
@@ -7,13 +13,22 @@ Image::~Image()
 {
 }
 
-Image::Image(const std::string& uid, const vtkImageDataPtr& data) : mUid(uid), mName(uid), mImageData(data)
+Image::Image(const std::string& uid, const vtkImageDataPtr& data) : 
+	mUid(uid), mName(uid), mBaseImageData(data)
 {
+	mOutputImageData = mBaseImageData;
+#ifdef USE_TRANSFORM_RESCLICER
+	mOrientator = vtkImageReslicePtr::New();
+	mOrientator->SetInput(mBaseImageData);
+	mOutputImageData = mOrientator->GetOutput();
+	mOutputImageData->Update();
+	mOutputImageData->UpdateInformation();	
+#endif
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
-	mImageData = data;
+	mBaseImageData = data;
 }
 void Image::setName(const std::string& name)
 {
@@ -23,6 +38,12 @@ void Image::setName(const std::string& name)
 void Image::setTransform(const Transform3D& trans)
 {
 	mTransform = trans;
+	
+#ifdef USE_TRANSFORM_RESCLICER
+	mOrientator->SetResliceAxes(mTransform.matrix());	
+	mOutputImageData->Update();
+	mOutputImageData->UpdateInformation();
+#endif
 }
 
 std::string Image::getUid() const
@@ -45,9 +66,14 @@ REGISTRATION_STATUS Image::getRegistrationStatus() const
 	return rsNOT_REGISTRATED;
 }
 
-vtkImageDataPtr Image::getVtkImageData()
+vtkImageDataPtr Image::getBaseVtkImageData()
 {
-	return mImageData;
+	return mBaseImageData;
+}
+
+vtkImageDataPtr Image::getRefVtkImageData()
+{
+	return mOutputImageData;
 }
 
 vtkPointsPtr Image::getLandmarks()

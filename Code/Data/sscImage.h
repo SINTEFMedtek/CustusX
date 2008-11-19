@@ -7,6 +7,7 @@
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 
 #include "sscData.h"
@@ -35,7 +36,8 @@ public:
 	virtual Transform3D getTransform() const;
 	virtual REGISTRATION_STATUS getRegistrationStatus() const;
 
-	virtual vtkImageDataPtr getVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
+	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
+	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkPointsPtr getLandmarks(); ///< \return all landmarks defined on the image.
 //	virtual vtkLookupTablePtr getLut() const = 0;
 
@@ -44,11 +46,14 @@ public:
 private:
 	std::string mUid;
 	std::string mName;
-	Transform3D mTransform;
+	Transform3D mTransform; ///< the transform from data to reference space
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 
-	vtkImageDataPtr mImageData;
+	vtkImageDataPtr mBaseImageData; ///< image data in data space
+	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata  	
+	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
+
 	vtkPointsPtr mLandmarks;
 };
 

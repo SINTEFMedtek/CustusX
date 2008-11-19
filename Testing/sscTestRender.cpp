@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 
 #include <vtkImageData.h>
 #include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include <QtGui>
 
 #include "sscTestUtilities.h"
@@ -52,15 +54,28 @@ int main(int argc, char **argv)
 	rep->setImage(image1);
 	view->setRep(rep);
 		
+	mainWindow.resize(QSize(500,500));
 	mainWindow.show();
-
-	for (unsigned i=0; i<8; ++i)
+	view->getRenderer()->ResetCamera();	
+		
+	for (unsigned i=0; i<5; ++i)
 	{
 		doRender(view->getRenderWindow());
 	}
 	
+//#define USE_TRANSFORM_RESCLICER
+#ifdef USE_TRANSFORM_RESCLICER
+	// this code is meant for testing the reslicer in ssc::Image
+	std::cout << "rotating the image data..." << std::endl;
+	image1->setTransform(ssc::createTransformRotateZ(1.0*M_PI/8.0));
+	doRender(view->getRenderWindow());
+	image1->setTransform(ssc::createTransformRotateZ(2.0*M_PI/8.0));
+	doRender(view->getRenderWindow());
+	image1->setTransform(ssc::createTransformRotateZ(3.0*M_PI/8.0));
+	doRender(view->getRenderWindow());
+#endif	
 	std::cout << "Uid       : " << image1->getUid() << std::endl;
-	//app.exec();
+//	app.exec();
 
 	return 0;
 }

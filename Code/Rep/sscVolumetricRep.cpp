@@ -61,7 +61,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	mImage = image;
 	mImage->connectRep(mSelf);
 
-	mTextureMapper3D->SetInput( image->getVtkImageData() );
+	mTextureMapper3D->SetInput( image->getRefVtkImageData() );
 }
 //void VolumeRep::addImage(ImagePtr image)
 //{}
