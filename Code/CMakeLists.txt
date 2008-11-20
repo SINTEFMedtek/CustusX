@@ -66,6 +66,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscBoundingBox3D.cpp
     Utilities/sscVector3D.cpp
     Utilities/sscTransform3D.cpp 
+    Utilities/sscSliceComputer.cpp 
     sscView.cpp
     Rep/sscRepImpl.cpp
     Rep/sscVolumetricRep.cpp

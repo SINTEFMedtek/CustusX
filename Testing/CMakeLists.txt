@@ -21,4 +21,9 @@ add_executable(TestDataManager sscTestDataManager.cpp)
 target_link_libraries( TestDataManager SSC )	
 add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
 
+add_executable(sscTestCPPUnit
+    sscCPPUnitMain.cpp
+    sscTestSliceComputer.cpp )
+target_link_libraries( sscTestCPPUnit SSC cppunit)
+add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/sscTestCPPUnit)
 
