@@ -86,33 +86,38 @@ public:
 	
 	void testAnyPlanes()
 	{
-//		ssc::SliceComputer slicer;
-//		slicer.setOrientationType(ssc::SliceComputer::otOBLIQUE);	
-//		slicer.setFollowType(ssc::SliceComputer::ftFOLLOW_TOOL);
-//		
-//		Vector3D c_tool(5,40,-50);
-//		Vector3D center(44,55,66);
-//		Transform3D R = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2);
-//		Transform3D T = ssc::createTransformTranslate(c_tool);		
-//		Transform3D rMt = T*R;
-//		slicer.setToolPosition(rMt);	
-//		slicer.setFixedCenter(center);
-//		
-//	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1)); 
-//	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1)); 
-//	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
-//
-//		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
-//		ssc::SlicePlane sagittalPlane(c_tool, Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
-//		CPPUNIT_ASSERT(similar(slicer.getPlane(), sagittalPlane));		
-//
-//		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
-//		ssc::SlicePlane  coronalPlane(c_tool, Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
-//		CPPUNIT_ASSERT(similar(slicer.getPlane(), coronalPlane));		
-//		
-//		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
-//		ssc::SlicePlane    axialPlane(c_tool, Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
-//		CPPUNIT_ASSERT(similar(slicer.getPlane(), axialPlane));				
+		ssc::SliceComputer slicer;
+		slicer.setOrientationType(ssc::SliceComputer::otOBLIQUE);	
+		slicer.setFollowType(ssc::SliceComputer::ftFOLLOW_TOOL);
+		
+		Vector3D c_tool(5,40,-50);
+		Vector3D center(44,55,66);
+		// position the tool with the tip pointing down
+		// and the front towards the nose.
+		// this is the case when the surgeon stands behind the upright head
+		// and aligns the tool with his left hand with the tip towards the feet.
+		Transform3D R = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2);
+		Transform3D T = ssc::createTransformTranslate(c_tool);		
+		Transform3D rMt = T*R;
+		CPPUNIT_ASSERT(similar(rMt.vector(Vector3D(0,0,1)), Vector3D(0,0,-1))); // tip down
+		CPPUNIT_ASSERT(similar(rMt.vector(Vector3D(0,1,0)), Vector3D(1,0,0))); // leftprobe to leftpatient
+		slicer.setToolPosition(rMt);	
+		slicer.setFixedCenter(center);
+
+		// looking from behind
+		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		ssc::SlicePlane anyPlane(c_tool, Vector3D( -1, 0, 0), Vector3D( 0, 0, 1));
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
+		
+		// looking from the right
+		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, -1, 0), Vector3D( 0, 0, 1));
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
+
+		// looking from above
+		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
+		ssc::SlicePlane radialPlane(c_tool, Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));				
 	}
 
 	void testMore()
@@ -124,8 +129,8 @@ public:
 	CPPUNIT_TEST_SUITE( TestSliceComputer );
 		CPPUNIT_TEST( testInitialize );			
 		CPPUNIT_TEST( testACS );			
-		//CPPUNIT_TEST( testMore );			
 		CPPUNIT_TEST( testACS_FollowTool );
+		CPPUNIT_TEST( testAnyPlanes );			
 	CPPUNIT_TEST_SUITE_END();
 private:
 

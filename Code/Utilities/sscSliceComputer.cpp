@@ -8,6 +8,14 @@ SlicePlane::SlicePlane(const Vector3D& c_, const Vector3D& i_, const Vector3D& j
 {
 }
 
+std::ostream& operator<<(std::ostream& s, const SlicePlane& val)
+{
+	s << "center   : " << val.c << std::endl;
+	s << "i_vector : " << val.i << std::endl;
+	s << "j_vector : " << val.j << std::endl;
+	return s;
+}
+
 bool similar(const SlicePlane& a, const SlicePlane& b)
 {
 	return similar(a.c, b.c) && similar(a.i, b.i) && similar(a.j, b.j);
@@ -116,6 +124,58 @@ Vector3D SliceComputer::generateFixedIJCenter(const Vector3D& center_r, const Ve
 		return q_r;
 	}
 	return cross_r;
+}
+
+/**Modify the i,j vector such that j points as much as possible towards 
+ * the gravity up direction, while not changing the plane itself (i.e. k is constant).
+ * 
+ * This is done by computing 
+ *   i' = -g x k
+ *   j' =  k x i'
+ * 
+ * If the input j vector point upwards, we flip gravity so that the image dont flip.
+ * 
+ * When k and g points in the same direction, the calculations gets unstable. 
+ * In this case we use the input i,j definition. There is a gradual shift between
+ * these two definitions as we approach the singularity.
+ */
+SlicePlane SliceComputer::orientToGravity(const SlicePlane& base)
+{
+	if (!mUseGravity)
+	{
+		return base;
+	}
+	
+	SlicePlane retval = base;	
+	const Vector3D k = cross(base.i, base.j); // plane normal. Constant
+	Vector3D up;
+	
+	// find the up direction. This removes flips.
+	if (dot(base.j, mGravityDirection) > 0.0)
+	{
+		up = -mGravityDirection;
+	}
+	else
+	{
+		up = mGravityDirection;		
+	}
+	
+	// weight of nongravity, 0=<w=<1, 1 means dont use gravity
+	double w_n = dot(up, k); 
+	w_n = w_n*w_n; // square to keep stability near normal use.
+	
+	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
+	Vector3D i_n = base.i; // |i_n|==1
+	
+	// set i vector to a weighted mean of the two definitions
+	// can also experiment with a tanh function or simply a linear interpolation
+	//
+	// Note: i_g is already small here if w_n is small, this will increase
+	// the effect of i_n. Investigate.
+	//
+	retval.i = i_g*(1.0-w_n) + i_n*w_n; 
+	retval.i = retval.i.normal(); // |i|==1 
+	retval.j = cross(k, retval.i);
 }
 
 /**Orientate a view to gravity as follows:
