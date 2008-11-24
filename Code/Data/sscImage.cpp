@@ -4,7 +4,7 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 
-//#define USE_TRANSFORM_RESCLICER
+#define USE_TRANSFORM_RESCLICER
 
 namespace ssc
 {
@@ -18,6 +18,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 {
 	mOutputImageData = mBaseImageData;
 #ifdef USE_TRANSFORM_RESCLICER
+	mBaseImageData->ReleaseDataFlagOn();
 	mOrientator = vtkImageReslicePtr::New();
 	mOrientator->SetInput(mBaseImageData);
 	mOutputImageData = mOrientator->GetOutput();

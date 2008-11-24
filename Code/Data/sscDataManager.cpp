@@ -12,6 +12,8 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 {
 	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
 	reader->SetFileName(filename.c_str());
+	reader->ReleaseDataFlagOn();
+	reader->GetOutput()->ReleaseDataFlagOn();
 	reader->Update();
 	vtkImageDataPtr imageData = reader->GetOutput();
 
