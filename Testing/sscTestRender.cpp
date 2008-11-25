@@ -63,7 +63,7 @@ int main(int argc, char **argv)
 		doRender(view->getRenderWindow());
 	}
 	
-//#define USE_TRANSFORM_RESCLICER
+#define USE_TRANSFORM_RESCLICER
 #ifdef USE_TRANSFORM_RESCLICER
 	// this code is meant for testing the reslicer in ssc::Image
 	std::cout << "rotating the image data..." << std::endl;

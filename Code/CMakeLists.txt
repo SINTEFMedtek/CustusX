@@ -69,9 +69,13 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSliceComputer.cpp 
     sscView.cpp
     Rep/sscRepImpl.cpp
+    Rep/sscAxesRep.cpp
     Rep/sscVolumetricRep.cpp
+    Rep/sscGeometricRep.cpp
     Rep/sscToolRep3D.cpp
+    Data/sscData.cpp
     Data/sscImage.cpp
+    Data/sscMesh.cpp
     Data/sscDataManager.cpp
     Tool/sscDummyToolManager.cpp
     Tool/sscDummyTool.cpp

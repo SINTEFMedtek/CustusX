@@ -21,9 +21,17 @@ add_executable(TestDataManager sscTestDataManager.cpp)
 target_link_libraries( TestDataManager SSC )	
 add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/TestDataManager)
 
+add_executable(TestMeshAndDataManager sscTestMeshAndDataManager.cpp)
+target_link_libraries( TestMeshAndDataManager SSC )	
+add_test(TestMeshAndDataManager ${EXECUTABLE_OUTPUT_PATH}/TestMeshAndDataManager)
+
+add_executable(TestMeshDMGeoRepView sscTestMeshDMGeoRepView.cpp)
+target_link_libraries( TestMeshDMGeoRepView SSC )	
+add_test(TestMeshDMGeoRepView ${EXECUTABLE_OUTPUT_PATH}/TestMeshDMGeoRepView)
+
+
 add_executable(sscTestCPPUnit
     sscCPPUnitMain.cpp
     sscTestSliceComputer.cpp )
 target_link_libraries( sscTestCPPUnit SSC cppunit)
-add_test(TestDataManager ${EXECUTABLE_OUTPUT_PATH}/sscTestCPPUnit)
 

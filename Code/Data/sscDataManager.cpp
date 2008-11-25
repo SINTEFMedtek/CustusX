@@ -1,13 +1,21 @@
 #include "sscDataManager.h"
 
+#include <vtkImageData.h>
+#include <vtkMetaImageReader.h>
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
-#include <vtkMetaImageReader.h>
-#include <vtkImageData.h>
+
+#include <vtkPolyData.h>
+#include <vtkPolyDataReader.h>
+#include <vtkSTLReader.h>
+typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
+typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
+
 
 namespace ssc
 {
 
+//-----
 ImagePtr MetaImageReader::load(const std::string& filename)
 {
 	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
@@ -21,6 +29,31 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 //		image->setVtkImageData(imageData);
 //		return image;
 	return ImagePtr(new Image(filename, imageData));
+
+}
+
+//-----
+MeshPtr PolyDataMeshReader::load(const std::string& fileName)
+{
+	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
+	reader->SetFileName(fileName.c_str());
+	reader->Update();
+	vtkPolyDataPtr polyData = reader->GetOutput();
+
+	//return MeshPtr(new Mesh(fileName, fileName, polyData));
+	return MeshPtr(new Mesh(fileName, "PolyData", polyData));
+
+}
+
+MeshPtr StlMeshReader::load(const std::string& fileName)
+{
+	vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
+	reader->SetFileName(fileName.c_str());
+	reader->Update();
+	vtkPolyDataPtr polyData = reader->GetOutput();
+
+	//return MeshPtr(new Mesh(fileName, fileName, polyData));
+	return MeshPtr(new Mesh(fileName, "PolyData", polyData));
 
 }
 
@@ -41,6 +74,9 @@ DataManager* DataManager::instance()
 DataManager::DataManager()
 {
 	mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
+	
+	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
+	mMeshReaders[mrtSTL].reset(new StlMeshReader());
 }
 
 DataManager::~DataManager()
@@ -62,6 +98,18 @@ ImagePtr DataManager::loadImage(const std::string& filename, READER_TYPE type)
 		mImages[current->getUid()] = current;
 	}
 	return current;
+}
+
+// meshes
+MeshPtr DataManager::loadMesh(const std::string& fileName, MESH_READER_TYPE meshType)
+{
+	// identify type
+	MeshPtr newMesh = mMeshReaders[meshType]->load(fileName);
+	if (newMesh)
+	{
+		mMeshes[newMesh->getUID()] = newMesh;
+	}
+	return newMesh;
 }
 
 

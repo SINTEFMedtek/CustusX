@@ -2,9 +2,16 @@
 #define SSCDATA_H_
 
 #include <string>
+#include <set>
+
+#include <boost/shared_ptr.hpp>
+
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 #include "sscTransform3D.h"
+
+#include "sscData.h"
+#include "sscRep.h"
 
 namespace ssc
 {
@@ -22,13 +29,34 @@ enum REGISTRATION_STATUS
 /**Superclass for all data objects.
  * Example suclassess: Image and Surface.
  */
-struct Data
+class Data
 {
-	virtual ~Data() {}
-	virtual std::string getUid() const = 0; ///< \return unique id for this instance
-	virtual std::string getName() const = 0; /// \return a descriptive name for this instance
-	virtual Transform3D getTransform() const = 0; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
-	virtual REGISTRATION_STATUS getRegistrationStatus() const = 0; ///< \return what kind of registration that has been performed on this data object.
+public:
+	Data();
+	virtual ~Data();
+	
+	void setUID(const std::string& uid);
+	void setName(const std::string& name);
+	void setRegistrationStatus(REGISTRATION_STATUS regStat);
+	void set_rMd(Transform3D rMd);
+
+	virtual std::string getUID() const; ///< \return unique id for this instance
+	virtual std::string getName() const; /// \return a descriptive name for this instance
+	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
+	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
+
+	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
+	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
+
+protected:
+	std::string mUID;
+	std::string mName;
+
+	REGISTRATION_STATUS mRegistrationStatus;
+	Transform3D m_rMd; ///< the transform from data to reference space
+
+	std::set<RepWeakPtr> mReps; ///< links to Rep users.
+
 };
 
 } // end namespace ssc
