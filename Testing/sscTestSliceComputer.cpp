@@ -84,6 +84,9 @@ public:
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), axialPlane));				
 	}
 	
+	/** anyplanes with no gravity, tool in standard position with 
+	 *  tip down and from towards nose
+	 */
 	void testAnyPlanes()
 	{
 		ssc::SliceComputer slicer;
@@ -111,13 +114,52 @@ public:
 		
 		// looking from the right
 		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		//std::cout << "side: \n" << slicer.getPlane() << std::endl;
 		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, -1, 0), Vector3D( 0, 0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
 
 		// looking from above
 		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
 		ssc::SlicePlane radialPlane(c_tool, Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
-		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));				
+		//std::cout << "radial: \n" << slicer.getPlane() << std::endl;
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));		
+
+		// perform test with a default gravity vector.
+		// This has no effect
+		slicer.setGravity(true, Vector3D(0,0,-1));
+		
+		// looking from behind
+		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		//std::cout << "any: \n" << slicer.getPlane() << std::endl;
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
+		// looking from the right
+		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
+		// looking from above
+		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));	
+		
+		// test viewOffset
+		slicer.setToolViewOffset(true, 40, 0.25);
+		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		//std::cout << "viewoffset: \n" << slicer.getPlane() << std::endl;
+		CPPUNIT_ASSERT(similar(slicer.getPlane().c, c_tool-10.0*Vector3D(0,0,1)));
+		slicer.setToolViewOffset(false, 40, 0.25);
+				
+		// perform test with gravity vector normal to any direction.
+		// this is a singularity and should be handled by using the standard vectors
+		slicer.setGravity(true, Vector3D(0,1,0));
+		
+		// looking from behind
+		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		//std::cout << "any: \n" << slicer.getPlane() << std::endl;
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
+		// looking from the right
+		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
+		// looking from above
+		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));		
 	}
 
 	void testMore()
@@ -130,7 +172,9 @@ public:
 		CPPUNIT_TEST( testInitialize );			
 		CPPUNIT_TEST( testACS );			
 		CPPUNIT_TEST( testACS_FollowTool );
-		CPPUNIT_TEST( testAnyPlanes );			
+		CPPUNIT_TEST( testAnyPlanes );
+//		CPPUNIT_TEST( testAnyPlanesWithGravity );
+		
 	CPPUNIT_TEST_SUITE_END();
 private:
 
