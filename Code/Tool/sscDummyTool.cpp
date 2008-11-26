@@ -57,7 +57,9 @@ void DummyTool::setTransformSaveFile(const std::string& filename)
 	mTransformSaveFileName = filename;
 }
 Transform3D DummyTool::get_prMt() const
-{}
+{
+	return Transform3D();
+}
 bool DummyTool::getVisible() const
 {
 	return mVisible;
@@ -146,7 +148,7 @@ std::vector<Transform3D> DummyTool::createToolPositionMovement() const
 }
 Transform3D* DummyTool::getNextTransform()
 {
-	if(mTransformCount >= mTransforms.size())
+	if(mTransformCount >= int(mTransforms.size()))
 		mTransformCount = 0;
 
 	return &mTransforms.at(mTransformCount++);

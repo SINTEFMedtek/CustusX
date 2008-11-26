@@ -32,7 +32,7 @@ public:
   };
   /**\return the View type, indicating display dimension.
    */
-  virtual Type getType() const {VIEW;};
+  virtual Type getType() const { return VIEW;};
 
   View(QWidget *parent = NULL, Qt::WFlags f = 0);
   virtual ~View();
