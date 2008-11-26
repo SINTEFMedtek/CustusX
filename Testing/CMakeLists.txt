@@ -29,6 +29,11 @@ add_executable(TestMeshDMGeoRepView sscTestMeshDMGeoRepView.cpp)
 target_link_libraries( TestMeshDMGeoRepView SSC )	
 add_test(TestMeshDMGeoRepView ${EXECUTABLE_OUTPUT_PATH}/TestMeshDMGeoRepView)
 
+# sscTestSliceRep
+add_executable(TestSliceRep sscTestSliceRep.cpp)
+target_link_libraries( TestSliceRep SSC )	
+add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
+
 
 add_executable(sscTestCPPUnit
     sscCPPUnitMain.cpp

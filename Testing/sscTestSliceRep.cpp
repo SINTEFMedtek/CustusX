@@ -1,0 +1,70 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+//#include <vtkPolyData.h>
+#include <vtkImageData.h>
+#include <vtkMetaImageReader.h>
+#include <vtkImagePlaneWidget.h>
+#include <vtkRenderer.h>
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+
+#include <QtGui>
+
+
+#include "sscTestUtilities.h"
+#include "sscDataManager.h"
+#include "sscImage.h"
+//#include "sscMesh.h"
+//#include "sscGeometricRep.h"
+#include "sscAxesRep.h"
+#include "sscView.h"
+
+
+int main(int argc, char **argv)
+{
+	// generate imageFileName
+	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
+	std::cout << imageFileName1 << std::endl;
+
+	// read image, not ok
+	ssc::ImagePtr image1 = ssc::DataManager::instance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
+
+	// read "directely", ok
+	vtkMetaImageReader* reader = vtkMetaImageReader::New();
+	reader->SetFileName(imageFileName1.c_str());
+	reader->Update();
+
+
+
+	QApplication app(argc, argv);
+	ssc::ViewPtr view(new ssc::View());		
+
+	ssc::AxesRepPtr axesRep = ssc::AxesRep::create("AxesRepUID");
+	view->addRep(axesRep);
+
+	vtkImagePlaneWidget* planeWidget = vtkImagePlaneWidget::New();
+	// not ok:
+	//planeWidget->SetInput( image1->getBaseVtkImageData() );
+	// ok:
+	planeWidget->SetInput( reader->GetOutput() );
+	planeWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
+	//planeWidget->InteractionOn();
+	planeWidget->SetPlaneOrientationToZAxes();
+	//planeWidget->SetOrigin(-50,-50,0);
+	planeWidget->On();
+
+	QMainWindow mainWindow;
+	mainWindow.setCentralWidget(view.get());
+	mainWindow.resize(QSize(500,500));
+	mainWindow.show();
+	view->getRenderer()->ResetCamera();	
+	app.exec();
+
+
+	return 0;
+}
+
