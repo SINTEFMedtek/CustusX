@@ -24,6 +24,7 @@ enum READER_TYPE
 class ImageReader
 {
 public:
+	virtual ~ImageReader() {}
 	virtual bool canLoad(const std::string& filename) = 0;
 	virtual ImagePtr load(const std::string& filename) = 0;
 };
@@ -32,6 +33,7 @@ typedef boost::shared_ptr<ImageReader> ImageReaderPtr;
 class MetaImageReader : public ImageReader
 {
 public:
+	virtual ~MetaImageReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
 	virtual ImagePtr load(const std::string& filename);
 };
@@ -46,6 +48,7 @@ enum MESH_READER_TYPE
 class MeshReader
 {
 public:
+	virtual ~MeshReader() {}
 	virtual bool canLoad(const std::string& filename) = 0;
 	virtual MeshPtr load(const std::string& filename) = 0;
 };
@@ -55,6 +58,7 @@ typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
 class PolyDataMeshReader : public MeshReader
 {
 public:
+	virtual ~PolyDataMeshReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
 	virtual MeshPtr load(const std::string& filename);
 };
@@ -63,6 +67,7 @@ public:
 class StlMeshReader : public MeshReader
 {
 public:
+	virtual ~StlMeshReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
 	virtual MeshPtr load(const std::string& filename);
 };
