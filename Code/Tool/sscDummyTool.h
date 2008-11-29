@@ -32,7 +32,7 @@ public:
 	virtual bool getVisible() const;
 	virtual std::string getUid() const;
 	virtual std::string getName() const;
-
+	virtual int getIndex() const{return 0;};
 	void startTracking();
 	void stopTracking();
 

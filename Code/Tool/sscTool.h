@@ -1,4 +1,4 @@
-#ifndef SSCTOOL_H_
+	#ifndef SSCTOOL_H_
 #define SSCTOOL_H_
 
 #include <string>
@@ -61,7 +61,8 @@ public:
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
-
+	virtual int getIndex() const = 0;///<return a index ivar due to a list..
+	
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);

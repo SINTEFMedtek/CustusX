@@ -24,7 +24,13 @@ public:
 		mInstance = instance;
 	};
 	static ToolManager* getInstance() { return mInstance; }	
-
+	static void shutdown()
+	{
+		delete mInstance;
+		mInstance = NULL;
+	}
+	
+	
 	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
 	virtual bool isTracking() const = 0; ///< system is tracking

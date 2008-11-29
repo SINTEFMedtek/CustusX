@@ -2,6 +2,7 @@
 
 namespace ssc
 {
+
 ToolManager* ToolManager::mInstance = NULL;
 
 ToolManager* DummyToolManager::getInstance()
@@ -98,8 +99,7 @@ ToolManager::ToolMapPtr DummyToolManager::getTools()
 	DummyToolMapIter it = mDummyTools->begin();
 	while(it != mDummyTools->end())
 	{
-		retval->insert(std::pair<std::string, ToolPtr>
-                     (((*it).first), (ToolPtr)((*it).second)));
+		retval->insert(std::pair<std::string, ToolPtr> (((*it).first), (ToolPtr)((*it).second)));
 		it++;
 	}
 	return retval;

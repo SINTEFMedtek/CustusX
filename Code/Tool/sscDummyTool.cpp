@@ -31,8 +31,7 @@ DummyTool::DummyTool() :
 
 	this->createPolyData();
 
-	connect(mTimer.get(), SIGNAL(timeout()),
-			this, SLOT(sendTransform()));
+	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
 }
 DummyTool::~DummyTool()
 {}

@@ -1,8 +1,7 @@
-#ifndef SSCDUMMYTOOLMANAGER_H_
+	#ifndef SSCDUMMYTOOLMANAGER_H_
 #define SSCDUMMYTOOLMANAGER_H_
 
 #include "sscToolManager.h"
-
 #include "sscDummyTool.h"
 /**
  * sscDummyToolManager.h
@@ -18,6 +17,7 @@ namespace ssc
 class DummyToolManager : public ToolManager
 {
 	Q_OBJECT
+	
 public:
 	typedef std::map<std::string, DummyToolPtr> DummyToolMap;
 	typedef boost::shared_ptr<DummyToolMap> DummyToolMapPtr;
