@@ -18,12 +18,12 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 {
 	mOutputImageData = mBaseImageData;
 #ifdef USE_TRANSFORM_RESCLICER
-	mBaseImageData->ReleaseDataFlagOn();
+	//mBaseImageData->ReleaseDataFlagOn();
 	mOrientator = vtkImageReslicePtr::New();
 	mOrientator->SetInput(mBaseImageData);
 	mOutputImageData = mOrientator->GetOutput();
 	mOutputImageData->Update();
-	mOutputImageData->UpdateInformation();	
+	//mOutputImageData->UpdateInformation();	
 #endif
 }
 

@@ -38,27 +38,28 @@ int main(int argc, char **argv)
 	reader->SetFileName(imageFileName1.c_str());
 	reader->Update();
 
-
-
 	QApplication app(argc, argv);
-	ssc::ViewPtr view(new ssc::View());		
+	//ssc::ViewPtr view(new ssc::View());
+	ssc::View* view = new ssc::View();
 
 	ssc::AxesRepPtr axesRep = ssc::AxesRep::create("AxesRepUID");
 	view->addRep(axesRep);
 
 	vtkImagePlaneWidget* planeWidget = vtkImagePlaneWidget::New();
 	// not ok:
-	//planeWidget->SetInput( image1->getBaseVtkImageData() );
+	planeWidget->SetInput( image1->getBaseVtkImageData() );
 	// ok:
-	planeWidget->SetInput( reader->GetOutput() );
+	//planeWidget->SetInput( reader->GetOutput() );
 	planeWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
 	//planeWidget->InteractionOn();
 	planeWidget->SetPlaneOrientationToZAxes();
 	//planeWidget->SetOrigin(-50,-50,0);
 	planeWidget->On();
+	
+	//view.reset();
 
 	QMainWindow mainWindow;
-	mainWindow.setCentralWidget(view.get());
+	mainWindow.setCentralWidget(view);
 	mainWindow.resize(QSize(500,500));
 	mainWindow.show();
 	view->getRenderer()->ResetCamera();	
