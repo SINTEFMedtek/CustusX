@@ -70,6 +70,7 @@ SET( SSC_SOURCE_FILES
     sscView.cpp
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp
+    Rep/sscSliceRep.cpp
     Rep/sscVolumetricRep.cpp
     Rep/sscGeometricRep.cpp
     Rep/sscToolRep3D.cpp

@@ -19,25 +19,28 @@
 //#include "sscMesh.h"
 //#include "sscGeometricRep.h"
 #include "sscAxesRep.h"
+#include "sscSliceRep.h"
 #include "sscView.h"
 
 
 int main(int argc, char **argv)
 {
 	// generate imageFileName
-	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
 	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
 	std::cout << imageFileName1 << std::endl;
 
-	// read image, not ok
+	// read image
 	ssc::ImagePtr image1 = ssc::DataManager::instance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
 
-	// read "directely", ok
+	/*
+	// read "directely"
 	vtkMetaImageReader* reader = vtkMetaImageReader::New();
 	reader->SetFileName(imageFileName1.c_str());
 	reader->Update();
-
+	*/
+	
 	QApplication app(argc, argv);
 	//ssc::ViewPtr view(new ssc::View());
 	ssc::View* view = new ssc::View();
@@ -45,18 +48,23 @@ int main(int argc, char **argv)
 	ssc::AxesRepPtr axesRep = ssc::AxesRep::create("AxesRepUID");
 	view->addRep(axesRep);
 
+	ssc::SliceRepPtr sliceRep = ssc::SliceRep::create("SliceRepUID");
+	sliceRep->setImage( image1 );
+	view->addRep(sliceRep);
+
+/*
 	vtkImagePlaneWidget* planeWidget = vtkImagePlaneWidget::New();
-	// not ok:
 	planeWidget->SetInput( image1->getBaseVtkImageData() );
-	// ok:
 	//planeWidget->SetInput( reader->GetOutput() );
+	
 	planeWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
-	//planeWidget->InteractionOn();
+	planeWidget->InteractionOn();
 	planeWidget->SetPlaneOrientationToZAxes();
-	//planeWidget->SetOrigin(-50,-50,0);
+	//planeWidget->SetOrigin(-100,-100,0);
 	planeWidget->On();
 	
 	//view.reset();
+*/
 
 	QMainWindow mainWindow;
 	mainWindow.setCentralWidget(view);

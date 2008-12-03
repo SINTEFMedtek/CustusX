@@ -30,7 +30,7 @@ target_link_libraries( TestMeshDMGeoRepView SSC )
 add_test(TestMeshDMGeoRepView ${EXECUTABLE_OUTPUT_PATH}/TestMeshDMGeoRepView)
 
 # sscTestSliceRep
-add_executable(TestSliceRep sscTestSliceRep.cpp)
+add_executable(TestSliceRep MACOSX_BUNDLE sscTestSliceRep.cpp)
 target_link_libraries( TestSliceRep SSC )	
 add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
 
