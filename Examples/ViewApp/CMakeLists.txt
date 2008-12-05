@@ -29,7 +29,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${SSCTestApp_QT_MOC_HEADER_FILES} )
 		
 # =========================================================
 # create the target
-add_executable( SSCTestApp ${MOC_HEADER_FILES} ${SSCTestApp_SOURCE_FILES} )
+add_executable( SSCTestApp MACOSX_BUNDLE ${MOC_HEADER_FILES} ${SSCTestApp_SOURCE_FILES} )
 target_link_libraries( SSCTestApp SSC )
 # =========================================================
 

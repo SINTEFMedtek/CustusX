@@ -61,7 +61,9 @@ int main(int argc, char **argv)
 	//std::vector<std::string> names = ssc::DataManager::instance()->getImageNames();
 
 
-	ssc::ViewPtr view(new ssc::View());		
+	//ssc::ViewPtr view(new ssc::View());
+	ssc::View* view = new ssc::View();
+
 	ssc::GeometricRepPtr rep = ssc::GeometricRep::create(mesh1->getUID());
 	rep->setMesh(mesh1);
 	view->setRep(rep);
@@ -70,7 +72,7 @@ int main(int argc, char **argv)
 	view->addRep(axesRep);
 
 	QMainWindow mainWindow;
-	mainWindow.setCentralWidget(view.get());
+	mainWindow.setCentralWidget(view);
 	mainWindow.resize(QSize(500,500));
 	mainWindow.show();
 	view->getRenderer()->ResetCamera();	

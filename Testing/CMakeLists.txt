@@ -25,7 +25,7 @@ add_executable(TestMeshAndDataManager sscTestMeshAndDataManager.cpp)
 target_link_libraries( TestMeshAndDataManager SSC )	
 add_test(TestMeshAndDataManager ${EXECUTABLE_OUTPUT_PATH}/TestMeshAndDataManager)
 
-add_executable(TestMeshDMGeoRepView sscTestMeshDMGeoRepView.cpp)
+add_executable(TestMeshDMGeoRepView MACOSX_BUNDLE sscTestMeshDMGeoRepView.cpp)
 target_link_libraries( TestMeshDMGeoRepView SSC )	
 add_test(TestMeshDMGeoRepView ${EXECUTABLE_OUTPUT_PATH}/TestMeshDMGeoRepView)
 
