@@ -20,7 +20,14 @@ View::View(QWidget *parent, Qt::WFlags f) :
 View::~View()
 {
 }
-
+std::string View::getUid()
+{
+  return mUid;
+}
+std::string View::getName()
+{
+  return mName;
+}
 vtkRendererPtr View::getRenderer() const
 {
 	return mRenderer;
