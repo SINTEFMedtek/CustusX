@@ -26,10 +26,10 @@ public:
 	static VolumetricRepPtr create(const std::string& uid);
 
 	virtual std::string getType() const { return "ssc::VolumeRep"; }
-	void setImage(ImagePtr image);
+	virtual void setImage(ImagePtr image);
 	//void addImage(ImagePtr image);
 	//void removeImage(ImagePtr image);
-	bool hasImage(ImagePtr image) const;
+	virtual bool hasImage(ImagePtr image) const;
 protected:
 	VolumetricRep(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
