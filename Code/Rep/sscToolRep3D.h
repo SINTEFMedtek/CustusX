@@ -18,11 +18,12 @@ class ToolRep3D : public RepImpl
 {
 	Q_OBJECT
 public:
-	ToolRep3D(const std::string& uid, const std::string& name, ToolPtr tool);
+	static ToolRep3DPtr New(const std::string& uid, const std::string& name, ToolPtr tool);
 	virtual ~ToolRep3D();
 	virtual std::string getType() const;
 
 protected:
+	ToolRep3D(const std::string& uid, const std::string& name, ToolPtr tool);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

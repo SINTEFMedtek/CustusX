@@ -19,7 +19,7 @@ class SliceRep : public RepImpl
 public:
 	virtual ~SliceRep();
 
-	static SliceRepPtr create(const std::string& uid);
+	static SliceRepPtr New(const std::string& uid);
 
 	virtual std::string getType() const { return "ssc::SliceRep"; }
 	void setImage(ImagePtr image);
@@ -31,9 +31,9 @@ protected:
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 
-	
+
 	vtkImagePlaneWidgetPtr mVtkImagePlaneWidget;
-	
+
 	ImagePtr mImage;
 };
 

@@ -22,7 +22,7 @@ AxesRep::~AxesRep()
 	// ??
 }
 
-AxesRepPtr AxesRep::create(const std::string& uid)
+AxesRepPtr AxesRep::New(const std::string& uid)
 {
 	AxesRepPtr retval(new AxesRep(uid));
 	retval->mSelf = retval;

@@ -57,25 +57,25 @@ int main(int argc, char **argv)
 	std::cout << "numPolys  : " << numPolys << std::endl;
 	std::cout << "numStrips : " << numStrips << std::endl;
 
-	
+
 	//std::vector<std::string> names = ssc::DataManager::instance()->getImageNames();
 
 
 	//ssc::ViewPtr view(new ssc::View());
 	ssc::View* view = new ssc::View();
 
-	ssc::GeometricRepPtr rep = ssc::GeometricRep::create(mesh1->getUID());
+	ssc::GeometricRepPtr rep = ssc::GeometricRep::New(mesh1->getUID());
 	rep->setMesh(mesh1);
 	view->setRep(rep);
 
-	ssc::AxesRepPtr axesRep = ssc::AxesRep::create("AxesRepUID");
+	ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
 	view->addRep(axesRep);
 
 	QMainWindow mainWindow;
 	mainWindow.setCentralWidget(view);
 	mainWindow.resize(QSize(500,500));
 	mainWindow.show();
-	view->getRenderer()->ResetCamera();	
+	view->getRenderer()->ResetCamera();
 	app.exec();
 
 	return 0;

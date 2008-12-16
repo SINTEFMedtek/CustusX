@@ -23,7 +23,7 @@ class VolumetricRep : public RepImpl
 public:
 	virtual ~VolumetricRep();
 
-	static VolumetricRepPtr create(const std::string& uid);
+	static VolumetricRepPtr New(const std::string& uid);
 
 	virtual std::string getType() const { return "ssc::VolumeRep"; }
 	virtual void setImage(ImagePtr image);

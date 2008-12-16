@@ -31,7 +31,12 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name, ToolPtr to
 
 ToolRep3D::~ToolRep3D()
 {}
-
+ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name, ToolPtr tool)
+{
+	ToolRep3DPtr retval(new ToolRep3D(uid, name, tool));
+	retval->mSelf = retval;
+	return retval;
+}
 std::string ToolRep3D::getType() const
 {
 	return "ssc::ToolRep3D";

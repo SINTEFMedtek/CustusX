@@ -21,7 +21,7 @@ class GeometricRep : public RepImpl
 public:
 	virtual ~GeometricRep();
 
-	static GeometricRepPtr create(const std::string& uid);
+	static GeometricRepPtr New(const std::string& uid);
 
 	virtual std::string getType() const { return "ssc::GeometricRep"; }
 	void setMesh(MeshPtr mesh);

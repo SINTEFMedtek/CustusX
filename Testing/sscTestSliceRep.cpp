@@ -40,15 +40,15 @@ int main(int argc, char **argv)
 	reader->SetFileName(imageFileName1.c_str());
 	reader->Update();
 	*/
-	
+
 	QApplication app(argc, argv);
 	//ssc::ViewPtr view(new ssc::View());
 	ssc::View* view = new ssc::View();
 
-	ssc::AxesRepPtr axesRep = ssc::AxesRep::create("AxesRepUID");
+	ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
 	view->addRep(axesRep);
 
-	ssc::SliceRepPtr sliceRep = ssc::SliceRep::create("SliceRepUID");
+	ssc::SliceRepPtr sliceRep = ssc::SliceRep::New("SliceRepUID");
 	sliceRep->setImage( image1 );
 	view->addRep(sliceRep);
 
@@ -56,13 +56,13 @@ int main(int argc, char **argv)
 	vtkImagePlaneWidget* planeWidget = vtkImagePlaneWidget::New();
 	planeWidget->SetInput( image1->getBaseVtkImageData() );
 	//planeWidget->SetInput( reader->GetOutput() );
-	
+
 	planeWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
 	planeWidget->InteractionOn();
 	planeWidget->SetPlaneOrientationToZAxes();
 	//planeWidget->SetOrigin(-100,-100,0);
 	planeWidget->On();
-	
+
 	//view.reset();
 */
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 	mainWindow.setCentralWidget(view);
 	mainWindow.resize(QSize(500,500));
 	mainWindow.show();
-	view->getRenderer()->ResetCamera();	
+	view->getRenderer()->ResetCamera();
 	app.exec();
 
 

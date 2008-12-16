@@ -28,7 +28,7 @@ GeometricRep::~GeometricRep()
 	// ??
 }
 
-GeometricRepPtr GeometricRep::create(const std::string& uid)
+GeometricRepPtr GeometricRep::New(const std::string& uid)
 {
 	GeometricRepPtr retval(new GeometricRep(uid));
 	retval->mSelf = retval;

@@ -18,7 +18,7 @@ class AxesRep : public RepImpl
 public:
 	virtual ~AxesRep();
 
-	static AxesRepPtr create(const std::string& uid);
+	static AxesRepPtr New(const std::string& uid);
 
 	virtual std::string getType() const { return "ssc::AxesRep"; }
 

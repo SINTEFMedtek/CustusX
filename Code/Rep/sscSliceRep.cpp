@@ -23,7 +23,7 @@ SliceRep::~SliceRep()
 {
 }
 
-SliceRepPtr SliceRep::create(const std::string& uid)
+SliceRepPtr SliceRep::New(const std::string& uid)
 {
 	SliceRepPtr retval(new SliceRep(uid));
 	retval->mSelf = retval;
