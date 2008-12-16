@@ -70,7 +70,7 @@ void TestInterface::testDummyToolAndDummyToolManager()
 
 	ToolPtr tool = mToolmanager->getDominantTool();
 
-	ToolRep3DPtr toolRep = ToolRep3DPtr(new ToolRep3D(tool->getUid(),tool->getName(),tool));
+	ToolRep3DPtr toolRep = ToolRep3D::New(tool->getUid(),tool->getName(),tool);
 
 	mView1->setRep(toolRep);
 
@@ -94,8 +94,8 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 	mImagePtr1 = DataManager::instance()->loadImage(testFile1, rtMETAIMAGE);
 	mImagePtr2 = DataManager::instance()->loadImage(testFile2, rtMETAIMAGE);
 
-	mRepPtr1 = VolumetricRep::create(mImagePtr1->getUid());
-	mRepPtr2 = VolumetricRep::create(mImagePtr2->getUid());
+	mRepPtr1 = VolumetricRep::New(mImagePtr1->getUid());
+	mRepPtr2 = VolumetricRep::New(mImagePtr2->getUid());
 
 	//Setup default
 	mCurrentImage =mImagePtr1;
