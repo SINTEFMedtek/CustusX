@@ -12,8 +12,8 @@
 namespace ssc
 {
 
-VolumetricRep::VolumetricRep(const std::string& uid) :
-	RepImpl(uid),
+VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
+	RepImpl(uid, name),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New())
@@ -40,7 +40,7 @@ VolumetricRep::~VolumetricRep()
 	// ??
 }
 
-VolumetricRepPtr VolumetricRep::New(const std::string& uid)
+VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
 {
 	VolumetricRepPtr retval(new VolumetricRep(uid));
 	retval->mSelf = retval;

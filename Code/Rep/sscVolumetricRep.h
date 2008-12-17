@@ -23,7 +23,7 @@ class VolumetricRep : public RepImpl
 public:
 	virtual ~VolumetricRep();
 
-	static VolumetricRepPtr New(const std::string& uid);
+	static VolumetricRepPtr New(const std::string& uid, const std::string& name="");
 
 	virtual std::string getType() const { return "ssc::VolumeRep"; }
 	virtual void setImage(ImagePtr image);
@@ -31,7 +31,7 @@ public:
 	//void removeImage(ImagePtr image);
 	virtual bool hasImage(ImagePtr image) const;
 protected:
-	VolumetricRep(const std::string& uid);
+	VolumetricRep(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

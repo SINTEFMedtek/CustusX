@@ -70,7 +70,8 @@ void TestInterface::testDummyToolAndDummyToolManager()
 
 	ToolPtr tool = mToolmanager->getDominantTool();
 
-	ToolRep3DPtr toolRep = ToolRep3D::New(tool->getUid(),tool->getName(),tool);
+	ToolRep3DPtr toolRep = ToolRep3D::New(tool->getUid(),tool->getName());
+	toolRep->setTool(tool);
 
 	mView1->setRep(toolRep);
 

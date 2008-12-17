@@ -18,12 +18,15 @@ class ToolRep3D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static ToolRep3DPtr New(const std::string& uid, const std::string& name, ToolPtr tool);
+	static ToolRep3DPtr New(const std::string& uid, const std::string& name="");
 	virtual ~ToolRep3D();
 	virtual std::string getType() const;
 
+	virtual void setTool(ToolPtr tool);
+	virtual bool hasTool(ToolPtr tool) const;
+
 protected:
-	ToolRep3D(const std::string& uid, const std::string& name, ToolPtr tool);
+	ToolRep3D(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 
@@ -44,7 +47,6 @@ private:
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
 };
-
 } // namespace ssc
 
 #endif /*SSCTOOL3DREP_H_*/

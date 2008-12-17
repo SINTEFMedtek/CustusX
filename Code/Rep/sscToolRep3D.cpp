@@ -12,15 +12,11 @@
 namespace ssc
 {
 
-ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name, ToolPtr tool) :
+ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name)
 {
-	mTool = tool;
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapper::New();
-
-	mPolyDataMapper->SetInput(mTool->getGraphicsPolyData());
-	mToolActor->SetMapper(mPolyDataMapper);
 
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
 			this, SLOT(receiveTransforms(Transform3D, double)));
@@ -31,15 +27,25 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name, ToolPtr to
 
 ToolRep3D::~ToolRep3D()
 {}
-ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name, ToolPtr tool)
+ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name)
 {
-	ToolRep3DPtr retval(new ToolRep3D(uid, name, tool));
+	ToolRep3DPtr retval(new ToolRep3D(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 std::string ToolRep3D::getType() const
 {
 	return "ssc::ToolRep3D";
+}
+void ToolRep3D::setTool(ToolPtr tool)
+{
+	mTool = tool;
+	mPolyDataMapper->SetInput(mTool->getGraphicsPolyData());
+	mToolActor->SetMapper(mPolyDataMapper);
+}
+bool ToolRep3D::hasTool(ToolPtr tool) const
+{
+	return (mTool != NULL);
 }
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
