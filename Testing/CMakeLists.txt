@@ -9,7 +9,7 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 find_package(SSC REQUIRED)
-include (${SSC_USE_FILE})
+include (${SSC_USE_FILE} )
 	
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 
@@ -32,6 +32,18 @@ add_test(TestMeshDMGeoRepView ${EXECUTABLE_OUTPUT_PATH}/TestMeshDMGeoRepView)
 # sscTestSliceRep
 add_executable(TestSliceRep MACOSX_BUNDLE sscTestSliceRep.cpp)
 target_link_libraries( TestSliceRep SSC )	
+add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
+
+# sscTestSliceAndToolRep
+
+SET( SSCSliceAndToolRep_QT_MOC_HEADER_FILES
+    sscTestSliceAndToolRep.h
+   )
+set( MOC_HEADER_FILES )
+QT4_WRAP_CPP( MOC_HEADER_FILES ${SSCSliceAndToolRep_QT_MOC_HEADER_FILES} )
+
+add_executable(TestSliceAndToolRep MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSliceAndToolRep.cpp)
+target_link_libraries( TestSliceAndToolRep SSC )	
 add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
 
 

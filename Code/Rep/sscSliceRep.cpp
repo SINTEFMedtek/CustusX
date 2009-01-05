@@ -13,10 +13,8 @@ namespace ssc
 SliceRep::SliceRep(const std::string& uid) :
 	RepImpl(uid)
 {
-
 	mVtkImagePlaneWidget = vtkImagePlaneWidgetPtr::New();
 	mVtkImagePlaneWidget->SetPlaneOrientationToZAxes();
-
 }
 
 SliceRep::~SliceRep()

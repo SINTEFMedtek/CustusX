@@ -89,7 +89,7 @@ void DummyTool::stopTracking()
 void DummyTool::sendTransform()
 {
 	QDateTime time;
-
+	std::cout<<"send transform"<<std::endl;	
 	Transform3D matrix = *getNextTransform();
 	double timestamp = (double) time.time().msec();
 
@@ -113,13 +113,14 @@ void DummyTool::createPolyData()
 }
 std::vector<Transform3D> DummyTool::createToolPositionMovement() const
 {
+	std::cout<<"createToolPositionMovement"<<std::endl;
     std::vector<Transform3D> retval;
 
     Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);
     Transform3D r = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
-    Transform3D t = createTransformTranslate(Vector3D(0,120,127));
+    Transform3D t = createTransformTranslate(Vector3D(-10,-11,0));
 
-    for (unsigned i=0; i<50; ++i)
+    for (unsigned i=0; i<40; ++i)
     {
         Transform3D t_delta = createTransformTranslate(Vector3D(2,0,0));
         t = t_delta * t;

@@ -18,11 +18,7 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapper::New();
 
-	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-			this, SLOT(receiveTransforms(Transform3D, double)));
 
-	connect(mTool.get(), SIGNAL(toolVisible(bool)),
-			this, SLOT(receiveVisible(bool)));
 }
 
 ToolRep3D::~ToolRep3D()
@@ -42,6 +38,11 @@ void ToolRep3D::setTool(ToolPtr tool)
 	mTool = tool;
 	mPolyDataMapper->SetInput(mTool->getGraphicsPolyData());
 	mToolActor->SetMapper(mPolyDataMapper);
+	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+			this, SLOT(receiveTransforms(Transform3D, double)));
+
+	connect(mTool.get(), SIGNAL(toolVisible(bool)),
+			this, SLOT(receiveVisible(bool)));
 }
 bool ToolRep3D::hasTool(ToolPtr tool) const
 {
@@ -57,7 +58,8 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 }
 void ToolRep3D::receiveTransforms(Transform3D matrix, double timestamp)
 {
-	mToolActor->SetUserMatrix(matrix.matrix().GetPointer());
+	std::cout<<"recived tool matrix"<<std::endl;
+	mToolActor->SetUserMatrix( matrix.matrix().GetPointer());
 }
 void ToolRep3D::receiveVisible(bool visible)
 {

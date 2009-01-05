@@ -74,7 +74,6 @@ DataManager* DataManager::instance()
 DataManager::DataManager()
 {
 	mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
-	
 	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
 	mMeshReaders[mrtSTL].reset(new StlMeshReader());
 }

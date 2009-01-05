@@ -49,7 +49,7 @@ TestInterface::TestInterface() :
 	mTestMenu->addAction(mTestSwitchingViewsRepsAndImagesAction);
 
 	//Setup and show the mainwindow
-	this->resize(QSize(1000,500));
+	this->resize( QSize(1000,500) );
 	this->show();
 
 	mView1 = new View();

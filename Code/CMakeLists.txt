@@ -27,7 +27,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Tool/sscDummyToolManager.h
     #Tool/cxToolManager.h #remove when moved to custusx
     Rep/sscRep.h
-    Rep/sscToolRep3D.h
+    Rep/sscSlicerRepSW.h
+    Rep/sscToolRep3D.h    
     )
 
 SET( SSC_HEADER_FILES
@@ -74,6 +75,7 @@ SET( SSC_SOURCE_FILES
     Rep/sscVolumetricRep.cpp
     Rep/sscGeometricRep.cpp
     Rep/sscToolRep3D.cpp
+    Rep/sscSlicerRepSW.cpp
     Data/sscData.cpp
     Data/sscImage.cpp
     Data/sscMesh.cpp
