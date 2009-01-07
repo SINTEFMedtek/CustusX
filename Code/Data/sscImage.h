@@ -9,6 +9,7 @@
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
+typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 #include "sscData.h"
 #include "sscRep.h"
@@ -23,6 +24,7 @@ namespace ssc
  */
 class Image : public Data
 {
+	Q_OBJECT
 public:
 	virtual ~Image();
 	Image(const std::string& uid, const vtkImageDataPtr& data);
@@ -38,11 +40,20 @@ public:
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
-	virtual vtkPointsPtr getLandmarks(); ///< \return all landmarks defined on the image.
+	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
 //	virtual vtkLookupTablePtr getLut() const = 0;
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
+
+signals:
+	void landmarkRemoved(double x, double y, double z);
+	void landmarkAdded(double x, double y, double z);
+
+public slots:
+	void addLandmarkSlot(double x, double y, double z);
+	void removeLandmarkSlot(double x, double y, double z);
+
 private:
 	std::string mUid;
 	std::string mName;
@@ -51,10 +62,15 @@ private:
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
-	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata  	
+	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
 	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
 
-	vtkPointsPtr mLandmarks;
+	//Cannot remove points from vtkPoint, using vtkDoubleArray instead,
+	// to create vtkPoints if/when needed:
+	// vtkPointsPtr points = vtkPoints::New();
+	// points->SetData(mLandmarks);
+	//vtkPointsPtr mLandmarks;
+	vtkDoubleArrayPtr mLandmarks;
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

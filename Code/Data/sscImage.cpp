@@ -3,6 +3,7 @@
 #include <vtkImageReslice.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
+#include <vtkDoubleArray.h>
 
 #define USE_TRANSFORM_RESCLICER
 
@@ -13,8 +14,9 @@ Image::~Image()
 {
 }
 
-Image::Image(const std::string& uid, const vtkImageDataPtr& data) : 
-	mUid(uid), mName(uid), mBaseImageData(data)
+Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
+	mUid(uid), mName(uid), mBaseImageData(data),
+	mLandmarks(vtkDoubleArray::New())
 {
 	mOutputImageData = mBaseImageData;
 #ifdef USE_TRANSFORM_RESCLICER
@@ -23,8 +25,9 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mOrientator->SetInput(mBaseImageData);
 	mOutputImageData = mOrientator->GetOutput();
 	mOutputImageData->Update();
-	//mOutputImageData->UpdateInformation();	
+	//mOutputImageData->UpdateInformation();
 #endif
+	mLandmarks->SetNumberOfComponents(3);
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
@@ -39,9 +42,9 @@ void Image::setName(const std::string& name)
 void Image::setTransform(const Transform3D& trans)
 {
 	mTransform = trans;
-	
+
 #ifdef USE_TRANSFORM_RESCLICER
-	mOrientator->SetResliceAxes(mTransform.matrix());	
+	mOrientator->SetResliceAxes(mTransform.matrix());
 	mOutputImageData->Update();
 	mOutputImageData->UpdateInformation();
 #endif
@@ -77,7 +80,7 @@ vtkImageDataPtr Image::getRefVtkImageData()
 	return mOutputImageData;
 }
 
-vtkPointsPtr Image::getLandmarks()
+vtkDoubleArrayPtr Image::getLandmarks()
 {
 	return mLandmarks;
 }
@@ -88,5 +91,20 @@ void Image::connectRep(const RepWeakPtr& rep)
 void Image::disconnectRep(const RepWeakPtr& rep)
 {
 	mReps.erase(rep);
+}
+void Image::addLandmarkSlot(double x, double y, double z)
+{
+	double point[3] = {x, y, z};
+	mLandmarks->InsertNextTupleValue(point);
+}
+void Image::removeLandmarkSlot(double x, double y, double z)
+{
+	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
+	for(int i=1; i<= numberOfLandmarks; i++)
+	{
+		double* point = mLandmarks->GetTuple(i);
+		if(point[0] == x && point[1] == y && point[2] == z)
+			mLandmarks->RemoveTuple(i);
+	}
 }
 } // namespace ssc

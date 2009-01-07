@@ -6,6 +6,7 @@
 
 #include <boost/shared_ptr.hpp>
 
+#include <QObject>
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 #include "sscTransform3D.h"
@@ -29,12 +30,12 @@ enum REGISTRATION_STATUS
 /**Superclass for all data objects.
  * Example suclassess: Image and Surface.
  */
-class Data
+class Data : public QObject
 {
 public:
 	Data();
 	virtual ~Data();
-	
+
 	void setUID(const std::string& uid);
 	void setName(const std::string& name);
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
