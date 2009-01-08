@@ -10,6 +10,7 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
+typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 
 #include "sscData.h"
 #include "sscRep.h"
@@ -39,9 +40,11 @@ public:
 	virtual REGISTRATION_STATUS getRegistrationStatus() const;
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
-	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
+	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
-//	virtual vtkLookupTablePtr getLut() const = 0;
+
+	virtual void setLut(const vtkLookupTablePtr& lut);
+	virtual vtkLookupTablePtr getLut() const;
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
@@ -49,6 +52,7 @@ public:
 signals:
 	void landmarkRemoved(double x, double y, double z);
 	void landmarkAdded(double x, double y, double z);
+	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 
 public slots:
 	void addLandmarkSlot(double x, double y, double z);
@@ -58,6 +62,7 @@ private:
 	std::string mUid;
 	std::string mName;
 	Transform3D mTransform; ///< the transform from data to reference space
+	vtkLookupTablePtr mLut;
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 

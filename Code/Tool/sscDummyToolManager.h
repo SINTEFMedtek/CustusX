@@ -17,7 +17,7 @@ namespace ssc
 class DummyToolManager : public ToolManager
 {
 	Q_OBJECT
-	
+
 public:
 	typedef std::map<std::string, DummyToolPtr> DummyToolMap;
 	typedef boost::shared_ptr<DummyToolMap> DummyToolMapPtr;
@@ -45,6 +45,7 @@ public:
 	virtual std::vector<std::string> getToolUids() const;
 
 	virtual Transform3DPtr get_rMpr() const;
+	virtual void set_rMpr(const Transform3DPtr& val);
 	virtual ToolPtr getReferenceTool() const;
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "");
 

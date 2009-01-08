@@ -160,6 +160,12 @@ Transform3DPtr DummyToolManager::get_rMpr() const
 {
 	return m_rMpr;
 }
+
+void DummyToolManager::set_rMpr(const Transform3DPtr& val)
+{
+	m_rMpr = val;
+}
+
 ToolPtr DummyToolManager::getReferenceTool() const
 {
 	return mReferenceTool;

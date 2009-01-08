@@ -20,24 +20,6 @@ enum READER_TYPE
 	rtMETAIMAGE,
 	rtAUTO
 };
-
-class ImageReader
-{
-public:
-	virtual ~ImageReader() {}
-	virtual bool canLoad(const std::string& filename) = 0;
-	virtual ImagePtr load(const std::string& filename) = 0;
-};
-typedef boost::shared_ptr<ImageReader> ImageReaderPtr;
-
-class MetaImageReader : public ImageReader
-{
-public:
-	virtual ~MetaImageReader() {}
-	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual ImagePtr load(const std::string& filename);
-};
-
 //-----
 enum MESH_READER_TYPE
 {
@@ -45,72 +27,41 @@ enum MESH_READER_TYPE
 	mrtSTL,
 };
 
-class MeshReader
-{
-public:
-	virtual ~MeshReader() {}
-	virtual bool canLoad(const std::string& filename) = 0;
-	virtual MeshPtr load(const std::string& filename) = 0;
-};
-typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
-
-
-class PolyDataMeshReader : public MeshReader
-{
-public:
-	virtual ~PolyDataMeshReader() {}
-	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual MeshPtr load(const std::string& filename);
-};
-
-
-class StlMeshReader : public MeshReader
-{
-public:
-	virtual ~StlMeshReader() {}
-	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual MeshPtr load(const std::string& filename);
-};
-
-
-//-----
+/**Manager for images, meshes, and associated data.
+ *
+ * Simply calling instance() will instantiate the default manager DataManagerImpl.
+ * It is also possible to subclass and use setInstance() to set another type.
+ */
 class DataManager
 {
 public:
 	static DataManager* instance();
 
 	// images
-	ImagePtr loadImage(const std::string& filename, READER_TYPE type);
-	ImagePtr getImage(const std::string& uid);
-	std::map<std::string, ImagePtr> getImages();
+	virtual ImagePtr loadImage(const std::string& filename, READER_TYPE type) = 0;
+	virtual ImagePtr getImage(const std::string& uid) = 0;
+	virtual std::map<std::string, ImagePtr> getImages() = 0;
 
-	std::map<std::string, std::string> getImageUidsAndNames() const;
-	std::vector<std::string> getImageNames() const;
-	std::vector<std::string> getImageUids() const;
+	virtual std::map<std::string, std::string> getImageUidsAndNames() const = 0;
+	virtual std::vector<std::string> getImageNames() const = 0;
+	virtual std::vector<std::string> getImageUids() const = 0;
 
 	// meshes
-	MeshPtr loadMesh(const std::string& fileName, MESH_READER_TYPE meshType);
-	MeshPtr getMesh(const std::string& uid);
-	std::map<std::string, MeshPtr> getMeshes();
-	
-	std::map<std::string, std::string> getMeshUIDsWithNames() const;
-	std::vector<std::string> getMeshUIDs() const;
-	std::vector<std::string> getMeshNames() const;
+	virtual MeshPtr loadMesh(const std::string& fileName, MESH_READER_TYPE meshType) = 0;
+	virtual MeshPtr getMesh(const std::string& uid) = 0;
+	virtual std::map<std::string, MeshPtr> getMeshes() = 0;
 
+	virtual std::map<std::string, std::string> getMeshUIDsWithNames() const = 0;
+	virtual std::vector<std::string> getMeshUIDs() const = 0;
+	virtual std::vector<std::string> getMeshNames() const = 0;
 
-
-private:
+protected:
+	static void setInstance(DataManager* instance);
 	DataManager();
 	virtual ~DataManager();
 
+private:
 	static DataManager* mInstance;
-
-	std::map<std::string, ImagePtr> mImages;
-	std::map<READER_TYPE, ImageReaderPtr> mImageReaders;
-
-	std::map<std::string, MeshPtr> mMeshes;
-	std::map<MESH_READER_TYPE, MeshReaderPtr> mMeshReaders;
-
 };
 
 } // namespace ssc

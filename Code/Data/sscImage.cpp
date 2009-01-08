@@ -28,12 +28,23 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	//mOutputImageData->UpdateInformation();
 #endif
 	mLandmarks->SetNumberOfComponents(3);
+
+	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
 	mBaseImageData = data;
+#ifdef USE_TRANSFORM_RESCLICER
+	mOrientator->SetInput(mBaseImageData);
+	mOrientator->SetResliceAxes(mTransform.matrix());
+	mOutputImageData->Update();
+	mOutputImageData->UpdateInformation();
+	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+#endif
+	emit vtkImageDataChanged();
 }
+
 void Image::setName(const std::string& name)
 {
 	mName = name;
@@ -41,13 +52,21 @@ void Image::setName(const std::string& name)
 
 void Image::setTransform(const Transform3D& trans)
 {
+	if (similar(trans, mTransform))
+	{
+		return;
+	}
+
 	mTransform = trans;
 
 #ifdef USE_TRANSFORM_RESCLICER
 	mOrientator->SetResliceAxes(mTransform.matrix());
 	mOutputImageData->Update();
 	mOutputImageData->UpdateInformation();
+	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 #endif
+
+	emit vtkImageDataChanged();
 }
 
 std::string Image::getUid() const
@@ -107,4 +126,16 @@ void Image::removeLandmarkSlot(double x, double y, double z)
 			mLandmarks->RemoveTuple(i);
 	}
 }
+
+void Image::setLut(const vtkLookupTablePtr& lut)
+{
+	mLut = lut;
+}
+
+vtkLookupTablePtr Image::getLut() const
+{
+	return mLut;
+}
+
+
 } // namespace ssc

@@ -20,17 +20,17 @@ public:
 
 	/** not sure if this is needed? we have getInstance in subclasses...*/
 	static void setInstance(ToolManager* instance)
-	{	
+	{
 		mInstance = instance;
 	};
-	static ToolManager* getInstance() { return mInstance; }	
+	static ToolManager* getInstance() { return mInstance; }
 	static void shutdown()
 	{
 		delete mInstance;
 		mInstance = NULL;
 	}
-	
-	
+
+
 	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
 	virtual bool isTracking() const = 0; ///< system is tracking
@@ -52,6 +52,7 @@ public:
 	virtual std::vector<std::string> getToolUids() const = 0; ///< get the uid of all the tools
 
 	virtual Transform3DPtr get_rMpr() const = 0; ///< transform from patient ref to ref space
+	virtual void set_rMpr(const Transform3DPtr& val) = 0; ///< set transform from patient ref to ref space
 	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 	/** write to file all recorded transforms and timestamps */
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "") = 0;
@@ -62,7 +63,7 @@ signals:
 	void trackingStarted(); ///< signal emitted when the system starts tracking
 	void trackingStopped(); ///< signal emitted when the system stops tracking
 	void dominantToolChanged(const std::string& uId); ///<signal for change of dominant tool
-	
+
 protected:
 	ToolManager(){}; ///< Empty on purpose
 	~ToolManager(){}; ///< Empty on purpose

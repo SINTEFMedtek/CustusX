@@ -7,6 +7,7 @@ typedef	vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunction
 typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
 typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
 typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
+typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 
 #include "sscRepImpl.h"
 #include "sscImage.h"
@@ -20,6 +21,7 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
  */
 class VolumetricRep : public RepImpl
 {
+	Q_OBJECT
 public:
 	virtual ~VolumetricRep();
 
@@ -42,6 +44,12 @@ protected:
 	vtkVolumePtr mVolume;
 
 	ImagePtr mImage;
+
+	// nye ting:
+	vtkLookupTablePtr mLUT;
+
+private slots:
+	void vtkImageDataChangedSlot();
 };
 
 } // namespace ssc
