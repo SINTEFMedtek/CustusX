@@ -84,7 +84,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	{
 
 		mImage->disconnectRep(mSelf);
-		disconnect(mImage.get(), SIGNAL("vtkImageDataChanged()"), this, SLOT("vtkImageDataChangedSlot()"));
+		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 	}
 
 	mImage = image;
@@ -92,7 +92,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-		connect(mImage.get(), SIGNAL("vtkImageDataChanged()"), this, SLOT("vtkImageDataChangedSlot()"));
+		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		mLUT = mImage->getLut();
 		mTextureMapper3D->SetInput( mImage->getRefVtkImageData() );
 	}
