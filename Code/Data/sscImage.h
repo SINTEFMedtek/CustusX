@@ -10,10 +10,11 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
-typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 
 #include "sscData.h"
 #include "sscRep.h"
+#include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 
 namespace ssc
 {
@@ -43,8 +44,8 @@ public:
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
 
-	virtual void setLut(const vtkLookupTablePtr& lut);
-	virtual vtkLookupTablePtr getLut() const;
+	ImageTF3D& transferFunctions3D();
+	ImageLUT2D& lookupTable2D();
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
@@ -59,6 +60,9 @@ public slots:
 	void removeLandmarkSlot(double x, double y, double z);
 
 private:
+	ImageTF3D mImageTransferFunctions3D;
+	ImageLUT2D mImageLookupTable2D;
+
 	std::string mUid;
 	std::string mName;
 	Transform3D mTransform; ///< the transform from data to reference space

@@ -16,8 +16,8 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
-	mTextureMapper3D(vtkVolumeTextureMapper3DPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
+	mTextureMapper3D(vtkVolumeTextureMapper3DPtr::New()),
 	mVolume(vtkVolumePtr::New())
 {
 	double maxVal = 255;//500.0;
@@ -93,7 +93,9 @@ void VolumetricRep::setImage(ImagePtr image)
 	{
 		mImage->connectRep(mSelf);
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		mLUT = mImage->getLut();
+		//mLUT = mImage->getLut();
+		mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
+		mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
 		mTextureMapper3D->SetInput( mImage->getRefVtkImageData() );
 	}
 	else
@@ -125,7 +127,9 @@ void VolumetricRep::vtkImageDataChangedSlot()
 		return;
 	}
 
-	mLUT = mImage->getLut();
+	//mLUT = mImage->getLut();
+	mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
+	mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
 	mTextureMapper3D->SetInput( mImage->getRefVtkImageData() );
 	// TODO CA test if we need more update of the texturemapper...
 }

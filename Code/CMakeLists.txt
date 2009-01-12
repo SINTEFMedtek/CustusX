@@ -78,7 +78,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicerRepSW.cpp
     Data/sscData.cpp
     Data/sscImage.cpp
-    #Data/sscImageImpl.cpp
+    Data/sscImageTF3D.cpp
+    Data/sscImageLUT2D.cpp
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManagerImpl.cpp

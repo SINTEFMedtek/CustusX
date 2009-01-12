@@ -15,6 +15,8 @@ Image::~Image()
 }
 
 Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
+	mImageTransferFunctions3D(data),
+	mImageLookupTable2D(data),
 	mUid(uid), mName(uid), mBaseImageData(data),
 	mLandmarks(vtkDoubleArray::New())
 {
@@ -42,7 +44,21 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	mOutputImageData->UpdateInformation();
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 #endif
+	mImageTransferFunctions3D = ImageTF3D(data);
+	mImageLookupTable2D = ImageLUT2D(data);
+
+
 	emit vtkImageDataChanged();
+}
+
+ImageTF3D& Image::transferFunctions3D()
+{
+	return mImageTransferFunctions3D;
+}
+
+ImageLUT2D& Image::lookupTable2D()
+{
+	return mImageLookupTable2D;
 }
 
 void Image::setName(const std::string& name)
@@ -127,15 +143,15 @@ void Image::removeLandmarkSlot(double x, double y, double z)
 	}
 }
 
-void Image::setLut(const vtkLookupTablePtr& lut)
-{
-	mLut = lut;
-}
-
-vtkLookupTablePtr Image::getLut() const
-{
-	return mLut;
-}
+//void Image::setLut(const vtkLookupTablePtr& lut)
+//{
+//	mLut = lut;
+//}
+//
+//vtkLookupTablePtr Image::getLut() const
+//{
+//	return mLut;
+//}
 
 
 } // namespace ssc
