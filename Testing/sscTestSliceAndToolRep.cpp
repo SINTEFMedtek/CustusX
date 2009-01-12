@@ -84,6 +84,7 @@ void TestSliceAndToolRep::start()
 
 	//ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
 	//view->addRep(axesRep);
+	/*3D Tool */
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
@@ -92,7 +93,7 @@ void TestSliceAndToolRep::start()
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
 	
-	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New(tool->getUid(), tool->getName());
+	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view3D->addRep(toolRep);
 

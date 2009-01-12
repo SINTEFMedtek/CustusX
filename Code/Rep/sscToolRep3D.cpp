@@ -3,6 +3,7 @@
 #include <vtkActor.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyData.h>
+#include <vtkSTLReader.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
 
@@ -17,10 +18,14 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 {
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapper::New();
-
-
+	mSTLReader = vtkSTLReader::New();
+	
+//	if (pd::Settings::instance()->useDebugAxis())
+//	 	{
+//		 	mTool->AddPart( Axes3D().getProp() );
+//	 	}
 }
-
+	
 ToolRep3D::~ToolRep3D()
 {}
 ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name)
@@ -29,6 +34,7 @@ ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name)
 	retval->mSelf = retval;
 	return retval;
 }
+
 std::string ToolRep3D::getType() const
 {
 	return "ssc::ToolRep3D";
@@ -36,13 +42,27 @@ std::string ToolRep3D::getType() const
 void ToolRep3D::setTool(ToolPtr tool)
 {
 	mTool = tool;
-	mPolyDataMapper->SetInput(mTool->getGraphicsPolyData());
+	std::string filename = mTool->getGraphicsFileName();
+	 
+	if( !filename.empty() )
+	{
+		mSTLReader->SetFileName( filename.c_str() ); 
+		mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );	 //read a 3D model file of the tool
+		
+	}
+	else
+	{
+		mPolyDataMapper->SetInput( mTool->getGraphicsPolyData() ); // creates a cone, default	
+	}
+	
 	mToolActor->SetMapper(mPolyDataMapper);
+	
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
 			this, SLOT(receiveTransforms(Transform3D, double)));
 
 	connect(mTool.get(), SIGNAL(toolVisible(bool)),
 			this, SLOT(receiveVisible(bool)));
+	
 }
 bool ToolRep3D::hasTool(ToolPtr tool) const
 {
@@ -50,7 +70,7 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 }
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
-	view->getRenderer()->AddActor(mToolActor.GetPointer());
+	view->getRenderer()->AddActor( mToolActor.GetPointer() );
 }
 void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
@@ -65,4 +85,5 @@ void ToolRep3D::receiveVisible(bool visible)
 {
 	mToolActor->SetVisibility(visible);
 }
+
 } // namespace ssc

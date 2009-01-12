@@ -79,6 +79,10 @@ void DummyTool::startTracking()
 
 	emit toolVisible(visible);
 }
+bool DummyTool::isCalibrated() const
+{
+	return true;
+}
 void DummyTool::stopTracking()
 {
 	mTimer->stop();

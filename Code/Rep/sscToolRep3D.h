@@ -8,6 +8,7 @@
 
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
+typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 namespace ssc
 {
@@ -24,7 +25,7 @@ public:
 
 	virtual void setTool(ToolPtr tool);
 	virtual bool hasTool(ToolPtr tool) const;
-
+	
 protected:
 	ToolRep3D(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
@@ -46,6 +47,7 @@ private:
 	ToolPtr mTool;
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
+	vtkSTLReaderPtr mSTLReader;
 };
 } // namespace ssc
 

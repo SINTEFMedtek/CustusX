@@ -83,9 +83,9 @@ std::vector<RepPtr> View::getReps()
 	return mReps;
 }
 
-bool View::hasRep(const RepPtr& rep) const
+bool View::hasRep(const RepPtr& rep) const	
 {
-	return std::count(mReps.begin(), mReps.end(), rep);
+	return std::count(mReps.begin(), mReps.end(), rep);	
 }
 
 } // namespace ssc

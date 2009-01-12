@@ -33,6 +33,7 @@ public:
 	virtual std::string getUid() const;
 	virtual std::string getName() const;
 	virtual int getIndex() const{return 0;};
+	virtual bool isCalibrated() const;
 	void startTracking();
 	void stopTracking();
 
