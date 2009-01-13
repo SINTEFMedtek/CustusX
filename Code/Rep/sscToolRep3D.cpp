@@ -43,15 +43,19 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
 	mTool = tool;
 	std::string filename = mTool->getGraphicsFileName();
-	 
-	if( !filename.empty() )
+	std::cout<<"filename :" <<	filename << std::endl;
+//	std::extension = filename.str();
+	
+	if( filename.compare(filename.size()-3,3,"STL") == 0 )
 	{
+		std::cout<<"reading filename :" <<	std::endl;
 		mSTLReader->SetFileName( filename.c_str() ); 
 		mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );	 //read a 3D model file of the tool
 		
 	}
 	else
 	{
+		std::cout<<"making a cone :" <<	std::endl;
 		mPolyDataMapper->SetInput( mTool->getGraphicsPolyData() ); // creates a cone, default	
 	}
 	
