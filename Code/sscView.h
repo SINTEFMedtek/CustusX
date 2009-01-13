@@ -43,6 +43,8 @@ public:
   virtual std::vector<RepPtr> getReps(); ///< returns all reps in the view
   virtual void removeReps(); ///< removes all reps in the view
 
+signals:
+      void resized(QSize size);
 protected:
 	std::string mUid; 		///< the views unique id
 	std::string mName; 		///< the views name
@@ -51,8 +53,12 @@ protected:
 	vtkRenderWindowPtr 						mRenderWindow;
 	std::vector<RepPtr> 					mReps; ///< storage for internal reps.
 	typedef std::vector<RepPtr>::iterator 	RepsIter; ///< iterator typedef for the internal rep vector.
+private:
+    void resizeEvent(QResizeEvent * event);
 };
+
 typedef boost::shared_ptr<View> ViewPtr;
+
 } // namespace ssc
 
 

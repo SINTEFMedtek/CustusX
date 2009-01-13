@@ -1,5 +1,6 @@
 #include "sscView.h"
 
+#include <QtGui>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "sscRep.h"
@@ -83,9 +84,15 @@ std::vector<RepPtr> View::getReps()
 	return mReps;
 }
 
-bool View::hasRep(const RepPtr& rep) const	
+bool View::hasRep(const RepPtr& rep) const
 {
-	return std::count(mReps.begin(), mReps.end(), rep);	
+	return std::count(mReps.begin(), mReps.end(), rep);
 }
+
+void View::resizeEvent ( QResizeEvent * event )
+{
+    emit resized(event->size());
+}
+
 
 } // namespace ssc
