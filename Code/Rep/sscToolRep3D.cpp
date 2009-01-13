@@ -43,12 +43,10 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
 	mTool = tool;
 	std::string filename = mTool->getGraphicsFileName();
-	std::cout<<"filename :" <<	filename << std::endl;
-//	std::extension = filename.str();
 	
 	if( filename.compare(filename.size()-3,3,"STL") == 0 )
 	{
-		std::cout<<"reading filename :" <<	std::endl;
+		std::cout<<"reading filename :" << filename <<	std::endl;
 		mSTLReader->SetFileName( filename.c_str() ); 
 		mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );	 //read a 3D model file of the tool
 		
@@ -82,7 +80,6 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 }
 void ToolRep3D::receiveTransforms(Transform3D matrix, double timestamp)
 {
-	std::cout<<"recived tool matrix"<<std::endl;
 	mToolActor->SetUserMatrix( matrix.matrix().GetPointer());
 }
 void ToolRep3D::receiveVisible(bool visible)
