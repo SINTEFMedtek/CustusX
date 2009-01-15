@@ -2,8 +2,8 @@
 #define SSCVIEW_H_
 
 #include <boost/shared_ptr.hpp>
-#include "QVTKWidget.h"
 #include "vtkSmartPointer.h"
+#include "QVTKWidget.h"
 
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;

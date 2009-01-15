@@ -1,9 +1,28 @@
 #include "sscView.h"
 
-#include <QtGui>
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
+#ifdef check
+	#undef check
+#endif
+#include <QtGui>
 #include "sscRep.h"
+
+/*! Copy/pasted from qitemdelegate.cpp
+  \internal
+
+  Note that on Mac, if /usr/include/AssertMacros.h is included prior
+  to QItemDelegate, and the application is building in debug mode, the
+  check(assertion) will conflict with QItemDelegate::check.
+
+  To avoid this problem, add
+
+  #ifdef check
+	#undef check
+  #endif
+
+  after including AssertMacros.h
+*/
 
 namespace ssc
 {
