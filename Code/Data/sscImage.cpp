@@ -5,6 +5,8 @@
 #include <vtkMatrix4x4.h>
 #include <vtkDoubleArray.h>
 
+#include <sstream>
+
 #define USE_TRANSFORM_RESCLICER
 
 namespace ssc
@@ -131,18 +133,37 @@ void Image::addLandmarkSlot(double x, double y, double z)
 {
 	double point[3] = {x, y, z};
 	mLandmarks->InsertNextTupleValue(point);
+	emit landmarkAdded(x, y, z);
 }
 void Image::removeLandmarkSlot(double x, double y, double z)
 {
+
 	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
-	for(int i=1; i<= numberOfLandmarks; i++)
+	for(int i=0; i<= numberOfLandmarks-1; i++)
 	{
 		double* point = mLandmarks->GetTuple(i);
 		if(point[0] == x && point[1] == y && point[2] == z)
 			mLandmarks->RemoveTuple(i);
 	}
+	emit landmarkRemoved(x, y, z);
 }
-
+void Image::printLandmarks()
+{
+	std::cout << "Landmarks: " << std::endl;
+	for(int i=0; i<= mLandmarks->GetNumberOfTuples()-1; i++)
+	{
+		double* point = mLandmarks->GetTuple(i);
+		std::stringstream stream;
+		stream << i << ": (";
+		stream << point[0];
+		stream << ",";
+		stream << point[1];
+		stream << ",";
+		stream << point[2];
+		stream << ")";
+		std::cout << stream.str() << std::endl;
+	}
+}
 //void Image::setLut(const vtkLookupTablePtr& lut)
 //{
 //	mLut = lut;

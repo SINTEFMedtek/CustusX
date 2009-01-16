@@ -82,9 +82,11 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-
 		mImage->disconnectRep(mSelf);
-		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()),
+					this, SLOT(vtkImageDataChangedSlot()));
+		disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
+					mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 	}
 
 	mImage = image;
@@ -92,7 +94,10 @@ void VolumetricRep::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		connect(mImage.get(), SIGNAL(vtkImageDataChanged()),
+					this, SLOT(vtkImageDataChangedSlot()));
+		connect(this, SIGNAL(addPermanentPoint(double, double, double)),
+					mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 		//mLUT = mImage->getLut();
 		mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
 		mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
