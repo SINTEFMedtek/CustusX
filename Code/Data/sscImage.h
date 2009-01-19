@@ -50,7 +50,7 @@ public:
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
-	void Image::printLandmarks(); //TODO: JUST FOR TESTING
+	void printLandmarks(); //TODO: JUST FOR TESTING
 
 signals:
 	void landmarkRemoved(double x, double y, double z);
