@@ -136,7 +136,6 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
 	mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
 	mTextureMapper3D->SetInput( mImage->getRefVtkImageData() );
-	// TODO CA test if we need more update of the texturemapper...
 }
 
 

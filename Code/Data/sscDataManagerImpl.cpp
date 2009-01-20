@@ -67,10 +67,20 @@ DataManagerImpl::DataManagerImpl()
 	mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
 	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
 	mMeshReaders[mrtSTL].reset(new StlMeshReader());
+	mCenter = Vector3D(0,0,0);
 }
 
 DataManagerImpl::~DataManagerImpl()
 {
+}
+
+Vector3D DataManagerImpl::getCenter() const
+{
+	return mCenter;
+}
+void DataManagerImpl::setCenter(const Vector3D& center)
+{
+	mCenter = center;
 }
 
 ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE type)
