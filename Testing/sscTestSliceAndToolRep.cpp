@@ -77,7 +77,7 @@ void TestSliceAndToolRep::start()
 	viewC = new ssc::View();
 	viewS = new ssc::View();
 	view3D = new ssc::View();
-	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New(image1->getUid() );
+	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image1->getUid() );
 	mRepPtr->setImage(image1);
 	mRepPtr->setName(image1->getName());
 	view3D->addRep(mRepPtr);
@@ -102,25 +102,27 @@ void TestSliceAndToolRep::start()
 	ssc::SliceRepSWPtr axialRep = ssc::SliceRepSW::New("Axial");
 	axialRep->setImage(image1);
 	axialRep->setTool(tool);
-	axialRep->setOrientation(ssc::SliceComputer::ptAXIAL);
-	axialRep->setFollowType(ssc::SliceComputer::ftFIXED_CENTER);
+	axialRep->setOrientation(ssc::ptAXIAL);
+	
+	axialRep->setFollowType(ssc::ftFIXED_CENTER);
 	//axialRep->setFollowType(ssc::SliceComputer::ftFOLLOW_TOOL);
 	viewA->addRep(axialRep);
 
 	ssc::SliceRepSWPtr sagittalRep = ssc::SliceRepSW::New("Sagittal");
 	sagittalRep->setImage(image1);
 	sagittalRep->setTool(tool);
-	sagittalRep->setOrientation(ssc::SliceComputer::ptSAGITTAL);
+	sagittalRep->setOrientation(ssc::ptSAGITTAL);
 	viewS->addRep(sagittalRep);
 
 	ssc::SliceRepSWPtr CoronalRep = ssc::SliceRepSW::New("Coronal");
 	CoronalRep->setImage(image1);
 	CoronalRep->setTool(tool);
-	CoronalRep->setOrientation(ssc::SliceComputer::ptCORONAL);
+	CoronalRep->setOrientation(ssc::ptCORONAL);
 	viewC->addRep(CoronalRep);
 
 	QGridLayout* sliceLayout = new QGridLayout;
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
+	
 	mainLayout->addLayout(sliceLayout);//Slice layout
 	sliceLayout->addWidget(viewC, 0, 0);
 	sliceLayout->addWidget(viewS, 0, 1);

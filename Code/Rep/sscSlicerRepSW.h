@@ -2,7 +2,7 @@
 #define SSCSLICERREPSW_H_
 
 #include <vtkSmartPointer.h>
-
+#include "sscDefinitions.h"
 #include "sscTool.h"
 #include "sscRepImpl.h"
 #include "sscImage.h"
@@ -28,17 +28,20 @@ public:
 	virtual std::string getType() const { return "ssc::SliceRep"; }
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
-	void setTool(ToolPtr image);
-	void setOrientation(SliceComputer::PLANE_TYPE orientation );
-	void setFollowType(SliceComputer::FOLLOW_TYPE followType);
-	
+	void setTool(ToolPtr tool);
+	void setOrientation(PLANE_TYPE orientation );
+	void setFollowType(FOLLOW_TYPE followType);
+	void setTransform(const Transform3D& pos);
+	std::string getImageUid()const;
+	PLANE_TYPE getOrientation();
 protected:
 	SliceRepSW(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
 	virtual void removeRepActorsFromViewRenderer(View* view) ;
 
 private slots:
-	void updateToolTransform( Transform3D matrix, double timestamp );
+	void updateToolTransformSlot( Transform3D matrix, double timestamp );
+	void setNewCenterSlot(const Vector3D& center);
 	
 private:
 	void compute();	
@@ -47,12 +50,13 @@ private:
 	void setLookupTable ();
 	
 	//typedef boost::shared_ptr<SliceComputer> SliceComputerPtr;
+	Vector3D mFixedCenter;
 	SliceComputer mCutplane;
-	SliceComputer::PLANE_TYPE mPlaneType;
-	SliceComputer::FOLLOW_TYPE mFollowType;
+	PLANE_TYPE mPlaneType;
+	FOLLOW_TYPE mFollowType;
 	ImagePtr mImage;
 	ToolPtr mTool;
-		
+	std::string mImageUid;
 	vtkWindowLevelLookupTablePtr mLookupTable;
 	vtkImageMapToWindowLevelColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;

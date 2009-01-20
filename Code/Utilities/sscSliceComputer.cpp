@@ -1,4 +1,5 @@
 #include "sscSliceComputer.h"
+#include "sscDefinitions.h"
 #include <math.h>
 
 namespace ssc

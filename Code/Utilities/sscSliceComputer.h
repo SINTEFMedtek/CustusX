@@ -3,6 +3,7 @@
 
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
+#include "sscDefinitions.h"
 
 namespace ssc
 {
@@ -35,25 +36,27 @@ bool similar(const SlicePlane& a, const SlicePlane& b);
 class SliceComputer
 {
 public:
-	enum ORIENTATION_TYPE
-	{
-		otOBLIQUE,   ///< orient planes relative to the tool space 
-		otORTHOGONAL ///< orient planes relative to the image/reference space.
-	};
-	enum PLANE_TYPE
-	{
-		ptSAGITTAL,   ///< a slice seen from the side of the patient
-		ptCORONAL,    ///< a slice seen from the front of the patient
-		ptAXIAL,      ///< a slice seen from the top of the patient
-		ptANYPLANE,   ///< a plane aligned with the tool base plane
-		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
-		ptRADIALPLANE ///< y-rotated 90* relative to anyplane (bird's view)
-	};
-	enum FOLLOW_TYPE
-	{
-		ftFOLLOW_TOOL, ///< center follows tool
-		ftFIXED_CENTER ///< center is set.
-	};
+	
+	/* This enums is plaeced in a Definition files*/
+//	enum ORIENTATION_TYPE
+//	{
+//		otOBLIQUE,   ///< orient planes relative to the tool space 
+//		otORTHOGONAL ///< orient planes relative to the image/reference space.
+//	};
+//	enum PLANE_TYPE
+//	{
+//		ptSAGITTAL,   ///< a slice seen from the side of the patient
+//		ptCORONAL,    ///< a slice seen from the front of the patient
+//		ptAXIAL,      ///< a slice seen from the top of the patient
+//		ptANYPLANE,   ///< a plane aligned with the tool base plane
+//		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
+//		ptRADIALPLANE ///< y-rotated 90* relative to anyplane (bird's view)
+//	};
+//	enum FOLLOW_TYPE
+//	{
+//		ftFOLLOW_TOOL, ///< center follows tool
+//		ftFIXED_CENTER ///< center is set.
+//	};
 	
 public:
 	SliceComputer();

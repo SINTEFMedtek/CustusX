@@ -46,7 +46,7 @@ public:
 	 * \sa getGraphicsPolyData().
 	 */
 	virtual std::string getGraphicsFileName() const = 0;
-	/**Get a pointer to the tools graphical data in the form of vtkPolyData,
+	/**Get a pointer to the tools graphical data in the form of vtkPolyData,	
 	 * if any. Either getGraphicsPolyData() or getGraphicsFileName() or both
 	 * should return valid data. \sa getGraphicsFileName().
 	 */

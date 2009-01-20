@@ -41,6 +41,8 @@ Tool::Type DummyTool::getType() const
 }
 std::string DummyTool::getGraphicsFileName() const
 {
+	//return "DummyToolsDoNotHaveAGraphicsFile";
+
 	return "DummyToolsDoNotHaveAGraphicsFile";
 }
 vtkPolyDataPtr DummyTool::getGraphicsPolyData() const

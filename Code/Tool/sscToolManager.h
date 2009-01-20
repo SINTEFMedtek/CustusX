@@ -57,6 +57,8 @@ public:
 	/** write to file all recorded transforms and timestamps */
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "") = 0;
 
+	
+	
 signals:
 	void configured(); ///< signal emitted when the system is configured
 	void initialized(); ///< signal emitted when the system is initialized

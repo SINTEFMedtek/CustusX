@@ -7,6 +7,7 @@
 #include <vtkMatrix4x4.h>
 #include "sscSlicerRepSW.h"
 #include "sscView.h"
+#include "sscDataManager.h"
 
 #include "sscBoundingBox3D.h"
 
@@ -22,7 +23,7 @@ SliceRepSW::SliceRepSW(const std::string& uid) :
 	mImageActor = vtkImageActorPtr::New();
 	mWindowLevel = vtkImageMapToWindowLevelColorsPtr::New();
 	mLookupTable = vtkWindowLevelLookupTablePtr::New();
-
+	mPlaneType = ptNOPLANE;
 	//*create default lut
 	setLookupTable();
 }
@@ -42,14 +43,26 @@ void SliceRepSW::setImage(ImagePtr image)
 	std::cout<<"setImage"<<std::endl;
 	mImage = image;
 	mImage->connectRep(mSelf);
-}
-
-void SliceRepSW::setTool(ToolPtr tool)
-{
-	std::cout<<"setTool"<<std::endl;
-	mTool = tool;
+	mImageUid = mImage->getUid();
+	ssc::DataManager* data = ssc::DataManager::instance();
+	mFixedCenter = data->getCenter();
+	connect(data, SIGNAL(centerChanged()),this, SLOT(setNewCenterSlot(const Vector3D&)) ) ;
 	
-	connect( mTool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateToolTransform(Transform3D,double) ));
+	std::cout << "Center :"<< mFixedCenter <<std::endl;
+}
+std::string SliceRepSW::getImageUid()const
+{
+	return mImageUid;
+}
+void SliceRepSW::setTool(ToolPtr tool)
+{	
+	if(!tool)
+	{
+		std::cout<<"No tool created to be set to the slicer"<<std::endl;
+	}
+	mTool = tool;
+	//std::cout<<"setTool :"<< mTool->getName()<<std::endl;
+	connect( mTool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateToolTransformSlot(Transform3D,double) ));
 
 }
 void SliceRepSW::addRepActorsToViewRenderer(View* view)
@@ -64,32 +77,34 @@ bool SliceRepSW::hasImage(ImagePtr image) const
 {
 	return (mImage != NULL);
 }
-void SliceRepSW::setOrientation(SliceComputer::PLANE_TYPE planeType)
+void SliceRepSW::setOrientation(PLANE_TYPE planeType)
 {
 	mPlaneType = planeType;
-	compute();
+	std::cout<<" planeType "<<planeType<<std::endl;
+	compute(); //this my be moved or rearange----
 }
-void SliceRepSW::setFollowType(SliceComputer::FOLLOW_TYPE followType)
+PLANE_TYPE SliceRepSW::getOrientation()
+{
+	return mPlaneType;
+}
+void SliceRepSW::setFollowType(FOLLOW_TYPE followType)
 {
 	mFollowType = followType;
 }
 void SliceRepSW::compute()
 {
-	if ( mImage == NULL)
+	if ( mImage == NULL && ptNOPLANE !=  mPlaneType )
 	{
 		return;
 	}
-	DoubleBoundingBox3D bounds( mImage->getBaseVtkImageData()->GetBounds() );
-	Vector3D center = bounds.center();
-	
-	std::cout << "Center :\n"<< center<<std::endl;
-	
-	mCutplane.setOrientationType(ssc::SliceComputer::otORTHOGONAL);
+	mCutplane.setOrientationType(otORTHOGONAL);
 	mCutplane.setFollowType(mFollowType);
 	mCutplane.setPlaneType(mPlaneType);
-	mCutplane.setFixedCenter(center);
+	mCutplane.setFixedCenter(mFixedCenter);
+	
 	SlicePlane plane = mCutplane.getPlane();
-
+	std::cout << " plane.i : "<<plane.i<<"\n plane.j :"<<plane.j<<"\n plane.c: "<<plane.c<<std::endl;
+	
 	this->setMatrixData(plane.i, plane.j, plane.c);
 	this->doSliceing();
 }
@@ -120,14 +135,25 @@ void SliceRepSW::setMatrixData(const Vector3D& ivec, const Vector3D& jvec, const
 	}
 }
 
-//**SLOTS***//
-void SliceRepSW::updateToolTransform(Transform3D matrix, double timestamp)
+//**SLOTS - update slicer**//
+void SliceRepSW::updateToolTransformSlot(Transform3D matrix, double timestamp)
 {
 	mCutplane.setToolPosition( matrix );
 	SlicePlane plane = mCutplane.getPlane();
 	std::cout << "plane: "<< this->getUid()<<"\n" << mCutplane.getPlane() << std::endl;
 	this->setMatrixData( plane.i, plane.j, plane.c );
 } 
+void SliceRepSW::setNewCenterSlot(const Vector3D& center)
+{
+	mCutplane.setFixedCenter(center);
+	std::cout<<"New fixed center: "<<  mFixedCenter <<std::endl;
+	SlicePlane plane = mCutplane.getPlane();
+	this->setMatrixData( plane.i, plane.j, plane.c );
+}
+void SliceRepSW::setTransform(const Transform3D& pos)
+{
+	updateToolTransformSlot(pos, 0.0 );	
+}
 
 void SliceRepSW::setLookupTable()
 {

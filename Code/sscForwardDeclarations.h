@@ -19,7 +19,7 @@ typedef boost::shared_ptr<class Mesh> MeshPtr;
 // reps
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-
+typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 
 } // namespace ssc
 

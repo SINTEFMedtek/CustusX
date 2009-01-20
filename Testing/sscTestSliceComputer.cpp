@@ -33,8 +33,8 @@ public:
 		// test acs for the std case: a fixed center and a moving tool
 		
 		ssc::SliceComputer slicer;
-		slicer.setOrientationType(ssc::SliceComputer::otORTHOGONAL);	
-		slicer.setFollowType(ssc::SliceComputer::ftFIXED_CENTER);
+		slicer.setOrientationType(ssc::otORTHOGONAL);	
+		slicer.setFollowType(ssc::ftFIXED_CENTER);
 		
 		Vector3D c_tool(5,40,-50);
 		Vector3D center(33,66,-3);
@@ -44,15 +44,15 @@ public:
 		slicer.setToolPosition(rMt);	
 		slicer.setFixedCenter(center);
 		
-		slicer.setPlaneType(ssc::SliceComputer::ptSAGITTAL);
+		slicer.setPlaneType(ssc::ptSAGITTAL);
 		ssc::SlicePlane sagittalPlane(Vector3D(c_tool[0], center[1], center[2]), Vector3D( 0, 1, 0), Vector3D(0,  0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sagittalPlane));		
 
-		slicer.setPlaneType(ssc::SliceComputer::ptCORONAL);
+		slicer.setPlaneType(ssc::ptCORONAL);
 		ssc::SlicePlane  coronalPlane(Vector3D(center[0], c_tool[1], center[2]), Vector3D(-1, 0, 0), Vector3D(0,  0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), coronalPlane));		
 		
-		slicer.setPlaneType(ssc::SliceComputer::ptAXIAL);
+		slicer.setPlaneType(ssc::ptAXIAL);
 		ssc::SlicePlane    axialPlane(Vector3D(center[0], center[1], c_tool[2]), Vector3D(-1, 0, 0), Vector3D(0, -1, 0));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), axialPlane));		
 	}
@@ -60,8 +60,8 @@ public:
 	void testACS_FollowTool()
 	{
 		ssc::SliceComputer slicer;
-		slicer.setOrientationType(ssc::SliceComputer::otORTHOGONAL);	
-		slicer.setFollowType(ssc::SliceComputer::ftFOLLOW_TOOL);
+		slicer.setOrientationType(ssc::otORTHOGONAL);	
+		slicer.setFollowType(ssc::ftFOLLOW_TOOL);
 		
 		Vector3D c_tool(5,40,-50);
 		Vector3D center(44,55,66);
@@ -71,15 +71,15 @@ public:
 		slicer.setToolPosition(rMt);	
 		slicer.setFixedCenter(center);
 		
-		slicer.setPlaneType(ssc::SliceComputer::ptSAGITTAL);
+		slicer.setPlaneType(ssc::ptSAGITTAL);
 		ssc::SlicePlane sagittalPlane(c_tool, Vector3D( 0, 1, 0), Vector3D(0,  0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sagittalPlane));		
 
-		slicer.setPlaneType(ssc::SliceComputer::ptCORONAL);
+		slicer.setPlaneType(ssc::ptCORONAL);
 		ssc::SlicePlane  coronalPlane(c_tool, Vector3D(-1, 0, 0), Vector3D(0,  0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), coronalPlane));		
 		
-		slicer.setPlaneType(ssc::SliceComputer::ptAXIAL);
+		slicer.setPlaneType(ssc::ptAXIAL);
 		ssc::SlicePlane    axialPlane(c_tool, Vector3D(-1, 0, 0), Vector3D(0, -1, 0));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), axialPlane));				
 	}
@@ -90,8 +90,8 @@ public:
 	void testAnyPlanes()
 	{
 		ssc::SliceComputer slicer;
-		slicer.setOrientationType(ssc::SliceComputer::otOBLIQUE);	
-		slicer.setFollowType(ssc::SliceComputer::ftFOLLOW_TOOL);
+		slicer.setOrientationType(ssc::otOBLIQUE);	
+		slicer.setFollowType(ssc::ftFOLLOW_TOOL);
 		
 		Vector3D c_tool(5,40,-50);
 		Vector3D center(44,55,66);
@@ -108,18 +108,18 @@ public:
 		slicer.setFixedCenter(center);
 
 		// looking from behind
-		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		slicer.setPlaneType(ssc::ptANYPLANE);
 		ssc::SlicePlane anyPlane(c_tool, Vector3D( -1, 0, 0), Vector3D( 0, 0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
 		
 		// looking from the right
-		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		slicer.setPlaneType(ssc::ptSIDEPLANE);
 		//std::cout << "side: \n" << slicer.getPlane() << std::endl;
 		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, -1, 0), Vector3D( 0, 0, 1));
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
 
 		// looking from above
-		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
+		slicer.setPlaneType(ssc::ptRADIALPLANE);
 		ssc::SlicePlane radialPlane(c_tool, Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
 		//std::cout << "radial: \n" << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));		
@@ -129,19 +129,19 @@ public:
 		slicer.setGravity(true, Vector3D(0,0,-1));
 		
 		// looking from behind
-		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		slicer.setPlaneType(ssc::ptANYPLANE);
 		//std::cout << "any: \n" << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
 		// looking from the right
-		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		slicer.setPlaneType(ssc::ptSIDEPLANE);
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
 		// looking from above
-		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
+		slicer.setPlaneType(ssc::ptRADIALPLANE);
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));	
 		
 		// test viewOffset
 		slicer.setToolViewOffset(true, 40, 0.25);
-		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		slicer.setPlaneType(ssc::ptANYPLANE);
 		//std::cout << "viewoffset: \n" << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane().c, c_tool-10.0*Vector3D(0,0,1)));
 		slicer.setToolViewOffset(false, 40, 0.25);
@@ -151,14 +151,14 @@ public:
 		slicer.setGravity(true, Vector3D(0,1,0));
 		
 		// looking from behind
-		slicer.setPlaneType(ssc::SliceComputer::ptANYPLANE);
+		slicer.setPlaneType(ssc::ptANYPLANE);
 		//std::cout << "any: \n" << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
 		// looking from the right
-		slicer.setPlaneType(ssc::SliceComputer::ptSIDEPLANE);
+		slicer.setPlaneType(ssc::ptSIDEPLANE);
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
 		// looking from above
-		slicer.setPlaneType(ssc::SliceComputer::ptRADIALPLANE);
+		slicer.setPlaneType(ssc::ptRADIALPLANE);
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));		
 	}
 

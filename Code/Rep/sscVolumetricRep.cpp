@@ -41,7 +41,7 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	mVolumeProperty->SetSpecularPower ( 15.0 );
 	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
 
-	// from snw
+	// from snws
 	mTextureMapper3D->SetPreferredMethodToNVidia();
     mTextureMapper3D->SetBlendModeToComposite();
 
@@ -131,7 +131,6 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	{
 		return;
 	}
-
 	//mLUT = mImage->getLut();
 	mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
 	mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
