@@ -32,8 +32,9 @@ enum MESH_READER_TYPE
  * Simply calling instance() will instantiate the default manager DataManagerImpl.
  * It is also possible to subclass and use setInstance() to set another type.
  */
-class DataManager
+class DataManager : public QObject
 {
+	Q_OBJECT
 public:
 	static DataManager* instance();
 
@@ -58,7 +59,10 @@ public:
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing. 
 	virtual void setCenter(const Vector3D& center) = 0;
-
+	
+signals:
+	void centerChanged(); ///< emitter when center is changed.
+	
 protected:
 	static void setInstance(DataManager* instance);
 	DataManager();

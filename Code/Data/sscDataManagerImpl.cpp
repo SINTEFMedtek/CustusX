@@ -81,6 +81,7 @@ Vector3D DataManagerImpl::getCenter() const
 void DataManagerImpl::setCenter(const Vector3D& center)
 {
 	mCenter = center;
+	emit centerChanged(); 
 }
 
 ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE type)

@@ -21,6 +21,7 @@ endif(COMMAND cmake_policy)
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
     Data/sscImage.h
+    Data/sscDataManager.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
