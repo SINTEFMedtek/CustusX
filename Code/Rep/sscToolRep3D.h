@@ -25,6 +25,7 @@ public:
 
 	virtual void setTool(ToolPtr tool);
 	virtual bool hasTool(ToolPtr tool) const;
+	virtual ToolPtr getTool();
 	
 protected:
 	ToolRep3D(const std::string& uid, const std::string& name="");

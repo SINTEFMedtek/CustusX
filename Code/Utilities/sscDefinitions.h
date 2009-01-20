@@ -25,10 +25,5 @@ namespace ssc
 		ftFOLLOW_TOOL, ///< center follows tool
 		ftFIXED_CENTER ///< center is set.
 	};
-
-
 } //namespace end
-
 #endif /*SSCDEFINITIONS_H_*/
-
-	

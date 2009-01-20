@@ -39,6 +39,12 @@ std::string ToolRep3D::getType() const
 {
 	return "ssc::ToolRep3D";
 }
+
+ToolPtr ToolRep3D::getTool()
+{
+	return mTool;
+}
+
 void ToolRep3D::setTool(ToolPtr tool)
 {
 	if(!tool)
