@@ -30,41 +30,22 @@ public:
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
-//	void setTool(ToolPtr tool);
-//	void setOrientation(PLANE_TYPE orientation );
-//	void setFollowType(FOLLOW_TYPE followType);
-//	void setTransform(const Transform3D& pos);
 	std::string getImageUid()const;
-//	PLANE_TYPE getOrientation();
 protected:
 	SliceRepSW(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
 	virtual void removeRepActorsFromViewRenderer(View* view) ;
 
-//private slots:
-//	void updateToolTransformSlot( Transform3D matrix, double timestamp );
-//	void setNewCenterSlot();
-	
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr); 
-//	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
-//	void toolVisibleSlot(bool visible); 
 		
 private:
 	void update();
-	//void compute();	
 	void doSliceing();
-	//void setMatrixData ( const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center );
 	void setLookupTable ();
 	
 	SliceProxyPtr mSlicer;
-	//typedef boost::shared_ptr<SliceComputer> SliceComputerPtr;
-	//Vector3D mFixedCenter;
-	//SliceComputer mCutplane;
-	//PLANE_TYPE mPlaneType;
-	//FOLLOW_TYPE mFollowType;
 	ImagePtr mImage;
-	//ToolPtr mTool;
 	std::string mImageUid;
 	vtkWindowLevelLookupTablePtr mLookupTable;
 	vtkImageMapToWindowLevelColorsPtr mWindowLevel;

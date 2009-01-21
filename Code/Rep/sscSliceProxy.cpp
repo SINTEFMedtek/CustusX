@@ -11,7 +11,6 @@ SliceProxy::SliceProxy()
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	//TODO connect to toolmanager rMpr changed
-	//TODO initialize more data
 	mCutplane.setFixedCenter(ssc::DataManager::getInstance()->getCenter());
 }
 
