@@ -164,6 +164,15 @@ void Image::printLandmarks()
 		std::cout << stream.str() << std::endl;
 	}
 }
+
+DoubleBoundingBox3D Image::boundingBox() const
+{
+	mOutputImageData->UpdateInformation();
+	DoubleBoundingBox3D bounds(mOutputImageData->GetBounds());
+	return bounds;
+}
+
+
 //void Image::setLut(const vtkLookupTablePtr& lut)
 //{
 //	mLut = lut;

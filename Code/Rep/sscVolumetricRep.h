@@ -29,6 +29,7 @@ public:
 
 	virtual std::string getType() const { return "ssc::VolumeRep"; }
 	virtual void setImage(ImagePtr image);
+	virtual ImagePtr getImage();
 	//void addImage(ImagePtr image);
 	//void removeImage(ImagePtr image);
 	virtual bool hasImage(ImagePtr image) const;

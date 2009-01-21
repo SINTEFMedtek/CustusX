@@ -51,6 +51,7 @@ public:
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
 	void printLandmarks(); //TODO: JUST FOR TESTING
+	DoubleBoundingBox3D boundingBox() const;
 
 signals:
 	void landmarkRemoved(double x, double y, double z);

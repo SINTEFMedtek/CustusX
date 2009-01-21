@@ -73,6 +73,11 @@ void VolumetricRep::removeRepActorsFromViewRenderer(View* view)
 	view->getRenderer()->RemoveVolume(mVolume);
 }
 
+ImagePtr VolumetricRep::getImage()
+{
+	return mImage;
+}
+
 void VolumetricRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
