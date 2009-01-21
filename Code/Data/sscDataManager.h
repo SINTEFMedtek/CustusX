@@ -36,7 +36,7 @@ class DataManager : public QObject
 {
 	Q_OBJECT
 public:
-	static DataManager* instance();
+	static DataManager* getInstance();
 
 	// images
 	virtual ImagePtr loadImage(const std::string& filename, READER_TYPE type) = 0;

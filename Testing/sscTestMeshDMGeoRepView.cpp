@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 	//ssc::MeshPtr mesh1 = ssc::DataManager::instance()->loadMesh(vtkFileName1, ssc::mrtPOLYDATA);
 	// .stl
 	// OK: f.eks. 2 eller 4,    Ikke ok: 5S_joinedpart.STL
-	ssc::MeshPtr mesh1 = ssc::DataManager::instance()->loadMesh(stlFileName2, ssc::mrtSTL);
+	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName2, ssc::mrtSTL);
 
 
 	std::cout << "UID     : " << mesh1->getUID() << std::endl;

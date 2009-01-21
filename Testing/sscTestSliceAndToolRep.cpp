@@ -36,7 +36,7 @@ using ssc::Transform3D;
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
-	
+
 	TestSliceAndToolRep test;
 
 	int val = app.exec();
@@ -50,20 +50,20 @@ TestSliceAndToolRep::TestSliceAndToolRep()
 	this->show();
 	mWidget = new QWidget;
 	this->setCentralWidget( mWidget );
-	
+
 	start();
-	
+
 }
 TestSliceAndToolRep::~TestSliceAndToolRep()
 {}
 void TestSliceAndToolRep::start()
 {
-	
+
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mWidget->setLayout(mainLayout);
-		
-	
+
+
 	// generate imageFileName
 	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
@@ -71,7 +71,7 @@ void TestSliceAndToolRep::start()
 	std::cout << imageFileName1 << std::endl;
 
 	// read image
-	ssc::ImagePtr image1 = ssc::DataManager::instance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
 
 	viewA = new ssc::View();
 	viewC = new ssc::View();
@@ -92,7 +92,7 @@ void TestSliceAndToolRep::start()
 
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
 	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
-	
+
 	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view3D->addRep(toolRep);

@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	std::cout << imageFileName1 << std::endl;
 
 	// read image
-	ssc::ImagePtr image1 = ssc::DataManager::instance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
 
 	/*
 	// read "directely"

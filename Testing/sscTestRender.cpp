@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::cout << testFile1 << std::endl;
 
-	ssc::ImagePtr image1 = ssc::DataManager::instance()->loadImage(testFile1, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, ssc::rtMETAIMAGE);
 
 	QMainWindow mainWindow;
 	ssc::ViewPtr view(new ssc::View());

@@ -20,7 +20,7 @@ namespace ssc
 DataManager* DataManager::mInstance = NULL; ///< static member
 // --------------------------------------------------------
 
-DataManager* DataManager::instance()
+DataManager* DataManager::getInstance()
 {
 	if (!mInstance)
 	{

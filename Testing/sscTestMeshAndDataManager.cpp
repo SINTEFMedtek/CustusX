@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 	// .vtk
 	//ssc::MeshPtr mesh1 = ssc::DataManager::instance()->loadMesh(vtkFileName1, ssc::mrtPOLYDATA);
 	// .stl
-	ssc::MeshPtr mesh1 = ssc::DataManager::instance()->loadMesh(stlFileName1, ssc::mrtSTL);
+	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName1, ssc::mrtSTL);
 
 
 	std::cout << "UID     : " << mesh1->getUID() << std::endl;
@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 	std::cout << "numPolys  : " << numPolys << std::endl;
 	std::cout << "numStrips : " << numStrips << std::endl;
 
-	
+
 	//std::vector<std::string> names = ssc::DataManager::instance()->getImageNames();
 
 	return 0;
