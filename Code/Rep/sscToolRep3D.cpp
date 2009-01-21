@@ -93,6 +93,12 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	
+//	std::cout << "----------" << std::endl;
+//	std::cout << "prMt\n" << prMt << std::endl;
+//	std::cout << "rMpr\n" << rMpr << std::endl;
+//	std::cout << "----------" << std::endl;
+	
 	Transform3D rMt = rMpr*prMt;	
 	mToolActor->SetUserMatrix( rMt.matrix());
 }

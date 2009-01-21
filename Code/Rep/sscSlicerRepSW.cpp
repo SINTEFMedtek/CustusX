@@ -42,9 +42,17 @@ SliceRepSWPtr SliceRepSW::New(const std::string& uid)
 void SliceRepSW::setImage(ImagePtr image)
 {
 	std::cout<<"setImage"<<std::endl;
+	if (mImage)
+	{
+		mImage->disconnectRep(mSelf);
+		mImageUid = "";
+	}
 	mImage = image;
-	mImage->connectRep(mSelf);
-	mImageUid = mImage->getUid();
+	if (mImage)
+	{
+		mImage->connectRep(mSelf);
+		mImageUid = mImage->getUid();
+	}
 
 	doSliceing();
 }
