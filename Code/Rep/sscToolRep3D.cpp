@@ -7,6 +7,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
 
+#include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscView.h"
 
@@ -83,16 +84,17 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 }
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
-	view->getRenderer()->AddActor( mToolActor.GetPointer() );
+	view->getRenderer()->AddActor(mToolActor);
 }
 void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
-	view->getRenderer()->RemoveActor(mToolActor.GetPointer());
+	view->getRenderer()->RemoveActor(mToolActor);
 }
-void ToolRep3D::receiveTransforms(Transform3D matrix, double timestamp)
+void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	// TODO multiply by toolmanager::rMpr
-	mToolActor->SetUserMatrix( matrix.matrix().GetPointer());
+	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMt = rMpr*prMt;	
+	mToolActor->SetUserMatrix( rMt.matrix());
 }
 void ToolRep3D::receiveVisible(bool visible)
 {
