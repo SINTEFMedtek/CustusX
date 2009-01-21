@@ -91,6 +91,7 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 }
 void ToolRep3D::receiveTransforms(Transform3D matrix, double timestamp)
 {
+	// TODO multiply by toolmanager::rMpr
 	mToolActor->SetUserMatrix( matrix.matrix().GetPointer());
 }
 void ToolRep3D::receiveVisible(bool visible)

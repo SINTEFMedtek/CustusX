@@ -26,6 +26,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Tool/sscTool.h 
     Tool/sscDummyTool.h
     Tool/sscDummyToolManager.h
+    Rep/sscSliceProxy.h
     Rep/sscRep.h
     Rep/sscSlicerRepSW.h
     Rep/sscToolRep3D.h    
@@ -77,6 +78,7 @@ SET( SSC_SOURCE_FILES
     Rep/sscGeometricRep.cpp
     Rep/sscToolRep3D.cpp
     Rep/sscSlicerRepSW.cpp
+    Rep/sscSliceProxy.cpp
     Data/sscData.cpp
     Data/sscImage.cpp
     Data/sscImageTF3D.cpp

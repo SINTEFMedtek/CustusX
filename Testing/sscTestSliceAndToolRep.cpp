@@ -58,7 +58,7 @@ TestSliceAndToolRep::~TestSliceAndToolRep()
 {}
 void TestSliceAndToolRep::start()
 {
-
+/*
 
 	QVBoxLayout *mainLayout = new QVBoxLayout;
 	mWidget->setLayout(mainLayout);
@@ -84,7 +84,7 @@ void TestSliceAndToolRep::start()
 
 	//ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
 	//view->addRep(axesRep);
-	/*3D Tool */
+	//3D Tool 
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	mToolmanager->configure();
 	mToolmanager->initialize();
@@ -133,7 +133,7 @@ void TestSliceAndToolRep::start()
 	viewC->getRenderer()->ResetCamera();
 	viewS->getRenderer()->ResetCamera();
 	view3D->getRenderer()->ResetCamera();
-	updateRender();
+	updateRender();*/
 }
 void TestSliceAndToolRep::updateRender()
 {
