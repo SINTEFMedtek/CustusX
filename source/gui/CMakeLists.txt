@@ -3,6 +3,7 @@ SET(LIBNAME gui)
 SET(cxProject_MOC_HDRS
   cxMainWindow.h
   cxMessageManager.h
+  cxStatusBarWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -22,6 +23,8 @@ SET(${LIBNAME}_SRCS
     cxMainWindow.cpp 
     cxMessageManager.h
     cxMessageManager.cpp
+    cxStatusBarWidget.h
+    cxStatusBarWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

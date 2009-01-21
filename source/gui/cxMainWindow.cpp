@@ -214,7 +214,7 @@ void MainWindow::loadDataSlot()
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
-    mMessageManager.sendInfo("Vtk data loaded.");
+    //mMessageManager.sendInfo("Vtk data loaded.");
   }
 
 }
