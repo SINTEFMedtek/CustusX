@@ -54,12 +54,12 @@ void ToolRep3D::setTool(ToolPtr tool)
 	}
 	mTool = tool;
 	std::string filename = mTool->getGraphicsFileName();
-	
 	if (!filename.empty() && filename.compare(filename.size()-3,3,"STL") == 0 )
 	{
 		std::cout<<"reading filename :" << filename <<	std::endl;
 		mSTLReader->SetFileName( filename.c_str() ); 
 		mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );	 //read a 3D model file of the tool
+		
 	}
 	else 
 	{
@@ -70,6 +70,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 	
 	std::cout<<"setMapper"<<std::endl;
 	mToolActor->SetMapper(mPolyDataMapper);
+	mToolActor->SetVisibility(tool->getVisible());
 	
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
 			this, SLOT(receiveTransforms(Transform3D, double)));

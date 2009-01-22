@@ -5,6 +5,7 @@
 #include "sscToolManager.h"
 
 namespace ssc
+
 {
 
 SliceProxy::SliceProxy()
@@ -12,6 +13,7 @@ SliceProxy::SliceProxy()
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	//TODO connect to toolmanager rMpr changed
 	mCutplane.setFixedCenter(ssc::DataManager::getInstance()->getCenter());
+	std::cout<<"Got center"<< ssc::DataManager::getInstance()->getCenter() <<std::endl;
 }
 
 SliceProxy::~SliceProxy()
@@ -46,7 +48,7 @@ void SliceProxy::setTool(ToolPtr tool)
 
 void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
-	//std::cout << "proxy get transform" << std::endl;
+	std::cout << "proxy get transform" << std::endl;
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	mCutplane.setToolPosition(rMpr*prMt);	
 	changed();

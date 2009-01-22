@@ -31,6 +31,7 @@ public:
 	void setImage(ImagePtr image);
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	std::string getImageUid()const;
+	void update();
 protected:
 	SliceRepSW(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
@@ -40,7 +41,7 @@ private slots:
 	void sliceTransformChangedSlot(Transform3D sMr); 
 		
 private:
-	void update();
+	
 	void doSliceing();
 	void setLookupTable ();
 	
