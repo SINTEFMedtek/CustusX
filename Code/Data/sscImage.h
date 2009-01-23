@@ -57,6 +57,7 @@ signals:
 	void landmarkRemoved(double x, double y, double z);
 	void landmarkAdded(double x, double y, double z);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
+	void transformChanged(); ///< emitted when transform is changed
 
 public slots:
 	void addLandmarkSlot(double x, double y, double z);

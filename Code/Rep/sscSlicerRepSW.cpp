@@ -124,7 +124,7 @@ void SliceRepSW::setLookupTable()
 	mLookupTable->SetHueRange(0, 0);
 	mLookupTable->SetValueRange(0, 1);
 	mLookupTable->Build();
-	std::cout<<"add Lookup table"<<std::endl;
+	//std::cout<<"add Lookup table"<<std::endl;
 	mWindowLevel->SetLookupTable(mLookupTable);
 	mWindowLevel->SetWindow( 255.0);
 	mWindowLevel->SetLevel( 127.5);

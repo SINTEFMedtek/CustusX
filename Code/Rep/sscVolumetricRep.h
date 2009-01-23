@@ -30,8 +30,6 @@ public:
 	virtual std::string getType() const { return "ssc::VolumeRep"; }
 	virtual void setImage(ImagePtr image);
 	virtual ImagePtr getImage();
-	//void addImage(ImagePtr image);
-	//void removeImage(ImagePtr image);
 	virtual bool hasImage(ImagePtr image) const;
 protected:
 	VolumetricRep(const std::string& uid, const std::string& name="");
@@ -46,10 +44,8 @@ protected:
 
 	ImagePtr mImage;
 
-	// nye ting:
-	vtkLookupTablePtr mLUT;
-
 private slots:
+	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
 };
 

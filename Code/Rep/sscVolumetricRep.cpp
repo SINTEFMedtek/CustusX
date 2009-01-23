@@ -7,6 +7,8 @@
 #include <vtkImageData.h>
 #include <vtkVolume.h>
 #include <vtkRenderer.h>
+#include <vtkMatrix4x4.h>
+
 #include "sscView.h"
 
 namespace ssc
@@ -88,10 +90,10 @@ void VolumetricRep::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mImage->disconnectRep(mSelf);
-		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()),
-					this, SLOT(vtkImageDataChangedSlot()));
-		disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
-					mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
+		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		//disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
+		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 	}
 
 	mImage = image;
@@ -99,29 +101,18 @@ void VolumetricRep::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-		connect(mImage.get(), SIGNAL(vtkImageDataChanged()),
-					this, SLOT(vtkImageDataChangedSlot()));
-		connect(this, SIGNAL(addPermanentPoint(double, double, double)),
-					mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
-		//mLUT = mImage->getLut();
-		mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
-		mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
-		mTextureMapper3D->SetInput( mImage->getRefVtkImageData() );
+		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),
+		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
+		vtkImageDataChangedSlot();
 	}
 	else
 	{
 		mTextureMapper3D->SetInput( (vtkImageData*)NULL );
 	}
 }
-//void VolumeRep::addImage(ImagePtr image)
-//{}
-/*void VolumeRep::removeImage(ImagePtr image)
-{
-v	mImage->disconnectRep(mSelf);
-	mTextureMapper3D->SetInput( (vtkImageData*)NULL );
 
-	mImage.reset();
-}*/
 bool VolumetricRep::hasImage(ImagePtr image) const
 {
 	return (mImage != NULL);
@@ -136,10 +127,26 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	{
 		return;
 	}
-	//mLUT = mImage->getLut();
 	mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
 	mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
-	mTextureMapper3D->SetInput( mImage->getRefVtkImageData() );
+	// use the base instead of the ref image, because otherwise changes in the transform 
+	// causes data to be sent anew to the graphics card (takes 4s).
+	// changing the mVolume transform instead is a fast operation.
+	mTextureMapper3D->SetInput( mImage->getBaseVtkImageData() );
+	transformChangedSlot();
+}
+
+/**called when transform is changed
+ * reset it in the prop.
+ */
+void VolumetricRep::transformChangedSlot()
+{
+	if (!mImage)
+	{
+		return;
+	}
+	//std::cout << "VolumetricRep::transformChangedSlot() \n" << mImage->getTransform() << std::endl;
+	mVolume->SetUserMatrix(mImage->getTransform().inv().matrix());
 }
 
 

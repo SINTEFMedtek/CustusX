@@ -70,6 +70,7 @@ void Image::setName(const std::string& name)
 
 void Image::setTransform(const Transform3D& trans)
 {
+	//std::cout << "Image::setTransform(): \n" << trans << std::endl;
 	if (similar(trans, mTransform))
 	{
 		return;
@@ -84,7 +85,7 @@ void Image::setTransform(const Transform3D& trans)
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 #endif
 
-	emit vtkImageDataChanged();
+	emit transformChanged();
 }
 
 std::string Image::getUid() const
@@ -171,17 +172,5 @@ DoubleBoundingBox3D Image::boundingBox() const
 	DoubleBoundingBox3D bounds(mOutputImageData->GetBounds());
 	return bounds;
 }
-
-
-//void Image::setLut(const vtkLookupTablePtr& lut)
-//{
-//	mLut = lut;
-//}
-//
-//vtkLookupTablePtr Image::getLut() const
-//{
-//	return mLut;
-//}
-
 
 } // namespace ssc
