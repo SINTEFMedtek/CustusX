@@ -29,6 +29,7 @@ typedef ssc::DataManager DataManager;
 class RepManager;
 class ViewManager;
 class ToolManager;
+class CustomStatusBar;
 
 class MainWindow : public QMainWindow
 {
@@ -100,7 +101,7 @@ private:
   //cxImageRegistrationDockWidget* mImageRegistrationDockWidget; //TODO
   //cxPatientRegistrationDockWidget* mPatientRegistrationDockWidget; //TODO
   //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
-  //cxStatusBarWidget* mStatusBarWidget; //TODO
+  CustomStatusBar* mCustomStatusBar;
 
   //Prefrences
   QString mCurrentPatientDataFolder;

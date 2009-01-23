@@ -85,6 +85,10 @@ protected:
   std::string   mView2DNames[9];  ///< the name of all the 2D views
   View2DMap     mView2DMap;       ///< a map of all the 3D views
   View3DMap     mView3DMap;       ///< a map of all the 2D views
+
+private:
+  ViewManager(ViewManager const&);
+  ViewManager& operator=(ViewManager const&);
 };
 }//namespace
 #endif /* CXVIEWMANAGER_H_ */

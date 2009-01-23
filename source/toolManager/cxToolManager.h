@@ -140,6 +140,10 @@ protected:
                     ///< names of necessary tags in the configuration file
 
   igstk::PulseGenerator::Pointer mPulseGenerator;
+
+private:
+  ToolManager(ToolManager const&);
+  ToolManager& operator=(ToolManager const&);
 };
 }//namespace cx
 #endif /* CXTOOLMANAGER_H_ */

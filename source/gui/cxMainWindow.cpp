@@ -11,6 +11,7 @@
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
+#include "cxCustomStatusBar.h"
 
 /**
  * cxMainWindow.cpp
@@ -28,7 +29,8 @@ MainWindow::MainWindow() :
   mDataManager(DataManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
   mRepManager(RepManager::getInstance()),
-  mCentralWidget(new QWidget())
+  mCentralWidget(new QWidget()),
+  mCustomStatusBar(new CustomStatusBar())
 {
   this->createActions();
   this->createToolBars();
@@ -170,8 +172,7 @@ void MainWindow::createToolBars()
 }
 void MainWindow::createStatusBar()
 {
-  //this->statusBar();
-  //this->statusBar()->setWidget(mStatusBarWidget);
+  this->setStatusBar(mCustomStatusBar);
 }
 void MainWindow::aboutSlot()
 {}

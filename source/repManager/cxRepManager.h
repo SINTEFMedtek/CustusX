@@ -81,6 +81,8 @@ protected:
 private:
   RepManager();
   ~RepManager();
+  RepManager(RepManager const&);
+  RepManager& operator=(RepManager const&);
 };
 }//namespace cx
 #endif /* CXREPMANAGER_H_ */
