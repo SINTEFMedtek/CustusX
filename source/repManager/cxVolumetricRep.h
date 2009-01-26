@@ -30,13 +30,13 @@ public:
   static VolumetricRepPtr New(const std::string& uid, const std::string& name="");
 
   virtual std::string getType() const { return "cx::VolumeRep"; } ///< returns this classes type
+  virtual void setImage(ssc::ImagePtr image);
   void setThreshold(const int threshold); ///< sets the threshold for picking the point on the volumes surface
   void pickSurfacePoint(vtkObject* object, double &x, double &y, double &z); ///< picks a point on the volumes surface
   void makePointPermanent(); ///< calling this will emit a signal with the current point
 
 signals:
-  void addPermanentPoint(double x, double y, double z); ///< signal requesting this point be made permanent
-  //void pointPicked(double x, double y, double z);
+  void addPermanentPoint(double x, double y, double z, std::string uids); ///< signal requesting this point be made permanent
 
 public slots:
   void pickSurfacePointSlot(vtkObject* object); ///< picks a point on the volumes surface
@@ -45,6 +45,7 @@ protected:
   VolumetricRep(const std::string& uid, const std::string& name=""); ///< constructor
   vtkSmartPointer<vtkRenderer> getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
   virtual void addRepActorsToViewRenderer(ssc::View* view);
+  virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
   MessageManager&     mMessageManager;  ///< device for sending messages to the statusbar
 

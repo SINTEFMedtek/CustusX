@@ -39,6 +39,21 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
   mPickedPointActor(NULL),
   mConnections(vtkEventQtSlotConnect::New())
 {}
+void VolumetricRep::setImage(ssc::ImagePtr image)
+{
+  if (image==mImage)
+  {
+    return;
+  }
+  if (mImage)
+  {
+    disconnect(this, SIGNAL(addPermanentPoint(double, double, double, std::string)),
+          mImage.get(), SLOT(addLandmarkSlot(double, double, double, std::string)));
+  }
+  ssc::VolumetricRep::setImage(image);
+  connect(this, SIGNAL(addPermanentPoint(double, double, double, std::string)),
+        mImage.get(), SLOT(addLandmarkSlot(double, double, double, std::string)));
+}
 void VolumetricRep::setThreshold(const int threshold)
 {
   mThreshold = threshold;
@@ -217,7 +232,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
 }
 void VolumetricRep::makePointPermanent()
 {
-  emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ);
+  emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ, mUid);
 }
 vtkSmartPointer<vtkRenderer> VolumetricRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
@@ -240,6 +255,20 @@ void VolumetricRep::addRepActorsToViewRenderer(ssc::View* view)
   ssc::VolumetricRep::addRepActorsToViewRenderer(view);
 
   mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::LeftButtonPressEvent,
+                       this,
+                       SLOT(pickSurfacePointSlot(vtkObject*)));
+}
+void VolumetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
+{
+  if(view == NULL)
+  {
+    mMessageManager.sendError("Trying to remove rep actors to view renderer, but view is NULL in volumetric rep.");
+    return;
+  }
+  ssc::VolumetricRep::removeRepActorsFromViewRenderer(view);
+
+  mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickSurfacePointSlot(vtkObject*)));
