@@ -36,6 +36,8 @@ ViewManager::ViewManager() :
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(9)
 {
+  mLayout->setSpacing(1);
+
   mView3DNames[0] = "View3D_1";
   mView3DNames[1] = "View3D_2";
   mView2DNames[0] = "View2D_1";
