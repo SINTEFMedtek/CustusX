@@ -30,6 +30,7 @@ class RepManager;
 class ViewManager;
 class ToolManager;
 class CustomStatusBar;
+class ImageRegistrationDockWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -54,6 +55,9 @@ private slots:
 
   //data menu
   void loadDataSlot();
+
+  //tool menu
+  void configureSlot();
 
 
 private:
@@ -98,7 +102,7 @@ private:
   QToolBar* mDataToolBar; //load
   QToolBar* mToolToolBar; //start and stop
 
-  //cxImageRegistrationDockWidget* mImageRegistrationDockWidget; //TODO
+  ImageRegistrationDockWidget* mImageRegistrationDockWidget;
   //cxPatientRegistrationDockWidget* mPatientRegistrationDockWidget; //TODO
   //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
   CustomStatusBar* mCustomStatusBar;

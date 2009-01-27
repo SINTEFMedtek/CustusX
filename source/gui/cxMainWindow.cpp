@@ -12,6 +12,7 @@
 #include "cxRepManager.h"
 #include "cxToolManager.h"
 #include "cxCustomStatusBar.h"
+#include "cxImageRegistrationDockWidget.h"
 
 /**
  * cxMainWindow.cpp
@@ -30,7 +31,8 @@ MainWindow::MainWindow() :
   mToolManager(ToolManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mCentralWidget(new QWidget()),
-  mCustomStatusBar(new CustomStatusBar())
+  mCustomStatusBar(new CustomStatusBar()),
+  mImageRegistrationDockWidget(new ImageRegistrationDockWidget())
 {
   this->createActions();
   this->createToolBars();
@@ -97,7 +99,7 @@ void MainWindow::createActions()
   mConfigureToolsAction->setChecked(true);
 
   connect(mConfigureToolsAction, SIGNAL(triggered()),
-          mToolManager, SLOT(configure()));
+          this, SLOT(configureSlot()));
   connect(mInitializeToolsAction, SIGNAL(triggered()),
           mToolManager, SLOT(initialize()));
   connect(mStartTrackingToolsAction, SIGNAL(triggered()),
@@ -219,5 +221,18 @@ void MainWindow::loadDataSlot()
   }
 
 }
+void MainWindow::configureSlot()
+{
+  QString configFile = QFileDialog::getOpenFileName(this, tr("Open file"),
+                                                    "/home",
+                                                    tr("Configuration files (*.xml)"));
+  mToolManager->setConfigurationFile(configFile.toStdString());
 
+  QString loggingFolder = QFileDialog::getExistingDirectory(this, tr("Open directory"),
+                                                            "/home",
+                                                            QFileDialog::ShowDirsOnly);
+  mToolManager->setLoggingFolder(loggingFolder.toStdString());
+
+  mToolManager->configure();
+}
 }//namespace cx

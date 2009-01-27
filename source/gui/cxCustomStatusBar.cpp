@@ -41,15 +41,17 @@ void CustomStatusBar::connectToToolSignals()
     connect(tool, SIGNAL(toolVisible(bool)),
             this, SLOT(receiveToolVisible(bool)));
 
-    //TODO Add a pixelmap and name
     QPixmap pixmap;
     pixmap.fill(Qt::gray);
     QString toolName = QString(tool->getName().c_str());
-    QLabel* label = new QLabel();
-    label->setPixmap(pixmap);
-    label->setText(toolName);
-    //mToolColorMap->insert(std::pair<std::string, QPixmap*>(toolName, pixmap));
-    mToolLabelVector.push_back(label);
+
+    QLabel* textLabel = new QLabel();
+    textLabel->setText(toolName);
+
+    QLabel* colorLabel = new QLabel();
+    colorLabel->setPixmap(pixmap);
+
+    mToolColorMap.insert(std::pair<QLabel*,QLabel*>(textLabel, colorLabel));
 
     it++;
   }
@@ -57,13 +59,27 @@ void CustomStatusBar::connectToToolSignals()
 void CustomStatusBar::disconnectFromToolSignals()
 {
   ssc::ToolManager::ToolMapPtr connectedTools = mToolManager->getTools();
-  ssc::ToolManager::ToolMap::iterator it = connectedTools->begin();
-  while (it != connectedTools->end())
+  ssc::ToolManager::ToolMap::iterator it1 = connectedTools->begin();
+  while (it1 != connectedTools->end())
   {
-    disconnect(it->second.get(), SIGNAL(toolVisible(bool)),
+    disconnect(it1->second.get(), SIGNAL(toolVisible(bool)),
             this, SLOT(receiveToolVisible(bool)));
-    //TODO Remove pixelmap and name
-    it++;
+    it1++;
+  }
+  std::map<QLabel*, QLabel*>::iterator it2 = mToolColorMap.begin();
+  while(it2 != mToolColorMap.end())
+  {
+    QLabel* textLabel = it2->first;
+    QLabel* colorLabel = it2->second;
+    this->removeWidget(textLabel);
+    this->removeWidget(colorLabel);
+    mToolColorMap.erase(it2);
+
+    //RemoveWidget does not delete the widget but hides it...
+    delete textLabel;
+    delete colorLabel;
+
+    it2++;
   }
 }
 void CustomStatusBar::receiveToolVisible(bool visible)
@@ -76,10 +92,36 @@ void CustomStatusBar::receiveToolVisible(bool visible)
   }
   const QMetaObject* metaObject = sender->metaObject();
   const char* className = metaObject->className();
-  std::cout << "Incoming objects classname is: " << className << std::endl;
+  std::cout << "Incoming objects classname is: " << className << std::endl; //TODO debuggging
   if(className == "Tool")
   {
-
+    Tool* tool = dynamic_cast<Tool*>(sender);
+    if(tool == NULL)
+    {
+      mMessageManager.sendWarning("The sender does not appear to be a tool.");
+      return;
+    }
+    std::string name = tool->getName();
+    std::map<QLabel*, QLabel*>::iterator it = mToolColorMap.begin();
+    while(it != mToolColorMap.end())
+    {
+      QLabel* textLabel = it->first;
+      if(textLabel->text().compare(QString(name.c_str()), Qt::CaseInsensitive) == 0)
+      {
+        QLabel* colorLabel = it->second;
+        QPixmap pixmap;
+        if(visible)
+        {
+          pixmap.fill(Qt::green);
+        }else
+        {
+          pixmap.fill(Qt::red);
+        }
+        colorLabel->setPixmap(pixmap);
+        std::cout << "Set new pixmap. " << std::endl; //TODO debuggging
+      }
+      it++;
+    }
   }
 
 }

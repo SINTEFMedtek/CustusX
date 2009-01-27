@@ -9,7 +9,7 @@
 #define CXCustomStatusBar_H_
 
 #include <QStatusBar>
-//#include <map.h>
+#include <map.h>
 
 class QLabel;
 class QPixmap;
@@ -18,8 +18,6 @@ namespace cx
 {
 class MessageManager;
 class ToolManager;
-
-//typedef std::map<std::string, QPixmap*> ToolColorMap;
 
 class CustomStatusBar: public QStatusBar
 {
@@ -38,8 +36,7 @@ protected:
   MessageManager& mMessageManager;
   ToolManager* mToolManager;
 
-  //ToolColorMap mToolColorMap;
-  std::vector<QLabel*> mToolLabelVector;
+  std::map<QLabel*, QLabel*> mToolColorMap;
 };
 }
 
