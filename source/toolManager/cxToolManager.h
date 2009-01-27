@@ -22,6 +22,8 @@ class QTimer;
 
 namespace cx
 {
+class MessageManager;
+
 class ToolManager: public ssc::ToolManager
 {
   Q_OBJECT
@@ -114,6 +116,8 @@ protected:
   void connectSignalsAndSlots(); ///< connects signals and slots
 
   static ToolManager* mCxInstance;
+
+  MessageManager& mMessageManager;
 
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder;         ///< path to where logging should be saved

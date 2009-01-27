@@ -7,6 +7,7 @@
 #include <QMetaType>
 #include "cxTool.h"
 #include "cxTracker.h"
+#include "cxMessageManager.h"
 /**
  * cxToolManager.cpp
  *
@@ -32,6 +33,7 @@ ToolManager* ToolManager::getInstance()
 }
 
 ToolManager::ToolManager() :
+  mMessageManager(MessageManager::getInstance()),
   mConfigurationFilePath(""),
   mLoggingFolder(""),
   mTracker(TrackerPtr()),
@@ -121,15 +123,30 @@ void ToolManager::configure()
 }
 void ToolManager::initialize()
 {
+  if(!mConfigured)
+  {
+    mMessageManager.sendWarning("Please configure before trying to initialize.");
+    return;
+  }
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
 void ToolManager::startTracking()
 {
+  if(!mInitialized)
+  {
+    mMessageManager.sendWarning("Please initialize before trying to start tracking.");
+    return;
+  }
   mTracker->startTracking();
 }
 void ToolManager::stopTracking()
 {
+  if(!mTracking)
+  {
+    mMessageManager.sendWarning("Please start tracking before trying to stop tracking.");
+    return;
+  }
   mTracker->stopTracking();
 }
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
