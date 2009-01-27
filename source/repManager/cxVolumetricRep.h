@@ -36,7 +36,7 @@ public:
   void makePointPermanent(); ///< calling this will emit a signal with the current point
 
 signals:
-  void addPermanentPoint(double x, double y, double z, std::string uids); ///< signal requesting this point be made permanent
+  void addPermanentPoint(double x, double y, double z); ///< signal requesting this point be made permanent
 
 public slots:
   void pickSurfacePointSlot(vtkObject* object); ///< picks a point on the volumes surface

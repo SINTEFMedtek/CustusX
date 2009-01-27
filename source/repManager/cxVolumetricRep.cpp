@@ -47,12 +47,12 @@ void VolumetricRep::setImage(ssc::ImagePtr image)
   }
   if (mImage)
   {
-    disconnect(this, SIGNAL(addPermanentPoint(double, double, double, std::string)),
-          mImage.get(), SLOT(addLandmarkSlot(double, double, double, std::string)));
+    disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
+          mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
   }
   ssc::VolumetricRep::setImage(image);
-  connect(this, SIGNAL(addPermanentPoint(double, double, double, std::string)),
-        mImage.get(), SLOT(addLandmarkSlot(double, double, double, std::string)));
+  connect(this, SIGNAL(addPermanentPoint(double, double, double)),
+        mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 }
 void VolumetricRep::setThreshold(const int threshold)
 {
@@ -232,7 +232,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
 }
 void VolumetricRep::makePointPermanent()
 {
-  emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ, mUid);
+  emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ);
 }
 vtkSmartPointer<vtkRenderer> VolumetricRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
