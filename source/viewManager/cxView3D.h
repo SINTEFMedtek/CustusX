@@ -21,6 +21,7 @@ class DataManager;
 namespace cx
 {
 class RepManager;
+class MessageManager;
 
 class View3D : public ssc::View
 {
@@ -35,9 +36,11 @@ public:
 
 protected:
   QMenu* mContextMenu;
+  QMenu* mMakeRepMenu;
 
   DataManager* mDataManager;
   RepManager* mRepManager;
+  MessageManager& mMessageManager;
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */
