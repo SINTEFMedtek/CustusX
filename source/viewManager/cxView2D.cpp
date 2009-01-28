@@ -33,8 +33,6 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
 {
     mContextMenu->clear();
 
-    mContextMenu->clear();
-
     //Get a list of available image and meshes names
     std::vector<std::string> imageNames = mDataManager->getImageNames();
     std::vector<std::string> meshNames = mDataManager->getMeshNames();

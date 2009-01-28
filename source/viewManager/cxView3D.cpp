@@ -22,50 +22,54 @@
 namespace cx
 {
 View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
-  View(parent, f),
+  ssc::View(parent, f),
   mContextMenu(new QMenu(this)),
-  mMakeRepMenu(new QMenu(tr("Add volumetric representation of...") ,mContextMenu)),
+  mMakeVolumetricRepMenu(new QMenu(tr("Add volumetric representation of...") ,mContextMenu)),
+  mMakeGeometricRepMenu(new QMenu(tr("Add geometric representation of...") ,mContextMenu)),
   mDataManager(DataManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mMessageManager(MessageManager::getInstance())
 {
   mUid = uid;
   mName = name;
+
+  mContextMenu->addMenu(mMakeVolumetricRepMenu);
+  mContextMenu->addMenu(mMakeGeometricRepMenu);
 }
 View3D::~View3D()
 {}
 void View3D::contextMenuEvent(QContextMenuEvent *event)
 {
-    mContextMenu->clear();
-    mMakeRepMenu->clear();
+    mMakeVolumetricRepMenu->clear();
+    mMakeGeometricRepMenu->clear();
 
-    mContextMenu->addMenu(mMakeRepMenu);
+    mMakeGeometricRepMenu->setEnabled(false); //TODO remove when we know what to do with meshes
 
     //Get a list of available image and meshes names
     std::map<std::string, std::string> imageUidsAndNames = mDataManager->getImageUidsAndNames();
-/*    std::map<std::string, std::string> meshNames = mDataManager->getMeshUIDsWithNames();*/
+    std::map<std::string, std::string> meshUidsAndNames = mDataManager->getMeshUIDsWithNames();
 
     //Display the lists to the user
     //Extract to own function if often reused...
     std::map<std::string, std::string>::iterator itImages = imageUidsAndNames.begin();
     while(itImages != imageUidsAndNames.end())
     {
-      const QString name = itImages->first.c_str();
-      QAction* imageIdAction = new QAction(name, mContextMenu);
-      mMakeRepMenu->addAction(imageIdAction);
+      const QString id = itImages->first.c_str();
+      QAction* imageIdAction = new QAction(id, mMakeVolumetricRepMenu);
+      mMakeVolumetricRepMenu->addAction(imageIdAction);
       itImages++;
     }
-    //TODO: What to do with meshes?
-/*    std::map<std::string, std::string>::iterator itMeshes = meshNames.begin();
-    while(itMeshes != imageNames.end())
+    std::map<std::string, std::string>::iterator itMeshes = meshUidsAndNames.begin();
+    while(itMeshes != meshUidsAndNames.end())
     {
-      const QString name = itMeshes->first.c_str();
-      QAction* meshNameAction = new QAction(name, mContextMenu);
-      mMakeRepMenu->addAction(meshNameAction);
+      const QString id = itMeshes->first.c_str();
+      QAction* meshIdAction = new QAction(id, mMakeGeometricRepMenu);
+      mMakeGeometricRepMenu->addAction(meshIdAction);
       itMeshes++;
-    }*/
+    }
 
     //Find out which the user chose
+    //TODO: IMAGE OR MESH??? theAction->parent()?
     QAction* theAction = mContextMenu->exec(event->globalPos());
     if(theAction == NULL)
       return;
@@ -75,7 +79,7 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
     mMessageManager.sendInfo(info);
 
     //Make a volumetric rep out of the image
-    VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");//TODO: REMOVE HACK!!!
+    VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");//TODO: REMOVE HACK???
     ssc::ImagePtr image = mDataManager->getImage(actionId);
     volumetricRep->setImage(image);
 

@@ -36,7 +36,8 @@ public:
 
 protected:
   QMenu* mContextMenu;
-  QMenu* mMakeRepMenu;
+  QMenu* mMakeVolumetricRepMenu;
+  QMenu* mMakeGeometricRepMenu;
 
   DataManager* mDataManager;
   RepManager* mRepManager;
