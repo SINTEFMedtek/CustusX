@@ -14,10 +14,18 @@
 class QWidget;
 class QMenu;
 
+namespace ssc
+{
+class DataManager;
+}
 namespace cx
 {
+class RepManager;
+
 class View2D : public ssc::View
 {
+typedef ssc::DataManager DataManager;
+
 public:
   View2D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0);
   virtual ~View2D();
@@ -27,6 +35,9 @@ public:
 
 protected:
   QMenu* mContextMenu;
+
+  DataManager* mDataManager;
+  RepManager* mRepManager;
 
 };
 }//namespace cx
