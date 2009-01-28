@@ -15,9 +15,12 @@
  */
 
 class QVBoxLayout;
+class QComboBox;
 
 namespace cx
 {
+class RepManager;
+
 class ImageRegistrationDockWidget : public QDockWidget
 {
   Q_OBJECT
@@ -26,12 +29,18 @@ public:
   ImageRegistrationDockWidget();
   ~ImageRegistrationDockWidget();
 
-  void setVolumetricRep(VolumetricRepPtr volumetricRep);
+protected slots:
+  void volumetricRepSelectedSlot(QString& comboBoxText);
 
 protected:
-  VolumetricRepPtr mVolumetricRep;
-
   QVBoxLayout* mVerticalLayout;
+  QComboBox* mImagesComboBox;
+  //TODO:
+  //QTableWidget* mLandmarkTableWidget;
+  //QPushButton* mAddPointButton;
+  //QPushButton* mRemovePointButton;
+
+  RepManager* mRepManager;
 };
 }//namespace cx
 
