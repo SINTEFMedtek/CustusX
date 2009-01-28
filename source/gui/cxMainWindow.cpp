@@ -20,7 +20,7 @@
  * \brief
  *
  * \date Jan 20, 2009
- * \author: jbake
+ * \author: Janne Beate Bakeng, SINTEF
  */
 
 namespace cx
@@ -31,8 +31,8 @@ MainWindow::MainWindow() :
   mToolManager(ToolManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mCentralWidget(new QWidget()),
-  mCustomStatusBar(new CustomStatusBar()),
-  mImageRegistrationDockWidget(new ImageRegistrationDockWidget())
+  mImageRegistrationDockWidget(new ImageRegistrationDockWidget()),
+  mCustomStatusBar(new CustomStatusBar())
 {
   this->createActions();
   this->createToolBars();

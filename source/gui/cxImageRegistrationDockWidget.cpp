@@ -1,5 +1,7 @@
 #include "cxImageRegistrationDockWidget.h"
 
+#include <QVBoxLayout>
+
 /**
  * cxImageRegistrationDockWidget.cpp
  *
@@ -11,8 +13,16 @@
 
 namespace cx
 {
-ImageRegistrationDockWidget::ImageRegistrationDockWidget()
-{}
+ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
+  mVerticalLayout(new QVBoxLayout(this))
+{
+  this->setLayout(mVerticalLayout);
+  this->setMaximumWidth(250);
+}
 ImageRegistrationDockWidget::~ImageRegistrationDockWidget()
 {}
+void ImageRegistrationDockWidget::setVolumetricRep(VolumetricRepPtr volumetricRep)
+{
+  mVolumetricRep = volumetricRep;
+}
 }//namespace cx

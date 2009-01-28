@@ -10,7 +10,7 @@
  * \brief
  *
  * \date Jan 20, 2009
- * \author: jbake
+ * \author: Janne Beate Bakeng, SINTEF
  */
 
 class QAction;

@@ -2,15 +2,19 @@
 #define CXIMAGEREGISTRATIONDOCKWIDGET_H_
 
 #include <QDockWidget>
+#include "cxVolumetricRep.h"
 
 /**
  * cxImageRegistrationDockWidget.h
  *
- * \brief
+ * \brief This class represents an interface to a dockwidget used for image to
+ * image registration.
  *
  * \date Jan 27, 2009
  * \author: Janne Beate Bakeng, SINTEF
  */
+
+class QVBoxLayout;
 
 namespace cx
 {
@@ -22,7 +26,12 @@ public:
   ImageRegistrationDockWidget();
   ~ImageRegistrationDockWidget();
 
+  void setVolumetricRep(VolumetricRepPtr volumetricRep);
+
 protected:
+  VolumetricRepPtr mVolumetricRep;
+
+  QVBoxLayout* mVerticalLayout;
 };
 }//namespace cx
 
