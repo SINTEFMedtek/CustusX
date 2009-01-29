@@ -16,6 +16,8 @@
 
 class QVBoxLayout;
 class QComboBox;
+class QTableWidget;
+class QPushButton;
 
 namespace cx
 {
@@ -30,15 +32,17 @@ public:
   ~ImageRegistrationDockWidget();
 
 protected slots:
-  void volumetricRepSelectedSlot(QString& comboBoxText);
+  void volumetricRepSelectedSlot(const QString& comboBoxText);
 
 protected:
+  void populateTheImageComboBox();
+
+  QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
   QComboBox* mImagesComboBox;
-  //TODO:
-  //QTableWidget* mLandmarkTableWidget;
-  //QPushButton* mAddPointButton;
-  //QPushButton* mRemovePointButton;
+  QTableWidget* mLandmarkTableWidget;
+  QPushButton* mAddPointButton;
+  QPushButton* mRemovePointButton;
 
   RepManager* mRepManager;
 };

@@ -11,6 +11,7 @@
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
+#include "cxMessageManager.h"
 #include "cxCustomStatusBar.h"
 #include "cxImageRegistrationDockWidget.h"
 
@@ -26,10 +27,12 @@
 namespace cx
 {
 MainWindow::MainWindow() :
+  mCurrentWorkflowState(PATIENT_DATA),
   mViewManager(ViewManager::getInstance()),
   mDataManager(DataManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
   mRepManager(RepManager::getInstance()),
+  mMessageManager(MessageManager::getInstance()),
   mCentralWidget(new QWidget()),
   mImageRegistrationDockWidget(new ImageRegistrationDockWidget()),
   mCustomStatusBar(new CustomStatusBar())
@@ -53,17 +56,11 @@ void MainWindow::createActions()
 
   //workflow
   mWorkflowActionGroup = new QActionGroup(this);
-  mPatientDataWorkflowAction = new QAction(tr("Acquire patient data"), this);
-  mImageRegistrationWorkflowAction = new QAction(tr("Image registration"), this);
-  mPatientRegistrationWorkflowAction = new QAction(tr("Patient registration"), this);
-  mNavigationWorkflowAction = new QAction(tr("Navigation"), this);
-  mUSAcquisitionWorkflowAction = new QAction(tr("US acquisition"), this);
-
-  mWorkflowActionGroup->addAction(mPatientDataWorkflowAction);
-  mWorkflowActionGroup->addAction(mImageRegistrationWorkflowAction);
-  mWorkflowActionGroup->addAction(mPatientRegistrationWorkflowAction);
-  mWorkflowActionGroup->addAction(mNavigationWorkflowAction);
-  mWorkflowActionGroup->addAction(mUSAcquisitionWorkflowAction);
+  mPatientDataWorkflowAction = new QAction(tr("Acquire patient data"), mWorkflowActionGroup);
+  mImageRegistrationWorkflowAction = new QAction(tr("Image registration"), mWorkflowActionGroup);
+  mPatientRegistrationWorkflowAction = new QAction(tr("Patient registration"), mWorkflowActionGroup);
+  mNavigationWorkflowAction = new QAction(tr("Navigation"), mWorkflowActionGroup);
+  mUSAcquisitionWorkflowAction = new QAction(tr("US acquisition"), mWorkflowActionGroup);
   mPatientDataWorkflowAction->setChecked(true);
 
   connect(mPatientDataWorkflowAction, SIGNAL(triggered()),
@@ -87,15 +84,11 @@ void MainWindow::createActions()
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
-  mConfigureToolsAction =  new QAction(tr("Tool configuration"), this);
-  mInitializeToolsAction =  new QAction(tr("Initialize"), this);
-  mStartTrackingToolsAction =  new QAction(tr("Start tracking"), this);
-  mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), this);
+  mConfigureToolsAction =  new QAction(tr("Tool configuration"), mToolsActionGroup);
+  mInitializeToolsAction =  new QAction(tr("Initialize"), mToolsActionGroup);
+  mStartTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
+  mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), mToolsActionGroup);
 
-  mToolsActionGroup->addAction(mConfigureToolsAction);
-  mToolsActionGroup->addAction(mInitializeToolsAction);
-  mToolsActionGroup->addAction(mStartTrackingToolsAction);
-  mToolsActionGroup->addAction(mStopTrackingToolsAction);
   mConfigureToolsAction->setChecked(true);
 
   connect(mConfigureToolsAction, SIGNAL(triggered()),
@@ -109,15 +102,11 @@ void MainWindow::createActions()
 
   //layout
   mLayoutActionGroup = new QActionGroup(this);
-  m3D_1x1_LayoutAction = new QAction(tr("3D_1X1"), this);
-  m3DACS_2x2_LayoutAction = new QAction(tr("3DACS_2X2"), this);
-  m3DACS_1x3_LayoutAction = new QAction(tr("3DACS_1X3"), this);
-  mACSACS_2x3_LayoutAction = new QAction(tr("ACSACS_2X3"), this);
+  m3D_1x1_LayoutAction = new QAction(tr("3D_1X1"), mLayoutActionGroup);
+  m3DACS_2x2_LayoutAction = new QAction(tr("3DACS_2X2"), mLayoutActionGroup);
+  m3DACS_1x3_LayoutAction = new QAction(tr("3DACS_1X3"), mLayoutActionGroup);
+  mACSACS_2x3_LayoutAction = new QAction(tr("ACSACS_2X3"), mLayoutActionGroup);
 
-  mLayoutActionGroup->addAction(m3D_1x1_LayoutAction);
-  mLayoutActionGroup->addAction(m3DACS_2x2_LayoutAction);
-  mLayoutActionGroup->addAction(m3DACS_1x3_LayoutAction);
-  mLayoutActionGroup->addAction(mACSACS_2x3_LayoutAction);
   m3D_1x1_LayoutAction->setChecked(true);
 
   connect(m3D_1x1_LayoutAction, SIGNAL(triggered()),
@@ -176,6 +165,95 @@ void MainWindow::createStatusBar()
 {
   this->setStatusBar(mCustomStatusBar);
 }
+void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
+{
+  switch (fromState)
+  {
+  case PATIENT_DATA:
+    this->deactivatePatientDataState();
+    break;
+  case IMAGE_REGISTRATION:
+    this->deactivateImageRegistationState();
+    break;
+  case PATIENT_REGISTRATION:
+    this->deactivatePatientRegistrationState();
+    break;
+  case NAVIGATION:
+    this->deactivateNavigationState();
+    break;
+  case US_ACQUISITION:
+    this->deactivateUSAcquisitionState();
+    break;
+  default:
+    mMessageManager.sendWarning("Could not determine what workflow state to deactivate.");
+    return;
+    break;
+  };
+
+  switch (toState)
+  {
+  case PATIENT_DATA:
+    this->activatePatientDataState();
+    break;
+  case IMAGE_REGISTRATION:
+    this->activateImageRegistationState();
+    break;
+  case PATIENT_REGISTRATION:
+    this->activatePatientRegistrationState();
+    break;
+  case NAVIGATION:
+    this->activateNavigationState();
+    break;
+  case US_ACQUISITION:
+    this->activateUSAcquisitionState();
+    break;
+  default:
+    mMessageManager.sendWarning("Could not determine what workflow state to activate.");
+    this->activatePatientDataState();
+    return;
+    break;
+  };
+}
+void MainWindow::activatePatientDataState()
+{
+  mCurrentWorkflowState = PATIENT_DATA;
+}
+void MainWindow::deactivatePatientDataState()
+{}
+void MainWindow::activateImageRegistationState()
+{
+  this->addDockWidget(Qt::LeftDockWidgetArea, mImageRegistrationDockWidget);
+  mImageRegistrationDockWidget->show();
+
+  mCurrentWorkflowState = IMAGE_REGISTRATION;
+}
+void MainWindow::deactivateImageRegistationState()
+{
+  this->removeDockWidget(mImageRegistrationDockWidget);
+}
+void MainWindow::activatePatientRegistrationState()
+{
+  //TODO
+  //this->addDockWidget(Qt::LeftDockWidgetArea, mPatientRegistrationDockWidget);
+  mCurrentWorkflowState = PATIENT_REGISTRATION;
+}
+void MainWindow::deactivatePatientRegistrationState()
+{
+  //TODO
+  //this->removeDockWidget(mPatientRegistrationDockWidget);
+}
+void MainWindow::activateNavigationState()
+{
+  mCurrentWorkflowState = NAVIGATION;
+}
+void MainWindow::deactivateNavigationState()
+{}
+void MainWindow::activateUSAcquisitionState()
+{
+  mCurrentWorkflowState = US_ACQUISITION;
+}
+void MainWindow::deactivateUSAcquisitionState()
+{}
 void MainWindow::aboutSlot()
 {}
 void MainWindow::preferencesSlot()
@@ -183,15 +261,25 @@ void MainWindow::preferencesSlot()
 void MainWindow::quitSlot()
 {}
 void MainWindow::patientDataWorkflowSlot()
-{}
+{
+  this->changeState(mCurrentWorkflowState, PATIENT_DATA);
+}
 void MainWindow::imageRegistrationWorkflowSlot()
-{}
+{
+  this->changeState(mCurrentWorkflowState, IMAGE_REGISTRATION);
+}
 void MainWindow::patientRegistrationWorkflowSlot()
-{}
+{
+  this->changeState(mCurrentWorkflowState, PATIENT_REGISTRATION);
+}
 void MainWindow::navigationWorkflowSlot()
-{}
+{
+  this->changeState(mCurrentWorkflowState, NAVIGATION);
+}
 void MainWindow::usAcquisitionWorkflowSlot()
-{}
+{
+  this->changeState(mCurrentWorkflowState, US_ACQUISITION);
+}
 void MainWindow::loadDataSlot()
 {
   this->statusBar()->showMessage(QString(tr("Loading data..")));
@@ -209,15 +297,15 @@ void MainWindow::loadDataSlot()
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    this->statusBar()->showMessage(QString(tr("Meta data loaded.")));
+    mMessageManager.sendInfo("Meta data loaded.");
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
-    this->statusBar()->showMessage(QString(tr("STL data loaded.")));
+    mMessageManager.sendInfo("STL data loaded.");
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
-    //mMessageManager.sendInfo("Vtk data loaded.");
+    mMessageManager.sendInfo("Vtk data loaded.");
   }
 
 }

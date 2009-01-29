@@ -29,6 +29,7 @@ typedef ssc::DataManager DataManager;
 class RepManager;
 class ViewManager;
 class ToolManager;
+class MessageManager;
 class CustomStatusBar;
 class ImageRegistrationDockWidget;
 
@@ -40,7 +41,7 @@ public:
   MainWindow();
   ~MainWindow();
 
-private slots:
+protected slots:
   //application menu
   void aboutSlot();
   void preferencesSlot();
@@ -60,16 +61,41 @@ private slots:
   void configureSlot();
 
 
-private:
+protected:
+  enum WorkflowState
+  {
+    PATIENT_DATA,
+    IMAGE_REGISTRATION,
+    PATIENT_REGISTRATION,
+    NAVIGATION,
+    US_ACQUISITION
+  };
+
   void createActions();
   void createMenus();
   void createToolBars();
   void createStatusBar();
 
+  //Takes care of removing and adding widgets depending on which workflow state the system is in
+  void changeState(WorkflowState fromState, WorkflowState toState);
+  void activatePatientDataState();
+  void deactivatePatientDataState();
+  void activateImageRegistationState();
+  void deactivateImageRegistationState();
+  void activatePatientRegistrationState();
+  void deactivatePatientRegistrationState();
+  void activateNavigationState();
+  void deactivateNavigationState();
+  void activateUSAcquisitionState();
+  void deactivateUSAcquisitionState();
+
+  WorkflowState mCurrentWorkflowState;
+
   ViewManager* mViewManager;
   DataManager* mDataManager;
   ToolManager* mToolManager;
   RepManager* mRepManager;
+  MessageManager& mMessageManager;
 
   QWidget* mCentralWidget;
 
