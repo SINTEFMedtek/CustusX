@@ -1,5 +1,6 @@
 #include "cxVolumetricRep.h"
 
+#include <limits>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
@@ -33,9 +34,9 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
   ssc::VolumetricRep(uid, name),
   mMessageManager(MessageManager::getInstance()),
   mThreshold(25),
-  mCurrentX(0),
-  mCurrentY(0),
-  mCurrentZ(0),
+  mCurrentX(std::numeric_limits<double>::max()),
+  mCurrentY(std::numeric_limits<double>::max()),
+  mCurrentZ(std::numeric_limits<double>::max()),
   mPickedPointActor(NULL),
   mConnections(vtkEventQtSlotConnect::New())
 {}
@@ -232,6 +233,14 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
 }
 void VolumetricRep::makePointPermanent()
 {
+
+  if(mCurrentX == std::numeric_limits<double>::max() &&
+      mCurrentY == std::numeric_limits<double>::max() &&
+      mCurrentY == std::numeric_limits<double>::max())
+  {
+    mMessageManager.sendWarning("Could not make the point permanent, invalid values.");
+    return;
+  }
   emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ);
 }
 vtkSmartPointer<vtkRenderer> VolumetricRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)

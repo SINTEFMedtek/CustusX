@@ -19,12 +19,20 @@ class QComboBox;
 class QTableWidget;
 class QPushButton;
 
+namespace ssc
+{
+class DataManager;
+}
 namespace cx
 {
 class RepManager;
+class ViewManager;
+class MessageManager;
 
 class ImageRegistrationDockWidget : public QDockWidget
 {
+  typedef ssc::DataManager DataManager;
+
   Q_OBJECT
 
 public:
@@ -32,10 +40,15 @@ public:
   ~ImageRegistrationDockWidget();
 
 protected slots:
-  void volumetricRepSelectedSlot(const QString& comboBoxText);
+  void addPointButtonClickedSlot();
+  void removePointButtonClickedSlot();
+  void imageSelectedSlot(const QString& comboBoxText);
+  void visibilityOfDockWidgetChangedSlot(bool visible);
+
 
 protected:
   void populateTheImageComboBox();
+  void populateTheLandmarkTableWidget(ssc::ImagePtr image);
 
   QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
@@ -45,6 +58,9 @@ protected:
   QPushButton* mRemovePointButton;
 
   RepManager* mRepManager;
+  DataManager* mDataManager;
+  ViewManager* mViewManager;
+  MessageManager& mMessageManager;
 };
 }//namespace cx
 

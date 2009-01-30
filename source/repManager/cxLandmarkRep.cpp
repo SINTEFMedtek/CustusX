@@ -88,8 +88,7 @@ void LandmarkRep::showLandmarks(bool on)
 }
 void LandmarkRep::setImage(ssc::ImagePtr image)
 {
-  //std::cout << "LandmarkRep::setImage" << std::endl;
-  if(image.get() == NULL)
+  if(image.get() == NULL || image == mImage)
     return;
 
   if(mImage.get() != NULL)
