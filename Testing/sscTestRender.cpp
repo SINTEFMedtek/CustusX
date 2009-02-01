@@ -41,7 +41,8 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 
 	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
-	std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	//std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::cout << testFile1 << std::endl;
 
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, ssc::rtMETAIMAGE);
@@ -63,7 +64,7 @@ int main(int argc, char **argv)
 		doRender(view->getRenderWindow());
 	}
 
-#define USE_TRANSFORM_RESCLICER
+//#define USE_TRANSFORM_RESCLICER
 #ifdef USE_TRANSFORM_RESCLICER
 	// this code is meant for testing the reslicer in ssc::Image
 	std::cout << "rotating the image data..." << std::endl;
@@ -75,7 +76,7 @@ int main(int argc, char **argv)
 	doRender(view->getRenderWindow());
 #endif
 	std::cout << "Uid       : " << image1->getUid() << std::endl;
-//	app.exec();
+	app.exec();
 
 	return 0;
 }

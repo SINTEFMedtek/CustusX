@@ -22,13 +22,24 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorTF(vtkColorTransferFunctionPtr::New()),
 	mBase(base)
 {
-	mLevel = getScalarMax()/2.0;
-	mWindow = getScalarMax();
+	double max = getScalarMax();
+	//max = 500;
+	mLevel = max/2.0;
+	mWindow = max;
+	std::cout << "getScalarMax(): " << max << std::endl;
 	mLLR = 0.0;
 
 	mColorTF->SetColorSpaceToRGB();
 
 	vtkWindowLevelLookupTablePtr lut = vtkWindowLevelLookupTablePtr::New();
+
+	int numColors = lut->GetNumberOfTableValues();
+	for ( int i = 0; i < numColors; i++ )
+	{
+		double val = double(i)/(numColors-1);
+		lut->SetTableValue(i, val, val, val, 0);
+	}
+
 	lut->SetWindow(mWindow);
 	lut->SetLevel(mLevel);
 	mLut = lut;
@@ -140,7 +151,7 @@ void ImageTF3D::refreshColorTF()
 	for ( int i = 0; i < numColors; i++ )
 	{
 		double* color = mLut->GetTableValue ( i );
-		double index = ( min + ( double ) ( i ) * ( max - min ) / numColors - 1 );
+		double index = min + double(i) * (max-min) / (numColors-1);
 		mColorTF->AddRGBPoint ( index, color[0], color[1], color[2] );
 	}
 }

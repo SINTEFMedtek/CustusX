@@ -22,7 +22,12 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	mTextureMapper3D(vtkVolumeTextureMapper3DPtr::New()),
 	mVolume(vtkVolumePtr::New())
 {
-	double maxVal = 255;//500.0;
+	//double maxVal = 255;//500.0;
+//	double maxVal = 500.0;
+	// should use GetScalarRange()[1], but we dont have an image yet,
+	// and this code dont ever get run... pick a value (TF's set from ssc::Image)
+	//double maxVal = 1296.0;
+	double maxVal = 500;
 
 	mOpacityTransferFunction->AddPoint(0.0, 0.0);
 	mOpacityTransferFunction->AddPoint(maxVal, 1.0);
@@ -129,7 +134,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	}
 	mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
 	mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
-	// use the base instead of the ref image, because otherwise changes in the transform 
+	// use the base instead of the ref image, because otherwise changes in the transform
 	// causes data to be sent anew to the graphics card (takes 4s).
 	// changing the mVolume transform instead is a fast operation.
 	mTextureMapper3D->SetInput( mImage->getBaseVtkImageData() );
