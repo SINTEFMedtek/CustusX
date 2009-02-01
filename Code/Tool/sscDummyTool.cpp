@@ -33,12 +33,25 @@ DummyTool::DummyTool() :
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
 }
+
 DummyTool::~DummyTool()
-{}
+{
+}
+
+/**Use this to override the default movement pattern in the tool.
+ * The pattern
+ *
+ */
+void DummyTool::setToolPositionMovement(const std::vector<Transform3D>& positions)
+{
+	mTransforms = positions;
+}
+
 Tool::Type DummyTool::getType() const
 {
 	return TOOL_NONE;
 }
+
 std::string DummyTool::getGraphicsFileName() const
 {
 	//return "DummyToolsDoNotHaveAGraphicsFile";
@@ -77,9 +90,9 @@ void DummyTool::startTracking()
 {
 	mTimer->start(33);
 
-	bool visible = true;
+	mVisible = true;
 
-	emit toolVisible(visible);
+	emit toolVisible(mVisible);
 }
 bool DummyTool::isCalibrated() const
 {
@@ -89,13 +102,13 @@ void DummyTool::stopTracking()
 {
 	mTimer->stop();
 
-	bool visible = false;
-	emit toolVisible(visible);
+	mVisible = false;
+	emit toolVisible(mVisible);
 }
 void DummyTool::sendTransform()
 {
 	QDateTime time;
-	std::cout<<"send transform"<<std::endl;	
+	std::cout<<"send transform"<<std::endl;
 	Transform3D matrix = *getNextTransform();
 	double timestamp = (double) time.time().msec();
 

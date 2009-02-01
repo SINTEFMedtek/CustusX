@@ -37,6 +37,8 @@ public:
 	void startTracking();
 	void stopTracking();
 
+	void setToolPositionMovement(const std::vector<Transform3D>& positions);
+
 private slots:
 	virtual void sendTransform();
 
