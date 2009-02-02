@@ -94,7 +94,7 @@ void SliceRepSW::doSliceing()
 		return;
 	}
 
-	mReslicer->SetInput(mImage->getBaseVtkImageData() );
+	mReslicer->SetInput(mImage->getRefVtkImageData());
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->GetOutput()->UpdateInformation();
 	mReslicer->SetOutputDimensionality( 2);

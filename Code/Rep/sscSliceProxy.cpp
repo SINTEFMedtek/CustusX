@@ -12,7 +12,7 @@ SliceProxy::SliceProxy()
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	//TODO connect to toolmanager rMpr changed
-	mCutplane.setFixedCenter(ssc::DataManager::getInstance()->getCenter());
+	centerChangedSlot();
 	std::cout<<"Got center"<< ssc::DataManager::getInstance()->getCenter() <<std::endl;
 }
 
@@ -43,6 +43,7 @@ void SliceProxy::setTool(ToolPtr tool)
 	}	
 	
 	// TODO fill data from tool
+	centerChangedSlot(); // force center update for tool==0
 	changed();	
 }
 
@@ -61,7 +62,14 @@ void SliceProxy::toolVisibleSlot(bool visible)
 
 void SliceProxy::centerChangedSlot()
 {
-	mCutplane.setFixedCenter(ssc::DataManager::getInstance()->getCenter());
+	Vector3D c = ssc::DataManager::getInstance()->getCenter();
+	mCutplane.setFixedCenter(c);
+	
+	if (!mTool)
+	{
+		mCutplane.setToolPosition(createTransformTranslate(c));			
+	}	
+	
 	//std::cout << "center changed: " + boost::lexical_cast<std::string>(ssc::DataManager::instance()->getCenter());
 	changed();
 }
@@ -92,7 +100,8 @@ ToolPtr SliceProxy::getTool()
 Transform3D SliceProxy::get_sMr()
 {
 	SlicePlane plane = mCutplane.getPlane();
-	//std::cout << "proxy get transform :\n"+boost::lexical_cast<std::string>(plane) << std::endl;
+	//std::cout << mDebugId << " proxy get transform.c : " << plane.c << std::endl;
+	//std::cout << "proxy get transform :\n" << plane << std::endl;
 	return createTransformIJC(plane.i, plane.j, plane.c).inv();	
 }
 
