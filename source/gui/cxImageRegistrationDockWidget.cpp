@@ -33,7 +33,9 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mRepManager(RepManager::getInstance()),
   mDataManager(DataManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
-  mMessageManager(MessageManager::getInstance())
+  mMessageManager(MessageManager::getInstance()),
+  mCurrentRow(-1),
+  mCurrentColumn(-1)
 {
   //dock widget
   this->setWindowTitle("Image Registration");
@@ -46,14 +48,6 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString&)),
           this, SLOT(imageSelectedSlot(const QString&)));
 
-  //tablewidget
-  mLandmarkTableWidget->setColumnCount(2);
-  QStringList headerItems(QStringList() << "Point nr."
-                          << "Image space");
-  mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
-  mLandmarkTableWidget->horizontalHeader()->
-    setResizeMode(QHeaderView::ResizeToContents);
-
   //pushbuttons
   mAddPointButton->setDisabled(true);
   connect(mAddPointButton, SIGNAL(clicked()),
@@ -61,6 +55,10 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mRemovePointButton->setDisabled(true);
   connect(mRemovePointButton, SIGNAL(clicked()),
           this, SLOT(removePointButtonClickedSlot()));
+
+  //table widget
+  connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
+          this, SLOT(landmarkSelectedSlot(int, int)));
 
   //layout
   mVerticalLayout->addWidget(mImagesComboBox);
@@ -83,7 +81,15 @@ void ImageRegistrationDockWidget::addPointButtonClickedSlot()
   volumetricRep->makePointPermanent();
 }
 void ImageRegistrationDockWidget::removePointButtonClickedSlot()
-{}
+{
+  if(mCurrentRow < 0 || mCurrentColumn < 0)
+    return;
+
+  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+  landmarkRep->requestRemovePermanentPoint(0,0,0); //TODO: implement
+  //TODO:...or make sure landmarks are not sorted in image...
+  //landmarkRep->removePermanentPoint(mCurrentRow+1);
+}
 void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
   std::string imageId = comboBoxText.toStdString();
@@ -95,9 +101,26 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
     mMessageManager.sendError("Could not find the selected image in the DataManager.");
     return;
   }
-  //get the images landmarks and populate the landmark table
-  this->populateTheLandmarkTableWidget(image);
+  if(mCurrentImage)
+  {
+    //disconnect from the old image
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double)),
+              this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double)),
+              this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
+  }
 
+  //Set new current image
+  mCurrentImage = image;
+  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
+  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
+
+  //get the images landmarks and populate the landmark table
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+
+  //TODO
   //show volumetric rep in View3D and InriaRep in View2D (linked)
     //view3D->getVolumetricRep->setImage()???
     //view3D->getInria3DRep->setImage()???
@@ -106,8 +129,8 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  volumetricRep->setImage(image);
-  landmarkRep->setImage(image);
+  volumetricRep->setImage(mCurrentImage);
+  landmarkRep->setImage(mCurrentImage);
   view3D_1->setRep(volumetricRep);
   view3D_1->addRep(landmarkRep);
 }
@@ -116,8 +139,14 @@ void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible
   if(visible)
     this->populateTheImageComboBox();
 }
+void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ)
+{
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+}
 void ImageRegistrationDockWidget::populateTheImageComboBox()
 {
+  mImagesComboBox->clear();
+
   //get a list of images from the datamanager
   std::map<std::string, ssc::ImagePtr> images = mDataManager->getImages();
   if(images.size() == 0)
@@ -137,18 +166,34 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
   //enable the add point button if any images was found
   mAddPointButton->setDisabled(false);
 }
+void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
+{
+  mCurrentRow = row;
+  mCurrentColumn = column;
+}
 void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
+
+  mLandmarkTableWidget->clear();
+  mLandmarkTableWidget->setRowCount(numberOfLandmarks);
+  mLandmarkTableWidget->setColumnCount(1);
+  QStringList headerItems(QStringList() << "Image space");
+  mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
+  mLandmarkTableWidget->horizontalHeader()->
+    setResizeMode(QHeaderView::ResizeToContents);
+
   for(int row=1; row<=numberOfLandmarks; row++)
   {
     double* point = landmarks->GetTuple(row);
-    mLandmarkTableWidget->setItem(row, 0, new QTableWidgetItem(QString(QChar(row))));
-    mLandmarkTableWidget->setItem(row, 1, new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2])));
+
+    QTableWidgetItem* columnOne = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
+    columnOne->setFlags(Qt::ItemIsSelectable);
+
+    mLandmarkTableWidget->setItem(row-1, 0, columnOne);
   }
 
-  //enable the remove point button if the selected image has any landmarks
   if(numberOfLandmarks == 0)
     mRemovePointButton->setDisabled(true);
   else

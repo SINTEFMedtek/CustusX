@@ -54,7 +54,9 @@ public:
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
   ssc::ImagePtr getImage() const; ///< returns a pointer to the image being used
+  //TODO: REMOVE
   void removePermanentPoint(unsigned int idNumber); ///< sends out a signal requesting a point to be removed from the images internal landmarklist
+  void requestRemovePermanentPoint(double x, double y, double z);
 
 signals:
   void removePermanentPoint(double x, double y, double z); ///< the landmarkrep can signal that a point should be removed the (images) landmarklist

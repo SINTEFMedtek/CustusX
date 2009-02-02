@@ -10,6 +10,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include "sscView.h"
 #include "cxMessageManager.h"
 /**
@@ -35,31 +36,24 @@ LandmarkRep::LandmarkRep(const std::string& uid, const std::string& name) :
   mType("cxLandmarkRep"),
   mShowLandmarks(true)
 {
-  //std::cout << "LandmarkRep::LandmarkRep" << std::endl;
   mTextScale[0] = mTextScale[1] = mTextScale[2] = 20;
 }
 LandmarkRep::~LandmarkRep()
-{
-  //std::cout << "LandmarkRep::~LandmarkRep();" << std::endl;
-}
+{}
 std::string LandmarkRep::getType() const
 {
-  //std::cout << "LandmarkRep::getType()" << std::endl;
   return mType;
 }
 int LandmarkRep::getNumberOfLandmarks() const
 {
-  //std::cout << "LandmarkRep::getNumberOfLandmarks()" << std::endl;
   return mImage->getLandmarks()->GetNumberOfTuples();
 }
 void LandmarkRep::setColor(RGB color)
 {
-  //std::cout << "LandmarkRep::setColor" << std::endl;
   mColor = color;
 }
 void LandmarkRep::setTextScale(int& x, int& y,int& z)
 {
-  //std::cout << "LandmarkRep::setTextScale" << std::endl;
   mTextScale[0] = x;
   mTextScale[1] = y;
   mTextScale[2] = z;
@@ -68,7 +62,6 @@ void LandmarkRep::setTextScale(int& x, int& y,int& z)
 }
 void LandmarkRep::showLandmarks(bool on)
 {
-  //std::cout << "LandmarkRep::showLandmarks" << std::endl;
   if(on == mShowLandmarks)
     return;
 
@@ -88,15 +81,21 @@ void LandmarkRep::showLandmarks(bool on)
 }
 void LandmarkRep::setImage(ssc::ImagePtr image)
 {
-  if(image.get() == NULL || image == mImage)
+  if(image == mImage || image.get() == NULL)
     return;
 
-  if(mImage.get() != NULL)
+  if(mImage)
   {
+    mImage->disconnectRep(mSelf);
     disconnect(mImage.get(), SIGNAL(landmarkAdded(double, double, double)),
             this, SLOT(addPermanentPointSlot(double, double, double)));
     disconnect(this, SIGNAL(removePermanentPoint(double, double, double)),
             mImage.get(), SLOT(removeLandmarkSlot(double, double, double)));
+    for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
+    {
+      ssc::View* view = *it;
+      this->removeRepActorsFromViewRenderer(view);
+    }
   }
 
   mImage = image;
@@ -104,6 +103,11 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
   mSkinPointActors.clear();
   mTextFollowerActors.clear();
 
+  mImage->connectRep(mSelf);
+  connect(mImage.get(), SIGNAL(landmarkAdded(double, double, double)),
+          this, SLOT(addPermanentPointSlot(double, double, double)));
+  connect(this, SIGNAL(removePermanentPoint(double, double, double)),
+          mImage.get(), SLOT(removeLandmarkSlot(double, double, double)));
   vtkDoubleArrayPtr landmarks = mImage->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
   for(int i=0; i<numberOfLandmarks; i++)
@@ -112,27 +116,16 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
     point = landmarks->GetTuple(i);
     this->addPoint(point[0], point[1], point[2], i);
   }
-
-  connect(mImage.get(), SIGNAL(landmarkAdded(double, double, double)),
-          this, SLOT(addPermanentPointSlot(double, double, double)));
-  connect(this, SIGNAL(removePermanentPoint(double, double, double)),
-          mImage.get(), SLOT(removeLandmarkSlot(double, double, double)));
 }
 ssc::ImagePtr LandmarkRep::getImage() const
 {
-  //std::cout << "LandmarkRep::getImage()" << std::endl;
   return mImage;
 }
 void LandmarkRep::removePermanentPoint(unsigned int idNumber)
 {
-  //std::cout << "LandmarkRep::removePermanentPoint" << std::endl;
   unsigned int numberOfLandmarksInImage = this->getNumberOfLandmarks();
   unsigned int numberOfSkinpointActors = mSkinPointActors.size();
   unsigned int numberOfTextFollowerActors = mTextFollowerActors.size();
-
-  //std::cout << "Number of landmarks in mImage is: " << numberOfLandmarksInImage << std::endl;
-  //std::cout << "Number of actor in mSkinPointActors is: " << numberOfSkinpointActors << std::endl;
-  //std::cout << "Number of actor in mTextFollowerActors is: " << numberOfTextFollowerActors << std::endl;
 
   mImage->printLandmarks();
   if(idNumber == 0 ||
@@ -171,22 +164,17 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
     ssc::View* view = (*it);
     if(view == NULL)
     {
-      //std::cout << "view == NULL" << std::endl;
       continue;
     }
-    //std::cout << "The views id is " << view->getUid() << std::endl;
     vtkRendererPtr renderer = view->getRenderer();
     if(renderer != NULL)
     {
-      //std::cout << "renderer != NULL" << std::endl;
       if(renderer->HasViewProp(skinPointActorToRemove.GetPointer()))
       {
-        //std::cout << "Renderer has the viewprop, removing it." << std::endl;
         renderer->RemoveActor(skinPointActorToRemove.GetPointer());
       }
       if(renderer->HasViewProp(textFollowerActorToRemove.second.GetPointer()))
       {
-        //std::cout << "Renderer has the viewprop, removing it." << std::endl;
         renderer->RemoveActor(textFollowerActorToRemove.second.GetPointer());
       }
 
@@ -196,7 +184,6 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
       {
         if(i == idNumber)
         {
-          //std::cout << "Erasing the actors from the actor lists..." << std::endl;
           mSkinPointActors.erase(it1);
           mTextFollowerActors.erase(it2);
         }
@@ -210,17 +197,18 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
     it++;
   }
   this->internalUpdate();
-  //std::cout << "After internalUpdate()" << std::endl;
   mImage->printLandmarks();
+}
+void LandmarkRep::requestRemovePermanentPoint(double x, double y, double z)
+{
+  //TODO
 }
 void LandmarkRep::addPermanentPointSlot(double x, double y, double z)
 {
-  //std::cout << "LandmarkRep::addPermanentPointSlot" << std::endl;
   this->addPoint(x, y, z);
 }
 void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 {
-  //std::cout << "LandmarkRep::addRepActorsToViewRenderer" << std::endl;
   if(view == NULL)
   {
     mMessageManager.sendWarning("Trying to add rep actors to view renderer, but view is null.");
@@ -257,7 +245,6 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 }
 void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
-  //std::cout << "LandmarkRep::removeRepActorsFromViewRenderer" << std::endl;
   if(view == NULL)
   {
     mMessageManager.sendWarning("Trying to remove rep actors to view renderer, but view is null.");
@@ -287,7 +274,6 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 }
 void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
 {
-  //std::cout << "LandmarkRep::addPoint" << std::endl;
   vtkImageDataPtr imageData = mImage->getBaseVtkImageData();
   double imageCenter[3];
   imageData->GetCenter(imageCenter);
@@ -306,8 +292,7 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
 
   vtkVectorTextPtr text = vtkVectorTextPtr::New();
   std::stringstream numberstream;
-  if(numberInLine == 0)
-    numberInLine = mTextFollowerActors.size()+1;
+  numberInLine = mTextFollowerActors.size()+1;
   numberstream << numberInLine;
   text->SetText(numberstream.str().c_str());
 
@@ -347,11 +332,11 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
   {
     ssc::View* view = *it;
     this->addRepActorsToViewRenderer(view);
+    view->GetInteractor()->Render();
   }
 }
 void LandmarkRep::internalUpdate()
 {
-  //std::cout << "LandmarkRep::internalUpdate" << std::endl;
   if(mTextFollowerActors.size() != mSkinPointActors.size())
   {
     std::stringstream errormessage;

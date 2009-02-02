@@ -41,9 +41,11 @@ public:
 
 protected slots:
   void addPointButtonClickedSlot();
-  void removePointButtonClickedSlot();
+  void removePointButtonClickedSlot(); //TODO
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
+  void imageLandmarksUpdateSlot(double, double, double);
+  void landmarkSelectedSlot(int row, int column);
 
 
 protected:
@@ -61,6 +63,10 @@ protected:
   DataManager* mDataManager;
   ViewManager* mViewManager;
   MessageManager& mMessageManager;
+
+  ssc::ImagePtr mCurrentImage;
+
+  int mCurrentRow, mCurrentColumn;
 };
 }//namespace cx
 
