@@ -71,6 +71,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 	std::cout<<"setMapper"<<std::endl;
 	mToolActor->SetMapper(mPolyDataMapper);
 	mToolActor->SetVisibility(tool->getVisible());
+	receiveTransforms(mTool->get_prMt(), 0);
 	
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
 			this, SLOT(receiveTransforms(Transform3D, double)));
