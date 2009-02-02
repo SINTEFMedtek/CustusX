@@ -41,15 +41,15 @@ public:
 
 protected slots:
   void addPointButtonClickedSlot();
-  void removePointButtonClickedSlot(); //TODO
+  void removePointButtonClickedSlot();
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
   void imageLandmarksUpdateSlot(double, double, double);
   void landmarkSelectedSlot(int row, int column);
+  void populateTheImageComboBox();
 
 
 protected:
-  void populateTheImageComboBox();
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
 
   QWidget* mGuiContainer;

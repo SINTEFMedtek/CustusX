@@ -47,6 +47,8 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mImagesComboBox->setEditable(false);
   connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString&)),
           this, SLOT(imageSelectedSlot(const QString&)));
+  connect(mDataManager, SIGNAL(dataLoaded()), //TODO: implement in datamanager...
+          this, SLOT(populateTheImageComboBox()));
 
   //pushbuttons
   mAddPointButton->setDisabled(true);
@@ -86,19 +88,20 @@ void ImageRegistrationDockWidget::removePointButtonClickedSlot()
     return;
 
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  landmarkRep->requestRemovePermanentPoint(0,0,0); //TODO: implement
-  //TODO:...or make sure landmarks are not sorted in image...
-  //landmarkRep->removePermanentPoint(mCurrentRow+1);
+  landmarkRep->removePermanentPoint(mCurrentRow+1);
 }
 void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
+  if(comboBoxText.isEmpty())
+    return;
+
   std::string imageId = comboBoxText.toStdString();
 
   //find the image
   ssc::ImagePtr image = mDataManager->getImage(imageId);
   if(image.get() == NULL)
   {
-    mMessageManager.sendError("Could not find the selected image in the DataManager.");
+    mMessageManager.sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
   if(mCurrentImage)
@@ -186,7 +189,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
 
   for(int row=1; row<=numberOfLandmarks; row++)
   {
-    double* point = landmarks->GetTuple(row);
+    double* point = landmarks->GetTuple(row-1);
 
     QTableWidgetItem* columnOne = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
     columnOne->setFlags(Qt::ItemIsSelectable);

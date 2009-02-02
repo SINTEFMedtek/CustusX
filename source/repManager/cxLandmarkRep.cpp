@@ -127,7 +127,7 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
   unsigned int numberOfSkinpointActors = mSkinPointActors.size();
   unsigned int numberOfTextFollowerActors = mTextFollowerActors.size();
 
-  mImage->printLandmarks();
+  //mImage->printLandmarks();
   if(idNumber == 0 ||
      numberOfLandmarksInImage < idNumber ||
      numberOfSkinpointActors < idNumber ||
@@ -193,15 +193,10 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
           it2++;
       }
     }
-    renderer->Render();
+    this->internalUpdate();
+    view->GetInteractor()->Render();
     it++;
   }
-  this->internalUpdate();
-  mImage->printLandmarks();
-}
-void LandmarkRep::requestRemovePermanentPoint(double x, double y, double z)
-{
-  //TODO
 }
 void LandmarkRep::addPermanentPointSlot(double x, double y, double z)
 {
@@ -355,7 +350,6 @@ void LandmarkRep::internalUpdate()
   int i=1;
   while(it != mTextFollowerActors.end())
   {
-    std::cout << "Setting VectorText to: " << i << std::endl;
     std::stringstream numberstream;
     numberstream << i;
     it->first->SetText(numberstream.str().c_str());
