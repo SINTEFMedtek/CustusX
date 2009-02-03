@@ -7,11 +7,15 @@
 #include <QTableWidgetItem>
 #include <QHeaderView>
 #include <vtkDoubleArray.h>
+#include <vtkImageData.h>
 #include "sscDataManager.h"
 #include "cxRepManager.h"
 #include "cxViewManager.h"
 #include "cxMessageManager.h"
 #include "cxView3D.h"
+#include "cxView2D.h"
+#include "cxInriaRep2D.h"
+
 /**
  * cxImageRegistrationDockWidget.cpp
  *
@@ -47,8 +51,6 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mImagesComboBox->setEditable(false);
   connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString&)),
           this, SLOT(imageSelectedSlot(const QString&)));
-  connect(mDataManager, SIGNAL(dataLoaded()), //TODO: implement in datamanager...
-          this, SLOT(populateTheImageComboBox()));
 
   //pushbuttons
   mAddPointButton->setDisabled(true);
@@ -67,7 +69,6 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mAddPointButton);
   mVerticalLayout->addWidget(mRemovePointButton);
-
   mGuiContainer->setLayout(mVerticalLayout);
 }
 ImageRegistrationDockWidget::~ImageRegistrationDockWidget()
@@ -92,7 +93,7 @@ void ImageRegistrationDockWidget::removePointButtonClickedSlot()
 }
 void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
-  if(comboBoxText.isEmpty())
+  if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
     return;
 
   std::string imageId = comboBoxText.toStdString();
@@ -129,6 +130,8 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
     //view3D->getInria3DRep->setImage()???
     //view2D->getInria2DRep->setImage()??? sync with the three others (2d, 2d and 3d)
   //show landmark reps
+
+  //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
@@ -136,11 +139,57 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   landmarkRep->setImage(mCurrentImage);
   view3D_1->setRep(volumetricRep);
   view3D_1->addRep(landmarkRep);
+
+  //view2D
+  View2D* view2D_1 = mViewManager->get2DView("View2D_1");
+  View2D* view2D_2 = mViewManager->get2DView("View2D_2");
+  View2D* view2D_3 = mViewManager->get2DView("View2D_3");
+  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+  view2D_1->setRep(inriaRep2D_1);
+  view2D_2->setRep(inriaRep2D_2);
+  view2D_3->setRep(inriaRep2D_3);
+  //TODO: ...or getBaseVtkImageData()???
+  inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
+  inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
+  inriaRep2D_3->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::SAGITTAL_ID);
+  inriaRep2D_1->getVtkViewImage2D()->AddChild(inriaRep2D_2->getVtkViewImage2D());
+  inriaRep2D_2->getVtkViewImage2D()->AddChild(inriaRep2D_3->getVtkViewImage2D());
+  inriaRep2D_3->getVtkViewImage2D()->AddChild(inriaRep2D_1->getVtkViewImage2D());
+  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+  inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mCurrentImage->getRefVtkImageData());
+  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
+
+/*  connect(volumetricRep, SIGNAL(imageChanged()),
+          this, SLOT(react()));
+  connect(inriaRep2D, SIGNAL(imageChanged()),
+            this, SLOT(react()));*/
 }
+/*void react()
+{
+  uid = volumetricRep->getImage()->getUid();
+  image = Datamanager_>getImage(uid)
+  updatae combobox
+  update tablewidget
+  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+  inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(image);
+  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
+}*/
+
 void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 {
   if(visible)
+  {
+    connect(mDataManager, SIGNAL(dataLoaded()),
+            this, SLOT(populateTheImageComboBox()));
     this->populateTheImageComboBox();
+  }
+  else
+  {
+    disconnect(mDataManager, SIGNAL(dataLoaded()),
+            this, SLOT(populateTheImageComboBox()));
+  }
 }
 void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ)
 {
@@ -155,7 +204,13 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
   if(images.size() == 0)
   {
     mAddPointButton->setDisabled(true);
+    mImagesComboBox->insertItem(1, QString("Load an image to begin..."));
+    mImagesComboBox->setEnabled(false);
     return;
+  }
+  else
+  {
+    mImagesComboBox->setEnabled(true);
   }
 
   //add these to the combobox
