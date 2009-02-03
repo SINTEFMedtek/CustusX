@@ -81,7 +81,7 @@ Vector3D DataManagerImpl::getCenter() const
 void DataManagerImpl::setCenter(const Vector3D& center)
 {
 	mCenter = center;
-	emit centerChanged(); 
+	emit centerChanged();
 }
 
 ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE type)
@@ -97,6 +97,7 @@ ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE typ
 	if (current)
 	{
 		mImages[current->getUid()] = current;
+		emit dataLoaded();
 	}
 	return current;
 }
@@ -109,6 +110,7 @@ MeshPtr DataManagerImpl::loadMesh(const std::string& fileName, MESH_READER_TYPE 
 	if (newMesh)
 	{
 		mMeshes[newMesh->getUID()] = newMesh;
+		emit dataLoaded();
 	}
 	return newMesh;
 }
