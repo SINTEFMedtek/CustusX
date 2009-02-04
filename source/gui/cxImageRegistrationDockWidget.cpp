@@ -32,8 +32,8 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mVerticalLayout(new QVBoxLayout(mGuiContainer)),
   mImagesComboBox(new QComboBox(mGuiContainer)),
   mLandmarkTableWidget(new QTableWidget(mGuiContainer)),
-  mAddPointButton(new QPushButton("Add point", mGuiContainer)),
-  mRemovePointButton(new QPushButton("Remove point", mGuiContainer)),
+  mAddLandmarkButton(new QPushButton("Add landmark", mGuiContainer)),
+  mRemoveLandmarkButton(new QPushButton("Remove landmark", mGuiContainer)),
   mRepManager(RepManager::getInstance()),
   mDataManager(DataManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
@@ -53,12 +53,12 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
           this, SLOT(imageSelectedSlot(const QString&)));
 
   //pushbuttons
-  mAddPointButton->setDisabled(true);
-  connect(mAddPointButton, SIGNAL(clicked()),
-          this, SLOT(addPointButtonClickedSlot()));
-  mRemovePointButton->setDisabled(true);
-  connect(mRemovePointButton, SIGNAL(clicked()),
-          this, SLOT(removePointButtonClickedSlot()));
+  mAddLandmarkButton->setDisabled(true);
+  connect(mAddLandmarkButton, SIGNAL(clicked()),
+          this, SLOT(addLandmarkButtonClickedSlot()));
+  mRemoveLandmarkButton->setDisabled(true);
+  connect(mRemoveLandmarkButton, SIGNAL(clicked()),
+          this, SLOT(removeLandmarkButtonClickedSlot()));
 
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
@@ -67,8 +67,8 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   //layout
   mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
-  mVerticalLayout->addWidget(mAddPointButton);
-  mVerticalLayout->addWidget(mRemovePointButton);
+  mVerticalLayout->addWidget(mAddLandmarkButton);
+  mVerticalLayout->addWidget(mRemoveLandmarkButton);
   mGuiContainer->setLayout(mVerticalLayout);
 }
 ImageRegistrationDockWidget::~ImageRegistrationDockWidget()
@@ -125,11 +125,7 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   this->populateTheLandmarkTableWidget(mCurrentImage);
 
   //TODO
-  //show volumetric rep in View3D and InriaRep in View2D (linked)
-    //view3D->getVolumetricRep->setImage()???
-    //view3D->getInria3DRep->setImage()???
-    //view2D->getInria2DRep->setImage()??? sync with the three others (2d, 2d and 3d)
-  //show landmark reps
+  //link volumetricRep and inriaRepss
 
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
@@ -160,7 +156,6 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
   inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mCurrentImage->getRefVtkImageData());
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-
 /*  connect(volumetricRep, SIGNAL(imageChanged()),
           this, SLOT(react()));
   connect(inriaRep2D, SIGNAL(imageChanged()),
@@ -203,7 +198,7 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
   std::map<std::string, ssc::ImagePtr> images = mDataManager->getImages();
   if(images.size() == 0)
   {
-    mAddPointButton->setDisabled(true);
+    mAddLandmarkButton->setDisabled(true);
     mImagesComboBox->insertItem(1, QString("Load an image to begin..."));
     mImagesComboBox->setEnabled(false);
     return;
@@ -222,7 +217,7 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
     listPosition++;
   }
   //enable the add point button if any images was found
-  mAddPointButton->setDisabled(false);
+  mAddLandmarkButton->setDisabled(false);
 }
 void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {
@@ -253,8 +248,8 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
   }
 
   if(numberOfLandmarks == 0)
-    mRemovePointButton->setDisabled(true);
+    mRemoveLandmarkButton->setDisabled(true);
   else
-    mRemovePointButton->setDisabled(false);
+    mRemoveLandmarkButton->setDisabled(false);
 }
 }//namespace cx

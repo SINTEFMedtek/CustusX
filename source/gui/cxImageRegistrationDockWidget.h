@@ -56,8 +56,8 @@ protected:
   QVBoxLayout* mVerticalLayout;
   QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;
-  QPushButton* mAddPointButton;
-  QPushButton* mRemovePointButton;
+  QPushButton* mAddLandmarkButton;
+  QPushButton* mRemoveLandmarkButton;
 
   RepManager* mRepManager;
   DataManager* mDataManager;
