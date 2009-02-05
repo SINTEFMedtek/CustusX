@@ -46,6 +46,7 @@ protected:
   vtkSmartPointer<vtkRenderer> getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+  bool doesLandmarkAlreadyExist(double x, double y, double z);
 
   MessageManager&     mMessageManager;  ///< device for sending messages to the statusbar
 

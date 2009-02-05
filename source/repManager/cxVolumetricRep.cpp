@@ -13,6 +13,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkSphereSource.h>
 #include <vtkProperty.h>
+#include <vtkDoubleArray.h>
 #include <vtkEventQtSlotConnect.h>
 #include "sscView.h"
 #include "cxView2D.h"
@@ -241,7 +242,12 @@ void VolumetricRep::makePointPermanent()
     mMessageManager.sendWarning("Could not make the point permanent, invalid values.");
     return;
   }
-  emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ);
+  if(!this->doesLandmarkAlreadyExist(mCurrentX, mCurrentY, mCurrentZ))
+    emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ);
+}
+void VolumetricRep::pickSurfacePointSlot(vtkObject* object)
+{
+  this->pickSurfacePoint(object, mCurrentX, mCurrentY, mCurrentY);
 }
 vtkSmartPointer<vtkRenderer> VolumetricRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
@@ -282,9 +288,25 @@ void VolumetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
                        this,
                        SLOT(pickSurfacePointSlot(vtkObject*)));
 }
-void VolumetricRep::pickSurfacePointSlot(vtkObject* object)
+bool VolumetricRep::doesLandmarkAlreadyExist(double x, double y, double z)
 {
-  this->pickSurfacePoint(object, mCurrentX, mCurrentY, mCurrentY);
+  if(mImage.get() == NULL)
+    return true; //because then it woun't be added...
 
+  vtkDoubleArrayPtr landmarks =  mImage->getLandmarks();
+  int numberOfLandmarks = landmarks->GetNumberOfTuples();
+
+  for(int row=1; row<=numberOfLandmarks; row++)
+  {
+    double* point = landmarks->GetTuple(row-1);
+    if((x == point[0]) &&
+       (y == point[1]) &&
+       (z == point[2]))
+    {
+      mMessageManager.sendWarning("Landmark already exists! Skipping this one.");
+      return true;
+    }
+  }
+  return false;
 }
 }//namespace cx
