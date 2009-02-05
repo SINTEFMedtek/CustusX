@@ -31,6 +31,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSlicerRepSW.h
     Rep/sscToolRep3D.h    
     Rep/sscVolumetricRep.h    
+    Rep/sscProgressiveLODVolumetricRep.h    
     )
 
 SET( SSC_HEADER_FILES
@@ -75,6 +76,7 @@ SET( SSC_SOURCE_FILES
     Rep/sscAxesRep.cpp
     Rep/sscSliceRep.cpp
     Rep/sscVolumetricRep.cpp
+    Rep/sscProgressiveLODVolumetricRep.cpp    
     Rep/sscGeometricRep.cpp
     Rep/sscToolRep3D.cpp
     Rep/sscSlicerRepSW.cpp

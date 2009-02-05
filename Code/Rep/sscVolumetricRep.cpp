@@ -8,8 +8,10 @@
 #include <vtkVolume.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
-
+#include <vtkImageResample.h>
 #include "sscView.h"
+
+typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 
 namespace ssc
 {
@@ -22,6 +24,7 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	mTextureMapper3D(vtkVolumeTextureMapper3DPtr::New()),
 	mVolume(vtkVolumePtr::New())
 {
+	mResampleFactor = 1.0;
 	//double maxVal = 255;//500.0;
 //	double maxVal = 500.0;
 	// should use GetScalarRange()[1], but we dont have an image yet,
@@ -78,6 +81,14 @@ void VolumetricRep::addRepActorsToViewRenderer(View* view)
 void VolumetricRep::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveVolume(mVolume);
+}
+
+/**set a resample factor 0...1. This gives a full-detail image for factor=1,
+ * and a more grained image otherwise.
+ */
+void VolumetricRep::setResampleFactor(double factor)
+{
+	mResampleFactor = factor;
 }
 
 ImagePtr VolumetricRep::getImage()
@@ -137,7 +148,23 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	// use the base instead of the ref image, because otherwise changes in the transform
 	// causes data to be sent anew to the graphics card (takes 4s).
 	// changing the mVolume transform instead is a fast operation.
-	mTextureMapper3D->SetInput( mImage->getBaseVtkImageData() );
+
+	if (fabs(1.0-mResampleFactor)>0.01)
+	{
+		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+		resampler->SetAxisMagnificationFactor(0, mResampleFactor);
+		resampler->SetAxisMagnificationFactor(1, mResampleFactor);
+		resampler->SetAxisMagnificationFactor(2, mResampleFactor);
+		resampler->SetInput(mImage->getBaseVtkImageData());
+		resampler->GetOutput()->Update();
+		resampler->GetOutput()->GetScalarRange();
+
+		mTextureMapper3D->SetInput( resampler->GetOutput() );
+	}
+	else
+	{
+		mTextureMapper3D->SetInput( mImage->getBaseVtkImageData() );
+	}
 	transformChangedSlot();
 }
 

@@ -31,6 +31,9 @@ public:
 	virtual void setImage(ImagePtr image);
 	virtual ImagePtr getImage();
 	virtual bool hasImage(ImagePtr image) const;
+	vtkVolumePtr getVtkVolume() { return mVolume; }
+	virtual void setResampleFactor(double factor);
+
 protected:
 	VolumetricRep(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
@@ -43,6 +46,7 @@ protected:
 	vtkVolumePtr mVolume;
 
 	ImagePtr mImage;
+	double mResampleFactor;
 
 private slots:
 	void transformChangedSlot();
