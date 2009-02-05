@@ -11,6 +11,7 @@
 #include "sscDataManager.h"
 #include "cxRepManager.h"
 #include "cxViewManager.h"
+#include "cxRegistrationManager.h"
 #include "cxMessageManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
@@ -37,6 +38,7 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mRepManager(RepManager::getInstance()),
   mDataManager(DataManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
+  mRegistrationManager(RegistrationManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),
   mCurrentRow(-1),
   mCurrentColumn(-1)
@@ -63,6 +65,10 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
           this, SLOT(landmarkSelectedSlot(int, int)));
+  //TODO:
+  //connect to cellChanged(row, column)
+  //slot should check that column == 2
+  //then send signal with new name to registrationManager
 
   //layout
   mVerticalLayout->addWidget(mImagesComboBox);
@@ -70,10 +76,18 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mVerticalLayout->addWidget(mAddLandmarkButton);
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
   mGuiContainer->setLayout(mVerticalLayout);
+
+  //TODO:REMOVE, testing
+  std::map<std::string, bool> nameList;
+  nameList["Test1"] = true;
+  nameList["Test2"] = true;
+  nameList["Test3"] = true;
+  mRegistrationManager->setGlobalPointSetNameList(nameList);
+
 }
 ImageRegistrationDockWidget::~ImageRegistrationDockWidget()
 {}
-void ImageRegistrationDockWidget::addPointButtonClickedSlot()
+void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
 {
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   if(volumetricRep.get() == NULL)
@@ -83,7 +97,7 @@ void ImageRegistrationDockWidget::addPointButtonClickedSlot()
   }
   volumetricRep->makePointPermanent();
 }
-void ImageRegistrationDockWidget::removePointButtonClickedSlot()
+void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
 {
   if(mCurrentRow < 0 || mCurrentColumn < 0)
     return;
@@ -125,7 +139,7 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   this->populateTheLandmarkTableWidget(mCurrentImage);
 
   //TODO
-  //link volumetricRep and inriaRepss
+  //link volumetricRep and inriaReps
 
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
@@ -146,7 +160,6 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   view2D_1->setRep(inriaRep2D_1);
   view2D_2->setRep(inriaRep2D_2);
   view2D_3->setRep(inriaRep2D_3);
-  //TODO: ...or getBaseVtkImageData()???
   inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
   inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
   inriaRep2D_3->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::SAGITTAL_ID);
@@ -154,9 +167,12 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   inriaRep2D_2->getVtkViewImage2D()->AddChild(inriaRep2D_3->getVtkViewImage2D());
   inriaRep2D_3->getVtkViewImage2D()->AddChild(inriaRep2D_1->getVtkViewImage2D());
   inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+  //TODO: ...or getBaseVtkImageData()???
   inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mCurrentImage->getRefVtkImageData());
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-/*  connect(volumetricRep, SIGNAL(imageChanged()),
+
+  //TODO:
+  /*  connect(volumetricRep, SIGNAL(imageChanged()),
           this, SLOT(react()));
   connect(inriaRep2D, SIGNAL(imageChanged()),
             this, SLOT(react()));*/
@@ -184,6 +200,10 @@ void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible
   {
     disconnect(mDataManager, SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBox()));
+    //TODO:
+    //bool allregistered = this->checkRegistrationStatus() -> send out warning if not all images are registrated?
+    //if !allregistered -> send out warning, not registrated images disables nav. and us. workflow?
+    // ...or don't send out warning/error until pat. nav. or us.???
   }
 }
 void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ)
@@ -226,27 +246,55 @@ void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 }
 void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
+  //get globalPointsNameList from the RegistrationManager
+  std::map<std::string, bool> nameList = mRegistrationManager->getGlobalPointSetNameList();
+  int numberOfNames = nameList.size();
+
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
 
   mLandmarkTableWidget->clear();
-  mLandmarkTableWidget->setRowCount(numberOfLandmarks);
-  mLandmarkTableWidget->setColumnCount(1);
-  QStringList headerItems(QStringList() << "Image space");
+  mLandmarkTableWidget->setRowCount((numberOfLandmarks > numberOfNames ? numberOfLandmarks : numberOfNames));
+  mLandmarkTableWidget->setColumnCount(2);
+  QStringList headerItems(QStringList() << "Name" << "Landmark");
   mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
   mLandmarkTableWidget->horizontalHeader()->
     setResizeMode(QHeaderView::ResizeToContents);
 
-  for(int row=1; row<=numberOfLandmarks; row++)
+  //fill the combobox with these names
+  typedef std::map<std::string, bool>::iterator Iterator;
+  int row = 1;
+  for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
+  {
+    std::string name = it->first;
+    QTableWidgetItem* columnOne = new QTableWidgetItem(tr(name.c_str()));
+    QTableWidgetItem* columnTwo;
+    if(row <= numberOfLandmarks)
+    {
+      double* point = landmarks->GetTuple(row-1);
+      columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
+    }
+    else
+    {
+      columnTwo = new QTableWidgetItem(tr(" "));
+    }
+    columnTwo->setFlags(Qt::ItemIsSelectable);
+
+    mLandmarkTableWidget->setItem(row-1, 0, columnOne);
+    mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
+    row++;
+  }
+  for(; row<=numberOfLandmarks; row++)
   {
     double* point = landmarks->GetTuple(row-1);
 
-    QTableWidgetItem* columnOne = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
-    columnOne->setFlags(Qt::ItemIsSelectable);
+    QTableWidgetItem* columnOne = new QTableWidgetItem(tr(" "));
+    QTableWidgetItem* columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
+    columnTwo->setFlags(Qt::ItemIsSelectable);
 
     mLandmarkTableWidget->setItem(row-1, 0, columnOne);
+    mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
   }
-
   if(numberOfLandmarks == 0)
     mRemoveLandmarkButton->setDisabled(true);
   else

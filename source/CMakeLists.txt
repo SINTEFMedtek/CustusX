@@ -61,6 +61,7 @@ INCLUDE_DIRECTORIES(
     gui
     viewManager
     repManager
+    registrationManager
     toolManager
     )
     
@@ -69,6 +70,7 @@ ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(viewManager)
 ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(toolManager)
+ADD_SUBDIRECTORY(registrationManager)
 
 ADD_EXECUTABLE(CustusX MACOSX_BUNDLE ${SOURCES} )
 
@@ -78,6 +80,7 @@ SET ( LINK_LIBRARIES
   gui
   viewManager
   repManager
+  registrationManager
   toolManager
   vtkRendering
   vtkWidgets

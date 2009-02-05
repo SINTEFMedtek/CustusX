@@ -5,6 +5,7 @@ SET(cxProject_MOC_HDRS
   cxMessageManager.h
   cxCustomStatusBar.h
   cxImageRegistrationDockWidget.h
+  cxPatientRegistrationDockWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -28,6 +29,8 @@ SET(${LIBNAME}_SRCS
     cxCustomStatusBar.cpp
     cxImageRegistrationDockWidget.h
     cxImageRegistrationDockWidget.cpp
+    cxPatientRegistrationDockWidget.h
+    cxPatientRegistrationDockWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

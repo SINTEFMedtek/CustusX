@@ -27,6 +27,7 @@ namespace cx
 {
 class RepManager;
 class ViewManager;
+class RegistrationManager;
 class MessageManager;
 
 class ImageRegistrationDockWidget : public QDockWidget
@@ -40,8 +41,8 @@ public:
   ~ImageRegistrationDockWidget();
 
 protected slots:
-  void addPointButtonClickedSlot();
-  void removePointButtonClickedSlot();
+  void addLandmarkButtonClickedSlot();
+  void removeLandmarkButtonClickedSlot();
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
   void imageLandmarksUpdateSlot(double, double, double);
@@ -62,6 +63,7 @@ protected:
   RepManager* mRepManager;
   DataManager* mDataManager;
   ViewManager* mViewManager;
+  RegistrationManager* mRegistrationManager;
   MessageManager& mMessageManager;
 
   ssc::ImagePtr mCurrentImage;
