@@ -67,10 +67,13 @@ void ToolRep3D::setTool(ToolPtr tool)
 		std::cout<<"filename empty, making a cone :" <<	std::endl;	
 	}
 	
-	
-	//std::cout<<"setMapper"<<std::endl;
-	mToolActor->SetMapper(mPolyDataMapper);
+	if (mPolyDataMapper->GetInput())
+	{
+		mToolActor->SetMapper(mPolyDataMapper);
+	}
+
 	mToolActor->SetVisibility(tool->getVisible());
+	//mToolActor->SetVisibility(true);
 	receiveTransforms(mTool->get_prMt(), 0);
 	
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
@@ -78,6 +81,8 @@ void ToolRep3D::setTool(ToolPtr tool)
 
 	connect(mTool.get(), SIGNAL(toolVisible(bool)),
 			this, SLOT(receiveVisible(bool)));
+
+	std::cout << "created toolrep3d " << std::endl;
 	
 }
 bool ToolRep3D::hasTool(ToolPtr tool) const
@@ -94,9 +99,10 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 }
 void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
+	//return;
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	
-//	std::cout << "----------" << std::endl;
+//	std::cout << "--ToolRep3D::receiveTransforms()---" << std::endl;
 //	std::cout << "prMt\n" << prMt << std::endl;
 //	std::cout << "rMpr\n" << rMpr << std::endl;
 //	std::cout << "----------" << std::endl;
@@ -106,6 +112,7 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 }
 void ToolRep3D::receiveVisible(bool visible)
 {
+//	std::cout << "ToolRep3D::receiveVisible " << visible << std::endl;
 	mToolActor->SetVisibility(visible);
 }
 
