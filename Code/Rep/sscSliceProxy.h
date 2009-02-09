@@ -37,6 +37,7 @@ private slots:
 	void toolVisibleSlot(bool visible); 
 	void centerChangedSlot();
 private:
+	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	void changed();
 	ToolPtr mTool;
 	SliceComputer mCutplane;

@@ -13,7 +13,7 @@ SliceProxy::SliceProxy()
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	//TODO connect to toolmanager rMpr changed
 	centerChangedSlot();
-	std::cout<<"Got center"<< ssc::DataManager::getInstance()->getCenter() <<std::endl;
+	//std::cout<<"Got center"<< ssc::DataManager::getInstance()->getCenter() <<std::endl;
 }
 
 SliceProxy::~SliceProxy()
@@ -40,9 +40,10 @@ void SliceProxy::setTool(ToolPtr tool)
 
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(toolTransformAndTimestamp(Transform3D,double)));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));		
+
+		toolTransformAndTimestampSlot(mTool->get_prMt(), 0); // initial values
 	}	
 	
-	// TODO fill data from tool
 	centerChangedSlot(); // force center update for tool==0
 	changed();	
 }
@@ -60,6 +61,15 @@ void SliceProxy::toolVisibleSlot(bool visible)
 	
 }
 
+/**Provide a nice default transform for displays without a tool.
+ */
+Transform3D SliceProxy::getSyntheticToolPos(const Vector3D& center) const
+{
+	Transform3D R_tq = createTransformRotateY(M_PI) * createTransformRotateZ(M_PI_2);
+	Transform3D T_c = createTransformTranslate(center);
+	return T_c * R_tq;
+}
+
 void SliceProxy::centerChangedSlot()
 {
 	Vector3D c = ssc::DataManager::getInstance()->getCenter();
@@ -67,7 +77,7 @@ void SliceProxy::centerChangedSlot()
 	
 	if (!mTool)
 	{
-		mCutplane.setToolPosition(createTransformTranslate(c));			
+		mCutplane.setToolPosition(getSyntheticToolPos(c));			
 	}	
 	
 	//std::cout << "center changed: " + boost::lexical_cast<std::string>(ssc::DataManager::instance()->getCenter());

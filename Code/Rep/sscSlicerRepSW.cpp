@@ -41,7 +41,7 @@ SliceRepSWPtr SliceRepSW::New(const std::string& uid)
 
 void SliceRepSW::setImage(ImagePtr image)
 {
-	std::cout<<"setImage"<<std::endl;
+	//std::cout<<"setImage"<<std::endl;
 	if (mImage)
 	{
 		mImage->disconnectRep(mSelf);
