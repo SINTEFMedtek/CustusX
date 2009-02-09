@@ -75,9 +75,9 @@ void InriaRep2D::setTool(Tool* tool)
   mTool = tool;
 
   connect(mTool, SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-          this, SLOT(receiveToolTransformAndTimeStamp(Transform3D, double)));
+          this, SLOT(toolTransformAndTimeStampSlot(Transform3D, double)));
   connect(mTool, SIGNAL(toolVisible(bool)),
-          this, SLOT(receiveToolVisible(bool)));
+          this, SLOT(toolVisibleSlot(bool)));
 }
 void InriaRep2D::removeTool(Tool* tool)
 {
@@ -136,13 +136,13 @@ void InriaRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
   mInria->SetRenderWindow(NULL);
   mInria->SetRenderer(NULL);
 }
-void InriaRep2D::receiveToolTransformAndTimeStamp(Transform3D matrix, double timestamp)
+void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp)
 {
   double position[3] = { matrix.matrix()->GetElement(0,3),
                          matrix.matrix()->GetElement(1,3),
                          matrix.matrix()->GetElement(2,3)};
   mInria->SyncSetPosition(position);
 }
-void InriaRep2D::receiveToolVisible(bool visible)
+void InriaRep2D::toolVisibleSlot(bool visible)
 {}
 }//namespace cx

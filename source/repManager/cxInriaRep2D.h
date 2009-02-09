@@ -55,8 +55,8 @@ protected:
   vtkViewImage2DPtr mInria;   ///< the inria object
 
 private slots:
-  void receiveToolTransformAndTimeStamp(Transform3D matrix, double timestamp);
-  void receiveToolVisible(bool visible);
+  void toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp);
+  void toolVisibleSlot(bool visible);
 
 private:
   InriaRep2D();
