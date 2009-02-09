@@ -32,6 +32,7 @@ class ToolManager;
 class MessageManager;
 class CustomStatusBar;
 class ImageRegistrationDockWidget;
+class PatientRegistrationDockWidget;
 
 class MainWindow : public QMainWindow
 {
@@ -129,7 +130,7 @@ protected:
   QToolBar* mToolToolBar; //start and stop
 
   ImageRegistrationDockWidget* mImageRegistrationDockWidget;
-  //cxPatientRegistrationDockWidget* mPatientRegistrationDockWidget; //TODO
+  PatientRegistrationDockWidget* mPatientRegistrationDockWidget; 
   //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
   CustomStatusBar* mCustomStatusBar;
 
