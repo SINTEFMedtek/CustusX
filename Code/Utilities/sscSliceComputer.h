@@ -69,6 +69,7 @@ public:
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolOffset(double val); 
 	void setToolViewOffset(bool use, double viewportHeight, double viewOffset);
+	void setToolViewportHeight(double viewportHeight);
 	SlicePlane getPlane() const;	
 	
 private:

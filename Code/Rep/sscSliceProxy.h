@@ -25,6 +25,10 @@ public:
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
 	
+	void setGravity(bool use, const Vector3D& dir);
+	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset); 
+	void setToolViewportHeight(double viewportHeight);
+	
 	ToolPtr getTool();
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	

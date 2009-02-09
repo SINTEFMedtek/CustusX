@@ -102,6 +102,20 @@ void SliceProxy::setFollowType(FOLLOW_TYPE followType)
 	changed();
 }
 
+void SliceProxy::setGravity(bool use, const Vector3D& dir)
+{
+	mCutplane.setGravity(use, dir);
+}
+void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset)
+{
+	mCutplane.setToolViewOffset(use, viewportHeight, toolViewOffset);
+}
+ 
+void SliceProxy::setToolViewportHeight(double viewportHeight)
+{
+	mCutplane.setToolViewportHeight(viewportHeight);
+}
+
 ToolPtr SliceProxy::getTool()
 {
 	return mTool;

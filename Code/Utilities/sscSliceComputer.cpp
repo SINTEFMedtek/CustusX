@@ -110,6 +110,13 @@ void SliceComputer::setToolViewOffset(bool use, double viewportHeight, double vi
 	mViewOffset = viewOffset; 
 }
 
+/**see setToolViewOffset()
+ */
+void SliceComputer::setToolViewportHeight(double viewportHeight)
+{
+	mViewportHeight = viewportHeight; 	
+}
+
 /**Calculate a slice plane given the defined parameters.
  */
 SlicePlane SliceComputer::getPlane()  const
