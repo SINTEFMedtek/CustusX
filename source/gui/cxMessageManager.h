@@ -24,7 +24,7 @@ public:
    * Returns a reference to the only MessageManager that exists.
    * \return The only MessageManager that exists.
    */
-  static MessageManager &getInstance();
+  static MessageManager* getInstance();
   /** Should be called by the object that made the MessageManager.*/
   static void destroyInstance();
 
@@ -49,7 +49,7 @@ private:
   /** Copycontructur.*/
   MessageManager(const MessageManager&){this->getInstance();};
   /** Assignment operator*/
-  MessageManager& operator=(const MessageManager&){ return this->getInstance();};
+  MessageManager& operator=(const MessageManager&){};
   /** Emits the signal that actually sends the message.*/
   void sendMessage(QString &message, int timeout);
 

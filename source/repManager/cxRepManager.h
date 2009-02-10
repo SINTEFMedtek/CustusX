@@ -56,7 +56,7 @@ public slots:
 
 protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
-  MessageManager&     mMessageManager;      ///< device for sending messages to the statusbar
+  MessageManager*     mMessageManager;      ///< device for sending messages to the statusbar
 
   const int           MAX_INRIAREP3DS;
   std::string         mInriaRep3DNames[2];

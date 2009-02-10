@@ -8,15 +8,15 @@
 
 namespace cx
 {
-MessageManager *MessageManager::mTheInstance = NULL;
+MessageManager* MessageManager::mTheInstance = NULL;
 
-MessageManager &MessageManager::getInstance()
+MessageManager* MessageManager::getInstance()
 {
   if(mTheInstance == NULL)
   {
     mTheInstance = new MessageManager();
   }
-  return *mTheInstance;
+  return mTheInstance;
 }
 
 void MessageManager::destroyInstance()

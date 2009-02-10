@@ -96,7 +96,7 @@ protected:
   DataManager* mDataManager;
   ToolManager* mToolManager;
   RepManager* mRepManager;
-  MessageManager& mMessageManager;
+  MessageManager* mMessageManager;
 
   QWidget* mCentralWidget;
 
@@ -130,7 +130,7 @@ protected:
   QToolBar* mToolToolBar; //start and stop
 
   ImageRegistrationDockWidget* mImageRegistrationDockWidget;
-  PatientRegistrationDockWidget* mPatientRegistrationDockWidget; 
+  PatientRegistrationDockWidget* mPatientRegistrationDockWidget;
   //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
   CustomStatusBar* mCustomStatusBar;
 

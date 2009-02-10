@@ -142,7 +142,7 @@ void ViewManager::setLayoutTo_3D_1X1()
     return;
     break;
   }
-  mMessageManager.sendInfo("Layout changed to 3D_1X1");
+  mMessageManager->sendInfo("Layout changed to 3D_1X1");
 }
 void ViewManager::setLayoutTo_3DACS_2X2()
 {
@@ -169,7 +169,7 @@ void ViewManager::setLayoutTo_3DACS_2X2()
     return;
     break;
   }
-  mMessageManager.sendInfo("Layout changed to 3DACS_2X2");
+  mMessageManager->sendInfo("Layout changed to 3DACS_2X2");
 }
 void ViewManager::setLayoutTo_3DACS_1X3()
 {
@@ -196,7 +196,7 @@ void ViewManager::setLayoutTo_3DACS_1X3()
     return;
     break;
   }
-  mMessageManager.sendInfo("Layout changed to 3DACS_1X3");
+  mMessageManager->sendInfo("Layout changed to 3DACS_1X3");
 }
 void ViewManager::setLayoutTo_ACSACS_2X3()
 {
@@ -223,7 +223,7 @@ void ViewManager::setLayoutTo_ACSACS_2X3()
     return;
     break;
   }
-  mMessageManager.sendInfo("Layout changed to ACSACS_2X3");
+  mMessageManager->sendInfo("Layout changed to ACSACS_2X3");
 }
 void ViewManager::activateLayout_3D_1X1()
 {

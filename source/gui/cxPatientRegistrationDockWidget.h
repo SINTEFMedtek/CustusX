@@ -22,13 +22,13 @@ class QString;
 class QLabel;
 
 namespace ssc {
-  class DataManager;	
+  class DataManager;
 }
 
 namespace cx
 {
-typedef ssc::DataManager DataManager; 
-typedef ssc::Transform3D Transform3D; 
+typedef ssc::DataManager DataManager;
+typedef ssc::Transform3D Transform3D;
 
 class RegistrationManager;
 class ToolManager;
@@ -47,7 +47,7 @@ protected slots:
   void visibilityOfDockWidgetChangedSlot(bool visible);
   void toolVisibleSlot(bool visible);
   void toolTransformAndTimestamp(Transform3D transform, double timestamp);
-  
+
   void landmarkSelectedSlot(int row, int column);
   void populateTheImageComboBox();
 
@@ -61,11 +61,11 @@ protected:
   QPushButton* mToolSampleButton;
   QPushButton* mDoRegistrationButton;
   QLabel* mAccuracyLabel;
-  
+
   DataManager* mDataManager;
   RegistrationManager* mRegistrationManager;
   ToolManager* mToolManager;
-  MessageManager& mMessageManager;
+  MessageManager* mMessageManager;
 
   int mCurrentRow, mCurrentColumn;
 };

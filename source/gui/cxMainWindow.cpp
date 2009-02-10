@@ -7,7 +7,10 @@
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QFileInfo>
+#include <vtkPiecewiseFunction.h> //TODO: REMOVE?
+#include <vtkColorTransferFunction.h> //TODO: REMOVE?
 #include "sscDataManager.h"
+#include "sscImageTF3D.h" //TODO: REMOVE?
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
@@ -187,7 +190,7 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
     this->deactivateUSAcquisitionState();
     break;
   default:
-    mMessageManager.sendWarning("Could not determine what workflow state to deactivate.");
+    mMessageManager->sendWarning("Could not determine what workflow state to deactivate.");
     return;
     break;
   };
@@ -210,7 +213,7 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
     this->activateUSAcquisitionState();
     break;
   default:
-    mMessageManager.sendWarning("Could not determine what workflow state to activate.");
+    mMessageManager->sendWarning("Could not determine what workflow state to activate.");
     this->activatePatientDataState();
     return;
     break;
@@ -296,16 +299,19 @@ void MainWindow::loadDataSlot()
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
-    mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    mMessageManager.sendInfo("Meta data loaded.");
+    ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
+/*    vtkPiecewiseFunctionPtr opacityFunc = image->transferFunctions3D().getOpacityTF();
+    vtkColorTransferFunctionPtr colorFunc = image->transferFunctions3D().getColorTF();
+    opacityFunc->*/
+    mMessageManager->sendInfo("Meta data loaded.");
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
-    mMessageManager.sendInfo("STL data loaded.");
+    mMessageManager->sendInfo("STL data loaded.");
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
-    mMessageManager.sendInfo("Vtk data loaded.");
+    mMessageManager->sendInfo("Vtk data loaded.");
   }
 
 }

@@ -125,7 +125,7 @@ void ToolManager::initialize()
 {
   if(!mConfigured)
   {
-    mMessageManager.sendWarning("Please configure before trying to initialize.");
+    mMessageManager->sendWarning("Please configure before trying to initialize.");
     return;
   }
   mTracker->open();
@@ -135,7 +135,7 @@ void ToolManager::startTracking()
 {
   if(!mInitialized)
   {
-    mMessageManager.sendWarning("Please initialize before trying to start tracking.");
+    mMessageManager->sendWarning("Please initialize before trying to start tracking.");
     return;
   }
   mTracker->startTracking();
@@ -144,7 +144,7 @@ void ToolManager::stopTracking()
 {
   if(!mTracking)
   {
-    mMessageManager.sendWarning("Please start tracking before trying to stop tracking.");
+    mMessageManager->sendWarning("Please start tracking before trying to stop tracking.");
     return;
   }
   mTracker->stopTracking();

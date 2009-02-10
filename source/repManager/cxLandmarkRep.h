@@ -69,7 +69,7 @@ protected:
   void addPoint(double& x, double& y, double& z, int numberInLine=0); ///< add a set of actors for the new point
   void internalUpdate(); ///< run after a point is removed to update the numbers of the textactors
 
-  MessageManager&     mMessageManager;  ///< device for sending messages to the statusbar
+  MessageManager*     mMessageManager;  ///< device for sending messages to the statusbar
 
   std::string     mType;          ///< description of this reps type
   RGB             mColor;         ///< the color of the landmark actors

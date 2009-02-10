@@ -92,10 +92,12 @@ void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   if(volumetricRep.get() == NULL)
   {
-    mMessageManager.sendError("Could not find a rep to add the landmark to.");
+    mMessageManager->sendError("Could not find a rep to add the landmark to.");
     return;
   }
   volumetricRep->makePointPermanent();
+
+  //TODO: Move mCurrentRow to next line...
 }
 void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
 {
@@ -116,7 +118,7 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   ssc::ImagePtr image = mDataManager->getImage(imageId);
   if(image.get() == NULL)
   {
-    mMessageManager.sendError("Could not find the selected image in the DataManager: "+imageId);
+    mMessageManager->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
   if(mCurrentImage)

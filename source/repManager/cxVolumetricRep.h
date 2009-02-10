@@ -48,7 +48,7 @@ protected:
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
   bool doesLandmarkAlreadyExist(double x, double y, double z);
 
-  MessageManager&     mMessageManager;  ///< device for sending messages to the statusbar
+  MessageManager*     mMessageManager;  ///< device for sending messages to the statusbar
 
   int                 mThreshold;                       ///< used to picked the point together with the probefilter
   double              mCurrentX, mCurrentY, mCurrentZ;  ///< the last point that was successfully sampled

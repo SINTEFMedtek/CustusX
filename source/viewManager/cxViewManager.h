@@ -73,7 +73,7 @@ protected:
   void deactivateLayout_ACSACS_2X3();
 
   static ViewManager* mTheInstance; ///< the only instance of this class
-  MessageManager&     mMessageManager; ///< device for sending messages to the statusbar
+  MessageManager*     mMessageManager; ///< device for sending messages to the statusbar
 
   LayoutType      mCurrentLayoutType; ///< what LayoutType is currently active
   QGridLayout*    mLayout;            ///< the layout

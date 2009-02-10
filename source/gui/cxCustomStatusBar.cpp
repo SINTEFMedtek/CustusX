@@ -20,7 +20,7 @@ CustomStatusBar::CustomStatusBar() :
   mMessageManager(MessageManager::getInstance()),
   mToolManager(ToolManager::getInstance())
 {
-  connect(&mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
+  connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(showMessage(const QString&, int)));
 
   connect(mToolManager, SIGNAL(trackingStarted()),
@@ -87,7 +87,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
   QObject* sender = this->sender();
   if(sender == 0)
   {
-    mMessageManager.sendWarning("Could not determine which tool changed visibility.");
+    mMessageManager->sendWarning("Could not determine which tool changed visibility.");
     return;
   }
   const QMetaObject* metaObject = sender->metaObject();
@@ -98,7 +98,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
     Tool* tool = dynamic_cast<Tool*>(sender);
     if(tool == NULL)
     {
-      mMessageManager.sendWarning("The sender does not appear to be a tool.");
+      mMessageManager->sendWarning("The sender does not appear to be a tool.");
       return;
     }
     std::string name = tool->getName();

@@ -127,7 +127,6 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
   unsigned int numberOfSkinpointActors = mSkinPointActors.size();
   unsigned int numberOfTextFollowerActors = mTextFollowerActors.size();
 
-  //mImage->printLandmarks();
   if(idNumber == 0 ||
      numberOfLandmarksInImage < idNumber ||
      numberOfSkinpointActors < idNumber ||
@@ -137,7 +136,7 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
     warning << "Cannot remove point ";
     warning << idNumber;
     warning << " because it dosn't exist in either the image or in the actor lists.";
-    mMessageManager.sendWarning(warning.str());
+    mMessageManager->sendWarning(warning.str());
     return;
   }
 
@@ -152,7 +151,7 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
   debug << ",";
   debug << point[2];
   debug << "), requesting to remove...";
-  mMessageManager.sendInfo(debug.str());
+  mMessageManager->sendInfo(debug.str());
   emit removePermanentPoint(point[0], point[1], point[2]);
 
   vtkActorPtr skinPointActorToRemove = mSkinPointActors.at(idNumber-1);
@@ -206,13 +205,13 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    mMessageManager.sendWarning("Trying to add rep actors to view renderer, but view is null.");
+    mMessageManager->sendWarning("Trying to add rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    mMessageManager.sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
+    mMessageManager->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -242,13 +241,13 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    mMessageManager.sendWarning("Trying to remove rep actors to view renderer, but view is null.");
+    mMessageManager->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    mMessageManager.sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
+    mMessageManager->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -321,7 +320,7 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
   info << ",";
   info << z;
   info << ") to the landmark.";
-  mMessageManager.sendInfo(info.str());
+  mMessageManager->sendInfo(info.str());
 
   for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
   {
@@ -340,7 +339,7 @@ void LandmarkRep::internalUpdate()
     errormessage << ") != (mSkinPointActors ==";
     errormessage << mSkinPointActors.size();
     errormessage << "), trying to fix the error...";
-    mMessageManager.sendError(errormessage.str());
+    mMessageManager->sendError(errormessage.str());
 
     //trying to set repopulate the vectors
     this->setImage(mImage);

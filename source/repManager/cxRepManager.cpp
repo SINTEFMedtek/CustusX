@@ -87,7 +87,7 @@ RepManager::RepManager() :
         mToolRep3DNames[i]));
     mToolRep3DMap[toolRep->getUid()] = toolRep;
   }
-  mMessageManager.sendInfo("All necessary representations have been created.");
+  mMessageManager->sendInfo("All necessary representations have been created.");
 }
 RepManager::~RepManager()
 {}

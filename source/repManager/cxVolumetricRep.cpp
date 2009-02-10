@@ -67,7 +67,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
 
   if(iren == NULL)
   {
-    mMessageManager.sendError("Could not pick the point because the renderwindowinteractor is NULL.");
+    mMessageManager->sendError("Could not pick the point because the renderwindowinteractor is NULL.");
     return;
   }
 
@@ -81,7 +81,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   vtkRenderer* renderer = this->getRendererFromRenderWindow(*iren);
   if(renderer == NULL)
   {
-    mMessageManager.sendError("Could not pick the point because the renderer is NULL.");
+    mMessageManager->sendError("Could not pick the point because the renderer is NULL.");
     return;
   }
 
@@ -128,7 +128,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   vtkMath::Normalize(cameraDOP);
   if((rayLength = vtkMath::Dot(cameraDOP, ray)) == 0.0)
   {
-    mMessageManager.sendError("Cannot process the picked point.");
+    mMessageManager->sendError("Cannot process the picked point.");
   }
   double* clipRange = camera->GetClippingRange();
   double tFront, tBack;
@@ -216,7 +216,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   stream << ",";
   stream << mCurrentZ;
   stream << ")";
-  mMessageManager.sendInfo(stream.str());
+  mMessageManager->sendInfo(stream.str());
 
   iren->GetRenderWindow()->Render();
 
@@ -230,7 +230,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   if(itInriaRep3D != inriaRep3DMapPtr->end())
     itInriaRep3D->second->getVtkViewImage3D()->SyncSetPosition(skinPoint);
   else
-    mMessageManager.sendWarning("The volumetric representation: "+mUid+", could not sync the views.");
+    mMessageManager->sendWarning("The volumetric representation: "+mUid+", could not sync the views.");
 }
 void VolumetricRep::makePointPermanent()
 {
@@ -239,7 +239,7 @@ void VolumetricRep::makePointPermanent()
       mCurrentY == std::numeric_limits<double>::max() &&
       mCurrentY == std::numeric_limits<double>::max())
   {
-    mMessageManager.sendWarning("Could not make the point permanent, invalid values.");
+    mMessageManager->sendWarning("Could not make the point permanent, invalid values.");
     return;
   }
   if(!this->doesLandmarkAlreadyExist(mCurrentX, mCurrentY, mCurrentZ))
@@ -264,7 +264,7 @@ void VolumetricRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    mMessageManager.sendError("Trying to add rep actors to view renderer, but view is NULL in volumetric rep.");
+    mMessageManager->sendError("Trying to add rep actors to view renderer, but view is NULL in volumetric rep.");
     return;
   }
   ssc::VolumetricRep::addRepActorsToViewRenderer(view);
@@ -278,7 +278,7 @@ void VolumetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    mMessageManager.sendError("Trying to remove rep actors to view renderer, but view is NULL in volumetric rep.");
+    mMessageManager->sendError("Trying to remove rep actors to view renderer, but view is NULL in volumetric rep.");
     return;
   }
   ssc::VolumetricRep::removeRepActorsFromViewRenderer(view);
@@ -303,7 +303,7 @@ bool VolumetricRep::doesLandmarkAlreadyExist(double x, double y, double z)
        (y == point[1]) &&
        (z == point[2]))
     {
-      mMessageManager.sendWarning("Landmark already exists! Skipping this one.");
+      mMessageManager->sendWarning("Landmark already exists! Skipping this one.");
       return true;
     }
   }

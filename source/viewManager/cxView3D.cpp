@@ -76,7 +76,7 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
 
     std::string actionId = theAction->text().toStdString();
     std::string info = "Making a volumetricrep of data with name: "+actionId;
-    mMessageManager.sendInfo(info);
+    mMessageManager->sendInfo(info);
 
     //Make a volumetric rep out of the image
     VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");//TODO: REMOVE HACK???

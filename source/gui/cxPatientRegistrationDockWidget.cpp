@@ -42,7 +42,7 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
 {
   this->setWindowTitle("Patient Registration");
   this->setWidget(mGuiContainer);
-  
+
   mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
@@ -56,7 +56,7 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
 
   connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString& )),
           this, SLOT(imageSelectedSlot(const QString& )));
-  
+
 
 }
 
@@ -74,7 +74,7 @@ void PatientRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxTex
   ssc::ImagePtr image = mDataManager->getImage(imageId);
   if(image.get() == NULL)
   {
-    mMessageManager.sendError("Could not find the selected image in the DataManager: "+imageId);
+    mMessageManager->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
 
@@ -143,7 +143,7 @@ void PatientRegistrationDockWidget::toolVisibleSlot(bool visible)
 }
 
 void PatientRegistrationDockWidget::toolTransformAndTimestamp(Transform3D transform, double timestamp)
-{}  
+{}
 void PatientRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {}
 void PatientRegistrationDockWidget::populateTheImageComboBox()
@@ -169,17 +169,17 @@ void PatientRegistrationDockWidget::populateTheImageComboBox()
   }
   //enable the add point button if any images was found
   ssc::ImagePtr masterImage = mRegistrationManager->getMasterImage();
-  
+
   if(masterImage.get() == NULL)
     return;
-    
+
   std::string uid = masterImage->getUid();
   int comboboxIndex = mImagesComboBox->findText(QString(uid.c_str()));
   if (comboboxIndex < 0)
     return;
-    
+
   mImagesComboBox->setCurrentIndex(comboboxIndex);
-  
+
 }
 
 void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)

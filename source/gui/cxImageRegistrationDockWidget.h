@@ -64,7 +64,7 @@ protected:
   DataManager* mDataManager;
   ViewManager* mViewManager;
   RegistrationManager* mRegistrationManager;
-  MessageManager& mMessageManager;
+  MessageManager* mMessageManager;
 
   ssc::ImagePtr mCurrentImage;
 

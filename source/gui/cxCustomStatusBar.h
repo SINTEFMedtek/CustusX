@@ -33,7 +33,7 @@ protected slots:
   void receiveToolVisible(bool visible);
 
 protected:
-  MessageManager& mMessageManager;
+  MessageManager* mMessageManager;
   ToolManager* mToolManager;
 
   std::map<QLabel*, QLabel*> mToolColorMap;

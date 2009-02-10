@@ -41,7 +41,7 @@ protected:
 
   DataManager* mDataManager;
   RepManager* mRepManager;
-  MessageManager& mMessageManager;
+  MessageManager* mMessageManager;
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */

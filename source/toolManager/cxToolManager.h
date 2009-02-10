@@ -117,7 +117,7 @@ protected:
 
   static ToolManager* mCxInstance;
 
-  MessageManager& mMessageManager;
+  MessageManager* mMessageManager;
 
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder;         ///< path to where logging should be saved
