@@ -3,7 +3,7 @@
 
 #include "sscRepImpl.h"
 
-#include <vector>
+#include <map>
 #include "sscImage.h"
 
 /**
@@ -54,19 +54,19 @@ public:
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
   ssc::ImagePtr getImage() const; ///< returns a pointer to the image being used
-  void removePermanentPoint(unsigned int idNumber); ///< sends out a signal requesting a point to be removed from the images internal landmarklist
+  void removePermanentPoint(unsigned int index); ///< sends out a signal requesting a point to be removed from the images internal landmarklist
 
 signals:
-  void removePermanentPoint(double x, double y, double z); ///< the landmarkrep can signal that a point should be removed the (images) landmarklist
+  void removePermanentPoint(double x, double y, double z, unsigned int index); ///< the landmarkrep can signal that a point should be removed the (images) landmarklist
 
 public slots:
-  void addPermanentPointSlot(double x, double y, double z); ///< used tell the landmarkrep that a new point is added
+  void addPermanentPointSlot(double x, double y, double z, unsigned int index); ///< used tell the landmarkrep that a new point is added
 
 protected:
   LandmarkRep(const std::string& uid, const std::string& name="");
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-  void addPoint(double& x, double& y, double& z, int numberInLine=0); ///< add a set of actors for the new point
+  void addPoint(double& x, double& y, double& z, int index); ///< add a set of actors for the new point
   void internalUpdate(); ///< run after a point is removed to update the numbers of the textactors
 
   MessageManager*     mMessageManager;  ///< device for sending messages to the statusbar
@@ -77,8 +77,8 @@ protected:
   bool            mShowLandmarks; ///< whether or not the actors should be showed in (all) views
   int             mTextScale[3];  ///< the textscale
 
-  std::vector<vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
-  std::vector<vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
+  std::map<int, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
+  std::map<int, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
 
 private:
   LandmarkRep(); ///< not implemented

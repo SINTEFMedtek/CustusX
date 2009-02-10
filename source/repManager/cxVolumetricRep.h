@@ -33,10 +33,10 @@ public:
   virtual void setImage(ssc::ImagePtr image);
   void setThreshold(const int threshold); ///< sets the threshold for picking the point on the volumes surface
   void pickSurfacePoint(vtkObject* object, double &x, double &y, double &z); ///< picks a point on the volumes surface
-  void makePointPermanent(); ///< calling this will emit a signal with the current point
+  void makePointPermanent(unsigned int index); ///< calling this will emit a signal with the current point
 
 signals:
-  void addPermanentPoint(double x, double y, double z); ///< signal requesting this point be made permanent
+  void addPermanentPoint(double x, double y, double z, unsigned int); ///< signal requesting this point be made permanent
 
 public slots:
   void pickSurfacePointSlot(vtkObject* object); ///< picks a point on the volumes surface

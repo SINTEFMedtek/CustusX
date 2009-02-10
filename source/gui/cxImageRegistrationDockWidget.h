@@ -45,7 +45,7 @@ protected slots:
   void removeLandmarkButtonClickedSlot();
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
-  void imageLandmarksUpdateSlot(double, double, double);
+  void imageLandmarksUpdateSlot(double, double, double,unsigned int);
   void landmarkSelectedSlot(int row, int column);
   void populateTheImageComboBox();
 

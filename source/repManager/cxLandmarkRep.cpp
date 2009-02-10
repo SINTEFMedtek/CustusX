@@ -25,7 +25,6 @@ namespace cx
 {
 LandmarkRepPtr LandmarkRep::New(const std::string& uid, const std::string& name)
 {
-  //std::cout << "LandmarkRep::New" << std::endl;
   LandmarkRepPtr retval(new LandmarkRep(uid, name));
   retval->mSelf = retval;
   return retval;
@@ -65,16 +64,16 @@ void LandmarkRep::showLandmarks(bool on)
   if(on == mShowLandmarks)
     return;
 
-  std::vector<vtkVectorTextFollowerPair>::iterator it1 = mTextFollowerActors.begin();
+  std::map<int, vtkVectorTextFollowerPair>::iterator it1 = mTextFollowerActors.begin();
   while(it1 != mTextFollowerActors.end())
   {
-    it1->second->SetVisibility(on);
+    (it1->second).second->SetVisibility(on);
     it1++;
   }
-  std::vector<vtkActorPtr>::iterator it2 = mSkinPointActors.begin();
+  std::map<int, vtkActorPtr>::iterator it2 = mSkinPointActors.begin();
   while(it2 != mSkinPointActors.end())
   {
-    (*it2)->SetVisibility(on);
+    it2->second->SetVisibility(on);
     it2++;
   }
     mShowLandmarks = on;
@@ -87,10 +86,10 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
   if(mImage)
   {
     mImage->disconnectRep(mSelf);
-    disconnect(mImage.get(), SIGNAL(landmarkAdded(double, double, double)),
-            this, SLOT(addPermanentPointSlot(double, double, double)));
-    disconnect(this, SIGNAL(removePermanentPoint(double, double, double)),
-            mImage.get(), SLOT(removeLandmarkSlot(double, double, double)));
+    disconnect(mImage.get(), SIGNAL(landmarkAdded(double, double, double,unsigned int)),
+            this, SLOT(addPermanentPointSlot(double, double, double,unsigned int)));
+    disconnect(this, SIGNAL(removePermanentPoint(double, double, double,unsigned int)),
+            mImage.get(), SLOT(removeLandmarkSlot(double, double, double,unsigned int)));
     for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
     {
       ssc::View* view = *it;
@@ -104,58 +103,42 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
   mTextFollowerActors.clear();
 
   mImage->connectRep(mSelf);
-  connect(mImage.get(), SIGNAL(landmarkAdded(double, double, double)),
-          this, SLOT(addPermanentPointSlot(double, double, double)));
-  connect(this, SIGNAL(removePermanentPoint(double, double, double)),
-          mImage.get(), SLOT(removeLandmarkSlot(double, double, double)));
+  connect(mImage.get(), SIGNAL(landmarkAdded(double, double, double,unsigned int)),
+          this, SLOT(addPermanentPointSlot(double, double, double,unsigned int)));
+  connect(this, SIGNAL(removePermanentPoint(double, double, double,unsigned int)),
+          mImage.get(), SLOT(removeLandmarkSlot(double, double, double,unsigned   int)));
   vtkDoubleArrayPtr landmarks = mImage->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
   for(int i=0; i<numberOfLandmarks; i++)
   {
-    double* point;
-    point = landmarks->GetTuple(i);
-    this->addPoint(point[0], point[1], point[2], i);
+    double* landmark;
+    landmark = landmarks->GetTuple(i);
+    this->addPoint(landmark[0], landmark[1], landmark[2], landmark[3]);
   }
 }
 ssc::ImagePtr LandmarkRep::getImage() const
 {
   return mImage;
 }
-void LandmarkRep::removePermanentPoint(unsigned int idNumber)
+void LandmarkRep::removePermanentPoint(unsigned int index)
 {
   unsigned int numberOfLandmarksInImage = this->getNumberOfLandmarks();
   unsigned int numberOfSkinpointActors = mSkinPointActors.size();
   unsigned int numberOfTextFollowerActors = mTextFollowerActors.size();
 
-  if(idNumber == 0 ||
-     numberOfLandmarksInImage < idNumber ||
-     numberOfSkinpointActors < idNumber ||
-     numberOfTextFollowerActors < idNumber)
+  vtkDoubleArrayPtr landmarks = mImage->getLandmarks();
+  for(int i=0; i<=numberOfLandmarksInImage; i++)
   {
-    std::stringstream warning;
-    warning << "Cannot remove point ";
-    warning << idNumber;
-    warning << " because it dosn't exist in either the image or in the actor lists.";
-    mMessageManager->sendWarning(warning.str());
-    return;
+    //Do NOT use landmarks->GetTupleValue(idNumber-1, point);
+    double* landmark = landmarks->GetTuple(i+1);
+    if(landmark[3] == index)
+    {
+      emit removePermanentPoint(landmark[0], landmark[1], landmark[2], landmark[3]);
+    }
   }
 
-  vtkDoubleArrayPtr landmarks = mImage->getLandmarks();
-  //Do NOT use landmarks->GetTupleValue(idNumber-1, point);
-  double* point = landmarks->GetTuple(idNumber-1);
-  std::stringstream debug;
-  debug << "Found point: (";
-  debug << point[0];
-  debug << ",";
-  debug << point[1];
-  debug << ",";
-  debug << point[2];
-  debug << "), requesting to remove...";
-  mMessageManager->sendInfo(debug.str());
-  emit removePermanentPoint(point[0], point[1], point[2]);
-
-  vtkActorPtr skinPointActorToRemove = mSkinPointActors.at(idNumber-1);
-  vtkVectorTextFollowerPair textFollowerActorToRemove = mTextFollowerActors.at(idNumber-1);
+  std::map<int, vtkActorPtr>::iterator skinPointActorToRemove = mSkinPointActors.find(index);
+  std::map<int, vtkVectorTextFollowerPair>::iterator textFollowerActorToRemove = mTextFollowerActors.find(index);
 
   std::set<ssc::View *>::iterator it = mViews.begin();
   while(it != mViews.end())
@@ -168,38 +151,31 @@ void LandmarkRep::removePermanentPoint(unsigned int idNumber)
     vtkRendererPtr renderer = view->getRenderer();
     if(renderer != NULL)
     {
-      if(renderer->HasViewProp(skinPointActorToRemove.GetPointer()))
+      if(skinPointActorToRemove != mSkinPointActors.end() &&
+         renderer->HasViewProp(skinPointActorToRemove->second.GetPointer()))
       {
-        renderer->RemoveActor(skinPointActorToRemove.GetPointer());
+        renderer->RemoveActor(skinPointActorToRemove->second.GetPointer());
       }
-      if(renderer->HasViewProp(textFollowerActorToRemove.second.GetPointer()))
+      if(textFollowerActorToRemove != mTextFollowerActors.end() &&
+         renderer->HasViewProp(textFollowerActorToRemove->second.second.GetPointer()))
       {
-        renderer->RemoveActor(textFollowerActorToRemove.second.GetPointer());
+        renderer->RemoveActor(textFollowerActorToRemove->second.second.GetPointer());
       }
 
-      std::vector<vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
-      std::vector<vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
-      for(unsigned int i=1; i<=mSkinPointActors.size();i++)
-      {
-        if(i == idNumber)
-        {
-          mSkinPointActors.erase(it1);
-          mTextFollowerActors.erase(it2);
-        }
-        if(it1 != mSkinPointActors.end())
-          it1++;
-        if(it2 != mTextFollowerActors.end())
-          it2++;
-      }
+      if(skinPointActorToRemove != mSkinPointActors.end())
+        mSkinPointActors.erase(skinPointActorToRemove);
+
+      if(textFollowerActorToRemove != mTextFollowerActors.end())
+        mTextFollowerActors.erase(textFollowerActorToRemove);
     }
     this->internalUpdate();
     view->GetInteractor()->Render();
     it++;
   }
 }
-void LandmarkRep::addPermanentPointSlot(double x, double y, double z)
+void LandmarkRep::addPermanentPointSlot(double x, double y, double z, unsigned int index)
 {
-  this->addPoint(x, y, z);
+  this->addPoint(x, y, z, index);
 }
 void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 {
@@ -215,24 +191,24 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     return;
   }
 
-  std::vector<vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
+  std::map<int, vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
   while(it1 != mSkinPointActors.end())
   {
-    if(!renderer->HasViewProp(*it1))
+    if(!renderer->HasViewProp(it1->second))
     {
-      (*it1)->SetVisibility(mShowLandmarks);
-      renderer->AddActor(*it1);
+      it1->second->SetVisibility(mShowLandmarks);
+      renderer->AddActor(it1->second);
     }
     it1++;
   }
-  std::vector<vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
+  std::map<int, vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
   while(it2 != mTextFollowerActors.end())
   {
-    if(!renderer->HasViewProp(it2->second))
+    if(!renderer->HasViewProp(it2->second.second))
     {
-      it2->second->SetCamera(renderer->GetActiveCamera());
-      it2->second->SetVisibility(mShowLandmarks);
-      renderer->AddActor(it2->second);
+      it2->second.second->SetCamera(renderer->GetActiveCamera());
+      it2->second.second->SetVisibility(mShowLandmarks);
+      renderer->AddActor(it2->second.second);
     }
     it2++;
   }
@@ -251,24 +227,24 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
     return;
   }
 
-  std::vector<vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
+  std::map<int, vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
   while(it1 != mSkinPointActors.end())
   {
-    if(renderer->HasViewProp(*it1))
-      renderer->RemoveActor(*it1);
+    if(renderer->HasViewProp(it1->second))
+      renderer->RemoveActor(it1->second);
     it1++;
   }
-  std::vector<vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
+  std::map<int, vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
   while(it2 != mTextFollowerActors.end())
   {
-    if(renderer->HasViewProp(it2->second))
-      renderer->RemoveActor(it2->second);
+    if(renderer->HasViewProp(it2->second.second))
+      renderer->RemoveActor(it2->second.second);
     it2++;
   }
 }
-void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
+void LandmarkRep::addPoint(double& x, double& y, double& z, int index)
 {
-  vtkImageDataPtr imageData = mImage->getBaseVtkImageData();
+  vtkImageDataPtr imageData = mImage->getRefVtkImageData();
   double imageCenter[3];
   imageData->GetCenter(imageCenter);
 
@@ -286,8 +262,7 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
 
   vtkVectorTextPtr text = vtkVectorTextPtr::New();
   std::stringstream numberstream;
-  numberInLine = mTextFollowerActors.size()+1;
-  numberstream << numberInLine;
+  numberstream << index;
   text->SetText(numberstream.str().c_str());
 
   vtkPolyDataMapperPtr textMapper = vtkPolyDataMapperPtr::New();
@@ -299,7 +274,8 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
   followerActor->SetScale(mTextScale[0], mTextScale[1], mTextScale[2]);
   followerActor->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
 
-  mTextFollowerActors.push_back(vtkVectorTextFollowerPair(text, followerActor));
+  mTextFollowerActors.insert(std::pair<int, vtkVectorTextFollowerPair>
+                            (index, vtkVectorTextFollowerPair(text, followerActor)));
 
   vtkSphereSourcePtr sphere = vtkSphereSourcePtr::New();
   sphere->SetRadius(2);
@@ -310,7 +286,7 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int numberInLine)
   skinPointActor->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
   skinPointActor->SetPosition(x, y, z);
 
-  mSkinPointActors.push_back(skinPointActor);
+  mSkinPointActors.insert(std::pair<int, vtkActorPtr>(index, skinPointActor));
 
   std::stringstream info;
   info << "Added the permanent point, (";
@@ -341,23 +317,22 @@ void LandmarkRep::internalUpdate()
     errormessage << "), trying to fix the error...";
     mMessageManager->sendError(errormessage.str());
 
-    //trying to set repopulate the vectors
+    //trying to set repopulate the map
     this->setImage(mImage);
   }
 
-  std::vector<vtkVectorTextFollowerPair>::iterator it = mTextFollowerActors.begin();
-  int i=1;
+  std::map<int, vtkVectorTextFollowerPair>::iterator it = mTextFollowerActors.begin();
   while(it != mTextFollowerActors.end())
   {
+    int index = it->first;
     std::stringstream numberstream;
-    numberstream << i;
-    it->first->SetText(numberstream.str().c_str());
-    it->first->Modified();
-    it->second->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
-    it->second->SetScale(mTextScale[0], mTextScale[1], mTextScale[2]);
-    it->second->Modified();
+    numberstream << index;
+    it->second.first->SetText(numberstream.str().c_str());
+    it->second.first->Modified();
+    it->second.second->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
+    it->second.second->SetScale(mTextScale[0], mTextScale[1], mTextScale[2]);
+    it->second.second->Modified();
     it++;
-    i++;
   }
 }
 }//namespace cx

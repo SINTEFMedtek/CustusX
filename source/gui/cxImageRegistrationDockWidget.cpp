@@ -77,13 +77,6 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
   mGuiContainer->setLayout(mVerticalLayout);
 
-  //TODO:REMOVE, testing
-  std::map<std::string, bool> nameList;
-  nameList["Test1"] = true;
-  nameList["Test2"] = true;
-  nameList["Test3"] = true;
-  mRegistrationManager->setGlobalPointSetNameList(nameList);
-
 }
 ImageRegistrationDockWidget::~ImageRegistrationDockWidget()
 {}
@@ -95,7 +88,9 @@ void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
     mMessageManager->sendError("Could not find a rep to add the landmark to.");
     return;
   }
-  volumetricRep->makePointPermanent();
+  if(mCurrentRow == -1)
+    mCurrentRow = 0;
+  volumetricRep->makePointPermanent(mCurrentRow+1);
 
   //TODO: Move mCurrentRow to next line...
 }
@@ -124,18 +119,18 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   if(mCurrentImage)
   {
     //disconnect from the old image
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double)),
-              this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double)),
-              this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+              this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+              this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
   }
 
   //Set new current image
   mCurrentImage = image;
-  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
-  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double)));
+  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
 
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
@@ -208,7 +203,7 @@ void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible
     // ...or don't send out warning/error until pat. nav. or us.???
   }
 }
-void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ)
+void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
 {
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }

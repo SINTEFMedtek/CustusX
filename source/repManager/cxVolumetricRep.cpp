@@ -49,12 +49,12 @@ void VolumetricRep::setImage(ssc::ImagePtr image)
   }
   if (mImage)
   {
-    disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
-          mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
+    disconnect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
+          mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
   }
   ssc::VolumetricRep::setImage(image);
-  connect(this, SIGNAL(addPermanentPoint(double, double, double)),
-        mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
+  connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
+        mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
 }
 void VolumetricRep::setThreshold(const int threshold)
 {
@@ -232,7 +232,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   else
     mMessageManager->sendWarning("The volumetric representation: "+mUid+", could not sync the views.");
 }
-void VolumetricRep::makePointPermanent()
+void VolumetricRep::makePointPermanent(unsigned int index)
 {
 
   if(mCurrentX == std::numeric_limits<double>::max() &&
@@ -243,7 +243,7 @@ void VolumetricRep::makePointPermanent()
     return;
   }
   if(!this->doesLandmarkAlreadyExist(mCurrentX, mCurrentY, mCurrentZ))
-    emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ);
+    emit addPermanentPoint(mCurrentX, mCurrentY, mCurrentZ, index);
 }
 void VolumetricRep::pickSurfacePointSlot(vtkObject* object)
 {
