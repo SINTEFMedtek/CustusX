@@ -89,18 +89,29 @@ void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
     return;
   }
   if(mCurrentRow == -1)
-    mCurrentRow = 0;
-  volumetricRep->makePointPermanent(mCurrentRow+1);
+    mCurrentRow = 1;
+  volumetricRep->makePointPermanent(mCurrentRow);
 
-  //TODO: Move mCurrentRow to next line...
+  mCurrentRow = mLandmarkTableWidget->rowCount()+1;
 }
 void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
 {
   if(mCurrentRow < 0 || mCurrentColumn < 0)
     return;
 
+  std::cout << "mCurrentRow == " << mCurrentRow << std::endl;
+
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  landmarkRep->removePermanentPoint(mCurrentRow+1);
+  int numberOfLandmarks = mCurrentImage->getLandmarks()->GetNumberOfTuples();
+  if(mCurrentRow <= numberOfLandmarks)
+  {
+    landmarkRep->removePermanentPoint(mCurrentRow);
+    mCurrentRow = mLandmarkTableWidget->rowCount()+1;
+  }
+  else
+  {
+    mMessageManager->sendWarning("Please select a landmark to remove.");
+  }
 }
 void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
@@ -238,8 +249,9 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
 }
 void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {
-  mCurrentRow = row;
-  mCurrentColumn = column;
+  mCurrentRow = row+1;
+  mCurrentColumn = column+1;
+  std::cout << "mCurrentRow: " << mCurrentRow << ", mCurrentColumn: " << mCurrentColumn << std::endl;
 }
 void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
