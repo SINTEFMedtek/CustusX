@@ -31,7 +31,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mOutputImageData->Update();
 	//mOutputImageData->UpdateInformation();
 #endif
-	mLandmarks->SetNumberOfComponents(3);
+	mLandmarks->SetNumberOfComponents(4);
 
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 }
@@ -130,37 +130,68 @@ void Image::disconnectRep(const RepWeakPtr& rep)
 {
 	mReps.erase(rep);
 }
-void Image::addLandmarkSlot(double x, double y, double z)
+/** If index is found, it's treated as an edit operation, else
+ * it's an add operation.
+ * @param x
+ * @param y
+ * @param z
+ * @param index
+ */
+void Image::addLandmarkSlot(double x, double y, double z, unsigned int index)
 {
-	double point[3] = {x, y, z};
-	mLandmarks->InsertNextTupleValue(point);
-	emit landmarkAdded(x, y, z);
-}
-void Image::removeLandmarkSlot(double x, double y, double z)
-{
+	double addLandmark[4] = {x, y, z, (double)index};
 
+	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
+	//if index exists, we treat it as an edit operation
+	for(int i=0; i<= numberOfLandmarks-1; i++)
+	{
+		double* landmark = mLandmarks->GetTuple(i);
+		if(landmark[3] == index)
+		{
+			mLandmarks->SetTupleValue(i, addLandmark);
+			emit landmarkAdded(x, y, z, index);
+			return;
+		}
+	}
+	//else it's an add operation
+	mLandmarks->InsertNextTupleValue(addLandmark);
+	emit landmarkAdded(x, y, z, index);
+}
+/** If index is found that tuple(landmark) is removed from the array, else
+ * it's just ignored.
+ * @param x
+ * @param y
+ * @param z
+ * @param index
+ */
+void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
+{
 	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
 	for(int i=0; i<= numberOfLandmarks-1; i++)
 	{
-		double* point = mLandmarks->GetTuple(i);
-		if(point[0] == x && point[1] == y && point[2] == z)
+		double* landmark = mLandmarks->GetTuple(i);
+		if(landmark[3] == index)
+		{
 			mLandmarks->RemoveTuple(i);
+		}
 	}
-	emit landmarkRemoved(x, y, z);
+	emit landmarkRemoved(x, y, z, index);
 }
 void Image::printLandmarks()
 {
 	std::cout << "Landmarks: " << std::endl;
 	for(int i=0; i<= mLandmarks->GetNumberOfTuples()-1; i++)
 	{
-		double* point = mLandmarks->GetTuple(i);
+		double* landmark = mLandmarks->GetTuple(i);
 		std::stringstream stream;
 		stream << i << ": (";
-		stream << point[0];
+		stream << landmark[0];
 		stream << ",";
-		stream << point[1];
+		stream << landmark[1];
 		stream << ",";
-		stream << point[2];
+		stream << landmark[2];
+		stream << ",";
+		stream << landmark[3];
 		stream << ")";
 		std::cout << stream.str() << std::endl;
 	}

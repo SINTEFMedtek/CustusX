@@ -54,16 +54,16 @@ public:
 	DoubleBoundingBox3D boundingBox() const;
 
 signals:
-	void landmarkRemoved(double x, double y, double z);
-	void landmarkAdded(double x, double y, double z);
+	void landmarkRemoved(double x, double y, double z, unsigned int index);
+	void landmarkAdded(double x, double y, double z, unsigned int index);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transformChanged(); ///< emitted when transform is changed
 
 public slots:
-	void addLandmarkSlot(double x, double y, double z);
-	void removeLandmarkSlot(double x, double y, double z);
+	void addLandmarkSlot(double x, double y, double z, unsigned int index);
+	void removeLandmarkSlot(double x, double y, double z, unsigned int index);
 
-private:
+protected:
 	ImageTF3D mImageTransferFunctions3D;
 	ImageLUT2D mImageLookupTable2D;
 
@@ -83,7 +83,7 @@ private:
 	// vtkPointsPtr points = vtkPoints::New();
 	// points->SetData(mLandmarks);
 	//vtkPointsPtr mLandmarks;
-	vtkDoubleArrayPtr mLandmarks;
+	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;
