@@ -260,17 +260,30 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int index)
   numberPosition[1] = y + 10*centerToSkinVector[1];
   numberPosition[2] = z + 10*centerToSkinVector[2];
 
-  vtkVectorTextPtr text = vtkVectorTextPtr::New();
+  vtkVectorTextPtr text;
+  vtkFollowerPtr followerActor;
+  vtkPolyDataMapperPtr textMapper;
+  std::map<int, vtkVectorTextFollowerPair>::iterator textFollowerIt = mTextFollowerActors.find(index);
+  if(textFollowerIt == mTextFollowerActors.end())
+  {
+    text = vtkVectorTextPtr::New();
+    followerActor = vtkFollowerPtr::New();
+    textMapper = vtkPolyDataMapperPtr::New();
+  }
+  else
+  {
+    text = textFollowerIt->second.first;
+    followerActor = textFollowerIt->second.second;
+    textMapper = dynamic_cast<vtkPolyDataMapper*>(followerActor->GetMapper());
+  }
   std::stringstream numberstream;
   numberstream << index;
   text->SetText(numberstream.str().c_str());
 
-  vtkPolyDataMapperPtr textMapper = vtkPolyDataMapperPtr::New();
   textMapper->SetInput(text->GetOutput());
 
-  vtkFollowerPtr followerActor = vtkFollowerPtr::New();
   followerActor->SetMapper(textMapper);
-  followerActor->AddPosition(numberPosition);
+  followerActor->SetPosition(numberPosition);
   followerActor->SetScale(mTextScale[0], mTextScale[1], mTextScale[2]);
   followerActor->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
 
@@ -278,10 +291,21 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int index)
                             (index, vtkVectorTextFollowerPair(text, followerActor)));
 
   vtkSphereSourcePtr sphere = vtkSphereSourcePtr::New();
+  vtkPolyDataMapperPtr sphereMapper;
+  vtkActorPtr skinPointActor;
+  std::map<int, vtkActorPtr>::iterator actorIt = mSkinPointActors.find(index);
+  if(actorIt == mSkinPointActors.end())
+  {
+    sphereMapper = vtkPolyDataMapperPtr::New();
+    skinPointActor = vtkActorPtr::New();
+  }
+  else
+  {
+    skinPointActor = actorIt->second;
+    sphereMapper = dynamic_cast<vtkPolyDataMapper*>(skinPointActor->GetMapper());
+  }
   sphere->SetRadius(2);
-  vtkPolyDataMapperPtr sphereMapper = vtkPolyDataMapperPtr::New();
   sphereMapper->SetInputConnection(sphere->GetOutputPort());
-  vtkActorPtr skinPointActor = vtkActorPtr::New();
   skinPointActor->SetMapper(sphereMapper);
   skinPointActor->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
   skinPointActor->SetPosition(x, y, z);
