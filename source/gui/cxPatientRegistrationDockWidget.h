@@ -4,6 +4,7 @@
 #include <QDockWidget>
 #include "sscImage.h"
 #include "sscTransform3D.h"
+#include "cxTool.h"
 
 /**
  * cxPatientRegistrationDockWidget.h
@@ -46,10 +47,14 @@ protected slots:
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
   void toolVisibleSlot(bool visible);
-  void toolTransformAndTimestamp(Transform3D transform, double timestamp);
+  void toolSampleButtonClickedSlot(bool checked);
 
   void landmarkSelectedSlot(int row, int column);
   void populateTheImageComboBox();
+  
+  void cellChangedSlot(int row, int column);
+  
+  void dominantToolChangedSlot(const std::string& uid);
 
 protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
@@ -68,6 +73,10 @@ protected:
   MessageManager* mMessageManager;
 
   int mCurrentRow, mCurrentColumn;
+  std::vector<bool> mLandmarkActiveVector;
+  
+  ToolPtr mToolToSample; 
+  
 };
 }//namespace cx
 

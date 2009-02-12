@@ -39,6 +39,8 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
   mMessageManager(MessageManager::getInstance()),
   mCurrentRow(-1),
   mCurrentColumn(-1)
+  //mToolToSample(mToolManager->getDominantTool())
+
 {
   this->setWindowTitle("Patient Registration");
   this->setWidget(mGuiContainer);
@@ -57,7 +59,16 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
   connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString& )),
           this, SLOT(imageSelectedSlot(const QString& )));
 
+  connect(mLandmarkTableWidget, SIGNAL(cellChanged(int, int)),
+          this, SLOT(cellChangedSlot(int, int)));
+          
+  connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)), 
+          this, SLOT(dominantToolChangedSlot(const std::string&)));
 
+  connect(mToolSampleButton, SIGNAL(clicked(bool)), 
+          this, SLOT(toolSampleButtonClickedSlot(bool)));
+          
+  this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
 }
 
 PatientRegistrationDockWidget::~PatientRegistrationDockWidget()
@@ -142,8 +153,17 @@ void PatientRegistrationDockWidget::toolVisibleSlot(bool visible)
     mToolSampleButton->setEnabled(false);
 }
 
-void PatientRegistrationDockWidget::toolTransformAndTimestamp(Transform3D transform, double timestamp)
-{}
+void PatientRegistrationDockWidget::toolSampleButtonClickedSlot(bool checked)
+{
+  ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
+  vtkMatrix4x4Ptr lastTransformMatrix = lastTransform->matrix();
+  double x = lastTransformMatrix->GetElement(0,3);
+  double y = lastTransformMatrix->GetElement(1,3);
+  double z = lastTransformMatrix->GetElement(2,3);
+  
+  unsigned int index = mCurrentRow+1;
+  //emit addToolPosition(x, y, z, index);
+}
 void PatientRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {}
 void PatientRegistrationDockWidget::populateTheImageComboBox()
@@ -182,16 +202,49 @@ void PatientRegistrationDockWidget::populateTheImageComboBox()
 
 }
 
+void PatientRegistrationDockWidget::cellChangedSlot(int row, int column)
+{
+  if (column!=0)
+    return;
+    
+  Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();  
+  mLandmarkActiveVector.push_back(state);
+  
+}
+
+void PatientRegistrationDockWidget::dominantToolChangedSlot(const std::string& uid)
+{
+  if(mToolToSample.get() != NULL && mToolToSample->getUid() == uid)
+    return;
+   
+  ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getTool(uid).get())); 
+  if(mToolToSample.get() != NULL)
+  {
+    if(newTool.get() == NULL)
+      return;
+  
+    disconnect(mToolToSample.get(), SIGNAL(toolVisible()),
+                this, SLOT(toolVisibleSlot()));
+  }
+  
+  mToolToSample = newTool;
+
+  connect(mToolToSample.get(), SIGNAL(toolVisible()),
+              this, SLOT(toolVisibleSlot()));
+}
+
 void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
 
   // TODO - Work in progress :-) //
-  /*
+  
   std::map<std::string, bool> nameList = mRegistrationManager->getGlobalPointSetNameList();
   int numberOfNames = nameList.size();
 
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
+  
+  mLandmarkActiveVector.clear();
 
   mLandmarkTableWidget->clear();
   mLandmarkTableWidget->setRowCount((numberOfLandmarks > numberOfNames ? numberOfLandmarks : numberOfNames));
@@ -201,14 +254,15 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
   mLandmarkTableWidget->horizontalHeader()->
     setResizeMode(QHeaderView::ResizeToContents);
 
-  //fill the combobox with these names
   typedef std::map<std::string, bool>::iterator Iterator;
   int row = 1;
   for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
   {
     std::string name = it->first;
-    QTableWidgetItem* columnOne = new QTableWidgetItem(tr(name.c_str()));
-    QTableWidgetItem* columnTwo;
+    QTableWidgetItem* columnOne = new QTableWidgetItem();
+    columnOne->setCheckState(Qt::Checked);
+    QTableWidgetItem* columnTwo = new QTableWidgetItem(tr(name.c_str()));
+    QTableWidgetItem* columnThree;
     if(row <= numberOfLandmarks)
     {
       double* point = landmarks->GetTuple(row-1);
@@ -218,24 +272,31 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
     {
       columnTwo = new QTableWidgetItem(tr(" "));
     }
-    columnTwo->setFlags(Qt::ItemIsSelectable);
+    columnThree->setFlags(Qt::ItemIsSelectable);
 
     mLandmarkTableWidget->setItem(row-1, 0, columnOne);
     mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
+    mLandmarkTableWidget->setItem(row-1, 2, columnThree);
+    mLandmarkActiveVector.push_back(true);
     row++;
   }
   for(; row<=numberOfLandmarks; row++)
   {
     double* point = landmarks->GetTuple(row-1);
 
-    QTableWidgetItem* columnOne = new QTableWidgetItem(tr(" "));
+    QTableWidgetItem* columnOne = new QTableWidgetItem();
+    columnOne->setCheckState(Qt::Checked);
     QTableWidgetItem* columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
-    columnTwo->setFlags(Qt::ItemIsSelectable);
+    QTableWidgetItem* columnThree = new QTableWidgetItem(tr(" "));
+    columnThree->setFlags(Qt::ItemIsSelectable);
 
     mLandmarkTableWidget->setItem(row-1, 0, columnOne);
     mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
+    mLandmarkTableWidget->setItem(row-1, 2, columnThree);
+    mLandmarkActiveVector.push_back(true);
   }
-*/
+
 }
+
 
 }//namespace cx
