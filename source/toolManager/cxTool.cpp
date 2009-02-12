@@ -123,6 +123,13 @@ bool Tool::getVisible() const
 {
   return mVisible;
 }
+ssc::Transform3DPtr Tool::getLastTransform()
+{
+  ssc::Transform3DPtr lastTransform;
+  if(mTransforms->size() > 0)
+    lastTransform = mTransforms->at(mTransforms->size()-1);
+  return lastTransform;
+}
 std::string Tool::getUid() const
 {
   return ssc::Tool::mUid;
