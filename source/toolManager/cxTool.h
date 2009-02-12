@@ -3,6 +3,8 @@
 
 #include "sscTool.h"
 
+#include <boost/shared_ptr.hpp>
+
 #include <igstkPolarisTrackerTool.h>
 #include <igstkAuroraTrackerTool.h>
 #include <igstkTransform.h>
@@ -140,5 +142,6 @@ protected:
   bool mAttachedToTracker;  ///< wheter the tool is attached to a tracker or not
   bool mTracked;            ///< whether the tool is beeing tracked or not
 };
+typedef boost::shared_ptr<Tool> ToolPtr;
 } //namespace cx
 #endif /* CXTOOL_H_ */
