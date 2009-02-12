@@ -34,6 +34,7 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mImagesComboBox(new QComboBox(mGuiContainer)),
   mLandmarkTableWidget(new QTableWidget(mGuiContainer)),
   mAddLandmarkButton(new QPushButton("Add landmark", mGuiContainer)),
+  mEditLandmarkButton(new QPushButton("Resample landmark", mGuiContainer)),
   mRemoveLandmarkButton(new QPushButton("Remove landmark", mGuiContainer)),
   mRepManager(RepManager::getInstance()),
   mDataManager(DataManager::getInstance()),
@@ -58,6 +59,9 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mAddLandmarkButton->setDisabled(true);
   connect(mAddLandmarkButton, SIGNAL(clicked()),
           this, SLOT(addLandmarkButtonClickedSlot()));
+  mEditLandmarkButton->setDisabled(true);
+  connect(mEditLandmarkButton, SIGNAL(clicked()),
+          this, SLOT(addLandmarkButtonClickedSlot()));
   mRemoveLandmarkButton->setDisabled(true);
   connect(mRemoveLandmarkButton, SIGNAL(clicked()),
           this, SLOT(removeLandmarkButtonClickedSlot()));
@@ -74,6 +78,7 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mAddLandmarkButton);
+  mVerticalLayout->addWidget(mEditLandmarkButton);
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
   mGuiContainer->setLayout(mVerticalLayout);
 
@@ -89,9 +94,11 @@ void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
     return;
   }
   if(mCurrentRow == -1)
-    mCurrentRow = 1;
-  volumetricRep->makePointPermanent(mCurrentRow);
+    mCurrentRow = 0;
+  int index = mCurrentRow+1;
+  volumetricRep->makePointPermanent(index);
 
+  //TODO: REMOVE all other updates on mCurrentRow...
   mCurrentRow = mLandmarkTableWidget->rowCount()+1;
 }
 void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
@@ -99,14 +106,15 @@ void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
   if(mCurrentRow < 0 || mCurrentColumn < 0)
     return;
 
-  std::cout << "mCurrentRow == " << mCurrentRow << std::endl;
+  //std::cout << "mCurrentRow == " << mCurrentRow << std::endl;
+  int index = mCurrentRow+1;
 
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   int numberOfLandmarks = mCurrentImage->getLandmarks()->GetNumberOfTuples();
-  if(mCurrentRow <= numberOfLandmarks)
+  if(index <= numberOfLandmarks)
   {
-    landmarkRep->removePermanentPoint(mCurrentRow);
-    mCurrentRow = mLandmarkTableWidget->rowCount()+1;
+    landmarkRep->removePermanentPoint(index);
+    this->updateCurrentRow();
   }
   else
   {
@@ -249,9 +257,10 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
 }
 void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {
-  mCurrentRow = row+1;
-  mCurrentColumn = column+1;
-  std::cout << "mCurrentRow: " << mCurrentRow << ", mCurrentColumn: " << mCurrentColumn << std::endl;
+  mCurrentRow = row;
+  mCurrentColumn = column;
+
+  //std::cout << "mCurrentRow: " << mCurrentRow << ", mCurrentColumn: " << mCurrentColumn << std::endl;
 }
 void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
@@ -308,5 +317,13 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
     mRemoveLandmarkButton->setDisabled(true);
   else
     mRemoveLandmarkButton->setDisabled(false);
+}
+void ImageRegistrationDockWidget::updateCurrentRow()
+{
+  int lastRow = mLandmarkTableWidget->rowCount()-1;
+  if(mCurrentRow == lastRow)
+    mLandmarkTableWidget->setCurrentCell(lastRow, mCurrentColumn);
+  else
+    mLandmarkTableWidget->setCurrentCell(mCurrentRow+1, mCurrentColumn);
 }
 }//namespace cx

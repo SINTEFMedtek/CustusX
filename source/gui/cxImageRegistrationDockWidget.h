@@ -52,12 +52,14 @@ protected slots:
 
 protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
+  void updateCurrentRow();
 
   QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
   QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;
   QPushButton* mAddLandmarkButton;
+  QPushButton* mEditLandmarkButton; //TODO
   QPushButton* mRemoveLandmarkButton;
 
   RepManager* mRepManager;
