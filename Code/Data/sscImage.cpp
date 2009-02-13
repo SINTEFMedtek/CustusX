@@ -173,9 +173,9 @@ void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
 		if(landmark[3] == index)
 		{
 			mLandmarks->RemoveTuple(i);
+			emit landmarkRemoved(x, y, z, index);
 		}
 	}
-	emit landmarkRemoved(x, y, z, index);
 }
 void Image::printLandmarks()
 {
