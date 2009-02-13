@@ -61,14 +61,17 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
 
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int, int)),
           this, SLOT(cellChangedSlot(int, int)));
-          
-  connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)), 
+
+  connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)),
           this, SLOT(dominantToolChangedSlot(const std::string&)));
 
-  connect(mToolSampleButton, SIGNAL(clicked(bool)), 
+  connect(mToolSampleButton, SIGNAL(clicked(bool)),
           this, SLOT(toolSampleButtonClickedSlot(bool)));
-          
-  this->dominantToolChangedSlot(mToolManager->getDominantTool()->getUid());
+
+
+  ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
+  if(dominantTool.get() != NULL)
+    this->dominantToolChangedSlot(dominantTool->getUid());
 }
 
 PatientRegistrationDockWidget::~PatientRegistrationDockWidget()
@@ -160,7 +163,7 @@ void PatientRegistrationDockWidget::toolSampleButtonClickedSlot(bool checked)
   double x = lastTransformMatrix->GetElement(0,3);
   double y = lastTransformMatrix->GetElement(1,3);
   double z = lastTransformMatrix->GetElement(2,3);
-  
+
   unsigned int index = mCurrentRow+1;
   //emit addToolPosition(x, y, z, index);
 }
@@ -206,27 +209,27 @@ void PatientRegistrationDockWidget::cellChangedSlot(int row, int column)
 {
   if (column!=0)
     return;
-    
-  Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();  
+
+  Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
   mLandmarkActiveVector.push_back(state);
-  
+
 }
 
 void PatientRegistrationDockWidget::dominantToolChangedSlot(const std::string& uid)
 {
   if(mToolToSample.get() != NULL && mToolToSample->getUid() == uid)
     return;
-   
-  ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getTool(uid).get())); 
+
+  ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getTool(uid).get()));
   if(mToolToSample.get() != NULL)
   {
     if(newTool.get() == NULL)
       return;
-  
+
     disconnect(mToolToSample.get(), SIGNAL(toolVisible()),
                 this, SLOT(toolVisibleSlot()));
   }
-  
+
   mToolToSample = newTool;
 
   connect(mToolToSample.get(), SIGNAL(toolVisible()),
@@ -237,13 +240,13 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
 {
 
   // TODO - Work in progress :-) //
-  
+
   std::map<std::string, bool> nameList = mRegistrationManager->getGlobalPointSetNameList();
   int numberOfNames = nameList.size();
 
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
-  
+
   mLandmarkActiveVector.clear();
 
   mLandmarkTableWidget->clear();
