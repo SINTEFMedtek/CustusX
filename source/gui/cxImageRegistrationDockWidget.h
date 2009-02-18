@@ -42,17 +42,18 @@ public:
 
 protected slots:
   void addLandmarkButtonClickedSlot();
+  void editLandmarkButtonClickedSlot();
   void removeLandmarkButtonClickedSlot();
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
   void imageLandmarksUpdateSlot(double, double, double,unsigned int);
   void landmarkSelectedSlot(int row, int column);
   void populateTheImageComboBox();
+  void cellChangedSlot(int row,int column);
 
 
 protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
-  void updateCurrentRow();
 
   QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;

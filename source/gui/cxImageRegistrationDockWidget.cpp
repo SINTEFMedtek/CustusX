@@ -61,7 +61,7 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
           this, SLOT(addLandmarkButtonClickedSlot()));
   mEditLandmarkButton->setDisabled(true);
   connect(mEditLandmarkButton, SIGNAL(clicked()),
-          this, SLOT(addLandmarkButtonClickedSlot()));
+          this, SLOT(editLandmarkButtonClickedSlot()));
   mRemoveLandmarkButton->setDisabled(true);
   connect(mRemoveLandmarkButton, SIGNAL(clicked()),
           this, SLOT(removeLandmarkButtonClickedSlot()));
@@ -73,6 +73,8 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   //connect to cellChanged(row, column)
   //slot should check that column == 2
   //then send signal with new name to registrationManager
+  connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)),
+          this, SLOT(cellChangedSlot(int,int)));
 
   //layout
   mVerticalLayout->addWidget(mImagesComboBox);
@@ -93,33 +95,35 @@ void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
     mMessageManager->sendError("Could not find a rep to add the landmark to.");
     return;
   }
-  if(mCurrentRow == -1)
-    mCurrentRow = 0;
-  int index = mCurrentRow+1;
+  int index = mLandmarkTableWidget->rowCount()+1;
   volumetricRep->makePointPermanent(index);
 
-  //TODO: REMOVE all other updates on mCurrentRow...
-  mCurrentRow = mLandmarkTableWidget->rowCount()+1;
+  //TODO: find a better place for this?
+  //make sure the masterImage is set
+  ssc::ImagePtr masterImage = mRegistrationManager->getMasterImage();
+  if(masterImage.get() == NULL)
+    mRegistrationManager->setMasterImage(mCurrentImage);
+}
+void ImageRegistrationDockWidget::editLandmarkButtonClickedSlot()
+{
+  VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
+  if(volumetricRep.get() == NULL)
+  {
+    mMessageManager->sendError("Could not find a rep to edit the landmark for.");
+    return;
+  }
+  int index = mCurrentRow+1;
+  volumetricRep->makePointPermanent(index);
 }
 void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
 {
   if(mCurrentRow < 0 || mCurrentColumn < 0)
     return;
 
-  //std::cout << "mCurrentRow == " << mCurrentRow << std::endl;
   int index = mCurrentRow+1;
 
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  int numberOfLandmarks = mCurrentImage->getLandmarks()->GetNumberOfTuples();
-  if(index <= numberOfLandmarks)
-  {
-    landmarkRep->removePermanentPoint(index);
-    this->updateCurrentRow();
-  }
-  else
-  {
-    mMessageManager->sendWarning("Please select a landmark to remove.");
-  }
+  landmarkRep->removePermanentPoint(index);
 }
 void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
@@ -259,71 +263,97 @@ void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {
   mCurrentRow = row;
   mCurrentColumn = column;
-
-  //std::cout << "mCurrentRow: " << mCurrentRow << ", mCurrentColumn: " << mCurrentColumn << std::endl;
 }
 void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
   //get globalPointsNameList from the RegistrationManager
-  std::map<std::string, bool> nameList = mRegistrationManager->getGlobalPointSetNameList();
-  int numberOfNames = nameList.size();
+  RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
 
+  //get the landmarks from the image
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
 
+  //ready the table widget
   mLandmarkTableWidget->clear();
-  mLandmarkTableWidget->setRowCount((numberOfLandmarks > numberOfNames ? numberOfLandmarks : numberOfNames));
+  mLandmarkTableWidget->setRowCount(0);
   mLandmarkTableWidget->setColumnCount(2);
   QStringList headerItems(QStringList() << "Name" << "Landmark");
   mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
-  mLandmarkTableWidget->horizontalHeader()->
-    setResizeMode(QHeaderView::ResizeToContents);
+  mLandmarkTableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+  mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  //fill the combobox with these names
-  typedef std::map<std::string, bool>::iterator Iterator;
-  int row = 1;
+  //fill the table widget with rows for the landmarks
+  int row = 0;
+  for(int i=0; i<numberOfLandmarks; i++)
+  {
+    double* landmark = landmarks->GetTuple(i);
+    mLandmarkTableWidget->setRowCount(landmark[3]);
+    QTableWidgetItem* columnOne;
+    QTableWidgetItem* columnTwo;
+
+    int rowToInsert = landmark[3]-1;
+    for(; row <= rowToInsert; row++)
+    {
+      if(row == rowToInsert)
+      {
+        columnOne = new QTableWidgetItem();
+        columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
+      }
+      else
+      {
+        columnOne = new QTableWidgetItem();
+        columnTwo = new QTableWidgetItem();
+      }
+      columnTwo->setFlags(Qt::ItemIsSelectable);
+      mLandmarkTableWidget->setItem(row, 0, columnOne);
+      mLandmarkTableWidget->setItem(row, 1, columnTwo);
+      std::cout << "Setting (" << row << ", 0) and (" << row << ",1)" <<  std::endl;
+    }
+  }
+  //fill in names
+  typedef RegistrationManager::NameListType::iterator Iterator;
   for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
   {
-    std::string name = it->first;
-    QTableWidgetItem* columnOne = new QTableWidgetItem(tr(name.c_str()));
-    QTableWidgetItem* columnTwo;
-    if(row <= numberOfLandmarks)
+    std::string name = it->second.first;
+    int index = it->first;
+    int row = index-1;
+    QTableWidgetItem* columnOne;
+    //std::cout << "Index before if is: " << index << std::endl;
+    //std::cout << "Rowcount before if is: " << mLandmarkTableWidget->rowCount() << std::endl;
+    if(index > mLandmarkTableWidget->rowCount())
     {
-      double* point = landmarks->GetTuple(row-1);
-      columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
+      mLandmarkTableWidget->setRowCount(index);
+      columnOne = new QTableWidgetItem();
+      QTableWidgetItem* columnTwo = new QTableWidgetItem();
+      columnTwo->setFlags(Qt::ItemIsSelectable);
+      mLandmarkTableWidget->setItem(row, 0, columnOne);
+      mLandmarkTableWidget->setItem(row, 1, columnTwo);
     }
     else
     {
-      columnTwo = new QTableWidgetItem(tr(" "));
+      //std::cout << "Trying to get item (" << row << ",0)" << std::endl;
+      columnOne = mLandmarkTableWidget->item(row, 0);
+      if(columnOne == NULL)
+        std::cout << "columnOne == NULL!!!" << std::endl;
     }
-    columnTwo->setFlags(Qt::ItemIsSelectable);
-
-    mLandmarkTableWidget->setItem(row-1, 0, columnOne);
-    mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
-    row++;
+    columnOne->setText(QString(name.c_str()));
   }
-  for(; row<=numberOfLandmarks; row++)
-  {
-    double* point = landmarks->GetTuple(row-1);
 
-    QTableWidgetItem* columnOne = new QTableWidgetItem(tr(" "));
-    QTableWidgetItem* columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
-    columnTwo->setFlags(Qt::ItemIsSelectable);
-
-    mLandmarkTableWidget->setItem(row-1, 0, columnOne);
-    mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
-  }
+  //update buttons
   if(numberOfLandmarks == 0)
     mRemoveLandmarkButton->setDisabled(true);
   else
     mRemoveLandmarkButton->setDisabled(false);
 }
-void ImageRegistrationDockWidget::updateCurrentRow()
+void ImageRegistrationDockWidget::cellChangedSlot(int row,int column)
 {
-  int lastRow = mLandmarkTableWidget->rowCount()-1;
-  if(mCurrentRow == lastRow)
-    mLandmarkTableWidget->setCurrentCell(lastRow, mCurrentColumn);
-  else
-    mLandmarkTableWidget->setCurrentCell(mCurrentRow+1, mCurrentColumn);
+  if(column != 0)
+    return;
+
+  std::string name = mLandmarkTableWidget->item(row, column)->text().toStdString();
+
+  int index = row+1;
+  std::cout << "cellChangedSlot(): name: " << name << " index: " << index << std::endl;
+  mRegistrationManager->setGlobalPointsNameSlot(index, name);
 }
 }//namespace cx
