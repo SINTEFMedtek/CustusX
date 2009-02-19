@@ -60,7 +60,7 @@ protected:
   QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;
   QPushButton* mAddLandmarkButton;
-  QPushButton* mEditLandmarkButton; //TODO
+  QPushButton* mEditLandmarkButton;
   QPushButton* mRemoveLandmarkButton;
 
   RepManager* mRepManager;

@@ -23,6 +23,9 @@ class RegistrationManager : public QObject
   Q_OBJECT
 
 public:
+  typedef std::pair<std::string, bool> StringBoolPair;
+  typedef std::map<int, StringBoolPair> NameListType;
+
   static RegistrationManager* getInstance();
 
   void setMasterImage(ssc::ImagePtr image);
@@ -32,11 +35,11 @@ public:
   void setGlobalPointSet(vtkDoubleArrayPtr pointset);
   vtkDoubleArrayPtr getGlobalPointSet();
 
-  void setGlobalPointSetNameList(std::map<std::string, bool> nameList);
-  std::map<std::string, bool> getGlobalPointSetNameList();
+  void setGlobalPointSetNameList(NameListType nameList);
+  NameListType getGlobalPointSetNameList();
 
 public slots:
-  void setGlobalPointsNameSlot(int index, std::string); ///< set the points (user) name
+  void setGlobalPointsNameSlot(int index, std::string name); ///< set the points (user) name
   void setGlobalPointsActiveSlot(int index, bool active); ///< set if the point should be used in matrix calc or not
 
 protected:
@@ -47,7 +50,7 @@ protected:
 
   ssc::ImagePtr mMasterImage;
   vtkDoubleArrayPtr mGlobalPointSet;
-  std::map<std::string, bool> mGlobalPointSetNameList;
+  NameListType mGlobalPointSetNameList;
 
 private:
   RegistrationManager(RegistrationManager const&);

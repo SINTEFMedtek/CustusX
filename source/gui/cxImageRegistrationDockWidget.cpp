@@ -263,6 +263,8 @@ void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {
   mCurrentRow = row;
   mCurrentColumn = column;
+
+  mEditLandmarkButton->setEnabled(true);
 }
 void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
@@ -271,6 +273,9 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
 
   //get the landmarks from the image
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
+  std::cout << "==========================" << std::endl;
+  image->printLandmarks();
+  std::cout << "==========================" << std::endl;
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
 
   //ready the table widget
@@ -287,11 +292,14 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
   for(int i=0; i<numberOfLandmarks; i++)
   {
     double* landmark = landmarks->GetTuple(i);
-    mLandmarkTableWidget->setRowCount(landmark[3]);
+    if(landmark[3] > mLandmarkTableWidget->rowCount())
+      mLandmarkTableWidget->setRowCount(landmark[3]);
     QTableWidgetItem* columnOne;
     QTableWidgetItem* columnTwo;
 
     int rowToInsert = landmark[3]-1;
+    if(rowToInsert < row)
+      row = rowToInsert;
     for(; row <= rowToInsert; row++)
     {
       if(row == rowToInsert)
@@ -299,7 +307,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
         columnOne = new QTableWidgetItem();
         columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
       }
-      else
+      else//if(row not already added...)
       {
         columnOne = new QTableWidgetItem();
         columnTwo = new QTableWidgetItem();
@@ -307,7 +315,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       columnTwo->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
-      std::cout << "Setting (" << row << ", 0) and (" << row << ",1)" <<  std::endl;
+      //std::cout << "Setting (" << row << ", 0) and (" << row << ",1)" <<  std::endl;
     }
   }
   //fill in names
@@ -339,11 +347,22 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
     columnOne->setText(QString(name.c_str()));
   }
 
+  //highlight selected row
+  if(mCurrentRow != -1 && mCurrentColumn != -1)
+    mLandmarkTableWidget->setCurrentCell(mCurrentRow, mCurrentColumn);
+
   //update buttons
   if(numberOfLandmarks == 0)
+  {
     mRemoveLandmarkButton->setDisabled(true);
+    mEditLandmarkButton->setDisabled(true);
+  }
   else
-    mRemoveLandmarkButton->setDisabled(false);
+  {
+    mRemoveLandmarkButton->setEnabled(true);
+    if(mCurrentRow != -1 && mCurrentColumn != -1)
+      mEditLandmarkButton->setEnabled(true);
+  }
 }
 void ImageRegistrationDockWidget::cellChangedSlot(int row,int column)
 {

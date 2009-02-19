@@ -46,20 +46,40 @@ vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
 {
   return mGlobalPointSet;
 }
-void RegistrationManager::setGlobalPointSetNameList(std::map<std::string, bool> nameList)
+void RegistrationManager::setGlobalPointSetNameList(RegistrationManager::NameListType nameList)
 {
   mGlobalPointSetNameList = nameList;
 }
-std::map<std::string, bool> RegistrationManager::getGlobalPointSetNameList()
+RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList()
 {
   return mGlobalPointSetNameList;
 }
-void RegistrationManager::setGlobalPointsNameSlot(int index, std::string)
+void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
 {
-  //TODO
+  if(name.empty())
+    return;
+
+  NameListType::iterator it = mGlobalPointSetNameList.find(index);
+  if(it != mGlobalPointSetNameList.end())
+  {
+    it->second.first = name;
+  }
+  else
+  {
+    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,true)));
+  }
 }
 void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
 {
-  //TODO
+  std::string name = " ";
+  NameListType::iterator it = mGlobalPointSetNameList.find(index);
+  if(it != mGlobalPointSetNameList.end())
+  {
+    it->second.second = active;
+  }
+  else
+  {
+    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,active)));
+  }
 }
 }//namespace cx
