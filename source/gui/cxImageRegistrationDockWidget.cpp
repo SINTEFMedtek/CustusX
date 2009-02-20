@@ -242,6 +242,11 @@ void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible
             volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
     disconnect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
             volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+
+    //update global pointset before exiting dockwidget, only if current image is master image
+    ssc::ImagePtr masterImage = mRegistrationManager->getMasterImage();
+    if(masterImage == mCurrentImage)
+      mRegistrationManager->setGlobalPointSet(mCurrentImage->getLandmarks());
   }
 }
 void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
