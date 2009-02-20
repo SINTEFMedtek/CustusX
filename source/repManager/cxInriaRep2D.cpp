@@ -1,6 +1,8 @@
 #include "cxInriaRep2D.h"
 
+#include <vtkEventQtSlotConnect.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include <vtkMetaDataSet.h>
 #include <vtkMetaImageData.h>
@@ -21,7 +23,8 @@ InriaRep2D::InriaRep2D(const std::string& uid, const std::string& name) :
   ssc::RepImpl(uid, name),
   mType("cxInriaRep2D"),
   mTool(NULL),
-  mInria(vtkViewImage2D::New())
+  mInria(vtkViewImage2D::New()),
+  mConnections(vtkEventQtSlotConnect::New())
 {
   mInria->SetLeftButtonInteractionStyle(vtkViewImage2D::WINDOW_LEVEL_INTERACTION);
   mInria->SetMiddleButtonInteractionStyle(vtkViewImage2D::SELECT_INTERACTION);
@@ -29,6 +32,7 @@ InriaRep2D::InriaRep2D(const std::string& uid, const std::string& name) :
   mInria->SetRightButtonInteractionStyle(vtkViewImage2D::NO_INTERACTION);
 
   mInria->SetLinkZoom(true);
+
 }
 InriaRep2D::~InriaRep2D()
 {}
@@ -63,7 +67,7 @@ void InriaRep2D::setDataset(vtkMetaDataSet *dataset)
     std::cout << "Could not get vtkImageData from vtkmetaDataSet..\n";
   }
 }
-InriaRep2D::vtkViewImage2DPtr InriaRep2D::getVtkViewImage2D()
+vtkViewImage2DPtr InriaRep2D::getVtkViewImage2D()
 {
   return mInria;
 }
@@ -101,6 +105,18 @@ bool InriaRep2D::hasTool(Tool* tool)
     return false;
   }
 }
+void InriaRep2D::pickSurfacePointSlot(vtkObject* object)
+{
+  double point[3];
+  mInria->GetCurrentPoint(point);
+
+  emit pointPicked(point[0], point[1], point[2]);
+}
+void InriaRep2D::syncSetPosition(double x, double y, double z)
+{
+  const double point[3] = {x,y,z};
+  mInria->SyncSetPosition(point);
+}
 vtkImageData *InriaRep2D::getImageDataFromVtkMetaDataSet(vtkMetaDataSet *dataset)
 {
   if(dataset == NULL)
@@ -129,12 +145,22 @@ void InriaRep2D::addRepActorsToViewRenderer(ssc::View* view)
   mInria->SetRenderer(view->getRenderer());
   mInria->SetBackgroundColor(0.0, 0.0, 0.0);
   mInria->Render();
+
+  mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::MiddleButtonPressEvent,
+                       this,
+                       SLOT(pickSurfacePointSlot(vtkObject*)));
 }
 void InriaRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   mInria->RemoveAllDataSet();
   mInria->SetRenderWindow(NULL);
   mInria->SetRenderer(NULL);
+
+  mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::MiddleButtonPressEvent,
+                       this,
+                       SLOT(pickSurfacePointSlot(vtkObject*)));
 }
 void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp)
 {

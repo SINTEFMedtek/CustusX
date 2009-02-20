@@ -78,8 +78,8 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   int selectionY = pickedPoint[1];
   int selectionZ = pickedPoint[2];
 
-  vtkRenderer* renderer = this->getRendererFromRenderWindow(*iren);
-  if(renderer == NULL)
+  mCurrentRenderer = this->getRendererFromRenderWindow(*iren);
+  if(mCurrentRenderer == NULL)
   {
     mMessageManager->sendError("Could not pick the point because the renderer is NULL.");
     return;
@@ -87,7 +87,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
 
   //Get camera focal point and position
   double cameraPos[4], cameraFocalPoint[4];
-  vtkCamera* camera = renderer->GetActiveCamera();
+  vtkCamera* camera = mCurrentRenderer->GetActiveCamera();
   camera->ParallelProjectionOn();
   camera->GetPosition((double*)cameraPos);
   cameraPos[3] = 1.0;
@@ -97,16 +97,16 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   //Get the cameras focal point in display coordinates.
   //We need a depth value for the z-buffer.
   double* displayCoords;
-  renderer->SetWorldPoint(cameraFocalPoint[0], cameraFocalPoint[1], cameraFocalPoint[2], cameraFocalPoint[3]);
-  renderer->WorldToDisplay();
-  displayCoords = renderer->GetDisplayPoint();
+  mCurrentRenderer->SetWorldPoint(cameraFocalPoint[0], cameraFocalPoint[1], cameraFocalPoint[2], cameraFocalPoint[3]);
+  mCurrentRenderer->WorldToDisplay();
+  displayCoords = mCurrentRenderer->GetDisplayPoint();
   selectionZ = displayCoords[2];
 
   //Convert the selection point into world coordinates
   double* worldCoords;
-  renderer->SetDisplayPoint(selectionX, selectionY, selectionZ);
-  renderer->DisplayToWorld();
-  worldCoords = renderer->GetWorldPoint();
+  mCurrentRenderer->SetDisplayPoint(selectionX, selectionY, selectionZ);
+  mCurrentRenderer->DisplayToWorld();
+  worldCoords = mCurrentRenderer->GetWorldPoint();
 
   double pickPosition[3];
   for(int i=0; i<3; i++)
@@ -189,24 +189,13 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   probeFilterMapper->GetInput()->GetPoint(tuple, skinPoint);
 
   //Make an sphere actor to show where the calculated point is
-  if(mPickedPointActor == NULL )
-  {
-    vtkSmartPointer<vtkSphereSource> pickedPointSphereSource = vtkSphereSource::New();
-    pickedPointSphereSource->SetRadius(2);
-    vtkSmartPointer<vtkPolyDataMapper> pickedPointMapper = vtkPolyDataMapper::New();
-    pickedPointMapper->SetInputConnection(pickedPointSphereSource->GetOutputPort());
-    mPickedPointActor = vtkActor::New();
-    mPickedPointActor->SetMapper(pickedPointMapper);
-    mPickedPointActor->GetProperty()->SetColor(0,1,0);
-  }
-  if(renderer->HasViewProp(mPickedPointActor))
-      renderer->RemoveActor(mPickedPointActor);
+  this->showTemporaryPointSlot(skinPoint[0], skinPoint[1], skinPoint[2]);
 
-  mPickedPointActor->SetPosition(skinPoint[0], skinPoint[1], skinPoint[2]);
-  renderer->AddActor(mPickedPointActor);
   mCurrentX = skinPoint[0];
   mCurrentY = skinPoint[1];
   mCurrentZ = skinPoint[2];
+
+  emit pointPicked(mCurrentX, mCurrentY, mCurrentZ);
 
   std::stringstream stream;
   stream << "Picked point: (";
@@ -219,18 +208,6 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   mMessageManager->sendInfo(stream.str());
 
   iren->GetRenderWindow()->Render();
-
-  //TODO: Should this really be here???
-  //Nope.
-  //Send out a signal that the repmanager is connected to.
-  //The slot in the repmanager should take care of syncing...
-  // ... should this be handled by the view that receives the mouse click?
-  InriaRep3DMap* inriaRep3DMapPtr = RepManager::getInstance()->getInria3DReps();
-  InriaRep3DMap::iterator itInriaRep3D = inriaRep3DMapPtr->begin();
-  if(itInriaRep3D != inriaRep3DMapPtr->end())
-    itInriaRep3D->second->getVtkViewImage3D()->SyncSetPosition(skinPoint);
-  else
-    mMessageManager->sendWarning("The volumetric representation: "+mUid+", could not sync the views.");
 }
 void VolumetricRep::makePointPermanent(unsigned int index)
 {
@@ -273,6 +250,34 @@ void VolumetricRep::addRepActorsToViewRenderer(ssc::View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickSurfacePointSlot(vtkObject*)));
+}
+void VolumetricRep::showTemporaryPointSlot(double x, double y, double z)
+{
+  //std::cout << "void VolumetricRep::showTemporaryPointSlot("<< x <<","<< y <<" ,"<< z <<")" << std::endl;
+
+  if(mCurrentRenderer == NULL)
+  {
+    mMessageManager->sendWarning("Could not determine what renderer to add the temporary point to. Try picking a point in the rep first.");
+    return;
+  }
+
+  if(mPickedPointActor == NULL )
+  {
+    vtkSmartPointer<vtkSphereSource> pickedPointSphereSource = vtkSphereSource::New();
+    pickedPointSphereSource->SetRadius(2);
+    vtkSmartPointer<vtkPolyDataMapper> pickedPointMapper = vtkPolyDataMapper::New();
+    pickedPointMapper->SetInputConnection(pickedPointSphereSource->GetOutputPort());
+    mPickedPointActor = vtkActor::New();
+    mPickedPointActor->SetMapper(pickedPointMapper);
+    mPickedPointActor->GetProperty()->SetColor(0,1,0);
+  }
+  if(mCurrentRenderer->HasViewProp(mPickedPointActor))
+      mCurrentRenderer->RemoveActor(mPickedPointActor);
+
+  mPickedPointActor->SetPosition(x, y, z);
+  mCurrentRenderer->AddActor(mPickedPointActor);
+
+  mCurrentRenderer->GetRenderWindow()->Render();
 }
 void VolumetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {

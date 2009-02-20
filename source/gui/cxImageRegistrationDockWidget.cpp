@@ -69,10 +69,6 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
           this, SLOT(landmarkSelectedSlot(int, int)));
-  //TODO:
-  //connect to cellChanged(row, column)
-  //slot should check that column == 2
-  //then send signal with new name to registrationManager
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)),
           this, SLOT(cellChangedSlot(int,int)));
 
@@ -158,9 +154,6 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
 
-  //TODO
-  //link volumetricRep and inriaReps
-
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
@@ -191,6 +184,16 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mCurrentImage->getRefVtkImageData());
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
 
+  //link volumetricRep and inriaReps
+  connect(volumetricRep.get(), SIGNAL(pointPicked(double,double,double)),
+          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
+  connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
+          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
+          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
+          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+
   //TODO:
   /*  connect(volumetricRep, SIGNAL(imageChanged()),
           this, SLOT(react()));
@@ -220,10 +223,25 @@ void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible
   {
     disconnect(mDataManager, SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBox()));
+
     //TODO:
     //bool allregistered = this->checkRegistrationStatus() -> send out warning if not all images are registrated?
     //if !allregistered -> send out warning, not registrated images disables nav. and us. workflow?
     // ...or don't send out warning/error until pat. nav. or us.???
+
+    //clean up
+    VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
+    InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+    InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
+    InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+    disconnect(volumetricRep.get(), SIGNAL(pointPicked(double,double,double)),
+            inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
+    disconnect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
+            volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+    disconnect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
+            volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+    disconnect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
+            volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   }
 }
 void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
@@ -273,9 +291,6 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
 
   //get the landmarks from the image
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
-  std::cout << "==========================" << std::endl;
-  image->printLandmarks();
-  std::cout << "==========================" << std::endl;
   int numberOfLandmarks = landmarks->GetNumberOfTuples();
 
   //ready the table widget
@@ -307,7 +322,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
         columnOne = new QTableWidgetItem();
         columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
       }
-      else//if(row not already added...)
+      else
       {
         columnOne = new QTableWidgetItem();
         columnTwo = new QTableWidgetItem();
@@ -315,7 +330,6 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       columnTwo->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
-      //std::cout << "Setting (" << row << ", 0) and (" << row << ",1)" <<  std::endl;
     }
   }
   //fill in names
@@ -326,8 +340,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
     int index = it->first;
     int row = index-1;
     QTableWidgetItem* columnOne;
-    //std::cout << "Index before if is: " << index << std::endl;
-    //std::cout << "Rowcount before if is: " << mLandmarkTableWidget->rowCount() << std::endl;
+
     if(index > mLandmarkTableWidget->rowCount())
     {
       mLandmarkTableWidget->setRowCount(index);
@@ -339,9 +352,8 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
     }
     else
     {
-      //std::cout << "Trying to get item (" << row << ",0)" << std::endl;
       columnOne = mLandmarkTableWidget->item(row, 0);
-      if(columnOne == NULL)
+      if(columnOne == NULL) //TODO: remove
         std::cout << "columnOne == NULL!!!" << std::endl;
     }
     columnOne->setText(QString(name.c_str()));
@@ -372,7 +384,6 @@ void ImageRegistrationDockWidget::cellChangedSlot(int row,int column)
   std::string name = mLandmarkTableWidget->item(row, column)->text().toStdString();
 
   int index = row+1;
-  std::cout << "cellChangedSlot(): name: " << name << " index: " << index << std::endl;
   mRegistrationManager->setGlobalPointsNameSlot(index, name);
 }
 }//namespace cx

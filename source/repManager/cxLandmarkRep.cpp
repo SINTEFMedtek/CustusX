@@ -127,13 +127,14 @@ void LandmarkRep::removePermanentPoint(unsigned int index)
   unsigned int numberOfTextFollowerActors = mTextFollowerActors.size();
 
   vtkDoubleArrayPtr landmarks = mImage->getLandmarks();
-  for(int i=0; i<=numberOfLandmarksInImage; i++)
+  for(unsigned int i=0; i<numberOfLandmarksInImage; i++)
   {
     //Do NOT use landmarks->GetTupleValue(idNumber-1, point);
-    double* landmark = landmarks->GetTuple(i+1);
+    double* landmark = landmarks->GetTuple(i);
     if(landmark[3] == index)
     {
       emit removePermanentPoint(landmark[0], landmark[1], landmark[2], landmark[3]);
+      break;
     }
   }
 

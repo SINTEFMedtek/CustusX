@@ -17,6 +17,8 @@
  * \author: Janne Beate Bakeng, SINTEF
  */
 class vtkMetaDataSet;
+typedef vtkSmartPointer<class vtkViewImage2D> vtkViewImage2DPtr;
+typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
 namespace ssc
 {
 class View;
@@ -28,7 +30,6 @@ class Tool;
 class InriaRep2D : public ssc::RepImpl
 {
   typedef ssc::Transform3D Transform3D;
-  typedef vtkSmartPointer<class vtkViewImage2D> vtkViewImage2DPtr;
 
   Q_OBJECT
 public:
@@ -45,6 +46,13 @@ public:
   void removeTool(Tool* tool); ///< remove connection to a tool
   bool hasTool(Tool* tool); ///< check if a rep is connected to a specific tool
 
+signals:
+  void pointPicked(double x, double y, double z); ///< send out a signal every time current position changes
+
+public slots:
+  void pickSurfacePointSlot(vtkObject* object); ///< picks a point on the volumes surface
+  void syncSetPosition(double x, double y, double z); ///< sets the current position
+
 protected:
   vtkImageData* getImageDataFromVtkMetaDataSet(vtkMetaDataSet *dataset);
   virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -53,6 +61,8 @@ protected:
   std::string       mType;    ///< the reps type as a string
   Tool*             mTool;    ///< the tool that controls the rep
   vtkViewImage2DPtr mInria;   ///< the inria object
+
+  vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals og evnts between qt and vtk
 
 private slots:
   void toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp);

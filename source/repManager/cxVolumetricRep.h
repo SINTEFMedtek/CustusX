@@ -16,6 +16,7 @@ class vtkRenderer;
 class vtkActor;
 class vtkRenderWindowInteractor;
 typedef vtkSmartPointer<vtkActor> vtkActorPtr;
+typedef vtkSmartPointer<vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
 namespace cx
 {
@@ -37,9 +38,11 @@ public:
 
 signals:
   void addPermanentPoint(double x, double y, double z, unsigned int); ///< signal requesting this point be made permanent
+  void pointPicked(double x, double y, double z); /// the rep sends out a signal when the user picks a point on it
 
 public slots:
   void pickSurfacePointSlot(vtkObject* object); ///< picks a point on the volumes surface
+  void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
 
 protected:
   VolumetricRep(const std::string& uid, const std::string& name=""); ///< constructor
@@ -53,6 +56,7 @@ protected:
   int                 mThreshold;                       ///< used to picked the point together with the probefilter
   double              mCurrentX, mCurrentY, mCurrentZ;  ///< the last point that was successfully sampled
   vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
+  vtkRendererPtr      mCurrentRenderer;
 
   vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals og evnts between qt and vtk
 };
