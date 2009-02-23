@@ -4,7 +4,7 @@
 #include "sscToolManager.h"
 
 #include "itkCommand.h"
-
+#include "vtkSmartPointer.h"
 #include "cxTool.h"
 #include "cxTracker.h"
 
@@ -19,6 +19,7 @@
 class QDomNode;
 class QDomNodeList;
 class QTimer;
+typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 namespace cx
 {
@@ -58,6 +59,8 @@ public:
   void setConfigurationFile(std::string configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
   void setLoggingFolder(std::string loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
+  virtual vtkDoubleArrayPtr getToolSamples(); ///< \return all toolsamples defined .
+
 public slots:
   virtual void configure();
   virtual void initialize();
@@ -66,6 +69,12 @@ public slots:
 
 signals:
   void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
+  void toolSampleRemoved(double x, double y, double z, unsigned int index);
+  void toolSampleAdded(double x, double y, double z, unsigned int index);
+
+public slots:
+  void addToolSampleSlot(double x, double y, double z, unsigned int index);
+  void removeToolSampleSlot(double x, double y, double z, unsigned int index);
 
 protected slots:
   /**
@@ -144,6 +153,8 @@ protected:
                     ///< names of necessary tags in the configuration file
 
   igstk::PulseGenerator::Pointer mPulseGenerator;
+
+  vtkDoubleArrayPtr mToolSamples; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)
 
 private:
   ToolManager(ToolManager const&);

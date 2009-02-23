@@ -38,6 +38,8 @@ public:
   void setGlobalPointSetNameList(NameListType nameList);
   NameListType getGlobalPointSetNameList();
 
+  void doRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
+
 public slots:
   void setGlobalPointsNameSlot(int index, std::string name); ///< set the points (user) name
   void setGlobalPointsActiveSlot(int index, bool active); ///< set if the point should be used in matrix calc or not

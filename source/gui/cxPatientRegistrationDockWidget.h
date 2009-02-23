@@ -34,6 +34,8 @@ typedef ssc::Transform3D Transform3D;
 class RegistrationManager;
 class ToolManager;
 class MessageManager;
+class ViewManager;
+class RepManager;
 
 class PatientRegistrationDockWidget : public QDockWidget
 {
@@ -46,18 +48,19 @@ public:
 protected slots:
   void imageSelectedSlot(const QString& comboBoxText);
   void visibilityOfDockWidgetChangedSlot(bool visible);
+  void toolSampledUpdateSlot(double, double, double,unsigned int);
   void toolVisibleSlot(bool visible);
-  void toolSampleButtonClickedSlot(bool checked);
-
-  void landmarkSelectedSlot(int row, int column);
+  void toolSampleButtonClickedSlot();
+  void doRegistrationButtonClickedSlot();
+  void rowSelectedSlot(int row, int column);
   void populateTheImageComboBox();
-  
   void cellChangedSlot(int row, int column);
-  
   void dominantToolChangedSlot(const std::string& uid);
 
 protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
+  void updateAccuracy();
+  void doRegistration();
 
   QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
@@ -71,12 +74,15 @@ protected:
   RegistrationManager* mRegistrationManager;
   ToolManager* mToolManager;
   MessageManager* mMessageManager;
+  ViewManager* mViewManager;
+  RepManager* mRepManager;
 
   int mCurrentRow, mCurrentColumn;
   std::vector<bool> mLandmarkActiveVector;
-  
-  ToolPtr mToolToSample; 
-  
+
+  ToolPtr mToolToSample;
+  ssc::ImagePtr mCurrentImage;
+
 };
 }//namespace cx
 

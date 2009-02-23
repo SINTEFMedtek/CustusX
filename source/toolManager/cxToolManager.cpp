@@ -5,6 +5,7 @@
 #include <QList>
 #include <QDomDocument>
 #include <QMetaType>
+#include <vtkDoubleArray.h>
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxMessageManager.h"
@@ -272,6 +273,10 @@ void ToolManager::setConfigurationFile(std::string configurationFile)
 void ToolManager::setLoggingFolder(std::string loggingFolder)
 {
   mLoggingFolder = loggingFolder;
+}
+vtkDoubleArrayPtr ToolManager::getToolSamples()
+{
+  return mToolSamples;
 }
 void ToolManager::receiveToolReport(ToolMessage message, bool state, bool success, stdString uid)
 {
@@ -757,6 +762,39 @@ void ToolManager::checkTimeoutsAndRequestTransform()
     Tool* refTool = static_cast<Tool*>(mReferenceTool.get());
     static_cast<Tool*>((*it).second.get())->getPointer()->RequestComputeTransformTo(refTool->getPointer());
     it++;
+  }
+}
+void ToolManager::addToolSampleSlot(double x, double y, double z, unsigned int index)
+{
+  double addToolSample[4] = {x, y, z, (double)index};
+
+  int numberOfLandmarks = mToolSamples->GetNumberOfTuples();
+  //if index exists, we treat it as an edit operation
+  for(int i=0; i<= numberOfLandmarks-1; i++)
+  {
+    double* landmark = mToolSamples->GetTuple(i);
+    if(landmark[3] == index)
+    {
+      mToolSamples->SetTupleValue(i, addToolSample);
+      emit toolSampleAdded(x, y, z, index);
+      return;
+    }
+  }
+  //else it's an add operation
+  mToolSamples->InsertNextTupleValue(addToolSample);
+  emit toolSampleAdded(x,y,z,index);
+}
+void ToolManager::removeToolSampleSlot(double x, double y, double z, unsigned int index)
+{
+  int numberOfLandmarks = mToolSamples->GetNumberOfTuples();
+  for(int i=0; i<= numberOfLandmarks-1; i++)
+  {
+    double* landmark = mToolSamples->GetTuple(i);
+    if(landmark[3] == index)
+    {
+      mToolSamples->RemoveTuple(i);
+      emit toolSampleRemoved(x, y, z, index);
+    }
   }
 }
 }//namespace cx

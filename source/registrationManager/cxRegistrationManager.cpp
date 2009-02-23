@@ -54,6 +54,10 @@ RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList
 {
   return mGlobalPointSetNameList;
 }
+void RegistrationManager::doRegistration(ssc::ImagePtr image)
+{
+  //TODO
+}
 void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
 {
   if(name.empty())
