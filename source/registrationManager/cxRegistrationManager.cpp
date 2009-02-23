@@ -1,4 +1,8 @@
 #include "cxRegistrationManager.h"
+#include "cxToolmanager.h"
+#include "vtkPoints.h"
+#include "vtkDoubleArray.h"
+#include "vtkLandmarkTransform.h"
 
 /**
  * cxRegistrationManager.cpp
@@ -54,10 +58,41 @@ RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList
 {
   return mGlobalPointSetNameList;
 }
-void RegistrationManager::doRegistration(ssc::ImagePtr image)
+void RegistrationManager::doPatientRegistration()
 {
-  //TODO
+  // Bør sjekke om masterImage er satt ?
+  // Beregne transform kun basert på aktive punkter
+  vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
+  vtkDoubleArrayPtr imagePoints = this->getMasterImage()->getLandmarks();
+
+  vtkPointsPtr sourcePoints = vtkPointsPtr::New();
+  vtkPointsPtr targetPoints = vtkPointsPtr::New();
+  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
+
+	int numberOfPoints = toolPoints->GetNumberOfTuples();
+  for (int iPairNum = 0; iPairNum < numberOfPoints; iPairNum++)
+  {
+    double* sourcePoint = toolPoints->GetTuple(iPairNum);
+    double* targetPoint = imagePoints->GetTuple(iPairNum);
+    sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
+    targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+  }
+  
+  landmarktransform->SetSourceLandmarks(sourcePoints);
+  landmarktransform->SetTargetLandmarks(targetPoints);
+  landmarktransform->SetModeToSimilarity();
+  sourcePoints->Modified();
+  targetPoints->Modified();
+  landmarktransform->Update();
+  
+
 }
+void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
+{
+
+
+}
+
 void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
 {
   if(name.empty())

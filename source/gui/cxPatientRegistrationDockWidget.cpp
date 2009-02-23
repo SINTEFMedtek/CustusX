@@ -183,7 +183,7 @@ void PatientRegistrationDockWidget::toolSampledUpdateSlot(double notUsedX, doubl
   }
   if(numberOfActiveToolSamples >= 3 && numberOfToolSamples >= 3)
   {
-    this->doRegistration();
+    this->doPatientRegistration();
     this->updateAccuracy();
   }
 }
@@ -207,7 +207,7 @@ void PatientRegistrationDockWidget::toolSampleButtonClickedSlot()
 }
 void PatientRegistrationDockWidget::doRegistrationButtonClickedSlot()
 {
-  this->doRegistration();
+  this->doPatientRegistration();
   this->updateAccuracy();
 }
 void PatientRegistrationDockWidget::rowSelectedSlot(int row, int column)
@@ -410,8 +410,8 @@ void PatientRegistrationDockWidget::updateAccuracy()
 {
   //TODO
 }
-void PatientRegistrationDockWidget::doRegistration()
+void PatientRegistrationDockWidget::doPatientRegistration()
 {
-  mRegistrationManager->doRegistration(mCurrentImage);
+  mRegistrationManager->doPatientRegistration();
 }
 }//namespace cx

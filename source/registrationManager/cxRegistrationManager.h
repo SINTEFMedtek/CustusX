@@ -15,12 +15,15 @@
  */
 
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
+typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
+typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
 
 namespace cx
 {
 class RegistrationManager : public QObject
 {
   Q_OBJECT
+
 
 public:
   typedef std::pair<std::string, bool> StringBoolPair;
@@ -38,7 +41,8 @@ public:
   void setGlobalPointSetNameList(NameListType nameList);
   NameListType getGlobalPointSetNameList();
 
-  void doRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
+  void doPatientRegistration(); ///< registrates the master image to the patient
+  void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
 
 public slots:
   void setGlobalPointsNameSlot(int index, std::string name); ///< set the points (user) name

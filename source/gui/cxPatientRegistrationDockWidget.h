@@ -60,7 +60,7 @@ protected slots:
 protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
   void updateAccuracy();
-  void doRegistration();
+  void doPatientRegistration();
 
   QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
