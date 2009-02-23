@@ -135,9 +135,10 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
     mMessageManager->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
+
+  //disconnect from the old image
   if(mCurrentImage)
   {
-    //disconnect from the old image
     disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
     disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
@@ -266,10 +267,8 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
     mImagesComboBox->setEnabled(false);
     return;
   }
-  else
-  {
-    mImagesComboBox->setEnabled(true);
-  }
+
+  mImagesComboBox->setEnabled(true);
 
   //add these to the combobox
   typedef std::map<std::string, ssc::ImagePtr>::iterator iterator;
@@ -280,7 +279,7 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
     listPosition++;
   }
   //enable the add point button if any images was found
-  mAddLandmarkButton->setDisabled(false);
+  mAddLandmarkButton->setEnabled(true);
 }
 void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
 {
@@ -318,8 +317,12 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
     QTableWidgetItem* columnTwo;
 
     int rowToInsert = landmark[3]-1;
+    int tempRow = -1;
     if(rowToInsert < row)
+    {
+      tempRow = row;
       row = rowToInsert;
+    }
     for(; row <= rowToInsert; row++)
     {
       if(row == rowToInsert)
@@ -336,6 +339,8 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
     }
+    if(tempRow != -1)
+      row = tempRow;
   }
   //fill in names
   typedef RegistrationManager::NameListType::iterator Iterator;
