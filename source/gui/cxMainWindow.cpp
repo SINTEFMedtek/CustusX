@@ -239,6 +239,8 @@ void MainWindow::deactivateImageRegistationState()
 void MainWindow::activatePatientRegistrationState()
 {
   this->addDockWidget(Qt::LeftDockWidgetArea, mPatientRegistrationDockWidget);
+  mPatientRegistrationDockWidget->show();
+
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
 void MainWindow::deactivatePatientRegistrationState()
