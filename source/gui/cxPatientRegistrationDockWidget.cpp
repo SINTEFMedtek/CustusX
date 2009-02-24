@@ -347,6 +347,8 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
         mLandmarkActiveMap[row] = true;
         columnOne->setCheckState(Qt::Checked);
       }
+      columnTwo->setFlags(Qt::ItemIsSelectable);
+      columnThree->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
       mLandmarkTableWidget->setItem(row, 1, columnThree);

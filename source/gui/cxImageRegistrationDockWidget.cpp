@@ -363,7 +363,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       columnThree->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
-      mLandmarkTableWidget->setItem(row, 1, columnThree);
+      mLandmarkTableWidget->setItem(row, 2, columnThree);
     }
     if(tempRow != -1)
       row = tempRow;
@@ -383,12 +383,12 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       columnTwo = new QTableWidgetItem();
       QTableWidgetItem* columnThree = new QTableWidgetItem();
       columnThree->setFlags(Qt::ItemIsSelectable);
-      mLandmarkTableWidget->setItem(row, 0, columnTwo);
-      mLandmarkTableWidget->setItem(row, 1, columnThree);
+      mLandmarkTableWidget->setItem(row, 1, columnTwo);
+      mLandmarkTableWidget->setItem(row, 2, columnThree);
     }
     else
     {
-      columnTwo = mLandmarkTableWidget->item(row, 0);
+      columnTwo = mLandmarkTableWidget->item(row, 1);
       if(columnTwo == NULL) //TODO: remove
         std::cout << "columnOne == NULL!!!" << std::endl;
     }
