@@ -79,6 +79,8 @@ protected:
 
   int mCurrentRow, mCurrentColumn;
   std::map<int, bool> mLandmarkActiveMap;
+  vtkDoubleArrayPtr mLandmarkAccuracy;
+  double mTotalAccuracy;
 
   ToolPtr mToolToSample;
   ssc::ImagePtr mCurrentImage;

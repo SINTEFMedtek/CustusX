@@ -384,9 +384,35 @@ void PatientRegistrationDockWidget::updateAccuracy()
 {
   //ssc:Image masterImage = mRegistrationManager->getMasterImage();
   vtkDoubleArrayPtr globalPointset = mRegistrationManager->getGlobalPointSet();
-  vtkDoubleArrayPtr toolPointset = mToolManager->getToolSamples();
+  vtkDoubleArrayPtr toolSamplePointset = mToolManager->getToolSamples();
 
   ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
+  mLandmarkActiveMap = mRegistrationManager->getActivePointsMap();
+  std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
+
+  int numberOfGlobalImagePoints = globalPointset->GetNumberOfTuples();
+  int numberOfToolSamplePoints = toolSamplePointset->GetNumberOfTuples();
+  
+  for (int i=0; i < numberOfGlobalImagePoints; i++)
+  {
+    for(int j=0; j < numberOfToolSamplePoints; j++)
+    {
+      double* targetPoint = globalPointset->GetTuple(i);
+      double* sourcePoint = toolSamplePointset->GetTuple(j);
+      if(sourcePoint[3] == targetPoint[3])
+      {
+        if(mLandmarkActiveMap[sourcePoint[3]])
+        {
+          // Calculate accuracy - Set mLandmarkAccuracy
+          // double transformedPoint = 
+        } else {
+          // Set mLandmarkAccuracy to 1000 etc.
+        }
+
+      }
+    }
+  }
+
 }
 void PatientRegistrationDockWidget::doPatientRegistration()
 {
