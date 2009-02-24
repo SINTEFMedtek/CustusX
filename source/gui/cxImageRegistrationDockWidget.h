@@ -1,6 +1,7 @@
 #ifndef CXIMAGEREGISTRATIONDOCKWIDGET_H_
 #define CXIMAGEREGISTRATIONDOCKWIDGET_H_
 
+#include <map.h>
 #include <QDockWidget>
 #include "cxVolumetricRep.h"
 
@@ -70,6 +71,7 @@ protected:
   MessageManager* mMessageManager;
 
   ssc::ImagePtr mCurrentImage;
+  std::map<int, bool> mLandmarkActiveMap;
 
   int mCurrentRow, mCurrentColumn;
 };

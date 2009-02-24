@@ -62,13 +62,13 @@ RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList
 {
   return mGlobalPointSetNameList;
 }
-void RegistrationManager::setActivePointsVector(std::vector<bool> vector)
+void RegistrationManager::setActivePointsMap(std::map<int, bool> vector)
 {
-  mActivePointsVector = vector;
+  mActivePointsMap = vector;
 }
-std::vector<bool> RegistrationManager::getActivePointsVector()
+std::map<int, bool> RegistrationManager::getActivePointsMap()
 {
-  return mActivePointsVector;
+  return mActivePointsMap;
 }
 void RegistrationManager::doPatientRegistration()
 {
@@ -82,13 +82,20 @@ void RegistrationManager::doPatientRegistration()
   vtkPointsPtr targetPoints = vtkPointsPtr::New();
   vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
 
-	int numberOfPoints = toolPoints->GetNumberOfTuples();
-  for (int iPairNum = 0; iPairNum < numberOfPoints; iPairNum++)
+	int numberOfToolPoints = toolPoints->GetNumberOfTuples();
+	int numberOfImagePoints = imagePoints->GetNumberOfTuples();
+  for (int i=0; i < numberOfToolPoints; i++)
   {
-    double* sourcePoint = toolPoints->GetTuple(iPairNum);
-    double* targetPoint = imagePoints->GetTuple(iPairNum);
-    sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
-    targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+    for(int j=0; j < numberOfImagePoints; j++)
+    {
+      double* sourcePoint = toolPoints->GetTuple(i);
+      double* targetPoint = imagePoints->GetTuple(j);
+      if(sourcePoint[3] == targetPoint[3])
+      {
+        sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
+        targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+      }
+    }
   }
 
   landmarktransform->SetSourceLandmarks(sourcePoints);
@@ -117,13 +124,20 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   vtkPointsPtr targetPoints = vtkPointsPtr::New();
   vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
 
-  int numberOfPoints = imagePoints->GetNumberOfTuples();
-  for (int iPairNum = 0; iPairNum < numberOfPoints; iPairNum++)
+  int numberOfImagePoints = imagePoints->GetNumberOfTuples();
+  int numberOfMasterImagePoints = masterImagePoints->GetNumberOfTuples();
+  for (int i=0; i < numberOfImagePoints; i++)
   {
-    double* sourcePoint = imagePoints->GetTuple(iPairNum);
-    double* targetPoint = masterImagePoints->GetTuple(iPairNum);
-    sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
-    targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+    for(int j=0; j < numberOfMasterImagePoints; j++)
+    {
+      double* sourcePoint = imagePoints->GetTuple(i);
+      double* targetPoint = masterImagePoints->GetTuple(j);
+      if(sourcePoint[3] == targetPoint[3])
+      {
+        sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
+        targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+      }
+    }
   }
 
   landmarktransform->SetSourceLandmarks(sourcePoints);

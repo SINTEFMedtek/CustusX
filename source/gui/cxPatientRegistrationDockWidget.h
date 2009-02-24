@@ -78,7 +78,7 @@ protected:
   RepManager* mRepManager;
 
   int mCurrentRow, mCurrentColumn;
-  std::vector<bool> mLandmarkActiveVector;
+  std::map<int, bool> mLandmarkActiveMap;
 
   ToolPtr mToolToSample;
   ssc::ImagePtr mCurrentImage;

@@ -2,7 +2,6 @@
 #define CXREGISTRATIONMANAGER_H_
 
 #include <map.h>
-#include <vector.h>
 #include <QObject>
 #include "vtkSmartPointer.h"
 #include "sscImage.h"
@@ -44,8 +43,8 @@ public:
   void setGlobalPointSetNameList(NameListType nameList);
   NameListType getGlobalPointSetNameList();
 
-  void setActivePointsVector(std::vector<bool> vector);
-  std::vector<bool> getActivePointsVector();
+  void setActivePointsMap(std::map<int, bool> activePointsMap);
+  std::map<int, bool> getActivePointsMap();
 
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
@@ -65,7 +64,7 @@ protected:
   ssc::ImagePtr mMasterImage;
   vtkDoubleArrayPtr mGlobalPointSet;
   NameListType mGlobalPointSetNameList;
-  std::vector<bool> mActivePointsVector;
+  std::map<int, bool> mActivePointsMap;
 
 private:
   RegistrationManager(RegistrationManager const&);
