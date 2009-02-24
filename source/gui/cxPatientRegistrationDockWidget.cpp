@@ -113,7 +113,7 @@ void PatientRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxTex
 
   //Set new current image
   mCurrentImage = image;
-  mLandmarkTableWidget = mRegistrationManager->getActivePointsVector();
+  //mLandmarkTableWidget = mRegistrationManager->getActivePointsVector();
 
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(image);

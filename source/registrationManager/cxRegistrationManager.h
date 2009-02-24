@@ -2,6 +2,7 @@
 #define CXREGISTRATIONMANAGER_H_
 
 #include <map.h>
+#include <vector.h>
 #include <QObject>
 #include "vtkSmartPointer.h"
 #include "sscImage.h"
