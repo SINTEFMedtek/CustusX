@@ -373,7 +373,11 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
 }
 void PatientRegistrationDockWidget::updateAccuracy()
 {
-  //TODO
+  //ssc:Image masterImage = mRegistrationManager->getMasterImage();
+  vtkDoubleArrayPtr globalPointset = mRegistrationManager->getGlobalPointSet();
+  vtkDoubleArrayPtr toolPointset = mToolManager->getToolSamples();
+  
+  ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
 }
 void PatientRegistrationDockWidget::doPatientRegistration()
 {

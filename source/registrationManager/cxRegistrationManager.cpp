@@ -72,6 +72,7 @@ std::vector<bool> RegistrationManager::getActivePointsVector()
 }
 void RegistrationManager::doPatientRegistration()
 {
+  // TODO
   // Bør sjekke om masterImage er satt ?
   // Beregne transform kun basert på aktive punkter
   vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
