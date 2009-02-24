@@ -20,6 +20,8 @@ typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
 
 namespace cx
 {
+class ToolManager;
+
 class RegistrationManager : public QObject
 {
   Q_OBJECT
@@ -41,6 +43,9 @@ public:
   void setGlobalPointSetNameList(NameListType nameList);
   NameListType getGlobalPointSetNameList();
 
+  void setActivePointsVector(std::vector<bool> vector);
+  std::vector<bool> getActivePointsVector();
+
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
 
@@ -54,9 +59,12 @@ protected:
 
   static RegistrationManager* mCxInstance;
 
+  ToolManager* mToolManager;
+
   ssc::ImagePtr mMasterImage;
   vtkDoubleArrayPtr mGlobalPointSet;
   NameListType mGlobalPointSetNameList;
+  std::vector<bool> mActivePointsVector;
 
 private:
   RegistrationManager(RegistrationManager const&);

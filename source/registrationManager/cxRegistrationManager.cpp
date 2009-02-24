@@ -1,8 +1,11 @@
 #include "cxRegistrationManager.h"
-#include "cxToolmanager.h"
+
 #include "vtkPoints.h"
 #include "vtkDoubleArray.h"
 #include "vtkLandmarkTransform.h"
+#include "vtkMatrix4x4.h"
+#include "sscTransform3D.h"
+#include "cxToolmanager.h"
 
 /**
  * cxRegistrationManager.cpp
@@ -24,7 +27,8 @@ RegistrationManager* RegistrationManager::getInstance()
   }
   return mCxInstance;
 }
-RegistrationManager::RegistrationManager()
+RegistrationManager::RegistrationManager() :
+  mToolManager(ToolManager::getInstance())
 {
   //TODO
 }
@@ -58,6 +62,14 @@ RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList
 {
   return mGlobalPointSetNameList;
 }
+void RegistrationManager::setActivePointsVector(std::vector<bool> vector)
+{
+  mActivePointsVector = vector;
+}
+std::vector<bool> RegistrationManager::getActivePointsVector()
+{
+  return mActivePointsVector;
+}
 void RegistrationManager::doPatientRegistration()
 {
   // Bør sjekke om masterImage er satt ?
@@ -77,20 +89,53 @@ void RegistrationManager::doPatientRegistration()
     sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
     targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
   }
-  
+
   landmarktransform->SetSourceLandmarks(sourcePoints);
   landmarktransform->SetTargetLandmarks(targetPoints);
   landmarktransform->SetModeToSimilarity();
   sourcePoints->Modified();
   targetPoints->Modified();
   landmarktransform->Update();
-  
 
+  //update rMpr transform in ToolManager
+  vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
+  ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
+  mToolManager->set_rMpr(rMprPtr);
 }
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 {
+  //TODO
+  //use only active points
+  //check that the active points exists in the image
 
+  //calculate the transform from image to dataRef
+  vtkDoubleArrayPtr imagePoints = image->getLandmarks();
+  vtkDoubleArrayPtr masterImagePoints = mMasterImage->getLandmarks();
 
+  vtkPointsPtr sourcePoints = vtkPointsPtr::New();
+  vtkPointsPtr targetPoints = vtkPointsPtr::New();
+  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
+
+  int numberOfPoints = imagePoints->GetNumberOfTuples();
+  for (int iPairNum = 0; iPairNum < numberOfPoints; iPairNum++)
+  {
+    double* sourcePoint = imagePoints->GetTuple(iPairNum);
+    double* targetPoint = masterImagePoints->GetTuple(iPairNum);
+    sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
+    targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+  }
+
+  landmarktransform->SetSourceLandmarks(sourcePoints);
+  landmarktransform->SetTargetLandmarks(targetPoints);
+  landmarktransform->SetModeToSimilarity();
+  sourcePoints->Modified();
+  targetPoints->Modified();
+  landmarktransform->Update();
+
+  //set the transform on the image
+  vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
+  ssc::Transform3D transform(matrix);
+  image->setTransform(transform);
 }
 
 void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)

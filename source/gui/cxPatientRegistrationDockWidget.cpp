@@ -113,6 +113,7 @@ void PatientRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxTex
 
   //Set new current image
   mCurrentImage = image;
+  mLandmarkTableWidget = mRegistrationManager->getActivePointsVector();
 
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(image);
@@ -169,6 +170,9 @@ void PatientRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visib
   {
     disconnect(mDataManager, SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBox()));
+
+    //TODO
+    //update the activevector in registration manager
   }
 }
 void PatientRegistrationDockWidget::toolSampledUpdateSlot(double notUsedX, double notUsedY, double notUsedZ,unsigned int notUsedIndex)
@@ -331,6 +335,8 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
         columnTwo = new QTableWidgetItem();
         columnThree = new QTableWidgetItem();
       }
+      //TODO
+      //check the mLandmarkActiveVector...
       columnOne->setCheckState(Qt::Checked);
       //columnThree->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
@@ -364,47 +370,6 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
     }
     columnTwo->setText(QString(name.c_str()));
   }
-/*  typedef std::map<std::string, bool>::iterator Iterator;
-  int row = 1;
-  for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
-  {
-    std::string name = it->first;
-    QTableWidgetItem* columnOne = new QTableWidgetItem();
-    columnOne->setCheckState(Qt::Checked);
-    QTableWidgetItem* columnTwo = new QTableWidgetItem(tr(name.c_str()));
-    QTableWidgetItem* columnThree;
-    if(row <= numberOfLandmarks)
-    {
-      double* point = landmarks->GetTuple(row-1);
-      columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
-    }
-    else
-    {
-      columnTwo = new QTableWidgetItem(tr(" "));
-    }
-    columnThree->setFlags(Qt::ItemIsSelectable);
-
-    mLandmarkTableWidget->setItem(row-1, 0, columnOne);
-    mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
-    mLandmarkTableWidget->setItem(row-1, 2, columnThree);
-    mLandmarkActiveVector.push_back(true);
-    row++;
-  }
-  for(; row<=numberOfLandmarks; row++)
-  {
-    double* point = landmarks->GetTuple(row-1);
-
-    QTableWidgetItem* columnOne = new QTableWidgetItem();
-    columnOne->setCheckState(Qt::Checked);
-    QTableWidgetItem* columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(point[0]).arg(point[1]).arg(point[2]));
-    QTableWidgetItem* columnThree = new QTableWidgetItem(tr(" "));
-    columnThree->setFlags(Qt::ItemIsSelectable);
-
-    mLandmarkTableWidget->setItem(row-1, 0, columnOne);
-    mLandmarkTableWidget->setItem(row-1, 1, columnTwo);
-    mLandmarkTableWidget->setItem(row-1, 2, columnThree);
-    mLandmarkActiveVector.push_back(true);
-  }*/
 }
 void PatientRegistrationDockWidget::updateAccuracy()
 {
