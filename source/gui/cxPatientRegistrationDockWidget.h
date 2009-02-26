@@ -30,6 +30,7 @@ namespace cx
 {
 typedef ssc::DataManager DataManager;
 typedef ssc::Transform3D Transform3D;
+typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
 class RegistrationManager;
 class ToolManager;
@@ -79,8 +80,8 @@ protected:
 
   int mCurrentRow, mCurrentColumn;
   std::map<int, bool> mLandmarkActiveMap;
-  vtkDoubleArrayPtr mLandmarkAccuracy;
-  double mTotalAccuracy;
+  std::map<int, double> mLandmarkRegistrationAccuracyMap;
+  double mTotalRegistrationAccuracy;
 
   ToolPtr mToolToSample;
   ssc::ImagePtr mCurrentImage;

@@ -72,7 +72,7 @@ std::map<int, bool> RegistrationManager::getActivePointsMap()
 }
 void RegistrationManager::doPatientRegistration()
 {
-  // TODO
+  // TODO:
   // Bør sjekke om masterImage er satt ?
   // Beregne transform kun basert på aktive punkter
   vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
@@ -84,6 +84,7 @@ void RegistrationManager::doPatientRegistration()
 
 	int numberOfToolPoints = toolPoints->GetNumberOfTuples();
 	int numberOfImagePoints = imagePoints->GetNumberOfTuples();
+  
   for (int i=0; i < numberOfToolPoints; i++)
   {
     for(int j=0; j < numberOfImagePoints; j++)
@@ -92,8 +93,11 @@ void RegistrationManager::doPatientRegistration()
       double* targetPoint = imagePoints->GetTuple(j);
       if(sourcePoint[3] == targetPoint[3])
       {
-        sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
-        targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+        std::map<int, bool>::iterator it = mActivePointsMap.find(sourcePoint[3]);
+        if(!it->second) { // Insert pointset if state is active
+          sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
+          targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
+        }
       }
     }
   }

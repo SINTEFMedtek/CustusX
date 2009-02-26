@@ -10,6 +10,7 @@
 #include <vtkDoubleArray.h>
 
 #include "sscDataManager.h"
+#include "sscVector3D.h"
 #include "cxVolumetricRep.h"
 #include "cxLandmarkRep.h"
 #include "cxView2D.h"
@@ -184,6 +185,7 @@ void PatientRegistrationDockWidget::toolSampledUpdateSlot(double notUsedX, doubl
   {
     if(it->second)
       numberOfActiveToolSamples++;
+    it++;
   }
   if(numberOfActiveToolSamples >= 3 && numberOfToolSamples >= 3)
   {
@@ -306,6 +308,9 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
   for(int i=0; i<numberOfLandmarks; i++)
   {
     double* landmark = landmarks->GetTuple(i);
+    std::map<int, double>::iterator it = mLandmarkRegistrationAccuracyMap.find(landmark[3]);
+    double landmarkRegistrationAccuracy = it->second;
+    
     if(landmark[3] > mLandmarkTableWidget->rowCount())
       mLandmarkTableWidget->setRowCount(landmark[3]);
     QTableWidgetItem* columnOne;
@@ -325,7 +330,7 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
       {
         columnOne = new QTableWidgetItem();
         columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
-        columnThree = new QTableWidgetItem();
+        columnThree = new QTableWidgetItem(tr("%1").arg(landmarkRegistrationAccuracy));
       }
       else
       {
@@ -387,12 +392,18 @@ void PatientRegistrationDockWidget::updateAccuracy()
   vtkDoubleArrayPtr toolSamplePointset = mToolManager->getToolSamples();
 
   ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
-  mLandmarkActiveMap = mRegistrationManager->getActivePointsMap();
-  std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
 
   int numberOfGlobalImagePoints = globalPointset->GetNumberOfTuples();
   int numberOfToolSamplePoints = toolSamplePointset->GetNumberOfTuples();
-  
+
+  // First reset the accuracy table
+  for (int i=0; i < numberOfGlobalImagePoints; i++)
+  {
+    double* imagePoint = globalPointset->GetTuple(i);
+    mLandmarkRegistrationAccuracyMap[imagePoint[3]] = 1000;
+  }
+
+  // Calculate and fill the accuracy table
   for (int i=0; i < numberOfGlobalImagePoints; i++)
   {
     for(int j=0; j < numberOfToolSamplePoints; j++)
@@ -401,19 +412,39 @@ void PatientRegistrationDockWidget::updateAccuracy()
       double* sourcePoint = toolSamplePointset->GetTuple(j);
       if(sourcePoint[3] == targetPoint[3])
       {
-        if(mLandmarkActiveMap[sourcePoint[3]])
-        {
           // Calculate accuracy - Set mLandmarkAccuracy
-          // double transformedPoint = 
-        } else {
-          // Set mLandmarkAccuracy to 1000 etc.
-        }
+          //Vector3DPtr sourcePointVector = 
+          //  Vector3DPtr(new ssc::Vector3D(sourcePoint[0],
+          //                                sourcePoint[1], sourcePoint[2]));
+          //Vector3DPtr transformedPointVector = rMpr->coord(sourcePointVector);
+          ssc::Vector3D sourcePointVector(sourcePoint[0],
+                                          sourcePoint[1], sourcePoint[2]);
+          ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
+          mLandmarkRegistrationAccuracyMap[sourcePoint[3]] = 
+              sqrt(pow(transformedPointVector[0],2) + 
+                    pow(transformedPointVector[1],2) +
+                    pow(transformedPointVector[2],2));
 
       }
     }
   }
+  
+  // Calculate total registration accuracy
+  mTotalRegistrationAccuracy = 0;
+  std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
+  
+  for (int i=0; i < numberOfGlobalImagePoints; i++)
+  {
+    if(it->second)
+    {
+      mTotalRegistrationAccuracy = mTotalRegistrationAccuracy + 
+                                    mLandmarkRegistrationAccuracyMap[i];
+      it++;
+    }
+  }
 
 }
+
 void PatientRegistrationDockWidget::doPatientRegistration()
 {
   mRegistrationManager->doPatientRegistration();
