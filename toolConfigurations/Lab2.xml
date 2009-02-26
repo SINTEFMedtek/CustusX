@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<!-- Maybe just type (and rom+cal files) should be required, name=type if empty -->
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>USProbe</type>
+  <id>???</id>
+  <name>USProbe</name>
+  <description>GE Vingmed US-probe with NDI Sensor</description>
+  <manufacturer>SINTEF</manufacturer>
+  <clinical_app>Lab</clinical_app>
+  <geo_file>Lab_USProbe5S_Polaris_30092008_8700449.stl</geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type>USProbe</type>
+    <id>???</id>
+    <name>M12L</name>
+    <manufacturer>GE Vingmed</manufacturer>
+    <description>1.5D 12MHz Linear US-Probe</description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>8700449</id>
+    <name></name>
+    <manufacturer>NDI</manufacturer>
+    <description>Spectra passive tool rigid body, extra large</description>
+    <rom_file>Lab_USProbe_Polaris_30092008_8700449.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file>Lab_USProbe_Polaris_30092008_8700449.cal</cal_file>
+    <date>
+      <yyyy>2008</yyyy>
+      <mm>09</mm>
+      <dd>30</dd>
+    </date>
+    <time>
+      <hh>10</hh>
+      <mm>30</mm>
+      <ss>50</ss>
+    </time>
+  </calibration>
+
+</tool>
+
+
+</configuration>

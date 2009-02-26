@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>polaris_spectra</type>
+</tracker>
+
+
+<!-- Reference           -->
+<!-- =================== -->
+<tool>
+  <name>Reference</name>
+  <type>Reference</type>
+  <description>NDI/Vicra Passive Tool Rigid Body, Large/MD-8700339</description>
+  <clinical_app>Lab</clinical_app>
+  
+  <tracking_system>PolarisSpectra</tracking_system>
+  <rom_file>Lab_Reference_Spectra_30092008_8700339.rom</rom_file>
+  <cal_file></cal_file>
+  <cal_date>
+    <day>01</tool>
+    <month>01</month>
+    <year>2008</year>
+  </cal_date>
+  
+  <geo_file></tool>
+
+</tool>
+
+
+<!-- Pointer             -->
+<!-- =================== -->
+<tool>
+  <name>Pointer</name>
+  <type>Pointer</type>
+  <description>NDI/Vicra Passive Tool Probe/MD-8700340</description>
+  <clinical_app>Lab</clinical_app>
+  
+  <tracking_system>PolarisSpectra</tracking_system>
+  <rom_file>Lab_Pointer_Spectra_30092008_8700340.rom</rom_file>
+  <cal_file>Lab_Pointer_Spectra_30092008_8700340.cal</cal_file>
+  <cal_date>
+    <day>01</tool>
+    <month>01</month>
+    <year>2008</year>
+  </cal_date>
+  
+  <geo_file></tool>
+
+</tool>
+
+
+<!-- USProbe             -->
+<!-- =================== -->
+<tool>
+  <name>USProbe</name>
+  <type>USProbe</type>
+  <description>NDI/Spectra passive tool rigid body, extra large</description>
+  <clinical_app>Lab</clinical_app>
+  
+  <tracking_system>PolarisSpectra</tracking_system>
+  <rom_file>Lab_USProbe_Spectra_30092008_8700449.rom</rom_file>
+  <cal_file>Lab_USProbe_Spectra_30092008_8700449.cal</cal_file>
+  <cal_date>
+    <day>01</tool>
+    <month>01</month>
+    <year>2008</year>
+  </cal_date>
+  
+  <geo_file></tool>
+
+</tool>
+
+
+
+</configuration>

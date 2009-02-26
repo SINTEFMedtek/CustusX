@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<!-- Maybe just type (and rom+cal files) should be required, name=type if empty -->
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>reference</type>
+  <id>02-206-00913_SW_PasRef_01</id>
+  <name>Sonowand reference frame</name>
+  <description>Sonowand reference frame</description>
+  <manufacturer>Sonowand</manufacturer>
+  <clinical_app>Lab</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>02-206-00913_SW_PasRef_01</id>
+    <name>02-206-00913_SW_PasRef_01</name>
+    <wireless>yes</wireless>
+    <DOF></DOF>
+    <portnumber></portnumber>
+    <channelnumber></channelnumber>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file>Lab/02-206-00913_SW_PasRef_01.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file>Lab/02-206-00913_SW_PasRef_01.cal</cal_file>
+    <date>
+      <yyyy>2008</yyyy>
+      <mm>09</mm>
+      <dd>30</dd>
+    </date>
+    <time>
+      <hh>10</hh>
+      <mm>30</mm>
+      <ss>50</ss>
+    </time>
+  </calibration>
+</tool>
