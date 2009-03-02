@@ -108,7 +108,7 @@ void Tracker::attachTools(ToolMapPtr tools)
   //remove one node from the map (the one you haven't processed yet!),
   //I have no idea why this happens...
   std::map<std::string, ssc::ToolPtr> toolMap = *tools.get();
-  for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); it++ )
+  for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
   {
     ssc::Tool* toolPtr = ((*it).second).get();
     Tool* tool = static_cast<Tool*>(toolPtr);

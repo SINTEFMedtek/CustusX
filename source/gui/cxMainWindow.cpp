@@ -39,8 +39,8 @@ MainWindow::MainWindow() :
   mMessageManager(MessageManager::getInstance()),
   mCentralWidget(new QWidget()),
   mImageRegistrationDockWidget(new ImageRegistrationDockWidget()),
-  mPatientRegistrationDockWidget(new PatientRegistrationDockWidget()),
-  mCustomStatusBar(new CustomStatusBar())
+  mPatientRegistrationDockWidget(new PatientRegistrationDockWidget())
+  //mCustomStatusBar(new CustomStatusBar())
 {
   this->createActions();
   this->createToolBars();
@@ -52,6 +52,10 @@ MainWindow::MainWindow() :
   this->show();
 
   mViewManager->setCentralWidget(*mCentralWidget);
+
+  //debugging
+  connect(mToolManager, SIGNAL(toolManagerReport(std::string)),
+          this, SLOT(printSlot(std::string)));
 }
 MainWindow::~MainWindow()
 {}
@@ -168,7 +172,7 @@ void MainWindow::createToolBars()
 }
 void MainWindow::createStatusBar()
 {
-  this->setStatusBar(mCustomStatusBar);
+  //this->setStatusBar(mCustomStatusBar);
 }
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 {
@@ -330,5 +334,9 @@ void MainWindow::configureSlot()
   mToolManager->setLoggingFolder(loggingFolder.toStdString());
 
   mToolManager->configure();
+}
+void MainWindow::printSlot(std::string message)
+{
+  std::cout << message << std::endl;
 }
 }//namespace cx

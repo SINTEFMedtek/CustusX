@@ -61,6 +61,9 @@ protected slots:
   //tool menu
   void configureSlot();
 
+  //degugging
+  void printSlot(std::string message);
+
 
 protected:
   enum WorkflowState
@@ -132,7 +135,7 @@ protected:
   ImageRegistrationDockWidget* mImageRegistrationDockWidget;
   PatientRegistrationDockWidget* mPatientRegistrationDockWidget;
   //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
-  CustomStatusBar* mCustomStatusBar;
+  //CustomStatusBar* mCustomStatusBar; //TODO, not working yet
 
   //Prefrences
   QString mCurrentPatientDataFolder;

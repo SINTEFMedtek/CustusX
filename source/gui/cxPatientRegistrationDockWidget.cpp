@@ -203,11 +203,18 @@ void PatientRegistrationDockWidget::toolVisibleSlot(bool visible)
 void PatientRegistrationDockWidget::toolSampleButtonClickedSlot()
 {
   ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
+  if(lastTransform.get() == NULL)
+  {
+    std::cout << "if(lastTransform.get() == NULL)" << std::endl;
+    return;
+  }
   vtkMatrix4x4Ptr lastTransformMatrix = lastTransform->matrix();
   double x = lastTransformMatrix->GetElement(0,3);
   double y = lastTransformMatrix->GetElement(1,3);
   double z = lastTransformMatrix->GetElement(2,3);
 
+  if(mCurrentRow == -1)
+    mCurrentRow = 0;
   unsigned int index = mCurrentRow+1;
   mToolManager->addToolSampleSlot(x, y, z, index);
 }
@@ -268,19 +275,26 @@ void PatientRegistrationDockWidget::dominantToolChangedSlot(const std::string& u
   if(mToolToSample.get() != NULL && mToolToSample->getUid() == uid)
     return;
 
-  ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getTool(uid).get()));
+  //ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getTool(uid).get()));
+  ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
   if(mToolToSample.get() != NULL)
   {
     if(newTool.get() == NULL)
       return;
 
-    disconnect(mToolToSample.get(), SIGNAL(toolVisible()),
-                this, SLOT(toolVisibleSlot()));
+    disconnect(mToolToSample.get(), SIGNAL(toolVisible(bool)),
+                this, SLOT(toolVisibleSlot(bool)));
   }
 
   mToolToSample = newTool;
-  connect(mToolToSample.get(), SIGNAL(toolVisible()),
-              this, SLOT(toolVisibleSlot()));
+  connect(mToolToSample.get(), SIGNAL(toolVisible(bool)),
+              this, SLOT(toolVisibleSlot(bool)));
+
+  //TODO: REMOVE
+  ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
+  toolRep3D_1->setTool(mToolToSample);
+  View3D* view = mViewManager->get3DView("View3D_1");
+  view->addRep(toolRep3D_1);
 
   //update button
   mToolSampleButton->setEnabled(mToolToSample->getVisible());
@@ -310,7 +324,7 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
     double* landmark = landmarks->GetTuple(i);
     std::map<int, double>::iterator it = mLandmarkRegistrationAccuracyMap.find(landmark[3]);
     double landmarkRegistrationAccuracy = it->second;
-    
+
     if(landmark[3] > mLandmarkTableWidget->rowCount())
       mLandmarkTableWidget->setRowCount(landmark[3]);
     QTableWidgetItem* columnOne;
@@ -413,31 +427,31 @@ void PatientRegistrationDockWidget::updateAccuracy()
       if(sourcePoint[3] == targetPoint[3])
       {
           // Calculate accuracy - Set mLandmarkAccuracy
-          //Vector3DPtr sourcePointVector = 
+          //Vector3DPtr sourcePointVector =
           //  Vector3DPtr(new ssc::Vector3D(sourcePoint[0],
           //                                sourcePoint[1], sourcePoint[2]));
           //Vector3DPtr transformedPointVector = rMpr->coord(sourcePointVector);
           ssc::Vector3D sourcePointVector(sourcePoint[0],
                                           sourcePoint[1], sourcePoint[2]);
           ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
-          mLandmarkRegistrationAccuracyMap[sourcePoint[3]] = 
-              sqrt(pow(transformedPointVector[0],2) + 
+          mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
+              sqrt(pow(transformedPointVector[0],2) +
                     pow(transformedPointVector[1],2) +
                     pow(transformedPointVector[2],2));
 
       }
     }
   }
-  
+
   // Calculate total registration accuracy
   mTotalRegistrationAccuracy = 0;
   std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
-  
+
   for (int i=0; i < numberOfGlobalImagePoints; i++)
   {
     if(it->second)
     {
-      mTotalRegistrationAccuracy = mTotalRegistrationAccuracy + 
+      mTotalRegistrationAccuracy = mTotalRegistrationAccuracy +
                                     mLandmarkRegistrationAccuracyMap[i];
       it++;
     }

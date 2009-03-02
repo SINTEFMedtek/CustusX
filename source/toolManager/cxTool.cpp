@@ -127,7 +127,10 @@ ssc::Transform3DPtr Tool::getLastTransform()
 {
   ssc::Transform3DPtr lastTransform;
   if(mTransforms->size() > 0)
+  {
+    std::cout << "cx::Tool if(mTransforms->size() > 0)" << std::endl;
     lastTransform = mTransforms->at(mTransforms->size()-1);
+  }
   return lastTransform;
 }
 std::string Tool::getUid() const
@@ -188,6 +191,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     m_prMt = boost::shared_ptr<ssc::Transform3D>(new ssc::Transform3D(prMt));
 
+    mTransforms->push_back(m_prMt);
     emit toolTransformAndTimestamp(rMt, timestamp);
     emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);
   }

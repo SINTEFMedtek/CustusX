@@ -29,6 +29,7 @@ ToolManager* ToolManager::getInstance()
   if (mCxInstance == NULL)
   {
     mCxInstance = new ToolManager();
+    ssc::ToolManager::setInstance(mCxInstance);
   }
   return mCxInstance;
 }
@@ -63,7 +64,8 @@ ToolManager::ToolManager() :
   mToolSensorRomFileTag("rom_file"),
   mToolCalibrationTag("calibration"),
   mToolCalibrationFileTag("cal_file"),
-  mPulseGenerator(igstk::PulseGenerator::New())
+  mPulseGenerator(igstk::PulseGenerator::New()),
+  mToolSamples(vtkDoubleArray::New())
 {
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransform()));
