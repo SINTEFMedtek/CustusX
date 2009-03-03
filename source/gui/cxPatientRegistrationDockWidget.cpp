@@ -433,11 +433,11 @@ void PatientRegistrationDockWidget::updateAccuracy()
           //Vector3DPtr transformedPointVector = rMpr->coord(sourcePointVector);
           ssc::Vector3D sourcePointVector(sourcePoint[0],
                                           sourcePoint[1], sourcePoint[2]);
-          //ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
+          ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
           mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
-              sqrt(pow(sourcePointVector[0],2) +
-                    pow(sourcePointVector[1],2) +
-                    pow(sourcePointVector[2],2));
+              sqrt(pow(transformedPointVector[0],2) +
+                    pow(transformedPointVector[1],2) +
+                    pow(transformedPointVector[2],2));
 
       }
     }

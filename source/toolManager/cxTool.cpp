@@ -127,10 +127,7 @@ ssc::Transform3DPtr Tool::getLastTransform()
 {
   ssc::Transform3DPtr lastTransform;
   if(mTransforms->size() > 0)
-  {
-    std::cout << "cx::Tool if(mTransforms->size() > 0)" << std::endl;
     lastTransform = mTransforms->at(mTransforms->size()-1);
-  }
   return lastTransform;
 }
 std::string Tool::getUid() const
