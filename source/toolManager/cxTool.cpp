@@ -192,7 +192,8 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     m_prMt = boost::shared_ptr<ssc::Transform3D>(new ssc::Transform3D(prMt));
 
     mTransforms->push_back(m_prMt);
-    emit toolTransformAndTimestamp(rMt, timestamp);
+    //emit toolTransformAndTimestamp(rMt, timestamp);
+    emit toolTransformAndTimestamp(prMt, timestamp);
     emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);
   }
   //Successes

@@ -347,7 +347,8 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
         columnThree = new QTableWidgetItem();
       }
       //check the mLandmarkActiveVector...
-      std::map<int, bool>::iterator it = mLandmarkActiveMap.find(row);
+      int index =  row+1;
+      std::map<int, bool>::iterator it = mLandmarkActiveMap.find(index);
       if(it != mLandmarkActiveMap.end())
       {
         if(!it->second)
@@ -357,7 +358,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       }
       else
       {
-        mLandmarkActiveMap[row] = true;
+        mLandmarkActiveMap[index] = true;
         columnOne->setCheckState(Qt::Checked);
       }
       columnThree->setFlags(Qt::ItemIsSelectable);

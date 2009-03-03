@@ -74,6 +74,8 @@ ToolManager::ToolManager() :
 
   mPulseGenerator->RequestSetFrequency( 30.0);
   mPulseGenerator->RequestStart();
+
+  mToolSamples->SetNumberOfComponents(4);
 }
 ToolManager::~ToolManager()
 {}
@@ -252,6 +254,8 @@ ssc::Transform3DPtr ToolManager::get_rMpr() const
 }
 void ToolManager::set_rMpr(const ssc::Transform3DPtr& val)
 {
+  ssc::Transform3D trans = *val.get();
+  std::cout << "cxToolManager::set_rMpr: \n" << trans << std::endl;
   m_rMpr = val;
 }
 ssc::ToolPtr ToolManager::getReferenceTool() const

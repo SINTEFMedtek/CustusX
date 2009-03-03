@@ -1,5 +1,6 @@
 #include "cxRegistrationManager.h"
 
+#include "vtkMath.h"
 #include "vtkPoints.h"
 #include "vtkDoubleArray.h"
 #include "vtkLandmarkTransform.h"
@@ -76,6 +77,14 @@ void RegistrationManager::doPatientRegistration()
   // Bør sjekke om masterImage er satt ?
   // Beregne transform kun basert på aktive punkter
   vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
+  std::cout << "-----TOOLPOINTS----- " << std::endl;
+  toolPoints->Print(std::cout);
+  for(int i=0;i<toolPoints->GetNumberOfTuples();i++)
+  {
+    double* toolPoint = toolPoints->GetTuple(i);
+    std::cout << "Toolpoint: "<< i <<": (" << toolPoint[0] << "," << toolPoint[1] << "," << toolPoint[2] << ")" << std::endl;
+  }
+  std::cout << "-----TOOLPOINTS----- " << std::endl;
   vtkDoubleArrayPtr imagePoints = this->getMasterImage()->getLandmarks();
 
   vtkPointsPtr sourcePoints = vtkPointsPtr::New();
@@ -84,23 +93,34 @@ void RegistrationManager::doPatientRegistration()
 
 	int numberOfToolPoints = toolPoints->GetNumberOfTuples();
 	int numberOfImagePoints = imagePoints->GetNumberOfTuples();
-  
+
   for (int i=0; i < numberOfToolPoints; i++)
   {
     for(int j=0; j < numberOfImagePoints; j++)
     {
       double* sourcePoint = toolPoints->GetTuple(i);
       double* targetPoint = imagePoints->GetTuple(j);
+      std::cout << "sourcePoint[3] == targetPoint[3] : (" << sourcePoint[3] << "," << targetPoint[3] << ")" << std::endl;
       if(sourcePoint[3] == targetPoint[3])
       {
         std::map<int, bool>::iterator it = mActivePointsMap.find(sourcePoint[3]);
-        if(!it->second) { // Insert pointset if state is active
+        if(it->second)
+        {
+          // Insert pointset if state is active
+          std::cout << "Index: " << sourcePoint[3] << std::endl;;
           sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
           targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
         }
       }
     }
   }
+
+  std::cout << "-----SOURCE_POINTS----- " << std::endl;
+  sourcePoints->Print(std::cout);
+  std::cout << "-----SOURCE_POINTS----- " << std::endl;
+  std::cout << "-----TARGET_POINTS----- " << std::endl;
+  targetPoints->Print(std::cout);
+  std::cout << "-----TARGET_POINTS----- " << std::endl;
 
   landmarktransform->SetSourceLandmarks(sourcePoints);
   landmarktransform->SetTargetLandmarks(targetPoints);
@@ -109,8 +129,56 @@ void RegistrationManager::doPatientRegistration()
   targetPoints->Modified();
   landmarktransform->Update();
 
+  std::cout << "-----LANDMARKTRANSFORM----- " << std::endl;
+  landmarktransform->Print(std::cout);
+  std::cout << "-----LANDMARKTRANSFORM----- " << std::endl;
+
   //update rMpr transform in ToolManager
   vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
+
+  std::cout << "-----BEFORE_MATRIX----- " << std::endl;
+  matrix->Print(std::cout);
+  std::cout << "-----BEFORE_MATRIX----- " << std::endl;
+
+//  //Trying to normalize...
+//  double row1[3], row2[3], row3[3];
+//
+//  //row1
+//  row1[0] = matrix->GetElement(0,0);
+//  row1[1] = matrix->GetElement(1,0);
+//  row1[2] = matrix->GetElement(2,0);
+//  //row2
+//  row2[0] = matrix->GetElement(0,1);
+//  row2[1] = matrix->GetElement(1,1);
+//  row2[2] = matrix->GetElement(2,1);
+//  //row3
+//  row3[0] = matrix->GetElement(0,2);
+//  row3[1] = matrix->GetElement(1,2);
+//  row3[2] = matrix->GetElement(2,2);
+//
+//  vtkMath::Normalize(row1);
+//  vtkMath::Normalize(row2);
+//  vtkMath::Normalize(row3);
+//
+//  //row1
+//  matrix->SetElement(0,0,row1[0]);
+//  matrix->SetElement(1,0,row1[1]);
+//  matrix->SetElement(2,0,row1[2]);
+//  //row2
+//  matrix->SetElement(0,1,row2[0]);
+//  matrix->SetElement(1,1,row2[1]);
+//  matrix->SetElement(2,1,row2[2]);
+//  //row3
+//  matrix->SetElement(0,2,row3[0]);
+//  matrix->SetElement(1,2,row3[1]);
+//  matrix->SetElement(2,2,row3[2]);
+//
+//  matrix->Modified();
+//
+//  std::cout << "-----AFTER_MATRIX----- " << std::endl;
+//  matrix->Print(std::cout);
+//  std::cout << "-----AFTER_MATRIX----- " << std::endl;
+
   ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
   mToolManager->set_rMpr(rMprPtr);
 }

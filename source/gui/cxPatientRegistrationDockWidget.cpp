@@ -370,7 +370,7 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
       columnThree->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
-      mLandmarkTableWidget->setItem(row, 1, columnThree);
+      mLandmarkTableWidget->setItem(row, 2, columnThree);
     }
     if(tempRow != -1)
       row = tempRow;
@@ -457,6 +457,8 @@ void PatientRegistrationDockWidget::updateAccuracy()
     }
   }
 
+  //make sure the accuracy is filled in the table widget
+  this->populateTheLandmarkTableWidget(mCurrentImage);
 }
 
 void PatientRegistrationDockWidget::doPatientRegistration()

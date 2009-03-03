@@ -337,6 +337,6 @@ void MainWindow::configureSlot()
 }
 void MainWindow::printSlot(std::string message)
 {
-  std::cout << message << std::endl;
+  //std::cout << message << std::endl;
 }
 }//namespace cx
