@@ -73,7 +73,7 @@ std::map<int, bool> RegistrationManager::getActivePointsMap()
 }
 void RegistrationManager::doPatientRegistration()
 {
-  // TODO:
+  // TODO
   // Bør sjekke om masterImage er satt ?
 
   vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
