@@ -123,8 +123,6 @@ ssc::ImagePtr LandmarkRep::getImage() const
 void LandmarkRep::removePermanentPoint(unsigned int index)
 {
   unsigned int numberOfLandmarksInImage = this->getNumberOfLandmarks();
-  unsigned int numberOfSkinpointActors = mSkinPointActors.size();
-  unsigned int numberOfTextFollowerActors = mTextFollowerActors.size();
 
   vtkDoubleArrayPtr landmarks = mImage->getLandmarks();
   for(unsigned int i=0; i<numberOfLandmarksInImage; i++)

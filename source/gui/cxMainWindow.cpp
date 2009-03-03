@@ -7,10 +7,7 @@
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QFileInfo>
-#include <vtkPiecewiseFunction.h> //TODO: REMOVE?
-#include <vtkColorTransferFunction.h> //TODO: REMOVE?
 #include "sscDataManager.h"
-#include "sscImageTF3D.h" //TODO: REMOVE?
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
@@ -172,6 +169,7 @@ void MainWindow::createToolBars()
 }
 void MainWindow::createStatusBar()
 {
+  //TODO, not working as intended
   //this->setStatusBar(mCustomStatusBar);
 }
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
@@ -306,9 +304,6 @@ void MainWindow::loadDataSlot()
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
     ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-/*    vtkPiecewiseFunctionPtr opacityFunc = image->transferFunctions3D().getOpacityTF();
-    vtkColorTransferFunctionPtr colorFunc = image->transferFunctions3D().getColorTF();
-    opacityFunc->*/
     mMessageManager->sendInfo("Meta data loaded.");
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {

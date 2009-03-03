@@ -49,7 +49,7 @@ private:
   /** Copycontructur.*/
   MessageManager(const MessageManager&){this->getInstance();};
   /** Assignment operator*/
-  MessageManager& operator=(const MessageManager&){};
+  MessageManager& operator=(const MessageManager&){return *this->getInstance();};
   /** Emits the signal that actually sends the message.*/
   void sendMessage(QString &message, int timeout);
 

@@ -1,4 +1,4 @@
-/*
+/**
  * cxCustomStatusBar.h
  *
  *  Created on: Jan 21, 2009

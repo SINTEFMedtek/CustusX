@@ -61,6 +61,7 @@ protected slots:
   //tool menu
   void configureSlot();
 
+  //TODO: REMOVE
   //degugging
   void printSlot(std::string message);
 
@@ -78,7 +79,7 @@ protected:
   void createActions();
   void createMenus();
   void createToolBars();
-  void createStatusBar();
+  void createStatusBar(); //TODO
 
   //Takes care of removing and adding widgets depending on which workflow state the system is in
   void changeState(WorkflowState fromState, WorkflowState toState);

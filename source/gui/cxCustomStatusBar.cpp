@@ -7,7 +7,7 @@
 #include "cxMessageManager.h"
 #include <QPixmap>
 #include <QMetaObject>
-/*
+/**
  * cxCustomStatusBar.cpp
  *
  *  Created on: Jan 21, 2009
