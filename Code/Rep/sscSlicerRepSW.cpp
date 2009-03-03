@@ -95,11 +95,11 @@ void SliceRepSW::doSliceing()
 	}
 
 	mReslicer->SetInput(mImage->getRefVtkImageData());
+	mReslicer->AutoCropOutputOn();	
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->GetOutput()->UpdateInformation();
 	mReslicer->SetOutputDimensionality( 2);
 	mReslicer->SetResliceAxes(mMatrixAxes) ;
-	mReslicer->SetAutoCropOutput(false);
 
 	mWindowLevel->SetInputConnection(mReslicer->GetOutputPort() );
 	mImageActor->SetInput( mWindowLevel->GetOutput() );

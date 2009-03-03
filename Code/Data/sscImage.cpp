@@ -26,6 +26,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 #ifdef USE_TRANSFORM_RESCLICER
 	//mBaseImageData->ReleaseDataFlagOn();
 	mOrientator = vtkImageReslicePtr::New();
+	mOrientator->AutoCropOutputOn();	
 	mOrientator->SetInput(mBaseImageData);
 	mOutputImageData = mOrientator->GetOutput();
 	mOutputImageData->Update();

@@ -76,7 +76,7 @@ void SlicerRep::create()
 	mReslicer->GetOutput()->UpdateInformation();
 	mReslicer->SetOutputDimensionality ( 2 );
 	mReslicer->SetResliceAxes ( mMatrixAxes ) ;
-	mReslicer->SetAutoCropOutput(false);
+	mReslicer->SetAutoCropOutputOn();
 
 	mWindowLevel->SetInputConnection ( mReslicer->GetOutputPort() );
 	mImageActor->SetInput ( mWindowLevel->GetOutput() );
