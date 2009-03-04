@@ -39,7 +39,6 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
   mImagesComboBox(new QComboBox(mGuiContainer)),
   mLandmarkTableWidget(new QTableWidget(mGuiContainer)),
   mToolSampleButton(new QPushButton("Sample Tool", mGuiContainer)),
-  mDoRegistrationButton(new QPushButton("Do Registration", mGuiContainer)),
   mAccuracyLabel(new QLabel(QString(" "),mGuiContainer)),
   mDataManager(DataManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
@@ -72,9 +71,6 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
   mToolSampleButton->setDisabled(true);
   connect(mToolSampleButton, SIGNAL(clicked()),
           this, SLOT(toolSampleButtonClickedSlot()));
-  mDoRegistrationButton->setDisabled(true);
-  connect(mDoRegistrationButton, SIGNAL(clicked()),
-          this, SLOT(doRegistrationButtonClickedSlot()));
 
   //toolmanager
   connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)),
@@ -88,7 +84,6 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
   mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
-  mVerticalLayout->addWidget(mDoRegistrationButton);
   mVerticalLayout->addWidget(mAccuracyLabel);
 
   ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
@@ -215,11 +210,6 @@ void PatientRegistrationDockWidget::toolSampleButtonClickedSlot()
     mCurrentRow = 0;
   unsigned int index = mCurrentRow+1;
   mToolManager->addToolSampleSlot(x, y, z, index);
-}
-void PatientRegistrationDockWidget::doRegistrationButtonClickedSlot()
-{
-  this->doPatientRegistration();
-  this->updateAccuracy();
 }
 void PatientRegistrationDockWidget::rowSelectedSlot(int row, int column)
 {
@@ -425,7 +415,7 @@ void PatientRegistrationDockWidget::updateAccuracy()
       if(sourcePoint[3] == targetPoint[3])
       {
         //check the mLandmarkActiveVector...
-        std::map<int, bool>::iterator it = mLandmarkActiveMap.find(row);
+        std::map<int, bool>::iterator it = mLandmarkActiveMap.find(sourcePoint[3]);
         if(it != mLandmarkActiveMap.end())
         {
           if(!it->second)
@@ -452,6 +442,7 @@ void PatientRegistrationDockWidget::updateAccuracy()
         }
       }
     }
+  }
 
   // Calculate total registration accuracy
   mTotalRegistrationAccuracy = 0;

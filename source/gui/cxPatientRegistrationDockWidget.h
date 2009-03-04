@@ -52,7 +52,6 @@ protected slots:
   void toolSampledUpdateSlot(double, double, double,unsigned int);
   void toolVisibleSlot(bool visible);
   void toolSampleButtonClickedSlot();
-  void doRegistrationButtonClickedSlot();
   void rowSelectedSlot(int row, int column);
   void populateTheImageComboBox();
   void cellChangedSlot(int row, int column);
@@ -68,7 +67,6 @@ protected:
   QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;
   QPushButton* mToolSampleButton;
-  QPushButton* mDoRegistrationButton;
   QLabel* mAccuracyLabel;
 
   DataManager* mDataManager;
