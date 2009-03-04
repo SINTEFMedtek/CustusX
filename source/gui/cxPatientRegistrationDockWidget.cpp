@@ -204,10 +204,8 @@ void PatientRegistrationDockWidget::toolSampleButtonClickedSlot()
 {
   ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
   if(lastTransform.get() == NULL)
-  {
-    std::cout << "if(lastTransform.get() == NULL)" << std::endl;
     return;
-  }
+
   vtkMatrix4x4Ptr lastTransformMatrix = lastTransform->matrix();
   double x = lastTransformMatrix->GetElement(0,3);
   double y = lastTransformMatrix->GetElement(1,3);
@@ -434,11 +432,19 @@ void PatientRegistrationDockWidget::updateAccuracy()
           ssc::Vector3D sourcePointVector(sourcePoint[0],
                                           sourcePoint[1], sourcePoint[2]);
           ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
-          mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
+
+          double xAccuracy = targetPoint[0] - transformedPointVector[0];
+          double yAccuracy = targetPoint[1] - transformedPointVector[1];
+          double zAccuracy = targetPoint[2] - transformedPointVector[2];
+
+          /*mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
               sqrt(pow(transformedPointVector[0],2) +
                     pow(transformedPointVector[1],2) +
-                    pow(transformedPointVector[2],2));
-
+                    pow(transformedPointVector[2],2));*/
+          mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
+              sqrt(pow(xAccuracy,2) +
+                    pow(yAccuracy,2) +
+                    pow(zAccuracy,2));
       }
     }
   }
