@@ -424,35 +424,38 @@ void PatientRegistrationDockWidget::updateAccuracy()
       double* sourcePoint = toolSamplePointset->GetTuple(j);
       if(sourcePoint[3] == targetPoint[3])
       {
-          // Calculate accuracy - Set mLandmarkAccuracy
-          //Vector3DPtr sourcePointVector =
-          //  Vector3DPtr(new ssc::Vector3D(sourcePoint[0],
-          //                                sourcePoint[1], sourcePoint[2]));
-          //Vector3DPtr transformedPointVector = rMpr->coord(sourcePointVector);
-          ssc::Vector3D sourcePointVector(sourcePoint[0],
-                                          sourcePoint[1], sourcePoint[2]);
-          ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
+        //check the mLandmarkActiveVector...
+        std::map<int, bool>::iterator it = mLandmarkActiveMap.find(row);
+        if(it != mLandmarkActiveMap.end())
+        {
+          if(!it->second)
+          {
+            // Calculate accuracy - Set mLandmarkAccuracy
+            ssc::Vector3D sourcePointVector(sourcePoint[0],
+                                            sourcePoint[1],
+                                            sourcePoint[2]);
+            ssc::Vector3D transformedPointVector = rMpr->coord(sourcePointVector);
 
-          double xAccuracy = targetPoint[0] - transformedPointVector[0];
-          double yAccuracy = targetPoint[1] - transformedPointVector[1];
-          double zAccuracy = targetPoint[2] - transformedPointVector[2];
+            double xAccuracy = targetPoint[0] - transformedPointVector[0];
+            double yAccuracy = targetPoint[1] - transformedPointVector[1];
+            double zAccuracy = targetPoint[2] - transformedPointVector[2];
 
-          /*mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
-              sqrt(pow(transformedPointVector[0],2) +
-                    pow(transformedPointVector[1],2) +
-                    pow(transformedPointVector[2],2));*/
-          mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
-              sqrt(pow(xAccuracy,2) +
-                    pow(yAccuracy,2) +
-                    pow(zAccuracy,2));
+            /*mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
+                sqrt(pow(transformedPointVector[0],2) +
+                      pow(transformedPointVector[1],2) +
+                      pow(transformedPointVector[2],2));*/
+            mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
+                sqrt(pow(xAccuracy,2) +
+                     pow(yAccuracy,2) +
+                     pow(zAccuracy,2));
+          }
+        }
       }
     }
-  }
 
   // Calculate total registration accuracy
   mTotalRegistrationAccuracy = 0;
   std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
-
   for (int i=0; i < numberOfGlobalImagePoints; i++)
   {
     if(it->second)
