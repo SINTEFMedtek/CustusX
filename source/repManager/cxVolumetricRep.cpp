@@ -245,6 +245,7 @@ void VolumetricRep::addRepActorsToViewRenderer(ssc::View* view)
     return;
   }
   ssc::VolumetricRep::addRepActorsToViewRenderer(view);
+  view->getRenderer()->ResetCamera();
 
   mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
                        vtkCommand::LeftButtonPressEvent,

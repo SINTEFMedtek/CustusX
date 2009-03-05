@@ -211,6 +211,7 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     }
     it2++;
   }
+  view->getRenderer()->ResetCamera();
 }
 void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
