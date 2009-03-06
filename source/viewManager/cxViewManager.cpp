@@ -2,6 +2,8 @@
 
 #include <QGridLayout>
 #include <QWidget>
+#include <QTimer>
+#include "vtkRenderWindow.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxMessageManager.h"
@@ -34,7 +36,8 @@ ViewManager::ViewManager() :
   mCurrentLayoutType(LAYOUT_NONE),
   mLayout(new QGridLayout()),
   MAX_3DVIEWS(2),
-  MAX_2DVIEWS(9)
+  MAX_2DVIEWS(9),
+  mRenderingTimer(new QTimer(this))
 {
   mLayout->setSpacing(1);
 
@@ -62,6 +65,11 @@ ViewManager::ViewManager() :
   }
 
   this->setLayoutTo_3DACS_2X2();
+
+  mRenderingTimer->start(33);
+  connect(mRenderingTimer, SIGNAL(timeout()),
+          this, SLOT(void renderAllViewsSlot()));
+
 }
 ViewManager::~ViewManager()
 {}
@@ -315,5 +323,18 @@ void ViewManager::deactivateLayout_ACSACS_2X3()
   mLayout->removeWidget( mView2DMap[mView2DNames[3]]);
   mLayout->removeWidget( mView2DMap[mView2DNames[4]]);
   mLayout->removeWidget( mView2DMap[mView2DNames[5]]);
+}
+void ViewManager::renderAllViewsSlot()
+{
+  View3DMap::iterator it3D = mView3DMap.begin();
+  for(; it3D != mView3DMap.end(); ++it3D)
+  {
+    it3D->second->getRenderWindow()->Render();
+  }
+  View2DMap::iterator it2D = mView2DMap.begin();
+  for(; it2D != mView2DMap.end(); ++it2D)
+  {
+    it2D->second->getRenderWindow()->Render();
+  }
 }
 }//namespace cx

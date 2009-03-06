@@ -14,6 +14,7 @@
  */
 class QGridLayout;
 class QWidget;
+class QTimer;
 namespace ssc
 {
 class View;
@@ -72,6 +73,8 @@ protected:
   void activateLayout_ACSACS_2X3();
   void deactivateLayout_ACSACS_2X3();
 
+  void renderAllViewsSlot(); ///< renders all views
+
   static ViewManager* mTheInstance; ///< the only instance of this class
   MessageManager*     mMessageManager; ///< device for sending messages to the statusbar
 
@@ -85,6 +88,8 @@ protected:
   std::string   mView2DNames[9];  ///< the name of all the 2D views
   View2DMap     mView2DMap;       ///< a map of all the 3D views
   View3DMap     mView3DMap;       ///< a map of all the 2D views
+
+  QTimer*       mRenderingTimer;  ///< timer that drives rendering
 
 private:
   ViewManager(ViewManager const&);
