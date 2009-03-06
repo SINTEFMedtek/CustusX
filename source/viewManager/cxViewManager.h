@@ -60,6 +60,9 @@ public slots:
   void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
   void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
 
+protected slots:
+  void renderAllViewsSlot(); ///< renders all views
+
 protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
@@ -72,8 +75,6 @@ protected:
   void deactivateLayout_3DACS_1X3();
   void activateLayout_ACSACS_2X3();
   void deactivateLayout_ACSACS_2X3();
-
-  void renderAllViewsSlot(); ///< renders all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
   MessageManager*     mMessageManager; ///< device for sending messages to the statusbar

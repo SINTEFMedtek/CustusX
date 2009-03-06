@@ -68,7 +68,7 @@ ViewManager::ViewManager() :
 
   mRenderingTimer->start(33);
   connect(mRenderingTimer, SIGNAL(timeout()),
-          this, SLOT(void renderAllViewsSlot()));
+          this, SLOT(renderAllViewsSlot()));
 
 }
 ViewManager::~ViewManager()
