@@ -91,7 +91,8 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 	//Create the objects
 	std::string testFile1 = TestUtilities::ExpandDataFileName("/Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::string testFile2 = TestUtilities::ExpandDataFileName("/MetaImage/20070309T105136_MRT1.mhd");
-
+	
+	
 	mImagePtr1 = DataManager::getInstance()->loadImage(testFile1, rtMETAIMAGE);
 	mImagePtr2 = DataManager::getInstance()->loadImage(testFile2, rtMETAIMAGE);
 
