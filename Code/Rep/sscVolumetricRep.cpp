@@ -33,18 +33,14 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	
 	double maxVal = 255;
 	mOpacityTransferFunction->AddPoint(0.0, 0.0);
-		mOpacityTransferFunction->AddPoint(maxVal, 1.0);
+	mOpacityTransferFunction->AddPoint(maxVal, 1.0);
 
-		mColorTransferFunction->SetColorSpaceToRGB();
-		mColorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-		mColorTransferFunction->AddRGBPoint(maxVal, 1.0, 1.0, 1.0);
-
-	
-	
+	mColorTransferFunction->SetColorSpaceToRGB();
+	mColorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
+	mColorTransferFunction->AddRGBPoint(maxVal, 1.0, 1.0, 1.0);
 	
 	mVolumeProperty->SetColor(mColorTransferFunction);
-	mVolumeProperty->SetScalarOpacity(mOpacityTransferFunction);
-	
+	mVolumeProperty->SetScalarOpacity(mOpacityTransferFunction);	
 	mVolumeProperty->SetInterpolationTypeToLinear();
 
 	// from snw
@@ -100,19 +96,8 @@ ImagePtr VolumetricRep::getImage()
 {
 	return mImage;
 }
-void VolumetricRep::setInput(vtkImageDataPtr input)
-{
-	std::cout<<"Blending mode on "<<std::endl;
-	if (mImage)
-	{
-		mImage->disconnectRep(mSelf);
-		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-		mImage.reset();
-	}
-	
-	mTextureMapper3D->SetInput(input);
-}
+
+
 
 void VolumetricRep::setImage(ImagePtr image)
 {
