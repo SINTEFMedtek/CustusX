@@ -35,6 +35,7 @@ public:
 	Transform3D inv() const; ///< return an inverted transform M^-1
 	void operator*=(const Transform3D& rhs); ///< multiply two transforms as if they were matrices
 	std::ostream& put(std::ostream& s, int indent=0, char newline='\n') const;
+	boost::array<double, 16> flatten() const;
 
 //	Vector3D getIVector() const; ///< get the first column vector
 //	Vector3D getJVector() const; ///< get the second column vector

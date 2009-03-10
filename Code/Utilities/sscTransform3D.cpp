@@ -113,6 +113,23 @@ std::ostream& Transform3D::put(std::ostream& s, int indent, char newline) const
 	return s;
 }
 
+/**Return the matrix a a flat array with 16 elements.
+ * 
+ */
+boost::array<double, 16> Transform3D::flatten() const
+{
+	boost::array<double, 16> retval;
+	for (unsigned i=0; i<4; ++i)
+	{
+		for (unsigned j=0; j<4; ++j)
+		{
+			retval[i*4+j] = mMatrix->GetElement(i,j);
+		}
+	}
+	return retval;
+}
+
+
 std::ostream& operator<<(std::ostream& s, const Transform3D& t)
 {
 	return t.put(s, 0, '\n');
