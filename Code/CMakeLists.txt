@@ -32,7 +32,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscImageBlenderProxy.h
     Rep/sscToolRep3D.h    
     Rep/sscVolumetricRep.h    
-    Rep/sscSlicePlaneRep.h
+   # Rep/sscSlicePlaneRep.h
     Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscBlendedSliceRep.h
     Rep/sscSlicedImageProxy.h
@@ -87,7 +87,7 @@ SET( SSC_SOURCE_FILES
     Rep/sscToolRep3D.cpp
     Rep/sscSlicerRepSW.cpp
     Rep/sscSliceProxy.cpp
-    Rep/sscSlicePlaneRep.cpp
+   # Rep/sscSlicePlaneRep.cpp
     Rep/sscSlicedImageProxy.cpp
     Rep/sscImageBlenderProxy.cpp
     Rep/sscBlendedSliceRep.cpp
