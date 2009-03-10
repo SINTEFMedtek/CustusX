@@ -32,6 +32,7 @@
 #include "sscSlicerRepSW.h"
 #include "sscSlicePlaneRep.h"
 
+
 using ssc::Vector3D;
 using ssc::Transform3D;
 

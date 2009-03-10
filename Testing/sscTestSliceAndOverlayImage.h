@@ -8,10 +8,12 @@
 #include "sscImage.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
+#include "sscSurfaceRep.h"
 #include "sscBlendedSliceRep.h"
-#include "sscImageBlenderProxy.h"
 #include "sscSlicedImageProxy.h"
-#include "sscSurfaceRep.h" 
+
+
+
 
 class SingleLayout
 {
