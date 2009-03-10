@@ -35,7 +35,6 @@ target_link_libraries( TestSliceRep SSC )
 add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
 
 # sscTestSliceAndToolRep
-
 SET( SSCSliceAndToolRep_QT_MOC_HEADER_FILES
     sscTestSliceAndToolRep.h
    )
@@ -46,7 +45,29 @@ add_executable(TestSliceAndToolRep MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSlic
 target_link_libraries( TestSliceAndToolRep SSC )	
 add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
 
+#sscTestSlicePlaneRep
+SET( sscTestSlicePlaneRep_QT_MOC_HEADER_FILES
+    sscTestSlicePlaneRep.h
+   )
+set( MOC_HEADER_FILES )
+QT4_WRAP_CPP( MOC_HEADER_FILES ${sscTestSlicePlaneRep_QT_MOC_HEADER_FILES} )
 
+add_executable(TestPlaneRep MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSlicePlaneRep.cpp)
+target_link_libraries( TestPlaneRep SSC )	
+add_test(TestPlaneRep ${EXECUTABLE_OUTPUT_PATH}/TestPlaneRep)
+
+
+#sscTestSliceAndOverlayImage
+SET( sscTestSliceAndOverlayImage_QT_MOC_HEADER_FILES
+    sscTestSliceAndOverlayImage.h    
+   )
+set( MOC_HEADER_FILES )
+QT4_WRAP_CPP( MOC_HEADER_FILES ${sscTestSliceAndOverlayImage_QT_MOC_HEADER_FILES} )
+add_executable(TestSliceAndOverlayImage MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSliceAndOverlayImage.cpp)
+target_link_libraries( TestSliceAndOverlayImage SSC )	
+add_test(TestSliceAndOverlayImage ${EXECUTABLE_OUTPUT_PATH}/TestSliceAndOverlayImage)
+
+#sscTestCPPunit tes
 add_executable(sscTestCPPUnit
     sscCPPUnitMain.cpp
     sscTestSliceComputer.cpp )

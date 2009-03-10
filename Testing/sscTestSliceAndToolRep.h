@@ -11,10 +11,9 @@ class SingleLayout
 {
 public:
 	ssc::View* mView;
-	ssc::SliceProxyPtr mSlicer;
-	ssc::SliceRepSWPtr mSliceRep;
+	ssc::SliceProxyPtr mSlicer;         
+	ssc::SliceRepSWPtr mSliceRep;  ///en vector av slice overlay....
 };
-
 
 class TestSliceAndToolRep : public QMainWindow
 {
@@ -26,16 +25,20 @@ public:
 private:
 	QWidget* mWidget;
 	void start();
-
 	ssc::View* view(const std::string& uid);
 	void generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	void generateView(const std::string& uid);
-
+	QSlider* mBrightnessSlider;
+	QSlider *mContrastSlider;
+	std::string imageFileName1;
+	
 	typedef std::map<std::string, SingleLayout> LayoutMap;
 	LayoutMap mLayouts;
 
 private slots:
 	void updateRender();
+	void contrast(int val);
+	void brightness(int val);
 };
 
 

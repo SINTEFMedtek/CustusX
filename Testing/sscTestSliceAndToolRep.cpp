@@ -86,12 +86,10 @@ ssc::View* TestSliceAndToolRep::view(const std::string& uid)
 
 void TestSliceAndToolRep::start()
 {
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	mWidget->setLayout(mainLayout);
-
+	
 	// generate imageFileName
 	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
 	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
 	std::cout << imageFileName1 << std::endl;
 
@@ -133,18 +131,62 @@ void TestSliceAndToolRep::start()
 	generateSlice("C", tool, image1, ssc::ptCORONAL);
 	generateSlice("S", tool, image1, ssc::ptSAGITTAL);
 
+	//gui controll
+	QVBoxLayout *mainLayout = new QVBoxLayout;
+	mWidget->setLayout(mainLayout);
+
 	QGridLayout* sliceLayout = new QGridLayout;
-	QHBoxLayout *buttonLayout = new QHBoxLayout;
+	
 
 	mainLayout->addLayout(sliceLayout);//Slice layout
 	sliceLayout->addWidget(view("C"), 0, 0);
 	sliceLayout->addWidget(view("S"), 0, 1);
 	sliceLayout->addWidget(view("A"), 1, 0);
 	sliceLayout->addWidget(view("3D"), 1, 1);
-	mainLayout->addLayout(buttonLayout); //Buttons
+
+	QHBoxLayout *controllLayout = new QHBoxLayout;
+	
+	QVBoxLayout *slidersLayout = new QVBoxLayout;
+	mBrightnessSlider = new QSlider(Qt::Horizontal);
+	mBrightnessSlider->setTickInterval(10);
+	mContrastSlider= new QSlider(Qt::Horizontal);
+	mContrastSlider->setTickInterval(10);
+	slidersLayout->addWidget(new QLabel(tr("Brightness")) );
+	slidersLayout->addWidget(mContrastSlider);
+	slidersLayout->addWidget(new QLabel(tr("Contrasst")) );
+	slidersLayout->addWidget(mBrightnessSlider);	
+	controllLayout->addLayout(slidersLayout);
+	
+	mainLayout->addLayout(controllLayout); //Buttons
+	
+	connect(mContrastSlider, SIGNAL(sliderMoved(int)), this, SLOT(contrast(int)) );	
+	connect(mBrightnessSlider, SIGNAL(sliderMoved(int)), this, SLOT(brightness(int)) );
+	
+	//update slidebar...
+	//int window = (int)10 * image1->lookupTable2D().getWindow();
+	//int level = (int)10 * image1->lookupTable2D().getLevel();
+	
+	mContrastSlider->setMaximum(256);
+	mContrastSlider->setValue(256);
+			
+	mBrightnessSlider->setMaximum(256);
+	mBrightnessSlider->setValue(128);
+	
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 		iter->second.mView->getRenderer()->ResetCamera();
 	updateRender();
+}
+void TestSliceAndToolRep::contrast(int val)
+{
+	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->getImage(imageFileName1);	
+	
+	image1->lookupTable2D().setWindow(val/1.0);	
+}
+	
+void TestSliceAndToolRep::brightness(int val)
+{
+	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->getImage(imageFileName1);
+	image1->lookupTable2D().setLevel(val/1.0);
 }
 
 void TestSliceAndToolRep::updateRender()
