@@ -8,33 +8,54 @@
 #ifndef SSCIMAGELOOKUPTABLE2D_H_
 #define SSCIMAGELOOKUPTABLE2D_H_
 
-#include "vtkSmartPointer.h"
+#include <QColor>
+#include "vtkSmartPointer.h" 
+typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
+typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 
 namespace ssc
 {
 
 /**Handler for the lookup table used in 2d image slices.
- * Used by Image.
+ * This lookup-handler has default lut grayscale
+ * Or usese stored lut from file.
+ * This class will also store differenst windowlevel values and color.
  */
 class ImageLUT2D
 {
 public:
 	ImageLUT2D(vtkImageDataPtr base);
 
-	void setLookupTable(vtkScalarsToColorsPtr lut);
-	vtkScalarsToColorsPtr getLookupTable();
+	void setLookupTable(vtkLookupTablePtr lut);
+	vtkLookupTablePtr getLookupTable(); //try to be use ony one class rep for lut--
+	
+	//vtkScalarsToColorsPtr getLookupTable();
 
 	void setLLR(double val);
 	double getLLR() const;
-	void setWindow(double val);
+	void setWindow(double window);
 	double getWindow() const;
-	void setLevel(double val);
+	void setLevel(double level);
 	double getLevel() const;
 	double getScalarMax() const;
+	void addNewColor(QColor color);
+	void setAlphaRange(double alpha) ;
+	
+	void changeOpacityForAll(double opacity);
+	void changeOpacity(int index, double opacity);
+	
 private:
-	vtkScalarsToColorsPtr mLut;
+	vtkScalarsToColorsPtr mScalarToColor;
+	
+	vtkLookupTablePtr mLut;
+	vtkLookupTablePtr mLookupTable;
+	
+	vtkWindowLevelLookupTablePtr mColorLookupTable;
+	vtkPiecewiseFunctionPtr mLowLevel;
+	//vtkWindowLevelLookupTablePtr ;
 	vtkImageDataPtr mBase;
 	double mLLR;
 	double mWindow;

@@ -4,7 +4,7 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkDoubleArray.h>
-
+#include <vtkLookupTable.h>
 #include <sstream>
 
 #define USE_TRANSFORM_RESCLICER
@@ -31,10 +31,11 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mOutputImageData = mOrientator->GetOutput();
 	mOutputImageData->Update();
 	//mOutputImageData->UpdateInformation();
-#endif
+#endif		
 	mLandmarks->SetNumberOfComponents(4);
-
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+	mAlpha = 0.5;
+	mTreshold = 1.0; 
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
@@ -49,9 +50,33 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 #endif
 	mImageTransferFunctions3D = ImageTF3D(data);
 	mImageLookupTable2D = ImageLUT2D(data);
-
-
+	
 	emit vtkImageDataChanged();
+}
+void Image::setClut(vtkLookupTablePtr clut)
+{
+	mImageLookupTable2D.setLookupTable( clut );
+	std::cout<<"ssc::Image, set new lut"<<std::endl;
+}
+
+double Image::treshold()
+{
+	return mTreshold;
+}
+
+void Image::setTreshold( double val )
+{
+}
+
+double Image::getAlpha()
+{ 
+	return mAlpha; 
+}
+
+void Image::setAlpha(double val)
+{
+	mAlpha = val;
+	emit alphaChange();
 }
 
 ImageTF3D& Image::transferFunctions3D()

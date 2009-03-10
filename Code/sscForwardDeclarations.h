@@ -22,6 +22,7 @@ typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolum
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
 
 } // namespace ssc
 

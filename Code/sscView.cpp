@@ -33,7 +33,8 @@ View::View(QWidget *parent, Qt::WFlags f) :
 	mRenderWindow->AddRenderer(mRenderer);
 	this->SetRenderWindow(mRenderWindow);
 
-	mRenderer->SetBackground(0.0, 0.0, 0.0);
+	mRenderer->SetBackground(0.5,0.5,0.5);
+
 	//mRenderWindow->Render();
 }
 

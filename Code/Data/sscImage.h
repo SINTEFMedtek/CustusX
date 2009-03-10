@@ -49,15 +49,21 @@ public:
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
-
 	void printLandmarks(); //TODO: JUST FOR TESTING
+	double getAlpha();//TODO: JUST FOR TESTING
+	void setAlpha(double val);//TODO: JUST FOR TESTING 
 	DoubleBoundingBox3D boundingBox() const;
-
+	///preset colorTabel
+	void setClut(vtkLookupTablePtr clut);
+	double treshold();
+	void setTreshold( double val );
 signals:
 	void landmarkRemoved(double x, double y, double z, unsigned int index);
 	void landmarkAdded(double x, double y, double z, unsigned int index);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transformChanged(); ///< emitted when transform is changed
+	void alphaChange(); ///<blending alpha
+	
 
 public slots:
 	void addLandmarkSlot(double x, double y, double z, unsigned int index);
@@ -71,9 +77,7 @@ protected:
 	std::string mName;
 	Transform3D mTransform; ///< the transform from data to reference space
 	vtkLookupTablePtr mLut;
-
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
-
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
 	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
@@ -84,6 +88,8 @@ protected:
 	// points->SetData(mLandmarks);
 	//vtkPointsPtr mLandmarks;
 	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)
+	double mAlpha ;
+	double mTreshold;
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

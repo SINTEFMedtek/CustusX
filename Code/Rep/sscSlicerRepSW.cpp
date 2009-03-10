@@ -8,6 +8,10 @@
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
+#include <vtkImageBlend.h>
+#include <vtkLookupTable.h> 
+
+#include <vtkColorTransferFunction.h> 
 #include "sscView.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
@@ -19,14 +23,22 @@ namespace ssc
 
 SliceRepSW::SliceRepSW(const std::string& uid) :
 	RepImpl(uid)
-{
-
+{	
 	mReslicer = vtkImageReslicePtr::New();
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
 	mImageActor = vtkImageActorPtr::New();
+	
 	mWindowLevel = vtkImageMapToWindowLevelColorsPtr::New();
 	mLookupTable = vtkWindowLevelLookupTablePtr::New();
-	setLookupTable();
+	
+	// set up the slicer pipeline
+	mReslicer->SetInterpolationModeToLinear();
+	mReslicer->SetOutputDimensionality(2);
+	mReslicer->SetResliceAxes(mMatrixAxes) ;
+	mReslicer->SetAutoCropOutput(false);
+	
+	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
+
 }
 SliceRepSW::~SliceRepSW()
 {
@@ -39,22 +51,54 @@ SliceRepSWPtr SliceRepSW::New(const std::string& uid)
 	return retval;
 }
 
-void SliceRepSW::setImage(ImagePtr image)
+/**This method brings vtkImageData that is preprocessed  
+ *with color
+ */
+void SliceRepSW::setInput(vtkImageDataPtr input)
 {
-	//std::cout<<"setImage"<<std::endl;
+	if(!input)
+		 return;
+	
+	if (mImage)
+	{
+		mImage->connectRep(mSelf);
+		mImageUid = "";
+		mImage.reset();
+	}
+	mReslicer->SetInput(input);
+	mImageActor->SetInput( mReslicer->GetOutput() );	
+}
+/**This method set the image, that has all the information in it self.
+ * color, brigthness, contrast, etc...
+ */
+void SliceRepSW::setImage( ImagePtr image )
+{
+	
 	if (mImage)
 	{
 		mImage->disconnectRep(mSelf);
 		mImageUid = "";
 	}
 	mImage = image;
+	
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
 		mImageUid = mImage->getUid();
 	}
-
-	doSliceing();
+	mReslicer->SetInput(mImage->getRefVtkImageData());
+	
+	double from;
+	double to; 
+	vtkLookupTable *table =vtkLookupTable::SafeDownCast( image->lookupTable2D().getLookupTable());
+	table->GetAlphaRange(from, to );
+	std::cout<<"opacity from " <<from<<", to: "<<to <<std::endl;
+	
+	mWindowLevel->SetLookupTable(table);
+	mWindowLevel->SetOutputFormatToRGBA();
+	mWindowLevel->Update();	
+	
+	std::cout<<"Number of components "<< mWindowLevel->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
 }
 
 std::string SliceRepSW::getImageUid()const
@@ -76,6 +120,7 @@ void SliceRepSW::setSliceProxy(ssc::SliceProxyPtr slicer)
 
 void SliceRepSW::addRepActorsToViewRenderer(View* view)
 {
+	mImageActor->SetInput( mWindowLevel->GetOutput());
 	view->getRenderer()->AddActor(mImageActor);
 }
 void SliceRepSW::removeRepActorsFromViewRenderer(View* view)
@@ -87,23 +132,6 @@ bool SliceRepSW::hasImage(ImagePtr image) const
 	return (mImage != NULL);
 }
 
-void SliceRepSW::doSliceing()
-{
-	if (!mImage)
-	{
-		return;
-	}
-
-	mReslicer->SetInput(mImage->getRefVtkImageData());
-	mReslicer->AutoCropOutputOn();	
-	mReslicer->SetInterpolationModeToLinear();
-	mReslicer->GetOutput()->UpdateInformation();
-	mReslicer->SetOutputDimensionality( 2);
-	mReslicer->SetResliceAxes(mMatrixAxes) ;
-
-	mWindowLevel->SetInputConnection(mReslicer->GetOutputPort() );
-	mImageActor->SetInput( mWindowLevel->GetOutput() );
-}
 
 void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 {
@@ -117,15 +145,14 @@ void SliceRepSW::update()
 	mMatrixAxes->DeepCopy(rMs.matrix());
 }
 
-void SliceRepSW::setLookupTable()
+void SliceRepSW::setLookupTable(vtkScalarsToColorsPtr lut)	
 {
-	mLookupTable->SetTableRange(0, 1);
-	mLookupTable->SetSaturationRange(0, 0);
-	mLookupTable->SetHueRange(0, 0);
-	mLookupTable->SetValueRange(0, 1);
-	mLookupTable->Build();
-	//std::cout<<"add Lookup table"<<std::endl;
-	mWindowLevel->SetLookupTable(mLookupTable);
+	vtkWindowLevelLookupTablePtr newlut = vtkWindowLevelLookupTable::SafeDownCast(lut);
+	if(!newlut)	
+	{
+		std::cout<<"SliceRepSW, Cannot cast vtkScalarsToColors to  vtkImageMapToWindowLevelColors "<<std::endl;
+	}
+	mWindowLevel->SetLookupTable(newlut);
 	mWindowLevel->SetWindow( 255.0);
 	mWindowLevel->SetLevel( 127.5);
 }

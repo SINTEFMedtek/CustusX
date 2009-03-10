@@ -11,6 +11,7 @@
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkVolumeProperty.h>
 
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 
@@ -19,33 +20,49 @@ namespace ssc
 
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mOpacityTF(vtkPiecewiseFunctionPtr::New()),
-	mColorTF(vtkColorTransferFunctionPtr::New()),
+	mColorTF(vtkColorTransferFunctionPtr::New()),	
+	mVolumeProperty(vtkVolumePropertyPtr::New()),
 	mBase(base)
 {
 	double max = getScalarMax();
-	//max = 500;
 	mLevel = max/2.0;
 	mWindow = max;
-	std::cout << "getScalarMax(): " << max << std::endl;
 	mLLR = 0.0;
-
+	
 	mColorTF->SetColorSpaceToRGB();
+	mOpacityTF->AddPoint(0.0, 0.0);
+	mOpacityTF->AddPoint(255, 1.0);
 
-	vtkWindowLevelLookupTablePtr lut = vtkWindowLevelLookupTablePtr::New();
+	
+	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
+	mColorTF->AddRGBPoint(255, 1.0, 1.0, 1.0);
 
-	int numColors = lut->GetNumberOfTableValues();
-	for ( int i = 0; i < numColors; i++ )
-	{
-		double val = double(i)/(numColors-1);
-		lut->SetTableValue(i, val, val, val, 0);
-	}
+	mVolumeProperty->SetColor(mColorTF);
+	mVolumeProperty->SetScalarOpacity(mOpacityTF);
+	mVolumeProperty->SetInterpolationTypeToLinear();
 
-	lut->SetWindow(mWindow);
-	lut->SetLevel(mLevel);
-	mLut = lut;
-
-	refreshColorTF();
-	refreshOpacityTF();
+	// from snw
+	mVolumeProperty->ShadeOff();
+	mVolumeProperty->SetAmbient ( 0.2 );	
+	mVolumeProperty->SetDiffuse ( 0.9 );
+	mVolumeProperty->SetSpecular ( 0.3 );
+	mVolumeProperty->SetSpecularPower ( 15.0 );
+	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
+	
+//	vtkWindowLevelLookupTablePtr lut = vtkWindowLevelLookupTablePtr::New();
+//	int numColors = lut->GetNumberOfTableValues();
+//	for ( int i = 0; i < numColors; i++ )
+//	{
+//		double val = double(i)/(numColors-1);
+//		lut->SetTableValue(i, val, val, val, 0);
+//	}
+//
+//	lut->SetWindow(mWindow);
+//	lut->SetLevel(mLevel);
+//	mLut = lut;
+//
+//	refreshColorTF();
+//	refreshOpacityTF();
 }
 
 void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
@@ -88,6 +105,7 @@ double ImageTF3D::getLLR() const
 void ImageTF3D::setWindow(double val)
 {
 	mWindow = val;
+	std::cout<<"setWindow, val: "<<val<<std::endl;
 	refreshColorTF();
 }
 
@@ -101,6 +119,7 @@ double ImageTF3D::getWindow() const
  */
 void ImageTF3D::setLevel(double val)
 {
+	std::cout<<"setLevel, val: "<<val<<std::endl;
 	mLevel = val;
 	refreshColorTF();
 }

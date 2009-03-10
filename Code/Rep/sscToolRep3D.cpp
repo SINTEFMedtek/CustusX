@@ -98,7 +98,21 @@ void ToolRep3D::setTool(ToolPtr tool)
 		connect(mTool.get(), SIGNAL(toolVisible(bool)),
 				this, SLOT(receiveVisible(bool)));
 	}
+
+	//mToolActor->SetVisibility(true);
+	receiveTransforms(mTool->get_prMt(), 0);
+	
+	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+			this, SLOT(receiveTransforms(Transform3D, double)));
+
+	connect(mTool.get(), SIGNAL(toolVisible(bool)),
+			this, SLOT(receiveVisible(bool)));
+
+	std::cout << "created toolrep3d " << std::endl;
+	
+
 	//std::cout << "ToolRep3D::setTool() end" << std::endl;	
+	receiveVisible(tool->getVisible());
 }
 bool ToolRep3D::hasTool(ToolPtr tool) const
 {

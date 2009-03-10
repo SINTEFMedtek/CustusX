@@ -28,6 +28,7 @@ public:
 	//void addImage(ImagePtr image);
 	//void removeImage(ImagePtr image);
 	bool hasMesh(MeshPtr mesh) const;
+	
 protected:
 	GeometricRep(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view);

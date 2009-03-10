@@ -108,10 +108,9 @@ void DummyTool::stopTracking()
 void DummyTool::sendTransform()
 {
 	QDateTime time;
-	std::cout<<"send transform"<<std::endl;
+	//std::cout<<"send transform"<<std::endl;
 	Transform3D matrix = *getNextTransform();
 	double timestamp = (double) time.time().msec();
-
 	emit toolTransformAndTimestamp(matrix, timestamp);
 }
 void DummyTool::createPolyData()

@@ -25,7 +25,6 @@ GeometricRep::GeometricRep(const std::string& uid) :
 
 GeometricRep::~GeometricRep()
 {
-	// ??
 }
 
 GeometricRepPtr GeometricRep::New(const std::string& uid)
@@ -57,4 +56,8 @@ bool GeometricRep::hasMesh(MeshPtr mesh) const
 {
 	return (mMesh != NULL);
 }
+
+//---------------------------------------------------------
 } // namespace ssc
+//---------------------------------------------------------
+

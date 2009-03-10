@@ -26,6 +26,7 @@ public:
 	//void addImage(ImagePtr image);
 	//void removeImage(ImagePtr image);
 	bool hasImage(ImagePtr image) const;
+	
 protected:
 	SliceRep(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view);

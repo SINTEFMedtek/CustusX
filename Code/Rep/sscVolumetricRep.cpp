@@ -26,44 +26,21 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 {
 	mResampleFactor = 1.0;
 	//double maxVal = 255;//500.0;
-//	double maxVal = 500.0;
-	// should use GetScalarRange()[1], but we dont have an image yet,
-	// and this code dont ever get run... pick a value (TF's set from ssc::Image)
+	//double maxVal = 500.0;
+	//should use GetScalarRange()[1], but we dont have an image yet,
+	//and this code dont ever get run... pick a value (TF's set from ssc::Image)
 	//double maxVal = 1296.0;
-	double maxVal = 500;
-
-	mOpacityTransferFunction->AddPoint(0.0, 0.0);
-	mOpacityTransferFunction->AddPoint(maxVal, 1.0);
-
-	mColorTransferFunction->SetColorSpaceToRGB();
-	mColorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-	mColorTransferFunction->AddRGBPoint(maxVal, 1.0, 1.0, 1.0);
-
-	mVolumeProperty->SetColor(mColorTransferFunction);
-	mVolumeProperty->SetScalarOpacity(mOpacityTransferFunction);
-	mVolumeProperty->SetInterpolationTypeToLinear();
-
-	// from snw
-	mVolumeProperty->ShadeOff();
-	mVolumeProperty->SetAmbient ( 0.2 );
-	mVolumeProperty->SetDiffuse ( 0.9 );
-	mVolumeProperty->SetSpecular ( 0.3 );
-	mVolumeProperty->SetSpecularPower ( 15.0 );
-	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
+	
+	double maxVal = 255;
 
 	// from snws
 	mTextureMapper3D->SetPreferredMethodToNVidia();
-    mTextureMapper3D->SetBlendModeToComposite();
-
-	mVolume->SetProperty( mVolumeProperty );
-	mVolume->SetMapper( mTextureMapper3D );
+    mTextureMapper3D->SetBlendModeToComposite();	
 }
-
-
 
 VolumetricRep::~VolumetricRep()
 {
-	// ??
+	
 }
 
 VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
@@ -94,6 +71,19 @@ void VolumetricRep::setResampleFactor(double factor)
 ImagePtr VolumetricRep::getImage()
 {
 	return mImage;
+}
+void VolumetricRep::setInput(vtkImageDataPtr input)
+{
+	std::cout<<"Blending mode on "<<std::endl;
+	if (mImage)
+	{
+		mImage->disconnectRep(mSelf);
+		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		mImage.reset();
+	}
+	
+	mTextureMapper3D->SetInput(input);
 }
 
 void VolumetricRep::setImage(ImagePtr image)
@@ -126,6 +116,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	else
 	{
 		mTextureMapper3D->SetInput( (vtkImageData*)NULL );
+		
 	}
 }
 
@@ -151,7 +142,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 
 	if (fabs(1.0-mResampleFactor)>0.01)
 	{
-		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();	
 		resampler->SetAxisMagnificationFactor(0, mResampleFactor);
 		resampler->SetAxisMagnificationFactor(1, mResampleFactor);
 		resampler->SetAxisMagnificationFactor(2, mResampleFactor);
@@ -169,8 +160,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 }
 
 /**called when transform is changed
- * reset it in the prop.
- */
+ * reset it in the prop.*/
 void VolumetricRep::transformChangedSlot()
 {
 	if (!mImage)
@@ -182,4 +172,6 @@ void VolumetricRep::transformChangedSlot()
 }
 
 
+//---------------------------------------------------------
 } // namespace ssc
+//---------------------------------------------------------

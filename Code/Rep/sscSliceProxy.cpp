@@ -14,6 +14,7 @@ SliceProxy::SliceProxy()
 	//TODO connect to toolmanager rMpr changed
 	centerChangedSlot();
 	//std::cout<<"Got center"<< ssc::DataManager::getInstance()->getCenter() <<std::endl;
+	
 }
 
 SliceProxy::~SliceProxy()

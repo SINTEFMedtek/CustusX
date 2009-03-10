@@ -9,12 +9,11 @@
 
 namespace ssc
 {
-
 SliceRep::SliceRep(const std::string& uid) :
 	RepImpl(uid)
 {
 	mVtkImagePlaneWidget = vtkImagePlaneWidgetPtr::New();
-	mVtkImagePlaneWidget->SetPlaneOrientationToZAxes();
+	mVtkImagePlaneWidget->SetPlaneOrientationToZAxes();//Convenience method sets the plane orientation normal to the x, y, or z axes
 }
 
 SliceRep::~SliceRep()
@@ -30,7 +29,6 @@ SliceRepPtr SliceRep::New(const std::string& uid)
 
 void SliceRep::addRepActorsToViewRenderer(View* view)
 {
-	//view->getRenderer()->AddVolume(mVolume);
 	mVtkImagePlaneWidget->SetInteractor( view->getRenderWindow()->GetInteractor() );
 	mVtkImagePlaneWidget->InteractionOn();
 	mVtkImagePlaneWidget->On();
@@ -38,14 +36,12 @@ void SliceRep::addRepActorsToViewRenderer(View* view)
 
 void SliceRep::removeRepActorsFromViewRenderer(View* view)
 {
-	//view->getRenderer()->RemoveVolume(mVolume);
+	
 }
 void SliceRep::setImage(ImagePtr image)
 {
 	mImage = image;
 	mImage->connectRep(mSelf);
-
-	//mTextureMapper3D->SetInput( image->getRefVtkImageData() );
 	mVtkImagePlaneWidget->SetInput( image->getBaseVtkImageData() );
 }
 
@@ -53,5 +49,10 @@ bool SliceRep::hasImage(ImagePtr image) const
 {
 	return (mImage != NULL);
 }
+
+	//void SliceRep::setSliceProxy(SliceProxyPtr proxy) //connect tool transform update to sliceRep
+	//{
+	//	
+	//}
 
 } // namespace ssc

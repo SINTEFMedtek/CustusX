@@ -36,6 +36,7 @@ signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
 	void toolVisible(bool visible); ///< forwarding of visible in tool
+	
 private slots:
 	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 	void toolVisibleSlot(bool visible); 

@@ -14,6 +14,7 @@ typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 typedef vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
+typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
 
 namespace ssc
 {
@@ -48,6 +49,8 @@ private:
 	//vtkPiecewiseFunctionPtr mGradientOpacityTF; // implement when needed.
 	vtkPiecewiseFunctionPtr mOpacityTF;
 	vtkColorTransferFunctionPtr mColorTF;
+	vtkVolumePropertyPtr mVolumeProperty;
+	
 	vtkImageDataPtr mBase;
 	double mLLR;
 	double mWindow;
