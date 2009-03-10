@@ -32,10 +32,37 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	//double maxVal = 1296.0;
 	
 	double maxVal = 255;
+	mOpacityTransferFunction->AddPoint(0.0, 0.0);
+		mOpacityTransferFunction->AddPoint(maxVal, 1.0);
 
+		mColorTransferFunction->SetColorSpaceToRGB();
+		mColorTransferFunction->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
+		mColorTransferFunction->AddRGBPoint(maxVal, 1.0, 1.0, 1.0);
+
+	
+	
+	
+	mVolumeProperty->SetColor(mColorTransferFunction);
+	mVolumeProperty->SetScalarOpacity(mOpacityTransferFunction);
+	
+	mVolumeProperty->SetInterpolationTypeToLinear();
+
+	// from snw
+	mVolumeProperty->ShadeOff();
+	mVolumeProperty->SetAmbient ( 0.2 );	
+	mVolumeProperty->SetDiffuse ( 0.9 );
+	mVolumeProperty->SetSpecular ( 0.3 );
+	mVolumeProperty->SetSpecularPower ( 15.0 );
+	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
+	
 	// from snws
 	mTextureMapper3D->SetPreferredMethodToNVidia();
-    mTextureMapper3D->SetBlendModeToComposite();	
+	mTextureMapper3D->SetBlendModeToComposite();
+	    
+	mVolume->SetProperty( mVolumeProperty );
+	mVolume->SetMapper( mTextureMapper3D );
+	
+		
 }
 
 VolumetricRep::~VolumetricRep()
@@ -52,6 +79,7 @@ VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& n
 
 void VolumetricRep::addRepActorsToViewRenderer(View* view)
 {
+	
 	view->getRenderer()->AddVolume(mVolume);
 }
 
@@ -115,8 +143,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	}
 	else
 	{
-		mTextureMapper3D->SetInput( (vtkImageData*)NULL );
-		
+		mTextureMapper3D->SetInput( (vtkImageData*)NULL );	
 	}
 }
 
@@ -136,6 +163,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	}
 	mVolumeProperty->SetColor(mImage->transferFunctions3D().getColorTF());
 	mVolumeProperty->SetScalarOpacity(mImage->transferFunctions3D().getOpacityTF());
+	
 	// use the base instead of the ref image, because otherwise changes in the transform
 	// causes data to be sent anew to the graphics card (takes 4s).
 	// changing the mVolume transform instead is a fast operation.

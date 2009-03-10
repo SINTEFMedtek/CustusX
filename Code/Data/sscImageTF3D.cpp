@@ -37,18 +37,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
 	mColorTF->AddRGBPoint(255, 1.0, 1.0, 1.0);
 
-	mVolumeProperty->SetColor(mColorTF);
-	mVolumeProperty->SetScalarOpacity(mOpacityTF);
-	mVolumeProperty->SetInterpolationTypeToLinear();
 
-	// from snw
-	mVolumeProperty->ShadeOff();
-	mVolumeProperty->SetAmbient ( 0.2 );	
-	mVolumeProperty->SetDiffuse ( 0.9 );
-	mVolumeProperty->SetSpecular ( 0.3 );
-	mVolumeProperty->SetSpecularPower ( 15.0 );
-	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
-	
 //	vtkWindowLevelLookupTablePtr lut = vtkWindowLevelLookupTablePtr::New();
 //	int numColors = lut->GetNumberOfTableValues();
 //	for ( int i = 0; i < numColors; i++ )
@@ -82,6 +71,7 @@ void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
 
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
+	std::cout<<"fetching color for 3d head" <<std::endl;
 	return mColorTF;
 }
 
@@ -134,6 +124,7 @@ double ImageTF3D::getLevel() const
  */
 void ImageTF3D::setLut(vtkLookupTablePtr lut)
 {
+	std::cout<<"Lut set in 3d property" <<std::endl;
 	mLut = lut;
 	refreshColorTF();
 }

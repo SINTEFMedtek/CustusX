@@ -88,7 +88,7 @@ void ImageLUT2D::addNewColor(QColor color)
 void ImageLUT2D::setAlphaRange(double alpha)
 {
 	std::cout<<"alpha range: [0,"<<alpha<<"]"<<std::endl;
-	mLookupTable->SetAlphaRange(0.0 ,alpha);
+	//mLookupTable->SetAlphaRange(0.0 ,alpha);
 	
 }
 /**Set Low Level Reject, meaning the lowest intensity
@@ -100,7 +100,7 @@ void ImageLUT2D::setLLR(double val)
 	//mLookupTable->SetAlphaRange(mLLR , 1.0);
 	//->Build();
 	//changeOpacity(mLLR, 0);
-	changeOpacityForAll(mLLR);
+	//changeOpacityForAll(mLLR);
 	
 	std::cout<<"alpha range: [0,"<<mLLR<<"]"<<std::endl;
 }
@@ -162,7 +162,6 @@ void ImageLUT2D::changeOpacityForAll(double opacity )
 	for ( int i = 0;i < noValues;i++ )
 	{
 		mLookupTable->GetTableValue ( i, rgba );
-		std::cout << "old opacity" <<rgba[3] << std::endl;
 		rgba[ 3 ] = opacity;
 		mLookupTable->SetTableValue ( i, rgba );
 	}
