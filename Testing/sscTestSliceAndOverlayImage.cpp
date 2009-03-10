@@ -334,10 +334,10 @@ void TestSliceAndOverlayImage::generateSliceRepLayerd(ssc::ToolPtr tool, std::ve
 void TestSliceAndOverlayImage::generateVolumeInVolumeRep(ssc::ImageBlenderProxyPtr blender,ssc::PLANE_TYPE plane)
 {
 	
-	ssc::VolumetricRepPtr mRepPtr = mLayouts[plane]->mVolumetricRep;
-	mRepPtr->setInput(blender->getOutput());
-	mRepPtr->setName("Blending mode");	
-	mLayouts[plane]->mView->addRep(mRepPtr);	
+//	ssc::VolumetricRepPtr mRepPtr = mLayouts[plane]->mVolumetricRep;
+//	mRepPtr->setInput(blender->getOutput());
+//	mRepPtr->setName("Blending mode");	
+//	mLayouts[plane]->mView->addRep(mRepPtr);	
 }
 //Test wiht iso-surface--->
 void TestSliceAndOverlayImage::generateSurfaceRep(ssc::ImagePtr images,ssc::PLANE_TYPE plane)
