@@ -89,9 +89,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscSliceProxy.cpp
    # Rep/sscSlicePlaneRep.cpp
     Rep/sscSlicedImageProxy.cpp
-    Rep/sscImageBlenderProxy.cpp
     Rep/sscBlendedSliceRep.cpp
-    Rep/sscSurfaceRep.cpp
+    #Rep/sscSurfaceRep.cpp
     Data/sscData.cpp
     Data/sscImage.cpp
     Data/sscImageTF3D.cpp
