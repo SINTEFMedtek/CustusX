@@ -11,7 +11,7 @@
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkLookupTable.h>
 #include <vtkPiecewiseFunction.h>
- 
+#include "sscVector3D.h"
 
 namespace ssc
 {
@@ -96,6 +96,9 @@ void ImageLUT2D::setAlphaRange(double alpha)
  */
 void ImageLUT2D::setLLR(double val)
 {
+	if (similar(mLLR, val))
+		return;
+	
 	mLLR = val;
 	//mLookupTable->SetAlphaRange(mLLR , 1.0);
 	//->Build();
@@ -115,6 +118,9 @@ double ImageLUT2D::getLLR() const
  */
 void ImageLUT2D::setWindow(double window)
 {
+	if (similar(mWindow, window))
+		return;
+
 	if (window < 1e-5)
 	{
 		window = 1e-5; 
@@ -135,6 +141,8 @@ double ImageLUT2D::getWindow() const
  */
 void ImageLUT2D::setLevel(double level)
 {
+	if (similar(mLevel, level))
+		return;
 	std::cout<<"Level :"<< level<<std::endl;
 	mLevel = level;
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0);

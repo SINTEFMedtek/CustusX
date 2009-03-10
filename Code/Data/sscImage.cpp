@@ -75,6 +75,8 @@ double Image::getAlpha()
 
 void Image::setAlpha(double val)
 {
+	if (similar(mAlpha, val))
+		return;
 	mAlpha = val;
 	emit alphaChange();
 }
