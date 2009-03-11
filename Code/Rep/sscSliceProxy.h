@@ -6,6 +6,7 @@
 #include "sscSliceComputer.h"
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
+#include "sscIndent.h"
 
 namespace ssc
 {
@@ -31,6 +32,7 @@ public:
 	
 	ToolPtr getTool();
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
+	void printSelf(std::ostream & os, Indent indent);
 	
 signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.

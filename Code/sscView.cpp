@@ -118,5 +118,28 @@ void View::resizeEvent ( QResizeEvent * event )
     emit resized(size);
 }
 
+void View::print(std::ostream& os)
+{
+	Indent ind;
+	printSelf(os, ind);
+}
+
+void View::printSelf(std::ostream & os, Indent indent)
+{
+	os << indent << "mUid: " << mUid << std::endl;
+	os << indent << "mName: " << mName << std::endl;
+	os << indent << "NumberOfReps: " << mReps.size() << std::endl;
+	
+	if (indent.includeDetails())
+	{
+		mRenderWindow->PrintSelf(os, indent.getVtkIndent().GetNextIndent());
+	}
+	
+	for (unsigned i=0; i<mReps.size(); ++i)
+	{
+		os << indent << "Rep child " << i << std::endl;
+		mReps[i]->printSelf(os, indent.stepDown());
+	}
+}
 
 } // namespace ssc

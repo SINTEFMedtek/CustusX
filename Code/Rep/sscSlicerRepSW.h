@@ -38,10 +38,11 @@ public:
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	std::string getImageUid()const;
 	void update();
-	PLANE_TYPE getPlane(){ return mType; }
+	//PLANE_TYPE getPlane(){ return mType; }
 //	void addIamges(ImagePtr image);
 //	void createOverlay();
-	
+	virtual void printSelf(std::ostream & os, Indent indent);
+
 protected:
 	SliceRepSW(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
@@ -52,11 +53,11 @@ private slots:
 		
 private:
 	void setLookupTable(vtkScalarsToColorsPtr lut);
-	PLANE_TYPE mType;
+	//PLANE_TYPE mType;
 	ImagePtr mImage;
 
 	SliceProxyPtr mSlicer;
-	std::string mImageUid;
+	//std::string mImageUid;
 	vtkWindowLevelLookupTablePtr mLookupTable;
 	vtkImageMapToWindowLevelColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;

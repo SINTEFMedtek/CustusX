@@ -62,7 +62,6 @@ void SliceRepSW::setInput(vtkImageDataPtr input)
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-		mImageUid = "";
 		mImage.reset();
 	}
 	mReslicer->SetInput(input);
@@ -77,14 +76,12 @@ void SliceRepSW::setImage( ImagePtr image )
 	if (mImage)
 	{
 		mImage->disconnectRep(mSelf);
-		mImageUid = "";
 	}
 	mImage = image;
 	
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-		mImageUid = mImage->getUid();
 	}
 	mReslicer->SetInput(mImage->getRefVtkImageData());
 	
@@ -103,7 +100,7 @@ void SliceRepSW::setImage( ImagePtr image )
 
 std::string SliceRepSW::getImageUid()const
 {
-	return mImageUid;
+	return mImage ? mImage->getUid() : "";
 }
 
 void SliceRepSW::setSliceProxy(ssc::SliceProxyPtr slicer)
@@ -155,6 +152,19 @@ void SliceRepSW::setLookupTable(vtkScalarsToColorsPtr lut)
 	mWindowLevel->SetLookupTable(newlut);
 	mWindowLevel->SetWindow( 255.0);
 	mWindowLevel->SetLevel( 127.5);
+}
+
+void SliceRepSW::printSelf(std::ostream & os, Indent indent)
+{
+	RepImpl::printSelf(os, indent);
+	
+	//os << indent << "PlaneType: " << mType << std::endl;	
+	os << indent << "mImage: " << (mImage ? mImage->getUid() : "NULL") << std::endl;
+	os << indent << "mSlicer: " << (mSlicer ? mSlicer.get() : 0) << std::endl;	
+	if (mSlicer)
+	{
+		mSlicer->printSelf(os, indent.stepDown());
+	}		
 }
 
 }// namespace ssc

@@ -44,4 +44,12 @@ void RepImpl::disconnectFromView(View *theView)
 	this->removeRepActorsFromViewRenderer(theView);
 }
 
+void RepImpl::printSelf(std::ostream & os, Indent indent)
+{
+	os << indent << "mUid: " << mUid << std::endl;
+	os << indent << "mName: " << mName << std::endl;
+	os << indent << "Type: " << getType() << std::endl;	
+}
+
+
 } // namespace ssc

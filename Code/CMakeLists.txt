@@ -77,6 +77,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscVector3D.cpp
     Utilities/sscTransform3D.cpp 
     Utilities/sscSliceComputer.cpp 
+    Utilities/sscIndent.cpp
     sscView.cpp
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp

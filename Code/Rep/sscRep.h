@@ -13,6 +13,7 @@ namespace ssc
 typedef boost::shared_ptr<class Rep> RepPtr;
 typedef boost::weak_ptr<class Rep> RepWeakPtr;
 
+class Indent;
 class View;
 
 /**
@@ -74,6 +75,9 @@ public:
 	 * \return the unique id.
 	 */
 	virtual std::string getUid() const = 0;
+	
+	virtual void printSelf(std::ostream & os, Indent indent) = 0;
+	
 };
 
 } // namespace ssc

@@ -3,6 +3,7 @@
 
 #include <set>
 #include "sscRep.h"
+#include "sscIndent.h"
 
 namespace ssc
 {
@@ -28,6 +29,7 @@ public:
 	void setName(std::string name);
 	std::string getName() const; ///< \return a reps name
 	std::string getUid() const; ///< \return a reps unique id
+	virtual void printSelf(std::ostream & os, Indent indent);
 
 protected:
 	std::set<View *> mViews;

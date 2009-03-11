@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include "vtkSmartPointer.h"
 #include "QVTKWidget.h"
+#include "sscIndent.h"
 
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
@@ -42,7 +43,10 @@ public:
   virtual bool hasRep(const RepPtr& rep) const; ///< checks if the view already have the rep
   virtual std::vector<RepPtr> getReps(); ///< returns all reps in the view
   virtual void removeReps(); ///< removes all reps in the view
-
+  
+  void print(std::ostream& os);  	
+  virtual void printSelf(std::ostream & os, Indent indent);
+  
 signals:
       void resized(QSize size);
 protected:

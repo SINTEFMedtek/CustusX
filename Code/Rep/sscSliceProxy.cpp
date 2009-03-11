@@ -135,5 +135,12 @@ void SliceProxy::changed()
 	emit transformChanged(get_sMr());
 }
 
+void SliceProxy::printSelf(std::ostream & os, Indent indent)
+{
+	os << indent << "sliceproxy" << std::endl;
+	os << indent << "sMr: " << std::endl;
+	get_sMr().put(os, indent.getIndent()+3);
+	os << std::endl;
+}
 
 } // namespace ssc
