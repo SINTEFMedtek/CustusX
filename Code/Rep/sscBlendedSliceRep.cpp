@@ -26,9 +26,7 @@ BlendedSliceRep::BlendedSliceRep(const std::string& uid):
 	mImageActor = vtkImageActorPtr::New();
 
 	// set up the slicer pipeline		
-	mBlender->SetBlendModeToCompound();
 	mBlender->SetBlendModeToNormal();
-	
 	firstImage = true;
 	countImage = 0;
 }
