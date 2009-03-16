@@ -28,14 +28,10 @@ namespace ssc
 {
 
 View::View(QWidget *parent, Qt::WFlags f) :
-	QVTKWidget(parent, f), mRenderer(vtkRendererPtr::New()), mRenderWindow(vtkRenderWindowPtr::New())
+	QVTKWidget(parent, f), mRenderWindow(vtkRenderWindowPtr::New())
 {
-	mRenderWindow->AddRenderer(mRenderer);
 	this->SetRenderWindow(mRenderWindow);
-
-	mRenderer->SetBackground(0.0,0.0,0.0);
-
-	//mRenderWindow->Render();
+	clear();
 }
 
 View::~View()
@@ -74,6 +70,22 @@ void View::setRep(const RepPtr& rep)
 {
 	removeReps();
 	addRep(rep);
+}
+
+/**clear all content of the view. This ensures that props added from  
+ * outside the rep system also is cleared, and data not cleared with
+ * RemoveAllViewProps() (added to fix problem in snw ultrasound rep, 
+ * data was not cleared, dont know why). 
+ */
+void View::clear()
+{
+	removeReps();
+
+	mRenderWindow->RemoveRenderer(mRenderer);
+
+	mRenderer = vtkRendererPtr::New();
+	mRenderer->SetBackground(0.0,0.0,0.0);
+	mRenderWindow->AddRenderer(mRenderer);	
 }
 
 void View::removeReps()
@@ -130,15 +142,33 @@ void View::printSelf(std::ostream & os, Indent indent)
 	os << indent << "mName: " << mName << std::endl;
 	os << indent << "NumberOfReps: " << mReps.size() << std::endl;
 	
-	if (indent.includeDetails())
-	{
-		mRenderWindow->PrintSelf(os, indent.getVtkIndent().GetNextIndent());
-	}
-	
 	for (unsigned i=0; i<mReps.size(); ++i)
 	{
-		os << indent << "Rep child " << i << std::endl;
+		os << indent << "<Rep child " << i << ">" << std::endl;
 		mReps[i]->printSelf(os, indent.stepDown());
+		os << indent << "</Rep child " << i << ">" << std::endl;
+	}
+
+	if (indent.includeDetails())
+	{
+		os << indent << "<RenderWindow>" << std::endl;
+		mRenderWindow->PrintSelf(os, indent.getVtkIndent().GetNextIndent());
+		os << indent << "</RenderWindow>" << std::endl;
+		os << indent << "<Renderer>" << std::endl;
+		mRenderer->PrintSelf(os, indent.getVtkIndent().GetNextIndent());
+		os << indent << "</Renderer>" << std::endl;
+		os << indent << "<Props>" << std::endl;
+		vtkPropCollection* collection = mRenderer->GetViewProps();
+		collection->InitTraversal();
+		vtkProp* prop = collection->GetNextProp();
+		while (prop)
+		{
+			os << indent << indent << "<Prop>" << std::endl;
+			prop->PrintSelf(os, indent.getVtkIndent().GetNextIndent().GetNextIndent());
+			os << indent << indent << "</Prop>" << std::endl;
+			prop = collection->GetNextProp();
+		}
+		os << indent << "</Props>" << std::endl;		
 	}
 }
 

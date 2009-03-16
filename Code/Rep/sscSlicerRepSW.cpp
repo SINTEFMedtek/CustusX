@@ -24,7 +24,7 @@ namespace ssc
 SliceRepSW::SliceRepSW(const std::string& uid) :
 	RepImpl(uid)
 {	
-	std::cout << "SliceRepSW created: " << uid << std::endl;
+//	std::cout << "SliceRepSW created: " << uid << std::endl;
 	mReslicer = vtkImageReslicePtr::New();
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
 	mImageActor = vtkImageActorPtr::New();
@@ -75,7 +75,7 @@ void SliceRepSW::setInput(vtkImageDataPtr input)
  */
 void SliceRepSW::setImage( ImagePtr image )
 {
-	std::cout << "SliceRepSW::setImage called: [" << getName() << "]" << std::endl;
+//	std::cout << "SliceRepSW::setImage called: [" << getName() << "]" << std::endl;
 	
 	if (mImage)
 	{

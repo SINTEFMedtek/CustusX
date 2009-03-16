@@ -43,6 +43,7 @@ public:
   virtual bool hasRep(const RepPtr& rep) const; ///< checks if the view already have the rep
   virtual std::vector<RepPtr> getReps(); ///< returns all reps in the view
   virtual void removeReps(); ///< removes all reps in the view
+  virtual void clear(); ///< removes everything in the view, inluding reps.
   
   void print(std::ostream& os);  	
   virtual void printSelf(std::ostream & os, Indent indent);
