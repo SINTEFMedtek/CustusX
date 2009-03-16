@@ -43,47 +43,47 @@ class PatientRegistrationWidget : public QWidget
   Q_OBJECT
 
 public:
-  PatientRegistrationWidget();
-  ~PatientRegistrationWidget();
+  PatientRegistrationWidget(); ///<
+  ~PatientRegistrationWidget(); ///<
 
 protected slots:
   //void imageSelectedSlot(const QString& comboBoxText); //TODO REMOVE
-  void currentImageChangedSlot(ssc::ImagePtr currentImage);
-  void imageLandmarksUpdateSlot(double, double, double,unsigned int);
+  void currentImageChangedSlot(ssc::ImagePtr currentImage); ///<
+  void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///<
   //void visibilityOfWidgetChangedSlot(bool visible);
-  void toolSampledUpdateSlot(double, double, double,unsigned int);
-  void toolVisibleSlot(bool visible);
-  void toolSampleButtonClickedSlot();
-  void rowSelectedSlot(int row, int column);
+  void toolSampledUpdateSlot(double, double, double,unsigned int); ///<
+  void toolVisibleSlot(bool visible); ///<
+  void toolSampleButtonClickedSlot(); ///<
+  void rowSelectedSlot(int row, int column); ///<
   //void populateTheImageComboBox(); //TODO REMOVE
-  void cellChangedSlot(int row, int column);
-  void dominantToolChangedSlot(const std::string& uid);
+  void cellChangedSlot(int row, int column); ///<
+  void dominantToolChangedSlot(const std::string& uid); ///<
 
 protected:
-  void populateTheLandmarkTableWidget(ssc::ImagePtr image);
-  void updateAccuracy();
-  void doPatientRegistration();
+  void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///<
+  void updateAccuracy(); ///<
+  void doPatientRegistration(); ///<
 
-  QVBoxLayout* mVerticalLayout;
+  QVBoxLayout* mVerticalLayout; ///<
   //QComboBox* mImagesComboBox; //TODO REMOVE
-  QTableWidget* mLandmarkTableWidget;
-  QPushButton* mToolSampleButton;
-  QLabel* mAccuracyLabel;
+  QTableWidget* mLandmarkTableWidget; ///<
+  QPushButton* mToolSampleButton; ///<
+  QLabel* mAccuracyLabel; ///<
 
-  DataManager* mDataManager;
-  RegistrationManager* mRegistrationManager;
-  ToolManager* mToolManager;
-  MessageManager* mMessageManager;
-  ViewManager* mViewManager;
-  RepManager* mRepManager;
+  DataManager* mDataManager; ///<
+  RegistrationManager* mRegistrationManager; ///<
+  ToolManager* mToolManager; ///<
+  MessageManager* mMessageManager; ///<
+  ViewManager* mViewManager; ///<
+  RepManager* mRepManager; ///<
 
-  int mCurrentRow, mCurrentColumn;
-  std::map<int, bool> mLandmarkActiveMap;
-  std::map<int, double> mLandmarkRegistrationAccuracyMap;
-  double mTotalRegistrationAccuracy;
+  int mCurrentRow, mCurrentColumn; ///<
+  std::map<int, bool> mLandmarkActiveMap; ///<
+  std::map<int, double> mLandmarkRegistrationAccuracyMap; ///<
+  double mTotalRegistrationAccuracy; ///<
 
-  ToolPtr mToolToSample;
-  ssc::ImagePtr mCurrentImage;
+  ToolPtr mToolToSample; ///<
+  ssc::ImagePtr mCurrentImage; ///<
 
 };
 }//namespace cx

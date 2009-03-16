@@ -34,7 +34,7 @@ namespace cx
 {
 PatientRegistrationWidget::PatientRegistrationWidget() :
   mVerticalLayout(new QVBoxLayout(this)),
-  //mImagesComboBox(new QComboBox(this)),
+  //mImagesComboBox(new QComboBox(this)), //TODO REMOVE
   mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
   mAccuracyLabel(new QLabel(QString(" "), this)),
@@ -77,10 +77,6 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
   connect(mToolManager, SIGNAL(toolSampleRemoved(double,double,double,unsigned int)),
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
-
-  //TODO
-  //registrationmanager
-  //connect to signal that global names and active points have changed
 
   //layout
   //mVerticalLayout->addWidget(mImagesComboBox);
@@ -183,6 +179,9 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
           this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
   connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
           this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+
+  //get the images landmarks and populate the landmark table
+  this->populateTheLandmarkTableWidget(mCurrentImage);
 }
 void PatientRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
 {

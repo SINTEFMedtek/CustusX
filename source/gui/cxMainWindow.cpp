@@ -243,10 +243,6 @@ void MainWindow::deactivatePatientDataState()
 {}
 void MainWindow::activateImageRegistationState()
 {
-  //TODO
-  //this->addDockWidget(Qt::LeftDockWidgetArea, mImageRegistrationWidget);
-  //mImageRegistrationWidget->show();
-
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
       QString("Image Registration"));
 
@@ -254,9 +250,6 @@ void MainWindow::activateImageRegistationState()
 }
 void MainWindow::deactivateImageRegistationState()
 {
-  //TODO
-  //this->removeDockWidget(mImageRegistrationWidget);
-
   if(mImageRegistrationIndex != -1)
   {
     mContextDockWidget->removeTab(mImageRegistrationIndex);
@@ -265,10 +258,6 @@ void MainWindow::deactivateImageRegistationState()
 }
 void MainWindow::activatePatientRegistrationState()
 {
-  //TODO
-  //this->addDockWidget(Qt::LeftDockWidgetArea, mPatientRegistrationWidget);
-  //mPatientRegistrationWidget->show();
-
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
       QString("Patient Registration"));
 
@@ -276,9 +265,6 @@ void MainWindow::activatePatientRegistrationState()
 }
 void MainWindow::deactivatePatientRegistrationState()
 {
-  //TODO
-  //this->removeDockWidget(mPatientRegistrationWidget);
-
   if(mPatientRegistrationIndex != -1)
   {
     mContextDockWidget->removeTab(mPatientRegistrationIndex);

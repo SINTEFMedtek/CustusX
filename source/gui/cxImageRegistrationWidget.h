@@ -38,42 +38,42 @@ class ImageRegistrationWidget : public QWidget
   Q_OBJECT
 
 public:
-  ImageRegistrationWidget();
-  ~ImageRegistrationWidget();
+  ImageRegistrationWidget(); ///<
+  ~ImageRegistrationWidget(); ///<
 
 protected slots:
-  void currentImageChangedSlot(ssc::ImagePtr currentImage);
-  void addLandmarkButtonClickedSlot();
-  void editLandmarkButtonClickedSlot();
-  void removeLandmarkButtonClickedSlot();
+  void currentImageChangedSlot(ssc::ImagePtr currentImage); ///<
+  void addLandmarkButtonClickedSlot(); ///<
+  void editLandmarkButtonClickedSlot(); ///<
+  void removeLandmarkButtonClickedSlot(); ///<
   //void imageSelectedSlot(const QString& comboBoxText); //TODO REMOVE
-  //void visibilityOfDockWidgetChangedSlot(bool visible);
-  void imageLandmarksUpdateSlot(double, double, double,unsigned int);
-  void landmarkSelectedSlot(int row, int column);
+  //void visibilityOfDockWidgetChangedSlot(bool visible); //TODO REMOVE
+  void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///<
+  void landmarkSelectedSlot(int row, int column); ///<
   //void populateTheImageComboBox(); //TODO REMOVE
-  void cellChangedSlot(int row,int column);
+  void cellChangedSlot(int row,int column); ///<
 
 
 protected:
-  void populateTheLandmarkTableWidget(ssc::ImagePtr image);
+  void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///<
 
-  QVBoxLayout* mVerticalLayout;
+  QVBoxLayout* mVerticalLayout; ///<
   //QComboBox* mImagesComboBox;
-  QTableWidget* mLandmarkTableWidget;
-  QPushButton* mAddLandmarkButton;
-  QPushButton* mEditLandmarkButton;
-  QPushButton* mRemoveLandmarkButton;
+  QTableWidget* mLandmarkTableWidget; ///<
+  QPushButton* mAddLandmarkButton; ///<
+  QPushButton* mEditLandmarkButton; ///<
+  QPushButton* mRemoveLandmarkButton; ///<
 
-  RepManager* mRepManager;
-  DataManager* mDataManager;
-  ViewManager* mViewManager;
-  RegistrationManager* mRegistrationManager;
-  MessageManager* mMessageManager;
+  RepManager* mRepManager; ///<
+  DataManager* mDataManager; ///<
+  ViewManager* mViewManager; ///<
+  RegistrationManager* mRegistrationManager; ///<
+  MessageManager* mMessageManager; ///<
 
-  ssc::ImagePtr mCurrentImage;
-  std::map<int, bool> mLandmarkActiveMap;
+  ssc::ImagePtr mCurrentImage; ///<
+  std::map<int, bool> mLandmarkActiveMap; ///<
 
-  int mCurrentRow, mCurrentColumn;
+  int mCurrentRow, mCurrentColumn; ///<
 };
 }//namespace cx
 

@@ -70,10 +70,6 @@ ImageRegistrationWidget::ImageRegistrationWidget() :
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)),
           this, SLOT(cellChangedSlot(int,int)));
 
-  //TODO
-  //registrationmanager
-  //connect to signal that global names and active points have changed???
-
   //layout
   //mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
