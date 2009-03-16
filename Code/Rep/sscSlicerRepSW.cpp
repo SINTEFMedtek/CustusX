@@ -24,6 +24,7 @@ namespace ssc
 SliceRepSW::SliceRepSW(const std::string& uid) :
 	RepImpl(uid)
 {	
+	std::cout << "SliceRepSW created: " << uid << std::endl;
 	mReslicer = vtkImageReslicePtr::New();
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
 	mImageActor = vtkImageActorPtr::New();
@@ -56,6 +57,8 @@ SliceRepSWPtr SliceRepSW::New(const std::string& uid)
  */
 void SliceRepSW::setInput(vtkImageDataPtr input)
 {
+	std::cout << "DANGEROUS METHOD CALLED: " << getName() << std::endl;
+	
 	if(!input)
 		 return;
 	
@@ -72,6 +75,7 @@ void SliceRepSW::setInput(vtkImageDataPtr input)
  */
 void SliceRepSW::setImage( ImagePtr image )
 {
+	std::cout << "SliceRepSW::setImage called: [" << getName() << "]" << std::endl;
 	
 	if (mImage)
 	{
@@ -89,13 +93,13 @@ void SliceRepSW::setImage( ImagePtr image )
 	double to; 
 	vtkLookupTable *table =vtkLookupTable::SafeDownCast( image->lookupTable2D().getLookupTable());
 	table->GetAlphaRange(from, to );
-	std::cout<<"opacity from " <<from<<", to: "<<to <<std::endl;
+	//std::cout<<"opacity from " <<from<<", to: "<<to <<std::endl;
 	
 	mWindowLevel->SetLookupTable(table);
 	mWindowLevel->SetOutputFormatToRGBA();
 	mWindowLevel->Update();	
 	
-	std::cout<<"Number of components "<< mWindowLevel->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
+	//std::cout<<"Number of components "<< mWindowLevel->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
 }
 
 std::string SliceRepSW::getImageUid()const
@@ -138,6 +142,7 @@ void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 void SliceRepSW::update()
 {
 	Transform3D rMs = mSlicer->get_sMr().inv();
+	rMs_debug = rMs;
 	//std::cout << "slicerep get transform "+getName()+" :\n"+boost::lexical_cast<std::string>(rMs) << std::endl;
 	mMatrixAxes->DeepCopy(rMs.matrix());
 }
@@ -164,7 +169,16 @@ void SliceRepSW::printSelf(std::ostream & os, Indent indent)
 	if (mSlicer)
 	{
 		mSlicer->printSelf(os, indent.stepDown());
-	}		
+	}
+	os << indent << "mReslicer->GetOutput(): " << mReslicer->GetOutput() << std::endl;
+	os << indent << "mReslicer->GetInput() : " << mReslicer->GetInput() << std::endl;
+	Transform3D test(mReslicer->GetResliceAxes());
+	os << indent << "resliceaxes: " << std::endl;
+	test.put(os, indent.getIndent()+3);
+	os << std::endl;
+	//os << indent << "rMs_debug: " << std::endl;
+	//rMs_debug.put(os, indent.getIndent()+3);
+
 }
 
 }// namespace ssc

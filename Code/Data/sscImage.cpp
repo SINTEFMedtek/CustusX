@@ -22,6 +22,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mUid(uid), mName(uid), mBaseImageData(data),
 	mLandmarks(vtkDoubleArray::New())
 {
+	std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
 #ifdef USE_TRANSFORM_RESCLICER
 	//mBaseImageData->ReleaseDataFlagOn();
@@ -40,6 +41,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
+	std::cout << "Image::setVtkImageData() " << std::endl;
 	mBaseImageData = data;
 #ifdef USE_TRANSFORM_RESCLICER
 	mOrientator->SetInput(mBaseImageData);

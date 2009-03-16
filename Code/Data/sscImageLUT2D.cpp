@@ -30,11 +30,11 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	mLowLevel->AddPoint(255, 1.0);
 	 
 	//make a default system set lookuptable, Default my be gryscale...
-	mLut = vtkLookupTablePtr::New();
-	mLut->SetHueRange(0.0, 0.0);	
-	mLut->SetSaturationRange(0.0, 0.0);
-	mLut->SetValueRange(0.0, 1.0);
-	mLut->Build();
+	mLookupTable = vtkLookupTablePtr::New();
+	mLookupTable->SetHueRange(0.0, 0.0);	
+	mLookupTable->SetSaturationRange(0.0, 0.0);
+	mLookupTable->SetValueRange(0.0, 1.0);
+	mLookupTable->Build();
 		
 	
 //	mLookupTable->SetNumberOfColors(1);
@@ -54,15 +54,13 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 //set lookupTable, generated from file only froms DataManagerImpl::setViewControlData
 void ImageLUT2D::setLookupTable(vtkLookupTablePtr lut)
 {
-	std::cout<<"Got image lookup tabel "<<std::endl;	
+	std::cout<<"Got image lookup tabel "<<std::endl;
 	mLookupTable = lut;
 }
 
 vtkLookupTablePtr ImageLUT2D::getLookupTable()
 {		
-	std::cout<<"Image LUT2D, fetch lookuptable"<<std::endl;
-	if(!mLookupTable)
-		mLookupTable = mLut;	
+	std::cout<<"Image LUT2D, fetch lookuptable"<<std::endl;	
 	return mLookupTable;	
 }
 
@@ -72,10 +70,10 @@ void ImageLUT2D::addNewColor(QColor color)
 	double hue = color.hue()/255.0;
 	double saturation = color.saturation()/255.0;
 	
-	std::cout<<"Got new color:"<<std::endl;
-	std::cout<<"hue: "<<hue<<"\nsaturation: "<<saturation<<"\nvalue: "<<value<<std::endl;
-	
-	std::cout<<"---------------------"<<std::endl;
+//	std::cout<<"Got new color:"<<std::endl;
+//	std::cout<<"hue: "<<hue<<"\nsaturation: "<<saturation<<"\nvalue: "<<value<<std::endl;
+//	
+//	std::cout<<"---------------------"<<std::endl;
 	
 	mLookupTable->SetSaturationRange(0, saturation);	
 	mLookupTable->SetHueRange(0.0, hue);

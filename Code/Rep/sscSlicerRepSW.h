@@ -29,7 +29,7 @@ class SliceRepSW : public RepImpl
 public:
 	static SliceRepSWPtr New(const std::string& uid);	
 	virtual ~SliceRepSW();
-	virtual std::string getType() const { return "ssc::SliceRep"; };
+	virtual std::string getType() const { return "ssc::SliceRepSW"; };
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
 	void setInput(vtkImageDataPtr input);
@@ -56,6 +56,9 @@ private:
 	//PLANE_TYPE mType;
 	ImagePtr mImage;
 
+	Transform3D rMs_debug;
+	
+	
 	SliceProxyPtr mSlicer;
 	//std::string mImageUid;
 	vtkWindowLevelLookupTablePtr mLookupTable;
