@@ -8,7 +8,6 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <vtkDoubleArray.h>
-
 #include "sscDataManager.h"
 #include "sscVector3D.h"
 #include "cxVolumetricRep.h"
@@ -35,7 +34,7 @@ namespace cx
 {
 PatientRegistrationWidget::PatientRegistrationWidget() :
   mVerticalLayout(new QVBoxLayout(this)),
-  mImagesComboBox(new QComboBox(this)),
+  //mImagesComboBox(new QComboBox(this)),
   mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
   mAccuracyLabel(new QLabel(QString(" "), this)),
@@ -50,14 +49,15 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
 {
   //Dock widget
   this->setWindowTitle("Patient Registration");
-  connect(this, SIGNAL(visibilityChanged(bool)),
-          this, SLOT(visibilityOfDockWidgetChangedSlot(bool)));
+/*  connect(this, SIGNAL(visibilityChanged(bool)), //TODO does not exist in widget
+          this, SLOT(visibilityOfWidgetChangedSlot(bool)));*/
 
+  //TODO REMOVE
   //combobox
-  mImagesComboBox->setEditable(false);
-  mImagesComboBox->setEnabled(false);
-  connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString& )),
-          this, SLOT(imageSelectedSlot(const QString& )));
+/*  mImagesComboBox->setEditable(false);
+  mImagesComboBox->setEnabled(false);*/
+/*  connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString& )),
+          this, SLOT(imageSelectedSlot(const QString& )));*/
 
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int, int)),
@@ -78,8 +78,12 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
   connect(mToolManager, SIGNAL(toolSampleRemoved(double,double,double,unsigned int)),
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
 
+  //TODO
+  //registrationmanager
+  //connect to signal that global names and active points have changed
+
   //layout
-  mVerticalLayout->addWidget(mImagesComboBox);
+  //mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAccuracyLabel);
@@ -91,7 +95,8 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
 }
 PatientRegistrationWidget::~PatientRegistrationWidget()
 {}
-void PatientRegistrationWidget::imageSelectedSlot(const QString& comboBoxText)
+//TODO REMOVE
+/*void PatientRegistrationWidget::imageSelectedSlot(const QString& comboBoxText)
 {
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
     return;
@@ -152,8 +157,38 @@ void PatientRegistrationWidget::imageSelectedSlot(const QString& comboBoxText)
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+}*/
+void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage)
+{
+  if(mCurrentImage == currentImage)
+    return;
+
+  //disconnect from the old image
+  if(mCurrentImage)
+  {
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+              this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+              this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  }
+
+  //save active points before changing image
+  mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
+  mLandmarkActiveMap = mRegistrationManager->getActivePointsMap(); //TODO is this correct?
+
+  mCurrentImage = currentImage;
+
+  //connect to new image
+  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
 }
-void PatientRegistrationWidget::visibilityOfDockWidgetChangedSlot(bool visible)
+void PatientRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
+{
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+}
+/*void PatientRegistrationWidget::visibilityOfWidgetChangedSlot(bool visible)
 {
   if(visible)
   {
@@ -169,7 +204,7 @@ void PatientRegistrationWidget::visibilityOfDockWidgetChangedSlot(bool visible)
     //update the active vector in registration manager
     mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
   }
-}
+}*/
 void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double notUsedY, double notUsedZ,unsigned int notUsedIndex)
 {
   int numberOfToolSamples = mToolManager->getToolSamples()->GetNumberOfTuples();
@@ -215,7 +250,8 @@ void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
   mCurrentRow = row;
   mCurrentColumn = column;
 }
-void PatientRegistrationWidget::populateTheImageComboBox()
+//TODO REMOVE
+/*void PatientRegistrationWidget::populateTheImageComboBox()
 {
   mImagesComboBox->clear();
 
@@ -247,7 +283,7 @@ void PatientRegistrationWidget::populateTheImageComboBox()
     return;
 
   mImagesComboBox->setCurrentIndex(comboboxIndex);
-}
+}*/
 void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 {
   if (column!=0)

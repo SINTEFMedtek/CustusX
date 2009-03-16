@@ -42,14 +42,15 @@ public:
   ~ImageRegistrationWidget();
 
 protected slots:
+  void currentImageChangedSlot(ssc::ImagePtr currentImage);
   void addLandmarkButtonClickedSlot();
   void editLandmarkButtonClickedSlot();
   void removeLandmarkButtonClickedSlot();
-  void imageSelectedSlot(const QString& comboBoxText);
-  void visibilityOfDockWidgetChangedSlot(bool visible);
+  //void imageSelectedSlot(const QString& comboBoxText); //TODO REMOVE
+  //void visibilityOfDockWidgetChangedSlot(bool visible);
   void imageLandmarksUpdateSlot(double, double, double,unsigned int);
   void landmarkSelectedSlot(int row, int column);
-  void populateTheImageComboBox();
+  //void populateTheImageComboBox(); //TODO REMOVE
   void cellChangedSlot(int row,int column);
 
 
@@ -57,7 +58,7 @@ protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
 
   QVBoxLayout* mVerticalLayout;
-  QComboBox* mImagesComboBox;
+  //QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;
   QPushButton* mAddLandmarkButton;
   QPushButton* mEditLandmarkButton;

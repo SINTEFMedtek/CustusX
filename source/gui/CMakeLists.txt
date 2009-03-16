@@ -4,6 +4,7 @@ SET(cxProject_MOC_HDRS
   cxMainWindow.h
   cxMessageManager.h
   cxCustomStatusBar.h
+  cxContextDockWidget.h
   cxImageRegistrationWidget.h
   cxPatientRegistrationWidget.h
 )
@@ -27,6 +28,8 @@ SET(${LIBNAME}_SRCS
     cxMessageManager.cpp
     cxCustomStatusBar.h
     cxCustomStatusBar.cpp
+    cxContextDockWidget.h
+    cxContextDockWidget.cpp
     cxImageRegistrationWidget.h
     cxImageRegistrationWidget.cpp
     cxPatientRegistrationWidget.h

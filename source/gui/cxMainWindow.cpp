@@ -13,6 +13,7 @@
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxCustomStatusBar.h"
+#include "cxContextDockWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxPatientRegistrationWidget.h"
 
@@ -35,8 +36,11 @@ MainWindow::MainWindow() :
   mRepManager(RepManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),
   mCentralWidget(new QWidget()),
+  mContextDockWidget(new ContextDockWidget()),
   mImageRegistrationWidget(new ImageRegistrationWidget()),
-  mPatientRegistrationWidget(new PatientRegistrationWidget())
+  mPatientRegistrationWidget(new PatientRegistrationWidget()),
+  mImageRegistrationIndex(-1),
+  mPatientRegistrationIndex(-1)
   //mCustomStatusBar(new CustomStatusBar())
 {
   this->createActions();
@@ -55,7 +59,10 @@ MainWindow::MainWindow() :
           this, SLOT(printSlot(std::string)));
 }
 MainWindow::~MainWindow()
-{}
+{
+  //TODO
+  //do I need to disconnect signals and slots here?
+}
 void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
@@ -123,6 +130,13 @@ void MainWindow::createActions()
       mViewManager, SLOT(setLayoutTo_3DACS_1X3()));
   connect(mACSACS_2x3_LayoutAction, SIGNAL(triggered()),
       mViewManager, SLOT(setLayoutTo_ACSACS_2X3()));
+
+  //context widgets
+  this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
+  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+          mImageRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
+  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+          mPatientRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 }
 void MainWindow::createMenus()
 {
@@ -231,7 +245,10 @@ void MainWindow::activateImageRegistationState()
 {
   //TODO
   //this->addDockWidget(Qt::LeftDockWidgetArea, mImageRegistrationWidget);
-  mImageRegistrationWidget->show();
+  //mImageRegistrationWidget->show();
+
+  mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
+      QString("Image Registration"));
 
   mCurrentWorkflowState = IMAGE_REGISTRATION;
 }
@@ -239,12 +256,21 @@ void MainWindow::deactivateImageRegistationState()
 {
   //TODO
   //this->removeDockWidget(mImageRegistrationWidget);
+
+  if(mImageRegistrationIndex != -1)
+  {
+    mContextDockWidget->removeTab(mImageRegistrationIndex);
+    mImageRegistrationIndex = -1;
+  }
 }
 void MainWindow::activatePatientRegistrationState()
 {
   //TODO
   //this->addDockWidget(Qt::LeftDockWidgetArea, mPatientRegistrationWidget);
-  mPatientRegistrationWidget->show();
+  //mPatientRegistrationWidget->show();
+
+  mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
+      QString("Patient Registration"));
 
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
@@ -252,6 +278,12 @@ void MainWindow::deactivatePatientRegistrationState()
 {
   //TODO
   //this->removeDockWidget(mPatientRegistrationWidget);
+
+  if(mPatientRegistrationIndex != -1)
+  {
+    mContextDockWidget->removeTab(mPatientRegistrationIndex);
+    mPatientRegistrationIndex = -1;
+  }
 }
 void MainWindow::activateNavigationState()
 {

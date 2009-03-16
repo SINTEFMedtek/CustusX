@@ -31,6 +31,7 @@ class ViewManager;
 class ToolManager;
 class MessageManager;
 class CustomStatusBar;
+class ContextDockWidget;
 class ImageRegistrationWidget;
 class PatientRegistrationWidget;
 
@@ -133,10 +134,12 @@ protected:
   QToolBar* mDataToolBar; //load
   QToolBar* mToolToolBar; //start and stop
 
-  ImageRegistrationWidget* mImageRegistrationWidget;
-  PatientRegistrationWidget* mPatientRegistrationWidget;
+  ContextDockWidget* mContextDockWidget;
+  ImageRegistrationWidget* mImageRegistrationWidget; ///<
+  PatientRegistrationWidget* mPatientRegistrationWidget; ///<
   //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
   //CustomStatusBar* mCustomStatusBar; //TODO, not working yet
+  int mImageRegistrationIndex, mPatientRegistrationIndex;
 
   //Prefrences
   QString mCurrentPatientDataFolder;

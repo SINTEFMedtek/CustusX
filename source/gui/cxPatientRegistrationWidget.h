@@ -47,13 +47,15 @@ public:
   ~PatientRegistrationWidget();
 
 protected slots:
-  void imageSelectedSlot(const QString& comboBoxText);
-  void visibilityOfDockWidgetChangedSlot(bool visible);
+  //void imageSelectedSlot(const QString& comboBoxText); //TODO REMOVE
+  void currentImageChangedSlot(ssc::ImagePtr currentImage);
+  void imageLandmarksUpdateSlot(double, double, double,unsigned int);
+  //void visibilityOfWidgetChangedSlot(bool visible);
   void toolSampledUpdateSlot(double, double, double,unsigned int);
   void toolVisibleSlot(bool visible);
   void toolSampleButtonClickedSlot();
   void rowSelectedSlot(int row, int column);
-  void populateTheImageComboBox();
+  //void populateTheImageComboBox(); //TODO REMOVE
   void cellChangedSlot(int row, int column);
   void dominantToolChangedSlot(const std::string& uid);
 
@@ -63,7 +65,7 @@ protected:
   void doPatientRegistration();
 
   QVBoxLayout* mVerticalLayout;
-  QComboBox* mImagesComboBox;
+  //QComboBox* mImagesComboBox; //TODO REMOVE
   QTableWidget* mLandmarkTableWidget;
   QPushButton* mToolSampleButton;
   QLabel* mAccuracyLabel;
