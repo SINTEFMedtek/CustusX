@@ -1,4 +1,4 @@
-#include "cxPatientRegistrationDockWidget.h"
+#include "cxPatientRegistrationWidget.h"
 
 #include <QVBoxLayout>
 #include <QComboBox>
@@ -33,13 +33,12 @@
 
 namespace cx
 {
-PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
-  mGuiContainer(new QWidget(this)),
-  mVerticalLayout(new QVBoxLayout(mGuiContainer)),
-  mImagesComboBox(new QComboBox(mGuiContainer)),
-  mLandmarkTableWidget(new QTableWidget(mGuiContainer)),
-  mToolSampleButton(new QPushButton("Sample Tool", mGuiContainer)),
-  mAccuracyLabel(new QLabel(QString(" "),mGuiContainer)),
+PatientRegistrationWidget::PatientRegistrationWidget() :
+  mVerticalLayout(new QVBoxLayout(this)),
+  mImagesComboBox(new QComboBox(this)),
+  mLandmarkTableWidget(new QTableWidget(this)),
+  mToolSampleButton(new QPushButton("Sample Tool", this)),
+  mAccuracyLabel(new QLabel(QString(" "), this)),
   mDataManager(DataManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
@@ -51,7 +50,6 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
 {
   //Dock widget
   this->setWindowTitle("Patient Registration");
-  this->setWidget(mGuiContainer);
   connect(this, SIGNAL(visibilityChanged(bool)),
           this, SLOT(visibilityOfDockWidgetChangedSlot(bool)));
 
@@ -85,14 +83,15 @@ PatientRegistrationDockWidget::PatientRegistrationDockWidget() :
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAccuracyLabel);
+  this->setLayout(mVerticalLayout);
 
   ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
   if(dominantTool.get() != NULL)
     this->dominantToolChangedSlot(dominantTool->getUid());
 }
-PatientRegistrationDockWidget::~PatientRegistrationDockWidget()
+PatientRegistrationWidget::~PatientRegistrationWidget()
 {}
-void PatientRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
+void PatientRegistrationWidget::imageSelectedSlot(const QString& comboBoxText)
 {
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
     return;
@@ -154,7 +153,7 @@ void PatientRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxTex
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
 }
-void PatientRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
+void PatientRegistrationWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 {
   if(visible)
   {
@@ -171,7 +170,7 @@ void PatientRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visib
     mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
   }
 }
-void PatientRegistrationDockWidget::toolSampledUpdateSlot(double notUsedX, double notUsedY, double notUsedZ,unsigned int notUsedIndex)
+void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double notUsedY, double notUsedZ,unsigned int notUsedIndex)
 {
   int numberOfToolSamples = mToolManager->getToolSamples()->GetNumberOfTuples();
   int numberOfActiveToolSamples = 0;
@@ -188,14 +187,14 @@ void PatientRegistrationDockWidget::toolSampledUpdateSlot(double notUsedX, doubl
     this->updateAccuracy();
   }
 }
-void PatientRegistrationDockWidget::toolVisibleSlot(bool visible)
+void PatientRegistrationWidget::toolVisibleSlot(bool visible)
 {
   if(visible)
     mToolSampleButton->setEnabled(true);
   else
     mToolSampleButton->setEnabled(false);
 }
-void PatientRegistrationDockWidget::toolSampleButtonClickedSlot()
+void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 {
   ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
   if(lastTransform.get() == NULL)
@@ -211,12 +210,12 @@ void PatientRegistrationDockWidget::toolSampleButtonClickedSlot()
   unsigned int index = mCurrentRow+1;
   mToolManager->addToolSampleSlot(x, y, z, index);
 }
-void PatientRegistrationDockWidget::rowSelectedSlot(int row, int column)
+void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
 {
   mCurrentRow = row;
   mCurrentColumn = column;
 }
-void PatientRegistrationDockWidget::populateTheImageComboBox()
+void PatientRegistrationWidget::populateTheImageComboBox()
 {
   mImagesComboBox->clear();
 
@@ -249,7 +248,7 @@ void PatientRegistrationDockWidget::populateTheImageComboBox()
 
   mImagesComboBox->setCurrentIndex(comboboxIndex);
 }
-void PatientRegistrationDockWidget::cellChangedSlot(int row, int column)
+void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 {
   if (column!=0)
     return;
@@ -258,7 +257,7 @@ void PatientRegistrationDockWidget::cellChangedSlot(int row, int column)
   mLandmarkActiveMap[row] = state;
 
 }
-void PatientRegistrationDockWidget::dominantToolChangedSlot(const std::string& uid)
+void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 {
   if(mToolToSample.get() != NULL && mToolToSample->getUid() == uid)
     return;
@@ -287,7 +286,7 @@ void PatientRegistrationDockWidget::dominantToolChangedSlot(const std::string& u
   //update button
   mToolSampleButton->setEnabled(mToolToSample->getVisible());
 }
-void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
+void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
   //get globalPointsNameList from the RegistrationManager
   RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
@@ -387,7 +386,7 @@ void PatientRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr
     columnTwo->setText(QString(name.c_str()));
   }
 }
-void PatientRegistrationDockWidget::updateAccuracy()
+void PatientRegistrationWidget::updateAccuracy()
 {
   //ssc:Image masterImage = mRegistrationManager->getMasterImage();
   vtkDoubleArrayPtr globalPointset = mRegistrationManager->getGlobalPointSet();
@@ -461,7 +460,7 @@ void PatientRegistrationDockWidget::updateAccuracy()
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
 
-void PatientRegistrationDockWidget::doPatientRegistration()
+void PatientRegistrationWidget::doPatientRegistration()
 {
   mRegistrationManager->doPatientRegistration();
 }

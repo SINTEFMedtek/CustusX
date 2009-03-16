@@ -155,7 +155,7 @@ void VolumetricRep::pickSurfacePoint(vtkObject* object, double &x, double &y, do
   }
   pointFrontWorld[3] = pointBackWorld[3] = 1.0;
 
-  //Creating the line from the camera throught the picked point
+  //Creating the line from the camera through the picked point
   //into the volume
   vtkSmartPointer<vtkLineSource> lineSource = vtkLineSource::New();
   lineSource->SetPoint1(pointFrontWorld[0], pointFrontWorld[1], pointFrontWorld[2]);
@@ -254,8 +254,6 @@ void VolumetricRep::addRepActorsToViewRenderer(ssc::View* view)
 }
 void VolumetricRep::showTemporaryPointSlot(double x, double y, double z)
 {
-  //std::cout << "void VolumetricRep::showTemporaryPointSlot("<< x <<","<< y <<" ,"<< z <<")" << std::endl;
-
   if(mCurrentRenderer == NULL)
   {
     mMessageManager->sendWarning("Could not determine what renderer to add the temporary point to. Try picking a point in the rep first.");

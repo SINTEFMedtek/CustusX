@@ -1,4 +1,4 @@
-#include "cxImageRegistrationDockWidget.h"
+#include "cxImageRegistrationWidget.h"
 
 #include <QVBoxLayout>
 #include <QComboBox>
@@ -28,14 +28,13 @@
 
 namespace cx
 {
-ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
-  mGuiContainer(new QWidget(this)),
-  mVerticalLayout(new QVBoxLayout(mGuiContainer)),
-  mImagesComboBox(new QComboBox(mGuiContainer)),
-  mLandmarkTableWidget(new QTableWidget(mGuiContainer)),
-  mAddLandmarkButton(new QPushButton("Add landmark", mGuiContainer)),
-  mEditLandmarkButton(new QPushButton("Resample landmark", mGuiContainer)),
-  mRemoveLandmarkButton(new QPushButton("Remove landmark", mGuiContainer)),
+ImageRegistrationWidget::ImageRegistrationWidget() :
+  mVerticalLayout(new QVBoxLayout(this)),
+  mImagesComboBox(new QComboBox(this)),
+  mLandmarkTableWidget(new QTableWidget(this)),
+  mAddLandmarkButton(new QPushButton("Add landmark", this)),
+  mEditLandmarkButton(new QPushButton("Resample landmark", this)),
+  mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
   mRepManager(RepManager::getInstance()),
   mDataManager(DataManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
@@ -46,7 +45,6 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
 {
   //dock widget
   this->setWindowTitle("Image Registration");
-  this->setWidget(mGuiContainer);
   connect(this, SIGNAL(visibilityChanged(bool)),
           this, SLOT(visibilityOfDockWidgetChangedSlot(bool)));
 
@@ -78,12 +76,12 @@ ImageRegistrationDockWidget::ImageRegistrationDockWidget() :
   mVerticalLayout->addWidget(mAddLandmarkButton);
   mVerticalLayout->addWidget(mEditLandmarkButton);
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
-  mGuiContainer->setLayout(mVerticalLayout);
+  this->setLayout(mVerticalLayout);
 
 }
-ImageRegistrationDockWidget::~ImageRegistrationDockWidget()
+ImageRegistrationWidget::~ImageRegistrationWidget()
 {}
-void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
+void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   if(volumetricRep.get() == NULL)
@@ -100,7 +98,7 @@ void ImageRegistrationDockWidget::addLandmarkButtonClickedSlot()
   if(masterImage.get() == NULL)
     mRegistrationManager->setMasterImage(mCurrentImage);
 }
-void ImageRegistrationDockWidget::editLandmarkButtonClickedSlot()
+void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   if(volumetricRep.get() == NULL)
@@ -111,7 +109,7 @@ void ImageRegistrationDockWidget::editLandmarkButtonClickedSlot()
   int index = mCurrentRow+1;
   volumetricRep->makePointPermanent(index);
 }
-void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
+void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
   if(mCurrentRow < 0 || mCurrentColumn < 0)
     return;
@@ -121,7 +119,7 @@ void ImageRegistrationDockWidget::removeLandmarkButtonClickedSlot()
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   landmarkRep->removePermanentPoint(index);
 }
-void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
+void ImageRegistrationWidget::imageSelectedSlot(const QString& comboBoxText)
 {
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
     return;
@@ -214,7 +212,7 @@ void ImageRegistrationDockWidget::imageSelectedSlot(const QString& comboBoxText)
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
 }*/
 
-void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
+void ImageRegistrationWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 {
   if(visible)
   {
@@ -258,11 +256,11 @@ void ImageRegistrationDockWidget::visibilityOfDockWidgetChangedSlot(bool visible
       mRegistrationManager->setGlobalPointSet(mCurrentImage->getLandmarks());
   }
 }
-void ImageRegistrationDockWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
+void ImageRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
 {
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
-void ImageRegistrationDockWidget::populateTheImageComboBox()
+void ImageRegistrationWidget::populateTheImageComboBox()
 {
   mImagesComboBox->clear();
 
@@ -289,14 +287,14 @@ void ImageRegistrationDockWidget::populateTheImageComboBox()
   //enable the add point button if any images was found
   mAddLandmarkButton->setEnabled(true);
 }
-void ImageRegistrationDockWidget::landmarkSelectedSlot(int row, int column)
+void ImageRegistrationWidget::landmarkSelectedSlot(int row, int column)
 {
   mCurrentRow = row;
   mCurrentColumn = column;
 
   mEditLandmarkButton->setEnabled(true);
 }
-void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
+void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
   //get globalPointsNameList from the RegistrationManager
   RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
@@ -413,7 +411,7 @@ void ImageRegistrationDockWidget::populateTheLandmarkTableWidget(ssc::ImagePtr i
       mEditLandmarkButton->setEnabled(true);
   }
 }
-void ImageRegistrationDockWidget::cellChangedSlot(int row,int column)
+void ImageRegistrationWidget::cellChangedSlot(int row,int column)
 {
   if(column==0)
   {

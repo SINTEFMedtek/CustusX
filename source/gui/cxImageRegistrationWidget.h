@@ -1,8 +1,8 @@
-#ifndef CXIMAGEREGISTRATIONDOCKWIDGET_H_
-#define CXIMAGEREGISTRATIONDOCKWIDGET_H_
+#ifndef CXIMAGEREGISTRATIONWIDGET_H_
+#define CXIMAGEREGISTRATIONWIDGET_H_
 
 #include <map.h>
-#include <QDockWidget>
+#include <QWidget>
 #include "cxVolumetricRep.h"
 
 /**
@@ -31,15 +31,15 @@ class ViewManager;
 class RegistrationManager;
 class MessageManager;
 
-class ImageRegistrationDockWidget : public QDockWidget
+class ImageRegistrationWidget : public QWidget
 {
   typedef ssc::DataManager DataManager;
 
   Q_OBJECT
 
 public:
-  ImageRegistrationDockWidget();
-  ~ImageRegistrationDockWidget();
+  ImageRegistrationWidget();
+  ~ImageRegistrationWidget();
 
 protected slots:
   void addLandmarkButtonClickedSlot();
@@ -56,7 +56,6 @@ protected slots:
 protected:
   void populateTheLandmarkTableWidget(ssc::ImagePtr image);
 
-  QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
   QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;
@@ -77,4 +76,4 @@ protected:
 };
 }//namespace cx
 
-#endif /* CXIMAGEREGISTRATIONDOCKWIDGET_H_ */
+#endif /* CXIMAGEREGISTRATIONWIDGET_H_ */

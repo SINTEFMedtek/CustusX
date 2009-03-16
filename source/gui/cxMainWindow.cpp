@@ -13,8 +13,8 @@
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxCustomStatusBar.h"
-#include "cxImageRegistrationDockWidget.h"
-#include "cxPatientRegistrationDockWidget.h"
+#include "cxImageRegistrationWidget.h"
+#include "cxPatientRegistrationWidget.h"
 
 /**
  * cxMainWindow.cpp
@@ -35,8 +35,8 @@ MainWindow::MainWindow() :
   mRepManager(RepManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),
   mCentralWidget(new QWidget()),
-  mImageRegistrationDockWidget(new ImageRegistrationDockWidget()),
-  mPatientRegistrationDockWidget(new PatientRegistrationDockWidget())
+  mImageRegistrationWidget(new ImageRegistrationWidget()),
+  mPatientRegistrationWidget(new PatientRegistrationWidget())
   //mCustomStatusBar(new CustomStatusBar())
 {
   this->createActions();
@@ -229,25 +229,29 @@ void MainWindow::deactivatePatientDataState()
 {}
 void MainWindow::activateImageRegistationState()
 {
-  this->addDockWidget(Qt::LeftDockWidgetArea, mImageRegistrationDockWidget);
-  mImageRegistrationDockWidget->show();
+  //TODO
+  //this->addDockWidget(Qt::LeftDockWidgetArea, mImageRegistrationWidget);
+  mImageRegistrationWidget->show();
 
   mCurrentWorkflowState = IMAGE_REGISTRATION;
 }
 void MainWindow::deactivateImageRegistationState()
 {
-  this->removeDockWidget(mImageRegistrationDockWidget);
+  //TODO
+  //this->removeDockWidget(mImageRegistrationWidget);
 }
 void MainWindow::activatePatientRegistrationState()
 {
-  this->addDockWidget(Qt::LeftDockWidgetArea, mPatientRegistrationDockWidget);
-  mPatientRegistrationDockWidget->show();
+  //TODO
+  //this->addDockWidget(Qt::LeftDockWidgetArea, mPatientRegistrationWidget);
+  mPatientRegistrationWidget->show();
 
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
 void MainWindow::deactivatePatientRegistrationState()
 {
-  this->removeDockWidget(mPatientRegistrationDockWidget);
+  //TODO
+  //this->removeDockWidget(mPatientRegistrationWidget);
 }
 void MainWindow::activateNavigationState()
 {

@@ -1,7 +1,7 @@
 #ifndef CXPATIENTREGISTRATIONDOCKWIDGET_H_
 #define CXPATIENTREGISTRATIONDOCKWIDGET_H_
 
-#include <QDockWidget>
+#include <QWidget>
 #include "sscImage.h"
 #include "sscTransform3D.h"
 #include "cxTool.h"
@@ -38,13 +38,13 @@ class MessageManager;
 class ViewManager;
 class RepManager;
 
-class PatientRegistrationDockWidget : public QDockWidget
+class PatientRegistrationWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  PatientRegistrationDockWidget();
-  ~PatientRegistrationDockWidget();
+  PatientRegistrationWidget();
+  ~PatientRegistrationWidget();
 
 protected slots:
   void imageSelectedSlot(const QString& comboBoxText);
@@ -62,7 +62,6 @@ protected:
   void updateAccuracy();
   void doPatientRegistration();
 
-  QWidget* mGuiContainer;
   QVBoxLayout* mVerticalLayout;
   QComboBox* mImagesComboBox;
   QTableWidget* mLandmarkTableWidget;

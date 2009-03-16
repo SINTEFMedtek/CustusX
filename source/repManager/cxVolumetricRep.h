@@ -26,8 +26,8 @@ typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 class VolumetricRep : public ssc::VolumetricRep
 {
   Q_OBJECT
-public:
 
+public:
   static VolumetricRepPtr New(const std::string& uid, const std::string& name="");
 
   virtual std::string getType() const { return "cx::VolumeRep"; } ///< returns this classes type
