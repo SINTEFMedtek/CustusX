@@ -37,7 +37,7 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
   //mImagesComboBox(new QComboBox(this)), //TODO REMOVE
   mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
-  mAccuracyLabel(new QLabel(QString(" "), this)),
+  mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
   mDataManager(DataManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
@@ -82,7 +82,7 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
   //mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
-  mVerticalLayout->addWidget(mAccuracyLabel);
+  mVerticalLayout->addWidget(mAvarageAccuracyLabel);
   this->setLayout(mVerticalLayout);
 
   ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
@@ -479,13 +479,13 @@ void PatientRegistrationWidget::updateAccuracy()
   }
 
   // Calculate total registration accuracy
-  mTotalRegistrationAccuracy = 0;
+  mAverageRegistrationAccuracy = 0;
   std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
   for (int i=0; i < numberOfGlobalImagePoints; i++)
   {
     if(it->second)
     {
-      mTotalRegistrationAccuracy = mTotalRegistrationAccuracy +
+      mAverageRegistrationAccuracy = mAverageRegistrationAccuracy +
                                     mLandmarkRegistrationAccuracyMap[i];
       it++;
     }

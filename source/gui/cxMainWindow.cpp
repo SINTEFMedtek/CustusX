@@ -59,10 +59,7 @@ MainWindow::MainWindow() :
           this, SLOT(printSlot(std::string)));
 }
 MainWindow::~MainWindow()
-{
-  //TODO
-  //do I need to disconnect signals and slots here?
-}
+{}
 void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
@@ -284,11 +281,17 @@ void MainWindow::activateUSAcquisitionState()
 void MainWindow::deactivateUSAcquisitionState()
 {}
 void MainWindow::aboutSlot()
-{}
+{
+  //TODO
+}
 void MainWindow::preferencesSlot()
-{}
+{
+  //TODO
+}
 void MainWindow::quitSlot()
-{}
+{
+  //TODO
+}
 void MainWindow::patientDataWorkflowSlot()
 {
   this->changeState(mCurrentWorkflowState, PATIENT_DATA);
@@ -354,6 +357,7 @@ void MainWindow::configureSlot()
 }
 void MainWindow::printSlot(std::string message)
 {
+  //TODO REMOVE just for debugging
   //std::cout << message << std::endl;
 }
 }//namespace cx
