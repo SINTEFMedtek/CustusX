@@ -27,6 +27,8 @@ public:
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
 	
+	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
+	
 protected:
 	ToolRep3D(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
@@ -49,6 +51,8 @@ private:
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
 	vtkSTLReaderPtr mSTLReader;
+	
+	bool mStayVisibleAfterHide; 
 };
 } // namespace ssc
 
