@@ -20,43 +20,27 @@ class MessageManager : public QObject
   Q_OBJECT
 
 public:
-  /**
-   * Returns a reference to the only MessageManager that exists.
-   * \return The only MessageManager that exists.
-   */
-  static MessageManager* getInstance();
-  /** Should be called by the object that made the MessageManager.*/
-  static void destroyInstance();
+  static MessageManager* getInstance(); ///< Returns a reference to the only MessageManager that exists.
+  static void destroyInstance(); ///< Should be called by the object that made the MessageManager.
 
-  /** Sends information to the statusbar. Used to report successful operations.*/
-  void sendInfo(std::string info);
-  /** Sends a warning to the statusbar. The program does not need to terminate,
-   * but the user might need to do something.*/
-  void sendWarning(std::string warning);
-  /** Sends a errormessage to the statusbar. The program (might) need to
-   * terminate*/
-  void sendError(std::string error);
+  void sendInfo(std::string info); ///< Used to report successful operations.
+  void sendWarning(std::string warning); ///< The program does not need to terminate, but the user might need to do something.
+  void sendError(std::string error); ///< The program (might) need to terminate
 
 signals:
-  /** The signal the owner of a statusbar should listen to.*/
-  void emittedMessage(const QString& message, int timeout);
+  void emittedMessage(const QString& message, int timeout); ///< The signal the owner of a statusbar should listen to.
 
 private:
-  /** Use getInstance().*/
-  MessageManager(){};
-  /** Use destroyInstance().*/
-  ~MessageManager(){};
-  /** Copycontructur.*/
-  MessageManager(const MessageManager&){this->getInstance();};
-  /** Assignment operator*/
-  MessageManager& operator=(const MessageManager&){return *this->getInstance();};
-  /** Emits the signal that actually sends the message.*/
-  void sendMessage(QString &message, int timeout);
+  MessageManager(){}; ///< Use getInstance().
+  ~MessageManager(){}; ///< Use destroyInstance().
+  MessageManager(const MessageManager&){this->getInstance();}; ///< Copycontructur.
+  MessageManager& operator=(const MessageManager&){return *this->getInstance();}; ///< Assignment operator.
 
-  /** The unique ToolManager.*/
-  static MessageManager *mTheInstance;
+  void sendMessage(QString &message, int timeout); ///< Emits the signal that actually sends the message.
+
+  static MessageManager *mTheInstance; ///< The unique MessageManager.
 };
 
-} //End namespace cx
+} //namespace cx
 
 #endif /* MESSAGEMANAGER_H_ */
