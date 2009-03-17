@@ -112,11 +112,15 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
   VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
+  //ProgressiveVolumetricRepPtr progressiveVolumetricRep = mRepManager->getProgressiveVolumetricRep("ProgressiveVolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   volumetricRep->setImage(mCurrentImage);
+  //progressiveVolumetricRep->setImage(mCurrentImage);
   landmarkRep->setImage(mCurrentImage);
   view3D_1->setRep(volumetricRep);
+  //view3D_1->setRep(progressiveVolumetricRep);
   view3D_1->addRep(landmarkRep);
+  //TODO add ProbeRep
 
   //view2D
   View2D* view2D_1 = mViewManager->get2DView("View2D_1");
