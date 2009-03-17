@@ -9,6 +9,7 @@ namespace cx
 {
 /**
  * \class MessageManager
+ *
  * \brief This class handles delivering messages to a statusbar from all the other
  * classes.
  *

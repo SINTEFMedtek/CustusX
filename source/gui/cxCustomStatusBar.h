@@ -8,6 +8,10 @@
  *
  * \warning Not working yet and functionality still missing.
  *
+ * TODO: get the text and color labels representing the tool to work
+ * TODO: divide the statusbar into zones
+ * TODO: first zone should display normal status text, including the messages from messagemanager
+ *
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF
  */

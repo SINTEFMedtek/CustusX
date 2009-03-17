@@ -7,7 +7,7 @@
 #include "cxTool.h"
 
 /**
- * cxPatientRegistrationDockWidget.h
+ * \class PatientRegistrationDockWidget
  *
  * \brief Widget used as a tab in the ContexDockWidget for patient registration.
  *

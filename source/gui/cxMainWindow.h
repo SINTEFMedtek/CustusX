@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 /**
- * cxMainWindow.h
+ * \class MainWindow
  *
  * \brief This is the main gui class which controls the workflow.
  *

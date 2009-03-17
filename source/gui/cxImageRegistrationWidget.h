@@ -6,9 +6,9 @@
 #include "cxVolumetricRep.h"
 
 /**
- * cxImageRegistrationDockWidget.h
+ * \class ImageRegistrationDockWidget
  *
- * \brief Widget used as a tab in teh ContextDockWidget for image registration.
+ * \brief Widget used as a tab in the ContextDockWidget for image registration.
  *
  * \date Jan 27, 2009
  * \author: Janne Beate Bakeng, SINTEF
