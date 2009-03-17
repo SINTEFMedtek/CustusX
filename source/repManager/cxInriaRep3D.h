@@ -7,6 +7,13 @@
 #include <vtkSmartPointer.h>
 #include "sscTransform3D.h"
 
+namespace ssc
+{
+class View;
+}
+namespace cx
+{
+
 /**
  * \class InriaRep3D
  *
@@ -16,12 +23,6 @@
  * \date Dec 8, 2008
  * \author: Janne Beate Bakeng, SINTEF
  */
-namespace ssc
-{
-class View;
-}
-namespace cx
-{
 class InriaRep3D : public ssc::RepImpl
 {
   typedef vtkSmartPointer<class vtkViewImage3D> vtkViewImage3DPtr;

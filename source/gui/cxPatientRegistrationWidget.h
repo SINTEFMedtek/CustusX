@@ -1,19 +1,10 @@
-#ifndef CXPATIENTREGISTRATIONDOCKWIDGET_H_
-#define CXPATIENTREGISTRATIONDOCKWIDGET_H_
+#ifndef CXPATIENTREGISTRATIONWIDGET_H_
+#define CXPATIENTREGISTRATIONWIDGET_H_
 
 #include <QWidget>
 #include "sscImage.h"
 #include "sscTransform3D.h"
 #include "cxTool.h"
-
-/**
- * \class PatientRegistrationDockWidget
- *
- * \brief Widget used as a tab in the ContexDockWidget for patient registration.
- *
- * \date Feb 3, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
 
 class QVBoxLayout;
 class QComboBox;
@@ -39,6 +30,14 @@ class MessageManager;
 class ViewManager;
 class RepManager;
 
+/**
+ * \class PatientRegistrationWidget
+ *
+ * \brief Widget used as a tab in the ContexDockWidget for patient registration.
+ *
+ * \date Feb 3, 2009
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class PatientRegistrationWidget : public QWidget
 {
   Q_OBJECT
@@ -90,4 +89,4 @@ protected:
 };
 }//namespace cx
 
-#endif /* CXPATIENTREGISTRATIONDOCKWIDGET_H_ */
+#endif /* CXPATIENTREGISTRATIONWIDGET_H_ */

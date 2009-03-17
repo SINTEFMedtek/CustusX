@@ -10,17 +10,7 @@
 #include <igstkTransform.h>
 #include <igstkLogger.h>
 #include <itkStdStreamLogOutput.h>
-
 #include "cxTracker.h"
-
-/**
- * cxTool.h
- *
- * \brief
- *
- * \date Nov 6, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
@@ -37,6 +27,14 @@ typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
 typedef std::vector<ssc::Transform3DPtr> Transform3DVector;
 typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
 
+/**
+ * \class Tool
+ *
+ * \brief Class representing the tools a navigation system can recognize.
+ *
+ * \date Nov 6, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class Tool: public ssc::Tool
 {
   Q_OBJECT

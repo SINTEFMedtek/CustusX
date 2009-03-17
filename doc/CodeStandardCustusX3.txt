@@ -38,7 +38,7 @@
 
 -C++ header files should have the name cxClassName.h
 -C++ source files should have the name cxClassName.cpp
--include guards should be used at the start of the headerfile
+-include guards should be used at the start of the header file
 -normally use block grouping (ie { }) for if, while, for and do statements. 
 -brackets are always on their own line, the first one indented similar to the preceeding code.
 -always put spaces like this: for (int i = 0; i < MAX; i++)
@@ -50,9 +50,9 @@
 -Qt instances can be raw pointers if they are set as someones child
 -vtk: use vtkSmartPointer
 -the rest: boost::shared_ptr<class>
--membervariables start with a m and the rest is 'CamelCase', mMemberVariable
--functionsnames are 'lowerCamelCase()'
--classenames are 'UpperCamelCase'
+-member variables start with a m and the rest is 'CamelCase', mMemberVariable
+-function names are 'lowerCamelCase()'
+-class names are 'UpperCamelCase'
 -files should be included in the order of increasing dependencies
 -use forward declaration in header files where possible
 -tab = 2 spaces
@@ -76,7 +76,7 @@
 	  double x; ///< description
 	  double y; ///< description
 	};
-	}//namescace cx
+	}//namespace cx
 	#endif /* CXPOINT_H_ */
 	
 	-------------------------SOURCE FILE-------------------------------

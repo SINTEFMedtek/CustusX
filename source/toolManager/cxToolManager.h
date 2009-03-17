@@ -8,14 +8,6 @@
 #include "cxTool.h"
 #include "cxTracker.h"
 
-/**
- * cxToolManager.h
- *
- * \brief
- *
- * \date Nov 6, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 class QDomNode;
 class QDomNodeList;
 class QTimer;
@@ -25,6 +17,14 @@ namespace cx
 {
 class MessageManager;
 
+/**
+ * \class ToolManager
+ *
+ * \brief Interface towards the navigation system.
+ *
+ * \date Nov 6, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class ToolManager: public ssc::ToolManager
 {
   Q_OBJECT

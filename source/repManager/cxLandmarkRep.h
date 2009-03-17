@@ -6,14 +6,6 @@
 #include <map>
 #include "sscImage.h"
 
-/**
- * cxLandmarkRep.h
- *
- * \brief
- *
- * \date Dec 10, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 namespace ssc
 {
 class View;
@@ -30,6 +22,14 @@ class MessageManager;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 typedef boost::weak_ptr<class LandmarkRep> LandmarkRepWeakPtr;
 
+/**
+ * \class LandmarkRep
+ *
+ * \brief
+ *
+ * \date Dec 10, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class LandmarkRep : public ssc::RepImpl
 {
   Q_OBJECT

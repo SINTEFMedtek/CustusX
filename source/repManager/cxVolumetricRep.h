@@ -3,14 +3,6 @@
 
 #include "sscVolumetricRep.h"
 
-/**
- * cxVolumetricRep.h
- *
- * \brief
- *
- * \date Dec 10, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 class vtkObject;
 class vtkRenderer;
 class vtkActor;
@@ -23,6 +15,14 @@ namespace cx
 class MessageManager;
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
+/**
+ * \class VolumetricRep
+ *
+ * \brief
+ *
+ * \date Dec 10, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class VolumetricRep : public ssc::VolumetricRep
 {
   Q_OBJECT

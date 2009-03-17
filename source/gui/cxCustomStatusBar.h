@@ -1,8 +1,19 @@
 #ifndef CXCustomStatusBar_H_
 #define CXCustomStatusBar_H_
 
+#include <QStatusBar>
+#include <map.h>
+
+class QLabel;
+class QPixmap;
+
+namespace cx
+{
+class MessageManager;
+class ToolManager;
+
 /**
- * cxCustomStatusBar.h
+ * \class CustomStatusBar
  *
  * \brief Statusbar with extended functionality.
  *
@@ -15,18 +26,6 @@
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
-
-#include <QStatusBar>
-#include <map.h>
-
-class QLabel;
-class QPixmap;
-
-namespace cx
-{
-class MessageManager;
-class ToolManager;
-
 class CustomStatusBar: public QStatusBar
 {
   Q_OBJECT

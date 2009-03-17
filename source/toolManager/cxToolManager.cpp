@@ -9,14 +9,6 @@
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxMessageManager.h"
-/**
- * cxToolManager.cpp
- *
- * \brief
- *
- * \date Nov 6, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 
 namespace cx
 {

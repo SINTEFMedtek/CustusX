@@ -10,18 +10,6 @@
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxLandmarkRep.h"
 
-/**
- * \class RepManager
- *
- * \brief Creates a pool of reps (representations) and offers an interface to
- * access them.
- *
- * \warning ProgressiveLODVolumetricRep does not work!
- *
- * \date Dec 10, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
 typedef ssc::ProgressiveLODVolumetricRep ProgressiveVolumetricRep;
@@ -36,6 +24,18 @@ typedef std::map<std::string, LandmarkRepPtr> LandmarkRepMap;
 typedef std::map<std::string, ssc::ToolRep3DPtr> ToolRep3DMap;
 
 class MessageManager;
+
+/**
+ * \class RepManager
+ *
+ * \brief Creates a pool of reps (representations) and offers an interface to
+ * access them.
+ *
+ * \warning ProgressiveLODVolumetricRep does not work!
+ *
+ * \date Dec 10, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class RepManager : public QObject
 {
   Q_OBJECT

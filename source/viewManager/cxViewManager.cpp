@@ -8,14 +8,6 @@
 #include "cxView3D.h"
 #include "cxMessageManager.h"
 
-/**
- * cxViewManager.cpp
- *
- * \brief
- *
- * \date Dec 9, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 namespace cx
 {
 

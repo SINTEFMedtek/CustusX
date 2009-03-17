@@ -3,14 +3,6 @@
 
 #include "sscView.h"
 
-/**
- * cxView2D2.h
- *
- * \brief
- *
- * \date Dec 9, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 class QWidget;
 class QMenu;
 
@@ -21,23 +13,33 @@ class DataManager;
 namespace cx
 {
 class RepManager;
+class MessageManager;
 
+/**
+ * \class View2D
+ *
+ * \brief Class for displaying 2D representations.
+ *
+ * \date Dec 9, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class View2D : public ssc::View
 {
 typedef ssc::DataManager DataManager;
 
 public:
-  View2D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0);
-  virtual ~View2D();
+  View2D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
+  virtual ~View2D(); ///< empty
 
-  virtual Type getType() const { return VIEW_2D;};
-  void contextMenuEvent(QContextMenuEvent *event);
+  virtual Type getType() const { return VIEW_2D;}; ///< get the class type
+  void contextMenuEvent(QContextMenuEvent *event); ///< decides what happens when you rightclick in a view
 
 protected:
-  QMenu* mContextMenu;
+  QMenu* mContextMenu; ///< right click menu
 
-  DataManager* mDataManager;
-  RepManager* mRepManager;
+  DataManager* mDataManager; ///< has all the data loaded into the system
+  RepManager* mRepManager; ///< has a pool of reps
+  MessageManager* mMessageManager; ///< takes messages intended for the user
 
 };
 }//namespace cx

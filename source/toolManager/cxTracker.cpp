@@ -2,15 +2,6 @@
 
 #include "cxTool.h"
 
-/**
- * cxTracker.cpp
- *
- * \brief
- *
- * \date Nov 7, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
 Tracker::Tracker(InternalStructure internalStructure) :

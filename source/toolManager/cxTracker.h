@@ -17,19 +17,19 @@
 #endif
 #include "sscTool.h"
 
-/**
- * cxTracker.h
- *
- * \brief
- *
- * \date Nov 7, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 namespace cx
 {
 typedef std::map<std::string, ssc::ToolPtr> ToolMap;
 typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
+/**
+ * \class Tracker
+ *
+ * \brief Class representing the navigation system.
+ *
+ * \date Nov 7, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class Tracker : public QObject
 {
   Q_OBJECT

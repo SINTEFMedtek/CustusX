@@ -8,15 +8,6 @@
 #include "sscTransform3D.h"
 #include "cxToolmanager.h"
 
-/**
- * cxRegistrationManager.cpp
- *
- * \brief
- *
- * \date Feb 4, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
 RegistrationManager* RegistrationManager::mCxInstance = NULL;

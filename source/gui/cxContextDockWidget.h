@@ -5,15 +5,6 @@
 
 #include "sscImage.h"
 
-/**
- * \class ContextDockWidget
- *
- * \brief Dock widget for context specific information. Lays out the widgets
- * using tabs.
- *
- * \date Mar 16, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
 class QTabWidget;
 class QVBoxLayout;
 class QComboBox;
@@ -32,6 +23,16 @@ class MessageManager;
 class ViewManager;
 class RepManager;
 
+
+/**
+ * \class ContextDockWidget
+ *
+ * \brief Dock widget for context specific information. Lays out the widgets
+ * using tabs.
+ *
+ * \date Mar 16, 2009
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class ContextDockWidget : public QDockWidget
 {
   Q_OBJECT

@@ -7,17 +7,14 @@
 #include "sscDataManager.h"
 #include "cxRepManager.h"
 
-/**
- * cxView2D2.cpp
- *
- * \brief
- *
- * \date Dec 9, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
+/**
+ * \param uid the views unique id
+ * \param name the views name
+ * \param parent the views parent
+ * \param f flags
+ */
 View2D::View2D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
   View(parent, f),
   mContextMenu(new QMenu(this)),

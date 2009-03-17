@@ -4,14 +4,6 @@
 #include <map>
 #include <QObject>
 
-/**
- * cxViewManager.h
- *
- * \brief
- *
- * \date Dec 9, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 class QGridLayout;
 class QWidget;
 class QTimer;
@@ -25,6 +17,15 @@ class MessageManager;
 class View2D;
 class View3D;
 
+/**
+ * \class ViewManager
+ *
+ * \brief Creates a pool of views and offers an interface to them, also handles
+ * layouts on a centralwidget.
+ *
+ * \date Dec 9, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class ViewManager : public QObject
 {
   typedef std::map<std::string, View2D*> View2DMap;
@@ -67,14 +68,14 @@ protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
 
-  void activateLayout_3D_1X1();
-  void deactivatLayout_3D_1X1();
-  void activateLayout_3DACS_2X2();
-  void deactivateLayout_3DACS_2X2();
-  void activateLayout_3DACS_1X3();
-  void deactivateLayout_3DACS_1X3();
-  void activateLayout_ACSACS_2X3();
-  void deactivateLayout_ACSACS_2X3();
+  void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
+  void deactivatLayout_3D_1X1(); ///< deactivate the 3D_1X1 layout
+  void activateLayout_3DACS_2X2(); ///< activate the 3DACS_2X2 layout
+  void deactivateLayout_3DACS_2X2(); ///< deactivate the 3DACS_2X2 layout
+  void activateLayout_3DACS_1X3(); ///< activate the 3DACS_1X3 layout
+  void deactivateLayout_3DACS_1X3(); ///< deactivate the 3DACS_1X3 layout
+  void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
+  void deactivateLayout_ACSACS_2X3(); ///< deactivate the ACSACS_2X3 layout
 
   static ViewManager* mTheInstance; ///< the only instance of this class
   MessageManager*     mMessageManager; ///< device for sending messages to the statusbar

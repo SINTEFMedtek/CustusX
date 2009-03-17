@@ -8,15 +8,6 @@
 
 #include "cxToolManager.h"
 
-/**
- * cxTool.cpp
- *
- * \brief
- *
- * \date Nov 6, 2008
- * \author: jbake
- */
-
 namespace cx
 {
 

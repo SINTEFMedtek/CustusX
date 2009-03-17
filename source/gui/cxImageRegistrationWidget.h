@@ -5,15 +5,6 @@
 #include <QWidget>
 #include "cxVolumetricRep.h"
 
-/**
- * \class ImageRegistrationDockWidget
- *
- * \brief Widget used as a tab in the ContextDockWidget for image registration.
- *
- * \date Jan 27, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 class QVBoxLayout;
 class QComboBox;
 class QTableWidget;
@@ -30,6 +21,14 @@ class ViewManager;
 class RegistrationManager;
 class MessageManager;
 
+/**
+ * \class ImageRegistrationWidget
+ *
+ * \brief Widget used as a tab in the ContextDockWidget for image registration.
+ *
+ * \date Jan 27, 2009
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class ImageRegistrationWidget : public QWidget
 {
   typedef ssc::DataManager DataManager;
@@ -64,7 +63,7 @@ protected:
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
 
   //manageres
-  RepManager* mRepManager; ///< has a pool of reps
+  RepManager* mRepManager; ///< has a pool of reps //TODO remove when removing proberep func!!!
   DataManager* mDataManager; ///< has all the data loaded into the system
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
   RegistrationManager* mRegistrationManager; ///< handles image and patient registration

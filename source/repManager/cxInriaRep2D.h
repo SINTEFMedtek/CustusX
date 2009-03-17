@@ -6,16 +6,6 @@
 #include <vtkViewImage2D.h>
 #include "sscTransform3D.h"
 
-/**
- * \class InriaRep2D
- *
- * \brief This class extends a vtkViewImage2D and make it adhere to the
- * ssc::Rep interface. It is both a Representation and a
- * vtkViewImage2D.
- *
- * \date Dec 8, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 class vtkMetaDataSet;
 typedef vtkSmartPointer<class vtkViewImage2D> vtkViewImage2DPtr;
 typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
@@ -27,6 +17,16 @@ namespace cx
 {
 class Tool;
 
+/**
+ * \class InriaRep2D
+ *
+ * \brief This class extends a vtkViewImage2D and make it adhere to the
+ * ssc::Rep interface. It is both a Representation and a
+ * vtkViewImage2D.
+ *
+ * \date Dec 8, 2008
+ * \author: Janne Beate Bakeng, SINTEF
+ */
 class InriaRep2D : public ssc::RepImpl
 {
   typedef ssc::Transform3D Transform3D;

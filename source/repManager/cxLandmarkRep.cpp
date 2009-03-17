@@ -13,7 +13,7 @@
 #include <vtkRenderWindow.h>
 #include "sscView.h"
 #include "cxMessageManager.h"
-s
+
 namespace cx
 {
 LandmarkRepPtr LandmarkRep::New(const std::string& uid, const std::string& name)
