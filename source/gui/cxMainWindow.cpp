@@ -17,15 +17,6 @@
 #include "cxImageRegistrationWidget.h"
 #include "cxPatientRegistrationWidget.h"
 
-/**
- * cxMainWindow.cpp
- *
- * \brief
- *
- * \date Jan 20, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
 MainWindow::MainWindow() :

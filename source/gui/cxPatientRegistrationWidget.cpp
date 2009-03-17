@@ -20,16 +20,6 @@
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 
-/**
- * cxPatientRegistrationDockWidget.cpp
- *
- * \brief
- *
- * \date Feb 3, 2009
- * \author: Janne Beate Bakeng, SINTEF
- * \author Geir Arne Tangen, SINTEF
- */
-
 namespace cx
 {
 PatientRegistrationWidget::PatientRegistrationWidget() :

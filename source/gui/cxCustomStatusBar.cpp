@@ -7,12 +7,6 @@
 #include "cxMessageManager.h"
 #include <QPixmap>
 #include <QMetaObject>
-/**
- * cxCustomStatusBar.cpp
- *
- *  Created on: Jan 21, 2009
- *      Author: Janne Beate Bakeng, SINTEF
- */
 
 namespace cx
 {

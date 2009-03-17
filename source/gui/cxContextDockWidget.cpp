@@ -12,15 +12,6 @@
 #include "cxView3D.h"
 #include "cxView2D.h"
 
-/**
- * cxContextDockWidget.cpp
- *
- * \brief
- *
- * \date Mar 16, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
 ContextDockWidget::ContextDockWidget() :
@@ -116,7 +107,6 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 
   //Set new current image
   mCurrentImage = image;
-  //TODO notify tabs
   emit currentImageChanged(mCurrentImage);
 
   //view3D

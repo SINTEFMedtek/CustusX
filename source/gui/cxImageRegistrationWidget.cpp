@@ -17,15 +17,6 @@
 #include "cxView2D.h"
 #include "cxInriaRep2D.h"
 
-/**
- * cxImageRegistrationDockWidget.cpp
- *
- * \brief
- *
- * \date Jan 27, 2009
- * \author: Janne Beate Bakeng, SINTEF
- */
-
 namespace cx
 {
 ImageRegistrationWidget::ImageRegistrationWidget() :
