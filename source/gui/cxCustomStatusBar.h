@@ -1,12 +1,16 @@
+#ifndef CXCustomStatusBar_H_
+#define CXCustomStatusBar_H_
+
 /**
  * cxCustomStatusBar.h
  *
- *  Created on: Jan 21, 2009
- *      Author: Janne Beate Bakeng, SINTEF
+ * \brief Statusbar with extended functionality.
+ *
+ * \warning Not working yet and functionality still missing.
+ *
+ * \date Jan 21, 2009
+ * \author Janne Beate Bakeng, SINTEF
  */
-
-#ifndef CXCustomStatusBar_H_
-#define CXCustomStatusBar_H_
 
 #include <QStatusBar>
 #include <map.h>
@@ -24,19 +28,19 @@ class CustomStatusBar: public QStatusBar
   Q_OBJECT
 
 public:
-  CustomStatusBar();
-  ~CustomStatusBar();
+  CustomStatusBar(); ///< connects signals and slots
+  ~CustomStatusBar(); ///< empty
 
 protected slots:
-  void connectToToolSignals();
-  void disconnectFromToolSignals();
-  void receiveToolVisible(bool visible);
+  void connectToToolSignals(); ///< connect to all available tools
+  void disconnectFromToolSignals(); ///< disconnect from all tool
+  void receiveToolVisible(bool visible); ///< updates the color label for a tool
 
 protected:
-  MessageManager* mMessageManager;
-  ToolManager* mToolManager;
+  MessageManager* mMessageManager; ///< takes messages intended for the user
+  ToolManager* mToolManager; ///< interface to the navigation system
 
-  std::map<QLabel*, QLabel*> mToolColorMap;
+  std::map<QLabel*, QLabel*> mToolColorMap; ///< maps text- and colorlabel for a tool
 };
 }
 
