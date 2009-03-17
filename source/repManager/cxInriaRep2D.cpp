@@ -9,14 +9,6 @@
 #include "sscView.h"
 #include "cxTool.h"
 
-/**
- * cxInriaRep2D.cpp
- *
- * \brief
- *
- * \date Dec 8, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 namespace cx
 {
 InriaRep2D::InriaRep2D(const std::string& uid, const std::string& name) :
@@ -170,5 +162,7 @@ void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D matrix, double timest
   mInria->SyncSetPosition(position);
 }
 void InriaRep2D::toolVisibleSlot(bool visible)
-{}
+{
+  //TODO either implement or remove?
+}
 }//namespace cx

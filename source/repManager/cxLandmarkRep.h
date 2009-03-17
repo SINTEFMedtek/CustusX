@@ -41,10 +41,10 @@ public:
     int B;
     RGB() : R(255), G(0), B(0)
     {};
-  };
+  }; ///< struct representing a rgb color
 
-  static LandmarkRepPtr New(const std::string& uid, const std::string& name="");
-  ~LandmarkRep();
+  static LandmarkRepPtr New(const std::string& uid, const std::string& name=""); ///constructor
+  ~LandmarkRep(); ///< empty
 
   virtual std::string getType() const;
 
@@ -63,7 +63,7 @@ public slots:
   void addPermanentPointSlot(double x, double y, double z, unsigned int index); ///< used tell the landmarkrep that a new point is added
 
 protected:
-  LandmarkRep(const std::string& uid, const std::string& name="");
+  LandmarkRep(const std::string& uid, const std::string& name=""); ///< sets default text scaling to 20
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
   void addPoint(double& x, double& y, double& z, int index); ///< add a set of actors for the new point

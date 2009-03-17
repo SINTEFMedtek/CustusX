@@ -3,14 +3,6 @@
 #include <vtkRenderer.h>
 #include "sscView.h"
 
-/**
- * cxInriaRep3D.cpp
- *
- * \brief
- *
- * \date Dec 8, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
 namespace cx
 {
 InriaRep3D::InriaRep3D(const std::string& uid, const std::string& name) :

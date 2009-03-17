@@ -13,14 +13,7 @@
 #include <vtkRenderWindow.h>
 #include "sscView.h"
 #include "cxMessageManager.h"
-/**
- * cxLandmarkRep.cpp
- *
- * \brief
- *
- * \date Dec 10, 2008
- * \author: Janne Beate Bakeng, SINTEF
- */
+s
 namespace cx
 {
 LandmarkRepPtr LandmarkRep::New(const std::string& uid, const std::string& name)

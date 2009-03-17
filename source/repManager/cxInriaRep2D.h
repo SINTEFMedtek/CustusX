@@ -7,7 +7,7 @@
 #include "sscTransform3D.h"
 
 /**
- * \class cxInriaRep2D
+ * \class InriaRep2D
  *
  * \brief This class extends a vtkViewImage2D and make it adhere to the
  * ssc::Rep interface. It is both a Representation and a
@@ -33,15 +33,15 @@ class InriaRep2D : public ssc::RepImpl
 
   Q_OBJECT
 public:
-  InriaRep2D(const std::string& uid, const std::string& name="");
-  ~InriaRep2D();
+  InriaRep2D(const std::string& uid, const std::string& name=""); ///< constructor
+  ~InriaRep2D(); ///< empty
 
   virtual std::string getType() const;
   virtual void connectToView(ssc::View *theView);
   virtual void disconnectFromView(ssc::View *theView);
   virtual void setDataset(vtkMetaDataSet *dataset);
 
-  vtkViewImage2DPtr getVtkViewImage2D();
+  vtkViewImage2DPtr getVtkViewImage2D(); ///< returns the internal VtkViewImage2D
   void setTool(Tool* tool); ///< connect to a tool
   void removeTool(Tool* tool); ///< remove connection to a tool
   bool hasTool(Tool* tool); ///< check if a rep is connected to a specific tool
@@ -54,7 +54,7 @@ public slots:
   void syncSetPosition(double x, double y, double z); ///< sets the current position
 
 protected:
-  vtkImageData* getImageDataFromVtkMetaDataSet(vtkMetaDataSet *dataset);
+  vtkImageData* getImageDataFromVtkMetaDataSet(vtkMetaDataSet *dataset); ///< get vtkImageData
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
@@ -65,11 +65,11 @@ protected:
   vtkEventQtSlotConnectPtr mConnections; ///< used to sending signals og evnts between qt and vtk
 
 private slots:
-  void toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp);
-  void toolVisibleSlot(bool visible);
+  void toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp); ///< updates sync position
+  void toolVisibleSlot(bool visible); ///< empty
 
 private:
-  InriaRep2D();
+  InriaRep2D(); ///< not implemented
 };
 typedef boost::shared_ptr<InriaRep2D> InriaRep2DPtr;
 }//namespace cx
