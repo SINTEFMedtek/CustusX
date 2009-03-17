@@ -1,0 +1,98 @@
+//CUSTUSX3 CODING STANDARDS
+-updated 17.04.2009 by Janne Beate Bakeng
+
+//DOCUMENTATION
+
+-all code should be documented using doxygen!
+-the code should always build without warnings
+-classes should be documented like this (minimum):
+	-IN THE HEADER FILE
+	  /**
+	  *\class ClassName
+	  *\brief Brief description of what the class does.
+	  *\date DateWhenCreated
+	  *\author NameOfAuthor(s)
+	  */
+-functions should be documented like this:
+	- IN THE HEADER FILE
+	  what functions do:
+	  ///< description
+	- IN THE SOURCE FILE
+	  function parameters:
+	  /**
+	  * \param[in] name description
+	  * \param[out] name description
+	  * \return description (optional?)
+	  */
+-class members should be documented like this:
+	-IN THE HEADER FILE
+	  ///< description
+-to do:
+	-//TODO what needs doing
+-general comments
+	-comments should only appear where clarification of the code is needed
+	-code should be self explaining as far as possible
+	
+	
+//CODE STYLE
+
+-C++ header files should have the name cxClassName.h
+-C++ source files should have the name cxClassName.cpp
+-include guards should be used at the start of the headerfile
+-normally use block grouping (ie { }) for if, while, for and do statements. 
+-brackets are always on their own line, the first one indented similar to the preceeding code.
+-always put spaces like this: for (int i = 0; i < MAX; i++)
+-remove unused code from production code.
+-do not litter the code with commented out code sections.
+-all code should be in the cx namespace
+-never use 'using'
+-never use raw pointers
+-Qt instances can be raw pointers if they are set as someones child
+-vtk: use vtkSmartPointer
+-the rest: boost::shared_ptr<class>
+-membervariables start with a m and the rest is 'CamelCase', mMemberVariable
+-functionsnames are 'lowerCamelCase()'
+-classenames are 'UpperCamelCase'
+-files should be included in the order of increasing dependencies
+-use forward declaration in header files where possible
+-tab = 2 spaces
+-code should look like this:
+	-------------------------HEADER FILE-----------------------------
+	#ifndef CXPOINT_H_
+	#define CXPOINT_H_
+	
+	#include <class.h>
+	namespace cx
+	{
+	class Point
+	{
+	public:
+	  Point(double xc, double yc) :
+	    x(xc),
+	    y(yc)
+	  {}; ///< description
+	  double distance(const Point& other) const; ///< description
+	
+	  double x; ///< description
+	  double y; ///< description
+	};
+	}//namescace cx
+	#endif /* CXPOINT_H_ */
+	
+	-------------------------SOURCE FILE-------------------------------
+	#include "point.h"
+	
+	namespace cx
+	{
+	/**
+	*\param[in] other desciption
+	*/
+	double Point::distance(const Point& other) const
+	{
+	  double dx = x - other.x;
+	  double dy = y - other.y;
+	  return sqrt(dx * dx + dy * dy);
+	}
+	}//namespace cx
+	---------------------------------------------------------------------
+	
