@@ -86,18 +86,19 @@ void SliceRepSW::setImage( ImagePtr image )
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
+
+		mReslicer->SetInput(mImage->getRefVtkImageData());
+	
+		double from;
+		double to; 
+		vtkLookupTable *table =vtkLookupTable::SafeDownCast( image->lookupTable2D().getLookupTable());
+		table->GetAlphaRange(from, to );
+		//std::cout<<"opacity from " <<from<<", to: "<<to <<std::endl;
+		
+		mWindowLevel->SetLookupTable(table);
+		mWindowLevel->SetOutputFormatToRGBA();
+		mWindowLevel->Update();	
 	}
-	mReslicer->SetInput(mImage->getRefVtkImageData());
-	
-	double from;
-	double to; 
-	vtkLookupTable *table =vtkLookupTable::SafeDownCast( image->lookupTable2D().getLookupTable());
-	table->GetAlphaRange(from, to );
-	//std::cout<<"opacity from " <<from<<", to: "<<to <<std::endl;
-	
-	mWindowLevel->SetLookupTable(table);
-	mWindowLevel->SetOutputFormatToRGBA();
-	mWindowLevel->Update();	
 	
 	//std::cout<<"Number of components "<< mWindowLevel->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
 }
