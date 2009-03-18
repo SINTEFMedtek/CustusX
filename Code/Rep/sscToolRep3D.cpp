@@ -86,7 +86,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 		}
 	
 		receiveTransforms(mTool->get_prMt(), 0);
-		receiveVisible(mTool->getVisible());
+		mToolActor->SetVisibility(mTool->getVisible());
 		
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
 				this, SLOT(receiveTransforms(Transform3D, double)));
