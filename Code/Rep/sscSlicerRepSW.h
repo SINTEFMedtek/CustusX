@@ -14,6 +14,7 @@
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
+typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
 typedef vtkSmartPointer<class vtkImageActor> vtkImageActorPtr;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
@@ -52,7 +53,6 @@ private slots:
 	void sliceTransformChangedSlot(Transform3D sMr); 
 		
 private:
-	void setLookupTable(vtkScalarsToColorsPtr lut);
 	//PLANE_TYPE mType;
 	ImagePtr mImage;
 
@@ -62,7 +62,8 @@ private:
 	SliceProxyPtr mSlicer;
 	//std::string mImageUid;
 	vtkWindowLevelLookupTablePtr mLookupTable;
-	vtkImageMapToWindowLevelColorsPtr mWindowLevel;
+	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
+	vtkImageMapToColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;
 	vtkImageActorPtr mImageActor;

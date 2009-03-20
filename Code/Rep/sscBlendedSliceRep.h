@@ -15,6 +15,8 @@
 
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
+typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
+typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 
 namespace ssc
 {
@@ -49,6 +51,7 @@ private:
 	SliceProxyPtr mSlicer;
 	ssc::SlicedImageProxyPtr mSlicedProxy;
 	std::vector<ssc::SlicedImageProxyPtr> mSlices;
+	
 	
 	vtkImageBlendPtr mBlender;
 	int countImage;

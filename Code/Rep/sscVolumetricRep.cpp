@@ -54,12 +54,12 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	// from snws
 	mTextureMapper3D->SetPreferredMethodToNVidia();
 	mTextureMapper3D->SetBlendModeToComposite();
-	    
+	
 	mVolume->SetProperty( mVolumeProperty );
 	mVolume->SetMapper( mTextureMapper3D );
 	
-		
 }
+		
 
 VolumetricRep::~VolumetricRep()
 {
@@ -96,8 +96,6 @@ ImagePtr VolumetricRep::getImage()
 {
 	return mImage;
 }
-
-
 
 void VolumetricRep::setImage(ImagePtr image)
 {

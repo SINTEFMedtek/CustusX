@@ -8,6 +8,9 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageBlend.h>
+#include <vtkTexture.h>
+#include <vtkProperty.h>
+#include <vtkPolyDataMapper.h>
 #include "sscView.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
@@ -27,6 +30,8 @@ BlendedSliceRep::BlendedSliceRep(const std::string& uid):
 
 	// set up the slicer pipeline		
 	mBlender->SetBlendModeToNormal();
+	//mBlender->SetBlendModeToCompound();
+	//mBlender->SetCompoundThreshold(0.1);
 	firstImage = true;
 	countImage = 0;
 }
@@ -81,6 +86,7 @@ void BlendedSliceRep::addInputImages(vtkImageDataPtr slicedImage )
 	mBlender->AddInput(0, resample->GetOutput() );
 	
 }
+
 double BlendedSliceRep::getAlpha(int countImage)
 {
 	for(unsigned int i = 0; i<mSlices.size(); ++i)
@@ -94,6 +100,7 @@ void BlendedSliceRep::addRepActorsToViewRenderer(View* view)
 {	
 	mImageActor->SetInput( mBlender->GetOutput() );
 	view->getRenderer()->AddActor(mImageActor);	
+	
 }
 void BlendedSliceRep::removeRepActorsFromViewRenderer(View* view)
 {

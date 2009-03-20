@@ -6,7 +6,9 @@
  */
 
 #include "sscImageLUT2D.h"
-
+#include <QDir>
+#include <QTextStream>
+#include <QFile>
 #include <vtkImageData.h>
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkLookupTable.h>
@@ -19,51 +21,57 @@ namespace ssc
 ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	mBase(base)
 {
-	//mLevel = getScalarMax() / 2.0;
-	//mWindow = getScalarMax();
-	mWindow = 255;
-	mLevel = 128.0;
+	mLevel = getScalarMax() / 2.0;
+	mWindow = getScalarMax();
 	mLLR = 0.0;
+	std::cout<< "-- ImageLUT2D --"<<std::endl;
+	std::cout<<" default windowlevel  ["<<mLevel<<"],["<<mWindow<<"]"<<std::endl;
 	
-	mLowLevel = vtkPiecewiseFunctionPtr::New();
-	mLowLevel->AddPoint(0.0, 0.0);
-	mLowLevel->AddPoint(255, 1.0);
-	 
 	//make a default system set lookuptable, Default my be gryscale...
 	mLookupTable = vtkLookupTablePtr::New();
+	mLookupTable ->SetTableRange(0,65536);
 	mLookupTable->SetHueRange(0.0, 0.0);	
-	mLookupTable->SetSaturationRange(0.0, 0.0);
+	mLookupTable->SetSaturationRange(1.0, 1.0);	
 	mLookupTable->SetValueRange(0.0, 1.0);
 	mLookupTable->Build();
-		
 	
-//	mLookupTable->SetNumberOfColors(1);
-//	mLookupTable->Build();
-//	mLookupTable->SetTableValue(0, 0.2, 0.2, 0.2, 1.0);
-//	mLookupTable->SetTableValue(0, 0.0, 1.0, 0.0, 1.0);
-//	mLookupTable->SetTableValue(0, 0.0, 0.0, 1.0, 1.0);
-//	
-//	
-//	mLookupTable->SetNumberOfColors(256);
-//	
-//mLookupTable->SetAlpha(0.2);
-	
-
-
 }
 //set lookupTable, generated from file only froms DataManagerImpl::setViewControlData
 void ImageLUT2D::setLookupTable(vtkLookupTablePtr lut)
 {
 	std::cout<<"Got image lookup tabel "<<std::endl;
 	mLookupTable = lut;
+	mLookupTable->SetTableRange(mLevel,mWindow); 
+	
+	//setWindow(getWindow()+1);
+	//setLevel(getLevel()+1);
+	//printToFile();
 }
 
 vtkLookupTablePtr ImageLUT2D::getLookupTable()
 {		
 	std::cout<<"Image LUT2D, fetch lookuptable"<<std::endl;	
-	return mLookupTable;	
+	return mLookupTable;
 }
 
+void ImageLUT2D::printToFile()
+{
+	ofstream myfile;
+	myfile.open ("/Data/Logs/example.txt");
+	int tableSize = mLookupTable->GetNumberOfTableValues();
+	for(int i = 0; i<tableSize; ++i )
+	{
+		double rgba[4];
+		mLookupTable->GetTableValue(i,rgba);
+		//stream << "i("<<i<<"), ["<< rgba[0] <<", "<<rgba[1]<<","<<rgba[2]<<","<<rgba[3]<< "]\n";
+		myfile << "i("<<i<<"), R["<< rgba[0] <<"] G["<<rgba[1]<<"] B["<<rgba[2]<<"] A["<<rgba[3]<< "]\n";	
+	}	
+	myfile.close();	
+}
+void ImageLUT2D::addNewColorLut()
+{
+	
+}
 void ImageLUT2D::addNewColor(QColor color)
 {
 	double value = color.value()/255.0;
@@ -101,7 +109,7 @@ void ImageLUT2D::setLLR(double val)
 	//mLookupTable->SetAlphaRange(mLLR , 1.0);
 	//->Build();
 	//changeOpacity(mLLR, 0);
-	//changeOpacityForAll(mLLR);
+	changeOpacityForAll(mLLR);
 	
 	std::cout<<"alpha range: [0,"<<mLLR<<"]"<<std::endl;
 }
@@ -123,9 +131,9 @@ void ImageLUT2D::setWindow(double window)
 	{
 		window = 1e-5; 
 	}
-	
-	std::cout<<"Window :"<<window<<std::endl;
 	mWindow = window;
+	std::cout<<"setWindow: WindowWidth (:"<<mWindow<<"), WindowCenter ("<<mLevel<<")"<<std::endl;
+	std::cout<<"new range:["<<mLevel-mWindow/2.0<<", "<< mLevel+mWindow/2.0<<"]"<<std::endl;
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0); 
 }
 
@@ -141,8 +149,10 @@ void ImageLUT2D::setLevel(double level)
 {
 	if (similar(mLevel, level))
 		return;
-	std::cout<<"Level :"<< level<<std::endl;
 	mLevel = level;
+	
+	std::cout<<"setLevel: WindowWidth (:"<<mWindow<<"), WindowCenter ("<<mLevel<<")"<<std::endl;
+	std::cout<<"new range:["<<mLevel-mWindow/2.0<<", "<< mLevel+mWindow/2.0<<"]"<<std::endl;
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0);
 }
 
@@ -160,10 +170,12 @@ double ImageLUT2D::getScalarMax() const
 	return mBase->GetScalarRange()[1];
 }
 
+//Gets the number of color in the lut
 void ImageLUT2D::changeOpacityForAll(double opacity )
 {
 	int noValues = mLookupTable->GetNumberOfTableValues ();
 	std::cout << " noValues" <<noValues<< std::endl;
+	//prints
 	double rgba[ 4 ];
 	for ( int i = 0;i < noValues;i++ )
 	{

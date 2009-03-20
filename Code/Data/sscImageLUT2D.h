@@ -43,19 +43,17 @@ public:
 	double getScalarMax() const;
 	void addNewColor(QColor color);
 	void setAlphaRange(double alpha) ;
-	
 	void changeOpacityForAll(double opacity);
 	void changeOpacity(int index, double opacity);
+	void addNewColorLut();
 	
 private:
+	void printToFile();
 	vtkScalarsToColorsPtr mScalarToColor;
-	
 	vtkLookupTablePtr mLut;
 	vtkLookupTablePtr mLookupTable;
-	
 	vtkWindowLevelLookupTablePtr mColorLookupTable;
 	vtkPiecewiseFunctionPtr mLowLevel;
-	//vtkWindowLevelLookupTablePtr ;
 	vtkImageDataPtr mBase;
 	double mLLR;
 	double mWindow;

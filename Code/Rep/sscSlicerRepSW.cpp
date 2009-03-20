@@ -29,8 +29,8 @@ SliceRepSW::SliceRepSW(const std::string& uid) :
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
 	mImageActor = vtkImageActorPtr::New();
 	
-	mWindowLevel = vtkImageMapToWindowLevelColorsPtr::New();
-	mLookupTable = vtkWindowLevelLookupTablePtr::New();
+	//mWindowLevel = vtkImageMapToWindowLevelColorsPtr::New();
+	mWindowLevel = vtkImageMapToColorsPtr::New();	
 	
 	// set up the slicer pipeline
 	mReslicer->SetInterpolationModeToLinear();
@@ -74,9 +74,7 @@ void SliceRepSW::setInput(vtkImageDataPtr input)
  * color, brigthness, contrast, etc...
  */
 void SliceRepSW::setImage( ImagePtr image )
-{
-//	std::cout << "SliceRepSW::setImage called: [" << getName() << "]" << std::endl;
-	
+{	
 	if (mImage)
 	{
 		mImage->disconnectRep(mSelf);
@@ -86,21 +84,11 @@ void SliceRepSW::setImage( ImagePtr image )
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-
 		mReslicer->SetInput(mImage->getRefVtkImageData());
-	
-		double from;
-		double to; 
-		vtkLookupTable *table =vtkLookupTable::SafeDownCast( image->lookupTable2D().getLookupTable());
-		table->GetAlphaRange(from, to );
-		//std::cout<<"opacity from " <<from<<", to: "<<to <<std::endl;
-		
-		mWindowLevel->SetLookupTable(table);
+		mWindowLevel->SetLookupTable(image->lookupTable2D().getLookupTable());
 		mWindowLevel->SetOutputFormatToRGBA();
 		mWindowLevel->Update();	
 	}
-	
-	//std::cout<<"Number of components "<< mWindowLevel->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
 }
 
 std::string SliceRepSW::getImageUid()const
@@ -114,9 +102,7 @@ void SliceRepSW::setSliceProxy(ssc::SliceProxyPtr slicer)
 	{
 		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 	}
-	
 	mSlicer = slicer;
-	
 	connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 }
 
@@ -134,7 +120,6 @@ bool SliceRepSW::hasImage(ImagePtr image) const
 	return (mImage != NULL);
 }
 
-
 void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 {
 	update();
@@ -148,17 +133,6 @@ void SliceRepSW::update()
 	mMatrixAxes->DeepCopy(rMs.matrix());
 }
 
-void SliceRepSW::setLookupTable(vtkScalarsToColorsPtr lut)	
-{
-	vtkWindowLevelLookupTablePtr newlut = vtkWindowLevelLookupTable::SafeDownCast(lut);
-	if(!newlut)	
-	{
-		std::cout<<"SliceRepSW, Cannot cast vtkScalarsToColors to  vtkImageMapToWindowLevelColors "<<std::endl;
-	}
-	mWindowLevel->SetLookupTable(newlut);
-	mWindowLevel->SetWindow( 255.0);
-	mWindowLevel->SetLevel( 127.5);
-}
 
 void SliceRepSW::printSelf(std::ostream & os, Indent indent)
 {

@@ -25,33 +25,33 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mBase(base)
 {
 	double max = getScalarMax();
-	mLevel = max/2.0;
+	std::cout << "For ImageTF3D image scalar range = "<< max<<std::endl;
+	mLevel = max/2.0; 
 	mWindow = max;
 	mLLR = 0.0;
-	
-	mColorTF->SetColorSpaceToRGB();
-	mOpacityTF->AddPoint(0.0, 0.0);
-	mOpacityTF->AddPoint(255, 1.0);
 
+	
+	// nice CT_color...
+//	mColorTF->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
+	mColorTF->SetColorSpaceToRGB();
+	
+	
+//	mColorTF->AddRGBPoint( 500, .88, .60, .29, 0.33, 0.45 );
+//	mColorTF->AddRGBPoint( 1000, .62, .36, .18, 0.5, 0.0 );
+//	mColorTF->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
+
+//	mOpacityTF->AddPoint(-3024, 0, 0.5, 0.0 );
+//	mOpacityTF->AddPoint(500, 1.0, 0.33, 0.45 );
+//	mOpacityTF->AddPoint(1000, 0, 0.5, 0.0 );
+//	mOpacityTF->AddPoint(3071, 1.0, 0.5, 0.0);
+//	
+	mOpacityTF->AddPoint(0.0, 0.0);
+	mOpacityTF->AddPoint(max, 1.0);
+	
 	
 	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-	mColorTF->AddRGBPoint(255, 1.0, 1.0, 1.0);
-
-
-//	vtkWindowLevelLookupTablePtr lut = vtkWindowLevelLookupTablePtr::New();
-//	int numColors = lut->GetNumberOfTableValues();
-//	for ( int i = 0; i < numColors; i++ )
-//	{
-//		double val = double(i)/(numColors-1);
-//		lut->SetTableValue(i, val, val, val, 0);
-//	}
-//
-//	lut->SetWindow(mWindow);
-//	lut->SetLevel(mLevel);
-//	mLut = lut;
-//
-//	refreshColorTF();
-//	refreshOpacityTF();
+	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
+	
 }
 
 void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
@@ -150,19 +150,27 @@ void ImageTF3D::refreshColorTF()
 {
 	double min = mLevel - ( mWindow / 2.0 );
 	double max = mLevel + ( mWindow / 2.0 );
-
+	std::cout << " refresh colorTable windowLevel = ["<<min<<","<<max<<"]"<<std::endl;
+	
 	if (!mLut)
 	{
 		return;
 	}
 
 	mColorTF->RemoveAllPoints();
+	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
+	mColorTF->AddRGBPoint(min, 0.0, 0.0, 0.0);
+	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
+	mColorTF->AddRGBPoint(getScalarMax(), 1.0, 1.0, 1.0);
+	
 	int numColors = mLut->GetNumberOfTableValues();
-	for ( int i = 0; i < numColors; i++ )
+	int step = numColors / 256;
+	
+	for (int i = 0; i < numColors; i += step)
 	{
-		double* color = mLut->GetTableValue ( i );
-		double index = min + double(i) * (max-min) / (numColors-1);
-		mColorTF->AddRGBPoint ( index, color[0], color[1], color[2] );
+		double* color = mLut->GetTableValue(i);
+		double index = min + double(i) * (max - min) / (numColors - 1);
+		mColorTF->AddRGBPoint(index, color[0], color[1], color[2]);
 	}
 }
 
@@ -170,6 +178,8 @@ void ImageTF3D::refreshColorTF()
  */
 void ImageTF3D::refreshOpacityTF()
 {
+	//opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,  opacityLevel + 0.5*opacityWindow, 1.0 );
+	
 	if (mLLR >= getScalarMax())
 	{
 		return;

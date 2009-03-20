@@ -117,7 +117,7 @@ void OverlayControlWidget::Brightness3D(int val)
 
 void OverlayControlWidget::llrSlot(int val)
 {
-	
+	mImage->lookupTable2D().setLLR(val/10.0);
 }
 void OverlayControlWidget::changeColorSlot(QColor color)	
 {
@@ -172,7 +172,7 @@ void OverlayControlWidget::setupWidget()
 	slidersLayout_3D->addWidget(new QLabel(tr("3D - Brightness")) );
 	slidersLayout_3D->addWidget(m3DBrightness);
 	m3DAlphaSlider = new QSlider(Qt::Horizontal);
-	slidersLayout_3D->addWidget(new QLabel(tr("3D - Brightness")) );
+	slidersLayout_3D->addWidget(new QLabel(tr("3D - Opacity")) );
 	slidersLayout_3D->addWidget(m3DAlphaSlider);
 	
 
@@ -227,6 +227,10 @@ void OverlayControlWidget::setImage(ssc::ImagePtr image)
 	
 	m3DBrightness->setMaximum(256);
 	m3DBrightness->setValue(128);
+	
+	
+	m3DAlphaSlider->setMaximum(10);
+	m3DAlphaSlider->setValue(10);
 	
 }
 
