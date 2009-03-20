@@ -180,6 +180,9 @@ set( SSC_GENERATED_LIBRARIES
 include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
 link_directories( ${SSC_LIBRARY_DIRS} )
 
+set (BUILD_SHARED_LIBS ON CACHE BOOL "build shared or static libs")
+
+
 # =========================================================
 # create the target
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
