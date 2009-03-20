@@ -1,6 +1,5 @@
 #include "sscImageBlenderProxy.h"
 
-
 #include <vtkImageReslice.h>
 #include <vtkImageMapToColors.h>
 #include <vtkWindowLevelLookupTable.h>
@@ -8,9 +7,9 @@
 #include <vtkImageData.h>
 #include <vtkImageBlend.h>
 #include "sscDataManager.h"
+
 namespace ssc
 {
-
 
 ImageBlenderProxy::ImageBlenderProxy()
 {
@@ -63,10 +62,12 @@ void ImageBlenderProxy::createOverlay()
 		
 	}
 }
+
 void  ImageBlenderProxy::sliceFirstTheneBlend()
 {
 	
 }
+
 void  ImageBlenderProxy::updateBlender()
 {
 	for( int i = 0; i<mBlender->GetNumberOfInputs(); ++i )
@@ -140,6 +141,7 @@ void ImageBlenderProxy::volumeBlend()
 	}
 	
 }
+
 void  ImageBlenderProxy::addSlice(vtkImageDataPtr slice)
 {
 	
@@ -162,10 +164,12 @@ bool ImageBlenderProxy::hasImage(ImagePtr image) const
 {	
 	return true;
 }
+
 void  ImageBlenderProxy::clearImages()
 {
 	
 }
+
 void ImageBlenderProxy::addImage(ImagePtr image)
 {
 	if (!image)
@@ -196,9 +200,6 @@ void ImageBlenderProxy::removeImage(ImagePtr image)
 	}
 	
 }	
-
-
-
 
 
 //----------------------------------------------------------

@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-//#include <vtkPolyData.h>
-
 #include <vtkMetaImageReader.h>
 #include <vtkImagePlaneWidget.h>
 #include <vtkRenderer.h>
@@ -29,8 +27,6 @@
 #include "sscSlicePlaneRep.h"
 #include "sscImageBlenderProxy.h"
 #include "sscSlicedImageProxy.h"
-
-//#include "sscLayerSliceRep.h"
 
 using ssc::Vector3D;
 using ssc::Transform3D;
@@ -58,10 +54,12 @@ MyColorDialog ::MyColorDialog (QWidget* parent)
 	layout->addWidget(colorLabel);
 	setLayout(layout);
 }
+
 MyColorDialog::~MyColorDialog()
 {
 	
 }
+
 void MyColorDialog::setColor()
 {
 	QColor color = QColorDialog::getColor(Qt::green, this);
@@ -76,20 +74,21 @@ void MyColorDialog::setColor()
 	 }	
 	emit colorChanged(color);
 }
+
 //----------------------------
 //buttons and slider for overlay 
 //----------------------------
 OverlayControlWidget::OverlayControlWidget(QWidget* parent ,Qt::WindowFlags f ):
 	QWidget(parent,f)	
 {
-//	mCLut = vtkLookupTablePtr::New();
 	this->setupWidget();		
 	this->setupAction();
-	
 }
+
 OverlayControlWidget::~OverlayControlWidget()
 {
 }
+
 void OverlayControlWidget::setupAction()
 {
 	//slider action 
@@ -132,10 +131,12 @@ void OverlayControlWidget::brightness(int val)
 {
 	mImage->lookupTable2D().setLevel(val/1.0);
 }
+
 void OverlayControlWidget::contrast(int val)
 {
 	mImage->lookupTable2D().setWindow(val/1.0);	
 }
+
 void OverlayControlWidget::setThreshold( int val)
 {
 	mImage->lookupTable2D().setAlphaRange(val/10.0);
@@ -197,16 +198,16 @@ void OverlayControlWidget::setupWidget()
 	this->setLayout(overAllLayout);
 	
 }
+
 void OverlayControlWidget::setImage(ssc::ImagePtr image)
 {
 	mImage = image;
 	mImageUid = image->getUid();
-//	mCLut = vtkLookupTable::SafeDownCast( image->lookupTable2D().getLookupTable() );
 
-	int window = (int)10 * mImage->lookupTable2D().getWindow();
-	int level = (int)10 * mImage->lookupTable2D().getLevel();
+	int window = 10 * (int)mImage->lookupTable2D().getWindow();
+	int level = 10 * (int)mImage->lookupTable2D().getLevel();
 	double alpha = mImage->getAlpha();
-	
+
 	std::cout<<"window: "<<window<<std::endl;
 	std::cout<<"level: "<<level<<std::endl;
 	std::cout<<"alpha: "<<alpha<<std::endl;
@@ -220,7 +221,7 @@ void OverlayControlWidget::setImage(ssc::ImagePtr image)
 	mBrightness->setValue(128);
 	
 	mAlphaSlider->setMaximum(10);
-	mAlphaSlider->setValue( alpha*10 );
+	mAlphaSlider->setValue((int)alpha * 10);
 	
 	m3DContrast->setMaximum(256);
 	m3DContrast->setValue(256);
@@ -231,14 +232,12 @@ void OverlayControlWidget::setImage(ssc::ImagePtr image)
 	
 	m3DAlphaSlider->setMaximum(10);
 	m3DAlphaSlider->setValue(10);
-	
 }
 
 void OverlayControlWidget::createFirstCLUT()
 {
-
-
 }
+
 //----------------------------
 //end button  widget class
 //----------------------------
@@ -248,13 +247,16 @@ SingleLayout::SingleLayout()
 {
 	//mUid = uid;
 }
+
 SingleLayout::~SingleLayout()
 {
 }
+
 std::string SingleLayout::getUid()const 
 {
 	return mUid;
 }
+
 TestSliceAndOverlayImage::TestSliceAndOverlayImage()
 {
 	
@@ -264,6 +266,7 @@ TestSliceAndOverlayImage::TestSliceAndOverlayImage()
 	this->setCentralWidget( mWidget );
 	start();
 }
+
 TestSliceAndOverlayImage::~TestSliceAndOverlayImage()
 {}
 
@@ -300,6 +303,7 @@ void TestSliceAndOverlayImage::addImageToView(const std::string& imageUid)
 		iter->second->mView->addRep( iter->second->mSliceRep);	
 	}	
 }
+
 //Test Blend first then slice - update slicer 
 void TestSliceAndOverlayImage::generateLayerdSliceRep(ssc::ToolPtr tool, ssc::ImageBlenderProxyPtr blender, ssc::PLANE_TYPE plane)
 {
@@ -309,7 +313,7 @@ void TestSliceAndOverlayImage::generateLayerdSliceRep(ssc::ToolPtr tool, ssc::Im
 	proxy->setFollowType(ssc::ftFIXED_CENTER);
 	proxy->setOrientation(ssc::otORTHOGONAL);
 	proxy->setPlane(plane);
-//	
+
 	mLayouts[plane]->mSliceRep->setSliceProxy(proxy);
 	mLayouts[plane]->mSliceRep->setInput( blender->getOutput() ); //3D dataset
 	mLayouts[plane]->mSliceRep->update();
@@ -343,6 +347,7 @@ void TestSliceAndOverlayImage::generateVolumeInVolumeRep(ssc::ImageBlenderProxyP
 //	mRepPtr->setName("Blending mode");	
 //	mLayouts[plane]->mView->addRep(mRepPtr);	
 }
+
 //Test wiht iso-surface--->
 void TestSliceAndOverlayImage::generateSurfaceRep(ssc::ImagePtr images,ssc::PLANE_TYPE plane)
 {
@@ -351,7 +356,8 @@ void TestSliceAndOverlayImage::generateSurfaceRep(ssc::ImagePtr images,ssc::PLAN
 	//mLayouts[plane]->mSurfaceRep = surfaceRep;
 	mLayouts[plane]->mView->addRep(surfaceRep);
 }
-//TEST WHIT PLANAR VOLUME...!!!!
+
+// TODO: TEST WITH PLANAR VOLUME
 void TestSliceAndOverlayImage::generatePlanarVolumeRep(ssc::ImagePtr images,ssc::PLANE_TYPE plane)
 {
 	
@@ -364,8 +370,6 @@ ssc::View* TestSliceAndOverlayImage::view(ssc::PLANE_TYPE uid)
 	
 void TestSliceAndOverlayImage::start()
 {
-	
-	
 	// generate imageFileName
 	std::string mImageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::string	mImageFileName2 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
@@ -423,7 +427,6 @@ void TestSliceAndOverlayImage::start()
 	//toolRep->setTool(tool);
 	//view("3D")->addRep(toolRep);
 	
-	
 	//-Layout stuff- 
 	QHBoxLayout* mainLayout = new QHBoxLayout;
 	//slicerView lauout
@@ -469,7 +472,7 @@ void TestSliceAndOverlayImage::updateAlpha()
 void TestSliceAndOverlayImage::updateRender()
 {
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	{
 		iter->second->mView->getRenderWindow()->Render();
+	}
 }
-
-
