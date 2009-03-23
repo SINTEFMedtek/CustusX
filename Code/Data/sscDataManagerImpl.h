@@ -87,15 +87,15 @@ public:
 	virtual std::map<std::string, std::string> getMeshUIDsWithNames() const;
 	virtual std::vector<std::string> getMeshUIDs() const;
 	virtual std::vector<std::string> getMeshNames() const;
-	
+
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const;
 	virtual void setCenter(const Vector3D& center);
-	
-private:
+
+protected:
 	DataManagerImpl();
 	virtual ~DataManagerImpl();
-private:
+protected:
 	typedef std::map<std::string, ImagePtr> ImagesMap;
 	ImagesMap mImages;
 	Vector3D mCenter;
