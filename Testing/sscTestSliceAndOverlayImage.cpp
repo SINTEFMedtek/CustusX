@@ -106,21 +106,21 @@ void OverlayControlWidget::setupAction()
 
 void OverlayControlWidget::Contrast3D(int val)
 {
-	mImage->transferFunctions3D().setLevel(val/1.0);
+	mImage->getTransferFunctions3D().setLevel(val/1.0);
 }
 
 void OverlayControlWidget::Brightness3D(int val)
 {
-	mImage->transferFunctions3D().setLevel(val/1.0);
+	mImage->getTransferFunctions3D().setLevel(val/1.0);
 }
 
 void OverlayControlWidget::llrSlot(int val)
 {
-	mImage->lookupTable2D().setLLR(val/10.0);
+	mImage->getLookupTable2D().setLLR(val/10.0);
 }
 void OverlayControlWidget::changeColorSlot(QColor color)	
 {
-	mImage->lookupTable2D().addNewColor(color); 
+	mImage->getLookupTable2D().addNewColor(color); 
 }
 void OverlayControlWidget::alphaSlider(int val)
 {
@@ -129,17 +129,17 @@ void OverlayControlWidget::alphaSlider(int val)
 }
 void OverlayControlWidget::brightness(int val)
 {
-	mImage->lookupTable2D().setLevel(val/1.0);
+	mImage->getLookupTable2D().setLevel(val/1.0);
 }
 
 void OverlayControlWidget::contrast(int val)
 {
-	mImage->lookupTable2D().setWindow(val/1.0);	
+	mImage->getLookupTable2D().setWindow(val/1.0);	
 }
 
 void OverlayControlWidget::setThreshold( int val)
 {
-	mImage->lookupTable2D().setAlphaRange(val/10.0);
+	mImage->getLookupTable2D().setAlphaRange(val/10.0);
 }
 
 void OverlayControlWidget::setupWidget()
@@ -204,8 +204,8 @@ void OverlayControlWidget::setImage(ssc::ImagePtr image)
 	mImage = image;
 	mImageUid = image->getUid();
 
-	int window = 10 * (int)mImage->lookupTable2D().getWindow();
-	int level = 10 * (int)mImage->lookupTable2D().getLevel();
+	int window = 10 * (int)mImage->getLookupTable2D().getWindow();
+	int level = 10 * (int)mImage->getLookupTable2D().getLevel();
 	double alpha = mImage->getAlpha();
 
 	std::cout<<"window: "<<window<<std::endl;

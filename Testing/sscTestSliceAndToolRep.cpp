@@ -180,13 +180,13 @@ void TestSliceAndToolRep::contrast(int val)
 {
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->getImage(imageFileName1);	
 	
-	image1->lookupTable2D().setWindow(val/1.0);	
+	image1->getLookupTable2D().setWindow(val/1.0);	
 }
 	
 void TestSliceAndToolRep::brightness(int val)
 {
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->getImage(imageFileName1);
-	image1->lookupTable2D().setLevel(val/1.0);
+	image1->getLookupTable2D().setLevel(val/1.0);
 }
 
 void TestSliceAndToolRep::updateRender()
