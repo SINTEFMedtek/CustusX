@@ -9,9 +9,9 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageBlend.h>
-#include <vtkLookupTable.h> 
+#include <vtkLookupTable.h>
 
-#include <vtkColorTransferFunction.h> 
+#include <vtkColorTransferFunction.h>
 #include "sscView.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
@@ -23,21 +23,21 @@ namespace ssc
 
 SliceRepSW::SliceRepSW(const std::string& uid) :
 	RepImpl(uid)
-{	
+{
 //	std::cout << "SliceRepSW created: " << uid << std::endl;
 	mReslicer = vtkImageReslicePtr::New();
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
 	mImageActor = vtkImageActorPtr::New();
-	
+
 	//mWindowLevel = vtkImageMapToWindowLevelColorsPtr::New();
-	mWindowLevel = vtkImageMapToColorsPtr::New();	
-	
+	mWindowLevel = vtkImageMapToColorsPtr::New();
+
 	// set up the slicer pipeline
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->SetOutputDimensionality(2);
 	mReslicer->SetResliceAxes(mMatrixAxes) ;
 	mReslicer->SetAutoCropOutput(false);
-	
+
 	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 
 }
@@ -52,42 +52,42 @@ SliceRepSWPtr SliceRepSW::New(const std::string& uid)
 	return retval;
 }
 
-/**This method brings vtkImageData that is preprocessed  
+/**This method brings vtkImageData that is preprocessed
  *with color
  */
 void SliceRepSW::setInput(vtkImageDataPtr input)
 {
 	std::cout << "DANGEROUS METHOD CALLED: " << getName() << std::endl;
-	
+
 	if(!input)
 		 return;
-	
+
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
 		mImage.reset();
 	}
 	mReslicer->SetInput(input);
-	mImageActor->SetInput( mReslicer->GetOutput() );	
+	mImageActor->SetInput( mReslicer->GetOutput() );
 }
 /**This method set the image, that has all the information in it self.
  * color, brigthness, contrast, etc...
  */
 void SliceRepSW::setImage( ImagePtr image )
-{	
+{
 	if (mImage)
 	{
 		mImage->disconnectRep(mSelf);
 	}
 	mImage = image;
-	
+
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
 		mReslicer->SetInput(mImage->getRefVtkImageData());
-		mWindowLevel->SetLookupTable(image->lookupTable2D().getLookupTable());
+		mWindowLevel->SetLookupTable(image->getLookupTable2D().getLookupTable());
 		mWindowLevel->SetOutputFormatToRGBA();
-		mWindowLevel->Update();	
+		mWindowLevel->Update();
 	}
 }
 
@@ -137,10 +137,10 @@ void SliceRepSW::update()
 void SliceRepSW::printSelf(std::ostream & os, Indent indent)
 {
 	RepImpl::printSelf(os, indent);
-	
-	//os << indent << "PlaneType: " << mType << std::endl;	
+
+	//os << indent << "PlaneType: " << mType << std::endl;
 	os << indent << "mImage: " << (mImage ? mImage->getUid() : "NULL") << std::endl;
-	os << indent << "mSlicer: " << (mSlicer ? mSlicer.get() : 0) << std::endl;	
+	os << indent << "mSlicer: " << (mSlicer ? mSlicer.get() : 0) << std::endl;
 	if (mSlicer)
 	{
 		mSlicer->printSelf(os, indent.stepDown());

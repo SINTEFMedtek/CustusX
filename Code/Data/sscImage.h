@@ -44,14 +44,14 @@ public:
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
 
-	ImageTF3D& transferFunctions3D();
-	ImageLUT2D& lookupTable2D();
+	ImageTF3D& getTransferFunctions3D();
+	ImageLUT2D& getLookupTable2D();
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 	void printLandmarks(); //TODO: JUST FOR TESTING
 	double getAlpha();//TODO: JUST FOR TESTING
-	void setAlpha(double val);//TODO: JUST FOR TESTING 
+	void setAlpha(double val);//TODO: JUST FOR TESTING
 	DoubleBoundingBox3D boundingBox() const;
 	///preset colorTabel
 	void setClut(vtkLookupTablePtr clut);
@@ -63,7 +63,7 @@ signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transformChanged(); ///< emitted when transform is changed
 	void alphaChange(); ///<blending alpha
-	
+
 
 public slots:
 	void addLandmarkSlot(double x, double y, double z, unsigned int index);

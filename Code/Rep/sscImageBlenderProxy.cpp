@@ -22,7 +22,7 @@ ImageBlenderProxy::ImageBlenderProxy()
 
 ImageBlenderProxy::~ImageBlenderProxy()
 {
-	
+
 }
 
 void ImageBlenderProxy::createOverlay()
@@ -30,10 +30,10 @@ void ImageBlenderProxy::createOverlay()
 	if(mImages.size()<1)
 		return;
 	vtkImageDataPtr baseImage = mImages[0]->getRefVtkImageData();
-	
+
 	mBlender->RemoveAllInputs();
-	std::cout<<"There are ("<<mImages.size()<<") to be overlayed"<<std::endl;	
-	
+	std::cout<<"There are ("<<mImages.size()<<") to be overlayed"<<std::endl;
+
 	for(unsigned int i = 0; i<mImages.size(); ++i )
 	{
 		vtkImageDataPtr imageData = mImages[i]->getRefVtkImageData();
@@ -41,31 +41,31 @@ void ImageBlenderProxy::createOverlay()
 		resample->SetInput(imageData);
 		resample->SetInterpolationModeToLinear();
 		resample->SetInformationInput(baseImage);
-		
-		vtkImageMapToWindowLevelColorsPtr ColorMapper  = vtkImageMapToWindowLevelColorsPtr::New();	
+
+		vtkImageMapToWindowLevelColorsPtr ColorMapper  = vtkImageMapToWindowLevelColorsPtr::New();
 		ColorMapper->SetInput( resample->GetOutput() );
 		//Get the individual color tables
-		vtkScalarsToColorsPtr lut =  mImages[i]->lookupTable2D().getLookupTable();
+		vtkScalarsToColorsPtr lut =  mImages[i]->getLookupTable2D().getLookupTable();
 		if(lut)
 		{
 			std::cout<<"change lut"<<std::endl;
 			ColorMapper->SetLookupTable(lut);
-			//ColorMapper->SetInput( resample->GetOutput() );	
+			//ColorMapper->SetInput( resample->GetOutput() );
 			ColorMapper->SetWindow(255.0);
 			ColorMapper->SetLevel(127.5);
 			ColorMapper->Update();
 		}
-		
+
 		std::cout<<"Number of components "<<ColorMapper->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
 		mBlender->SetOpacity(i, mImages[i]->getAlpha() );
 		mBlender->AddInput(0, ColorMapper->GetOutput() );
-		
+
 	}
 }
 
 void  ImageBlenderProxy::sliceFirstTheneBlend()
 {
-	
+
 }
 
 void  ImageBlenderProxy::updateBlender()
@@ -73,16 +73,16 @@ void  ImageBlenderProxy::updateBlender()
 	for( int i = 0; i<mBlender->GetNumberOfInputs(); ++i )
 	{
 		//mColorMapper = vtkImageMapToWindowLevelColorsPtr::New();
-		vtkImageMapToWindowLevelColorsPtr ColorMapper = vtkImageMapToWindowLevelColorsPtr::New();	
-		
-		ColorMapper->SetInput( mBlender->GetInput(i) );	
-		vtkLookupTablePtr lut = vtkLookupTable::SafeDownCast( mImages[i]->lookupTable2D().getLookupTable() );
-		
+		vtkImageMapToWindowLevelColorsPtr ColorMapper = vtkImageMapToWindowLevelColorsPtr::New();
+
+		ColorMapper->SetInput( mBlender->GetInput(i) );
+		vtkLookupTablePtr lut = vtkLookupTable::SafeDownCast( mImages[i]->getLookupTable2D().getLookupTable() );
+
 		ColorMapper->SetLookupTable( lut );
 		ColorMapper->SetWindow(255.0);
 		ColorMapper->SetLevel(127.5);
 
-		
+
 		mBlender->SetOpacity(i,0.50 );
 		mBlender->Update();
 	}
@@ -105,9 +105,9 @@ void ImageBlenderProxy::volumeBlend()
 {
 	//vtkImageDataPtr baseImage = mImages[0]->getRefVtkImageData();
 	mBlender->RemoveAllInputs();
-	
-	std::cout<<"There are ("<<mImages.size()<<") to be overlayed"<<std::endl;	
-	
+
+	std::cout<<"There are ("<<mImages.size()<<") to be overlayed"<<std::endl;
+
 	for(unsigned int j = 0; j<mImages.size(); ++j )
 	{
 //		vtkImageDataPtr imageData = mImages[j]->getRefVtkImageData();
@@ -115,8 +115,8 @@ void ImageBlenderProxy::volumeBlend()
 //		resample->SetInput(imageData);
 //		resample->SetInterpolationModeToLinear();
 //		resample->SetInformationInput(baseImage);
-//		
-		
+//
+
 		vtkImageMapToWindowLevelColorsPtr colorMapper = vtkImageMapToWindowLevelColorsPtr::New();
 		//colorMapper->SetInput(resample->GetOutput());
 		colorMapper->SetInput( mImages[j]->getRefVtkImageData());
@@ -134,17 +134,17 @@ void ImageBlenderProxy::volumeBlend()
 	      int val = (int)(*outBuffer);
 	      outBuffer += 3;
 	      (*outBuffer++)=(unsigned char)(val);
-	    }   	    	    
+	    }
 		std::cout<<"Number of components "<<colorMapper->GetOutput()->GetNumberOfScalarComponents()<<std::endl;
 		mBlender->SetOpacity(j, mImages[j]->getAlpha() );
 		mBlender->AddInput ( outColor );
 	}
-	
+
 }
 
 void  ImageBlenderProxy::addSlice(vtkImageDataPtr slice)
 {
-	
+
 	if(firstImage)
 	{
 		mBlender->RemoveAllInputs();
@@ -155,19 +155,19 @@ void  ImageBlenderProxy::addSlice(vtkImageDataPtr slice)
 	resample->SetInput(slice);
 	resample->SetInterpolationModeToLinear();
 	resample->SetInformationInput(baseImage);
-	
-	
+
+
 	mBlender->AddInput(slice);
 }
 
 bool ImageBlenderProxy::hasImage(ImagePtr image) const
-{	
+{
 	return true;
 }
 
 void  ImageBlenderProxy::clearImages()
 {
-	
+
 }
 
 void ImageBlenderProxy::addImage(ImagePtr image)
@@ -191,15 +191,15 @@ vtkImageDataPtr ImageBlenderProxy::getOutput()
 void ImageBlenderProxy::removeImage(ImagePtr image)
 {
 	std::string uid = image->getUid();
-	for(unsigned int i = 0; i<mImages.size(); ++i)	
+	for(unsigned int i = 0; i<mImages.size(); ++i)
 	{
 		if( uid == mImages[i]->getUid())
 		{
 			mImages.erase(mImages.begin()+i);
 		}
 	}
-	
-}	
+
+}
 
 
 //----------------------------------------------------------

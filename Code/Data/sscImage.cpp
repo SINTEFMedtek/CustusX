@@ -27,16 +27,16 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 #ifdef USE_TRANSFORM_RESCLICER
 	//mBaseImageData->ReleaseDataFlagOn();
 	mOrientator = vtkImageReslicePtr::New();
-	mOrientator->AutoCropOutputOn();	
+	mOrientator->AutoCropOutputOn();
 	mOrientator->SetInput(mBaseImageData);
 	mOutputImageData = mOrientator->GetOutput();
 	mOutputImageData->Update();
 	//mOutputImageData->UpdateInformation();
-#endif		
+#endif
 	mLandmarks->SetNumberOfComponents(4);
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	mAlpha = 0.5;
-	mTreshold = 1.0; 
+	mTreshold = 1.0;
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
@@ -52,7 +52,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 #endif
 	mImageTransferFunctions3D = ImageTF3D(data);
 	mImageLookupTable2D = ImageLUT2D(data);
-	
+
 	emit vtkImageDataChanged();
 }
 void Image::setClut(vtkLookupTablePtr clut)
@@ -71,8 +71,8 @@ void Image::setTreshold( double val )
 }
 
 double Image::getAlpha()
-{ 
-	return mAlpha; 
+{
+	return mAlpha;
 }
 
 void Image::setAlpha(double val)
@@ -83,12 +83,12 @@ void Image::setAlpha(double val)
 	emit alphaChange();
 }
 
-ImageTF3D& Image::transferFunctions3D()
+ImageTF3D& Image::getTransferFunctions3D()
 {
 	return mImageTransferFunctions3D;
 }
 
-ImageLUT2D& Image::lookupTable2D()
+ImageLUT2D& Image::getLookupTable2D()
 {
 	return mImageLookupTable2D;
 }

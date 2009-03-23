@@ -7,7 +7,7 @@
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include <vtkMatrix4x4.h> 
+#include <vtkMatrix4x4.h>
 
 #include "sscView.h"
 #include "sscDataManager.h"
@@ -33,20 +33,20 @@ SlicedImageProxy::~SlicedImageProxy()
 }
 
 void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
-{ 
+{
 	if (mSlicer)
 	{
 		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 	}
 	mSlicer = slicer;
 	connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
-	
+
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)
 {
 	std::cout<<"got image id"<<image->getUid()<<std::endl;
-//	
+//
 //	if (mImage)
 //	{
 //		disconnect( mImage.get(), SIGNAL(alphaChange()), this, SIGNAL(updateAlpha()));
@@ -56,8 +56,8 @@ void SlicedImageProxy::setImage(ImagePtr image)
 
 	mImage = image;
 	mReslicer->SetInput(mImage->getRefVtkImageData());
-	mWindowLevel->SetLookupTable( image->lookupTable2D().getLookupTable() );
-	mWindowLevel->Update();	
+	mWindowLevel->SetLookupTable( image->getLookupTable2D().getLookupTable() );
+	mWindowLevel->Update();
 }
 
 ImagePtr SlicedImageProxy::getImage()const
