@@ -33,7 +33,7 @@ class ContextDockWidget : public QDockWidget
   Q_OBJECT
 
 public:
-  ContextDockWidget(); ///< sets up layout and connects signals and slots
+  ContextDockWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   ~ContextDockWidget(); ///< empty
 
   int addTab(QWidget * page, const QString & label); ///< add a context specific widget
@@ -64,6 +64,9 @@ protected:
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the currently selected image
+
+private:
+  ContextDockWidget(); ///< not implemented
 };
 }//namespace cx
 #endif /* CXCONTEXTDOCKWIDGET_H_ */

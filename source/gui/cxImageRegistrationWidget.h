@@ -36,7 +36,7 @@ class ImageRegistrationWidget : public QWidget
   Q_OBJECT
 
 public:
-  ImageRegistrationWidget(); ///< sets up layout and connects signals and slots
+  ImageRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   ~ImageRegistrationWidget(); ///< empty
 
 protected slots:
@@ -44,11 +44,8 @@ protected slots:
   void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
   void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
-  //void imageSelectedSlot(const QString& comboBoxText); //TODO REMOVE
-  //void visibilityOfDockWidgetChangedSlot(bool visible); //TODO REMOVE
   void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
   void landmarkSelectedSlot(int row, int column); ///<
-  //void populateTheImageComboBox(); //TODO REMOVE
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
 
 
@@ -73,6 +70,9 @@ protected:
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
   std::map<int, bool> mLandmarkActiveMap; ///< mapping which landmarks are active (is going to be used when calculating the matrix)
   int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
+
+private:
+  ImageRegistrationWidget(); ///< not implemented
 };
 }//namespace cx
 

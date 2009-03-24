@@ -38,19 +38,16 @@ class PatientRegistrationWidget : public QWidget
   Q_OBJECT
 
 public:
-  PatientRegistrationWidget(); ///< sets up layout and connects signals and slots
+  PatientRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   ~PatientRegistrationWidget(); ///< empty
 
 protected slots:
-  //void imageSelectedSlot(const QString& comboBoxText); //TODO REMOVE
   void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
   void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
-  //void visibilityOfWidgetChangedSlot(bool visible);
   void toolSampledUpdateSlot(double, double, double,unsigned int); ///<
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
   void rowSelectedSlot(int row, int column); ///<  updates the current row and column
-  //void populateTheImageComboBox(); //TODO REMOVE
   void cellChangedSlot(int row, int column); ///<  reacts when the user types in a (landmark) name
   void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
 
@@ -80,6 +77,9 @@ protected:
   double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
   ToolPtr mToolToSample; ///< tool to be sampled from
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
+
+private:
+  PatientRegistrationWidget(); ///< not implemented
 
 };
 }//namespace cx

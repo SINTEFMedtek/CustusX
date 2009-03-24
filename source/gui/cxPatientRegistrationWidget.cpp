@@ -1,7 +1,6 @@
 #include "cxPatientRegistrationWidget.h"
 
 #include <QVBoxLayout>
-#include <QComboBox>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -22,9 +21,9 @@
 
 namespace cx
 {
-PatientRegistrationWidget::PatientRegistrationWidget() :
+PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
+  QWidget(parent),
   mVerticalLayout(new QVBoxLayout(this)),
-  //mImagesComboBox(new QComboBox(this)), //TODO REMOVE
   mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
   mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
@@ -39,15 +38,6 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
 {
   //Dock widget
   this->setWindowTitle("Patient Registration");
-/*  connect(this, SIGNAL(visibilityChanged(bool)), //TODO does not exist in widget
-          this, SLOT(visibilityOfWidgetChangedSlot(bool)));*/
-
-  //TODO REMOVE
-  //combobox
-/*  mImagesComboBox->setEditable(false);
-  mImagesComboBox->setEnabled(false);*/
-/*  connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString& )),
-          this, SLOT(imageSelectedSlot(const QString& )));*/
 
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int, int)),
@@ -69,7 +59,6 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
 
   //layout
-  //mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
@@ -81,69 +70,6 @@ PatientRegistrationWidget::PatientRegistrationWidget() :
 }
 PatientRegistrationWidget::~PatientRegistrationWidget()
 {}
-//TODO REMOVE
-/*void PatientRegistrationWidget::imageSelectedSlot(const QString& comboBoxText)
-{
-  if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
-    return;
-
-  std::string imageId = comboBoxText.toStdString();
-
-  //find the image
-  ssc::ImagePtr image = mDataManager->getImage(imageId);
-  if(image.get() == NULL)
-  {
-    mMessageManager->sendError("Could not find the selected image in the DataManager: "+imageId);
-    return;
-  }
-
-  //Set new current image
-  mCurrentImage = image;
-  mLandmarkActiveMap = mRegistrationManager->getActivePointsMap();
-
-  //get the images landmarks and populate the landmark table
-  this->populateTheLandmarkTableWidget(image);
-
-  //view3D
-  View3D* view3D_1 = mViewManager->get3DView("View3D_1");
-  VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
-  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  volumetricRep->setImage(mCurrentImage);
-  landmarkRep->setImage(mCurrentImage);
-  view3D_1->setRep(volumetricRep);
-  view3D_1->addRep(landmarkRep);
-
-  //view2D
-  View2D* view2D_1 = mViewManager->get2DView("View2D_1");
-  View2D* view2D_2 = mViewManager->get2DView("View2D_2");
-  View2D* view2D_3 = mViewManager->get2DView("View2D_3");
-  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
-  view2D_1->setRep(inriaRep2D_1);
-  view2D_2->setRep(inriaRep2D_2);
-  view2D_3->setRep(inriaRep2D_3);
-  inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
-  inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
-  inriaRep2D_3->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::SAGITTAL_ID);
-  inriaRep2D_1->getVtkViewImage2D()->AddChild(inriaRep2D_2->getVtkViewImage2D());
-  inriaRep2D_2->getVtkViewImage2D()->AddChild(inriaRep2D_3->getVtkViewImage2D());
-  inriaRep2D_3->getVtkViewImage2D()->AddChild(inriaRep2D_1->getVtkViewImage2D());
-  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
-  //TODO: ...or getBaseVtkImageData()???
-  inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mCurrentImage->getRefVtkImageData());
-  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-
-  //link volumetricRep and inriaReps
-  connect(volumetricRep.get(), SIGNAL(pointPicked(double,double,double)),
-          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
-  connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
-          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
-          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-}*/
 void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage)
 {
   if(mCurrentImage == currentImage)
@@ -175,25 +101,12 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
 }
 void PatientRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
 {
+  //update the active vector in registration manager
+  mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
+
+  //repopulate the tablewidget
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
-/*void PatientRegistrationWidget::visibilityOfWidgetChangedSlot(bool visible)
-{
-  if(visible)
-  {
-    connect(mDataManager, SIGNAL(dataLoaded()),
-            this, SLOT(populateTheImageComboBox()));
-    this->populateTheImageComboBox();
-  }
-  else
-  {
-    disconnect(mDataManager, SIGNAL(dataLoaded()),
-            this, SLOT(populateTheImageComboBox()));
-
-    //update the active vector in registration manager
-    mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
-  }
-}*/
 void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double notUsedY, double notUsedZ,unsigned int notUsedIndex)
 {
   int numberOfToolSamples = mToolManager->getToolSamples()->GetNumberOfTuples();
@@ -239,40 +152,6 @@ void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
   mCurrentRow = row;
   mCurrentColumn = column;
 }
-//TODO REMOVE
-/*void PatientRegistrationWidget::populateTheImageComboBox()
-{
-  mImagesComboBox->clear();
-
-  //find out if the master image is set
-  ssc::ImagePtr masterImage = mRegistrationManager->getMasterImage();
-
-  //get a list of images from the datamanager
-  std::map<std::string, ssc::ImagePtr> images = mDataManager->getImages();
-  if(images.size() == 0 || masterImage.get() == NULL)
-  {
-    mImagesComboBox->insertItem(1, QString("First do Image Registration..."));
-    mImagesComboBox->setEnabled(false);
-    return;
-  }
-
-  //add these to the combobox
-  typedef std::map<std::string, ssc::ImagePtr>::iterator iterator;
-  int listPosition = 1;
-  for(iterator i = images.begin(); i != images.end(); ++i)
-  {
-    mImagesComboBox->insertItem(listPosition, QString(i->first.c_str()));
-    listPosition++;
-  }
-
-  //set the master image as the selected on
-  std::string uid = masterImage->getUid();
-  int comboboxIndex = mImagesComboBox->findText(QString(uid.c_str()));
-  if (comboboxIndex < 0)
-    return;
-
-  mImagesComboBox->setCurrentIndex(comboboxIndex);
-}*/
 void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 {
   if (column!=0)
@@ -287,7 +166,6 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   if(mToolToSample.get() != NULL && mToolToSample->getUid() == uid)
     return;
 
-  //ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getTool(uid).get()));
   ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
   if(mToolToSample.get() != NULL)
   {
@@ -303,6 +181,7 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
               this, SLOT(toolVisibleSlot(bool)));
 
   //TODO: REMOVE
+  //only for testing...
   ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
   toolRep3D_1->setTool(mToolToSample);
   View3D* view = mViewManager->get3DView("View3D_1");
@@ -405,8 +284,8 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     else
     {
       columnTwo = mLandmarkTableWidget->item(row, 1);
-      if(columnTwo == NULL) //TODO: remove
-        std::cout << "columnTwo == NULL!!!" << std::endl;
+/*      if(columnTwo == NULL) //TODO: remove
+        std::cout << "columnTwo == NULL!!!" << std::endl;*/
     }
     columnTwo->setText(QString(name.c_str()));
   }
@@ -454,10 +333,6 @@ void PatientRegistrationWidget::updateAccuracy()
             double yAccuracy = targetPoint[1] - transformedPointVector[1];
             double zAccuracy = targetPoint[2] - transformedPointVector[2];
 
-            /*mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
-                sqrt(pow(transformedPointVector[0],2) +
-                      pow(transformedPointVector[1],2) +
-                      pow(transformedPointVector[2],2));*/
             mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
                 sqrt(pow(xAccuracy,2) +
                      pow(yAccuracy,2) +
