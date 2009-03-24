@@ -9,19 +9,14 @@ class QTabWidget;
 class QVBoxLayout;
 class QComboBox;
 
-namespace ssc
-{
-class DataManager;
-}
 namespace cx
 {
-typedef ssc::DataManager DataManager;
-
 class RegistrationManager;
 class ToolManager;
 class MessageManager;
 class ViewManager;
 class RepManager;
+class DataManager;
 
 
 /**

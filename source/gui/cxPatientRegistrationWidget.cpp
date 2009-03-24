@@ -8,7 +8,7 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <vtkDoubleArray.h>
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "sscVector3D.h"
 #include "cxVolumetricRep.h"
 #include "cxLandmarkRep.h"

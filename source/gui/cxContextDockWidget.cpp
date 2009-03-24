@@ -3,7 +3,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QComboBox>
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 #include "cxMessageManager.h"
 #include "cxToolManager.h"

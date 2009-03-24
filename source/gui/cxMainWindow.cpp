@@ -7,13 +7,14 @@
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QFileInfo>
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxCustomStatusBar.h"
 #include "cxContextDockWidget.h"
+#include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxPatientRegistrationWidget.h"
 
@@ -30,6 +31,7 @@ MainWindow::MainWindow() :
   mContextDockWidget(new ContextDockWidget()),
   mImageRegistrationWidget(new ImageRegistrationWidget()),
   mPatientRegistrationWidget(new PatientRegistrationWidget()),
+  mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
   mImageRegistrationIndex(-1),
   mPatientRegistrationIndex(-1)
   //mCustomStatusBar(new CustomStatusBar())
@@ -48,6 +50,8 @@ MainWindow::MainWindow() :
   //debugging
   connect(mToolManager, SIGNAL(toolManagerReport(std::string)),
           this, SLOT(printSlot(std::string)));
+
+  this->changeState(PATIENT_DATA, PATIENT_DATA);
 }
 MainWindow::~MainWindow()
 {}
@@ -125,6 +129,8 @@ void MainWindow::createActions()
           mImageRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           mPatientRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
+  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+          mTransferFunctionWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 }
 void MainWindow::createMenus()
 {
@@ -226,6 +232,8 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 void MainWindow::activatePatientDataState()
 {
   mCurrentWorkflowState = PATIENT_DATA;
+  mImageRegistrationIndex = mContextDockWidget->addTab(mTransferFunctionWidget,
+      QString("Transfer functions"));
 }
 void MainWindow::deactivatePatientDataState()
 {}

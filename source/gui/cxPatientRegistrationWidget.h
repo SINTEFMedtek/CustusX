@@ -13,17 +13,12 @@ class QPushButton;
 class QString;
 class QLabel;
 
-namespace ssc
-{
-  class DataManager;
-}
-
 namespace cx
 {
-typedef ssc::DataManager DataManager;
 typedef ssc::Transform3D Transform3D;
 typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
+class DataManager;
 class RegistrationManager;
 class ToolManager;
 class MessageManager;

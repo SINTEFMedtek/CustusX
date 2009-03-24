@@ -7,21 +7,17 @@ class QAction;
 class QMenu;
 class QActionGroup;
 
-namespace ssc
-{
-class DataManager;
-}
 
 namespace cx
 {
-typedef ssc::DataManager DataManager;
-
+class DataManager;
 class RepManager;
 class ViewManager;
 class ToolManager;
 class MessageManager;
 class CustomStatusBar;
 class ContextDockWidget;
+class TransferFunctionWidget;
 class ImageRegistrationWidget;
 class PatientRegistrationWidget;
 
@@ -139,7 +135,7 @@ protected:
   ContextDockWidget* mContextDockWidget; ///< dock widget for context sensitive widgets
   ImageRegistrationWidget* mImageRegistrationWidget; ///< interface for image registration
   PatientRegistrationWidget* mPatientRegistrationWidget; ///< interface for patient registration
-  //cxVolumetricTFsDockWidget* mVolumetricTFsDockWidget; //TODO
+  TransferFunctionWidget* mTransferFunctionWidget;
   //CustomStatusBar* mCustomStatusBar; //TODO, not working yet
   int mImageRegistrationIndex, mPatientRegistrationIndex; ///< tab index for removing tabs is ContextDockWidget
 
