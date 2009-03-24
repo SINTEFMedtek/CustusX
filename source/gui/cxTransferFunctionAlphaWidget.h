@@ -59,6 +59,7 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent* event);  ///< Reimplemented from superclass
 
   virtual void paintEvent(QPaintEvent* event); ///<Reimplemented from superclass.
+  virtual void resizeEvent(QResizeEvent* evt);///<Reimplemented from superclass
 
   bool isInsideCurrentPoint();
   AlphaPoint getCurrentAlphaPoint();///<

@@ -17,8 +17,9 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
       mTransferFunctionRgbWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));*/
 
   mLayout->addWidget(mTransferFunctionAlphaWidget);
-  //§mLayout->addWidget(mTransferFunctionRgbWidget);
+  //mLayout->addWidget(mTransferFunctionRgbWidget);
   //mLayout->addWidget(mInfoWidget);
+  this->setLayout(mLayout);
 }
 TransferFunctionWidget::~TransferFunctionWidget()
 {}
