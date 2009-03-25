@@ -50,7 +50,7 @@ public:
   InriaRep3DMap* getInria3DReps(); ///< get all Inria3D reps in the pool
   InriaRep2DMap* getInria2DReps(); ///< get all Inria2D reps in the pool
   VolumetricRepMap* getVolumetricReps(); ///< get all Volumetric reps in the pool
-  ProgressiveVolumetricRepMap* RepManager::getProgressiveVolumetricReps(); ///< get all ProgressiveLODVolumetric reps in the pool
+  /*ProgressiveVolumetricRepMap* RepManager::getProgressiveVolumetricReps(); ///< get all ProgressiveLODVolumetric reps in the pool*/
   LandmarkRepMap* getLandmarkReps(); ///< get all Landmark reps in the pool
   ToolRep3DMap* getToolRep3DReps(); ///< get all Tool3D reps in the pool
 
@@ -58,7 +58,7 @@ public:
   InriaRep3DPtr getInria3DRep(const std::string& uid); ///< get one specific Inria3D rep
   InriaRep2DPtr getInria2DRep(const std::string& uid); ///< get one specific Inria2D rep
   VolumetricRepPtr getVolumetricRep(const std::string& uid); ///< get one specific Volumetric rep
-  ProgressiveVolumetricRepPtr getProgressiveVolumetricRep(const std::string& uid); ///< get one specific ProgressiveLODVolumetric rep
+  /*ProgressiveVolumetricRepPtr getProgressiveVolumetricRep(const std::string& uid); ///< get one specific ProgressiveLODVolumetric rep*/
   LandmarkRepPtr getLandmarkRep(const std::string& uid); ///<  get one specific Landmark rep
   ssc::ToolRep3DPtr getToolRep3DRep(const std::string& uid); ///<  get one specific Tool3D rep
 
@@ -81,9 +81,11 @@ protected:
   std::string         mVolumetricRepNames[2]; ///< the name of the reps in the pool
   VolumetricRepMap    mVolumetricRepMap;  ///< the reps in the pool
 
+/*
   const int           MAX_PROGRESSIVEVOLUMETRICREPS; ///< number of ProgressiveLODVolumetric reps in the pool
   std::string         mProgressiveVolumetricRepNames[2]; ///< the name of the reps in the pool
   ProgressiveVolumetricRepMap    mProgressiveVolumetricRepMap;  ///< the reps in the pool
+*/
 
   const int           MAX_LANDMARKREPS; ///< number of Landmark reps in the pool
   std::string         mLandmarkRepNames[2]; ///< the name of the reps in the pool
