@@ -158,21 +158,14 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
 {
   QWidget::resizeEvent(evt);
-  
+
   // Calculate areas
   this->mFullArea = QRect(0, 0, width(), height());
   this->mPlotArea = QRect(5, 5, width() - 10, height() - 10);
-  
+
   //barwidthmult_ = (width() - 10) / static_cast<double>(histogram_.size());
   //barheightmult_ = static_cast<double>( height() - 10 ) / histmax_;
 }
-  
-/**
- * \param x
- * \param y
- * \param insidePoint
- * \return
- */
 bool TransferFunctionAlphaWidget::isInsideCurrentPoint()
 {
   std::map<int, QRect>::iterator it = mPointRects.begin();
@@ -187,11 +180,6 @@ bool TransferFunctionAlphaWidget::isInsideCurrentPoint()
   mCurrentAlphaPoint.reset();
   return false;
 }
-/**
- * \param x
- * \param y
- * \return
- */
 TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentAlphaPoint()
 {
   AlphaPoint point;
