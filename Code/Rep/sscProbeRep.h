@@ -9,11 +9,11 @@
 class vtkObject;
 class vtkRenderWindowInteractor;
 
-
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkLineSource> vtkLineSourcePtr;
 typedef vtkSmartPointer<class vtkProbeFilter> vtkProbeFilterPtr;
+typedef vtkSmartPointer<class vtkSphereSource> vtkSphereSourcePtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 typedef vtkSmartPointer<class vtkDataSetAttributes> vtkDataSetAttributesPtr;
 typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
@@ -43,7 +43,7 @@ public:
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
 	//void useRenderWindowInteractor(bool use);
 
-	Vector3DPtr pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
+	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
 
 signals:
@@ -52,19 +52,20 @@ signals:
 
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
+	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
 
 protected:
 	ProbeRep(const std::string& uid, const std::string& name=""); ///<
 	virtual void addRepActorsToViewRenderer(View* view); ///<
 	virtual void removeRepActorsFromViewRenderer(View* view); ///<
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
-	bool intersectData(Vector3D p0, Vector3D p1, Vector3DPtr intersection); ///< Find the intersection between the probe line and the image.
-	bool snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D* bestPoint); ///< if there is a landmark close by, use that instead
+	bool intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection); ///< Find the intersection between the probe line and the image.
+	bool snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint); ///< if there is a landmark close by, use that instead
 
 	ImagePtr            mImage;                           ///< the image to pick points from
 	int                 mThreshold;                       ///< used to picked the point together with the probefilter, default=25
 	int                 mResolution;                      ///< used to divide the probing ray into pieces, default=1000
-	Vector3DPtr         mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image
+	Vector3D            mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image
 	vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
 	vtkRendererPtr      mCurrentRenderer;                 ///< TODO
 

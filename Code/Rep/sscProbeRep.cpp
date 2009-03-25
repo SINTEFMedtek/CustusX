@@ -4,12 +4,12 @@
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
-//#include <vtkProperty.h>
+#include <vtkProperty.h>
 #include <vtkImageData.h>
 #include <vtkLineSource.h>
 #include <vtkDoubleArray.h>
 #include <vtkProbeFilter.h>
-//#include <vtkSphereSource.h>
+#include <vtkSphereSource.h>
 #include <vtkRenderWindow.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkDataSetAttributes.h>
@@ -42,15 +42,15 @@ std::string ProbeRep::getType() const
 }
 void ProbeRep::setImage(ImagePtr image)
 {
-	if (image==mImage)
-	{
+	if (image==mImage || !image.get())
 		return;
-	}
-	if (mImage)
+
+	if (mImage.get())
 	{
 		disconnect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
 				mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
 	}
+	mImage = image;
 	connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
 			mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
 }
@@ -73,7 +73,7 @@ void ProbeRep::setResolution(const int resolution)
  * \param[in] renderer the renderer from which to get the camera
  * \return the point where the ray intersects the image
  */
-Vector3DPtr ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
+Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
 	//Get camera position and focal point in world coordinates
 	vtkCamera* camera = renderer->GetActiveCamera();
@@ -114,15 +114,19 @@ Vector3DPtr ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr
 	Vector3D p0 = worldClickPoint + probeRayDirection * (clipRange[0] - cam2click);
 	Vector3D p1 = worldClickPoint + probeRayDirection * (clipRange[1] - cam2click);
 
-	Vector3DPtr intersection;
+	Vector3D intersection;
 	bool hit = this->intersectData(p0, p1, intersection);
 
 	//TODO: we need to know the result of this outside this function, so we know
 	//if the point should be made permanent or not
 	//bool snapped = snapToExistingPoints(p0, p1, intersection);
 
-	//TODO: maybe mPickedPoint shouldnt be a Ptr?
+	//set the last point picked
 	mPickedPoint = intersection;
+	emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
+
+	//Make an sphere actor to show where the calculated point is
+	this->showTemporaryPointSlot(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 
 	return intersection;
 }
@@ -131,9 +135,9 @@ Vector3DPtr ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr
  */
 void ProbeRep::makeLandmarkPermanent(unsigned int index)
 {
-	emit addPermanentPoint((*mPickedPoint.get())[0],
-						   (*mPickedPoint.get())[1],
-						   (*mPickedPoint.get())[2],
+	emit addPermanentPoint(mPickedPoint[0],
+						   mPickedPoint[1],
+						   mPickedPoint[2],
 						   index);
 }
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
@@ -147,13 +151,35 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	int pickedPoint[2]; //<x,y>
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
 
-	//TODO: maybe we dont need the renderer to be a member
 	mCurrentRenderer = this->getRendererFromRenderWindow(*iren);
 	if(mCurrentRenderer == NULL)
 		return;
 
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
 	this->pickLandmark(clickPoint, mCurrentRenderer);
+}
+void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
+{
+  if(mCurrentRenderer == NULL)
+    return;
+
+  if(mPickedPointActor == NULL )
+  {
+    vtkSphereSourcePtr pickedPointSphereSource = vtkSphereSource::New();
+    pickedPointSphereSource->SetRadius(2);
+    vtkPolyDataMapperPtr pickedPointMapper = vtkPolyDataMapper::New();
+    pickedPointMapper->SetInputConnection(pickedPointSphereSource->GetOutputPort());
+    mPickedPointActor = vtkActor::New();
+    mPickedPointActor->SetMapper(pickedPointMapper);
+    mPickedPointActor->GetProperty()->SetColor(0,1,0);
+  }
+  if(mCurrentRenderer->HasViewProp(mPickedPointActor))
+      mCurrentRenderer->RemoveActor(mPickedPointActor);
+
+  mPickedPointActor->SetPosition(x, y, z);
+  mCurrentRenderer->AddActor(mPickedPointActor);
+
+  mCurrentRenderer->GetRenderWindow()->Render();
 }
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {
@@ -180,7 +206,7 @@ vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& 
  * \param[out] intersection the point where the probeline intersects the image
  * \return whether or not the a intersection point was found
  */
-bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3DPtr intersection)
+bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
 	//Creating the line from the camera through the picked point into the volume
 	vtkLineSourcePtr lineSource = vtkLineSource::New();
@@ -216,7 +242,7 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3DPtr intersection)
 		return false;
 
 	Vector3D retval(probeFilterMapper->GetInput()->GetPoint(i));
-	*intersection = retval;
+	intersection = retval;
 	return true;
 }
 /**
@@ -226,7 +252,7 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3DPtr intersection)
  * existing point if one is close by
  * \return whether or not the incoming bestPoint was replaced
  */
-bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D* bestPoint)
+bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint)
 {
 	Vector3D tangent = (p1-p0).normal(); //ray tangent
 	vtkDoubleArrayPtr existingLandmarks = mImage->getLandmarks();
@@ -234,7 +260,7 @@ bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vecto
 	for(int i=0; i<= existingLandmarks->GetNumberOfTuples()-1; i++)
 	{
 		//distance from p0 to the currently best point
-		double distanceStartPointToBestPoint = dot((*bestPoint-p0), tangent);
+		double distanceStartPointToBestPoint = dot((bestPoint-p0), tangent);
 
 		//distance from p0 to this existing landmark
 		double* landmark = existingLandmarks->GetTuple(i);
