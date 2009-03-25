@@ -12,7 +12,6 @@ class QPushButton;
 
 namespace cx
 {
-class DataManager;
 class RepManager;
 class ViewManager;
 class RegistrationManager;
@@ -57,7 +56,6 @@ protected:
 
   //manageres
   RepManager* mRepManager; ///< has a pool of reps //TODO remove when removing proberep func!!!
-  DataManager* mDataManager; ///< has all the data loaded into the system
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
   RegistrationManager* mRegistrationManager; ///< handles image and patient registration
   MessageManager* mMessageManager; ///< takes messages intended for the user

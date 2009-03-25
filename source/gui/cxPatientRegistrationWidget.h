@@ -18,7 +18,6 @@ namespace cx
 typedef ssc::Transform3D Transform3D;
 typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
-class DataManager;
 class RegistrationManager;
 class ToolManager;
 class MessageManager;
@@ -63,7 +62,6 @@ protected:
   QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy //TODO
 
   //managers
-  DataManager* mDataManager; ///< has all the data loaded into the system
   RegistrationManager* mRegistrationManager; ///< handles image and patient registration
   ToolManager* mToolManager; ///< interface to the navigation system
   MessageManager* mMessageManager; ///< takes messages intended for the user

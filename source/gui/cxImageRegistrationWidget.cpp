@@ -7,7 +7,6 @@
 #include <QHeaderView>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "cxViewManager.h"
 #include "cxRegistrationManager.h"
@@ -26,7 +25,6 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mEditLandmarkButton(new QPushButton("Resample landmark", this)),
   mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
   mRepManager(RepManager::getInstance()),
-  mDataManager(DataManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),

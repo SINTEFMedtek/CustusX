@@ -7,7 +7,6 @@
 #include <QHeaderView>
 #include <QLabel>
 #include <vtkDoubleArray.h>
-#include "cxDataManager.h"
 #include "sscVector3D.h"
 #include "cxVolumetricRep.h"
 #include "cxLandmarkRep.h"
@@ -27,7 +26,6 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
   mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
-  mDataManager(DataManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),
