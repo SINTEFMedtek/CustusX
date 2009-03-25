@@ -6,7 +6,7 @@
 namespace cx
 {
 /**
- * \class cxDataManager.h
+ * \class cxDataManager
  *
  * \brief
  *
