@@ -7,19 +7,19 @@
 #include "cxInriaRep3D.h"
 #include "cxInriaRep2D.h"
 #include "cxVolumetricRep.h"
-#include "sscProgressiveLODVolumetricRep.h"
+//#include "sscProgressiveLODVolumetricRep.h"
 #include "cxLandmarkRep.h"
 
 namespace cx
 {
-typedef ssc::ProgressiveLODVolumetricRep ProgressiveVolumetricRep;
-typedef ssc::ProgressiveLODVolumetricRepPtr ProgressiveVolumetricRepPtr;
+/*typedef ssc::ProgressiveLODVolumetricRep ProgressiveVolumetricRep;
+typedef ssc::ProgressiveLODVolumetricRepPtr ProgressiveVolumetricRepPtr;*/
 
 typedef std::map<std::string, ssc::RepPtr> RepMap;
 typedef std::map<std::string, InriaRep2DPtr> InriaRep2DMap;
 typedef std::map<std::string, InriaRep3DPtr> InriaRep3DMap;
 typedef std::map<std::string, VolumetricRepPtr> VolumetricRepMap;
-typedef std::map<std::string, ProgressiveVolumetricRepPtr> ProgressiveVolumetricRepMap;
+//typedef std::map<std::string, ProgressiveVolumetricRepPtr> ProgressiveVolumetricRepMap;
 typedef std::map<std::string, LandmarkRepPtr> LandmarkRepMap;
 typedef std::map<std::string, ssc::ToolRep3DPtr> ToolRep3DMap;
 
