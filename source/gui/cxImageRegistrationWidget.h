@@ -10,12 +10,9 @@ class QComboBox;
 class QTableWidget;
 class QPushButton;
 
-namespace ssc
-{
-class DataManager;
-}
 namespace cx
 {
+class DataManager;
 class RepManager;
 class ViewManager;
 class RegistrationManager;
@@ -31,7 +28,6 @@ class MessageManager;
  */
 class ImageRegistrationWidget : public QWidget
 {
-  typedef ssc::DataManager DataManager;
 
   Q_OBJECT
 

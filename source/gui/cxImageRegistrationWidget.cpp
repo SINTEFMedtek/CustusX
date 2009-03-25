@@ -7,7 +7,7 @@
 #include <QHeaderView>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "cxViewManager.h"
 #include "cxRegistrationManager.h"

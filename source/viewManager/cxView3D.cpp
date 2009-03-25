@@ -4,7 +4,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
-#include "sscDataManager.h"
+#include "cxDataManager.h"
 #include "sscImage.h"
 #include "cxRepManager.h"
 #include "cxMessageManager.h"

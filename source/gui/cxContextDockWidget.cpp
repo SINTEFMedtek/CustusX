@@ -3,6 +3,8 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QComboBox>
+#include "sscVolumetricRep.h" //TODO REMOVE
+#include "sscProbeRep.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"
 #include "cxMessageManager.h"
@@ -112,10 +114,14 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
-  VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
+  //TODO: REMOVE, should be done in the repmanager
+  ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New("ssc_VolumetricRep", "ssc_VolumetricRep"));
+  ssc::ProbeRepPtr probeRep(ssc::ProbeRep::New("ssc_ProbeRep", "ssc_ProbeRep"));
+  //VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
   //ProgressiveVolumetricRepPtr progressiveVolumetricRep = mRepManager->getProgressiveVolumetricRep("ProgressiveVolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   volumetricRep->setImage(mCurrentImage);
+  probeRep->setImage(mCurrentImage);
   //progressiveVolumetricRep->setImage(mCurrentImage);
   landmarkRep->setImage(mCurrentImage);
   view3D_1->setRep(volumetricRep);
@@ -145,13 +151,21 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
 
   //link volumetricRep and inriaReps
-  connect(volumetricRep.get(), SIGNAL(pointPicked(double,double,double)),
+/*  connect(volumetricRep.get(), SIGNAL(pointPicked(double,double,double)),
           inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
   connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+          volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));*/
+  connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
+          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
+  connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
 }
 }//namespace cx

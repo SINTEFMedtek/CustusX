@@ -232,6 +232,7 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 void MainWindow::activatePatientDataState()
 {
   mCurrentWorkflowState = PATIENT_DATA;
+  //should never be removed
   mImageRegistrationIndex = mContextDockWidget->addTab(mTransferFunctionWidget,
       QString("Transfer functions"));
 }

@@ -6,12 +6,9 @@
 class QWidget;
 class QMenu;
 
-namespace ssc
-{
-class DataManager;
-}
 namespace cx
 {
+class DataManager;
 class RepManager;
 class MessageManager;
 
@@ -25,7 +22,6 @@ class MessageManager;
  */
 class View3D : public ssc::View
 {
-typedef ssc::DataManager DataManager;
 
 public:
   View3D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
