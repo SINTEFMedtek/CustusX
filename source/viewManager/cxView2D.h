@@ -22,7 +22,7 @@ class MessageManager;
  */
 class View2D : public ssc::View
 {
-
+  Q_OBJECT
 public:
   View2D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
   virtual ~View2D(); ///< empty

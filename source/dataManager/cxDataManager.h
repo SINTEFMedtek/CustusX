@@ -15,6 +15,7 @@ namespace cx
  */
 class DataManager : public ssc::DataManagerImpl
 {
+  Q_OBJECT
 public:
   static DataManager* getInstance();
 

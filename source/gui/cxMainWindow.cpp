@@ -323,8 +323,9 @@ void MainWindow::loadDataSlot()
     statusBar()->showMessage(QString(tr("Load cancelled")));
     return;
   }
+//  std::cout << "fileName: " << fileName.toAscii() << std::endl;
   QFileInfo fileInfo(fileName);
-  QString fileType = fileInfo.completeSuffix();
+  QString fileType = fileInfo.suffix();
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
