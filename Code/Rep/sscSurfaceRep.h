@@ -17,6 +17,7 @@ typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
 
 class SurfaceRep : public RepImpl
 {
+  Q_OBJECT
 public:
 	static SurfaceRepPtr New(const std::string& uid);
 	virtual std::string getType() const { return "ssc::SurfaceRep"; }

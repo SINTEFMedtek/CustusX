@@ -24,12 +24,10 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 	//reader->GetOutput()->ReleaseDataFlagOn();
 	reader->Update();
 	vtkImageDataPtr imageData = reader->GetOutput();
-
-//		ImagePtr image(new Image());
-//		image->setVtkImageData(imageData);
-//		return image;
-	return ImagePtr(new Image(filename, imageData));
-
+  
+  ImagePtr image(new Image(filename, imageData));
+  return image;
+  
 }
 
 //-----
@@ -41,7 +39,8 @@ MeshPtr PolyDataMeshReader::load(const std::string& fileName)
 	vtkPolyDataPtr polyData = reader->GetOutput();
 
 	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-	return MeshPtr(new Mesh(fileName, "PolyData", polyData));
+  MeshPtr tempMesh(new Mesh(fileName, "PolyData", polyData));
+  return tempMesh;
 
 }
 
@@ -53,7 +52,8 @@ MeshPtr StlMeshReader::load(const std::string& fileName)
 	vtkPolyDataPtr polyData = reader->GetOutput();
 
 	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-	return MeshPtr(new Mesh(fileName, "PolyData", polyData));
+  MeshPtr tempMesh(new Mesh(fileName, "PolyData", polyData));
+  return tempMesh;
 
 }
 
