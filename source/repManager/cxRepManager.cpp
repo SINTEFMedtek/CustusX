@@ -21,7 +21,8 @@ RepManager::RepManager() :
   MAX_INRIAREP3DS(2),
   MAX_INRIAREP2DS(9),
   MAX_VOLUMETRICREPS(2),
-  /*MAX_PROGRESSIVEVOLUMETRICREPS(2),*/
+  MAX_PROGRESSIVEVOLUMETRICREPS(2),
+  MAX_PROBEREPS(2),
   MAX_LANDMARKREPS(2),
   MAX_TOOLREP3DS(5)
 {
@@ -41,10 +42,11 @@ RepManager::RepManager() :
   mVolumetricRepNames[0] = "VolumetricRep_1";
   mVolumetricRepNames[1] = "VolumetricRep_2";
 
-/*
   mProgressiveVolumetricRepNames[0] = "ProgressiveVolumetricRep_1";
   mProgressiveVolumetricRepNames[1] = "ProgressiveVolumetricRep_2";
-*/
+
+  mProbeRepNames[0] = "ProbeRep_1";
+  mProbeRepNames[1] = "ProbeRep_2";
 
   mLandmarkRepNames[0] = "LandmarkRep_1";
   mLandmarkRepNames[1] = "LandmarkRep_2";
@@ -73,13 +75,19 @@ RepManager::RepManager() :
         mVolumetricRepNames[i]));
     mVolumetricRepMap[volumetricRep->getUid()] = volumetricRep;
   }
-/*  for(int i=0; i<MAX_PROGRESSIVEVOLUMETRICREPS; i++)
+  for(int i=0; i<MAX_PROGRESSIVEVOLUMETRICREPS; i++)
   {
     ProgressiveVolumetricRepPtr progressiveVolumetricRep(
         ProgressiveVolumetricRep::New(mProgressiveVolumetricRepNames[i],
         mProgressiveVolumetricRepNames[i]));
     mProgressiveVolumetricRepMap[progressiveVolumetricRep->getUid()] = progressiveVolumetricRep;
-  }*/
+  }
+  for(int i=0; i<MAX_PROBEREPS; i++)
+  {
+    ProbeRepPtr probeRep(ProbeRep::New(mProbeRepNames[i],
+        mProbeRepNames[i]));
+    mProbeRepMap[probeRep->getUid()] = probeRep;
+  }
   for(int i=0; i<MAX_LANDMARKREPS; i++)
   {
     LandmarkRepPtr landmarkRep(LandmarkRep::New(mLandmarkRepNames[i],
@@ -111,10 +119,14 @@ std::vector<std::pair<std::string, std::string> > RepManager::getRepUidsAndNames
   {
     uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
   }
-/*  for(ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.begin(); it != mProgressiveVolumetricRepMap.end(); it++)
+  for(ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.begin(); it != mProgressiveVolumetricRepMap.end(); it++)
   {
     uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }*/
+  }
+  for(ProbeRepMap::iterator it = mProbeRepMap.begin(); it != mProbeRepMap.end(); it++)
+  {
+    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
+  }
   for(LandmarkRepMap::iterator it = mLandmarkRepMap.begin(); it != mLandmarkRepMap.end(); it++)
   {
     uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
@@ -140,10 +152,14 @@ RepMap* RepManager::getReps()
   {
     repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
   }
-/*  for(ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.begin(); it != mProgressiveVolumetricRepMap.end(); it++)
+  for(ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.begin(); it != mProgressiveVolumetricRepMap.end(); it++)
   {
     repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }*/
+  }
+  for(ProbeRepMap::iterator it = mProbeRepMap.begin(); it != mProbeRepMap.end(); it++)
+  {
+    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
+  }
   for(LandmarkRepMap::iterator it = mLandmarkRepMap.begin(); it != mLandmarkRepMap.end(); it++)
   {
     repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
@@ -166,10 +182,14 @@ VolumetricRepMap* RepManager::getVolumetricReps()
 {
   return &mVolumetricRepMap;
 }
-/*ProgressiveVolumetricRepMap* RepManager::getProgressiveVolumetricReps()
+ProgressiveVolumetricRepMap* RepManager::getProgressiveVolumetricReps()
 {
   return &mProgressiveVolumetricRepMap;
-}*/
+}
+ProbeRepMap* RepManager::getProbeReps()
+{
+  return &mProbeRepMap;
+}
 LandmarkRepMap* RepManager::getLandmarkReps()
 {
   return &mLandmarkRepMap;
@@ -189,12 +209,18 @@ ssc::RepPtr RepManager::getRep(const std::string& uid)
   VolumetricRepMap::iterator it3 = mVolumetricRepMap.find(uid);
   if(it3 != mVolumetricRepMap.end())
     return it3->second;
-  LandmarkRepMap::iterator it4 = mLandmarkRepMap.find(uid);
-  if(it4 != mLandmarkRepMap.end())
+  ProgressiveVolumetricRepMap::iterator it4 = mProgressiveVolumetricRepMap.find(uid);
+  if(it4 != mProgressiveVolumetricRepMap.end())
     return it4->second;
-  ToolRep3DMap::iterator it5 = mToolRep3DMap.find(uid);
-  if(it5 != mToolRep3DMap.end())
+  ProbeRepMap::iterator it5 = mProbeRepMap.find(uid);
+  if(it5 != mProbeRepMap.end())
     return it5->second;
+  LandmarkRepMap::iterator it6 = mLandmarkRepMap.find(uid);
+  if(it6 != mLandmarkRepMap.end())
+    return it6->second;
+  ToolRep3DMap::iterator it7 = mToolRep3DMap.find(uid);
+  if(it7 != mToolRep3DMap.end())
+    return it7->second;
 
   return ssc::RepPtr();
 }
@@ -222,14 +248,22 @@ VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
   else
     return VolumetricRepPtr();
 }
-/*ProgressiveVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
+ProgressiveVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
 {
   ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.find(uid);
   if(it != mProgressiveVolumetricRepMap.end())
     return it->second;
   else
     return ProgressiveVolumetricRepPtr();
-}*/
+}
+ProbeRepPtr RepManager::getProbeRep(const std::string& uid)
+{
+  ProbeRepMap::iterator it = mProbeRepMap.find(uid);
+  if(it != mProbeRepMap.end())
+    return it->second;
+  else
+    return ProbeRepPtr();
+}
 LandmarkRepPtr RepManager::getLandmarkRep(const std::string& uid)
 {
   LandmarkRepMap::iterator it = mLandmarkRepMap.find(uid);
