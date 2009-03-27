@@ -3,7 +3,6 @@ SET (LIB repManager)
 SET( CX_QT_MOC_HEADER_FILES
     cxInriaRep3D.h
     cxInriaRep2D.h
-    cxVolumetricRep.h
     cxLandmarkRep.h
     cxRepManager.h
 )
@@ -11,7 +10,6 @@ SET( CX_QT_MOC_HEADER_FILES
 SET ( ${LIB}_repManager
     cxInriaRep3D.cpp
     cxInriaRep2D.cpp
-    cxVolumetricRep.cpp
     cxLandmarkRep.cpp
     cxRepManager.cpp
 )

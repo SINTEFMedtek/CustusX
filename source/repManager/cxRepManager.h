@@ -4,10 +4,10 @@
 #include <QObject>
 #include <map>
 #include "sscToolRep3D.h"
+#include "sscVolumetricRep.h"
+#include "sscProbeRep.h"
 #include "cxInriaRep3D.h"
 #include "cxInriaRep2D.h"
-#include "cxVolumetricRep.h"
-#include "sscProbeRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxLandmarkRep.h"
 
@@ -21,7 +21,7 @@ typedef ssc::ProgressiveLODVolumetricRepPtr ProgressiveVolumetricRepPtr;
 typedef std::map<std::string, ssc::RepPtr> RepMap;
 typedef std::map<std::string, InriaRep2DPtr> InriaRep2DMap;
 typedef std::map<std::string, InriaRep3DPtr> InriaRep3DMap;
-typedef std::map<std::string, VolumetricRepPtr> VolumetricRepMap;
+typedef std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
 typedef std::map<std::string, ProbeRepPtr> ProbeRepMap;
 typedef std::map<std::string, ProgressiveVolumetricRepPtr> ProgressiveVolumetricRepMap;
 typedef std::map<std::string, LandmarkRepPtr> LandmarkRepMap;
@@ -62,7 +62,7 @@ public:
   ssc::RepPtr getRep(const std::string& uid); ///< get one specific rep
   InriaRep3DPtr getInria3DRep(const std::string& uid); ///< get one specific Inria3D rep
   InriaRep2DPtr getInria2DRep(const std::string& uid); ///< get one specific Inria2D rep
-  VolumetricRepPtr getVolumetricRep(const std::string& uid); ///< get one specific Volumetric rep
+  ssc::VolumetricRepPtr getVolumetricRep(const std::string& uid); ///< get one specific Volumetric rep
   ProbeRepPtr getProbeRep(const std::string& uid); ///< get one specific Probe rep
   ProgressiveVolumetricRepPtr getProgressiveVolumetricRep(const std::string& uid); ///< get one specific ProgressiveLODVolumetric rep
   LandmarkRepPtr getLandmarkRep(const std::string& uid); ///<  get one specific Landmark rep

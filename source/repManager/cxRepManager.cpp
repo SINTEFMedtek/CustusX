@@ -71,7 +71,7 @@ RepManager::RepManager() :
   }
   for(int i=0; i<MAX_VOLUMETRICREPS; i++)
   {
-    VolumetricRepPtr volumetricRep(VolumetricRep::New(mVolumetricRepNames[i],
+    ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New(mVolumetricRepNames[i],
         mVolumetricRepNames[i]));
     mVolumetricRepMap[volumetricRep->getUid()] = volumetricRep;
   }
@@ -240,13 +240,13 @@ InriaRep2DPtr RepManager::getInria2DRep(const std::string& uid)
   else
     return InriaRep2DPtr();
 }
-VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
+ssc::VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
 {
   VolumetricRepMap::iterator it = mVolumetricRepMap.find(uid);
   if(it != mVolumetricRepMap.end())
     return it->second;
   else
-    return VolumetricRepPtr();
+    return ssc::VolumetricRepPtr();
 }
 ProgressiveVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
 {
