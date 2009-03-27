@@ -69,8 +69,9 @@ protected:
 	vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
 	vtkRendererPtr      mCurrentRenderer;                 ///< TODO
 
-	//bool                     mUseRenderWindowInteractor;  ///< should the rep connect to the renderwindowinteractor
 	vtkEventQtSlotConnectPtr mConnections;                ///< used to sending signals and events between vtk and qt
 };
+
+typedef boost::shared_ptr<ProbeRep> ProbeRepPtr;
 }//namespace
 #endif /* SSCPROBEREP_H_ */

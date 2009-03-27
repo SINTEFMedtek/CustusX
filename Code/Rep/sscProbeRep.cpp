@@ -21,6 +21,7 @@ namespace ssc
 {
 ProbeRepPtr ProbeRep::New(const std::string& uid, const std::string& name)
 {
+  std::cout << "ProbeRep::New" << std::endl;
 	ProbeRepPtr retval(new ProbeRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
@@ -31,17 +32,22 @@ ProbeRep::ProbeRep(const std::string& uid, const std::string& name) :
 	mResolution(1000),
 	mPickedPoint(),
 	mPickedPointActor(NULL),
-	//mUseRenderWindowInteractor(false),
 	mConnections(vtkEventQtSlotConnect::New())
-{}
+{
+  std::cout << "ProbeRep::ProbeRep" << std::endl;
+  }
 ProbeRep::~ProbeRep()
-{}
+{
+  std::cout << "ProbeRep::~ProbeRep" << std::endl;
+}
 std::string ProbeRep::getType() const
 {
+  std::cout << "ProbeRep::getType" << std::endl;
 	return "ssc::ProbeRep";
 }
 void ProbeRep::setImage(ImagePtr image)
 {
+  std::cout << "ProbeRep::setImage" << std::endl;
 	if (image==mImage || !image.get())
 		return;
 
@@ -56,16 +62,14 @@ void ProbeRep::setImage(ImagePtr image)
 }
 void ProbeRep::setThreshold(const int threshold)
 {
+  std::cout << "ProbeRep::setThreshold" << std::endl;
 	mThreshold = threshold;
 }
 void ProbeRep::setResolution(const int resolution)
 {
+  std::cout << "ProbeRep::setResolution" << std::endl;
 	mResolution = resolution;
 }
-/*void ProbeRep::useRenderWindowInteractor(bool use)
-{
-	mUseRenderWindowInteractor = use;
-}*/
 /**
  * Trace a ray from clickPosition along the camera view direction and intersect
  * the image.
@@ -75,6 +79,7 @@ void ProbeRep::setResolution(const int resolution)
  */
 Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
+  std::cout << "ProbeRep::pickLandmark" << std::endl;
 	//Get camera position and focal point in world coordinates
 	vtkCamera* camera = renderer->GetActiveCamera();
 	Vector3D cameraPosition(camera->GetPosition());
@@ -85,7 +90,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	//We need a depth value for the z-buffer.
 	double* displayCoords;
 	renderer->SetWorldPoint(cameraFocalPoint[0], cameraFocalPoint[1],
-			cameraFocalPoint[2], cameraFocalPoint[3]);
+			cameraFocalPoint[2], 1);
 	renderer->WorldToDisplay();
 	displayCoords = renderer->GetDisplayPoint();
 	Vector3D displayClickPosition = clickPosition;
@@ -135,6 +140,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
  */
 void ProbeRep::makeLandmarkPermanent(unsigned int index)
 {
+  std::cout << "ProbeRep::makeLandmarkPermanent" << std::endl;
 	emit addPermanentPoint(mPickedPoint[0],
 						   mPickedPoint[1],
 						   mPickedPoint[2],
@@ -142,6 +148,7 @@ void ProbeRep::makeLandmarkPermanent(unsigned int index)
 }
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
+  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren =
 		vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
@@ -160,6 +167,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 }
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
+  std::cout << "ProbeRep::showTemporaryPointSlot" << std::endl;
   if(mCurrentRenderer == NULL)
     return;
 
@@ -183,14 +191,29 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 }
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {
-	//TODO
+  std::cout << "ProbeRep::addRepActorsToViewRenderer" << std::endl;
+  if(view == NULL)
+    return;
+
+  mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::LeftButtonPressEvent,
+                       this,
+                       SLOT(pickLandmarkSlot(vtkObject*)));
 }
 void ProbeRep::removeRepActorsFromViewRenderer(View* view)
 {
-	//TODO
+  std::cout << "ProbeRep::removeRepActorsFromViewRenderer" << std::endl;
+  if(view == NULL)
+    return;
+
+  mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::LeftButtonPressEvent,
+                       this,
+                       SLOT(pickLandmarkSlot(vtkObject*)));
 }
 vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
+  std::cout << "ProbeRep::getRendererFromRenderWindow" << std::endl;
 	vtkRendererPtr renderer = NULL;
 	std::set<ssc::View*>::const_iterator it = mViews.begin();
 	for(; it != mViews.end(); ++it)
@@ -208,6 +231,7 @@ vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& 
  */
 bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
+  std::cout << "ProbeRep::intersectData" << std::endl;
 	//Creating the line from the camera through the picked point into the volume
 	vtkLineSourcePtr lineSource = vtkLineSource::New();
 	lineSource->SetPoint1(p0.begin());
@@ -254,6 +278,7 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
  */
 bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint)
 {
+  std::cout << "ProbeRep::snapToExistingPoint" << std::endl;
 	Vector3D tangent = (p1-p0).normal(); //ray tangent
 	vtkDoubleArrayPtr existingLandmarks = mImage->getLandmarks();
 
