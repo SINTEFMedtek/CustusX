@@ -89,14 +89,14 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
 }
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
-  VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
-  if(volumetricRep.get() == NULL)
+  ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  if(probeRep.get() == NULL)
   {
     mMessageManager->sendError("Could not find a rep to add the landmark to.");
     return;
   }
   int index = mLandmarkTableWidget->rowCount()+1;
-  volumetricRep->makePointPermanent(index);
+  probeRep->makeLandmarkPermanent(index);
 
   //TODO: find a better place for this?
   //make sure the masterImage is set
@@ -106,14 +106,14 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 }
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-  VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
-  if(volumetricRep.get() == NULL)
+  ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  if(probeRep.get() == NULL)
   {
     mMessageManager->sendError("Could not find a rep to edit the landmark for.");
     return;
   }
   int index = mCurrentRow+1;
-  volumetricRep->makePointPermanent(index);
+  probeRep->makeLandmarkPermanent(index);
 }
 void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {

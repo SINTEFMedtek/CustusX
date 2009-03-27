@@ -3,7 +3,7 @@
 
 #include <map.h>
 #include <QWidget>
-#include "cxVolumetricRep.h"
+#include "sscVolumetricRep.h"
 
 class QVBoxLayout;
 class QComboBox;

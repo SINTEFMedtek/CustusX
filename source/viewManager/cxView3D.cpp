@@ -4,11 +4,11 @@
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
-#include "cxDataManager.h"
 #include "sscImage.h"
+#include "sscVolumetricRep.h"
+#include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "cxMessageManager.h"
-#include "cxVolumetricRep.h"
 
 namespace cx
 {
@@ -76,7 +76,7 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
     mMessageManager->sendInfo(info);
 
     //Make a volumetric rep out of the image
-    VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");//TODO: REMOVE HACK???
+    ssc::VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");//TODO: REMOVE HACK???
     ssc::ImagePtr image = mDataManager->getImage(actionId);
     volumetricRep->setImage(image);
 

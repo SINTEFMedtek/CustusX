@@ -114,20 +114,19 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
-  //TODO: REMOVE, should be done in the repmanager
-  ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New("ssc_VolumetricRep", "ssc_VolumetricRep"));
-  ssc::ProbeRepPtr probeRep(ssc::ProbeRep::New("ssc_ProbeRep", "ssc_ProbeRep"));
-  //VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
-  //ProgressiveVolumetricRepPtr progressiveVolumetricRep = mRepManager->getProgressiveVolumetricRep("ProgressiveVolumetricRep_1");
+  //ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New("ssc_VolumetricRep", "ssc_VolumetricRep"));
+  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ssc::VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
+  //A: ProgressiveVolumetricRepPtr progressiveVolumetricRep = mRepManager->getProgressiveVolumetricRep("ProgressiveVolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   volumetricRep->setImage(mCurrentImage);
   probeRep->setImage(mCurrentImage);
-  //progressiveVolumetricRep->setImage(mCurrentImage);
+  //A: progressiveVolumetricRep->setImage(mCurrentImage);
   landmarkRep->setImage(mCurrentImage);
   view3D_1->setRep(volumetricRep);
-  //view3D_1->setRep(progressiveVolumetricRep);
+  //A: view3D_1->setRep(progressiveVolumetricRep);
   view3D_1->addRep(landmarkRep);
-  //TODO add ProbeRep
+  view3D_1->addRep(probeRep);
 
   //view2D
   View2D* view2D_1 = mViewManager->get2DView("View2D_1");
