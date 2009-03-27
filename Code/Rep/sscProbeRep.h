@@ -33,15 +33,14 @@ class ProbeRep : public RepImpl
 	Q_OBJECT
 
 public:
-	static ProbeRepPtr New(const std::string& uid, const std::string& name=""); ///<
-	virtual ~ProbeRep(); ///<
+	static ProbeRepPtr New(const std::string& uid, const std::string& name=""); ///< for creating new instances
+	virtual ~ProbeRep(); ///<empty
 
-	virtual std::string getType() const; ///<
+	virtual std::string getType() const; ///< returns a string identifying this class type
 
 	void setImage(ImagePtr image); ///< set which image points should be picked from
 	void setThreshold(const int threshold); ///< sets the threshold for picking the point on the volumes surface
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
-	//void useRenderWindowInteractor(bool use);
 
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
@@ -55,9 +54,9 @@ public slots:
 	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
 
 protected:
-	ProbeRep(const std::string& uid, const std::string& name=""); ///<
-	virtual void addRepActorsToViewRenderer(View* view); ///<
-	virtual void removeRepActorsFromViewRenderer(View* view); ///<
+	ProbeRep(const std::string& uid, const std::string& name=""); ///< use New instead
+	virtual void addRepActorsToViewRenderer(View* view); ///< connects to the renderwindowinteractor
+	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
 	bool intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection); ///< Find the intersection between the probe line and the image.
 	bool snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint); ///< if there is a landmark close by, use that instead
@@ -67,7 +66,7 @@ protected:
 	int                 mResolution;                      ///< used to divide the probing ray into pieces, default=1000
 	Vector3D            mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image
 	vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
-	vtkRendererPtr      mCurrentRenderer;                 ///< TODO
+	vtkRendererPtr      mCurrentRenderer;                 ///< the renderer set to use
 
 	vtkEventQtSlotConnectPtr mConnections;                ///< used to sending signals and events between vtk and qt
 };
