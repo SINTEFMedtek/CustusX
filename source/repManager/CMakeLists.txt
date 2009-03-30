@@ -8,9 +8,13 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( ${LIB}_repManager
+    cxInriaRep3D.h
     cxInriaRep3D.cpp
+    cxInriaRep2D.h
     cxInriaRep2D.cpp
+    cxLandmarkRep.h
     cxLandmarkRep.cpp
+    cxRepManager.h
     cxRepManager.cpp
 )
 
