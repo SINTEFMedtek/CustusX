@@ -41,7 +41,8 @@ public:
 
 signals:
   void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
-
+  void changeTabIndex(int index); ///< Send a signal when the tab index must be changed
+  
 protected slots:
   void visibilityOfDockWidgetChangedSlot(bool visible); ///< connects/disconnects to signals from the datamanager
   void populateTheImageComboBoxSlot(); ///< populates the combobox with the images loaded into the datamanager

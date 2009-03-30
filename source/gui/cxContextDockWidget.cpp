@@ -44,12 +44,19 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mTabWidget);
   mGuiWidget->setLayout(mVerticalLayout);
+  
+  // Change current tab index
+  connect(this, SIGNAL(changeTabIndex(int)),
+          mTabWidget, SLOT(setCurrentIndex(int)));
+  
 }
 ContextDockWidget::~ContextDockWidget()
 {}
 int ContextDockWidget::addTab(QWidget * page, const QString & label)
 {
-  return mTabWidget->addTab(page, label);
+  int tabIndex = mTabWidget->addTab(page, label);
+  emit changeTabIndex(tabIndex);
+  return tabIndex;
 }
 void ContextDockWidget::removeTab(int tabIndex)
 {
