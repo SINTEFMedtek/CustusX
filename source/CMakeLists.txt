@@ -51,6 +51,7 @@ if (SSC_FOUND)
 	include (${SSC_USE_FILE})
 	#add_executable (testSSC testSSC.cpp)
 	#target_link_libraries (testSSC SSC)
+	link_directories (${SSC_DIR}/Code)
 endif (SSC_FOUND)
 message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} ) 
 #----------
