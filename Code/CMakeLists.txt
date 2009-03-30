@@ -182,26 +182,16 @@ set( SSC_GENERATED_LIBRARIES
 include_directories( ${SSC_INCLUDE_DIRS} ${SSC_BINARY_DIR} ${QT_INCLUDES} ${Boost_INCLUDE_DIRS} )
 link_directories( ${SSC_LIBRARY_DIRS} )
 
-#set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
+set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
+
 
 # =========================================================
-
-# Generate both shared and static library versions
-# Idea gotten from http://www.lcfg.org/doc/buildtools/cmake_recipes.html
-add_library( SSC SHARED ${SSC_GENERATED_SOURCE_FILES} )
+# create the target
+add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
 target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
+# =========================================================
+# =========================================================
 
-# Cannot have two targets with the same name so the static version has
-# '-static' appended and then the name of the output file is set
-# separately.
-add_library( SSC-static STATIC ${SSC_GENERATED_SOURCE_FILES} )
-set_target_properties( SSC-static  PROPERTIES OUTPUT_NAME "SSC")
-target_link_libraries( SSC-static ${SSC_GENERATED_LIBRARIES} )
-
-# These next two lines are required but it is unclear exactly what they do.
-# The CMake FAQ mentions they are necessary and it does not work otherwise.
-set_target_properties( SSC PROPERTIES CLEAN_DIRECT_OUTPUT 1 )
-set_target_properties( SSC-static PROPERTIES CLEAN_DIRECT_OUTPUT 1 )
 
 # =========================================================
 # 
