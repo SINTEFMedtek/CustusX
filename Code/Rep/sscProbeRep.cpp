@@ -110,7 +110,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	Vector3D p1 = worldClickPoint + probeRayDirection * (clipRange[1] - cam2click);
 
 	Vector3D intersection;
-	bool hit = this->intersectData(p0, p1, intersection);
+	this->intersectData(p0, p1, intersection);
 
 	//TODO: we need to know the result of this outside this function, so we know
 	//if the point should be made permanent or not
@@ -261,23 +261,24 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
  */
 bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint)
 {
-	Vector3D tangent = (p1-p0).normal(); //ray tangent
-	vtkDoubleArrayPtr existingLandmarks = mImage->getLandmarks();
-
-	for(int i=0; i<= existingLandmarks->GetNumberOfTuples()-1; i++)
-	{
-		//distance from p0 to the currently best point
-		double distanceStartPointToBestPoint = dot((bestPoint-p0), tangent);
-
-		//distance from p0 to this existing landmark
-		double* landmark = existingLandmarks->GetTuple(i);
-		Vector3D existingLandmark(landmark[0], landmark[1], landmark[3]);
-		double distanceStartPointToExistingPoint = dot((existingLandmark-p0), tangent);
-
-		//TODO continue implementing
-		//incoming point projected onto ray
-		//Vector3D
-	}
-
+	return false;
+//	Vector3D tangent = (p1-p0).normal(); //ray tangent
+//	vtkDoubleArrayPtr existingLandmarks = mImage->getLandmarks();
+//
+//	for(int i=0; i<= existingLandmarks->GetNumberOfTuples()-1; i++)
+//	{
+//		//distance from p0 to the currently best point
+//		double distanceStartPointToBestPoint = dot((bestPoint-p0), tangent);
+//
+//		//distance from p0 to this existing landmark
+//		double* landmark = existingLandmarks->GetTuple(i);
+//		Vector3D existingLandmark(landmark[0], landmark[1], landmark[3]);
+//		double distanceStartPointToExistingPoint = dot((existingLandmark-p0), tangent);
+//
+//		//TODO continue implementing
+//		//incoming point projected onto ray
+//		//Vector3D
+//	}
+//
 }
 }//namespace ssc
