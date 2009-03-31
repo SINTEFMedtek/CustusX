@@ -63,7 +63,7 @@ signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transformChanged(); ///< emitted when transform is changed
 	void alphaChange(); ///<blending alpha
-
+	void thresholdChange(double val); 
 
 public slots:
 	void addLandmarkSlot(double x, double y, double z, unsigned int index);

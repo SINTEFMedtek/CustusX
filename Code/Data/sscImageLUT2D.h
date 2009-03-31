@@ -9,13 +9,14 @@
 #define SSCIMAGELOOKUPTABLE2D_H_
 
 #include <QColor>
+#include <vtkUnsignedCharArray.h> 
 #include "vtkSmartPointer.h" 
 typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
-
+typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
 namespace ssc
 {
 
@@ -46,7 +47,8 @@ public:
 	void changeOpacityForAll(double opacity);
 	void changeOpacity(int index, double opacity);
 	void addNewColorLut();
-	
+	void setTable(vtkUnsignedCharArray *  table);
+	vtkImageMapToColorsPtr getColorMap();
 private:
 	void printToFile();
 	vtkScalarsToColorsPtr mScalarToColor;
@@ -55,6 +57,7 @@ private:
 	vtkWindowLevelLookupTablePtr mColorLookupTable;
 	vtkPiecewiseFunctionPtr mLowLevel;
 	vtkImageDataPtr mBase;
+	vtkImageMapToColorsPtr mImageMapToColor;
 	double mLLR;
 	double mWindow;
 	double mLevel;

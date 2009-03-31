@@ -120,7 +120,6 @@ double ImageTF3D::getLevel() const
 }
 
 /**set a lut that is used as a basis for the color tf.
- *
  */
 void ImageTF3D::setLut(vtkLookupTablePtr lut)
 {
@@ -128,7 +127,11 @@ void ImageTF3D::setLut(vtkLookupTablePtr lut)
 	mLut = lut;
 	refreshColorTF();
 }
-
+void ImageTF3D::setTable(vtkUnsignedCharArrayPtr table)
+{
+	mLut->SetTable(table);
+	refreshColorTF();
+}
 vtkLookupTablePtr ImageTF3D::getLut() const
 {
 	return mLut;

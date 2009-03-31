@@ -37,8 +37,8 @@ SliceRepSW::SliceRepSW(const std::string& uid) :
 	mReslicer->SetOutputDimensionality(2);
 	mReslicer->SetResliceAxes(mMatrixAxes) ;
 	mReslicer->SetAutoCropOutput(false);
-
-	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
+	
+	
 
 }
 SliceRepSW::~SliceRepSW()
@@ -80,13 +80,14 @@ void SliceRepSW::setImage( ImagePtr image )
 		mImage->disconnectRep(mSelf);
 	}
 	mImage = image;
-
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
+		std::cout<<" The image data type is:  "<< mImage->getRefVtkImageData()<<std::endl;
 		mReslicer->SetInput(mImage->getRefVtkImageData());
-		mWindowLevel->SetLookupTable(image->getLookupTable2D().getLookupTable());
+		mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 		mWindowLevel->SetOutputFormatToRGBA();
+		mWindowLevel->SetLookupTable(image->getLookupTable2D().getLookupTable());
 		mWindowLevel->Update();
 	}
 }
@@ -123,7 +124,7 @@ bool SliceRepSW::hasImage(ImagePtr image) const
 void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 {
 	update();
-}
+}		
 
 void SliceRepSW::update()
 {

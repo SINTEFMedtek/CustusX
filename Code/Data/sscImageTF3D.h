@@ -15,6 +15,8 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 typedef vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
 typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
+typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
+
 
 namespace ssc
 {
@@ -41,7 +43,8 @@ public:
 	void setLut(vtkLookupTablePtr lut);
 	vtkLookupTablePtr getLut() const;
 	double getScalarMax() const;
-
+	void setTable(vtkUnsignedCharArrayPtr table);
+	
 private:
 	void refreshColorTF();
 	void refreshOpacityTF();

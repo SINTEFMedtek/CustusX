@@ -333,7 +333,7 @@ void TestSliceAndOverlayImage::generateSliceRepLayerd(ssc::ToolPtr tool, std::ve
 	
 	mLayouts[plane]->mBlendedSliceRep->setSliceProxy(proxy);
 	mLayouts[plane]->mBlendedSliceRep->setImages(images);
-	mLayouts[plane]->mBlendedSliceRep->update();
+	
 	mLayouts[plane]->mView->addRep(mLayouts[plane]->mBlendedSliceRep);
 	 
 }

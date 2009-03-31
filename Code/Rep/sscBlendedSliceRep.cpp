@@ -30,8 +30,9 @@ BlendedSliceRep::BlendedSliceRep(const std::string& uid):
 
 	// set up the slicer pipeline		
 	mBlender->SetBlendModeToNormal();
-	//mBlender->SetBlendModeToCompound();
-	//mBlender->SetCompoundThreshold(0.1);
+//	mBlender->SetBlendModeToCompound();
+//	mBlender->SetOpacity(1, 0.9);
+//	mBlender->SetCompoundThreshold(0.8);
 	firstImage = true;
 	countImage = 0;
 }
@@ -57,6 +58,7 @@ void BlendedSliceRep::setImages(std::vector<ImagePtr> images)
 		std::cout<<"slice image: id"<<images.at(i)->getUid()<<std::endl;
 		ImagePtr image = images.at(i);
 		connect( image.get(), SIGNAL(alphaChange()), this, SLOT(updateAlphaSlot()));
+		connect( image.get(), SIGNAL(thresholdChange(double)), this, SLOT(updateThresholdSlot(double)));
 		SlicedImageProxyPtr slicedImage(new ssc::SlicedImageProxy());
 		slicedImage->setSliceProxy(mSlicer);
 		slicedImage->setImage(image);
@@ -100,26 +102,34 @@ void BlendedSliceRep::addRepActorsToViewRenderer(View* view)
 {	
 	mImageActor->SetInput( mBlender->GetOutput() );
 	view->getRenderer()->AddActor(mImageActor);	
-	
 }
+
 void BlendedSliceRep::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mImageActor);
 }
+
 void BlendedSliceRep::update()
 {
 	updateAlphaSlot();
 }
 
+void BlendedSliceRep::updateThresholdSlot(double  val)
+{
+	val = 	val/100.0;
+	std::cout<<"mBlender got threshold :"<<val<<std::endl;
+	mBlender->SetCompoundThreshold(val);
+}
+
 /**SLOT 
-*this get signal if alpha changes.. will update render pipe
+*this get signal if alpha changes.. will excecute render pipeline
 **/
 void BlendedSliceRep::updateAlphaSlot()
 {
 	int blenderSize = mBlender->GetNumberOfInputs();
+	
 	for (int i = 0; i<blenderSize; i++)
-	{
-		mBlender->SetOpacity(i,getAlpha(i));
+	{	mBlender->SetOpacity(i,getAlpha(i));
 		mBlender->Update();
 	}
 }

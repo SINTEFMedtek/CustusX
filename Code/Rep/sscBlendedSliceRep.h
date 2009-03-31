@@ -35,7 +35,6 @@ public:
 	void setSliceProxy(SliceProxyPtr slicer); 
 	void setImages(std::vector<ImagePtr> images);
 	void update();
-
 protected:
 	BlendedSliceRep(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
@@ -44,6 +43,7 @@ protected:
 	
 private slots:
 	void updateAlphaSlot();
+	void updateThresholdSlot(double val);
 private:
 	double getAlpha(int countImage);	
 	bool firstImage;

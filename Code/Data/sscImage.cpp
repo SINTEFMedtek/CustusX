@@ -68,6 +68,11 @@ double Image::treshold()
 
 void Image::setTreshold( double val )
 {
+	if( similar(mTreshold ,val))
+		return;
+	std::cout<<"ssc::Image, got threshold :"<<val<<std::endl;
+	mTreshold = val;
+	emit thresholdChange(val);
 }
 
 double Image::getAlpha()
