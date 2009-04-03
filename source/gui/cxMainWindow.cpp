@@ -35,11 +35,7 @@ MainWindow::MainWindow() :
   mImageRegistrationIndex(-1),
   mPatientRegistrationIndex(-1)
   //mCustomStatusBar(new CustomStatusBar())
-{
-  // Don't draw Widget yet. 
-  // Prevents flicker and the visualizetion bug to start drawing lines and dots.
-  setUpdatesEnabled(false);
-  
+{  
   this->createActions();
   this->createToolBars();
   this->createMenus();
@@ -47,7 +43,6 @@ MainWindow::MainWindow() :
 
   this->setCentralWidget(mCentralWidget);
   this->resize(QSize(1000,1000));
-  this->show();
 
   mViewManager->setCentralWidget(*mCentralWidget);
 
@@ -69,8 +64,8 @@ MainWindow::MainWindow() :
                                                          QString("Patient Registration"));
   mContextDockWidget->removeTab(mPatientRegistrationIndex);
   
-  // Ok to draw Widget
-  setUpdatesEnabled(true);  
+  // Don't show the Widget before all elements are initialized
+  this->show();
 }
 MainWindow::~MainWindow()
 {}
