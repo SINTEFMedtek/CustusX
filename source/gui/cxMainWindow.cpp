@@ -57,7 +57,6 @@ MainWindow::MainWindow() :
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
   
-  
   // Try to fix visualization bug by adding and removing tabs
   // Looks like mImageRegistrationWidget and mPatientRegistrationWidget
   // draws some lines and dots when the are added to mContextDockWidget
@@ -79,6 +78,10 @@ void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
 
+  //View
+  this->mToggleContextDockWidgetAction = mContextDockWidget->toggleViewAction();
+  mToggleContextDockWidgetAction->setText("Context Widget");
+  
   //workflow
   mWorkflowActionGroup = new QActionGroup(this);
   mPatientDataWorkflowAction = new QAction(tr("Acquire patient data"), mWorkflowActionGroup);
@@ -127,12 +130,18 @@ void MainWindow::createActions()
 
   //layout
   mLayoutActionGroup = new QActionGroup(this);
+  mLayoutActionGroup->setExclusive(true);
   m3D_1x1_LayoutAction = new QAction(tr("3D_1X1"), mLayoutActionGroup);
   m3DACS_2x2_LayoutAction = new QAction(tr("3DACS_2X2"), mLayoutActionGroup);
   m3DACS_1x3_LayoutAction = new QAction(tr("3DACS_1X3"), mLayoutActionGroup);
   mACSACS_2x3_LayoutAction = new QAction(tr("ACSACS_2X3"), mLayoutActionGroup);
+  
+  m3D_1x1_LayoutAction->setCheckable(true);
+  m3DACS_2x2_LayoutAction->setCheckable(true);
+  m3DACS_1x3_LayoutAction->setCheckable(true);
+  mACSACS_2x3_LayoutAction->setCheckable(true);
 
-  m3D_1x1_LayoutAction->setChecked(true);
+  m3DACS_2x2_LayoutAction->setChecked(true);
 
   connect(m3D_1x1_LayoutAction, SIGNAL(triggered()),
       mViewManager, SLOT(setLayoutTo_3D_1X1()));
@@ -154,11 +163,16 @@ void MainWindow::createActions()
 }
 void MainWindow::createMenus()
 {
+  mViewMenu = new QMenu(tr("View"), this);;
   mWorkflowMenu = new QMenu(tr("Workflow"), this);;
   mDataMenu = new QMenu(tr("Data"), this);
   mToolMenu = new QMenu(tr("Tracking"), this);
   mLayoutMenu = new QMenu(tr("Layouts"), this);
 
+  // View
+  this->menuBar()->addMenu(mViewMenu);
+  mViewMenu->addAction(mToggleContextDockWidgetAction);
+  
   //workflow
   this->menuBar()->addMenu(mWorkflowMenu);
   mWorkflowMenu->addAction(mPatientDataWorkflowAction);

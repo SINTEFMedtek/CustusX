@@ -101,12 +101,15 @@ protected:
   QWidget* mCentralWidget; ///< central widget used for views
 
   //menus
+  QMenu* mViewMenu; ///< Menu for showing / hiding GUI elements
   QMenu* mWorkflowMenu; ///< menu for choosing workflow
   QMenu* mDataMenu; ///< menu for loading data
   QMenu* mToolMenu; ///< menu for interacting with the navigation system
   QMenu* mLayoutMenu; ///< menu for changing view layouts
 
   //actions and actiongroups
+  QAction* mToggleContextDockWidgetAction;///< Action for turning dock widget on/off
+  
   QAction* mPatientDataWorkflowAction; ///< action for switching to the patient data workflow
   QAction* mImageRegistrationWorkflowAction; ///< action for switching to the image registration workflow
   QAction* mPatientRegistrationWorkflowAction; ///< action for switching to the patient registraiton workflow
@@ -127,7 +130,7 @@ protected:
   QAction* m3DACS_1x3_LayoutAction; ///< action for switching to 3DACS_1x3 view layout
   QAction* mACSACS_2x3_LayoutAction; ///< action for switching to ACSACS_2x3 view layout
   QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
-
+  
   //toolbars
   QToolBar* mDataToolBar; ///< toolbar for data actions
   QToolBar* mToolToolBar; ///< toolbar for navigation actions
