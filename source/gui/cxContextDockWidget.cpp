@@ -120,6 +120,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   emit currentImageChanged(mCurrentImage);
   
   // TODO: Shouldn't most of this be in a manager: ViewManager / MainWindow?
+  // The responsible manager should listen to the currentImageChanged signal
   
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
