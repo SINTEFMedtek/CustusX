@@ -118,7 +118,9 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   //Set new current image
   mCurrentImage = image;
   emit currentImageChanged(mCurrentImage);
-
+  
+  // TODO: Shouldn't most of this be in a manager: ViewManager / MainWindow?
+  
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
   //ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New("ssc_VolumetricRep", "ssc_VolumetricRep"));
@@ -134,6 +136,8 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   //A: view3D_1->setRep(progressiveVolumetricRep);
   view3D_1->addRep(landmarkRep);
   view3D_1->addRep(probeRep);
+  view3D_1->getRenderer()->ResetCamera();
+  view3D_1->getRenderer()->Render();
 
   //view2D
   View2D* view2D_1 = mViewManager->get2DView("View2D_1");
