@@ -36,6 +36,10 @@ MainWindow::MainWindow() :
   mPatientRegistrationIndex(-1)
   //mCustomStatusBar(new CustomStatusBar())
 {
+  // Don't draw Widget yet. 
+  // Prevents flicker and the visualizetion bug to start drawing lines and dots.
+  setUpdatesEnabled(false);
+  
   this->createActions();
   this->createToolBars();
   this->createMenus();
@@ -52,6 +56,22 @@ MainWindow::MainWindow() :
           this, SLOT(printSlot(std::string)));
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
+  
+  
+  // Try to fix visualization bug by adding and removing tabs
+  // Looks like mImageRegistrationWidget and mPatientRegistrationWidget
+  // draws some lines and dots when the are added to mContextDockWidget
+  // without more information about how and where the should be shown
+  // TODO: Find a better way to do this
+  mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
+                                                       QString("Image Registration"));
+  mContextDockWidget->removeTab(mImageRegistrationIndex);
+  mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
+                                                         QString("Patient Registration"));
+  mContextDockWidget->removeTab(mPatientRegistrationIndex);
+  
+  // Ok to draw Widget
+  setUpdatesEnabled(true);  
 }
 MainWindow::~MainWindow()
 {}

@@ -9,6 +9,7 @@ class QVBoxLayout;
 namespace cx
 {
 class TransferFunctionAlphaWidget;
+class TransferFunctionColorWidget;
 
 /**
  * \class TransferFunctionWidget
@@ -37,7 +38,7 @@ protected:
   //gui
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
-  //TransferFunctionRgbWidget* mTransferFunctionRgbWidget;
+  TransferFunctionColorWidget* mTransferFunctionColorWidget;
   //TransferFunctionInfoWidget*  mInfoWidget;
 
   ssc::ImagePtr mCurrentImage;

@@ -1,23 +1,24 @@
 #include "cxTransferFunctionWidget.h"
 
 #include <QVBoxLayout>
-#include "cxTransferFunctionAlphaWidget.h"
+//#include "cxTransferFunctionAlphaWidget.h"
+//#include "cxTransferFunctionColorWidget.h"
 
 namespace cx
 {
 
 TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
   QWidget(parent),
-  mLayout(new QVBoxLayout(this)),
-  mTransferFunctionAlphaWidget(new TransferFunctionAlphaWidget(this))
+  mLayout(new QVBoxLayout(this))
+  //mTransferFunctionAlphaWidget(new TransferFunctionAlphaWidget(this))
 {
-  connect(this, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-      mTransferFunctionAlphaWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 /*  connect(this, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-      mTransferFunctionRgbWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));*/
+      mTransferFunctionAlphaWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
+  connect(this, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+      mTransferFunctionColorWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 
   mLayout->addWidget(mTransferFunctionAlphaWidget);
-  //mLayout->addWidget(mTransferFunctionRgbWidget);
+  mLayout->addWidget(mTransferFunctionColorWidget);*/
   //mLayout->addWidget(mInfoWidget);
   this->setLayout(mLayout);
 }

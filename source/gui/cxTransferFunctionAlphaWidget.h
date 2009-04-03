@@ -21,12 +21,20 @@ namespace cx
  */
 class TransferFunctionAlphaWidget : public QWidget
 {
+  // TODO: Move ssc::ImageTF3D
+  //typedef std::map<int, int> IntIntMap;
+  //typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
+  //typedef boost::shared_ptr<IntIntMap> OpacityMapPtr;
+    
   Q_OBJECT
-
+  
 public:
   TransferFunctionAlphaWidget(QWidget* parent);
   ~TransferFunctionAlphaWidget();
 
+signals:
+  void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
+  
 public slots:
   void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
 
@@ -58,23 +66,22 @@ protected:
   virtual void mouseReleaseEvent(QMouseEvent* event); ///< Reimplemented from superclass
   virtual void mouseMoveEvent(QMouseEvent* event);  ///< Reimplemented from superclass
 
-  virtual void paintEvent(QPaintEvent* event); ///<Reimplemented from superclass.
-  virtual void resizeEvent(QResizeEvent* evt);///<Reimplemented from superclass
+  virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
+  virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
 
-  bool isInsideCurrentPoint();
-  AlphaPoint getCurrentAlphaPoint();///<
-  void toggleCurrentPoint(); ///<
-  void moveCurrentAlphaPoint(); ///<
+  bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles
+  AlphaPoint getCurrentAlphaPoint();///< Get aplha point based on mCurrentClickX and mCurrentClickY
+  void toggleCurrentPoint();///< Turn a transfer function point on or off (depending on it is on or not)
+  void moveCurrentAlphaPoint();///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
 
   QRect mFullArea; ///< The full widget area.
   QRect mPlotArea; ///< The plot area.
   std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
-  AlphaPoint mCurrentAlphaPoint;
-/*
-  int mCurrentAlphaValue; ///<The current value  - used to update the info widget.
-  int mCurrentAlphaPosition; ///<The currently selected scalar.
-*/
-  int mCurrentClickX, mCurrentClickY;
+  AlphaPoint mCurrentAlphaPoint;///< The current alpha point 
+
+  int mCurrentClickX, mCurrentClickY;///< The x, y coordinate currently selected with the mouse
+
+  int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
 
   ssc::ImagePtr mCurrentImage;
 };
