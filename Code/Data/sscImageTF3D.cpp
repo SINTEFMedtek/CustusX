@@ -71,7 +71,7 @@ void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
 
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
-	std::cout<<"fetching color for 3d head" <<std::endl;
+	//std::cout<<"fetching color for 3d head" <<std::endl;
 	return mColorTF;
 }
 

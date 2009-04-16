@@ -62,7 +62,7 @@ void ImageLUT2D::setTable(vtkUnsignedCharArray* table)
 
 vtkLookupTablePtr ImageLUT2D::getLookupTable()
 {		
-	std::cout<<"Image LUT2D, fetch lookuptable"<<std::endl;	
+	//std::cout<<"Image LUT2D, fetch lookuptable"<<std::endl;	
 	return mLookupTable;
 }
 
