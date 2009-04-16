@@ -7,7 +7,6 @@
 #include <vtkLookupTable.h>
 #include <sstream>
 
-#define USE_TRANSFORM_RESCLICER
 
 namespace ssc
 {
@@ -30,13 +29,35 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mOrientator->AutoCropOutputOn();
 	mOrientator->SetInput(mBaseImageData);
 	mOutputImageData = mOrientator->GetOutput();
-	mOutputImageData->Update();
-	//mOutputImageData->UpdateInformation();
+	//mOutputImageData->Update();
+	mOutputImageData->UpdateInformation();
 #endif
 	mLandmarks->SetNumberOfComponents(4);
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	mAlpha = 0.5;
 	mTreshold = 1.0;
+	
+	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
+}
+
+void Image::setTransform(const Transform3D& trans)
+{
+	//std::cout << "Image::setTransform(): \n" << trans << std::endl;
+	if (similar(trans, mTransform))
+	{
+		return;
+	}
+
+	mTransform = trans;
+
+#ifdef USE_TRANSFORM_RESCLICER
+	mOrientator->SetResliceAxes(mTransform.matrix());
+	//mOutputImageData->Update();
+	mOutputImageData->UpdateInformation();
+	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+#endif
+
+	emit transformChanged();
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
@@ -49,6 +70,8 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	mOutputImageData->Update();
 	mOutputImageData->UpdateInformation();
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+#else
+	mOutputImageData = mBaseImageData;
 #endif
 	mImageTransferFunctions3D = ImageTF3D(data);
 	mImageLookupTable2D = ImageLUT2D(data);
@@ -101,26 +124,6 @@ ImageLUT2D& Image::getLookupTable2D()
 void Image::setName(const std::string& name)
 {
 	mName = name;
-}
-
-void Image::setTransform(const Transform3D& trans)
-{
-	//std::cout << "Image::setTransform(): \n" << trans << std::endl;
-	if (similar(trans, mTransform))
-	{
-		return;
-	}
-
-	mTransform = trans;
-
-#ifdef USE_TRANSFORM_RESCLICER
-	mOrientator->SetResliceAxes(mTransform.matrix());
-	mOutputImageData->Update();
-	mOutputImageData->UpdateInformation();
-	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-#endif
-
-	emit transformChanged();
 }
 
 std::string Image::getUid() const

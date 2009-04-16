@@ -18,6 +18,8 @@
 
 #include "sscBoundingBox3D.h"
 
+//#define USE_TRANSFORM_RESCLICER
+
 namespace ssc
 {
 
@@ -83,8 +85,11 @@ void SliceRepSW::setImage( ImagePtr image )
 	if (mImage)
 	{
 		mImage->connectRep(mSelf);
-		std::cout<<" The image data type is:  "<< mImage->getRefVtkImageData()<<std::endl;
+#ifdef USE_TRANSFORM_RESCLICER
 		mReslicer->SetInput(mImage->getRefVtkImageData());
+#else
+		mReslicer->SetInput(mImage->getBaseVtkImageData());
+#endif
 		mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 		mWindowLevel->SetOutputFormatToRGBA();
 		mWindowLevel->SetLookupTable(image->getLookupTable2D().getLookupTable());
@@ -129,9 +134,17 @@ void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 void SliceRepSW::update()
 {
 	Transform3D rMs = mSlicer->get_sMr().inv();
+	Transform3D iMr = mImage->getTransform();
+	
+	Transform3D M = iMr*rMs;
+	
 	rMs_debug = rMs;
 	//std::cout << "slicerep get transform "+getName()+" :\n"+boost::lexical_cast<std::string>(rMs) << std::endl;
+#ifdef USE_TRANSFORM_RESCLICER
 	mMatrixAxes->DeepCopy(rMs.matrix());
+#else
+	mMatrixAxes->DeepCopy(M.matrix());
+#endif
 }
 
 

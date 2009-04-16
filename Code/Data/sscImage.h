@@ -16,6 +16,8 @@ typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
 
+#define USE_TRANSFORM_RESCLICER
+
 namespace ssc
 {
 
@@ -37,7 +39,7 @@ public:
 
 	virtual std::string getUid() const;
 	virtual std::string getName() const;
-	virtual Transform3D getTransform() const;
+	virtual Transform3D getTransform() const; /// transform iMr i.e. from reference to image space
 	virtual REGISTRATION_STATUS getRegistrationStatus() const;
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
