@@ -144,8 +144,8 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	{
 		return;
 	}
-	mVolumeProperty->SetColor(mImage->getTransferFunctions3D().getColorTF());
-	mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D().getOpacityTF());
+	mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
+	mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
 
 	// use the base instead of the ref image, because otherwise changes in the transform
 	// causes data to be sent anew to the graphics card (takes 4s).

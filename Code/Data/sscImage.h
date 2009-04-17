@@ -15,6 +15,7 @@ typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 #include "sscRep.h"
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
+typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
 
 #define USE_TRANSFORM_RESCLICER
 
@@ -46,7 +47,7 @@ public:
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
 
-	ImageTF3D& getTransferFunctions3D();
+	ImageTF3DPtr getTransferFunctions3D();
 	ImageLUT2D& getLookupTable2D();
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
@@ -59,6 +60,12 @@ public:
 	void setClut(vtkLookupTablePtr clut);
 	double treshold();
 	void setTreshold( double val );
+	HistogramMapPtr getHistogram();///< \return The histogram for the image
+	int getMaxHistogramValue();///< \return Max number of occurences for a single point in the histogram
+	int getMax();///< \return Max alpha position in the histogram = max key value in map
+	int getMin();///< \return Min alpha position in the histogram = min key value in map
+	int getRange();///< For convenience: getMax() – getMin()
+	int getMaxAlphaValue();///<Max alpha value (probably 255)
 signals:
 	void landmarkRemoved(double x, double y, double z, unsigned int index);
 	void landmarkAdded(double x, double y, double z, unsigned int index);
@@ -70,9 +77,12 @@ signals:
 public slots:
 	void addLandmarkSlot(double x, double y, double z, unsigned int index);
 	void removeLandmarkSlot(double x, double y, double z, unsigned int index);
+	
+protected slots:
+	void transferFunctionsChangedSlot();
 
 protected:
-	ImageTF3D mImageTransferFunctions3D;
+	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2D mImageLookupTable2D;
 
 	std::string mUid;
@@ -92,6 +102,9 @@ protected:
 	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)
 	double mAlpha ;
 	double mTreshold;
+	
+	HistogramMapPtr mHistogramPtr;///< Histogram
+	int mMaxHistogramValue;///< Max number of occurences for a single point in the histogram
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

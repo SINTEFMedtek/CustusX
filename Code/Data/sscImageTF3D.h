@@ -8,6 +8,10 @@
 #ifndef SSCIMAGETRANSFERFUNCTIONS3D_H_
 #define SSCIMAGETRANSFERFUNCTIONS3D_H_
 
+#include <boost/shared_ptr.hpp>
+
+#include <QObject>
+
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
@@ -17,6 +21,15 @@ typedef vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunction
 typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
 typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
+class QColor;
+
+#include <map.h>
+#include <boost/shared_ptr.hpp>
+typedef std::map<int, int> IntIntMap;
+typedef std::map<int, QColor> ColorMap;
+typedef boost::shared_ptr<IntIntMap> OpacityMapPtr;
+typedef boost::shared_ptr<ColorMap> ColorMapPtr;
+
 
 namespace ssc
 {
@@ -24,10 +37,12 @@ namespace ssc
 /**Handler for the transfer functions used in 3d image volumes.
  * Used by Image.
  */
-class ImageTF3D
+class ImageTF3D : public QObject
 {
+	Q_OBJECT
 public:
 	ImageTF3D(vtkImageDataPtr base);
+	void setVtkImageData(vtkImageDataPtr base);
 
 	void setOpacityTF(vtkPiecewiseFunctionPtr tf);
 	vtkPiecewiseFunctionPtr getOpacityTF();
@@ -43,7 +58,20 @@ public:
 	void setLut(vtkLookupTablePtr lut);
 	vtkLookupTablePtr getLut() const;
 	double getScalarMax() const;
+	double getScalarMin() const;///< \return Minimum intensity of underlying dataset
 	void setTable(vtkUnsignedCharArrayPtr table);
+	
+	OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function
+	ColorMapPtr getColorMap();///< \return The values of the color transfer function
+	void addAlphaPoint( int alphaPosition , int alphaValue);///< Add point to the opacity transfer function
+	void removeAlphaPoint(int alphaPosition);///< Remove point from the opacity transfer function
+	void setAlphaValue(int alphaPosition, int alphaValue);///< Change value of an existing opacity transfer function point
+	int getAlphaValue(int alphaPosition);///< \return Alpha value of a specified position in the opacity transfer function
+	void addColorPoint( int colorPosition , QColor colorValue);///< Add point to the color transfer function
+	void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
+	void setColorValue(int colorPosition, QColor colorValue);///< Change value of an existing color transfer function point
+signals:
+	void transferFunctionsChanged();
 	
 private:
 	void refreshColorTF();
@@ -59,9 +87,13 @@ private:
 	double mWindow;
 	double mLevel;
 	vtkLookupTablePtr mLut;
+	
+	OpacityMapPtr mOpacityMapPtr;
+	ColorMapPtr mColorMapPtr;
 };
+	
+typedef boost::shared_ptr<ImageTF3D> ImageTF3DPtr;
 
-
-}
+} // end namespace ssc
 
 #endif /* SSCIMAGETRANSFERFUNCTIONS3D_H_ */

@@ -13,6 +13,8 @@
 #include <vtkPiecewiseFunction.h>
 #include <vtkVolumeProperty.h>
 
+#include <QColor>
+
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 
 namespace ssc
@@ -22,7 +24,9 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mOpacityTF(vtkPiecewiseFunctionPtr::New()),
 	mColorTF(vtkColorTransferFunctionPtr::New()),	
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
-	mBase(base)
+	mBase(base),
+	mOpacityMapPtr(new IntIntMap()),
+	mColorMapPtr(new ColorMap())
 {
 	double max = getScalarMax();
 	std::cout << "For ImageTF3D image scalar range = "<< max<<std::endl;
@@ -53,7 +57,11 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
 	
 }
-
+	
+void ImageTF3D::setVtkImageData(vtkImageDataPtr base)
+{
+	mBase = base;
+}
 void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
 {
 	mOpacityTF = tf;
@@ -61,6 +69,12 @@ void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
 
 vtkPiecewiseFunctionPtr ImageTF3D::getOpacityTF()
 {
+	// Create vtkPiecewiseFunction from the color map
+	mOpacityTF->RemoveAllPoints();
+	for (IntIntMap::iterator iter = mOpacityMapPtr->begin();
+			 iter != mOpacityMapPtr->end(); iter++)
+		mOpacityTF->AddPoint(iter->first, iter->second/255.0 );
+	
 	return mOpacityTF;
 }
 
@@ -72,9 +86,18 @@ void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
 	//std::cout<<"fetching color for 3d head" <<std::endl;
+	
+	// Create vtkColorTransferFunction from the color map
+	mColorTF->RemoveAllPoints();
+	
+	for (ColorMap::iterator iter = mColorMapPtr->begin();
+			 iter != mColorMapPtr->end(); iter++)
+		mColorTF->AddRGBPoint(iter->first, iter->second.red()/255.0, 
+													iter->second.green()/255.0, iter->second.blue()/255.0);
+
 	return mColorTF;
 }
-
+	
 /**Set Low Level Reject, meaning the lowest intensity
  * value that will be visible.
  */
@@ -145,6 +168,11 @@ double ImageTF3D::getScalarMax() const
 {
 	return 	mBase->GetScalarRange()[1];
 }
+	
+double ImageTF3D::getScalarMin() const
+{
+	return 	mBase->GetScalarRange()[0];
+}
 
 /**update the color TF according to the
  * mLevel, mWindow and mLut values.
@@ -195,5 +223,47 @@ void ImageTF3D::refreshOpacityTF()
 	mOpacityTF->Update();
 }
 
-
+OpacityMapPtr ImageTF3D::getOpacityMap()
+{
+	return mOpacityMapPtr;
+}
+ColorMapPtr ImageTF3D::getColorMap()
+{
+	return mColorMapPtr;
+}
+void ImageTF3D::addAlphaPoint( int alphaPosition , int alphaValue)
+{
+	mOpacityMapPtr->insert(std::pair<int, int>(alphaPosition, alphaValue));
+	emit transferFunctionsChanged();
+}
+void ImageTF3D::removeAlphaPoint(int alphaPosition)
+{
+	mOpacityMapPtr->erase(alphaPosition);
+	emit transferFunctionsChanged();
+}
+void ImageTF3D::setAlphaValue(int alphaPosition, int alphaValue)
+{
+	(*mOpacityMapPtr)[alphaPosition] = alphaValue;
+	emit transferFunctionsChanged();
+}
+int ImageTF3D::getAlphaValue(int alphaPosition)
+{
+	return (*mOpacityMapPtr)[alphaPosition];
+}
+void ImageTF3D::addColorPoint( int colorPosition , QColor colorValue)
+{
+	mColorMapPtr->insert(std::pair<int, QColor>(colorPosition, colorValue));
+	emit transferFunctionsChanged();
+}
+void ImageTF3D::removeColorPoint(int colorPosition)
+{
+	mColorMapPtr->erase(colorPosition);
+	emit transferFunctionsChanged();
+}
+void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
+{
+	(*mColorMapPtr)[colorPosition] = colorValue;
+	emit transferFunctionsChanged();
+}
+		
 }

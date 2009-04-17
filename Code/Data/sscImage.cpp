@@ -16,10 +16,12 @@ Image::~Image()
 }
 
 Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
-	mImageTransferFunctions3D(data),
+	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(data),
 	mUid(uid), mName(uid), mBaseImageData(data),
-	mLandmarks(vtkDoubleArray::New())
+	mLandmarks(vtkDoubleArray::New()),
+	mHistogramPtr(new IntIntMap()),
+	mMaxHistogramValue(0)
 {
 	std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
@@ -36,6 +38,17 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	mAlpha = 0.5;
 	mTreshold = 1.0;
+	
+	// Add initial values to the transfer functions
+	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
+	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), 
+																					//1.0);
+																					this->getMaxAlphaValue());
+	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
+	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
+	
+  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+					this, SLOT(transferFunctionsChangedSlot()));
 	
 	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
 }
@@ -73,7 +86,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 #else
 	mOutputImageData = mBaseImageData;
 #endif
-	mImageTransferFunctions3D = ImageTF3D(data);
+	mImageTransferFunctions3D->setVtkImageData(data);
 	mImageLookupTable2D = ImageLUT2D(data);
 
 	emit vtkImageDataChanged();
@@ -111,7 +124,7 @@ void Image::setAlpha(double val)
 	emit alphaChange();
 }
 
-ImageTF3D& Image::getTransferFunctions3D()
+ImageTF3DPtr Image::getTransferFunctions3D()
 {
 	return mImageTransferFunctions3D;
 }
@@ -215,6 +228,12 @@ void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
 		}
 	}
 }
+
+void Image::transferFunctionsChangedSlot()
+{
+	emit vtkImageDataChanged();
+}
+
 void Image::printLandmarks()
 {
 	std::cout << "Landmarks: " << std::endl;
@@ -240,6 +259,64 @@ DoubleBoundingBox3D Image::boundingBox() const
 	mOutputImageData->UpdateInformation();
 	DoubleBoundingBox3D bounds(mOutputImageData->GetBounds());
 	return bounds;
+}
+
+	
+HistogramMapPtr Image::getHistogram()
+{
+	// Make histogram only when needed.
+	if (mHistogramPtr->empty())
+	{
+		// vtkImageAccumulate may possibly be used instead to create histogram
+		unsigned char* charDataPtr = reinterpret_cast<unsigned char*>(mBaseImageData->GetScalarPointer());
+		int* dimensions = mBaseImageData->GetDimensions();
+		
+		IntIntMap::iterator current;
+		for (int i = 0; i < dimensions[0]*dimensions[1]*dimensions[2]; i++)
+		{
+			//std::cout << "hist x: " << (*charDataPtr) << std::endl;
+			current = mHistogramPtr->find(*charDataPtr);
+			if (current != mHistogramPtr->end())
+			{
+				current->second++;
+				if (mMaxHistogramValue < current->second)
+					mMaxHistogramValue = current->second;
+			}
+			else
+				mHistogramPtr->insert(std::pair<int, int>(*charDataPtr, 1));
+			++charDataPtr;
+		}
+	}
+	return mHistogramPtr;
+}
+int Image::getMaxHistogramValue()
+{
+	// Make sure a histogram exists
+	this->getHistogram();
+	return mMaxHistogramValue;
+}
+int Image::getMax()
+{
+	// Alternatively create max from histogram
+	//IntIntMap::iterator iter = this->getHistogram()->end();
+	//iter--;
+	//return (*iter).first;
+	return mImageTransferFunctions3D->getScalarMax();
+}
+int Image::getMin()
+{
+	// Alternatively create min from histogram
+	//IntIntMap::iterator iter = this->getHistogram()->begin();
+	//return (*iter).first;
+	return mImageTransferFunctions3D->getScalarMin();
+}
+int Image::getRange()
+{
+	return this->getMax() - this->getMin();
+}
+int Image::getMaxAlphaValue()
+{
+	return 255;
 }
 
 } // namespace ssc

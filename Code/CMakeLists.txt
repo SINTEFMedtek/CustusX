@@ -21,6 +21,7 @@ endif(COMMAND cmake_policy)
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
     Data/sscImage.h
+    Data/sscImageTF3D.h
     Data/sscDataManager.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
@@ -96,7 +97,9 @@ SET( SSC_SOURCE_FILES
     Rep/sscSurfaceRep.cpp
     Rep/sscImageBlenderProxy.cpp
     Data/sscData.cpp
+    Data/sscImage.h
     Data/sscImage.cpp
+    Data/sscImageTF3D.h
     Data/sscImageTF3D.cpp
     Data/sscImageLUT2D.cpp
     Data/sscMesh.cpp
