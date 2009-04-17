@@ -3,11 +3,9 @@
 
 #include <QWidget>
 
-#include <map.h>
 #include "sscImage.h"
 
 class QRect;
-class QColor;
 class QMenu;
 
 namespace cx
@@ -22,9 +20,6 @@ namespace cx
  */
 class TransferFunctionColorWidget : public QWidget
 {
-  //TODO: Move to ssc::ImageTF3D
-  //typedef std::map<int, QColor> ColorMap;
-  //typedef boost::shared_ptr<ColorMap> ColorMapPtr;
   Q_OBJECT
   
 public:
@@ -70,13 +65,14 @@ protected:
   std::map<int, QRect> mPointRects;///< Cache with all point rectangles
   
   ColorPoint mCurrentPoint;///< The currently selected point
+	bool mEndPoint;///< Current point is an endpoint
   int mColorindexSelected;
   int mCurrentClickX, mCurrentClickY;///< The x coordinate currently selected with the mouse
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
   
   ssc::ImagePtr mCurrentImage;
   
-  bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles
+  bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles. Sets mCurrentPoint.position and mCurrentPoint.value
   void contextMenuEvent(QContextMenuEvent *event);///< Decides what happens when you rightclick in a view
   
     

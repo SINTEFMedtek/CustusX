@@ -3,7 +3,6 @@
 
 #include <QWidget>
 
-#include <map.h>
 #include "sscImage.h"
 
 class QRect;
@@ -20,12 +19,7 @@ namespace cx
  * \author: Ole Vegard Solberg, SINTEF
  */
 class TransferFunctionAlphaWidget : public QWidget
-{
-  // TODO: Move ssc::ImageTF3D
-  //typedef std::map<int, int> IntIntMap;
-  //typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
-  //typedef boost::shared_ptr<IntIntMap> OpacityMapPtr;
-    
+{    
   Q_OBJECT
   
 public:
@@ -77,7 +71,8 @@ protected:
   QRect mFullArea; ///< The full widget area.
   QRect mPlotArea; ///< The plot area.
   std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
-  AlphaPoint mCurrentAlphaPoint;///< The current alpha point 
+  AlphaPoint mCurrentAlphaPoint;///< The current alpha point
+	bool mEndPoint;///< Current alpha point is an endpoint
 
   int mCurrentClickX, mCurrentClickY;///< The x, y coordinate currently selected with the mouse
 

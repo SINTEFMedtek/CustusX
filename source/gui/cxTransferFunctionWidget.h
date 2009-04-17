@@ -27,6 +27,7 @@ class TransferFunctionWidget : public QWidget
 public:
   TransferFunctionWidget(QWidget* parent);
   ~TransferFunctionWidget();
+	void init();///< Initialize TransferFunctionWidget. Create members
 
 public slots:
   void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
@@ -42,6 +43,7 @@ protected:
   //TransferFunctionInfoWidget*  mInfoWidget;
 
   ssc::ImagePtr mCurrentImage;
+	bool mInitialized;///< Is TransferFunctionWidget initialized
 };
 }
 
