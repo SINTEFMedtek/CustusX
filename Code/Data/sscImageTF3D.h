@@ -23,7 +23,7 @@ typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 class QColor;
 
-#include <map.h>
+#include <map>
 #include <boost/shared_ptr.hpp>
 typedef std::map<int, int> IntIntMap;
 typedef std::map<int, QColor> ColorMap;

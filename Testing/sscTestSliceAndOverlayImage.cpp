@@ -106,12 +106,12 @@ void OverlayControlWidget::setupAction()
 
 void OverlayControlWidget::Contrast3D(int val)
 {
-	mImage->getTransferFunctions3D().setLevel(val/1.0);
+	mImage->getTransferFunctions3D()->setLevel(val/1.0);
 }
 
 void OverlayControlWidget::Brightness3D(int val)
 {
-	mImage->getTransferFunctions3D().setLevel(val/1.0);
+	mImage->getTransferFunctions3D()->setLevel(val/1.0);
 }
 
 void OverlayControlWidget::llrSlot(int val)
