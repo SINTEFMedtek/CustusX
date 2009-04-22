@@ -39,7 +39,7 @@ public:
 	void setUID(const std::string& uid);
 	void setName(const std::string& name);
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
-	void set_rMd(Transform3D rMd);
+	virtual void set_rMd(Transform3D rMd);
 
 	virtual std::string getUID() const; ///< \return unique id for this instance
 	virtual std::string getName() const; /// \return a descriptive name for this instance

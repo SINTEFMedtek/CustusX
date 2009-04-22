@@ -36,11 +36,10 @@ public:
 	void setVtkImageData(const vtkImageDataPtr& data);
 
 	void setName(const std::string& name);
-	void setTransform(const Transform3D& trans);
+	virtual void set_rMd(Transform3D rMd);
 
 	virtual std::string getUid() const;
 	virtual std::string getName() const;
-	virtual Transform3D getTransform() const; /// transform iMr i.e. from reference to image space
 	virtual REGISTRATION_STATUS getRegistrationStatus() const;
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
@@ -87,7 +86,6 @@ protected:
 
 	std::string mUid;
 	std::string mName;
-	Transform3D mTransform; ///< the transform from data to reference space
 	vtkLookupTablePtr mLut;
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 	vtkImageDataPtr mBaseImageData; ///< image data in data space

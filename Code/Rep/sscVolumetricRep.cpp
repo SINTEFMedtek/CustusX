@@ -178,8 +178,7 @@ void VolumetricRep::transformChangedSlot()
 	{
 		return;
 	}
-	//std::cout << "VolumetricRep::transformChangedSlot() \n" << mImage->getTransform() << std::endl;
-	mVolume->SetUserMatrix(mImage->getTransform().inv().matrix());
+	mVolume->SetUserMatrix(mImage->get_rMd().matrix());	
 }
 
 

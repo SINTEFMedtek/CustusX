@@ -53,19 +53,17 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
 }
 
-void Image::setTransform(const Transform3D& trans)
+void Image::set_rMd(Transform3D rMd)
 {
+	Data::set_rMd(rMd);
 	//std::cout << "Image::setTransform(): \n" << trans << std::endl;
-	if (similar(trans, mTransform))
+	if (similar(rMd, m_rMd))
 	{
 		return;
 	}
 
-	mTransform = trans;
-
 #ifdef USE_TRANSFORM_RESCLICER
-	mOrientator->SetResliceAxes(mTransform.matrix());
-	//mOutputImageData->Update();
+	mOrientator->SetResliceAxes(m_rMd.inv().matrix());
 	mOutputImageData->UpdateInformation();
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 #endif
@@ -79,7 +77,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	mBaseImageData = data;
 #ifdef USE_TRANSFORM_RESCLICER
 	mOrientator->SetInput(mBaseImageData);
-	mOrientator->SetResliceAxes(mTransform.matrix());
+	mOrientator->SetResliceAxes(m_rMd.inv().matrix());
 	mOutputImageData->Update();
 	mOutputImageData->UpdateInformation();
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
@@ -147,11 +145,6 @@ std::string Image::getUid() const
 std::string Image::getName() const
 {
 	return mName;
-}
-
-Transform3D Image::getTransform() const
-{
-	return mTransform;
 }
 
 REGISTRATION_STATUS Image::getRegistrationStatus() const

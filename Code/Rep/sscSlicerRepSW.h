@@ -39,9 +39,6 @@ public:
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	std::string getImageUid()const;
 	void update();
-	//PLANE_TYPE getPlane(){ return mType; }
-//	void addIamges(ImagePtr image);
-//	void createOverlay();
 	virtual void printSelf(std::ostream & os, Indent indent);
 
 protected:
@@ -53,16 +50,10 @@ private slots:
 	void sliceTransformChangedSlot(Transform3D sMr); 
 		
 private:
-	//PLANE_TYPE mType;
 	ImagePtr mImage;
 
-	Transform3D rMs_debug;
-	
-	
 	SliceProxyPtr mSlicer;
-	//std::string mImageUid;
 	vtkWindowLevelLookupTablePtr mLookupTable;
-	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
 	vtkImageMapToColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;

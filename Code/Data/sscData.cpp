@@ -39,6 +39,10 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 
 void Data::set_rMd(Transform3D rMd)
 {
+	if (similar(rMd, m_rMd))
+	{
+		return;
+	}
 	m_rMd = rMd;
 }
 

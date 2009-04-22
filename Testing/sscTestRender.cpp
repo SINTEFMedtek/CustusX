@@ -68,11 +68,11 @@ int main(int argc, char **argv)
 #ifdef USE_TRANSFORM_RESCLICER
 	// this code is meant for testing the reslicer in ssc::Image
 	std::cout << "rotating the image data..." << std::endl;
-	image1->setTransform(ssc::createTransformRotateZ(1.0*M_PI/8.0));
+	image1->set_rMd(ssc::createTransformRotateZ(1.0*M_PI/8.0).inv());
 	doRender(view->getRenderWindow());
-	image1->setTransform(ssc::createTransformRotateZ(2.0*M_PI/8.0));
+	image1->set_rMd(ssc::createTransformRotateZ(2.0*M_PI/8.0).inv());
 	doRender(view->getRenderWindow());
-	image1->setTransform(ssc::createTransformRotateZ(3.0*M_PI/8.0));
+	image1->set_rMd(ssc::createTransformRotateZ(3.0*M_PI/8.0).inv());
 	doRender(view->getRenderWindow());
 #endif
 	std::cout << "Uid       : " << image1->getUid() << std::endl;

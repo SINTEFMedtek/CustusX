@@ -134,12 +134,9 @@ void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 void SliceRepSW::update()
 {
 	Transform3D rMs = mSlicer->get_sMr().inv();
-	Transform3D iMr = mImage->getTransform();
-	
+	Transform3D iMr = mImage->get_rMd().inv();	
 	Transform3D M = iMr*rMs;
 	
-	rMs_debug = rMs;
-	//std::cout << "slicerep get transform "+getName()+" :\n"+boost::lexical_cast<std::string>(rMs) << std::endl;
 #ifdef USE_TRANSFORM_RESCLICER
 	mMatrixAxes->DeepCopy(rMs.matrix());
 #else
