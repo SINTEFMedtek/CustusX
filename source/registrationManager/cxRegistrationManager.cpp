@@ -149,7 +149,8 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //set the transform on the image
   vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
   ssc::Transform3D transform(matrix);
-  image->setTransform(transform);
+  //image->setTransform(transform);
+  image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 }
 
 void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
