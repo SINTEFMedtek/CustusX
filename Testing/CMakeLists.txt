@@ -45,6 +45,10 @@ add_executable(TestSliceAndToolRep MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSlic
 target_link_libraries( TestSliceAndToolRep SSC )	
 add_test(TestSliceRep ${EXECUTABLE_OUTPUT_PATH}/TestSliceRep)
 
+add_executable(TestRenderSpeed MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestRenderSpeed.cpp)
+target_link_libraries( TestRenderSpeed SSC )	
+
+
 #sscTestSlicePlaneRep
 SET( sscTestSlicePlaneRep_QT_MOC_HEADER_FILES
     sscTestSlicePlaneRep.h
