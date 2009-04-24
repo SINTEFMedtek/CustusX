@@ -17,4 +17,25 @@ DataManager::DataManager()
 {}
 DataManager::~DataManager()
 {}
+
+void DataManager::save(QString filename)
+{
+  QDomNode datanode = this->GetXml();
+}
+
+void DataManager::load(QString filename)
+{
+  QDomNode datanode;
+  this->ParseXml(&datanode);
+}
+
+QDomNode DataManager::GetXml()
+{
+  QDomNode datanode;
+  return datanode;
+}
+
+void DataManager::ParseXml(QDomNode* datanode)
+{}
+
 }//namespace cx
