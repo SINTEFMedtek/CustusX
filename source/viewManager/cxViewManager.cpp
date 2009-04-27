@@ -3,10 +3,14 @@
 #include <QGridLayout>
 #include <QWidget>
 #include <QTimer>
-#include "vtkRenderWindow.h"
+#include <vtkRenderWindow.h>
+#include <vtkImageData.h>
+#include "sscProbeRep.h"
+#include "sscVolumetricRep.h"
+#include "cxMessageManager.h"
+#include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
-#include "cxMessageManager.h"
 
 namespace cx
 {
@@ -329,4 +333,73 @@ void ViewManager::renderAllViewsSlot()
     it2D->second->getRenderWindow()->Render();
   }
 }
+	
+void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
+{
+  if (!currentImage.get())
+    return;
+  if (!currentImage->getRefVtkImageData().GetPointer())
+    return;
+  // Update 3D view
+  RepManager* repManager = RepManager::getInstance();
+  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_1");
+  ssc::VolumetricRepPtr volumetricRep 
+  = repManager->getVolumetricRep("VolumetricRep_1");
+  LandmarkRepPtr landmarkRep = repManager->getLandmarkRep("LandmarkRep_1");
+  
+  volumetricRep->setImage(currentImage);
+  probeRep->setImage(currentImage);
+  landmarkRep->setImage(currentImage);
+  
+  //View3D* view3D_1 = this->get3DView("View3D_1");
+  View3D* view3D_1 = mView3DMap[mView3DNames[0]];
+  view3D_1->setRep(volumetricRep);
+  //view3D_1->addRep(landmarkRep);
+  //view3D_1->addRep(probeRep);
+  view3D_1->getRenderer()->ResetCamera();
+  view3D_1->getRenderer()->Render();
+  
+  // Update 2D views
+  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");
+
+  //View2D* view2D_1 = this->get2DView("View2D_1");
+  //View2D* view2D_2 = this->get2DView("View2D_2");
+  //View2D* view2D_3 = this->get2DView("View2D_3");
+  View2D* view2D_1 = mView2DMap[mView2DNames[0]];
+  View2D* view2D_2 = mView2DMap[mView2DNames[1]];
+  View2D* view2D_3 = mView2DMap[mView2DNames[2]];
+  view2D_1->setRep(inriaRep2D_1);
+  view2D_2->setRep(inriaRep2D_2);
+  view2D_3->setRep(inriaRep2D_3);
+  
+  //test: Is render set?
+  if (inriaRep2D_1->getVtkViewImage2D()->GetRenderer() == NULL)
+    std::cout << "inriaRep2D_1: Lost renderer" << std::endl;
+  if (inriaRep2D_2->getVtkViewImage2D()->GetRenderer() == NULL)
+    std::cout << "inriaRep2D_2: Lost renderer" << std::endl;
+  if (inriaRep2D_3->getVtkViewImage2D()->GetRenderer() == NULL)
+    std::cout << "inriaRep2D_3: Lost renderer" << std::endl;
+  
+  inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
+  inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
+  inriaRep2D_3->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::SAGITTAL_ID);
+  inriaRep2D_1->getVtkViewImage2D()->AddChild(inriaRep2D_2->getVtkViewImage2D());
+  inriaRep2D_2->getVtkViewImage2D()->AddChild(inriaRep2D_3->getVtkViewImage2D());
+  inriaRep2D_3->getVtkViewImage2D()->AddChild(inriaRep2D_1->getVtkViewImage2D());
+  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+  //TODO: ...or getBaseVtkImageData()???
+  inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(currentImage->getRefVtkImageData());
+  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
+  
+  connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
+          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
+  connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+}	
 }//namespace cx

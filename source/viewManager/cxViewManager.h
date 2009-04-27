@@ -3,6 +3,7 @@
 
 #include <map>
 #include <QObject>
+#include "sscImage.h"
 
 class QGridLayout;
 class QWidget;
@@ -61,7 +62,8 @@ public slots:
   void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
   void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
 
-protected slots:
+  protected slots:
+	void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
   void renderAllViewsSlot(); ///< renders all views
 
 protected:

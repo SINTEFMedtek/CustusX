@@ -119,9 +119,10 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   mCurrentImage = image;
   emit currentImageChanged(mCurrentImage);
   
-  // TODO: Shouldn't most of this be in a manager: ViewManager / MainWindow?
-  // The responsible manager should listen to the currentImageChanged signal
-  
+  // TODO: Remove code when the move is complete
+  // Block moved mostly to cxViewManager::currentImageChangedSlot(),
+  // but some code is moved to cxMainWindow
+  /*
   //view3D
   View3D* view3D_1 = mViewManager->get3DView("View3D_1");
   //ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New("ssc_VolumetricRep", "ssc_VolumetricRep"));
@@ -160,7 +161,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   //TODO: ...or getBaseVtkImageData()???
   inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mCurrentImage->getRefVtkImageData());
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-
+*/
   //link volumetricRep and inriaReps
 /*  connect(volumetricRep.get(), SIGNAL(pointPicked(double,double,double)),
           inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
@@ -170,13 +171,15 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
           volumetricRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));*/
-  connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
+  
+  //Block moved to cxViewManager::currentImageChangedSlot()
+/*  connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
           inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
   connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));*/
 }
 }//namespace cx

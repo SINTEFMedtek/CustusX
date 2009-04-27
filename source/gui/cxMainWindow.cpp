@@ -17,6 +17,8 @@
 #include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxPatientRegistrationWidget.h"
+#include "cxView3D.h"
+#include "cxView2D.h"
 
 namespace cx
 {
@@ -146,6 +148,9 @@ void MainWindow::createActions()
       mViewManager, SLOT(setLayoutTo_3DACS_1X3()));
   connect(mACSACS_2x3_LayoutAction, SIGNAL(triggered()),
       mViewManager, SLOT(setLayoutTo_ACSACS_2X3()));
+  
+  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+          mViewManager, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
@@ -271,7 +276,12 @@ void MainWindow::activateImageRegistationState()
 {
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
       QString("Image Registration"));
-
+  
+  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+  mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
+  mViewManager->get3DView("View3D_1")->addRep(probeRep);
+  
   mCurrentWorkflowState = IMAGE_REGISTRATION;
 }
 void MainWindow::deactivateImageRegistationState()
@@ -280,13 +290,18 @@ void MainWindow::deactivateImageRegistationState()
   {
     mContextDockWidget->removeTab(mImageRegistrationIndex);
     mImageRegistrationIndex = -1;
+    
+    ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+    LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+    mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
+    mViewManager->get3DView("View3D_1")->removeRep(probeRep);
   }
 }
 void MainWindow::activatePatientRegistrationState()
 {
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
       QString("Patient Registration"));
-
+  
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
 void MainWindow::deactivatePatientRegistrationState()
@@ -390,4 +405,5 @@ void MainWindow::printSlot(std::string message)
   //TODO REMOVE just for debugging
   //std::cout << message << std::endl;
 }
+  
 }//namespace cx
