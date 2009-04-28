@@ -11,7 +11,7 @@ namespace cx
 /**
  * \class cxDataManager
  *
- * \brief
+ * \brief cx implementation of additional functionality for the ssc::DataManager
  *
  * \date Mar 23, 2009
  * \author: Janne Beate Bakeng, SINTEF
@@ -27,11 +27,11 @@ public slots:
   void load(QString filename); ///< loads the application data for the active patient from XML document
 
 protected:
-  DataManager(); ///< use getInstance instead
+  DataManager(); ///< DataManager is a Singleton. Use getInstance instead
   ~DataManager(); ///< destructor
   
-  QDomNode getXml(QDomDocument& doc); ///< \return the XML data representation for the Datamanger
-  void parseXml(QDomNode& datamangerNode); ///< input the XML datarepresentation for the DataManager
+  QDomNode getXml(QDomDocument& doc);///< Get a XML representation of the DataManager \return A XML data representation for this object. \param doc The root of the document tree.
+  void parseXml(QDomNode& datamangerNode);///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager.
 
   static DataManager* mCxInstance;
 
