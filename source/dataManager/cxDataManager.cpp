@@ -1,5 +1,7 @@
 #include "cxDataManager.h"
 
+#include <QDomDocument>
+
 namespace cx
 {
 DataManager* DataManager::mCxInstance = NULL;
@@ -20,22 +22,30 @@ DataManager::~DataManager()
 
 void DataManager::save(QString filename)
 {
-  QDomNode datanode = this->GetXml();
+	QDomDocument doc("CustusX 3 save file");
+	// Call getXml() of all manager that have things that should be saved
+  QDomNode datanode = this->getXml(doc);
 }
 
 void DataManager::load(QString filename)
 {
   QDomNode datanode;
-  this->ParseXml(&datanode);
+	// Call parseXml() of all managers that have things that should be loaded
+  this->parseXml(datanode);
 }
 
-QDomNode DataManager::GetXml()
+QDomNode DataManager::getXml(QDomDocument& doc)
 {
-  QDomNode datanode;
+  QDomElement datanode = doc.createElement("DataManager");
+	
+	// Call getXml() of all objects that have things that should be saved
+	
   return datanode;
 }
 
-void DataManager::ParseXml(QDomNode* datanode)
-{}
+void DataManager::parseXml(QDomNode& datanode)
+{
+	// Call parseXml() of all object that have things that should be loaded
+}
 
 }//namespace cx

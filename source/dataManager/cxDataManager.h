@@ -2,7 +2,9 @@
 #define CXDATAMANAGER_H_
 
 #include "sscDataManagerImpl.h"
-#include <QDomNode>
+
+class QDomNode;
+class QDomDocument;
 
 namespace cx
 {
@@ -28,8 +30,8 @@ protected:
   DataManager(); ///< use getInstance instead
   ~DataManager(); ///< destructor
   
-  QDomNode GetXml(); ///< return the XML data representation for the Datamanger
-  void ParseXml(QDomNode* datamangerNode); ///< input the XML datarepresentation for the DataManager
+  QDomNode getXml(QDomDocument& doc); ///< \return the XML data representation for the Datamanger
+  void parseXml(QDomNode& datamangerNode); ///< input the XML datarepresentation for the DataManager
 
   static DataManager* mCxInstance;
 
