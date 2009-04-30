@@ -22,6 +22,8 @@ typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
 typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 class QColor;
+class QDomDocument;
+class QDomNode;
 
 #include <map>
 #include <boost/shared_ptr.hpp>
@@ -70,6 +72,10 @@ public:
 	void addColorPoint( int colorPosition , QColor colorValue);///< Add point to the color transfer function
 	void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
 	void setColorValue(int colorPosition, QColor colorValue);///< Change value of an existing color transfer function point
+
+	QDomNode getXml(QDomDocument& doc);///< Create a XML node for this object. It's up to the caller to add this node to the XML tree. \return A XML data representation for this object. \param doc The root of the document tree.
+	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
 signals:
 	void transferFunctionsChanged();
 	

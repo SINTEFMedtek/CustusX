@@ -12,8 +12,9 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkVolumeProperty.h>
-
 #include <QColor>
+#include <QDomDocument>
+#include <QStringList>
 
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 
@@ -265,5 +266,83 @@ void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
 	(*mColorMapPtr)[colorPosition] = colorValue;
 	emit transferFunctionsChanged();
 }
-		
+QDomNode ImageTF3D::getXml(QDomDocument& doc)
+{
+	QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
+	
+	QDomElement alphaNode = doc.createElement("alpha");
+	// Use QStringList to put all points in the same string instead of storing 
+	// the points as separate nodes.
+	QStringList pointStringList;
+	// Add alpha points
+	for (IntIntMap::iterator opPoint = mOpacityMapPtr->begin();
+       opPoint != mOpacityMapPtr->end();
+       opPoint++)
+		pointStringList.append(QString("%1=%2").arg(opPoint->first).
+													 arg(opPoint->second));
+	alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
+	
+	pointStringList.clear();
+	QDomElement colorNode = doc.createElement("color");
+	// Add color points
+	for (ColorMap::iterator colorPoint = mColorMapPtr->begin();
+       colorPoint != mColorMapPtr->end();
+       colorPoint++)
+		pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first).
+													 arg(colorPoint->second.red()).
+													 arg(colorPoint->second.green()).
+													 arg(colorPoint->second.blue()));
+	colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
+	
+	transferfunctionsNode.appendChild(alphaNode);
+	transferfunctionsNode.appendChild(colorNode);
+	
+	// Calling function must append this node
+	return transferfunctionsNode;
+}
+void ImageTF3D::parseXml(QDomNode& dataNode)
+{
+	if (dataNode.isNull())
+		return;
+	
+	QDomNode alphaNode = dataNode.namedItem("alpha");
+	// Read alpha node if it exists
+	if (!alphaNode.isNull())
+	{
+		mOpacityMapPtr->clear();
+		QStringList alphaStringList = alphaNode.toElement().text().split(" ");
+		for (int i = 0; i < alphaStringList.size(); i++)
+		{
+			QStringList pointStringList = alphaStringList[i].split("=");
+			addAlphaPoint(pointStringList[0].toInt(), pointStringList[1].toInt());
+		}
+	}
+	else
+	{
+		std::cout << "Warning: ImageTF3D::parseXml() found no alpha transferfunction";
+		std::cout << std::endl;
+	}
+	
+	QDomNode colorNode = dataNode.namedItem("color");
+	// Read color node if it exists
+	if (!colorNode.isNull())
+	{
+		mColorMapPtr->clear();
+		QStringList colorStringList = colorNode.toElement().text().split(" ");
+		for (int i = 0; i < colorStringList.size(); i++)
+		{
+			QStringList pointStringList = colorStringList[i].split("=");
+			QStringList valueStringList = pointStringList[1].split("/");
+			addColorPoint(pointStringList[0].toInt(), 
+										QColor(valueStringList[0].toInt(),
+													 valueStringList[1].toInt(),
+													 valueStringList[2].toInt()));
+		}
+	}
+	else
+	{
+		std::cout << "Warning: ImageTF3D::parseXml() found no color transferfunction";
+		std::cout << std::endl;
+	}
+}
 }

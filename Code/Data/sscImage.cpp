@@ -6,7 +6,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkLookupTable.h>
 #include <sstream>
-
+#include <QDomDocument>
 
 namespace ssc
 {
@@ -312,4 +312,38 @@ int Image::getMaxAlphaValue()
 	return 255;
 }
 
+QDomNode Image::getXml(QDomDocument& doc)
+{
+	QDomElement imageNode = doc.createElement("image");
+	
+	QDomElement uidNode = doc.createElement("uid");
+	uidNode.appendChild(doc.createTextNode(mUid.c_str()));
+	imageNode.appendChild(uidNode);
+	
+	QDomElement nameNode = doc.createElement("name");
+	nameNode.appendChild(doc.createTextNode(mName.c_str()));
+	imageNode.appendChild(nameNode);
+	
+	// Add submodes
+	// Add node for 3D transferfunctions
+	imageNode.appendChild(mImageTransferFunctions3D->getXml(doc));
+	
+	return imageNode;
+}
+void Image::parseXml(QDomNode& dataNode)
+{
+	if (dataNode.isNull())
+		return;
+	
+	// image node must be parsed in the data manager to create this Image object
+	// Only subnodes are parsed here
+	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
+	if (!transferfunctionsNode.isNull())
+		mImageTransferFunctions3D->parseXml(transferfunctionsNode);
+	else
+	{
+		std::cout << "Warning: Image::parseXml() found no transferfunctions";
+		std::cout << std::endl;
+	}
+}
 } // namespace ssc

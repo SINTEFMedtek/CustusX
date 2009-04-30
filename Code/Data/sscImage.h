@@ -33,6 +33,8 @@ class Image : public Data
 public:
 	virtual ~Image();
 	Image(const std::string& uid, const vtkImageDataPtr& data);
+	Image(const std::string& uid, const std::string& name,
+				const vtkImageDataPtr& data);
 	void setVtkImageData(const vtkImageDataPtr& data);
 
 	void setName(const std::string& name);
@@ -65,6 +67,10 @@ public:
 	int getMin();///< \return Min alpha position in the histogram = min key value in map
 	int getRange();///< For convenience: getMax() – getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
+
+	QDomNode getXml(QDomDocument& doc);///< Create a XML node for this object. It's up to the caller to add this node to the XML tree. \return A XML data representation for this object. \param doc The root of the document tree.
+	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
 signals:
 	void landmarkRemoved(double x, double y, double z, unsigned int index);
 	void landmarkAdded(double x, double y, double z, unsigned int index);
