@@ -42,6 +42,10 @@ protected slots:
   void aboutSlot(); ///< TODO
   void preferencesSlot(); ///< TODO
   void quitSlot(); ///< TODO
+  
+  // File menu
+  void loadFileSlot();///< Load all application data from XML file
+  void saveFileSlot();///< Save all application data to XML file
 
   //workflow menu
   void patientDataWorkflowSlot(); ///< change state to patient data
@@ -59,7 +63,7 @@ protected slots:
   //TODO: REMOVE
   //degugging
   void printSlot(std::string message); ///< prints messages from the toolmanager to std::cout
-
+  
 protected:
   enum WorkflowState
   {
@@ -101,6 +105,7 @@ protected:
   QWidget* mCentralWidget; ///< central widget used for views
 
   //menus
+  QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
   QMenu* mViewMenu; ///< Menu for showing / hiding GUI elements
   QMenu* mWorkflowMenu; ///< menu for choosing workflow
   QMenu* mDataMenu; ///< menu for loading data
@@ -108,6 +113,9 @@ protected:
   QMenu* mLayoutMenu; ///< menu for changing view layouts
 
   //actions and actiongroups
+  QAction* mLoadFileAction;///< Action for loading all data from file
+  QAction* mSaveFileAction;///< Action for saving all data to file
+	
   QAction* mToggleContextDockWidgetAction;///< Action for turning dock widget on/off
   
   QAction* mPatientDataWorkflowAction; ///< action for switching to the patient data workflow

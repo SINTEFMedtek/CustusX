@@ -1,7 +1,5 @@
 #include "cxDataManager.h"
 
-#include <QDomDocument>
-
 namespace cx
 {
 DataManager* DataManager::mCxInstance = NULL;
@@ -20,32 +18,26 @@ DataManager::DataManager()
 DataManager::~DataManager()
 {}
 
-void DataManager::save(QString filename)
+QDomDocument DataManager::save()
 {
-	QDomDocument doc("CustusX 3 save file");
-	// Call getXml() of all manager that have things that should be saved
-  QDomNode datanode = this->getXml(doc);
+	QDomDocument doc("CustusX3 patient file");
+  //QDomElement docElement = doc.documentElement();
+  QDomElement docElement = doc.createElement("custus3");
+  doc.appendChild(docElement);
+  // Call getXml() of all manager that have things that should be saved
+  docElement.appendChild(this->getXml(doc));
+  return doc;
 }
 
-void DataManager::load(QString filename)
+void DataManager::load(QDomDocument& doc)
 {
-  QDomNode datanode;
-	// Call parseXml() of all managers that have things that should be loaded
-  this->parseXml(datanode);
-}
-
-QDomNode DataManager::getXml(QDomDocument& doc)
-{
-  QDomElement datanode = doc.createElement("DataManager");
-	
-	// Call getXml() of all objects that have things that should be saved
-	
-  return datanode;
-}
-
-void DataManager::parseXml(QDomNode& datanode)
-{
-	// Call parseXml() of all object that have things that should be loaded
+  QDomNode topNode = doc.namedItem("custus3");
+  // Call parseXml() of all managers that have things that should be loaded
+  QDomNode dataManagerNode = topNode.namedItem("DataManager");
+  if (!dataManagerNode.isNull())
+    this->parseXml(dataManagerNode);
+  else
+    std::cout << "Warning: DataManager::load(): No DataManager node" << std::endl;
 }
 
 }//namespace cx

@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QStatusBar>
 #include <QFileInfo>
+#include <QDomDocument>
+#include <QTextStream> 
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -74,6 +76,15 @@ MainWindow::~MainWindow()
 void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
+	
+  // File
+  mLoadFileAction = new QAction(tr("Load Patient file"), this);
+  mSaveFileAction = new QAction(tr("Save Patient file"), this);
+  
+  connect(mLoadFileAction, SIGNAL(triggered()),
+          this, SLOT(loadFileSlot()));
+  connect(mSaveFileAction, SIGNAL(triggered()),
+          this, SLOT(saveFileSlot()));
 
   //View
   this->mToggleContextDockWidgetAction = mContextDockWidget->toggleViewAction();
@@ -163,12 +174,18 @@ void MainWindow::createActions()
 }
 void MainWindow::createMenus()
 {
+	mFileMenu = new QMenu(tr("File"), this);;
   mViewMenu = new QMenu(tr("View"), this);;
   mWorkflowMenu = new QMenu(tr("Workflow"), this);;
   mDataMenu = new QMenu(tr("Data"), this);
   mToolMenu = new QMenu(tr("Tracking"), this);
   mLayoutMenu = new QMenu(tr("Layouts"), this);
 
+  // File
+  this->menuBar()->addMenu(mFileMenu);
+  mFileMenu->addAction(mLoadFileAction);
+  mFileMenu->addAction(mSaveFileAction);
+	
   // View
   this->menuBar()->addMenu(mViewMenu);
   mViewMenu->addAction(mToggleContextDockWidgetAction);
@@ -335,6 +352,56 @@ void MainWindow::preferencesSlot()
 void MainWindow::quitSlot()
 {
   //TODO
+}  
+void MainWindow::loadFileSlot()
+{
+  // Open file dialog
+  QString dir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
+                                                  QString::null,
+                                                  QFileDialog::ShowDirsOnly);
+  if (dir == QString::null)
+    return; // On cancel
+  
+  QFile file(dir + "/custusdoc.xml");
+  if(file.open(QIODevice::ReadOnly))
+  {    
+    QDomDocument doc;
+    QString emsg;
+    int eline, ecolumn;
+    // Read the file
+    if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
+    {
+      std::cout << "ERROR! MainWindow::loadFileSlot(): Could not parse XML file:";
+      std::cout << emsg.toStdString() << "line: "<< eline << "col: " << ecolumn;
+      std::cout << std::endl;
+      throw "Could not parse XML file";
+    }
+    file.close();
+    mDataManager->load(doc);
+  }
+}
+void MainWindow::saveFileSlot()
+{
+  // Open file dialog
+  QString dir = QFileDialog::getSaveFileName(this, 
+                                             tr("Select directory to save file in")
+                                             );
+  if (dir == QString::null)
+    return; // On cancel
+  if (!dir.endsWith(".cx3"))
+    dir.append(".cx3");
+  if(!QDir().exists(dir))
+    QDir().mkdir(dir);
+  QDomDocument doc = mDataManager->save();
+  
+  
+  QFile file(dir + "/custusdoc.xml");
+  if(file.open(QIODevice::WriteOnly))
+  {
+    QTextStream stream(&file);
+    stream << doc.toString();
+    file.close();
+  }
 }
 void MainWindow::patientDataWorkflowSlot()
 {
@@ -405,5 +472,5 @@ void MainWindow::printSlot(std::string message)
   //TODO REMOVE just for debugging
   //std::cout << message << std::endl;
 }
-  
+
 }//namespace cx

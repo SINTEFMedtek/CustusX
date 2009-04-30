@@ -1,10 +1,9 @@
 #ifndef CXDATAMANAGER_H_
 #define CXDATAMANAGER_H_
 
-#include "sscDataManagerImpl.h"
+#include <sscDataManagerImpl.h>
 
-class QDomNode;
-class QDomDocument;
+#include <QDomDocument>
 
 namespace cx
 {
@@ -23,16 +22,13 @@ public:
   static DataManager* getInstance();
   
 public slots:
-  void save(QString filename); ///< saves the application data for the active patient to XML document
-  void load(QString filename); ///< loads the application data for the active patient from XML document
+  QDomDocument save(); ///< saves the application data for the active patient to XML document
+  void load(QDomDocument& doc); ///< loads the application data for the active patient from XML document
 
 protected:
   DataManager(); ///< DataManager is a Singleton. Use getInstance instead
   ~DataManager(); ///< destructor
   
-  QDomNode getXml(QDomDocument& doc);///< Get a XML representation of the DataManager \return A XML data representation for this object. \param doc The root of the document tree.
-  void parseXml(QDomNode& datamangerNode);///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager.
-
   static DataManager* mCxInstance;
 
 private:
