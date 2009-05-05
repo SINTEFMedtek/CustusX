@@ -76,6 +76,9 @@ int main(int argc, char **argv)
 	doRender(view->getRenderWindow());
 #endif
 	std::cout << "Uid       : " << image1->getUid() << std::endl;
+	
+	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
+	
 	app.exec();
 
 	return 0;

@@ -17,7 +17,7 @@ typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 #include "sscImageLUT2D.h"
 typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
 
-#define USE_TRANSFORM_RESCLICER
+//#define USE_TRANSFORM_RESCLICER
 
 namespace ssc
 {

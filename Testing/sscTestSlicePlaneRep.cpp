@@ -40,6 +40,7 @@ int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	TestSlicePlaneRep test;
+	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
 	int val = app.exec();
 	return val;
 }

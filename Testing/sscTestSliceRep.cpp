@@ -71,6 +71,7 @@ int main(int argc, char **argv)
 	mainWindow.resize(QSize(500,500));
 	mainWindow.show();
 	view->getRenderer()->ResetCamera();
+	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
 	app.exec();
 
 
