@@ -1,10 +1,10 @@
 #ifndef CXLANDMARKREP_H_
 #define CXLANDMARKREP_H_
 
-#include "sscRepImpl.h"
+#include <sscRepImpl.h>
 
 #include <map>
-#include "sscImage.h"
+#include <sscImage.h>
 
 namespace ssc
 {
@@ -34,12 +34,13 @@ class LandmarkRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
-  struct RGB
+  // Fix for Windows
+  struct RGB_
   {
     int R;
     int G;
     int B;
-    RGB() : R(255), G(0), B(0)
+    RGB_() : R(255), G(0), B(0)
     {};
   }; ///< struct representing a rgb color
 
@@ -49,7 +50,7 @@ public:
   virtual std::string getType() const;
 
   int getNumberOfLandmarks() const; ///< returns the number of landmarks
-  void setColor(RGB color); ///< sets the reps color
+  void setColor(RGB_ color); ///< sets the reps color
   void setTextScale(int& x, int& y,int& z); ///< default is (20,20,20)
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
@@ -72,7 +73,7 @@ protected:
   MessageManager*     mMessageManager;  ///< device for sending messages to the statusbar
 
   std::string     mType;          ///< description of this reps type
-  RGB             mColor;         ///< the color of the landmark actors
+  RGB_             mColor;         ///< the color of the landmark actors
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
   bool            mShowLandmarks; ///< whether or not the actors should be showed in (all) views
   int             mTextScale[3];  ///< the textscale

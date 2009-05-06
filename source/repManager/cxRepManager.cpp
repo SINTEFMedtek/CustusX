@@ -4,9 +4,9 @@
 
 namespace cx
 {
-RepManager::RepManager* RepManager::mTheInstance = NULL;
+RepManager* RepManager::mTheInstance = NULL;
 
-RepManager::RepManager* RepManager::getInstance()
+RepManager* RepManager::getInstance()
 {
   if(mTheInstance == NULL)
    {

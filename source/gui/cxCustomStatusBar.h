@@ -2,7 +2,7 @@
 #define CXCustomStatusBar_H_
 
 #include <QStatusBar>
-#include <map.h>
+#include <map>
 
 class QLabel;
 class QPixmap;

@@ -1,7 +1,7 @@
 #ifndef CXIMAGEREGISTRATIONWIDGET_H_
 #define CXIMAGEREGISTRATIONWIDGET_H_
 
-#include <map.h>
+#include <map>
 #include <QWidget>
 #include "sscVolumetricRep.h"
 

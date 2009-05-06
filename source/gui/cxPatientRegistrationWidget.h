@@ -2,8 +2,8 @@
 #define CXPATIENTREGISTRATIONWIDGET_H_
 
 #include <QWidget>
-#include "sscImage.h"
-#include "sscTransform3D.h"
+#include <sscImage.h>
+#include <sscTransform3D.h>
 #include "cxTool.h"
 
 class QVBoxLayout;

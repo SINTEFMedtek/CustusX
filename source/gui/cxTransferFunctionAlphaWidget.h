@@ -3,7 +3,7 @@
 
 #include <QWidget>
 
-#include "sscImage.h"
+#include <sscImage.h>
 
 class QRect;
 

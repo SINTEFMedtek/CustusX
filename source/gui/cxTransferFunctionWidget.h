@@ -2,7 +2,7 @@
 #define CXTRANSFERFUNCTIONWIDGET_H_
 
 #include <QWidget>
-#include "sscImage.h"
+#include <sscImage.h>
 
 class QVBoxLayout;
 

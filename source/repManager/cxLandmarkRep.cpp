@@ -40,7 +40,7 @@ int LandmarkRep::getNumberOfLandmarks() const
 {
   return mImage->getLandmarks()->GetNumberOfTuples();
 }
-void LandmarkRep::setColor(RGB color)
+void LandmarkRep::setColor(RGB_ color)
 {
   mColor = color;
 }
