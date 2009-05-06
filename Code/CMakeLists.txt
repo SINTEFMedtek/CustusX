@@ -187,14 +187,12 @@ link_directories( ${SSC_LIBRARY_DIRS} )
 
 set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 
-
 # =========================================================
 # create the target
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
 target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
 # =========================================================
 # =========================================================
-
 
 # =========================================================
 # 

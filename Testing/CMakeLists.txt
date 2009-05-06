@@ -13,6 +13,13 @@ include (${SSC_USE_FILE} )
 	
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 
+# -- replaced by cisst system below
+#add_executable(sscTestCPPUnit
+#   sscCPPUnitMain.cpp
+#   sscTestSliceComputer.cpp )
+#target_link_libraries( sscTestCPPUnit SSC cppunit)
+#add_test(sscTestCPPUnit sscTestCPPUnit)
+
 add_executable(TestRender sscTestRender.cpp)
 target_link_libraries( TestRender SSC )	
 add_test(TestRender TestRender)
@@ -71,9 +78,21 @@ add_executable(TestSliceAndOverlayImage MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTes
 target_link_libraries( TestSliceAndOverlayImage SSC )	
 add_test(TestSliceAndOverlayImage TestSliceAndOverlayImage)
 
-#sscTestCPPunit tes
-add_executable(sscTestCPPUnit
-    sscCPPUnitMain.cpp
-    sscTestSliceComputer.cpp )
-target_link_libraries( sscTestCPPUnit SSC cppunit)
+# --------------- -------------------------------
+# -- CppUnit - CTest integration. ---------------
+# --   Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test. 
 
+# Initialize cisst routines
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/Testing/cisst_code)
+include(cisstMacros)
+add_subdirectory(cisst_code)
+# link all CppUnit tests to the cisstTestsMain library
+add_executable(myFirst_CPPUNIT_CTEST_TEST
+    #sscCPPUnitMain.cpp
+    sscTestSliceComputer.cpp )
+target_link_libraries(myFirst_CPPUNIT_CTEST_TEST cisstTestsMain SSC cppunit)
+# Generate a CTest list of tests
+CISST_ADD_TESTS(myFirst_CPPUNIT_CTEST_TEST)
+
+# -- finished CppUnit - CTest integration. ------
+# -----------------------------------------------

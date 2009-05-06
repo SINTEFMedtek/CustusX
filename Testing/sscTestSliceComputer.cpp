@@ -8,8 +8,13 @@
 using ssc::Vector3D;
 using ssc::Transform3D;
 
-namespace ssctest
+//namespace ssctest
+//{
+
+void testResultText(const std::string& msg)
 {
+	std::cout << msg;
+}
 
 /**Unit tests for class ssc::SliceComputer
  */
@@ -30,6 +35,7 @@ public:
 	}
 	void testACS()
 	{
+		//testResultText("testing ACS\n");
 		// test acs for the std case: a fixed center and a moving tool
 		
 		ssc::SliceComputer slicer;
@@ -59,6 +65,7 @@ public:
 	
 	void testACS_FollowTool()
 	{
+		//testResultText("testing ACS-FollowTool\n");
 		ssc::SliceComputer slicer;
 		slicer.setOrientationType(ssc::otORTHOGONAL);	
 		slicer.setFollowType(ssc::ftFOLLOW_TOOL);
@@ -181,5 +188,5 @@ private:
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestSliceComputer );
 
-} // ssctest
+//} // ssctest
 
