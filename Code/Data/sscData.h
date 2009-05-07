@@ -11,7 +11,6 @@
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 #include "sscTransform3D.h"
 
-#include "sscData.h"
 #include "sscRep.h"
 
 namespace ssc

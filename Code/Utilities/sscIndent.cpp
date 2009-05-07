@@ -30,7 +30,7 @@ bool Indent::includeNormal() const
 
 ostream& operator<<(ostream &os, const Indent &val)
 {
-	os << std::string(val.getIndent(), ' ');
+	os << std::string(val.getIndent(), ' ').c_str();
 	return os;
 }
 

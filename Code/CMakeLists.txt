@@ -113,8 +113,15 @@ SET( SSC_SOURCE_FILES
 # =========================================================
 #message( STATUS "processing project " ${SSC_PROJECT_NAME} "...")
 
-# add gcc definitions for all projects
-add_definitions( -g  )
+# add gcc definitions for all projects, except for Windows
+if (NOT WIN32)
+    add_definitions( -g  )
+endif(NOT WIN32)
+
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (WIN32)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(WIN32)
 
 # boost
 find_package( Boost REQUIRED )
