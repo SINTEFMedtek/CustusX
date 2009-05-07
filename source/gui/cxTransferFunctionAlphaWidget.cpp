@@ -1,6 +1,8 @@
 #include "cxTransferFunctionAlphaWidget.h"
 
 #include <limits.h>
+#include <vtkImageData.h>
+#include <vtkPointData.h>
 #include <QPainter>
 #include <QPen>
 #include <QColor>
@@ -110,6 +112,33 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   painter.fillRect(this->mFullArea, frameBrush);
   painter.fillRect(this->mPlotArea, backgroundBrush);
 
+	
+  // Draw histogram
+  vtkImageAccumulatePtr histogram = mCurrentImage->getHistogram();
+	int histogramSize = histogram->GetComponentExtent()[1] - 
+											histogram->GetComponentExtent()[0];
+  
+  painter.setPen(QColor(140, 140, 210));
+  
+  // A more correct approach may be to sum all values that comes inside
+  // a y-value instead of drawing multiple lines on the same position.
+  int x = 0;
+  int y = 0;
+  double barHeightMult = (height() - mBorder*2) 
+	/ log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
+	// / double(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
+	
+  double posMult = (width() - mBorder*2) / double(histogramSize);
+	for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)
+	{
+		x = i * posMult;
+		y = log(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]) * barHeightMult;
+		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
+    if (y > 0)
+      painter.drawLine(x + mBorder, height() - mBorder, 
+											 x + mBorder, height() - mBorder - y);
+	}
+/*
   // Draw histogram
 	//std::cout << "Get histogram" << std::endl;
   HistogramMapPtr histogram = mCurrentImage->getHistogram();
@@ -135,7 +164,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
       painter.drawLine(x + mBorder, height() - mBorder, 
 											 x + mBorder, height() - mBorder - y);
   }
-
+*/
   // Go through each point and draw squares and lines
 
   OpacityMapPtr opacityMap = mCurrentImage->getTransferFunctions3D()->getOpacityMap();
