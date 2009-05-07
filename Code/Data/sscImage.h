@@ -4,12 +4,14 @@
 #include <set>
 
 #include <boost/shared_ptr.hpp>
+#include <vtkImageAccumulate.h>
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
+typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
 
 #include "sscData.h"
 #include "sscRep.h"
@@ -61,8 +63,7 @@ public:
 	void setClut(vtkLookupTablePtr clut);
 	double treshold();
 	void setTreshold( double val );
-	HistogramMapPtr getHistogram();///< \return The histogram for the image
-	int getMaxHistogramValue();///< \return Max number of occurences for a single point in the histogram
+	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
 	int getMax();///< \return Max alpha position in the histogram = max key value in map
 	int getMin();///< \return Min alpha position in the histogram = min key value in map
 	int getRange();///< For convenience: getMax() – getMin()
@@ -107,8 +108,7 @@ protected:
 	double mAlpha ;
 	double mTreshold;
 	
-	HistogramMapPtr mHistogramPtr;///< Histogram
-	int mMaxHistogramValue;///< Max number of occurences for a single point in the histogram
+	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

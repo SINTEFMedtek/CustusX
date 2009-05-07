@@ -19,9 +19,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(data),
 	mUid(uid), mName(uid), mBaseImageData(data),
-	mLandmarks(vtkDoubleArray::New()),
-	mHistogramPtr(new IntIntMap()),
-	mMaxHistogramValue(0)
+	mLandmarks(vtkDoubleArray::New())
 {
 	std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
@@ -254,40 +252,21 @@ DoubleBoundingBox3D Image::boundingBox() const
 	return bounds;
 }
 
-	
-HistogramMapPtr Image::getHistogram()
+vtkImageAccumulatePtr Image::getHistogram()
 {
-	// Make histogram only when needed.
-	if (mHistogramPtr->empty())
+	if (mHistogramPtr.GetPointer() == NULL)
 	{
-		// vtkImageAccumulate may possibly be used instead to create histogram
-		unsigned char* charDataPtr = reinterpret_cast<unsigned char*>(mBaseImageData->GetScalarPointer());
-		int* dimensions = mBaseImageData->GetDimensions();
-		
-		IntIntMap::iterator current;
-		for (int i = 0; i < dimensions[0]*dimensions[1]*dimensions[2]; i++)
-		{
-			//std::cout << "hist x: " << (*charDataPtr) << std::endl;
-			current = mHistogramPtr->find(*charDataPtr);
-			if (current != mHistogramPtr->end())
-			{
-				current->second++;
-				if (mMaxHistogramValue < current->second)
-					mMaxHistogramValue = current->second;
-			}
-			else
-				mHistogramPtr->insert(std::pair<int, int>(*charDataPtr, 1));
-			++charDataPtr;
-		}
+		mHistogramPtr = vtkImageAccumulate::New();
+		mHistogramPtr->SetInput(mBaseImageData);
+		// Set up only a 1D histogram for now, so y and z values are set to 0
+		mHistogramPtr->SetComponentExtent(this->getMin(), this->getMax(),0,0,0,0);
+		mHistogramPtr->SetComponentOrigin(this->getMin(), 0, 0);
+		mHistogramPtr->SetComponentSpacing(1, 0, 0);
 	}
+	mHistogramPtr->Update();
 	return mHistogramPtr;
 }
-int Image::getMaxHistogramValue()
-{
-	// Make sure a histogram exists
-	this->getHistogram();
-	return mMaxHistogramValue;
-}
+
 int Image::getMax()
 {
 	// Alternatively create max from histogram
