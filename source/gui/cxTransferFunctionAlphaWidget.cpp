@@ -102,21 +102,21 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 
   QPainter painter(this);
   QPen pointPen, pointLinePen;
-
+  
   pointPen.setColor(QColor(0, 0, 150));
   pointLinePen.setColor(QColor(150, 100, 100));
-
+  
   // Fill with white global background color and grey plot area background color
   const QBrush frameBrush = QBrush(QColor(170, 170, 170));
   const QBrush backgroundBrush = QBrush(QColor(200, 200, 200));
   painter.fillRect(this->mFullArea, frameBrush);
   painter.fillRect(this->mPlotArea, backgroundBrush);
-
 	
   // Draw histogram
+	// with log compression
   vtkImageAccumulatePtr histogram = mCurrentImage->getHistogram();
 	int histogramSize = histogram->GetComponentExtent()[1] - 
-											histogram->GetComponentExtent()[0];
+                      histogram->GetComponentExtent()[0];
   
   painter.setPen(QColor(140, 140, 210));
   
@@ -138,33 +138,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
       painter.drawLine(x + mBorder, height() - mBorder, 
 											 x + mBorder, height() - mBorder - y);
 	}
-/*
-  // Draw histogram
-	//std::cout << "Get histogram" << std::endl;
-  HistogramMapPtr histogram = mCurrentImage->getHistogram();
-	//std::cout << "Got histogram" << std::endl;
-  int histogramSize = histogram->end()->first - histogram->begin()->first;
-  IntIntMap::iterator iter;// = histogram->begin();
-  
-  painter.setPen(QColor(140, 140, 210));
-  
-  // A more correct approach may be to sum all values that comes inside
-  // a y-value instead of drawing multiple lines on the same position.
-  int x = 0;
-  int y = 0;
-  double barHeightMult = (height() - mBorder*2) 
-		/ double(mCurrentImage->getMaxHistogramValue());
-  double posMult = (width() - mBorder*2) / double(histogramSize);
-  for (iter = histogram->begin(); iter!= histogram->end(); iter++)
-  {
-    x = static_cast<int>(iter->first * posMult);
-    y = static_cast<int>(iter->second * barHeightMult);
-    
-    if (y > 0)
-      painter.drawLine(x + mBorder, height() - mBorder, 
-											 x + mBorder, height() - mBorder - y);
-  }
-*/
+
   // Go through each point and draw squares and lines
 
   OpacityMapPtr opacityMap = mCurrentImage->getTransferFunctions3D()->getOpacityMap();

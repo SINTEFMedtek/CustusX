@@ -85,6 +85,8 @@ protected:
   virtual void mouseMoveEvent(QMouseEvent* event);  ///< Reimplemented from superclass
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
+  
+  virtual QSize sizeHint () const { return QSize(100, 30);};///< Define a recommended size
 };
 }
 #endif /* CXTRANSFERFUNCTIONCOLORWIDGET_H_ */

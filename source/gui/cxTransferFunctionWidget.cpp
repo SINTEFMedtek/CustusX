@@ -28,6 +28,11 @@ void TransferFunctionWidget::init()
   connect(this, SIGNAL(currentImageChanged(ssc::ImagePtr)),
 					mTransferFunctionColorWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 	
+  mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding, 
+                                              QSizePolicy::MinimumExpanding);
+  mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding, 
+                                              QSizePolicy::Fixed);
+  
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
   //mLayout->addWidget(mInfoWidget);

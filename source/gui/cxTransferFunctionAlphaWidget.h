@@ -79,6 +79,8 @@ protected:
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
 
   ssc::ImagePtr mCurrentImage;
+  
+  virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
 };
 }
 #endif /* CXTRANSFERFUNCTIONALPHAWIDGET_H_ */
