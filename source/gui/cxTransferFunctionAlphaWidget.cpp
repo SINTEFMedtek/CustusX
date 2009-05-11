@@ -125,14 +125,14 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   int x = 0;
   int y = 0;
   double barHeightMult = (height() - mBorder*2) 
-	/ log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
+	/ log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
 	// / double(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
 	
   double posMult = (width() - mBorder*2) / double(histogramSize);
 	for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)
 	{
 		x = i * posMult;
-		y = log(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]) * barHeightMult;
+		y = log(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
       painter.drawLine(x + mBorder, height() - mBorder, 
