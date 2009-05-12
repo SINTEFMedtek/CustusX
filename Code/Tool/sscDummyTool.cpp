@@ -72,7 +72,7 @@ void DummyTool::setTransformSaveFile(const std::string& filename)
 }
 Transform3D DummyTool::get_prMt() const
 {
-	return Transform3D();
+	return m_prMt;
 }
 bool DummyTool::getVisible() const
 {
@@ -107,11 +107,7 @@ void DummyTool::stopTracking()
 }
 void DummyTool::sendTransform()
 {
-	QDateTime time;
-	//std::cout<<"send transform"<<std::endl;
-	Transform3D matrix = *getNextTransform();
-	double timestamp = (double) time.time().msec();
-	emit toolTransformAndTimestamp(matrix, timestamp);
+	set_prMt(*getNextTransform());
 }
 void DummyTool::createPolyData()
 {
@@ -171,4 +167,14 @@ Transform3D* DummyTool::getNextTransform()
 
 	return &mTransforms.at(mTransformCount++);
 }
+
+void DummyTool::set_prMt(const Transform3D& prMt)
+{
+	QDateTime time;
+	double timestamp = (double) time.time().msec();
+	m_prMt = prMt;
+	emit toolTransformAndTimestamp(m_prMt, timestamp);
+}
+
+
 }//namespace ssc

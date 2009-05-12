@@ -38,6 +38,7 @@ public:
 	void stopTracking();
 
 	void setToolPositionMovement(const std::vector<Transform3D>& positions);
+	void set_prMt(const Transform3D& ptMt);
 
 private slots:
 	virtual void sendTransform();
@@ -50,6 +51,7 @@ private:
 	vtkPolyDataPtr mPolyData;
 
 	bool mVisible;
+	Transform3D m_prMt;
 	std::string mTransformSaveFileName;
 	QTimerPtr mTimer;
 	std::vector<Transform3D> mTransforms;

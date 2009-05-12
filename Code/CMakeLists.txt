@@ -105,6 +105,7 @@ SET( SSC_SOURCE_FILES
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManagerImpl.cpp
+    Tool/sscToolManager.cpp
     Tool/sscDummyToolManager.cpp
     Tool/sscDummyTool.cpp
 	) 

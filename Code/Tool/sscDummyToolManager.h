@@ -49,6 +49,9 @@ public:
 	virtual ToolPtr getReferenceTool() const;
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "");
 
+	static DummyToolManager* getDowncastInstance();
+	void addTool(DummyToolPtr tool);	
+	
 private:
 	typedef DummyToolMap::iterator DummyToolMapIter;
 	typedef DummyToolMap::const_iterator DummyToolMapConstIter;

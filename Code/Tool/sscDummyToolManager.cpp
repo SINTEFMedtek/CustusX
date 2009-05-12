@@ -3,7 +3,7 @@
 namespace ssc
 {
 
-ToolManager* ToolManager::mInstance = NULL;
+//ToolManager* ToolManager::mInstance = NULL;
 
 ToolManager* DummyToolManager::getInstance()
 {
@@ -96,7 +96,7 @@ ToolManager::ToolMapPtr DummyToolManager::getTools()
 {
 	//Is there a better way to do this?
 	ToolMapPtr retval(new ToolMap);
-	DummyToolMapIter it = mDummyTools->begin();
+	DummyToolMapIter it = mDummyTools->begin();	
 	while(it != mDummyTools->end())
 	{
 		retval->insert(std::pair<std::string, ToolPtr> (((*it).first), (ToolPtr)((*it).second)));
@@ -179,5 +179,17 @@ void DummyToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
 		it++;
 	}
 }
+
+DummyToolManager* DummyToolManager::getDowncastInstance()
+{
+	return dynamic_cast<DummyToolManager*>( getInstance() );
+}
+
+void DummyToolManager::addTool(DummyToolPtr tool)
+{
+	mDummyTools->insert(std::make_pair(tool->getUid(), tool));
+}
+
+
 
 } //namespace ssc
