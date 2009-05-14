@@ -114,10 +114,11 @@ SET( SSC_SOURCE_FILES
 # =========================================================
 #message( STATUS "processing project " ${SSC_PROJECT_NAME} "...")
 
+## -  removed this, as -g is applied by cmake.
 # add gcc definitions for all projects, except for Windows
-if (NOT WIN32)
-    add_definitions( -g  )
-endif(NOT WIN32)
+#if (NOT WIN32)
+#    add_definitions( -g  )
+#endif(NOT WIN32)
 
 # _USE_MATH_DEFINES Must be defined before math.h is included
 if (WIN32)
