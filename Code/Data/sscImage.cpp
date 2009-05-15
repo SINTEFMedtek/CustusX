@@ -34,7 +34,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 #endif
 	mLandmarks->SetNumberOfComponents(4);
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-	mAlpha = 0.5;
+	mAlpha = 0.5; 
 	mTreshold = 1.0;
 	
 	// Add initial values to the transfer functions
@@ -273,14 +273,14 @@ int Image::getMax()
 	//IntIntMap::iterator iter = this->getHistogram()->end();
 	//iter--;
 	//return (*iter).first;
-	return mImageTransferFunctions3D->getScalarMax();
+	return (int)mImageTransferFunctions3D->getScalarMax();
 }
 int Image::getMin()
 {
 	// Alternatively create min from histogram
 	//IntIntMap::iterator iter = this->getHistogram()->begin();
 	//return (*iter).first;
-	return mImageTransferFunctions3D->getScalarMin();
+	return (int)mImageTransferFunctions3D->getScalarMin();
 }
 int Image::getRange()
 {
