@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QFile>
+
 #include <vtkImageData.h>
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkPiecewiseFunction.h>
@@ -22,34 +23,39 @@ namespace ssc
 ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	mBase(base)
 {
-//	mLevel = getScalarMax() / 2.0;
-//	mWindow = getScalarMax();
-
-	mLevel = 127.5;
-	mWindow = 255;
+	//dafault Full Range.... or level-it 
+	mLevel =  0; //getScalarMax() / 2.0;
+	mWindow = getScalarMax();
 	mLLR = 0.0;
 	
-	std::cout<< "-- ImageLUT2D --"<<std::endl;
-	std::cout<<" default windowlevel  ["<<mLevel<<"],["<<mWindow<<"]"<<std::endl;
+	std::cout<< "--[ ImageLUT2D ]--"<<std::endl;	
+	std::cout<<  "window "<<mWindow<<std::endl;
+	std::cout<<  "level "<<mLevel<<std::endl;
 	
 	mImageMapToColor = vtkImageMapToColorsPtr::New();
 	mLookupTable = vtkLookupTablePtr::New();
-	//make a default system set lookuptable, Default my be gryscale...
+	
+	//make a default system set lookuptable, gryscale...
 	vtkLookupTablePtr bwLut= vtkLookupTablePtr::New();
 	bwLut->SetTableRange (0, 1);
 	bwLut->SetSaturationRange (0, 0);
 	bwLut->SetHueRange (0, 0);
 	bwLut->SetValueRange (0, 1);
 	bwLut->Build();
-	this->setLookupTable(bwLut);		
+	this->setLookupTable(bwLut); 
 }
 //set lookupTable, generated from file only froms DataManagerImpl::setViewControlData
 void ImageLUT2D::setLookupTable(vtkLookupTablePtr lut)
 {
-	std::cout<<"Got image lookup tabel, set table range ("<< mLevel<<","<<mWindow<<")"<<std::endl;
 	mLookupTable = lut;
-	mLookupTable->SetTableRange(mLevel,mWindow); 
-//	mImageMapToColor->SetLookupTable(mLookupTable); 
+	mLookupTable->SetTableRange(mLevel,mWindow);
+	mImageMapToColor->SetLookupTable(mLookupTable);
+}
+
+void ImageLUT2D::setImportedLut(vtkLookupTablePtr lut)
+{
+	mBaseLut = lut;
+	this->setLookupTable(mBaseLut);
 }
 vtkImageMapToColorsPtr ImageLUT2D::getColorMap()
 {
@@ -61,11 +67,11 @@ void ImageLUT2D::setTable(vtkUnsignedCharArray* table)
 }
 
 vtkLookupTablePtr ImageLUT2D::getLookupTable()
-{		
-	//std::cout<<"Image LUT2D, fetch lookuptable"<<std::endl;	
+{			
 	return mLookupTable;
 }
 
+//debug method.. will be removed later 
 void ImageLUT2D::printToFile()
 {
 	ofstream myfile;
@@ -79,30 +85,15 @@ void ImageLUT2D::printToFile()
 	}	
 	myfile.close();	
 }
-void ImageLUT2D::addNewColorLut()
-{
 	
-}
-void ImageLUT2D::addNewColor(QColor color)
-{
-	double value = color.value()/255.0;
-	double hue = color.hue()/255.0;
-	double saturation = color.saturation()/255.0;
-	
-	mLookupTable->SetSaturationRange(0, saturation);	
-	mLookupTable->SetHueRange(0.0, hue);
-	mLookupTable->SetValueRange(0.0, value);
-	
-	
-	//mLookupTable->Build();
-		
-}
 void ImageLUT2D::setAlphaRange(double alpha)
 {
-	std::cout<<"alpha range: [0,"<<alpha<<"]"<<std::endl;
-	//mLookupTable->SetAlphaRange(0.0 ,alpha);
-	
+	int scale = this->getScalarMax() + 1.0 / mLookupTable->GetTableRange()[1];
+	int r = (int)alpha / scale;
+	mLookupTable->SetAlphaRange(0.0 ,r);
+	mLookupTable->SetAlphaRange(r , 1.0);
 }
+
 /**Set Low Level Reject, meaning the lowest intensity
  * value that will be visible.
  */
@@ -110,13 +101,9 @@ void ImageLUT2D::setLLR(double val)
 {
 	if (similar(mLLR, val))
 		return;
-	
-	mLLR = val;
-	//mLookupTable->SetAlphaRange(mLLR , 1.0);
-	//->Build();
+	mLLR = val;	
 	changeOpacity(mLLR, 0);
 	//changeOpacityForAll(mLLR);
-
 }
 
 double ImageLUT2D::getLLR() const
@@ -129,6 +116,7 @@ double ImageLUT2D::getLLR() const
  */
 void ImageLUT2D::setWindow(double window)
 {
+	std::cout<<"setWindow "<<window<<std::endl;
 	if (similar(mWindow, window))
 		return;
 
@@ -137,9 +125,6 @@ void ImageLUT2D::setWindow(double window)
 		window = 1e-5; 
 	}
 	mWindow = window;
-	std::cout<<"setWindow: WindowWidth (:"<<mWindow<<"), WindowCenter ("<<mLevel<<")"<<std::endl;
-	std::cout<<"new range:["<<mLevel-mWindow/2.0<<", "<< mLevel+mWindow/2.0<<"]"<<std::endl;
-
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0); 
 }
 
@@ -156,10 +141,6 @@ void ImageLUT2D::setLevel(double level)
 	if (similar(mLevel, level))
 		return;
 	mLevel = level;
-	
-	std::cout<<"setLevel: WindowWidth (:"<<mWindow<<"), WindowCenter ("<<mLevel<<")"<<std::endl;
-	std::cout<<"new range:["<<mLevel-mWindow/2.0<<", "<< mLevel+mWindow/2.0<<"]"<<std::endl;
-	
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0);
 }
 
@@ -176,59 +157,49 @@ double ImageLUT2D::getScalarMax() const
 	return mBase->GetScalarRange()[1];
 }
 
-//Gets the number of color in the lut
+//set the a overall opacity.
 void ImageLUT2D::changeOpacityForAll(double opacity )
 {
-	int noValues = mLookupTable->GetNumberOfTableValues ();
-	std::cout << " noValues" <<noValues<< std::endl;
-	//prints
-	double rgba[ 4 ];
-	for ( int i = 0;i < noValues;i++ )
+	int noValues = mLookupTable->GetNumberOfTableValues();	
+	double rgba[4];
+	for ( int i = 0; i <noValues; i++ )
 	{
-		mLookupTable->GetTableValue ( i, rgba );
-		rgba[ 3 ] = opacity;
-		mLookupTable->SetTableValue ( i, rgba );
+		mLookupTable->GetTableValue (i, rgba);
+		rgba[3] = opacity;
+		mLookupTable->SetTableValue (i, rgba);
 	}
-	mLookupTable->Modified();  // need to call modiefied, since LookupTableProperty seems to be unchanged so no widget-updat is executed
+	mLookupTable->Modified();
 }
 
-void ImageLUT2D::changeOpacity(int index, double opacity)
+/*this is a version off a llr method on Alpha channel on the lookuptable*/
+void ImageLUT2D::changeOpacity(double index, double opacity)
 {
 	int noValues = mLookupTable->GetNumberOfTableValues();
-	std::cout << " noValues " <<noValues<< std::endl;
-	std::cout << " index "<< index <<std::endl;
-	std::cout << " scalarmax"<< (getScalarMax()+1)<<std::endl;
-	
-	double scale = (getScalarMax()+1)/noValues; // 65536/65536 = 1 eller 65536/256 = 256
-	std::cout << " scalar value "<< scale <<std::endl;
-	
-	index = index/scale;
+	double scale = (getScalarMax()+1)/noValues; 	
+	index = (int)(index/scale);	
 	
 	if (index>noValues)
 	{
 		std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
-		//return;
+		return;
 	}
-	
-	std::cout<<" index we have is "<<index<<std::endl;
+	std::cout<<"set the LLR at "<<index<<std::endl;
 	
 	for ( int i = 0; i < index; i++ )
 	{ 
 		double rgba[4];
 		mLookupTable->GetTableValue(i, rgba);	
-		rgba[ 3 ] = 0.1;
+		rgba[ 3 ] = 0.001;
 		mLookupTable->SetTableValue(i, rgba);
 	}
 	for ( int i = index; i < noValues; i++ )
 	{
 		double rgba[4];
 		mLookupTable->GetTableValue(i, rgba);
-		rgba[ 3 ] = 0.99;
+		rgba[ 3 ] = 0.9999;
 		mLookupTable->SetTableValue(i, rgba);
 	}
-	
-	
-	//mLookupTable->Modified(); 
+	mLookupTable->Modified();
 }
 
 
