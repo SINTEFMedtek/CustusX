@@ -32,28 +32,27 @@ public:
 
 	void setLookupTable(vtkLookupTablePtr lut);
 	vtkLookupTablePtr getLookupTable(); //try to be use ony one class rep for lut--
-	
-	//vtkScalarsToColorsPtr getLookupTable();
-
 	void setLLR(double val);
-	double getLLR() const;
 	void setWindow(double window);
-	double getWindow() const;
 	void setLevel(double level);
+	double getWindow() const;
+	double getLLR() const;
 	double getLevel() const;
 	double getScalarMax() const;
-	void addNewColor(QColor color);
 	void setAlphaRange(double alpha) ;
 	void changeOpacityForAll(double opacity);
-	void changeOpacity(int index, double opacity);
-	void addNewColorLut();
+	void changeOpacity(double index, double opacity);
 	void setTable(vtkUnsignedCharArray *  table);
+	void setImportedLut(vtkLookupTablePtr lut); //temporary method....
+	
 	vtkImageMapToColorsPtr getColorMap();
+
 private:
 	void printToFile();
 	vtkScalarsToColorsPtr mScalarToColor;
-	vtkLookupTablePtr mLut;
+	vtkLookupTablePtr mBaseLut;
 	vtkLookupTablePtr mLookupTable;
+	
 	vtkWindowLevelLookupTablePtr mColorLookupTable;
 	vtkPiecewiseFunctionPtr mLowLevel;
 	vtkImageDataPtr mBase;
