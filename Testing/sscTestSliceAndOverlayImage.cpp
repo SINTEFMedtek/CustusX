@@ -107,6 +107,7 @@ void OverlayControlWidget::setupAction()
 
 void OverlayControlWidget::Contrast3D(int val)
 {
+	mImage->getMax();
 	mImage->getTransferFunctions3D()->setLevel(val/1.0);
 }
 
@@ -117,30 +118,31 @@ void OverlayControlWidget::Brightness3D(int val)
 
 void OverlayControlWidget::llrSlot(int val)
 {
-	mImage->getLookupTable2D().setLLR(val/10.0);
+	mImage->getLookupTable2D().setLLR(mImage->getMax()-val);
 }
+
 void OverlayControlWidget::changeColorSlot(QColor color)	
 {
-	mImage->getLookupTable2D().addNewColor(color); 
+
 }
+
 void OverlayControlWidget::alphaSlider(int val)
 {
-	mImage->setAlpha( val/10.0 );
-	
+	mImage->setAlpha( val/100.0 );	
 }
 void OverlayControlWidget::brightness(int val)
 {
-	mImage->getLookupTable2D().setLevel(val/1.0);
+	mImage->getLookupTable2D().setLevel(mImage->getMax()-val);
 }
 
 void OverlayControlWidget::contrast(int val)
 {
-	mImage->getLookupTable2D().setWindow(val/1.0);	
+	mImage->getLookupTable2D().setWindow(mImage->getMax()-val);	
 }
 
 void OverlayControlWidget::setThreshold( int val)
 {
-	mImage->getLookupTable2D().setAlphaRange(val/10.0);
+	mImage->getLookupTable2D().setAlphaRange(val/100.0);
 }
 
 void OverlayControlWidget::setupWidget()
@@ -174,7 +176,7 @@ void OverlayControlWidget::setupWidget()
 	slidersLayout_3D->addWidget(new QLabel(tr("3D - Brightness")) );
 	slidersLayout_3D->addWidget(m3DBrightness);
 	m3DAlphaSlider = new QSlider(Qt::Horizontal);
-	slidersLayout_3D->addWidget(new QLabel(tr("3D - Opacity")) );
+	slidersLayout_3D->addWidget(new QLabel(tr("2D - Opacity")) );
 	slidersLayout_3D->addWidget(m3DAlphaSlider);
 	
 
@@ -206,33 +208,34 @@ void OverlayControlWidget::setImage(ssc::ImagePtr image)
 	mImageUid = image->getUid();
 
 	int window = 10 * (int)mImage->getLookupTable2D().getWindow();
-	int level = 10 * (int)mImage->getLookupTable2D().getLevel();
+	int level = 10 * (int)mImage->getLookupTable2D().getLevel();	
 	double alpha = mImage->getAlpha();
-
+	int scaleMAx = mImage->getMax();
 	std::cout<<"window: "<<window<<std::endl;
 	std::cout<<"level: "<<level<<std::endl;
 	std::cout<<"alpha: "<<alpha<<std::endl;
+	std::cout<<"image Scalar Max: "<<scaleMAx<<std::endl;
 	std::cout<<"--------"<<std::endl;
-	
+
 	//update slidebar...
-	mContrastSlider->setMaximum(256);
-	mContrastSlider->setValue(256);
+	mContrastSlider->setMaximum(mImage->getMax());
+	mContrastSlider->setMinimum(0);
 	
-	mBrightness->setMaximum(256);
-	mBrightness->setValue(128);
+	mBrightness->setMaximum(mImage->getMax());
+	mBrightness->setMinimum(0);
+	mBrightness->setSliderPosition(mImage->getMax()/2);
 	
-	mAlphaSlider->setMaximum(10);
-	mAlphaSlider->setValue((int)alpha * 10);
+	mAlphaSlider->setMaximum(100);
+	mAlphaSlider->setSliderPosition(100);
 	
-	m3DContrast->setMaximum(256);
-	m3DContrast->setValue(256);
+	m3DContrast->setMaximum(100);
+	m3DContrast->setSliderPosition(50);
 	
-	m3DBrightness->setMaximum(256);
-	m3DBrightness->setValue(128);
+	m3DBrightness->setMaximum(100);
+	m3DBrightness->setSliderPosition(0);
 	
-	
-	m3DAlphaSlider->setMaximum(10);
-	m3DAlphaSlider->setValue(10);
+	m3DAlphaSlider->setMaximum(mImage->getMax());
+	m3DAlphaSlider->setSliderPosition(mImage->getMax());
 }
 
 void OverlayControlWidget::createFirstCLUT()
@@ -243,20 +246,6 @@ void OverlayControlWidget::createFirstCLUT()
 //end button  widget class
 //----------------------------
 
-
-SingleLayout::SingleLayout()
-{
-	//mUid = uid;
-}
-
-SingleLayout::~SingleLayout()
-{
-}
-
-std::string SingleLayout::getUid()const 
-{
-	return mUid;
-}
 
 TestSliceAndOverlayImage::TestSliceAndOverlayImage()
 {
@@ -282,12 +271,16 @@ void TestSliceAndOverlayImage::generateView(ssc::PLANE_TYPE plane)
 	ssc::VolumetricRepPtr volumeRep = ssc::VolumetricRep::New("VolumetricRep");
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	ssc::BlendedSliceRepPtr layeredRep = ssc::BlendedSliceRep::New("LayerSliceRep");
+	ssc::MultiTextureRepPtr textur = ssc::MultiTextureRep::New("MultiTextureRep");
+	ssc::SlicePlaneRepPtr planeSlice = ssc::SlicePlaneRep::New("SlicePlaneRep"); 
 	
 	single->mView =  new ssc::View();
 	single->mSliceRep = sliceRep;
 	single->mToolProxy = proxy;
 	single->mVolumetricRep = volumeRep;
 	single->mBlendedSliceRep = layeredRep;
+	single->mMultiTexturRep = textur;
+	single->mPlaneSliceRep = planeSlice;
 	
 	mLayouts.insert( std::make_pair(plane, single) );
 }	
@@ -334,10 +327,43 @@ void TestSliceAndOverlayImage::generateSliceRepLayerd(ssc::ToolPtr tool, std::ve
 	
 	mLayouts[plane]->mBlendedSliceRep->setSliceProxy(proxy);
 	mLayouts[plane]->mBlendedSliceRep->setImages(images);
-	
 	mLayouts[plane]->mView->addRep(mLayouts[plane]->mBlendedSliceRep);
 	 
 }
+//Multitexture, Many texture with images... OverlayRep
+void TestSliceAndOverlayImage::generateTexture(ssc::ToolPtr tool, std::vector<ssc::ImagePtr> images, ssc::PLANE_TYPE plane)
+{
+	std::cout<<"\ngenerateTexture,"<< images.size()<<" image to blend "<<std::endl;
+	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+
+	proxy->setTool(tool);
+	proxy->setFollowType(ssc::ftFIXED_CENTER);
+	proxy->setOrientation(ssc::otORTHOGONAL);
+	proxy->setPlane(plane);
+		
+	mLayouts[plane]->mMultiTexturRep->setSliceProxy(proxy);
+	mLayouts[plane]->mMultiTexturRep->setImages(images);
+	mLayouts[plane]->mView->addRep(mLayouts[plane]->mMultiTexturRep);
+}
+
+//OverlayRep, but uses vtkImagePlaneWidget to generate planes and textures.
+void TestSliceAndOverlayImage::generatePlaneSlices(ssc::ToolPtr tool, std::vector<ssc::ImagePtr> images, ssc::PLANE_TYPE plane)
+{
+	std::cout<<"\ngeneratePlaneSlices,"<< images.size()<<" image to blend "<<std::endl;
+	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+
+	proxy->setTool(tool);
+	proxy->setFollowType(ssc::ftFIXED_CENTER);
+	proxy->setOrientation(ssc::otORTHOGONAL);
+	proxy->setPlane(plane);
+		
+	mLayouts[plane]->mPlaneSliceRep->setSliceProxy(proxy);
+	mLayouts[plane]->mPlaneSliceRep->setImages(images);
+	mLayouts[plane]->mView->addRep(mLayouts[plane]->mPlaneSliceRep);
+}
+
+//----------- 3D ------------//
+//-----------Stuff------------//
 
 // volume rep ..NOT FINISHED
 void TestSliceAndOverlayImage::generateVolumeInVolumeRep(ssc::ImageBlenderProxyPtr blender,ssc::PLANE_TYPE plane)
@@ -382,7 +408,7 @@ void TestSliceAndOverlayImage::start()
 	// read image
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(mImageFileName1 , ssc::rtMETAIMAGE);
 	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(mImageFileName2 , ssc::rtMETAIMAGE);
-	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(mImageFileName2 , ssc::rtMETAIMAGE);
+	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(mImageFileName3 , ssc::rtMETAIMAGE);
 	
 	//store imags	
 	std::vector<ssc::ImagePtr> images;
@@ -390,7 +416,6 @@ void TestSliceAndOverlayImage::start()
 	images.push_back(image2);
 	//images.push_back(image3);	
 			
-
 	// Initialize dummy toolmanager.
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	mToolmanager->configure();
@@ -407,12 +432,33 @@ void TestSliceAndOverlayImage::start()
 	generateView(ssc::ptSAGITTAL);
 	generateView(ssc::ptNOPLANE); //3D view
 	
-	//we are going with this one on 2d overlay
-	generateSliceRepLayerd(tool, images, ssc::ptAXIAL);
-	generateSliceRepLayerd(tool, images, ssc::ptCORONAL);
-	generateSliceRepLayerd(tool, images, ssc::ptSAGITTAL);
-		
+	int command = 2;
+	bool _3d = false;
 	
+	if (command == 1)
+	{
+		//we are going with this one on 2d overlay
+		generateSliceRepLayerd(tool, images, ssc::ptAXIAL);
+		generateSliceRepLayerd(tool, images, ssc::ptCORONAL);
+		generateSliceRepLayerd(tool, images, ssc::ptSAGITTAL);
+	}
+	else if(command == 2)
+	{
+		generateTexture(tool, images, ssc::ptAXIAL);
+		generateTexture(tool, images, ssc::ptCORONAL);
+		generateTexture(tool, images, ssc::ptSAGITTAL);
+	}
+	else if(command == 3)
+	{
+		generatePlaneSlices(tool, images, ssc::ptAXIAL);
+		generatePlaneSlices(tool, images, ssc::ptCORONAL);
+		generatePlaneSlices(tool, images, ssc::ptSAGITTAL);
+	}
+	if (_3d) 
+	{
+		
+	}
+
 	/*--- 3D overLay.. using vtkImageBlend... not good! ---*/
 	//generateVolumeInVolumeRep(mBlenderProxy, ssc::ptNOPLANE);
 	
@@ -469,7 +515,6 @@ void TestSliceAndOverlayImage::updateAlpha()
 	}
 	
 }
-
 void TestSliceAndOverlayImage::updateRender()
 {
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
