@@ -251,7 +251,8 @@ Vector3D SliceComputer::generateFixedIJCenter(const Vector3D& center_r, const Ve
  *   i' = -g x k
  *   j' =  k x i'
  * 
- * If the input j vector point upwards, we flip gravity so that the image dont flip.
+ * (If the input j vector point upwards, we flip gravity so that the image dont flip.
+ * - removed, did not work.)
  * 
  * When k and g points in the same direction, the calculations gets unstable. 
  * In this case we use the input i,j definition. There is a gradual shift between
@@ -267,17 +268,21 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	SlicePlane retval = base;	
 	const Vector3D k = cross(base.i, base.j); // plane normal. Constant
 	Vector3D up;
+	up = -mGravityDirection; // normal case
 	
-	//std::cout << "base: \n" << base << std::endl;
-	// find the up direction. This removes flips.
-	if (dot(base.j, -mGravityDirection) > 0.0)
-	{
-		up = -mGravityDirection; // normal case
-	}
-	else
-	{
-		up = mGravityDirection;	// flipped case
-	}
+	// this did not work out well. Fails when k vector isperpendicular to gravity.
+	// I dont think a good solution exist - be simple instead.
+////	//std::cout << "base: \n" << base << std::endl;
+////	// find the up direction. This removes flips.
+//	if (dot(base.j, -mGravityDirection) > 0.0)
+//	{
+//		up = -mGravityDirection; // normal case
+//	}
+//	else
+//	{
+//		std::cout << " fliPP! " << std::endl;
+//		up = mGravityDirection;	// flipped case
+//	}
 	
 	// weight of nongravity, 0=<w=<1, 1 means dont use gravity
 	double w_n = dot(up, k); 
@@ -285,6 +290,15 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	
 	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
 	Vector3D i_n = base.i; // |i_n|==1
+	
+//	std::cout << "-------------------" << std::endl;
+//	std::cout << "mGravityDirection\t" << mGravityDirection   << std::endl;
+//	std::cout << "up\t" << up   << std::endl;
+//	std::cout << "w_n\t" << w_n   << std::endl;
+//	std::cout << "i\t" << base.i   << std::endl;
+//	std::cout << "j\t" << base.j   << std::endl;
+//	std::cout << "k\t" << k   << std::endl;
+//	std::cout << "-------------------" << std::endl;
 	
 	// set i vector to a weighted mean of the two definitions
 	// can also experiment with a tanh function or simply a linear interpolation
