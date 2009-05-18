@@ -54,7 +54,7 @@ TestSliceAndToolRep::TestSliceAndToolRep()
 	start();
 
 }
-TestSliceAndToolRep::~TestSliceAndToolRep()
+TestSliceAndToolRep::~TestSliceAndToolRep()	
 {}
 
 void TestSliceAndToolRep::generateView(const std::string& uid)

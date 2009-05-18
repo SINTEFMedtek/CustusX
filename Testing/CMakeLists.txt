@@ -36,18 +36,15 @@ add_executable(TestMeshDMGeoRepView MACOSX_BUNDLE sscTestMeshDMGeoRepView.cpp)
 target_link_libraries( TestMeshDMGeoRepView SSC )	
 add_test(TestMeshDMGeoRepView TestMeshDMGeoRepView)
 
-# sscTestSliceRep
+#sscTestSliceRep
 add_executable(TestSliceRep MACOSX_BUNDLE sscTestSliceRep.cpp)
 target_link_libraries( TestSliceRep SSC )	
 add_test(TestSliceRep TestSliceRep)
 
-# sscTestSliceAndToolRep
-SET( SSCSliceAndToolRep_QT_MOC_HEADER_FILES
-    sscTestSliceAndToolRep.h
-   )
-set( MOC_HEADER_FILES )
+#sscTestSliceAndToolRep
+SET( SSCSliceAndToolRep_QT_MOC_HEADER_FILES sscTestSliceAndToolRep.h)
+set( MOC_HEADER_FILES )    
 QT4_WRAP_CPP( MOC_HEADER_FILES ${SSCSliceAndToolRep_QT_MOC_HEADER_FILES} )
-
 add_executable(TestSliceAndToolRep MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSliceAndToolRep.cpp)
 target_link_libraries( TestSliceAndToolRep SSC )	
 add_test(TestSliceRep TestSliceRep)
@@ -57,26 +54,13 @@ target_link_libraries( TestRenderSpeed SSC )
 
 
 #sscTestSlicePlaneRep
-SET( sscTestSlicePlaneRep_QT_MOC_HEADER_FILES
-    sscTestSlicePlaneRep.h
-   )
+SET( sscTestSlicePlaneRep_QT_MOC_HEADER_FILES sscTestSlicePlaneRep.h)
 set( MOC_HEADER_FILES )
 QT4_WRAP_CPP( MOC_HEADER_FILES ${sscTestSlicePlaneRep_QT_MOC_HEADER_FILES} )
-
 add_executable(TestPlaneRep MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSlicePlaneRep.cpp)
 target_link_libraries( TestPlaneRep SSC )	
 add_test(TestPlaneRep TestPlaneRep)
 
-
-#sscTestSliceAndOverlayImage
-SET( sscTestSliceAndOverlayImage_QT_MOC_HEADER_FILES
-    sscTestSliceAndOverlayImage.h    
-   )
-set( MOC_HEADER_FILES )
-QT4_WRAP_CPP( MOC_HEADER_FILES ${sscTestSliceAndOverlayImage_QT_MOC_HEADER_FILES} )
-add_executable(TestSliceAndOverlayImage MACOSX_BUNDLE ${MOC_HEADER_FILES} sscTestSliceAndOverlayImage.cpp)
-target_link_libraries( TestSliceAndOverlayImage SSC )	
-add_test(TestSliceAndOverlayImage TestSliceAndOverlayImage)
 
 # --------------- -------------------------------
 # -- CppUnit - CTest integration. ---------------

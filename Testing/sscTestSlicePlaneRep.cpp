@@ -62,8 +62,6 @@ void TestSlicePlaneRep::generateView(const std::string& uid)
 
 void TestSlicePlaneRep::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-	
-	
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	proxy->setTool(tool);
 	proxy->setFollowType(ssc::ftFIXED_CENTER);
@@ -77,7 +75,7 @@ void TestSlicePlaneRep::generateSlice(const std::string& uid, ssc::ToolPtr tool,
 	
 	mLayouts[uid].mSlicer = proxy;
 	mLayouts[uid].mSliceRep = rep;
-	mLayouts[uid].mView->addRep(rep);
+	//mLayouts[uid].mView->addRep(rep);
 }
 
 ssc::View* TestSlicePlaneRep::view(const std::string& uid)
@@ -91,13 +89,15 @@ void TestSlicePlaneRep::start()
 	mWidget->setLayout(mainLayout);
 
 	// generate imageFileName
-	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	std::string imageFileName2 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
 	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
 	std::cout << imageFileName1 << std::endl;
-
+	std::cout << imageFileName2 << std::endl;
+	
 	// read image
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(imageFileName1, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(imageFileName2, ssc::rtMETAIMAGE);
 	std::cout<<" count components"<<image1->getBaseVtkImageData()->GetNumberOfScalarComponents()<<std::endl;
 	
 	
@@ -129,9 +129,13 @@ void TestSlicePlaneRep::start()
 	generateSlice("A", tool, image1, ssc::ptAXIAL);
 	generateSlice("C", tool, image1, ssc::ptCORONAL);
 	generateSlice("S", tool, image1, ssc::ptSAGITTAL);
-	//Plane rep
+	
+
+	
+	//3D scene,  Plane rep 
 	ssc::SlicePlaneRepPtr mPlaneRep = ssc::SlicePlaneRep::New(image1->getUid());
 	std::vector<ssc::SliceRepSWPtr> tmp;
+	
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{	
 		std::cout<<"add sliceRep"<<std::endl;	
@@ -143,37 +147,36 @@ void TestSlicePlaneRep::start()
 		
 	}
 	mPlaneRep->setSliceReps(tmp);
-		//mPlaneRep->setImage(image1);
-	view("3D")->addRep(mPlaneRep);
-	// Tool 3D rep
-//	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
-//	toolRep->setTool(tool);
-//	view("3D")->addRep(toolRep);
-
+	//mPlaneRep->setImage(image1);
 	
+	view("A")->addRep(mPlaneRep);
+	
+	// Tool 3D rep
+	//ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+	//toolRep->setTool(tool);
+	//view("3D")->addRep(toolRep);
 
 	QGridLayout* sliceLayout = new QGridLayout;
 	QHBoxLayout *buttonLayout = new QHBoxLayout;
-
 	mainLayout->addLayout(sliceLayout);//Slice layout
 	sliceLayout->addWidget(view("C"), 0, 0);
 	sliceLayout->addWidget(view("S"), 0, 1);
-	sliceLayout->addWidget(view("A"), 1, 0);
+	sliceLayout->addWidget(view("A"), 1, 0 );
 	sliceLayout->addWidget(view("3D"), 1, 1);
 	
 	
-	mainLayout->addLayout(buttonLayout); //Buttons
+	mainLayout->addLayout(buttonLayout); 
+	
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 		iter->second.mView->getRenderer()->ResetCamera();
+	
 	updateRender();
 }
 
 void TestSlicePlaneRep::updateRender()
 {
-//	std::cout<<"render begin"<<std::endl;
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 		iter->second.mView->getRenderWindow()->Render();
-//	std::cout<<"render end"<<std::endl;
 }
 
 
