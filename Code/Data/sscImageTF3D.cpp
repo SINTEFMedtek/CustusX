@@ -119,7 +119,7 @@ double ImageTF3D::getLLR() const
 void ImageTF3D::setWindow(double val)
 {
 	mWindow = val;
-	std::cout<<"setWindow, val: "<<val<<std::endl;
+	//std::cout<<"setWindow, val: "<<val<<std::endl;
 	refreshColorTF();
 }
 

@@ -116,7 +116,7 @@ double ImageLUT2D::getLLR() const
  */
 void ImageLUT2D::setWindow(double window)
 {
-	std::cout<<"setWindow "<<window<<std::endl;
+	//std::cout<<"setWindow "<<window<<std::endl;
 	if (similar(mWindow, window))
 		return;
 
