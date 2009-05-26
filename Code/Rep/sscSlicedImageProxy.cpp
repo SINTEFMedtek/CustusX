@@ -46,7 +46,7 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 void SlicedImageProxy::setImage(ImagePtr image)
 {
 	std::cout<<"got image id"<<image->getUid()<<std::endl;
-//
+
 //	if (mImage)
 //	{
 //		disconnect( mImage.get(), SIGNAL(alphaChange()), this, SIGNAL(updateAlpha()));
@@ -55,7 +55,8 @@ void SlicedImageProxy::setImage(ImagePtr image)
 //	connect( mImage.get(), SIGNAL(alphaChange()), this, SIGNAL(updateAlpha()));
 
 	mImage = image;
-	mReslicer->SetInput(mImage->getRefVtkImageData());
+	//mReslicer->SetInput(mImage->getRefVtkImageData());	
+	mReslicer->SetInput(mImage->getBaseVtkImageData());
 	mWindowLevel->SetLookupTable( image->getLookupTable2D().getLookupTable() );
 	mWindowLevel->Update();
 }
@@ -74,8 +75,13 @@ vtkImageDataPtr SlicedImageProxy::getOutput()
 void SlicedImageProxy::update()
 {
 	Transform3D rMs = mSlicer->get_sMr().inv();
-	//std::cout << "slicerep get transform :\n"+boost::lexical_cast<std::string>(rMs) << std::endl;
-	mMatrixAxes->DeepCopy(rMs.matrix());
+	Transform3D iMr = mImage->get_rMd().inv();
+	Transform3D M = iMr*rMs;
+	
+	mMatrixAxes->DeepCopy(M.matrix());
+	
+//	Transform3D rMs = mSlicer->get_sMr().inv();
+//	mMatrixAxes->DeepCopy(rMs.matrix());
 }
 void SlicedImageProxy::sliceTransformChangedSlot(Transform3D sMr)
 {
