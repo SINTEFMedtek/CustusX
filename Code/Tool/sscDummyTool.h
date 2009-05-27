@@ -21,7 +21,7 @@ class DummyTool : public Tool
 {
 	Q_OBJECT
 public:
-	DummyTool();
+	explicit DummyTool(const std::string& uid="");
 	~DummyTool();
 	virtual Type getType() const;
 	virtual std::string getGraphicsFileName() const;
@@ -39,6 +39,7 @@ public:
 
 	void setToolPositionMovement(const std::vector<Transform3D>& positions);
 	void set_prMt(const Transform3D& ptMt);
+	void setVisible(bool val);
 
 private slots:
 	virtual void sendTransform();

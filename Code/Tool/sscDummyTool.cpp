@@ -19,13 +19,13 @@ namespace ssc
 
 int DummyTool::mTransformCount = 0;
 
-DummyTool::DummyTool() :
+DummyTool::DummyTool(const std::string& uid) :
 	mVisible(false),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer())
 {
-	mUid = "DummyToolUid";
-	mName = "DummyToolName";
+	mUid = "DummyToolUid_"+uid;
+	mName = "DummyToolName_"+uid;
 
 	mTransforms = createToolPositionMovement();
 
@@ -105,6 +105,11 @@ void DummyTool::stopTracking()
 	mVisible = false;
 	emit toolVisible(mVisible);
 }
+void DummyTool::setVisible(bool val)
+{
+	mVisible = val;
+	emit toolVisible(mVisible);	
+}
 void DummyTool::sendTransform()
 {
 	set_prMt(*getNextTransform());
@@ -127,7 +132,7 @@ void DummyTool::createPolyData()
 }
 std::vector<Transform3D> DummyTool::createToolPositionMovement() const
 {
-	std::cout<<"createToolPositionMovement"<<std::endl;
+	//std::cout<<"createToolPositionMovement"<<std::endl;
     std::vector<Transform3D> retval;
 
     Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);

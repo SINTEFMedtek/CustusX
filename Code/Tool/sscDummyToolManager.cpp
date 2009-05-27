@@ -118,6 +118,7 @@ void DummyToolManager::setDominantTool(const std::string& uid)
 {
 	DummyToolMapConstIter it = mDummyTools->find(uid);
 	mDominantTool = (*it).second;
+	emit dominantToolChanged(uid);
 }
 
 std::map<std::string, std::string> DummyToolManager::getToolUidsAndNames() const
