@@ -58,6 +58,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	//mReslicer->SetInput(mImage->getRefVtkImageData());	
 	mReslicer->SetInput(mImage->getBaseVtkImageData());
 	mWindowLevel->SetLookupTable( image->getLookupTable2D().getLookupTable() );
+	mWindowLevel->SetOutputFormatToRGBA();
 	mWindowLevel->Update();
 }
 
