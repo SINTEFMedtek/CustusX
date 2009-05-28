@@ -21,7 +21,7 @@ class DummyTool : public Tool
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(const std::string& uid="");
+	explicit DummyTool(const std::string& uid="dummytool");
 	~DummyTool();
 	virtual Type getType() const;
 	virtual std::string getGraphicsFileName() const;

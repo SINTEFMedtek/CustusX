@@ -24,8 +24,8 @@ DummyTool::DummyTool(const std::string& uid) :
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer())
 {
-	mUid = "DummyToolUid_"+uid;
-	mName = "DummyToolName_"+uid;
+	mUid = uid;
+	mName = uid;
 
 	mTransforms = createToolPositionMovement();
 
