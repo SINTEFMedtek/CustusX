@@ -30,68 +30,6 @@
 using ssc::Vector3D;
 using ssc::Transform3D;
 
-AcceptanceBox::AcceptanceBox(QString text, QWidget* parent) : QFrame(parent)
-{
-#ifdef SSC_AUTOMATIC_TEST_ACCEPT
-	text += "\n[Auto mode: Accepted after " + QString::number(SSC_DEFAULT_TEST_TIMEOUT_SECS) + "s]";
-#endif	
-	
-	mAccepted = false;
-	QVBoxLayout* top = new QVBoxLayout(this);
-	QHBoxLayout* buttons = new QHBoxLayout;
-	mText = new QLabel(text);
-	mText->setFont(QFont("Arial", 14, 75));
-	top->addWidget(mText);
-	top->addLayout(buttons);
-	mAcceptButton = new QPushButton("Accept");
-	mRejectButton = new QPushButton("Reject");
-	buttons->addWidget(mAcceptButton);
-	//buttons->addStretch();
-	buttons->addWidget(mRejectButton);
-	connect(mAcceptButton, SIGNAL( clicked()), this, SLOT(accept()) );	
-	connect(mRejectButton, SIGNAL( clicked()), this, SLOT(reject()) );
-	mAcceptButton->setFocus();
-	//mAcceptButton->setShortcut(Qt::Key_Enter);
-}
-
-bool AcceptanceBox::accepted() const
-{
-	return mAccepted;
-}
-
-/**trigger an event when shown. This gives visibility of the
- * widget in a specified time (putting it in the constructor will
- * include first render time in the shown time) 
- */
-void AcceptanceBox::showEvent ( QShowEvent * event )
-{
-	QWidget::showEvent(event);
-
-	// autofinish if auto (this define lies in ssc/Code/Utilities/sscConfig.h.in)
-	#ifdef SSC_AUTOMATIC_TEST_ACCEPT
-	std::cout << "autofinishing..." << std::endl;	
-	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, this, SLOT(accept())); // terminate app after some seconds - this is an automated test!!	
-	#endif	
-}
-
-void AcceptanceBox::accept()
-{
-	finish(true);
-}
-
-void AcceptanceBox::reject()
-{
-	finish(false);	
-}
-
-void AcceptanceBox::finish(bool accepted)
-{
-	mAccepted = accepted;
-	std::cout << "success: " << accepted << std::endl;	
-	emit finished(mAccepted);
-	qApp->quit();
-}
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -216,10 +154,12 @@ void ViewsWindow::start(bool showSliders)
 	mainLayout->addLayout(mSliceLayout);//Slice layout
 
 	QHBoxLayout *controlLayout = new QHBoxLayout;
+	controlLayout->addStretch();
 	
-	mAcceptanceBox = new AcceptanceBox(mDisplayText); 
+	mAcceptanceBox = new ssc::AcceptanceBoxWidget(mDisplayText); 
 	controlLayout->addWidget(mAcceptanceBox);
 
+	controlLayout->addStretch();
 	mainLayout->addLayout(controlLayout); //Buttons
 
 	if (showSliders)

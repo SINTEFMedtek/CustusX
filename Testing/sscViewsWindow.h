@@ -6,6 +6,7 @@
 
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
+#include "sscAcceptanceBoxWidget.h"
 
 //class SingleLayout
 //{
@@ -14,39 +15,6 @@
 //	ssc::SliceProxyPtr mSlicer;         
 //	ssc::SliceRepSWPtr mSliceRep;  ///en vector av slice overlay....
 //};
-
-/**Widget that displays two buttons: accept and reject.
- * The result will emit a finished(bool) signal. - true=accepted, false=rejected
- * 
- * Intended use: During automated tests, the user can accept/reject the graphical
- * test result using these buttons. Connect the signal to the return value of the
- * test function or similar.
- * 
- * Clicking the button will also send a quit() to the application.
- *  
- * In automatic mode, the accept button is clicked automatically after 2 seconds.
- */
-class AcceptanceBox : public QFrame
-{
-	Q_OBJECT
-	
-public:
-	AcceptanceBox(QString text, QWidget* parent = 0);
-	bool accepted() const;
-signals:
-	void finished(bool);
-private:
-	bool mAccepted;
-	void finish(bool accepted);
-	QLabel* mText;
-	QPushButton* mAcceptButton;
-	QPushButton* mRejectButton;
-protected:
-	virtual void showEvent(QShowEvent * event);
-private slots:
-	void accept();
-	void reject();	
-};
 
 
 /**Test class  with convenience methods for defining views.
@@ -87,7 +55,7 @@ private:
 	int mTotalRender;
 	int mTotalOther;
 	QTime mLastRenderEnd;
-	AcceptanceBox* mAcceptanceBox; 
+	ssc::AcceptanceBoxWidget* mAcceptanceBox; 
 	
 	
 public slots:

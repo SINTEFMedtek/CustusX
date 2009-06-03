@@ -133,6 +133,9 @@ void SliceRepSW::sliceTransformChangedSlot(Transform3D sMr)
 
 void SliceRepSW::update()
 {
+	if (!mSlicer || !mImage)
+		return;
+	
 	Transform3D rMs = mSlicer->get_sMr().inv();
 	Transform3D iMr = mImage->get_rMd().inv();	
 	Transform3D M = iMr*rMs;

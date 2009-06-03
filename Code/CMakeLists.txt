@@ -20,6 +20,7 @@ endif(COMMAND cmake_policy)
 
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
+    Utilities/sscAcceptanceBoxWidget.h
     Data/sscImage.h
     Data/sscImageTF3D.h
     Data/sscDataManager.h
@@ -80,6 +81,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscTransform3D.cpp 
     Utilities/sscSliceComputer.cpp 
     Utilities/sscIndent.cpp
+    Utilities/sscAcceptanceBoxWidget.cpp
     sscView.cpp
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp
