@@ -85,6 +85,27 @@ void SliceProxy::centerChangedSlot()
 	changed();
 }
 
+/**Group the typical plane definition uses together.
+ */
+void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
+{
+	setPlane(plane);
+	//Logger::log("vm.log"," set plane to proxy ");
+	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
+	{
+		setOrientation(ssc::otORTHOGONAL);
+		setFollowType(ssc::ftFIXED_CENTER);
+	}
+	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+	{
+		setOrientation(ssc::otOBLIQUE);
+		setFollowType(ssc::ftFOLLOW_TOOL);
+		
+		setGravity(useGravity, gravityDir);
+		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one		
+	}
+}
+
 void SliceProxy::setOrientation(ORIENTATION_TYPE orientation)
 {
 	mCutplane.setOrientationType(orientation);	

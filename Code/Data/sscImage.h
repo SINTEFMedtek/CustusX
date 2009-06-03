@@ -58,7 +58,7 @@ public:
 	void printLandmarks(); //TODO: JUST FOR TESTING
 	double getAlpha();//TODO: JUST FOR TESTING
 	void setAlpha(double val);//TODO: JUST FOR TESTING
-	DoubleBoundingBox3D boundingBox() const;
+	DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	///preset colorTabel
 	void setClut(vtkLookupTablePtr clut);
 	double treshold();

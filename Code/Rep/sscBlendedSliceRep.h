@@ -1,6 +1,7 @@
 #ifndef SSCLAYERSLICEREP_H_
 #define SSCLAYERSLICEREP_H_
 #include <vtkSmartPointer.h>
+#include <vector>
 #include "sscDefinitions.h"
 #include "sscForwardDeclarations.h"
 #include "sscTool.h"
@@ -9,7 +10,7 @@
 #include "sscSliceComputer.h"
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
-#include "sscImageBlenderProxy.h"
+//#include "sscImageBlenderProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscSlicedImageProxy.h"
 
@@ -22,8 +23,10 @@ namespace ssc
 {
 typedef boost::shared_ptr<class BlendedSliceRep> BlendedSliceRepPtr;
 
-/**Represenation for one Image.
- * Use this to slice an image.
+/**Slice a list of volumes using a SliceProxy.
+ * The volumes are blended together during the slice process.
+ * 
+ * Used as the slicer for multi-layer slicing in Sonowand 2.1.
  */
 class BlendedSliceRep : public RepImpl
 {	

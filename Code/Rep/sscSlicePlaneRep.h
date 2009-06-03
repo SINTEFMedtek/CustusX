@@ -12,8 +12,10 @@ namespace ssc
 {
 typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
 
-/**Represenation for one Image.
- * Use this to slice an image.
+/**A slicer implementation. 
+ * Unknown functionality.
+ * 
+ * Used only as experimental feature in Sonowand.
  */
 class SlicePlaneRep : public RepImpl
 {

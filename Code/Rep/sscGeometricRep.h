@@ -15,6 +15,8 @@ typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
 
 /**Represenation for one Mesh.
  * Use this to render geometric poly data in a 3D scene.
+ * 
+ * Used by CustusX.
  */
 class GeometricRep : public RepImpl
 {

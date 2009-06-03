@@ -13,6 +13,9 @@ typedef boost::shared_ptr<class SliceRep> SliceRepPtr;
 
 /**Represenation for one Image.
  * Use this to slice an image.
+ * 
+ * NOT IN USE BY ANYONE! 
+ * If you want to use this class, test is thoroughly first!!
  */
 class SliceRep : public RepImpl
 {

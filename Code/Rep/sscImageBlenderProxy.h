@@ -21,10 +21,11 @@ namespace ssc
 //----------------------------------------------------------
 typedef boost::shared_ptr<class ImageBlenderProxy> ImageBlenderProxyPtr;
 
-/**
- * blend together multiple image, with predefined color tables....
+/**Part of sonowand test implementation of image blending.
+ * 
+ * NOT IN USE!
+ * 
  */
-
 class ImageBlenderProxy : public QObject
 {
 	Q_OBJECT

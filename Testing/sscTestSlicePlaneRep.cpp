@@ -36,6 +36,8 @@
 using ssc::Vector3D;
 using ssc::Transform3D;
 
+/** TODO This test is incomplete and is removed from the autotest framework.
+ */
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);

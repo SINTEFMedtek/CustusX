@@ -12,6 +12,9 @@
 //namespace ssc
 //{
 
+/**Test loading images from file and inserting them into DataManager
+ * 
+ */
 int main(int argc, char **argv)
 {
 	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;

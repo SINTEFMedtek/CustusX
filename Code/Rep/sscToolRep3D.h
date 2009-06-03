@@ -15,6 +15,12 @@ namespace ssc
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
+/**Display a 3D representation of a ssc::Tool.
+ * The representation to use is extracted from the tool itself.
+ * 
+ * Used by Sonowand.
+ * Used by CustusX.
+ */
 class ToolRep3D : public RepImpl
 {
 	Q_OBJECT

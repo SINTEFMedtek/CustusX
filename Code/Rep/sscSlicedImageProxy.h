@@ -18,6 +18,10 @@ namespace ssc
 
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
 
+/**Used internally by BlendedSliceRep, 
+ * as the slice engine.
+ * Used by Sonowand 2.1
+ */
 class SlicedImageProxy : public QObject
 {
 	Q_OBJECT

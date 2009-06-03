@@ -87,6 +87,11 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 
 ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE type)
 {
+	if (mImages.count(filename)) // dont load same image twice
+	{
+		return mImages[filename];
+	}	
+	
 	if (type==rtAUTO)
 	{
 		// do special stuff

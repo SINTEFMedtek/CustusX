@@ -24,6 +24,10 @@ namespace ssc
 {
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 
+/**Slice a volume using a SliceProxy.
+ * 
+ * Used as main slicer for single volume slicing in Sonowand.
+ */
 class SliceRepSW : public RepImpl
 {
 	Q_OBJECT

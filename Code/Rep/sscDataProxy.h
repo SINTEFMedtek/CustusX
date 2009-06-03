@@ -11,6 +11,9 @@ namespace ssc
 
 typedef boost::shared_ptr<class Image> ImagePtr;
 
+/**Not used by anyone.
+ * 
+ */
 class ImageProxy
 {
 public:

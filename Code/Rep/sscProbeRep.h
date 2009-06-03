@@ -27,6 +27,9 @@ typedef boost::shared_ptr<class Vector3D> Vector3DPtr;
 
 /**
  * Representation of points picked in an image.
+ * 
+ * Used by CustusX.
+ * Not used by Sonowand - will be used in a future releasee.
  */
 class ProbeRep : public RepImpl
 {

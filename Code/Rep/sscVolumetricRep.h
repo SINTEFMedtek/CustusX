@@ -16,8 +16,11 @@ namespace ssc
 {
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
-/**Represenation for one Image.
+/**Representation for one Image.
  * Use this to render volumetric image data in a 3D scene.
+ * 
+ * Used by Sonowand.
+ * Used by CustusX.
  */
 class VolumetricRep : public RepImpl
 {

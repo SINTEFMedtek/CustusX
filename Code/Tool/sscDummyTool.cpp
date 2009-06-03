@@ -139,13 +139,25 @@ std::vector<Transform3D> DummyTool::createToolPositionMovement() const
     Transform3D r = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
     Transform3D t = createTransformTranslate(Vector3D(-10,-11,0));
 
-    for (unsigned i=0; i<40; ++i)
+    for (unsigned i=0; i<50; ++i)
     {
         Transform3D t_delta = createTransformTranslate(Vector3D(2,0,0));
         t = t_delta * t;
         retval.push_back(t * r);
     }
+    for (unsigned i=0; i<50; ++i)
+    {
+        Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
+        r = r_delta * r;
+        retval.push_back(t * r);
+    }
     for (unsigned i=0; i<100; ++i)
+    {
+        Transform3D t_delta = createTransformTranslate(Vector3D(0,0,2));
+        t = t_delta * t;
+        retval.push_back(t * r);
+    }
+    for (unsigned i=0; i<50; ++i)
     {
         Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
         r = r_delta * r;
@@ -153,14 +165,8 @@ std::vector<Transform3D> DummyTool::createToolPositionMovement() const
     }
     for (unsigned i=0; i<50; ++i)
     {
-        Transform3D t_delta = createTransformTranslate(Vector3D(0,0,2));
+        Transform3D t_delta = createTransformTranslate(Vector3D(-2,0,0));
         t = t_delta * t;
-        retval.push_back(t * r);
-    }
-    for (unsigned i=0; i<100; ++i)
-    {
-        Transform3D r_delta = createTransformRotateZ(-M_PI*0.01);
-        r = r_delta * r;
         retval.push_back(t * r);
     }
     return retval;

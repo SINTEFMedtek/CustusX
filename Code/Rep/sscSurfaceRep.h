@@ -15,6 +15,10 @@ namespace ssc
 {
 typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
 
+/**
+ * NOT IN USE BY ANYONE! 
+ * If you want to use this class, test is thoroughly first!!
+ */
 class SurfaceRep : public RepImpl
 {
   Q_OBJECT

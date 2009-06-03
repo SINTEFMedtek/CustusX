@@ -11,8 +11,10 @@
 namespace ssc
 {
 
-/**helper class that connects to a tool and generates slice
+/**Helper class that connects to a tool and generates slice
  * matrices based on it and other slice parameters.
+ * 
+ * Used as the slicer in Sonowand.
  */
 class SliceProxy : public QObject
 {
@@ -25,6 +27,7 @@ public:
 	void setOrientation(ORIENTATION_TYPE orientation );
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
+	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset);
 	
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset); 

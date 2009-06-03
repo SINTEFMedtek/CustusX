@@ -18,6 +18,10 @@ typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolum
  * The rendering will be performed at progressively higher sample rates, thus
  * the user will get immediate feedback at low detail, and when the high-resolution
  * rendering is finished (in another thread) the display will be updated.
+ * 
+ * Used by Sonowand.  
+ * 
+ * Not working for Windows and Mac. OK on Fedora.
  *
  */
 class ProgressiveLODVolumetricRep : public RepImpl
