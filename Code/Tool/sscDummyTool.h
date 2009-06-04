@@ -3,6 +3,7 @@
 
 #include "sscTool.h"
 #include <vector>
+#include "sscBoundingBox3D.h"
 
 typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
 typedef boost::shared_ptr<class QTimer> QTimerPtr;
@@ -38,6 +39,7 @@ public:
 	void stopTracking();
 
 	void setToolPositionMovement(const std::vector<Transform3D>& positions);
+	void setToolPositionMovementBB(const DoubleBoundingBox3D& bb);
 	void set_prMt(const Transform3D& ptMt);
 	void setVisible(bool val);
 
@@ -46,8 +48,9 @@ private slots:
 
 private:
 	void createPolyData();
-	std::vector<Transform3D> createToolPositionMovement() const;
+	std::vector<Transform3D> createToolPositionMovement(const DoubleBoundingBox3D& bb) const;
 	Transform3D* getNextTransform();
+	void createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const;
 
 	vtkPolyDataPtr mPolyData;
 
