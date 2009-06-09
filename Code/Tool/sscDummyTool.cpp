@@ -141,7 +141,7 @@ void DummyTool::createPolyData()
 void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const
 {
 	Vector3D u = (b-a).normal();
-	unsigned N = round((b-a).length()/step);
+	unsigned N = (unsigned)round((b-a).length()/step);
 	Transform3D& T = *T_in;
 	
 	for (unsigned i=0; i<N; ++i)

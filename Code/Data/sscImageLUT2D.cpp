@@ -88,7 +88,7 @@ void ImageLUT2D::printToFile()
 	
 void ImageLUT2D::setAlphaRange(double alpha)
 {
-	int scale = this->getScalarMax() + 1.0 / mLookupTable->GetTableRange()[1];
+	int scale = (int)(this->getScalarMax() + 1.0 / mLookupTable->GetTableRange()[1]);
 	int r = (int)alpha / scale;
 	mLookupTable->SetAlphaRange(0.0 ,r);
 	mLookupTable->SetAlphaRange(r , 1.0);
@@ -172,8 +172,9 @@ void ImageLUT2D::changeOpacityForAll(double opacity )
 }
 
 /*this is a version off a llr method on Alpha channel on the lookuptable*/
-void ImageLUT2D::changeOpacity(double index, double opacity)
+void ImageLUT2D::changeOpacity(double index_dbl, double opacity)
 {
+	int index = (int)index_dbl;
 	int noValues = mLookupTable->GetNumberOfTableValues();
 	double scale = (getScalarMax()+1)/noValues; 	
 	index = (int)(index/scale);	
