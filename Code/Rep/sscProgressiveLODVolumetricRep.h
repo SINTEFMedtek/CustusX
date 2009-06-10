@@ -45,6 +45,7 @@ protected:
 	VolumetricRepPtr getNextResampleLevel();
 	void startThread(VolumetricRepPtr rep);
 	VolumetricRepPtr mCurrent;
+	bool mClearing; ///< quick fix for shutting down faster
 	vtkAssemblyPtr mAssembly;
 	View* mView;
 	std::vector<double> mResampleFactors;

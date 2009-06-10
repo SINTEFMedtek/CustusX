@@ -69,6 +69,7 @@ private:
 ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name)
 {
+	mClearing = false;
 	mAssembly = vtkAssemblyPtr::New();
 	mView = NULL;
 	resetResampleList();
@@ -159,6 +160,8 @@ void ProgressiveLODVolumetricRep::startThread(VolumetricRepPtr rep)
 {
 	if (!rep)
 		return;
+	if (mClearing)
+		return;
 	mThread.reset(new VolumetricRepThreadedRenderer(rep));
 	connect(mThread.get(), SIGNAL(finished()), this, SLOT(volumetricThreadFinishedSlot()));
 	mThread->start();
@@ -173,8 +176,10 @@ void ProgressiveLODVolumetricRep::clearThreads()
 {
 	if (mThread)
 	{
+		mClearing = true;
 		disconnect(mThread.get(), SIGNAL(finished()), this, SLOT(volumetricThreadFinishedSlot()));
 		mThread->wait(10000); // wait 10s for each thread... should be fast though.
+		mClearing = false;
 	}
 }
 

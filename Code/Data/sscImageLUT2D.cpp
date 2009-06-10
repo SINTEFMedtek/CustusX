@@ -52,11 +52,11 @@ void ImageLUT2D::setLookupTable(vtkLookupTablePtr lut)
 	mImageMapToColor->SetLookupTable(mLookupTable);
 }
 
-void ImageLUT2D::setImportedLut(vtkLookupTablePtr lut)
-{
-	mBaseLut = lut;
-	this->setLookupTable(mBaseLut);
-}
+//void ImageLUT2D::setImportedLut(vtkLookupTablePtr lut)
+//{
+//	mBaseLut = lut;
+//	this->setLookupTable(mBaseLut);
+//}
 vtkImageMapToColorsPtr ImageLUT2D::getColorMap()
 {
 	return mImageMapToColor;

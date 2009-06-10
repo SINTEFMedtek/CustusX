@@ -43,18 +43,18 @@ public:
 	void changeOpacityForAll(double opacity);
 	void changeOpacity(double index, double opacity);
 	void setTable(vtkUnsignedCharArray *  table);
-	void setImportedLut(vtkLookupTablePtr lut); //temporary method....
+	//void setImportedLut(vtkLookupTablePtr lut); //temporary method....
 	
 	vtkImageMapToColorsPtr getColorMap();
 
 private:
 	void printToFile();
-	vtkScalarsToColorsPtr mScalarToColor;
-	vtkLookupTablePtr mBaseLut;
+	//vtkScalarsToColorsPtr mScalarToColor;
+	//vtkLookupTablePtr mBaseLut;
 	vtkLookupTablePtr mLookupTable;
 	
-	vtkWindowLevelLookupTablePtr mColorLookupTable;
-	vtkPiecewiseFunctionPtr mLowLevel;
+	//vtkWindowLevelLookupTablePtr mColorLookupTable;
+	//vtkPiecewiseFunctionPtr mLowLevel;
 	vtkImageDataPtr mBase;
 	vtkImageMapToColorsPtr mImageMapToColor;
 	double mLLR;

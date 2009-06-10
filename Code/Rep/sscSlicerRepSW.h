@@ -11,6 +11,8 @@
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
 
+#include "sscSlicedImageProxy.h"
+
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
@@ -37,9 +39,8 @@ public:
 	virtual std::string getType() const { return "ssc::SliceRepSW"; };
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
-	void setInput(vtkImageDataPtr input);
-	ImagePtr getImage() { return mImage; };
-	vtkImageActorPtr getActor(){ return mImageActor; };
+	ImagePtr getImage();
+	vtkImageActorPtr getActor();
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	std::string getImageUid()const;
 	void update();
@@ -49,18 +50,9 @@ protected:
 	SliceRepSW(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
 	virtual void removeRepActorsFromViewRenderer(View* view) ;
-
-private slots:
-	void sliceTransformChangedSlot(Transform3D sMr); 
 		
 private:
-	ImagePtr mImage;
-
-	SliceProxyPtr mSlicer;
-	vtkWindowLevelLookupTablePtr mLookupTable;
-	vtkImageMapToColorsPtr mWindowLevel;
-	vtkImageReslicePtr mReslicer;
-	vtkMatrix4x4Ptr mMatrixAxes;
+	SlicedImageProxyPtr mImageSlicer;
 	vtkImageActorPtr mImageActor;
 };	
 

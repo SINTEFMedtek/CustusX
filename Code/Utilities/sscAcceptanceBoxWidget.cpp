@@ -10,9 +10,12 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	mAccepted = false;
 	QVBoxLayout* top = new QVBoxLayout(this);
 	QHBoxLayout* buttons = new QHBoxLayout;
+	QLabel* preText = new QLabel("Accept the following statement:");
+	preText->setFont(QFont("Arial", 12));
 	mText = new QLabel;
 	setText(text);
 	mText->setFont(QFont("Arial", 14, 75));
+	top->addWidget(preText);
 	top->addWidget(mText);
 	top->addLayout(buttons);
 	mAcceptButton = new QPushButton("Accept");
@@ -28,7 +31,7 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 
 void AcceptanceBoxWidget::setText(QString text)
 {
-	text = "Accept the following statement:\n" + text;
+	//text = "Accept the following statement:\n" + text;
 	
 #ifdef SSC_AUTOMATIC_TEST_ACCEPT
 	text += "\n[Auto mode: Accepted after " + QString::number(SSC_DEFAULT_TEST_TIMEOUT_SECS) + "s]";
