@@ -3,4 +3,4 @@
 // default timeout for automated tests (in the Testing folder)
 #define SSC_DEFAULT_TEST_TIMEOUT_SECS 2
 // auto-accept tests that require user acceptance
-#define SSC_AUTOMATIC_TEST_ACCEPT 
+//#define SSC_AUTOMATIC_TEST_ACCEPT 
