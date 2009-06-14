@@ -10,10 +10,12 @@
 #include <vtkTexture.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
+
 #include "sscView.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
 #include "sscBoundingBox3D.h"
+#include "sscImageLUT2D.h"
 
 //---------------------------------------------------------	
 namespace ssc
@@ -57,21 +59,18 @@ void BlendedSliceRep::setSliceProxy(SliceProxyPtr slicer)
 void BlendedSliceRep::setImages(std::vector<ImagePtr> images)
 {
 	for (unsigned int i = 0; i< images.size(); ++i)
-	//for (unsigned int i = 0; i< 1; ++i)
 	{
 		std::cout<<"slice image: id"<<images.at(i)->getUid()<<std::endl;
 		ImagePtr image = images.at(i);
-		connect(image.get(), SIGNAL(alphaChange()), this, SLOT(updateAlphaSlot()));
-		connect(image.get(), SIGNAL(thresholdChange(double)), this, SLOT(updateThresholdSlot(double)));
+		connect(image.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateAlphaSlot()));
+//		connect(image.get(), SIGNAL(thresholdChange(double)), this, SLOT(updateThresholdSlot(double)));
 		SlicedImageProxyPtr slicedImage(new ssc::SlicedImageProxy());
 		slicedImage->setSliceProxy(mSlicer);
 		slicedImage->setImage(image);
 		slicedImage->update();
 		mSlices.push_back(slicedImage);
 		addInputImages(slicedImage->getOutput());
-	}
-	
-	
+	}	
 }
 
 void BlendedSliceRep::addInputImages(vtkImageDataPtr slicedImage)
@@ -100,7 +99,7 @@ double BlendedSliceRep::getAlpha(int countImage)
 {
 	if (countImage<int(mSlices.size()))
 	{
-		return mSlices[countImage]->getImage()->getAlpha();
+		return mSlices[countImage]->getImage()->getLookupTable2D()->getAlpha();
 	}
 	else
 	{
@@ -124,12 +123,12 @@ void BlendedSliceRep::update()
 	updateAlphaSlot();
 }
 
-void BlendedSliceRep::updateThresholdSlot(double val)
-{
-	val = val/100.0;
-	std::cout<<"mBlender got threshold :"<<val<<std::endl;
-	mBlender->SetCompoundThreshold(val);
-}
+//void BlendedSliceRep::updateThresholdSlot(double val)
+//{
+//	val = val/100.0;
+//	std::cout<<"mBlender got threshold :"<<val<<std::endl;
+//	mBlender->SetCompoundThreshold(val);
+//}
 
 /**SLOT 
  *this get signal if alpha changes.. will excecute render pipeline
@@ -138,6 +137,7 @@ void BlendedSliceRep::updateAlphaSlot()
 {
 	for (int i=0; i<mBlender->GetNumberOfInputs(); i++)
 	{
+		//std::cout << "getAlpha(i) " << getAlpha(i) << std::endl;
 		mBlender->SetOpacity(i, getAlpha(i));
 		mBlender->Update();
 	}

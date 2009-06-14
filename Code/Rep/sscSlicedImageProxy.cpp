@@ -1,6 +1,7 @@
 #include "sscSlicedImageProxy.h"
 
 #include <boost/lexical_cast.hpp>
+
 #include <vtkImageActor.h>
 #include <vtkImageReslice.h>
 #include <vtkImageMapToWindowLevelColors.h>
@@ -12,6 +13,7 @@
 #include "sscView.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
+#include "sscImageLUT2D.h"
 
 namespace ssc
 {
@@ -55,14 +57,10 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	mImage = image;
 	if (mImage)
 	{
-#ifdef USE_TRANSFORM_RESCLICER
-		mReslicer->SetInput(mImage->getRefVtkImageData());
-#else
 		mReslicer->SetInput(mImage->getBaseVtkImageData());
-#endif
 		//mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 		//mWindowLevel->SetOutputFormatToRGBA();
-		mWindowLevel->SetLookupTable(image->getLookupTable2D().getLookupTable());
+		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getLookupTable());
 		mWindowLevel->Update();
 	}
 
@@ -95,11 +93,7 @@ void SlicedImageProxy::update()
 	Transform3D iMr = mImage->get_rMd().inv();
 	Transform3D M = iMr*rMs;
 
-#ifdef USE_TRANSFORM_RESCLICER
-	mMatrixAxes->DeepCopy(rMs.matrix());
-#else
 	mMatrixAxes->DeepCopy(M.matrix());
-#endif
 
 	//	Transform3D rMs = mSlicer->get_sMr().inv();
 	//	mMatrixAxes->DeepCopy(rMs.matrix());

@@ -4,7 +4,6 @@
 #include <set>
 
 #include <boost/shared_ptr.hpp>
-#include <vtkImageAccumulate.h>
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -15,16 +14,16 @@ typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
 
 #include "sscData.h"
 #include "sscRep.h"
-#include "sscImageTF3D.h"
-#include "sscImageLUT2D.h"
-typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
+
+class QDomNode;
+class QDomDocument;
+
+#include "sscForwardDeclarations.h"
 
 //#define USE_TRANSFORM_RESCLICER
 
 namespace ssc
 {
-
-//typedef boost::weak_ptr<class ImageProxy> ImageProxyWeakPtr;
 
 /**One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
@@ -51,18 +50,12 @@ public:
 	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
 
 	ImageTF3DPtr getTransferFunctions3D();
-	ImageLUT2D& getLookupTable2D();
+	ImageLUT2DPtr getLookupTable2D();
 
 	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 	void printLandmarks(); //TODO: JUST FOR TESTING
-	double getAlpha();//TODO: JUST FOR TESTING
-	void setAlpha(double val);//TODO: JUST FOR TESTING
 	DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
-	///preset colorTabel
-	void setClut(vtkLookupTablePtr clut);
-	double treshold();
-	void setTreshold( double val );
 	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
 	int getMax();///< \return Max alpha position in the histogram = max key value in map
 	int getMin();///< \return Min alpha position in the histogram = min key value in map
@@ -76,9 +69,10 @@ signals:
 	void landmarkRemoved(double x, double y, double z, unsigned int index);
 	void landmarkAdded(double x, double y, double z, unsigned int index);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
+	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	void transformChanged(); ///< emitted when transform is changed
-	void alphaChange(); ///<blending alpha
-	void thresholdChange(double val); 
+	//void alphaChange(); ///<blending alpha
+	//void thresholdChange(double val); 
 
 public slots:
 	void addLandmarkSlot(double x, double y, double z, unsigned int index);
@@ -89,25 +83,17 @@ protected slots:
 
 protected:
 	ImageTF3DPtr mImageTransferFunctions3D;
-	ImageLUT2D mImageLookupTable2D;
+	ImageLUT2DPtr mImageLookupTable2D;
 
 	std::string mUid;
 	std::string mName;
-	vtkLookupTablePtr mLut;
+
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
+	
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
 	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
-
-	//Cannot remove points from vtkPoint, using vtkDoubleArray instead,
-	// to create vtkPoints if/when needed:
-	// vtkPointsPtr points = vtkPoints::New();
-	// points->SetData(mLandmarks);
-	//vtkPointsPtr mLandmarks;
-	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)
-	double mAlpha ;
-	double mTreshold;
-	
+	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)	
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 };
 

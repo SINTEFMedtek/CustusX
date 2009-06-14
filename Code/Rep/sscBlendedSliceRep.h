@@ -46,7 +46,7 @@ protected:
 	
 private slots:
 	void updateAlphaSlot();
-	void updateThresholdSlot(double val);
+//	void updateThresholdSlot(double val);
 private:
 	double getAlpha(int countImage);	
 	bool firstImage;

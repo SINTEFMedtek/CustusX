@@ -1,12 +1,17 @@
 #include "sscImage.h"
 
+#include <sstream>
+#include <QDomDocument>
+
+#include <vtkImageAccumulate.h>
 #include <vtkImageReslice.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkDoubleArray.h>
 #include <vtkLookupTable.h>
-#include <sstream>
-#include <QDomDocument>
+
+#include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 
 namespace ssc
 {
@@ -17,36 +22,27 @@ Image::~Image()
 
 Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mImageTransferFunctions3D(new ImageTF3D(data)),
-	mImageLookupTable2D(data),
+	mImageLookupTable2D(new ImageLUT2D(data)),
 	mUid(uid), mName(uid), mBaseImageData(data),
 	mLandmarks(vtkDoubleArray::New())
 {
 	std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
-#ifdef USE_TRANSFORM_RESCLICER
-	//mBaseImageData->ReleaseDataFlagOn();
-	mOrientator = vtkImageReslicePtr::New();
-	mOrientator->AutoCropOutputOn();
-	mOrientator->SetInput(mBaseImageData);
-	mOutputImageData = mOrientator->GetOutput();
-	//mOutputImageData->Update();
-	mOutputImageData->UpdateInformation();
-#endif
 	mLandmarks->SetNumberOfComponents(4);
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-	mAlpha = 0.5; 
-	mTreshold = 1.0;
+	//mAlpha = 0.5; 
+	//mTreshold = 1.0;
 	
 	// Add initial values to the transfer functions
 	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
-	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), 
-																					//1.0);
-																					this->getMaxAlphaValue());
+	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
 	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
 	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
 	
   connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-					this, SLOT(transferFunctionsChangedSlot()));
+					this, SLOT(transferFunctionsChangedSlot())); // TODO: This signal causes VolumetricRep to re-create itself. change to the one below?? (CA)
+  connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
+					this, SIGNAL(transferFunctionsChanged()));
 	
 	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
 }
@@ -62,12 +58,6 @@ void Image::set_rMd(Transform3D rMd)
 		return;
 	}
 
-#ifdef USE_TRANSFORM_RESCLICER
-	mOrientator->SetResliceAxes(m_rMd.inv().matrix());
-	mOutputImageData->UpdateInformation();
-	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-#endif
-
 	emit transformChanged();
 }
 
@@ -75,51 +65,11 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
 	std::cout << "Image::setVtkImageData() " << std::endl;
 	mBaseImageData = data;
-#ifdef USE_TRANSFORM_RESCLICER
-	mOrientator->SetInput(mBaseImageData);
-	mOrientator->SetResliceAxes(m_rMd.inv().matrix());
-	mOutputImageData->Update();
-	mOutputImageData->UpdateInformation();
-	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-#else
 	mOutputImageData = mBaseImageData;
-#endif
 	mImageTransferFunctions3D->setVtkImageData(data);
-	mImageLookupTable2D = ImageLUT2D(data);
+	mImageLookupTable2D->setVtkImageData(data);
 
 	emit vtkImageDataChanged();
-}
-void Image::setClut(vtkLookupTablePtr clut)
-{
-	mImageLookupTable2D.setLookupTable( clut );
-	std::cout<<"ssc::Image, set new lut"<<std::endl;
-}
-
-double Image::treshold()
-{
-	return mTreshold;
-}
-
-void Image::setTreshold( double val )
-{
-	if( similar(mTreshold ,val))
-		return;
-	std::cout<<"ssc::Image, got threshold :"<<val<<std::endl;
-	mTreshold = val;
-	emit thresholdChange(val);
-}
-
-double Image::getAlpha()
-{
-	return mAlpha;
-}
-
-void Image::setAlpha(double val)
-{
-	if (similar(mAlpha, val))
-		return;
-	mAlpha = val;
-	emit alphaChange();
 }
 
 ImageTF3DPtr Image::getTransferFunctions3D()
@@ -127,7 +77,7 @@ ImageTF3DPtr Image::getTransferFunctions3D()
 	return mImageTransferFunctions3D;
 }
 
-ImageLUT2D& Image::getLookupTable2D()
+ImageLUT2DPtr Image::getLookupTable2D()
 {
 	return mImageLookupTable2D;
 }

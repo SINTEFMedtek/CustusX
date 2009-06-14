@@ -51,6 +51,8 @@ public:
 	void setColorTF(vtkColorTransferFunctionPtr tf);
 	vtkColorTransferFunctionPtr getColorTF();
 
+	void setAlpha(double val);
+	double getAlpha() const;	
 	void setLLR(double val);
 	double getLLR() const;
 	void setWindow(double val);
@@ -92,6 +94,7 @@ private:
 	double mLLR;
 	double mWindow;
 	double mLevel;
+	double mAlpha;
 	vtkLookupTablePtr mLut;
 	
 	OpacityMapPtr mOpacityMapPtr;

@@ -15,6 +15,7 @@
 #include <QColor>
 #include <QDomDocument>
 #include <QStringList>
+#include "sscVector3D.h"
 
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 
@@ -34,29 +35,15 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mLevel = max/2.0; 
 	mWindow = max;
 	mLLR = 0.0;
-
+	mAlpha = 1.0;
 	
-	// nice CT_color...
-//	mColorTF->AddRGBPoint( -3024, 0, 0, 0, 0.5, 0.0 );
 	mColorTF->SetColorSpaceToRGB();
 	
-	
-//	mColorTF->AddRGBPoint( 500, .88, .60, .29, 0.33, 0.45 );
-//	mColorTF->AddRGBPoint( 1000, .62, .36, .18, 0.5, 0.0 );
-//	mColorTF->AddRGBPoint( 3071, .83, .66, 1, 0.5, 0.0 );
-
-//	mOpacityTF->AddPoint(-3024, 0, 0.5, 0.0 );
-//	mOpacityTF->AddPoint(500, 1.0, 0.33, 0.45 );
-//	mOpacityTF->AddPoint(1000, 0, 0.5, 0.0 );
-//	mOpacityTF->AddPoint(3071, 1.0, 0.5, 0.0);
-//	
 	mOpacityTF->AddPoint(0.0, 0.0);
 	mOpacityTF->AddPoint(max, 1.0);
 	
-	
 	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
-	
 }
 	
 void ImageTF3D::setVtkImageData(vtkImageDataPtr base)
@@ -70,6 +57,12 @@ void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
 
 vtkPiecewiseFunctionPtr ImageTF3D::getOpacityTF()
 {
+	if (mLut) // sonowand hack .. while we figure out how to really do this.... 
+	{
+		refreshOpacityTF();
+		return mOpacityTF;
+	}
+	
 	// Create vtkPiecewiseFunction from the color map
 	mOpacityTF->RemoveAllPoints();
 	for (IntIntMap::iterator iter = mOpacityMapPtr->begin();
@@ -86,8 +79,14 @@ void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
 
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
-	//std::cout<<"fetching color for 3d head" <<std::endl;
+	std::cout<<"ImageTF3D::getColorTF()" <<std::endl;
 	
+	if (mLut) // sonowand hack .. while we figure out how to really do this.... 
+	{
+		refreshColorTF();
+		return mColorTF;
+	}
+
 	// Create vtkColorTransferFunction from the color map
 	mColorTF->RemoveAllPoints();
 	
@@ -104,6 +103,9 @@ vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
  */
 void ImageTF3D::setLLR(double val)
 {
+	if (similar(mLLR, val))
+		return;
+
 	mLLR = val;
 	refreshOpacityTF();
 }
@@ -113,11 +115,29 @@ double ImageTF3D::getLLR() const
 	return mLLR;
 }
 
+void ImageTF3D::setAlpha(double val)
+{
+	if (similar(mAlpha, val))
+		return;
+
+	mAlpha = val;
+	refreshOpacityTF();
+}
+
+double ImageTF3D::getAlpha() const
+{
+	return mAlpha;
+}
+
+
 /**Set Window, i.e. the size of the intensity
  * window that will be visible.
  */
 void ImageTF3D::setWindow(double val)
 {
+	if (similar(mWindow, val))
+		return;
+	
 	mWindow = val;
 	//std::cout<<"setWindow, val: "<<val<<std::endl;
 	refreshColorTF();
@@ -133,7 +153,10 @@ double ImageTF3D::getWindow() const
  */
 void ImageTF3D::setLevel(double val)
 {
-	std::cout<<"setLevel, val: "<<val<<std::endl;
+	if (similar(mLevel, val))
+		return;
+	
+	//std::cout<<"setLevel, val: "<<val<<std::endl;
 	mLevel = val;
 	refreshColorTF();
 }
@@ -182,7 +205,8 @@ void ImageTF3D::refreshColorTF()
 {
 	double min = mLevel - ( mWindow / 2.0 );
 	double max = mLevel + ( mWindow / 2.0 );
-	std::cout << " refresh colorTable windowLevel = ["<<min<<","<<max<<"]"<<std::endl;
+	std::cout << " ImageTF3D::refreshColorTF() windowLevel = ["<<min<<","<<max<<"]"<<std::endl;
+	//std::cout << " refresh colorTable windowLevel = ["<<min<<","<<max<<"]"<<std::endl;
 	
 	if (!mLut)
 	{
@@ -198,11 +222,14 @@ void ImageTF3D::refreshColorTF()
 	int numColors = mLut->GetNumberOfTableValues();
 	int step = numColors / 256;
 	
+	std::cout << "numColors " << numColors  << std::endl; 
+	
 	for (int i = 0; i < numColors; i += step)
 	{
 		double* color = mLut->GetTableValue(i);
 		double index = min + double(i) * (max - min) / (numColors - 1);
 		mColorTF->AddRGBPoint(index, color[0], color[1], color[2]);
+		//std::cout << "color [" << i << "] " << Vector3D(color)  << std::endl; 
 	}
 }
 
@@ -220,7 +247,7 @@ void ImageTF3D::refreshOpacityTF()
 	mOpacityTF->RemoveAllPoints();
 	mOpacityTF->AddPoint(0.0, 0.0 );
 	mOpacityTF->AddPoint(mLLR, 0.0 );
-	mOpacityTF->AddPoint(getScalarMax(), 1.0 );
+	mOpacityTF->AddPoint(getScalarMax(), mAlpha );
 	mOpacityTF->Update();
 }
 

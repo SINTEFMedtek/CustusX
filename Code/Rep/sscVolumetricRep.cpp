@@ -9,7 +9,10 @@
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageResample.h>
+
 #include "sscView.h"
+#include "sscImageTF3D.h"
+
 
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 

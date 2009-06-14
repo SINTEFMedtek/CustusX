@@ -27,12 +27,13 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	mLevel =  0; //getScalarMax() / 2.0;
 	mWindow = getScalarMax();
 	mLLR = 0.0;
+	mAlpha = 1.0;
 	
-	std::cout<< "--[ ImageLUT2D ]--"<<std::endl;	
-	std::cout<<  "window "<<mWindow<<std::endl;
-	std::cout<<  "level "<<mLevel<<std::endl;
+//	std::cout<< "--[ ImageLUT2D ]--"<<std::endl;	
+//	std::cout<<  "window "<<mWindow<<std::endl;
+//	std::cout<<  "level "<<mLevel<<std::endl;
 	
-	mImageMapToColor = vtkImageMapToColorsPtr::New();
+	//mImageMapToColor = vtkImageMapToColorsPtr::New();
 	mLookupTable = vtkLookupTablePtr::New();
 	
 	//make a default system set lookuptable, gryscale...
@@ -44,12 +45,19 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	bwLut->Build();
 	this->setLookupTable(bwLut); 
 }
+
+void ImageLUT2D::setVtkImageData(vtkImageDataPtr base)
+{
+	mBase = base;
+}
+
 //set lookupTable, generated from file only froms DataManagerImpl::setViewControlData
 void ImageLUT2D::setLookupTable(vtkLookupTablePtr lut)
 {
 	mLookupTable = lut;
 	mLookupTable->SetTableRange(mLevel,mWindow);
-	mImageMapToColor->SetLookupTable(mLookupTable);
+	//mImageMapToColor->SetLookupTable(mLookupTable);
+	emit transferFunctionsChanged();
 }
 
 //void ImageLUT2D::setImportedLut(vtkLookupTablePtr lut)
@@ -57,13 +65,14 @@ void ImageLUT2D::setLookupTable(vtkLookupTablePtr lut)
 //	mBaseLut = lut;
 //	this->setLookupTable(mBaseLut);
 //}
-vtkImageMapToColorsPtr ImageLUT2D::getColorMap()
-{
-	return mImageMapToColor;
-}
+//vtkImageMapToColorsPtr ImageLUT2D::getColorMap()
+//{
+//	return mImageMapToColor;
+//}
 void ImageLUT2D::setTable(vtkUnsignedCharArray* table)
 {
 	mLookupTable->SetTable(table);
+	emit transferFunctionsChanged();
 }
 
 vtkLookupTablePtr ImageLUT2D::getLookupTable()
@@ -71,28 +80,28 @@ vtkLookupTablePtr ImageLUT2D::getLookupTable()
 	return mLookupTable;
 }
 
-//debug method.. will be removed later 
-void ImageLUT2D::printToFile()
-{
-	ofstream myfile;
-	myfile.open ("/Data/Logs/example.txt");
-	int tableSize = mLookupTable->GetNumberOfTableValues();
-	for(int i = 0; i<tableSize; ++i )
-	{
-		double rgba[4];
-		mLookupTable->GetTableValue(i,rgba);
-		myfile << "i("<<i<<"), R["<< rgba[0] <<"] G["<<rgba[1]<<"] B["<<rgba[2]<<"] A["<<rgba[3]<< "]\n";	
-	}	
-	myfile.close();	
-}
+////debug method.. will be removed later 
+//void ImageLUT2D::printToFile()
+//{
+//	ofstream myfile;
+//	myfile.open ("/Data/Logs/example.txt");
+//	int tableSize = mLookupTable->GetNumberOfTableValues();
+//	for(int i = 0; i<tableSize; ++i )
+//	{
+//		double rgba[4];
+//		mLookupTable->GetTableValue(i,rgba);
+//		myfile << "i("<<i<<"), R["<< rgba[0] <<"] G["<<rgba[1]<<"] B["<<rgba[2]<<"] A["<<rgba[3]<< "]\n";	
+//	}	
+//	myfile.close();	
+//}
 	
-void ImageLUT2D::setAlphaRange(double alpha)
-{
-	int scale = (int)(this->getScalarMax() + 1.0 / mLookupTable->GetTableRange()[1]);
-	int r = (int)alpha / scale;
-	mLookupTable->SetAlphaRange(0.0 ,r);
-	mLookupTable->SetAlphaRange(r , 1.0);
-}
+//void ImageLUT2D::setAlphaRange(double alpha)
+//{
+//	int scale = (int)(this->getScalarMax() + 1.0 / mLookupTable->GetTableRange()[1]);
+//	int r = (int)alpha / scale;
+//	mLookupTable->SetAlphaRange(0.0 ,r);
+//	mLookupTable->SetAlphaRange(r , 1.0);
+//}
 
 /**Set Low Level Reject, meaning the lowest intensity
  * value that will be visible.
@@ -101,15 +110,32 @@ void ImageLUT2D::setLLR(double val)
 {
 	if (similar(mLLR, val))
 		return;
-	mLLR = val;	
+	mLLR = val;
+	std::cout << "ImageLUT2D::setLLR " << this << "  " << mLLR << std::endl;
 	changeOpacity(mLLR, 0);
 	//changeOpacityForAll(mLLR);
+	emit transferFunctionsChanged();
 }
 
 double ImageLUT2D::getLLR() const
 {
 	return mLLR;
 }
+
+void ImageLUT2D::setAlpha(double val)
+{
+	if (similar(mAlpha, val))
+		return;
+	mAlpha = val;	
+	emit transferFunctionsChanged();
+	//changeOpacity(mLLR, mAlpha); //	
+}
+
+double ImageLUT2D::getAlpha() const
+{
+	return mAlpha;
+}
+
 
 /**Set Window, i.e. the size of the intensity
  * window that will be visible.
@@ -126,6 +152,7 @@ void ImageLUT2D::setWindow(double window)
 	}
 	mWindow = window;
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0); 
+	emit transferFunctionsChanged();
 }
 
 double ImageLUT2D::getWindow() const
@@ -142,6 +169,7 @@ void ImageLUT2D::setLevel(double level)
 		return;
 	mLevel = level;
 	mLookupTable->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0);
+	emit transferFunctionsChanged();
 }
 
 double ImageLUT2D::getLevel() const
@@ -174,6 +202,9 @@ void ImageLUT2D::changeOpacityForAll(double opacity )
 /*this is a version off a llr method on Alpha channel on the lookuptable*/
 void ImageLUT2D::changeOpacity(double index_dbl, double opacity)
 {
+//	mLookupTable er den orginale, og den endres her inne, derfor blir viewzones 0 og 1 lik!!!
+	
+	
 	int index = (int)index_dbl;
 	int noValues = mLookupTable->GetNumberOfTableValues();
 	double scale = (getScalarMax()+1)/noValues; 	
