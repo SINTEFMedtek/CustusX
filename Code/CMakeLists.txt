@@ -28,6 +28,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Tool/sscTool.h 
     Tool/sscDummyTool.h
     Tool/sscDummyToolManager.h
+    Tool/sscManualTool.h
     Rep/sscSliceProxy.h
     Rep/sscRep.h
     Rep/sscSlicerRepSW.h
@@ -110,6 +111,8 @@ SET( SSC_SOURCE_FILES
     Tool/sscToolManager.cpp
     Tool/sscDummyToolManager.cpp
     Tool/sscDummyTool.cpp
+    Tool/sscManualTool.cpp
+    Tool/sscProbeSector.cpp
 	) 
 	
 # =========================================================

@@ -13,6 +13,7 @@ namespace ssc {
 
 // data
 typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 

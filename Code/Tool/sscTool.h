@@ -8,9 +8,11 @@
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 #include "sscTransform3D.h"
+#include "sscProbeSector.h"
 
 namespace ssc
 {
+
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
  *
@@ -63,7 +65,10 @@ public:
 	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
 	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
 	//virtual int getIndex() const = 0;///<return a index ivar due to a list..
-	virtual bool isCalibrated() const = 0; ///a tool may not be calibrated, then no tracking i allowed
+	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
+	
+	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe.	
+	
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);

@@ -35,6 +35,8 @@ public:
 	virtual std::string getName() const;
 	virtual int getIndex() const{return 0;};
 	virtual bool isCalibrated() const;
+	virtual ProbeSector getProbeSector() const { return ProbeSector(); }	
+
 	void startTracking();
 	void stopTracking();
 
