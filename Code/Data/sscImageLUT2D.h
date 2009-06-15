@@ -33,9 +33,8 @@ class ImageLUT2D : public QObject
 public:
 	ImageLUT2D(vtkImageDataPtr base);
 	void setVtkImageData(vtkImageDataPtr base);
-
-	void setLookupTable(vtkLookupTablePtr lut);
-	vtkLookupTablePtr getLookupTable(); //try to be use ony one class rep for lut--
+	void setBaseLookupTable(vtkLookupTablePtr lut);
+	vtkLookupTablePtr getOutputLookupTable(); 
 	void setLLR(double val);
 	void setWindow(double val);
 	void setLevel(double val);
@@ -46,32 +45,21 @@ public:
 	double getAlpha() const;
 	
 	double getScalarMax() const;
-	//void setAlphaRange(double alpha) ;
-	void setTable(vtkUnsignedCharArray *  table);
-	//void setImportedLut(vtkLookupTablePtr lut); //temporary method....
-	
-	//vtkImageMapToColorsPtr getColorMap();
-
 	
 signals:
 	void transferFunctionsChanged();	
 	
 private:
-	void changeOpacityForAll(double opacity);
+	void refreshOutput();
 	void changeOpacity(double index, double opacity);
-//	void printToFile();
-	//vtkScalarsToColorsPtr mScalarToColor;
-	//vtkLookupTablePtr mBaseLut;
-	vtkLookupTablePtr mLookupTable;
 	
-	//vtkWindowLevelLookupTablePtr mColorLookupTable;
-	//vtkPiecewiseFunctionPtr mLowLevel;
-	vtkImageDataPtr mBase;
-	//vtkImageMapToColorsPtr mImageMapToColor;
-	double mLLR;
-	double mWindow;
-	double mLevel;
-	double mAlpha;
+	vtkLookupTablePtr mOutputLUT; ///< the sum of all internal values
+	vtkImageDataPtr mBase; ///< image data
+	double mLLR; ///< used to modify the output
+	double mWindow; ///< used to modify the output
+	double mLevel; ///< used to modify the output
+	double mAlpha; ///< not used by output, use BlenderRep to solve this.
+	vtkLookupTablePtr mBaseLUT;	///< basis for generating the output lut
 };
 
 typedef boost::shared_ptr<ImageLUT2D> ImageLUT2DPtr;

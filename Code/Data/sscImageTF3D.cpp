@@ -170,15 +170,13 @@ double ImageTF3D::getLevel() const
  */
 void ImageTF3D::setLut(vtkLookupTablePtr lut)
 {
+	if (lut==mLut)
+		return;
 	std::cout<<"Lut set in 3d property" <<std::endl;
 	mLut = lut;
 	refreshColorTF();
 }
-void ImageTF3D::setTable(vtkUnsignedCharArrayPtr table)
-{
-	mLut->SetTable(table);
-	refreshColorTF();
-}
+
 vtkLookupTablePtr ImageTF3D::getLut() const
 {
 	return mLut;

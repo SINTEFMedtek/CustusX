@@ -60,17 +60,9 @@ void SlicedImageProxy::setImage(ImagePtr image)
 		mReslicer->SetInput(mImage->getBaseVtkImageData());
 		//mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 		//mWindowLevel->SetOutputFormatToRGBA();
-		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getLookupTable());
+		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
 	}
-
-//	if (mImage)
-//	{
-//		disconnect( mImage.get(), SIGNAL(alphaChange()), this, SIGNAL(updateAlpha()));
-//	}
-
-//	connect( mImage.get(), SIGNAL(alphaChange()), this, SIGNAL(updateAlpha()));
-
 }
 
 ImagePtr SlicedImageProxy::getImage()const

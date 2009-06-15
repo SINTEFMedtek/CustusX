@@ -78,7 +78,7 @@ void  ImageBlenderProxy::updateBlender()
 		vtkImageMapToWindowLevelColorsPtr ColorMapper = vtkImageMapToWindowLevelColorsPtr::New();
 
 		ColorMapper->SetInput( mBlender->GetInput(i) );
-		vtkLookupTablePtr lut = vtkLookupTable::SafeDownCast( mImages[i]->getLookupTable2D()->getLookupTable() );
+		vtkLookupTablePtr lut = vtkLookupTable::SafeDownCast( mImages[i]->getLookupTable2D()->getOutputLookupTable() );
 
 		ColorMapper->SetLookupTable( lut );
 		ColorMapper->SetWindow(255.0);

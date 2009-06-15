@@ -63,7 +63,6 @@ public:
 	vtkLookupTablePtr getLut() const;
 	double getScalarMax() const;
 	double getScalarMin() const;///< \return Minimum intensity of underlying dataset
-	void setTable(vtkUnsignedCharArrayPtr table);
 	
 	OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function
 	ColorMapPtr getColorMap();///< \return The values of the color transfer function
