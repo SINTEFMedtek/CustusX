@@ -32,7 +32,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorMapPtr(new ColorMap())
 {
 	double max = getScalarMax();
-	std::cout << "For ImageTF3D image scalar range = "<< max<<std::endl;
+	//std::cout << "For ImageTF3D image scalar range = "<< max<<std::endl;
 	mLevel = max/2.0; 
 	mWindow = max;
 	mLLR = 0.0;
@@ -80,7 +80,7 @@ void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
 
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
-	std::cout<<"ImageTF3D::getColorTF()" <<std::endl;
+	//std::cout<<"ImageTF3D::getColorTF()" <<std::endl;
 	
 	if (mLut) // sonowand hack .. while we figure out how to really do this.... 
 	{
@@ -175,7 +175,7 @@ void ImageTF3D::setLut(vtkLookupTablePtr lut)
 {
 	if (lut==mLut)
 		return;
-	std::cout<<"Lut set in 3d property" <<std::endl;
+	//std::cout<<"Lut set in 3d property" <<std::endl;
 	mLut = lut;
 	refreshColorTF();
 }
@@ -248,7 +248,7 @@ void ImageTF3D::refreshColorTF()
  */
 void ImageTF3D::refreshOpacityTF()
 {
-	std::cout << "ImageTF3D::refreshOpacityTF(): LLR=" << mLLR << ", Alpha=" << mAlpha << std::endl;
+	//std::cout << "ImageTF3D::refreshOpacityTF(): LLR=" << mLLR << ", Alpha=" << mAlpha << std::endl;
 
 	mOpacityTF->RemoveAllPoints();
 	//mOpacityTF->AddPoint(0.0, 0.0 );
