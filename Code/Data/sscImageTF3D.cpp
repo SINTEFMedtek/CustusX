@@ -7,6 +7,7 @@
 
 #include "sscImageTF3D.h"
 
+#include <vector>
 #include <vtkImageData.h>
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkColorTransferFunction.h>
@@ -135,6 +136,8 @@ double ImageTF3D::getAlpha() const
  */
 void ImageTF3D::setWindow(double val)
 {
+	val = std::max(1.0, val);
+
 	if (similar(mWindow, val))
 		return;
 	
@@ -201,51 +204,71 @@ double ImageTF3D::getScalarMin() const
  */
 void ImageTF3D::refreshColorTF()
 {
-	double min = mLevel - ( mWindow / 2.0 );
-	double max = mLevel + ( mWindow / 2.0 );
-	std::cout << " ImageTF3D::refreshColorTF() windowLevel = ["<<min<<","<<max<<"]"<<std::endl;
-	//std::cout << " refresh colorTable windowLevel = ["<<min<<","<<max<<"]"<<std::endl;
-	
 	if (!mLut)
 	{
 		return;
 	}
-
+	
+	// Note on optimization:
+	// the table generation can be moved to setLut(), leaving only
+	// BuildFunctionFromTable here.
+	
+	double min = mLevel - ( mWindow / 2.0 );
+	double max = mLevel + ( mWindow / 2.0 );
 	mColorTF->RemoveAllPoints();
-	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
-	mColorTF->AddRGBPoint(min, 0.0, 0.0, 0.0);
-	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
-	mColorTF->AddRGBPoint(getScalarMax(), 1.0, 1.0, 1.0);
+	int N = mLut->GetNumberOfTableValues();
+	//std::cout << " ImageTF3D::refreshColorTF(): range = [" << min << "," << max << "],\t lvl=" << mLevel << ",\t win=" << mWindow << std::endl;
+	//std::cout << "mLut->GetNumberOfTableValues(): " << N  << std::endl;
 	
-	int numColors = mLut->GetNumberOfTableValues();
-	int step = numColors / 256;
-	
-	std::cout << "numColors " << numColors  << std::endl; 
-	
-	for (int i = 0; i < numColors; i += step)
+	std::vector<double> function(N*3);
+	for (int i=0; i<N; ++i)
 	{
 		double* color = mLut->GetTableValue(i);
-		double index = min + double(i) * (max - min) / (numColors - 1);
-		mColorTF->AddRGBPoint(index, color[0], color[1], color[2]);
-		//std::cout << "color [" << i << "] " << Vector3D(color)  << std::endl; 
+		function[3*i+0] = color[0];
+		function[3*i+1] = color[1];
+		function[3*i+2] = color[2];
 	}
+	mColorTF->BuildFunctionFromTable(min, max, N, &*function.begin());
+	
+// equivalent way to go (slower):
+	
+//	// scale the lut from the |0,N> to |min,max> range,
+//	// using index transformation i' = min + (max-min)/(N-1)*i
+//	double delta = (max - min) / (N - 1);
+//	
+//	for (int i=0; i<N; ++i)
+//	{
+//		double* color = mLut->GetTableValue(i);
+//		double index = min + delta*i;
+//		mColorTF->AddRGBPoint(index, color[0], color[1], color[2]);
+//	}
 }
 
 /**update the opacity TF according to the mLLR value
  */
 void ImageTF3D::refreshOpacityTF()
 {
-	//opacityFun->AddSegment( opacityLevel - 0.5*opacityWindow, 0.0,  opacityLevel + 0.5*opacityWindow, 1.0 );
-	
-	if (mLLR >= getScalarMax())
-	{
-		return;
-	}
+	std::cout << "ImageTF3D::refreshOpacityTF(): LLR=" << mLLR << ", Alpha=" << mAlpha << std::endl;
 
 	mOpacityTF->RemoveAllPoints();
-	mOpacityTF->AddPoint(0.0, 0.0 );
+	//mOpacityTF->AddPoint(0.0, 0.0 );
+#if 0 // old way - looks pretty but theoretically catastrophic
 	mOpacityTF->AddPoint(mLLR, 0.0 );
 	mOpacityTF->AddPoint(getScalarMax(), mAlpha );
+#endif
+#if 0 // correct way - step function - looks bad
+	mOpacityTF->AddPoint(mLLR, 0.0 );
+	mOpacityTF->AddPoint(mLLR+1, mAlpha );
+#endif
+#if 1 // middle way: cut at LLR, then a ramp up to alpha.
+	int smooth = 0.15*getScalarMax();
+	mOpacityTF->AddPoint(mLLR, 0 );
+	//mOpacityTF->AddPoint(mLLR+1+smooth/2, mAlpha*1/4 );
+	mOpacityTF->AddPoint(mLLR+1+1*smooth, mAlpha*2/4 );
+	//mOpacityTF->AddPoint(mLLR+1+2*smooth, mAlpha*3/4 );
+	mOpacityTF->AddPoint(mLLR+1+3*smooth, mAlpha );
+	//mOpacityTF->AddPoint(getScalarMax(), mAlpha );
+#endif
 	mOpacityTF->Update();
 }
 
