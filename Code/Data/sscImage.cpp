@@ -26,7 +26,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mUid(uid), mName(uid), mBaseImageData(data),
 	mLandmarks(vtkDoubleArray::New())
 {
-	std::cout << "Image::Image() " << std::endl;
+	//std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
 	mLandmarks->SetNumberOfComponents(4);
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
