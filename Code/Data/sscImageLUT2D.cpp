@@ -140,7 +140,15 @@ void ImageLUT2D::refreshOutput()
 {
 	double opacity = 0; // ignore alpha, used by blender
 	changeOpacity(mLLR, opacity);
-	mOutputLUT->SetTableRange(mLevel-mWindow/2.0, mLevel+mWindow/2.0);
+	
+//	// find a valid range (in order to avoid overflow)
+	double r0 = mLevel-mWindow/2.0;
+	double r1 = mLevel+mWindow/2.0;
+//	r0 = std::max(r0, mBase->GetScalarRange()[0]);
+//	r1 = std::min(r1, mBase->GetScalarRange()[1]);
+//	std::cout << "r0" << r0 << ", r1 " << r1 << std::endl;
+	
+	mOutputLUT->SetTableRange(r0, r1);
 	
 	emit transferFunctionsChanged();
 
