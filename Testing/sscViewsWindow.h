@@ -37,11 +37,11 @@ public:
 	
 	bool mDumpSpeedData;
 	
+	void insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c);
 private:
 	void start(bool showSliders);
 	ssc::View* generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	ssc::ImagePtr loadImage(const std::string& imageFilename);
-	void insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c);
 	
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;

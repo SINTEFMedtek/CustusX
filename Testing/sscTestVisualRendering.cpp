@@ -60,6 +60,16 @@ void TestVisualRendering::testInitialize()
 	CPPUNIT_ASSERT(1);
 }
 
+void TestVisualRendering::testEmptyView()
+{
+	ssc::View* view = new ssc::View();
+	widget->insertView(view, "dummy", "none", 0,0);
+
+	widget->updateRender();
+	int val = qApp->exec();
+	CPPUNIT_ASSERT(!val && widget->accepted());	
+}
+
 void TestVisualRendering::test_3D_Tool()
 {
 	widget->define3D(image[0], 0, 0);
