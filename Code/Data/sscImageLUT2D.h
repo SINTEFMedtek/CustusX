@@ -51,7 +51,9 @@ signals:
 	
 private:
 	void refreshOutput();
-	void changeOpacity(double index, double opacity);
+//	void changeOpacity(double index, double opacity);
+	void testMap(double val);
+	double mapThroughLUT(double x);
 	
 	vtkLookupTablePtr mOutputLUT; ///< the sum of all internal values
 	vtkImageDataPtr mBase; ///< image data

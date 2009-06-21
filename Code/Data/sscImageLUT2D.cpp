@@ -54,7 +54,7 @@ void ImageLUT2D::setBaseLookupTable(vtkLookupTablePtr lut)
 		return;
 	
 	mBaseLUT = lut;
-	mOutputLUT->DeepCopy(mBaseLUT);
+	//mOutputLUT->DeepCopy(mBaseLUT);
 	refreshOutput();
 }
 
@@ -134,57 +134,113 @@ double ImageLUT2D::getScalarMax() const
 	return mBase->GetScalarRange()[1];
 }
 
+void ImageLUT2D::testMap(double val)
+{
+	unsigned char* color = mOutputLUT->MapValue(val);
+	std::cout << "i=" << val << ", \t(" 
+		<< static_cast<int>(color[0]) << "," 
+		<< static_cast<int>(color[1]) << "," 
+		<< static_cast<int>(color[2]) << "," 
+		<< static_cast<int>(color[3]) << ")" << std::endl; 	
+}
+
+double ImageLUT2D::mapThroughLUT(double x)
+{
+	double y = (mLLR - (mLevel - mWindow/2))/mWindow * mBaseLUT->GetNumberOfTableValues();
+	return y;
+}
+
 /**rebuild the output lut from all inputs.
  */
 void ImageLUT2D::refreshOutput()
 {
-	double opacity = 0; // ignore alpha, used by blender
-	changeOpacity(mLLR, opacity);
+	double b0 = mLevel-mWindow/2.0;
+	double b1 = mLevel+mWindow/2.0;
 	
-//	// find a valid range (in order to avoid overflow)
-	double r0 = mLevel-mWindow/2.0;
-	double r1 = mLevel+mWindow/2.0;
-//	r0 = std::max(r0, mBase->GetScalarRange()[0]);
-//	r1 = std::min(r1, mBase->GetScalarRange()[1]);
-//	std::cout << "r0" << r0 << ", r1 " << r1 << std::endl;
+	// find LLR on the lut: 
+	// We want to use the LLR on the _input_ intensity data, not on the
+	// mapped data. Thus we map the llr through the lut and insert that value
+	// into the lut.
+	double llr = mapThroughLUT(mLLR);
+	// if LLR < minimum table range, even the first value in the LUT will climb
+	// above the llr. To avoid this, we use a hack that sets llr to at least 1.
+	// This causes all zeros to become transparent, but the alternative is worse.
+	// (what we really need is to subclass vtkLookupTable, 
+	//  but it contains nonvirtual functions).
+	llr = std::max(1.0, llr); // hack. 
 	
-	mOutputLUT->SetTableRange(r0, r1);
+	mOutputLUT->Build();
+	mOutputLUT->SetNumberOfTableValues(mBaseLUT->GetNumberOfTableValues());	
+	mOutputLUT->SetTableRange(b0,b1);
 	
-	emit transferFunctionsChanged();
-
-}
-
-/*this is a version off a llr method on Alpha channel on the lookuptable*/
-void ImageLUT2D::changeOpacity(double index_dbl, double opacity)
-{
-	int index = (int)index_dbl;
-	int noValues = mOutputLUT->GetNumberOfTableValues();
-	double scale = (getScalarMax()+1)/noValues; 	
-	index = (int)(index/scale);	
-	
-	if (index>noValues)
-	{
-		std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
-		return;
-	}
-//	std::cout<<"set the LLR at "<<index<<std::endl;
-	
-	for ( int i = 0; i < index; i++ )
-	{ 
-		double rgba[4];
-		mOutputLUT->GetTableValue(i, rgba);	
-		rgba[ 3 ] = 0.001;
-		mOutputLUT->SetTableValue(i, rgba);
-	}
-	for ( int i = index; i < noValues; i++ )
+	for (int i=0; i<mOutputLUT->GetNumberOfTableValues(); ++i)
 	{
 		double rgba[4];
-		mOutputLUT->GetTableValue(i, rgba);
-		rgba[ 3 ] = 0.9999;
+		mBaseLUT->GetTableValue(i, rgba);
+		
+		if (i >= llr)
+			rgba[ 3 ] = 0.9999;
+		else
+			rgba[ 3 ] = 0.001;
+		
 		mOutputLUT->SetTableValue(i, rgba);
 	}
 	mOutputLUT->Modified();
+	
+//	std::cout << "-----------------" << std::endl;
+//	for (unsigned i=0; i<256; i+=20)
+//	{
+//		testMap(i);		
+//	}
+//	testMap(255);		
+//	//mOutputLUT->Print(std::cout);
+//	//mOutputLUT->GetTable()->Print(std::cout);
+//	std::cout << "-----" 
+//		<< "llr=" << llr 
+//		<< ", LLR=" << mLLR 
+//		<< ", level=" << mLevel 
+//		<< ", window=" << mWindow 
+//		<< ", b=[" << b0 << "," << b1 << "] "
+//		<< this
+//		<< std::endl;
+//	std::cout << "-----------------" << std::endl;
+	
+	emit transferFunctionsChanged();
 }
+
+///*this is a version off a llr method on Alpha channel on the lookuptable*/
+//void ImageLUT2D::changeOpacity(double index_dbl, double opacity)
+//{
+//	int index = (int)index_dbl;
+//	int noValues = mOutputLUT->GetNumberOfTableValues();
+//	double scale = (getScalarMax()+1)/noValues; 	
+//	index = (int)(index/scale);
+//	index = std::max<int>(0, index);
+//	index = std::min<int>(noValues, index);
+//	
+////	if (index>noValues)
+////	{
+////		std::cout << "could not change opacity. index exceed size of lut ... " << std::endl;
+////		return;
+////	}
+////	std::cout<<"set the LLR at "<<index<<std::endl;
+//	
+//	for ( int i = 0; i < index; i++ )
+//	{ 
+//		double rgba[4];
+//		mOutputLUT->GetTableValue(i, rgba);	
+//		rgba[ 3 ] = 0.001;
+//		mOutputLUT->SetTableValue(i, rgba);
+//	}
+//	for ( int i = index; i < noValues; i++ )
+//	{
+//		double rgba[4];
+//		mOutputLUT->GetTableValue(i, rgba);
+//		rgba[ 3 ] = 0.9999;
+//		mOutputLUT->SetTableValue(i, rgba);
+//	}
+//	mOutputLUT->Modified();
+//}
 
 
 //---------------------------------------------------------

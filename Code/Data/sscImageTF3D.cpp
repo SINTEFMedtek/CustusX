@@ -263,11 +263,11 @@ void ImageTF3D::refreshOpacityTF()
 #if 1 // middle way: cut at LLR, then a ramp up to alpha.
 	double range = getScalarMax()-getScalarMin();
 	int smooth = (int)(0.15*range);
-	mOpacityTF->AddPoint(mLLR, 0 );
+	mOpacityTF->AddPoint(mLLR-1, 0 );
 	//mOpacityTF->AddPoint(mLLR+1+smooth/2, mAlpha*1/4 );
-	mOpacityTF->AddPoint(mLLR+1+1*smooth, mAlpha*2/4 );
+	mOpacityTF->AddPoint(mLLR+1*smooth, mAlpha*2/4 );
 	//mOpacityTF->AddPoint(mLLR+1+2*smooth, mAlpha*3/4 );
-	mOpacityTF->AddPoint(mLLR+1+3*smooth, mAlpha );
+	mOpacityTF->AddPoint(mLLR+3*smooth, mAlpha );
 	//mOpacityTF->AddPoint(getScalarMax(), mAlpha );
 #endif
 	mOpacityTF->Update();

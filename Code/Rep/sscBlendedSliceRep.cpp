@@ -60,7 +60,7 @@ void BlendedSliceRep::setImages(std::vector<ImagePtr> images)
 {
 	for (unsigned int i = 0; i< images.size(); ++i)
 	{
-		std::cout<<"slice image: id"<<images.at(i)->getUid()<<std::endl;
+		std::cout<<"BlendedSliceRep::setImages(): slice image: id"<<images.at(i)->getUid()<<std::endl;
 		ImagePtr image = images.at(i);
 		connect(image.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateAlphaSlot()));
 //		connect(image.get(), SIGNAL(thresholdChange(double)), this, SLOT(updateThresholdSlot(double)));
@@ -75,7 +75,7 @@ void BlendedSliceRep::setImages(std::vector<ImagePtr> images)
 
 void BlendedSliceRep::addInputImages(vtkImageDataPtr slicedImage)
 {
-	std::cout<<".. in blender"<<std::endl;
+//	std::cout<<".. in blender"<<std::endl;
 	countImage++;
 	if (firstImage)
 	{
