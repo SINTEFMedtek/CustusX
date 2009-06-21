@@ -12,9 +12,8 @@ SliceProxy::SliceProxy()
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	//TODO connect to toolmanager rMpr changed
+	mDefaultCenter = ssc::DataManager::getInstance()->getCenter();	
 	centerChangedSlot();
-	//std::cout<<"Got center"<< ssc::DataManager::getInstance()->getCenter() <<std::endl;
-	
 }
 
 SliceProxy::~SliceProxy()
@@ -71,14 +70,26 @@ Transform3D SliceProxy::getSyntheticToolPos(const Vector3D& center) const
 	return T_c * R_tq;
 }
 
+void SliceProxy::setDefaultCenter(const Vector3D& c)
+{
+	mDefaultCenter = c;	
+	centerChangedSlot();
+}
+
 void SliceProxy::centerChangedSlot()
 {
-	Vector3D c = ssc::DataManager::getInstance()->getCenter();
-	mCutplane.setFixedCenter(c);
-	
-	if (!mTool)
+	if (mTool)
 	{
-		mCutplane.setToolPosition(getSyntheticToolPos(c));			
+		Vector3D c = ssc::DataManager::getInstance()->getCenter();
+		mCutplane.setFixedCenter(c);		
+	}
+	else
+	{
+		// If no tool is available, ensure only dummy values are used.
+		// It is very important that this volume is completely frozen in order
+		// to avoid any confusion - the user must know it is nonnavigable.
+		mCutplane.setFixedCenter(mDefaultCenter);
+		mCutplane.setToolPosition(getSyntheticToolPos(mDefaultCenter));			
 	}	
 	
 	//std::cout << "center changed: " + boost::lexical_cast<std::string>(ssc::DataManager::instance()->getCenter());

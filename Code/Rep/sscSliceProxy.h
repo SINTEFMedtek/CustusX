@@ -32,6 +32,7 @@ public:
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset); 
 	void setToolViewportHeight(double viewportHeight);
+	void setDefaultCenter(const Vector3D& c);
 	
 	ToolPtr getTool();
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
@@ -51,6 +52,7 @@ private:
 	void changed();
 	ToolPtr mTool;
 	SliceComputer mCutplane;
+	Vector3D mDefaultCenter; ///< use this center when no tool is available
 };
 typedef boost::shared_ptr<SliceProxy> SliceProxyPtr;
 
