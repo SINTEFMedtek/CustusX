@@ -93,9 +93,9 @@ std::string DummyTool::getName() const
 {
 	return mName;
 }
-void DummyTool::startTracking()
+void DummyTool::startTracking(int interval)
 {
-	mTimer->start(33);
+	mTimer->start(interval);
 
 	mVisible = true;
 
@@ -158,7 +158,6 @@ std::vector<Transform3D> DummyTool::createToolPositionMovement(const DoubleBound
 {	
 //	std::cout<<"createToolPositionMovement:"<<bb<<std::endl;
     std::vector<Transform3D> retval;
-
        
     Vector3D range = bb.range();
     // define four points. Traverse them and then back to the starting point.

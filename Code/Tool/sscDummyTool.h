@@ -37,7 +37,7 @@ public:
 	virtual bool isCalibrated() const;
 	virtual ProbeSector getProbeSector() const { return ProbeSector(); }	
 
-	void startTracking();
+	void startTracking(int interval=33);
 	void stopTracking();
 
 	void setToolPositionMovement(const std::vector<Transform3D>& positions);
