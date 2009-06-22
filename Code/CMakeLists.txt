@@ -228,4 +228,6 @@ export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
 # =========================================================
 
+install( TARGETS SSC DESTINATION lib64 )
+# =========================================================
 
