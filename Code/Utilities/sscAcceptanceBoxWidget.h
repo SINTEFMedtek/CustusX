@@ -31,6 +31,8 @@ public:
 	virtual ~AcceptanceBoxWidget() {}
 	bool accepted() const;
 	void setText(QString text);
+	void hideAcceptButtons();
+	
 signals:
 	void finished(bool);
 private:

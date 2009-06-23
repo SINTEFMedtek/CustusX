@@ -29,6 +29,12 @@ AcceptanceBoxWidget::AcceptanceBoxWidget(QString text, QWidget* parent) : QFrame
 	//mAcceptButton->setShortcut(Qt::Key_Enter);
 }
 
+void AcceptanceBoxWidget::hideAcceptButtons()
+{
+	mAcceptButton->setVisible(false);
+	mRejectButton->setVisible(false);
+}
+
 void AcceptanceBoxWidget::setText(QString text)
 {
 	//text = "Accept the following statement:\n" + text;
