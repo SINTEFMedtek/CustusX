@@ -10,6 +10,7 @@ namespace ssc
 
 ManualTool::ManualTool(const std::string& uid) : mUid(uid), mName(uid), mMutex(QMutex::Recursive)
 {
+	mType = TOOL_MANUAL;
 	mVisible = false; 	
 	createPolyData();
 }
@@ -52,7 +53,7 @@ void ManualTool::createPolyData()
 
 ssc::Tool::Type ManualTool::getType() const
 {
-	return TOOL_MANUAL;
+	return mType;
 }
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
