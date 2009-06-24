@@ -35,6 +35,7 @@ public:
 	// extensions:
 	void set_prMt(const Transform3D& prMt);
 	void setVisible(bool vis);
+	void setType(const Type& type);
 
 private:
 	// constant data
@@ -43,6 +44,7 @@ private:
 	vtkPolyDataPtr mPolyData;
 
 	// mutex-protected mutable data
+	Type mType;
 	bool mVisible; 	
 	Transform3D m_prMt;
 	mutable QMutex mMutex;

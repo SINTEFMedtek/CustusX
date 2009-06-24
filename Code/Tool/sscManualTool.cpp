@@ -93,6 +93,12 @@ void ManualTool::setVisible(bool vis)
 	mVisible = vis;
 }
 
+void ManualTool::setType(const Type& type) 
+{
+	QMutexLocker locker(&mMutex);
+	mType = type;	
+}
+
 bool ManualTool::isCalibrated() const
 {
 	return false;	
