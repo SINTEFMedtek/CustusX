@@ -31,6 +31,7 @@ public:
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
 	virtual ssc::ProbeSector getProbeSector() const;	
+	virtual double getTimestamp() const;
 	
 	// extensions:
 	void set_prMt(const Transform3D& prMt);

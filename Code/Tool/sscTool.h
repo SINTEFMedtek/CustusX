@@ -67,7 +67,8 @@ public:
 	//virtual int getIndex() const = 0;///<return a index ivar due to a list..
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
 	
-	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe.	
+	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe.
+	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
 	
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);

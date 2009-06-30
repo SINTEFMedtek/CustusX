@@ -110,4 +110,10 @@ ssc::ProbeSector ManualTool::getProbeSector() const
 	return ssc::ProbeSector(); 
 }	
 
+double ManualTool::getTimestamp() const
+{
+	return 0;
+}
+
+
 }//end namespace

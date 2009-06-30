@@ -36,6 +36,7 @@ public:
 	virtual int getIndex() const{return 0;};
 	virtual bool isCalibrated() const;
 	virtual ProbeSector getProbeSector() const { return ProbeSector(); }	
+	virtual double getTimestamp() const { return 0; }
 
 	void startTracking(int interval=33);
 	void stopTracking();
