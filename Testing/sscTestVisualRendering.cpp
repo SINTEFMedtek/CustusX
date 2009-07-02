@@ -38,6 +38,7 @@ using ssc::Transform3D;
 
 #include "sscTestVisualRendering.h"
 
+
 void TestVisualRendering::setUp()
 {
 	widget = new ViewsWindow("Verify that the volumes are rendered correctly.", false);
@@ -62,6 +63,7 @@ void TestVisualRendering::testInitialize()
 
 void TestVisualRendering::testEmptyView()
 {
+	widget->setDescription("Empty view");
 	ssc::View* view = new ssc::View();
 	widget->insertView(view, "dummy", "none", 0,0);
 
@@ -72,6 +74,7 @@ void TestVisualRendering::testEmptyView()
 
 void TestVisualRendering::test_3D_Tool()
 {
+	widget->setDescription("3D Volume, moving tool");
 	widget->define3D(image[0], 0, 0);
 
 	widget->updateRender();
@@ -81,6 +84,7 @@ void TestVisualRendering::test_3D_Tool()
 
 void TestVisualRendering::test_ACS_3D_Tool()
 {
+	widget->setDescription("ACS+3D, moving tool");
 	widget->define3D(image[0], 1, 1);
 	widget->defineSlice("A", image[0], ssc::ptAXIAL, 0, 0);
 	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
@@ -93,6 +97,7 @@ void TestVisualRendering::test_ACS_3D_Tool()
 
 void TestVisualRendering::test_AnyDual_3D_Tool()
 {
+	widget->setDescription("Any+Dual+3D, moving tool");
 	widget->define3D(image[0], 0, 2);
 	widget->defineSlice("Any", image[0], ssc::ptANYPLANE, 0, 0);
 	widget->defineSlice("Dua", image[0], ssc::ptSIDEPLANE, 0, 1);
@@ -104,6 +109,8 @@ void TestVisualRendering::test_AnyDual_3D_Tool()
 
 void TestVisualRendering::test_ACS_3Volumes()
 {
+	widget->setDescription("ACS 3 volumes, moving tool");
+
 	for (unsigned i=0; i<3; ++i)
 	{
 		widget->defineSlice("A", image[i], ssc::ptAXIAL, 0, i);
@@ -118,6 +125,8 @@ void TestVisualRendering::test_ACS_3Volumes()
 
 void TestVisualRendering::test_AnyDual_3Volumes()
 {
+	widget->setDescription("Any+Dual 3 volumes, moving tool");
+
 	for (unsigned i=0; i<3; ++i)
 	{
 		widget->defineSlice("Any", image[i], ssc::ptANYPLANE, 0, i);

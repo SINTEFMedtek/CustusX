@@ -204,6 +204,13 @@ std::vector<Transform3D> DummyTool::createToolPositionMovement(const DoubleBound
     createLinearMovement(&retval, &T, R, c, d, step);    
     createLinearMovement(&retval, &T, R, d, a, step);    
 
+    for (unsigned i=0; i<20; ++i)
+    {
+        Transform3D r_delta = createTransformRotateZ(-M_PI/20);
+        R = r_delta * R;
+        retval.push_back(T * R);
+    }
+    
     return retval;
 }
 

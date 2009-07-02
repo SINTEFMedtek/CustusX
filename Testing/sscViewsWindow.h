@@ -31,6 +31,7 @@ public:
 	ViewsWindow(QString displayText, bool showSliders);
 	virtual ~ViewsWindow();
 	
+	void setDescription(const std::string& desc);
 	void define3D(const std::string& imageFilename, int r, int c);
 	void defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	bool accepted() const { return mAcceptanceBox->accepted(); }

@@ -37,6 +37,13 @@ using ssc::Transform3D;
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+namespace {
+	ssc::DummyToolPtr dummyTool()
+	{
+		return boost::dynamic_pointer_cast<ssc::DummyTool>(ssc::ToolManager::getInstance()->getDominantTool());
+	}
+}
+
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
@@ -53,6 +60,12 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 
 	start(showSliders);
 }
+
+void ViewsWindow::setDescription(const std::string& desc)
+{
+	mAcceptanceBox->setText(QString::fromStdString(desc));
+}
+
 
 ViewsWindow::~ViewsWindow()
 {
@@ -94,6 +107,10 @@ ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	ssc::DataManager::getInstance()->setCenter(center);
+	
+	// side effect: set tool movement box to data box,
+	dummyTool()->setToolPositionMovementBB(image->boundingBox());
+	
 	return image;
 }
 
