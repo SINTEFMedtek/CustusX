@@ -28,8 +28,9 @@ SlicedImageProxy::SlicedImageProxy()
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->SetOutputDimensionality( 2);
 	mReslicer->SetResliceAxes(mMatrixAxes);
-	mReslicer->SetAutoCropOutput(false);
-
+	//mReslicer->SetAutoCropOutput(false);
+	mReslicer->AutoCropOutputOn(); // used in 2.0.9
+	
 	mWindowLevel = vtkImageMapToColorsPtr::New();
 	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 	mWindowLevel->SetOutputFormatToRGBA();
@@ -57,7 +58,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	mImage = image;
 	if (mImage)
 	{
-		mReslicer->SetInput(mImage->getBaseVtkImageData());
+		mReslicer->SetInput( mImage->getBaseVtkImageData() );
 		//mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 		//mWindowLevel->SetOutputFormatToRGBA();
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
