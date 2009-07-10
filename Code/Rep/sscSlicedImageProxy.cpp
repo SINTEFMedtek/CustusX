@@ -28,8 +28,8 @@ SlicedImageProxy::SlicedImageProxy()
 	mReslicer->SetInterpolationModeToLinear();
 	mReslicer->SetOutputDimensionality( 2);
 	mReslicer->SetResliceAxes(mMatrixAxes);
-	//mReslicer->SetAutoCropOutput(false);
-	mReslicer->AutoCropOutputOn(); // used in 2.0.9
+	//mReslicer->SetAutoCropOutput(false); //faster update rate
+	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
 	
 	mWindowLevel = vtkImageMapToColorsPtr::New();
 	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
