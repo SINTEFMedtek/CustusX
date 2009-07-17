@@ -18,8 +18,8 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name)
 {
 	mToolActor = vtkActorPtr::New();
-	mPolyDataMapper = vtkPolyDataMapper::New();
-	mSTLReader = vtkSTLReader::New();
+	mPolyDataMapper = vtkPolyDataMapperPtr::New();
+	mSTLReader = vtkSTLReaderPtr::New();
 	
 //	if (pd::Settings::instance()->useDebugAxis())
 //	 	{
