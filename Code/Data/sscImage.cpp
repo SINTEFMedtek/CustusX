@@ -10,7 +10,6 @@
 #include <vtkDoubleArray.h>
 #include <vtkLookupTable.h>
 
-#include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
 
 namespace ssc

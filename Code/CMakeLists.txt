@@ -110,6 +110,7 @@ SET( SSC_SOURCE_FILES
     Data/sscDataManager.cpp
     Data/sscDataManagerImpl.cpp
     Tool/sscToolManager.cpp
+    Tool/sscTool.h 
     Tool/sscDummyToolManager.cpp
     Tool/sscDummyTool.cpp
     Tool/sscManualTool.cpp

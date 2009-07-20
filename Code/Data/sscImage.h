@@ -14,6 +14,8 @@ typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
 
 #include "sscData.h"
 #include "sscRep.h"
+#include "sscImageTF3D.h"
+typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
 
 class QDomNode;
 class QDomDocument;
