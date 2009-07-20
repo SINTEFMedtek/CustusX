@@ -3,11 +3,13 @@
 #include <limits.h>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
+#include <vtkImageAccumulate.h>
 #include <QPainter>
 #include <QPen>
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
+
 
 namespace cx
 {
