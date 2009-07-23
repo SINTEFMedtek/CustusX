@@ -66,6 +66,7 @@ public slots:
   virtual void initialize();
   virtual void startTracking();
   virtual void stopTracking();
+  virtual void saveToolsSlot();
 
 signals:
   void toolManagerReport(std::string message); ///< sends out messages the outside might want to log

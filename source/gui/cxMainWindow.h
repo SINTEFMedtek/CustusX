@@ -131,6 +131,7 @@ protected:
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
   QAction* mStartTrackingToolsAction; ///< action for asking the navigation system to start tracking
   QAction* mStopTrackingToolsAction; ///< action for asking the navigation system to stop tracking
+  QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
   QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
   QAction* m3D_1x1_LayoutAction; ///< action for switching to 3D_1x1 view layout

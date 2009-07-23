@@ -146,6 +146,10 @@ void ToolManager::stopTracking()
   }
   mTracker->stopTracking();
 }
+void ToolManager::saveToolsSlot()
+{
+  saveTransformsAndTimestamps();
+}
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
   return mConfiguredTools;
@@ -258,6 +262,8 @@ void ToolManager::saveTransformsAndTimestamps(
   ToolMapConstIter it = mConnectedTools->begin();
   while (it != mConnectedTools->end())
   {
+    //TODO: Check/move following line, filename should probably be set elsewhere
+    ((*it).second)->setTransformSaveFile(filePathAndName);
     ((*it).second)->saveTransformsAndTimestamps();
     it++;
   }

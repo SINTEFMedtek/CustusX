@@ -61,11 +61,14 @@ void Tool::saveTransformsAndTimestamps()
 
   std::stringstream timestampsName;
   std::stringstream transformsName;
-  timestampsName << mInternalStructure.mLoggingFolderName << ssc::Tool::mName << "_Timestamps_"
-  << stamp << ".txt";
-  transformsName << mInternalStructure.mLoggingFolderName << ssc::Tool::mName << "_Transforms_"
-  << stamp << ".txt";
-
+  //timestampsName << mInternalStructure.mLoggingFolderName
+  timestampsName << mInternalStructure.mTransformSaveFileName 
+  << ssc::Tool::mName << "_" << stamp << "_timestamps.txt";
+  //transformsName << mInternalStructure.mLoggingFolderName
+  transformsName << mInternalStructure.mTransformSaveFileName 
+  << ssc::Tool::mName << "_" << stamp << "_transforms.txt";
+  
+  //Save the timestamps
   std::ofstream timestamps;
   timestamps.open(timestampsName.str().c_str());
   timestamps << std::fixed;
@@ -80,7 +83,8 @@ void Tool::saveTransformsAndTimestamps()
   }
   mTimestamps.reset();
   timestamps.close();
-
+  
+  //Save the transforms
   std::ofstream transforms;
   transforms.open(transformsName.str().c_str());
   transforms << mTransforms->size();
@@ -180,6 +184,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     m_prMt = boost::shared_ptr<ssc::Transform3D>(new ssc::Transform3D(prMt));
 
     mTransforms->push_back(m_prMt);
+    mTimestamps->push_back(timestamp);
     //emit toolTransformAndTimestamp(rMt, timestamp);
     emit toolTransformAndTimestamp(prMt, timestamp);
     emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);

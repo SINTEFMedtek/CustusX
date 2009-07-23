@@ -124,6 +124,7 @@ void MainWindow::createActions()
   mInitializeToolsAction =  new QAction(tr("Initialize"), mToolsActionGroup);
   mStartTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
   mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), mToolsActionGroup);
+  mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
   mConfigureToolsAction->setChecked(true);
 
@@ -135,6 +136,8 @@ void MainWindow::createActions()
           mToolManager, SLOT(startTracking()));
   connect(mStopTrackingToolsAction, SIGNAL(triggered()),
           mToolManager, SLOT(stopTracking()));
+  connect(mSaveToolsPositionsAction, SIGNAL(triggered()), 
+          mToolManager, SLOT(saveToolsSlot()));
 
   //layout
   mLayoutActionGroup = new QActionGroup(this);
@@ -208,6 +211,8 @@ void MainWindow::createMenus()
   mToolMenu->addAction(mInitializeToolsAction);
   mToolMenu->addAction(mStartTrackingToolsAction);
   mToolMenu->addAction(mStopTrackingToolsAction);
+  mToolMenu->addSeparator();
+  mToolMenu->addAction(mSaveToolsPositionsAction);
 
   //tool
   this->menuBar()->addMenu(mLayoutMenu);
