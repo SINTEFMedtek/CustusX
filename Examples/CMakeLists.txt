@@ -1,1 +1,2 @@
+add_subdirectory(SliceAndToolRep)
 add_subdirectory(ViewApp)
