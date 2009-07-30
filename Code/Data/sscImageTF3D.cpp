@@ -265,11 +265,10 @@ void ImageTF3D::refreshOpacityTF()
 	double range = mWindow;
 	int smooth = (int)(0.1*range);
 	mOpacityTF->AddPoint(mLLR-1, 0 );
-	//mOpacityTF->AddPoint(mLLR+1+smooth/2, mAlpha*1/4 );
-	mOpacityTF->AddPoint(mLLR+1*smooth, mAlpha*2/4 );
-	//mOpacityTF->AddPoint(mLLR+1+2*smooth, mAlpha*3/4 );
+	//mOpacityTF->AddPoint(mLLR-1*smooth, 0 );
+	mOpacityTF->AddPoint(mLLR,          mAlpha*1/10 );
+	mOpacityTF->AddPoint(mLLR+1*smooth, mAlpha*5/10 );
 	mOpacityTF->AddPoint(mLLR+4*smooth, mAlpha );
-	//mOpacityTF->AddPoint(getScalarMax(), mAlpha );
 #endif
 	mOpacityTF->Update();
 }
