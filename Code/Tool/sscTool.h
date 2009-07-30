@@ -9,6 +9,7 @@ typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 #include "sscTransform3D.h"
 #include "sscProbeSector.h"
+#include "sscIndent.h"
 
 namespace ssc
 {
@@ -69,6 +70,7 @@ public:
 	
 	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe.
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
+	virtual void printSelf(std::ostream & os, Indent indent) {} ///< dump internal debug data
 	
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
