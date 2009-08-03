@@ -23,7 +23,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(new ImageLUT2D(data)),
 	mUid(uid), mName(uid), mBaseImageData(data),
-	mLandmarks(vtkDoubleArray::New())
+	mLandmarks(vtkDoubleArrayPtr::New())
 {
 	//std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
