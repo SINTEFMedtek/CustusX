@@ -148,13 +148,32 @@ SlicePlane SliceComputer::getPlane()  const
 	}	
 	
 	// transform into the final plane (dont transform the center)
-	Transform3D offset = generateBasisOffset();
-	plane.i = offset.vector(plane.i); 
-	plane.j = offset.vector(plane.j);
+	plane = applyBasisOffset(plane);
 	
 	plane = applyViewOffset(plane);
 		
 	return plane; 
+}
+
+/**Apply offsets from the initial plane definition.
+ * This offset is applied in the local space of the plane (base),
+ * thus we apply a similarity transform the the basis offset.
+ */
+SlicePlane SliceComputer::applyBasisOffset(const SlicePlane& base) const
+{
+	SlicePlane retval = base;
+	Transform3D offset = generateBasisOffset();
+	
+	Vector3D local_x = base.i;
+	Vector3D local_y = cross(base.i, base.j);
+	Transform3D gMl = createTransformIJC(local_x, local_y, Vector3D(0,0,0)).inv(); // relation base to global
+	Transform3D offsetGlobal = gMl.inv() * offset * gMl;
+	
+	retval.i = offsetGlobal.vector(base.i); 
+	retval.j = offsetGlobal.vector(base.j);
+	//	plane.i = offset.vector(plane.i); 
+	//	plane.j = offset.vector(plane.j);
+	return retval;
 }
 
 /**Apply the view offset which is defined as follows:

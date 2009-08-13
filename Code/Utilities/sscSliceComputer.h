@@ -77,6 +77,7 @@ private:
 	Vector3D generateFixedIJCenter(const Vector3D& center_r, const Vector3D& cross_r, const Vector3D& i, const Vector3D& j) const;
 	SlicePlane orientToGravity(const SlicePlane& base) const;
 	Transform3D generateBasisOffset() const;
+	SlicePlane applyBasisOffset(const SlicePlane& base) const;
 	SlicePlane applyViewOffset(const SlicePlane& base) const;
 
 private:
