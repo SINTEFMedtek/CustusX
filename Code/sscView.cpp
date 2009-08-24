@@ -172,4 +172,10 @@ void View::printSelf(std::ostream & os, Indent indent)
 	}
 }
 
+void View::mouseMoveEvent(QMouseEvent* event)
+{
+	emit mouseMoveSignal(event);
+}
+
+
 } // namespace ssc

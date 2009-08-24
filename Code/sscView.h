@@ -50,6 +50,8 @@ public:
   
 signals:
       void resized(QSize size);
+      void mouseMoveSignal(QMouseEvent* event);
+      
 protected:
 	std::string mUid; 		///< the views unique id
 	std::string mName; 		///< the views name
@@ -59,6 +61,7 @@ protected:
 	std::vector<RepPtr> 					mReps; ///< storage for internal reps.
 	typedef std::vector<RepPtr>::iterator 	RepsIter; ///< iterator typedef for the internal rep vector.
 private:
+	virtual void mouseMoveEvent(QMouseEvent* event);
     void resizeEvent(QResizeEvent * event);
 };
 
