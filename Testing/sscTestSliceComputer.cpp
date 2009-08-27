@@ -122,12 +122,13 @@ public:
 		// looking from the right
 		slicer.setPlaneType(ssc::ptSIDEPLANE);
 		//std::cout << "side: \n" << slicer.getPlane() << std::endl;
-		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, -1, 0), Vector3D( 0, 0, 1));
+		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
+		//std::cout << "side: " << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
 
 		// looking from above
 		slicer.setPlaneType(ssc::ptRADIALPLANE);
-		ssc::SlicePlane radialPlane(c_tool, Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
+		ssc::SlicePlane radialPlane(c_tool, Vector3D(-1, 0, 0), Vector3D( 0,1, 0));
 		//std::cout << "radial: \n" << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));		
 
