@@ -10,6 +10,7 @@ namespace ssc
 
 ManualTool::ManualTool(const std::string& uid) : mUid(uid), mName(uid), mMutex(QMutex::Recursive)
 {
+	mOffset = 0;
 	mType = TOOL_MANUAL;
 	mVisible = false; 	
 	createPolyData();
@@ -115,5 +116,17 @@ double ManualTool::getTimestamp() const
 	return 0;
 }
 
+double ManualTool::getTooltipOffset() const 
+{
+	return mOffset; 
+}
+
+void ManualTool::setTooltipOffset(double val) 
+{ 
+	if (similar(val,mOffset)) 
+		return; 
+	mOffset = val; 
+	emit tooltipOffset(mOffset); 
+}
 
 }//end namespace

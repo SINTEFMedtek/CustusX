@@ -72,9 +72,13 @@ public:
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
 	virtual void printSelf(std::ostream & os, Indent indent) {} ///< dump internal debug data
 	
+	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
+	virtual void setTooltipOffset(double val) {} ///< set a virtual offset extending from the tool tip.
+	
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
+	void tooltipOffset(double offset);
 
 protected:
 	std::string mUid;

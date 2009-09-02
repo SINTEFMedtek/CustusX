@@ -84,6 +84,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSliceComputer.cpp 
     Utilities/sscIndent.cpp
     Utilities/sscAcceptanceBoxWidget.cpp
+    Utilities/sscGraphicalPrimitives.cpp
     sscView.cpp
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp

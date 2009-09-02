@@ -22,7 +22,8 @@ int DummyTool::mTransformCount = 0;
 DummyTool::DummyTool(const std::string& uid) :
 	mVisible(false),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
-	mTimer(new QTimer())
+	mTimer(new QTimer()),
+	mOffset(0)
 {
 	mUid = uid;
 	mName = uid;
@@ -228,6 +229,19 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	double timestamp = (double) time.time().msec();
 	m_prMt = prMt;
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
+}
+
+double DummyTool::getTooltipOffset() const 
+{
+	return mOffset; 
+}
+
+void DummyTool::setTooltipOffset(double val) 
+{ 
+	if (similar(val,mOffset)) 
+		return; 
+	mOffset = val; 
+	emit tooltipOffset(mOffset); 
 }
 
 

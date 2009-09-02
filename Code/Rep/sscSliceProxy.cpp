@@ -26,9 +26,7 @@ void SliceProxy::setTool(ToolPtr tool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
-
-		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(toolTransformAndTimestamp(Transform3D,double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));		
+		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
 	}	
 	
 	mTool = tool;
@@ -37,11 +35,10 @@ void SliceProxy::setTool(ToolPtr tool)
 	{
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
-
-		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(toolTransformAndTimestamp(Transform3D,double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SIGNAL(toolVisible(bool)));		
+		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
 
 		toolTransformAndTimestampSlot(mTool->get_prMt(), 0); // initial values
+		tooltipOffsetSlot(mTool->getTooltipOffset());
 	}	
 	
 	centerChangedSlot(); // force center update for tool==0
@@ -53,6 +50,12 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 	//std::cout << "proxy get transform" << std::endl;
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	mCutplane.setToolPosition(rMpr*prMt);	
+	changed();
+}
+
+void SliceProxy::tooltipOffsetSlot(double val)
+{
+	mCutplane.setToolOffset(val);		
 	changed();
 }
 

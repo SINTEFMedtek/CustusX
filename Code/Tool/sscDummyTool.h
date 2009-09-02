@@ -46,6 +46,9 @@ public:
 	void set_prMt(const Transform3D& ptMt);
 	void setVisible(bool val);
 
+	virtual double getTooltipOffset() const;
+	virtual void setTooltipOffset(double val);	
+	
 private slots:
 	virtual void sendTransform();
 
@@ -58,6 +61,7 @@ private:
 	vtkPolyDataPtr mPolyData;
 
 	bool mVisible;
+	double mOffset;
 	Transform3D m_prMt;
 	std::string mTransformSaveFileName;
 	QTimerPtr mTimer;

@@ -5,6 +5,7 @@
 #include "vtkSmartPointer.h"
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
+#include "sscGraphicalPrimitives.h"
 
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
@@ -52,12 +53,16 @@ private slots:
 	 *\param visible Whether or not the tool is visible to the tracking system.
 	 */
 	void receiveVisible(bool visible);
+	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.		
 private:
+	void updateOffsetGraphics();
+
 	ToolPtr mTool;
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
 	vtkSTLReaderPtr mSTLReader;
-	
+	GraphicalPoint3DPtr mOffsetPoint;
+	GraphicalLine3DPtr mOffsetLine;
 	bool mStayVisibleAfterHide; 
 };
 } // namespace ssc

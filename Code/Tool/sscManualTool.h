@@ -33,6 +33,9 @@ public:
 	virtual ssc::ProbeSector getProbeSector() const;	
 	virtual double getTimestamp() const;
 	
+	virtual double getTooltipOffset() const;
+	virtual void setTooltipOffset(double val);	
+
 	// extensions:
 	void set_prMt(const Transform3D& prMt);
 	void setVisible(bool vis);
@@ -43,6 +46,7 @@ private:
 	const std::string mUid;
 	const std::string mName;
 	vtkPolyDataPtr mPolyData;
+	double mOffset;
 
 	// mutex-protected mutable data
 	Type mType;

@@ -20,6 +20,8 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mSTLReader = vtkSTLReaderPtr::New();
+	mOffsetPoint.reset(new GraphicalPoint3D());
+	mOffsetLine.reset(new GraphicalLine3D());	
 	
 //	if (pd::Settings::instance()->useDebugAxis())
 //	 	{
@@ -59,6 +61,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 
 		disconnect(mTool.get(), SIGNAL(toolVisible(bool)),
 				this, SLOT(receiveVisible(bool)));
+		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
 		
 		mToolActor->SetMapper(NULL);
 	}
@@ -92,6 +95,8 @@ void ToolRep3D::setTool(ToolPtr tool)
 				this, SLOT(receiveTransforms(Transform3D, double)));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)),
 				this, SLOT(receiveVisible(bool)));
+		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
+		
 	}
 }
 
@@ -103,11 +108,19 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
 	view->getRenderer()->AddActor(mToolActor);
+	
+	mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
+	mOffsetPoint->setRadius(3);
+	mOffsetPoint->setColor(Vector3D(1,1,0));
+	mOffsetLine.reset(new GraphicalLine3D(view->getRenderer()));	
+	mOffsetLine->setColor(Vector3D(1,1,0));
 }
 
 void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mToolActor);
+	mOffsetPoint.reset(new GraphicalPoint3D());
+	mOffsetLine.reset(new GraphicalLine3D());	
 }
 
 void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
@@ -122,6 +135,26 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 	
 	Transform3D rMt = rMpr*prMt;	
 	mToolActor->SetUserMatrix( rMt.matrix());
+
+	updateOffsetGraphics();
+}
+
+void ToolRep3D::updateOffsetGraphics()
+{
+	bool visible = mTool && !similar(0.0, mTool->getTooltipOffset()) && mTool->getVisible();
+	mOffsetPoint->getActor()->SetVisibility(visible);
+	mOffsetLine->getActor()->SetVisibility(visible);
+	
+	if (!mTool)
+		return;
+	
+	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMt = rMpr * mTool->get_prMt();	
+
+	Vector3D p0 = rMt.coord(Vector3D(0,0,0));
+	Vector3D p1 = rMt.coord(Vector3D(0,0,mTool->getTooltipOffset()));	
+	mOffsetPoint->setValue(p1);
+	mOffsetLine->setValue(p0,p1);	
 }
 
 void ToolRep3D::receiveVisible(bool visible)
@@ -133,6 +166,7 @@ void ToolRep3D::receiveVisible(bool visible)
 	}
 	
 	mToolActor->SetVisibility(visible);
+	updateOffsetGraphics();
 }
 
 /**
@@ -144,5 +178,9 @@ void ToolRep3D::setStayVisibleAfterHide(bool val)
 	mStayVisibleAfterHide = val;	
 }
 
+void ToolRep3D::tooltipOffsetSlot(double val)
+{
+	updateOffsetGraphics();	
+}
 
 } // namespace ssc

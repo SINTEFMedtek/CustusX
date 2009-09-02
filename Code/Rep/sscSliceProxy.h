@@ -44,6 +44,7 @@ signals:
 	void toolVisible(bool visible); ///< forwarding of visible in tool
 	
 private slots:
+	void tooltipOffsetSlot(double val);
 	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 	void toolVisibleSlot(bool visible); 
 	void centerChangedSlot();
