@@ -136,6 +136,11 @@ SlicePlane SliceComputer::getPlane()  const
 		plane.j = m_rMt.vector(plane.j);		
 	}
 
+	// apply basis offset _before_ applying gravity
+	// this is the behaviour of LabView-Sonowand.
+	plane = applyBasisOffset(plane);
+	
+	
 	if (mUseGravity)
 	{
 		plane = orientToGravity(plane);
@@ -147,8 +152,8 @@ SlicePlane SliceComputer::getPlane()  const
 		plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
 	}	
 	
-	// transform into the final plane (dont transform the center)
-	plane = applyBasisOffset(plane);
+//	// transform into the final plane (dont transform the center)
+//	plane = applyBasisOffset(plane);
 	
 	plane = applyViewOffset(plane);
 		

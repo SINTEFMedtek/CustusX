@@ -110,7 +110,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 	view->getRenderer()->AddActor(mToolActor);
 	
 	mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
-	mOffsetPoint->setRadius(3);
+	mOffsetPoint->setRadius(2);
 	mOffsetPoint->setColor(Vector3D(1,1,0));
 	mOffsetLine.reset(new GraphicalLine3D(view->getRenderer()));	
 	mOffsetLine->setColor(Vector3D(1,1,0));
@@ -142,8 +142,12 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 void ToolRep3D::updateOffsetGraphics()
 {
 	bool visible = mTool && !similar(0.0, mTool->getTooltipOffset()) && mTool->getVisible();
-	mOffsetPoint->getActor()->SetVisibility(visible);
-	mOffsetLine->getActor()->SetVisibility(visible);
+	
+	if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility()==false))
+	{
+		mOffsetPoint->getActor()->SetVisibility(visible);
+		mOffsetLine->getActor()->SetVisibility(visible);
+	}
 	
 	if (!mTool)
 		return;
