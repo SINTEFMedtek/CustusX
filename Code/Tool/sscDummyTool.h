@@ -49,6 +49,8 @@ public:
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);	
 	
+	static vtkPolyDataPtr createPolyData(double h1, double h2, double r1, double r2);	
+	
 private slots:
 	virtual void sendTransform();
 

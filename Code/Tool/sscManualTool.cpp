@@ -1,7 +1,8 @@
 #include "sscManualTool.h"
 #include <QTime>
 #include <QTimer>
-#include <vtkConeSource.h>
+//#include <vtkConeSource.h>
+#include "sscDummyTool.h"
 
 typedef vtkSmartPointer <class vtkConeSource> vtkConeSourcePtr;
 
@@ -13,7 +14,8 @@ ManualTool::ManualTool(const std::string& uid) : mUid(uid), mName(uid), mMutex(Q
 	mOffset = 0;
 	mType = TOOL_MANUAL;
 	mVisible = false; 	
-	createPolyData();
+//	createPolyData();
+    mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);	
 }
 
 ManualTool::~ManualTool()
@@ -38,19 +40,19 @@ std::string ManualTool::getGraphicsFileName() const
 	return "";
 }
 
-void ManualTool::createPolyData()
-{
-	vtkConeSourcePtr coneSource = vtkConeSource::New();
-	coneSource->SetResolution(25);
-	coneSource->SetRadius(10);
-	coneSource->SetHeight(500);
-	coneSource->SetDirection(0, 0, 1);	
-	double newCenter[3];
-	coneSource->GetCenter(newCenter);
-	newCenter[2] = newCenter[2] - coneSource->GetHeight()/2;
-	coneSource->SetCenter( newCenter );
-	mPolyData = coneSource->GetOutput();
-}
+//void ManualTool::createPolyData()
+//{
+//	vtkConeSourcePtr coneSource = vtkConeSource::New();
+//	coneSource->SetResolution(25);
+//	coneSource->SetRadius(10);
+//	coneSource->SetHeight(500);
+//	coneSource->SetDirection(0, 0, 1);	
+//	double newCenter[3];
+//	coneSource->GetCenter(newCenter);
+//	newCenter[2] = newCenter[2] - coneSource->GetHeight()/2;
+//	coneSource->SetCenter( newCenter );
+//	mPolyData = coneSource->GetOutput();
+//}
 
 ssc::Tool::Type ManualTool::getType() const
 {

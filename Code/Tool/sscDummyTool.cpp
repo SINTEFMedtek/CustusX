@@ -1,9 +1,22 @@
 #include "sscDummyTool.h"
 
 #include <vtkPolyData.h>
+#include <vtkAppendPolyData.h>
 #include <vtkConeSource.h>
+#include <vtkCylinderSource.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkTransform.h>
 #include <QTimer>
 #include <QTime>
+#include <vtkPlane.h>
+#include <vtkClipPolyData.h>
+
+typedef vtkSmartPointer<vtkAppendPolyData> vtkAppendPolyDataPtr;
+typedef vtkSmartPointer<vtkCylinderSource> vtkCylinderSourcePtr;
+typedef vtkSmartPointer<vtkTransformPolyDataFilter> vtkTransformPolyDataFilterPtr ;
+typedef vtkSmartPointer<vtkTransform> vtkTransformPtr;
+typedef vtkSmartPointer<vtkPlane> vtkPlanePtr;
+typedef vtkSmartPointer<vtkClipPolyData> vtkClipPolyDataPtr;
 
 /**
  * sscTool.cpp
@@ -31,7 +44,8 @@ DummyTool::DummyTool(const std::string& uid) :
 	DoubleBoundingBox3D bb(Vector3D(0,0,0), Vector3D(512,512,256));
 	setToolPositionMovementBB(bb);
 
-	this->createPolyData();
+//	this->createPolyData();
+    mPolyData = this->createPolyData(140,10,10,3);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
 }
@@ -122,21 +136,53 @@ void DummyTool::sendTransform()
 {
 	set_prMt(*getNextTransform());
 }
-void DummyTool::createPolyData()
+
+/** Create a dummy 3D representation with a butt tip
+ * Input is the height of the two segments, h1 and h2,
+ * and the radius of the two segmens, r1 and r2.
+ * Typical values is given in the class constructor (150,10,10,3).
+ */
+vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double r2)
 {
-	vtkConeSourcePtr coneSource = vtkConeSource::New();
+//	mOffset = 5; // debug - show yellow stuff
+		
+//	double r1 = 10;
+//	double r2 = 3;
+//	double h1 = 140;
+//	double h2 =  10;
+	
+	vtkAppendPolyDataPtr assembly = vtkAppendPolyDataPtr::New(); 
+	
+	vtkPlanePtr plane = vtkPlanePtr::New();
+	plane->SetNormal(0,0,-1);
+	plane->SetOrigin(0,0,-h2);
+	
+	vtkConeSourcePtr cone1 = vtkConeSource::New();
+	double h1_extension = h1*r2 / (r1-r2); 
+	double h1_mod = h1+h1_extension;
+    cone1->SetResolution(50);
+    cone1->SetRadius(r1);
+    cone1->SetHeight(h1_mod);
+    cone1->SetDirection(0,0,1);
+    double center1 = -h1/2-h2+h1_extension/2;
+    cone1->SetCenter(Vector3D(0,0,center1).begin());
 
-    coneSource->SetResolution(25);
-    coneSource->SetRadius(10);
-    coneSource->SetHeight(300);
+	vtkClipPolyDataPtr clipper1 = vtkClipPolyDataPtr::New();
+	clipper1->SetInput(cone1->GetOutput());
+	clipper1->SetClipFunction(plane);    
+    
+	vtkConeSourcePtr cone2 = vtkConeSource::New();
+    cone2->SetResolution(25);
+    cone2->SetRadius(r2);
+    cone2->SetHeight(h2);
+    cone2->SetDirection(0,0,1);
+    double center2 = -h2/2;
+    cone2->SetCenter(Vector3D(0,0,center2).begin());
 
-    coneSource->SetDirection(0,0,1);
-    double newCenter[3];
-    coneSource->GetCenter(newCenter);
-    newCenter[2] = newCenter[2] - coneSource->GetHeight()/2;
-    coneSource->SetCenter(newCenter);
-
-    mPolyData = coneSource->GetOutput();
+    assembly->AddInput(clipper1->GetOutput());
+    assembly->AddInput(cone2->GetOutput());
+//    mPolyData = assembly->GetOutput();
+    return assembly->GetOutput();
 }
 
 void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const

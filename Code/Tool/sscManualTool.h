@@ -54,7 +54,7 @@ private:
 	Transform3D m_prMt;
 	mutable QMutex mMutex;
 
-	void createPolyData();
+//	void createPolyData();
 };
 
 typedef boost::shared_ptr<ManualTool> ManualToolPtr;
