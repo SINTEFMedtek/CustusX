@@ -22,6 +22,8 @@ typedef boost::shared_ptr<class Rep> RepPtr;
 class View : public QVTKWidget
 {
   Q_OBJECT
+  
+  typedef QVTKWidget inherited;
 
 public:
   enum Type
@@ -51,6 +53,7 @@ public:
 signals:
       void resized(QSize size);
       void mouseMoveSignal(QMouseEvent* event);
+      void mouseReleaseSignal(QMouseEvent* event);
       
 protected:
 	std::string mUid; 		///< the views unique id
@@ -62,6 +65,7 @@ protected:
 	typedef std::vector<RepPtr>::iterator 	RepsIter; ///< iterator typedef for the internal rep vector.
 private:
 	virtual void mouseMoveEvent(QMouseEvent* event);
+	virtual void mouseReleaseEvent(QMouseEvent* event);
     void resizeEvent(QResizeEvent * event);
 };
 

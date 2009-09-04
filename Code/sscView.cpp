@@ -123,10 +123,13 @@ bool View::hasRep(const RepPtr& rep) const
 
 void View::resizeEvent ( QResizeEvent * event )
 {
+	inherited::resizeEvent(event);
+	
 	QSize size = event->size();
 	vtkRenderWindowInteractor* iren = mRenderWindow->GetInteractor();
 	if(iren != NULL)
 		iren->UpdateSize(size.width(), size.height());
+	
     emit resized(size);
 }
 
@@ -174,8 +177,16 @@ void View::printSelf(std::ostream & os, Indent indent)
 
 void View::mouseMoveEvent(QMouseEvent* event)
 {
+	inherited::mouseMoveEvent(event);
 	emit mouseMoveSignal(event);
 }
+
+void View::mouseReleaseEvent(QMouseEvent* event)
+{
+	inherited::mouseReleaseEvent(event);
+	emit mouseReleaseSignal(event);
+}
+
 
 
 } // namespace ssc

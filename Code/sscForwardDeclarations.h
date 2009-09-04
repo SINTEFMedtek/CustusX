@@ -11,6 +11,8 @@
 
 namespace ssc {
 
+class View;
+
 // data
 typedef boost::shared_ptr<class Tool> ToolPtr;
 typedef boost::shared_ptr<class ManualTool> ManualToolPtr;
