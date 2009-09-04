@@ -236,7 +236,7 @@ Transform3D SliceComputer::generateBasisOffset() const
 {
 	switch (mPlaneType)
 	{
-	case ptSIDEPLANE:   return createTransformRotateZ(M_PI/2); 
+	case ptSIDEPLANE:   return createTransformRotateZ(-M_PI/2); 
 	case ptRADIALPLANE: return createTransformRotateX(M_PI/2);
 	default:
 		return Transform3D();
