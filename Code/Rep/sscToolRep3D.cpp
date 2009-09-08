@@ -144,7 +144,7 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 
 void ToolRep3D::updateOffsetGraphics()
 {
-	bool visible = mTool && mTool->getVisible();
+	bool visible = mTool && mTool->getVisible() && mTool->getType()!=Tool::TOOL_US_PROBE; // no offset for probes
 	
 	if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility()==false))
 	{

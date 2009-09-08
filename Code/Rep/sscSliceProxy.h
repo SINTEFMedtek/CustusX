@@ -48,9 +48,9 @@ private slots:
 	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 	void toolVisibleSlot(bool visible); 
 	void centerChangedSlot();
+	void changed();
 private:
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
-	void changed();
 	ToolPtr mTool;
 	SliceComputer mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available

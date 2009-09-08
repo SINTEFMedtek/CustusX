@@ -79,6 +79,7 @@ signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
+	void toolProbeSector();
 
 protected:
 	std::string mUid;

@@ -27,6 +27,7 @@ void SliceProxy::setTool(ToolPtr tool)
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
 		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
+		disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed())); 		
 	}	
 	
 	mTool = tool;
@@ -36,7 +37,9 @@ void SliceProxy::setTool(ToolPtr tool)
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SLOT(toolTransformAndTimestampSlot(Transform3D,double)));
 		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));		
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));		
+		connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(changed()));/// not used here, but forwarded to users		
 
+		emit toolVisible(mTool->getVisible());
 		toolTransformAndTimestampSlot(mTool->get_prMt(), 0); // initial values
 		tooltipOffsetSlot(mTool->getTooltipOffset());
 	}	
