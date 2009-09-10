@@ -121,9 +121,9 @@ public:
 		
 		// looking from the right
 		slicer.setPlaneType(ssc::ptSIDEPLANE);
-		//std::cout << "side: \n" << slicer.getPlane() << std::endl;
-		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
-		//std::cout << "side: " << slicer.getPlane() << std::endl;
+		ssc::SlicePlane sidePlane(c_tool, Vector3D( 0, -1, 0), Vector3D( 0, 0, 1));
+//		std::cout << "side template: \n" << sidePlane << std::endl;
+//		std::cout << "side result: " << slicer.getPlane() << std::endl;
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
 
 		// looking from above
@@ -164,10 +164,14 @@ public:
 		CPPUNIT_ASSERT(similar(slicer.getPlane(), anyPlane));
 		// looking from the right
 		slicer.setPlaneType(ssc::ptSIDEPLANE);
-		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlane));		
+		ssc::SlicePlane sidePlaneG(c_tool, Vector3D( 0, 0, -1), Vector3D( 0, -1, 0));
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), sidePlaneG));		
 		// looking from above
 		slicer.setPlaneType(ssc::ptRADIALPLANE);
-		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlane));		
+//		std::cout << "r template: \n" << radialPlane << std::endl;
+//		std::cout << "r result: " << slicer.getPlane() << std::endl;
+		ssc::SlicePlane radialPlaneG(c_tool, Vector3D(1, 0, 0), Vector3D( 0,-1, 0));
+		CPPUNIT_ASSERT(similar(slicer.getPlane(), radialPlaneG));		
 	}
 
 	void testMore()
