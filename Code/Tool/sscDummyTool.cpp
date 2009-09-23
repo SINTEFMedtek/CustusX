@@ -157,7 +157,7 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 	plane->SetNormal(0,0,-1);
 	plane->SetOrigin(0,0,-h2);
 	
-	vtkConeSourcePtr cone1 = vtkConeSource::New();
+	vtkConeSourcePtr cone1 = vtkConeSourcePtr::New();
 	double h1_extension = h1*r2 / (r1-r2); 
 	double h1_mod = h1+h1_extension;
     cone1->SetResolution(50);
@@ -171,7 +171,7 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 	clipper1->SetInput(cone1->GetOutput());
 	clipper1->SetClipFunction(plane);    
     
-	vtkConeSourcePtr cone2 = vtkConeSource::New();
+	vtkConeSourcePtr cone2 = vtkConeSourcePtr::New();
     cone2->SetResolution(25);
     cone2->SetRadius(r2);
     cone2->SetHeight(h2);

@@ -17,6 +17,7 @@ namespace ssc
 ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name)
 {
+	mStayVisibleAfterHide = false;
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mSTLReader = vtkSTLReaderPtr::New();
