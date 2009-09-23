@@ -40,20 +40,6 @@ std::string ManualTool::getGraphicsFileName() const
 	return "";
 }
 
-//void ManualTool::createPolyData()
-//{
-//	vtkConeSourcePtr coneSource = vtkConeSource::New();
-//	coneSource->SetResolution(25);
-//	coneSource->SetRadius(10);
-//	coneSource->SetHeight(500);
-//	coneSource->SetDirection(0, 0, 1);	
-//	double newCenter[3];
-//	coneSource->GetCenter(newCenter);
-//	newCenter[2] = newCenter[2] - coneSource->GetHeight()/2;
-//	coneSource->SetCenter( newCenter );
-//	mPolyData = coneSource->GetOutput();
-//}
-
 ssc::Tool::Type ManualTool::getType() const
 {
 	return mType;

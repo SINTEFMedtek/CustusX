@@ -207,7 +207,7 @@ vtkImageAccumulatePtr Image::getHistogram()
 {
 	if (mHistogramPtr.GetPointer() == NULL)
 	{
-		mHistogramPtr = vtkImageAccumulate::New();
+		mHistogramPtr = vtkImageAccumulatePtr::New();
 		mHistogramPtr->SetInput(mBaseImageData);
 		mHistogramPtr->IgnoreZeroOn(); // required for Sonowand CT volumes, where data are placed between 31K and 35K.
 		// Set up only a 1D histogram for now, so y and z values are set to 0
