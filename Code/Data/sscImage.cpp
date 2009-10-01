@@ -9,6 +9,7 @@
 #include <vtkMatrix4x4.h>
 #include <vtkDoubleArray.h>
 #include <vtkLookupTable.h>
+#include <vtkImageLuminance.h>
 
 #include "sscImageLUT2D.h"
 
@@ -64,11 +65,34 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
 	std::cout << "Image::setVtkImageData() " << std::endl;
 	mBaseImageData = data;
+	mBaseGrayScaleImageData = NULL;
 	mOutputImageData = mBaseImageData;
 	mImageTransferFunctions3D->setVtkImageData(data);
 	mImageLookupTable2D->setVtkImageData(data);
 
 	emit vtkImageDataChanged();
+}
+
+
+vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
+{
+	if (mBaseGrayScaleImageData)
+	{
+		return mBaseGrayScaleImageData;
+	}
+	
+	mBaseGrayScaleImageData = getBaseVtkImageData();
+	
+	// if the volume is color, run it through a luminance filter in order to get a
+	// finning grayscale representation.
+	if (mBaseGrayScaleImageData->GetNumberOfScalarComponents()>2) // color
+	{
+		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+		luminance->SetInput(mBaseGrayScaleImageData);
+		mBaseGrayScaleImageData = luminance->GetOutput();		
+	}
+	
+	return mBaseGrayScaleImageData;
 }
 
 ImageTF3DPtr Image::getTransferFunctions3D()

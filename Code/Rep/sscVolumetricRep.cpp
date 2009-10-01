@@ -9,7 +9,6 @@
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageResample.h>
-#include <vtkImageLuminance.h>
 
 #include "sscView.h"
 #include "sscImageTF3D.h"
@@ -154,14 +153,9 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	// use the base instead of the ref image, because otherwise changes in the transform
 	// causes data to be sent anew to the graphics card (takes 4s).
 	// changing the mVolume transform instead is a fast operation.
-	vtkImageDataPtr volume = mImage->getBaseVtkImageData();
-
-	if (volume->GetNumberOfScalarComponents()>2) // color
-	{
-		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
-		luminance->SetInput(volume);
-		volume = luminance->GetOutput();		
-	}	
+	//
+	// also use grayscale as vtk is incapable of rendering 3component color.
+	vtkImageDataPtr volume = mImage->getGrayScaleBaseVtkImageData();
 
 	if (fabs(1.0-mResampleFactor)>0.01) // resampling
 	{

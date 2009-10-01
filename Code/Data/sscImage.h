@@ -48,6 +48,7 @@ public:
 	virtual REGISTRATION_STATUS getRegistrationStatus() const;
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
+	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
 	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
 
@@ -93,6 +94,7 @@ protected:
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 	
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
+	vtkImageDataPtr mBaseGrayScaleImageData; ///< image data in data space
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
 	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
 	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)	
