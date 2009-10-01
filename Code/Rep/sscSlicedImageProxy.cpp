@@ -10,6 +10,9 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 
+#include <vtkImageAlgorithm.h>
+#include <vtkImageChangeInformation.h>
+
 #include "sscView.h"
 #include "sscDataManager.h"
 #include "sscSliceProxy.h"
@@ -22,7 +25,6 @@ namespace ssc
 SlicedImageProxy::SlicedImageProxy()
 {
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
-	//mWindowLevel = vtkImageMapToWindowLevelColorsPtr::New();
 
 	mReslicer = vtkImageReslicePtr::New();
 	mReslicer->SetInterpolationModeToLinear();
@@ -34,6 +36,8 @@ SlicedImageProxy::SlicedImageProxy()
 	mWindowLevel = vtkImageMapToColorsPtr::New();
 	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 	mWindowLevel->SetOutputFormatToRGBA();
+	
+ 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 }
 
 SlicedImageProxy::~SlicedImageProxy()
@@ -59,10 +63,17 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	if (mImage)
 	{
 		mReslicer->SetInput( mImage->getBaseVtkImageData() );
-		//mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
-		//mWindowLevel->SetOutputFormatToRGBA();
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
+		
+		if (mImage->getBaseVtkImageData()->GetNumberOfScalarComponents()>2) // color
+		{
+		 	mRedirecter->SetInput(mReslicer->GetOutput());			
+		}
+		else // grayscale
+		{
+		 	mRedirecter->SetInput(mWindowLevel->GetOutput());						
+		}
 	}
 }
 
@@ -74,7 +85,7 @@ ImagePtr SlicedImageProxy::getImage()const
 //deliver the sliced image..
 vtkImageDataPtr SlicedImageProxy::getOutput()
 {
-	return mWindowLevel->GetOutput();
+	return mRedirecter->GetOutput();
 }
 
 void SlicedImageProxy::update()
@@ -87,9 +98,6 @@ void SlicedImageProxy::update()
 	Transform3D M = iMr*rMs;
 
 	mMatrixAxes->DeepCopy(M.matrix());
-
-	//	Transform3D rMs = mSlicer->get_sMr().inv();
-	//	mMatrixAxes->DeepCopy(rMs.matrix());
 }
 
 void SlicedImageProxy::sliceTransformChangedSlot(Transform3D sMr)

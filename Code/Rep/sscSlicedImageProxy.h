@@ -12,6 +12,7 @@
 
 typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
 typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
+typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr; 
 
 namespace ssc
 {
@@ -39,10 +40,14 @@ public:
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
 
-private:
+private: 	
+	
 	SliceProxyPtr mSlicer;
 	ImagePtr mImage;
 	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
+	vtkImageAlgorithmPtr mRedirecter; 	
+ 	//vtkImageReslicePtr mRedirecter;
+	
 	vtkImageMapToColorsPtr mWindowLevel;
 	vtkImageReslicePtr mReslicer;
 	vtkMatrix4x4Ptr mMatrixAxes;
