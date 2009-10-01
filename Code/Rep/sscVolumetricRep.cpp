@@ -9,6 +9,7 @@
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageResample.h>
+#include <vtkImageLuminance.h>
 
 #include "sscView.h"
 #include "sscImageTF3D.h"
@@ -153,23 +154,29 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	// use the base instead of the ref image, because otherwise changes in the transform
 	// causes data to be sent anew to the graphics card (takes 4s).
 	// changing the mVolume transform instead is a fast operation.
+	vtkImageDataPtr volume = mImage->getBaseVtkImageData();
 
-	if (fabs(1.0-mResampleFactor)>0.01)
+	if (volume->GetNumberOfScalarComponents()>2) // color
+	{
+		vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+		luminance->SetInput(volume);
+		volume = luminance->GetOutput();		
+	}	
+
+	if (fabs(1.0-mResampleFactor)>0.01) // resampling
 	{
 		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
 		resampler->SetAxisMagnificationFactor(0, mResampleFactor);
 		resampler->SetAxisMagnificationFactor(1, mResampleFactor);
 		resampler->SetAxisMagnificationFactor(2, mResampleFactor);
-		resampler->SetInput(mImage->getBaseVtkImageData());
+		resampler->SetInput(volume);
 		resampler->GetOutput()->Update();
-		resampler->GetOutput()->GetScalarRange();
+		resampler->GetOutput()->GetScalarRange();		
+		volume = resampler->GetOutput();
+	}
 
-		mTextureMapper3D->SetInput( resampler->GetOutput() );
-	}
-	else
-	{
-		mTextureMapper3D->SetInput( mImage->getBaseVtkImageData() );
-	}
+	mTextureMapper3D->SetInput(volume);	
+	
 	transformChangedSlot();
 }
 
