@@ -12,6 +12,8 @@
 
 #include <vtkImageAlgorithm.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkImageExtractComponents.h>
+#include <vtkImageAppendComponents.h>
 
 #include "sscView.h"
 #include "sscDataManager.h"
@@ -57,6 +59,9 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 	}
 }
 
+typedef vtkSmartPointer<vtkImageExtractComponents> vtkImageExtractComponentsPtr;
+typedef vtkSmartPointer<vtkImageAppendComponents > vtkImageAppendComponentsPtr;
+
 void SlicedImageProxy::setImage(ImagePtr image)
 {
 	mImage = image;
@@ -66,9 +71,33 @@ void SlicedImageProxy::setImage(ImagePtr image)
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
 		
-		if (mImage->getBaseVtkImageData()->GetNumberOfScalarComponents()>2) // color
+		if (mImage->getBaseVtkImageData()->GetNumberOfScalarComponents()==3) // color
 		{
-		 	mRedirecter->SetInput(mReslicer->GetOutput());			
+			// split the image into the components, apply the lut, then merge.
+
+			vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
+			
+			for (int i=0; i<3; ++i)
+			{			
+				
+				vtkImageMapToColorsPtr windowLevel = vtkImageMapToColorsPtr::New();
+				windowLevel->SetInput(mReslicer->GetOutput());
+				windowLevel->SetActiveComponent(i);
+				windowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
+//				if (i=2) //TODO the only thing missing here is the alpha channel. Should be able to pass that on from the last pipe.
+//				{
+//					windowLevel->SetOutputFormatToLuminanceAlpha();	
+//				}
+//				else
+				{
+					windowLevel->SetOutputFormatToLuminance();					
+				}
+
+				merger->SetInput(i, windowLevel->GetOutput());
+			}
+			
+			mRedirecter->SetInput(merger->GetOutput());
+		 	//mRedirecter->SetInput(mReslicer->GetOutput());			
 		}
 		else // grayscale
 		{
