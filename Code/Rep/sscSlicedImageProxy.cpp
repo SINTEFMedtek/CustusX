@@ -34,7 +34,7 @@ SlicedImageProxy::SlicedImageProxy()
 	mReslicer->SetResliceAxes(mMatrixAxes);
 	//mReslicer->SetAutoCropOutput(false); //faster update rate
 	mReslicer->AutoCropOutputOn(); // fix used in 2.0.9, but slower update rate
-	
+
 	mWindowLevel = vtkImageMapToColorsPtr::New();
 	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 	mWindowLevel->SetOutputFormatToRGBA();
@@ -51,7 +51,7 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 	if (mSlicer)
 	{
 		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
-	}	
+	}
 	mSlicer = slicer;
 	if (mSlicer)
 	{
@@ -127,6 +127,14 @@ void SlicedImageProxy::update()
 	Transform3D M = iMr*rMs;
 
 	mMatrixAxes->DeepCopy(M.matrix());
+
+	/*lock-out render time*/
+	/* this will probably update the pipe*/
+
+
+//	mReslicer->Update(); //and the mapper
+//	mWindowLevel->Update();
+
 }
 
 void SlicedImageProxy::sliceTransformChangedSlot(Transform3D sMr)

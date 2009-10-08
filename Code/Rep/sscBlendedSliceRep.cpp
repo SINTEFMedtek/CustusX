@@ -17,7 +17,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
 
-//---------------------------------------------------------	
+//---------------------------------------------------------
 namespace ssc
 {
 //---------------------------------------------------------
@@ -28,16 +28,10 @@ BlendedSliceRep::BlendedSliceRep(const std::string& uid) :
 	mBlender = vtkImageBlendPtr::New();
 	mImageActor = vtkImageActorPtr::New();
 
-	// set up the slicer pipeline		
+	// set up the slicer pipeline
 	mBlender->SetBlendModeToNormal();
-	//	mBlender->SetBlendModeToCompound();
-	//	mBlender->SetOpacity(1, 0.9);
-	//	mBlender->SetCompoundThreshold(0.8);
 	firstImage = true;
 	countImage = 0;
-	
-//	mBlender->SetBlendModeToCompound();
-	mBlender->SetCompoundThreshold(0.7);
 }
 
 BlendedSliceRep::~BlendedSliceRep()
@@ -60,17 +54,17 @@ void BlendedSliceRep::setImages(std::vector<ImagePtr> images)
 {
 	for (unsigned int i = 0; i< images.size(); ++i)
 	{
-		std::cout<<"BlendedSliceRep::setImages(): slice image: id"<<images.at(i)->getUid()<<std::endl;
+		std::cout<<"BlendedSliceRep::setImages(): slice image: id" << images.at(i)->getUid()<<std::endl;
 		ImagePtr image = images.at(i);
 		connect(image.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateAlphaSlot()));
-//		connect(image.get(), SIGNAL(thresholdChange(double)), this, SLOT(updateThresholdSlot(double)));
+
 		SlicedImageProxyPtr slicedImage(new ssc::SlicedImageProxy());
 		slicedImage->setSliceProxy(mSlicer);
 		slicedImage->setImage(image);
 		slicedImage->update();
 		mSlices.push_back(slicedImage);
 		addInputImages(slicedImage->getOutput());
-	}	
+	}
 }
 
 void BlendedSliceRep::addInputImages(vtkImageDataPtr slicedImage)
@@ -103,7 +97,7 @@ double BlendedSliceRep::getAlpha(int countImage)
 	}
 	else
 	{
-		return 1.0;		
+		return 1.0;
 	}
 }
 
@@ -130,7 +124,7 @@ void BlendedSliceRep::update()
 //	mBlender->SetCompoundThreshold(val);
 //}
 
-/**SLOT 
+/**SLOT
  *this get signal if alpha changes.. will excecute render pipeline
  **/
 void BlendedSliceRep::updateAlphaSlot()
@@ -143,8 +137,8 @@ void BlendedSliceRep::updateAlphaSlot()
 	}
 }
 
-//---------------------------------------------------------	
-}// namespace ssc 
+//---------------------------------------------------------
+}// namespace ssc
 //---------------------------------------------------------
 
 

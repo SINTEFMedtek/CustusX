@@ -11,8 +11,8 @@
 #include <boost/shared_ptr.hpp>
 #include <QColor>
 #include <QObject>
-#include <vtkUnsignedCharArray.h> 
-#include "vtkSmartPointer.h" 
+#include <vtkUnsignedCharArray.h>
+#include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
@@ -34,7 +34,8 @@ public:
 	ImageLUT2D(vtkImageDataPtr base);
 	void setVtkImageData(vtkImageDataPtr base);
 	void setBaseLookupTable(vtkLookupTablePtr lut);
-	vtkLookupTablePtr getOutputLookupTable(); 
+	vtkLookupTablePtr getOutputLookupTable();
+	vtkLookupTablePtr getBaseLookupTable();
 	void setLLR(double val);
 	void setWindow(double val);
 	void setLevel(double val);
@@ -43,18 +44,18 @@ public:
 	double getLLR() const;
 	double getLevel() const;
 	double getAlpha() const;
-	
+
 	double getScalarMax() const;
-	
+
 signals:
-	void transferFunctionsChanged();	
-	
+	void transferFunctionsChanged();
+
 private:
 	void refreshOutput();
 //	void changeOpacity(double index, double opacity);
 	void testMap(double val);
 	double mapThroughLUT(double x);
-	
+
 	vtkLookupTablePtr mOutputLUT; ///< the sum of all internal values
 	vtkImageDataPtr mBase; ///< image data
 	double mLLR; ///< used to modify the output
