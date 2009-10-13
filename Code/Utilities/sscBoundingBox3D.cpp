@@ -58,9 +58,9 @@ Vector3D IntBoundingBox3D::range() const
 Vector3D IntBoundingBox3D::corner(int x, int y, int z) const
 {
 	Vector3D c;
-	c[0] = x ? elems[0] : elems[1];
-	c[1] = y ? elems[2] : elems[3];
-	c[2] = z ? elems[4] : elems[5];
+	c[0] = x ? elems[1] : elems[0];
+	c[1] = y ? elems[3] : elems[2];
+	c[2] = z ? elems[5] : elems[4];
 	return c;
 }
 // --------------------------------------------------------
@@ -131,9 +131,9 @@ Vector3D DoubleBoundingBox3D::range() const
 Vector3D DoubleBoundingBox3D::corner(int x, int y, int z) const
 {
 	Vector3D c;
-	c[0] = x ? elems[0] : elems[1];
-	c[1] = y ? elems[2] : elems[3];
-	c[2] = z ? elems[4] : elems[5];
+	c[0] = x ? elems[1] : elems[0];
+	c[1] = y ? elems[3] : elems[2];
+	c[2] = z ? elems[5] : elems[4];
 	return c;
 }
 // --------------------------------------------------------
