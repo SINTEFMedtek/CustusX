@@ -68,6 +68,10 @@ public:
 	QDomNode getXml(QDomDocument& doc);///< Create a XML node for this object. It's up to the caller to add this node to the XML tree. \return A XML data representation for this object. \param doc The root of the document tree.
 	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
+	/**Return a reference to a GL texture buffer collection for the image.
+	 * If no buffer exist, it is created. When noone uses the buffer, it is released. */
+	GPUImageBufferPtr getGPUBuffer();
+	
 signals:
 	void landmarkRemoved(double x, double y, double z, unsigned int index);
 	void landmarkAdded(double x, double y, double z, unsigned int index);
@@ -99,6 +103,7 @@ protected:
 	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
 	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)	
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
+	GPUImageBufferWeakPtr mBuffer; 
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

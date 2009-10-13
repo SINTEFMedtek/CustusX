@@ -12,6 +12,7 @@
 #include <vtkImageLuminance.h>
 
 #include "sscImageLUT2D.h"
+#include "sscGPUImageBuffer.h"
 
 namespace ssc
 {
@@ -301,4 +302,19 @@ void Image::parseXml(QDomNode& dataNode)
 		std::cout << std::endl;
 	}
 }
+
+GPUImageBufferPtr Image::getGPUBuffer()
+{
+	GPUImageBufferPtr retval = mBuffer.lock();
+	if (!retval)
+	{
+		retval = createGPUImageBuffer(
+				getGrayScaleBaseVtkImageData(), 
+				getLookupTable2D()->getBaseLookupTable()->GetTable());
+		mBuffer = retval;
+	}
+	return retval;
+}
+
+
 } // namespace ssc
