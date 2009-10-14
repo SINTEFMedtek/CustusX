@@ -74,6 +74,7 @@ set(SSC_LIBRARY_DIRS
 
 set( SSC_LIBRARIES 
     QVTK    
+    GLU
      )
 
 # library
