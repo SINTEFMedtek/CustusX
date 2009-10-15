@@ -67,8 +67,8 @@ signals:
 	void dominantToolChanged(const std::string& uId); ///<signal for change of dominant tool
 
 protected:
-	ToolManager(){}; ///< Empty on purpose
-	~ToolManager(){}; ///< Empty on purpose
+	ToolManager() {} ///< Empty on purpose
+	~ToolManager() {} ///< Empty on purpose
 
 	static ToolManager* mInstance; ///< The only instance of this class that can exist.
 };
