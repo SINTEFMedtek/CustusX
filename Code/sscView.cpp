@@ -1,11 +1,20 @@
 #include "sscView.h"
+#include <QtGui>
 
 #include "vtkRenderWindow.h"
+
+#ifdef USE_GLX_SHARED_CONTEXT
+#include "sscSNWXOpenGLRenderWindow.h"
+typedef SNWXOpenGLRenderWindow ViewRenderWindow;
+#else
+#include "vtkRenderWindow.h"
+typedef vtkRenderWindow ViewRenderWindow;
+#endif
 #include "vtkRenderer.h"
 #ifdef check
 	#undef check
 #endif
-#include <QtGui>
+
 #include "sscRep.h"
 
 /*! Copy/pasted from qitemdelegate.cpp
@@ -28,7 +37,7 @@ namespace ssc
 {
 
 View::View(QWidget *parent, Qt::WFlags f) :
-	QVTKWidget(parent, f), mRenderWindow(vtkRenderWindowPtr::New())
+	ViewParent(parent, f), mRenderWindow( ViewRenderWindow::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
@@ -36,6 +45,7 @@ View::View(QWidget *parent, Qt::WFlags f) :
 
 View::~View()
 {
+
 }
 std::string View::getUid()
 {
@@ -72,10 +82,10 @@ void View::setRep(const RepPtr& rep)
 	addRep(rep);
 }
 
-/**clear all content of the view. This ensures that props added from  
+/**clear all content of the view. This ensures that props added from
  * outside the rep system also is cleared, and data not cleared with
- * RemoveAllViewProps() (added to fix problem in snw ultrasound rep, 
- * data was not cleared, dont know why). 
+ * RemoveAllViewProps() (added to fix problem in snw ultrasound rep,
+ * data was not cleared, dont know why).
  */
 void View::clear()
 {
@@ -85,7 +95,7 @@ void View::clear()
 
 	mRenderer = vtkRendererPtr::New();
 	mRenderer->SetBackground(0.0,0.0,0.0);
-	mRenderWindow->AddRenderer(mRenderer);	
+	mRenderWindow->AddRenderer(mRenderer);
 }
 
 void View::removeReps()
@@ -124,12 +134,12 @@ bool View::hasRep(const RepPtr& rep) const
 void View::resizeEvent ( QResizeEvent * event )
 {
 	inherited::resizeEvent(event);
-	
+
 	QSize size = event->size();
 	vtkRenderWindowInteractor* iren = mRenderWindow->GetInteractor();
 	if(iren != NULL)
 		iren->UpdateSize(size.width(), size.height());
-	
+
     emit resized(size);
 }
 
@@ -144,7 +154,7 @@ void View::printSelf(std::ostream & os, Indent indent)
 	os << indent << "mUid: " << mUid << std::endl;
 	os << indent << "mName: " << mName << std::endl;
 	os << indent << "NumberOfReps: " << mReps.size() << std::endl;
-	
+
 	for (unsigned i=0; i<mReps.size(); ++i)
 	{
 		os << indent << "<Rep child " << i << ">" << std::endl;
@@ -171,7 +181,7 @@ void View::printSelf(std::ostream & os, Indent indent)
 			os << indent << indent << "</Prop>" << std::endl;
 			prop = collection->GetNextProp();
 		}
-		os << indent << "</Props>" << std::endl;		
+		os << indent << "</Props>" << std::endl;
 	}
 }
 

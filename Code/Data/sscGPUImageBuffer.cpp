@@ -6,7 +6,7 @@
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
-
+#include <stdint.h>
 #include <GL/glu.h>
 
 #define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__)
@@ -16,7 +16,7 @@ namespace{
 	{
 		GLenum error;
 		int i = 0;
-	
+
 		while ( ( error = glGetError () ) != GL_NO_ERROR  && i < 20 )
 		{
 			printf( "Oops, GL error caught: %s %s:%d\n", gluErrorString( error ), file, line );
@@ -46,17 +46,17 @@ public:
 	std::vector<float> mLut;
 	bool mAllocated;
 	//int mTextureUnit; ///< index of GL_TEXTURE<2X> and GL_TEXTURE<2X+1> used for volume and lut
-	
+
 	GPUImageBufferImpl()
 	{
-		std::cout << "create GPUImageBufferImpl()" << std::endl; 
+		std::cout << "create GPUImageBufferImpl()" << std::endl;
 		mAllocated = false;
 		mLutSize = 0.0;
 	//	mTextureUnit = unit;
 	}
 	virtual ~GPUImageBufferImpl()
 	{
-		std::cout << "delete GPUImageBufferImpl()" << std::endl; 
+		std::cout << "delete GPUImageBufferImpl()" << std::endl;
 		release();
 	}
 
@@ -82,10 +82,10 @@ public:
 	{
 		mTexture = texture;
 	}
-	
+
 	/**Allocate resources for the lookup table and the volume on the GPU.
 	 * Prerequisite: SetImage and SetcolorTable has been called.
-	 * 
+	 *
 	 * Call this from inside a PrepareForRendering() methods in vtk.
 	 */
 	virtual void allocate()
@@ -99,11 +99,9 @@ public:
 			std::cout << "error: bad buffer initialization" << std::endl;
 			return;
 		}
-		
+
 		vtkgl::ActiveTexture(GL_TEXTURE7);
-		
-		
-		//Logger::log("vm.log"," initializeRendering");
+
 		GLenum size,internalType;
 		uint32_t dimx = mTexture ->GetDimensions( )[0];
 		uint32_t dimy = mTexture ->GetDimensions( )[1];
@@ -126,14 +124,12 @@ public:
 		{
 			size = GL_UNSIGNED_BYTE;
 			internalType = GL_LUMINANCE;
-			//std::cout << "VTK_UNSIGNED_CHAR" << endl;
 		}
 			break; //8UI_EXT; break;
 		case VTK_UNSIGNED_SHORT:
 		{
 			size = GL_UNSIGNED_SHORT;
 			internalType = GL_LUMINANCE16;
-			//std::cout << "VTK_UNSIGNED_SHORT" << endl;
 		}
 			break; //16UI_EXT; break;
 		default:
@@ -146,10 +142,10 @@ public:
 		glBindTexture(GL_TEXTURE_3D, 0);
 		glDisable(GL_TEXTURE_3D);
 
-//		//Color Buffer --
+		/** upload color buffer **/
 		vtkgl::ActiveTexture(GL_TEXTURE8);
-//		vtkgl::ActiveTexture(getGLTextureForLut(textureUnitIndex)); //TODO is this OK?
-//		//upload lut
+		//vtkgl::ActiveTexture(getGLTextureForLut(textureUnitIndex)); //TODO is this OK?
+
 		vtkgl::GenBuffersARB(1, &lutBuffer);
 		vtkgl::BindBuffer(vtkgl::TEXTURE_BUFFER_EXT, lutBuffer);
 		vtkgl::BufferData(vtkgl::TEXTURE_BUFFER_EXT, mLutDataSize * sizeof(float), &(*mLut.begin()), vtkgl::STATIC_DRAW);
@@ -159,11 +155,11 @@ public:
 		report_gl_error();
 
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, 0);
-		
+
 		mAllocated = true;
 	}
-	/**Activate and bind the volume and lut buffers inside the texture units 
-	 * GL_TEXTURE<2X> and GL_TEXTURE<2X+1>. 
+	/**Activate and bind the volume and lut buffers inside the texture units
+	 * GL_TEXTURE<2X> and GL_TEXTURE<2X+1>.
 	 * Use during RenderInternal()
 	 */
 	virtual void bind(int textureUnitIndex)
@@ -173,22 +169,25 @@ public:
 			std::cout << "error: called bind() on unallocated buffer" << std::endl;
 			return;
 		}
-		
-		glEnable( vtkgl::TEXTURE_3D );
+
+		//glEnable( vtkgl::TEXTURE_3D );
+
 		vtkgl::ActiveTexture(getGLTextureForVolume(textureUnitIndex));
 		glBindTexture(GL_TEXTURE_3D, textures[0]);
 
 		vtkgl::ActiveTexture(getGLTextureForLut(textureUnitIndex));
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, textures[1]);
-		report_gl_error();		
+		report_gl_error();
+
+		//glDisable( vtkgl::TEXTURE_3D );
 	}
-	
+
 	void release()
 	{
 		glDeleteTextures(2, textures);
 		//glDeleteBuffersARB(1, &lutBuffer); //TODO find a working deleter
 	}
-	
+
 	int getGLTextureForVolume(int textureUnitIndex)
 	{
 		switch (textureUnitIndex)

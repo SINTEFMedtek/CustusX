@@ -1,13 +1,24 @@
 #ifndef SSCVIEW_H_
 #define SSCVIEW_H_
-
+#include "sscConfig.h"
 #include <boost/shared_ptr.hpp>
 #include "vtkSmartPointer.h"
-#include "QVTKWidget.h"
 #include "sscIndent.h"
+
+#ifdef USE_GLX_SHARED_CONTEXT
+#include "sscSNWQVTKWidget.h"
+typedef SNWQVTKWidget ViewParent;
+#else
+#include "QVTKWidget.h"
+typedef QVTKWidget ViewParent;
+#endif
+
+
+
 
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
+typedef vtkSmartPointer<class SNWXOpenGLRenderWindow> SNWXOpenGLRenderWindowPtr;
 
 namespace ssc
 {
@@ -18,11 +29,11 @@ namespace ssc
 	 * \brief Base widget for displaying lists of Rep. The View class inherits a
 	 * QVTKWidget but creates its own vtkRenderer and vtkRenderWindow.
 	 */
-	class View : public QVTKWidget
+	class View : public ViewParent
 	{
 		Q_OBJECT
 
-		typedef QVTKWidget inherited;
+		typedef ViewParent inherited;
 
 	public:
 		enum Type
@@ -60,6 +71,7 @@ namespace ssc
 
 		vtkRendererPtr mRenderer;
 		vtkRenderWindowPtr mRenderWindow;
+		//SNWXOpenGLRenderWindowPtr mRenderWindow;
 		std::vector<RepPtr> mReps;				///< Storage for internal reps.
 		typedef std::vector<RepPtr>::iterator RepsIter;		///< Iterator typedef for the internal rep vector.
 	private:

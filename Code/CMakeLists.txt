@@ -42,7 +42,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscBlendedSliceRep.h
     Rep/sscSlicedImageProxy.h
     Rep/sscSurfaceRep.h
-        
+    vtkMods/sscSNWQVTKWidget.h
     )
 
 SET( SSC_HEADER_FILES
@@ -59,6 +59,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Rep/
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
+    ${SSC_SOURCE_DIR}/Code/vtkMods/
     ) 
 
 #set( SSC_INCLUDE_DIRS
@@ -87,6 +88,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscAcceptanceBoxWidget.cpp
     Utilities/sscGraphicalPrimitives.cpp
     sscView.cpp
+    vtkMods/sscSNWXOpenGLRenderWindow.cpp
+    vtkMods/sscSNWQVTKWidget.cpp
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp
     Rep/sscSliceRep.cpp
@@ -142,6 +145,7 @@ find_package( Boost REQUIRED )
 # vtk
 # =========================================================
 find_package(VTK REQUIRED)
+
 include(${VTK_USE_FILE})
 
 set( SSC_VTK_LIBRARIES 
@@ -154,6 +158,13 @@ set( SSC_VTK_LIBRARIES
     vtkFiltering 
     vtkVolumeRendering  
     )
+
+find_package(X11)
+if(X11_FOUND)
+    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
+else(X11_FOUND)
+    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
+endif(X11_FOUND)
 
 # =========================================================
 # qt
@@ -220,6 +231,8 @@ target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
 #set (SSC_INCLUDE ${PROJECT_BINARY_DIR}/include)
 
 set (SSC_DIR ${SSC_BINARY_DIR} CACHE PATH "where to find the SSC cmake")
+#set (USE_GLX_SHARED_CONTEXT ON CACHE BOOL "use shared glx contexts")
+
 
 configure_file (
 	"${PROJECT_SOURCE_DIR}/CMake/SSCConfig.cmake.in"
