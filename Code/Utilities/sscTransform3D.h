@@ -21,6 +21,30 @@ namespace utils
  */
 class Transform3D
 {
+private:
+	/**Helper for accessing a single value using M[i][j] notation */
+	class ElementProxy
+	{
+	public:
+		ElementProxy(vtkMatrix4x4Ptr matrix, unsigned row, unsigned col);
+		void operator=(double val);
+		operator double() const;
+	private:
+		unsigned mRow, mCol;
+		vtkMatrix4x4Ptr mMatrix;
+	};
+	/**Helper for accessing a single value using M[i][j] notation */
+	class RowProxy
+	{
+	public:
+		RowProxy(vtkMatrix4x4Ptr matrix, unsigned row);
+		ElementProxy operator[](unsigned col);
+		const ElementProxy operator[](unsigned col) const;
+	private:
+		unsigned mRow;
+		vtkMatrix4x4Ptr mMatrix;
+	};
+
 public:
 	Transform3D();
 	explicit Transform3D(const double* data);
@@ -42,6 +66,9 @@ public:
 //	Vector3D getKVector() const; ///< get the third column vector
 //	Vector3D getOrigin() const; ///< get the third column vector, center for a orhonormal affine transform
 //	Vector3D getColumnVector(unsigned col) const;
+	
+	RowProxy operator[](unsigned row);
+	const RowProxy operator[](unsigned row) const;
 
 	vtkMatrix4x4Ptr matrix();
 	vtkMatrix4x4Ptr matrix() const;

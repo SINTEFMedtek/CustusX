@@ -286,6 +286,49 @@ Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const
 }
 
 
+
+Transform3D::ElementProxy::ElementProxy(vtkMatrix4x4Ptr matrix, unsigned row, unsigned col)
+{
+	mMatrix = matrix;
+	mRow = row;
+	mCol = col;
+}
+
+void Transform3D::ElementProxy::operator=(double val)
+{
+	mMatrix->SetElement(mRow, mCol, val);
+}
+
+Transform3D::ElementProxy::operator double() const
+{
+	return mMatrix->GetElement(mRow, mCol);
+}
+
+Transform3D::RowProxy::RowProxy(vtkMatrix4x4Ptr matrix, unsigned row)
+{
+	mMatrix = matrix;
+	mRow = row;
+}
+
+Transform3D::ElementProxy Transform3D::RowProxy::operator[](unsigned col)
+{
+	return ElementProxy(mMatrix, mRow, col);
+}
+const Transform3D::ElementProxy Transform3D::RowProxy::operator[](unsigned col) const
+{
+	return ElementProxy(mMatrix, mRow, col);
+}
+
+Transform3D::RowProxy Transform3D::operator[](unsigned row) 
+{
+	return RowProxy(mMatrix, row);
+}
+const Transform3D::RowProxy Transform3D::operator[](unsigned row) const
+{
+	return RowProxy(mMatrix, row);
+}
+
+
 // --------------------------------------------------------
 } // namespace utils
 } // namespace ssc
