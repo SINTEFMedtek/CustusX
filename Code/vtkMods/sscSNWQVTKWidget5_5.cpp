@@ -5,8 +5,16 @@
 #pragma warning(disable:4512)
 #endif
 
-//#include "QVTKWidget.h"
-#include "sscSNWQVTKWidget.h"
+#include "sscSNWQVTKWidget5_5.h"
+
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+#include "vtkTDxWinDevice.h"
+#endif
+
+#if QT_VERSION >= 0x040000
+//#include "QVTKPaintEngine.h"
+#endif
+
 #include "qevent.h"
 #include "qapplication.h"
 #include "qpainter.h"
@@ -21,9 +29,6 @@
 #include "vtkRenderWindow.h"
 #if defined(QVTK_USE_CARBON)
 #  include "vtkCarbonRenderWindow.h"
-#endif
-#if defined(QVTK_USE_COCOA)
-#  include "vtkCocoaRenderWindow.h"
 #endif
 #include "vtkCommand.h"
 #include "vtkOStrStreamWrapper.h"
@@ -52,10 +57,13 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
 #else
     : QWidget(parent, name, f | Qt::WWinOwnDC )
 #endif
-    , mRenWin(NULL),
+    , mRenWin(NULL), mPaintEngine(NULL)
       cachedImageCleanFlag(false),
       automaticImageCache(false), maxImageCacheRenderRate(1.0)
 {
+		std::cout << "SNWQVTKWidget " << endl;
+  this->UseTDx=false;
+
   // no background
   this->setBackgroundMode( Qt::NoBackground );
 
@@ -81,12 +89,13 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
 
 #if QT_VERSION >= 0x040000
 /*! constructor */
-SNWQVTKWidget::SNWQVTKWidget(QWidget* p, Qt::WFlags f)
+  SNWQVTKWidget::SNWQVTKWidget(QWidget* p, Qt::WFlags f)
   : QWidget(p, f | Qt::MSWindowsOwnDC), mRenWin(NULL),
     cachedImageCleanFlag(false),
     automaticImageCache(false), maxImageCacheRenderRate(1.0)
 
 {
+  this->UseTDx=false;
   // no background
   this->setAttribute(Qt::WA_NoBackground);
   // no double buffering
@@ -103,6 +112,8 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* p, Qt::WFlags f)
   this->setSizePolicy(
     QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding )
     );
+
+  //mPaintEngine = new QVTKPaintEngine;
 
   this->mCachedImage = vtkImageData::New();
   this->mCachedImage->SetScalarTypeToUnsignedChar();
@@ -126,6 +137,28 @@ SNWQVTKWidget::~SNWQVTKWidget()
   this->SetRenderWindow(NULL);
 
   this->mCachedImage->Delete();
+
+//#if QT_VERSION >= 0x040000
+//  if(mPaintEngine)
+//    {
+//    delete mPaintEngine;
+//    }
+//#endif
+}
+
+// ----------------------------------------------------------------------------
+void SNWQVTKWidget::SetUseTDx(bool useTDx)
+{
+  if(useTDx!=this->UseTDx)
+    {
+    this->UseTDx=useTDx;
+    }
+}
+
+// ----------------------------------------------------------------------------
+bool SNWQVTKWidget::GetUseTDx() const
+{
+  return this->UseTDx;
 }
 
 /*! get the render window
@@ -142,8 +175,6 @@ vtkRenderWindow* SNWQVTKWidget::GetRenderWindow()
 
   return this->mRenWin;
 }
-
-
 
 /*! set the render window
   this will bind a VTK window with the Qt window
@@ -197,11 +228,7 @@ void SNWQVTKWidget::SetRenderWindow(vtkRenderWindow* w)
     x11_setup_window();
 
     // give the qt window id to the vtk window
-#if defined(QVTK_USE_COCOA)
-    this->mRenWin->SetDisplayId( reinterpret_cast<void*>(this->winId()));
-#else
     this->mRenWin->SetWindowId( reinterpret_cast<void*>(this->winId()));
-#endif
 
     // mac compatibility issues
 #if defined(QVTK_USE_CARBON) && (QT_VERSION < 0x040000)
@@ -229,6 +256,7 @@ void SNWQVTKWidget::SetRenderWindow(vtkRenderWindow* w)
       {
       // create a default interactor
       QVTKInteractor* iren = QVTKInteractor::New();
+      iren->SetUseTDx(this->UseTDx);
       this->mRenWin->SetInteractor(iren);
       iren->Initialize();
 
@@ -257,7 +285,7 @@ void SNWQVTKWidget::SetRenderWindow(vtkRenderWindow* w)
   if(mRenWin && !this->DirtyRegionHandlerUPP)
     {
     this->DirtyRegionHandlerUPP = NewEventHandlerUPP(SNWQVTKWidget::DirtyRegionProcessor);
-    static EventTypeSpec events[] = { {'cute', 20} };
+    static EventTypeSpec events[] = { {'cute', 20}, {'Cute', 20} };
     // kEventClassQt, kEventQtRequestWindowChange from qt_mac_p.h
     // Suggested by Sam Magnuson at Trolltech as best portabile hack
     // around Apple's missing functionality in HI Toolbox.
@@ -816,6 +844,15 @@ void SNWQVTKWidget::focusInEvent(QFocusEvent*)
   // does an update because the color group's
   // active status changes.  We don't even use
   // color groups so we do nothing here.
+
+  // For 3Dconnexion devices:
+  QVTKInteractor* iren = this->GetInteractor();
+  // Note that this class can have interactor of type
+  // other than QVTKInteractor
+  if (iren)
+    {
+    iren->StartListening();
+    }
 }
 
 void SNWQVTKWidget::focusOutEvent(QFocusEvent*)
@@ -825,6 +862,15 @@ void SNWQVTKWidget::focusOutEvent(QFocusEvent*)
   // does an update because the color group's
   // active status changes.  We don't even use
   // color groups so we do nothing here.
+
+  // For 3DConnexion devices:
+  QVTKInteractor* iren = this->GetInteractor();
+  // Note that this class can have interactor of type
+  // other than QVTKInteractor
+  if (iren)
+    {
+    iren->StopListening();
+    }
 }
 
 
@@ -984,10 +1030,10 @@ void SNWQVTKWidget::showEvent(QShowEvent* e)
   QWidget::showEvent(e);
 }
 
-QPaintEngine* SNWQVTKWidget::paintEngine() const
-{
-  return NULL;
-}
+//QPaintEngine* SNWQVTKWidget::paintEngine() const
+//{
+//  return mPaintEngine;
+//}
 
 class QVTKInteractorInternal : public QObject
 {
@@ -1016,10 +1062,27 @@ QVTKInteractor::QVTKInteractor()
 {
   this->Internal = new QVTKInteractorInternal(this);
   QObject::connect(this->Internal->SignalMapper, SIGNAL(mapped(int)), this, SLOT(TimerEvent(int)) );
+
+#if defined(VTK_USE_TDX) && defined (Q_WS_WIN)
+  this->Device=vtkTDxWinDevice::New();
+#endif
 }
 
 void QVTKInteractor::Initialize()
 {
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+  if(this->UseTDx)
+    {
+    // this is QWidget::winId();
+    HWND hWnd=static_cast<HWND>(this->GetRenderWindow()->GetGenericWindowId());
+    if(!this->Device->GetInitialized())
+      {
+      this->Device->SetInteractor(this);
+      this->Device->SetWindowHandle(hWnd);
+      this->Device->Initialize();
+      }
+    }
+#endif
   this->Initialized = 1;
   this->Enable();
 }
@@ -1038,6 +1101,28 @@ void QVTKInteractor::TerminateApp()
 {
   // we are in a GUI so let's terminate the GUI the normal way
   //qApp->exit();
+}
+
+// ----------------------------------------------------------------------------
+void QVTKInteractor::StartListening()
+{
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+  if(this->Device->GetInitialized() && !this->Device->GetIsListening())
+    {
+    this->Device->StartListening();
+    }
+#endif
+}
+
+// ----------------------------------------------------------------------------
+void QVTKInteractor::StopListening()
+{
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+  if(this->Device->GetInitialized() && this->Device->GetIsListening())
+    {
+    this->Device->StopListening();
+    }
+#endif
 }
 
 
@@ -1061,6 +1146,9 @@ void QVTKInteractor::TimerEvent(int timerId)
  */
 QVTKInteractor::~QVTKInteractor()
 {
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+  this->Device->Delete();
+#endif
 }
 
 /*! create Qt timer with an interval of 10 msec.
@@ -1257,7 +1345,8 @@ const char* qt_key_to_key_sym(Qt::Key i)
 
 #if defined Q_WS_X11
 #if defined(VTK_USE_OPENGL_LIBRARY)
-#include "vtkXOpenGLRenderWindow.h"
+//#include "vtkXOpenGLRenderWindow.h"
+#include "sscSNWXOpenGLRenderWindow.h"
 #endif
 #ifdef VTK_USE_MANGLED_MESA
 #include "vtkXMesaRenderWindow.h"
@@ -1296,7 +1385,8 @@ void SNWQVTKWidget::x11_setup_window()
 
   // check ogl and mesa and get information we need to create a decent window
 #if defined(VTK_USE_OPENGL_LIBRARY)
-  vtkXOpenGLRenderWindow* ogl_win = vtkXOpenGLRenderWindow::SafeDownCast(mRenWin);
+  //vtkXOpenGLRenderWindow* ogl_win = vtkXOpenGLRenderWindow::SafeDownCast(mRenWin);
+  SNWXOpenGLRenderWindow* ogl_win = SNWXOpenGLRenderWindow::SafeDownCast(mRenWin);
   if(ogl_win)
     {
     vi = ogl_win->GetDesiredVisualInfo();
@@ -1329,7 +1419,8 @@ void SNWQVTKWidget::x11_setup_window()
   // create the X window based on information VTK gave us
   XSetWindowAttributes attrib;
   attrib.colormap = cmap;
-  attrib.border_pixel = BlackPixel(display, DefaultScreen(display));
+  attrib.border_pixel = 0;
+  attrib.background_pixel = 0;
 
   Window p = RootWindow(display, DefaultScreen(display));
   if(parentWidget())
@@ -1342,7 +1433,7 @@ void SNWQVTKWidget::x11_setup_window()
 
   Window win = XCreateWindow(display, p, a.x, a.y, a.width, a.height,
                              0, vi->depth, InputOutput, vi->visual,
-                             CWBorderPixel|CWColormap, &attrib);
+                             CWBackPixel|CWBorderPixel|CWColormap, &attrib);
 
   // backup colormap stuff
   Window *cmw;
@@ -1409,7 +1500,7 @@ OSStatus SNWQVTKWidget::DirtyRegionProcessor(EventHandlerCallRef, EventRef event
   SNWQVTKWidget* widget = reinterpret_cast<SNWQVTKWidget*>(wid);
   UInt32 event_kind = GetEventKind(event);
   UInt32 event_class = GetEventClass(event);
-  if(event_class == 'cute' && event_kind == 20)
+  if((event_class == 'cute' || event_class == 'Cute') && event_kind == 20)
     {
     static_cast<vtkCarbonRenderWindow*>(widget->GetRenderWindow())->UpdateGLRegion();
     }

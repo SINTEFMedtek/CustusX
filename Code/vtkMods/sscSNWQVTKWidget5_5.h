@@ -1,12 +1,25 @@
-
-#ifndef Q_VTK_WIDGET_H
-#define Q_VTK_WIDGET_H
-
+#ifndef SSCSNWQVTKWIDGET_H_
+#define SSCSNWQVTKWIDGET_H_
 #include <qwidget.h>
-class QPaintEngine;
+
+//#include "QVTKWidget.h"
+//class QPaintEngine;
 
 class vtkRenderWindow;
 class QVTKInteractor;
+class QVTKPaintEngine;
+#include <vtkRenderWindowInteractor.h>
+#include <vtkCommand.h>
+#include <vtkConfigure.h>
+#include <vtkToolkits.h>
+class vtkImageData;
+
+#include <qwidget.h>
+//class QPaintEngine;
+
+class vtkRenderWindow;
+class QVTKInteractor;
+class QVTKPaintEngine;
 #include <vtkRenderWindowInteractor.h>
 #include <vtkCommand.h>
 #include <vtkConfigure.h>
@@ -14,9 +27,9 @@ class QVTKInteractor;
 class vtkImageData;
 
 #if defined(Q_WS_MAC)
+# elif !defined(QT_MAC_USE_COCOA) && defined(VTK_USE_CARBON)
 # if defined(QT_MAC_USE_COCOA) && defined(VTK_USE_COCOA)
 #  define QVTK_USE_COCOA
-# elif !defined(QT_MAC_USE_COCOA) && defined(VTK_USE_CARBON)
 #  define QVTK_USE_CARBON
 # elif defined(VTK_USE_COCOA)
 #  error "VTK configured to use Cocoa, but Qt configured to use Carbon"
@@ -31,6 +44,11 @@ class vtkImageData;
 #endif
 
 #include "QVTKWin32Header.h"
+
+#include "vtkTDxConfigure.h" // defines VTK_USE_TDX
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+class vtkTDxWinDevice;
+#endif
 
 //! QVTKWidget displays a VTK window in a Qt window.
 class QVTK_EXPORT SNWQVTKWidget : public QWidget
@@ -47,10 +65,10 @@ class QVTK_EXPORT SNWQVTKWidget : public QWidget
     public:
 #if QT_VERSION < 0x040000
   //! constructor for Qt 3
-    	SNWQVTKWidget(QWidget* parent = NULL, const char* name = NULL, Qt::WFlags f = 0);
+    SNWQVTKWidget(QWidget* parent = NULL, const char* name = NULL, Qt::WFlags f = 0);
 #else
   //! constructor for Qt 4
-    	SNWQVTKWidget(QWidget* parent = NULL, Qt::WFlags f = 0);
+  SNWQVTKWidget(QWidget* parent = NULL, Qt::WFlags f = 0);
 #endif
   //! destructor
   virtual ~SNWQVTKWidget();
@@ -111,7 +129,18 @@ class QVTK_EXPORT SNWQVTKWidget : public QWidget
   // Handle showing of the Widget
   virtual void showEvent(QShowEvent*);
 
-  virtual QPaintEngine* paintEngine() const;
+  //virtual QPaintEngine* paintEngine() const;
+
+  // Description:
+  // Use a 3DConnexion device. Initial value is false.
+  // If VTK is not build with the TDx option, this is no-op.
+  // If VTK is build with the TDx option, and a device is not connected,
+  // a warning is emitted.
+  // It is must be called before the first Render to be effective, otherwise
+  // it is ignored.
+  void SetUseTDx(bool useTDx);
+  bool GetUseTDx() const;
+
 
   Q_SIGNALS:
   // Description:
@@ -127,7 +156,6 @@ class QVTK_EXPORT SNWQVTKWidget : public QWidget
   // Description:
   // This signal will be emitted whenever the cached image is refreshed.
   void cachedImageClean();
-
 
 public Q_SLOTS:
   // Description:
@@ -189,6 +217,10 @@ protected:
 
   // the vtk render window
   vtkRenderWindow* mRenWin;
+  bool UseTDx;
+
+  // the paint engine
+  QPaintEngine* mPaintEngine;
 
   // set up an X11 window based on a visual and colormap
   // that VTK chooses
@@ -248,6 +280,14 @@ public:
   virtual void Start();
   virtual void Initialize();
 
+  // Description:
+  // Start listening events on 3DConnexion device.
+  virtual void StartListening();
+
+  // Description:
+  // Stop listening events on 3DConnexion device.
+  virtual void StopListening();
+
 public Q_SLOTS:
 // timer event slot
 virtual void TimerEvent(int timerId);
@@ -262,6 +302,9 @@ protected:
   virtual int InternalCreateTimer(int timerId, int timerType, unsigned long duration);
   // destroy a Qt Timer
   virtual int InternalDestroyTimer(int platformTimerId);
+#if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
+  vtkTDxWinDevice *Device;
+#endif
 
 private:
 
@@ -275,6 +318,4 @@ private:
 };
 
 
-#endif
-
-
+#endif /* SSCQVTKWIDGET_H_ */
