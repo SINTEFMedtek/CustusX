@@ -1257,7 +1257,8 @@ const char* qt_key_to_key_sym(Qt::Key i)
 
 #if defined Q_WS_X11
 #if defined(VTK_USE_OPENGL_LIBRARY)
-#include "vtkXOpenGLRenderWindow.h"
+//	#include "vtkXOpenGLRenderWindow.h"
+#include "sscSNWXOpenGLRenderWindow.h"
 #endif
 #ifdef VTK_USE_MANGLED_MESA
 #include "vtkXMesaRenderWindow.h"
@@ -1296,7 +1297,8 @@ void SNWQVTKWidget::x11_setup_window()
 
   // check ogl and mesa and get information we need to create a decent window
 #if defined(VTK_USE_OPENGL_LIBRARY)
-  vtkXOpenGLRenderWindow* ogl_win = vtkXOpenGLRenderWindow::SafeDownCast(mRenWin);
+  //vtkXOpenGLRenderWindow* ogl_win = vtkXOpenGLRenderWindow::SafeDownCast(mRenWin);
+  SNWXOpenGLRenderWindow* ogl_win = SNWXOpenGLRenderWindow::SafeDownCast(mRenWin);
   if(ogl_win)
     {
     vi = ogl_win->GetDesiredVisualInfo();
