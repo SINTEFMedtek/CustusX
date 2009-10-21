@@ -303,18 +303,53 @@ void Image::parseXml(QDomNode& dataNode)
 	}
 }
 
-GPUImageBufferPtr Image::getGPUBuffer()
-{
-	GPUImageBufferPtr retval = mBuffer.lock();
-	if (!retval)
-	{
-		retval = createGPUImageBuffer(
-				getGrayScaleBaseVtkImageData(), 
-				getLookupTable2D()->getBaseLookupTable()->GetTable());
-		mBuffer = retval;
-	}
-	return retval;
-}
+//struct InternalData
+//{
+//	vtkImageDataPtr volume;
+//	vtkUnsignedCharArrayPtr lut;
+//    bool operator==(const CGFrame& f) const
+//    {
+//    	return (a.volume==b.volume && a.lut==b.lut)    	
+//    }
+//    bool operator!=(const CGFrame& f) const;
+//};
+//
+//class FPUImageBufferRepository
+//{
+//private:
+//	
+//public:
+//	static FPUImageBufferRepository* getInstance()
+//	{
+//		if (!mInstance)
+//		{
+//			mInstance = new FPUImageBufferRepository();
+//		}
+//		return mInstance;
+//	}
+//	
+//	GPUImageBufferPtr getGPUImageBuffer(vtkImageDataPtr volume, vtkUnsignedCharArrayPtr lut)
+//	{
+//		
+//	}
+//		
+//private:
+//	static FPUImageBufferRepository* mInstance;
+//};
+//FPUImageBufferRepository* FPUImageBufferRepository::mInstance = NULL;
+
+//GPUImageBufferPtr Image::getGPUBuffer()
+//{
+//	GPUImageBufferPtr retval = mBuffer.lock();
+//	if (!retval)
+//	{
+//		retval = createGPUImageBuffer(
+//				getGrayScaleBaseVtkImageData(), 
+//				getLookupTable2D()->getBaseLookupTable()->GetTable());
+//		mBuffer = retval;
+//	}
+//	return retval;
+//}
 
 
 } // namespace ssc
