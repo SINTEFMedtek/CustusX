@@ -57,6 +57,9 @@ public:
 	 * Use during RenderInternal()
 	 */
 	virtual void bind(int textureUnitIndex) = 0;
+	/**Size of lut. Used by fragment shader.
+	 */
+	virtual int getLutSize() const = 0;	
 };
 
 typedef boost::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;

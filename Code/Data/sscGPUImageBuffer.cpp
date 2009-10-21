@@ -260,6 +260,11 @@ public:
 
 		//glDisable( vtkgl::TEXTURE_3D );
 	}
+	
+	int getLutSize() const 
+	{
+		return mLutSize;
+	}
 
 	void release()
 	{
