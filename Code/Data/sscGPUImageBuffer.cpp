@@ -306,8 +306,8 @@ GPUImageBufferRepository* GPUImageBufferRepository::mInstance = NULL;
 
 GPUImageBufferRepository::GPUImageBufferRepository()
 {
-	mMaxVolumes = 10;
-	mMaxLuts = 20;
+	mMaxVolumes = 7;
+	mMaxLuts = 7;
 }
 
 GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
