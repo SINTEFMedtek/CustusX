@@ -6,7 +6,7 @@
 #include "sscIndent.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT
-#include "sscSNWQVTKWidget.h"
+#include "sscSNWQVTKWidget5_5.h"
 typedef SNWQVTKWidget ViewParent;
 #else
 #include "QVTKWidget.h"
@@ -68,7 +68,6 @@ namespace ssc
 	protected:
 		std::string mUid;					///< The view's unique id
 		std::string mName;					///< The view's name
-
 		vtkRendererPtr mRenderer;
 		vtkRenderWindowPtr mRenderWindow;
 		//SNWXOpenGLRenderWindowPtr mRenderWindow;

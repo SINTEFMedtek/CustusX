@@ -32,12 +32,12 @@ typedef vtkRenderWindow ViewRenderWindow;
 
   after including AssertMacros.h
 */
-
+typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
 namespace ssc
 {
 
 View::View(QWidget *parent, Qt::WFlags f) :
-	ViewParent(parent, f), mRenderWindow( ViewRenderWindow::New())
+	ViewParent(parent, f), mRenderWindow( ViewRenderWindowPtr::New())
 {
 	this->SetRenderWindow(mRenderWindow);
 	clear();
@@ -45,7 +45,6 @@ View::View(QWidget *parent, Qt::WFlags f) :
 
 View::~View()
 {
-
 }
 std::string View::getUid()
 {
@@ -92,7 +91,6 @@ void View::clear()
 	removeReps();
 
 	mRenderWindow->RemoveRenderer(mRenderer);
-
 	mRenderer = vtkRendererPtr::New();
 	mRenderer->SetBackground(0.0,0.0,0.0);
 	mRenderWindow->AddRenderer(mRenderer);
