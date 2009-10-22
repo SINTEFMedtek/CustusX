@@ -87,6 +87,7 @@ void ImageLUT2D::setAlpha(double val)
 	if (similar(mAlpha, val))
 		return;
 	mAlpha = val;
+	std::cout << "Set Alpha :" << mAlpha << std::endl;
 	refreshOutput();
 }
 

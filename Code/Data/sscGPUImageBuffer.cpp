@@ -56,7 +56,7 @@ public:
 	{
 		if (!texture)
 		{
-			std::cout << "error: bad buffer initialization: null image" << std::endl;			
+			std::cout << "error: bad buffer initialization: null image" << std::endl;
 		}
 		mTexture = texture;
 	}
@@ -133,14 +133,9 @@ public:
 			std::cout << "error: called bind() on unallocated volume buffer" << std::endl;
 			return;
 		}
-
-		//glEnable( vtkgl::TEXTURE_3D );
-
 		vtkgl::ActiveTexture(getGLTextureForVolume(textureUnitIndex));
 		glBindTexture(GL_TEXTURE_3D, textureId);
 		report_gl_error();
-
-		//glDisable( vtkgl::TEXTURE_3D );
 	}
 
 	void release()
@@ -260,8 +255,8 @@ public:
 
 		//glDisable( vtkgl::TEXTURE_3D );
 	}
-	
-	int getLutSize() const 
+
+	int getLutSize() const
 	{
 		return mLutSize;
 	}
