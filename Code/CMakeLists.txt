@@ -44,6 +44,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSurfaceRep.h
     vtkMods/sscSNWQVTKWidget.h
     )
+    
 
 SET( SSC_HEADER_FILES
     ${SSC_QT_MOC_HEADER_FILES}
@@ -87,6 +88,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscIndent.cpp
     Utilities/sscAcceptanceBoxWidget.cpp
     Utilities/sscGraphicalPrimitives.cpp
+    Utilities/sscFrame3D.cpp
     sscView.cpp
     vtkMods/sscSNWXOpenGLRenderWindow.cpp
     vtkMods/sscSNWQVTKWidget.cpp
@@ -147,6 +149,26 @@ find_package( Boost REQUIRED )
 find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
+
+#add moc versions of out modified QVTKWidget
+if (VTK_MAJOR_VERSION EQUAL 5)
+    message("hepp" ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION} ".")
+    if (VTK_MINOR_VERSION EQUAL 4)
+        SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_4.h)
+        SET(SUPPORTED_VTK_VERSION_FOUND "5.4")
+        message("hepp54")
+    endif (VTK_MINOR_VERSION EQUAL 4)
+    if (VTK_MINOR_VERSION EQUAL 5)
+        SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
+        SET(SUPPORTED_VTK_VERSION_FOUND "5.5")
+        message("hepp55")
+    endif (VTK_MINOR_VERSION EQUAL 5)
+endif (VTK_MAJOR_VERSION EQUAL 5)
+
+if (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
+    message(FATAL_ERROR "vtk version not supported (for glx use): " ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION})
+endif (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
+
 
 set( SSC_VTK_LIBRARIES 
     vtkIO 

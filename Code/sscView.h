@@ -6,7 +6,7 @@
 #include "sscIndent.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT
-#include "sscSNWQVTKWidget5_5.h"
+#include "sscSNWQVTKWidget.h"
 typedef SNWQVTKWidget ViewParent;
 #else
 #include "QVTKWidget.h"
