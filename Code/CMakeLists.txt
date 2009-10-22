@@ -152,16 +152,13 @@ include(${VTK_USE_FILE})
 
 #add moc versions of out modified QVTKWidget
 if (VTK_MAJOR_VERSION EQUAL 5)
-    message("hepp" ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION} ".")
     if (VTK_MINOR_VERSION EQUAL 4)
         SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_4.h)
         SET(SUPPORTED_VTK_VERSION_FOUND "5.4")
-        message("hepp54")
     endif (VTK_MINOR_VERSION EQUAL 4)
     if (VTK_MINOR_VERSION EQUAL 5)
         SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
         SET(SUPPORTED_VTK_VERSION_FOUND "5.5")
-        message("hepp55")
     endif (VTK_MINOR_VERSION EQUAL 5)
 endif (VTK_MAJOR_VERSION EQUAL 5)
 
