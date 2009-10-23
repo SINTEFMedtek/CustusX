@@ -7,7 +7,11 @@
 #include <cppunit/TestResult.h> 
 #include <cppunit/BriefTestProgressListener.h> 
 
-//#include "sscTestVisualRendering.h"
+#define RUN_ALL_TESTS
+
+#ifndef RUN_ALL_TESTS
+#include "sscTestUtilityClasses.h"
+#endif
 
 
 //#include "SonoWand.h"
@@ -24,8 +28,19 @@ int main(int argc, char **argv)
 	CppUnit::BriefTestProgressListener listener; 
 	runner.eventManager().addListener( &listener ); 
 	
+//	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
+//	runner.addTest(registry.makeTest() );
+	
+#ifdef RUN_ALL_TESTS
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-	runner.addTest(registry.makeTest() );
+	runner.addTest( registry.makeTest() );
+#else
+	runner.addTest( new CppUnit::TestCaller<TestUtilities>(
+			                                 "debugtest",
+			                                  &TestUtilities::testFrame ) );
+#endif
+	
+	
 	bool failed = runner.run();
 	return !failed;
 } 
