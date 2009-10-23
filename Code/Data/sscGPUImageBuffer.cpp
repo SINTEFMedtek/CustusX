@@ -120,6 +120,8 @@ public:
 		glBindTexture(GL_TEXTURE_3D, 0);
 		glDisable(GL_TEXTURE_3D);
 
+		report_gl_error();
+
 		mAllocated = true;
 	}
 	/**Activate and bind the volume and lut buffers inside the texture units
@@ -138,9 +140,17 @@ public:
 		report_gl_error();
 	}
 
-	void release()
+	virtual void release()
 	{
-		glDeleteTextures(1, &textureId);
+		std::cout << "relase?" <<  std::endl;
+		if (glIsTexture(textureId) )
+		{
+			std::cout << "glHasTexture " << std::endl;
+			glBindTexture(GL_TEXTURE_3D,0);
+			glEnable(GL_TEXTURE_2D);
+			glDisable(GL_TEXTURE_3D);
+		}
+		//glDeleteTextures(1, &textureId);
 	}
 
 	int getGLTextureForVolume(int textureUnitIndex)
@@ -261,10 +271,10 @@ public:
 		return mLutSize;
 	}
 
-	void release()
+	virtual void release()
 	{
-		glDeleteTextures(1, &textureId);
 		//glDeleteBuffersARB(1, &lutBuffer); //TODO find a working deleter
+		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
 
 	int getGLTextureForLut(int textureUnitIndex)

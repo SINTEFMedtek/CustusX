@@ -31,6 +31,10 @@ public:
 	 * Use during RenderInternal()
 	 */
 	virtual void bind(int textureUnitIndex) = 0;
+
+	/**attempt to clear buffer.
+	 */
+	virtual void release() = 0;
 };
 
 typedef boost::shared_ptr<GPUImageDataBuffer> GPUImageDataBufferPtr;
@@ -59,7 +63,7 @@ public:
 	virtual void bind(int textureUnitIndex) = 0;
 	/**Size of lut. Used by fragment shader.
 	 */
-	virtual int getLutSize() const = 0;	
+	virtual int getLutSize() const = 0;
 };
 
 typedef boost::shared_ptr<GPUImageLutBuffer> GPUImageLutBufferPtr;
@@ -79,7 +83,7 @@ private:
 	unsigned mMaxVolumes;
 	unsigned mMaxLuts;
 	std::map<vtkImageDataPtr, ssc::GPUImageDataBufferPtr> mVolumes;
-	std::map<vtkUnsignedCharArrayPtr, ssc::GPUImageLutBufferPtr> mLuts;	
+	std::map<vtkUnsignedCharArrayPtr, ssc::GPUImageLutBufferPtr> mLuts;
 	static GPUImageBufferRepository* mInstance;
 };
 
