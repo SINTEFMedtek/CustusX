@@ -41,6 +41,7 @@ namespace ssc
 			VIEW,
 			VIEW_2D,
 			VIEW_3D,
+			VIEW_REAL_TIME
 		}; ///< type describing the view
 		View(QWidget *parent = NULL, Qt::WFlags f = 0);
 		virtual ~View();

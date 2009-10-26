@@ -98,6 +98,7 @@ void View::clear()
 
 void View::removeReps()
 {
+
 	for (RepsIter it=mReps.begin(); it != mReps.end(); ++it)
 	{
 		(*it)->disconnectFromView(this);
