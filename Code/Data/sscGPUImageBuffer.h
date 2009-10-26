@@ -31,10 +31,6 @@ public:
 	 * Use during RenderInternal()
 	 */
 	virtual void bind(int textureUnitIndex) = 0;
-
-	/**attempt to clear buffer.
-	 */
-	virtual void release() = 0;
 };
 
 typedef boost::shared_ptr<GPUImageDataBuffer> GPUImageDataBufferPtr;

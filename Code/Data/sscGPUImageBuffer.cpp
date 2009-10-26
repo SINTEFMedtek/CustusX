@@ -142,15 +142,16 @@ public:
 
 	virtual void release()
 	{
-		std::cout << "relase?" <<  std::endl;
+		//std::cout<< "GPUImageDataBuffer::release"<<std::endl;
 		if (glIsTexture(textureId) )
 		{
 			std::cout << "glHasTexture " << std::endl;
 			glBindTexture(GL_TEXTURE_3D,0);
-			glEnable(GL_TEXTURE_2D);
 			glDisable(GL_TEXTURE_3D);
+			glDisable(GL_TEXTURE_2D);
+			//glDeleteTextures(1, &textureId);
 		}
-		//glDeleteTextures(1, &textureId);
+		
 	}
 
 	int getGLTextureForVolume(int textureUnitIndex)
@@ -185,7 +186,7 @@ public:
 	{
 		std::cout << "create GPUImageLutBufferImpl()" << std::endl;
 		mAllocated = false;
-		mLutSize = 0.0;
+		mLutSize = 0;
 	}
 	virtual ~GPUImageLutBufferImpl()
 	{
@@ -256,14 +257,9 @@ public:
 			std::cout << "error: called bind() on unallocated lut buffer" << std::endl;
 			return;
 		}
-
-		//glEnable( vtkgl::TEXTURE_3D );
-
 		vtkgl::ActiveTexture(getGLTextureForLut(textureUnitIndex));
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, textureId);
 		report_gl_error();
-
-		//glDisable( vtkgl::TEXTURE_3D );
 	}
 
 	int getLutSize() const
@@ -273,7 +269,8 @@ public:
 
 	virtual void release()
 	{
-		//glDeleteBuffersARB(1, &lutBuffer); //TODO find a working deleter
+		std::cout<< "GPUImageDataBuffer::release"<<std::endl;
+		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT,0);		
 		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
 
