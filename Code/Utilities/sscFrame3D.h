@@ -11,7 +11,8 @@ namespace utils
 {
 // --------------------------------------------------------
 
-/**Defines an axis-angle representation of a position+orientation in 3D space.
+/**
+ * Defines an axis-angle representation of a position+orientation in 3D space.
  * - ThetaXY+ThetaZ is the axis of rotation
  * - Phi is the amount of rotation
  * - P is the position of the origin
