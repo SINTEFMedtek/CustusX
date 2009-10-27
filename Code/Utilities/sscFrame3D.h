@@ -15,7 +15,7 @@ namespace utils
  * Defines an axis-angle representation of a position+orientation in 3D space.
  * - ThetaXY+ThetaZ is the axis of rotation
  * - Phi is the amount of rotation
- * - P is the position of the origin
+ * - P is the translation
  * 
  * The frame describes a coordinate space B related to A.
  * The transform for the frame F_B, T_B, can be used to convert points
@@ -35,14 +35,13 @@ public:
 	Frame3D();
 	virtual ~Frame3D();
 	
-private:
-	Transform3D generateRotationMatrix() const;
-	
     double mThetaXY; // angle of axis from x in xy plane
     double mThetaZ;  // angle of axis from xy-plane toward z-axis. (thetaZ=0 -> we are in xy-plane)
     double mPhi;     // rotation around axis.
-    Vector3D mPos;         // W==1
-
+    Vector3D mPos;   // translation
+	
+private:
+	Transform3D generateRotationMatrix() const;
 };
 
 std::ostream& operator<<(std::ostream& s, const Frame3D& t);
