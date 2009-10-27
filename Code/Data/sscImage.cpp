@@ -93,6 +93,7 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 		mBaseGrayScaleImageData = luminance->GetOutput();		
 	}
 	
+	mBaseGrayScaleImageData->Update();
 	return mBaseGrayScaleImageData;
 }
 

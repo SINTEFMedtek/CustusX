@@ -114,8 +114,22 @@ public:
 			std::cout << "Bit size not supported!" << std::endl;
 			break;
 		}
-		void* data = mTexture->GetPointData()->GetScalars()->GetVoidPointer(0);
-		glTexImage3D(vtkgl::TEXTURE_3D, 0, internalType, dimx, dimy, dimz, 0, GL_LUMINANCE, size, data);
+		
+		if (mTexture->GetNumberOfScalarComponents()==1)
+		{
+			void* data = mTexture->GetPointData()->GetScalars()->GetVoidPointer(0);
+			glTexImage3D(vtkgl::TEXTURE_3D, 0, internalType, dimx, dimy, dimz, 0, GL_LUMINANCE, size, data);
+		}
+		else if (mTexture->GetNumberOfScalarComponents()==3)
+		{
+			internalType = GL_RGB;
+			void* data = mTexture->GetPointData()->GetScalars()->GetVoidPointer(0);
+			glTexImage3D(vtkgl::TEXTURE_3D, 0, internalType, dimx, dimy, dimz, 0, GL_RGB, size, data);
+		}
+		else
+		{
+			std::cout << "unsupported number of image components" << std::endl;
+		}
 //
 		glBindTexture(GL_TEXTURE_3D, 0);
 		glDisable(GL_TEXTURE_3D);
