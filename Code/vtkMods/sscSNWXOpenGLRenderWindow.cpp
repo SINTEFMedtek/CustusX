@@ -396,7 +396,7 @@ XVisualInfo *SNWXOpenGLRenderWindow::GetDesiredVisualInfo()
 static GLXContext test = 0;
 SNWXOpenGLRenderWindow::SNWXOpenGLRenderWindow()
 {
-	std::cout << "create SNWXOpenGLRenderWindow " << endl;
+	//std::cout << "create SNWXOpenGLRenderWindow " << endl;
 	//Logger::log("vm.log","create SNWXOpenGLRenderWindow " );
   this->ParentId = static_cast<Window>(NULL);
   this->ScreenSize[0] = 0;
@@ -616,12 +616,12 @@ void SNWXOpenGLRenderWindow::CreateAWindow()
 		{
 			this->Internal->ContextId = glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
 			test = this->Internal->ContextId;
-			std::cout << "glXCreateContext with 0!!" << endl;
+//			std::cout << "glXCreateContext with 0!!" << endl;
 		}
 		else
 		{
 		    this->Internal->ContextId = glXCreateContext(this->DisplayId, v, test, GL_TRUE);
-		    std::cout << "glXCreateContext with share list!!" << endl;
+//		    std::cout << "glXCreateContext with share list!!" << endl;
 		}
     }
 

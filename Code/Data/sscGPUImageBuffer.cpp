@@ -43,12 +43,12 @@ public:
 
 	GPUImageDataBufferImpl()
 	{
-		std::cout << "create GPUImageDataBufferImpl()" << std::endl;
+		//std::cout << "create GPUImageDataBufferImpl()" << std::endl;
 		mAllocated = false;
 	}
 	virtual ~GPUImageDataBufferImpl()
 	{
-		std::cout << "delete GPUImageDataBufferImpl()" << std::endl;
+		//std::cout << "delete GPUImageDataBufferImpl()" << std::endl;
 		release();
 	}
 
@@ -159,7 +159,7 @@ public:
 		//std::cout<< "GPUImageDataBuffer::release"<<std::endl;
 		if (glIsTexture(textureId) )
 		{
-			std::cout << "glHasTexture " << std::endl;
+			//std::cout << "glHasTexture " << std::endl;
 			glBindTexture(GL_TEXTURE_3D,0);
 			glDisable(GL_TEXTURE_3D);
 			glDisable(GL_TEXTURE_2D);
@@ -198,13 +198,13 @@ public:
 
 	GPUImageLutBufferImpl()
 	{
-		std::cout << "create GPUImageLutBufferImpl()" << std::endl;
+		//std::cout << "create GPUImageLutBufferImpl()" << std::endl;
 		mAllocated = false;
 		mLutSize = 0;
 	}
 	virtual ~GPUImageLutBufferImpl()
 	{
-		std::cout << "delete GPUImageLutBufferImpl()" << std::endl;
+		//std::cout << "delete GPUImageLutBufferImpl()" << std::endl;
 		release();
 	}
 
@@ -283,7 +283,7 @@ public:
 
 	virtual void release()
 	{
-		std::cout<< "GPUImageDataBuffer::release"<<std::endl;
+		//std::cout<< "GPUImageDataBuffer::release"<<std::endl;
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT,0);		
 		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
