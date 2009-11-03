@@ -135,6 +135,7 @@ public:
 		glDisable(GL_TEXTURE_3D);
 
 		report_gl_error();
+		std::cout << "this=[" << this << "] tex=[" << mTexture << "] allocated buffer" << std::endl;
 
 		mAllocated = true;
 	}
@@ -166,6 +167,7 @@ public:
 			//glDeleteTextures(1, &textureId);
 		}
 		
+		std::cout << "this=[" << this << "] tex=[" << mTexture << "] release buffer" << std::endl;
 	}
 
 	int getGLTextureForVolume(int textureUnitIndex)
@@ -417,6 +419,8 @@ public:
 			mRemovedData[mData.back().mData] = mData.back().mBuffer; 
 			mData.pop_back();;
 		}
+		
+		std::cout << "current gpu buffer count: " << mData.size() << "+" << mRemovedData.size() << std::endl;
 		
 		return retval;
 	}
