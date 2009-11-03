@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include <map>
+#include <list>
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -68,20 +69,20 @@ typedef boost::weak_ptr<GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 GPUImageDataBufferPtr createGPUImageDataBuffer(vtkImageDataPtr volume);
 GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 
+/**Use this repository for avoiding multiple allocations of buffer data.
+ */
 class GPUImageBufferRepository
 {
 public:
-	GPUImageBufferRepository();
 	static GPUImageBufferRepository* getInstance();
 	ssc::GPUImageDataBufferPtr getGPUImageDataBuffer(vtkImageDataPtr volume);
 	ssc::GPUImageLutBufferPtr getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 private:
-	unsigned mMaxVolumes;
-	unsigned mMaxLuts;
-	std::map<vtkImageDataPtr, ssc::GPUImageDataBufferPtr> mVolumes;
-	std::map<vtkUnsignedCharArrayPtr, ssc::GPUImageLutBufferPtr> mLuts;
+	GPUImageBufferRepository();
+	class GPUImageBufferRepositoryInternal* mInternal;
 	static GPUImageBufferRepository* mInstance;
 };
+
 
 }
 

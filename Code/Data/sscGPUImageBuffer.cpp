@@ -316,14 +316,133 @@ GPUImageLutBufferPtr createGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut)
 	return GPUImageLutBufferPtr(retval.release());
 }
 
+template<class BUFFER, class DATA_PTR>
+boost::shared_ptr<BUFFER> createGPUImageBuffer(DATA_PTR val);
+
+template<>
+boost::shared_ptr<GPUImageDataBuffer> createGPUImageBuffer<GPUImageDataBuffer>(vtkImageDataPtr val);
+template<>
+boost::shared_ptr<GPUImageLutBuffer> createGPUImageBuffer<GPUImageLutBuffer>(vtkUnsignedCharArrayPtr val);
+
+template<>
+boost::shared_ptr<GPUImageDataBuffer> createGPUImageBuffer<GPUImageDataBuffer,vtkImageDataPtr>(vtkImageDataPtr val)
+{
+	return createGPUImageDataBuffer(val);
+}
+template<>
+boost::shared_ptr<GPUImageLutBuffer> createGPUImageBuffer<GPUImageLutBuffer>(vtkUnsignedCharArrayPtr val)
+{
+	return createGPUImageLutBuffer(val);
+}
+
+
 //---------------------------------------------------------
 GPUImageBufferRepository* GPUImageBufferRepository::mInstance = NULL;
 //---------------------------------------------------------
 
+template<class DATA_PTR, class BUFFER>
+class BufferQueue
+{
+public:
+	typedef boost::shared_ptr<BUFFER> BufferPtr;
+	typedef boost::weak_ptr<BUFFER> BufferWeakPtr;
+
+	struct BufferStore
+	{
+		BufferStore(DATA_PTR data, BufferPtr buffer) : mData(data), mBuffer(buffer) {}
+		DATA_PTR mData;
+		BufferPtr mBuffer;
+	};
+public:
+	
+	BufferQueue() : mMaxBuffers(7)
+	{
+		
+	}
+	void setMaxBuffers(unsigned val)
+	{
+		mMaxBuffers = val;
+	}
+
+	BufferPtr get(DATA_PTR data)
+	{
+		// clear out deleted data
+		for (typename BufferMap::iterator iter=mRemovedData.begin(); iter!=mRemovedData.end(); )
+		{
+			if (!iter->second.lock())
+			{
+				typename BufferMap::iterator temp = iter;
+				++iter;
+				mRemovedData.erase(temp);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+		
+		// reclaim weak pointer to buffer if it exists.
+		if (mRemovedData.count(data))
+		{
+			BufferPtr object = mRemovedData[data].lock();
+			if (object)
+			{
+				mData.push_front(BufferStore(data, object));
+				mRemovedData.erase(data);
+			}
+		}
+		
+		BufferPtr retval;
+		for (typename std::list<BufferStore>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
+		{
+			if (iter->mData==data)
+			{
+				retval = iter->mBuffer; // retrieve data
+				mData.push_front(*iter); // push on queue front (most recent)
+				mData.erase(iter); // erase from old position
+				break;
+			}
+		}
+		
+		// create buffer if nonexistent
+		if (!retval)
+		{
+			retval = createGPUImageBuffer<BUFFER>(data);
+			mData.push_front(BufferStore(data, retval));
+		}
+				
+		// reduce repository size if too large.
+		while (mData.size()>mMaxBuffers)
+		{
+			mRemovedData[mData.back().mData] = mData.back().mBuffer; 
+			mData.pop_back();;
+		}
+		
+		return retval;
+	}
+	
+private:
+	typedef std::map<DATA_PTR, BufferWeakPtr> BufferMap;
+	BufferMap mRemovedData; // those buffers that are removed but still might live outside of the repo.
+	//typedef std::map<DATA_PTR, BufferWeakPtr> RemovedDataIter;
+	std::list<BufferStore> mData; // newest elems in front
+	//std::map<DATA_PTR, BufferPtr> mData; // repository of buffered buffers.
+	unsigned mMaxBuffers;
+	
+};
+
+class GPUImageBufferRepositoryInternal
+{
+public:
+	BufferQueue<vtkImageDataPtr, ssc::GPUImageDataBuffer> mVolumeBuffer;
+	BufferQueue<vtkUnsignedCharArrayPtr, ssc::GPUImageLutBuffer> mLutBuffer;
+};
+
 GPUImageBufferRepository::GPUImageBufferRepository()
 {
-	mMaxVolumes = 7;
-	mMaxLuts = 7;
+	mInternal = new GPUImageBufferRepositoryInternal();
+//	mMaxVolumes = 7;
+//	mMaxLuts = 7;
 }
 
 GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
@@ -337,30 +456,12 @@ GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 
 ssc::GPUImageDataBufferPtr GPUImageBufferRepository::getGPUImageDataBuffer(vtkImageDataPtr volume)
 {
-	while (mVolumes.size()>mMaxVolumes)
-	{
-		mVolumes.erase(mVolumes.begin());
-	}
-
-	if (!mVolumes.count(volume))
-	{
-		mVolumes[volume] = ssc::createGPUImageDataBuffer(volume);
-	}
-	return mVolumes[volume];
+	return mInternal->mVolumeBuffer.get(volume);
 }
 
 ssc::GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut)
 {
-	while (mLuts.size()>mMaxLuts)
-	{
-		mLuts.erase(mLuts.begin());
-	}
-
-	if (!mLuts.count(lut))
-	{
-		mLuts[lut] = ssc::createGPUImageLutBuffer(lut);
-	}
-	return mLuts[lut];
+	return mInternal->mLutBuffer.get(lut);
 }
 
 
