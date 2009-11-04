@@ -25,6 +25,9 @@
 #include "vtkToolkits.h"
 #ifndef VTK_IMPLEMENT_MESA_CXX
 #ifdef VTK_OPENGL_HAS_OSMESA
+#ifndef GLAPIENTRY
+#define GLAPIENTRY APIENTRY
+#endif
 #include <GL/osmesa.h>
 #endif
 #endif
