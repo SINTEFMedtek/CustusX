@@ -1,6 +1,7 @@
 #include "sscAcceptanceBoxWidget.h"
 
 #include <iostream>
+#include "sscConfig.h"
 
 namespace ssc
 {
