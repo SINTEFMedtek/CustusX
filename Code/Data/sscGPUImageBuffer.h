@@ -75,12 +75,15 @@ class GPUImageBufferRepository
 {
 public:
 	static GPUImageBufferRepository* getInstance();
+	static void shutdown();
+
 	ssc::GPUImageDataBufferPtr getGPUImageDataBuffer(vtkImageDataPtr volume);
 	ssc::GPUImageLutBufferPtr getGPUImageLutBuffer(vtkUnsignedCharArrayPtr lut);
 private:
 	GPUImageBufferRepository();
 	class GPUImageBufferRepositoryInternal* mInternal;
 	static GPUImageBufferRepository* mInstance;
+	void tearDown();
 };
 
 

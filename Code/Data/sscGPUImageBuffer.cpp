@@ -114,7 +114,7 @@ public:
 			std::cout << "Bit size not supported!" << std::endl;
 			break;
 		}
-		
+
 		if (mTexture->GetNumberOfScalarComponents()==1)
 		{
 			void* data = mTexture->GetPointData()->GetScalars()->GetVoidPointer(0);
@@ -165,10 +165,10 @@ public:
 			glBindTexture(GL_TEXTURE_3D,0);
 			glDisable(GL_TEXTURE_3D);
 			glDisable(GL_TEXTURE_2D);
-			//glDeleteTextures(1, &textureId);
+			glDeleteTextures(1, &textureId);
+			//std::cout << "this=[" << this << "] tex=[" << mTexture << "] release buffer" << std::endl;
 		}
-		
-		std::cout << "this=[" << this << "] tex=[" << mTexture << "] release buffer" << std::endl;
+
 	}
 
 	int getGLTextureForVolume(int textureUnitIndex)
@@ -287,7 +287,7 @@ public:
 	virtual void release()
 	{
 		//std::cout<< "GPUImageDataBuffer::release"<<std::endl;
-		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT,0);		
+		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT,0);
 		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
 
@@ -357,10 +357,10 @@ public:
 		BufferPtr mBuffer;
 	};
 public:
-	
+
 	BufferQueue() : mMaxBuffers(7)
 	{
-		
+
 	}
 	void setMaxBuffers(unsigned val)
 	{
@@ -383,7 +383,7 @@ public:
 				++iter;
 			}
 		}
-		
+
 		// reclaim weak pointer to buffer if it exists.
 		if (mRemovedData.count(data))
 		{
@@ -394,7 +394,7 @@ public:
 				mRemovedData.erase(data);
 			}
 		}
-		
+
 		BufferPtr retval;
 		for (typename std::list<BufferStore>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
 		{
@@ -406,26 +406,26 @@ public:
 				break;
 			}
 		}
-		
+
 		// create buffer if nonexistent
 		if (!retval)
 		{
 			retval = createGPUImageBuffer<BUFFER>(data);
 			mData.push_front(BufferStore(data, retval));
 		}
-				
+
 		// reduce repository size if too large.
 		while (mData.size()>mMaxBuffers)
 		{
-			mRemovedData[mData.back().mData] = mData.back().mBuffer; 
+			mRemovedData[mData.back().mData] = mData.back().mBuffer;
 			mData.pop_back();;
 		}
-		
-		std::cout << "current gpu buffer count: " << mData.size() << "+" << mRemovedData.size() << std::endl;
-		
+
+		//std::cout << "current gpu buffer count: " << mData.size() << "+" << mRemovedData.size() << std::endl;
+
 		return retval;
 	}
-	
+
 private:
 	typedef std::map<DATA_PTR, BufferWeakPtr> BufferMap;
 	BufferMap mRemovedData; // those buffers that are removed but still might live outside of the repo.
@@ -433,7 +433,7 @@ private:
 	std::list<BufferStore> mData; // newest elems in front
 	//std::map<DATA_PTR, BufferPtr> mData; // repository of buffered buffers.
 	unsigned mMaxBuffers;
-	
+
 };
 
 class GPUImageBufferRepositoryInternal
@@ -459,6 +459,21 @@ GPUImageBufferRepository* GPUImageBufferRepository::getInstance()
 	return mInstance;
 }
 
+void GPUImageBufferRepository::shutdown()
+{
+	if(mInstance)
+	{
+		mInstance->tearDown();
+		delete mInstance;
+	}
+	mInstance = NULL;
+
+}
+void GPUImageBufferRepository::tearDown()
+{
+	delete mInternal;
+	mInternal = NULL;
+}
 ssc::GPUImageDataBufferPtr GPUImageBufferRepository::getGPUImageDataBuffer(vtkImageDataPtr volume)
 {
 	return mInternal->mVolumeBuffer.get(volume);
