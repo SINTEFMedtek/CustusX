@@ -434,8 +434,8 @@ SNWXOpenGLRenderWindow::SNWXOpenGLRenderWindow()
 SNWXOpenGLRenderWindow::~SNWXOpenGLRenderWindow()
 {
   // close-down all system-specific drawing resources
-  this->Finalize();
-
+std::cout << "destroy SNWXOpenGLRenderWindow " << endl;
+	this->Finalize();
   vtkRenderer* ren;
   this->Renderers->InitTraversal();
   for ( ren = vtkOpenGLRenderer::SafeDownCast(this->Renderers->GetNextItemAsObject());
@@ -615,7 +615,8 @@ void SNWXOpenGLRenderWindow::CreateAWindow()
 
   if (!this->Internal->ContextId)
     {
-		if(!test)
+	std::cout << "vtk Opengl window context:" << test<< std::endl;
+	  if(!test)
 		{
 			this->Internal->ContextId = glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
 			test = this->Internal->ContextId;
@@ -630,7 +631,7 @@ void SNWXOpenGLRenderWindow::CreateAWindow()
 
   if(!this->Internal->ContextId)
     {
-    vtkErrorMacro("Cannot create GLX context.  Aborting.");
+	 vtkErrorMacro("Cannot create GLX context.  Aborting.");
     if (this->HasObserver(vtkCommand::ExitEvent))
       {
       this->InvokeEvent(vtkCommand::ExitEvent, NULL);
@@ -915,7 +916,13 @@ void SNWXOpenGLRenderWindow::CreateOffScreenWindow(int width, int height)
         {
         v = this->GetDesiredVisualInfo();
         std::cout << " Pbuffer creation " << endl;
-         this->Internal->PixmapContextId = glXCreateContext(this->DisplayId, v, 0, GL_FALSE);
+
+        this->Internal->PixmapContextId = glXCreateContext(this->DisplayId, v, 0, GL_FALSE);
+
+
+
+
+
         this->Internal->pixmap=
           XCreatePixmap(this->DisplayId,
                         XRootWindow(this->DisplayId,v->screen),

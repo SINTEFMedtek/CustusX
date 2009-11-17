@@ -87,6 +87,7 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* p, Qt::WFlags f)
     automaticImageCache(false), maxImageCacheRenderRate(1.0)
 
 {
+	std::cout << "creator SNWQVTKWidget 5_4" << std::endl;
   // no background
   this->setAttribute(Qt::WA_NoBackground);
   // no double buffering
@@ -122,6 +123,7 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* p, Qt::WFlags f)
 
 SNWQVTKWidget::~SNWQVTKWidget()
 {
+	std::cout << "destructor SNWQVTKWidget 5_4" << std::endl;
   // get rid of the VTK window
   this->SetRenderWindow(NULL);
   this->mCachedImage->Delete();

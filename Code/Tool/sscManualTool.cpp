@@ -1,10 +1,12 @@
 #include "sscManualTool.h"
 #include <QTime>
 #include <QTimer>
-//#include <vtkConeSource.h>
+#include <vtkSTLReader.h>
+#include <vtkCursor3D.h>
 #include "sscDummyTool.h"
 
-typedef vtkSmartPointer <class vtkConeSource> vtkConeSourcePtr;
+
+//typedef vtkSmartPointer <class vtkConeSource> vtkConeSourcePtr;
 
 namespace ssc
 {
@@ -13,30 +15,61 @@ ManualTool::ManualTool(const std::string& uid) : mUid(uid), mName(uid), mMutex(Q
 {
 	mOffset = 0;
 	mType = TOOL_MANUAL;
-	mVisible = false; 	
-//	createPolyData();
-    mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);	
+	mVisible = false;
+	//mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);
+	read3DCrossHair();
 }
 
 ManualTool::~ManualTool()
 {
 }
 
+void ManualTool::read3DCrossHair()
+{
+	if(mCrossHair)
+	{
+		return;
+	}
+	mCrossHair = vtkCursor3DPtr::New();
+	mCrossHair->SetModelBounds(-120,140,-120,140,-120,140);
+	mCrossHair->SetFocalPoint(0,0,0);
+	mCrossHair->AllOff();
+	mCrossHair->AxesOn();
+	//mCrossHair->OutlineOn();
+//	mCrossHair->XShadowsOn();
+//	mCrossHair->YShadowsOn();
+//	mCrossHair->ZShadowsOn();
+
+	//std::string filename( "/Data/Models/3DCrosshair.STL");
+//	mSTLReader = vtkSTLReaderPtr::New();
+//	mSTLReader->SetFileName( filename.c_str() );
+//	mSTLReader->Update();
+//	if (mSTLReader->GetOutput())
+//	{
+//		std::cout << " we got polydata " << std::endl;
+//		vtkPolyDataPtr mPolyData = mSTLReader->GetOutput();
+//	}
+
+	//mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );
+
+
+}
 //only used now by mouse or touch tool
 void ManualTool::set_prMt(const Transform3D& prMt)
 {
 	QDateTime time;
 	double timestamp = (double) time.time().msec();
-	
+
 	QMutexLocker locker(&mMutex);
 	m_prMt = prMt;
 	locker.unlock();
-	
-	emit toolTransformAndTimestamp( prMt, timestamp ); 
+
+	emit toolTransformAndTimestamp( prMt, timestamp );
 }
 
 std::string ManualTool::getGraphicsFileName() const
 {
+	//return "/Data/Models/3DCrosshair.STL";
 	return "";
 }
 
@@ -47,7 +80,8 @@ ssc::Tool::Type ManualTool::getType() const
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 {
-	return mPolyData;
+	//return mPolyData;
+	return mCrossHair->GetOutput();
 }
 
 Transform3D ManualTool::get_prMt() const
@@ -68,13 +102,13 @@ int ManualTool::getIndex() const
 }
 
 std::string ManualTool::getUid() const
-{ 
+{
 	return mUid;
 }
 
 std::string ManualTool::getName() const
 {
-	return mName;	
+	return mName;
 }
 
 void ManualTool::setVisible(bool vis)
@@ -83,38 +117,38 @@ void ManualTool::setVisible(bool vis)
 	mVisible = vis;
 }
 
-void ManualTool::setType(const Type& type) 
+void ManualTool::setType(const Type& type)
 {
 	QMutexLocker locker(&mMutex);
-	mType = type;	
+	mType = type;
 }
 
 bool ManualTool::isCalibrated() const
 {
-	return false;	
+	return false;
 }
 
-ssc::ProbeSector ManualTool::getProbeSector() const 
+ssc::ProbeSector ManualTool::getProbeSector() const
 {
-	return ssc::ProbeSector(); 
-}	
+	return ssc::ProbeSector();
+}
 
 double ManualTool::getTimestamp() const
 {
 	return 0;
 }
 
-double ManualTool::getTooltipOffset() const 
+double ManualTool::getTooltipOffset() const
 {
-	return mOffset; 
+	return mOffset;
 }
 
-void ManualTool::setTooltipOffset(double val) 
-{ 
-	if (similar(val,mOffset)) 
-		return; 
-	mOffset = val; 
-	emit tooltipOffset(mOffset); 
+void ManualTool::setTooltipOffset(double val)
+{
+	if (similar(val,mOffset))
+		return;
+	mOffset = val;
+	emit tooltipOffset(mOffset);
 }
 
 }//end namespace

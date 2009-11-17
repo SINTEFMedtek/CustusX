@@ -95,6 +95,7 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
     automaticImageCache(false), maxImageCacheRenderRate(1.0)
 
 {
+	 std::cout << " create SNWQVTKWidget 5_5 " << std::endl;
   this->UseTDx=false;
   // no background
   this->setAttribute(Qt::WA_NoBackground);
@@ -133,6 +134,7 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
 
 SNWQVTKWidget::~SNWQVTKWidget()
 {
+	std::cout << "destructor SNWQVTKWidget 5_5" << std::endl;
   // get rid of the VTK window
   this->SetRenderWindow(NULL);
 

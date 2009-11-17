@@ -66,7 +66,7 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 
 VolumetricRep::~VolumetricRep()
 {
-
+std::cout << "VolumetricRep::~VolumetricRep()" << std::endl;
 }
 
 VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
@@ -156,6 +156,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	//
 	// also use grayscale as vtk is incapable of rendering 3component color.
 	vtkImageDataPtr volume = mImage->getGrayScaleBaseVtkImageData();
+	//vtkImageDataPtr volume = mImage->getVOIExtractVtkImageData();
 
 	if (fabs(1.0-mResampleFactor)>0.01) // resampling
 	{
@@ -165,12 +166,15 @@ void VolumetricRep::vtkImageDataChangedSlot()
 		resampler->SetAxisMagnificationFactor(2, mResampleFactor);
 		resampler->SetInput(volume);
 		resampler->GetOutput()->Update();
-		resampler->GetOutput()->GetScalarRange();		
+		resampler->GetOutput()->GetScalarRange();
 		volume = resampler->GetOutput();
 	}
 
-	mTextureMapper3D->SetInput(volume);	
-	
+
+
+
+	mTextureMapper3D->SetInput(volume);
+
 	transformChangedSlot();
 }
 
@@ -182,7 +186,7 @@ void VolumetricRep::transformChangedSlot()
 	{
 		return;
 	}
-	mVolume->SetUserMatrix(mImage->get_rMd().matrix());	
+	mVolume->SetUserMatrix(mImage->get_rMd().matrix());
 }
 
 
