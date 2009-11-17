@@ -35,6 +35,7 @@ void ManualTool::read3DCrossHair()
 	mCrossHair->SetFocalPoint(0,0,0);
 	mCrossHair->AllOff();
 	mCrossHair->AxesOn();
+
 	//mCrossHair->OutlineOn();
 //	mCrossHair->XShadowsOn();
 //	mCrossHair->YShadowsOn();
@@ -69,7 +70,6 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 
 std::string ManualTool::getGraphicsFileName() const
 {
-	//return "/Data/Models/3DCrosshair.STL";
 	return "";
 }
 
@@ -148,6 +148,7 @@ void ManualTool::setTooltipOffset(double val)
 	if (similar(val,mOffset))
 		return;
 	mOffset = val;
+	mCrossHair->SetFocalPoint(0,0,mOffset);
 	emit tooltipOffset(mOffset);
 }
 
