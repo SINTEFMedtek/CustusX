@@ -90,6 +90,9 @@ void ToolRep3D::setTool(ToolPtr tool)
 			mToolActor->SetMapper(mPolyDataMapper);
 		}
 
+
+
+
 		receiveTransforms(mTool->get_prMt(), 0);
 		mToolActor->SetVisibility(mTool->getVisible());
 
@@ -109,6 +112,10 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
+	if (mTool->getType() == Tool::TOOL_MANUAL)
+	{
+		mToolActor->GetProperty()->SetColor(1.0, 0.8, 0.0);
+	}
 	view->getRenderer()->AddActor(mToolActor);
 
 	mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
@@ -145,6 +152,8 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 
 void ToolRep3D::updateOffsetGraphics()
 {
+
+
 	bool visible = mTool && mTool->getVisible() && mTool->getType()!=Tool::TOOL_US_PROBE; // no offset for probes
 
 	if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility()==false))
