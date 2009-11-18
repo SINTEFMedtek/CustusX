@@ -54,7 +54,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
 	if (tool==mTool)
 		return;
-
+	std::cout << "ToolRep3D::setTool get type : " << tool->getType() <<std::endl;
 	// teardown old
 	if (mTool)
 	{
@@ -74,7 +74,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		std::string filename = mTool->getGraphicsFileName();
-		std::cout<<"reading filename :" << filename <<	std::endl;
+		//std::cout<<"reading filename :" << filename <<	std::endl;
 		if (!filename.empty() && filename.compare(filename.size()-3,3,"STL") == 0 )
 		{
 			mSTLReader->SetFileName( filename.c_str() );
@@ -89,10 +89,15 @@ void ToolRep3D::setTool(ToolPtr tool)
 		{
 			mToolActor->SetMapper(mPolyDataMapper);
 		}
-
-
-
-
+		
+		
+		mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+		if (mTool->getType() == Tool::TOOL_MANUAL)
+		{
+			std::cout << "SetProperty color 1.0, 0.8, 0.0" << std::endl;
+			mToolActor->GetProperty()->SetColor(1.0, 0.8, 0.0);
+		}
+		
 		receiveTransforms(mTool->get_prMt(), 0);
 		mToolActor->SetVisibility(mTool->getVisible());
 
@@ -112,12 +117,9 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
-	if (mTool->getType() == Tool::TOOL_MANUAL)
-	{
-		mToolActor->GetProperty()->SetColor(1.0, 0.8, 0.0);
-	}
+	
 	view->getRenderer()->AddActor(mToolActor);
-
+	
 	mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
 	mOffsetPoint->setRadius(2);
 	mOffsetPoint->setColor(Vector3D(1,0.8,0));
@@ -152,8 +154,6 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 
 void ToolRep3D::updateOffsetGraphics()
 {
-
-
 	bool visible = mTool && mTool->getVisible() && mTool->getType()!=Tool::TOOL_US_PROBE; // no offset for probes
 
 	if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility()==false))
@@ -186,7 +186,6 @@ void ToolRep3D::receiveVisible(bool visible)
 	{
 		return; // don't hide
 	}
-
 	mToolActor->SetVisibility(visible);
 	updateOffsetGraphics();
 }
