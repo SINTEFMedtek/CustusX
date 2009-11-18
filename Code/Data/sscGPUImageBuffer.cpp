@@ -1,13 +1,15 @@
-#include "sscGPUImageBuffer.h"
+#define GL_GLEXT_PROTOTYPES
+#include <vtkgl.h>
+#include <GL/glu.h>
 
 #include <vector>
 #include <vtkImageData.h>
-#include <vtkgl.h>
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <stdint.h>
-#include <GL/glu.h>
+
+#include "sscGPUImageBuffer.h"
 
 #define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__)
 
