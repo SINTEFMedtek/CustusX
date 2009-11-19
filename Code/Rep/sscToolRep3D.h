@@ -18,7 +18,7 @@ typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /**Display a 3D representation of a ssc::Tool.
  * The representation to use is extracted from the tool itself.
- * 
+ *
  * Used by Sonowand.
  * Used by CustusX.
  */
@@ -33,9 +33,9 @@ public:
 	virtual void setTool(ToolPtr tool);
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
-	
+
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
-	
+
 protected:
 	ToolRep3D(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
@@ -53,7 +53,7 @@ private slots:
 	 *\param visible Whether or not the tool is visible to the tracking system.
 	 */
 	void receiveVisible(bool visible);
-	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.		
+	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
 private:
 	void updateOffsetGraphics();
 
@@ -61,9 +61,10 @@ private:
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;
 	vtkSTLReaderPtr mSTLReader;
+	GraphicalPoint3DPtr mTooltipPoint;
 	GraphicalPoint3DPtr mOffsetPoint;
 	GraphicalLine3DPtr mOffsetLine;
-	bool mStayVisibleAfterHide; 
+	bool mStayVisibleAfterHide;
 };
 } // namespace ssc
 

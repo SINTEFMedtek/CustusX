@@ -22,8 +22,11 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mSTLReader = vtkSTLReaderPtr::New();
+
 	mOffsetPoint.reset(new GraphicalPoint3D());
 	mOffsetLine.reset(new GraphicalLine3D());
+	mTooltipPoint.reset(new GraphicalPoint3D());
+
 
 //	if (pd::Settings::instance()->useDebugAxis())
 //	 	{
@@ -54,7 +57,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
 	if (tool==mTool)
 		return;
-	std::cout << "ToolRep3D::setTool get type : " << tool->getType() <<std::endl;
+
 	// teardown old
 	if (mTool)
 	{
@@ -74,7 +77,6 @@ void ToolRep3D::setTool(ToolPtr tool)
 	if (mTool)
 	{
 		std::string filename = mTool->getGraphicsFileName();
-		//std::cout<<"reading filename :" << filename <<	std::endl;
 		if (!filename.empty() && filename.compare(filename.size()-3,3,"STL") == 0 )
 		{
 			mSTLReader->SetFileName( filename.c_str() );
@@ -89,15 +91,14 @@ void ToolRep3D::setTool(ToolPtr tool)
 		{
 			mToolActor->SetMapper(mPolyDataMapper);
 		}
-		
-		
+
+		//some color to 3D cursor
 		mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
 		if (mTool->getType() == Tool::TOOL_MANUAL)
 		{
-			std::cout << "SetProperty color 1.0, 0.8, 0.0" << std::endl;
 			mToolActor->GetProperty()->SetColor(1.0, 0.8, 0.0);
 		}
-		
+
 		receiveTransforms(mTool->get_prMt(), 0);
 		mToolActor->SetVisibility(mTool->getVisible());
 
@@ -117,15 +118,20 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
-	
 	view->getRenderer()->AddActor(mToolActor);
-	
+
 	mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
 	mOffsetPoint->setRadius(2);
 	mOffsetPoint->setColor(Vector3D(1,0.8,0));
+
+	mTooltipPoint.reset(new GraphicalPoint3D(view->getRenderer()));
+	mTooltipPoint->setRadius(2);
+	mTooltipPoint->setColor(Vector3D(0.25,0.87,0.16)); //light green
+
 	mOffsetLine.reset(new GraphicalLine3D(view->getRenderer()));
 	mOffsetLine->setColor(Vector3D(1,0.8,0));
 
+	mTooltipPoint->getActor()->SetVisibility(false);
 	mOffsetPoint->getActor()->SetVisibility(false);
 	mOffsetLine->getActor()->SetVisibility(false);
 }
@@ -133,6 +139,8 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mToolActor);
+
+	mTooltipPoint.reset(new GraphicalPoint3D());
 	mOffsetPoint.reset(new GraphicalPoint3D());
 	mOffsetLine.reset(new GraphicalLine3D());
 }
@@ -141,12 +149,6 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	//return;
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-
-//	std::cout << "--ToolRep3D::receiveTransforms()---" << std::endl;
-//	std::cout << "prMt\n" << prMt << std::endl;
-//	std::cout << "rMpr\n" << rMpr << std::endl;
-//	std::cout << "----------" << std::endl;
-
 	Transform3D rMt = rMpr*prMt;
 	mToolActor->SetUserMatrix( rMt.matrix());
 	updateOffsetGraphics();
@@ -154,22 +156,25 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 
 void ToolRep3D::updateOffsetGraphics()
 {
+
 	bool visible = mTool && mTool->getVisible() && mTool->getType()!=Tool::TOOL_US_PROBE; // no offset for probes
 
 	if (!mStayVisibleAfterHide || (mOffsetPoint->getActor()->GetVisibility()==false))
 	{
 		mOffsetPoint->getActor()->SetVisibility(visible);
+		mTooltipPoint->getActor()->SetVisibility(visible);
 		mOffsetLine->getActor()->SetVisibility(visible);
 	}
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
+		std::cout << "hide" << std::endl;
+		//mTooltipPoint->getActor()->SetVisibility(false);
 		mOffsetPoint->getActor()->SetVisibility(false);
 		mOffsetLine->getActor()->SetVisibility(false);
 	}
 
 	if (!mTool)
 		return;
-
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = rMpr * mTool->get_prMt();
 
@@ -177,11 +182,12 @@ void ToolRep3D::updateOffsetGraphics()
 	Vector3D p1 = rMt.coord(Vector3D(0,0,mTool->getTooltipOffset()));
 	mOffsetPoint->setValue(p1);
 	mOffsetLine->setValue(p0,p1);
+	mTooltipPoint->setValue(Vector3D(p0));
 }
 
 void ToolRep3D::receiveVisible(bool visible)
 {
-	//std::cout << "ToolRep3D::receiveVisible " << visible << std::endl;
+	std::cout << "ToolRep3D::receiveVisible " << visible << std::endl;
 	if (!visible && mStayVisibleAfterHide)
 	{
 		return; // don't hide
