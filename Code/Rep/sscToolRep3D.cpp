@@ -57,8 +57,8 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
 	if (tool==mTool)
 		return;
-
-	// teardown old
+	std::cout<< "setTool 1 " <<std::endl;
+	
 	if (mTool)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
@@ -76,6 +76,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 	// setup new
 	if (mTool)
 	{
+		std::cout<< "setTool 2 " <<std::endl;
 		std::string filename = mTool->getGraphicsFileName();
 		if (!filename.empty() && filename.compare(filename.size()-3,3,"STL") == 0 )
 		{
@@ -126,7 +127,8 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 
 	mTooltipPoint.reset(new GraphicalPoint3D(view->getRenderer()));
 	mTooltipPoint->setRadius(2);
-	mTooltipPoint->setColor(Vector3D(0.25,0.87,0.16)); //light green
+	mTooltipPoint->setColor(Vector3D(1,0.8,0)); //light green
+	//mTooltipPoint->setColor(Vector3D(0.25,0.87,0.16)); //light green
 
 	mOffsetLine.reset(new GraphicalLine3D(view->getRenderer()));
 	mOffsetLine->setColor(Vector3D(1,0.8,0));
@@ -167,8 +169,7 @@ void ToolRep3D::updateOffsetGraphics()
 	}
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
-		std::cout << "hide" << std::endl;
-		//mTooltipPoint->getActor()->SetVisibility(false);
+		mTooltipPoint->getActor()->SetVisibility(false);
 		mOffsetPoint->getActor()->SetVisibility(false);
 		mOffsetLine->getActor()->SetVisibility(false);
 	}
@@ -207,6 +208,7 @@ void ToolRep3D::setStayVisibleAfterHide(bool val)
 
 void ToolRep3D::tooltipOffsetSlot(double val)
 {
+	std::cout << "updateOffset" << val << std::endl;
 	updateOffsetGraphics();
 }
 
