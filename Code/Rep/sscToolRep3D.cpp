@@ -57,7 +57,6 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
 	if (tool==mTool)
 		return;
-	std::cout<< "setTool 1 " <<std::endl;
 	
 	if (mTool)
 	{
@@ -76,7 +75,6 @@ void ToolRep3D::setTool(ToolPtr tool)
 	// setup new
 	if (mTool)
 	{
-		std::cout<< "setTool 2 " <<std::endl;
 		std::string filename = mTool->getGraphicsFileName();
 		if (!filename.empty() && filename.compare(filename.size()-3,3,"STL") == 0 )
 		{
@@ -188,7 +186,6 @@ void ToolRep3D::updateOffsetGraphics()
 
 void ToolRep3D::receiveVisible(bool visible)
 {
-	std::cout << "ToolRep3D::receiveVisible " << visible << std::endl;
 	if (!visible && mStayVisibleAfterHide)
 	{
 		return; // don't hide
@@ -208,7 +205,6 @@ void ToolRep3D::setStayVisibleAfterHide(bool val)
 
 void ToolRep3D::tooltipOffsetSlot(double val)
 {
-	std::cout << "updateOffset" << val << std::endl;
 	updateOffsetGraphics();
 }
 
