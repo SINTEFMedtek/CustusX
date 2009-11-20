@@ -66,7 +66,6 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 
 VolumetricRep::~VolumetricRep()
 {
-std::cout << "VolumetricRep::~VolumetricRep()" << std::endl;
 }
 
 VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
