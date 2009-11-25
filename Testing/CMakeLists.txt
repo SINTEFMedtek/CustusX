@@ -107,6 +107,7 @@ set(SSC_TEST_SOURCE_FILES
     sscTestSliceComputer.cpp
     sscViewsWindow.cpp 
     sscTestVisualRendering.cpp
+    sscTestUtilityClasses.cpp
     ${SSC_TEST_SOURCE_FILES}
     )
     
