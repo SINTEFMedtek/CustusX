@@ -11,6 +11,7 @@
 
 #ifndef RUN_ALL_TESTS
 #include "sscTestUtilityClasses.h"
+#include "sscTestSliceComputer.h"
 #endif
 
 
@@ -35,9 +36,9 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-	runner.addTest( new CppUnit::TestCaller<TestUtilities>(
+	runner.addTest( new CppUnit::TestCaller<TestSliceComputer>(
 			                                 "debugtest",
-			                                  &TestUtilities::testFrame ) );
+			                                  &TestSliceComputer::testAnyPlanes ) );
 #endif
 	
 	
