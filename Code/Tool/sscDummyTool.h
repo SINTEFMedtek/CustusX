@@ -43,6 +43,7 @@ public:
 
 	void setToolPositionMovement(const std::vector<Transform3D>& positions);
 	void setToolPositionMovementBB(const DoubleBoundingBox3D& bb);
+	std::vector<Transform3D> getToolPositionMovement();
 	void set_prMt(const Transform3D& ptMt);
 	void setVisible(bool val);
 

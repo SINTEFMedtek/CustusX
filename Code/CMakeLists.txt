@@ -89,6 +89,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscAcceptanceBoxWidget.cpp
     Utilities/sscGraphicalPrimitives.cpp
     Utilities/sscFrame3D.cpp
+    Utilities/sscPositionStorageFile.cpp
     sscView.cpp
     vtkMods/sscSNWXOpenGLRenderWindow.cpp
     vtkMods/sscSNWQVTKWidget.cpp

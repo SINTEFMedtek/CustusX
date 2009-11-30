@@ -59,6 +59,10 @@ void DummyTool::setToolPositionMovementBB(const DoubleBoundingBox3D& bb)
 	setToolPositionMovement(createToolPositionMovement(bb));
 }
 
+std::vector<Transform3D> DummyTool::getToolPositionMovement()
+{
+	return mTransforms;
+}
 
 /**Use this to override the default movement pattern in the tool.
  * The pattern
