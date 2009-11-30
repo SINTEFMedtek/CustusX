@@ -1,2 +1,3 @@
 add_subdirectory(SliceAndToolRep)
 add_subdirectory(ViewApp)
+add_subdirectory(PositionFileReader)
