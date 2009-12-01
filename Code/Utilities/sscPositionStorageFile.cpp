@@ -93,4 +93,17 @@ bool PositionStorageReader::atEnd() const
 	return !positions.isReadable() || stream.atEnd();	
 }
 
+QString PositionStorageReader::timestampToString(double timestamp)
+{
+	QDateTime retval;
+	uint64_t ts = static_cast<uint64_t>(timestamp);
+	//std::cout << "tostring: uint64: " << ts << " ts/1000: " << ts/1000 << " ts%1000: " << ts%1000 << std::endl;
+	retval.setTime_t(ts/1000);
+	retval = retval.addMSecs(ts%1000);
+	//return retval.toString("yyyyMMdd'T'hhmmss:zzz");
+	return retval.toString("yyyyMMddhhmmss.zzz");
+}
+
+
+
 } // namespace ssc 

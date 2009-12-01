@@ -35,7 +35,8 @@ int main(int argc, char **argv)
 	int toolIndex;
 	
 	std::cout << "reading file [" << posFile.toStdString() << "]" << std::endl;
-	std::cout << "[index]\ttimestamp\ttoolIndex\tmatrix" << std::endl;
+	if (!verbose)
+		std::cout << "[index]\ttoolIndex\ttimestamp\tmatrix" << std::endl;
 	int index = 0;
 	while (!reader.atEnd())
 	{
@@ -46,13 +47,14 @@ int main(int argc, char **argv)
 			std::cout 
 			 	<< "index:\t"<< index << '\t'
 				<< "tool id:\t" << toolIndex << '\t' 
-				<< "timestamp:\t" << timestamp << '\n' 
+//				<< "timestamp:\t" << timestamp << '\n'
+				<< "timestamp:\t" << ssc::PositionStorageReader::timestampToString(timestamp).toStdString() << '\n'				
 				<< "matrix:\n" << T << '\n' 
 				<< std::endl;			
 		}
 		else
 		{		
-			std::cout << "[" << index << "]\t" << timestamp << '\t' << toolIndex << '\t';
+			std::cout << "[" << index << "]\t" << toolIndex << '\t' << ssc::PositionStorageReader::timestampToString(timestamp).toStdString() << '\t';
 			boost::array<double, 16>  val = T.flatten();
 			stream_range(std::cout, val.begin(), val.end(), ' ');
 			std::cout << std::endl;

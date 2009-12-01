@@ -18,6 +18,7 @@ public:
 	~PositionStorageReader();
 	bool read(Transform3D* matrix, double* timestamp, int* toolIndex);
 	bool atEnd() const;
+	static QString timestampToString(double timestamp);
 private:
 	QFile positions;
 	QDataStream stream;	

@@ -275,9 +275,16 @@ Transform3D* DummyTool::getNextTransform()
 
 void DummyTool::set_prMt(const Transform3D& prMt)
 {
-	QDateTime time;
-	double timestamp = (double) time.time().msec();
 	m_prMt = prMt;
+
+	// use ms since Epoch (AD1970)
+	QDateTime time = QDateTime::currentDateTime();
+	uint64_t ts = (uint64_t)(time.toTime_t())*1000 + time.time().msec();
+	double timestamp = static_cast<double>(ts);
+	
+	//check:
+	//std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
+	
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }
 
