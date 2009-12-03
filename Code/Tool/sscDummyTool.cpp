@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "sscDummyTool.h"
 
 #include <vtkPolyData.h>
