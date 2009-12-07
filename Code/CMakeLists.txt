@@ -42,6 +42,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscBlendedSliceRep.h
     Rep/sscSlicedImageProxy.h
     Rep/sscSurfaceRep.h
+    Rep/sscTexture3DSlicerRep.h
     vtkMods/sscSNWQVTKWidget.h
     )
     
@@ -93,6 +94,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscTypeConversions.cpp
     Utilities/sscMD5Check.cpp
     Utilities/sscSnwInifile.cpp
+	Utilities/sscGLHelpers.cpp
     sscView.cpp
     vtkMods/sscSNWXOpenGLRenderWindow.cpp
     vtkMods/sscSNWQVTKWidget.cpp
@@ -111,6 +113,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscBlendedSliceRep.cpp
     Rep/sscSurfaceRep.cpp
     Rep/sscImageBlenderProxy.cpp
+	Rep/sscTexture3DSlicerRep.cpp
+	Rep/sscTextureSlicePainter.cpp    
     Data/sscData.cpp
     Data/sscImage.h
     Data/sscImage.cpp

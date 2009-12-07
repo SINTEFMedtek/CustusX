@@ -9,27 +9,28 @@
 #include <vtkUnsignedShortArray.h>
 #include <stdint.h>
 
+#include "sscGLHelpers.h"
 #include "sscGPUImageBuffer.h"
 
-#define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__)
-
-namespace{
-	void fgl_really_report_gl_errors( const char *file, int line )
-	{
-		GLenum error;
-		int i = 0;
-
-		while ( ( error = glGetError () ) != GL_NO_ERROR  && i < 20 )
-		{
-			printf( "Oops, GL error caught: %s %s:%d\n", gluErrorString( error ), file, line );
-			++i;
-		}
-		if ( i != 0 )
-		{
-			abort();
-		}
-	}
-}
+//#define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__)
+//
+//namespace{
+//	void fgl_really_report_gl_errors( const char *file, int line )
+//	{
+//		GLenum error;
+//		int i = 0;
+//
+//		while ( ( error = glGetError () ) != GL_NO_ERROR  && i < 20 )
+//		{
+//			printf( "Oops, GL error caught: %s %s:%d\n", gluErrorString( error ), file, line );
+//			++i;
+//		}
+//		if ( i != 0 )
+//		{
+//			abort();
+//		}
+//	}
+//}
 
 namespace ssc
 {
