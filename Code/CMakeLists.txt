@@ -90,6 +90,9 @@ SET( SSC_SOURCE_FILES
     Utilities/sscGraphicalPrimitives.cpp
     Utilities/sscFrame3D.cpp
     Utilities/sscPositionStorageFile.cpp
+    Utilities/sscTypeConversions.cpp
+    Utilities/sscMD5Check.cpp
+    Utilities/sscSnwInifile.cpp
     sscView.cpp
     vtkMods/sscSNWXOpenGLRenderWindow.cpp
     vtkMods/sscSNWQVTKWidget.cpp
@@ -118,6 +121,7 @@ SET( SSC_SOURCE_FILES
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManagerImpl.cpp
+    Data/sscSNW2Volume.cpp    
     Tool/sscToolManager.cpp
     Tool/sscTool.h 
     Tool/sscDummyToolManager.cpp
