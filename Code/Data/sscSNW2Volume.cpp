@@ -6,6 +6,7 @@
 #include <vtkUnsignedShortArray.h>
 #include <vtkLookupTable.h>
 #include <vtkSmartPointer.h>
+#include <vtkImageAccumulate.h>
 
 #include "sscTypeConversions.h"
 #include "sscImage.h"
@@ -123,10 +124,10 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath)
 		return SNW2VolumePtr();
 	}
 
-//	theVolume->ensureCenterWindowValid(
-//			&theVolume->mMetaData.Volume.mWindowWidth,
-//			&theVolume->mMetaData.Volume.mWindowCenter,
-//			&theVolume->mMetaData.Volume.mLLR);
+	retval->ensureCenterWindowValid(
+			&retval->mMetaData.Volume.mWindowWidth,
+			&retval->mMetaData.Volume.mWindowCenter,
+			&retval->mMetaData.Volume.mLLR);
 
 	return retval;
 }
@@ -605,6 +606,57 @@ void SNW2Volume::rawSaveLutData(const QString& filename, vtkLookupTablePtr lut) 
 	file.close();
 	GenerateMD5(rawLutFileName().toAscii().constData());
 }
+
+/** Insert default vallues for Center/Window if not set by load
+ */
+void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, double* llrPtr)
+{
+	double& window = *windowPtr;
+	double& level = *levelPtr;
+	double& llr = *llrPtr;
+	
+	boost::array<double, 2> range;
+	vtkImageAccumulatePtr histogram = getImage()->getHistogram();
+	range[0] = histogram->GetMin()[0];
+	range[1] = histogram->GetMax()[0];
+	
+	//boost::array<double, 2> range = scalarRange();
+	
+	//std::stringstream ss;
+	//ss << "ensureCenterWindowValid() id: " << uid() <<  std::endl;
+	//ss << "     Pre values:  " << "window " << window << ", level " << level << ", llr " << llr << ", range [" << range[0] << ", " << range[1] << "]" << std::endl;
+	
+	if (window <= 0)
+	{
+		//mWindowWidth = (range[1]-range[0])/2.0;
+		window = (range[1]-range[0]);
+	}
+	if (level <= 0)
+	{
+		level = range[0] + (range[1]-range[0])/2.0;
+	}
+
+	// non-us volumes that have a preset get a llr equal to the lower end of the window.
+	if (!mMetaData.mIntraoperative && window>0 && level>0)
+	{
+		llr = level - window/2;
+	}
+	
+	if (mMetaData.mModalityType.toUpper().contains("ANGIO")) // set a default LLR for angio. //TODO move it to a better place. Tried to move it to vmLayer::createFromSeries
+	{
+		llr = range[0] + 0.2*(range[1]-range[0]);
+		//llr = Settings::instance()->settingsFile()->value("PersistentData/US_ANGIO_LLR", llr).value<double>();
+		//mLLR = 0.2*scalarMax;
+	}
+	else if (mMetaData.mModality=="US") // set a default LLR for US (0 is defined to be transparent by scanconversion). //TODO move it to a better place.
+	{
+		llr = 1;
+	}
+	
+	//ss << "    Post values: " << "window " << window << ", level " << level << ", llr " << llr << ", range [" << range[0] << ", " << range[1] << "]" << std::endl;
+	//Logger::log("pd.log", ss.str());
+}
+
 
 } // namespace ssc
 
