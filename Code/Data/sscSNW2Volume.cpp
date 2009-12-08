@@ -147,7 +147,7 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath, const SNW2VolumeMetaDa
 void SNW2Volume::writeStatus(const QString& text) const
 {
 	//Logger::log("pd.log", text);
-	std::cout << "text" << std::endl;
+	std::cout << text << std::endl;
 }
 
 bool SNW2Volume::loadAll()
@@ -157,7 +157,7 @@ bool SNW2Volume::loadAll()
 		writeStatus("volume["+uid()+"], failed - metadata");
 		return false;
 	}
-	writeStatus("volume["+uid()+"], loaded metadata");
+	//writeStatus("volume["+uid()+"], loaded metadata");
 	// ignore lazy load for now.
 	if (!loadVolumeData())
 	{
@@ -170,7 +170,7 @@ bool SNW2Volume::loadAll()
 //			&theVolume->mMetaData.Volume.mWindowCenter,
 //			&theVolume->mMetaData.Volume.mLLR);
 
-	writeStatus("volume["+uid()+"], loaded volumedata");
+	//writeStatus("volume["+uid()+"], loaded volumedata");
 	return true;
 }
 
@@ -334,7 +334,7 @@ bool SNW2Volume::loadVolumeData()
 			return false;
 		}
 	}
-	writeStatus("checksumming lut["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
+	//writeStatus("checksumming lut["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
 
 	mImageData = vtkImageDataPtr::New();
 	mImage = ssc::ImagePtr(new ssc::Image("series_"+uid().toStdString(), mImageData));
@@ -368,10 +368,10 @@ bool SNW2Volume::rawLoadVtkImageData()
 	char *rawchars = (char*)malloc(file.size());
 
 	stream.readRawData(rawchars, file.size());
-	writeStatus("loaded raw volume["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
+	//writeStatus("loaded raw volume["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
 	pre = QTime::currentTime();
 	bool success = checksumData(rawDataFileName(), (unsigned char*)rawchars, file.size());
-	writeStatus("checksummed volume["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
+	//writeStatus("checksummed volume["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
 	if (!success)
 	{
 		writeStatus("md5 checksum failed for volume ["+uid()+"]");
@@ -409,7 +409,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 	}
 	else if (mMetaData.Volume.mSamplesPerPixel==3 && mMetaData.Volume.mBitsPerSample==8)
 	{
-		writeStatus("volume["+uid()+"], loading color data");
+		//writeStatus("volume["+uid()+"], loading color data");
 
 		uint8_t *image = (uint8_t*)(rawchars);
 		if (scalarSize*3!=file.size())
@@ -490,7 +490,7 @@ bool SNW2Volume::rawLoadLut(const QString& filename, vtkLookupTablePtr lut) cons
 
 void SNW2Volume::rawSaveMetaData(const QString& filename, const SNW2VolumeMetaData& data) const
 {
-	writeStatus("writing ini "+filename);
+	//writeStatus("writing ini "+filename);
 	SonowandInifile file(filename);
 
 	file.setValue("Format/Type", "SNW2");
@@ -544,7 +544,7 @@ void SNW2Volume::rawSaveMetaData(const QString& filename, const SNW2VolumeMetaDa
 
 void SNW2Volume::rawSaveVolumeData(const QString& filename, vtkImageDataPtr imageData) const
 {
-	writeStatus("writing volume "+filename);
+	//writeStatus("writing volume "+filename);
 
 	int scalarSize = mMetaData.Volume.mDim[0] * mMetaData.Volume.mDim[1] * mMetaData.Volume.mDim[2];
 
