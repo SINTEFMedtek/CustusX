@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "sscSNW2Volume.h"
 
 #include <vtkImageData.h>
