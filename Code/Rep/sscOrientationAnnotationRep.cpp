@@ -21,13 +21,13 @@ OrientationAnnotation* OrientationAnnotation::New()
 	{
 		return static_cast<OrientationAnnotation*>(ret);
 	}
-	return new OrientationAnnotation; 
+	return new OrientationAnnotation;
 }
 
-OrientationAnnotationRep::OrientationAnnotationRep( const std::string& uid, const std::string& name) : 
+OrientationAnnotationRep::OrientationAnnotationRep( const std::string& uid, const std::string& name) :
 RepImpl(uid, name)
-{	
-}	
+{
+}
 OrientationAnnotationRepPtr OrientationAnnotationRep::New(const std::string& uid,const std::string& name)
 {
 	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(uid,name));
@@ -37,7 +37,7 @@ OrientationAnnotationRepPtr OrientationAnnotationRep::New(const std::string& uid
 
 OrientationAnnotationRep::~OrientationAnnotationRep()
 {
-	
+
 }
 void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type )
 {
@@ -46,7 +46,7 @@ void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type )
 		mNorthAnnotation = "S";
 		mSouthAnnotation = "I";
 		mEastAnnotation = "P";
-		mWestAnnotation = "A";		
+		mWestAnnotation = "A";
 	}
 	if (ptCORONAL == type)
 	{
@@ -87,8 +87,8 @@ void OrientationAnnotationRep::createAnnotation(vtkRendererPtr render)
 
 OrientationAnnotation::OrientationAnnotation()
 {
-	
-}	
+
+}
 OrientationAnnotation::~OrientationAnnotation()
 {
 }
@@ -96,9 +96,9 @@ void OrientationAnnotation::SetTextActorsPosition(int vsize[2])
 {
 	//Logger::log("nav.log","set text position");
 	this->TextActor[2]->SetPosition(5, vsize[1]/2);
-	this->TextActor[3]->SetPosition(vsize[0]/2, 5);
-	this->TextActor[0]->SetPosition(vsize[0]-5, vsize[1]/2);
-	this->TextActor[1]->SetPosition(vsize[0]/2, vsize[1]-5);
+	this->TextActor[3]->SetPosition(vsize[0]/2, 7);
+	this->TextActor[0]->SetPosition(vsize[0]-7, vsize[1]/2);
+	this->TextActor[1]->SetPosition(vsize[0]/2, vsize[1]-7);
 }
 void OrientationAnnotation::SetTextActorsJustification()
 {
@@ -109,14 +109,14 @@ void OrientationAnnotation::SetTextActorsJustification()
 	  tprop = this->TextMapper[3]->GetTextProperty();
 	  tprop->SetJustificationToCentered();
 	  tprop->SetVerticalJustificationToBottom();
-	        
+
 	  tprop = this->TextMapper[0]->GetTextProperty();
 	  tprop->SetJustificationToRight();
 	  tprop->SetVerticalJustificationToCentered();
-	        
+
 	  tprop = this->TextMapper[1]->GetTextProperty();
 	  tprop->SetJustificationToCentered();
-	  tprop->SetVerticalJustificationToTop();	
+	  tprop->SetVerticalJustificationToTop();
 }
 
 
