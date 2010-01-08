@@ -1,6 +1,12 @@
 #define GL_GLEXT_PROTOTYPES
 #include <vtkgl.h>
+
+//#include <GL/glu.h>
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
 
 #include <vector>
 #include <vtkImageData.h>

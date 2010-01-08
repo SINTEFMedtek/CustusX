@@ -25,7 +25,13 @@
 #include <vtkUnsignedShortArray.h>
 
 #include "/usr/include/X11/Xlib.h"
+//#include <GL/glu.h>
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
+
 #include "sscGPUImageBuffer.h"
 //#include "SonoWand.h"
 //#include "QtUtilities.h"
