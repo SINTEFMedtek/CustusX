@@ -18,6 +18,17 @@ endif(COMMAND cmake_policy)
 
 #set( SSC_SOURCE_ROOT_DIR ${PROJECT_SOURCE_DIR}/.. )
 
+find_package(X11)
+if(X11_FOUND)
+    if(APPLE)
+        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
+    else(APPLE)
+        option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
+    endif(APPLE)
+else(X11_FOUND)
+    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
+endif(X11_FOUND)
+
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
     Utilities/sscAcceptanceBoxWidget.h
@@ -45,9 +56,13 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscTool2DRep.h
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerRep.h
-    vtkMods/sscSNWQVTKWidget.h
     )
-    
+if (USE_GLX_SHARED_CONTEXT)
+    SET( SSC_QT_MOC_HEADER_FILES
+        ${SSC_QT_MOC_HEADER_FILES}
+        vtkMods/sscSNWQVTKWidget.h
+        )
+endif (USE_GLX_SHARED_CONTEXT)    
 
 SET( SSC_HEADER_FILES
     ${SSC_QT_MOC_HEADER_FILES}
@@ -63,8 +78,10 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Rep/
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
-    ${SSC_SOURCE_DIR}/Code/vtkMods/
+    ${SSC_BINARY_DIR}
     ) 
+
+
 
 #set( SSC_INCLUDE_DIRS
 #    .
@@ -79,8 +96,7 @@ set(SSC_LIBRARY_DIRS
 
 set( SSC_LIBRARIES 
     QVTK    
-    GLU
-     )
+    )
 
 # library
 SET( SSC_SOURCE_FILES
@@ -98,8 +114,6 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSnwInifile.cpp
 	Utilities/sscGLHelpers.cpp
     sscView.cpp
-    vtkMods/sscSNWXOpenGLRenderWindow.cpp
-    vtkMods/sscSNWQVTKWidget.cpp
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp
     Rep/sscSliceRep.cpp
@@ -140,7 +154,7 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.cpp
     Tool/sscProbeSector.cpp
 	) 
-	
+
 # =========================================================
 # =========================================================
 #message( STATUS "processing project " ${SSC_PROJECT_NAME} "...")
@@ -165,23 +179,39 @@ find_package( Boost REQUIRED )
 find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
+	
+if (USE_GLX_SHARED_CONTEXT)
+    SET( SSC_INCLUDE_DIRS
+        ${SSC_INCLUDE_DIRS}
+        ${SSC_SOURCE_DIR}/Code/vtkMods/
+        )
+    SET( SSC_LIBRARIES 
+        ${SSC_LIBRARIES}
+        GLU
+        )
+    SET( SSC_SOURCE_FILES
+        ${SSC_SOURCE_FILES}
+        vtkMods/sscSNWXOpenGLRenderWindow.cpp
+        vtkMods/sscSNWQVTKWidget.cpp
+        )
 
-#add moc versions of out modified QVTKWidget
-if (VTK_MAJOR_VERSION EQUAL 5)
-    if (VTK_MINOR_VERSION EQUAL 4)
-        SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_4.h)
-        SET(SUPPORTED_VTK_VERSION_FOUND "5.4")
-    endif (VTK_MINOR_VERSION EQUAL 4)
-    if (VTK_MINOR_VERSION EQUAL 5)
-        SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
-        SET(SUPPORTED_VTK_VERSION_FOUND "5.5")
-    endif (VTK_MINOR_VERSION EQUAL 5)
-endif (VTK_MAJOR_VERSION EQUAL 5)
+    #add moc versions of out modified QVTKWidget
+    if (VTK_MAJOR_VERSION EQUAL 5)
+        if (VTK_MINOR_VERSION EQUAL 4)
+            SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_4.h)
+            SET(SUPPORTED_VTK_VERSION_FOUND "5.4")
+        endif (VTK_MINOR_VERSION EQUAL 4)
+        if (VTK_MINOR_VERSION EQUAL 5)
+            SET(SSC_QT_MOC_HEADER_FILES ${SSC_QT_MOC_HEADER_FILES} vtkMods/sscSNWQVTKWidget5_5.h)
+            SET(SUPPORTED_VTK_VERSION_FOUND "5.5")
+        endif (VTK_MINOR_VERSION EQUAL 5)
+    endif (VTK_MAJOR_VERSION EQUAL 5)
 
-if (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
-    message(FATAL_ERROR "vtk version not supported (for glx use): " ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION})
-endif (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
+    if (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
+        message(FATAL_ERROR "vtk version not supported (for glx use): " ${VTK_MAJOR_VERSION} "." ${VTK_MINOR_VERSION})
+    endif (NOT DEFINED SUPPORTED_VTK_VERSION_FOUND)
 
+endif (USE_GLX_SHARED_CONTEXT)  
 
 set( SSC_VTK_LIBRARIES 
     vtkIO 
@@ -193,13 +223,6 @@ set( SSC_VTK_LIBRARIES
     vtkFiltering 
     vtkVolumeRendering  
     )
-
-find_package(X11)
-if(X11_FOUND)
-    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" ON)
-else(X11_FOUND)
-    option(USE_GLX_SHARED_CONTEXT "use shared glx contexts" OFF)
-endif(X11_FOUND)
 
 # =========================================================
 # qt
