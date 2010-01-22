@@ -31,11 +31,13 @@ ViewManager::ViewManager() :
   mMessageManager(MessageManager::getInstance()),
   mCurrentLayoutType(LAYOUT_NONE),
   mLayout(new QGridLayout()),
+  mMainWindowsCentralWidget(new QWidget()),
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(9),
   mRenderingTimer(new QTimer(this))
 {
   mLayout->setSpacing(1);
+  mMainWindowsCentralWidget->setLayout(mLayout);
 
   mView3DNames[0] = "View3D_1";
   mView3DNames[1] = "View3D_2";
@@ -51,12 +53,14 @@ ViewManager::ViewManager() :
 
   for(int i=0; i<MAX_3DVIEWS; i++)
   {
-    View3D* view = new View3D(mView3DNames[i]);
+    View3D* view = new View3D(mView3DNames[i], mView3DNames[i],
+                              mMainWindowsCentralWidget);
     mView3DMap[view->getUid()] = view;
   }
   for(int i=0; i<MAX_2DVIEWS; i++)
   {
-    View2D* view = new View2D(mView2DNames[i]);
+    View2D* view = new View2D(mView2DNames[i], mView2DNames[i],
+                              mMainWindowsCentralWidget);
     mView2DMap[view->getUid()] = view;
   }
 
@@ -65,14 +69,12 @@ ViewManager::ViewManager() :
   mRenderingTimer->start(33);
   connect(mRenderingTimer, SIGNAL(timeout()),
           this, SLOT(renderAllViewsSlot()));
-
 }
 ViewManager::~ViewManager()
 {}
-void ViewManager::setCentralWidget(QWidget& centralWidget)
+QWidget* ViewManager::stealCentralWidget()
 {
-  mCentralWidget = &centralWidget;
-  mCentralWidget->setLayout(mLayout);
+  return mMainWindowsCentralWidget;
 }
 ViewManager::View2DMap* ViewManager::get2DViews()
 {

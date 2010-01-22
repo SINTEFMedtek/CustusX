@@ -45,10 +45,8 @@ MainWindow::MainWindow() :
   this->createMenus();
   this->createStatusBar();
 
-  this->setCentralWidget(mCentralWidget);
+  this->setCentralWidget(mViewManager->stealCentralWidget());
   this->resize(QSize(1000,1000));
-
-  mViewManager->setCentralWidget(*mCentralWidget);
 
   //debugging
   connect(mToolManager, SIGNAL(toolManagerReport(std::string)),

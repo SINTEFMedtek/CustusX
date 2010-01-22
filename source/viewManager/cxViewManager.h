@@ -46,7 +46,7 @@ public:
   static ViewManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
 
-  void setCentralWidget(QWidget& centralWidget); ///< lets the viewmanager know where to place its layout
+  QWidget* stealCentralWidget(); ///< lets the viewmanager know where to place its layout
 
   View2DMap* get2DViews(); ///< returns all possible 2D views
   View3DMap* get3DViews(); ///< returns all possible 3D views
@@ -84,7 +84,7 @@ protected:
 
   LayoutType      mCurrentLayoutType; ///< what LayoutType is currently active
   QGridLayout*    mLayout;            ///< the layout
-  QWidget*        mCentralWidget;     ///< the widget the layout should be used on
+  QWidget*        mMainWindowsCentralWidget;     ///< the widget the layout should be used on
 
   const int     MAX_3DVIEWS;      ///< constant defining the max number of 3D views available
   const int     MAX_2DVIEWS;      ///< constant defining the max number of 2D views available
