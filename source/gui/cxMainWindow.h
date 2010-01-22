@@ -7,6 +7,7 @@ class QAction;
 class QMenu;
 class QActionGroup;
 class QDomDocument;
+class QSettings;
 
 
 namespace cx
@@ -164,6 +165,7 @@ protected:
   QString mCurrentPatientDataFolder; ///< folder in which patient data is located
   QString mCurrentToolConfigFile; ///< file determining the navigation systems setup
 
+  QSettings* mSettings; ///< Object for storing all program/user specific settings
 };
 }//namespace cx
 
