@@ -84,7 +84,7 @@ protected:
 
   LayoutType      mCurrentLayoutType; ///< what LayoutType is currently active
   QGridLayout*    mLayout;            ///< the layout
-  QWidget*        mMainWindowsCentralWidget;     ///< the widget the layout should be used on
+  QWidget*        mMainWindowsCentralWidget;     ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 
   const int     MAX_3DVIEWS;      ///< constant defining the max number of 3D views available
   const int     MAX_2DVIEWS;      ///< constant defining the max number of 2D views available
