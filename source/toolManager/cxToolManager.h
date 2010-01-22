@@ -9,6 +9,7 @@
 #include "cxTracker.h"
 
 class QDomNode;
+class QDomDocument;
 class QDomNodeList;
 class QTimer;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
@@ -61,12 +62,18 @@ public:
 
   virtual vtkDoubleArrayPtr getToolSamples(); ///< \return all toolsamples defined .
 
+  //Interface for saving/loading
+  QDomNode& getXml(QDomDocument& doc){};
+  void parseXml(QDomNode& node){};
+  bool write(QString& folder){};
+  bool load(QString& folder){};
+
 public slots:
   virtual void configure();
   virtual void initialize();
   virtual void startTracking();
   virtual void stopTracking();
-  virtual void saveToolsSlot();
+  virtual void saveToolsSlot();//TODO REMOVE, deprecated
 
 signals:
   void toolManagerReport(std::string message); ///< sends out messages the outside might want to log

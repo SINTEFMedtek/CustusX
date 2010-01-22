@@ -14,6 +14,7 @@
 #include "cxRepManager.h"
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
+#include "cxRegistrationManager.h"
 #include "cxCustomStatusBar.h"
 #include "cxContextDockWidget.h"
 #include "cxTransferFunctionWidget.h"
@@ -31,6 +32,7 @@ MainWindow::MainWindow() :
   mToolManager(ToolManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),
+  mRegistrationManager(RegistrationManager::getInstance()),
   mCentralWidget(new QWidget(this)),
   mContextDockWidget(new ContextDockWidget(this)),
   mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
@@ -234,6 +236,57 @@ void MainWindow::createStatusBar()
   //TODO, not working as intended
   //this->setStatusBar(mCustomStatusBar);
 }
+void MainWindow::generateSaveDoc(QDomDocument& doc)
+{
+  mViewManager->getXml(doc); //TODO
+  mRepManager->getXml(doc); //TODO
+  mRegistrationManager->getXml(doc);
+  mDataManager->getXml(doc);
+  mToolManager->getXml(doc); //TODO
+  mMessageManager->getXml(doc); //TODO
+}
+bool MainWindow::write(QString& patientFolder)
+{
+  bool error = false;
+
+  //Tell all the managers to write their data
+  if(!mViewManager->write(patientFolder))
+  {
+    error = true;
+    mMessageManager->sendError("ViewManager could not write its data.");
+  }
+  if(!mRepManager->write(patientFolder))
+  {
+    error = true;
+    mMessageManager->sendError("RepManager could not write its data.");
+  }
+  if(!mDataManager->write(patientFolder))
+  {
+    error = true;
+    mMessageManager->sendError("DataManager could not write its data.");
+  }
+  if(!mToolManager->write(patientFolder))
+  {
+    error = true;
+    mMessageManager->sendError("ToolManager could not write its data.");
+  }
+  if(!mMessageManager->write(patientFolder))
+  {
+    error = true;
+    mMessageManager->sendError("MessageManager could not write its data.");
+  }
+  return error;
+}
+void MainWindow::readLoadDoc(QDomDocument& doc)
+{
+  QDomNode topNode = doc.namedItem("custus3");
+  // Call parseXml() of all managers that have things that should be loaded
+  QDomNode dataManagerNode = topNode.namedItem("DataManager");
+  if (!dataManagerNode.isNull())
+    this->parseXml(dataManagerNode);
+  else
+    std::cout << "Warning: DataManager::load(): No DataManager node" << std::endl;
+}
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 {
   switch (fromState)
@@ -380,12 +433,14 @@ void MainWindow::loadFileSlot()
       throw "Could not parse XML file";
     }
     file.close();
-    mDataManager->load(doc);
+
+    //Read the xml
+    //this->readLoadDoc(doc);
   }
 }
 void MainWindow::saveFileSlot()
 {
-  // Open file dialog
+  // Open file dialog, get patient data folder
   QString dir = QFileDialog::getSaveFileName(this, 
                                              tr("Select directory to save file in")
                                              );
@@ -395,16 +450,26 @@ void MainWindow::saveFileSlot()
     dir.append(".cx3");
   if(!QDir().exists(dir))
     QDir().mkdir(dir);
-  QDomDocument doc = mDataManager->save();
+  //TODO: REMOVE
+  //QDomDocument doc = mDataManager->save();
   
-  
-  QFile file(dir + "/custusdoc.xml");
-  if(file.open(QIODevice::WriteOnly))
+  //Gather all the information that needs to be saved
+  QDomDocument* doc(new QDomDocument());
+  this->generateSaveDoc(*doc);
+
+  //Write the data to file
+  if(this->write(dir))
   {
-    QTextStream stream(&file);
-    stream << doc.toString();
-    file.close();
+    QFile file(dir + "/custusdoc.xml");
+    if(file.open(QIODevice::WriteOnly))
+    {
+      QTextStream stream(&file);
+      stream << doc->toString();
+      file.close();
+    }
   }
+  delete doc;
+  //TODO: The user should be notified if something bad happens
 }
 void MainWindow::patientDataWorkflowSlot()
 {

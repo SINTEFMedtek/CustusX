@@ -68,6 +68,12 @@ public:
   LandmarkRepPtr getLandmarkRep(const std::string& uid); ///<  get one specific Landmark rep
   ssc::ToolRep3DPtr getToolRep3DRep(const std::string& uid); ///<  get one specific Tool3D rep
 
+  //Interface for saving/loading
+  QDomNode& getXml(QDomDocument& doc){};
+  void parseXml(QDomNode& node){};
+  bool write(QString& folder){};
+  bool load(QString& folder){};
+
 public slots:
   void receivePointToSyncSlot(double x, double y, double z); ///< this slot syncs inria reps when a point is picked in a view...
 

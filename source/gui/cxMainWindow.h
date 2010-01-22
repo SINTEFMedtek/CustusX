@@ -6,6 +6,7 @@
 class QAction;
 class QMenu;
 class QActionGroup;
+class QDomDocument;
 
 
 namespace cx
@@ -15,6 +16,7 @@ class RepManager;
 class ViewManager;
 class ToolManager;
 class MessageManager;
+class RegistrationManager;
 class CustomStatusBar;
 class ContextDockWidget;
 class TransferFunctionWidget;
@@ -79,6 +81,12 @@ protected:
   void createToolBars(); ///< creates and adds toolbars for convenience
   void createStatusBar();  ///< //TODO
 
+  //saving/loading
+  void generateSaveDoc(QDomDocument& doc);
+  bool write(QString& patientFolder);
+  void readLoadDoc(QDomDocument& loadDoc);
+  //bool loadXml();
+
   //Takes care of removing and adding widgets depending on which workflow state the system is in
   void changeState(WorkflowState fromState, WorkflowState toState); ///< used to change state
   void activatePatientDataState(); ///< Should only be used by changeState(...)!
@@ -100,6 +108,7 @@ protected:
   ToolManager* mToolManager; ///< interface to the navigation system
   RepManager* mRepManager; ///< has a pool of reps
   MessageManager* mMessageManager; ///< takes messages intended for the user
+  RegistrationManager* mRegistrationManager; ///< manages registration of data
 
   //gui
   QWidget* mCentralWidget; ///< central widget used for views
