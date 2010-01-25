@@ -24,7 +24,6 @@ public:
   
   //Interface for saving/loading
   void addXml(QDomNode& parentNode);
-  //TODO REMOVE QDomNode getXml(QDomDocument& doc);
   void parseXml(QDomNode& node);
   bool write(QString& folder);
   bool load(QString& folder);

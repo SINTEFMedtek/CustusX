@@ -62,18 +62,12 @@ public:
 
   virtual vtkDoubleArrayPtr getToolSamples(); ///< \return all toolsamples defined .
 
-  //Interface for saving/loading
-  QDomNode& getXml(QDomDocument& doc){};
-  void parseXml(QDomNode& node){};
-  bool write(QString& folder){};
-  bool load(QString& folder){};
-
 public slots:
   virtual void configure();
   virtual void initialize();
   virtual void startTracking();
   virtual void stopTracking();
-  virtual void saveToolsSlot();//TODO REMOVE, deprecated
+  virtual void saveToolsSlot();
 
 signals:
   void toolManagerReport(std::string message); ///< sends out messages the outside might want to log

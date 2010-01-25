@@ -49,12 +49,6 @@ public:
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
 
-  //Interface for saving/loading
-  QDomNode& getXml(QDomDocument& doc){};
-  void parseXml(QDomNode& node){};
-  bool write(QString& folder){};
-  bool load(QString& folder){};
-
 public slots:
   void setGlobalPointsNameSlot(int index, std::string name); ///< set the points (user) name
   void setGlobalPointsActiveSlot(int index, bool active); ///< set if the point should be used in matrix calc or not

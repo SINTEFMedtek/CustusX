@@ -146,7 +146,7 @@ void ToolManager::stopTracking()
   }
   mTracker->stopTracking();
 }
-void ToolManager::saveToolsSlot() //TODO REMOVE, deprecated
+void ToolManager::saveToolsSlot()
 {
   saveTransformsAndTimestamps();
 }

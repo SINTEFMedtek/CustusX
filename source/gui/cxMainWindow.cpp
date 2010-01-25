@@ -253,35 +253,15 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
 }
 bool MainWindow::write(QString& patientFolder)
 {
-  bool error = false;
+  bool success = true;
 
   //Tell all the managers to write their data
-  if(!mViewManager->write(patientFolder))
-  {
-    error = true;
-    mMessageManager->sendError("ViewManager could not write its data.");
-  }
-  if(!mRepManager->write(patientFolder))
-  {
-    error = true;
-    mMessageManager->sendError("RepManager could not write its data.");
-  }
   if(!mDataManager->write(patientFolder))
   {
-    error = true;
+    success = false;
     mMessageManager->sendError("DataManager could not write its data.");
   }
-  if(!mToolManager->write(patientFolder))
-  {
-    error = true;
-    mMessageManager->sendError("ToolManager could not write its data.");
-  }
-  if(!mMessageManager->write(patientFolder))
-  {
-    error = true;
-    mMessageManager->sendError("MessageManager could not write its data.");
-  }
-  return error;
+  return success;
 }
 void MainWindow::readLoadDoc(QDomDocument& doc)
 {

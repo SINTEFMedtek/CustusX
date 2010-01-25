@@ -22,26 +22,23 @@ void DataManager::addXml(QDomNode& parentNode)
 {
   ssc::DataManagerImpl::addXml(parentNode);
 }
-/*TODO REMOVE
- QDomNode DataManager::getXml(QDomDocument& doc)
-{
-  return ssc::DataManagerImpl::getXml(doc);
-}
-*/
 void DataManager::parseXml(QDomNode& node)
 {
   ssc::DataManagerImpl::parseXml(node);
 }
 bool DataManager::write(QString& folder)
 {
+  bool success = true;
   //TODO
   std::cout << "Implement DataManager::write" << std::endl;
+  return success;
 }
 bool DataManager::load(QString& folder)
 {
+  bool success = true;
   //TODO
   std::cout << "Implement DataManager::load" << std::endl;
-
+  return success;
 }
 /*
 QDomDocument DataManager::save() //TODO MOVE TO MainWindow

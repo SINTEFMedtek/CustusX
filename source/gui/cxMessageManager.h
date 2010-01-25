@@ -30,12 +30,6 @@ public:
   void sendWarning(std::string warning); ///< The program does not need to terminate, but the user might need to do something.
   void sendError(std::string error); ///< The program (might) need to terminate
 
-  //Interface for saving/loading
-  QDomNode& getXml(QDomDocument& doc){};
-  void parseXml(QDomNode& node){};
-  bool write(QString& folder){};
-  bool load(QString& folder){};
-
 signals:
   void emittedMessage(const QString& message, int timeout); ///< The signal the owner of a statusbar should listen to.
 
