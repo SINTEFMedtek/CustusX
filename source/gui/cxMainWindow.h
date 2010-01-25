@@ -65,7 +65,7 @@ protected slots:
 
   //TODO: REMOVE
   //degugging
-  void printSlot(std::string message); ///< prints messages from the toolmanager to std::cout
+  void printSlot(const QString& message, int timeout); ///< prints messages for debugging
   
 protected:
   enum WorkflowState

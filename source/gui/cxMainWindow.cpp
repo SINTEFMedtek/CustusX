@@ -63,8 +63,8 @@ MainWindow::MainWindow() :
     mSettings->setValue("toolManager/toolConfigFilePath", QDir::homePath());
   
   //debugging
-  connect(mToolManager, SIGNAL(toolManagerReport(std::string)),
-          this, SLOT(printSlot(std::string)));
+  connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
+          this, SLOT(printSlot(const QString&, int)));
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
   
@@ -271,7 +271,7 @@ void MainWindow::createStatusBar()
 }
 void MainWindow::generateSaveDoc(QDomDocument& doc)
 {
-  QDomElement managerNode = doc.createElement("Managers");
+  QDomElement managerNode = doc.createElement("managers");
   doc.appendChild(managerNode);
 
   mDataManager->addXml(managerNode);
@@ -298,16 +298,17 @@ bool MainWindow::write(QString& patientFolder)
 }
 void MainWindow::readLoadDoc(QDomDocument& doc)
 {
-  QDomNode topNode = doc.namedItem("custus3");
-  // Call parseXml() of all managers that have things that should be loaded
-  QDomNode dataManagerNode = topNode.namedItem("DataManager");
+  //Get all the nodes
+  QDomNode managerNode = doc.namedItem("managers");
+  QDomNode dataManagerNode = managerNode.namedItem("datamanager");
+
+  //Evaluate the xml nodes and load what's needed
   if (!dataManagerNode.isNull())
   {
-    //TODO
-    //this->parseXml(dataManagerNode);
+    mDataManager->parseXml(dataManagerNode);
   }
   else
-    std::cout << "Warning: DataManager::load(): No DataManager node" << std::endl;
+    mMessageManager->sendWarning("cx::MainWindow::readLoadDoc(): No DataManager node");
 }
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 {
@@ -459,7 +460,7 @@ void MainWindow::loadPatientFileSlot()
     file.close();
 
     //Read the xml
-    //this->readLoadDoc(doc);
+    this->readLoadDoc(doc);
   }
 }
 void MainWindow::savePatientFileSlot()
@@ -558,10 +559,10 @@ void MainWindow::configureSlot()
 
   mToolManager->configure();
 }
-void MainWindow::printSlot(std::string message)
+void MainWindow::printSlot(const QString& message, int timeout)
 {
   //TODO REMOVE just for debugging
-  //std::cout << message << std::endl;
+  std::cout << message.toStdString() << std::endl;
 }
 
 }//namespace cx
