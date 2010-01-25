@@ -517,18 +517,67 @@ void MainWindow::usAcquisitionWorkflowSlot()
 }
 void MainWindow::importDataSlot()
 {
-  this->statusBar()->showMessage(QString(tr("Importing data..")));
+  mMessageManager->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
                                   mSettings->value("mainWindow/patientDataFolder").toString() );
   if(fileName.isEmpty())
   {
-    statusBar()->showMessage(QString(tr("Import cancelled")));
+    mMessageManager->sendInfo("Import cancelled");
     return;
   }
-//  std::cout << "fileName: " << fileName.toAscii() << std::endl;
+
+  QDir dir;
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
+  QString pathToImageFolder = mSettings->value("mainWindow/patientDataFolder")
+                             .toString()+"/Images/";
+  if(!dir.exists(pathToImageFolder))
+  {
+    dir.mkpath(pathToImageFolder);
+    mMessageManager->sendInfo("Made new directory: "+pathToImageFolder.toStdString());
+  }
+  QString pathToNewFile = pathToImageFolder+fileInfo.fileName();
+
+  if(QFile::copy(fileName, pathToNewFile))
+  {
+    mMessageManager->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
+  }else
+  {
+    mMessageManager->sendError("Copy failed!");
+  }
+  //make sure we also copy the .raw file in case if mhd/hdr
+  if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
+  {
+    QString fileName2 = fileName.replace(".mhd", ".raw");
+    QString pathToNewFile2 = pathToNewFile.replace(".mhd", ".raw");
+    if(QFile::copy(fileName2, pathToNewFile2))
+    {
+      QFile newFile(pathToNewFile2);
+      //TODO FIX
+      newFile.waitForReadyRead(-1);
+      mMessageManager->sendInfo("File copied to new location: "+pathToNewFile2.toStdString());
+    }
+    else
+      mMessageManager->sendError("Copy failed!");
+  }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
+  {
+    QString fileName2 = fileName.replace(".mhd", ".raw");
+    QString pathToNewFile2 = pathToNewFile.replace(".hdr", ".raw");
+    if(QFile::copy(fileName2, pathToNewFile2))
+    {
+      QFile newFile(pathToNewFile2);
+      //TODO FIX
+      newFile.waitForReadyRead(-1);
+      mMessageManager->sendInfo("File copied to new location: "+pathToNewFile2.toStdString());
+    }
+    else
+      mMessageManager->sendError("Copy failed!");
+  }
+
+  fileName = pathToNewFile;
+  std::cout << fileName.toStdString() << std::endl;
+
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
@@ -543,7 +592,6 @@ void MainWindow::importDataSlot()
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
     mMessageManager->sendInfo("Vtk data imported.");
   }
-
 }
 void MainWindow::configureSlot()
 {
