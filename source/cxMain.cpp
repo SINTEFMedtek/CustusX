@@ -13,12 +13,15 @@
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(cxResources);
-
-    QApplication app(argc, argv);
-    cx::MainWindow mainWin;
-    mainWin.show();
-    int retVal = app.exec();
-    return retVal;
-
+  Q_INIT_RESOURCE(cxResources);
+  
+  QApplication app(argc, argv);
+  app.setOrganizationName("SINTEF");
+  app.setOrganizationDomain("www.sintef.no");
+  app.setApplicationName("CustusX3");
+  cx::MainWindow mainWin;
+  mainWin.show();
+  int retVal = app.exec();
+  return retVal;
+  
 }
