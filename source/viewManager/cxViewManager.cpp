@@ -250,13 +250,11 @@ void ViewManager::activateLayout_3DACS_2X2()
   mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
   mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 0 );
   mLayout->addWidget( mView2DMap[mView2DNames[2]],   1, 1 );
-  //if(mCurrentLayoutType != LAYOUT_NONE)
-  //{
-    mView3DMap[mView3DNames[0]]->show();
-    mView2DMap[mView2DNames[0]]->show();
-    mView2DMap[mView2DNames[1]]->show();
-    mView2DMap[mView2DNames[2]]->show();
-  //}
+  mView3DMap[mView3DNames[0]]->show();
+  mView2DMap[mView2DNames[0]]->show();
+  mView2DMap[mView2DNames[1]]->show();
+  mView2DMap[mView2DNames[2]]->show();
+
   mCurrentLayoutType = LAYOUT_3DACS_2X2;
 }
 void ViewManager::deactivateLayout_3DACS_2X2()
