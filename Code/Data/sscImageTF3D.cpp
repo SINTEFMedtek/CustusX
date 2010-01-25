@@ -315,39 +315,38 @@ void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
 	(*mColorMapPtr)[colorPosition] = colorValue;
 	emit transferFunctionsChanged();
 }
-QDomNode ImageTF3D::getXml(QDomDocument& doc)
+void ImageTF3D::addXml(QDomNode& parentNode)
 {
-	QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
-	
-	QDomElement alphaNode = doc.createElement("alpha");
-	// Use QStringList to put all points in the same string instead of storing 
-	// the points as separate nodes.
-	QStringList pointStringList;
-	// Add alpha points
-	for (IntIntMap::iterator opPoint = mOpacityMapPtr->begin();
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement transferfunctionsNode = doc.createElement("Transferfunctions");
+  parentNode.appendChild(transferfunctionsNode);
+
+  QDomElement alphaNode = doc.createElement("alpha");
+  // Use QStringList to put all points in the same string instead of storing
+  // the points as separate nodes.
+  QStringList pointStringList;
+  // Add alpha points
+  for (IntIntMap::iterator opPoint = mOpacityMapPtr->begin();
        opPoint != mOpacityMapPtr->end();
        opPoint++)
-		pointStringList.append(QString("%1=%2").arg(opPoint->first).
-													 arg(opPoint->second));
-	alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-	
-	pointStringList.clear();
-	QDomElement colorNode = doc.createElement("color");
-	// Add color points
-	for (ColorMap::iterator colorPoint = mColorMapPtr->begin();
+    pointStringList.append(QString("%1=%2").arg(opPoint->first).
+                           arg(opPoint->second));
+  alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
+
+  pointStringList.clear();
+  QDomElement colorNode = doc.createElement("color");
+  // Add color points
+  for (ColorMap::iterator colorPoint = mColorMapPtr->begin();
        colorPoint != mColorMapPtr->end();
        colorPoint++)
-		pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first).
-													 arg(colorPoint->second.red()).
-													 arg(colorPoint->second.green()).
-													 arg(colorPoint->second.blue()));
-	colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-	
-	transferfunctionsNode.appendChild(alphaNode);
-	transferfunctionsNode.appendChild(colorNode);
-	
-	// Calling function must append this node
-	return transferfunctionsNode;
+    pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first).
+                           arg(colorPoint->second.red()).
+                           arg(colorPoint->second.green()).
+                           arg(colorPoint->second.blue()));
+  colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
+
+  transferfunctionsNode.appendChild(alphaNode);
+  transferfunctionsNode.appendChild(colorNode);
 }
 void ImageTF3D::parseXml(QDomNode& dataNode)
 {

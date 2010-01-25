@@ -92,7 +92,7 @@ public:
 	virtual Vector3D getCenter() const;
 	virtual void setCenter(const Vector3D& center);
 
-	QDomNode getXml(QDomDocument& doc);///< Get a XML representation of the DataManager \return A XML data representation for this object. \param doc The root of the document tree.
+	void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	void parseXml(QDomNode& datamangerNode);///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager.
 
 protected:

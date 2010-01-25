@@ -268,24 +268,21 @@ int Image::getMaxAlphaValue()
 {
 	return 255;
 }
-
-QDomNode Image::getXml(QDomDocument& doc)
+void Image::addXml(QDomNode& parentNode)
 {
-	QDomElement imageNode = doc.createElement("image");
-	
-	QDomElement uidNode = doc.createElement("uid");
-	uidNode.appendChild(doc.createTextNode(mUid.c_str()));
-	imageNode.appendChild(uidNode);
-	
-	QDomElement nameNode = doc.createElement("name");
-	nameNode.appendChild(doc.createTextNode(mName.c_str()));
-	imageNode.appendChild(nameNode);
-	
-	// Add submodes
-	// Add node for 3D transferfunctions
-	imageNode.appendChild(mImageTransferFunctions3D->getXml(doc));
-	
-	return imageNode;
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement imageNode = doc.createElement("image");
+  parentNode.appendChild(imageNode);
+
+  QDomElement uidNode = doc.createElement("uid");
+  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
+  imageNode.appendChild(uidNode);
+
+  QDomElement nameNode = doc.createElement("name");
+  nameNode.appendChild(doc.createTextNode(mName.c_str()));
+  imageNode.appendChild(nameNode);
+
+  mImageTransferFunctions3D->addXml(imageNode);
 }
 void Image::parseXml(QDomNode& dataNode)
 {

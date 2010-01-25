@@ -162,60 +162,49 @@ std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() { return std::map<st
 std::map<std::string, std::string> DataManagerImpl::getMeshUIDsWithNames() const { return std::map<std::string, std::string>(); }
 std::vector<std::string> DataManagerImpl::getMeshUIDs() const {  return std::vector<std::string>(); }
 std::vector<std::string> DataManagerImpl::getMeshNames() const {  return std::vector<std::string>(); }
-	
-QDomNode DataManagerImpl::getXml(QDomDocument& doc)
-{
-	QDomElement dataNode = doc.createElement("DataManager");
-	
-	// Call getXml() of all objects that have things that should be saved
-	
-	// Add all images to the XML node
-	for (ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
-	{
-		std::cout << "Add image: " << iter->first << std::endl;
-		QDomNode imageNode = iter->second->getXml(doc);
-		if (!imageNode.isNull())
-			dataNode.appendChild(imageNode);
-		else
-			std::cout << "Error! DataManager::getXml: Empty node returned" << std::endl;
-	}
-	return dataNode;
-}
 
+void DataManagerImpl::addXml(QDomNode& parentNode)
+{
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement dataManagerNode = doc.createElement("DataManager");
+  parentNode.appendChild(dataManagerNode);
+
+  for(ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
+  {
+    iter->second->addXml(dataManagerNode);
+  }
+}
 void DataManagerImpl::parseXml(QDomNode& dataNode)
 {
-	std::cout << "DataManager::parseXml()" << std::endl;
-	// Call parseXml() of all object that have things that should be loaded
-	
-	// All images must be created from the DataManager, so the image nodes
-	// are parsed here
-	QDomNode node = dataNode.firstChild();
-	while (!node.isNull())
-	{
-		if (node.nodeName() == "image")
-		{
-			QDomElement uidNode = node.namedItem("uid").toElement();
-			QDomElement nameNode = node.namedItem("name").toElement();
-			if (!uidNode.isNull())
-			{
-				ssc::ImagePtr image = loadImage(uidNode.text().toStdString(), 
-																				ssc::rtMETAIMAGE);
-				image->setName(nameNode.text().toStdString());
-				image->parseXml(node);
-			}
-			else
-			{
-				std::cout << "Warning: DataManager::parseXml() found no uid for image";
-				std::cout << std::endl;
-			}
-		}
-		else
-		{
-			std::cout << "Warning: DataManager::parseXml() found unknown XML node: ";
-			std::cout << node.nodeName().toStdString() << std::endl;
-		}
-		node = node.nextSibling();
-	}
+  // All images must be created from the DataManager, so the image nodes
+  // are parsed here
+  QDomNode node = dataNode.firstChild();
+  while (!node.isNull())
+  {
+    if (node.nodeName() == "image")
+    {
+      QDomElement uidNode = node.namedItem("uid").toElement();
+      QDomElement nameNode = node.namedItem("name").toElement();
+      if (!uidNode.isNull())
+      {
+        ssc::ImagePtr image = loadImage(uidNode.text().toStdString(),
+                                        ssc::rtMETAIMAGE);
+        image->setName(nameNode.text().toStdString());
+        image->parseXml(node);
+      }
+      else
+      {
+        std::cout << "Warning: DataManager::parseXml() found no uid for image";
+        std::cout << std::endl;
+      }
+    }
+    else
+    {
+      std::cout << "Warning: DataManager::parseXml() found unknown XML node: ";
+      std::cout << node.nodeName().toStdString() << std::endl;
+    }
+    node = node.nextSibling();
+  }
 }
 
 } // namespace ssc
