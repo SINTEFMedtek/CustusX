@@ -327,12 +327,14 @@ void ViewManager::renderAllViewsSlot()
   View3DMap::iterator it3D = mView3DMap.begin();
   for(; it3D != mView3DMap.end(); ++it3D)
   {
-    it3D->second->getRenderWindow()->Render();
+    if(it3D->second->isVisible())
+      it3D->second->getRenderWindow()->Render();
   }
   View2DMap::iterator it2D = mView2DMap.begin();
   for(; it2D != mView2DMap.end(); ++it2D)
   {
-    it2D->second->getRenderWindow()->Render();
+    if(it2D->second->isVisible())
+      it2D->second->getRenderWindow()->Render();
   }
 }
 	
