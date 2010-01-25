@@ -8,7 +8,8 @@
 #include <QStatusBar>
 #include <QFileInfo>
 #include <QDomDocument>
-#include <QTextStream> 
+#include <QTextStream>
+#include <QSettings>
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -22,7 +23,7 @@
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
-#include "cxPreferencesDialog.h"
+//#include "cxPreferencesDialog.h"
 
 namespace cx
 {
@@ -40,7 +41,8 @@ MainWindow::MainWindow() :
   mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
   mImageRegistrationIndex(-1),
-  mPatientRegistrationIndex(-1)
+  mPatientRegistrationIndex(-1),
+  mSettings(new QSettings())
   //mCustomStatusBar(new CustomStatusBar())
 {  
   this->createActions();
@@ -423,8 +425,8 @@ void MainWindow::aboutSlot()
 }
 void MainWindow::preferencesSlot()
 {
-  PreferencesDialog prefDialog(this);
-  prefDialog.exec();
+  //PreferencesDialog prefDialog(this);
+  //prefDialog.exec();
 }
 void MainWindow::quitSlot()
 {
