@@ -18,10 +18,16 @@ DataManager::DataManager()
 {}
 DataManager::~DataManager()
 {}
-QDomNode DataManager::getXml(QDomDocument& doc)
+void DataManager::addXml(QDomNode& parentNode)
+{
+  ssc::DataManagerImpl::addXml(parentNode);
+}
+/*TODO REMOVE
+ QDomNode DataManager::getXml(QDomDocument& doc)
 {
   return ssc::DataManagerImpl::getXml(doc);
 }
+*/
 void DataManager::parseXml(QDomNode& node)
 {
   ssc::DataManagerImpl::parseXml(node);

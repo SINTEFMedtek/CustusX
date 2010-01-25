@@ -23,7 +23,8 @@ public:
   static DataManager* getInstance();
   
   //Interface for saving/loading
-  QDomNode getXml(QDomDocument& doc);
+  void addXml(QDomNode& parentNode);
+  //TODO REMOVE QDomNode getXml(QDomDocument& doc);
   void parseXml(QDomNode& node);
   bool write(QString& folder);
   bool load(QString& folder);

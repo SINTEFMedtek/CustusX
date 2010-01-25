@@ -9,8 +9,6 @@
 #include <QFileInfo>
 #include <QDomDocument>
 #include <QTextStream> 
-#include <QSettings>
-#include <QDir>
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -41,8 +39,7 @@ MainWindow::MainWindow() :
   mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
   mImageRegistrationIndex(-1),
-  mPatientRegistrationIndex(-1),
-  mSettings(new QSettings())
+  mPatientRegistrationIndex(-1)
   //mCustomStatusBar(new CustomStatusBar())
 {  
   this->createActions();
@@ -52,13 +49,7 @@ MainWindow::MainWindow() :
 
   this->setCentralWidget(mViewManager->stealCentralWidget());
   this->resize(QSize(1000,1000));
-  
-  // Settings
-  if (!mSettings->contains("mainWindow/patientDataFolder"))
-    mSettings->setValue("mainWindow/patientDataFolder", QDir::homePath());
-  if (!mSettings->contains("mainWindow/importDataFolder"))
-    mSettings->setValue("mainWindow/importDataFolder", ".");
-  
+
   //debugging
   connect(mToolManager, SIGNAL(toolManagerReport(std::string)),
           this, SLOT(printSlot(std::string)));
@@ -247,23 +238,25 @@ void MainWindow::createStatusBar()
 }
 void MainWindow::generateSaveDoc(QDomDocument& doc)
 {
-  //QDomDocument doc("CustusX3 patient file");
-  QDomElement docElement = doc.createElement("custus3");
-  doc.appendChild(docElement);
-  
-  //mViewManager->getXml(doc); //TODO
-  //mRepManager->getXml(doc); //TODO
-  //mRegistrationManager->getXml(doc);
-  docElement.appendChild(mDataManager->getXml(doc));
-  //mToolManager->getXml(doc); //TODO
-  //mMessageManager->getXml(doc); //TODO
+  QDomElement managerNode = doc.createElement("Managers");
+  doc.appendChild(managerNode);
+
+  mDataManager->addXml(managerNode);
+
+  //TODO Implement
+  /*mToolManager->getXml(doc); //TODO
+  mMessageManager->getXml(doc); //TODO
+  mViewManager->getXml(doc); //TODO
+  mRepManager->getXml(doc); //TODO
+  mRegistrationManager->getXml(doc);*/
+
 }
 bool MainWindow::write(QString& patientFolder)
 {
   bool error = false;
 
   //Tell all the managers to write their data
-/*  if(!mViewManager->write(patientFolder))
+  if(!mViewManager->write(patientFolder))
   {
     error = true;
     mMessageManager->sendError("ViewManager could not write its data.");
@@ -272,13 +265,13 @@ bool MainWindow::write(QString& patientFolder)
   {
     error = true;
     mMessageManager->sendError("RepManager could not write its data.");
-  }*/
+  }
   if(!mDataManager->write(patientFolder))
   {
     error = true;
     mMessageManager->sendError("DataManager could not write its data.");
   }
-/*  if(!mToolManager->write(patientFolder))
+  if(!mToolManager->write(patientFolder))
   {
     error = true;
     mMessageManager->sendError("ToolManager could not write its data.");
@@ -287,7 +280,7 @@ bool MainWindow::write(QString& patientFolder)
   {
     error = true;
     mMessageManager->sendError("MessageManager could not write its data.");
-  }*/
+  }
   return error;
 }
 void MainWindow::readLoadDoc(QDomDocument& doc)
@@ -296,7 +289,10 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
   // Call parseXml() of all managers that have things that should be loaded
   QDomNode dataManagerNode = topNode.namedItem("DataManager");
   if (!dataManagerNode.isNull())
-    mDataManager->parseXml(dataManagerNode);
+  {
+    //TODO
+    //this->parseXml(dataManagerNode);
+  }
   else
     std::cout << "Warning: DataManager::load(): No DataManager node" << std::endl;
 }
@@ -426,7 +422,7 @@ void MainWindow::loadFileSlot()
 {
   // Open file dialog
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                  mSettings->value("mainWindow/patientDataFolder").toString(),
+                                                  QString::null,
                                                   QFileDialog::ShowDirsOnly);
   if (dir == QString::null)
     return; // On cancel
@@ -455,8 +451,7 @@ void MainWindow::saveFileSlot()
 {
   // Open file dialog, get patient data folder
   QString dir = QFileDialog::getSaveFileName(this, 
-                                             tr("Select directory to save file in"),
-                                             mSettings->value("mainWindow/patientDataFolder").toString()
+                                             tr("Select directory to save file in")
                                              );
   if (dir == QString::null)
     return; // On cancel
@@ -510,7 +505,7 @@ void MainWindow::loadDataSlot()
   this->statusBar()->showMessage(QString(tr("Loading data..")));
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
-                                  mSettings->value("mainWindow/importDataFolder").toString());
+                                  mCurrentPatientDataFolder );
   if(fileName.isEmpty())
   {
     statusBar()->showMessage(QString(tr("Load cancelled")));
