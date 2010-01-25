@@ -22,6 +22,7 @@
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
+#include "cxPreferencesDialog.h"
 
 namespace cx
 {
@@ -49,7 +50,15 @@ MainWindow::MainWindow() :
 
   this->setCentralWidget(mViewManager->stealCentralWidget());
   this->resize(QSize(1000,1000));
-
+  
+  // Settings
+  if (!mSettings->contains("mainWindow/patientDataFolder"))
+    mSettings->setValue("mainWindow/patientDataFolder", QDir::homePath());
+  if (!mSettings->contains("mainWindow/importDataFolder"))
+    mSettings->setValue("mainWindow/importDataFolder", ".");
+  if (!mSettings->contains("toolManager/toolConfigFilePath"))
+    mSettings->setValue("toolManager/toolConfigFilePath", QDir::homePath());
+  
   //debugging
   connect(mToolManager, SIGNAL(toolManagerReport(std::string)),
           this, SLOT(printSlot(std::string)));
@@ -86,6 +95,21 @@ void MainWindow::createActions()
   connect(mSaveFileAction, SIGNAL(triggered()),
           this, SLOT(savePatientFileSlot()));
 
+  // Application
+  mAboutAction = new QAction(tr("A&bout"), this);  // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
+  mAboutAction->setShortcut(tr("Ctrl+A"));
+  mAboutAction->setStatusTip(tr("Show the application's About box"));
+  mPreferencesAction = new QAction(tr("P&references"), this);
+  mPreferencesAction->setShortcut(tr("Ctrl+P"));
+  mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
+  //mQuitAction = new QAction(tr("Q&uit"), this);
+  //mQuitAction->setShortcut(tr("Ctrl+Q"));
+  //mQuitAction->setStatusTip(tr("Exit the application"));
+  
+  connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
+  connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
+  //connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
+  
   //View
   this->mToggleContextDockWidgetAction = mContextDockWidget->toggleViewAction();
   mToggleContextDockWidgetAction->setText("Context Widget");
@@ -177,6 +201,7 @@ void MainWindow::createActions()
 }
 void MainWindow::createMenus()
 {
+  mCustusXMenu = new QMenu(tr("CustusX"), this);;
 	mFileMenu = new QMenu(tr("File"), this);;
   mViewMenu = new QMenu(tr("View"), this);;
   mWorkflowMenu = new QMenu(tr("Workflow"), this);;
@@ -184,6 +209,11 @@ void MainWindow::createMenus()
   mToolMenu = new QMenu(tr("Tracking"), this);
   mLayoutMenu = new QMenu(tr("Layouts"), this);
 
+  // Application
+  this->menuBar()->addMenu(mCustusXMenu);
+  mCustusXMenu->addAction(mAboutAction);
+  mCustusXMenu->addAction(mPreferencesAction);
+  
   // File
   this->menuBar()->addMenu(mFileMenu);
   mFileMenu->addAction(mSaveFileAction);
@@ -388,11 +418,13 @@ void MainWindow::deactivateUSAcquisitionState()
 {}
 void MainWindow::aboutSlot()
 {
-  //TODO
+//  QMessageBox::about(this, tr("About CustusX"),
+//                     tr("<b>CustusX</b> is an application for IGS"));
 }
 void MainWindow::preferencesSlot()
 {
-  //TODO
+  PreferencesDialog prefDialog(this);
+  prefDialog.exec();
 }
 void MainWindow::quitSlot()
 {
