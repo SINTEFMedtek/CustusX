@@ -47,8 +47,8 @@ protected slots:
   void quitSlot(); ///< TODO
   
   // File menu
-  void loadFileSlot();///< Load all application data from XML file
-  void saveFileSlot();///< Save all application data to XML file
+  void loadPatientFileSlot();///< Load all application data from XML file
+  void savePatientFileSlot();///< Save all application data to XML file
 
   //workflow menu
   void patientDataWorkflowSlot(); ///< change state to patient data
@@ -58,7 +58,7 @@ protected slots:
   void usAcquisitionWorkflowSlot(); ///< change state to ultrasound acquisition
 
   //data menu
-  void loadDataSlot(); ///< loads data into the datamanager
+  void importDataSlot(); ///< loads data(images) into the datamanager
 
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
@@ -135,7 +135,7 @@ protected:
   QAction* mUSAcquisitionWorkflowAction; ///< action for switching to the ultrasound acqusition workflow
   QActionGroup* mWorkflowActionGroup; ///< grouping the workflow actions
 
-  QAction* mLoadDataAction; ///< action for loading data into the datamanager
+  QAction* mImportDataAction; ///< action for loading data into the datamanager
 
   QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system

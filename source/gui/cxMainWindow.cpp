@@ -78,13 +78,13 @@ void MainWindow::createActions()
   //TODO: add shortcuts and tooltips
 	
   // File
-  mLoadFileAction = new QAction(tr("Load Patient file"), this);
   mSaveFileAction = new QAction(tr("Save Patient file"), this);
+  mLoadFileAction = new QAction(tr("Load Patient file"), this);
   
   connect(mLoadFileAction, SIGNAL(triggered()),
-          this, SLOT(loadFileSlot()));
+          this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()),
-          this, SLOT(saveFileSlot()));
+          this, SLOT(savePatientFileSlot()));
 
   //View
   this->mToggleContextDockWidgetAction = mContextDockWidget->toggleViewAction();
@@ -111,12 +111,12 @@ void MainWindow::createActions()
           this, SLOT(usAcquisitionWorkflowSlot()));
 
   //data
-  mLoadDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Load data"), this);
-  mLoadDataAction->setShortcut(tr("Ctrl+L"));
-  mLoadDataAction->setStatusTip(tr("Load image data"));
+  mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
+  mImportDataAction->setShortcut(tr("Ctrl+Is"));
+  mImportDataAction->setStatusTip(tr("Import image data"));
 
-  connect(mLoadDataAction, SIGNAL(triggered()),
-          this, SLOT(loadDataSlot()));
+  connect(mImportDataAction, SIGNAL(triggered()),
+          this, SLOT(importDataSlot()));
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
@@ -186,8 +186,8 @@ void MainWindow::createMenus()
 
   // File
   this->menuBar()->addMenu(mFileMenu);
-  mFileMenu->addAction(mLoadFileAction);
   mFileMenu->addAction(mSaveFileAction);
+  mFileMenu->addAction(mLoadFileAction);
 	
   // View
   this->menuBar()->addMenu(mViewMenu);
@@ -203,7 +203,7 @@ void MainWindow::createMenus()
 
   //data
   this->menuBar()->addMenu(mDataMenu);
-  mDataMenu->addAction(mLoadDataAction);
+  mDataMenu->addAction(mImportDataAction);
 
   //tool
   this->menuBar()->addMenu(mToolMenu);
@@ -224,7 +224,7 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
   mDataToolBar = addToolBar("Data");
-  mDataToolBar->addAction(mLoadDataAction);
+  mDataToolBar->addAction(mImportDataAction);
 
   mToolToolBar = addToolBar("Tools");
   mToolToolBar->addAction(mStartTrackingToolsAction);
@@ -398,7 +398,7 @@ void MainWindow::quitSlot()
 {
   //TODO
 }  
-void MainWindow::loadFileSlot()
+void MainWindow::loadPatientFileSlot()
 {
   // Open file dialog
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
@@ -416,7 +416,7 @@ void MainWindow::loadFileSlot()
     // Read the file
     if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
     {
-      std::cout << "ERROR! MainWindow::loadFileSlot(): Could not parse XML file:";
+      std::cout << "ERROR! MainWindow::loadPatientFileSlot(): Could not parse XML file:";
       std::cout << emsg.toStdString() << "line: "<< eline << "col: " << ecolumn;
       std::cout << std::endl;
       throw "Could not parse XML file";
@@ -427,7 +427,7 @@ void MainWindow::loadFileSlot()
     //this->readLoadDoc(doc);
   }
 }
-void MainWindow::saveFileSlot()
+void MainWindow::savePatientFileSlot()
 {
   // Open file dialog, get patient data folder
   QString dir = QFileDialog::getSaveFileName(this, 
@@ -439,8 +439,6 @@ void MainWindow::saveFileSlot()
     dir.append(".cx3");
   if(!QDir().exists(dir))
     QDir().mkdir(dir);
-  //TODO: REMOVE
-  //QDomDocument doc = mDataManager->save();
   
   //Gather all the information that needs to be saved
   QDomDocument* doc(new QDomDocument());
@@ -480,15 +478,15 @@ void MainWindow::usAcquisitionWorkflowSlot()
 {
   this->changeState(mCurrentWorkflowState, US_ACQUISITION);
 }
-void MainWindow::loadDataSlot()
+void MainWindow::importDataSlot()
 {
-  this->statusBar()->showMessage(QString(tr("Loading data..")));
+  this->statusBar()->showMessage(QString(tr("Importing data..")));
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
                                   mCurrentPatientDataFolder );
   if(fileName.isEmpty())
   {
-    statusBar()->showMessage(QString(tr("Load cancelled")));
+    statusBar()->showMessage(QString(tr("Import cancelled")));
     return;
   }
 //  std::cout << "fileName: " << fileName.toAscii() << std::endl;
@@ -498,15 +496,15 @@ void MainWindow::loadDataSlot()
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
     ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    mMessageManager->sendInfo("Meta data loaded.");
+    mMessageManager->sendInfo("Meta data imported.");
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
-    mMessageManager->sendInfo("STL data loaded.");
+    mMessageManager->sendInfo("STL data imported.");
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
-    mMessageManager->sendInfo("Vtk data loaded.");
+    mMessageManager->sendInfo("Vtk data imported.");
   }
 
 }
