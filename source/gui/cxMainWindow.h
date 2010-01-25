@@ -43,7 +43,7 @@ public:
 protected slots:
   //application menu
   void aboutSlot(); ///< TODO
-  void preferencesSlot(); ///< TODO
+  void preferencesSlot();
   void quitSlot(); ///< TODO
   
   // File menu
@@ -115,6 +115,7 @@ protected:
   QWidget* mCentralWidget; ///< central widget used for views
 
   //menus
+  QMenu* mCustusXMenu; ///< Application menu
   QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
   QMenu* mViewMenu; ///< Menu for showing / hiding GUI elements
   QMenu* mWorkflowMenu; ///< menu for choosing workflow
@@ -123,6 +124,10 @@ protected:
   QMenu* mLayoutMenu; ///< menu for changing view layouts
 
   //actions and actiongroups
+  QAction* mAboutAction;
+  QAction* mPreferencesAction;
+  //QAction* mQuitAction;
+  
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
 	
