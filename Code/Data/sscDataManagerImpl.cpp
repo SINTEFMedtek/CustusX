@@ -166,7 +166,7 @@ std::vector<std::string> DataManagerImpl::getMeshNames() const {  return std::ve
 void DataManagerImpl::addXml(QDomNode& parentNode)
 {
   QDomDocument doc = parentNode.ownerDocument();
-  QDomElement dataManagerNode = doc.createElement("DataManager");
+  QDomElement dataManagerNode = doc.createElement("datamanager");
   parentNode.appendChild(dataManagerNode);
 
   for(ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)

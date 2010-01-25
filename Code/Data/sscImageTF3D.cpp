@@ -318,7 +318,7 @@ void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
 void ImageTF3D::addXml(QDomNode& parentNode)
 {
   QDomDocument doc = parentNode.ownerDocument();
-  QDomElement transferfunctionsNode = doc.createElement("Transferfunctions");
+  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
   parentNode.appendChild(transferfunctionsNode);
 
   QDomElement alphaNode = doc.createElement("alpha");
