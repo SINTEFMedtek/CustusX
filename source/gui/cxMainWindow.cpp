@@ -24,7 +24,7 @@
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
-//#include "cxPreferencesDialog.h"
+#include "cxPreferencesDialog.h"
 
 namespace cx
 {
@@ -57,8 +57,8 @@ MainWindow::MainWindow() :
   // Settings
   if (!mSettings->contains("mainWindow/patientDataFolder"))
     mSettings->setValue("mainWindow/patientDataFolder", QDir::homePath());
-  if (!mSettings->contains("mainWindow/importDataFolder"))
-    mSettings->setValue("mainWindow/importDataFolder", ".");
+  //if (!mSettings->contains("mainWindow/importDataFolder"))
+  //  mSettings->setValue("mainWindow/importDataFolder", ".");
   if (!mSettings->contains("toolManager/toolConfigFilePath"))
     mSettings->setValue("toolManager/toolConfigFilePath", QDir::homePath());
   
@@ -427,8 +427,8 @@ void MainWindow::aboutSlot()
 }
 void MainWindow::preferencesSlot()
 {
-  //PreferencesDialog prefDialog(this);
-  //prefDialog.exec();
+  PreferencesDialog prefDialog(this);
+  prefDialog.exec();
 }
 void MainWindow::quitSlot()
 {
@@ -520,7 +520,7 @@ void MainWindow::importDataSlot()
   this->statusBar()->showMessage(QString(tr("Importing data..")));
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
-                                  mSettings->value("mainWindow/importDataFolder").toString() );
+                                  mSettings->value("mainWindow/patientDataFolder").toString() );
   if(fileName.isEmpty())
   {
     statusBar()->showMessage(QString(tr("Import cancelled")));
