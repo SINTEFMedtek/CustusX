@@ -10,6 +10,7 @@
 #include <QDomDocument>
 #include <QTextStream>
 #include <QSettings>
+#include <QSettings>
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -436,7 +437,7 @@ void MainWindow::loadPatientFileSlot()
 {
   // Open file dialog
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                  QString::null,
+                                                  mSettings->value("mainWindow/patientDataFolder").toString(),
                                                   QFileDialog::ShowDirsOnly);
   if (dir == QString::null)
     return; // On cancel
@@ -465,7 +466,8 @@ void MainWindow::savePatientFileSlot()
 {
   // Open file dialog, get patient data folder
   QString dir = QFileDialog::getSaveFileName(this, 
-                                             tr("Select directory to save file in")
+                                             tr("Select directory to save file in"),
+                                             mSettings->value("mainWindow/patientDataFolder").toString()
                                              );
   if (dir == QString::null)
     return; // On cancel
@@ -517,7 +519,7 @@ void MainWindow::importDataSlot()
   this->statusBar()->showMessage(QString(tr("Importing data..")));
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
-                                  mCurrentPatientDataFolder );
+                                  mSettings->value("mainWindow/importDataFolder").toString() );
   if(fileName.isEmpty())
   {
     statusBar()->showMessage(QString(tr("Import cancelled")));
