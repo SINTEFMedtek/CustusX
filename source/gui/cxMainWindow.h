@@ -170,7 +170,7 @@ protected:
   QSettings* mSettings; ///< Object for storing all program/user specific settings
   
   //Patient
-  QString mActivePatientFolder; ///< Folder for storing the files for the active patient
+  QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
 };
 }//namespace cx
 

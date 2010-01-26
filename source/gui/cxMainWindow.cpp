@@ -436,60 +436,63 @@ void MainWindow::quitSlot()
   
 void MainWindow::newPatientSlot()
 {  
-  QString dir = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   QString name = QDateTime::currentDateTime().toString("yyyyMMdd'T'hhmmss");
-  dir += "/";
-  dir += name;
-  dir += "_";
-  dir += mSettings->value("globalApplicationName").toString();
-  dir += "_";
-  dir += mSettings->value("globalPatientNumber").toString();
+  name += "_";
+  name += mSettings->value("globalApplicationName").toString();
+  name += "_";
+  name += mSettings->value("globalPatientNumber").toString();
+  
+  QString choosenDir = patientDatafolder;
+  choosenDir += "/";
+  choosenDir += name;
   // Open file dialog, get patient data folder
-  dir = QFileDialog::getSaveFileName(this, 
-                                     tr("Select directory to save file in"),
-                                     dir
-                                     );
-  if (dir == QString::null)
+  choosenDir = QFileDialog::getSaveFileName(this, 
+                                            tr("Select directory to save file in"),
+                                            choosenDir);
+  if (choosenDir == QString::null)
     return; // On cancel
   
   // Update global patient number
   int patientNumber = mSettings->value("globalPatientNumber").toInt();
   mSettings->setValue("globalPatientNumber", ++patientNumber);
   
-  // Set active patient folder
-  mActivePatientFolder = dir;
+  if (!choosenDir.endsWith(".cx3"))
+    choosenDir.append(".cx3");
+  
+  // Set active patient folder. Use path relative to the globalPatientDataFolder
+  QDir patientDataDir(patientDatafolder);
+  mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
   
   // Create folders
-  if (!mActivePatientFolder.endsWith(".cx3"))
-    mActivePatientFolder.append(".cx3");
-  if(!QDir().exists(mActivePatientFolder))
-    QDir().mkdir(mActivePatientFolder);
+  if(!QDir().exists(choosenDir))
+    QDir().mkdir(choosenDir);
   
-  dir = mActivePatientFolder;
-  dir.append("/Images"); 
-  if(!QDir().exists(dir))
-    QDir().mkdir(dir);
+  QString newDir = choosenDir;
+  newDir.append("/Images"); 
+  if(!QDir().exists(newDir))
+    QDir().mkdir(newDir);
   
-  dir = mActivePatientFolder;
-  dir.append("/Logs"); 
-  if(!QDir().exists(dir))
-    QDir().mkdir(dir);
-
+  newDir = choosenDir;
+  newDir.append("/Logs"); 
+  if(!QDir().exists(newDir))
+    QDir().mkdir(newDir);
 }
   
 void MainWindow::loadPatientFileSlot()
 {
   // Open file dialog
-  QString dir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                  mSettings->value("globalPatientDataFolder").toString(),
-                                                  QFileDialog::ShowDirsOnly);
-  if (dir == QString::null)
+  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
+                                                         mSettings->value("globalPatientDataFolder").toString(),
+                                                         QFileDialog::ShowDirsOnly);
+  if (choosenDir == QString::null)
     return; // On cancel
   
-  // Set active patient folder
-  mActivePatientFolder = dir;
+  // Set active patient folder, relative to globalPatientDataFolder
+  QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString());
+  mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
   
-  QFile file(mActivePatientFolder + "/custusdoc.xml");
+  QFile file(choosenDir + "/custusdoc.xml");
   if(file.open(QIODevice::ReadOnly))
   {    
     QDomDocument doc;
@@ -533,7 +536,9 @@ void MainWindow::savePatientFileSlot()
   QDomDocument* doc(new QDomDocument());
   this->generateSaveDoc(*doc);
 
-  QFile file(mActivePatientFolder + "/custusdoc.xml");
+  QString activePatientDir = mSettings->value("globalPatientDataFolder").toString();
+  activePatientDir += mActivePatientFolder;
+  QFile file(activePatientDir + "/custusdoc.xml");
   if(file.open(QIODevice::WriteOnly))
   {
     QTextStream stream(&file);
