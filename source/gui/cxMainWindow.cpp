@@ -105,13 +105,13 @@ void MainWindow::createActions()
   mPreferencesAction = new QAction(tr("P&references"), this);
   mPreferencesAction->setShortcut(tr("Ctrl+P"));
   mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
-  //mQuitAction = new QAction(tr("Q&uit"), this);
-  //mQuitAction->setShortcut(tr("Ctrl+Q"));
-  //mQuitAction->setStatusTip(tr("Exit the application"));
+  mQuitAction = new QAction(tr("Q&uit"), this);
+  mQuitAction->setShortcut(tr("Ctrl+Q"));
+  mQuitAction->setStatusTip(tr("Exit the application"));
   
   connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
   connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
-  //connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
+  connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
   
   //View
   this->mToggleContextDockWidgetAction = mContextDockWidget->toggleViewAction();
@@ -470,6 +470,14 @@ void MainWindow::savePatientFileSlot()
   QDomDocument* doc(new QDomDocument());
   this->generateSaveDoc(*doc);
 
+  QFile file(dir + "/custusdoc.xml");
+  if(file.open(QIODevice::WriteOnly))
+  {
+    QTextStream stream(&file);
+    stream << doc->toString();
+    file.close();
+  }
+
   //Write the data to file
   //TODO Implement when we know what we want to save here...
   /*if(this->write(dir))
@@ -590,14 +598,21 @@ void MainWindow::configureSlot()
                                                     tr("Configuration files (*.xml)"));*/
 
   QString configFile = mSettings->value("toolManager/toolConfigFilePath").toString();
-  mMessageManager->sendInfo(configFile.toStdString());
+  //mMessageManager->sendInfo(configFile.toStdString());
   //TODO What if config file hasn't been set?
   mToolManager->setConfigurationFile(configFile.toStdString());
 
-  QString loggingFolder = QFileDialog::getExistingDirectory(this, tr("Open directory"),
+  /*QString loggingFolder = QFileDialog::getExistingDirectory(this, tr("Open directory"),
                                                             "/home",
-                                                            QFileDialog::ShowDirsOnly);
-  mToolManager->setLoggingFolder(loggingFolder.toStdString());
+                                                            QFileDialog::ShowDirsOnly);*/
+  QString loggingPath = mSettings->value("mainWindow/patientDataFolder").toString()+"/Logs";
+  QDir loggingDir(loggingPath);
+  if(!loggingDir.exists())
+  {
+    loggingDir.mkdir(loggingPath);
+    mMessageManager->sendInfo("Made a folder for logging: "+loggingPath.toStdString());
+  }
+  mToolManager->setLoggingFolder(loggingPath.toStdString());
 
   mToolManager->configure();
 }

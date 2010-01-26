@@ -124,7 +124,7 @@ protected:
   //actions and actiongroups
   QAction* mAboutAction;
   QAction* mPreferencesAction;
-  //QAction* mQuitAction;
+  QAction* mQuitAction;
   
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
