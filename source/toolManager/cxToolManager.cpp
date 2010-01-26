@@ -440,6 +440,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
     break;
   }
   emit toolManagerReport(report);
+  mMessageManager->sendInfo(report);
 }
 bool ToolManager::pathsExists()
 {
