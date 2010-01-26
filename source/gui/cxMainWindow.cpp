@@ -593,18 +593,21 @@ void MainWindow::importDataSlot()
 }
 void MainWindow::configureSlot()
 {
-  /*QString configFile = QFileDialog::getOpenFileName(this, tr("Open file"),
-                  mSettings->value("toolManager/toolConfigFilePath").toString(),
-                                                    tr("Configuration files (*.xml)"));*/
-
   QString configFile = mSettings->value("toolManager/toolConfigFilePath").toString();
-  //mMessageManager->sendInfo(configFile.toStdString());
-  //TODO What if config file hasn't been set?
+
+  if(mSettings->value("toolManager/toolConfigFilePath").toString() ==
+      QDir::homePath())
+  {
+    QString configFile = QFileDialog::getOpenFileName(this,
+        tr("Select configuration file (*.xml)"),
+        mSettings->value("toolManager/toolConfigFilePath").toString(),
+        tr("Configuration files (*.xml)"));
+    mSettings->setValue("toolManager/toolConfigFilePath", configFile);
+    mMessageManager->sendInfo("Tool configuration file is now selected: "+
+                              configFile.toStdString());
+  }
   mToolManager->setConfigurationFile(configFile.toStdString());
 
-  /*QString loggingFolder = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                            "/home",
-                                                            QFileDialog::ShowDirsOnly);*/
   QString loggingPath = mSettings->value("mainWindow/patientDataFolder").toString()+"/Logs";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
