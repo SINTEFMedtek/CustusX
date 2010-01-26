@@ -25,13 +25,6 @@ public:
   //Interface for saving/loading
   void addXml(QDomNode& parentNode);
   void parseXml(QDomNode& node);
-  bool write(QString& folder);
-  bool load(QString& folder);
-
-public slots:
-  //TODO REMOVE
-  //QDomDocument save(); ///< saves the application data for the active patient to XML document
-  //void load(QDomDocument& doc); ///< loads the application data for the active patient from XML document
 
 protected:
   DataManager(); ///< DataManager is a Singleton. Use getInstance instead
