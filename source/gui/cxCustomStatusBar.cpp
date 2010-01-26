@@ -86,7 +86,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
     return;
   }
   const QMetaObject* metaObject = sender->metaObject();
-  const char* className = metaObject->className();
+  std::string className = metaObject->className();
   std::cout << "Incoming objects classname is: " << className << std::endl; //TODO debuggging
   if(className == "Tool")
   {

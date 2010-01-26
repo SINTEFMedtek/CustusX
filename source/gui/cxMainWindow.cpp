@@ -43,8 +43,8 @@ MainWindow::MainWindow() :
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
   mImageRegistrationIndex(-1),
   mPatientRegistrationIndex(-1),
-  mSettings(new QSettings())
-  //mCustomStatusBar(new CustomStatusBar())
+  mSettings(new QSettings()),
+  mCustomStatusBar(new CustomStatusBar())
 {  
   this->createActions();
   this->createToolBars();
@@ -267,10 +267,11 @@ void MainWindow::createToolBars()
 void MainWindow::createStatusBar()
 {
   //TODO, not working as intended
-  //this->setStatusBar(mCustomStatusBar);
+  this->setStatusBar(mCustomStatusBar);
 }
 void MainWindow::generateSaveDoc(QDomDocument& doc)
 {
+  doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
   QDomElement managerNode = doc.createElement("managers");
   doc.appendChild(managerNode);
 
@@ -283,18 +284,6 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
   mRepManager->getXml(doc); //TODO
   mRegistrationManager->getXml(doc);*/
 
-}
-bool MainWindow::write(QString& patientFolder)
-{
-  bool success = true;
-
-  //Tell all the managers to write their data
-  if(!mDataManager->write(patientFolder))
-  {
-    success = false;
-    mMessageManager->sendError("DataManager could not write its data.");
-  }
-  return success;
 }
 void MainWindow::readLoadDoc(QDomDocument& doc)
 {
@@ -482,7 +471,8 @@ void MainWindow::savePatientFileSlot()
   this->generateSaveDoc(*doc);
 
   //Write the data to file
-  if(this->write(dir))
+  //TODO Implement when we know what we want to save here...
+  /*if(this->write(dir))
   {
     QFile file(dir + "/custusdoc.xml");
     if(file.open(QIODevice::WriteOnly))
@@ -491,7 +481,7 @@ void MainWindow::savePatientFileSlot()
       stream << doc->toString();
       file.close();
     }
-  }
+  }*/
   delete doc;
   //TODO: The user should be notified if something bad happens
 }
@@ -551,9 +541,9 @@ void MainWindow::importDataSlot()
   {
     QString fileName2 = fileName.replace(".mhd", ".raw");
     QString pathToNewFile2 = pathToNewFile.replace(".mhd", ".raw");
+    QFile newFile(pathToNewFile2);
     if(QFile::copy(fileName2, pathToNewFile2))
     {
-      QFile newFile(pathToNewFile2);
       //TODO FIX
       newFile.waitForReadyRead(-1);
       mMessageManager->sendInfo("File copied to new location: "+pathToNewFile2.toStdString());
@@ -595,9 +585,13 @@ void MainWindow::importDataSlot()
 }
 void MainWindow::configureSlot()
 {
-  QString configFile = QFileDialog::getOpenFileName(this, tr("Open file"),
-                                                    "/home",
-                                                    tr("Configuration files (*.xml)"));
+  /*QString configFile = QFileDialog::getOpenFileName(this, tr("Open file"),
+                  mSettings->value("toolManager/toolConfigFilePath").toString(),
+                                                    tr("Configuration files (*.xml)"));*/
+
+  QString configFile = mSettings->value("toolManager/toolConfigFilePath").toString();
+  mMessageManager->sendInfo(configFile.toStdString());
+  //TODO What if config file hasn't been set?
   mToolManager->setConfigurationFile(configFile.toStdString());
 
   QString loggingFolder = QFileDialog::getExistingDirectory(this, tr("Open directory"),
@@ -612,5 +606,4 @@ void MainWindow::printSlot(const QString& message, int timeout)
   //TODO REMOVE just for debugging
   std::cout << message.toStdString() << std::endl;
 }
-
 }//namespace cx

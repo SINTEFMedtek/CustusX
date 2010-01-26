@@ -84,9 +84,7 @@ protected:
 
   //saving/loading
   void generateSaveDoc(QDomDocument& doc);
-  bool write(QString& patientFolder);
   void readLoadDoc(QDomDocument& loadDoc);
-  //bool loadXml();
 
   //Takes care of removing and adding widgets depending on which workflow state the system is in
   void changeState(WorkflowState fromState, WorkflowState toState); ///< used to change state
@@ -163,7 +161,7 @@ protected:
   ImageRegistrationWidget* mImageRegistrationWidget; ///< interface for image registration
   PatientRegistrationWidget* mPatientRegistrationWidget; ///< interface for patient registration
   TransferFunctionWidget* mTransferFunctionWidget;
-  //CustomStatusBar* mCustomStatusBar; //TODO, not working yet
+  CustomStatusBar* mCustomStatusBar; //TODO, not working yet
   int mImageRegistrationIndex, mPatientRegistrationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences
