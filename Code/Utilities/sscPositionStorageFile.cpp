@@ -81,7 +81,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, int* to
 	stream >> tool;
 	stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
 	stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
-	
+
 	*matrix = frame.transform();
 	*timestamp = ts;
 	*toolIndex = tool;
@@ -98,13 +98,9 @@ QString PositionStorageReader::timestampToString(double timestamp)
 {
 	QDateTime retval;
 	uint64_t ts = static_cast<uint64_t>(timestamp);
-	//std::cout << "tostring: uint64: " << ts << " ts/1000: " << ts/1000 << " ts%1000: " << ts%1000 << std::endl;
 	retval.setTime_t(ts/1000);
 	retval = retval.addMSecs(ts%1000);
-	//return retval.toString("yyyyMMdd'T'hhmmss:zzz");
 	return retval.toString("yyyyMMddhhmmss.zzz");
 }
-
-
 
 } // namespace ssc 
