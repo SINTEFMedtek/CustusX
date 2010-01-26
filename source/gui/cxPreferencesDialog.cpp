@@ -16,27 +16,10 @@ void FoldersTab::init(){
   mCurrentPatientDataFolder = mSettings->value("mainWindow/patientDataFolder").toString();
   //mCurrentImportDataFolder  = mSettings->value("mainWindow/importDataFolder").toString();
   mCurrentToolConfigFilePath = mSettings->value("toolManager/toolConfigFilePath").toString();
-  
-  /*if( currentPatientDataFolder.isEmpty() )
-    currentPatientDataFolder = QDir::homePath();
-  std::cout << "FoldersTab::FoldersTab:currentPatientDataFolder: " << currentPatientDataFolder.toStdString() << std::endl;
-  
-  currentToolConfigFilePath = settings.value("preferences/folders/currentToolConfigFilePath").toString();
-  if( currentToolConfigFilePath.isEmpty() )
-  {
-    currentToolConfigFilePath = QDir::homePath();
-    currentToolConfigFolder = currentToolConfigFilePath;
-    currentToolConfigFile = "";
-  }*/
 
-    QFileInfo fileInfo( mCurrentToolConfigFilePath );
-    mCurrentToolConfigFolder = fileInfo.absolutePath();
-    mCurrentToolConfigFile = fileInfo.fileName();
-
-/*  std::cout << "FoldersTab::FoldersTab:currentToolConfigFilePath: " << currentToolConfigFilePath.toStdString() << std::endl;
-  std::cout << "FoldersTab::FoldersTab:currentToolConfigFolder: " << currentToolConfigFolder.toStdString() << std::endl;
-  std::cout << "FoldersTab::FoldersTab:currentToolConfigFile: " << currentToolConfigFile.toStdString() << std::endl;
-*/
+  QFileInfo fileInfo( mCurrentToolConfigFilePath );
+  mCurrentToolConfigFolder = fileInfo.absolutePath();
+  mCurrentToolConfigFile = fileInfo.fileName();
 
   // patientDataFolder
   QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
@@ -46,20 +29,26 @@ void FoldersTab::init(){
   //patientDataFolderComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
   QPushButton* patientDataFolderButton = new QPushButton(tr("&Browse..."));
-  connect( patientDataFolderButton, SIGNAL(clicked()), this, SLOT(browsePatientDataFolderSlot()) );
+  connect( patientDataFolderButton, 
+          SIGNAL(clicked()), 
+          this, 
+          SLOT(browsePatientDataFolderSlot()) );
 
   //QLabel *currentPatientLabel = new QLabel(tr("Current patient:"));
   //QComboBox *currentPatientComboBox = new QComboBox;
   
   // importDataFolder
-  /*QLabel* importDataFolderLabel = new QLabel(tr("Import data folder:"));
+  /*/QLabel* importDataFolderLabel = new QLabel(tr("Import data folder:"));
   
   mImportDataFolderComboBox = new QComboBox;
   mImportDataFolderComboBox->addItem( mCurrentImportDataFolder);
   //importDataFolderComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
   
   QPushButton* importDataFolderButton = new QPushButton(tr("&Browse..."));
-  connect( importDataFolderButton, SIGNAL(clicked()), this, SLOT(browseImportDataFolderSlot()) );*/
+  connect( importDataFolderButton, 
+          SIGNAL(clicked()), 
+          this, 
+          SLOT(browseImportDataFolderSlot()) );*/
   
 
   // toolConfigFolder
@@ -70,12 +59,18 @@ void FoldersTab::init(){
   //mToolConfigFolderComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
   QPushButton* toolConfigFolderButton = new QPushButton(tr("&Browse..."));
-  connect( toolConfigFolderButton, SIGNAL(clicked()), this, SLOT(browseToolConfigFolderSlot()) );
+  connect( toolConfigFolderButton, 
+          SIGNAL(clicked()), 
+          this, 
+          SLOT(browseToolConfigFolderSlot()) );
 
   QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
   mToolConfigFilesComboBox = new QComboBox;
   setToolConfigFiles();
-  connect( mToolConfigFilesComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
+  connect( mToolConfigFilesComboBox, 
+          SIGNAL(currentIndexChanged(const QString &)), 
+          this, 
+          SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
   setCurrentToolConfigFile();
 
 
@@ -149,7 +144,6 @@ void FoldersTab::browseToolConfigFolderSlot()
 void FoldersTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
 {
   mCurrentToolConfigFile = newToolConfigFile;
-//  std::cout << "FoldersTab::currentToolConfigFilesIndexChangedSlot:currentToolConfigFile: " << currentToolConfigFile.toStdString() << std::endl;
 }
 
 void FoldersTab::setToolConfigFiles()
@@ -185,7 +179,6 @@ void FoldersTab::saveParametersSlot()
   // currentToolConfigFilePath
   QDir dir(mCurrentToolConfigFolder);
   mCurrentToolConfigFilePath = dir.absoluteFilePath( mCurrentToolConfigFile );
-  //cout << "FoldersTab::~FoldersTab:currentToolConfigFilePath: " << currentToolConfigFilePath.toStdString() << std::endl;
   mSettings->setValue("toolManager/toolConfigFilePath", mCurrentToolConfigFilePath);
   
   mSettings->sync();
@@ -209,11 +202,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent)
 {
   mFoldersTab = new FoldersTab;
   mFoldersTab->init();
-  testTab = new TestTab;
+  //testTab = new TestTab;
   
   tabWidget = new QTabWidget;
 	tabWidget->addTab(mFoldersTab, tr("Folders"));
-  tabWidget->addTab(testTab, tr("Test"));
+  //tabWidget->addTab(testTab, tr("Test"));
 	
 	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   connect(buttonBox, SIGNAL(accepted()), mFoldersTab, SLOT(saveParametersSlot()));
