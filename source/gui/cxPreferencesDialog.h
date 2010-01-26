@@ -18,6 +18,7 @@ namespace cx
  *
  * \brief Configure default folder in preferences dialog
  *
+ * \date Jan 25, 2010
  * \author Frank Lindseth, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
@@ -55,7 +56,7 @@ private:
   QComboBox *mToolConfigFolderComboBox;
   QComboBox *mToolConfigFilesComboBox;
 
-  QString mCurrentPatientDataFolder;
+  QString mGlobalPatientDataFolder;
   //QString mCurrentImportDataFolder;
   
   QString mCurrentToolConfigFilePath;

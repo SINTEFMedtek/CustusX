@@ -10,7 +10,7 @@
 #include <QDomDocument>
 #include <QTextStream>
 #include <QSettings>
-#include <QSettings>
+#include <QDateTime>
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -41,10 +41,11 @@ MainWindow::MainWindow() :
   mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
   mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
+  mCustomStatusBar(new CustomStatusBar()),
   mImageRegistrationIndex(-1),
   mPatientRegistrationIndex(-1),
   mSettings(new QSettings()),
-  mCustomStatusBar(new CustomStatusBar())
+  mActivePatientFolder("")
 {  
   this->createActions();
   this->createToolBars();
@@ -54,13 +55,18 @@ MainWindow::MainWindow() :
   this->setCentralWidget(mViewManager->stealCentralWidget());
   this->resize(QSize(1000,1000));
   
-  // Settings
-  if (!mSettings->contains("mainWindow/patientDataFolder"))
-    mSettings->setValue("mainWindow/patientDataFolder", QDir::homePath());
+  // Initialize settings if empty
+  if (!mSettings->contains("globalPatientDataFolder"))
+    mSettings->setValue("globalPatientDataFolder", QDir::homePath());
   //if (!mSettings->contains("mainWindow/importDataFolder"))
   //  mSettings->setValue("mainWindow/importDataFolder", ".");
-  if (!mSettings->contains("toolManager/toolConfigFilePath"))
-    mSettings->setValue("toolManager/toolConfigFilePath", QDir::homePath());
+  if (!mSettings->contains("toolConfigFilePath"))
+    mSettings->setValue("toolConfigFilePath", QDir::homePath());
+  
+  if (!mSettings->contains("globalApplicationName"))
+    mSettings->setValue("globalApplicationName", "Nevro");
+  if (!mSettings->contains("globalPatientNumber"))
+    mSettings->setValue("globalPatientNumber", 1);
   
   //debugging
   connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
@@ -90,9 +96,12 @@ void MainWindow::createActions()
   //TODO: add shortcuts and tooltips
 	
   // File
+  mNewPatientAction = new QAction(tr("Create new patient"), this);
   mSaveFileAction = new QAction(tr("Save Patient file"), this);
   mLoadFileAction = new QAction(tr("Load Patient file"), this);
   
+  connect(mNewPatientAction, SIGNAL(triggered()),
+          this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()),
           this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()),
@@ -219,6 +228,7 @@ void MainWindow::createMenus()
   
   // File
   this->menuBar()->addMenu(mFileMenu);
+  mFileMenu->addAction(mNewPatientAction);
   mFileMenu->addAction(mSaveFileAction);
   mFileMenu->addAction(mLoadFileAction);
 	
@@ -423,16 +433,63 @@ void MainWindow::quitSlot()
 {
   //TODO
 }  
+  
+void MainWindow::newPatientSlot()
+{  
+  QString dir = mSettings->value("globalPatientDataFolder").toString();
+  QString name = QDateTime::currentDateTime().toString("yyyyMMdd'T'hhmmss");
+  dir += "/";
+  dir += name;
+  dir += "_";
+  dir += mSettings->value("globalApplicationName").toString();
+  dir += "_";
+  dir += mSettings->value("globalPatientNumber").toString();
+  // Open file dialog, get patient data folder
+  dir = QFileDialog::getSaveFileName(this, 
+                                     tr("Select directory to save file in"),
+                                     dir
+                                     );
+  if (dir == QString::null)
+    return; // On cancel
+  
+  // Update global patient number
+  int patientNumber = mSettings->value("globalPatientNumber").toInt();
+  mSettings->setValue("globalPatientNumber", ++patientNumber);
+  
+  // Set active patient folder
+  mActivePatientFolder = dir;
+  
+  // Create folders
+  if (!mActivePatientFolder.endsWith(".cx3"))
+    mActivePatientFolder.append(".cx3");
+  if(!QDir().exists(mActivePatientFolder))
+    QDir().mkdir(mActivePatientFolder);
+  
+  dir = mActivePatientFolder;
+  dir.append("/Images"); 
+  if(!QDir().exists(dir))
+    QDir().mkdir(dir);
+  
+  dir = mActivePatientFolder;
+  dir.append("/Logs"); 
+  if(!QDir().exists(dir))
+    QDir().mkdir(dir);
+
+}
+  
 void MainWindow::loadPatientFileSlot()
 {
   // Open file dialog
   QString dir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                  mSettings->value("mainWindow/patientDataFolder").toString(),
+                                                  mSettings->value("globalPatientDataFolder").toString(),
                                                   QFileDialog::ShowDirsOnly);
   if (dir == QString::null)
     return; // On cancel
   
-  QFile file(dir + "/custusdoc.xml");
+  // Set active patient folder
+  mActivePatientFolder = dir;
+  
+  QFile file(mActivePatientFolder + "/custusdoc.xml");
   if(file.open(QIODevice::ReadOnly))
   {    
     QDomDocument doc;
@@ -455,22 +512,28 @@ void MainWindow::loadPatientFileSlot()
 void MainWindow::savePatientFileSlot()
 {
   // Open file dialog, get patient data folder
-  QString dir = QFileDialog::getSaveFileName(this, 
+  /*QString dir = QFileDialog::getSaveFileName(this, 
                                              tr("Select directory to save file in"),
-                                             mSettings->value("mainWindow/patientDataFolder").toString()
+                                             mSettings->value("globalPatientDataFolder").toString()
                                              );
   if (dir == QString::null)
     return; // On cancel
   if (!dir.endsWith(".cx3"))
     dir.append(".cx3");
   if(!QDir().exists(dir))
-    QDir().mkdir(dir);
+    QDir().mkdir(dir);*/
+  
+  if(mActivePatientFolder.isEmpty())
+  {
+    mMessageManager->sendWarning("cx::MainWindow::savePatientFileSlot(): No Patient created!");
+    return;
+  }
   
   //Gather all the information that needs to be saved
   QDomDocument* doc(new QDomDocument());
   this->generateSaveDoc(*doc);
 
-  QFile file(dir + "/custusdoc.xml");
+  QFile file(mActivePatientFolder + "/custusdoc.xml");
   if(file.open(QIODevice::WriteOnly))
   {
     QTextStream stream(&file);
@@ -518,7 +581,7 @@ void MainWindow::importDataSlot()
   mMessageManager->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
-                                  mSettings->value("mainWindow/patientDataFolder").toString() );
+                                  mSettings->value("globalPatientDataFolder").toString() );
   if(fileName.isEmpty())
   {
     mMessageManager->sendInfo("Import cancelled");
@@ -528,7 +591,7 @@ void MainWindow::importDataSlot()
   QDir dir;
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
-  QString pathToImageFolder = mSettings->value("mainWindow/patientDataFolder")
+  QString pathToImageFolder = mSettings->value("globalPatientDataFolder")
                              .toString()+"/Images/";
   if(!dir.exists(pathToImageFolder))
   {
@@ -593,22 +656,22 @@ void MainWindow::importDataSlot()
 }
 void MainWindow::configureSlot()
 {
-  QString configFile = mSettings->value("toolManager/toolConfigFilePath").toString();
+  QString configFile = mSettings->value("toolConfigFilePath").toString();
 
   if(mSettings->value("toolManager/toolConfigFilePath").toString() ==
       QDir::homePath())
   {
     QString configFile = QFileDialog::getOpenFileName(this,
         tr("Select configuration file (*.xml)"),
-        mSettings->value("toolManager/toolConfigFilePath").toString(),
+        mSettings->value("toolConfigFilePath").toString(),
         tr("Configuration files (*.xml)"));
-    mSettings->setValue("toolManager/toolConfigFilePath", configFile);
+    mSettings->setValue("toolConfigFilePath", configFile);
     mMessageManager->sendInfo("Tool configuration file is now selected: "+
                               configFile.toStdString());
   }
   mToolManager->setConfigurationFile(configFile.toStdString());
 
-  QString loggingPath = mSettings->value("mainWindow/patientDataFolder").toString()+"/Logs";
+  QString loggingPath = mSettings->value("globalPatientDataFolder").toString()+"/Logs";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {

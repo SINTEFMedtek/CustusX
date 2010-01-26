@@ -13,9 +13,9 @@ FoldersTab::FoldersTab(QWidget *parent) :
 {}
 
 void FoldersTab::init(){
-  mCurrentPatientDataFolder = mSettings->value("mainWindow/patientDataFolder").toString();
+  mGlobalPatientDataFolder = mSettings->value("globalPatientDataFolder").toString();
   //mCurrentImportDataFolder  = mSettings->value("mainWindow/importDataFolder").toString();
-  mCurrentToolConfigFilePath = mSettings->value("toolManager/toolConfigFilePath").toString();
+  mCurrentToolConfigFilePath = mSettings->value("toolConfigFilePath").toString();
 
   QFileInfo fileInfo( mCurrentToolConfigFilePath );
   mCurrentToolConfigFolder = fileInfo.absolutePath();
@@ -25,7 +25,7 @@ void FoldersTab::init(){
   QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
 
   mPatientDataFolderComboBox = new QComboBox;
-  mPatientDataFolderComboBox->addItem( mCurrentPatientDataFolder);
+  mPatientDataFolderComboBox->addItem( mGlobalPatientDataFolder);
   //patientDataFolderComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
   QPushButton* patientDataFolderButton = new QPushButton(tr("&Browse..."));
@@ -105,12 +105,12 @@ FoldersTab::~FoldersTab()
 
 void FoldersTab::browsePatientDataFolderSlot()
 {
-  mCurrentPatientDataFolder = QFileDialog::getExistingDirectory(this, 
+  mGlobalPatientDataFolder = QFileDialog::getExistingDirectory(this, 
                                                      tr("Find Patient Data Folder"), 
-                                                     mCurrentPatientDataFolder,
+                                                     mGlobalPatientDataFolder,
                                                      QFileDialog::ShowDirsOnly);
-  if( !mCurrentPatientDataFolder.isEmpty() ) {
-    mPatientDataFolderComboBox->addItem( mCurrentPatientDataFolder );
+  if( !mGlobalPatientDataFolder.isEmpty() ) {
+    mPatientDataFolderComboBox->addItem( mGlobalPatientDataFolder );
     mPatientDataFolderComboBox->setCurrentIndex( mPatientDataFolderComboBox->currentIndex() + 1 );
   }
 }
@@ -173,13 +173,13 @@ void FoldersTab::saveParametersSlot()
 {
   
   // currentPatientDataFolder
-  mSettings->setValue("mainWindow/patientDataFolder", mCurrentPatientDataFolder);
+  mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   //mSettings->setValue("mainWindow/importDataFolder",  mCurrentImportDataFolder);
   
   // currentToolConfigFilePath
   QDir dir(mCurrentToolConfigFolder);
   mCurrentToolConfigFilePath = dir.absoluteFilePath( mCurrentToolConfigFile );
-  mSettings->setValue("toolManager/toolConfigFilePath", mCurrentToolConfigFilePath);
+  mSettings->setValue("toolConfigFilePath", mCurrentToolConfigFilePath);
   
   mSettings->sync();
   emit savedParameters();

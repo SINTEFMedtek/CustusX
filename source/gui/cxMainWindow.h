@@ -47,6 +47,7 @@ protected slots:
   void quitSlot(); ///< TODO
   
   // File menu
+  void newPatientSlot(); ///< Create new patient with directory structure
   void loadPatientFileSlot();///< Load all application data from XML file
   void savePatientFileSlot();///< Save all application data to XML file
 
@@ -126,6 +127,7 @@ protected:
   QAction* mPreferencesAction;
   QAction* mQuitAction;
   
+  QAction* mNewPatientAction;///< Actionfor creating a new patient
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
 	
@@ -165,10 +167,10 @@ protected:
   int mImageRegistrationIndex, mPatientRegistrationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences
-  QString mCurrentPatientDataFolder; ///< folder in which patient data is located
-  QString mCurrentToolConfigFile; ///< file determining the navigation systems setup
-
   QSettings* mSettings; ///< Object for storing all program/user specific settings
+  
+  //Patient
+  QString mActivePatientFolder; ///< Folder for storing the files for the active patient
 };
 }//namespace cx
 
