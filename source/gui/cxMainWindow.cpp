@@ -70,7 +70,7 @@ MainWindow::MainWindow() :
   
   //debugging
   connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
-          this, SLOT(printSlot(const QString&, int)));
+          this, SLOT(loggingSlot(const QString&, int)));
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
   
@@ -96,7 +96,7 @@ void MainWindow::createActions()
   //TODO: add shortcuts and tooltips
 	
   // File
-  mNewPatientAction = new QAction(tr("Create new patient"), this);
+  mNewPatientAction = new QAction(tr("New patient"), this);
   mSaveFileAction = new QAction(tr("Save Patient file"), this);
   mLoadFileAction = new QAction(tr("Load Patient file"), this);
   
@@ -279,11 +279,42 @@ void MainWindow::createStatusBar()
   //TODO, not working as intended
   this->setStatusBar(mCustomStatusBar);
 }
+/**
+ * Xml version 1.0: Knows about the nodes:
+ * <managers>
+ *   <datamanager>
+ *     <image>
+ *        <uid> //an images unique id
+ *        <name> //an images name
+ *        <transferfunctions> //an images transferefunction
+ *            <alpha> //a transferefunctions alpha values
+ *            <color> //a transferefunctions color values
+ */
+/**
+ * Xml version 2.0: Knows about the nodes:
+ * <patient>
+ *  <active_patient> //relative path to this patients folder
+ *  <managers>
+ *     <datamanager>
+ *       <image>
+ *         <uid> //an images unique id
+ *         <name> //an images name
+ *         <transferfunctions> //an images transferefunction
+ *            <alpha> //a transferefunctions alpha values
+ *            <color> //a transferefunctions color values
+ */
 void MainWindow::generateSaveDoc(QDomDocument& doc)
 {
-  doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
+  doc.appendChild(doc.createProcessingInstruction("xml version =", "'2.0'"));
+
+  QDomElement patientNode = doc.createElement("patient");
+  QDomElement activePatientNode = doc.createElement("active_patient");
+  activePatientNode.appendChild(doc.createTextNode(mActivePatientFolder.toStdString().c_str()));
+  patientNode.appendChild(activePatientNode);
+  doc.appendChild(patientNode);
+
   QDomElement managerNode = doc.createElement("managers");
-  doc.appendChild(managerNode);
+  patientNode.appendChild(managerNode);
 
   mDataManager->addXml(managerNode);
 
@@ -294,20 +325,30 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
   mRepManager->getXml(doc); //TODO
   mRegistrationManager->getXml(doc);*/
 
+  mMessageManager->sendInfo("Xml file ready to be written to disk.");
 }
 void MainWindow::readLoadDoc(QDomDocument& doc)
 {
   //Get all the nodes
-  QDomNode managerNode = doc.namedItem("managers");
+  QDomNode patientNode = doc.namedItem("patient");
+  QDomNode managerNode = patientNode.namedItem("managers");
   QDomNode dataManagerNode = managerNode.namedItem("datamanager");
 
   //Evaluate the xml nodes and load what's needed
+  if(!patientNode.isNull())
+  {
+    QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
+    if(!activePatientNode.isNull())
+    {
+      mActivePatientFolder = activePatientNode.text();
+      mMessageManager->sendInfo("Active patient loaded to be "
+                                +mActivePatientFolder.toStdString());
+    }
+  }
   if (!dataManagerNode.isNull())
   {
     mDataManager->parseXml(dataManagerNode);
   }
-  else
-    mMessageManager->sendWarning("cx::MainWindow::readLoadDoc(): No DataManager node");
 }
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 {
@@ -457,26 +498,37 @@ void MainWindow::newPatientSlot()
   int patientNumber = mSettings->value("globalPatientNumber").toInt();
   mSettings->setValue("globalPatientNumber", ++patientNumber);
   
-  if (!choosenDir.endsWith(".cx3"))
+  if(!choosenDir.endsWith(".cx3"))
     choosenDir.append(".cx3");
   
   // Set active patient folder. Use path relative to the globalPatientDataFolder
   QDir patientDataDir(patientDatafolder);
   mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
+  mMessageManager->sendInfo("Selected a patient to work with.");
   
   // Create folders
   if(!QDir().exists(choosenDir))
+  {
     QDir().mkdir(choosenDir);
+    mMessageManager->sendInfo("Made a new patient folder: "+choosenDir.toStdString());
+  }
   
   QString newDir = choosenDir;
   newDir.append("/Images"); 
   if(!QDir().exists(newDir))
+  {
     QDir().mkdir(newDir);
+    mMessageManager->sendInfo("Made a new image folder: "+newDir.toStdString());
+  }
   
   newDir = choosenDir;
   newDir.append("/Logs"); 
   if(!QDir().exists(newDir))
+  {
     QDir().mkdir(newDir);
+    mMessageManager->sendInfo("Made a new logging folder: "+newDir.toStdString());
+  }
+  this->savePatientFileSlot();
 }
   
 void MainWindow::loadPatientFileSlot()
@@ -492,7 +544,7 @@ void MainWindow::loadPatientFileSlot()
   QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString());
   mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
   
-  QFile file(choosenDir + "/custusdoc.xml");
+  QFile file(choosenDir+"/custusdoc.xml");
   if(file.open(QIODevice::ReadOnly))
   {    
     QDomDocument doc;
@@ -501,65 +553,53 @@ void MainWindow::loadPatientFileSlot()
     // Read the file
     if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
     {
-      std::cout << "ERROR! MainWindow::loadPatientFileSlot(): Could not parse XML file:";
-      std::cout << emsg.toStdString() << "line: "<< eline << "col: " << ecolumn;
-      std::cout << std::endl;
-      throw "Could not parse XML file";
+      mMessageManager->sendError("Could not parse XML file :"
+                                 +file.fileName().toStdString()+" because: "
+                                 +emsg.toStdString()+"");
+
+      //Not nice to throw and never catch...
+      //throw "Could not parse XML file";
+    }
+    else
+    {
+      //Read the xml
+      this->readLoadDoc(doc);
     }
     file.close();
-
-    //Read the xml
-    this->readLoadDoc(doc);
   }
 }
 void MainWindow::savePatientFileSlot()
 {
-  // Open file dialog, get patient data folder
-  /*QString dir = QFileDialog::getSaveFileName(this, 
-                                             tr("Select directory to save file in"),
-                                             mSettings->value("globalPatientDataFolder").toString()
-                                             );
-  if (dir == QString::null)
-    return; // On cancel
-  if (!dir.endsWith(".cx3"))
-    dir.append(".cx3");
-  if(!QDir().exists(dir))
-    QDir().mkdir(dir);*/
   
   if(mActivePatientFolder.isEmpty())
   {
-    mMessageManager->sendWarning("cx::MainWindow::savePatientFileSlot(): No Patient created!");
+    mMessageManager->sendWarning("No patient selected, select or create patient before saving!");
+    this->newPatientSlot();
     return;
   }
   
   //Gather all the information that needs to be saved
-  QDomDocument* doc(new QDomDocument());
-  this->generateSaveDoc(*doc);
+  QDomDocument doc;
+  this->generateSaveDoc(doc);
 
   QString activePatientDir = mSettings->value("globalPatientDataFolder").toString();
-  activePatientDir += mActivePatientFolder;
+  activePatientDir += "/"+mActivePatientFolder;
   QFile file(activePatientDir + "/custusdoc.xml");
-  if(file.open(QIODevice::WriteOnly))
+  if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     QTextStream stream(&file);
-    stream << doc->toString();
+    stream << doc.toString();
     file.close();
+    mMessageManager->sendInfo("Created "+file.fileName().toStdString());
+  }
+  else
+  {
+    mMessageManager->sendError("Could not open "+file.fileName().toStdString()
+                               +" Error: "+file.errorString().toStdString());
   }
 
-  //Write the data to file
+  //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...
-  /*if(this->write(dir))
-  {
-    QFile file(dir + "/custusdoc.xml");
-    if(file.open(QIODevice::WriteOnly))
-    {
-      QTextStream stream(&file);
-      stream << doc->toString();
-      file.close();
-    }
-  }*/
-  delete doc;
-  //TODO: The user should be notified if something bad happens
 }
 void MainWindow::patientDataWorkflowSlot()
 {
@@ -583,6 +623,7 @@ void MainWindow::usAcquisitionWorkflowSlot()
 }
 void MainWindow::importDataSlot()
 {
+  //TODO: Clean up this function...
   mMessageManager->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
@@ -593,77 +634,98 @@ void MainWindow::importDataSlot()
     return;
   }
 
+  QString globalPatientFolderPath = mSettings->value("globalPatientDataFolder").toString();
+  QString patientsImageFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Images/";
+
   QDir dir;
+  if(!dir.exists(patientsImageFolder))
+  {
+    dir.mkpath(patientsImageFolder);
+    mMessageManager->sendInfo("Made new directory: "+patientsImageFolder.toStdString());
+  }
+
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
-  QString pathToImageFolder = mSettings->value("globalPatientDataFolder")
-                             .toString()+"/Images/";
-  if(!dir.exists(pathToImageFolder))
-  {
-    dir.mkpath(pathToImageFolder);
-    mMessageManager->sendInfo("Made new directory: "+pathToImageFolder.toStdString());
-  }
-  QString pathToNewFile = pathToImageFolder+fileInfo.fileName();
+  QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
+  QFile fromFile(fileName);
+  QFile toFile(pathToNewFile);
 
-  if(QFile::copy(fileName, pathToNewFile))
+  //Not copying, because we can't get the system to wait for the copy to finish
+  //before the datamanager tries to load it!
+  if(fileName != pathToNewFile && false) //checks if we need to copy
   {
-    mMessageManager->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-  }else
-  {
-    mMessageManager->sendError("Copy failed!");
-  }
-  //make sure we also copy the .raw file in case if mhd/hdr
-  if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
-  {
-    QString fileName2 = fileName.replace(".mhd", ".raw");
-    QString pathToNewFile2 = pathToNewFile.replace(".mhd", ".raw");
-    QFile newFile(pathToNewFile2);
-    if(QFile::copy(fileName2, pathToNewFile2))
+    if(fromFile.copy(toFile.fileName()))
     {
-      //TODO FIX
-      newFile.waitForReadyRead(-1);
-      mMessageManager->sendInfo("File copied to new location: "+pathToNewFile2.toStdString());
-    }
-    else
-      mMessageManager->sendError("Copy failed!");
-  }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
-  {
-    QString fileName2 = fileName.replace(".mhd", ".raw");
-    QString pathToNewFile2 = pathToNewFile.replace(".hdr", ".raw");
-    if(QFile::copy(fileName2, pathToNewFile2))
+      mMessageManager->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
+    }else
     {
-      QFile newFile(pathToNewFile2);
-      //TODO FIX
-      newFile.waitForReadyRead(-1);
-      mMessageManager->sendInfo("File copied to new location: "+pathToNewFile2.toStdString());
+      mMessageManager->sendError("First copy failed!");
+      return;
     }
-    else
-      mMessageManager->sendError("Copy failed!");
+    //make sure we also copy the .raw file in case if mhd/hdr
+    if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
+    {
+      //presuming the other file is a raw file
+      //TODO: what if it's not?
+      QString originalRawFile = fileName.replace(".mhd", ".raw");
+      QString newRawFile = pathToNewFile.replace(".mhd", ".raw");
+      fromFile.setFileName(originalRawFile);
+      toFile.setFileName(newRawFile);
+
+      if(fromFile.copy(toFile.fileName()))
+      {
+        mMessageManager->sendInfo("File copied to new location: "+newRawFile.toStdString());
+      }
+      else
+      {
+        mMessageManager->sendError("Second copy failed!");
+        return;
+      }
+    }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
+    {
+      //presuming the other file is a raw file
+      //TODO: waht if it's not?
+      QString originalRawFile = fileName.replace(".hdr", ".raw");
+      QString newRawFile = pathToNewFile.replace(".hdr", ".raw");
+      fromFile.setFileName(originalRawFile);
+      toFile.setFileName(newRawFile);
+
+      if(fromFile.copy(toFile.fileName()))
+      {
+        mMessageManager->sendInfo("File copied to new location: "+newRawFile.toStdString());
+      }
+      else
+      {
+        mMessageManager->sendError("Second copy failed!");
+        return;
+      }
+    }
   }
+  else //no copy was needed
+    mMessageManager->sendInfo("Didn't need to copy because file was in the right place.");
 
   fileName = pathToNewFile;
-  std::cout << fileName.toStdString() << std::endl;
+
+  //Need to wait for the copy to finish...
 
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("hdr", Qt::CaseInsensitive) == 0)
   {
-    ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    mMessageManager->sendInfo("Meta data imported.");
+    mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
-    mMessageManager->sendInfo("STL data imported.");
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
-    mMessageManager->sendInfo("Vtk data imported.");
   }
 }
 void MainWindow::configureSlot()
 {
+  //TODO: Use current patients folder, not global patientfolder like now!
   QString configFile = mSettings->value("toolConfigFilePath").toString();
 
-  if(mSettings->value("toolManager/toolConfigFilePath").toString() ==
+  if(mSettings->value("toolConfigFilePath").toString() ==
       QDir::homePath())
   {
     QString configFile = QFileDialog::getOpenFileName(this,
@@ -676,7 +738,7 @@ void MainWindow::configureSlot()
   }
   mToolManager->setConfigurationFile(configFile.toStdString());
 
-  QString loggingPath = mSettings->value("globalPatientDataFolder").toString()+"/Logs";
+  QString loggingPath = mSettings->value("globalPatientDataFolder").toString()+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {
@@ -687,9 +749,9 @@ void MainWindow::configureSlot()
 
   mToolManager->configure();
 }
-void MainWindow::printSlot(const QString& message, int timeout)
+void MainWindow::loggingSlot(const QString& message, int timeout)
 {
-  //TODO REMOVE just for debugging
+  //TODO Write to file and a "console" inside CX3 maybe?
   std::cout << message.toStdString() << std::endl;
 }
 }//namespace cx

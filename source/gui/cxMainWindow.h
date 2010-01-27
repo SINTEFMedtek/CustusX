@@ -9,7 +9,6 @@ class QActionGroup;
 class QDomDocument;
 class QSettings;
 
-
 namespace cx
 {
 class DataManager;
@@ -64,9 +63,8 @@ protected slots:
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
 
-  //TODO: REMOVE
   //degugging
-  void printSlot(const QString& message, int timeout); ///< prints messages for debugging
+  void loggingSlot(const QString& message, int timeout); ///< prints messages for debugging
   
 protected:
   enum WorkflowState
