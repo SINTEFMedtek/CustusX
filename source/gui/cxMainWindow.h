@@ -29,7 +29,7 @@ class PatientRegistrationWidget;
  * \brief This is the main gui class which controls the workflow.
  *
  * \date Jan 20, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
 class MainWindow : public QMainWindow
 {

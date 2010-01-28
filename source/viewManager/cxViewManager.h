@@ -25,7 +25,7 @@ class View3D;
  * layouts on a centralwidget.
  *
  * \date Dec 9, 2008
- * \author: Janne Beate Bakeng, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
 class ViewManager : public QObject
 {

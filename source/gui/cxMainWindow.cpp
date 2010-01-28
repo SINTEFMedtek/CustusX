@@ -68,6 +68,9 @@ MainWindow::MainWindow() :
   if (!mSettings->contains("globalPatientNumber"))
     mSettings->setValue("globalPatientNumber", 1);
   
+  if (!mSettings->contains("applicationNames"))
+    mSettings->setValue("applicationNames", "Nevro,Lap,Kar");
+  
   //debugging
   connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
@@ -96,9 +99,12 @@ void MainWindow::createActions()
   //TODO: add shortcuts and tooltips
 	
   // File
-  mNewPatientAction = new QAction(tr("New patient"), this);
-  mSaveFileAction = new QAction(tr("Save Patient file"), this);
-  mLoadFileAction = new QAction(tr("Load Patient file"), this);
+  mNewPatientAction = new QAction(tr("N&ew patient"), this);
+  mNewPatientAction->setShortcut(tr("Ctrl+N"));
+  mSaveFileAction = new QAction(tr("S&ave Patient file"), this);
+  mSaveFileAction->setShortcut(tr("Ctrl+S"));
+  mLoadFileAction = new QAction(tr("L&oad Patient file"), this);
+  mLoadFileAction->setShortcut(tr("Ctrl+L"));
   
   connect(mNewPatientAction, SIGNAL(triggered()),
           this, SLOT(newPatientSlot()));

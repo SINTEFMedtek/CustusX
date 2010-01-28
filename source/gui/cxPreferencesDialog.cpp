@@ -28,7 +28,7 @@ void FoldersTab::init(){
   mPatientDataFolderComboBox->addItem( mGlobalPatientDataFolder);
   //patientDataFolderComboBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-  QPushButton* patientDataFolderButton = new QPushButton(tr("&Browse..."));
+  QPushButton* patientDataFolderButton = new QPushButton(tr("B&rowse..."));
   connect( patientDataFolderButton, 
           SIGNAL(clicked()), 
           this, 
@@ -73,6 +73,15 @@ void FoldersTab::init(){
           SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
   setCurrentToolConfigFile();
 
+  // Choose application name
+  QLabel* chooseApplicationLabel = new QLabel(tr("Choose application name, used when creating new patients:"));
+  mChooseApplicationComboBox = new QComboBox();
+  setApplicationComboBox();
+  connect(mChooseApplicationComboBox,
+          SIGNAL(currentIndexChanged(const QString &)),
+          this,
+          SLOT(currenApplicationChangedSlot(const QString &)));
+  setCurrentApplication();
 
   // Layout
   QGridLayout *mainLayout = new QGridLayout;
@@ -95,6 +104,9 @@ void FoldersTab::init(){
   mainLayout->addWidget(toolConfigFolderButton, 6, 2);
   mainLayout->addWidget(toolConfigFilesLabel, 8, 0);
   mainLayout->addWidget(mToolConfigFilesComboBox, 8, 1);
+  
+  mainLayout->addWidget(chooseApplicationLabel, 9, 0);
+  mainLayout->addWidget(mChooseApplicationComboBox, 9, 1);
  
   setLayout(mainLayout);
   
@@ -146,9 +158,13 @@ void FoldersTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolC
   mCurrentToolConfigFile = newToolConfigFile;
 }
 
+void FoldersTab::currenApplicationChangedSlot(const QString & newApplicationName)
+{
+  mSettings->setValue("globalApplicationName", newApplicationName);
+}
+
 void FoldersTab::setToolConfigFiles()
 {
-    
 	QDir dir(mCurrentToolConfigFolder);
     dir.setFilter(QDir::Files);
 
@@ -160,13 +176,27 @@ void FoldersTab::setToolConfigFiles()
 	
     mToolConfigFilesComboBox->clear();
     mToolConfigFilesComboBox->addItems( list );
+}
 
+void FoldersTab::setApplicationComboBox()
+{
+  QString str = mSettings->value("applicationNames").toString();
+  QStringList list = str.split(",");
+  mChooseApplicationComboBox->clear();
+  mChooseApplicationComboBox->addItems(list);
 }
 
 void FoldersTab::setCurrentToolConfigFile()
 {
   int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
   mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
+}
+  
+  
+void FoldersTab::setCurrentApplication()
+{
+  int currentIndex = mChooseApplicationComboBox->findText( mSettings->value("globalApplicationName").toString() );
+  mChooseApplicationComboBox->setCurrentIndex( currentIndex );
 }
   
 void FoldersTab::saveParametersSlot()

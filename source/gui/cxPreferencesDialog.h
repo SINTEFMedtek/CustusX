@@ -43,18 +43,22 @@ private slots:
 
   void browseToolConfigFolderSlot();
   void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
+  void currenApplicationChangedSlot(const QString & newApplicationName);
 
 private:
   void setToolConfigFiles();
+  void setApplicationComboBox();
   void setCurrentToolConfigFile();
+  void setCurrentApplication();
 
   QSettings* mSettings;
 
   QComboBox* mPatientDataFolderComboBox;
   //QComboBox* mImportDataFolderComboBox;
 
-  QComboBox *mToolConfigFolderComboBox;
-  QComboBox *mToolConfigFilesComboBox;
+  QComboBox* mToolConfigFolderComboBox;
+  QComboBox* mToolConfigFilesComboBox;
+  QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
   //QString mCurrentImportDataFolder;
