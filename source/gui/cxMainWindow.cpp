@@ -286,28 +286,28 @@ void MainWindow::createStatusBar()
   this->setStatusBar(mCustomStatusBar);
 }
 /**
- * Xml version 1.0: Knows about the nodes:
- * <managers>
- *   <datamanager>
- *     <image>
- *        <uid> //an images unique id
- *        <name> //an images name
- *        <transferfunctions> //an images transferefunction
- *            <alpha> //a transferefunctions alpha values
- *            <color> //a transferefunctions color values
+ * Xml version 1.0: Knows about the nodes: \n
+ * \<managers\> \n
+ *   \<datamanager\> \n
+ *     \<image\> \n
+ *        \<uid\> //an images unique id \n
+ *        \<name\> //an images name \n
+ *        \<transferfunctions\> //an images transferefunction \n
+ *            \<alpha\> //a transferefunctions alpha values \n
+ *            \<color\> //a transferefunctions color values
  */
 /**
- * Xml version 2.0: Knows about the nodes:
- * <patient>
- *  <active_patient> //relative path to this patients folder
- *  <managers>
- *     <datamanager>
- *       <image>
- *         <uid> //an images unique id
- *         <name> //an images name
- *         <transferfunctions> //an images transferefunction
- *            <alpha> //a transferefunctions alpha values
- *            <color> //a transferefunctions color values
+ * Xml version 2.0: Knows about the nodes: \n
+ * \<patient\> \n
+ *  \<active_patient\> //relative path to this patients folder \n
+ *  \<managers\> \n
+ *     \<datamanager\> \n
+ *       \<image\> \n
+ *         \<uid\> //an images unique id \n
+ *         \<name\> //an images name \n
+ *         \<transferfunctions\> //an images transferefunction \n
+ *            \<alpha\> //a transferefunctions alpha values \n
+ *            \<color\> //a transferefunctions color values \n
  */
 void MainWindow::generateSaveDoc(QDomDocument& doc)
 {
