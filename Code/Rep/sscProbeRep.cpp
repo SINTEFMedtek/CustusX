@@ -41,17 +41,20 @@ std::string ProbeRep::getType() const
 }
 void ProbeRep::setImage(ImagePtr image)
 {
-	if (image==mImage || !image.get())
+	if (image==mImage)
 		return;
 
-	if (mImage.get())
+	if (mImage)
 	{
 		disconnect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
 				mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
 	}
 	mImage = image;
+  if (mImage)
+  {
 	connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
 			mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
+  }
 }
 void ProbeRep::setThreshold(const int threshold)
 {

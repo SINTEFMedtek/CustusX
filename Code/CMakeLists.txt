@@ -114,6 +114,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSnwInifile.cpp
 	Utilities/sscGLHelpers.cpp
     sscView.cpp
+    Rep/sscRep.h
+    Rep/sscRepImpl.h
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp
     Rep/sscSliceRep.cpp
