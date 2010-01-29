@@ -99,11 +99,11 @@ void MainWindow::createActions()
   //TODO: add shortcuts and tooltips
 	
   // File
-  mNewPatientAction = new QAction(tr("N&ew patient"), this);
+  mNewPatientAction = new QAction(tr("&New patient"), this);
   mNewPatientAction->setShortcut(tr("Ctrl+N"));
-  mSaveFileAction = new QAction(tr("S&ave Patient file"), this);
+  mSaveFileAction = new QAction(tr("&Save Patient file"), this);
   mSaveFileAction->setShortcut(tr("Ctrl+S"));
-  mLoadFileAction = new QAction(tr("L&oad Patient file"), this);
+  mLoadFileAction = new QAction(tr("&Load Patient file"), this);
   mLoadFileAction->setShortcut(tr("Ctrl+L"));
   
   connect(mNewPatientAction, SIGNAL(triggered()),
@@ -114,13 +114,13 @@ void MainWindow::createActions()
           this, SLOT(savePatientFileSlot()));
 
   // Application
-  mAboutAction = new QAction(tr("A&bout"), this);  // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
+  mAboutAction = new QAction(tr("&About"), this);  // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
   mAboutAction->setShortcut(tr("Ctrl+A"));
   mAboutAction->setStatusTip(tr("Show the application's About box"));
-  mPreferencesAction = new QAction(tr("P&references"), this);
+  mPreferencesAction = new QAction(tr("&Preferences"), this);
   mPreferencesAction->setShortcut(tr("Ctrl+P"));
   mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
-  mQuitAction = new QAction(tr("Q&uit"), this);
+  mQuitAction = new QAction(tr("&Quit"), this);
   mQuitAction->setShortcut(tr("Ctrl+Q"));
   mQuitAction->setStatusTip(tr("Exit the application"));
   
@@ -154,11 +154,16 @@ void MainWindow::createActions()
 
   //data
   mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
-  mImportDataAction->setShortcut(tr("Ctrl+Is"));
+  mImportDataAction->setShortcut(tr("Ctrl+I"));
   mImportDataAction->setStatusTip(tr("Import image data"));
+  
+  mDeleteDataAction = new QAction(tr("Delete current image"), this);
+  mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
 
   connect(mImportDataAction, SIGNAL(triggered()),
           this, SLOT(importDataSlot()));
+  connect(mDeleteDataAction, SIGNAL(triggered()),
+          this, SLOT(deleteDataSlot()));
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
@@ -204,18 +209,20 @@ void MainWindow::createActions()
       mViewManager, SLOT(setLayoutTo_3DACS_1X3()));
   connect(mACSACS_2x3_LayoutAction, SIGNAL(triggered()),
       mViewManager, SLOT(setLayoutTo_ACSACS_2X3()));
-  
-  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          mViewManager, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
+  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+          mViewManager, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           mImageRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           mPatientRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           mTransferFunctionWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
+  
+  connect(this, SIGNAL(deleteCurrentImage()),
+          mContextDockWidget, SLOT(deleteCurrentImageSlot()));
 }
 void MainWindow::createMenus()
 {
@@ -253,6 +260,7 @@ void MainWindow::createMenus()
   //data
   this->menuBar()->addMenu(mDataMenu);
   mDataMenu->addAction(mImportDataAction);
+  mDataMenu->addAction(mDeleteDataAction);
 
   //tool
   this->menuBar()->addMenu(mToolMenu);
@@ -726,6 +734,12 @@ void MainWindow::importDataSlot()
     mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
   }
 }
+
+void MainWindow::deleteDataSlot()
+{
+  emit deleteCurrentImage();
+}
+
 void MainWindow::configureSlot()
 {
   //TODO: Use current patients folder, not global patientfolder like now!
@@ -760,4 +774,5 @@ void MainWindow::loggingSlot(const QString& message, int timeout)
   //TODO Write to file and a "console" inside CX3 maybe?
   std::cout << message.toStdString() << std::endl;
 }
+
 }//namespace cx

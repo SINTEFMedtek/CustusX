@@ -38,6 +38,9 @@ class MainWindow : public QMainWindow
 public:
   MainWindow(); ///< sets up the initial gui
   ~MainWindow(); ///< empty
+  
+signals:
+  void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
 
 protected slots:
   //application menu
@@ -59,6 +62,7 @@ protected slots:
 
   //data menu
   void importDataSlot(); ///< loads data(images) into the datamanager
+  void deleteDataSlot(); ///< deletes data(image) from the patient
 
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
@@ -139,6 +143,7 @@ protected:
   QActionGroup* mWorkflowActionGroup; ///< grouping the workflow actions
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
+  QAction* mDeleteDataAction; ///< action for deleting the current volume
 
   QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
@@ -169,6 +174,7 @@ protected:
   
   //Patient
   QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
+  
 };
 }//namespace cx
 

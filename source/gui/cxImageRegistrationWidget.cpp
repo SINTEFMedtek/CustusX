@@ -76,10 +76,13 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
 
   //Set new current image
   mCurrentImage = currentImage;
-  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  if (currentImage)// Don't use image if deleted
+  {
+    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  }
 
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
@@ -138,6 +141,12 @@ void ImageRegistrationWidget::landmarkSelectedSlot(int row, int column)
 }
 void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
+  if(!image)
+  {
+    //Image is deleted
+    mLandmarkTableWidget->clear();
+    return;
+  }
   //get globalPointsNameList from the RegistrationManager
   RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
 

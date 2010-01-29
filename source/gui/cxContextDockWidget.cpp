@@ -49,6 +49,14 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   connect(this, SIGNAL(changeTabIndex(int)),
           mTabWidget, SLOT(setCurrentIndex(int)));
   
+  // Delete image
+  connect(this, SIGNAL(deleteImage(ssc::ImagePtr)),
+          mDataManager, SLOT(deleteImageSlot(ssc::ImagePtr)));
+  connect(this, SIGNAL(deleteImage(ssc::ImagePtr)),
+          mViewManager, SLOT(deleteImageSlot(ssc::ImagePtr)));
+  connect(mDataManager, SIGNAL(currentImageDeleted()),
+          this, SLOT(currentImageDeletedSlot()));
+  
 }
 ContextDockWidget::~ContextDockWidget()
 {}
@@ -62,17 +70,32 @@ void ContextDockWidget::removeTab(int tabIndex)
 {
   mTabWidget->removeTab(tabIndex);
 }
+
+void ContextDockWidget::deleteCurrentImageSlot()
+{
+  if (mCurrentImage.use_count() == 0)
+  {
+    mMessageManager->sendWarning("Can't delete image, no current Image!");
+    return;
+  }
+  emit deleteImage(mCurrentImage);
+}
+
 void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 {
   if(visible)
   {
     connect(mDataManager, SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBoxSlot()));
+    connect(mDataManager, SIGNAL(currentImageDeleted()),
+            this, SLOT(populateTheImageComboBoxSlot()));
     this->populateTheImageComboBoxSlot();
   }
   else
   {
     disconnect(mDataManager, SIGNAL(dataLoaded()),
+               this, SLOT(populateTheImageComboBoxSlot()));
+    disconnect(mDataManager, SIGNAL(currentImageDeleted()),
             this, SLOT(populateTheImageComboBoxSlot()));
   }
 }
@@ -100,6 +123,15 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
     listPosition++;
   }
 }
+  
+void ContextDockWidget::currentImageDeletedSlot()
+{
+  // Create empty current image
+  //ssc::ImagePtr image(new ssc::Image());
+  mCurrentImage.reset();
+  emit currentImageChanged(mCurrentImage);
+}
+  
 void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))

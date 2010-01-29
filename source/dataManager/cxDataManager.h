@@ -14,7 +14,7 @@ namespace cx
  * \brief cx implementation of additional functionality for the ssc::DataManager
  *
  * \date Mar 23, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
 class DataManager : public ssc::DataManagerImpl
 {
@@ -26,6 +26,12 @@ public:
   void addXml(QDomNode& parentNode);
   void parseXml(QDomNode& node);
 
+signals:
+  void currentImageDeleted(); ///< emitted when data is deleted
+  
+public slots:
+  void deleteImageSlot(ssc::ImagePtr image); ///< Deletes image and emits dataDeleted signal
+  
 protected:
   DataManager(); ///< DataManager is a Singleton. Use getInstance instead
   ~DataManager(); ///< destructor

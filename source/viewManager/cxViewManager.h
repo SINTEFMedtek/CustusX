@@ -15,6 +15,7 @@ class View;
 namespace cx
 {
 class MessageManager;
+class RepManager;
 class View2D;
 class View3D;
 
@@ -61,6 +62,7 @@ public slots:
   void setLayoutTo_3DACS_2X2(); ///< sets the layout to 3DACS_2X2
   void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
   void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
+  void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
 
   protected slots:
 	void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
@@ -78,9 +80,11 @@ protected:
   void deactivateLayout_3DACS_1X3(); ///< deactivate the 3DACS_1X3 layout
   void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
   void deactivateLayout_ACSACS_2X3(); ///< deactivate the ACSACS_2X3 layout
+  void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
   MessageManager*     mMessageManager; ///< device for sending messages to the statusbar
+  RepManager* mRepManager; ///< has a pool of reps
 
   LayoutType      mCurrentLayoutType; ///< what LayoutType is currently active
   QGridLayout*    mLayout;            ///< the layout

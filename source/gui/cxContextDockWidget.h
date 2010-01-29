@@ -26,7 +26,7 @@ class DataManager;
  * using tabs.
  *
  * \date Mar 16, 2009
- * \author: Janne Beate Bakeng, SINTEF
+ * \author Janne Beate Bakeng, SINTEF
  */
 class ContextDockWidget : public QDockWidget
 {
@@ -42,10 +42,15 @@ public:
 signals:
   void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
   void changeTabIndex(int index); ///< Send a signal when the tab index must be changed
+  void deleteImage(ssc::ImagePtr image);
+  
+public slots:
+  void deleteCurrentImageSlot(); ///< Deletes the current image and emits delete signal to managers
   
 protected slots:
   void visibilityOfDockWidgetChangedSlot(bool visible); ///< connects/disconnects to signals from the datamanager
   void populateTheImageComboBoxSlot(); ///< populates the combobox with the images loaded into the datamanager
+  void currentImageDeletedSlot(); ///< sends out the currentImageChanged signal with an empty image
   void imageSelectedSlot(const QString& comboBoxText); ///< sends out a signal and adds reps of the image to the views
 
 protected:

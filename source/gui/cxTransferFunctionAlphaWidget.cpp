@@ -82,14 +82,17 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
   else
   {
     if((event->x() >= mPlotArea.left()) &&
-      (event->x() <= (mPlotArea.width()+mPlotArea.left())))
+       (event->x() <= (mPlotArea.width()+mPlotArea.left())))
     {
-      mCurrentAlphaPoint.value = int(mCurrentImage->getRange() *
-          (event->x() - mPlotArea.left()) / 
-          static_cast<double>(mPlotArea.width()) );
-      // mCurrentAlphaPoint.position set at mousePressEvent() 
-      // (with isInsideCurrentPoint())
-      emit positionChanged(mCurrentAlphaPoint.value);
+      if(mCurrentImage)
+      {
+        mCurrentAlphaPoint.value = int(mCurrentImage->getRange() *
+                                       (event->x() - mPlotArea.left()) / 
+                                       static_cast<double>(mPlotArea.width()) );
+        // mCurrentAlphaPoint.position set at mousePressEvent() 
+        // (with isInsideCurrentPoint())
+        emit positionChanged(mCurrentAlphaPoint.value);
+      }
     }
   }
 }
@@ -97,7 +100,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 {
   // Don't do anything before we have an image
 	// May also be fixed by not calling TransferFunctionAlphaWidget constructor till we have an image
-  if (mCurrentImage.use_count() == 0)
+  if (!mCurrentImage)
     return;
   
   QWidget::paintEvent(event);
@@ -131,9 +134,10 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 	// / double(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
 	
   double posMult = (width() - mBorder*2) / double(histogramSize);
-	for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)
+	//for (int i = mCurrentImage->getPosMin(); i <= mCurrentImage->getPosMax(); i++)
+  for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)//TODO: replace with above line
 	{
-		x = i * posMult;
+		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
 		y = log(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
@@ -218,6 +222,11 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
                      (mPlotArea.bottom() - mCurrentClickY) / 
                      static_cast<double>(mPlotArea.height()) );
 
+  /*if (point.position > mCurrentImage->getPosMax())
+    point.position = mCurrentImage->getPosMax();
+  else if (point.position < mCurrentImage->getPosMin())
+    point.position = mCurrentImage->getPosMin();*/
+  //TODO: replace code with above code
   if (point.position > mCurrentImage->getMax())
     point.position = mCurrentImage->getMax();
   else if (point.position < mCurrentImage->getMin())
@@ -232,6 +241,8 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
 }
 void TransferFunctionAlphaWidget::toggleCurrentPoint()
 {
+  if(!mCurrentImage)
+    return;
   if(!isInsideCurrentPoint())
   {
     // Outside any of the rectangles
@@ -258,6 +269,9 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint()
   ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
   
   // Max and min points may only be moved in y direction
+  /*if(mCurrentAlphaPoint.position == mCurrentImage->getPosMin() 
+     || mCurrentAlphaPoint.position == mCurrentImage->getPosMax() )*/
+  //TODO: Replace with above code
   if(mCurrentAlphaPoint.position == mCurrentImage->getMin() 
      || mCurrentAlphaPoint.position == mCurrentImage->getMax() )
   {

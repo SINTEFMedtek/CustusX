@@ -89,11 +89,14 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
   mCurrentImage = currentImage;
 
   //connect to new image
-  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-
+  if (mCurrentImage) //Don't use image if deleted
+  {
+    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  }
+  
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
@@ -190,6 +193,11 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 }
 void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
+  if (!image)
+  {
+    mLandmarkTableWidget->clear();
+    return;
+  }
   //get globalPointsNameList from the RegistrationManager
   RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
 

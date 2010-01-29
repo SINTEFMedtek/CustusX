@@ -29,6 +29,7 @@ void ViewManager::destroyInstance()
 {}
 ViewManager::ViewManager() :
   mMessageManager(MessageManager::getInstance()),
+  mRepManager(RepManager::getInstance()),
   mCurrentLayoutType(LAYOUT_NONE),
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
@@ -233,6 +234,31 @@ void ViewManager::setLayoutTo_ACSACS_2X3()
   }
   mMessageManager->sendInfo("Layout changed to ACSACS_2X3");
 }
+  
+void ViewManager::deleteImageSlot(ssc::ImagePtr image)
+{
+  VolumetricRepMap* volRepMap = mRepManager->getVolumetricReps();
+  VolumetricRepMap::iterator itVolRep = volRepMap->begin();
+  for(; itVolRep != volRepMap->end(); ++itVolRep)
+    if(itVolRep->second->hasImage(image))
+      this->removeRepFromViews(itVolRep->second);
+  
+  /*InriaRep3DMap* inria3DRepMap = mRepManager->getInria3DReps();
+  InriaRep3DMap::iterator itInria3DRep = inria3DRepMap->begin();
+  for(; itInria3DRep != inria3DRepMap->end(); ++itInria3DRep)
+    if(itInria3DRep->second->hasImage(image))
+      this->removeRepFromViews(itInria3DRep->second);*/
+  
+  /*InriaRep2DMap* inria2DRepMap = mRepManager->getInria2DReps();
+  InriaRep2DMap::iterator itInria2DRep = inria2DRepMap->begin();
+  for(; itInria2DRep != inria2DRepMap->end(); ++itInria2DRep)
+    if(itInria2DRep->second->hasImage(image))
+      this->removeRepFromViews(itInria2DRep->second);*/
+
+  //InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+  //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+}
+  
 void ViewManager::activateLayout_3D_1X1()
 {
   mLayout->addWidget(mView3DMap[mView3DNames[0]]);
@@ -322,6 +348,17 @@ void ViewManager::deactivateLayout_ACSACS_2X3()
   mLayout->removeWidget( mView2DMap[mView2DNames[4]]);
   mLayout->removeWidget( mView2DMap[mView2DNames[5]]);
 }
+  
+void ViewManager::removeRepFromViews(ssc::RepPtr rep)
+{
+  View3DMap::iterator it3D = mView3DMap.begin();
+  for(; it3D != mView3DMap.end(); ++it3D)
+    it3D->second->removeRep(rep);
+  View2DMap::iterator it2D = mView2DMap.begin();
+  for(; it2D != mView2DMap.end(); ++it2D)
+    it2D->second->removeRep(rep);
+}
+  
 void ViewManager::renderAllViewsSlot()
 {
   View3DMap::iterator it3D = mView3DMap.begin();
@@ -339,18 +376,26 @@ void ViewManager::renderAllViewsSlot()
 }
 	
 void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
-{
-  if (!currentImage.get())
+{  
+  if (!currentImage)
+  {
+    InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+    inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+    inriaRep2D_1->getVtkViewImage2D()->SyncReset();
+    
+    mMessageManager->sendInfo("Removed current image from inria views");
     return;
+  }
   if (!currentImage->getRefVtkImageData().GetPointer())
     return;
-  // Update 3D view
-  RepManager* repManager = RepManager::getInstance();
-  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_1");
-  ssc::VolumetricRepPtr volumetricRep 
-  = repManager->getVolumetricRep("VolumetricRep_1");
-  LandmarkRepPtr landmarkRep = repManager->getLandmarkRep("LandmarkRep_1");
   
+  // Update 3D view
+  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ssc::VolumetricRepPtr volumetricRep 
+  = mRepManager->getVolumetricRep("VolumetricRep_1");
+  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+  
+   //Set these when image is deleted?
   volumetricRep->setImage(currentImage);
   probeRep->setImage(currentImage);
   landmarkRep->setImage(currentImage);
@@ -364,9 +409,9 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   view3D_1->getRenderer()->Render();
   
   // Update 2D views
-  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");
+  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
 
   //View2D* view2D_1 = this->get2DView("View2D_1");
   //View2D* view2D_2 = this->get2DView("View2D_2");

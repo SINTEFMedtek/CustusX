@@ -73,7 +73,7 @@ void LandmarkRep::showLandmarks(bool on)
 }
 void LandmarkRep::setImage(ssc::ImagePtr image)
 {
-  if(image == mImage || image.get() == NULL)
+  if(image == mImage)
     return;
 
   if(mImage)
@@ -94,7 +94,9 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
 
   mSkinPointActors.clear();
   mTextFollowerActors.clear();
-
+  
+  if (!mImage)
+    return;// Don't use image if deleted
   mImage->connectRep(mSelf);
   connect(mImage.get(), SIGNAL(landmarkAdded(double, double, double,unsigned int)),
           this, SLOT(addPermanentPointSlot(double, double, double,unsigned int)));
