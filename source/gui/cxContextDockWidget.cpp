@@ -107,7 +107,7 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
   std::map<std::string, ssc::ImagePtr> images = mDataManager->getImages();
   if(images.size() == 0)
   {
-    mImagesComboBox->insertItem(1, QString("Load an image to begin..."));
+    mImagesComboBox->insertItem(1, QString("Import an image to begin..."));
     mImagesComboBox->setEnabled(false);
     return;
   }
