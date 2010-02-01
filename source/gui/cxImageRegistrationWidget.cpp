@@ -88,7 +88,10 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
   this->populateTheLandmarkTableWidget(mCurrentImage);
 
   //enable the add point button
-  mAddLandmarkButton->setEnabled(true);
+  if (mCurrentImage)
+    mAddLandmarkButton->setEnabled(true);
+  else
+    mAddLandmarkButton->setEnabled(false);
 }
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {

@@ -42,7 +42,7 @@ public:
 signals:
   void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
   void changeTabIndex(int index); ///< Send a signal when the tab index must be changed
-  void deleteImage(ssc::ImagePtr image);
+  void deleteImage(ssc::ImagePtr image); ///< Sends a signal when an image is to be deleted
   
 public slots:
   void deleteCurrentImageSlot(); ///< Deletes the current image and emits delete signal to managers
@@ -50,7 +50,6 @@ public slots:
 protected slots:
   void visibilityOfDockWidgetChangedSlot(bool visible); ///< connects/disconnects to signals from the datamanager
   void populateTheImageComboBoxSlot(); ///< populates the combobox with the images loaded into the datamanager
-  void currentImageDeletedSlot(); ///< sends out the currentImageChanged signal with an empty image
   void imageSelectedSlot(const QString& comboBoxText); ///< sends out a signal and adds reps of the image to the views
 
 protected:
