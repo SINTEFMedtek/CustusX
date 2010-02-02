@@ -65,6 +65,7 @@ INCLUDE_DIRECTORIES(
     registrationManager
     toolManager
     dataManager
+    3DUSReconstruction
     )
     
 
@@ -74,6 +75,7 @@ ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(toolManager)
 ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
+ADD_SUBDIRECTORY(3DUSReconstruction)
 
 ADD_EXECUTABLE(CustusX MACOSX_BUNDLE ${SOURCES} )
 
@@ -86,6 +88,7 @@ SET ( LINK_LIBRARIES
   registrationManager
   toolManager
   dataManager
+  3DUSReconstruction
   vtkRendering
   vtkWidgets
   vtkGraphics
@@ -108,5 +111,10 @@ SET ( LINK_LIBRARIES
 # LINK
 #----------
 TARGET_LINK_LIBRARIES( CustusX
+  ${LINK_LIBRARIES}
+)
+
+ADD_EXECUTABLE ( reconstruct apps/cxReconstructMain.cpp )
+TARGET_LINK_LIBRARIES ( reconstruct
   ${LINK_LIBRARIES}
 )
