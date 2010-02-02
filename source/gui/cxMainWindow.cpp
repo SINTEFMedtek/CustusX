@@ -474,48 +474,14 @@ void MainWindow::activateUSAcquisitionState()
 }
 void MainWindow::deactivateUSAcquisitionState()
 {}
-void MainWindow::aboutSlot()
+  
+void MainWindow::createPatientFolders(QString choosenDir)
 {
-//  QMessageBox::about(this, tr("About CustusX"),
-//                     tr("<b>CustusX</b> is an application for IGS"));
-}
-void MainWindow::preferencesSlot()
-{
-  PreferencesDialog prefDialog(this);
-  prefDialog.exec();
-}
-void MainWindow::quitSlot()
-{
-  //TODO
-}  
-  
-void MainWindow::newPatientSlot()
-{  
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
-  QString name = QDateTime::currentDateTime().toString("yyyyMMdd'T'hhmmss");
-  name += "_";
-  name += mSettings->value("globalApplicationName").toString();
-  name += "_";
-  name += mSettings->value("globalPatientNumber").toString();
-  
-  QString choosenDir = patientDatafolder;
-  choosenDir += "/";
-  choosenDir += name;
-  // Open file dialog, get patient data folder
-  choosenDir = QFileDialog::getSaveFileName(this, 
-                                            tr("Select directory to save file in"),
-                                            choosenDir);
-  if (choosenDir == QString::null)
-    return; // On cancel
-  
-  // Update global patient number
-  int patientNumber = mSettings->value("globalPatientNumber").toInt();
-  mSettings->setValue("globalPatientNumber", ++patientNumber);
-  
   if(!choosenDir.endsWith(".cx3"))
     choosenDir.append(".cx3");
   
   // Set active patient folder. Use path relative to the globalPatientDataFolder
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   QDir patientDataDir(patientDatafolder);
   mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
   mMessageManager->sendInfo("Selected a patient to work with.");
@@ -545,6 +511,48 @@ void MainWindow::newPatientSlot()
   this->savePatientFileSlot();
 }
   
+void MainWindow::aboutSlot()
+{
+//  QMessageBox::about(this, tr("About CustusX"),
+//                     tr("<b>CustusX</b> is an application for IGS"));
+}
+void MainWindow::preferencesSlot()
+{
+  PreferencesDialog prefDialog(this);
+  prefDialog.exec();
+}
+void MainWindow::quitSlot()
+{
+  //TODO
+}  
+  
+void MainWindow::newPatientSlot()
+{  
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString name = QDateTime::currentDateTime().toString("yyyyMMdd'T'hhmmss") + "_";
+  //name += "_";
+  name += mSettings->value("globalApplicationName").toString() + "_";
+  //name += "_";
+  name += mSettings->value("globalPatientNumber").toString() + ".cx3";
+  //name += ".cx3";
+  
+  QString choosenDir = patientDatafolder + "/" + name;
+  //choosenDir += "/";
+  //choosenDir += name;
+  // Open file dialog, get patient data folder
+  choosenDir = QFileDialog::getSaveFileName(this, 
+                                            tr("Select directory to save file in"),
+                                            choosenDir);
+  if (choosenDir == QString::null)
+    return; // On cancel
+  
+  // Update global patient number
+  int patientNumber = mSettings->value("globalPatientNumber").toInt();
+  mSettings->setValue("globalPatientNumber", ++patientNumber);
+  
+  createPatientFolders(choosenDir);
+}
+
 void MainWindow::loadPatientFileSlot()
 {
   // Open file dialog
@@ -580,6 +588,10 @@ void MainWindow::loadPatientFileSlot()
       this->readLoadDoc(doc);
     }
     file.close();
+  }
+  else //User have creted the directory create xml file and folders
+  {
+    createPatientFolders(choosenDir);
   }
 }
 void MainWindow::savePatientFileSlot()

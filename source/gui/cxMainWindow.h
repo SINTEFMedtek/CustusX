@@ -101,6 +101,8 @@ protected:
   void deactivateNavigationState(); ///< Should only be used by changeState(...)!
   void activateUSAcquisitionState(); ///< Should only be used by changeState(...)!
   void deactivateUSAcquisitionState(); ///< Should only be used by changeState(...)!
+  
+  void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
 
   WorkflowState mCurrentWorkflowState; ///< the current workflow in use
 
