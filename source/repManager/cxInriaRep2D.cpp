@@ -146,8 +146,10 @@ void InriaRep2D::addRepActorsToViewRenderer(ssc::View* view)
 void InriaRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   mInria->RemoveAllDataSet();
-  mInria->SetRenderWindow(NULL);
-  mInria->SetRenderer(NULL);
+  //mInria->Uninitialize();
+  // Why???
+  //mInria->SetRenderWindow(NULL);
+  //mInria->SetRenderer(NULL);
 
   mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
                        vtkCommand::MiddleButtonPressEvent,

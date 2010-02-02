@@ -254,9 +254,21 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
   for(; itInria2DRep != inria2DRepMap->end(); ++itInria2DRep)
     if(itInria2DRep->second->hasImage(image))
       this->removeRepFromViews(itInria2DRep->second);*/
-
-  //InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+  
+  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+  View2D* view2D_1 = mView2DMap[mView2DNames[0]];
+  View2D* view2D_2 = mView2DMap[mView2DNames[1]];
+  View2D* view2D_3 = mView2DMap[mView2DNames[2]];
+  view2D_1->removeRep(inriaRep2D_1);
+  view2D_2->removeRep(inriaRep2D_2);
+  view2D_3->removeRep(inriaRep2D_3);
+  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveDataSet(image->getRefVtkImageData());
+  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
+  //this->renderAllViewsSlot();
   //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+  mMessageManager->sendInfo("Removed current image from inria views");
 }
   
 void ViewManager::activateLayout_3D_1X1()
@@ -377,20 +389,27 @@ void ViewManager::renderAllViewsSlot()
 	
 void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
 {  
+  
+  // Update 2D views
+  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+  View2D* view2D_1 = mView2DMap[mView2DNames[0]];
+  View2D* view2D_2 = mView2DMap[mView2DNames[1]];
+  View2D* view2D_3 = mView2DMap[mView2DNames[2]];
+  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  
   if (!currentImage)
   {
-    InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
-    inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
-    inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-    
-    mMessageManager->sendInfo("Removed current image from inria views");
     return;
   }
   if (!currentImage->getRefVtkImageData().GetPointer())
+  {
+    mMessageManager->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
     return;
+  }
   
   // Update 3D view
-  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
   ssc::VolumetricRepPtr volumetricRep 
   = mRepManager->getVolumetricRep("VolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
@@ -408,17 +427,9 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   view3D_1->getRenderer()->ResetCamera();
   view3D_1->getRenderer()->Render();
   
-  // Update 2D views
-  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
-
   //View2D* view2D_1 = this->get2DView("View2D_1");
   //View2D* view2D_2 = this->get2DView("View2D_2");
   //View2D* view2D_3 = this->get2DView("View2D_3");
-  View2D* view2D_1 = mView2DMap[mView2DNames[0]];
-  View2D* view2D_2 = mView2DMap[mView2DNames[1]];
-  View2D* view2D_3 = mView2DMap[mView2DNames[2]];
   view2D_1->setRep(inriaRep2D_1);
   view2D_2->setRep(inriaRep2D_2);
   view2D_3->setRep(inriaRep2D_3);
@@ -450,5 +461,7 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+  
+  mMessageManager->sendInfo("Added current image to inria views");
 }	
 }//namespace cx
