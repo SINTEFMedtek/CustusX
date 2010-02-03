@@ -7,6 +7,7 @@
 #include "vtkMatrix4x4.h"
 #include "sscTransform3D.h"
 #include "cxToolmanager.h"
+#include "cxMessagemanager.h"
 
 namespace cx
 {
@@ -20,15 +21,15 @@ RegistrationManager* RegistrationManager::getInstance()
   return mCxInstance;
 }
 RegistrationManager::RegistrationManager() :
-  mToolManager(ToolManager::getInstance())
-{
-  //TODO
-}
+  mToolManager(ToolManager::getInstance()),
+  mMessageManager(MessageManager::getInstance())
+{}
 RegistrationManager::~RegistrationManager()
 {}
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
   mMasterImage = image;
+  mMessageManager->sendInfo("Master image set to "+image->getUID());
 }
 ssc::ImagePtr RegistrationManager::getMasterImage()
 {
@@ -41,6 +42,7 @@ bool RegistrationManager::isMasterImageSet()
 void RegistrationManager::setGlobalPointSet(vtkDoubleArrayPtr pointset)
 {
   mGlobalPointSet = pointset;
+  mMessageManager->sendInfo("Global point set is set.");
 }
 vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
 {
@@ -49,18 +51,11 @@ vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
 void RegistrationManager::setGlobalPointSetNameList(RegistrationManager::NameListType nameList)
 {
   mGlobalPointSetNameList = nameList;
+  mMessageManager->sendInfo("Global point set name list is set.");
 }
 RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList()
 {
   return mGlobalPointSetNameList;
-}
-void RegistrationManager::setActivePointsMap(std::map<int, bool> vector)
-{
-  mActivePointsMap = vector;
-}
-std::map<int, bool> RegistrationManager::getActivePointsMap()
-{
-  return mActivePointsMap;
 }
 void RegistrationManager::doPatientRegistration()
 {
@@ -85,8 +80,8 @@ void RegistrationManager::doPatientRegistration()
       double* targetPoint = imagePoints->GetTuple(j);
       if(sourcePoint[3] == targetPoint[3])
       {
-        std::map<int, bool>::iterator it = mActivePointsMap.find(sourcePoint[3]);
-        if(it->second)
+        NameListType::iterator it = mGlobalPointSetNameList.find(sourcePoint[3]);
+        if(it->second.second)
         {
           // Insert pointset if state is active
           sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
@@ -108,6 +103,8 @@ void RegistrationManager::doPatientRegistration()
 
   ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
   mToolManager->set_rMpr(rMprPtr);
+
+  mMessageManager->sendInfo("Patient registration has been performed.");
 }
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 {
@@ -129,8 +126,8 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
       double* targetPoint = masterImagePoints->GetTuple(j);
       if(sourcePoint[3] == targetPoint[3])
       {
-        std::map<int, bool>::iterator it = mActivePointsMap.find(sourcePoint[3]);
-        if(it->second)
+        NameListType::iterator it = mGlobalPointSetNameList.find(sourcePoint[3]);
+        if(it->second.second)
         {
           sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
           targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
@@ -149,8 +146,10 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //set the transform on the image
   vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
   ssc::Transform3D transform(matrix);
-  //image->setTransform(transform);
+  //image->setTransform(transform); TODO remove?
   image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
+
+  mMessageManager->sendInfo("Image registration has been performed.");
 }
 
 void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
@@ -162,10 +161,12 @@ void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
   if(it != mGlobalPointSetNameList.end())
   {
     it->second.first = name;
+    mMessageManager->sendInfo("Updated name for existing global point to: "+name);
   }
   else
   {
     mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,true)));
+    mMessageManager->sendInfo("Created new global point name with name: "+name);
   }
 }
 void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
@@ -175,10 +176,12 @@ void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
   if(it != mGlobalPointSetNameList.end())
   {
     it->second.second = active;
+    mMessageManager->sendInfo("Updated status to for existing point.");
   }
   else
   {
     mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,active)));
+    mMessageManager->sendInfo("Added new point with active status.");
   }
 }
 }//namespace cx

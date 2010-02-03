@@ -13,8 +13,9 @@ typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
 namespace cx
 {
 class ToolManager;
+class MessageManager;
 
-/**
+/**\
  * \class RegistrationManager
  *
  * \brief This class manages (image- and patient-) registration specific details.
@@ -26,10 +27,9 @@ class RegistrationManager : public QObject
 {
   Q_OBJECT
 
-
 public:
-  typedef std::pair<std::string, bool> StringBoolPair;
-  typedef std::map<int, StringBoolPair> NameListType;
+  typedef std::pair<std::string, bool> StringBoolPair; ///< name and if the point is active or not
+  typedef std::map<int, StringBoolPair> NameListType; ///< landmarkindex, name and if point is active or not
 
   static RegistrationManager* getInstance(); ///< get the only instance of this class
 
@@ -40,11 +40,8 @@ public:
   void setGlobalPointSet(vtkDoubleArrayPtr pointset); ///< set a global point set used to register against
   vtkDoubleArrayPtr getGlobalPointSet(); ///< get the global point set
 
-  void setGlobalPointSetNameList(NameListType nameList); ///< set user specific names on the gloal points
+  void setGlobalPointSetNameList(NameListType nameList); ///< set user specific names on the global points
   NameListType getGlobalPointSetNameList(); ///< get a map of the names
-
-  void setActivePointsMap(std::map<int, bool> activePointsMap); ///< set which points should be used when doing the registration
-  std::map<int, bool> getActivePointsMap(); ///< get a map of which points to use when doing the registration
 
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
@@ -60,11 +57,11 @@ protected:
   static RegistrationManager* mCxInstance; ///< the only instance of this class
 
   ToolManager* mToolManager; ///< interface to the navigation system
+  MessageManager* mMessageManager; ///< takes messages intended for the user
 
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
   vtkDoubleArrayPtr mGlobalPointSet; ///< the pointset used when doing the registration
   NameListType mGlobalPointSetNameList; ///< names of the points in the global point set
-  std::map<int, bool> mActivePointsMap; ///< a list of which points to use when doing the registration
 
 private:
   RegistrationManager(RegistrationManager const&); ///< not implemented
