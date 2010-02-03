@@ -283,14 +283,32 @@ void Image::addXml(QDomNode& parentNode)
   imageNode.appendChild(nameNode);
 
   mImageTransferFunctions3D->addXml(imageNode);
+
+  QDomElement landmarksNode = doc.createElement("landmarks");
+  for(int i=0; i< mLandmarks->GetNumberOfTuples(); i++)
+  {
+    double* landmark = mLandmarks->GetTuple(i);
+    std::stringstream stream;
+    stream << landmark[3] << " "
+           << landmark[0] << " "
+           << landmark[1] << " "
+           << landmark[2];
+    QDomElement landmarkNode = doc.createElement("landmark");
+    landmarkNode.appendChild(doc.createTextNode(stream.str().c_str()));
+    landmarksNode.appendChild(landmarkNode);
+  }
+  imageNode.appendChild(landmarksNode);
+
 }
 void Image::parseXml(QDomNode& dataNode)
 {
+  // image node must be parsed in the data manager to create this Image object
+  // Only subnodes are parsed here
+
 	if (dataNode.isNull())
 		return;
 	
-	// image node must be parsed in the data manager to create this Image object
-	// Only subnodes are parsed here
+	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
 	if (!transferfunctionsNode.isNull())
 		mImageTransferFunctions3D->parseXml(transferfunctionsNode);
@@ -299,6 +317,23 @@ void Image::parseXml(QDomNode& dataNode)
 		std::cout << "Warning: Image::parseXml() found no transferfunctions";
 		std::cout << std::endl;
 	}
+
+	//landmarks
+	QDomNode landmarksNode = dataNode.namedItem("landmarks");
+	if(landmarksNode.isNull())
+	  return;
+	if(!landmarksNode.hasChildNodes())
+	  return; //this image dosn't have landmarks
+	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
+	do
+	{
+	  QStringList landmark = landmarkNode.toElement().text().split(" ");
+	  this->addLandmarkSlot(landmark[1].toDouble(), landmark[2].toDouble(),
+                          landmark[3].toDouble(), landmark[0].toInt());
+	  landmarkNode = landmarkNode.nextSiblingElement("landmark");
+	}
+	while(!landmarkNode.isNull());
+
 }
 
 //struct InternalData

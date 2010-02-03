@@ -29,6 +29,9 @@ namespace ssc
 
 /**One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
+ *
+ * warning Landmarks are only used by SINTEF atm, so they can change the code
+ * at any given point.
  */
 class Image : public Data
 {
