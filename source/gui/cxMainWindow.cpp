@@ -58,19 +58,15 @@ MainWindow::MainWindow() :
   // Initialize settings if empty
   if (!mSettings->contains("globalPatientDataFolder"))
     mSettings->setValue("globalPatientDataFolder", QDir::homePath());
-  //if (!mSettings->contains("mainWindow/importDataFolder"))
-  //  mSettings->setValue("mainWindow/importDataFolder", ".");
   if (!mSettings->contains("toolConfigFilePath"))
     mSettings->setValue("toolConfigFilePath", QDir::homePath());
-  
   if (!mSettings->contains("globalApplicationName"))
     mSettings->setValue("globalApplicationName", "Nevro");
   if (!mSettings->contains("globalPatientNumber"))
     mSettings->setValue("globalPatientNumber", 1);
-  
   if (!mSettings->contains("applicationNames"))
     mSettings->setValue("applicationNames", "Nevro,Lap,Kar");
-  
+
   //debugging
   connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
@@ -770,7 +766,8 @@ void MainWindow::configureSlot()
   }
   mToolManager->setConfigurationFile(configFile.toStdString());
 
-  QString loggingPath = mSettings->value("globalPatientDataFolder").toString()+"/Logs/";
+  QString loggingPath = mSettings->value("globalPatientDataFolder").toString()
+                        +"/"+mActivePatientFolder+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {

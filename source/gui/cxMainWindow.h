@@ -67,7 +67,7 @@ protected slots:
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
 
-  //degugging
+  //logging
   void loggingSlot(const QString& message, int timeout); ///< prints messages for debugging
   
 protected:
@@ -168,7 +168,7 @@ protected:
   ImageRegistrationWidget* mImageRegistrationWidget; ///< interface for image registration
   PatientRegistrationWidget* mPatientRegistrationWidget; ///< interface for patient registration
   TransferFunctionWidget* mTransferFunctionWidget;
-  CustomStatusBar* mCustomStatusBar; //TODO, not working yet
+  CustomStatusBar* mCustomStatusBar; //TODO, needs some work
   int mImageRegistrationIndex, mPatientRegistrationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences
