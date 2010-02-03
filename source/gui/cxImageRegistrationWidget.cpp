@@ -1,5 +1,6 @@
 #include "cxImageRegistrationWidget.h"
 
+#include <sstream>
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QTableWidget>
@@ -72,11 +73,13 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
   }
 
-  mLandmarkActiveMap = mRegistrationManager->getActivePointsMap();
+  //if there isn't a new image available
+  if(!currentImage)
+    return;
 
   //Set new current image
   mCurrentImage = currentImage;
-  if (currentImage)// Don't use image if deleted
+  if(mCurrentImage)// Don't use image if deleted
   {
     connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
             this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
@@ -142,16 +145,18 @@ void ImageRegistrationWidget::landmarkSelectedSlot(int row, int column)
 
   mEditLandmarkButton->setEnabled(true);
 }
+void ImageRegistrationWidget::showEvent(QShowEvent* event)
+{
+  QWidget::showEvent(event);
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+}
 void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
-  if(!image)
+  if(!image) //Image is deleted
   {
-    //Image is deleted
     mLandmarkTableWidget->clear();
     return;
   }
-  //get globalPointsNameList from the RegistrationManager
-  RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
 
   //get the landmarks from the image
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
@@ -161,7 +166,7 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
   mLandmarkTableWidget->clear();
   mLandmarkTableWidget->setRowCount(0);
   mLandmarkTableWidget->setColumnCount(3);
-  QStringList headerItems(QStringList() << "Active" << "Name" << "Landmark");
+  QStringList headerItems(QStringList() << "Name" << "Status" << "Landmark");
   mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
   mLandmarkTableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -173,9 +178,9 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
     double* landmark = landmarks->GetTuple(i);
     if(landmark[3] > mLandmarkTableWidget->rowCount())
       mLandmarkTableWidget->setRowCount(landmark[3]);
-    QTableWidgetItem* columnOne;
-    QTableWidgetItem* columnTwo;
-    QTableWidgetItem* columnThree;
+    QTableWidgetItem* columnOne; //Name
+    QTableWidgetItem* columnTwo; //Status
+    QTableWidgetItem* columnThree; //Image coordinates
 
     int rowToInsert = landmark[3]-1;
     int tempRow = -1;
@@ -198,20 +203,23 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
         columnTwo = new QTableWidgetItem();
         columnThree = new QTableWidgetItem();
       }
-      //check the mLandmarkActiveVector...
-      int index =  row+1;
-      std::map<int, bool>::iterator it = mLandmarkActiveMap.find(index);
-      if(it != mLandmarkActiveMap.end())
+      //check the LandmarkActiveMap...
+      //mapindex starts at 0 and tablerow and coloumns start at 0,0
+      RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+      int index = row;
+      RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(index);
+      if(it != landmarkActiveMap.end())
       {
-        if(!it->second)
-          columnOne->setCheckState(Qt::Unchecked);
+        if(!it->second.second)
+          columnTwo->setCheckState(Qt::Unchecked);
         else
-          columnOne->setCheckState(Qt::Checked);
+          columnTwo->setCheckState(Qt::Checked);
       }
-      else
+      else //if the landmark wasn't in the map it should be added
       {
-        mLandmarkActiveMap[index] = true;
-        columnOne->setCheckState(Qt::Checked);
+        //send update to registrationmanage
+        mRegistrationManager->setGlobalPointsActiveSlot(index, true);
+        columnTwo->setCheckState(Qt::Checked);
       }
       columnThree->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
@@ -221,31 +229,39 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
     if(tempRow != -1)
       row = tempRow;
   }
+  //get globalPointsNameList from the RegistrationManager
+  RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
   //fill in names
   typedef RegistrationManager::NameListType::iterator Iterator;
   for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
   {
     std::string name = it->second.first;
     int index = it->first;
-    int row = index-1;
-    QTableWidgetItem* columnTwo;
+    int row = index;
+    QTableWidgetItem* columnOne;
+
+    /* TODO just for debugging...
+    std::stringstream stream;
+    stream << "Index: " << index << ", row: " << row << ", rowcount: " << mLandmarkTableWidget->rowCount();
+    mMessageManager->sendInfo(stream.str());*/
 
     if(index > mLandmarkTableWidget->rowCount())
     {
       mLandmarkTableWidget->setRowCount(index);
-      columnTwo = new QTableWidgetItem();
+      columnOne = new QTableWidgetItem();
       QTableWidgetItem* columnThree = new QTableWidgetItem();
       columnThree->setFlags(Qt::ItemIsSelectable);
-      mLandmarkTableWidget->setItem(row, 1, columnTwo);
+      mLandmarkTableWidget->setItem(row, 1, columnOne);
       mLandmarkTableWidget->setItem(row, 2, columnThree);
     }
     else
     {
-      columnTwo = mLandmarkTableWidget->item(row, 1);
-/*      if(columnTwo == NULL) //TODO: remove
-        std::cout << "columnOne == NULL!!!" << std::endl;*/
+      columnOne = mLandmarkTableWidget->item(row, 1);
+      /*if(columnOne == NULL) //TODO: remove
+        mMessageManager->sendError("columnOne == NULL");*/
     }
-    columnTwo->setText(QString(name.c_str()));
+    if(columnOne != NULL && !name.empty())
+      columnOne->setText(QString(name.c_str()));
   }
 
   //highlight selected row
@@ -267,16 +283,19 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
 }
 void ImageRegistrationWidget::cellChangedSlot(int row,int column)
 {
-  if(column==0)
+  /*std::stringstream stream;
+  stream << "Cell(" << row << "," << column << ") changed.";
+  mMessageManager->sendInfo(stream.str());*/
+  if(column==1)
   {
     Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
-    mLandmarkActiveMap[row] = state;
+    mRegistrationManager->setGlobalPointsActiveSlot(row, state);
   }
 
-  if(column == 1)
+  if(column==0)
   {
     std::string name = mLandmarkTableWidget->item(row, column)->text().toStdString();
-    int index = row+1;
+    int index = row;
     mRegistrationManager->setGlobalPointsNameSlot(index, name);
   }
 }

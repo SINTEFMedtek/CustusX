@@ -31,6 +31,9 @@ class ImageRegistrationWidget : public QWidget
   Q_OBJECT
 
 public:
+  typedef std::vector<double> Point3D; ///<
+  typedef std::map<int, Point3D> Landmarks; ///<
+
   ImageRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   ~ImageRegistrationWidget(); ///< empty
 
@@ -43,8 +46,8 @@ protected slots:
   void landmarkSelectedSlot(int row, int column); ///<
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
 
-
 protected:
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
 
   //gui
@@ -62,7 +65,6 @@ protected:
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
-  std::map<int, bool> mLandmarkActiveMap; ///< mapping which landmarks are active (is going to be used when calculating the matrix)
   int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
 
 private:
