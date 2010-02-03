@@ -51,6 +51,7 @@ protected slots:
   void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
 
 protected:
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
   void updateAccuracy(); ///< calculates accuracy for each landmark after a registration
   void doPatientRegistration(); ///< initializes patient registration
@@ -70,8 +71,7 @@ protected:
 
   //data
   int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
-  std::map<int, bool> mLandmarkActiveMap; ///< mapping which landmarks are active (is going to be used when calculating the matrix)
-  std::map<int, double> mLandmarkRegistrationAccuracyMap; ///<
+  std::map<int, double> mLandmarkRegistrationAccuracyMap; ///< maps accuracy to index of a landmark
   double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
   ToolPtr mToolToSample; ///< tool to be sampled from
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration

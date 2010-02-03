@@ -80,11 +80,8 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
     disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    mMessageManager->sendInfo("Disconnected from old image "+mCurrentImage->getUid());
   }
-
-  //save active points before changing image
-  mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
-  mLandmarkActiveMap = mRegistrationManager->getActivePointsMap(); //TODO is this correct?
 
   mCurrentImage = currentImage;
 
@@ -102,9 +99,6 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
 }
 void PatientRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
 {
-  //update the active vector in registration manager
-  mRegistrationManager->setActivePointsMap(mLandmarkActiveMap);
-
   //repopulate the tablewidget
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
@@ -112,10 +106,11 @@ void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double no
 {
   int numberOfToolSamples = mToolManager->getToolSamples()->GetNumberOfTuples();
   int numberOfActiveToolSamples = 0;
-  std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
-  while(it != mLandmarkActiveMap.end())
+  RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+  RegistrationManager::NameListType::iterator it = landmarkActiveMap.begin();
+  while(it != landmarkActiveMap.end())
   {
-    if(it->second)
+    if(it->second.second)
       numberOfActiveToolSamples++;
     it++;
   }
@@ -155,11 +150,11 @@ void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
 }
 void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 {
-  if (column!=0)
+  if (column!=1) //can only make changes to the status (landmark active or not)
     return;
 
   Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
-  mLandmarkActiveMap[row] = state;
+  mRegistrationManager->setGlobalPointsActiveSlot(row, state);
 
 }
 void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
@@ -191,6 +186,11 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   //update button
   mToolSampleButton->setEnabled(mToolToSample->getVisible());
 }
+void PatientRegistrationWidget::showEvent(QShowEvent* event)
+{
+  QWidget::showEvent(event);
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+}
 void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
   if (!image)
@@ -208,8 +208,8 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
   //ready the table widget
   mLandmarkTableWidget->clear();
   mLandmarkTableWidget->setRowCount(0);
-  mLandmarkTableWidget->setColumnCount(3);
-  QStringList headerItems(QStringList() << "Active" << "Name" << "Accuracy");
+  mLandmarkTableWidget->setColumnCount(4);
+  QStringList headerItems(QStringList() << "Name" << "Status" << "Patient coordinates" << "Accuracy");
   mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
   mLandmarkTableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -224,9 +224,10 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
 
     if(landmark[3] > mLandmarkTableWidget->rowCount())
       mLandmarkTableWidget->setRowCount(landmark[3]);
-    QTableWidgetItem* columnOne;
-    QTableWidgetItem* columnTwo;
-    QTableWidgetItem* columnThree;
+    QTableWidgetItem* columnOne; //name
+    QTableWidgetItem* columnTwo; //status
+    QTableWidgetItem* columnThree; //patient coordinates
+    QTableWidgetItem* columnFour; //accuracy
 
     int rowToInsert = landmark[3]-1;
     int tempRow = -1;
@@ -239,35 +240,39 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     {
       if(row == rowToInsert)
       {
-        columnOne = new QTableWidgetItem();
-        columnTwo = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
-        columnThree = new QTableWidgetItem(tr("%1").arg(landmarkRegistrationAccuracy));
+        columnOne = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
+        columnTwo = new QTableWidgetItem();
+        columnThree = new QTableWidgetItem();
+        columnFour = new QTableWidgetItem(tr("%1").arg(landmarkRegistrationAccuracy));
       }
       else
       {
         columnOne = new QTableWidgetItem();
         columnTwo = new QTableWidgetItem();
         columnThree = new QTableWidgetItem();
+        columnFour = new QTableWidgetItem();
       }
       //check the mLandmarkActiveVector...
-      std::map<int, bool>::iterator it = mLandmarkActiveMap.find(row);
-      if(it != mLandmarkActiveMap.end())
+      RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+      RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(row);
+      if(it != landmarkActiveMap.end())
       {
-        if(!it->second)
-          columnOne->setCheckState(Qt::Unchecked);
+        if(!it->second.second)
+          columnTwo->setCheckState(Qt::Unchecked);
         else
-          columnOne->setCheckState(Qt::Checked);
+          columnTwo->setCheckState(Qt::Checked);
       }
       else
       {
-        mLandmarkActiveMap[row] = true;
-        columnOne->setCheckState(Qt::Checked);
+        columnTwo->setCheckState(Qt::Checked);
+        mRegistrationManager->setGlobalPointsActiveSlot(row, true);
       }
-      columnTwo->setFlags(Qt::ItemIsSelectable);
-      columnThree->setFlags(Qt::ItemIsSelectable);
+      columnOne->setFlags(Qt::ItemIsSelectable);
+      columnFour->setFlags(Qt::ItemIsSelectable);
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
       mLandmarkTableWidget->setItem(row, 2, columnThree);
+      mLandmarkTableWidget->setItem(row, 3, columnFour);
     }
     if(tempRow != -1)
       row = tempRow;
@@ -278,22 +283,24 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
   {
     std::string name = it->second.first;
     int index = it->first;
-    int row = index-1;
-    QTableWidgetItem* columnTwo;
+    int row = index;
+    QTableWidgetItem* columnOne;
 
-    if(index > mLandmarkTableWidget->rowCount())
+    if(mLandmarkTableWidget->rowCount() == 0 ||
+       index > mLandmarkTableWidget->rowCount()) //we need more rows
     {
       mLandmarkTableWidget->setRowCount(index);
-      columnTwo = new QTableWidgetItem();
-      mLandmarkTableWidget->setItem(row, 1, columnTwo);
+      columnOne = new QTableWidgetItem();
+      mLandmarkTableWidget->setItem(row, 0, columnOne);
     }
-    else
+    else //we have all the rows we need atm
     {
-      columnTwo = mLandmarkTableWidget->item(row, 1);
-/*      if(columnTwo == NULL) //TODO: remove
-        std::cout << "columnTwo == NULL!!!" << std::endl;*/
+      columnOne = mLandmarkTableWidget->item(row, 0);
+      /*if(columnOne == NULL) //TODO: remove
+        mMessageManager->sendError("Patient.Reg: columnOne == NULL!!!");*/
     }
-    columnTwo->setText(QString(name.c_str()));
+    if(columnOne != NULL && !name.empty())
+      columnOne->setText(QString(name.c_str()));
   }
 }
 void PatientRegistrationWidget::updateAccuracy()
@@ -324,10 +331,12 @@ void PatientRegistrationWidget::updateAccuracy()
       if(sourcePoint[3] == targetPoint[3])
       {
         //check the mLandmarkActiveVector...
-        std::map<int, bool>::iterator it = mLandmarkActiveMap.find(sourcePoint[3]);
-        if(it != mLandmarkActiveMap.end())
+        //std::map<int, bool> landmarkActiveMap = mRegistrationManager->getActivePointsMap();
+        RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+        RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]);
+        if(it != landmarkActiveMap.end())
         {
-          if(!it->second)
+          if(!it->second.second)
           {
             // Calculate accuracy - Set mLandmarkAccuracy
             ssc::Vector3D sourcePointVector(sourcePoint[0],
@@ -351,10 +360,11 @@ void PatientRegistrationWidget::updateAccuracy()
 
   // Calculate total registration accuracy
   mAverageRegistrationAccuracy = 0;
-  std::map<int, bool>::iterator it = mLandmarkActiveMap.begin();
+  RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+  RegistrationManager::NameListType::iterator it = landmarkActiveMap.begin();
   for (int i=0; i < numberOfGlobalImagePoints; i++)
   {
-    if(it->second)
+    if(it->second.second)
     {
       mAverageRegistrationAccuracy = mAverageRegistrationAccuracy +
                                     mLandmarkRegistrationAccuracyMap[i];
