@@ -22,7 +22,7 @@ DataManager::~DataManager()
 void DataManager::deleteImageSlot(ssc::ImagePtr image)
 {
   mImages.erase(image->getUid());
-  emit currentImageDeleted();
+  emit currentImageDeleted(image);
 }
 
 void DataManager::addXml(QDomNode& parentNode)

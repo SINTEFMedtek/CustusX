@@ -27,7 +27,7 @@ public:
   void parseXml(QDomNode& node);
 
 signals:
-  void currentImageDeleted(); ///< emitted when data is deleted
+  void currentImageDeleted(ssc::ImagePtr image); ///< emitted when data is deleted
   
 public slots:
   void deleteImageSlot(ssc::ImagePtr image); ///< Deletes image and emits dataDeleted signal

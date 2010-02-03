@@ -237,6 +237,7 @@ void ViewManager::setLayoutTo_ACSACS_2X3()
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
+  mMessageManager->sendInfo("Delete image: "+image->getName());
   VolumetricRepMap* volRepMap = mRepManager->getVolumetricReps();
   VolumetricRepMap::iterator itVolRep = volRepMap->begin();
   for(; itVolRep != volRepMap->end(); ++itVolRep)
@@ -258,17 +259,38 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
   InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
   InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
   InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
-  View2D* view2D_1 = mView2DMap[mView2DNames[0]];
-  View2D* view2D_2 = mView2DMap[mView2DNames[1]];
-  View2D* view2D_3 = mView2DMap[mView2DNames[2]];
-  view2D_1->removeRep(inriaRep2D_1);
-  view2D_2->removeRep(inriaRep2D_2);
-  view2D_3->removeRep(inriaRep2D_3);
-  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveDataSet(image->getRefVtkImageData());
-  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-  //this->renderAllViewsSlot();
-  //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
-  mMessageManager->sendInfo("Removed current image from inria views");
+  
+  //Don't work?
+  //if(inriaRep2D_1->getVtkViewImage2D()->HasDataSet(image->getRefVtkImageData()))
+  if(inriaRep2D_1->hasImage(image))
+  {  
+    View2D* view2D_1 = mView2DMap[mView2DNames[0]];
+    View2D* view2D_2 = mView2DMap[mView2DNames[1]];
+    View2D* view2D_3 = mView2DMap[mView2DNames[2]];
+    view2D_1->removeRep(inriaRep2D_1);
+    view2D_2->removeRep(inriaRep2D_2);
+    view2D_3->removeRep(inriaRep2D_3);
+    //Don't work?
+    inriaRep2D_1->getVtkViewImage2D()->SyncRemoveDataSet(image->getRefVtkImageData());
+    
+    // Test: create small dummy data set with one voxel
+    vtkImageDataPtr dummyImageData = vtkImageData::New();
+    dummyImageData->SetExtent(0,0,0,0,0,0);
+    dummyImageData->SetSpacing(1,1,1);
+    //dummyImageData->SetScalarTypeToUnsignedShort();
+    dummyImageData->SetScalarTypeToUnsignedChar();
+    dummyImageData->SetNumberOfScalarComponents(1);
+    dummyImageData->AllocateScalars();
+    unsigned char* dataPtr = static_cast<unsigned char*>(dummyImageData->GetScalarPointer());
+    dataPtr = 0;//Set voxel to black
+    inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(dummyImageData);
+    inriaRep2D_1->getVtkViewImage2D()->SyncReset();
+    
+    //this->renderAllViewsSlot();
+    //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
+    emit imageDeletedFromViews(image);
+    mMessageManager->sendInfo("Removed current image from inria views");
+  }
 }
   
 void ViewManager::activateLayout_3D_1X1()
@@ -394,6 +416,9 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
   InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
   InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+  inriaRep2D_1->setImage(currentImage);
+  inriaRep2D_2->setImage(currentImage);
+  inriaRep2D_3->setImage(currentImage);
   View2D* view2D_1 = mView2DMap[mView2DNames[0]];
   View2D* view2D_2 = mView2DMap[mView2DNames[1]];
   View2D* view2D_3 = mView2DMap[mView2DNames[2]];
@@ -462,6 +487,6 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   
-  mMessageManager->sendInfo("Added current image to inria views");
+  //mMessageManager->sendInfo("Added current image to inria views");
 }	
 }//namespace cx

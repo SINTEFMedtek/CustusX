@@ -52,7 +52,7 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   // Delete image
   connect(this, SIGNAL(deleteImage(ssc::ImagePtr)),
           mDataManager, SLOT(deleteImageSlot(ssc::ImagePtr)));
-  connect(this, SIGNAL(deleteImage(ssc::ImagePtr)),
+  connect(mDataManager, SIGNAL(currentImageDeleted(ssc::ImagePtr)),
           mViewManager, SLOT(deleteImageSlot(ssc::ImagePtr)));
   
 }
@@ -85,7 +85,7 @@ void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
   {
     connect(mDataManager, SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBoxSlot()));
-    connect(mDataManager, SIGNAL(currentImageDeleted()),
+    connect(mViewManager, SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
             this, SLOT(populateTheImageComboBoxSlot()));
     this->populateTheImageComboBoxSlot();
   }
@@ -93,8 +93,8 @@ void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
   {
     disconnect(mDataManager, SIGNAL(dataLoaded()),
                this, SLOT(populateTheImageComboBoxSlot()));
-    disconnect(mDataManager, SIGNAL(currentImageDeleted()),
-            this, SLOT(populateTheImageComboBoxSlot()));
+    disconnect(mViewManager, SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
+               this, SLOT(populateTheImageComboBoxSlot()));
   }
 }
 void ContextDockWidget::populateTheImageComboBoxSlot()
@@ -124,6 +124,7 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
   
 void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
+  //mMessageManager->sendInfo("New image selected: "+comboBoxText.toStdString());
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
   {
     // Create empty current image

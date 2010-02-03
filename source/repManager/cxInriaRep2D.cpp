@@ -31,7 +31,7 @@ InriaRep2D::~InriaRep2D()
 std::string InriaRep2D::getType() const
 {
   return mType;
-}
+} 
 void InriaRep2D::connectToView(ssc::View *theView)
 {
   if(isConnectedToView(theView))

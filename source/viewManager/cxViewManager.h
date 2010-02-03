@@ -57,6 +57,9 @@ public:
   View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
   View3D* get3DView(const std::string& uid); ///< returns a 3D view with a given uid
 
+signals:
+  void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
+
 public slots:
   void setLayoutTo_3D_1X1();    ///< sets the layout to 3D_1X1
   void setLayoutTo_3DACS_2X2(); ///< sets the layout to 3DACS_2X2
