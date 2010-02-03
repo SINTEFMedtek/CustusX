@@ -17,6 +17,10 @@ namespace cx
  *
  * \author Janne Beate Lervik Bakeng, SINTEF Health Research
  * \date 16.10.2008
+ *
+ *TODO Sender should be added to the message
+ *TODO Enable/disable info, warnings and errors
+ *
  */
 class MessageManager : public QObject
 {
