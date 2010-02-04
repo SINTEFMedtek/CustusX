@@ -68,11 +68,12 @@ void CustomStatusBar::disconnectFromToolSignals()
     QLabel* colorLabel = it2->second;
     this->removeWidget(textLabel);
     this->removeWidget(colorLabel);
-    mToolColorMap.erase(it2);
 
     //RemoveWidget does not delete the widget but hides it...
     delete textLabel;
     delete colorLabel;
+    
+    mToolColorMap.erase(it2);
 
     it2++;
   }
