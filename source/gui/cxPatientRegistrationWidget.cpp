@@ -148,11 +148,11 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 
   if(mCurrentRow == -1)
     mCurrentRow = 0;
-  unsigned int index = mCurrentRow;
+  unsigned int index = mCurrentRow+1;
   
   //TODO REMOVE just for debugging
   std::stringstream message;
-  message<<"Sampling row "<<mCurrentRow<<" for landmark "<<index;
+  message<<"Sampling row "<<mCurrentRow<<" for LANDMARK: "<<index;
   mMessageManager->sendWarning(message.str());
   //END
   
@@ -162,10 +162,16 @@ void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
 {
   mCurrentRow = row;
   mCurrentColumn = column;
+  
+  //TODO REMOVE just for debugging
+  std::stringstream stream;
+  stream<<"You clicked cell: ("<<mCurrentRow<<","<<mCurrentColumn<<").";
+  mMessageManager->sendInfo(stream.str());
+  //END
 }
 void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 {
-  if (column!=1) //can only make changes to the status (landmark active or not)
+  if(column!=1) //can only make changes to the status (landmark active or not)
     return;
 
   Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
@@ -282,8 +288,36 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
         columnTwo->setCheckState(Qt::Checked);
         mRegistrationManager->setGlobalPointsActiveSlot(row, true);
       }
-      columnOne->setFlags(Qt::ItemIsSelectable);
-      columnFour->setFlags(Qt::ItemIsSelectable);
+      //set flags and add the item to the table
+      //TODO dosnt work
+      /*columnOne->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate); //name should be editable and selectable
+      columnTwo->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate);//status should be ?
+      columnThree->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate);//tool coords. should be ?
+      columnFour->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate);//accuracy should be ?*/
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
       mLandmarkTableWidget->setItem(row, 2, columnThree);
@@ -306,6 +340,15 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     {
       mLandmarkTableWidget->setRowCount(index);
       columnOne = new QTableWidgetItem();
+      //set flags and add the item to the table
+      //TODO dosnt work
+      /*columnOne->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate);//name should be selectable and editable*/ 
       mLandmarkTableWidget->setItem(row, 0, columnOne);
     }
     else //we have all the rows we need atm
@@ -320,16 +363,16 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
   int numberOfToolSamples = toolsamples->GetNumberOfTuples();
  
   //TODO REMOVE for debugging
-  std::stringstream stream;
+  /*std::stringstream stream;
   stream<<"Number of tools sampled: "<<numberOfToolSamples;
-  mMessageManager->sendWarning(stream.str());
+  mMessageManager->sendWarning(stream.str());*/
   //END
 
   //fill in toolsamples
   for(int i=0; i<numberOfToolSamples; i++)
   {
     double* toolSample = toolsamples->GetTuple(i);
-    int row = toolSample[3];
+    int row = toolSample[3]-1;
     QTableWidgetItem* columnThree = mLandmarkTableWidget->item(row, 2);
     if(columnThree == NULL)
     {
@@ -366,14 +409,15 @@ void PatientRegistrationWidget::updateAccuracy()
     {
       double* targetPoint = globalPointset->GetTuple(i);
       double* sourcePoint = toolSamplePointset->GetTuple(j);
+      
       if(sourcePoint[3] == targetPoint[3])
       {
         //check the mLandmarkActiveVector...
         RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
-        RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]);
+        RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]-1);
         if(it != landmarkActiveMap.end())
         {
-          if(!it->second.second)
+          if(it->second.second)
           {
             // Calculate accuracy - Set mLandmarkAccuracy
             ssc::Vector3D sourcePointVector(sourcePoint[0],
@@ -385,6 +429,13 @@ void PatientRegistrationWidget::updateAccuracy()
             double yAccuracy = targetPoint[1] - transformedPointVector[1];
             double zAccuracy = targetPoint[2] - transformedPointVector[2];
 
+            //TODO REMOVE
+            /*std::stringstream stream;
+            stream<<"Landmark: "<<targetPoint[3]<<" ("<<targetPoint[0]<<","<<targetPoint[1]<<","<<targetPoint[2]<<")"<<std::endl;
+            stream<<"Toolpoint: "<<sourcePoint[3]<<" ("<<sourcePoint[0]<<","<<sourcePoint[1]<<","<<sourcePoint[2]<<")"<<std::endl;
+            mMessageManager->sendInfo(stream.str());*/
+            //END
+            
             mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =
                 sqrt(pow(xAccuracy,2) +
                      pow(yAccuracy,2) +

@@ -228,7 +228,23 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
         mRegistrationManager->setGlobalPointsActiveSlot(index, true);
         columnTwo->setCheckState(Qt::Checked);
       }
-      columnThree->setFlags(Qt::ItemIsSelectable);
+      //Set item properties and add the items to the table
+      //TODO dosnt work, makes every cell inactive...
+      /*columnOne->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate); //name should be selectable and editable
+      columnTwo->setFlags(!Qt::ItemIsEditable); //status shouldnt allow writing in the cell
+      columnThree->setFlags(Qt::ItemIsSelectable &&
+                            Qt::ItemIsEditable &&
+                            !Qt::ItemIsDragEnabled &&
+                            !Qt::ItemIsDropEnabled &&
+                            !Qt::ItemIsUserCheckable &&
+                            !Qt::ItemIsEnabled &&
+                            !Qt::ItemIsTristate);//image coords should be selectable*/
       mLandmarkTableWidget->setItem(row, 0, columnOne);
       mLandmarkTableWidget->setItem(row, 1, columnTwo);
       mLandmarkTableWidget->setItem(row, 2, columnThree);
@@ -252,7 +268,23 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
       mLandmarkTableWidget->setRowCount(index);
       columnOne = new QTableWidgetItem();
       QTableWidgetItem* columnThree = new QTableWidgetItem();
-      columnThree->setFlags(Qt::ItemIsSelectable);
+      
+      //Set item properties and add the items to the table
+      //TODO dosnt work, makes every cell inactive...
+      /*columnOne->setFlags(Qt::ItemIsSelectable &&
+                          Qt::ItemIsEditable &&
+                          !Qt::ItemIsDragEnabled &&
+                          !Qt::ItemIsDropEnabled &&
+                          !Qt::ItemIsUserCheckable &&
+                          !Qt::ItemIsEnabled &&
+                          !Qt::ItemIsTristate); //name should be selectable and editable
+      columnThree->setFlags(Qt::ItemIsSelectable &&
+                            !Qt::ItemIsEditable &&
+                            !Qt::ItemIsDragEnabled &&
+                            !Qt::ItemIsDropEnabled &&
+                            !Qt::ItemIsUserCheckable &&
+                            !Qt::ItemIsEnabled &&
+                            !Qt::ItemIsTristate);//image coords should be selectable*/
       mLandmarkTableWidget->setItem(row, 1, columnOne);
       mLandmarkTableWidget->setItem(row, 2, columnThree);
     }
