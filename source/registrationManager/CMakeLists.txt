@@ -5,6 +5,7 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( ${LIB}_registrationManager
+	cxRegistrationManager.h
 	cxRegistrationManager.cpp
 )
 
