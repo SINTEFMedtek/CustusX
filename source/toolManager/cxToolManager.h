@@ -70,7 +70,7 @@ public slots:
   virtual void saveToolsSlot();
 
 signals:
-  void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
+  //void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
   void toolSampleRemoved(double x, double y, double z, unsigned int index);
   void toolSampleAdded(double x, double y, double z, unsigned int index);
 
