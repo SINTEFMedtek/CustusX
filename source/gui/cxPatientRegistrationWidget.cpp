@@ -114,6 +114,11 @@ void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double no
       numberOfActiveToolSamples++;
     it++;
   }
+  //TODO REMOVE just for debugging
+  std::stringstream stream;
+  stream<<"ActiveToolSamples: "<<numberOfActiveToolSamples<<", ToolSamples: "<< numberOfToolSamples;
+  mMessageManager->sendWarning(stream.str());
+  //END
   if(numberOfActiveToolSamples >= 3 && numberOfToolSamples >= 3)
   {
     this->doPatientRegistration();
@@ -131,7 +136,10 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 {
   ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
   if(lastTransform.get() == NULL)
+  {
+    mMessageManager->sendError("The last transform was NULL!");
     return;
+  }
 
   vtkMatrix4x4Ptr lastTransformMatrix = lastTransform->matrix();
   double x = lastTransformMatrix->GetElement(0,3);
@@ -140,7 +148,14 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 
   if(mCurrentRow == -1)
     mCurrentRow = 0;
-  unsigned int index = mCurrentRow+1;
+  unsigned int index = mCurrentRow;
+  
+  //TODO REMOVE just for debugging
+  std::stringstream message;
+  message<<"Sampling row "<<mCurrentRow<<" for landmark "<<index;
+  mMessageManager->sendWarning(message.str());
+  //END
+  
   mToolManager->addToolSampleSlot(x, y, z, index);
 }
 void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
@@ -296,11 +311,34 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     else //we have all the rows we need atm
     {
       columnOne = mLandmarkTableWidget->item(row, 0);
-      /*if(columnOne == NULL) //TODO: remove
-        mMessageManager->sendError("Patient.Reg: columnOne == NULL!!!");*/
     }
     if(columnOne != NULL && !name.empty())
       columnOne->setText(QString(name.c_str()));
+  }
+  //get the patient coordinates from the toolmanager
+  vtkDoubleArrayPtr toolsamples = mToolManager->getToolSamples();
+  int numberOfToolSamples = toolsamples->GetNumberOfTuples();
+ 
+  //TODO REMOVE for debugging
+  std::stringstream stream;
+  stream<<"Number of tools sampled: "<<numberOfToolSamples;
+  mMessageManager->sendWarning(stream.str());
+  //END
+
+  //fill in toolsamples
+  for(int i=0; i<numberOfToolSamples; i++)
+  {
+    double* toolSample = toolsamples->GetTuple(i);
+    int row = toolSample[3];
+    QTableWidgetItem* columnThree = mLandmarkTableWidget->item(row, 2);
+    if(columnThree == NULL)
+    {
+      mMessageManager->sendError("Couldn't find a cell in the table to put the toolsample in.");
+    }
+    else
+    {
+      columnThree->setText(tr("(%1, %2, %3)").arg(toolSample[0]).arg(toolSample[1]).arg(toolSample[2]));
+    }
   }
 }
 void PatientRegistrationWidget::updateAccuracy()
@@ -331,7 +369,6 @@ void PatientRegistrationWidget::updateAccuracy()
       if(sourcePoint[3] == targetPoint[3])
       {
         //check the mLandmarkActiveVector...
-        //std::map<int, bool> landmarkActiveMap = mRegistrationManager->getActivePointsMap();
         RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
         RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]);
         if(it != landmarkActiveMap.end())
