@@ -115,9 +115,9 @@ void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double no
     it++;
   }
   //TODO REMOVE just for debugging
-  std::stringstream stream;
+  /*std::stringstream stream;
   stream<<"ActiveToolSamples: "<<numberOfActiveToolSamples<<", ToolSamples: "<< numberOfToolSamples;
-  mMessageManager->sendWarning(stream.str());
+  mMessageManager->sendWarning(stream.str());*/
   //END
   if(numberOfActiveToolSamples >= 3 && numberOfToolSamples >= 3)
   {
@@ -133,7 +133,8 @@ void PatientRegistrationWidget::toolVisibleSlot(bool visible)
     mToolSampleButton->setEnabled(false);
 }
 void PatientRegistrationWidget::toolSampleButtonClickedSlot()
-{
+{  
+  //TODO What if the reference frame isnt visible?
   ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
   if(lastTransform.get() == NULL)
   {
@@ -151,9 +152,9 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   unsigned int index = mCurrentRow+1;
   
   //TODO REMOVE just for debugging
-  std::stringstream message;
+  /*std::stringstream message;
   message<<"Sampling row "<<mCurrentRow<<" for LANDMARK: "<<index;
-  mMessageManager->sendWarning(message.str());
+  mMessageManager->sendWarning(message.str());*/
   //END
   
   mToolManager->addToolSampleSlot(x, y, z, index);
@@ -275,7 +276,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
       }
       //check the mLandmarkActiveVector...
       RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
-      RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(row);
+      RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(row+1);
       if(it != landmarkActiveMap.end())
       {
         if(!it->second.second)
@@ -332,7 +333,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
   {
     std::string name = it->second.first;
     int index = it->first;
-    int row = index;
+    int row = index-1;
     QTableWidgetItem* columnOne;
 
     if(mLandmarkTableWidget->rowCount() == 0 ||
@@ -414,7 +415,7 @@ void PatientRegistrationWidget::updateAccuracy()
       {
         //check the mLandmarkActiveVector...
         RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
-        RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]-1);
+        RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]);
         if(it != landmarkActiveMap.end())
         {
           if(it->second.second)

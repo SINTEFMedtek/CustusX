@@ -213,7 +213,7 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
       //mapindex for landmarkActiveMap starts at 0 
       //and tablerow and coloumns start at 0,0
       RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
-      int index = row;
+      int index = row+1;
       RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(index);
       if(it != landmarkActiveMap.end())
       {
@@ -260,7 +260,7 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
   {
     std::string name = it->second.first;
     int index = it->first;
-    int row = index;
+    int row = index-1;
     QTableWidgetItem* columnOne;
 
     if(index > mLandmarkTableWidget->rowCount())
@@ -324,7 +324,7 @@ void ImageRegistrationWidget::cellChangedSlot(int row,int column)
   if(column==0)
   {
     std::string name = mLandmarkTableWidget->item(row, column)->text().toStdString();
-    int index = row;
+    int index = row+1;
     mRegistrationManager->setGlobalPointsNameSlot(index, name);
   }
 }
