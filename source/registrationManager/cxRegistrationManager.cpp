@@ -29,7 +29,7 @@ RegistrationManager::~RegistrationManager()
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
   mMasterImage = image;
-  mMessageManager->sendInfo("Master image set to "+image->getUID());
+  mMessageManager->sendInfo("Master image set to "+image->getUid());
 }
 ssc::ImagePtr RegistrationManager::getMasterImage()
 {
@@ -108,6 +108,13 @@ void RegistrationManager::doPatientRegistration()
 }
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 {
+  //check that the masterimage is set
+  if(!mMasterImage)
+  {
+    mMessageManager->sendError("There isn't set a masterimage in the registrationmanager.");
+    return;
+  }
+  
   //calculate the transform from image to dataRef
   vtkDoubleArrayPtr imagePoints = image->getLandmarks();
   vtkDoubleArrayPtr masterImagePoints = mMasterImage->getLandmarks();
