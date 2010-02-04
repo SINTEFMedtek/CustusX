@@ -448,6 +448,9 @@ void MainWindow::activatePatientRegistrationState()
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
       QString("Patient Registration"));
   
+  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+  mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
+  
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
 void MainWindow::deactivatePatientRegistrationState()
