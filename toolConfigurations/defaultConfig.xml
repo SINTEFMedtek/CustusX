@@ -6,7 +6,7 @@
   <type>Polaris</type>
 </tracker>
 
-<toolfile>07-198-0838_SW_Pointer_02.xml</toolfile>
-<toolfile>32-175-0980_SW_USProbe10MHz_02.xml</toolfile>
+<toolfile type="polaris" reference="no">07-198-0838_SW_Pointer_02.xml</toolfile>
+<toolfile type="polaris" reference="yes">32-175-0980_SW_USProbe10MHz_02.xml</toolfile>
 
 </configuration>
