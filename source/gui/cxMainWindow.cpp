@@ -729,7 +729,10 @@ void MainWindow::importDataSlot()
   else //no copy was needed
     mMessageManager->sendInfo("Didn't need to copy because file was in the right place.");
 
-  fileName = pathToNewFile;
+  // Don't update fileName yet, as copy is not implemented. Just generate a warning
+  //fileName = pathToNewFile;
+  if(fileName != pathToNewFile)
+    mMessageManager->sendWarning("Imported file is not in the correct location: "+patientsImageFolder.toStdString());
 
   //Need to wait for the copy to finish...
 
