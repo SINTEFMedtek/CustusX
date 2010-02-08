@@ -104,6 +104,8 @@ protected:
   
   void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
 
+  void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
+  
   WorkflowState mCurrentWorkflowState; ///< the current workflow in use
 
   //managers

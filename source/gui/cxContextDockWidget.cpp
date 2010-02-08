@@ -29,6 +29,8 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   mViewManager(ViewManager::getInstance()),
   mRepManager(RepManager::getInstance())
 {
+  //QMainWindow::saveState() needs a way of identifying the ContextDockWidget
+  this->setObjectName("ContextDockWidget");
   //dock widget
   this->setWidget(mGuiWidget);
   connect(this, SIGNAL(visibilityChanged(bool)),

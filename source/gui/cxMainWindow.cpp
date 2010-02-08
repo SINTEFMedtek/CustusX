@@ -66,6 +66,10 @@ MainWindow::MainWindow() :
     mSettings->setValue("globalPatientNumber", 1);
   if (!mSettings->contains("applicationNames"))
     mSettings->setValue("applicationNames", "Nevro,Lap,Kar");
+  
+  // Restore saved window states
+  restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray());
+  restoreState(mSettings->value("mainWindow/windowState").toByteArray());
 
   //debugging
   connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
@@ -277,9 +281,11 @@ void MainWindow::createMenus()
 void MainWindow::createToolBars()
 {
   mDataToolBar = addToolBar("Data");
+  mDataToolBar->setObjectName("DataToolBar");
   mDataToolBar->addAction(mImportDataAction);
 
   mToolToolBar = addToolBar("Tools");
+  mToolToolBar->setObjectName("ToolToolBar");
   mToolToolBar->addAction(mStartTrackingToolsAction);
   mToolToolBar->addAction(mStopTrackingToolsAction);
 
@@ -522,6 +528,7 @@ void MainWindow::preferencesSlot()
 }
 void MainWindow::quitSlot()
 {
+  mMessageManager->sendInfo("quitSlot - never called?");
   //TODO
 }  
   
@@ -790,4 +797,11 @@ void MainWindow::loggingSlot(const QString& message, int timeout)
   std::cout << message.toStdString() << std::endl;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+  mSettings->setValue("mainWindow/geometry", saveGeometry());
+  mSettings->setValue("mainWindow/windowState", saveState());
+  mMessageManager->sendInfo("Closing: Save geometry and window state");
+  QMainWindow::closeEvent(event);
+}
 }//namespace cx
