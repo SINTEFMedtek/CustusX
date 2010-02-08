@@ -801,6 +801,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
   mSettings->setValue("mainWindow/geometry", saveGeometry());
   mSettings->setValue("mainWindow/windowState", saveState());
+  mSettings->sync();
   mMessageManager->sendInfo("Closing: Save geometry and window state");
   QMainWindow::closeEvent(event);
 }
