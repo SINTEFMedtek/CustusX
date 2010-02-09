@@ -7,11 +7,12 @@
 #include <cppunit/TestResult.h> 
 #include <cppunit/BriefTestProgressListener.h> 
 
-#define RUN_ALL_TESTS
+//#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
 #include "sscTestUtilityClasses.h"
 #include "sscTestSliceComputer.h"
+#include "sscTestSpaceOrganizer.h"
 #endif
 
 
@@ -28,17 +29,15 @@ int main(int argc, char **argv)
 
 	CppUnit::BriefTestProgressListener listener; 
 	runner.eventManager().addListener( &listener ); 
-	
-//	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
-//	runner.addTest(registry.makeTest() );
-	
+		
 #ifdef RUN_ALL_TESTS
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-	runner.addTest( new CppUnit::TestCaller<TestSliceComputer>(
-			                                 "debugtest",
-			                                  &TestSliceComputer::testAnyPlanes ) );
+//	runner.addTest( new CppUnit::TestCaller<TestSliceComputer>(
+//			                                 "debugtest",
+//			                                  &TestSliceComputer::testAnyPlanes ) );
+	runner.addTest(TestSpaceOrganizer::suite());
 #endif
 	
 	
