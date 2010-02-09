@@ -181,21 +181,27 @@ void DataManagerImpl::parseXml(QDomNode& dataNode)
   QDomNode node = dataNode.firstChild();
   while (!node.isNull())
   {
-    if (node.nodeName() == "image")
+    if(node.nodeName() == "image")
     {
       QDomElement uidNode = node.namedItem("uid").toElement();
       QDomElement nameNode = node.namedItem("name").toElement();
-      if (!uidNode.isNull())
-      {
-        ssc::ImagePtr image = loadImage(uidNode.text().toStdString(),
-                                        ssc::rtMETAIMAGE);
-        image->setName(nameNode.text().toStdString());
-        image->parseXml(node);
-      }
+      QDomElement filePathNode = node.namedItem("filePath").toElement();
+      std::string path;
+      if(!filePathNode.isNull()) 
+        path = filePathNode.text().toStdString();
+      else if(!uidNode.isNull())
+        path = uidNode.text().toStdString();
       else
       {
-        std::cout << "Warning: DataManager::parseXml() found no uid for image";
+        std::cout << "Warning: DataManager::parseXml() found no uid/filePath for image";
         std::cout << std::endl;
+      }
+      if(!path.empty())
+      {
+        ssc::ImagePtr image = loadImage(path, ssc::rtMETAIMAGE);
+        image->setName(nameNode.text().toStdString());
+        image->setFilePath(path);
+        image->parseXml(node);
       }
     }
     else

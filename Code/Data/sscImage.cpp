@@ -24,7 +24,7 @@ Image::~Image()
 Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(new ImageLUT2D(data)),
-	mUid(uid), mName(uid), mBaseImageData(data),
+	mUid(uid), mName(uid), mFilePath(uid), mBaseImageData(data),
 	mLandmarks(vtkDoubleArrayPtr::New())
 {
 	//std::cout << "Image::Image() " << std::endl;
@@ -112,6 +112,11 @@ void Image::setName(const std::string& name)
 	mName = name;
 }
 
+void Image::setFilePath(const std::string& filePath)
+{
+  mFilePath = filePath;
+}
+
 std::string Image::getUid() const
 {
 	return mUid;
@@ -120,6 +125,11 @@ std::string Image::getUid() const
 std::string Image::getName() const
 {
 	return mName;
+}
+  
+std::string Image::getFilePath() const
+{
+  return mFilePath;
 }
 
 REGISTRATION_STATUS Image::getRegistrationStatus() const
@@ -260,6 +270,16 @@ int Image::getMin()
 	//return (*iter).first;
 	return (int)mImageTransferFunctions3D->getScalarMin();
 }
+
+int Image::getPosMax()
+{
+	return (int)mImageTransferFunctions3D->getScalarMax() - getMin();
+}
+int Image::getPosMin()
+{
+	return 0;
+}
+  
 int Image::getRange()
 {
 	return this->getMax() - this->getMin();
@@ -281,7 +301,11 @@ void Image::addXml(QDomNode& parentNode)
   QDomElement nameNode = doc.createElement("name");
   nameNode.appendChild(doc.createTextNode(mName.c_str()));
   imageNode.appendChild(nameNode);
-
+  
+  QDomElement filePathNode = doc.createElement("filePath");
+  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
+  imageNode.appendChild(filePathNode);
+  
   mImageTransferFunctions3D->addXml(imageNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");

@@ -44,10 +44,12 @@ public:
 	void setVtkImageData(const vtkImageDataPtr& data);
 
 	void setName(const std::string& name);
+	void setFilePath(const std::string& filePath);///< Set current file path to file
 	virtual void set_rMd(Transform3D rMd);
 
 	virtual std::string getUid() const;
 	virtual std::string getName() const;
+	virtual std::string getFilePath() const;
 	virtual REGISTRATION_STATUS getRegistrationStatus() const;
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
@@ -63,8 +65,10 @@ public:
 	void printLandmarks(); //TODO: JUST FOR TESTING
 	DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
-	int getMax();///< \return Max alpha position in the histogram = max key value in map
-	int getMin();///< \return Min alpha position in the histogram = min key value in map
+	int getMax();///< \return Max alpha position in the histogram = max key value in map. Use getPosMax() instead to allow for signed volumes.
+	int getMin();///< \return Min alpha position in the histogram = min key value in map Use getPosMin() instead to allow for signed volumes.
+	int getPosMax();///< \return Max alpha position modified by getMin(). For use with signed volumes.
+	int getPosMin();///< \return Min alpha position set to zero.
 	int getRange();///< For convenience: getMax() – getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
 
@@ -97,6 +101,7 @@ protected:
 
 	std::string mUid;
 	std::string mName;
+	std::string mFilePath;
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 	
