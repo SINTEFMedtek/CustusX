@@ -2,6 +2,7 @@
 #define CXMAINWINDOW_H_
 
 #include <QMainWindow>
+#include "sscImage.h"
 
 class QAction;
 class QMenu;
@@ -23,6 +24,28 @@ class TransferFunctionWidget;
 class ImageRegistrationWidget;
 class PatientRegistrationWidget;
 
+/** \class FileCopied
+ *
+ * \brief This is a helper class for MainWindow::importDataSlot(). 
+ * Contain a slot that checks if a file is finished copying and updates the 
+ * ssc:Image object
+ *
+ * \date Feb 8, 2010
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class FileCopied : public QObject
+{
+  Q_OBJECT
+public:
+  FileCopied(const std::string& filePath, ssc::ImagePtr image);///< Creates the object
+protected:
+  MessageManager* mMessageManager; ///< takes messages intended for the user
+  std::string mFilePath;
+  ssc::ImagePtr mImage;
+public slots:
+  void areFileCopiedSlot();///< Checks if the file is finished copying and updates the ssc::Image
+};
+ 
 /**
  * \class MainWindow
  *
@@ -30,6 +53,7 @@ class PatientRegistrationWidget;
  *
  * \date Jan 20, 2009
  * \author Janne Beate Bakeng, SINTEF
+ * \author Ole Vegard Solberg, SINTEF
  */
 class MainWindow : public QMainWindow
 {
