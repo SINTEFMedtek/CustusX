@@ -108,6 +108,9 @@ void FileCopied::areFileCopiedSlot()
       
       mMessageManager->sendInfo("File copied correctly: "+mFilePath);
       mImage->setFilePath(mFilePath); // Update file path
+      
+      //Save patient, to avoid problems
+      emit fileCopiedCorrectly();
     }
   }
 }
@@ -840,6 +843,8 @@ void MainWindow::importDataSlot()
   {
     ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
     FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), image);
+    connect(fileCopied, SIGNAL(fileCopiedCorrectly()), 
+            this, SLOT(savePatientFileSlot()));
     QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {

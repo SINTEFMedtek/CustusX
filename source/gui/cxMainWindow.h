@@ -38,6 +38,9 @@ class FileCopied : public QObject
   Q_OBJECT
 public:
   FileCopied(const std::string& filePath, ssc::ImagePtr image);///< Creates the object
+  
+signals:
+  void fileCopiedCorrectly();///< Sends a signal when the copy is verified
 protected:
   MessageManager* mMessageManager; ///< takes messages intended for the user
   std::string mFilePath;
