@@ -521,6 +521,9 @@ void MainWindow::activateImageRegistationState()
   mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
   mViewManager->get3DView("View3D_1")->addRep(probeRep);
   
+  connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(const int)),
+          probeRep.get(), SLOT(setThresholdSlot(const int)));
+
   mCurrentWorkflowState = IMAGE_REGISTRATION;
 }
 void MainWindow::deactivateImageRegistationState()
@@ -534,6 +537,9 @@ void MainWindow::deactivateImageRegistationState()
     LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
     mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
     mViewManager->get3DView("View3D_1")->removeRep(probeRep);
+
+    disconnect(mImageRegistrationWidget, SIGNAL(tresholdChanged(const int)),
+            probeRep.get(), SLOT(setTresholdSlot(const int)));
   }
 }
 void MainWindow::activatePatientRegistrationState()

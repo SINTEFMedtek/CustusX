@@ -9,6 +9,8 @@ class QVBoxLayout;
 class QComboBox;
 class QTableWidget;
 class QPushButton;
+class QLabel;
+class QSlider;
 
 namespace cx
 {
@@ -37,14 +39,18 @@ public:
   ImageRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   ~ImageRegistrationWidget(); ///< empty
 
+signals:
+  void thresholdChanged(const int value); ///< the value selected by the slider
+
 protected slots:
   void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
   void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
   void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
   void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
-  void landmarkSelectedSlot(int row, int column); ///<
+  void landmarkSelectedSlot(int row, int column); ///< when a landmark i selected from the table
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
+  void thresholdChangedSlot(int value); ///< reemits the valueChanged signal from the slider
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -56,6 +62,8 @@ protected:
   QPushButton* mAddLandmarkButton; ///< the Add Landmark button
   QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
+  QLabel*      mThresholdLabel; ///< label for the tresholdslider
+  QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
 
   //manageres
   RepManager* mRepManager; ///< has a pool of reps //TODO remove when removing proberep func!!!

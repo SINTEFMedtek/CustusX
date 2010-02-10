@@ -6,6 +6,8 @@
 #include <QTableWidget>
 #include <QTableWidgetItem>
 #include <QHeaderView>
+#include <QLabel>
+#include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxRepManager.h"
@@ -25,6 +27,8 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mAddLandmarkButton(new QPushButton("Add landmark", this)),
   mEditLandmarkButton(new QPushButton("Resample landmark", this)),
   mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
+  mThresholdLabel(new QLabel("Probing treshold:", this)),
+  mThresholdSlider(new QSlider(Qt::Horizontal, this)),
   mRepManager(RepManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
@@ -46,6 +50,10 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   connect(mRemoveLandmarkButton, SIGNAL(clicked()),
           this, SLOT(removeLandmarkButtonClickedSlot()));
 
+  //slider
+  connect(mThresholdSlider, SIGNAL(valueChanged(int)),
+          this, SLOT(thresholdChangedSlot(int)));
+
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
           this, SLOT(landmarkSelectedSlot(int, int)));
@@ -57,6 +65,8 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mAddLandmarkButton);
   mVerticalLayout->addWidget(mEditLandmarkButton);
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
+  mVerticalLayout->addWidget(mThresholdLabel);
+  mVerticalLayout->addWidget(mThresholdSlider);
   this->setLayout(mVerticalLayout);
 
 }
@@ -86,6 +96,11 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
     connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
             this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
   }
+
+  //set a default treshold
+  mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
+  ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  mThresholdSlider->setValue(probeRep->getThreshold());
 
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
@@ -327,5 +342,18 @@ void ImageRegistrationWidget::cellChangedSlot(int row,int column)
     int index = row+1;
     mRegistrationManager->setGlobalPointsNameSlot(index, name);
   }
+}
+void ImageRegistrationWidget::thresholdChangedSlot(int value)
+{
+  emit thresholdChanged(value);
+  std::stringstream message;
+  message << "Threshold set to " << value;
+  mMessageManager->sendInfo(message.str());
+
+  QString text = "Probing threshold: ";
+  QString valueText;
+  valueText.setNum(value);
+  text.append(valueText);
+  mThresholdLabel->setText(text);
 }
 }//namespace cx
