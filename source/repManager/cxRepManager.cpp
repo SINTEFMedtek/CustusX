@@ -280,8 +280,8 @@ ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const std::string& uid)
   else
     return ssc::ToolRep3DPtr();
 }
-void RepManager::receivePointToSyncSlot(double x, double y, double z)
+/*void RepManager::receivePointToSyncSlot(double x, double y, double z)
 {
   //TODO
-}
+}*/
 }//namespace cx

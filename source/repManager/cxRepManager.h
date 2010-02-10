@@ -68,8 +68,8 @@ public:
   LandmarkRepPtr getLandmarkRep(const std::string& uid); ///<  get one specific Landmark rep
   ssc::ToolRep3DPtr getToolRep3DRep(const std::string& uid); ///<  get one specific Tool3D rep
 
-public slots:
-  void receivePointToSyncSlot(double x, double y, double z); ///< this slot syncs inria reps when a point is picked in a view...
+/*public slots:
+  void receivePointToSyncSlot(double x, double y, double z); ///< this slot syncs inria reps when a point is picked in a view...*/
 
 protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
