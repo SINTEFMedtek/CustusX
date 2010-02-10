@@ -435,7 +435,7 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   }
   
   // Update 3D view
-  ssc::VolumetricRepPtr volumetricRep 
+  ssc::VolumetricRepPtr volumetricRep
   = mRepManager->getVolumetricRep("VolumetricRep_1");
   LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   
@@ -444,28 +444,22 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   probeRep->setImage(currentImage);
   landmarkRep->setImage(currentImage);
   
-  //View3D* view3D_1 = this->get3DView("View3D_1");
   View3D* view3D_1 = mView3DMap[mView3DNames[0]];
   view3D_1->setRep(volumetricRep);
-  //view3D_1->addRep(landmarkRep);
-  //view3D_1->addRep(probeRep);
   view3D_1->getRenderer()->ResetCamera();
   view3D_1->getRenderer()->Render();
-  
-  //View2D* view2D_1 = this->get2DView("View2D_1");
-  //View2D* view2D_2 = this->get2DView("View2D_2");
-  //View2D* view2D_3 = this->get2DView("View2D_3");
+
   view2D_1->setRep(inriaRep2D_1);
   view2D_2->setRep(inriaRep2D_2);
   view2D_3->setRep(inriaRep2D_3);
   
   //test: Is render set?
-  if (inriaRep2D_1->getVtkViewImage2D()->GetRenderer() == NULL)
+  /*if (inriaRep2D_1->getVtkViewImage2D()->GetRenderer() == NULL)
     std::cout << "inriaRep2D_1: Lost renderer" << std::endl;
   if (inriaRep2D_2->getVtkViewImage2D()->GetRenderer() == NULL)
     std::cout << "inriaRep2D_2: Lost renderer" << std::endl;
   if (inriaRep2D_3->getVtkViewImage2D()->GetRenderer() == NULL)
-    std::cout << "inriaRep2D_3: Lost renderer" << std::endl;
+    std::cout << "inriaRep2D_3: Lost renderer" << std::endl;*/
   
   inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
   inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
@@ -478,6 +472,7 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(currentImage->getRefVtkImageData());
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
   
+  //connecting proberep and inriareps
   connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
           inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
   connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
@@ -486,7 +481,5 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  
-  //mMessageManager->sendInfo("Added current image to inria views");
 }	
 }//namespace cx
