@@ -9,8 +9,11 @@ SET( CX_QT_MOC_HEADER_FILES
 SET ( ${LIB}_viewManager
     ${CX_QT_MOC_HEADER_FILES}
     cxView2D.cpp
+    cxView2D.h
     cxView3D.cpp
+    cxView3D.h
     cxViewManager.cpp
+    cxViewManager.h
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

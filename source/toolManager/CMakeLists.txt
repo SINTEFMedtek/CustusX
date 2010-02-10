@@ -8,8 +8,11 @@ SET( CX_QT_MOC_HEADER_FILES
 
 SET ( ${LIB}_toolManager
     ${CX_QT_MOC_HEADER_FILES}
+    cxToolManager.h
     cxToolManager.cpp
+    cxTool.h
     cxTool.cpp
+    cxTracker.h
     cxTracker.cpp
 )
 
