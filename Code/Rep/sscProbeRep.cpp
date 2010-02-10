@@ -120,11 +120,12 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	//bool snapped = snapToExistingPoints(p0, p1, intersection);
 
 	//set the last point picked
-	mPickedPoint = intersection;
-	emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
+	//moved to showTemporaryPointSlot(..)
+	/*mPickedPoint = intersection;
+	emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);*/
 
 	//Make an sphere actor to show where the calculated point is
-	this->showTemporaryPointSlot(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
+	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
 
 	return intersection;
 }
@@ -178,6 +179,12 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mCurrentRenderer->AddActor(mPickedPointActor);
 
   mCurrentRenderer->GetRenderWindow()->Render();
+
+  //update temporary point
+  mPickedPoint[0] = x;
+  mPickedPoint[1] = y;
+  mPickedPoint[2] = z;
+  emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 }
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {
