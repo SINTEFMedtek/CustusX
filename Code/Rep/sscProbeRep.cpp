@@ -39,6 +39,10 @@ std::string ProbeRep::getType() const
 {
 	return "ssc::ProbeRep";
 }
+int ProbeRep::getThreshold()
+{
+  return mThreshold;
+}
 void ProbeRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
@@ -52,13 +56,10 @@ void ProbeRep::setImage(ImagePtr image)
 	mImage = image;
   if (mImage)
   {
-	connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
-			mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
+    mThreshold = (mImage->getPosMax()-mImage->getPosMin())/10;
+    connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
+        mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
   }
-}
-void ProbeRep::setThreshold(const int threshold)
-{
-	mThreshold = threshold;
 }
 void ProbeRep::setResolution(const int resolution)
 {
@@ -185,6 +186,10 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mPickedPoint[1] = y;
   mPickedPoint[2] = z;
   emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
+}
+void ProbeRep::setThresholdSlot(const int threshold)
+{
+  mThreshold = threshold;
 }
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {

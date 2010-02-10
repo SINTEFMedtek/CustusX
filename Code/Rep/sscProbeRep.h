@@ -41,8 +41,8 @@ public:
 
 	virtual std::string getType() const; ///< returns a string identifying this class type
 
+	int getThreshold(); ///< gets the probing threshold
 	void setImage(ImagePtr image); ///< set which image points should be picked from
-	void setThreshold(const int threshold); ///< sets the threshold for picking the point on the volumes surface
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
 
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
@@ -55,6 +55,7 @@ signals:
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
+	void setThresholdSlot(const int threshold); ///< sets the threshold for picking the point on the volumes surface
 
 protected:
 	ProbeRep(const std::string& uid, const std::string& name=""); ///< use New instead
