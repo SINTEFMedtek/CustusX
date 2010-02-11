@@ -3,7 +3,7 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QComboBox>
-#include "sscVolumetricRep.h" //TODO REMOVE
+//#include "sscVolumetricRep.h" //TODO REMOVE
 #include "sscProbeRep.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"

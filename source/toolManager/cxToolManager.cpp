@@ -31,7 +31,7 @@ ToolManager::ToolManager() :
   mConfigurationFilePath(""),
   mLoggingFolder(""),
   mTracker(TrackerPtr()),
-  //mConfiguredTools(new ssc::ToolManager::ToolMap),
+  mConfiguredTools(new ssc::ToolManager::ToolMap), //TODO Why was this commented out???
   mConnectedTools(new ssc::ToolManager::ToolMap),
   mDominantTool(ssc::ToolPtr()),
   mReferenceTool(ssc::ToolPtr()),

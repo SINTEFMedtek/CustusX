@@ -20,6 +20,7 @@
 #include "cxRegistrationManager.h"
 #include "cxCustomStatusBar.h"
 #include "cxContextDockWidget.h"
+#include "cxBrowserWidget.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxPatientRegistrationWidget.h"
@@ -128,6 +129,7 @@ MainWindow::MainWindow() :
   mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
   mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
+  mBrowserWidget(new BrowserWidget(mContextDockWidget)),
   mCustomStatusBar(new CustomStatusBar()),
   mImageRegistrationIndex(-1),
   mPatientRegistrationIndex(-1),
@@ -164,10 +166,6 @@ MainWindow::MainWindow() :
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
   
-  // Try to fix visualization bug by adding and removing tabs
-  // Looks like mImageRegistrationWidget and mPatientRegistrationWidget
-  // draws some lines and dots when the are added to mContextDockWidget
-  // without more information about how and where the should be shown
   // TODO: Find a better way to do this
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
                                                        QString("Image Registration"));
@@ -505,7 +503,10 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 void MainWindow::activatePatientDataState()
 {
   mCurrentWorkflowState = PATIENT_DATA;
+
   //should never be removed
+  mImageRegistrationIndex = mContextDockWidget->addTab(mBrowserWidget,
+      QString("Browser"));
   mImageRegistrationIndex = mContextDockWidget->addTab(mTransferFunctionWidget,
       QString("Transfer functions"));
 }

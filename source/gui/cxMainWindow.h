@@ -21,6 +21,7 @@ class RegistrationManager;
 class CustomStatusBar;
 class ContextDockWidget;
 class TransferFunctionWidget;
+class BrowserWidget;
 class ImageRegistrationWidget;
 class PatientRegistrationWidget;
 
@@ -193,11 +194,12 @@ protected:
   QToolBar* mDataToolBar; ///< toolbar for data actions
   QToolBar* mToolToolBar; ///< toolbar for navigation actions
 
-  ContextDockWidget* mContextDockWidget; ///< dock widget for context sensitive widgets
-  ImageRegistrationWidget* mImageRegistrationWidget; ///< interface for image registration
-  PatientRegistrationWidget* mPatientRegistrationWidget; ///< interface for patient registration
-  TransferFunctionWidget* mTransferFunctionWidget;
-  CustomStatusBar* mCustomStatusBar; //TODO, needs some work
+  ContextDockWidget*          mContextDockWidget; ///< dock widget for context sensitive widgets
+  ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration
+  PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
+  TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
+  BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
+  CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
   int mImageRegistrationIndex, mPatientRegistrationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences

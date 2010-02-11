@@ -36,7 +36,7 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mCurrentRow(-1),
   mCurrentColumn(-1)
 {
-  //dock widget
+  //widget
   this->setWindowTitle("Image Registration");
 
   //pushbuttons
