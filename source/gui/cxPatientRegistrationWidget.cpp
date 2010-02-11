@@ -200,10 +200,10 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 
   //TODO: REMOVE
   //only for testing...
-  ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
+  /*ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
   toolRep3D_1->setTool(mToolToSample);
   View3D* view = mViewManager->get3DView("View3D_1");
-  view->addRep(toolRep3D_1);
+  view->addRep(toolRep3D_1);*/
 
   //update button
   mToolSampleButton->setEnabled(mToolToSample->getVisible());

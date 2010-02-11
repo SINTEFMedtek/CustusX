@@ -958,6 +958,14 @@ void MainWindow::configureSlot()
   mToolManager->setLoggingFolder(loggingPath.toStdString());
 
   mToolManager->configure();
+  
+  if(mToolManager->isConfigured())
+  {
+    ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
+    toolRep3D_1->setTool(mToolManager->getDominantTool());
+    View3D* view = mViewManager->get3DView("View3D_1");
+    view->addRep(toolRep3D_1);
+  }
 }
 void MainWindow::loggingSlot(const QString& message, int timeout)
 {
