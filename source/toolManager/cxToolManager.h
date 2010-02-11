@@ -37,25 +37,25 @@ public:
 
   static ToolManager* getInstance();
 
-  virtual bool isConfigured() const;
-  virtual bool isInitialized() const;
-  virtual bool isTracking() const;
+  virtual bool isConfigured() const; ///< checks if the system is configured
+  virtual bool isInitialized() const; ///< checks if the hardware is initialized
+  virtual bool isTracking() const; ///< checks if the system is tracking
 
-  virtual ssc::ToolManager::ToolMapPtr getConfiguredTools();
-  virtual ssc::ToolManager::ToolMapPtr getTools();
-  virtual ssc::ToolPtr getTool(const std::string& uid);
+  virtual ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not connected tools
+  virtual ssc::ToolManager::ToolMapPtr getTools(); ///< get all connected tools
+  virtual ssc::ToolPtr getTool(const std::string& uid); ///< get a specific tool
 
-  virtual ssc::ToolPtr getDominantTool();
+  virtual ssc::ToolPtr getDominantTool(); ///< get the dominant tool
   virtual void setDominantTool(const std::string& uid); ///< can be set to either a connected or configured tool
 
   virtual std::map<std::string, std::string> getToolUidsAndNames() const; ///< both from configured and connected tools
   virtual std::vector<std::string> getToolNames() const; ///< both from configured and connected tools
   virtual std::vector<std::string> getToolUids() const; ///< both from configured and connected tools
 
-  virtual ssc::Transform3DPtr get_rMpr() const;
-  virtual void set_rMpr(const ssc::Transform3DPtr& val);
-  virtual ssc::ToolPtr getReferenceTool() const;
-  virtual void saveTransformsAndTimestamps(std::string filePathAndName = "");
+  virtual ssc::Transform3DPtr get_rMpr() const; ///< get the patient ...
+  virtual void set_rMpr(const ssc::Transform3DPtr& val); ///<  set the ...
+  virtual ssc::ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
+  virtual void saveTransformsAndTimestamps(std::string filePathAndName = ""); ///<
 
   void setConfigurationFile(std::string configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
   void setLoggingFolder(std::string loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
@@ -63,20 +63,20 @@ public:
   virtual vtkDoubleArrayPtr getToolSamples(); ///< \return all toolsamples defined .
 
 public slots:
-  virtual void configure();
-  virtual void initialize();
-  virtual void startTracking();
-  virtual void stopTracking();
-  virtual void saveToolsSlot();
+  virtual void configure(); ///< sets up the software like the xml file suggests
+  virtual void initialize(); ///< connects to the hardware
+  virtual void startTracking(); ///< starts tracking
+  virtual void stopTracking(); ///< stops tracking
+  virtual void saveToolsSlot(); ///< saves transforms and timestamps
 
 signals:
   //void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
-  void toolSampleRemoved(double x, double y, double z, unsigned int index);
-  void toolSampleAdded(double x, double y, double z, unsigned int index);
+  void toolSampleRemoved(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is removed
+  void toolSampleAdded(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is added
 
 public slots:
-  void addToolSampleSlot(double x, double y, double z, unsigned int index);
-  void removeToolSampleSlot(double x, double y, double z, unsigned int index);
+  void addToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to remove tool(patient) samples
+  void removeToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to add tool(patient) samples
 
 protected slots:
   /**
