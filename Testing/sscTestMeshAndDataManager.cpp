@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName1, ssc::mrtSTL);
 
 
-	std::cout << "UID     : " << mesh1->getUID() << std::endl;
+	std::cout << "UID     : " << mesh1->getUid() << std::endl;
 	std::cout << "Name    : " << mesh1->getName() << std::endl;
 	std::cout << "RegStat : " << mesh1->getRegistrationStatus() << std::endl;
 

@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	ssc::MeshPtr mesh1 = ssc::DataManager::getInstance()->loadMesh(stlFileName2, ssc::mrtSTL);
 
 
-	std::cout << "UID     : " << mesh1->getUID() << std::endl;
+	std::cout << "UID     : " << mesh1->getUid() << std::endl;
 	std::cout << "Name    : " << mesh1->getName() << std::endl;
 	std::cout << "RegStat : " << mesh1->getRegistrationStatus() << std::endl;
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
 	//ssc::ViewPtr view(new ssc::View());
 	ssc::View* view = new ssc::View();
 
-	ssc::GeometricRepPtr rep = ssc::GeometricRep::New(mesh1->getUID());
+	ssc::GeometricRepPtr rep = ssc::GeometricRep::New(mesh1->getUid());
 	rep->setMesh(mesh1);
 	view->setRep(rep);
 
