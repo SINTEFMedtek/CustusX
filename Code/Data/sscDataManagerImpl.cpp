@@ -115,7 +115,7 @@ MeshPtr DataManagerImpl::loadMesh(const std::string& fileName, MESH_READER_TYPE 
 	MeshPtr newMesh = mMeshReaders[meshType]->load(fileName);
 	if (newMesh)
 	{
-		mMeshes[newMesh->getUID()] = newMesh;
+		mMeshes[newMesh->getUid()] = newMesh;
 		emit dataLoaded();
 	}
 	return newMesh;
