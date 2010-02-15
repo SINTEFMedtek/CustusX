@@ -70,7 +70,7 @@ VolumetricRep::~VolumetricRep()
 
 VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
 {
-	VolumetricRepPtr retval(new VolumetricRep(uid));
+	VolumetricRepPtr retval(new VolumetricRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }

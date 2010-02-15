@@ -29,12 +29,12 @@ public:
 	virtual ~VolumetricRep();
 
 	static VolumetricRepPtr New(const std::string& uid, const std::string& name="");
-	virtual std::string getType() const { return "ssc::VolumeRep"; }
-	virtual void setImage(ImagePtr image);
-	virtual ImagePtr getImage();
-	virtual bool hasImage(ImagePtr image) const;
-	vtkVolumePtr getVtkVolume() { return mVolume; }
-	virtual void setResampleFactor(double factor);	
+	virtual std::string getType() const { return "ssc::VolumetricRep"; }
+	virtual void setImage(ImagePtr image); ///< set the reps image
+	virtual ImagePtr getImage(); ///< get the reps image
+	virtual bool hasImage(ImagePtr image) const; ///< check if the reps has the image
+	vtkVolumePtr getVtkVolume() { return mVolume; } ///< get the images vtkVolume
+	virtual void setResampleFactor(double factor); ///< set how detailed the image should be
 	
 protected:
 	VolumetricRep(const std::string& uid, const std::string& name="");
