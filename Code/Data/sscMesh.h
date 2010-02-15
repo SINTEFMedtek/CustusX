@@ -20,25 +20,18 @@ namespace ssc
 class Mesh : public Data
 {
 public:
-	Mesh();
+	Mesh(const std::string& uid, const std::string& name="");
 	Mesh(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData);
 	virtual ~Mesh();
-	
-//	void setUID(const std::string& uid);
-//	void setName(const std::string& name);
+
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
 
-//	virtual std::string getUID() const;
-//	virtual std::string getName() const;
 	virtual vtkPolyDataPtr getVtkPolyData();
 	
 //	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 //	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
 private:
-//	std::string mUID;
-//	std::string mName;
-
 	vtkPolyDataPtr mVtkPolyData;
 
 //	std::set<RepWeakPtr> mReps; ///< links to Rep users.
