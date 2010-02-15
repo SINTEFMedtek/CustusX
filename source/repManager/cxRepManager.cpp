@@ -24,7 +24,8 @@ RepManager::RepManager() :
   MAX_PROGRESSIVEVOLUMETRICREPS(2),
   MAX_PROBEREPS(2),
   MAX_LANDMARKREPS(2),
-  MAX_TOOLREP3DS(5)
+  MAX_TOOLREP3DS(5),
+  MAX_GEOMETRICREPS(6)
 {
   mInriaRep3DNames[0] = "InriaRep3D_1";
   mInriaRep3DNames[1] = "InriaRep3D_2";
@@ -56,6 +57,13 @@ RepManager::RepManager() :
   mToolRep3DNames[2] = "ToolRep3D_3";
   mToolRep3DNames[3] = "ToolRep3D_4";
   mToolRep3DNames[4] = "ToolRep3D_5";
+
+  mGeometricRepNames[0] = "GeometricRep_1";
+  mGeometricRepNames[1] = "GeometricRep_2";
+  mGeometricRepNames[2] = "GeometricRep_3";
+  mGeometricRepNames[3] = "GeometricRep_4";
+  mGeometricRepNames[4] = "GeometricRep_5";
+  mGeometricRepNames[5] = "GeometricRep_6";
 
   for(int i=0; i<MAX_INRIAREP3DS; i++)
   {
@@ -100,6 +108,12 @@ RepManager::RepManager() :
         mToolRep3DNames[i]));
     mToolRep3DMap[toolRep->getUid()] = toolRep;
   }
+  for(int i=0; i<MAX_GEOMETRICREPS; i++)
+  {
+    ssc::GeometricRepPtr geometricRep(ssc::GeometricRep::New(mGeometricRepNames[i],
+        mGeometricRepNames[i]));
+    mGeometricRepMap[geometricRep->getUid()] = geometricRep;
+  }
   mMessageManager->sendInfo("All necessary representations have been created.");
 }
 RepManager::~RepManager()
@@ -132,6 +146,10 @@ std::vector<std::pair<std::string, std::string> > RepManager::getRepUidsAndNames
     uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
   }
   for(ToolRep3DMap::iterator it = mToolRep3DMap.begin(); it != mToolRep3DMap.end(); it++)
+  {
+    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
+  }
+  for(GeometricRepMap::iterator it = mGeometricRepMap.begin(); it != mGeometricRepMap.end(); it++)
   {
     uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
   }
@@ -168,6 +186,10 @@ RepMap* RepManager::getReps()
   {
     repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
   }
+  for(GeometricRepMap::iterator it = mGeometricRepMap.begin(); it != mGeometricRepMap.end(); it++)
+  {
+    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
+  }
   return repmap;
 }
 InriaRep3DMap* RepManager::getInria3DReps()
@@ -198,6 +220,10 @@ ToolRep3DMap* RepManager::getToolRep3DReps()
 {
   return &mToolRep3DMap;
 }
+GeometricRepMap* RepManager::getGeometricReps()
+{
+  return &mGeometricRepMap;
+}
 ssc::RepPtr RepManager::getRep(const std::string& uid)
 {
   InriaRep3DMap::iterator it1 = mInriaRep3DMap.find(uid);
@@ -221,6 +247,9 @@ ssc::RepPtr RepManager::getRep(const std::string& uid)
   ToolRep3DMap::iterator it7 = mToolRep3DMap.find(uid);
   if(it7 != mToolRep3DMap.end())
     return it7->second;
+  GeometricRepMap::iterator it8 = mGeometricRepMap.find(uid);
+  if(it8 != mGeometricRepMap.end())
+    return it8->second;
 
   return ssc::RepPtr();
 }
@@ -280,8 +309,12 @@ ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const std::string& uid)
   else
     return ssc::ToolRep3DPtr();
 }
-/*void RepManager::receivePointToSyncSlot(double x, double y, double z)
+ssc::GeometricRepPtr RepManager::getGeometricRep(const std::string& uid)
 {
-  //TODO
-}*/
+  GeometricRepMap::iterator it = mGeometricRepMap.find(uid);
+  if(it != mGeometricRepMap.end())
+    return it->second;
+  else
+    return ssc::GeometricRepPtr();
+}
 }//namespace cx

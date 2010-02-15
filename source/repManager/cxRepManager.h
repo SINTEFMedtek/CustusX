@@ -6,9 +6,10 @@
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscProbeRep.h"
+#include "sscGeometricRep.h"
+#include "sscProgressiveLODVolumetricRep.h"
 #include "cxInriaRep3D.h"
 #include "cxInriaRep2D.h"
-#include "sscProgressiveLODVolumetricRep.h"
 #include "cxLandmarkRep.h"
 
 namespace cx
@@ -26,6 +27,7 @@ typedef std::map<std::string, ProbeRepPtr> ProbeRepMap;
 typedef std::map<std::string, ProgressiveVolumetricRepPtr> ProgressiveVolumetricRepMap;
 typedef std::map<std::string, LandmarkRepPtr> LandmarkRepMap;
 typedef std::map<std::string, ssc::ToolRep3DPtr> ToolRep3DMap;
+typedef std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
 
 class MessageManager;
 
@@ -58,6 +60,7 @@ public:
   ProgressiveVolumetricRepMap* getProgressiveVolumetricReps(); ///< get all ProgressiveLODVolumetric reps in the pool
   LandmarkRepMap* getLandmarkReps(); ///< get all Landmark reps in the pool
   ToolRep3DMap* getToolRep3DReps(); ///< get all Tool3D reps in the pool
+  GeometricRepMap* getGeometricReps(); ///< get all Geometric reps in the pool
 
   ssc::RepPtr getRep(const std::string& uid); ///< get one specific rep
   InriaRep3DPtr getInria3DRep(const std::string& uid); ///< get one specific Inria3D rep
@@ -67,9 +70,7 @@ public:
   ProgressiveVolumetricRepPtr getProgressiveVolumetricRep(const std::string& uid); ///< get one specific ProgressiveLODVolumetric rep
   LandmarkRepPtr getLandmarkRep(const std::string& uid); ///<  get one specific Landmark rep
   ssc::ToolRep3DPtr getToolRep3DRep(const std::string& uid); ///<  get one specific Tool3D rep
-
-/*public slots:
-  void receivePointToSyncSlot(double x, double y, double z); ///< this slot syncs inria reps when a point is picked in a view...*/
+  ssc::GeometricRepPtr getGeometricRep(const std::string& uid); ///<  get one specific Geometric rep
 
 protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
@@ -102,6 +103,10 @@ protected:
   const int           MAX_TOOLREP3DS; ///< number of Tool3D reps in the pool
   std::string         mToolRep3DNames[5]; ///< the name of the reps in the pool
   ToolRep3DMap        mToolRep3DMap;      ///< the reps in the pool
+
+  const int           MAX_GEOMETRICREPS; ///< number of Geometric reps in the pool
+  std::string         mGeometricRepNames[6]; ///< the name of the reps in the pool
+  GeometricRepMap     mGeometricRepMap;      ///< the reps in the pool
 
 private:
   RepManager(); ///< creates a pool of reps
