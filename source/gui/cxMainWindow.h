@@ -91,6 +91,7 @@ protected slots:
   //data menu
   void importDataSlot(); ///< loads data(images) into the datamanager
   void deleteDataSlot(); ///< deletes data(image) from the patient
+  void loadPatientRegistrationSlot(); ///< loads a patient registration
 
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
@@ -176,6 +177,7 @@ protected:
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume
+  QAction* mLoadPatientRegistrationFromFile; ///< action for loading a patient registration from file
 
   QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system

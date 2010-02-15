@@ -194,7 +194,7 @@ void MainWindow::createActions()
   connect(mNewPatientAction, SIGNAL(triggered()),
           this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()),
-          this, SLOT(loadPatientFileSlot()));
+          this, SLOT(loadPatientRegistration()));
   connect(mSaveFileAction, SIGNAL(triggered()),
           this, SLOT(savePatientFileSlot()));
 
@@ -245,10 +245,15 @@ void MainWindow::createActions()
   mDeleteDataAction = new QAction(tr("Delete current image"), this);
   mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
 
+  mLoadPatientRegistrationFromFile = new QAction(tr("Load patient registration from file"), this);
+  mLoadPatientRegistrationFromFile->setStatusTip("Select a txt-file to use as patient registration");
+
   connect(mImportDataAction, SIGNAL(triggered()),
           this, SLOT(importDataSlot()));
   connect(mDeleteDataAction, SIGNAL(triggered()),
           this, SLOT(deleteDataSlot()));
+  connect(mLoadPatientRegistrationFromFile, SIGNAL(triggered()),
+          this, SLOT(loadPatientRegistrationSlot()));
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
@@ -346,6 +351,7 @@ void MainWindow::createMenus()
   this->menuBar()->addMenu(mDataMenu);
   mDataMenu->addAction(mImportDataAction);
   mDataMenu->addAction(mDeleteDataAction);
+  mDataMenu->addAction(mLoadPatientRegistrationFromFile);
 
   //tool
   this->menuBar()->addMenu(mToolMenu);
@@ -356,7 +362,7 @@ void MainWindow::createMenus()
   mToolMenu->addSeparator();
   mToolMenu->addAction(mSaveToolsPositionsAction);
 
-  //tool
+  //layout
   this->menuBar()->addMenu(mLayoutMenu);
   mLayoutMenu->addAction(m3D_1x1_LayoutAction);
   mLayoutMenu->addAction(m3DACS_2x2_LayoutAction);
@@ -815,7 +821,7 @@ void MainWindow::importDataSlot()
     }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
     {
       //presuming the other file is a raw file
-      //TODO: waht if it's not?
+      //TODO: what if it's not?
       QString originalRawFile = fileName.replace(".hdr", ".raw");
       QString newRawFile = pathToNewFile.replace(".hdr", ".raw");
       fromFile.setFileName(originalRawFile);
@@ -906,7 +912,7 @@ void MainWindow::importDataSlot()
     }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
     {
       //presuming the other file is a raw file
-      //TODO: waht if it's not?
+      //TODO: what if it's not?
       QString originalRawFile = fileName.replace(".hdr", ".raw");
       QString newRawFile = pathToNewFile.replace(".hdr", ".raw");
       fromFile.setFileName(originalRawFile);
@@ -929,10 +935,55 @@ void MainWindow::deleteDataSlot()
 {
   emit deleteCurrentImage();
 }
+void MainWindow::loadPatientRegistrationSlot()
+{
+  /*Expecting a file that looks like this
+   *00 01 02 03
+   *10 11 12 13
+   *20 21 22 23
+   *30 31 32 33
+   */
 
+  QString registrationFilePath = QFileDialog::getOpenFileName(this,
+      tr("Select patient registration file (*.txt)"),
+      mSettings->value("globalPatientDataFolder").toString(),
+      tr("Patient registration files (*.txt)"));
+
+  //Check that the file can be open and read
+  QFile registrationFile(registrationFilePath);
+  if(!registrationFile.open(QIODevice::ReadOnly))
+  {
+    mMessageManager->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
+    return;
+  }else
+  {
+    vtkMatrix4x4* matrix = vtkMatrix4x4::New();
+    //read the content, 4x4 matrix
+    QTextStream inStream(&registrationFile);
+    for(int i=0; i<4; i++)
+    {
+      QString line = inStream.readLine();
+      std::cout << line.toStdString() << std::endl;
+      QStringList list = line.split(" ", QString::SkipEmptyParts);
+      if(list.size() != 4)
+      {
+        mMessageManager->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
+        return;
+      }
+      matrix->SetElement(i,0,list[0].toDouble());
+      matrix->SetElement(i,1,list[1].toDouble());
+      matrix->SetElement(i,2,list[2].toDouble());
+      matrix->SetElement(i,3,list[3].toDouble());
+    }
+    //set the toolmanageres matrix
+    ssc::Transform3DPtr patientRegistration(new ssc::Transform3D(matrix));
+    mToolManager->set_rMpr(patientRegistration);
+    std::cout << (*patientRegistration.get()) << std::endl;
+    mMessageManager->sendInfo("New patient registration is set.");
+  }
+}
 void MainWindow::configureSlot()
 {
-  //TODO: Use current patients folder, not global patientfolder like now!
   QString configFile = mSettings->value("toolConfigFilePath").toString();
 
   if(mSettings->value("toolConfigFilePath").toString() ==
