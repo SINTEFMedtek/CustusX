@@ -113,6 +113,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscMD5Check.cpp
     Utilities/sscSnwInifile.cpp
 	Utilities/sscGLHelpers.cpp
+	#Utilities/sscSpaceOrganizer.cpp
     sscView.cpp
     Rep/sscRep.h
     Rep/sscRepImpl.h
