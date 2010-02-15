@@ -14,6 +14,7 @@ class DataManager;
 class ToolManager;
 class MessageManager;
 class ViewManager;
+class RepManager;
 /**
  * \class BrowserWidget
  *
@@ -50,6 +51,7 @@ protected:
   ToolManager* mToolManager; ///< interface to the navigation system
   MessageManager* mMessageManager; ///< takes messages intended for the user
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
+  RepManager* mRepManager; ///< has a pool of reps
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the currently selected image

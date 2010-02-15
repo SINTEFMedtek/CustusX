@@ -8,6 +8,7 @@
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxViewManager.h"
+#include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
 
@@ -66,36 +67,141 @@ void BrowserWidget::populateTreeWidget()
   mTreeWidget->setColumnCount(2);
   QStringList headerItems(QStringList() << "Name" << "Uid");
   mTreeWidget->setHeaderLabels(headerItems);
+  mTreeWidget->resizeColumnToContents(1);
+  mTreeWidget->resize(this->size());
 
-  //keep track of what index we are at
-  int index = 0;
 
   //make QTreeWidgetItems for all the views
-  //TODO hide views thats not a part of the current layout
+  ViewManager::LayoutType layoutType = mViewManager->getCurrentLayoutType();
+  int numberOf3DViews = 0;
+  int numberOf2DViews = 0;
+  switch(layoutType)
+  {
+    case ViewManager::LAYOUT_NONE:
+      break;
+    case ViewManager::LAYOUT_3D_1X1:
+      numberOf3DViews = 1;
+      break;
+    case ViewManager::LAYOUT_3DACS_2X2:
+      numberOf3DViews = 1;
+      numberOf2DViews = 3;
+      break;
+    case ViewManager::LAYOUT_3DACS_1X3:
+      numberOf3DViews = 1;
+      numberOf2DViews = 3;
+      break;
+    case ViewManager::LAYOUT_ACSACS_2X3:
+      numberOf2DViews = 6;
+      break;
+    default:
+      break;
+  }
   QList<QTreeWidgetItem *> viewItems;
   std::map<std::string, View3D*>::iterator view3Diter = view3DMap->begin();
   while(view3Diter != view3DMap->end())
   {
-    QStringList view3D(QStringList() << QString(view3Diter->second->getName().c_str())
+    if(numberOf3DViews == 0) //only adding the views shown by the layout
+      break;
+    QStringList view3DList(QStringList() << QString(view3Diter->second->getName().c_str())
                                      << QString(view3Diter->second->getUid().c_str()));
-    QTreeWidgetItem* view3DItem = new QTreeWidgetItem(view3D);
+    QTreeWidgetItem* view3DItem = new QTreeWidgetItem(view3DList);
     viewItems.append(view3DItem);
     view3Diter++;
+    numberOf3DViews--;
   }
   std::map<std::string, View2D*>::iterator view2Diter = view2DMap->begin();
   while(view2Diter != view2DMap->end())
   {
-    QStringList view2D(QStringList() << QString(view2Diter->second->getName().c_str())
+    if(numberOf2DViews == 0) //only adding the views shown by the layout
+      break;
+    QStringList view2DList(QStringList() << QString(view2Diter->second->getName().c_str())
                                      << QString(view2Diter->second->getUid().c_str()));
-    QTreeWidgetItem* view2DItem = new QTreeWidgetItem(view2D);
+    QTreeWidgetItem* view2DItem = new QTreeWidgetItem(view2DList);
     viewItems.append(view2DItem);
     view2Diter++;
+    numberOf2DViews--;
   }
-  mTreeWidget->insertTopLevelItems(index, viewItems);
+  mTreeWidget->insertTopLevelItems(0, viewItems);
 
   QTreeWidgetItem* topLevelItem;
   foreach(topLevelItem, viewItems)
   {
+    ssc::View* view = mViewManager->getView(topLevelItem->text(1).toStdString());
+    if(view==NULL) //couldn't find a view with that id
+      return;
+    std::vector<ssc::RepPtr> reps = view->getReps();
+    std::vector<ssc::RepPtr>::iterator repIter = reps.begin();
+    while(repIter != reps.end())
+    {
+      //we need to add slightly different things per reptype,
+      //some rep types (like landmarkRep and probeRep, we dont want to add at all
+      std::string repType = (*repIter)->getType();
+      if(repType == "ssc::VolumetricRep")
+      {
+        //add the reps
+        /*mMessageManager->sendWarning((*repIter)->getUid().c_str());
+        std::cout << (*repIter)->getUid().c_str() << std::endl;*/
+        QStringList repList(QStringList() << QString((*repIter)->getName().c_str())
+                                        << QString((*repIter)->getUid().c_str()));
+        QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
+        topLevelItem->addChild(repItem);
+        //add the images
+        //TODO we get a segmentation fault...
+        //there is something wrong with the repmanagers volumetricrepmap!
+        /*std::string repUid = (*repIter)->getUid();
+        ssc::VolumetricRepPtr volRep = mRepManager->getVolumetricRep(repUid);
+        if(!volRep)
+          break;
+        ssc::ImagePtr image = volRep->getImage();
+        QStringList imageList(QStringList() << QString(image->getName().c_str())
+                                        << QString(image->getUid().c_str()));
+        QTreeWidgetItem* imageItem = new QTreeWidgetItem(imageList);
+        repItem->addChild(imageItem);*/
+      }else if (repType == "ssc::GeometricRep")
+      {
+        QStringList repList(QStringList() << QString((*repIter)->getName().c_str())
+                                        << QString((*repIter)->getUid().c_str()));
+        QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
+        topLevelItem->addChild(repItem);
+        //TODO we get a segmentation fault...
+        //there is something wrong with the repmanagers geometricreppmap!
+        //add meshes under geometricRep
+        /*std::string repUid = (*repIter)->getUid();
+        ssc::GeometricRepPtr geometricRep = mRepManager->getGeometricRep(repUid);
+        if(!geometricRep)
+          break;
+        ssc::MeshPtr mesh = geometricRep->getMesh();
+        QStringList meshList(QStringList() << QString(mesh->getName().c_str())
+                                        << QString(mesh->getUid().c_str()));
+        QTreeWidgetItem* meshItem = new QTreeWidgetItem(meshList);
+        repItem->addChild(meshItem);*/
+      }else if(repType == "ssc::ToolRep3D")
+      {
+        QStringList repList(QStringList() << QString((*repIter)->getName().c_str())
+                                        << QString((*repIter)->getUid().c_str()));
+        QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
+        topLevelItem->addChild(repItem);
+        //add tools under toolreps
+        //TODO we get a segmentation fault...
+        //there is something wrong with the repmanagers toolrepmap!
+        /*std::string repUid = (*repIter)->getUid();
+        ssc::ToolRep3DPtr toolRep3D = mRepManager->getToolRep3DRep(repUid);
+        if(!toolRep3D)
+          break;
+        ssc::ToolPtr tool = toolRep3D->getTool();
+        QStringList toolList(QStringList() << QString(tool->getName().c_str())
+                                        << QString(tool->getUid().c_str()));
+        QTreeWidgetItem* toolItem = new QTreeWidgetItem(toolList);
+        repItem->addChild(toolItem);*/
+      }
+      repIter++;
+    }
+    //TODO:
+    //for all reps
+      //add rep to tree
+      //add its data (image/mesh/tool etc) to the tree
+
+    /*
     //make QTreeWidgetItems of all the images
     std::map<std::string, std::string>::iterator it1 = imageUidAndNames.begin();
     while(it1 != imageUidAndNames.end())
@@ -152,6 +258,7 @@ void BrowserWidget::populateTreeWidget()
       index++;
       it3++;
     }
+    */
   }
 }
 }//end namespace cx
