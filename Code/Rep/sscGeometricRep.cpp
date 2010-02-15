@@ -11,39 +11,31 @@
 namespace ssc
 {
 
-GeometricRep::GeometricRep(const std::string& uid) :
-	RepImpl(uid)
+GeometricRep::GeometricRep(const std::string& uid, const std::string& name) :
+	RepImpl(uid, name)
 {
-
 	mMapper = vtkPolyDataMapperPtr::New();
 	mProperty = vtkPropertyPtr::New();
 	mActor = vtkActorPtr::New();
 	mActor->SetMapper( mMapper );
 	mActor->SetProperty( mProperty );
-
 }
-
 GeometricRep::~GeometricRep()
+{}
+GeometricRepPtr GeometricRep::New(const std::string& uid, const std::string& name)
 {
-}
-
-GeometricRepPtr GeometricRep::New(const std::string& uid)
-{
-	GeometricRepPtr retval(new GeometricRep(uid));
+	GeometricRepPtr retval(new GeometricRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-
 void GeometricRep::addRepActorsToViewRenderer(View* view)
 {
 	view->getRenderer()->AddActor(mActor);
 }
-
 void GeometricRep::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mActor);
 }
-
 void GeometricRep::setMesh(MeshPtr mesh)
 {
 	mMesh = mesh;
@@ -51,7 +43,10 @@ void GeometricRep::setMesh(MeshPtr mesh)
 
 	mMapper->SetInput( mesh->getVtkPolyData() );
 }
-
+MeshPtr GeometricRep::getMesh()
+{
+  return mMesh;
+}
 bool GeometricRep::hasMesh(MeshPtr mesh) const
 {
 	return (mMesh != NULL);

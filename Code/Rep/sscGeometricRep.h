@@ -23,16 +23,15 @@ class GeometricRep : public RepImpl
 public:
 	virtual ~GeometricRep();
 
-	static GeometricRepPtr New(const std::string& uid);
+	static GeometricRepPtr New(const std::string& uid, const std::string& name="");
 
-	virtual std::string getType() const { return "ssc::GeometricRep"; }
-	void setMesh(MeshPtr mesh);
-	//void addImage(ImagePtr image);
-	//void removeImage(ImagePtr image);
-	bool hasMesh(MeshPtr mesh) const;
+	virtual std::string getType() const { return "ssc::GeometricRep"; } ///< gives this reps type
+	void setMesh(MeshPtr mesh); ///< sets this reps mesh
+	MeshPtr getMesh(); ///< gives this reps mesh
+	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
 	
 protected:
-	GeometricRep(const std::string& uid);
+	GeometricRep(const std::string& uid, const std::string& name);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 
