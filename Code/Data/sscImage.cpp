@@ -22,12 +22,12 @@ Image::~Image()
 }
 
 Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
+  Data(uid),
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(new ImageLUT2D(data)),
-	mUid(uid), mName(uid), mFilePath(uid), mBaseImageData(data),
+	mFilePath(uid), mBaseImageData(data),
 	mLandmarks(vtkDoubleArrayPtr::New())
 {
-	//std::cout << "Image::Image() " << std::endl;
 	mOutputImageData = mBaseImageData;
 	mLandmarks->SetNumberOfComponents(4);
 	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
@@ -47,7 +47,6 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	
 	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
 }
-
 void Image::set_rMd(Transform3D rMd)
 {
 	bool changed = !similar(rMd, m_rMd);
@@ -61,10 +60,9 @@ void Image::set_rMd(Transform3D rMd)
 
 	emit transformChanged();
 }
-
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
-	std::cout << "Image::setVtkImageData() " << std::endl;
+	//std::cout << "Image::setVtkImageData() " << std::endl;
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
 	mOutputImageData = mBaseImageData;
@@ -73,8 +71,6 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 
 	emit vtkImageDataChanged();
 }
-
-
 vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 {
 	if (mBaseGrayScaleImageData)
@@ -96,57 +92,35 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 	mBaseGrayScaleImageData->Update();
 	return mBaseGrayScaleImageData;
 }
-
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
 	return mImageTransferFunctions3D;
 }
-
 ImageLUT2DPtr Image::getLookupTable2D()
 {
 	return mImageLookupTable2D;
 }
-
-void Image::setName(const std::string& name)
-{
-	mName = name;
-}
-
 void Image::setFilePath(const std::string& filePath)
 {
   mFilePath = filePath;
 }
-
-std::string Image::getUid() const
-{
-	return mUid;
-}
-
-std::string Image::getName() const
-{
-	return mName;
-}
-  
 std::string Image::getFilePath() const
 {
   return mFilePath;
 }
-
-REGISTRATION_STATUS Image::getRegistrationStatus() const
+//See ssc::Data
+/*REGISTRATION_STATUS Image::getRegistrationStatus() const
 {
-	return rsNOT_REGISTRATED;
-}
-
+	return mRegistrationStatus;
+}*/
 vtkImageDataPtr Image::getBaseVtkImageData()
 {
 	return mBaseImageData;
 }
-
 vtkImageDataPtr Image::getRefVtkImageData()
 {
 	return mOutputImageData;
 }
-
 vtkDoubleArrayPtr Image::getLandmarks()
 {
 	return mLandmarks;
@@ -206,12 +180,10 @@ void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
 		}
 	}
 }
-
 void Image::transferFunctionsChangedSlot()
 {
 	emit vtkImageDataChanged();
 }
-
 void Image::printLandmarks()
 {
 	std::cout << "Landmarks: " << std::endl;
@@ -231,14 +203,12 @@ void Image::printLandmarks()
 		std::cout << stream.str() << std::endl;
 	}
 }
-
 DoubleBoundingBox3D Image::boundingBox() const
 {
 	mOutputImageData->UpdateInformation();
 	DoubleBoundingBox3D bounds(mOutputImageData->GetBounds());
 	return bounds;
 }
-
 vtkImageAccumulatePtr Image::getHistogram()
 {
 	if (mHistogramPtr.GetPointer() == NULL)
@@ -254,7 +224,6 @@ vtkImageAccumulatePtr Image::getHistogram()
 	mHistogramPtr->Update();
 	return mHistogramPtr;
 }
-
 int Image::getMax()
 {
 	// Alternatively create max from histogram
@@ -270,7 +239,6 @@ int Image::getMin()
 	//return (*iter).first;
 	return (int)mImageTransferFunctions3D->getScalarMin();
 }
-
 int Image::getPosMax()
 {
 	return (int)mImageTransferFunctions3D->getScalarMax() - getMin();
@@ -357,7 +325,6 @@ void Image::parseXml(QDomNode& dataNode)
 	  landmarkNode = landmarkNode.nextSiblingElement("landmark");
 	}
 	while(!landmarkNode.isNull());
-
 }
 
 //struct InternalData
@@ -407,6 +374,4 @@ void Image::parseXml(QDomNode& dataNode)
 //	}
 //	return retval;
 //}
-
-
 } // namespace ssc

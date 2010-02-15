@@ -43,14 +43,10 @@ public:
 				const vtkImageDataPtr& data);
 	void setVtkImageData(const vtkImageDataPtr& data);
 
-	void setName(const std::string& name);
 	void setFilePath(const std::string& filePath);///< Set current file path to file
 	virtual void set_rMd(Transform3D rMd);
 
-	virtual std::string getUid() const;
-	virtual std::string getName() const;
-	virtual std::string getFilePath() const;
-	virtual REGISTRATION_STATUS getRegistrationStatus() const;
+	virtual std::string getFilePath() const; ///get the images filepath //TODO move to ssc::Data?
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
@@ -99,8 +95,6 @@ protected:
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 
-	std::string mUid;
-	std::string mName;
 	std::string mFilePath;
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
