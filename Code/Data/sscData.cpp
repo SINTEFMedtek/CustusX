@@ -4,10 +4,10 @@
 namespace ssc
 {
 Data::Data() : 
-	mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
+  mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
 {}
 Data::Data(const std::string& uid, const std::string& name) :
-    mUid(uid), mName(name), mRegistrationStatus(rsNOT_REGISTRATED)
+  mUid(uid), mName(name), mRegistrationStatus(rsNOT_REGISTRATED)
 {}
 /*
 Data::Data(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData) : 
@@ -21,10 +21,17 @@ void Data::setUid(const std::string& uid)
 {
 	mUid = uid;
 }
+
 void Data::setName(const std::string& name)
 {
 	mName = name;
 }
+
+void Data::setFilePath(const std::string& filePath)
+{
+  mFilePath = filePath;
+}
+
 void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 {
 	mRegistrationStatus = regStat;
@@ -45,6 +52,12 @@ std::string Data::getName() const
 {
 	return mName;
 }
+
+std::string Data::getFilePath() const
+{
+  return mFilePath;
+}
+
 REGISTRATION_STATUS Data::getRegistrationStatus() const
 {
 	return mRegistrationStatus;

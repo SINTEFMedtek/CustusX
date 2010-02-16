@@ -25,7 +25,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
   Data(uid),
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(new ImageLUT2D(data)),
-	mFilePath(uid), mBaseImageData(data),
+	mBaseImageData(data),
 	mLandmarks(vtkDoubleArrayPtr::New())
 {
 	mOutputImageData = mBaseImageData;
@@ -99,14 +99,6 @@ ImageTF3DPtr Image::getTransferFunctions3D()
 ImageLUT2DPtr Image::getLookupTable2D()
 {
 	return mImageLookupTable2D;
-}
-void Image::setFilePath(const std::string& filePath)
-{
-  mFilePath = filePath;
-}
-std::string Image::getFilePath() const
-{
-  return mFilePath;
 }
 //See ssc::Data
 /*REGISTRATION_STATUS Image::getRegistrationStatus() const
@@ -292,6 +284,7 @@ void Image::addXml(QDomNode& parentNode)
   imageNode.appendChild(landmarksNode);
 
 }
+
 void Image::parseXml(QDomNode& dataNode)
 {
   // image node must be parsed in the data manager to create this Image object

@@ -146,6 +146,7 @@ SET( SSC_SOURCE_FILES
     Data/sscImageTF3D.cpp
     Data/sscImageLUT2D.cpp
     Data/sscGPUImageBuffer.cpp
+    Data/sscMesh.h
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManagerImpl.cpp

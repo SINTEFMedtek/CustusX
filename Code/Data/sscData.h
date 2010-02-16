@@ -13,6 +13,8 @@ typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 
 #include "sscRep.h"
 
+class QDomNode;
+
 namespace ssc
 {
 
@@ -38,20 +40,25 @@ public:
 
 	void setUid(const std::string& uid);
 	void setName(const std::string& name);
+	void setFilePath(const std::string& filePath);///< Set current file path to file
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	virtual void set_rMd(Transform3D rMd);
 
 	virtual std::string getUid() const; ///< \return unique id for this instance
 	virtual std::string getName() const; /// \return a descriptive name for this instance
+	virtual std::string getFilePath() const; ///< \return the corresponding file path
 	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
+  virtual void parseXml(QDomNode& dataNode) = 0;///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
 protected:
 	std::string mUid;
 	std::string mName;
+	std::string mFilePath;
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	Transform3D m_rMd; ///< the transform from data to reference space
@@ -59,6 +66,8 @@ protected:
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 
 };
+  
+typedef boost::shared_ptr<Data> DataPtr;
 
 } // end namespace ssc
 

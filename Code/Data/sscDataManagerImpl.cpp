@@ -12,6 +12,7 @@ typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 #include <QDomDocument>
+#include <QFileInfo>
 
 namespace ssc
 {
@@ -173,20 +174,26 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   {
     iter->second->addXml(dataManagerNode);
   }
+  for(std::map<std::string, MeshPtr>::const_iterator iter=mMeshes.begin(); iter!=mMeshes.end(); ++iter)
+  {
+    iter->second->addXml(dataManagerNode);
+  }
 }
 void DataManagerImpl::parseXml(QDomNode& dataNode)
 {
   // All images must be created from the DataManager, so the image nodes
   // are parsed here
   QDomNode node = dataNode.firstChild();
+  QDomElement nameNode;
+  std::string path;//Path to data file
+  
   while (!node.isNull())
   {
     if(node.nodeName() == "image")
     {
       QDomElement uidNode = node.namedItem("uid").toElement();
-      QDomElement nameNode = node.namedItem("name").toElement();
+      nameNode = node.namedItem("name").toElement();
       QDomElement filePathNode = node.namedItem("filePath").toElement();
-      std::string path;
       if(!filePathNode.isNull()) 
         path = filePathNode.text().toStdString();
       else if(!uidNode.isNull())
@@ -196,18 +203,51 @@ void DataManagerImpl::parseXml(QDomNode& dataNode)
         std::cout << "Warning: DataManager::parseXml() found no uid/filePath for image";
         std::cout << std::endl;
       }
-      if(!path.empty())
-      {
-        ssc::ImagePtr image = loadImage(path, ssc::rtMETAIMAGE);
-        image->setName(nameNode.text().toStdString());
-        image->setFilePath(path);
-        image->parseXml(node);
-      }
     }
+    else if(node.nodeName() == "mesh")
+    {
+      QDomElement uidNode = node.namedItem("uid").toElement();
+      nameNode = node.namedItem("name").toElement();
+      QDomElement filePathNode = node.namedItem("filePath").toElement();
+      if(!filePathNode.isNull()) 
+        path = filePathNode.text().toStdString();
+      else if(!uidNode.isNull())
+        path = uidNode.text().toStdString();
+      else
+      {
+        std::cout << "Warning: DataManager::parseXml() found no uid/filePath for mesh";
+        std::cout << std::endl;
+      }
+    }    
     else
     {
       std::cout << "Warning: DataManager::parseXml() found unknown XML node: ";
       std::cout << node.nodeName().toStdString() << std::endl;
+    }
+    
+    if(!path.empty())
+    {
+      ssc::DataPtr data;
+      
+      QFileInfo fileInfo(path.c_str());
+      QString fileType = fileInfo.suffix();
+      if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
+         fileType.compare("mha", Qt::CaseInsensitive) == 0)
+      {
+        data = this->loadImage(path, ssc::rtMETAIMAGE);
+      }
+      else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
+      {
+        data = this->loadMesh(path, ssc::mrtSTL);
+      }
+      else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+      {
+        data = this->loadMesh(path, ssc::mrtPOLYDATA);
+      }
+      
+      data->setName(nameNode.text().toStdString());
+      data->setFilePath(path);
+      data->parseXml(node);
     }
     node = node.nextSibling();
   }

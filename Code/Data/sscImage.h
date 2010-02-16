@@ -43,10 +43,7 @@ public:
 				const vtkImageDataPtr& data);
 	void setVtkImageData(const vtkImageDataPtr& data);
 
-	void setFilePath(const std::string& filePath);///< Set current file path to file
 	virtual void set_rMd(Transform3D rMd);
-
-	virtual std::string getFilePath() const; ///get the images filepath //TODO move to ssc::Data?
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
@@ -68,8 +65,8 @@ public:
 	int getRange();///< For convenience: getMax() – getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
 
-	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels
-	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \return The created subnode
+	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 //	/**Return a reference to a GL texture buffer collection for the image.
 //	 * If no buffer exist, it is created. When noone uses the buffer, it is released. */
@@ -94,8 +91,6 @@ protected slots:
 protected:
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
-
-	std::string mFilePath;
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 	

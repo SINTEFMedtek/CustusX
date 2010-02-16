@@ -11,6 +11,9 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 #include "sscData.h"
 #include "sscRep.h"
 
+class QDomNode;
+class QDomDocument;
+
 namespace ssc
 {
 
@@ -30,7 +33,10 @@ public:
 	
 //	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 //	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
-
+  
+	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels
+	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+  
 private:
 	vtkPolyDataPtr mVtkPolyData;
 
