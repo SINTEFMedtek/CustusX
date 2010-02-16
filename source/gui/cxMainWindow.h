@@ -2,7 +2,7 @@
 #define CXMAINWINDOW_H_
 
 #include <QMainWindow>
-#include "sscImage.h"
+#include "sscData.h"
 
 class QAction;
 class QMenu;
@@ -38,14 +38,14 @@ class FileCopied : public QObject
 {
   Q_OBJECT
 public:
-  FileCopied(const std::string& filePath, ssc::ImagePtr image);///< Creates the object
+  FileCopied(const std::string& filePath, ssc::DataPtr image);///< Creates the object
   
 signals:
   void fileCopiedCorrectly();///< Sends a signal when the copy is verified
 protected:
   MessageManager* mMessageManager; ///< takes messages intended for the user
   std::string mFilePath;
-  ssc::ImagePtr mImage;
+  ssc::DataPtr mData;
 public slots:
   void areFileCopiedSlot();///< Checks if the file is finished copying and updates the ssc::Image
 };

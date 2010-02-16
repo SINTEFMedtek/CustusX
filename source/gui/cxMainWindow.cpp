@@ -31,10 +31,10 @@
 namespace cx
 {
 
-FileCopied::FileCopied(const std::string& filePath, ssc::ImagePtr image) :
+FileCopied::FileCopied(const std::string& filePath, ssc::DataPtr data) :
   mMessageManager(MessageManager::getInstance()),
   mFilePath(filePath),
-  mImage(image)
+  mData(data)
 {}
   
 void FileCopied::areFileCopiedSlot()
@@ -43,7 +43,9 @@ void FileCopied::areFileCopiedSlot()
   
   QFile file(QString::fromStdString(mFilePath));
   
-  bool foundDimSize = false;
+  bool correctCopy = false;
+  QFileInfo fileInfo(mFilePath.c_str());
+  QString fileType = fileInfo.suffix();
   
   if (!file.exists() || !file.open(QIODevice::NotOpen|QIODevice::ReadOnly))
   {
@@ -51,18 +53,22 @@ void FileCopied::areFileCopiedSlot()
     file.close();
     QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));// Wait another 5 seconds
   }
-  else
+  else if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
+          fileType.compare("mha", Qt::CaseInsensitive) == 0)
   {
+    bool foundDimSize = false;
+    bool foundElementType = false;
     // Parse file to check if copied correctly
     QTextStream stream(&file);
-    //QTextStream stream(file.handle());
     QString sLine;
     QRegExp rx("([\\d\\.]+)\\s+([\\d\\.]+)\\s+([\\d\\.]+)");
     QRegExp rxDimSize("DimSize =");
-    int filesize = 0;
+    QRegExp rxElementType("ElementType = ");
+    int numElements = 0;
     bool end = false;
+    int elementSize = 1;
     
-    while ( !end && !stream.atEnd() && !foundDimSize)
+    while ( !end && !stream.atEnd() )
     {
       sLine = stream.readLine(); // line of text excluding '\n'
       if(sLine.isEmpty())
@@ -75,9 +81,26 @@ void FileCopied::areFileCopiedSlot()
           rx.indexIn(sLine);
           rx.pos();
           QStringList list = rx.capturedTexts();
-          filesize = list[1].toInt() * list[2].toInt() * list[3].toInt();
+          numElements = list[1].toInt() * list[2].toInt() * list[3].toInt();
           foundDimSize = true;
         }
+        rxElementType.indexIn(sLine);
+        if ( rxElementType.pos() != -1 )
+        {
+          rx.indexIn(sLine);
+          rx.pos();
+          QString elementType = rx.cap();
+          mMessageManager->sendInfo("ElementType: "+elementType.toStdString());
+          if(elementType=="MET_USHORT") //16 bit
+            elementSize = 2;
+          else if(elementType=="MET_SHORT")
+            elementSize = 2;
+          else // 8 bit
+            elementSize = 1;
+          foundElementType = true;
+        }
+        if(foundDimSize && foundElementType)
+          end = true;
       }
     }
     if(!file.flush())
@@ -87,7 +110,6 @@ void FileCopied::areFileCopiedSlot()
     if (!foundDimSize)
     {
       mMessageManager->sendWarning("File is not copied correctly: "+mFilePath+" Parts missing");
-      QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));// Wait another 5 seconds
     }
     else
     {
@@ -98,21 +120,40 @@ void FileCopied::areFileCopiedSlot()
       else if(rawFilepath.endsWith(".mha"))
         rxFileype.setPattern("\\.mha");
       rawFilepath = rawFilepath.replace(rxFileype, ".raw");
-      //QFile rawFile(filepath.replace(rxFileype, ".raw"));
       QFile rawFile(rawFilepath);
       rawFile.open(QIODevice::ReadOnly);
       
       //Test if raw file is large enough
-      //TODO: also check for 16 bit file
-      if(rawFile.bytesAvailable() < filesize)
+      if(rawFile.bytesAvailable() < (numElements * elementSize))
         mMessageManager->sendWarning("File is not copied correctly: "+rawFilepath.toStdString()+" Parts missing");
+      else
+        correctCopy = true;
       
-      mMessageManager->sendInfo("File copied correctly: "+mFilePath);
-      mImage->setFilePath(mFilePath); // Update file path
-      
-      //Save patient, to avoid problems
-      emit fileCopiedCorrectly();
     }
+  }
+  else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
+  {
+    //TODO: Check intergity of file
+    correctCopy = true;
+  }
+  else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+  {
+    //TODO: Check intergity of file
+    correctCopy = true;
+  }
+  
+  if(!correctCopy)
+  {
+    mMessageManager->sendWarning("File(s) not copied correctly - wait another 5 seconds");
+    QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));
+  }
+  else
+  {
+    mMessageManager->sendInfo("File copied correctly: "+mFilePath);
+    mData->setFilePath(mFilePath); // Update file path
+    
+    //Save patient, to avoid problems
+    emit fileCopiedCorrectly();
   }
 }
   
@@ -607,6 +648,14 @@ void MainWindow::createPatientFolders(QString choosenDir)
   }
   
   newDir = choosenDir;
+  newDir.append("/Surfaces"); 
+  if(!QDir().exists(newDir))
+  {
+    QDir().mkdir(newDir);
+    mMessageManager->sendInfo("Made a new surface folder: "+newDir.toStdString());
+  }
+  
+  newDir = choosenDir;
   newDir.append("/Logs"); 
   if(!QDir().exists(newDir))
   {
@@ -755,7 +804,6 @@ void MainWindow::usAcquisitionWorkflowSlot()
 }
 void MainWindow::importDataSlot()
 {
-  //TODO: Clean up this function...
   mMessageManager->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
@@ -768,6 +816,7 @@ void MainWindow::importDataSlot()
 
   QString globalPatientFolderPath = mSettings->value("globalPatientDataFolder").toString();
   QString patientsImageFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Images/";
+  QString patientsSurfaceFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Surfaces/";
 
   QDir dir;
   if(!dir.exists(patientsImageFolder))
@@ -775,104 +824,46 @@ void MainWindow::importDataSlot()
     dir.mkpath(patientsImageFolder);
     mMessageManager->sendInfo("Made new directory: "+patientsImageFolder.toStdString());
   }
+  if(!dir.exists(patientsSurfaceFolder))
+  {
+    dir.mkpath(patientsSurfaceFolder);
+    mMessageManager->sendInfo("Made new directory: "+patientsSurfaceFolder.toStdString());
+  }
 
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
-  QFile toFile(pathToNewFile);
 
-  //Not copying, because we can't get the system to wait for the copy to finish
-  //before the datamanager tries to load it!
-  /*if(fileName != pathToNewFile && false) //checks if we need to copy
-  {
-    if(fromFile.copy(toFile.fileName()))
-    {
-      mMessageManager->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-    }else
-    {
-      mMessageManager->sendError("First copy failed!");
-      return;
-    }
-    if(!toFile.exists())
-      mMessageManager->sendWarning("File not copied");
-    //make sure we also copy the .raw file in case if mhd/hdr
-    if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
-    {
-      //presuming the other file is a raw file
-      //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".mhd", ".raw");
-      QString newRawFile = pathToNewFile.replace(".mhd", ".raw");
-      fromFile.setFileName(originalRawFile);
-      toFile.setFileName(newRawFile);
-
-      if(fromFile.copy(toFile.fileName()))
-      {
-        mMessageManager->sendInfo("File copied to new location: "+newRawFile.toStdString());
-      }
-      else
-      {
-        mMessageManager->sendError("Second copy failed!");
-        return;
-      }
-      if(!toFile.exists())
-        mMessageManager->sendWarning("File not copied");
-        
-    }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
-    {
-      //presuming the other file is a raw file
-      //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".hdr", ".raw");
-      QString newRawFile = pathToNewFile.replace(".hdr", ".raw");
-      fromFile.setFileName(originalRawFile);
-      toFile.setFileName(newRawFile);
-
-      if(fromFile.copy(toFile.fileName()))
-      {
-        mMessageManager->sendInfo("File copied to new location: "+newRawFile.toStdString());
-      }
-      else
-      {
-        mMessageManager->sendError("Second copy failed!");
-        return;
-      }
-    }
-  }
-  else //no copy was needed
-  {
-    mMessageManager->sendInfo("Didn't need to copy because file was in the right place.");
-    
-    // Don't update fileName yet, as copy is not implemented. Just generate a warning
-    //fileName = pathToNewFile;
-    if(fileName != pathToNewFile)
-      mMessageManager->sendWarning("Imported file is not in the correct location: "+patientsImageFolder.toStdString());
-  }*/
-  
   //Need to wait for the copy to finish...
   
   // Read files before copy
+  ssc::DataPtr data;
+  
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-     fileType.compare("hdr", Qt::CaseInsensitive) == 0)
+     fileType.compare("mha", Qt::CaseInsensitive) == 0)
   {
-    ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), image);
-    connect(fileCopied, SIGNAL(fileCopiedCorrectly()), 
-            this, SLOT(savePatientFileSlot()));
-    QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
+    //ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
+    data = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
-    mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
+    data = mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
+    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
-    mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
+    data = mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
+    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
   
-  //if(fileName != pathToNewFile) //checks if we need to copy
-  //  QTimer::singleShot(10000, this, SLOT(areFileCopiedSlot()));// Wait 10 seconds  
-  
+  FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), data);
+  connect(fileCopied, SIGNAL(fileCopiedCorrectly()), 
+          this, SLOT(savePatientFileSlot()));
+  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
+    
   //Copy file
   if(fileName != pathToNewFile) //checks if we need to copy
   {
+    QFile toFile(pathToNewFile);
     if(fromFile.copy(toFile.fileName()))
     {
       //mMessageManager->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
@@ -885,7 +876,7 @@ void MainWindow::importDataSlot()
       mMessageManager->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
     if(!toFile.exists())
       mMessageManager->sendWarning("File not copied");
-    //make sure we also copy the .raw file in case if mhd/hdr
+    //make sure we also copy the .raw file in case if mhd/mha
     if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
     {
       //presuming the other file is a raw file
@@ -909,12 +900,12 @@ void MainWindow::importDataSlot()
       if(!toFile.exists())
         mMessageManager->sendWarning("File not copied");
       
-    }else if(fileType.compare("hdr", Qt::CaseInsensitive) == 0)
+    }else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
     {
       //presuming the other file is a raw file
       //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".hdr", ".raw");
-      QString newRawFile = pathToNewFile.replace(".hdr", ".raw");
+      QString originalRawFile = fileName.replace(".mha", ".raw");
+      QString newRawFile = pathToNewFile.replace(".mha", ".raw");
       fromFile.setFileName(originalRawFile);
       toFile.setFileName(newRawFile);
       

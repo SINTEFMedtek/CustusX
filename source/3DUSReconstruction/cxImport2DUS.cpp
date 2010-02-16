@@ -90,7 +90,7 @@ void Import2DUS::readInputFile(const char *filename)
 {
   this->mFileName = filename;
   // Remove file ending
-  unsigned int loc = mFileName.rfind(".mha");
+  size_t loc = mFileName.rfind(".mha");
   if ( loc == std::string::npos )
     loc = mFileName.rfind(".mhd");
   if ( loc != std::string::npos )
