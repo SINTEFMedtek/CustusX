@@ -84,8 +84,8 @@ public:
 	virtual MeshPtr getMesh(const std::string& uid);
 	virtual std::map<std::string, MeshPtr> getMeshes();
 
-	virtual std::map<std::string, std::string> getMeshUIDsWithNames() const;
-	virtual std::vector<std::string> getMeshUIDs() const;
+	virtual std::map<std::string, std::string> getMeshUidsWithNames() const;
+	virtual std::vector<std::string> getMeshUids() const;
 	virtual std::vector<std::string> getMeshNames() const;
 
 	// global data (move to separate class if list grows)

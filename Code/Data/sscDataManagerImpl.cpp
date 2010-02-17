@@ -160,8 +160,8 @@ std::vector<std::string> DataManagerImpl::getImageUids() const
 
 MeshPtr DataManagerImpl::getMesh(const std::string& uid) { return MeshPtr(); }
 std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() { return std::map<std::string, MeshPtr>();  }
-std::map<std::string, std::string> DataManagerImpl::getMeshUIDsWithNames() const { return std::map<std::string, std::string>(); }
-std::vector<std::string> DataManagerImpl::getMeshUIDs() const {  return std::vector<std::string>(); }
+std::map<std::string, std::string> DataManagerImpl::getMeshUidsWithNames() const { return std::map<std::string, std::string>(); }
+std::vector<std::string> DataManagerImpl::getMeshUids() const {  return std::vector<std::string>(); }
 std::vector<std::string> DataManagerImpl::getMeshNames() const {  return std::vector<std::string>(); }
 
 void DataManagerImpl::addXml(QDomNode& parentNode)
