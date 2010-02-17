@@ -44,7 +44,7 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
 
     //Get a list of available image and meshes names
     std::map<std::string, std::string> imageUidsAndNames = mDataManager->getImageUidsAndNames();
-    std::map<std::string, std::string> meshUidsAndNames = mDataManager->getMeshUIDsWithNames();
+    std::map<std::string, std::string> meshUidsAndNames = mDataManager->getMeshUidsWithNames();
 
     //Display the lists to the user
     //Extract to own function if often reused...
