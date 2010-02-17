@@ -38,7 +38,7 @@ class FileCopied : public QObject
 {
   Q_OBJECT
 public:
-  FileCopied(const std::string& filePath, ssc::DataPtr image);///< Creates the object
+  FileCopied(const std::string& filePath, ssc::DataPtr data);///< Creates the object
   
 signals:
   void fileCopiedCorrectly();///< Sends a signal when the copy is verified

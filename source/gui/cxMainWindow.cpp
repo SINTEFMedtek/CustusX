@@ -235,7 +235,7 @@ void MainWindow::createActions()
   connect(mNewPatientAction, SIGNAL(triggered()),
           this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()),
-          this, SLOT(loadPatientRegistration()));
+          this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()),
           this, SLOT(savePatientFileSlot()));
 
@@ -569,7 +569,7 @@ void MainWindow::activateImageRegistationState()
   mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
   mViewManager->get3DView("View3D_1")->addRep(probeRep);
   
-  connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(const int)),
+  connect(mImageRegistrationWidget, SIGNAL(thresholdChangedSlot(const int)),
           probeRep.get(), SLOT(setThresholdSlot(const int)));
 
   mCurrentWorkflowState = IMAGE_REGISTRATION;
