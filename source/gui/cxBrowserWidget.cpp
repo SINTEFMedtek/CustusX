@@ -54,7 +54,7 @@ void BrowserWidget::populateTreeWidget()
   std::map<std::string, std::string> imageUidAndNames =
       mDataManager->getImageUidsAndNames();
   std::map<std::string, std::string> meshUidAndNames =
-      mDataManager->getMeshUIDsWithNames();
+      mDataManager->getMeshUidsWithNames();
   std::map<std::string, std::string> toolUidAndName =
       mToolManager->getToolUidsAndNames();
 
