@@ -177,16 +177,16 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     transform.ExportTransform(*vtkMatrix.GetPointer());
 
     const ssc::Transform3D prMt(vtkMatrix.GetPointer()); //prMt, transform from tool to patientref
-    ssc::Transform3D rMpr = *((ToolManager::getInstance()->get_rMpr()).get()); //rMpr, transform from patientref to global ref
-    ssc::Transform3D rMt = rMpr * prMt; //rMt, transform from tool to global ref
+    //ssc::Transform3D rMpr = *((ToolManager::getInstance()->get_rMpr()).get()); //rMpr, transform from patientref to global ref
+    //ssc::Transform3D rMt = rMpr * prMt; //rMt, transform from tool to global ref
     double timestamp = transform.GetStartTime();
 
-    m_prMt = boost::shared_ptr<ssc::Transform3D>(new ssc::Transform3D(prMt));
+    m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(prMt));
 
     mTransforms->push_back(m_prMt);
     mTimestamps->push_back(timestamp);
     //emit toolTransformAndTimestamp(rMt, timestamp);
-    emit toolTransformAndTimestamp(prMt, timestamp);
+    emit toolTransformAndTimestamp((*m_prMt), timestamp);
     emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);
   }
   //Successes
