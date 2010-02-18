@@ -293,11 +293,13 @@ void PatientRegistrationWidget::setOffset(int value)
 {
   mResetOffsetButton->setEnabled(true);
   mLandmarkTableWidget->setDisabled(true);
-
-  ssc::Transform3DPtr offsetPtr(new ssc::Transform3D());
-  (*offsetPtr.get())[0][3] = mXOffsetSlider->value();
-  (*offsetPtr.get())[1][3] = mYOffsetSlider->value();
-  (*offsetPtr.get())[2][3] = mZOffsetSlider->value();
+  
+  vtkMatrix4x4* offsetMatrix = vtkMatrix4x4::New();
+  offsetMatrix->SetElement(0, 3, mXOffsetSlider->value());
+  offsetMatrix->SetElement(1, 3, mYOffsetSlider->value());
+  offsetMatrix->SetElement(2, 3, mZOffsetSlider->value());
+  
+  ssc::Transform3DPtr offsetPtr(new ssc::Transform3D(offsetMatrix));
   mRegistrationManager->setManualPatientRegistrationOffsetSlot(offsetPtr);
 }
 void PatientRegistrationWidget::showEvent(QShowEvent* event)
