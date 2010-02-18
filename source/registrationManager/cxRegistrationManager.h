@@ -43,12 +43,20 @@ public:
   void setGlobalPointSetNameList(NameListType nameList); ///< set user specific names on the global points
   NameListType getGlobalPointSetNameList(); ///< get a map of the names
 
+  void setManualPatientRegistration(ssc::Transform3DPtr patientRegistration); ///< used for when a user wants to
+  ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
+  void resetManualPatientientRegistration(); ///< tells the system not to use a manually added patient registration, after it uses landmarks for patient registration instead
+
+  ssc::Transform3DPtr getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
+  void resetOffset(); ///< removes the offset, after it uses landmarks for patient registration instead
+
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
 
 public slots:
   void setGlobalPointsNameSlot(int index, std::string name); ///< set the points (user) name
   void setGlobalPointsActiveSlot(int index, bool active); ///< set if the point should be used in matrix calc or not
+  void setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset); ///< transform for (slightly) moving a patient registration
 
 protected:
   RegistrationManager(); ///< use getInstance instead
@@ -62,6 +70,9 @@ protected:
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
   vtkDoubleArrayPtr mGlobalPointSet; ///< the pointset used when doing the registration
   NameListType mGlobalPointSetNameList; ///< names of the points in the global point set
+
+  ssc::Transform3DPtr mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
+  ssc::Transform3DPtr mManualPatientRegistration; ///< patient registration loaded from file
 
 private:
   RegistrationManager(RegistrationManager const&); ///< not implemented

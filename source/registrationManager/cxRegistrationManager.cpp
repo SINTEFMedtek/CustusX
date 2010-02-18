@@ -57,10 +57,63 @@ RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList
 {
   return mGlobalPointSetNameList;
 }
+void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patientRegistration)
+{
+  mManualPatientRegistration = patientRegistration;
+  mToolManager->set_rMpr(patientRegistration);
+
+  //if an offset existed, its no longer valid and should be removed
+  mPatientRegistrationOffset.reset();
+
+  mMessageManager->sendInfo("Manual patient registration is set.");
+}
+ssc::Transform3DPtr RegistrationManager::getManualPatientRegistration()
+{
+  return mManualPatientRegistration;
+}
+void RegistrationManager::resetManualPatientientRegistration()
+{
+  mManualPatientRegistration.reset();
+  this->doPatientRegistration();
+}
+void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset)
+{
+  ssc::Transform3DPtr currentTransform;
+  if(mManualPatientRegistration) //we use this if we have it
+  {
+    currentTransform = mManualPatientRegistration;
+  }else if(mMasterImage)
+  {
+    this->resetOffset();
+    currentTransform = mToolManager->get_rMpr();
+  }else //if we dont have a masterimage or a manualtransform we just want to save the offset
+  {
+    //mPatientRegistrationOffset = offset;
+    return;
+  }
+  mPatientRegistrationOffset = offset;
+  ssc::Transform3D newTransform = (*(currentTransform.get()))*(*(mPatientRegistrationOffset.get()));
+  ssc::Transform3DPtr newTransformPtr(&newTransform);
+  mToolManager->set_rMpr(newTransformPtr);
+
+  mMessageManager->sendInfo("Offset for the patient registration is set.");
+}
+ssc::Transform3DPtr RegistrationManager::getManualPatientRegistrationOffset()
+{
+  return mPatientRegistrationOffset;
+}
+void RegistrationManager::resetOffset()
+{
+  mPatientRegistrationOffset.reset();
+  this->doPatientRegistration();
+}
 void RegistrationManager::doPatientRegistration()
 {
-  // TODO
-  // Bør sjekke om masterImage er satt ?
+  if(!mMasterImage)
+  {
+    mMessageManager->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
+    return;
+  }
 
   vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
   vtkDoubleArrayPtr imagePoints = this->getMasterImage()->getLandmarks();
