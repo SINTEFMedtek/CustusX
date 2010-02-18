@@ -569,8 +569,8 @@ void MainWindow::activateImageRegistationState()
   mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
   mViewManager->get3DView("View3D_1")->addRep(probeRep);
   
-  connect(mImageRegistrationWidget, SIGNAL(thresholdChangedSlot(const int)),
-          probeRep.get(), SLOT(setThresholdSlot(const int)));
+  connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(int)),
+          probeRep.get(), SLOT(setThresholdSlot(int)));
 
   mCurrentWorkflowState = IMAGE_REGISTRATION;
 }
@@ -586,7 +586,7 @@ void MainWindow::deactivateImageRegistationState()
     mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
     mViewManager->get3DView("View3D_1")->removeRep(probeRep);
 
-    disconnect(mImageRegistrationWidget, SIGNAL(tresholdChanged(const int)),
+    disconnect(mImageRegistrationWidget, SIGNAL(tresholdChanged(int)),
             probeRep.get(), SLOT(setTresholdSlot(const int)));
   }
 }
