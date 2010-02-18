@@ -6,6 +6,9 @@
 #include <QTableWidgetItem>
 #include <QHeaderView>
 #include <QLabel>
+#include <QSlider>
+#include <QGridLayout>
+#include <QSpinBox>
 #include <vtkDoubleArray.h>
 #include <sscVector3D.h>
 #include <sscVolumetricRep.h>
@@ -26,13 +29,29 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
   mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
+  mOffsetLabel(new QLabel(QString("Manual offset:"), this)),
+  mOffsetWidget(new QWidget(this)),
+  mOffsetsGridLayout(new QGridLayout(mOffsetWidget)),
+  mXLabel(new QLabel(QString("X "), this)),
+  mYLabel(new QLabel(QString("Y "), this)),
+  mZLabel(new QLabel(QString("Z "), this)),
+  mXOffsetSlider(new QSlider(Qt::Horizontal, this)),
+  mYOffsetSlider(new QSlider(Qt::Horizontal, this)),
+  mZOffsetSlider(new QSlider(Qt::Horizontal, this)),
+  mXSpinBox(new QSpinBox(mOffsetWidget)),
+  mYSpinBox(new QSpinBox(mOffsetWidget)),
+  mZSpinBox(new QSpinBox(mOffsetWidget)),
+  mResetOffsetButton(new QPushButton("Clear offset", this)),
   mRegistrationManager(RegistrationManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
   mMessageManager(MessageManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mCurrentRow(-1),
-  mCurrentColumn(-1)
+  mCurrentColumn(-1),
+  mMinValue(-200),
+  mMaxValue(200),
+  mDefaultValue(0)
 {
   //Dock widget
   this->setWindowTitle("Patient Registration");
@@ -47,6 +66,9 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mToolSampleButton->setDisabled(true);
   connect(mToolSampleButton, SIGNAL(clicked()),
           this, SLOT(toolSampleButtonClickedSlot()));
+  mResetOffsetButton->setDisabled(true);
+  connect(mResetOffsetButton, SIGNAL(clicked()),
+          this, SLOT(resetOffset()));
 
   //toolmanager
   connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)),
@@ -56,10 +78,63 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   connect(mToolManager, SIGNAL(toolSampleRemoved(double,double,double,unsigned int)),
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
 
+  //sliders
+  mXOffsetSlider->setRange(mMinValue,mMaxValue);
+  mXOffsetSlider->setValue(mDefaultValue);
+  mYOffsetSlider->setRange(mMinValue,mMaxValue);
+  mYOffsetSlider->setValue(mDefaultValue);
+  mZOffsetSlider->setRange(mMinValue,mMaxValue);
+  mZOffsetSlider->setValue(mDefaultValue);
+
+  //spinboxes
+  mXSpinBox->setRange(mMinValue,mMaxValue);
+  mXSpinBox->setValue(mDefaultValue);
+  mYSpinBox->setRange(mMinValue,mMaxValue);
+  mYSpinBox->setValue(mDefaultValue);
+  mZSpinBox->setRange(mMinValue,mMaxValue);
+  mZSpinBox->setValue(mDefaultValue);
+
+  //connect sliders to the spinbox
+  connect(mXOffsetSlider, SIGNAL(valueChanged(int)),
+          mXSpinBox, SLOT(setValue(int)));
+  connect(mYOffsetSlider, SIGNAL(valueChanged(int)),
+          mYSpinBox, SLOT(setValue(int)));
+  connect(mZOffsetSlider, SIGNAL(valueChanged(int)),
+          mZSpinBox, SLOT(setValue(int)));
+  connect(mXSpinBox, SIGNAL(valueChanged(int)),
+          mXOffsetSlider, SLOT(setValue(int)));
+  connect(mYSpinBox, SIGNAL(valueChanged(int)),
+          mYOffsetSlider, SLOT(setValue(int)));
+  connect(mZSpinBox, SIGNAL(valueChanged(int)),
+          mZOffsetSlider, SLOT(setValue(int)));
+
+  //connect sliders registrationmanager,
+  //spinboxes are connected to the sliders so no need to connect them to the
+  //registration manager as well
+  connect(mXOffsetSlider, SIGNAL(valueChanged(int)),
+          this, SLOT(setOffset(int)));
+  connect(mYOffsetSlider, SIGNAL(valueChanged(int)),
+          this, SLOT(setOffset(int)));
+  connect(mZOffsetSlider, SIGNAL(valueChanged(int)),
+          this, SLOT(setOffset(int)));
+
   //layout
+  mOffsetsGridLayout->addWidget(mXLabel, 0, 0);
+  mOffsetsGridLayout->addWidget(mYLabel, 1, 0);
+  mOffsetsGridLayout->addWidget(mZLabel, 2, 0);
+  mOffsetsGridLayout->addWidget(mXOffsetSlider, 0, 1);
+  mOffsetsGridLayout->addWidget(mYOffsetSlider, 1, 1);
+  mOffsetsGridLayout->addWidget(mZOffsetSlider, 2, 1);
+  mOffsetsGridLayout->addWidget(mXSpinBox, 0, 2);
+  mOffsetsGridLayout->addWidget(mYSpinBox, 1, 2);
+  mOffsetsGridLayout->addWidget(mZSpinBox, 2, 2);
+
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
+  mVerticalLayout->addWidget(mOffsetLabel);
+  mVerticalLayout->addWidget(mOffsetWidget);
+  mVerticalLayout->addWidget(mResetOffsetButton);
   this->setLayout(mVerticalLayout);
 
   ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
@@ -198,15 +273,32 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   connect(mToolToSample.get(), SIGNAL(toolVisible(bool)),
               this, SLOT(toolVisibleSlot(bool)));
 
-  //TODO: REMOVE
-  //only for testing...
-  /*ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
-  toolRep3D_1->setTool(mToolToSample);
-  View3D* view = mViewManager->get3DView("View3D_1");
-  view->addRep(toolRep3D_1);*/
-
   //update button
   mToolSampleButton->setEnabled(mToolToSample->getVisible());
+}
+void PatientRegistrationWidget::resetOffset()
+{
+  if(mXOffsetSlider->value() != mDefaultValue ||
+     mYOffsetSlider->value() != mDefaultValue ||
+     mZOffsetSlider->value() != mDefaultValue)
+  {
+    mXOffsetSlider->setValue(mDefaultValue);
+    mYOffsetSlider->setValue(mDefaultValue);
+    mZOffsetSlider->setValue(mDefaultValue);
+    mResetOffsetButton->setDisabled(true);
+    mLandmarkTableWidget->setEnabled(true);
+  }
+}
+void PatientRegistrationWidget::setOffset(int value)
+{
+  mResetOffsetButton->setEnabled(true);
+  mLandmarkTableWidget->setDisabled(true);
+
+  ssc::Transform3DPtr offsetPtr(new ssc::Transform3D());
+  (*offsetPtr.get())[0][3] = mXOffsetSlider->value();
+  (*offsetPtr.get())[1][3] = mYOffsetSlider->value();
+  (*offsetPtr.get())[2][3] = mZOffsetSlider->value();
+  mRegistrationManager->setManualPatientRegistrationOffsetSlot(offsetPtr);
 }
 void PatientRegistrationWidget::showEvent(QShowEvent* event)
 {
