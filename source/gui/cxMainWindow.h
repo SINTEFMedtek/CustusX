@@ -162,7 +162,7 @@ protected:
   QAction* mPreferencesAction;
   QAction* mQuitAction;
   
-  QAction* mNewPatientAction;///< Actionfor creating a new patient
+  QAction* mNewPatientAction;///< Action for creating a new patient
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
 	

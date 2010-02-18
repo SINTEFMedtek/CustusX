@@ -968,8 +968,8 @@ void MainWindow::loadPatientRegistrationSlot()
     }
     //set the toolmanageres matrix
     ssc::Transform3DPtr patientRegistration(new ssc::Transform3D(matrix));
-    mToolManager->set_rMpr(patientRegistration);
-    std::cout << (*patientRegistration.get()) << std::endl;
+    mRegistrationManager->setManualPatientRegistration(patientRegistration);
+    //std::cout << (*patientRegistration.get()) << std::endl;
     mMessageManager->sendInfo("New patient registration is set.");
   }
 }
