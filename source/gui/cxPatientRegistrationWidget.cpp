@@ -138,7 +138,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   this->setLayout(mVerticalLayout);
 
   ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
-  if(dominantTool.get() != NULL)
+  if(dominantTool)
     this->dominantToolChangedSlot(dominantTool->getUid());
 }
 PatientRegistrationWidget::~PatientRegistrationWidget()
@@ -211,7 +211,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 {  
   //TODO What if the reference frame isnt visible?
   ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
-  if(lastTransform.get() == NULL)
+  if(!lastTransform)
   {
     mMessageManager->sendError("The last transform was NULL!");
     return;
@@ -256,13 +256,13 @@ void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 }
 void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 {
-  if(mToolToSample.get() != NULL && mToolToSample->getUid() == uid)
+  if(!mToolToSample && mToolToSample->getUid() == uid)
     return;
 
   ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
-  if(mToolToSample.get() != NULL)
+  if(!mToolToSample)
   {
-    if(newTool.get() == NULL)
+    if(!newTool)
       return;
 
     disconnect(mToolToSample.get(), SIGNAL(toolVisible(bool)),

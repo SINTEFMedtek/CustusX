@@ -37,7 +37,7 @@ ssc::ImagePtr RegistrationManager::getMasterImage()
 }
 bool RegistrationManager::isMasterImageSet()
 {
-  return mMasterImage.get();
+  return mMasterImage;
 }
 void RegistrationManager::setGlobalPointSet(vtkDoubleArrayPtr pointset)
 {

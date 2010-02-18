@@ -114,7 +114,7 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
   ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
-  if(probeRep.get() == NULL)
+  if(!probeRep)
   {
     mMessageManager->sendError("Could not find a rep to add the landmark to.");
     return;
@@ -125,7 +125,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
   ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
-  if(probeRep.get() == NULL)
+  if(!probeRep)
   {
     mMessageManager->sendError("Could not find a rep to edit the landmark for.");
     return;
@@ -147,7 +147,7 @@ void ImageRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double n
 {
   //make sure the masterImage is set
   ssc::ImagePtr masterImage = mRegistrationManager->getMasterImage();
-  if(masterImage.get() == NULL)
+  if(!masterImage)
     mRegistrationManager->setMasterImage(mCurrentImage);
   
   //check if its time to do image registration

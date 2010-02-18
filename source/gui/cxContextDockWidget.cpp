@@ -139,7 +139,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 
   //find the image
   ssc::ImagePtr image = mDataManager->getImage(imageId);
-  if(image.get() == NULL)
+  if(!image)
   {
     mMessageManager->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;

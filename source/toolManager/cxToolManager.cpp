@@ -758,7 +758,7 @@ void ToolManager::checkTimeoutsAndRequestTransform()
 {
   mPulseGenerator->CheckTimeouts();
 
-  if(mReferenceTool.get() == NULL)
+  if(!mReferenceTool)
     return;
 
   ToolMap::iterator it = mConnectedTools->begin();

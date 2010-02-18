@@ -165,7 +165,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     const igstk::CoordinateSystem* destination = result.GetDestination();
     ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
-    if(refTool.get() != NULL)
+    if(!refTool)
     {
       ssc::Tool* tool = refTool.get();
       Tool* ref = dynamic_cast<Tool*>(tool);
