@@ -86,15 +86,15 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
   {
     this->resetOffset();
     currentTransform = mToolManager->get_rMpr();
-  }else //if we dont have a masterimage or a manualtransform we just want to save the offset
+  }else //if we dont have a masterimage or a manualtransform we just want to save the offset?
   {
-    //mPatientRegistrationOffset = offset;
+    //mPatientRegistrationOffset = offset; ?
     return;
   }
   mPatientRegistrationOffset = offset;
-  ssc::Transform3D newTransform = (*(currentTransform.get()))*(*(mPatientRegistrationOffset.get()));
-  ssc::Transform3DPtr newTransformPtr(&newTransform);
+  ssc::Transform3DPtr newTransformPtr(new ssc::Transform3D((*(currentTransform))*(*(mPatientRegistrationOffset))));
   mToolManager->set_rMpr(newTransformPtr);
+  //for debugging: std::cout << (*newTransformPtr) << std::endl;
 
   mMessageManager->sendInfo("Offset for the patient registration is set.");
 }
