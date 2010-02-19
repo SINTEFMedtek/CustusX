@@ -21,7 +21,8 @@ BrowserWidget::BrowserWidget(QWidget* parent) :
     mDataManager(DataManager::getInstance()),
     mToolManager(ToolManager::getInstance()),
     mMessageManager(MessageManager::getInstance()),
-    mViewManager(ViewManager::getInstance())
+    mViewManager(ViewManager::getInstance()),
+    mRepManager(RepManager::getInstance())
 {
   //dock widget
   this->setWindowTitle("Browser");
@@ -146,9 +147,8 @@ void BrowserWidget::populateTreeWidget()
         QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
         topLevelItem->addChild(repItem);
         //add the images
-        //TODO we get a segmentation fault...
-        //there is something wrong with the repmanagers volumetricrepmap!
-        /*std::string repUid = (*repIter)->getUid();
+        std::string repUid = (*repIter)->getUid();
+
         ssc::VolumetricRepPtr volRep = mRepManager->getVolumetricRep(repUid);
         if(!volRep)
           break;
@@ -156,17 +156,15 @@ void BrowserWidget::populateTreeWidget()
         QStringList imageList(QStringList() << QString(image->getName().c_str())
                                         << QString(image->getUid().c_str()));
         QTreeWidgetItem* imageItem = new QTreeWidgetItem(imageList);
-        repItem->addChild(imageItem);*/
+        repItem->addChild(imageItem);
       }else if (repType == "ssc::GeometricRep")
       {
         QStringList repList(QStringList() << QString((*repIter)->getName().c_str())
                                         << QString((*repIter)->getUid().c_str()));
         QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
         topLevelItem->addChild(repItem);
-        //TODO we get a segmentation fault...
-        //there is something wrong with the repmanagers geometricreppmap!
         //add meshes under geometricRep
-        /*std::string repUid = (*repIter)->getUid();
+        std::string repUid = (*repIter)->getUid();
         ssc::GeometricRepPtr geometricRep = mRepManager->getGeometricRep(repUid);
         if(!geometricRep)
           break;
@@ -174,7 +172,7 @@ void BrowserWidget::populateTreeWidget()
         QStringList meshList(QStringList() << QString(mesh->getName().c_str())
                                         << QString(mesh->getUid().c_str()));
         QTreeWidgetItem* meshItem = new QTreeWidgetItem(meshList);
-        repItem->addChild(meshItem);*/
+        repItem->addChild(meshItem);
       }else if(repType == "ssc::ToolRep3D")
       {
         QStringList repList(QStringList() << QString((*repIter)->getName().c_str())
@@ -182,9 +180,7 @@ void BrowserWidget::populateTreeWidget()
         QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
         topLevelItem->addChild(repItem);
         //add tools under toolreps
-        //TODO we get a segmentation fault...
-        //there is something wrong with the repmanagers toolrepmap!
-        /*std::string repUid = (*repIter)->getUid();
+        std::string repUid = (*repIter)->getUid();
         ssc::ToolRep3DPtr toolRep3D = mRepManager->getToolRep3DRep(repUid);
         if(!toolRep3D)
           break;
@@ -192,7 +188,7 @@ void BrowserWidget::populateTreeWidget()
         QStringList toolList(QStringList() << QString(tool->getName().c_str())
                                         << QString(tool->getUid().c_str()));
         QTreeWidgetItem* toolItem = new QTreeWidgetItem(toolList);
-        repItem->addChild(toolItem);*/
+        repItem->addChild(toolItem);
       }
       repIter++;
     }
@@ -257,8 +253,7 @@ void BrowserWidget::populateTreeWidget()
       topLevelItem->addChild(toolItem);
       index++;
       it3++;
-    }
-    */
+    }*/
   }
 }
 }//end namespace cx
