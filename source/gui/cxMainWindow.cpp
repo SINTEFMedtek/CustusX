@@ -586,7 +586,7 @@ void MainWindow::deactivateImageRegistationState()
     mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
     mViewManager->get3DView("View3D_1")->removeRep(probeRep);
 
-    disconnect(mImageRegistrationWidget, SIGNAL(tresholdChanged(int)),
+    disconnect(mImageRegistrationWidget, SIGNAL(tresholdChanged(const int)),
             probeRep.get(), SLOT(setTresholdSlot(const int)));
   }
 }
