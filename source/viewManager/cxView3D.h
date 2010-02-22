@@ -14,6 +14,7 @@ class RepManager;
 class MessageManager;
 class ToolManager;
 
+typedef ssc::Transform3D Transform3D;
 /**
  * \class View3D
  *
@@ -40,7 +41,7 @@ public:
   void setCameraStyle(CameraStyle style, int offset=-1); ///< lets the user select where the camera, offset only used by TOOL_STYLE
 
 protected slots:
-  void moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestamp);
+  void moveCameraToolStyleSlot(Transform3D prMt, double timestamp);
 
 protected:
   void activateCameraDefaultStyle();

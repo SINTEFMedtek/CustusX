@@ -107,7 +107,7 @@ void View3D::setCameraStyle(View3D::CameraStyle style, int offset)
     break;
   };
 }
-void View3D::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestamp)
+void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
   ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
   ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
@@ -140,7 +140,7 @@ void View3D::activateCameraToolStyle(int offset)
   if(offset != -1)
     mCameraOffset = offset;
 
-  ssc::ToolPtr dominantToolPtr = mToolManager->getDominantTool();
+  ssc::ToolPtr dominantToolPtr = ToolManager::getInstance()->getDominantTool();
   if(!dominantToolPtr)
     return;
 
@@ -161,7 +161,7 @@ void View3D::activateCameraToolStyle(int offset)
     return; //cannot set the camera to follow a tool if that tool dose not have a rep
 
   connect(dominantToolPtr.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-      this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+          this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
   dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(true);
 
@@ -169,7 +169,7 @@ void View3D::activateCameraToolStyle(int offset)
 }
 void View3D::deactivateCameraToolStyle()
 {
-  ssc::ToolPtr dominantToolPtr = mToolManager->getDominantTool();
+  ssc::ToolPtr dominantToolPtr = ToolManager::getInstance()->getDominantTool();
   disconnect(dominantToolPtr.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 

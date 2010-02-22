@@ -65,8 +65,8 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
 
   if(!image)
   {
-    mMessageManager->sendError("Couldn't find image with uid "+
-        imageUid.toStdString()+" to set in View2D.");
+    std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View2D.";
+    mMessageManager->sendError(error);
     return;
   }
 
