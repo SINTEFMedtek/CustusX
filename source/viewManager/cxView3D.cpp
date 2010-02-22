@@ -160,7 +160,8 @@ void View3D::activateCameraToolStyle(int offset)
   if(!dominantToolRepPtr)
     return; //cannot set the camera to follow a tool if that tool dose not have a rep
 
-  connect(dominantToolPtr.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+  mFollowingTool = dominantToolPtr;
+  connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
           this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
   dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(true);
@@ -169,11 +170,14 @@ void View3D::activateCameraToolStyle(int offset)
 }
 void View3D::deactivateCameraToolStyle()
 {
-  ssc::ToolPtr dominantToolPtr = ToolManager::getInstance()->getDominantTool();
-  disconnect(dominantToolPtr.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+  //make sure we disconnect from the right tool, which might not be the current
+  //dominant tool
+
+  disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-  ssc::ToolRep3DPtr dominantToolRepPtr = mRepManager->getToolRep3DRep(dominantToolPtr->getUid());
-  dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
+  ssc::ToolRep3DPtr followingToolRepPtr = mRepManager->getToolRep3DRep(mFollowingTool->getUid());
+  if(followingToolRepPtr)
+    followingToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
 }
 }//namespace cx

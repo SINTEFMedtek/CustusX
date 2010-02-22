@@ -3,6 +3,7 @@
 
 #include "sscView.h"
 #include "sscTransform3D.h"
+#include "sscTool.h"
 
 class QWidget;
 class QMenu;
@@ -54,6 +55,7 @@ protected:
 
   CameraStyle mCameraStyle; ///< the current camerastyle
   int mCameraOffset; ///< the distance between the camera and focalpoint
+  ssc::ToolPtr mFollowingTool; ///< the tool the camera is following
 
   DataManager* mDataManager; ///< has all the data loaded into the system
   RepManager* mRepManager; ///< has a pool of reps
