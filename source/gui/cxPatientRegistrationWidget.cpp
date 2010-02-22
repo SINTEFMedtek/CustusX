@@ -256,7 +256,7 @@ void PatientRegistrationWidget::cellChangedSlot(int row, int column)
 }
 void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 {
-  if(!mToolToSample || mToolToSample->getUid() == uid)
+  if(mToolToSample && mToolToSample->getUid() == uid)
     return;
 
   ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
