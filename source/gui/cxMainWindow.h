@@ -22,6 +22,7 @@ class CustomStatusBar;
 class ContextDockWidget;
 class TransferFunctionWidget;
 class BrowserWidget;
+class NavigationWidget;
 class ImageRegistrationWidget;
 class PatientRegistrationWidget;
 
@@ -201,8 +202,9 @@ protected:
   PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
   TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
   BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
+  NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
   CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
-  int mImageRegistrationIndex, mPatientRegistrationIndex; ///< tab index for removing tabs is ContextDockWidget
+  int mImageRegistrationIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences
   QSettings* mSettings; ///< Object for storing all program/user specific settings

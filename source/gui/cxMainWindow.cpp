@@ -21,6 +21,7 @@
 #include "cxCustomStatusBar.h"
 #include "cxContextDockWidget.h"
 #include "cxBrowserWidget.h"
+#include "cxNavigationWidget.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxPatientRegistrationWidget.h"
@@ -171,9 +172,11 @@ MainWindow::MainWindow() :
   mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
   mBrowserWidget(new BrowserWidget(mContextDockWidget)),
+  mNavigationWidget(new NavigationWidget(mContextDockWidget)),
   mCustomStatusBar(new CustomStatusBar()),
   mImageRegistrationIndex(-1),
   mPatientRegistrationIndex(-1),
+  mNavigationIndex(-1),
   mSettings(new QSettings()),
   mActivePatientFolder("")
 {  
@@ -208,6 +211,8 @@ MainWindow::MainWindow() :
   this->changeState(PATIENT_DATA, PATIENT_DATA);
   
   // TODO: Find a better way to do this
+  //if we remove this section some items stack in the upper left corner,
+  //probably some items missing a parent, check it out.
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
                                                        QString("Image Registration"));
   mContextDockWidget->removeTab(mImageRegistrationIndex);
@@ -610,10 +615,19 @@ void MainWindow::deactivatePatientRegistrationState()
 }
 void MainWindow::activateNavigationState()
 {
+  mNavigationIndex = mContextDockWidget->addTab(mNavigationWidget,
+      QString("Navigation"));
+
   mCurrentWorkflowState = NAVIGATION;
 }
 void MainWindow::deactivateNavigationState()
-{}
+{
+  if(mNavigationIndex != -1)
+  {
+    mContextDockWidget->removeTab(mNavigationIndex);
+    mNavigationIndex = -1;
+  }
+}
 void MainWindow::activateUSAcquisitionState()
 {
   mCurrentWorkflowState = US_ACQUISITION;
