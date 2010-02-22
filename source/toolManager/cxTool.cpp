@@ -22,7 +22,8 @@ Tool::Tool(InternalStructure internalStructure) :
   mConfigured(false),
   mVisible(false),
   mAttachedToTracker(false),
-  mTracked(false)
+  mTracked(false),
+  mToolTipOffset(0)
 {
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
@@ -112,7 +113,7 @@ void Tool::setTransformSaveFile(const std::string& filename)
 }
 ssc::Transform3D Tool::get_prMt() const
 {
-  return *m_prMt.get();
+  return *m_prMt;
 }
 bool Tool::getVisible() const
 {
@@ -137,6 +138,14 @@ bool Tool::isCalibrated() const
 {
   //TODO: What do we want to do here?
   return true;
+}
+double Tool::getTooltipOffset() const
+{
+  return mToolTipOffset;
+}
+void Tool::setTooltipOffset(double val)
+{
+  mToolTipOffset = val;
 }
 Tool::TrackerToolType* Tool::getPointer() const
 {

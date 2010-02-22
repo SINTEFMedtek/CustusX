@@ -100,6 +100,8 @@ public:
   virtual bool isCalibrated() const; //TODO
   virtual ssc::ProbeSector getProbeSector() const{ return ssc::ProbeSector(); }; //TODO
   virtual double getTimestamp() const{ return 0; }; //	TODO
+  virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
+  virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
 
@@ -140,8 +142,10 @@ protected:
 
   bool mConfigured;         ///< whether or not the tool is properly configured
   bool mVisible;            ///< whether or not the tool is visible to the tracking system
-  bool mAttachedToTracker;  ///< wheter the tool is attached to a tracker or not
-  bool mTracked;            ///< whether the tool is beeing tracked or not
+  bool mAttachedToTracker;  ///< whether the tool is attached to a tracker or not
+  bool mTracked;            ///< whether the tool is being tracked or not
+
+  double mToolTipOffset; ///< distance from tool where point should be shown
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } //namespace cx
