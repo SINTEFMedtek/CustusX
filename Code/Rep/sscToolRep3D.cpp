@@ -19,6 +19,7 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name)
 {
 	mStayVisibleAfterHide = false;
+	mOffsetPointVisibleAtZeroOffset = false;
 	mToolActor = vtkActorPtr::New();
 	mPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mSTLReader = vtkSTLReaderPtr::New();
@@ -167,7 +168,13 @@ void ToolRep3D::updateOffsetGraphics()
 	}
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
-		mTooltipPoint->getActor()->SetVisibility(false);
+	  if(mOffsetPointVisibleAtZeroOffset)
+	  {
+	    mTooltipPoint->getActor()->SetVisibility(true);
+	  }else
+	  {
+	    mTooltipPoint->getActor()->SetVisibility(false);
+	  }
 		mOffsetPoint->getActor()->SetVisibility(false);
 		mOffsetLine->getActor()->SetVisibility(false);
 	}
@@ -202,7 +209,10 @@ void ToolRep3D::setStayVisibleAfterHide(bool val)
 {
 	mStayVisibleAfterHide = val;
 }
-
+void ToolRep3D::setOffsetPointVisibleAtZeroOffset(bool val)
+{
+  mOffsetPointVisibleAtZeroOffset = val;
+}
 void ToolRep3D::tooltipOffsetSlot(double val)
 {
 	updateOffsetGraphics();

@@ -35,6 +35,7 @@ public:
 	virtual ToolPtr getTool();
 
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
+	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 
 protected:
 	ToolRep3D(const std::string& uid, const std::string& name="");
@@ -65,6 +66,7 @@ private:
 	GraphicalPoint3DPtr mOffsetPoint;
 	GraphicalLine3DPtr mOffsetLine;
 	bool mStayVisibleAfterHide;
+	bool mOffsetPointVisibleAtZeroOffset;
 };
 } // namespace ssc
 
