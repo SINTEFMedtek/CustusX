@@ -9,6 +9,7 @@
 #include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "cxMessageManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -23,6 +24,8 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
   mContextMenu(new QMenu(this)),
   mMakeVolumetricRepMenu(new QMenu(tr("Add volumetric representation of...") ,mContextMenu)),
   mMakeGeometricRepMenu(new QMenu(tr("Add geometric representation of...") ,mContextMenu)),
+  mCameraStyle(DEFAULT_STYLE),
+  mCameraOffset(-1),
   mDataManager(DataManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mMessageManager(MessageManager::getInstance())
@@ -32,6 +35,8 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
 
   mContextMenu->addMenu(mMakeVolumetricRepMenu);
   mContextMenu->addMenu(mMakeGeometricRepMenu);
+
+  mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 }
 View3D::~View3D()
 {}
@@ -82,5 +87,93 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
 
     //Show the rep in this view
     this->setRep(volumetricRep);
+}
+void View3D::setCameraStyle(View3D::CameraStyle style, int offset)
+{
+  if(mCameraStyle == style)
+    return;
+
+  switch(style)
+  {
+  case View3D::DEFAULT_STYLE:
+    if(mCameraStyle == View3D::TOOL_STYLE)
+      this->deactivateCameraToolStyle(); //need to disconnect some signals
+    this->activateCameraDefaultStyle();
+    break;
+  case View3D::TOOL_STYLE:
+    this->activateCameraToolStyle(offset);
+    break;
+  default:
+    break;
+  };
+}
+void View3D::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestamp)
+{
+  ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
+  ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
+
+  ssc::Transform3D prMo(vtkMatrix4x4::New());
+  prMo[2][3] = mCameraOffset; //offset is only applied in the tools z direction
+  ssc::Transform3D rMo = (*rMpr)*prMo;
+
+  double xCameraPos = rMo[0][3];
+  double yCameraPos = rMo[1][3];
+  double zCameraPos = rMo[2][3];
+  double xFocalPos = (*rMt)[0][3];
+  double yFocalPos = (*rMt)[1][3];
+  double zFocalPos = (*rMt)[2][3];
+
+  vtkCamera* camera = mRenderer->GetActiveCamera();
+  camera->SetPosition(xCameraPos, yCameraPos, zCameraPos);
+  camera->SetFocalPoint(xFocalPos, yFocalPos, zFocalPos);
+  camera->SetClippingRange(1, 2000);
+}
+void View3D::activateCameraDefaultStyle()
+{
+  mRenderer->ResetCamera();
+  mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
+
+  mCameraStyle = View3D::DEFAULT_STYLE;
+}
+void View3D::activateCameraToolStyle(int offset)
+{
+  if(offset != -1)
+    mCameraOffset = offset;
+
+  ssc::ToolPtr dominantToolPtr = mToolManager->getDominantTool();
+  if(!dominantToolPtr)
+    return;
+
+  //Need the toolrep to get the direction the camera should point in
+  ssc::ToolRep3DPtr dominantToolRepPtr;
+  ToolRep3DMap* toolRep3DMap = mRepManager->getToolRep3DReps();
+  ToolRep3DMap::iterator it = toolRep3DMap->begin();
+  while(it != toolRep3DMap->end())
+  {
+    if(it->second->hasTool(dominantToolPtr) && //there must be a rep for the dominant tool
+       this->hasRep(it->second)) //and this view must have it
+    {
+      dominantToolRepPtr = it->second;
+    }
+    it++;
+  }
+  if(!dominantToolRepPtr)
+    return; //cannot set the camera to follow a tool if that tool dose not have a rep
+
+  connect(dominantToolPtr.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+      this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+
+  dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(true);
+
+  mCameraStyle = View3D::TOOL_STYLE;
+}
+void View3D::deactivateCameraToolStyle()
+{
+  ssc::ToolPtr dominantToolPtr = mToolManager->getDominantTool();
+  disconnect(dominantToolPtr.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+      this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+
+  ssc::ToolRep3DPtr dominantToolRepPtr = mRepManager->getToolRep3DRep(dominantToolPtr->getUid());
+  dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
 }
 }//namespace cx
