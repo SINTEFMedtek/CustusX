@@ -375,7 +375,15 @@ public:
 	{
 		mMaxBuffers = val;
 	}
+	void setName(const std::string& name)
+	{
+		mName = name;
+	}
 
+	/** Get a GPU buffer for the input data. 
+	 * Try to reuse existing memory if available.
+	 * 
+	 */
 	BufferPtr get(DATA_PTR data)
 	{
 		// clear out deleted data
@@ -385,6 +393,7 @@ public:
 			{
 				typename BufferMap::iterator temp = iter;
 				++iter;
+				//std::cout << "GPU-Buffer[" << mName << "]\tclear" << std::endl;
 				mRemovedData.erase(temp);
 			}
 			else
@@ -400,16 +409,19 @@ public:
 			if (object)
 			{
 				mData.push_front(BufferStore(data, object));
+				//std::cout << "GPU-Buffer[" << mName << "]\treclaim" << std::endl;
 				mRemovedData.erase(data);
 			}
 		}
 
+		// move current data to front of buffer (i.e. increase importance)
 		BufferPtr retval;
 		for (typename std::list<BufferStore>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
 		{
 			if (iter->mData==data)
 			{
 				retval = iter->mBuffer; // retrieve data
+				//std::cout << "GPU-Buffer[" << mName << "]\tretrieve" << std::endl;
 				mData.push_front(*iter); // push on queue front (most recent)
 				mData.erase(iter); // erase from old position
 				break;
@@ -420,6 +432,7 @@ public:
 		if (!retval)
 		{
 			retval = createGPUImageBuffer<BUFFER>(data);
+			//std::cout << "GPU-Buffer[" << mName << "]\tcreate" << std::endl;
 			mData.push_front(BufferStore(data, retval));
 		}
 
@@ -427,10 +440,11 @@ public:
 		while (mData.size()>mMaxBuffers)
 		{
 			mRemovedData[mData.back().mData] = mData.back().mBuffer;
+			//std::cout << "GPU-Buffer[" << mName << "]\tpop" << std::endl;
 			mData.pop_back();;
 		}
 
-		//std::cout << "current gpu buffer count: " << mData.size() << "+" << mRemovedData.size() << std::endl;
+		//std::cout << "GPU-Buffer[" << mName << "]\tcount: " << mData.size() << "+" << mRemovedData.size() << std::endl;
 
 		return retval;
 	}
@@ -438,16 +452,22 @@ public:
 private:
 	typedef std::map<DATA_PTR, BufferWeakPtr> BufferMap;
 	BufferMap mRemovedData; // those buffers that are removed but still might live outside of the repo.
-	//typedef std::map<DATA_PTR, BufferWeakPtr> RemovedDataIter;
 	std::list<BufferStore> mData; // newest elems in front
-	//std::map<DATA_PTR, BufferPtr> mData; // repository of buffered buffers.
 	unsigned mMaxBuffers;
-
+	std::string mName; // debug
 };
 
 class GPUImageBufferRepositoryInternal
 {
 public:
+	GPUImageBufferRepositoryInternal()
+	{
+		mVolumeBuffer.setName("Volume");
+		mLutBuffer.setName("Lut");
+
+		mVolumeBuffer.setMaxBuffers(10);
+		mLutBuffer.setMaxBuffers(15);
+	}
 	BufferQueue<vtkImageDataPtr, ssc::GPUImageDataBuffer> mVolumeBuffer;
 	BufferQueue<vtkUnsignedCharArrayPtr, ssc::GPUImageLutBuffer> mLutBuffer;
 };
