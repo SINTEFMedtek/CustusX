@@ -172,6 +172,8 @@ void View3D::deactivateCameraToolStyle()
 {
   //make sure we disconnect from the right tool, which might not be the current
   //dominant tool
+  if(!mFollowingTool)
+    return;
 
   disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
