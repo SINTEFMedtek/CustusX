@@ -107,21 +107,38 @@ void View3D::setCameraStyle(View3D::CameraStyle style, int offset)
     break;
   };
 }
+void View3D::setCameraOffsetSlot(int offset)
+{
+  mCameraOffset = offset;
+}
 void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
-  ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
+  ssc::Transform3DPtr rMpr = ToolManager::getInstance()->get_rMpr();
   ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
+  
+  /*ssc::Vector3D cameraPoint = ssc::Vector3D((*rMt)[0][3],(*rMt)[1][3],(*rMt)[2][3])*mCameraOffset;
+  ssc::Vector3D pos = ssc::Vector3D((*rMt)[0][3],(*rMt)[1][3],(*rMt)[2][3])-cameraPoint;
+  ssc::Vector3D focalPoint = pos + ssc::Vector3D((*rMt)[0][3],(*rMt)[1][3],(*rMt)[2][3]);*/
 
-  ssc::Transform3D prMo(vtkMatrix4x4::New());
+  /*ssc::Transform3D prMo(vtkMatrix4x4::New());
   prMo[2][3] = mCameraOffset; //offset is only applied in the tools z direction
-  ssc::Transform3D rMo = (*rMpr)*prMo;
+  ssc::Transform3D rMo = (*rMpr)*prMo;*/
+  
+  //ssc::Transform3D prMt_withOffset = prMt;
+  //ssc::Transform3D prMt_withOffset = prMt;
+  //prMt_withOffset[2][3] = prMt_withOffset[2][3]+mCameraOffset; //offset is only applied in the tools z(?) direction
+  ssc::Vector3D cameraPoint_t = ssc::Vector3D(0,0,mCameraOffset);
+  ssc::Vector3D cameraPoint_r = prMt.coord(cameraPoint_t);
 
-  double xCameraPos = rMo[0][3];
-  double yCameraPos = rMo[1][3];
-  double zCameraPos = rMo[2][3];
+  double xCameraPos = cameraPoint_r[0];
+  double yCameraPos = cameraPoint_r[1];
+  double zCameraPos = cameraPoint_r[2];
   double xFocalPos = (*rMt)[0][3];
   double yFocalPos = (*rMt)[1][3];
   double zFocalPos = (*rMt)[2][3];
+  
+  //std::cout << rMt_withOffset << std::endl;
+  //std::cout << (*rMt) << std::endl;
 
   vtkCamera* camera = mRenderer->GetActiveCamera();
   camera->SetPosition(xCameraPos, yCameraPos, zCameraPos);
@@ -165,6 +182,7 @@ void View3D::activateCameraToolStyle(int offset)
           this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
   dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(true);
+  //dominantToolRepPtr->setStayHiddenAfterVisible(true);
 
   mCameraStyle = View3D::TOOL_STYLE;
 }

@@ -41,8 +41,11 @@ public:
 
   void setCameraStyle(CameraStyle style, int offset=-1); ///< lets the user select where the camera, offset only used by TOOL_STYLE
 
+public slots:
+  void setCameraOffsetSlot(int offset); ///< sets the camera offset
+  
 protected slots:
-  void moveCameraToolStyleSlot(Transform3D prMt, double timestamp);
+  void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
 
 protected:
   void activateCameraDefaultStyle();
@@ -60,7 +63,7 @@ protected:
   DataManager* mDataManager; ///< has all the data loaded into the system
   RepManager* mRepManager; ///< has a pool of reps
   MessageManager* mMessageManager; ///< takes messages intended for the user
-  ToolManager* mToolManager; ///< interface to the navigation system
+  //ToolManager* mToolManager; ///< interface to the navigation system
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */
