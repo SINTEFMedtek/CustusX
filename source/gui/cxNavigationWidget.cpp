@@ -34,6 +34,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   //camera setttings
   mCameraGroupBox->setLayout(mCameraGroupLayout);
   mDefaultCameraStyleRadioButton->setChecked(true);
+  mCameraOffsetSlider->setDisabled(true);
   mCameraOffsetSlider->setRange(0, 200);
   mCameraOffsetSlider->setValue(10);
   mCameraGroupLayout->addWidget(mDefaultCameraStyleRadioButton);
@@ -71,6 +72,8 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
   {
     if(checked)
     {
+      mCameraOffsetSlider->setDisabled(true);
+
       View3D* view3D_1Ptr = ViewManager::getInstance()->get3DView("View3D_1");
       view3D_1Ptr->setCameraStyle(View3D::DEFAULT_STYLE);
       MessageManager::getInstance()->sendInfo("Default camera selected");
@@ -80,6 +83,7 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
   {
     if(checked)
     {
+      mCameraOffsetSlider->setEnabled(true);
       View3D* view3D_1Ptr = ViewManager::getInstance()->get3DView("View3D_1");
       view3D_1Ptr->setCameraStyle(View3D::TOOL_STYLE, mCameraOffsetSlider->value());
       MessageManager::getInstance()->sendInfo("Tool camera selected");
