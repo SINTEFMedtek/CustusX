@@ -78,7 +78,7 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
 
   if(mImage)
   {
-    mImage->disconnectRep(mSelf);
+    mImage->disconnectFromRep(mSelf);
     disconnect(mImage.get(), SIGNAL(landmarkAdded(double, double, double,unsigned int)),
             this, SLOT(addPermanentPointSlot(double, double, double,unsigned int)));
     disconnect(this, SIGNAL(removePermanentPoint(double, double, double,unsigned int)),
@@ -97,7 +97,7 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
   
   if (!mImage)
     return;// Don't use image if deleted
-  mImage->connectRep(mSelf);
+  mImage->connectToRep(mSelf);
   connect(mImage.get(), SIGNAL(landmarkAdded(double, double, double,unsigned int)),
           this, SLOT(addPermanentPointSlot(double, double, double,unsigned int)));
   connect(this, SIGNAL(removePermanentPoint(double, double, double,unsigned int)),
