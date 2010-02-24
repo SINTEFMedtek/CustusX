@@ -77,6 +77,8 @@ RepManager::RepManager() :
     InriaRep2DPtr inriaRep2D(new InriaRep2D(mInriaRep2DNames[i],
         mInriaRep2DNames[i]));
     mInriaRep2DMap[inriaRep2D->getUid()] = inriaRep2D;
+    connect(inriaRep2D.get(), SIGNAL(pointPicked(double,double,double)),
+            this, SLOT(syncInria2DRepsSlot(double,double,double)));
   }
   for(int i=0; i<MAX_VOLUMETRICREPS; i++)
   {
@@ -117,11 +119,11 @@ RepManager::RepManager() :
   }
   mMessageManager->sendInfo("All necessary representations have been created.");
 
-  //connect the two acs-sets so both get updated when we click on one of them
+  /*//connect the two acs-sets so both get updated when we click on one of them
   connect(&(*getInria2DRep(mInriaRep2DNames[0])), SIGNAL(pointPicked(double,double,double)),
           this, SLOT(syncInria2DRepsSlot(double,double,double)));
   connect(&(*getInria2DRep(mInriaRep2DNames[3])), SIGNAL(pointPicked(double,double,double)),
-            this, SLOT(syncInria2DRepsSlot(double,double,double)));
+            this, SLOT(syncInria2DRepsSlot(double,double,double)));*/
 
   //connect the dominant tool to the acs-sets so they also get update when we move the tool
   connect(ToolManager::getInstance(), SIGNAL(dominantToolChanged(const std::string&)),
@@ -333,7 +335,6 @@ void RepManager::syncInria2DRepsSlot(double x,double y,double z)
   const double point[3] = {x,y,z};
   getInria2DRep(mInriaRep2DNames[0])->getVtkViewImage2D()->SyncSetPosition(point);
   getInria2DRep(mInriaRep2DNames[3])->getVtkViewImage2D()->SyncSetPosition(point);
-  MessageManager::getInstance()->sendInfo("Setting setsynccurrentpoint()");
 }
 void RepManager::dominantToolChangedSlot(const std::string& toolUid)
 {
