@@ -338,16 +338,21 @@ void RepManager::syncInria2DRepsSlot(double x,double y,double z)
 }
 void RepManager::dominantToolChangedSlot(const std::string& toolUid)
 {
-  ssc::ToolPtr dominantTool = ToolManager::getInstance()->getTool(toolUid);
+  ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
   if(!dominantTool)
+  {
+    MessageManager::getInstance()->sendError("Couldn't find a dominant tool to connect the inria2Dreps to.");
     return;
+  }
   if(mConnectedTool == dominantTool)
+  {
+    MessageManager::getInstance()->sendWarning("The new dominant tool was the same as the old one.");
     return;
+  }
   if(mConnectedTool)
   {
     disconnect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
                this, SLOT(receiveToolTransfromAndTimeStampSlot(Transform3D, double)));
-    MessageManager::getInstance()->sendWarning("Is it here?");
   }
   mConnectedTool = dominantTool;
   connect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
