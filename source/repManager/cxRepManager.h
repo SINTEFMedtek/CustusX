@@ -3,11 +3,13 @@
 
 #include <QObject>
 #include <map>
+#include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscProbeRep.h"
 #include "sscGeometricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
+#include "cxTool.h"
 #include "cxInriaRep3D.h"
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
@@ -15,6 +17,7 @@
 namespace cx
 {
 typedef ssc::ProbeRep ProbeRep;
+typedef ssc::Transform3D Transform3D;
 typedef ssc::ProbeRepPtr ProbeRepPtr;
 typedef ssc::ProgressiveLODVolumetricRep ProgressiveVolumetricRep;
 typedef ssc::ProgressiveLODVolumetricRepPtr ProgressiveVolumetricRepPtr;
@@ -73,7 +76,9 @@ public:
   ssc::GeometricRepPtr getGeometricRep(const std::string& uid); ///<  get one specific Geometric rep
 
 protected slots:
-  void syncInria2DRepsSlot(double x,double y,double z);
+  void syncInria2DRepsSlot(double x,double y,double z); ///< updates the inria2dreps with a new position on mouseclick and tooltransform
+  void dominantToolChangedSlot(const std::string& toolUid); ///< makes sure the inriareps are connected to the right tool
+  void receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double timestamp); ///< listens for new transforms from the tool
 
 protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
@@ -110,6 +115,8 @@ protected:
   const int           MAX_GEOMETRICREPS; ///< number of Geometric reps in the pool
   std::string         mGeometricRepNames[6]; ///< the name of the reps in the pool
   GeometricRepMap     mGeometricRepMap;      ///< the reps in the pool
+
+  ssc::ToolPtr mConnectedTool; ///< the tool we are listening to transforms from (to update inria2drep points)
 
 private:
   RepManager(); ///< creates a pool of reps

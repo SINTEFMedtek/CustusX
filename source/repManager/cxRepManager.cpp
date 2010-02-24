@@ -1,6 +1,7 @@
 #include "cxRepManager.h"
 
 #include "cxMessageManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -121,6 +122,10 @@ RepManager::RepManager() :
           this, SLOT(syncInria2DRepsSlot(double,double,double)));
   connect(&(*getInria2DRep(mInriaRep2DNames[3])), SIGNAL(pointPicked(double,double,double)),
             this, SLOT(syncInria2DRepsSlot(double,double,double)));
+
+  //connect the dominant tool to the acs-sets so they also get update when we move the tool
+  connect(ToolManager::getInstance(), SIGNAL(dominantToolChanged(const std::string&)),
+          this, SLOT(dominantToolChangedSlot(const std::string&)));
 }
 RepManager::~RepManager()
 {}
@@ -329,5 +334,31 @@ void RepManager::syncInria2DRepsSlot(double x,double y,double z)
   getInria2DRep(mInriaRep2DNames[0])->getVtkViewImage2D()->SyncSetPosition(point);
   getInria2DRep(mInriaRep2DNames[3])->getVtkViewImage2D()->SyncSetPosition(point);
   MessageManager::getInstance()->sendInfo("Setting setsynccurrentpoint()");
+}
+void RepManager::dominantToolChangedSlot(const std::string& toolUid)
+{
+  ssc::ToolPtr dominantTool = ToolManager::getInstance()->getTool(toolUid);
+  if(!dominantTool)
+    return;
+  if(mConnectedTool == dominantTool)
+    return;
+  if(mConnectedTool)
+  {
+    disconnect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+               this, SLOT(receiveToolTransfromAndTimeStampSlot(Transform3D, double)));
+    MessageManager::getInstance()->sendWarning("Is it here?");
+  }
+  mConnectedTool = dominantTool;
+  connect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+          this, SLOT(receiveToolTransfromAndTimeStampSlot(Transform3D, double)));
+}
+void RepManager::receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double timestamp)
+{
+  //move the incoming transform into dataref space
+  ssc::Transform3DPtr rMt(new Transform3D((*ToolManager::getInstance()->get_rMpr())*prMt));
+  double x = (*rMt)[0][3];
+  double y = (*rMt)[1][3];
+  double z = (*rMt)[2][3];
+  this->syncInria2DRepsSlot(x,y,z);
 }
 }//namespace cx
