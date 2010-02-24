@@ -72,6 +72,9 @@ public:
   ssc::ToolRep3DPtr getToolRep3DRep(const std::string& uid); ///<  get one specific Tool3D rep
   ssc::GeometricRepPtr getGeometricRep(const std::string& uid); ///<  get one specific Geometric rep
 
+protected slots:
+  void syncInria2DRepsSlot(double x,double y,double z);
+
 protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
   MessageManager*     mMessageManager;      ///< device for sending messages to the statusbar

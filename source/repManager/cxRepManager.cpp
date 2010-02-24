@@ -115,6 +115,12 @@ RepManager::RepManager() :
     mGeometricRepMap[geometricRep->getUid()] = geometricRep;
   }
   mMessageManager->sendInfo("All necessary representations have been created.");
+
+  //connect the two acs-sets so both get updated when we click on one of them
+  connect(&(*getInria2DRep(mInriaRep2DNames[0])), SIGNAL(pointPicked(double,double,double)),
+          this, SLOT(syncInria2DRepsSlot(double,double,double)));
+  connect(&(*getInria2DRep(mInriaRep2DNames[3])), SIGNAL(pointPicked(double,double,double)),
+            this, SLOT(syncInria2DRepsSlot(double,double,double)));
 }
 RepManager::~RepManager()
 {}
@@ -316,5 +322,12 @@ ssc::GeometricRepPtr RepManager::getGeometricRep(const std::string& uid)
     return it->second;
   else
     return ssc::GeometricRepPtr();
+}
+void RepManager::syncInria2DRepsSlot(double x,double y,double z)
+{
+  const double point[3] = {x,y,z};
+  getInria2DRep(mInriaRep2DNames[0])->getVtkViewImage2D()->SyncSetPosition(point);
+  getInria2DRep(mInriaRep2DNames[3])->getVtkViewImage2D()->SyncSetPosition(point);
+  MessageManager::getInstance()->sendInfo("Setting setsynccurrentpoint()");
 }
 }//namespace cx
