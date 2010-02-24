@@ -91,8 +91,11 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
       MessageManager::getInstance()->sendInfo("Tool camera selected");
     }else
     {
-      disconnect(mCameraOffsetSlider, SIGNAL(valueChanged(int)),
-                 view3D_1Ptr, SLOT(setCameraOffsetSlot(int)));
+      if(view3D_1Ptr)
+      {
+        disconnect(mCameraOffsetSlider, SIGNAL(valueChanged(int)),
+                   view3D_1Ptr, SLOT(setCameraOffsetSlot(int)));
+      }
     }
 
   }
