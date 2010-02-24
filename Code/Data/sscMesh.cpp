@@ -25,18 +25,6 @@ vtkPolyDataPtr Mesh::getVtkPolyData()
 {
 	return mVtkPolyData;
 }
-//-----
-/*
-void Mesh::connectRep(const RepWeakPtr& rep)
-{
-	mReps.insert(rep);
-}
-
-void Mesh::disconnectRep(const RepWeakPtr& rep)
-{
-	mReps.erase(rep);
-}
-*/
 void Mesh::addXml(QDomNode& parentNode)
 {
   //QDomElement datanode = Data::addXml(parentNode);

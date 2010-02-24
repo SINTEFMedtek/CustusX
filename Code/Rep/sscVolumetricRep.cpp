@@ -108,7 +108,7 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		mImage->disconnectRep(mSelf);
+		mImage->disconnectFromRep(mSelf);
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		//disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
@@ -119,7 +119,7 @@ void VolumetricRep::setImage(ImagePtr image)
 
 	if (mImage)
 	{
-		mImage->connectRep(mSelf);
+		mImage->connectToRep(mSelf);
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),

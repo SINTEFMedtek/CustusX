@@ -117,14 +117,6 @@ vtkDoubleArrayPtr Image::getLandmarks()
 {
 	return mLandmarks;
 }
-void Image::connectRep(const RepWeakPtr& rep)
-{
-	mReps.insert(rep);
-}
-void Image::disconnectRep(const RepWeakPtr& rep)
-{
-	mReps.erase(rep);
-}
 /** If index is found, it's treated as an edit operation, else
  * it's an add operation.
  * @param x

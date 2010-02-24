@@ -30,18 +30,12 @@ public:
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);
 
 	virtual vtkPolyDataPtr getVtkPolyData();
-	
-//	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
-//	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
   
 	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
   
 private:
 	vtkPolyDataPtr mVtkPolyData;
-
-//	std::set<RepWeakPtr> mReps; ///< links to Rep users.
-
 };
 
 typedef boost::shared_ptr<Mesh> MeshPtr;

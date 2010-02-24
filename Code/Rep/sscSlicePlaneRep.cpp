@@ -50,7 +50,7 @@ void SlicePlaneRep::removeRepActorsFromViewRenderer(View* view)
 void SlicePlaneRep::setImage(ImagePtr image)
 {
 	mImage = image;
-	mImage->connectRep(mSelf);
+	mImage->connectToRep(mSelf);
 	mVtkImagePlaneWidgetA->SetInput( image->getBaseVtkImageData() );	
 }
 bool SlicePlaneRep::hasImage(ImagePtr image) const

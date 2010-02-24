@@ -53,8 +53,6 @@ public:
 	ImageTF3DPtr getTransferFunctions3D();
 	ImageLUT2DPtr getLookupTable2D();
 
-	void connectRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
-	void disconnectRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 	void printLandmarks(); //TODO: JUST FOR TESTING
 	DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
@@ -91,8 +89,6 @@ protected slots:
 protected:
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
-
-	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 	
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
 	vtkImageDataPtr mBaseGrayScaleImageData; ///< image data in data space

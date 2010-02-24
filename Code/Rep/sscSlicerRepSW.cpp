@@ -57,12 +57,12 @@ void SliceRepSW::setImage( ImagePtr image )
 {
 	if (getImage())
 	{
-		getImage()->disconnectRep(mSelf);
+		getImage()->disconnectFromRep(mSelf);
 	}
 	mImageSlicer->setImage(image);
 	if (getImage())
 	{
-		getImage()->connectRep(mSelf);
+		getImage()->connectToRep(mSelf);
 	}
 }
 
