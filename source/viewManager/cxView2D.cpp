@@ -53,11 +53,8 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
 
   //Find out which the user chose
   QAction* theAction = mContextMenu->exec(event->globalPos());
-  if (!theAction)
-  {
-    MessageManager::getInstance()->sendError("Could not figure out what the user clicked on in the view2d contextmenu.");
+  if(!theAction)//this happens if you rightclick in the view and then don't select a 
     return;
-  }
 
   QString imageName = theAction->text();
   QString imageUid = theAction->statusTip();

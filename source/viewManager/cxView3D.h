@@ -53,8 +53,6 @@ protected:
   void deactivateCameraToolStyle();
 
   QMenu* mContextMenu; ///< right click menu
-  QMenu* mMakeVolumetricRepMenu; ///< sub menu of the context menu, for choosing volumetric reps
-  //QMenu* mMakeGeometricRepMenu; ///< sub menu of the context menu, for choosing geometric reps
 
   CameraStyle mCameraStyle; ///< the current camerastyle
   int mCameraOffset; ///< the distance between the camera and focalpoint
@@ -63,7 +61,6 @@ protected:
   DataManager* mDataManager; ///< has all the data loaded into the system
   RepManager* mRepManager; ///< has a pool of reps
   MessageManager* mMessageManager; ///< takes messages intended for the user
-  //ToolManager* mToolManager; ///< interface to the navigation system
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */

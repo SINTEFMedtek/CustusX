@@ -22,8 +22,6 @@ namespace cx
 View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
   ssc::View(parent, f),
   mContextMenu(new QMenu(this)),
-  mMakeVolumetricRepMenu(new QMenu(tr("Change volumetric representation of...") ,mContextMenu)),
-  //mMakeGeometricRepMenu(new QMenu(tr("Change geometric representation of...") ,mContextMenu)),
   mCameraStyle(DEFAULT_STYLE),
   mCameraOffset(-1),
   mDataManager(DataManager::getInstance()),
@@ -33,9 +31,6 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
   mUid = uid;
   mName = name;
 
-  mContextMenu->addMenu(mMakeVolumetricRepMenu);
-  //mContextMenu->addMenu(mMakeGeometricRepMenu);
-
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 }
 View3D::~View3D()
@@ -44,47 +39,43 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
 {
   //NOT SUPPORTING MESHES IN 3D VIEW YET
 
-    mMakeVolumetricRepMenu->clear();
-    //mMakeGeometricRepMenu->clear();
-
-    //mMakeGeometricRepMenu->setEnabled(false); //TODO remove when we know what to do with meshes
+    mContextMenu->clear();
 
     //Get a list of available image and meshes names
     std::map<std::string, std::string> imageUidsAndNames = mDataManager->getImageUidsAndNames();
     std::map<std::string, std::string> meshUidsAndNames = mDataManager->getMeshUidsWithNames();
 
     //Display the lists to the user
-    //Extract to own function if often reused...
-    std::map<std::string, std::string>::iterator itImages = imageUidsAndNames.begin();
-    while(itImages != imageUidsAndNames.end())
+    std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
+    while(imageIt != imageUidsAndNames.end())
     {
-      const QString id = itImages->first.c_str();
-      QAction* imageIdAction = new QAction(id, mMakeVolumetricRepMenu);
-      mMakeVolumetricRepMenu->addAction(imageIdAction);
-      itImages++;
+      const QString uid = imageIt->first.c_str();
+      const QString name = imageIt->second.c_str();
+      QAction* imageAction = new QAction(name, mContextMenu);
+      imageAction->setStatusTip(uid.toStdString().c_str());
+      mContextMenu->addAction(imageAction);
+      imageIt++;
     }
-    /*std::map<std::string, std::string>::iterator itMeshes = meshUidsAndNames.begin();
-    while(itMeshes != meshUidsAndNames.end())
-    {
-      const QString id = itMeshes->first.c_str();
-      QAction* meshIdAction = new QAction(id, mMakeGeometricRepMenu);
-      mMakeGeometricRepMenu->addAction(meshIdAction);
-      itMeshes++;
-    }*/
 
     //Find out which the user chose
     //TODO: IMAGE OR MESH??? theAction->parent()?
     QAction* theAction = mContextMenu->exec(event->globalPos());
-    if(theAction == NULL)
+    if(!theAction)//this happens if you rightclick in the view and then don't select a action
       return;
-
-    std::string actionId = theAction->text().toStdString();
-    std::string info = "Making a volumetricrep of data with name: "+actionId;
-    mMessageManager->sendInfo(info);
+  
+    QString imageName = theAction->text();
+    QString imageUid = theAction->statusTip();
+    ssc::ImagePtr image = mDataManager->getImage(imageUid.toStdString());
+  
+    if(!image)
+    {
+      std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View2D.";
+      MessageManager::getInstance()->sendError(error);
+      return;
+    }
 
     //Make a volumetric rep out of the image
-    ssc::VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");//TODO: REMOVE HACK???
-    ssc::ImagePtr image = mDataManager->getImage(actionId);
+    ssc::VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
     volumetricRep->setImage(image);
 
     //Show the rep in this view
@@ -115,6 +106,9 @@ void View3D::setCameraOffsetSlot(int offset)
 }
 void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
+  //TODO: work in progress, its not working as intended yet, there is something
+  //fishy with the axes
+  
   ssc::Transform3DPtr rMpr = ToolManager::getInstance()->get_rMpr();
   ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
   
