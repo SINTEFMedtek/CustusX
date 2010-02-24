@@ -219,6 +219,9 @@ MainWindow::MainWindow() :
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
                                                          QString("Patient Registration"));
   mContextDockWidget->removeTab(mPatientRegistrationIndex);
+  mNavigationIndex = mContextDockWidget->addTab(mNavigationWidget,
+                                                         QString("Navigation"));
+  mContextDockWidget->removeTab(mNavigationIndex);
   
   // Don't show the Widget before all elements are initialized
   this->show();
@@ -591,8 +594,8 @@ void MainWindow::deactivateImageRegistationState()
     mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
     mViewManager->get3DView("View3D_1")->removeRep(probeRep);
 
-    disconnect(mImageRegistrationWidget, SIGNAL(tresholdChanged(const int)),
-            probeRep.get(), SLOT(setTresholdSlot(const int)));
+    disconnect(mImageRegistrationWidget, SIGNAL(thresholdChanged(const int)),
+            probeRep.get(), SLOT(setThresholdSlot(const int)));
   }
 }
 void MainWindow::activatePatientRegistrationState()

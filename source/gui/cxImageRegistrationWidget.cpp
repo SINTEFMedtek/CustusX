@@ -343,7 +343,7 @@ void ImageRegistrationWidget::cellChangedSlot(int row,int column)
     mRegistrationManager->setGlobalPointsNameSlot(index, name);
   }
 }
-void ImageRegistrationWidget::thresholdChangedSlot(int value)
+void ImageRegistrationWidget::thresholdChangedSlot(const int value)
 {
   emit thresholdChanged(value);
   std::stringstream message;

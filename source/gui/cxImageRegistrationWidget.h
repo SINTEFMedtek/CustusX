@@ -50,7 +50,7 @@ protected slots:
   void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
   void landmarkSelectedSlot(int row, int column); ///< when a landmark i selected from the table
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
-  void thresholdChangedSlot(int value); ///< reemits the valueChanged signal from the slider
+  void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
