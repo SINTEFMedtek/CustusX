@@ -78,6 +78,10 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   connect(mToolManager, SIGNAL(toolSampleRemoved(double,double,double,unsigned int)),
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
 
+  //registrationmanager
+  connect(RegistrationManager::getInstance(), SIGNAL(patientRegistrationPerformed()),
+          this, SLOT(activateManualRegistrationFieldSlot()));
+
   //sliders
   mXOffsetSlider->setRange(mMinValue,mMaxValue);
   mXOffsetSlider->setValue(mDefaultValue);
@@ -136,6 +140,8 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mOffsetWidget);
   mVerticalLayout->addWidget(mResetOffsetButton);
   this->setLayout(mVerticalLayout);
+
+  mOffsetWidget->setDisabled(true);
 
   ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
   if(dominantTool)
@@ -301,6 +307,10 @@ void PatientRegistrationWidget::setOffset(int value)
   
   ssc::Transform3DPtr offsetPtr(new ssc::Transform3D(offsetMatrix));
   mRegistrationManager->setManualPatientRegistrationOffsetSlot(offsetPtr);
+}
+void PatientRegistrationWidget::activateManualRegistrationFieldSlot()
+{
+  mOffsetWidget->setEnabled(true);
 }
 void PatientRegistrationWidget::showEvent(QShowEvent* event)
 {

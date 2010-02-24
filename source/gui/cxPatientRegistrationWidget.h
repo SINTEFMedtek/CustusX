@@ -54,6 +54,7 @@ protected slots:
   void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
   void resetOffset(); ///< resets the patient registration offset to zero
   void setOffset(int value); ///< set the patient registration offset
+  void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
