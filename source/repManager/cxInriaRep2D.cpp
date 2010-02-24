@@ -18,8 +18,10 @@ InriaRep2D::InriaRep2D(const std::string& uid, const std::string& name) :
   mInria(vtkViewImage2D::New()),
   mConnections(vtkEventQtSlotConnect::New())
 {
-  mInria->SetLeftButtonInteractionStyle(vtkViewImage2D::WINDOW_LEVEL_INTERACTION);
-  mInria->SetMiddleButtonInteractionStyle(vtkViewImage2D::SELECT_INTERACTION);
+  //mInria->SetLeftButtonInteractionStyle(vtkViewImage2D::WINDOW_LEVEL_INTERACTION);
+  //mInria->SetMiddleButtonInteractionStyle(vtkViewImage2D::SELECT_INTERACTION);
+  mInria->SetLeftButtonInteractionStyle(vtkViewImage2D::SELECT_INTERACTION);
+  mInria->SetMiddleButtonInteractionStyle(vtkViewImage2D::WINDOW_LEVEL_INTERACTION);
   mInria->SetWheelInteractionStyle(vtkViewImage2D::ZOOM_INTERACTION);
   mInria->SetRightButtonInteractionStyle(vtkViewImage2D::NO_INTERACTION);
 
@@ -139,7 +141,7 @@ void InriaRep2D::addRepActorsToViewRenderer(ssc::View* view)
   mInria->Render();
 
   mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::MiddleButtonPressEvent,
+                       vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickSurfacePointSlot(vtkObject*)));
 }
@@ -152,7 +154,7 @@ void InriaRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
   //mInria->SetRenderer(NULL);
 
   mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::MiddleButtonPressEvent,
+                       vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickSurfacePointSlot(vtkObject*)));
 }
