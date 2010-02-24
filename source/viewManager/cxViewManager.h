@@ -67,7 +67,7 @@ public slots:
   void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
   void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
 
-  protected slots:
+protected slots:
 	void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
   void renderAllViewsSlot(); ///< renders all views
 

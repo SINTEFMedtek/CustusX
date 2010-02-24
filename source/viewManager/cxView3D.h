@@ -54,7 +54,7 @@ protected:
 
   QMenu* mContextMenu; ///< right click menu
   QMenu* mMakeVolumetricRepMenu; ///< sub menu of the context menu, for choosing volumetric reps
-  QMenu* mMakeGeometricRepMenu; ///< sub menu of the context menu, for choosing geometric reps
+  //QMenu* mMakeGeometricRepMenu; ///< sub menu of the context menu, for choosing geometric reps
 
   CameraStyle mCameraStyle; ///< the current camerastyle
   int mCameraOffset; ///< the distance between the camera and focalpoint

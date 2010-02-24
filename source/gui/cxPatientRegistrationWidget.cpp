@@ -270,9 +270,10 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   {
     if(!newTool)
       return;
-
+  }else
+  {
     disconnect(mToolToSample.get(), SIGNAL(toolVisible(bool)),
-                this, SLOT(toolVisibleSlot(bool)));
+               this, SLOT(toolVisibleSlot(bool)));
   }
 
   mToolToSample = newTool;

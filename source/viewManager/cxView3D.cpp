@@ -22,8 +22,8 @@ namespace cx
 View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
   ssc::View(parent, f),
   mContextMenu(new QMenu(this)),
-  mMakeVolumetricRepMenu(new QMenu(tr("Add volumetric representation of...") ,mContextMenu)),
-  mMakeGeometricRepMenu(new QMenu(tr("Add geometric representation of...") ,mContextMenu)),
+  mMakeVolumetricRepMenu(new QMenu(tr("Change volumetric representation of...") ,mContextMenu)),
+  //mMakeGeometricRepMenu(new QMenu(tr("Change geometric representation of...") ,mContextMenu)),
   mCameraStyle(DEFAULT_STYLE),
   mCameraOffset(-1),
   mDataManager(DataManager::getInstance()),
@@ -34,7 +34,7 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
   mName = name;
 
   mContextMenu->addMenu(mMakeVolumetricRepMenu);
-  mContextMenu->addMenu(mMakeGeometricRepMenu);
+  //mContextMenu->addMenu(mMakeGeometricRepMenu);
 
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 }
@@ -42,10 +42,12 @@ View3D::~View3D()
 {}
 void View3D::contextMenuEvent(QContextMenuEvent *event)
 {
-    mMakeVolumetricRepMenu->clear();
-    mMakeGeometricRepMenu->clear();
+  //NOT SUPPORTING MESHES IN 3D VIEW YET
 
-    mMakeGeometricRepMenu->setEnabled(false); //TODO remove when we know what to do with meshes
+    mMakeVolumetricRepMenu->clear();
+    //mMakeGeometricRepMenu->clear();
+
+    //mMakeGeometricRepMenu->setEnabled(false); //TODO remove when we know what to do with meshes
 
     //Get a list of available image and meshes names
     std::map<std::string, std::string> imageUidsAndNames = mDataManager->getImageUidsAndNames();
@@ -61,14 +63,14 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
       mMakeVolumetricRepMenu->addAction(imageIdAction);
       itImages++;
     }
-    std::map<std::string, std::string>::iterator itMeshes = meshUidsAndNames.begin();
+    /*std::map<std::string, std::string>::iterator itMeshes = meshUidsAndNames.begin();
     while(itMeshes != meshUidsAndNames.end())
     {
       const QString id = itMeshes->first.c_str();
       QAction* meshIdAction = new QAction(id, mMakeGeometricRepMenu);
       mMakeGeometricRepMenu->addAction(meshIdAction);
       itMeshes++;
-    }
+    }*/
 
     //Find out which the user chose
     //TODO: IMAGE OR MESH??? theAction->parent()?
