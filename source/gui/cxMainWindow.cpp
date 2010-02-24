@@ -868,6 +868,7 @@ void MainWindow::importDataSlot()
     data = mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
+  data->setName(fileInfo.fileName().toStdString());
   
   FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), data);
   connect(fileCopied, SIGNAL(fileCopiedCorrectly()), 
