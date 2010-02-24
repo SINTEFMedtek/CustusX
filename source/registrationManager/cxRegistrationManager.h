@@ -58,6 +58,10 @@ public slots:
   void setGlobalPointsActiveSlot(int index, bool active); ///< set if the point should be used in matrix calc or not
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset); ///< transform for (slightly) moving a patient registration
 
+signals:
+  void imageRegistrationPerformed();
+  void patientRegistrationPerformed();
+
 protected:
   RegistrationManager(); ///< use getInstance instead
   ~RegistrationManager(); ///< destructor

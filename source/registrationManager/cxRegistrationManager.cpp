@@ -157,6 +157,7 @@ void RegistrationManager::doPatientRegistration()
   ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
   mToolManager->set_rMpr(rMprPtr);
 
+  emit patientRegistrationPerformed();
   mMessageManager->sendInfo("Patient registration has been performed.");
 }
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
@@ -209,6 +210,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //image->setTransform(transform); TODO remove?
   image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
+  emit imageRegistrationPerformed();
   mMessageManager->sendInfo("Image registration has been performed.");
 }
 
