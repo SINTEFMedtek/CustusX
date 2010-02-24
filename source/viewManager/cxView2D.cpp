@@ -43,8 +43,8 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
       imageUidsAndNames.begin();
   while (imageIt != imageUidsAndNames.end())
   {
-    const QString uid = imageIt->second.c_str();
-    const QString name = imageIt->first.c_str();
+    const QString uid = imageIt->first.c_str();
+    const QString name = imageIt->second.c_str();
     QAction* imageAction = new QAction(name, mContextMenu);
     imageAction->setStatusTip(uid.toStdString().c_str());
     mContextMenu->addAction(imageAction);
@@ -55,7 +55,7 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
   QAction* theAction = mContextMenu->exec(event->globalPos());
   if (!theAction)
   {
-    mMessageManager->sendError("Could not figure out what the user clicked on in the view2d contextmenu.");
+    MessageManager::getInstance()->sendError("Could not figure out what the user clicked on in the view2d contextmenu.");
     return;
   }
 
@@ -66,7 +66,7 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
   if(!image)
   {
     std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View2D.";
-    mMessageManager->sendError(error);
+    MessageManager::getInstance()->sendError(error);
     return;
   }
 
