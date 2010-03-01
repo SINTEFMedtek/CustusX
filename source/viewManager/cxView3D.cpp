@@ -106,29 +106,20 @@ void View3D::setCameraOffsetSlot(int offset)
 }
 void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
-  //TODO: work in progress, its not working as intended yet, there is something
-  //fishy with the axes
-  
+  //TODO: work in progress, its not working as intended yet
+
+  ssc::Vector3D cameraPoint_t = ssc::Vector3D(0,0,mCameraOffset); //the camerapoint in tool space
+  ssc::Transform3D cameraTransform_pr = prMt*ssc::createTransformTranslate(cameraPoint_t);
+  ssc::Vector3D cameraPoint_pr = ssc::Vector3D(cameraTransform_pr[0][3],
+      cameraTransform_pr[1][3], cameraTransform_pr[2][3]); //the camera point in patient ref space
   ssc::Transform3DPtr rMpr = ToolManager::getInstance()->get_rMpr();
+  ssc::Transform3D cameraPoint_r = (*rMpr)*ssc::createTransformTranslate(cameraPoint_pr);
+
   ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
-  
-  /*ssc::Vector3D cameraPoint = ssc::Vector3D((*rMt)[0][3],(*rMt)[1][3],(*rMt)[2][3])*mCameraOffset;
-  ssc::Vector3D pos = ssc::Vector3D((*rMt)[0][3],(*rMt)[1][3],(*rMt)[2][3])-cameraPoint;
-  ssc::Vector3D focalPoint = pos + ssc::Vector3D((*rMt)[0][3],(*rMt)[1][3],(*rMt)[2][3]);*/
 
-  /*ssc::Transform3D prMo(vtkMatrix4x4::New());
-  prMo[2][3] = mCameraOffset; //offset is only applied in the tools z direction
-  ssc::Transform3D rMo = (*rMpr)*prMo;*/
-  
-  //ssc::Transform3D prMt_withOffset = prMt;
-  //ssc::Transform3D prMt_withOffset = prMt;
-  //prMt_withOffset[2][3] = prMt_withOffset[2][3]+mCameraOffset; //offset is only applied in the tools z(?) direction
-  ssc::Vector3D cameraPoint_t = ssc::Vector3D(0,0,mCameraOffset);
-  ssc::Vector3D cameraPoint_r = prMt.coord(cameraPoint_t);
-
-  double xCameraPos = cameraPoint_r[0];
-  double yCameraPos = cameraPoint_r[1];
-  double zCameraPos = cameraPoint_r[2];
+  double xCameraPos = cameraPoint_r[0][3];
+  double yCameraPos = cameraPoint_r[1][3];
+  double zCameraPos = cameraPoint_r[2][3];
   double xFocalPos = (*rMt)[0][3];
   double yFocalPos = (*rMt)[1][3];
   double zFocalPos = (*rMt)[2][3];
