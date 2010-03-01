@@ -18,6 +18,7 @@ namespace ssc
 ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name)
 {
+  mStayHiddenAfterVisible = false;
 	mStayVisibleAfterHide = false;
 	mOffsetPointVisibleAtZeroOffset = false;
 	mToolActor = vtkActorPtr::New();
@@ -148,9 +149,8 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 
 void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
-	//return;
-	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-	Transform3D rMt = rMpr*prMt;
+	Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
+	Transform3D rMt = (*rMprPtr)*prMt;
 	mToolActor->SetUserMatrix( rMt.matrix());
 	updateOffsetGraphics();
 }
@@ -166,6 +166,10 @@ void ToolRep3D::updateOffsetGraphics()
 		mTooltipPoint->getActor()->SetVisibility(visible);
 		mOffsetLine->getActor()->SetVisibility(visible);
 	}
+  if(mStayHiddenAfterVisible)
+  {
+    mToolActor->SetVisibility(false);
+  }
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
 	  if(mOffsetPointVisibleAtZeroOffset)
@@ -200,7 +204,10 @@ void ToolRep3D::receiveVisible(bool visible)
 	mToolActor->SetVisibility(visible);
 	updateOffsetGraphics();
 }
-
+void ToolRep3D::setStayHiddenAfterVisible(bool val)
+{
+  mStayHiddenAfterVisible = val;
+}
 /**
  * If true, tool is still rendered as visible after visibility status is hidden.
  * Nice for viewing the last known position of a tool.

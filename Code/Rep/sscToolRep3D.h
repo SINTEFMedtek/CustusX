@@ -17,7 +17,7 @@ typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /**Display a 3D representation of a ssc::Tool.
- * The representation to use is extracted from the tool itself.
+ * The representation to use is extracted from the tool itself.		
  *
  * Used by Sonowand.
  * Used by CustusX.
@@ -34,6 +34,7 @@ public:
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
 
+  void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 
@@ -65,6 +66,7 @@ private:
 	GraphicalPoint3DPtr mTooltipPoint;
 	GraphicalPoint3DPtr mOffsetPoint;
 	GraphicalLine3DPtr mOffsetLine;
+  bool mStayHiddenAfterVisible;
 	bool mStayVisibleAfterHide;
 	bool mOffsetPointVisibleAtZeroOffset;
 };
