@@ -68,7 +68,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
           this, SLOT(toolSampleButtonClickedSlot()));
   mResetOffsetButton->setDisabled(true);
   connect(mResetOffsetButton, SIGNAL(clicked()),
-          this, SLOT(resetOffset()));
+          this, SLOT(resetOffsetSlot()));
 
   //toolmanager
   connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)),
@@ -80,6 +80,8 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
 
   //registrationmanager
   connect(RegistrationManager::getInstance(), SIGNAL(patientRegistrationPerformed()),
+          this, SLOT(activateManualRegistrationFieldSlot()));
+  connect(ToolManager::getInstance(), SIGNAL(rMprChanged()),
           this, SLOT(activateManualRegistrationFieldSlot()));
 
   //sliders
@@ -116,11 +118,11 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   //spinboxes are connected to the sliders so no need to connect them to the
   //registration manager as well
   connect(mXOffsetSlider, SIGNAL(valueChanged(int)),
-          this, SLOT(setOffset(int)));
+          this, SLOT(setOffsetSlot(int)));
   connect(mYOffsetSlider, SIGNAL(valueChanged(int)),
-          this, SLOT(setOffset(int)));
+          this, SLOT(setOffsetSlot(int)));
   connect(mZOffsetSlider, SIGNAL(valueChanged(int)),
-          this, SLOT(setOffset(int)));
+          this, SLOT(setOffsetSlot(int)));
 
   //layout
   mOffsetsGridLayout->addWidget(mXLabel, 0, 0);
@@ -283,7 +285,7 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   //update button
   mToolSampleButton->setEnabled(mToolToSample->getVisible());
 }
-void PatientRegistrationWidget::resetOffset()
+void PatientRegistrationWidget::resetOffsetSlot()
 {
   if(mXOffsetSlider->value() != mDefaultValue ||
      mYOffsetSlider->value() != mDefaultValue ||
@@ -296,12 +298,12 @@ void PatientRegistrationWidget::resetOffset()
     mLandmarkTableWidget->setEnabled(true);
   }
 }
-void PatientRegistrationWidget::setOffset(int value)
+void PatientRegistrationWidget::setOffsetSlot(int value)
 {
   mResetOffsetButton->setEnabled(true);
   mLandmarkTableWidget->setDisabled(true);
   
-  vtkMatrix4x4* offsetMatrix = vtkMatrix4x4::New();
+  vtkMatrix4x4* offsetMatrix = vtkMatrix4x4::New(); //identity
   offsetMatrix->SetElement(0, 3, mXOffsetSlider->value());
   offsetMatrix->SetElement(1, 3, mYOffsetSlider->value());
   offsetMatrix->SetElement(2, 3, mZOffsetSlider->value());

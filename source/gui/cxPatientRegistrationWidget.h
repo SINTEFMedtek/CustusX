@@ -52,8 +52,8 @@ protected slots:
   void rowSelectedSlot(int row, int column); ///<  updates the current row and column
   void cellChangedSlot(int row, int column); ///<  reacts when the user types in a (landmark) name
   void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
-  void resetOffset(); ///< resets the patient registration offset to zero
-  void setOffset(int value); ///< set the patient registration offset
+  void resetOffsetSlot(); ///< resets the patient registration offset to zero
+  void setOffsetSlot(int value); ///< set the patient registration offset
   void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
 
 protected:
