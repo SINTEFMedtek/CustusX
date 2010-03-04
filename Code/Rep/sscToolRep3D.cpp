@@ -169,6 +169,9 @@ void ToolRep3D::updateOffsetGraphics()
   if(mStayHiddenAfterVisible)
   {
     mToolActor->SetVisibility(false);
+  }else
+  {
+    mToolActor->SetVisibility(mTool->getVisible());
   }
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
