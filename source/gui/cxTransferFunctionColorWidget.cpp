@@ -278,9 +278,7 @@ void TransferFunctionColorWidget::setColorSlot()
 	
   QColor result = QColorDialog::getColor( newPoint.value, this);
 	
-	// Looks like we might set a point even if the cancel is choosen in the dialog
-	// Maybee result and newPoint.value are not exactly equal
-  if (result.isValid() || result != newPoint.value)
+  if (result.isValid() && result != newPoint.value)
   {
     ColorMapPtr colorMapPtr = mCurrentImage->getTransferFunctions3D()->getColorMap();
     
