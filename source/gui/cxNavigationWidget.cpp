@@ -35,8 +35,8 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   mCameraGroupBox->setLayout(mCameraGroupLayout);
   mDefaultCameraStyleRadioButton->setChecked(true);
   mCameraOffsetSlider->setDisabled(true);
-  mCameraOffsetSlider->setRange(0, 200);
-  mCameraOffsetSlider->setValue(10);
+  mCameraOffsetSlider->setRange(0, 2000);
+  mCameraOffsetSlider->setValue(600);
   mCameraGroupLayout->addWidget(mDefaultCameraStyleRadioButton);
   mCameraGroupLayout->addWidget(mToolCameraStyleRadioButton);
   mCameraGroupLayout->addWidget(mCameraOffsetLabel);
