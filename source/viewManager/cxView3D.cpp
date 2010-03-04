@@ -183,7 +183,7 @@ void View3D::deactivateCameraToolStyle()
   disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-  ssc::ToolRep3DPtr followingToolRepPtr = mRepManager->getToolRep3DRep(mFollowingTool->getUid());
+  ssc::ToolRep3DPtr followingToolRepPtr = mRepManager->getToolRep3DRep("ToolRep3D_1");
   if(followingToolRepPtr)
   {
     followingToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
