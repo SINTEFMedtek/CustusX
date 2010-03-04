@@ -197,8 +197,8 @@ MainWindow::MainWindow() :
     mSettings->setValue("globalApplicationName", "Nevro");
   if (!mSettings->contains("globalPatientNumber"))
     mSettings->setValue("globalPatientNumber", 1);
-  if (!mSettings->contains("applicationNames"))
-    mSettings->setValue("applicationNames", "Nevro,Lap,Kar");
+  //if (!mSettings->contains("applicationNames"))
+    mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung");
   
   // Restore saved window states
   restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray());
