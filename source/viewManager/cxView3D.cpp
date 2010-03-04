@@ -185,6 +185,9 @@ void View3D::deactivateCameraToolStyle()
 
   ssc::ToolRep3DPtr followingToolRepPtr = mRepManager->getToolRep3DRep(mFollowingTool->getUid());
   if(followingToolRepPtr)
+  {
     followingToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
+    followingToolRepPtr->setStayHiddenAfterVisible(false);
+  }
 }
 }//namespace cx
