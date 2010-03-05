@@ -92,7 +92,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
     return;
   }
   mPatientRegistrationOffset = offset;
-  ssc::Transform3DPtr newTransformPtr(new ssc::Transform3D((*(currentTransform))*(*(mPatientRegistrationOffset))));
+  ssc::Transform3DPtr newTransformPtr(new ssc::Transform3D( (*(mPatientRegistrationOffset)) *  (*(currentTransform)) ));
   mToolManager->set_rMpr(newTransformPtr);
   //for debugging: std::cout << (*newTransformPtr) << std::endl;
 
