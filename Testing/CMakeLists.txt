@@ -105,7 +105,7 @@ QT4_WRAP_CPP( SSC_TEST_SOURCE_FILES
     sscViewsWindow.h)
 set(SSC_TEST_SOURCE_FILES
     sscTestSliceComputer.cpp
-	sscTestSpaceOrganizer.cpp
+	#sscTestSpaceOrganizer.cpp
     sscViewsWindow.cpp 
     sscTestVisualRendering.cpp
     sscTestUtilityClasses.cpp

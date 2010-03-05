@@ -12,7 +12,7 @@
 #ifndef RUN_ALL_TESTS
 #include "sscTestUtilityClasses.h"
 #include "sscTestSliceComputer.h"
-#include "sscTestSpaceOrganizer.h"
+//#include "sscTestSpaceOrganizer.h"
 #endif
 
 
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 //	runner.addTest( new CppUnit::TestCaller<TestSliceComputer>(
 //			                                 "debugtest",
 //			                                  &TestSliceComputer::testAnyPlanes ) );
-	runner.addTest(TestSpaceOrganizer::suite());
+//	runner.addTest(TestSpaceOrganizer::suite());
 #endif
 	
 	
