@@ -63,7 +63,7 @@ public:
 	int getRange();///< For convenience: getMax() – getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
 
-	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \return The created subnode
+	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 //	/**Return a reference to a GL texture buffer collection for the image.

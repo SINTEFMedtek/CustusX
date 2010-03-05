@@ -92,8 +92,9 @@ public:
 	virtual Vector3D getCenter() const;
 	virtual void setCenter(const Vector3D& center);
 
+  //Interface for saving/loading
 	void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
-	void parseXml(QDomNode& datamangerNode);///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager.
+	void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements. 
 
 protected:
 	DataManagerImpl();
