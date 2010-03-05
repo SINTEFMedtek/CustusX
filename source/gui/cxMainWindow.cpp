@@ -32,9 +32,10 @@
 namespace cx
 {
 
-FileCopied::FileCopied(const std::string& filePath, ssc::DataPtr data) :
+FileCopied::FileCopied(const std::string& absolutefilePath, const std::string& relativefilePath, ssc::DataPtr data) :
   mMessageManager(MessageManager::getInstance()),
-  mFilePath(filePath),
+  mFilePath(absolutefilePath),
+  mRelativeFilePath(relativefilePath),
   mData(data)
 {}
   
@@ -151,7 +152,7 @@ void FileCopied::areFileCopiedSlot()
   else
   {
     mMessageManager->sendInfo("File copied correctly: "+mFilePath);
-    mData->setFilePath(mFilePath); // Update file path
+    mData->setFilePath(mRelativeFilePath); // Update file path
     
     //Save patient, to avoid problems
     emit fileCopiedCorrectly();
@@ -502,8 +503,9 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
     }
   }
   if (!dataManagerNode.isNull())
-  {
-    mDataManager->parseXml(dataManagerNode);
+  {    
+    QString absolutePatientPath = mSettings->value("globalPatientDataFolder").toString()+"/"+mActivePatientFolder;
+    mDataManager->parseXml(dataManagerNode, absolutePatientPath);
   }
 }
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
@@ -873,7 +875,11 @@ void MainWindow::importDataSlot()
   }
   data->setName(fileInfo.fileName().toStdString());
   
-  FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), data);
+  QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString()
+                      +"/"+mActivePatientFolder);
+  FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), 
+                                          patientDataDir.relativeFilePath(pathToNewFile).toStdString(), 
+                                          data);
   connect(fileCopied, SIGNAL(fileCopiedCorrectly()), 
           this, SLOT(savePatientFileSlot()));
   QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds

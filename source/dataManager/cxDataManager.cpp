@@ -25,13 +25,4 @@ void DataManager::deleteImageSlot(ssc::ImagePtr image)
   emit currentImageDeleted(image);
 }
 
-void DataManager::addXml(QDomNode& parentNode)
-{
-  ssc::DataManagerImpl::addXml(parentNode);
-}
-void DataManager::parseXml(QDomNode& node)
-{
-  ssc::DataManagerImpl::parseXml(node);
-}
-
 }//namespace cx

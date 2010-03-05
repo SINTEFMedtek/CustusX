@@ -22,10 +22,6 @@ class DataManager : public ssc::DataManagerImpl
 public:
   static DataManager* getInstance();
   
-  //Interface for saving/loading
-  void addXml(QDomNode& parentNode);
-  void parseXml(QDomNode& node);
-
 signals:
   void currentImageDeleted(ssc::ImagePtr image); ///< emitted when data is deleted
   
