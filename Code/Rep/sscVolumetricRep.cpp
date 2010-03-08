@@ -134,7 +134,7 @@ void VolumetricRep::setImage(ImagePtr image)
 
 bool VolumetricRep::hasImage(ImagePtr image) const
 {
-	return (mImage != NULL);
+	return (mImage == image);
 }
 
 /**called when the image is changed internally.

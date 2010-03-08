@@ -120,6 +120,7 @@ SET( SSC_SOURCE_FILES
     Rep/sscRepImpl.cpp
     Rep/sscAxesRep.cpp
     Rep/sscSliceRep.cpp
+    Rep/sscVolumetricRep.h
     Rep/sscVolumetricRep.cpp
     Rep/sscProgressiveLODVolumetricRep.cpp    
     Rep/sscGeometricRep.cpp
