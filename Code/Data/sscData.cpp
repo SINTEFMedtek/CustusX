@@ -36,6 +36,10 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 {
 	mRegistrationStatus = regStat;
 }
+/**
+ * Set the transform that brings a point from local data space to (data-)ref space
+ * @param rMd the transformation from data to ref
+ */
 void Data::set_rMd(Transform3D rMd)
 {
 	if (similar(rMd, m_rMd))
@@ -62,6 +66,9 @@ REGISTRATION_STATUS Data::getRegistrationStatus() const
 {
 	return mRegistrationStatus;
 }
+/**
+ * @return Transform from local data space to (data-)ref space
+ */
 Transform3D Data::get_rMd() const
 {
 	return m_rMd;

@@ -42,7 +42,7 @@ public:
 	void setName(const std::string& name);
 	void setFilePath(const std::string& filePath);///< Set current file path to file
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
-	virtual void set_rMd(Transform3D rMd);
+	virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
 
 	virtual std::string getUid() const; ///< \return unique id for this instance
 	virtual std::string getName() const; /// \return a descriptive name for this instance

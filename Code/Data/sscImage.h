@@ -94,7 +94,7 @@ protected:
 	vtkImageDataPtr mBaseGrayScaleImageData; ///< image data in data space
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
 	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
-	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)	
+	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark), in reference space (r-space)
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 //	GPUImageBufferWeakPtr mBuffer; 
 };
