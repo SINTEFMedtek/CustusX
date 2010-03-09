@@ -5,29 +5,33 @@
 #include "cxToolManager.h"
 #include <QHBoxLayout>
 #include "cxMessageManager.h"
+#include "cxViewManager.h"
 #include <QPixmap>
 #include <QMetaObject>
 
 namespace cx
 {
 CustomStatusBar::CustomStatusBar() :
-  mMessageManager(MessageManager::getInstance()),
-  mToolManager(ToolManager::getInstance())
+  mFpsLabel(new QLabel())
 {
-  connect(mMessageManager, SIGNAL(emittedMessage(const QString&, int)),
-          this, SLOT(showMessage(const QString&, int)));
+  connect(MessageManager::getInstance(),
+          SIGNAL(emittedMessage(const QString&, int)),
+          this,
+          SLOT(showMessage(const QString&, int)));
 
-  connect(mToolManager, SIGNAL(trackingStarted()),
+  connect(ToolManager::getInstance(), SIGNAL(trackingStarted()),
           this, SLOT(connectToToolSignals()));
-  connect(mToolManager, SIGNAL(trackingStopped()),
+  connect(ToolManager::getInstance(), SIGNAL(trackingStopped()),
             this, SLOT(disconnectFromToolSignals()));
+  connect(ViewManager::getInstance(), SIGNAL(fps(int)),
+          this, SLOT(fpsSlot(int)));
 }
 CustomStatusBar::~CustomStatusBar()
 {
 }
 void CustomStatusBar::connectToToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = mToolManager->getTools();
+  ssc::ToolManager::ToolMapPtr connectedTools = ToolManager::getInstance()->getTools();
   ssc::ToolManager::ToolMap::iterator it = connectedTools->begin();
   while (it != connectedTools->end())
   {
@@ -52,7 +56,7 @@ void CustomStatusBar::connectToToolSignals()
 }
 void CustomStatusBar::disconnectFromToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = mToolManager->getTools();
+  ssc::ToolManager::ToolMapPtr connectedTools = ToolManager::getInstance()->getTools();
   ssc::ToolManager::ToolMap::iterator it1 = connectedTools->begin();
   while (it1 != connectedTools->end())
   {
@@ -83,7 +87,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
   QObject* sender = this->sender();
   if(sender == 0)
   {
-    mMessageManager->sendWarning("Could not determine which tool changed visibility.");
+    MessageManager::getInstance()->sendWarning("Could not determine which tool changed visibility.");
     return;
   }
   const QMetaObject* metaObject = sender->metaObject();
@@ -94,7 +98,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
     Tool* tool = dynamic_cast<Tool*>(sender);
     if(tool == NULL)
     {
-      mMessageManager->sendWarning("The sender does not appear to be a tool.");
+      MessageManager::getInstance()->sendWarning("The sender does not appear to be a tool.");
       return;
     }
     std::string name = tool->getName();
@@ -119,6 +123,13 @@ void CustomStatusBar::receiveToolVisible(bool visible)
       it++;
     }
   }
-
 }
+
+void CustomStatusBar::fpsSlot(int numFps)
+{
+  QString fpsString = "FPS: "+QString::number(numFps);
+  mFpsLabel->setText(fpsString);
+  this->addPermanentWidget(mFpsLabel);
+}
+
 }//namespace cx

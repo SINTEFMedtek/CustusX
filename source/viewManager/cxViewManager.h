@@ -9,14 +9,13 @@ class QGridLayout;
 class QWidget;
 class QTimer;
 class QSettings;
+class QTime;
 namespace ssc
 {
 class View;
 }
 namespace cx
 {
-class MessageManager;
-class RepManager;
 class View2D;
 class View3D;
 
@@ -60,6 +59,7 @@ public:
 
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
+  void fps(int number);///< Emits number of frames per second
 
 public slots:
   void setLayoutTo_3D_1X1();    ///< sets the layout to 3D_1X1
@@ -89,8 +89,6 @@ protected:
   void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
-  MessageManager*     mMessageManager; ///< device for sending messages to the statusbar
-  RepManager* mRepManager; ///< has a pool of reps
 
   LayoutType      mCurrentLayoutType; ///< what LayoutType is currently active
   QGridLayout*    mLayout;            ///< the layout
@@ -107,6 +105,8 @@ protected:
   
   bool mShadingOn; ///< Use shading for rendering?
   QSettings* mSettings; ///< Object for storing all program/user specific settings
+  QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
+  int mNumberOfRenderings; ///< Variable used to calculate FPS
 
 private:
   ViewManager(ViewManager const&);

@@ -9,9 +9,6 @@ class QPixmap;
 
 namespace cx
 {
-class MessageManager;
-class ToolManager;
-
 /**
  * \class CustomStatusBar
  *
@@ -38,12 +35,12 @@ protected slots:
   void connectToToolSignals(); ///< connect to all available tools
   void disconnectFromToolSignals(); ///< disconnect from all tool
   void receiveToolVisible(bool visible); ///< updates the color label for a tool
+  void fpsSlot(int numFps); ///< Show FPS
 
 protected:
-  MessageManager* mMessageManager; ///< takes messages intended for the user
-  ToolManager* mToolManager; ///< interface to the navigation system
-
   std::map<QLabel*, QLabel*> mToolColorMap; ///< maps text- and colorlabel for a tool
+  
+  QLabel* mFpsLabel; ///< Label for showing FPS
 };
 }
 

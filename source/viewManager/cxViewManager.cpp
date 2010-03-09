@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QSettings>
+#include <QTime>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include "sscProbeRep.h"
@@ -29,15 +30,15 @@ ViewManager* ViewManager::getInstance()
 void ViewManager::destroyInstance()
 {}
 ViewManager::ViewManager() :
-  mMessageManager(MessageManager::getInstance()),
-  mRepManager(RepManager::getInstance()),
   mCurrentLayoutType(LAYOUT_NONE),
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(9),
   mRenderingTimer(new QTimer(this)),
-  mSettings(new QSettings())
+  mSettings(new QSettings()),
+  mRenderingTime(new QTime()),
+  mNumberOfRenderings(0)
 {
   mLayout->setSpacing(1);
   mMainWindowsCentralWidget->setLayout(mLayout);
@@ -161,7 +162,7 @@ void ViewManager::setLayoutTo_3D_1X1()
     return;
     break;
   }
-  mMessageManager->sendInfo("Layout changed to 3D_1X1");
+  MessageManager::getInstance()->sendInfo("Layout changed to 3D_1X1");
 }
 void ViewManager::setLayoutTo_3DACS_2X2()
 {
@@ -188,7 +189,7 @@ void ViewManager::setLayoutTo_3DACS_2X2()
     return;
     break;
   }
-  mMessageManager->sendInfo("Layout changed to 3DACS_2X2");
+  MessageManager::getInstance()->sendInfo("Layout changed to 3DACS_2X2");
 }
 void ViewManager::setLayoutTo_3DACS_1X3()
 {
@@ -215,7 +216,7 @@ void ViewManager::setLayoutTo_3DACS_1X3()
     return;
     break;
   }
-  mMessageManager->sendInfo("Layout changed to 3DACS_1X3");
+  MessageManager::getInstance()->sendInfo("Layout changed to 3DACS_1X3");
 }
 void ViewManager::setLayoutTo_ACSACS_2X3()
 {
@@ -242,33 +243,34 @@ void ViewManager::setLayoutTo_ACSACS_2X3()
     return;
     break;
   }
-  mMessageManager->sendInfo("Layout changed to ACSACS_2X3");
+  MessageManager::getInstance()->sendInfo("Layout changed to ACSACS_2X3");
 }
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
-  mMessageManager->sendInfo("Delete image: "+image->getName());
-  VolumetricRepMap* volRepMap = mRepManager->getVolumetricReps();
+  MessageManager::getInstance()->sendInfo("Delete image: "+image->getName());
+  RepManager* repManager = RepManager::getInstance();
+  VolumetricRepMap* volRepMap = repManager->getVolumetricReps();
   VolumetricRepMap::iterator itVolRep = volRepMap->begin();
   for(; itVolRep != volRepMap->end(); ++itVolRep)
     if(itVolRep->second->hasImage(image))
       this->removeRepFromViews(itVolRep->second);
   
-  /*InriaRep3DMap* inria3DRepMap = mRepManager->getInria3DReps();
+  /*InriaRep3DMap* inria3DRepMap = repManager->getInria3DReps();
   InriaRep3DMap::iterator itInria3DRep = inria3DRepMap->begin();
   for(; itInria3DRep != inria3DRepMap->end(); ++itInria3DRep)
     if(itInria3DRep->second->hasImage(image))
       this->removeRepFromViews(itInria3DRep->second);*/
   
-  /*InriaRep2DMap* inria2DRepMap = mRepManager->getInria2DReps();
+  /*InriaRep2DMap* inria2DRepMap = repManager->getInria2DReps();
   InriaRep2DMap::iterator itInria2DRep = inria2DRepMap->begin();
   for(; itInria2DRep != inria2DRepMap->end(); ++itInria2DRep)
     if(itInria2DRep->second->hasImage(image))
       this->removeRepFromViews(itInria2DRep->second);*/
   
-  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");
   
   //Don't work?
   //if(inriaRep2D_1->getVtkViewImage2D()->HasDataSet(image->getRefVtkImageData()))
@@ -299,7 +301,7 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
     //this->renderAllViewsSlot();
     //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
     emit imageDeletedFromViews(image);
-    mMessageManager->sendInfo("Removed current image from inria views");
+    MessageManager::getInstance()->sendInfo("Removed current image from inria views");
   }
 }
 
@@ -314,7 +316,7 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
   mShadingOn = shadingOn;
   
   ssc::VolumetricRepPtr volumetricRep
-  = mRepManager->getVolumetricRep("VolumetricRep_1");
+  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
   if(volumetricRep->getImage())
     if(shadingOn)
       volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
@@ -436,22 +438,34 @@ void ViewManager::renderAllViewsSlot()
     if(it2D->second->isVisible())
       it2D->second->getRenderWindow()->Render();
   }
+  
+  if(mRenderingTime->isNull())
+     mRenderingTime->start();
+  else if(mRenderingTime->elapsed()>1000)
+  {
+    emit fps(mNumberOfRenderings);
+    mRenderingTime->restart();
+    mNumberOfRenderings = 0;
+  }
+  else
+    mNumberOfRenderings++;
 }
 	
 void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
 {  
+  RepManager* repManager = RepManager::getInstance();
   
   // Update 2D views
-  InriaRep2DPtr inriaRep2D_1 = mRepManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = mRepManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = mRepManager->getInria2DRep("InriaRep2D_3");
+  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
+  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
+  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");
   inriaRep2D_1->setImage(currentImage);
   inriaRep2D_2->setImage(currentImage);
   inriaRep2D_3->setImage(currentImage);
   View2D* view2D_1 = mView2DMap[mView2DNames[0]];
   View2D* view2D_2 = mView2DMap[mView2DNames[1]];
   View2D* view2D_3 = mView2DMap[mView2DNames[2]];
-  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_1");
   
   if (!currentImage)
   {
@@ -459,14 +473,14 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   }
   if (!currentImage->getRefVtkImageData().GetPointer())
   {
-    mMessageManager->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
+    MessageManager::getInstance()->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
     return;
   }
   
   // Update 3D view
   ssc::VolumetricRepPtr volumetricRep
-  = mRepManager->getVolumetricRep("VolumetricRep_1");
-  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+  = repManager->getVolumetricRep("VolumetricRep_1");
+  LandmarkRepPtr landmarkRep = repManager->getLandmarkRep("LandmarkRep_1");
   
    //Set these when image is deleted?
   volumetricRep->setImage(currentImage);
@@ -480,7 +494,8 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   View3D* view3D_1 = mView3DMap[mView3DNames[0]];
   view3D_1->setRep(volumetricRep);
   view3D_1->getRenderer()->ResetCamera();
-  view3D_1->getRenderer()->Render();
+  if(view3D_1->isVisible())
+    view3D_1->getRenderWindow()->Render();
 
   view2D_1->setRep(inriaRep2D_1);
   view2D_2->setRep(inriaRep2D_2);
