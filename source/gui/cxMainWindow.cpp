@@ -191,7 +191,7 @@ MainWindow::MainWindow() :
   
   // Initialize settings if empty
   if (!mSettings->contains("globalPatientDataFolder"))
-    mSettings->setValue("globalPatientDataFolder", QDir::homePath());
+    mSettings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
   if (!mSettings->contains("toolConfigFilePath"))
     mSettings->setValue("toolConfigFilePath", QDir::homePath());
   if (!mSettings->contains("globalApplicationName"))
@@ -200,6 +200,12 @@ MainWindow::MainWindow() :
     mSettings->setValue("globalPatientNumber", 1);
   //if (!mSettings->contains("applicationNames"))
     mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung");
+  
+  
+  if (!mSettings->contains("renderingInterval"))
+    mSettings->setValue("renderingInterval", 33);
+  if (!mSettings->contains("shadingOn"))
+    mSettings->setValue("shadingOn", true);
   
   // Restore saved window states
   restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray());
@@ -752,9 +758,6 @@ void MainWindow::loadPatientFileSlot()
       mMessageManager->sendError("Could not parse XML file :"
                                  +file.fileName().toStdString()+" because: "
                                  +emsg.toStdString()+"");
-
-      //Not nice to throw and never catch...
-      //throw "Could not parse XML file";
     }
     else
     {

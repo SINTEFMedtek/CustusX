@@ -2,6 +2,8 @@
 #include <QtGui>
 
 #include "cxPreferencesDialog.h"
+#include "cxMessageManager.h"
+#include "cxViewManager.h"
 
 #include <iostream>
 
@@ -216,30 +218,103 @@ void FoldersTab::saveParametersSlot()
 }
   
 //==============================================================================
-// TestTab
+// PerformanceTab
 //------------------------------------------------------------------------------
-TestTab::TestTab(QWidget *parent)
-    : QWidget(parent)
+PerformanceTab::PerformanceTab(QWidget *parent) :
+  QWidget(parent),
+  mMessageManager(MessageManager::getInstance()),
+  mSettings(new QSettings())
 {
 }
 
-TestTab::~TestTab()
+void PerformanceTab::init()
 {
+  int renderingInterval = mSettings->value("renderingInterval").toInt();
+  bool shadingOn = mSettings->value("shadingOn").toBool();
+  
+  QLabel* renderingIntervalLabel = new QLabel(tr("Rendering interval"));
+  
+  mRenderingIntervalSpinBox = new QSpinBox;
+  mRenderingIntervalSpinBox->setSuffix("ms");
+  mRenderingIntervalSpinBox->setMaximum(1);
+  mRenderingIntervalSpinBox->setMaximum(1000);
+  mRenderingIntervalSpinBox->setValue(renderingInterval);
+  connect(mRenderingIntervalSpinBox,
+          SIGNAL(valueChanged(int)),
+          this,
+          SLOT(renderingIntervalSlot(int)));
+  
+  QString renderingRateString = "Equals: ";
+  QString num;
+  num.setNum(1000.0/renderingInterval);
+  renderingRateString = renderingRateString+num+" frames/second";
+  mRenderingRateLabel = new QLabel(renderingRateString);
+  
+  mShadingCheckBox = new QCheckBox(tr("ShadingOn"));
+  mShadingCheckBox->setChecked(shadingOn);
+  
+  //Layout
+  mMainLayout = new QGridLayout;
+  mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
+  mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
+  mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
+  mMainLayout->addWidget(mShadingCheckBox, 2, 0);
+  setLayout(mMainLayout);
 }
 
-PreferencesDialog::PreferencesDialog(QWidget *parent)
-    : QDialog(parent)
+void PerformanceTab::renderingIntervalSlot(int interval)
+{    
+  QString renderingRateString = "Equals: ";
+  QString num;
+  //num.setNum(1000.0/mRenderingIntervalSpinBox->value());
+  num.setNum(1000.0/interval);
+  renderingRateString = renderingRateString+num+" frames/second";
+  mRenderingRateLabel->setText(renderingRateString);
+  mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
+} 
+
+void PerformanceTab::saveParametersSlot()
+{
+  int renderingInterval = mSettings->value("renderingInterval").toInt();
+  bool shadingOn = mSettings->value("shadingOn").toBool();
+  
+  if(renderingInterval != mRenderingIntervalSpinBox->value())
+  {
+    mSettings->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
+    emit renderingIntervalChanged(mRenderingIntervalSpinBox->value());
+  }
+  if(shadingOn != mShadingCheckBox->isChecked())
+  {
+    mSettings->setValue("shadingOn", mShadingCheckBox->isChecked());
+    emit shadingChanged(mShadingCheckBox->isChecked());
+  }
+}
+
+PreferencesDialog::PreferencesDialog(QWidget *parent) :
+  QDialog(parent),
+  mViewManager(ViewManager::getInstance())
 {
   mFoldersTab = new FoldersTab;
   mFoldersTab->init();
-  //testTab = new TestTab;
+  mPerformanceTab = new PerformanceTab;
+  mPerformanceTab->init();
+  
+  connect(mPerformanceTab,
+          SIGNAL(renderingIntervalChanged(int)),
+          mViewManager,
+          SLOT(renderingIntervalChangedSlot(int)));
+  connect(mPerformanceTab,
+          SIGNAL(shadingChanged(bool)),
+          mViewManager,
+          SLOT(shadingChangedSlot(bool)));
   
   tabWidget = new QTabWidget;
 	tabWidget->addTab(mFoldersTab, tr("Folders"));
-  //tabWidget->addTab(testTab, tr("Test"));
+  tabWidget->addTab(mPerformanceTab, tr("Performance"));
 	
 	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   connect(buttonBox, SIGNAL(accepted()), mFoldersTab, SLOT(saveParametersSlot()));
+  connect(buttonBox, SIGNAL(accepted()), mPerformanceTab, SLOT(saveParametersSlot()));
   connect(mFoldersTab, SIGNAL(savedParameters()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   

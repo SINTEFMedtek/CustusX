@@ -9,10 +9,15 @@ class QLabel;
 class QComboBox;
 class QPushButton;
 class QSettings;
+class QSpinBox;
+class QCheckBox;
+class QGridLayout;
 
 namespace cx
 {
-
+class MessageManager;
+class ViewManager;
+  
 /**
  * \class FoldersTab
  *
@@ -69,16 +74,39 @@ private:
 
 };
 
-
-// TestTab
-//------------------------------------------------------------------------------
-class TestTab : public QWidget
+/**
+ * \class PerformanceTab
+ *
+ * \brief Configure performance tab in preferences dialog
+ *
+ * \date Mar 8, 2010
+ * \author Ole Vegard Solberg, SINTEF
+ */
+class PerformanceTab : public QWidget
 {
     Q_OBJECT
 
 public:
-    TestTab(QWidget *parent = 0);
-	~TestTab();
+  PerformanceTab(QWidget *parent = 0);
+  void init();
+  
+  public slots:
+  void saveParametersSlot();
+  
+signals:
+  void renderingIntervalChanged(int);
+  void shadingChanged(bool);
+
+protected:
+  MessageManager* mMessageManager; ///< takes messages intended for the user
+  QSettings* mSettings;
+  QSpinBox* mRenderingIntervalSpinBox;
+  QLabel* mRenderingRateLabel;
+  QCheckBox* mShadingCheckBox;
+  QGridLayout *mMainLayout;
+  
+  private slots:
+  void renderingIntervalSlot(int interval);
 };
 
 /**
@@ -94,14 +122,15 @@ class PreferencesDialog : public QDialog
     Q_OBJECT
 
 public:
-    PreferencesDialog(QWidget *parent = 0);
-	~PreferencesDialog();	
+  PreferencesDialog(QWidget *parent = 0);
+  ~PreferencesDialog();	
   
-private:
-    FoldersTab *mFoldersTab;
-    TestTab *testTab;
-    QTabWidget *tabWidget;
-    QDialogButtonBox *buttonBox;
+protected:
+  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
+  FoldersTab *mFoldersTab;
+  PerformanceTab *mPerformanceTab;
+  QTabWidget *tabWidget;
+  QDialogButtonBox *buttonBox;
 };
 
 

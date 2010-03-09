@@ -8,6 +8,7 @@
 class QGridLayout;
 class QWidget;
 class QTimer;
+class QSettings;
 namespace ssc
 {
 class View;
@@ -66,6 +67,8 @@ public slots:
   void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
   void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
   void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
+  void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
+  void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
 
 protected slots:
 	void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
@@ -101,6 +104,9 @@ protected:
   View3DMap     mView3DMap;       ///< a map of all the 2D views
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
+  
+  bool mShadingOn; ///< Use shading for rendering?
+  QSettings* mSettings; ///< Object for storing all program/user specific settings
 
 private:
   ViewManager(ViewManager const&);

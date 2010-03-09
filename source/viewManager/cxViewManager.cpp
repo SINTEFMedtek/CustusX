@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QWidget>
 #include <QTimer>
+#include <QSettings>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include "sscProbeRep.h"
@@ -35,7 +36,8 @@ ViewManager::ViewManager() :
   mMainWindowsCentralWidget(new QWidget()),
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(9),
-  mRenderingTimer(new QTimer(this))
+  mRenderingTimer(new QTimer(this)),
+  mSettings(new QSettings())
 {
   mLayout->setSpacing(1);
   mMainWindowsCentralWidget->setLayout(mLayout);
@@ -58,6 +60,9 @@ ViewManager::ViewManager() :
                               mMainWindowsCentralWidget);
     view->hide();
     mView3DMap[view->getUid()] = view;
+    
+    //Turn off rendering in vtkRenderWindowInteractor
+    view->getRenderWindow()->GetInteractor()->EnableRenderOff();
   }
   for(int i=0; i<MAX_2DVIEWS; i++)
   {
@@ -65,13 +70,18 @@ ViewManager::ViewManager() :
                               mMainWindowsCentralWidget);
     view->hide();
     mView2DMap[view->getUid()] = view;
+    
+    //Turn off rendering in vtkRenderWindowInteractor
+    view->getRenderWindow()->GetInteractor()->EnableRenderOff();
   }
 
   this->setLayoutTo_3DACS_2X2();
 
-  mRenderingTimer->start(33);
+  mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),
           this, SLOT(renderAllViewsSlot()));
+  
+  mShadingOn = mSettings->value("shadingOn").toBool();
 }
 ViewManager::~ViewManager()
 {}
@@ -292,6 +302,25 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
     mMessageManager->sendInfo("Removed current image from inria views");
   }
 }
+
+void ViewManager::renderingIntervalChangedSlot(int interval)
+{
+  mRenderingTimer->stop();
+  mRenderingTimer->start(interval);
+}
+
+void ViewManager::shadingChangedSlot(bool shadingOn)
+{
+  mShadingOn = shadingOn;
+  
+  ssc::VolumetricRepPtr volumetricRep
+  = mRepManager->getVolumetricRep("VolumetricRep_1");
+  if(volumetricRep->getImage())
+    if(shadingOn)
+      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
+    else
+      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
+}
   
 void ViewManager::activateLayout_3D_1X1()
 {
@@ -443,6 +472,10 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   volumetricRep->setImage(currentImage);
   probeRep->setImage(currentImage);
   landmarkRep->setImage(currentImage);
+  
+  //Shading
+  if(mShadingOn)
+    volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
   
   View3D* view3D_1 = mView3DMap[mView3DNames[0]];
   view3D_1->setRep(volumetricRep);

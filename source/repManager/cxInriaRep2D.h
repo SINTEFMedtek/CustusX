@@ -39,7 +39,7 @@ public:
   virtual std::string getType() const;
 	virtual void setImage(ssc::ImagePtr image) {mImage = image;} ///< Set Image. Used to check if image is used, don't connect the image.
 	virtual ssc::ImagePtr getImage() {return mImage;} ///< Returns the used image
-	virtual bool hasImage(ssc::ImagePtr image) const {return (mImage != NULL);} ///< Checks if image is used
+	virtual bool hasImage(ssc::ImagePtr image) const {return (mImage == image);} ///< Checks if image is used
   virtual void connectToView(ssc::View *theView);
   virtual void disconnectFromView(ssc::View *theView);
   virtual void setDataset(vtkMetaDataSet *dataset);
