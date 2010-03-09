@@ -158,6 +158,11 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
 	this->pickLandmark(clickPoint, mCurrentRenderer);
 }
+/**
+ * @param x world coordinat, ref space
+ * @param y world coordinat, ref space
+ * @param z world coordinat, ref space
+ */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
   if(mCurrentRenderer == NULL)
@@ -187,6 +192,9 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mPickedPoint[2] = z;
   emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 }
+/**
+ * @param threshold sets a threshold for the probing ray
+ */
 void ProbeRep::setThresholdSlot(const int threshold)
 {
   mThreshold = threshold;
@@ -268,6 +276,7 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 	return true;
 }
 /**
+ * \warning NOT IMPLEMENTED!!!
  * \param[in] p0 start point for the probe line
  * \param[in] p1 end point for the probe line
  * \param[in/out] bestPoint send in the point from the intersection, get out an

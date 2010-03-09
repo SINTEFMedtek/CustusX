@@ -13,12 +13,10 @@
 #include "sscView.h"
 #include "sscImageTF3D.h"
 
-
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 
 namespace ssc
 {
-
 VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	RepImpl(uid, name),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
@@ -62,30 +60,22 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	mVolume->SetMapper( mTextureMapper3D );
 
 }
-
-
 VolumetricRep::~VolumetricRep()
-{
-}
-
+{}
 VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
 {
 	VolumetricRepPtr retval(new VolumetricRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-
 void VolumetricRep::addRepActorsToViewRenderer(View* view)
 {
-
 	view->getRenderer()->AddVolume(mVolume);
 }
-
 void VolumetricRep::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveVolume(mVolume);
 }
-
 /**set a resample factor 0...1. This gives a full-detail image for factor=1,
  * and a more grained image otherwise.
  */
@@ -93,12 +83,10 @@ void VolumetricRep::setResampleFactor(double factor)
 {
 	mResampleFactor = factor;
 }
-
 ImagePtr VolumetricRep::getImage()
 {
 	return mImage;
 }
-
 void VolumetricRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
@@ -131,12 +119,10 @@ void VolumetricRep::setImage(ImagePtr image)
 		mTextureMapper3D->SetInput( (vtkImageData*)NULL );
 	}
 }
-
 bool VolumetricRep::hasImage(ImagePtr image) const
 {
 	return (mImage == image);
 }
-
 /**called when the image is changed internally.
  * re-read the lut and vtkimagedata.
  */
@@ -149,13 +135,8 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
 	mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
 
-	// use the base instead of the ref image, because otherwise changes in the transform
-	// causes data to be sent anew to the graphics card (takes 4s).
-	// changing the mVolume transform instead is a fast operation.
-	//
 	// also use grayscale as vtk is incapable of rendering 3component color.
 	vtkImageDataPtr volume = mImage->getGrayScaleBaseVtkImageData();
-	//vtkImageDataPtr volume = mImage->getVOIExtractVtkImageData();
 
 	if (fabs(1.0-mResampleFactor)>0.01) // resampling
 	{
@@ -169,14 +150,10 @@ void VolumetricRep::vtkImageDataChangedSlot()
 		volume = resampler->GetOutput();
 	}
 
-
-
-
 	mTextureMapper3D->SetInput(volume);
 
 	transformChangedSlot();
 }
-
 /**called when transform is changed
  * reset it in the prop.*/
 void VolumetricRep::transformChangedSlot()
@@ -187,8 +164,6 @@ void VolumetricRep::transformChangedSlot()
 	}
 	mVolume->SetUserMatrix(mImage->get_rMd().matrix());
 }
-
-
 //---------------------------------------------------------
 } // namespace ssc
 //---------------------------------------------------------
