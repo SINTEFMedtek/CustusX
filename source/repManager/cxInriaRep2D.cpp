@@ -8,6 +8,7 @@
 #include <vtkMetaImageData.h>
 #include "sscView.h"
 #include "cxTool.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -99,6 +100,10 @@ bool InriaRep2D::hasTool(Tool* tool)
     return false;
   }
 }
+/**
+ * Pick a point in data ref space
+ * @param[in] object Not used for anything
+ */
 void InriaRep2D::pickSurfacePointSlot(vtkObject* object)
 {
   double point[3];
@@ -106,6 +111,12 @@ void InriaRep2D::pickSurfacePointSlot(vtkObject* object)
 
   emit pointPicked(point[0], point[1], point[2]);
 }
+/**
+ * Sets the crosshair in the inria2D views
+ * @param[in] x world coordinat, ref space
+ * @param[in] y world coordinat, ref space
+ * @param[in] z world coordinat, ref space
+ */
 void InriaRep2D::syncSetPosition(double x, double y, double z)
 {
   const double point[3] = {x,y,z};
@@ -158,13 +169,26 @@ void InriaRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
                        this,
                        SLOT(pickSurfacePointSlot(vtkObject*)));
 }
-void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp)
+/**
+ * Receives tool transforms from the (dominant?) tool
+ * @param prMt the transformation that brings you from patient ref to data ref
+ * @param timestamp the time the transform was created
+ */
+void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D prMt, double timestamp)
 {
-  double position[3] = { matrix.matrix()->GetElement(0,3),
+  ssc::Transform3DPtr rMt(new ssc::Transform3D((*ToolManager::getInstance()->get_rMpr())*prMt));
+  double position[3] = { rMt->matrix()->GetElement(0,3),
+      rMt->matrix()->GetElement(1,3),
+      rMt->matrix()->GetElement(2,3)};
+  /*double position[3] = { matrix.matrix()->GetElement(0,3),
                          matrix.matrix()->GetElement(1,3),
-                         matrix.matrix()->GetElement(2,3)};
+                         matrix.matrix()->GetElement(2,3)};*/
   mInria->SyncSetPosition(position);
 }
+/**
+ * \warning NOT IMPLEMENTED!!!
+ * @param visible wheter or not a tool should be visible
+ */
 void InriaRep2D::toolVisibleSlot(bool visible)
 {
   //TODO either implement or remove?
