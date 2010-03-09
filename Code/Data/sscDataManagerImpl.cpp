@@ -13,7 +13,11 @@ typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 #include <QDomDocument>
 #include <QFileInfo>
+#include <QFile>
+#include <QTextStream>
 #include <QDir>
+
+#include "sscTransform3D.h"
 
 namespace ssc
 {
@@ -21,6 +25,43 @@ namespace ssc
 //-----
 ImagePtr MetaImageReader::load(const std::string& filename)
 {
+  //read the specific TransformMatrix-tag from the header
+  Transform3DPtr rMd(new Transform3D);
+  QFile file(filename.c_str());
+  QString line;
+  if(file.open(QIODevice::ReadOnly))
+  {
+    QTextStream t(&file);
+    while(!t.atEnd())
+    {
+      line.clear();
+      line = t.readLine();
+      // do something with the line
+      if(line.startsWith("Position",Qt::CaseInsensitive))
+      {
+        QStringList list = line.split(" ", QString::SkipEmptyParts);
+        (*rMd)[0][3] = list.at(2).toDouble();
+        (*rMd)[1][3] = list.at(3).toDouble();
+        (*rMd)[2][3] = list.at(4).toDouble();
+      }
+      else if(line.startsWith("TransformMatrix",Qt::CaseInsensitive))
+      {
+        QStringList list = line.split(" ", QString::SkipEmptyParts);
+        (*rMd)[0][0] = list.at(2).toDouble();
+        (*rMd)[0][1] = list.at(3).toDouble();
+        (*rMd)[0][2] = list.at(4).toDouble();
+        (*rMd)[1][0] = list.at(5).toDouble();
+        (*rMd)[1][1] = list.at(6).toDouble();
+        (*rMd)[1][2] = list.at(7).toDouble();
+        (*rMd)[2][0] = list.at(8).toDouble();
+        (*rMd)[2][1] = list.at(9).toDouble();
+        (*rMd)[2][2] = list.at(10).toDouble();
+      }
+    }
+    file.close();
+  }
+
+  //load the image from file
 	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
 	reader->SetFileName(filename.c_str());
 	reader->ReleaseDataFlagOn();
@@ -29,8 +70,8 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 	vtkImageDataPtr imageData = reader->GetOutput();
   
   ImagePtr image(new Image(filename, imageData));
+  image->set_rMd((*rMd));
   return image;
-  
 }
 
 //-----
