@@ -207,8 +207,9 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //set the transform on the image
   vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
   ssc::Transform3D transform(matrix);
-  //image->setTransform(transform); TODO remove?
-  image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
+  image->set_rMd(transform);
+  //why did we use the inverse of the transform?
+  //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
   emit imageRegistrationPerformed();
   mMessageManager->sendInfo("Image registration has been performed.");
