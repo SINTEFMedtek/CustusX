@@ -106,8 +106,6 @@ void View3D::setCameraOffsetSlot(int offset)
 }
 void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
-  //TODO: work in progress, its not working as intended yet
-
   ssc::Vector3D cameraPoint_t = ssc::Vector3D(0,0,-mCameraOffset); //the camerapoint in tool space
   ssc::Transform3D cameraTransform_pr = prMt*ssc::createTransformTranslate(cameraPoint_t);
   ssc::Vector3D cameraPoint_pr = ssc::Vector3D(cameraTransform_pr[0][3],

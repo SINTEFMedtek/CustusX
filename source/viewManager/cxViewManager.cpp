@@ -506,6 +506,10 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
   
   //connecting proberep and inriareps
+  //this happens every time an image changed
+  //but its always the same proberep and inriareps we connect
+  //this should really only be done once
+  //TODO: maybe move this somewhere it«ll only be done once?
   connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
           inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
   connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
