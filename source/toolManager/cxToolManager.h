@@ -73,6 +73,7 @@ signals:
   //void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
   void toolSampleRemoved(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is removed
   void toolSampleAdded(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is added
+  void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 
 public slots:
   void addToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to remove tool(patient) samples
@@ -156,6 +157,9 @@ protected:
 
   igstk::PulseGenerator::Pointer mPulseGenerator;
 
+  /**
+   * ToolSamples are in patient reference space.
+   */
   vtkDoubleArrayPtr mToolSamples; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark)
 
 private:

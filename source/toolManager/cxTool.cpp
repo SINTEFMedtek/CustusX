@@ -119,6 +119,9 @@ bool Tool::getVisible() const
 {
   return mVisible;
 }
+/**
+ * @return last recorded transform that will get you from tool- to patient ref space
+ */
 ssc::Transform3DPtr Tool::getLastTransform()
 {
   ssc::Transform3DPtr lastTransform;
@@ -174,8 +177,8 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     const igstk::CoordinateSystem* destination = result.GetDestination();
     ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
-    if(!refTool)
-    {
+    if(!refTool) //hmmm why is this done? seems meaningless...
+    {            //its because we only request transforms from tool to reftool
       ssc::Tool* tool = refTool.get();
       Tool* ref = dynamic_cast<Tool*>(tool);
       if(!ref->getPointer()->IsCoordinateSystem(destination))

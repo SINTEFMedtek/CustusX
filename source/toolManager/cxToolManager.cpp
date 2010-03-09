@@ -83,7 +83,6 @@ bool ToolManager::isTracking() const
 {
   return mTracking;
 }
-
 void ToolManager::configure()
 {
   if(!this->pathsExists())
@@ -245,7 +244,6 @@ std::vector<std::string> ToolManager::getToolUids() const
   }
   return uids;
 }
-
 ssc::Transform3DPtr ToolManager::get_rMpr() const
 {
   return m_rMpr;
@@ -253,6 +251,7 @@ ssc::Transform3DPtr ToolManager::get_rMpr() const
 void ToolManager::set_rMpr(const ssc::Transform3DPtr& val)
 {
   m_rMpr = val;
+  emit rMprChanged();
 }
 ssc::ToolPtr ToolManager::getReferenceTool() const
 {
@@ -363,6 +362,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
       report.append("not ");
     if(state)
     {
+      //Should this really be done here?
       mInitialized = success;
       emit initialized();
       report.append("open.");
