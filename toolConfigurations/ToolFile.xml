@@ -15,6 +15,7 @@
   <pic_file></pic_file>
   <doc_file></doc_file>  
 
+
   <!-- Instrument -->
   <instrument>
     <type>USProbe</type>
