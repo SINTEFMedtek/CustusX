@@ -837,7 +837,8 @@ void MainWindow::importDataSlot()
   mMessageManager->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
-                                  mSettings->value("globalPatientDataFolder").toString() );
+                                  mSettings->value("globalPatientDataFolder").toString(),
+                                  tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
   if(fileName.isEmpty())
   {
     mMessageManager->sendInfo("Import cancelled");
