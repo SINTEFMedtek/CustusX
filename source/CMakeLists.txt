@@ -46,7 +46,7 @@ ENDIF(IGSTK_FOUND)
 
 # SSC
 #----------
-find_package (SSC)
+find_package (SSC PATHS "../externals/ssc/CMake")
 if (SSC_FOUND)
 	include (${SSC_USE_FILE})
 	#add_executable (testSSC testSSC.cpp)

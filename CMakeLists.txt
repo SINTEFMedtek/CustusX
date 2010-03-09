@@ -18,5 +18,6 @@ IF (WIN32)
   ADD_DEFINITIONS(-D__WIN32__)
 ENDIF (WIN32)
 
+add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
 ADD_SUBDIRECTORY ( source )
