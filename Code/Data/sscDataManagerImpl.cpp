@@ -199,8 +199,44 @@ void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
       {
         path = filePathNode.text();
         QDir relativePath = QDir(QString(path));
-        if(!absolutePath.isEmpty() && relativePath.isRelative())
-          path = absolutePath+"/"+path;
+        if(!absolutePath.isEmpty())
+          if(relativePath.isRelative())
+            path = absolutePath+"/"+path;
+          else //Make relative
+          {
+            QDir patientDataDir(absolutePath);
+            relativePath.setPath(patientDataDir.relativeFilePath(relativePath.path()));
+          }
+        
+        if(!path.isEmpty())
+        {
+          ssc::DataPtr data;
+          
+          QFileInfo fileInfo(path);
+          QString fileType = fileInfo.suffix();
+          if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
+             fileType.compare("mha", Qt::CaseInsensitive) == 0)
+          {
+            data = this->loadImage(path.toStdString(), ssc::rtMETAIMAGE);
+          }
+          else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
+          {
+            data = this->loadMesh(path.toStdString(), ssc::mrtSTL);
+          }
+          else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+          {
+            data = this->loadMesh(path.toStdString(), ssc::mrtPOLYDATA);
+          }
+          
+          data->setName(nameNode.text().toStdString());
+          data->setFilePath(relativePath.path().toStdString());
+          data->parseXml(node);
+        }
+        else
+        {
+          std::cout << "Warning: DataManager::parseXml() empty filePath for data";
+          std::cout << std::endl;
+        }
       }
       // Don't use uid as path
       //else if(!uidNode.isNull())
@@ -215,31 +251,6 @@ void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
     {
       std::cout << "Warning: DataManager::parseXml() found unknown XML node: ";
       std::cout << node.nodeName().toStdString() << std::endl;
-    }
-    
-    if(!path.isEmpty())
-    {
-      ssc::DataPtr data;
-      
-      QFileInfo fileInfo(path);
-      QString fileType = fileInfo.suffix();
-      if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-         fileType.compare("mha", Qt::CaseInsensitive) == 0)
-      {
-        data = this->loadImage(path.toStdString(), ssc::rtMETAIMAGE);
-      }
-      else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
-      {
-        data = this->loadMesh(path.toStdString(), ssc::mrtSTL);
-      }
-      else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-      {
-        data = this->loadMesh(path.toStdString(), ssc::mrtPOLYDATA);
-      }
-      
-      data->setName(nameNode.text().toStdString());
-      data->setFilePath(path.toStdString());
-      data->parseXml(node);
     }
     node = node.nextSibling();
   }
