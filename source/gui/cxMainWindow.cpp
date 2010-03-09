@@ -716,12 +716,20 @@ void MainWindow::newPatientSlot()
   name += mSettings->value("globalPatientNumber").toString() + ".cx3";
   //name += ".cx3";
   
+  
+  // Create folders
+  if(!QDir().exists(patientDatafolder))
+  {
+    QDir().mkdir(patientDatafolder);
+    mMessageManager->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
+  }
+  
   QString choosenDir = patientDatafolder + "/" + name;
   //choosenDir += "/";
   //choosenDir += name;
   // Open file dialog, get patient data folder
   choosenDir = QFileDialog::getSaveFileName(this, 
-                                            tr("Select directory to save file in"),
+                                            tr("Select directory to save patient in"),
                                             choosenDir);
   if (choosenDir == QString::null)
     return; // On cancel
