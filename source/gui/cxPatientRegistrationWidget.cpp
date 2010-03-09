@@ -218,14 +218,14 @@ void PatientRegistrationWidget::toolVisibleSlot(bool visible)
 void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 {  
   //TODO What if the reference frame isnt visible?
-  ssc::Transform3DPtr lastTransform = mToolToSample->getLastTransform();
-  if(!lastTransform)
+  ssc::Transform3DPtr lastTransform_prMt = mToolToSample->getLastTransform();
+  if(!lastTransform_prMt)
   {
     mMessageManager->sendError("The last transform was NULL!");
     return;
   }
 
-  vtkMatrix4x4Ptr lastTransformMatrix = lastTransform->matrix();
+  vtkMatrix4x4Ptr lastTransformMatrix = lastTransform_prMt->matrix();
   double x = lastTransformMatrix->GetElement(0,3);
   double y = lastTransformMatrix->GetElement(1,3);
   double z = lastTransformMatrix->GetElement(2,3);

@@ -236,6 +236,13 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
     it2++;
   }
 }
+/**
+ * Designed to take landmarks from the image.
+ * @param x world coordinat, ref space
+ * @param y world coordinat, ref space
+ * @param z world coordinat, ref space
+ * @param index the landmarks index
+ */
 void LandmarkRep::addPoint(double& x, double& y, double& z, int index)
 {
   vtkImageDataPtr imageData = mImage->getRefVtkImageData();
