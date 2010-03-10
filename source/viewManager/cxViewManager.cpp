@@ -83,6 +83,8 @@ ViewManager::ViewManager() :
           this, SLOT(renderAllViewsSlot()));
   
   mShadingOn = mSettings->value("shadingOn").toBool();
+  
+  mRenderingTime->start();
 }
 ViewManager::~ViewManager()
 {}
@@ -439,13 +441,11 @@ void ViewManager::renderAllViewsSlot()
       it2D->second->getRenderWindow()->Render();
   }
   
-  if(mRenderingTime->isNull())
-     mRenderingTime->start();
-  else if(mRenderingTime->elapsed()>1000)
+  if(mRenderingTime->elapsed()>1000)
   {
     emit fps(mNumberOfRenderings);
     mRenderingTime->restart();
-    mNumberOfRenderings = 0;
+    mNumberOfRenderings = 1;
   }
   else
     mNumberOfRenderings++;
