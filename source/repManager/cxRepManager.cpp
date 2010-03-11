@@ -76,6 +76,9 @@ RepManager::RepManager() :
   {
     InriaRep2DPtr inriaRep2D(new InriaRep2D(mInriaRep2DNames[i],
         mInriaRep2DNames[i]));
+    //Remove text from Inria reps
+    inriaRep2D->getVtkViewImage2D()->SetShowAnnotations(false);
+    inriaRep2D->getVtkViewImage2D()->UpdateAnnotations();
     mInriaRep2DMap[inriaRep2D->getUid()] = inriaRep2D;
     connect(inriaRep2D.get(), SIGNAL(pointPicked(double,double,double)),
             this, SLOT(syncInria2DRepsSlot(double,double,double)));
