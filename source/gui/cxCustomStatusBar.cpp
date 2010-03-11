@@ -127,8 +127,10 @@ void CustomStatusBar::receiveToolVisible(bool visible)
 
 void CustomStatusBar::fpsSlot(int numFps)
 {
+  this->removeWidget(mFpsLabel);
   QString fpsString = "FPS: "+QString::number(numFps);
   mFpsLabel->setText(fpsString);
+  mFpsLabel->show();
   this->addPermanentWidget(mFpsLabel);
 }
 
