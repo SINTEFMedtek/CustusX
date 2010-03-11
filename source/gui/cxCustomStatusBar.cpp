@@ -25,6 +25,8 @@ CustomStatusBar::CustomStatusBar() :
             this, SLOT(disconnectFromToolSignals()));
   connect(ViewManager::getInstance(), SIGNAL(fps(int)),
           this, SLOT(fpsSlot(int)));
+  
+  this->addPermanentWidget(mFpsLabel);
 }
 CustomStatusBar::~CustomStatusBar()
 {
@@ -127,11 +129,8 @@ void CustomStatusBar::receiveToolVisible(bool visible)
 
 void CustomStatusBar::fpsSlot(int numFps)
 {
-  this->removeWidget(mFpsLabel);
   QString fpsString = "FPS: "+QString::number(numFps);
   mFpsLabel->setText(fpsString);
-  mFpsLabel->show();
-  this->addPermanentWidget(mFpsLabel);
 }
 
 }//namespace cx
