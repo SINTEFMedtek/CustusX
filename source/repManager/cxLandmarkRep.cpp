@@ -24,7 +24,6 @@ LandmarkRepPtr LandmarkRep::New(const std::string& uid, const std::string& name)
 }
 LandmarkRep::LandmarkRep(const std::string& uid, const std::string& name) :
   RepImpl(uid, name),
-  mMessageManager(MessageManager::getInstance()),
   mType("cxLandmarkRep"),
   mShowLandmarks(true)
 {
@@ -175,13 +174,13 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    mMessageManager->sendWarning("Trying to add rep actors to view renderer, but view is null.");
+    messageMan()->sendWarning("Trying to add rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    mMessageManager->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
+    messageMan()->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -211,13 +210,13 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    mMessageManager->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
+    messageMan()->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    mMessageManager->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
+    messageMan()->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -321,7 +320,7 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int index)
   info << ",";
   info << z;
   info << ") to the landmark.";
-  mMessageManager->sendInfo(info.str());
+  messageMan()->sendInfo(info.str());
 
   for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
   {
@@ -340,7 +339,7 @@ void LandmarkRep::internalUpdate()
     errormessage << ") != (mSkinPointActors ==";
     errormessage << mSkinPointActors.size();
     errormessage << "), trying to fix the error...";
-    mMessageManager->sendError(errormessage.str());
+    messageMan()->sendError(errormessage.str());
 
     //trying to set repopulate the map
     this->setImage(mImage);

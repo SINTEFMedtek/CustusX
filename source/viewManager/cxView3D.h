@@ -60,7 +60,6 @@ protected:
 
   DataManager* mDataManager; ///< has all the data loaded into the system
   RepManager* mRepManager; ///< has a pool of reps
-  MessageManager* mMessageManager; ///< takes messages intended for the user
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */

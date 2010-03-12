@@ -82,7 +82,6 @@ protected slots:
 
 protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
-  MessageManager*     mMessageManager;      ///< device for sending messages to the statusbar
 
   const int           MAX_INRIAREP3DS; ///< number of Inria3D reps in the pool
   std::string         mInriaRep3DNames[2]; ///< the name of the reps in the pool

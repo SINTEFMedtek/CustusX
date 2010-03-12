@@ -25,8 +25,7 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
   mCameraStyle(DEFAULT_STYLE),
   mCameraOffset(-1),
   mDataManager(DataManager::getInstance()),
-  mRepManager(RepManager::getInstance()),
-  mMessageManager(MessageManager::getInstance())
+  mRepManager(RepManager::getInstance())
 {
   mUid = uid;
   mName = name;
@@ -70,7 +69,7 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
     if(!image)
     {
       std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View2D.";
-      MessageManager::getInstance()->sendError(error);
+      messageMan()->sendError(error);
       return;
     }
 

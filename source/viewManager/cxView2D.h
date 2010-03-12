@@ -36,7 +36,6 @@ protected:
 
   DataManager* mDataManager; ///< has all the data loaded into the system
   RepManager* mRepManager; ///< has a pool of reps
-  MessageManager* mMessageManager; ///< takes messages intended for the user
 
   //INFO:
   //Cannot have the viewmanager here because that creates a never-ending

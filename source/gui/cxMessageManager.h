@@ -48,6 +48,10 @@ private:
   static MessageManager *mTheInstance; ///< The unique MessageManager.
 };
 
+/**Shortcut for accessing the message manager instance.
+ */
+MessageManager* messageMan();
+
 } //namespace cx
 
 #endif /* MESSAGEMANAGER_H_ */

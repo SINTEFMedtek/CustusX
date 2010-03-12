@@ -70,8 +70,6 @@ protected:
   void addPoint(double& x, double& y, double& z, int index); ///< add a set of actors for the new point
   void internalUpdate(); ///< run after a point is removed to update the numbers of the textactors
 
-  MessageManager*     mMessageManager;  ///< device for sending messages to the statusbar
-
   std::string     mType;          ///< description of this reps type
   RGB_             mColor;         ///< the color of the landmark actors
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to

@@ -16,7 +16,6 @@ typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 namespace cx
 {
-class MessageManager;
 
 /**
  * \class ToolManager
@@ -128,8 +127,6 @@ protected:
   void connectSignalsAndSlots(); ///< connects signals and slots
 
   static ToolManager* mCxInstance;
-
-  MessageManager* mMessageManager;
 
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder;         ///< path to where logging should be saved

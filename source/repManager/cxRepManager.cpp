@@ -18,7 +18,6 @@ RepManager* RepManager::getInstance()
 void RepManager::destroyInstance()
 {}
 RepManager::RepManager() :
-  mMessageManager(MessageManager::getInstance()),
   MAX_INRIAREP3DS(2),
   MAX_INRIAREP2DS(9),
   MAX_VOLUMETRICREPS(2),
@@ -120,7 +119,7 @@ RepManager::RepManager() :
         mGeometricRepNames[i]));
     mGeometricRepMap[geometricRep->getUid()] = geometricRep;
   }
-  mMessageManager->sendInfo("All necessary representations have been created.");
+  messageMan()->sendInfo("All necessary representations have been created.");
 
   /*//connect the two acs-sets so both get updated when we click on one of them
   connect(&(*getInria2DRep(mInriaRep2DNames[0])), SIGNAL(pointPicked(double,double,double)),
@@ -344,12 +343,12 @@ void RepManager::dominantToolChangedSlot(const std::string& toolUid)
   ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
   if(!dominantTool)
   {
-    MessageManager::getInstance()->sendError("Couldn't find a dominant tool to connect the inria2Dreps to.");
+    messageMan()->sendError("Couldn't find a dominant tool to connect the inria2Dreps to.");
     return;
   }
   if(mConnectedTool == dominantTool)
   {
-    MessageManager::getInstance()->sendWarning("The new dominant tool was the same as the old one.");
+	  messageMan()->sendWarning("The new dominant tool was the same as the old one.");
     return;
   }
   if(mConnectedTool)

@@ -164,7 +164,7 @@ void ViewManager::setLayoutTo_3D_1X1()
     return;
     break;
   }
-  MessageManager::getInstance()->sendInfo("Layout changed to 3D_1X1");
+  messageMan()->sendInfo("Layout changed to 3D_1X1");
 }
 void ViewManager::setLayoutTo_3DACS_2X2()
 {
@@ -191,7 +191,7 @@ void ViewManager::setLayoutTo_3DACS_2X2()
     return;
     break;
   }
-  MessageManager::getInstance()->sendInfo("Layout changed to 3DACS_2X2");
+  messageMan()->sendInfo("Layout changed to 3DACS_2X2");
 }
 void ViewManager::setLayoutTo_3DACS_1X3()
 {
@@ -218,7 +218,7 @@ void ViewManager::setLayoutTo_3DACS_1X3()
     return;
     break;
   }
-  MessageManager::getInstance()->sendInfo("Layout changed to 3DACS_1X3");
+  messageMan()->sendInfo("Layout changed to 3DACS_1X3");
 }
 void ViewManager::setLayoutTo_ACSACS_2X3()
 {
@@ -245,12 +245,12 @@ void ViewManager::setLayoutTo_ACSACS_2X3()
     return;
     break;
   }
-  MessageManager::getInstance()->sendInfo("Layout changed to ACSACS_2X3");
+  messageMan()->sendInfo("Layout changed to ACSACS_2X3");
 }
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
-  MessageManager::getInstance()->sendInfo("Delete image: "+image->getName());
+  messageMan()->sendInfo("Delete image: "+image->getName());
   RepManager* repManager = RepManager::getInstance();
   VolumetricRepMap* volRepMap = repManager->getVolumetricReps();
   VolumetricRepMap::iterator itVolRep = volRepMap->begin();
@@ -303,7 +303,7 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
     //this->renderAllViewsSlot();
     //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
     emit imageDeletedFromViews(image);
-    MessageManager::getInstance()->sendInfo("Removed current image from inria views");
+    messageMan()->sendInfo("Removed current image from inria views");
   }
 }
 
@@ -473,7 +473,7 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   }
   if (!currentImage->getRefVtkImageData().GetPointer())
   {
-    MessageManager::getInstance()->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
+    messageMan()->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
     return;
   }
   
