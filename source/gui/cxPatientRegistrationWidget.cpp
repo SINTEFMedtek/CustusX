@@ -44,7 +44,6 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mResetOffsetButton(new QPushButton("Clear offset", this)),
   mRegistrationManager(RegistrationManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
-  mMessageManager(MessageManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mCurrentRow(-1),
@@ -163,7 +162,7 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
     disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-    mMessageManager->sendInfo("Disconnected from old image "+mCurrentImage->getUid());
+    messageMan()->sendInfo("Disconnected from old image "+mCurrentImage->getUid());
   }
 
   mCurrentImage = currentImage;
@@ -200,7 +199,7 @@ void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double no
   //TODO REMOVE just for debugging
   /*std::stringstream stream;
   stream<<"ActiveToolSamples: "<<numberOfActiveToolSamples<<", ToolSamples: "<< numberOfToolSamples;
-  mMessageManager->sendWarning(stream.str());*/
+  messageMan()->sendWarning(stream.str());*/
   //END
   if(numberOfActiveToolSamples >= 3 && numberOfToolSamples >= 3)
   {
@@ -221,7 +220,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   ssc::Transform3DPtr lastTransform_prMt = mToolToSample->getLastTransform();
   if(!lastTransform_prMt)
   {
-    mMessageManager->sendError("The last transform was NULL!");
+    messageMan()->sendError("The last transform was NULL!");
     return;
   }
 
@@ -237,7 +236,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   //TODO REMOVE just for debugging
   /*std::stringstream message;
   message<<"Sampling row "<<mCurrentRow<<" for LANDMARK: "<<index;
-  mMessageManager->sendWarning(message.str());*/
+  messageMan()->sendWarning(message.str());*/
   //END
   
   mToolManager->addToolSampleSlot(x, y, z, index);
@@ -250,7 +249,7 @@ void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
   //TODO REMOVE just for debugging
   std::stringstream stream;
   stream<<"You clicked cell: ("<<mCurrentRow<<","<<mCurrentColumn<<").";
-  mMessageManager->sendInfo(stream.str());
+  messageMan()->sendInfo(stream.str());
   //END
 }
 void PatientRegistrationWidget::cellChangedSlot(int row, int column)
@@ -473,7 +472,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
   //TODO REMOVE for debugging
   /*std::stringstream stream;
   stream<<"Number of tools sampled: "<<numberOfToolSamples;
-  mMessageManager->sendWarning(stream.str());*/
+  messageMan()->sendWarning(stream.str());*/
   //END
 
   //fill in toolsamples
@@ -484,7 +483,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     QTableWidgetItem* columnThree = mLandmarkTableWidget->item(row, 2);
     if(columnThree == NULL)
     {
-      mMessageManager->sendError("Couldn't find a cell in the table to put the toolsample in.");
+      messageMan()->sendError("Couldn't find a cell in the table to put the toolsample in.");
     }
     else
     {
@@ -541,7 +540,7 @@ void PatientRegistrationWidget::updateAccuracy()
             /*std::stringstream stream;
             stream<<"Landmark: "<<targetPoint[3]<<" ("<<targetPoint[0]<<","<<targetPoint[1]<<","<<targetPoint[2]<<")"<<std::endl;
             stream<<"Toolpoint: "<<sourcePoint[3]<<" ("<<sourcePoint[0]<<","<<sourcePoint[1]<<","<<sourcePoint[2]<<")"<<std::endl;
-            mMessageManager->sendInfo(stream.str());*/
+            messageMan()->sendInfo(stream.str());*/
             //END
             
             mLandmarkRegistrationAccuracyMap[sourcePoint[3]] =

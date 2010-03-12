@@ -69,7 +69,6 @@ protected:
   static RegistrationManager* mCxInstance; ///< the only instance of this class
 
   ToolManager* mToolManager; ///< interface to the navigation system
-  MessageManager* mMessageManager; ///< takes messages intended for the user
 
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
   vtkDoubleArrayPtr mGlobalPointSet; ///< the pointset used when doing the registration

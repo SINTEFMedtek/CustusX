@@ -46,7 +46,6 @@ public:
 signals:
   void fileCopiedCorrectly();///< Sends a signal when the copy is verified
 protected:
-  MessageManager* mMessageManager; ///< takes messages intended for the user
   std::string mFilePath;
   std::string mRelativeFilePath;
   ssc::DataPtr mData;
@@ -146,7 +145,6 @@ protected:
   DataManager* mDataManager; ///< has all the data loaded into the system
   ToolManager* mToolManager; ///< interface to the navigation system
   RepManager* mRepManager; ///< has a pool of reps
-  MessageManager* mMessageManager; ///< takes messages intended for the user
   RegistrationManager* mRegistrationManager; ///< manages registration of data
 
   //gui

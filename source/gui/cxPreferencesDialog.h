@@ -98,7 +98,6 @@ signals:
   void shadingChanged(bool);
 
 protected:
-  MessageManager* mMessageManager; ///< takes messages intended for the user
   QSettings* mSettings;
   QSpinBox* mRenderingIntervalSpinBox;
   QLabel* mRenderingRateLabel;

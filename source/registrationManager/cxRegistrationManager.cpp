@@ -21,15 +21,14 @@ RegistrationManager* RegistrationManager::getInstance()
   return mCxInstance;
 }
 RegistrationManager::RegistrationManager() :
-  mToolManager(ToolManager::getInstance()),
-  mMessageManager(MessageManager::getInstance())
+  mToolManager(ToolManager::getInstance())
 {}
 RegistrationManager::~RegistrationManager()
 {}
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
   mMasterImage = image;
-  mMessageManager->sendInfo("Master image set to "+image->getUid());
+  messageMan()->sendInfo("Master image set to "+image->getUid());
 }
 ssc::ImagePtr RegistrationManager::getMasterImage()
 {
@@ -42,7 +41,7 @@ bool RegistrationManager::isMasterImageSet()
 void RegistrationManager::setGlobalPointSet(vtkDoubleArrayPtr pointset)
 {
   mGlobalPointSet = pointset;
-  mMessageManager->sendInfo("Global point set is set.");
+  messageMan()->sendInfo("Global point set is set.");
 }
 vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
 {
@@ -51,7 +50,7 @@ vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
 void RegistrationManager::setGlobalPointSetNameList(RegistrationManager::NameListType nameList)
 {
   mGlobalPointSetNameList = nameList;
-  mMessageManager->sendInfo("Global point set name list is set.");
+  messageMan()->sendInfo("Global point set name list is set.");
 }
 RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList()
 {
@@ -65,7 +64,7 @@ void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patie
   //if an offset existed, its no longer valid and should be removed
   mPatientRegistrationOffset.reset();
 
-  mMessageManager->sendInfo("Manual patient registration is set.");
+  messageMan()->sendInfo("Manual patient registration is set.");
 }
 ssc::Transform3DPtr RegistrationManager::getManualPatientRegistration()
 {
@@ -96,7 +95,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
   mToolManager->set_rMpr(newTransformPtr);
   //for debugging: std::cout << (*newTransformPtr) << std::endl;
 
-  mMessageManager->sendInfo("Offset for the patient registration is set.");
+  messageMan()->sendInfo("Offset for the patient registration is set.");
 }
 ssc::Transform3DPtr RegistrationManager::getManualPatientRegistrationOffset()
 {
@@ -111,7 +110,7 @@ void RegistrationManager::doPatientRegistration()
 {
   if(!mMasterImage)
   {
-    mMessageManager->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
+    messageMan()->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
     return;
   }
 
@@ -158,14 +157,14 @@ void RegistrationManager::doPatientRegistration()
   mToolManager->set_rMpr(rMprPtr);
 
   emit patientRegistrationPerformed();
-  mMessageManager->sendInfo("Patient registration has been performed.");
+  messageMan()->sendInfo("Patient registration has been performed.");
 }
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 {
   //check that the masterimage is set
   if(!mMasterImage)
   {
-    mMessageManager->sendError("There isn't set a masterimage in the registrationmanager.");
+    messageMan()->sendError("There isn't set a masterimage in the registrationmanager.");
     return;
   }
   
@@ -212,7 +211,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
   emit imageRegistrationPerformed();
-  mMessageManager->sendInfo("Image registration has been performed.");
+  messageMan()->sendInfo("Image registration has been performed.");
 }
 
 void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
@@ -224,12 +223,12 @@ void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
   if(it != mGlobalPointSetNameList.end())
   {
     it->second.first = name;
-    mMessageManager->sendInfo("Updated name for existing global point to: "+name);
+    messageMan()->sendInfo("Updated name for existing global point to: "+name);
   }
   else
   {
     mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,true)));
-    mMessageManager->sendInfo("Created new global point name with name: "+name);
+    messageMan()->sendInfo("Created new global point name with name: "+name);
   }
 }
 void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
@@ -239,12 +238,12 @@ void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
   if(it != mGlobalPointSetNameList.end())
   {
     it->second.second = active;
-    mMessageManager->sendInfo("Updated status to for existing point.");
+    messageMan()->sendInfo("Updated status to for existing point.");
   }
   else
   {
     mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,active)));
-    mMessageManager->sendInfo("Added new point with active status.");
+    messageMan()->sendInfo("Added new point with active status.");
   }
 }
 }//namespace cx

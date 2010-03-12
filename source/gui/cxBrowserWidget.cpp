@@ -20,7 +20,6 @@ BrowserWidget::BrowserWidget(QWidget* parent) :
     mVerticalLayout(new QVBoxLayout()),
     mDataManager(DataManager::getInstance()),
     mToolManager(ToolManager::getInstance()),
-    mMessageManager(MessageManager::getInstance()),
     mViewManager(ViewManager::getInstance()),
     mRepManager(RepManager::getInstance())
 {

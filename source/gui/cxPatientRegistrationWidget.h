@@ -84,7 +84,6 @@ protected:
   //managers
   RegistrationManager* mRegistrationManager; ///< handles image and patient registration
   ToolManager* mToolManager; ///< interface to the navigation system
-  MessageManager* mMessageManager; ///< takes messages intended for the user
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
   RepManager* mRepManager; ///< has a pool of reps
 

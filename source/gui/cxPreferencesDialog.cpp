@@ -222,7 +222,6 @@ void FoldersTab::saveParametersSlot()
 //------------------------------------------------------------------------------
 PerformanceTab::PerformanceTab(QWidget *parent) :
   QWidget(parent),
-  mMessageManager(MessageManager::getInstance()),
   mSettings(new QSettings())
 {
 }

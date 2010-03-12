@@ -69,7 +69,6 @@ protected:
   RepManager* mRepManager; ///< has a pool of reps //TODO remove when removing proberep func!!!
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
   RegistrationManager* mRegistrationManager; ///< handles image and patient registration
-  MessageManager* mMessageManager; ///< takes messages intended for the user
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration

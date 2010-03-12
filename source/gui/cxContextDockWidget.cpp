@@ -25,7 +25,6 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   mDataManager(DataManager::getInstance()),
   mRegistrationManager(RegistrationManager::getInstance()),
   mToolManager(ToolManager::getInstance()),
-  mMessageManager(MessageManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
   mRepManager(RepManager::getInstance())
 {
@@ -75,7 +74,7 @@ void ContextDockWidget::deleteCurrentImageSlot()
 {
   if (mCurrentImage.use_count() == 0)
   {
-    mMessageManager->sendWarning("Can't delete image, no current Image!");
+    messageMan()->sendWarning("Can't delete image, no current Image!");
     return;
   }
   emit deleteImage(mCurrentImage);
@@ -126,7 +125,7 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
   
 void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
-  //mMessageManager->sendInfo("New image selected: "+comboBoxText.toStdString());
+  //messageMan()->sendInfo("New image selected: "+comboBoxText.toStdString());
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
   {
     // Create empty current image
@@ -141,7 +140,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   ssc::ImagePtr image = mDataManager->getImage(imageId);
   if(!image)
   {
-    mMessageManager->sendError("Could not find the selected image in the DataManager: "+imageId);
+    messageMan()->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
 
