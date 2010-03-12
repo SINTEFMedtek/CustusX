@@ -50,7 +50,7 @@ private:
 
 /**Shortcut for accessing the message manager instance.
  */
-MessageManager* messageMan();
+MessageManager* messageManager();
 
 } //namespace cx
 

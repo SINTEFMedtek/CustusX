@@ -99,14 +99,14 @@ void ToolManager::configure()
 	this->connectSignalsAndSlots();
 
 	mConfigured = true;
-	messageMan()->sendInfo("ToolManager is configured.");
+	messageManager()->sendInfo("ToolManager is configured.");
 	emit configured();
 }
 void ToolManager::initialize()
 {
 	if (!mConfigured)
 	{
-		messageMan()->sendWarning("Please configure before trying to initialize.");
+		messageManager()->sendWarning("Please configure before trying to initialize.");
 		return;
 	}
 	mTracker->open();
@@ -116,7 +116,7 @@ void ToolManager::startTracking()
 {
 	if (!mInitialized)
 	{
-		messageMan()->sendWarning("Please initialize before trying to start tracking.");
+		messageManager()->sendWarning("Please initialize before trying to start tracking.");
 		return;
 	}
 	mTracker->startTracking();
@@ -125,7 +125,7 @@ void ToolManager::stopTracking()
 {
 	if (!mTracking)
 	{
-		messageMan()->sendWarning("Please start tracking before trying to stop tracking.");
+		messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
 		return;
 	}
 	mTracker->stopTracking();
@@ -325,7 +325,7 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state, bool succes
 		report.append(toolUid + " reported an unknown message.");
 		break;
 	}
-	messageMan()->sendInfo(report);
+	messageManager()->sendInfo(report);
 }
 void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, bool success, std::string uid)
 {
@@ -365,7 +365,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
 		{
 			mInitialized = true;
 			emit initialized();
-			messageMan()->sendInfo("ToolManager is initialized.");
+			messageManager()->sendInfo("ToolManager is initialized.");
 		}
 		report.append("initialized.");
 		break;
@@ -422,8 +422,8 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
 		report.append(trackerUid + " reported an unknown message.");
 		break;
 	}
-	messageMan()->sendInfo(report);
-	messageMan()->sendInfo(report);
+	messageManager()->sendInfo(report);
+	messageManager()->sendInfo(report);
 }
 bool ToolManager::pathsExists()
 {
@@ -432,12 +432,12 @@ bool ToolManager::pathsExists()
 	bool loggingFolderExists = dir.exists(QString(mLoggingFolder.c_str()));
 	if (!confiurationFileExists)
 	{
-		messageMan()->sendInfo(mConfigurationFilePath + " does not exists.");
+		messageManager()->sendInfo(mConfigurationFilePath + " does not exists.");
 		return false;
 	}
 	if (!loggingFolderExists)
 	{
-		messageMan()->sendInfo(mLoggingFolder + " does not exists.");
+		messageManager()->sendInfo(mLoggingFolder + " does not exists.");
 		return false;
 	}
 	return true;
@@ -450,13 +450,13 @@ bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<QDo
 
 	if (!configurationFile.open(QIODevice::ReadOnly))
 	{
-		messageMan()->sendInfo("Could not open " + mConfigurationFilePath + ".");
+		messageManager()->sendInfo("Could not open " + mConfigurationFilePath + ".");
 		return false;
 	}
 	QDomDocument configureDoc;
 	if (!configureDoc.setContent(&configurationFile))
 	{
-		messageMan()->sendInfo("Could not set the xml content of the file " + mConfigurationFilePath);
+		messageManager()->sendInfo("Could not set the xml content of the file " + mConfigurationFilePath);
 		return false;
 	}
 
@@ -471,31 +471,31 @@ bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<QDo
 		QDomNode filenameNode = toolFileList.item(i).firstChild();
 		if (filenameNode.isNull())
 		{
-			messageMan()->sendInfo("Toolfiletag " + iString
+			messageManager()->sendInfo("Toolfiletag " + iString
 					+ " does not containe any usefull info. Skipping this tool.");
 			continue;
 		}
 		QString filename = filenameNode.nodeValue();
 		if (filename.isEmpty())
 		{
-			messageMan()->sendInfo("Toolfiletag " + iString + " does not contain readable text. Skipping this tool.");
+			messageManager()->sendInfo("Toolfiletag " + iString + " does not contain readable text. Skipping this tool.");
 			continue;
 		}
 		QFile toolFile(configurationPath + filename);
 		QDir dir;
 		if (!toolFile.exists())
 		{
-			messageMan()->sendInfo(filename.toStdString() + " does not exists. Skipping this tool.");
+			messageManager()->sendInfo(filename.toStdString() + " does not exists. Skipping this tool.");
 			continue;
 		}
 		else
 		{
-			messageMan()->sendInfo(filename.toStdString() + " exists.");
+			messageManager()->sendInfo(filename.toStdString() + " exists.");
 		}
 		QDomDocument toolDoc;
 		if (!toolDoc.setContent(&toolFile))
 		{
-			messageMan()->sendInfo("Could not set the xml content of the file " + filename.toStdString());
+			messageManager()->sendInfo("Could not set the xml content of the file " + filename.toStdString());
 			continue;
 		}
 		QDomNodeList toolList = toolDoc.elementsByTagName(QString(mToolTag.c_str()));
@@ -514,7 +514,7 @@ TrackerPtr ToolManager::configureTracker(QDomNodeList& trackerNodeList)
 		const QDomElement trackerType = trackerNode.firstChildElement(QString(mTrackerTypeTag.c_str()));
 		if (trackerType.isNull())
 		{
-			messageMan()->sendInfo("Tracker " + iString + " does not have the required tag <type>.");
+			messageManager()->sendInfo("Tracker " + iString + " does not have the required tag <type>.");
 			continue;
 		}
 		QString text = trackerType.text();
@@ -570,13 +570,13 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(QList<QDomNodeList>& to
 		QDomNodeList toolNodes = toolNodeList.at(i);
 		if (toolNodes.size() < 1)
 		{
-			messageMan()->sendInfo("Found no <tool> tags in the toolxmlfile.");
+			messageManager()->sendInfo("Found no <tool> tags in the toolxmlfile.");
 			continue;
 		}
 		QDomNode toolNode = toolNodes.item(0); //A toolfile should only contain 1 tool tag
 		if (toolNode.isNull())
 		{
-			messageMan()->sendInfo("Could not read the <tool> tag.");
+			messageManager()->sendInfo("Could not read the <tool> tag.");
 			continue;
 		}
 
@@ -616,7 +616,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(QList<QDomNodeList>& to
 		QDomElement toolSensorElement = toolNode.firstChildElement(QString(mToolSensorTag.c_str()));
 		if (toolSensorElement.isNull())
 		{
-			messageMan()->sendInfo("Could not find the <sensor> tag under the <tool> tag. Aborting tihs tool.");
+			messageManager()->sendInfo("Could not find the <sensor> tag under the <tool> tag. Aborting tihs tool.");
 			continue;
 		}
 		QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(QString(mToolSensorTypeTag.c_str()));
@@ -684,7 +684,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(QList<QDomNodeList>& to
 		QDomElement toolCalibrationElement = toolNode.firstChildElement(QString(mToolCalibrationTag.c_str()));
 		if (toolCalibrationElement.isNull())
 		{
-			messageMan()->sendInfo("Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
+			messageManager()->sendInfo("Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
 			continue;
 		}
 		QDomElement toolCalibrationFileElement = toolCalibrationElement.firstChildElement(QString(
@@ -712,13 +712,13 @@ void ToolManager::addConnectedTool(std::string uid)
 	ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);
 	if (it == mConfiguredTools->end())
 	{
-		messageMan()->sendInfo("Tool with id " + uid + " was not found to be configured "
+		messageManager()->sendInfo("Tool with id " + uid + " was not found to be configured "
 			", thus could not add is as a connected tool.");
 		return;
 	}
 	mConnectedTools->insert(std::pair<std::string, ssc::ToolPtr>((*it).first, (*it).second));
 	mConfiguredTools->erase(it);
-	messageMan()->sendInfo("Tool with id " + uid + " was moved from the configured to the connected map.");
+	messageManager()->sendInfo("Tool with id " + uid + " was moved from the configured to the connected map.");
 }
 void ToolManager::connectSignalsAndSlots()
 {
@@ -739,7 +739,7 @@ void ToolManager::connectSignalsAndSlots()
 				this, SLOT(receiveToolReport(ToolMessage, bool, bool, stdString)));
 		it++;
 	}
-	messageMan()->sendInfo("Signals and slots have been connected.");
+	messageManager()->sendInfo("Signals and slots have been connected.");
 }
 void ToolManager::checkTimeoutsAndRequestTransform()
 {
@@ -770,14 +770,14 @@ void ToolManager::addToolSampleSlot(double x, double y, double z, unsigned int i
 		{
 			mToolSamples->SetTupleValue(i, addToolSample);
 			emit toolSampleAdded(x, y, z, index);
-			messageMan()->sendInfo("Editet a toolsample");
+			messageManager()->sendInfo("Editet a toolsample");
 			return;
 		}
 	}
 	//else it's an add operation
 	mToolSamples->InsertNextTupleValue(addToolSample);
 	emit toolSampleAdded(x, y, z, index);
-	messageMan()->sendInfo("Added a toolsample.");
+	messageManager()->sendInfo("Added a toolsample.");
 }
 void ToolManager::removeToolSampleSlot(double x, double y, double z, unsigned int index)
 {

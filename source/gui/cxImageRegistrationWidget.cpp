@@ -115,7 +115,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
   ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
-    messageMan()->sendError("Could not find a rep to add the landmark to.");
+    messageManager()->sendError("Could not find a rep to add the landmark to.");
     return;
   }
   int index = mLandmarkTableWidget->rowCount()+1;
@@ -126,7 +126,7 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
   ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
-    messageMan()->sendError("Could not find a rep to edit the landmark for.");
+    messageManager()->sendError("Could not find a rep to edit the landmark for.");
     return;
   }
   int index = mCurrentRow+1;
@@ -152,7 +152,7 @@ void ImageRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double n
   //check if its time to do image registration
   if(mCurrentImage->getLandmarks()->GetNumberOfTuples() > 2)
   {
-    messageMan()->sendInfo(mCurrentImage->getUid());
+    messageManager()->sendInfo(mCurrentImage->getUid());
     mRegistrationManager->setGlobalPointSet(mCurrentImage->getLandmarks());
     mRegistrationManager->doImageRegistration(mCurrentImage);
   }
@@ -347,7 +347,7 @@ void ImageRegistrationWidget::thresholdChangedSlot(const int value)
   emit thresholdChanged(value);
   std::stringstream message;
   message << "Threshold set to " << value;
-  messageMan()->sendInfo(message.str());
+  messageManager()->sendInfo(message.str());
 
   QString text = "Probing threshold: ";
   QString valueText;

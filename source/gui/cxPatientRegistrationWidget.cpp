@@ -162,7 +162,7 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
     disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-    messageMan()->sendInfo("Disconnected from old image "+mCurrentImage->getUid());
+    messageManager()->sendInfo("Disconnected from old image "+mCurrentImage->getUid());
   }
 
   mCurrentImage = currentImage;
@@ -220,7 +220,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   ssc::Transform3DPtr lastTransform_prMt = mToolToSample->getLastTransform();
   if(!lastTransform_prMt)
   {
-    messageMan()->sendError("The last transform was NULL!");
+    messageManager()->sendError("The last transform was NULL!");
     return;
   }
 
@@ -249,7 +249,7 @@ void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
   //TODO REMOVE just for debugging
   std::stringstream stream;
   stream<<"You clicked cell: ("<<mCurrentRow<<","<<mCurrentColumn<<").";
-  messageMan()->sendInfo(stream.str());
+  messageManager()->sendInfo(stream.str());
   //END
 }
 void PatientRegistrationWidget::cellChangedSlot(int row, int column)
@@ -483,7 +483,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     QTableWidgetItem* columnThree = mLandmarkTableWidget->item(row, 2);
     if(columnThree == NULL)
     {
-      messageMan()->sendError("Couldn't find a cell in the table to put the toolsample in.");
+      messageManager()->sendError("Couldn't find a cell in the table to put the toolsample in.");
     }
     else
     {

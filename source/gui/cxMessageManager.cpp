@@ -6,7 +6,7 @@
 namespace cx
 {
 MessageManager* MessageManager::mTheInstance = NULL;
-MessageManager* messageMan() { return MessageManager::getInstance(); }
+MessageManager* messageManager() { return MessageManager::getInstance(); }
 
 MessageManager* MessageManager::getInstance()
 {

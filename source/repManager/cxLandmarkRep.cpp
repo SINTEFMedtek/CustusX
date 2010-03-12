@@ -174,13 +174,13 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    messageMan()->sendWarning("Trying to add rep actors to view renderer, but view is null.");
+    messageManager()->sendWarning("Trying to add rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    messageMan()->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
+    messageManager()->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -210,13 +210,13 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    messageMan()->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
+    messageManager()->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    messageMan()->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
+    messageManager()->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -320,7 +320,7 @@ void LandmarkRep::addPoint(double& x, double& y, double& z, int index)
   info << ",";
   info << z;
   info << ") to the landmark.";
-  messageMan()->sendInfo(info.str());
+  messageManager()->sendInfo(info.str());
 
   for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
   {
@@ -339,7 +339,7 @@ void LandmarkRep::internalUpdate()
     errormessage << ") != (mSkinPointActors ==";
     errormessage << mSkinPointActors.size();
     errormessage << "), trying to fix the error...";
-    messageMan()->sendError(errormessage.str());
+    messageManager()->sendError(errormessage.str());
 
     //trying to set repopulate the map
     this->setImage(mImage);

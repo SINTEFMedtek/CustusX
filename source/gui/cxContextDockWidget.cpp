@@ -74,7 +74,7 @@ void ContextDockWidget::deleteCurrentImageSlot()
 {
   if (mCurrentImage.use_count() == 0)
   {
-    messageMan()->sendWarning("Can't delete image, no current Image!");
+    messageManager()->sendWarning("Can't delete image, no current Image!");
     return;
   }
   emit deleteImage(mCurrentImage);
@@ -140,7 +140,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   ssc::ImagePtr image = mDataManager->getImage(imageId);
   if(!image)
   {
-    messageMan()->sendError("Could not find the selected image in the DataManager: "+imageId);
+    messageManager()->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
 
