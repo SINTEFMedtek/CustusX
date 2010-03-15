@@ -81,7 +81,7 @@ void SurfaceRep::setImage(ImagePtr image)
 	mImage = image;
 	std::cout<<"is this illigal"<<std::endl;
 	//mContourFilter->SetInput( (vtkDataSet*) &mImage->getRefVtkImageData() );
-	vtkImageData *imag = mImage->getRefVtkImageData(); 
+	vtkImageData *imag = mImage->getRefVtkImageData();
 	mContourFilter->SetInput( imag );
 	
 	std::cout<<"mybe not"<<std::endl;

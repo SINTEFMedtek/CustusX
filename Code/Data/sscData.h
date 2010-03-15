@@ -33,6 +33,7 @@ enum REGISTRATION_STATUS
  */
 class Data : public QObject
 {
+  Q_OBJECT
 public:
 	Data(); //TODO remove?
 	Data(const std::string& uid, const std::string& name="");
@@ -54,6 +55,9 @@ public:
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
   virtual void parseXml(QDomNode& dataNode) = 0;///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
+signals:
+  void transformChanged(); ///< emitted when transform is changed
 
 protected:
 	std::string mUid;

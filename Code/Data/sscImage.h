@@ -75,7 +75,6 @@ signals:
 	void landmarkAdded(double x, double y, double z, unsigned int index);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
-	void transformChanged(); ///< emitted when transform is changed
 	//void alphaChange(); ///<blending alpha
 	//void thresholdChange(double val); 
 

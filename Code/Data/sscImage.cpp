@@ -52,13 +52,11 @@ void Image::set_rMd(Transform3D rMd)
 	bool changed = !similar(rMd, m_rMd);
 
 	Data::set_rMd(rMd);
-	//std::cout << "Image::setTransform(): \n" << trans << std::endl;
+	//std::cout << "Image::setTransform(): \n" << rMd << std::endl;
 	if (!changed)
 	{
 		return;
 	}
-
-	emit transformChanged();
 }
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {

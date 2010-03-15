@@ -38,6 +38,7 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 }
 /**
  * Set the transform that brings a point from local data space to (data-)ref space
+ * Emits the transformChanged() signal.
  * @param rMd the transformation from data to ref
  */
 void Data::set_rMd(Transform3D rMd)
@@ -47,6 +48,7 @@ void Data::set_rMd(Transform3D rMd)
 		return;
 	}
 	m_rMd = rMd;
+	emit transformChanged();
 }
 std::string Data::getUid() const
 {

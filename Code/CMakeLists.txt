@@ -32,6 +32,7 @@ endif(X11_FOUND)
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
     Utilities/sscAcceptanceBoxWidget.h
+    Data/sscData.h
     Data/sscImage.h
     Data/sscImageTF3D.h
     Data/sscImageLUT2D.h
