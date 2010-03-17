@@ -800,7 +800,9 @@ void ToolManager::removeToolSampleSlot(double x, double y, double z, unsigned in
 
 void ToolManager::addXml(QDomNode& parentNode)
 {
-  QDomElement base = parentNode.namedItem("toolManager").toElement();
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement base = doc.createElement("toolManager");
+  parentNode.appendChild(base);
   m_rMpr_History->addXml(base);
 }
 

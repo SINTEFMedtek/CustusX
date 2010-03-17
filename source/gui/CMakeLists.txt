@@ -13,6 +13,7 @@ SET(cxProject_MOC_HDRS
   cxTransferFunctionAlphaWidget.h
   cxTransferFunctionColorWidget.h
   cxPreferencesDialog.h
+  cxRegistrationHistoryWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -52,6 +53,8 @@ SET(${LIBNAME}_SRCS
     cxTransferFunctionColorWidget.cpp
     cxPreferencesDialog.h
     cxPreferencesDialog.cpp
+    cxRegistrationHistoryWidget.h
+    cxRegistrationHistoryWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
