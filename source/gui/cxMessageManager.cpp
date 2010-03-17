@@ -50,4 +50,7 @@ void MessageManager::sendMessage(QString &message, int timeout)
 {
   emit this->emittedMessage((const QString &)message, timeout);
 }
+
+
+
 } //End namespace cx

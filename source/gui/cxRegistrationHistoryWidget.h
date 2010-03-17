@@ -1,7 +1,9 @@
 #ifndef CXREGISTRATIONHISTORYWIDGET_H_
 #define CXREGISTRATIONHISTORYWIDGET_H_
 
+#include <vector>
 #include <QtGUI>
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
@@ -26,13 +28,23 @@ public:
 signals:
 
 protected slots:
-
+  void rewindSlot();
+  void removeSlot();
+  void forwardSlot();
+  void updateSlot();
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void closeEvent(QCloseEvent* event); ///<disconnects stuff
+  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
   RegistrationHistoryWidget();
+
+  QPushButton* mRewindButton;
+  QPushButton* mRemoveButton;
+  QPushButton* mForwardButton;
+  bool isUsingNewestRegistration();
+  std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
+  std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };
 
 }//end namespace cx
