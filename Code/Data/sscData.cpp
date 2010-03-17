@@ -1,14 +1,20 @@
 #include "sscData.h"
+#include "sscRegistrationTransform.h"
 
 
 namespace ssc
 {
 Data::Data() : 
   mUid("DummyUID"), mName("DummyName"), mRegistrationStatus(rsNOT_REGISTRATED)
-{}
+{
+}
+
 Data::Data(const std::string& uid, const std::string& name) :
   mUid(uid), mName(name), mRegistrationStatus(rsNOT_REGISTRATED)
-{}
+{
+  m_rMd_History.reset(new ssc::RegistrationHistory() );
+  connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
+}
 /*
 Data::Data(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData) : 
 	mUID(uid), mName(name), mVtkPolyData(polyData)
@@ -43,17 +49,21 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
  */
 void Data::set_rMd(Transform3D rMd)
 {
-	if (similar(rMd, m_rMd))
-	{
-		return;
-	}
-	m_rMd = rMd;
-	emit transformChanged();
+  m_rMd_History->setRegistration(rMd);
+//	if (similar(rMd, m_rMd))
+//	{
+//		return;
+//	}
+//	m_rMd = rMd;
+//	emit transformChanged();
 }
+
+
 std::string Data::getUid() const
 {
 	return mUid;
 }
+
 std::string Data::getName() const
 {
 	return mName;
@@ -73,7 +83,7 @@ REGISTRATION_STATUS Data::getRegistrationStatus() const
  */
 Transform3D Data::get_rMd() const
 {
-	return m_rMd;
+  return m_rMd_History->getCurrentRegistration();
 }
 void Data::connectToRep(const RepWeakPtr& rep)
 {
@@ -83,4 +93,9 @@ void Data::disconnectFromRep(const RepWeakPtr& rep)
 {
 	mReps.erase(rep);
 }
+RegistrationHistoryPtr Data::get_rMd_History()
+{
+  return m_rMd_History;
+}
+
 } // namespace ssc

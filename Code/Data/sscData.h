@@ -17,6 +17,7 @@ class QDomNode;
 
 namespace ssc
 {
+typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /**Denotes the various states
  * of registration an object is in.
@@ -44,6 +45,7 @@ public:
 	void setFilePath(const std::string& filePath);///< Set current file path to file
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
+  virtual RegistrationHistoryPtr get_rMd_History();
 
 	virtual std::string getUid() const; ///< \return unique id for this instance
 	virtual std::string getName() const; /// \return a descriptive name for this instance
@@ -65,7 +67,8 @@ protected:
 	std::string mFilePath;
 
 	REGISTRATION_STATUS mRegistrationStatus;
-	Transform3D m_rMd; ///< the transform from data to reference space
+	//Transform3D m_rMd; ///< the transform from data to reference space
+	RegistrationHistoryPtr m_rMd_History;
 
 	std::set<RepWeakPtr> mReps; ///< links to Rep users.
 

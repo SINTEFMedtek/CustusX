@@ -2,6 +2,7 @@
 #define SSCTRANSFORM3D_H_
 
 #include <boost/shared_ptr.hpp>
+#include <QString>
 #include <vtkSmartPointer.h>
 #include "sscVector3D.h"
 #include "sscBoundingBox3D.h"
@@ -48,6 +49,7 @@ private:
 public:
 	Transform3D();
 	explicit Transform3D(const double* data);
+  static Transform3D fromString(const QString& text);
 	explicit Transform3D(vtkMatrix4x4* m);
 	Transform3D(const Transform3D& t);
 	Transform3D& operator=(const Transform3D& t);

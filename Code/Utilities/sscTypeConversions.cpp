@@ -1,5 +1,5 @@
 #include "sscTypeConversions.h"
-
+#include <QStringList>
 
 template<> cstring_cast_Placeholder cstring_cast<QString>(const QString& val)
 {
@@ -17,5 +17,17 @@ std::ostream& operator<<(std::ostream& str, const QString& qstring)
 	str << qstring.toStdString();
 	return str;
 }
+
+std::vector<double> convertQString2DoubleVector(const QString& input)
+{
+  QStringList comp = input.split(' ', QString::SkipEmptyParts);
+  std::vector<double> retval(comp.size());
+  for (unsigned i=0; i<retval.size(); ++i)
+  {
+    retval[i] = comp[i].toDouble();
+  }
+  return retval;
+}
+
 
 

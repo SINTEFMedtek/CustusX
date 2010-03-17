@@ -2,6 +2,7 @@
 #define SSCTYPECONVERSIONS_H_
 
 #include <string>
+#include <vector>
 #include <QString>
 #include <QVariant>
 #include <boost/lexical_cast.hpp>
@@ -49,5 +50,10 @@ template<> cstring_cast_Placeholder cstring_cast<QVariant>(const QVariant& val);
 /** Helper function overload for streaming a QString to std::cout.
  */
 std::ostream& operator<<(std::ostream& str, const QString& qstring);
+
+/** Helper function for converting a QString to a list of doubles.
+ *  Useful for reading vectors/matrices.
+ */
+std::vector<double> convertQString2DoubleVector(const QString& input);
 
 #endif /*SSCTYPECONVERSIONS_H_*/

@@ -2,10 +2,11 @@
 
 //#include "SonoWand.h"
 #include <sstream>
-
+#include <vector>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
 typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
+#include "sscTypeConversions.h"
 
 
 // --------------------------------------------------------
@@ -26,6 +27,14 @@ Transform3D::Transform3D(const double* data)
 Transform3D::Transform3D(vtkMatrix4x4* m)
 {
 	mMatrix = vtkMatrix4x4Ptr(m);
+}
+
+Transform3D Transform3D::fromString(const QString& text)
+{
+  std::vector<double> raw = convertQString2DoubleVector(text);
+  //might want to check for raw.size()==16 here.... but what to do? Setting to identity might hide errors.
+
+  return Transform3D((double*)(&raw.begin()));
 }
 
 Transform3D::Transform3D()

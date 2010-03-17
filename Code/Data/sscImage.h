@@ -43,7 +43,7 @@ public:
 				const vtkImageDataPtr& data);
 	void setVtkImageData(const vtkImageDataPtr& data);
 
-	virtual void set_rMd(Transform3D rMd);
+//	virtual void set_rMd(Transform3D rMd);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.

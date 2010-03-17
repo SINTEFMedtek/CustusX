@@ -37,6 +37,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscImageTF3D.h
     Data/sscImageLUT2D.h
     Data/sscDataManager.h
+    Data/sscRegistrationTransform.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -152,7 +153,8 @@ SET( SSC_SOURCE_FILES
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
     Data/sscDataManagerImpl.cpp
-    Data/sscSNW2Volume.cpp    
+    Data/sscSNW2Volume.cpp 
+    Data/sscRegistrationTransform.cpp       
     Tool/sscToolManager.cpp
     Tool/sscTool.h 
     Tool/sscDummyToolManager.cpp

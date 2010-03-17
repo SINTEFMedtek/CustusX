@@ -8,8 +8,11 @@
 #include "sscTransform3D.h"
 #include "sscTool.h"
 
+class QDomNode;
+
 namespace ssc
 {
+  typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 class ToolManager : public QObject
 {
@@ -53,11 +56,13 @@ public:
 
 	virtual Transform3DPtr get_rMpr() const = 0; ///< transform from patient ref to ref space
 	virtual void set_rMpr(const Transform3DPtr& val) = 0; ///< set transform from patient ref to ref space
-	virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
+  virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); } ///< interface to rMpr history.
+  virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 	/** write to file all recorded transforms and timestamps */
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "") = 0;
 
-	
+  virtual void addXml(QDomNode& parentNode) {} ///< write internal state to node
+  virtual void parseXml(QDomNode& dataNode) {} ///< read internal state from node
 	
 signals:
 	void configured(); ///< signal emitted when the system is configured

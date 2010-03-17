@@ -74,6 +74,7 @@ void ProbeRep::setResolution(const int resolution)
  */
 Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
+	std::cout << "ProbeRep::pickLandmark" << std::endl;
 	//Get camera position and focal point in world coordinates
 	vtkCamera* camera = renderer->GetActiveCamera();
 	Vector3D cameraPosition(camera->GetPosition());

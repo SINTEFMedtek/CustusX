@@ -13,6 +13,7 @@
 
 #include "sscImageLUT2D.h"
 #include "sscGPUImageBuffer.h"
+#include "sscRegistrationTransform.h"
 
 namespace ssc
 {
@@ -47,17 +48,18 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	
 	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
 }
-void Image::set_rMd(Transform3D rMd)
-{
-	bool changed = !similar(rMd, m_rMd);
+//void Image::set_rMd(Transform3D rMd)
+//{
+//	bool changed = !similar(rMd, m_rMd);
+//
+//	Data::set_rMd(rMd);
+//	//std::cout << "Image::setTransform(): \n" << rMd << std::endl;
+//	if (!changed)
+//	{
+//		return;
+//	}
+//}
 
-	Data::set_rMd(rMd);
-	//std::cout << "Image::setTransform(): \n" << rMd << std::endl;
-	if (!changed)
-	{
-		return;
-	}
-}
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
 	//std::cout << "Image::setVtkImageData() " << std::endl;
@@ -240,9 +242,13 @@ int Image::getMaxAlphaValue()
 }
 void Image::addXml(QDomNode& parentNode)
 {
+//  Data::addXml(parentNode);
+
   QDomDocument doc = parentNode.ownerDocument();
   QDomElement imageNode = doc.createElement("image");
   parentNode.appendChild(imageNode);
+
+  m_rMd_History->addXml(imageNode); //TODO: should be in the superclass
 
   QDomElement uidNode = doc.createElement("uid");
   uidNode.appendChild(doc.createTextNode(mUid.c_str()));
@@ -277,12 +283,17 @@ void Image::addXml(QDomNode& parentNode)
 
 void Image::parseXml(QDomNode& dataNode)
 {
+  //Data::parseXml(dataNode);
+
   // image node must be parsed in the data manager to create this Image object
   // Only subnodes are parsed here
 
 	if (dataNode.isNull())
 		return;
 	
+  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+  m_rMd_History->parseXml(registrationHistory);
+
 	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");
 	if (!transferfunctionsNode.isNull())
