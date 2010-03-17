@@ -6,41 +6,41 @@
 <!-- ==== -->
 <tool>
   <type>pointer</type>
-  <id>PolarisPointer1</id>
-  <name>PolarisPointer1</name>
-  <description>Metal pointer</description>
-  <manufacturer>SINTEF</manufacturer>
+  <id>07-081-0223_Intraoperative-Navigator</id>
+  <name>Sonowand pointer</name>
+  <description>Sonowand pointer</description>
+  <manufacturer>Sonowand</manufacturer>
   <clinical_app>Lab</clinical_app>
-  <geo_file>Lab/PolarisPointer1.stl</geo_file>
+  <geo_file></geo_file>
   <pic_file></pic_file>
   <doc_file></doc_file>  
 
   <!-- Instrument -->
   <instrument>
     <type>pointer</type>
-    <id></id>
-    <name>pointer</name>
-    <manufacturer></manufacturer>
-    <description>Metal pointer</description>
+    <id>07-081-0223_Intraoperative-Navigator</id>
+    <name>Sonowand pointer</name>
+    <manufacturer>Sonowand</manufacturer>
+    <description></description>
   </instrument>
 
   <!-- Sensor -->
   <sensor>
     <type>Polaris</type>
-    <id>PolarisPointer1</id>
-    <name>PolarisPointer1</name>
+    <id>07-081-0223_Intraoperative-Navigator</id>
+    <name>07-081-0223_Intraoperative-Navigator</name>
     <wireless>yes</wireless>
     <DOF></DOF>
     <portnumber></portnumber>
     <channelnumber></channelnumber>
     <manufacturer>NDI</manufacturer>
-    <description>Spectra passive tool rigid body, extra large</description>
-    <rom_file>Lab/PolarisPointer1.rom</rom_file>
+    <description></description>
+    <rom_file>Lab/07-081-0223_Intraoperative-Navigator.rom</rom_file>
   </sensor>
 
   <!-- Calibration -->
   <calibration>
-    <cal_file>Lab/PolarisPointer1.cal</cal_file>
+    <cal_file>Lab/07-081-0223_Intraoperative-Navigator.cal</cal_file>
     <date>
       <yyyy>2008</yyyy>
       <mm>09</mm>

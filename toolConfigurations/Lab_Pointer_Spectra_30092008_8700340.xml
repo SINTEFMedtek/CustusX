@@ -6,12 +6,12 @@
 <!-- ==== -->
 <tool>
   <type>pointer</type>
-  <id>PolarisPointer1</id>
-  <name>PolarisPointer1</name>
-  <description>Metal pointer</description>
+  <id>Lab_Pointer_Spectra</id>
+  <name>Lab_Pointer_Spectra</name>
+  <description>Black plastic/metal pointer</description>
   <manufacturer>SINTEF</manufacturer>
   <clinical_app>Lab</clinical_app>
-  <geo_file>Lab/PolarisPointer1.stl</geo_file>
+  <geo_file>Lab/Lab_Pointer_Spectra_30092008_8700340.stl</geo_file>
   <pic_file></pic_file>
   <doc_file></doc_file>  
 
@@ -21,26 +21,26 @@
     <id></id>
     <name>pointer</name>
     <manufacturer></manufacturer>
-    <description>Metal pointer</description>
+    <description>Black plastic/metal</description>
   </instrument>
 
   <!-- Sensor -->
   <sensor>
     <type>Polaris</type>
-    <id>PolarisPointer1</id>
-    <name>PolarisPointer1</name>
+    <id>Lab_Pointer_Spectra</id>
+    <name>Lab_Pointer_Spectra</name>
     <wireless>yes</wireless>
     <DOF></DOF>
     <portnumber></portnumber>
     <channelnumber></channelnumber>
     <manufacturer>NDI</manufacturer>
     <description>Spectra passive tool rigid body, extra large</description>
-    <rom_file>Lab/PolarisPointer1.rom</rom_file>
+    <rom_file>Lab/Lab_Pointer_Spectra_30092008_8700340.rom</rom_file>
   </sensor>
 
   <!-- Calibration -->
   <calibration>
-    <cal_file>Lab/PolarisPointer1.cal</cal_file>
+    <cal_file>Lab/Lab_Pointer_Spectra_30092008_8700340.cal</cal_file>
     <date>
       <yyyy>2008</yyyy>
       <mm>09</mm>
