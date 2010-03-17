@@ -14,6 +14,17 @@ class QDomNode;
 
 namespace ssc
 {
+//namespace time {
+
+QString timestampSecondsFormat();
+QString timestampSecondsFormatNice();
+
+//} // time
+} // ssc
+
+
+namespace ssc
+{
 
 /**Encapsulation of a transform and the registration event,
  * i.e the time and kind of registration.
@@ -28,6 +39,7 @@ public:
   RegistrationTransform();
   explicit RegistrationTransform(const Transform3D& value, const QDateTime& timestamp=QDateTime(), const QString& type="");
   bool operator<(const RegistrationTransform& rhs) const;
+  bool operator==(const RegistrationTransform& rhs) const;
   void addXml(QDomNode& parentNode); ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
 };
@@ -52,7 +64,7 @@ public:
 signals:
   void currentChanged();
 private:
-  void setCache(const Transform3D& val);
+  void setCache(const Transform3D& val, const QDateTime& timestamp);
 
   std::vector<RegistrationTransform> mData; ///< time-sorted list of all registration events.
   QDateTime mCurrentTime; ///< disregard registrations later than this time. Invalid means use running time.

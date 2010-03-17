@@ -5,15 +5,26 @@
 namespace ssc
 {
 
-namespace
-{
 
 QString timestampSecondsFormat()
 {
   return QString("yyyyMMdd'T'hhmmss");
 }
+QString timestampSecondsFormatNice()
+{
+  return QString("yyyy-MM-dd hh:mm:ss");
+}
 
-} // unnamed namespace
+template<class T>
+QString streamXml2String(T& val)
+{
+  QDomDocument doc;
+  QDomElement root = doc.createElement("root");
+  doc.appendChild(root);
+
+  val.addXml(root);
+  return doc.toString();
+}
 
 //---------------------------------------------------------
 //-------  RegistrationTransform  -------------------------
@@ -34,6 +45,11 @@ RegistrationTransform::RegistrationTransform(const Transform3D& value, const QDa
 bool RegistrationTransform::operator<(const RegistrationTransform& rhs) const
 {
   return mTimestamp < rhs.mTimestamp;
+}
+
+bool RegistrationTransform::operator==(const RegistrationTransform& rhs) const
+{
+  return similar(mValue, rhs.mValue) && mTimestamp==rhs.mTimestamp && mType==rhs.mType;
 }
 
 void RegistrationTransform::addXml(QDomNode& parentNode) ///< write internal state to node
@@ -90,7 +106,7 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
   //emit currentChanged();
   //return;
   QString currentTimeRaw = dataNode.namedItem("currentTime").toElement().text();
-  mCurrentTime = QDateTime::fromString(currentTimeRaw, timestampSecondsFormat());
+  QDateTime currentTime = QDateTime::fromString(currentTimeRaw, timestampSecondsFormat());
 
   // iterate over all data elements
   QDomElement currentElem = dataNode.firstChildElement("registrationTransform");
@@ -100,13 +116,17 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
     mData.back().parseXml(currentElem);
   }
 
-  setActiveTime(mCurrentTime); // update cache
+  std::sort(mData.begin(), mData.end());
+  setActiveTime(currentTime); // update cache
 }
 
 /**Add one registration transform to the history.
  */
 void RegistrationHistory::addRegistration(const RegistrationTransform& transform)
 {
+  if (std::count(mData.begin(), mData.end(), transform)) // ignore if already present
+    return;
+
   mData.push_back(transform);
   std::sort(mData.begin(), mData.end());
   setActiveTime(QDateTime()); // reset to last registration when reregistering.
@@ -132,10 +152,16 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
     return;
   //std::remove_if(mData.begin(), mData.end(), );
 //... remove_if etc etc.
+  //std::cout << "RegistrationHistory::removeNewerThan("<< timestamp.toString(timestampSecondsFormatNice()) <<")" << std::endl;
+
   for (std::vector<RegistrationTransform>::iterator iter=mData.begin(); iter!=mData.end(); )
   {
+    //std::cout << "  iter->mTimestamp: " << iter->mTimestamp.toString(timestampSecondsFormatNice()) << std::endl;
+    //std::cout << "  (iter->mTimestamp >= timestamp): " << (iter->mTimestamp >= timestamp) << std::endl;
+
     if (iter->mTimestamp >= timestamp)
     {
+      std::cout << "RegistrationHistory::removeNewerThan("<< timestamp.toString(timestampSecondsFormatNice()) <<"): removed [" << iter->mTimestamp.toString(timestampSecondsFormatNice()) << ", " << iter->mType << "]" << std::endl;
       iter = mData.erase(iter);
     }
     else
@@ -147,12 +173,19 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
   setActiveTime(QDateTime());
 }
 
-void RegistrationHistory::setCache(const Transform3D& val)
+void RegistrationHistory::setCache(const Transform3D& val, const QDateTime& timestamp)
 {
-  if (similar(mTransformCache, val))
+  if (similar(mTransformCache, val) && (mCurrentTime==timestamp))
     return;
 
+  mCurrentTime = timestamp;
   mTransformCache = val;
+
+//  std::cout << "--------------------------------" << std::endl;
+//  std::cout << "mTransformCache\n" << mTransformCache << std::endl;
+//  std::cout << streamXml2String(*this) << std::endl;
+//  std::cout << "--------------------------------" << std::endl;
+
   emit currentChanged();
 }
 
@@ -161,21 +194,29 @@ void RegistrationHistory::setCache(const Transform3D& val)
  */
 void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
 {
-  mCurrentTime = timestamp;
-
   if (mData.empty())
   {
-    setCache(Transform3D());
+//    std::cout << "setActiveTime1\n" << Transform3D() << std::endl;
+    setCache(Transform3D(), timestamp);
     return;
   }
 
   // set to running time
-  if (!mCurrentTime.isValid())
+  if (!timestamp.isValid())
   {
-    setCache(mData.back().mValue);
+//    std::cout << "--------------------------------" << std::endl;
+//    std::cout << "setActiveTime2\n" << mData.back().mValue << std::endl;
+//    std::cout << "mData.size() " << mData.size() << std::endl;
+//    std::cout << "mData.front().mTimestamp < mData.back().mTimestamp: " << (mData.front().mTimestamp < mData.back().mTimestamp) << std::endl;
+//    std::cout << "mData.front() < mData.back(): " << (mData.front() < mData.back()) << std::endl;
+//     std::cout << streamXml2String(*this) << std::endl;
+//    std::cout << "--------------------------------" << std::endl;
+
+    setCache(mData.back().mValue, timestamp);
     return;
   }
 
+//  std::cout << "setActiveTime3" << std::endl;
   // set to specified time
   Transform3D val;
   for (std::vector<RegistrationTransform>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
@@ -183,7 +224,7 @@ void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
     if (iter->mTimestamp <= timestamp)
       val = iter->mValue;
   }
-  setCache(val);
+  setCache(val, timestamp);
 }
 
 QDateTime RegistrationHistory::getActiveTime() const
@@ -196,106 +237,6 @@ Transform3D RegistrationHistory::getCurrentRegistration() const
   return mTransformCache;
 }
 
-///**collect registration histories from the tool manager (patient registration)
-// * and images (image registration) and return.
-// */
-//std::vector<RegistrationHistory> getAllRegistrationHistories()
-//{
-//  std::vector<RegistrationHistory> retval;
-//  retval.push_back(ssc::ToolManager::getInstance()->get_rMpr_History());
-//
-//  std::map<std::string, ssc::ImagePtr> images = ssc:DataManager::getInstance()->getImages();
-//  for (std::map<std::string, ImagePtr>::iterator iter=image.begin(); iter!=image.end(); ++iter)
-//  {
-//    retval.push_back(iter->second->get_rMpr_History());
-//  }
-//
-//  return retval;
-//}
-//
-///**Remove the latest registration event (image or patient)
-// * inserted into the system.
-// */
-//void removeLastRegistration()
-//{
-//  //search among all images and patient reg, find latest, remove that one.
-//  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//
-//  std::vector<RegistrationTransform> history;
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    std::vector<RegistrationTransform> current = raw[i]->getData();
-//    std::copy(current.begin(), current.end(), back_insert_iterator(history));
-//  }
-//  std::sort(history.begin(), history.end());
-//
-//  if (history.empty())
-//    return;
-//
-//  QDateTime lastTime = history.back().mTimestamp;
-//  lastTime.addSecs(-1);
-//
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    raw[i]->removeNewerThan(lastTime);
-//  }
-//}
-//
-///**Take one step back in registration time and use the previous
-// * registration event instead of the current.
-// */
-//void usePreviousRegistration()
-//{
-//  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//
-//  std::vector<RegistrationTransform> history;
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    std::vector<RegistrationTransform> current = raw[i]->getData();
-//    std::copy(current.begin(), current.end(), back_insert_iterator(history));
-//  }
-//  std::sort(history.begin(), history.end());
-//
-//  if (history.empty())
-//    return;
-//
-//  QDateTime lastTime = history.back().mTimestamp;
-//  lastTime.addSecs(-1);
-//
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    raw[i]->setActiveTime(lastTime);
-//  }
-//}
-//
-///**Use the newest available registration.
-// * Negates any call to usePreviousRegistration.
-// */
-//void useNewestRegistration()
-//{
-//  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    raw[i]->setActiveTime(QDateTime());
-//  }
-//}
-//
-///**Return true if the system is currently using the newest
-// * available registration.
-// */
-//void isUsingNewestRegistration()
-//{
-//  std::vector<RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    if (raw[i]->getActiveTime()!=QDateTime())
-//      return false;
-//  }
-//
-//  return true;
-//}
 
 
 } // end namespace ssc
