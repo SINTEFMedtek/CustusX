@@ -39,7 +39,7 @@ ImagePtr MetaImageReader::load(const std::string& filename)
       line.clear();
       line = t.readLine();
       // do something with the line
-      if(line.startsWith("Position",Qt::CaseInsensitive) || line.startsWith("_Offset",Qt::CaseInsensitive))
+      if(line.startsWith("Position",Qt::CaseInsensitive) || line.startsWith("Offset",Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
         (*rMd)[0][3] = list.at(2).toDouble();
