@@ -33,8 +33,7 @@ Transform3D Transform3D::fromString(const QString& text)
 {
   std::vector<double> raw = convertQString2DoubleVector(text);
   //might want to check for raw.size()==16 here.... but what to do? Setting to identity might hide errors.
-
-  return Transform3D((double*)(&raw.begin()));
+  return Transform3D((double*)&(*raw.begin()));
 }
 
 Transform3D::Transform3D()

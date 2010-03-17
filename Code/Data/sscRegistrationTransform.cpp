@@ -87,12 +87,14 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
   if (dataNode.isNull())
     return;
 
+  //emit currentChanged();
+  //return;
   QString currentTimeRaw = dataNode.namedItem("currentTime").toElement().text();
   mCurrentTime = QDateTime::fromString(currentTimeRaw, timestampSecondsFormat());
 
   // iterate over all data elements
   QDomElement currentElem = dataNode.firstChildElement("registrationTransform");
-  for ( ; !currentElem.isNull(); currentElem = dataNode.firstChildElement("registrationTransform"))
+  for ( ; !currentElem.isNull(); currentElem = currentElem.nextSiblingElement("registrationTransform"))
   {
     mData.push_back(RegistrationTransform());
     mData.back().parseXml(currentElem);

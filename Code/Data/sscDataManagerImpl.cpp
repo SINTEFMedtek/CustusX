@@ -11,6 +11,7 @@ typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
 typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
+#include <QtCore>
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QFile>
@@ -18,6 +19,7 @@ typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 #include <QDir>
 
 #include "sscTransform3D.h"
+#include "sscRegistrationTransform.h"
 
 namespace ssc
 {
@@ -37,7 +39,7 @@ ImagePtr MetaImageReader::load(const std::string& filename)
       line.clear();
       line = t.readLine();
       // do something with the line
-      if(line.startsWith("Position",Qt::CaseInsensitive))
+      if(line.startsWith("Position",Qt::CaseInsensitive) || line.startsWith("_Offset",Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
         (*rMd)[0][3] = list.at(2).toDouble();
@@ -70,7 +72,11 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 	vtkImageDataPtr imageData = reader->GetOutput();
   
   ImagePtr image(new Image(filename, imageData));
-  image->set_rMd((*rMd));
+
+  RegistrationTransform regTrans(*rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
+  image->get_rMd_History()->addRegistration(regTrans);
+
+//  std::cout << "ImagePtr MetaImageReader::load \n" << *rMd << std::endl << std::endl;
   return image;
 }
 
