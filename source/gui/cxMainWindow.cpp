@@ -1043,21 +1043,20 @@ void MainWindow::configureSlot()
   
   if(mToolManager->isConfigured())
   {
-    /*ssc::ToolRep3DPtr toolRep3D_1 = mRepManager->getToolRep3DRep("ToolRep3D_1");
-    toolRep3D_1->setTool(mToolManager->getDominantTool());*/
-
     View3D* view = mViewManager->get3DView("View3D_1");
-    //view->addRep(toolRep3D_1);
 
     ToolRep3DMap* toolRep3DMap = RepManager::getInstance()->getToolRep3DReps();
     ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
-    ssc::ToolManager::ToolMapPtr connectedTools = ToolManager::getInstance()->getTools();
-    ssc::ToolManager::ToolMap::iterator toolIt = connectedTools->begin();
-    while((toolIt != connectedTools->end()) && (repIt != toolRep3DMap->end()))
+    ssc::ToolManager::ToolMapPtr configuredTools = ToolManager::getInstance()->getConfiguredTools();
+    ssc::ToolManager::ToolMap::iterator toolIt = configuredTools->begin();
+    while((toolIt != configuredTools->end()) && (repIt != toolRep3DMap->end()))
     {
-      repIt->second->setTool(toolIt->second);
-      view->addRep(repIt->second);
-      repIt++;
+      if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
+      {
+        repIt->second->setTool(toolIt->second);
+        view->addRep(repIt->second);
+        repIt++;
+      }
       toolIt++;
     }
   }
