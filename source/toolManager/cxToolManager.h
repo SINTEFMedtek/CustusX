@@ -2,7 +2,6 @@
 #define CXTOOLMANAGER_H_
 
 #include "sscToolManager.h"
-
 #include "itkCommand.h"
 #include "vtkSmartPointer.h"
 #include "cxTool.h"
@@ -16,6 +15,8 @@ typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 namespace cx
 {
+
+
 
 /**
  * \class ToolManager
@@ -52,7 +53,14 @@ public:
   virtual std::vector<std::string> getToolUids() const; ///< both from configured and connected tools
 
   virtual ssc::Transform3DPtr get_rMpr() const; ///< get the patient ...
-  virtual void set_rMpr(const ssc::Transform3DPtr& val); ///<  set the ...
+  virtual void set_rMpr(const ssc::Transform3DPtr& val); ///<  set the transform from patient to reference space
+
+  virtual ssc::RegistrationHistoryPtr get_rMpr_History();
+  //virtual void set_rMpr(const CalibrationTransform& val); ///<  set the patient-reference transform, along with calibration info.
+  //virtual void set_rMpr_ActiveTime(const QDateTime& time); ///< roll the calibrationtime back to a specified point, use invalid DateTime for real time.
+  //virtual TransformEvent get_rMprEvent() const;
+  //virtual std::vector<TransformEvent> get_rMpr_History() const; ///< get all calibration events
+
   virtual ssc::ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
   virtual void saveTransformsAndTimestamps(std::string filePathAndName = ""); ///<
 
@@ -60,6 +68,9 @@ public:
   void setLoggingFolder(std::string loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
   virtual vtkDoubleArrayPtr getToolSamples(); ///< \return all toolsamples defined .
+
+  void addXml(QDomNode& parentNode); ///< write internal state to node
+  void parseXml(QDomNode& dataNode);///< read internal state from node
 
 public slots:
   virtual void configure(); ///< sets up the software like the xml file suggests
@@ -138,7 +149,7 @@ protected:
   ssc::ToolPtr                  mDominantTool;    ///< the tool with highest priority
   ssc::ToolPtr                  mReferenceTool;   ///< the tool which is used as patient reference tool
 
-  ssc::Transform3DPtr m_rMpr; ///< the transform from the patient reference to the reference
+  ssc::RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 
   bool mConfigured;   ///< whether or not the system is configured
   bool mInitialized;  ///< whether or not the system is initialized

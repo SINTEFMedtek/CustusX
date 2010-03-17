@@ -6,6 +6,7 @@
 #include <QDomDocument>
 #include <QMetaType>
 #include <vtkDoubleArray.h>
+#include "sscRegistrationTransform.h"
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxMessageManager.h"
@@ -32,7 +33,7 @@ ToolManager::ToolManager() :
 			mTracker(TrackerPtr()),
 			mConfiguredTools(new ssc::ToolManager::ToolMap), //TODO Why was this commented out???
 			mConnectedTools(new ssc::ToolManager::ToolMap), mDominantTool(ssc::ToolPtr()), mReferenceTool(
-					ssc::ToolPtr()), m_rMpr(ssc::Transform3DPtr(new ssc::Transform3D())), mConfigured(false),
+					ssc::ToolPtr()), mConfigured(false),
 			mInitialized(false), mTracking(false), mTrackerTag("tracker"), mTrackerTypeTag("type"), mToolfileTag(
 					"toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
 			mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"), mToolSensorTypeTag("type"), mToolSensorWirelessTag(
@@ -43,6 +44,9 @@ ToolManager::ToolManager() :
 {
 	mTimer = new QTimer(this);
 	connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransform()));
+
+  m_rMpr_History.reset(new ssc::RegistrationHistory() );
+  connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 
 	igstk::RealTimeClock::Initialize();
 
@@ -228,12 +232,13 @@ std::vector<std::string> ToolManager::getToolUids() const
 }
 ssc::Transform3DPtr ToolManager::get_rMpr() const
 {
-	return m_rMpr;
+	return ssc::Transform3DPtr(new ssc::Transform3D(m_rMpr_History->getCurrentRegistration()));
 }
 void ToolManager::set_rMpr(const ssc::Transform3DPtr& val)
 {
-	m_rMpr = val;
-	emit rMprChanged();
+  m_rMpr_History->setRegistration(*val);
+//	m_rMpr = val;
+//	emit rMprChanged();
 }
 ssc::ToolPtr ToolManager::getReferenceTool() const
 {
@@ -792,4 +797,23 @@ void ToolManager::removeToolSampleSlot(double x, double y, double z, unsigned in
 		}
 	}
 }
+
+void ToolManager::addXml(QDomNode& parentNode)
+{
+  QDomElement base = parentNode.namedItem("toolManager").toElement();
+  m_rMpr_History->addXml(base);
+}
+
+void ToolManager::parseXml(QDomNode& dataNode)
+{
+  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+  m_rMpr_History->parseXml(registrationHistory);
+}
+
+ssc::RegistrationHistoryPtr ToolManager::get_rMpr_History()
+{
+  return m_rMpr_History;
+}
+
+
 }//namespace cx

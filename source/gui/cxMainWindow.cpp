@@ -478,9 +478,10 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
   patientNode.appendChild(managerNode);
 
   mDataManager->addXml(managerNode);
+  ssc::ToolManager::getInstance()->addXml(managerNode);
 
   //TODO Implement
-  /*mToolManager->getXml(doc); //TODO
+  /*
   messageMan()->getXml(doc); //TODO
   mViewManager->getXml(doc); //TODO
   mRepManager->getXml(doc); //TODO
@@ -511,7 +512,11 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
     QString absolutePatientPath = mSettings->value("globalPatientDataFolder").toString()+"/"+mActivePatientFolder;
     mDataManager->parseXml(dataManagerNode, absolutePatientPath);
   }
+
+  QDomNode toolmanager = managerNode.namedItem("toolManager");
+  ssc::ToolManager::getInstance()->parseXml(toolmanager);
 }
+
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 {
   switch (fromState)
