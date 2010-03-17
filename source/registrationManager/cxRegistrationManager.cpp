@@ -1,11 +1,13 @@
 #include "cxRegistrationManager.h"
 
+#include <QtCore>
 #include "vtkMath.h"
 #include "vtkPoints.h"
 #include "vtkDoubleArray.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkMatrix4x4.h"
 #include "sscTransform3D.h"
+#include "sscRegistrationTransform.h"
 #include "cxToolmanager.h"
 #include "cxMessagemanager.h"
 
@@ -59,7 +61,10 @@ RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList
 void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patientRegistration)
 {
   mManualPatientRegistration = patientRegistration;
-  mToolManager->set_rMpr(patientRegistration);
+  //mToolManager->set_rMpr(patientRegistration);
+
+  ssc::RegistrationTransform regTrans(*patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
+  mToolManager->get_rMpr_History()->addRegistration(regTrans);
 
   //if an offset existed, its no longer valid and should be removed
   mPatientRegistrationOffset.reset();
@@ -75,28 +80,34 @@ void RegistrationManager::resetManualPatientientRegistration()
   mManualPatientRegistration.reset();
   this->doPatientRegistration();
 }
-void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset)
+void RegistrationManager::setManualPatientRegistrationOffsetSlot(
+    ssc::Transform3DPtr offset)
 {
-  ssc::Transform3DPtr currentTransform;
-  if(mManualPatientRegistration) //we use this if we have it
+  ssc::Transform3D currentTransform;
+  if (mManualPatientRegistration) //we use this if we have it
   {
-    currentTransform = mManualPatientRegistration;
-  }else if(mMasterImage)
+    currentTransform = *mManualPatientRegistration;
+  }
+  else if (mMasterImage)
   {
     this->resetOffset();
-    currentTransform = mToolManager->get_rMpr();
-  }else //if we dont have a masterimage or a manualtransform we just want to save the offset?
+    currentTransform = *mToolManager->get_rMpr();
+  }
+  else //if we dont have a masterimage or a manualtransform we just want to save the offset?
   {
     //mPatientRegistrationOffset = offset; ?
     return;
   }
   mPatientRegistrationOffset = offset;
-  ssc::Transform3DPtr newTransformPtr(new ssc::Transform3D( (*(mPatientRegistrationOffset)) *  (*(currentTransform)) ));
-  mToolManager->set_rMpr(newTransformPtr);
-  //for debugging: std::cout << (*newTransformPtr) << std::endl;
+  ssc::Transform3D newTransform = (*mPatientRegistrationOffset) * currentTransform;
+//  mToolManager->set_rMpr(newTransformPtr);
+  ssc::RegistrationTransform regTrans(newTransform, QDateTime::currentDateTime(), "Manual Patient Offset");
+  mToolManager->get_rMpr_History()->addRegistration(regTrans);
+
 
   messageManager()->sendInfo("Offset for the patient registration is set.");
 }
+
 ssc::Transform3DPtr RegistrationManager::getManualPatientRegistrationOffset()
 {
   return mPatientRegistrationOffset;
@@ -151,14 +162,20 @@ void RegistrationManager::doPatientRegistration()
   landmarktransform->Update();
 
   //update rMpr transform in ToolManager
-  vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
+  //vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
+  ssc::Transform3D rMpr(landmarktransform->GetMatrix());
 
-  ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
-  mToolManager->set_rMpr(rMprPtr);
+//  ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
+//  mToolManager->set_rMpr(rMprPtr);
+
+  ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
+  //image->get_rMd_History()->addRegistration(regTrans);
+  mToolManager->get_rMpr_History()->addRegistration(regTrans);
 
   emit patientRegistrationPerformed();
   messageManager()->sendInfo("Patient registration has been performed.");
 }
+
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 {
   //check that the masterimage is set
@@ -206,7 +223,9 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //set the transform on the image
   vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
   ssc::Transform3D transform(matrix);
-  image->set_rMd(transform);
+  //image->set_rMd(transform);
+  ssc::RegistrationTransform regTrans(transform, QDateTime::currentDateTime(), "Image to Image");
+  image->get_rMd_History()->addRegistration(regTrans);
   //why did we use the inverse of the transform?
   //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
