@@ -64,10 +64,10 @@ private:
 	vtkPolyDataPtr mPolyData;
 
 	bool mVisible;
-	double mOffset;
 	Transform3D m_prMt;
 	std::string mTransformSaveFileName;
 	QTimerPtr mTimer;
+	double mOffset;
 	std::vector<Transform3D> mTransforms;
 
 	static int mTransformCount;
