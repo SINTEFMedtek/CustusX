@@ -54,9 +54,9 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	mLastRenderEnd = QTime::currentTime();
 	
 	QRect screen = qApp->desktop()->screen()->rect();
-	this->show();
+	//this->show();
 	this->setGeometry(QRect(screen.bottomRight()*0.15, screen.bottomRight()*0.85));
-	this->setCentralWidget( new QWidget );
+	this->setCentralWidget( new QWidget(this) );
 
 	start(showSliders);
 }
@@ -73,7 +73,7 @@ ViewsWindow::~ViewsWindow()
 
 ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-	ssc::View* view = new ssc::View();
+	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
@@ -120,13 +120,13 @@ void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std:
 	mSliceLayout->addLayout(layout, r,c);
 	
 	layout->addWidget(view);
-	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume)));
+	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume), this));
 }
 
 void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
 {
 	std::string uid = "3D";
-	ssc::View* view = new ssc::View();
+	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
 	
 	ssc::ImagePtr image = loadImage(imageFilename);
@@ -173,32 +173,32 @@ void ViewsWindow::start(bool showSliders)
 	QHBoxLayout *controlLayout = new QHBoxLayout;
 	controlLayout->addStretch();
 	
-	mAcceptanceBox = new ssc::AcceptanceBoxWidget(mDisplayText); 
+	mAcceptanceBox = new ssc::AcceptanceBoxWidget(mDisplayText, this);
 	controlLayout->addWidget(mAcceptanceBox);
 
 	controlLayout->addStretch();
 	mainLayout->addLayout(controlLayout); //Buttons
 
-	if (showSliders)
-	{
-		QVBoxLayout* slidersLayout = new QVBoxLayout;
-		mBrightnessSlider = new QSlider(Qt::Horizontal);
-		mBrightnessSlider->setTickInterval(10);
-		mContrastSlider= new QSlider(Qt::Horizontal);
-		mContrastSlider->setTickInterval(10);
-		slidersLayout->addWidget(new QLabel(tr("Brightness")) );
-		slidersLayout->addWidget(mContrastSlider);
-		slidersLayout->addWidget(new QLabel(tr("Contrasst")) );
-		slidersLayout->addWidget(mBrightnessSlider);	
-		controlLayout->addLayout(slidersLayout);
-		
-		connect(mContrastSlider, SIGNAL(sliderMoved(int)), this, SLOT(contrast(int)) );	
-		connect(mBrightnessSlider, SIGNAL(sliderMoved(int)), this, SLOT(brightness(int)) );
-		mContrastSlider->setMaximum(256);
-		mContrastSlider->setValue(256);			
-		mBrightnessSlider->setMaximum(256);
-		mBrightnessSlider->setValue(128);
-	}	
+//	if (showSliders)
+//	{
+//		QVBoxLayout* slidersLayout = new QVBoxLayout;
+//		mBrightnessSlider = new QSlider(Qt::Horizontal);
+//		mBrightnessSlider->setTickInterval(10);
+//		mContrastSlider= new QSlider(Qt::Horizontal);
+//		mContrastSlider->setTickInterval(10);
+//		slidersLayout->addWidget(new QLabel(tr("Brightness")) );
+//		slidersLayout->addWidget(mContrastSlider);
+//		slidersLayout->addWidget(new QLabel(tr("Contrasst")) );
+//		slidersLayout->addWidget(mBrightnessSlider);
+//		controlLayout->addLayout(slidersLayout);
+//
+//		connect(mContrastSlider, SIGNAL(sliderMoved(int)), this, SLOT(contrast(int)) );
+//		connect(mBrightnessSlider, SIGNAL(sliderMoved(int)), this, SLOT(brightness(int)) );
+//		mContrastSlider->setMaximum(256);
+//		mContrastSlider->setValue(256);
+//		mBrightnessSlider->setMaximum(256);
+//		mBrightnessSlider->setValue(128);
+//	}
 }
 
 void ViewsWindow::contrast(int val)

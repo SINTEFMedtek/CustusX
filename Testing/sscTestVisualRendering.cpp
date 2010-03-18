@@ -64,9 +64,10 @@ void TestVisualRendering::testInitialize()
 void TestVisualRendering::testEmptyView()
 {
 	widget->setDescription("Empty view");
-	ssc::View* view = new ssc::View();
+	ssc::View* view = new ssc::View(widget->centralWidget());
 	widget->insertView(view, "dummy", "none", 0,0);
 
+  widget->show();
 	widget->updateRender();
 	int val = qApp->exec();
 	CPPUNIT_ASSERT(!val && widget->accepted());	
@@ -77,6 +78,7 @@ void TestVisualRendering::test_3D_Tool()
 	widget->setDescription("3D Volume, moving tool");
 	widget->define3D(image[0], 0, 0);
 
+  widget->show();
 	widget->updateRender();
 	int val = qApp->exec();
 	CPPUNIT_ASSERT(!val && widget->accepted());		
@@ -90,6 +92,7 @@ void TestVisualRendering::test_ACS_3D_Tool()
 	widget->defineSlice("C", image[0], ssc::ptCORONAL, 1, 0);
 	widget->defineSlice("S", image[0], ssc::ptSAGITTAL, 0, 1);
 	
+  widget->show();
 	widget->updateRender();
 	int val = qApp->exec();
 	CPPUNIT_ASSERT(!val && widget->accepted());	
@@ -102,6 +105,7 @@ void TestVisualRendering::test_AnyDual_3D_Tool()
 	widget->defineSlice("Any", image[0], ssc::ptANYPLANE, 0, 0);
 	widget->defineSlice("Dua", image[0], ssc::ptSIDEPLANE, 0, 1);
 	
+  widget->show();
 	widget->updateRender();
 	int val = qApp->exec();
 	CPPUNIT_ASSERT(!val && widget->accepted());		
@@ -118,6 +122,7 @@ void TestVisualRendering::test_ACS_3Volumes()
 		widget->defineSlice("S", image[i], ssc::ptSAGITTAL, 2, i);
 	}
 
+  widget->show();
 	widget->updateRender();
 	int val = qApp->exec();
 	CPPUNIT_ASSERT(!val && widget->accepted());		
@@ -133,6 +138,7 @@ void TestVisualRendering::test_AnyDual_3Volumes()
 		widget->defineSlice("Dua", image[i], ssc::ptSIDEPLANE, 1, i);
 	}
 	
+  widget->show();
 	widget->updateRender();
 	int val = qApp->exec();
 	CPPUNIT_ASSERT(!val && widget->accepted());		

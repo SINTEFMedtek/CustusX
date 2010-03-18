@@ -48,7 +48,7 @@ int main(int argc, char **argv)
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, ssc::rtMETAIMAGE);
 
 	QMainWindow mainWindow;
-	ssc::ViewPtr view(new ssc::View());
+	ssc::ViewPtr view(new ssc::View(mainWindow.centralWidget()));
 	mainWindow.setCentralWidget(view.get());
 
 	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
