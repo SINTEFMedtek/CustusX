@@ -176,9 +176,9 @@ void RegistrationHistoryWidget::updateSlot()
   std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
 
   bool newest = isUsingNewestRegistration();
-  mRewindButton->setEnabled(newest);
+  mRewindButton->setEnabled(newest && !history.empty());
   mRemoveButton->setEnabled(!history.empty());
-  mForwardButton->setEnabled(!newest);
+  mForwardButton->setEnabled(!newest && !history.empty());
 }
 
 /**Return true if the system is currently using the newest
