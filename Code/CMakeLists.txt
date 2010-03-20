@@ -83,21 +83,12 @@ set( SSC_INCLUDE_DIRS
     ${SSC_BINARY_DIR}
     ) 
 
-
-
-#set( SSC_INCLUDE_DIRS
-#    .
-#    Data
-#    Rep
-#    Tool
-#    Utilities
-#    ) 
-
 set(SSC_LIBRARY_DIRS 
     )    
 
 set( SSC_LIBRARIES 
     QVTK    
+    GLU
     )
 
 # library
@@ -115,7 +106,6 @@ SET( SSC_SOURCE_FILES
     Utilities/sscMD5Check.cpp
     Utilities/sscSnwInifile.cpp
 	Utilities/sscGLHelpers.cpp
-	#Utilities/sscSpaceOrganizer.cpp
     sscView.cpp
     Rep/sscRep.h
     Rep/sscRepImpl.h
@@ -166,12 +156,6 @@ SET( SSC_SOURCE_FILES
 # =========================================================
 # =========================================================
 #message( STATUS "processing project " ${SSC_PROJECT_NAME} "...")
-
-## -  removed this, as -g is applied by cmake.
-# add gcc definitions for all projects, except for Windows
-#if (NOT WIN32)
-#    add_definitions( -g  )
-#endif(NOT WIN32)
 
 # _USE_MATH_DEFINES Must be defined before math.h is included
 if (WIN32)

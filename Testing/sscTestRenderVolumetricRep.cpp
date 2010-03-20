@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 	mainWindow.show();
 	view->getRenderer()->ResetCamera();
 
-	for (unsigned i=0; i<5; ++i)
+	for (unsigned i=0; i<1; ++i)
 	{
 		doRender(view->getRenderWindow());
 	}

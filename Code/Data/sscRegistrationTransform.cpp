@@ -1,6 +1,7 @@
 #include "sscRegistrationTransform.h"
-#include <QtXML>
+//#include <QtXML>
 #include "sscTypeConversions.h"
+#include <QDomElement>
 
 namespace ssc
 {

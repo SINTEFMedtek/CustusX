@@ -43,10 +43,10 @@ namespace ssc
 //---------------------------------------------------------
 typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
 
-
+/*
 using ssc::Vector3D;
 using ssc::Transform3D;
-using ssc::DoubleBoundingBox3D;
+using ssc::DoubleBoundingBox3D;*/
 
 /**This will load a 3D volume as 3D texture
  *and let the painter slice 2D texture
