@@ -86,10 +86,12 @@ set( SSC_INCLUDE_DIRS
 set(SSC_LIBRARY_DIRS 
     )    
 
-set( SSC_LIBRARIES 
-    QVTK    
-    GLU
-    )
+set( SSC_LIBRARIES QVTK )
+
+# needed on linux
+if (NOT APPLE) 
+    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU )
+endif (NOT APPLE)
 
 # library
 SET( SSC_SOURCE_FILES
