@@ -14,6 +14,7 @@
 
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
+typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 namespace itk
 {

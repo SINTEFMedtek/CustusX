@@ -405,13 +405,13 @@ void Tool::createPolyData()
   QDir dir;
   if(!mInternalStructure.mGraphicsFileName.empty() && dir.exists(QString(mInternalStructure.mGraphicsFileName.c_str())))
   {
-    vtkSTLReader* reader = vtkSTLReader::New();
+    vtkSTLReaderPtr reader = vtkSTLReader::New();
     reader->SetFileName(mInternalStructure.mGraphicsFileName.c_str());
     mPolyData = reader->GetOutput();
   }
   else
   {
-    vtkConeSource* coneSource = vtkConeSource::New();
+    vtkConeSourcePtr coneSource = vtkConeSource::New();
     coneSource->SetResolution(25);
     coneSource->SetRadius(10);
     coneSource->SetHeight(100);
