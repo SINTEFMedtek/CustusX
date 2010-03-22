@@ -19,16 +19,16 @@ namespace cx
  */
 View2D::View2D(const std::string& uid, const std::string& name,
     QWidget *parent, Qt::WFlags f) :
-  View(parent, f), mContextMenu(new QMenu(this)), mDataManager(
-      DataManager::getInstance()), mRepManager(RepManager::getInstance())
+  View(parent, f)
 {
   mUid = uid;
   mName = name;
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 View2D::~View2D()
 {
 }
-void View2D::contextMenuEvent(QContextMenuEvent *event)
+/*void View2D::contextMenuEvent(QContextMenuEvent *event)
 {
   //NOT SUPPORTING MESHES IN 2D VIEW YET
 
@@ -123,6 +123,6 @@ void View2D::contextMenuEvent(QContextMenuEvent *event)
     inriaRep2D_4->getVtkViewImage2D()->SyncAddDataSet(image->getRefVtkImageData());
     inriaRep2D_4->getVtkViewImage2D()->SyncReset();
   }
-}
+}*/
 
 }//namespace cx

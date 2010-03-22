@@ -59,6 +59,7 @@ message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} )
 SET(SOURCES cxMain.cpp)
 
 INCLUDE_DIRECTORIES(
+	.
     gui
     viewManager
     repManager

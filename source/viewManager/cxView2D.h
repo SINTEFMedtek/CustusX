@@ -29,21 +29,9 @@ public:
   virtual ~View2D(); ///< empty
 
   virtual Type getType() const { return VIEW_2D;}; ///< get the class type
-  void contextMenuEvent(QContextMenuEvent *event); ///< decides what happens when you rightclick in a view
+  //moved to viewgroupinria void contextMenuEvent(QContextMenuEvent *event); ///< decides what happens when you rightclick in a view
 
 protected:
-  QMenu* mContextMenu; ///< right click menu
-
-  DataManager* mDataManager; ///< has all the data loaded into the system
-  RepManager* mRepManager; ///< has a pool of reps
-
-  //INFO:
-  //Cannot have the viewmanager here because that creates a never-ending
-  //dependency cycle between view2d and viewmanager, use
-  //ViewManager::getInstance in the code instead
-  //ViewManager* mViewManager; ///< has a pool of views and handles layout
-
-
 };
 }//namespace cx
 #endif /* CXVIEW2D2_H_ */

@@ -13,6 +13,7 @@
 #include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
+#include "cxViewGroup.h"
 
 namespace cx
 {
@@ -45,6 +46,7 @@ ViewManager::ViewManager() :
 
   mView3DNames[0] = "View3D_1";
   mView3DNames[1] = "View3D_2";
+
   mView2DNames[0] = "View2D_1";
   mView2DNames[1] = "View2D_2";
   mView2DNames[2] = "View2D_3";
@@ -76,6 +78,18 @@ ViewManager::ViewManager() :
     view->getRenderWindow()->GetInteractor()->EnableRenderOff();
   }
 
+  mViewGroup3D1.reset(new ViewGroup3D(1,mView3DMap["View3D_1"]));
+  mViewGroup3D2.reset(new ViewGroup3D(2,mView3DMap["View3D_2"]));
+  mViewGroups["ViewGroup3D1"] = mViewGroup3D1;
+  mViewGroups["ViewGroup3D2"] = mViewGroup3D2;
+
+  mViewGroupInria1.reset(new ViewGroupInria(1,mView2DMap["View2D_1"],
+      mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
+  mViewGroupInria2.reset(new ViewGroupInria(2,mView2DMap["View2D_4"],
+      mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
+  mViewGroups["ViewGroupInria1"] = mViewGroupInria1;
+  mViewGroups["ViewGroupInria2"] = mViewGroupInria2;
+
   this->setLayoutTo_3DACS_2X2();
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
@@ -88,6 +102,15 @@ ViewManager::ViewManager() :
 }
 ViewManager::~ViewManager()
 {}
+
+void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
+{
+  for(ViewGroupMap::iterator it = mViewGroups.begin(); it != mViewGroups.end(); ++it)
+  {
+    it->second->setRegistrationMode(mode);
+  }
+}
+
 QWidget* ViewManager::stealCentralWidget()
 {
   return mMainWindowsCentralWidget;
@@ -250,13 +273,18 @@ void ViewManager::setLayoutTo_ACSACS_2X3()
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
-  messageManager()->sendInfo("Delete image: "+image->getName());
+  for(ViewGroupMap::iterator it = mViewGroups.begin(); it != mViewGroups.end(); ++it)
+  {
+    it->second->removeImage(image);
+  }
+
+/*  messageManager()->sendInfo("Delete image: "+image->getName());
   RepManager* repManager = RepManager::getInstance();
   VolumetricRepMap* volRepMap = repManager->getVolumetricReps();
   VolumetricRepMap::iterator itVolRep = volRepMap->begin();
   for(; itVolRep != volRepMap->end(); ++itVolRep)
     if(itVolRep->second->hasImage(image))
-      this->removeRepFromViews(itVolRep->second);
+      this->removeRepFromViews(itVolRep->second);*/
   
   /*InriaRep3DMap* inria3DRepMap = repManager->getInria3DReps();
   InriaRep3DMap::iterator itInria3DRep = inria3DRepMap->begin();
@@ -270,13 +298,13 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
     if(itInria2DRep->second->hasImage(image))
       this->removeRepFromViews(itInria2DRep->second);*/
   
-  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
+/*  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
   InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");
+  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");*/
   
   //Don't work?
   //if(inriaRep2D_1->getVtkViewImage2D()->HasDataSet(image->getRefVtkImageData()))
-  if(inriaRep2D_1->hasImage(image))
+/*  if(inriaRep2D_1->hasImage(image))
   {  
     View2D* view2D_1 = mView2DMap[mView2DNames[0]];
     View2D* view2D_2 = mView2DMap[mView2DNames[1]];
@@ -304,7 +332,8 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
     //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
     emit imageDeletedFromViews(image);
     messageManager()->sendInfo("Removed current image from inria views");
-  }
+  }*/
+  emit imageDeletedFromViews(image);
 }
 
 void ViewManager::renderingIntervalChangedSlot(int interval)
@@ -416,7 +445,7 @@ void ViewManager::deactivateLayout_ACSACS_2X3()
   mLayout->removeWidget( mView2DMap[mView2DNames[5]]);
 }
   
-void ViewManager::removeRepFromViews(ssc::RepPtr rep)
+/*void ViewManager::removeRepFromViews(ssc::RepPtr rep)
 {
   View3DMap::iterator it3D = mView3DMap.begin();
   for(; it3D != mView3DMap.end(); ++it3D)
@@ -424,7 +453,7 @@ void ViewManager::removeRepFromViews(ssc::RepPtr rep)
   View2DMap::iterator it2D = mView2DMap.begin();
   for(; it2D != mView2DMap.end(); ++it2D)
     it2D->second->removeRep(rep);
-}
+}*/
   
 void ViewManager::renderAllViewsSlot()
 {
@@ -452,8 +481,13 @@ void ViewManager::renderAllViewsSlot()
 }
 	
 void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
-{  
-  RepManager* repManager = RepManager::getInstance();
+{
+  std::map<QString, ViewGroupPtr>::iterator it = mViewGroups.begin();
+  for(;it != mViewGroups.end(); ++it)
+  {
+    it->second->setImage(currentImage);
+  }
+  /*RepManager* repManager = RepManager::getInstance();
   
   // Update 2D views
   InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
@@ -502,12 +536,12 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   view2D_3->setRep(inriaRep2D_3);
   
   //test: Is render set?
-  /*if (inriaRep2D_1->getVtkViewImage2D()->GetRenderer() == NULL)
+  if (inriaRep2D_1->getVtkViewImage2D()->GetRenderer() == NULL)
     std::cout << "inriaRep2D_1: Lost renderer" << std::endl;
   if (inriaRep2D_2->getVtkViewImage2D()->GetRenderer() == NULL)
     std::cout << "inriaRep2D_2: Lost renderer" << std::endl;
   if (inriaRep2D_3->getVtkViewImage2D()->GetRenderer() == NULL)
-    std::cout << "inriaRep2D_3: Lost renderer" << std::endl;*/
+    std::cout << "inriaRep2D_3: Lost renderer" << std::endl;
   
   inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
   inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
@@ -532,6 +566,6 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
           probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
+          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));*/
 }	
 }//namespace cx

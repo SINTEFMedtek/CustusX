@@ -123,5 +123,6 @@ private:
   RepManager(RepManager const&); ///< not implemented
   RepManager& operator=(RepManager const&); ///< not implemented
 };
+RepManager* repManager();
 }//namespace cx
 #endif /* CXREPMANAGER_H_ */

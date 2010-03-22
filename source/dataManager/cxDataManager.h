@@ -38,5 +38,6 @@ private:
   DataManager(DataManager const&);
   DataManager& operator=(DataManager const&);
 };
+DataManager* dataManager();
 }//namespace cx
 #endif /* CXDATAMANAGER_H_ */

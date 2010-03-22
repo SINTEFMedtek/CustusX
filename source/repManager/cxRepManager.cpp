@@ -369,4 +369,8 @@ void RepManager::receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double t
   double z = (*rMt)[2][3];
   this->syncInria2DRepsSlot(x,y,z);
 }
+RepManager* repManager()
+{
+  return RepManager::getInstance();
+}
 }//namespace cx

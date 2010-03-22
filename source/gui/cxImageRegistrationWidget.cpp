@@ -16,7 +16,7 @@
 #include "cxMessageManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
-#include "cxInriaRep2D.h"
+//#include "cxInriaRep2D.h"
 #include "cxRegistrationHistoryWidget.h"
 
 namespace cx

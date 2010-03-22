@@ -21,7 +21,6 @@ namespace cx
  */
 View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
   ssc::View(parent, f),
-  mContextMenu(new QMenu(this)),
   mCameraStyle(DEFAULT_STYLE),
   mCameraOffset(-1),
   mDataManager(DataManager::getInstance()),
@@ -29,12 +28,13 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
 {
   mUid = uid;
   mName = name;
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
 
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 }
 View3D::~View3D()
 {}
-void View3D::contextMenuEvent(QContextMenuEvent *event)
+/*void View3D::contextMenuEvent(QContextMenuEvent *event)
 {
   //NOT SUPPORTING MESHES IN 3D VIEW YET
 
@@ -79,7 +79,7 @@ void View3D::contextMenuEvent(QContextMenuEvent *event)
 
     //Show the rep in this view
     this->setRep(volumetricRep);
-}
+}*/
 void View3D::setCameraStyle(View3D::CameraStyle style, int offset)
 {
   if(mCameraStyle == style)

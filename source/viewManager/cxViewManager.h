@@ -4,20 +4,15 @@
 #include <map>
 #include <QObject>
 #include "sscImage.h"
-
+#include "cxForwardDeclarations.h"
 class QGridLayout;
 class QWidget;
 class QTimer;
 class QSettings;
 class QTime;
-namespace ssc
-{
-class View;
-}
+
 namespace cx
 {
-class View2D;
-class View3D;
 
 /**
  * \class ViewManager
@@ -57,6 +52,8 @@ public:
   View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
   View3D* get3DView(const std::string& uid); ///< returns a 3D view with a given uid
 
+  void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
+
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
   void fps(int number);///< Emits number of frames per second
@@ -86,7 +83,7 @@ protected:
   void deactivateLayout_3DACS_1X3(); ///< deactivate the 3DACS_1X3 layout
   void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
   void deactivateLayout_ACSACS_2X3(); ///< deactivate the ACSACS_2X3 layout
-  void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
+  //void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -108,9 +105,18 @@ protected:
   QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 
+  typedef std::map<QString, ViewGroupPtr> ViewGroupMap;
+  ViewGroupMap mViewGroups;
+  ViewGroup3DPtr mViewGroup3D1;
+  ViewGroup3DPtr mViewGroup3D2;
+  ViewGroupInriaPtr mViewGroupInria1;
+  ViewGroupInriaPtr mViewGroupInria2;
+
 private:
   ViewManager(ViewManager const&);
   ViewManager& operator=(ViewManager const&);
 };
+
+
 }//namespace
 #endif /* CXVIEWMANAGER_H_ */

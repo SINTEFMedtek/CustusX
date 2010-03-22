@@ -24,5 +24,8 @@ void DataManager::deleteImageSlot(ssc::ImagePtr image)
   mImages.erase(image->getUid());
   emit currentImageDeleted(image);
 }
-
+DataManager* dataManager()
+{
+  return DataManager::getInstance();
+}
 }//namespace cx

@@ -583,11 +583,13 @@ void MainWindow::activateImageRegistationState()
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
       QString("Image Registration"));
   
+  mViewManager->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+
   ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
-  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+/*  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
   mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
   mViewManager->get3DView("View3D_1")->addRep(probeRep);
-  
+  */
   connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(int)),
           probeRep.get(), SLOT(setThresholdSlot(int)));
 
@@ -597,13 +599,14 @@ void MainWindow::deactivateImageRegistationState()
 {
   if(mImageRegistrationIndex != -1)
   {
+    mViewManager->setRegistrationMode(ssc::rsNOT_REGISTRATED);
     mContextDockWidget->removeTab(mImageRegistrationIndex);
     mImageRegistrationIndex = -1;
     
     ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
-    LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+/*    LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
     mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
-    mViewManager->get3DView("View3D_1")->removeRep(probeRep);
+    mViewManager->get3DView("View3D_1")->removeRep(probeRep);*/
 
     disconnect(mImageRegistrationWidget, SIGNAL(thresholdChanged(const int)),
             probeRep.get(), SLOT(setThresholdSlot(const int)));
@@ -614,8 +617,9 @@ void MainWindow::activatePatientRegistrationState()
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
       QString("Patient Registration"));
   
-  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
+  mViewManager->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+//  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+//  mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
   
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
@@ -623,6 +627,7 @@ void MainWindow::deactivatePatientRegistrationState()
 {
   if(mPatientRegistrationIndex != -1)
   {
+    mViewManager->setRegistrationMode(ssc::rsNOT_REGISTRATED);
     mContextDockWidget->removeTab(mPatientRegistrationIndex);
     mPatientRegistrationIndex = -1;
   }

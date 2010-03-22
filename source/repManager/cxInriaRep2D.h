@@ -7,6 +7,8 @@
 #include "sscTransform3D.h"
 
 class vtkMetaDataSet;
+class vtkTransform;
+typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 typedef vtkSmartPointer<class vtkViewImage2D> vtkViewImage2DPtr;
 typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
 namespace ssc
@@ -37,7 +39,7 @@ public:
   ~InriaRep2D(); ///< empty
 
   virtual std::string getType() const;
-	virtual void setImage(ssc::ImagePtr image) {mImage = image;} ///< Set Image. Used to check if image is used, don't connect the image.
+	virtual void setImage(ssc::ImagePtr image); ///< Set Image. Used to check if image is used, don't connect the image.
 	virtual ssc::ImagePtr getImage() {return mImage;} ///< Returns the used image
 	virtual bool hasImage(ssc::ImagePtr image) const {return (mImage == image);} ///< Checks if image is used
   virtual void connectToView(ssc::View *theView);
@@ -71,6 +73,7 @@ protected:
 private slots:
   void toolTransformAndTimeStampSlot(Transform3D matrix, double timestamp); ///< updates sync position
   void toolVisibleSlot(bool visible); ///< empty
+  void updateUserTransform();
 
 private:
   InriaRep2D(); ///< not implemented

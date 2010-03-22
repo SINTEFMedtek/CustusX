@@ -4,6 +4,7 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
+#include <vtkTransform.h>
 #include <vtkMetaDataSet.h>
 #include <vtkMetaImageData.h>
 #include "sscView.h"
@@ -35,6 +36,15 @@ std::string InriaRep2D::getType() const
 {
   return mType;
 } 
+void InriaRep2D::setImage(ssc::ImagePtr image)
+{
+  if(mImage)
+    disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(updateUserTransform()));
+  mImage = image;
+  if(mImage)
+    connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(updateUserTransform()));
+  this->updateUserTransform();
+}
 void InriaRep2D::connectToView(ssc::View *theView)
 {
   if(isConnectedToView(theView))
@@ -183,6 +193,7 @@ void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D prMt, double timestam
   /*double position[3] = { matrix.matrix()->GetElement(0,3),
                          matrix.matrix()->GetElement(1,3),
                          matrix.matrix()->GetElement(2,3)};*/
+  //TODO, this is wrong
   mInria->SyncSetPosition(position);
 }
 /**
@@ -192,5 +203,18 @@ void InriaRep2D::toolTransformAndTimeStampSlot(Transform3D prMt, double timestam
 void InriaRep2D::toolVisibleSlot(bool visible)
 {
   //TODO either implement or remove?
+}
+void InriaRep2D::updateUserTransform()
+{
+  /*
+  if(!mImage)
+      return;
+  ssc::Transform3D rMd = mImage->get_rMd();
+  std::cout << "Transform set in the \n"+getName() << rMd << std::endl;
+  vtkTransformPtr transform = vtkTransform::New();
+  transform->SetMatrix(rMd.matrix());
+  mInria->SetTransform(transform);
+  mInria->Update();
+  */
 }
 }//namespace cx
