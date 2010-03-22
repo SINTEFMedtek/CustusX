@@ -29,9 +29,13 @@ typedef boost::weak_ptr<class GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
+typedef boost::shared_ptr<class ProbeRep> ProbeRepPtr;
+typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
+typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 
 } // namespace ssc
 

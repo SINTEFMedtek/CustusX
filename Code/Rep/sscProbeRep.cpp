@@ -143,6 +143,7 @@ void ProbeRep::makeLandmarkPermanent(unsigned int index)
 }
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
+  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren =
 		vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
@@ -156,6 +157,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	if(mCurrentRenderer == NULL)
 		return;
 
+  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
 	this->pickLandmark(clickPoint, mCurrentRenderer);
 }
@@ -166,6 +168,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
+  std::cout << "ProbeRep::showTemporaryPointSlot B" << std::endl;
   if(mCurrentRenderer == NULL)
     return;
 
@@ -192,6 +195,7 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mPickedPoint[1] = y;
   mPickedPoint[2] = z;
   emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
+  std::cout << "ProbeRep::showTemporaryPointSlot E" << std::endl;
 }
 /**
  * @param threshold sets a threshold for the probing ray
@@ -209,6 +213,7 @@ void ProbeRep::addRepActorsToViewRenderer(View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickLandmarkSlot(vtkObject*)));
+  std::cout << "ProbeRep::addRepActorsToViewRenderer"<< std::endl;
 }
 void ProbeRep::removeRepActorsFromViewRenderer(View* view)
 {
@@ -219,6 +224,7 @@ void ProbeRep::removeRepActorsFromViewRenderer(View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickLandmarkSlot(vtkObject*)));
+  std::cout << "ProbeRep::removeRepActorsFromViewRenderer"<< std::endl;
 }
 vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
