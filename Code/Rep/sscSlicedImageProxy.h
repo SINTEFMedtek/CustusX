@@ -41,8 +41,10 @@ private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
 
 private: 	
-	
+	vtkImageDataPtr createDummyImageData();
+
 	SliceProxyPtr mSlicer;
+	vtkImageDataPtr mDummyImage; ///< need this to fool the vtk pipeline when no image is set
 	ImagePtr mImage;
 	//vtkImageMapToWindowLevelColorsPtr mWindowLevel;
 	vtkImageAlgorithmPtr mRedirecter; 	

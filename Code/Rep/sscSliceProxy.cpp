@@ -1,18 +1,30 @@
 #include "sscSliceProxy.h"
 
-#include <boost/lexical_cast.hpp>
+#include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 
 namespace ssc
-
 {
+
+
+SliceProxyPtr SliceProxy::New(const std::string& name)
+{
+  SliceProxyPtr retval(new SliceProxy);
+  retval->mName = name;
+  return retval;
+}
+
+std::string SliceProxy::getName() const
+{
+  return mName;
+}
 
 SliceProxy::SliceProxy()
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	//TODO connect to toolmanager rMpr changed
-	mDefaultCenter = ssc::DataManager::getInstance()->getCenter();	
+	mDefaultCenter = ssc::DataManager::getInstance()->getCenter();
 	centerChangedSlot();
 }
 
@@ -88,6 +100,7 @@ void SliceProxy::centerChangedSlot()
 	{
 		Vector3D c = ssc::DataManager::getInstance()->getCenter();
 		mCutplane.setFixedCenter(c);		
+	  //std::cout << "center changed: " + string_cast(c) << std::endl;
 	}
 	else
 	{
@@ -96,9 +109,9 @@ void SliceProxy::centerChangedSlot()
 		// to avoid any confusion - the user must know it is nonnavigable.
 		mCutplane.setFixedCenter(mDefaultCenter);
 		mCutplane.setToolPosition(getSyntheticToolPos(mDefaultCenter));			
+	  //std::cout << "center changed: " + string_cast(mDefaultCenter) << std::endl;
 	}	
 	
-	//std::cout << "center changed: " + boost::lexical_cast<std::string>(ssc::DataManager::instance()->getCenter());
 	changed();
 }
 
@@ -163,8 +176,8 @@ ToolPtr SliceProxy::getTool()
 Transform3D SliceProxy::get_sMr()
 {
 	SlicePlane plane = mCutplane.getPlane();
-	//std::cout << mDebugId << " proxy get transform.c : " << plane.c << std::endl;
-	//std::cout << "proxy get transform :\n" << plane << std::endl;
+	//std::cout << "---" << " proxy get transform.c : " << plane.c << std::endl;
+	//std::cout << "proxy get transform -" << getName() <<":\n" << plane << std::endl;
 	return createTransformIJC(plane.i, plane.j, plane.c).inv();	
 }
 

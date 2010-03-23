@@ -23,7 +23,6 @@
 namespace ssc
 {
 
-
 SlicedImageProxy::SlicedImageProxy()
 {
 	mMatrixAxes = vtkMatrix4x4Ptr::New();
@@ -38,12 +37,33 @@ SlicedImageProxy::SlicedImageProxy()
 	mWindowLevel = vtkImageMapToColorsPtr::New();
 	mWindowLevel->SetInputConnection( mReslicer->GetOutputPort() );
 	mWindowLevel->SetOutputFormatToRGBA();
-	
- 	mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+
+	mDummyImage = createDummyImageData();
+
+  mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+  //mRedirecter->SetInput(mWindowLevel->GetOutput());
+  mRedirecter->SetInput(mDummyImage);
 }
 
 SlicedImageProxy::~SlicedImageProxy()
 {
+}
+
+/** Test: create small dummy data set with one voxel
+ *
+ */
+vtkImageDataPtr SlicedImageProxy::createDummyImageData()
+{
+  vtkImageDataPtr dummyImageData = vtkImageData::New();
+  dummyImageData->SetExtent(0, 0, 0, 0, 0, 0);
+  dummyImageData->SetSpacing(1, 1, 1);
+  //dummyImageData->SetScalarTypeToUnsignedShort();
+  dummyImageData->SetScalarTypeToUnsignedChar();
+  dummyImageData->SetNumberOfScalarComponents(1);
+  dummyImageData->AllocateScalars();
+  unsigned char* dataPtr = static_cast<unsigned char*>(dummyImageData->GetScalarPointer());
+  dataPtr = 0;//Set voxel to black
+  return dummyImageData;
 }
 
 void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
@@ -56,6 +76,7 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 	if (mSlicer)
 	{
 		connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
+		update();
 	}
 }
 
@@ -67,6 +88,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	mImage = image;
 	if (mImage)
 	{
+	  std::cout << "slicedImageProxy::setImage" << std::endl;
 		mReslicer->SetInput( mImage->getBaseVtkImageData() );
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
@@ -103,6 +125,12 @@ void SlicedImageProxy::setImage(ImagePtr image)
 		{
 		 	mRedirecter->SetInput(mWindowLevel->GetOutput());						
 		}
+
+    update();
+	}
+	else // no image
+	{
+	  mRedirecter->SetInput(mDummyImage);
 	}
 }
 
@@ -125,6 +153,7 @@ void SlicedImageProxy::update()
 	Transform3D rMs = mSlicer->get_sMr().inv();
 	Transform3D iMr = mImage->get_rMd().inv();
 	Transform3D M = iMr*rMs;
+//	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;
 
 	mMatrixAxes->DeepCopy(M.matrix());
 

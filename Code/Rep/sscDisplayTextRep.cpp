@@ -37,6 +37,10 @@ void DisplayTextRep::removeRepActorsFromViewRenderer(View* view)
 			view->getRenderer()->RemoveActor(mDisplayText.at(i)->getActor() );
 		}
 }
+
+/**Add a text with give RGB color at pos.
+ * pos is in normalized view space.
+ */
 void DisplayTextRep::addText(const Vector3D& color, const std::string& text, const Vector3D& pos)
 {
 	Vector3D c = color;
@@ -54,12 +58,18 @@ void DisplayTextRep::addText(const Vector3D& color, const std::string& text, con
 
 }
 
+/**Set a text previously set with addText.
+ *
+ */
 void DisplayTextRep::setText(unsigned i, const std::string& text)
 {
 	if (i<mDisplayText.size())
 		mDisplayText[i]->updateText(text);	
 }
 
+/**set the color in all existing texts
+ *
+ */
 void DisplayTextRep::setColor(const Vector3D& color )
 {
 	Vector3D c = color;

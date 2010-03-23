@@ -10,6 +10,7 @@
 
 namespace ssc
 {
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 /**Helper class that connects to a tool and generates slice
  * matrices based on it and other slice parameters.
@@ -20,6 +21,7 @@ class SliceProxy : public QObject
 {
 	Q_OBJECT
 public:
+	static SliceProxyPtr New(const std::string& name);
 	SliceProxy();
 	virtual ~SliceProxy();
 
@@ -28,6 +30,7 @@ public:
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset);
+	std::string getName() const;
 	
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset); 
@@ -54,8 +57,8 @@ private:
 	ToolPtr mTool;
 	SliceComputer mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
+	std::string mName; ///< for debug
 };
-typedef boost::shared_ptr<SliceProxy> SliceProxyPtr;
 
 }
 
