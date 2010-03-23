@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "sscData.h"
+#include "cxViewManager.h"
 
 class QAction;
 class QMenu;
@@ -135,6 +136,7 @@ protected:
   void deactivateUSAcquisitionState(); ///< Should only be used by changeState(...)!
   
   void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
+  QAction* addLayoutAction(ViewManager::LayoutType layout);
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
   
@@ -188,10 +190,10 @@ protected:
   QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
   QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
-  QAction* m3D_1x1_LayoutAction; ///< action for switching to 3D_1x1 view layout
-  QAction* m3DACS_2x2_LayoutAction; ///< action for switching to 3DACS_2x2 view layout
-  QAction* m3DACS_1x3_LayoutAction; ///< action for switching to 3DACS_1x3 view layout
-  QAction* mACSACS_2x3_LayoutAction; ///< action for switching to ACSACS_2x3 view layout
+//  QAction* m3D_1x1_LayoutAction; ///< action for switching to 3D_1x1 view layout
+//  QAction* m3DACS_2x2_LayoutAction; ///< action for switching to 3DACS_2x2 view layout
+//  QAction* m3DACS_1x3_LayoutAction; ///< action for switching to 3DACS_1x3 view layout
+//  QAction* mACSACS_2x3_LayoutAction; ///< action for switching to ACSACS_2x3 view layout
   QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
   
   //toolbars

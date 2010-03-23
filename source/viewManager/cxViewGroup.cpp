@@ -1,5 +1,6 @@
 #include "cxViewGroup.h"
 
+#include <vector>
 #include <QString>
 #include <QPoint>
 #include <QMenu>
@@ -7,9 +8,12 @@
 #include <QAction>
 #include <vtkRenderWindow.h>
 #include "sscView.h"
+#include "sscTypeConversions.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"
+#include "sscOrientationAnnotationRep.h"
+#include "sscDisplayTextRep.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxMessageManager.h"
@@ -18,6 +22,35 @@
 
 namespace cx
 {
+
+std::string planeToString(ssc::PLANE_TYPE val)
+{
+  switch (val)
+  {
+  case ssc::ptNOPLANE      : return "";
+  case ssc::ptSAGITTAL     : return "Sagittal";
+  case ssc::ptCORONAL      : return "Coronal";
+  case ssc::ptAXIAL        : return "Axial";
+  case ssc::ptANYPLANE     : return "Any";
+  case ssc::ptSIDEPLANE    : return "Side";
+  case ssc::ptRADIALPLANE  : return "Radial";
+  default                  : return "";
+  }
+}
+
+enum PLANE_TYPE
+{
+  ptNOPLANE,     ///< a initial plane, if no yet set
+  ptSAGITTAL,   ///< a slice seen from the side of the patient
+  ptCORONAL,    ///< a slice seen from the front of the patient
+  ptAXIAL,      ///< a slice seen from the top of the patient
+  ptANYPLANE,   ///< a plane aligned with the tool base plane
+  ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
+  ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
+  ptCOUNT
+};
+
+
 ViewGroup::ViewGroup()
 {
 }
@@ -243,7 +276,7 @@ ViewGroup3D::~ViewGroup3D()
 {}
 void ViewGroup3D::setImage(ssc::ImagePtr image)
 {
-  std::cout << "ViewGroup3D::setImage B" << std::endl;
+ // std::cout << "ViewGroup3D::setImage B" << std::endl;
   mImage = image;
   //RepManager* repManager = RepManager::getInstance();
 
@@ -271,7 +304,7 @@ void ViewGroup3D::setImage(ssc::ImagePtr image)
   mViews[0]->getRenderer()->ResetCamera();
   if(mViews[0]->isVisible())
     mViews[0]->getRenderWindow()->Render();
-  std::cout << "ViewGroup3D::setImage E" << std::endl;
+  //std::cout << "ViewGroup3D::setImage E" << std::endl;
 }
 void ViewGroup3D::removeImage(ssc::ImagePtr image)
 {
@@ -317,23 +350,33 @@ ViewGroup2D::ViewGroup2D(int startIndex, ssc::View* view1,
 
   mElements.resize(3);
 
+  std::vector<ssc::PLANE_TYPE> planeType(3);
+  planeType[0] = ssc::ptAXIAL;
+  planeType[1] = ssc::ptCORONAL;
+  planeType[2] = ssc::ptSAGITTAL;
 
   for (unsigned i=0; i<mElements.size(); ++i)
   {
-    mElements[i].mSliceProxy.reset(new ssc::SliceProxy());
-    //mSliceProxy->setTool(tool);
-  }
+    // annotation rep
+    mElements[i].mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep"+string_cast(i), "annotationRep"+string_cast(i));
+    mElements[i].mOrientationAnnotationRep->setPlaneType(planeType[i]);
+    mViews[i]->addRep(mElements[i].mOrientationAnnotationRep);
+    // plane type text rep
+    mElements[i].mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep"+string_cast(i), "planeTypeRep"+string_cast(i));
+    mElements[i].mPlaneTypeText->addText(ssc::Vector3D(0,1,0), planeToString(planeType[i]), ssc::Vector3D(0.98, 0.02, 0.0));
+    mViews[i]->addRep(mElements[i].mPlaneTypeText);
 
-  mElements[0].mSliceProxy->initializeFromPlane(ssc::ptAXIAL, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
-  mElements[1].mSliceProxy->initializeFromPlane(ssc::ptCORONAL, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
-  mElements[2].mSliceProxy->initializeFromPlane(ssc::ptSAGITTAL, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
-
-  for (unsigned i=0; i<mElements.size(); ++i)
-  {
+    // slice proxy
+    mElements[i].mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mViews[i]->getName() +")"+string_cast(planeType[i]));
+    mElements[i].mSliceProxy->initializeFromPlane(planeType[i], false, ssc::Vector3D(0,0,1), false, 1, 0.25);
     //mElements[i].mSliceProxy->setTool(...);
+    // slice rep
     mElements[i].mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mViews[i]->getName());
- //   mElements[i].mToolRep2D.reset(new ssc::ToolRep2D());
- //   mElements[i].mSliceRep->setProxy(mElements[i].mSliceProxy);
+    //std::cout << "setSliceProxy 2dviewgroup" << std::endl;
+    mElements[i].mSliceRep->setSliceProxy(mElements[i].mSliceProxy);
+    mViews[i]->addRep(mElements[i].mSliceRep);
+    // tool rep
+    //   mElements[i].mToolRep2D.reset(new ssc::ToolRep2D());
  //   mElements[i].mToolRep2D->setProxy(mElements[i].mSliceProxy);
   }
 }
@@ -343,9 +386,20 @@ ViewGroup2D::~ViewGroup2D()
 
 }
 
+
 void ViewGroup2D::setImage(ssc::ImagePtr image)
 {
+  if (!image)
+    return;
 
+  ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+  ssc::DataManager::getInstance()->setCenter(c);
+
+  for (unsigned i=0; i<mElements.size(); ++i)
+  {
+    mElements[i].mSliceProxy->setDefaultCenter(c);
+    mElements[i].mSliceRep->setImage(image);
+  }
 }
 
 void ViewGroup2D::removeImage(ssc::ImagePtr image)

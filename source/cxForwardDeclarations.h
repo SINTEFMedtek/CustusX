@@ -17,6 +17,7 @@ typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 class View2D;
 class View3D;
 typedef boost::shared_ptr<class ViewGroup> ViewGroupPtr;
+typedef boost::shared_ptr<class ViewGroup2D> ViewGroup2DPtr;
 typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
 typedef boost::shared_ptr<class ViewGroupInria> ViewGroupInriaPtr;
 

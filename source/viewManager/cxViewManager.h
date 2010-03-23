@@ -2,6 +2,7 @@
 #define CXVIEWMANAGER_H_
 
 #include <map>
+#include <vector>
 #include <QObject>
 #include "sscImage.h"
 #include "cxForwardDeclarations.h"
@@ -36,8 +37,10 @@ public:
     LAYOUT_3D_1X1,
     LAYOUT_3DACS_2X2,
     LAYOUT_3DACS_1X3,
-    LAYOUT_ACSACS_2X3
+    LAYOUT_ACSACS_2X3,
+    LAYOUT_3DACS_2X2_SNW
   }; ///< the layout types available
+  static std::string layoutText(LayoutType type);
 
   static ViewManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
@@ -59,10 +62,12 @@ signals:
   void fps(int number);///< Emits number of frames per second
 
 public slots:
-  void setLayoutTo_3D_1X1();    ///< sets the layout to 3D_1X1
-  void setLayoutTo_3DACS_2X2(); ///< sets the layout to 3DACS_2X2
-  void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
-  void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
+  void setLayoutFromQActionSlot(); ///< set the layout using data from a QAction
+//  void setLayoutTo_3D_1X1();    ///< sets the layout to 3D_1X1
+//  void setLayoutTo_3DACS_2X2(); ///< sets the layout to 3DACS_2X2
+//  void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
+//  void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
+//  void setLayoutTo_3DACS_2X2_SNW();
   void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
   void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
   void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
@@ -75,6 +80,12 @@ protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
 
+  void deactivateCurrentLayout();
+  void changeLayout(LayoutType toType);
+  void activateLayout(LayoutType toType);
+  void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);
+  void deactivateView(ssc::View* view);
+
   void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
   void deactivatLayout_3D_1X1(); ///< deactivate the 3D_1X1 layout
   void activateLayout_3DACS_2X2(); ///< activate the 3DACS_2X2 layout
@@ -83,6 +94,9 @@ protected:
   void deactivateLayout_3DACS_1X3(); ///< deactivate the 3DACS_1X3 layout
   void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
   void deactivateLayout_ACSACS_2X3(); ///< deactivate the ACSACS_2X3 layout
+
+  void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
+  void deactivateLayout_3DACS_2X2_SNW(); ///< deactivate the 3DACS_2X2 layout
   //void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
@@ -93,8 +107,8 @@ protected:
 
   const int     MAX_3DVIEWS;      ///< constant defining the max number of 3D views available
   const int     MAX_2DVIEWS;      ///< constant defining the max number of 2D views available
-  std::string   mView3DNames[2];  ///< the name of all the 3D views
-  std::string   mView2DNames[9];  ///< the name of all the 2D views
+  std::vector<std::string> mView3DNames;  ///< the name of all the 3D views
+  std::vector<std::string> mView2DNames;  ///< the name of all the 2D views
   View2DMap     mView2DMap;       ///< a map of all the 3D views
   View3DMap     mView3DMap;       ///< a map of all the 2D views
 
@@ -111,6 +125,8 @@ protected:
   ViewGroup3DPtr mViewGroup3D2;
   ViewGroupInriaPtr mViewGroupInria1;
   ViewGroupInriaPtr mViewGroupInria2;
+  ViewGroup2DPtr mViewGroup2D1;
+  ViewGroup2DPtr mViewGroup2D2;
 
 private:
   ViewManager(ViewManager const&);

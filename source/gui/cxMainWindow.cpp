@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QDateTime>
 #include <QTimer>
+#include "sscTypeConversions.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -333,26 +334,33 @@ void MainWindow::createActions()
   //layout
   mLayoutActionGroup = new QActionGroup(this);
   mLayoutActionGroup->setExclusive(true);
-  m3D_1x1_LayoutAction = new QAction(tr("3D_1X1"), mLayoutActionGroup);
-  m3DACS_2x2_LayoutAction = new QAction(tr("3DACS_2X2"), mLayoutActionGroup);
-  m3DACS_1x3_LayoutAction = new QAction(tr("3DACS_1X3"), mLayoutActionGroup);
-  mACSACS_2x3_LayoutAction = new QAction(tr("ACSACS_2X3"), mLayoutActionGroup);
   
-  m3D_1x1_LayoutAction->setCheckable(true);
-  m3DACS_2x2_LayoutAction->setCheckable(true);
-  m3DACS_1x3_LayoutAction->setCheckable(true);
-  mACSACS_2x3_LayoutAction->setCheckable(true);
+  addLayoutAction(ViewManager::LAYOUT_3D_1X1);
+  addLayoutAction(ViewManager::LAYOUT_3DACS_2X2)->setChecked(true);
+  addLayoutAction(ViewManager::LAYOUT_3DACS_1X3);
+  addLayoutAction(ViewManager::LAYOUT_ACSACS_2X3);
+  addLayoutAction(ViewManager::LAYOUT_3DACS_2X2_SNW);
 
-  m3DACS_2x2_LayoutAction->setChecked(true);
-
-  connect(m3D_1x1_LayoutAction, SIGNAL(triggered()),
-      mViewManager, SLOT(setLayoutTo_3D_1X1()));
-  connect(m3DACS_2x2_LayoutAction, SIGNAL(triggered()),
-      mViewManager, SLOT(setLayoutTo_3DACS_2X2()));
-  connect(m3DACS_1x3_LayoutAction, SIGNAL(triggered()),
-      mViewManager, SLOT(setLayoutTo_3DACS_1X3()));
-  connect(mACSACS_2x3_LayoutAction, SIGNAL(triggered()),
-      mViewManager, SLOT(setLayoutTo_ACSACS_2X3()));
+//  m3D_1x1_LayoutAction = new QAction(tr("3D_1X1"), mLayoutActionGroup);
+//  m3DACS_2x2_LayoutAction = new QAction(tr("3DACS_2X2"), mLayoutActionGroup);
+//  m3DACS_1x3_LayoutAction = new QAction(tr("3DACS_1X3"), mLayoutActionGroup);
+//  mACSACS_2x3_LayoutAction = new QAction(tr("ACSACS_2X3"), mLayoutActionGroup);
+//
+//  m3D_1x1_LayoutAction->setCheckable(true);
+//  m3DACS_2x2_LayoutAction->setCheckable(true);
+//  m3DACS_1x3_LayoutAction->setCheckable(true);
+//  mACSACS_2x3_LayoutAction->setCheckable(true);
+//
+//  m3DACS_2x2_LayoutAction->setChecked(true);
+//
+//  connect(m3D_1x1_LayoutAction, SIGNAL(triggered()),
+//      mViewManager, SLOT(setLayoutTo_3D_1X1()));
+//  connect(m3DACS_2x2_LayoutAction, SIGNAL(triggered()),
+//      mViewManager, SLOT(setLayoutTo_3DACS_2X2()));
+//  connect(m3DACS_1x3_LayoutAction, SIGNAL(triggered()),
+//      mViewManager, SLOT(setLayoutTo_3DACS_1X3()));
+//  connect(mACSACS_2x3_LayoutAction, SIGNAL(triggered()),
+//      mViewManager, SLOT(setLayoutTo_ACSACS_2X3()));
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
@@ -368,6 +376,16 @@ void MainWindow::createActions()
   connect(this, SIGNAL(deleteCurrentImage()),
           mContextDockWidget, SLOT(deleteCurrentImageSlot()));
 }
+
+QAction* MainWindow::addLayoutAction(ViewManager::LayoutType layout)
+{
+  QAction* action = new QAction(qstring_cast(ViewManager::layoutText(layout)), mLayoutActionGroup);
+  action->setCheckable(true);
+  action->setData(QVariant(static_cast<int>(layout)));
+  connect(action, SIGNAL(triggered()), mViewManager, SLOT(setLayoutFromQActionSlot()));
+  return action;
+}
+
 void MainWindow::createMenus()
 {
   mCustusXMenu = new QMenu(tr("CustusX"), this);;
@@ -418,10 +436,14 @@ void MainWindow::createMenus()
 
   //layout
   this->menuBar()->addMenu(mLayoutMenu);
-  mLayoutMenu->addAction(m3D_1x1_LayoutAction);
-  mLayoutMenu->addAction(m3DACS_2x2_LayoutAction);
-  mLayoutMenu->addAction(m3DACS_1x3_LayoutAction);
-  mLayoutMenu->addAction(mACSACS_2x3_LayoutAction);
+//  QList<QAction*> layouts = mLayoutActionGroup->actions();
+//  for (int i=0; i<layouts.size(); ++i)
+//    mLayoutMenu->addActions(layouts[i]);
+  mLayoutMenu->addActions(mLayoutActionGroup->actions());
+//  mLayoutMenu->addAction(m3D_1x1_LayoutAction);
+//  mLayoutMenu->addAction(m3DACS_2x2_LayoutAction);
+//  mLayoutMenu->addAction(m3DACS_1x3_LayoutAction);
+//  mLayoutMenu->addAction(mACSACS_2x3_LayoutAction);
 }
 void MainWindow::createToolBars()
 {

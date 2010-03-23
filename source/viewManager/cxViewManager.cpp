@@ -5,10 +5,12 @@
 #include <QTimer>
 #include <QSettings>
 #include <QTime>
+#include <QAction>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 #include "sscProbeRep.h"
 #include "sscVolumetricRep.h"
+#include "sscTypeConversions.h"
 #include "cxMessageManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
@@ -35,7 +37,7 @@ ViewManager::ViewManager() :
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
   MAX_3DVIEWS(2),
-  MAX_2DVIEWS(9),
+  MAX_2DVIEWS(12),
   mRenderingTimer(new QTimer(this)),
   mSettings(new QSettings()),
   mRenderingTime(new QTime()),
@@ -44,18 +46,26 @@ ViewManager::ViewManager() :
   mLayout->setSpacing(1);
   mMainWindowsCentralWidget->setLayout(mLayout);
 
-  mView3DNames[0] = "View3D_1";
-  mView3DNames[1] = "View3D_2";
+  mView3DNames.resize(MAX_3DVIEWS);
+  for (unsigned i=0; i<mView3DNames.size(); ++i)
+    mView3DNames[i] = "View3D_"+string_cast(i+1);
 
-  mView2DNames[0] = "View2D_1";
-  mView2DNames[1] = "View2D_2";
-  mView2DNames[2] = "View2D_3";
-  mView2DNames[3] = "View2D_4";
-  mView2DNames[4] = "View2D_5";
-  mView2DNames[5] = "View2D_6";
-  mView2DNames[6] = "View2D_7";
-  mView2DNames[7] = "View2D_8";
-  mView2DNames[8] = "View2D_9";
+  mView2DNames.resize(MAX_2DVIEWS);
+  for (unsigned i=0; i<mView2DNames.size(); ++i)
+    mView2DNames[i] = "View2D_"+string_cast(i+1);
+
+//  mView3DNames[0] = "View3D_1";
+//  mView3DNames[1] = "View3D_2";
+//
+//  mView2DNames[0] = "View2D_1";
+//  mView2DNames[1] = "View2D_2";
+//  mView2DNames[2] = "View2D_3";
+//  mView2DNames[3] = "View2D_4";
+//  mView2DNames[4] = "View2D_5";
+//  mView2DNames[5] = "View2D_6";
+//  mView2DNames[6] = "View2D_7";
+//  mView2DNames[7] = "View2D_8";
+//  mView2DNames[8] = "View2D_9";
 
   for(int i=0; i<MAX_3DVIEWS; i++)
   {
@@ -83,14 +93,18 @@ ViewManager::ViewManager() :
   mViewGroups["ViewGroup3D1"] = mViewGroup3D1;
   mViewGroups["ViewGroup3D2"] = mViewGroup3D2;
 
-  mViewGroupInria1.reset(new ViewGroupInria(1,mView2DMap["View2D_1"],
-      mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
-  mViewGroupInria2.reset(new ViewGroupInria(2,mView2DMap["View2D_4"],
-      mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
+  mViewGroupInria1.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
+  mViewGroupInria2.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
   mViewGroups["ViewGroupInria1"] = mViewGroupInria1;
   mViewGroups["ViewGroupInria2"] = mViewGroupInria2;
 
-  this->setLayoutTo_3DACS_2X2();
+  mViewGroup2D1.reset(new ViewGroup2D(1,mView2DMap["View2D_7"], mView2DMap["View2D_8"],mView2DMap["View2D_9"]));
+  mViewGroup2D2.reset(new ViewGroup2D(2,mView2DMap["View2D_10"], mView2DMap["View2D_11"],mView2DMap["View2D_12"]));
+  mViewGroups["ViewGroup2D1"] = mViewGroup2D1;
+  mViewGroups["ViewGroup2D2"] = mViewGroup2D2;
+
+  //this->setLayoutTo_3DACS_2X2();
+  this->changeLayout(LAYOUT_3DACS_2X2);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),
@@ -102,6 +116,20 @@ ViewManager::ViewManager() :
 }
 ViewManager::~ViewManager()
 {}
+
+std::string ViewManager::layoutText(LayoutType type)
+{
+  switch (type)
+  {
+  case LAYOUT_NONE : return "No_layout";
+  case LAYOUT_3D_1X1 : return "3D_1X1";
+  case LAYOUT_3DACS_2X2 : return "3DACS_2X2";
+  case LAYOUT_3DACS_1X3 : return "3DACS_1X3";
+  case LAYOUT_ACSACS_2X3 : return "ACSACS_2X3";
+  case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
+  default: return "Undefined layout";
+  }
+}
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
@@ -162,114 +190,207 @@ View3D* ViewManager::get3DView(const std::string& uid)
   }
   return view;
 }
-void ViewManager::setLayoutTo_3D_1X1()
+
+/**deactivate the current layout, leaving an empty layout
+ */
+void ViewManager::deactivateCurrentLayout()
 {
   switch(mCurrentLayoutType)
   {
   case LAYOUT_NONE:
-    this->activateLayout_3D_1X1();
-    break;
-  case LAYOUT_3D_1X1:
-    break;
-  case LAYOUT_3DACS_2X2:
-    this->deactivateLayout_3DACS_2X2();
-    this->activateLayout_3D_1X1();
-    break;
-  case LAYOUT_3DACS_1X3:
-    this->deactivateLayout_3DACS_1X3();
-    this->activateLayout_3D_1X1();
-    break;
-  case LAYOUT_ACSACS_2X3:
-    this->deactivateLayout_ACSACS_2X3();
-    this->activateLayout_3D_1X1();
-    break;
-  default:
-    return;
-    break;
-  }
-  messageManager()->sendInfo("Layout changed to 3D_1X1");
-}
-void ViewManager::setLayoutTo_3DACS_2X2()
-{
-  switch(mCurrentLayoutType)
-  {
-  case LAYOUT_NONE:
-    this->activateLayout_3DACS_2X2();
     break;
   case LAYOUT_3D_1X1:
     this->deactivatLayout_3D_1X1();
-    this->activateLayout_3DACS_2X2();
-    break;
-  case LAYOUT_3DACS_2X2:
-    break;
-  case LAYOUT_3DACS_1X3:
-    this->deactivateLayout_3DACS_1X3();
-    this->activateLayout_3DACS_2X2();
-    break;
-  case LAYOUT_ACSACS_2X3:
-    this->deactivateLayout_ACSACS_2X3();
-    this->activateLayout_3DACS_2X2();
-    break;
-  default:
-    return;
-    break;
-  }
-  messageManager()->sendInfo("Layout changed to 3DACS_2X2");
-}
-void ViewManager::setLayoutTo_3DACS_1X3()
-{
-  switch(mCurrentLayoutType)
-  {
-  case LAYOUT_NONE:
-    this->activateLayout_3DACS_1X3();
-    break;
-  case LAYOUT_3D_1X1:
-    this->deactivatLayout_3D_1X1();
-    this->activateLayout_3DACS_1X3();
     break;
   case LAYOUT_3DACS_2X2:
     this->deactivateLayout_3DACS_2X2();
-    this->activateLayout_3DACS_1X3();
-    break;
-  case LAYOUT_3DACS_1X3:
-    break;
-  case LAYOUT_ACSACS_2X3:
-    this->deactivateLayout_ACSACS_2X3();
-    this->activateLayout_3DACS_1X3();
-    break;
-  default:
-    return;
-    break;
-  }
-  messageManager()->sendInfo("Layout changed to 3DACS_1X3");
-}
-void ViewManager::setLayoutTo_ACSACS_2X3()
-{
-  switch(mCurrentLayoutType)
-  {
-  case LAYOUT_NONE:
-    this->activateLayout_ACSACS_2X3();
-    break;
-  case LAYOUT_3D_1X1:
-    this->deactivatLayout_3D_1X1();
-    this->activateLayout_ACSACS_2X3();
-    break;
-  case LAYOUT_3DACS_2X2:
-    this->deactivateLayout_3DACS_2X2();
-    this->activateLayout_ACSACS_2X3();
     break;
   case LAYOUT_3DACS_1X3:
     this->deactivateLayout_3DACS_1X3();
-    this->activateLayout_ACSACS_2X3();
     break;
   case LAYOUT_ACSACS_2X3:
+    this->deactivateLayout_ACSACS_2X3();
+    break;
+  case LAYOUT_3DACS_2X2_SNW:
+    this->deactivateLayout_3DACS_2X2_SNW();
+    break;
+  default:
+    break;
+  }
+}
+
+/**Change layout from current to toType.
+ */
+void ViewManager::changeLayout(LayoutType toType)
+{
+  if (mCurrentLayoutType==toType)
+    return;
+
+  deactivateCurrentLayout();
+  activateLayout(toType);
+}
+
+/**activate a layout. Assumes the previous layout is already deactivated.
+ */
+void ViewManager::activateLayout(LayoutType toType)
+{
+  switch(toType)
+  {
+  case LAYOUT_NONE:
+    this->activateLayout_3D_1X1();
+    break;
+  case LAYOUT_3D_1X1:
+    this->activateLayout_3D_1X1();
+    break;
+  case LAYOUT_3DACS_2X2:
+    this->activateLayout_3DACS_2X2();
+    break;
+  case LAYOUT_3DACS_1X3:
+    this->activateLayout_3DACS_1X3();
+    break;
+  case LAYOUT_ACSACS_2X3:
+    this->activateLayout_ACSACS_2X3();
+    break;
+  case LAYOUT_3DACS_2X2_SNW:
+    this->activateLayout_3DACS_2X2_SNW();
     break;
   default:
     return;
     break;
   }
-  messageManager()->sendInfo("Layout changed to ACSACS_2X3");
+
+  messageManager()->sendInfo("Layout changed to "+ layoutText(mCurrentLayoutType));
 }
+
+void ViewManager::setLayoutFromQActionSlot()
+{
+  QAction* action = dynamic_cast<QAction*>(sender());
+  if (!action)
+    return;
+  LayoutType type = static_cast<LayoutType>(action->data().toInt());
+  changeLayout(type);
+}
+
+//void ViewManager::setLayoutTo_3D_1X1()
+//{
+//  changeLayout(LAYOUT_3D_1X1);
+//
+////  switch(mCurrentLayoutType)
+////  {
+////  case LAYOUT_NONE:
+////    this->activateLayout_3D_1X1();
+////    break;
+////  case LAYOUT_3D_1X1:
+////    break;
+////  case LAYOUT_3DACS_2X2:
+////    this->deactivateLayout_3DACS_2X2();
+////    this->activateLayout_3D_1X1();
+////    break;
+////  case LAYOUT_3DACS_1X3:
+////    this->deactivateLayout_3DACS_1X3();
+////    this->activateLayout_3D_1X1();
+////    break;
+////  case LAYOUT_ACSACS_2X3:
+////    this->deactivateLayout_ACSACS_2X3();
+////    this->activateLayout_3D_1X1();
+////    break;
+////  default:
+////    return;
+////    break;
+////  }
+////  messageManager()->sendInfo("Layout changed to 3D_1X1");
+//}
+//void ViewManager::setLayoutTo_3DACS_2X2()
+//{
+//  changeLayout(LAYOUT_3DACS_2X2);
+////  switch(mCurrentLayoutType)
+////  {
+////  case LAYOUT_NONE:
+////    this->activateLayout_3DACS_2X2();
+////    break;
+////  case LAYOUT_3D_1X1:
+////    this->deactivatLayout_3D_1X1();
+////    this->activateLayout_3DACS_2X2();
+////    break;
+////  case LAYOUT_3DACS_2X2:
+////    break;
+////  case LAYOUT_3DACS_1X3:
+////    this->deactivateLayout_3DACS_1X3();
+////    this->activateLayout_3DACS_2X2();
+////    break;
+////  case LAYOUT_ACSACS_2X3:
+////    this->deactivateLayout_ACSACS_2X3();
+////    this->activateLayout_3DACS_2X2();
+////    break;
+////  default:
+////    return;
+////    break;
+////  }
+////  messageManager()->sendInfo("Layout changed to 3DACS_2X2");
+//}
+//void ViewManager::setLayoutTo_3DACS_1X3()
+//{
+//  changeLayout(LAYOUT_3DACS_1X3);
+////
+////  switch(mCurrentLayoutType)
+////  {
+////  case LAYOUT_NONE:
+////    this->activateLayout_3DACS_1X3();
+////    break;
+////  case LAYOUT_3D_1X1:
+////    this->deactivatLayout_3D_1X1();
+////    this->activateLayout_3DACS_1X3();
+////    break;
+////  case LAYOUT_3DACS_2X2:
+////    this->deactivateLayout_3DACS_2X2();
+////    this->activateLayout_3DACS_1X3();
+////    break;
+////  case LAYOUT_3DACS_1X3:
+////    break;
+////  case LAYOUT_ACSACS_2X3:
+////    this->deactivateLayout_ACSACS_2X3();
+////    this->activateLayout_3DACS_1X3();
+////    break;
+////  default:
+////    return;
+////    break;
+////  }
+////  messageManager()->sendInfo("Layout changed to 3DACS_1X3");
+//}
+//
+//void ViewManager::setLayoutTo_3DACS_2X2_SNW()
+//{
+//  changeLayout(LAYOUT_3DACS_2X2);
+//}
+//
+//void ViewManager::setLayoutTo_ACSACS_2X3()
+//{
+//  changeLayout(LAYOUT_ACSACS_2X3);
+////  switch(mCurrentLayoutType)
+////  {
+////  case LAYOUT_NONE:
+////    this->activateLayout_ACSACS_2X3();
+////    break;
+////  case LAYOUT_3D_1X1:
+////    this->deactivatLayout_3D_1X1();
+////    this->activateLayout_ACSACS_2X3();
+////    break;
+////  case LAYOUT_3DACS_2X2:
+////    this->deactivateLayout_3DACS_2X2();
+////    this->activateLayout_ACSACS_2X3();
+////    break;
+////  case LAYOUT_3DACS_1X3:
+////    this->deactivateLayout_3DACS_1X3();
+////    this->activateLayout_ACSACS_2X3();
+////    break;
+////  case LAYOUT_ACSACS_2X3:
+////    break;
+////  default:
+////    return;
+////    break;
+////  }
+////  messageManager()->sendInfo("Layout changed to ACSACS_2X3");
+//}
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
@@ -366,83 +487,147 @@ void ViewManager::deactivatLayout_3D_1X1()
   mView3DMap[mView3DNames[0]]->hide();
   mLayout->removeWidget(mView3DMap[mView3DNames[0]]);
 }
+
+void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan)
+{
+  mLayout->addWidget(view, row, col, rowSpan, colSpan );
+  view->show();
+}
+
+void ViewManager::deactivateView(ssc::View* view)
+{
+  view->hide();
+  mLayout->removeWidget(view);
+}
+
 void ViewManager::activateLayout_3DACS_2X2()
 {
-  mLayout->addWidget( mView3DMap[mView3DNames[0]],   0, 0 );
-  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
-  mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 0 );
-  mLayout->addWidget( mView2DMap[mView2DNames[2]],   1, 1 );
-  mView3DMap[mView3DNames[0]]->show();
-  mView2DMap[mView2DNames[0]]->show();
-  mView2DMap[mView2DNames[1]]->show();
-  mView2DMap[mView2DNames[2]]->show();
+  activateView(mView3DMap[mView3DNames[0]],   0, 0);
+  activateView(mView2DMap[mView2DNames[0]],   0, 1);
+  activateView(mView2DMap[mView2DNames[1]],   1, 0);
+  activateView(mView2DMap[mView2DNames[2]],   1, 1);
+
+//  mLayout->addWidget( mView3DMap[mView3DNames[0]],   0, 0 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 0 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[2]],   1, 1 );
+//  mView3DMap[mView3DNames[0]]->show();
+//  mView2DMap[mView2DNames[0]]->show();
+//  mView2DMap[mView2DNames[1]]->show();
+//  mView2DMap[mView2DNames[2]]->show();
 
   mCurrentLayoutType = LAYOUT_3DACS_2X2;
 }
 void ViewManager::deactivateLayout_3DACS_2X2()
 {
-  mView3DMap[mView3DNames[0]]->hide();
-  mView2DMap[mView2DNames[0]]->hide();
-  mView2DMap[mView2DNames[1]]->hide();
-  mView2DMap[mView2DNames[2]]->hide();
-  mLayout->removeWidget( mView3DMap[mView3DNames[0]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
+  deactivateView(mView3DMap[mView3DNames[0]]);
+  deactivateView(mView2DMap[mView2DNames[0]]);
+  deactivateView(mView2DMap[mView2DNames[1]]);
+  deactivateView(mView2DMap[mView2DNames[2]]);
+
+//  mView3DMap[mView3DNames[0]]->hide();
+//  mView2DMap[mView2DNames[0]]->hide();
+//  mView2DMap[mView2DNames[1]]->hide();
+//  mView2DMap[mView2DNames[2]]->hide();
+//  mLayout->removeWidget( mView3DMap[mView3DNames[0]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
 }
+
+void ViewManager::activateLayout_3DACS_2X2_SNW()
+{
+  activateView(mView3DMap[mView3DNames[0]],   0, 0);
+  activateView(mView2DMap[mView2DNames[6]],   0, 1);
+  activateView(mView2DMap[mView2DNames[7]],   1, 0);
+  activateView(mView2DMap[mView2DNames[8]],   1, 1);
+  mCurrentLayoutType = LAYOUT_3DACS_2X2_SNW;
+}
+void ViewManager::deactivateLayout_3DACS_2X2_SNW()
+{
+  deactivateView(mView3DMap[mView3DNames[0]]);
+  deactivateView(mView2DMap[mView2DNames[6]]);
+  deactivateView(mView2DMap[mView2DNames[7]]);
+  deactivateView(mView2DMap[mView2DNames[8]]);
+}
+
 void ViewManager::activateLayout_3DACS_1X3()
 {
-  mLayout->addWidget( mView3DMap[mView3DNames[0]],   0, 0, 3, 1 );
-  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
-  mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 1 );
-  mLayout->addWidget( mView2DMap[mView2DNames[2]],   2, 1 );
-  mView3DMap[mView3DNames[0]]->show();
-  mView2DMap[mView2DNames[0]]->show();
-  mView2DMap[mView2DNames[1]]->show();
-  mView2DMap[mView2DNames[2]]->show();
+  activateView(mView3DMap[mView3DNames[0]],   0, 0, 3, 1);
+  activateView(mView2DMap[mView2DNames[0]],   0, 1);
+  activateView(mView2DMap[mView2DNames[1]],   1, 1);
+  activateView(mView2DMap[mView2DNames[2]],   2, 1);
+//
+//  mLayout->addWidget( mView3DMap[mView3DNames[0]],   0, 0, 3, 1 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 1 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[2]],   2, 1 );
+//  mView3DMap[mView3DNames[0]]->show();
+//  mView2DMap[mView2DNames[0]]->show();
+//  mView2DMap[mView2DNames[1]]->show();
+//  mView2DMap[mView2DNames[2]]->show();
   mCurrentLayoutType = LAYOUT_3DACS_1X3;
 }
 void ViewManager::deactivateLayout_3DACS_1X3()
 {
-  mView3DMap[mView3DNames[0]]->hide();
-  mView2DMap[mView2DNames[0]]->hide();
-  mView2DMap[mView2DNames[1]]->hide();
-  mView2DMap[mView2DNames[2]]->hide();
-  mLayout->removeWidget( mView3DMap[mView3DNames[0]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
+  deactivateView(mView3DMap[mView3DNames[0]]);
+  deactivateView(mView2DMap[mView2DNames[0]]);
+  deactivateView(mView2DMap[mView2DNames[1]]);
+  deactivateView(mView2DMap[mView2DNames[2]]);
+
+//  mView3DMap[mView3DNames[0]]->hide();
+//  mView2DMap[mView2DNames[0]]->hide();
+//  mView2DMap[mView2DNames[1]]->hide();
+//  mView2DMap[mView2DNames[2]]->hide();
+//  mLayout->removeWidget( mView3DMap[mView3DNames[0]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
 }
 void ViewManager::activateLayout_ACSACS_2X3()
 {
-  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 0);
-  mLayout->addWidget( mView2DMap[mView2DNames[1]],   0, 1 );
-  mLayout->addWidget( mView2DMap[mView2DNames[2]],   0, 2 );
-  mLayout->addWidget( mView2DMap[mView2DNames[3]],   1, 0 );
-  mLayout->addWidget( mView2DMap[mView2DNames[4]],   1, 1 );
-  mLayout->addWidget( mView2DMap[mView2DNames[5]],   1, 2 );
-  mView2DMap[mView2DNames[0]]->show();
-  mView2DMap[mView2DNames[1]]->show();
-  mView2DMap[mView2DNames[2]]->show();
-  mView2DMap[mView2DNames[3]]->show();
-  mView2DMap[mView2DNames[4]]->show();
-  mView2DMap[mView2DNames[5]]->show();
+  activateView(mView2DMap[mView2DNames[0]],   0, 0);
+  activateView(mView2DMap[mView2DNames[1]],   0, 1);
+  activateView(mView2DMap[mView2DNames[2]],   0, 2);
+  activateView(mView2DMap[mView2DNames[3]],   1, 0);
+  activateView(mView2DMap[mView2DNames[4]],   1, 1);
+  activateView(mView2DMap[mView2DNames[5]],   1, 2);
+
+//  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 0);
+//  mLayout->addWidget( mView2DMap[mView2DNames[1]],   0, 1 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[2]],   0, 2 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[3]],   1, 0 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[4]],   1, 1 );
+//  mLayout->addWidget( mView2DMap[mView2DNames[5]],   1, 2 );
+//  mView2DMap[mView2DNames[0]]->show();
+//  mView2DMap[mView2DNames[1]]->show();
+//  mView2DMap[mView2DNames[2]]->show();
+//  mView2DMap[mView2DNames[3]]->show();
+//  mView2DMap[mView2DNames[4]]->show();
+//  mView2DMap[mView2DNames[5]]->show();
   mCurrentLayoutType = LAYOUT_ACSACS_2X3;
 }
 void ViewManager::deactivateLayout_ACSACS_2X3()
 {
-  mView2DMap[mView2DNames[0]]->hide();
-  mView2DMap[mView2DNames[1]]->hide();
-  mView2DMap[mView2DNames[2]]->hide();
-  mView2DMap[mView2DNames[3]]->hide();
-  mView2DMap[mView2DNames[4]]->hide();
-  mView2DMap[mView2DNames[5]]->hide();
-  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[3]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[4]]);
-  mLayout->removeWidget( mView2DMap[mView2DNames[5]]);
+  deactivateView(mView2DMap[mView2DNames[0]]);
+  deactivateView(mView2DMap[mView2DNames[1]]);
+  deactivateView(mView2DMap[mView2DNames[2]]);
+  deactivateView(mView2DMap[mView2DNames[3]]);
+  deactivateView(mView2DMap[mView2DNames[4]]);
+  deactivateView(mView2DMap[mView2DNames[5]]);
+
+//  mView2DMap[mView2DNames[0]]->hide();
+//  mView2DMap[mView2DNames[1]]->hide();
+//  mView2DMap[mView2DNames[2]]->hide();
+//  mView2DMap[mView2DNames[3]]->hide();
+//  mView2DMap[mView2DNames[4]]->hide();
+//  mView2DMap[mView2DNames[5]]->hide();
+//  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[3]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[4]]);
+//  mLayout->removeWidget( mView2DMap[mView2DNames[5]]);
 }
   
 /*void ViewManager::removeRepFromViews(ssc::RepPtr rep)

@@ -5,10 +5,13 @@
 #include <QObject>
 #include "cxForwardDeclarations.h"
 #include "sscData.h"
+#include "sscDefinitions.h"
 class QMenu;
 class QPoint;
 namespace cx
 {
+std::string planeToString(ssc::PLANE_TYPE val);
+
 /**
  * \class cxViewGroup.h
  *
@@ -40,6 +43,9 @@ protected:
   std::vector<ssc::View*> mViews;
 };
 
+/**
+ *
+ */
 class ViewGroupInria : public ViewGroup
 {
   Q_OBJECT
@@ -56,6 +62,10 @@ protected:
   int mStartIndex;
   ssc::ImagePtr mImage;
 };
+
+/**
+ *
+ */
 class ViewGroup3D : public ViewGroup
 {
   Q_OBJECT
@@ -74,6 +84,9 @@ protected:
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
 };
+
+/**
+ */
 class ViewGroup2D : public ViewGroup
 {
 public:
