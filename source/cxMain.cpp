@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
   app.setApplicationName("CustusX3");
   cx::MainWindow mainWin;
   mainWin.show();
+  mainWin.activateWindow();
+  mainWin.raise();
   int retVal = app.exec();
   return retVal;
   
