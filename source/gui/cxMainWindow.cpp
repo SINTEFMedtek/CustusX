@@ -335,32 +335,12 @@ void MainWindow::createActions()
   mLayoutActionGroup = new QActionGroup(this);
   mLayoutActionGroup->setExclusive(true);
   
-  addLayoutAction(ViewManager::LAYOUT_3D_1X1);
-  addLayoutAction(ViewManager::LAYOUT_3DACS_2X2)->setChecked(true);
-  addLayoutAction(ViewManager::LAYOUT_3DACS_1X3);
-  addLayoutAction(ViewManager::LAYOUT_ACSACS_2X3);
-  addLayoutAction(ViewManager::LAYOUT_3DACS_2X2_SNW);
+  std::vector<ViewManager::LayoutType> layouts = ViewManager::getInstance()->availableLayouts();
+  for (unsigned i=0; i<layouts.size(); ++i)
+    addLayoutAction(layouts[i]);
 
-//  m3D_1x1_LayoutAction = new QAction(tr("3D_1X1"), mLayoutActionGroup);
-//  m3DACS_2x2_LayoutAction = new QAction(tr("3DACS_2X2"), mLayoutActionGroup);
-//  m3DACS_1x3_LayoutAction = new QAction(tr("3DACS_1X3"), mLayoutActionGroup);
-//  mACSACS_2x3_LayoutAction = new QAction(tr("ACSACS_2X3"), mLayoutActionGroup);
-//
-//  m3D_1x1_LayoutAction->setCheckable(true);
-//  m3DACS_2x2_LayoutAction->setCheckable(true);
-//  m3DACS_1x3_LayoutAction->setCheckable(true);
-//  mACSACS_2x3_LayoutAction->setCheckable(true);
-//
-//  m3DACS_2x2_LayoutAction->setChecked(true);
-//
-//  connect(m3D_1x1_LayoutAction, SIGNAL(triggered()),
-//      mViewManager, SLOT(setLayoutTo_3D_1X1()));
-//  connect(m3DACS_2x2_LayoutAction, SIGNAL(triggered()),
-//      mViewManager, SLOT(setLayoutTo_3DACS_2X2()));
-//  connect(m3DACS_1x3_LayoutAction, SIGNAL(triggered()),
-//      mViewManager, SLOT(setLayoutTo_3DACS_1X3()));
-//  connect(mACSACS_2x3_LayoutAction, SIGNAL(triggered()),
-//      mViewManager, SLOT(setLayoutTo_ACSACS_2X3()));
+  connect(mViewManager, SIGNAL(layoutChanged()), this, SLOT(layoutChangedSlot()));
+  layoutChangedSlot();
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
@@ -377,12 +357,39 @@ void MainWindow::createActions()
           mContextDockWidget, SLOT(deleteCurrentImageSlot()));
 }
 
+/** Called when the layout is changed: update the layout menu
+ */
+void MainWindow::layoutChangedSlot()
+{
+  ViewManager::LayoutType type = mViewManager->currentLayout();
+  QList<QAction*> actions = mLayoutActionGroup->actions();
+  for (int i=0; i<actions.size(); ++i)
+  {
+    if (actions[i]->data().toInt()==static_cast<int>(type))
+      actions[i]->setChecked(true);
+  }
+}
+
+/** Called when a layout is selected: introspect the sending action
+ *  in order to get correct layout; set it.
+ */
+void MainWindow::setLayoutSlot()
+{
+  QAction* action = dynamic_cast<QAction*>(sender());
+  if (!action)
+    return;
+  ViewManager::LayoutType type = static_cast<ViewManager::LayoutType>(action->data().toInt());
+  mViewManager->changeLayout(type);
+}
+
+/** Add one layout as an action to the layout menu.
+ */
 QAction* MainWindow::addLayoutAction(ViewManager::LayoutType layout)
 {
   QAction* action = new QAction(qstring_cast(ViewManager::layoutText(layout)), mLayoutActionGroup);
   action->setCheckable(true);
   action->setData(QVariant(static_cast<int>(layout)));
-  connect(action, SIGNAL(triggered()), mViewManager, SLOT(setLayoutFromQActionSlot()));
+  connect(action, SIGNAL(triggered()), this, SLOT(setLayoutSlot()));
   return action;
 }
 

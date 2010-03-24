@@ -347,6 +347,23 @@ ViewGroup2D::ViewGroup2D(int startIndex, ssc::View* view1,
   }
 }
 
+/**Call this on an initialized view, when the plane type is changed.
+ *
+ */
+ssc::View* ViewGroup2D::initializeView(int index, ssc::PLANE_TYPE plane)
+{
+  if (index<0 || index>=(int)mElements.size())
+  {
+    messageManager()->sendError("invalid index in ViewGroup2D");
+  }
+
+  mElements[index].mOrientationAnnotationRep->setPlaneType(plane);
+  mElements[index].mPlaneTypeText->setText(0, planeToString(plane));
+  mElements[index].mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
+
+  return mViews[index];
+}
+
 ViewGroup2D::~ViewGroup2D()
 {
 

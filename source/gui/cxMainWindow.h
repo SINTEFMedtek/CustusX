@@ -100,6 +100,10 @@ protected slots:
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
 
+  // layout menu
+  void layoutChangedSlot();
+  void setLayoutSlot();
+
   //logging
   void loggingSlot(const QString& message, int timeout); ///< prints messages for debugging
   

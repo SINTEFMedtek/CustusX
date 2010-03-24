@@ -5,6 +5,7 @@
 #include <vector>
 #include <QObject>
 #include "sscImage.h"
+#include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
 class QGridLayout;
 class QWidget;
@@ -28,6 +29,7 @@ class ViewManager : public QObject
 {
   typedef std::map<std::string, View2D*> View2DMap;
   typedef std::map<std::string, View3D*> View3DMap;
+  typedef std::map<std::string, ssc::View*> ViewMap;
 
   Q_OBJECT
 public:
@@ -38,9 +40,13 @@ public:
     LAYOUT_3DACS_2X2,
     LAYOUT_3DACS_1X3,
     LAYOUT_ACSACS_2X3,
-    LAYOUT_3DACS_2X2_SNW
+    LAYOUT_3DACS_2X2_SNW,
+    LAYOUT_3DAny_1X2_SNW
   }; ///< the layout types available
   static std::string layoutText(LayoutType type);
+  std::vector<LayoutType> availableLayouts() const;
+  LayoutType currentLayout() const;
+  void changeLayout(LayoutType toType);
 
   static ViewManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
@@ -60,9 +66,9 @@ public:
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
   void fps(int number);///< Emits number of frames per second
+  void layoutChanged();
 
 public slots:
-  void setLayoutFromQActionSlot(); ///< set the layout using data from a QAction
   void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
   void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
   void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
@@ -76,22 +82,17 @@ protected:
   virtual ~ViewManager();
 
   void deactivateCurrentLayout();
-  void changeLayout(LayoutType toType);
   void activateLayout(LayoutType toType);
   void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);
+  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan=1, int colSpan=1);
   void deactivateView(ssc::View* view);
 
   void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
-  void deactivatLayout_3D_1X1(); ///< deactivate the 3D_1X1 layout
   void activateLayout_3DACS_2X2(); ///< activate the 3DACS_2X2 layout
-  void deactivateLayout_3DACS_2X2(); ///< deactivate the 3DACS_2X2 layout
   void activateLayout_3DACS_1X3(); ///< activate the 3DACS_1X3 layout
-  void deactivateLayout_3DACS_1X3(); ///< deactivate the 3DACS_1X3 layout
   void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
-  void deactivateLayout_ACSACS_2X3(); ///< deactivate the ACSACS_2X3 layout
-
+  void activateLayout_3DAny_1X2_SNW();
   void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
-  void deactivateLayout_3DACS_2X2_SNW(); ///< deactivate the 3DACS_2X2 layout
   //void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
@@ -106,6 +107,7 @@ protected:
   std::vector<std::string> mView2DNames;  ///< the name of all the 2D views
   View2DMap     mView2DMap;       ///< a map of all the 3D views
   View3DMap     mView3DMap;       ///< a map of all the 2D views
+  ViewMap       mViewMap;         ///< a map of all the views
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
   

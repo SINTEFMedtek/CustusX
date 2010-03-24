@@ -60,6 +60,7 @@ ViewManager::ViewManager() :
                               mMainWindowsCentralWidget);
     view->hide();
     mView3DMap[view->getUid()] = view;
+    mViewMap[view->getUid()] = view;
     
     //Turn off rendering in vtkRenderWindowInteractor
     view->getRenderWindow()->GetInteractor()->EnableRenderOff();
@@ -70,6 +71,7 @@ ViewManager::ViewManager() :
                               mMainWindowsCentralWidget);
     view->hide();
     mView2DMap[view->getUid()] = view;
+    mViewMap[view->getUid()] = view;
     
     //Turn off rendering in vtkRenderWindowInteractor
     view->getRenderWindow()->GetInteractor()->EnableRenderOff();
@@ -108,14 +110,32 @@ std::string ViewManager::layoutText(LayoutType type)
 {
   switch (type)
   {
-  case LAYOUT_NONE : return "No_layout";
-  case LAYOUT_3D_1X1 : return "3D_1X1";
-  case LAYOUT_3DACS_2X2 : return "3DACS_2X2";
-  case LAYOUT_3DACS_1X3 : return "3DACS_1X3";
-  case LAYOUT_ACSACS_2X3 : return "ACSACS_2X3";
+  case LAYOUT_NONE :          return "No_layout";
+  case LAYOUT_3D_1X1 :        return "3D_1X1";
+  case LAYOUT_3DACS_2X2 :     return "3DACS_2X2";
+  case LAYOUT_3DACS_1X3 :     return "3DACS_1X3";
+  case LAYOUT_ACSACS_2X3 :    return "ACSACS_2X3";
   case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
+  case LAYOUT_3DAny_1X2_SNW : return "3DAny_1X2_SNW";
   default: return "Undefined layout";
   }
+}
+
+std::vector<ViewManager::LayoutType> ViewManager::availableLayouts() const
+{
+  std::vector<LayoutType> retval;
+  retval.push_back(LAYOUT_3D_1X1);
+  retval.push_back(LAYOUT_3DACS_2X2);
+  retval.push_back(LAYOUT_3DACS_1X3);
+  retval.push_back(LAYOUT_ACSACS_2X3);
+  retval.push_back(LAYOUT_3DACS_2X2_SNW);
+  retval.push_back(LAYOUT_3DAny_1X2_SNW);
+  return retval;
+}
+
+ViewManager::LayoutType ViewManager::currentLayout() const
+{
+  return mCurrentLayoutType;
 }
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
@@ -182,28 +202,8 @@ View3D* ViewManager::get3DView(const std::string& uid)
  */
 void ViewManager::deactivateCurrentLayout()
 {
-  switch(mCurrentLayoutType)
-  {
-  case LAYOUT_NONE:
-    break;
-  case LAYOUT_3D_1X1:
-    this->deactivatLayout_3D_1X1();
-    break;
-  case LAYOUT_3DACS_2X2:
-    this->deactivateLayout_3DACS_2X2();
-    break;
-  case LAYOUT_3DACS_1X3:
-    this->deactivateLayout_3DACS_1X3();
-    break;
-  case LAYOUT_ACSACS_2X3:
-    this->deactivateLayout_ACSACS_2X3();
-    break;
-  case LAYOUT_3DACS_2X2_SNW:
-    this->deactivateLayout_3DACS_2X2_SNW();
-    break;
-  default:
-    break;
-  }
+  for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
+    deactivateView(iter->second);
 }
 
 /**Change layout from current to toType.
@@ -241,21 +241,15 @@ void ViewManager::activateLayout(LayoutType toType)
   case LAYOUT_3DACS_2X2_SNW:
     this->activateLayout_3DACS_2X2_SNW();
     break;
+  case LAYOUT_3DAny_1X2_SNW:
+    this->activateLayout_3DAny_1X2_SNW();
+    break;
   default:
     return;
     break;
   }
 
   messageManager()->sendInfo("Layout changed to "+ layoutText(mCurrentLayoutType));
-}
-
-void ViewManager::setLayoutFromQActionSlot()
-{
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (!action)
-    return;
-  LayoutType type = static_cast<LayoutType>(action->data().toInt());
-  changeLayout(type);
 }
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
@@ -293,11 +287,6 @@ void ViewManager::activateLayout_3D_1X1()
   mView3DMap[mView3DNames[0]]->show();
   mCurrentLayoutType = LAYOUT_3D_1X1;
 }
-void ViewManager::deactivatLayout_3D_1X1()
-{
-  mView3DMap[mView3DNames[0]]->hide();
-  mLayout->removeWidget(mView3DMap[mView3DNames[0]]);
-}
 
 void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan)
 {
@@ -314,6 +303,8 @@ void ViewManager::deactivateView(ssc::View* view)
 void ViewManager::activateLayout_3DACS_2X2()
 {
   activateView(mView3DMap[mView3DNames[0]],   0, 0);
+
+
   activateView(mView2DMap[mView2DNames[0]],   0, 1);
   activateView(mView2DMap[mView2DNames[1]],   1, 0);
   activateView(mView2DMap[mView2DNames[2]],   1, 1);
@@ -321,35 +312,38 @@ void ViewManager::activateLayout_3DACS_2X2()
   mCurrentLayoutType = LAYOUT_3DACS_2X2;
 }
 
-void ViewManager::deactivateLayout_3DACS_2X2()
-{
-  deactivateView(mView3DMap[mView3DNames[0]]);
-  deactivateView(mView2DMap[mView2DNames[0]]);
-  deactivateView(mView2DMap[mView2DNames[1]]);
-  deactivateView(mView2DMap[mView2DNames[2]]);
-}
-
 void ViewManager::activateLayout_3DACS_2X2_SNW()
 {
   activateView(mView3DMap[mView3DNames[0]],   0, 0);
-  activateView(mView2DMap[mView2DNames[6]],   0, 1);
-  activateView(mView2DMap[mView2DNames[7]],   1, 0);
-  activateView(mView2DMap[mView2DNames[8]],   1, 1);
+
+  activate2DView(0, 0, ssc::ptAXIAL,    0, 1);
+  activate2DView(0, 1, ssc::ptCORONAL,  1, 0);
+  activate2DView(0, 2, ssc::ptSAGITTAL, 1, 1);
 
   mCurrentLayoutType = LAYOUT_3DACS_2X2_SNW;
 }
 
-void ViewManager::deactivateLayout_3DACS_2X2_SNW()
+
+void ViewManager::activateLayout_3DAny_1X2_SNW()
 {
-  deactivateView(mView3DMap[mView3DNames[0]]);
-  deactivateView(mView2DMap[mView2DNames[6]]);
-  deactivateView(mView2DMap[mView2DNames[7]]);
-  deactivateView(mView2DMap[mView2DNames[8]]);
+  activateView(mView3DMap[mView3DNames[0]],   0, 0);
+
+  activate2DView(0, 0, ssc::ptANYPLANE, 0, 1);
+
+  mCurrentLayoutType = LAYOUT_3DAny_1X2_SNW;
+}
+
+void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
+{
+  //TODO must use group to access the correct viewgroup
+  ssc::View* view = mViewGroup2D1->initializeView(index, plane);
+  activateView(view, row, col, rowSpan, colSpan);
 }
 
 void ViewManager::activateLayout_3DACS_1X3()
 {
   activateView(mView3DMap[mView3DNames[0]],   0, 0, 3, 1);
+
   activateView(mView2DMap[mView2DNames[0]],   0, 1);
   activateView(mView2DMap[mView2DNames[1]],   1, 1);
   activateView(mView2DMap[mView2DNames[2]],   2, 1);
@@ -357,33 +351,17 @@ void ViewManager::activateLayout_3DACS_1X3()
   mCurrentLayoutType = LAYOUT_3DACS_1X3;
 }
 
-void ViewManager::deactivateLayout_3DACS_1X3()
-{
-  deactivateView(mView3DMap[mView3DNames[0]]);
-  deactivateView(mView2DMap[mView2DNames[0]]);
-  deactivateView(mView2DMap[mView2DNames[1]]);
-  deactivateView(mView2DMap[mView2DNames[2]]);
-}
-
 void ViewManager::activateLayout_ACSACS_2X3()
 {
   activateView(mView2DMap[mView2DNames[0]],   0, 0);
   activateView(mView2DMap[mView2DNames[1]],   0, 1);
   activateView(mView2DMap[mView2DNames[2]],   0, 2);
+
   activateView(mView2DMap[mView2DNames[3]],   1, 0);
   activateView(mView2DMap[mView2DNames[4]],   1, 1);
   activateView(mView2DMap[mView2DNames[5]],   1, 2);
 
   mCurrentLayoutType = LAYOUT_ACSACS_2X3;
-}
-void ViewManager::deactivateLayout_ACSACS_2X3()
-{
-  deactivateView(mView2DMap[mView2DNames[0]]);
-  deactivateView(mView2DMap[mView2DNames[1]]);
-  deactivateView(mView2DMap[mView2DNames[2]]);
-  deactivateView(mView2DMap[mView2DNames[3]]);
-  deactivateView(mView2DMap[mView2DNames[4]]);
-  deactivateView(mView2DMap[mView2DNames[5]]);
 }
   
 /*void ViewManager::removeRepFromViews(ssc::RepPtr rep)
@@ -398,17 +376,10 @@ void ViewManager::deactivateLayout_ACSACS_2X3()
   
 void ViewManager::renderAllViewsSlot()
 {
-  View3DMap::iterator it3D = mView3DMap.begin();
-  for(; it3D != mView3DMap.end(); ++it3D)
+  for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
   {
-    if(it3D->second->isVisible())
-      it3D->second->getRenderWindow()->Render();
-  }
-  View2DMap::iterator it2D = mView2DMap.begin();
-  for(; it2D != mView2DMap.end(); ++it2D)
-  {
-    if(it2D->second->isVisible())
-      it2D->second->getRenderWindow()->Render();
+    if(iter->second->isVisible())
+      iter->second->getRenderWindow()->Render();
   }
   
   if(mRenderingTime->elapsed()>1000)

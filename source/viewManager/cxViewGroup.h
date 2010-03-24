@@ -94,6 +94,8 @@ public:
       ssc::View* view2, ssc::View* view3);
   virtual ~ViewGroup2D();
 
+  ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
+
   virtual void setImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
