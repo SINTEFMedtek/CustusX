@@ -63,11 +63,6 @@ signals:
 
 public slots:
   void setLayoutFromQActionSlot(); ///< set the layout using data from a QAction
-//  void setLayoutTo_3D_1X1();    ///< sets the layout to 3D_1X1
-//  void setLayoutTo_3DACS_2X2(); ///< sets the layout to 3DACS_2X2
-//  void setLayoutTo_3DACS_1X3(); ///< sets the layout to 3DACS_1X3
-//  void setLayoutTo_ACSACS_2X3(); ///< sets the layout to 2X3
-//  void setLayoutTo_3DACS_2X2_SNW();
   void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
   void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
   void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene

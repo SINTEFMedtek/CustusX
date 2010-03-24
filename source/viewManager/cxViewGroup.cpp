@@ -38,28 +38,19 @@ std::string planeToString(ssc::PLANE_TYPE val)
   }
 }
 
-enum PLANE_TYPE
-{
-  ptNOPLANE,     ///< a initial plane, if no yet set
-  ptSAGITTAL,   ///< a slice seen from the side of the patient
-  ptCORONAL,    ///< a slice seen from the front of the patient
-  ptAXIAL,      ///< a slice seen from the top of the patient
-  ptANYPLANE,   ///< a plane aligned with the tool base plane
-  ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
-  ptRADIALPLANE, ///< y-rotated 90* relative to anyplane (bird's view)
-  ptCOUNT
-};
-
-
 ViewGroup::ViewGroup()
 {
 }
+
 ViewGroup::~ViewGroup()
-{}
+{
+}
+
 std::string ViewGroup::toString(int i) const
 {
   return QString::number(i).toStdString();
 }
+
 void ViewGroup::connectContextMenu()
 {
   for(unsigned int i=0;i<mViews.size();++i)
@@ -68,6 +59,7 @@ void ViewGroup::connectContextMenu()
        this, SLOT(contexMenuSlot(const QPoint &)));
   }
 }
+
 void ViewGroup::contexMenuSlot(const QPoint& point)
 {
   //NOT SUPPORTING MESHES IN 3D VIEW YET
@@ -113,6 +105,7 @@ void ViewGroup::contexMenuSlot(const QPoint& point)
 
     this->setImage(image);
 }
+
 ViewGroupInria::ViewGroupInria(int startIndex, ssc::View* view1,
     ssc::View* view2, ssc::View* view3) :
     mStartIndex(startIndex)
@@ -123,8 +116,10 @@ ViewGroupInria::ViewGroupInria(int startIndex, ssc::View* view1,
 
   this->connectContextMenu();
 }
+
 ViewGroupInria::~ViewGroupInria()
 {}
+
 void ViewGroupInria::setImage(ssc::ImagePtr image)
 {
   mImage = image;
@@ -138,8 +133,6 @@ void ViewGroupInria::setImage(ssc::ImagePtr image)
   inriaRep2D_1->setImage(mImage);
   inriaRep2D_2->setImage(mImage);
   inriaRep2D_3->setImage(mImage);
-
-//  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_"+toString(mStartIndex));
 
   if (!mImage)
   {
@@ -164,22 +157,8 @@ void ViewGroupInria::setImage(ssc::ImagePtr image)
   inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
   inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(mImage->getRefVtkImageData());
   inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-/*
-  //connecting proberep and inriareps
-  //this happens every time an image changed
-  //but its always the same proberep and inriareps we connect
-  //this should really only be done once
-  //TODO: maybe move this somewhere it«ll only be done once?
-  connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
-          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
-  connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-*/
 }
+
 void ViewGroupInria::removeImage(ssc::ImagePtr image)
 {
   if(mImage!=image)
@@ -192,19 +171,6 @@ void ViewGroupInria::removeImage(ssc::ImagePtr image)
   InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_"+toString(baseIndex+0));
   InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_"+toString(baseIndex+1));
   InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_"+toString(baseIndex+2));
-
-/*  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_"+toString(mStartIndex));
-
-  disconnect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
-          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
-  disconnect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  disconnect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  disconnect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-*/
-
 
   if(inriaRep2D_1->hasImage(mImage))
   {

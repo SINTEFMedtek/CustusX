@@ -33,53 +33,9 @@ View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent,
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 }
 View3D::~View3D()
-{}
-/*void View3D::contextMenuEvent(QContextMenuEvent *event)
 {
-  //NOT SUPPORTING MESHES IN 3D VIEW YET
+}
 
-    mContextMenu->clear();
-
-    //Get a list of available image and meshes names
-    std::map<std::string, std::string> imageUidsAndNames = mDataManager->getImageUidsAndNames();
-    std::map<std::string, std::string> meshUidsAndNames = mDataManager->getMeshUidsWithNames();
-
-    //Display the lists to the user
-    std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
-    while(imageIt != imageUidsAndNames.end())
-    {
-      const QString uid = imageIt->first.c_str();
-      const QString name = imageIt->second.c_str();
-      QAction* imageAction = new QAction(name, mContextMenu);
-      imageAction->setStatusTip(uid.toStdString().c_str());
-      mContextMenu->addAction(imageAction);
-      imageIt++;
-    }
-
-    //Find out which the user chose
-    //TODO: IMAGE OR MESH??? theAction->parent()?
-    QAction* theAction = mContextMenu->exec(event->globalPos());
-    if(!theAction)//this happens if you rightclick in the view and then don't select a action
-      return;
-  
-    QString imageName = theAction->text();
-    QString imageUid = theAction->statusTip();
-    ssc::ImagePtr image = mDataManager->getImage(imageUid.toStdString());
-  
-    if(!image)
-    {
-      std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View2D.";
-      messageManager()->sendError(error);
-      return;
-    }
-
-    //Make a volumetric rep out of the image
-    ssc::VolumetricRepPtr volumetricRep = mRepManager->getVolumetricRep("VolumetricRep_1");
-    volumetricRep->setImage(image);
-
-    //Show the rep in this view
-    this->setRep(volumetricRep);
-}*/
 void View3D::setCameraStyle(View3D::CameraStyle style, int offset)
 {
   if(mCameraStyle == style)

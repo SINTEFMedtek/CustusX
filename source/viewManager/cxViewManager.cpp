@@ -54,19 +54,6 @@ ViewManager::ViewManager() :
   for (unsigned i=0; i<mView2DNames.size(); ++i)
     mView2DNames[i] = "View2D_"+string_cast(i+1);
 
-//  mView3DNames[0] = "View3D_1";
-//  mView3DNames[1] = "View3D_2";
-//
-//  mView2DNames[0] = "View2D_1";
-//  mView2DNames[1] = "View2D_2";
-//  mView2DNames[2] = "View2D_3";
-//  mView2DNames[3] = "View2D_4";
-//  mView2DNames[4] = "View2D_5";
-//  mView2DNames[5] = "View2D_6";
-//  mView2DNames[6] = "View2D_7";
-//  mView2DNames[7] = "View2D_8";
-//  mView2DNames[8] = "View2D_9";
-
   for(int i=0; i<MAX_3DVIEWS; i++)
   {
     View3D* view = new View3D(mView3DNames[i], mView3DNames[i],
@@ -270,127 +257,6 @@ void ViewManager::setLayoutFromQActionSlot()
   LayoutType type = static_cast<LayoutType>(action->data().toInt());
   changeLayout(type);
 }
-
-//void ViewManager::setLayoutTo_3D_1X1()
-//{
-//  changeLayout(LAYOUT_3D_1X1);
-//
-////  switch(mCurrentLayoutType)
-////  {
-////  case LAYOUT_NONE:
-////    this->activateLayout_3D_1X1();
-////    break;
-////  case LAYOUT_3D_1X1:
-////    break;
-////  case LAYOUT_3DACS_2X2:
-////    this->deactivateLayout_3DACS_2X2();
-////    this->activateLayout_3D_1X1();
-////    break;
-////  case LAYOUT_3DACS_1X3:
-////    this->deactivateLayout_3DACS_1X3();
-////    this->activateLayout_3D_1X1();
-////    break;
-////  case LAYOUT_ACSACS_2X3:
-////    this->deactivateLayout_ACSACS_2X3();
-////    this->activateLayout_3D_1X1();
-////    break;
-////  default:
-////    return;
-////    break;
-////  }
-////  messageManager()->sendInfo("Layout changed to 3D_1X1");
-//}
-//void ViewManager::setLayoutTo_3DACS_2X2()
-//{
-//  changeLayout(LAYOUT_3DACS_2X2);
-////  switch(mCurrentLayoutType)
-////  {
-////  case LAYOUT_NONE:
-////    this->activateLayout_3DACS_2X2();
-////    break;
-////  case LAYOUT_3D_1X1:
-////    this->deactivatLayout_3D_1X1();
-////    this->activateLayout_3DACS_2X2();
-////    break;
-////  case LAYOUT_3DACS_2X2:
-////    break;
-////  case LAYOUT_3DACS_1X3:
-////    this->deactivateLayout_3DACS_1X3();
-////    this->activateLayout_3DACS_2X2();
-////    break;
-////  case LAYOUT_ACSACS_2X3:
-////    this->deactivateLayout_ACSACS_2X3();
-////    this->activateLayout_3DACS_2X2();
-////    break;
-////  default:
-////    return;
-////    break;
-////  }
-////  messageManager()->sendInfo("Layout changed to 3DACS_2X2");
-//}
-//void ViewManager::setLayoutTo_3DACS_1X3()
-//{
-//  changeLayout(LAYOUT_3DACS_1X3);
-////
-////  switch(mCurrentLayoutType)
-////  {
-////  case LAYOUT_NONE:
-////    this->activateLayout_3DACS_1X3();
-////    break;
-////  case LAYOUT_3D_1X1:
-////    this->deactivatLayout_3D_1X1();
-////    this->activateLayout_3DACS_1X3();
-////    break;
-////  case LAYOUT_3DACS_2X2:
-////    this->deactivateLayout_3DACS_2X2();
-////    this->activateLayout_3DACS_1X3();
-////    break;
-////  case LAYOUT_3DACS_1X3:
-////    break;
-////  case LAYOUT_ACSACS_2X3:
-////    this->deactivateLayout_ACSACS_2X3();
-////    this->activateLayout_3DACS_1X3();
-////    break;
-////  default:
-////    return;
-////    break;
-////  }
-////  messageManager()->sendInfo("Layout changed to 3DACS_1X3");
-//}
-//
-//void ViewManager::setLayoutTo_3DACS_2X2_SNW()
-//{
-//  changeLayout(LAYOUT_3DACS_2X2);
-//}
-//
-//void ViewManager::setLayoutTo_ACSACS_2X3()
-//{
-//  changeLayout(LAYOUT_ACSACS_2X3);
-////  switch(mCurrentLayoutType)
-////  {
-////  case LAYOUT_NONE:
-////    this->activateLayout_ACSACS_2X3();
-////    break;
-////  case LAYOUT_3D_1X1:
-////    this->deactivatLayout_3D_1X1();
-////    this->activateLayout_ACSACS_2X3();
-////    break;
-////  case LAYOUT_3DACS_2X2:
-////    this->deactivateLayout_3DACS_2X2();
-////    this->activateLayout_ACSACS_2X3();
-////    break;
-////  case LAYOUT_3DACS_1X3:
-////    this->deactivateLayout_3DACS_1X3();
-////    this->activateLayout_ACSACS_2X3();
-////    break;
-////  case LAYOUT_ACSACS_2X3:
-////    break;
-////  default:
-////    return;
-////    break;
-////  }
-////  messageManager()->sendInfo("Layout changed to ACSACS_2X3");
-//}
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
@@ -399,61 +265,6 @@ void ViewManager::deleteImageSlot(ssc::ImagePtr image)
     it->second->removeImage(image);
   }
 
-/*  messageManager()->sendInfo("Delete image: "+image->getName());
-  RepManager* repManager = RepManager::getInstance();
-  VolumetricRepMap* volRepMap = repManager->getVolumetricReps();
-  VolumetricRepMap::iterator itVolRep = volRepMap->begin();
-  for(; itVolRep != volRepMap->end(); ++itVolRep)
-    if(itVolRep->second->hasImage(image))
-      this->removeRepFromViews(itVolRep->second);*/
-  
-  /*InriaRep3DMap* inria3DRepMap = repManager->getInria3DReps();
-  InriaRep3DMap::iterator itInria3DRep = inria3DRepMap->begin();
-  for(; itInria3DRep != inria3DRepMap->end(); ++itInria3DRep)
-    if(itInria3DRep->second->hasImage(image))
-      this->removeRepFromViews(itInria3DRep->second);*/
-  
-  /*InriaRep2DMap* inria2DRepMap = repManager->getInria2DReps();
-  InriaRep2DMap::iterator itInria2DRep = inria2DRepMap->begin();
-  for(; itInria2DRep != inria2DRepMap->end(); ++itInria2DRep)
-    if(itInria2DRep->second->hasImage(image))
-      this->removeRepFromViews(itInria2DRep->second);*/
-  
-/*  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");*/
-  
-  //Don't work?
-  //if(inriaRep2D_1->getVtkViewImage2D()->HasDataSet(image->getRefVtkImageData()))
-/*  if(inriaRep2D_1->hasImage(image))
-  {  
-    View2D* view2D_1 = mView2DMap[mView2DNames[0]];
-    View2D* view2D_2 = mView2DMap[mView2DNames[1]];
-    View2D* view2D_3 = mView2DMap[mView2DNames[2]];
-    view2D_1->removeRep(inriaRep2D_1);
-    view2D_2->removeRep(inriaRep2D_2);
-    view2D_3->removeRep(inriaRep2D_3);
-    //Don't work?
-    inriaRep2D_1->getVtkViewImage2D()->SyncRemoveDataSet(image->getRefVtkImageData());
-    
-    // Test: create small dummy data set with one voxel
-    vtkImageDataPtr dummyImageData = vtkImageData::New();
-    dummyImageData->SetExtent(0,0,0,0,0,0);
-    dummyImageData->SetSpacing(1,1,1);
-    //dummyImageData->SetScalarTypeToUnsignedShort();
-    dummyImageData->SetScalarTypeToUnsignedChar();
-    dummyImageData->SetNumberOfScalarComponents(1);
-    dummyImageData->AllocateScalars();
-    unsigned char* dataPtr = static_cast<unsigned char*>(dummyImageData->GetScalarPointer());
-    dataPtr = 0;//Set voxel to black
-    inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(dummyImageData);
-    inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-    
-    //this->renderAllViewsSlot();
-    //inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
-    emit imageDeletedFromViews(image);
-    messageManager()->sendInfo("Removed current image from inria views");
-  }*/
   emit imageDeletedFromViews(image);
 }
 
@@ -507,32 +318,15 @@ void ViewManager::activateLayout_3DACS_2X2()
   activateView(mView2DMap[mView2DNames[1]],   1, 0);
   activateView(mView2DMap[mView2DNames[2]],   1, 1);
 
-//  mLayout->addWidget( mView3DMap[mView3DNames[0]],   0, 0 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 0 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[2]],   1, 1 );
-//  mView3DMap[mView3DNames[0]]->show();
-//  mView2DMap[mView2DNames[0]]->show();
-//  mView2DMap[mView2DNames[1]]->show();
-//  mView2DMap[mView2DNames[2]]->show();
-
   mCurrentLayoutType = LAYOUT_3DACS_2X2;
 }
+
 void ViewManager::deactivateLayout_3DACS_2X2()
 {
   deactivateView(mView3DMap[mView3DNames[0]]);
   deactivateView(mView2DMap[mView2DNames[0]]);
   deactivateView(mView2DMap[mView2DNames[1]]);
   deactivateView(mView2DMap[mView2DNames[2]]);
-
-//  mView3DMap[mView3DNames[0]]->hide();
-//  mView2DMap[mView2DNames[0]]->hide();
-//  mView2DMap[mView2DNames[1]]->hide();
-//  mView2DMap[mView2DNames[2]]->hide();
-//  mLayout->removeWidget( mView3DMap[mView3DNames[0]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
 }
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
@@ -541,8 +335,10 @@ void ViewManager::activateLayout_3DACS_2X2_SNW()
   activateView(mView2DMap[mView2DNames[6]],   0, 1);
   activateView(mView2DMap[mView2DNames[7]],   1, 0);
   activateView(mView2DMap[mView2DNames[8]],   1, 1);
+
   mCurrentLayoutType = LAYOUT_3DACS_2X2_SNW;
 }
+
 void ViewManager::deactivateLayout_3DACS_2X2_SNW()
 {
   deactivateView(mView3DMap[mView3DNames[0]]);
@@ -557,33 +353,18 @@ void ViewManager::activateLayout_3DACS_1X3()
   activateView(mView2DMap[mView2DNames[0]],   0, 1);
   activateView(mView2DMap[mView2DNames[1]],   1, 1);
   activateView(mView2DMap[mView2DNames[2]],   2, 1);
-//
-//  mLayout->addWidget( mView3DMap[mView3DNames[0]],   0, 0, 3, 1 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 1 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[1]],   1, 1 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[2]],   2, 1 );
-//  mView3DMap[mView3DNames[0]]->show();
-//  mView2DMap[mView2DNames[0]]->show();
-//  mView2DMap[mView2DNames[1]]->show();
-//  mView2DMap[mView2DNames[2]]->show();
+
   mCurrentLayoutType = LAYOUT_3DACS_1X3;
 }
+
 void ViewManager::deactivateLayout_3DACS_1X3()
 {
   deactivateView(mView3DMap[mView3DNames[0]]);
   deactivateView(mView2DMap[mView2DNames[0]]);
   deactivateView(mView2DMap[mView2DNames[1]]);
   deactivateView(mView2DMap[mView2DNames[2]]);
-
-//  mView3DMap[mView3DNames[0]]->hide();
-//  mView2DMap[mView2DNames[0]]->hide();
-//  mView2DMap[mView2DNames[1]]->hide();
-//  mView2DMap[mView2DNames[2]]->hide();
-//  mLayout->removeWidget( mView3DMap[mView3DNames[0]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
 }
+
 void ViewManager::activateLayout_ACSACS_2X3()
 {
   activateView(mView2DMap[mView2DNames[0]],   0, 0);
@@ -593,18 +374,6 @@ void ViewManager::activateLayout_ACSACS_2X3()
   activateView(mView2DMap[mView2DNames[4]],   1, 1);
   activateView(mView2DMap[mView2DNames[5]],   1, 2);
 
-//  mLayout->addWidget( mView2DMap[mView2DNames[0]],   0, 0);
-//  mLayout->addWidget( mView2DMap[mView2DNames[1]],   0, 1 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[2]],   0, 2 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[3]],   1, 0 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[4]],   1, 1 );
-//  mLayout->addWidget( mView2DMap[mView2DNames[5]],   1, 2 );
-//  mView2DMap[mView2DNames[0]]->show();
-//  mView2DMap[mView2DNames[1]]->show();
-//  mView2DMap[mView2DNames[2]]->show();
-//  mView2DMap[mView2DNames[3]]->show();
-//  mView2DMap[mView2DNames[4]]->show();
-//  mView2DMap[mView2DNames[5]]->show();
   mCurrentLayoutType = LAYOUT_ACSACS_2X3;
 }
 void ViewManager::deactivateLayout_ACSACS_2X3()
@@ -615,19 +384,6 @@ void ViewManager::deactivateLayout_ACSACS_2X3()
   deactivateView(mView2DMap[mView2DNames[3]]);
   deactivateView(mView2DMap[mView2DNames[4]]);
   deactivateView(mView2DMap[mView2DNames[5]]);
-
-//  mView2DMap[mView2DNames[0]]->hide();
-//  mView2DMap[mView2DNames[1]]->hide();
-//  mView2DMap[mView2DNames[2]]->hide();
-//  mView2DMap[mView2DNames[3]]->hide();
-//  mView2DMap[mView2DNames[4]]->hide();
-//  mView2DMap[mView2DNames[5]]->hide();
-//  mLayout->removeWidget( mView2DMap[mView2DNames[0]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[1]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[2]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[3]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[4]]);
-//  mLayout->removeWidget( mView2DMap[mView2DNames[5]]);
 }
   
 /*void ViewManager::removeRepFromViews(ssc::RepPtr rep)
@@ -672,85 +428,5 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
   {
     it->second->setImage(currentImage);
   }
-  /*RepManager* repManager = RepManager::getInstance();
-  
-  // Update 2D views
-  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_1");
-  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_2");
-  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_3");
-  inriaRep2D_1->setImage(currentImage);
-  inriaRep2D_2->setImage(currentImage);
-  inriaRep2D_3->setImage(currentImage);
-  View2D* view2D_1 = mView2DMap[mView2DNames[0]];
-  View2D* view2D_2 = mView2DMap[mView2DNames[1]];
-  View2D* view2D_3 = mView2DMap[mView2DNames[2]];
-  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_1");
-  
-  if (!currentImage)
-  {
-    return;
-  }
-  if (!currentImage->getRefVtkImageData().GetPointer())
-  {
-    messageManager()->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
-    return;
-  }
-  
-  // Update 3D view
-  ssc::VolumetricRepPtr volumetricRep
-  = repManager->getVolumetricRep("VolumetricRep_1");
-  LandmarkRepPtr landmarkRep = repManager->getLandmarkRep("LandmarkRep_1");
-  
-   //Set these when image is deleted?
-  volumetricRep->setImage(currentImage);
-  probeRep->setImage(currentImage);
-  landmarkRep->setImage(currentImage);
-  
-  //Shading
-  if(mShadingOn)
-    volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-  
-  View3D* view3D_1 = mView3DMap[mView3DNames[0]];
-  view3D_1->setRep(volumetricRep);
-  view3D_1->getRenderer()->ResetCamera();
-  if(view3D_1->isVisible())
-    view3D_1->getRenderWindow()->Render();
-
-  view2D_1->setRep(inriaRep2D_1);
-  view2D_2->setRep(inriaRep2D_2);
-  view2D_3->setRep(inriaRep2D_3);
-  
-  //test: Is render set?
-  if (inriaRep2D_1->getVtkViewImage2D()->GetRenderer() == NULL)
-    std::cout << "inriaRep2D_1: Lost renderer" << std::endl;
-  if (inriaRep2D_2->getVtkViewImage2D()->GetRenderer() == NULL)
-    std::cout << "inriaRep2D_2: Lost renderer" << std::endl;
-  if (inriaRep2D_3->getVtkViewImage2D()->GetRenderer() == NULL)
-    std::cout << "inriaRep2D_3: Lost renderer" << std::endl;
-  
-  inriaRep2D_1->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::AXIAL_ID);
-  inriaRep2D_2->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::CORONAL_ID);
-  inriaRep2D_3->getVtkViewImage2D()->SetOrientation(vtkViewImage2D::SAGITTAL_ID);
-  inriaRep2D_1->getVtkViewImage2D()->AddChild(inriaRep2D_2->getVtkViewImage2D());
-  inriaRep2D_2->getVtkViewImage2D()->AddChild(inriaRep2D_3->getVtkViewImage2D());
-  inriaRep2D_3->getVtkViewImage2D()->AddChild(inriaRep2D_1->getVtkViewImage2D());
-  inriaRep2D_1->getVtkViewImage2D()->SyncRemoveAllDataSet();
-  //TODO: ...or getBaseVtkImageData()???
-  inriaRep2D_1->getVtkViewImage2D()->SyncAddDataSet(currentImage->getRefVtkImageData());
-  inriaRep2D_1->getVtkViewImage2D()->SyncReset();
-  
-  //connecting proberep and inriareps
-  //this happens every time an image changed
-  //but its always the same proberep and inriareps we connect
-  //this should really only be done once
-  //TODO: maybe move this somewhere it«ll only be done once?
-  connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),
-          inriaRep2D_1.get(), SLOT(syncSetPosition(double,double,double)));
-  connect(inriaRep2D_1.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  connect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
-  connect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),
-          probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));*/
 }	
 }//namespace cx
