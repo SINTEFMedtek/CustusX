@@ -61,6 +61,9 @@ public:
 signals:
   void transformChanged(); ///< emitted when transform is changed
 
+protected slots:
+  virtual void transformChangedSlot() {}
+
 protected:
 	std::string mUid;
 	std::string mName;

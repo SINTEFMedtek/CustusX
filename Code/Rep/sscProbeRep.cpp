@@ -74,7 +74,7 @@ void ProbeRep::setResolution(const int resolution)
  */
 Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer)
 {
-	std::cout << "ProbeRep::pickLandmark" << std::endl;
+	//std::cout << "ProbeRep::pickLandmark" << std::endl;
 	//Get camera position and focal point in world coordinates
 	vtkCamera* camera = renderer->GetActiveCamera();
 	Vector3D cameraPosition(camera->GetPosition());
@@ -99,6 +99,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	Vector3D worldClickPoint(worldCoords[0]/worldCoords[3],
 							 worldCoords[1]/worldCoords[3],
 							 worldCoords[2]/worldCoords[3]);
+	std::cout << "ProbeRep::pickLandmark: click:<"<<clickPosition<<"> world:<"<< worldClickPoint<<">"<< std::endl;
 
 	//Compute the direction of the probe ray
 	Vector3D probeRayDirection;
@@ -115,7 +116,11 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	Vector3D p1 = worldClickPoint + probeRayDirection * (clipRange[1] - cam2click);
 
 	Vector3D intersection;
-	this->intersectData(p0, p1, intersection);
+	if (!this->intersectData(p0, p1, intersection))
+	{
+	  std::cout << "No intersection with data found." << std::endl;
+	  return intersection;
+	}
 
 	//TODO: we need to know the result of this outside this function, so we know
 	//if the point should be made permanent or not
@@ -143,7 +148,7 @@ void ProbeRep::makeLandmarkPermanent(unsigned int index)
 }
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
+//  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren =
 		vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
@@ -157,8 +162,9 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	if(mCurrentRenderer == NULL)
 		return;
 
-  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
+//  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
+  std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
 	this->pickLandmark(clickPoint, mCurrentRenderer);
 }
 /**
@@ -168,17 +174,17 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
-  std::cout << "ProbeRep::showTemporaryPointSlot B" << std::endl;
+//  std::cout << "ProbeRep::showTemporaryPointSlot B" << std::endl;
   if(mCurrentRenderer == NULL)
     return;
 
   if(mPickedPointActor == NULL )
   {
-    vtkSphereSourcePtr pickedPointSphereSource = vtkSphereSource::New();
+    vtkSphereSourcePtr pickedPointSphereSource = vtkSphereSourcePtr::New();
     pickedPointSphereSource->SetRadius(2);
-    vtkPolyDataMapperPtr pickedPointMapper = vtkPolyDataMapper::New();
+    vtkPolyDataMapperPtr pickedPointMapper = vtkPolyDataMapperPtr::New();
     pickedPointMapper->SetInputConnection(pickedPointSphereSource->GetOutputPort());
-    mPickedPointActor = vtkActor::New();
+    mPickedPointActor = vtkActorPtr::New();
     mPickedPointActor->SetMapper(pickedPointMapper);
     mPickedPointActor->GetProperty()->SetColor(0,1,0);
   }
@@ -194,8 +200,9 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mPickedPoint[0] = x;
   mPickedPoint[1] = y;
   mPickedPoint[2] = z;
+  std::cout << "ProbeRep::showTemporaryPointSlot: pickpos = " << mPickedPoint << std::endl;
   emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
-  std::cout << "ProbeRep::showTemporaryPointSlot E" << std::endl;
+//  std::cout << "ProbeRep::showTemporaryPointSlot E" << std::endl;
 }
 /**
  * @param threshold sets a threshold for the probing ray
@@ -245,6 +252,7 @@ vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& 
  */
 bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
+  std::cout << "ProbeRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
 	//Creating the line from the camera through the picked point into the volume
 	vtkLineSourcePtr lineSource = vtkLineSource::New();
 	lineSource->SetPoint1(p0.begin());

@@ -14,6 +14,7 @@ Data::Data(const std::string& uid, const std::string& name) :
 {
   m_rMd_History.reset(new ssc::RegistrationHistory() );
   connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
+  connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));
 }
 /*
 Data::Data(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData) : 

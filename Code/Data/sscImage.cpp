@@ -29,12 +29,21 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 	mBaseImageData(data),
 	mLandmarks(vtkDoubleArrayPtr::New())
 {
-	mOutputImageData = mBaseImageData;
 	mLandmarks->SetNumberOfComponents(4);
-	mOutputImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
+	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	//mAlpha = 0.5; 
 	//mTreshold = 1.0;
 	
+	// provide a resampled volume for algorithms requiring that (such as proberep)
+	mOrientatorMatrix = vtkMatrix4x4Ptr::New();
+	mOrientator = vtkImageReslicePtr::New();
+	mOrientator->SetInput(mBaseImageData);
+	mOrientator->SetInterpolationModeToLinear();
+	mOrientator->SetOutputDimensionality( 3);
+	mOrientator->SetResliceAxes(mOrientatorMatrix);
+	mOrientator->AutoCropOutputOn();
+	mReferenceImageData = mOrientator->GetOutput();
+
 	// Add initial values to the transfer functions
 	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
 	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
@@ -60,12 +69,22 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
 //	}
 //}
 
+void Image::transformChangedSlot()
+{
+  Transform3D rMd = get_rMd();
+  mOrientatorMatrix->DeepCopy(rMd.inv().matrix());
+  mReferenceImageData->Update();
+  std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
+}
+
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
 	//std::cout << "Image::setVtkImageData() " << std::endl;
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
-	mOutputImageData = mBaseImageData;
+  mOrientator->SetInput(mBaseImageData);
+
+	//mOutputImageData = mBaseImageData;
 	mImageTransferFunctions3D->setVtkImageData(data);
 	mImageLookupTable2D->setVtkImageData(data);
 
@@ -111,7 +130,9 @@ vtkImageDataPtr Image::getBaseVtkImageData()
 }
 vtkImageDataPtr Image::getRefVtkImageData()
 {
-	return mOutputImageData;
+  //return mBaseImageData;
+  mReferenceImageData->Update();
+	return mReferenceImageData;
 }
 vtkDoubleArrayPtr Image::getLandmarks()
 {
@@ -189,8 +210,8 @@ void Image::printLandmarks()
 }
 DoubleBoundingBox3D Image::boundingBox() const
 {
-	mOutputImageData->UpdateInformation();
-	DoubleBoundingBox3D bounds(mOutputImageData->GetBounds());
+  mBaseImageData->UpdateInformation();
+	DoubleBoundingBox3D bounds(mBaseImageData->GetBounds());
 	return bounds;
 }
 vtkImageAccumulatePtr Image::getHistogram()
@@ -321,51 +342,4 @@ void Image::parseXml(QDomNode& dataNode)
 	while(!landmarkNode.isNull());
 }
 
-//struct InternalData
-//{
-//	vtkImageDataPtr volume;
-//	vtkUnsignedCharArrayPtr lut;
-//    bool operator==(const CGFrame& f) const
-//    {
-//    	return (a.volume==b.volume && a.lut==b.lut)    	
-//    }
-//    bool operator!=(const CGFrame& f) const;
-//};
-//
-//class FPUImageBufferRepository
-//{
-//private:
-//	
-//public:
-//	static FPUImageBufferRepository* getInstance()
-//	{
-//		if (!mInstance)
-//		{
-//			mInstance = new FPUImageBufferRepository();
-//		}
-//		return mInstance;
-//	}
-//	
-//	GPUImageBufferPtr getGPUImageBuffer(vtkImageDataPtr volume, vtkUnsignedCharArrayPtr lut)
-//	{
-//		
-//	}
-//		
-//private:
-//	static FPUImageBufferRepository* mInstance;
-//};
-//FPUImageBufferRepository* FPUImageBufferRepository::mInstance = NULL;
-
-//GPUImageBufferPtr Image::getGPUBuffer()
-//{
-//	GPUImageBufferPtr retval = mBuffer.lock();
-//	if (!retval)
-//	{
-//		retval = createGPUImageBuffer(
-//				getGrayScaleBaseVtkImageData(), 
-//				getLookupTable2D()->getBaseLookupTable()->GetTable());
-//		mBuffer = retval;
-//	}
-//	return retval;
-//}
 } // namespace ssc

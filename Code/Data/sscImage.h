@@ -84,6 +84,7 @@ public slots:
 	
 protected slots:
 	void transferFunctionsChangedSlot();
+  virtual void transformChangedSlot();
 
 protected:
 	ImageTF3DPtr mImageTransferFunctions3D;
@@ -92,10 +93,10 @@ protected:
 	vtkImageDataPtr mBaseImageData; ///< image data in data space
 	vtkImageDataPtr mBaseGrayScaleImageData; ///< image data in data space
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
-	vtkImageDataPtr mOutputImageData; ///< imagedata after filtering through the orientatior, given in reference space
+	vtkMatrix4x4Ptr mOrientatorMatrix;
+	vtkImageDataPtr mReferenceImageData; ///< imagedata after filtering through the orientatior, given in reference space
 	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark), in reference space (r-space)
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
-//	GPUImageBufferWeakPtr mBuffer; 
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;
