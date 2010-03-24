@@ -41,48 +41,67 @@ OrientationAnnotationRep::~OrientationAnnotationRep()
 }
 void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type )
 {
-	if (ptSAGITTAL == type)
+  switch (type)
+  {
+  case ptSAGITTAL:
 	{
 		mNorthAnnotation = "S";
 		mSouthAnnotation = "I";
 		mEastAnnotation = "P";
 		mWestAnnotation = "A";
+		break;
 	}
-	if (ptCORONAL == type)
+  case ptCORONAL:
 	{
 		mNorthAnnotation = "S";
 		mSouthAnnotation = "I" ;
 		mEastAnnotation = "R" ;
 		mWestAnnotation = "L";
+		break;
 	}
-	if (ptAXIAL == type)
+  case ptAXIAL:
 	{
 		mNorthAnnotation = "A";
 		mSouthAnnotation = "P";
 		mEastAnnotation = "R";
 		mWestAnnotation = "L";
+		break;
 	}
+  default:
+  {
+    mNorthAnnotation = "";
+    mSouthAnnotation = "";
+    mEastAnnotation = "";
+    mWestAnnotation = "";
+  }
+  }
+
+  createAnnotation();
 }
+
 void OrientationAnnotationRep::addRepActorsToViewRenderer(ssc::View* view)
 {
-	createAnnotation( view->getRenderer() );
+	createAnnotation();
+	view->getRenderer()->AddActor(mOrientation);
 }
+
 void OrientationAnnotationRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	view->getRenderer()->RemoveActor(mOrientation);
 }
 
-void OrientationAnnotationRep::createAnnotation(vtkRendererPtr render)
+void OrientationAnnotationRep::createAnnotation()
 {
-	mOrientation = OrientationAnnotationPtr::New();
-	mOrientation->SetNonlinearFontScaleFactor (0.35 );
-	mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039 );
+  if (!mOrientation)
+  {
+    mOrientation = OrientationAnnotationPtr::New();
+    mOrientation->SetNonlinearFontScaleFactor (0.35 );
+    mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039 );
+  }
 	mOrientation->SetText(0, mEastAnnotation.c_str() );
 	mOrientation->SetText(1, mNorthAnnotation.c_str() );
 	mOrientation->SetText(2, mWestAnnotation.c_str() );
 	mOrientation->SetText(3, mSouthAnnotation.c_str() );
-	render->AddActor(mOrientation);
-
 }
 
 OrientationAnnotation::OrientationAnnotation()

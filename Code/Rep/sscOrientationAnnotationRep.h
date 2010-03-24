@@ -38,7 +38,7 @@ protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 	
-	void createAnnotation(vtkRendererPtr render);
+	void createAnnotation();
 	
 	OrientationAnnotationPtr mOrientation;
 
