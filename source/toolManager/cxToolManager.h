@@ -4,6 +4,7 @@
 #include "sscToolManager.h"
 #include "itkCommand.h"
 #include "vtkSmartPointer.h"
+#include "sscManualTool.h"
 #include "cxTool.h"
 #include "cxTracker.h"
 
@@ -71,6 +72,8 @@ public:
 
   void addXml(QDomNode& parentNode); ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
+
+  ssc::ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
 
 public slots:
   virtual void configure(); ///< sets up the software like the xml file suggests
@@ -148,6 +151,7 @@ protected:
   ssc::ToolManager::ToolMapPtr  mConnectedTools;  ///< all connected tools
   ssc::ToolPtr                  mDominantTool;    ///< the tool with highest priority
   ssc::ToolPtr                  mReferenceTool;   ///< the tool which is used as patient reference tool
+  ssc::ManualToolPtr            mManualTool;      ///< a mouse-controllable virtual tool that is available even when not tracking.
 
   ssc::RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 

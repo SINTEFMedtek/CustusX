@@ -12,8 +12,9 @@ class QPoint;
 namespace cx
 {
 
-class ViewWrapper
+class ViewWrapper : public QObject
 {
+  Q_OBJECT
 public:
   virtual ~ViewWrapper() {}
   virtual void initializePlane(ssc::PLANE_TYPE plane) {}

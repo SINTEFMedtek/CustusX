@@ -54,7 +54,14 @@ ToolManager::ToolManager() :
 	mPulseGenerator->RequestStart();
 
 	mToolSamples->SetNumberOfComponents(4);
+
+	// added by CA for testing: Janne must check
+	mManualTool.reset(new ssc::ManualTool("tool_manual"));
+	(*mConfiguredTools)["tool_manual"] = mManualTool;
+	mManualTool->setVisible(true);
+	setDominantTool("tool_manual");
 }
+
 ToolManager::~ToolManager()
 {
 }
@@ -817,5 +824,9 @@ ssc::RegistrationHistoryPtr ToolManager::get_rMpr_History()
   return m_rMpr_History;
 }
 
+ssc::ManualToolPtr ToolManager::getManualTool()
+{
+  return mManualTool;
+}
 
 }//namespace cx

@@ -2,6 +2,7 @@
 
 #include "cxMessageManager.h"
 #include "cxToolManager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -100,6 +101,9 @@ RepManager::RepManager() :
     ProbeRepPtr probeRep(ProbeRep::New(mProbeRepNames[i],
         mProbeRepNames[i]));
     mProbeRepMap[probeRep->getUid()] = probeRep;
+
+    connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
+
   }
   for(int i=0; i<MAX_LANDMARKREPS; i++)
   {
@@ -131,6 +135,16 @@ RepManager::RepManager() :
   connect(ToolManager::getInstance(), SIGNAL(dominantToolChanged(const std::string&)),
           this, SLOT(dominantToolChangedSlot(const std::string&)));
 }
+
+void RepManager::probeRepPointPickedSlot(double x,double y,double z)
+{
+  //TODO check spaces....
+  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
+  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  DataManager::getInstance()->setCenter(p_r);
+  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+}
+
 RepManager::~RepManager()
 {}
 std::vector<std::pair<std::string, std::string> > RepManager::getRepUidsAndNames()
@@ -359,6 +373,8 @@ void RepManager::dominantToolChangedSlot(const std::string& toolUid)
   mConnectedTool = dominantTool;
   connect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
           this, SLOT(receiveToolTransfromAndTimeStampSlot(Transform3D, double)));
+
+
 }
 void RepManager::receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double timestamp)
 {

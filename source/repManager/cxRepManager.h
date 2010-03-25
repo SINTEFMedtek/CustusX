@@ -76,6 +76,7 @@ public:
   ssc::GeometricRepPtr getGeometricRep(const std::string& uid); ///<  get one specific Geometric rep
 
 protected slots:
+  void probeRepPointPickedSlot(double x,double y,double z);
   void syncInria2DRepsSlot(double x,double y,double z); ///< updates the inria2dreps with a new position on mouseclick and tooltransform
   void dominantToolChangedSlot(const std::string& toolUid); ///< makes sure the inriareps are connected to the right tool
   void receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double timestamp); ///< listens for new transforms from the tool

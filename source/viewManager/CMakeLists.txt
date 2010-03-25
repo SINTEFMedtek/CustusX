@@ -3,6 +3,8 @@ SET (LIB viewManager)
 SET( CX_QT_MOC_HEADER_FILES
 	cxView2D.h
 	cxView3D.h
+    cxViewWrapper2D.h
+    cxViewWrapper3D.h
 	cxViewManager.h
 	cxViewGroup.h
 )
