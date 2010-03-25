@@ -8,9 +8,22 @@
 #include "sscDefinitions.h"
 class QMenu;
 class QPoint;
+
 namespace cx
 {
-std::string planeToString(ssc::PLANE_TYPE val);
+
+class ViewWrapper
+{
+public:
+  virtual ~ViewWrapper() {}
+  virtual void initializePlane(ssc::PLANE_TYPE plane) {}
+  virtual void setImage(ssc::ImagePtr image) = 0;
+  virtual void removeImage(ssc::ImagePtr image) = 0;
+  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
+  virtual ssc::View* getView() = 0;
+};
+typedef boost::shared_ptr<ViewWrapper> ViewWrapperPtr;
+
 
 /**
  * \class cxViewGroup.h
@@ -27,11 +40,12 @@ public:
   ViewGroup();
   virtual ~ViewGroup();
 
+  void addViewWrapper(ViewWrapperPtr object);
   std::vector<ssc::View*> getViews() const;
-  virtual void setImage(ssc::ImagePtr image) = 0;
-  virtual void removeImage(ssc::ImagePtr image) = 0;
-
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) = 0;
+  ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
+  virtual void setImage(ssc::ImagePtr image);
+  virtual void removeImage(ssc::ImagePtr image);
+  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
 
 private slots:
   void contexMenuSlot(const QPoint& point);
@@ -41,6 +55,9 @@ protected:
   void connectContextMenu();
 
   std::vector<ssc::View*> mViews;
+
+  ssc::ImagePtr mImage;
+  std::vector<ViewWrapperPtr> mElements;
 };
 
 /**
@@ -63,58 +80,6 @@ protected:
   ssc::ImagePtr mImage;
 };
 
-/**
- *
- */
-class ViewGroup3D : public ViewGroup
-{
-  Q_OBJECT
-public:
-  ViewGroup3D(int startIndex, ssc::View* view);
-  virtual ~ViewGroup3D();
+} // namespace cx
 
-  virtual void setImage(ssc::ImagePtr image);
-  virtual void removeImage(ssc::ImagePtr image);
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
-
-protected:
-  int mStartIndex;
-  ssc::ImagePtr mImage;
-  ssc::VolumetricRepPtr mVolumetricRep;
-  LandmarkRepPtr mLandmarkRep;
-  ssc::ProbeRepPtr mProbeRep;
-};
-
-/**
- */
-class ViewGroup2D : public ViewGroup
-{
-public:
-  ViewGroup2D(int startIndex, ssc::View* view1,
-      ssc::View* view2, ssc::View* view3);
-  virtual ~ViewGroup2D();
-
-  ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
-
-  virtual void setImage(ssc::ImagePtr image);
-  virtual void removeImage(ssc::ImagePtr image);
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
-
-protected:
-  int mStartIndex;
-  ssc::ImagePtr mImage;
-  class ViewGroupElement
-  {
-  public:
-    ssc::SliceProxyPtr mSliceProxy;
-    ssc::SliceRepSWPtr mSliceRep;
-    ssc::ToolRep2DPtr mToolRep2D;
-    ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
-    ssc::DisplayTextRepPtr mPlaneTypeText;
-  };
-  std::vector<ViewGroupElement> mElements;
-
-
-};
-}
 #endif /* CXVIEWGROUP_H_ */

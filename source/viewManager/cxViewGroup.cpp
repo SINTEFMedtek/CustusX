@@ -23,27 +23,19 @@
 namespace cx
 {
 
-std::string planeToString(ssc::PLANE_TYPE val)
-{
-  switch (val)
-  {
-  case ssc::ptNOPLANE      : return "";
-  case ssc::ptSAGITTAL     : return "Sagittal";
-  case ssc::ptCORONAL      : return "Coronal";
-  case ssc::ptAXIAL        : return "Axial";
-  case ssc::ptANYPLANE     : return "Any";
-  case ssc::ptSIDEPLANE    : return "Side";
-  case ssc::ptRADIALPLANE  : return "Radial";
-  default                  : return "";
-  }
-}
-
 ViewGroup::ViewGroup()
 {
+  this->connectContextMenu();
 }
 
 ViewGroup::~ViewGroup()
 {
+}
+
+void ViewGroup::addViewWrapper(ViewWrapperPtr object)
+{
+  mViews.push_back(object->getView());
+  mElements.push_back(object);
 }
 
 std::string ViewGroup::toString(int i) const
@@ -59,6 +51,50 @@ void ViewGroup::connectContextMenu()
        this, SLOT(contexMenuSlot(const QPoint &)));
   }
 }
+
+std::vector<ssc::View*> ViewGroup::getViews() const
+{
+  return mViews;
+}
+
+/**Call this on an initialized view, when the plane type is changed.
+ *
+ */
+ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
+{
+  if (index<0 || index>=(int)mElements.size())
+  {
+    messageManager()->sendError("invalid index in ViewGroup2D");
+  }
+
+  mElements[index]->initializePlane(plane);
+  return mViews[index];
+}
+
+void ViewGroup::setImage(ssc::ImagePtr image)
+{
+  if(mImage == image)
+    return;
+  mImage = image;
+  for (unsigned i=0; i<mElements.size(); ++i)
+    mElements[i]->setImage(image);
+}
+
+void ViewGroup::removeImage(ssc::ImagePtr image)
+{
+  if(mImage != image)
+    return;
+  mImage = image;
+  for (unsigned i=0; i<mElements.size(); ++i)
+    mElements[i]->removeImage(image);
+}
+
+void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
+{
+  for (unsigned i=0; i<mElements.size(); ++i)
+    mElements[i]->setRegistrationMode(mode);
+}
+
 
 void ViewGroup::contexMenuSlot(const QPoint& point)
 {
@@ -222,172 +258,6 @@ void ViewGroupInria::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
     disconnect(inriaRep2D_2.get(), SIGNAL(pointPicked(double,double,double)),probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
     disconnect(inriaRep2D_3.get(), SIGNAL(pointPicked(double,double,double)),probeRep.get(), SLOT(showTemporaryPointSlot(double,double,double)));
   }
-}
-
-
-//------------------------------------------------------------------------------
-
-ViewGroup3D::ViewGroup3D(int startIndex, ssc::View* view) :
-    mStartIndex(startIndex)
-{
-  RepManager* repManager = RepManager::getInstance();
-  mViews.push_back(view);
-  mVolumetricRep = repManager->getVolumetricRep("VolumetricRep_"+toString(mStartIndex));
-  mLandmarkRep = repManager->getLandmarkRep("LandmarkRep_"+toString(mStartIndex));
-  mProbeRep = repManager->getProbeRep("ProbeRep_"+toString(mStartIndex));
-
-  this->connectContextMenu();
-}
-ViewGroup3D::~ViewGroup3D()
-{}
-void ViewGroup3D::setImage(ssc::ImagePtr image)
-{
- // std::cout << "ViewGroup3D::setImage B" << std::endl;
-  mImage = image;
-  //RepManager* repManager = RepManager::getInstance();
-
-  if (!mImage)
-  {
-    return;
-  }
-  if (!mImage->getRefVtkImageData().GetPointer())
-  {
-    messageManager()->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
-    return;
-  }
-   //Set these when image is deleted?
-  std::cout << "ViewGroup3D::setImage" << std::endl;
-  mVolumetricRep->setImage(mImage);
-  mProbeRep->setImage(mImage);
-  mLandmarkRep->setImage(mImage);
-  std::cout << "ViewGroup3D::setImage" << std::endl;
-
-  //Shading
-  if(QSettings().value("shadingOn").toBool())
-    mVolumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-
-  mViews[0]->addRep(mVolumetricRep);
-  mViews[0]->getRenderer()->ResetCamera();
-  if(mViews[0]->isVisible())
-    mViews[0]->getRenderWindow()->Render();
-  //std::cout << "ViewGroup3D::setImage E" << std::endl;
-}
-void ViewGroup3D::removeImage(ssc::ImagePtr image)
-{
-  if(mImage != image)
-    return;
-
-  messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
-  mViews[0]->removeRep(mVolumetricRep);
-
-  mImage.reset();
-}
-
-void ViewGroup3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
-{
-  if (mode==ssc::rsNOT_REGISTRATED)
-  {
-    mViews[0]->removeRep(mLandmarkRep);
-    mViews[0]->removeRep(mProbeRep);
-  }
-  if (mode==ssc::rsIMAGE_REGISTRATED)
-  {
-    mViews[0]->addRep(mLandmarkRep);
-    mViews[0]->addRep(mProbeRep);
-  }
-  if (mode==ssc::rsPATIENT_REGISTRATED)
-  {
-    mViews[0]->addRep(mLandmarkRep);
-  }
-}
-
-//------------------------------------------------------------------------------
-
-ViewGroup2D::ViewGroup2D(int startIndex, ssc::View* view1,
-    ssc::View* view2, ssc::View* view3)
-{
-  mStartIndex = startIndex;
-
-  mViews.push_back(view1);
-  mViews.push_back(view2);
-  mViews.push_back(view3);
-
-  this->connectContextMenu();
-
-  mElements.resize(3);
-
-  std::vector<ssc::PLANE_TYPE> planeType(3);
-  planeType[0] = ssc::ptAXIAL;
-  planeType[1] = ssc::ptCORONAL;
-  planeType[2] = ssc::ptSAGITTAL;
-
-  for (unsigned i=0; i<mElements.size(); ++i)
-  {
-    // annotation rep
-    mElements[i].mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep"+string_cast(i), "annotationRep"+string_cast(i));
-    mElements[i].mOrientationAnnotationRep->setPlaneType(planeType[i]);
-    mViews[i]->addRep(mElements[i].mOrientationAnnotationRep);
-    // plane type text rep
-    mElements[i].mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep"+string_cast(i), "planeTypeRep"+string_cast(i));
-    mElements[i].mPlaneTypeText->addText(ssc::Vector3D(0,1,0), planeToString(planeType[i]), ssc::Vector3D(0.98, 0.02, 0.0));
-    mViews[i]->addRep(mElements[i].mPlaneTypeText);
-
-    // slice proxy
-    mElements[i].mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mViews[i]->getName() +")"+string_cast(planeType[i]));
-    mElements[i].mSliceProxy->initializeFromPlane(planeType[i], false, ssc::Vector3D(0,0,1), false, 1, 0.25);
-    //mElements[i].mSliceProxy->setTool(...);
-    // slice rep
-    mElements[i].mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mViews[i]->getName());
-    //std::cout << "setSliceProxy 2dviewgroup" << std::endl;
-    mElements[i].mSliceRep->setSliceProxy(mElements[i].mSliceProxy);
-    mViews[i]->addRep(mElements[i].mSliceRep);
-    // tool rep
-    //   mElements[i].mToolRep2D.reset(new ssc::ToolRep2D());
- //   mElements[i].mToolRep2D->setProxy(mElements[i].mSliceProxy);
-  }
-}
-
-/**Call this on an initialized view, when the plane type is changed.
- *
- */
-ssc::View* ViewGroup2D::initializeView(int index, ssc::PLANE_TYPE plane)
-{
-  if (index<0 || index>=(int)mElements.size())
-  {
-    messageManager()->sendError("invalid index in ViewGroup2D");
-  }
-
-  mElements[index].mOrientationAnnotationRep->setPlaneType(plane);
-  mElements[index].mPlaneTypeText->setText(0, planeToString(plane));
-  mElements[index].mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
-
-  return mViews[index];
-}
-
-ViewGroup2D::~ViewGroup2D()
-{
-
-}
-
-
-void ViewGroup2D::setImage(ssc::ImagePtr image)
-{
-  if (!image)
-    return;
-
-  ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
-  ssc::DataManager::getInstance()->setCenter(c);
-
-  for (unsigned i=0; i<mElements.size(); ++i)
-  {
-    mElements[i].mSliceProxy->setDefaultCenter(c);
-    mElements[i].mSliceRep->setImage(image);
-  }
-}
-
-void ViewGroup2D::removeImage(ssc::ImagePtr image)
-{
-
 }
 
 }//cx

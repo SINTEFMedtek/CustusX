@@ -16,6 +16,8 @@
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxViewGroup.h"
+#include "cxViewWrapper2D.h"
+#include "cxViewWrapper3D.h"
 
 namespace cx
 {
@@ -77,22 +79,29 @@ ViewManager::ViewManager() :
     view->getRenderWindow()->GetInteractor()->EnableRenderOff();
   }
 
-  mViewGroup3D1.reset(new ViewGroup3D(1,mView3DMap["View3D_1"]));
-  mViewGroup3D2.reset(new ViewGroup3D(2,mView3DMap["View3D_2"]));
-  mViewGroups["ViewGroup3D1"] = mViewGroup3D1;
-  mViewGroups["ViewGroup3D2"] = mViewGroup3D2;
+  // initialize view groups:
+  ViewGroupPtr group;
 
-  mViewGroupInria1.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
-  mViewGroupInria2.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
-  mViewGroups["ViewGroupInria1"] = mViewGroupInria1;
-  mViewGroups["ViewGroupInria2"] = mViewGroupInria2;
+  group.reset(new ViewGroup());
+  group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(1, mView3DMap["View3D_1"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_7"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_8"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_9"])));
+  mViewGroups.push_back(group);
 
-  mViewGroup2D1.reset(new ViewGroup2D(1,mView2DMap["View2D_7"], mView2DMap["View2D_8"],mView2DMap["View2D_9"]));
-  mViewGroup2D2.reset(new ViewGroup2D(2,mView2DMap["View2D_10"], mView2DMap["View2D_11"],mView2DMap["View2D_12"]));
-  mViewGroups["ViewGroup2D1"] = mViewGroup2D1;
-  mViewGroups["ViewGroup2D2"] = mViewGroup2D2;
+  group.reset(new ViewGroup());
+  group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(2, mView3DMap["View3D_2"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_10"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_11"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_12"])));
+  mViewGroups.push_back(group);
 
-  //this->setLayoutTo_3DACS_2X2();
+  group.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
+  mViewGroups.push_back(group);
+  group.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
+  mViewGroups.push_back(group);
+
+  // set start layout
   this->changeLayout(LAYOUT_3DACS_2X2);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
@@ -140,10 +149,8 @@ ViewManager::LayoutType ViewManager::currentLayout() const
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
-  for(ViewGroupMap::iterator it = mViewGroups.begin(); it != mViewGroups.end(); ++it)
-  {
-    it->second->setRegistrationMode(mode);
-  }
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
+    mViewGroups[i]->setRegistrationMode(mode);
 }
 
 QWidget* ViewManager::stealCentralWidget()
@@ -254,10 +261,8 @@ void ViewManager::activateLayout(LayoutType toType)
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
 {
-  for(ViewGroupMap::iterator it = mViewGroups.begin(); it != mViewGroups.end(); ++it)
-  {
-    it->second->removeImage(image);
-  }
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
+    mViewGroups[i]->removeImage(image);
 
   emit imageDeletedFromViews(image);
 }
@@ -281,15 +286,21 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
       volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
 }
   
-void ViewManager::activateLayout_3D_1X1()
-{
-  mLayout->addWidget(mView3DMap[mView3DNames[0]]);
-  mView3DMap[mView3DNames[0]]->show();
-  mCurrentLayoutType = LAYOUT_3D_1X1;
-}
-
 void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan)
 {
+  mLayout->addWidget(view, row, col, rowSpan, colSpan );
+  view->show();
+}
+void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
+{
+  mViewGroups[group]->initializeView(index, plane);
+  ssc::View* view = mViewGroups[group]->getViews()[index];
+  mLayout->addWidget(view, row, col, rowSpan, colSpan );
+  view->show();
+}
+void ViewManager::activate3DView(int group, int index, int row, int col, int rowSpan, int colSpan)
+{
+  ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, row, col, rowSpan, colSpan );
   view->show();
 }
@@ -300,10 +311,15 @@ void ViewManager::deactivateView(ssc::View* view)
   mLayout->removeWidget(view);
 }
 
+void ViewManager::activateLayout_3D_1X1()
+{
+  activate3DView(0, 0,                  0, 0);
+  mCurrentLayoutType = LAYOUT_3D_1X1;
+}
+
 void ViewManager::activateLayout_3DACS_2X2()
 {
-  activateView(mView3DMap[mView3DNames[0]],   0, 0);
-
+  activate3DView(0, 0,                  0, 0);
 
   activateView(mView2DMap[mView2DNames[0]],   0, 1);
   activateView(mView2DMap[mView2DNames[1]],   1, 0);
@@ -314,35 +330,25 @@ void ViewManager::activateLayout_3DACS_2X2()
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
 {
-  activateView(mView3DMap[mView3DNames[0]],   0, 0);
-
-  activate2DView(0, 0, ssc::ptAXIAL,    0, 1);
-  activate2DView(0, 1, ssc::ptCORONAL,  1, 0);
-  activate2DView(0, 2, ssc::ptSAGITTAL, 1, 1);
+  activate3DView(0, 0,                  0, 0);
+  activate2DView(0, 1, ssc::ptAXIAL,    0, 1);
+  activate2DView(0, 2, ssc::ptCORONAL,  1, 0);
+  activate2DView(0, 3, ssc::ptSAGITTAL, 1, 1);
 
   mCurrentLayoutType = LAYOUT_3DACS_2X2_SNW;
 }
 
-
 void ViewManager::activateLayout_3DAny_1X2_SNW()
 {
-  activateView(mView3DMap[mView3DNames[0]],   0, 0);
-
-  activate2DView(0, 0, ssc::ptANYPLANE, 0, 1);
+  activate3DView(0, 0,                  0, 0);
+  activate2DView(0, 1, ssc::ptANYPLANE, 0, 1);
 
   mCurrentLayoutType = LAYOUT_3DAny_1X2_SNW;
 }
 
-void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
-{
-  //TODO must use group to access the correct viewgroup
-  ssc::View* view = mViewGroup2D1->initializeView(index, plane);
-  activateView(view, row, col, rowSpan, colSpan);
-}
-
 void ViewManager::activateLayout_3DACS_1X3()
 {
-  activateView(mView3DMap[mView3DNames[0]],   0, 0, 3, 1);
+  activate3DView(0, 0,                  0, 0, 3, 1);
 
   activateView(mView2DMap[mView2DNames[0]],   0, 1);
   activateView(mView2DMap[mView2DNames[1]],   1, 1);
@@ -394,10 +400,9 @@ void ViewManager::renderAllViewsSlot()
 	
 void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
 {
-  std::map<QString, ViewGroupPtr>::iterator it = mViewGroups.begin();
-  for(;it != mViewGroups.end(); ++it)
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
   {
-    it->second->setImage(currentImage);
+    mViewGroups[i]->setImage(currentImage);
   }
 }	
 }//namespace cx

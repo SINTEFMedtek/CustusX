@@ -85,6 +85,7 @@ protected:
   void activateLayout(LayoutType toType);
   void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);
   void activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan=1, int colSpan=1);
+  void activate3DView(int group, int index, int row, int col, int rowSpan=1, int colSpan=1);
   void deactivateView(ssc::View* view);
 
   void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
@@ -116,14 +117,15 @@ protected:
   QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 
-  typedef std::map<QString, ViewGroupPtr> ViewGroupMap;
-  ViewGroupMap mViewGroups;
-  ViewGroup3DPtr mViewGroup3D1;
-  ViewGroup3DPtr mViewGroup3D2;
-  ViewGroupInriaPtr mViewGroupInria1;
-  ViewGroupInriaPtr mViewGroupInria2;
-  ViewGroup2DPtr mViewGroup2D1;
-  ViewGroup2DPtr mViewGroup2D2;
+  //typedef std::map<QString, ViewGroupPtr> ViewGroupMap;
+  //ViewGroupMap mViewGroups;
+  //ViewGroup3DPtr mViewGroup3D1;
+  //ViewGroup3DPtr mViewGroup3D2;
+  //ViewGroupInriaPtr mViewGroupInria1;
+  //ViewGroupInriaPtr mViewGroupInria2;
+  //ViewGroup2DPtr mViewGroup2D1;
+  //ViewGroup2DPtr mViewGroup2D2;
+  std::vector<ViewGroupPtr> mViewGroups;
 
 private:
   ViewManager(ViewManager const&);
