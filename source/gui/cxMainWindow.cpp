@@ -29,6 +29,7 @@
 #include "cxView3D.h"
 #include "cxView2D.h"
 #include "cxPreferencesDialog.h"
+#include "cxShiftCorrectionWidget.h"
 
 namespace cx
 {
@@ -168,13 +169,20 @@ MainWindow::MainWindow() :
   mRegistrationManager(RegistrationManager::getInstance()),
   mCentralWidget(new QWidget(this)),
   mContextDockWidget(new ContextDockWidget(this)),
-  mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
-  mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
+  //mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
+  //mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
+  //mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
+  //mShiftCorrectionWidget(new ShiftCorrectionWidget(mContextDockWidget)),
+  mImageRegistrationWidget(new ImageRegistrationWidget(NULL)),
+  mPatientRegistrationWidget(new PatientRegistrationWidget(NULL)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
+  mShiftCorrectionWidget(new ShiftCorrectionWidget(NULL)),
   mBrowserWidget(new BrowserWidget(mContextDockWidget)),
-  mNavigationWidget(new NavigationWidget(mContextDockWidget)),
+  //mNavigationWidget(new NavigationWidget(mContextDockWidget)),
+  mNavigationWidget(new NavigationWidget(NULL)),
   mCustomStatusBar(new CustomStatusBar()),
   mImageRegistrationIndex(-1),
+  mShiftCorrectionIndex(-1),
   mPatientRegistrationIndex(-1),
   mNavigationIndex(-1),
   mSettings(new QSettings()),
@@ -219,7 +227,8 @@ MainWindow::MainWindow() :
   // TODO: Find a better way to do this
   //if we remove this section some items stack in the upper left corner,
   //probably some items missing a parent, check it out.
-  mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
+  // Solution?: Set parent to NULL in constructors
+  /*mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
                                                        QString("Image Registration"));
   mContextDockWidget->removeTab(mImageRegistrationIndex);
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
@@ -227,8 +236,8 @@ MainWindow::MainWindow() :
   mContextDockWidget->removeTab(mPatientRegistrationIndex);
   mNavigationIndex = mContextDockWidget->addTab(mNavigationWidget,
                                                          QString("Navigation"));
-  mContextDockWidget->removeTab(mNavigationIndex);
-  
+  mContextDockWidget->removeTab(mNavigationIndex);*/
+    
   // Don't show the Widget before all elements are initialized
   this->show();
 }
@@ -600,15 +609,20 @@ void MainWindow::activatePatientDataState()
   mCurrentWorkflowState = PATIENT_DATA;
 
   //should never be removed
-  mImageRegistrationIndex = mContextDockWidget->addTab(mBrowserWidget,
-      QString("Browser"));
-  mImageRegistrationIndex = mContextDockWidget->addTab(mTransferFunctionWidget,
-      QString("Transfer functions"));
+  mContextDockWidget->addTab(mBrowserWidget, QString("Browser"));
+  mContextDockWidget->addTab(mTransferFunctionWidget, 
+                             QString("Transfer functions"));
 }
 void MainWindow::deactivatePatientDataState()
 {}
 void MainWindow::activateImageRegistationState()
-{
+{  
+  QString imagesPath = 
+    mSettings->value("globalPatientDataFolder").toString()+
+    "/"+mActivePatientFolder+"/Images";
+  mShiftCorrectionWidget->init(imagesPath);
+  mShiftCorrectionIndex = mContextDockWidget->addTab(mShiftCorrectionWidget, 
+      QString("Shift correction"));
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
       QString("Image Registration"));
   
@@ -626,6 +640,11 @@ void MainWindow::activateImageRegistationState()
 }
 void MainWindow::deactivateImageRegistationState()
 {
+  if(mShiftCorrectionIndex != -1)
+  {
+    mContextDockWidget->removeTab(mShiftCorrectionIndex);
+    mShiftCorrectionIndex = -1;
+  }
   if(mImageRegistrationIndex != -1)
   {
     mViewManager->setRegistrationMode(ssc::rsNOT_REGISTRATED);

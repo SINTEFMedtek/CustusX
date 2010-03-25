@@ -26,6 +26,7 @@ class BrowserWidget;
 class NavigationWidget;
 class ImageRegistrationWidget;
 class PatientRegistrationWidget;
+class ShiftCorrectionWidget;
 
 /** \class FileCopied
  *
@@ -208,10 +209,11 @@ protected:
   ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration
   PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
   TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
+  ShiftCorrectionWidget*      mShiftCorrectionWidget; ///< interface for image shift correction
   BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
   CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
-  int mImageRegistrationIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
+  int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences
   QSettings* mSettings; ///< Object for storing all program/user specific settings

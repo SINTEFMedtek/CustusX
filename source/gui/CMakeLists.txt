@@ -13,6 +13,7 @@ SET(cxProject_MOC_HDRS
   cxTransferFunctionAlphaWidget.h
   cxTransferFunctionColorWidget.h
   cxPreferencesDialog.h
+  cxShiftCorrectionWidget.h
   cxRegistrationHistoryWidget.h
 )
 
@@ -53,6 +54,8 @@ SET(${LIBNAME}_SRCS
     cxTransferFunctionColorWidget.cpp
     cxPreferencesDialog.h
     cxPreferencesDialog.cpp
+    cxShiftCorrectionWidget.h
+    cxShiftCorrectionWidget.cpp
     cxRegistrationHistoryWidget.h
     cxRegistrationHistoryWidget.cpp
     ${cxProject_RCC_SRCS} )
