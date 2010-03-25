@@ -13,6 +13,7 @@ include (${SSC_USE_FILE} )
 	
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
+include_directories( /usr/local/include )
 
 # test starting the data manager 
 # - ssc::Image

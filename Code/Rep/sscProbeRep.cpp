@@ -99,7 +99,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	Vector3D worldClickPoint(worldCoords[0]/worldCoords[3],
 							 worldCoords[1]/worldCoords[3],
 							 worldCoords[2]/worldCoords[3]);
-	std::cout << "ProbeRep::pickLandmark: click:<"<<clickPosition<<"> world:<"<< worldClickPoint<<">"<< std::endl;
+	//std::cout << "ProbeRep::pickLandmark: click:<"<<clickPosition<<"> world:<"<< worldClickPoint<<">"<< std::endl;
 
 	//Compute the direction of the probe ray
 	Vector3D probeRayDirection;
@@ -164,7 +164,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 
 //  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
-  std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
+  //std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
 	this->pickLandmark(clickPoint, mCurrentRenderer);
 }
 /**
@@ -200,7 +200,7 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mPickedPoint[0] = x;
   mPickedPoint[1] = y;
   mPickedPoint[2] = z;
-  std::cout << "ProbeRep::showTemporaryPointSlot: pickpos = " << mPickedPoint << std::endl;
+  //std::cout << "ProbeRep::showTemporaryPointSlot: pickpos = " << mPickedPoint << std::endl;
   emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 //  std::cout << "ProbeRep::showTemporaryPointSlot E" << std::endl;
 }
@@ -220,7 +220,7 @@ void ProbeRep::addRepActorsToViewRenderer(View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickLandmarkSlot(vtkObject*)));
-  std::cout << "ProbeRep::addRepActorsToViewRenderer"<< std::endl;
+ // std::cout << "ProbeRep::addRepActorsToViewRenderer"<< std::endl;
 }
 void ProbeRep::removeRepActorsFromViewRenderer(View* view)
 {
@@ -231,7 +231,7 @@ void ProbeRep::removeRepActorsFromViewRenderer(View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickLandmarkSlot(vtkObject*)));
-  std::cout << "ProbeRep::removeRepActorsFromViewRenderer"<< std::endl;
+ // std::cout << "ProbeRep::removeRepActorsFromViewRenderer"<< std::endl;
 }
 vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {

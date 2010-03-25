@@ -196,6 +196,12 @@ void View::mouseReleaseEvent(QMouseEvent* event)
 	emit mouseReleaseSignal(event);
 }
 
+void View::wheelEvent(QWheelEvent* event)
+{
+  inherited::wheelEvent(event);
+  emit mouseWheelSignal(event);
+}
+
 
 
 } // namespace ssc
