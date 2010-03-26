@@ -16,9 +16,6 @@ typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 namespace cx
 {
-
-
-
 /**
  * \class ToolManager
  *
