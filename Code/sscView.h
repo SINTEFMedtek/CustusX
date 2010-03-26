@@ -66,6 +66,7 @@ namespace ssc
 		void mouseMoveSignal(QMouseEvent* event);
 		void mouseReleaseSignal(QMouseEvent* event);
 	  void mouseWheelSignal(QWheelEvent*);
+    void showSignal(QShowEvent* event);
 
 	protected:
 		std::string mUid;					///< The view's unique id
@@ -76,6 +77,7 @@ namespace ssc
 		std::vector<RepPtr> mReps;				///< Storage for internal reps.
 		typedef std::vector<RepPtr>::iterator RepsIter;		///< Iterator typedef for the internal rep vector.
 	private:
+		virtual void showEvent(QShowEvent* event);
 	  virtual void wheelEvent(QWheelEvent*);
 		virtual void mouseMoveEvent(QMouseEvent *event);
 		virtual void mouseReleaseEvent(QMouseEvent *event);
