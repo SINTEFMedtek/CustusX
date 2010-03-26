@@ -78,10 +78,11 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
 
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(viewportChanged()));
-  //viewportChanged();
+  connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
+  connect(mView, SIGNAL(mouseReleaseSignal(QMouseEvent*)), this, SLOT(mouseReleaseSlot(QMouseEvent*)));
 }
 
-ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v)
+ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
 {
   vtkRendererPtr renderer = mView->getRenderer();
   renderer->SetViewPoint(p_v.begin());
@@ -90,7 +91,7 @@ ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v)
   return p_d;
 }
 
-ssc::Vector3D ViewWrapper2D::displayToWorld(ssc::Vector3D p_d)
+ssc::Vector3D ViewWrapper2D::displayToWorld(ssc::Vector3D p_d) const
 {
   vtkRendererPtr renderer = mView->getRenderer();
   //if ()
@@ -109,35 +110,58 @@ void ViewWrapper2D::viewportChanged()
   if (!mView->getRenderer()->IsActiveCameraCreated())
     return;
   std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
-  // coordinates in display space (pixels, right-handed)
-  ssc::Vector3D p0_d = viewToDisplay(ssc::Vector3D(0,0,0));
-  ssc::Vector3D p0_w = displayToWorld(p0_d);
-  ssc::Vector3D p1_w = displayToWorld(p0_d+ssc::Vector3D(1,0,0));
-  ssc::Vector3D p2_w = displayToWorld(p0_d+ssc::Vector3D(0,1,0));
 
-  ssc::Vector3D ex_w = p1_w - p0_w;
-  ssc::Vector3D ey_w = p2_w - p0_w;
+  // world == slice
+  // display == vp
 
-  std::cout << "ez_w: " << cross(ex_w, ey_w) << std::endl;
-
-  //std::cout << ": " << vp << std::endl;
-
-  // eller motsatt....
-  ssc::Transform3D vpMs = ssc::createTransformIJC(ex_w, ey_w, p0_w);
-
-  //ssc::DoubleBoundingBox3D vp(mView->getRenderer()->GetViewport());
   QSize size = mView->size();
-  ssc::DoubleBoundingBox3D vp(0,size.width(), 0, size.height(), 0, 1);
 
-  std::cout << "vp: " << vp << std::endl;
+  ssc::Vector3D p0_d(0,0,0);
+  ssc::Vector3D p1_d(size.width(), size.height(), 0);
 
-  mToolRep2D->setViewportData(vpMs, vp);
+  ssc::Vector3D p0_w = displayToWorld(p0_d);
+  ssc::Vector3D p1_w = displayToWorld(p1_d);
+
+  ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
+  ssc::DoubleBoundingBox3D BB_s(p0_w, p1_w);
+
+  ssc::Transform3D vpMs = get_vpMs();
+
+  mToolRep2D->setViewportData(vpMs, BB_vp);
 }
 
-void ViewWrapper2D::fixStuff()
+ssc::DoubleBoundingBox3D ViewWrapper2D::getViewport() const
 {
-  std::cout << "stuff fixed" << std::endl;
+  QSize size = mView->size();
+  ssc::Vector3D p0_d(0,0,0);
+  ssc::Vector3D p1_d(size.width(), size.height(), 0);
+  ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
+  return BB_vp;
+}
+
+ssc::Transform3D ViewWrapper2D::get_vpMs() const
+{
+  QSize size = mView->size();
+
+  ssc::Vector3D p0_d(0,0,0);
+  ssc::Vector3D p1_d(size.width(), size.height(), 0);
+
+  ssc::Vector3D p0_w = displayToWorld(p0_d);
+  ssc::Vector3D p1_w = displayToWorld(p1_d);
+
+  ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
+  ssc::DoubleBoundingBox3D BB_s(p0_w, p1_w);
+
+  ssc::Transform3D vpMs = ssc::createTransformNormalize(BB_s, BB_vp);
+  return vpMs;
+}
+
+void ViewWrapper2D::showSlot()
+{
+  //TODO: need better camera control than this...
+  std::cout << "stuff fixed - show" << std::endl;
   mView->getRenderer()->ResetCamera();
+  viewportChanged();
 }
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
@@ -176,6 +200,41 @@ void ViewWrapper2D::dominantToolChangedSlot()
   connect(dominantTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(fixStuff()));
 
 }
+
+void ViewWrapper2D::mouseReleaseSlot(QMouseEvent* event)
+{
+  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+
+  ssc::Transform3D sMr = mSliceProxy->get_sMr();
+  ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+  ssc::Transform3D prMt = tool->get_prMt();
+
+  // find tool position in s
+  ssc::Vector3D tool_t(0,0,tool->getTooltipOffset());
+  ssc::Vector3D tool_s = (sMr*rMpr*prMt).coord(tool_t);
+
+  // find click position in s.
+  QPoint click_q = event->pos();
+  QSize size = mView->size();
+  ssc::Vector3D click_vp(click_q.x(), size.height()-click_q.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+  ssc::Vector3D click_s = get_vpMs().inv().coord(click_vp);
+
+  // compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
+  ssc::Vector3D cross_s(click_s[0], click_s[1], tool_s[2]);
+  // compute the position change and transform to patient.
+  ssc::Vector3D delta_s = cross_s - tool_s;
+  ssc::Vector3D delta_pr = (rMpr.inv()*sMr.inv()).vector(delta_s);
+
+  // MD is the actual tool movement in patient space, matrix form
+  ssc::Transform3D MD = createTransformTranslate(delta_pr);
+  // set new tool position to old modified by MD:
+  tool->set_prMt(MD*prMt);
+
+//  ssc::Vector3D p_r = mSliceProxy->get_sMr().inv().coord(p_s);
+//  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+//  ToolManager::getInstance()->getManualTool()->set_prMt(createTransformTranslate(p_pr));
+}
+
 
 
 //------------------------------------------------------------------------------

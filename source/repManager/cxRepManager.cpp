@@ -141,6 +141,7 @@ void RepManager::probeRepPointPickedSlot(double x,double y,double z)
   //TODO check spaces....
   ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
   ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  // TODO set center here will not do: must handle
   DataManager::getInstance()->setCenter(p_r);
   ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
 }

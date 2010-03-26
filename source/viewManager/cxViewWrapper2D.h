@@ -8,7 +8,7 @@
 #define CXVIEWWRAPPER2D_H_
 
 #include <vector>
-#include <QObject>
+#include <QtGui>
 #include "cxForwardDeclarations.h"
 #include "sscData.h"
 #include "sscDefinitions.h"
@@ -36,11 +36,15 @@ public:
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the inriareps are connected to the right tool
   void viewportChanged();
-  void fixStuff();
+  void showSlot();
+  void mouseReleaseSlot(QMouseEvent* event);
 
 private:
-  ssc::Vector3D displayToWorld(ssc::Vector3D p_d);
-  ssc::Vector3D viewToDisplay(ssc::Vector3D p_v);
+  ssc::DoubleBoundingBox3D getViewport() const;
+  ssc::Transform3D get_vpMs() const;
+
+  ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
+  ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
   ssc::PLANE_TYPE mPlaneType;
   ssc::SliceProxyPtr mSliceProxy;
