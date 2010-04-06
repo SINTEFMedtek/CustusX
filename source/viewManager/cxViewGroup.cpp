@@ -19,6 +19,7 @@
 #include "cxMessageManager.h"
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
+#include "cxViewWrapper.h"
 
 namespace cx
 {

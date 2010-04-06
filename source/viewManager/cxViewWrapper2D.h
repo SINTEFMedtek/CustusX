@@ -12,7 +12,7 @@
 #include "cxForwardDeclarations.h"
 #include "sscData.h"
 #include "sscDefinitions.h"
-#include "cxViewGroup.h"
+#include "cxViewWrapper.h"
 
 namespace cx
 {
