@@ -515,10 +515,10 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
 
   //TODO Implement
   /*
-  messageMan()->getXml(doc); //TODO
+  messageManager()->getXml(doc); //TODO
   viewManager()->getXml(doc); //TODO
-  mRepManager->getXml(doc); //TODO
-  mRegistrationManager->getXml(doc);*/
+  repManager->getXml(doc); //TODO
+  registrationManager->getXml(doc);*/
 
   messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
@@ -829,7 +829,7 @@ void MainWindow::loadPatientFileSlot()
     }
     file.close();
   }
-  else //User have creted the directory create xml file and folders
+  else //User have created the directory create xml file and folders
   {
     createPatientFolders(choosenDir);
   }
@@ -940,7 +940,7 @@ void MainWindow::importDataSlot()
     data = dataManager()->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
-  data->setName(fileInfo.fileName().toStdString());
+  //data->setName(fileInfo.fileName().toStdString());
   
   QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString()
                       +"/"+mActivePatientFolder);
