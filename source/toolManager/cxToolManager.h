@@ -175,5 +175,8 @@ private:
   ToolManager(ToolManager const&);
   ToolManager& operator=(ToolManager const&);
 };
+/**Shortcut for accessing the toolmanager instance.
+ */
+ToolManager* toolManager();
 }//namespace cx
 #endif /* CXTOOLMANAGER_H_ */

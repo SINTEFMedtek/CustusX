@@ -162,11 +162,6 @@ void FileCopied::areFileCopiedSlot()
   
 MainWindow::MainWindow() :
   mCurrentWorkflowState(PATIENT_DATA),
-  mViewManager(ViewManager::getInstance()),
-  mDataManager(DataManager::getInstance()),
-  mToolManager(ToolManager::getInstance()),
-  mRepManager(RepManager::getInstance()),
-  mRegistrationManager(RegistrationManager::getInstance()),
   mCentralWidget(new QWidget(this)),
   mContextDockWidget(new ContextDockWidget(this)),
   //mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
@@ -193,7 +188,7 @@ MainWindow::MainWindow() :
   this->createMenus();
   this->createStatusBar();
 
-  this->setCentralWidget(mViewManager->stealCentralWidget());
+  this->setCentralWidget(viewManager()->stealCentralWidget());
   this->resize(QSize(1000,1000));
   
   // Initialize settings if empty
@@ -332,13 +327,13 @@ void MainWindow::createActions()
   connect(mConfigureToolsAction, SIGNAL(triggered()),
           this, SLOT(configureSlot()));
   connect(mInitializeToolsAction, SIGNAL(triggered()),
-          mToolManager, SLOT(initialize()));
+          toolManager(), SLOT(initialize()));
   connect(mStartTrackingToolsAction, SIGNAL(triggered()),
-          mToolManager, SLOT(startTracking()));
+          toolManager(), SLOT(startTracking()));
   connect(mStopTrackingToolsAction, SIGNAL(triggered()),
-          mToolManager, SLOT(stopTracking()));
+          toolManager(), SLOT(stopTracking()));
   connect(mSaveToolsPositionsAction, SIGNAL(triggered()), 
-          mToolManager, SLOT(saveToolsSlot()));
+          toolManager(), SLOT(saveToolsSlot()));
 
   //layout
   mLayoutActionGroup = new QActionGroup(this);
@@ -348,13 +343,13 @@ void MainWindow::createActions()
   for (unsigned i=0; i<layouts.size(); ++i)
     addLayoutAction(layouts[i]);
 
-  connect(mViewManager, SIGNAL(layoutChanged()), this, SLOT(layoutChangedSlot()));
+  connect(viewManager(), SIGNAL(layoutChanged()), this, SLOT(layoutChangedSlot()));
   layoutChangedSlot();
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          mViewManager, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
+          viewManager(), SLOT(currentImageChangedSlot(ssc::ImagePtr)));
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           mImageRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
   connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
@@ -370,7 +365,7 @@ void MainWindow::createActions()
  */
 void MainWindow::layoutChangedSlot()
 {
-  ViewManager::LayoutType type = mViewManager->currentLayout();
+  ViewManager::LayoutType type = viewManager()->currentLayout();
   QList<QAction*> actions = mLayoutActionGroup->actions();
   for (int i=0; i<actions.size(); ++i)
   {
@@ -388,7 +383,7 @@ void MainWindow::setLayoutSlot()
   if (!action)
     return;
   ViewManager::LayoutType type = static_cast<ViewManager::LayoutType>(action->data().toInt());
-  mViewManager->changeLayout(type);
+  viewManager()->changeLayout(type);
 }
 
 /** Add one layout as an action to the layout menu.
@@ -515,13 +510,13 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
   QDomElement managerNode = doc.createElement("managers");
   patientNode.appendChild(managerNode);
 
-  mDataManager->addXml(managerNode);
-  ssc::ToolManager::getInstance()->addXml(managerNode);
+  dataManager()->addXml(managerNode);
+  toolManager()->addXml(managerNode);
 
   //TODO Implement
   /*
   messageMan()->getXml(doc); //TODO
-  mViewManager->getXml(doc); //TODO
+  viewManager()->getXml(doc); //TODO
   mRepManager->getXml(doc); //TODO
   mRegistrationManager->getXml(doc);*/
 
@@ -548,11 +543,11 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
   if (!dataManagerNode.isNull())
   {    
     QString absolutePatientPath = mSettings->value("globalPatientDataFolder").toString()+"/"+mActivePatientFolder;
-    mDataManager->parseXml(dataManagerNode, absolutePatientPath);
+    dataManager()->parseXml(dataManagerNode, absolutePatientPath);
   }
 
   QDomNode toolmanager = managerNode.namedItem("toolManager");
-  ssc::ToolManager::getInstance()->parseXml(toolmanager);
+  toolManager()->parseXml(toolmanager);
 }
 
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
@@ -626,12 +621,12 @@ void MainWindow::activateImageRegistationState()
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
       QString("Image Registration"));
   
-  mViewManager->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+  viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 
-  ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
 /*  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
-  mViewManager->get3DView("View3D_1")->addRep(probeRep);
+  viewManager()->get3DView("View3D_1")->addRep(landmarkRep);
+  viewManager()->get3DView("View3D_1")->addRep(probeRep);
   */
   connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(int)),
           probeRep.get(), SLOT(setThresholdSlot(int)));
@@ -647,14 +642,14 @@ void MainWindow::deactivateImageRegistationState()
   }
   if(mImageRegistrationIndex != -1)
   {
-    mViewManager->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+    viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
     mContextDockWidget->removeTab(mImageRegistrationIndex);
     mImageRegistrationIndex = -1;
     
-    ssc::ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+    ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
 /*    LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-    mViewManager->get3DView("View3D_1")->removeRep(landmarkRep);
-    mViewManager->get3DView("View3D_1")->removeRep(probeRep);*/
+    viewManager()->get3DView("View3D_1")->removeRep(landmarkRep);
+    viewManager()->get3DView("View3D_1")->removeRep(probeRep);*/
 
     disconnect(mImageRegistrationWidget, SIGNAL(thresholdChanged(const int)),
             probeRep.get(), SLOT(setThresholdSlot(const int)));
@@ -665,9 +660,9 @@ void MainWindow::activatePatientRegistrationState()
   mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
       QString("Patient Registration"));
   
-  mViewManager->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+  viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
 //  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-//  mViewManager->get3DView("View3D_1")->addRep(landmarkRep);
+//  viewManager()->get3DView("View3D_1")->addRep(landmarkRep);
   
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
@@ -675,7 +670,7 @@ void MainWindow::deactivatePatientRegistrationState()
 {
   if(mPatientRegistrationIndex != -1)
   {
-    mViewManager->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+    viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
     mContextDockWidget->removeTab(mPatientRegistrationIndex);
     mPatientRegistrationIndex = -1;
   }
@@ -875,6 +870,9 @@ void MainWindow::patientDataWorkflowSlot()
 void MainWindow::imageRegistrationWorkflowSlot()
 {
   this->changeState(mCurrentWorkflowState, IMAGE_REGISTRATION);
+
+  //set the manual tool to be the the default tool for imagereg.
+  toolManager()->setDominantTool(toolManager()->getManualTool()->getUid());
 }
 void MainWindow::patientRegistrationWorkflowSlot()
 {
@@ -930,15 +928,15 @@ void MainWindow::importDataSlot()
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("mha", Qt::CaseInsensitive) == 0)
   {
-    //ssc::ImagePtr image = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    data = mDataManager->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
+    //ssc::ImagePtr image = dataManager()->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
+    data = dataManager()->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
-    data = mDataManager->loadMesh(fileName.toStdString(), ssc::mrtSTL);
+    data = dataManager()->loadMesh(fileName.toStdString(), ssc::mrtSTL);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
-    data = mDataManager->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
+    data = dataManager()->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
   data->setName(fileInfo.fileName().toStdString());
@@ -1060,7 +1058,7 @@ void MainWindow::loadPatientRegistrationSlot()
     }
     //set the toolmanageres matrix
     ssc::Transform3DPtr patientRegistration(new ssc::Transform3D(matrix));
-    mRegistrationManager->setManualPatientRegistration(patientRegistration);
+    registrationManager()->setManualPatientRegistration(patientRegistration);
     //std::cout << (*patientRegistration.get()) << std::endl;
     messageManager()->sendInfo("New patient registration is set.");
   }
@@ -1080,7 +1078,7 @@ void MainWindow::configureSlot()
     messageManager()->sendInfo("Tool configuration file is now selected: "+
                               configFile.toStdString());
   }
-  mToolManager->setConfigurationFile(configFile.toStdString());
+  toolManager()->setConfigurationFile(configFile.toStdString());
 
   QString loggingPath = mSettings->value("globalPatientDataFolder").toString()
                         +"/"+mActivePatientFolder+"/Logs/";
@@ -1090,17 +1088,17 @@ void MainWindow::configureSlot()
     loggingDir.mkdir(loggingPath);
     messageManager()->sendInfo("Made a folder for logging: "+loggingPath.toStdString());
   }
-  mToolManager->setLoggingFolder(loggingPath.toStdString());
+  toolManager()->setLoggingFolder(loggingPath.toStdString());
 
-  mToolManager->configure();
+  toolManager()->configure();
   
-  if(mToolManager->isConfigured())
+  if(toolManager()->isConfigured())
   {
-    View3D* view = mViewManager->get3DView("View3D_1");
+    View3D* view = viewManager()->get3DView("View3D_1");
 
-    ToolRep3DMap* toolRep3DMap = RepManager::getInstance()->getToolRep3DReps();
+    ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
     ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
-    ssc::ToolManager::ToolMapPtr configuredTools = ToolManager::getInstance()->getConfiguredTools();
+    ssc::ToolManager::ToolMapPtr configuredTools = toolManager()->getConfiguredTools();
     ssc::ToolManager::ToolMap::iterator toolIt = configuredTools->begin();
     while((toolIt != configuredTools->end()) && (repIt != toolRep3DMap->end()))
     {

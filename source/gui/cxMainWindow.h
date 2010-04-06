@@ -13,12 +13,6 @@ class QSettings;
 
 namespace cx
 {
-class DataManager;
-class RepManager;
-class ViewManager;
-class ToolManager;
-class MessageManager;
-class RegistrationManager;
 class CustomStatusBar;
 class ContextDockWidget;
 class TransferFunctionWidget;
@@ -146,13 +140,6 @@ protected:
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
   
   WorkflowState mCurrentWorkflowState; ///< the current workflow in use
-
-  //managers
-  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
-  DataManager* mDataManager; ///< has all the data loaded into the system
-  ToolManager* mToolManager; ///< interface to the navigation system
-  RepManager* mRepManager; ///< has a pool of reps
-  RegistrationManager* mRegistrationManager; ///< manages registration of data
 
   //gui
   QWidget* mCentralWidget; ///< central widget used for views

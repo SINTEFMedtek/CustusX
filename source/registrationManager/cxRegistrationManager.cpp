@@ -14,6 +14,7 @@
 namespace cx
 {
 RegistrationManager* RegistrationManager::mCxInstance = NULL;
+RegistrationManager* registrationManager() { return RegistrationManager::getInstance(); }
 RegistrationManager* RegistrationManager::getInstance()
 {
   if (mCxInstance == NULL)

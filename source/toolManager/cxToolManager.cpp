@@ -17,6 +17,7 @@ namespace cx
 /// \cond
 ToolManager* ToolManager::mCxInstance = NULL;
 /// \endcond
+ToolManager* toolManager() { return ToolManager::getInstance(); }
 ToolManager* ToolManager::getInstance()
 {
   if (mCxInstance == NULL)
@@ -178,6 +179,9 @@ ssc::ToolPtr ToolManager::getDominantTool()
 }
 void ToolManager::setDominantTool(const std::string& uid)
 {
+  if(mDominantTool->getUid() == uid)
+    return;
+
   ToolMapConstIter iter = mConfiguredTools->find(uid);
   if (iter != mConfiguredTools->end())
   {

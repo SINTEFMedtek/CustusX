@@ -26,7 +26,7 @@ namespace cx
 {
 
 ViewManager *ViewManager::mTheInstance = NULL;
-
+ViewManager* viewManager() { return ViewManager::getInstance(); }
 ViewManager* ViewManager::getInstance()
 {
   if(mTheInstance == NULL)

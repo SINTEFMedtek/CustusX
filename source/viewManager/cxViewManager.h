@@ -131,7 +131,8 @@ private:
   ViewManager(ViewManager const&);
   ViewManager& operator=(ViewManager const&);
 };
-
-
+/**Shortcut for accessing the viewmanager instance.
+ */
+ViewManager* viewManager();
 }//namespace
 #endif /* CXVIEWMANAGER_H_ */

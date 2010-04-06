@@ -81,6 +81,9 @@ private:
   RegistrationManager(RegistrationManager const&); ///< not implemented
   RegistrationManager& operator=(RegistrationManager const&); ///< not implemented
 };
+/**Shortcut for accessing the registrationmanager instance.
+ */
+RegistrationManager* registrationManager();
 }//namespace cx
 
 #endif /* CXREGISTRATIONMANAGER_H_ */

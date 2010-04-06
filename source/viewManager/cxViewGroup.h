@@ -12,8 +12,6 @@ class QPoint;
 
 namespace cx
 {
-
-
 /**
  * \class cxViewGroup.h
  *
@@ -48,7 +46,6 @@ protected:
   ssc::ImagePtr mImage;
   std::vector<ViewWrapperPtr> mElements;
 };
-
 
 } // namespace cx
 
