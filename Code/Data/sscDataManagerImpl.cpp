@@ -275,7 +275,10 @@ void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
             data = this->loadMesh(path.toStdString(), ssc::mrtPOLYDATA);
           }
           
-          data->setName(nameNode.text().toStdString());
+          if(nameNode.text().isEmpty())
+            data->setName(fileInfo.fileName().toStdString());
+          else
+            data->setName(nameNode.text().toStdString());
           data->setFilePath(relativePath.path().toStdString());
           data->parseXml(node);
         }

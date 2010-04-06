@@ -38,9 +38,8 @@ class Image : public Data
 	Q_OBJECT
 public:
 	virtual ~Image();
-	Image(const std::string& uid, const vtkImageDataPtr& data);
-	Image(const std::string& uid, const std::string& name,
-				const vtkImageDataPtr& data);
+	//Image(const std::string& uid, const vtkImageDataPtr& data);
+	Image(const std::string& uid, const vtkImageDataPtr& data, const std::string& name="");
 	void setVtkImageData(const vtkImageDataPtr& data);
 
 //	virtual void set_rMd(Transform3D rMd);

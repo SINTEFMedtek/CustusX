@@ -22,8 +22,9 @@ Image::~Image()
 {
 }
 
-Image::Image(const std::string& uid, const vtkImageDataPtr& data) :
-  Data(uid),
+Image::Image(const std::string& uid, const vtkImageDataPtr& data,
+    const std::string& name) :
+  Data(uid, name),
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(new ImageLUT2D(data)),
 	mBaseImageData(data),
