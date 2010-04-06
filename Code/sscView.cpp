@@ -196,6 +196,12 @@ void View::mouseReleaseEvent(QMouseEvent* event)
 	emit mouseReleaseSignal(event);
 }
 
+void View::mousePressEvent(QMouseEvent* event)
+{
+  inherited::mousePressEvent(event);
+  emit mousePressSignal(event);
+}
+
 void View::wheelEvent(QWheelEvent* event)
 {
   inherited::wheelEvent(event);

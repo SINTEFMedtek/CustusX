@@ -65,6 +65,7 @@ namespace ssc
 		void resized(QSize size);
 		void mouseMoveSignal(QMouseEvent* event);
 		void mouseReleaseSignal(QMouseEvent* event);
+    void mousePressSignal(QMouseEvent* event);
 	  void mouseWheelSignal(QWheelEvent*);
     void showSignal(QShowEvent* event);
 
@@ -81,6 +82,7 @@ namespace ssc
 	  virtual void wheelEvent(QWheelEvent*);
 		virtual void mouseMoveEvent(QMouseEvent *event);
 		virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
 		void resizeEvent(QResizeEvent *event);
 	};
 
