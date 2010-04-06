@@ -37,11 +37,14 @@ private slots:
   void dominantToolChangedSlot(); ///< makes sure the inriareps are connected to the right tool
   void viewportChanged();
   void showSlot();
-  void mouseReleaseSlot(QMouseEvent* event);
+//  void mouseReleaseSlot(QMouseEvent* event);
+  void mousePressSlot(QMouseEvent* event);
 
 private:
   ssc::DoubleBoundingBox3D getViewport() const;
   ssc::Transform3D get_vpMs() const;
+  ssc::Vector3D qvp2vp(QPoint pos_qvp);
+  void moveAxisPos(ssc::Vector3D click_vp);
 
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;

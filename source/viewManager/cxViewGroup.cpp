@@ -41,6 +41,7 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
+  connectContextMenu(wrapper->getView());
 }
 
 std::string ViewGroup::toString(int i) const
@@ -52,9 +53,14 @@ void ViewGroup::connectContextMenu()
 {
   for(unsigned int i=0;i<mViews.size();++i)
   {
-   connect(mViews[i], SIGNAL(customContextMenuRequested(const QPoint &)),
-       this, SLOT(contexMenuSlot(const QPoint &)));
+    connectContextMenu(mViews[i]);
   }
+}
+
+void ViewGroup::connectContextMenu(ssc::View* view)
+{
+   connect(view, SIGNAL(customContextMenuRequested(const QPoint &)),
+       this, SLOT(contexMenuSlot(const QPoint &)));
 }
 
 std::vector<ssc::View*> ViewGroup::getViews() const

@@ -41,6 +41,7 @@ private slots:
 protected:
   std::string toString(int i) const;
   void connectContextMenu();
+  void connectContextMenu(ssc::View* view);
 
   std::vector<ssc::View*> mViews;
 

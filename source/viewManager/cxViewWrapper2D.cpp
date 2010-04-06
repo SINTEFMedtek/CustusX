@@ -86,7 +86,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
-  connect(mView, SIGNAL(mouseReleaseSignal(QMouseEvent*)), this, SLOT(mouseReleaseSlot(QMouseEvent*)));
+  connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
 }
 
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
@@ -211,7 +211,28 @@ void ViewWrapper2D::dominantToolChangedSlot()
 
 }
 
-void ViewWrapper2D::mouseReleaseSlot(QMouseEvent* event)
+void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
+{
+  if (event->buttons() & Qt::LeftButton)
+  {
+    moveAxisPos(qvp2vp(event->pos()));
+  }
+}
+
+/**Convert a position in Qt viewport space (pixels with origin in upper-left corner)
+ * to vtk viewport space (pixels with origin in lower-left corner).
+ */
+ssc::Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
+{
+  QSize size = mView->size();
+  ssc::Vector3D pos_vp(pos_qvp.x(), size.height()-pos_qvp.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+  return pos_vp;
+}
+
+/**Move the tool pos / axis pos to a new position given
+ * by the input click position in vp space.
+ */
+void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
 {
   ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
 
@@ -224,9 +245,9 @@ void ViewWrapper2D::mouseReleaseSlot(QMouseEvent* event)
   ssc::Vector3D tool_s = (sMr*rMpr*prMt).coord(tool_t);
 
   // find click position in s.
-  QPoint click_q = event->pos();
-  QSize size = mView->size();
-  ssc::Vector3D click_vp(click_q.x(), size.height()-click_q.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
+//  QPoint click_q = event->pos();
+//  QSize size = mView->size();
+//  ssc::Vector3D click_vp(click_q.x(), size.height()-click_q.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
   ssc::Vector3D click_s = get_vpMs().inv().coord(click_vp);
 
   // compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
