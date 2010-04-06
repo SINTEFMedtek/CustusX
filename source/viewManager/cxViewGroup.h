@@ -27,7 +27,7 @@ public:
   ViewGroup();
   virtual ~ViewGroup();
 
-  void addViewWrapper(ViewWrapperPtr object);
+  void addViewWrapper(ViewWrapperPtr wrapper);
   std::vector<ssc::View*> getViews() const;
   ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
   virtual void setImage(ssc::ImagePtr image);
@@ -36,6 +36,7 @@ public:
 
 private slots:
   void contexMenuSlot(const QPoint& point);
+  void activateManualToolSlot();
 
 protected:
   std::string toString(int i) const;

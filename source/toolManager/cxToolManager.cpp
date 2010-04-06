@@ -179,8 +179,11 @@ ssc::ToolPtr ToolManager::getDominantTool()
 }
 void ToolManager::setDominantTool(const std::string& uid)
 {
-  if(mDominantTool->getUid() == uid)
+  std::cout << "1: void ToolManager::setDominantTool(const std::string& uid)" << std::endl;
+  if(mDominantTool && mDominantTool->getUid() == uid)
     return;
+
+  std::cout << "2: void ToolManager::setDominantTool(const std::string& uid)" << std::endl;
 
   ToolMapConstIter iter = mConfiguredTools->find(uid);
   if (iter != mConfiguredTools->end())
@@ -202,15 +205,15 @@ std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
   ToolMapConstIter it = mConnectedTools->begin();
   while (it != mConnectedTools->end())
   {
-    uidsAndNames.insert(std::pair<std::string, std::string>(
-        ((*it).second)->getUid(), ((*it).second)->getName()));
+    //uidsAndNames.insert(std::pair<std::string, std::string>(((*it).second)->getUid(), ((*it).second)->getName()));
+    uidsAndNames[((*it).second)->getUid()] = ((*it).second)->getName();
     it++;
   }
   ToolMapConstIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
-    uidsAndNames.insert(std::pair<std::string, std::string>(
-        ((*iter).second)->getUid(), ((*iter).second)->getName()));
+    //uidsAndNames.insert(std::pair<std::string, std::string>(((*iter).second)->getUid(), ((*iter).second)->getName()));
+    uidsAndNames[((*iter).second)->getUid()] = ((*iter).second)->getName();
     iter++;
   }
   return uidsAndNames;
@@ -741,7 +744,8 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
     {
       mReferenceTool = tool;
     }
-    tools->insert(std::pair<std::string, ssc::ToolPtr>(tool->getUid(), tool));
+    //tools->insert(std::pair<std::string, ssc::ToolPtr>(tool->getUid(), tool));
+    (*tools)[tool->getUid()] = tool;
   }
   return tools;
 }
@@ -755,11 +759,14 @@ void ToolManager::addConnectedTool(std::string uid)
           ", thus could not add is as a connected tool.");
     return;
   }
-  mConnectedTools->insert(std::pair<std::string, ssc::ToolPtr>((*it).first,
-      (*it).second));
+  //mConnectedTools->insert(std::pair<std::string, ssc::ToolPtr>((*it).first, (*it).second));
+  (*mConnectedTools)[(*it).first] = (*it).second;
   mConfiguredTools->erase(it);
   messageManager()->sendInfo("Tool with id " + uid
       + " was moved from the configured to the connected map.");
+
+  //connect visible/hidden signal to domiantCheck
+  //connect();
 }
 void ToolManager::connectSignalsAndSlots()
 {

@@ -16,6 +16,7 @@
 #include "sscDisplayTextRep.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
@@ -33,10 +34,13 @@ ViewGroup::~ViewGroup()
 {
 }
 
-void ViewGroup::addViewWrapper(ViewWrapperPtr object)
+void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 {
-  mViews.push_back(object->getView());
-  mElements.push_back(object);
+  mViews.push_back(wrapper->getView());
+  mElements.push_back(wrapper);
+
+  connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
+          this, SLOT(activateManualToolSlot()));
 }
 
 std::string ViewGroup::toString(int i) const
@@ -141,5 +145,9 @@ void ViewGroup::contexMenuSlot(const QPoint& point)
     }
 
     this->setImage(image);
+}
+void ViewGroup::activateManualToolSlot()
+{
+  toolManager()->setDominantTool(toolManager()->getManualTool()->getUid());
 }
 }//cx
