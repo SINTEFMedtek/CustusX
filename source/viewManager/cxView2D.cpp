@@ -4,6 +4,8 @@
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
 #include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "cxMessageManager.h"

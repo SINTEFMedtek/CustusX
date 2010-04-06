@@ -44,6 +44,8 @@ std::string planeToString(ssc::PLANE_TYPE val)
 ViewWrapper2D::ViewWrapper2D(ssc::View* view)
 {
   mView = view;
+  // disable vtk interactor: this wrapper IS an interactor
+  mView->getRenderWindow()->GetInteractor()->Disable();
 
   // annotation rep
   mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
@@ -144,7 +146,7 @@ ssc::Transform3D ViewWrapper2D::get_vpMs() const
   QSize size = mView->size();
 
   ssc::Vector3D p0_d(0,0,0);
-  ssc::Vector3D p1_d(size.width(), size.height(), 0);
+  ssc::Vector3D p1_d(size.width(), size.height(), 1);
 
   ssc::Vector3D p0_w = displayToWorld(p0_d);
   ssc::Vector3D p1_w = displayToWorld(p1_d);
@@ -197,7 +199,7 @@ void ViewWrapper2D::dominantToolChangedSlot()
   mSliceProxy->setTool(dominantTool);
   std::cout << "ViewWrapper2D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 
-  connect(dominantTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(fixStuff()));
+  //connect(dominantTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(fixStuff()));
 
 }
 
@@ -230,9 +232,13 @@ void ViewWrapper2D::mouseReleaseSlot(QMouseEvent* event)
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 
-//  ssc::Vector3D p_r = mSliceProxy->get_sMr().inv().coord(p_s);
-//  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
-//  ToolManager::getInstance()->getManualTool()->set_prMt(createTransformTranslate(p_pr));
+//  std::cout << "--- mouse click ---" << std::endl;
+//  std::cout << "get_vpMs()\n" << get_vpMs() << std::endl;
+//  std::cout << "get_vpMs().inv()\n" << get_vpMs().inv() << std::endl;
+//  std::cout << "center_r\t" << DataManager::getInstance()->getCenter() << std::endl;
+//  std::cout << "click_vp\t" << click_vp << std::endl;
+//  std::cout << "click_s \t" << click_s << std::endl;
+//  std::cout << "tool_s  \t" << tool_s << std::endl;
 }
 
 

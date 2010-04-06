@@ -18,6 +18,8 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
+#include "cxDataManager.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -330,6 +332,20 @@ void ViewManager::activateLayout_3DACS_2X2()
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
 {
+  //TODO: move this to suitable place... (CA)
+  ssc::Vector3D p_r(0,0,0);
+  if (!DataManager::getInstance()->getImages().empty())
+  {
+    ssc::ImagePtr image = DataManager::getInstance()->getImages().begin()->second;
+    p_r = image->get_rMd().coord(image->boundingBox().center());
+  }
+
+  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  // TODO set center here will not do: must handle
+  DataManager::getInstance()->setCenter(p_r);
+  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+
+
   activate3DView(0, 0,                  0, 0);
   activate2DView(0, 1, ssc::ptAXIAL,    0, 1);
   activate2DView(0, 2, ssc::ptCORONAL,  1, 0);
