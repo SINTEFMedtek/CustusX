@@ -16,6 +16,7 @@
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxViewGroup.h"
+#include "cxViewGroupInria.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
 #include "cxDataManager.h"

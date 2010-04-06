@@ -61,25 +61,6 @@ protected:
   std::vector<ViewWrapperPtr> mElements;
 };
 
-/**
- *
- */
-class ViewGroupInria : public ViewGroup
-{
-  Q_OBJECT
-public:
-  ViewGroupInria(int startIndex, ssc::View* view1,
-      ssc::View* view2, ssc::View* view3);
-  virtual ~ViewGroupInria();
-
-  virtual void setImage(ssc::ImagePtr image);
-  virtual void removeImage(ssc::ImagePtr image);
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
-
-protected:
-  int mStartIndex;
-  ssc::ImagePtr mImage;
-};
 
 } // namespace cx
 
