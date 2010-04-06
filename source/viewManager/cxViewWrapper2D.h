@@ -53,6 +53,7 @@ private:
   ssc::ToolRep2DPtr mToolRep2D;
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
+  ssc::DisplayTextRepPtr mDataNameText;
   ssc::View* mView;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;

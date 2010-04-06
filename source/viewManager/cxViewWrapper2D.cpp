@@ -58,6 +58,11 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   mPlaneTypeText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.98, 0.02, 0.0));
   mView->addRep(mPlaneTypeText);
 
+  //data name text rep
+  mDataNameText = ssc::DisplayTextRep::New("dataNameText_"+mView->getName(), "");
+  mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
+  mView->addRep(mDataNameText);
+
   // slice proxy
   mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
   //(handled by init) mSliceProxy->initializeFromPlane(planeType[i], false, ssc::Vector3D(0,0,1), false, 1, 0.25);
@@ -186,6 +191,9 @@ void ViewWrapper2D::setImage(ssc::ImagePtr image)
   ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
   mSliceProxy->setDefaultCenter(c);
   mSliceRep->setImage(image);
+
+  //update data name text rep
+  mDataNameText->setText(0, image->getName());
 }
 
 void ViewWrapper2D::removeImage(ssc::ImagePtr image)
