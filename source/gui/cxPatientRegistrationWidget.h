@@ -22,7 +22,6 @@ typedef ssc::Transform3D Transform3D;
 typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
 class RegistrationManager;
-class ToolManager;
 class MessageManager;
 class ViewManager;
 class RepManager;
@@ -83,7 +82,7 @@ protected:
 
   //managers
   RegistrationManager* mRegistrationManager; ///< handles image and patient registration
-  ToolManager* mToolManager; ///< interface to the navigation system
+  //ToolManager* mToolManager; ///< interface to the navigation system
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
   RepManager* mRepManager; ///< has a pool of reps
 
@@ -91,7 +90,7 @@ protected:
   int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
   std::map<int, double> mLandmarkRegistrationAccuracyMap; ///< maps accuracy to index of a landmark
   double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
-  ToolPtr mToolToSample; ///< tool to be sampled from
+  ssc::ToolPtr mToolToSample; ///< tool to be sampled from
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 
   int mMinValue, mMaxValue, mDefaultValue; ///< values for the range of the offset

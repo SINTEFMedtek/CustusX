@@ -44,7 +44,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mZSpinBox(new QSpinBox(mOffsetWidget)),
   mResetOffsetButton(new QPushButton("Clear offset", this)),
   mRegistrationManager(RegistrationManager::getInstance()),
-  mToolManager(ToolManager::getInstance()),
+  //mToolManager(ToolManager::getInstance()),
   mViewManager(ViewManager::getInstance()),
   mRepManager(RepManager::getInstance()),
   mCurrentRow(-1),
@@ -71,11 +71,11 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
           this, SLOT(resetOffsetSlot()));
 
   //toolmanager
-  connect(mToolManager, SIGNAL(dominantToolChanged(const std::string&)),
+  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)),
           this, SLOT(dominantToolChangedSlot(const std::string&)));
-  connect(mToolManager, SIGNAL(toolSampleAdded(double,double,double,unsigned int)),
+  connect(toolManager(), SIGNAL(toolSampleAdded(double,double,double,unsigned int)),
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
-  connect(mToolManager, SIGNAL(toolSampleRemoved(double,double,double,unsigned int)),
+  connect(toolManager(), SIGNAL(toolSampleRemoved(double,double,double,unsigned int)),
           this, SLOT(toolSampledUpdateSlot(double, double, double,unsigned int)));
 
   //registrationmanager
@@ -147,7 +147,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
 
   mOffsetWidget->setDisabled(true);
 
-  ssc::ToolPtr dominantTool = mToolManager->getDominantTool();
+  ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
   if(dominantTool)
     this->dominantToolChangedSlot(dominantTool->getUid());
 }
@@ -189,7 +189,7 @@ void PatientRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double
 }
 void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double notUsedY, double notUsedZ,unsigned int notUsedIndex)
 {
-  int numberOfToolSamples = mToolManager->getToolSamples()->GetNumberOfTuples();
+  int numberOfToolSamples = toolManager()->getToolSamples()->GetNumberOfTuples();
   int numberOfActiveToolSamples = 0;
   RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
   RegistrationManager::NameListType::iterator it = landmarkActiveMap.begin();
@@ -219,15 +219,16 @@ void PatientRegistrationWidget::toolVisibleSlot(bool visible)
 }
 void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 {  
-  //TODO What if the reference frame isnt visible?
-  ssc::Transform3DPtr lastTransform_prMt = mToolToSample->getLastTransform();
-  if(!lastTransform_prMt)
+  if(!mToolToSample)
   {
-    messageManager()->sendError("The last transform was NULL!");
+    messageManager()->sendError("mToolToSample is NULL!");
     return;
   }
+  //TODO What if the reference frame isnt visible?
+  //ssc::Transform3DPtr lastTransform_prMt = mToolToSample->getLastTransform();
+  ssc::Transform3D lastTransform_prMt = mToolToSample->get_prMt();
 
-  vtkMatrix4x4Ptr lastTransformMatrix = lastTransform_prMt->matrix();
+  vtkMatrix4x4Ptr lastTransformMatrix = lastTransform_prMt.matrix();
   double x = lastTransformMatrix->GetElement(0,3);
   double y = lastTransformMatrix->GetElement(1,3);
   double z = lastTransformMatrix->GetElement(2,3);
@@ -242,7 +243,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   messageMan()->sendWarning(message.str());*/
   //END
   
-  mToolManager->addToolSampleSlot(x, y, z, index);
+  toolManager()->addToolSampleSlot(x, y, z, index);
 }
 void PatientRegistrationWidget::rowSelectedSlot(int row, int column)
 {
@@ -269,10 +270,11 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   if(mToolToSample && mToolToSample->getUid() == uid)
     return;
 
-  ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
+  //ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
+  ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
   if(!mToolToSample)
   {
-    if(!newTool)
+    if(!dominantTool)
       return;
   }else
   {
@@ -280,7 +282,12 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
                this, SLOT(toolVisibleSlot(bool)));
   }
 
-  mToolToSample = newTool;
+  //mToolToSample = boost::shared_dynamic_cast<Tool>(dominantTool);
+  mToolToSample = dominantTool;
+  if(!dominantTool)
+  {
+    return;
+  }
   connect(mToolToSample.get(), SIGNAL(toolVisible(bool)),
               this, SLOT(toolVisibleSlot(bool)));
 
@@ -469,7 +476,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
       columnOne->setText(QString(name.c_str()));
   }
   //get the patient coordinates from the toolmanager
-  vtkDoubleArrayPtr toolsamples = mToolManager->getToolSamples();
+  vtkDoubleArrayPtr toolsamples = toolManager()->getToolSamples();
   int numberOfToolSamples = toolsamples->GetNumberOfTuples();
  
   //TODO REMOVE for debugging
@@ -498,9 +505,9 @@ void PatientRegistrationWidget::updateAccuracy()
 {
   //ssc:Image masterImage = mRegistrationManager->getMasterImage();
   vtkDoubleArrayPtr globalPointset = mRegistrationManager->getGlobalPointSet();
-  vtkDoubleArrayPtr toolSamplePointset = mToolManager->getToolSamples();
+  vtkDoubleArrayPtr toolSamplePointset = toolManager()->getToolSamples();
 
-  ssc::Transform3DPtr rMpr = mToolManager->get_rMpr();
+  ssc::Transform3DPtr rMpr = toolManager()->get_rMpr();
 
   int numberOfGlobalImagePoints = globalPointset->GetNumberOfTuples();
   int numberOfToolSamplePoints = toolSamplePointset->GetNumberOfTuples();
