@@ -39,9 +39,9 @@ public:
 	{
 		TOOL_NONE,
 		TOOL_REFERENCE,
-		TOOL_POINTER,
 		TOOL_MANUAL, ///< representation of a mouse/keyboard-controlled virtual tool
-		TOOL_US_PROBE
+	  TOOL_POINTER,
+	  TOOL_US_PROBE
 	};
 	virtual Type getType() const = 0;
 	/**\return a file containing a graphical description of the tool,
