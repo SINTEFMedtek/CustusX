@@ -625,10 +625,6 @@ void MainWindow::activateImageRegistationState()
   connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(int)),
           probeRep.get(), SLOT(setThresholdSlot(int)));
 
-  //set the manual tool to be the the default tool for image registration
-  //TODO:do we need this when manual tool is  always set as dominant when click in a view?
-  toolManager()->setDominantTool(toolManager()->getManualTool()->getUid());
-
   mCurrentWorkflowState = IMAGE_REGISTRATION;
 }
 void MainWindow::deactivateImageRegistationState()
