@@ -12,7 +12,6 @@ typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
 
 namespace cx
 {
-class ToolManager;
 class MessageManager;
 
 /**\
@@ -67,8 +66,6 @@ protected:
   ~RegistrationManager(); ///< destructor
 
   static RegistrationManager* mCxInstance; ///< the only instance of this class
-
-  ToolManager* mToolManager; ///< interface to the navigation system
 
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
   vtkDoubleArrayPtr mGlobalPointSet; ///< the pointset used when doing the registration

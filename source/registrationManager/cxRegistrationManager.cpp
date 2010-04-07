@@ -23,8 +23,8 @@ RegistrationManager* RegistrationManager::getInstance()
   }
   return mCxInstance;
 }
-RegistrationManager::RegistrationManager() :
-  mToolManager(ToolManager::getInstance())
+RegistrationManager::RegistrationManager()
+  //mToolManager(ToolManager::getInstance())
 {}
 RegistrationManager::~RegistrationManager()
 {}
@@ -65,7 +65,7 @@ void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patie
   //mToolManager->set_rMpr(patientRegistration);
 
   ssc::RegistrationTransform regTrans(*patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
-  mToolManager->get_rMpr_History()->addRegistration(regTrans);
+  toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   //if an offset existed, its no longer valid and should be removed
   mPatientRegistrationOffset.reset();
@@ -92,7 +92,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(
   else if (mMasterImage)
   {
     this->resetOffset();
-    currentTransform = *mToolManager->get_rMpr();
+    currentTransform = *toolManager()->get_rMpr();
   }
   else //if we dont have a masterimage or a manualtransform we just want to save the offset?
   {
@@ -103,7 +103,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(
   ssc::Transform3D newTransform = (*mPatientRegistrationOffset) * currentTransform;
 //  mToolManager->set_rMpr(newTransformPtr);
   ssc::RegistrationTransform regTrans(newTransform, QDateTime::currentDateTime(), "Manual Patient Offset");
-  mToolManager->get_rMpr_History()->addRegistration(regTrans);
+  toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
 
   messageManager()->sendInfo("Offset for the patient registration is set.");
@@ -171,7 +171,7 @@ void RegistrationManager::doPatientRegistration()
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
   //image->get_rMd_History()->addRegistration(regTrans);
-  mToolManager->get_rMpr_History()->addRegistration(regTrans);
+  toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   emit patientRegistrationPerformed();
   messageManager()->sendInfo("Patient registration has been performed.");
