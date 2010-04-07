@@ -179,11 +179,11 @@ ssc::ToolPtr ToolManager::getDominantTool()
 }
 void ToolManager::setDominantTool(const std::string& uid)
 {
-  std::cout << "1: void ToolManager::setDominantTool(const std::string& uid)" << std::endl;
+  std::cout << "1: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
   if(mDominantTool && mDominantTool->getUid() == uid)
     return;
 
-  std::cout << "2: void ToolManager::setDominantTool(const std::string& uid)" << std::endl;
+  std::cout << "2: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
 
   ToolMapConstIter iter = mConfiguredTools->find(uid);
   if (iter != mConfiguredTools->end())
@@ -766,7 +766,8 @@ void ToolManager::addConnectedTool(std::string uid)
       + " was moved from the configured to the connected map.");
 
   //connect visible/hidden signal to domiantCheck
-  //connect();
+  connect((*it).second.get(), SIGNAL(toolVisible(bool)),
+          this, SLOT(dominantCheckSlot(bool)));
 }
 void ToolManager::connectSignalsAndSlots()
 {
@@ -804,6 +805,35 @@ void ToolManager::checkTimeoutsAndRequestTransform()
         refTool->getPointer());
     it++;
   }
+}
+void ToolManager::dominantCheckSlot(bool visible)
+{
+  //make a sorted vector of all visible tools
+  std::vector<ssc::ToolPtr> visibleTools;
+  for(ToolMap::iterator it = mConnectedTools->begin();
+      it != mConnectedTools->end(); ++it)
+  {
+    if(it->second->getVisible())
+      visibleTools.push_back(it->second);
+  }
+
+  if(!visibleTools.empty())
+  {
+    //sort most important tool to the start of the vector:
+    sort(visibleTools.begin(), visibleTools.end(), toolTypeSort);
+    const std::string uid = visibleTools.at(0)->getUid();
+    this->setDominantTool(uid);
+  }
+}
+/**
+ * sorts tools in descending order of type
+ * @param tool1 the first tool
+ * @param tool2 the second tool
+ * @return whether the second tool is of higher priority than the first or not
+ */
+bool toolTypeSort(const boost::shared_ptr<ssc::Tool> tool1, const boost::shared_ptr<ssc::Tool> tool2)
+{
+  return tool1->getType() > tool2->getType();
 }
 void ToolManager::addToolSampleSlot(double x, double y, double z, unsigned int index)
 {

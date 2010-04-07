@@ -107,6 +107,7 @@ protected slots:
    */
   void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid);
   void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
+  void dominantCheckSlot(bool visible); ///< checks if the visible tool is going to be set as dominant tool
 
 protected:
   typedef ssc::ToolManager::ToolMap::const_iterator ToolMapConstIter;
@@ -178,5 +179,6 @@ private:
 /**Shortcut for accessing the toolmanager instance.
  */
 ToolManager* toolManager();
+bool toolTypeSort(const boost::shared_ptr<ssc::Tool> tool1, const boost::shared_ptr<ssc::Tool> tool2); ///< function for sorting tools by type
 }//namespace cx
 #endif /* CXTOOLMANAGER_H_ */
