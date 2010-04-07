@@ -129,6 +129,7 @@ std::string ViewManager::layoutText(LayoutType type)
   case LAYOUT_ACSACS_2X3 :    return "ACSACS_2X3";
   case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
   case LAYOUT_3DAny_1X2_SNW : return "3DAny_1X2_SNW";
+  case LAYOUT_ACSACS_2X3_SNW : return "ACSACS_2X3_SNW";
   default: return "Undefined layout";
   }
 }
@@ -142,6 +143,7 @@ std::vector<ViewManager::LayoutType> ViewManager::availableLayouts() const
   retval.push_back(LAYOUT_ACSACS_2X3);
   retval.push_back(LAYOUT_3DACS_2X2_SNW);
   retval.push_back(LAYOUT_3DAny_1X2_SNW);
+  retval.push_back(LAYOUT_ACSACS_2X3_SNW);
   return retval;
 }
 
@@ -254,6 +256,9 @@ void ViewManager::activateLayout(LayoutType toType)
   case LAYOUT_3DAny_1X2_SNW:
     this->activateLayout_3DAny_1X2_SNW();
     break;
+  case LAYOUT_ACSACS_2X3_SNW:
+    this->activateLayout_ACSACS_2X3_SNW();
+    break;
   default:
     return;
     break;
@@ -353,6 +358,32 @@ void ViewManager::activateLayout_3DACS_2X2_SNW()
   activate2DView(0, 3, ssc::ptSAGITTAL, 1, 1);
 
   mCurrentLayoutType = LAYOUT_3DACS_2X2_SNW;
+}
+
+void ViewManager::activateLayout_ACSACS_2X3_SNW()
+{
+  //TODO: move this to suitable place... (CA)
+  ssc::Vector3D p_r(0,0,0);
+  if (!DataManager::getInstance()->getImages().empty())
+  {
+    ssc::ImagePtr image = DataManager::getInstance()->getImages().begin()->second;
+    p_r = image->get_rMd().coord(image->boundingBox().center());
+  }
+
+  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  // TODO set center here will not do: must handle
+  DataManager::getInstance()->setCenter(p_r);
+  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+
+  activate2DView(0, 1, ssc::ptAXIAL,    0, 0);
+  activate2DView(0, 2, ssc::ptCORONAL,  0, 1);
+  activate2DView(0, 3, ssc::ptSAGITTAL, 0, 2);
+  activate2DView(1, 1, ssc::ptAXIAL,    1, 0);
+  activate2DView(1, 2, ssc::ptCORONAL,  1, 1);
+  activate2DView(1, 3, ssc::ptSAGITTAL, 1, 2);
+
+  mCurrentLayoutType = LAYOUT_ACSACS_2X3_SNW;
+
 }
 
 void ViewManager::activateLayout_3DAny_1X2_SNW()

@@ -41,7 +41,8 @@ public:
     LAYOUT_3DACS_1X3,
     LAYOUT_ACSACS_2X3,
     LAYOUT_3DACS_2X2_SNW,
-    LAYOUT_3DAny_1X2_SNW
+    LAYOUT_3DAny_1X2_SNW,
+    LAYOUT_ACSACS_2X3_SNW
   }; ///< the layout types available
   static std::string layoutText(LayoutType type);
   std::vector<LayoutType> availableLayouts() const;
@@ -94,6 +95,7 @@ protected:
   void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
   void activateLayout_3DAny_1X2_SNW();
   void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
+  void activateLayout_ACSACS_2X3_SNW();
   //void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
