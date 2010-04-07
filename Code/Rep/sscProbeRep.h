@@ -5,6 +5,8 @@
 #include "vtkSmartPointer.h"
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
+#include "sscTransform3D.h"
+#include "sscForwardDeclarations.h"
 
 class vtkObject;
 class vtkRenderWindowInteractor;
@@ -44,6 +46,7 @@ public:
 	int getThreshold(); ///< gets the probing threshold
 	void setImage(ImagePtr image); ///< set which image points should be picked from
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
+  void setTool(ToolPtr tool); ///< set the tool to listen to
 
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
@@ -56,6 +59,9 @@ public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
 	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
 	void setThresholdSlot(const int threshold); ///< sets the threshold for picking the point on the volumes surface
+  
+protected slots:
+  void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
 
 protected:
 	ProbeRep(const std::string& uid, const std::string& name=""); ///< use New instead
@@ -66,6 +72,7 @@ protected:
 	bool snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint); ///< if there is a landmark close by, use that instead
 
 	ImagePtr            mImage;                           ///< the image to pick points from
+  ToolPtr             mTool;                            ///< the connected tool
 	int                 mThreshold;                       ///< used to picked the point together with the probefilter, default=25
 	int                 mResolution;                      ///< used to divide the probing ray into pieces, default=1000
 	Vector3D            mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image

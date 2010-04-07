@@ -16,6 +16,8 @@
 #include <vtkEventQtSlotConnect.h>
 #include "sscImage.h"
 #include "sscView.h"
+#include "sscTool.h"
+#include "sscToolManager.h"
 
 namespace ssc
 {
@@ -65,6 +67,28 @@ void ProbeRep::setResolution(const int resolution)
 {
 	mResolution = resolution;
 }
+void ProbeRep::setTool(ToolPtr tool)
+{
+  if (tool==mTool)
+    return;
+  
+  if (mTool)
+  {
+    disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+               this, SLOT(receiveTransforms(Transform3D, double)));
+  }
+  
+  mTool = tool;
+  
+  if (mTool)
+  {
+    receiveTransforms(mTool->get_prMt(), 0);
+    
+    connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
+            this, SLOT(receiveTransforms(Transform3D, double)));     
+  }
+}
+  
 /**
  * Trace a ray from clickPosition along the camera view direction and intersect
  * the image.
@@ -133,7 +157,8 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 
 	//Make an sphere actor to show where the calculated point is
 	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
-
+  
+  emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 	return intersection;
 }
 /**
@@ -174,7 +199,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
-//  std::cout << "ProbeRep::showTemporaryPointSlot B" << std::endl;
+  std::cout << "ProbeRep::showTemporaryPointSlot()" << std::endl;
   if(mCurrentRenderer == NULL)
     return;
 
@@ -194,14 +219,13 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
   mPickedPointActor->SetPosition(x, y, z);
   mCurrentRenderer->AddActor(mPickedPointActor);
 
-  mCurrentRenderer->GetRenderWindow()->Render();
+  //mCurrentRenderer->GetRenderWindow()->Render();
 
   //update temporary point
   mPickedPoint[0] = x;
   mPickedPoint[1] = y;
   mPickedPoint[2] = z;
   //std::cout << "ProbeRep::showTemporaryPointSlot: pickpos = " << mPickedPoint << std::endl;
-  emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 //  std::cout << "ProbeRep::showTemporaryPointSlot E" << std::endl;
 }
 /**
@@ -210,6 +234,12 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 void ProbeRep::setThresholdSlot(const int threshold)
 {
   mThreshold = threshold;
+}
+void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
+{
+  Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
+  Transform3D rMt = (*rMprPtr)*prMt;
+  this->showTemporaryPointSlot(rMt[0][3], rMt[1][3], rMt[2][3]);
 }
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {
