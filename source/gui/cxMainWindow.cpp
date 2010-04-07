@@ -182,7 +182,12 @@ MainWindow::MainWindow() :
   mNavigationIndex(-1),
   mSettings(new QSettings()),
   mActivePatientFolder("")
-{  
+{
+#ifdef VERSION_NUMBER
+  this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER));
+#else
+#endif
+  
   this->createActions();
   this->createToolBars();
   this->createMenus();

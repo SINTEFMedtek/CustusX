@@ -1,5 +1,8 @@
 SET(LIBNAME gui)
 
+# Make VERSION_NUMBER available for c++ files in gui folder
+ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
+
 SET(cxProject_MOC_HDRS
   cxMainWindow.h
   cxMessageManager.h
