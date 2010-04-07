@@ -1,17 +1,6 @@
 #include "cxMainWindow.h"
 
-#include <QAction>
-#include <QMenu>
-#include <QMenuBar>
-#include <QToolBar>
-#include <QFileDialog>
-#include <QStatusBar>
-#include <QFileInfo>
-#include <QDomDocument>
-#include <QTextStream>
-#include <QSettings>
-#include <QDateTime>
-#include <QTimer>
+#include <QtGui>
 #include "sscTypeConversions.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
@@ -752,9 +741,14 @@ void MainWindow::createPatientFolders(QString choosenDir)
   
 void MainWindow::aboutSlot()
 {
-//  QMessageBox::about(this, tr("About CustusX"),
-//                     tr("<b>CustusX</b> is an application for IGS"));
+  QMessageBox::about(this, tr("About CustusX"),
+                     tr("<h2>CustusX version %1</h2> "
+                        "<p>Created by SINTEF Medical Technology."
+                        "<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
+                        "<p>An application for Image Guided Surgery."
+                        "<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(VERSION_NUMBER));
 }
+
 void MainWindow::preferencesSlot()
 {
   PreferencesDialog prefDialog(this);
