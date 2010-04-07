@@ -78,16 +78,16 @@ public slots:
   virtual void startTracking(); ///< starts tracking
   virtual void stopTracking(); ///< stops tracking
   virtual void saveToolsSlot(); ///< saves transforms and timestamps
+  void addToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to remove tool(patient) samples
+  void removeToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to add tool(patient) samples
+  void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
+  
 
 signals:
   //void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
   void toolSampleRemoved(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is removed
   void toolSampleAdded(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is added
   void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
-
-public slots:
-  void addToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to remove tool(patient) samples
-  void removeToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to add tool(patient) samples
 
 protected slots:
   /**
@@ -107,7 +107,6 @@ protected slots:
    */
   void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid);
   void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
-  void dominantCheckSlot(bool visible); ///< checks if the visible tool is going to be set as dominant tool
 
 protected:
   typedef ssc::ToolManager::ToolMap::const_iterator ToolMapConstIter;
@@ -179,6 +178,6 @@ private:
 /**Shortcut for accessing the toolmanager instance.
  */
 ToolManager* toolManager();
-bool toolTypeSort(const boost::shared_ptr<ssc::Tool> tool1, const boost::shared_ptr<ssc::Tool> tool2); ///< function for sorting tools by type
+bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2); ///< function for sorting tools by type
 }//namespace cx
 #endif /* CXTOOLMANAGER_H_ */

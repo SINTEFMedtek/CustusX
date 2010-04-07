@@ -94,7 +94,7 @@ public:
   virtual void setTransformSaveFile(const std::string& filename);
   virtual ssc::Transform3D get_prMt() const;
   virtual bool getVisible() const;
-  virtual ssc::Transform3DPtr getLastTransform();
+  //virtual ssc::Transform3DPtr getLastTransform();
   virtual std::string getUid() const;
   virtual std::string getName() const;
   virtual int getIndex() const{return 0;};

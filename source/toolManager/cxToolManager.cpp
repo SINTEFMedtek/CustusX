@@ -185,18 +185,27 @@ void ToolManager::setDominantTool(const std::string& uid)
 
   std::cout << "2: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
 
-  ToolMapConstIter iter = mConfiguredTools->find(uid);
+  ssc::ToolPtr newTool;
+  
+  ToolMapConstIter iter = mConfiguredTools->find(uid);  
   if (iter != mConfiguredTools->end())
   {
-    mDominantTool = ((*iter).second);
-    emit dominantToolChanged(uid);
+    newTool = iter->second;
   }
   ToolMapConstIter it = mConnectedTools->find(uid);
   if (it != mConnectedTools->end())
   {
-    mDominantTool = ((*it).second);
-    emit dominantToolChanged(uid);
+    newTool = it->second;
   }
+  
+  if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mDominantTool && mManualTool)
+  {
+    mManualTool->set_prMt(mDominantTool->get_prMt());
+  }
+
+  mDominantTool = newTool;
+  emit dominantToolChanged(uid);
+
 }
 std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
 {
@@ -750,9 +759,9 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
   return tools;
 }
 void ToolManager::addConnectedTool(std::string uid)
-{
-  ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);
-  if (it == mConfiguredTools->end())
+{  
+  ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
+  if (it == mConfiguredTools->end() || !it->second)
   {
     messageManager()->sendInfo("Tool with id " + uid
         + " was not found to be configured "
@@ -760,14 +769,15 @@ void ToolManager::addConnectedTool(std::string uid)
     return;
   }
   //mConnectedTools->insert(std::pair<std::string, ssc::ToolPtr>((*it).first, (*it).second));
-  (*mConnectedTools)[(*it).first] = (*it).second;
+  (*mConnectedTools)[it->first] = it->second;
+  ssc::ToolPtr tool = it->second;
+  //connect visible/hidden signal to domiantCheck
+  connect(tool.get(), SIGNAL(toolVisible(bool)),
+          this, SLOT(dominantCheckSlot()));
+  
   mConfiguredTools->erase(it);
   messageManager()->sendInfo("Tool with id " + uid
       + " was moved from the configured to the connected map.");
-
-  //connect visible/hidden signal to domiantCheck
-  connect((*it).second.get(), SIGNAL(toolVisible(bool)),
-          this, SLOT(dominantCheckSlot(bool)));
 }
 void ToolManager::connectSignalsAndSlots()
 {
@@ -797,16 +807,19 @@ void ToolManager::checkTimeoutsAndRequestTransform()
   if (!mReferenceTool)
     return;
 
+  ToolPtr refTool = boost::shared_dynamic_cast<Tool>(mReferenceTool);
   ToolMap::iterator it = mConnectedTools->begin();
-  while (it != mConnectedTools->end())
+  for(;it != mConnectedTools->end();++it)
   {
-    Tool* refTool = static_cast<Tool*> (mReferenceTool.get());
-    static_cast<Tool*> ((*it).second.get())->getPointer()->RequestComputeTransformTo(
-        refTool->getPointer());
-    it++;
+    //Tool* refTool = static_cast<Tool*> (mReferenceTool.get());
+    //static_cast<Tool*> ((*it).second.get())->getPointer()->RequestComputeTransformTo(refTool->getPointer());
+    ToolPtr connectedTool = boost::shared_dynamic_cast<Tool>(it->second);
+    if(!refTool || !connectedTool)
+      continue;
+    connectedTool->getPointer()->RequestComputeTransformTo(refTool->getPointer());
   }
 }
-void ToolManager::dominantCheckSlot(bool visible)
+void ToolManager::dominantCheckSlot()
 {
   //make a sorted vector of all visible tools
   std::vector<ssc::ToolPtr> visibleTools;
@@ -831,7 +844,7 @@ void ToolManager::dominantCheckSlot(bool visible)
  * @param tool2 the second tool
  * @return whether the second tool is of higher priority than the first or not
  */
-bool toolTypeSort(const boost::shared_ptr<ssc::Tool> tool1, const boost::shared_ptr<ssc::Tool> tool2)
+bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2)
 {
   return tool1->getType() > tool2->getType();
 }
