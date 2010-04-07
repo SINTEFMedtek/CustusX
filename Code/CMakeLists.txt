@@ -96,64 +96,112 @@ endif (NOT APPLE)
 # library
 SET( SSC_SOURCE_FILES
     Utilities/sscBoundingBox3D.cpp
+    Utilities/sscBoundingBox3D.h
     Utilities/sscVector3D.cpp
+    Utilities/sscVector3D.h
     Utilities/sscTransform3D.cpp 
+    Utilities/sscTransform3D.h
     Utilities/sscSliceComputer.cpp 
+    Utilities/sscSliceComputer.h
     Utilities/sscIndent.cpp
+    Utilities/sscIndent.h
     Utilities/sscAcceptanceBoxWidget.cpp
+    Utilities/sscAcceptanceBoxWidget.h
     Utilities/sscGraphicalPrimitives.cpp
+    Utilities/sscGraphicalPrimitives.h
     Utilities/sscFrame3D.cpp
+    Utilities/sscFrame3D.h
     Utilities/sscUtilHelpers.cpp
+    Utilities/sscUtilHelpers.h
     Utilities/sscPositionStorageFile.cpp
+    Utilities/sscPositionStorageFile.h
     Utilities/sscTypeConversions.cpp
+    Utilities/sscTypeConversions.h
     Utilities/sscMD5Check.cpp
+    Utilities/sscMD5Check.h
     Utilities/sscSnwInifile.cpp
-	Utilities/sscGLHelpers.cpp
+    Utilities/sscSnwInifile.h
+    Utilities/sscGLHelpers.cpp
+    Utilities/sscGLHelpers.h
     sscView.cpp
+    sscView.h
     Rep/sscRep.h
     Rep/sscRepImpl.h
     Rep/sscRepImpl.cpp
+    Rep/sscRepImpl.h
     Rep/sscAxesRep.cpp
+    Rep/sscAxesRep.h
     Rep/sscSliceRep.cpp
+    Rep/sscSliceRep.h
     Rep/sscVolumetricRep.h
     Rep/sscVolumetricRep.cpp
-    Rep/sscProgressiveLODVolumetricRep.cpp    
+    Rep/sscProgressiveLODVolumetricRep.cpp
+    Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscGeometricRep.cpp
+    Rep/sscGeometricRep.h
     Rep/sscToolRep3D.cpp
+    Rep/sscToolRep3D.h
     Rep/sscProbeRep.cpp
+    Rep/sscProbeRep.h
     Rep/sscSlicerRepSW.cpp
+    Rep/sscSlicerRepSW.h
     Rep/sscSliceProxy.cpp
+    Rep/sscSliceProxy.h
     Rep/sscSlicePlaneRep.cpp
+    Rep/sscSlicePlaneRep.h
     Rep/sscSlicedImageProxy.cpp
+    Rep/sscSlicedImageProxy.h
     Rep/sscBlendedSliceRep.cpp
+    Rep/sscBlendedSliceRep.h
     Rep/sscSurfaceRep.cpp
+    Rep/sscSurfaceRep.h
     Rep/sscImageBlenderProxy.cpp
-	Rep/sscTexture3DSlicerRep.cpp
-	Rep/sscTextureSlicePainter.cpp    
+    Rep/sscImageBlenderProxy.h
+    Rep/sscTexture3DSlicerRep.cpp
+    Rep/sscTexture3DSlicerRep.h
+    Rep/sscTextureSlicePainter.cpp
+    Rep/sscTextureSlicePainter.h
     Rep/sscOrientationAnnotationRep.cpp
-	Rep/sscTool2DRep.cpp
+    Rep/sscOrientationAnnotationRep.h
+    Rep/sscTool2DRep.cpp
+    Rep/sscTool2DRep.h
     Rep/sscCrossHairRep2D.cpp
+    Rep/sscCrossHairRep2D.h
     Rep/sscDisplayTextRep.cpp
-	Rep/sscVtkHelperClasses.cpp
+    Rep/sscDisplayTextRep.h
+    Rep/sscVtkHelperClasses.cpp
+    Rep/sscVtkHelperClasses.h
     Data/sscData.cpp
+    Data/sscData.h
     Data/sscImage.h
     Data/sscImage.cpp
     Data/sscImageTF3D.h
     Data/sscImageTF3D.cpp
     Data/sscImageLUT2D.cpp
+    Data/sscImageLUT2D.h
     Data/sscGPUImageBuffer.cpp
+    Data/sscGPUImageBuffer.h
     Data/sscMesh.h
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
+    Data/sscDataManager.h
     Data/sscDataManagerImpl.cpp
-    Data/sscSNW2Volume.cpp 
-    Data/sscRegistrationTransform.cpp       
+    Data/sscDataManagerImpl.h
+    Data/sscSNW2Volume.cpp
+    Data/sscSNW2Volume.h
+    Data/sscRegistrationTransform.cpp
+    Data/sscRegistrationTransform.h
     Tool/sscToolManager.cpp
+    Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyToolManager.cpp
+    Tool/sscDummyToolManager.h
     Tool/sscDummyTool.cpp
+    Tool/sscDummyTool.h
     Tool/sscManualTool.cpp
+    Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
+    Tool/sscProbeSector.h
 	) 
 
 # =========================================================
