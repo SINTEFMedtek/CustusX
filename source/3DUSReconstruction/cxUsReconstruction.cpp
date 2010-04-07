@@ -964,9 +964,9 @@ vtkImageData* UsReconstruction::reconstructVolume(Input2DUS* usData,
                 
         //if (targetIndex > 0 && targetIndex < maxTargetIndex)
         if (targetIndex > 0 && targetIndex < maxTargetIndex
-          &&outputIndex[0] >= 0 && outputIndex[0] <= m_volumeSize[0]
-          && outputIndex[1] >= 0 && outputIndex[1] <= m_volumeSize[1]
-          && outputIndex[2] >= 0 && outputIndex[2] <= m_volumeSize[2] 
+          &&outputIndex[0] >= 0 && outputIndex[0] <= static_cast<long>(m_volumeSize[0])
+          && outputIndex[1] >= 0 && outputIndex[1] <= static_cast<long>(m_volumeSize[1])
+          && outputIndex[2] >= 0 && outputIndex[2] <= static_cast<long>(m_volumeSize[2]) 
           && dontRemove)
         {
           //inputIndex = sample + beam * usData->samples 
@@ -1048,9 +1048,9 @@ vtkImageData* UsReconstruction::reconstructVolume(Input2DUS* usData,
                   z*m_volumeSize[0]*m_volumeSize[1];
                   
                   if (newTargetIndex > 0 && newTargetIndex < maxTargetIndex
-                      && ((outputIndex[0]+x) >= 0) && ((outputIndex[0]+x) < m_volumeSize[0])
-                      && ((outputIndex[1]+y) >= 0) && ((outputIndex[1]+y) < m_volumeSize[1])
-                      && ((outputIndex[2]+z) >= 0) && ((outputIndex[2]+z) < m_volumeSize[2]))
+                      && ((outputIndex[0]+x) >= 0) && ((outputIndex[0]+x) < static_cast<long>(m_volumeSize[0]))
+                      && ((outputIndex[1]+y) >= 0) && ((outputIndex[1]+y) < static_cast<long>(m_volumeSize[1]))
+                      && ((outputIndex[2]+z) >= 0) && ((outputIndex[2]+z) < static_cast<long>(m_volumeSize[2])))
                   {
                     // look at this code to speed up processing time
                     
@@ -1282,9 +1282,9 @@ vtkImageData* UsReconstruction::reconstructVolume(Input2DUS* usData,
         //TODO: Don't use values that are outside the volume
         
         if (targetIndex > 0 && targetIndex < maxTargetIndex
-            && ((outputIndex[0]) >= 0) && ((outputIndex[0]) < m_volumeSize[0])
-            && ((outputIndex[1]) >= 0) && ((outputIndex[1]) < m_volumeSize[1])
-            && ((outputIndex[2]) >= 0) && ((outputIndex[2]) < m_volumeSize[2]))
+            && ((outputIndex[0]) >= 0) && ((outputIndex[0]) < static_cast<long>(m_volumeSize[0]))
+            && ((outputIndex[1]) >= 0) && ((outputIndex[1]) < static_cast<long>(m_volumeSize[1]))
+            && ((outputIndex[2]) >= 0) && ((outputIndex[2]) < static_cast<long>(m_volumeSize[2])))
         {
           //error = inputPointer[inputIndex] - returnVolumeCharPtr[targetIndex];
           int inPoint = inputPointer[inputIndex];
