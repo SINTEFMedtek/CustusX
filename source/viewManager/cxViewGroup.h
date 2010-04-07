@@ -37,6 +37,7 @@ public:
 private slots:
   void contexMenuSlot(const QPoint& point);
   void activateManualToolSlot();
+  void mouseWheelSlot(QWheelEvent*);
 
 protected:
   std::string toString(int i) const;
@@ -46,6 +47,7 @@ protected:
   std::vector<ssc::View*> mViews;
 
   ssc::ImagePtr mImage;
+  double mZoomFactor;
   std::vector<ViewWrapperPtr> mElements;
 };
 

@@ -26,6 +26,7 @@ public:
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
+  virtual void setZoom(double zoomFactor, const ssc::Vector3D& click_vp) {}
 };
 typedef boost::shared_ptr<ViewWrapper> ViewWrapperPtr;
 

@@ -1,11 +1,7 @@
 #include "cxViewGroup.h"
 
 #include <vector>
-#include <QString>
-#include <QPoint>
-#include <QMenu>
-#include <QSettings>
-#include <QAction>
+#include <QtGui>
 #include <vtkRenderWindow.h>
 #include "sscView.h"
 #include "sscTypeConversions.h"
@@ -14,6 +10,7 @@
 #include "sscTool2DRep.h"
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
+#include "sscUtilHelpers.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
@@ -27,6 +24,7 @@ namespace cx
 
 ViewGroup::ViewGroup()
 {
+  mZoomFactor = 0.5;
   this->connectContextMenu();
 }
 
@@ -41,7 +39,31 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
+  connect(wrapper->getView(), SIGNAL(mouseWheelSignal(QWheelEvent*)),
+          this, SLOT(mouseWheelSlot(QWheelEvent*)));
   connectContextMenu(wrapper->getView());
+}
+
+void ViewGroup::mouseWheelSlot(QWheelEvent* event)
+{
+  //std::cout << "mouse wheel: " << event->delta() << std::endl;
+  ssc::Vector3D click_vp(0,0,0);
+
+  // scale zoom in log space
+  double val = log10(mZoomFactor);
+  val += event->delta()/120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
+  mZoomFactor = pow(10.0, val);
+  mZoomFactor = ssc::constrainValue(mZoomFactor, 0.2, 10.0);
+
+
+//  double change = 1.0 + event->delta()/120 /10.0; // event->delta() is 120 normally
+//  if (change<0.1)
+//    change = 0.1;
+//  mZoomFactor *= change;
+  for (unsigned i=0; i<mElements.size(); ++i)
+  {
+    mElements[i]->setZoom(mZoomFactor, click_vp);
+  }
 }
 
 std::string ViewGroup::toString(int i) const

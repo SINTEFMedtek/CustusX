@@ -33,6 +33,8 @@ public:
   virtual void setImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual ssc::View* getView();
+  virtual void setZoom(double zoomFactor, const ssc::Vector3D& click_vp);
+
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the inriareps are connected to the right tool
   void viewportChanged();

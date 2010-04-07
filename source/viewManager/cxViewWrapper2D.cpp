@@ -46,6 +46,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   mView = view;
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
+  mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
   // annotation rep
   mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
@@ -84,7 +85,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   dominantToolChangedSlot();
 
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
-  connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(viewportChanged()));
+  //connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
 }
@@ -116,7 +117,7 @@ void ViewWrapper2D::viewportChanged()
 
   if (!mView->getRenderer()->IsActiveCameraCreated())
     return;
-  std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
+  //std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
 
   // world == slice
   // display == vp
@@ -169,6 +170,7 @@ void ViewWrapper2D::showSlot()
   std::cout << "stuff fixed - show" << std::endl;
   mView->getRenderer()->ResetCamera();
   viewportChanged();
+  setZoom(0.5, ssc::Vector3D(0,0,0));
 }
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
@@ -208,7 +210,23 @@ void ViewWrapper2D::dominantToolChangedSlot()
   std::cout << "ViewWrapper2D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 
   //connect(dominantTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(fixStuff()));
+}
 
+void ViewWrapper2D::setZoom(double zoomFactor, const ssc::Vector3D& click_vp)
+{
+  //ssc::Vector3D p_pr = ToolManager::getInstance()->getManualTool()->get_prMt().coord(ssc::Vector3D(0,0,0));
+  ssc::Vector3D p_pr = ToolManager::getInstance()->getDominantTool()->get_prMt().coord(ssc::Vector3D(0,0,0));
+  ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(p_pr);
+  // TODO set center here will not do: must handle
+  DataManager::getInstance()->setCenter(p_r);
+  //ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+
+  //QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(mView));
+  //double mmPix = screen->heightMM() / screen->geometry().height();
+  double parallelScale = mView->heightMM() / 2.0 / zoomFactor;
+  mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
+  viewportChanged();
+ // std::cout << "zoomed: " << zoomFactor << std::endl;
 }
 
 void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
