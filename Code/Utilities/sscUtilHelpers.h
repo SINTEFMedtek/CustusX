@@ -4,6 +4,10 @@
 #include <sstream>
 #include <iomanip>
 
+namespace ssc
+{
+
+
 /**stream the range |begin,end> to the ostream.
  * insert separator between each element..
  */
@@ -25,5 +29,10 @@ template<class ITER> std::ostream& stream_range(std::ostream& s, ITER begin, ITE
 	return s;
 }
 // --------------------------------------------------------
+
+double constrainValue(double val, double min, double max);
+int sign(double x);
+
+} // namespace ssc
 
 #endif /*SSCUTILHELPERS_H_*/

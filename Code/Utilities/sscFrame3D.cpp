@@ -1,6 +1,6 @@
 #include "sscFrame3D.h"
 #include <math.h>
-
+#include "sscUtilHelpers.h"
 // --------------------------------------------------------
 namespace ssc
 {
@@ -24,26 +24,26 @@ Frame3D::~Frame3D()
 
 namespace { // unnamed
 
-/**Constrain the input to the range |min,max|
- */	
-double constrainValue(double val, double min, double max)
-{
-	if (val<=min)
-		return min;
-	if (val>=max)
-		return max;
-	return val;			
-}
+///**Constrain the input to the range |min,max|
+// */
+//double constrainValue(double val, double min, double max)
+//{
+//	if (val<=min)
+//		return min;
+//	if (val>=max)
+//		return max;
+//	return val;
+//}
 double safe_sqrt(double x)
 {
 	return sqrt(x);
 }
-int sign(double x)
-{
-	if (x>=0)
-		return 1;
-	return -1;
-}
+//int sign(double x)
+//{
+//	if (x>=0)
+//		return 1;
+//	return -1;
+//}
 
 } // namespace unnamed
 

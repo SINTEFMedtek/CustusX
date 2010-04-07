@@ -103,6 +103,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscAcceptanceBoxWidget.cpp
     Utilities/sscGraphicalPrimitives.cpp
     Utilities/sscFrame3D.cpp
+    Utilities/sscUtilHelpers.cpp
     Utilities/sscPositionStorageFile.cpp
     Utilities/sscTypeConversions.cpp
     Utilities/sscMD5Check.cpp

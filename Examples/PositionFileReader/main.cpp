@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 		{		
 			std::cout << "[" << index << "]\t" << toolIndex << '\t' << ssc::PositionStorageReader::timestampToString(timestamp).toStdString() << '\t';
 			boost::array<double, 16>  val = T.flatten();
-			stream_range(std::cout, val.begin(), val.end(), ' ');
+			ssc::stream_range(std::cout, val.begin(), val.end(), ' ');
 			std::cout << std::endl;
 		}
 
