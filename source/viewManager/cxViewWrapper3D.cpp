@@ -17,6 +17,7 @@
 #include "sscDisplayTextRep.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
+#include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
@@ -27,12 +28,12 @@ namespace cx
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mView = view;
-  RepManager* repManager = RepManager::getInstance();
+  //RepManager* repManager = RepManager::getInstance();
   std::string index = QString::number(startIndex).toStdString();
 
-  mVolumetricRep = repManager->getVolumetricRep("VolumetricRep_"+index);
-  mLandmarkRep = repManager->getLandmarkRep("LandmarkRep_"+index);
-  mProbeRep = repManager->getProbeRep("ProbeRep_"+index);
+  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
+  mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
+  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
 }
 
 void ViewWrapper3D::setImage(ssc::ImagePtr image)
@@ -72,7 +73,12 @@ ssc::View* ViewWrapper3D::getView()
 {
   return mView;
 }
-
+void ViewWrapper3D::dominantToolChangedSlot()
+{
+  ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
+  mProbeRep->setTool(dominantTool);
+  std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
+}
 void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 {
   if(mImage != image)
@@ -90,11 +96,16 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   {
     mView->removeRep(mLandmarkRep);
     mView->removeRep(mProbeRep);
+    
+    disconnect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   }
   if (mode==ssc::rsIMAGE_REGISTRATED)
   {
     mView->addRep(mLandmarkRep);
     mView->addRep(mProbeRep);
+
+    connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+    this->dominantToolChangedSlot();
   }
   if (mode==ssc::rsPATIENT_REGISTRATED)
   {

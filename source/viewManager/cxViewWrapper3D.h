@@ -34,6 +34,10 @@ public:
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
 
+private slots:
+  void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
+  
+private:
   ssc::VolumetricRepPtr mVolumetricRep;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;

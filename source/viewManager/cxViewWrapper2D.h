@@ -36,7 +36,7 @@ public:
   virtual void setZoom(double zoomFactor, const ssc::Vector3D& click_vp);
 
 private slots:
-  void dominantToolChangedSlot(); ///< makes sure the inriareps are connected to the right tool
+  void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void viewportChanged();
   void showSlot();
 //  void mouseReleaseSlot(QMouseEvent* event);

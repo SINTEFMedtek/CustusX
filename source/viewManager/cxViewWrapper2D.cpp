@@ -81,7 +81,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   mToolRep2D->setUseCrosshair(true);
   mView->addRep(mToolRep2D);
 
-  connect(ToolManager::getInstance(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   dominantToolChangedSlot();
 
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));

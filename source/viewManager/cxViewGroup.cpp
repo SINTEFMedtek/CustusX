@@ -176,6 +176,6 @@ void ViewGroup::contexMenuSlot(const QPoint& point)
 }
 void ViewGroup::activateManualToolSlot()
 {
-  toolManager()->setDominantTool(toolManager()->getManualTool()->getUid());
+  toolManager()->dominantCheckSlot();
 }
 }//cx
