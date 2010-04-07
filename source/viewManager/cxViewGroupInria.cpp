@@ -104,13 +104,12 @@ void ViewGroupInria::removeImage(ssc::ImagePtr image)
 
 void ViewGroupInria::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
-  RepManager* repManager = RepManager::getInstance();
   int baseIndex = 3*mStartIndex -2;
-  InriaRep2DPtr inriaRep2D_1 = repManager->getInria2DRep("InriaRep2D_"+toString(baseIndex+0));
-  InriaRep2DPtr inriaRep2D_2 = repManager->getInria2DRep("InriaRep2D_"+toString(baseIndex+1));
-  InriaRep2DPtr inriaRep2D_3 = repManager->getInria2DRep("InriaRep2D_"+toString(baseIndex+2));
+  InriaRep2DPtr inriaRep2D_1 = repManager()->getInria2DRep("InriaRep2D_"+toString(baseIndex+0));
+  InriaRep2DPtr inriaRep2D_2 = repManager()->getInria2DRep("InriaRep2D_"+toString(baseIndex+1));
+  InriaRep2DPtr inriaRep2D_3 = repManager()->getInria2DRep("InriaRep2D_"+toString(baseIndex+2));
 
-  ssc::ProbeRepPtr probeRep = repManager->getProbeRep("ProbeRep_"+toString(mStartIndex));
+  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_"+toString(mStartIndex));
 
   if (mode==ssc::rsIMAGE_REGISTRATED)
   {
