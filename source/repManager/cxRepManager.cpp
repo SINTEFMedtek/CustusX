@@ -68,60 +68,41 @@ RepManager::RepManager() :
 
   for(int i=0; i<MAX_INRIAREP3DS; i++)
   {
-    InriaRep3DPtr inriaRep3D(new InriaRep3D(mInriaRep3DNames[i],
-        mInriaRep3DNames[i]));
-    mInriaRep3DMap[inriaRep3D->getUid()] = inriaRep3D;
+    addRep<InriaRep3D>(new InriaRep3D(mInriaRep3DNames[i],mInriaRep3DNames[i]), &mInriaRep3DMap);
   }
   for(int i=0; i<MAX_INRIAREP2DS; i++)
   {
-    InriaRep2DPtr inriaRep2D(new InriaRep2D(mInriaRep2DNames[i],
-        mInriaRep2DNames[i]));
+    InriaRep2DPtr inriaRep2D = addRep<InriaRep2D>(new InriaRep2D(mInriaRep2DNames[i], mInriaRep2DNames[i]), &mInriaRep2DMap);
     //Remove text from Inria reps
     inriaRep2D->getVtkViewImage2D()->SetShowAnnotations(false);
     inriaRep2D->getVtkViewImage2D()->UpdateAnnotations();
-    mInriaRep2DMap[inriaRep2D->getUid()] = inriaRep2D;
     connect(inriaRep2D.get(), SIGNAL(pointPicked(double,double,double)),
             this, SLOT(syncInria2DRepsSlot(double,double,double)));
   }
   for(int i=0; i<MAX_VOLUMETRICREPS; i++)
   {
-    ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New(mVolumetricRepNames[i],
-        mVolumetricRepNames[i]));
-    mVolumetricRepMap[volumetricRep->getUid()] = volumetricRep;
+    addRep<ssc::VolumetricRep>(mVolumetricRepNames[i], &mVolumetricRepMap);
   }
   for(int i=0; i<MAX_PROGRESSIVEVOLUMETRICREPS; i++)
   {
-    ProgressiveVolumetricRepPtr progressiveVolumetricRep(
-        ProgressiveVolumetricRep::New(mProgressiveVolumetricRepNames[i],
-        mProgressiveVolumetricRepNames[i]));
-    mProgressiveVolumetricRepMap[progressiveVolumetricRep->getUid()] = progressiveVolumetricRep;
+    addRep<ProgressiveVolumetricRep>(mProgressiveVolumetricRepNames[i], &mProgressiveVolumetricRepMap);
   }
   for(int i=0; i<MAX_PROBEREPS; i++)
   {
-    ProbeRepPtr probeRep(ProbeRep::New(mProbeRepNames[i],
-        mProbeRepNames[i]));
-    mProbeRepMap[probeRep->getUid()] = probeRep;
-
+    ProbeRepPtr probeRep = addRep<ProbeRep>(mProbeRepNames[i], &mProbeRepMap);
     connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
-
   }
   for(int i=0; i<MAX_LANDMARKREPS; i++)
   {
-    LandmarkRepPtr landmarkRep(LandmarkRep::New(mLandmarkRepNames[i],
-        mLandmarkRepNames[i]));
-    mLandmarkRepMap[landmarkRep->getUid()] = landmarkRep;
+    addRep<LandmarkRep>(mLandmarkRepNames[i], &mLandmarkRepMap);
   }
   for(int i=0; i<MAX_TOOLREP3DS; i++)
   {
-    ssc::ToolRep3DPtr toolRep(ssc::ToolRep3D::New(mToolRep3DNames[i],
-        mToolRep3DNames[i]));
-    mToolRep3DMap[toolRep->getUid()] = toolRep;
+    addRep<ssc::ToolRep3D>(mToolRep3DNames[i], &mToolRep3DMap);
   }
   for(int i=0; i<MAX_GEOMETRICREPS; i++)
   {
-    ssc::GeometricRepPtr geometricRep(ssc::GeometricRep::New(mGeometricRepNames[i],
-        mGeometricRepNames[i]));
-    mGeometricRepMap[geometricRep->getUid()] = geometricRep;
+    addRep<ssc::GeometricRep>(mGeometricRepNames[i], &mGeometricRepMap);
   }
   messageManager()->sendInfo("All necessary representations have been created.");
 
@@ -136,6 +117,32 @@ RepManager::RepManager() :
           this, SLOT(dominantToolChangedSlot(const std::string&)));
 }
 
+/**Shortcut function for adding new reps to the internal maps
+ */
+template<class REP, class MAP>
+boost::shared_ptr<REP> RepManager::addRep(const std::string& uid, MAP* specificMap)
+{
+  return addRep(REP::New(uid, uid), specificMap);
+}
+
+/**Shortcut function for adding new reps to the internal maps
+ */
+template<class REP, class MAP>
+boost::shared_ptr<REP> RepManager::addRep(REP* raw, MAP* specificMap)
+{
+  return addRep(boost::shared_ptr<REP>(raw), specificMap);
+}
+
+/**Shortcut function for adding new reps to the internal maps
+ */
+template<class REP, class MAP>
+boost::shared_ptr<REP> RepManager::addRep(boost::shared_ptr<REP> rep, MAP* specificMap)
+{
+  (*specificMap)[rep->getUid()] = rep;
+  mRepMap[rep->getUid()] = rep;
+  return rep;
+}
+
 void RepManager::probeRepPointPickedSlot(double x,double y,double z)
 {
   //TODO check spaces....
@@ -147,80 +154,22 @@ void RepManager::probeRepPointPickedSlot(double x,double y,double z)
 }
 
 RepManager::~RepManager()
-{}
+{
+}
+
 std::vector<std::pair<std::string, std::string> > RepManager::getRepUidsAndNames()
 {
-  std::vector<std::pair<std::string, std::string> >* uidsAndNames = new std::vector<std::pair<std::string, std::string> >;
-  for(InriaRep3DMap::iterator it = mInriaRep3DMap.begin(); it != mInriaRep3DMap.end(); it++)
+  std::vector<std::pair<std::string, std::string> > retval;
+  for(RepMap::iterator it = mRepMap.begin(); it != mRepMap.end(); ++it)
   {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
+    retval.push_back(make_pair(it->second->getUid(), it->second->getName()));
   }
-  for(InriaRep2DMap::iterator it = mInriaRep2DMap.begin(); it != mInriaRep2DMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  for(VolumetricRepMap::iterator it = mVolumetricRepMap.begin(); it != mVolumetricRepMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  for(ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.begin(); it != mProgressiveVolumetricRepMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  for(ProbeRepMap::iterator it = mProbeRepMap.begin(); it != mProbeRepMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  for(LandmarkRepMap::iterator it = mLandmarkRepMap.begin(); it != mLandmarkRepMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  for(ToolRep3DMap::iterator it = mToolRep3DMap.begin(); it != mToolRep3DMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  for(GeometricRepMap::iterator it = mGeometricRepMap.begin(); it != mGeometricRepMap.end(); it++)
-  {
-    uidsAndNames->push_back(std::pair<std::string, std::string>(it->second->getUid(), it->second->getName()));
-  }
-  return *uidsAndNames;
+  return retval;
 }
+
 RepMap* RepManager::getReps()
 {
-  RepMap* repmap = new RepMap;
-  for(InriaRep3DMap::iterator it = mInriaRep3DMap.begin(); it != mInriaRep3DMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(InriaRep2DMap::iterator it = mInriaRep2DMap.begin(); it != mInriaRep2DMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(VolumetricRepMap::iterator it = mVolumetricRepMap.begin(); it != mVolumetricRepMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.begin(); it != mProgressiveVolumetricRepMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(ProbeRepMap::iterator it = mProbeRepMap.begin(); it != mProbeRepMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(LandmarkRepMap::iterator it = mLandmarkRepMap.begin(); it != mLandmarkRepMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(ToolRep3DMap::iterator it = mToolRep3DMap.begin(); it != mToolRep3DMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  for(GeometricRepMap::iterator it = mGeometricRepMap.begin(); it != mGeometricRepMap.end(); it++)
-  {
-    repmap->insert(std::pair<std::string, ssc::RepPtr>(it->first, it->second));
-  }
-  return repmap;
+  return new RepMap(mRepMap);
 }
 InriaRep3DMap* RepManager::getInria3DReps()
 {
@@ -256,96 +205,52 @@ GeometricRepMap* RepManager::getGeometricReps()
 }
 ssc::RepPtr RepManager::getRep(const std::string& uid)
 {
-  InriaRep3DMap::iterator it1 = mInriaRep3DMap.find(uid);
-  if(it1 != mInriaRep3DMap.end())
-    return it1->second;
-  InriaRep2DMap::iterator it2 = mInriaRep2DMap.find(uid);
-  if(it2 != mInriaRep2DMap.end())
-    return it2->second;
-  VolumetricRepMap::iterator it3 = mVolumetricRepMap.find(uid);
-  if(it3 != mVolumetricRepMap.end())
-    return it3->second;
-  ProgressiveVolumetricRepMap::iterator it4 = mProgressiveVolumetricRepMap.find(uid);
-  if(it4 != mProgressiveVolumetricRepMap.end())
-    return it4->second;
-  ProbeRepMap::iterator it5 = mProbeRepMap.find(uid);
-  if(it5 != mProbeRepMap.end())
-    return it5->second;
-  LandmarkRepMap::iterator it6 = mLandmarkRepMap.find(uid);
-  if(it6 != mLandmarkRepMap.end())
-    return it6->second;
-  ToolRep3DMap::iterator it7 = mToolRep3DMap.find(uid);
-  if(it7 != mToolRep3DMap.end())
-    return it7->second;
-  GeometricRepMap::iterator it8 = mGeometricRepMap.find(uid);
-  if(it8 != mGeometricRepMap.end())
-    return it8->second;
-
+  if (mRepMap.count(uid))
+    return mRepMap[uid];
   return ssc::RepPtr();
 }
+
+template<class REP, class MAP>
+boost::shared_ptr<REP> RepManager::getRep(const std::string& uid, MAP* specificMap)
+{
+  typename MAP::iterator iter = specificMap->find(uid);
+  if (iter != specificMap->end())
+    return iter->second;
+  else
+    return boost::shared_ptr<REP>();
+}
+
 InriaRep3DPtr RepManager::getInria3DRep(const std::string& uid)
 {
-  InriaRep3DMap::iterator it = mInriaRep3DMap.find(uid);
-  if(it != mInriaRep3DMap.end())
-    return it->second;
-  else
-    return InriaRep3DPtr();
+  return getRep<InriaRep3D>(uid, &mInriaRep3DMap);
 }
 InriaRep2DPtr RepManager::getInria2DRep(const std::string& uid)
 {
-  InriaRep2DMap::iterator it = mInriaRep2DMap.find(uid);
-  if(it != mInriaRep2DMap.end())
-    return it->second;
-  else
-    return InriaRep2DPtr();
+  return getRep<InriaRep2D>(uid, &mInriaRep2DMap);
 }
 ssc::VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
 {
-  VolumetricRepMap::iterator it = mVolumetricRepMap.find(uid);
-  if(it != mVolumetricRepMap.end())
-    return it->second;
-  else
-    return ssc::VolumetricRepPtr();
+  return getRep<ssc::VolumetricRep>(uid, &mVolumetricRepMap);
 }
 ProgressiveVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
 {
-  ProgressiveVolumetricRepMap::iterator it = mProgressiveVolumetricRepMap.find(uid);
-  if(it != mProgressiveVolumetricRepMap.end())
-    return it->second;
-  else
-    return ProgressiveVolumetricRepPtr();
+  return getRep<ProgressiveVolumetricRep>(uid, &mProgressiveVolumetricRepMap);
 }
 ProbeRepPtr RepManager::getProbeRep(const std::string& uid)
 {
-  ProbeRepMap::iterator it = mProbeRepMap.find(uid);
-  if(it != mProbeRepMap.end())
-    return it->second;
-  else
-    return ProbeRepPtr();
+  return getRep<ProbeRep>(uid, &mProbeRepMap);
 }
 LandmarkRepPtr RepManager::getLandmarkRep(const std::string& uid)
 {
-  LandmarkRepMap::iterator it = mLandmarkRepMap.find(uid);
-  if(it != mLandmarkRepMap.end())
-    return it->second;
-  else
-    return LandmarkRepPtr();
+  return getRep<LandmarkRep>(uid, &mLandmarkRepMap);
 }
 ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const std::string& uid)
 {
-  ToolRep3DMap::iterator it = mToolRep3DMap.find(uid);
-  if(it != mToolRep3DMap.end())
-    return it->second;
-  else
-    return ssc::ToolRep3DPtr();
+  return getRep<ssc::ToolRep3D>(uid, &mToolRep3DMap);
 }
 ssc::GeometricRepPtr RepManager::getGeometricRep(const std::string& uid)
 {
-  GeometricRepMap::iterator it = mGeometricRepMap.find(uid);
-  if(it != mGeometricRepMap.end())
-    return it->second;
-  else
-    return ssc::GeometricRepPtr();
+  return getRep<ssc::GeometricRep>(uid, &mGeometricRepMap);
 }
 void RepManager::syncInria2DRepsSlot(double x,double y,double z)
 {

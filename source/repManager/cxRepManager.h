@@ -82,6 +82,16 @@ protected slots:
   void receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double timestamp); ///< listens for new transforms from the tool
 
 protected:
+  template<class REP, class MAP>
+  boost::shared_ptr<REP> addRep(const std::string& uid, MAP* specificMap);
+  template<class REP, class MAP>
+  boost::shared_ptr<REP> addRep(REP* rep, MAP* specificMap);
+  template<class REP, class MAP>
+  boost::shared_ptr<REP> addRep(boost::shared_ptr<REP> rep, MAP* specificMap);
+  template<class REP, class MAP>
+  boost::shared_ptr<REP> getRep(const std::string& uid, MAP* specificMap);
+
+
   static RepManager*  mTheInstance;         ///< the only instance of this class
 
   const int           MAX_INRIAREP3DS; ///< number of Inria3D reps in the pool
@@ -115,6 +125,8 @@ protected:
   const int           MAX_GEOMETRICREPS; ///< number of Geometric reps in the pool
   std::string         mGeometricRepNames[6]; ///< the name of the reps in the pool
   GeometricRepMap     mGeometricRepMap;      ///< the reps in the pool
+
+  RepMap              mRepMap; ///< contains all the reps in the specific maps above. Use for simplified access.
 
   ssc::ToolPtr mConnectedTool; ///< the tool we are listening to transforms from (to update inria2drep points)
 
