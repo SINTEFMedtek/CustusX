@@ -28,17 +28,18 @@ namespace cx
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mView = view;
-  //RepManager* repManager = RepManager::getInstance();
   std::string index = QString::number(startIndex).toStdString();
 
   mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
+
+  connect(toolManager(), SIGNAL(configured()), this, SLOT(toolManagerConfiguredSlot()));
+  toolManagerConfiguredSlot();
 }
 
 void ViewWrapper3D::setImage(ssc::ImagePtr image)
 {
-  // std::cout << "ViewGroup3D::setImage B" << std::endl;
    mImage = image;
    //RepManager* repManager = RepManager::getInstance();
 
@@ -66,7 +67,6 @@ void ViewWrapper3D::setImage(ssc::ImagePtr image)
    mView->getRenderer()->ResetCamera();
    if(mView->isVisible())
      mView->getRenderWindow()->Render();
-   //std::cout << "ViewGroup3D::setImage E" << std::endl;
 }
 
 ssc::View* ViewWrapper3D::getView()
@@ -89,6 +89,29 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 
   mImage.reset();
 }
+
+void ViewWrapper3D::toolManagerConfiguredSlot()
+{
+  if (!toolManager()->isConfigured())
+    return;
+
+  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
+  ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
+  ssc::ToolManager::ToolMapPtr configuredTools = toolManager()->getConfiguredTools();
+  ssc::ToolManager::ToolMap::iterator toolIt = configuredTools->begin();
+
+  while((toolIt != configuredTools->end()) && (repIt != toolRep3DMap->end()))
+  {
+    if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
+    {
+      repIt->second->setTool(toolIt->second);
+      mView->addRep(repIt->second);
+      repIt++;
+    }
+    toolIt++;
+  }
+}
+
 
 void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {

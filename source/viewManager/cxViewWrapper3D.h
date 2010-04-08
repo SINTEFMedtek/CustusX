@@ -36,7 +36,8 @@ public:
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
-  
+  void toolManagerConfiguredSlot(); ///< add all tools when configured
+
 private:
   ssc::VolumetricRepPtr mVolumetricRep;
   LandmarkRepPtr mLandmarkRep;

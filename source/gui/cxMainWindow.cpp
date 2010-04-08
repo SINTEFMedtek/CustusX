@@ -1088,25 +1088,26 @@ void MainWindow::configureSlot()
 
   toolManager()->configure();
   
-  if(toolManager()->isConfigured())
-  {
-    View3D* view = viewManager()->get3DView("View3D_1");
-
-    ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
-    ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
-    ssc::ToolManager::ToolMapPtr configuredTools = toolManager()->getConfiguredTools();
-    ssc::ToolManager::ToolMap::iterator toolIt = configuredTools->begin();
-    while((toolIt != configuredTools->end()) && (repIt != toolRep3DMap->end()))
-    {
-      if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
-      {
-        repIt->second->setTool(toolIt->second);
-        view->addRep(repIt->second);
-        repIt++;
-      }
-      toolIt++;
-    }
-  }
+  // moved to viewwrapper3d:
+//  if(toolManager()->isConfigured())
+//  {
+//    View3D* view = viewManager()->get3DView("View3D_1");
+//
+//    ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
+//    ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
+//    ssc::ToolManager::ToolMapPtr configuredTools = toolManager()->getConfiguredTools();
+//    ssc::ToolManager::ToolMap::iterator toolIt = configuredTools->begin();
+//    while((toolIt != configuredTools->end()) && (repIt != toolRep3DMap->end()))
+//    {
+//      if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
+//      {
+//        repIt->second->setTool(toolIt->second);
+//        view->addRep(repIt->second);
+//        repIt++;
+//      }
+//      toolIt++;
+//    }
+//  }
 }
 void MainWindow::loggingSlot(const QString& message, int timeout)
 {
