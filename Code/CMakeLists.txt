@@ -123,6 +123,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscSnwInifile.h
     Utilities/sscGLHelpers.cpp
     Utilities/sscGLHelpers.h
+    Utilities/sscEnumConverter.h
     sscView.cpp
     sscView.h
     Rep/sscRep.h
@@ -171,6 +172,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscDisplayTextRep.h
     Rep/sscVtkHelperClasses.cpp
     Rep/sscVtkHelperClasses.h
+    Rep/sscSlicePlanes3DRep.cpp
+    Rep/sscSlicePlanes3DRep.h
     Data/sscData.cpp
     Data/sscData.h
     Data/sscImage.h
