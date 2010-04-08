@@ -82,6 +82,8 @@ protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
 
+//  void centerToImageCenter();
+//  void centerToTooltip();
   void deactivateCurrentLayout();
   void activateLayout(LayoutType toType);
   void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);

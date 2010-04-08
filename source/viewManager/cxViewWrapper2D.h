@@ -51,6 +51,7 @@ private:
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
+  double mZoomFactor;
   ssc::PLANE_TYPE mPlaneType;
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;

@@ -22,6 +22,45 @@
 namespace cx
 {
 
+/**Place the global center to the mean center of
+ * all the loaded images.
+ */
+void Navigation::centerToImageCenter()
+{
+  //TODO: move this to suitable place... (CA)
+  // must use mean center at the least.
+  ssc::Vector3D p_r(0,0,0);
+  if (!DataManager::getInstance()->getImages().empty())
+  {
+    ssc::ImagePtr image = DataManager::getInstance()->getImages().begin()->second;
+    p_r = image->get_rMd().coord(image->boundingBox().center());
+  }
+
+  // set center to calculated position
+  DataManager::getInstance()->setCenter(p_r);
+
+  // move the manual tool to the same position. (this is a side effect... do we want it?)
+  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+}
+
+/**Place the global center at the current position of the
+ * tooltip of the dominant tool.
+ */
+void Navigation::centerToTooltip()
+{
+  ssc::Vector3D p_pr = ToolManager::getInstance()->getDominantTool()->get_prMt().coord(ssc::Vector3D(0,0,0));
+  ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(p_pr);
+  // set center to calculated position
+  DataManager::getInstance()->setCenter(p_r);
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 ViewGroup::ViewGroup()
 {
   mZoomFactor = 0.5;
@@ -46,7 +85,6 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
 void ViewGroup::mouseWheelSlot(QWheelEvent* event)
 {
-  //std::cout << "mouse wheel: " << event->delta() << std::endl;
   ssc::Vector3D click_vp(0,0,0);
 
   // scale zoom in log space
@@ -55,11 +93,8 @@ void ViewGroup::mouseWheelSlot(QWheelEvent* event)
   mZoomFactor = pow(10.0, val);
   mZoomFactor = ssc::constrainValue(mZoomFactor, 0.2, 10.0);
 
+  Navigation().centerToTooltip();
 
-//  double change = 1.0 + event->delta()/120 /10.0; // event->delta() is 120 normally
-//  if (change<0.1)
-//    change = 0.1;
-//  mZoomFactor *= change;
   for (unsigned i=0; i<mElements.size(); ++i)
   {
     mElements[i]->setZoom(mZoomFactor, click_vp);
@@ -111,6 +146,8 @@ void ViewGroup::setImage(ssc::ImagePtr image)
   mImage = image;
   for (unsigned i=0; i<mElements.size(); ++i)
     mElements[i]->setImage(image);
+
+  Navigation().centerToImageCenter();
 }
 
 void ViewGroup::removeImage(ssc::ImagePtr image)

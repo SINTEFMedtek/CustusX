@@ -105,7 +105,8 @@ ViewManager::ViewManager() :
   mViewGroups.push_back(group);
 
   // set start layout
-  this->changeLayout(LAYOUT_3DACS_2X2);
+//  this->changeLayout(LAYOUT_3DACS_2X2);
+  this->changeLayout(LAYOUT_3DACS_2X2_SNW);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),
@@ -233,6 +234,9 @@ void ViewManager::changeLayout(LayoutType toType)
  */
 void ViewManager::activateLayout(LayoutType toType)
 {
+  // reset the center for easier viewing.
+  Navigation().centerToImageCenter();
+
   switch(toType)
   {
   case LAYOUT_NONE:
@@ -338,20 +342,6 @@ void ViewManager::activateLayout_3DACS_2X2()
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
 {
-  //TODO: move this to suitable place... (CA)
-  ssc::Vector3D p_r(0,0,0);
-  if (!DataManager::getInstance()->getImages().empty())
-  {
-    ssc::ImagePtr image = DataManager::getInstance()->getImages().begin()->second;
-    p_r = image->get_rMd().coord(image->boundingBox().center());
-  }
-
-  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
-  // TODO set center here will not do: must handle
-  DataManager::getInstance()->setCenter(p_r);
-  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
-
-
   activate3DView(0, 0,                  0, 0);
   activate2DView(0, 1, ssc::ptAXIAL,    0, 1);
   activate2DView(0, 2, ssc::ptCORONAL,  1, 0);
@@ -362,19 +352,6 @@ void ViewManager::activateLayout_3DACS_2X2_SNW()
 
 void ViewManager::activateLayout_ACSACS_2X3_SNW()
 {
-  //TODO: move this to suitable place... (CA)
-  ssc::Vector3D p_r(0,0,0);
-  if (!DataManager::getInstance()->getImages().empty())
-  {
-    ssc::ImagePtr image = DataManager::getInstance()->getImages().begin()->second;
-    p_r = image->get_rMd().coord(image->boundingBox().center());
-  }
-
-  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
-  // TODO set center here will not do: must handle
-  DataManager::getInstance()->setCenter(p_r);
-  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
-
   activate2DView(0, 1, ssc::ptAXIAL,    0, 0);
   activate2DView(0, 2, ssc::ptCORONAL,  0, 1);
   activate2DView(0, 3, ssc::ptSAGITTAL, 0, 2);

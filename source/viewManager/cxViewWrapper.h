@@ -8,6 +8,7 @@
 
 namespace cx
 {
+
 /**
  * \class cxViewWrapper.h
  *

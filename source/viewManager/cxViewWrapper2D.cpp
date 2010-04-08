@@ -44,6 +44,7 @@ std::string planeToString(ssc::PLANE_TYPE val)
 ViewWrapper2D::ViewWrapper2D(ssc::View* view)
 {
   mView = view;
+  mZoomFactor = 0.5;
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
   mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
@@ -117,19 +118,19 @@ void ViewWrapper2D::viewportChanged()
 
   if (!mView->getRenderer()->IsActiveCameraCreated())
     return;
-  //std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
+//  std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
+
+  double parallelScale = mView->heightMM() / 2.0 / mZoomFactor;
+  mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
+  //std::cout << "ViewWrapper2D::viewportChanged(): zoom:" << mZoomFactor << ", parallelScale:" << parallelScale << ", " << planeToString(mPlaneType) <<  std::endl;
 
   // world == slice
   // display == vp
-
   QSize size = mView->size();
-
   ssc::Vector3D p0_d(0,0,0);
   ssc::Vector3D p1_d(size.width(), size.height(), 0);
-
   ssc::Vector3D p0_w = displayToWorld(p0_d);
   ssc::Vector3D p1_w = displayToWorld(p1_d);
-
   ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
   ssc::DoubleBoundingBox3D BB_s(p0_w, p1_w);
 
@@ -167,10 +168,10 @@ ssc::Transform3D ViewWrapper2D::get_vpMs() const
 void ViewWrapper2D::showSlot()
 {
   //TODO: need better camera control than this...
-  std::cout << "stuff fixed - show" << std::endl;
+  //std::cout << "stuff fixed - show - " << planeToString(mPlaneType) << std::endl;
   mView->getRenderer()->ResetCamera();
   viewportChanged();
-  setZoom(0.5, ssc::Vector3D(0,0,0));
+  setZoom(mZoomFactor, ssc::Vector3D(0,0,0)); // TODO this must get zoom data from viewgroup
 }
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
@@ -207,26 +208,14 @@ void ViewWrapper2D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
   mSliceProxy->setTool(dominantTool);
-  std::cout << "ViewWrapper2D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
-
-  //connect(dominantTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(fixStuff()));
+  //std::cout << "ViewWrapper2D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
 
 void ViewWrapper2D::setZoom(double zoomFactor, const ssc::Vector3D& click_vp)
 {
-  //ssc::Vector3D p_pr = ToolManager::getInstance()->getManualTool()->get_prMt().coord(ssc::Vector3D(0,0,0));
-  ssc::Vector3D p_pr = ToolManager::getInstance()->getDominantTool()->get_prMt().coord(ssc::Vector3D(0,0,0));
-  ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(p_pr);
-  // TODO set center here will not do: must handle
-  DataManager::getInstance()->setCenter(p_r);
-  //ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
-
-  //QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(mView));
-  //double mmPix = screen->heightMM() / screen->geometry().height();
-  double parallelScale = mView->heightMM() / 2.0 / zoomFactor;
-  mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
+  mZoomFactor = zoomFactor;
+  //std::cout << "zoomed: " << zoomFactor << ", " << planeToString(mPlaneType) <<  std::endl;
   viewportChanged();
- // std::cout << "zoomed: " << zoomFactor << std::endl;
 }
 
 void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
@@ -263,9 +252,6 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
   ssc::Vector3D tool_s = (sMr*rMpr*prMt).coord(tool_t);
 
   // find click position in s.
-//  QPoint click_q = event->pos();
-//  QSize size = mView->size();
-//  ssc::Vector3D click_vp(click_q.x(), size.height()-click_q.y(), 0.0); // convert from left-handed qt space to vtk space display/viewport
   ssc::Vector3D click_s = get_vpMs().inv().coord(click_vp);
 
   // compute the new tool position in slice space as a synthesis of the plane part of click and the z part of original.
@@ -278,14 +264,6 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
   ssc::Transform3D MD = createTransformTranslate(delta_pr);
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
-
-//  std::cout << "--- mouse click ---" << std::endl;
-//  std::cout << "get_vpMs()\n" << get_vpMs() << std::endl;
-//  std::cout << "get_vpMs().inv()\n" << get_vpMs().inv() << std::endl;
-//  std::cout << "center_r\t" << DataManager::getInstance()->getCenter() << std::endl;
-//  std::cout << "click_vp\t" << click_vp << std::endl;
-//  std::cout << "click_s \t" << click_s << std::endl;
-//  std::cout << "tool_s  \t" << tool_s << std::endl;
 }
 
 

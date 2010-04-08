@@ -12,6 +12,18 @@ class QPoint;
 
 namespace cx
 {
+
+/**Helper for functions independent of state.
+ * Not sure if we need this - think of better place.
+ *
+ */
+class Navigation
+{
+public:
+  void centerToImageCenter();
+  void centerToTooltip();
+};
+
 /**
  * \class cxViewGroup.h
  *
