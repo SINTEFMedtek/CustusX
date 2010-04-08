@@ -33,16 +33,17 @@ public:
   virtual void setImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual ssc::View* getView();
-  virtual void setZoom(double zoomFactor, const ssc::Vector3D& click_vp);
+  virtual void setZoom2D(double zoomFactor);
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void viewportChanged();
   void showSlot();
-//  void mouseReleaseSlot(QMouseEvent* event);
   void mousePressSlot(QMouseEvent* event);
+  void mouseWheelSlot(QWheelEvent* event);
 
 private:
+  void addReps();
   ssc::DoubleBoundingBox3D getViewport() const;
   ssc::Transform3D get_vpMs() const;
   ssc::Vector3D qvp2vp(QPoint pos_qvp);
@@ -55,7 +56,6 @@ private:
   ssc::PLANE_TYPE mPlaneType;
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
-  //ssc::ToolPtr mTool;
   ssc::ToolRep2DPtr mToolRep2D;
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;

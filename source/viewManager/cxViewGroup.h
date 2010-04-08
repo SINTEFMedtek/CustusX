@@ -49,17 +49,16 @@ public:
 private slots:
   void contexMenuSlot(const QPoint& point);
   void activateManualToolSlot();
-  void mouseWheelSlot(QWheelEvent*);
+  void zoom2DChangeSlot(double newZoom);
 
 protected:
-  std::string toString(int i) const;
   void connectContextMenu();
   void connectContextMenu(ssc::View* view);
 
   std::vector<ssc::View*> mViews;
 
   ssc::ImagePtr mImage;
-  double mZoomFactor;
+  double mZoomFactor2D;
   std::vector<ViewWrapperPtr> mElements;
 };
 

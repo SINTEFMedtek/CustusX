@@ -45,18 +45,28 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
 {
   mView = view;
   mZoomFactor = 0.5;
+
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
   mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
+  addReps();
+
+  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
+  connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
+  connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
+  connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(mouseWheelSlot(QWheelEvent*)));
+}
+
+void ViewWrapper2D::addReps()
+{
   // annotation rep
   mOrientationAnnotationRep = ssc::OrientationAnnotationRep::New("annotationRep_"+mView->getName(), "annotationRep_"+mView->getName());
-  //(handled by init) mOrientationAnnotationRep->setPlaneType(planeType[i]);
   mView->addRep(mOrientationAnnotationRep);
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
-  //mPlaneTypeText->addText(ssc::Vector3D(0,1,0), planeToString(planeType[i]), ssc::Vector3D(0.98, 0.02, 0.0));
   mPlaneTypeText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.98, 0.02, 0.0));
   mView->addRep(mPlaneTypeText);
 
@@ -67,12 +77,9 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
 
   // slice proxy
   mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
-  //(handled by init) mSliceProxy->initializeFromPlane(planeType[i], false, ssc::Vector3D(0,0,1), false, 1, 0.25);
-  //mElements[i].mSliceProxy->setTool(...);
 
   // slice rep
   mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
-  //std::cout << "setSliceProxy 2dviewgroup" << std::endl;
   mSliceRep->setSliceProxy(mSliceProxy);
   mView->addRep(mSliceRep);
 
@@ -81,14 +88,6 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   mToolRep2D->setSliceProxy(mSliceProxy);
   mToolRep2D->setUseCrosshair(true);
   mView->addRep(mToolRep2D);
-
-  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
-  dominantToolChangedSlot();
-
-  connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
-  //connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(viewportChanged()));
-  connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
-  connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
 }
 
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
@@ -103,15 +102,16 @@ ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
 ssc::Vector3D ViewWrapper2D::displayToWorld(ssc::Vector3D p_d) const
 {
   vtkRendererPtr renderer = mView->getRenderer();
-  //if ()
   renderer->SetDisplayPoint(p_d.begin());
-  //renderer->SetDisplayPoint(0,0,0);
-  renderer->DisplayToWorld();///pang
+  renderer->DisplayToWorld();
   double* p_wH = renderer->GetWorldPoint();
   ssc::Vector3D p_w = ssc::Vector3D(p_wH)/p_wH[3]; // convert from homogenous to cartesan coords
   return p_w;
 }
 
+/**Call when viewport size or zoom has changed.
+ * Recompute camera zoom and  reps requiring vpMs.
+ */
 void ViewWrapper2D::viewportChanged()
 {
   //std::cout << "ViewWrapper2D::viewportChanged()" << std::endl;
@@ -124,21 +124,14 @@ void ViewWrapper2D::viewportChanged()
   mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
   //std::cout << "ViewWrapper2D::viewportChanged(): zoom:" << mZoomFactor << ", parallelScale:" << parallelScale << ", " << planeToString(mPlaneType) <<  std::endl;
 
-  // world == slice
-  // display == vp
-  QSize size = mView->size();
-  ssc::Vector3D p0_d(0,0,0);
-  ssc::Vector3D p1_d(size.width(), size.height(), 0);
-  ssc::Vector3D p0_w = displayToWorld(p0_d);
-  ssc::Vector3D p1_w = displayToWorld(p1_d);
-  ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
-  ssc::DoubleBoundingBox3D BB_s(p0_w, p1_w);
-
+  ssc::DoubleBoundingBox3D BB_vp = getViewport();
   ssc::Transform3D vpMs = get_vpMs();
 
   mToolRep2D->setViewportData(vpMs, BB_vp);
 }
 
+/**Return the viewport in vtk pixels. (viewport space)
+ */
 ssc::DoubleBoundingBox3D ViewWrapper2D::getViewport() const
 {
   QSize size = mView->size();
@@ -148,8 +141,13 @@ ssc::DoubleBoundingBox3D ViewWrapper2D::getViewport() const
   return BB_vp;
 }
 
+/**Compute transform from slice space (vtk world/ssc after slicing) to vtk viewport.
+ */
 ssc::Transform3D ViewWrapper2D::get_vpMs() const
 {
+  // world == slice
+  // display == vp
+
   QSize size = mView->size();
 
   ssc::Vector3D p0_d(0,0,0);
@@ -167,11 +165,8 @@ ssc::Transform3D ViewWrapper2D::get_vpMs() const
 
 void ViewWrapper2D::showSlot()
 {
-  //TODO: need better camera control than this...
-  //std::cout << "stuff fixed - show - " << planeToString(mPlaneType) << std::endl;
-  mView->getRenderer()->ResetCamera();
+  dominantToolChangedSlot();
   viewportChanged();
-  setZoom(mZoomFactor, ssc::Vector3D(0,0,0)); // TODO this must get zoom data from viewgroup
 }
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
@@ -208,22 +203,38 @@ void ViewWrapper2D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
   mSliceProxy->setTool(dominantTool);
-  //std::cout << "ViewWrapper2D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
 
-void ViewWrapper2D::setZoom(double zoomFactor, const ssc::Vector3D& click_vp)
+void ViewWrapper2D::setZoom2D(double zoomFactor)
 {
   mZoomFactor = zoomFactor;
-  //std::cout << "zoomed: " << zoomFactor << ", " << planeToString(mPlaneType) <<  std::endl;
   viewportChanged();
 }
 
+/**Part of the mouse interactor:
+ * Move manual tool tip when mouse pressed
+ *
+ */
 void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
 {
   if (event->buttons() & Qt::LeftButton)
   {
     moveAxisPos(qvp2vp(event->pos()));
   }
+}
+
+/**Part of the mouse interactor:
+ * Interpret mouse wheel as a zoom operation.
+ */
+void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
+{
+  // scale zoom in log space
+  double val = log10(mZoomFactor);
+  val += event->delta()/120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
+  double newZoom = pow(10.0, val);
+
+  // we cannot set zoom directly in this, since parent (viewgroup) manages zoom
+  emit zoom2DChange(newZoom);
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)

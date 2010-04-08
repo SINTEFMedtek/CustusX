@@ -179,7 +179,7 @@ ssc::ToolPtr ToolManager::getDominantTool()
 }
 void ToolManager::setDominantTool(const std::string& uid)
 {
-  std::cout << "1: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
+  //std::cout << "1: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
   if(mDominantTool && mDominantTool->getUid() == uid)
     return;
 

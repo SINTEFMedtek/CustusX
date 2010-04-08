@@ -25,6 +25,7 @@ public:
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
 
 protected:
+  std::string toString(int i) const;
   int mStartIndex;
   ssc::ImagePtr mImage;
 };

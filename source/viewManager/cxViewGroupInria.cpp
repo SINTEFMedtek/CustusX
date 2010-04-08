@@ -24,6 +24,11 @@ ViewGroupInria::ViewGroupInria(int startIndex, ssc::View* view1,
 ViewGroupInria::~ViewGroupInria()
 {}
 
+std::string ViewGroupInria::toString(int i) const
+{
+  return QString::number(i).toStdString();
+}
+
 void ViewGroupInria::setImage(ssc::ImagePtr image)
 {
   mImage = image;

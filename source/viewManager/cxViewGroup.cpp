@@ -63,7 +63,7 @@ void Navigation::centerToTooltip()
 
 ViewGroup::ViewGroup()
 {
-  mZoomFactor = 0.5;
+  mZoomFactor2D = 0.5;
   this->connectContextMenu();
 }
 
@@ -71,6 +71,8 @@ ViewGroup::~ViewGroup()
 {
 }
 
+/**Add one view wrapper and setup the necessary connections.
+ */
 void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 {
   mViews.push_back(wrapper->getView());
@@ -78,32 +80,24 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
-  connect(wrapper->getView(), SIGNAL(mouseWheelSignal(QWheelEvent*)),
-          this, SLOT(mouseWheelSlot(QWheelEvent*)));
+  connect(wrapper.get(), SIGNAL(zoom2DChange(double)), this, SLOT(zoom2DChangeSlot(double)));
   connectContextMenu(wrapper->getView());
 }
 
-void ViewGroup::mouseWheelSlot(QWheelEvent* event)
+/**Called when a zoom change is requested from one view wrapper
+ *
+ */
+void ViewGroup::zoom2DChangeSlot(double newZoom)
 {
-  ssc::Vector3D click_vp(0,0,0);
-
-  // scale zoom in log space
-  double val = log10(mZoomFactor);
-  val += event->delta()/120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
-  mZoomFactor = pow(10.0, val);
-  mZoomFactor = ssc::constrainValue(mZoomFactor, 0.2, 10.0);
+  mZoomFactor2D = newZoom;
+  mZoomFactor2D = ssc::constrainValue(mZoomFactor2D, 0.2, 10.0); // constrain zoom to a sensible interval
 
   Navigation().centerToTooltip();
 
   for (unsigned i=0; i<mElements.size(); ++i)
   {
-    mElements[i]->setZoom(mZoomFactor, click_vp);
+    mElements[i]->setZoom2D(mZoomFactor2D);
   }
-}
-
-std::string ViewGroup::toString(int i) const
-{
-  return QString::number(i).toStdString();
 }
 
 void ViewGroup::connectContextMenu()
