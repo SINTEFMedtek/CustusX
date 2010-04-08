@@ -14,7 +14,7 @@ bool similar(double a, double b, double tol)
 	return fabs(b-a) < tol;
 }
 
-// quick and dirty way to access functionality from vtkMath:
+// quick and dirty way to access functionality from vtkMath (this produces a one-time memory leak):
 static vtkMath* mathEngine = vtkMath::New();
 // --------------------------------------------------------
 
@@ -87,15 +87,11 @@ Vector3D Vector3D::operator-() const
 }
 // --------------------------------------------------------
 
-/** return the vector with length 1.
- */
 Vector3D Vector3D::normal() const
 {
 	return *this/length();
 }
 
-/** return cartesian length of vector.
- */
 double Vector3D::length() const
 {
 	double tmp = 0.0;

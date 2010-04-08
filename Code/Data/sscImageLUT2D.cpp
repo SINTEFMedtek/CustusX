@@ -24,10 +24,15 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	mBase(base)
 {
 	//dafault Full Range.... or level-it
-	mLevel =  0; //getScalarMax() / 2.0;
+//	mLevel =  0; //getScalarMax() / 2.0;
+  mLevel =  getScalarMax() / 2.0;
 	mWindow = getScalarMax();
 	mLLR = 0.0;
 	mAlpha = 1.0;
+
+  mLevel =  getScalarMax() *0.15;
+  mWindow = getScalarMax() *0.5;
+	std::cout << "mLevel: " << mLevel << ", mWindow: " << mWindow << std::endl;
 
 	mOutputLUT = vtkLookupTablePtr::New();
 

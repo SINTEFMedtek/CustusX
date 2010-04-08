@@ -196,6 +196,9 @@ bool similar(const Transform3D& a, const Transform3D& b, double tol)
 }
 // --------------------------------------------------------
 
+/**Transform bb using the transform m.
+ * Only the two defining corners are actually transformed.
+ */
 DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb)
 {
 	Vector3D a = m.coord(bb.bottomLeft());
@@ -203,6 +206,8 @@ DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& b
 	return DoubleBoundingBox3D(a,b);
 }
 
+/**Create a transform representing a scale in x,y,z
+ */
 Transform3D createTransformScale(const Vector3D& scale)
 {
 	vtkTransformPtr transform = vtkTransformPtr::New();
@@ -211,6 +216,8 @@ Transform3D createTransformScale(const Vector3D& scale)
 	return Transform3D(transform->GetMatrix());
 }
 
+/**Create a transform representing a translation
+ */
 Transform3D createTransformTranslate(const Vector3D& translation)
 {
 	vtkTransformPtr transform = vtkTransformPtr::New();
@@ -219,6 +226,8 @@ Transform3D createTransformTranslate(const Vector3D& translation)
 	return Transform3D(transform->GetMatrix());	
 }
 
+/**Create a transform representing a rotation about the X-axis with an input angle.
+ */
 Transform3D createTransformRotateX(const double angle)
 {
 	double angRad = angle/M_PI*180.0;
@@ -228,6 +237,8 @@ Transform3D createTransformRotateX(const double angle)
 	return Transform3D(transform->GetMatrix());		
 }
 
+/**Create a transform representing a rotation about the Y-axis with an input angle.
+ */
 Transform3D createTransformRotateY(const double angle)
 {
 	double angRad = angle/M_PI*180.0;
@@ -237,6 +248,8 @@ Transform3D createTransformRotateY(const double angle)
 	return Transform3D(transform->GetMatrix());		
 }
 
+/**Create a transform representing a rotation about the Z-axis with an input angle.
+ */
 Transform3D createTransformRotateZ(const double angle)
 {
 	double angRad = angle/M_PI*180.0;
@@ -248,6 +261,9 @@ Transform3D createTransformRotateZ(const double angle)
 
 
 /**Normalize volume defined by in to volume defined by out.
+ *
+ * This is intended for creating transforms from one viewport to another, i.e.
+ * the two boxes should be aligned and differ only in translation + scaling.
  */
 Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out)
 {
