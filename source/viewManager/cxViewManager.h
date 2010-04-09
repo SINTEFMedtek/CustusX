@@ -94,7 +94,7 @@ public slots:
   void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
 
 protected slots:
-	void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
+  //void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
   void renderAllViewsSlot(); ///< renders all views
 
 protected:

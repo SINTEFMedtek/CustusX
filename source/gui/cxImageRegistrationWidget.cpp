@@ -11,9 +11,9 @@
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "cxRepManager.h"
-#include "cxViewManager.h"
 #include "cxRegistrationManager.h"
 #include "cxMessageManager.h"
+#include "cxDataManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
 //#include "cxInriaRep2D.h"
@@ -30,9 +30,6 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
   mThresholdLabel(new QLabel("Probing treshold:", this)),
   mThresholdSlider(new QSlider(Qt::Horizontal, this)),
-  mRepManager(RepManager::getInstance()),
-  mViewManager(ViewManager::getInstance()),
-  mRegistrationManager(RegistrationManager::getInstance()),
   mCurrentRow(-1),
   mCurrentColumn(-1)
 {
@@ -74,8 +71,12 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
 }
 ImageRegistrationWidget::~ImageRegistrationWidget()
 {}
-void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage)
+void ImageRegistrationWidget::activeImageChangedSlot()
 {
+  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  if(mCurrentImage == activeImage)
+    return;
+
   //disconnect from the old image
   if(mCurrentImage)
   {
@@ -85,23 +86,24 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
               this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
   }
 
-  //if there isn't a new image available
-  if(!currentImage)
-    return;
-
   //Set new current image
-  mCurrentImage = currentImage;
-  if(mCurrentImage)// Don't use image if deleted
+  mCurrentImage = activeImage;
+  if(!mCurrentImage)// Don't use image if deleted
   {
-    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
-            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
-            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    messageManager()->sendWarning("Empty mCurrentImage in ImageRegistrationWidget::activeImageChangedSlot(), return");
+    return;
   }
+
+  messageManager()->sendInfo("ImageRegistrationWidget got a new current image to work on: "+mCurrentImage->getUid()+"");
+
+  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
 
   //set a default treshold
   mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
-  ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   mThresholdSlider->setValue(probeRep->getThreshold());
 
   //get the images landmarks and populate the landmark table
@@ -115,7 +117,7 @@ void ImageRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage
 }
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
-  ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
     messageManager()->sendError("Could not find a rep to add the landmark to.");
@@ -126,7 +128,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 }
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-  ProbeRepPtr probeRep = mRepManager->getProbeRep("ProbeRep_1");
+  ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
     messageManager()->sendError("Could not find a rep to edit the landmark for.");
@@ -142,22 +144,22 @@ void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 
   int index = mCurrentRow+1;
 
-  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
+  LandmarkRepPtr landmarkRep = repManager()->getLandmarkRep("LandmarkRep_1");
   landmarkRep->removePermanentPoint(index);
 }
 void ImageRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
 {
   //make sure the masterImage is set
-  ssc::ImagePtr masterImage = mRegistrationManager->getMasterImage();
+  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
   if(!masterImage)
-    mRegistrationManager->setMasterImage(mCurrentImage);
+    registrationManager()->setMasterImage(mCurrentImage);
   
   //check if its time to do image registration
   if(mCurrentImage->getLandmarks()->GetNumberOfTuples() > 2)
   {
     messageManager()->sendInfo(mCurrentImage->getUid());
-    mRegistrationManager->setGlobalPointSet(mCurrentImage->getLandmarks());
-    mRegistrationManager->doImageRegistration(mCurrentImage);
+    registrationManager()->setGlobalPointSet(mCurrentImage->getLandmarks());
+    registrationManager()->doImageRegistration(mCurrentImage);
   }
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
@@ -229,7 +231,7 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
       //check the LandmarkActiveMap...
       //mapindex for landmarkActiveMap starts at 0 
       //and tablerow and coloumns start at 0,0
-      RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+      RegistrationManager::NameListType landmarkActiveMap = registrationManager()->getGlobalPointSetNameList();
       int index = row+1;
       RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(index);
       if(it != landmarkActiveMap.end())
@@ -242,7 +244,7 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
       else //if the landmark wasn't in the map it should be added
       {
         //send update to registrationmanage
-        mRegistrationManager->setGlobalPointsActiveSlot(index, true);
+        registrationManager()->setGlobalPointsActiveSlot(index, true);
         columnTwo->setCheckState(Qt::Checked);
       }
       //Set item properties and add the items to the table
@@ -270,7 +272,7 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
       row = tempRow;
   }
   //get globalPointsNameList from the RegistrationManager
-  RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
+  RegistrationManager::NameListType nameList = registrationManager()->getGlobalPointSetNameList();
   //fill in names
   typedef RegistrationManager::NameListType::iterator Iterator;
   for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
@@ -335,14 +337,14 @@ void ImageRegistrationWidget::cellChangedSlot(int row,int column)
   if(column==1)
   {
     Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
-    mRegistrationManager->setGlobalPointsActiveSlot(row, state);
+    registrationManager()->setGlobalPointsActiveSlot(row, state);
   }
 
   if(column==0)
   {
     std::string name = mLandmarkTableWidget->item(row, column)->text().toStdString();
     int index = row+1;
-    mRegistrationManager->setGlobalPointsNameSlot(index, name);
+    registrationManager()->setGlobalPointsNameSlot(index, name);
   }
 }
 void ImageRegistrationWidget::thresholdChangedSlot(const int value)

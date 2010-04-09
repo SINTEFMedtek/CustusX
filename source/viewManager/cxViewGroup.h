@@ -53,6 +53,7 @@ private slots:
   void contexMenuSlot(const QPoint& point);
   void activateManualToolSlot();
   void zoom2DChangeSlot(double newZoom);
+  void activeImageChangeSlot();
 
 protected:
   void connectContextMenu();

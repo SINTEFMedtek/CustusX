@@ -49,7 +49,7 @@ void ViewGroupInria::setImage(ssc::ImagePtr image)
   }
   if (!mImage->getRefVtkImageData().GetPointer())
   {
-    messageManager()->sendWarning("ViewManager::currentImageChangedSlot vtk image missing from current image!");
+    messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
     return;
   }
 

@@ -30,10 +30,11 @@ public:
 	void init();///< Initialize TransferFunctionWidget. Create members
 
 public slots:
-  void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
 
-signals:
-  void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
+/*signals:
+  void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on*/
 
 protected:
   //gui

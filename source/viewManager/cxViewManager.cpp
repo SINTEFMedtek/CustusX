@@ -541,7 +541,13 @@ void ViewManager::activateLayout_ACSACS_2X3()
   for(; it2D != mView2DMap.end(); ++it2D)
     it2D->second->removeRep(rep);
 }*/
-  
+/*void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
+{
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    mViewGroups[i]->setImage(currentImage);
+  }
+}*/
 void ViewManager::renderAllViewsSlot()
 {
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
@@ -559,15 +565,6 @@ void ViewManager::renderAllViewsSlot()
   else
     mNumberOfRenderings++;
 }
-	
-void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
-{
-  for (unsigned i=0; i<mViewGroups.size(); ++i)
-  {
-    mViewGroups[i]->setImage(currentImage);
-  }
-}	
-
 //void ViewManager::addXml(QDomNode& parentNode)
 //{
 //  QDomDocument doc = parentNode.ownerDocument();

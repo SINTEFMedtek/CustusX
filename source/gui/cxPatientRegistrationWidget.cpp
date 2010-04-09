@@ -18,8 +18,7 @@
 #include "cxRegistrationManager.h"
 #include "cxMessageManager.h"
 #include "cxToolManager.h"
-#include "cxViewManager.h"
-#include "cxRepManager.h"
+#include "cxDataManager.h"
 #include "cxRegistrationHistoryWidget.h"
 
 namespace cx
@@ -43,10 +42,6 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mYSpinBox(new QSpinBox(mOffsetWidget)),
   mZSpinBox(new QSpinBox(mOffsetWidget)),
   mResetOffsetButton(new QPushButton("Clear offset", this)),
-  mRegistrationManager(RegistrationManager::getInstance()),
-  //mToolManager(ToolManager::getInstance()),
-  mViewManager(ViewManager::getInstance()),
-  mRepManager(RepManager::getInstance()),
   mCurrentRow(-1),
   mCurrentColumn(-1),
   mMinValue(-200),
@@ -153,9 +148,10 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
 }
 PatientRegistrationWidget::~PatientRegistrationWidget()
 {}
-void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentImage)
+void PatientRegistrationWidget::activeImageChangedSlot()
 {
-  if(mCurrentImage == currentImage)
+  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  if(mCurrentImage == activeImage)
     return;
 
   //disconnect from the old image
@@ -168,16 +164,21 @@ void PatientRegistrationWidget::currentImageChangedSlot(ssc::ImagePtr currentIma
     messageManager()->sendInfo("Disconnected from old image "+mCurrentImage->getUid());
   }
 
-  mCurrentImage = currentImage;
+  mCurrentImage = activeImage;
+
+  if(!mCurrentImage) //Don't use image if deleted
+  {
+    messageManager()->sendWarning("Empty mCurrentImage in PatientRegistrationWidget::activeImageChangedSlot(), return");
+    return;
+  }
+
+  messageManager()->sendInfo("PatientRegistrationWidget got a new current image to work on: "+mCurrentImage->getUid()+"");
 
   //connect to new image
-  if (mCurrentImage) //Don't use image if deleted
-  {
-    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
-            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
-            this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-  }
+  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
+          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
   
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
@@ -191,7 +192,7 @@ void PatientRegistrationWidget::toolSampledUpdateSlot(double notUsedX, double no
 {
   int numberOfToolSamples = toolManager()->getToolSamples()->GetNumberOfTuples();
   int numberOfActiveToolSamples = 0;
-  RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+  RegistrationManager::NameListType landmarkActiveMap = registrationManager()->getGlobalPointSetNameList();
   RegistrationManager::NameListType::iterator it = landmarkActiveMap.begin();
   while(it != landmarkActiveMap.end())
   {
@@ -262,7 +263,7 @@ void PatientRegistrationWidget::cellChangedSlot(int row, int column)
     return;
 
   Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
-  mRegistrationManager->setGlobalPointsActiveSlot(row, state);
+  registrationManager()->setGlobalPointsActiveSlot(row, state);
 
 }
 void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
@@ -270,7 +271,7 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   if(mToolToSample && mToolToSample->getUid() == uid)
     return;
 
-  //ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(mToolManager->getDominantTool().get()));
+  //ToolPtr newTool = ToolPtr(dynamic_cast<Tool*>(toolManager()->getDominantTool().get()));
   ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
   if(!mToolToSample)
   {
@@ -318,7 +319,7 @@ void PatientRegistrationWidget::setOffsetSlot(int value)
   offsetMatrix->SetElement(2, 3, mZOffsetSlider->value());
   
   ssc::Transform3DPtr offsetPtr(new ssc::Transform3D(offsetMatrix));
-  mRegistrationManager->setManualPatientRegistrationOffsetSlot(offsetPtr);
+  registrationManager()->setManualPatientRegistrationOffsetSlot(offsetPtr);
 }
 void PatientRegistrationWidget::activateManualRegistrationFieldSlot()
 {
@@ -337,7 +338,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
     return;
   }
   //get globalPointsNameList from the RegistrationManager
-  RegistrationManager::NameListType nameList = mRegistrationManager->getGlobalPointSetNameList();
+  RegistrationManager::NameListType nameList = registrationManager()->getGlobalPointSetNameList();
 
   //get the landmarks from the image
   vtkDoubleArrayPtr landmarks =  image->getLandmarks();
@@ -391,7 +392,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
         columnFour = new QTableWidgetItem();
       }
       //check the mLandmarkActiveVector...
-      RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+      RegistrationManager::NameListType landmarkActiveMap = registrationManager()->getGlobalPointSetNameList();
       RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(row+1);
       if(it != landmarkActiveMap.end())
       {
@@ -403,7 +404,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
       else
       {
         columnTwo->setCheckState(Qt::Checked);
-        mRegistrationManager->setGlobalPointsActiveSlot(row, true);
+        registrationManager()->setGlobalPointsActiveSlot(row, true);
       }
       //set flags and add the item to the table
       //TODO dosnt work
@@ -503,8 +504,8 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
 }
 void PatientRegistrationWidget::updateAccuracy()
 {
-  //ssc:Image masterImage = mRegistrationManager->getMasterImage();
-  vtkDoubleArrayPtr globalPointset = mRegistrationManager->getGlobalPointSet();
+  //ssc:Image masterImage = registrationManager()->getMasterImage();
+  vtkDoubleArrayPtr globalPointset = registrationManager()->getGlobalPointSet();
   vtkDoubleArrayPtr toolSamplePointset = toolManager()->getToolSamples();
 
   ssc::Transform3DPtr rMpr = toolManager()->get_rMpr();
@@ -530,7 +531,7 @@ void PatientRegistrationWidget::updateAccuracy()
       if(sourcePoint[3] == targetPoint[3])
       {
         //check the mLandmarkActiveVector...
-        RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+        RegistrationManager::NameListType landmarkActiveMap = registrationManager()->getGlobalPointSetNameList();
         RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(sourcePoint[3]);
         if(it != landmarkActiveMap.end())
         {
@@ -565,7 +566,7 @@ void PatientRegistrationWidget::updateAccuracy()
 
   // Calculate total registration accuracy
   mAverageRegistrationAccuracy = 0;
-  RegistrationManager::NameListType landmarkActiveMap = mRegistrationManager->getGlobalPointSetNameList();
+  RegistrationManager::NameListType landmarkActiveMap = registrationManager()->getGlobalPointSetNameList();
   RegistrationManager::NameListType::iterator it = landmarkActiveMap.begin();
   for (int i=0; i < numberOfGlobalImagePoints; i++)
   {
@@ -583,6 +584,6 @@ void PatientRegistrationWidget::updateAccuracy()
 
 void PatientRegistrationWidget::doPatientRegistration()
 {
-  mRegistrationManager->doPatientRegistration();
+  registrationManager()->doPatientRegistration();
 }
 }//namespace cx

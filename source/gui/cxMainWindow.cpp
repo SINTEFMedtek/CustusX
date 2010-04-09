@@ -342,14 +342,17 @@ void MainWindow::createActions()
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
-  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          viewManager(), SLOT(currentImageChangedSlot(ssc::ImagePtr)));
-  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          mImageRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
-  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          mPatientRegistrationWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
-  connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          mTransferFunctionWidget, SLOT(currentImageChangedSlot(ssc::ImagePtr)));
+
+  //TODO remove
+  /*connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
+          viewManager(), SLOT(currentImageChangedSlot(ssc::ImagePtr)));*/
+
+  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+          mImageRegistrationWidget, SLOT(activeImageChangedSlot()));
+  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+          mPatientRegistrationWidget, SLOT(activeImageChangedSlot()));
+  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+          mTransferFunctionWidget, SLOT(activeImageChangedSlot()));
   
   connect(this, SIGNAL(deleteCurrentImage()),
           mContextDockWidget, SLOT(deleteCurrentImageSlot()));

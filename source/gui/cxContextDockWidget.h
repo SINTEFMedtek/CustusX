@@ -32,7 +32,7 @@ public:
   void removeTab(int tabIndex); ///< remove a context specific widget
 
 signals:
-  void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
+  //void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
   void changeTabIndex(int index); ///< Send a signal when the tab index must be changed
   void deleteImage(ssc::ImagePtr image); ///< Sends a signal when an image is to be deleted
   
@@ -43,7 +43,7 @@ protected slots:
   void visibilityOfDockWidgetChangedSlot(bool visible); ///< connects/disconnects to signals from the datamanager
   void populateTheImageComboBoxSlot(); ///< populates the combobox with the images loaded into the datamanager
   void imageSelectedSlot(const QString& comboBoxText); ///< sends out a signal and adds reps of the image to the views
-  void activeImageChangedSlot(std::string uid); ///< temporary function(while waiting to remove the internal mCurrentImage) for handling incoming active image requests
+  void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
 
 protected:
   //gui

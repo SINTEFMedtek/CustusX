@@ -9,7 +9,7 @@
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
-
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -24,12 +24,13 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
 }
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 {}
-void TransferFunctionAlphaWidget::currentImageChangedSlot(ssc::ImagePtr currentImage)
+void TransferFunctionAlphaWidget::activeImageChangedSlot()
 {
-  if(mCurrentImage == currentImage)
+  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  if(mCurrentImage == activeImage)
     return;
 
-  mCurrentImage = currentImage;
+  mCurrentImage = activeImage;
   //TODO: call update or not ???
   update();
 }

@@ -14,11 +14,6 @@ class QSlider;
 
 namespace cx
 {
-class RepManager;
-class ViewManager;
-class RegistrationManager;
-class MessageManager;
-
 /**
  * \class ImageRegistrationWidget
  *
@@ -43,7 +38,8 @@ signals:
   void thresholdChanged(const int value); ///< the value selected by the slider
 
 protected slots:
-  void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
   void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
@@ -64,11 +60,6 @@ protected:
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
   QLabel*      mThresholdLabel; ///< label for the tresholdslider
   QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
-
-  //manageres
-  RepManager* mRepManager; ///< has a pool of reps //TODO remove when removing proberep func!!!
-  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
-  RegistrationManager* mRegistrationManager; ///< handles image and patient registration
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration

@@ -30,7 +30,8 @@ signals:
   void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
-  void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
 
 protected:
   struct AlphaPoint

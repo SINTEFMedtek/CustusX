@@ -21,11 +21,6 @@ namespace cx
 typedef ssc::Transform3D Transform3D;
 typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
 
-class RegistrationManager;
-class MessageManager;
-class ViewManager;
-class RepManager;
-
 /**
  * \class PatientRegistrationWidget
  *
@@ -43,7 +38,8 @@ public:
   ~PatientRegistrationWidget(); ///< empty
 
 protected slots:
-  void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
+  void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
   void toolSampledUpdateSlot(double, double, double,unsigned int); ///<
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
@@ -79,12 +75,6 @@ protected:
   QSpinBox* mYSpinBox; ///< box for showing Y value
   QSpinBox* mZSpinBox; ///< box for showing Z value
   QPushButton* mResetOffsetButton; ///< button for resetting the offset to zero
-
-  //managers
-  RegistrationManager* mRegistrationManager; ///< handles image and patient registration
-  //ToolManager* mToolManager; ///< interface to the navigation system
-  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
-  RepManager* mRepManager; ///< has a pool of reps
 
   //data
   int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones

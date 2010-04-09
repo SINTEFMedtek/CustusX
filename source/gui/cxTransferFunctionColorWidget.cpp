@@ -9,6 +9,7 @@
 #include <QMouseEvent>
 #include <QColorDialog>
 #include <QMenu>
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -35,12 +36,13 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
 }
 TransferFunctionColorWidget::~TransferFunctionColorWidget()
 {}
-void TransferFunctionColorWidget::currentImageChangedSlot(ssc::ImagePtr currentImage)
+void TransferFunctionColorWidget::activeImageChangedSlot()
 {
-  if(mCurrentImage == currentImage)
+  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  if(mCurrentImage == activeImage)
     return;
 
-  mCurrentImage = currentImage;
+  mCurrentImage = activeImage;
   //TODO: call update or not ???
   this->update();
 }

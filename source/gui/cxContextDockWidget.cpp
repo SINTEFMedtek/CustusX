@@ -51,8 +51,8 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
           viewManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
   
   //listen for active image changed from the datamanager
-//  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
-//          this, SLOT(activeImageChangedSlot(std::string)));
+  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+          this, SLOT(activeImageChangedSlot()));
 }
 ContextDockWidget::~ContextDockWidget()
 {}
@@ -129,7 +129,9 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   {
     // Create empty current image
     mCurrentImage.reset();
-    emit currentImageChanged(mCurrentImage);
+    dataManager()->setActiveImage(mCurrentImage);
+
+    //emit currentImageChanged(mCurrentImage); //TODO remove
     return;
   }
 
@@ -148,11 +150,24 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 
   //Set new current image
   mCurrentImage = image;
-  emit currentImageChanged(mCurrentImage);
+  dataManager()->setActiveImage(mCurrentImage);
 
-  //dataManager()->setActiveImage(mCurrentImage);
+  //emit currentImageChanged(mCurrentImage); //TODO remove
 }
-void ContextDockWidget::activeImageChangedSlot(std::string uid)
+void ContextDockWidget::activeImageChangedSlot()
+{
+  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  if(mCurrentImage == activeImage || !activeImage)
+    return;
+
+  const QString& qUid(activeImage->getUid().c_str());
+  this->imageSelectedSlot(qUid);
+
+  //find the index in the combobox and set it
+  int index = mImagesComboBox->findText(qUid);
+  mImagesComboBox->setCurrentIndex(index);
+}
+/*void ContextDockWidget::activeImageChangedSlot(std::string uid)
 {
   const QString& qUid(uid.c_str());
   this->imageSelectedSlot(qUid);
@@ -160,5 +175,5 @@ void ContextDockWidget::activeImageChangedSlot(std::string uid)
   //find the index in the combobox and set it
   int index = mImagesComboBox->findText(qUid);
   mImagesComboBox->setCurrentIndex(index);
-}
+}*/
 }//namespace cx

@@ -27,9 +27,6 @@ public:
   BrowserWidget(QWidget* parent);
   ~BrowserWidget();
 
-signals:
-  void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on
-
 protected slots:
   void populateTreeWidget(); ///< fills the tree
 
@@ -40,9 +37,6 @@ protected:
   //gui
   QTreeWidget* mTreeWidget; ///< the treestructure containing the images, meshes and tools
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
-
-  //data
-  ssc::ImagePtr mCurrentImage; ///< the currently selected image
 
 private:
   BrowserWidget();
