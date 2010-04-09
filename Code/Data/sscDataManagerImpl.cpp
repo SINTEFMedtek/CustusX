@@ -236,14 +236,16 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   QDomElement dataManagerNode = doc.createElement("datamanager");
   parentNode.appendChild(dataManagerNode);
 
-  //TODO
-  /*QDomElement activeImageNode = doc.createElement("activeImage");
+  QDomElement activeImageNode = doc.createElement("activeImage");
   if(mActiveImage)
-    activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));*/
+    activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));
+  dataManagerNode.appendChild(activeImageNode);
 
+  //TODO
   /*QDomElement activeMeshNode = doc.createElement("activeMesh");
   if(mActiveMesh)
-    activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));*/
+    activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));
+  dataManagerNode.appendChild(activeMeshNode);*/
 
   for(ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
   {
@@ -254,23 +256,21 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
     iter->second->addXml(dataManagerNode);
   }
 }
-void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
+void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 {
-  //TODO parse activeImage and activeMesh when added
-
   // All images must be created from the DataManager, so the image nodes
   // are parsed here
-  QDomNode node = dataNode.firstChild();
+  QDomNode child = dataManagerNode.firstChild();
   QDomElement nameNode;
   QString path;//Path to data file
   
-  while (!node.isNull())
+  while (!child.isNull())
   {
-    if(node.nodeName() == "image" || node.nodeName() == "mesh")
+    if(child.nodeName() == "image" || child.nodeName() == "mesh")
     {
-      QDomElement uidNode = node.namedItem("uid").toElement();
-      nameNode = node.namedItem("name").toElement();
-      QDomElement filePathNode = node.namedItem("filePath").toElement();
+      QDomElement uidNode = child.namedItem("uid").toElement();
+      nameNode = child.namedItem("name").toElement();
+      QDomElement filePathNode = child.namedItem("filePath").toElement();
       if(!filePathNode.isNull()) 
       {
         path = filePathNode.text();
@@ -309,7 +309,7 @@ void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
           else
             data->setName(nameNode.text().toStdString());
           data->setFilePath(relativePath.path().toStdString());
-          data->parseXml(node);
+          data->parseXml(child);
         }
         else
         {
@@ -329,9 +329,27 @@ void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
     else
     {
       std::cout << "Warning: DataManager::parseXml() found unknown XML node: ";
-      std::cout << node.nodeName().toStdString() << std::endl;
+      std::cout << child.nodeName().toStdString() << std::endl;
     }
-    node = node.nextSibling();
+    child = child.nextSibling();
+  }
+
+  //we need to make sure all images are loaded before we try to set an active image
+  child = dataManagerNode.firstChild();
+  while(!child.isNull())
+  {
+    if(child.toElement().tagName() == "activeImage")
+    {
+      const QString activeImageString = child.toElement().text();
+      std::cout << "Found a activeImage with uid: " << activeImageString.toStdString().c_str() << std::endl;
+      if(!activeImageString.isEmpty())
+      {
+        ImagePtr image = this->getImage(activeImageString.toStdString());
+        std::cout << "Got an image with uid: " << image->getUid().c_str() << std::endl;
+        this->setActiveImage(image);
+      }
+    }
+    child = child.nextSibling();
   }
 }
 
