@@ -177,6 +177,9 @@ MainWindow::MainWindow() :
 #else
 #endif
   
+  //make sure the transferefunctionwidget it fully initialized
+  mTransferFunctionWidget->init();
+
   this->createActions();
   this->createToolBars();
   this->createMenus();

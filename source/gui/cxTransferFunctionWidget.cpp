@@ -42,13 +42,13 @@ void TransferFunctionWidget::init()
 	
 void TransferFunctionWidget::activeImageChangedSlot()
 {
+  if (!mInitialized)
+    init();
+
   ssc::ImagePtr activeImage = dataManager()->getActiveImage();
   if(mCurrentImage == activeImage)
     return;
 
-	if (!mInitialized)
-		init();
-	
   mCurrentImage = activeImage;
 
   //emit currentImageChanged(mCurrentImage);
