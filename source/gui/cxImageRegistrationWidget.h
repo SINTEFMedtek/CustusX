@@ -38,8 +38,7 @@ signals:
   void thresholdChanged(const int value); ///< the value selected by the slider
 
 protected slots:
-  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+  void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
   void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
