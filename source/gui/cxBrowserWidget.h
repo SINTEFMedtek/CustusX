@@ -10,11 +10,6 @@ class QTreeWidgetItem;
 
 namespace cx
 {
-class DataManager;
-class ToolManager;
-class MessageManager;
-class ViewManager;
-class RepManager;
 /**
  * \class BrowserWidget
  *
@@ -45,12 +40,6 @@ protected:
   //gui
   QTreeWidget* mTreeWidget; ///< the treestructure containing the images, meshes and tools
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
-
-  //managers
-  DataManager* mDataManager; ///< has all the data loaded into the system
-  ToolManager* mToolManager; ///< interface to the navigation system
-  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
-  RepManager* mRepManager; ///< has a pool of reps
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the currently selected image

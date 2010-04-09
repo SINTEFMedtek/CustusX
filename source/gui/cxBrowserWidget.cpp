@@ -17,11 +17,7 @@ namespace cx
 BrowserWidget::BrowserWidget(QWidget* parent) :
     QWidget(parent),
     mTreeWidget(new QTreeWidget(this)),
-    mVerticalLayout(new QVBoxLayout()),
-    mDataManager(DataManager::getInstance()),
-    mToolManager(ToolManager::getInstance()),
-    mViewManager(ViewManager::getInstance()),
-    mRepManager(RepManager::getInstance())
+    mVerticalLayout(new QVBoxLayout())
 {
   //dock widget
   this->setWindowTitle("Browser");
@@ -34,33 +30,33 @@ BrowserWidget::~BrowserWidget()
 void BrowserWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
-  connect(mDataManager, SIGNAL(dataLoaded()),
+  connect(dataManager(), SIGNAL(dataLoaded()),
           this, SLOT(populateTreeWidget()));
-  connect(mViewManager, SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
+  connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
           this, SLOT(populateTreeWidget()));
   this->populateTreeWidget();
 }
 void BrowserWidget::closeEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
-  disconnect(mDataManager, SIGNAL(dataLoaded()),
+  disconnect(dataManager(), SIGNAL(dataLoaded()),
              this, SLOT(populateTreeWidget()));
-  disconnect(mViewManager, SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
+  disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
              this, SLOT(populateTreeWidget()));
 }
 void BrowserWidget::populateTreeWidget()
 {
   //get all images, meshes and tools
   std::map<std::string, std::string> imageUidAndNames =
-      mDataManager->getImageUidsAndNames();
+      dataManager()->getImageUidsAndNames();
   std::map<std::string, std::string> meshUidAndNames =
-      mDataManager->getMeshUidsWithNames();
+      dataManager()->getMeshUidsWithNames();
   std::map<std::string, std::string> toolUidAndName =
-      mToolManager->getToolUidsAndNames();
+      toolManager()->getToolUidsAndNames();
 
   //get all views
-  std::map<std::string, View2D*>* view2DMap = mViewManager->get2DViews();
-  std::map<std::string, View3D*>* view3DMap = mViewManager->get3DViews();
+  std::map<std::string, View2D*>* view2DMap = viewManager()->get2DViews();
+  std::map<std::string, View3D*>* view3DMap = viewManager()->get3DViews();
 
   //ready the tree
   mTreeWidget->clear();
@@ -72,7 +68,7 @@ void BrowserWidget::populateTreeWidget()
 
 
   //make QTreeWidgetItems for all the views
-  ViewManager::LayoutType layoutType = mViewManager->getCurrentLayoutType();
+  ViewManager::LayoutType layoutType = viewManager()->getActiveLayout();
   int numberOf3DViews = 0;
   int numberOf2DViews = 0;
   switch(layoutType)
@@ -126,7 +122,7 @@ void BrowserWidget::populateTreeWidget()
   QTreeWidgetItem* topLevelItem;
   foreach(topLevelItem, viewItems)
   {
-    ssc::View* view = mViewManager->getView(topLevelItem->text(1).toStdString());
+    ssc::View* view = viewManager()->getView(topLevelItem->text(1).toStdString());
     if(view==NULL) //couldn't find a view with that id
       return;
     std::vector<ssc::RepPtr> reps = view->getReps();
@@ -148,7 +144,7 @@ void BrowserWidget::populateTreeWidget()
         //add the images
         std::string repUid = (*repIter)->getUid();
 
-        ssc::VolumetricRepPtr volRep = mRepManager->getVolumetricRep(repUid);
+        ssc::VolumetricRepPtr volRep = repManager()->getVolumetricRep(repUid);
         if(!volRep)
           break;
         ssc::ImagePtr image = volRep->getImage();
@@ -164,7 +160,7 @@ void BrowserWidget::populateTreeWidget()
         topLevelItem->addChild(repItem);
         //add meshes under geometricRep
         std::string repUid = (*repIter)->getUid();
-        ssc::GeometricRepPtr geometricRep = mRepManager->getGeometricRep(repUid);
+        ssc::GeometricRepPtr geometricRep = repManager()->getGeometricRep(repUid);
         if(!geometricRep)
           break;
         ssc::MeshPtr mesh = geometricRep->getMesh();
@@ -180,7 +176,7 @@ void BrowserWidget::populateTreeWidget()
         topLevelItem->addChild(repItem);
         //add tools under toolreps
         std::string repUid = (*repIter)->getUid();
-        ssc::ToolRep3DPtr toolRep3D = mRepManager->getToolRep3DRep(repUid);
+        ssc::ToolRep3DPtr toolRep3D = repManager()->getToolRep3DRep(repUid);
         if(!toolRep3D)
           break;
         ssc::ToolPtr tool = toolRep3D->getTool();
