@@ -1,5 +1,6 @@
 #include "sscDataManagerImpl.h"
 
+#include <sstream>
 #include <vtkImageData.h>
 #include <vtkMetaImageReader.h>
 #include <vtkSmartPointer.h>
@@ -275,6 +276,12 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
     activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));
   dataManagerNode.appendChild(activeMeshNode);*/
 
+  QDomElement centerNode = doc.createElement("center");
+  std::stringstream centerStream;
+  centerStream << mCenter;
+  centerNode.appendChild(doc.createTextNode(centerStream.str().c_str()));
+  dataManagerNode.appendChild(centerNode);
+
   for(ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
   {
     iter->second->addXml(dataManagerNode);
@@ -369,12 +376,23 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
     if(child.toElement().tagName() == "activeImage")
     {
       const QString activeImageString = child.toElement().text();
-      std::cout << "Found a activeImage with uid: " << activeImageString.toStdString().c_str() << std::endl;
+      //std::cout << "Found a activeImage with uid: " << activeImageString.toStdString().c_str() << std::endl;
       if(!activeImageString.isEmpty())
       {
         ImagePtr image = this->getImage(activeImageString.toStdString());
-        std::cout << "Got an image with uid: " << image->getUid().c_str() << std::endl;
+        //std::cout << "Got an image with uid: " << image->getUid().c_str() << std::endl;
         this->setActiveImage(image);
+      }
+    }
+    //TODO add activeMesh
+    if(child.toElement().tagName() == "center")
+    {
+      const QString centerString = child.toElement().text();
+      if(!centerString.isEmpty())
+      {
+        Vector3D center = Vector3D::fromString(centerString);
+        this->setCenter(center);
+        std::cout << "Center: " << center << std::endl;
       }
     }
     child = child.nextSibling();
