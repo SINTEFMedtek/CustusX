@@ -897,7 +897,7 @@ void MainWindow::importDataSlot()
                                   tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
   if(fileName.isEmpty())
   {
-    messageManager()->sendInfo("Import cancelled");
+    messageManager()->sendInfo("Import canceled");
     return;
   }
 
@@ -941,7 +941,7 @@ void MainWindow::importDataSlot()
     data = dataManager()->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
-  //data->setName(fileInfo.fileName().toStdString());
+  data->setName(fileInfo.fileName().toStdString());
   
   QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString()
                       +"/"+mActivePatientFolder);
