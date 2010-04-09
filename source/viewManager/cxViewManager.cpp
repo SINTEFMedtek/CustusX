@@ -210,8 +210,7 @@ LayoutType ViewManager::getActiveLayout() const
  */
 void ViewManager::setActiveLayout(LayoutType layout)
 {
-  //TODO, test why it s not set when loading
-  std::cout << "Setting active layout to "<< layoutText(layout) << std::endl;
+  //std::cout << "Setting active layout to "<< layoutText(layout) << std::endl;
   if (mActiveLayout==layout)
     return;
 
@@ -247,25 +246,24 @@ void ViewManager::addXml(QDomNode& parentNode)
 }
 void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
-//  QDomNode child = viewmanagerNode.firstChild();
-//  while(!child.isNull())
-//  {
-//    if(child.toElement().tagName() == "activeLayout")
-//    {
-//      std::cout << "Found activeLayout tag." << std::endl;
-//      const QString activeLayoutString = child.toElement().text();
-//      if(!activeLayoutString.isEmpty())
-//        this->setActiveLayout(string2enum<LayoutType>(activeLayoutString.toStdString()));
-//    }
-//    else if(child.toElement().tagName() == "activeView")
-//    {
-//      const QString activeViewString = child.toElement().text();
-//      if(!activeViewString.isEmpty())
-//        this->setActiveView(getView(activeViewString.toStdString()));
-//    }
-//    child = child.nextSibling();
-//  }
-
+  QDomNode child = viewmanagerNode.firstChild();
+  while(!child.isNull())
+  {
+    if(child.toElement().tagName() == "activeLayout")
+    {
+      //std::cout << "Found activeLayout tag." << std::endl;
+      const QString activeLayoutString = child.toElement().text();
+      if(!activeLayoutString.isEmpty())
+        this->setActiveLayout(string2enum<LayoutType>(activeLayoutString.toStdString()));
+    }
+    else if(child.toElement().tagName() == "activeView")
+    {
+      const QString activeViewString = child.toElement().text();
+      if(!activeViewString.isEmpty())
+        this->setActiveView(getView(activeViewString.toStdString()));
+    }
+    child = child.nextSibling();
+  }
 }
 QWidget* ViewManager::stealCentralWidget()
 {
@@ -280,10 +278,6 @@ ViewManager::View3DMap* ViewManager::get3DViews()
   return &mView3DMap;
 }
 
-/*LayoutType ViewManager::getCurrentLayoutType()
-{
-  return mActiveLayout;
-}*/
 ssc::View* ViewManager::getView(const std::string& uid)
 {
   ssc::View* view = NULL;

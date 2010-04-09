@@ -57,8 +57,6 @@ public:
   static std::string layoutText(LayoutType type);
   static LayoutType layoutTypeFromText(std::string text);
   std::vector<LayoutType> availableLayouts() const;
-  //LayoutType currentLayout() const;
-  //void changeLayout(LayoutType toType);
 
   static ViewManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
@@ -67,7 +65,6 @@ public:
 
   View2DMap* get2DViews(); ///< returns all possible 2D views
   View3DMap* get3DViews(); ///< returns all possible 3D views
-  //LayoutType getCurrentLayoutType(); ///< returns the current layout type
 
   ssc::View* getView(const std::string& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
   View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
