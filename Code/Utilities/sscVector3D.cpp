@@ -1,6 +1,7 @@
 #include "sscVector3D.h"
 #include <vtkMath.h>
 #include "sscUtilHelpers.h"
+#include "sscTypeConversions.h"
 
 // --------------------------------------------------------
 namespace ssc
@@ -70,6 +71,14 @@ Vector3D::Vector3D(const int* data)
 {
 	std::copy(data, data+size(), elems);
 }
+
+Vector3D Vector3D::fromString(const QString& text)
+{
+  std::vector<double> raw = convertQString2DoubleVector(text);
+  //might want to check for raw.size()==3 here.... but what to do? Setting to identity might hide errors.
+  return Vector3D((double*)&(*raw.begin()));
+}
+
 // --------------------------------------------------------
 Vector3D& Vector3D::operator+=(const Vector3D& b)
 {	add_left(begin(), b.begin(), size() ); return *this;}

@@ -2,7 +2,7 @@
 #define SSCVECTOR3D_H_
 
 #include "boost/array.hpp"
-
+class QString;
 
 // --------------------------------------------------------
 namespace ssc
@@ -23,7 +23,8 @@ public:
 	Vector3D(double x, double y, double z);
 	explicit Vector3D(const double* data); ///< construct vector from a c-style array of size 3.
 	explicit Vector3D(const int* data);    ///< construct vector from a c-style array of size 3.
-	
+  static Vector3D fromString(const QString& text); ///< construct a vector from a string containing 3 whitespace-separated numbers
+
 	Vector3D& operator+=(const Vector3D& b);
 	Vector3D& operator-=(const Vector3D& b);
 	Vector3D& operator*=(double b);
