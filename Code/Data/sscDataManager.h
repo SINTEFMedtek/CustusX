@@ -60,9 +60,18 @@ public:
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
 	virtual void setCenter(const Vector3D& center) = 0;
 
+	// state information
+	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
+	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+
+	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
+	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
+
 signals:
 	void centerChanged(); ///< emitter when center is changed.
 	void dataLoaded(); ///emitted when data is loaded successfully
+	void activeImageChanged(const std::string& uId); ///< emitted when the active image is changed
+	//void activeMeshChanged(const std::string& uId); ///< emitted when the active mesh is changed
 
 protected:
 	static void setInstance(DataManager* instance);

@@ -118,6 +118,7 @@ DataManagerImpl::DataManagerImpl()
 	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
 	mMeshReaders[mrtSTL].reset(new StlMeshReader());
 	mCenter = Vector3D(0,0,0);
+	mActiveImage.reset();
 }
 
 DataManagerImpl::~DataManagerImpl()
@@ -133,7 +134,24 @@ void DataManagerImpl::setCenter(const Vector3D& center)
 	mCenter = center;
 	emit centerChanged();
 }
+ImagePtr DataManagerImpl::getActiveImage() const
+{
+  return mActiveImage;
+}
+void DataManagerImpl::setActiveImage(ImagePtr activeImage)
+{
+  if(mActiveImage == activeImage)
+    return;
 
+  mActiveImage = activeImage;
+
+  std::string uid = "";
+  if(mActiveImage)
+    uid = mActiveImage->getUid();
+
+  emit activeImageChanged(uid);
+  std::cout << "Active image set to "<< uid << std::endl;
+}
 ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE type)
 {
 	if (mImages.count(filename)) // dont load same image twice
@@ -218,6 +236,15 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   QDomElement dataManagerNode = doc.createElement("datamanager");
   parentNode.appendChild(dataManagerNode);
 
+  //TODO
+  /*QDomElement activeImageNode = doc.createElement("activeImage");
+  if(mActiveImage)
+    activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));*/
+
+  /*QDomElement activeMeshNode = doc.createElement("activeMesh");
+  if(mActiveMesh)
+    activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));*/
+
   for(ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
   {
     iter->second->addXml(dataManagerNode);
@@ -229,6 +256,8 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 }
 void DataManagerImpl::parseXml(QDomNode& dataNode, QString absolutePath)
 {
+  //TODO parse activeImage and activeMesh when added
+
   // All images must be created from the DataManager, so the image nodes
   // are parsed here
   QDomNode node = dataNode.firstChild();

@@ -92,6 +92,13 @@ public:
 	virtual Vector3D getCenter() const;
 	virtual void setCenter(const Vector3D& center);
 
+ // state information
+  virtual ImagePtr getActiveImage() const; ///< used for system state
+  virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
+
+  //virtual MeshPtr getActiveMesh() const; ///< used for system state
+  //virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state
+
   //Interface for saving/loading
 	void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements. 
@@ -107,6 +114,10 @@ protected:
 
 	std::map<std::string, MeshPtr> mMeshes;
 	std::map<MESH_READER_TYPE, MeshReaderPtr> mMeshReaders;
+
+	//state
+	ImagePtr mActiveImage;
+	//MeshPtr mActiveMesh;
 };
 
 } // namespace ssc
