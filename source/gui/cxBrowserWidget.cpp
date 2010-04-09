@@ -68,25 +68,25 @@ void BrowserWidget::populateTreeWidget()
 
 
   //make QTreeWidgetItems for all the views
-  ViewManager::LayoutType layoutType = viewManager()->getActiveLayout();
+  LayoutType layoutType = viewManager()->getActiveLayout();
   int numberOf3DViews = 0;
   int numberOf2DViews = 0;
   switch(layoutType)
   {
-    case ViewManager::LAYOUT_NONE:
+    case LAYOUT_NONE:
       break;
-    case ViewManager::LAYOUT_3D_1X1:
+    case LAYOUT_3D_1X1:
       numberOf3DViews = 1;
       break;
-    case ViewManager::LAYOUT_3DACS_2X2:
-      numberOf3DViews = 1;
-      numberOf2DViews = 3;
-      break;
-    case ViewManager::LAYOUT_3DACS_1X3:
+    case LAYOUT_3DACS_2X2:
       numberOf3DViews = 1;
       numberOf2DViews = 3;
       break;
-    case ViewManager::LAYOUT_ACSACS_2X3:
+    case LAYOUT_3DACS_1X3:
+      numberOf3DViews = 1;
+      numberOf2DViews = 3;
+      break;
+    case LAYOUT_ACSACS_2X3:
       numberOf2DViews = 6;
       break;
     default:

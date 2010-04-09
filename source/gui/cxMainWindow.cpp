@@ -333,7 +333,7 @@ void MainWindow::createActions()
   mLayoutActionGroup = new QActionGroup(this);
   mLayoutActionGroup->setExclusive(true);
   
-  std::vector<ViewManager::LayoutType> layouts = ViewManager::getInstance()->availableLayouts();
+  std::vector<LayoutType> layouts = ViewManager::getInstance()->availableLayouts();
   for (unsigned i=0; i<layouts.size(); ++i)
     addLayoutAction(layouts[i]);
 
@@ -359,7 +359,7 @@ void MainWindow::createActions()
  */
 void MainWindow::layoutChangedSlot()
 {
-  ViewManager::LayoutType type = viewManager()->getActiveLayout();
+  LayoutType type = viewManager()->getActiveLayout();
   QList<QAction*> actions = mLayoutActionGroup->actions();
   for (int i=0; i<actions.size(); ++i)
   {
@@ -376,13 +376,13 @@ void MainWindow::setLayoutSlot()
   QAction* action = dynamic_cast<QAction*>(sender());
   if (!action)
     return;
-  ViewManager::LayoutType type = static_cast<ViewManager::LayoutType>(action->data().toInt());
+  LayoutType type = static_cast<LayoutType>(action->data().toInt());
   viewManager()->setActiveLayout(type);
 }
 
 /** Add one layout as an action to the layout menu.
  */
-QAction* MainWindow::addLayoutAction(ViewManager::LayoutType layout)
+QAction* MainWindow::addLayoutAction(LayoutType layout)
 {
   QAction* action = new QAction(qstring_cast(ViewManager::layoutText(layout)), mLayoutActionGroup);
   action->setCheckable(true);
@@ -546,6 +546,8 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
 
   QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
   toolManager()->parseXml(toolmanagerNode);
+
+  viewManager()->parseXml(managerNode.namedItem("viewManager"));
 }
 
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)

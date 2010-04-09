@@ -12,9 +12,30 @@ class QWidget;
 class QTimer;
 class QSettings;
 class QTime;
+#include "sscEnumConverter.h"
+
 
 namespace cx
 {
+enum LayoutType
+{
+  LAYOUT_NONE=0,
+  LAYOUT_3D_1X1,
+  LAYOUT_3DACS_2X2,
+  LAYOUT_3DACS_1X3,
+  LAYOUT_ACSACS_2X3,
+  LAYOUT_3DACS_2X2_SNW,
+  LAYOUT_3DAny_1X2_SNW,
+  LAYOUT_ACSACS_2X3_SNW,
+  LAYOUT_COUNT
+}; ///< the layout types available
+} // namespace cx
+SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, LayoutType);
+
+
+namespace cx
+{
+
 
 /**
  * \class ViewManager
@@ -33,17 +54,6 @@ class ViewManager : public QObject
 
   Q_OBJECT
 public:
-  enum LayoutType
-  {
-    LAYOUT_NONE,
-    LAYOUT_3D_1X1,
-    LAYOUT_3DACS_2X2,
-    LAYOUT_3DACS_1X3,
-    LAYOUT_ACSACS_2X3,
-    LAYOUT_3DACS_2X2_SNW,
-    LAYOUT_3DAny_1X2_SNW,
-    LAYOUT_ACSACS_2X3_SNW
-  }; ///< the layout types available
   static std::string layoutText(LayoutType type);
   static LayoutType layoutTypeFromText(std::string text);
   std::vector<LayoutType> availableLayouts() const;
@@ -73,7 +83,7 @@ public:
 
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
-  void parseXml(QDomNode& viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
+  void parseXml(QDomNode viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
 
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager

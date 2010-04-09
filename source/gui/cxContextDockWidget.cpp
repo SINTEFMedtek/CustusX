@@ -51,8 +51,8 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
           viewManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
   
   //listen for active image changed from the datamanager
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
-          this, SLOT(activeImageChangedSlot(std::string)));
+//  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+//          this, SLOT(activeImageChangedSlot(std::string)));
 }
 ContextDockWidget::~ContextDockWidget()
 {}

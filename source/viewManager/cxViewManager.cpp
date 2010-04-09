@@ -22,6 +22,19 @@
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 
+SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
+{
+  "No_layout",
+  "3D_1X1",
+  "3DACS_2X2",
+  "3DACS_1X3",
+  "ACSACS_2X3",
+  "3DACS_2X2_SNW",
+  "3DAny_1X2_SNW",
+  "ACSACS_2X3_SNW"
+}
+SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, LayoutType, LAYOUT_COUNT);
+
 namespace cx
 {
 
@@ -121,51 +134,55 @@ ViewManager::~ViewManager()
 
 std::string ViewManager::layoutText(LayoutType type)
 {
-  switch (type)
-  {
-  case LAYOUT_NONE :          return "No_layout";
-  case LAYOUT_3D_1X1 :        return "3D_1X1";
-  case LAYOUT_3DACS_2X2 :     return "3DACS_2X2";
-  case LAYOUT_3DACS_1X3 :     return "3DACS_1X3";
-  case LAYOUT_ACSACS_2X3 :    return "ACSACS_2X3";
-  case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
-  case LAYOUT_3DAny_1X2_SNW : return "3DAny_1X2_SNW";
-  case LAYOUT_ACSACS_2X3_SNW :return "ACSACS_2X3_SNW";
-  default: return "Undefined layout";
-  }
+
+  return string_cast(type);
+//  switch (type)
+//  {
+//  case LAYOUT_NONE :          return "No_layout";
+//  case LAYOUT_3D_1X1 :        return "3D_1X1";
+//  case LAYOUT_3DACS_2X2 :     return "3DACS_2X2";
+//  case LAYOUT_3DACS_1X3 :     return "3DACS_1X3";
+//  case LAYOUT_ACSACS_2X3 :    return "ACSACS_2X3";
+//  case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
+//  case LAYOUT_3DAny_1X2_SNW : return "3DAny_1X2_SNW";
+//  case LAYOUT_ACSACS_2X3_SNW : return "ACSACS_2X3_SNW";
+//  default: return "Undefined layout";
+//  }
 }
-ViewManager::LayoutType ViewManager::layoutTypeFromText(std::string text)
-{
-  if(text == "No_layout")
-  {
-    return LAYOUT_NONE;
-  } else if(text == "3D_1X1")
-  {
-    return LAYOUT_3D_1X1;
-  } else if(text == "3DACS_2X2")
-  {
-    return LAYOUT_3DACS_2X2;
-  } else if(text == "3DACS_1X3")
-  {
-    return LAYOUT_3DACS_1X3;
-  } else if(text == "ACSACS_2X3")
-  {
-    return LAYOUT_ACSACS_2X3;
-  } else if(text == "3DACS_2X2_SNW")
-  {
-    return LAYOUT_3DACS_2X2_SNW;
-  } else if(text == "3DAny_1X2_SNW")
-  {
-    return LAYOUT_3DAny_1X2_SNW;
-  } else if (text == "ACSACS_2X3_SNW")
-  {
-    return LAYOUT_ACSACS_2X3_SNW;
-  } else
-  {
-    return LAYOUT_NONE;
-  }
-}
-std::vector<ViewManager::LayoutType> ViewManager::availableLayouts() const
+
+//ViewManager::LayoutType ViewManager::layoutTypeFromText(std::string text)
+//{
+//  if(text == "No_layout")
+//  {
+//    return LAYOUT_NONE;
+//  } else if(text == "3D_1X1")
+//  {
+//    return LAYOUT_3D_1X1;
+//  } else if(text == "3DACS_2X2")
+//  {
+//    return LAYOUT_3DACS_2X2;
+//  } else if(text == "3DACS_1X3")
+//  {
+//    return LAYOUT_3DACS_1X3;
+//  } else if(text == "ACSACS_2X3")
+//  {
+//    return LAYOUT_ACSACS_2X3;
+//  } else if(text == "3DACS_2X2_SNW")
+//  {
+//    return LAYOUT_3DACS_2X2_SNW;
+//  } else if(text == "3DAny_1X2_SNW")
+//  {
+//    return LAYOUT_3DAny_1X2_SNW;
+//  } else if (text == "ACSACS_2X3_SNW")
+//  {
+//    return LAYOUT_ACSACS_2X3_SNW;
+//  } else
+//  {
+//    return LAYOUT_NONE;
+//  }
+//}
+
+std::vector<LayoutType> ViewManager::availableLayouts() const
 {
   std::vector<LayoutType> retval;
   retval.push_back(LAYOUT_3D_1X1);
@@ -178,23 +195,20 @@ std::vector<ViewManager::LayoutType> ViewManager::availableLayouts() const
   return retval;
 }
 
-/*ViewManager::LayoutType ViewManager::currentLayout() const
-{
-  return mActiveLayout;
-}*/
-
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
   for (unsigned i=0; i<mViewGroups.size(); ++i)
     mViewGroups[i]->setRegistrationMode(mode);
 }
-ViewManager::LayoutType ViewManager::getActiveLayout() const
+
+LayoutType ViewManager::getActiveLayout() const
 {
   return mActiveLayout;
 }
+
 /**Change layout from current to layout.
  */
-void ViewManager::setActiveLayout(ViewManager::LayoutType layout)
+void ViewManager::setActiveLayout(LayoutType layout)
 {
   //TODO, test why it s not set when loading
   std::cout << "Setting active layout to "<< layoutText(layout) << std::endl;
@@ -231,25 +245,26 @@ void ViewManager::addXml(QDomNode& parentNode)
     activeViewNode.appendChild(doc.createTextNode(mActiveView->getUid().c_str()));
   viewManagerNode.appendChild(activeLayoutNode);
 }
-void ViewManager::parseXml(QDomNode& viewmanagerNode)
+void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
-  QDomNode child = viewmanagerNode.firstChild();
-  while(!child.isNull())
-  {
-    if(child.toElement().tagName() == "activeLayout")
-    {
-      std::cout << "Found activeLayout tag." << std::endl;
-      const QString activeLayoutString = child.toElement().text();
-      if(!activeLayoutString.isEmpty())
-        this->setActiveLayout(layoutTypeFromText(activeLayoutString.toStdString()));
-    }else if(child.toElement().tagName() == "activeView")
-    {
-      const QString activeViewString = child.toElement().text();
-      if(!activeViewString.isEmpty())
-        this->setActiveView(getView(activeViewString.toStdString()));
-    }
-    child = child.nextSibling();
-  }
+//  QDomNode child = viewmanagerNode.firstChild();
+//  while(!child.isNull())
+//  {
+//    if(child.toElement().tagName() == "activeLayout")
+//    {
+//      std::cout << "Found activeLayout tag." << std::endl;
+//      const QString activeLayoutString = child.toElement().text();
+//      if(!activeLayoutString.isEmpty())
+//        this->setActiveLayout(string2enum<LayoutType>(activeLayoutString.toStdString()));
+//    }
+//    else if(child.toElement().tagName() == "activeView")
+//    {
+//      const QString activeViewString = child.toElement().text();
+//      if(!activeViewString.isEmpty())
+//        this->setActiveView(getView(activeViewString.toStdString()));
+//    }
+//    child = child.nextSibling();
+//  }
 
 }
 QWidget* ViewManager::stealCentralWidget()
@@ -264,7 +279,8 @@ ViewManager::View3DMap* ViewManager::get3DViews()
 {
   return &mView3DMap;
 }
-/*ViewManager::LayoutType ViewManager::getCurrentLayoutType()
+
+/*LayoutType ViewManager::getCurrentLayoutType()
 {
   return mActiveLayout;
 }*/
@@ -527,4 +543,49 @@ void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
     mViewGroups[i]->setImage(currentImage);
   }
 }	
+
+//void ViewManager::addXml(QDomNode& parentNode)
+//{
+//  QDomDocument doc = parentNode.ownerDocument();
+//  QDomElement base = doc.createElement("viewManager");
+//  parentNode.appendChild(base);
+//
+//  base.setAttribute("layoutType", qstring_cast(mCurrentLayoutType));
+//
+//
+////  m_rMpr_History->addXml(base);
+////
+////  QDomDocument doc = parentNode.ownerDocument();
+////  QDomElement base = doc.createElement("registrationTransform");
+////  parentNode.appendChild(base);
+////
+////  base.setAttribute("timestamp", mTimestamp.toString(timestampSecondsFormat()));
+////  base.setAttribute("type", mType);
+////  base.appendChild(doc.createTextNode(qstring_cast(mValue)));
+//}
+//
+//void ViewManager::parseXml(QDomNode dataNode)
+//{
+//  if (dataNode.isNull())
+//    return;
+//
+//  QDomElement base = dataNode.toElement();
+//  QString layout = base.attribute("layoutType");
+//  changeLayout(string2enum<LayoutType>(string_cast(layout)));
+////  LayoutType = base
+//
+////  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+////  m_rMpr_History->parseXml(registrationHistory);
+////
+////
+////  QDomElement base = dataNode.toElement();
+////
+////  mTimestamp = QDateTime::fromString(base.attribute("timestamp"), timestampSecondsFormat());
+////  mType = base.attribute("type");
+////  mValue = Transform3D::fromString(base.text());
+//
+//
+//}
+
+
 }//namespace cx

@@ -135,7 +135,7 @@ protected:
   void deactivateUSAcquisitionState(); ///< Should only be used by changeState(...)!
   
   void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
-  QAction* addLayoutAction(ViewManager::LayoutType layout);
+  QAction* addLayoutAction(LayoutType layout);
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
   
