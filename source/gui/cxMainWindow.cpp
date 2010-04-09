@@ -522,9 +522,12 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
   //Get all the nodes
   QDomNode patientNode = doc.namedItem("patient");
   QDomNode managerNode = patientNode.namedItem("managers");
-  QDomNode dataManagerNode = managerNode.namedItem("datamanager");
+
+  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
+  viewManager()->parseXml(viewmanagerNode);
 
   //Evaluate the xml nodes and load what's needed
+  QDomNode dataManagerNode = managerNode.namedItem("datamanager");
   if(!patientNode.isNull())
   {
     QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
@@ -543,9 +546,6 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
 
   QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
   toolManager()->parseXml(toolmanagerNode);
-
-  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-  viewManager()->parseXml(viewmanagerNode);
 }
 
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)

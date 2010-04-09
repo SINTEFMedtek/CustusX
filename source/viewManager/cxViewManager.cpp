@@ -219,17 +219,17 @@ void ViewManager::setActiveView(ssc::View* view)
 void ViewManager::addXml(QDomNode& parentNode)
 {
   QDomDocument doc = parentNode.ownerDocument();
-  QDomElement dataManagerNode = doc.createElement("datamanager");
-  parentNode.appendChild(dataManagerNode);
+  QDomElement viewManagerNode = doc.createElement("viewManager");
+  parentNode.appendChild(viewManagerNode);
 
   QDomElement activeLayoutNode = doc.createElement("activeLayout");
   activeLayoutNode.appendChild(doc.createTextNode(layoutText(mActiveLayout).c_str()));
-  parentNode.appendChild(activeLayoutNode);
+  viewManagerNode.appendChild(activeLayoutNode);
 
   QDomElement activeViewNode = doc.createElement("activeView");
   if(mActiveView)
     activeViewNode.appendChild(doc.createTextNode(mActiveView->getUid().c_str()));
-  parentNode.appendChild(activeLayoutNode);
+  viewManagerNode.appendChild(activeLayoutNode);
 }
 void ViewManager::parseXml(QDomNode& viewmanagerNode)
 {
@@ -238,6 +238,7 @@ void ViewManager::parseXml(QDomNode& viewmanagerNode)
   {
     if(child.toElement().tagName() == "activeLayout")
     {
+      std::cout << "Found activeLayout tag." << std::endl;
       const QString activeLayoutString = child.toElement().text();
       if(!activeLayoutString.isEmpty())
         this->setActiveLayout(layoutTypeFromText(activeLayoutString.toStdString()));
