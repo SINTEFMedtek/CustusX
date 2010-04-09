@@ -198,12 +198,17 @@ void ViewGroup::contexMenuSlot(const QPoint& point)
 
     if(!image)
     {
-      std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View3D.";
+      std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View.";
       messageManager()->sendError(error);
       return;
     }
 
     this->setImage(image);
+
+    //TODO remove/move? (JB)
+    //test to see if the contextdockwidgets combobox will respond
+    //it did
+    //dataManager()->setActiveImage(image);
 }
 void ViewGroup::activateManualToolSlot()
 {

@@ -337,7 +337,7 @@ void MainWindow::createActions()
   for (unsigned i=0; i<layouts.size(); ++i)
     addLayoutAction(layouts[i]);
 
-  connect(viewManager(), SIGNAL(layoutChanged()), this, SLOT(layoutChangedSlot()));
+  connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   layoutChangedSlot();
 
   //context widgets
@@ -359,7 +359,7 @@ void MainWindow::createActions()
  */
 void MainWindow::layoutChangedSlot()
 {
-  ViewManager::LayoutType type = viewManager()->currentLayout();
+  ViewManager::LayoutType type = viewManager()->getActiveLayout();
   QList<QAction*> actions = mLayoutActionGroup->actions();
   for (int i=0; i<actions.size(); ++i)
   {
@@ -377,7 +377,7 @@ void MainWindow::setLayoutSlot()
   if (!action)
     return;
   ViewManager::LayoutType type = static_cast<ViewManager::LayoutType>(action->data().toInt());
-  viewManager()->changeLayout(type);
+  viewManager()->setActiveLayout(type);
 }
 
 /** Add one layout as an action to the layout menu.
@@ -506,6 +506,7 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
 
   dataManager()->addXml(managerNode);
   toolManager()->addXml(managerNode);
+  viewManager()->addXml(managerNode);
 
   //TODO Implement
   /*
@@ -540,8 +541,11 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
     dataManager()->parseXml(dataManagerNode, absolutePatientPath);
   }
 
-  QDomNode toolmanager = managerNode.namedItem("toolManager");
-  toolManager()->parseXml(toolmanager);
+  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
+  toolManager()->parseXml(toolmanagerNode);
+
+  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
+  viewManager()->parseXml(viewmanagerNode);
 }
 
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)

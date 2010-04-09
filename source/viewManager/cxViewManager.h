@@ -45,9 +45,10 @@ public:
     LAYOUT_ACSACS_2X3_SNW
   }; ///< the layout types available
   static std::string layoutText(LayoutType type);
+  static LayoutType layoutTypeFromText(std::string text);
   std::vector<LayoutType> availableLayouts() const;
-  LayoutType currentLayout() const;
-  void changeLayout(LayoutType toType);
+  //LayoutType currentLayout() const;
+  //void changeLayout(LayoutType toType);
 
   static ViewManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
@@ -56,7 +57,7 @@ public:
 
   View2DMap* get2DViews(); ///< returns all possible 2D views
   View3DMap* get3DViews(); ///< returns all possible 3D views
-  LayoutType getCurrentLayoutType(); ///< returns the current layout type
+  //LayoutType getCurrentLayoutType(); ///< returns the current layout type
 
   ssc::View* getView(const std::string& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
   View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
@@ -64,10 +65,21 @@ public:
 
   void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
 
+  LayoutType getActiveLayout() const; ///< returns the active layout type
+  void setActiveLayout(LayoutType layout); ///< change the layout
+
+  ssc::View* getActiveView() const; ///< returns the active view
+  void setActiveView(ssc::View* view); ///< change the active view
+
+  //Interface for saving/loading
+  void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
+  void parseXml(QDomNode& viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
+
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
   void fps(int number);///< Emits number of frames per second
-  void layoutChanged();
+  void activeLayoutChanged(); ///< emitted when the active layout changes
+  void activeViewChanged(); ///< emitted when the active view changes
 
 public slots:
   void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
@@ -102,17 +114,18 @@ protected:
 
   static ViewManager* mTheInstance; ///< the only instance of this class
 
-  LayoutType      mCurrentLayoutType; ///< what LayoutType is currently active
-  QGridLayout*    mLayout;            ///< the layout
-  QWidget*        mMainWindowsCentralWidget;     ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
+  LayoutType      mActiveLayout;              ///< the active layout (type)
+  QGridLayout*    mLayout;                    ///< the layout
+  QWidget*        mMainWindowsCentralWidget;  ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 
-  const int     MAX_3DVIEWS;      ///< constant defining the max number of 3D views available
-  const int     MAX_2DVIEWS;      ///< constant defining the max number of 2D views available
-  std::vector<std::string> mView3DNames;  ///< the name of all the 3D views
-  std::vector<std::string> mView2DNames;  ///< the name of all the 2D views
-  View2DMap     mView2DMap;       ///< a map of all the 3D views
-  View3DMap     mView3DMap;       ///< a map of all the 2D views
-  ViewMap       mViewMap;         ///< a map of all the views
+  ssc::View*    mActiveView;            ///< the active view
+  const int     MAX_3DVIEWS;            ///< constant defining the max number of 3D views available
+  const int     MAX_2DVIEWS;            ///< constant defining the max number of 2D views available
+  std::vector<std::string> mView3DNames;///< the name of all the 3D views
+  std::vector<std::string> mView2DNames;///< the name of all the 2D views
+  View2DMap     mView2DMap;             ///< a map of all the 3D views
+  View3DMap     mView3DMap;             ///< a map of all the 2D views
+  ViewMap       mViewMap;               ///< a map of all the views
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
   

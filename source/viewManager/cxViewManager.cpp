@@ -38,9 +38,10 @@ ViewManager* ViewManager::getInstance()
 void ViewManager::destroyInstance()
 {}
 ViewManager::ViewManager() :
-  mCurrentLayoutType(LAYOUT_NONE),
+  mActiveLayout(LAYOUT_NONE),
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
+  mActiveView(NULL),
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(12),
   mRenderingTimer(new QTimer(this)),
@@ -105,8 +106,7 @@ ViewManager::ViewManager() :
   mViewGroups.push_back(group);
 
   // set start layout
-//  this->changeLayout(LAYOUT_3DACS_2X2);
-  this->changeLayout(LAYOUT_3DACS_2X2_SNW);
+  this->setActiveLayout(LAYOUT_3DACS_2X2);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),
@@ -130,11 +130,41 @@ std::string ViewManager::layoutText(LayoutType type)
   case LAYOUT_ACSACS_2X3 :    return "ACSACS_2X3";
   case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
   case LAYOUT_3DAny_1X2_SNW : return "3DAny_1X2_SNW";
-  case LAYOUT_ACSACS_2X3_SNW : return "ACSACS_2X3_SNW";
+  case LAYOUT_ACSACS_2X3_SNW :return "ACSACS_2X3_SNW";
   default: return "Undefined layout";
   }
 }
-
+ViewManager::LayoutType ViewManager::layoutTypeFromText(std::string text)
+{
+  if(text == "No_layout")
+  {
+    return LAYOUT_NONE;
+  } else if(text == "3D_1X1")
+  {
+    return LAYOUT_3D_1X1;
+  } else if(text == "3DACS_2X2")
+  {
+    return LAYOUT_3DACS_2X2;
+  } else if(text == "3DACS_1X3")
+  {
+    return LAYOUT_3DACS_1X3;
+  } else if(text == "ACSACS_2X3")
+  {
+    return LAYOUT_ACSACS_2X3;
+  } else if(text == "3DACS_2X2_SNW")
+  {
+    return LAYOUT_3DACS_2X2_SNW;
+  } else if(text == "3DAny_1X2_SNW")
+  {
+    return LAYOUT_3DAny_1X2_SNW;
+  } else if (text == "ACSACS_2X3_SNW")
+  {
+    return LAYOUT_ACSACS_2X3_SNW;
+  } else
+  {
+    return LAYOUT_NONE;
+  }
+}
 std::vector<ViewManager::LayoutType> ViewManager::availableLayouts() const
 {
   std::vector<LayoutType> retval;
@@ -148,17 +178,79 @@ std::vector<ViewManager::LayoutType> ViewManager::availableLayouts() const
   return retval;
 }
 
-ViewManager::LayoutType ViewManager::currentLayout() const
+/*ViewManager::LayoutType ViewManager::currentLayout() const
 {
-  return mCurrentLayoutType;
-}
+  return mActiveLayout;
+}*/
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
   for (unsigned i=0; i<mViewGroups.size(); ++i)
     mViewGroups[i]->setRegistrationMode(mode);
 }
+ViewManager::LayoutType ViewManager::getActiveLayout() const
+{
+  return mActiveLayout;
+}
+/**Change layout from current to layout.
+ */
+void ViewManager::setActiveLayout(ViewManager::LayoutType layout)
+{
+  //TODO, test why it s not set when loading
+  std::cout << "Setting active layout to "<< layoutText(layout) << std::endl;
+  if (mActiveLayout==layout)
+    return;
 
+  deactivateCurrentLayout();
+  activateLayout(layout);
+}
+ssc::View* ViewManager::getActiveView() const
+{
+  return mActiveView;
+}
+void ViewManager::setActiveView(ssc::View* view)
+{
+  if(mActiveView && view && mActiveView->getUid() != view->getUid())
+    return;
+
+  mActiveView = view;
+  emit activeViewChanged();
+}
+void ViewManager::addXml(QDomNode& parentNode)
+{
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement dataManagerNode = doc.createElement("datamanager");
+  parentNode.appendChild(dataManagerNode);
+
+  QDomElement activeLayoutNode = doc.createElement("activeLayout");
+  activeLayoutNode.appendChild(doc.createTextNode(layoutText(mActiveLayout).c_str()));
+  parentNode.appendChild(activeLayoutNode);
+
+  QDomElement activeViewNode = doc.createElement("activeView");
+  if(mActiveView)
+    activeViewNode.appendChild(doc.createTextNode(mActiveView->getUid().c_str()));
+  parentNode.appendChild(activeLayoutNode);
+}
+void ViewManager::parseXml(QDomNode& viewmanagerNode)
+{
+  QDomNode child = viewmanagerNode.firstChild();
+  while(!child.isNull())
+  {
+    if(child.toElement().tagName() == "activeLayout")
+    {
+      const QString activeLayoutString = child.toElement().text();
+      if(!activeLayoutString.isEmpty())
+        this->setActiveLayout(layoutTypeFromText(activeLayoutString.toStdString()));
+    }else if(child.toElement().tagName() == "activeView")
+    {
+      const QString activeViewString = child.toElement().text();
+      if(!activeViewString.isEmpty())
+        this->setActiveView(getView(activeViewString.toStdString()));
+    }
+    child = child.nextSibling();
+  }
+
+}
 QWidget* ViewManager::stealCentralWidget()
 {
   return mMainWindowsCentralWidget;
@@ -171,10 +263,10 @@ ViewManager::View3DMap* ViewManager::get3DViews()
 {
   return &mView3DMap;
 }
-ViewManager::LayoutType ViewManager::getCurrentLayoutType()
+/*ViewManager::LayoutType ViewManager::getCurrentLayoutType()
 {
-  return mCurrentLayoutType;
-}
+  return mActiveLayout;
+}*/
 ssc::View* ViewManager::getView(const std::string& uid)
 {
   ssc::View* view = NULL;
@@ -218,17 +310,14 @@ void ViewManager::deactivateCurrentLayout()
   for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
     deactivateView(iter->second);
 }
-
-/**Change layout from current to toType.
- */
-void ViewManager::changeLayout(LayoutType toType)
+/*void ViewManager::changeLayout(LayoutType toType)
 {
-  if (mCurrentLayoutType==toType)
+  if (mActiveLayout==toType)
     return;
 
   deactivateCurrentLayout();
   activateLayout(toType);
-}
+}*/
 
 /**activate a layout. Assumes the previous layout is already deactivated.
  */
@@ -268,7 +357,7 @@ void ViewManager::activateLayout(LayoutType toType)
     break;
   }
 
-  messageManager()->sendInfo("Layout changed to "+ layoutText(mCurrentLayoutType));
+  messageManager()->sendInfo("Layout changed to "+ layoutText(mActiveLayout));
 }
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
@@ -326,7 +415,9 @@ void ViewManager::deactivateView(ssc::View* view)
 void ViewManager::activateLayout_3D_1X1()
 {
   activate3DView(0, 0,                  0, 0);
-  mCurrentLayoutType = LAYOUT_3D_1X1;
+
+  mActiveLayout = LAYOUT_3D_1X1;
+  emit activeLayoutChanged();
 }
 
 void ViewManager::activateLayout_3DACS_2X2()
@@ -337,7 +428,8 @@ void ViewManager::activateLayout_3DACS_2X2()
   activateView(mView2DMap[mView2DNames[1]],   1, 0);
   activateView(mView2DMap[mView2DNames[2]],   1, 1);
 
-  mCurrentLayoutType = LAYOUT_3DACS_2X2;
+  mActiveLayout = LAYOUT_3DACS_2X2;
+  emit activeLayoutChanged();
 }
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
@@ -347,7 +439,8 @@ void ViewManager::activateLayout_3DACS_2X2_SNW()
   activate2DView(0, 2, ssc::ptCORONAL,  1, 0);
   activate2DView(0, 3, ssc::ptSAGITTAL, 1, 1);
 
-  mCurrentLayoutType = LAYOUT_3DACS_2X2_SNW;
+  mActiveLayout = LAYOUT_3DACS_2X2_SNW;
+  emit activeLayoutChanged();
 }
 
 void ViewManager::activateLayout_ACSACS_2X3_SNW()
@@ -359,8 +452,8 @@ void ViewManager::activateLayout_ACSACS_2X3_SNW()
   activate2DView(1, 2, ssc::ptCORONAL,  1, 1);
   activate2DView(1, 3, ssc::ptSAGITTAL, 1, 2);
 
-  mCurrentLayoutType = LAYOUT_ACSACS_2X3_SNW;
-
+  mActiveLayout = LAYOUT_ACSACS_2X3_SNW;
+  emit activeLayoutChanged();
 }
 
 void ViewManager::activateLayout_3DAny_1X2_SNW()
@@ -368,7 +461,8 @@ void ViewManager::activateLayout_3DAny_1X2_SNW()
   activate3DView(0, 0,                  0, 0);
   activate2DView(0, 1, ssc::ptANYPLANE, 0, 1);
 
-  mCurrentLayoutType = LAYOUT_3DAny_1X2_SNW;
+  mActiveLayout = LAYOUT_3DAny_1X2_SNW;
+  emit activeLayoutChanged();
 }
 
 void ViewManager::activateLayout_3DACS_1X3()
@@ -379,7 +473,8 @@ void ViewManager::activateLayout_3DACS_1X3()
   activateView(mView2DMap[mView2DNames[1]],   1, 1);
   activateView(mView2DMap[mView2DNames[2]],   2, 1);
 
-  mCurrentLayoutType = LAYOUT_3DACS_1X3;
+  mActiveLayout = LAYOUT_3DACS_1X3;
+  emit activeLayoutChanged();
 }
 
 void ViewManager::activateLayout_ACSACS_2X3()
@@ -392,7 +487,8 @@ void ViewManager::activateLayout_ACSACS_2X3()
   activateView(mView2DMap[mView2DNames[4]],   1, 1);
   activateView(mView2DMap[mView2DNames[5]],   1, 2);
 
-  mCurrentLayoutType = LAYOUT_ACSACS_2X3;
+  mActiveLayout = LAYOUT_ACSACS_2X3;
+  emit activeLayoutChanged();
 }
   
 /*void ViewManager::removeRepFromViews(ssc::RepPtr rep)
