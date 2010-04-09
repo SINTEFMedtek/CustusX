@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <QObject>
+#include <QDomDocument>
 #include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
@@ -45,6 +46,8 @@ public:
   virtual void setImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
+  virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
+  virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
 
 private slots:
   void contexMenuSlot(const QPoint& point);

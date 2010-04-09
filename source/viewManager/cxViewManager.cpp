@@ -264,6 +264,24 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
     }
     child = child.nextSibling();
   }
+
+//  QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
+//
+//  QDomNode viewgroup = viewgroups.firstChild();
+//  while(!viewgroup.isNull())
+//  {
+//    if (viewgroup.toElement().tagName()!="viewGroup")
+//      continue;
+//    int index = viewgroup.toElement().attribute("index").toInt();
+//
+//    if (index<0 || index>=int(mViewGroups.size()))
+//      continue;
+//
+//    mViewGroups[index]->parseXml(viewgroup);
+//
+//    viewgroup = viewgroup.nextSibling();
+//  }
+
 }
 QWidget* ViewManager::stealCentralWidget()
 {

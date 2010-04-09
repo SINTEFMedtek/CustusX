@@ -53,11 +53,11 @@ void ViewWrapper3D::setImage(ssc::ImagePtr image)
      return;
    }
     //Set these when image is deleted?
-   std::cout << "ViewGroup3D::setImage" << std::endl;
+   //std::cout << "ViewGroup3D::setImage" << std::endl;
    mVolumetricRep->setImage(mImage);
    mProbeRep->setImage(mImage);
    mLandmarkRep->setImage(mImage);
-   std::cout << "ViewGroup3D::setImage" << std::endl;
+   //std::cout << "ViewGroup3D::setImage" << std::endl;
 
    //Shading
    if(QSettings().value("shadingOn").toBool())
@@ -77,7 +77,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
   mProbeRep->setTool(dominantTool);
-  std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
+  //std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
 void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 {

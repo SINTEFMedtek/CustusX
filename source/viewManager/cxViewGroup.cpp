@@ -214,4 +214,37 @@ void ViewGroup::activateManualToolSlot()
 {
   toolManager()->dominantCheckSlot();
 }
+
+void ViewGroup::addXml(QDomNode& dataNode)
+{
+  QDomDocument doc = dataNode.ownerDocument();
+//  QDomElement viewManagerNode = doc.createElement("viewManager");
+//  parentNode.appendChild(viewManagerNode);
+
+  if (mImage)
+  {
+    QDomElement imageNode = doc.createElement("image");
+    imageNode.appendChild(doc.createTextNode(qstring_cast(mImage->getUid())));
+    dataNode.appendChild(imageNode);
+  }
+
+  QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
+  zoom2DNode.appendChild(doc.createTextNode(qstring_cast(mZoomFactor2D)));
+  dataNode.appendChild(zoom2DNode);
+}
+
+void ViewGroup::parseXml(QDomNode dataNode)
+{
+  QString imageUid = dataNode.namedItem("image").toElement().text();
+  ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
+  if (image)
+    setImage(image);
+
+  QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
+  bool ok;
+  zoom2D.toDouble(&ok);
+  if (ok)
+    zoom2DChangeSlot(zoom2D.toDouble());
+}
+
 }//cx

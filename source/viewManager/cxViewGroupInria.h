@@ -23,6 +23,8 @@ public:
   virtual void setImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
+  virtual void addXml(QDomNode& dataNode) {} ///< store internal state info in dataNode
+  virtual void parseXml(QDomNode dataNode) {}///< load internal state info from dataNode
 
 protected:
   std::string toString(int i) const;
