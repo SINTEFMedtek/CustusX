@@ -243,7 +243,19 @@ void ViewManager::addXml(QDomNode& parentNode)
   if(mActiveView)
     activeViewNode.appendChild(doc.createTextNode(mActiveView->getUid().c_str()));
   viewManagerNode.appendChild(activeLayoutNode);
+
+  QDomElement viewGroupsNode = doc.createElement("viewGroups");
+  viewManagerNode.appendChild(viewGroupsNode);
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    QDomElement viewGroupNode = doc.createElement("viewGroup");
+    viewGroupNode.setAttribute("index", i);
+    viewGroupsNode.appendChild(viewGroupNode);
+
+    mViewGroups[i]->addXml(viewGroupNode);
+  }
 }
+
 void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
   QDomNode child = viewmanagerNode.firstChild();
@@ -265,24 +277,24 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
     child = child.nextSibling();
   }
 
-//  QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
-//
-//  QDomNode viewgroup = viewgroups.firstChild();
-//  while(!viewgroup.isNull())
-//  {
-//    if (viewgroup.toElement().tagName()!="viewGroup")
-//      continue;
-//    int index = viewgroup.toElement().attribute("index").toInt();
-//
-//    if (index<0 || index>=int(mViewGroups.size()))
-//      continue;
-//
-//    mViewGroups[index]->parseXml(viewgroup);
-//
-//    viewgroup = viewgroup.nextSibling();
-//  }
+  QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
 
+  QDomNode viewgroup = viewgroups.firstChild();
+  while(!viewgroup.isNull())
+  {
+    if (viewgroup.toElement().tagName()!="viewGroup")
+      continue;
+    int index = viewgroup.toElement().attribute("index").toInt();
+
+    if (index<0 || index>=int(mViewGroups.size()))
+      continue;
+
+    mViewGroups[index]->parseXml(viewgroup);
+
+    viewgroup = viewgroup.nextSibling();
+  }
 }
+
 QWidget* ViewManager::stealCentralWidget()
 {
   return mMainWindowsCentralWidget;

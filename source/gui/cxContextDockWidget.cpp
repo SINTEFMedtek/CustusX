@@ -97,6 +97,7 @@ void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 }
 void ContextDockWidget::populateTheImageComboBoxSlot()
 {
+  mImagesComboBox->blockSignals(true);
   mImagesComboBox->clear();
 
   //get a list of images from the datamanager
@@ -118,6 +119,7 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
     mImagesComboBox->insertItem(listPosition, QString(i->first.c_str()));
     listPosition++;
   }
+  mImagesComboBox->blockSignals(false);
 }
   
 void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
