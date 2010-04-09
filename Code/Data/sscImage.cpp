@@ -75,7 +75,7 @@ void Image::transformChangedSlot()
   Transform3D rMd = get_rMd();
   mOrientatorMatrix->DeepCopy(rMd.inv().matrix());
   mReferenceImageData->Update();
-  std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
+  //std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
 }
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)

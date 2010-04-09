@@ -88,7 +88,7 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	mImage = image;
 	if (mImage)
 	{
-	  std::cout << "slicedImageProxy::setImage" << std::endl;
+	  //std::cout << "slicedImageProxy::setImage" << std::endl;
 		mReslicer->SetInput( mImage->getBaseVtkImageData() );
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();

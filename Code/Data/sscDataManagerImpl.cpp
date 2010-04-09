@@ -28,7 +28,7 @@ namespace ssc
 ImagePtr MetaImageReader::load(const std::string& filename)
 {
   //read the specific TransformMatrix-tag from the header
-  Transform3DPtr rMd(new Transform3D);
+  Transform3D rMd;
   QFile file(filename.c_str());
   QString line;
   if(file.open(QIODevice::ReadOnly))
@@ -42,22 +42,50 @@ ImagePtr MetaImageReader::load(const std::string& filename)
       if(line.startsWith("Position",Qt::CaseInsensitive) || line.startsWith("Offset",Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        (*rMd)[0][3] = list.at(2).toDouble();
-        (*rMd)[1][3] = list.at(3).toDouble();
-        (*rMd)[2][3] = list.at(4).toDouble();
+        rMd[0][3] = list.at(2).toDouble();
+        rMd[1][3] = list.at(3).toDouble();
+        rMd[2][3] = list.at(4).toDouble();
       }
-      else if(line.startsWith("TransformMatrix",Qt::CaseInsensitive))
+      else if(line.startsWith("TransformMatrix",Qt::CaseInsensitive) || line.startsWith("Orientation",Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        (*rMd)[0][0] = list.at(2).toDouble();
-        (*rMd)[0][1] = list.at(3).toDouble();
-        (*rMd)[0][2] = list.at(4).toDouble();
-        (*rMd)[1][0] = list.at(5).toDouble();
-        (*rMd)[1][1] = list.at(6).toDouble();
-        (*rMd)[1][2] = list.at(7).toDouble();
-        (*rMd)[2][0] = list.at(8).toDouble();
-        (*rMd)[2][1] = list.at(9).toDouble();
-        (*rMd)[2][2] = list.at(10).toDouble();
+
+        Vector3D e_x(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
+        Vector3D e_y(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
+        Vector3D e_z(list[8].toDouble(), list[9].toDouble(), list[10].toDouble());
+
+        for (unsigned i=0; i<3; ++i)
+        {
+          rMd[i][0] = e_x[i];
+          rMd[i][1] = e_y[i];
+          rMd[i][2] = e_z[i];
+        }
+
+//        std::cout << "e_x:\t" << e_x << ", ||=" << e_x.length() << "\trMd*<1,0,0,0>="<< rMd.vector(Vector3D(1,0,0)) << std::endl;
+//        std::cout << "e_y:\t" << e_y << ", ||=" << e_y.length() << "\trMd*<0,1,0,0>="<< rMd.vector(Vector3D(0,1,0)) << std::endl;
+//        std::cout << "e_z:\t" << e_z << ", ||=" << e_z.length() << "\trMd*<0,0,1,0>="<< rMd.vector(Vector3D(0,0,1)) << std::endl;
+//        std::cout << "cross(e_x,e_y):\t" << cross(e_x,e_y) << std::endl;
+
+//        rMd[0][0] = list.at(2).toDouble();
+//        rMd[1][0] = list.at(3).toDouble();
+//        rMd[2][0] = list.at(4).toDouble();
+//        rMd[0][1] = list.at(5).toDouble();
+//        rMd[1][1] = list.at(6).toDouble();
+//        rMd[2][1] = list.at(7).toDouble();
+//        rMd[0][2] = list.at(8).toDouble();
+//        rMd[1][2] = list.at(9).toDouble();
+//        rMd[2][2] = list.at(10).toDouble();
+
+        //original (does not work)
+//        rMd[0][0] = list.at(2).toDouble();
+//        rMd[0][1] = list.at(3).toDouble();
+//        rMd[0][2] = list.at(4).toDouble();
+//        rMd[1][0] = list.at(5).toDouble();
+//        rMd[1][1] = list.at(6).toDouble();
+//        rMd[1][2] = list.at(7).toDouble();
+//        rMd[2][0] = list.at(8).toDouble();
+//        rMd[2][1] = list.at(9).toDouble();
+//        rMd[2][2] = list.at(10).toDouble();
       }
     }
     file.close();
@@ -73,7 +101,7 @@ ImagePtr MetaImageReader::load(const std::string& filename)
   
   ImagePtr image(new Image(filename, imageData));
 
-  RegistrationTransform regTrans(*rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
+  RegistrationTransform regTrans(rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
   image->get_rMd_History()->addRegistration(regTrans);
 
 //  std::cout << "ImagePtr MetaImageReader::load \n" << *rMd << std::endl << std::endl;
