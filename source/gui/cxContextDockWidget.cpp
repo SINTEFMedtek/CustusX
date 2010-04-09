@@ -148,7 +148,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   mCurrentImage = image;
   emit currentImageChanged(mCurrentImage);
 
-  dataManager()->setActiveImage(mCurrentImage);
+  //dataManager()->setActiveImage(mCurrentImage);
 }
 void ContextDockWidget::activeImageChangedSlot(std::string uid)
 {
