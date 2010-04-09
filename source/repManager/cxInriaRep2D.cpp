@@ -159,7 +159,7 @@ void InriaRep2D::addRepActorsToViewRenderer(ssc::View* view)
   mInria->SetRenderWindow(view->GetRenderWindow());
   mInria->SetRenderer(view->getRenderer());
   mInria->SetBackgroundColor(0.0, 0.0, 0.0);
-  mInria->Render();
+  //mInria->Render();
 
   mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
                        vtkCommand::LeftButtonPressEvent,
