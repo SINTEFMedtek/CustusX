@@ -11,14 +11,6 @@ class QComboBox;
 
 namespace cx
 {
-class RegistrationManager;
-class ToolManager;
-class MessageManager;
-class ViewManager;
-class RepManager;
-class DataManager;
-
-
 /**
  * \class ContextDockWidget
  *
@@ -51,6 +43,7 @@ protected slots:
   void visibilityOfDockWidgetChangedSlot(bool visible); ///< connects/disconnects to signals from the datamanager
   void populateTheImageComboBoxSlot(); ///< populates the combobox with the images loaded into the datamanager
   void imageSelectedSlot(const QString& comboBoxText); ///< sends out a signal and adds reps of the image to the views
+  void activeImageChangedSlot(std::string uid); ///< temporary function(while waiting to remove the internal mCurrentImage) for handling incoming active image requests
 
 protected:
   //gui
@@ -58,13 +51,6 @@ protected:
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QComboBox* mImagesComboBox; ///< combobox for displaying available images
   QTabWidget* mTabWidget; ///< tab widget for adding the incoming context specific widgets
-
-  //managers
-  DataManager* mDataManager; ///< has all the data loaded into the system
-  RegistrationManager* mRegistrationManager; ///< handles image and patient registration
-  ToolManager* mToolManager; ///< interface to the navigation system
-  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
-  RepManager* mRepManager; ///< has a pool of reps
 
   //data
   ssc::ImagePtr mCurrentImage; ///< the currently selected image

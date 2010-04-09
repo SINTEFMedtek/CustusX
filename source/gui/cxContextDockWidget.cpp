@@ -3,7 +3,6 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QComboBox>
-//#include "sscVolumetricRep.h" //TODO REMOVE
 #include "sscProbeRep.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"
@@ -21,12 +20,7 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   mGuiWidget(new QWidget(this)),
   mVerticalLayout(new QVBoxLayout()),
   mImagesComboBox(new QComboBox(mGuiWidget)),
-  mTabWidget(new QTabWidget(mGuiWidget)),
-  mDataManager(DataManager::getInstance()),
-  mRegistrationManager(RegistrationManager::getInstance()),
-  mToolManager(ToolManager::getInstance()),
-  mViewManager(ViewManager::getInstance()),
-  mRepManager(RepManager::getInstance())
+  mTabWidget(new QTabWidget(mGuiWidget))
 {
   //QMainWindow::saveState() needs a way of identifying the ContextDockWidget
   this->setObjectName("ContextDockWidget");
@@ -45,17 +39,20 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mImagesComboBox);
   mVerticalLayout->addWidget(mTabWidget);
   mGuiWidget->setLayout(mVerticalLayout);
-  
+
   // Change current tab index
   connect(this, SIGNAL(changeTabIndex(int)),
           mTabWidget, SLOT(setCurrentIndex(int)));
   
   // Delete image
   connect(this, SIGNAL(deleteImage(ssc::ImagePtr)),
-          mDataManager, SLOT(deleteImageSlot(ssc::ImagePtr)));
-  connect(mDataManager, SIGNAL(currentImageDeleted(ssc::ImagePtr)),
-          mViewManager, SLOT(deleteImageSlot(ssc::ImagePtr)));
+          dataManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
+  connect(dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),
+          viewManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
   
+  //listen for active image changed from the datamanager
+  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+          this, SLOT(activeImageChangedSlot(std::string)));
 }
 ContextDockWidget::~ContextDockWidget()
 {}
@@ -84,17 +81,17 @@ void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 {
   if(visible)
   {
-    connect(mDataManager, SIGNAL(dataLoaded()),
+    connect(dataManager(), SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBoxSlot()));
-    connect(mViewManager, SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
+    connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
             this, SLOT(populateTheImageComboBoxSlot()));
     this->populateTheImageComboBoxSlot();
   }
   else
   {
-    disconnect(mDataManager, SIGNAL(dataLoaded()),
+    disconnect(dataManager(), SIGNAL(dataLoaded()),
                this, SLOT(populateTheImageComboBoxSlot()));
-    disconnect(mViewManager, SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
+    disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
                this, SLOT(populateTheImageComboBoxSlot()));
   }
 }
@@ -103,7 +100,7 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
   mImagesComboBox->clear();
 
   //get a list of images from the datamanager
-  std::map<std::string, ssc::ImagePtr> images = mDataManager->getImages();
+  std::map<std::string, ssc::ImagePtr> images = dataManager()->getImages();
   if(images.size() == 0)
   {
     mImagesComboBox->insertItem(1, QString("Import an image to begin..."));
@@ -137,15 +134,29 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   std::string imageId = comboBoxText.toStdString();
 
   //find the image
-  ssc::ImagePtr image = mDataManager->getImage(imageId);
+  ssc::ImagePtr image = dataManager()->getImage(imageId);
   if(!image)
   {
     messageManager()->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
 
+  if(mCurrentImage == image)
+    return;
+
   //Set new current image
   mCurrentImage = image;
   emit currentImageChanged(mCurrentImage);
+
+  dataManager()->setActiveImage(mCurrentImage);
+}
+void ContextDockWidget::activeImageChangedSlot(std::string uid)
+{
+  const QString& qUid(uid.c_str());
+  this->imageSelectedSlot(qUid);
+
+  //find the index in the combobox and set it
+  int index = mImagesComboBox->findText(qUid);
+  mImagesComboBox->setCurrentIndex(index);
 }
 }//namespace cx
