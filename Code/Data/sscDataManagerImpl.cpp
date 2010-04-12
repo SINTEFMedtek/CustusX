@@ -9,8 +9,11 @@ typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
 #include <vtkSTLReader.h>
+#include <vtkImageChangeInformation.h>
 typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
+typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
+
 
 #include <QtCore>
 #include <QDomDocument>
@@ -29,8 +32,14 @@ namespace ssc
 ImagePtr MetaImageReader::load(const std::string& filename)
 {
   //read the specific TransformMatrix-tag from the header
-  Transform3D rMd;
+  Vector3D p_r(0,0,0);
+  Vector3D e_x(1,0,0);
+  Vector3D e_y(0,1,0);
+  Vector3D e_z(0,0,1);
+
+  QString creator;
   QFile file(filename.c_str());
+
   QString line;
   if(file.open(QIODevice::ReadOnly))
   {
@@ -40,57 +49,58 @@ ImagePtr MetaImageReader::load(const std::string& filename)
       line.clear();
       line = t.readLine();
       // do something with the line
-      if(line.startsWith("Position",Qt::CaseInsensitive) || line.startsWith("Offset",Qt::CaseInsensitive))
+      if(line.startsWith("Position",Qt::CaseInsensitive)
+          || line.startsWith("Offset",Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        rMd[0][3] = list.at(2).toDouble();
-        rMd[1][3] = list.at(3).toDouble();
-        rMd[2][3] = list.at(4).toDouble();
+        p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
       }
-      else if(line.startsWith("TransformMatrix",Qt::CaseInsensitive) || line.startsWith("Orientation",Qt::CaseInsensitive))
+      else if(line.startsWith("TransformMatrix",Qt::CaseInsensitive)
+          || line.startsWith("Orientation",Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
 
-        Vector3D e_x(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
-        Vector3D e_y(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
-        Vector3D e_z(list[8].toDouble(), list[9].toDouble(), list[10].toDouble());
-
-        for (unsigned i=0; i<3; ++i)
-        {
-          rMd[i][0] = e_x[i];
-          rMd[i][1] = e_y[i];
-          rMd[i][2] = e_z[i];
-        }
-
-//        std::cout << "e_x:\t" << e_x << ", ||=" << e_x.length() << "\trMd*<1,0,0,0>="<< rMd.vector(Vector3D(1,0,0)) << std::endl;
-//        std::cout << "e_y:\t" << e_y << ", ||=" << e_y.length() << "\trMd*<0,1,0,0>="<< rMd.vector(Vector3D(0,1,0)) << std::endl;
-//        std::cout << "e_z:\t" << e_z << ", ||=" << e_z.length() << "\trMd*<0,0,1,0>="<< rMd.vector(Vector3D(0,0,1)) << std::endl;
-//        std::cout << "cross(e_x,e_y):\t" << cross(e_x,e_y) << std::endl;
-
-//        rMd[0][0] = list.at(2).toDouble();
-//        rMd[1][0] = list.at(3).toDouble();
-//        rMd[2][0] = list.at(4).toDouble();
-//        rMd[0][1] = list.at(5).toDouble();
-//        rMd[1][1] = list.at(6).toDouble();
-//        rMd[2][1] = list.at(7).toDouble();
-//        rMd[0][2] = list.at(8).toDouble();
-//        rMd[1][2] = list.at(9).toDouble();
-//        rMd[2][2] = list.at(10).toDouble();
-
-        //original (does not work)
-//        rMd[0][0] = list.at(2).toDouble();
-//        rMd[0][1] = list.at(3).toDouble();
-//        rMd[0][2] = list.at(4).toDouble();
-//        rMd[1][0] = list.at(5).toDouble();
-//        rMd[1][1] = list.at(6).toDouble();
-//        rMd[1][2] = list.at(7).toDouble();
-//        rMd[2][0] = list.at(8).toDouble();
-//        rMd[2][1] = list.at(9).toDouble();
-//        rMd[2][2] = list.at(10).toDouble();
+        e_x = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
+        e_y = Vector3D(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
+        e_z = cross(e_x, e_y);
+      }
+      else if (line.startsWith("Creator",Qt::CaseInsensitive))
+      {
+        QStringList list = line.split(" ", QString::SkipEmptyParts);
+        creator = list[2];
       }
     }
     file.close();
   }
+
+  // MDH is a volatile format: warn if we dont know the source
+  if (( creator!="Ingerid" )&&( creator != "DICOMtoMetadataFilter" ))
+  {
+    std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
+  }
+
+  Transform3D rMd;
+
+  // add rotational part
+  for (unsigned i=0; i<3; ++i)
+  {
+    rMd[i][0] = e_x[i];
+    rMd[i][1] = e_y[i];
+    rMd[i][2] = e_z[i];
+  }
+
+  // Special Ingerid Reinertsen fix: Position is stored as p_d instead of p_r: convert here
+  if (creator=="Ingerid")
+  {
+    std::cout << "ingrid fixing" << std::endl;
+    p_r = rMd.coord(p_r);
+  }
+
+  // add translational part
+  rMd[0][3] = p_r[0];
+  rMd[1][3] = p_r[1];
+  rMd[2][3] = p_r[2];
+
 
   //load the image from file
 	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
@@ -98,7 +108,13 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 	reader->ReleaseDataFlagOn();
 	//reader->GetOutput()->ReleaseDataFlagOn();
 	reader->Update();
-	vtkImageDataPtr imageData = reader->GetOutput();
+
+	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+	zeroer->SetInput(reader->GetOutput());
+  zeroer->SetOutputOrigin(0,0,0);
+
+  vtkImageDataPtr imageData = zeroer->GetOutput();
+  imageData->Update();
   
   ImagePtr image(new Image(filename, imageData));
 
