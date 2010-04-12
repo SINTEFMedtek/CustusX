@@ -68,6 +68,7 @@ namespace ssc
 		void mouseReleaseSignal(QMouseEvent* event);
 	  void mouseWheelSignal(QWheelEvent*);
     void showSignal(QShowEvent* event);
+    void focusInSignal(QFocusEvent* event);
 
 	protected:
 		std::string mUid;					///< The view's unique id
@@ -83,6 +84,7 @@ namespace ssc
 		virtual void mouseMoveEvent(QMouseEvent *event);
 		virtual void mousePressEvent(QMouseEvent *event);
 		virtual void mouseReleaseEvent(QMouseEvent *event);
+		virtual void focusInEvent(QFocusEvent* event);
 		void resizeEvent(QResizeEvent *event);
 	};
 
