@@ -103,7 +103,7 @@ void ViewsWindow::defineSlice(const std::string& uid, const std::string& imageFi
 ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
 {
 	std::string filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
-	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, filename, ssc::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	ssc::DataManager::getInstance()->setCenter(center);

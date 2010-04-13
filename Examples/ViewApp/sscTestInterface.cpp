@@ -93,8 +93,8 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 	std::string testFile2 = TestUtilities::ExpandDataFileName("/MetaImage/20070309T105136_MRT1.mhd");
 	
 	
-	mImagePtr1 = DataManager::getInstance()->loadImage(testFile1, rtMETAIMAGE);
-	mImagePtr2 = DataManager::getInstance()->loadImage(testFile2, rtMETAIMAGE);
+	mImagePtr1 = DataManager::getInstance()->loadImage(testFile1, testFile1, rtMETAIMAGE);
+	mImagePtr2 = DataManager::getInstance()->loadImage(testFile2, testFile2, rtMETAIMAGE);
 
 	mRepPtr1 = VolumetricRep::New(mImagePtr1->getUid());
 	mRepPtr2 = VolumetricRep::New(mImagePtr2->getUid());

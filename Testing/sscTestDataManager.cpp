@@ -26,9 +26,9 @@ int main(int argc, char **argv)
 	//std::cout << testFile2 << std::endl;
 	//std::cout << testFile3 << std::endl;
 
-	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, ssc::rtMETAIMAGE);
-	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(testFile2, ssc::rtMETAIMAGE);
-	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(testFile3, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(testFile2, testFile2, ssc::rtMETAIMAGE);
+	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(testFile3, testFile3, ssc::rtMETAIMAGE);
 
 	std::string Uid1 = image1->getUid();
 	std::string Uid2 = image2->getUid();
