@@ -23,7 +23,7 @@ class ImageReader
 public:
 	virtual ~ImageReader() {}
 	virtual bool canLoad(const std::string& filename) = 0;
-	virtual ImagePtr load(const std::string& filename) = 0;
+	virtual ImagePtr load(const std::string& uid, const std::string& filename) = 0;
 };
 typedef boost::shared_ptr<ImageReader> ImageReaderPtr;
 
@@ -32,7 +32,7 @@ class MetaImageReader : public ImageReader
 public:
 	virtual ~MetaImageReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual ImagePtr load(const std::string& filename);
+	virtual ImagePtr load(const std::string& uid, const std::string& filename);
 };
 
 
@@ -41,7 +41,7 @@ class MeshReader
 public:
 	virtual ~MeshReader() {}
 	virtual bool canLoad(const std::string& filename) = 0;
-	virtual MeshPtr load(const std::string& filename) = 0;
+	virtual MeshPtr load(const std::string& uid, const std::string& filename) = 0;
 };
 typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
 
@@ -51,7 +51,7 @@ class PolyDataMeshReader : public MeshReader
 public:
 	virtual ~PolyDataMeshReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual MeshPtr load(const std::string& filename);
+	virtual MeshPtr load(const std::string& uid, const std::string& filename);
 };
 
 
@@ -60,7 +60,7 @@ class StlMeshReader : public MeshReader
 public:
 	virtual ~StlMeshReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual MeshPtr load(const std::string& filename);
+	virtual MeshPtr load(const std::string& uid, const std::string& filename);
 };
 
 
@@ -71,7 +71,7 @@ public:
 	static void initialize();
 
 	// images
-	virtual ImagePtr loadImage(const std::string& filename, READER_TYPE type);
+	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
 	virtual ImagePtr getImage(const std::string& uid);
 	virtual std::map<std::string, ImagePtr> getImages();
 
@@ -80,7 +80,7 @@ public:
 	virtual std::vector<std::string> getImageUids() const;
 
 	// meshes
-	virtual MeshPtr loadMesh(const std::string& fileName, MESH_READER_TYPE meshType);
+	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType);
 	virtual MeshPtr getMesh(const std::string& uid);
 	virtual std::map<std::string, MeshPtr> getMeshes();
 

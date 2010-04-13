@@ -39,7 +39,7 @@ public:
 	static DataManager* getInstance();
 
 	// images
-	virtual ImagePtr loadImage(const std::string& filename, READER_TYPE type) = 0;
+	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type) = 0;
 	virtual ImagePtr getImage(const std::string& uid) = 0;
 	virtual std::map<std::string, ImagePtr> getImages() = 0;
 
@@ -48,7 +48,7 @@ public:
 	virtual std::vector<std::string> getImageUids() const = 0;
 
 	// meshes
-	virtual MeshPtr loadMesh(const std::string& fileName, MESH_READER_TYPE meshType) = 0;
+	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType) = 0;
 	virtual MeshPtr getMesh(const std::string& uid) = 0;
 	virtual std::map<std::string, MeshPtr> getMeshes() = 0;
 

@@ -29,7 +29,7 @@ namespace ssc
 {
 
 //-----
-ImagePtr MetaImageReader::load(const std::string& filename)
+ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filename)
 {
   //read the specific TransformMatrix-tag from the header
   Vector3D p_r(0,0,0);
@@ -116,7 +116,7 @@ ImagePtr MetaImageReader::load(const std::string& filename)
   vtkImageDataPtr imageData = zeroer->GetOutput();
   imageData->Update();
   
-  ImagePtr image(new Image(filename, imageData));
+  ImagePtr image(new Image(uid, imageData));
 
   RegistrationTransform regTrans(rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
   image->get_rMd_History()->addRegistration(regTrans);
@@ -126,7 +126,7 @@ ImagePtr MetaImageReader::load(const std::string& filename)
 }
 
 //-----
-MeshPtr PolyDataMeshReader::load(const std::string& fileName)
+MeshPtr PolyDataMeshReader::load(const std::string& uid, const std::string& fileName)
 {
 	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
 	reader->SetFileName(fileName.c_str());
@@ -134,12 +134,12 @@ MeshPtr PolyDataMeshReader::load(const std::string& fileName)
 	vtkPolyDataPtr polyData = reader->GetOutput();
 
 	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-  MeshPtr tempMesh(new Mesh(fileName, "PolyData", polyData));
+  MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
   return tempMesh;
 
 }
 
-MeshPtr StlMeshReader::load(const std::string& fileName)
+MeshPtr StlMeshReader::load(const std::string& uid, const std::string& fileName)
 {
 	vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
 	reader->SetFileName(fileName.c_str());
@@ -147,7 +147,7 @@ MeshPtr StlMeshReader::load(const std::string& fileName)
 	vtkPolyDataPtr polyData = reader->GetOutput();
 
 	//return MeshPtr(new Mesh(fileName, fileName, polyData));
-  MeshPtr tempMesh(new Mesh(fileName, "PolyData", polyData));
+  MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
   return tempMesh;
 
 }
@@ -197,11 +197,13 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
   emit activeImageChanged(uid);
   std::cout << "Active image set to "<< uid << std::endl;
 }
-ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE type)
+ImagePtr DataManagerImpl::loadImage(const std::string& uid, const std::string& filename, READER_TYPE type)
 {
-	if (mImages.count(filename)) // dont load same image twice
+  //TODO
+	if (mImages.count(uid)) // dont load same image twice
 	{
-		return mImages[filename];
+		return mImages[uid];
+		std::cout << "WARNING: Image with uid: "+uid+" already exists, abort loading.";
 	}	
 	
 	if (type==rtAUTO)
@@ -211,7 +213,7 @@ ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE typ
 	}
 
 	// identify type
-	ImagePtr current = mImageReaders[type]->load(filename);
+	ImagePtr current = mImageReaders[type]->load(uid, filename);
 	if (current)
 	{
 		mImages[current->getUid()] = current;
@@ -221,10 +223,15 @@ ImagePtr DataManagerImpl::loadImage(const std::string& filename, READER_TYPE typ
 }
 
 // meshes
-MeshPtr DataManagerImpl::loadMesh(const std::string& fileName, MESH_READER_TYPE meshType)
+MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType)
 {
+  if (mMeshes.count(uid)) // dont load same mesh twice
+  {
+    return mMeshes[uid];
+    std::cout << "WARNING: Mesh with uid: "+uid+" already exists, abort loading.";
+  }
 	// identify type
-	MeshPtr newMesh = mMeshReaders[meshType]->load(fileName);
+	MeshPtr newMesh = mMeshReaders[meshType]->load(uid, fileName);
 	if (newMesh)
 	{
 		mMeshes[newMesh->getUid()] = newMesh;
@@ -281,7 +288,7 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   QDomElement dataManagerNode = doc.createElement("datamanager");
   parentNode.appendChild(dataManagerNode);
 
-  QDomElement activeImageNode = doc.createElement("activeImage");
+  QDomElement activeImageNode = doc.createElement("activeImageUid");
   if(mActiveImage)
     activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));
   dataManagerNode.appendChild(activeImageNode);
@@ -319,7 +326,8 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
   {
     if(child.nodeName() == "image" || child.nodeName() == "mesh")
     {
-      QDomElement uidNode = child.namedItem("uid").toElement();
+      QString uidNodeString = child.namedItem("uid").toElement().text();
+
       nameNode = child.namedItem("name").toElement();
       QDomElement filePathNode = child.namedItem("filePath").toElement();
       if(!filePathNode.isNull()) 
@@ -344,15 +352,15 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
           if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
              fileType.compare("mha", Qt::CaseInsensitive) == 0)
           {
-            data = this->loadImage(path.toStdString(), ssc::rtMETAIMAGE);
+            data = this->loadImage(uidNodeString.toStdString(), path.toStdString(), ssc::rtMETAIMAGE);
           }
           else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
           {
-            data = this->loadMesh(path.toStdString(), ssc::mrtSTL);
+            data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtSTL);
           }
           else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
           {
-            data = this->loadMesh(path.toStdString(), ssc::mrtPOLYDATA);
+            data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtPOLYDATA);
           }
           
           if(nameNode.text().isEmpty())
@@ -389,7 +397,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
   child = dataManagerNode.firstChild();
   while(!child.isNull())
   {
-    if(child.toElement().tagName() == "activeImage")
+    if(child.toElement().tagName() == "activeImageUid")
     {
       const QString activeImageString = child.toElement().text();
       //std::cout << "Found a activeImage with uid: " << activeImageString.toStdString().c_str() << std::endl;
