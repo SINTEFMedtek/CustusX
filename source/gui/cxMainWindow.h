@@ -200,6 +200,7 @@ protected:
   BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
   CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
+  class ImagePropertiesWidget* mImagePropertiesWidget; ///< display and control of image properties for active image.
   int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences

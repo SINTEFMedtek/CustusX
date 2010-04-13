@@ -19,6 +19,7 @@
 #include "cxView2D.h"
 #include "cxPreferencesDialog.h"
 #include "cxShiftCorrectionWidget.h"
+#include "cxImagePropertiesWidget.h"
 
 namespace cx
 {
@@ -165,6 +166,7 @@ MainWindow::MainWindow() :
   //mNavigationWidget(new NavigationWidget(mContextDockWidget)),
   mNavigationWidget(new NavigationWidget(NULL)),
   mCustomStatusBar(new CustomStatusBar()),
+  mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),
   mPatientRegistrationIndex(-1),
@@ -230,6 +232,12 @@ MainWindow::MainWindow() :
                                                          QString("Navigation"));
   mContextDockWidget->removeTab(mNavigationIndex);*/
     
+
+  QDockWidget* imagePropertiesDockWidget = new QDockWidget("Image Properties", this);
+  imagePropertiesDockWidget->setObjectName("ImagePropertiesDockWidget");
+  imagePropertiesDockWidget->setWidget(mImagePropertiesWidget);
+  this->addDockWidget(Qt::LeftDockWidgetArea, imagePropertiesDockWidget);
+
   // Don't show the Widget before all elements are initialized
   this->show();
 }
