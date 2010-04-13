@@ -20,8 +20,7 @@ namespace ssc
 
 
 Image::~Image()
-{
-}
+{}
 
 Image::Image(const std::string& uid, const vtkImageDataPtr& data,
     const std::string& name) :
