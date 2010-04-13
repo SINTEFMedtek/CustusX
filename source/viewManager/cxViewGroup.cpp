@@ -248,13 +248,17 @@ void ViewGroup::parseXml(QDomNode dataNode)
   QString imageUid = dataNode.namedItem("image").toElement().text();
   ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
   if (image)
-    setImage(image);
+    this->setImage(image);
+  else
+    messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;
   zoom2D.toDouble(&ok);
   if (ok)
-    zoom2DChangeSlot(zoom2D.toDouble());
+    this->zoom2DChangeSlot(zoom2D.toDouble());
+  else
+    messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
 }
 
 }//cx
