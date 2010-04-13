@@ -31,7 +31,8 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
   "ACSACS_2X3",
   "3DACS_2X2_SNW",
   "3DAny_1X2_SNW",
-  "ACSACS_2X3_SNW"
+  "ACSACS_2X3_SNW",
+  "Any_2x3_SNW"
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, LayoutType, LAYOUT_COUNT);
 
@@ -56,7 +57,7 @@ ViewManager::ViewManager() :
   mMainWindowsCentralWidget(new QWidget()),
   mActiveView(NULL),
   MAX_3DVIEWS(2),
-  MAX_2DVIEWS(12),
+  MAX_2DVIEWS(15),
   mRenderingTimer(new QTimer(this)),
   mSettings(new QSettings()),
   mRenderingTime(new QTime()),
@@ -111,6 +112,13 @@ ViewManager::ViewManager() :
   group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_10"])));
   group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_11"])));
   group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_12"])));
+  mViewGroups.push_back(group);
+
+  group.reset(new ViewGroup());
+  //group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(3, mView3DMap["View3D_3"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_13"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_14"])));
+  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_15"])));
   mViewGroups.push_back(group);
 
   group.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
@@ -192,6 +200,7 @@ std::vector<LayoutType> ViewManager::availableLayouts() const
   retval.push_back(LAYOUT_3DACS_2X2_SNW);
   retval.push_back(LAYOUT_3DAny_1X2_SNW);
   retval.push_back(LAYOUT_ACSACS_2X3_SNW);
+  retval.push_back(LAYOUT_Any_2x3_SNW);
   return retval;
 }
 
@@ -393,6 +402,9 @@ void ViewManager::activateLayout(LayoutType toType)
   case LAYOUT_ACSACS_2X3_SNW:
     this->activateLayout_ACSACS_2X3_SNW();
     break;
+  case LAYOUT_Any_2x3_SNW:
+    this->activateLayout_Any_2X3_SNW();
+    break;
   default:
     return;
     break;
@@ -494,6 +506,19 @@ void ViewManager::activateLayout_ACSACS_2X3_SNW()
   activate2DView(1, 3, ssc::ptSAGITTAL, 1, 2);
 
   mActiveLayout = LAYOUT_ACSACS_2X3_SNW;
+  emit activeLayoutChanged();
+}
+
+void ViewManager::activateLayout_Any_2X3_SNW()
+{
+  activate2DView(0, 1, ssc::ptANYPLANE, 0, 0);
+  activate2DView(0, 2, ssc::ptANYPLANE, 1, 0);
+  activate2DView(1, 1, ssc::ptANYPLANE, 0, 1);
+  activate2DView(1, 2, ssc::ptANYPLANE, 1, 1);
+  activate2DView(2, 1, ssc::ptANYPLANE, 0, 2);
+  activate2DView(2, 2, ssc::ptANYPLANE, 1, 2);
+
+  mActiveLayout = LAYOUT_3DAny_1X2_SNW;
   emit activeLayoutChanged();
 }
 
