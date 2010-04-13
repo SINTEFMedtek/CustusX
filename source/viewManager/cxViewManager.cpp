@@ -292,11 +292,17 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
   while(!viewgroup.isNull())
   {
     if (viewgroup.toElement().tagName()!="viewGroup")
+    {
+      viewgroup = viewgroup.nextSibling();
       continue;
+    }
     int index = viewgroup.toElement().attribute("index").toInt();
 
     if (index<0 || index>=int(mViewGroups.size()))
+    {
+      viewgroup = viewgroup.nextSibling();
       continue;
+    }
 
     mViewGroups[index]->parseXml(viewgroup);
 
@@ -518,7 +524,7 @@ void ViewManager::activateLayout_Any_2X3_SNW()
   activate2DView(2, 1, ssc::ptANYPLANE, 0, 2);
   activate2DView(2, 2, ssc::ptANYPLANE, 1, 2);
 
-  mActiveLayout = LAYOUT_3DAny_1X2_SNW;
+  mActiveLayout = LAYOUT_Any_2x3_SNW;
   emit activeLayoutChanged();
 }
 
