@@ -18,6 +18,7 @@
 namespace ssc
 {
 
+
 Image::~Image()
 {
 }
