@@ -2,6 +2,7 @@
 
 #include <QtGui>
 #include "sscTypeConversions.h"
+#include "sscRegistrationTransform.h" //TODO remove when timestampSecondsFormat() is moved to a more suitable place
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -935,6 +936,7 @@ void MainWindow::importDataSlot()
   QString fileType = fileInfo.suffix();
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
+  QString uid = fileInfo.fileName()+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
 
   //Need to wait for the copy to finish...
   
@@ -944,15 +946,14 @@ void MainWindow::importDataSlot()
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("mha", Qt::CaseInsensitive) == 0)
   {
-    //ssc::ImagePtr image = dataManager()->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
-    data = dataManager()->loadImage(fileName.toStdString(), ssc::rtMETAIMAGE);
+    data = dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
-    data = dataManager()->loadMesh(fileName.toStdString(), ssc::mrtSTL);
+    data = dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtSTL);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
-    data = dataManager()->loadMesh(fileName.toStdString(), ssc::mrtPOLYDATA);
+    data = dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
   data->setName(fileInfo.fileName().toStdString());
