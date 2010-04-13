@@ -58,6 +58,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscTool2DRep.h
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerRep.h
+    Widgets/sscAbstractInterface.h
+    Widgets/sscHelperWidgets.h
     )
 if (USE_GLX_SHARED_CONTEXT)
     SET( SSC_QT_MOC_HEADER_FILES
@@ -80,6 +82,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Rep/
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
+    ${SSC_SOURCE_DIR}/Code/Widgets/
     ${SSC_BINARY_DIR}
     ) 
 

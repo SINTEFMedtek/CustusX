@@ -2,18 +2,11 @@
 #define SSCABSTRACTINTERFACE_H_
 
 #include <boost/shared_ptr.hpp>
-#include <QApplication>
+#include <QString>
+#include <QObject>
 
-/// This follows the proposed DICOM standard for hosting services, see supplement 118
-enum appStates
+namespace ssc
 {
-	APP_IDLE =		0,
-	APP_INPROGRESS =	1,
-	APP_SUSPENDED =		2,
-	APP_COMPLETED =		3,
-	APP_CANCELED =		4,
-	APP_EXIT =		5
-};
 
 /** Utility class for describing a bounded numeric range. */
 struct DoubleRange
@@ -53,8 +46,7 @@ public:
 	virtual bool setValue(double value) = 0; ///< implemented by subclasses to set value for this entity
 	virtual double getValue() const = 0; ///< implemented by subclasses to get value for this entity
 	virtual DoubleRange getValueRange() const { return DoubleRange(0,1,0.01); } /// range of value
-	virtual double convertInternal2Display(double internal) { return internal*100; } ///< conversion from internal value to 
-display value
+	virtual double convertInternal2Display(double internal) { return internal*100; } ///< conversion from internal value to display value
 	virtual int getValueDecimals() const { return 0; } ///< number of relevant decimals in value
 	virtual double legendStep() const {return 0.2;} ///< step between each pos on the legend
 	virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
@@ -76,5 +68,7 @@ public:
 	virtual double getValue() const { return 0; }
 	virtual void connectValueSignals(bool on) {}
 };
+
+}
 
 #endif

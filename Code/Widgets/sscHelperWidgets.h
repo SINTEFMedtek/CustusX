@@ -26,16 +26,16 @@ public:
 /**Custom widget for display of double-valued data
  * Use the double-named methods instead of qslider's int-based ones.
  */
-class ssc DoubleSlider : public QSlider
+class DoubleSlider : public QSlider
 {
 	Q_OBJECT
 
 public:
-	virtual ~sscDoubleSlider() {}
-	sscDoubleSlider(QWidget* parent = 0) : QSlider(parent)
+	virtual ~DoubleSlider() {}
+	DoubleSlider(QWidget* parent = 0) : QSlider(parent)
 	{
 		connect(this, SIGNAL(valueChanged(int)), this, SLOT(valueChangedSlot(int)));
-		setDoubleRange(DoubleRange(0,1,1000));
+		setDoubleRange(DoubleRange(0,1,0.1));
 	}
 	void setDoubleRange(const DoubleRange& range)
 	{
@@ -69,6 +69,28 @@ private slots:
 		
 private:
 	DoubleRange mRange;
+};
+
+/**A QLineEdit specialized to deal with double data.
+ */
+class DoubleLineEdit : public QLineEdit
+{
+public:
+  DoubleLineEdit(QWidget* parent = 0) : QLineEdit(parent) {}
+  virtual QSize sizeHint() const { return QSize(30,20); }
+
+  double getDoubleValue(double defVal=0.0) const
+  {
+    bool ok;
+    double newVal = this->text().toDouble(&ok);
+    if (!ok)
+      return defVal;
+    return newVal;
+  }
+  void setDoubleValue(double val)
+  {
+    this->setText(QString::number(val, 'g', 4));
+  }
 };
 
 }
