@@ -15,88 +15,102 @@
 namespace cx
 {
 
+DoubleDataInterfaceActiveImageBase::DoubleDataInterfaceActiveImageBase()
+{
+  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
+}
+void DoubleDataInterfaceActiveImageBase::activeImageChanged()
+{
+  if (mImage)
+    disconnect(mImage->getLookupTable2D().get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 
-DoubleDataInterfaceWindow::DoubleDataInterfaceWindow()
-{
-  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SIGNAL(valueChanged()));
-}
-DoubleDataInterfaceWindow::~DoubleDataInterfaceWindow() {}
-double DoubleDataInterfaceWindow::getValue() const
-{
-  ssc::ImagePtr image = dataManager()->getActiveImage();
-  if (image)
-  {
-    return image->getLookupTable2D()->getWindow();
-  }
-  return 0.0;
-}
-void DoubleDataInterfaceWindow::setValue(double val)
-{
-  ssc::ImagePtr image = dataManager()->getActiveImage();
-  if (image)
-  {
-    image->getLookupTable2D()->setWindow(val);
-  }
-}
-QString DoubleDataInterfaceWindow::getName() const
-{
-  return "Window";
-}
+  mImage = dataManager()->getActiveImage();
 
+  if (mImage)
+    connect(mImage->getLookupTable2D().get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
 
-DoubleDataInterfaceLevel::DoubleDataInterfaceLevel()
+  emit changed();
+}
+double DoubleDataInterfaceActiveImageBase::getValue() const
 {
-  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SIGNAL(valueChanged()));
+  if (!mImage)
+    return 0.0;
+  return getValueInternal();
+}
+bool DoubleDataInterfaceActiveImageBase::setValue(double val)
+{
+  if (!mImage)
+    return false;
+  setValueInternal(val);
+  return true;
 }
 
-DoubleDataInterfaceLevel::~DoubleDataInterfaceLevel()
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+double DoubleDataInterface2DWindow::getValueInternal() const
 {
+  return mImage->getLookupTable2D()->getWindow();
+}
+void DoubleDataInterface2DWindow::setValueInternal(double val)
+{
+  mImage->getLookupTable2D()->setWindow(val);
+}
+ssc::DoubleRange DoubleDataInterface2DWindow::getValueRange() const
+{
+  if (!mImage)
+    return ssc::DoubleRange();
+  double range = mImage->getRange();
+  return ssc::DoubleRange(1,range,range/1000.0);
 }
 
-double DoubleDataInterfaceLevel::getValue() const
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+double DoubleDataInterface2DLevel::getValueInternal() const
 {
-  ssc::ImagePtr image = dataManager()->getActiveImage();
-  if (image)
-  {
-    return image->getLookupTable2D()->getLevel();
-  }
-  return 0.0;
+  return mImage->getLookupTable2D()->getLevel();
+}
+void DoubleDataInterface2DLevel::setValueInternal(double val)
+{
+  mImage->getLookupTable2D()->setLevel(val);
+}
+ssc::DoubleRange DoubleDataInterface2DLevel::getValueRange() const
+{
+  if (!mImage)
+    return ssc::DoubleRange();
+
+  double max = mImage->getMax();
+  return ssc::DoubleRange(1,max,max/1000.0);
 }
 
-void DoubleDataInterfaceLevel::setValue(double val)
-{
-  ssc::ImagePtr image = dataManager()->getActiveImage();
-  if (image)
-  {
-    image->getLookupTable2D()->setLevel(val);
-  }
-}
+//---------------------------------------------------------
+//---------------------------------------------------------
 
-QString DoubleDataInterfaceLevel::getName() const
-{
-  return "Level";
-}
-
-
-SliderGroup::SliderGroup(QWidget* parent, DoubleDataInterfacePtr dataInterface, QGridLayout* gridLayout, int row)
+SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataInterfacePtr dataInterface, QGridLayout* gridLayout, int row)
 {
   mData = dataInterface;
-  connect(mData.get(), SIGNAL(valueChanged()), this, SLOT(dataChanged()));
+  connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
 
   QHBoxLayout* topLayout = new QHBoxLayout;
   topLayout->setMargin(0);
   this->setLayout(topLayout);
 
   mLabel = new QLabel(this);
-  mLabel->setText(mData->getName());
+  mLabel->setText(mData->getValueName());
   topLayout->addWidget(mLabel);
-  mEdit = new QLineEdit(this);
-  topLayout->addWidget(mEdit);
-  mSlider = new QSlider(this);
-  mSlider->setOrientation(Qt::Horizontal);
-  topLayout->addWidget(mSlider);
 
+  mEdit = new ssc::DoubleLineEdit(this);
+  topLayout->addWidget(mEdit);
   connect(mEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEditedSlot(const QString&)));
+
+  mSlider = new ssc::DoubleSlider(this);
+  mSlider->setOrientation(Qt::Horizontal);
+  mSlider->setDoubleRange(mData->getValueRange());
+  topLayout->addWidget(mSlider);
+  connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
+
 
   if (gridLayout) // add to input gridlayout
   {
@@ -114,12 +128,17 @@ SliderGroup::SliderGroup(QWidget* parent, DoubleDataInterfacePtr dataInterface, 
   dataChanged();
 }
 
-void SliderGroup::textEditedSlot(const QString& text)
+void SliderGroupWidget::doubleValueChanged(double val)
 {
-  bool ok;
-  double newVal = text.toDouble(&ok);
-  if (!ok)
-    return;
+  if (ssc::similar(val, mData->getValue()))
+      return;
+
+  mData->setValue(val);
+}
+
+void SliderGroupWidget::textEditedSlot(const QString& text)
+{
+  double newVal = mEdit->getDoubleValue(mData->getValue());
 
   if (ssc::similar(newVal, mData->getValue()))
       return;
@@ -127,9 +146,14 @@ void SliderGroup::textEditedSlot(const QString& text)
   mData->setValue(newVal);
 }
 
-void SliderGroup::dataChanged()
+void SliderGroupWidget::dataChanged()
 {
-  mEdit->setText(qstring_cast(mData->getValue()));
+  mSlider->setDoubleRange(mData->getValueRange()); // in case the image is changed
+
+  ssc::DoubleRange range = mData->getValueRange();
+  std::cout << "SliderGroup::dataChanged() " << range.min() << "," << range.max() << "," << range.step() << std::endl;
+  mSlider->setDoubleValue(mData->getValue());
+  mEdit->setDoubleValue(mData->getValue());
 }
 
 } // namespace cx

@@ -39,41 +39,11 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   QGridLayout* gridLayout = new QGridLayout;
   toptopLayout->addLayout(gridLayout);
 
-  mLevelWidget = new SliderGroup(this, DoubleDataInterfacePtr(new DoubleDataInterfaceLevel), gridLayout, 0);
-  mWindowWidget = new SliderGroup(this, DoubleDataInterfacePtr(new DoubleDataInterfaceWindow), gridLayout, 1);
-
-
-//  toptopLayout->addWidget(mLevelWidget);
-//  toptopLayout->addWidget(mWindowWidget);
-
-//  mWindowEdit = new QLineEdit(this);
-//  winlvlLayout->addWidget(mWindowEdit);
-//  mLevelEdit = new QLineEdit(this);
-//  winlvlLayout->addWidget(mLevelEdit);
+  mLevelWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DLevel), gridLayout, 0);
+  mWindowWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DWindow), gridLayout, 1);
 
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
   updateSlot();
-
-//  QGroupBox* group = new QGroupBox;
-//  //group->setFlat(true);
-//  toptopLayout->addWidget(group);
-//  group->setTitle("Registration Time Control");
-//  QHBoxLayout* topLayout = new QHBoxLayout(group);
-//
-//  mRewindButton = new QPushButton("Rewind");
-//  mRewindButton->setToolTip("Use previous registration");
-//  connect(mRewindButton, SIGNAL(clicked()), this, SLOT(rewindSlot()));
-//  topLayout->addWidget(mRewindButton);
-//
-//  mRemoveButton = new QPushButton("Remove");
-//  mRemoveButton->setToolTip("Remove the latest registration");
-//  connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeSlot()));
-//  topLayout->addWidget(mRemoveButton);
-//
-//  mForwardButton = new QPushButton("Forward");
-//  mForwardButton->setToolTip("Use latest registration");
-//  connect(mForwardButton, SIGNAL(clicked()), this, SLOT(forwardSlot()));
-//  topLayout->addWidget(mForwardButton);
 }
 
 ImagePropertiesWidget::~ImagePropertiesWidget()
@@ -86,33 +56,17 @@ void ImagePropertiesWidget::updateSlot()
   if (image)
   {
     mImageNameLabel->setText(qstring_cast(image->getName()));
-//    mWindowEdit->setText(qstring_cast(image->getLookupTable2D()->getWindow()));
-//    mLevelEdit->setText(qstring_cast(image->getLookupTable2D()->getLevel()));
   }
 }
 
 void ImagePropertiesWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
-
-//  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    connect(raw[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
-//  }
-//
-//  updateSlot();
 }
 
 void ImagePropertiesWidget::hideEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
-
-//  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-//  for (unsigned i=0; i<raw.size(); ++i)
-//  {
-//    connect(raw[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
-//  }
 }
 
 

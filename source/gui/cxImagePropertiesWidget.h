@@ -7,7 +7,7 @@
 namespace cx
 {
 
-class SliderGroup;
+class SliderGroupWidget;
 
 /**
  * \class ImagePropertiesWidget
@@ -36,12 +36,9 @@ protected:
 private:
   ImagePropertiesWidget();
 
-  SliderGroup* mLevelWidget;
-  SliderGroup* mWindowWidget;
-
+  SliderGroupWidget* mLevelWidget;
+  SliderGroupWidget* mWindowWidget;
   QLabel* mImageNameLabel;
-//  QLineEdit* mWindowEdit;
-//  QLineEdit* mLevelEdit;
 };
 
 }//end namespace cx
