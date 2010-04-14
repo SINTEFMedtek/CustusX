@@ -6,6 +6,9 @@
 #include "sscView.h"
 #include "sscDefinitions.h"
 
+class QMenu;
+class QActionGroup;
+
 namespace cx
 {
 
@@ -28,8 +31,18 @@ public:
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
   virtual void setZoom2D(double zoomFactor) {}
+
 signals:
   void zoom2DChange(double newZoom);
+
+protected slots:
+  void contextMenuSlot(const QPoint& point);
+
+protected:
+  //void connectContextMenu();
+  void connectContextMenu(ssc::View* view);
+  virtual void appendToContextMenu(QMenu& contextMenu) = 0;
+  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup) = 0;
 };
 typedef boost::shared_ptr<ViewWrapper> ViewWrapperPtr;
 

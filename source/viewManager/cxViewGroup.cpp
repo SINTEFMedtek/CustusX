@@ -110,7 +110,6 @@ void Navigation::centerToTooltip()
 ViewGroup::ViewGroup()
 {
   mZoomFactor2D = 0.5;
-  this->connectContextMenu();
 }
 
 ViewGroup::~ViewGroup()
@@ -133,7 +132,6 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
           this, SLOT(activeImageChangeSlot()));
 
   connect(wrapper.get(), SIGNAL(zoom2DChange(double)), this, SLOT(zoom2DChangeSlot(double)));
-  connectContextMenu(wrapper->getView());
 }
 
 /**Set the zoom2D factor, only.
@@ -162,19 +160,6 @@ void ViewGroup::activeImageChangeSlot()
 {
   messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
   dataManager()->setActiveImage(mImage);
-}
-void ViewGroup::connectContextMenu()
-{
-  for(unsigned int i=0;i<mViews.size();++i)
-  {
-    connectContextMenu(mViews[i]);
-  }
-}
-
-void ViewGroup::connectContextMenu(ssc::View* view)
-{
-   connect(view, SIGNAL(customContextMenuRequested(const QPoint &)),
-       this, SLOT(contexMenuSlot(const QPoint &)));
 }
 
 std::vector<ssc::View*> ViewGroup::getViews() const
@@ -220,58 +205,6 @@ void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
     mElements[i]->setRegistrationMode(mode);
 }
 
-
-void ViewGroup::contexMenuSlot(const QPoint& point)
-{
-  //NOT SUPPORTING MESHES IN 3D VIEW YET
-
-  QWidget* sender = dynamic_cast<QWidget*>(this->sender());
-  QPoint pointGlobal = sender->mapToGlobal(point);
-  /*ssc::View* senderView = dynamic_cast<ssc::View*>(sender);
-  if(senderView)
-    std::cout << senderView->getUid() << std::endl;*/
-  QMenu contextMenu(sender);
-
-    //Get a list of available image and meshes names
-    std::map<std::string, std::string> imageUidsAndNames = dataManager()->getImageUidsAndNames();
-    std::map<std::string, std::string> meshUidsAndNames = dataManager()->getMeshUidsWithNames();
-
-    //Display the lists to the user
-    std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
-    while(imageIt != imageUidsAndNames.end())
-    {
-      const QString uid = imageIt->first.c_str();
-      const QString name = imageIt->second.c_str();
-      QAction* imageAction = new QAction(name, &contextMenu);
-      imageAction->setStatusTip(uid.toStdString().c_str());
-      contextMenu.addAction(imageAction);
-      imageIt++;
-    }
-
-    //Find out which the user chose
-    QAction* theAction = contextMenu.exec(pointGlobal);
-    if(!theAction)//this happens if you rightclick in the view and then don't select a action
-      return;
-
-    QString imageName = theAction->text();
-    QString imageUid = theAction->statusTip();
-    ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
-
-    if(!image)
-    {
-      std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View.";
-      messageManager()->sendError(error);
-      return;
-    }
-
-    this->setImage(image);
-    Navigation().centerToImageCenter(); // reset center for convenience
-
-    //TODO remove/move? (JB)
-    //test to see if the contextdockwidgets combobox will respond
-    //it did
-    //dataManager()->setActiveImage(image);
-}
 void ViewGroup::activateManualToolSlot()
 {
   toolManager()->dominantCheckSlot();
@@ -280,8 +213,6 @@ void ViewGroup::activateManualToolSlot()
 void ViewGroup::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
-//  QDomElement viewManagerNode = doc.createElement("viewManager");
-//  parentNode.appendChild(viewManagerNode);
 
   if (mImage)
   {

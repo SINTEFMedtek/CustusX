@@ -35,6 +35,9 @@ public:
   virtual ssc::View* getView();
   virtual void setZoom2D(double zoomFactor);
 
+/*protected slots:
+  virtual void contextMenuSlot(const QPoint& point);*/
+
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void viewportChanged();
@@ -43,6 +46,8 @@ private slots:
   void mouseWheelSlot(QWheelEvent* event);
 
 private:
+  virtual void appendToContextMenu(QMenu& contextMenu);
+  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup);
   void addReps();
   ssc::DoubleBoundingBox3D getViewport() const;
   ssc::Transform3D get_vpMs() const;
@@ -61,6 +66,11 @@ private:
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   ssc::View* mView;
+
+  QActionGroup* mOrientationActionGroup;
+  QActionGroup* mGlobal2DZoomActionGroup;
+  bool mOblique; //just for testing, remove when we have this functionality in sliceproxy
+  bool mGlobal2DZoom;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

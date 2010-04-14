@@ -51,15 +51,12 @@ public:
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
 
 private slots:
-  void contexMenuSlot(const QPoint& point);
   void activateManualToolSlot();
   void zoom2DChangeSlot(double newZoom);
   void activeImageChangeSlot();
 
 protected:
   void setZoom2D(double newZoom);
-  void connectContextMenu();
-  void connectContextMenu(ssc::View* view);
 
   std::vector<ssc::View*> mViews;
 
