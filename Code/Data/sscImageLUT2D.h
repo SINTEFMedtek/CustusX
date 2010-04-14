@@ -8,6 +8,10 @@
 #ifndef SSCIMAGELOOKUPTABLE2D_H_
 #define SSCIMAGELOOKUPTABLE2D_H_
 
+
+class QDomElement;
+class QDomNode;
+
 #include <boost/shared_ptr.hpp>
 #include <QColor>
 #include <QObject>
@@ -47,10 +51,14 @@ public:
 
 	double getScalarMax() const;
 
+  void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
+  void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
 signals:
 	void transferFunctionsChanged();
 
 private:
+	double loadAttribute(QDomNode dataNode, QString name, double defVal);
 	void refreshOutput();
 //	void changeOpacity(double index, double opacity);
 	void testMap(double val);

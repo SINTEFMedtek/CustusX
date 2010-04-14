@@ -61,7 +61,7 @@ void RegistrationTransform::addXml(QDomNode& parentNode) ///< write internal sta
 
   base.setAttribute("timestamp", mTimestamp.toString(timestampSecondsFormat()));
   base.setAttribute("type", mType);
-  base.appendChild(doc.createTextNode(qstring_cast(mValue)));
+  base.appendChild(doc.createTextNode("\n"+qstring_cast(mValue)));
 }
 
 void RegistrationTransform::parseXml(QDomNode& dataNode)///< read internal state from node

@@ -9,6 +9,7 @@
 #include <QDir>
 #include <QTextStream>
 #include <QFile>
+#include <QDomDocument>
 
 #include <vtkImageData.h>
 #include <vtkWindowLevelLookupTable.h>
@@ -250,6 +251,44 @@ void ImageLUT2D::refreshOutput()
 //	}
 //	mOutputLUT->Modified();
 //}
+
+
+void ImageLUT2D::addXml(QDomNode& parentNode)
+{
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement dataNode = doc.createElement("lookuptable2D");
+  parentNode.appendChild(dataNode);
+
+  dataNode.setAttribute("window", mWindow);
+  dataNode.setAttribute("level", mLevel);
+  dataNode.setAttribute("llr", mLLR);
+  dataNode.setAttribute("alpha", mAlpha);
+
+  //TODO: missing save of BaseLut
+}
+
+double ImageLUT2D::loadAttribute(QDomNode dataNode, QString name, double defVal)
+{
+  QString text = dataNode.toElement().attribute(name);
+  bool ok;
+  double val = text.toDouble(&ok);
+  if (ok)
+    return val;
+  return defVal;
+}
+
+void ImageLUT2D::parseXml(QDomNode dataNode)
+{
+  if (dataNode.isNull())
+    return;
+
+  mWindow = loadAttribute(dataNode, "window", mWindow);
+  mLevel = loadAttribute(dataNode, "level", mLevel);
+  mLLR = loadAttribute(dataNode, "llr", mLLR);
+  mAlpha = loadAttribute(dataNode, "alpha", mAlpha);
+
+  //TODO: missing load of BaseLut
+}
 
 
 //---------------------------------------------------------

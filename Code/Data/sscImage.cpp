@@ -285,6 +285,7 @@ void Image::addXml(QDomNode& parentNode)
   imageNode.appendChild(filePathNode);
   
   mImageTransferFunctions3D->addXml(imageNode);
+  mImageLookupTable2D->addXml(imageNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");
   for(int i=0; i< mLandmarks->GetNumberOfTuples(); i++)
@@ -325,6 +326,8 @@ void Image::parseXml(QDomNode& dataNode)
 		std::cout << "Warning: Image::parseXml() found no transferfunctions";
 		std::cout << std::endl;
 	}
+
+	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
 
 	//landmarks
 	QDomNode landmarksNode = dataNode.namedItem("landmarks");
