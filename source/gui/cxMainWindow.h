@@ -151,7 +151,7 @@ protected:
   //menus
   QMenu* mCustusXMenu; ///< Application menu
   QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
-  QMenu* mViewMenu; ///< Menu for showing / hiding GUI elements
+  QMenu* mWindowMenu; ///< Menu for showing / hiding GUI elements
   QMenu* mWorkflowMenu; ///< menu for choosing workflow
   QMenu* mDataMenu; ///< menu for loading data
   QMenu* mToolMenu; ///< menu for interacting with the navigation system

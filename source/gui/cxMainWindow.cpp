@@ -428,7 +428,7 @@ void MainWindow::createMenus()
 {
   mCustusXMenu = new QMenu(tr("CustusX"), this);;
 	mFileMenu = new QMenu(tr("File"), this);;
-  mViewMenu = new QMenu(tr("View"), this);;
+  mWindowMenu = new QMenu(tr("Window"), this);;
   mWorkflowMenu = new QMenu(tr("Workflow"), this);;
   mDataMenu = new QMenu(tr("Data"), this);
   mToolMenu = new QMenu(tr("Tracking"), this);
@@ -446,8 +446,8 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mLoadFileAction);
 	
   // View
-  this->menuBar()->addMenu(mViewMenu);
-  mViewMenu->addAction(mToggleContextDockWidgetAction);
+  this->menuBar()->addMenu(mWindowMenu);
+  mWindowMenu->addAction(mToggleContextDockWidgetAction);
   
   //workflow
   this->menuBar()->addMenu(mWorkflowMenu);
