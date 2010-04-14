@@ -18,6 +18,7 @@
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
+#include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
 #include "cxShiftCorrectionWidget.h"
 #include "cxImagePropertiesWidget.h"
@@ -355,6 +356,13 @@ void MainWindow::createActions()
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
 
+
+  mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
+  connect(mCenterToImageCenterAction, SIGNAL(triggered()), this, SLOT(centerToImageCenterSlot()));
+  mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
+  connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
+
+
   //TODO remove
   /*connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           viewManager(), SLOT(currentImageChangedSlot(ssc::ImagePtr)));*/
@@ -368,6 +376,16 @@ void MainWindow::createActions()
   
   connect(this, SIGNAL(deleteCurrentImage()),
           mContextDockWidget, SLOT(deleteCurrentImageSlot()));
+}
+
+void MainWindow::centerToImageCenterSlot()
+{
+  Navigation().centerToImageCenter();
+}
+
+void MainWindow::centerToTooltipSlot()
+{
+  Navigation().centerToTooltip();
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -476,6 +494,9 @@ void MainWindow::createToolBars()
   mToolToolBar->addAction(mStartTrackingToolsAction);
   mToolToolBar->addAction(mStopTrackingToolsAction);
 
+  mNavigationToolBar = addToolBar("Navigation");
+  mNavigationToolBar->addAction(mCenterToImageCenterAction);
+  mNavigationToolBar->addAction(mCenterToTooltipAction);
 }
 void MainWindow::createStatusBar()
 {

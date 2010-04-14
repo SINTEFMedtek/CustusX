@@ -10,6 +10,7 @@
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -891,12 +892,19 @@ void ToolManager::addXml(QDomNode& parentNode)
   QDomElement base = doc.createElement("toolManager");
   parentNode.appendChild(base);
   m_rMpr_History->addXml(base);
+
+  QDomElement manualToolNode = doc.createElement("manualTool");
+  manualToolNode.appendChild(doc.createTextNode("\n"+qstring_cast(mManualTool->get_prMt())));
+  base.appendChild(manualToolNode);
 }
 
 void ToolManager::parseXml(QDomNode& dataNode)
 {
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMpr_History->parseXml(registrationHistory);
+
+  QString manualToolText = dataNode.namedItem("manualTool").toElement().text();
+  mManualTool->set_prMt(ssc::Transform3D::fromString(manualToolText));
 }
 
 ssc::RegistrationHistoryPtr ToolManager::get_rMpr_History()

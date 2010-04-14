@@ -23,6 +23,7 @@ class Navigation
 public:
   void centerToImageCenter();
   void centerToTooltip();
+  ssc::Vector3D findGlobalImageCenter();
 };
 
 /**
@@ -56,6 +57,7 @@ private slots:
   void activeImageChangeSlot();
 
 protected:
+  void setZoom2D(double newZoom);
   void connectContextMenu();
   void connectContextMenu(ssc::View* view);
 

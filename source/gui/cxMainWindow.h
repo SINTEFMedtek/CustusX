@@ -101,7 +101,11 @@ protected slots:
 
   //logging
   void loggingSlot(const QString& message, int timeout); ///< prints messages for debugging
-  
+
+  // navigation
+  void centerToImageCenterSlot();
+  void centerToTooltipSlot();
+
 protected:
   enum WorkflowState
   {
@@ -187,10 +191,15 @@ protected:
 //  QAction* m3DACS_1x3_LayoutAction; ///< action for switching to 3DACS_1x3 view layout
 //  QAction* mACSACS_2x3_LayoutAction; ///< action for switching to ACSACS_2x3 view layout
   QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
-  
+
+  // actions for image navigation
+  QAction* mCenterToImageCenterAction;
+  QAction* mCenterToTooltipAction;
+
   //toolbars
   QToolBar* mDataToolBar; ///< toolbar for data actions
-  QToolBar* mToolToolBar; ///< toolbar for navigation actions
+  QToolBar* mToolToolBar; ///< toolbar for tracking system actions
+  QToolBar* mNavigationToolBar; ///< toolbar for navigation actions
 
   ContextDockWidget*          mContextDockWidget; ///< dock widget for context sensitive widgets
   ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration

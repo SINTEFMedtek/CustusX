@@ -22,6 +22,57 @@
 namespace cx
 {
 
+
+/**Find the center of all images, defined as the center
+ * of the smallest bounding box enclosing all images.
+ */
+ssc::Vector3D Navigation::findGlobalImageCenter()
+{
+  ssc::Vector3D p_r(0,0,0);
+  if (DataManager::getInstance()->getImages().empty())
+    return p_r;
+
+    //TODO: move this to suitable place... (CA)
+  // must use mean center at the least.
+  std::vector<ssc::Vector3D> coord;
+
+  ssc::DataManager::ImagesMap images = dataManager()->getImages();
+  ssc::DataManager::ImagesMap::iterator iter;
+
+  for (iter=images.begin(); iter!=images.end(); ++iter)
+  {
+    ssc::ImagePtr image = iter->second;
+    ssc::Transform3D rMd = image->get_rMd();
+    ssc::DoubleBoundingBox3D bb = image->boundingBox();
+
+    coord.push_back(rMd.coord(bb.corner(0,0,0)));
+    coord.push_back(rMd.coord(bb.corner(0,0,1)));
+    coord.push_back(rMd.coord(bb.corner(0,1,0)));
+    coord.push_back(rMd.coord(bb.corner(0,1,1)));
+    coord.push_back(rMd.coord(bb.corner(1,0,0)));
+    coord.push_back(rMd.coord(bb.corner(1,0,1)));
+    coord.push_back(rMd.coord(bb.corner(1,1,0)));
+    coord.push_back(rMd.coord(bb.corner(1,1,1)));
+  }
+
+  //p_r = image->get_rMd().coord(image->boundingBox().center());
+  ssc::Vector3D p_min = coord[0];
+  ssc::Vector3D p_max = coord[0];
+
+  for (unsigned i=0; i<coord.size(); ++i)
+  {
+    for (unsigned j=0; j<3; ++j)
+    {
+      p_min[j] = std::min(p_min[j], coord[i][j]);
+      p_max[j] = std::max(p_max[j], coord[i][j]);
+    }
+  }
+
+  p_r = (p_min+p_max)/2.0;
+
+  return p_r;
+}
+
 /**Place the global center to the mean center of
  * all the loaded images.
  */
@@ -29,12 +80,7 @@ void Navigation::centerToImageCenter()
 {
   //TODO: move this to suitable place... (CA)
   // must use mean center at the least.
-  ssc::Vector3D p_r(0,0,0);
-  if (!DataManager::getInstance()->getImages().empty())
-  {
-    ssc::ImagePtr image = DataManager::getInstance()->getImages().begin()->second;
-    p_r = image->get_rMd().coord(image->boundingBox().center());
-  }
+  ssc::Vector3D p_r = findGlobalImageCenter();
 
   // set center to calculated position
   DataManager::getInstance()->setCenter(p_r);
@@ -90,21 +136,28 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
   connectContextMenu(wrapper->getView());
 }
 
-/**Called when a zoom change is requested from one view wrapper
- *
+/**Set the zoom2D factor, only.
  */
-void ViewGroup::zoom2DChangeSlot(double newZoom)
+void ViewGroup::setZoom2D(double newZoom)
 {
   mZoomFactor2D = newZoom;
   mZoomFactor2D = ssc::constrainValue(mZoomFactor2D, 0.2, 10.0); // constrain zoom to a sensible interval
-
-  Navigation().centerToTooltip();
 
   for (unsigned i=0; i<mElements.size(); ++i)
   {
     mElements[i]->setZoom2D(mZoomFactor2D);
   }
 }
+
+/**Called when a zoom change is requested from one view wrapper
+ *
+ */
+void ViewGroup::zoom2DChangeSlot(double newZoom)
+{
+  Navigation().centerToTooltip(); // side effect: center on tool
+  setZoom2D(newZoom);
+}
+
 void ViewGroup::activeImageChangeSlot()
 {
   messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
@@ -150,8 +203,6 @@ void ViewGroup::setImage(ssc::ImagePtr image)
   mImage = image;
   for (unsigned i=0; i<mElements.size(); ++i)
     mElements[i]->setImage(image);
-
-  Navigation().centerToImageCenter();
 }
 
 void ViewGroup::removeImage(ssc::ImagePtr image)
@@ -214,6 +265,7 @@ void ViewGroup::contexMenuSlot(const QPoint& point)
     }
 
     this->setImage(image);
+    Navigation().centerToImageCenter(); // reset center for convenience
 
     //TODO remove/move? (JB)
     //test to see if the contextdockwidgets combobox will respond
@@ -246,17 +298,21 @@ void ViewGroup::addXml(QDomNode& dataNode)
 void ViewGroup::parseXml(QDomNode dataNode)
 {
   QString imageUid = dataNode.namedItem("image").toElement().text();
-  ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
-  if (image)
-    this->setImage(image);
-  else
-    messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+
+  if (!imageUid.isEmpty())
+  {
+    ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
+    if (image)
+      this->setImage(image);
+    else
+      messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+  }
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;
   zoom2D.toDouble(&ok);
   if (ok)
-    this->zoom2DChangeSlot(zoom2D.toDouble());
+    this->setZoom2D(zoom2D.toDouble());
   else
     messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
 }
