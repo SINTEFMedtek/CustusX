@@ -136,6 +136,7 @@ protected:
   ssc::ToolManager::ToolMapPtr configureTools(QList<QDomNodeList>& toolNodeList);
   void addConnectedTool(std::string uid); ///< moves a tool from configuredTools to connectedTools
   void connectSignalsAndSlots(); ///< connects signals and slots
+  void initializeManualTool();
 
   static ToolManager* mCxInstance;
 

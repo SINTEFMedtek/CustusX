@@ -78,8 +78,6 @@ ssc::Vector3D Navigation::findGlobalImageCenter()
  */
 void Navigation::centerToImageCenter()
 {
-  //TODO: move this to suitable place... (CA)
-  // must use mean center at the least.
   ssc::Vector3D p_r = findGlobalImageCenter();
 
   // set center to calculated position
@@ -87,7 +85,11 @@ void Navigation::centerToImageCenter()
 
   // move the manual tool to the same position. (this is a side effect... do we want it?)
   ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
-  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+  ssc::Transform3D prM0t = ToolManager::getInstance()->getManualTool()->get_prMt(); // modify old pos in order to keep orientation
+  ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0,0,0));
+  ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
+  //ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+  ToolManager::getInstance()->getManualTool()->set_prMt(prM1t);
 }
 
 /**Place the global center at the current position of the
