@@ -9,11 +9,11 @@
 
 #include <vector>
 #include <QObject>
-#include "cxForwardDeclarations.h"
 #include "sscData.h"
 #include "sscDefinitions.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -39,6 +39,9 @@ private slots:
   void toolManagerConfiguredSlot(); ///< add all tools when configured
 
 private:
+  virtual void appendToContextMenu(QMenu& contextMenu){};
+  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
+
   ssc::VolumetricRepPtr mVolumetricRep;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;

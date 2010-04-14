@@ -28,6 +28,7 @@ namespace cx
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mView = view;
+  this->connectContextMenu(mView);
   std::string index = QString::number(startIndex).toStdString();
 
   mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
@@ -73,6 +74,7 @@ ssc::View* ViewWrapper3D::getView()
 {
   return mView;
 }
+
 void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = toolManager()->getDominantTool();

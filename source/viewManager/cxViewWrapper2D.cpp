@@ -41,9 +41,14 @@ std::string planeToString(ssc::PLANE_TYPE val)
 }
 
 
-ViewWrapper2D::ViewWrapper2D(ssc::View* view)
+ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
+    mOrientationActionGroup(new QActionGroup(view)),
+    mGlobal2DZoomActionGroup(new QActionGroup(view)),
+    mOblique(false),
+    mGlobal2DZoom(true)
 {
   mView = view;
+  this->connectContextMenu(mView);
   mZoomFactor = 0.5;
 
   // disable vtk interactor: this wrapper IS an interactor
@@ -57,6 +62,45 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view)
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
   connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(mouseWheelSlot(QWheelEvent*)));
+}
+
+void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
+{
+  //messageManager()->sendInfo("ViewWrapper2D::appendToContextMenu");
+
+  QAction* orientationAction = new QAction("Oblique", &contextMenu);
+  orientationAction->setCheckable(true);
+  orientationAction->setChecked(mOblique);
+  mOrientationActionGroup->addAction(orientationAction);
+
+  QAction* global2DZoomAction = new QAction("Global 2D Zoom", &contextMenu);
+  global2DZoomAction->setCheckable(true);
+  global2DZoomAction->setChecked(mGlobal2DZoom);
+  mGlobal2DZoomActionGroup->addAction(global2DZoomAction);
+
+  contextMenu.addSeparator();
+  contextMenu.addAction(orientationAction);
+  contextMenu.addSeparator();
+  contextMenu.addAction(global2DZoomAction);
+}
+
+void ViewWrapper2D::checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup)
+{
+  //messageManager()->sendInfo("ViewWrapper2D::checkFromContextMenu");
+
+  if(theActionGroup == mOrientationActionGroup)
+  {
+    messageManager()->sendInfo("Clicked Oblique!");
+    mOblique = !mOblique;
+    //TODO set the sliceproxy
+    //use theAction for something?
+  }else if(theActionGroup == mGlobal2DZoomActionGroup)
+  {
+    messageManager()->sendInfo("Clicked global 2D zoom!");
+    mGlobal2DZoom = !mGlobal2DZoom;
+    //TODO do something
+    //use theAction for something?
+  }
 }
 
 void ViewWrapper2D::addReps()

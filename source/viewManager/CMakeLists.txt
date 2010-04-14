@@ -18,10 +18,13 @@ SET ( ${LIB}_viewManager
     cxView3D.cpp
     cxView3D.h
     cxViewWrapper2D.cpp
+    cxViewWrapper2D.h
     cxViewWrapper3D.cpp
+    cxViewWrapper3D.h
+    cxViewWrapper.h
+    cxViewWrapper.cpp
     cxViewManager.cpp
     cxViewManager.h
-    cxViewWrapper.h
     cxViewGroup.h
     cxViewGroup.cpp
     cxViewGroupInria.h

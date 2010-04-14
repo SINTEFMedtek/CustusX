@@ -26,7 +26,12 @@ public:
   virtual void addXml(QDomNode& dataNode) {} ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode) {}///< load internal state info from dataNode
 
+private slots:
+  void contextMenuSlot(const QPoint& point);
+
 protected:
+  void connectContextMenu();
+  void connectContextMenu(ssc::View* view);
   std::string toString(int i) const;
   int mStartIndex;
   ssc::ImagePtr mImage;
