@@ -416,7 +416,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
       {
         Vector3D center = Vector3D::fromString(centerString);
         this->setCenter(center);
-        std::cout << "Center: " << center << std::endl;
+        //std::cout << "Center: " << center << std::endl;
       }
     }
     child = child.nextSibling();

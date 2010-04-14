@@ -75,7 +75,8 @@ Vector3D::Vector3D(const int* data)
 Vector3D Vector3D::fromString(const QString& text)
 {
   std::vector<double> raw = convertQString2DoubleVector(text);
-  //might want to check for raw.size()==3 here.... but what to do? Setting to identity might hide errors.
+  if (raw.size()!=3)
+    return Vector3D(0,0,0);
   return Vector3D((double*)&(*raw.begin()));
 }
 

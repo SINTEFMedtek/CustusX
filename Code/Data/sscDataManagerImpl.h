@@ -107,7 +107,6 @@ protected:
 	DataManagerImpl();
 	virtual ~DataManagerImpl();
 protected:
-	typedef std::map<std::string, ImagePtr> ImagesMap;
 	ImagesMap mImages;
 	Vector3D mCenter;
 	std::map<READER_TYPE, ImageReaderPtr> mImageReaders;
