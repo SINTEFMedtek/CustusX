@@ -44,7 +44,6 @@ std::string planeToString(ssc::PLANE_TYPE val)
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
     mOrientationActionGroup(new QActionGroup(view)),
     mGlobal2DZoomActionGroup(new QActionGroup(view)),
-    mOblique(false),
     mGlobal2DZoom(true)
 {
   mView = view;
@@ -68,10 +67,19 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 {
   //messageManager()->sendInfo("ViewWrapper2D::appendToContextMenu");
 
-  QAction* orientationAction = new QAction("Oblique", &contextMenu);
-  orientationAction->setCheckable(true);
-  orientationAction->setChecked(mOblique);
-  mOrientationActionGroup->addAction(orientationAction);
+  QAction* obliqueAction = new QAction("Oblique", &contextMenu);
+  obliqueAction->setCheckable(true);
+  obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
+  obliqueAction->setChecked(getOrientationType()==ssc::otOBLIQUE);
+
+  QAction* ortogonalAction = new QAction("Ortogonal", &contextMenu);
+  ortogonalAction->setCheckable(true);
+  ortogonalAction->setData(qstring_cast(ssc::otORTHOGONAL));
+  ortogonalAction->setChecked(getOrientationType()==ssc::otORTHOGONAL);
+  //ortogonalAction->setChecked(true);
+
+  mOrientationActionGroup->addAction(obliqueAction);
+  mOrientationActionGroup->addAction(ortogonalAction);
 
   QAction* global2DZoomAction = new QAction("Global 2D Zoom", &contextMenu);
   global2DZoomAction->setCheckable(true);
@@ -79,7 +87,8 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
   mGlobal2DZoomActionGroup->addAction(global2DZoomAction);
 
   contextMenu.addSeparator();
-  contextMenu.addAction(orientationAction);
+  contextMenu.addAction(obliqueAction);
+  contextMenu.addAction(ortogonalAction);
   contextMenu.addSeparator();
   contextMenu.addAction(global2DZoomAction);
 }
@@ -90,11 +99,13 @@ void ViewWrapper2D::checkFromContextMenu(QAction* theAction, QActionGroup* theAc
 
   if(theActionGroup == mOrientationActionGroup)
   {
-    messageManager()->sendInfo("Clicked Oblique!");
-    mOblique = !mOblique;
-    //TODO set the sliceproxy
-    //use theAction for something?
-  }else if(theActionGroup == mGlobal2DZoomActionGroup)
+    //messageManager()->sendInfo("Clicked Oblique!");
+    //mOblique = !mOblique;
+    ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(string_cast(theAction->data().toString()));
+    //std::cout << "ortype: " << type << std::endl;
+    changeOrientationType(type);
+  }
+  else if(theActionGroup == mGlobal2DZoomActionGroup)
   {
     messageManager()->sendInfo("Clicked global 2D zoom!");
     mGlobal2DZoom = !mGlobal2DZoom;
@@ -215,10 +226,26 @@ void ViewWrapper2D::showSlot()
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
-  mPlaneType = plane;
+//  mPlaneType = plane;
   mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, planeToString(plane));
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
+}
+
+ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
+{
+  return mSliceProxy->getComputer().getOrientationType();
+}
+
+void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
+{
+  ssc::SliceComputer computer = mSliceProxy->getComputer();
+  computer.switchOrientationMode(type);
+
+  ssc::PLANE_TYPE plane = computer.getPlaneType();
+  mOrientationAnnotationRep->setPlaneType(plane);
+  mPlaneTypeText->setText(0, planeToString(plane));
+  mSliceProxy->setComputer(computer);
 }
 
 ssc::View* ViewWrapper2D::getView()

@@ -518,11 +518,11 @@ void ViewManager::activateLayout_ACSACS_2X3_SNW()
 void ViewManager::activateLayout_Any_2X3_SNW()
 {
   activate2DView(0, 1, ssc::ptANYPLANE, 0, 0);
-  activate2DView(0, 2, ssc::ptANYPLANE, 1, 0);
+  activate2DView(0, 2, ssc::ptSIDEPLANE, 1, 0);
   activate2DView(1, 1, ssc::ptANYPLANE, 0, 1);
-  activate2DView(1, 2, ssc::ptANYPLANE, 1, 1);
+  activate2DView(1, 2, ssc::ptSIDEPLANE, 1, 1);
   activate2DView(2, 1, ssc::ptANYPLANE, 0, 2);
-  activate2DView(2, 2, ssc::ptANYPLANE, 1, 2);
+  activate2DView(2, 2, ssc::ptSIDEPLANE, 1, 2);
 
   mActiveLayout = LAYOUT_Any_2x3_SNW;
   emit activeLayoutChanged();

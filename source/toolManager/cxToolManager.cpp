@@ -62,16 +62,38 @@ ToolManager::ToolManager() :
 
   mToolSamples->SetNumberOfComponents(4);
 
-  //adding a manual tool as default
-  mManualTool.reset(new ssc::ManualTool("tool_manual"));
-  (*mConfiguredTools)["tool_manual"] = mManualTool;
-  mManualTool->setVisible(true);
-  this->addConnectedTool("tool_manual");
+  initializeManualTool();
+//  //adding a manual tool as default
+//  mManualTool.reset(new ssc::ManualTool("tool_manual"));
+//  (*mConfiguredTools)["tool_manual"] = mManualTool;
+//  mManualTool->setVisible(true);
+//  ssc::Transform3D prMt =
+//
+//  this->addConnectedTool("tool_manual");
   this->setDominantTool("tool_manual");
 }
 ToolManager::~ToolManager()
 {
 }
+
+void ToolManager::initializeManualTool()
+{
+  if (!mManualTool)
+  {
+    //adding a manual tool as default
+    mManualTool.reset(new ssc::ManualTool("tool_manual"));
+    (*mConfiguredTools)["tool_manual"] = mManualTool;
+    mManualTool->setVisible(true);
+    this->addConnectedTool("tool_manual");
+  }
+
+  ssc::Transform3D prMt =
+      this->get_rMpr()->inv() *
+      ssc::createTransformRotateY(M_PI) *
+      ssc::createTransformRotateZ(M_PI_2);
+  mManualTool->set_prMt(prMt);
+}
+
 bool ToolManager::isConfigured() const
 {
   return mConfigured;

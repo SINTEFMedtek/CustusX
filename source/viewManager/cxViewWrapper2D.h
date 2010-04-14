@@ -54,11 +54,14 @@ private:
   ssc::Vector3D qvp2vp(QPoint pos_qvp);
   void moveAxisPos(ssc::Vector3D click_vp);
 
+  ssc::ORIENTATION_TYPE getOrientationType() const;
+  void changeOrientationType(ssc::ORIENTATION_TYPE type);
+
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
   double mZoomFactor;
-  ssc::PLANE_TYPE mPlaneType;
+//  ssc::PLANE_TYPE mPlaneType;
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
   ssc::ToolRep2DPtr mToolRep2D;
@@ -69,7 +72,7 @@ private:
 
   QActionGroup* mOrientationActionGroup;
   QActionGroup* mGlobal2DZoomActionGroup;
-  bool mOblique; //just for testing, remove when we have this functionality in sliceproxy
+//  bool mOblique; //just for testing, remove when we have this functionality in sliceproxy
   bool mGlobal2DZoom;
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
