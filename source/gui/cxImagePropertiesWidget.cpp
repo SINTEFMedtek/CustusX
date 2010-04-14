@@ -36,8 +36,12 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   QVBoxLayout* winlvlLayout = new QVBoxLayout;
   toptopLayout->addLayout(winlvlLayout);
 
-  QGridLayout* gridLayout = new QGridLayout;
-  toptopLayout->addLayout(gridLayout);
+  QGroupBox* group2D = new QGroupBox(this);
+  group2D->setTitle("2D properties");
+  toptopLayout->addWidget(group2D);
+
+  QGridLayout* gridLayout = new QGridLayout(group2D);
+  //toptopLayout->addLayout(gridLayout);
 
   mLevelWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DLevel), gridLayout, 0);
   mWindowWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DWindow), gridLayout, 1);

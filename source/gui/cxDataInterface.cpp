@@ -151,7 +151,7 @@ void SliderGroupWidget::dataChanged()
   mSlider->setDoubleRange(mData->getValueRange()); // in case the image is changed
 
   ssc::DoubleRange range = mData->getValueRange();
-  std::cout << "SliderGroup::dataChanged() " << range.min() << "," << range.max() << "," << range.step() << std::endl;
+  //std::cout << "SliderGroup::dataChanged() " << range.min() << "," << range.max() << "," << range.step() << std::endl;
   mSlider->setDoubleValue(mData->getValue());
   mEdit->setDoubleValue(mData->getValue());
 }
