@@ -33,7 +33,7 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 
   mLevel =  getScalarMax() *0.15;
   mWindow = getScalarMax() *0.5;
-	std::cout << "mLevel: " << mLevel << ", mWindow: " << mWindow << std::endl;
+//	std::cout << "mLevel: " << mLevel << ", mWindow: " << mWindow << std::endl;
 
 	mOutputLUT = vtkLookupTablePtr::New();
 

@@ -5,8 +5,86 @@
 namespace ssc
 {
 
-SlicePlane::SlicePlane(const Vector3D& c_, const Vector3D& i_, const Vector3D& j_) : 
-	c(c_), i(i_), j(j_) 
+
+///**Initialize the computer with reasonable defaults.
+// */
+//SliceData::SliceData() :
+//  mOrientType(otORTHOGONAL),
+//  mPlaneType(ptAXIAL),
+//  mFollowType(ftFIXED_CENTER),
+////  mFixedCenter(Vector3D(0,0,0)),
+////  mToolOffset(0.0),
+//  mUseGravity(false),
+//  mGravityDirection(Vector3D(0,0,-1)) ,
+//  mUseViewOffset(false),
+//  mViewportHeight(1),
+//  mViewOffset(0.5)
+//{
+//}
+//
+///**Group the typical plane definition uses together.
+// */
+//void SliceData::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
+//{
+//  setPlane(plane);
+//  //Logger::log("vm.log"," set plane to proxy ");
+//  if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
+//  {
+//    setOrientation(ssc::otORTHOGONAL);
+//    setFollowType(ssc::ftFIXED_CENTER);
+//  }
+//  else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+//  {
+//    setOrientation(ssc::otOBLIQUE);
+//    setFollowType(ssc::ftFOLLOW_TOOL);
+//
+//    setGravity(useGravity, gravityDir);
+//    setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
+//  }
+//}
+//
+///**Switch an existing plane definition to its dual definition, i.e.
+// * Axial<->Radial
+// * Coronal<->Any
+// * Sagittal<->Dual
+// * Use initializeFromPlane() to set connected parameters.
+// */
+//void SliceData::switchOrientationMode(ORIENTATION_TYPE type)
+//{
+//  if (type==mOrientType)
+//    return; // no change
+//
+//  PLANE_TYPE newType = mPlaneType;
+//
+//  if (type==otOBLIQUE) // ACS->ADR
+//  {
+//    switch (mPlaneType)
+//    {
+//    case ptSAGITTAL : newType = ptSIDEPLANE;
+//    case ptCORONAL  : newType = ptANYPLANE;
+//    case ptAXIAL    : newType = ptRADIALPLANE;
+//    }
+//  }
+//  else if (type==otORTHOGONAL)
+//  {
+//    switch (mPlaneType)
+//    {
+//    case ptSIDEPLANE   : newType = ptSAGITTAL;
+//    case ptANYPLANE    : newType = ptCORONAL;
+//    case ptRADIALPLANE : newType = ptAXIAL;
+//    }
+//  }
+//
+//  initializeFromPlane(newPlane, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset);
+//}
+
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+
+
+SlicePlane::SlicePlane(const Vector3D& c_, const Vector3D& i_, const Vector3D& j_) :
+	c(c_), i(i_), j(j_)
 {
 }
 
@@ -42,6 +120,73 @@ SliceComputer::SliceComputer() :
 SliceComputer::~SliceComputer()
 {
 }
+
+/**Group the typical plane definition uses together.
+ */
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
+{
+  setPlaneType(plane);
+  //Logger::log("vm.log"," set plane to proxy ");
+  if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
+  {
+    setOrientationType(ssc::otORTHOGONAL);
+    setFollowType(ssc::ftFIXED_CENTER);
+  }
+  else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+  {
+    setOrientationType(ssc::otOBLIQUE);
+    setFollowType(ssc::ftFOLLOW_TOOL);
+
+    setGravity(useGravity, gravityDir);
+    setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
+  }
+}
+
+/**Switch an existing plane definition to its dual definition, i.e.
+ * Axial<->Radial
+ * Coronal<->Any
+ * Sagittal<->Dual
+ * Use initializeFromPlane() to set connected parameters.
+ */
+void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
+{
+  if (type==mOrientType)
+    return; // no change
+
+  PLANE_TYPE newType = mPlaneType;
+
+  if (type==otOBLIQUE) // ACS->ADR
+  {
+    switch (mPlaneType)
+    {
+    case ptSAGITTAL : newType = ptSIDEPLANE; break;
+    case ptCORONAL  : newType = ptANYPLANE; break;
+    case ptAXIAL    : newType = ptRADIALPLANE; break;
+    }
+  }
+  else if (type==otORTHOGONAL)
+  {
+    switch (mPlaneType)
+    {
+    case ptSIDEPLANE   : newType = ptSAGITTAL; break;
+    case ptANYPLANE    : newType = ptCORONAL; break;
+    case ptRADIALPLANE : newType = ptAXIAL; break;
+    }
+  }
+
+  initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset);
+}
+
+ORIENTATION_TYPE SliceComputer::getOrientationType() const
+{
+  return mOrientType;
+}
+
+PLANE_TYPE SliceComputer::getPlaneType() const
+{
+  return mPlaneType;
+}
+
 
 /**Set the position of the navigation tool, using the
  * standard definition of a tool transform (given in ssc::Tool).
@@ -140,17 +285,18 @@ SlicePlane SliceComputer::getPlane()  const
 	// this is the behaviour of LabView-Sonowand.
 	plane = applyBasisOffset(plane);
 	
+	// NOTE: generateBasisVectors and applyBasisOffset can probably be merged. The
+	//       reason they are separate are that in a previous version applyBasisOffset()
+	//       were applied _after_ orientToGravity()
 	
-	if (mUseGravity)
-	{
-		plane = orientToGravity(plane);
-	}		
+  plane = orientToGravity(plane);
 	
+	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo
-	if (mOrientType==otORTHOGONAL) // is this algo applicable for oblique views?
-	{
+	//if (mOrientType==otORTHOGONAL) // is this algo applicable for oblique views?
+	//{
 		plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
-	}	
+	//}
 	
 //	// transform into the final plane (dont transform the center)
 //	plane = applyBasisOffset(plane);

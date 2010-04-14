@@ -119,21 +119,34 @@ void SliceProxy::centerChangedSlot()
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
-	setPlane(plane);
-	//Logger::log("vm.log"," set plane to proxy ");
-	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
-	{
-		setOrientation(ssc::otORTHOGONAL);
-		setFollowType(ssc::ftFIXED_CENTER);
-	}
-	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
-	{
-		setOrientation(ssc::otOBLIQUE);
-		setFollowType(ssc::ftFOLLOW_TOOL);
-		
-		setGravity(useGravity, gravityDir);
-		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one		
-	}
+  mCutplane.initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset);
+  changed();
+//	setPlane(plane);
+//	//Logger::log("vm.log"," set plane to proxy ");
+//	if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
+//	{
+//		setOrientation(ssc::otORTHOGONAL);
+//		setFollowType(ssc::ftFIXED_CENTER);
+//	}
+//	else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
+//	{
+//		setOrientation(ssc::otOBLIQUE);
+//		setFollowType(ssc::ftFOLLOW_TOOL);
+//
+//		setGravity(useGravity, gravityDir);
+//		setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
+//	}
+}
+
+SliceComputer SliceProxy::getComputer() const
+{
+  return mCutplane;
+}
+
+void SliceProxy::setComputer(const SliceComputer& val)
+{
+  mCutplane = val;
+  changed();
 }
 
 void SliceProxy::setOrientation(ORIENTATION_TYPE orientation)

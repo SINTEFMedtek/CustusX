@@ -127,6 +127,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscGLHelpers.cpp
     Utilities/sscGLHelpers.h
     Utilities/sscEnumConverter.h
+    Utilities/sscDefinitions.cpp
     sscView.cpp
     sscView.h
     Rep/sscRep.h

@@ -1,13 +1,16 @@
 #ifndef SSCDEFINITIONS_H_
 #define SSCDEFINITIONS_H_
 
+#include "sscEnumConverter.h"
+
 namespace ssc
 {
 
 	enum ORIENTATION_TYPE
 	{
 		otOBLIQUE,   ///< orient planes relative to the tool space 
-		otORTHOGONAL ///< orient planes relative to the image/reference space.
+		otORTHOGONAL, ///< orient planes relative to the image/reference space.
+		otCOUNT
 	};
 	enum PLANE_TYPE
 	{
@@ -23,7 +26,14 @@ namespace ssc
 	enum FOLLOW_TYPE
 	{
 		ftFOLLOW_TOOL, ///< center follows tool
-		ftFIXED_CENTER ///< center is set.
+		ftFIXED_CENTER, ///< center is set.
+		ftCOUNT
 	};
 } //namespace end
+
+SNW_DECLARE_ENUM_STRING_CONVERTERS(ssc, ORIENTATION_TYPE);
+SNW_DECLARE_ENUM_STRING_CONVERTERS(ssc, PLANE_TYPE);
+SNW_DECLARE_ENUM_STRING_CONVERTERS(ssc, FOLLOW_TYPE);
+
+
 #endif /*SSCDEFINITIONS_H_*/

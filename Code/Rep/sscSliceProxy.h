@@ -37,6 +37,9 @@ public:
 	void setToolViewportHeight(double viewportHeight);
 	void setDefaultCenter(const Vector3D& c);
 	
+	SliceComputer getComputer() const;
+	void setComputer(const SliceComputer& val);
+
 	ToolPtr getTool();
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	void printSelf(std::ostream & os, Indent indent);
