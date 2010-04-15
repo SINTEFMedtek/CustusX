@@ -17,7 +17,7 @@
 namespace cx
 {
 
-std::string planeToString(ssc::PLANE_TYPE val);
+//std::string planeToString(ssc::PLANE_TYPE val);
 
 
 /** Wrapper for a View2D.

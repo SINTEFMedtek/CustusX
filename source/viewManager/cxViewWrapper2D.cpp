@@ -25,20 +25,20 @@
 namespace cx
 {
 
-std::string planeToString(ssc::PLANE_TYPE val)
-{
-  switch (val)
-  {
-  case ssc::ptNOPLANE      : return "";
-  case ssc::ptSAGITTAL     : return "Sagittal";
-  case ssc::ptCORONAL      : return "Coronal";
-  case ssc::ptAXIAL        : return "Axial";
-  case ssc::ptANYPLANE     : return "Any";
-  case ssc::ptSIDEPLANE    : return "Side";
-  case ssc::ptRADIALPLANE  : return "Radial";
-  default                  : return "";
-  }
-}
+//std::string planeToString(ssc::PLANE_TYPE val)
+//{
+//  switch (val)
+//  {
+//  case ssc::ptNOPLANE      : return "";
+//  case ssc::ptSAGITTAL     : return "Sagittal";
+//  case ssc::ptCORONAL      : return "Coronal";
+//  case ssc::ptAXIAL        : return "Axial";
+//  case ssc::ptANYPLANE     : return "Any";
+//  case ssc::ptSIDEPLANE    : return "Side";
+//  case ssc::ptRADIALPLANE  : return "Radial";
+//  default                  : return "";
+//  }
+//}
 
 
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
@@ -228,7 +228,7 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
 //  mPlaneType = plane;
   mOrientationAnnotationRep->setPlaneType(plane);
-  mPlaneTypeText->setText(0, planeToString(plane));
+  mPlaneTypeText->setText(0, string_cast(plane));
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
 }
 
@@ -244,7 +244,7 @@ void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
 
   ssc::PLANE_TYPE plane = computer.getPlaneType();
   mOrientationAnnotationRep->setPlaneType(plane);
-  mPlaneTypeText->setText(0, planeToString(plane));
+  mPlaneTypeText->setText(0, string_cast(plane));
   mSliceProxy->setComputer(computer);
 }
 
