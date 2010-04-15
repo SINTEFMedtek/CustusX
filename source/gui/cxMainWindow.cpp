@@ -559,9 +559,6 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
   QDomNode patientNode = doc.namedItem("patient");
   QDomNode managerNode = patientNode.namedItem("managers");
 
-  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-  viewManager()->parseXml(viewmanagerNode);
-
   //Evaluate the xml nodes and load what's needed
   QDomNode dataManagerNode = managerNode.namedItem("datamanager");
   if(!patientNode.isNull())
@@ -583,6 +580,7 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
   QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
   toolManager()->parseXml(toolmanagerNode);
 
+  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
   viewManager()->parseXml(managerNode.namedItem("viewManager"));
 }
 
