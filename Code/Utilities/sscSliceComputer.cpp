@@ -5,84 +5,6 @@
 namespace ssc
 {
 
-
-///**Initialize the computer with reasonable defaults.
-// */
-//SliceData::SliceData() :
-//  mOrientType(otORTHOGONAL),
-//  mPlaneType(ptAXIAL),
-//  mFollowType(ftFIXED_CENTER),
-////  mFixedCenter(Vector3D(0,0,0)),
-////  mToolOffset(0.0),
-//  mUseGravity(false),
-//  mGravityDirection(Vector3D(0,0,-1)) ,
-//  mUseViewOffset(false),
-//  mViewportHeight(1),
-//  mViewOffset(0.5)
-//{
-//}
-//
-///**Group the typical plane definition uses together.
-// */
-//void SliceData::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
-//{
-//  setPlane(plane);
-//  //Logger::log("vm.log"," set plane to proxy ");
-//  if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
-//  {
-//    setOrientation(ssc::otORTHOGONAL);
-//    setFollowType(ssc::ftFIXED_CENTER);
-//  }
-//  else if (plane == ptANYPLANE || plane==ptRADIALPLANE || plane==ptSIDEPLANE)
-//  {
-//    setOrientation(ssc::otOBLIQUE);
-//    setFollowType(ssc::ftFOLLOW_TOOL);
-//
-//    setGravity(useGravity, gravityDir);
-//    setToolViewOffset(useViewOffset, viewportHeight, toolViewOffset); // TODO finish this one
-//  }
-//}
-//
-///**Switch an existing plane definition to its dual definition, i.e.
-// * Axial<->Radial
-// * Coronal<->Any
-// * Sagittal<->Dual
-// * Use initializeFromPlane() to set connected parameters.
-// */
-//void SliceData::switchOrientationMode(ORIENTATION_TYPE type)
-//{
-//  if (type==mOrientType)
-//    return; // no change
-//
-//  PLANE_TYPE newType = mPlaneType;
-//
-//  if (type==otOBLIQUE) // ACS->ADR
-//  {
-//    switch (mPlaneType)
-//    {
-//    case ptSAGITTAL : newType = ptSIDEPLANE;
-//    case ptCORONAL  : newType = ptANYPLANE;
-//    case ptAXIAL    : newType = ptRADIALPLANE;
-//    }
-//  }
-//  else if (type==otORTHOGONAL)
-//  {
-//    switch (mPlaneType)
-//    {
-//    case ptSIDEPLANE   : newType = ptSAGITTAL;
-//    case ptANYPLANE    : newType = ptCORONAL;
-//    case ptRADIALPLANE : newType = ptAXIAL;
-//    }
-//  }
-//
-//  initializeFromPlane(newPlane, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset);
-//}
-
-/// -------------------------------------------------------
-/// -------------------------------------------------------
-/// -------------------------------------------------------
-
-
 SlicePlane::SlicePlane(const Vector3D& c_, const Vector3D& i_, const Vector3D& j_) :
 	c(c_), i(i_), j(j_)
 {
@@ -126,7 +48,7 @@ SliceComputer::~SliceComputer()
 void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
   setPlaneType(plane);
-  //Logger::log("vm.log"," set plane to proxy ");
+
   if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
   {
     setOrientationType(ssc::otORTHOGONAL);
@@ -272,59 +194,26 @@ SlicePlane SliceComputer::getPlane()  const
 	plane.j = basis.second;	
 	plane.c = Vector3D(0,0,mToolOffset);
 	
+  // transform position from tool to reference space
 	plane.c = m_rMt.coord(plane.c);
-	// transform from tool to reference space
+	// transform orientation from tool to reference space for the oblique case only
 	if (mOrientType==otOBLIQUE)
 	{
-		//plane.c = Vector3D(0,0,mOffset+mAnyPlaneCenterOffset);
 		plane.i = m_rMt.vector(plane.i);
 		plane.j = m_rMt.vector(plane.j);		
 	}
 
-	// apply basis offset _before_ applying gravity
-	// this is the behaviour of LabView-Sonowand.
-	plane = applyBasisOffset(plane);
-	
-	// NOTE: generateBasisVectors and applyBasisOffset can probably be merged. The
-	//       reason they are separate are that in a previous version applyBasisOffset()
-	//       were applied _after_ orientToGravity()
-	
+	// orient planes so that gravity is down
   plane = orientToGravity(plane);
 	
 	// try to to this also for oblique views, IF the ftFIXED_CENTER is set.
 	// use special acs centermod algo
-	//if (mOrientType==otORTHOGONAL) // is this algo applicable for oblique views?
-	//{
-		plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
-	//}
+  plane.c = generateFixedIJCenter(mFixedCenter, plane.c, plane.i, plane.j);
 	
-//	// transform into the final plane (dont transform the center)
-//	plane = applyBasisOffset(plane);
-	
+  // set center so that it is a fixed distance from viewport top
 	plane = applyViewOffset(plane);
 		
 	return plane; 
-}
-
-/**Apply offsets from the initial plane definition.
- * This offset is applied in the local space of the plane (base),
- * thus we apply a similarity transform the the basis offset.
- */
-SlicePlane SliceComputer::applyBasisOffset(const SlicePlane& base) const
-{
-	SlicePlane retval = base;
-	Transform3D offset = generateBasisOffset();
-	
-	Vector3D local_x = base.i;
-	Vector3D local_y = cross(base.i, base.j);
-	Transform3D gMl = createTransformIJC(local_x, local_y, Vector3D(0,0,0)).inv(); // relation base to global
-	Transform3D offsetGlobal = gMl.inv() * offset * gMl;
-	
-	retval.i = offsetGlobal.vector(base.i); 
-	retval.j = offsetGlobal.vector(base.j);
-	//	plane.i = offset.vector(plane.i); 
-	//	plane.j = offset.vector(plane.j);
-	return retval;
 }
 
 /**Apply the view offset which is defined as follows:
@@ -365,30 +254,13 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
 	case ptAXIAL:       return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0,-1, 0)); 
 	case ptCORONAL:     return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0, 1)); 
 	case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1)); 
-	case ptANYPLANE:      
-	case ptSIDEPLANE:    
-	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
-//	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1)); 
-//	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1)); 
-//	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
+	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
+	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
 	default:
 		throw std::exception();
 	}
 }
-
-/** generate a transform relating the basis plane to the real plane used.
- */
-Transform3D SliceComputer::generateBasisOffset() const
-{
-	switch (mPlaneType)
-	{
-	case ptSIDEPLANE:   return createTransformRotateZ(-M_PI/2); 
-	case ptRADIALPLANE: return createTransformRotateX(-M_PI/2);
-	default:
-		return Transform3D();
-	}
-}
-
 
 /**Generate a viewdata containing a slice that always keeps the center 
  * of the observed image at center, but the z-component varies according 
@@ -421,9 +293,6 @@ Vector3D SliceComputer::generateFixedIJCenter(const Vector3D& center_r, const Ve
  *   i' = -g x k
  *   j' =  k x i'
  * 
- * (If the input j vector point upwards, we flip gravity so that the image dont flip.
- * - removed, did not work.)
- * 
  * When k and g points in the same direction, the calculations gets unstable. 
  * In this case we use the input i,j definition. There is a gradual shift between
  * these two definitions as we approach the singularity.
@@ -439,21 +308,7 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	const Vector3D k = cross(base.i, base.j); // plane normal. Constant
 	Vector3D up;
 	up = -mGravityDirection; // normal case
-	
-	// this did not work out well. Fails when k vector isperpendicular to gravity.
-	// I dont think a good solution exist - be simple instead.
-////	//std::cout << "base: \n" << base << std::endl;
-////	// find the up direction. This removes flips.
-//	if (dot(base.j, -mGravityDirection) > 0.0)
-//	{
-//		up = -mGravityDirection; // normal case
-//	}
-//	else
-//	{
-//		std::cout << " fliPP! " << std::endl;
-//		up = mGravityDirection;	// flipped case
-//	}
-	
+
 	// weight of nongravity, 0=<w=<1, 1 means dont use gravity
 	double w_n = dot(up, k); 
 	w_n = w_n*w_n; // square to keep stability near normal use.
@@ -461,14 +316,6 @@ SlicePlane SliceComputer::orientToGravity(const SlicePlane& base) const
 	Vector3D i_g = cross(up, k); //  |i_g| varies from 0 to 1 depending on 1-w_n
 	Vector3D i_n = base.i; // |i_n|==1
 	
-//	std::cout << "-------------------" << std::endl;
-//	std::cout << "mGravityDirection\t" << mGravityDirection   << std::endl;
-//	std::cout << "up\t" << up   << std::endl;
-//	std::cout << "w_n\t" << w_n   << std::endl;
-//	std::cout << "i\t" << base.i   << std::endl;
-//	std::cout << "j\t" << base.j   << std::endl;
-//	std::cout << "k\t" << k   << std::endl;
-//	std::cout << "-------------------" << std::endl;
 	
 	// set i vector to a weighted mean of the two definitions
 	// can also experiment with a tanh function or simply a linear interpolation

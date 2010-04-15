@@ -60,29 +60,6 @@ bool similar(const SlicePlane& a, const SlicePlane& b);
 class SliceComputer
 {
 public:
-	
-	/* This enums is plaeced in a Definition files*/
-//	enum ORIENTATION_TYPE
-//	{
-//		otOBLIQUE,   ///< orient planes relative to the tool space 
-//		otORTHOGONAL ///< orient planes relative to the image/reference space.
-//	};
-//	enum PLANE_TYPE
-//	{
-//		ptSAGITTAL,   ///< a slice seen from the side of the patient
-//		ptCORONAL,    ///< a slice seen from the front of the patient
-//		ptAXIAL,      ///< a slice seen from the top of the patient
-//		ptANYPLANE,   ///< a plane aligned with the tool base plane
-//		ptSIDEPLANE,  ///< z-rotated 90* relative to anyplane (dual anyplane)
-//		ptRADIALPLANE ///< y-rotated 90* relative to anyplane (bird's view)
-//	};
-//	enum FOLLOW_TYPE
-//	{
-//		ftFOLLOW_TOOL, ///< center follows tool
-//		ftFIXED_CENTER ///< center is set.
-//	};
-	
-public:
 	SliceComputer();
 	~SliceComputer();
 	void setToolPosition(const Transform3D& rMt);
@@ -105,8 +82,6 @@ private:
 	std::pair<Vector3D,Vector3D> generateBasisVectors() const;
 	Vector3D generateFixedIJCenter(const Vector3D& center_r, const Vector3D& cross_r, const Vector3D& i, const Vector3D& j) const;
 	SlicePlane orientToGravity(const SlicePlane& base) const;
-	Transform3D generateBasisOffset() const;
-	SlicePlane applyBasisOffset(const SlicePlane& base) const;
 	SlicePlane applyViewOffset(const SlicePlane& base) const;
 
 private:
