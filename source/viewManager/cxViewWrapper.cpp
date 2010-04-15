@@ -65,14 +65,6 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   this->checkFromContextMenu(theAction, theActionGroup);
 }
 
-/*void ViewWrapper::connectContextMenu()
-{
-  for(unsigned int i=0;i<mViews.size();++i)
-  {
-    connectContextMenu(mViews[i]);
-  }
-}*/
-
 void ViewWrapper::connectContextMenu(ssc::View* view)
 {
    connect(view, SIGNAL(customContextMenuRequested(const QPoint &)),

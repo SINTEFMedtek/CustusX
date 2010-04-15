@@ -49,22 +49,28 @@ public:
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
+  double getZoom2D();
+
+signals:
+  void viewGroupZoom2DChanged(double newZoom);
+
+public slots:
+  void zoom2DChangeSlot(double newZoom);
 
 private slots:
   void activateManualToolSlot();
-  void zoom2DChangeSlot(double newZoom);
   void activeImageChangeSlot();
 
 protected:
+  //zoom2d is the same for all viewwrapper2ds in a viewgroup
   void setZoom2D(double newZoom);
 
   std::vector<ssc::View*> mViews;
 
   ssc::ImagePtr mImage;
-  double mZoomFactor2D;
   std::vector<ViewWrapperPtr> mElements;
 };
-
+bool isViewWrapper2D(ViewWrapperPtr wrapper);
 } // namespace cx
 
 #endif /* CXVIEWGROUP_H_ */

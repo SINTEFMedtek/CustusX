@@ -8,6 +8,7 @@
 #include "cxViewWrapper2D.h"
 #include <vector>
 #include <vtkRenderWindow.h>
+#include "sscUtilHelpers.h"
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscSliceProxy.h"
@@ -18,6 +19,7 @@
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxMessageManager.h"
+#include "cxViewManager.h"
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 #include "cxToolManager.h"
@@ -43,12 +45,11 @@ namespace cx
 
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
     mOrientationActionGroup(new QActionGroup(view)),
-    mGlobal2DZoomActionGroup(new QActionGroup(view)),
-    mGlobal2DZoom(true)
+    mGlobal2DZoomActionGroup(new QActionGroup(view))
 {
   mView = view;
   this->connectContextMenu(mView);
-  mZoomFactor = 0.5;
+  mZoomFactor = 0;
 
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
@@ -83,7 +84,7 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 
   QAction* global2DZoomAction = new QAction("Global 2D Zoom", &contextMenu);
   global2DZoomAction->setCheckable(true);
-  global2DZoomAction->setChecked(mGlobal2DZoom);
+  global2DZoomAction->setChecked(viewManager()->getGlobal2DZoom());
   mGlobal2DZoomActionGroup->addAction(global2DZoomAction);
 
   contextMenu.addSeparator();
@@ -108,9 +109,7 @@ void ViewWrapper2D::checkFromContextMenu(QAction* theAction, QActionGroup* theAc
   else if(theActionGroup == mGlobal2DZoomActionGroup)
   {
     messageManager()->sendInfo("Clicked global 2D zoom!");
-    mGlobal2DZoom = !mGlobal2DZoom;
-    //TODO do something
-    //use theAction for something?
+    viewManager()->setGlobal2DZoom(!viewManager()->getGlobal2DZoom());
   }
 }
 
@@ -278,8 +277,22 @@ void ViewWrapper2D::dominantToolChangedSlot()
 
 void ViewWrapper2D::setZoom2D(double zoomFactor)
 {
+  zoomFactor = ssc::constrainValue(zoomFactor, 0.2, 10.0);
+
+  if(zoomFactor == mZoomFactor)
+    return;
+
   mZoomFactor = zoomFactor;
-  viewportChanged();
+  emit zoom2DChange(mZoomFactor);
+
+  //std::cout << "VIEWWRAPPER: zoom changed: " + string_cast(mZoomFactor) << std::endl;
+
+  this->viewportChanged();
+}
+
+double ViewWrapper2D::getZoom2D()
+{
+  return mZoomFactor;
 }
 
 /**Part of the mouse interactor:
@@ -304,8 +317,7 @@ void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
   val += event->delta()/120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
   double newZoom = pow(10.0, val);
 
-  // we cannot set zoom directly in this, since parent (viewgroup) manages zoom
-  emit zoom2DChange(newZoom);
+  this->setZoom2D(newZoom);
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)

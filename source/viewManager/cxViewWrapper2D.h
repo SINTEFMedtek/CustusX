@@ -34,9 +34,7 @@ public:
   virtual void removeImage(ssc::ImagePtr image);
   virtual ssc::View* getView();
   virtual void setZoom2D(double zoomFactor);
-
-/*protected slots:
-  virtual void contextMenuSlot(const QPoint& point);*/
+  virtual double getZoom2D();
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -72,8 +70,7 @@ private:
 
   QActionGroup* mOrientationActionGroup;
   QActionGroup* mGlobal2DZoomActionGroup;
-//  bool mOblique; //just for testing, remove when we have this functionality in sliceproxy
-  bool mGlobal2DZoom;
+
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
 

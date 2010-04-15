@@ -33,6 +33,7 @@ public:
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
+  virtual double getZoom2D(){return -1.0;};
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
