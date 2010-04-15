@@ -79,6 +79,9 @@ public:
   ssc::View* getActiveView() const; ///< returns the active view
   void setActiveView(ssc::View* view); ///< change the active view
 
+  void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
+  bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
+
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
   void parseXml(QDomNode viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
@@ -97,6 +100,7 @@ public slots:
 protected slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage);///< Update views when the current image is changed
   void renderAllViewsSlot(); ///< renders all views
+  void global2DZooming(double zoom);
 
 protected:
   ViewManager(); ///< create all needed views
@@ -143,15 +147,10 @@ protected:
   QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 
-  //typedef std::map<QString, ViewGroupPtr> ViewGroupMap;
-  //ViewGroupMap mViewGroups;
-  //ViewGroup3DPtr mViewGroup3D1;
-  //ViewGroup3DPtr mViewGroup3D2;
-  //ViewGroupInriaPtr mViewGroupInria1;
-  //ViewGroupInriaPtr mViewGroupInria2;
-  //ViewGroup2DPtr mViewGroup2D1;
-  //ViewGroup2DPtr mViewGroup2D2;
   std::vector<ViewGroupPtr> mViewGroups;
+
+  bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
+  bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
 
 private:
   ViewManager(ViewManager const&);

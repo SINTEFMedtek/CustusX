@@ -61,7 +61,9 @@ ViewManager::ViewManager() :
   mRenderingTimer(new QTimer(this)),
   mSettings(new QSettings()),
   mRenderingTime(new QTime()),
-  mNumberOfRenderings(0)
+  mNumberOfRenderings(0),
+  mGlobal2DZoom(true),
+  mGlobalObliqueOrientation(false)
 {
   mLayout->setSpacing(1);
   mMainWindowsCentralWidget->setLayout(mLayout);
@@ -134,7 +136,9 @@ ViewManager::ViewManager() :
           this, SLOT(renderAllViewsSlot()));
   
   mShadingOn = mSettings->value("shadingOn").toBool();
-  
+
+  this->setGlobal2DZoom(mGlobal2DZoom);
+
   mRenderingTime->start();
 }
 ViewManager::~ViewManager()
@@ -142,53 +146,8 @@ ViewManager::~ViewManager()
 
 std::string ViewManager::layoutText(LayoutType type)
 {
-
   return string_cast(type);
-//  switch (type)
-//  {
-//  case LAYOUT_NONE :          return "No_layout";
-//  case LAYOUT_3D_1X1 :        return "3D_1X1";
-//  case LAYOUT_3DACS_2X2 :     return "3DACS_2X2";
-//  case LAYOUT_3DACS_1X3 :     return "3DACS_1X3";
-//  case LAYOUT_ACSACS_2X3 :    return "ACSACS_2X3";
-//  case LAYOUT_3DACS_2X2_SNW : return "3DACS_2X2_SNW";
-//  case LAYOUT_3DAny_1X2_SNW : return "3DAny_1X2_SNW";
-//  case LAYOUT_ACSACS_2X3_SNW : return "ACSACS_2X3_SNW";
-//  default: return "Undefined layout";
-//  }
 }
-
-//ViewManager::LayoutType ViewManager::layoutTypeFromText(std::string text)
-//{
-//  if(text == "No_layout")
-//  {
-//    return LAYOUT_NONE;
-//  } else if(text == "3D_1X1")
-//  {
-//    return LAYOUT_3D_1X1;
-//  } else if(text == "3DACS_2X2")
-//  {
-//    return LAYOUT_3DACS_2X2;
-//  } else if(text == "3DACS_1X3")
-//  {
-//    return LAYOUT_3DACS_1X3;
-//  } else if(text == "ACSACS_2X3")
-//  {
-//    return LAYOUT_ACSACS_2X3;
-//  } else if(text == "3DACS_2X2_SNW")
-//  {
-//    return LAYOUT_3DACS_2X2_SNW;
-//  } else if(text == "3DAny_1X2_SNW")
-//  {
-//    return LAYOUT_3DAny_1X2_SNW;
-//  } else if (text == "ACSACS_2X3_SNW")
-//  {
-//    return LAYOUT_ACSACS_2X3_SNW;
-//  } else
-//  {
-//    return LAYOUT_NONE;
-//  }
-//}
 
 std::vector<LayoutType> ViewManager::availableLayouts() const
 {
@@ -238,11 +197,56 @@ void ViewManager::setActiveView(ssc::View* view)
   mActiveView = view;
   emit activeViewChanged();
 }
+/*void ViewManager::setGlobalOrientation(bool global)
+{
+  if(mGlobalObliqueOrientation == global)
+    return;
+
+  mGlobalObliqueOrientation = global;
+  if(mGlobalObliqueOrientation)
+  {}
+  else
+  {}
+}*/
+void ViewManager::setGlobal2DZoom(bool global)
+{
+  mGlobal2DZoom = global;
+  if(mGlobal2DZoom)
+  {
+    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
+    for(;it != mViewGroups.end(); ++it)
+    {
+      connect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
+              this, SLOT(global2DZooming(double)));
+    }
+    //messageManager()->sendInfo("GLOBAL ZOOMING IS ON");
+  }
+  else
+  {
+    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
+    for(;it != mViewGroups.end(); ++it)
+    {
+      disconnect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
+                this, SLOT(global2DZooming(double)));
+    }
+    //messageManager()->sendInfo("GLOBAL ZOOMING IS OFF");
+  }
+}
+
+bool ViewManager::getGlobal2DZoom()
+{
+  return mGlobal2DZoom;
+}
+
 void ViewManager::addXml(QDomNode& parentNode)
 {
   QDomDocument doc = parentNode.ownerDocument();
   QDomElement viewManagerNode = doc.createElement("viewManager");
   parentNode.appendChild(viewManagerNode);
+
+  QDomElement global2DZoomNode = doc.createElement("global2DZoom");
+  global2DZoomNode.appendChild(doc.createTextNode(string_cast(mGlobal2DZoom).c_str()));
+  viewManagerNode.appendChild(global2DZoomNode);
 
   QDomElement activeLayoutNode = doc.createElement("activeLayout");
   activeLayoutNode.appendChild(doc.createTextNode(layoutText(mActiveLayout).c_str()));
@@ -270,7 +274,15 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
   QDomNode child = viewmanagerNode.firstChild();
   while(!child.isNull())
   {
-    if(child.toElement().tagName() == "activeLayout")
+    if(child.toElement().tagName() == "global2DZoom")
+    {
+      std::cout << "Found global2DZoom tag." << std::endl;
+      const QString global2DZoomString = child.toElement().text();
+      if(!global2DZoomString.isEmpty() && global2DZoomString.toInt() == 0)
+        this->setGlobal2DZoom(false);
+      else
+        this->setGlobal2DZoom(true);
+    }else if(child.toElement().tagName() == "activeLayout")
     {
       //std::cout << "Found activeLayout tag." << std::endl;
       const QString activeLayoutString = child.toElement().text();
@@ -595,6 +607,17 @@ void ViewManager::renderAllViewsSlot()
   }
   else
     mNumberOfRenderings++;
+}
+void ViewManager::global2DZooming(double zoom)
+{
+  std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
+  for(;it != mViewGroups.end(); ++it)
+  {
+    //std::cout << "VIEWMANAGER: zoom global: " + string_cast(mGlobal2DZoom) << std::endl;
+    (*it)->blockSignals(true);
+    (*it)->zoom2DChangeSlot(zoom);
+    (*it)->blockSignals(false);
+  }
 }
 //void ViewManager::addXml(QDomNode& parentNode)
 //{

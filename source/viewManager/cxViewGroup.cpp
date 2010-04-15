@@ -17,7 +17,7 @@
 #include "cxMessageManager.h"
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
-#include "cxViewWrapper.h"
+#include "cxViewWrapper2D.h"
 
 namespace cx
 {
@@ -110,13 +110,10 @@ void Navigation::centerToTooltip()
 
 
 ViewGroup::ViewGroup()
-{
-  mZoomFactor2D = 0.5;
-}
+{}
 
 ViewGroup::~ViewGroup()
-{
-}
+{}
 
 /**Add one view wrapper and setup the necessary connections.
  */
@@ -133,20 +130,33 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
   connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
           this, SLOT(activeImageChangeSlot()));
 
-  connect(wrapper.get(), SIGNAL(zoom2DChange(double)), this, SLOT(zoom2DChangeSlot(double)));
+  connect(wrapper.get(), SIGNAL(zoom2DChange(double)),
+          this, SLOT(zoom2DChangeSlot(double)));
 }
 
 /**Set the zoom2D factor, only.
  */
 void ViewGroup::setZoom2D(double newZoom)
 {
-  mZoomFactor2D = newZoom;
-  mZoomFactor2D = ssc::constrainValue(mZoomFactor2D, 0.2, 10.0); // constrain zoom to a sensible interval
-
   for (unsigned i=0; i<mElements.size(); ++i)
   {
-    mElements[i]->setZoom2D(mZoomFactor2D);
+    mElements[i]->setZoom2D(newZoom);
   }
+
+  //std::cout << "VIEWGROUP: zoom changed: " + string_cast(newZoom) << std::endl;
+  emit viewGroupZoom2DChanged(this->getZoom2D());
+}
+
+double ViewGroup::getZoom2D()
+{
+  double zoom2D = 0.5; //dafault value if no viewwrapper2d exists in this viewgroup
+  std::vector<ViewWrapperPtr>::iterator it  = find_if(mElements.begin(), mElements.end(), cx::isViewWrapper2D);
+  if(it != mElements.end() && (*it))
+  {
+    zoom2D = (*it)->getZoom2D();
+  }
+
+  return zoom2D;
 }
 
 /**Called when a zoom change is requested from one view wrapper
@@ -155,7 +165,8 @@ void ViewGroup::setZoom2D(double newZoom)
 void ViewGroup::zoom2DChangeSlot(double newZoom)
 {
   Navigation().centerToTooltip(); // side effect: center on tool
-  setZoom2D(newZoom);
+
+  this->setZoom2D(newZoom);
 }
 
 void ViewGroup::activeImageChangeSlot()
@@ -224,8 +235,16 @@ void ViewGroup::addXml(QDomNode& dataNode)
   }
 
   QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
-  zoom2DNode.appendChild(doc.createTextNode(qstring_cast(mZoomFactor2D)));
+  zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
   dataNode.appendChild(zoom2DNode);
+}
+
+bool isViewWrapper2D(ViewWrapperPtr wrapper)
+{
+  if(wrapper->getZoom2D() != -1)
+    return true;
+  else
+    return false;
 }
 
 void ViewGroup::parseXml(QDomNode dataNode)
@@ -243,9 +262,9 @@ void ViewGroup::parseXml(QDomNode dataNode)
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;
-  zoom2D.toDouble(&ok);
-  if (ok)
-    this->setZoom2D(zoom2D.toDouble());
+  double zoom2Ddouble = zoom2D.toDouble(&ok);
+  if(ok)
+    this->setZoom2D(zoom2Ddouble);
   else
     messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
 }
