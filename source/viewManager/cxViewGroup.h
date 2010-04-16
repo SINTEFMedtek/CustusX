@@ -56,6 +56,8 @@ signals:
 
 public slots:
   void zoom2DChangeSlot(double newZoom);
+  void orientationChangedSlot(ssc::ORIENTATION_TYPE type);
+  void changeImage(QString imageUid);
 
 private slots:
   void activateManualToolSlot();

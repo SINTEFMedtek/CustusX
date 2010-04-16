@@ -44,8 +44,7 @@ namespace cx
 
 
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
-    mOrientationActionGroup(new QActionGroup(view)),
-    mGlobal2DZoomActionGroup(new QActionGroup(view))
+    mOrientationActionGroup(new QActionGroup(view))
 {
   mView = view;
   this->connectContextMenu(mView);
@@ -72,20 +71,27 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
   obliqueAction->setCheckable(true);
   obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
   obliqueAction->setChecked(getOrientationType()==ssc::otOBLIQUE);
+  connect(obliqueAction, SIGNAL(triggered()),
+          this, SLOT(orientationActionSlot()));
 
   QAction* ortogonalAction = new QAction("Ortogonal", &contextMenu);
   ortogonalAction->setCheckable(true);
   ortogonalAction->setData(qstring_cast(ssc::otORTHOGONAL));
   ortogonalAction->setChecked(getOrientationType()==ssc::otORTHOGONAL);
   //ortogonalAction->setChecked(true);
+  connect(ortogonalAction, SIGNAL(triggered()),
+          this, SLOT(orientationActionSlot()));
 
+  //TODO remove actiongroups?
   mOrientationActionGroup->addAction(obliqueAction);
   mOrientationActionGroup->addAction(ortogonalAction);
 
   QAction* global2DZoomAction = new QAction("Global 2D Zoom", &contextMenu);
   global2DZoomAction->setCheckable(true);
   global2DZoomAction->setChecked(viewManager()->getGlobal2DZoom());
-  mGlobal2DZoomActionGroup->addAction(global2DZoomAction);
+  //mGlobal2DZoomActionGroup->addAction(global2DZoomAction);
+  connect(global2DZoomAction, SIGNAL(triggered()),
+          this, SLOT(global2DZoomActionSlot()));
 
   contextMenu.addSeparator();
   contextMenu.addAction(obliqueAction);
@@ -94,23 +100,25 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addAction(global2DZoomAction);
 }
 
-void ViewWrapper2D::checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup)
+void ViewWrapper2D::orientationActionSlot()
 {
-  //messageManager()->sendInfo("ViewWrapper2D::checkFromContextMenu");
+  //messageManager()->sendInfo("ViewWrapper2D::orientationActionSlot()");
+  QAction* theAction = static_cast<QAction*>(sender());
+  if(!theAction)
+    return;
 
-  if(theActionGroup == mOrientationActionGroup)
-  {
-    //messageManager()->sendInfo("Clicked Oblique!");
-    //mOblique = !mOblique;
-    ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(string_cast(theAction->data().toString()));
-    //std::cout << "ortype: " << type << std::endl;
-    changeOrientationType(type);
-  }
-  else if(theActionGroup == mGlobal2DZoomActionGroup)
-  {
-    messageManager()->sendInfo("Clicked global 2D zoom!");
-    viewManager()->setGlobal2DZoom(!viewManager()->getGlobal2DZoom());
-  }
+  ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(string_cast(theAction->data().toString()));
+  this->changeOrientationType(type);
+}
+
+void ViewWrapper2D::global2DZoomActionSlot()
+{
+  //messageManager()->sendInfo("ViewWrapper2D::global2DZoomActionSlot()");
+  QAction* theAction = static_cast<QAction*>(sender());
+  if(!theAction)
+    return;
+
+  viewManager()->setGlobal2DZoom(!viewManager()->getGlobal2DZoom());
 }
 
 void ViewWrapper2D::addReps()
@@ -238,6 +246,9 @@ ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
 
 void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
 {
+  if(type == this->getOrientationType())
+    return;
+
   ssc::SliceComputer computer = mSliceProxy->getComputer();
   computer.switchOrientationMode(type);
 
@@ -245,6 +256,8 @@ void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
   mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, string_cast(plane));
   mSliceProxy->setComputer(computer);
+
+  emit orientationChanged(type);
 }
 
 ssc::View* ViewWrapper2D::getView()
@@ -262,6 +275,8 @@ void ViewWrapper2D::setImage(ssc::ImagePtr image)
 
   //update data name text rep
   mDataNameText->setText(0, image->getName());
+
+  emit imageChanged(image->getUid().c_str());
 }
 
 void ViewWrapper2D::removeImage(ssc::ImagePtr image)
@@ -359,10 +374,5 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 }
-
-
-
 //------------------------------------------------------------------------------
-
-
 }

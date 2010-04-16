@@ -124,14 +124,17 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
-
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activeImageChangeSlot()));
   connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
           this, SLOT(activeImageChangeSlot()));
 
+  connect(wrapper.get(), SIGNAL(imageChanged(QString)),
+          this, SLOT(changeImage(QString)));
   connect(wrapper.get(), SIGNAL(zoom2DChange(double)),
           this, SLOT(zoom2DChangeSlot(double)));
+  connect(wrapper.get(), SIGNAL(orientationChanged(ssc::ORIENTATION_TYPE)),
+          this, SLOT(orientationChangedSlot(ssc::ORIENTATION_TYPE)));
 }
 
 /**Set the zoom2D factor, only.
@@ -169,9 +172,29 @@ void ViewGroup::zoom2DChangeSlot(double newZoom)
   this->setZoom2D(newZoom);
 }
 
+void ViewGroup::orientationChangedSlot(ssc::ORIENTATION_TYPE type)
+{
+  std::vector<ViewWrapperPtr>::iterator it = mElements.begin();
+  for(;it != mElements.end();++it)
+  {
+    (*it)->changeOrientationType(type);
+  }
+}
+
+void ViewGroup::changeImage(QString imageUid)
+{
+  ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
+  if(!image)
+  {
+    messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
+    return;
+  }
+  this->setImage(image);
+}
+
 void ViewGroup::activeImageChangeSlot()
 {
-  messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
+  //messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
   dataManager()->setActiveImage(mImage);
 }
 

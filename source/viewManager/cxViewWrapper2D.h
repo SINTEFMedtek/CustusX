@@ -35,6 +35,7 @@ public:
   virtual ssc::View* getView();
   virtual void setZoom2D(double zoomFactor);
   virtual double getZoom2D();
+  virtual void changeOrientationType(ssc::ORIENTATION_TYPE type);
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -42,10 +43,11 @@ private slots:
   void showSlot();
   void mousePressSlot(QMouseEvent* event);
   void mouseWheelSlot(QWheelEvent* event);
+  void orientationActionSlot();
+  void global2DZoomActionSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
-  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup);
   void addReps();
   ssc::DoubleBoundingBox3D getViewport() const;
   ssc::Transform3D get_vpMs() const;
@@ -53,7 +55,6 @@ private:
   void moveAxisPos(ssc::Vector3D click_vp);
 
   ssc::ORIENTATION_TYPE getOrientationType() const;
-  void changeOrientationType(ssc::ORIENTATION_TYPE type);
 
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
@@ -69,7 +70,6 @@ private:
   ssc::View* mView;
 
   QActionGroup* mOrientationActionGroup;
-  QActionGroup* mGlobal2DZoomActionGroup;
 
 };
 typedef boost::shared_ptr<ViewWrapper2D> ViewWrapper2DPtr;
