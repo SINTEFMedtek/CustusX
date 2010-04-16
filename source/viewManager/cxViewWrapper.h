@@ -32,17 +32,20 @@ public:
   virtual ssc::View* getView() = 0;
   virtual void setZoom2D(double zoomFactor) {}
   virtual double getZoom2D() = 0;
+  virtual void changeOrientationType(ssc::ORIENTATION_TYPE type){};
 
 signals:
   void zoom2DChange(double newZoom);
+  void orientationChanged(ssc::ORIENTATION_TYPE type);
+  void imageChanged(QString uid);
 
 protected slots:
   void contextMenuSlot(const QPoint& point);
+  void imageActionSlot(); ///< triggered when an imageaction is selected in the contextmenu
 
 protected:
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
-  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup) = 0;
 };
 typedef boost::shared_ptr<ViewWrapper> ViewWrapperPtr;
 
