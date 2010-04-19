@@ -23,6 +23,7 @@
 #include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 #include "cxToolManager.h"
+#include "cxViewGroup.h"
 
 namespace cx
 {
@@ -48,13 +49,16 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 {
   mView = view;
   this->connectContextMenu(mView);
-  mZoomFactor = 0;
+  //mZoomFactor = 0;
+  setZoom2D(SyncedValue::create(1));
 
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
   mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
   addReps();
+
+  setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
   connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
@@ -108,7 +112,9 @@ void ViewWrapper2D::orientationActionSlot()
     return;
 
   ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(string_cast(theAction->data().toString()));
-  this->changeOrientationType(type);
+  //messageManager()->sendInfo("ViewWrapper2D::orientationActionSlot():" + string_cast(type));
+  mOrientationMode->set(type);
+//  this->changeOrientationType(type);
 }
 
 void ViewWrapper2D::global2DZoomActionSlot()
@@ -182,7 +188,7 @@ void ViewWrapper2D::viewportChanged()
     return;
 //  std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
 
-  double parallelScale = mView->heightMM() / 2.0 / mZoomFactor;
+  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
   mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
   //std::cout << "ViewWrapper2D::viewportChanged(): zoom:" << mZoomFactor << ", parallelScale:" << parallelScale << ", " << planeToString(mPlaneType) <<  std::endl;
 
@@ -237,6 +243,9 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
   mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, string_cast(plane));
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
+
+  // do this to force sync global and local type - must think on how we want this to work
+  this->changeOrientationType(getOrientationType());
 }
 
 ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
@@ -244,9 +253,16 @@ ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
   return mSliceProxy->getComputer().getOrientationType();
 }
 
-void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
+void ViewWrapper2D::orientationModeChanged()
 {
+//  changeOrientationType(static_cast<ssc::ORIENTATION_TYPE>(mOrientationMode->get().toInt()));
+//std::cout << "mOrientationModeChanbgedslot" << std::endl;
+
+  ssc::ORIENTATION_TYPE type = static_cast<ssc::ORIENTATION_TYPE>(mOrientationMode->get().toInt());
+
   if(type == this->getOrientationType())
+    return;
+  if (!mSliceProxy)
     return;
 
   ssc::SliceComputer computer = mSliceProxy->getComputer();
@@ -256,8 +272,11 @@ void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
   mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, string_cast(plane));
   mSliceProxy->setComputer(computer);
+}
 
-  emit orientationChanged(type);
+void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
+{
+  mOrientationMode->set(type);
 }
 
 ssc::View* ViewWrapper2D::getView()
@@ -290,24 +309,53 @@ void ViewWrapper2D::dominantToolChangedSlot()
   mSliceProxy->setTool(dominantTool);
 }
 
-void ViewWrapper2D::setZoom2D(double zoomFactor)
+void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)
+{
+  if (mOrientationMode)
+    disconnect(mOrientationMode.get(), SIGNAL(changed()), this, SLOT(orientationModeChanged()));
+  mOrientationMode = value;
+  if (mOrientationMode)
+    connect(mOrientationMode.get(), SIGNAL(changed()), this, SLOT(orientationModeChanged()));
+
+  orientationModeChanged();
+}
+
+
+void ViewWrapper2D::setZoom2D(SyncedValuePtr value)
+{
+  if (mZoom2D)
+    disconnect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
+  mZoom2D = value;
+  if (mZoom2D)
+    connect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
+}
+
+//void ViewWrapper2D::zoom2DChangedSlot()
+//{
+//  //std::cout << "called ViewWrapper2D::zoom2DChangedSlot()" << std::endl;
+//  this->viewportChanged();
+//}
+
+void ViewWrapper2D::setZoomFactor2D(double zoomFactor)
 {
   zoomFactor = ssc::constrainValue(zoomFactor, 0.2, 10.0);
 
-  if(zoomFactor == mZoomFactor)
-    return;
+//  if(zoomFactor == mZoomFactor)
+//    return;
 
-  mZoomFactor = zoomFactor;
-  emit zoom2DChange(mZoomFactor);
+  mZoom2D->set(zoomFactor);
 
-  //std::cout << "VIEWWRAPPER: zoom changed: " + string_cast(mZoomFactor) << std::endl;
-
-  this->viewportChanged();
+//  mZoomFactor = zoomFactor;
+//  emit zoom2DChange(mZoomFactor);
+//
+//  //std::cout << "VIEWWRAPPER: zoom changed: " + string_cast(mZoomFactor) << std::endl;
+//
+//  this->viewportChanged();
 }
 
-double ViewWrapper2D::getZoom2D()
+double ViewWrapper2D::getZoomFactor2D() const
 {
-  return mZoomFactor;
+  return mZoom2D->get().toDouble();
 }
 
 /**Part of the mouse interactor:
@@ -328,11 +376,13 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
 void ViewWrapper2D::mouseWheelSlot(QWheelEvent* event)
 {
   // scale zoom in log space
-  double val = log10(mZoomFactor);
+  double val = log10(getZoomFactor2D());
   val += event->delta()/120.0 / 20.0; // 120 is normal scroll resolution, x is zoom resolution
   double newZoom = pow(10.0, val);
 
-  this->setZoom2D(newZoom);
+  this->setZoomFactor2D(newZoom);
+
+  Navigation().centerToTooltip(); // side effect: center on tool
 }
 
 /**Convert a position in Qt viewport space (pixels with origin in upper-left corner)

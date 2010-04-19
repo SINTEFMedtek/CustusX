@@ -51,12 +51,15 @@ public:
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
   double getZoom2D();
 
+  void setGlobal2DZoom(bool use, SyncedValuePtr val);
+  void syncOrientationMode(SyncedValuePtr val);
+
 signals:
-  void viewGroupZoom2DChanged(double newZoom);
+  //void viewGroupZoom2DChanged(double newZoom);
 
 public slots:
-  void zoom2DChangeSlot(double newZoom);
-  void orientationChangedSlot(ssc::ORIENTATION_TYPE type);
+  //void zoom2DChangeSlot(double newZoom);
+  //void orientationChangedSlot(ssc::ORIENTATION_TYPE type);
   void changeImage(QString imageUid);
 
 private slots:
@@ -68,6 +71,21 @@ protected:
   void setZoom2D(double newZoom);
 
   std::vector<ssc::View*> mViews;
+
+  struct SyncGroup
+  {
+    void activateGlobal(bool val)
+    {
+      if (val)
+        mActive = mGlobal;
+      else
+        mActive = mLocal;
+    }
+    SyncedValuePtr mGlobal;
+    SyncedValuePtr mLocal;
+    SyncedValuePtr mActive;
+  };
+  SyncGroup mZoom2D;
 
   ssc::ImagePtr mImage;
   std::vector<ViewWrapperPtr> mElements;

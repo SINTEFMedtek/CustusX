@@ -37,6 +37,7 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, LayoutType);
 namespace cx
 {
 
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
 /**
  * \class ViewManager
@@ -106,6 +107,8 @@ protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
 
+  void syncOrientationMode(SyncedValuePtr val);
+
 //  void centerToImageCenter();
 //  void centerToTooltip();
   void deactivateCurrentLayout();
@@ -151,6 +154,7 @@ protected:
 
   bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
   bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
+  SyncedValuePtr mGlobalZoom2DVal;
 
 private:
   ViewManager(ViewManager const&);
