@@ -110,7 +110,10 @@ void Navigation::centerToTooltip()
 
 
 ViewGroup::ViewGroup()
-{}
+{
+  mZoom2D.mLocal = SyncedValue::create(1.0);
+  mZoom2D.activateGlobal(false);
+}
 
 ViewGroup::~ViewGroup()
 {}
@@ -122,6 +125,8 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
   mViews.push_back(wrapper->getView());
   mElements.push_back(wrapper);
 
+  wrapper->setZoom2D(mZoom2D.mActive);
+
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
@@ -131,55 +136,77 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper.get(), SIGNAL(imageChanged(QString)),
           this, SLOT(changeImage(QString)));
-  connect(wrapper.get(), SIGNAL(zoom2DChange(double)),
-          this, SLOT(zoom2DChangeSlot(double)));
-  connect(wrapper.get(), SIGNAL(orientationChanged(ssc::ORIENTATION_TYPE)),
-          this, SLOT(orientationChangedSlot(ssc::ORIENTATION_TYPE)));
+//  connect(wrapper.get(), SIGNAL(zoom2DChange(double)),
+//          this, SLOT(zoom2DChangeSlot(double)));
+//  connect(wrapper.get(), SIGNAL(orientationChanged(ssc::ORIENTATION_TYPE)),
+//          this, SLOT(orientationChangedSlot(ssc::ORIENTATION_TYPE)));
+}
+
+
+void ViewGroup::setGlobal2DZoom(bool use, SyncedValuePtr val)
+{
+  mZoom2D.mGlobal = val;
+  mZoom2D.activateGlobal(use);
+
+  for (unsigned i=0; i<mElements.size(); ++i)
+    mElements[i]->setZoom2D(mZoom2D.mActive);
 }
 
 /**Set the zoom2D factor, only.
  */
 void ViewGroup::setZoom2D(double newZoom)
 {
-  for (unsigned i=0; i<mElements.size(); ++i)
-  {
-    mElements[i]->setZoom2D(newZoom);
-  }
-
-  //std::cout << "VIEWGROUP: zoom changed: " + string_cast(newZoom) << std::endl;
-  emit viewGroupZoom2DChanged(this->getZoom2D());
+  mZoom2D.mActive->set(newZoom);
+//  for (unsigned i=0; i<mElements.size(); ++i)
+//  {
+//    mElements[i]->setZoom2D(newZoom);
+//  }
+//
+//  //std::cout << "VIEWGROUP: zoom changed: " + string_cast(newZoom) << std::endl;
+//  emit viewGroupZoom2DChanged(this->getZoom2D());
 }
 
 double ViewGroup::getZoom2D()
 {
-  double zoom2D = 0.5; //dafault value if no viewwrapper2d exists in this viewgroup
-  std::vector<ViewWrapperPtr>::iterator it  = find_if(mElements.begin(), mElements.end(), cx::isViewWrapper2D);
-  if(it != mElements.end() && (*it))
-  {
-    zoom2D = (*it)->getZoom2D();
-  }
-
-  return zoom2D;
+  return mZoom2D.mActive->get().toDouble();
+//  double zoom2D = 0.5; //dafault value if no viewwrapper2d exists in this viewgroup
+//  std::vector<ViewWrapperPtr>::iterator it  = find_if(mElements.begin(), mElements.end(), cx::isViewWrapper2D);
+//  if(it != mElements.end() && (*it))
+//  {
+//    zoom2D = (*it)->getZoom2D();
+//  }
+//
+//  return zoom2D;
 }
 
-/**Called when a zoom change is requested from one view wrapper
- *
- */
-void ViewGroup::zoom2DChangeSlot(double newZoom)
+///**Called when a zoom change is requested from one view wrapper
+// *
+// */
+//void ViewGroup::zoom2DChangeSlot(double newZoom)
+//{
+//  Navigation().centerToTooltip(); // side effect: center on tool
+//
+//  this->setZoom2D(newZoom);
+//}
+
+//void ViewGroup::orientationChangedSlot(ssc::ORIENTATION_TYPE type)
+//{
+//  std::cout << "pling" << std::endl;
+//  std::vector<ViewWrapperPtr>::iterator it = mElements.begin();
+//  for(;it != mElements.end();++it)
+//  {
+//    (*it)->changeOrientationType(type);
+//  }
+//}
+
+void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 {
-  Navigation().centerToTooltip(); // side effect: center on tool
-
-  this->setZoom2D(newZoom);
-}
-
-void ViewGroup::orientationChangedSlot(ssc::ORIENTATION_TYPE type)
-{
-  std::vector<ViewWrapperPtr>::iterator it = mElements.begin();
-  for(;it != mElements.end();++it)
+  for(unsigned i=0; i<mElements.size(); ++i)
   {
-    (*it)->changeOrientationType(type);
+    mElements[i]->setOrientationMode(val);
   }
 }
+
 
 void ViewGroup::changeImage(QString imageUid)
 {
@@ -262,13 +289,13 @@ void ViewGroup::addXml(QDomNode& dataNode)
   dataNode.appendChild(zoom2DNode);
 }
 
-bool isViewWrapper2D(ViewWrapperPtr wrapper)
-{
-  if(wrapper->getZoom2D() != -1)
-    return true;
-  else
-    return false;
-}
+//bool isViewWrapper2D(ViewWrapperPtr wrapper)
+//{
+//  if(wrapper->getZoom2D() != -1)
+//    return true;
+//  else
+//    return false;
+//}
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {

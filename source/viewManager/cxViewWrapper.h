@@ -1,6 +1,7 @@
 #ifndef CXVIEWWRAPPER_H_
 #define CXVIEWWRAPPER_H_
 
+#include <QVariant>
 #include <QObject>
 #include "sscImage.h"
 #include "sscView.h"
@@ -11,6 +12,22 @@ class QActionGroup;
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
+
+class SyncedValue : public QObject
+{
+  Q_OBJECT
+public:
+  SyncedValue(QVariant val=QVariant());
+  static SyncedValuePtr create(QVariant val=QVariant());
+  void set(QVariant val);
+  QVariant get() const;
+private:
+  QVariant mValue;
+signals:
+  void changed();
+};
 
 /**
  * \class cxViewWrapper.h
@@ -30,12 +47,15 @@ public:
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
-  virtual void setZoom2D(double zoomFactor) {}
-  virtual double getZoom2D() = 0;
-  virtual void changeOrientationType(ssc::ORIENTATION_TYPE type){};
+//  virtual void setZoom2D(double zoomFactor) {}
+//  virtual double getZoom2D() = 0;
+//  virtual void changeOrientationType(ssc::ORIENTATION_TYPE type){};
+
+  virtual void setZoom2D(SyncedValuePtr value) {}
+  virtual void setOrientationMode(SyncedValuePtr value) {}
 
 signals:
-  void zoom2DChange(double newZoom);
+//  void zoom2DChange(double newZoom);
   void orientationChanged(ssc::ORIENTATION_TYPE type);
   void imageChanged(QString uid);
 

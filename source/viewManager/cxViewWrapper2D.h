@@ -33,9 +33,8 @@ public:
   virtual void setImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual ssc::View* getView();
-  virtual void setZoom2D(double zoomFactor);
-  virtual double getZoom2D();
-  virtual void changeOrientationType(ssc::ORIENTATION_TYPE type);
+  virtual void setZoom2D(SyncedValuePtr value);
+  virtual void setOrientationMode(SyncedValuePtr value);
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -45,8 +44,14 @@ private slots:
   void mouseWheelSlot(QWheelEvent* event);
   void orientationActionSlot();
   void global2DZoomActionSlot();
+//  void zoom2DChangedSlot();
+  void orientationModeChanged();
+
 
 private:
+  virtual void setZoomFactor2D(double zoomFactor);
+  virtual double getZoomFactor2D() const;
+
   virtual void appendToContextMenu(QMenu& contextMenu);
   void addReps();
   ssc::DoubleBoundingBox3D getViewport() const;
@@ -55,11 +60,12 @@ private:
   void moveAxisPos(ssc::Vector3D click_vp);
 
   ssc::ORIENTATION_TYPE getOrientationType() const;
+  void changeOrientationType(ssc::ORIENTATION_TYPE type);
 
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
-  double mZoomFactor;
+  //double mZoomFactor;
 //  ssc::PLANE_TYPE mPlaneType;
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
@@ -68,6 +74,10 @@ private:
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   ssc::View* mView;
+
+  // sunchronized data
+  SyncedValuePtr mZoom2D;
+  SyncedValuePtr mOrientationMode;
 
   QActionGroup* mOrientationActionGroup;
 

@@ -7,6 +7,27 @@
 
 namespace cx
 {
+
+SyncedValue::SyncedValue(QVariant val) : mValue(val) {}
+SyncedValuePtr SyncedValue::create(QVariant val)
+{
+  return SyncedValuePtr(new SyncedValue(val));
+}
+void SyncedValue::set(QVariant val)
+{
+  //std::cout << "emit changed new=" << val.toDouble() << ", old=" << mValue.toDouble() << std::endl;
+  if (mValue==val)
+    return;
+  mValue = val;
+  //std::cout << "emit changed" << std::endl;
+  emit changed();
+}
+QVariant SyncedValue::get() const
+{
+  return mValue;
+}
+
+
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
   QWidget* sender = dynamic_cast<QWidget*>(this->sender());

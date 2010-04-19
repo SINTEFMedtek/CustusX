@@ -128,6 +128,8 @@ ViewManager::ViewManager() :
   group.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
   mViewGroups.push_back(group);
 
+  syncOrientationMode(SyncedValue::create(0));
+
   // set start layout
   this->setActiveLayout(LAYOUT_3DACS_2X2);
 
@@ -137,6 +139,7 @@ ViewManager::ViewManager() :
   
   mShadingOn = mSettings->value("shadingOn").toBool();
 
+  mGlobalZoom2DVal = SyncedValue::create(1);
   this->setGlobal2DZoom(mGlobal2DZoom);
 
   mRenderingTime->start();
@@ -208,29 +211,45 @@ void ViewManager::setActiveView(ssc::View* view)
   else
   {}
 }*/
+
+void ViewManager::syncOrientationMode(SyncedValuePtr val)
+{
+  for(unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    mViewGroups[i]->syncOrientationMode(val);
+  }
+}
+
+
 void ViewManager::setGlobal2DZoom(bool global)
 {
   mGlobal2DZoom = global;
-  if(mGlobal2DZoom)
+
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
   {
-    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
-    for(;it != mViewGroups.end(); ++it)
-    {
-      connect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
-              this, SLOT(global2DZooming(double)));
-    }
-    //messageManager()->sendInfo("GLOBAL ZOOMING IS ON");
+    mViewGroups[i]->setGlobal2DZoom(mGlobal2DZoom, mGlobalZoom2DVal);
   }
-  else
-  {
-    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
-    for(;it != mViewGroups.end(); ++it)
-    {
-      disconnect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
-                this, SLOT(global2DZooming(double)));
-    }
-    //messageManager()->sendInfo("GLOBAL ZOOMING IS OFF");
-  }
+
+//  if(mGlobal2DZoom)
+//  {
+//    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
+//    for(;it != mViewGroups.end(); ++it)
+//    {
+//      connect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
+//              this, SLOT(global2DZooming(double)));
+//    }
+//    //messageManager()->sendInfo("GLOBAL ZOOMING IS ON");
+//  }
+//  else
+//  {
+//    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
+//    for(;it != mViewGroups.end(); ++it)
+//    {
+//      disconnect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
+//                this, SLOT(global2DZooming(double)));
+//    }
+//    //messageManager()->sendInfo("GLOBAL ZOOMING IS OFF");
+//  }
 }
 
 bool ViewManager::getGlobal2DZoom()
@@ -610,57 +629,16 @@ void ViewManager::renderAllViewsSlot()
 }
 void ViewManager::global2DZooming(double zoom)
 {
-  std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
-  for(;it != mViewGroups.end(); ++it)
-  {
-    //std::cout << "VIEWMANAGER: zoom global: " + string_cast(mGlobal2DZoom) << std::endl;
-    (*it)->blockSignals(true);
-    (*it)->zoom2DChangeSlot(zoom);
-    (*it)->blockSignals(false);
-  }
+//  std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
+//  for(;it != mViewGroups.end(); ++it)
+//  {
+//    //std::cout << "VIEWMANAGER: zoom global: " + string_cast(mGlobal2DZoom) << std::endl;
+//    (*it)->blockSignals(true);
+//    (*it)->zoom2DChangeSlot(zoom);
+//    (*it)->blockSignals(false);
+//  }
 }
-//void ViewManager::addXml(QDomNode& parentNode)
-//{
-//  QDomDocument doc = parentNode.ownerDocument();
-//  QDomElement base = doc.createElement("viewManager");
-//  parentNode.appendChild(base);
-//
-//  base.setAttribute("layoutType", qstring_cast(mCurrentLayoutType));
-//
-//
-////  m_rMpr_History->addXml(base);
-////
-////  QDomDocument doc = parentNode.ownerDocument();
-////  QDomElement base = doc.createElement("registrationTransform");
-////  parentNode.appendChild(base);
-////
-////  base.setAttribute("timestamp", mTimestamp.toString(timestampSecondsFormat()));
-////  base.setAttribute("type", mType);
-////  base.appendChild(doc.createTextNode(qstring_cast(mValue)));
-//}
-//
-//void ViewManager::parseXml(QDomNode dataNode)
-//{
-//  if (dataNode.isNull())
-//    return;
-//
-//  QDomElement base = dataNode.toElement();
-//  QString layout = base.attribute("layoutType");
-//  changeLayout(string2enum<LayoutType>(string_cast(layout)));
-////  LayoutType = base
-//
-////  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
-////  m_rMpr_History->parseXml(registrationHistory);
-////
-////
-////  QDomElement base = dataNode.toElement();
-////
-////  mTimestamp = QDateTime::fromString(base.attribute("timestamp"), timestampSecondsFormat());
-////  mType = base.attribute("type");
-////  mValue = Transform3D::fromString(base.text());
-//
-//
-//}
+
 
 
 }//namespace cx
