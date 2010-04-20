@@ -17,9 +17,6 @@
 namespace cx
 {
 
-//std::string planeToString(ssc::PLANE_TYPE val);
-
-
 /** Wrapper for a View2D.
  *  Handles the connections between specific reps and the view.
  *
@@ -44,7 +41,6 @@ private slots:
   void mouseWheelSlot(QWheelEvent* event);
   void orientationActionSlot();
   void global2DZoomActionSlot();
-//  void zoom2DChangedSlot();
   void orientationModeChanged();
 
 
@@ -65,8 +61,6 @@ private:
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
-  //double mZoomFactor;
-//  ssc::PLANE_TYPE mPlaneType;
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
   ssc::ToolRep2DPtr mToolRep2D;
