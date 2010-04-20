@@ -2,30 +2,12 @@
 //#include <QtXML>
 #include "sscTypeConversions.h"
 #include <QDomElement>
+#include "sscTime.h"
 
 namespace ssc
 {
 
 
-QString timestampSecondsFormat()
-{
-  return QString("yyyyMMdd'T'hhmmss");
-}
-QString timestampSecondsFormatNice()
-{
-  return QString("yyyy-MM-dd hh:mm:ss");
-}
-
-template<class T>
-QString streamXml2String(T& val)
-{
-  QDomDocument doc;
-  QDomElement root = doc.createElement("root");
-  doc.appendChild(root);
-
-  val.addXml(root);
-  return doc.toString();
-}
 
 //---------------------------------------------------------
 //-------  RegistrationTransform  -------------------------

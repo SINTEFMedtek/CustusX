@@ -14,17 +14,6 @@ class QDomNode;
 
 namespace ssc
 {
-//namespace time {
-
-QString timestampSecondsFormat();
-QString timestampSecondsFormatNice();
-
-//} // time
-} // ssc
-
-
-namespace ssc
-{
 
 /**Encapsulation of a transform and the registration event,
  * i.e the time and kind of registration.

@@ -10,6 +10,7 @@
 #include <vtkSmartPointer.h>
 #include <vtkImageAccumulate.h>
 
+#include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscSnwInifile.h"
@@ -69,7 +70,7 @@ bool SNW2VolumeMetaData::DateTime::isValid() const
  */
 QString SNW2VolumeMetaData::DateTime::timestampFormat() const
 {
-	return QString("yyyyMMdd'T'hhmmss");
+	return QString(timestampSecondsFormat());
 }
 QDateTime SNW2VolumeMetaData::DateTime::convertTimestamp2QDateTime(const QString& timestamp) const ///< converter for the custom sonowand timestamp format
 {

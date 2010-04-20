@@ -5,6 +5,7 @@
 #include <vector>
 #include <QString>
 #include <QVariant>
+#include <QDomDocument>
 #include <boost/lexical_cast.hpp>
 
 /**Convenience function that converts a type to its 
@@ -55,5 +56,19 @@ std::ostream& operator<<(std::ostream& str, const QString& qstring);
  *  Useful for reading vectors/matrices.
  */
 std::vector<double> convertQString2DoubleVector(const QString& input);
+
+/** Helper function template for streaming an object to string.
+ *  The streamed object must support the method void addXml(QDomNode).
+ */
+template<class T>
+QString streamXml2String(T& val)
+{
+  QDomDocument doc;
+  QDomElement root = doc.createElement("root");
+  doc.appendChild(root);
+
+  val.addXml(root);
+  return doc.toString();
+}
 
 #endif /*SSCTYPECONVERSIONS_H_*/

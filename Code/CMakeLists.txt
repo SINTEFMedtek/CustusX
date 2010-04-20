@@ -128,6 +128,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscGLHelpers.h
     Utilities/sscEnumConverter.h
     Utilities/sscDefinitions.cpp
+    Utilities/sscTime.h
+    Utilities/sscTime.cpp
     sscView.cpp
     sscView.h
     Rep/sscRep.h
