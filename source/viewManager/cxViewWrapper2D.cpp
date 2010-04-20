@@ -28,22 +28,6 @@
 namespace cx
 {
 
-//std::string planeToString(ssc::PLANE_TYPE val)
-//{
-//  switch (val)
-//  {
-//  case ssc::ptNOPLANE      : return "";
-//  case ssc::ptSAGITTAL     : return "Sagittal";
-//  case ssc::ptCORONAL      : return "Coronal";
-//  case ssc::ptAXIAL        : return "Axial";
-//  case ssc::ptANYPLANE     : return "Any";
-//  case ssc::ptSIDEPLANE    : return "Side";
-//  case ssc::ptRADIALPLANE  : return "Radial";
-//  default                  : return "";
-//  }
-//}
-
-
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
     mOrientationActionGroup(new QActionGroup(view))
 {
@@ -69,8 +53,6 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
 {
-  //messageManager()->sendInfo("ViewWrapper2D::appendToContextMenu");
-
   QAction* obliqueAction = new QAction("Oblique", &contextMenu);
   obliqueAction->setCheckable(true);
   obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
@@ -93,7 +75,6 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
   QAction* global2DZoomAction = new QAction("Global 2D Zoom", &contextMenu);
   global2DZoomAction->setCheckable(true);
   global2DZoomAction->setChecked(viewManager()->getGlobal2DZoom());
-  //mGlobal2DZoomActionGroup->addAction(global2DZoomAction);
   connect(global2DZoomAction, SIGNAL(triggered()),
           this, SLOT(global2DZoomActionSlot()));
 
@@ -104,22 +85,24 @@ void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addAction(global2DZoomAction);
 }
 
+/** Slot for the orientation action.
+ *  Set the orientation mode.
+ */
 void ViewWrapper2D::orientationActionSlot()
 {
-  //messageManager()->sendInfo("ViewWrapper2D::orientationActionSlot()");
   QAction* theAction = static_cast<QAction*>(sender());
   if(!theAction)
     return;
 
   ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(string_cast(theAction->data().toString()));
-  //messageManager()->sendInfo("ViewWrapper2D::orientationActionSlot():" + string_cast(type));
   mOrientationMode->set(type);
-//  this->changeOrientationType(type);
 }
 
+/** Slot for the global zoom action
+ *  Set the global zoom flag in the view manager.
+ */
 void ViewWrapper2D::global2DZoomActionSlot()
 {
-  //messageManager()->sendInfo("ViewWrapper2D::global2DZoomActionSlot()");
   QAction* theAction = static_cast<QAction*>(sender());
   if(!theAction)
     return;
@@ -182,11 +165,8 @@ ssc::Vector3D ViewWrapper2D::displayToWorld(ssc::Vector3D p_d) const
  */
 void ViewWrapper2D::viewportChanged()
 {
-  //std::cout << "ViewWrapper2D::viewportChanged()" << std::endl;
-
   if (!mView->getRenderer()->IsActiveCameraCreated())
     return;
-//  std::cout << "ViewWrapper2D::viewportChanged() with camera, pt=" << planeToString(mPlaneType) << std::endl;
 
   double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
   mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
@@ -239,7 +219,6 @@ void ViewWrapper2D::showSlot()
 
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
-//  mPlaneType = plane;
   mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, string_cast(plane));
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
@@ -248,11 +227,16 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
   this->changeOrientationType(getOrientationType());
 }
 
+/** get the orientation type directly from the slice proxy
+ */
 ssc::ORIENTATION_TYPE ViewWrapper2D::getOrientationType() const
 {
   return mSliceProxy->getComputer().getOrientationType();
 }
 
+/** Slot called when the synced orientation has changed.
+ *  Update the slice proxy orientation.
+ */
 void ViewWrapper2D::orientationModeChanged()
 {
 //  changeOrientationType(static_cast<ssc::ORIENTATION_TYPE>(mOrientationMode->get().toInt()));
@@ -274,6 +258,8 @@ void ViewWrapper2D::orientationModeChanged()
   mSliceProxy->setComputer(computer);
 }
 
+/** Set the synced orientation mode.
+ */
 void ViewWrapper2D::changeOrientationType(ssc::ORIENTATION_TYPE type)
 {
   mOrientationMode->set(type);
@@ -284,6 +270,8 @@ ssc::View* ViewWrapper2D::getView()
   return mView;
 }
 
+/**
+ */
 void ViewWrapper2D::setImage(ssc::ImagePtr image)
 {
   if (!image)
@@ -320,7 +308,6 @@ void ViewWrapper2D::setOrientationMode(SyncedValuePtr value)
   orientationModeChanged();
 }
 
-
 void ViewWrapper2D::setZoom2D(SyncedValuePtr value)
 {
   if (mZoom2D)
@@ -328,29 +315,14 @@ void ViewWrapper2D::setZoom2D(SyncedValuePtr value)
   mZoom2D = value;
   if (mZoom2D)
     connect(mZoom2D.get(), SIGNAL(changed()), this, SLOT(viewportChanged()));
-}
 
-//void ViewWrapper2D::zoom2DChangedSlot()
-//{
-//  //std::cout << "called ViewWrapper2D::zoom2DChangedSlot()" << std::endl;
-//  this->viewportChanged();
-//}
+  viewportChanged();
+}
 
 void ViewWrapper2D::setZoomFactor2D(double zoomFactor)
 {
   zoomFactor = ssc::constrainValue(zoomFactor, 0.2, 10.0);
-
-//  if(zoomFactor == mZoomFactor)
-//    return;
-
   mZoom2D->set(zoomFactor);
-
-//  mZoomFactor = zoomFactor;
-//  emit zoom2DChange(mZoomFactor);
-//
-//  //std::cout << "VIEWWRAPPER: zoom changed: " + string_cast(mZoomFactor) << std::endl;
-//
-//  this->viewportChanged();
 }
 
 double ViewWrapper2D::getZoomFactor2D() const

@@ -2,7 +2,7 @@
 
 #include <QtGui>
 #include "sscTypeConversions.h"
-#include "sscRegistrationTransform.h" //TODO remove when timestampSecondsFormat() is moved to a more suitable place
+#include "sscTime.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -799,7 +799,7 @@ void MainWindow::quitSlot()
 void MainWindow::newPatientSlot()
 {  
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
-  QString name = QDateTime::currentDateTime().toString("yyyyMMdd'T'hhmmss") + "_";
+  QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
   //name += "_";
   name += mSettings->value("globalApplicationName").toString() + "_";
   //name += "_";

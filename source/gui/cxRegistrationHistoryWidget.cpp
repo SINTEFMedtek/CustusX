@@ -13,6 +13,7 @@
 #include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
+#include "sscTime.h"
 
 namespace cx
 {
