@@ -1,7 +1,8 @@
 #ifndef CXPATIENTREGISTRATIONWIDGET_H_
 #define CXPATIENTREGISTRATIONWIDGET_H_
 
-#include <QWidget>
+#include "cxRegistrationWidget.h"
+
 #include <sscImage.h>
 #include <sscTransform3D.h>
 #include "cxTool.h"
@@ -29,47 +30,39 @@ typedef boost::shared_ptr<ssc::Vector3D> Vector3DPtr;
  * \date Feb 3, 2009
  * \author: Janne Beate Bakeng, SINTEF
  */
-class PatientRegistrationWidget : public QWidget
+class PatientRegistrationWidget : public RegistrationWidget
 {
   Q_OBJECT
 
 public:
   PatientRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
-  ~PatientRegistrationWidget(); ///< empty
+  virtual ~PatientRegistrationWidget(); ///< empty
 
 protected slots:
-  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-  void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
-  //void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
-  //void toolSampledUpdateSlot(double, double, double,unsigned int); ///<
+
+  virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
-  void rowSelectedSlot(int row, int column); ///<  updates the current row and column
-  void cellChangedSlot(int row, int column); ///<  reacts when the user types in a (landmark) name
   void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
   void resetOffsetSlot(); ///< resets the patient registration offset to zero
   void setOffsetSlot(int value); ///< set the patient registration offset
   void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
 
-  void landmarkAddedSlot(std::string uid);
-  void landmarkRemovedSlot(std::string uid);
-  void patientLandmarkChangedSlot(std::string uid);
-
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
-  void updateAccuracy(); ///< calculates accuracy for each landmark after a registration
-  void doPatientRegistration(); ///< initializes patient registration
+  virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
+//  void updateAccuracy(); ///< calculates accuracy for each landmark after a registration
+  virtual ssc::LandmarkMap getTargetLandmarks() const;
+  virtual ssc::Transform3D getTargetTransform() const;
+  virtual void performRegistration();
 
-  double getAccuracy(std::string uid);
-  double getAvarageAccuracy();
-  std::vector<ssc::Landmark> getAllLandmarks() const;
+
+  //std::vector<ssc::Landmark> getAllLandmarks() const;
 
   //gui
-  QVBoxLayout* mVerticalLayout; ///< vertical layout is used
-  QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
+  //QVBoxLayout* mVerticalLayout; ///< vertical layout is used
+  //QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
   QPushButton* mToolSampleButton; ///< the Sample Tool button
-  QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy //TODO
   QLabel* mOffsetLabel; ///< header label for the offset section
   QWidget* mOffsetWidget; ///< widget for offset functionality
   QGridLayout* mOffsetsGridLayout; ///< layout to put the offset objects into
@@ -85,12 +78,12 @@ protected:
   QPushButton* mResetOffsetButton; ///< button for resetting the offset to zero
 
   //data
-  std::string mActiveLandmark;
+  //std::string mActiveLandmark;
   //int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
   //std::map<std, double> mLandmarkRegistrationAccuracyMap; ///< maps accuracy to index of a landmark
   //double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
-  ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
+  //ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 
   int mMinValue, mMaxValue, mDefaultValue; ///< values for the range of the offset
 

@@ -134,7 +134,7 @@ std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::Land
   for (iter=props.begin(); iter!=props.end(); ++iter)
   {
     std::string uid = iter->first;
-    if (data_a.count(uid) || data_b.count(uid) || iter->second.getActive())
+    if (data_a.count(uid) && data_b.count(uid) && iter->second.getActive())
       retval.push_back(uid);
   }
 
@@ -160,48 +160,6 @@ vtkPointsPtr RegistrationManager::convertTovtkPoints(const std::vector<std::stri
 
   return retval;
 }
-
-///** Perform a landmark registration between the data sets source and target.
-// *  Return transform from source to target.
-// */
-//ssc::Transform3D RegistrationManager::performLandmarkRegistration(const ssc::LandmarkMap& source, const ssc::LandmarkMap& target, bool* ok) const
-//{
-//  *ok = false;
-//  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
-//  std::map<std::string, ssc::LandmarkProperty>::iterator iter;
-//
-//  vtkPointsPtr sourcePoints = vtkPointsPtr::New();
-//  vtkPointsPtr targetPoints = vtkPointsPtr::New();
-//
-//  for (iter=props.begin(); iter!=props.end(); ++iter)
-//  {
-//    std::string uid = iter->first;
-//    if (!target.count(uid) || !source.count(uid) || !iter->second.getActive())
-//      continue;
-//
-//    sourcePoints->InsertNextPoint(source.find(uid)->second.getCoord().begin());
-//    targetPoints->InsertNextPoint(target.find(uid)->second.getCoord().begin());
-//  }
-//
-//  // too few data samples: ignore
-//  if (sourcePoints->GetNumberOfPoints() < 3)
-//  {
-//    std::cout << "not enoug pts to register" << std::endl;
-//    return ssc::Transform3D();
-//  }
-//
-//  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
-//  landmarktransform->SetSourceLandmarks(sourcePoints);
-//  landmarktransform->SetTargetLandmarks(targetPoints);
-//  landmarktransform->SetModeToSimilarity();
-//  sourcePoints->Modified();
-//  targetPoints->Modified();
-//  landmarktransform->Update();
-//
-//  ssc::Transform3D tar_M_src(landmarktransform->GetMatrix());
-//  *ok = true;
-//  return tar_M_src;
-//}
 
 /** Perform a landmark registration between the data sets source and target.
  *  Return transform from source to target.
@@ -242,9 +200,10 @@ void RegistrationManager::doPatientRegistration()
   ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
   ssc::LandmarkMap toolLandmarks = toolManager()->getLandmarks();
 
-  std::vector<std::string> landmarks = getUsableLandmarks(masterLandmarks, toolLandmarks);
-  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, masterLandmarks, mMasterImage->get_rMd());
-  vtkPointsPtr p_pr = convertTovtkPoints(landmarks, toolLandmarks, ssc::Transform3D());
+  std::vector<std::string> landmarks = this->getUsableLandmarks(masterLandmarks, toolLandmarks);
+
+  vtkPointsPtr p_ref = this->convertTovtkPoints(landmarks, masterLandmarks, mMasterImage->get_rMd());
+  vtkPointsPtr p_pr = this->convertTovtkPoints(landmarks, toolLandmarks, ssc::Transform3D());
 
   bool ok = false;
   ssc::Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
