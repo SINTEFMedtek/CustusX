@@ -50,18 +50,18 @@ void ProbeRep::setImage(ImagePtr image)
 	if (image==mImage)
 		return;
 
-	if (mImage)
-	{
-		disconnect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
-				mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
-	}
+//	if (mImage)
+//	{
+//		disconnect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
+//				mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
+//	}
 	mImage = image;
-  if (mImage)
-  {
-    mThreshold = (mImage->getPosMax()-mImage->getPosMin())/10;
-    connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
-        mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
-  }
+//  if (mImage)
+//  {
+//    mThreshold = (mImage->getPosMax()-mImage->getPosMin())/10;
+//    connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
+//        mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
+//  }
 }
 void ProbeRep::setResolution(const int resolution)
 {
@@ -164,7 +164,7 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 /**
  * \param[in] index the index you want to give the landmark
  */
-void ProbeRep::makeLandmarkPermanent(unsigned int index)
+void ProbeRep::makeLandmarkPermanent(unsigned index)
 {
 	emit addPermanentPoint(mPickedPoint[0],
 						   mPickedPoint[1],
@@ -199,7 +199,6 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
-  std::cout << "ProbeRep::showTemporaryPointSlot()" << std::endl;
   if(mCurrentRenderer == NULL)
     return;
 
@@ -350,4 +349,11 @@ bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vecto
 //	}
 //
 }
+
+Vector3D ProbeRep::getPosition() const
+{
+  return mPickedPoint;
+}
+
+
 }//namespace ssc

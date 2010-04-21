@@ -96,6 +96,12 @@ public:
   virtual ImagePtr getActiveImage() const; ///< used for system state
   virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 
+  virtual std::string addLandmark();
+  virtual void setLandmarkNames(std::vector<std::string> names);
+  virtual void setLandmarkName(std::string uid, std::string name);
+  virtual void setLandmarkActive(std::string uid, bool active);
+  virtual std::map<std::string, LandmarkProperty> getLandmarkProperties() const;
+
   //virtual MeshPtr getActiveMesh() const; ///< used for system state
   //virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state
 
@@ -117,7 +123,10 @@ protected:
 	//state
 	ImagePtr mActiveImage;
 	//MeshPtr mActiveMesh;
+
+	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 };
+
 
 } // namespace ssc
 

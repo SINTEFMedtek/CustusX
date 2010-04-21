@@ -12,6 +12,7 @@ typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
 
+#include "sscLandmark.h"
 #include "sscData.h"
 #include "sscRep.h"
 #include "sscImageTF3D.h"
@@ -26,7 +27,6 @@ class QDomDocument;
 
 namespace ssc
 {
-
 /**One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
  *
@@ -47,7 +47,7 @@ public:
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
 	virtual vtkImageDataPtr getGrayScaleBaseVtkImageData(); ///< as getBaseVtkImageData(), but constrained to 1 component if multicolor.
 	virtual vtkImageDataPtr getRefVtkImageData(); ///< \return the vtkimagedata in the reference coordinate space
-	virtual vtkDoubleArrayPtr getLandmarks(); ///< \return all landmarks defined on the image.
+	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
 
 	ImageTF3DPtr getTransferFunctions3D();
 	ImageLUT2DPtr getLookupTable2D();
@@ -70,16 +70,21 @@ public:
 //	GPUImageBufferPtr getGPUBuffer();
 	
 signals:
-	void landmarkRemoved(double x, double y, double z, unsigned int index);
-	void landmarkAdded(double x, double y, double z, unsigned int index);
+  void landmarkRemoved(std::string uid);
+  void landmarkAdded(std::string uid);
+	//void landmarkRemoved(double x, double y, double z, unsigned int index);
+	//void landmarkAdded(double x, double y, double z, unsigned int index);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	//void alphaChange(); ///<blending alpha
 	//void thresholdChange(double val); 
 
 public slots:
-	void addLandmarkSlot(double x, double y, double z, unsigned int index);
-	void removeLandmarkSlot(double x, double y, double z, unsigned int index);
+  void setLandmark(Landmark landmark);
+  void removeLandmark(std::string uid);
+
+	//void addLandmarkSlot(double x, double y, double z, unsigned int index);
+	//void removeLandmarkSlot(double x, double y, double z, unsigned int index);
 	
 protected slots:
 	void transferFunctionsChangedSlot();
@@ -94,8 +99,12 @@ protected:
 	vtkImageReslicePtr mOrientator; ///< converts imagedata to outputimagedata
 	vtkMatrix4x4Ptr mOrientatorMatrix;
 	vtkImageDataPtr mReferenceImageData; ///< imagedata after filtering through the orientatior, given in reference space
-	vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark), in reference space (r-space)
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
+
+	//landmarks
+	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
+	//vtkDoubleArrayPtr mLandmarks; ///< array consists of 4 components (<x,y,z,index>) for each tuple (landmark), in reference space (r-space)
+
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

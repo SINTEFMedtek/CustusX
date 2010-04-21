@@ -15,5 +15,5 @@ enable_testing()
 include_directories( /usr/local/include )
 
 add_subdirectory(Code)
-add_subdirectory(Examples)
-add_subdirectory(Testing)
+#add_subdirectory(Examples)
+#add_subdirectory(Testing)

@@ -32,6 +32,7 @@ endif(X11_FOUND)
 SET( SSC_QT_MOC_HEADER_FILES
     sscView.h
     Utilities/sscAcceptanceBoxWidget.h
+    #Data/sscLandmark.h
     Data/sscData.h
     Data/sscImage.h
     Data/sscImageTF3D.h
@@ -180,6 +181,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscVtkHelperClasses.h
     Rep/sscSlicePlanes3DRep.cpp
     Rep/sscSlicePlanes3DRep.h
+    Data/sscLandmark.h
+    Data/sscLandmark.cpp
     Data/sscData.cpp
     Data/sscData.h
     Data/sscImage.h

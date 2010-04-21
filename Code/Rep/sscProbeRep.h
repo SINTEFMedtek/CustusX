@@ -50,6 +50,7 @@ public:
 
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
+	Vector3D getPosition() const;
 
 signals:
 	void addPermanentPoint(double x, double y, double z, unsigned int); ///< signal requesting this point be made permanent

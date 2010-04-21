@@ -24,6 +24,7 @@ typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformati
 
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -197,6 +198,48 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
   emit activeImageChanged(uid);
   std::cout << "Active image set to "<< uid << std::endl;
 }
+
+void DataManagerImpl::setLandmarkNames(std::vector<std::string> names)
+{
+  mLandmarkProperties.clear();
+  for(unsigned i=0; i<names.size();++i)
+  {
+    LandmarkProperty prop(string_cast(i+1), names[i]); // generate 1-indexed uids (keep users happy)
+    mLandmarkProperties[prop.getUid()] = prop;
+  }
+}
+
+std::string DataManagerImpl::addLandmark()
+{
+  int max = 0;
+  std::map<std::string, LandmarkProperty>::iterator iter;
+  for (iter=mLandmarkProperties.begin(); iter!=mLandmarkProperties.end(); ++iter)
+  {
+    max = std::max(max, qstring_cast(iter->second.getName()).toInt());
+  }
+  std::string uid = string_cast(max+1);
+  mLandmarkProperties[uid] = LandmarkProperty(uid);
+  return uid;
+}
+
+
+void DataManagerImpl::setLandmarkName(std::string uid, std::string name)
+{
+  mLandmarkProperties[uid].setName(name);
+}
+
+std::map<std::string, LandmarkProperty> DataManagerImpl::getLandmarkProperties() const
+{
+  return mLandmarkProperties;
+}
+
+void DataManagerImpl::setLandmarkActive(std::string uid, bool active)
+{
+  mLandmarkProperties[uid].setActive(active);
+}
+
+
+
 ImagePtr DataManagerImpl::loadImage(const std::string& uid, const std::string& filename, READER_TYPE type)
 {
   //TODO
@@ -293,6 +336,16 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
     activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));
   dataManagerNode.appendChild(activeImageNode);
 
+  QDomElement landmarksNode = doc.createElement("landmarks");
+  LandmarkPropertyMap::iterator it = mLandmarkProperties.begin();
+  for(; it != mLandmarkProperties.end(); ++it)
+  {
+    QDomElement landmarkNode = doc.createElement("landmark");
+    it->second.addXml(landmarkNode);
+    landmarksNode.appendChild(landmarkNode);
+  }
+  dataManagerNode.appendChild(landmarksNode);
+
   //TODO
   /*QDomElement activeMeshNode = doc.createElement("activeMesh");
   if(mActiveMesh)
@@ -316,12 +369,21 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 }
 void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 {
+  QDomNode landmarksNode = dataManagerNode.namedItem("landmarks");
+  QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
+  for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
+  {
+    LandmarkProperty landmark;
+    landmark.parseXml(landmarkNode);
+    mLandmarkProperties[landmark.getUid()] = landmark;
+  }
+
   // All images must be created from the DataManager, so the image nodes
   // are parsed here
   QDomNode child = dataManagerNode.firstChild();
   QDomElement nameNode;
   QString path;//Path to data file
-  
+
   while (!child.isNull())
   {
     if(child.nodeName() == "image" || child.nodeName() == "mesh")

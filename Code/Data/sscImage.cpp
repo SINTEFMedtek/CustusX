@@ -27,10 +27,10 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
   Data(uid, name),
 	mImageTransferFunctions3D(new ImageTF3D(data)),
 	mImageLookupTable2D(new ImageLUT2D(data)),
-	mBaseImageData(data),
-	mLandmarks(vtkDoubleArrayPtr::New())
+	mBaseImageData(data)
+	//mLandmarks(vtkDoubleArrayPtr::New())
 {
-	mLandmarks->SetNumberOfComponents(4);
+	//mLandmarks->SetNumberOfComponents(4);
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	//mAlpha = 0.5; 
 	//mTreshold = 1.0;
@@ -135,9 +135,20 @@ vtkImageDataPtr Image::getRefVtkImageData()
   mReferenceImageData->Update();
 	return mReferenceImageData;
 }
-vtkDoubleArrayPtr Image::getLandmarks()
+LandmarkMap Image::getLandmarks()
 {
 	return mLandmarks;
+}
+void Image::setLandmark(Landmark landmark)
+{
+  std::cout << "Image::setLandmark" << std::endl;
+  mLandmarks[landmark.getUid()] = landmark;
+  emit landmarkAdded(landmark.getUid());
+}
+void Image::removeLandmark(std::string uid)
+{
+  mLandmarks.erase(uid);
+  emit landmarkRemoved(uid);
 }
 /** If index is found, it's treated as an edit operation, else
  * it's an add operation.
@@ -146,7 +157,7 @@ vtkDoubleArrayPtr Image::getLandmarks()
  * @param z
  * @param index
  */
-void Image::addLandmarkSlot(double x, double y, double z, unsigned int index)
+/*void Image::addLandmarkSlot(double x, double y, double z, unsigned int index)
 {
 	double addLandmark[4] = {x, y, z, (double)index};
 
@@ -165,7 +176,7 @@ void Image::addLandmarkSlot(double x, double y, double z, unsigned int index)
 	//else it's an add operation
 	mLandmarks->InsertNextTupleValue(addLandmark);
 	emit landmarkAdded(x, y, z, index);
-}
+}*/
 /** If index is found that tuple(landmark) is removed from the array, else
  * it's just ignored.
  * @param x
@@ -173,7 +184,7 @@ void Image::addLandmarkSlot(double x, double y, double z, unsigned int index)
  * @param z
  * @param index
  */
-void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
+/*void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
 {
 	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
 	for(int i=0; i<= numberOfLandmarks-1; i++)
@@ -185,7 +196,8 @@ void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
 			emit landmarkRemoved(x, y, z, index);
 		}
 	}
-}
+}*/
+
 void Image::transferFunctionsChangedSlot()
 {
 	emit vtkImageDataChanged();
@@ -193,7 +205,7 @@ void Image::transferFunctionsChangedSlot()
 void Image::printLandmarks()
 {
 	std::cout << "Landmarks: " << std::endl;
-	for(int i=0; i<= mLandmarks->GetNumberOfTuples()-1; i++)
+	/*for(int i=0; i<= mLandmarks->GetNumberOfTuples()-1; i++)
 	{
 		double* landmark = mLandmarks->GetTuple(i);
 		std::stringstream stream;
@@ -207,7 +219,7 @@ void Image::printLandmarks()
 		stream << landmark[3];
 		stream << ")";
 		std::cout << stream.str() << std::endl;
-	}
+	}*/
 }
 DoubleBoundingBox3D Image::boundingBox() const
 {
@@ -288,16 +300,11 @@ void Image::addXml(QDomNode& parentNode)
   mImageLookupTable2D->addXml(imageNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");
-  for(int i=0; i< mLandmarks->GetNumberOfTuples(); i++)
+  LandmarkMap::iterator it = mLandmarks.begin();
+  for(; it != mLandmarks.end(); ++it)
   {
-    double* landmark = mLandmarks->GetTuple(i);
-    std::stringstream stream;
-    stream << landmark[3] << " "
-           << landmark[0] << " "
-           << landmark[1] << " "
-           << landmark[2];
     QDomElement landmarkNode = doc.createElement("landmark");
-    landmarkNode.appendChild(doc.createTextNode(stream.str().c_str()));
+    it->second.addXml(landmarkNode);
     landmarksNode.appendChild(landmarkNode);
   }
   imageNode.appendChild(landmarksNode);
@@ -329,8 +336,17 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
 
-	//landmarks
 	QDomNode landmarksNode = dataNode.namedItem("landmarks");
+	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
+	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
+	{
+	  Landmark landmark;
+	  landmark.parseXml(landmarkNode);
+	  this->setLandmark(landmark);
+  }
+
+	//landmarks
+	/*QDomNode landmarksNode = dataNode.namedItem("landmarks");
 	if(landmarksNode.isNull())
 	  return;
 	if(!landmarksNode.hasChildNodes())
@@ -343,7 +359,7 @@ void Image::parseXml(QDomNode& dataNode)
                           landmark[3].toDouble(), landmark[0].toInt());
 	  landmarkNode = landmarkNode.nextSiblingElement("landmark");
 	}
-	while(!landmarkNode.isNull());
+	while(!landmarkNode.isNull());*/
 }
 
 } // namespace ssc

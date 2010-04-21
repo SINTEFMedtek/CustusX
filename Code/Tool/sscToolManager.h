@@ -7,6 +7,7 @@
 #include <QObject>
 #include "sscTransform3D.h"
 #include "sscTool.h"
+#include "sscLandmark.h"
 
 class QDomNode;
 
@@ -64,12 +65,18 @@ public:
   virtual void addXml(QDomNode& parentNode) {} ///< write internal state to node
   virtual void parseXml(QDomNode& dataNode) {} ///< read internal state from node
 	
+  virtual ssc::LandmarkMap getLandmarks() { return ssc::LandmarkMap();}
+  virtual void setLandmark(ssc::Landmark landmark) {}
+  virtual void removeLandmark(std::string uid) {}
+
 signals:
 	void configured(); ///< signal emitted when the system is configured
 	void initialized(); ///< signal emitted when the system is initialized
 	void trackingStarted(); ///< signal emitted when the system starts tracking
 	void trackingStopped(); ///< signal emitted when the system stops tracking
 	void dominantToolChanged(const std::string& uId); ///<signal for change of dominant tool
+  void landmarkRemoved(std::string uid);
+  void landmarkAdded(std::string uid);
 
 protected:
 	ToolManager() {} ///< Empty on purpose

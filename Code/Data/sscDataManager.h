@@ -66,6 +66,11 @@ public:
 	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
 
+  virtual void setLandmarkNames(std::vector<std::string> names) = 0;
+  virtual void setLandmarkName(std::string uid, std::string name) = 0;
+  virtual void setLandmarkActive(std::string uid, bool active) = 0;
+  virtual std::map<std::string, LandmarkProperty> getLandmarkProperties() const = 0;
+
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
 
