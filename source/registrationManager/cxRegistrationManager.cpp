@@ -9,7 +9,8 @@
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
 #include "cxToolmanager.h"
-#include "cxMessagemanager.h"
+#include "cxMessageManager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -41,24 +42,24 @@ bool RegistrationManager::isMasterImageSet()
 {
   return mMasterImage;
 }
-void RegistrationManager::setGlobalPointSet(vtkDoubleArrayPtr pointset)
-{
-  mGlobalPointSet = pointset;
-  messageManager()->sendInfo("Global point set is set.");
-}
-vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
-{
-  return mGlobalPointSet;
-}
-void RegistrationManager::setGlobalPointSetNameList(RegistrationManager::NameListType nameList)
-{
-  mGlobalPointSetNameList = nameList;
-  messageManager()->sendInfo("Global point set name list is set.");
-}
-RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList()
-{
-  return mGlobalPointSetNameList;
-}
+//void RegistrationManager::setGlobalPointSet(vtkDoubleArrayPtr pointset)
+//{
+//  mGlobalPointSet = pointset;
+//  messageManager()->sendInfo("Global point set is set.");
+//}
+//vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
+//{
+//  return mGlobalPointSet;
+//}
+//void RegistrationManager::setGlobalPointSetNameList(RegistrationManager::NameListType nameList)
+//{
+//  mGlobalPointSetNameList = nameList;
+//  messageManager()->sendInfo("Global point set name list is set.");
+//}
+//RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList()
+//{
+//  return mGlobalPointSetNameList;
+//}
 void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patientRegistration)
 {
   mManualPatientRegistration = patientRegistration;
@@ -118,6 +119,118 @@ void RegistrationManager::resetOffset()
   mPatientRegistrationOffset.reset();
   this->doPatientRegistration();
 }
+
+
+/**Inspect the landmarks in data a and b, find landmarks defined in both of them and
+ * that also is active.
+ * Return the uids of these landmarks.
+ */
+std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b)
+{
+  std::vector<std::string> retval;
+  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
+  std::map<std::string, ssc::LandmarkProperty>::iterator iter;
+
+  for (iter=props.begin(); iter!=props.end(); ++iter)
+  {
+    std::string uid = iter->first;
+    if (data_a.count(uid) || data_b.count(uid) || iter->second.getActive())
+      retval.push_back(uid);
+  }
+
+  return retval;
+}
+
+/**Convert the landmarks given by uids to vtk points.
+ * The coordinates are given by the input data,
+ * and should be transformed by M.
+ *
+ * Prerequisite: all uids exist in data.
+ */
+vtkPointsPtr RegistrationManager::convertTovtkPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M)
+{
+  vtkPointsPtr retval = vtkPointsPtr::New();
+
+  for (unsigned i=0; i<uids.size(); ++i)
+  {
+    std::string uid = uids[i];
+    ssc::Vector3D p = M.coord(data.find(uid)->second.getCoord());
+    retval->InsertNextPoint(p.begin());
+  }
+
+  return retval;
+}
+
+///** Perform a landmark registration between the data sets source and target.
+// *  Return transform from source to target.
+// */
+//ssc::Transform3D RegistrationManager::performLandmarkRegistration(const ssc::LandmarkMap& source, const ssc::LandmarkMap& target, bool* ok) const
+//{
+//  *ok = false;
+//  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
+//  std::map<std::string, ssc::LandmarkProperty>::iterator iter;
+//
+//  vtkPointsPtr sourcePoints = vtkPointsPtr::New();
+//  vtkPointsPtr targetPoints = vtkPointsPtr::New();
+//
+//  for (iter=props.begin(); iter!=props.end(); ++iter)
+//  {
+//    std::string uid = iter->first;
+//    if (!target.count(uid) || !source.count(uid) || !iter->second.getActive())
+//      continue;
+//
+//    sourcePoints->InsertNextPoint(source.find(uid)->second.getCoord().begin());
+//    targetPoints->InsertNextPoint(target.find(uid)->second.getCoord().begin());
+//  }
+//
+//  // too few data samples: ignore
+//  if (sourcePoints->GetNumberOfPoints() < 3)
+//  {
+//    std::cout << "not enoug pts to register" << std::endl;
+//    return ssc::Transform3D();
+//  }
+//
+//  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
+//  landmarktransform->SetSourceLandmarks(sourcePoints);
+//  landmarktransform->SetTargetLandmarks(targetPoints);
+//  landmarktransform->SetModeToSimilarity();
+//  sourcePoints->Modified();
+//  targetPoints->Modified();
+//  landmarktransform->Update();
+//
+//  ssc::Transform3D tar_M_src(landmarktransform->GetMatrix());
+//  *ok = true;
+//  return tar_M_src;
+//}
+
+/** Perform a landmark registration between the data sets source and target.
+ *  Return transform from source to target.
+ */
+ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const
+{
+  *ok = false;
+
+  // too few data samples: ignore
+  if (source->GetNumberOfPoints() < 3)
+  {
+    std::cout << "not enoug pts to register" << std::endl;
+    return ssc::Transform3D();
+  }
+
+  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
+  landmarktransform->SetSourceLandmarks(source);
+  landmarktransform->SetTargetLandmarks(target);
+  landmarktransform->SetModeToSimilarity();
+  source->Modified();
+  target->Modified();
+  landmarktransform->Update();
+
+  ssc::Transform3D tar_M_src(landmarktransform->GetMatrix());
+  *ok = true;
+  return tar_M_src;
+}
+
+
 void RegistrationManager::doPatientRegistration()
 {
   if(!mMasterImage)
@@ -126,51 +239,25 @@ void RegistrationManager::doPatientRegistration()
     return;
   }
 
-  vtkDoubleArrayPtr toolPoints = ToolManager::getInstance()->getToolSamples();
-  vtkDoubleArrayPtr imagePoints = this->getMasterImage()->getLandmarks();
+  ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
+  ssc::LandmarkMap toolLandmarks = toolManager()->getLandmarks();
 
-  vtkPointsPtr sourcePoints = vtkPointsPtr::New();
-  vtkPointsPtr targetPoints = vtkPointsPtr::New();
-  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
+  std::vector<std::string> landmarks = getUsableLandmarks(masterLandmarks, toolLandmarks);
+  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, masterLandmarks, mMasterImage->get_rMd());
+  vtkPointsPtr p_pr = convertTovtkPoints(landmarks, toolLandmarks, ssc::Transform3D());
 
-	int numberOfToolPoints = toolPoints->GetNumberOfTuples();
-	int numberOfImagePoints = imagePoints->GetNumberOfTuples();
+  bool ok = false;
+  ssc::Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
+  if (!ok)
+    return;
 
-  for (int i=0; i < numberOfToolPoints; i++)
-  {
-    for(int j=0; j < numberOfImagePoints; j++)
-    {
-      double* sourcePoint = toolPoints->GetTuple(i);
-      double* targetPoint = imagePoints->GetTuple(j);
-      if(sourcePoint[3] == targetPoint[3])
-      {
-        NameListType::iterator it = mGlobalPointSetNameList.find(sourcePoint[3]);
-        if(it->second.second)
-        {
-          // Insert pointset if state is active
-          sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
-          targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
-        }
-      }
-    }
-  }
-
-  landmarktransform->SetSourceLandmarks(sourcePoints);
-  landmarktransform->SetTargetLandmarks(targetPoints);
-  landmarktransform->SetModeToSimilarity();
-  sourcePoints->Modified();
-  targetPoints->Modified();
-  landmarktransform->Update();
-
-  //update rMpr transform in ToolManager
-  //vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
-  ssc::Transform3D rMpr(landmarktransform->GetMatrix());
-
-//  ssc::Transform3DPtr rMprPtr(new ssc::Transform3D(matrix));
-//  mToolManager->set_rMpr(rMprPtr);
+//
+//  bool ok = false;
+//  ssc::Transform3D rMpr = this->performLandmarkRegistration(toolLandmarks, imageLandmarks, &ok);
+//  if (!ok)
+//    return;
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
-  //image->get_rMd_History()->addRegistration(regTrans);
   toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   emit patientRegistrationPerformed();
@@ -185,47 +272,20 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
     messageManager()->sendError("There isn't set a masterimage in the registrationmanager.");
     return;
   }
-  
-  //calculate the transform from image to dataRef
-  vtkDoubleArrayPtr imagePoints = image->getLandmarks();
-  vtkDoubleArrayPtr masterImagePoints = mMasterImage->getLandmarks();
 
-  vtkPointsPtr sourcePoints = vtkPointsPtr::New();
-  vtkPointsPtr targetPoints = vtkPointsPtr::New();
-  vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
+  ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
+  ssc::LandmarkMap imageLandmarks = image->getLandmarks();
 
-  int numberOfImagePoints = imagePoints->GetNumberOfTuples();
-  int numberOfMasterImagePoints = masterImagePoints->GetNumberOfTuples();
-  for (int i=0; i < numberOfImagePoints; i++)
-  {
-    for(int j=0; j < numberOfMasterImagePoints; j++)
-    {
-      double* sourcePoint = imagePoints->GetTuple(i);
-      double* targetPoint = masterImagePoints->GetTuple(j);
-      if(sourcePoint[3] == targetPoint[3])
-      {
-        NameListType::iterator it = mGlobalPointSetNameList.find(sourcePoint[3]);
-        if(it->second.second)
-        {
-          sourcePoints->InsertNextPoint(sourcePoint[0], sourcePoint[1], sourcePoint[2]);
-          targetPoints->InsertNextPoint(targetPoint[0], targetPoint[1], targetPoint[2]);
-        }
-      }
-    }
-  }
+  std::vector<std::string> landmarks = getUsableLandmarks(masterLandmarks, imageLandmarks);
+  vtkPointsPtr p_ref = convertTovtkPoints(landmarks, masterLandmarks, mMasterImage->get_rMd());
+  vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D());
 
-  landmarktransform->SetSourceLandmarks(sourcePoints);
-  landmarktransform->SetTargetLandmarks(targetPoints);
-  landmarktransform->SetModeToSimilarity();
-  sourcePoints->Modified();
-  targetPoints->Modified();
-  landmarktransform->Update();
+  bool ok = false;
+  ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
+  if (!ok)
+    return;
 
-  //set the transform on the image
-  vtkMatrix4x4* matrix = landmarktransform->GetMatrix();
-  ssc::Transform3D transform(matrix);
-  //image->set_rMd(transform);
-  ssc::RegistrationTransform regTrans(transform, QDateTime::currentDateTime(), "Image to Image");
+  ssc::RegistrationTransform regTrans(rMd, QDateTime::currentDateTime(), "Image to Image");
   image->get_rMd_History()->addRegistration(regTrans);
   //why did we use the inverse of the transform?
   //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
@@ -234,36 +294,36 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   messageManager()->sendInfo("Image registration has been performed.");
 }
 
-void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
-{
-  if(name.empty())
-    return;
-
-  NameListType::iterator it = mGlobalPointSetNameList.find(index);
-  if(it != mGlobalPointSetNameList.end())
-  {
-    it->second.first = name;
-    messageManager()->sendInfo("Updated name for existing global point to: "+name);
-  }
-  else
-  {
-    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,true)));
-    messageManager()->sendInfo("Created new global point name with name: "+name);
-  }
-}
-void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
-{
-  std::string name = " ";
-  NameListType::iterator it = mGlobalPointSetNameList.find(index);
-  if(it != mGlobalPointSetNameList.end())
-  {
-    it->second.second = active;
-    messageManager()->sendInfo("Updated status to for existing point.");
-  }
-  else
-  {
-    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,active)));
-    messageManager()->sendInfo("Added new point with active status.");
-  }
-}
+//void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
+//{
+//  if(name.empty())
+//    return;
+//
+//  NameListType::iterator it = mGlobalPointSetNameList.find(index);
+//  if(it != mGlobalPointSetNameList.end())
+//  {
+//    it->second.first = name;
+//    messageManager()->sendInfo("Updated name for existing global point to: "+name);
+//  }
+//  else
+//  {
+//    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,true)));
+//    messageManager()->sendInfo("Created new global point name with name: "+name);
+//  }
+//}
+//void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
+//{
+//  std::string name = " ";
+//  NameListType::iterator it = mGlobalPointSetNameList.find(index);
+//  if(it != mGlobalPointSetNameList.end())
+//  {
+//    it->second.second = active;
+//    messageManager()->sendInfo("Updated status to for existing point.");
+//  }
+//  else
+//  {
+//    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,active)));
+//    messageManager()->sendInfo("Added new point with active status.");
+//  }
+//}
 }//namespace cx

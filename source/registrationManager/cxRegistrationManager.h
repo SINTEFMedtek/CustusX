@@ -2,6 +2,7 @@
 #define CXREGISTRATIONMANAGER_H_
 
 #include <map>
+#include <vector>
 #include <QObject>
 #include "vtkSmartPointer.h"
 #include "sscImage.h"
@@ -36,11 +37,10 @@ public:
   ssc::ImagePtr getMasterImage(); ///< get the master image
   bool isMasterImageSet(); ///< check if the master image is set
 
-  void setGlobalPointSet(vtkDoubleArrayPtr pointset); ///< set a global point set used to register against
-  vtkDoubleArrayPtr getGlobalPointSet(); ///< get the global point set
-
-  void setGlobalPointSetNameList(NameListType nameList); ///< set user specific names on the global points
-  NameListType getGlobalPointSetNameList(); ///< get a map of the names
+//  void setGlobalPointSet(vtkDoubleArrayPtr pointset); ///< set a global point set used to register against
+//  vtkDoubleArrayPtr getGlobalPointSet(); ///< get the global point set
+//
+//  void setGlobalPointSetNameList(NameListType nameList); ///< set user specific names on the global points
 
   void setManualPatientRegistration(ssc::Transform3DPtr patientRegistration); ///< used for when a user wants to
   ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
@@ -53,8 +53,6 @@ public:
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
 
 public slots:
-  void setGlobalPointsNameSlot(int index, std::string name); ///< set the points (user) name
-  void setGlobalPointsActiveSlot(int index, bool active); ///< set if the point should be used in matrix calc or not
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset); ///< transform for (slightly) moving a patient registration
 
 signals:
@@ -65,11 +63,13 @@ protected:
   RegistrationManager(); ///< use getInstance instead
   ~RegistrationManager(); ///< destructor
 
+  ssc::Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
+  vtkPointsPtr convertTovtkPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
+  std::vector<std::string> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
+
   static RegistrationManager* mCxInstance; ///< the only instance of this class
 
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
-  vtkDoubleArrayPtr mGlobalPointSet; ///< the pointset used when doing the registration
-  NameListType mGlobalPointSetNameList; ///< names of the points in the global point set
 
   ssc::Transform3DPtr mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
   ssc::Transform3DPtr mManualPatientRegistration; ///< patient registration loaded from file

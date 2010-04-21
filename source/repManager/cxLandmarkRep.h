@@ -49,35 +49,38 @@ public:
 
   virtual std::string getType() const;
 
-  int getNumberOfLandmarks() const; ///< returns the number of landmarks
+  //int getNumberOfLandmarks() const; ///< returns the number of landmarks
   void setColor(RGB_ color); ///< sets the reps color
   void setTextScale(int& x, int& y,int& z); ///< default is (20,20,20)
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
   ssc::ImagePtr getImage() const; ///< returns a pointer to the image being used
-  void removePermanentPoint(unsigned int index); ///< sends out a signal requesting a point to be removed from the images internal landmarklist
+  //void removePermanentPoint(unsigned int index); ///< sends out a signal requesting a point to be removed from the images internal landmarklist
 
-signals:
-  void removePermanentPoint(double x, double y, double z, unsigned int index); ///< the landmarkrep can signal that a point should be removed the (images) landmarklist
+//signals:
+  //void removePermanentPoint(double x, double y, double z, unsigned int index); ///< the landmarkrep can signal that a point should be removed the (images) landmarklist
 
 public slots:
-  void addPermanentPointSlot(double x, double y, double z, unsigned int index); ///< used tell the landmarkrep that a new point is added
+  //void addPermanentPointSlot(double x, double y, double z, unsigned int index); ///< used tell the landmarkrep that a new point is added
+  void landmarkAddedSlot(std::string );
+  void landmarkRemovedSlot(std::string);
 
 protected:
   LandmarkRep(const std::string& uid, const std::string& name=""); ///< sets default text scaling to 20
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-  void addPoint(double& x, double& y, double& z, int index); ///< add a set of actors for the new point
+  void addPoint(ssc::Vector3D coord, std::string caption);
+  //void addPoint(double& x, double& y, double& z, int index); ///< add a set of actors for the new point
   void internalUpdate(); ///< run after a point is removed to update the numbers of the textactors
 
   std::string     mType;          ///< description of this reps type
-  RGB_             mColor;         ///< the color of the landmark actors
+  RGB_            mColor;         ///< the color of the landmark actors
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
   bool            mShowLandmarks; ///< whether or not the actors should be showed in (all) views
   int             mTextScale[3];  ///< the textscale
 
-  std::map<int, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
-  std::map<int, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
+  std::map<std::string, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
+  std::map<std::string, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
 
 private:
   LandmarkRep(); ///< not implemented
