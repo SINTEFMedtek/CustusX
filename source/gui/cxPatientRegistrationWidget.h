@@ -40,8 +40,8 @@ public:
 protected slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
-  void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
-  void toolSampledUpdateSlot(double, double, double,unsigned int); ///<
+  //void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
+  //void toolSampledUpdateSlot(double, double, double,unsigned int); ///<
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
   void rowSelectedSlot(int row, int column); ///<  updates the current row and column
@@ -51,11 +51,19 @@ protected slots:
   void setOffsetSlot(int value); ///< set the patient registration offset
   void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
 
+  void landmarkAddedSlot(std::string uid);
+  void landmarkRemovedSlot(std::string uid);
+  void patientLandmarkChangedSlot(std::string uid);
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
   void updateAccuracy(); ///< calculates accuracy for each landmark after a registration
   void doPatientRegistration(); ///< initializes patient registration
+
+  double getAccuracy(std::string uid);
+  double getAvarageAccuracy();
+  std::vector<ssc::Landmark> getAllLandmarks() const;
 
   //gui
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
@@ -77,9 +85,10 @@ protected:
   QPushButton* mResetOffsetButton; ///< button for resetting the offset to zero
 
   //data
-  int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
-  std::map<int, double> mLandmarkRegistrationAccuracyMap; ///< maps accuracy to index of a landmark
-  double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
+  std::string mActiveLandmark;
+  //int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
+  //std::map<std, double> mLandmarkRegistrationAccuracyMap; ///< maps accuracy to index of a landmark
+  //double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 

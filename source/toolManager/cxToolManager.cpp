@@ -45,7 +45,7 @@ ToolManager::ToolManager() :
       mToolSensorChannelnumberTag("channelnumber"), mToolSensorRomFileTag(
           "rom_file"), mToolCalibrationTag("calibration"),
       mToolCalibrationFileTag("cal_file"), mPulseGenerator(
-          igstk::PulseGenerator::New()), mToolSamples(vtkDoubleArray::New())
+          igstk::PulseGenerator::New())
 {
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(
@@ -60,7 +60,6 @@ ToolManager::ToolManager() :
   mPulseGenerator->RequestSetFrequency(30.0);
   mPulseGenerator->RequestStart();
 
-  mToolSamples->SetNumberOfComponents(4);
 
   initializeManualTool();
 //  //adding a manual tool as default
@@ -177,6 +176,25 @@ void ToolManager::saveToolsSlot()
 {
   saveTransformsAndTimestamps();
 }
+
+ssc::LandmarkMap ToolManager::getLandmarks()
+{
+  return mLandmarks;
+}
+
+void ToolManager::setLandmark(ssc::Landmark landmark)
+{
+  mLandmarks[landmark.getUid()] = landmark;
+  emit landmarkAdded(landmark.getUid());
+}
+
+void ToolManager::removeLandmark(std::string uid)
+{
+  mLandmarks.erase(uid);
+  emit landmarkRemoved(uid);
+}
+
+
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
   return mConfiguredTools;
@@ -318,10 +336,7 @@ void ToolManager::setLoggingFolder(std::string loggingFolder)
 {
   mLoggingFolder = loggingFolder;
 }
-vtkDoubleArrayPtr ToolManager::getToolSamples()
-{
-  return mToolSamples;
-}
+
 void ToolManager::receiveToolReport(ToolMessage message, bool state,
     bool success, stdString uid)
 {
@@ -870,42 +885,6 @@ void ToolManager::dominantCheckSlot()
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2)
 {
   return tool1->getType() > tool2->getType();
-}
-void ToolManager::addToolSampleSlot(double x, double y, double z, unsigned int index)
-{
-  double addToolSample[4] =
-  { x, y, z, (double) index};
-
-  int numberOfLandmarks = mToolSamples->GetNumberOfTuples();
-  //if index exists, we treat it as an edit operation
-  for (int i = 0; i <= numberOfLandmarks - 1; i++)
-  {
-    double* landmark = mToolSamples->GetTuple(i);
-    if (landmark[3] == index)
-    {
-      mToolSamples->SetTupleValue(i, addToolSample);
-      emit toolSampleAdded(x, y, z, index);
-      messageManager()->sendInfo("Editet a toolsample");
-      return;
-    }
-  }
-  //else it's an add operation
-  mToolSamples->InsertNextTupleValue(addToolSample);
-  emit toolSampleAdded(x, y, z, index);
-  messageManager()->sendInfo("Added a toolsample.");
-}
-void ToolManager::removeToolSampleSlot(double x, double y, double z, unsigned int index)
-{
-  int numberOfLandmarks = mToolSamples->GetNumberOfTuples();
-  for (int i = 0; i <= numberOfLandmarks - 1; i++)
-  {
-    double* landmark = mToolSamples->GetTuple(i);
-    if (landmark[3] == index)
-    {
-      mToolSamples->RemoveTuple(i);
-      emit toolSampleRemoved(x, y, z, index);
-    }
-  }
 }
 
 void ToolManager::addXml(QDomNode& parentNode)

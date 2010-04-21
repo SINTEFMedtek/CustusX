@@ -18,6 +18,7 @@
 #include "cxView2D.h"
 //#include "cxInriaRep2D.h"
 #include "cxRegistrationHistoryWidget.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -29,9 +30,9 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mEditLandmarkButton(new QPushButton("Resample landmark", this)),
   mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
   mThresholdLabel(new QLabel("Probing treshold:", this)),
-  mThresholdSlider(new QSlider(Qt::Horizontal, this)),
-  mCurrentRow(-1),
-  mCurrentColumn(-1)
+  mThresholdSlider(new QSlider(Qt::Horizontal, this))
+  //mCurrentRow(-1),
+  //mCurrentColumn(-1)
 {
   //widget
   this->setWindowTitle("Image Registration");
@@ -80,40 +81,41 @@ void ImageRegistrationWidget::activeImageChangedSlot()
   //disconnect from the old image
   if(mCurrentImage)
   {
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
-              this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
-              this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)),
+               this, SLOT(landmarkAddedSlot(std::string)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)),
+               this, SLOT(landmarkRemovedSlot(std::string)));
   }
 
   //Set new current image
   mCurrentImage = activeImage;
-  if(!mCurrentImage)// Don't use image if deleted
+
+  if(mCurrentImage)
+  {
+    messageManager()->sendInfo("ImageRegistrationWidget got a new current image to work on: "+mCurrentImage->getUid()+"");
+
+    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)),
+               this, SLOT(landmarkAddedSlot(std::string)));
+    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)),
+               this, SLOT(landmarkRemovedSlot(std::string)));
+
+    //set a default treshold
+    mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
+    ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+    mThresholdSlider->setValue(probeRep->getThreshold());
+    }
+  else
   {
     messageManager()->sendWarning("Empty mCurrentImage in ImageRegistrationWidget::activeImageChangedSlot(), return");
     return;
   }
 
-  messageManager()->sendInfo("ImageRegistrationWidget got a new current image to work on: "+mCurrentImage->getUid()+"");
-
-  connect(mCurrentImage.get(), SIGNAL(landmarkAdded(double,double,double,unsigned int)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-  connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(double,double,double,unsigned int)),
-          this, SLOT(imageLandmarksUpdateSlot(double,double,double,unsigned int)));
-
-  //set a default treshold
-  mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
-  ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-  mThresholdSlider->setValue(probeRep->getThreshold());
-
   //get the images landmarks and populate the landmark table
   this->populateTheLandmarkTableWidget(mCurrentImage);
 
   //enable the add point button
-  if (mCurrentImage)
-    mAddLandmarkButton->setEnabled(true);
-  else
-    mAddLandmarkButton->setEnabled(false);
+  mAddLandmarkButton->setEnabled(mCurrentImage!=0);
+
 }
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
@@ -123,9 +125,16 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
     messageManager()->sendError("Could not find a rep to add the landmark to.");
     return;
   }
-  int index = mLandmarkTableWidget->rowCount()+1;
-  probeRep->makeLandmarkPermanent(index);
+  //int index = mLandmarkTableWidget->rowCount()+1;
+
+  std::string uid = dataManager()->addLandmark();
+  ssc::Vector3D pos_r = probeRep->getPosition();
+  ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
+  std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
+  mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
+  //probeRep->makeLandmarkPermanent(uid); //TODO
 }
+
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
   ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
@@ -134,217 +143,149 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
     messageManager()->sendError("Could not find a rep to edit the landmark for.");
     return;
   }
-  int index = mCurrentRow+1;
-  probeRep->makeLandmarkPermanent(index);
+//  int index = mCurrentRow+1;
+  std::string uid = mActiveLandmark;
+  ssc::Vector3D pos_r = probeRep->getPosition();
+  mCurrentImage->setLandmark(ssc::Landmark(uid, pos_r));
+
+//  probeRep->makeLandmarkPermanent(index); //TODO
 }
+
 void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
-  if(mCurrentRow < 0 || mCurrentColumn < 0)
-    return;
+//  if(mCurrentRow < 0 || mCurrentColumn < 0)
+//    return;
 
-  int index = mCurrentRow+1;
+//  int index = mCurrentRow+1;
+  std::string uid = mActiveLandmark;
+  mCurrentImage->removeLandmark(uid);
 
-  LandmarkRepPtr landmarkRep = repManager()->getLandmarkRep("LandmarkRep_1");
-  landmarkRep->removePermanentPoint(index);
+//  LandmarkRepPtr landmarkRep = repManager()->getLandmarkRep("LandmarkRep_1");
+//  landmarkRep->removePermanentPoint(index);
 }
-void ImageRegistrationWidget::imageLandmarksUpdateSlot(double notUsedX, double notUsedY, double notUsedZ, unsigned int notUsedIndex)
-{
-  //make sure the masterImage is set
-  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
-  if(!masterImage)
-    registrationManager()->setMasterImage(mCurrentImage);
-  
-  //check if its time to do image registration
-  if(mCurrentImage->getLandmarks()->GetNumberOfTuples() > 2)
-  {
-    messageManager()->sendInfo(mCurrentImage->getUid());
-    registrationManager()->setGlobalPointSet(mCurrentImage->getLandmarks());
-    registrationManager()->doImageRegistration(mCurrentImage);
-  }
-  this->populateTheLandmarkTableWidget(mCurrentImage);
-}
+
 void ImageRegistrationWidget::landmarkSelectedSlot(int row, int column)
 {
-  mCurrentRow = row;
-  mCurrentColumn = column;
+  mActiveLandmark = string_cast(mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString());
+//  mCurrentRow = row;
+//  mCurrentColumn = column;
 
   mEditLandmarkButton->setEnabled(true);
+  mRemoveLandmarkButton->setEnabled(true);
 }
+
 void ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
+
 void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
-  if(!image) //Image is deleted
-  {
-    mLandmarkTableWidget->clear();
-    return;
-  }
+  mLandmarkTableWidget->clear();
 
-  //get the landmarks from the image
-  vtkDoubleArrayPtr landmarks =  image->getLandmarks();
-  int numberOfLandmarks = landmarks->GetNumberOfTuples();
+  if(!image) //Image is deleted
+    return;
+
+  std::vector<ssc::Landmark> landmarks =  this->getAllLandmarks();
 
   //ready the table widget
-  mLandmarkTableWidget->clear();
-  mLandmarkTableWidget->setRowCount(0);
+  mLandmarkTableWidget->setRowCount(landmarks.size());
   mLandmarkTableWidget->setColumnCount(3);
   QStringList headerItems(QStringList() << "Name" << "Status" << "Landmark");
   mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
   mLandmarkTableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-  //fill the table widget with rows for the landmarks
-  int row = 0;
-  for(int i=0; i<numberOfLandmarks; i++)
-  {
-    double* landmark = landmarks->GetTuple(i);
-    if(landmark[3] > mLandmarkTableWidget->rowCount())
-      mLandmarkTableWidget->setRowCount(landmark[3]);
-    QTableWidgetItem* columnOne; //Name
-    QTableWidgetItem* columnTwo; //Status
-    QTableWidgetItem* columnThree; //Image coordinates
+  std::cout << "landmarks.size()" << landmarks.size() << std::endl;
 
-    int rowToInsert = landmark[3]-1;
-    int tempRow = -1;
-    if(rowToInsert < row)
-    {
-      tempRow = row;
-      row = rowToInsert;
-    }
-    for(; row <= rowToInsert; row++)
-    {
-      if(row == rowToInsert)
-      {
-        columnOne = new QTableWidgetItem();
-        columnTwo = new QTableWidgetItem();
-        columnThree = new QTableWidgetItem(tr("(%1, %2, %3)").arg(landmark[0]).arg(landmark[1]).arg(landmark[2]));
-      }
-      else
-      {
-        columnOne = new QTableWidgetItem();
-        columnTwo = new QTableWidgetItem();
-        columnThree = new QTableWidgetItem();
-      }
-      //check the LandmarkActiveMap...
-      //mapindex for landmarkActiveMap starts at 0 
-      //and tablerow and coloumns start at 0,0
-      RegistrationManager::NameListType landmarkActiveMap = registrationManager()->getGlobalPointSetNameList();
-      int index = row+1;
-      RegistrationManager::NameListType::iterator it = landmarkActiveMap.find(index);
-      if(it != landmarkActiveMap.end())
-      {
-        if(!it->second.second)
-          columnTwo->setCheckState(Qt::Unchecked);
-        else
-          columnTwo->setCheckState(Qt::Checked);
-      }
-      else //if the landmark wasn't in the map it should be added
-      {
-        //send update to registrationmanage
-        registrationManager()->setGlobalPointsActiveSlot(index, true);
-        columnTwo->setCheckState(Qt::Checked);
-      }
-      //Set item properties and add the items to the table
-      //TODO dosnt work, makes every cell inactive...
-      /*columnOne->setFlags(Qt::ItemIsSelectable &&
-                          Qt::ItemIsEditable &&
-                          !Qt::ItemIsDragEnabled &&
-                          !Qt::ItemIsDropEnabled &&
-                          !Qt::ItemIsUserCheckable &&
-                          !Qt::ItemIsEnabled &&
-                          !Qt::ItemIsTristate); //name should be selectable and editable
-      columnTwo->setFlags(!Qt::ItemIsEditable); //status shouldnt allow writing in the cell
-      columnThree->setFlags(Qt::ItemIsSelectable &&
-                            Qt::ItemIsEditable &&
-                            !Qt::ItemIsDragEnabled &&
-                            !Qt::ItemIsDropEnabled &&
-                            !Qt::ItemIsUserCheckable &&
-                            !Qt::ItemIsEnabled &&
-                            !Qt::ItemIsTristate);//image coords should be selectable*/
-      mLandmarkTableWidget->setItem(row, 0, columnOne);
-      mLandmarkTableWidget->setItem(row, 1, columnTwo);
-      mLandmarkTableWidget->setItem(row, 2, columnThree);
-    }
-    if(tempRow != -1)
-      row = tempRow;
-  }
-  //get globalPointsNameList from the RegistrationManager
-  RegistrationManager::NameListType nameList = registrationManager()->getGlobalPointSetNameList();
-  //fill in names
-  typedef RegistrationManager::NameListType::iterator Iterator;
-  for(Iterator it = nameList.begin(); it != nameList.end(); ++it)
+  for(unsigned i=0; i<landmarks.size();++i)
   {
-    std::string name = it->second.first;
-    int index = it->first;
-    int row = index-1;
-    QTableWidgetItem* columnOne;
+    std::vector<QTableWidgetItem*> items(3); // name, status, coordinates
 
-    if(index > mLandmarkTableWidget->rowCount())
-    {
-      mLandmarkTableWidget->setRowCount(index);
-      columnOne = new QTableWidgetItem();
-      QTableWidgetItem* columnThree = new QTableWidgetItem();
-      
-      //Set item properties and add the items to the table
-      //TODO dosnt work, makes every cell inactive...
-      /*columnOne->setFlags(Qt::ItemIsSelectable &&
-                          Qt::ItemIsEditable &&
-                          !Qt::ItemIsDragEnabled &&
-                          !Qt::ItemIsDropEnabled &&
-                          !Qt::ItemIsUserCheckable &&
-                          !Qt::ItemIsEnabled &&
-                          !Qt::ItemIsTristate); //name should be selectable and editable
-      columnThree->setFlags(Qt::ItemIsSelectable &&
-                            !Qt::ItemIsEditable &&
-                            !Qt::ItemIsDragEnabled &&
-                            !Qt::ItemIsDropEnabled &&
-                            !Qt::ItemIsUserCheckable &&
-                            !Qt::ItemIsEnabled &&
-                            !Qt::ItemIsTristate);//image coords should be selectable*/
-      mLandmarkTableWidget->setItem(row, 1, columnOne);
-      mLandmarkTableWidget->setItem(row, 2, columnThree);
-    }
+    ssc::LandmarkProperty prop = dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
+    ssc::Vector3D coord = landmarks[i].getCoord();
+
+    items[0] = new QTableWidgetItem(qstring_cast(prop.getName()));
+    items[1] = new QTableWidgetItem;
+
+    if (prop.getActive())
+      items[1]->setCheckState(Qt::Checked);
     else
-    {
-      columnOne = mLandmarkTableWidget->item(row, 1);
-    }
-    if(columnOne != NULL && !name.empty())
-      columnOne->setText(QString(name.c_str()));
-  }
+      items[1]->setCheckState(Qt::Unchecked);
 
-  //highlight selected row
-  if(mCurrentRow != -1 && mCurrentColumn != -1)
-    mLandmarkTableWidget->setCurrentCell(mCurrentRow, mCurrentColumn);
+    //std::cout << "coord[" << i << "]=" << coord << std::endl;
+    items[2] = new QTableWidgetItem(tr("(%1, %2, %3)").arg(coord[0]).arg(coord[1]).arg(coord[2]));
+
+    for (unsigned j=0; j<items.size(); ++j)
+    {
+      items[j]->setData(Qt::UserRole, qstring_cast(prop.getUid()));
+      mLandmarkTableWidget->setItem(i, j, items[j]);
+    }
+
+    //highlight selected row
+    if (prop.getUid()==mActiveLandmark)
+    {
+      mLandmarkTableWidget->setCurrentItem(items[2]);
+    }
+  }
 
   //update buttons
-  if(numberOfLandmarks == 0)
-  {
-    mRemoveLandmarkButton->setDisabled(true);
-    mEditLandmarkButton->setDisabled(true);
-  }
-  else
-  {
-    mRemoveLandmarkButton->setEnabled(true);
-    if(mCurrentRow != -1 && mCurrentColumn != -1)
-      mEditLandmarkButton->setEnabled(true);
-  }
+  mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.empty());
+  mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.empty());
+
+//  if(landmarks.empty())
+//  {
+//    mRemoveLandmarkButton->setDisabled(true);
+//    mEditLandmarkButton->setDisabled(true);
+//  }
+//  else
+//  {
+//    mRemoveLandmarkButton->setEnabled(true);
+//    if(!mActiveLandmark.empty())
+//      mEditLandmarkButton->setEnabled(true);
+//  }
 }
+
+std::vector<ssc::Landmark> ImageRegistrationWidget::getAllLandmarks() const
+{
+  std::vector<ssc::Landmark> retval;
+  ssc::LandmarkMap imageData = mCurrentImage->getLandmarks();
+  std::map<std::string, ssc::LandmarkProperty> dataData = dataManager()->getLandmarkProperties();
+  std::cout << "imageData.size()" << imageData.size() << std::endl;
+  std::cout << "dataData.size()" << dataData.size() << std::endl;
+
+  std::map<std::string, ssc::LandmarkProperty>::iterator iter;
+
+  for (iter=dataData.begin(); iter!=dataData.end(); ++iter)
+  {
+    if (imageData.count(iter->first))
+      retval.push_back(imageData[iter->first]);
+    else
+      retval.push_back(ssc::Landmark(iter->first));
+  }
+
+  return retval;
+}
+
 void ImageRegistrationWidget::cellChangedSlot(int row,int column)
 {
+  QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
+  std::string uid = string_cast(item->data(Qt::UserRole).toString());
+
   if(column==1)
   {
-    Qt::CheckState state = mLandmarkTableWidget->item(row,column)->checkState();
-    registrationManager()->setGlobalPointsActiveSlot(row, state);
+    Qt::CheckState state = item->checkState();
+    dataManager()->setLandmarkActive(uid, state==Qt::Checked);
+    //registrationManager()->setGlobalPointsActiveSlot(row, state);
   }
 
   if(column==0)
   {
-    std::string name = mLandmarkTableWidget->item(row, column)->text().toStdString();
-    int index = row+1;
-    registrationManager()->setGlobalPointsNameSlot(index, name);
+    std::string name = item->text().toStdString();
+    dataManager()->setLandmarkName(uid, name);
+//    int index = row+1;
+//    registrationManager()->setGlobalPointsNameSlot(index, name);
   }
 }
 void ImageRegistrationWidget::thresholdChangedSlot(const int value)
@@ -360,4 +301,30 @@ void ImageRegistrationWidget::thresholdChangedSlot(const int value)
   text.append(valueText);
   mThresholdLabel->setText(text);
 }
+
+void ImageRegistrationWidget::landmarkAddedSlot(std::string uid)
+{
+  //make sure the masterImage is set
+  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
+  if(!masterImage)
+    registrationManager()->setMasterImage(mCurrentImage);
+
+  registrationManager()->doImageRegistration(mCurrentImage);
+// //check if its time to do image registration
+//  if(mCurrentImage->getLandmarks().size() > 2)
+//  {
+//    messageManager()->sendInfo(mCurrentImage->getUid());
+//    //registrationManager()->setGlobalPointSet(mCurrentImage->getLandmarks());
+//    registrationManager()->doImageRegistration(mCurrentImage);
+//  }
+
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+}
+
+void ImageRegistrationWidget::landmarkRemovedSlot(std::string uid)
+{
+  this->populateTheLandmarkTableWidget(mCurrentImage);
+}
+
+
 }//namespace cx

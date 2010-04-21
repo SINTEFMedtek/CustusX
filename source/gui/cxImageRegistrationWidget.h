@@ -42,14 +42,19 @@ protected slots:
   void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
   void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
-  void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
+  //void imageLandmarksUpdateSlot(double, double, double,unsigned int); ///< updates the table widget when landmarks are added/edited or removed
   void landmarkSelectedSlot(int row, int column); ///< when a landmark i selected from the table
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
 
+  void landmarkAddedSlot(std::string uid);
+  void landmarkRemovedSlot(std::string uid);
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
+  std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
+  QString getLandmarkName(std::string uid);
 
   //gui
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
@@ -61,8 +66,9 @@ protected:
   QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
 
   //data
+  std::string mActiveLandmark; ///< uid of surrently selected landmark.
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
-  int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
+  //int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
 
 private:
   ImageRegistrationWidget(); ///< not implemented
