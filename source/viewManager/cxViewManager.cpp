@@ -131,7 +131,8 @@ ViewManager::ViewManager() :
   syncOrientationMode(SyncedValue::create(0));
 
   // set start layout
-  this->setActiveLayout(LAYOUT_3DACS_2X2);
+
+  this->setActiveLayout(LAYOUT_3DACS_2X2_SNW);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),

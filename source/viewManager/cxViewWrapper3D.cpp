@@ -35,6 +35,16 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
 
+  // plane type text rep
+  mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
+  mPlaneTypeText->addText(ssc::Vector3D(0,1,0), "3D", ssc::Vector3D(0.98, 0.02, 0.0));
+  mView->addRep(mPlaneTypeText);
+
+  //data name text rep
+  mDataNameText = ssc::DisplayTextRep::New("dataNameText_"+mView->getName(), "");
+  mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
+  mView->addRep(mDataNameText);
+
   connect(toolManager(), SIGNAL(configured()), this, SLOT(toolManagerConfiguredSlot()));
   toolManagerConfiguredSlot();
 }
@@ -59,6 +69,9 @@ void ViewWrapper3D::setImage(ssc::ImagePtr image)
    mProbeRep->setImage(mImage);
    mLandmarkRep->setImage(mImage);
    //std::cout << "ViewGroup3D::setImage" << std::endl;
+
+   //update data name text rep
+   mDataNameText->setText(0, mImage->getName());
 
    //Shading
    if(QSettings().value("shadingOn").toBool())

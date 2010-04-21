@@ -46,6 +46,9 @@ private:
   ssc::VolumetricRepPtr mVolumetricRep;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
+  ssc::DisplayTextRepPtr mPlaneTypeText;
+  ssc::DisplayTextRepPtr mDataNameText;
+
   ssc::ImagePtr mImage;
   ssc::View* mView;
 };
