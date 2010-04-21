@@ -11,6 +11,7 @@ SET(cxProject_MOC_HDRS
   cxNavigationWidget.h
   cxBrowserWidget.h
   cxImageRegistrationWidget.h
+    cxRegistrationWidget.h
   cxPatientRegistrationWidget.h
   cxTransferFunctionWidget.h
   cxTransferFunctionAlphaWidget.h
@@ -49,6 +50,8 @@ SET(${LIBNAME}_SRCS
     cxBrowserWidget.cpp
     cxImageRegistrationWidget.h
     cxImageRegistrationWidget.cpp
+    cxRegistrationWidget.h
+    cxRegistrationWidget.cpp
     cxPatientRegistrationWidget.h
     cxPatientRegistrationWidget.cpp
     cxTransferFunctionWidget.h
