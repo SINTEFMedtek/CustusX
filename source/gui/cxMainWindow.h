@@ -121,6 +121,8 @@ protected:
   void createToolBars(); ///< creates and adds toolbars for convenience
   void createStatusBar();  ///< //TODO
 
+  void addAsDockWidget(QWidget* widget);
+
   //saving/loading
   void generateSaveDoc(QDomDocument& doc);
   void readLoadDoc(QDomDocument& loadDoc);
@@ -210,6 +212,7 @@ protected:
   NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
   CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
   class ImagePropertiesWidget* mImagePropertiesWidget; ///< display and control of image properties for active image.
+  class ToolPropertiesWidget* mToolPropertiesWidget; ///< display and control of tool properties for active tool.
   int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences

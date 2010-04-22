@@ -15,6 +15,7 @@
 #include "cxNavigationWidget.h"
 #include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
+#include "cxToolPropertiesWidget.h"
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
@@ -169,6 +170,7 @@ MainWindow::MainWindow() :
   mNavigationWidget(new NavigationWidget(NULL)),
   mCustomStatusBar(new CustomStatusBar()),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
+  mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),
   mPatientRegistrationIndex(-1),
@@ -235,14 +237,26 @@ MainWindow::MainWindow() :
   mContextDockWidget->removeTab(mNavigationIndex);*/
     
 
-  QDockWidget* imagePropertiesDockWidget = new QDockWidget("Image Properties", this);
-  imagePropertiesDockWidget->setObjectName("ImagePropertiesDockWidget");
-  imagePropertiesDockWidget->setWidget(mImagePropertiesWidget);
-  this->addDockWidget(Qt::LeftDockWidgetArea, imagePropertiesDockWidget);
+//  QDockWidget* imagePropertiesDockWidget = new QDockWidget("Image Properties", this);
+//  imagePropertiesDockWidget->setObjectName("ImagePropertiesDockWidget");
+//  imagePropertiesDockWidget->setWidget(mImagePropertiesWidget);
+//  this->addDockWidget(Qt::LeftDockWidgetArea, imagePropertiesDockWidget);
+
+  this->addAsDockWidget(mImagePropertiesWidget);
+  this->addAsDockWidget(mToolPropertiesWidget);
 
   // Don't show the Widget before all elements are initialized
   this->show();
 }
+
+void MainWindow::addAsDockWidget(QWidget* widget)
+{
+  QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
+  dockWidget->setObjectName(widget->objectName()+"DockWidget");
+  dockWidget->setWidget(widget);
+  this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+}
+
 MainWindow::~MainWindow()
 {}
 void MainWindow::createActions()
@@ -495,7 +509,7 @@ void MainWindow::createToolBars()
   mToolToolBar->addAction(mStopTrackingToolsAction);
 
   mNavigationToolBar = addToolBar("Navigation");
-  mToolToolBar->setObjectName("NavigationToolBar");
+  mNavigationToolBar->setObjectName("NavigationToolBar");
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
   mNavigationToolBar->addAction(mCenterToTooltipAction);
 }

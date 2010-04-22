@@ -152,7 +152,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   }
   //TODO What if the reference frame isnt visible?
   ssc::Transform3D lastTransform_prMt = mToolToSample->get_prMt();
-  ssc::Vector3D p_pr = lastTransform_prMt.coord(ssc::Vector3D(0,0,0));
+  ssc::Vector3D p_pr = lastTransform_prMt.coord(ssc::Vector3D(0,0,mToolToSample->getTooltipOffset()));
 
   // TODO: do we want to allow sampling points not defined in image??
   if (mActiveLandmark.empty() && !dataManager()->getLandmarkProperties().empty())

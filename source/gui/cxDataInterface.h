@@ -18,6 +18,28 @@
 namespace cx
 {
 
+/** Interface to the tool offset of the dominant tool
+ */
+class DoubleDataInterfaceActiveToolOffset : public ssc::DoubleDataInterface
+{
+  Q_OBJECT
+public:
+  DoubleDataInterfaceActiveToolOffset();
+  virtual ~DoubleDataInterfaceActiveToolOffset() {}
+  virtual QString getValueName() const { return "Offset"; }
+  virtual double getValue() const;
+  virtual bool setValue(double val);
+  virtual QString getValueID() const { return ""; }
+  virtual void connectValueSignals(bool on) {}
+  ssc::DoubleRange getValueRange() const;
+
+private slots:
+  void dominantToolChangedSlot();
+protected:
+  ssc::ToolPtr mTool;
+};
+
+
 /** Superclass for all doubles interacting with the active image.
  */
 class DoubleDataInterfaceActiveImageBase : public ssc::DoubleDataInterface

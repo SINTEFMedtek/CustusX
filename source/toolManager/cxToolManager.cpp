@@ -61,15 +61,7 @@ ToolManager::ToolManager() :
   mPulseGenerator->RequestSetFrequency(30.0);
   mPulseGenerator->RequestStart();
 
-
   initializeManualTool();
-//  //adding a manual tool as default
-//  mManualTool.reset(new ssc::ManualTool("tool_manual"));
-//  (*mConfiguredTools)["tool_manual"] = mManualTool;
-//  mManualTool->setVisible(true);
-//  ssc::Transform3D prMt =
-//
-//  this->addConnectedTool("tool_manual");
   this->setDominantTool("tool_manual");
 }
 ToolManager::~ToolManager()
@@ -243,6 +235,7 @@ void ToolManager::setDominantTool(const std::string& uid)
   if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mDominantTool && mManualTool)
   {
     mManualTool->set_prMt(mDominantTool->get_prMt());
+    mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
   }
 
   mDominantTool = newTool;
@@ -898,6 +891,13 @@ void ToolManager::addXml(QDomNode& parentNode)
   QDomElement manualToolNode = doc.createElement("manualTool");
   manualToolNode.appendChild(doc.createTextNode("\n"+qstring_cast(mManualTool->get_prMt())));
   base.appendChild(manualToolNode);
+
+//  if (mDominantTool)
+//  {
+//    QDomElement toolOffsetNode = doc.createElement("toolOffset");
+//    toolOffsetNode.appendChild(doc.createTextNode("\n"+qstring_cast(mDominantTool->getTooltipOffset())));
+//    base.appendChild(toolOffsetNode);
+//  }
 
   QDomElement landmarksNode = doc.createElement("landmarks");
   ssc::LandmarkMap::iterator it = mLandmarks.begin();
