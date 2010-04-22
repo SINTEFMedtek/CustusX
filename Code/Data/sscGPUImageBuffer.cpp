@@ -120,6 +120,8 @@ public:
 		}
 			break; //16UI_EXT; break;
 		default:
+      size = 0;
+      internalType = 0;
 			std::cout << "Bit size not supported!" << std::endl;
 			break;
 		}

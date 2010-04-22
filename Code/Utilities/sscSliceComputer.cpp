@@ -84,6 +84,7 @@ void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
     case ptSAGITTAL : newType = ptSIDEPLANE; break;
     case ptCORONAL  : newType = ptANYPLANE; break;
     case ptAXIAL    : newType = ptRADIALPLANE; break;
+    default: break;
     }
   }
   else if (type==otORTHOGONAL)
@@ -93,6 +94,7 @@ void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
     case ptSIDEPLANE   : newType = ptSAGITTAL; break;
     case ptANYPLANE    : newType = ptCORONAL; break;
     case ptRADIALPLANE : newType = ptAXIAL; break;
+    default: break;
     }
   }
 
