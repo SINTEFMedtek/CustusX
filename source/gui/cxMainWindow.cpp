@@ -495,6 +495,7 @@ void MainWindow::createToolBars()
   mToolToolBar->addAction(mStopTrackingToolsAction);
 
   mNavigationToolBar = addToolBar("Navigation");
+  mToolToolBar->setObjectName("NavigationToolBar");
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
   mNavigationToolBar->addAction(mCenterToTooltipAction);
 }

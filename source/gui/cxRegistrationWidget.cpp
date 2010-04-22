@@ -83,6 +83,7 @@ void RegistrationWidget::cellClickedSlot(int row, int column)
 void RegistrationWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
+  registrationManager()->initialize();
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
 

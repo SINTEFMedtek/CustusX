@@ -29,6 +29,15 @@ RegistrationManager::RegistrationManager()
 {}
 RegistrationManager::~RegistrationManager()
 {}
+
+/** Start a new round of registrations : this collects fex adding several landmarks into one registration session.
+ *
+ */
+void RegistrationManager::initialize()
+{
+  mLastRegistrationTime = QDateTime::currentDateTime();
+}
+
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
   mMasterImage = image;
@@ -171,7 +180,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
-    std::cout << "not enoug pts to register" << std::endl;
+    std::cout << "not enough points to register" << std::endl;
     return ssc::Transform3D();
   }
 
@@ -217,7 +226,8 @@ void RegistrationManager::doPatientRegistration()
 //    return;
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
-  toolManager()->get_rMpr_History()->addRegistration(regTrans);
+  toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  mLastRegistrationTime = regTrans.mTimestamp;
 
   emit patientRegistrationPerformed();
   messageManager()->sendInfo("Patient registration has been performed.");
@@ -245,7 +255,9 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
     return;
 
   ssc::RegistrationTransform regTrans(rMd, QDateTime::currentDateTime(), "Image to Image");
-  image->get_rMd_History()->addRegistration(regTrans);
+  image->get_rMd_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  mLastRegistrationTime = regTrans.mTimestamp;
+
   //why did we use the inverse of the transform?
   //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
