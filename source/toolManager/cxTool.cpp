@@ -148,7 +148,11 @@ double Tool::getTooltipOffset() const
 }
 void Tool::setTooltipOffset(double val)
 {
+  std::cout << "Tool::setTooltipOffset" << std::endl;
+  if (!ssc::similar(val, mToolTipOffset))
+    return;
   mToolTipOffset = val;
+  emit tooltipOffset(mToolTipOffset);
 }
 Tool::TrackerToolType* Tool::getPointer() const
 {

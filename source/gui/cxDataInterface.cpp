@@ -11,9 +11,58 @@
 #include "cxMessageManager.h"
 #include "sscImageLUT2D.h"
 #include "cxDataManager.h"
+#include "cxToolManager.h"
+#include "sscTool.h"
 
 namespace cx
 {
+
+DoubleDataInterfaceActiveToolOffset::DoubleDataInterfaceActiveToolOffset()
+{
+  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  dominantToolChangedSlot();
+}
+
+double DoubleDataInterfaceActiveToolOffset::getValue() const
+{
+  if (mTool)
+    return mTool->getTooltipOffset();
+  return 0.0;
+}
+
+bool DoubleDataInterfaceActiveToolOffset::setValue(double val)
+{
+  if (!mTool)
+    return false;
+  mTool->setTooltipOffset(val);
+  return true;
+}
+
+void DoubleDataInterfaceActiveToolOffset::dominantToolChangedSlot()
+{
+  if (mTool)
+  {
+    disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
+  }
+
+  mTool = toolManager()->getDominantTool();
+
+  if (mTool)
+  {
+    connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
+  }
+}
+
+ssc::DoubleRange DoubleDataInterfaceActiveToolOffset::getValueRange() const
+{
+  double range = 200;
+  return ssc::DoubleRange(0,range,range/1000.0);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 
 DoubleDataInterfaceActiveImageBase::DoubleDataInterfaceActiveImageBase()
 {

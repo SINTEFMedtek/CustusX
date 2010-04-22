@@ -84,12 +84,13 @@ void Navigation::centerToImageCenter()
   DataManager::getInstance()->setCenter(p_r);
 
   // move the manual tool to the same position. (this is a side effect... do we want it?)
+  ssc::ManualToolPtr manual = ToolManager::getInstance()->getManualTool();
   ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
-  ssc::Transform3D prM0t = ToolManager::getInstance()->getManualTool()->get_prMt(); // modify old pos in order to keep orientation
-  ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0,0,0));
+  ssc::Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
+  ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0,0,manual->getTooltipOffset()));
   ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
   //ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
-  ToolManager::getInstance()->getManualTool()->set_prMt(prM1t);
+  manual->set_prMt(prM1t);
 }
 
 /**Place the global center at the current position of the
@@ -97,7 +98,8 @@ void Navigation::centerToImageCenter()
  */
 void Navigation::centerToTooltip()
 {
-  ssc::Vector3D p_pr = ToolManager::getInstance()->getDominantTool()->get_prMt().coord(ssc::Vector3D(0,0,0));
+  ssc::ToolPtr tool = ToolManager::getInstance()->getDominantTool();
+  ssc::Vector3D p_pr = tool->get_prMt().coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
   ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(p_pr);
   // set center to calculated position
   DataManager::getInstance()->setCenter(p_r);
