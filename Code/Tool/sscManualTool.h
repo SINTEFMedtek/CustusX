@@ -19,7 +19,7 @@ class ManualTool : public ssc::Tool
 	Q_OBJECT
 public:
 
-	explicit ManualTool(const std::string& uid);
+	explicit ManualTool(const std::string& uid, const std::string& name ="");
 	virtual ~ManualTool();
 	virtual Type getType() const;
 	virtual std::string getGraphicsFileName() const;
@@ -46,8 +46,8 @@ public:
 private:
 	void read3DCrossHair();
 	// constant data
-	const std::string mUid;
-	const std::string mName;
+	//const std::string mUid; //see sscTool
+	//const std::string mName; //see sscTool
 	vtkPolyDataPtr mPolyData;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;

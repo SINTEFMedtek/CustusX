@@ -11,7 +11,8 @@
 namespace ssc
 {
 
-ManualTool::ManualTool(const std::string& uid) : mUid(uid), mName(uid), mMutex(QMutex::Recursive)
+ManualTool::ManualTool(const std::string& uid, const std::string& name) :
+    Tool(uid,name), mMutex(QMutex::Recursive)
 {
 	mOffset = 0;
 	mType = TOOL_MANUAL;

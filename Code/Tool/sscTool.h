@@ -31,6 +31,13 @@ public:
 		mUid(""),
 		mName("")
 	{};
+	 Tool(const std::string& uid, const std::string& name ="") :
+	    mUid(uid),
+	    mName(name)
+	  {
+	   if(name.empty())
+	     mName = uid;
+	  };
 	~Tool(){};
 
 	/**Enumerates the general type of tool.
