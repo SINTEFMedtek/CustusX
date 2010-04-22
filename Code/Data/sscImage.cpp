@@ -141,7 +141,7 @@ LandmarkMap Image::getLandmarks()
 }
 void Image::setLandmark(Landmark landmark)
 {
-  std::cout << "Image::setLandmark" << std::endl;
+  //std::cout << "Image::setLandmark" << std::endl;
   mLandmarks[landmark.getUid()] = landmark;
   emit landmarkAdded(landmark.getUid());
 }
