@@ -74,7 +74,7 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& s, const Transform3D& t);
-bool similar(const Transform3D& a, const Transform3D& b, double tol=1.0E-6);
+bool similar(const Transform3D& a, const Transform3D& b, double tol=1.0E-4);
 
 DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb);
 

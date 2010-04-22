@@ -188,11 +188,12 @@ bool similar(const Transform3D& a, const Transform3D& b, double tol)
 {
 	vtkMatrix4x4Ptr m = a.matrix();
 	vtkMatrix4x4Ptr n = b.matrix();
-	
 	for (int i=0; i<4; ++i)
 		for (int j=0; j<4; ++j)
 			if (!similar(m->GetElement(i,j), n->GetElement(i,j), tol))
+			{
 				return false;
+			}
 	return true;
 }
 // --------------------------------------------------------

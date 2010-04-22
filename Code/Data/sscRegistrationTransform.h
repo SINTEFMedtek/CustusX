@@ -27,11 +27,12 @@ public:
 
   RegistrationTransform();
   explicit RegistrationTransform(const Transform3D& value, const QDateTime& timestamp=QDateTime(), const QString& type="");
-  bool operator<(const RegistrationTransform& rhs) const;
-  bool operator==(const RegistrationTransform& rhs) const;
-  void addXml(QDomNode& parentNode); ///< write internal state to node
+  void addXml(QDomNode& parentNode) const; ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
 };
+
+bool operator<(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
+bool operator==(const RegistrationTransform& lhs, const RegistrationTransform& rhs);
 
 /**A RegistrationHistory describes the registration history of one
  * transform. Normally only the newest transform is used, but it is
@@ -41,10 +42,11 @@ class RegistrationHistory : public QObject
 {
   Q_OBJECT
 public:
-  void addXml(QDomNode& parentNode); ///< write internal state to node
+  void addXml(QDomNode& parentNode) const; ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
   void addRegistration(const RegistrationTransform& transform);
   void setRegistration(const Transform3D& transform);
+  void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
   std::vector<RegistrationTransform> getData() const;
   void removeNewerThan(const QDateTime& timestamp);
   void setActiveTime(const QDateTime& timestamp);

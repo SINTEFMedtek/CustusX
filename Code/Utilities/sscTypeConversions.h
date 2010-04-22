@@ -61,7 +61,7 @@ std::vector<double> convertQString2DoubleVector(const QString& input);
  *  The streamed object must support the method void addXml(QDomNode).
  */
 template<class T>
-QString streamXml2String(T& val)
+QString streamXml2String(const T& val)
 {
   QDomDocument doc;
   QDomElement root = doc.createElement("root");
