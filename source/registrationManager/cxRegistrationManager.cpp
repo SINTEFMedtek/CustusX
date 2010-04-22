@@ -245,26 +245,32 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 void RegistrationManager::addXml(QDomNode& parentNode)
 {
   QDomDocument doc = parentNode.ownerDocument();
+  QDomElement base = doc.createElement("registrationManager");
+  parentNode.appendChild(base);
 
   QDomElement masterImageNode = doc.createElement("masterImageUid");
   if(mMasterImage)
+  {
     masterImageNode.appendChild(doc.createTextNode(mMasterImage->getUid().c_str()));
-  parentNode.appendChild(masterImageNode);
+    //messageManager()->sendInfo("SAVED MASTERIMAGE, UID: "+mMasterImage->getUid());
+  }
+  base.appendChild(masterImageNode);
 }
 
 void RegistrationManager::parseXml(QDomNode& dataNode)
 {
+  messageManager()->sendInfo("Inside: void RegistrationManager::parseXml(QDomNode& dataNode)");
   QDomNode child = dataNode.firstChild();
   while(!child.isNull())
   {
     if(child.toElement().tagName() == "masterImageUid")
     {
       const QString masterImageString = child.toElement().text();
-      std::cout << "RM: Found a masterImage with uid: " << masterImageString.toStdString().c_str() << std::endl;
+      //std::cout << "RM: Found a masterImage with uid: " << masterImageString.toStdString().c_str() << std::endl;
       if(!masterImageString.isEmpty())
       {
         ssc::ImagePtr image = dataManager()->getImage(masterImageString.toStdString());
-        std::cout << "RM: Got an image with uid: " << image->getUid().c_str() << std::endl;
+        //std::cout << "RM: Got an image with uid: " << image->getUid().c_str() << std::endl;
         this->setMasterImage(image);
       }
     }
