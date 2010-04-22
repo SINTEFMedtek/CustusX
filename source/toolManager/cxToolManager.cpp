@@ -378,6 +378,7 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state,
     break;
   case Tool::TOOL_COORDINATESYSTEM_TRANSFORM:
     report.append(toolUid + " got a new transform and timestamp.");
+    return; //this is spamming the screen....
     break;
   case Tool::TOOL_NDI_PORT_NUMBER:
     report.append(toolUid + " could not used the given port number.");
@@ -463,12 +464,16 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state,
     report.append(trackerUid + " has a tool that is ");
     if (!success)
       report.append("not ");
+    else
+      return;//this is spamming the screen....
     report.append("updated successfully.");
     break;
   case Tracker::TRACKER_TOOL_TRANSFORM_UPDATED:
     report.append(trackerUid + " has a tool that is ");
     if (!success)
       report.append("not ");
+    else
+      return; //this is spamming the screen....
     report.append("updated successfully.");
     break;
   case Tracker::TRACKER_COMMUNICATION_COMPLETE:
@@ -491,7 +496,6 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state,
     report.append(trackerUid + " reported an unknown message.");
     break;
   }
-  messageManager()->sendInfo(report);
   messageManager()->sendInfo(report);
 }
 bool ToolManager::pathsExists()
@@ -853,6 +857,8 @@ void ToolManager::checkTimeoutsAndRequestTransform()
 }
 void ToolManager::dominantCheckSlot()
 {
+  std::cout << "void ToolManager::dominantCheckSlot()" << std::endl;
+
   //make a sorted vector of all visible tools
   std::vector<ssc::ToolPtr> visibleTools;
   for(ToolMap::iterator it = mConnectedTools->begin();
