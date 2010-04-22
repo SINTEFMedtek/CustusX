@@ -51,17 +51,11 @@ protected slots:
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
-//  void updateAccuracy(); ///< calculates accuracy for each landmark after a registration
   virtual ssc::LandmarkMap getTargetLandmarks() const;
   virtual ssc::Transform3D getTargetTransform() const;
   virtual void performRegistration();
 
-
-  //std::vector<ssc::Landmark> getAllLandmarks() const;
-
   //gui
-  //QVBoxLayout* mVerticalLayout; ///< vertical layout is used
-  //QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
   QPushButton* mToolSampleButton; ///< the Sample Tool button
   QLabel* mOffsetLabel; ///< header label for the offset section
   QWidget* mOffsetWidget; ///< widget for offset functionality
@@ -78,12 +72,7 @@ protected:
   QPushButton* mResetOffsetButton; ///< button for resetting the offset to zero
 
   //data
-  //std::string mActiveLandmark;
-  //int mCurrentRow, mCurrentColumn; ///< which row and column are currently the choose ones
-  //std::map<std, double> mLandmarkRegistrationAccuracyMap; ///< maps accuracy to index of a landmark
-  //double mAverageRegistrationAccuracy; ///< the average registration accuracy of the last registration
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
-  //ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 
   int mMinValue, mMaxValue, mDefaultValue; ///< values for the range of the offset
 

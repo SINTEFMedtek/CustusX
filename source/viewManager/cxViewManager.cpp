@@ -17,6 +17,7 @@
 #include "cxView3D.h"
 #include "cxViewGroup.h"
 #include "cxViewGroupInria.h"
+#include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
 #include "cxDataManager.h"
@@ -128,7 +129,7 @@ ViewManager::ViewManager() :
   group.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
   mViewGroups.push_back(group);
 
-  syncOrientationMode(SyncedValue::create(0));
+  this->syncOrientationMode(SyncedValue::create(0));
 
   // set start layout
 

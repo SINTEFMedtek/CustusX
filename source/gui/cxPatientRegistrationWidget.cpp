@@ -26,10 +26,7 @@ namespace cx
 {
 PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   RegistrationWidget(parent),
-  //mVerticalLayout(new QVBoxLayout(this)),
-  //mLandmarkTableWidget(new QTableWidget(this)),
   mToolSampleButton(new QPushButton("Sample Tool", this)),
-  //mAvarageAccuracyLabel(new QLabel(QString(" "), this)),
   mOffsetLabel(new QLabel(QString("Manual offset:"), this)),
   mOffsetWidget(new QWidget(this)),
   mOffsetsGridLayout(new QGridLayout(mOffsetWidget)),
@@ -43,20 +40,12 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mYSpinBox(new QSpinBox(mOffsetWidget)),
   mZSpinBox(new QSpinBox(mOffsetWidget)),
   mResetOffsetButton(new QPushButton("Clear offset", this)),
-  //mCurrentRow(-1),
-  //mCurrentColumn(-1),
   mMinValue(-200),
   mMaxValue(200),
   mDefaultValue(0)
 {
   //Dock widget
   this->setWindowTitle("Patient Registration");
-
-//  //table widget
-//  connect(mLandmarkTableWidget, SIGNAL(cellChanged(int, int)),
-//          this, SLOT(cellChangedSlot(int, int)));
-//  connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
-//          this, SLOT(rowSelectedSlot(int, int)));
 
   //buttons
   mToolSampleButton->setDisabled(true);
@@ -132,8 +121,6 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mOffsetWidget);
   mVerticalLayout->addWidget(mResetOffsetButton);
   mVerticalLayout->addWidget(new RegistrationHistoryWidget(this));
-
-  //this->setLayout(mVerticalLayout);
 
   mOffsetWidget->setDisabled(true);
 

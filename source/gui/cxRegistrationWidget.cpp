@@ -99,7 +99,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
   //ready the table widget
   mLandmarkTableWidget->setRowCount(landmarks.size());
   mLandmarkTableWidget->setColumnCount(4);
-  QStringList headerItems(QStringList() << "Name" << "Status" << "Patient coordinates" << "Accuracy");
+  QStringList headerItems(QStringList() << "Name" << "Status" << "Coordinates" << "Accuracy");
   mLandmarkTableWidget->setHorizontalHeaderLabels(headerItems);
   mLandmarkTableWidget->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   mLandmarkTableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);

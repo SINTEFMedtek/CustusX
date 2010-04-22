@@ -5,9 +5,9 @@
 #include "itkCommand.h"
 #include "vtkSmartPointer.h"
 #include "sscManualTool.h"
+#include "sscLandmark.h"
 #include "cxTool.h"
 #include "cxTracker.h"
-#include "sscLandmark.h"
 
 class QDomNode;
 class QDomDocument;
@@ -66,8 +66,6 @@ public:
   void setConfigurationFile(std::string configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
   void setLoggingFolder(std::string loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
-//  virtual vtkDoubleArrayPtr getToolSamples(); ///< \return all toolsamples defined .
-
   void addXml(QDomNode& parentNode); ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
 
@@ -82,17 +80,11 @@ public slots:
   virtual void startTracking(); ///< starts tracking
   virtual void stopTracking(); ///< stops tracking
   virtual void saveToolsSlot(); ///< saves transforms and timestamps
-  //void addToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to remove tool(patient) samples
-  //void removeToolSampleSlot(double x, double y, double z, unsigned int index); ///< slot to add tool(patient) samples
-  //void setLandmark(Landmark landmark);
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 signals:
   void landmarkRemoved(std::string uid);
   void landmarkAdded(std::string uid);
-  //void toolManagerReport(std::string message); ///< sends out messages the outside might want to log
-//  void toolSampleRemoved(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is removed
-//  void toolSampleAdded(double x, double y, double z, unsigned int index); ///< emitted when a tool(patient) coordinate is added
   void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 
 protected slots:

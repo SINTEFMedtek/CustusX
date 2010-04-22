@@ -40,15 +40,11 @@ protected slots:
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
 
-//  void landmarkAddedSlot(std::string uid);
-//  void landmarkRemovedSlot(std::string uid);
-
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual ssc::LandmarkMap getTargetLandmarks() const;
   virtual void performRegistration();
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
-//  std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
   QString getLandmarkName(std::string uid);
   virtual ssc::Transform3D getTargetTransform() const;
 
@@ -58,10 +54,6 @@ protected:
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
   QLabel*      mThresholdLabel; ///< label for the tresholdslider
   QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
-
-  //data
-  //std::string mActiveLandmark; ///< uid of surrently selected landmark.
-  //ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 
 private:
   ImageRegistrationWidget(); ///< not implemented

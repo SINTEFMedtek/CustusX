@@ -6,11 +6,12 @@
 #include <QDomDocument>
 #include <QMetaType>
 #include <vtkDoubleArray.h>
+#include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
+#include "cxDataManager.h"
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxMessageManager.h"
-#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -897,6 +898,16 @@ void ToolManager::addXml(QDomNode& parentNode)
   QDomElement manualToolNode = doc.createElement("manualTool");
   manualToolNode.appendChild(doc.createTextNode("\n"+qstring_cast(mManualTool->get_prMt())));
   base.appendChild(manualToolNode);
+
+  QDomElement landmarksNode = doc.createElement("landmarks");
+  ssc::LandmarkMap::iterator it = mLandmarks.begin();
+  for(; it != mLandmarks.end(); ++it)
+  {
+    QDomElement landmarkNode = doc.createElement("landmark");
+    it->second.addXml(landmarkNode);
+    landmarksNode.appendChild(landmarkNode);
+  }
+  base.appendChild(landmarksNode);
 }
 
 void ToolManager::parseXml(QDomNode& dataNode)
@@ -906,6 +917,15 @@ void ToolManager::parseXml(QDomNode& dataNode)
 
   QString manualToolText = dataNode.namedItem("manualTool").toElement().text();
   mManualTool->set_prMt(ssc::Transform3D::fromString(manualToolText));
+
+  QDomNode landmarksNode = dataNode.namedItem("landmarks");
+  QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
+  for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
+  {
+    ssc::Landmark landmark;
+    landmark.parseXml(landmarkNode);
+    this->setLandmark(landmark);
+  }
 }
 
 ssc::RegistrationHistoryPtr ToolManager::get_rMpr_History()

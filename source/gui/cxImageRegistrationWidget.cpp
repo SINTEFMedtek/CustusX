@@ -49,16 +49,15 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
 
   //layout
   mVerticalLayout->addWidget(mLandmarkTableWidget);
+  mVerticalLayout->addWidget(mAvarageAccuracyLabel);
   mVerticalLayout->addWidget(mAddLandmarkButton);
   mVerticalLayout->addWidget(mEditLandmarkButton);
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
   mVerticalLayout->addWidget(mThresholdLabel);
   mVerticalLayout->addWidget(mThresholdSlider);
   mVerticalLayout->addWidget(new RegistrationHistoryWidget(this));
-
-//  this->setLayout(mVerticalLayout);
-
 }
+
 ImageRegistrationWidget::~ImageRegistrationWidget()
 {
 }
