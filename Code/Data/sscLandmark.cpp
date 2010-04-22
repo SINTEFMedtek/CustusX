@@ -103,8 +103,8 @@ void LandmarkProperty::parseXml(QDomNode& dataNode)
 
   QDomElement base = dataNode.toElement();
   mUid = base.attribute("uid").toStdString();
-  mActive = base.attribute("uid").toInt();
-  mName = base.attribute("uid").toStdString();
+  mActive = base.attribute("active").toInt();
+  mName = base.attribute("name").toStdString();
 }
 
 

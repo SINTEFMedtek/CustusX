@@ -15,9 +15,8 @@
  */
 namespace ssc
 {
-class Landmark //: public QObject
+class Landmark
 {
-	//Q_OBJECT
 public:
 	explicit Landmark(std::string uid="", Vector3D coord=Vector3D(0,0,0));
 	~Landmark();
