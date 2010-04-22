@@ -33,6 +33,8 @@ public:
 
   static RegistrationManager* getInstance(); ///< get the only instance of this class
 
+  void initialize();
+
   void setMasterImage(ssc::ImagePtr image); ///< set a master image used when registrating
   ssc::ImagePtr getMasterImage(); ///< get the master image
   bool isMasterImageSet(); ///< check if the master image is set
@@ -70,6 +72,7 @@ protected:
   static RegistrationManager* mCxInstance; ///< the only instance of this class
 
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
+  QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
   ssc::Transform3DPtr mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
   ssc::Transform3DPtr mManualPatientRegistration; ///< patient registration loaded from file
