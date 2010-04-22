@@ -544,13 +544,13 @@ void MainWindow::generateSaveDoc(QDomDocument& doc)
   dataManager()->addXml(managerNode);
   toolManager()->addXml(managerNode);
   viewManager()->addXml(managerNode);
+  registrationManager()->addXml(managerNode);
 
   //TODO Implement
   /*
   messageManager()->getXml(doc); //TODO
-  viewManager()->getXml(doc); //TODO
   repManager->getXml(doc); //TODO
-  registrationManager->getXml(doc);*/
+  */
 
   messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
@@ -582,7 +582,10 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
   toolManager()->parseXml(toolmanagerNode);
 
   QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-  viewManager()->parseXml(managerNode.namedItem("viewManager"));
+  viewManager()->parseXml(viewmanagerNode);
+
+  QDomNode registrationNode = managerNode.namedItem("registrationManager");
+  registrationManager()->parseXml(registrationNode);
 }
 
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)

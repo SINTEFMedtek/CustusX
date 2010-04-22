@@ -40,28 +40,22 @@ public:
     int R;
     int G;
     int B;
-    RGB_() : R(255), G(0), B(0)
+    RGB_() : R(0), G(255), B(0)
     {};
   }; ///< struct representing a rgb color
 
   static LandmarkRepPtr New(const std::string& uid, const std::string& name=""); ///constructor
-  ~LandmarkRep(); ///< empty
+  virtual ~LandmarkRep(); ///< empty
 
   virtual std::string getType() const;
 
-  //int getNumberOfLandmarks() const; ///< returns the number of landmarks
   void setColor(RGB_ color); ///< sets the reps color
   void setTextScale(int& x, int& y,int& z); ///< default is (20,20,20)
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
   ssc::ImagePtr getImage() const; ///< returns a pointer to the image being used
-  //void removePermanentPoint(unsigned int index); ///< sends out a signal requesting a point to be removed from the images internal landmarklist
-
-//signals:
-  //void removePermanentPoint(double x, double y, double z, unsigned int index); ///< the landmarkrep can signal that a point should be removed the (images) landmarklist
 
 public slots:
-  //void addPermanentPointSlot(double x, double y, double z, unsigned int index); ///< used tell the landmarkrep that a new point is added
   void landmarkAddedSlot(std::string );
   void landmarkRemovedSlot(std::string);
 
@@ -70,9 +64,11 @@ protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
   void addPoint(ssc::Vector3D coord, std::string caption);
-  //void addPoint(double& x, double& y, double& z, int index); ///< add a set of actors for the new point
-  void internalUpdate(); ///< run after a point is removed to update the numbers of the textactors
 
+protected slots:
+  void internalUpdate(); ///< updates the text, color, scale etc
+
+protected:
   std::string     mType;          ///< description of this reps type
   RGB_            mColor;         ///< the color of the landmark actors
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to

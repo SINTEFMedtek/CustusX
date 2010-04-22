@@ -39,11 +39,6 @@ public:
   ssc::ImagePtr getMasterImage(); ///< get the master image
   bool isMasterImageSet(); ///< check if the master image is set
 
-//  void setGlobalPointSet(vtkDoubleArrayPtr pointset); ///< set a global point set used to register against
-//  vtkDoubleArrayPtr getGlobalPointSet(); ///< get the global point set
-//
-//  void setGlobalPointSetNameList(NameListType nameList); ///< set user specific names on the global points
-
   void setManualPatientRegistration(ssc::Transform3DPtr patientRegistration); ///< used for when a user wants to
   ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
   void resetManualPatientientRegistration(); ///< tells the system not to use a manually added patient registration, after it uses landmarks for patient registration instead
@@ -53,6 +48,10 @@ public:
 
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
+
+  //Interface for saving/loading
+  void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
+  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
 
 public slots:
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset); ///< transform for (slightly) moving a patient registration

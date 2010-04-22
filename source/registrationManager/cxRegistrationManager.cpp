@@ -1,6 +1,7 @@
 #include "cxRegistrationManager.h"
 
 #include <QtCore>
+#include <QDomElement>
 #include "vtkMath.h"
 #include "vtkPoints.h"
 #include "vtkDoubleArray.h"
@@ -24,9 +25,10 @@ RegistrationManager* RegistrationManager::getInstance()
   }
   return mCxInstance;
 }
+
 RegistrationManager::RegistrationManager()
-  //mToolManager(ToolManager::getInstance())
 {}
+
 RegistrationManager::~RegistrationManager()
 {}
 
@@ -43,36 +45,20 @@ void RegistrationManager::setMasterImage(ssc::ImagePtr image)
   mMasterImage = image;
   messageManager()->sendInfo("Master image set to "+image->getUid());
 }
+
 ssc::ImagePtr RegistrationManager::getMasterImage()
 {
   return mMasterImage;
 }
+
 bool RegistrationManager::isMasterImageSet()
 {
   return mMasterImage;
 }
-//void RegistrationManager::setGlobalPointSet(vtkDoubleArrayPtr pointset)
-//{
-//  mGlobalPointSet = pointset;
-//  messageManager()->sendInfo("Global point set is set.");
-//}
-//vtkDoubleArrayPtr RegistrationManager::getGlobalPointSet()
-//{
-//  return mGlobalPointSet;
-//}
-//void RegistrationManager::setGlobalPointSetNameList(RegistrationManager::NameListType nameList)
-//{
-//  mGlobalPointSetNameList = nameList;
-//  messageManager()->sendInfo("Global point set name list is set.");
-//}
-//RegistrationManager::NameListType RegistrationManager::getGlobalPointSetNameList()
-//{
-//  return mGlobalPointSetNameList;
-//}
+
 void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patientRegistration)
 {
   mManualPatientRegistration = patientRegistration;
-  //mToolManager->set_rMpr(patientRegistration);
 
   ssc::RegistrationTransform regTrans(*patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
   toolManager()->get_rMpr_History()->addRegistration(regTrans);
@@ -82,17 +68,19 @@ void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patie
 
   messageManager()->sendInfo("Manual patient registration is set.");
 }
+
 ssc::Transform3DPtr RegistrationManager::getManualPatientRegistration()
 {
   return mManualPatientRegistration;
 }
+
 void RegistrationManager::resetManualPatientientRegistration()
 {
   mManualPatientRegistration.reset();
   this->doPatientRegistration();
 }
-void RegistrationManager::setManualPatientRegistrationOffsetSlot(
-    ssc::Transform3DPtr offset)
+
+void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset)
 {
   ssc::Transform3D currentTransform;
   if (mManualPatientRegistration) //we use this if we have it
@@ -111,10 +99,8 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(
   }
   mPatientRegistrationOffset = offset;
   ssc::Transform3D newTransform = (*mPatientRegistrationOffset) * currentTransform;
-//  mToolManager->set_rMpr(newTransformPtr);
   ssc::RegistrationTransform regTrans(newTransform, QDateTime::currentDateTime(), "Manual Patient Offset");
   toolManager()->get_rMpr_History()->addRegistration(regTrans);
-
 
   messageManager()->sendInfo("Offset for the patient registration is set.");
 }
@@ -123,12 +109,12 @@ ssc::Transform3DPtr RegistrationManager::getManualPatientRegistrationOffset()
 {
   return mPatientRegistrationOffset;
 }
+
 void RegistrationManager::resetOffset()
 {
   mPatientRegistrationOffset.reset();
   this->doPatientRegistration();
 }
-
 
 /**Inspect the landmarks in data a and b, find landmarks defined in both of them and
  * that also is active.
@@ -146,7 +132,6 @@ std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::Land
     if (data_a.count(uid) && data_b.count(uid) && iter->second.getActive())
       retval.push_back(uid);
   }
-
   return retval;
 }
 
@@ -166,7 +151,6 @@ vtkPointsPtr RegistrationManager::convertTovtkPoints(const std::vector<std::stri
     ssc::Vector3D p = M.coord(data.find(uid)->second.getCoord());
     retval->InsertNextPoint(p.begin());
   }
-
   return retval;
 }
 
@@ -197,7 +181,6 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   return tar_M_src;
 }
 
-
 void RegistrationManager::doPatientRegistration()
 {
   if(!mMasterImage)
@@ -218,12 +201,6 @@ void RegistrationManager::doPatientRegistration()
   ssc::Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
   if (!ok)
     return;
-
-//
-//  bool ok = false;
-//  ssc::Transform3D rMpr = this->performLandmarkRegistration(toolLandmarks, imageLandmarks, &ok);
-//  if (!ok)
-//    return;
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
   toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
@@ -265,36 +242,34 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   messageManager()->sendInfo("Image registration has been performed.");
 }
 
-//void RegistrationManager::setGlobalPointsNameSlot(int index, std::string name)
-//{
-//  if(name.empty())
-//    return;
-//
-//  NameListType::iterator it = mGlobalPointSetNameList.find(index);
-//  if(it != mGlobalPointSetNameList.end())
-//  {
-//    it->second.first = name;
-//    messageManager()->sendInfo("Updated name for existing global point to: "+name);
-//  }
-//  else
-//  {
-//    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,true)));
-//    messageManager()->sendInfo("Created new global point name with name: "+name);
-//  }
-//}
-//void RegistrationManager::setGlobalPointsActiveSlot(int index, bool active)
-//{
-//  std::string name = " ";
-//  NameListType::iterator it = mGlobalPointSetNameList.find(index);
-//  if(it != mGlobalPointSetNameList.end())
-//  {
-//    it->second.second = active;
-//    messageManager()->sendInfo("Updated status to for existing point.");
-//  }
-//  else
-//  {
-//    mGlobalPointSetNameList.insert(std::pair<int,StringBoolPair>(index, StringBoolPair(name,active)));
-//    messageManager()->sendInfo("Added new point with active status.");
-//  }
-//}
+void RegistrationManager::addXml(QDomNode& parentNode)
+{
+  QDomDocument doc = parentNode.ownerDocument();
+
+  QDomElement masterImageNode = doc.createElement("masterImageUid");
+  if(mMasterImage)
+    masterImageNode.appendChild(doc.createTextNode(mMasterImage->getUid().c_str()));
+  parentNode.appendChild(masterImageNode);
+}
+
+void RegistrationManager::parseXml(QDomNode& dataNode)
+{
+  QDomNode child = dataNode.firstChild();
+  while(!child.isNull())
+  {
+    if(child.toElement().tagName() == "masterImageUid")
+    {
+      const QString masterImageString = child.toElement().text();
+      std::cout << "RM: Found a masterImage with uid: " << masterImageString.toStdString().c_str() << std::endl;
+      if(!masterImageString.isEmpty())
+      {
+        ssc::ImagePtr image = dataManager()->getImage(masterImageString.toStdString());
+        std::cout << "RM: Got an image with uid: " << image->getUid().c_str() << std::endl;
+        this->setMasterImage(image);
+      }
+    }
+    child = child.nextSibling();
+  }
+}
+
 }//namespace cx

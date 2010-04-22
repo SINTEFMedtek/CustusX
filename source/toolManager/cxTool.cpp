@@ -331,6 +331,7 @@ bool Tool::verifyInternalStructure()
   if(!mInternalStructure.mSROMFilename.empty() && !dir.exists(QString(mInternalStructure.mSROMFilename.c_str())))
   {
     std::cout << "if(!dir.exists(QString(mInternalStructure.mSROMFilename.c_str())))" << std::endl;
+    std::cout << "mInternalStructure.mSROMFilename: " << mInternalStructure.mSROMFilename.c_str() << std::endl;
     return false;
   }
   if(!mInternalStructure.mCalibrationFilename.empty() && !dir.exists(QString(mInternalStructure.mCalibrationFilename.c_str())))

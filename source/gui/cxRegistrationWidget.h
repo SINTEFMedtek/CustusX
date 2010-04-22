@@ -39,8 +39,6 @@ protected slots:
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
 
-//  void landmarkAddedSlot(std::string uid);
-//  void landmarkRemovedSlot(std::string uid);
   void landmarkUpdatedSlot(std::string uid);
 
 protected:
