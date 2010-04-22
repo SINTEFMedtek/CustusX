@@ -113,7 +113,8 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
 
   //add these to the combobox
   typedef std::map<std::string, ssc::ImagePtr>::iterator iterator;
-  int listPosition = 1;
+  mImagesComboBox->insertItem(1, QString("<No image selected>"));
+  int listPosition = 2;
   for(iterator i = images.begin(); i != images.end(); ++i)
   {
     mImagesComboBox->insertItem(listPosition, QString(i->first.c_str()));
@@ -125,7 +126,8 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
 void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 {
   //messageMan()->sendInfo("New image selected: "+comboBoxText.toStdString());
-  if(comboBoxText.isEmpty() || comboBoxText.endsWith("..."))
+  if(comboBoxText.isEmpty() || comboBoxText.endsWith("...") 
+     || comboBoxText.endsWith(">"))
   {
     // Create empty current image
     mCurrentImage.reset();
