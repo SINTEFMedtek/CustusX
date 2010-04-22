@@ -207,6 +207,7 @@ void DataManagerImpl::setLandmarkNames(std::vector<std::string> names)
     LandmarkProperty prop(string_cast(i+1), names[i]); // generate 1-indexed uids (keep users happy)
     mLandmarkProperties[prop.getUid()] = prop;
   }
+  emit landmarkPropertiesChanged();
 }
 
 std::string DataManagerImpl::addLandmark()
@@ -219,6 +220,8 @@ std::string DataManagerImpl::addLandmark()
   }
   std::string uid = string_cast(max+1);
   mLandmarkProperties[uid] = LandmarkProperty(uid);
+
+  emit landmarkPropertiesChanged();
   return uid;
 }
 
@@ -226,6 +229,7 @@ std::string DataManagerImpl::addLandmark()
 void DataManagerImpl::setLandmarkName(std::string uid, std::string name)
 {
   mLandmarkProperties[uid].setName(name);
+  emit landmarkPropertiesChanged();
 }
 
 std::map<std::string, LandmarkProperty> DataManagerImpl::getLandmarkProperties() const
@@ -236,6 +240,7 @@ std::map<std::string, LandmarkProperty> DataManagerImpl::getLandmarkProperties()
 void DataManagerImpl::setLandmarkActive(std::string uid, bool active)
 {
   mLandmarkProperties[uid].setActive(active);
+  emit landmarkPropertiesChanged();
 }
 
 

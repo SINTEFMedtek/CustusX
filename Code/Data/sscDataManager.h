@@ -75,10 +75,11 @@ public:
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
 
 signals:
-	void centerChanged(); ///< emitter when center is changed.
+	void centerChanged(); ///< emitted when center is changed.
 	void dataLoaded(); ///emitted when data is loaded successfully
-	void activeImageChanged(const std::string& uId); ///< emitted when the active image is changed
+	void activeImageChanged(const std::string& uId); ///< emitted when the active image is change
 	//void activeMeshChanged(const std::string& uId); ///< emitted when the active mesh is changed
+	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 
 protected:
 	static void setInstance(DataManager* instance);

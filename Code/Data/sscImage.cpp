@@ -344,22 +344,6 @@ void Image::parseXml(QDomNode& dataNode)
 	  landmark.parseXml(landmarkNode);
 	  this->setLandmark(landmark);
   }
-
-	//landmarks
-	/*QDomNode landmarksNode = dataNode.namedItem("landmarks");
-	if(landmarksNode.isNull())
-	  return;
-	if(!landmarksNode.hasChildNodes())
-	  return; //this image dosn't have landmarks
-	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
-	do
-	{
-	  QStringList landmark = landmarkNode.toElement().text().split(" ");
-	  this->addLandmarkSlot(landmark[1].toDouble(), landmark[2].toDouble(),
-                          landmark[3].toDouble(), landmark[0].toInt());
-	  landmarkNode = landmarkNode.nextSiblingElement("landmark");
-	}
-	while(!landmarkNode.isNull());*/
 }
 
 } // namespace ssc

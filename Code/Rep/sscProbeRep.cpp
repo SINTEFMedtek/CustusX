@@ -210,7 +210,7 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
     pickedPointMapper->SetInputConnection(pickedPointSphereSource->GetOutputPort());
     mPickedPointActor = vtkActorPtr::New();
     mPickedPointActor->SetMapper(pickedPointMapper);
-    mPickedPointActor->GetProperty()->SetColor(0,1,0);
+    mPickedPointActor->GetProperty()->SetColor(0,0,1);
   }
   if(mCurrentRenderer->HasViewProp(mPickedPointActor))
       mCurrentRenderer->RemoveActor(mPickedPointActor);

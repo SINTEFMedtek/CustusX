@@ -10,7 +10,7 @@ endif(COMMAND cmake_policy)
 
 project( SSC )
 
-enable_testing()
+#enable_testing()
 
 include_directories( /usr/local/include )
 

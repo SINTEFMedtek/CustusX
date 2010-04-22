@@ -6,7 +6,6 @@
 namespace ssc
 {
 
-
 Landmark::Landmark(std::string uid, Vector3D coord) :
   mUid(uid), mCoord(coord)
 {
@@ -56,11 +55,9 @@ void Landmark::parseXml(QDomNode& dataNode)
   mTimestamp = QDateTime::fromString(dataNode.namedItem("timestamp").toElement().text(), timestampSecondsFormat());
 }
 
-
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
 
 LandmarkProperty::LandmarkProperty(const std::string& uid, const std::string& name, bool active) : mUid(uid), mName(name), mActive(active)
 {
