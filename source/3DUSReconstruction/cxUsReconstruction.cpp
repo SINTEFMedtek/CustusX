@@ -589,7 +589,9 @@ vtkImageData* UsReconstruction::reconstructVolume(Input2DUS* usData,
   
   typedef itk::Matrix< double, 3, 3 > MatrixType;
   MatrixType::InternalMatrixType splat_ui, splat_uv;
-  int dx, dy, dz;
+  int dx = 0;
+  int dy = 0;
+  int dz = 0;
   int margin;
   
   // 1.54 => 50% conf. interval
