@@ -66,7 +66,7 @@ void CustomStatusBar::disconnectFromToolSignals()
             this, SLOT(receiveToolVisible(bool)));
     it1++;
   }
-  std::cout << "mToolColorMap.size() = " << mToolColorMap.size() << std::endl;
+  //std::cout << "mToolColorMap.size() = " << mToolColorMap.size() << std::endl;
   std::map<QLabel*, QLabel*>::iterator it2 = mToolColorMap.begin();
   while(it2 != mToolColorMap.end())
   {

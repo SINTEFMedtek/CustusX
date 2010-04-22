@@ -177,6 +177,7 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
     connect(mToolToSample.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 
   //update button
+  mToolSampleButton->setText("Sample ("+qstring_cast(mToolToSample->getName())+")");
   mToolSampleButton->setEnabled(mToolToSample && mToolToSample->getVisible());
 }
 
