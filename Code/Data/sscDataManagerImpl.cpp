@@ -341,15 +341,15 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
     activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));
   dataManagerNode.appendChild(activeImageNode);
 
-  QDomElement landmarksNode = doc.createElement("landmarks");
+  QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
   LandmarkPropertyMap::iterator it = mLandmarkProperties.begin();
   for(; it != mLandmarkProperties.end(); ++it)
   {
-    QDomElement landmarkNode = doc.createElement("landmark");
-    it->second.addXml(landmarkNode);
-    landmarksNode.appendChild(landmarkNode);
+    QDomElement landmarkPropNode = doc.createElement("landmarkprop");
+    it->second.addXml(landmarkPropNode);
+    landmarkPropsNode.appendChild(landmarkPropNode);
   }
-  dataManagerNode.appendChild(landmarksNode);
+  dataManagerNode.appendChild(landmarkPropsNode);
 
   //TODO
   /*QDomElement activeMeshNode = doc.createElement("activeMesh");
@@ -374,13 +374,15 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 }
 void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 {
-  QDomNode landmarksNode = dataManagerNode.namedItem("landmarks");
-  QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
-  for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
+  QDomNode landmarksNode = dataManagerNode.namedItem("landmarkprops");
+  QDomElement landmarkNode = landmarksNode.firstChildElement("landmarkprop");
+  for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmarkprop"))
   {
-    LandmarkProperty landmark;
-    landmark.parseXml(landmarkNode);
-    mLandmarkProperties[landmark.getUid()] = landmark;
+    LandmarkProperty landmarkProp;
+    landmarkProp.parseXml(landmarkNode);
+    mLandmarkProperties[landmarkProp.getUid()] = landmarkProp;
+    //std::cout << "Loaded landmarkprop with name: " << landmarkProp.getName() << std::endl;
+    emit landmarkPropertiesChanged();
   }
 
   // All images must be created from the DataManager, so the image nodes
