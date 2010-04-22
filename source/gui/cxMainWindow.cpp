@@ -654,8 +654,10 @@ void MainWindow::activateImageRegistationState()
     mSettings->value("globalPatientDataFolder").toString()+
     "/"+mActivePatientFolder+"/Images";
   mShiftCorrectionWidget->init(imagesPath);
-  mShiftCorrectionIndex = mContextDockWidget->addTab(mShiftCorrectionWidget, 
-      QString("Shift correction"));
+  //TODO: Finish ShiftCorrection
+  //Don't show ShiftCorrection in release
+  //mShiftCorrectionIndex = mContextDockWidget->addTab(mShiftCorrectionWidget, 
+  //    QString("Shift correction"));
   mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
       QString("Image Registration"));
   
@@ -681,6 +683,8 @@ void MainWindow::deactivateImageRegistationState()
   if(mImageRegistrationIndex != -1)
   {
     viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+    //TODO: Fix: This doesn't work if we remove more than one tab since the indexes changes on remove.
+    // Use clear() instead and add the tabs that should be present
     mContextDockWidget->removeTab(mImageRegistrationIndex);
     mImageRegistrationIndex = -1;
     
