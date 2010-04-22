@@ -109,7 +109,8 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 
 void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
-  mCurrentImage->removeLandmark(mActiveLandmark);
+  if(mCurrentImage)
+    mCurrentImage->removeLandmark(mActiveLandmark);
 }
 
 void ImageRegistrationWidget::cellClickedSlot(int row, int column)
@@ -138,7 +139,10 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
 
 ssc::LandmarkMap ImageRegistrationWidget::getTargetLandmarks() const
 {
-  return mCurrentImage->getLandmarks();
+  if(mCurrentImage)
+    return mCurrentImage->getLandmarks();
+  else
+    return ssc::LandmarkMap();
 }
 
 void ImageRegistrationWidget::thresholdChangedSlot(const int value)
