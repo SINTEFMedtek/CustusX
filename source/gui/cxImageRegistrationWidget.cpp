@@ -89,8 +89,10 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
   std::string uid = dataManager()->addLandmark();
   ssc::Vector3D pos_r = probeRep->getPosition();
   ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
-  std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
+  //std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
   mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
+
+  this->nextRow();
 }
 
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
@@ -104,12 +106,16 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
   std::string uid = mActiveLandmark;
   ssc::Vector3D pos_r = probeRep->getPosition();
   mCurrentImage->setLandmark(ssc::Landmark(uid, pos_r));
+
+  this->nextRow();
 }
 
 void ImageRegistrationWidget::removeLandmarkButtonClickedSlot()
 {
   if(mCurrentImage)
     mCurrentImage->removeLandmark(mActiveLandmark);
+
+  this->nextRow();
 }
 
 void ImageRegistrationWidget::cellClickedSlot(int row, int column)

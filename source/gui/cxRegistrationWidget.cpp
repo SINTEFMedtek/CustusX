@@ -140,6 +140,36 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
   mAvarageAccuracyLabel->setText(tr("Avrage accuracy %1 mm").arg(this->getAvarageAccuracy()));
 }
 
+void RegistrationWidget::nextRow()
+{
+  //std::cout << "RegistrationWidget::nextRow()" << std::endl;
+  int selectedRow = mLandmarkTableWidget->currentIndex().row();
+  int nextRow = selectedRow;
+  int lastRow = mLandmarkTableWidget->rowCount()-1;
+
+  if(selectedRow == -1) //no row is selected yet
+  {
+    selectedRow = lastRow;
+    mLandmarkTableWidget->setCurrentItem(mLandmarkTableWidget->itemAt(selectedRow, 0));
+  }
+  if(selectedRow < lastRow)
+  {
+    nextRow=nextRow+1;
+  }
+  else if(selectedRow > lastRow)
+  {
+    nextRow = lastRow;
+  }
+
+  QModelIndex nextIndex = mLandmarkTableWidget->currentIndex().sibling(nextRow,0);
+  if(nextIndex.isValid())
+  {
+    mLandmarkTableWidget->setCurrentIndex(nextIndex);
+    mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString().toStdString();
+    //std::cout << "mActiveLandmark: " << mActiveLandmark.c_str() << std::endl;
+  }
+}
+
 std::vector<ssc::Landmark> RegistrationWidget::getAllLandmarks() const
 {
   std::vector<ssc::Landmark> retval;

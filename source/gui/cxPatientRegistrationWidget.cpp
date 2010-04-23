@@ -159,6 +159,8 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
     mActiveLandmark = dataManager()->getLandmarkProperties().begin()->first;
 
   toolManager()->setLandmark(ssc::Landmark(mActiveLandmark, p_pr));
+
+  this->nextRow();
 }
 
 void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
