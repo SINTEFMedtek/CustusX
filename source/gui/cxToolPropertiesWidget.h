@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <QtGUI>
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {
@@ -33,6 +34,8 @@ signals:
 
 protected slots:
   void updateSlot();
+  void dominantToolChangedSlot();
+  void referenceToolChangedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -41,8 +44,14 @@ protected:
 private:
   ToolPropertiesWidget();
 
+  ssc::ToolPtr mReferenceTool;
+  ssc::ToolPtr mActiveTool;
+
   SliderGroupWidget* mToolOffsetWidget;
+  QLabel* mActiveToolVisibleLabel;
   QLabel* mToolNameLabel;
+  QLabel* mReferenceStatusLabel;
+  QLabel* mTrackingSystemStatusLabel;
 };
 
 }//end namespace cx
