@@ -28,6 +28,7 @@ public:
   ViewWrapper2D(ssc::View* view);
   virtual void initializePlane(ssc::PLANE_TYPE plane);
   virtual void setImage(ssc::ImagePtr image);
+  virtual ssc::ImagePtr getImage() const;
   virtual void removeImage(ssc::ImagePtr image);
   virtual ssc::View* getView();
   virtual void setZoom2D(SyncedValuePtr value);

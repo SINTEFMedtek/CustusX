@@ -28,8 +28,8 @@ class ViewWrapper3D : public ViewWrapper
   Q_OBJECT
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
-  //ssc::View* initialize(ssc::PLANE_TYPE plane);
   virtual void setImage(ssc::ImagePtr image);
+  virtual ssc::ImagePtr getImage() const;
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
