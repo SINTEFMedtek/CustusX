@@ -123,6 +123,9 @@ protected:
 
   void addAsDockWidget(QWidget* widget);
 
+  //patient
+  void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (relative to the globalPatientDataFolder)
+
   //saving/loading
   void generateSaveDoc(QDomDocument& doc);
   void readLoadDoc(QDomDocument& loadDoc);

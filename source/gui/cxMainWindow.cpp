@@ -402,6 +402,13 @@ void MainWindow::centerToTooltipSlot()
   Navigation().centerToTooltip();
 }
 
+void MainWindow::setActivePatient(const QString& activePatientFolder)
+{
+  mActivePatientFolder = activePatientFolder;
+  //TODO
+  //Update gui in some way to show which patient is active
+}
+
 /** Called when the layout is changed: update the layout menu
  */
 void MainWindow::layoutChangedSlot()
@@ -581,7 +588,8 @@ void MainWindow::readLoadDoc(QDomDocument& doc)
     QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
     if(!activePatientNode.isNull())
     {
-      mActivePatientFolder = activePatientNode.text();
+      //mActivePatientFolder = activePatientNode.text();
+      this->setActivePatient(activePatientNode.text());
       messageManager()->sendInfo("Active patient loaded to be "
                                 +mActivePatientFolder.toStdString());
     }
@@ -761,7 +769,8 @@ void MainWindow::createPatientFolders(QString choosenDir)
   // Set active patient folder. Use path relative to the globalPatientDataFolder
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   QDir patientDataDir(patientDatafolder);
-  mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
+  //mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
+  this->setActivePatient(patientDataDir.relativeFilePath(choosenDir));
   messageManager()->sendInfo("Selected a patient to work with.");
   
   // Create folders
@@ -864,7 +873,8 @@ void MainWindow::loadPatientFileSlot()
   
   // Set active patient folder, relative to globalPatientDataFolder
   QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString());
-  mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
+  //mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
+  this->setActivePatient(patientDataDir.relativeFilePath(choosenDir));
   
   QFile file(choosenDir+"/custusdoc.xml");
   if(file.open(QIODevice::ReadOnly))
