@@ -76,6 +76,7 @@ void ViewWrapper::imageActionSlot()
   ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
 
   this->setImage(image);
+  dataManager()->setActiveImage(image);
 
   Navigation().centerToImageCenter(); // reset center for convenience
 }
