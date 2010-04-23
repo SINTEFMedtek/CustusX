@@ -26,7 +26,7 @@ class DoubleDataInterfaceActiveToolOffset : public ssc::DoubleDataInterface
 public:
   DoubleDataInterfaceActiveToolOffset();
   virtual ~DoubleDataInterfaceActiveToolOffset() {}
-  virtual QString getValueName() const { return "Offset"; }
+  virtual QString getValueName() const { return "Offset (mm)"; }
   virtual double getValue() const;
   virtual bool setValue(double val);
   virtual QString getValueID() const { return ""; }
