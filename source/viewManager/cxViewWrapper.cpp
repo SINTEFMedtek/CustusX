@@ -1,6 +1,7 @@
 #include "cxViewWrapper.h"
 
 #include <QMenu>
+#include "sscTypeConversions.h"
 #include "cxDataManager.h"
 #include "cxMessageManager.h"
 #include "cxViewGroup.h" //for class Navigation
@@ -46,10 +47,14 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
     QAction* imageAction = new QAction(name, &contextMenu);
     imageAction->setData(QVariant(uid));
+    imageAction->setCheckable(true);
     connect(imageAction, SIGNAL(triggered()),
             this, SLOT(imageActionSlot()));
 
     contextMenu.addAction(imageAction);
+
+    if(this->getImage() && uid == qstring_cast(this->getImage()->getUid()))
+      imageAction->setChecked(true);
 
     imageIt++;
   }

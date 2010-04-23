@@ -6,7 +6,6 @@
 #include <QContextMenuEvent>
 #include "sscImage.h"
 #include "sscVolumetricRep.h"
-#include "cxDataManager.h"
 #include "cxRepManager.h"
 #include "cxMessageManager.h"
 #include "cxToolManager.h"
@@ -22,9 +21,7 @@ namespace cx
 View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
   ssc::View(parent, f),
   mCameraStyle(DEFAULT_STYLE),
-  mCameraOffset(-1),
-  mDataManager(DataManager::getInstance()),
-  mRepManager(RepManager::getInstance())
+  mCameraOffset(-1)
 {
   mUid = uid;
   mName = name;
@@ -103,7 +100,7 @@ void View3D::activateCameraToolStyle(int offset)
 
   //Need the toolrep to get the direction the camera should point in
   ssc::ToolRep3DPtr dominantToolRepPtr;
-  ToolRep3DMap* toolRep3DMap = mRepManager->getToolRep3DReps();
+  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
   ToolRep3DMap::iterator it = toolRep3DMap->begin();
   while(it != toolRep3DMap->end())
   {
@@ -136,7 +133,7 @@ void View3D::deactivateCameraToolStyle()
   disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-  ssc::ToolRep3DPtr followingToolRepPtr = mRepManager->getToolRep3DRep("ToolRep3D_1");
+  ssc::ToolRep3DPtr followingToolRepPtr = repManager()->getToolRep3DRep("ToolRep3D_1");
   if(followingToolRepPtr)
   {
     followingToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);

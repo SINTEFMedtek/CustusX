@@ -52,7 +52,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 void ViewWrapper3D::setImage(ssc::ImagePtr image)
 {
    mImage = image;
-   //RepManager* repManager = RepManager::getInstance();
 
    if (!mImage)
    {
@@ -83,6 +82,11 @@ void ViewWrapper3D::setImage(ssc::ImagePtr image)
    mView->getRenderer()->ResetCamera();
    if(mView->isVisible())
      mView->getRenderWindow()->Render();
+}
+
+ssc::ImagePtr ViewWrapper3D::getImage() const
+{
+  return mImage;
 }
 
 ssc::View* ViewWrapper3D::getView()

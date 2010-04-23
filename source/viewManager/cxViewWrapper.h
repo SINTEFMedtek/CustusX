@@ -44,6 +44,7 @@ public:
   virtual ~ViewWrapper() {}
   virtual void initializePlane(ssc::PLANE_TYPE plane) {}
   virtual void setImage(ssc::ImagePtr image) = 0;
+  virtual ssc::ImagePtr getImage() const = 0;
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;

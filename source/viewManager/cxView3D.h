@@ -37,7 +37,6 @@ public:
   virtual ~View3D(); ///< empty
 
   virtual Type getType() const { return VIEW_3D;}; ///< get the class type
-  //void contextMenuEvent(QContextMenuEvent *event); ///< decides what happens when you rightclick in a view
 
   void setCameraStyle(CameraStyle style, int offset=-1); ///< lets the user select where the camera, offset only used by TOOL_STYLE
 
@@ -52,14 +51,9 @@ protected:
   void activateCameraToolStyle(int offset=0);
   void deactivateCameraToolStyle();
 
-  //QMenu* mContextMenu; ///< right click menu
-
   CameraStyle mCameraStyle; ///< the current camerastyle
   int mCameraOffset; ///< the distance between the camera and focalpoint
   ssc::ToolPtr mFollowingTool; ///< the tool the camera is following
-
-  DataManager* mDataManager; ///< has all the data loaded into the system
-  RepManager* mRepManager; ///< has a pool of reps
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */

@@ -286,6 +286,11 @@ void ViewWrapper2D::setImage(ssc::ImagePtr image)
   emit imageChanged(image->getUid().c_str());
 }
 
+ssc::ImagePtr ViewWrapper2D::getImage() const
+{
+  return mSliceRep->getImage();
+}
+
 void ViewWrapper2D::removeImage(ssc::ImagePtr image)
 {
   mSliceRep->setImage(ssc::ImagePtr());
