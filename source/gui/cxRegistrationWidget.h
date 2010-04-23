@@ -32,24 +32,25 @@ class RegistrationWidget : public QWidget
 
 public:
   RegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
-  ~RegistrationWidget(); ///< empty
+  virtual ~RegistrationWidget(); ///< empty
 
 protected slots:
   virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
-  void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
 
+  void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
   void landmarkUpdatedSlot(std::string uid);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
-  std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
-  QString getLandmarkName(std::string uid);
   virtual ssc::LandmarkMap getTargetLandmarks() const = 0;
   virtual void performRegistration() = 0;
   virtual ssc::Transform3D getTargetTransform() const = 0;
 
+  void nextRow(); ///< jump to the next line in the tablewidget, updates active landmark and highlighted row
+  std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
+  QString getLandmarkName(std::string uid);
   double getAccuracy(std::string uid);
   double getAvarageAccuracy();
 
