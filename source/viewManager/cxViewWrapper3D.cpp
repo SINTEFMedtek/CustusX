@@ -73,6 +73,8 @@ void ViewWrapper3D::setImage(ssc::ImagePtr image)
    //update data name text rep
    mDataNameText->setText(0, mImage->getName());
 
+   emit imageChanged(image->getUid().c_str());
+
    //Shading
    if(QSettings().value("shadingOn").toBool())
      mVolumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
