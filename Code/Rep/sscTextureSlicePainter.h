@@ -32,6 +32,9 @@ namespace ssc
 //---------------------------------------------------------
 typedef vtkSmartPointer<class TextureSlicePainter > TextureSlicePainterPtr;
 
+/**Helper class for GPU rendering of slices.
+ * Used by Texture3DSlicerRep.
+ */
 class TextureSlicePainter : public vtkOpenGLRepresentationPainter
 {
 public:
@@ -54,6 +57,7 @@ protected:
 
 	bool CanRender(vtkRenderer*, vtkActor*);
 	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
+	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 
 	class vtkInternals;
 	vtkInternals* mInternals;

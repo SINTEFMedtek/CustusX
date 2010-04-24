@@ -16,6 +16,7 @@ public:
 	void test_AnyDual_3D_Tool();
 	void test_ACS_3Volumes();
 	void test_AnyDual_3Volumes();
+	void test_ACS_3Volumes_GPU();
 	
 public:
 	CPPUNIT_TEST_SUITE( TestVisualRendering );
@@ -26,6 +27,7 @@ public:
 		CPPUNIT_TEST( test_AnyDual_3D_Tool );					
 		CPPUNIT_TEST( test_ACS_3Volumes );					
 		CPPUNIT_TEST( test_AnyDual_3Volumes );					
+		CPPUNIT_TEST( test_ACS_3Volumes_GPU );
 	CPPUNIT_TEST_SUITE_END();
 private:
 	class ViewsWindow* widget;

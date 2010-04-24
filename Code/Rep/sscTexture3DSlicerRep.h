@@ -8,7 +8,6 @@
 #ifndef SSCTEXTURE3DSLICER_H_
 #define SSCTEXTURE3DSLICER_H_
 
-
 #include <vector>
 #include <vtkSmartPointer.h>
 #include "sscDefinitions.h"
@@ -22,8 +21,6 @@
 //#include "snwVtkIncludes.h"
 
 #include "sscTextureSlicePainter.h" //new gl slicer
-
-
 //#include "vmTestApplication/testAppImageProxy.h" //testApp slicer - no colormapping
 
 typedef vtkSmartPointer<class vtkOpenGLTexture> vtkOpenGLTexturePtr;
@@ -43,33 +40,36 @@ namespace ssc
 //---------------------------------------------------------
 typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
 
-/*
-using ssc::Vector3D;
-using ssc::Transform3D;
-using ssc::DoubleBoundingBox3D;*/
-
-/**This will load a 3D volume as 3D texture
- *and let the painter slice 2D texture
+/**Slice a volume using a SliceProxy.
+ *
+ * The functionality is equal to SlicerRepSW, but the actual slicing
+ * is performed by loading the image into the GPU as a 3D texture and
+ * slicing it there, using the GPU.
+ *
+ * Used by Sonowand.
  */
-class Texture3DSlicerRep : public ssc::RepImpl
+class Texture3DSlicerRep: public ssc::RepImpl
 {
-	Q_OBJECT
+Q_OBJECT
 public:
 	static Texture3DSlicerRepPtr New(const std::string& uid);
 	virtual ~Texture3DSlicerRep();
-	virtual std::string getType() const { return "vm::Texture3DSlicerRep"; }
+	virtual std::string getType() const
+	{
+		return "vm::Texture3DSlicerRep";
+	}
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp);
 	void setImages(std::vector<ssc::ImagePtr> images);
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void update();
 protected:
-	Texture3DSlicerRep (const std::string& uid);
-	virtual void addRepActorsToViewRenderer(ssc::View* view) ;
+	Texture3DSlicerRep(const std::string& uid);
+	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-	void createGeometryPlane( Vector3D point1_s,  Vector3D point2_s, Vector3D origin_s );
+	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
-	private slots:
+private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
 	void updateColorAttributeSlot();
 private:
@@ -77,8 +77,8 @@ private:
 	void updateCoordinates(int index);
 	std::string getTCoordName(int index);
 	void setColorAttributes(int i);
-		DoubleBoundingBox3D mBB_s;
-		std::vector<ssc::ImagePtr> mImages;
+	DoubleBoundingBox3D mBB_s;
+	std::vector<ssc::ImagePtr> mImages;
 	ssc::SliceProxyPtr mSliceProxy;
 
 	TextureSlicePainterPtr mPainter;
@@ -88,22 +88,10 @@ private:
 	vtkStripperPtr mStripper;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
 
-
 	//std::vector<testApp::SlicedImageProxyPtr> mSlices;
 };
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
 #endif /* SSCTEXTURE3DSLICER_H_ */
-
-
-
-
-
-
-
-
-
-
-
 

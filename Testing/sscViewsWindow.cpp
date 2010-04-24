@@ -25,6 +25,7 @@
 #include "sscDummyTool.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
+#include "sscTexture3DSlicerRep.h"
 #include "sscViewsWindow.h"
 
 using ssc::Vector3D;
@@ -70,6 +71,67 @@ void ViewsWindow::setDescription(const std::string& desc)
 ViewsWindow::~ViewsWindow()
 {
 }
+
+ssc::View* ViewsWindow::generateGPUSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
+{
+	ssc::View* view = new ssc::View(centralWidget());
+	mLayouts.insert(view);
+
+	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+	proxy->setTool(tool);
+
+	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+
+	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
+	//rep->setImage(image);
+	rep->setViewportData(get_vpMs(view), getViewport(view));
+	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
+	rep->setSliceProxy(proxy);
+
+	view->addRep(rep);
+	return view;
+}
+
+Transform3D ViewsWindow::get_vpMs(ssc::View* view) const
+{
+	Vector3D center_vp = getViewport(view).center();
+
+	double zoomFactor = 1; // real magnification
+	double scale = zoomFactor/mmPerPix(view);
+	Transform3D S = createTransformScale(Vector3D(scale, scale, scale));
+	Transform3D T = createTransformTranslate(center_vp);// center of viewport in viewport coordinates
+	Transform3D M_vp_w = T*S; // first scale , then translate to center.
+	return M_vp_w;
+}
+
+/**return the pixel viewport.
+ */
+ssc::DoubleBoundingBox3D ViewsWindow::getViewport(ssc::View* view) const
+{
+	QSize size = view->size();
+	return ssc::DoubleBoundingBox3D(0, size.width(), 0, size.height(), 0, 1);
+}
+
+double ViewsWindow::mmPerPix(ssc::View* view) const
+{
+	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(view));
+	double r_h = (double)screen->heightMM()/(double)screen->geometry().height();
+	double r_w = (double)screen->widthMM()/(double)screen->geometry().width();
+	double retval = (r_h+r_w)/2.0;
+	return retval;
+}
+
+void ViewsWindow::defineGPUSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+{
+	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+
+	ssc::ImagePtr image = loadImage(imageFilename);
+
+	ssc::View* view = generateGPUSlice(uid, tool, image, plane);
+	insertView(view, uid, imageFilename, r, c);
+}
+
 
 ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {

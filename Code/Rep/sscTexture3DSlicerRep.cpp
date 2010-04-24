@@ -41,6 +41,7 @@ namespace ssc
 Texture3DSlicerRep::Texture3DSlicerRep(const std::string& uid) :
 	RepImpl(uid)
 {
+	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = TextureSlicePainterPtr::New();
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
@@ -165,6 +166,8 @@ void Texture3DSlicerRep::createCoordinates(int count)
 	TCoords->InsertNextTuple3( 0.0, 0.0, 0.0 );
 	TCoords->SetName(cstring_cast(getTCoordName(count)) );
 
+	if (!mPolyData)
+		std::cerr << "Error in Texture3DSlicerRep: setViewport was not called" << std::endl;
 	mPolyData->GetPointData()->AddArray(TCoords);
 	//mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2*count, cstring_cast(getTCoordName(count)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
 }

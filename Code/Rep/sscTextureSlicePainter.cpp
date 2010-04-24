@@ -184,7 +184,9 @@ public:
 TextureSlicePainter::TextureSlicePainter()
 {
 	mInternals = new vtkInternals();
-	QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
+	//QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
+	QFile fp(QString("/home/chrask/workspace/ssc/Sandbox/Texture3DOverlay.frag"));
+
 	if (fp.exists())
 	{
 		fp.open(QFile::ReadOnly);
@@ -325,6 +327,15 @@ bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)
 {
 	return true;
 }
+
+bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
+{
+	bool loaded = mgr->LoadSupportedExtension(cstring_cast(id));
+	if (!loaded)
+		std::cout << "TextureSlicePainter Error: GL extension " + id + " not found" << std::endl;
+	return loaded;
+}
+
 bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 {
 	GLint value[2];
@@ -333,11 +344,11 @@ bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 	{
 		std::cout<<"GL_MAX_TEXTURE_COORDS="<<value[0]<<" . Number of texture coordinate sets. Min is 2."<<std::endl;
 	}
-	return (mgr->LoadSupportedExtension("GL_VERSION_2_0")
-			&& mgr->LoadSupportedExtension("GL_VERSION_1_5")
-//			&& mgr->LoadSupportedExtension("GL_EXT_texture3D")
-			&& mgr->LoadSupportedExtension("GL_ARB_vertex_buffer_object")
-			&& mgr->LoadSupportedExtension("GL_EXT_texture_buffer_object"));
+	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
+			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
+//			&& mgr->LoadSupportedExtension(mgr, "GL_EXT_texture3D")
+			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
+			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
 
 void TextureSlicePainter::SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer)

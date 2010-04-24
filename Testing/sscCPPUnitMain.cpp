@@ -7,7 +7,7 @@
 #include <cppunit/TestResult.h> 
 #include <cppunit/BriefTestProgressListener.h> 
 
-#define RUN_ALL_TESTS
+//#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
 #include "sscTestUtilityClasses.h"
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 //                                        &TestVisualRendering::test_ACS_3Volumes ) );
   runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
                                        "visual",
-                                        &TestVisualRendering::test_3D_Tool ) );
+                                        &TestVisualRendering::test_ACS_3Volumes_GPU ) );
 //	runner.addTest(TestSpaceOrganizer::suite());
 #endif
 	

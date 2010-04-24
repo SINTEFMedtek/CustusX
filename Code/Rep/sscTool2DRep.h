@@ -31,7 +31,9 @@ typedef boost::shared_ptr<class USProbe2D> USProbe2DPtr;
 /**Represents a 
  * 
  *This class will hold all the representation and drawing of 2d tool
- *in navigation and registration
+ *in navigation and registration.
+ *
+ * Used by Sonowand.
  */
 class ToolRep2D : public ssc::RepImpl
 {

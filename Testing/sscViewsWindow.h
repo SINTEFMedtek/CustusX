@@ -34,6 +34,7 @@ public:
 	void setDescription(const std::string& desc);
 	void define3D(const std::string& imageFilename, int r, int c);
 	void defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+	void defineGPUSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	bool mDumpSpeedData;
@@ -42,8 +43,13 @@ public:
 private:
 	void start(bool showSliders);
 	ssc::View* generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
+	ssc::View* generateGPUSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	ssc::ImagePtr loadImage(const std::string& imageFilename);
 	
+	ssc::Transform3D get_vpMs(ssc::View* view) const;
+	ssc::DoubleBoundingBox3D getViewport(ssc::View* view) const;
+	double mmPerPix(ssc::View* view) const;
+
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
 	
