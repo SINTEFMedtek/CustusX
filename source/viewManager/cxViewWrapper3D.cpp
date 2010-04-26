@@ -45,8 +45,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
   mView->addRep(mDataNameText);
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(toolManagerConfiguredSlot()));
-  toolManagerConfiguredSlot();
+  connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+  toolsAvailableSlot();
 }
 
 void ViewWrapper3D::setImage(ssc::ImagePtr image)
@@ -100,6 +100,7 @@ void ViewWrapper3D::dominantToolChangedSlot()
   mProbeRep->setTool(dominantTool);
   //std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
+
 void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 {
   if(mImage != image)
@@ -111,26 +112,42 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
   mImage.reset();
 }
 
-void ViewWrapper3D::toolManagerConfiguredSlot()
+void ViewWrapper3D::toolsAvailableSlot()
 {
-  if (!toolManager()->isConfigured())
-    return;
+  // we want to do this also when nonconfigured and manual tool is present
+//  if (!toolManager()->isConfigured())
+//    return;
 
-  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
-  ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
-  ssc::ToolManager::ToolMapPtr configuredTools = toolManager()->getConfiguredTools();
-  ssc::ToolManager::ToolMap::iterator toolIt = configuredTools->begin();
-
-  while((toolIt != configuredTools->end()) && (repIt != toolRep3DMap->end()))
+  ssc::ToolManager::ToolMapPtr tools = toolManager()->getTools();
+  ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
+  for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
-    if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
-    {
-      repIt->second->setTool(toolIt->second);
-      mView->addRep(repIt->second);
-      repIt++;
-    }
-    toolIt++;
+    if(iter->second->getType() == ssc::Tool::TOOL_REFERENCE)
+      continue;
+
+    //std::cout << "setting tool rep " << toolIt->second->getName() << std::endl;
+    ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New(iter->second->getUid()+"_rep3d");
+    toolRep->setTool(iter->second);
+    mView->addRep(toolRep);
   }
+
+//
+//  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
+//  ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
+//  ssc::ToolManager::ToolMapPtr tools = toolManager()->getTools();
+//  ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
+//
+//  while((toolIt != tools->end()) && (repIt != toolRep3DMap->end()))
+//  {
+//    if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
+//    {
+//      std::cout << "setting tool rep " << toolIt->second->getName() << std::endl;
+//      repIt->second->setTool(toolIt->second);
+//      mView->addRep(repIt->second);
+//      repIt++;
+//    }
+//    toolIt++;
+//  }
 }
 
 

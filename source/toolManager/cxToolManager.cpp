@@ -857,7 +857,7 @@ void ToolManager::checkTimeoutsAndRequestTransform()
 }
 void ToolManager::dominantCheckSlot()
 {
-  std::cout << "void ToolManager::dominantCheckSlot()" << std::endl;
+  //std::cout << "void ToolManager::dominantCheckSlot()" << std::endl;
 
   //make a sorted vector of all visible tools
   std::vector<ssc::ToolPtr> visibleTools;
