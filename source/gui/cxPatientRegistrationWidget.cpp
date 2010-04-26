@@ -140,7 +140,16 @@ void PatientRegistrationWidget::activeImageChangedSlot()
 
 void PatientRegistrationWidget::toolVisibleSlot(bool visible)
 {
-  mToolSampleButton->setEnabled(visible);
+  enableToolSampleButton();
+}
+
+void PatientRegistrationWidget::enableToolSampleButton()
+{
+  bool enabled = false;
+  enabled = mToolToSample &&
+      mToolToSample->getVisible() &&
+      (mToolToSample->getType()!=ssc::Tool::TOOL_MANUAL || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+  mToolSampleButton->setEnabled(enabled);
 }
 
 void PatientRegistrationWidget::toolSampleButtonClickedSlot()
@@ -180,7 +189,8 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 
   //update button
   mToolSampleButton->setText("Sample ("+qstring_cast(mToolToSample->getName())+")");
-  mToolSampleButton->setEnabled(mToolToSample && mToolToSample->getVisible());
+  connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButton()));
+  enableToolSampleButton();
 }
 
 void PatientRegistrationWidget::resetOffsetSlot()

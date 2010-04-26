@@ -165,6 +165,7 @@ protected:
   //actions and actiongroups
   QAction* mAboutAction;
   QAction* mPreferencesAction;
+  QAction* mDebugModeAction;
   QAction* mQuitAction;
   
   QAction* mNewPatientAction;///< Action for creating a new patient

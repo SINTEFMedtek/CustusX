@@ -47,6 +47,7 @@ protected slots:
   void resetOffsetSlot(); ///< resets the patient registration offset to zero
   void setOffsetSlot(int value); ///< set the patient registration offset
   void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
+  void enableToolSampleButton();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
