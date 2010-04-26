@@ -12,6 +12,7 @@
 #include "cxToolmanager.h"
 #include "cxMessageManager.h"
 #include "cxDataManager.h"
+#include "sscTypeconversions.h"
 
 namespace cx
 {
@@ -164,19 +165,28 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
-    std::cout << "not enough points to register" << std::endl;
+    messageManager()->sendInfo("not enough points to register");
     return ssc::Transform3D();
   }
 
   vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
   landmarktransform->SetSourceLandmarks(source);
   landmarktransform->SetTargetLandmarks(target);
-  landmarktransform->SetModeToSimilarity();
+  //landmarktransform->SetModeToSimilarity(); // this allows scaling. Very dangerous!
+  landmarktransform->SetModeToRigidBody();
   source->Modified();
   target->Modified();
   landmarktransform->Update();
+  //landmarktransform->PrintSelf(std::cout, vtkIndent());
 
   ssc::Transform3D tar_M_src(landmarktransform->GetMatrix());
+
+  if (QString::number(tar_M_src[0][0])=="nan") // harry but quick way to check badness of transform...
+  {
+    messageManager()->sendError("landmark transform failed");
+    return ssc::Transform3D();
+  }
+
   *ok = true;
   return tar_M_src;
 }
