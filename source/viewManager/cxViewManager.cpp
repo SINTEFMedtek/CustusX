@@ -67,7 +67,8 @@ ViewManager::ViewManager() :
   mGlobal2DZoom(true),
   mGlobalObliqueOrientation(false)
 {
-  mLayout->setSpacing(1);
+  mLayout->setSpacing(2);
+  mLayout->setMargin(4);
   mMainWindowsCentralWidget->setLayout(mLayout);
 
   mView3DNames.resize(MAX_3DVIEWS);
