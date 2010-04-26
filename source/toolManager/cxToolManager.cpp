@@ -246,10 +246,13 @@ void ToolManager::setDominantTool(const std::string& uid)
   }
 
   // special case for manual tool
-  if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mDominantTool && mManualTool)
+  if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mManualTool)
   {
-    mManualTool->set_prMt(mDominantTool->get_prMt());
-    mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
+    if (mDominantTool)
+    {
+      mManualTool->set_prMt(mDominantTool->get_prMt());
+      mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
+    }
     mManualTool->setVisible(true);
   }
 

@@ -291,6 +291,15 @@ void RepManager::receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double t
   double z = (*rMt)[2][3];
   this->syncInria2DRepsSlot(x,y,z);
 }
+
+void RepManager::addToolRep3D(ssc::ToolRep3DPtr rep)
+{
+  if (!this->getToolRep3DRep(rep->getUid()))
+  {
+    this->addRep(rep, &mToolRep3DMap);
+  }
+}
+
 RepManager* repManager()
 {
   return RepManager::getInstance();
