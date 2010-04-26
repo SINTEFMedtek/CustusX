@@ -294,12 +294,21 @@ void MainWindow::createActions()
   mPreferencesAction = new QAction(tr("&Preferences"), this);
   mPreferencesAction->setShortcut(tr("Ctrl+P"));
   mPreferencesAction->setStatusTip(tr("Show the preferences dialog"));
+
+  mDebugModeAction = new QAction(tr("&Debug Mode"), this);
+  mDebugModeAction->setShortcut(tr("Ctrl+D"));
+  mDebugModeAction->setCheckable(true);
+  mDebugModeAction->setChecked(dataManager()->getDebugMode());
+  mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
+
   mQuitAction = new QAction(tr("&Quit"), this);
   mQuitAction->setShortcut(tr("Ctrl+Q"));
   mQuitAction->setStatusTip(tr("Exit the application"));
   
   connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
   connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
+  connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
+  connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
   connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
   
   //View
@@ -474,7 +483,9 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mNewPatientAction);
   mFileMenu->addAction(mSaveFileAction);
   mFileMenu->addAction(mLoadFileAction);
-	
+  mFileMenu->addSeparator();
+  mFileMenu->addAction(mDebugModeAction);
+
   // View
   this->menuBar()->addMenu(mWindowMenu);
   mWindowMenu->addAction(mToggleContextDockWidgetAction);

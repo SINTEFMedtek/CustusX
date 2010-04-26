@@ -14,11 +14,24 @@ DataManager* DataManager::getInstance()
   }
   return mCxInstance;
 }
-DataManager::DataManager()
+DataManager::DataManager() : mDebugMode(false)
 {}
 DataManager::~DataManager()
 {}
   
+bool DataManager::getDebugMode() const
+{
+  return mDebugMode;
+}
+void DataManager::setDebugMode(bool on)
+{
+  if (mDebugMode==on)
+    return;
+  std::cout << "Setting DEBUG MODE = " << on << std::endl;
+  mDebugMode = on;
+  emit debugModeChanged(mDebugMode);
+}
+
 void DataManager::deleteImageSlot(ssc::ImagePtr image)
 {
   mImages.erase(image->getUid());
