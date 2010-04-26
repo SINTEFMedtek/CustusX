@@ -48,6 +48,7 @@ private:
   ssc::ProbeRepPtr mProbeRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
+  std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
 
   ssc::ImagePtr mImage;
   ssc::View* mView;
