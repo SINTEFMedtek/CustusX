@@ -192,7 +192,6 @@ MainWindow::MainWindow() :
   this->createStatusBar();
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
-  this->resize(QSize(1000,1000));
   
   // Initialize settings if empty
   if (!mSettings->contains("globalPatientDataFolder"))
@@ -213,8 +212,18 @@ MainWindow::MainWindow() :
     mSettings->setValue("shadingOn", true);
   
   // Restore saved window states
-  restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray());
-  restoreState(mSettings->value("mainWindow/windowState").toByteArray());
+  if(!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
+  {
+    //Debug
+    //std::cout << "Warning: MainWindow: restore geometry failed" << std::endl;
+    this->resize(QSize(1200,1000));//Set initial size if no previous size exist
+  }
+  if(!restoreState(mSettings->value("mainWindow/windowState").toByteArray()))
+  {
+    //Debug
+    //std::cout << "Warning: MainWindow: restore state failed" << std::endl;
+  }
+    
 
   //debugging
   connect(messageManager(), SIGNAL(emittedMessage(const QString&, int)),
