@@ -119,7 +119,9 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
     else
       items[1]->setCheckState(Qt::Unchecked);
 
-    items[2] = new QTableWidgetItem(tr("(%1, %2, %3)").arg(coord[0]).arg(coord[1]).arg(coord[2]));
+    int width = 5;
+    int prec = 1;
+    items[2] = new QTableWidgetItem(tr("(%1, %2, %3)").arg(coord[0],width,'f',prec).arg(coord[1],width,'f',prec).arg(coord[2],width,'f',prec));
 
     items[3] = new QTableWidgetItem(tr("%1").arg(this->getAccuracy(landmarks[i].getUid())));
 
