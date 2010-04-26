@@ -454,11 +454,6 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
         std::cout << std::endl;
       }
     }
-    else
-    {
-      std::cout << "Warning: DataManager::parseXml() found unknown XML node: ";
-      std::cout << child.nodeName().toStdString() << std::endl;
-    }
     child = child.nextSibling();
   }
 
