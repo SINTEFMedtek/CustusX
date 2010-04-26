@@ -158,6 +158,18 @@ Tool::TrackerToolType* Tool::getPointer() const
 {
   return mTool;
 }
+//copied from ManualTool, move to ssc::Tool?
+void Tool::set_prMt(const ssc::Transform3D& prMt)
+{
+  QDateTime time;
+  double timestamp = (double) time.time().msec();
+
+  //QMutexLocker locker(&mMutex);
+  m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(prMt));
+  //locker.unlock();
+
+  emit toolTransformAndTimestamp( prMt, timestamp );
+}
 void Tool::toolTransformCallback(const itk::EventObject &event)
 {
   if(igstk::CoordinateSystemTransformToEvent().CheckEvent(&event))
