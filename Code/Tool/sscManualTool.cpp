@@ -40,6 +40,7 @@ void ManualTool::read3DCrossHair()
 }
 
 //only used now by mouse or touch tool
+//copied into cx::Tool, move to ssc::Tool?
 void ManualTool::set_prMt(const Transform3D& prMt)
 {
 	QDateTime time;

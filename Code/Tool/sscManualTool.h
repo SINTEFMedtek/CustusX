@@ -34,12 +34,12 @@ public:
 	virtual bool isCalibrated() const;
 	virtual ssc::ProbeSector getProbeSector() const;
 	virtual double getTimestamp() const;
+	virtual void set_prMt(const Transform3D& prMt);
 
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
 	// extensions:
-	void set_prMt(const Transform3D& prMt);
 	void setVisible(bool vis);
 	void setType(const Type& type);
 
