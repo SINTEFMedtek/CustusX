@@ -128,9 +128,12 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(iter->second->getType() == ssc::Tool::TOOL_REFERENCE)
       continue;
 
-    std::string uid = iter->second->getUid()+"_rep3d";
+    std::string uid = iter->second->getUid()+"_rep3d_"+this->mView->getUid();
     if (!mToolReps.count(uid))
+    {
       mToolReps[uid] = ssc::ToolRep3D::New(uid);
+      repManager()->addToolRep3D(mToolReps[uid]);
+    }
     ssc::ToolRep3DPtr toolRep = mToolReps[uid];
     std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
     toolRep->setTool(iter->second);
