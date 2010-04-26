@@ -27,13 +27,14 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
 {
   "No_layout",
   "3D_1X1",
+  "3DACS_2X2_inria",
+  "3DACS_1X3_inria",
+  "ACSACS_2X3_inria",
   "3DACS_2X2",
   "3DACS_1X3",
+  "3DAny_1X2",
   "ACSACS_2X3",
-  "3DACS_2X2_SNW",
-  "3DAny_1X2_SNW",
-  "ACSACS_2X3_SNW",
-  "Any_2x3_SNW"
+  "Any_2x3"
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, LayoutType, LAYOUT_COUNT);
 
@@ -158,10 +159,11 @@ std::vector<LayoutType> ViewManager::availableLayouts() const
 {
   std::vector<LayoutType> retval;
   retval.push_back(LAYOUT_3D_1X1);
-  retval.push_back(LAYOUT_3DACS_2X2);
-  retval.push_back(LAYOUT_3DACS_1X3);
-  retval.push_back(LAYOUT_ACSACS_2X3);
+//  retval.push_back(LAYOUT_3DACS_2X2);
+//  retval.push_back(LAYOUT_3DACS_1X3);
+//  retval.push_back(LAYOUT_ACSACS_2X3);
   retval.push_back(LAYOUT_3DACS_2X2_SNW);
+  retval.push_back(LAYOUT_3DACS_1X3_SNW);
   retval.push_back(LAYOUT_3DAny_1X2_SNW);
   retval.push_back(LAYOUT_ACSACS_2X3_SNW);
   retval.push_back(LAYOUT_Any_2x3_SNW);
@@ -435,6 +437,9 @@ void ViewManager::activateLayout(LayoutType toType)
   case LAYOUT_3DACS_2X2_SNW:
     this->activateLayout_3DACS_2X2_SNW();
     break;
+  case LAYOUT_3DACS_1X3_SNW:
+    this->activateLayout_3DACS_1X3_SNW();
+    break;
   case LAYOUT_3DAny_1X2_SNW:
     this->activateLayout_3DAny_1X2_SNW();
     break;
@@ -534,6 +539,18 @@ void ViewManager::activateLayout_3DACS_2X2_SNW()
   mActiveLayout = LAYOUT_3DACS_2X2_SNW;
   emit activeLayoutChanged();
 }
+
+void ViewManager::activateLayout_3DACS_1X3_SNW()
+{
+  activate3DView(0, 0,                  0, 0, 3, 1);
+  activate2DView(0, 1, ssc::ptAXIAL,    0, 1);
+  activate2DView(0, 2, ssc::ptCORONAL,  1, 1);
+  activate2DView(0, 3, ssc::ptSAGITTAL, 2, 1);
+
+  mActiveLayout = LAYOUT_3DACS_1X3_SNW;
+  emit activeLayoutChanged();
+}
+
 
 void ViewManager::activateLayout_ACSACS_2X3_SNW()
 {
