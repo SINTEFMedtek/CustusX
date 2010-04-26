@@ -209,21 +209,7 @@ MainWindow::MainWindow() :
   if (!mSettings->contains("renderingInterval"))
     mSettings->setValue("renderingInterval", 33);
   if (!mSettings->contains("shadingOn"))
-    mSettings->setValue("shadingOn", true);
-  
-  // Restore saved window states
-  if(!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
-  {
-    //Debug
-    //std::cout << "Warning: MainWindow: restore geometry failed" << std::endl;
-    this->resize(QSize(1200,1000));//Set initial size if no previous size exist
-  }
-  if(!restoreState(mSettings->value("mainWindow/windowState").toByteArray()))
-  {
-    //Debug
-    //std::cout << "Warning: MainWindow: restore state failed" << std::endl;
-  }
-    
+    mSettings->setValue("shadingOn", true);  
 
   //debugging
   connect(messageManager(), SIGNAL(emittedMessage(const QString&, int)),
@@ -253,7 +239,13 @@ MainWindow::MainWindow() :
 
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mToolPropertiesWidget);
-
+  
+  // Restore saved window states
+  // Must be done after all DockWidgets are created
+  if(!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
+    this->resize(QSize(1200,1000));//Set initial size if no previous size exist
+  restoreState(mSettings->value("mainWindow/windowState").toByteArray());
+  
   // Don't show the Widget before all elements are initialized
   this->show();
 }
