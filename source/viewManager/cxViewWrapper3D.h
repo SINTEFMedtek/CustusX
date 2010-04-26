@@ -37,7 +37,7 @@ public:
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
-  void toolManagerConfiguredSlot(); ///< add all tools when configured
+  void toolsAvailableSlot(); ///< add all tools when configured
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu){};
