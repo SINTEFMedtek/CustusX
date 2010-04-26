@@ -150,32 +150,30 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 
 void RegistrationWidget::nextRow()
 {
-  //std::cout << "RegistrationWidget::nextRow()" << std::endl;
-  int selectedRow = mLandmarkTableWidget->currentIndex().row();
-  int nextRow = selectedRow;
-  int lastRow = mLandmarkTableWidget->rowCount()-1;
+  int selectedRow = mLandmarkTableWidget->currentRow();
 
-  if(selectedRow == -1) //no row is selected yet
+  //std::cout << "1 Selected row = " << string_cast(selectedRow) << std::endl;
+  if(selectedRow == -1 && mLandmarkTableWidget->rowCount() != 0) //no row is selected yet
   {
-    selectedRow = lastRow;
-    mLandmarkTableWidget->setCurrentItem(mLandmarkTableWidget->itemAt(selectedRow, 0));
+    mLandmarkTableWidget->selectRow(0);
+    selectedRow = mLandmarkTableWidget->currentRow();
+    //std::cout << "2 Selected row = " << string_cast(selectedRow) << std::endl;
   }
-  if(selectedRow < lastRow)
-  {
-    nextRow=nextRow+1;
-  }
-  else if(selectedRow > lastRow)
+
+  int nextRow = selectedRow+1;
+  int lastRow = mLandmarkTableWidget->rowCount()-1;
+  if(nextRow > lastRow)
   {
     nextRow = lastRow;
   }
 
-  QModelIndex nextIndex = mLandmarkTableWidget->currentIndex().sibling(nextRow,0);
-  if(nextIndex.isValid())
-  {
-    mLandmarkTableWidget->setCurrentIndex(nextIndex);
-    mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString().toStdString();
-    //std::cout << "mActiveLandmark: " << mActiveLandmark.c_str() << std::endl;
-  }
+  selectedRow = nextRow;
+  mLandmarkTableWidget->selectRow(selectedRow);
+  mLandmarkTableWidget->setCurrentCell(selectedRow, 0);
+  //std::cout << "3 Selected row = " << string_cast(selectedRow) << std::endl;
+
+  mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString().toStdString();
+  //std::cout << "ActiveLandmark uid: " << mActiveLandmark << std::endl;
 }
 
 std::vector<ssc::Landmark> RegistrationWidget::getAllLandmarks() const
