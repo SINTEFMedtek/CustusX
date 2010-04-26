@@ -118,6 +118,9 @@ void ViewWrapper3D::toolsAvailableSlot()
 //  if (!toolManager()->isConfigured())
 //    return;
 
+  std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
+
+
   ssc::ToolManager::ToolMapPtr tools = toolManager()->getTools();
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
@@ -125,8 +128,11 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(iter->second->getType() == ssc::Tool::TOOL_REFERENCE)
       continue;
 
-    //std::cout << "setting tool rep " << toolIt->second->getName() << std::endl;
-    ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New(iter->second->getUid()+"_rep3d");
+    std::string uid = iter->second->getUid()+"_rep3d";
+    if (!mToolReps.count(uid))
+      mToolReps[uid] = ssc::ToolRep3D::New(uid);
+    ssc::ToolRep3DPtr toolRep = mToolReps[uid];
+    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
     toolRep->setTool(iter->second);
     mView->addRep(toolRep);
   }
