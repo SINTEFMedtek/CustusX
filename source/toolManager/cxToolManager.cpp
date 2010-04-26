@@ -74,6 +74,7 @@ void ToolManager::initializeManualTool()
   {
     //adding a manual tool as default
     mManualTool.reset(new ssc::ManualTool("tool_manual"));
+    //mManualTool->setName("Mouse tool");
     (*mConfiguredTools)["tool_manual"] = mManualTool;
     mManualTool->setVisible(true);
     this->addConnectedTool("tool_manual");
@@ -883,6 +884,8 @@ void ToolManager::dominantCheckSlot()
       it != mConnectedTools->end(); ++it)
   {
     if(it->second->getVisible())
+      visibleTools.push_back(it->second);
+    else if(it->second->getType() == ssc::Tool::TOOL_MANUAL)
       visibleTools.push_back(it->second);
   }
 

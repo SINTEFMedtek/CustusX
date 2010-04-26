@@ -62,7 +62,7 @@ void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
   ssc::Transform3D cameraTransform_pr = prMt*ssc::createTransformTranslate(cameraPoint_t);
   ssc::Vector3D cameraPoint_pr = ssc::Vector3D(cameraTransform_pr[0][3],
       cameraTransform_pr[1][3], cameraTransform_pr[2][3]); //the camera point in patient ref space
-  ssc::Transform3DPtr rMpr = ToolManager::getInstance()->get_rMpr();
+  ssc::Transform3DPtr rMpr = toolManager()->get_rMpr();
   ssc::Transform3D cameraPoint_r = (*rMpr)*ssc::createTransformTranslate(cameraPoint_pr);
 
   ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
@@ -94,7 +94,7 @@ void View3D::activateCameraToolStyle(int offset)
   if(offset != -1)
     mCameraOffset = offset;
 
-  ssc::ToolPtr dominantToolPtr = ToolManager::getInstance()->getDominantTool();
+  ssc::ToolPtr dominantToolPtr = toolManager()->getDominantTool();
   if(!dominantToolPtr)
     return;
 

@@ -114,14 +114,12 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
+  std::cout <<"void ViewWrapper3D::toolsAvailableSlot() " << std::endl;
   // we want to do this also when nonconfigured and manual tool is present
 //  if (!toolManager()->isConfigured())
 //    return;
 
-  std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
-
-
-  ssc::ToolManager::ToolMapPtr tools = toolManager()->getTools();
+  ssc::ToolManager::ToolMapPtr tools = toolManager()->getConfiguredTools();
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {

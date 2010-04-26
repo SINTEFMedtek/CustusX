@@ -94,7 +94,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
   }
   const QMetaObject* metaObject = sender->metaObject();
   std::string className = metaObject->className();
-  std::cout << "Incoming objects classname is: " << className << std::endl; //TODO debuggging
+  //std::cout << "Incoming objects classname is: " << className << std::endl; //TODO debuggging
   if(className == "Tool")
   {
     Tool* tool = dynamic_cast<Tool*>(sender);

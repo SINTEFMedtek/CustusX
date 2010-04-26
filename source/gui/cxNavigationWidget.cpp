@@ -74,21 +74,21 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
     {
       mCameraOffsetSlider->setDisabled(true);
 
-      View3D* view3D_1Ptr = ViewManager::getInstance()->get3DView("View3D_1");
+      View3D* view3D_1Ptr = viewManager()->get3DView("View3D_1");
       view3D_1Ptr->setCameraStyle(View3D::DEFAULT_STYLE);
-      MessageManager::getInstance()->sendInfo("Default camera selected");
+      messageManager()->sendInfo("Default camera selected");
     }
   }
   else if(this->sender() == mToolCameraStyleRadioButton)
   {
-    View3D* view3D_1Ptr = ViewManager::getInstance()->get3DView("View3D_1");
+    View3D* view3D_1Ptr = viewManager()->get3DView("View3D_1");
     if(checked)
     {
       mCameraOffsetSlider->setEnabled(true);
       view3D_1Ptr->setCameraStyle(View3D::TOOL_STYLE, mCameraOffsetSlider->value());
       connect(mCameraOffsetSlider, SIGNAL(valueChanged(int)),
                  view3D_1Ptr, SLOT(setCameraOffsetSlot(int)));
-      MessageManager::getInstance()->sendInfo("Tool camera selected");
+      messageManager()->sendInfo("Tool camera selected");
     }else
     {
       if(view3D_1Ptr)
