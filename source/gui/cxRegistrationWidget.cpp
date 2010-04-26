@@ -95,6 +95,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
     return;
 
   std::vector<ssc::Landmark> landmarks =  this->getAllLandmarks();
+  ssc::LandmarkMap targetData = this->getTargetLandmarks();
 
   //ready the table widget
   mLandmarkTableWidget->setRowCount(landmarks.size());
@@ -119,12 +120,17 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
     else
       items[1]->setCheckState(Qt::Unchecked);
 
-    int width = 5;
-    int prec = 1;
-    items[2] = new QTableWidgetItem(tr("(%1, %2, %3)").arg(coord[0],width,'f',prec).arg(coord[1],width,'f',prec).arg(coord[2],width,'f',prec));
+    QString coordText = "Not sampled";
+    if (targetData.count(prop.getUid()))
+    {
+      int width = 5;
+      int prec = 1;
+      coordText = tr("(%1, %2, %3)").arg(coord[0],width,'f',prec).arg(coord[1],width,'f',prec).arg(coord[2],width,'f',prec);
+    }
+
+    items[2] = new QTableWidgetItem(coordText);
 
     items[3] = new QTableWidgetItem(tr("%1").arg(this->getAccuracy(landmarks[i].getUid())));
-
 
     for (unsigned j=0; j<items.size(); ++j)
     {
