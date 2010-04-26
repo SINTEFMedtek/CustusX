@@ -214,17 +214,27 @@ ssc::ToolPtr ToolManager::getDominantTool()
 {
   return mDominantTool;
 }
+
 void ToolManager::setDominantTool(const std::string& uid)
 {
   //std::cout << "1: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
   if(mDominantTool && mDominantTool->getUid() == uid)
     return;
 
-  std::cout << "2: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
+  if (mDominantTool)
+  {
+    // make manual tool invisible when other tools are active.
+    if (mDominantTool->getType()==ssc::Tool::TOOL_MANUAL)
+    {
+      mManualTool->setVisible(false);
+    }
+  }
+
+  std::cout << "void ToolManager::setDominantTool( "+uid+" )" << std::endl;
 
   ssc::ToolPtr newTool;
-  
-  ToolMapConstIter iter = mConfiguredTools->find(uid);  
+
+  ToolMapConstIter iter = mConfiguredTools->find(uid);
   if (iter != mConfiguredTools->end())
   {
     newTool = iter->second;
@@ -234,17 +244,19 @@ void ToolManager::setDominantTool(const std::string& uid)
   {
     newTool = it->second;
   }
-  
+
+  // special case for manual tool
   if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mDominantTool && mManualTool)
   {
     mManualTool->set_prMt(mDominantTool->get_prMt());
     mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
+    mManualTool->setVisible(true);
   }
 
   mDominantTool = newTool;
   emit dominantToolChanged(uid);
-
 }
+
 std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
 {
   std::map<std::string, std::string> uidsAndNames;
