@@ -307,7 +307,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
 
   mSkinPointActors[uid] = skinPointActor;
 
-  messageManager()->sendInfo("Added the permanent point to landmark: "+string_cast(coord));
+  messageManager()->sendInfo("Added permanent point to landmark("+uid+"): "+string_cast(coord));
 
   for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
   {
