@@ -27,35 +27,18 @@ ManualTool::~ManualTool()
 
 void ManualTool::read3DCrossHair()
 {
-	if(mCrossHair)
+	if(!mCrossHair)
 	{
-		return;
+	  mCrossHair = vtkCursor3DPtr::New();
+	  mCrossHair->AllOff();
+	  mCrossHair->AxesOn();
 	}
-	mCrossHair = vtkCursor3DPtr::New();
-	mCrossHair->SetModelBounds(-120,140,-120,140,-120,140);
-	mCrossHair->SetFocalPoint(0,0,0);
-	mCrossHair->AllOff();
-	mCrossHair->AxesOn();
-
-	//mCrossHair->OutlineOn();
-//	mCrossHair->XShadowsOn();
-//	mCrossHair->YShadowsOn();
-//	mCrossHair->ZShadowsOn();
-
-	//std::string filename( "/Data/Models/3DCrosshair.STL");
-//	mSTLReader = vtkSTLReaderPtr::New();
-//	mSTLReader->SetFileName( filename.c_str() );
-//	mSTLReader->Update();
-//	if (mSTLReader->GetOutput())
-//	{
-//		std::cout << " we got polydata " << std::endl;
-//		vtkPolyDataPtr mPolyData = mSTLReader->GetOutput();
-//	}
-
-	//mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );
-
-
+	int s = 60;
+	//mCrossHair->SetModelBounds(-120,140,-120,140,-120,140);
+	mCrossHair->SetModelBounds(-s,s,-s,s,-s,s+mOffset);
+  mCrossHair->SetFocalPoint(0,0,mOffset);
 }
+
 //only used now by mouse or touch tool
 void ManualTool::set_prMt(const Transform3D& prMt)
 {
@@ -149,7 +132,8 @@ void ManualTool::setTooltipOffset(double val)
 	if (similar(val,mOffset))
 		return;
 	mOffset = val;
-	mCrossHair->SetFocalPoint(0,0,mOffset);
+	read3DCrossHair();
+//	mCrossHair->SetFocalPoint(0,0,mOffset);
 	emit tooltipOffset(mOffset);
 }
 
