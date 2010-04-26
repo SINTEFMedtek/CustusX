@@ -4,12 +4,12 @@
 #include "sscTool.h"
 
 #include <boost/shared_ptr.hpp>
-
 #include <igstkPolarisTrackerTool.h>
 #include <igstkAuroraTrackerTool.h>
 #include <igstkTransform.h>
 #include <igstkLogger.h>
 #include <itkStdStreamLogOutput.h>
+#include "sscTransform3D.h"
 #include "cxTracker.h"
 
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
@@ -103,6 +103,7 @@ public:
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
+  virtual void set_prMt(const ssc::Transform3D& transform);
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
 
