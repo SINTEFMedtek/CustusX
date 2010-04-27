@@ -642,7 +642,9 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	// non-us volumes that have a preset get a llr equal to the lower end of the window.
 	if (!mMetaData.mIntraoperative && window>0 && level>0)
 	{
-		llr = level - window/2;
+		//llr = level - window/2; this gives the side effect of showing a non-zero llr to the user
+		// in the case when llr is shown absolutely: removed.
+		llr = 0;
 	}
 	
 	if (mMetaData.mModalityType.toUpper().contains("ANGIO")) // set a default LLR for angio. //TODO move it to a better place. Tried to move it to vmLayer::createFromSeries

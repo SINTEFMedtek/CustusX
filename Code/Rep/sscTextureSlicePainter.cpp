@@ -184,8 +184,8 @@ public:
 TextureSlicePainter::TextureSlicePainter()
 {
 	mInternals = new vtkInternals();
-	//QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
-	QFile fp(QString("/home/chrask/workspace/ssc/Sandbox/Texture3DOverlay.frag"));
+	QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
+	//QFile fp(QString("/home/chrask/workspace/ssc/Sandbox/Texture3DOverlay.frag"));
 
 	if (fp.exists())
 	{
