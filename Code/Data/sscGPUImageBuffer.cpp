@@ -467,7 +467,7 @@ public:
 		mVolumeBuffer.setName("Volume");
 		mLutBuffer.setName("Lut");
 
-		mVolumeBuffer.setMaxBuffers(10);
+		mVolumeBuffer.setMaxBuffers(12);
 		mLutBuffer.setMaxBuffers(15);
 	}
 	BufferQueue<vtkImageDataPtr, ssc::GPUImageDataBuffer> mVolumeBuffer;
