@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <QtGui>
+#include <stdint.h>
 
 #include "sscTransform3D.h"
 #include "sscPositionStorageFile.h"
