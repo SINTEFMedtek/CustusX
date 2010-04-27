@@ -35,15 +35,15 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
 	//mAlpha = 0.5; 
 	//mTreshold = 1.0;
 	
-	// provide a resampled volume for algorithms requiring that (such as proberep)
-	mOrientatorMatrix = vtkMatrix4x4Ptr::New();
-	mOrientator = vtkImageReslicePtr::New();
-	mOrientator->SetInput(mBaseImageData);
-	mOrientator->SetInterpolationModeToLinear();
-	mOrientator->SetOutputDimensionality( 3);
-	mOrientator->SetResliceAxes(mOrientatorMatrix);
-	mOrientator->AutoCropOutputOn();
-	mReferenceImageData = mOrientator->GetOutput();
+//	// provide a resampled volume for algorithms requiring that (such as proberep)
+//	mOrientatorMatrix = vtkMatrix4x4Ptr::New();
+//	mOrientator = vtkImageReslicePtr::New();
+//	mOrientator->SetInput(mBaseImageData);
+//	mOrientator->SetInterpolationModeToLinear();
+//	mOrientator->SetOutputDimensionality( 3);
+//	mOrientator->SetResliceAxes(mOrientatorMatrix);
+//	mOrientator->AutoCropOutputOn();
+//	mReferenceImageData = mOrientator->GetOutput();
 
 	// Add initial values to the transfer functions
 	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
@@ -72,9 +72,12 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
 
 void Image::transformChangedSlot()
 {
-  Transform3D rMd = get_rMd();
-  mOrientatorMatrix->DeepCopy(rMd.inv().matrix());
-  mReferenceImageData->Update();
+	if (mReferenceImageData)
+	{
+		Transform3D rMd = get_rMd();
+		mOrientatorMatrix->DeepCopy(rMd.inv().matrix());
+		mReferenceImageData->Update();		
+	}
   //std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
 }
 
@@ -83,7 +86,11 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 	//std::cout << "Image::setVtkImageData() " << std::endl;
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
-  mOrientator->SetInput(mBaseImageData);
+	
+	if (mOrientator)
+	{
+		mOrientator->SetInput(mBaseImageData);		
+	}
 
 	//mOutputImageData = mBaseImageData;
 	mImageTransferFunctions3D->setVtkImageData(data);
@@ -131,10 +138,24 @@ vtkImageDataPtr Image::getBaseVtkImageData()
 }
 vtkImageDataPtr Image::getRefVtkImageData()
 {
-  //return mBaseImageData;
-  mReferenceImageData->Update();
+	if (!mReferenceImageData) // optimized: dont init it if you dont need it.
+	{
+		// provide a resampled volume for algorithms requiring that (such as proberep)
+		mOrientatorMatrix = vtkMatrix4x4Ptr::New();
+		mOrientator = vtkImageReslicePtr::New();
+		mOrientator->SetInput(mBaseImageData);
+		mOrientator->SetInterpolationModeToLinear();
+		mOrientator->SetOutputDimensionality( 3);
+		mOrientator->SetResliceAxes(mOrientatorMatrix);
+		mOrientator->AutoCropOutputOn();
+		mReferenceImageData = mOrientator->GetOutput();
+
+		mReferenceImageData->Update();		
+	}
+	
 	return mReferenceImageData;
 }
+
 LandmarkMap Image::getLandmarks()
 {
 	return mLandmarks;
