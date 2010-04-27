@@ -59,6 +59,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscTool2DRep.h
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerRep.h
+    Rep/sscSlicePlanes3DRep.h
     Widgets/sscAbstractInterface.h
     Widgets/sscHelperWidgets.h
     )

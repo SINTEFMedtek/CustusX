@@ -9,25 +9,34 @@
 #include "sscPositionStorageFile.h"
 #include "sscUtilHelpers.h"
 
+#define EVENT_DATE_FORMAT "yyyyMMddHHmmss.zzz000"
+
 /** 
  */
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
 	
-	if (argc<2)
+	if (argc<3)
 	{
-		std::cout << "usage: sscPositionFileReader [-v] <filename> " << std::endl;
+		std::cout << "usage: sscPositionFileReader [-v] <filename> <timestamp>" << std::endl;
 		return 0;
 	}
 
 	QString posFile(argv[1]);
+	QString startTS(argv[2]);
 	bool verbose = argc>2 && QString(argv[1])=="-v";
 	if (verbose)
 	{
 		posFile = QString(argv[2]);		
+		startTS = QString(argv[3]);
 	}
 	
+	QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
+	uint64_t ret64 = startTime.toTime_t();
+	ret64 *= 1000;
+	uint64_t tsModifier = ret64 & 0xffffffff00000000;
+
 	ssc::PositionStorageReader reader(posFile);
 	
 	ssc::Transform3D T;
@@ -41,6 +50,8 @@ int main(int argc, char **argv)
 	while (!reader.atEnd())
 	{
 		reader.read(&T, &timestamp, &toolIndex);
+		uint64_t ts64 = (uint64_t)timestamp;
+		ts64 |= tsModifier;
 
 		if (verbose)
 		{
@@ -48,13 +59,13 @@ int main(int argc, char **argv)
 			 	<< "index:\t"<< index << '\t'
 				<< "tool id:\t" << toolIndex << '\t' 
 //				<< "timestamp:\t" << timestamp << '\n'
-				<< "timestamp:\t" << ssc::PositionStorageReader::timestampToString(timestamp).toStdString() << '\n'				
+				<< "timestamp:\t" << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\n'
 				<< "matrix:\n" << T << '\n' 
 				<< std::endl;			
 		}
 		else
 		{		
-			std::cout << "[" << index << "]\t" << toolIndex << '\t' << ssc::PositionStorageReader::timestampToString(timestamp).toStdString() << '\t';
+			std::cout << "[" << index << "]\t" << toolIndex << '\t' << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
 			boost::array<double, 16>  val = T.flatten();
 			ssc::stream_range(std::cout, val.begin(), val.end(), ' ');
 			std::cout << std::endl;

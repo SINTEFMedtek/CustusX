@@ -63,13 +63,13 @@ public:
 	virtual void setCenter(const Vector3D& center) = 0;
 
 	// state information
-	virtual ImagePtr getActiveImage() const = 0; ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage) = 0; ///< used for system state
+	virtual ImagePtr getActiveImage() const { return ImagePtr(); } ///< used for system state
+	virtual void setActiveImage(ImagePtr activeImage) {} ///< used for system state
 
-  virtual void setLandmarkNames(std::vector<std::string> names) = 0;
-  virtual void setLandmarkName(std::string uid, std::string name) = 0;
-  virtual void setLandmarkActive(std::string uid, bool active) = 0;
-  virtual std::map<std::string, LandmarkProperty> getLandmarkProperties() const = 0;
+  virtual void setLandmarkNames(std::vector<std::string> names) {}
+  virtual void setLandmarkName(std::string uid, std::string name) {}
+  virtual void setLandmarkActive(std::string uid, bool active) {}
+  virtual LandmarkPropertyMap getLandmarkProperties() const { return LandmarkPropertyMap(); }
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
