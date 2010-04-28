@@ -97,6 +97,10 @@ set( SSC_LIBRARIES QVTK )
 if (NOT APPLE) 
     set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU )
 endif (NOT APPLE)
+# needed on apple
+if (APPLE) 
+    set( SSC_LIBRARIES ${SSC_LIBRARIES} crypto )
+endif (APPLE)
 
 # library
 SET( SSC_SOURCE_FILES
