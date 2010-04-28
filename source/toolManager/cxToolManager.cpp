@@ -114,23 +114,26 @@ void ToolManager::configure()
   mTracker = this->configureTracker(trackerNode);
   mConfiguredTools = this->configureTools(toolNodeList);
 
-  if (!mConfiguredTools->empty())
-  {
-    ToolMapConstIter it = mConfiguredTools->begin();
-    while (it != mConfiguredTools->end())
-    {
-      ssc::ToolPtr tool = (*it).second;
-      if (tool->getType() != ssc::Tool::TOOL_REFERENCE)
-      {
-        //use manual tools
-        ssc::Transform3D transform = this->getManualTool()->get_prMt();
-        tool->set_prMt(transform);
-        this->setDominantTool(tool->getUid());
-        break;
-      }
-      it++;
-    }
-  }
+//  if (!mConfiguredTools->empty())
+//  {
+//    ToolMapConstIter it = mConfiguredTools->begin();
+//    while (it != mConfiguredTools->end())
+//    {
+//      ssc::ToolPtr tool = (*it).second;
+//      if (tool->getType() != ssc::Tool::TOOL_REFERENCE)
+//      {
+//        //use manual tools
+//        ssc::Transform3D transform = this->getManualTool()->get_prMt();
+//        tool->set_prMt(transform);
+//        this->setDominantTool(tool->getUid());
+//        break;
+//      }
+//      it++;
+//    }
+//  }
+
+  // replaced above code with simpler version... ?
+  this->setDominantTool(this->getManualTool()->getUid());
 
   this->connectSignalsAndSlots();
 
