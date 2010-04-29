@@ -1,3 +1,4 @@
 add_subdirectory(SliceAndToolRep)
 add_subdirectory(ViewApp)
+add_subdirectory(QtSandbox)
 add_subdirectory(PositionFileReader)
