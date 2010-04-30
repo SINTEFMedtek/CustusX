@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
   app.setOrganizationName("SINTEF");
   app.setOrganizationDomain("www.sintef.no");
   app.setApplicationName("CustusX3");
+  app.setWindowIcon(QIcon(":/icons/CustusX.png"));
+//  app.setWindowIcon(QIcon(":/icons/.png"));
+
   cx::MainWindow mainWin;
   mainWin.show();
   mainWin.activateWindow();
