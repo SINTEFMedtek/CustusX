@@ -23,6 +23,7 @@
 #include "cxPreferencesDialog.h"
 #include "cxShiftCorrectionWidget.h"
 #include "cxImagePropertiesWidget.h"
+#include "cxPointSamplingWidget.h"
 
 namespace cx
 {
@@ -171,6 +172,7 @@ MainWindow::MainWindow() :
   mCustomStatusBar(new CustomStatusBar()),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
+  mPointSamplingWidget(new PointSamplingWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),
   mPatientRegistrationIndex(-1),
@@ -239,6 +241,7 @@ MainWindow::MainWindow() :
 
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mToolPropertiesWidget);
+  this->addAsDockWidget(mPointSamplingWidget);
   
   // Restore saved window states
   // Must be done after all DockWidgets are created
@@ -256,6 +259,7 @@ void MainWindow::addAsDockWidget(QWidget* widget)
   dockWidget->setObjectName(widget->objectName()+"DockWidget");
   dockWidget->setWidget(widget);
   this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+  dockWidget->setVisible(false); // default visibility
 }
 
 MainWindow::~MainWindow()
