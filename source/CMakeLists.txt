@@ -76,7 +76,9 @@ ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(toolManager)
 ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
-ADD_SUBDIRECTORY(3DUSReconstruction)
+IF(APPLE) # doesnt compile on ca's linux box - ??
+    ADD_SUBDIRECTORY(3DUSReconstruction)
+ENDIF(APPLE)
 
 IF(APPLE)
   SET(MACOSX_BUNDLE_INFO_STRING "CustusX")
@@ -99,7 +101,7 @@ SET ( LINK_LIBRARIES
   registrationManager
   toolManager
   dataManager
-  3DUSReconstruction
+  #3DUSReconstruction
   vtkRendering
   vtkWidgets
   vtkGraphics
@@ -125,7 +127,11 @@ TARGET_LINK_LIBRARIES( CustusX
   ${LINK_LIBRARIES}
 )
 
-ADD_EXECUTABLE ( reconstruct apps/cxReconstructMain.cpp )
-TARGET_LINK_LIBRARIES ( reconstruct
-  ${LINK_LIBRARIES}
-)
+IF(APPLE)
+    ADD_EXECUTABLE ( reconstruct apps/cxReconstructMain.cpp )
+    TARGET_LINK_LIBRARIES ( reconstruct
+      3DUSReconstruction
+      ${LINK_LIBRARIES}
+      )
+ENDIF(APPLE)
+      

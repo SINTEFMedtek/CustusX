@@ -1,7 +1,7 @@
 #ifndef MESSAGEMANAGER_H_
 #define MESSAGEMANAGER_H_
 
-#include <QObject.h>
+#include <QObject>
 
 class QString;
 class QDomNode;

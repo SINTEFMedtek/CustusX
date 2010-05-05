@@ -8,7 +8,7 @@
 #define CXTOOLPROPERTIESWIDGET_H_
 
 #include <vector>
-#include <QtGUI>
+#include <QtGui>
 #include "sscForwardDeclarations.h"
 
 namespace cx

@@ -9,10 +9,10 @@
 #include "vtkMatrix4x4.h"
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
-#include "cxToolmanager.h"
+#include "cxToolManager.h"
 #include "cxMessageManager.h"
 #include "cxDataManager.h"
-#include "sscTypeconversions.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

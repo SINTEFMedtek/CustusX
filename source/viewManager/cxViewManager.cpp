@@ -479,10 +479,12 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
   ssc::VolumetricRepPtr volumetricRep
   = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
   if(volumetricRep->getImage())
+  {
     if(shadingOn)
       volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
     else
       volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
+  }
 }
   
 void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan)
