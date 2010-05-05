@@ -2,7 +2,7 @@
 #define CXIMAGEPROPERTIESWIDGET_H_
 
 #include <vector>
-#include <QtGUI>
+#include <QtGui>
 
 namespace cx
 {

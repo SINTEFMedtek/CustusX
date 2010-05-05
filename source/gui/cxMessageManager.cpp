@@ -1,6 +1,6 @@
 #include "cxMessageManager.h"
 
-#include <QString.h>
+#include <QString>
 #include "cxMainWindow.h"
 
 namespace cx

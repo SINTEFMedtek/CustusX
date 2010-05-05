@@ -1,6 +1,7 @@
 #ifndef CXTRANSFERFUNCTIONALPHAWIDGET_H_
 #define CXTRANSFERFUNCTIONALPHAWIDGET_H_
 
+#include <limits.h>
 #include <QWidget>
 
 #include <sscImage.h>

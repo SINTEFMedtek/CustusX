@@ -2,8 +2,9 @@
 #define CXREGISTRATIONHISTORYWIDGET_H_
 
 #include <vector>
-#include <QtGUI>
+#include <QtGui>
 #include "sscRegistrationTransform.h"
+
 
 namespace cx
 {

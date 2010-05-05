@@ -3,6 +3,7 @@
 
 #include "sscTool.h"
 
+#include <limits.h>
 #include <boost/shared_ptr.hpp>
 #include <igstkPolarisTrackerTool.h>
 #include <igstkAuroraTrackerTool.h>

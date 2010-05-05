@@ -2,7 +2,7 @@
 #include "cxShiftCorrectionWidget.h"
 #include "cxMessageManager.h"
 #include "sscMesh.h"
-#include "sscGeometricRep.H"
+#include "sscGeometricRep.h"
 #include "cxDataManager.h"
 #include "cxRepManager.h"
 #include <QVBoxLayout>
@@ -30,7 +30,7 @@
 #include <itkBinaryThinningImageFilter.h>
 
 #include <vtkImageToPolyDataFilter.h>
-#include <vtkPolydata.h>
+#include <vtkPolyData.h>
 #include "cxViewManager.h"
 #include <vtkPolyDataMapper.h>
 #include "cxView3D.h"
