@@ -217,6 +217,7 @@ protected:
   CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
   class ImagePropertiesWidget* mImagePropertiesWidget; ///< display and control of image properties for active image.
   class ToolPropertiesWidget* mToolPropertiesWidget; ///< display and control of tool properties for active tool.
+  class PointSamplingWidget* mPointSamplingWidget;
   int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences

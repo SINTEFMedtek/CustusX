@@ -2,7 +2,7 @@
 #define CXSHIFTCORRECTIONWIDGET_H_
 
 #include <QWidget>
-#include <QProcess>;
+#include <QProcess>
 //class QVBoxLayout;
 class QGridLayout;
 class QComboBox;
