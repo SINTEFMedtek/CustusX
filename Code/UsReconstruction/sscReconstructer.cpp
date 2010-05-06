@@ -15,7 +15,10 @@
 
 namespace ssc
 {
-
+Reconstructer::Reconstructer() :
+  mAlgorithm(new ThunderVNNReconstructAlgorithm)
+{}
+  
 QString Reconstructer::changeExtension(QString name, QString ext)
 {
   QStringList splitName = name.split(".");
@@ -107,6 +110,58 @@ void Reconstructer::readPositionFile(QString posFile)
   std::cout << "Reconstructer::readPositionFile() - succes. Number of positions: " 
   << mPositions.size() << std::endl;
   return;
+}
+  
+vtkImageDataPtr Reconstructer::generateVtkImageData(Vector3D dim, 
+                                                  Vector3D spacing,
+                                                  const char initValue)
+{
+  //TODO: Must generalize
+  vtkImageDataPtr data = vtkImageDataPtr::New();
+  data->SetSpacing(spacing[0], spacing[1], spacing[2]);
+  data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
+  data->SetScalarTypeToUnsignedChar();
+  data->SetNumberOfScalarComponents(1);
+  
+  int scalarSize = dim[0]*dim[1]*dim[2];
+  
+	unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
+  std::fill(rawchars,rawchars+scalarSize, initValue);
+  
+  vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
+  array->SetNumberOfComponents(1);
+  //TODO: Whithout the +1 the volume is black 
+  array->SetArray(rawchars, scalarSize+1, 0); // take ownership
+  data->GetPointData()->SetScalars(array);
+  
+  /*data->AllocateScalars();
+   unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
+   unsigned long N = data->GetNumberOfPoints();
+   N--;//Don't understand this
+   for (unsigned long i = 0; i < N; i++)
+   dataPtr[i] = 200;
+   
+   //dataPtr[N] = 255;//This creates a black volume
+   
+   std::cout << "Reconstructer::generateOutputVolume() data->GetNumberOfPoints(): " 
+   << N << std::endl;
+   */
+  
+  return data;
+}
+
+ImagePtr Reconstructer::generateMask()
+{  
+  ssc::Vector3D dim(mUsRaw->getBaseVtkImageData()->GetDimensions());
+  dim[2] = 1;
+  ssc::Vector3D spacing(mUsRaw->getBaseVtkImageData()->GetSpacing());
+  
+  vtkImageDataPtr data = generateVtkImageData(dim, spacing, 255);
+  
+  //TODO: Create ouput volume name
+  ImagePtr image = ImagePtr(new Image("mask", data, "mask")) ;
+  return image;
+  
 }
   
 /**
@@ -257,40 +312,9 @@ ImagePtr Reconstructer::generateOutputVolume()
   for (unsigned int i = 0; i < mFrames.size(); i++)
     mFrames[i].mPos = mFrames[i].mPos * prMd;
   
-  int x = 400;
-  int y = 200;
-  int z = 400;
-  
-  //TODO: Must generalize
-  vtkImageDataPtr data = vtkImageDataPtr::New();
-  data->SetSpacing(0.115, 0.115, 0.115);
-  data->SetExtent(0, x-1, 0, y-1, 0, z-1);
-  data->SetScalarTypeToUnsignedChar();
-  data->SetNumberOfScalarComponents(1);
-  
-  int scalarSize = x*y*z;
-  
-	unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
-  std::fill(rawchars,rawchars+scalarSize, 200);
-  
-  vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
-  array->SetNumberOfComponents(1);
-  //TODO: Whithout the +1 the volume is black 
-  array->SetArray(rawchars, scalarSize+1, 0); // take ownership
-  data->GetPointData()->SetScalars(array);
-  
-  /*data->AllocateScalars();
-  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
-  unsigned long N = data->GetNumberOfPoints();
-  N--;//Don't understand this
-  for (unsigned long i = 0; i < N; i++)
-    dataPtr[i] = 200;
-    
-  //dataPtr[N] = 255;//This creates a black volume
-  
-  std::cout << "Reconstructer::generateOutputVolume() data->GetNumberOfPoints(): " 
-    << N << std::endl;
-  */
+  ssc::Vector3D dim(400,200,400);
+  ssc::Vector3D spacing(0.115, 0.115, 0.115);  
+  vtkImageDataPtr data = generateVtkImageData(dim, spacing, 255);
   
   //TODO: Create ouput volume name
   ImagePtr image = ImagePtr(new Image("tull", data, "tull")) ;
@@ -303,6 +327,8 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   this->readFiles(mhdFileName); 
   //mPos is now tMpr
   
+  mMask = this->generateMask();
+  
   this->calibrateTimeStamps();
   
   this->calibrate(calFileName);
@@ -314,7 +340,7 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   mOutput = this->generateOutputVolume();
   //mPos in mFrames is now usMd
   
-  //mOutput = mAlgorithm->reconstruct(mFrames, mOutput);
+  mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask);
   
   return mOutput;
 }

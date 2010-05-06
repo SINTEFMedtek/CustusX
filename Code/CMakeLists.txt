@@ -62,8 +62,6 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSlicePlanes3DRep.h
     Widgets/sscAbstractInterface.h
     Widgets/sscHelperWidgets.h
-    UsReconstruction/sscReconstructer.h
-    UsReconstruction/sscReconstructionWidget.h
     )
 if (USE_GLX_SHARED_CONTEXT)
     SET( SSC_QT_MOC_HEADER_FILES
@@ -87,7 +85,6 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
     ${SSC_SOURCE_DIR}/Code/Widgets/
-    ${SSC_SOURCE_DIR}/Code/UsReconstruction/
     ${SSC_BINARY_DIR}
     ) 
 
@@ -223,10 +220,6 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
-    UsReconstruction/sscReconstructer.h
-    UsReconstruction/sscReconstructer.cpp
-    UsReconstruction/sscReconstructionWidget.h
-    UsReconstruction/sscReconstructionWidget.cpp
 	) 
 
 # =========================================================
@@ -317,6 +310,8 @@ FIND_PATH(SSC_DATA_ROOT sscData.readme
   ${SSC_SOURCE_DIR}/Data
   $ENV{SSC_DATA_ROOT})
   
+set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/Code/UsReconstruction/Thunder)
+
 configure_file(
   "${SSC_SOURCE_DIR}/Code/Utilities/sscConfig.h.in"
   "${SSC_BINARY_DIR}/sscConfig.h"
@@ -368,6 +363,9 @@ configure_file (
 include (CMakeExportBuildSettings)
 cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)
 export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
+
+
+ADD_SUBDIRECTORY(UsReconstruction)
 
 # =========================================================
 
