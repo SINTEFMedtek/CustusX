@@ -55,7 +55,7 @@ std::ostream& operator<<(std::ostream& str, const QString& qstring);
 /** Helper function for converting a QString to a list of doubles.
  *  Useful for reading vectors/matrices.
  */
-std::vector<double> convertQString2DoubleVector(const QString& input);
+std::vector<double> convertQString2DoubleVector(const QString& input, bool* ok=0);
 
 /** Helper function template for streaming an object to string.
  *  The streamed object must support the method void addXml(QDomNode).

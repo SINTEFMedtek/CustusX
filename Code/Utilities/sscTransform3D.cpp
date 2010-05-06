@@ -29,10 +29,12 @@ Transform3D::Transform3D(vtkMatrix4x4* m)
 	mMatrix = vtkMatrix4x4Ptr(m);
 }
 
-Transform3D Transform3D::fromString(const QString& text)
+Transform3D Transform3D::fromString(const QString& text, bool* ok)
 {
-  std::vector<double> raw = convertQString2DoubleVector(text);
+  std::vector<double> raw = convertQString2DoubleVector(text, ok);
   if (raw.size()!=16)
+    ok = false;
+  if (!ok)
     return Transform3D();
   return Transform3D((double*)&(*raw.begin()));
 }

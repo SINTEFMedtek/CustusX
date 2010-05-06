@@ -62,6 +62,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSlicePlanes3DRep.h
     Widgets/sscAbstractInterface.h
     Widgets/sscHelperWidgets.h
+    UsReconstruction/sscReconstructer.h
+    UsReconstruction/sscReconstructionWIdget.h
     )
 if (USE_GLX_SHARED_CONTEXT)
     SET( SSC_QT_MOC_HEADER_FILES
@@ -85,6 +87,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
     ${SSC_SOURCE_DIR}/Code/Widgets/
+    ${SSC_SOURCE_DIR}/Code/UsReconstruction/
     ${SSC_BINARY_DIR}
     ) 
 
@@ -104,6 +107,7 @@ endif (APPLE)
 
 # library
 SET( SSC_SOURCE_FILES
+    sscForwardDeclarations.h
     Utilities/sscBoundingBox3D.cpp
     Utilities/sscBoundingBox3D.h
     Utilities/sscVector3D.cpp
@@ -219,6 +223,10 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
+    UsReconstruction/sscReconstructer.h
+    UsReconstruction/sscReconstructer.cpp
+    UsReconstruction/sscReconstructionWIdget.h
+    UsReconstruction/sscReconstructionWIdget.cpp
 	) 
 
 # =========================================================

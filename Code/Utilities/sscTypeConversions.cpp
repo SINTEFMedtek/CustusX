@@ -19,13 +19,16 @@ std::ostream& operator<<(std::ostream& str, const QString& qstring)
 	return str;
 }
 
-std::vector<double> convertQString2DoubleVector(const QString& input)
+std::vector<double> convertQString2DoubleVector(const QString& input, bool* ok)
 {
+  *ok = true;
   QStringList comp = input.split(QRegExp("\\s+"), QString::SkipEmptyParts);
   std::vector<double> retval(comp.size());
+  bool tempOk = true;
   for (unsigned i=0; i<retval.size(); ++i)
   {
-    retval[i] = comp[i].toDouble();
+    retval[i] = comp[i].toDouble(&tempOk);
+    *ok = *ok && tempOk;
   }
   return retval;
 }
