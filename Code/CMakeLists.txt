@@ -63,7 +63,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscAbstractInterface.h
     Widgets/sscHelperWidgets.h
     UsReconstruction/sscReconstructer.h
-    UsReconstruction/sscReconstructionWIdget.h
+    UsReconstruction/sscReconstructionWidget.h
     )
 if (USE_GLX_SHARED_CONTEXT)
     SET( SSC_QT_MOC_HEADER_FILES
@@ -225,8 +225,8 @@ SET( SSC_SOURCE_FILES
     Tool/sscProbeSector.h
     UsReconstruction/sscReconstructer.h
     UsReconstruction/sscReconstructer.cpp
-    UsReconstruction/sscReconstructionWIdget.h
-    UsReconstruction/sscReconstructionWIdget.cpp
+    UsReconstruction/sscReconstructionWidget.h
+    UsReconstruction/sscReconstructionWidget.cpp
 	) 
 
 # =========================================================

@@ -314,7 +314,7 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   mOutput = this->generateOutputVolume();
   //mPos in mFrames is now usMd
   
-  mOutput = mAlgorithm->reconstruct(mFrames, mOutput);
+  //mOutput = mAlgorithm->reconstruct(mFrames, mOutput);
   
   return mOutput;
 }
