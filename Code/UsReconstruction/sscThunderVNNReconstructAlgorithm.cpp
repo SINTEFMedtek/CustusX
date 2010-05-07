@@ -51,7 +51,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<UsFrame> frameInfo,
   data.input_mask = static_cast<unsigned char*>(input_mask->GetScalarPointer());
   
   vtkImageDataPtr output = outputData->getBaseVtkImageData();
-  data.input = static_cast<unsigned char*>(output->GetScalarPointer());
+  data.output = static_cast<unsigned char*>(output->GetScalarPointer());
   output->GetDimensions(data.output_dim);
   output->GetSpacing(data.output_spacing);
   

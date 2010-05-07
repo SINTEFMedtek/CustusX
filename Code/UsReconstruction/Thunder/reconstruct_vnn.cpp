@@ -237,11 +237,6 @@ void call_vnn_kernel(cl_kernel vnn,
   holger_time_print(1);
 }
 
-
-
-
-
-
 void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
 {
   const char* program_src = file2string(kernel_path);
@@ -256,8 +251,6 @@ void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
   //TODO: free program_src
 	
 	cl_kernel vnn	= ocl_kernel_build(program, context->device, "vnn");
-  
-  //TODO: not finished
   
   float3* plane_points = generate_plane_points(data->input_pos_matrices, 
                                                data->input_dim[0],
