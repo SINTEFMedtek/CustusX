@@ -17,7 +17,8 @@
 namespace ssc
 {
 Reconstructer::Reconstructer() :
-  mAlgorithm(new ThunderVNNReconstructAlgorithm)
+  mAlgorithm(new ThunderVNNReconstructAlgorithm),
+  mMaxVolumeSize(256*256*256)
 {}
   
 QString Reconstructer::changeExtension(QString name, QString ext)
@@ -178,11 +179,29 @@ ImagePtr Reconstructer::generateMask()
   ssc::Vector3D spacing(mUsRaw->getBaseVtkImageData()->GetSpacing());
   
   vtkImageDataPtr data = generateVtkImageData(dim, spacing, 255);
-  
+    
   //TODO: Create ouput volume name
   ImagePtr image = ImagePtr(new Image("mask", data, "mask")) ;
   return image;
+}
   
+ImagePtr Reconstructer::readMaskFile(QString mhdFileName)
+{  
+  ssc::ImagePtr retval = this->generateMask();
+  vtkImageDataPtr data = retval->getBaseVtkImageData();
+    
+  QString fileName = changeExtension(mhdFileName, "msk");
+    
+  QFile file(fileName);
+  file.open(QIODevice::ReadOnly);
+  QDataStream stream(&file);    
+        
+  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());  
+  char *rawchars = reinterpret_cast<char*>(dataPtr);
+  
+  stream.readRawData(rawchars, file.size());
+  
+  return retval;
 }
   
 /**
@@ -335,13 +354,44 @@ Transform3D Reconstructer::find_prMd()
 std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
 {
   std::vector<ssc::Vector3D> retval(4);
+  if(!mMask)
+  {
+    std::cout << "ERROR Reconstructer::generateInputRectangle() requires mask" << std::endl;
+    return retval;
+  }
   int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
   double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
   //TODO: Use clipping mask instead of whole image
-  retval[0] = ssc::Vector3D(0,0,0);
+  
+  int xmin = dims[0];
+  int xmax = 0;
+  int ymin = dims[1];
+  int ymax = 0;
+  unsigned char* ptr = static_cast<unsigned char*>(mMask->getBaseVtkImageData()->GetScalarPointer());
+  for (int x = 0; x < dims[0]; x++)
+    for(int y = 0; y < dims[1]; y++)
+    {
+      unsigned char val = ptr[x + y*dims[0]];
+      if (val != 0)
+      {
+        xmin = std::min(xmin, x);
+        ymin = std::min(ymin, y);
+        xmax = std::max(xmax, x);
+        ymax = std::max(ymax, y);
+      }
+    }
+  
+  retval[0] = ssc::Vector3D(xmin*spacing[0], ymin*spacing[1], 0);
+  retval[1] = ssc::Vector3D(xmax*spacing[0], ymin*spacing[1], 0);
+  retval[2] = ssc::Vector3D(xmin*spacing[0], ymax*spacing[1], 0);
+  retval[3] = ssc::Vector3D(xmax*spacing[0], ymax*spacing[1], 0);
+  
+  std::cout << "x and y, min and max: " << xmin << " " << xmax << " " << ymin << " " << ymax << std::endl;
+  
+  /*retval[0] = ssc::Vector3D(0,0,0);
   retval[1] = ssc::Vector3D(dims[0]*spacing[0],0,0);
   retval[2] = ssc::Vector3D(0,dims[1]*spacing[1],0);
-  retval[3] = ssc::Vector3D(dims[0]*spacing[0],dims[1]*spacing[1],0);
+  retval[3] = ssc::Vector3D(dims[0]*spacing[0],dims[1]*spacing[1],0);*/
   return retval;
 }
   
@@ -356,7 +406,6 @@ ImagePtr Reconstructer::generateOutputVolume()
   Transform3D prMd = this->find_prMd();
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
-    //std::cout << "usMpr: " << i << " " << mFrames[i].mPos.coord(ssc::Vector3D(0,0,0)) << std::endl; 
     mFrames[i].mPos = mFrames[i].mPos * prMd;
   }
   
@@ -369,63 +418,28 @@ ImagePtr Reconstructer::generateOutputVolume()
     for (unsigned int i = 0; i < inputRect.size(); i++)
     {
       outputRect.push_back(dMus.coord(inputRect[i]));
-      //std::cout << outputRect[slice*4 + i] << ", ";
     }
   }
   
-  std::cout << "1st dMus:  " << mFrames.front().mPos.inv().coord(ssc::Vector3D(0,0,0));  
+  /*std::cout << "1st dMus:  " << mFrames.front().mPos.inv().coord(ssc::Vector3D(0,0,0));  
   std::cout << std::endl;
   std::cout << "last dMus: " << mFrames.back().mPos.inv().coord(ssc::Vector3D(0,0,0)); 
-  std::cout << std::endl;
-  
-  /*std::cout << "input 1st point: " << inputRect[0] << std::endl;
-  std::cout << "input last point: " << inputRect.back() << std::endl;
-  std::cout << "outputRect.size(): " << outputRect.size() << std::endl;
-  std::cout << "1st point: " << outputRect[0] << std::endl;
-  std::cout << "last point: " << outputRect.back() << std::endl;*/
-  
+  std::cout << std::endl;*/
+    
   ssc::DoubleBoundingBox3D boundingBox = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
-  
-  
   ssc::Vector3D bbSize = boundingBox.range();
-  
-  ssc::Transform3D T_origo = ssc::createTransformTranslate(boundingBox.corner(0,0,0));
-  
-  std::cout << "boundingBox.corner(0,0,0): " << boundingBox.corner(0,0,0) << std::endl;
-  std::cout << "boundingBox.corner(1,1,1): " << boundingBox.corner(1,1,1) << std::endl;
-  
+    
   // Translate usMd to output volume origo
+  ssc::Transform3D T_origo = ssc::createTransformTranslate(boundingBox.corner(0,0,0));
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
     mFrames[i].mPos = mFrames[i].mPos * T_origo;
   }
   
-  /*std::cout << "Middle points: " << std::endl;
-  int middleSlize = mFrames.size()/2;
-  for (unsigned int i=0; i < inputRect.size(); i++)
-  {
-    std::cout << mFrames[middleSlize].mPos.inv().coord(inputRect[i]) << std::endl;
-  }
-  std::cout << "First frame points: " << std::endl;
-  for (unsigned int i=0; i < inputRect.size(); i++)
-  {
-    std::cout << mFrames.front().mPos.inv().coord(inputRect[i]) << std::endl;
-  }
-  std::cout << "last frame points: " << std::endl;
-  for (unsigned int i=0; i < inputRect.size(); i++)
-  {
-    std::cout << mFrames.back().mPos.inv().coord(inputRect[i]) << std::endl;
-  }
-  
-  for (int i = 0; i < mFrames.size(); i++)
-  {
-    std::cout << "frame points " << mFrames[i].mPos.inv().coord(inputRect[0]) << std::endl;
-  }*/
-  
+  // Calculate optimal output image spacing and dimensions based on US frame spacing
   double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
                                  mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
   
-  unsigned int maxVolumeSize = 256*256*256;
   unsigned int xSize = bbSize[0] / inputSpacing;//floor
   unsigned int ySize = bbSize[1] / inputSpacing;
   unsigned int zSize = bbSize[2] / inputSpacing;
@@ -433,12 +447,12 @@ ImagePtr Reconstructer::generateOutputVolume()
   std::cout << "Optimal size: " << xSize << " " << ySize << " " << zSize << std::endl;
   std::cout << "bbSize: " << bbSize << std::endl;
   
-  unsigned int volumeSize = xSize*ySize*zSize;
-  
-  if (volumeSize > maxVolumeSize)
+  // Reduce output volume size if optimal volume size is too large
+  unsigned long volumeSize = xSize*ySize*zSize;
+  if (volumeSize > mMaxVolumeSize)
   {
-    double scaleFactor = pow(volumeSize/double(maxVolumeSize),1/3.0);
-    std::cout << "Used scaleFactor : " << scaleFactor << std::endl;
+    double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
+    std::cout << "Downsampled volume - Used scaleFactor : " << scaleFactor << std::endl;
     xSize /= scaleFactor;
     ySize /= scaleFactor;
     zSize /= scaleFactor;
@@ -449,14 +463,18 @@ ImagePtr Reconstructer::generateOutputVolume()
   ssc::Vector3D spacing(inputSpacing, inputSpacing, inputSpacing);
   
   std::cout << "output dim: " << dim << std::endl;
-  std::cout << "output spacing: " << spacing << std::endl;
-  //ssc::Vector3D spacing(0.115, 0.115, 0.115);  
-  
+  std::cout << "output spacing: " << spacing << std::endl;  
   
   vtkImageDataPtr data = this->generateVtkImageData(dim, spacing, 0);
   
-  //TODO: Create ouput volume name
-  ImagePtr image = ImagePtr(new Image("tull", data, "tull")) ;
+  // Generate volume name and uid
+  QString volumeName = qstring_cast(mUsRaw->getName());
+  volumeName += "_reconstruct";
+  QString volumeId = qstring_cast(mUsRaw->getUid());
+  volumeId += "_reconstruct";
+  ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
+                                      data, 
+                                      string_cast(volumeName))) ;
   return image;
 }
   
@@ -466,7 +484,7 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   this->readFiles(mhdFileName); 
   //mPos is now tMpr
   
-  mMask = this->generateMask();
+  mMask = this->readMaskFile(mhdFileName);
   
   this->calibrateTimeStamps();
   
@@ -482,7 +500,9 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   for (unsigned int i; i < mFrames.size(); i++)
     mFrames[i].mPos = mFrames[i].mPos.inv();
   
+  QDateTime pre = QDateTime::currentDateTime();
   mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask);
+  std::cout << "Reconstruct time: " << pre.time().msecsTo(QDateTime::currentDateTime().time()) << std::endl;
   
   return mOutput;
 }

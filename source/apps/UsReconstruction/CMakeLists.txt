@@ -1,7 +1,3 @@
-# =========================================================
-# Sonowand Sintef Cooperation C++ UsReconstruction App 
-# =========================================================
-
 cmake_minimum_required( VERSION 2.4 )
 
 if(COMMAND cmake_policy)
@@ -22,11 +18,7 @@ SET( SOURCE_FILES
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${QT_MOC_HEADER_FILES} )
-
-
-include_directories( ${SSC_SOURCE_DIR}/Code/UsReconstruction )
-link_directories( ${SSC_SOURCE_DIR}/Code/UsReconstruction )
-		
+	
 # =========================================================
 # create the target
 add_executable( sscUsReconstruction MACOSX_BUNDLE ${MOC_HEADER_FILES} ${SOURCE_FILES} )

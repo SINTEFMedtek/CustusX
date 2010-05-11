@@ -67,6 +67,7 @@ INCLUDE_DIRECTORIES(
     toolManager
     dataManager
     3DUSReconstruction
+    UsReconstruction
     )
     
 
@@ -77,6 +78,7 @@ ADD_SUBDIRECTORY(toolManager)
 ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
+ADD_SUBDIRECTORY(apps)
 IF(APPLE) # doesnt compile on ca's linux box - ??
     ADD_SUBDIRECTORY(3DUSReconstruction)
 ENDIF(APPLE)

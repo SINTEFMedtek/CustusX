@@ -74,7 +74,7 @@ ocl_context* ocl_init()
 	clGetPlatformIDs(numPlatforms, &platform, NULL);
 	cl_context_properties cps[3] = {CL_CONTEXT_PLATFORM, (cl_context_properties)platform, 0};
   
-#define USE_CPU
+//#define USE_CPU
 #ifdef USE_CPU
 	clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &(retval->device), NULL);
 	retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_CPU, NULL, NULL, &err);
