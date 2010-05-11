@@ -41,10 +41,12 @@ private:
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;
+  unsigned long mMaxVolumeSize;///< Max volume size in bytes for output volume
   void readFiles(QString mhdFileName);
   void readUsDataFile(QString mhdFileName);
   void readPositionFile(QString posFile);
   ImagePtr generateMask();
+  ImagePtr readMaskFile(QString mhdFileName);
   vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
   
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);

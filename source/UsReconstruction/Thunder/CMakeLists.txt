@@ -14,12 +14,13 @@ SET( SOURCE_FILES
   utils.cpp
   reconstruct_vnn.h
   reconstruct_vnn.cpp
+  kernels.ocl
   ) 
+
+SET_SOURCE_FILES_PROPERTIES(kernels.ocl PROPERTIES HEADER_FILE_ONLY TRUE)
 
 # create the target
 add_library( thunder  ${SOURCE_FILES} )
-
-SET_SOURCE_FILES_PROPERTIES(kernels.ocl PROPERTIES HEADER_FILE_ONLY TRUE)
 
 FIND_PACKAGE(OpenGL)
 FIND_PACKAGE(GLUT)

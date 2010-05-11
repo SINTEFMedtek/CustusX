@@ -451,27 +451,32 @@ printf("bscan_w: %d, bscan_h: %d, bscan_n: %d\n", bscan_w, bscan_h, bscan_n);*/
 		if ((px >= 0) && (px < bscan_w) && (py >= 0) && (py < bscan_h))
     {
     
-    if (current_bscan < bscan_n/2)
+    /*if (current_bscan < bscan_n/2)
       volume_a(x,y,z) = bscans0[px + py*bscan_w + current_bscan*bscan_w*bscan_h];
     else
-      volume_a(x,y,z) = bscans1[px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
+      volume_a(x,y,z) = bscans1[px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];*/
       
-			/*if (fabs(dist) < kernel_radius)
+			if (fabs(dist) < kernel_radius)
       {
 				//if ((mask[(px + py*bscan_w)/4] & mask_bitmask) != 0)
 				if (mask[px + py*bscan_w] != 0)
         {
-					if (current_bscan < bscan_n/2) {
-						int shift = 8*((px + py*bscan_w + current_bscan*bscan_w*bscan_h)%4);
+					if (current_bscan < bscan_n/2)
+          {
+						/*int shift = 8*((px + py*bscan_w + current_bscan*bscan_w*bscan_h)%4);
 						unsigned int char_int = bscans0[(px + py*bscan_w + current_bscan*bscan_w*bscan_h)/4] >> shift;
-						volume_a(x,y,z) = char_int & 255;
-					} else {
-						int shift = 8*((px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)%4);
+						volume_a(x,y,z) = char_int & 255;*/
+            volume_a(x,y,z) = bscans0[px + py*bscan_w + current_bscan*bscan_w*bscan_h];
+					} 
+          else 
+          {
+						/*int shift = 8*((px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)%4);
 						unsigned int char_int = bscans1[(px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)/4] >> shift;
-						volume_a(x,y,z) = char_int & 255;
+						volume_a(x,y,z) = char_int & 255;*/
+            volume_a(x,y,z) = bscans1[px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
 					}
         }
-      }*/
+      }
       //volume_a(x,y,z) = 255;
     }
     //else
