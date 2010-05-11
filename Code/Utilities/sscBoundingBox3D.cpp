@@ -160,6 +160,25 @@ std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data)
 }
 // --------------------------------------------------------
 
+DoubleBoundingBox3D DoubleBoundingBox3D::fromCloud(std::vector<Vector3D> cloud)
+{
+  if (cloud.empty())
+    return ssc::DoubleBoundingBox3D(0,0,0,0,0,0);
+  
+  Vector3D a = cloud[0]; // min
+  Vector3D b = cloud[0]; // max
+  
+  for (unsigned int i=0; i<cloud.size(); ++i)
+  {
+    for (unsigned int j=0; j<3; ++j)
+    {
+      a[j] = std::min(a[j], cloud[i][j]);
+      b[j] = std::max(b[j], cloud[i][j]);
+    }
+  }
+  return DoubleBoundingBox3D(a,b);
+}
+  
 // --------------------------------------------------------
 } // namespace utils
 } // namespace ssc

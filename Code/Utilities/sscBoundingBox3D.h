@@ -3,6 +3,7 @@
 
 #include "boost/array.hpp"
 #include "sscVector3D.h"
+#include <vector>
 
 // --------------------------------------------------------
 namespace ssc
@@ -49,6 +50,7 @@ public:
 	explicit DoubleBoundingBox3D(const IntBoundingBox3D& bb); 
 	explicit DoubleBoundingBox3D(const int* data); 
 	static DoubleBoundingBox3D fromViewport(const double* data);
+  static DoubleBoundingBox3D fromCloud(std::vector<Vector3D> cloud);
 
 	Vector3D bottomLeft() const;
 	Vector3D topRight() const;

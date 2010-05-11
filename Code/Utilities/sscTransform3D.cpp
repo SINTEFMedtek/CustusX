@@ -33,7 +33,7 @@ Transform3D Transform3D::fromString(const QString& text, bool* ok)
 {
   std::vector<double> raw = convertQString2DoubleVector(text, ok);
   if (raw.size()!=16)
-    ok = false;
+    *ok = false;
   if (!ok)
     return Transform3D();
   return Transform3D((double*)&(*raw.begin()));
