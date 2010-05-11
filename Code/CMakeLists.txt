@@ -310,7 +310,7 @@ FIND_PATH(SSC_DATA_ROOT sscData.readme
   ${SSC_SOURCE_DIR}/Data
   $ENV{SSC_DATA_ROOT})
   
-set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/Code/UsReconstruction/Thunder)
+set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/../../source/UsReconstruction/Thunder)
 
 configure_file(
   "${SSC_SOURCE_DIR}/Code/Utilities/sscConfig.h.in"
@@ -364,8 +364,6 @@ include (CMakeExportBuildSettings)
 cmake_export_build_settings (${SSC_BINARY_DIR}/SSCBuildSettings.cmake)
 export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
-
-ADD_SUBDIRECTORY(UsReconstruction)
 
 # =========================================================
 
