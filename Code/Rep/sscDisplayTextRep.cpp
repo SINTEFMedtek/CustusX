@@ -1,8 +1,11 @@
+#include "sscDisplayTextRep.h"
+
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
 #include <vtkTextProperty.h>
-#include "sscDisplayTextRep.h"
+
 #include "sscView.h"
+#include "sscVtkHelperClasses.h"
 
 namespace ssc
 {

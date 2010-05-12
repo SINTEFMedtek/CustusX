@@ -1,12 +1,12 @@
 #include "sscSliceProxy.h"
 
+#include <math.h>
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 
 namespace ssc
 {
-
 
 SliceProxyPtr SliceProxy::New(const std::string& name)
 {

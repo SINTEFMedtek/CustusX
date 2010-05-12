@@ -5,10 +5,11 @@
 typedef	vtkSmartPointer<class vtkImagePlaneWidget> vtkImagePlaneWidgetPtr;
 
 #include "sscRepImpl.h"
-#include "sscImage.h"
 
 namespace ssc
 {
+typedef boost::shared_ptr<class Image> ImagePtr;
+
 typedef boost::shared_ptr<class SliceRep> SliceRepPtr;
 
 /**Represenation for one Image.

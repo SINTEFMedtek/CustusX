@@ -12,24 +12,28 @@
 #ifndef VMVMTOOL2DREP_H
 #define VMVMTOOL2DREP_H
 
-#include <vtkTexturedActor2D.h>
-#include <vtkTexture.h>
-#include <vtkPNGReader.h>
-#include <vtkImageMapper.h>
-#include <vtkPlaneSource.h>
+
+#include <vtkSmartPointer.h>
+typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 
 #include "sscRepImpl.h"
-#include "sscForwardDeclarations.h"
-#include "sscVtkHelperClasses.h"
+#include "sscTransform3D.h"
+#include "sscBoundingBox3D.h"
 #include "sscProbeSector.h"
 
-namespace ssc {
+namespace ssc
+{
+// forward declarations
+typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
+typedef boost::shared_ptr<class LineSegment> LineSegmentPtr;
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class OffsetPoint> OffsetPointPtr;
 
 typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
 typedef boost::shared_ptr<class USProbe2D> USProbe2DPtr;
 
-/**Represents a 
- * 
+/**
  *This class will hold all the representation and drawing of 2d tool
  *in navigation and registration.
  *
@@ -87,11 +91,6 @@ class ToolRep2D : public ssc::RepImpl
 		bool mUseOffsetText;		
 //		bool mUseProbe;
 		
-		typedef boost::shared_ptr<CrossHair2D> CrossHair2DPtr;
-		typedef boost::shared_ptr<LineSegment> LineSegmentPtr;
-//		typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
-		typedef boost::shared_ptr<TextDisplay> TextDisplayPtr;
-
 		//double mOffset; 
 		CrossHair2DPtr cursor;
 		LineSegmentPtr center2Tool;

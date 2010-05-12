@@ -1,21 +1,21 @@
 #ifndef SSCSLICEDIMAGEPROXY_H_
 #define SSCSLICEDIMAGEPROXY_H_
-#include <vtkSmartPointer.h>
-#include "sscDefinitions.h"
-#include "sscForwardDeclarations.h"
-#include "sscTool.h"
+
 #include "sscRepImpl.h"
-#include "sscImage.h"
-#include "sscSliceComputer.h"
-#include "sscVector3D.h"
 #include "sscTransform3D.h"
 
+#include <vtkSmartPointer.h>
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
 typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
-typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr; 
+typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
+typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
 

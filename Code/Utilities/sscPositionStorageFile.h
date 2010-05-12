@@ -1,8 +1,11 @@
 #ifndef SSCPOSITIONSTORAGEFILE_H_
 #define SSCPOSITIONSTORAGEFILE_H_
 
-#include <QtCore>
-#include "sscFrame3D.h"
+#include <QString>
+#include <QFile>
+#include <QDataStream>
+
+#include "sscTransform3D.h"
 
 namespace ssc {
 

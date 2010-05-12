@@ -1,21 +1,15 @@
 #include "sscBlendedSliceRep.h"
-#include <boost/lexical_cast.hpp>
 
 #include <vtkImageActor.h>
 #include <vtkImageReslice.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include <vtkMatrix4x4.h>
 #include <vtkImageBlend.h>
-#include <vtkTexture.h>
-#include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
 
 #include "sscView.h"
-#include "sscDataManager.h"
-#include "sscSliceProxy.h"
-#include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
+#include "sscImage.h"
+#include "sscSlicedImageProxy.h"
 
 //---------------------------------------------------------
 namespace ssc

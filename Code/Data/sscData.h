@@ -5,18 +5,20 @@
 #include <set>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 #include <QObject>
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 #include "sscTransform3D.h"
 
-#include "sscRep.h"
+//#include "sscRep.h"
 
 class QDomNode;
 
 namespace ssc
 {
+typedef boost::weak_ptr<class Rep> RepWeakPtr;
 typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 /**Denotes the various states

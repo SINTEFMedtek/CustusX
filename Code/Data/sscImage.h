@@ -1,8 +1,7 @@
 #ifndef SSCIMAGE_H_
 #define SSCIMAGE_H_
 
-#include <set>
-
+#include <map>
 #include <boost/shared_ptr.hpp>
 
 #include "vtkSmartPointer.h"
@@ -12,21 +11,21 @@ typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
 
-#include "sscLandmark.h"
 #include "sscData.h"
-#include "sscRep.h"
-#include "sscImageTF3D.h"
-typedef boost::shared_ptr<IntIntMap> HistogramMapPtr;
+typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
 
 class QDomNode;
 class QDomDocument;
-
-#include "sscForwardDeclarations.h"
 
 //#define USE_TRANSFORM_RESCLICER
 
 namespace ssc
 {
+// forward declarations
+typedef std::map<std::string, class Landmark> LandmarkMap;
+typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
+typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
+
 /**One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
  *

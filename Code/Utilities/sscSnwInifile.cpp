@@ -2,8 +2,6 @@
 #include <QFileInfo>
 #include <QStringList>
 #include <iostream>
-//#include "QtUtilities.h"
-//#include "Common/StdIncludes.h"
 #include "sscMD5Check.h"
 
 namespace ssc

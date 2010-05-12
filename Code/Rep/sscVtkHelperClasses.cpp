@@ -13,11 +13,7 @@
 
 #include <vtkSphereSource.h>
 #include <vtkLineSource.h>
-#include <vtkPolyDataMapper.h>
 #include <vtkPolyDataMapper2D.h>
-#include <vtkActor2D.h>
-#include <vtkActor.h>
-#include <vtkProperty.h>
 #include <vtkProperty2D.h>
 #include <vtkTextMapper.h>
 #include <vtkTextProperty.h>
@@ -27,6 +23,8 @@
 #include <vtkRenderer.h>
 #include <vtkCursor2D.h>
 #include <vtkLeaderActor2D.h>
+
+#include "sscBoundingBox3D.h"
 
 // --------------------------------------------------------
 namespace ssc

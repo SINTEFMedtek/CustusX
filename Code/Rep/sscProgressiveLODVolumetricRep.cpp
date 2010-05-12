@@ -2,11 +2,15 @@
 
 #include <boost/lexical_cast.hpp>
 #include <QtCore>
-#include <vtkVolume.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkAssembly.h>
+
 #include "sscView.h"
+#include "sscVolumetricRep.h"
+
+typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
+typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
 
 namespace ssc
 {

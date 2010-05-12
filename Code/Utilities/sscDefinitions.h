@@ -1,8 +1,6 @@
 #ifndef SSCDEFINITIONS_H_
 #define SSCDEFINITIONS_H_
 
-#include "sscEnumConverter.h"
-
 namespace ssc
 {
 
@@ -30,10 +28,5 @@ namespace ssc
 		ftCOUNT
 	};
 } //namespace end
-
-SNW_DECLARE_ENUM_STRING_CONVERTERS(ssc, ORIENTATION_TYPE);
-SNW_DECLARE_ENUM_STRING_CONVERTERS(ssc, PLANE_TYPE);
-SNW_DECLARE_ENUM_STRING_CONVERTERS(ssc, FOLLOW_TYPE);
-
 
 #endif /*SSCDEFINITIONS_H_*/

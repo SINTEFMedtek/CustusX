@@ -2,27 +2,16 @@
 #define VMORIENTATIONANNOTATIONREP_H_
 
 #include "sscRepImpl.h"
-//#include "vmDefinitions.h"
-#include "sscSliceProxy.h"
-#include <vtkCornerAnnotation.h>
-#include "sscVtkHelperClasses.h"
+#include "sscDefinitions.h"
+#include "vtkSmartPointer.h"
 
 namespace ssc
 {
-typedef  vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
-typedef  boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
+// forward declarations
+typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
-class OrientationAnnotation : public vtkCornerAnnotation
-{
-	vtkTypeMacro(OrientationAnnotation, vtkCornerAnnotation);
-public:	
-	static OrientationAnnotation* New();
-	OrientationAnnotation();
-	~OrientationAnnotation();	
-	virtual void SetTextActorsPosition(int vsize[2]);
-	virtual void SetTextActorsJustification();
-	 
-};
+typedef  boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
 
 class OrientationAnnotationRep : public ssc::RepImpl
 {

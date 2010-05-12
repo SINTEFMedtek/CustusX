@@ -5,7 +5,6 @@
 #include <QString>
 #include <vtkSmartPointer.h>
 #include "sscVector3D.h"
-#include "sscBoundingBox3D.h"
 
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 
@@ -16,6 +15,7 @@ namespace ssc
 namespace utils
 {
 // --------------------------------------------------------
+class DoubleBoundingBox3D;
 
 /**Transform 3D vectors and coordinates.
  * Wraps a vtkMatrix4x4.

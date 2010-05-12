@@ -3,11 +3,12 @@
 
 #include <vector>
 #include "sscRepImpl.h"
+#include "sscTransform3D.h"
+
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkAxesActor> vtkAxesActorPtr;
 typedef vtkSmartPointer<class vtkAssembly> vtkAssemblyPtr;
 typedef vtkSmartPointer<class vtkCaptionActor2D> vtkCaptionActor2DPtr;
-#include "sscTransform3D.h"
 
 namespace ssc
 {

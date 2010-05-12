@@ -6,6 +6,7 @@
 #include <vtkActor.h>
 #include <vtkRenderer.h>
 
+#include "sscMesh.h"
 #include "sscView.h"
 
 namespace ssc

@@ -6,6 +6,7 @@
 #include <vtkRenderWindow.h>
 
 #include "sscView.h"
+#include "sscImage.h"
 
 namespace ssc
 {

@@ -4,13 +4,16 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "sscImage.h"
-#include "sscMesh.h"
-#include "sscVector3D.h"
+#include <QObject>
 
+#include "sscVector3D.h"
+#include "sscLandmark.h"
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class Mesh> MeshPtr;
 
 //-----
 enum READER_TYPE
@@ -63,8 +66,8 @@ public:
 	virtual void setCenter(const Vector3D& center) = 0;
 
 	// state information
-	virtual ImagePtr getActiveImage() const { return ImagePtr(); } ///< used for system state
-	virtual void setActiveImage(ImagePtr activeImage) {} ///< used for system state
+	virtual ImagePtr getActiveImage() const; ///< used for system state
+	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 
   virtual void setLandmarkNames(std::vector<std::string> names) {}
   virtual void setLandmarkName(std::string uid, std::string name) {}

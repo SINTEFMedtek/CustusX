@@ -13,15 +13,12 @@
 
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
-#include <vtkImageCanvasSource2D.h>
-#include <vtkImageMapper.h>
-#include <vtkPolyDataMapper2D.h>
 #include <vtkTextProperty.h>
 
 #include "sscSliceProxy.h"
 #include "sscToolManager.h"
 #include "sscView.h"
-
+#include "sscVtkHelperClasses.h"
 
 namespace ssc
 {

@@ -1,19 +1,19 @@
 #include "sscProbeRep.h"
 
-//#include <vtkMath.h>
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
 #include <vtkProperty.h>
 #include <vtkImageData.h>
 #include <vtkLineSource.h>
-#include <vtkDoubleArray.h>
+//#include <vtkDoubleArray.h>
 #include <vtkProbeFilter.h>
 #include <vtkSphereSource.h>
 #include <vtkRenderWindow.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkDataSetAttributes.h>
+//#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
+
 #include "sscImage.h"
 #include "sscView.h"
 #include "sscTool.h"

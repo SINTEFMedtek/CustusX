@@ -1,15 +1,18 @@
 #ifndef SSCSLICEPROXY_H_
 #define SSCSLICEPROXY_H_
 
-#include <QtCore>
-#include "sscTool.h"
+#include <boost/shared_ptr.hpp>
+#include <QObject>
+#include "sscDefinitions.h"
 #include "sscSliceComputer.h"
-#include "sscVector3D.h"
 #include "sscTransform3D.h"
 #include "sscIndent.h"
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class Tool> ToolPtr;
+
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 
 /**Helper class that connects to a tool and generates slice

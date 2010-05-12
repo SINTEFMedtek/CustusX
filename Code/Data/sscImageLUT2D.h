@@ -8,14 +8,13 @@
 #ifndef SSCIMAGELOOKUPTABLE2D_H_
 #define SSCIMAGELOOKUPTABLE2D_H_
 
-
 class QDomElement;
 class QDomNode;
 
 #include <boost/shared_ptr.hpp>
 #include <QColor>
 #include <QObject>
-#include <vtkUnsignedCharArray.h>
+
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
@@ -23,6 +22,7 @@ typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
+
 namespace ssc
 {
 

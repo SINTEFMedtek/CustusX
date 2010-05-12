@@ -135,6 +135,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscGLHelpers.h
     Utilities/sscEnumConverter.h
     Utilities/sscDefinitions.cpp
+    Utilities/sscDefinitionStrings.cpp
     Utilities/sscTime.h
     Utilities/sscTime.cpp
     sscView.cpp
@@ -343,6 +344,7 @@ set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
 target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
 # =========================================================
+message(STATUS "libs: " ${LINK_DIRECTORIES} )
 # =========================================================
 
 # =========================================================

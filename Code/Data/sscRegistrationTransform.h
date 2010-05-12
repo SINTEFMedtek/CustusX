@@ -2,12 +2,11 @@
 #define SSCREGISTRATIONTRANSFORM_H_
 
 #include <string>
-#include <set>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QDateTime>
-#include "vtkSmartPointer.h"
+
 #include "sscTransform3D.h"
 
 class QDomNode;

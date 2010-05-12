@@ -1,37 +1,34 @@
 /*
- * vmTexture3DSlicer.cpp
+ * vmTexture3DSlicerRep.cpp
  *
  *  Created on: Oct 13, 2009
  *      Author: petterw
  */
 
 #include "sscTexture3DSlicerRep.h"
-#include "sscTextureSlicePainter.h"
-#include <boost/lexical_cast.hpp>
 
-#include <vtkProperty.h>
+//#include "sscTextureSlicePainter.h" //new gl slicer
+////#include "vmTestApplication/testAppImageProxy.h" //testApp slicer - no colormapping
+
+#include "sscTextureSlicePainter.h"
 #include <vtkRenderer.h>
 #include <vtkFloatArray.h>
 #include <vtkPlaneSource.h>
 #include <vtkPointData.h>
-#include <vtkRenderWindow.h>
 #include <vtkTriangleFilter.h>
 #include <vtkStripper.h>
-#include <vtkDataArray.h>
 #include <vtkImageData.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkLookupTable.h>
 
-//#include "QtUtilities.h"
+#include "sscImage.h"
 #include "sscView.h"
 #include "sscImageLUT2D.h"
-#include "sscDataManager.h"
 #include "sscSliceProxy.h"
 #include "sscTypeConversions.h"
-
+#include "sscGPUImageBuffer.h"
 
 typedef vtkSmartPointer<class vtkTriangleFilter> vtkTriangleFilterPtr;
-
 
 //---------------------------------------------------------
 namespace ssc

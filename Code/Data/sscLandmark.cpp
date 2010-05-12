@@ -1,5 +1,7 @@
 #include "sscLandmark.h"
 
+#include <QDomNode>
+
 #include "sscTypeConversions.h"
 #include "sscTime.h"
 

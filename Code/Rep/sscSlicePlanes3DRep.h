@@ -1,18 +1,24 @@
 #ifndef VMSLICEPLANES3DREP_H_
 #define VMSLICEPLANES3DREP_H_
 
-#include <vtkSmartPointer.h>
-#include <vtkVectorText.h>
-#include <vtkTextActor3D.h>
+#include <map>
 #include "sscRepImpl.h"
-#include "sscSliceProxy.h"
-#include "sscVtkHelperClasses.h"
+#include "sscBoundingBox3D.h"
+#include "sscTransform3D.h"
 
-typedef vtkSmartPointer<vtkVectorText> vtkVectorTextPtr;
-typedef vtkSmartPointer<vtkTextActor3D> vtkTextActor3DPtr;
+#include <vtkSmartPointer.h>
+typedef vtkSmartPointer<class vtkVectorText> vtkVectorTextPtr;
+typedef vtkSmartPointer<class vtkTextActor3D> vtkTextActor3DPtr;
+typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
+typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
+typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 /**Enumerates the contents of a view area.
  */
@@ -29,19 +35,6 @@ enum VIEW_AREA_TYPE
 	vaTEXTBOX,
         vaDUMMY,
         vaCOUNT
-};
-
-typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
-//typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
-
-class Rect3D
-{
-public:
-	Rect3D( vtkRendererPtr renderer, const Vector3D& color);
-	~Rect3D() {}
-	void updatePosition( const DoubleBoundingBox3D bb, const Transform3D& M);	
-private:
-	ssc::GraphicalLine3D a,b,c,d;//,x;
 };
 
 /**Helper for the reps displaying slice planes in 3D and
@@ -101,11 +94,11 @@ private:
 	struct DataType
 	{
 		vtkTextActor3DPtr mText;
-		ssc::GraphicalPoint3DPtr mPoint;
+		GraphicalPoint3DPtr mPoint;
 		Rect3DPtr mRect;
-		ssc::Axes3DPtr mAxes;
+		Axes3DPtr mAxes;
 	};
-	typedef std::map<ssc::VIEW_AREA_TYPE, DataType> DataMap;
+	typedef std::map<VIEW_AREA_TYPE, DataType> DataMap;
 	DataMap mData;
 };
 

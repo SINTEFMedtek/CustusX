@@ -8,11 +8,13 @@ typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
 typedef	vtkSmartPointer<class vtkActor> vtkActorPtr;
 
 #include "sscRepImpl.h"
-#include "sscMesh.h"
-#include "sscImage.h"
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class Mesh> MeshPtr;
+
 typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
 
 /**

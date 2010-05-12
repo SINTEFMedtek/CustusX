@@ -1,26 +1,24 @@
 #ifndef SSCLAYERSLICEREP_H_
 #define SSCLAYERSLICEREP_H_
-#include <vtkSmartPointer.h>
-#include <vector>
-#include "sscDefinitions.h"
-#include "sscForwardDeclarations.h"
-#include "sscTool.h"
-#include "sscRepImpl.h"
-#include "sscImage.h"
-#include "sscSliceComputer.h"
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
-//#include "sscImageBlenderProxy.h"
-#include "sscSlicerRepSW.h"
-#include "sscSlicedImageProxy.h"
 
+#include <vector>
+#include "sscRepImpl.h"
+
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
 typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkImageActor> vtkImageActorPtr;
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
+
 typedef boost::shared_ptr<class BlendedSliceRep> BlendedSliceRepPtr;
 
 /**Slice a list of volumes using a SliceProxy.

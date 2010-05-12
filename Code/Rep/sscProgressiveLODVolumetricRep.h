@@ -3,13 +3,16 @@
 
 #include <vector>
 #include "sscRepImpl.h"
-#include "sscImage.h"
-#include "sscVolumetricRep.h"
 
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkAssembly> vtkAssemblyPtr;
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
+
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
 
 /**Volume rendering of one image.

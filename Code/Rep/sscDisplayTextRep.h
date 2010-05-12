@@ -3,10 +3,11 @@
 
 #include <vector>
 #include "sscRepImpl.h"
-#include "sscVtkHelperClasses.h"
+#include "sscVector3D.h"
 
 namespace ssc
 {
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 
 typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 

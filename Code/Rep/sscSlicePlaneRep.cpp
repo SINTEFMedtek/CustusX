@@ -1,10 +1,15 @@
 #include "sscSlicePlaneRep.h"
+
 #include <vtkImageActor.h>
 #include <vtkImagePlaneWidget.h>
 #include <vtkImageData.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
+
+#include "sscSlicerRepSW.h"
+#include "sscSliceProxy.h"
 #include "sscView.h"
+#include "sscImage.h"
 #include "sscDataManager.h"
 
 namespace ssc

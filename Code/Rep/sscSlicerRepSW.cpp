@@ -1,22 +1,12 @@
 #include "sscSlicerRepSW.h"
 
-#include <boost/lexical_cast.hpp>
 #include <vtkImageActor.h>
-#include <vtkImageReslice.h>
-#include <vtkImageMapToWindowLevelColors.h>
-#include <vtkWindowLevelLookupTable.h>
 #include <vtkRenderer.h>
 #include <vtkImageData.h>
-#include <vtkMatrix4x4.h>
-#include <vtkImageBlend.h>
-#include <vtkLookupTable.h>
 
-#include <vtkColorTransferFunction.h>
 #include "sscView.h"
-#include "sscDataManager.h"
-#include "sscSliceProxy.h"
-
-#include "sscBoundingBox3D.h"
+#include "sscImage.h"
+#include "sscSlicedImageProxy.h"
 
 namespace ssc
 {

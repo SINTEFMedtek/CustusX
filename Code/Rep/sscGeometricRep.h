@@ -7,10 +7,11 @@ typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
 typedef	vtkSmartPointer<class vtkActor> vtkActorPtr;
 
 #include "sscRepImpl.h"
-#include "sscMesh.h"
 
 namespace ssc
 {
+typedef boost::shared_ptr<class Mesh> MeshPtr;
+
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
 
 /**Represenation for one Mesh.

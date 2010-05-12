@@ -1,13 +1,12 @@
 #include "sscImageBlenderProxy.h"
 
+#include <vtkImageThreshold.h>
 #include <vtkImageReslice.h>
-#include <vtkImageMapToColors.h>
 #include <vtkWindowLevelLookupTable.h>
 #include <vtkImageMapToWindowLevelColors.h>
 #include <vtkImageData.h>
 #include <vtkImageBlend.h>
-
-#include "sscDataManager.h"
+#include "sscImage.h"
 #include "sscImageLUT2D.h"
 
 namespace ssc

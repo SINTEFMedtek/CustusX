@@ -9,8 +9,10 @@
 
 #include <vtkActor2D.h>
 #include <vtkRenderer.h>
+
 #include "sscView.h"
 #include "sscToolManager.h"
+#include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
 
 namespace ssc

@@ -1,7 +1,6 @@
 #ifndef SSCSLICECOMPUTER_H_
 #define SSCSLICECOMPUTER_H_
 
-#include "sscVector3D.h"
 #include "sscTransform3D.h"
 #include "sscDefinitions.h"
 

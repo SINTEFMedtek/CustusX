@@ -1,5 +1,5 @@
 /*
- * vmTexture3DSlicer.h
+ * vmTexture3DSlicerRep.h
  *
  *  Created on: Oct 13, 2009
  *      Author: petterw
@@ -8,27 +8,14 @@
 #ifndef SSCTEXTURE3DSLICER_H_
 #define SSCTEXTURE3DSLICER_H_
 
-#include <vector>
-#include <vtkSmartPointer.h>
-#include "sscDefinitions.h"
-#include "sscForwardDeclarations.h"
-#include "sscTool.h"
 #include "sscRepImpl.h"
-#include "sscImage.h"
-#include "sscSliceComputer.h"
-#include "sscVector3D.h"
+#include <vector>
 #include "sscTransform3D.h"
-//#include "snwVtkIncludes.h"
+#include "sscBoundingBox3D.h"
 
-#include "sscTextureSlicePainter.h" //new gl slicer
-//#include "vmTestApplication/testAppImageProxy.h" //testApp slicer - no colormapping
-
-typedef vtkSmartPointer<class vtkOpenGLTexture> vtkOpenGLTexturePtr;
-typedef vtkSmartPointer<class vtkOpenGLPolyDataMapper> vtkOpenGLPolyDataMapperPtr;
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkPainterPolyDataMapper> vtkPainterPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkOpenGLProperty> vtkOpenGLPropertyPtr;
 typedef vtkSmartPointer<class vtkFloatArray> vtkFloatArrayPtr;
-
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkStripper> vtkStripperPtr;
@@ -38,6 +25,11 @@ typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;
 namespace ssc
 {
 //---------------------------------------------------------
+// forward declarations
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef vtkSmartPointer<class TextureSlicePainter > TextureSlicePainterPtr;
+
 typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
 
 /**Slice a volume using a SliceProxy.

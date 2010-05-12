@@ -10,9 +10,13 @@ int main(int argc, char **argv)
 
 	QApplication app(argc, argv);
 	app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
+//  app.setWindowIcon(QIcon(":/images/exec.png"));
+  app.setWindowIcon(QIcon(":/images/application.png"));
 
 	ssc::MainWindow mainWindow;
 	mainWindow.show();
+  mainWindow.activateWindow();
+  mainWindow.raise();
 
 	int val = app.exec();
 	return val;

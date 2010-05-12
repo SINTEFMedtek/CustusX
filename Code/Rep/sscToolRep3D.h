@@ -1,18 +1,21 @@
 #ifndef SSCTOOL3DREP_H_
 #define SSCTOOL3DREP_H_
 
-#include <boost/shared_ptr.hpp>
-#include "vtkSmartPointer.h"
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
-#include "sscGraphicalPrimitives.h"
 
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
+typedef boost::shared_ptr<class GraphicalLine3D> GraphicalLine3DPtr;
+
+
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
 

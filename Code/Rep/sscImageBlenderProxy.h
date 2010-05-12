@@ -1,24 +1,25 @@
 #ifndef SSCIMAGEBLENDERPROXY_H_
 #define SSCIMAGEBLENDERPROXY_H_
 
+#include <boost/shared_ptr.hpp>
+#include <QObject>
 #include <vector>
-#include <QtCore>
-#include <vtkSmartPointer.h>
-#include <vtkImageThreshold.h>
-#include "sscDefinitions.h"
-#include "sscForwardDeclarations.h"
-#include "sscImage.h"
 
+#include <vtkSmartPointer.h>
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
+class vtkImageThreshold;
 
 //----------------------------------------------------------
 namespace ssc
 {
 //----------------------------------------------------------
+typedef boost::shared_ptr<class Image> ImagePtr;
+
 typedef boost::shared_ptr<class ImageBlenderProxy> ImageBlenderProxyPtr;
 
 /**Part of sonowand test implementation of image blending.

@@ -1,13 +1,12 @@
-#include <stdint.h>
-
 #include "sscSNW2Volume.h"
 
+#include <stdint.h>
+#include <QStringList>
+#include <QFile>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
-#include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <vtkLookupTable.h>
-#include <vtkSmartPointer.h>
 #include <vtkImageAccumulate.h>
 
 #include "sscTime.h"

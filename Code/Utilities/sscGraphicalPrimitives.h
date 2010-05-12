@@ -3,7 +3,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <vtkSmartPointer.h>
-#include "sscVector3D.h"
+#include "sscTransform3D.h"
 
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
@@ -54,6 +54,19 @@ class GraphicalLine3D
 		vtkLineSourcePtr source;
 };
 typedef boost::shared_ptr<GraphicalLine3D> GraphicalLine3DPtr;
+
+
+class Rect3D
+{
+public:
+  Rect3D( vtkRendererPtr renderer, const Vector3D& color);
+  ~Rect3D() {}
+  void updatePosition( const DoubleBoundingBox3D bb, const Transform3D& M);
+private:
+  ssc::GraphicalLine3D a,b,c,d;//,x;
+};
+typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
+
 
 }
 

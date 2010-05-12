@@ -8,29 +8,25 @@
 #ifndef SSCTEXTURESLICEPAINTER_H_
 #define SSCTEXTURESLICEPAINTER_H_
 
-#include <QtCore>
-#include <vtkProperty.h>
-#include <vtkOpenGLExtensionManager.h>
+#include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
-#include <vtkActor.h>
-#include <vtkRenderer.h>
 
-#include "sscImage.h"
-//#include "Utilities.h"
-//#include "snwVtkIncludes.h"
-#include "sscGPUImageBuffer.h"
-
-
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkOpenGLHardwareSupport > vtkOpenGLHardwareSupportPtr;
 typedef vtkSmartPointer<class vtkShaderProgram2 > vtkShaderProgram2Ptr;
 typedef vtkSmartPointer<class vtkGLSLShaderDeviceAdapter2 > vtkGLSLShaderDeviceAdapter2Ptr;
 typedef vtkSmartPointer<class vtkShader2 > vtkShader2Ptr;
+class vtkOpenGLExtensionManager;
 
 //---------------------------------------------------------
 namespace ssc
 {
 //---------------------------------------------------------
 typedef vtkSmartPointer<class TextureSlicePainter > TextureSlicePainterPtr;
+// forward declarations
+typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
+typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
+
 
 /**Helper class for GPU rendering of slices.
  * Used by Texture3DSlicerRep.
@@ -57,16 +53,12 @@ protected:
 
 	bool CanRender(vtkRenderer*, vtkActor*);
 	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
-	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
+	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, std::string id);
 
 	class vtkInternals;
 	vtkInternals* mInternals;
 	std::string mSource;
 };
-
-
-
-
 
 //---------------------------------------------------------
 }//end namespace

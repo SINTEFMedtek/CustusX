@@ -8,7 +8,8 @@
 #include <vtkContourFilter.h>
 #include <vtkImageData.h>
 #include "sscView.h"
-
+#include "sscMesh.h"
+#include "sscImage.h"
 
 namespace ssc
 {

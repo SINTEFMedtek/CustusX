@@ -12,6 +12,8 @@ typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 #include "sscDataManagerImpl.h"
+#include "sscImage.h"
+#include "sscMesh.h"
 
 namespace ssc
 {
@@ -45,5 +47,9 @@ DataManager::DataManager()
 DataManager::~DataManager()
 {
 }
+
+ImagePtr DataManager::getActiveImage() const { return ImagePtr(); } ///< used for system state
+void DataManager::setActiveImage(ImagePtr activeImage) {} ///< used for system state
+
 
 } // namespace ssc

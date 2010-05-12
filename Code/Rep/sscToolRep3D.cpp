@@ -3,11 +3,11 @@
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkPolyData.h>
 #include <vtkSTLReader.h>
 #include <vtkMatrix4x4.h>
 #include <vtkRenderer.h>
 
+#include "sscGraphicalPrimitives.h"
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscView.h"

@@ -1,16 +1,13 @@
 #ifndef SSCPROBEREP_H_
 #define SSCPROBEREP_H_
 
-#include <boost/shared_ptr.hpp>
-#include "vtkSmartPointer.h"
 #include "sscRepImpl.h"
-#include "sscVector3D.h"
 #include "sscTransform3D.h"
-#include "sscForwardDeclarations.h"
 
 class vtkObject;
 class vtkRenderWindowInteractor;
 
+#include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkLineSource> vtkLineSourcePtr;
@@ -25,7 +22,7 @@ namespace ssc
 {
 typedef boost::shared_ptr<class ProbeRep> ProbeRepPtr;
 typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class Vector3D> Vector3DPtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /**
  * Representation of points picked in an image.

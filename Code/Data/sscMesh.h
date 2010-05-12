@@ -2,14 +2,12 @@
 #define SSCMESH_
 
 #include <set>
-
 #include <boost/shared_ptr.hpp>
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 
 #include "sscData.h"
-#include "sscRep.h"
 
 class QDomNode;
 class QDomDocument;

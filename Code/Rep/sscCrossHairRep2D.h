@@ -8,13 +8,15 @@
 #ifndef SSCCROSSHAIRREP2D_H_
 #define SSCCROSSHAIRREP2D_H_
 
-#include <vtkSmartPointer.h>
+//#include <vtkSmartPointer.h>
 #include "sscRepImpl.h"
-#include "sscSliceProxy.h"
-#include "sscVtkHelperClasses.h"
+#include "sscTransform3D.h"
 
 namespace ssc
 {
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
+
 typedef boost::shared_ptr<class CrossHairRep2D> CrossHairRep2DPtr;
 
 /**Simple toolrep2D that displays a crosshair in the tool tip pos.
@@ -42,8 +44,8 @@ protected:
 
 private:
 	void update();
-	ssc::CrossHair2DPtr mCursor;
-	ssc::SliceProxyPtr mSlicer;
+	CrossHair2DPtr mCursor;
+	SliceProxyPtr mSlicer;
 	Transform3D m_vpMs;
 };
 

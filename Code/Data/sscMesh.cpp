@@ -1,6 +1,7 @@
 #include "sscMesh.h"
 
 #include <vtkPolyData.h>
+#include "sscRep.h"
 
 #include <QDomDocument>
 

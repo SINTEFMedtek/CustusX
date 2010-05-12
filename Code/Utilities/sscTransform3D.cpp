@@ -1,6 +1,5 @@
 #include "sscTransform3D.h"
 
-//#include "SonoWand.h"
 #include <sstream>
 #include <vector>
 #include <vtkMatrix4x4.h>
@@ -8,6 +7,7 @@
 typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 #include "sscTypeConversions.h"
 
+#include "sscBoundingBox3D.h"
 
 // --------------------------------------------------------
 namespace ssc

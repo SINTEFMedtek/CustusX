@@ -1,12 +1,14 @@
 #ifndef SSCLANDMARK_H_
 #define SSCLANDMARK_H_
 
-#include <QObject>
-#include <QDomNode>
-#include <QDateTime>
 #include <string>
 #include <map>
+#include <QObject>
+#include <QDateTime>
 #include "sscVector3D.h"
+
+class QDomNode;
+
 /*
  * sscLandmark.h
  *

@@ -1,10 +1,9 @@
 #ifndef SSCVOLUMEREP_H_
 #define SSCVOLUMEREP_H_
 
-#include <vtkSmartPointer.h>
 #include "sscRepImpl.h"
-#include "sscImage.h"
 
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
 typedef	vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
 typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
@@ -14,6 +13,8 @@ typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 
 namespace ssc
 {
+typedef boost::shared_ptr<class Image> ImagePtr;
+
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 
 /**Representation for one Image.

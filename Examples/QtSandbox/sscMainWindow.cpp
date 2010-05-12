@@ -10,7 +10,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 	// http://www.everaldo.com/crystal/
 
 	this->setWindowTitle("QtSandbox");
-	this->setWindowIcon(QIcon(":/images/exec.png"));
 
     mTextEdit = new QPlainTextEdit;
     setCentralWidget(mTextEdit);

@@ -6,18 +6,13 @@
  */
 
 #include "sscImageLUT2D.h"
-#include <QDir>
-#include <QTextStream>
-#include <QFile>
-#include <QDomDocument>
 
+#include <QDomDocument>
+#include <vtkLookupTable.h>
 #include <vtkImageData.h>
-#include <vtkWindowLevelLookupTable.h>
-#include <vtkPiecewiseFunction.h>
-#include <vtkImageMapToColors.h>
+
 #include "sscVector3D.h"
 
-#include <vtkLookupTable.h>
 namespace ssc
 {
 

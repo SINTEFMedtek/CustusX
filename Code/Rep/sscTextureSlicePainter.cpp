@@ -7,22 +7,33 @@
 
 #include "sscTextureSlicePainter.h"
 
-#include <vtkActor.h>
+#include <QtCore>
+//#include <vtkProperty.h>
+#include <vtkOpenGLExtensionManager.h>
+//#include <vtkOpenGLRepresentationPainter.h>
+//#include <vtkActor.h>
+#include <vtkRenderer.h>
+//
+//#include "sscImage.h"
+//#include "sscGPUImageBuffer.h"
+//
+//
+//#include <vtkActor.h>
 #include <vtkShaderProgram2.h>
 #include <vtkShader2.h>
 #include <vtkShader2Collection.h>
 #include <vtkUniformVariables.h>
 #include <vtkObjectFactory.h>
-#include <vtkPolyData.h>
-#include <vtkProperty.h>
-#include <vtkRenderer.h>
+//#include <vtkPolyData.h>
+//#include <vtkProperty.h>
+//#include <vtkRenderer.h>
 #include <vtkOpenGLRenderWindow.h>
-#include <vtkSmartPointer.h>
-#include <vtkImageData.h>
+//#include <vtkSmartPointer.h>
+//#include <vtkImageData.h>
 #include <vtkgl.h>
-#include <vtkPointData.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkUnsignedShortArray.h>
+//#include <vtkPointData.h>
+//#include <vtkUnsignedCharArray.h>
+//#include <vtkUnsignedShortArray.h>
 
 #include "/usr/include/X11/Xlib.h"
 //#include <GL/glu.h>
@@ -37,6 +48,7 @@
 //#include "QtUtilities.h"
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
+
 
 //---------------------------------------------------------
 namespace ssc
@@ -328,7 +340,7 @@ bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)
 	return true;
 }
 
-bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
+bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, std::string id)
 {
 	bool loaded = mgr->LoadSupportedExtension(cstring_cast(id));
 	if (!loaded)

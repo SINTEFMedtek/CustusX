@@ -1,16 +1,31 @@
+#include "sscOrientationAnnotationRep.h"
+
 #include <vtkTextProperty.h>
 #include <vtkRenderer.h>
 #include <vtkTextMapper.h>
 #include <vtkObjectFactory.h>
+#include <vtkCornerAnnotation.h>
 
 #include "sscView.h"
-#include "sscOrientationAnnotationRep.h"
+#include "sscSliceProxy.h"
+#include "sscVtkHelperClasses.h"
 
 
 // --------------------------------------------------------
 namespace ssc
 // --------------------------------------------------------
 {
+
+class OrientationAnnotation : public vtkCornerAnnotation
+{
+  vtkTypeMacro(OrientationAnnotation, vtkCornerAnnotation);
+public:
+  static OrientationAnnotation* New();
+  OrientationAnnotation();
+  ~OrientationAnnotation();
+  virtual void SetTextActorsPosition(int vsize[2]);
+  virtual void SetTextActorsJustification();
+};
 
 /** Follows vtk spec.
  */

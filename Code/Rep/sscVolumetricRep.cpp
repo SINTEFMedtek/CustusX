@@ -11,6 +11,7 @@
 #include <vtkImageResample.h>
 
 #include "sscView.h"
+#include "sscImage.h"
 #include "sscImageTF3D.h"
 
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;

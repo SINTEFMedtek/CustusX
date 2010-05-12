@@ -7,6 +7,7 @@
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 
+#include "sscBoundingBox3D.h"
 
 namespace ssc
 {
@@ -103,6 +104,34 @@ vtkActorPtr GraphicalLine3D::getActor()
 {
 	return actor;
 }
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+Rect3D::Rect3D( vtkRendererPtr renderer, const Vector3D& color) :
+  a(renderer),
+  b(renderer),
+  c(renderer),
+  d(renderer)
+{
+  a.setColor(color);
+  b.setColor(color);
+  c.setColor(color);
+  d.setColor(color);
+}
+
+void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
+{
+  a.setValue(M.coord(bb.corner(0,0,0)), M.coord(bb.corner(1,0,0)));
+  b.setValue(M.coord(bb.corner(1,0,0)), M.coord(bb.corner(1,1,0)));
+  c.setValue(M.coord(bb.corner(1,1,0)), M.coord(bb.corner(0,1,0)));
+  d.setValue(M.coord(bb.corner(0,1,0)), M.coord(bb.corner(0,0,0)));
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
 
 }

@@ -1,23 +1,20 @@
 #include "sscImage.h"
 
-#include <sstream>
 #include <QDomDocument>
-
 #include <vtkImageAccumulate.h>
 #include <vtkImageReslice.h>
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
-#include <vtkDoubleArray.h>
-#include <vtkLookupTable.h>
 #include <vtkImageLuminance.h>
 
+#include "sscImageTF3D.h"
+#include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
-#include "sscGPUImageBuffer.h"
 #include "sscRegistrationTransform.h"
+#include "sscLandmark.h"
 
 namespace ssc
 {
-
 
 Image::~Image()
 {}

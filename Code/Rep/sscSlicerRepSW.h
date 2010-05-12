@@ -1,29 +1,19 @@
 #ifndef SSCSLICERREPSW_H_
 #define SSCSLICERREPSW_H_
 
-#include <vtkSmartPointer.h>
-#include "sscDefinitions.h"
-#include "sscForwardDeclarations.h"
-#include "sscTool.h"
 #include "sscRepImpl.h"
-#include "sscImage.h"
-#include "sscSliceComputer.h"
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
 
-#include "sscSlicedImageProxy.h"
-
-typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
-typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
-typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
-typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
+#include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkImageActor> vtkImageActorPtr;
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
-
 
 namespace ssc
 {
+// forward declarations
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
+
+
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 
 /**Slice a volume using a SliceProxy.
