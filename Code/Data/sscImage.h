@@ -3,6 +3,7 @@
 
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include "sscLandmark.h"
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
