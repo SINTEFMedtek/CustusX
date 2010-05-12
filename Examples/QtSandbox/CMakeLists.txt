@@ -25,7 +25,7 @@ include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 	
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 	
-QT4_ADD_RESOURCES( QT_RESOURCE_FILES resources/resource.qrc )
+QT4_ADD_RESOURCES( QT_RESOURCE_FILES resource.qrc )
 		
 # =========================================================
 # create the target
