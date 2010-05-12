@@ -27,11 +27,13 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
   
-  //QString path = "/Users/olevs/data/UL_thunder/test/";
-  QString path = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  QString path = "/Users/olevs/data/UL_thunder/test/1/";
+  //QString path = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
 
-  //mInputFile = "/Users/olevs/data/UL_thunder/Nevro_Spine/SpineData/ultrasoundSample5.mhd";
-  mInputFile = path + "ultrasoundSample5.mhd";
+
+  //mInputFile = "/Users/olevs/data/UL_thunder/test/ultrasoundSample5.mhd";
+  //mInputFile = "/Users/olevs/data/UL_thunder/test/1/UsAcq_1.mhd";
+  mInputFile = path + "UsAcq_1.mhd";
   
   mReconstructer->reconstruct(mInputFile, path+"M12L.cal");
   
