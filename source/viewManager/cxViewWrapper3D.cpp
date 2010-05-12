@@ -7,7 +7,9 @@
 
 #include "cxViewWrapper3D.h"
 #include <vector>
+#include <QSettings>
 #include <vtkRenderWindow.h>
+
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscSliceProxy.h"

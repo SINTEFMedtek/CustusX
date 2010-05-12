@@ -10,6 +10,7 @@
 #include <QColorDialog>
 #include <QMenu>
 #include "cxDataManager.h"
+#include "sscImageTF3D.h"
 
 namespace cx
 {
