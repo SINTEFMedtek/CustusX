@@ -134,7 +134,6 @@ vtkImageDataPtr Reconstructer::generateVtkImageData(Vector3D dim,
                                                   Vector3D spacing,
                                                   const unsigned char initValue)
 {
-  //TODO: Must generalize
   vtkImageDataPtr data = vtkImageDataPtr::New();
   data->SetSpacing(spacing[0], spacing[1], spacing[2]);
   data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
@@ -152,7 +151,7 @@ vtkImageDataPtr Reconstructer::generateVtkImageData(Vector3D dim,
   array->SetArray(rawchars, scalarSize+1, 0); // take ownership
   data->GetPointData()->SetScalars(array);
   
-  rawchars[0] = 255;
+  rawchars[0] = 255;// A trick to get a full LUT in ssc::Image (automatic LUT generation)
   
   /*data->AllocateScalars();
   unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
@@ -180,7 +179,6 @@ ImagePtr Reconstructer::generateMask()
   
   vtkImageDataPtr data = generateVtkImageData(dim, spacing, 255);
     
-  //TODO: Create ouput volume name
   ImagePtr image = ImagePtr(new Image("mask", data, "mask")) ;
   return image;
 }
@@ -331,24 +329,6 @@ void Reconstructer::calibrate(QString calFile)
 }
   
 /**
- * Find the transform matrix between output data space d and reference space pr
- * \return the prMd matrix
- */
-Transform3D Reconstructer::find_prMd()
-{
-  Transform3D retval;
-  retval = mFrames[mFrames.size()/2].mPos;
-  retval = retval.inv();
-  
-  //testcode
-  //retval = Transform3D();
-  
-  //TODO: Move origo for prMd
-  
-  return retval;
-}
-  
-/**
  * Generate a rectangle (2D) defining ROI in input image space
  */
 std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
@@ -361,7 +341,6 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
   }
   int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
   double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
-  //TODO: Use clipping mask instead of whole image
   
   int xmin = dims[0];
   int xmax = 0;
@@ -403,7 +382,10 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
 ImagePtr Reconstructer::generateOutputVolume()
 {
   // A first guess for usMd with correct orientation
-  Transform3D prMd = this->find_prMd();
+  Transform3D prMd;
+  prMd = mFrames[mFrames.size()/2].mPos;
+  prMd = prMd.inv();
+  
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
     mFrames[i].mPos = mFrames[i].mPos * prMd;

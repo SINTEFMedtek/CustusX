@@ -56,7 +56,6 @@ private:
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();
   void calibrate(QString calFile);
-  Transform3D find_prMd();
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
 };
