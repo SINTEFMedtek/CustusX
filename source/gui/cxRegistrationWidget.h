@@ -12,6 +12,8 @@
 #include <map>
 #include <QWidget>
 #include "sscVolumetricRep.h"
+#include "sscLandmark.h"
+#include "sscTransform3D.h"
 
 class QVBoxLayout;
 class QComboBox;

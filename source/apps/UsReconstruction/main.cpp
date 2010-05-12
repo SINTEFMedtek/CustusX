@@ -18,6 +18,7 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
   
 	QWidget* top = new QWidget();
+	top->setWindowTitle("US reconstruct test app");
   QHBoxLayout* layout = new QHBoxLayout(top);
   ssc::ReconstructionWidget* reconstructionWidget = new ssc::ReconstructionWidget(top);
   layout->addWidget(reconstructionWidget);
@@ -35,6 +36,10 @@ int main(int argc, char **argv)
   top->resize(700, 600);
   
   top->show();
+#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+  top->activateWindow();
+#endif
+  top->raise();
   view->getRenderer()->ResetCamera();
      
 	int val = app.exec();

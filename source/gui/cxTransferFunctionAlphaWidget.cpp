@@ -10,6 +10,7 @@
 #include <QBrush>
 #include <QMouseEvent>
 #include "cxDataManager.h"
+#include "sscImageTF3D.h"
 
 namespace cx
 {

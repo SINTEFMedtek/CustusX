@@ -10,9 +10,12 @@
 #include <vtkImageData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPointData.h>
+
+#include "sscBoundingBox3D.h"
 #include "sscDataManagerImpl.h"
 #include "sscTypeConversions.h"
 
+typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace ssc
 {

@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <QObject>
+#include <QDateTime>
 #include "vtkSmartPointer.h"
 #include "sscImage.h"
 
