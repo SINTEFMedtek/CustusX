@@ -14,13 +14,12 @@
 
 namespace ssc
 {
-typedef boost::shared_ptr<class UsFrame> UsFramePtr;
-/** Represents one 2D US frame along with timestamp and position
+typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
+/** Represents one position with timestamp 
  */
-class UsFrame
+class TimedPosition
 {
 public:
-  //std::vector<unsigned char> mData; //Data is currently placed in mUsRaw
   double mTime;
   Transform3D mPos;
 };
@@ -41,7 +40,7 @@ public:
    * \param frameData The frame data. Assumes that the transfrom is identity.
    * \param outputData [Out] The reconstructed volume. Memory must be allocated in advance.
    */
-  virtual void reconstruct(std::vector<UsFrame> frameInfo, 
+  virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,
                            ImagePtr frameMask) = 0;

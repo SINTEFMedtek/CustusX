@@ -18,7 +18,7 @@ ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm()
 {
 }
   
-void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<UsFrame> frameInfo, 
+void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
                                                  ImagePtr frameData,
                                                  ImagePtr outputData,
                                                  ImagePtr frameMask)

@@ -35,8 +35,17 @@ void Reconstructer::readFiles(QString mhdFileName)
 {
   readUsDataFile(mhdFileName);
   
-  QString posName = changeExtension(mhdFileName, "pos");
-  readPositionFile(posName);
+  // Read frame time stamps file
+  QString fileName = changeExtension(mhdFileName, "fts");
+  readTimeStampsFile(fileName, &mFrames);
+  
+  //QString posName = changeExtension(mhdFileName, "pos");//old format
+  fileName = changeExtension(mhdFileName, "tp");
+  readPositionFile(fileName);
+  
+  // Read tracking time stamps file
+  fileName = changeExtension(mhdFileName, "tts");
+  readTimeStampsFile(fileName, &mPositions);
 }
 
 void Reconstructer::readUsDataFile(QString mhdFileName)
@@ -44,6 +53,9 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   //Read US images
   mUsRaw = MetaImageReader().load(string_cast(mhdFileName), 
                                   string_cast(mhdFileName));
+  
+  //Allcate place for position and time stamps for all frames
+  mFrames.resize(mUsRaw->getBaseVtkImageData()->GetDimensions()[2]);
   
   //Test
   
@@ -60,8 +72,9 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
         std::fill(a, b, val);
       }*/
   
+  //old format
   //Read US image time tags
-  QString timeName = changeExtension(mhdFileName, "tim");
+  /*QString timeName = changeExtension(mhdFileName, "tim");
   QFile timeFile(timeName);
   if(!timeFile.open(QIODevice::ReadOnly))
   {
@@ -71,7 +84,7 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   while (!timeFile.atEnd())
   {
     bool ok = true;
-    UsFrame frame;
+    TimedPosition frame;
     QByteArray array = timeFile.readLine();
     frame.mTime = QString(array).toDouble(&ok);
     if (!ok)
@@ -87,11 +100,72 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
     mUsRaw.reset();
     std::cout << "Number of frames don't match number of positions" << std::endl;
     return;
-  }
+  }*/
   std::cout << "Reconstructer::readUsDataFile() - succes. Number of frames: " 
     << mFrames.size() << std::endl;
   return;
 }
+  
+void Reconstructer::readTimeStampsFile(QString fileName, 
+                                       std::vector<TimedPosition>* timedPos)
+{
+  QFile file(fileName);
+  if(!file.open(QIODevice::ReadOnly))
+  {
+    std::cout << "Can't open file: " << string_cast(fileName) << std::endl;
+    return;
+  }
+  bool ok = true;
+  
+  //old format
+  /*QByteArray array = file.readLine();
+  unsigned int numStamps = QString(array).toInt(&ok);
+  if (!ok)
+  {
+    std::cout << "Can't read num stamps (int) in file: " << string_cast(fileName);
+    std::cout << std::endl;
+    return;
+  }
+  if (numStamps != timedPos->size())
+  {
+    std::cout << "num positions != num time stamps in file: ";
+    std::cout << string_cast(fileName);
+    std::cout << " numStamps: " << numStamps << ", numPos: " << timedPos->size();
+    std::cout << std::endl;
+    return;
+  }*/
+  
+  unsigned int i = 0;
+  while (!file.atEnd() && i<timedPos->size())
+  {
+    QByteArray array = file.readLine();
+    double time = QString(array).toDouble(&ok);
+    if (!ok)
+    {
+      std::cout << "Can't read double in file: " << string_cast(fileName) 
+      << std::endl;
+      return;
+    }
+    timedPos->at(i).mTime = time;
+    i++;
+  }
+  
+  if(i!=timedPos->size())
+  {
+    std::cout << "Reconstructer::readTimeStampsFile() - warning. ";
+    std::cout << "timedPos->size(): " << timedPos->size();
+    std::cout << ", read number of time stamps: ";
+    std::cout << i << std::endl;
+  }
+  else
+  {
+    std::cout << "Reconstructer::readTimeStampsFile() - succes. ";
+    std::cout << "Number of time stamps: ";
+    std::cout << timedPos->size() << std::endl;
+  }
+  return;
+}
+  
 void Reconstructer::readPositionFile(QString posFile)
 {
   QFile file(posFile);
@@ -100,18 +174,29 @@ void Reconstructer::readPositionFile(QString posFile)
     std::cout << "Can't open file: " << string_cast(posFile) << std::endl;
     return;
   }
+  bool ok = true;
+  //old format
+  /*QByteArray array = file.readLine();
+  int numPos = QString(array).toInt(&ok);
+  if (!ok)
+  {
+    std::cout << "Can't read num positions (int) in file: " << string_cast(posFile) 
+    << std::endl;
+    return;
+  }*/
+  int i = 0;
   while (!file.atEnd())
   {
-    bool ok = true;
-    PositionData position;
-    QByteArray array = file.readLine();
+    TimedPosition position;
+    //old format
+    /*QByteArray array = file.readLine();
     position.mTime = QString(array).toDouble(&ok);
     if (!ok)
     {
       std::cout << "Can't read double in file: " << string_cast(posFile) 
         << std::endl;
       return;
-    }
+    }*/
     
     QString positionString = file.readLine();
     positionString += " " + file.readLine();
@@ -126,10 +211,21 @@ void Reconstructer::readPositionFile(QString posFile)
       return;
     }
     mPositions.push_back(position);
+    i++;
+    //std::cout << positionString << std::endl;
+    //std::cout << position.mPos << std::endl;
   }
   
-  std::cout << "Reconstructer::readPositionFile() - succes. Number of positions: " 
-  << mPositions.size() << std::endl;
+  //old format
+  /*if(i!=numPos)
+  {
+    std::cout << "Reconstructer::readPositionFile() - warning. ";
+    std::cout << "numPos: " << numPos << ", read number of pos: ";
+    std::cout << mPositions.size() << std::endl;
+  }*/
+  std::cout << "Reconstructer::readPositionFile() - succes. ";
+  std::cout << "Number of positions: ";
+  std::cout << mPositions.size() << std::endl;
   return;
 }
   
@@ -229,8 +325,10 @@ void Reconstructer::calibrateTimeStamps(double offset, double scale)
  */
 void Reconstructer::calibrateTimeStamps()
 {
-  double scale = (mFrames.back().mTime - mFrames.front().mTime)
-    / (mPositions.back().mTime - mPositions.front().mTime);
+  double framesSpan = mFrames.back().mTime - mFrames.front().mTime;
+  double positionsSpan = mPositions.back().mTime - mPositions.front().mTime;
+  double scale = framesSpan / positionsSpan;
+  std::cout << "framesTimeSpan: " << framesSpan << ", positionsTimeSpan: " << positionsSpan << std::endl;
   
   double offset = mFrames.front().mTime - scale * mPositions.front().mTime;
   
@@ -272,8 +370,10 @@ void Reconstructer::interpolatePositions()
     else if(i_pos >= mPositions.size()-1)
       i_pos = mPositions.size()-2;
       
-    double t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) 
-      / (mPositions[i_pos+1].mTime - mPositions[i_pos].mTime);
+    double t_delta_tracking = mPositions[i_pos+1].mTime - mPositions[i_pos].mTime;
+    double t = 0;
+    if (!similar(t_delta_tracking, 0))
+      t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) / t_delta_tracking;
     mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos, 
                                         mPositions[i_pos+1].mPos, t);
   }
@@ -397,13 +497,18 @@ ImagePtr Reconstructer::generateOutputVolume()
   // Find extent of all frames as a point cloud
   std::vector<ssc::Vector3D> inputRect = this->generateInputRectangle();
   std::vector<ssc::Vector3D> outputRect;
+  //std::cout << "inputRect" << std::endl;
   for(unsigned int slice = 0; slice < mFrames.size(); slice++)
   {
     Transform3D dMus = mFrames[slice].mPos.inv();
     for (unsigned int i = 0; i < inputRect.size(); i++)
     {
       outputRect.push_back(dMus.coord(inputRect[i]));
+      //std::cout << " " << inputRect[i];
     }
+    //std::cout << " " << dMus;
+    //std::cout << " " << mFrames[slice].mPos;
+    //std::cout << std::endl;
   }
   
   /*std::cout << "1st dMus:  " << mFrames.front().mPos.inv().coord(ssc::Vector3D(0,0,0));  
@@ -469,7 +574,10 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   this->readFiles(mhdFileName); 
   //mPos is now tMpr
   
-  mMask = this->readMaskFile(mhdFileName);
+  //old format
+  //mMask = this->readMaskFile(mhdFileName);
+  
+  mMask = this->generateMask();
   
   this->calibrateTimeStamps();
   

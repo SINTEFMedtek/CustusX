@@ -15,15 +15,6 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
 {
-typedef boost::shared_ptr<class PositionData> PositionDataPtr;
-/** Represents one 2D US frame along with timestamp and position
- */
-class PositionData
-{
-public:
-  double mTime;
-  Transform3D mPos;
-};
   
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 class Reconstructer : public QObject
@@ -36,14 +27,15 @@ public:
 private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
   QString changeExtension(QString name, QString ext);
-  std::vector<UsFrame> mFrames;
-  std::vector<PositionData> mPositions;
+  std::vector<TimedPosition> mFrames;
+  std::vector<TimedPosition> mPositions;
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;
   unsigned long mMaxVolumeSize;///< Max volume size in bytes for output volume
   void readFiles(QString mhdFileName);
   void readUsDataFile(QString mhdFileName);
+  void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
   void readPositionFile(QString posFile);
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
