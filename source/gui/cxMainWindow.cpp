@@ -95,6 +95,8 @@ MainWindow::MainWindow() :
   connect(messageManager(), SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
 
+  connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+
   this->changeState(PATIENT_DATA, PATIENT_DATA);
   
   // TODO: Find a better way to do this
@@ -380,6 +382,11 @@ void MainWindow::importDataSlot()
   mPatientData->importData(fileName);
 }
 
+void MainWindow::patientChangedSlot()
+{
+  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
+}
+
 /** Called when the layout is changed: update the layout menu
  */
 void MainWindow::layoutChangedSlot()
@@ -556,9 +563,7 @@ void MainWindow::deactivatePatientDataState()
 {}
 void MainWindow::activateImageRegistationState()
 {  
-  QString imagesPath = 
-    mSettings->value("globalPatientDataFolder").toString()+
-    "/"+mPatientData->getActivePatientFolder()+"/Images";
+  QString imagesPath = mPatientData->getActivePatientFullPath()+"/Images";
   mShiftCorrectionWidget->init(imagesPath);
   //TODO: Finish ShiftCorrection
   //Don't show ShiftCorrection in release
@@ -756,8 +761,7 @@ void MainWindow::configureSlot()
   }
   toolManager()->setConfigurationFile(configFile.toStdString());
 
-  QString loggingPath = mSettings->value("globalPatientDataFolder").toString()
-                        +"/"+mPatientData->getActivePatientFolder()+"/Logs/";
+  QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {
