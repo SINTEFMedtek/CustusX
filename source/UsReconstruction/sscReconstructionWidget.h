@@ -11,6 +11,7 @@
 #include <QtGui>
 #include "sscReconstructer.h"
 
+
 namespace ssc
 {
 class ReconstructionWidget : public QWidget
@@ -19,6 +20,7 @@ class ReconstructionWidget : public QWidget
 public:
   ReconstructionWidget(QWidget* parent);
   ReconstructerPtr reconstructer() {  return mReconstructer; }
+  void selectData(QString inputfile);
 
 public slots:
   void reconstruct();

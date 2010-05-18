@@ -101,12 +101,8 @@ void ReconstructionWidget::updateComboBox()
   mDataComboBox->blockSignals(false);
 }
 
-void ReconstructionWidget::selectData()
+void ReconstructionWidget::selectData(QString filename)
 {
-  QString filename = QFileDialog::getOpenFileName( this,
-                                  QString(tr("Select data file")),
-                                  getCurrentPath(),
-                                  tr("USAcq (*.mhd)"));
   if(filename.isEmpty())
   {
     std::cout << "no file selected" << std::endl;
@@ -116,6 +112,15 @@ void ReconstructionWidget::selectData()
   mInputFile = filename;
 
   updateComboBox();
+}
+
+void ReconstructionWidget::selectData()
+{
+  QString filename = QFileDialog::getOpenFileName( this,
+                                  QString(tr("Select data file")),
+                                  getCurrentPath(),
+                                  tr("USAcq (*.mhd)"));
+  selectData(filename);
 }
   
 }//namespace
