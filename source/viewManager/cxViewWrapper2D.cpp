@@ -24,6 +24,7 @@
 #include "cxLandmarkRep.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
+#include "sscDefinitionStrings.h"
 
 namespace cx
 {

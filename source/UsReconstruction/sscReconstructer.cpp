@@ -31,21 +31,23 @@ QString Reconstructer::changeExtension(QString name, QString ext)
   return splitName.join(".");
 }
   
-void Reconstructer::readFiles(QString mhdFileName)
+void Reconstructer::readFiles(QString fileName)
 {
-  readUsDataFile(mhdFileName);
+  readUsDataFile(changeExtension(fileName, "mhd"));
   
-  // Read frame time stamps file
-  QString fileName = changeExtension(mhdFileName, "fts");
-  readTimeStampsFile(fileName, &mFrames);
-  
-  //QString posName = changeExtension(mhdFileName, "pos");//old format
-  fileName = changeExtension(mhdFileName, "tp");
-  readPositionFile(fileName);
-  
-  // Read tracking time stamps file
-  fileName = changeExtension(mhdFileName, "tts");
-  readTimeStampsFile(fileName, &mPositions);
+  bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
+
+  if (useOldFormat)
+  {
+    readTimeStampsFile(changeExtension(fileName, "tim"), &mFrames);
+    readPositionFile(changeExtension(fileName, "pos"), true);
+  }
+  else
+  {
+    readTimeStampsFile(changeExtension(fileName, "fts"), &mFrames);
+    readPositionFile(changeExtension(fileName, "tp"), false);
+    readTimeStampsFile(changeExtension(fileName, "tts"), &mPositions);
+  }
 }
 
 void Reconstructer::readUsDataFile(QString mhdFileName)
@@ -57,55 +59,11 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   //Allcate place for position and time stamps for all frames
   mFrames.resize(mUsRaw->getBaseVtkImageData()->GetDimensions()[2]);
   
-  //Test
-  
-  /*unsigned char* dataPtr = static_cast<unsigned char*>(mUsRaw->getBaseVtkImageData()->GetScalarPointer());
-  int* dim = mUsRaw->getBaseVtkImageData()->GetDimensions();
-  //std::cout << "dim: " << ssc::Vector3D(dim) << std::endl;
-  //std::cout << "number of points:" 
-      for(int z = 0; z < dim[2]; z++)
-      {
-        //dataPtr[x + y*dim[0] + z*dim[0]*dim[1]] = z/((double)dim[2])*255;
-        unsigned char* a = dataPtr + z*dim[0]*dim[1];
-        unsigned char* b = dataPtr + (z+1)*dim[0]*dim[1];
-        unsigned const char val = z/((double)dim[2])*255;
-        std::fill(a, b, val);
-      }*/
-  
-  //old format
-  //Read US image time tags
-  /*QString timeName = changeExtension(mhdFileName, "tim");
-  QFile timeFile(timeName);
-  if(!timeFile.open(QIODevice::ReadOnly))
-  {
-    std::cout << "Can't open file: " << string_cast(timeName) << std::endl;
-    return;
-  }
-  while (!timeFile.atEnd())
-  {
-    bool ok = true;
-    TimedPosition frame;
-    QByteArray array = timeFile.readLine();
-    frame.mTime = QString(array).toDouble(&ok);
-    if (!ok)
-    {
-      std::cout << "Can't read double in file: " << string_cast(timeName) << std::endl;
-      return;
-    }
-    mFrames.push_back(frame);
-  }
-  if(mUsRaw->getBaseVtkImageData()->GetDimensions()[2] != (int)mFrames.size())
-  {
-    mFrames.clear();
-    mUsRaw.reset();
-    std::cout << "Number of frames don't match number of positions" << std::endl;
-    return;
-  }*/
   std::cout << "Reconstructer::readUsDataFile() - succes. Number of frames: " 
     << mFrames.size() << std::endl;
   return;
 }
-  
+
 void Reconstructer::readTimeStampsFile(QString fileName, 
                                        std::vector<TimedPosition>* timedPos)
 {
@@ -116,24 +74,6 @@ void Reconstructer::readTimeStampsFile(QString fileName,
     return;
   }
   bool ok = true;
-  
-  //old format
-  /*QByteArray array = file.readLine();
-  unsigned int numStamps = QString(array).toInt(&ok);
-  if (!ok)
-  {
-    std::cout << "Can't read num stamps (int) in file: " << string_cast(fileName);
-    std::cout << std::endl;
-    return;
-  }
-  if (numStamps != timedPos->size())
-  {
-    std::cout << "num positions != num time stamps in file: ";
-    std::cout << string_cast(fileName);
-    std::cout << " numStamps: " << numStamps << ", numPos: " << timedPos->size();
-    std::cout << std::endl;
-    return;
-  }*/
   
   unsigned int i = 0;
   while (!file.atEnd() && i<timedPos->size())
@@ -166,7 +106,7 @@ void Reconstructer::readTimeStampsFile(QString fileName,
   return;
 }
   
-void Reconstructer::readPositionFile(QString posFile)
+void Reconstructer::readPositionFile(QString posFile, bool alsoReadTimestamps)
 {
   QFile file(posFile);
   if(!file.open(QIODevice::ReadOnly))
@@ -175,28 +115,23 @@ void Reconstructer::readPositionFile(QString posFile)
     return;
   }
   bool ok = true;
-  //old format
-  /*QByteArray array = file.readLine();
-  int numPos = QString(array).toInt(&ok);
-  if (!ok)
-  {
-    std::cout << "Can't read num positions (int) in file: " << string_cast(posFile) 
-    << std::endl;
-    return;
-  }*/
+
   int i = 0;
   while (!file.atEnd())
   {
     TimedPosition position;
-    //old format
-    /*QByteArray array = file.readLine();
-    position.mTime = QString(array).toDouble(&ok);
-    if (!ok)
+    if (alsoReadTimestamps)
     {
-      std::cout << "Can't read double in file: " << string_cast(posFile) 
-        << std::endl;
-      return;
-    }*/
+      //old format - timestamps embedded in pos file);
+      QByteArray array = file.readLine();
+      position.mTime = QString(array).toDouble(&ok);
+      if (!ok)
+      {
+        std::cout << "Can't read double in file: " << string_cast(posFile)
+          << std::endl;
+        return;
+      }
+    }
     
     QString positionString = file.readLine();
     positionString += " " + file.readLine();
@@ -571,14 +506,21 @@ ImagePtr Reconstructer::generateOutputVolume()
   
 ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
 {
+  std::cout << "Perform reconstruction on: " << mhdFileName << std::endl;
+  std::cout << "Use calibration file: " << calFileName << std::endl;
+
   this->readFiles(mhdFileName); 
   //mPos is now tMpr
-  
-  //old format
-  //mMask = this->readMaskFile(mhdFileName);
-  
-  mMask = this->generateMask();
-  
+
+  if (QFileInfo(changeExtension(mhdFileName, "msk")).exists())
+  {
+    mMask = this->readMaskFile(changeExtension(mhdFileName, "msk"));
+  }
+  else
+  {
+    mMask = this->generateMask();
+  }
+
   this->calibrateTimeStamps();
   
   this->calibrate(calFileName);
@@ -596,6 +538,8 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   QDateTime pre = QDateTime::currentDateTime();
   mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask);
   std::cout << "Reconstruct time: " << pre.time().msecsTo(QDateTime::currentDateTime().time()) << std::endl;
+
+  DataManager::getInstance()->loadImage(mOutput);
   
   return mOutput;
 }

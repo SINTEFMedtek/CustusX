@@ -36,7 +36,7 @@ private:
   void readFiles(QString mhdFileName);
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
-  void readPositionFile(QString posFile);
+  void readPositionFile(QString posFile, bool alsoReadTimestamps);
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
   vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
