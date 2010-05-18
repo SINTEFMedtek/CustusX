@@ -221,6 +221,7 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
+    Widgets/sscHelperWidgets.cpp
 	) 
 
 # =========================================================

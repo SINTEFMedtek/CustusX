@@ -94,6 +94,27 @@ public:
   }
 };
 
+/**Composite widget for scalar data manipulation.
+ * Consists of <namelabel, valueedit, slider>.
+ * Insert a subclass of ssc::DoubleDataInterfacePtr in order to connect to data.
+ */
+class SliderGroupWidget : public QWidget
+{
+  Q_OBJECT
+public:
+  SliderGroupWidget(QWidget* parent, DoubleDataInterfacePtr dataInterface, QGridLayout* gridLayout=0, int row=0);
+private slots:
+  void dataChanged();
+  void textEditedSlot(const QString& text);
+  void doubleValueChanged(double val);
+
+private:
+  DoubleSlider* mSlider;
+  QLabel* mLabel;
+  DoubleLineEdit* mEdit;
+  DoubleDataInterfacePtr mData;
+};
+
 }
 
 #endif

@@ -46,7 +46,8 @@ public:
 	virtual bool setValue(double value) = 0; ///< implemented by subclasses to set value for this entity
 	virtual double getValue() const = 0; ///< implemented by subclasses to get value for this entity
 	virtual DoubleRange getValueRange() const { return DoubleRange(0,1,0.01); } /// range of value
-	virtual double convertInternal2Display(double internal) { return internal*100; } ///< conversion from internal value to display value
+	virtual double convertInternal2Display(double internal) { return internal; } ///< conversion from internal value to display value
+  virtual double convertDisplay2Internal(double display) { return display; } ///< conversion from internal value to display value
 	virtual int getValueDecimals() const { return 0; } ///< number of relevant decimals in value
 	virtual double legendStep() const {return 0.2;} ///< step between each pos on the legend
 	virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
