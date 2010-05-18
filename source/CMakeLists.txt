@@ -121,6 +121,7 @@ SET ( LINK_LIBRARIES
   vtkDataManagement
   vtkRenderingAddOn
   QVTK
+  sscUsReconstructionLib  
   SSC
 )
 

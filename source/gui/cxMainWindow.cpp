@@ -24,6 +24,7 @@
 #include "cxShiftCorrectionWidget.h"
 #include "cxImagePropertiesWidget.h"
 #include "cxPointSamplingWidget.h"
+#include "sscReconstructionWidget.h"
 
 namespace cx
 {
@@ -173,6 +174,7 @@ MainWindow::MainWindow() :
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
+  mReconstructionWidget(new ssc::ReconstructionWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),
   mPatientRegistrationIndex(-1),
@@ -242,6 +244,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mToolPropertiesWidget);
   this->addAsDockWidget(mPointSamplingWidget);
+  this->addAsDockWidget(mReconstructionWidget);
   
   // Restore saved window states
   // Must be done after all DockWidgets are created

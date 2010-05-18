@@ -5,6 +5,7 @@
 
 
 #include "sscReconstructionWidget.h"
+#include "sscTypeConversions.h"
 
 namespace ssc 
 {
@@ -27,18 +28,94 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
   
-  QString path = "/Users/olevs/data/UL_thunder/test/1/";
-  //QString path = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  //QString path = "/Users/olevs/data/UL_thunder/test/1/";
+  QString path = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
 
+  //mInputFile = path + "UsAcq_1.mhd";
+  mInputFile = path + "ultrasoundSample5.mhd";
 
-  //mInputFile = "/Users/olevs/data/UL_thunder/test/ultrasoundSample5.mhd";
-  //mInputFile = "/Users/olevs/data/UL_thunder/test/1/UsAcq_1.mhd";
-  mInputFile = path + "UsAcq_1.mhd";
-  
-  mReconstructer->reconstruct(mInputFile, path+"M12L.cal");
-  
+  QVBoxLayout* topLayout = new QVBoxLayout(this);
+
+  QHBoxLayout* dataLayout = new QHBoxLayout;
+  mDataComboBox = new QComboBox(this);
+  connect(mDataComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentDataComboIndexChanged(const QString&)));
+  this->updateComboBox();
+
+  mSelectDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Select data"), this);
+  connect(mSelectDataAction, SIGNAL(triggered()), this, SLOT(selectData()));
+  mSelectDataButton = new QToolButton(this);
+  mSelectDataButton->setDefaultAction(mSelectDataAction);
+
+  mReconstructButton = new QPushButton("Reconstruct", this);
+  connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
+
+  topLayout->addLayout(dataLayout);
+  dataLayout->addWidget(mDataComboBox);
+  dataLayout->addWidget(mSelectDataButton);
+  topLayout->addWidget(mReconstructButton);
+  topLayout->addStretch();
 }
-  
-  
+
+void ReconstructionWidget::currentDataComboIndexChanged(const QString& text)
+{
+  QDir dir = QFileInfo(mInputFile).dir();
+  mInputFile = dir.filePath(text);
+  std::cout << "selected: " << mInputFile << std::endl;
+  mDataComboBox->setToolTip(mInputFile);
+}
+
+QString ReconstructionWidget::getCurrentPath()
+{
+  return QFileInfo(mInputFile).dir().absolutePath();
+}
+
+void ReconstructionWidget::reconstruct()
+{
+  QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+
+  mReconstructer->reconstruct(mInputFile, calFile);
+}
+
+void ReconstructionWidget::updateComboBox()
+{
+  mDataComboBox->blockSignals(true);
+  mDataComboBox->clear();
+
+  QDir dir = QFileInfo(mInputFile).dir();
+  QStringList nameFilters;
+  nameFilters << "*.mhd";
+  std::cout << dir.path() << std::endl;
+  QStringList files = dir.entryList(nameFilters, QDir::Files);
+
+  for (int i=0; i<files.size(); ++i)
+  {
+    std::cout << files[i] << std::endl;
+    mDataComboBox->addItem(files[i]);
+    if (files[i]==QFileInfo(mInputFile).fileName())
+      mDataComboBox->setCurrentIndex(i);
+  }
+
+  mDataComboBox->setToolTip(mInputFile);
+
+  //mDataComboBox->addItem(mInputFile);
+  mDataComboBox->blockSignals(false);
+}
+
+void ReconstructionWidget::selectData()
+{
+  QString filename = QFileDialog::getOpenFileName( this,
+                                  QString(tr("Select data file")),
+                                  getCurrentPath(),
+                                  tr("USAcq (*.mhd)"));
+  if(filename.isEmpty())
+  {
+    std::cout << "no file selected" << std::endl;
+    return;
+  }
+
+  mInputFile = filename;
+
+  updateComboBox();
+}
   
 }//namespace

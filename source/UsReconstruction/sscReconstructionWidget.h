@@ -8,9 +8,8 @@
 #ifndef SSCRECONSTRUCTIONWIDGET_H_
 #define SSCRECONSTRUCTIONWIDGET_H_
 
-#include <QWidget>
+#include <QtGui>
 #include "sscReconstructer.h"
-
 
 namespace ssc
 {
@@ -19,10 +18,25 @@ class ReconstructionWidget : public QWidget
   Q_OBJECT
 public:
   ReconstructionWidget(QWidget* parent);
-//private:
-  ReconstructerPtr mReconstructer;
-  
-  QString mInputFile;
+  ReconstructerPtr reconstructer() {  return mReconstructer; }
+
+public slots:
+  void reconstruct();
+  void selectData();
+  void currentDataComboIndexChanged(const QString& text);
+
+private:
+    ReconstructerPtr mReconstructer;
+
+    QString mInputFile;
+
+    QComboBox* mDataComboBox;
+    QToolButton* mSelectDataButton;
+    QPushButton* mReconstructButton;
+    QAction* mSelectDataAction;
+
+    QString getCurrentPath();
+    void updateComboBox();
 };
 
 }//namespace

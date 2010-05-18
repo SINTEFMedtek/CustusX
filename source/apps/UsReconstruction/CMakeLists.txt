@@ -7,21 +7,21 @@ endif(COMMAND cmake_policy)
 find_package(SSC REQUIRED)
 include (${SSC_USE_FILE})
 
-SET( QT_MOC_HEADER_FILES
-    )
-
 # library
 SET( SOURCE_FILES
     main.cpp
+    sscMainWindow.cpp
 	) 
 	
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
 
-QT4_WRAP_CPP( MOC_HEADER_FILES ${QT_MOC_HEADER_FILES} )
+QT4_ADD_RESOURCES(SOURCE_FILES ../../gui/cxResources.qrc)
+
+QT4_WRAP_CPP( SOURCE_FILES sscMainWindow.h )
 	
 # =========================================================
 # create the target
-add_executable( sscUsReconstruction MACOSX_BUNDLE ${MOC_HEADER_FILES} ${SOURCE_FILES} )
+add_executable( sscUsReconstruction MACOSX_BUNDLE ${SOURCE_FILES} )
 target_link_libraries( sscUsReconstruction sscUsReconstructionLib )
 # =========================================================
 
