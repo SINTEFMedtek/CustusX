@@ -5,6 +5,8 @@ ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
 
 SET(cxProject_MOC_HDRS
   cxMainWindow.h
+  cxFileCopied.h
+  cxPatientData.h
   cxMessageManager.h
   cxCustomStatusBar.h
   cxContextDockWidget.h
@@ -40,6 +42,8 @@ QT4_ADD_RESOURCES(cxProject_RCC_SRCS ${cxProject_RCCS})
 SET(${LIBNAME}_SRCS 
     cxMainWindow.h
     cxMainWindow.cpp 
+    cxFileCopied.cpp
+    cxPatientData.cpp
     cxMessageManager.h
     cxMessageManager.cpp
     cxCustomStatusBar.h
