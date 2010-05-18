@@ -3,11 +3,10 @@
 
 #include <vector>
 #include <QtGui>
+#include "sscHelperWidgets.h"
 
 namespace cx
 {
-
-class SliderGroupWidget;
 
 /**
  * \class ImagePropertiesWidget
@@ -36,8 +35,8 @@ protected:
 private:
   ImagePropertiesWidget();
 
-  SliderGroupWidget* mLevelWidget;
-  SliderGroupWidget* mWindowWidget;
+  ssc::SliderGroupWidget* mLevelWidget;
+  ssc::SliderGroupWidget* mWindowWidget;
   QLabel* mImageNameLabel;
 };
 

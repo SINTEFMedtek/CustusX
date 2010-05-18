@@ -6,9 +6,44 @@
 
 #include "sscReconstructionWidget.h"
 #include "sscTypeConversions.h"
+#include "cxDataInterface.h"
 
 namespace ssc 
 {
+
+
+DoubleDataInterfaceMaxUSVolumeSize::DoubleDataInterfaceMaxUSVolumeSize(ReconstructerPtr reconstructer) :
+    mFactor(1024*1024), mReconstructer(reconstructer)
+{
+  //connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  //dominantToolChangedSlot();
+}
+
+double DoubleDataInterfaceMaxUSVolumeSize::getValue() const
+{
+  return mReconstructer->getMaxOutputVolumeSize();
+}
+
+bool DoubleDataInterfaceMaxUSVolumeSize::setValue(double val)
+{
+  if (similar(val, mReconstructer->getMaxOutputVolumeSize()))
+    return false;
+
+  mReconstructer->setMaxOutputVolumeSize(val);
+  emit changed();
+  return true;
+}
+
+ssc::DoubleRange DoubleDataInterfaceMaxUSVolumeSize::getValueRange() const
+{
+  return ssc::DoubleRange(mFactor,mFactor*500,mFactor);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   QWidget(parent),
   mReconstructer(new Reconstructer())
@@ -49,9 +84,13 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   mReconstructButton = new QPushButton("Reconstruct", this);
   connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
+  QGridLayout* gridLayout = new QGridLayout;
+  mMaxVolSizeWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceMaxUSVolumeSize(mReconstructer)), gridLayout, 0);
+
   topLayout->addLayout(dataLayout);
   dataLayout->addWidget(mDataComboBox);
   dataLayout->addWidget(mSelectDataButton);
+  topLayout->addLayout(gridLayout);
   topLayout->addWidget(mReconstructButton);
   topLayout->addStretch();
 }

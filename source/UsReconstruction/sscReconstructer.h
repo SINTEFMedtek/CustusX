@@ -24,6 +24,10 @@ public:
   Reconstructer();
   ImagePtr reconstruct(QString mhdFileName, QString calFileName);
   ImagePtr getOutput();
+
+  long getMaxOutputVolumeSize() const;
+  void setMaxOutputVolumeSize(long val);
+
 private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
   QString changeExtension(QString name, QString ext);

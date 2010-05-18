@@ -23,6 +23,16 @@ Reconstructer::Reconstructer() :
   mAlgorithm(new ThunderVNNReconstructAlgorithm),
   mMaxVolumeSize(256*256*256)
 {}
+
+long Reconstructer::getMaxOutputVolumeSize() const
+{
+  return mMaxVolumeSize;
+}
+
+void Reconstructer::setMaxOutputVolumeSize(long val)
+{
+  mMaxVolumeSize = val;
+}
   
 QString Reconstructer::changeExtension(QString name, QString ext)
 {

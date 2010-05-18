@@ -43,8 +43,8 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   QGridLayout* gridLayout = new QGridLayout(group2D);
   //toptopLayout->addLayout(gridLayout);
 
-  mLevelWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DLevel), gridLayout, 0);
-  mWindowWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DWindow), gridLayout, 1);
+  mLevelWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DLevel), gridLayout, 0);
+  mWindowWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DWindow), gridLayout, 1);
 
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
   updateSlot();
