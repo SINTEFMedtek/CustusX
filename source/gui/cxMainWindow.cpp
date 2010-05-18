@@ -25,135 +25,10 @@
 #include "cxImagePropertiesWidget.h"
 #include "cxPointSamplingWidget.h"
 #include "sscReconstructionWidget.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
-
-FileCopied::FileCopied(const std::string& absolutefilePath, const std::string& relativefilePath, ssc::DataPtr data) :
-  mFilePath(absolutefilePath),
-  mRelativeFilePath(relativefilePath),
-  mData(data)
-{}
-  
-void FileCopied::areFileCopiedSlot()
-{
-  //messageMan()->sendInfo("Check if file is copied: "+mFilePath);
-  
-  QFile file(QString::fromStdString(mFilePath));
-  
-  bool correctCopy = false;
-  QFileInfo fileInfo(mFilePath.c_str());
-  QString fileType = fileInfo.suffix();
-  
-  if (!file.exists() || !file.open(QIODevice::NotOpen|QIODevice::ReadOnly))
-  {
-    messageManager()->sendWarning("File is not copied: "+mFilePath+" Cannot open file.");
-    file.close();
-    QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));// Wait another 5 seconds
-  }
-  else if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-          fileType.compare("mha", Qt::CaseInsensitive) == 0)
-  {
-    bool foundDimSize = false;
-    bool foundElementType = false;
-    // Parse file to check if copied correctly
-    QTextStream stream(&file);
-    QString sLine;
-    QRegExp rx("([\\d\\.]+)\\s+([\\d\\.]+)\\s+([\\d\\.]+)");
-    QRegExp rxDimSize("DimSize =");
-    QRegExp rxElementType("ElementType = ");
-    int numElements = 0;
-    bool end = false;
-    int elementSize = 1;
-    
-    while ( !end && !stream.atEnd() )
-    {
-      sLine = stream.readLine(); // line of text excluding '\n'
-      if(sLine.isEmpty())
-        end = true;
-      //messageMan()->sendInfo("line: "+sLine.toStdString());
-      {
-        rxDimSize.indexIn(sLine);
-        if ( rxDimSize.pos() != -1 )
-        {
-          rx.indexIn(sLine);
-          rx.pos();
-          QStringList list = rx.capturedTexts();
-          numElements = list[1].toInt() * list[2].toInt() * list[3].toInt();
-          foundDimSize = true;
-        }
-        rxElementType.indexIn(sLine);
-        if ( rxElementType.pos() != -1 )
-        {
-          rx.indexIn(sLine);
-          rx.pos();
-          QString elementType = rx.cap();
-          messageManager()->sendInfo("ElementType: "+elementType.toStdString());
-          if(elementType=="MET_USHORT") //16 bit
-            elementSize = 2;
-          else if(elementType=="MET_SHORT")
-            elementSize = 2;
-          else // 8 bit
-            elementSize = 1;
-          foundElementType = true;
-        }
-        if(foundDimSize && foundElementType)
-          end = true;
-      }
-    }
-    if(!file.flush())
-      messageManager()->sendWarning("Flush error");
-    file.close();
-    
-    if (!foundDimSize)
-    {
-      messageManager()->sendWarning("File is not copied correctly: "+mFilePath+" Parts missing");
-    }
-    else
-    {
-      QRegExp rxFileype;
-      QString rawFilepath = QString::fromStdString(mFilePath);
-      if(rawFilepath.endsWith(".mhd"))
-        rxFileype.setPattern("\\.mhd");
-      else if(rawFilepath.endsWith(".mha"))
-        rxFileype.setPattern("\\.mha");
-      rawFilepath = rawFilepath.replace(rxFileype, ".raw");
-      QFile rawFile(rawFilepath);
-      rawFile.open(QIODevice::ReadOnly);
-      
-      //Test if raw file is large enough
-      if(rawFile.bytesAvailable() < (numElements * elementSize))
-        messageManager()->sendWarning("File is not copied correctly: "+rawFilepath.toStdString()+" Parts missing");
-      else
-        correctCopy = true;
-      
-    }
-  }
-  else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
-  {
-    //TODO: Check intergity of file
-    correctCopy = true;
-  }
-  else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-  {
-    //TODO: Check intergity of file
-    correctCopy = true;
-  }
-  
-  if(!correctCopy)
-  {
-    messageManager()->sendWarning("File(s) not copied correctly - wait another 5 seconds");
-    QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));
-  }
-  else
-  {
-    messageManager()->sendInfo("File copied correctly: "+mFilePath);
-    mData->setFilePath(mRelativeFilePath); // Update file path
-    
-    //Save patient, to avoid problems
-    emit fileCopiedCorrectly();
-  }
-}
   
 MainWindow::MainWindow() :
   mCurrentWorkflowState(PATIENT_DATA),
@@ -180,7 +55,8 @@ MainWindow::MainWindow() :
   mPatientRegistrationIndex(-1),
   mNavigationIndex(-1),
   mSettings(new QSettings()),
-  mActivePatientFolder("")
+  mPatientData(new PatientData(this))
+  //mActivePatientFolder("")
 {
 #ifdef VERSION_NUMBER
   this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER));
@@ -419,11 +295,89 @@ void MainWindow::centerToTooltipSlot()
   Navigation().centerToTooltip();
 }
 
-void MainWindow::setActivePatient(const QString& activePatientFolder)
+//void MainWindow::setActivePatient(const QString& activePatientFolder)
+//{
+//  mActivePatientFolder = activePatientFolder;
+//  //TODO
+//  //Update gui in some way to show which patient is active
+//}
+
+void MainWindow::newPatientSlot()
 {
-  mActivePatientFolder = activePatientFolder;
-  //TODO
-  //Update gui in some way to show which patient is active
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
+  //name += "_";
+  name += mSettings->value("globalApplicationName").toString() + "_";
+  //name += "_";
+  name += mSettings->value("globalPatientNumber").toString() + ".cx3";
+  //name += ".cx3";
+
+
+  // Create folders
+  if(!QDir().exists(patientDatafolder))
+  {
+    QDir().mkdir(patientDatafolder);
+    messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
+  }
+
+  QString choosenDir = patientDatafolder + "/" + name;
+  //choosenDir += "/";
+  //choosenDir += name;
+  // Open file dialog, get patient data folder
+  choosenDir = QFileDialog::getSaveFileName(this,
+                                            tr("Select directory to save patient in"),
+                                            choosenDir);
+  if (choosenDir == QString::null)
+    return; // On cancel
+
+  // Update global patient number
+  int patientNumber = mSettings->value("globalPatientNumber").toInt();
+  mSettings->setValue("globalPatientNumber", ++patientNumber);
+
+//  createPatientFolders(choosenDir);
+  mPatientData->newPatient(choosenDir);
+}
+
+void MainWindow::savePatientFileSlot()
+{
+  if(mPatientData->getActivePatientFolder().isEmpty())
+  {
+    messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+    this->newPatientSlot();
+    return;
+  }
+
+  mPatientData->savePatient();
+}
+
+void MainWindow::loadPatientFileSlot()
+{
+  // Open file dialog
+  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
+                                                         mSettings->value("globalPatientDataFolder").toString(),
+                                                         QFileDialog::ShowDirsOnly);
+  if (choosenDir == QString::null)
+    return; // On cancel
+
+  mPatientData->loadPatient(choosenDir);
+}
+
+void MainWindow::importDataSlot()
+{
+  this->savePatientFileSlot();
+
+  messageManager()->sendInfo("Importing data...");
+  QString fileName = QFileDialog::getOpenFileName( this,
+                                  QString(tr("Select data file")),
+                                  mSettings->value("globalPatientDataFolder").toString(),
+                                  tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
+  if(fileName.isEmpty())
+  {
+    messageManager()->sendInfo("Import canceled");
+    return;
+  }
+
+  mPatientData->importData(fileName);
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -514,15 +468,9 @@ void MainWindow::createMenus()
 
   //layout
   this->menuBar()->addMenu(mLayoutMenu);
-//  QList<QAction*> layouts = mLayoutActionGroup->actions();
-//  for (int i=0; i<layouts.size(); ++i)
-//    mLayoutMenu->addActions(layouts[i]);
   mLayoutMenu->addActions(mLayoutActionGroup->actions());
-//  mLayoutMenu->addAction(m3D_1x1_LayoutAction);
-//  mLayoutMenu->addAction(m3DACS_2x2_LayoutAction);
-//  mLayoutMenu->addAction(m3DACS_1x3_LayoutAction);
-//  mLayoutMenu->addAction(mACSACS_2x3_LayoutAction);
 }
+
 void MainWindow::createToolBars()
 {
   mDataToolBar = addToolBar("Data");
@@ -544,90 +492,7 @@ void MainWindow::createStatusBar()
   //TODO, not working as intended
   this->setStatusBar(mCustomStatusBar);
 }
-/**
- * Xml version 1.0: Knows about the nodes: \n
- * \<managers\> \n
- *   \<datamanager\> \n
- *     \<image\> \n
- *        \<uid\> //an images unique id \n
- *        \<name\> //an images name \n
- *        \<transferfunctions\> //an images transferefunction \n
- *            \<alpha\> //a transferefunctions alpha values \n
- *            \<color\> //a transferefunctions color values
- */
-/**
- * Xml version 2.0: Knows about the nodes: \n
- * \<patient\> \n
- *  \<active_patient\> //relative path to this patients folder \n
- *  \<managers\> \n
- *     \<datamanager\> \n
- *       \<image\> \n
- *         \<uid\> //an images unique id \n
- *         \<name\> //an images name \n
- *         \<transferfunctions\> //an images transferefunction \n
- *            \<alpha\> //a transferefunctions alpha values \n
- *            \<color\> //a transferefunctions color values \n
- */
-void MainWindow::generateSaveDoc(QDomDocument& doc)
-{
-  doc.appendChild(doc.createProcessingInstruction("xml version =", "'2.0'"));
 
-  QDomElement patientNode = doc.createElement("patient");
-  QDomElement activePatientNode = doc.createElement("active_patient");
-  activePatientNode.appendChild(doc.createTextNode(mActivePatientFolder.toStdString().c_str()));
-  patientNode.appendChild(activePatientNode);
-  doc.appendChild(patientNode);
-
-  QDomElement managerNode = doc.createElement("managers");
-  patientNode.appendChild(managerNode);
-
-  dataManager()->addXml(managerNode);
-  toolManager()->addXml(managerNode);
-  viewManager()->addXml(managerNode);
-  registrationManager()->addXml(managerNode);
-
-  //TODO Implement
-  /*
-  messageManager()->getXml(doc); //TODO
-  repManager->getXml(doc); //TODO
-  */
-
-  messageManager()->sendInfo("Xml file ready to be written to disk.");
-}
-void MainWindow::readLoadDoc(QDomDocument& doc)
-{
-  //Get all the nodes
-  QDomNode patientNode = doc.namedItem("patient");
-  QDomNode managerNode = patientNode.namedItem("managers");
-
-  //Evaluate the xml nodes and load what's needed
-  QDomNode dataManagerNode = managerNode.namedItem("datamanager");
-  if(!patientNode.isNull())
-  {
-    QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
-    if(!activePatientNode.isNull())
-    {
-      //mActivePatientFolder = activePatientNode.text();
-      this->setActivePatient(activePatientNode.text());
-      messageManager()->sendInfo("Active patient loaded to be "
-                                +mActivePatientFolder.toStdString());
-    }
-  }
-  if (!dataManagerNode.isNull())
-  {    
-    QString absolutePatientPath = mSettings->value("globalPatientDataFolder").toString()+"/"+mActivePatientFolder;
-    dataManager()->parseXml(dataManagerNode, absolutePatientPath);
-  }
-
-  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-  toolManager()->parseXml(toolmanagerNode);
-
-  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-  viewManager()->parseXml(viewmanagerNode);
-
-  QDomNode registrationNode = managerNode.namedItem("registrationManager");
-  registrationManager()->parseXml(registrationNode);
-}
 
 void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
 {
@@ -693,7 +558,7 @@ void MainWindow::activateImageRegistationState()
 {  
   QString imagesPath = 
     mSettings->value("globalPatientDataFolder").toString()+
-    "/"+mActivePatientFolder+"/Images";
+    "/"+mPatientData->getActivePatientFolder()+"/Images";
   mShiftCorrectionWidget->init(imagesPath);
   //TODO: Finish ShiftCorrection
   //Don't show ShiftCorrection in release
@@ -780,50 +645,6 @@ void MainWindow::activateUSAcquisitionState()
 void MainWindow::deactivateUSAcquisitionState()
 {}
   
-void MainWindow::createPatientFolders(QString choosenDir)
-{
-  if(!choosenDir.endsWith(".cx3"))
-    choosenDir.append(".cx3");
-  
-  // Set active patient folder. Use path relative to the globalPatientDataFolder
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
-  QDir patientDataDir(patientDatafolder);
-  //mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
-  this->setActivePatient(patientDataDir.relativeFilePath(choosenDir));
-  messageManager()->sendInfo("Selected a patient to work with.");
-  
-  // Create folders
-  if(!QDir().exists(choosenDir))
-  {
-    QDir().mkdir(choosenDir);
-    messageManager()->sendInfo("Made a new patient folder: "+choosenDir.toStdString());
-  }
-  
-  QString newDir = choosenDir;
-  newDir.append("/Images"); 
-  if(!QDir().exists(newDir))
-  {
-    QDir().mkdir(newDir);
-    messageManager()->sendInfo("Made a new image folder: "+newDir.toStdString());
-  }
-  
-  newDir = choosenDir;
-  newDir.append("/Surfaces"); 
-  if(!QDir().exists(newDir))
-  {
-    QDir().mkdir(newDir);
-    messageManager()->sendInfo("Made a new surface folder: "+newDir.toStdString());
-  }
-  
-  newDir = choosenDir;
-  newDir.append("/Logs"); 
-  if(!QDir().exists(newDir))
-  {
-    QDir().mkdir(newDir);
-    messageManager()->sendInfo("Made a new logging folder: "+newDir.toStdString());
-  }
-  this->savePatientFileSlot();
-}
   
 void MainWindow::aboutSlot()
 {
@@ -846,113 +667,6 @@ void MainWindow::quitSlot()
   //TODO
 }  
   
-void MainWindow::newPatientSlot()
-{  
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
-  QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
-  //name += "_";
-  name += mSettings->value("globalApplicationName").toString() + "_";
-  //name += "_";
-  name += mSettings->value("globalPatientNumber").toString() + ".cx3";
-  //name += ".cx3";
-  
-  
-  // Create folders
-  if(!QDir().exists(patientDatafolder))
-  {
-    QDir().mkdir(patientDatafolder);
-    messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
-  }
-  
-  QString choosenDir = patientDatafolder + "/" + name;
-  //choosenDir += "/";
-  //choosenDir += name;
-  // Open file dialog, get patient data folder
-  choosenDir = QFileDialog::getSaveFileName(this, 
-                                            tr("Select directory to save patient in"),
-                                            choosenDir);
-  if (choosenDir == QString::null)
-    return; // On cancel
-  
-  // Update global patient number
-  int patientNumber = mSettings->value("globalPatientNumber").toInt();
-  mSettings->setValue("globalPatientNumber", ++patientNumber);
-  
-  createPatientFolders(choosenDir);
-}
-
-void MainWindow::loadPatientFileSlot()
-{
-  // Open file dialog
-  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                         mSettings->value("globalPatientDataFolder").toString(),
-                                                         QFileDialog::ShowDirsOnly);
-  if (choosenDir == QString::null)
-    return; // On cancel
-  
-  // Set active patient folder, relative to globalPatientDataFolder
-  QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString());
-  //mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
-  this->setActivePatient(patientDataDir.relativeFilePath(choosenDir));
-  
-  QFile file(choosenDir+"/custusdoc.xml");
-  if(file.open(QIODevice::ReadOnly))
-  {    
-    QDomDocument doc;
-    QString emsg;
-    int eline, ecolumn;
-    // Read the file
-    if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
-    {
-      messageManager()->sendError("Could not parse XML file :"
-                                 +file.fileName().toStdString()+" because: "
-                                 +emsg.toStdString()+"");
-    }
-    else
-    {
-      //Read the xml
-      this->readLoadDoc(doc);
-    }
-    file.close();
-  }
-  else //User have created the directory create xml file and folders
-  {
-    createPatientFolders(choosenDir);
-  }
-}
-void MainWindow::savePatientFileSlot()
-{
-  
-  if(mActivePatientFolder.isEmpty())
-  {
-    messageManager()->sendWarning("No patient selected, select or create patient before saving!");
-    this->newPatientSlot();
-    return;
-  }
-  
-  //Gather all the information that needs to be saved
-  QDomDocument doc;
-  this->generateSaveDoc(doc);
-
-  QString activePatientDir = mSettings->value("globalPatientDataFolder").toString();
-  activePatientDir += "/"+mActivePatientFolder;
-  QFile file(activePatientDir + "/custusdoc.xml");
-  if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-  {
-    QTextStream stream(&file);
-    stream << doc.toString();
-    file.close();
-    messageManager()->sendInfo("Created "+file.fileName().toStdString());
-  }
-  else
-  {
-    messageManager()->sendError("Could not open "+file.fileName().toStdString()
-                               +" Error: "+file.errorString().toStdString());
-  }
-
-  //Write the data to file, fx modified images... etc...
-  //TODO Implement when we know what we want to save here...
-}
 void MainWindow::patientDataWorkflowSlot()
 {
   this->changeState(mCurrentWorkflowState, PATIENT_DATA);
@@ -972,133 +686,6 @@ void MainWindow::navigationWorkflowSlot()
 void MainWindow::usAcquisitionWorkflowSlot()
 {
   this->changeState(mCurrentWorkflowState, US_ACQUISITION);
-}
-void MainWindow::importDataSlot()
-{
-  this->savePatientFileSlot();
-
-  messageManager()->sendInfo("Importing data...");
-  QString fileName = QFileDialog::getOpenFileName( this,
-                                  QString(tr("Select data file")),
-                                  mSettings->value("globalPatientDataFolder").toString(),
-                                  tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
-  if(fileName.isEmpty())
-  {
-    messageManager()->sendInfo("Import canceled");
-    return;
-  }
-
-  QString globalPatientFolderPath = mSettings->value("globalPatientDataFolder").toString();
-  QString patientsImageFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Images/";
-  QString patientsSurfaceFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Surfaces/";
-
-  QDir dir;
-  if(!dir.exists(patientsImageFolder))
-  {
-    dir.mkpath(patientsImageFolder);
-    messageManager()->sendInfo("Made new directory: "+patientsImageFolder.toStdString());
-  }
-  if(!dir.exists(patientsSurfaceFolder))
-  {
-    dir.mkpath(patientsSurfaceFolder);
-    messageManager()->sendInfo("Made new directory: "+patientsSurfaceFolder.toStdString());
-  }
-
-  QFileInfo fileInfo(fileName);
-  QString fileType = fileInfo.suffix();
-  QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
-  QFile fromFile(fileName);
-  QString uid = fileInfo.fileName()+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
-
-  //Need to wait for the copy to finish...
-  
-  // Read files before copy
-  ssc::DataPtr data;
-  
-  if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-     fileType.compare("mha", Qt::CaseInsensitive) == 0)
-  {
-    data = dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
-  }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
-  {
-    data = dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtSTL);
-    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
-  }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-  {
-    data = dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtPOLYDATA);
-    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
-  }
-  data->setName(fileInfo.fileName().toStdString());
-  
-  QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString()
-                      +"/"+mActivePatientFolder);
-  FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(), 
-                                          patientDataDir.relativeFilePath(pathToNewFile).toStdString(), 
-                                          data);
-  connect(fileCopied, SIGNAL(fileCopiedCorrectly()), 
-          this, SLOT(savePatientFileSlot()));
-  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
-    
-  //Copy file
-  if(fileName != pathToNewFile) //checks if we need to copy
-  {
-    QFile toFile(pathToNewFile);
-    if(fromFile.copy(toFile.fileName()))
-    {
-      //messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-    }else
-    {
-      messageManager()->sendError("First copy failed!");
-      return;
-    }
-    if(!toFile.flush())
-      messageManager()->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
-    if(!toFile.exists())
-      messageManager()->sendWarning("File not copied");
-    //make sure we also copy the .raw file in case if mhd/mha
-    if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
-    {
-      //presuming the other file is a raw file
-      //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".mhd", ".raw");
-      QString newRawFile = pathToNewFile.replace(".mhd", ".raw");
-      fromFile.setFileName(originalRawFile);
-      toFile.setFileName(newRawFile);
-      
-      if(fromFile.copy(toFile.fileName()))
-      {
-        //messageMan()->sendInfo("File copied to new location: "+newRawFile.toStdString());
-      }
-      else
-      {
-        messageManager()->sendError("Second copy failed!");
-        return;
-      }
-      if(!toFile.flush())
-        messageManager()->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
-      if(!toFile.exists())
-        messageManager()->sendWarning("File not copied");
-      
-    }else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
-    {
-      //presuming the other file is a raw file
-      //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".mha", ".raw");
-      QString newRawFile = pathToNewFile.replace(".mha", ".raw");
-      fromFile.setFileName(originalRawFile);
-      toFile.setFileName(newRawFile);
-      
-      if(fromFile.copy(toFile.fileName()))
-      {
-        //messageMan()->sendInfo("File copied to new location: "+newRawFile.toStdString());
-      }
-      else
-      {
-        messageManager()->sendError("Second copy failed!");
-        return;
-      }
-    }
-  }
 }
   
 void MainWindow::deleteDataSlot()
@@ -1170,7 +757,7 @@ void MainWindow::configureSlot()
   toolManager()->setConfigurationFile(configFile.toStdString());
 
   QString loggingPath = mSettings->value("globalPatientDataFolder").toString()
-                        +"/"+mActivePatientFolder+"/Logs/";
+                        +"/"+mPatientData->getActivePatientFolder()+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {

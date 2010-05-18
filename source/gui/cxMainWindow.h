@@ -19,6 +19,8 @@ namespace ssc
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientData> PatientDataPtr;
+
 class CustomStatusBar;
 class ContextDockWidget;
 class TransferFunctionWidget;
@@ -28,32 +30,7 @@ class ImageRegistrationWidget;
 class PatientRegistrationWidget;
 class ShiftCorrectionWidget;
 
-/** \class FileCopied
- *
- * \brief This is a helper class for MainWindow::importDataSlot(). 
- * Contain a slot that checks if a file is finished copying and updates the 
- * ssc:Image object
- *
- * \date Feb 8, 2010
- * \author Ole Vegard Solberg, SINTEF
- */
-class FileCopied : public QObject
-{
-  Q_OBJECT
-public:
-  FileCopied(const std::string& absolutefilePath, 
-             const std::string& relativefilePath, 
-             ssc::DataPtr data);///< Creates the object
-  
-signals:
-  void fileCopiedCorrectly();///< Sends a signal when the copy is verified
-protected:
-  std::string mFilePath;
-  std::string mRelativeFilePath;
-  ssc::DataPtr mData;
-public slots:
-  void areFileCopiedSlot();///< Checks if the file is finished copying and updates the ssc::Image
-};
+
  
 /**
  * \class MainWindow
@@ -129,12 +106,12 @@ protected:
 
   void addAsDockWidget(QWidget* widget);
 
-  //patient
-  void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (relative to the globalPatientDataFolder)
-
-  //saving/loading
-  void generateSaveDoc(QDomDocument& doc);
-  void readLoadDoc(QDomDocument& loadDoc);
+//  //patient
+//  void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (relative to the globalPatientDataFolder)
+//
+//  //saving/loading
+//  void generateSaveDoc(QDomDocument& doc);
+//  void readLoadDoc(QDomDocument& loadDoc);
 
   //Takes care of removing and adding widgets depending on which workflow state the system is in
   void changeState(WorkflowState fromState, WorkflowState toState); ///< used to change state
@@ -149,7 +126,7 @@ protected:
   void activateUSAcquisitionState(); ///< Should only be used by changeState(...)!
   void deactivateUSAcquisitionState(); ///< Should only be used by changeState(...)!
   
-  void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
+//  void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
   QAction* addLayoutAction(LayoutType layout);
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
@@ -229,9 +206,10 @@ protected:
 
   //Preferences
   QSettings* mSettings; ///< Object for storing all program/user specific settings
-  
-  //Patient
-  QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
+
+  PatientDataPtr mPatientData;
+//  //Patient
+//  QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
   
 };
 }//namespace cx
