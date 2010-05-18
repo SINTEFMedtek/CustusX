@@ -72,6 +72,7 @@ public:
 
 	// images
 	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
+  virtual void loadImage(ImagePtr image);
 	virtual ImagePtr getImage(const std::string& uid);
 	virtual std::map<std::string, ImagePtr> getImages();
 

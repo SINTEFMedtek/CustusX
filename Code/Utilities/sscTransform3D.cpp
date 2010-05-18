@@ -29,8 +29,13 @@ Transform3D::Transform3D(vtkMatrix4x4* m)
 	mMatrix = vtkMatrix4x4Ptr(m);
 }
 
-Transform3D Transform3D::fromString(const QString& text, bool* ok)
+Transform3D Transform3D::fromString(const QString& text, bool* _ok)
 {
+  bool okval = false; // if input _ok is null, we still need a flag
+  bool* ok = &okval;
+  if (_ok)
+    ok = _ok;
+
   std::vector<double> raw = convertQString2DoubleVector(text, ok);
   if (raw.size()!=16)
     *ok = false;

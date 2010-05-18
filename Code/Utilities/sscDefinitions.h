@@ -29,4 +29,6 @@ namespace ssc
 	};
 } //namespace end
 
+//#include "sscDefinitionStrings.h"
+
 #endif /*SSCDEFINITIONS_H_*/

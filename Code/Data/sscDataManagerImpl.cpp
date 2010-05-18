@@ -262,12 +262,17 @@ ImagePtr DataManagerImpl::loadImage(const std::string& uid, const std::string& f
 
 	// identify type
 	ImagePtr current = mImageReaders[type]->load(uid, filename);
-	if (current)
-	{
-		mImages[current->getUid()] = current;
-		emit dataLoaded();
-	}
+	this->loadImage(current);
 	return current;
+}
+
+void DataManagerImpl::loadImage(ImagePtr image)
+{
+  if (image)
+  {
+    mImages[image->getUid()] = image;
+    emit dataLoaded();
+  }
 }
 
 // meshes
