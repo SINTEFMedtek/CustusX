@@ -53,6 +53,7 @@ signals:
   void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
 
 protected slots:
+  void patientChangedSlot();
   //application menu
   void aboutSlot(); ///< TODO
   void preferencesSlot();

@@ -31,6 +31,7 @@ public:
   PatientData(QObject* parent);
   virtual ~PatientData() {}
 
+  QString getActivePatientFullPath() const;
   QString getActivePatientFolder() const;
 
 public slots:
@@ -38,6 +39,9 @@ public slots:
   void loadPatient(QString chosenDir);
   void importData(QString fileName);
   void savePatient();///< Save all application data to XML file
+
+signals:
+  void patientChanged();
 
 private:
   //patient

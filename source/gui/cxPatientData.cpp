@@ -34,11 +34,20 @@ QString PatientData::getActivePatientFolder() const
   return mActivePatientFolder;
 }
 
+QString PatientData::getActivePatientFullPath() const
+{
+  return mSettings->value("globalPatientDataFolder").toString()
+      + "/"+this->getActivePatientFolder();
+}
+
+
 void PatientData::setActivePatient(const QString& activePatientFolder)
 {
   mActivePatientFolder = activePatientFolder;
   //TODO
   //Update gui in some way to show which patient is active
+
+  emit patientChanged();
 }
 
 void PatientData::newPatient(QString choosenDir)
