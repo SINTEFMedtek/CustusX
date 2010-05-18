@@ -384,7 +384,7 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
+//  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
 }
 
 /** Called when the layout is changed: update the layout menu

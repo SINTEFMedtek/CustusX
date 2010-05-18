@@ -10,11 +10,10 @@
 #include <vector>
 #include <QtGui>
 #include "sscForwardDeclarations.h"
+#include "sscHelperWidgets.h"
 
 namespace cx
 {
-
-class SliderGroupWidget;
 
 /**
  * \class ToolPropertiesWidget
@@ -47,7 +46,7 @@ private:
   ssc::ToolPtr mReferenceTool;
   ssc::ToolPtr mActiveTool;
 
-  SliderGroupWidget* mToolOffsetWidget;
+  ssc::SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;

@@ -66,12 +66,12 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
 
-  mToolOffsetWidget = new SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceActiveToolOffset), gridLayout, 0);
+  mToolOffsetWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceActiveToolOffset), gridLayout, 0);
 
-  void configured(); ///< signal emitted when the system is configured
-  void initialized(); ///< signal emitted when the system is initialized
-  void trackingStarted(); ///< signal emitted when the system starts tracking
-  void trackingStopped(); ///< signal emitted when the system stops tracking
+//  void configured(); ///< signal emitted when the system is configured
+//  void initialized(); ///< signal emitted when the system is initialized
+//  void trackingStarted(); ///< signal emitted when the system starts tracking
+//  void trackingStopped(); ///< signal emitted when the system stops tracking
 
   connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
   connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
