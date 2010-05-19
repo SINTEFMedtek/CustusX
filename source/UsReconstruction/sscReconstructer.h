@@ -8,6 +8,7 @@
 #define SSCRECONSTRUCTER_H_
 
 #include <QObject>
+#include <math.h>
 #include "sscReconstructAlgorithm.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
@@ -16,6 +17,104 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
 {
+
+/** Helper struct for sending and controlling output volume properties.
+ */
+class OutputVolumeParams
+{
+public:
+  // constants, set only based on input data
+  ssc::DoubleBoundingBox3D mExtent;
+  double mInputSpacing;
+  ssc::Vector3D mInputDim;
+
+  OutputVolumeParams() :
+    mExtent(0,0,0,0,0,0),
+    mInputSpacing(0),
+    mInputDim(0,0,0),
+    mMaxVolumeSize(0)
+  {
+  }
+  /** Initialize the volue parameters with sensible defaults.
+   */
+  OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing, ssc::Vector3D inputDim) :
+    mExtent(extent),
+    mInputSpacing(inputSpacing),
+    mInputDim(inputDim),
+    mMaxVolumeSize(1024*1024*16)
+  {
+    setSpacing(mInputSpacing);
+  }
+
+  unsigned long getVolumeSize() const
+  {
+    return mDim[0]*mDim[1]*mDim[2];;
+  }
+
+  /** Set a spacing, recalculate dimensions.
+   */
+  void setSpacing(double spacing)
+  {
+    mSpacing = spacing;
+    mDim = mExtent.range() / mSpacing;
+  }
+  double getSpacing() const
+  {
+    return mSpacing;
+  }
+  /** Set one of the dimensions explicitly, recalculate other dims and spacing.
+   */
+  void setDim(int index, int val)
+  {
+    //mSpacing = mExtent.range()[index] / val;
+    setSpacing(mExtent.range()[index] / val);
+  }
+  ssc::Vector3D getDim() const
+  {
+    return mDim;
+  }
+//
+//  /** Insert default values for output volume, given the input volume
+//   */
+//  void init()
+//  {
+//    mDim = mExtent.range() / mInputSpacing;
+//    mSpacing = inputSpacing;
+////    unsigned int xSize = bbSize[0] / inputSpacing;//floor
+////    unsigned int ySize = bbSize[1] / inputSpacing;
+////    unsigned int zSize = bbSize[2] / inputSpacing;
+//    std::cout << "Optimal inputSpacing: " << inputSpacing << std::endl;
+//    std::cout << "Optimal size: " << mDim << std::endl;
+//    std::cout << "bbSize: " << mExtent.range() << std::endl;
+//  }
+  /** Increase spacing in order to keep size below a max size
+   */
+  void constrainVolumeSize(double maxSize)
+  {
+    mMaxVolumeSize = maxSize;
+    // Reduce output volume size if optimal volume size is too large
+    unsigned long volumeSize = getVolumeSize();
+    if (volumeSize > mMaxVolumeSize)
+    {
+      double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
+      std::cout << "Downsampled volume - Used scaleFactor : " << scaleFactor << std::endl;
+      mDim /= scaleFactor;
+      mSpacing *= scaleFactor;
+    }
+//    ssc::Vector3D dim(xSize, ySize, zSize);
+//    ssc::Vector3D spacing(inputSpacing, inputSpacing, inputSpacing);
+  }
+  unsigned long getMaxVolumeSize() const
+  {
+    return mMaxVolumeSize;
+  }
+
+private:
+  // controllable data, set only using the setters
+  unsigned long mMaxVolumeSize;
+  double mSpacing;
+  ssc::Vector3D mDim;
+};
   
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 class Reconstructer : public QObject
@@ -39,6 +138,7 @@ private:
   std::vector<TimedPosition> mFrames;
   std::vector<TimedPosition> mPositions;
   ssc::DoubleBoundingBox3D mExtent; ///< extent of volume on output space
+  OutputVolumeParams mOutputVolumeParams;
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;

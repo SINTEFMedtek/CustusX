@@ -62,6 +62,7 @@ private:
     QToolButton* mSelectDataButton;
     QPushButton* mReconstructButton;
     QAction* mSelectDataAction;
+    QLineEdit* mExtentLineEdit;
     ssc::SliderGroupWidget* mMaxVolSizeWidget;
 
     QString getCurrentPath();
