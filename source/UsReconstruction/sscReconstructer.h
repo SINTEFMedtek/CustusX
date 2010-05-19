@@ -41,8 +41,9 @@ public:
     mExtent(extent),
     mInputSpacing(inputSpacing),
     mInputDim(inputDim),
-    mMaxVolumeSize(1024*1024*16)
+    mMaxVolumeSize(1024*1024*32)
   {
+    // Calculate optimal output image spacing and dimensions based on US frame spacing
     setSpacing(mInputSpacing);
   }
 
@@ -73,20 +74,6 @@ public:
   {
     return mDim;
   }
-//
-//  /** Insert default values for output volume, given the input volume
-//   */
-//  void init()
-//  {
-//    mDim = mExtent.range() / mInputSpacing;
-//    mSpacing = inputSpacing;
-////    unsigned int xSize = bbSize[0] / inputSpacing;//floor
-////    unsigned int ySize = bbSize[1] / inputSpacing;
-////    unsigned int zSize = bbSize[2] / inputSpacing;
-//    std::cout << "Optimal inputSpacing: " << inputSpacing << std::endl;
-//    std::cout << "Optimal size: " << mDim << std::endl;
-//    std::cout << "bbSize: " << mExtent.range() << std::endl;
-//  }
   /** Increase spacing in order to keep size below a max size
    */
   void constrainVolumeSize(double maxSize)
@@ -101,8 +88,6 @@ public:
       mDim /= scaleFactor;
       mSpacing *= scaleFactor;
     }
-//    ssc::Vector3D dim(xSize, ySize, zSize);
-//    ssc::Vector3D spacing(inputSpacing, inputSpacing, inputSpacing);
   }
   unsigned long getMaxVolumeSize() const
   {
@@ -142,7 +127,6 @@ private:
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;
-  unsigned long mMaxVolumeSize;///< Max volume size in bytes for output volume
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);

@@ -20,25 +20,23 @@ typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 namespace ssc
 {
 Reconstructer::Reconstructer() :
-  mAlgorithm(new ThunderVNNReconstructAlgorithm),
-  mMaxVolumeSize(256*256*256)
+  mAlgorithm(new ThunderVNNReconstructAlgorithm)
 {}
 
 long Reconstructer::getMaxOutputVolumeSize() const
 {
-  return mMaxVolumeSize;
+  return mOutputVolumeParams.getMaxVolumeSize();
 }
 
 void Reconstructer::setMaxOutputVolumeSize(long val)
 {
-  mMaxVolumeSize = val;
+  mOutputVolumeParams.constrainVolumeSize(val);
 }
 
 ssc::DoubleBoundingBox3D Reconstructer::getExtent() const
 {
   return mExtent;
 }
-
   
 QString Reconstructer::changeExtension(QString name, QString ext)
 {
@@ -466,7 +464,7 @@ void Reconstructer::findExtentAndOutputTransform()
   double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
                                  mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
   mOutputVolumeParams = OutputVolumeParams(mExtent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
-  mOutputVolumeParams.constrainVolumeSize(256*256*256);
+  mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
 }
   
 /**
@@ -475,38 +473,6 @@ void Reconstructer::findExtentAndOutputTransform()
  */
 ImagePtr Reconstructer::generateOutputVolume()
 {
-//  // Calculate optimal output image spacing and dimensions based on US frame spacing
-//  double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
-//                                 mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
-//  mOutputVolumeParams = OutputVolumeParams(mExtent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
-//  mOutputVolumeParams.constrainVolumeSize(256*256*256);
-  
-//  ssc::Vector3D bbSize = mExtent.range();
-//  // Calculate optimal output image spacing and dimensions based on US frame spacing
-//  double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
-//                                 mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
-//
-//  unsigned int xSize = bbSize[0] / inputSpacing;//floor
-//  unsigned int ySize = bbSize[1] / inputSpacing;
-//  unsigned int zSize = bbSize[2] / inputSpacing;
-//  std::cout << "Optimal inputSpacing: " << inputSpacing << std::endl;
-//  std::cout << "Optimal size: " << xSize << " " << ySize << " " << zSize << std::endl;
-//  std::cout << "bbSize: " << bbSize << std::endl;
-//
-//  // Reduce output volume size if optimal volume size is too large
-//  unsigned long volumeSize = xSize*ySize*zSize;
-//  if (volumeSize > mMaxVolumeSize)
-//  {
-//    double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
-//    std::cout << "Downsampled volume - Used scaleFactor : " << scaleFactor << std::endl;
-//    xSize /= scaleFactor;
-//    ySize /= scaleFactor;
-//    zSize /= scaleFactor;
-//    inputSpacing *= scaleFactor;
-//  }
-//
-//  ssc::Vector3D dim(xSize, ySize, zSize);
-//  ssc::Vector3D spacing(inputSpacing, inputSpacing, inputSpacing);
   ssc::Vector3D dim = mOutputVolumeParams.getDim();
   ssc::Vector3D spacing = ssc::Vector3D(1,1,1) * mOutputVolumeParams.getSpacing();
   
