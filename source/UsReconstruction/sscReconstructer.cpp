@@ -33,6 +33,12 @@ void Reconstructer::setMaxOutputVolumeSize(long val)
 {
   mMaxVolumeSize = val;
 }
+
+ssc::DoubleBoundingBox3D Reconstructer::getExtent() const
+{
+  return mExtent;
+}
+
   
 QString Reconstructer::changeExtension(QString name, QString ext)
 {
@@ -545,7 +551,7 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
   // mFrames: now mPos as usMpr
 
   this->findExtentAndOutputTransform();
-  mOutput = this->generateOutputVolume();
+//  mOutput = this->generateOutputVolume();
   //mPos in mFrames is now usMd
 }
 
@@ -556,6 +562,27 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   std::cout << "Use calibration file: " << calFileName << std::endl;
 
   this->readFiles(mhdFileName, calFileName);
+  mOutput = this->generateOutputVolume();
+
+  this->reconstruct();
+
+  //DataManager::getInstance()->loadImage(mOutput);
+
+  return mOutput;
+}
+
+void Reconstructer::reconstruct()
+{
+  if (mFrames.empty() || !mUsRaw)
+  {
+    std::cout << "Reconstruct failed: no data loaded" << std::endl;
+    return;
+  }
+
+  if (!mOutput)
+  {
+    mOutput = this->generateOutputVolume();
+  }
   
   // reconstruction expects the inverted matrix direction: give it that.
   std::vector<TimedPosition> mInvFrames = mFrames;
@@ -567,9 +594,8 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   std::cout << "Reconstruct time: " << pre.time().msecsTo(QDateTime::currentDateTime().time()) << std::endl;
 
   DataManager::getInstance()->loadImage(mOutput);
-  
-  return mOutput;
 }
+
  
   
 ImagePtr Reconstructer::getOutput()

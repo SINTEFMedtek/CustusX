@@ -23,11 +23,16 @@ class Reconstructer : public QObject
   Q_OBJECT
 public:
   Reconstructer();
-  ImagePtr reconstruct(QString mhdFileName, QString calFileName);
+
+  void readFiles(QString mhdFileName, QString calFileName);
+  void reconstruct(); // assumes readFiles has already been called
+
+  ImagePtr reconstruct(QString mhdFileName, QString calFileName); // do everything
   ImagePtr getOutput();
 
   long getMaxOutputVolumeSize() const;
   void setMaxOutputVolumeSize(long val);
+  ssc::DoubleBoundingBox3D getExtent() const; ///< extent of volume on output space
 
 private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
@@ -39,7 +44,6 @@ private:
   ReconstructAlgorithmPtr mAlgorithm;
   unsigned long mMaxVolumeSize;///< Max volume size in bytes for output volume
 
-  void readFiles(QString mhdFileName, QString calFileName);
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
   void readPositionFile(QString posFile, bool alsoReadTimestamps);

@@ -64,17 +64,18 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_z 280.0f*/
   
   //QString path = "/Users/olevs/data/UL_thunder/test/1/";
-  QString path = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  QString defFile = "ultrasoundSample5.mhd";
 
   //mInputFile = path + "UsAcq_1.mhd";
-  mInputFile = path + "ultrasoundSample5.mhd";
+  //mInputFile = path + "ultrasoundSample5.mhd";
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
   QHBoxLayout* dataLayout = new QHBoxLayout;
   mDataComboBox = new QComboBox(this);
   connect(mDataComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentDataComboIndexChanged(const QString&)));
-  this->updateComboBox();
+  //this->updateComboBox();
 
   mSelectDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Select data"), this);
   connect(mSelectDataAction, SIGNAL(triggered()), this, SLOT(selectData()));
@@ -93,14 +94,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   topLayout->addLayout(gridLayout);
   topLayout->addWidget(mReconstructButton);
   topLayout->addStretch();
+
+  this->selectData(defPath+defFile);
 }
 
 void ReconstructionWidget::currentDataComboIndexChanged(const QString& text)
 {
   QDir dir = QFileInfo(mInputFile).dir();
-  mInputFile = dir.filePath(text);
-  std::cout << "selected: " << mInputFile << std::endl;
-  mDataComboBox->setToolTip(mInputFile);
+  this->selectData(dir.filePath(text));
+//  std::cout << "selected: " << mInputFile << std::endl;
+//  mDataComboBox->setToolTip(mInputFile);
 }
 
 QString ReconstructionWidget::getCurrentPath()
@@ -112,7 +115,8 @@ void ReconstructionWidget::reconstruct()
 {
   QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
 
-  mReconstructer->reconstruct(mInputFile, calFile);
+  //mReconstructer->reconstruct(mInputFile, calFile);
+  mReconstructer->reconstruct();
 }
 
 void ReconstructionWidget::updateComboBox()
@@ -150,7 +154,13 @@ void ReconstructionWidget::selectData(QString filename)
 
   mInputFile = filename;
 
-  updateComboBox();
+  std::cout << "selected: " << mInputFile << std::endl;
+  this->updateComboBox();
+  mDataComboBox->setToolTip(mInputFile);
+
+  // read data into reconstructer
+  QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+  mReconstructer->readFiles(mInputFile, calFile);
 }
 
 void ReconstructionWidget::selectData()
@@ -159,7 +169,7 @@ void ReconstructionWidget::selectData()
                                   QString(tr("Select data file")),
                                   getCurrentPath(),
                                   tr("USAcq (*.mhd)"));
-  selectData(filename);
+  this->selectData(filename);
 }
   
 }//namespace

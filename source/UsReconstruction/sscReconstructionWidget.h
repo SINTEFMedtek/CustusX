@@ -66,6 +66,7 @@ private:
 
     QString getCurrentPath();
     void updateComboBox();
+    void setInputFile(const QString& inputFile);
 };
 
 }//namespace
