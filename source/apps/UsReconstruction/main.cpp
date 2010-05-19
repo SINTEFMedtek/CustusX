@@ -20,7 +20,7 @@ int main(int argc, char **argv)
   top.raise();
      
   // uncomment to perform test reconstruction during startup
-  //top.automaticStart();
+  top.automaticStart();
 
 	int val = app.exec();
 	return val;

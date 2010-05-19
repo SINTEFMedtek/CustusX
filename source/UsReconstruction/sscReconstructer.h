@@ -10,6 +10,7 @@
 #include <QObject>
 #include "sscReconstructAlgorithm.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
+#include "sscBoundingBox3D.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
@@ -30,21 +31,24 @@ public:
 
 private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
-  QString changeExtension(QString name, QString ext);
   std::vector<TimedPosition> mFrames;
   std::vector<TimedPosition> mPositions;
+  ssc::DoubleBoundingBox3D mExtent; ///< extent of volume on output space
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;
   unsigned long mMaxVolumeSize;///< Max volume size in bytes for output volume
-  void readFiles(QString mhdFileName);
+
+  void readFiles(QString mhdFileName, QString calFileName);
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
   void readPositionFile(QString posFile, bool alsoReadTimestamps);
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
   vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
-  
+  void findExtentAndOutputTransform();
+
+  QString changeExtension(QString name, QString ext);
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
   Transform3D readTransformFromFile(QString fileName);
   void applyCalibration(const Transform3D& calibration);
