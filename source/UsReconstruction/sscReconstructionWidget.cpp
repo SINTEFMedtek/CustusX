@@ -82,6 +82,13 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   mSelectDataButton = new QToolButton(this);
   mSelectDataButton->setDefaultAction(mSelectDataAction);
 
+  QHBoxLayout* extentLayout = new QHBoxLayout;
+
+  mExtentLineEdit = new QLineEdit(this);
+  mExtentLineEdit->setReadOnly(true);
+  extentLayout->addWidget(new QLabel("Extent(mm)", this));
+  extentLayout->addWidget(mExtentLineEdit);
+
   mReconstructButton = new QPushButton("Reconstruct", this);
   connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
@@ -91,6 +98,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   topLayout->addLayout(dataLayout);
   dataLayout->addWidget(mDataComboBox);
   dataLayout->addWidget(mSelectDataButton);
+  topLayout->addLayout(extentLayout);
   topLayout->addLayout(gridLayout);
   topLayout->addWidget(mReconstructButton);
   topLayout->addStretch();
@@ -161,6 +169,12 @@ void ReconstructionWidget::selectData(QString filename)
   // read data into reconstructer
   QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
   mReconstructer->readFiles(mInputFile, calFile);
+
+//  ssc::DoubleBoundingBox3D extent = mReconstructer->getExtent();
+  ssc::Vector3D range = mReconstructer->getExtent().range();
+
+  QString extText = QString("%1,  %2,  %3").arg(range[0],0,'f',1).arg(range[1],0,'f',1).arg(range[2],0,'f',1);
+  mExtentLineEdit->setText(extText);
 }
 
 void ReconstructionWidget::selectData()
