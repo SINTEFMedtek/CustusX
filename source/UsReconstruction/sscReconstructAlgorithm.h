@@ -34,7 +34,7 @@ typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 class ReconstructAlgorithm
 {
 public:
-  ~ReconstructAlgorithm() {};
+  virtual ~ReconstructAlgorithm() {};
   /**
    * \param frameInfo Timetags and positions for the input frames
    * \param frameData The frame data. Assumes that the transfrom is identity.

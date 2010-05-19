@@ -17,6 +17,7 @@ class ThunderVNNReconstructAlgorithm : public ReconstructAlgorithm
 {
 public:
   ThunderVNNReconstructAlgorithm();
+  virtual ~ThunderVNNReconstructAlgorithm() {}
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,

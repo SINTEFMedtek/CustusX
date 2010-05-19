@@ -41,25 +41,6 @@ QString Reconstructer::changeExtension(QString name, QString ext)
   return splitName.join(".");
 }
   
-void Reconstructer::readFiles(QString fileName)
-{
-  readUsDataFile(changeExtension(fileName, "mhd"));
-  
-  bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
-
-  if (useOldFormat)
-  {
-    readTimeStampsFile(changeExtension(fileName, "tim"), &mFrames);
-    readPositionFile(changeExtension(fileName, "pos"), true);
-  }
-  else
-  {
-    readTimeStampsFile(changeExtension(fileName, "fts"), &mFrames);
-    readPositionFile(changeExtension(fileName, "tp"), false);
-    readTimeStampsFile(changeExtension(fileName, "tts"), &mPositions);
-  }
-}
-
 void Reconstructer::readUsDataFile(QString mhdFileName)
 {
   //Read US images
@@ -421,13 +402,17 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
   retval[3] = ssc::Vector3D(dims[0]*spacing[0],dims[1]*spacing[1],0);*/
   return retval;
 }
-  
+
 /**
+ * Compute the transform from input to output space using the
+ * orientation of the mid-frame and the point cloud from the mask.
+ * mExtent is computed as a by-product
+ *
  * Pre:  mFrames[i].mPos = usMpr
  * Post: mFrames[i].mPos = usMd
- *       Output volume is initialized
+ *       mExtent is defined
  */
-ImagePtr Reconstructer::generateOutputVolume()
+void Reconstructer::findExtentAndOutputTransform()
 {
   // A first guess for usMd with correct orientation
   Transform3D prMd;
@@ -462,7 +447,7 @@ ImagePtr Reconstructer::generateOutputVolume()
   std::cout << std::endl;*/
     
   ssc::DoubleBoundingBox3D boundingBox = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
-  ssc::Vector3D bbSize = boundingBox.range();
+  mExtent = boundingBox;
     
   // Translate usMd to output volume origo
   ssc::Transform3D T_origo = ssc::createTransformTranslate(boundingBox.corner(0,0,0));
@@ -470,7 +455,15 @@ ImagePtr Reconstructer::generateOutputVolume()
   {
     mFrames[i].mPos = mFrames[i].mPos * T_origo;
   }
+}
   
+/**
+ * Pre:  All data read, mExtent is calculated
+ * Post: Output volume is initialized
+ */
+ImagePtr Reconstructer::generateOutputVolume()
+{
+  ssc::Vector3D bbSize = mExtent.range();
   // Calculate optimal output image spacing and dimensions based on US frame spacing
   double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
                                  mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
@@ -512,19 +505,31 @@ ImagePtr Reconstructer::generateOutputVolume()
                                       string_cast(volumeName))) ;
   return image;
 }
-  
-  
-ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
-{
-  std::cout << "Perform reconstruction on: " << mhdFileName << std::endl;
-  std::cout << "Use calibration file: " << calFileName << std::endl;
 
-  this->readFiles(mhdFileName); 
+
+void Reconstructer::readFiles(QString fileName, QString calFileName)
+{
+  readUsDataFile(changeExtension(fileName, "mhd"));
+  
+  bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
+
+  if (useOldFormat)
+  {
+    readTimeStampsFile(changeExtension(fileName, "tim"), &mFrames);
+    readPositionFile(changeExtension(fileName, "pos"), true);
+  }
+  else
+  {
+    readTimeStampsFile(changeExtension(fileName, "fts"), &mFrames);
+    readPositionFile(changeExtension(fileName, "tp"), false);
+    readTimeStampsFile(changeExtension(fileName, "tts"), &mPositions);
+  }
+
   //mPos is now tMpr
 
-  if (QFileInfo(changeExtension(mhdFileName, "msk")).exists())
+  if (QFileInfo(changeExtension(fileName, "msk")).exists())
   {
-    mMask = this->readMaskFile(changeExtension(mhdFileName, "msk"));
+    mMask = this->readMaskFile(changeExtension(fileName, "msk"));
   }
   else
   {
@@ -532,21 +537,33 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   }
 
   this->calibrateTimeStamps();
-  
+
   this->calibrate(calFileName);
   //mPos (in mPositions) is now usMpr
-  
+
   this->interpolatePositions();
   // mFrames: now mPos as usMpr
-  
+
+  this->findExtentAndOutputTransform();
   mOutput = this->generateOutputVolume();
   //mPos in mFrames is now usMd
+}
+
   
-  for (unsigned int i; i < mFrames.size(); i++)
-    mFrames[i].mPos = mFrames[i].mPos.inv();
+ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
+{
+  std::cout << "Perform reconstruction on: " << mhdFileName << std::endl;
+  std::cout << "Use calibration file: " << calFileName << std::endl;
+
+  this->readFiles(mhdFileName, calFileName);
   
+  // reconstruction expects the inverted matrix direction: give it that.
+  std::vector<TimedPosition> mInvFrames = mFrames;
+  for (unsigned int i=0; i < mFrames.size(); i++)
+    mInvFrames[i].mPos = mFrames[i].mPos.inv();
+
   QDateTime pre = QDateTime::currentDateTime();
-  mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask);
+  mAlgorithm->reconstruct(mInvFrames, mUsRaw, mOutput, mMask);
   std::cout << "Reconstruct time: " << pre.time().msecsTo(QDateTime::currentDateTime().time()) << std::endl;
 
   DataManager::getInstance()->loadImage(mOutput);
