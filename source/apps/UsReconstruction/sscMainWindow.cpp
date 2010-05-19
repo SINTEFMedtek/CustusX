@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget* parent)
   layout->addWidget(mReconstructionWidget);
 
   mView = new ssc::View(this);
-  layout->addWidget(mView);
+  layout->addWidget(mView, 1);
 
   connect(ssc::DataManager::getInstance(), SIGNAL(dataLoaded()), this, SLOT(showData()));
 }
