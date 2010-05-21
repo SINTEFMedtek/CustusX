@@ -63,9 +63,12 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
   
-  //QString path = "/Users/olevs/data/UL_thunder/test/1/";
-  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
-  QString defFile = "ultrasoundSample5.mhd";
+  QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
+  QString defFile = "UsAcq_1.mhd";
+  //QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/";
+  //QString defFile = "ultrasoundSample5.mhd";
+
 
   //mInputFile = path + "UsAcq_1.mhd";
   //mInputFile = path + "ultrasoundSample5.mhd";
