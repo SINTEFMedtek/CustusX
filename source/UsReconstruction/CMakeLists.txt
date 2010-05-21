@@ -23,6 +23,8 @@ SET( SOURCE_FILES
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.cpp
+  ../../modules/ultrasoundAcquisition/source/gui/ProbeXmlConfigParser.h
+  ../../modules/ultrasoundAcquisition/source/gui/ProbeXmlConfigParser.cpp
   )
 
 # =========================================================

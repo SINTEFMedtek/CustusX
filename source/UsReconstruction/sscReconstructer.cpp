@@ -45,11 +45,73 @@ QString Reconstructer::changeExtension(QString name, QString ext)
   return splitName.join(".");
 }
   
+bool within(int x, int min, int max)
+{
+  return (x>=min) && (x<=max);
+}
+  
+  
 void Reconstructer::readUsDataFile(QString mhdFileName)
 {
   //Read US images
   mUsRaw = MetaImageReader().load(string_cast(mhdFileName), 
                                   string_cast(mhdFileName));
+  
+  //Read XML info from mdh file
+  //Stored in ConfigurationID tag
+  QFile file(mhdFileName);
+  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+    std::cout << "Error in Reconstructer::readUsDataFile(): Can't open file: ";
+    std::cout << string_cast(mhdFileName) << std::endl;
+  }
+  bool found = false;
+  while (!file.atEnd())
+  {
+    //QByteArray array = file.readLine();
+    //QString line = QString(array);
+    QString line = file.readLine();
+    if(line.startsWith("ConfigurationID", Qt::CaseInsensitive))
+    {
+      QStringList tempList = line.split(" ", QString::SkipEmptyParts);
+      QStringList list = tempList[2].split(":", QString::SkipEmptyParts);
+      QString xmlPath = "ProbeCalibConfigs.xml"; //TODO: Use correct path
+      ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
+      mConfiguration = xmlConfigParser->getConfiguration(list[0], list[1], list[2], list[3]);
+      found = true;
+    }
+  }
+  if(!found)
+  {
+    std::cout << "Error in Reconstructer::readUsDataFile(): ";
+    std::cout << "Can't find ConfigurationID in file: ";
+    std::cout << string_cast(mhdFileName) << std::endl;
+  }
+  
+  
+  //testcode
+  int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
+  double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
+  unsigned char* ptr = static_cast<unsigned char*>(mUsRaw->getBaseVtkImageData()->GetScalarPointer());
+  for (int x = 0; x < 50; x++)
+    for(int y = 0; y < 50; y++)
+      for(int z = 0; z < dims[2]; z++) 
+    {
+      //unsigned char val = ptr[x + y*dims[0] + z*dims[0]*dims[1]];
+      ptr[x + y*dims[0] + z*dims[0]*dims[1]] = 255;      
+    }
+  
+  int b = 20;
+  for (int x = 0; x < dims[0]; x++)
+    for(int y = 0; y < dims[1]; y++)
+      for(int z = 0; z < dims[2]; z++) 
+      {
+        if (!within(x, b, dims[0]-b) || !within(y, b, dims[1]-b))
+ //       if( (x<b) || (x>(dims[0]-b)))
+ //          if ((y<b) || (y>(dims[1]-b)))
+          ptr[x + y*dims[0] + z*dims[0]*dims[1]] = 255;      
+      }
+  
   
   //Allcate place for position and time stamps for all frames
   mFrames.resize(mUsRaw->getBaseVtkImageData()->GetDimensions()[2]);
@@ -141,9 +203,11 @@ void Reconstructer::readPositionFile(QString posFile, bool alsoReadTimestamps)
       return;
     }
     mPositions.push_back(position);
-    i++;
     //std::cout << positionString << std::endl;
     //std::cout << position.mPos << std::endl;
+    //std::cout << position.mPos.inv().coord(ssc::Vector3D(0,0,0));  
+    //std::cout << std::endl;
+    i++;
   }
   
   //old format
@@ -199,7 +263,26 @@ vtkImageDataPtr Reconstructer::generateVtkImageData(Vector3D dim,
   
   return data;
 }
-
+  
+ImagePtr Reconstructer::createMaskFromConfigParams()
+{
+  //TODO: Use corners instead of edges to allow for CLA and phased probes
+  ssc::ImagePtr retval = this->generateMask();
+  vtkImageDataPtr data = retval->getBaseVtkImageData();
+  int* dim(mUsRaw->getBaseVtkImageData()->GetDimensions());
+  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
+  for(int x = 0; x < dim[0]; x++)
+    for(int y = 0; y < dim[1]; y++)
+    {
+      if(   (x < mConfiguration.mLeftEdge)
+         || (x > mConfiguration.mRightEdge)
+         || (y < mConfiguration.mTopEdge)
+         || (y > mConfiguration.mBottomEdge) )
+        dataPtr[x + y*dim[0]] = 0;
+    }
+  return retval;
+}
+  
 ImagePtr Reconstructer::generateMask()
 {  
   ssc::Vector3D dim(mUsRaw->getBaseVtkImageData()->GetDimensions());
@@ -223,7 +306,7 @@ ImagePtr Reconstructer::readMaskFile(QString mhdFileName)
   file.open(QIODevice::ReadOnly);
   QDataStream stream(&file);    
         
-  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());  
+  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
   char *rawchars = reinterpret_cast<char*>(dataPtr);
   
   stream.readRawData(rawchars, file.size());
@@ -306,6 +389,9 @@ void Reconstructer::interpolatePositions()
       t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) / t_delta_tracking;
     mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos, 
                                         mPositions[i_pos+1].mPos, t);
+    
+    //std::cout << mFrames[i_frame].mPos.inv().coord(ssc::Vector3D(0,0,0));  
+    //std::cout << std::endl;
   }
 }
   
@@ -337,26 +423,88 @@ Transform3D Reconstructer::readTransformFromFile(QString fileName)
   }
   return retval;
 }
-  
-void Reconstructer::applyCalibration(const Transform3D& calibration)
-{
-  std::cout << " 1st input pos: " << mPositions.front().mPos.coord(ssc::Vector3D(0,0,0)) << std::endl;
-  std::cout << "last input pos: " << mPositions.back().mPos.coord(ssc::Vector3D(0,0,0)) << std::endl;
-  
-  for (unsigned int i = 0; i < mPositions.size(); i++)
-    mPositions[i].mPos = calibration * mPositions[i].mPos;
-}
 
+  
+/**
+ * Pre:  mPos is sMpr
+ * Post: mPos is uMpr
+ */
 void Reconstructer::calibrate(QString calFile)
 {
-  Transform3D C = this->readTransformFromFile(calFile);
+  // Calibration from tool space to localizer = sMt
+  //Transform3D sMt = this->readTransformFromFile(calFile);
   
-  Transform3D Ry = ssc::createTransformRotateY(M_PI/2.0);
+  //Geir Arne means calibration = tMs
+  Transform3D tMs = this->readTransformFromFile(calFile);
+  
+  //Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
+  //Transform3D Ry = ssc::createTransformRotateY(M_PI/2.0);
+  //Transform3D Rz = ssc::createTransformRotateZ(-M_PI/2.0);
+    
+  // Calibration from frame space u to tool space t
+  //ssc::Transform3D R = (Rz*Rx);
+  
+  //test
   Transform3D Rx = ssc::createTransformRotateX(M_PI/2.0);
+  Transform3D Rz = ssc::createTransformRotateZ(M_PI/2.0);
+  ssc::Transform3D R = (Rx*Rz);
   
-  Transform3D usMt = Rx*Ry*C;
-  applyCalibration(usMt);
+  //TODO: Input values from XML-file
+  //ssc::Vector3D origin_u(315,550,0);
+  //origin_u *= 0.167;
   
+  //TODO: Use values in u coordinates
+  int x_u = mConfiguration.mOriginCol*mConfiguration.mPixelWidth;
+  int y_u = mConfiguration.mOriginRow*mConfiguration.mPixelHeight;
+  ssc::Vector3D origin_u(x_u, y_u, 0);
+  ssc::Vector3D origin_rotated = R.coord(origin_u);
+  
+  //ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
+  ssc::Transform3D T = ssc::createTransformTranslate(origin_rotated);//test
+  
+  ssc::Transform3D tMu = T*R;
+  //ssc::Transform3D tMu = T;//test
+  
+  ssc::Transform3D sMu = tMs.inv()*tMu;
+  //ssc::Transform3D sMu = sMt*tMu;
+  
+  //testcode
+  ssc::Vector3D ex_u(1,0,0);
+  ssc::Vector3D ey_u(0,1,0);
+  ssc::Vector3D ex_t = tMu.vector(ex_u);
+  ssc::Vector3D ey_t = tMu.vector(ey_u);
+  ssc::Vector3D origin_t = tMu.coord(origin_u);
+  
+  if (!similar(ex_t, ssc::Vector3D(0,-1,0)))
+  {
+    std::cout << "error ex_t: " << ex_t << std::endl;
+  }
+  if (!similar(ey_t, ssc::Vector3D(0,0,-1)))
+  {
+    std::cout << "error ey_t: " << ey_t << std::endl;
+  }
+  if (!similar(origin_t, ssc::Vector3D(0,0,0)))
+  {
+    std::cout << "error origin_t: " << origin_t << std::endl;
+  }
+  
+  //applyCalibration(sMu);
+  
+  //mPos is sMpr
+  for (unsigned int i = 0; i < mPositions.size(); i++)
+  {
+    //testcode
+    ssc::Transform3D sMpr = mPositions[i].mPos;
+    //Calibration * Input position
+    ssc::Transform3D tMpr = tMs * sMpr;
+    //ssc::Transform3D tMpr = sMt.inv() * sMpr;
+    
+    //std::cout << tMpr.inv().vector(ssc::Vector3D(0,1,0));  
+    //std::cout << std::endl;
+    
+    mPositions[i].mPos = sMu.inv() * mPositions[i].mPos;
+  }
+  //mPos is uMpr
   
   //TODO: Create offset between input picture origo and US origo
 }
@@ -420,8 +568,8 @@ void Reconstructer::findExtentAndOutputTransform()
 {
   // A first guess for usMd with correct orientation
   Transform3D prMd;
-  prMd = mFrames[mFrames.size()/2].mPos;
-  prMd = prMd.inv();
+  //prMd = mFrames[mFrames.size()/2].mPos;
+  //prMd = prMd.inv();
   
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
@@ -458,6 +606,8 @@ void Reconstructer::findExtentAndOutputTransform()
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
     mFrames[i].mPos = mFrames[i].mPos * T_origo;
+    //std::cout << mFrames[i].mPos.inv().coord(ssc::Vector3D(0,0,0));  
+    //std::cout << std::endl;
   }
 
   // Calculate optimal output image spacing and dimensions based on US frame spacing
@@ -496,7 +646,7 @@ ImagePtr Reconstructer::generateOutputVolume()
 void Reconstructer::readFiles(QString fileName, QString calFileName)
 {
   readUsDataFile(changeExtension(fileName, "mhd"));
-  
+    
   bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
 
   if (useOldFormat)
@@ -511,7 +661,7 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
     readTimeStampsFile(changeExtension(fileName, "tts"), &mPositions);
   }
 
-  //mPos is now tMpr
+  //mPos is now sMpr
 
   if (QFileInfo(changeExtension(fileName, "msk")).exists())
   {
@@ -519,20 +669,21 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
   }
   else
   {
-    mMask = this->generateMask();
+    //mMask = this->generateMask();
+    mMask = this->createMaskFromConfigParams();
   }
 
   this->calibrateTimeStamps();
 
   this->calibrate(calFileName);
-  //mPos (in mPositions) is now usMpr
+  //mPos (in mPositions) is now uMpr
 
   this->interpolatePositions();
-  // mFrames: now mPos as usMpr
+  // mFrames: now mPos as uMpr
 
   this->findExtentAndOutputTransform();
 //  mOutput = this->generateOutputVolume();
-  //mPos in mFrames is now usMd
+  //mPos in mFrames is now uMd
 }
 
   
@@ -545,8 +696,6 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
   mOutput = this->generateOutputVolume();
 
   this->reconstruct();
-
-  //DataManager::getInstance()->loadImage(mOutput);
 
   return mOutput;
 }
@@ -568,12 +717,16 @@ void Reconstructer::reconstruct()
   std::vector<TimedPosition> mInvFrames = mFrames;
   for (unsigned int i=0; i < mFrames.size(); i++)
     mInvFrames[i].mPos = mFrames[i].mPos.inv();
-
+  
+  //test
+  DataManager::getInstance()->loadImage(mUsRaw);
+  
   QDateTime pre = QDateTime::currentDateTime();
   mAlgorithm->reconstruct(mInvFrames, mUsRaw, mOutput, mMask);
   std::cout << "Reconstruct time: " << pre.time().msecsTo(QDateTime::currentDateTime().time()) << std::endl;
 
   DataManager::getInstance()->loadImage(mOutput);
+  //DataManager::getInstance()->loadImage(mUsRaw);
 }
 
  
@@ -581,6 +734,10 @@ void Reconstructer::reconstruct()
 ImagePtr Reconstructer::getOutput()
 {
   return mOutput;
+}
+ImagePtr Reconstructer::getInput()
+{
+  return mUsRaw;
 }
   
 }

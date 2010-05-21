@@ -13,6 +13,8 @@
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
 
+#include "../../modules/ultrasoundAcquisition/source/gui/ProbeXmlConfigParser.h"
+
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
@@ -102,6 +104,15 @@ private:
 };
   
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+/**
+ * Used coordinate systems:
+ * u  = raw input Ultrasound frames (in x, y. Origin lower left.)
+ * t  = Tool space for probe as defined in ssc:Tool (z in ray direction, y to the left)
+ * s  = probe localizer Sensor.
+ * pr = Patient Reference localizer sensor.
+ * d  = Output Data space
+ *
+ */
 class Reconstructer : public QObject
 {
   Q_OBJECT
@@ -113,6 +124,7 @@ public:
 
   ImagePtr reconstruct(QString mhdFileName, QString calFileName); // do everything
   ImagePtr getOutput();
+  ImagePtr getInput();
 
   long getMaxOutputVolumeSize() const;
   void setMaxOutputVolumeSize(long val);
@@ -127,10 +139,12 @@ private:
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;
+  ProbeXmlConfigParser::Configuration mConfiguration;
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
   void readPositionFile(QString posFile, bool alsoReadTimestamps);
+  ImagePtr createMaskFromConfigParams();
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
   vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
@@ -139,7 +153,6 @@ private:
   QString changeExtension(QString name, QString ext);
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
   Transform3D readTransformFromFile(QString fileName);
-  void applyCalibration(const Transform3D& calibration);
   void calibrateTimeStamps();
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();

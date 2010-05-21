@@ -1,5 +1,6 @@
 #include "sscMainWindow.h"
 #include "sscDataManager.h"
+#include "sscAxesRep.h"//test
   
 MainWindow::MainWindow(QWidget* parent)
 {
@@ -22,9 +23,14 @@ void MainWindow::automaticStart()
 void MainWindow::showData()
 {
   ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getOutput();
+  //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getInput();
   ssc::VolumetricRepPtr volumeRep = ssc::VolumetricRep::New("test","test");
   volumeRep->setImage(data);
   mView->addRep(volumeRep);
+  
+  //Test: show axes
+  ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
+	mView->addRep(axesRep);
 
   // desperate attempt to show data automatically...
   mView->getRenderer()->Render();
