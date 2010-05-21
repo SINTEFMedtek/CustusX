@@ -459,8 +459,8 @@ void Reconstructer::calibrate(QString calFile)
   ssc::Vector3D origin_u(x_u, y_u, 0);
   ssc::Vector3D origin_rotated = R.coord(origin_u);
   
-  //ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
-  ssc::Transform3D T = ssc::createTransformTranslate(origin_rotated);//test
+  ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
+  //ssc::Transform3D T = ssc::createTransformTranslate(origin_rotated);//test
   
   ssc::Transform3D tMu = T*R;
   //ssc::Transform3D tMu = T;//test
@@ -568,8 +568,8 @@ void Reconstructer::findExtentAndOutputTransform()
 {
   // A first guess for usMd with correct orientation
   Transform3D prMd;
-  //prMd = mFrames[mFrames.size()/2].mPos;
-  //prMd = prMd.inv();
+  prMd = mFrames[mFrames.size()/2].mPos;
+  prMd = prMd.inv();
   
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
