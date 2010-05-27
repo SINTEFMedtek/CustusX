@@ -34,7 +34,9 @@ public:
     mExtent(0,0,0,0,0,0),
     mInputSpacing(0),
     mInputDim(0,0,0),
-    mMaxVolumeSize(0)
+    mMaxVolumeSize(0),
+    mDim(0,0,0),
+    mSpacing(0)
   {
   }
   /** Initialize the volue parameters with sensible defaults.
@@ -47,6 +49,7 @@ public:
   {
     // Calculate optimal output image spacing and dimensions based on US frame spacing
     setSpacing(mInputSpacing);
+    constrainVolumeSize(mMaxVolumeSize);
   }
 
   unsigned long getVolumeSize() const
@@ -60,6 +63,7 @@ public:
   {
     mSpacing = spacing;
     mDim = mExtent.range() / mSpacing;
+    this->roundDim();
   }
   double getSpacing() const
   {
@@ -69,9 +73,8 @@ public:
    */
   void setDim(int index, int val)
   {
-    //mSpacing = mExtent.range()[index] / val;
     setSpacing(mExtent.range()[index] / val);
-  }
+   }
   ssc::Vector3D getDim() const
   {
     return mDim;
@@ -80,6 +83,8 @@ public:
    */
   void constrainVolumeSize(double maxSize)
   {
+    this->setSpacing(mInputSpacing); // reset to default values
+
     mMaxVolumeSize = maxSize;
     // Reduce output volume size if optimal volume size is too large
     unsigned long volumeSize = getVolumeSize();
@@ -87,8 +92,9 @@ public:
     {
       double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
       std::cout << "Downsampled volume - Used scaleFactor : " << scaleFactor << std::endl;
-      mDim /= scaleFactor;
-      mSpacing *= scaleFactor;
+//      mDim /= scaleFactor;
+//      mSpacing *= scaleFactor;
+      this->setSpacing(mSpacing*scaleFactor);
     }
   }
   unsigned long getMaxVolumeSize() const
@@ -99,8 +105,14 @@ public:
 private:
   // controllable data, set only using the setters
   unsigned long mMaxVolumeSize;
-  double mSpacing;
   ssc::Vector3D mDim;
+  double mSpacing;
+
+  void roundDim()
+  {
+    for (int i=0; i<3; ++i)
+      mDim[i] = ceil(mDim[i]);
+  }
 };
   
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
@@ -126,9 +138,14 @@ public:
   ImagePtr getOutput();
   ImagePtr getInput();
 
-  long getMaxOutputVolumeSize() const;
-  void setMaxOutputVolumeSize(long val);
-  ssc::DoubleBoundingBox3D getExtent() const; ///< extent of volume on output space
+  OutputVolumeParams getOutputVolumeParams() const;
+  void setOutputVolumeParams(const OutputVolumeParams& par);
+//  long getMaxOutputVolumeSize() const;
+//  void setMaxOutputVolumeSize(long val);
+//  ssc::DoubleBoundingBox3D getExtent() const; ///< extent of volume on output space
+
+  signals:
+    void paramsChanged();
 
 private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
