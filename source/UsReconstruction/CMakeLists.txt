@@ -24,7 +24,7 @@ SET( SOURCE_FILES
   sscThunderVNNReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.cpp
   ../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h
-  ../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h
+  ../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.cpp
   )
 
 # =========================================================
