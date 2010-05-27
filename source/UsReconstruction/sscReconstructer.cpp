@@ -19,9 +19,80 @@ typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace ssc
 {
+
 Reconstructer::Reconstructer() :
   mAlgorithm(new ThunderVNNReconstructAlgorithm)
-{}
+{
+  QString defPath = "/Users/christiana/workspace/sessions/";
+  QString filename = "usReconstruct.xml";
+
+  QDomDocument doc("us reconstruction");
+  QFile file(defPath+filename);
+  if (!file.open(QIODevice::ReadOnly))
+  {
+    std::cout << "file not found: " << defPath+filename << std::endl;
+    return;
+  }
+  QString error;
+  int line,col;
+  if (!doc.setContent(&file, &error,&line,&col))
+  {
+    std::cout << "error setting xml content [" << line << "," << col << "]"<< error << std::endl;
+      file.close();
+      return;
+  }
+  file.close();
+
+  std::cout << doc.toString(2) << std::endl;
+  mSettings = doc;
+}
+
+QDomElement Reconstructer::getSettings() const
+{
+  return mSettings.documentElement();
+}
+
+void Reconstructer::setSettings()
+{
+  QString newOrient = this->getNamedSetting("Orientation").getValue();
+  if (newOrient!=mLastAppliedOrientation)
+  {
+    clearAll();
+    // reread everything.
+    mLastAppliedOrientation = newOrient;
+  }
+
+  emit paramsChanged();
+  // notify that settings xml is changed
+
+  std::cout << "set settings - " << newOrient << std::endl;
+  //std::cout << mSettings.toString(2) << std::endl;
+}
+
+StringOptionItem Reconstructer::getNamedSetting(const QString& uid)
+{
+  return StringOptionItem::fromName(uid, this->getSettings());
+}
+
+void Reconstructer::clearAll()
+{
+  mUsRaw.reset();
+  mFrames.clear();
+  mPositions.clear();
+  mOutputVolumeParams = OutputVolumeParams();
+  mMask.reset();///< Clipping mask for the input data
+  //ReconstructAlgorithmPtr mAlgorithm;
+  //ProbeXmlConfigParser::Configuration mConfiguration;
+  //QDomDocument mSettings;
+  //QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
+  this->clearOutput();
+}
+
+void Reconstructer::clearOutput()
+{
+  mOutput.reset();
+}
+
 
 OutputVolumeParams Reconstructer::getOutputVolumeParams() const
 {
@@ -575,6 +646,38 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
 }
 
 /**
+ * Pre:  mFrames[i].mPos = prMu
+ * Post: mFrames[i].mPos = d'Mu, where d' is an oriented but not translated data space.
+ */
+void Reconstructer::applyOutputOrientation()
+{
+  QString newOrient = this->getNamedSetting("Orientation").getValue();
+  Transform3D prMd;
+
+  if (newOrient=="PatientReference")
+  {
+    // identity
+  }
+  else if (newOrient=="MiddleFrame")
+  {
+    prMd = mFrames[mFrames.size()/2].mPos;
+    prMd = prMd.inv();
+  }
+  else
+  {
+    std::cout << "ERROR: " << "no orientation algorithm selected in reconstruction" << std::endl;
+  }
+
+  // apply the selected orientation to the frames.
+  for (unsigned int i = 0; i < mFrames.size(); i++)
+  {
+    mFrames[i].mPos = mFrames[i].mPos * prMd;
+  }
+}
+
+
+
+/**
  * Compute the transform from input to output space using the
  * orientation of the mid-frame and the point cloud from the mask.
  * mExtent is computed as a by-product
@@ -585,10 +688,12 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
  */
 void Reconstructer::findExtentAndOutputTransform()
 {
-  // A first guess for usMd with correct orientation
-  Transform3D prMd;
-  prMd = mFrames[mFrames.size()/2].mPos;
-  prMd = prMd.inv();
+  this->applyOutputOrientation();
+
+//  // A first guess for usMd with correct orientation
+//  Transform3D prMd;
+//  prMd = mFrames[mFrames.size()/2].mPos;
+//  prMd = prMd.inv();
   
   /*for (unsigned int i = 0; i < mFrames.size(); i++)
   {
@@ -619,11 +724,11 @@ void Reconstructer::findExtentAndOutputTransform()
   std::cout << "last dMus: " << mFrames.back().mPos.inv().coord(ssc::Vector3D(0,0,0)); 
   std::cout << std::endl;*/
     
-  ssc::DoubleBoundingBox3D boundingBox = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
-  mExtent = boundingBox;
+  ssc::DoubleBoundingBox3D extent = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
+  //mExtent = boundingBox;
     
   // Translate dMu to output volume origo
-  ssc::Transform3D T_origo = ssc::createTransformTranslate(boundingBox.corner(0,0,0));
+  ssc::Transform3D T_origo = ssc::createTransformTranslate(extent.corner(0,0,0));
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
     mFrames[i].mPos = T_origo.inv() * mFrames[i].mPos;
@@ -634,7 +739,7 @@ void Reconstructer::findExtentAndOutputTransform()
   // Calculate optimal output image spacing and dimensions based on US frame spacing
   double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
                                  mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
-  mOutputVolumeParams = OutputVolumeParams(mExtent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
+  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
   mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
 }
   
@@ -666,6 +771,8 @@ ImagePtr Reconstructer::generateOutputVolume()
 
 void Reconstructer::readFiles(QString fileName, QString calFileName)
 {
+  this->clearAll();
+
   readUsDataFile(changeExtension(fileName, "mhd"));
     
   bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
@@ -706,9 +813,7 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
 //  mOutput = this->generateOutputVolume();
   //mPos in mFrames is now dMu
 
-  std::cout << "ferdig med readfiles" << std::endl;
   emit paramsChanged();
-  std::cout << "ferdig med paramsChanged()" << std::endl;
 }
 
   
@@ -733,10 +838,11 @@ void Reconstructer::reconstruct()
     return;
   }
 
-  if (!mOutput)
-  {
+  // do anyway: the dim might have changed
+//  if (!mOutput)
+//  {
     mOutput = this->generateOutputVolume();
-  }
+//  }
   
   // reconstruction expects the inverted matrix direction: give it that.
   //std::vector<TimedPosition> mInvFrames = mFrames;

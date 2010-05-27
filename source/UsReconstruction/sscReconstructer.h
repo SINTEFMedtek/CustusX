@@ -12,108 +12,13 @@
 #include "sscReconstructAlgorithm.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
-
+#include "sscReconstructedOutputVolumeParams.h"
 #include "../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
 {
-
-/** Helper struct for sending and controlling output volume properties.
- */
-class OutputVolumeParams
-{
-public:
-  // constants, set only based on input data
-  ssc::DoubleBoundingBox3D mExtent;
-  double mInputSpacing;
-  ssc::Vector3D mInputDim;
-
-  OutputVolumeParams() :
-    mExtent(0,0,0,0,0,0),
-    mInputSpacing(0),
-    mInputDim(0,0,0),
-    mMaxVolumeSize(0),
-    mDim(0,0,0),
-    mSpacing(0)
-  {
-  }
-  /** Initialize the volue parameters with sensible defaults.
-   */
-  OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing, ssc::Vector3D inputDim) :
-    mExtent(extent),
-    mInputSpacing(inputSpacing),
-    mInputDim(inputDim),
-    mMaxVolumeSize(1024*1024*32)
-  {
-    // Calculate optimal output image spacing and dimensions based on US frame spacing
-    setSpacing(mInputSpacing);
-    constrainVolumeSize(mMaxVolumeSize);
-  }
-
-  unsigned long getVolumeSize() const
-  {
-    return mDim[0]*mDim[1]*mDim[2];;
-  }
-
-  /** Set a spacing, recalculate dimensions.
-   */
-  void setSpacing(double spacing)
-  {
-    mSpacing = spacing;
-    mDim = mExtent.range() / mSpacing;
-    this->roundDim();
-  }
-  double getSpacing() const
-  {
-    return mSpacing;
-  }
-  /** Set one of the dimensions explicitly, recalculate other dims and spacing.
-   */
-  void setDim(int index, int val)
-  {
-    setSpacing(mExtent.range()[index] / val);
-   }
-  ssc::Vector3D getDim() const
-  {
-    return mDim;
-  }
-  /** Increase spacing in order to keep size below a max size
-   */
-  void constrainVolumeSize(double maxSize)
-  {
-    this->setSpacing(mInputSpacing); // reset to default values
-
-    mMaxVolumeSize = maxSize;
-    // Reduce output volume size if optimal volume size is too large
-    unsigned long volumeSize = getVolumeSize();
-    if (volumeSize > mMaxVolumeSize)
-    {
-      double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
-      std::cout << "Downsampled volume - Used scaleFactor : " << scaleFactor << std::endl;
-//      mDim /= scaleFactor;
-//      mSpacing *= scaleFactor;
-      this->setSpacing(mSpacing*scaleFactor);
-    }
-  }
-  unsigned long getMaxVolumeSize() const
-  {
-    return mMaxVolumeSize;
-  }
-
-private:
-  // controllable data, set only using the setters
-  unsigned long mMaxVolumeSize;
-  ssc::Vector3D mDim;
-  double mSpacing;
-
-  void roundDim()
-  {
-    for (int i=0; i<3; ++i)
-      mDim[i] = ceil(mDim[i]);
-  }
-};
   
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 /**
@@ -137,6 +42,7 @@ public:
   ImagePtr reconstruct(QString mhdFileName, QString calFileName); // do everything
   ImagePtr getOutput();
   ImagePtr getInput();
+  QDomElement getSettings() const;
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
@@ -144,19 +50,24 @@ public:
 //  void setMaxOutputVolumeSize(long val);
 //  ssc::DoubleBoundingBox3D getExtent() const; ///< extent of volume on output space
 
-  signals:
-    void paramsChanged();
+public slots:
+  void setSettings();
+
+signals:
+  void paramsChanged();
 
 private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
   std::vector<TimedPosition> mFrames;
   std::vector<TimedPosition> mPositions;
-  ssc::DoubleBoundingBox3D mExtent; ///< extent of volume on output space
+//  ssc::DoubleBoundingBox3D mExtent; ///< extent of volume on output space
   OutputVolumeParams mOutputVolumeParams;
   ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
   ReconstructAlgorithmPtr mAlgorithm;
   ProbeXmlConfigParser::Configuration mConfiguration;
+  QDomDocument mSettings;
+  QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
@@ -165,6 +76,7 @@ private:
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
   vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
+  void applyOutputOrientation();
   void findExtentAndOutputTransform();
 
   QString changeExtension(QString name, QString ext);
@@ -176,6 +88,9 @@ private:
   void calibrate(QString calFile);
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
+  StringOptionItem getNamedSetting(const QString& uid);
+  void clearAll();
+  void clearOutput();
 };
 
 }//namespace

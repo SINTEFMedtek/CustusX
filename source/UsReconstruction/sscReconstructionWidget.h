@@ -16,105 +16,88 @@
 namespace ssc
 {
 
-/** Abstract interface to setting one of the values in class OutputValueParams.
- *  Sublass to get a concrete class.
- */
-class DoubleDataInterfaceOutputValueParams : public DoubleDataInterface
+/** Abstract interface for interaction with internal string-valued data */
+class StringDataInterface : public QObject
+{
+  Q_OBJECT
+
+public:
+  virtual ~StringDataInterface() {}
+  virtual QString getValueID() const = 0;
+  virtual QString getValueName() const = 0;
+  virtual QString getHelp() const { return QString(); }
+  virtual bool setValue(const QString& value) = 0; ///< implemented by subclasses to set value for this entity
+  virtual QString getValue() const = 0; ///< implemented by subclasses to get value for this entity
+  virtual QStringList getValueRange() const { return QStringList(); } /// range of value
+  virtual QString convertInternal2Display(QString internal) { return internal; } ///< conversion from internal value to display value
+//  virtual double convertDisplay2Internal(double display) { return display; } ///< conversion from internal value to display value
+  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
+signals:
+  void changed();
+};
+typedef boost::shared_ptr<StringDataInterface> StringDataInterfacePtr;
+
+/** dummy implementation */
+class StringDataInterfaceNull : public StringDataInterface
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceOutputValueParams(ReconstructerPtr reconstructer);
-  virtual ~DoubleDataInterfaceOutputValueParams() {}
-  virtual double getValue() const;
-  virtual bool setValue(double val);
+  virtual ~StringDataInterfaceNull() {}
   virtual QString getValueID() const { return ""; }
+  virtual QString getValueName() const { return "dummy"; }
+  virtual bool setValue(const QString& value) { return false; }
+  virtual QString getValue() const { return ""; }
+  virtual void connectValueSignals(bool on) {}
+};
+
+class StringDataInterfaceXmlNode : public StringDataInterface
+{
+  Q_OBJECT
+public:
+  explicit StringDataInterfaceXmlNode(StringOptionItem element) : mElement(element) {}
+  virtual ~StringDataInterfaceXmlNode()  {}
+  virtual QString getValueID() const { return mElement.getId(); }
+  virtual QString getValueName() const { return mElement.getName(); }
+  virtual QString getHelp() const { return mElement.getHelp(); }
+  virtual bool setValue(const QString& value)
+  {
+    QString current = this->getValue();
+    if (current==value)
+      return false;
+    mElement.setValue(value);
+    emit valueWasSet();
+    return true;
+  }
+  virtual QString getValue() const { return mElement.getValue(); }
+  virtual QStringList getValueRange() const { return mElement.getRange(); }
   virtual void connectValueSignals(bool on) {}
 
+signals:
+  void valueWasSet();
+private:
+  StringOptionItem mElement;
+};
+typedef boost::shared_ptr<StringDataInterfaceXmlNode> StringDataInterfaceXmlNodePtr;
+
+
+/**Composite widget for string selection.
+ * Consists of <namelabel, combobox>.
+ * Insert a subclass of ssc::StringDataInterfacePtr in order to connect to data.
+ */
+class ComboGroupWidget : public QWidget
+{
+  Q_OBJECT
+public:
+  ComboGroupWidget(QWidget* parent, StringDataInterfacePtr dataInterface, QGridLayout* gridLayout=0, int row=0);
 private slots:
-
-protected:
-  virtual double getValue(OutputVolumeParams* params) const = 0;
-  virtual void setValue(OutputVolumeParams* params, double val) = 0;
-
-  ReconstructerPtr mReconstructer;
+  void dataChanged();
+  void comboIndexChanged(const QString& val);
+private:
+  QLabel* mLabel;
+  QComboBox* mCombo;
+  StringDataInterfacePtr mData;
 };
 
-/** Interface to setting max size for reconstructed us volume.
- */
-class DoubleDataInterfaceMaxUSVolumeSize : public DoubleDataInterfaceOutputValueParams
-{
-  Q_OBJECT
-public:
-  DoubleDataInterfaceMaxUSVolumeSize(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer), mFactor(1024*1024) {}
-  virtual ~DoubleDataInterfaceMaxUSVolumeSize() {}
-  virtual QString getValueName() const { return "Volume Size (Mb)"; }
-  virtual double convertInternal2Display(double internal) { return internal/mFactor; } ///< conversion from internal value to display value
-  virtual double convertDisplay2Internal(double display) { return display*mFactor; } ///< conversion from internal value to display value
-  ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(mFactor,mFactor*500,mFactor); }
-protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getVolumeSize(); }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->constrainVolumeSize(val); }
-
-  double mFactor;
-};
-
-/** Interface to setting spacing in output volume
- */
-class DoubleDataInterfaceSpacing : public DoubleDataInterfaceOutputValueParams
-{
-  Q_OBJECT
-public:
-  DoubleDataInterfaceSpacing(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceSpacing() {}
-  virtual QString getValueName() const { return "Output Spacing (mm)"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(0.001,1,0.001); }
-protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getSpacing(); }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->setSpacing(val); }
-};
-
-/** Interface to setting dim in output volume
- */
-class DoubleDataInterfaceXDim : public DoubleDataInterfaceOutputValueParams
-{
-  Q_OBJECT
-public:
-  DoubleDataInterfaceXDim(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceXDim() {}
-  virtual QString getValueName() const { return "X Dim"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
-protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getDim()[0]; }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(0, val); }
-};
-/** Interface to setting dim in output volume
- */
-class DoubleDataInterfaceYDim : public DoubleDataInterfaceOutputValueParams
-{
-  Q_OBJECT
-public:
-  DoubleDataInterfaceYDim(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceYDim() {}
-  virtual QString getValueName() const { return "Y Dim"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
-protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getDim()[1]; }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(1, val); }
-};
-/** Interface to setting dim in output volume
- */
-class DoubleDataInterfaceZDim : public DoubleDataInterfaceOutputValueParams
-{
-  Q_OBJECT
-public:
-  DoubleDataInterfaceZDim(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceZDim() {}
-  virtual QString getValueName() const { return "Z Dim"; }
-  DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
-protected:
-  virtual double getValue(OutputVolumeParams* params) const { return params->getDim()[2]; }
-  virtual void setValue(OutputVolumeParams* params, double val) { params->setDim(2, val); }
-};
 
 class ReconstructionWidget : public QWidget
 {
@@ -127,6 +110,7 @@ public:
 public slots:
   void reconstruct();
   void selectData();
+  void reload();
   void currentDataComboIndexChanged(const QString& text);
 
 private:
@@ -137,6 +121,7 @@ private:
     QComboBox* mDataComboBox;
     QToolButton* mSelectDataButton;
     QPushButton* mReconstructButton;
+    QPushButton* mReloadButton;
     QAction* mSelectDataAction;
     QLineEdit* mExtentLineEdit;
     ssc::SliderGroupWidget* mMaxVolSizeWidget;
@@ -145,6 +130,7 @@ private:
     ssc::SliderGroupWidget* mDimYWidget;
     ssc::SliderGroupWidget* mDimZWidget;
 
+    ssc::StringDataInterfacePtr generateStringDataInterface(QString uid);
     QString getCurrentPath();
     void updateComboBox();
     void setInputFile(const QString& inputFile);
