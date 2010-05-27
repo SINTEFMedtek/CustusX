@@ -23,20 +23,31 @@ Reconstructer::Reconstructer() :
   mAlgorithm(new ThunderVNNReconstructAlgorithm)
 {}
 
-long Reconstructer::getMaxOutputVolumeSize() const
+OutputVolumeParams Reconstructer::getOutputVolumeParams() const
 {
-  return mOutputVolumeParams.getMaxVolumeSize();
+  return mOutputVolumeParams;
 }
 
-void Reconstructer::setMaxOutputVolumeSize(long val)
+void Reconstructer::setOutputVolumeParams(const OutputVolumeParams& par)
 {
-  mOutputVolumeParams.constrainVolumeSize(val);
+  mOutputVolumeParams = par;
+  emit paramsChanged();
 }
 
-ssc::DoubleBoundingBox3D Reconstructer::getExtent() const
-{
-  return mExtent;
-}
+//long Reconstructer::getMaxOutputVolumeSize() const
+//{
+//  return mOutputVolumeParams.getMaxVolumeSize();
+//}
+//
+//void Reconstructer::setMaxOutputVolumeSize(long val)
+//{
+//  mOutputVolumeParams.constrainVolumeSize(val);
+//}
+//
+//ssc::DoubleBoundingBox3D Reconstructer::getExtent() const
+//{
+//  return mExtent;
+//}
   
 QString Reconstructer::changeExtension(QString name, QString ext)
 {
@@ -694,6 +705,10 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
   this->findExtentAndOutputTransform();
 //  mOutput = this->generateOutputVolume();
   //mPos in mFrames is now dMu
+
+  std::cout << "ferdig med readfiles" << std::endl;
+  emit paramsChanged();
+  std::cout << "ferdig med paramsChanged()" << std::endl;
 }
 
   

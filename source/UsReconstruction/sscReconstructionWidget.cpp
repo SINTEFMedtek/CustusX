@@ -11,33 +11,33 @@
 namespace ssc 
 {
 
-
-DoubleDataInterfaceMaxUSVolumeSize::DoubleDataInterfaceMaxUSVolumeSize(ReconstructerPtr reconstructer) :
-    mFactor(1024*1024), mReconstructer(reconstructer)
+DoubleDataInterfaceOutputValueParams::DoubleDataInterfaceOutputValueParams(ReconstructerPtr reconstructer) :
+    mReconstructer(reconstructer)
 {
-  //connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
-  //dominantToolChangedSlot();
+  connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SIGNAL(changed()));
 }
 
-double DoubleDataInterfaceMaxUSVolumeSize::getValue() const
+double DoubleDataInterfaceOutputValueParams::getValue() const
 {
-  return mReconstructer->getMaxOutputVolumeSize();
+  OutputVolumeParams par = mReconstructer->getOutputVolumeParams();
+  return this->getValue(&par);
 }
 
-bool DoubleDataInterfaceMaxUSVolumeSize::setValue(double val)
+bool DoubleDataInterfaceOutputValueParams::setValue(double val)
 {
-  if (similar(val, mReconstructer->getMaxOutputVolumeSize()))
+  OutputVolumeParams par = mReconstructer->getOutputVolumeParams();
+  if (similar(val, this->getValue(&par)))
     return false;
-
-  mReconstructer->setMaxOutputVolumeSize(val);
-  emit changed();
+  //std::cout << "DoubleDataInterfaceOutputValueParams::setValue():" << this->getValueName() << std::endl;
+  this->setValue(&par, val);
+  mReconstructer->setOutputVolumeParams(par);
   return true;
 }
 
-ssc::DoubleRange DoubleDataInterfaceMaxUSVolumeSize::getValueRange() const
-{
-  return ssc::DoubleRange(mFactor,mFactor*500,mFactor);
-}
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -65,12 +65,15 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   
   //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
   //QString defFile = "UsAcq_1.mhd";
-  QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
-  QString defFile = "USAcq_29.mhd";
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
+  //QString defFile = "USAcq_29.mhd";
   
   //QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
   //QString defPath = "/Users/olevs/data/UL_thunder/test/";
   //QString defFile = "ultrasoundSample5.mhd";
+
+  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  QString defFile = "ultrasoundSample5.mhd";
 
 
   //mInputFile = path + "UsAcq_1.mhd";
@@ -100,6 +103,10 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 
   QGridLayout* gridLayout = new QGridLayout;
   mMaxVolSizeWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceMaxUSVolumeSize(mReconstructer)), gridLayout, 0);
+  mSpacingWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceSpacing(mReconstructer)), gridLayout, 1);
+  mDimXWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceXDim(mReconstructer)), gridLayout, 2);
+  mDimYWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceYDim(mReconstructer)), gridLayout, 3);
+  mDimZWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceZDim(mReconstructer)), gridLayout, 4);
 
   topLayout->addLayout(dataLayout);
   dataLayout->addWidget(mDataComboBox);
@@ -156,6 +163,7 @@ void ReconstructionWidget::updateComboBox()
 
   //mDataComboBox->addItem(mInputFile);
   mDataComboBox->blockSignals(false);
+
 }
 
 void ReconstructionWidget::selectData(QString filename)
@@ -178,7 +186,7 @@ void ReconstructionWidget::selectData(QString filename)
   mReconstructer->readFiles(mInputFile, calFile);
 
 //  ssc::DoubleBoundingBox3D extent = mReconstructer->getExtent();
-  ssc::Vector3D range = mReconstructer->getExtent().range();
+  ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 
   QString extText = QString("%1,  %2,  %3").arg(range[0],0,'f',1).arg(range[1],0,'f',1).arg(range[2],0,'f',1);
   mExtentLineEdit->setText(extText);
