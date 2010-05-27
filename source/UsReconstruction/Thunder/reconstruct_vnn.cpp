@@ -158,7 +158,7 @@ void call_vnn_kernel(cl_kernel vnn,
   unsigned char* mask = data->input_mask;
   
   int volume_size = volume_n * volume_h * volume_w * sizeof(cl_uchar);
-  int bscans_size = bscan_n * bscan_h * bscan_w * sizeof(cl_uchar);
+  //int bscans_size = bscan_n * bscan_h * bscan_w * sizeof(cl_uchar);
   int mask_byte_size = bscan_h * bscan_w * sizeof(cl_uchar);
   int plane_eq_size = sizeof(float) * 4 * bscan_n;
   int plane_points_size = sizeof(float) * 4 * bscan_n * 3;
@@ -167,14 +167,27 @@ void call_vnn_kernel(cl_kernel vnn,
   float * h_dev_plane_eq = (float *) malloc(plane_eq_size);
   float * h_dev_plane_points = (float *) malloc(plane_points_size);
   memcpy(h_dev_plane_eq, bscan_plane_equations, plane_eq_size);
+  //memset(h_dev_plane_points, 0, plane_points_size);//test
   for (int n = 0; n < bscan_n; n++)
+  {
     for (int m = 0; m < 3; m++)
-      memcpy(&h_dev_plane_points[n*3*4+m*4], &plane_points[n*3+m], sizeof(float)*3);
+    {
+      //Might be slower, but easier to read 
+      //memcpy(&h_dev_plane_points[n*3*4+m*4], &plane_points[n*3+m], sizeof(float)*3);//Also remember to set mem of last float to 0.0
+      h_dev_plane_points[n*3*4+m*4+0] = plane_points[n*3+m].x;
+      h_dev_plane_points[n*3*4+m*4+1] = plane_points[n*3+m].y;
+      h_dev_plane_points[n*3*4+m*4+2] = plane_points[n*3+m].z;
+      h_dev_plane_points[n*3*4+m*4+3] = 0;
+    }
+  }
+  
   float * printings = (float *) malloc(printings_size);
   memset(printings, 0, printings_size);
   
-  cl_mem dev_bscans0 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size/2, bscans);
-  cl_mem dev_bscans1 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size/2+bscans_size%2, bscans + bscans_size/2);//Make sure we allocate the last byte
+  int bscans_size0 = bscan_n/2 * bscan_h * bscan_w;
+  int bscans_size1 = (bscan_n/2 + bscan_n%2) * bscan_h * bscan_w;
+  cl_mem dev_bscans0 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size0, bscans);
+  cl_mem dev_bscans1 = ocl_create_buffer(context->context, CL_MEM_READ_ONLY, bscans_size1, bscans + bscans_size0);//Make sure we allocate the last byte
   
   ///* // with byte adressable memory:
   cl_mem dev_volume = ocl_create_buffer(context->context, CL_MEM_WRITE_ONLY, volume_size, volume);

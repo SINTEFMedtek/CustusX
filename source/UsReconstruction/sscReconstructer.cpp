@@ -77,7 +77,8 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
       QStringList list = tempList[2].split(":", QString::SkipEmptyParts);
       QString xmlPath = "ProbeCalibConfigs.xml"; //TODO: Use correct path
       ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
-      mConfiguration = xmlConfigParser->getConfiguration(list[0], list[1], list[2], list[3]);
+      QString config = list[3].trimmed();
+      mConfiguration = xmlConfigParser->getConfiguration(list[0], list[1], list[2], config);
       found = true;
     }
   }
@@ -90,7 +91,7 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   
   
   //testcode
-  int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
+  /*int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
   double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
   unsigned char* ptr = static_cast<unsigned char*>(mUsRaw->getBaseVtkImageData()->GetScalarPointer());
   for (int x = 0; x < 50; x++)
@@ -111,7 +112,7 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
  //          if ((y<b) || (y>(dims[1]-b)))
           ptr[x + y*dims[0] + z*dims[0]*dims[1]] = 255;      
       }
-  
+  */
   
   //Allcate place for position and time stamps for all frames
   mFrames.resize(mUsRaw->getBaseVtkImageData()->GetDimensions()[2]);
@@ -432,30 +433,26 @@ Transform3D Reconstructer::readTransformFromFile(QString fileName)
 void Reconstructer::calibrate(QString calFile)
 {
   // Calibration from tool space to localizer = sMt
-  //Transform3D sMt = this->readTransformFromFile(calFile);
+  Transform3D sMt = this->readTransformFromFile(calFile);
   
   //Geir Arne means calibration = tMs
-  Transform3D tMs = this->readTransformFromFile(calFile);
+  //Transform3D tMs = this->readTransformFromFile(calFile).inv();
   
+  //testcode: Transform from image coordinate syst with origin in lower loft corner
   //Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
-  //Transform3D Ry = ssc::createTransformRotateY(M_PI/2.0);
   //Transform3D Rz = ssc::createTransformRotateZ(-M_PI/2.0);
-    
-  // Calibration from frame space u to tool space t
   //ssc::Transform3D R = (Rz*Rx);
   
-  //test
+  
+  // Transform from image coordinate syst with origin in upper left corner
+  // to t (tool) space
   Transform3D Rx = ssc::createTransformRotateX(M_PI/2.0);
-  Transform3D Rz = ssc::createTransformRotateZ(M_PI/2.0);
-  ssc::Transform3D R = (Rx*Rz);
+  Transform3D Ry = ssc::createTransformRotateY(-M_PI/2.0);
+  // Calibration from frame space u to tool space t
+  ssc::Transform3D R = (Rx*Ry);
   
-  //TODO: Input values from XML-file
-  //ssc::Vector3D origin_u(315,550,0);
-  //origin_u *= 0.167;
-  
-  //TODO: Use values in u coordinates
-  int x_u = mConfiguration.mOriginCol*mConfiguration.mPixelWidth;
-  int y_u = mConfiguration.mOriginRow*mConfiguration.mPixelHeight;
+  int x_u = mConfiguration.mOriginCol * mConfiguration.mPixelWidth;
+  int y_u = mConfiguration.mOriginRow * mConfiguration.mPixelHeight;
   ssc::Vector3D origin_u(x_u, y_u, 0);
   ssc::Vector3D origin_rotated = R.coord(origin_u);
   
@@ -465,8 +462,8 @@ void Reconstructer::calibrate(QString calFile)
   ssc::Transform3D tMu = T*R;
   //ssc::Transform3D tMu = T;//test
   
-  ssc::Transform3D sMu = tMs.inv()*tMu;
-  //ssc::Transform3D sMu = sMt*tMu;
+  //ssc::Transform3D sMu = tMs.inv()*tMu;
+  ssc::Transform3D sMu = sMt*tMu;
   
   //testcode
   ssc::Vector3D ex_u(1,0,0);
@@ -479,7 +476,8 @@ void Reconstructer::calibrate(QString calFile)
   {
     std::cout << "error ex_t: " << ex_t << std::endl;
   }
-  if (!similar(ey_t, ssc::Vector3D(0,0,-1)))
+  //if (!similar(ey_t, ssc::Vector3D(0,0,-1)))
+  if (!similar(ey_t, ssc::Vector3D(0,0,1)))
   {
     std::cout << "error ey_t: " << ey_t << std::endl;
   }
@@ -490,23 +488,33 @@ void Reconstructer::calibrate(QString calFile)
   
   //applyCalibration(sMu);
   
-  //mPos is sMpr
+  //mPos is prMs
   for (unsigned int i = 0; i < mPositions.size(); i++)
   {
     //testcode
-    ssc::Transform3D sMpr = mPositions[i].mPos;
+    //ssc::Transform3D sMpr = mPositions[i].mPos;
+    ssc::Transform3D prMs = mPositions[i].mPos;
     //Calibration * Input position
-    ssc::Transform3D tMpr = tMs * sMpr;
+    //ssc::Transform3D tMpr = tMs * sMpr;
+    //ssc::Transform3D tMpr = tMs * prMs.inv();
     //ssc::Transform3D tMpr = sMt.inv() * sMpr;
     
-    //std::cout << tMpr.inv().vector(ssc::Vector3D(0,1,0));  
+    //ssc::Transform3D prMt = prMs * tMs.inv();
+    //ssc::Transform3D prMt = prMs * sMt; 
+    
+    //std::cout << prMt.vector(ssc::Vector3D(0,1,0));
+    //std::cout << prMt.coord(ssc::Vector3D(0,0,0));
     //std::cout << std::endl;
     
-    mPositions[i].mPos = sMu.inv() * mPositions[i].mPos;
+    mPositions[i].mPos = prMs * sMu; // * mPositions[i].mPos;
+    
+    ssc::Transform3D prMu = prMs * sMu;
+    //std::cout << prMu.vector(ssc::Vector3D(1,0,0));
+    //std::cout << prMu.coord(ssc::Vector3D(0,0,0));
+    //std::cout << std::endl;
   }
-  //mPos is uMpr
+  //mPos is prMu
   
-  //TODO: Create offset between input picture origo and US origo
 }
   
 /**
@@ -560,8 +568,8 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
  * orientation of the mid-frame and the point cloud from the mask.
  * mExtent is computed as a by-product
  *
- * Pre:  mFrames[i].mPos = usMpr
- * Post: mFrames[i].mPos = usMd
+ * Pre:  mFrames[i].mPos = prMu
+ * Post: mFrames[i].mPos = dMu
  *       mExtent is defined
  */
 void Reconstructer::findExtentAndOutputTransform()
@@ -571,10 +579,12 @@ void Reconstructer::findExtentAndOutputTransform()
   prMd = mFrames[mFrames.size()/2].mPos;
   prMd = prMd.inv();
   
-  for (unsigned int i = 0; i < mFrames.size(); i++)
+  /*for (unsigned int i = 0; i < mFrames.size(); i++)
   {
     mFrames[i].mPos = mFrames[i].mPos * prMd;
-  }
+  }*/
+  
+  //mFrames[i].mPos = d'Mu, d' = only rotation
   
   // Find extent of all frames as a point cloud
   std::vector<ssc::Vector3D> inputRect = this->generateInputRectangle();
@@ -582,10 +592,10 @@ void Reconstructer::findExtentAndOutputTransform()
   //std::cout << "inputRect" << std::endl;
   for(unsigned int slice = 0; slice < mFrames.size(); slice++)
   {
-    Transform3D dMus = mFrames[slice].mPos.inv();
+    Transform3D dMu = mFrames[slice].mPos;
     for (unsigned int i = 0; i < inputRect.size(); i++)
     {
-      outputRect.push_back(dMus.coord(inputRect[i]));
+      outputRect.push_back(dMu.coord(inputRect[i]));
       //std::cout << " " << inputRect[i];
     }
     //std::cout << " " << dMus;
@@ -601,11 +611,11 @@ void Reconstructer::findExtentAndOutputTransform()
   ssc::DoubleBoundingBox3D boundingBox = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
   mExtent = boundingBox;
     
-  // Translate usMd to output volume origo
+  // Translate dMu to output volume origo
   ssc::Transform3D T_origo = ssc::createTransformTranslate(boundingBox.corner(0,0,0));
   for (unsigned int i = 0; i < mFrames.size(); i++)
   {
-    mFrames[i].mPos = mFrames[i].mPos * T_origo;
+    mFrames[i].mPos = T_origo.inv() * mFrames[i].mPos;
     //std::cout << mFrames[i].mPos.inv().coord(ssc::Vector3D(0,0,0));  
     //std::cout << std::endl;
   }
@@ -661,7 +671,7 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
     readTimeStampsFile(changeExtension(fileName, "tts"), &mPositions);
   }
 
-  //mPos is now sMpr
+  //mPos is now prMs
 
   if (QFileInfo(changeExtension(fileName, "msk")).exists())
   {
@@ -676,14 +686,14 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
   this->calibrateTimeStamps();
 
   this->calibrate(calFileName);
-  //mPos (in mPositions) is now uMpr
+  //mPos (in mPositions) is now prMu
 
   this->interpolatePositions();
-  // mFrames: now mPos as uMpr
+  // mFrames: now mPos as prMu
 
   this->findExtentAndOutputTransform();
 //  mOutput = this->generateOutputVolume();
-  //mPos in mFrames is now uMd
+  //mPos in mFrames is now dMu
 }
 
   
@@ -714,15 +724,24 @@ void Reconstructer::reconstruct()
   }
   
   // reconstruction expects the inverted matrix direction: give it that.
-  std::vector<TimedPosition> mInvFrames = mFrames;
-  for (unsigned int i=0; i < mFrames.size(); i++)
-    mInvFrames[i].mPos = mFrames[i].mPos.inv();
+  //std::vector<TimedPosition> mInvFrames = mFrames;
   
   //test
-  DataManager::getInstance()->loadImage(mUsRaw);
+  //for (unsigned int i=0; i < mFrames.size(); i++)
+  //  mInvFrames[i].mPos = mFrames[i].mPos.inv();
+  
+  //test
+  //DataManager::getInstance()->loadImage(mUsRaw);
+  
+  /*double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
+  ssc::Vector3D tp = ssc::Vector3D(370*spacing[0], 150*spacing[1], 0);
+  for (int i = 0; i < mFrames.size(); i++)
+  {
+    std::cout << i << ": " << mFrames[i].mPos.coord(tp) << std::endl;
+  }*/
   
   QDateTime pre = QDateTime::currentDateTime();
-  mAlgorithm->reconstruct(mInvFrames, mUsRaw, mOutput, mMask);
+  mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask);
   std::cout << "Reconstruct time: " << pre.time().msecsTo(QDateTime::currentDateTime().time()) << std::endl;
 
   DataManager::getInstance()->loadImage(mOutput);
