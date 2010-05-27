@@ -382,7 +382,7 @@ __kernel void vnn(__global unsigned char * bscans0,
 		int done_down = 0;
 		int min_bscan = current_bscan;
 		int n;
-		for (int i = 1; !done_down || !done_up; i++) {
+		/*for (int i = 1; !done_down || !done_up; i++) {
 			if (!done_up) {
 				n = current_bscan + i;
 				temp = fabs(_distance(voxel_coord, plane_eq[n]));
@@ -398,14 +398,15 @@ __kernel void vnn(__global unsigned char * bscans0,
 				dist = min(dist, temp);
 				done_down = temp-dist > kernel_radius || n <= 0;
 			}
-		}
+		}*/
     
 		current_bscan = min_bscan;
 		dist = _distance(voxel_coord, plane_eq[current_bscan]);
 
-  /*  	// Find bscan closest to voxel (x,0,z)
+  //testcode
+    	// Find bscan closest to voxel (x,0,z)
 	int current_bscan = -1;
-	float dist = 10000; // inf
+	dist = 10000; // inf
 	for (int n = 0; n < bscan_n; n++) {
 		float4 voxel_000 = {x*volume_spacing, y*volume_spacing, z*volume_spacing, 0.0f};
 		float temp = fabs(_distance(voxel_000, plane_eq[n]));
@@ -413,7 +414,7 @@ __kernel void vnn(__global unsigned char * bscans0,
 			current_bscan = n;
 			dist = temp;
 		}
-	}*/
+	}
 
     //if(fabs(dist) > kernel_radius)
     //  continue;
@@ -427,8 +428,8 @@ __kernel void vnn(__global unsigned char * bscans0,
 		float4 x_vector = normalize(cornerx - corner0);
 		float4 y_vector = normalize(cornery - corner0);
 
-		unsigned int px = dot(p, x_vector)/bscan_spacing_x;
-		unsigned int py = dot(p, y_vector)/bscan_spacing_y;
+		int px = dot(p, x_vector)/bscan_spacing_x;
+		int py = dot(p, y_vector)/bscan_spacing_y;
 
     /*if((x == 100) && (y == 100) & (z == 100) )
     {

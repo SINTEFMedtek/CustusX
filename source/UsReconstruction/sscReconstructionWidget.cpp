@@ -63,8 +63,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
   
-  QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
-  QString defFile = "UsAcq_1.mhd";
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
+  //QString defFile = "UsAcq_1.mhd";
+  QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
+  QString defFile = "USAcq_29.mhd";
+  
   //QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
   //QString defPath = "/Users/olevs/data/UL_thunder/test/";
   //QString defFile = "ultrasoundSample5.mhd";
@@ -124,7 +127,7 @@ QString ReconstructionWidget::getCurrentPath()
 
 void ReconstructionWidget::reconstruct()
 {
-  QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+  //QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
 
   //mReconstructer->reconstruct(mInputFile, calFile);
   mReconstructer->reconstruct();
@@ -170,7 +173,8 @@ void ReconstructionWidget::selectData(QString filename)
   mDataComboBox->setToolTip(mInputFile);
 
   // read data into reconstructer
-  QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+  //QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+  QString calFile = QFileInfo(mInputFile).dir().filePath("CLA_terrason.cal");
   mReconstructer->readFiles(mInputFile, calFile);
 
 //  ssc::DoubleBoundingBox3D extent = mReconstructer->getExtent();
