@@ -6,6 +6,7 @@
  */
 #include "sscHelperWidgets.h"
 
+#include <iostream>
 #include "sscVector3D.h"
 
 namespace ssc
@@ -74,6 +75,9 @@ void SliderGroupWidget::textEditedSlot(const QString& text)
 
 void SliderGroupWidget::dataChanged()
 {
+  mSlider->blockSignals(true);
+  mEdit->blockSignals(true);
+
   DoubleRange range = mData->getValueRange();
   DoubleRange dRange(
       mData->convertInternal2Display(range.min()),
@@ -85,6 +89,24 @@ void SliderGroupWidget::dataChanged()
   //std::cout << "SliderGroup::dataChanged() " << range.min() << "," << range.max() << "," << range.step() << std::endl;
   mSlider->setDoubleValue(mData->convertInternal2Display(mData->getValue()));
   mEdit->setDoubleValue(mData->convertInternal2Display(mData->getValue()));
+
+  mSlider->blockSignals(false);
+  mEdit->blockSignals(false);
 }
+
+
+QSize DoubleLineEdit::sizeHint() const
+{
+  return QLineEdit::sizeHint();
+}
+
+QSize DoubleLineEdit::minimumSizeHint() const
+{
+  QSize size = QLineEdit::minimumSizeHint();
+  //std::cout << "DoubleLineEdit::minimumSizeHint() " << size.width() << ", " << size.height() << std::endl;
+  //size.setWidth(size.height()*2);
+  return size;
+}
+
 
 }

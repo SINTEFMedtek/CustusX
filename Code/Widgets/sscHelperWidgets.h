@@ -78,8 +78,8 @@ class DoubleLineEdit : public QLineEdit
 public:
   DoubleLineEdit(QWidget* parent = 0) : QLineEdit(parent) {}
   //virtual QSize sizeHint() const { return QSize(30,20); }
-  virtual QSize sizeHint() const { return minimumSizeHint(); }
-
+  virtual QSize sizeHint() const;
+  virtual QSize minimumSizeHint() const;
   double getDoubleValue(double defVal=0.0) const
   {
     bool ok;
