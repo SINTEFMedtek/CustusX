@@ -83,7 +83,7 @@ ocl_context* ocl_init()
 	retval->context = clCreateContextFromType(cps, CL_DEVICE_TYPE_GPU, NULL, NULL, &err);
 #endif //USE_CPU
   
-	printf("device id: %p\n", retval->device);
+	//printf("device id: %p\n", retval->device);
   
 	ocl_check_error(err, "clCreateContext");
 	retval->cmd_queue = clCreateCommandQueue(retval->context, retval->device, CL_QUEUE_PROFILING_ENABLE, &err);

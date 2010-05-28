@@ -37,10 +37,10 @@ class Reconstructer : public QObject
 public:
   Reconstructer();
 
-  void readFiles(QString mhdFileName, QString calFileName);
+  void readFiles(QString mhdFileName, QString calFilesPath);
   void reconstruct(); // assumes readFiles has already been called
 
-  ImagePtr reconstruct(QString mhdFileName, QString calFileName); // do everything
+  ImagePtr reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr getOutput();
   ImagePtr getInput();
   QDomElement getSettings() const;
@@ -65,6 +65,8 @@ private:
   ProbeXmlConfigParser::Configuration mConfiguration;
   QDomDocument mSettings;
   QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
+  QString mCalFileName; ///< Name of calibration file
+  QString mCalFilesPath; ///< Path to calibration files
   QString mFilename; ///< filename used for current data read
   QString mCalFilename; /// filename used for current cal read
   ImagePtr mOutput;///< Output image from reconstruction
@@ -85,7 +87,7 @@ private:
   void calibrateTimeStamps();
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();
-  void calibrate(QString calFile);
+  void calibrate(QString calFilesPath);
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
   StringOptionItem getNamedSetting(const QString& uid);

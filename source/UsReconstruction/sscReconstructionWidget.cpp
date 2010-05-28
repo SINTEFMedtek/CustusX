@@ -112,7 +112,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
 
-#define CA_DEFS
+//#define CA_DEFS
 
 #ifdef CA_DEFS
   QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
@@ -120,7 +120,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #else
   //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
   //QString defFile = "UsAcq_1.mhd";
-  //QString defFile = "USAcq_29.mhd";
 
   QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
   //QString defPath = "/Users/olevs/data/UL_thunder/test/";
@@ -233,9 +232,6 @@ QString ReconstructionWidget::getCurrentPath()
 
 void ReconstructionWidget::reconstruct()
 {
-  //QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
-
-  //mReconstructer->reconstruct(mInputFile, calFile);
   mReconstructer->reconstruct();
 }
 
@@ -285,12 +281,11 @@ void ReconstructionWidget::selectData(QString filename)
   mDataComboBox->setToolTip(mInputFile);
 
   // read data into reconstructer
-#ifdef CA_DEFS
-  QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
-#else
-  QString calFile = QFileInfo(mInputFile).dir().filePath("CLA_terrason.cal");
-#endif
-  mReconstructer->readFiles(mInputFile, calFile);
+
+  QStringList list = mInputFile.split("/");
+  list[list.size()-1] = "";
+  QString calFilesPath = list.join("/")+"/";
+  mReconstructer->readFiles(mInputFile, calFilesPath);
 }
 
 /** Called when parameters in the reconstructer has changed

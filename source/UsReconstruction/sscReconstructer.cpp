@@ -86,7 +86,7 @@ void Reconstructer::setSettings()
     mLastAppliedOrientation = newOrient;
     this->clearOutput();
     // reread everything.
-    this->readFiles(mFilename, mCalFilename);
+    this->readFiles(mFilename, mCalFilesPath);
   }
 
   emit paramsChanged();
@@ -174,7 +174,9 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
     std::cout << "Error in Reconstructer::readUsDataFile(): Can't open file: ";
     std::cout << string_cast(mhdFileName) << std::endl;
   }
-  bool found = false;
+  bool foundConfig = false;
+  QStringList configList;
+  bool foundCalFile = false;
   while (!file.atEnd())
   {
     //QByteArray array = file.readLine();
@@ -183,51 +185,45 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
     if(line.startsWith("ConfigurationID", Qt::CaseInsensitive))
     {
       QStringList tempList = line.split(" ", QString::SkipEmptyParts);
-      QStringList list = tempList[2].split(":", QString::SkipEmptyParts);
-      QString xmlPath = "ProbeCalibConfigs.xml"; //TODO: Use correct path
-      ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
-      QString config = list[3].trimmed();
-      mConfiguration = xmlConfigParser->getConfiguration(list[0], list[1], list[2], config);
-      found = true;
+      configList = tempList[2].split(":", QString::SkipEmptyParts);
+      configList[3] = configList[3].trimmed();
+      foundConfig = true;
+    }
+    else if(line.startsWith("ProbeCalibration", Qt::CaseInsensitive))
+    {
+      QStringList list = line.split(" ", QString::SkipEmptyParts);
+      mCalFileName = list[2].trimmed();
+      foundCalFile = true;
     }
   }
-  if(!found)
+  if(!foundConfig)
   {
     std::cout << "Error in Reconstructer::readUsDataFile(): ";
     std::cout << "Can't find ConfigurationID in file: ";
     std::cout << string_cast(mhdFileName) << std::endl;
   }
+  else
+  {
+    QString xmlPath = "ProbeCalibConfigs.xml"; //TODO: Use correct path
+    ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
+    mConfiguration = xmlConfigParser->getConfiguration(configList[0], 
+                                                       configList[1], 
+                                                       configList[2], 
+                                                       configList[3]);
+  }
   
-  
-  //testcode
-  /*int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
-  double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
-  unsigned char* ptr = static_cast<unsigned char*>(mUsRaw->getBaseVtkImageData()->GetScalarPointer());
-  for (int x = 0; x < 50; x++)
-    for(int y = 0; y < 50; y++)
-      for(int z = 0; z < dims[2]; z++) 
-    {
-      //unsigned char val = ptr[x + y*dims[0] + z*dims[0]*dims[1]];
-      ptr[x + y*dims[0] + z*dims[0]*dims[1]] = 255;      
-    }
-  
-  int b = 20;
-  for (int x = 0; x < dims[0]; x++)
-    for(int y = 0; y < dims[1]; y++)
-      for(int z = 0; z < dims[2]; z++) 
-      {
-        if (!within(x, b, dims[0]-b) || !within(y, b, dims[1]-b))
- //       if( (x<b) || (x>(dims[0]-b)))
- //          if ((y<b) || (y>(dims[1]-b)))
-          ptr[x + y*dims[0] + z*dims[0]*dims[1]] = 255;      
-      }
-  */
+  if(!foundCalFile)
+  {
+    std::cout << "Error in Reconstructer::readUsDataFile(): ";
+    std::cout << "Can't find ProbeCalibration in file: ";
+    std::cout << string_cast(mhdFileName) << std::endl;
+  }
   
   //Allcate place for position and time stamps for all frames
   mFrames.resize(mUsRaw->getBaseVtkImageData()->GetDimensions()[2]);
   
-  std::cout << "Reconstructer::readUsDataFile() - succes. Number of frames: " 
-    << mFrames.size() << std::endl;
+  //std::cout << "Reconstructer::readUsDataFile() - succes. Number of frames: " 
+  //  << mFrames.size() << std::endl;
   return;
 }
 
@@ -266,9 +262,9 @@ void Reconstructer::readTimeStampsFile(QString fileName,
   }
   else
   {
-    std::cout << "Reconstructer::readTimeStampsFile() - succes. ";
-    std::cout << "Number of time stamps: ";
-    std::cout << timedPos->size() << std::endl;
+    //std::cout << "Reconstructer::readTimeStampsFile() - succes. ";
+    //std::cout << "Number of time stamps: ";
+    //std::cout << timedPos->size() << std::endl;
   }
   return;
 }
@@ -327,9 +323,9 @@ void Reconstructer::readPositionFile(QString posFile, bool alsoReadTimestamps)
     std::cout << "numPos: " << numPos << ", read number of pos: ";
     std::cout << mPositions.size() << std::endl;
   }*/
-  std::cout << "Reconstructer::readPositionFile() - succes. ";
-  std::cout << "Number of positions: ";
-  std::cout << mPositions.size() << std::endl;
+  //std::cout << "Reconstructer::readPositionFile() - succes. ";
+  //std::cout << "Number of positions: ";
+  //std::cout << mPositions.size() << std::endl;
   return;
 }
   
@@ -539,15 +535,12 @@ Transform3D Reconstructer::readTransformFromFile(QString fileName)
  * Pre:  mPos is sMpr
  * Post: mPos is uMpr
  */
-void Reconstructer::calibrate(QString calFile)
+void Reconstructer::calibrate(QString calFilesPath)
 {
   // Calibration from tool space to localizer = sMt
-  Transform3D sMt = this->readTransformFromFile(calFile);
-  
-  //Geir Arne means calibration = tMs
-  //Transform3D tMs = this->readTransformFromFile(calFile).inv();
-  
-  //testcode: Transform from image coordinate syst with origin in lower loft corner
+  Transform3D sMt = this->readTransformFromFile(calFilesPath+mCalFileName);
+      
+  //testcode: Transform from image coordinate syst with origin in lower left corner
   //Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
   //Transform3D Rz = ssc::createTransformRotateZ(-M_PI/2.0);
   //ssc::Transform3D R = (Rz*Rx);
@@ -566,15 +559,11 @@ void Reconstructer::calibrate(QString calFile)
   ssc::Vector3D origin_rotated = R.coord(origin_u);
   
   ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
-  //ssc::Transform3D T = ssc::createTransformTranslate(origin_rotated);//test
   
   ssc::Transform3D tMu = T*R;
-  //ssc::Transform3D tMu = T;//test
   
-  //ssc::Transform3D sMu = tMs.inv()*tMu;
   ssc::Transform3D sMu = sMt*tMu;
   
-  //testcode
   ssc::Vector3D ex_u(1,0,0);
   ssc::Vector3D ey_u(0,1,0);
   ssc::Vector3D ex_t = tMu.vector(ex_u);
@@ -585,7 +574,6 @@ void Reconstructer::calibrate(QString calFile)
   {
     std::cout << "error ex_t: " << ex_t << std::endl;
   }
-  //if (!similar(ey_t, ssc::Vector3D(0,0,-1)))
   if (!similar(ey_t, ssc::Vector3D(0,0,1)))
   {
     std::cout << "error ey_t: " << ey_t << std::endl;
@@ -595,13 +583,9 @@ void Reconstructer::calibrate(QString calFile)
     std::cout << "error origin_t: " << origin_t << std::endl;
   }
   
-  //applyCalibration(sMu);
-  
   //mPos is prMs
   for (unsigned int i = 0; i < mPositions.size(); i++)
   {
-    //testcode
-    //ssc::Transform3D sMpr = mPositions[i].mPos;
     ssc::Transform3D prMs = mPositions[i].mPos;
     //Calibration * Input position
     //ssc::Transform3D tMpr = tMs * sMpr;
@@ -615,8 +599,8 @@ void Reconstructer::calibrate(QString calFile)
     //std::cout << prMt.coord(ssc::Vector3D(0,0,0));
     //std::cout << std::endl;
     
-    mPositions[i].mPos = prMs * sMu; // * mPositions[i].mPos;
-    
+    mPositions[i].mPos = prMs * sMu;
+        
     ssc::Transform3D prMu = prMs * sMu;
     //std::cout << prMu.vector(ssc::Vector3D(1,0,0));
     //std::cout << prMu.coord(ssc::Vector3D(0,0,0));
@@ -797,11 +781,11 @@ ImagePtr Reconstructer::generateOutputVolume()
 }
 
 
-void Reconstructer::readFiles(QString fileName, QString calFileName)
+void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 {
   this->clearAll();
   mFilename = fileName;
-  mCalFilename = calFileName;
+  mCalFilesPath = calFilesPath;
 
   readUsDataFile(changeExtension(fileName, "mhd"));
     
@@ -833,7 +817,7 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
 
   this->calibrateTimeStamps();
 
-  this->calibrate(calFileName);
+  this->calibrate(calFilesPath);
   //mPos (in mPositions) is now prMu
 
   this->interpolatePositions();
@@ -847,12 +831,12 @@ void Reconstructer::readFiles(QString fileName, QString calFileName)
 }
 
   
-ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFileName)
+ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
 {
   std::cout << "Perform reconstruction on: " << mhdFileName << std::endl;
-  std::cout << "Use calibration file: " << calFileName << std::endl;
+  //std::cout << "Use calibration file: " << calFileName << std::endl;
 
-  this->readFiles(mhdFileName, calFileName);
+  this->readFiles(mhdFileName, calFilesPath);
   mOutput = this->generateOutputVolume();
 
   this->reconstruct();
