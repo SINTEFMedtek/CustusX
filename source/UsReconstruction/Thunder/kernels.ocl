@@ -382,13 +382,16 @@ __kernel void vnn(__global unsigned char * bscans0,
 		int done_down = 0;
 		int min_bscan = current_bscan;
 		int n;
+    // Problem with GPU: Don't work if we traverse all the input images
 		/*for (int i = 1; !done_down || !done_up; i++) {
 			if (!done_up) {
 				n = current_bscan + i;
 				temp = fabs(_distance(voxel_coord, plane_eq[n]));
 				min_bscan = temp < dist ? n : min_bscan;
 				dist = min(dist, temp);
-				done_up = temp-dist > kernel_radius || n >= bscan_n-1;
+				//done_up = temp-dist > kernel_radius || n >= bscan_n-1;
+				//done_up = n >= bscan_n-1;
+				done_up = n >= bscan_n-50;//test
 			}
 
 			if (!done_down) {
@@ -396,7 +399,9 @@ __kernel void vnn(__global unsigned char * bscans0,
 				temp = fabs(_distance(voxel_coord, plane_eq[n]));
 				min_bscan = temp < dist ? n : min_bscan;
 				dist = min(dist, temp);
-				done_down = temp-dist > kernel_radius || n <= 0;
+				//done_down = temp-dist > kernel_radius || n <= 0;
+				//done_down = n <= 0;
+				done_down = n <= 50;//test
 			}
 		}*/
     
@@ -404,12 +409,11 @@ __kernel void vnn(__global unsigned char * bscans0,
 		dist = _distance(voxel_coord, plane_eq[current_bscan]);
 
   //testcode
-    	// Find bscan closest to voxel (x,0,z)
-	int current_bscan = -1;
+  // Find bscan closest to voxel (x,y,z)
+	current_bscan = -1;
 	dist = 10000; // inf
 	for (int n = 0; n < bscan_n; n++) {
-		float4 voxel_000 = {x*volume_spacing, y*volume_spacing, z*volume_spacing, 0.0f};
-		float temp = fabs(_distance(voxel_000, plane_eq[n]));
+		float temp = fabs(_distance(voxel_coord, plane_eq[n]));
 		if (temp < dist) {
 			current_bscan = n;
 			dist = temp;
@@ -452,10 +456,10 @@ printf("bscan_w: %d, bscan_h: %d, bscan_n: %d\n", bscan_w, bscan_h, bscan_n);*/
 		if ((px >= 0) && (px < bscan_w) && (py >= 0) && (py < bscan_h))
     {
     
-    /*if (current_bscan < bscan_n/2)
-      volume_a(x,y,z) = bscans0[px + py*bscan_w + current_bscan*bscan_w*bscan_h];
-    else
-      volume_a(x,y,z) = bscans1[px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];*/
+    //if (current_bscan < bscan_n/2)
+    //  volume_a(x,y,z) = bscans0[px + py*bscan_w + current_bscan*bscan_w*bscan_h];
+    //else
+    //  volume_a(x,y,z) = bscans1[px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
       
 			if (fabs(dist) < kernel_radius)
       {
@@ -464,16 +468,16 @@ printf("bscan_w: %d, bscan_h: %d, bscan_n: %d\n", bscan_w, bscan_h, bscan_n);*/
         {
 					if (current_bscan < bscan_n/2)
           {
-						/*int shift = 8*((px + py*bscan_w + current_bscan*bscan_w*bscan_h)%4);
-						unsigned int char_int = bscans0[(px + py*bscan_w + current_bscan*bscan_w*bscan_h)/4] >> shift;
-						volume_a(x,y,z) = char_int & 255;*/
+						//int shift = 8*((px + py*bscan_w + current_bscan*bscan_w*bscan_h)%4);
+						//unsigned int char_int = bscans0[(px + py*bscan_w + current_bscan*bscan_w*bscan_h)/4] >> shift;
+						//volume_a(x,y,z) = char_int & 255;
             volume_a(x,y,z) = bscans0[px + py*bscan_w + current_bscan*bscan_w*bscan_h];
 					} 
           else 
           {
-						/*int shift = 8*((px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)%4);
-						unsigned int char_int = bscans1[(px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)/4] >> shift;
-						volume_a(x,y,z) = char_int & 255;*/
+						//int shift = 8*((px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)%4);
+						//unsigned int char_int = bscans1[(px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h)/4] >> shift;
+						//volume_a(x,y,z) = char_int & 255;
             volume_a(x,y,z) = bscans1[px + py*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
 					}
         }

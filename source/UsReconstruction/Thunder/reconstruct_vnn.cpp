@@ -265,8 +265,8 @@ void call_vnn_kernel(cl_kernel vnn,
 
   ocl_check_error(clFinish(context->cmd_queue));
 
-  holger_time(1, "Fill volume");
-  holger_time_print(1);
+  //holger_time(1, "Fill volume");
+  //holger_time_print(1);
 }
 
 void reconstruct_vnn(reconstruct_data* data, const char* kernel_path)
