@@ -15,7 +15,7 @@
 #include "sscVolumetricRep.h"
 #include "sscImage.h"
 #include "sscMainWindow.h"
-
+#include "sscForwardDeclarations.h"
 
 /**Main win for us reconstruction test app
  *
@@ -33,6 +33,9 @@ private slots:
 private:
   ssc::ReconstructionWidget* mReconstructionWidget;
   ssc::View* mView;
+
+  ssc::VolumetricRepPtr mVolumeRep;
+  ssc::AxesRepPtr mAxesRep;
 };
 
 #endif //USTEST_MAINWINDOW_H_

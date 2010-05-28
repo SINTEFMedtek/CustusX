@@ -740,7 +740,8 @@ void Reconstructer::findExtentAndOutputTransform()
   double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
                                  mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
   mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
-  mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
+  //mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
+  mOutputVolumeParams.constrainVolumeSize(1024*1024*16);
 }
   
 /**
