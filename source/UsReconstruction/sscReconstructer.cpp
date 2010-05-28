@@ -204,7 +204,8 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   }
   else
   {
-    QString xmlPath = "ProbeCalibConfigs.xml"; //TODO: Use correct path
+    //Assumes ProbeCalibConfigs.xml file and calfiles have the same path
+    QString xmlPath = mCalFilesPath+"ProbeCalibConfigs.xml";
     ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
     mConfiguration = xmlConfigParser->getConfiguration(configList[0], 
                                                        configList[1], 
