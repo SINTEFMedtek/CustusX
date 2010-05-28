@@ -11,11 +11,22 @@
 #include "sscConfig.h"
 #include "reconstruct_vnn.h"
 #include "sscImage.h"
+#include "sscXmlOptionItem.h"
 
 namespace ssc 
 {
 ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm()
 {
+}
+
+void ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
+{
+  StringOptionItem::initialize("Processor",
+      "",
+      "Which processor to use when reconstructing",
+      "CPU",
+      "\"CPU\" \"GPU\"",
+      root);
 }
   
 void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 

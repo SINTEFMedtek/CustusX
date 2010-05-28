@@ -2,8 +2,6 @@
  *  sscReconstructer.cpp
  *  Created by Ole Vegard Solberg on 5/4/10.
  */
-
-
 #include "sscReconstructer.h"
 
 #include <QtCore>
@@ -14,6 +12,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscDataManagerImpl.h"
 #include "sscTypeConversions.h"
+#include "sscXmlOptionItem.h"
 
 typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
@@ -24,27 +23,54 @@ Reconstructer::Reconstructer() :
   mAlgorithm(new ThunderVNNReconstructAlgorithm)
 {
   QString defPath = "/Users/christiana/workspace/sessions/";
-  QString filename = "usReconstruct.xml";
+  QString filename = "usReconstruct.xml_";
 
   QDomDocument doc("us reconstruction");
+  doc.appendChild(doc.createElement("usReconstruct"));
+  doc.documentElement().appendChild(doc.createElement("algorithms"));
+
   QFile file(defPath+filename);
   if (!file.open(QIODevice::ReadOnly))
   {
     std::cout << "file not found: " << defPath+filename << std::endl;
-    return;
   }
-  QString error;
-  int line,col;
-  if (!doc.setContent(&file, &error,&line,&col))
+  else
   {
-    std::cout << "error setting xml content [" << line << "," << col << "]"<< error << std::endl;
+    QString error;
+    int line,col;
+    if (!doc.setContent(&file, &error,&line,&col))
+    {
+      std::cout << "error setting xml content [" << line << "," << col << "]"<< error << std::endl;
       file.close();
-      return;
+    }
+    file.close();
   }
-  file.close();
+
+  mSettings = doc;
+
+  StringOptionItem::initialize("Orientation",
+      "",
+      "Algorithm to use for output volume orientation",
+      "PatientReference",
+      "\"PatientReference\" \"MiddleFrame\"",
+      this->getSettings());
+  StringOptionItem::initialize("Algorithm",
+      "",
+      "",
+      "ThunderVNN",
+      "\"ThunderVNN\"",
+      this->getSettings());
+
+  QDomElement algorithms = this->getSettings().namedItem("algorithms").toElement();
+
+  if (algorithms.namedItem(mAlgorithm->getName()).isNull())
+  {
+    QDomElement algo = doc.createElement(mAlgorithm->getName());
+    algorithms.appendChild(algo);
+    mAlgorithm->getSettings(algo);
+  }
 
   std::cout << doc.toString(2) << std::endl;
-  mSettings = doc;
 }
 
 QDomElement Reconstructer::getSettings() const
@@ -57,9 +83,10 @@ void Reconstructer::setSettings()
   QString newOrient = this->getNamedSetting("Orientation").getValue();
   if (newOrient!=mLastAppliedOrientation)
   {
-    clearAll();
-    // reread everything.
     mLastAppliedOrientation = newOrient;
+    this->clearOutput();
+    // reread everything.
+    this->readFiles(mFilename, mCalFilename);
   }
 
   emit paramsChanged();
@@ -773,6 +800,8 @@ ImagePtr Reconstructer::generateOutputVolume()
 void Reconstructer::readFiles(QString fileName, QString calFileName)
 {
   this->clearAll();
+  mFilename = fileName;
+  mCalFilename = calFileName;
 
   readUsDataFile(changeExtension(fileName, "mhd"));
     

@@ -19,7 +19,8 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
 {
-  
+class StringOptionItem;
+
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 /**
  * Used coordinate systems:
@@ -46,9 +47,6 @@ public:
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
-//  long getMaxOutputVolumeSize() const;
-//  void setMaxOutputVolumeSize(long val);
-//  ssc::DoubleBoundingBox3D getExtent() const; ///< extent of volume on output space
 
 public slots:
   void setSettings();
@@ -60,14 +58,16 @@ private:
   ImagePtr mUsRaw;///<All imported US data framed packed into one image
   std::vector<TimedPosition> mFrames;
   std::vector<TimedPosition> mPositions;
-//  ssc::DoubleBoundingBox3D mExtent; ///< extent of volume on output space
-  OutputVolumeParams mOutputVolumeParams;
-  ImagePtr mOutput;///< Output image from reconstruction
   ImagePtr mMask;///< Clipping mask for the input data
+
+  OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
   ProbeXmlConfigParser::Configuration mConfiguration;
   QDomDocument mSettings;
   QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
+  QString mFilename; ///< filename used for current data read
+  QString mCalFilename; /// filename used for current cal read
+  ImagePtr mOutput;///< Output image from reconstruction
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);

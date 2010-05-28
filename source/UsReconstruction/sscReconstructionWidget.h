@@ -12,6 +12,7 @@
 #include "sscReconstructer.h"
 #include "sscAbstractInterface.h"
 #include "sscHelperWidgets.h"
+#include "sscXmlOptionItem.h"
 
 namespace ssc
 {
