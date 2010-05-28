@@ -10,8 +10,12 @@ Data::Data() :
 }
 
 Data::Data(const std::string& uid, const std::string& name) :
-  mUid(uid), mName(name), mRegistrationStatus(rsNOT_REGISTRATED)
+  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED)
 {
+  if(name=="")
+    mName = mUid;
+  else
+    mName = name;
   m_rMd_History.reset(new ssc::RegistrationHistory() );
   connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SIGNAL(transformChanged()));
   connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));

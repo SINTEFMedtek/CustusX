@@ -4,7 +4,9 @@
 #include <vtkImageData.h>
 #include <vtkMetaImageReader.h>
 #include <vtkSmartPointer.h>
+#include <vtkMetaImageWriter.h>
 typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
+typedef vtkSmartPointer<class vtkMetaImageWriter> vtkMetaImageWriterPtr;
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
@@ -492,5 +494,18 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
   }
 }
 
+void DataManagerImpl::saveImage(ImagePtr image)
+{
+	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+  writer->SetInput(image->getBaseVtkImageData());
+  writer->SetFileDimensionality(3);
+  std::string filename = image->getFilePath() + "/" + image->getUid();
+  writer->SetFileName(std::string(filename + ".mhd").c_str());
+  writer->SetRAWFileName(std::string(filename + ".raw").c_str());
+  writer->SetCompression(false);
+  writer->Update();
+  writer->Write();
+}
+  
 } // namespace ssc
 
