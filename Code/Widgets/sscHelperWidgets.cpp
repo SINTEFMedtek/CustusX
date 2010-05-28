@@ -94,10 +94,16 @@ void SliderGroupWidget::dataChanged()
   mEdit->blockSignals(false);
 }
 
+// --------------------------------------------------------
+
 
 QSize DoubleLineEdit::sizeHint() const
 {
-  return QLineEdit::sizeHint();
+//  return QLineEdit::sizeHint();
+  QSize size = QLineEdit::minimumSizeHint();
+  //std::cout << "DoubleLineEdit::minimumSizeHint() " << size.width() << ", " << size.height() << std::endl;
+  size.setWidth(size.height()*3);
+  return size;
 }
 
 QSize DoubleLineEdit::minimumSizeHint() const

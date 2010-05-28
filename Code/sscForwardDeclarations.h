@@ -36,6 +36,7 @@ typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
 typedef boost::shared_ptr<class ProbeRep> ProbeRepPtr;
 typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
 typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
+typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
 
 } // namespace ssc
 
