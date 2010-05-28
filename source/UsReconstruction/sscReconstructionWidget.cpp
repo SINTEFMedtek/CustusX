@@ -112,21 +112,25 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
   
-  //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
-  //QString defFile = "UsAcq_1.mhd";
-  //QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
-  //QString defFile = "USAcq_29.mhd";
-  
-  //QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
-  //QString defPath = "/Users/olevs/data/UL_thunder/test/";
-  //QString defFile = "ultrasoundSample5.mhd";
 
+//#define CA_DEFS
+
+#ifdef CA_DEFS
   QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
   QString defFile = "ultrasoundSample5.mhd";
+#else
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
+  //QString defFile = "UsAcq_1.mhd";
+  //QString defFile = "USAcq_29.mhd";
 
+  QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/";
+  QString defFile = "USAcq_29.mhd";
+#endif
 
   //mInputFile = path + "UsAcq_1.mhd";
   //mInputFile = path + "ultrasoundSample5.mhd";
+  connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -141,11 +145,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   mSelectDataButton->setDefaultAction(mSelectDataAction);
 
   QHBoxLayout* extentLayout = new QHBoxLayout;
-
   mExtentLineEdit = new QLineEdit(this);
   mExtentLineEdit->setReadOnly(true);
   extentLayout->addWidget(new QLabel("Extent(mm)", this));
   extentLayout->addWidget(mExtentLineEdit);
+
+  QHBoxLayout* inputSpacingLayout = new QHBoxLayout;
+  mInputSpacingLineEdit = new QLineEdit(this);
+  mInputSpacingLineEdit->setReadOnly(true);
+  inputSpacingLayout->addWidget(new QLabel("Input Spacing(mm)", this));
+  inputSpacingLayout->addWidget(mInputSpacingLineEdit);
 
   mReloadButton = new QPushButton("Reload", this);
   connect(mReloadButton, SIGNAL(clicked()), this, SLOT(reload()));
@@ -187,6 +196,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   topLayout->addWidget(mReloadButton);
   topLayout->addWidget(outputVolGroup);
     outputVolLayout->addLayout(extentLayout);
+    outputVolLayout->addLayout(inputSpacingLayout);
     outputVolLayout->addLayout(outputVolGridLayout);
     outputVolLayout->addWidget(orientationWidget);
   topLayout->addWidget(algorithmWidget);
@@ -279,12 +289,20 @@ void ReconstructionWidget::selectData(QString filename)
   //QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
   QString calFile = QFileInfo(mInputFile).dir().filePath("CLA_terrason.cal");
   mReconstructer->readFiles(mInputFile, calFile);
+}
 
-//  ssc::DoubleBoundingBox3D extent = mReconstructer->getExtent();
-  ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
+/** Called when parameters in the reconstructer has changed
+ *
+ */
+void ReconstructionWidget::paramsChangedSlot()
+{
+  //  ssc::DoubleBoundingBox3D extent = mReconstructer->getExtent();
+    ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 
-  QString extText = QString("%1,  %2,  %3").arg(range[0],0,'f',1).arg(range[1],0,'f',1).arg(range[2],0,'f',1);
-  mExtentLineEdit->setText(extText);
+    QString extText = QString("%1,  %2,  %3").arg(range[0],0,'f',1).arg(range[1],0,'f',1).arg(range[2],0,'f',1);
+    mExtentLineEdit->setText(extText);
+
+    mInputSpacingLineEdit->setText(QString("%1").arg(mReconstructer->getOutputVolumeParams().mInputSpacing,0,'f',4));
 }
 
 void ReconstructionWidget::selectData()

@@ -22,15 +22,22 @@ void MainWindow::automaticStart()
 
 void MainWindow::showData()
 {
-  ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getOutput();
+  if (!mVolumeRep)
+  {
+    mVolumeRep = ssc::VolumetricRep::New("test","test");
+    mView->addRep(mVolumeRep);
+  }
+
   //ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getInput();
-  ssc::VolumetricRepPtr volumeRep = ssc::VolumetricRep::New("test","test");
-  volumeRep->setImage(data);
-  mView->addRep(volumeRep);
-  
+  ssc::ImagePtr data = mReconstructionWidget->reconstructer()->getOutput();
+  mVolumeRep->setImage(data);
+
   //Test: show axes
-  ssc::AxesRepPtr axesRep = ssc::AxesRep::New("AxesRepUID");
-	mView->addRep(axesRep);
+  if (!mAxesRep)
+  {
+    mAxesRep = ssc::AxesRep::New("AxesRepUID");
+    mView->addRep(mAxesRep);
+  }
 
   // desperate attempt to show data automatically...
   mView->getRenderer()->Render();

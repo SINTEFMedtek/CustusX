@@ -112,6 +112,7 @@ public slots:
   void selectData();
   void reload();
   void currentDataComboIndexChanged(const QString& text);
+  void paramsChangedSlot();
 
 private:
     ReconstructerPtr mReconstructer;
@@ -124,6 +125,7 @@ private:
     QPushButton* mReloadButton;
     QAction* mSelectDataAction;
     QLineEdit* mExtentLineEdit;
+    QLineEdit* mInputSpacingLineEdit;
     ssc::SliderGroupWidget* mMaxVolSizeWidget;
     ssc::SliderGroupWidget* mSpacingWidget;
     ssc::SliderGroupWidget* mDimXWidget;
