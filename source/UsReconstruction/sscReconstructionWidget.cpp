@@ -111,9 +111,8 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_x 85.0f
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
-  
 
-//#define CA_DEFS
+#define CA_DEFS
 
 #ifdef CA_DEFS
   QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
@@ -156,8 +155,8 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   inputSpacingLayout->addWidget(new QLabel("Input Spacing(mm)", this));
   inputSpacingLayout->addWidget(mInputSpacingLineEdit);
 
-  mReloadButton = new QPushButton("Reload", this);
-  connect(mReloadButton, SIGNAL(clicked()), this, SLOT(reload()));
+//  mReloadButton = new QPushButton("Reload", this);
+//  connect(mReloadButton, SIGNAL(clicked()), this, SLOT(reload()));
   mReconstructButton = new QPushButton("Reconstruct", this);
   connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
@@ -193,7 +192,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   topLayout->addLayout(dataLayout);
     dataLayout->addWidget(mDataComboBox);
     dataLayout->addWidget(mSelectDataButton);
-  topLayout->addWidget(mReloadButton);
+  //topLayout->addWidget(mReloadButton);
   topLayout->addWidget(outputVolGroup);
     outputVolLayout->addLayout(extentLayout);
     outputVolLayout->addLayout(inputSpacingLayout);
@@ -286,8 +285,11 @@ void ReconstructionWidget::selectData(QString filename)
   mDataComboBox->setToolTip(mInputFile);
 
   // read data into reconstructer
-  //QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+#ifdef CA_DEFS
+  QString calFile = QFileInfo(mInputFile).dir().filePath("M12L.cal");
+#else
   QString calFile = QFileInfo(mInputFile).dir().filePath("CLA_terrason.cal");
+#endif
   mReconstructer->readFiles(mInputFile, calFile);
 }
 

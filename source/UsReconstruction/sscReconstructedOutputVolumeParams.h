@@ -7,96 +7,18 @@
 #ifndef SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 #define SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
-#include <QDomElement>
-#include <QStringList>
 
 namespace ssc
 {
 
-/** Represents one option of the string type.
- *  The data are stored within a xml document.
- *
- *  The option node has this layout:
- *   <option>
- *     <id>Processor</id>
- *     <name>Nice name for Processor, optional</name>
- *     <help>Preferred type of processor to use during reconstruction</help>
- *     <value>CPU</value>
- *     <type>string</type>
- *     <range>"GPU" "CPU"</range>
- *   </option>
- */
-class StringOptionItem
-{
-public:
-  /** find and return the setting with id==uid among the children of root.
-   */
-  static StringOptionItem fromName(const QString& uid, QDomNode root)
-  {
-    QDomNodeList settings = root.childNodes();
-    for (int i=0; i<settings.size(); ++i)
-    {
-      StringOptionItem item(settings.item(i).toElement());
-      //std::cout << "getnamed("<<uid<<") "<< item.getId() << std::endl;
-      if (item.getId()==uid)
-        return item;
-    }
-    return StringOptionItem(QDomElement());
-  }
-
-  StringOptionItem(QDomElement element) : mElement(element) {}
-  QString getId() const
-  {
-    return mElement.attribute("id");
-    //return mElement.namedItem("id").toElement().text();
-  }
-  QString getName() const
-  {
-    QString name = mElement.namedItem("name").toElement().text();
-    if (!name.isEmpty())
-      return name;
-    return this->getId();
-  }
-  QString getHelp() const
-  {
-    return mElement.namedItem("help").toElement().text();
-  }
-  QString getValue() const
-  {
-    return mElement.namedItem("value").toElement().text();
-  }
-  void setValue(const QString& val)
-  {
-    QDomText text = mElement.namedItem("value").firstChild().toText();
-    if (text.isNull())
-    {
-      std::cout << "setvalue: null" << std::endl;
-      text = mElement.ownerDocument().createTextNode("");
-      mElement.namedItem("value").appendChild(text);
-    }
-    std::cout << "setvalue: " << val.toStdString() << std::endl;
-    text.setData(val);
-  }
-  QStringList getRange() const
-  {
-    QString str = mElement.namedItem("range").toElement().text();
-    // split sequences of type "a" "bb" "ff f"
-    QStringList retval = str.split(QRegExp("\"|\"\\s+\""), QString::SkipEmptyParts);
-    return retval;
-  }
-private:
-  QDomElement mElement;
-};
-
+/*
 class ReconstructionParams
 {
   QDomDocument mDocument;
   QString mProcessor; // GPU, CPU,
   QString mOrientation; // PatientReference, MiddleFrame,
   QString mAlgorithm;
-};
-
-
+};*/
 
 /** Helper struct for sending and controlling output volume properties.
  */

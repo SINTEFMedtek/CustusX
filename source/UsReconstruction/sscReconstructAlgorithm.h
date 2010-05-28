@@ -12,6 +12,8 @@
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
 
+class QDomElement;
+
 namespace ssc
 {
 typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
@@ -35,6 +37,16 @@ class ReconstructAlgorithm
 {
 public:
   virtual ~ReconstructAlgorithm() {};
+  /**
+   *  Return a unique name for this algo.
+   */
+  virtual QString getName() const = 0;
+  /**
+   *  Fill settings for this algorithm.
+   *  Input is the root node for this algo, filled with stored settings (if any).
+   *  On completion, the root is filled with default values for settings.
+   */
+  virtual void getSettings(QDomElement root) = 0;
   /**
    * \param frameInfo Timetags and positions for the input frames
    * \param frameData The frame data. Assumes that the transfrom is identity.
