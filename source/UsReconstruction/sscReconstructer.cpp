@@ -898,6 +898,8 @@ void Reconstructer::reconstruct()
 
   DataManager::getInstance()->loadImage(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
+  
+  DataManager::getInstance()->saveImage(mOutput);
 }
 
  
