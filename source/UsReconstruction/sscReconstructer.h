@@ -47,6 +47,8 @@ public:
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
+  void setOutputRelativePath(QString path);
+  void setOutputBasePath(QString path);
 
 public slots:
   void setSettings();
@@ -70,6 +72,8 @@ private:
   QString mFilename; ///< filename used for current data read
   QString mCalFilename; /// filename used for current cal read
   ImagePtr mOutput;///< Output image from reconstruction
+  QString mOutputRelativePath;///< Relative path to the output image
+  QString mOutputBasePath;///< Global path where the relative path starts, for the output image
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);

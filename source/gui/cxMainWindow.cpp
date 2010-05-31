@@ -384,7 +384,9 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-//  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
+  //  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
+  mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
+  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
 }
 
 /** Called when the layout is changed: update the layout menu

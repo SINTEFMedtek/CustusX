@@ -21,7 +21,9 @@ namespace ssc
 {
 
 Reconstructer::Reconstructer() :
-  mAlgorithm(new ThunderVNNReconstructAlgorithm)
+  mAlgorithm(new ThunderVNNReconstructAlgorithm),
+  mOutputRelativePath(""),
+  mOutputBasePath("")
 {
   QString defPath = "/Users/christiana/workspace/sessions/";
   QString filename = "usReconstruct.xml_";
@@ -133,6 +135,16 @@ void Reconstructer::setOutputVolumeParams(const OutputVolumeParams& par)
   emit paramsChanged();
 }
 
+void Reconstructer::setOutputRelativePath(QString path)
+{
+  mOutputRelativePath = path;
+}
+  
+void Reconstructer::setOutputBasePath(QString path)
+{
+  mOutputBasePath = path;
+}
+  
 //long Reconstructer::getMaxOutputVolumeSize() const
 //{
 //  return mOutputVolumeParams.getMaxVolumeSize();
@@ -851,8 +863,15 @@ ImagePtr Reconstructer::generateOutputVolume()
   ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
                                       data, 
                                       string_cast(volumeName))) ;
+  //If no output path is selecetd, use the same path as the input
+  QString filePath;
+  if(mOutputBasePath.isEmpty() && mOutputRelativePath.isEmpty())
+    filePath = qstring_cast(mUsRaw->getFilePath());
+  else
+    filePath = mOutputRelativePath + "/" + volumeName + ".mhd";
+
+  image->setFilePath(string_cast(filePath));
   image->set_rMd(mOutputVolumeParams.m_rMd);
-  image->setFilePath(mUsRaw->getFilePath());
   return image;
 }
 
@@ -964,7 +983,7 @@ void Reconstructer::reconstruct()
   DataManager::getInstance()->loadImage(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
   
-  DataManager::getInstance()->saveImage(mOutput);
+  DataManager::getInstance()->saveImage(mOutput, string_cast(mOutputBasePath));
 }
 
  
