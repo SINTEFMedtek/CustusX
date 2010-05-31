@@ -78,7 +78,7 @@ private:
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
   vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
-  void applyOutputOrientation();
+  ssc::Transform3D applyOutputOrientation();
   void findExtentAndOutputTransform();
 
   QString changeExtension(QString name, QString ext);

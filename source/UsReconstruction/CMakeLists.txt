@@ -19,6 +19,7 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
 # library
 SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
+  matrixInterpolation.cpp
   sscReconstructer.cpp
   sscReconstructionWidget.cpp
   sscReconstructOutputValueParamsInterfaces.cpp
@@ -41,7 +42,7 @@ link_directories( Thunder )
 # =========================================================
 # create the target
 add_library( sscUsReconstructionLib  ${SOURCE_FILES} )
-target_link_libraries( sscUsReconstructionLib SSC thunder )
+target_link_libraries( sscUsReconstructionLib SSC thunder ITKCommon)
 # =========================================================
 
 

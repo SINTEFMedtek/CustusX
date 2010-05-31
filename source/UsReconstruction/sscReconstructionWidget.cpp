@@ -112,7 +112,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
 
-//#define CA_DEFS
+#define CA_DEFS
 
 #ifdef CA_DEFS
   QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
@@ -186,6 +186,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
     connect(interface.get(), SIGNAL(valueWasSet()), mReconstructer.get(), SLOT(setSettings()));
     connect(mReconstructer.get(), SIGNAL(paramsChanged()), interface.get(), SIGNAL(changed()));
     ssc::ComboGroupWidget* widget = new ssc::ComboGroupWidget(this, interface, algoLayout, i);
+    widget = widget;
   }
 
   topLayout->addLayout(dataLayout);

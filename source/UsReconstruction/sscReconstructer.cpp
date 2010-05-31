@@ -8,11 +8,12 @@
 #include <vtkImageData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkPointData.h>
-
+#include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
 #include "sscDataManagerImpl.h"
 #include "sscTypeConversions.h"
 #include "sscXmlOptionItem.h"
+#include "sscToolManager.h"
 
 typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
@@ -496,29 +497,89 @@ Transform3D Reconstructer::interpolate(const Transform3D& a,
  */
 void Reconstructer::interpolatePositions()
 {
-  //TODO: Check if the affine transforms still are affine after the linear interpolation 
-  
+  //TODO: Check if the affine transforms still are affine after the linear interpolation
+
   double scale = mPositions.size() / (double)mFrames.size();
-  for(unsigned int i_frame = 0; i_frame < mFrames.size(); i_frame++)
+  for(unsigned i_frame = 0; i_frame < mFrames.size(); i_frame++)
   {
-    unsigned int i_pos = i_frame*scale;// =floor()
+    unsigned i_pos = i_frame*scale;// =floor()
     if (i_pos < 0)
       i_pos = 0;
     else if(i_pos >= mPositions.size()-1)
       i_pos = mPositions.size()-2;
-      
+
     double t_delta_tracking = mPositions[i_pos+1].mTime - mPositions[i_pos].mTime;
     double t = 0;
     if (!similar(t_delta_tracking, 0))
       t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) / t_delta_tracking;
-    mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos, 
-                                        mPositions[i_pos+1].mPos, t);
-    
-    //std::cout << mFrames[i_frame].mPos.inv().coord(ssc::Vector3D(0,0,0));  
+    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
+//    mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos,
+//                                        mPositions[i_pos+1].mPos, t);
+
+    //std::cout << mFrames[i_frame].mPos.inv().coord(ssc::Vector3D(0,0,0));
     //std::cout << std::endl;
   }
 }
-  
+
+vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
+{
+//  std::cout << src[0][3] << " " << src[1][3] << " " << src[2][3] << " " << std::endl;
+
+  vnl_matrix_double dst(4,4);
+  for (int i=0; i<4; ++i)
+    for (int j=0; j<4; ++j)
+      dst[i][j] = src[i][j];
+  return dst;
+}
+
+ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
+{
+  ssc::Transform3D dst;
+  for (int i=0; i<4; ++i)
+    for (int j=0; j<4; ++j)
+      dst[i][j] = src[i][j];
+  return dst;
+}
+
+//void Reconstructer::interpolatePositions()
+//{
+//  vnl_vector<double> DataPoints(mPositions.size());
+//  std::vector<vnl_matrix_double> DataValues(mPositions.size());
+//  vnl_vector<double> InterpolationPoints(mFrames.size());
+//  std::string InterpolationMethod = "linear";
+////  std::string InterpolationMethod = "closest point";
+//
+//  for (unsigned i=0; i<mPositions.size(); ++i)
+//  {
+//    DataValues[i] = convertSSC2VNL(mPositions[i].mPos.inv());
+//    DataPoints[i] = mPositions[i].mTime;
+//  }
+//  for (unsigned i=0; i<mFrames.size(); ++i)
+//  {
+//    InterpolationPoints[i] = mFrames[i].mTime;
+//  }
+////  std::cout << "--------------------------------" << std::endl;
+////  std::cout << "--------------------------------" << std::endl;
+////  std::cout << "--------------------------------" << std::endl;
+//
+//  std::vector<vnl_matrix_double> result = matrixInterpolation(
+//                         DataPoints,
+//                         DataValues,
+//                         InterpolationPoints,
+//                         InterpolationMethod );
+//
+//  if (result.size()!=mFrames.size())
+//  {
+//    std::cout << "ERROR: failed to interpolate matrices" << std::endl;
+//    return;
+//  }
+//
+//  for (unsigned i=0; i<mFrames.size(); ++i)
+//  {
+//    mFrames[i].mPos = convertVNL2SSC(result[i]).inv();
+//  }
+//}
+
 /**
  * Reads a whitespace separated 4x4 matrix from file
  * \param fileName Input file
@@ -674,14 +735,16 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
   return retval;
 }
 
-/**
+/**Compute the orientation part of the transform prMd, denoted as prMdd.
+ * /return the prMdd.
+ *
  * Pre:  mFrames[i].mPos = prMu
  * Post: mFrames[i].mPos = d'Mu, where d' is an oriented but not translated data space.
  */
-void Reconstructer::applyOutputOrientation()
+ssc::Transform3D Reconstructer::applyOutputOrientation()
 {
   QString newOrient = this->getNamedSetting("Orientation").getValue();
-  Transform3D prMd;
+  ssc::Transform3D prMdd;
 
   if (newOrient=="PatientReference")
   {
@@ -689,8 +752,7 @@ void Reconstructer::applyOutputOrientation()
   }
   else if (newOrient=="MiddleFrame")
   {
-    prMd = mFrames[mFrames.size()/2].mPos;
-    prMd = prMd.inv();
+    prMdd = mFrames[mFrames.size()/2].mPos;
   }
   else
   {
@@ -698,10 +760,15 @@ void Reconstructer::applyOutputOrientation()
   }
 
   // apply the selected orientation to the frames.
-  for (unsigned int i = 0; i < mFrames.size(); i++)
+  ssc::Transform3D ddMpr = prMdd.inv();
+  for (unsigned i = 0; i < mFrames.size(); i++)
   {
-    mFrames[i].mPos = mFrames[i].mPos * prMd;
+    // mPos = prMu
+    mFrames[i].mPos = ddMpr * mFrames[i].mPos;
+    // mPos = ddMu
   }
+
+  return prMdd;
 }
 
 
@@ -717,35 +784,20 @@ void Reconstructer::applyOutputOrientation()
  */
 void Reconstructer::findExtentAndOutputTransform()
 {
-  this->applyOutputOrientation();
-
-//  // A first guess for usMd with correct orientation
-//  Transform3D prMd;
-//  prMd = mFrames[mFrames.size()/2].mPos;
-//  prMd = prMd.inv();
-  
-  /*for (unsigned int i = 0; i < mFrames.size(); i++)
-  {
-    mFrames[i].mPos = mFrames[i].mPos * prMd;
-  }*/
-  
+  // A first guess for d'Mu with correct orientation
+  ssc::Transform3D prMdd = this->applyOutputOrientation();
   //mFrames[i].mPos = d'Mu, d' = only rotation
   
   // Find extent of all frames as a point cloud
   std::vector<ssc::Vector3D> inputRect = this->generateInputRectangle();
   std::vector<ssc::Vector3D> outputRect;
-  //std::cout << "inputRect" << std::endl;
-  for(unsigned int slice = 0; slice < mFrames.size(); slice++)
+  for(unsigned slice = 0; slice < mFrames.size(); slice++)
   {
     Transform3D dMu = mFrames[slice].mPos;
-    for (unsigned int i = 0; i < inputRect.size(); i++)
+    for (unsigned i = 0; i < inputRect.size(); i++)
     {
       outputRect.push_back(dMu.coord(inputRect[i]));
-      //std::cout << " " << inputRect[i];
     }
-    //std::cout << " " << dMus;
-    //std::cout << " " << mFrames[slice].mPos;
-    //std::cout << std::endl;
   }
   
   /*std::cout << "1st dMus:  " << mFrames.front().mPos.inv().coord(ssc::Vector3D(0,0,0));  
@@ -754,11 +806,11 @@ void Reconstructer::findExtentAndOutputTransform()
   std::cout << std::endl;*/
     
   ssc::DoubleBoundingBox3D extent = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
-  //mExtent = boundingBox;
     
   // Translate dMu to output volume origo
   ssc::Transform3D T_origo = ssc::createTransformTranslate(extent.corner(0,0,0));
-  for (unsigned int i = 0; i < mFrames.size(); i++)
+  ssc::Transform3D prMd = prMdd * T_origo; // transform from output space to patref, use when storing volume.
+  for (unsigned i = 0; i < mFrames.size(); i++)
   {
     mFrames[i].mPos = T_origo.inv() * mFrames[i].mPos;
     //std::cout << mFrames[i].mPos.inv().coord(ssc::Vector3D(0,0,0));  
@@ -769,6 +821,12 @@ void Reconstructer::findExtentAndOutputTransform()
   double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
                                  mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
   mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
+
+  if (ssc::ToolManager::getInstance())
+    mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
+  else
+    mOutputVolumeParams.m_rMd = prMd;
+
   //mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
   mOutputVolumeParams.constrainVolumeSize(1024*1024*16);
 }
@@ -793,6 +851,7 @@ ImagePtr Reconstructer::generateOutputVolume()
   ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
                                       data, 
                                       string_cast(volumeName))) ;
+  image->set_rMd(mOutputVolumeParams.m_rMd);
   image->setFilePath(mUsRaw->getFilePath());
   return image;
 }
