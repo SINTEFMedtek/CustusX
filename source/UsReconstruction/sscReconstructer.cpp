@@ -71,7 +71,7 @@ Reconstructer::Reconstructer() :
     mAlgorithm->getSettings(algo);
   }
 
-  std::cout << doc.toString(2) << std::endl;
+  //std::cout << doc.toString(2) << std::endl;
 }
 
 QDomElement Reconstructer::getSettings() const
@@ -862,6 +862,12 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
+
+  if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
+  {
+    std::cout << "File not found: " << changeExtension(fileName, "mhd") <<", reconstruct load failed" << std::endl;
+    return;
+  }
 
   readUsDataFile(changeExtension(fileName, "mhd"));
     
