@@ -3,9 +3,10 @@
 
 #include <QVariant>
 #include <QObject>
-#include "sscImage.h"
 #include "sscView.h"
+#include "sscImage.h"
 #include "sscDefinitions.h"
+#include "sscForwardDeclarations.h"
 
 class QMenu;
 class QActionGroup;
@@ -44,7 +45,9 @@ public:
   virtual ~ViewWrapper() {}
   virtual void initializePlane(ssc::PLANE_TYPE plane) {}
   virtual void setImage(ssc::ImagePtr image) = 0;
+  virtual void addMesh(ssc::MeshPtr mesh) = 0;
   virtual ssc::ImagePtr getImage() const = 0;
+  virtual ssc::MeshPtr getMesh() const = 0;
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
@@ -59,6 +62,7 @@ signals:
 protected slots:
   void contextMenuSlot(const QPoint& point);
   void imageActionSlot(); ///< triggered when an imageaction is selected in the contextmenu
+  void meshActionSlot();
 
 protected:
   void connectContextMenu(ssc::View* view);

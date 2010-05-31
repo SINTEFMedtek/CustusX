@@ -7,6 +7,7 @@ SET( CX_QT_MOC_HEADER_FILES
 SET ( ${LIB}_dataManager
 	cxDataManager.h
 	cxDataManager.cpp
+	../cxForwardDeclarations.h
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

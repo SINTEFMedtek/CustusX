@@ -36,6 +36,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
+  mGeometricRep = repManager()->getGeometricRep("GeometricRep_"+index);
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -85,12 +86,35 @@ void ViewWrapper3D::setImage(ssc::ImagePtr image)
    if(mView->isVisible())
      mView->getRenderWindow()->Render();
 }
+  
+void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
+{
+  if (!mesh)
+    return;
+  
+  mMesh = mesh;
+  //mMeshes.push(mesh);
 
+  mGeometricRep->setMesh(mesh);
+  
+  //emit imageChanged(image->getUid().c_str());
+  
+  mView->addRep(mGeometricRep);
+  mView->getRenderer()->ResetCamera();
+  if(mView->isVisible())
+    mView->getRenderWindow()->Render();
+}
+  
 ssc::ImagePtr ViewWrapper3D::getImage() const
 {
   return mImage;
 }
 
+ssc::MeshPtr ViewWrapper3D::getMesh() const
+{
+  return mMesh;
+}
+  
 ssc::View* ViewWrapper3D::getView()
 {
   return mView;
