@@ -68,6 +68,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   mToolOffsetWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceActiveToolOffset), gridLayout, 0);
 
+  toptopLayout->addStretch();
+
 //  void configured(); ///< signal emitted when the system is configured
 //  void initialized(); ///< signal emitted when the system is initialized
 //  void trackingStarted(); ///< signal emitted when the system starts tracking

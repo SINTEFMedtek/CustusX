@@ -46,6 +46,8 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   mLevelWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DLevel), gridLayout, 0);
   mWindowWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterface2DWindow), gridLayout, 1);
 
+  toptopLayout->addStretch();
+
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
   updateSlot();
 }
