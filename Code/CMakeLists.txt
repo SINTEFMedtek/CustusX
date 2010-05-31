@@ -134,6 +134,7 @@ SET( SSC_SOURCE_FILES
     Utilities/sscGLHelpers.cpp
     Utilities/sscGLHelpers.h
     Utilities/sscEnumConverter.h
+    Utilities/sscDefinitions.h
     Utilities/sscDefinitions.cpp
     Utilities/sscDefinitionStrings.cpp
     Utilities/sscTime.h

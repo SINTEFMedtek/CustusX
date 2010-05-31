@@ -40,6 +40,7 @@ class DataManager : public QObject
 	Q_OBJECT
 public:
 	typedef std::map<std::string, ImagePtr> ImagesMap;
+	typedef std::map<std::string, MeshPtr> MeshMap;
 
 	static DataManager* getInstance();
 
