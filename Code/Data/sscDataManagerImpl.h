@@ -73,6 +73,7 @@ public:
 	// images
 	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
   virtual void loadImage(ImagePtr image);
+  virtual void saveImage(ImagePtr image);///< Save image to file
 	virtual ImagePtr getImage(const std::string& uid);
 	virtual std::map<std::string, ImagePtr> getImages();
 
@@ -109,8 +110,6 @@ public:
   //Interface for saving/loading
 	void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements. 
-  
-  void saveImage(ImagePtr image);///< Save image to file
   
 protected:
 	DataManagerImpl();

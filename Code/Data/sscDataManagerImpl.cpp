@@ -277,6 +277,19 @@ void DataManagerImpl::loadImage(ImagePtr image)
   }
 }
 
+void DataManagerImpl::saveImage(ImagePtr image)
+{
+  vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+  writer->SetInput(image->getBaseVtkImageData());
+  writer->SetFileDimensionality(3);
+  std::string filename = image->getFilePath() + "/" + image->getUid();
+  writer->SetFileName(std::string(filename + ".mhd").c_str());
+  writer->SetRAWFileName(std::string(filename + ".raw").c_str());
+  writer->SetCompression(false);
+  writer->Update();
+  writer->Write();
+}
+  
 // meshes
 MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType)
 {
@@ -492,19 +505,6 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
     }
     child = child.nextSibling();
   }
-}
-
-void DataManagerImpl::saveImage(ImagePtr image)
-{
-	vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
-  writer->SetInput(image->getBaseVtkImageData());
-  writer->SetFileDimensionality(3);
-  std::string filename = image->getFilePath() + "/" + image->getUid();
-  writer->SetFileName(std::string(filename + ".mhd").c_str());
-  writer->SetRAWFileName(std::string(filename + ".raw").c_str());
-  writer->SetCompression(false);
-  writer->Update();
-  writer->Write();
 }
   
 } // namespace ssc
