@@ -166,13 +166,7 @@ void ToolRep3D::updateOffsetGraphics()
 		mTooltipPoint->getActor()->SetVisibility(visible);
 		mOffsetLine->getActor()->SetVisibility(visible);
 	}
-  if(mStayHiddenAfterVisible)
-  {
-    mToolActor->SetVisibility(false);
-  }else
-  {
-    mToolActor->SetVisibility(mTool->getVisible());
-  }
+
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
 	  if(mOffsetPointVisibleAtZeroOffset)
@@ -205,12 +199,25 @@ void ToolRep3D::receiveVisible(bool visible)
 		return; // don't hide
 	}
 	mToolActor->SetVisibility(visible);
+
+  if(mStayHiddenAfterVisible)
+  {
+    mToolActor->SetVisibility(false);
+  }else
+  {
+    mToolActor->SetVisibility(mTool->getVisible());
+  }
+
 	updateOffsetGraphics();
 }
+
 void ToolRep3D::setStayHiddenAfterVisible(bool val)
 {
   mStayHiddenAfterVisible = val;
+  if (mTool)
+    receiveVisible(mTool->getVisible());
 }
+
 /**
  * If true, tool is still rendered as visible after visibility status is hidden.
  * Nice for viewing the last known position of a tool.
