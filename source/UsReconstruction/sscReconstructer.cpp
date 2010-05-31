@@ -163,8 +163,25 @@ bool within(int x, int min, int max)
 void Reconstructer::readUsDataFile(QString mhdFileName)
 {
   //Read US images
-  mUsRaw = MetaImageReader().load(string_cast(mhdFileName), 
+  
+  //Split mhdFileName into file name and file path
+  QStringList list = mhdFileName.split("/");
+  QString fileName = list[list.size()-1];
+  list[list.size()-1] = "";
+  QString filePath = list.join("/");//+"/";
+  
+  // Remove file ending from file name
+  list = fileName.split(".");
+  if(list.size() > 1)
+  {
+    list[list.size()-1] = "";
+    fileName = list.join("");
+  }
+  
+  //Use file name as uid
+  mUsRaw = MetaImageReader().load(string_cast(fileName), 
                                   string_cast(mhdFileName));
+  mUsRaw->setFilePath(string_cast(filePath));
   
   //Read XML info from mdh file
   //Stored in ConfigurationID tag
@@ -770,14 +787,13 @@ ImagePtr Reconstructer::generateOutputVolume()
   
   vtkImageDataPtr data = this->generateVtkImageData(dim, spacing, 0);
   
-  // Generate volume name and uid
-  QString volumeName = qstring_cast(mUsRaw->getName());
-  volumeName += "_reconstruct";
-  QString volumeId = qstring_cast(mUsRaw->getUid());
-  volumeId += "_reconstruct";
+  // Add _rec to volume name and uid
+  QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
+  QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
   ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
                                       data, 
                                       string_cast(volumeName))) ;
+  image->setFilePath(mUsRaw->getFilePath());
   return image;
 }
 
