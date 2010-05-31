@@ -58,6 +58,27 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
     imageIt++;
   }
+  
+  contextMenu.addSeparator();
+  std::map<std::string, std::string>::iterator meshIt = meshUidsAndNames.begin();
+  while(meshIt != meshUidsAndNames.end())
+  {
+    const QString uid = meshIt->first.c_str();
+    const QString name = meshIt->second.c_str();
+    
+    QAction* meshAction = new QAction(name, &contextMenu);
+    meshAction->setData(QVariant(uid));
+    meshAction->setCheckable(true);
+    connect(meshAction, SIGNAL(triggered()),
+            this, SLOT(meshActionSlot()));
+    
+    contextMenu.addAction(meshAction);
+    
+    if(this->getMesh() && uid == qstring_cast(this->getMesh()->getUid()))
+      meshAction->setChecked(true);
+    
+    meshIt++;
+  }
 
   //append specific info from derived classes
   this->appendToContextMenu(contextMenu);
@@ -80,7 +101,23 @@ void ViewWrapper::imageActionSlot()
 
   Navigation().centerToImageCenter(); // reset center for convenience
 }
-
+  
+void ViewWrapper::meshActionSlot()
+{
+  messageManager()->sendInfo("ViewWrapper::meshActionSlot()");
+  QAction* theAction = static_cast<QAction*>(sender());
+  if(!theAction)
+    return;
+  
+  QString meshUid = theAction->data().toString();
+  ssc::MeshPtr mesh= dataManager()->getMesh(meshUid.toStdString());
+  
+  this->addMesh(mesh);
+  //dataManager()->setActiveImage(mesh);
+  
+  Navigation().centerToImageCenter(); // reset center for convenience
+}
+  
 void ViewWrapper::connectContextMenu(ssc::View* view)
 {
    connect(view, SIGNAL(customContextMenuRequested(const QPoint &)),

@@ -29,7 +29,9 @@ class ViewWrapper3D : public ViewWrapper
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
   virtual void setImage(ssc::ImagePtr image);
+  virtual void addMesh(ssc::MeshPtr mesh);
   virtual ssc::ImagePtr getImage() const;
+  virtual ssc::MeshPtr getMesh() const;
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
@@ -46,11 +48,14 @@ private:
   ssc::VolumetricRepPtr mVolumetricRep;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
+  ssc::GeometricRepPtr mGeometricRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
 
   ssc::ImagePtr mImage;
+  //std::vector<ssc::MeshPtr> mMeshes;
+  ssc::MeshPtr mMesh;
   ssc::View* mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
