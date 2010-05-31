@@ -29,6 +29,7 @@ public:
   ssc::DoubleBoundingBox3D mExtent;
   double mInputSpacing;
   ssc::Vector3D mInputDim;
+  ssc::Transform3D m_rMd; ///< transform from output data space to global ref space r
 
   OutputVolumeParams() :
     mExtent(0,0,0,0,0,0),
