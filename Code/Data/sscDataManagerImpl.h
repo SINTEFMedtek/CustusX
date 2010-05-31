@@ -73,7 +73,7 @@ public:
 	// images
 	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
   virtual void loadImage(ImagePtr image);
-  virtual void saveImage(ImagePtr image);///< Save image to file
+  virtual void saveImage(ImagePtr image, const std::string& basePath);///< Save image to file \param basePath Absolute path to patient data folder
 	virtual ImagePtr getImage(const std::string& uid);
 	virtual std::map<std::string, ImagePtr> getImages();
 

@@ -277,14 +277,20 @@ void DataManagerImpl::loadImage(ImagePtr image)
   }
 }
 
-void DataManagerImpl::saveImage(ImagePtr image)
+void DataManagerImpl::saveImage(ImagePtr image, const std::string& basePath)
 {
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
   writer->SetInput(image->getBaseVtkImageData());
   writer->SetFileDimensionality(3);
-  std::string filename = image->getFilePath() + "/" + image->getUid();
-  writer->SetFileName(std::string(filename + ".mhd").c_str());
-  writer->SetRAWFileName(std::string(filename + ".raw").c_str());
+  std::string filename = basePath + "/" + image->getFilePath();
+  writer->SetFileName(filename.c_str());
+  
+  //Rename ending from .mhd to .raw
+  QStringList splitName = qstring_cast(filename).split(".");
+  splitName[splitName.size()-1] = "raw";
+  filename = string_cast(splitName.join("."));
+  
+  writer->SetRAWFileName(filename.c_str());
   writer->SetCompression(false);
   writer->Update();
   writer->Write();
