@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<toolfile type="polaris" reference="no">8700340.xml</toolfile>
+<toolfile type="polaris" reference="no">PolarisPointer2.xml</toolfile>
+<toolfile type="polaris" reference="yes">REFERENCE_frame_small.xml</toolfile>
+
+</configuration>
