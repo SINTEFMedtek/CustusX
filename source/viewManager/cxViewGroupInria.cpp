@@ -29,7 +29,7 @@ std::string ViewGroupInria::toString(int i) const
   return QString::number(i).toStdString();
 }
 
-void ViewGroupInria::setImage(ssc::ImagePtr image)
+void ViewGroupInria::addImage(ssc::ImagePtr image)
 {
   mImage = image;
   RepManager* repManager = RepManager::getInstance();
@@ -170,7 +170,7 @@ void ViewGroupInria::contextMenuSlot(const QPoint& point)
     return;
   }
 
-  this->setImage(image);
+  this->addImage(image);
   Navigation().centerToImageCenter(); // reset center for convenience
 }
 void ViewGroupInria::connectContextMenu()

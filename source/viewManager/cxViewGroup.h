@@ -44,7 +44,7 @@ public:
   void addViewWrapper(ViewWrapperPtr wrapper);
   std::vector<ssc::View*> getViews() const;
   ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
-  virtual void setImage(ssc::ImagePtr image);
+  virtual void addImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
@@ -60,7 +60,8 @@ signals:
 public slots:
   //void zoom2DChangeSlot(double newZoom);
   //void orientationChangedSlot(ssc::ORIENTATION_TYPE type);
-  void changeImage(QString imageUid);
+  void addImage(QString imageUid);
+  void removeImage(QString imageUid);
 
 private slots:
   void activateManualToolSlot();
@@ -87,7 +88,7 @@ protected:
   };
   SyncGroup mZoom2D;
 
-  ssc::ImagePtr mImage;
+  std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mElements;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);

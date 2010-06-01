@@ -28,9 +28,9 @@ class ViewWrapper2D : public ViewWrapper
 public:
   ViewWrapper2D(ssc::View* view);
   virtual void initializePlane(ssc::PLANE_TYPE plane);
-  virtual void setImage(ssc::ImagePtr image);
+  virtual void addImage(ssc::ImagePtr image);
   virtual void addMesh(ssc::MeshPtr mesh) {/*TODO */ std::cout << "This is not implemented" << std::endl;};
-  virtual ssc::ImagePtr getImage() const;
+  std::vector<ssc::ImagePtr> getImages() const;
   virtual ssc::MeshPtr getMesh() const {/*TODO*/ std::cout << "This is not implemented" << std::endl; return ssc::MeshPtr(new ssc::Mesh("dummy"));};
   virtual void removeImage(ssc::ImagePtr image);
   virtual ssc::View* getView();

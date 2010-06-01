@@ -44,9 +44,9 @@ class ViewWrapper : public QObject
 public:
   virtual ~ViewWrapper() {}
   virtual void initializePlane(ssc::PLANE_TYPE plane) {}
-  virtual void setImage(ssc::ImagePtr image) = 0;
+  virtual void addImage(ssc::ImagePtr image) = 0;
   virtual void addMesh(ssc::MeshPtr mesh) = 0;
-  virtual ssc::ImagePtr getImage() const = 0;
+  virtual std::vector<ssc::ImagePtr> getImages() const = 0;
   virtual ssc::MeshPtr getMesh() const = 0;
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
@@ -57,7 +57,8 @@ public:
 
 signals:
   void orientationChanged(ssc::ORIENTATION_TYPE type);
-  void imageChanged(QString uid);
+  void imageAdded(QString uid);
+  void imageRemoved(QString uid);
 
 protected slots:
   void contextMenuSlot(const QPoint& point);

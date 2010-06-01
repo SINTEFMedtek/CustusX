@@ -28,9 +28,9 @@ class ViewWrapper3D : public ViewWrapper
   Q_OBJECT
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
-  virtual void setImage(ssc::ImagePtr image);
+  virtual void addImage(ssc::ImagePtr image);
   virtual void addMesh(ssc::MeshPtr mesh);
-  virtual ssc::ImagePtr getImage() const;
+  virtual std::vector<ssc::ImagePtr> getImages() const;
   virtual ssc::MeshPtr getMesh() const;
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
@@ -45,7 +45,8 @@ private:
   virtual void appendToContextMenu(QMenu& contextMenu){};
   virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
 
-  ssc::VolumetricRepPtr mVolumetricRep;
+//  ssc::VolumetricRepPtr mVolumetricRep;
+  std::map<std::string, ssc::VolumetricRepPtr> mVolumetricReps;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   ssc::GeometricRepPtr mGeometricRep;
@@ -53,7 +54,7 @@ private:
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
 
-  ssc::ImagePtr mImage;
+  std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;
   ssc::MeshPtr mMesh;
   ssc::View* mView;
