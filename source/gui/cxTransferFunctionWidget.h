@@ -2,6 +2,7 @@
 #define CXTRANSFERFUNCTIONWIDGET_H_
 
 #include <QWidget>
+#include <QCheckBox>
 #include <sscImage.h>
 
 class QVBoxLayout;
@@ -32,6 +33,7 @@ public:
 public slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+  void shadingToggledSlot(bool val);
 
 /*signals:
   void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on*/
@@ -42,6 +44,7 @@ protected:
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   //TransferFunctionInfoWidget*  mInfoWidget;
+  QCheckBox* mShadingCheckBox;
 
   ssc::ImagePtr mCurrentImage;
 	bool mInitialized;///< Is TransferFunctionWidget initialized
