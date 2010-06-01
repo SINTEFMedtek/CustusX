@@ -136,8 +136,8 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
   connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
           this, SLOT(activeImageChangeSlot()));
 
-  connect(wrapper.get(), SIGNAL(imageChanged(QString)),
-          this, SLOT(changeImage(QString)));
+  connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
+  connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
 //  connect(wrapper.get(), SIGNAL(zoom2DChange(double)),
 //          this, SLOT(zoom2DChangeSlot(double)));
 //  connect(wrapper.get(), SIGNAL(orientationChanged(ssc::ORIENTATION_TYPE)),
@@ -209,8 +209,7 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
   }
 }
 
-
-void ViewGroup::changeImage(QString imageUid)
+void ViewGroup::addImage(QString imageUid)
 {
   ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
   if(!image)
@@ -218,13 +217,29 @@ void ViewGroup::changeImage(QString imageUid)
     messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
     return;
   }
-  this->setImage(image);
+  this->addImage(image);
+}
+
+void ViewGroup::removeImage(QString imageUid)
+{
+  std::cout << "ViewGroup::removeImage [" << imageUid<< "]"<< std::endl;
+
+  ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
+  if(!image)
+  {
+    messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
+    return;
+  }
+  this->removeImage(image);
 }
 
 void ViewGroup::activeImageChangeSlot()
 {
   //messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
-  dataManager()->setActiveImage(mImage);
+  if (mImages.empty())
+    dataManager()->setActiveImage(ssc::ImagePtr());
+  else
+    dataManager()->setActiveImage(mImages.front());
 }
 
 std::vector<ssc::View*> ViewGroup::getViews() const
@@ -246,20 +261,24 @@ ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
   return mViews[index];
 }
 
-void ViewGroup::setImage(ssc::ImagePtr image)
+void ViewGroup::addImage(ssc::ImagePtr image)
 {
-  if(mImage == image)
+  if (std::count(mImages.begin(), mImages.end(), image))
     return;
-  mImage = image;
+//  if(mImage == image)
+//    return;
+  mImages.push_back(image);
   for (unsigned i=0; i<mElements.size(); ++i)
-    mElements[i]->setImage(image);
+    mElements[i]->addImage(image);
 }
 
 void ViewGroup::removeImage(ssc::ImagePtr image)
 {
-  if(mImage != image)
+  if (!std::count(mImages.begin(), mImages.end(), image))
     return;
-  mImage = image;
+//  if(mImage != image)
+//    return;
+  mImages.erase(std::find(mImages.begin(), mImages.end(), image));
   for (unsigned i=0; i<mElements.size(); ++i)
     mElements[i]->removeImage(image);
 }
@@ -279,12 +298,19 @@ void ViewGroup::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
 
-  if (mImage)
+  for (unsigned i=0; i<mImages.size(); ++i)
   {
     QDomElement imageNode = doc.createElement("image");
-    imageNode.appendChild(doc.createTextNode(qstring_cast(mImage->getUid())));
+    imageNode.appendChild(doc.createTextNode(qstring_cast(mImages[i]->getUid())));
     dataNode.appendChild(imageNode);
   }
+
+//  if (mImage)
+//  {
+//    QDomElement imageNode = doc.createElement("image");
+//    imageNode.appendChild(doc.createTextNode(qstring_cast(mImage->getUid())));
+//    dataNode.appendChild(imageNode);
+//  }
 
   QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
   zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
@@ -301,16 +327,30 @@ void ViewGroup::addXml(QDomNode& dataNode)
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {
-  QString imageUid = dataNode.namedItem("image").toElement().text();
-
-  if (!imageUid.isEmpty())
+  for (QDomElement elem = dataNode.firstChildElement("image"); !elem.isNull(); elem = elem.nextSiblingElement("image"))
   {
-    ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
-    if (image)
-      this->setImage(image);
-    else
-      messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+    QString imageUid = elem.text();
+
+     if (!imageUid.isEmpty())
+     {
+       ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
+       if (image)
+         this->addImage(image);
+       else
+         messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+     }
   }
+
+//  QString imageUid = dataNode.namedItem("image").toElement().text();
+//
+//  if (!imageUid.isEmpty())
+//  {
+//    ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
+//    if (image)
+//      this->setImage(image);
+//    else
+//      messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+//  }
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;

@@ -20,7 +20,7 @@ public:
       ssc::View* view2, ssc::View* view3);
   virtual ~ViewGroupInria();
 
-  virtual void setImage(ssc::ImagePtr image);
+  virtual void addImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode) {} ///< store internal state info in dataNode

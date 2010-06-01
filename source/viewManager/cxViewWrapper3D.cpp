@@ -33,7 +33,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->connectContextMenu(mView);
   std::string index = QString::number(startIndex).toStdString();
 
-  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
+//  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
   mGeometricRep = repManager()->getGeometricRep("GeometricRep_"+index);
@@ -52,39 +52,65 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   toolsAvailableSlot();
 }
 
-void ViewWrapper3D::setImage(ssc::ImagePtr image)
+void ViewWrapper3D::addImage(ssc::ImagePtr image)
 {
-   mImage = image;
+  if (!image)
+  {
+    return;
+  }
 
-   if (!mImage)
-   {
-     return;
-   }
-   if (!mImage->getRefVtkImageData().GetPointer())
-   {
-     messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
-     return;
-   }
-    //Set these when image is deleted?
-   //std::cout << "ViewGroup3D::setImage" << std::endl;
-   mVolumetricRep->setImage(mImage);
-   mProbeRep->setImage(mImage);
-   mLandmarkRep->setImage(mImage);
-   //std::cout << "ViewGroup3D::setImage" << std::endl;
+  if (std::count(mImage.begin(), mImage.end(), image))
+  {
+    return;
+  }
 
-   //update data name text rep
-   mDataNameText->setText(0, mImage->getName());
+  if (!image->getRefVtkImageData().GetPointer())
+  {
+    messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
+    return;
+  }
 
-   emit imageChanged(image->getUid().c_str());
+  mImage.push_back(image);
 
-   //Shading
-   if(QSettings().value("shadingOn").toBool())
-     mVolumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
+  if (!mVolumetricReps.count(image->getUid()))
+  {
+    std::string uid("VolumetricRep_" + image->getUid());
+    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+    mVolumetricReps[image->getUid()] = rep;
+    //Shading
+    if (QSettings().value("shadingOn").toBool())
+      rep->getVtkVolume()->GetProperty()->ShadeOn();
 
-   mView->addRep(mVolumetricRep);
-   mView->getRenderer()->ResetCamera();
-   if(mView->isVisible())
-     mView->getRenderWindow()->Render();
+    rep->setImage(image);
+    mView->addRep(rep);
+    emit imageAdded(image->getUid().c_str());
+  }
+
+  //Set these when image is deleted?
+  //std::cout << "ViewGroup3D::setImage" << std::endl;
+  //mVolumetricRep->setImage(mImage);
+  mProbeRep->setImage(image);
+  mLandmarkRep->setImage(image);
+  //std::cout << "ViewGroup3D::setImage" << std::endl;
+
+  //update data name text rep
+  QStringList text;
+  for (unsigned i = 0; i < mImage.size(); ++i)
+  {
+    text << qstring_cast(mImage[i]->getName());
+  }
+  mDataNameText->setText(0, string_cast(text.join("\n")));
+
+  //   emit imageChanged(image->getUid().c_str());
+
+  //   //Shading
+  //   if(QSettings().value("shadingOn").toBool())
+  //     mVolumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
+
+  //   mView->addRep(mVolumetricRep);
+  mView->getRenderer()->ResetCamera();
+  if (mView->isVisible())
+    mView->getRenderWindow()->Render();
 }
   
 void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
@@ -104,8 +130,8 @@ void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
   if(mView->isVisible())
     mView->getRenderWindow()->Render();
 }
-  
-ssc::ImagePtr ViewWrapper3D::getImage() const
+
+std::vector<ssc::ImagePtr> ViewWrapper3D::getImages() const
 {
   return mImage;
 }
@@ -129,13 +155,25 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 {
-  if(mImage != image)
+  std::cout << "ViewWrapper3D::removeImag 1" << std::endl;
+  if (!image)
+    return;
+  std::cout << "ViewWrapper3D::removeImag 2" << std::endl;
+  if (!mVolumetricReps.count(image->getUid()))
     return;
 
-  messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
-  mView->removeRep(mVolumetricRep);
+//  if(mImage != image)
+//    return;
+  std::cout << "ViewWrapper3D::removeImag3" << std::endl;
 
-  mImage.reset();
+  mImage.erase(std::find(mImage.begin(), mImage.end(), image));
+
+  messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
+  mView->removeRep(mVolumetricReps[image->getUid()]);
+  mVolumetricReps.erase(image->getUid());
+
+//  mImage.reset();
+  emit imageRemoved(qstring_cast(image->getUid()));
 }
 
 void ViewWrapper3D::toolsAvailableSlot()

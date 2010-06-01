@@ -273,7 +273,7 @@ ssc::View* ViewWrapper2D::getView()
 
 /**
  */
-void ViewWrapper2D::setImage(ssc::ImagePtr image)
+void ViewWrapper2D::addImage(ssc::ImagePtr image)
 {
   if (!image)
     return;
@@ -284,17 +284,18 @@ void ViewWrapper2D::setImage(ssc::ImagePtr image)
   //update data name text rep
   mDataNameText->setText(0, image->getName());
 
-  emit imageChanged(image->getUid().c_str());
+  emit imageAdded(image->getUid().c_str());
 }
 
-ssc::ImagePtr ViewWrapper2D::getImage() const
+std::vector<ssc::ImagePtr> ViewWrapper2D::getImages() const
 {
-  return mSliceRep->getImage();
+  return std::vector<ssc::ImagePtr>(1, mSliceRep->getImage());
 }
 
 void ViewWrapper2D::removeImage(ssc::ImagePtr image)
 {
   mSliceRep->setImage(ssc::ImagePtr());
+  emit imageRemoved(qstring_cast(image->getUid()));
 }
 
 void ViewWrapper2D::dominantToolChangedSlot()

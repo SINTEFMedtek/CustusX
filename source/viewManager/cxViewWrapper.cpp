@@ -39,6 +39,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   std::map<std::string, std::string> imageUidsAndNames = dataManager()->getImageUidsAndNames();
   std::map<std::string, std::string> meshUidsAndNames = dataManager()->getMeshUidsWithNames();
 
+  std::vector<ssc::ImagePtr> images = this->getImages();
   std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
   while(imageIt != imageUidsAndNames.end())
   {
@@ -53,8 +54,9 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
     contextMenu.addAction(imageAction);
 
-    if(this->getImage() && uid == qstring_cast(this->getImage()->getUid()))
-      imageAction->setChecked(true);
+    //if(this->getImage() && uid == qstring_cast(this->getImage()->getUid()))
+    //  imageAction->setChecked(true);
+    imageAction->setChecked(std::count(images.begin(), images.end(), dataManager()->getImage(imageIt->first)));
 
     imageIt++;
   }
@@ -96,8 +98,17 @@ void ViewWrapper::imageActionSlot()
   QString imageUid = theAction->data().toString();
   ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
 
-  this->setImage(image);
-  dataManager()->setActiveImage(image);
+  if (theAction->isChecked())
+  {
+    this->addImage(image);
+    dataManager()->setActiveImage(image);
+  }
+  else
+  {
+    std::cout << "ViewGroup::ViewWrapper - remove - [" << imageUid<< "]" << image.get() << std::endl;
+    this->removeImage(image);
+    dataManager()->setActiveImage(ssc::ImagePtr());
+  }
 
   Navigation().centerToImageCenter(); // reset center for convenience
 }
