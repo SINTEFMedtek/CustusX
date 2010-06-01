@@ -32,14 +32,27 @@ void TransferFunctionWidget::init()
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding, 
                                               QSizePolicy::Fixed);
   
+  mShadingCheckBox = new QCheckBox("Shading", this);
+  connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
+
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
+  mLayout->addWidget(mShadingCheckBox);
   //mLayout->addWidget(mInfoWidget);
   this->setLayout(mLayout);
 	
 	mInitialized = true;
 }
 	
+void TransferFunctionWidget::shadingToggledSlot(bool val)
+{
+  ssc::ImagePtr image = dataManager()->getActiveImage();
+  if (image)
+  {
+    image->setShading(val);
+  }
+}
+
 void TransferFunctionWidget::activeImageChangedSlot()
 {
   if (!mInitialized)
@@ -50,6 +63,11 @@ void TransferFunctionWidget::activeImageChangedSlot()
     return;
 
   mCurrentImage = activeImage;
+
+  if (activeImage)
+  {
+    mShadingCheckBox->setChecked(activeImage->getShading());
+  }
 
   //emit currentImageChanged(mCurrentImage);
 

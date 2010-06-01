@@ -77,21 +77,17 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
     std::string uid("VolumetricRep_" + image->getUid());
     ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
     mVolumetricReps[image->getUid()] = rep;
-    //Shading
-    if (QSettings().value("shadingOn").toBool())
-      rep->getVtkVolume()->GetProperty()->ShadeOn();
+//    //Shading
+//    if (QSettings().value("shadingOn").toBool())
+//      rep->getVtkVolume()->GetProperty()->ShadeOn();
 
     rep->setImage(image);
     mView->addRep(rep);
     emit imageAdded(image->getUid().c_str());
   }
 
-  //Set these when image is deleted?
-  //std::cout << "ViewGroup3D::setImage" << std::endl;
-  //mVolumetricRep->setImage(mImage);
   mProbeRep->setImage(image);
   mLandmarkRep->setImage(image);
-  //std::cout << "ViewGroup3D::setImage" << std::endl;
 
   //update data name text rep
   QStringList text;
@@ -101,13 +97,6 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
   }
   mDataNameText->setText(0, string_cast(text.join("\n")));
 
-  //   emit imageChanged(image->getUid().c_str());
-
-  //   //Shading
-  //   if(QSettings().value("shadingOn").toBool())
-  //     mVolumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-
-  //   mView->addRep(mVolumetricRep);
   mView->getRenderer()->ResetCamera();
   if (mView->isVisible())
     mView->getRenderWindow()->Render();

@@ -187,6 +187,8 @@ void PatientData::importData(QString fileName)
   }
   data->setName(fileInfo.fileName().toStdString());
 
+  data->setShading(true);
+
   QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString()
                       +"/"+mActivePatientFolder);
   FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(),

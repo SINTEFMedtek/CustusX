@@ -300,7 +300,6 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
   {
     if(child.toElement().tagName() == "global2DZoom")
     {
-      std::cout << "Found global2DZoom tag." << std::endl;
       const QString global2DZoomString = child.toElement().text();
       if(!global2DZoomString.isEmpty() && global2DZoomString.toInt() == 0)
         this->setGlobal2DZoom(false);
@@ -476,15 +475,15 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
 {
   mShadingOn = shadingOn;
   
-  ssc::VolumetricRepPtr volumetricRep
-  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
-  if(volumetricRep->getImage())
-  {
-    if(shadingOn)
-      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-    else
-      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
-  }
+//  ssc::VolumetricRepPtr volumetricRep
+//  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
+//  if(volumetricRep->getImage())
+//  {
+//    if(shadingOn)
+//      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
+//    else
+//      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
+//  }
 }
   
 void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan)
