@@ -107,6 +107,8 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
   if (dataNode.isNull())
     return;
 
+  mData.clear();
+//std::cout << "RegistrationHistory::parseXml" << std::endl;
   //emit currentChanged();
   //return;
   QString currentTimeRaw = dataNode.namedItem("currentTime").toElement().text();

@@ -124,7 +124,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
   RegistrationTransform regTrans(rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
   image->get_rMd_History()->addRegistration(regTrans);
 
-//  std::cout << "ImagePtr MetaImageReader::load \n" << *rMd << std::endl << std::endl;
+  //std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
   return image;
 }
 
