@@ -7,6 +7,7 @@ typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
 typedef	vtkSmartPointer<class vtkActor> vtkActorPtr;
 
 #include "sscRepImpl.h"
+#include "sscVector3D.h"
 
 namespace ssc
 {
@@ -30,6 +31,7 @@ public:
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
 	MeshPtr getMesh(); ///< gives this reps mesh
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
+  void setColor(const Vector3D& color);///<Sets the color of the mesh
 	
 protected:
 	GeometricRep(const std::string& uid, const std::string& name);

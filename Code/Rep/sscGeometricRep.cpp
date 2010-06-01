@@ -53,6 +53,12 @@ bool GeometricRep::hasMesh(MeshPtr mesh) const
 	return (mMesh != NULL);
 }
 
+void GeometricRep::setColor(const Vector3D& color)
+{
+  Vector3D c = color;
+  mActor->GetProperty()->SetColor(c.begin());
+}
+  
 //---------------------------------------------------------
 } // namespace ssc
 //---------------------------------------------------------
