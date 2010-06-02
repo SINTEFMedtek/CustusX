@@ -54,6 +54,7 @@ protected:
 private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
+  void transferFunctionsChangedSlot();
 };
 //---------------------------------------------------------
 } // namespace ssc

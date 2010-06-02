@@ -103,4 +103,14 @@ RegistrationHistoryPtr Data::get_rMd_History()
   return m_rMd_History;
 }
 
+void Data::setShading(bool on)
+{
+}
+
+bool Data::getShading() const
+{
+  return false;
+}
+
+
 } // namespace ssc

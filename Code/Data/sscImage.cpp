@@ -12,6 +12,7 @@
 #include "sscImageLUT2D.h"
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -27,6 +28,8 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
 	mBaseImageData(data)
 	//mLandmarks(vtkDoubleArrayPtr::New())
 {
+  mShading = false;
+
 	//mLandmarks->SetNumberOfComponents(4);
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
 	//mAlpha = 0.5; 
@@ -48,8 +51,10 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
 	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
 	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
 	
+//  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+//					this, SLOT(transferFunctionsChangedSlot())); // TODO: This signal causes VolumetricRep to re-create itself. change to the one below?? (CA)
   connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-					this, SLOT(transferFunctionsChangedSlot())); // TODO: This signal causes VolumetricRep to re-create itself. change to the one below?? (CA)
+          this, SIGNAL(transferFunctionsChanged()));
   connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
 					this, SIGNAL(transferFunctionsChanged()));
 	
@@ -215,11 +220,11 @@ void Image::removeLandmark(std::string uid)
 		}
 	}
 }*/
-
-void Image::transferFunctionsChangedSlot()
-{
-	emit vtkImageDataChanged();
-}
+//
+//void Image::transferFunctionsChangedSlot()
+//{
+//	emit vtkImageDataChanged();
+//}
 void Image::printLandmarks()
 {
 	std::cout << "Landmarks: " << std::endl;
@@ -317,6 +322,11 @@ void Image::addXml(QDomNode& parentNode)
   mImageTransferFunctions3D->addXml(imageNode);
   mImageLookupTable2D->addXml(imageNode);
 
+  QDomElement shadingNode = doc.createElement("shading");
+  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading)));
+  imageNode.appendChild(shadingNode);
+  std::cout << "created shading" << std::endl;
+
   QDomElement landmarksNode = doc.createElement("landmarks");
   LandmarkMap::iterator it = mLandmarks.begin();
   for(; it != mLandmarks.end(); ++it)
@@ -354,6 +364,8 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
 
+	mShading = dataNode.namedItem("shading").toElement().text().toInt();
+
 	QDomNode landmarksNode = dataNode.namedItem("landmarks");
 	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
 	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
@@ -363,5 +375,17 @@ void Image::parseXml(QDomNode& dataNode)
 	  this->setLandmark(landmark);
   }
 }
+
+void Image::setShading(bool on)
+{
+  mShading = on;
+  emit transferFunctionsChanged();
+}
+
+bool Image::getShading() const
+{
+  return mShading;
+}
+
 
 } // namespace ssc

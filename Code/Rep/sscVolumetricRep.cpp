@@ -100,6 +100,7 @@ void VolumetricRep::setImage(ImagePtr image)
 		mImage->disconnectFromRep(mSelf);
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 	}
@@ -111,6 +112,7 @@ void VolumetricRep::setImage(ImagePtr image)
 		mImage->connectToRep(mSelf);
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 		vtkImageDataChangedSlot();
@@ -133,8 +135,8 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	{
 		return;
 	}
-	mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
-	mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
+	//mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
+	//mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
 
 	// also use grayscale as vtk is incapable of rendering 3component color.
 	vtkImageDataPtr volume = mImage->getGrayScaleBaseVtkImageData();
@@ -153,6 +155,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 
 	mTextureMapper3D->SetInput(volume);
 
+	transferFunctionsChangedSlot();
 	transformChangedSlot();
 }
 /**called when transform is changed
@@ -165,6 +168,14 @@ void VolumetricRep::transformChangedSlot()
 	}
 	mVolume->SetUserMatrix(mImage->get_rMd().matrix());
 }
+
+void VolumetricRep::transferFunctionsChangedSlot()
+{
+  mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
+  mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
+  mVolumeProperty->SetShade(mImage->getShading());
+}
+
 //---------------------------------------------------------
 } // namespace ssc
 //---------------------------------------------------------

@@ -58,6 +58,8 @@ public:
 	int getPosMin();///< \return Min alpha position set to zero.
 	int getRange();///< For convenience: getMax() – getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
+  virtual void setShading(bool on);
+  virtual bool getShading() const;
 
 	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -77,7 +79,7 @@ public slots:
   void removeLandmark(std::string uid);
 	
 protected slots:
-	void transferFunctionsChangedSlot();
+//	void transferFunctionsChangedSlot();
   virtual void transformChangedSlot();
 
 protected:
@@ -91,8 +93,8 @@ protected:
 	vtkImageDataPtr mReferenceImageData; ///< imagedata after filtering through the orientatior, given in reference space
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 
-	//landmarks
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
+  bool mShading; ///< determine if shading effects are to be used for this volume.
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

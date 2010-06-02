@@ -54,6 +54,8 @@ public:
 	virtual std::string getFilePath() const; ///< \return the corresponding file path
 	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
+  virtual void setShading(bool on);
+  virtual bool getShading() const;
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
