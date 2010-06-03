@@ -592,8 +592,8 @@ void ViewManager::renderAllViewsSlot()
   {
     if(iter->second->isVisible())
     {
-      //iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
-      iter->second->render(); // render only changed scenegraph
+      iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+      //iter->second->render(); // render only changed scenegraph
     }
   }
   

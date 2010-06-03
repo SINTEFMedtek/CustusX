@@ -302,7 +302,8 @@ void ViewWrapper2D::updateView()
 {
   ssc::ImagePtr image;
   if (!mImage.empty())
-    image = mImage.front(); // always show first in vector
+//    image = mImage.front(); // always show first in vector
+    image = mImage.back(); // always show last in vector
 
   std::string text;
 
