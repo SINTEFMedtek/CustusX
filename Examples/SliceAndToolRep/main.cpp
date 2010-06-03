@@ -47,12 +47,20 @@ int main(int argc, char **argv)
 	image.push_back("MetaImage/20070309T105136_MRT1.mhd");
 	image.push_back("MetaImage/20070309T102309_MRA.mhd");
 
-	ViewsWindow* widget = new ViewsWindow;
-	widget->define3D(image[0], 0, 0);
-	widget->updateRender();
+	ViewsWindow widget;
 
-	int val = qApp->exec();
-	delete widget;
+  widget.define3D(image[0], 0, 0);
+  //widget.define3D(image[1], 0, 1);
+
+  widget.show();
+#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+	widget.activateWindow();
+#endif
+	widget.raise();
+
+  widget.updateRender();
+
+  int val = qApp->exec();
 	return val;
 }
 

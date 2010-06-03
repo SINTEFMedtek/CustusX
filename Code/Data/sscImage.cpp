@@ -153,6 +153,8 @@ vtkImageDataPtr Image::getRefVtkImageData()
 		mReferenceImageData = mOrientator->GetOutput();
 
 		mReferenceImageData->Update();		
+
+		this->transformChangedSlot(); // update transform
 	}
 	
 	return mReferenceImageData;

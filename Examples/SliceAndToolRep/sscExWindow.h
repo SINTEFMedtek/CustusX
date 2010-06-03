@@ -6,6 +6,7 @@
 
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
+#include "sscVolumetricRep.h"
 
 /**Test class  with convenience methods for defining views.
  * Uses the following reps:
@@ -13,7 +14,7 @@
  *  - ssc::SliceRepSW
  *  - ssc::VolumetricRep
  */
-class ViewsWindow : public QMainWindow
+class ViewsWindow : public QWidget
 {
 	Q_OBJECT
 
@@ -26,14 +27,16 @@ public:
 	
 	void insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c);
 private:
-	void start();
 	ssc::View* generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	ssc::ImagePtr loadImage(const std::string& imageFilename);
 	
 	typedef std::set<ssc::View*> LayoutMap;
 	std::set<ssc::View*> mLayouts;
 	QGridLayout* mSliceLayout;
-	
+	QTimer* mRenderingTimer;
+	QLineEdit* mSpeedEdit;
+  ssc::VolumetricRepPtr mVolumetricRep;
+
 public slots:
 	void updateRender();
 };

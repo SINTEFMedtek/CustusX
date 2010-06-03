@@ -52,6 +52,7 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	mVolumeProperty->SetSpecular ( 0.3 );
 	mVolumeProperty->SetSpecularPower ( 15.0 );
 	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
+//	mVolumeProperty->SetInterpolationTypeToNearest();
 
 	// from snws
 	mTextureMapper3D->SetPreferredMethodToNVidia();

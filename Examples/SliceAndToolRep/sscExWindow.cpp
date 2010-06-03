@@ -9,6 +9,8 @@
 #include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkVolumeTextureMapper3D.h"
+#include "vtkCamera.h"
 
 #include "sscTestUtilities.h"
 #include "sscDataManager.h"
@@ -26,6 +28,7 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscExWindow.h"
+#include "sscTypeConversions.h"
 
 using ssc::Vector3D;
 using ssc::Transform3D;
@@ -50,9 +53,36 @@ ViewsWindow::ViewsWindow()
 	QRect screen = qApp->desktop()->screen()->rect();
 	this->show();
 	this->setGeometry(QRect(screen.bottomRight()*0.15, screen.bottomRight()*0.85));
-	this->setCentralWidget( new QWidget );
+//	this->setCentralWidget( new QWidget() );
 
-	start();
+  // Initialize dummy toolmanager.
+  ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+  mToolmanager->configure();
+  mToolmanager->initialize();
+  mToolmanager->startTracking();
+
+  ssc::ToolPtr tool = mToolmanager->getDominantTool();
+  connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
+
+  mSliceLayout = new QGridLayout(this);
+  mSpeedEdit = new QLineEdit(this);
+  mSliceLayout->addWidget(mSpeedEdit, 1, 0);
+
+//  ssc::View* view = new ssc::View(this);
+//  view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+////  this->setCentralWidget(view);
+//  mLayouts.insert(view);
+//
+//  mSliceLayout->addWidget(view, 0,0);
+//  view->show();
+////  mSliceLayout->addWidget(new QLabel("tekst", this), 0, 1);
+
+  std::cout << "started" << std::endl;
+
+  mRenderingTimer = new QTimer(this);
+  mRenderingTimer->start(33);
+  connect(mRenderingTimer, SIGNAL(timeout()),
+          this, SLOT(updateRender()));
 }
 
 ViewsWindow::~ViewsWindow()
@@ -61,7 +91,7 @@ ViewsWindow::~ViewsWindow()
 
 ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-	ssc::View* view = new ssc::View();
+	ssc::View* view = new ssc::View(this);
 	mLayouts.insert(view);
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
@@ -104,27 +134,38 @@ ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
 
 void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c)
 {
+  view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+  view->getRenderer()->GetActiveCamera();
 	QVBoxLayout* layout = new QVBoxLayout;
 	mSliceLayout->addLayout(layout, r,c);
 	
 	layout->addWidget(view);
-	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume)));
+	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume), this));
 }
 
 void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
 {
 	std::string uid = "3D";
-	ssc::View* view = new ssc::View();
+	ssc::View* view = new ssc::View(this);
 	mLayouts.insert(view);
 	
-	ssc::ImagePtr image = loadImage(imageFilename);
+	std::vector<std::string> images;
+	images.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	//images.push_back("MetaImage/20070309T105136_MRT1.mhd");
 
-	// volume rep
-	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
-	mRepPtr->setImage(image);
-	mRepPtr->setName(image->getName());
-	view->addRep(mRepPtr);
-	
+	for (unsigned i=0; i< images.size(); ++i)
+	{
+    ssc::ImagePtr image = loadImage(images[i]);
+
+    // volume rep
+    ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
+    //mRepPtr->setResampleFactor(0.2);
+    mRepPtr->setImage(image);
+    mRepPtr->setName(image->getName());
+    view->addRep(mRepPtr);
+    mVolumetricRep = mRepPtr;
+  }
+
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
@@ -132,40 +173,40 @@ void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
 	
-	insertView(view, uid, imageFilename, r, c);
-}
+//	insertView(view, uid, imageFilename, r, c);
+	 insertView(view, uid, "2 images", r, c);
 
-
-void ViewsWindow::start()
-{
-	// Initialize dummy toolmanager.
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	mToolmanager->configure();
-	mToolmanager->initialize();
-	mToolmanager->startTracking();
-
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
-
-	//gui controll
-	QVBoxLayout *mainLayout = new QVBoxLayout;
-	this->centralWidget()->setLayout(mainLayout);
-
-	mSliceLayout = new QGridLayout;
-
-	mainLayout->addLayout(mSliceLayout);//Slice layout
-
-	QHBoxLayout *controlLayout = new QHBoxLayout;
-	controlLayout->addStretch();
-	
-	controlLayout->addStretch();
-	mainLayout->addLayout(controlLayout); //Buttons
+	  view->getRenderer()->ResetCamera();
 }
 
 void ViewsWindow::updateRender()
 {
+  std::vector<int> times;
+  int sum = 0;
+
 	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
-		(*iter)->getRenderWindow()->Render();
+	{
+	  if ((*iter)->isVisible())
+	  {
+	    QTime time = QTime::currentTime();
+
+      //(*iter)->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+	    (*iter)->render(); // render only changed scenegraph
+
+	    int t_render = time.msecsTo(QTime::currentTime());
+      sum += t_render;
+      times.push_back(t_render);
+	  }
+	}
+
+	std::string text = string_cast(sum);
+	for (unsigned i=0; i<times.size(); ++i)
+	{
+	  text += "\t" + string_cast(times[i]);
+	}
+
+  //std::cout << "render:\t" << text << std::endl;
+	mSpeedEdit->setText(qstring_cast(text));
 }
 
 
