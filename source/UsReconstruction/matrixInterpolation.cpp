@@ -24,8 +24,8 @@ std::vector<vnl_matrix_double> matrixInterpolation(vnl_vector<double> DataPoints
 
     if (InterpolationMethod.compare("closest point") == 0) // Closest point "interpolation"
     {
-      int i = 1;
-      for (int j = 0; j < InterpolationPoints.size(); j++)
+      unsigned int i = 1;
+      for (unsigned int j = 0; j < InterpolationPoints.size(); j++)
       {
         while (DataPoints[i] < InterpolationPoints[j] && i < DataPoints.size() - 1)
         {
@@ -46,8 +46,8 @@ std::vector<vnl_matrix_double> matrixInterpolation(vnl_vector<double> DataPoints
 
     else if (InterpolationMethod.compare("linear") == 0) // Linear interpolation
     {
-      int j = 0;
-      for (int i = 0; i < InterpolationPoints.size(); i++)
+      unsigned int j = 0;
+      for (unsigned int i = 0; i < InterpolationPoints.size(); i++)
       {
         while (DataPoints.get(j + 1) < InterpolationPoints.get(i) && j + 1 < DataPoints.size() - 1)
         {
