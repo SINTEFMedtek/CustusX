@@ -222,7 +222,7 @@ void ViewGroup::addImage(QString imageUid)
 
 void ViewGroup::removeImage(QString imageUid)
 {
-  std::cout << "ViewGroup::removeImage [" << imageUid<< "]"<< std::endl;
+  //std::cout << "ViewGroup::removeImage [" << imageUid<< "]"<< std::endl;
 
   ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
   if(!image)

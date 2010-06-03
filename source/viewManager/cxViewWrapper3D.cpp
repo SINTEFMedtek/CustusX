@@ -144,16 +144,10 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::removeImage(ssc::ImagePtr image)
 {
-  std::cout << "ViewWrapper3D::removeImag 1" << std::endl;
   if (!image)
     return;
-  std::cout << "ViewWrapper3D::removeImag 2" << std::endl;
   if (!mVolumetricReps.count(image->getUid()))
     return;
-
-//  if(mImage != image)
-//    return;
-  std::cout << "ViewWrapper3D::removeImag3" << std::endl;
 
   mImage.erase(std::find(mImage.begin(), mImage.end(), image));
 
@@ -161,13 +155,12 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
   mView->removeRep(mVolumetricReps[image->getUid()]);
   mVolumetricReps.erase(image->getUid());
 
-//  mImage.reset();
   emit imageRemoved(qstring_cast(image->getUid()));
 }
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-  std::cout <<"void ViewWrapper3D::toolsAvailableSlot() " << std::endl;
+ // std::cout <<"void ViewWrapper3D::toolsAvailableSlot() " << std::endl;
   // we want to do this also when nonconfigured and manual tool is present
 //  if (!toolManager()->isConfigured())
 //    return;
@@ -186,7 +179,7 @@ void ViewWrapper3D::toolsAvailableSlot()
       repManager()->addToolRep3D(mToolReps[uid]);
     }
     ssc::ToolRep3DPtr toolRep = mToolReps[uid];
-    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
+//    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
     toolRep->setTool(iter->second);
     mView->addRep(toolRep);
   }
