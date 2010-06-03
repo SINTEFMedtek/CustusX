@@ -205,17 +205,6 @@ void ViewManager::setActiveView(ssc::View* view)
   mActiveView = view;
   emit activeViewChanged();
 }
-/*void ViewManager::setGlobalOrientation(bool global)
-{
-  if(mGlobalObliqueOrientation == global)
-    return;
-
-  mGlobalObliqueOrientation = global;
-  if(mGlobalObliqueOrientation)
-  {}
-  else
-  {}
-}*/
 
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
 {
@@ -234,27 +223,6 @@ void ViewManager::setGlobal2DZoom(bool global)
   {
     mViewGroups[i]->setGlobal2DZoom(mGlobal2DZoom, mGlobalZoom2DVal);
   }
-
-//  if(mGlobal2DZoom)
-//  {
-//    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
-//    for(;it != mViewGroups.end(); ++it)
-//    {
-//      connect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
-//              this, SLOT(global2DZooming(double)));
-//    }
-//    //messageManager()->sendInfo("GLOBAL ZOOMING IS ON");
-//  }
-//  else
-//  {
-//    std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
-//    for(;it != mViewGroups.end(); ++it)
-//    {
-//      disconnect((*it).get(), SIGNAL(viewGroupZoom2DChanged(double)),
-//                this, SLOT(global2DZooming(double)));
-//    }
-//    //messageManager()->sendInfo("GLOBAL ZOOMING IS OFF");
-//  }
 }
 
 bool ViewManager::getGlobal2DZoom()
@@ -474,6 +442,9 @@ void ViewManager::renderingIntervalChangedSlot(int interval)
 void ViewManager::shadingChangedSlot(bool shadingOn)
 {
   mShadingOn = shadingOn;
+
+  // currently disabled: shading is now a property in ssc::Image.
+  // Remove this method???
   
 //  ssc::VolumetricRepPtr volumetricRep
 //  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
@@ -614,29 +585,16 @@ void ViewManager::activateLayout_ACSACS_2X3()
   mActiveLayout = LAYOUT_ACSACS_2X3;
   emit activeLayoutChanged();
 }
-  
-/*void ViewManager::removeRepFromViews(ssc::RepPtr rep)
-{
-  View3DMap::iterator it3D = mView3DMap.begin();
-  for(; it3D != mView3DMap.end(); ++it3D)
-    it3D->second->removeRep(rep);
-  View2DMap::iterator it2D = mView2DMap.begin();
-  for(; it2D != mView2DMap.end(); ++it2D)
-    it2D->second->removeRep(rep);
-}*/
-/*void ViewManager::currentImageChangedSlot(ssc::ImagePtr currentImage)
-{
-  for (unsigned i=0; i<mViewGroups.size(); ++i)
-  {
-    mViewGroups[i]->setImage(currentImage);
-  }
-}*/
+
 void ViewManager::renderAllViewsSlot()
 {
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
   {
     if(iter->second->isVisible())
-      iter->second->getRenderWindow()->Render();
+    {
+      //iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+      iter->second->render(); // render only changed scenegraph
+    }
   }
   
   if(mRenderingTime->elapsed()>1000)
@@ -647,17 +605,6 @@ void ViewManager::renderAllViewsSlot()
   }
   else
     mNumberOfRenderings++;
-}
-void ViewManager::global2DZooming(double zoom)
-{
-//  std::vector<ViewGroupPtr>::iterator it = mViewGroups.begin();
-//  for(;it != mViewGroups.end(); ++it)
-//  {
-//    //std::cout << "VIEWMANAGER: zoom global: " + string_cast(mGlobal2DZoom) << std::endl;
-//    (*it)->blockSignals(true);
-//    (*it)->zoom2DChangeSlot(zoom);
-//    (*it)->blockSignals(false);
-//  }
 }
 
 
