@@ -27,7 +27,8 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mCommunication->SetHardwareHandshake(igstk::SerialCommunication::HandshakeOff);
 
   mCommunication->SetCaptureFileName( "RecordedStreamByCustusX3.txt" );
-  mCommunication->SetCapture( true );
+  //mCommunication->SetCapture( true );
+  mCommunication->SetCapture( false );
 
   switch (mInternalStructure.mType)
   {
