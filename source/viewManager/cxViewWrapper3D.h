@@ -44,6 +44,7 @@ private slots:
 private:
   virtual void appendToContextMenu(QMenu& contextMenu){};
   virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
+  void updateView();
 
 //  ssc::VolumetricRepPtr mVolumetricRep;
   std::map<std::string, ssc::VolumetricRepPtr> mVolumetricReps;

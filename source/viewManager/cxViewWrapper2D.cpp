@@ -276,25 +276,72 @@ ssc::View* ViewWrapper2D::getView()
 void ViewWrapper2D::addImage(ssc::ImagePtr image)
 {
   if (!image)
+  {
     return;
-  ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
-  mSliceProxy->setDefaultCenter(c);
-  mSliceRep->setImage(image);
+  }
+  if (std::count(mImage.begin(), mImage.end(), image))
+  {
+    return;
+  }
+  mImage.push_back(image);
 
-  //update data name text rep
-  mDataNameText->setText(0, image->getName());
+//  image = mImage.front(); // always show first in vector
+//
+//  ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+//  mSliceProxy->setDefaultCenter(c);
+//  mSliceRep->setImage(image);
+//
+//  //update data name text rep
+//  mDataNameText->setText(0, image->getName());
+  updateView();
 
   emit imageAdded(image->getUid().c_str());
 }
 
+void ViewWrapper2D::updateView()
+{
+  ssc::ImagePtr image;
+  if (!mImage.empty())
+    image = mImage.front(); // always show first in vector
+
+  std::string text;
+
+  if (image)
+  {
+    ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
+    mSliceProxy->setDefaultCenter(c);
+    text = image->getName();
+  }
+
+  mSliceRep->setImage(image);
+  //update data name text rep
+  mDataNameText->setText(0, text);
+}
+
+
 std::vector<ssc::ImagePtr> ViewWrapper2D::getImages() const
 {
-  return std::vector<ssc::ImagePtr>(1, mSliceRep->getImage());
+  return mImage;
+//  return std::vector<ssc::ImagePtr>(1, mSliceRep->getImage());
 }
 
 void ViewWrapper2D::removeImage(ssc::ImagePtr image)
 {
-  mSliceRep->setImage(ssc::ImagePtr());
+  if (!image)
+    return;
+  std::cout << "remove 2d: " << image->getName() << std::endl;
+  std::cout << "size " << mImage.size() << std::endl;
+  if (!std::count(mImage.begin(), mImage.end(), image))
+    return;
+  mImage.erase(std::find(mImage.begin(), mImage.end(), image));
+  std::cout << "size " << mImage.size() << std::endl;
+//
+//  if (mImage.empty())
+//    mSliceRep->setImage(ssc::ImagePtr());
+//  else
+//    mSliceRep->setImage(mImage.front());
+
+  updateView();
   emit imageRemoved(qstring_cast(image->getUid()));
 }
 

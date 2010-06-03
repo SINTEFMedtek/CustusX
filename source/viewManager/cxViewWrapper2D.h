@@ -51,6 +51,7 @@ private slots:
 private:
   virtual void setZoomFactor2D(double zoomFactor);
   virtual double getZoomFactor2D() const;
+  void updateView();
 
   virtual void appendToContextMenu(QMenu& contextMenu);
   void addReps();
@@ -72,6 +73,7 @@ private:
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   ssc::View* mView;
+  std::vector<ssc::ImagePtr> mImage;
 
   // sunchronized data
   SyncedValuePtr mZoom2D;
