@@ -89,6 +89,15 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
   mProbeRep->setImage(image);
   mLandmarkRep->setImage(image);
 
+  updateView();
+
+  mView->getRenderer()->ResetCamera();
+//  if (mView->isVisible())
+//    mView->getRenderWindow()->Render();
+}
+
+void ViewWrapper3D::updateView()
+{
   //update data name text rep
   QStringList text;
   for (unsigned i = 0; i < mImage.size(); ++i)
@@ -96,12 +105,28 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
     text << qstring_cast(mImage[i]->getName());
   }
   mDataNameText->setText(0, string_cast(text.join("\n")));
-
-  mView->getRenderer()->ResetCamera();
-  if (mView->isVisible())
-    mView->getRenderWindow()->Render();
 }
-  
+
+void ViewWrapper3D::removeImage(ssc::ImagePtr image)
+{
+  if (!image)
+    return;
+  if (!mVolumetricReps.count(image->getUid()))
+    return;
+  if (!std::count(mImage.begin(), mImage.end(), image))
+    return;
+  mImage.erase(std::find(mImage.begin(), mImage.end(), image));
+
+  messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
+  mView->removeRep(mVolumetricReps[image->getUid()]);
+  mVolumetricReps.erase(image->getUid());
+
+  updateView();
+
+  emit imageRemoved(qstring_cast(image->getUid()));
+}
+
+
 void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
 {
   if (!mesh)
@@ -142,21 +167,6 @@ void ViewWrapper3D::dominantToolChangedSlot()
   //std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
 
-void ViewWrapper3D::removeImage(ssc::ImagePtr image)
-{
-  if (!image)
-    return;
-  if (!mVolumetricReps.count(image->getUid()))
-    return;
-
-  mImage.erase(std::find(mImage.begin(), mImage.end(), image));
-
-  messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
-  mView->removeRep(mVolumetricReps[image->getUid()]);
-  mVolumetricReps.erase(image->getUid());
-
-  emit imageRemoved(qstring_cast(image->getUid()));
-}
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
