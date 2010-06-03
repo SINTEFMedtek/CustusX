@@ -58,6 +58,8 @@ namespace ssc
 		virtual void removeReps();				///< Removes all reps in the view
 		virtual void clear();					///< Removes everything in the view, inluding reps.
 
+		virtual void render(); ///< render the view contents if vtk-MTimes are changed
+
 		void print(std::ostream& os);
 		virtual void printSelf(std::ostream & os, Indent indent);
 
@@ -71,6 +73,7 @@ namespace ssc
     void focusInSignal(QFocusEvent* event);
 
 	protected:
+    unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 		std::string mUid;					///< The view's unique id
 		std::string mName;					///< The view's name
 		vtkRendererPtr mRenderer;

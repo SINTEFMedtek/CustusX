@@ -55,10 +55,21 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 
 	// from snws
 	mTextureMapper3D->SetPreferredMethodToNVidia();
+	//mTextureMapper3D->SetPreferredMethodToFragmentProgram();
 	mTextureMapper3D->SetBlendModeToComposite();
+
+//  std::cout << "comp: "<< mTextureMapper3D->GetUseCompressedTexture() << std::endl;
+//	mTextureMapper3D->SetUseCompressedTexture(true);
+//  std::cout << "comp: "<< mTextureMapper3D->GetUseCompressedTexture() << std::endl;
+ // mTextureMapper3D->CroppingOff();
 
 	mVolume->SetProperty( mVolumeProperty );
 	mVolume->SetMapper( mTextureMapper3D );
+
+//	if (!mTextureMapper3D->IsRenderSupported(mVolumeProperty))
+//	{
+//	  std::cout << "Warning: texture rendering not supported" << std::endl;
+//	}
 
 }
 VolumetricRep::~VolumetricRep()

@@ -39,6 +39,8 @@ namespace ssc
 View::View(QWidget *parent, Qt::WFlags f) :
 	ViewParent(parent, f), mRenderWindow( ViewRenderWindowPtr::New())
 {
+  mMTimeHash = 0;
+
 	this->SetRenderWindow(mRenderWindow);
 	clear();
 }
@@ -139,7 +141,10 @@ void View::resizeEvent ( QResizeEvent * event )
 	if(iren != NULL)
 		iren->UpdateSize(size.width(), size.height());
 
-    emit resized(size);
+  emit resized(size);
+    //std::cout << "resize " << getName() << " " << this->getRenderWindow()->GetMTime() << std::endl;
+    //this->getRenderWindow()->Modified();
+    //std::cout << "   resized " << getName() << " " << this->getRenderWindow()->GetMTime() << std::endl;
 }
 
 void View::print(std::ostream& os)
@@ -216,6 +221,32 @@ void View::showEvent(QShowEvent* event)
 {
   inherited::showEvent(event);
   emit showSignal(event);
+}
+
+void View::render()
+{
+  // Render is called only when mtime is changed.
+  // At least on MaxOS, this is not done automatically.
+
+  unsigned long hash = 0;
+
+  hash += this->getRenderer()->GetMTime();
+  hash += this->getRenderWindow()->GetMTime();
+  vtkPropCollection* props = this->getRenderer()->GetViewProps();
+  props->InitTraversal();
+  for (vtkProp* prop = props->GetNextProp(); prop!=NULL; prop=props->GetNextProp())
+  {
+    //std::cout << "--" << getName() << "\t" << hash << std::endl;
+    hash += prop->GetMTime();
+  }
+
+  if ( hash!=mMTimeHash )
+  {
+    this->getRenderWindow()->Render();
+    mMTimeHash = hash;
+//    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
+//    std::cout << getName() << "\t" << hash << std::endl;
+  }
 }
 
 
