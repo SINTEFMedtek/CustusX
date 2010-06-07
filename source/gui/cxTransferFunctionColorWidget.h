@@ -33,7 +33,8 @@ public slots:
 protected slots:
   void removeColorSlot();
   void setColorSlot();
-  
+  void setColorSlotDelayed();
+
 protected:
   struct ColorPoint
   {
