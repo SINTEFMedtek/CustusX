@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 #include "sscDummyTool.h"
 
 #include <vtkPolyData.h>
@@ -193,7 +193,9 @@ vtkPolyDataPtr DummyTool::createPolyData(double h1, double h2, double r1, double
 void DummyTool::createLinearMovement(std::vector<Transform3D>* retval, Transform3D* T_in, const Transform3D& R, const Vector3D& a, const Vector3D& b, double step) const
 {
 	Vector3D u = (b-a).normal();
-	unsigned N = (unsigned)round((b-a).length()/step);
+	//No round in Windows
+	//unsigned N = (unsigned)round((b-a).length()/step);
+	unsigned N = (unsigned)floor((b-a).length()/step + 0.5);
 	Transform3D& T = *T_in;
 	
 	for (unsigned i=0; i<N; ++i)
@@ -280,7 +282,7 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 
 	// use ms since Epoch (AD1970)
 	QDateTime time = QDateTime::currentDateTime();
-	uint64_t ts = (uint64_t)(time.toTime_t())*1000 + time.time().msec();
+	boost::uint64_t ts = (boost::uint64_t)(time.toTime_t())*1000 + time.time().msec();
 	double timestamp = static_cast<double>(ts);
 	
 	//check:

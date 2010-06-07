@@ -1,6 +1,6 @@
 #include "sscSNW2Volume.h"
 
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 #include <QStringList>
 #include <QFile>
 #include <vtkImageData.h>
@@ -384,7 +384,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 	// Initialize VTK image
 	if (mMetaData.Volume.mSamplesPerPixel==1 && mMetaData.Volume.mBitsPerSample==8)
 	{
-		uint8_t *image = (uint8_t*)(rawchars);
+		boost::uint8_t *image = (boost::uint8_t*)(rawchars);
 		if (scalarSize!=file.size())
 		{
 			writeStatus("unexpected file size for " + file.fileName());
@@ -398,7 +398,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 	}
 	else if (mMetaData.Volume.mSamplesPerPixel==1 && mMetaData.Volume.mBitsPerSample==16)
 	{
-		uint16_t *image = (uint16_t*)(rawchars);
+		boost::uint16_t *image = (boost::uint16_t*)(rawchars);
 		if (scalarSize*2!=file.size())
 		{
 			writeStatus("unexpected file size for "+file.fileName());
@@ -414,7 +414,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 	{
 		//writeStatus("volume["+uid()+"], loading color data");
 
-		uint8_t *image = (uint8_t*)(rawchars);
+		boost::uint8_t *image = (boost::uint8_t*)(rawchars);
 		if (scalarSize*3!=file.size())
 		{
 			writeStatus("unexpected file size for " + file.fileName());
@@ -470,7 +470,7 @@ bool SNW2Volume::rawLoadLut(const QString& filename, vtkLookupTablePtr lut) cons
 		int lutSize = mMetaData.Lut.mLength;
 		vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
 		array->SetNumberOfComponents(4);
-		uint8_t *raw = (uint8_t*)malloc(lutSize*4);
+		boost::uint8_t *raw = (boost::uint8_t*)malloc(lutSize*4);
 		char* charArray = reinterpret_cast<char*>(raw);
 		stream.readRawData(charArray, lutSize*4);
 		array->SetArray(raw, lutSize*4, 0); // take ownership

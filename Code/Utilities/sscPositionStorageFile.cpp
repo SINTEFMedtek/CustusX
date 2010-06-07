@@ -1,6 +1,6 @@
 #include "sscPositionStorageFile.h"
 #include <QDateTime>
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 #include "sscFrame3D.h"
 namespace ssc {
 
@@ -98,7 +98,7 @@ bool PositionStorageReader::atEnd() const
 QString PositionStorageReader::timestampToString(double timestamp)
 {
 	QDateTime retval;
-	uint64_t ts = static_cast<uint64_t>(timestamp);
+	boost::uint64_t ts = static_cast<boost::uint64_t>(timestamp);
 	retval.setTime_t(ts/1000);
 	retval = retval.addMSecs(ts%1000);
 	return retval.toString("yyyyMMddhhmmss.zzz");

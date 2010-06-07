@@ -1,14 +1,17 @@
 #include "sscMD5Check.h"
 
+#ifndef WIN32
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+
 #include <unistd.h>
+#include <stdbool.h>
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <openssl/md5.h>
 #include <iostream>
@@ -369,3 +372,4 @@ bool CheckMD5InMemory( const char* const pathname, const unsigned char* const da
 }
 
 }
+#endif

@@ -36,11 +36,16 @@
 //#include <vtkUnsignedShortArray.h>
 
 #include "/usr/include/X11/Xlib.h"
-//#include <GL/glu.h>
+
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #else
 #include <GL/glu.h>
+#endif
+
+#ifdef WIN32
+#include <windows.h>
+#include <GL/glext.h>
 #endif
 
 #include "sscGPUImageBuffer.h"

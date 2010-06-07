@@ -344,7 +344,8 @@ void ToolRep2D::updateOffsetText()
 	if( getOffset() > 2.0 && mUseOffsetText && showOffset())
 	{
 		char buffer[100];
-		snprintf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
+		//snprintf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
+		printf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
 		std::string text = buffer;
 		distanceText->updateText( text );
 		distanceText->getActor()->VisibilityOn();

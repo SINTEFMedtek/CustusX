@@ -8,12 +8,17 @@
 #include <GL/glu.h>
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#include <GL/glext.h>
+#endif
+
 #include <vector>
 #include <vtkImageData.h>
 #include <vtkPointData.h>
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 
 #include "sscGLHelpers.h"
 #include "sscGPUImageBuffer.h"
@@ -90,9 +95,9 @@ public:
 		vtkgl::ActiveTexture(GL_TEXTURE7);
 
 		GLenum size,internalType;
-		uint32_t dimx = mTexture ->GetDimensions( )[0];
-		uint32_t dimy = mTexture ->GetDimensions( )[1];
-		uint32_t dimz = mTexture ->GetDimensions( )[2];
+		boost::uint32_t dimx = mTexture ->GetDimensions( )[0];
+		boost::uint32_t dimy = mTexture ->GetDimensions( )[1];
+		boost::uint32_t dimz = mTexture ->GetDimensions( )[2];
 
 		glEnable( vtkgl::TEXTURE_3D );
 		glGenTextures(1, &textureId);
