@@ -253,7 +253,7 @@ void ImageLUT2D::addXml(QDomNode& parentNode)
   QDomDocument doc = parentNode.ownerDocument();
   QDomElement dataNode = doc.createElement("lookuptable2D");
   parentNode.appendChild(dataNode);
-
+  std::cout << "Saving window: " << mWindow << std::endl;
   dataNode.setAttribute("window", mWindow);
   dataNode.setAttribute("level", mLevel);
   dataNode.setAttribute("llr", mLLR);
@@ -277,12 +277,16 @@ void ImageLUT2D::parseXml(QDomNode dataNode)
   if (dataNode.isNull())
     return;
 
+  std::cout << "Loading window (pre): " << mWindow << std::endl;
   mWindow = loadAttribute(dataNode, "window", mWindow);
+  std::cout << "Loading window (port): " << mWindow << std::endl;
   mLevel = loadAttribute(dataNode, "level", mLevel);
   mLLR = loadAttribute(dataNode, "llr", mLLR);
   mAlpha = loadAttribute(dataNode, "alpha", mAlpha);
 
   //TODO: missing load of BaseLut
+
+  refreshOutput();
 }
 
 
