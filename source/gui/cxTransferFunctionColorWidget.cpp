@@ -11,6 +11,7 @@
 #include <QMenu>
 #include "cxDataManager.h"
 #include "sscImageTF3D.h"
+#include <QTimer>
 
 namespace cx
 {
@@ -24,19 +25,17 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
 {
   mCurrentPoint.reset();
   
-  // Create right click menu
-  mRightClickMenu = new QMenu(this);
   // Create actions
-  mCustomColorAction = new QAction(tr("Custom color..."), mRightClickMenu);
-  mRemoveColorAction = new QAction(tr("Remove point"), mRightClickMenu);
+  mCustomColorAction = new QAction(tr("Custom color..."), this);
+  mRemoveColorAction = new QAction(tr("Remove point"), this);
   
-  connect(mCustomColorAction, SIGNAL(triggered(bool)),
-    this, SLOT(setColorSlot()));
-  connect(mRemoveColorAction, SIGNAL(triggered()),
-    this, SLOT(removeColorSlot()));
+  connect(mCustomColorAction, SIGNAL(triggered(bool)), this, SLOT(setColorSlot()));
+  connect(mRemoveColorAction, SIGNAL(triggered()), this, SLOT(removeColorSlot()));
 }
+
 TransferFunctionColorWidget::~TransferFunctionColorWidget()
 {}
+
 void TransferFunctionColorWidget::activeImageChangedSlot()
 {
   ssc::ImagePtr activeImage = dataManager()->getActiveImage();
@@ -71,7 +70,7 @@ void TransferFunctionColorWidget::mouseReleaseEvent(QMouseEvent* event)
 
   //we no longer need these values
   mCurrentPoint.reset();
-  
+
   //TODO do we need to render here?
   //this->update();
 }
@@ -97,17 +96,17 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 
   QPainter painter(this);
   QPen pointPen, pointLinePen;
-  
+
   // Fill with white background color and grey plot area background color
   painter.fillRect(this->mFullArea, QColor(170, 170, 170));
   painter.fillRect(this->mPlotArea, QColor(200, 200, 200));
-  
+
   // Draw color-background
-  
+
   ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
-  
+
   painter.setPen(QColor(140, 140, 210));
-	
+
 	// Use vtkColorTransferFunction for interpolation
 	vtkColorTransferFunctionPtr trFunc = transferFunction->getColorTF();
   for (int x = mPlotArea.left(); x <= mPlotArea.right(); ++x)
@@ -120,9 +119,9 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
     painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
     painter.drawLine(x, mPlotArea.top(), x, mPlotArea.bottom());
   }
-  
+
   // Go through each point and draw squares
-  
+
   ColorMapPtr colorMapPtr = mCurrentImage->getTransferFunctions3D()->getColorMap();
   QPoint lastScreenPoint;
   this->mPointRects.clear();
@@ -132,18 +131,18 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
   {
     // Get the screen (plot) position of this point
     QPoint screenPoint = QPoint(
-      static_cast<int>(mPlotArea.left() + mPlotArea.width() * 
-                       colorPoint->first / 
+      static_cast<int>(mPlotArea.left() + mPlotArea.width() *
+                       colorPoint->first /
                        static_cast<double>(mCurrentImage->getRange())),
                        mPlotArea.bottom());
-    
+
   // Draw the rectangle
-  QRect pointRect(screenPoint.x() - mBorder, mFullArea.top(), 
+  QRect pointRect(screenPoint.x() - mBorder, mFullArea.top(),
                   mBorder*2, mFullArea.height());
   painter.setPen(pointPen);
   painter.drawRect(pointRect);
   this->mPointRects[colorPoint->first] = pointRect;
-  
+
   // Store the point
   lastScreenPoint = screenPoint;
   }
@@ -179,12 +178,11 @@ bool TransferFunctionColorWidget::isInsideCurrentPoint()
 }
 void TransferFunctionColorWidget::contextMenuEvent(QContextMenuEvent *event)
 {
-	QMenu menu;
+  QMenu menu;
 	
-  //mRightClickMenu->clear();
 	//TODO: Fix crash at this position
   menu.addAction(mCustomColorAction);
-  
+
   if (isInsideCurrentPoint() && !mEndPoint)
   {
     menu.addSeparator();
@@ -223,11 +221,11 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
 {
   ColorPoint point;
 
-  point.position = 
-    static_cast<int>( mCurrentImage->getRange() * 
-                     (mCurrentClickX - mPlotArea.left()) / 
+  point.position =
+    static_cast<int>( mCurrentImage->getRange() *
+                     (mCurrentClickX - mPlotArea.left()) /
                      static_cast<double>(mPlotArea.width()) );
-  
+
   if (point.position > mCurrentImage->getMax())
     point.position = mCurrentImage->getMax();
   else if (point.position < mCurrentImage->getMin())
@@ -237,7 +235,7 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
 	vtkColorTransferFunctionPtr trFunc = mCurrentImage->getTransferFunctions3D()->getColorTF();
 	double* rgb = trFunc->GetColor(point.position);
   point.value = QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255));
-	
+
   return point;
 }
 
@@ -245,27 +243,27 @@ void TransferFunctionColorWidget::moveCurrentPoint()
 {
   if(!mCurrentPoint.isValid())
     return;
-  
+
   ColorPoint newColorPoint = this->getCurrentColorPoint();
 	newColorPoint.value = mCurrentPoint.value;
-  
+
   ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
-  
-  ColorMap::iterator prevPointIterator = 
+
+  ColorMap::iterator prevPointIterator =
     transferFunction->getColorMap()->find(mCurrentPoint.position);
-  
+
   if (mCurrentPoint.position != mCurrentImage->getMin()
     && mCurrentPoint.position != mCurrentImage->getMax() )
   {
     ColorMap::iterator nextPointIterator = prevPointIterator;
     prevPointIterator--;
     nextPointIterator++;
-    
+
     if (newColorPoint.position <= prevPointIterator->first)
       newColorPoint.position = prevPointIterator->first + 1;
     else if (newColorPoint.position >= nextPointIterator->first)
       newColorPoint.position = nextPointIterator->first - 1;
-		
+
     transferFunction->removeColorPoint(mCurrentPoint.position);
     transferFunction->addColorPoint(newColorPoint.position, newColorPoint.value);
     mCurrentPoint = newColorPoint;
@@ -275,19 +273,26 @@ void TransferFunctionColorWidget::moveCurrentPoint()
   
 void TransferFunctionColorWidget::setColorSlot()
 {
-	ColorPoint newPoint = mCurrentPoint;
+//  setColorSlotDelayed(); // crashed sporadically
+  QTimer::singleShot(1, this, SLOT(setColorSlotDelayed()));
+}
+
+
+void TransferFunctionColorWidget::setColorSlotDelayed()
+{
+   ColorPoint newPoint = mCurrentPoint;
 	if (!newPoint.isValid())
 		newPoint = getCurrentColorPoint();
-	
+
   QColor result = QColorDialog::getColor( newPoint.value, this);
-	
+
   if (result.isValid() && result != newPoint.value)
   {
     ColorMapPtr colorMapPtr = mCurrentImage->getTransferFunctions3D()->getColorMap();
-    
+
     // Check if the point is already in the map
     ColorMap::iterator pointIterator = colorMapPtr->find(newPoint.position);
-    
+
     if (pointIterator != colorMapPtr->end())
       mCurrentImage->getTransferFunctions3D()->setColorValue(newPoint.position, result);
     else
@@ -299,13 +304,13 @@ void TransferFunctionColorWidget::setColorSlot()
 }
 void TransferFunctionColorWidget::removeColorSlot()
 {
-  if(!this->mCurrentPoint.isValid()) 
+  if(!this->mCurrentPoint.isValid())
     return;
-    
+
   mCurrentImage->getTransferFunctions3D()->removeColorPoint(this->mCurrentPoint.position);
-  
-  // TODO: call update/render??? 
+
+  // TODO: call update/render???
   this->update();
-  //GUIManager::instance().getRenderWidget()->render();       
+  //GUIManager::instance().getRenderWidget()->render();
 }
 }//namespace cx
