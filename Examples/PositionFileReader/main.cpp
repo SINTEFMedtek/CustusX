@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include <QtGui>
-#include <stdint.h>
+#include <boost/cstdint.hpp>
 
 #include "sscTransform3D.h"
 #include "sscPositionStorageFile.h"
@@ -34,9 +34,9 @@ int main(int argc, char **argv)
 	}
 	
 	QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
-	uint64_t ret64 = startTime.toTime_t();
+	boost::uint64_t ret64 = startTime.toTime_t();
 	ret64 *= 1000;
-	uint64_t tsModifier = ret64 & 0xffffffff00000000;
+	boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
 
 	ssc::PositionStorageReader reader(posFile);
 	
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 	while (!reader.atEnd())
 	{
 		reader.read(&T, &timestamp, &toolIndex);
-		uint64_t ts64 = (uint64_t)timestamp;
+		boost::uint64_t ts64 = (boost::uint64_t)timestamp;
 		ts64 |= tsModifier;
 
 		if (verbose)
