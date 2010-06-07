@@ -199,6 +199,10 @@ void ViewsWindow::updateRender()
 	  }
 	}
 
+
+	vtkVolumeTextureMapper3D* mapper = vtkVolumeTextureMapper3D::SafeDownCast(mVolumetricRep->getVtkVolume()->GetMapper());
+	mapper->Print(std::cout);
+
 	std::string text = string_cast(sum);
 	for (unsigned i=0; i<times.size(); ++i)
 	{

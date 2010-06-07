@@ -236,16 +236,23 @@ void View::render()
   props->InitTraversal();
   for (vtkProp* prop = props->GetNextProp(); prop!=NULL; prop=props->GetNextProp())
   {
+    vtkVolume* volume = vtkVolume::SafeDownCast(prop);
+    if (volume)
+    {
+      std::cout << getName() << "\t" << prop->GetRedrawMTime() << "  " << prop->GetMTime() << std::endl;
+    }
     //std::cout << "--" << getName() << "\t" << hash << std::endl;
     hash += prop->GetMTime();
+    hash += prop->GetRedrawMTime();
   }
+  std::cout << "--" << getName() << "\t" << hash << std::endl;
 
   if ( hash!=mMTimeHash )
   {
     this->getRenderWindow()->Render();
     mMTimeHash = hash;
 //    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
-//    std::cout << getName() << "\t" << hash << std::endl;
+    std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
   }
 }
 

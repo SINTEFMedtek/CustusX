@@ -38,6 +38,9 @@ void MainWindow::addActions()
     mAboutAct = new QAction(tr("About QtSandbox"), this);
     mAboutAct->setStatusTip(tr("Show the Application's About box"));
     connect(mAboutAct, SIGNAL(triggered()), this, SLOT(about()));
+
+    mCrashAct = new QAction(tr("Color crash"), this);
+    connect(mCrashAct, SIGNAL(triggered()), this, SLOT(colorCrash()));
 }
 
 void MainWindow::addToolbar()
@@ -45,6 +48,7 @@ void MainWindow::addToolbar()
 	mToolbar = this->addToolBar("Mytoolbar");
 	mToolbar->addAction(mAction1);
 	mToolbar->addAction(mAction2);
+	mToolbar->addAction(mCrashAct);
 }
 
 void MainWindow::addMenu()
@@ -52,6 +56,7 @@ void MainWindow::addMenu()
     QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(mAction1);
     fileMenu->addAction(mAction2);
+    fileMenu->addAction(mCrashAct);
 
     QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(mAboutQtAct);
@@ -71,4 +76,13 @@ void MainWindow::createStatusBar()
     statusBar()->showMessage(tr("Ready"));
 }
 
+void MainWindow::colorCrash()
+{
+#if 1
+   QColorDialog dialog(QColor("white"), this);
+  dialog.exec();
+#else
+  QColor result = QColorDialog::getColor( newPoint.value, this);
+#endif
+}
 }

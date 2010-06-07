@@ -16,6 +16,7 @@ public:
 	QPlainTextEdit* mTextEdit;
 private slots:
 	void about();
+	void colorCrash();
 private:
 	void createStatusBar();
 	void addActions();
@@ -27,6 +28,7 @@ private:
     QAction* mAboutQtAct;
     QAction* mAboutAct;
 
+    QAction* mCrashAct;
 };
 
 

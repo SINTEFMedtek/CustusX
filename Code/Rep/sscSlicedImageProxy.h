@@ -39,6 +39,7 @@ public:
 
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
+	void transferFunctionsChangedSlot();
 
 private: 	
 	vtkImageDataPtr createDummyImageData();

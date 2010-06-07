@@ -74,14 +74,26 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 	}
 }
 
+
+void SlicedImageProxy::transferFunctionsChangedSlot()
+{
+  mWindowLevel->Modified();
+}
+
 typedef vtkSmartPointer<vtkImageExtractComponents> vtkImageExtractComponentsPtr;
 typedef vtkSmartPointer<vtkImageAppendComponents > vtkImageAppendComponentsPtr;
 
 void SlicedImageProxy::setImage(ImagePtr image)
 {
-	mImage = image;
+  if (mImage)
+  {
+    disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+  }
+
+  mImage = image;
 	if (mImage)
 	{
+    connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 	  //std::cout << "slicedImageProxy::setImage" << std::endl;
 		mReslicer->SetInput( mImage->getBaseVtkImageData() );
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
