@@ -7,6 +7,7 @@
 
 #include "sscTextureSlicePainter.h"
 
+#ifndef WIN32
 #include <QtCore>
 //#include <vtkProperty.h>
 #include <vtkOpenGLExtensionManager.h>
@@ -399,5 +400,6 @@ void TextureSlicePainter::PrintSelf(ostream& os, vtkIndent indent)
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
+#endif //WIN32
 
 

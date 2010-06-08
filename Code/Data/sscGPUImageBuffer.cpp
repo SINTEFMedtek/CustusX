@@ -1,3 +1,7 @@
+
+#include "sscGPUImageBuffer.h"
+
+#ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
 #include <vtkgl.h>
 
@@ -21,7 +25,6 @@
 #include <boost/cstdint.hpp>
 
 #include "sscGLHelpers.h"
-#include "sscGPUImageBuffer.h"
 
 //#define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__)
 //
@@ -520,5 +523,5 @@ ssc::GPUImageLutBufferPtr GPUImageBufferRepository::getGPUImageLutBuffer(vtkUnsi
 	return mInternal->mLutBuffer.get(lut);
 }
 
-
 }
+#endif //WIN32

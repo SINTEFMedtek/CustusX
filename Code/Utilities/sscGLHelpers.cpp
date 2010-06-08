@@ -1,6 +1,7 @@
 #include "sscGLHelpers.h"
 //#include "SonoWand.h"
 
+#ifndef WIN32
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #else
@@ -25,3 +26,4 @@ void fgl_really_report_gl_errors( const char *file, int line )
 		abort();
 	}
 }
+#endif //WIN32

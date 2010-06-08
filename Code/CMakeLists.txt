@@ -131,8 +131,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscMD5Check.h
     Utilities/sscSnwInifile.cpp
     Utilities/sscSnwInifile.h
-    #Utilities/sscGLHelpers.cpp
-    #Utilities/sscGLHelpers.h
+    Utilities/sscGLHelpers.cpp
+    Utilities/sscGLHelpers.h
     Utilities/sscEnumConverter.h
     Utilities/sscDefinitions.h
     Utilities/sscDefinitions.cpp
@@ -175,8 +175,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscImageBlenderProxy.h
     Rep/sscTexture3DSlicerRep.cpp
     Rep/sscTexture3DSlicerRep.h
-    #Rep/sscTextureSlicePainter.cpp
-    #Rep/sscTextureSlicePainter.h
+    Rep/sscTextureSlicePainter.cpp
+    Rep/sscTextureSlicePainter.h
     Rep/sscOrientationAnnotationRep.cpp
     Rep/sscOrientationAnnotationRep.h
     Rep/sscTool2DRep.cpp
@@ -199,8 +199,8 @@ SET( SSC_SOURCE_FILES
     Data/sscImageTF3D.cpp
     Data/sscImageLUT2D.cpp
     Data/sscImageLUT2D.h
-    #Data/sscGPUImageBuffer.cpp
-    #Data/sscGPUImageBuffer.h
+    Data/sscGPUImageBuffer.cpp
+    Data/sscGPUImageBuffer.h
     Data/sscMesh.h
     Data/sscMesh.cpp
     Data/sscDataManager.cpp
@@ -257,12 +257,13 @@ if (USE_GLX_SHARED_CONTEXT)
         ${SSC_SOURCE_FILES}
         vtkMods/sscSNWXOpenGLRenderWindow.cpp
         vtkMods/sscSNWQVTKWidget.cpp
-        Data/sscGPUImageBuffer.cpp
-        Data/sscGPUImageBuffer.h
-        Rep/sscTextureSlicePainter.cpp
-        Rep/sscTextureSlicePainter.h
-        Utilities/sscGLHelpers.cpp
-        Utilities/sscGLHelpers.h
+        # These files and more should probably be moved here
+        #Data/sscGPUImageBuffer.cpp
+        #Data/sscGPUImageBuffer.h
+        #Rep/sscTextureSlicePainter.cpp
+        #Rep/sscTextureSlicePainter.h
+        #Utilities/sscGLHelpers.cpp
+        #Utilities/sscGLHelpers.h
         )
 
     #add moc versions of out modified QVTKWidget
