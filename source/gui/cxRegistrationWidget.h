@@ -42,6 +42,7 @@ protected slots:
 
   void cellChangedSlot(int row,int column); ///< reacts when the user types in a (landmark) name
   void landmarkUpdatedSlot(std::string uid);
+  void updateAvarageAccuracyLabel();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

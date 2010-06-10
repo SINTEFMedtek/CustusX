@@ -255,6 +255,7 @@ ssc::Transform3D PatientRegistrationWidget::getTargetTransform() const
 void PatientRegistrationWidget::performRegistration()
 {
   registrationManager()->doPatientRegistration();
+  this->updateAvarageAccuracyLabel();
 }
 
 }//namespace cx

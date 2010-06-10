@@ -145,7 +145,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
     }
   }
 
-  mAvarageAccuracyLabel->setText(tr("Avrage accuracy %1 mm").arg(this->getAvarageAccuracy()));
+  this->updateAvarageAccuracyLabel();
 }
 
 void RegistrationWidget::nextRow()
@@ -216,6 +216,11 @@ void RegistrationWidget::landmarkUpdatedSlot(std::string uid)
 {
   this->performRegistration();
   this->populateTheLandmarkTableWidget(mCurrentImage);
+}
+
+void RegistrationWidget::updateAvarageAccuracyLabel()
+{
+  mAvarageAccuracyLabel->setText(tr("Avrage accuracy %1 mm").arg(this->getAvarageAccuracy()));
 }
 
 double RegistrationWidget::getAvarageAccuracy()

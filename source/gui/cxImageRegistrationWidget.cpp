@@ -169,6 +169,8 @@ void ImageRegistrationWidget::performRegistration()
     registrationManager()->setMasterImage(mCurrentImage);
 
   registrationManager()->doImageRegistration(mCurrentImage);
+
+  this->updateAvarageAccuracyLabel();
 }
 
 /** Return transform from target space to reference space
