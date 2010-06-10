@@ -208,6 +208,7 @@ void RegistrationWidget::cellChangedSlot(int row,int column)
   {
     Qt::CheckState state = item->checkState();
     dataManager()->setLandmarkActive(uid, state==Qt::Checked);
+    this->performRegistration();
   }
 }
 
