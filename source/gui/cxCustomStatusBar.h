@@ -14,12 +14,6 @@ namespace cx
  *
  * \brief Statusbar with extended functionality.
  *
- * \warning Not working yet and functionality still missing.
- *
- * TODO: get the text and color labels representing the tool to work
- * TODO: divide the statusbar into zones
- * TODO: first zone should display normal status text, including the messages from messagemanager
- *
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
@@ -38,8 +32,7 @@ protected slots:
   void fpsSlot(int numFps); ///< Show FPS
 
 protected:
-  std::map<QLabel*, QLabel*> mToolColorMap; ///< maps text- and colorlabel for a tool
-  
+  std::vector<QLabel*> mToolLabels; ///< labels indicating the tools visibility
   QLabel* mFpsLabel; ///< Label for showing FPS
 };
 }

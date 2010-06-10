@@ -14,7 +14,7 @@ namespace cx
 CustomStatusBar::CustomStatusBar() :
   mFpsLabel(new QLabel())
 {
-  connect(MessageManager::getInstance(),
+  connect(messageManager(),
           SIGNAL(emittedMessage(const QString&, int)),
           this,
           SLOT(showMessage(const QString&, int)));
@@ -28,101 +28,84 @@ CustomStatusBar::CustomStatusBar() :
   
   this->addPermanentWidget(mFpsLabel);
 }
+
 CustomStatusBar::~CustomStatusBar()
-{
-}
+{}
+
 void CustomStatusBar::connectToToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = ToolManager::getInstance()->getTools();
+  ssc::ToolManager::ToolMapPtr connectedTools = toolManager()->getTools();
   ssc::ToolManager::ToolMap::iterator it = connectedTools->begin();
   while (it != connectedTools->end())
   {
     ssc::Tool* tool = it->second.get();
-    connect(tool, SIGNAL(toolVisible(bool)),
-            this, SLOT(receiveToolVisible(bool)));
+    connect(tool, SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
 
-    QPixmap pixmap;
-    pixmap.fill(Qt::gray);
+    //QPixmap pixmap;
+    //pixmap.fill(tool->getVisible() ? Qt::green : Qt::red);
     QString toolName = QString(tool->getName().c_str());
 
-    QLabel* textLabel = new QLabel();
-    textLabel->setText(toolName);
+    QLabel* toolLabel = new QLabel();
+    toolLabel->setText(toolName);
 
-    QLabel* colorLabel = new QLabel();
-    colorLabel->setPixmap(pixmap);
+    QString color;
+    if(tool->getVisible())
+      color = QString("QLabel { background-color: green }");
+    else
+      color = QString("QLabel { background-color: red }");
+    toolLabel->setStyleSheet(color);
 
-    mToolColorMap.insert(std::pair<QLabel*,QLabel*>(textLabel, colorLabel));
+    this->addPermanentWidget(toolLabel);
+    mToolLabels.push_back(toolLabel);
+
+    //std::cout << "Added permanent label with name " << toolLabel->text().toStdString() << std::endl;
+    std::cout << "Added permanent label with name " << toolName.toStdString() << std::endl;
 
     it++;
   }
 }
+
 void CustomStatusBar::disconnectFromToolSignals()
 {
   ssc::ToolManager::ToolMapPtr connectedTools = ToolManager::getInstance()->getTools();
-  ssc::ToolManager::ToolMap::iterator it1 = connectedTools->begin();
-  while (it1 != connectedTools->end())
+  ssc::ToolManager::ToolMap::iterator toolIt = connectedTools->begin();
+  while (toolIt != connectedTools->end())
   {
-    disconnect(it1->second.get(), SIGNAL(toolVisible(bool)),
-            this, SLOT(receiveToolVisible(bool)));
-    it1++;
+    disconnect(toolIt->second.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
+    toolIt++;
   }
-  //std::cout << "mToolColorMap.size() = " << mToolColorMap.size() << std::endl;
-  std::map<QLabel*, QLabel*>::iterator it2 = mToolColorMap.begin();
-  while(it2 != mToolColorMap.end())
+  for(unsigned i=0; i<mToolLabels.size(); ++i)
   {
-    QLabel* textLabel = it2->first;
-    QLabel* colorLabel = it2->second;
-    this->removeWidget(textLabel);
-    this->removeWidget(colorLabel);
-
-    //RemoveWidget does not delete the widget but hides it...
-    delete textLabel;
-    delete colorLabel;
-    
-    mToolColorMap.erase(it2);
-
-    it2++;
+    QLabel* toolLabel = mToolLabels[i];
+    this->removeWidget(toolLabel);
+    delete toolLabel;
   }
+  mToolLabels.clear();
 }
+
 void CustomStatusBar::receiveToolVisible(bool visible)
 {
-  QObject* sender = this->sender();
-  if(sender == 0)
+  Tool* tool = dynamic_cast<Tool*>(this->sender());
+  if(!tool)
   {
     MessageManager::getInstance()->sendWarning("Could not determine which tool changed visibility.");
     return;
   }
-  const QMetaObject* metaObject = sender->metaObject();
-  std::string className = metaObject->className();
-  //std::cout << "Incoming objects classname is: " << className << std::endl; //TODO debuggging
-  if(className == "Tool")
+
+  std::string name = tool->getName();
+  for(unsigned i=0; i<mToolLabels.size(); ++i)
   {
-    Tool* tool = dynamic_cast<Tool*>(sender);
-    if(tool == NULL)
+    QLabel* toolLabel = mToolLabels[i];
+    if(toolLabel->text().compare(QString(name.c_str()), Qt::CaseInsensitive) == 0)
     {
-      MessageManager::getInstance()->sendWarning("The sender does not appear to be a tool.");
-      return;
-    }
-    std::string name = tool->getName();
-    std::map<QLabel*, QLabel*>::iterator it = mToolColorMap.begin();
-    while(it != mToolColorMap.end())
-    {
-      QLabel* textLabel = it->first;
-      if(textLabel->text().compare(QString(name.c_str()), Qt::CaseInsensitive) == 0)
-      {
-        QLabel* colorLabel = it->second;
-        QPixmap pixmap;
-        if(visible)
-        {
-          pixmap.fill(Qt::green);
-        }else
-        {
-          pixmap.fill(Qt::red);
-        }
-        colorLabel->setPixmap(pixmap);
-        std::cout << "Set new pixmap. " << std::endl; //TODO debuggging
-      }
-      it++;
+      QString color;
+      if(tool->getVisible())
+        color = QString("QLabel { background-color: green }");
+      else
+        color = QString("QLabel { background-color: red }");
+
+      toolLabel->setStyleSheet(color);
+      std::cout << "Set new pixmap for tool: "<< tool->getName() << std::endl; //TODO debuggging
     }
   }
 }
