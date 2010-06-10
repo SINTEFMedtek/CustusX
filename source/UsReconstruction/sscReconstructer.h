@@ -13,7 +13,7 @@
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
-#include "../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h"
+#include "probeXmlConfigParser.h"
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
