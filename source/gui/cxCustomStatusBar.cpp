@@ -39,6 +39,11 @@ void CustomStatusBar::connectToToolSignals()
   while (it != connectedTools->end())
   {
     ssc::Tool* tool = it->second.get();
+    if(tool->getType() == ssc::Tool::TOOL_MANUAL)
+    {
+      it++;
+      continue;
+    }
     connect(tool, SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
 
     //QPixmap pixmap;
