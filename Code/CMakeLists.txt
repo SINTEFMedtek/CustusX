@@ -93,14 +93,15 @@ set(SSC_LIBRARY_DIRS
 
 set( SSC_LIBRARIES QVTK )
 
-# needed on linux
-if (NOT APPLE) 
-    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU )
-endif (NOT APPLE)
+if(WIN32)
+    set( SSC_LIBRARIES ${SSC_LIBRARIES} )
 # needed on apple
-if (APPLE) 
+elseif(APPLE)
     set( SSC_LIBRARIES ${SSC_LIBRARIES} crypto )
-endif (APPLE)
+# needed on linux
+else(WIN32)
+    set( SSC_LIBRARIES ${SSC_LIBRARIES} GLU )
+endif(WIN32)
 
 # library
 SET( SSC_SOURCE_FILES
