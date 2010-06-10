@@ -35,10 +35,18 @@ SET( SOURCE_FILES
 
 # =========================================================
 
+# 
+set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
+
 ADD_SUBDIRECTORY(Thunder)
 
 include_directories( Thunder
-  ${SSC_SOURCE_DIR}/Code/UsReconstruction/Thunder )
+  #${SSC_SOURCE_DIR}/Code/UsReconstruction/Thunder 
+  ${CMAKE_CURRENT_BINARY_DIR}
+)
 link_directories( Thunder )
 
 # =========================================================

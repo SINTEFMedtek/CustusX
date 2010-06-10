@@ -8,7 +8,7 @@
 
 #include <QFileInfo>
 #include <vtkImageData.h>
-#include "sscConfig.h"
+#include "recConfig.h"
 #include "reconstruct_vnn.h"
 #include "sscImage.h"
 #include "sscXmlOptionItem.h"
@@ -34,7 +34,8 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr outputData,
                                                  ImagePtr frameMask)
 {
-  QFileInfo path(SSC_THUNDER_KERNEL_PATH+QString("/kernels.ocl"));
+  QFileInfo path(THUNDER_KERNEL_PATH+QString("/kernels.ocl"));
+  std::cout << "kernels path: " << path.absoluteFilePath().toStdString() << std::endl;
   
   if (!path.exists())
     path = QFileInfo("./kernels.ocl");
