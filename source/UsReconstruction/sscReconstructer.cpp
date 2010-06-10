@@ -15,6 +15,11 @@
 #include "sscXmlOptionItem.h"
 #include "sscToolManager.h"
 
+//Windows fix
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 namespace ssc

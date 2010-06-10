@@ -7,7 +7,7 @@
 #ifndef SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 #define SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 
-#include "cxDataInterface.h"
+#include "sscAbstractInterface.h"
 #include "sscReconstructer.h"
 
 namespace ssc
