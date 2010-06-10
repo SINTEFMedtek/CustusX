@@ -34,7 +34,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr outputData,
                                                  ImagePtr frameMask)
 {
-  QFileInfo path(THUNDER_KERNEL_PATH+QString("/kernels.ocl"));
+  QFileInfo path(THUNDER_KERNEL_PATH+QString("kernels.ocl"));
   std::cout << "kernels path: " << path.absoluteFilePath().toStdString() << std::endl;
   
   if (!path.exists())
