@@ -62,7 +62,7 @@ ToolManager::ToolManager() :
   mPulseGenerator->RequestStart();
 
   initializeManualTool();
-  this->setDominantTool("tool_manual");
+  this->setDominantTool("Manual Tool");
 }
 ToolManager::~ToolManager()
 {
@@ -73,11 +73,11 @@ void ToolManager::initializeManualTool()
   if (!mManualTool)
   {
     //adding a manual tool as default
-    mManualTool.reset(new ssc::ManualTool("tool_manual"));
+    mManualTool.reset(new ssc::ManualTool("Manual Tool"));
     //mManualTool->setName("Mouse tool");
-    (*mConfiguredTools)["tool_manual"] = mManualTool;
+    (*mConfiguredTools)["Manual Tool"] = mManualTool;
     mManualTool->setVisible(true);
-    this->addConnectedTool("tool_manual");
+    this->addConnectedTool("Manual Tool");
   }
 
   ssc::Transform3D prMt =
