@@ -105,7 +105,8 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
   }
   std::string uid = mActiveLandmark;
   ssc::Vector3D pos_r = probeRep->getPosition();
-  mCurrentImage->setLandmark(ssc::Landmark(uid, pos_r));
+  ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
+  mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
 
   this->nextRow();
 }
