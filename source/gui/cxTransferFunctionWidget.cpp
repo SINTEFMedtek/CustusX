@@ -14,12 +14,12 @@ namespace cx
 TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
   QWidget(parent),
   mLayout(new QVBoxLayout(this)),
-	mInitialized(false)
-  //mTransferFunctionAlphaWidget(new TransferFunctionAlphaWidget(this)),
-  //mTransferFunctionColorWidget(new TransferFunctionColorWidget(this))
+  mInitialized(false)
 {}
+
 TransferFunctionWidget::~TransferFunctionWidget()
 {}
+
 void TransferFunctionWidget::init()
 {
 	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
@@ -39,17 +39,18 @@ void TransferFunctionWidget::init()
   mPresetsComboBox = new QComboBox(this);
   
   //Populate presets comboBox
-  mPresets = new QStringList();
+  /*mPresets = new QStringList();
   mPresets->append("Transfer function preset...");
   mPresets->append("Fire - CT");
-  mPresets->append("Blue - CT");
-  mPresetsComboBox->addItems(*mPresets);
-  this->initTransferFunctionPresets();
+  mPresets->append("Blue - CT");*/
+
+  mPresetsComboBox->addItems(mPresets.getPresetList());
+  //this->initTransferFunctionPresets();
   
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), 
           this, SLOT(shadingToggledSlot(bool)));
-  connect(mPresetsComboBox, SIGNAL(currentIndexChanged(int)), 
-          this, SLOT(presetsBoxChangedSlot(int)));
+  connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)),
+          this, SLOT(presetsBoxChangedSlot(const QString&)));
 
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
@@ -57,10 +58,10 @@ void TransferFunctionWidget::init()
   mLayout->addWidget(mPresetsComboBox);
   //mLayout->addWidget(mInfoWidget);
   this->setLayout(mLayout);
-	
-	mInitialized = true;
+
+  mInitialized = true;
 }
-	
+
 void TransferFunctionWidget::shadingToggledSlot(bool val)
 {
   ssc::ImagePtr image = dataManager()->getActiveImage();
@@ -85,13 +86,10 @@ void TransferFunctionWidget::activeImageChangedSlot()
   {
     mShadingCheckBox->setChecked(activeImage->getShading());
   }
-
-  //emit currentImageChanged(mCurrentImage);
-
-  //this->updatesomething()
 }
 
-void TransferFunctionWidget::initTransferFunctionPresets()
+/*MOVED TO PresetTransferFunctions3D
+ void TransferFunctionWidget::initTransferFunctionPresets()
 {
   // Use XML structure
   QDomDocument doc;
@@ -102,7 +100,7 @@ void TransferFunctionWidget::initTransferFunctionPresets()
   pointStringList.append(QString("0=0"));
   pointStringList.append(QString("100=100"));
   pointStringList.append(QString("150=100"));
-  pointStringList.append(QString("10000=200"));
+  pointStringList.append(QString("1000=200"));
   alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   
@@ -137,29 +135,31 @@ void TransferFunctionWidget::initTransferFunctionPresets()
   
   mTransferfunctionPresetCTBlue.appendChild(alphaNode);
   mTransferfunctionPresetCTBlue.appendChild(colorNode);
-}
+}*/
   
-void TransferFunctionWidget::presetsBoxChangedSlot(int val)
+void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
 {
   if(!mCurrentImage)
     return;
   
   ssc::ImageTF3DPtr transferFunctions = mCurrentImage->getTransferFunctions3D();
+  transferFunctions->parseXml(mPresets.getPresetDomElement(presetName));
 
   //transferFunctions->addAlphaPoint(0, 0);
   //transferFunctions->addColorPoint(0, QColor(0,0,0));
   
-  switch(val)
+  /*switch(val)
   {
     case 1:
-      transferFunctions->parseXml(mTransferfunctionPresetCTFire);
+      //transferFunctions->parseXml(mTransferfunctionPresetCTFire);
       break;
     case 2:
       transferFunctions->parseXml(mTransferfunctionPresetCTBlue);
       break;
     default:
       break;
-  }
+  }*/
+
   //Make sure min and max values for transferfunctions are set
   transferFunctions->addAlphaPoint(mCurrentImage->getMin(), 0);
   transferFunctions->addAlphaPoint(mCurrentImage->getMax(), 0);
