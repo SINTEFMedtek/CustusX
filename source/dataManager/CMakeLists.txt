@@ -7,6 +7,8 @@ SET( CX_QT_MOC_HEADER_FILES
 SET ( ${LIB}_dataManager
 	cxDataManager.h
 	cxDataManager.cpp
+	cxPresetTransferFunctions3D.h
+	cxPresetTransferFunctions3D.cpp
 	../cxForwardDeclarations.h
 )
 
