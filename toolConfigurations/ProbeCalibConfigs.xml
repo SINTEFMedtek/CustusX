@@ -1,5 +1,5 @@
 <root>
-	<Version>3.0.4</Version>
+	<Version>3.0.5</Version>
 	<USScanner>
 		<Name>Vivid 7 - Karkirurgen</Name>
 		<USProbe>
@@ -57,11 +57,11 @@
 					</Origin>
 					<NCorners>4</NCorners>
 					<Corner>
-						<Col>265</Col>
+						<Col>266</Col>
 						<Row>99</Row>
 					</Corner>
 					<Corner>
-						<Col>543</Col>
+						<Col>542</Col>
 						<Row>99</Row>
 					</Corner>
 					<Corner>
@@ -73,8 +73,8 @@
 						<Row>458</Row>
 					</Corner>
 					<Edges>
-						<Left>265</Left>
-						<Right>543</Right>
+						<Left>266</Left>
+						<Right>542</Right>
 						<Top>99</Top>
 						<Bottom>458</Bottom>
 					</Edges>
@@ -118,6 +118,356 @@
 					<PixelSize>
 						<Width>0.1611</Width>
 						<Height>0.1671</Height>
+					</PixelSize>
+				</Config>
+			</RTSource>
+			<RTSource>
+				<Name>VGA</Name>
+				<DefaultConfig>Max width 50 mm</DefaultConfig>
+				<Config>
+					<ID>Max width 40 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>40</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>317.5</Col>
+						<Row>52</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>146</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>489</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>489</Col>
+						<Row>410</Row>
+					</Corner>
+					<Corner>
+						<Col>146</Col>
+						<Row>410</Row>
+					</Corner>
+					<Edges>
+						<Left>146</Left>
+						<Right>489</Right>
+						<Top>52</Top>
+						<Bottom>410</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.1236</Width>
+						<Height>0.1282</Height>
+					</PixelSize>
+				</Config>
+				<Config>
+					<ID>Max width 50 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>50</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>318</Col>
+						<Row>99</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>181</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>455</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>455</Col>
+						<Row>411</Row>
+					</Corner>
+					<Corner>
+						<Col>181</Col>
+						<Row>411</Row>
+					</Corner>
+					<Edges>
+						<Left>181</Left>
+						<Right>455</Right>
+						<Top>52</Top>
+						<Bottom>411</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.1545</Width>
+						<Height>0.1603</Height>
+					</PixelSize>
+				</Config>
+				<Config>
+					<ID>Max width 60 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>60</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>317.5</Col>
+						<Row>52</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>204</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>431</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>431</Col>
+						<Row>411</Row>
+					</Corner>
+					<Corner>
+						<Col>204</Col>
+						<Row>411</Row>
+					</Corner>
+					<Edges>
+						<Left>204</Left>
+						<Right>431</Right>
+						<Top>52</Top>
+						<Bottom>411</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.1854</Width>
+						<Height>0.1923</Height>
+					</PixelSize>
+				</Config>
+			</RTSource>
+		</USProbe>
+		<USProbe>
+			<Name>Hypofyse</Name>
+			<Type>LinearArray</Type>
+			<DefaultRTSource>VGA</DefaultRTSource>
+			<RTSource>
+				<Name>SVideo</Name>
+				<DefaultConfig>Max width 25 mm</DefaultConfig>
+				<Config>
+					<ID>Max width 20 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>20</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>404</Col>
+						<Row>99</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>275</Col>
+						<Row>99</Row>
+					</Corner>
+					<Corner>
+						<Col>533</Col>
+						<Row>99</Row>
+					</Corner>
+					<Corner>
+						<Col>533</Col>
+						<Row>488</Row>
+					</Corner>
+					<Corner>
+						<Col>275</Col>
+						<Row>488</Row>
+					</Corner>
+					<Edges>
+						<Left>275</Left>
+						<Right>533</Right>
+						<Top>99</Top>
+						<Bottom>488</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.0494</Width>
+						<Height>0.0513</Height>
+					</PixelSize>
+				</Config>
+				<Config>
+					<ID>Max width 25 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>25</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>403.5</Col>
+						<Row>99</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>301</Col>
+						<Row>99</Row>
+					</Corner>
+					<Corner>
+						<Col>506</Col>
+						<Row>99</Row>
+					</Corner>
+					<Corner>
+						<Col>506</Col>
+						<Row>488</Row>
+					</Corner>
+					<Corner>
+						<Col>301</Col>
+						<Row>488</Row>
+					</Corner>
+					<Edges>
+						<Left>301</Left>
+						<Right>506</Right>
+						<Top>99</Top>
+						<Bottom>488</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.0618</Width>
+						<Height>0.0641</Height>
+					</PixelSize>
+				</Config>
+				<Config>
+					<ID>Max width 30 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>30</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>404</Col>
+						<Row>99</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>319</Col>
+						<Row>99</Row>
+					</Corner>
+					<Corner>
+						<Col>489</Col>
+						<Row>99</Row>
+					</Corner>
+					<Corner>
+						<Col>489</Col>
+						<Row>488</Row>
+					</Corner>
+					<Corner>
+						<Col>319</Col>
+						<Row>488</Row>
+					</Corner>
+					<Edges>
+						<Left>319</Left>
+						<Right>489</Right>
+						<Top>99</Top>
+						<Bottom>488</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.0769</Width>
+						<Height>0.0742</Height>
+					</PixelSize>
+				</Config>
+			</RTSource>
+			<RTSource>
+				<Name>VGA</Name>
+				<DefaultConfig>Max width 25 mm</DefaultConfig>
+				<Config>
+					<ID>Max width 20 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>20</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>317.5</Col>
+						<Row>52</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>190</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>445</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>445</Col>
+						<Row>441</Row>
+					</Corner>
+					<Corner>
+						<Col>190</Col>
+						<Row>441</Row>
+					</Corner>
+					<Edges>
+						<Left>190</Left>
+						<Right>445</Right>
+						<Top>52</Top>
+						<Bottom>441</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.0496</Width>
+						<Height>0.0514</Height>
+					</PixelSize>
+				</Config>
+				<Config>
+					<ID>Max width 25 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>25</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>317.5</Col>
+						<Row>52</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>216</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>419</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>419</Col>
+						<Row>441</Row>
+					</Corner>
+					<Corner>
+						<Col>216</Col>
+						<Row>441</Row>
+					</Corner>
+					<Edges>
+						<Left>216</Left>
+						<Right>419</Right>
+						<Top>52</Top>
+						<Bottom>441</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.062</Width>
+						<Height>0.0643</Height>
+					</PixelSize>
+				</Config>
+				<Config>
+					<ID>Max width 30 mm</ID>
+					<WidthDeg>0</WidthDeg>
+					<Depth>30</Depth>
+					<Offset>0</Offset>
+					<Origin>
+						<Col>317.5</Col>
+						<Row>52</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>233</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>402</Col>
+						<Row>52</Row>
+					</Corner>
+					<Corner>
+						<Col>402</Col>
+						<Row>441</Row>
+					</Corner>
+					<Corner>
+						<Col>233</Col>
+						<Row>441</Row>
+					</Corner>
+					<Edges>
+						<Left>233</Left>
+						<Right>402</Right>
+						<Top>52</Top>
+						<Bottom>441</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.0744</Width>
+						<Height>0.0771</Height>
 					</PixelSize>
 				</Config>
 			</RTSource>
