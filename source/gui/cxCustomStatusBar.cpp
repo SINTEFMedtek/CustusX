@@ -46,8 +46,6 @@ void CustomStatusBar::connectToToolSignals()
     }
     connect(tool, SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
 
-    //QPixmap pixmap;
-    //pixmap.fill(tool->getVisible() ? Qt::green : Qt::red);
     QString toolName = QString(tool->getName().c_str());
 
     QLabel* toolLabel = new QLabel();
@@ -62,10 +60,7 @@ void CustomStatusBar::connectToToolSignals()
 
     this->addPermanentWidget(toolLabel);
     mToolLabels.push_back(toolLabel);
-
-    //std::cout << "Added permanent label with name " << toolLabel->text().toStdString() << std::endl;
-    std::cout << "Added permanent label with name " << toolName.toStdString() << std::endl;
-
+    //std::cout << "Added permanent label with name " << toolName.toStdString() << std::endl;
     it++;
   }
 }
@@ -110,7 +105,6 @@ void CustomStatusBar::receiveToolVisible(bool visible)
         color = QString("QLabel { background-color: red }");
 
       toolLabel->setStyleSheet(color);
-      std::cout << "Set new pixmap for tool: "<< tool->getName() << std::endl; //TODO debuggging
     }
   }
 }
