@@ -3,9 +3,12 @@
 
 #include <QWidget>
 #include <QCheckBox>
+#include <QDomElement>
 #include <sscImage.h>
 
 class QVBoxLayout;
+class QComboBox;
+class QStringList;
 
 namespace cx
 {
@@ -34,6 +37,7 @@ public slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void shadingToggledSlot(bool val);
+  void presetsBoxChangedSlot(int val);
 
 /*signals:
   void currentImageChanged(ssc::ImagePtr currentImage); ///< sends out a signal when the user chooses a different image to work on*/
@@ -45,9 +49,15 @@ protected:
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
   //TransferFunctionInfoWidget*  mInfoWidget;
   QCheckBox* mShadingCheckBox;
+  QComboBox* mPresetsComboBox;
+  QStringList* mPresets;
+  QDomElement mTransferfunctionPresetCTFire;
+  QDomElement mTransferfunctionPresetCTBlue;
 
   ssc::ImagePtr mCurrentImage;
 	bool mInitialized;///< Is TransferFunctionWidget initialized
+  
+  void initTransferFunctionPresets();
 };
 }
 
