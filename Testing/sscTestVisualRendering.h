@@ -32,7 +32,7 @@ public:
 private:
 	class ViewsWindow* widget;
 	std::vector<std::string> image;
-
+	bool runWidget();
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestVisualRendering );
 
