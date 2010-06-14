@@ -316,6 +316,51 @@ __kernel void cast_rays(__global unsigned int * volume,
 #define VOL_BLOCK_Y
 #define VOL_BLOCK_Z
 
+typedef struct _pixel_type
+{
+  int x;
+  int y;
+} pixel_type;
+
+// Find pixels coordinates
+__kernel pixel_type findPixel(
+                        float bscan_spacing_x,
+                        float bscan_spacing_y,
+                        __global float4 * plane_eq,
+                        __global float4 * plane_points,
+                        int current_bscan,
+                        float dist,
+                        float4 voxel_coord
+                        )
+{
+  
+  float4 normal = {plane_eq[current_bscan].x, plane_eq[current_bscan].y, plane_eq[current_bscan].z, 0.0f};
+  float4 corner0 = plane_points_c(current_bscan,0);
+  float4 cornerx = plane_points_c(current_bscan,1);
+  float4 cornery = plane_points_c(current_bscan,2);
+  
+  float4 p = voxel_coord + -dist*normal - corner0;
+  float4 x_vector = normalize(cornerx - corner0);
+  float4 y_vector = normalize(cornery - corner0);
+  
+  pixel_type retval;
+  retval.x = dot(p, x_vector)/bscan_spacing_x;
+  retval.y = dot(p, y_vector)/bscan_spacing_y;
+  return retval;
+}
+
+__kernel bool valid_pixel(pixel_type p,
+                          __global unsigned char * mask,
+                          int bscan_w,
+                          int bscan_h,
+                          float dist,
+                          float kernel_radius)
+{
+  return ((p.x >= 0) && (p.x < bscan_w) && (p.y >= 0) && (p.y < bscan_h))
+  && (fabs(dist) < kernel_radius)
+  && (mask[p.x + p.y*bscan_w] != 0);
+}
+
 __kernel void vnn(__global unsigned char * bscans0,
 									__global unsigned char * bscans1,
 									__global unsigned char * mask,
@@ -341,7 +386,8 @@ __kernel void vnn(__global unsigned char * bscans0,
 	if (x >= volume_w) return;
 	
 
-	#define kernel_radius (volume_spacing*4)
+	//#define kernel_radius (volume_spacing*4)
+  float kernel_radius = volume_spacing*4;
 
 	// Find bscan closest to voxel (x,0,z)
 	int current_bscan = -1;
@@ -357,9 +403,8 @@ __kernel void vnn(__global unsigned char * bscans0,
 
 	int print_counter = 0;
 
-	for (int y = 0; y < volume_h; y++) {
-
-
+	for (int y = 0; y < volume_h; y++)
+  {
     //if(x!=230 || y!=185) 
     //  continue;
 
@@ -412,18 +457,38 @@ __kernel void vnn(__global unsigned char * bscans0,
   // Find bscan closest to voxel (x,y,z)
 	current_bscan = -1;
 	dist = 10000; // inf
-	for (int n = 0; n < bscan_n; n++) {
-		float temp = fabs(_distance(voxel_coord, plane_eq[n]));
-		if (temp < dist) {
-			current_bscan = n;
-			dist = temp;
+  pixel_type p;
+	for (int n = 0; n < bscan_n; n++) 
+  {
+		float temp_dist = fabs(_distance(voxel_coord, plane_eq[n]));
+		if (temp_dist < dist)
+    {
+      pixel_type p_temp = findPixel(bscan_spacing_x, bscan_spacing_y, plane_eq, plane_points, n, dist, voxel_coord);
+      if (valid_pixel(p_temp, mask, bscan_w, bscan_h, temp_dist, kernel_radius))
+      {
+        p = p_temp;
+			  current_bscan = n;
+			  dist = temp_dist;
+      }
 		}
 	}
+  if (current_bscan == -1)
+    continue;
+
+  if (current_bscan < bscan_n/2)
+  {
+    volume_a(x,y,z) = bscans0[p.x + p.y*bscan_w + current_bscan*bscan_w*bscan_h];
+	} 
+  else 
+  {
+    volume_a(x,y,z) = bscans1[p.x + p.y*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
+	}
+          
 
     //if(fabs(dist) > kernel_radius)
     //  continue;
 
-		float4 normal = {plane_eq[current_bscan].x, plane_eq[current_bscan].y, plane_eq[current_bscan].z, 0.0f};
+		/*float4 normal = {plane_eq[current_bscan].x, plane_eq[current_bscan].y, plane_eq[current_bscan].z, 0.0f};
 		float4 corner0 = plane_points_c(current_bscan,0);
 		float4 cornerx = plane_points_c(current_bscan,1);
 		float4 cornery = plane_points_c(current_bscan,2);
@@ -433,7 +498,22 @@ __kernel void vnn(__global unsigned char * bscans0,
 		float4 y_vector = normalize(cornery - corner0);
 
 		int px = dot(p, x_vector)/bscan_spacing_x;
-		int py = dot(p, y_vector)/bscan_spacing_y;
+		int py = dot(p, y_vector)/bscan_spacing_y;*/
+
+
+/*    pixel_type p = findPixel(bscan_spacing_x, bscan_spacing_y, plane_eq, plane_points, current_bscan, dist, voxel_coord);
+
+if(valid_pixel(p, mask, bscan_w, bscan_h, dist, kernel_radius))
+{
+  if (current_bscan < bscan_n/2)
+  {
+    volume_a(x,y,z) = bscans0[p.x + p.y*bscan_w + current_bscan*bscan_w*bscan_h];
+	} 
+  else 
+  {
+    volume_a(x,y,z) = bscans1[p.x + p.y*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
+	}
+}*/
 
     /*if((x == 100) && (y == 100) & (z == 100) )
     {
@@ -453,7 +533,7 @@ continue;*/
 /*if(y==0)
 printf("bscan_w: %d, bscan_h: %d, bscan_n: %d\n", bscan_w, bscan_h, bscan_n);*/
 
-		if ((px >= 0) && (px < bscan_w) && (py >= 0) && (py < bscan_h))
+/*		if ((px >= 0) && (px < bscan_w) && (py >= 0) && (py < bscan_h))
     {
     
     //if (current_bscan < bscan_n/2)
@@ -483,7 +563,7 @@ printf("bscan_w: %d, bscan_h: %d, bscan_n: %d\n", bscan_w, bscan_h, bscan_n);*/
         }
       }
       //volume_a(x,y,z) = 255;
-    }
+    }*/
     //else
     //volume_a(x,y,z) = 255;
 	}
