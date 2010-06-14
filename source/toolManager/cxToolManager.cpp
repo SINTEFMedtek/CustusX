@@ -48,6 +48,8 @@ ToolManager::ToolManager() :
       mToolCalibrationFileTag("cal_file"), mPulseGenerator(
           igstk::PulseGenerator::New())
 {
+  //this->createSymlink(); // test
+
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(
       checkTimeoutsAndRequestTransform()));
@@ -149,9 +151,53 @@ void ToolManager::initialize()
         "Please configure before trying to initialize.");
     return;
   }
+  this->createSymlink();
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
+
+/** Assume that IGSTK requires the file /dev/cu.CustusX3 as a rep for the
+ *  HW connection.
+ *  Create that file as a symlink to the correct device.
+ *
+ *
+ */
+void ToolManager::createSymlink()
+{
+  QString linkfile = "/dev/cu.CustusX3";
+//  linkfile = "/Users/christiana/test_file";
+  QDir devDir("/dev/");
+
+  QStringList filters;
+  //filters << "*cu.*"; // test
+  filters << "*cu.usbserial*";
+  QStringList files = devDir.entryList(filters, QDir::System);
+  std::cout << "Files: " << files.join("\n") << std::endl;
+  if (files.empty())
+  {
+    std::cout << "Warning: No usb connections found in /dev" << std::endl;
+    return;
+  }
+
+  QString device = devDir.filePath(files[0]);
+
+  //QString command = QString("sudo ln -s %1 %2").arg(device).arg(linkfile);
+  //std::cout << "Command string: " << command << std::endl;
+
+  QFile(linkfile).remove();
+  QFile devFile(device);
+  // this call only succeeds if Custus is run as root.
+  bool val = devFile.link(linkfile);
+  if (!val)
+  {
+    std::cout << "symlink failed with code " << devFile.error() << std::endl;
+  }
+  else
+  {
+    std::cout << QString("created symlink from %1 to %2").arg(device).arg(linkfile) << std::endl;
+  }
+}
+
 void ToolManager::startTracking()
 {
   if (!mInitialized)
