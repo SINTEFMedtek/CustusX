@@ -170,6 +170,8 @@ protected:
 private:
   ToolManager(ToolManager const&);
   ToolManager& operator=(ToolManager const&);
+
+  void createSymlink();
 };
 /**Shortcut for accessing the toolmanager instance.
  */
