@@ -145,6 +145,9 @@ void ToolManager::configure()
 }
 void ToolManager::initialize()
 {
+	if (!this->isConfigured())
+		this->configure();
+
   if (!mConfigured)
   {
     messageManager()->sendWarning(
@@ -200,6 +203,9 @@ void ToolManager::createSymlink()
 
 void ToolManager::startTracking()
 {
+	if (!this->isInitialized())
+		this->initialize();
+
   if (!mInitialized)
   {
     messageManager()->sendWarning(
