@@ -203,6 +203,7 @@ protected:
   class ToolPropertiesWidget* mToolPropertiesWidget; ///< display and control of tool properties for active tool.
   class PointSamplingWidget* mPointSamplingWidget;
   ssc::ReconstructionWidget* mReconstructionWidget;
+  class RegistrationHistoryWidget* mRegistrationHistoryWidget; ///< look back in registration history.
   int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences

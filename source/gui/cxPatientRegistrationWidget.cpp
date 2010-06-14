@@ -20,7 +20,6 @@
 #include "cxMessageManager.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
-#include "cxRegistrationHistoryWidget.h"
 
 namespace cx
 {
@@ -120,7 +119,6 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mOffsetLabel);
   mVerticalLayout->addWidget(mOffsetWidget);
   mVerticalLayout->addWidget(mResetOffsetButton);
-  mVerticalLayout->addWidget(new RegistrationHistoryWidget(this));
 
   mOffsetWidget->setDisabled(true);
 

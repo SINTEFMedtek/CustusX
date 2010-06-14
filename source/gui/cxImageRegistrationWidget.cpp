@@ -16,7 +16,6 @@
 #include "cxDataManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
-#include "cxRegistrationHistoryWidget.h"
 #include "sscTypeConversions.h"
 
 namespace cx
@@ -55,7 +54,6 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mRemoveLandmarkButton);
   mVerticalLayout->addWidget(mThresholdLabel);
   mVerticalLayout->addWidget(mThresholdSlider);
-  mVerticalLayout->addWidget(new RegistrationHistoryWidget(this));
 }
 
 ImageRegistrationWidget::~ImageRegistrationWidget()
