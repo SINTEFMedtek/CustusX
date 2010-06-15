@@ -112,7 +112,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 #define input_set_mac_origo_y 1.0f
 #define input_set_mac_origo_z 280.0f*/
 
-#define CA_DEFS
+//#define CA_DEFS
 
 #ifdef CA_DEFS
   QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";

@@ -28,7 +28,8 @@ namespace ssc
 Reconstructer::Reconstructer() :
   mAlgorithm(new ThunderVNNReconstructAlgorithm),
   mOutputRelativePath(""),
-  mOutputBasePath("")
+  mOutputBasePath(""),
+  mRecCounter(1)
 {
   QString defPath = "/Users/christiana/workspace/sessions/";
   QString filename = "usReconstruct.xml_";
@@ -865,6 +866,12 @@ ImagePtr Reconstructer::generateOutputVolume()
   // Add _rec to volume name and uid
   QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
   QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
+  if( mRecCounter != 1)
+  {
+    volumeName += QString::number(mRecCounter);
+    volumeId += QString::number(mRecCounter);
+  }
+  mRecCounter++;
   ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
                                       data, 
                                       string_cast(volumeName))) ;
