@@ -8,6 +8,7 @@
 #include "sscLandmark.h"
 #include "cxTool.h"
 #include "cxTracker.h"
+//#include "cxToolConfigurationParser.h"
 
 class QDomNode;
 class QDomDocument;
@@ -101,7 +102,7 @@ protected slots:
    * \param message What happended to the tool
    * \param state   Whether the tool was trying to enter or leave a state
    * \param success Whether or not the request was a success
-   * \param uid     The tools unique id
+   * \param uid     The trackers unique id
    */
   void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid);
   void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
@@ -112,32 +113,34 @@ protected:
   ToolManager(); ///< use getInstance instead
   ~ToolManager(); ///< destructor
 
-  bool pathsExists(); ///< checks that the needed paths actually exits
+  //bool pathsExists(); ///< checks that the needed paths actually exits
   /**
    * reads the configuration file and extracts tracker and tool nodes
    * \param[out] trackerNode  a container for the tracker info
    * \param[out] toolNodeList a container for the tool info
    * \return whether or not the configuration file could be read successfully
    */
-  bool readConfigurationFile(QDomNodeList& trackerNode, QList<QDomNodeList>& toolNodeList);
+  //bool readConfigurationFile(QDomNodeList& trackerNode, QList<QDomNodeList>& toolNodeList);
   /**
    * configures a tracker according to the config file
    * \param[in] trackerNodeList
    * \return a pointer to the created tracker
    */
-  TrackerPtr configureTracker(QDomNodeList& trackerNodeList);
+  //TrackerPtr configureTracker(QDomNodeList& trackerNodeList);
   /**
    * configures tools according to the config file
    * \param[in] toolNodeList
    * \return a pointer to a map containing all the created tools
    */
-  ssc::ToolManager::ToolMapPtr configureTools(QList<QDomNodeList>& toolNodeList);
+  //ssc::ToolManager::ToolMapPtr configureTools(QList<QDomNodeList>& toolNodeList);
+
   void addConnectedTool(std::string uid); ///< moves a tool from configuredTools to connectedTools
   void connectSignalsAndSlots(); ///< connects signals and slots
   void initializeManualTool();
 
   static ToolManager* mCxInstance;
 
+  //ToolConfigurationParser* mToolConfigurationParser; ///< parser that reads the configurationfile
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder;         ///< path to where logging should be saved
   QTimer* mTimer;                     ///< timer controlling the demand of transforms
@@ -155,13 +158,15 @@ protected:
   bool mInitialized;  ///< whether or not the system is initialized
   bool mTracking;   ///< whether or not the system is tracking
 
-  const std::string mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
+  /*Moved to ToolConfigurationParser
+   * const std::string mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
                     mToolTypeTag, mToolIdTag, mToolNameTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
                     mToolSensorChannelnumberTag, mToolSensorRomFileTag,
                     mToolCalibrationTag, mToolCalibrationFileTag;
                     ///< names of necessary tags in the configuration file
+                     */
 
   igstk::PulseGenerator::Pointer mPulseGenerator;
 
