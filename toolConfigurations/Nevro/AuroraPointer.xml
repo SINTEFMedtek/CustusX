@@ -40,7 +40,7 @@
 
   <!-- Calibration -->
   <calibration>
-    <cal_file></cal_file>
+    <cal_file>probeCalibrationTransform_hypofyse_comp.cal</cal_file>
     <date>
       <yyyy></yyyy>
       <mm></mm>
