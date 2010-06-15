@@ -154,7 +154,7 @@ void ToolManager::initialize()
     messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
-  this->createSymlink();
+  //this->createSymlink();
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
@@ -859,9 +859,9 @@ void ToolManager::addConnectedTool(std::string uid)
           ", thus could not add is as a connected tool.");
     return;
   }
-  //mConnectedTools->insert(std::pair<std::string, ssc::ToolPtr>((*it).first, (*it).second));
   (*mConnectedTools)[it->first] = it->second;
   ssc::ToolPtr tool = it->second;
+
   //connect visible/hidden signal to domiantCheck
   connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   
