@@ -74,7 +74,6 @@ private:
   ImagePtr mOutput;///< Output image from reconstruction
   QString mOutputRelativePath;///< Relative path to the output image
   QString mOutputBasePath;///< Global path where the relative path starts, for the output image
-  unsigned int mRecCounter;///< Reconstruction file number
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);

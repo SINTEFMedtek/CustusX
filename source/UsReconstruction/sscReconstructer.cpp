@@ -4,6 +4,7 @@
  */
 #include "sscReconstructer.h"
 
+#include <algorithm>
 #include <QtCore>
 #include <vtkImageData.h>
 #include <vtkUnsignedCharArray.h>
@@ -28,8 +29,7 @@ namespace ssc
 Reconstructer::Reconstructer() :
   mAlgorithm(new ThunderVNNReconstructAlgorithm),
   mOutputRelativePath(""),
-  mOutputBasePath(""),
-  mRecCounter(1)
+  mOutputBasePath("")
 {
   QString defPath = "/Users/christiana/workspace/sessions/";
   QString filename = "usReconstruct.xml_";
@@ -866,12 +866,23 @@ ImagePtr Reconstructer::generateOutputVolume()
   // Add _rec to volume name and uid
   QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
   QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
-  if( mRecCounter != 1)
+  
+  std::vector<std::string> imageUids = DataManager::getInstance()->getImageUids();
+ 
+  // Find an uid that is not used before
+  int numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(volumeId));
+  if(numMatches != 0)
   {
-    volumeName += QString::number(mRecCounter);
-    volumeId += QString::number(mRecCounter);
+    int recNumber = 1;
+    while(numMatches != 0)
+    {
+      QString newId = volumeName + QString::number(++recNumber);
+      numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(newId));
+    }
+    
+    volumeName += QString::number(recNumber);
+    volumeId += QString::number(recNumber);
   }
-  mRecCounter++;
   ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
                                       data, 
                                       string_cast(volumeName))) ;
