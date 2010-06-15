@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QDir>
 #include <QList>
-#include <QDomDocument>
+//#include <QDomDocument>
 #include <QMetaType>
 #include <vtkDoubleArray.h>
 #include "sscTypeConversions.h"
@@ -12,6 +12,7 @@
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxMessageManager.h"
+#include "cxToolConfigurationParser.h"
 
 namespace cx
 {
@@ -37,7 +38,7 @@ ToolManager::ToolManager() :
       mConfiguredTools(new ssc::ToolManager::ToolMap), //TODO Why was this commented out???
       mConnectedTools(new ssc::ToolManager::ToolMap), mDominantTool(
           ssc::ToolPtr()), mReferenceTool(ssc::ToolPtr()), mConfigured(false),
-      mInitialized(false), mTracking(false), mTrackerTag("tracker"),
+      mInitialized(false), mTracking(false), /*mTrackerTag("tracker"),
       mTrackerTypeTag("type"), mToolfileTag("toolfile"), mToolTag("tool"),
       mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
       mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
@@ -45,30 +46,28 @@ ToolManager::ToolManager() :
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
       mToolSensorChannelnumberTag("channelnumber"), mToolSensorRomFileTag(
           "rom_file"), mToolCalibrationTag("calibration"),
-      mToolCalibrationFileTag("cal_file"), mPulseGenerator(
+      mToolCalibrationFileTag("cal_file"),*/ mPulseGenerator(
           igstk::PulseGenerator::New())
 {
   //this->createSymlink(); // test
 
   mTimer = new QTimer(this);
-  connect(mTimer, SIGNAL(timeout()), this, SLOT(
-      checkTimeoutsAndRequestTransform()));
+  connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransform()));
 
   m_rMpr_History.reset(new ssc::RegistrationHistory());
-  connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(
-      rMprChanged()));
+  connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 
   igstk::RealTimeClock::Initialize();
 
   mPulseGenerator->RequestSetFrequency(30.0);
   mPulseGenerator->RequestStart();
 
-  initializeManualTool();
+  this->initializeManualTool();
   this->setDominantTool("Manual Tool");
 }
+
 ToolManager::~ToolManager()
-{
-}
+{}
 
 void ToolManager::initializeManualTool()
 {
@@ -103,11 +102,13 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
-  if (!this->pathsExists())
+  /*if (!this->pathsExists())
   {
     return;
-  }
+  }*/
 
+  //MOVED TO TOOLCONFIGURATIONPARSER - START
+  /*
   QDomNodeList trackerNode;
   QList<QDomNodeList> toolNodeList;
   if (!this->readConfigurationFile(trackerNode, toolNodeList))
@@ -115,26 +116,26 @@ void ToolManager::configure()
 
   mTracker = this->configureTracker(trackerNode);
   mConfiguredTools = this->configureTools(toolNodeList);
+  */
+  //MOVED TO TOOLCONFIGURATIONPARSER - END
 
-//  if (!mConfiguredTools->empty())
-//  {
-//    ToolMapConstIter it = mConfiguredTools->begin();
-//    while (it != mConfiguredTools->end())
-//    {
-//      ssc::ToolPtr tool = (*it).second;
-//      if (tool->getType() != ssc::Tool::TOOL_REFERENCE)
-//      {
-//        //use manual tools
-//        ssc::Transform3D transform = this->getManualTool()->get_prMt();
-//        tool->set_prMt(transform);
-//        this->setDominantTool(tool->getUid());
-//        break;
-//      }
-//      it++;
-//    }
-//  }
+  ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath);
+  if(!toolConfigurationParser.readConfigurationFile())
+    return;
+  mTracker = toolConfigurationParser.getTracker();
+  mConfiguredTools = toolConfigurationParser.getConfiguredTools();
 
-  // replaced above code with simpler version... ?
+  ToolMapConstIter iter = mConfiguredTools->begin();
+  while (iter != mConfiguredTools->end())
+  {
+    ssc::ToolPtr tool = (*iter).second;
+    if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
+    {
+      mReferenceTool = tool;
+    }
+    iter++;
+  }
+
   this->setDominantTool(this->getManualTool()->getUid());
 
   this->connectSignalsAndSlots();
@@ -150,8 +151,7 @@ void ToolManager::initialize()
 
   if (!mConfigured)
   {
-    messageManager()->sendWarning(
-        "Please configure before trying to initialize.");
+    messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
   this->createSymlink();
@@ -162,8 +162,6 @@ void ToolManager::initialize()
 /** Assume that IGSTK requires the file /dev/cu.CustusX3 as a rep for the
  *  HW connection.
  *  Create that file as a symlink to the correct device.
- *
- *
  */
 void ToolManager::createSymlink()
 {
@@ -173,7 +171,7 @@ void ToolManager::createSymlink()
 
   QStringList filters;
   //filters << "*cu.*"; // test
-  filters << "*cu.usbserial*";
+  filters << "*cu.usbserial*"; //TODO file isn't always called cu.usbserial...
   QStringList files = devDir.entryList(filters, QDir::System);
   std::cout << "Files: " << files.join("\n") << std::endl;
   if (files.empty())
@@ -208,8 +206,7 @@ void ToolManager::startTracking()
 
   if (!mInitialized)
   {
-    messageManager()->sendWarning(
-        "Please initialize before trying to start tracking.");
+    messageManager()->sendWarning("Please initialize before trying to start tracking.");
     return;
   }
   mTracker->startTracking();
@@ -218,8 +215,7 @@ void ToolManager::stopTracking()
 {
   if (!mTracking)
   {
-    messageManager()->sendWarning(
-        "Please start tracking before trying to stop tracking.");
+    messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
     return;
   }
   mTracker->stopTracking();
@@ -245,7 +241,6 @@ void ToolManager::removeLandmark(std::string uid)
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
 }
-
 
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
@@ -286,7 +281,7 @@ void ToolManager::setDominantTool(const std::string& uid)
     }
   }
 
-  std::cout << "void ToolManager::setDominantTool( "+uid+" )" << std::endl;
+  //std::cout << "void ToolManager::setDominantTool( "+uid+" )" << std::endl;
 
   ssc::ToolPtr newTool;
 
@@ -323,14 +318,12 @@ std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
   ToolMapConstIter it = mConnectedTools->begin();
   while (it != mConnectedTools->end())
   {
-    //uidsAndNames.insert(std::pair<std::string, std::string>(((*it).second)->getUid(), ((*it).second)->getName()));
     uidsAndNames[((*it).second)->getUid()] = ((*it).second)->getName();
     it++;
   }
   ToolMapConstIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
-    //uidsAndNames.insert(std::pair<std::string, std::string>(((*iter).second)->getUid(), ((*iter).second)->getName()));
     uidsAndNames[((*iter).second)->getUid()] = ((*iter).second)->getName();
     iter++;
   }
@@ -572,6 +565,8 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state,
   }
   messageManager()->sendInfo(report);
 }
+
+/*
 bool ToolManager::pathsExists()
 {
   QDir dir;
@@ -589,9 +584,10 @@ bool ToolManager::pathsExists()
     return false;
   }
   return true;
-}
-bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<
-    QDomNodeList>& toolNodeList)
+}*/
+
+/*
+bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<QDomNodeList>& toolNodeList)
 {
   QFile configurationFile(QString(mConfigurationFilePath.c_str()));
   QFileInfo configurationFileInfo(configurationFile);
@@ -611,12 +607,10 @@ bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<
   }
 
   //tracker
-  trackerNodeList
-      = configureDoc.elementsByTagName(QString(mTrackerTag.c_str()));
+  trackerNodeList = configureDoc.elementsByTagName(QString(mTrackerTag.c_str()));
 
   //tools
-  QDomNodeList toolFileList = configureDoc.elementsByTagName(QString(
-      mToolfileTag.c_str()));
+  QDomNodeList toolFileList = configureDoc.elementsByTagName(QString(mToolfileTag.c_str()));
   for (int i = 0; i < toolFileList.count(); i++)
   {
     std::string iString = "" + i;
@@ -652,13 +646,14 @@ bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<
           + filename.toStdString());
       continue;
     }
-    QDomNodeList toolList =
-        toolDoc.elementsByTagName(QString(mToolTag.c_str()));
+    QDomNodeList toolList = toolDoc.elementsByTagName(QString(mToolTag.c_str()));
     toolNodeList.push_back(toolList);
   }
   return true;
-}
-TrackerPtr ToolManager::configureTracker(QDomNodeList& trackerNodeList)
+
+}*/
+
+/*TrackerPtr ToolManager::configureTracker(QDomNodeList& trackerNodeList)
 {
   std::vector<TrackerPtr> trackers;
   Tracker::InternalStructure internalStructure;
@@ -666,8 +661,7 @@ TrackerPtr ToolManager::configureTracker(QDomNodeList& trackerNodeList)
   {
     std::string iString = "" + i;
     QDomNode trackerNode = trackerNodeList.at(i);
-    const QDomElement trackerType = trackerNode.firstChildElement(QString(
-        mTrackerTypeTag.c_str()));
+    const QDomElement trackerType = trackerNode.firstChildElement(QString(mTrackerTypeTag.c_str()));
     if (trackerType.isNull())
     {
       messageManager()->sendInfo("Tracker " + iString
@@ -707,9 +701,9 @@ TrackerPtr ToolManager::configureTracker(QDomNodeList& trackerNodeList)
     trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
   }
   return trackers.at(0);
-}
-ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
-    QList<QDomNodeList>& toolNodeList)
+}*/
+
+/*ssc::ToolManager::ToolMapPtr ToolManager::configureTools(QList<QDomNodeList>& toolNodeList)
 {
   QFile configurationFile(QString(mConfigurationFilePath.c_str()));
   QFileInfo configurationFileInfo(configurationFile);
@@ -733,8 +727,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
       continue;
     }
 
-    QDomElement toolTypeElement = toolNode.firstChildElement(QString(
-        mToolTypeTag.c_str()));
+    QDomElement toolTypeElement = toolNode.firstChildElement(QString(mToolTypeTag.c_str()));
     QString toolTypeText = toolTypeElement.text();
     if (toolTypeText.contains("reference", Qt::CaseInsensitive))
     {
@@ -750,33 +743,28 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
       internalStructure.mType = ssc::Tool::TOOL_NONE;
     }
 
-    QDomElement toolIdElement = toolNode.firstChildElement(QString(
-        mToolIdTag.c_str()));
+    QDomElement toolIdElement = toolNode.firstChildElement(QString(mToolIdTag.c_str()));
     QString toolIdText = toolIdElement.text();
     internalStructure.mUid = toolIdText.toStdString();
 
-    QDomElement toolNameElement = toolNode.firstChildElement(QString(
-        mToolNameTag.c_str()));
+    QDomElement toolNameElement = toolNode.firstChildElement(QString(mToolNameTag.c_str()));
     QString toolNameText = toolNameElement.text();
     internalStructure.mName = toolNameText.toStdString();
 
-    QDomElement toolGeofileElement = toolNode.firstChildElement(QString(
-        mToolGeoFileTag.c_str()));
+    QDomElement toolGeofileElement = toolNode.firstChildElement(QString(mToolGeoFileTag.c_str()));
     QString toolGeofileText = toolGeofileElement.text();
     if (!toolGeofileText.isEmpty())
       toolGeofileText = configurationPath + toolGeofileText;
     internalStructure.mGraphicsFileName = toolGeofileText.toStdString();
 
-    QDomElement toolSensorElement = toolNode.firstChildElement(QString(
-        mToolSensorTag.c_str()));
+    QDomElement toolSensorElement = toolNode.firstChildElement(QString(mToolSensorTag.c_str()));
     if (toolSensorElement.isNull())
     {
       messageManager()->sendInfo(
           "Could not find the <sensor> tag under the <tool> tag. Aborting tihs tool.");
       continue;
     }
-    QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(
-        QString(mToolSensorTypeTag.c_str()));
+    QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(QString(mToolSensorTypeTag.c_str()));
     QString toolSensorTypeText = toolSensorTypeElement.text();
     if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
     {
@@ -802,16 +790,14 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
     }
 
     QDomElement toolSensorWirelessElement =
-        toolSensorElement.firstChildElement(QString(
-            mToolSensorWirelessTag.c_str()));
+        toolSensorElement.firstChildElement(QString(mToolSensorWirelessTag.c_str()));
     QString toolSensorWirelessText = toolSensorWirelessElement.text();
     if (toolSensorWirelessText.contains("yes", Qt::CaseInsensitive))
       internalStructure.mWireless = true;
     else if (toolSensorWirelessText.contains("no", Qt::CaseInsensitive))
       internalStructure.mWireless = false;
 
-    QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(
-        QString(mToolSensorDOFTag.c_str()));
+    QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(QString(mToolSensorDOFTag.c_str()));
     QString toolSensorDOFText = toolSensorDOFElement.text();
     if (toolSensorDOFText.contains("5", Qt::CaseInsensitive))
       internalStructure.m5DOF = true;
@@ -819,26 +805,22 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
       internalStructure.m5DOF = false;
 
     QDomElement toolSensorPortnumberElement =
-        toolSensorElement.firstChildElement(QString(
-            mToolSensorPortnumberTag.c_str()));
+        toolSensorElement.firstChildElement(QString(mToolSensorPortnumberTag.c_str()));
     QString toolSensorPortnumberText = toolSensorPortnumberElement.text();
     internalStructure.mPortNumber = toolSensorPortnumberText.toInt();
 
     QDomElement toolSensorChannelnumberElement =
-        toolSensorElement.firstChildElement(QString(
-            mToolSensorChannelnumberTag.c_str()));
+        toolSensorElement.firstChildElement(QString(mToolSensorChannelnumberTag.c_str()));
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
 
-    QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(
-        QString(mToolSensorRomFileTag.c_str()));
+    QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(QString(mToolSensorRomFileTag.c_str()));
     QString toolSensorRomFileText = toolSensorRomFileElement.text();
     if (!toolSensorRomFileText.isEmpty())
       toolSensorRomFileText = configurationPath + toolSensorRomFileText;
     internalStructure.mSROMFilename = toolSensorRomFileText.toStdString();
 
-    QDomElement toolCalibrationElement = toolNode.firstChildElement(QString(
-        mToolCalibrationTag.c_str()));
+    QDomElement toolCalibrationElement = toolNode.firstChildElement(QString(mToolCalibrationTag.c_str()));
     if (toolCalibrationElement.isNull())
     {
       messageManager()->sendInfo(
@@ -846,13 +828,11 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
       continue;
     }
     QDomElement toolCalibrationFileElement =
-        toolCalibrationElement.firstChildElement(QString(
-            mToolCalibrationFileTag.c_str()));
+        toolCalibrationElement.firstChildElement(QString(mToolCalibrationFileTag.c_str()));
     QString toolCalibrationFileText = toolCalibrationFileElement.text();
     if (!toolCalibrationFileText.isEmpty())
       toolCalibrationFileText = configurationPath + toolCalibrationFileText;
-    internalStructure.mCalibrationFilename
-        = toolCalibrationFileText.toStdString();
+    internalStructure.mCalibrationFilename = toolCalibrationFileText.toStdString();
 
     internalStructure.mTransformSaveFileName = mLoggingFolder;
     internalStructure.mLoggingFolderName = mLoggingFolder;
@@ -867,7 +847,8 @@ ssc::ToolManager::ToolMapPtr ToolManager::configureTools(
     (*tools)[tool->getUid()] = tool;
   }
   return tools;
-}
+}*/
+
 void ToolManager::addConnectedTool(std::string uid)
 {  
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
@@ -882,8 +863,7 @@ void ToolManager::addConnectedTool(std::string uid)
   (*mConnectedTools)[it->first] = it->second;
   ssc::ToolPtr tool = it->second;
   //connect visible/hidden signal to domiantCheck
-  connect(tool.get(), SIGNAL(toolVisible(bool)),
-          this, SLOT(dominantCheckSlot()));
+  connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   
   mConfiguredTools->erase(it);
   messageManager()->sendInfo("Tool with id " + uid
@@ -921,8 +901,6 @@ void ToolManager::checkTimeoutsAndRequestTransform()
   ToolMap::iterator it = mConnectedTools->begin();
   for(;it != mConnectedTools->end();++it)
   {
-    //Tool* refTool = static_cast<Tool*> (mReferenceTool.get());
-    //static_cast<Tool*> ((*it).second.get())->getPointer()->RequestComputeTransformTo(refTool->getPointer());
     ToolPtr connectedTool = boost::shared_dynamic_cast<Tool>(it->second);
     if(!refTool || !connectedTool)
       continue;

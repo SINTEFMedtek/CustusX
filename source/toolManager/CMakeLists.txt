@@ -14,6 +14,8 @@ SET ( ${LIB}_toolManager
     cxTool.cpp
     cxTracker.h
     cxTracker.cpp
+    cxToolConfigurationParser.h
+    cxToolConfigurationParser.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
