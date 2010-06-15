@@ -27,7 +27,8 @@ SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataInterfacePt
 
   mEdit = new ssc::DoubleLineEdit(this);
   topLayout->addWidget(mEdit);
-  connect(mEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEditedSlot(const QString&)));
+//  connect(mEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEditedSlot()));
+  connect(mEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
 
   mSlider = new ssc::DoubleSlider(this);
   mSlider->setOrientation(Qt::Horizontal);
@@ -62,7 +63,7 @@ void SliderGroupWidget::doubleValueChanged(double val)
   mData->setValue(val);
 }
 
-void SliderGroupWidget::textEditedSlot(const QString& text)
+void SliderGroupWidget::textEditedSlot()
 {
   double defVal =mData->convertInternal2Display(mData->getValue()); // defval in display space
   double newVal = mData->convertDisplay2Internal(mEdit->getDoubleValue(defVal)); // newval iin internal space

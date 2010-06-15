@@ -105,7 +105,7 @@ public:
   SliderGroupWidget(QWidget* parent, DoubleDataInterfacePtr dataInterface, QGridLayout* gridLayout=0, int row=0);
 private slots:
   void dataChanged();
-  void textEditedSlot(const QString& text);
+  void textEditedSlot();
   void doubleValueChanged(double val);
 
 private:
