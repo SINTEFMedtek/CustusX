@@ -44,6 +44,7 @@ DummyTool::DummyTool(const std::string& uid) :
 
 	DoubleBoundingBox3D bb(Vector3D(0,0,0), Vector3D(512,512,256));
 	setToolPositionMovementBB(bb);
+//	std::cout << "dummytool" << std::endl;
 
 //	this->createPolyData();
     mPolyData = this->createPolyData(140,10,10,3);
@@ -116,7 +117,7 @@ std::string DummyTool::getName() const
 void DummyTool::startTracking(int interval)
 {
 	mTimer->start(interval);
-
+//std::cout << "start tracking" << std::endl;
 	mVisible = true;
 
 	emit toolVisible(mVisible);
@@ -128,6 +129,7 @@ bool DummyTool::isCalibrated() const
 void DummyTool::stopTracking()
 {
 	mTimer->stop();
+	std::cout << "stop tracking" << std::endl;
 
 	mVisible = false;
 	emit toolVisible(mVisible);
@@ -286,7 +288,7 @@ void DummyTool::set_prMt(const Transform3D& prMt)
 	double timestamp = static_cast<double>(ts);
 	
 	//check:
-	//std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
+//	std::cout << "check: " << time.toString("yyyyMMdd'T'hhmmss:zzz").toStdString() << std::endl;
 	
 	emit toolTransformAndTimestamp(m_prMt, timestamp);
 }

@@ -49,11 +49,14 @@ int main(int argc, char **argv)
 
 	ViewsWindow widget;
 
-  widget.define3D(image[0], 0, 0);
+	  widget.defineSlice("A",image[0], ssc::ptAXIAL, 0, 0);
+	  widget.defineSlice("C",image[0], ssc::ptSAGITTAL, 0, 1);
+	  widget.defineSlice("S",image[0], ssc::ptCORONAL, 0, 2);
+//  widget.define3D(image[0], 0, 0);
   //widget.define3D(image[1], 0, 1);
 
   widget.show();
-#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
 	widget.activateWindow();
 #endif
 	widget.raise();

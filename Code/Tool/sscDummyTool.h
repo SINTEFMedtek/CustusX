@@ -37,7 +37,6 @@ public:
 	virtual bool isCalibrated() const;
 	virtual ProbeSector getProbeSector() const { return ProbeSector(); }	
 	virtual double getTimestamp() const { return 0; }
-	virtual void set_prMt(Transform3D& transform){};
 
 	void startTracking(int interval=33);
 	void stopTracking();

@@ -10,6 +10,8 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkVolumeTextureMapper3D.h"
+#include <vtkGPUVolumeRayCastMapper.h>
+
 #include "vtkCamera.h"
 
 #include "sscTestUtilities.h"
@@ -19,6 +21,7 @@
 #include "sscSliceRep.h"
 
 #include "sscVolumetricRep.h"
+#include "sscGPURayCastVolumetricRep.h"
 #include "sscSliceComputer.h"
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
@@ -59,7 +62,7 @@ ViewsWindow::ViewsWindow()
   ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
   mToolmanager->configure();
   mToolmanager->initialize();
-  mToolmanager->startTracking();
+ mToolmanager->startTracking();
 
   ssc::ToolPtr tool = mToolmanager->getDominantTool();
   connect( tool.get(), SIGNAL( toolTransformAndTimestamp(Transform3D ,double) ), this, SLOT( updateRender()));
@@ -116,6 +119,7 @@ void ViewsWindow::defineSlice(const std::string& uid, const std::string& imageFi
 	
 	ssc::View* view = generateSlice(uid, tool, image, plane);
 	insertView(view, uid, imageFilename, r, c);
+	view->getRenderer()->ResetCamera();
 }
 
 ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
@@ -143,28 +147,19 @@ void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std:
 	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume), this));
 }
 
-void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
+void ViewsWindow::defineGPU_3D(const std::string& imageFilename, int r, int c)
 {
 	std::string uid = "3D";
 	ssc::View* view = new ssc::View(this);
 	mLayouts.insert(view);
-	
-	std::vector<std::string> images;
-	images.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	//images.push_back("MetaImage/20070309T105136_MRT1.mhd");
 
-	for (unsigned i=0; i< images.size(); ++i)
-	{
-    ssc::ImagePtr image = loadImage(images[i]);
+	ssc::ImagePtr image = loadImage(imageFilename);
 
-    // volume rep
-    ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
-    //mRepPtr->setResampleFactor(0.2);
-    mRepPtr->setImage(image);
-    mRepPtr->setName(image->getName());
-    view->addRep(mRepPtr);
-    mVolumetricRep = mRepPtr;
-  }
+	// volume rep
+	ssc::GPURayCastVolumetricRepPtr mRepPtr = ssc::GPURayCastVolumetricRep::New(image->getUid());
+	mRepPtr->setImage(image);
+	mRepPtr->setName(image->getName());
+	view->addRep(mRepPtr);
 
 	// Tool 3D rep
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
@@ -172,44 +167,88 @@ void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
 	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
 	toolRep->setTool(tool);
 	view->addRep(toolRep);
-	
-//	insertView(view, uid, imageFilename, r, c);
-	 insertView(view, uid, "2 images", r, c);
 
-	  view->getRenderer()->ResetCamera();
+	insertView(view, uid, imageFilename, r, c);
+
+	view->getRenderer()->ResetCamera();
+}
+
+
+void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
+{
+	std::string uid = "3D";
+	ssc::View* view = new ssc::View(this);
+	mLayouts.insert(view);
+
+	ssc::ImagePtr image = loadImage(imageFilename);
+
+	// volume rep
+	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New(image->getUid());
+	//mRepPtr->setResampleFactor(0.2);
+	mRepPtr->setImage(image);
+	mRepPtr->setName(image->getName());
+	view->addRep(mRepPtr);
+	//mVolumetricRep = mRepPtr;
+
+		// Tool 3D rep
+		ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+		ssc::ToolPtr tool = mToolmanager->getDominantTool();
+		ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+		toolRep->setTool(tool);
+		view->addRep(toolRep);
+
+	insertView(view, uid, imageFilename, r, c);
+
+	view->getRenderer()->ResetCamera();
 }
 
 void ViewsWindow::updateRender()
 {
-  std::vector<int> times;
-  int sum = 0;
+	std::vector<int> times;
+	int sum = 0;
+	static int count = 0;
 
-	for (LayoutMap::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+
+	for (LayoutMap::iterator iter = mLayouts.begin(); iter != mLayouts.end(); ++iter)
 	{
-	  if ((*iter)->isVisible())
-	  {
-	    QTime time = QTime::currentTime();
+		if ((*iter)->isVisible())
+		{
+			QTime time = QTime::currentTime();
 
-      //(*iter)->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
-	    (*iter)->render(); // render only changed scenegraph
-
-	    int t_render = time.msecsTo(QTime::currentTime());
-      sum += t_render;
-      times.push_back(t_render);
-	  }
+			(*iter)->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
+			//  (*iter)->render(); // render only changed scenegraph
+			int t_render = time.msecsTo(QTime::currentTime());
+			sum += t_render;
+			times.push_back(t_render);
+		}
 	}
 
-
-	vtkVolumeTextureMapper3D* mapper = vtkVolumeTextureMapper3D::SafeDownCast(mVolumetricRep->getVtkVolume()->GetMapper());
-	mapper->Print(std::cout);
+//	if (!count)
+//	{
+//		typedef vtkGPUVolumeRayCastMapper MapperType;
+//		MapperType* mapper = MapperType::SafeDownCast(mVolumetricRep->getVtkVolume()->GetMapper());
+//		int valid = mapper->IsRenderSupported((*mLayouts.begin())->getRenderWindow(),
+//				mVolumetricRep->getVtkVolume()->GetProperty());
+//		//	vtkVolumeTextureMapper3D* mapper = vtkVolumeTextureMapper3D::SafeDownCast(mVolumetricRep->getVtkVolume()->GetMapper());
+//		//	mapper->Print(std::cout);
+//		std::cout << "is render supported: " << valid << std::endl;
+//	}
+//	else
+//	{
+//		return;
+//	}
+//	++count;
+//
+//
+//	mVolumetricRep->getVtkVolume()->GetMapper()->Print(std::cout);
 
 	std::string text = string_cast(sum);
-	for (unsigned i=0; i<times.size(); ++i)
+	for (unsigned i = 0; i < times.size(); ++i)
 	{
-	  text += "\t" + string_cast(times[i]);
+		text += "\t" + string_cast(times[i]);
 	}
 
-  //std::cout << "render:\t" << text << std::endl;
+	//std::cout << "render:\t" << text << std::endl;
 	mSpeedEdit->setText(qstring_cast(text));
 }
 

@@ -7,6 +7,8 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscVolumetricRep.h"
+#include "sscGPURayCastVolumetricRep.h"
+
 
 /**Test class  with convenience methods for defining views.
  * Uses the following reps:
@@ -23,6 +25,7 @@ public:
 	virtual ~ViewsWindow();
 	
 	void define3D(const std::string& imageFilename, int r, int c);
+	void defineGPU_3D(const std::string& imageFilename, int r, int c);
 	void defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	
 	void insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c);
@@ -35,7 +38,7 @@ private:
 	QGridLayout* mSliceLayout;
 	QTimer* mRenderingTimer;
 	QLineEdit* mSpeedEdit;
-  ssc::VolumetricRepPtr mVolumetricRep;
+ // ssc::GPURayCastVolumetricRepPtr mVolumetricRep;
 
 public slots:
 	void updateRender();
