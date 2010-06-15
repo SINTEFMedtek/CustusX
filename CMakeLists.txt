@@ -30,3 +30,6 @@ ENDIF (WIN32)
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
 ADD_SUBDIRECTORY ( source )
+
+enable_testing()
+add_subdirectory(testing)
