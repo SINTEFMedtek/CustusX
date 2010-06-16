@@ -7,7 +7,7 @@
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscVolumetricRep.h"
-#include "sscGPURayCastVolumetricRep.h"
+//#include "sscGPURayCastVolumetricRep.h"
 
 
 /**Test class  with convenience methods for defining views.
