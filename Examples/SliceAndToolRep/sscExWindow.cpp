@@ -10,7 +10,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkVolumeTextureMapper3D.h"
-#include <vtkGPUVolumeRayCastMapper.h>
+//#include <vtkGPUVolumeRayCastMapper.h>
 
 #include "vtkCamera.h"
 
@@ -21,7 +21,7 @@
 #include "sscSliceRep.h"
 
 #include "sscVolumetricRep.h"
-#include "sscGPURayCastVolumetricRep.h"
+//#include "sscGPURayCastVolumetricRep.h"
 #include "sscSliceComputer.h"
 #include "sscVector3D.h"
 #include "sscTransform3D.h"
@@ -149,28 +149,28 @@ void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std:
 
 void ViewsWindow::defineGPU_3D(const std::string& imageFilename, int r, int c)
 {
-	std::string uid = "3D";
-	ssc::View* view = new ssc::View(this);
-	mLayouts.insert(view);
-
-	ssc::ImagePtr image = loadImage(imageFilename);
-
-	// volume rep
-	ssc::GPURayCastVolumetricRepPtr mRepPtr = ssc::GPURayCastVolumetricRep::New(image->getUid());
-	mRepPtr->setImage(image);
-	mRepPtr->setName(image->getName());
-	view->addRep(mRepPtr);
-
-	// Tool 3D rep
-	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
-	ssc::ToolPtr tool = mToolmanager->getDominantTool();
-	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
-	toolRep->setTool(tool);
-	view->addRep(toolRep);
-
-	insertView(view, uid, imageFilename, r, c);
-
-	view->getRenderer()->ResetCamera();
+//	std::string uid = "3D";
+//	ssc::View* view = new ssc::View(this);
+//	mLayouts.insert(view);
+//
+//	ssc::ImagePtr image = loadImage(imageFilename);
+//
+//	// volume rep
+//	ssc::GPURayCastVolumetricRepPtr mRepPtr = ssc::GPURayCastVolumetricRep::New(image->getUid());
+//	mRepPtr->setImage(image);
+//	mRepPtr->setName(image->getName());
+//	view->addRep(mRepPtr);
+//
+//	// Tool 3D rep
+//	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
+//	ssc::ToolPtr tool = mToolmanager->getDominantTool();
+//	ssc::ToolRep3DPtr toolRep = ssc::ToolRep3D::New( tool->getUid(), tool->getName() );
+//	toolRep->setTool(tool);
+//	view->addRep(toolRep);
+//
+//	insertView(view, uid, imageFilename, r, c);
+//
+//	view->getRenderer()->ResetCamera();
 }
 
 
