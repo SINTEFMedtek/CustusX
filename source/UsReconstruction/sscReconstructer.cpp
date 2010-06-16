@@ -220,15 +220,15 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
     QString line = file.readLine();
     if(line.startsWith("ConfigurationID", Qt::CaseInsensitive))
     {
-      QStringList tempList = line.split(" ", QString::SkipEmptyParts);
-      configList = tempList[2].split(":", QString::SkipEmptyParts);
+      QStringList tempList = line.split("=", QString::SkipEmptyParts);
+      configList = tempList[1].trimmed().split(":", QString::SkipEmptyParts);
       configList[3] = configList[3].trimmed();
       foundConfig = true;
     }
     else if(line.startsWith("ProbeCalibration", Qt::CaseInsensitive))
     {
-      QStringList list = line.split(" ", QString::SkipEmptyParts);
-      mCalFileName = list[2].trimmed();
+      QStringList list = line.split("=", QString::SkipEmptyParts);
+      mCalFileName = list[1].trimmed();
       foundCalFile = true;
     }
   }
@@ -901,6 +901,7 @@ ImagePtr Reconstructer::generateOutputVolume()
 
 void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 {
+  //std::cout << "calFilesPath: " << string_cast(calFilesPath) << std::endl;
   this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
