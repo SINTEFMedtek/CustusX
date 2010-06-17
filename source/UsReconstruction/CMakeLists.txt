@@ -56,6 +56,6 @@ target_link_libraries( sscUsReconstructionLib SSC thunder ITKCommon)
 # =========================================================
 
 
-install( TARGETS sscUsReconstructionLib DESTINATION lib64 )
+#install( TARGETS sscUsReconstructionLib DESTINATION lib64 )
 # =========================================================
 
