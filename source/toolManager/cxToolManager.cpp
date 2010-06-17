@@ -78,6 +78,20 @@ void ToolManager::initializeManualTool()
   mManualTool->set_prMt(prMt);
 }
 
+void ToolManager::configureReferences()
+{
+  ToolMapConstIter iter = mConfiguredTools->begin();
+  while (iter != mConfiguredTools->end())
+  {
+    ssc::ToolPtr tool = (*iter).second;
+    if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
+    {
+      mReferenceTool = tool;
+    }
+    iter++;
+  }
+}
+
 bool ToolManager::isConfigured() const
 {
   return mConfigured;
@@ -96,16 +110,7 @@ void ToolManager::configure()
   mTracker = toolConfigurationParser.getTracker();
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
 
-  ToolMapConstIter iter = mConfiguredTools->begin();
-  while (iter != mConfiguredTools->end())
-  {
-    ssc::ToolPtr tool = (*iter).second;
-    if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
-    {
-      mReferenceTool = tool;
-    }
-    iter++;
-  }
+  this->configureReferences();
 
   this->setDominantTool(this->getManualTool()->getUid());
 
@@ -211,6 +216,11 @@ void ToolManager::removeLandmark(std::string uid)
 {
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
+}
+
+TrackerPtr ToolManager::getTracker()
+{
+  return mTracker;
 }
 
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
@@ -593,7 +603,7 @@ void ToolManager::checkTimeoutsAndRequestTransform()
 {
   mPulseGenerator->CheckTimeouts();
 
-  if (!mReferenceTool)
+  if (!mReferenceTool) // no need to request extra transforms from tools to the tracker, its already done
     return;
 
   ToolPtr refTool = boost::shared_dynamic_cast<Tool>(mReferenceTool);
