@@ -6,8 +6,8 @@
   <type>Polaris</type>
 </tracker>
 
-<toolfile type="polaris" reference="no">8700340.xml</toolfile>
-<toolfile type="polaris" reference="no">PolarisPointer2.xml</toolfile>
-<toolfile type="polaris" reference="yes">REFERENCE_frame_small.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/8700340.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/PolarisPointer2.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/REFERENCE_frame_small.xml</toolfile>
 
 </configuration>
