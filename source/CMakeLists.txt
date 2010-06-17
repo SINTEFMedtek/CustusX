@@ -49,8 +49,6 @@ ENDIF(IGSTK_FOUND)
 find_package (SSC PATHS "../externals/ssc/CMake")
 if (SSC_FOUND)
 	include (${SSC_USE_FILE})
-	#add_executable (testSSC testSSC.cpp)
-	#target_link_libraries (testSSC SSC)
 	link_directories (${SSC_DIR}/Code)
 endif (SSC_FOUND)
 message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} ) 
@@ -58,8 +56,7 @@ message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} )
 
 SET(SOURCES cxMain.cpp)
 
-INCLUDE_DIRECTORIES(
-	.
+set(SUB_FOLDERS
     gui
     viewManager
     repManager
@@ -68,6 +65,23 @@ INCLUDE_DIRECTORIES(
     dataManager
     3DUSReconstruction
     UsReconstruction
+    )
+    
+foreach (ITER ${SUB_FOLDERS})
+    SET(LIB_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/${ITER} ${LIB_DIRECTORIES})    
+endforeach (ITER ${SUB_FOLDERS})
+set (LIB_DIRECTORIES 
+    ${CMAKE_CURRENT_BINARY_DIR}
+    ${LIB_DIRECTORIES}
+    #${SSC_DIR}/Code 
+    ${CMAKE_CURRENT_BINARY_DIR}/UsReconstruction/Thunder)
+
+# rescope LIB_DIRECTORIES to parent scope
+set(LIB_DIRECTORIES ${LIB_DIRECTORIES} PARENT_SCOPE)
+
+INCLUDE_DIRECTORIES(
+	.
+    ${SUB_FOLDERS}
     )
     
 
@@ -81,6 +95,17 @@ ADD_SUBDIRECTORY(UsReconstruction)
 ADD_SUBDIRECTORY(apps)
 IF(APPLE) # doesnt compile on ca's linux box - ??
     ADD_SUBDIRECTORY(3DUSReconstruction)
+ENDIF(APPLE)
+
+#--------------------------------------------------------------------------------
+# For Apple set the icns file containing icons
+IF(APPLE)
+  # set how it shows up in the Info.plist file
+  SET(MACOSX_BUNDLE_ICON_FILE application.icns) 
+  # set where in the bundle to put the icns file
+  SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/application.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  # include the icns file in the target
+  SET(SOURCES ${SOURCES} ${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/application.icns)
 ENDIF(APPLE)
 
 IF(APPLE)
@@ -125,11 +150,17 @@ SET ( LINK_LIBRARIES
   SSC
 )
 
-# LINK
 #----------
-TARGET_LINK_LIBRARIES( CustusX
-  ${LINK_LIBRARIES}
-)
+# LINK
+TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
-install(TARGETS CustusX DESTINATION . )#COMPONENT application)
+
+#--------------------------------------------------------------------------------
+# Install the application, on Apple, the bundle is at the root of the
+# install tree, and on other platforms it'll go into the bin directory.
+install(TARGETS CustusX
+    BUNDLE DESTINATION . COMPONENT Runtime
+    RUNTIME DESTINATION bin COMPONENT Runtime
+    #COMPONENT application # crashes in installer
+    )
       
