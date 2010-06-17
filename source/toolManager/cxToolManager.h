@@ -27,7 +27,7 @@ namespace cx
  */
 class ToolManager: public ssc::ToolManager
 {
-  Q_OBJECT
+Q_OBJECT
 
 public:
   typedef Tracker::Message TrackerMessage;
@@ -70,6 +70,8 @@ public:
   virtual void setLandmark(ssc::Landmark landmark);
   virtual void removeLandmark(std::string uid);
 
+  TrackerPtr getTracker();
+
 public slots:
   virtual void configure(); ///< sets up the software like the xml file suggests
   virtual void initialize(); ///< connects to the hardware
@@ -78,7 +80,7 @@ public slots:
   virtual void saveToolsSlot(); ///< saves transforms and timestamps
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
-signals:
+  signals:
   void landmarkRemoved(std::string uid);
   void landmarkAdded(std::string uid);
   void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
@@ -97,25 +99,26 @@ protected:
   void addConnectedTool(std::string uid); ///< moves a tool from configuredTools to connectedTools
   void connectSignalsAndSlots(); ///< connects signals and slots
   void initializeManualTool();
+  void configureReferences(); ///<
 
   static ToolManager* mCxInstance;
 
   std::string mConfigurationFilePath; ///< path to the configuration file
-  std::string mLoggingFolder;         ///< path to where logging should be saved
-  QTimer* mTimer;                     ///< timer controlling the demand of transforms
+  std::string mLoggingFolder; ///< path to where logging should be saved
+  QTimer* mTimer; ///< timer controlling the demand of transforms
 
-  TrackerPtr                    mTracker;         ///< the tracker to use
-  ssc::ToolManager::ToolMapPtr  mConfiguredTools; ///< all configured, but not connected, tools
-  ssc::ToolManager::ToolMapPtr  mConnectedTools;  ///< all connected tools
-  ssc::ToolPtr                  mDominantTool;    ///< the tool with highest priority
-  ssc::ToolPtr                  mReferenceTool;   ///< the tool which is used as patient reference tool
-  ssc::ManualToolPtr            mManualTool;      ///< a mouse-controllable virtual tool that is available even when not tracking.
+  TrackerPtr mTracker; ///< the tracker to use
+  ssc::ToolManager::ToolMapPtr mConfiguredTools; ///< all configured, but not connected, tools
+  ssc::ToolManager::ToolMapPtr mConnectedTools; ///< all connected tools
+  ssc::ToolPtr mDominantTool; ///< the tool with highest priority
+  ssc::ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
+  ssc::ManualToolPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
 
   ssc::RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 
-  bool mConfigured;   ///< whether or not the system is configured
-  bool mInitialized;  ///< whether or not the system is initialized
-  bool mTracking;   ///< whether or not the system is tracking
+  bool mConfigured; ///< whether or not the system is configured
+  bool mInitialized; ///< whether or not the system is initialized
+  bool mTracking; ///< whether or not the system is tracking
 
   igstk::PulseGenerator::Pointer mPulseGenerator;
 

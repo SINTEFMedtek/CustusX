@@ -174,15 +174,13 @@ void Tool::set_prMt(const ssc::Transform3D& prMt)
 
   emit toolTransformAndTimestamp( prMt, timestamp );
 }
+
 void Tool::toolTransformCallback(const itk::EventObject &event)
 {
   if(igstk::CoordinateSystemTransformToEvent().CheckEvent(&event))
   {
-    //Maybe we need to request this transform somewhere?
-
     const igstk::CoordinateSystemTransformToEvent *transformEvent;
-    transformEvent=dynamic_cast
-                  <const igstk::CoordinateSystemTransformToEvent*>( &event );
+    transformEvent=dynamic_cast<const igstk::CoordinateSystemTransformToEvent*>( &event );
     if(!transformEvent)
       return;
 
@@ -196,13 +194,23 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     }
 
     const igstk::CoordinateSystem* destination = result.GetDestination();
-    ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
-    if(!refTool) //hmmm why is this done? seems meaningless...
+    ssc::ToolPtr refTool = toolManager()->getReferenceTool();
+
+    if(refTool) //hmmm why is this done? seems meaningless...
     {            //its because we only request transforms from tool to reftool
+      std::cout << "Checking that the incoming transforms destiantion is the referenceTOOL." << std::endl;
       ssc::Tool* tool = refTool.get();
       Tool* ref = dynamic_cast<Tool*>(tool);
       if(!ref->getPointer()->IsCoordinateSystem(destination))
         return;
+      std::cout << "RefTool is the destiantion." << std::endl;
+    }else
+    {
+      std::cout << "Checking that the incoming transforms destiantion is the TRACKER." << std::endl;
+      TrackerPtr tracker = toolManager()->getTracker();
+      if(!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
+        return;
+      std::cout << "Tracker is the destiantion." << std::endl;
     }
 
     vtkMatrix4x4Ptr vtkMatrix =  vtkMatrix4x4Ptr::New();
@@ -217,7 +225,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     mTransforms->push_back(m_prMt);
     mTimestamps->push_back(timestamp);
-    //emit toolTransformAndTimestamp(rMt, timestamp);
+
     emit toolTransformAndTimestamp((*m_prMt), timestamp);
     emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);
   }
@@ -320,6 +328,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     emit toolReport(TOOL_AURORA_CHANNEL_NUMBER, true, false, mUid);
   }
 }
+
 bool Tool::verifyInternalStructure()
 {
   if(mInternalStructure.mType == ssc::Tool::TOOL_NONE)

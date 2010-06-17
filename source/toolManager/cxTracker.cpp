@@ -99,22 +99,18 @@ void Tracker::open()
 }
 void Tracker::attachTools(ToolMapPtr tools)
 {
-  //If you don't copy tools into a new map the RequestAttachToTracker will
-  //remove one node from the map (the one you haven't processed yet!),
-  //I have no idea why this happens...
   std::map<std::string, ssc::ToolPtr> toolMap = *tools.get();
   for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
   {
-    ssc::Tool* toolPtr = ((*it).second).get();
-    Tool* tool = static_cast<Tool*>(toolPtr);
-    if(tool != NULL)
+    ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
+
+    //ssc::Tool* toolPtr = ((*it).second).get();
+    //Tool* tool = static_cast<Tool*>(toolPtr);
+    if(tool && tool->getPointer())
     {
-      if(tool->getPointer() != NULL)
-      {
-      tool->getPointer()->RequestAttachToTracker(mTracker); //this isn't compatible with a shared_ptr map!
+      tool->getPointer()->RequestAttachToTracker(mTracker);
       if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
         mTracker->RequestSetReferenceTool(tool->getPointer());
-      }
     }
   }
 }
