@@ -138,7 +138,7 @@ void ToolPropertiesWidget::updateSlot()
   }
   else
   {
-    mReferenceStatusLabel->setText("Reference not found");
+    mReferenceStatusLabel->setText("Reference is the tracker");
   }
 
   QString status = "Unconfigured";
