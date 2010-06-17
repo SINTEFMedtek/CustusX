@@ -50,7 +50,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscToolRep3D.h
     Rep/sscProbeRep.h    
     Rep/sscImageBlenderProxy.h
-    Rep/sscVolumetricRep.h    
+    Rep/sscVolumetricRep.h 
+    #Rep/sscGPURayCastVolumetricRep.h   
     Rep/sscSlicePlaneRep.h
     Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscBlendedSliceRep.h
@@ -152,6 +153,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscSliceRep.h
     Rep/sscVolumetricRep.h
     Rep/sscVolumetricRep.cpp
+    #Rep/sscGPURayCastVolumetricRep.h
+    #Rep/sscGPURayCastVolumetricRep.cpp
     Rep/sscProgressiveLODVolumetricRep.cpp
     Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscGeometricRep.cpp
@@ -378,7 +381,10 @@ export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
 
 # =========================================================
-
-install( TARGETS SSC DESTINATION lib64 )
+if (APPLE)
+    # defer install to user app
+else (APPLE) # i.e. sonowand linux
+    install( TARGETS SSC DESTINATION lib64 )
+endif(APPLE)
 # =========================================================
 
