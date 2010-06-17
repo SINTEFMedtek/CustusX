@@ -73,3 +73,10 @@ CISST_ADD_TESTS(testCX_CppUnit_CTest)
 
 # -- finished CppUnit - CTest integration. ------
 # -----------------------------------------------
+
+# testing of installer
+#install(TARGETS testCX #${LINK_LIBRARIES}
+#        BUNDLE  DESTINATION testCX/bin
+#        RUNTIME DESTINATION testCX/bin
+#        LIBRARY DESTINATION testCX/lib
+#        ARCHIVE DESTINATION testCX/lib)
