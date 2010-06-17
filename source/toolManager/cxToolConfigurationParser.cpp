@@ -1,6 +1,5 @@
 #include "cxToolConfigurationParser.h"
 
-//#include <QDomDocument>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
@@ -8,8 +7,8 @@
 
 namespace cx
 {
-ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath) :
-      mTrackerTag("tracker"),
+ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath, std::string loggingFolder) :
+      mLoggingFolder(loggingFolder), mTrackerTag("tracker"),
       mTrackerTypeTag("type"), mToolfileTag("toolfile"), mToolTag("tool"),
       mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
       mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
@@ -36,79 +35,31 @@ ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath)
   //std::cout << mConfigureDoc.toString().toStdString() << std::endl;
   mConfigurationPath = configurationFileInfo.absolutePath().toStdString()+"/";
   //std::cout << "mConfigurationPath: " << mConfigurationPath << std::endl;
+
+  if(mLoggingFolder.empty())
+    mLoggingFolder = mConfigurationPath;
 }
 
 ToolConfigurationParser::~ToolConfigurationParser()
 {}
 
-void ToolConfigurationParser::setLoggingFolder(std::string& loggingFolder)
-{
-  mLoggingFolder = loggingFolder;
-}
-
-bool ToolConfigurationParser::readConfigurationFile()
-{
-  //tracker
-  QDomNodeList trackerNodeList = mConfigureDoc.elementsByTagName(QString(mTrackerTag.c_str()));
-
-  //tools
-  QDomNodeList toolFileList = mConfigureDoc.elementsByTagName(QString(mToolfileTag.c_str()));
-  for (int i = 0; i < toolFileList.count(); i++)
-  {
-    std::string iString = "" + i;
-    QDomNode filenameNode = toolFileList.item(i).firstChild();
-    if (filenameNode.isNull())
-    {
-      messageManager()->sendInfo("Toolfiletag " + iString+ " does not containe any usefull info. Skipping this tool.");
-      continue;
-    }
-    QString filename = filenameNode.nodeValue();
-    if (filename.isEmpty())
-    {
-      messageManager()->sendInfo("Toolfiletag " + iString+ " does not contain readable text. Skipping this tool.");
-      continue;
-    }
-    //QFile toolFile(configurationPath + filename);
-    std::string filepath = mConfigurationPath+"/"+filename.toStdString();
-    QFile toolFile(QString(filepath.c_str()));
-    QDir dir;
-    if (!toolFile.exists())
-    {
-      messageManager()->sendInfo(filepath+ " does not exists. Skipping this tool.");
-      continue;
-    } else
-    {
-      messageManager()->sendInfo(filename.toStdString() + " exists.");
-    }
-    QDomDocument toolDoc;
-    if (!toolDoc.setContent(&toolFile))
-    {
-      messageManager()->sendInfo("Could not set the xml content of the file "
-          + filename.toStdString());
-      continue;
-    }
-    QDomNodeList toolList = toolDoc.elementsByTagName(QString(mToolTag.c_str()));
-    mToolNodeList.push_back(toolList);
-  }
-  return true;
-}
-
 TrackerPtr ToolConfigurationParser::getTracker()
 {
-  QDomNodeList trackerNodeList = mConfigureDoc.elementsByTagName(QString(mTrackerTag.c_str()));
+  QList<QDomNode> trackerNodeList = this->getTrackerNodeList();
+
   std::vector<TrackerPtr> trackers;
   Tracker::InternalStructure internalStructure;
   for (int i = 0; i < trackerNodeList.count(); i++)
   {
     std::string iString = "" + i;
     QDomNode trackerNode = trackerNodeList.at(i);
-    const QDomElement trackerType = trackerNode.firstChildElement(QString(mTrackerTypeTag.c_str()));
-    if (trackerType.isNull())
+    const QDomElement trackerTypeElement = trackerNode.firstChildElement(mTrackerTypeTag);
+    if (trackerTypeElement.isNull())
     {
       messageManager()->sendInfo("Tracker " + iString + " does not have the required tag <type>.");
       continue;
     }
-    QString text = trackerType.text();
+    QString text = trackerTypeElement.text();
     if (text.contains("polaris", Qt::CaseInsensitive))
     {
       if (text.contains("spectra", Qt::CaseInsensitive))
@@ -131,13 +82,13 @@ TrackerPtr ToolConfigurationParser::getTracker()
     {
       internalStructure.mType = Tracker::TRACKER_NONE;
     }
-    internalStructure.mLoggingFolderName = mLoggingFolder;
+    internalStructure.mLoggingFolderName = this->getLoggingFolder();
     trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
   }
   if (trackers.empty())
   {
     internalStructure.mType = Tracker::TRACKER_NONE;
-    internalStructure.mLoggingFolderName = mLoggingFolder;
+    internalStructure.mLoggingFolderName = this->getLoggingFolder();
     trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
   }
   return trackers.at(0);
@@ -145,29 +96,28 @@ TrackerPtr ToolConfigurationParser::getTracker()
 
 ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
 {
-  QFile configurationFile(QString(mConfigurationPath.c_str()));
-  QFileInfo configurationFileInfo(configurationFile);
-  //QString configurationPath = configurationFileInfo.path() + "/";
+  std::vector<QString> toolFolderAbsolutePaths;
+  QList<QDomNode> toolNodeList = this->getToolNodeList(toolFolderAbsolutePaths);
 
   ssc::ToolManager::ToolMapPtr tools(new ssc::ToolManager::ToolMap());
-  QDomNode node;
-  for (int i = 0; i < mToolNodeList.size(); i++)
+  //QDomNode node;
+  for (int i = 0; i < toolNodeList.size(); i++)
   {
     Tool::InternalStructure internalStructure;
-    QDomNodeList toolNodes = mToolNodeList.at(i);
+    /*QDomNode toolNodes = toolNodeList.at(i);
     if (toolNodes.size() < 1)
     {
       messageManager()->sendInfo("Found no <tool> tags in the toolxmlfile.");
       continue;
-    }
-    QDomNode toolNode = toolNodes.item(0); //A toolfile should only contain 1 tool tag
+    }*/
+    QDomNode toolNode = toolNodeList.at(i);
     if (toolNode.isNull())
     {
       messageManager()->sendInfo("Could not read the <tool> tag.");
       continue;
     }
 
-    QDomElement toolTypeElement = toolNode.firstChildElement(QString(mToolTypeTag.c_str()));
+    QDomElement toolTypeElement = toolNode.firstChildElement(mToolTypeTag);
     QString toolTypeText = toolTypeElement.text();
     if (toolTypeText.contains("reference", Qt::CaseInsensitive))
     {
@@ -183,28 +133,28 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       internalStructure.mType = ssc::Tool::TOOL_NONE;
     }
 
-    QDomElement toolIdElement = toolNode.firstChildElement(QString(mToolIdTag.c_str()));
+    QDomElement toolIdElement = toolNode.firstChildElement(mToolIdTag);
     QString toolIdText = toolIdElement.text();
     internalStructure.mUid = toolIdText.toStdString();
 
-    QDomElement toolNameElement = toolNode.firstChildElement(QString(mToolNameTag.c_str()));
+    QDomElement toolNameElement = toolNode.firstChildElement(mToolNameTag);
     QString toolNameText = toolNameElement.text();
     internalStructure.mName = toolNameText.toStdString();
 
-    QDomElement toolGeofileElement = toolNode.firstChildElement(QString(mToolGeoFileTag.c_str()));
+    QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
     QString toolGeofileText = toolGeofileElement.text();
     if (!toolGeofileText.isEmpty())
-      toolGeofileText = QString(mConfigurationPath.c_str()) + toolGeofileText;
+      //toolGeofileText = QString(mConfigurationPath.c_str()) + toolGeofileText;
+      toolGeofileText = toolFolderAbsolutePaths.at(i) + toolGeofileText;
     internalStructure.mGraphicsFileName = toolGeofileText.toStdString();
 
-    QDomElement toolSensorElement = toolNode.firstChildElement(QString(mToolSensorTag.c_str()));
+    QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
     if (toolSensorElement.isNull())
     {
-      messageManager()->sendInfo(
-          "Could not find the <sensor> tag under the <tool> tag. Aborting tihs tool.");
+      messageManager()->sendInfo("Could not find the <sensor> tag under the <tool> tag. Aborting this tool.");
       continue;
     }
-    QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(QString(mToolSensorTypeTag.c_str()));
+    QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
     QString toolSensorTypeText = toolSensorTypeElement.text();
     if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
     {
@@ -230,14 +180,14 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     }
 
     QDomElement toolSensorWirelessElement =
-        toolSensorElement.firstChildElement(QString(mToolSensorWirelessTag.c_str()));
+        toolSensorElement.firstChildElement(mToolSensorWirelessTag);
     QString toolSensorWirelessText = toolSensorWirelessElement.text();
     if (toolSensorWirelessText.contains("yes", Qt::CaseInsensitive))
       internalStructure.mWireless = true;
     else if (toolSensorWirelessText.contains("no", Qt::CaseInsensitive))
       internalStructure.mWireless = false;
 
-    QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(QString(mToolSensorDOFTag.c_str()));
+    QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(mToolSensorDOFTag);
     QString toolSensorDOFText = toolSensorDOFElement.text();
     if (toolSensorDOFText.contains("5", Qt::CaseInsensitive))
       internalStructure.m5DOF = true;
@@ -245,22 +195,23 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       internalStructure.m5DOF = false;
 
     QDomElement toolSensorPortnumberElement =
-        toolSensorElement.firstChildElement(QString(mToolSensorPortnumberTag.c_str()));
+        toolSensorElement.firstChildElement(mToolSensorPortnumberTag);
     QString toolSensorPortnumberText = toolSensorPortnumberElement.text();
     internalStructure.mPortNumber = toolSensorPortnumberText.toInt();
 
     QDomElement toolSensorChannelnumberElement =
-        toolSensorElement.firstChildElement(QString(mToolSensorChannelnumberTag.c_str()));
+        toolSensorElement.firstChildElement(mToolSensorChannelnumberTag);
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
 
-    QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(QString(mToolSensorRomFileTag.c_str()));
+    QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
     QString toolSensorRomFileText = toolSensorRomFileElement.text();
     if (!toolSensorRomFileText.isEmpty())
-      toolSensorRomFileText = QString(mConfigurationPath.c_str()) + toolSensorRomFileText;
+      //toolSensorRomFileText = QString(mConfigurationPath.c_str()) + toolSensorRomFileText;
+      toolSensorRomFileText = toolFolderAbsolutePaths.at(i) + toolSensorRomFileText;
     internalStructure.mSROMFilename = toolSensorRomFileText.toStdString();
 
-    QDomElement toolCalibrationElement = toolNode.firstChildElement(QString(mToolCalibrationTag.c_str()));
+    QDomElement toolCalibrationElement = toolNode.firstChildElement(mToolCalibrationTag);
     if (toolCalibrationElement.isNull())
     {
       messageManager()->sendInfo(
@@ -268,10 +219,11 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       continue;
     }
     QDomElement toolCalibrationFileElement =
-        toolCalibrationElement.firstChildElement(QString(mToolCalibrationFileTag.c_str()));
+        toolCalibrationElement.firstChildElement(mToolCalibrationFileTag);
     QString toolCalibrationFileText = toolCalibrationFileElement.text();
     if (!toolCalibrationFileText.isEmpty())
-      toolCalibrationFileText = QString(mConfigurationPath.c_str()) + toolCalibrationFileText;
+      //toolCalibrationFileText = QString(mConfigurationPath.c_str()) + toolCalibrationFileText;
+      toolCalibrationFileText = toolFolderAbsolutePaths.at(i) + toolCalibrationFileText;
     internalStructure.mCalibrationFilename = toolCalibrationFileText.toStdString();
 
     internalStructure.mTransformSaveFileName = mLoggingFolder;
@@ -280,9 +232,86 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     Tool* cxTool = new Tool(internalStructure);
     ssc::ToolPtr tool(cxTool);
     (*tools)[tool->getUid()] = tool;
-    messageManager()->sendInfo("Done configuring a tool with uid: "+tool->getUid());
+    messageManager()->sendInfo("Successfully configuring a tool with uid: "+tool->getUid());
   }
   return tools;
+}
+
+std::string ToolConfigurationParser::getLoggingFolder() const
+{
+  return mLoggingFolder;
+}
+
+QList<QDomNode> ToolConfigurationParser::getTrackerNodeList()
+{
+  //only support one tracker at the moment
+  int nrOfSupportedTrackers = 1;
+
+  QList<QDomNode> trackerNodeList;
+  for(int i = 0; i<nrOfSupportedTrackers; ++i )
+    trackerNodeList.push_back(mConfigureDoc.elementsByTagName(mTrackerTag).item(i));
+  return trackerNodeList;
+}
+
+/**
+ * @param toolFolderAbsolutePaths[out] send in a vector to get the tool.xml files absolute folder path
+ * @return the tool node
+ */
+QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& toolFolderAbsolutePaths)
+{
+  QList<QDomNode> toolNodeList;
+
+  QDomNodeList toolFileList = mConfigureDoc.elementsByTagName(mToolfileTag);
+  for (int i = 0; i < toolFileList.count(); i++)
+  {
+    /*std::string iString = "" + i;
+    QDomNode filenameNode = toolFileList.item(i).firstChild();
+    if (filenameNode.isNull())
+    {
+      messageManager()->sendInfo("Toolfiletag "+iString+" does not containe any usefull info. Skipping this tool.");
+      continue;
+    }
+    QString filename = filenameNode.nodeValue();
+    if (filename.isEmpty())
+    {
+      messageManager()->sendInfo("Toolfiletag "+ iString+" does not contain readable text. Skipping this tool.");
+      continue;
+    }*/
+    const QString toolFilename = toolFileList.item(i).firstChild().nodeValue();
+    if(toolFilename.isEmpty())
+    {
+      messageManager()->sendWarning("A toolfile tag in the config xml file is not correctly formated. Skipping it.");
+      continue;
+    }
+
+
+    QDir dir(QString(mConfigurationPath.c_str()));
+    //std::cout << "absolutePath dir is " << dir.absolutePath().toStdString() << std::endl;
+    //std::cout << "absolutePath file is " << dir.absoluteFilePath(toolFilename).toStdString() << std::endl;
+
+    const QString filepath = dir.absoluteFilePath(toolFilename);
+    QFile toolFile(filepath);
+    if (!toolFile.exists())
+    {
+      messageManager()->sendInfo(filepath.toStdString()+" does not exists. Skipping this tool.");
+      continue;
+    } else
+    {
+      messageManager()->sendInfo(filepath.toStdString() + " exists.");
+    }
+    QDomDocument toolDoc;
+    if (!toolDoc.setContent(&toolFile))
+    {
+      messageManager()->sendInfo("Could not set the xml content of the file "+toolFilename.toStdString());
+      continue;
+    }
+    //there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)
+    QDomNode toolNode = toolDoc.elementsByTagName(mToolTag).item(0);
+    toolNodeList.push_back(toolNode);
+    QString toolFilesAbsoluteFolderPath = QFileInfo(toolFile).absolutePath()+QString("/");
+    toolFolderAbsolutePaths.push_back(toolFilesAbsoluteFolderPath);
+  }
+  return toolNodeList;
 }
 
 } //namespace cx

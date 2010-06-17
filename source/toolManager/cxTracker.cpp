@@ -1,6 +1,7 @@
 #include "cxTracker.h"
 
 #include "cxTool.h"
+#include "cxMessageManager.h"
 
 namespace cx
 {
@@ -34,6 +35,8 @@ Tracker::Tracker(InternalStructure internalStructure) :
   {
   case TRACKER_NONE:
     mUid = mName = "None";
+    messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
+    return;
     break;
   case TRACKER_POLARIS:
     mUid = mName = "Polaris";
