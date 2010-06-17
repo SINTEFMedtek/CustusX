@@ -477,6 +477,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
       //Should this really be done here?
       mInitialized = success;
       emit initialized();
+      messageManager()->sendInfo("ToolManager is initialized.");
       report.append("open.");
     } else
     {
@@ -597,7 +598,7 @@ void ToolManager::connectSignalsAndSlots()
         this, SLOT(receiveToolReport(ToolMessage, bool, bool, stdString)));
     it++;
   }
-  messageManager()->sendInfo("Signals and slots have been connected.");
+  //messageManager()->sendInfo("Signals and slots have been connected.");
 }
 void ToolManager::checkTimeoutsAndRequestTransform()
 {

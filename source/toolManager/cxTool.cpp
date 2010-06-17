@@ -196,17 +196,17 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     const igstk::CoordinateSystem* destination = result.GetDestination();
     ssc::ToolPtr refTool = toolManager()->getReferenceTool();
 
-    if(refTool) //hmmm why is this done? seems meaningless...
-    {            //its because we only request transforms from tool to reftool
-      std::cout << "Checking that the incoming transforms destiantion is the referenceTOOL." << std::endl;
+    if(refTool) //if we are tracking with a reftool it must be visible
+    {
+      //std::cout << "Checking that the incoming transforms destiantion is the referenceTOOL." << std::endl;
       ssc::Tool* tool = refTool.get();
       Tool* ref = dynamic_cast<Tool*>(tool);
       if(!ref->getPointer()->IsCoordinateSystem(destination))
         return;
       std::cout << "RefTool is the destiantion." << std::endl;
-    }else
+    }else //if we dont have a reftool we use the tracker as patientref
     {
-      std::cout << "Checking that the incoming transforms destiantion is the TRACKER." << std::endl;
+      //std::cout << "Checking that the incoming transforms destiantion is the TRACKER." << std::endl;
       TrackerPtr tracker = toolManager()->getTracker();
       if(!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
         return;
