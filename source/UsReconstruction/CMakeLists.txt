@@ -51,11 +51,9 @@ link_directories( Thunder )
 
 # =========================================================
 # create the target
-add_library( sscUsReconstructionLib  ${SOURCE_FILES} )
+add_library( sscUsReconstructionLib ${SOURCE_FILES} )
 target_link_libraries( sscUsReconstructionLib SSC thunder ITKCommon)
 # =========================================================
 
 
-#install( TARGETS sscUsReconstructionLib DESTINATION lib64 )
-# =========================================================
 
