@@ -1,6 +1,7 @@
 #ifndef CXTOOLCONFIGURATIONPARSER_H_
 #define CXTOOLCONFIGURATIONPARSER_H_
 
+#include <vector>
 #include <QString>
 #include <QDomDocument>
 #include "sscToolManager.h"
@@ -15,24 +16,28 @@ namespace cx
  * \brief Class for reading the configuration file that sets up
  * tracking for CustusX3
  *
+ * \warning Only supports configurations with one tracker at the moment
+ *
  * \date 15. juni 2010
- * \author: jbake
+ * \author: Janne Beate Bakeng
  */
 class ToolConfigurationParser
 {
 public:
-  ToolConfigurationParser(std::string& configXmlFilePath);
+  ToolConfigurationParser(std::string& configXmlFilePath, std::string loggingFolder = ""); ///< opens the xml file and readies it for reading
   ~ToolConfigurationParser();
 
-  void setLoggingFolder(std::string& loggingFolder);
-  bool readConfigurationFile();
-  TrackerPtr getTracker();
-  ssc::ToolManager::ToolMapPtr getConfiguredTools();
+  TrackerPtr getTracker(); ///< return the tracker created from the xml file
+  ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< return all tools created from the xml files
 
 private:
+  std::string     getLoggingFolder() const;
+  QList<QDomNode> getTrackerNodeList(); ///< returns a list of tracker nodes
+  QList<QDomNode> getToolNodeList(std::vector<QString>& toolFolderAbsolutePaths); ///< returns a list of tool nodes
+
   std::string mConfigurationPath; ///< path to the configuration file
-  std::string mLoggingFolder;         ///< path to where logging should be saved
-  const std::string mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
+  std::string mLoggingFolder; ///< path to where logging should be saved, default is the folder where configfile is found
+  const QString mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
                     mToolTypeTag, mToolIdTag, mToolNameTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
@@ -40,8 +45,7 @@ private:
                     mToolCalibrationTag, mToolCalibrationFileTag;
                     ///< names of necessary tags in the configuration file
 
-  QDomDocument mConfigureDoc;
-  QList<QDomNodeList> mToolNodeList;
+  QDomDocument mConfigureDoc; ///< the config xml document
 };
 
 } //namespace cx

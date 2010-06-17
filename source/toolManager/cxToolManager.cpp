@@ -3,7 +3,6 @@
 #include <QTimer>
 #include <QDir>
 #include <QList>
-//#include <QDomDocument>
 #include <QMetaType>
 #include <vtkDoubleArray.h>
 #include "sscTypeConversions.h"
@@ -38,15 +37,7 @@ ToolManager::ToolManager() :
       mConfiguredTools(new ssc::ToolManager::ToolMap), //TODO Why was this commented out???
       mConnectedTools(new ssc::ToolManager::ToolMap), mDominantTool(
           ssc::ToolPtr()), mReferenceTool(ssc::ToolPtr()), mConfigured(false),
-      mInitialized(false), mTracking(false), /*mTrackerTag("tracker"),
-      mTrackerTypeTag("type"), mToolfileTag("toolfile"), mToolTag("tool"),
-      mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
-      mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
-      mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
-      mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
-      mToolSensorChannelnumberTag("channelnumber"), mToolSensorRomFileTag(
-          "rom_file"), mToolCalibrationTag("calibration"),
-      mToolCalibrationFileTag("cal_file"),*/ mPulseGenerator(
+      mInitialized(false), mTracking(false), mPulseGenerator(
           igstk::PulseGenerator::New())
 {
   //this->createSymlink(); // test
@@ -75,7 +66,6 @@ void ToolManager::initializeManualTool()
   {
     //adding a manual tool as default
     mManualTool.reset(new ssc::ManualTool("Manual Tool"));
-    //mManualTool->setName("Mouse tool");
     (*mConfiguredTools)["Manual Tool"] = mManualTool;
     mManualTool->setVisible(true);
     this->addConnectedTool("Manual Tool");
@@ -102,26 +92,7 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
-  /*if (!this->pathsExists())
-  {
-    return;
-  }*/
-
-  //MOVED TO TOOLCONFIGURATIONPARSER - START
-  /*
-  QDomNodeList trackerNode;
-  QList<QDomNodeList> toolNodeList;
-  if (!this->readConfigurationFile(trackerNode, toolNodeList))
-    return;
-
-  mTracker = this->configureTracker(trackerNode);
-  mConfiguredTools = this->configureTools(toolNodeList);
-  */
-  //MOVED TO TOOLCONFIGURATIONPARSER - END
-
-  ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath);
-  if(!toolConfigurationParser.readConfigurationFile())
-    return;
+  ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath, mLoggingFolder);
   mTracker = toolConfigurationParser.getTracker();
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
 
@@ -146,8 +117,8 @@ void ToolManager::configure()
 }
 void ToolManager::initialize()
 {
-	if (!this->isConfigured())
-		this->configure();
+  if (!this->isConfigured())
+    this->configure();
 
   if (!mConfigured)
   {
@@ -222,7 +193,7 @@ void ToolManager::stopTracking()
 }
 void ToolManager::saveToolsSlot()
 {
-  saveTransformsAndTimestamps();
+  this->saveTransformsAndTimestamps();
 }
 
 ssc::LandmarkMap ToolManager::getLandmarks()
@@ -371,8 +342,6 @@ ssc::Transform3DPtr ToolManager::get_rMpr() const
 void ToolManager::set_rMpr(const ssc::Transform3DPtr& val)
 {
   m_rMpr_History->setRegistration(*val);
-  //	m_rMpr = val;
-  //	emit rMprChanged();
 }
 ssc::ToolPtr ToolManager::getReferenceTool() const
 {
@@ -398,8 +367,14 @@ void ToolManager::setLoggingFolder(std::string loggingFolder)
   mLoggingFolder = loggingFolder;
 }
 
-void ToolManager::receiveToolReport(ToolMessage message, bool state,
-    bool success, stdString uid)
+/**
+ * Slot that receives reports from tools
+ * \param message What happended to the tool
+ * \param state   Whether the tool was trying to enter or leave a state
+ * \param success Whether or not the request was a success
+ * \param uid     The tools unique id
+ */
+void ToolManager::receiveToolReport(ToolMessage message, bool state, bool success, stdString uid)
 {
   std::string toolUid = "" + uid;
   std::string report = "";
@@ -465,8 +440,15 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state,
   }
   messageManager()->sendInfo(report);
 }
-void ToolManager::receiveTrackerReport(Tracker::Message message, bool state,
-    bool success, std::string uid)
+
+/**
+ * Slot that receives reports from trackers
+ * \param message What happended to the tool
+ * \param state   Whether the tool was trying to enter or leave a state
+ * \param success Whether or not the request was a success
+ * \param uid     The trackers unique id
+ */
+void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, bool success, std::string uid)
 {
   std::string trackerUid = uid;
   std::string report = "";
@@ -565,289 +547,6 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state,
   }
   messageManager()->sendInfo(report);
 }
-
-/*
-bool ToolManager::pathsExists()
-{
-  QDir dir;
-  bool confiurationFileExists = QFile::exists(QString(
-      mConfigurationFilePath.c_str()));
-  bool loggingFolderExists = dir.exists(QString(mLoggingFolder.c_str()));
-  if (!confiurationFileExists)
-  {
-    messageManager()->sendInfo(mConfigurationFilePath + " does not exists.");
-    return false;
-  }
-  if (!loggingFolderExists)
-  {
-    messageManager()->sendInfo(mLoggingFolder + " does not exists.");
-    return false;
-  }
-  return true;
-}*/
-
-/*
-bool ToolManager::readConfigurationFile(QDomNodeList& trackerNodeList, QList<QDomNodeList>& toolNodeList)
-{
-  QFile configurationFile(QString(mConfigurationFilePath.c_str()));
-  QFileInfo configurationFileInfo(configurationFile);
-  QString configurationPath = configurationFileInfo.path() + "/";
-
-  if (!configurationFile.open(QIODevice::ReadOnly))
-  {
-    messageManager()->sendInfo("Could not open " + mConfigurationFilePath + ".");
-    return false;
-  }
-  QDomDocument configureDoc;
-  if (!configureDoc.setContent(&configurationFile))
-  {
-    messageManager()->sendInfo("Could not set the xml content of the file "
-        + mConfigurationFilePath);
-    return false;
-  }
-
-  //tracker
-  trackerNodeList = configureDoc.elementsByTagName(QString(mTrackerTag.c_str()));
-
-  //tools
-  QDomNodeList toolFileList = configureDoc.elementsByTagName(QString(mToolfileTag.c_str()));
-  for (int i = 0; i < toolFileList.count(); i++)
-  {
-    std::string iString = "" + i;
-    QDomNode filenameNode = toolFileList.item(i).firstChild();
-    if (filenameNode.isNull())
-    {
-      messageManager()->sendInfo("Toolfiletag " + iString
-          + " does not containe any usefull info. Skipping this tool.");
-      continue;
-    }
-    QString filename = filenameNode.nodeValue();
-    if (filename.isEmpty())
-    {
-      messageManager()->sendInfo("Toolfiletag " + iString
-          + " does not contain readable text. Skipping this tool.");
-      continue;
-    }
-    QFile toolFile(configurationPath + filename);
-    QDir dir;
-    if (!toolFile.exists())
-    {
-      messageManager()->sendInfo(filename.toStdString()
-          + " does not exists. Skipping this tool.");
-      continue;
-    } else
-    {
-      messageManager()->sendInfo(filename.toStdString() + " exists.");
-    }
-    QDomDocument toolDoc;
-    if (!toolDoc.setContent(&toolFile))
-    {
-      messageManager()->sendInfo("Could not set the xml content of the file "
-          + filename.toStdString());
-      continue;
-    }
-    QDomNodeList toolList = toolDoc.elementsByTagName(QString(mToolTag.c_str()));
-    toolNodeList.push_back(toolList);
-  }
-  return true;
-
-}*/
-
-/*TrackerPtr ToolManager::configureTracker(QDomNodeList& trackerNodeList)
-{
-  std::vector<TrackerPtr> trackers;
-  Tracker::InternalStructure internalStructure;
-  for (int i = 0; i < trackerNodeList.count(); i++)
-  {
-    std::string iString = "" + i;
-    QDomNode trackerNode = trackerNodeList.at(i);
-    const QDomElement trackerType = trackerNode.firstChildElement(QString(mTrackerTypeTag.c_str()));
-    if (trackerType.isNull())
-    {
-      messageManager()->sendInfo("Tracker " + iString
-          + " does not have the required tag <type>.");
-      continue;
-    }
-    QString text = trackerType.text();
-    if (text.contains("polaris", Qt::CaseInsensitive))
-    {
-      if (text.contains("spectra", Qt::CaseInsensitive))
-      {
-        internalStructure.mType = Tracker::TRACKER_POLARIS_SPECTRA;
-      } else if (text.contains("vicra", Qt::CaseInsensitive))
-      {
-        internalStructure.mType = Tracker::TRACKER_POLARIS_VICRA;
-      } else
-      {
-        internalStructure.mType = Tracker::TRACKER_POLARIS;
-      }
-    } else if (text.contains("aurora", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = Tracker::TRACKER_AURORA;
-    } else if (text.contains("micron", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = Tracker::TRACKER_MICRON;
-    } else
-    {
-      internalStructure.mType = Tracker::TRACKER_NONE;
-    }
-    internalStructure.mLoggingFolderName = mLoggingFolder;
-    trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
-  }
-  if (trackers.empty())
-  {
-    internalStructure.mType = Tracker::TRACKER_NONE;
-    internalStructure.mLoggingFolderName = mLoggingFolder;
-    trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
-  }
-  return trackers.at(0);
-}*/
-
-/*ssc::ToolManager::ToolMapPtr ToolManager::configureTools(QList<QDomNodeList>& toolNodeList)
-{
-  QFile configurationFile(QString(mConfigurationFilePath.c_str()));
-  QFileInfo configurationFileInfo(configurationFile);
-  QString configurationPath = configurationFileInfo.path() + "/";
-
-  ssc::ToolManager::ToolMapPtr tools(new ssc::ToolManager::ToolMap());
-  QDomNode node;
-  for (int i = 0; i < toolNodeList.size(); i++)
-  {
-    Tool::InternalStructure internalStructure;
-    QDomNodeList toolNodes = toolNodeList.at(i);
-    if (toolNodes.size() < 1)
-    {
-      messageManager()->sendInfo("Found no <tool> tags in the toolxmlfile.");
-      continue;
-    }
-    QDomNode toolNode = toolNodes.item(0); //A toolfile should only contain 1 tool tag
-    if (toolNode.isNull())
-    {
-      messageManager()->sendInfo("Could not read the <tool> tag.");
-      continue;
-    }
-
-    QDomElement toolTypeElement = toolNode.firstChildElement(QString(mToolTypeTag.c_str()));
-    QString toolTypeText = toolTypeElement.text();
-    if (toolTypeText.contains("reference", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = ssc::Tool::TOOL_REFERENCE;
-    } else if (toolTypeText.contains("pointer", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = ssc::Tool::TOOL_POINTER;
-    } else if (toolTypeText.contains("usprobe", Qt::CaseInsensitive))
-    {
-      internalStructure.mType = ssc::Tool::TOOL_US_PROBE;
-    } else
-    {
-      internalStructure.mType = ssc::Tool::TOOL_NONE;
-    }
-
-    QDomElement toolIdElement = toolNode.firstChildElement(QString(mToolIdTag.c_str()));
-    QString toolIdText = toolIdElement.text();
-    internalStructure.mUid = toolIdText.toStdString();
-
-    QDomElement toolNameElement = toolNode.firstChildElement(QString(mToolNameTag.c_str()));
-    QString toolNameText = toolNameElement.text();
-    internalStructure.mName = toolNameText.toStdString();
-
-    QDomElement toolGeofileElement = toolNode.firstChildElement(QString(mToolGeoFileTag.c_str()));
-    QString toolGeofileText = toolGeofileElement.text();
-    if (!toolGeofileText.isEmpty())
-      toolGeofileText = configurationPath + toolGeofileText;
-    internalStructure.mGraphicsFileName = toolGeofileText.toStdString();
-
-    QDomElement toolSensorElement = toolNode.firstChildElement(QString(mToolSensorTag.c_str()));
-    if (toolSensorElement.isNull())
-    {
-      messageManager()->sendInfo(
-          "Could not find the <sensor> tag under the <tool> tag. Aborting tihs tool.");
-      continue;
-    }
-    QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(QString(mToolSensorTypeTag.c_str()));
-    QString toolSensorTypeText = toolSensorTypeElement.text();
-    if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
-    {
-      if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
-      {
-        internalStructure.mTrackerType = Tracker::TRACKER_POLARIS_SPECTRA;
-      } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
-      {
-        internalStructure.mTrackerType = Tracker::TRACKER_POLARIS_VICRA;
-      } else
-      {
-        internalStructure.mTrackerType = Tracker::TRACKER_POLARIS;
-      }
-    } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
-    {
-      internalStructure.mTrackerType = Tracker::TRACKER_AURORA;
-    } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
-    {
-      internalStructure.mTrackerType = Tracker::TRACKER_MICRON;
-    } else
-    {
-      internalStructure.mTrackerType = Tracker::TRACKER_NONE;
-    }
-
-    QDomElement toolSensorWirelessElement =
-        toolSensorElement.firstChildElement(QString(mToolSensorWirelessTag.c_str()));
-    QString toolSensorWirelessText = toolSensorWirelessElement.text();
-    if (toolSensorWirelessText.contains("yes", Qt::CaseInsensitive))
-      internalStructure.mWireless = true;
-    else if (toolSensorWirelessText.contains("no", Qt::CaseInsensitive))
-      internalStructure.mWireless = false;
-
-    QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(QString(mToolSensorDOFTag.c_str()));
-    QString toolSensorDOFText = toolSensorDOFElement.text();
-    if (toolSensorDOFText.contains("5", Qt::CaseInsensitive))
-      internalStructure.m5DOF = true;
-    else if (toolSensorDOFText.contains("6", Qt::CaseInsensitive))
-      internalStructure.m5DOF = false;
-
-    QDomElement toolSensorPortnumberElement =
-        toolSensorElement.firstChildElement(QString(mToolSensorPortnumberTag.c_str()));
-    QString toolSensorPortnumberText = toolSensorPortnumberElement.text();
-    internalStructure.mPortNumber = toolSensorPortnumberText.toInt();
-
-    QDomElement toolSensorChannelnumberElement =
-        toolSensorElement.firstChildElement(QString(mToolSensorChannelnumberTag.c_str()));
-    QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
-    internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
-
-    QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(QString(mToolSensorRomFileTag.c_str()));
-    QString toolSensorRomFileText = toolSensorRomFileElement.text();
-    if (!toolSensorRomFileText.isEmpty())
-      toolSensorRomFileText = configurationPath + toolSensorRomFileText;
-    internalStructure.mSROMFilename = toolSensorRomFileText.toStdString();
-
-    QDomElement toolCalibrationElement = toolNode.firstChildElement(QString(mToolCalibrationTag.c_str()));
-    if (toolCalibrationElement.isNull())
-    {
-      messageManager()->sendInfo(
-          "Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
-      continue;
-    }
-    QDomElement toolCalibrationFileElement =
-        toolCalibrationElement.firstChildElement(QString(mToolCalibrationFileTag.c_str()));
-    QString toolCalibrationFileText = toolCalibrationFileElement.text();
-    if (!toolCalibrationFileText.isEmpty())
-      toolCalibrationFileText = configurationPath + toolCalibrationFileText;
-    internalStructure.mCalibrationFilename = toolCalibrationFileText.toStdString();
-
-    internalStructure.mTransformSaveFileName = mLoggingFolder;
-    internalStructure.mLoggingFolderName = mLoggingFolder;
-
-    Tool* cxTool = new Tool(internalStructure);
-    ssc::ToolPtr tool(cxTool);
-    if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
-    {
-      mReferenceTool = tool;
-    }
-    //tools->insert(std::pair<std::string, ssc::ToolPtr>(tool->getUid(), tool));
-    (*tools)[tool->getUid()] = tool;
-  }
-  return tools;
-}*/
 
 void ToolManager::addConnectedTool(std::string uid)
 {  

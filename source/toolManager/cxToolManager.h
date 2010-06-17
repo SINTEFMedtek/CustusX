@@ -8,7 +8,6 @@
 #include "sscLandmark.h"
 #include "cxTool.h"
 #include "cxTracker.h"
-//#include "cxToolConfigurationParser.h"
 
 class QDomNode;
 class QDomDocument;
@@ -52,14 +51,10 @@ public:
   virtual std::vector<std::string> getToolNames() const; ///< both from configured and connected tools
   virtual std::vector<std::string> getToolUids() const; ///< both from configured and connected tools
 
-  virtual ssc::Transform3DPtr get_rMpr() const; ///< get the patient ...
+  virtual ssc::Transform3DPtr get_rMpr() const; ///< get the patient registration transform
   virtual void set_rMpr(const ssc::Transform3DPtr& val); ///<  set the transform from patient to reference space
 
   virtual ssc::RegistrationHistoryPtr get_rMpr_History();
-  //virtual void set_rMpr(const CalibrationTransform& val); ///<  set the patient-reference transform, along with calibration info.
-  //virtual void set_rMpr_ActiveTime(const QDateTime& time); ///< roll the calibrationtime back to a specified point, use invalid DateTime for real time.
-  //virtual TransformEvent get_rMprEvent() const;
-  //virtual std::vector<TransformEvent> get_rMpr_History() const; ///< get all calibration events
 
   virtual ssc::ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
   virtual void saveTransformsAndTimestamps(std::string filePathAndName = ""); ///<
@@ -89,22 +84,8 @@ signals:
   void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 
 protected slots:
-  /**
-   * Slot that receives reports from tools
-   * \param message What happended to the tool
-   * \param state   Whether the tool was trying to enter or leave a state
-   * \param success Whether or not the request was a success
-   * \param uid     The tools unique id
-   */
-  void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid);
-  /**
-   * Slot that receives reports from trackers
-   * \param message What happended to the tool
-   * \param state   Whether the tool was trying to enter or leave a state
-   * \param success Whether or not the request was a success
-   * \param uid     The trackers unique id
-   */
-  void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid);
+  void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from tools
+  void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from trackers
   void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
 
 protected:
@@ -113,34 +94,12 @@ protected:
   ToolManager(); ///< use getInstance instead
   ~ToolManager(); ///< destructor
 
-  //bool pathsExists(); ///< checks that the needed paths actually exits
-  /**
-   * reads the configuration file and extracts tracker and tool nodes
-   * \param[out] trackerNode  a container for the tracker info
-   * \param[out] toolNodeList a container for the tool info
-   * \return whether or not the configuration file could be read successfully
-   */
-  //bool readConfigurationFile(QDomNodeList& trackerNode, QList<QDomNodeList>& toolNodeList);
-  /**
-   * configures a tracker according to the config file
-   * \param[in] trackerNodeList
-   * \return a pointer to the created tracker
-   */
-  //TrackerPtr configureTracker(QDomNodeList& trackerNodeList);
-  /**
-   * configures tools according to the config file
-   * \param[in] toolNodeList
-   * \return a pointer to a map containing all the created tools
-   */
-  //ssc::ToolManager::ToolMapPtr configureTools(QList<QDomNodeList>& toolNodeList);
-
   void addConnectedTool(std::string uid); ///< moves a tool from configuredTools to connectedTools
   void connectSignalsAndSlots(); ///< connects signals and slots
   void initializeManualTool();
 
   static ToolManager* mCxInstance;
 
-  //ToolConfigurationParser* mToolConfigurationParser; ///< parser that reads the configurationfile
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder;         ///< path to where logging should be saved
   QTimer* mTimer;                     ///< timer controlling the demand of transforms
@@ -158,16 +117,6 @@ protected:
   bool mInitialized;  ///< whether or not the system is initialized
   bool mTracking;   ///< whether or not the system is tracking
 
-  /*Moved to ToolConfigurationParser
-   * const std::string mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
-                    mToolTypeTag, mToolIdTag, mToolNameTag,
-                    mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
-                    mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
-                    mToolSensorChannelnumberTag, mToolSensorRomFileTag,
-                    mToolCalibrationTag, mToolCalibrationFileTag;
-                    ///< names of necessary tags in the configuration file
-                     */
-
   igstk::PulseGenerator::Pointer mPulseGenerator;
 
   ssc::LandmarkMap mLandmarks; ///< in space patient reference.
@@ -178,9 +127,10 @@ private:
 
   void createSymlink();
 };
-/**Shortcut for accessing the toolmanager instance.
- */
+
+/**Shortcut for accessing the toolmanager instance.*/
 ToolManager* toolManager();
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2); ///< function for sorting tools by type
+
 }//namespace cx
 #endif /* CXTOOLMANAGER_H_ */
