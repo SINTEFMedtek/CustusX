@@ -13,7 +13,7 @@ SET(cxProject_MOC_HDRS
   cxNavigationWidget.h
   cxBrowserWidget.h
   cxImageRegistrationWidget.h
-    cxRegistrationWidget.h
+  cxRegistrationWidget.h
   cxPatientRegistrationWidget.h
   cxTransferFunctionWidget.h
   cxTransferFunctionAlphaWidget.h
@@ -24,7 +24,8 @@ SET(cxProject_MOC_HDRS
   cxImagePropertiesWidget.h
   cxToolPropertiesWidget.h
   cxPointSamplingWidget.h
-  cxDataInterface.h  
+  cxDataInterface.h
+  cxShadingParamsInterfaces.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -72,10 +73,16 @@ SET(${LIBNAME}_SRCS
     cxShiftCorrectionWidget.cpp
     cxRegistrationHistoryWidget.h
     cxRegistrationHistoryWidget.cpp
+    cxImagePropertiesWidget.h
     cxImagePropertiesWidget.cpp
+    cxToolPropertiesWidget.h
     cxToolPropertiesWidget.cpp
+    cxPointSamplingWidget.h
     cxPointSamplingWidget.cpp
+    cxDataInterface.h
     cxDataInterface.cpp
+    cxShadingParamsInterfaces.h
+    cxShadingParamsInterfaces.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

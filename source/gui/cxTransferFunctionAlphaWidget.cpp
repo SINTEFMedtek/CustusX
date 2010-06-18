@@ -33,8 +33,14 @@ void TransferFunctionAlphaWidget::activeImageChangedSlot()
 
   mCurrentImage = activeImage;
   //TODO: call update or not ???
-  update();
+  this->update();
 }
+  
+void TransferFunctionAlphaWidget::activeImageTransferFunctionsChangedSlot()
+{
+  this->update();
+}
+  
 void TransferFunctionAlphaWidget::enterEvent(QEvent* event)
 {
   this->setMouseTracking(true);

@@ -124,6 +124,9 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
   //QString defPath = "/Users/olevs/data/UL_thunder/test/";
   QString defFile = "USAcq_29.mhd";
+  QSettings* settings = new QSettings();
+  defPath = settings->value("globalPatientDataFolder").toString();
+  defFile = "";
 #endif
 
   //mInputFile = path + "UsAcq_1.mhd";

@@ -8,6 +8,9 @@
 #include "cxDataManager.h"
 #include "sscImageTF3D.h"
 
+//#include "sscAbstractInterface.h"
+#include "cxShadingParamsInterfaces.h"
+
 namespace cx
 {
 
@@ -29,7 +32,11 @@ void TransferFunctionWidget::init()
           mTransferFunctionAlphaWidget, SLOT(activeImageChangedSlot()));
   connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
           mTransferFunctionColorWidget, SLOT(activeImageChangedSlot()));
-
+  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
+          mTransferFunctionAlphaWidget, SLOT(activeImageTransferFunctionsChangedSlot()));
+  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
+          mTransferFunctionColorWidget, SLOT(activeImageTransferFunctionsChangedSlot()));
+  
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding, 
                                               QSizePolicy::MinimumExpanding);
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding, 
@@ -54,9 +61,33 @@ void TransferFunctionWidget::init()
 
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
-  mLayout->addWidget(mShadingCheckBox);
   mLayout->addWidget(mPresetsComboBox);
   //mLayout->addWidget(mInfoWidget);
+  
+  
+  QGridLayout* shadingLayput = new QGridLayout();
+  
+  ssc::SliderGroupWidget* shadingAmbientWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceShadingAmbient()), shadingLayput, 0);
+  ssc::SliderGroupWidget* shadingDiffuseWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceShadingDiffuse()), shadingLayput, 1);
+  ssc::SliderGroupWidget* shadingSpecularWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceShadingSpecular()), shadingLayput, 2);
+  ssc::SliderGroupWidget* shadingSpecularPowerWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceShadingSpecularPower()), shadingLayput, 3);
+  
+  
+  shadingAmbientWidget->setEnabled(false);
+  shadingDiffuseWidget->setEnabled(false);
+  shadingSpecularWidget->setEnabled(false);
+  shadingSpecularPowerWidget->setEnabled(false);
+  
+  //QLabel* shadingLabel = new QLabel("Shading", this);
+  mLayout->addWidget(mShadingCheckBox);
+  mLayout->addLayout(shadingLayput);
+  
+  //mLayout->addWidget(shadingLabel);
+  //mLayout->addWidget(shadingAmbientWidget);
+  //mLayout->addWidget(shadingDiffuseWidget);
+  //mLayout->addWidget(shadingSpecularWidget);
+  //mLayout->addWidget(shadingSpecularPowerWidget);
+  
   this->setLayout(mLayout);
 
   mInitialized = true;
@@ -67,7 +98,7 @@ void TransferFunctionWidget::shadingToggledSlot(bool val)
   ssc::ImagePtr image = dataManager()->getActiveImage();
   if (image)
   {
-    image->setShading(val);
+    image->setShadingOn(val);
   }
 }
 
@@ -84,7 +115,7 @@ void TransferFunctionWidget::activeImageChangedSlot()
 
   if (activeImage)
   {
-    mShadingCheckBox->setChecked(activeImage->getShading());
+    mShadingCheckBox->setChecked(activeImage->getShadingOn());
   }
 }
 
@@ -145,6 +176,10 @@ void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
   ssc::ImageTF3DPtr transferFunctions = mCurrentImage->getTransferFunctions3D();
   transferFunctions->parseXml(mPresets.getPresetDomElement(presetName));
 
+  mCurrentImage->setShading(mPresets.getShadingPresets(presetName));
+  
+  mShadingCheckBox->setChecked(mCurrentImage->getShadingOn());
+  
   //transferFunctions->addAlphaPoint(0, 0);
   //transferFunctions->addColorPoint(0, QColor(0,0,0));
   

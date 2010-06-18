@@ -2,6 +2,7 @@
 #define PRESETTRANSFERFUNCTIONS3D_H_
 
 #include <QDomElement>
+#include "sscImage.h"
 
 class QString;
 class QStringList;
@@ -26,6 +27,7 @@ public:
 
   QStringList getPresetList(); ///< returns a list of the preset names
   QDomElement& getPresetDomElement(const QString& presetName); ///< returns a specific presets QDomElement representation
+  ssc::Image::shadingStruct getShadingPresets(const QString& presetName);///< Returns a struct with specific shading presets
 
 private:
   QStringList generatePresetList(); ///< internally generate the preset list
@@ -33,6 +35,7 @@ private:
   QDomElement& getDefaultPresetDomElement(); ///< returns a default preset
 
   QDomDocument* mPresetDomDocument; ///< the xml document with the presets
+  std::map<std::string, ssc::Image::shadingStruct> mShadings;// Map with the shading presets
 
   QDomElement mLastReturnedPreset;
 };

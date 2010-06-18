@@ -46,7 +46,12 @@ void TransferFunctionColorWidget::activeImageChangedSlot()
   //TODO: call update or not ???
   this->update();
 }
-
+  
+void TransferFunctionColorWidget::activeImageTransferFunctionsChangedSlot()
+{
+  this->update();
+}
+  
 void TransferFunctionColorWidget::mousePressEvent(QMouseEvent* event)
 {
   QWidget::mousePressEvent(event);

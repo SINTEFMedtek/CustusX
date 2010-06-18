@@ -241,6 +241,7 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   else
   {
     //Assumes ProbeCalibConfigs.xml file and calfiles have the same path
+    std::cout << "mCalFilesPath: " << mCalFilesPath << std::endl;
     QString xmlPath = mCalFilesPath+"ProbeCalibConfigs.xml";
     ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
     mConfiguration = xmlConfigParser->getConfiguration(configList[0], 
