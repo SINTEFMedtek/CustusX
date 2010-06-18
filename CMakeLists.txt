@@ -28,6 +28,13 @@ ADD_DEFINITIONS(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
 
 INCLUDE(Dart)
 
+include_directories( /usr/local/include )
+
+if (APPLE AND EXISTS /opt/local/lib) 
+    # location of cppunit library if installed using macport
+    link_directories( /opt/local/lib )
+endif (APPLE AND EXISTS /opt/local/lib)    
+
 IF (WIN32)
   ADD_DEFINITIONS(-D__WIN32__)
 ENDIF (WIN32)
@@ -77,7 +84,7 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/igstk.links DESTINATION "/Library/
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CustusX description summary")# does not work..?
 set(CPACK_PACKAGE_VENDOR "Sintef blabla")# does not work..?
 set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
-message(STATUS "licence fle: " "${CMAKE_CURRENT_SOURCE_DIR}/config/Licence.txt")
+#message(STATUS "licence fle: " "${CMAKE_CURRENT_SOURCE_DIR}/config/Licence.txt")
 set(CPACK_RECOURCE_FILE_LICENCE "${CMAKE_CURRENT_SOURCE_DIR}/config/Licence.txt") # does not work..?
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER})
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
@@ -119,7 +126,7 @@ if (BUILD_SHARED_LIBS)
         fixup_bundle(\"${APPS}\" \"\" \"${BUNDLE_DIRS}\")
         " COMPONENT Runtime)
     #FIXUP_BUNDLE(<app> <libs> <dirs>)
-    message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
+    #message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
 endif (BUILD_SHARED_LIBS)
 
 # To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X

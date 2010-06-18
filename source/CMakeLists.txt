@@ -18,18 +18,12 @@ ENDIF(QT_USE_FILE)
 
 # VTK
 #----------
-FIND_PACKAGE(VTK)
-IF(NOT VTK_DIR)
-  MESSAGE(FATAL_ERROR "Please set VTK_DIR.")
-ENDIF(NOT VTK_DIR)
+FIND_PACKAGE(VTK REQUIRED)
 INCLUDE(${VTK_USE_FILE})
 
 # ITK
 #----------
-FIND_PACKAGE(ITK)
-IF(NOT ITK_DIR)
-  MESSAGE(FATAL_ERROR "Please set ITK_DIR.")
-ENDIF(NOT ITK_DIR)
+FIND_PACKAGE(ITK REQUIRED)
 INCLUDE(${ITK_USE_FILE})
 
 # vtkINRIA3D
@@ -40,18 +34,16 @@ INCLUDE(${vtkINRIA3D_USE_FILE})
 # IGSTK
 #----------
 FIND_PACKAGE(IGSTK REQUIRED)
-IF(IGSTK_FOUND)
-  INCLUDE(${IGSTK_USE_FILE})
-ENDIF(IGSTK_FOUND)
+INCLUDE(${IGSTK_USE_FILE})
 
 # SSC
 #----------
-find_package (SSC PATHS "../externals/ssc/CMake")
-if (SSC_FOUND)
+find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
+#if (SSC_FOUND)
 	include (${SSC_USE_FILE})
-	link_directories (${SSC_DIR}/Code)
-endif (SSC_FOUND)
-message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} ) 
+#	link_directories (${SSC_DIR}/Code)
+#endif (SSC_FOUND)
+#message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} ) 
 #----------
 
 SET(SOURCES cxMain.cpp)
@@ -161,7 +153,7 @@ TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 # install tree, and on other platforms it'll go into the bin directory.
 install(TARGETS CustusX
     BUNDLE DESTINATION . #COMPONENT Runtime
-    RUNTIME DESTINATION bin #COMPONENT Runtime
+    #RUNTIME DESTINATION bin #COMPONENT Runtime
     #COMPONENT application # crashes in installer
     )
       

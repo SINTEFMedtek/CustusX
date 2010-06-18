@@ -44,10 +44,9 @@ configure_file(
 ADD_SUBDIRECTORY(Thunder)
 
 include_directories( Thunder
-  #${SSC_SOURCE_DIR}/Code/UsReconstruction/Thunder 
   ${CMAKE_CURRENT_BINARY_DIR}
 )
-link_directories( Thunder )
+link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
 
 # =========================================================
 # create the target
