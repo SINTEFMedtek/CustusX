@@ -46,10 +46,12 @@ add_subdirectory(testing)
 SET(BUNDLE_NAME CustusX)
 SET(plugin_dest_dir bin)
 SET(qtconf_dest_dir bin)
+SET(CONFIG_DIR bin)
 SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/${BUNDLE_NAME}")
 IF(APPLE)
   SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
   SET(qtconf_dest_dir ${BUNDLE_NAME}.app/Contents/Resources)
+  SET(CONFIG_DIR ${BUNDLE_NAME}.app/Contents/config)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}.app")
 ENDIF(APPLE)
 IF(WIN32)
@@ -59,7 +61,7 @@ ENDIF(WIN32)
 
 #install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config DESTINATION target_config COMPONENT config)
 #install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt DESTINATION "/Library/CustusX")# COMPONENT config)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config/ DESTINATION "./config" 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}/config" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
     #PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE
@@ -88,39 +90,42 @@ if (APPLE)
     set (CPACK_PACKAGING_INSTALL_PREFIX "/Applications/")  
 endif(APPLE)
 
-#--------------------------------------------------------------------------------
-# Use BundleUtilities to get all other dependencies for the application to work.
-# It takes a bundle or executable along with possible plugins and inspects it
-# for dependencies.  If they are not system dependencies, they are copied.
-#message(STATUS "APPS: " ${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}.app)
-# directories to look for dependencies
-SET(BUNDLE_DIRS 
-    ${SSC_DIR}/Code 
-    ${LIB_DIRECTORIES}
-    ${QT_LIBRARY_DIRS})
-#foreach (ITER ${LIB_DIRECTORIES})
-#    SET(BUNDLE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${ITER} ${BUNDLE_DIRS})    
-#endforeach (ITER ${LIB_DIRECTORIES})
-
-set(BUNDLE_LIBS )
-
-# Now the work of copying dependencies into the bundle/package
-# The quotes are escaped and variables to use at install time have their $ escaped
-# An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
-# Note that the image plugins depend on QtSvg and QtXml, and it got those copied
-# over.
-install(CODE "
-    include(BundleUtilities)
-#    fixup_bundle(\"${APPS}\" \"${BUNDLE_LIBS}\" \"${BUNDLE_DIRS}\")
-    fixup_bundle(\"${APPS}\" \"\" \"${BUNDLE_DIRS}\")
-    " COMPONENT Runtime)
-#FIXUP_BUNDLE(<app> <libs> <dirs>)
-message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
+# special handling of shared libraries: must copy them into the bundle
+if (BUILD_SHARED_LIBS)
+    #--------------------------------------------------------------------------------
+    # Use BundleUtilities to get all other dependencies for the application to work.
+    # It takes a bundle or executable along with possible plugins and inspects it
+    # for dependencies.  If they are not system dependencies, they are copied.
+    #message(STATUS "APPS: " ${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}.app)
+    # directories to look for dependencies
+    SET(BUNDLE_DIRS 
+        ${SSC_DIR}/Code 
+        ${LIB_DIRECTORIES}
+        ${QT_LIBRARY_DIRS})
+    #foreach (ITER ${LIB_DIRECTORIES})
+    #    SET(BUNDLE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${ITER} ${BUNDLE_DIRS})    
+    #endforeach (ITER ${LIB_DIRECTORIES})
+    
+    set(BUNDLE_LIBS )
+    
+    # Now the work of copying dependencies into the bundle/package
+    # The quotes are escaped and variables to use at install time have their $ escaped
+    # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
+    # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
+    # over.
+    install(CODE "
+        include(BundleUtilities)
+    #    fixup_bundle(\"${APPS}\" \"${BUNDLE_LIBS}\" \"${BUNDLE_DIRS}\")
+        fixup_bundle(\"${APPS}\" \"\" \"${BUNDLE_DIRS}\")
+        " COMPONENT Runtime)
+    #FIXUP_BUNDLE(<app> <libs> <dirs>)
+    message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
+endif (BUILD_SHARED_LIBS)
 
 # To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X
 # where CPackConfig.cmake is created by including CPack
 # And then there's ways to customize this as well
-set(CPACK_BINARY_DRAGNDROP ON)
+#set(CPACK_BINARY_DRAGNDROP ON)
 include(CPack)
 
 # dette krasjer installeren...
