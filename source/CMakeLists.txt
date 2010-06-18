@@ -80,8 +80,9 @@ set (LIB_DIRECTORIES
 set(LIB_DIRECTORIES ${LIB_DIRECTORIES} PARENT_SCOPE)
 
 INCLUDE_DIRECTORIES(
-	.
+    .
     ${SUB_FOLDERS}
+    /usr/local/include
     )
     
 
