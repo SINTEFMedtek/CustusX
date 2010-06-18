@@ -357,8 +357,6 @@ set (BUILD_SHARED_LIBS OFF CACHE BOOL "build shared or static libs")
 add_library( SSC ${SSC_GENERATED_SOURCE_FILES} )
 target_link_libraries( SSC ${SSC_GENERATED_LIBRARIES} )
 # =========================================================
-message(STATUS "libs: " ${LINK_DIRECTORIES} )
-# =========================================================
 
 # =========================================================
 # 
@@ -381,7 +379,10 @@ export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
 
 # =========================================================
-
-install( TARGETS SSC DESTINATION lib64 )
+if(APPLE)
+    # do nothing
+else(APPLE)
+    install( TARGETS SSC DESTINATION lib64 )
+endif(APPLE)
 # =========================================================
 
