@@ -579,7 +579,7 @@ __kernel void vnn(__global unsigned char * bscans0,
   else 
     volume_a(x,y,z) = bscans1[p.x + p.y*bscan_w + (current_bscan-bscan_n/2)*bscan_w*bscan_h];
 	}
-  
+}
   
   
 //temp:
@@ -835,8 +835,6 @@ printf("bscan_w: %d, bscan_h: %d, bscan_n: %d\n", bscan_w, bscan_h, bscan_n);*/
     }*/
     //else
     //volume_a(x,y,z) = 255;
-/*	}*/
-  
-  
-  
-}
+/*	}*//*
+
+}*/

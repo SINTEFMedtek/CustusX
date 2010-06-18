@@ -33,6 +33,7 @@ signals:
 public slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+  void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
 
 protected:
   struct AlphaPoint
