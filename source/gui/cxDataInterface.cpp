@@ -67,17 +67,11 @@ ssc::DoubleRange DoubleDataInterfaceActiveToolOffset::getValueRange() const
 DoubleDataInterfaceActiveImageBase::DoubleDataInterfaceActiveImageBase()
 {
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
+  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
 void DoubleDataInterfaceActiveImageBase::activeImageChanged()
 {
-  if (mImage)
-    disconnect(mImage->getLookupTable2D().get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
-
   mImage = dataManager()->getActiveImage();
-
-  if (mImage)
-    connect(mImage->getLookupTable2D().get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
-
   emit changed();
 }
 double DoubleDataInterfaceActiveImageBase::getValue() const
