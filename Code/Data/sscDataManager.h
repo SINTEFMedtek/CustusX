@@ -83,7 +83,8 @@ public:
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataLoaded(); ///emitted when data is loaded successfully
-	void activeImageChanged(const std::string& uId); ///< emitted when the active image is change
+	void activeImageChanged(const std::string& uId); ///< emitted when the active image or the image data inside the image is changed 
+	void activeImageTransferFunctionsChanged(); ///< emitted when the transfer functions in active image is changed
 	//void activeMeshChanged(const std::string& uId); ///< emitted when the active mesh is changed
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 

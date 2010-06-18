@@ -67,6 +67,7 @@ public:
 //-----
 class DataManagerImpl : public DataManager
 {
+  Q_OBJECT
 public:
 	static void initialize();
 
@@ -127,6 +128,10 @@ protected:
 	//MeshPtr mActiveMesh;
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
+  
+public slots:
+  void vtkImageDataChangedSlot();
+  void transferFunctionsChangedSlot();
 };
 
 

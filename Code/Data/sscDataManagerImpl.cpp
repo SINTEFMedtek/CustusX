@@ -191,14 +191,22 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
   if(mActiveImage == activeImage)
     return;
 
+  if (mActiveImage)
+	{
+		disconnect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		//disconnect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    disconnect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+	}
+  
   mActiveImage = activeImage;
-
-  std::string uid = "";
-  if(mActiveImage)
-    uid = mActiveImage->getUid();
-
-  emit activeImageChanged(uid);
-  std::cout << "Active image set to "<< uid << std::endl;
+  
+	if (mActiveImage)
+	{
+		connect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+		//connect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    connect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+	}
+  this->vtkImageDataChangedSlot();
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<std::string> names)
@@ -525,5 +533,19 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
   }
 }
   
+void DataManagerImpl::vtkImageDataChangedSlot()
+{
+  std::string uid = "";
+  if(mActiveImage)
+    uid = mActiveImage->getUid();
+  
+  emit activeImageChanged(uid);
+  std::cout << "Active image set to "<< uid << std::endl;
+}
+  
+void DataManagerImpl::transferFunctionsChangedSlot()
+{
+  emit activeImageTransferFunctionsChanged();
+}
 } // namespace ssc
 

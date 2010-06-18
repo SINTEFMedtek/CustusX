@@ -39,6 +39,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscImageLUT2D.h
     Data/sscDataManager.h
     Data/sscRegistrationTransform.h
+    Data/sscDataManagerImpl.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -50,8 +51,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscToolRep3D.h
     Rep/sscProbeRep.h    
     Rep/sscImageBlenderProxy.h
-    Rep/sscVolumetricRep.h 
-    #Rep/sscGPURayCastVolumetricRep.h   
+    Rep/sscVolumetricRep.h    
     Rep/sscSlicePlaneRep.h
     Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscBlendedSliceRep.h
@@ -153,8 +153,6 @@ SET( SSC_SOURCE_FILES
     Rep/sscSliceRep.h
     Rep/sscVolumetricRep.h
     Rep/sscVolumetricRep.cpp
-    #Rep/sscGPURayCastVolumetricRep.h
-    #Rep/sscGPURayCastVolumetricRep.cpp
     Rep/sscProgressiveLODVolumetricRep.cpp
     Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscGeometricRep.cpp
@@ -227,6 +225,8 @@ SET( SSC_SOURCE_FILES
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
     Widgets/sscHelperWidgets.cpp
+    Widgets/sscHelperWidgets.h
+    Widgets/sscAbstractInterface.h
 	) 
 
 # =========================================================
@@ -381,10 +381,7 @@ export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 
 
 # =========================================================
-if (APPLE)
-    # defer install to user app
-else (APPLE) # i.e. sonowand linux
-    install( TARGETS SSC DESTINATION lib64 )
-endif(APPLE)
+
+install( TARGETS SSC DESTINATION lib64 )
 # =========================================================
 

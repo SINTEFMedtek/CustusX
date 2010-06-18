@@ -37,6 +37,15 @@ class Image : public Data
 {
 	Q_OBJECT
 public:
+  struct shadingStruct
+  {
+    bool on;
+    double ambient;
+    double diffuse;
+    double specular;
+    double specularPower;
+  };
+  
 	virtual ~Image();
 	Image(const std::string& uid, const vtkImageDataPtr& data, const std::string& name="");
 	void setVtkImageData(const vtkImageDataPtr& data);
@@ -58,8 +67,18 @@ public:
 	int getPosMin();///< \return Min alpha position set to zero.
 	int getRange();///< For convenience: getMax() – getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
-  virtual void setShading(bool on);
-  virtual bool getShading() const;
+  virtual void setShadingOn(bool on);
+  virtual bool getShadingOn() const;
+  void setShadingAmbient(double ambient);             ///<Set shading ambient parmeter
+  void setShadingDiffuse(double diffuse);             ///<Set shading diffuse parmeter
+  void setShadingSpecular(double specular);           ///<Set shading specular parmeter
+  void setShadingSpecularPower(double specularPower); ///<Set shading specular power parmeter
+  double getShadingAmbient();                         ///<Get shading ambient parmeter
+  double getShadingDiffuse();                         ///<Get shading diffuse parmeter
+  double getShadingSpecular();                        ///<Get shading specular parmeter
+  double getShadingSpecularPower();                   ///<Get shading specular power parmeter
+  Image::shadingStruct getShading();
+  void setShading(Image::shadingStruct shading );
 
 	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -94,7 +113,13 @@ protected:
 	vtkImageAccumulatePtr mHistogramPtr;///< Histogram
 
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
-  bool mShading; ///< determine if shading effects are to be used for this volume.
+  
+  shadingStruct mShading;
+  /*bool mShading; ///< determine if shading effects are to be used for this volume.
+  double mAmbient;///< Shading parameter
+  double mDiffuse;///< Shading parameter
+  double mSpecular;///< Shading parameter
+  double mSpecularPower;///< Shading parameter*/
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;

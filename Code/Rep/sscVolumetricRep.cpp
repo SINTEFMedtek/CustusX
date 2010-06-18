@@ -185,7 +185,19 @@ void VolumetricRep::transferFunctionsChangedSlot()
 {
   mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
   mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
-  mVolumeProperty->SetShade(mImage->getShading());
+  mVolumeProperty->SetShade(mImage->getShadingOn());
+  
+  //Shading parameters from OsiriX
+  /*mVolumeProperty->SetAmbient(0.15);
+  mVolumeProperty->SetDiffuse(0.90);
+  mVolumeProperty->SetSpecular(0.30);
+  mVolumeProperty->SetSpecularPower(15.00);*/
+  
+  mVolumeProperty->SetAmbient(mImage->getShadingAmbient());
+  mVolumeProperty->SetDiffuse(mImage->getShadingDiffuse());
+  mVolumeProperty->SetSpecular(mImage->getShadingSpecular());
+  mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
+  
 }
 
 //---------------------------------------------------------

@@ -16,7 +16,7 @@
 
 namespace ssc
 {
-
+  
 Image::~Image()
 {}
 
@@ -28,7 +28,11 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
 	mBaseImageData(data)
 	//mLandmarks(vtkDoubleArrayPtr::New())
 {
-  mShading = false;
+  mShading.on = false;
+  mShading.ambient = 0.2;
+  mShading.diffuse = 0.9;
+  mShading.specular = 0.3;
+  mShading.specularPower = 15.0;
 
 	//mLandmarks->SetNumberOfComponents(4);
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
@@ -325,9 +329,25 @@ void Image::addXml(QDomNode& parentNode)
   mImageLookupTable2D->addXml(imageNode);
 
   QDomElement shadingNode = doc.createElement("shading");
-  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading)));
+  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
   imageNode.appendChild(shadingNode);
   std::cout << "created shading" << std::endl;
+  
+  QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
+  shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));
+  imageNode.appendChild(shadingAmbientNode);
+  
+  QDomElement shadingDiffuseNode = doc.createElement("shadingDiffuse");
+  shadingDiffuseNode.appendChild(doc.createTextNode(qstring_cast(mShading.diffuse)));
+  imageNode.appendChild(shadingDiffuseNode);
+  
+  QDomElement shadingSpecularNode = doc.createElement("shadingSpecular");
+  shadingSpecularNode.appendChild(doc.createTextNode(qstring_cast(mShading.specular)));
+  imageNode.appendChild(shadingSpecularNode);
+  
+  QDomElement shadingSpecularPowerNode = doc.createElement("shadingSpecularPower");
+  shadingSpecularPowerNode.appendChild(doc.createTextNode(qstring_cast(mShading.specularPower)));
+  imageNode.appendChild(shadingSpecularPowerNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");
   LandmarkMap::iterator it = mLandmarks.begin();
@@ -366,8 +386,25 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
 
-	mShading = dataNode.namedItem("shading").toElement().text().toInt();
-
+	mShading.on = dataNode.namedItem("shading").toElement().text().toInt();
+  //Assign default values if the shading nodes don't exists to allow backward compability
+  if(!dataNode.namedItem("shadingAmbient").isNull())
+    mShading.ambient = dataNode.namedItem("shadingAmbient").toElement().text().toDouble();
+  //else
+  //  mShading.ambient = 0.2;
+  if(!dataNode.namedItem("shadingDiffuse").isNull())
+    mShading.diffuse = dataNode.namedItem("shadingDiffuse").toElement().text().toDouble();
+  //else
+  //  mShading.diffuse = 0.9;
+  if(!dataNode.namedItem("shadingSpecular").isNull())
+    mShading.specular = dataNode.namedItem("shadingSpecular").toElement().text().toDouble();
+  //else
+  //  mShading.specular = 0.3;
+  if(!dataNode.namedItem("shadingSpecularPower").isNull())
+    mShading.specularPower = dataNode.namedItem("shadingSpecularPower").toElement().text().toDouble();
+  //else
+  //  mShading.specularPower = 15.0;
+  
 	QDomNode landmarksNode = dataNode.namedItem("landmarks");
 	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
 	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
@@ -378,16 +415,59 @@ void Image::parseXml(QDomNode& dataNode)
   }
 }
 
-void Image::setShading(bool on)
+void Image::setShadingOn(bool on)
 {
-  mShading = on;
+  mShading.on = on;
   emit transferFunctionsChanged();
 }
 
-bool Image::getShading() const
+bool Image::getShadingOn() const
+{
+  return mShading.on;
+}
+
+void Image::setShadingAmbient(double ambient)
+{
+  mShading.ambient = ambient;
+  emit transferFunctionsChanged();
+}
+  
+void Image::setShadingDiffuse(double diffuse)
+{
+  mShading.diffuse = diffuse;
+  emit transferFunctionsChanged();
+}
+  
+void Image::setShadingSpecular(double specular)
+{
+  mShading.specular = specular;
+  emit transferFunctionsChanged();
+}
+
+void Image::setShadingSpecularPower(double specularPower)
+{
+  mShading.specularPower = specularPower;
+  emit transferFunctionsChanged();
+}
+
+double Image::getShadingAmbient()
+{return mShading.ambient;}
+double Image::getShadingDiffuse()
+{return mShading.diffuse;}
+double Image::getShadingSpecular()
+{return mShading.specular;}
+double Image::getShadingSpecularPower()
+{return mShading.specularPower;}  
+
+Image::shadingStruct Image::getShading()
 {
   return mShading;
 }
 
-
+void Image::setShading(Image::shadingStruct shading )
+{
+  mShading = shading;
+  emit transferFunctionsChanged();
+}
+  
 } // namespace ssc
