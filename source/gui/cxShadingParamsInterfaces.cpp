@@ -14,17 +14,11 @@ namespace cx
 DoubleDataInterfaceShadingBase::DoubleDataInterfaceShadingBase()
 {
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
+  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
 void DoubleDataInterfaceShadingBase::activeImageChanged()
-{
-  if (mImage)
-    disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
-  
+{  
   mImage = dataManager()->getActiveImage();
-  
-  if (mImage)
-    connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(changed()));
-  
   emit changed();
 }
 
