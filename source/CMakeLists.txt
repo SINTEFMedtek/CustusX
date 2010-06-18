@@ -159,8 +159,8 @@ TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 # Install the application, on Apple, the bundle is at the root of the
 # install tree, and on other platforms it'll go into the bin directory.
 install(TARGETS CustusX
-    BUNDLE DESTINATION . COMPONENT Runtime
-    RUNTIME DESTINATION bin COMPONENT Runtime
+    BUNDLE DESTINATION . #COMPONENT Runtime
+    RUNTIME DESTINATION bin #COMPONENT Runtime
     #COMPONENT application # crashes in installer
     )
       
