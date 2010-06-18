@@ -13,11 +13,11 @@ public:
 	void setUp();
 	void tearDown();
 
-	void testInitialize();
+	void testConstructor();
 
 public:
 	CPPUNIT_TEST_SUITE( TestToolConfigurationParser );
-		CPPUNIT_TEST( testInitialize );			
+		CPPUNIT_TEST( testConstructor );
 	CPPUNIT_TEST_SUITE_END();
 private:
 
