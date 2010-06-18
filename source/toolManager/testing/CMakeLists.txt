@@ -24,7 +24,6 @@ target_link_libraries(cxTestToolManager toolManager cppunit)
 
 # -----------------------------------------------
 # -- CppUnit - CTest integration. ---------------
-if (itteno)
 # Use CISST_ADD_TESTS() to convert each CppUnit test to a CTest test. 
 
 # Initialize cisst routines
@@ -36,7 +35,6 @@ add_executable(testTM_CppUnit_CTest ${TM_TEST_SOURCE_FILES} )
 target_link_libraries(testTM_CppUnit_CTest cisstTestsMain toolManager cppunit)
 # Generate a CTest list of tests
 CISST_ADD_TESTS(testTM_CppUnit_CTest)
-endif (itteno)
 
 # -- finished CppUnit - CTest integration. ------
 # -----------------------------------------------
