@@ -206,7 +206,7 @@ void ViewsWindow::updateRender()
 {
 	std::vector<int> times;
 	int sum = 0;
-	static int count = 0;
+	//static int count = 0;
 
 
 	for (LayoutMap::iterator iter = mLayouts.begin(); iter != mLayouts.end(); ++iter)
