@@ -19,11 +19,10 @@ if (BUILD_TESTING)
     include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
     include_directories( /usr/local/include )
     
-    if (APPLE) 
+    if (APPLE AND EXISTS /opt/local/lib) 
         # location of cppunit library if installed using macport
         link_directories( /opt/local/lib )
-    endif (APPLE)
-    
+    endif (APPLE AND EXISTS /opt/local/lib)    
     
     # test starting the data manager 
     # - ssc::Image
