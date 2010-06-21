@@ -54,5 +54,5 @@ add_library( sscUsReconstructionLib ${SOURCE_FILES} )
 target_link_libraries( sscUsReconstructionLib SSC thunder ITKCommon)
 # =========================================================
 
-
+ADD_SUBDIRECTORY( testing )
 
