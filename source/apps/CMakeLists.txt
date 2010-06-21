@@ -15,8 +15,9 @@ SET ( LINK_LIBRARIES
   vtkHybrid
   vtkVolumeRendering
   IGSTK
-  vtkDataManagement
-  vtkRenderingAddOn)
+  #vtkDataManagement
+  #vtkRenderingAddOn
+  )
 
 IF(APPLE)
     ADD_EXECUTABLE ( reconstruct cxReconstructMain.cpp )

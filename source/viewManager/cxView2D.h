@@ -29,9 +29,6 @@ public:
   virtual ~View2D(); ///< empty
 
   virtual Type getType() const { return VIEW_2D;}; ///< get the class type
-  //moved to viewgroupinria void contextMenuEvent(QContextMenuEvent *event); ///< decides what happens when you rightclick in a view
-
-protected:
 };
 }//namespace cx
 #endif /* CXVIEW2D2_H_ */

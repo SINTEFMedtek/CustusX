@@ -9,7 +9,7 @@
 #include <vector>
 #include <QSettings>
 #include <vtkRenderWindow.h>
-
+#include <vtkRenderer.h>
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscSliceProxy.h"
@@ -21,7 +21,7 @@
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
-#include "cxInriaRep2D.h"
+//#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 
 namespace cx

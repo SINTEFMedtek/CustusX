@@ -7,6 +7,7 @@
 
 #include "cxViewWrapper2D.h"
 #include <vector>
+#include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "sscUtilHelpers.h"
 #include "sscView.h"
@@ -20,7 +21,7 @@
 #include "cxDataManager.h"
 #include "cxMessageManager.h"
 #include "cxViewManager.h"
-#include "cxInriaRep2D.h"
+//#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"

@@ -3,12 +3,12 @@ SET (LIB viewManager)
 SET( CX_QT_MOC_HEADER_FILES
 	cxView2D.h
 	cxView3D.h
-    cxViewWrapper2D.h
-    cxViewWrapper3D.h
+  cxViewWrapper2D.h
+  cxViewWrapper3D.h
 	cxViewManager.h
 	cxViewWrapper.h
 	cxViewGroup.h
-	cxViewGroupInria.h
+	#cxViewGroupInria.h
 )
 
 SET ( ${LIB}_viewManager
@@ -27,8 +27,8 @@ SET ( ${LIB}_viewManager
     cxViewManager.h
     cxViewGroup.h
     cxViewGroup.cpp
-    cxViewGroupInria.h
-    cxViewGroupInria.cpp
+    #cxViewGroupInria.h
+    #cxViewGroupInria.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

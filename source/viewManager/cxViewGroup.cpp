@@ -15,7 +15,7 @@
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxMessageManager.h"
-#include "cxInriaRep2D.h"
+//#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
 
