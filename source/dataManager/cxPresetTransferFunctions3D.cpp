@@ -12,7 +12,7 @@ PresetTransferFunctions3D::PresetTransferFunctions3D() :
     mPresetDomDocument(new QDomDocument("PresetTransferFunctions3D"))
 {
   this->initializeDomDocument();
-  std::cout << "QDomDoc: " << mPresetDomDocument->toString().toStdString() << std::endl;
+  //std::cout << "QDomDoc: " << mPresetDomDocument->toString().toStdString() << std::endl;
 }
 
 PresetTransferFunctions3D::~PresetTransferFunctions3D()
