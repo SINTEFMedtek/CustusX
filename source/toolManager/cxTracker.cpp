@@ -18,8 +18,8 @@ Tracker::Tracker(InternalStructure internalStructure) :
   #if defined (_WINDOWS)
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber4 );
   #else
-    //mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
-    mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber1 );
+    mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
+    //mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber1 );
   #endif //_WINDOWS
 
   mCommunication->SetParity( igstk::SerialCommunication::NoParity );

@@ -61,15 +61,16 @@ vtkPolyDataPtr Tool::getGraphicsPolyData() const
 }
 void Tool::saveTransformsAndTimestamps()
 {
+  if(this->getType() == Tool::TOOL_REFERENCE)
+    return;  //we don't save transforms and timestamps for reference tools
+
   QDateTime dateTime = QDateTime::currentDateTime();
   std::string stamp = dateTime.toString(QString("ddMMyyhhmmss")).toStdString();
 
   std::stringstream timestampsName;
   std::stringstream transformsName;
-  //timestampsName << mInternalStructure.mLoggingFolderName
   timestampsName << mInternalStructure.mTransformSaveFileName 
   << ssc::Tool::mName << "_" << stamp << "_timestamps.txt";
-  //transformsName << mInternalStructure.mLoggingFolderName
   transformsName << mInternalStructure.mTransformSaveFileName 
   << ssc::Tool::mName << "_" << stamp << "_transforms.txt";
   
@@ -203,14 +204,14 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
       Tool* ref = dynamic_cast<Tool*>(tool);
       if(!ref->getPointer()->IsCoordinateSystem(destination))
         return;
-      std::cout << "RefTool is the destiantion." << std::endl;
+      //std::cout << "RefTool is the destiantion." << std::endl;
     }else //if we dont have a reftool we use the tracker as patientref
     {
       //std::cout << "Checking that the incoming transforms destiantion is the TRACKER." << std::endl;
       TrackerPtr tracker = toolManager()->getTracker();
       if(!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
         return;
-      std::cout << "Tracker is the destiantion." << std::endl;
+      //std::cout << "Tracker is the destiantion." << std::endl;
     }
 
     vtkMatrix4x4Ptr vtkMatrix =  vtkMatrix4x4Ptr::New();
