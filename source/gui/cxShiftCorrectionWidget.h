@@ -12,8 +12,8 @@ class QSpinBox;
 #include <itkImage.h>
 #include <itkImageFileReader.h>
 #include <itkImageFileWriter.h>
-#include <itkImageToVTKImageFilter.h>
 #include <vtkSmartPointer.h>
+#include "itkImageToVTKImageFilter.h"
 
 typedef vtkSmartPointer<class vtkMarchingCubes> vtkMarchingCubesPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;

@@ -83,6 +83,10 @@ SET(${LIBNAME}_SRCS
     cxDataInterface.cpp
     cxShadingParamsInterfaces.h
     cxShadingParamsInterfaces.cpp
+    ItkVtkGlue/itkImageToVTKImageFilter.h
+    ItkVtkGlue/itkImageToVTKImageFilter.txx
+    ItkVtkGlue/itkVTKImageToImageFilter.h
+    ItkVtkGlue/itkVTKImageToImageFilter.txx
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
