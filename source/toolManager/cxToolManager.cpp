@@ -106,8 +106,19 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
+  if(mConfigurationFilePath.empty() || !QFile::exists(QString(mConfigurationFilePath.c_str())))
+  {
+    messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
+    return;
+  }
+
   ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath, mLoggingFolder);
   mTracker = toolConfigurationParser.getTracker();
+  if(mTracker->getType() == Tracker::TRACKER_NONE)
+  {
+    messageManager()->sendError("Could not configure the toolmanager, tracker is invalid.");
+    return;
+  }
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
 
   this->configureReferences();
