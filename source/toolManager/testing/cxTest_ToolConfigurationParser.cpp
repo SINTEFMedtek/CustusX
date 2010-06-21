@@ -1,19 +1,38 @@
 #include "cxTest_ToolConfigurationParser.h"
 
+#include "sscTestUtilities.h"
 #include "cxToolConfigurationParser.h"
+#include <QFile>
 
 void TestToolConfigurationParser::setUp()
 {
-  // this stuff will be performed just before all tests in this class
+  mXmlFilePath = QString(ssc::TestUtilities::ExpandDataFileName(
+     "../../../toolConfigurations/Lab/POLARIS_07-198-0838_SW_Pointer_02_AND_02-206-00913_SW_PasRef_01.xml").c_str());
+
+  std::string xmlFilePath = mXmlFilePath.toStdString();
+  mConfigurationParser = new cx::ToolConfigurationParser(xmlFilePath);
 }
 
 void TestToolConfigurationParser::tearDown()
 {
-  // this stuff will be performed just after all tests in this class
+  delete mConfigurationParser;
 }
 
 void TestToolConfigurationParser::testConstructor()
 {
-  std::string xmlFilePath = "../../../modules/xmlFileGenerator/ProbeCalibConfigs.xml";
-  cx::ToolConfigurationParser configurationParser(xmlFilePath);
+  CPPUNIT_ASSERT_MESSAGE("Xml file does not exist.", QFile::exists(mXmlFilePath));
+  CPPUNIT_ASSERT_MESSAGE("Could not make a new configuration parser.", mConfigurationParser);
+}
+
+void TestToolConfigurationParser::testGetTracker()
+{
+  cx::TrackerPtr tracker = mConfigurationParser->getTracker();
+  CPPUNIT_ASSERT_MESSAGE("Tracker is null.", tracker);
+  CPPUNIT_ASSERT_MESSAGE("Tracker is not of type Polaris.", tracker->getType() == cx::Tracker::TRACKER_POLARIS);
+}
+
+void TestToolConfigurationParser::testGetConfiguredTools()
+{
+  cx::ToolMapPtr toolmap = mConfigurationParser->getConfiguredTools();
+  CPPUNIT_ASSERT_MESSAGE("Not the right number of tools.", toolmap->size() == 2);
 }
