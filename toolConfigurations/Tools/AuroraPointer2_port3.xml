@@ -6,9 +6,9 @@
 <!-- ==== -->
 <tool>
   <type>pointer</type>
-  <id>AuroraPointer01</id>
-  <name>Aurora pointer</name>
-  <description>Aurora pointer 1</description>
+  <id>AuroraPointer02</id>
+  <name>Aurora pointer 2</name>
+  <description>Aurora pointer 2</description>
   <manufacturer>NDI</manufacturer>
   <clinical_app>Lab</clinical_app>
   <geo_file></geo_file>
@@ -27,11 +27,11 @@
   <!-- Sensor -->
   <sensor>
     <type>Aurora</type>
-    <id>Aurora01</id>
+    <id>Aurora02</id>
     <name>AuroraSensor1</name>
     <wireless>yes</wireless>
     <DOF>5</DOF>
-    <portnumber>1</portnumber>
+    <portnumber>2</portnumber>
     <channelnumber>0</channelnumber>
     <manufacturer>NDI</manufacturer>
     <description></description>
