@@ -16,7 +16,7 @@
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxViewGroup.h"
-#include "cxViewGroupInria.h"
+//#include "cxViewGroupInria.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
@@ -27,9 +27,9 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
 {
   "No_layout",
   "3D_1X1",
-  "3DACS_2X2_inria",
-  "3DACS_1X3_inria",
-  "ACSACS_2X3_inria",
+  //"3DACS_2X2_inria",
+  //"3DACS_1X3_inria",
+  //"ACSACS_2X3_inria",
   "3DACS_2X2",
   "3DACS_1X3",
   "3DAny_1X2",
@@ -126,10 +126,10 @@ ViewManager::ViewManager() :
   group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_15"])));
   mViewGroups.push_back(group);
 
-  group.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
+  /*group.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
   mViewGroups.push_back(group);
   group.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
-  mViewGroups.push_back(group);
+  mViewGroups.push_back(group);*/
 
   this->syncOrientationMode(SyncedValue::create(0));
 
@@ -393,7 +393,7 @@ void ViewManager::activateLayout(LayoutType toType)
   case LAYOUT_3D_1X1:
     this->activateLayout_3D_1X1();
     break;
-  case LAYOUT_3DACS_2X2:
+  /*case LAYOUT_3DACS_2X2:
     this->activateLayout_3DACS_2X2();
     break;
   case LAYOUT_3DACS_1X3:
@@ -401,7 +401,7 @@ void ViewManager::activateLayout(LayoutType toType)
     break;
   case LAYOUT_ACSACS_2X3:
     this->activateLayout_ACSACS_2X3();
-    break;
+    break;*/
   case LAYOUT_3DACS_2X2_SNW:
     this->activateLayout_3DACS_2X2_SNW();
     break;
@@ -457,11 +457,11 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
 //  }
 }
   
-void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan)
+/*void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan) INRIA SPECIFIC?
 {
   mLayout->addWidget(view, row, col, rowSpan, colSpan );
   view->show();
-}
+}*/
 void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
 {
   mViewGroups[group]->initializeView(index, plane);
@@ -490,7 +490,7 @@ void ViewManager::activateLayout_3D_1X1()
   emit activeLayoutChanged();
 }
 
-void ViewManager::activateLayout_3DACS_2X2()
+/*void ViewManager::activateLayout_3DACS_2X2() INRIA
 {
   activate3DView(0, 0,                  0, 0);
 
@@ -500,7 +500,7 @@ void ViewManager::activateLayout_3DACS_2X2()
 
   mActiveLayout = LAYOUT_3DACS_2X2;
   emit activeLayoutChanged();
-}
+}*/
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
 {
@@ -523,7 +523,6 @@ void ViewManager::activateLayout_3DACS_1X3_SNW()
   mActiveLayout = LAYOUT_3DACS_1X3_SNW;
   emit activeLayoutChanged();
 }
-
 
 void ViewManager::activateLayout_ACSACS_2X3_SNW()
 {
@@ -560,7 +559,7 @@ void ViewManager::activateLayout_3DAny_1X2_SNW()
   emit activeLayoutChanged();
 }
 
-void ViewManager::activateLayout_3DACS_1X3()
+/*void ViewManager::activateLayout_3DACS_1X3() INRIA
 {
   activate3DView(0, 0,                  0, 0, 3, 1);
 
@@ -570,9 +569,9 @@ void ViewManager::activateLayout_3DACS_1X3()
 
   mActiveLayout = LAYOUT_3DACS_1X3;
   emit activeLayoutChanged();
-}
+}*/
 
-void ViewManager::activateLayout_ACSACS_2X3()
+/*void ViewManager::activateLayout_ACSACS_2X3() INRIA
 {
   activateView(mView2DMap[mView2DNames[0]],   0, 0);
   activateView(mView2DMap[mView2DNames[1]],   0, 1);
@@ -584,7 +583,7 @@ void ViewManager::activateLayout_ACSACS_2X3()
 
   mActiveLayout = LAYOUT_ACSACS_2X3;
   emit activeLayoutChanged();
-}
+}*/
 
 void ViewManager::renderAllViewsSlot()
 {

@@ -40,7 +40,11 @@ SET(cxProject_RCCS cxResources.qrc)
 # generate rules for building source files from the resources
 QT4_ADD_RESOURCES(cxProject_RCC_SRCS ${cxProject_RCCS})
 
-SET(${LIBNAME}_SRCS 
+SET(${LIBNAME}_SRCS
+    ItkVtkGlue/itkImageToVTKImageFilter.h
+    ItkVtkGlue/itkImageToVTKImageFilter.txx
+    ItkVtkGlue/itkVTKImageToImageFilter.h
+    ItkVtkGlue/itkVTKImageToImageFilter.txx 
     cxMainWindow.h
     cxMainWindow.cpp 
     cxFileCopied.cpp
@@ -83,10 +87,6 @@ SET(${LIBNAME}_SRCS
     cxDataInterface.cpp
     cxShadingParamsInterfaces.h
     cxShadingParamsInterfaces.cpp
-    ItkVtkGlue/itkImageToVTKImageFilter.h
-    ItkVtkGlue/itkImageToVTKImageFilter.txx
-    ItkVtkGlue/itkVTKImageToImageFilter.h
-    ItkVtkGlue/itkVTKImageToImageFilter.txx
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

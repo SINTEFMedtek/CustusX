@@ -28,8 +28,8 @@ INCLUDE(${ITK_USE_FILE})
 
 # vtkINRIA3D
 #----------
-FIND_PACKAGE(vtkINRIA3D REQUIRED)
-INCLUDE(${vtkINRIA3D_USE_FILE})
+#FIND_PACKAGE(vtkINRIA3D REQUIRED)
+#INCLUDE(${vtkINRIA3D_USE_FILE})
 
 # IGSTK
 #----------
@@ -136,8 +136,8 @@ SET ( LINK_LIBRARIES
 #  ITKBasicFilters
 #  ITKIO
   IGSTK
-  vtkDataManagement
-  vtkRenderingAddOn
+  #vtkDataManagement
+  #vtkRenderingAddOn
   QVTK
   sscUsReconstructionLib  
   SSC

@@ -21,9 +21,9 @@ enum LayoutType
 {
   LAYOUT_NONE=0,
   LAYOUT_3D_1X1,
-  LAYOUT_3DACS_2X2,
-  LAYOUT_3DACS_1X3,
-  LAYOUT_ACSACS_2X3,
+  //LAYOUT_3DACS_2X2, inria
+  //LAYOUT_3DACS_1X3, inria
+  //LAYOUT_ACSACS_2X3, inria
   LAYOUT_3DACS_2X2_SNW,
   LAYOUT_3DACS_1X3_SNW,
   LAYOUT_3DAny_1X2_SNW,
@@ -112,15 +112,15 @@ protected:
 //  void centerToTooltip();
   void deactivateCurrentLayout();
   void activateLayout(LayoutType toType);
-  void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);
+  //void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);
   void activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan=1, int colSpan=1);
   void activate3DView(int group, int index, int row, int col, int rowSpan=1, int colSpan=1);
   void deactivateView(ssc::View* view);
 
   void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
-  void activateLayout_3DACS_2X2(); ///< activate the 3DACS_2X2 layout
-  void activateLayout_3DACS_1X3(); ///< activate the 3DACS_1X3 layout
-  void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout
+  //void activateLayout_3DACS_2X2(); ///< activate the 3DACS_2X2 layout, inria
+  //void activateLayout_3DACS_1X3(); ///< activate the 3DACS_1X3 layout, inria
+  //void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout, inria
   void activateLayout_3DAny_1X2_SNW();
   void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
   void activateLayout_3DACS_1X3_SNW(); ///< activate the 3DACS_1X3 layout

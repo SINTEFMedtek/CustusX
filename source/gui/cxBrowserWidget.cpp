@@ -78,17 +78,17 @@ void BrowserWidget::populateTreeWidget()
     case LAYOUT_3D_1X1:
       numberOf3DViews = 1;
       break;
-    case LAYOUT_3DACS_2X2:
+    /*case LAYOUT_3DACS_2X2: INRIA
       numberOf3DViews = 1;
       numberOf2DViews = 3;
       break;
-    case LAYOUT_3DACS_1X3:
+    case LAYOUT_3DACS_1X3: INRIA
       numberOf3DViews = 1;
       numberOf2DViews = 3;
       break;
-    case LAYOUT_ACSACS_2X3:
+    case LAYOUT_ACSACS_2X3: INRIA
       numberOf2DViews = 6;
-      break;
+      break;*/
     default:
       break;
   }

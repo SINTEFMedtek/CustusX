@@ -485,10 +485,11 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
       report.append("not ");
     if (state)
     {
-      //Should this really be done here?
-      mInitialized = success;
-      emit initialized();
-      messageManager()->sendInfo("ToolManager is initialized.");
+      if(success){ //Should this really be done here?
+        mInitialized = success;
+        emit initialized();
+        messageManager()->sendInfo("ToolManager is initialized. (TRACKER_OPEN)");
+      }
       report.append("open.");
     } else
     {
@@ -506,7 +507,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
     {
       mInitialized = true;
       emit initialized();
-      messageManager()->sendInfo("ToolManager is initialized.");
+      messageManager()->sendInfo("ToolManager is initialized.(TRACKER_INITIALIZED");
     }
     report.append("initialized.");
     break;

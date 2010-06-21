@@ -18,7 +18,8 @@ Tracker::Tracker(InternalStructure internalStructure) :
   #if defined (_WINDOWS)
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber4 );
   #else
-    mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
+    //mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
+    mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber1 );
   #endif //_WINDOWS
 
   mCommunication->SetParity( igstk::SerialCommunication::NoParity );
@@ -28,8 +29,8 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mCommunication->SetHardwareHandshake(igstk::SerialCommunication::HandshakeOff);
 
   mCommunication->SetCaptureFileName( "RecordedStreamByCustusX3.txt" );
-  //mCommunication->SetCapture( true );
-  mCommunication->SetCapture( false );
+  mCommunication->SetCapture( true );
+  //mCommunication->SetCapture( false );
 
   switch (mInternalStructure.mType)
   {
@@ -42,28 +43,33 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mUid = mName = "Polaris";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
+    messageManager()->sendInfo("Tracker: Polaris");
     mTracker = mTempPolarisTracker.GetPointer();
     break;
   case TRACKER_POLARIS_SPECTRA:
     mUid = mName = "Polaris Spectra";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
+    messageManager()->sendInfo("Tracker: Polaris Spectra");
     mTracker = mTempPolarisTracker.GetPointer();
     break;
   case TRACKER_POLARIS_VICRA:
     mUid = mName = "Polaris Vicra";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
+    messageManager()->sendInfo("Tracker: Polaris Vicra");
     mTracker = mTempPolarisTracker.GetPointer();
     break;
   case TRACKER_AURORA:
     mUid = mName = "Aurora";
     mTempAuroraTracker = AuroraTrackerType::New();
     mTempAuroraTracker->SetCommunication(mCommunication);
+    messageManager()->sendInfo("Tracker: Aurora");
     mTracker = mTempAuroraTracker.GetPointer();
     break;
   case TRACKER_MICRON:
     mUid = mName = "Micron";
+    messageManager()->sendInfo("Tracker: Micron");
     //TODO: implement support for a micron tracker...
     break;
   default:

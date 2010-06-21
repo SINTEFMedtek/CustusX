@@ -4,6 +4,7 @@
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
+#include <vtkRenderer.h>
 #include "sscImage.h"
 #include "sscVolumetricRep.h"
 #include "cxRepManager.h"

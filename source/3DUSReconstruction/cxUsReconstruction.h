@@ -23,7 +23,7 @@
 #include <vtkImageData.h>
 //#include <itkImageFileReader.h>
 #include <itkRescaleIntensityImageFilter.h>
-#include "itkImageToVTKImageFilter.h"
+#include "itkVtkGlue/itkImageToVTKImageFilter.h"
 
 // Move to a volume class
 #include <vtkImageWriter.h>

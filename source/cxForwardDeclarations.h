@@ -11,7 +11,7 @@
  */
 
 namespace cx {
-typedef boost::shared_ptr<class InriaRep2D> InriaRep2DPtr;
+//typedef boost::shared_ptr<class InriaRep2D> InriaRep2DPtr;
 typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
 
 class View2D;
