@@ -77,9 +77,10 @@ void PresetTransferFunctions3D::initializeDomDocument()
   QDomElement alphaNode = mPresetDomDocument->createElement("alpha");
   QStringList pointStringList;
   pointStringList.append(QString("0=0"));
-  pointStringList.append(QString("100=100"));
-  pointStringList.append(QString("150=100"));
-  pointStringList.append(QString("200=200"));
+  pointStringList.append(QString("990=0"));
+  pointStringList.append(QString("1133=1"));
+  pointStringList.append(QString("1400=200"));
+  pointStringList.append(QString("2000=200"));
   alphaNode.appendChild(mPresetDomDocument->createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   presetElement.appendChild(alphaNode);
@@ -87,8 +88,9 @@ void PresetTransferFunctions3D::initializeDomDocument()
   // Add color points
   QDomElement colorNode = mPresetDomDocument->createElement("color");
   pointStringList.append(QString("0=0/0/0"));
-  pointStringList.append(QString("150=255/255/0"));
-  pointStringList.append(QString("200=255/0/0"));
+  pointStringList.append(QString("1170=255/0/0"));
+  pointStringList.append(QString("1280=255/255/0"));
+  pointStringList.append(QString("2000=255/255/0"));
   colorNode.appendChild(mPresetDomDocument->createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   presetElement.appendChild(colorNode);
@@ -109,8 +111,9 @@ void PresetTransferFunctions3D::initializeDomDocument()
   // Add alpha points
   alphaNode = mPresetDomDocument->createElement("alpha");
   pointStringList.append(QString("0=0"));
-  pointStringList.append(QString("200=50"));
-  pointStringList.append(QString("300=255"));
+  pointStringList.append(QString("920=0"));
+  pointStringList.append(QString("1245=2"));
+  pointStringList.append(QString("1920=200"));
   alphaNode.appendChild(mPresetDomDocument->createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   presetElement.appendChild(alphaNode);
@@ -118,18 +121,18 @@ void PresetTransferFunctions3D::initializeDomDocument()
   // Add color points
   colorNode = mPresetDomDocument->createElement("color");
   pointStringList.append(QString("0=0/0/0"));
-  pointStringList.append(QString("200=255/255/0"));
-  pointStringList.append(QString("300=0/0/255"));
+  pointStringList.append(QString("910=255/255/0"));
+  pointStringList.append(QString("1610=0/0/255"));
   colorNode.appendChild(mPresetDomDocument->createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   presetElement.appendChild(colorNode);
   
   // Add shading parameters
   mShadings["CT - Blue"].on = true;
-  mShadings["CT - Blue"].ambient = 0.2;
+  mShadings["CT - Blue"].ambient = 0.5;
   mShadings["CT - Blue"].diffuse = 0.9;
   mShadings["CT - Blue"].specular = 0.3;
-  mShadings["CT - Blue"].specularPower = 15.0;
+  mShadings["CT - Blue"].specularPower = 2.0;
   
   //========== ct - soft tissue standard ==========
   presetElement = mPresetDomDocument->createElement("Preset");
@@ -139,20 +142,20 @@ void PresetTransferFunctions3D::initializeDomDocument()
   
   // Add alpha points
   alphaNode = mPresetDomDocument->createElement("alpha");
-  pointStringList.append(QString("12=0"));
-  pointStringList.append(QString("202=7"));//6.885"));
-  pointStringList.append(QString("404=34"));//33.915"));
-  pointStringList.append(QString("549=174"));//173.91"));
+  pointStringList.append(QString("1024=0"));
+  pointStringList.append(QString("1226=7"));//6.885"));
+  pointStringList.append(QString("1428=34"));//33.915"));
+  pointStringList.append(QString("1573=174"));//173.91"));
   alphaNode.appendChild(mPresetDomDocument->createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   presetElement.appendChild(alphaNode);
   
   // Add color points
   colorNode = mPresetDomDocument->createElement("color");
-  pointStringList.append(QString("12=0/0/0"));
-  pointStringList.append(QString("202=255/0/0"));
-  pointStringList.append(QString("404=255/255/0"));
-  pointStringList.append(QString("549=255/255/255"));
+  pointStringList.append(QString("1036=0/0/0"));
+  pointStringList.append(QString("1226=255/0/0"));
+  pointStringList.append(QString("1428=255/255/0"));
+  pointStringList.append(QString("1573=255/255/255"));
   colorNode.appendChild(mPresetDomDocument->createTextNode(pointStringList.join(" ")));
   pointStringList.clear();
   presetElement.appendChild(colorNode);
