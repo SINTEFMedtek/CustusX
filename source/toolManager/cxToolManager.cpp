@@ -210,6 +210,7 @@ void ToolManager::stopTracking()
 void ToolManager::saveToolsSlot()
 {
   this->saveTransformsAndTimestamps();
+  messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
 ssc::LandmarkMap ToolManager::getLandmarks()
@@ -373,8 +374,7 @@ void ToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
   ToolMapConstIter it = mConnectedTools->begin();
   while (it != mConnectedTools->end())
   {
-    //TODO: Check/move following line, filename should probably be set elsewhere
-    ((*it).second)->setTransformSaveFile(filePathAndName);
+    //((*it).second)->setTransformSaveFile(filePathAndName); is set during tools constructor
     ((*it).second)->saveTransformsAndTimestamps();
     it++;
   }
