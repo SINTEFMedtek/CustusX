@@ -105,7 +105,9 @@ void ViewWrapper::imageActionSlot()
   }
   else
   {
-    std::cout << "ViewGroup::ViewWrapper - remove - [" << imageUid<< "]" << image.get() << std::endl;
+    //ssc::messageManager()->sendInfo("ViewGroup::ViewWrapper - remove - [" 
+    //                                + string_cast(imageUid) + "]" 
+    //                                + string_cast(image.get()));
     this->removeImage(image);
     dataManager()->setActiveImage(ssc::ImagePtr());
   }

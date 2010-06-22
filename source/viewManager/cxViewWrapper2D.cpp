@@ -331,12 +331,12 @@ void ViewWrapper2D::removeImage(ssc::ImagePtr image)
 {
   if (!image)
     return;
-  std::cout << "remove 2d: " << image->getName() << std::endl;
-  std::cout << "size " << mImage.size() << std::endl;
+  //std::cout << "remove 2d: " << image->getName() << std::endl;
+  //std::cout << "size " << mImage.size() << std::endl;
   if (!std::count(mImage.begin(), mImage.end(), image))
     return;
   mImage.erase(std::find(mImage.begin(), mImage.end(), image));
-  std::cout << "size " << mImage.size() << std::endl;
+  //std::cout << "size " << mImage.size() << std::endl;
 //
 //  if (mImage.empty())
 //    mSliceRep->setImage(ssc::ImagePtr());

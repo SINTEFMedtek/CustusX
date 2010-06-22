@@ -37,14 +37,15 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr frameMask)
 {
   QFileInfo path(THUNDER_KERNEL_PATH+QString("kernels.ocl"));
-  ssc::messageManager()->sendInfo("kernels path: " 
-                                  + string_cast(path.absoluteFilePath().toStdString()));
+  //ssc::messageManager()->sendInfo("kernels path: " 
+  //                                + string_cast(path.absoluteFilePath().toStdString()));
   
   if (!path.exists())
     path = QFileInfo("./kernels.ocl");
   if (!path.exists())
   {
-    ssc::messageManager()->sendWarning("Error: Can't find kernels.ocl");
+    ssc::messageManager()->sendError("Error: Can't find kernels.ocl in "
+                                     + string_cast(path.absoluteFilePath().toStdString()));
     return;
   }
   
@@ -56,12 +57,12 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   
   //test
   long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
-  ssc::messageManager()->sendInfo("input size: " 
-                                  + string_cast(size));
-  ssc::messageManager()->sendInfo("input dimensions: " 
-                                  + string_cast(data.input_dim[0]) + " " 
-                                  + string_cast(data.input_dim[1]) + " " 
-                                  + string_cast(data.input_dim[2]));
+  ssc::messageManager()->sendDebug("input size: " 
+                                   + string_cast(size));
+  //ssc::messageManager()->sendInfo("input dimensions: " 
+  //                                + string_cast(data.input_dim[0]) + " " 
+  //                                + string_cast(data.input_dim[1]) + " " 
+  //                                + string_cast(data.input_dim[2]));
   //for (int i = 0; i < size; i++)
   //  data.input[i]=255;
   
@@ -82,7 +83,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   output->GetSpacing(data.output_spacing);
   
   reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str());
-  ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
+  //ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
 }
   
   

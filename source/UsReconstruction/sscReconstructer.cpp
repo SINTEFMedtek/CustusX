@@ -492,21 +492,23 @@ void Reconstructer::calibrateTimeStamps(double offset, double scale)
  */
 void Reconstructer::calibrateTimeStamps()
 {
+  //TODO: Use data from a time calibration instead of this function
+  ssc::messageManager()->sendInfo("Generate time calibration based on input time stamps.");
   double framesSpan = mFrames.back().mTime - mFrames.front().mTime;
   double positionsSpan = mPositions.back().mTime - mPositions.front().mTime;
   double scale = framesSpan / positionsSpan;
-  ssc::messageManager()->sendInfo("framesTimeSpan: " 
-                                  + string_cast(framesSpan)
-                                  + ", positionsTimeSpan: " 
-                                  + string_cast(positionsSpan));
+  //ssc::messageManager()->sendDebug("framesTimeSpan: " 
+  //                                 + string_cast(framesSpan)
+  //                                 + ", positionsTimeSpan: " 
+  //                                 + string_cast(positionsSpan));
   
   double offset = mFrames.front().mTime - scale * mPositions.front().mTime;
   
-  ssc::messageManager()->sendWarning(string_cast("Reconstructor::calibrateTimeStamps()")
-                                     + "NB!!! generated offset: " 
-                                     + string_cast(offset)
-                                     + " scale: "
-                                     + string_cast(scale));
+  //ssc::messageManager()->sendDebug(string_cast("Reconstructor::calibrateTimeStamps()")
+  //                                 + "NB!!! generated offset: " 
+  //                                 + string_cast(offset)
+  //                                 + " scale: "
+  //                                 + string_cast(scale));
   calibrateTimeStamps(offset, scale);
 }
 
@@ -766,11 +768,11 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
   retval[2] = ssc::Vector3D(xmin*spacing[0], ymax*spacing[1], 0);
   retval[3] = ssc::Vector3D(xmax*spacing[0], ymax*spacing[1], 0);
   
-  ssc::messageManager()->sendInfo("x and y, min and max: " 
-                                  + string_cast(xmin) + " "
-                                  + string_cast(xmax) + " " 
-                                  + string_cast(ymin) + " "
-                                  + string_cast(ymax));
+  //ssc::messageManager()->sendInfo("x and y, min and max: " 
+  //                                + string_cast(xmin) + " "
+  //                                + string_cast(xmax) + " " 
+  //                                + string_cast(ymin) + " "
+  //                                + string_cast(ymax));
   
   /*retval[0] = ssc::Vector3D(0,0,0);
   retval[1] = ssc::Vector3D(dims[0]*spacing[0],0,0);
@@ -884,10 +886,10 @@ ImagePtr Reconstructer::generateOutputVolume()
   ssc::Vector3D dim = mOutputVolumeParams.getDim();
   ssc::Vector3D spacing = ssc::Vector3D(1,1,1) * mOutputVolumeParams.getSpacing();
   
-  ssc::messageManager()->sendInfo("output dim: "
-                                  + string_cast(dim));
-  ssc::messageManager()->sendInfo("output spacing: "
-                                  + string_cast(spacing));  
+  //ssc::messageManager()->sendInfo("output dim: "
+  //                                + string_cast(dim));
+  //ssc::messageManager()->sendInfo("output spacing: "
+  //                                + string_cast(spacing));  
   
   vtkImageDataPtr data = this->generateVtkImageData(dim, spacing, 0);
   
