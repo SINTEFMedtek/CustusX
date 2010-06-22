@@ -205,6 +205,8 @@ QString ReconstructionWidget::getCurrentPath()
 
 void ReconstructionWidget::reconstruct()
 {
+  ssc::messageManager()->sendInfo("Reconstructing...");
+  qApp->processEvents();
   mReconstructer->reconstruct();
 }
 
