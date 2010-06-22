@@ -7,6 +7,8 @@
 #ifndef SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 #define SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
+#include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -92,7 +94,8 @@ public:
     if (volumeSize > mMaxVolumeSize)
     {
       double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
-      std::cout << "Downsampled volume - Used scaleFactor : " << scaleFactor << std::endl;
+      ssc::messageManager()->sendInfo("Downsampled volume - Used scaleFactor : "
+                                      +string_cast(scaleFactor));
 //      mDim /= scaleFactor;
 //      mSpacing *= scaleFactor;
       this->setSpacing(mSpacing*scaleFactor);
