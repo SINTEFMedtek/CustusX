@@ -16,7 +16,7 @@
 namespace cx
 {
 ContextDockWidget::ContextDockWidget(QWidget* parent) :
-  QDockWidget(parent),
+  QDockWidget("ContextDockWidget", parent),
   mGuiWidget(new QWidget(this)),
   mVerticalLayout(new QVBoxLayout()),
   mImagesComboBox(new QComboBox(mGuiWidget)),
