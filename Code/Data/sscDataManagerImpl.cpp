@@ -27,6 +27,7 @@ typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformati
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -540,7 +541,8 @@ void DataManagerImpl::vtkImageDataChangedSlot()
     uid = mActiveImage->getUid();
   
   emit activeImageChanged(uid);
-  std::cout << "Active image set to "<< uid << std::endl;
+  messageManager()->sendInfo("Active image set to "
+                             +string_cast(uid));
 }
   
 void DataManagerImpl::transferFunctionsChangedSlot()

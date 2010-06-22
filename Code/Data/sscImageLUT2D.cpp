@@ -277,9 +277,9 @@ void ImageLUT2D::parseXml(QDomNode dataNode)
   if (dataNode.isNull())
     return;
 
-  std::cout << "Loading window (pre): " << mWindow << std::endl;
+  //std::cout << "Loading window (pre): " << mWindow << std::endl;
   mWindow = loadAttribute(dataNode, "window", mWindow);
-  std::cout << "Loading window (port): " << mWindow << std::endl;
+  //std::cout << "Loading window (port): " << mWindow << std::endl;
   mLevel = loadAttribute(dataNode, "level", mLevel);
   mLLR = loadAttribute(dataNode, "llr", mLLR);
   mAlpha = loadAttribute(dataNode, "alpha", mAlpha);
