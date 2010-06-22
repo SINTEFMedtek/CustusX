@@ -18,7 +18,7 @@ if (BUILD_TESTING)
     include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
     include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
     include_directories( /usr/local/include )
-    
+         
     # cppunit
     find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib)  
     

@@ -143,8 +143,29 @@ void FoldersTab::browsePatientDataFolderSlot()
 
 void FoldersTab::browseToolConfigFolderSlot()
 {
-  mCurrentToolConfigFolder = QFileDialog::getExistingDirectory(this, 
-                                                     tr("Find Tool Config Folder"), 
+//  QFileDialog dialog(this, tr("Find Tool Config Folder"));
+//
+//  QList<QUrl> urls;
+//  urls << QUrl::fromLocalFile(qApp->applicationFilePath())
+//       << QUrl::fromLocalFile("/usr")
+//       << QUrl::fromLocalFile("/usr/bin/")
+//       << QUrl::fromLocalFile(qApp->applicationFilePath()+"/../config/");
+//  dialog.setSidebarUrls(urls);
+//
+//  dialog.setOption(QFileDialog::ShowDirsOnly, true);
+//  dialog.setFileMode(QFileDialog::Directory);
+//  dialog.setDirectory(qApp->applicationFilePath());
+////  dialog.setDirectory(mCurrentToolConfigFolder);
+//
+//
+//  if(!dialog.exec() || dialog.selectedFiles().isEmpty())
+//    return;
+//
+//  mCurrentToolConfigFolder = dialog.selectedFiles().front();
+
+
+  mCurrentToolConfigFolder = QFileDialog::getExistingDirectory(this,
+                                                     tr("Find Tool Config Folder"),
                                                      mCurrentToolConfigFolder,
                                                      QFileDialog::ShowDirsOnly);
   if( !mCurrentToolConfigFolder.isEmpty() ) {
