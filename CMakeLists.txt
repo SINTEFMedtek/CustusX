@@ -46,6 +46,11 @@ ADD_SUBDIRECTORY ( source )
 enable_testing()
 add_subdirectory(testing)
 
+
+
+
+if(nothing)
+message(FATAL_ERROR failed)
 # taken from http://www.itk.org/Wiki/BundleUtilitiesExample
 #--------------------------------------------------------------------------------
 # Now the installation stuff below
@@ -139,5 +144,5 @@ include(CPack)
 #cpack_add_component(application)
 #cpack_add_component(config DISPLAY_NAME "Configuration files" DESCRIPTION "Detaljert beskrivelse")
 
-
+endif(nothing)
 
