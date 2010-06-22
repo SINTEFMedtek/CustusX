@@ -1,7 +1,7 @@
 #include "cxTracker.h"
 
+#include "sscMessageManager.h"
 #include "cxTool.h"
-#include "cxMessageManager.h"
 
 namespace cx
 {
@@ -36,40 +36,40 @@ Tracker::Tracker(InternalStructure internalStructure) :
   {
   case TRACKER_NONE:
     mUid = mName = "None";
-    messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
+    ssc::messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
     return;
     break;
   case TRACKER_POLARIS:
     mUid = mName = "Polaris";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
-    messageManager()->sendInfo("Tracker: Polaris");
+    ssc::messageManager()->sendInfo("Tracker: Polaris");
     mTracker = mTempPolarisTracker.GetPointer();
     break;
   case TRACKER_POLARIS_SPECTRA:
     mUid = mName = "Polaris Spectra";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
-    messageManager()->sendInfo("Tracker: Polaris Spectra");
+    ssc::messageManager()->sendInfo("Tracker: Polaris Spectra");
     mTracker = mTempPolarisTracker.GetPointer();
     break;
   case TRACKER_POLARIS_VICRA:
     mUid = mName = "Polaris Vicra";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
-    messageManager()->sendInfo("Tracker: Polaris Vicra");
+    ssc::messageManager()->sendInfo("Tracker: Polaris Vicra");
     mTracker = mTempPolarisTracker.GetPointer();
     break;
   case TRACKER_AURORA:
     mUid = mName = "Aurora";
     mTempAuroraTracker = AuroraTrackerType::New();
     mTempAuroraTracker->SetCommunication(mCommunication);
-    messageManager()->sendInfo("Tracker: Aurora");
+    ssc::messageManager()->sendInfo("Tracker: Aurora");
     mTracker = mTempAuroraTracker.GetPointer();
     break;
   case TRACKER_MICRON:
     mUid = mName = "Micron";
-    messageManager()->sendInfo("Tracker: Micron");
+    ssc::messageManager()->sendInfo("Tracker: Micron");
     //TODO: implement support for a micron tracker...
     break;
   default:

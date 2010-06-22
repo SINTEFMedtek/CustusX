@@ -7,6 +7,25 @@ MainWindow::MainWindow(QWidget* parent)
   this->setWindowTitle("US reconstruct test app");
   QHBoxLayout* layout = new QHBoxLayout(this);
   mReconstructionWidget = new ssc::ReconstructionWidget(this);
+  
+  //#define CA_DEFS
+#ifdef CA_DEFS
+  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+  QString defFile = "ultrasoundSample5.mhd";
+#else
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
+  //QString defFile = "UsAcq_1.mhd";
+  
+  QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
+  //QString defPath = "/Users/olevs/data/UL_thunder/test/";
+  QString defFile = "USAcq_29.mhd";
+  //QSettings* settings = new QSettings();
+  //defPath = settings->value("globalPatientDataFolder").toString();
+  //defFile = "";
+#endif
+  
+  mReconstructionWidget->selectData(defPath+defFile);
+  
   layout->addWidget(mReconstructionWidget);
 
   mView = new ssc::View(this);

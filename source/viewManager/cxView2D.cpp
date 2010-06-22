@@ -6,9 +6,9 @@
 #include <QContextMenuEvent>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxRepManager.h"
-#include "cxMessageManager.h"
 #include "cxViewManager.h"
 
 namespace cx

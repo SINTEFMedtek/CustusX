@@ -2,8 +2,8 @@
 
 #include <QMenu>
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
-#include "cxMessageManager.h"
 #include "cxViewGroup.h" //for class Navigation
 
 namespace cx
@@ -90,7 +90,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
 void ViewWrapper::imageActionSlot()
 {
-  //messageManager()->sendInfo("ViewWrapper::imageActionSlot()");
+  //ssc::messageManager()->sendInfo("ViewWrapper::imageActionSlot()");
   QAction* theAction = static_cast<QAction*>(sender());
   if(!theAction)
     return;
@@ -115,7 +115,7 @@ void ViewWrapper::imageActionSlot()
   
 void ViewWrapper::meshActionSlot()
 {
-  messageManager()->sendInfo("ViewWrapper::meshActionSlot()");
+  ssc::messageManager()->sendInfo("ViewWrapper::meshActionSlot()");
   QAction* theAction = static_cast<QAction*>(sender());
   if(!theAction)
     return;

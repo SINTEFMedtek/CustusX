@@ -10,9 +10,9 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
+#include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
-#include "cxMessageManager.h"
 #include "cxDataManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
@@ -80,7 +80,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
   ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
-    messageManager()->sendError("Could not find a rep to add the landmark to.");
+    ssc::messageManager()->sendError("Could not find a rep to add the landmark to.");
     return;
   }
 
@@ -98,7 +98,7 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
   ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
-    messageManager()->sendError("Could not find a rep to edit the landmark for.");
+    ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");
     return;
   }
   std::string uid = mActiveLandmark;

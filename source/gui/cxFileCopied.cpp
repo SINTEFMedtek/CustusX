@@ -2,7 +2,7 @@
 
 #include <QtCore>
 #include "sscData.h"
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -25,7 +25,7 @@ void FileCopied::areFileCopiedSlot()
 
   if (!file.exists() || !file.open(QIODevice::NotOpen|QIODevice::ReadOnly))
   {
-    messageManager()->sendWarning("File is not copied: "+mFilePath+" Cannot open file.");
+    ssc::messageManager()->sendWarning("File is not copied: "+mFilePath+" Cannot open file.");
     file.close();
     QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));// Wait another 5 seconds
   }
@@ -66,7 +66,7 @@ void FileCopied::areFileCopiedSlot()
           rx.indexIn(sLine);
           rx.pos();
           QString elementType = rx.cap();
-          messageManager()->sendInfo("ElementType: "+elementType.toStdString());
+          ssc::messageManager()->sendInfo("ElementType: "+elementType.toStdString());
           if(elementType=="MET_USHORT") //16 bit
             elementSize = 2;
           else if(elementType=="MET_SHORT")
@@ -80,12 +80,12 @@ void FileCopied::areFileCopiedSlot()
       }
     }
     if(!file.flush())
-      messageManager()->sendWarning("Flush error");
+      ssc::messageManager()->sendWarning("Flush error");
     file.close();
 
     if (!foundDimSize)
     {
-      messageManager()->sendWarning("File is not copied correctly: "+mFilePath+" Parts missing");
+      ssc::messageManager()->sendWarning("File is not copied correctly: "+mFilePath+" Parts missing");
     }
     else
     {
@@ -101,7 +101,7 @@ void FileCopied::areFileCopiedSlot()
 
       //Test if raw file is large enough
       if(rawFile.bytesAvailable() < (numElements * elementSize))
-        messageManager()->sendWarning("File is not copied correctly: "+rawFilepath.toStdString()+" Parts missing");
+        ssc::messageManager()->sendWarning("File is not copied correctly: "+rawFilepath.toStdString()+" Parts missing");
       else
         correctCopy = true;
 
@@ -120,12 +120,12 @@ void FileCopied::areFileCopiedSlot()
 
   if(!correctCopy)
   {
-    messageManager()->sendWarning("File(s) not copied correctly - wait another 5 seconds");
+    ssc::messageManager()->sendWarning("File(s) not copied correctly - wait another 5 seconds");
     QTimer::singleShot(5000, this, SLOT(areFileCopiedSlot()));
   }
   else
   {
-    messageManager()->sendInfo("File copied correctly: "+mFilePath);
+    ssc::messageManager()->sendInfo("File copied correctly: "+mFilePath);
     mData->setFilePath(mRelativeFilePath); // Update file path
 
     //Save patient, to avoid problems

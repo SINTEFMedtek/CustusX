@@ -5,7 +5,7 @@
 #include <vtkSTLReader.h>
 #include <QDir>
 #include <QDateTime>
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 
 #include "cxToolManager.h"
 
@@ -41,7 +41,7 @@ Tool::Tool(InternalStructure internalStructure) :
     this->createPolyData();
   }else
   {
-    messageManager()->sendError("Tool: "+ssc::Tool::mUid+" was created with invalid internal structure.");
+    ssc::messageManager()->sendError("Tool: "+ssc::Tool::mUid+" was created with invalid internal structure.");
   }
 }
 Tool::~Tool()

@@ -1,10 +1,5 @@
 
 #include "cxShiftCorrectionWidget.h"
-#include "cxMessageManager.h"
-#include "sscMesh.h"
-#include "sscGeometricRep.h"
-#include "cxDataManager.h"
-#include "cxRepManager.h"
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QComboBox>
@@ -31,12 +26,18 @@
 
 #include <vtkImageToPolyDataFilter.h>
 #include <vtkPolyData.h>
-#include "cxViewManager.h"
 #include <vtkPolyDataMapper.h>
-#include "cxView3D.h"
 #include <vtkRenderer.h>
 #include <vtkMarchingCubes.h>
 #include <vtkProperty.h>
+
+#include "sscMessageManager.h"
+#include "sscMesh.h"
+#include "sscGeometricRep.h"
+#include "cxDataManager.h"
+#include "cxRepManager.h"
+#include "cxViewManager.h"
+#include "cxView3D.h"
 
 //test
 #include <vtkConeSource.h>

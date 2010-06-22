@@ -11,10 +11,10 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscUtilHelpers.h"
+#include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
 //#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
@@ -214,7 +214,7 @@ void ViewGroup::addImage(QString imageUid)
   ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
   if(!image)
   {
-    messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
+    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
     return;
   }
   this->addImage(image);
@@ -227,7 +227,7 @@ void ViewGroup::removeImage(QString imageUid)
   ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
   if(!image)
   {
-    messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
+    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
     return;
   }
   this->removeImage(image);
@@ -235,7 +235,7 @@ void ViewGroup::removeImage(QString imageUid)
 
 void ViewGroup::activeImageChangeSlot()
 {
-  //messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
+  //ssc::messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
   if (mImages.empty())
     dataManager()->setActiveImage(ssc::ImagePtr());
   else
@@ -254,7 +254,7 @@ ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
 {
   if (index<0 || index>=(int)mElements.size())
   {
-    messageManager()->sendError("invalid index in ViewGroup2D");
+    ssc::messageManager()->sendError("invalid index in ViewGroup2D");
   }
 
   mElements[index]->initializePlane(plane);
@@ -337,7 +337,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
        if (image)
          this->addImage(image);
        else
-         messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+         ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
      }
   }
 
@@ -349,7 +349,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
 //    if (image)
 //      this->setImage(image);
 //    else
-//      messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+//      ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
 //  }
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
@@ -358,7 +358,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
   if(ok)
     this->setZoom2D(zoom2Ddouble);
   else
-    messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
+    ssc::messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
 }
 
 }//cx

@@ -4,7 +4,7 @@
 #include <QString>
 #include "cxToolManager.h"
 #include <QHBoxLayout>
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 #include "cxViewManager.h"
 #include <QPixmap>
 #include <QMetaObject>
@@ -14,7 +14,7 @@ namespace cx
 CustomStatusBar::CustomStatusBar() :
   mFpsLabel(new QLabel())
 {
-  connect(messageManager(),
+  connect(ssc::messageManager(),
           SIGNAL(emittedMessage(const QString&, int)),
           this,
           SLOT(showMessage(const QString&, int)));
@@ -88,7 +88,7 @@ void CustomStatusBar::receiveToolVisible(bool visible)
   Tool* tool = dynamic_cast<Tool*>(this->sender());
   if(!tool)
   {
-    MessageManager::getInstance()->sendWarning("Could not determine which tool changed visibility.");
+    ssc::messageManager()->sendWarning("Could not determine which tool changed visibility.");
     return;
   }
 

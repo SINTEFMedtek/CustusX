@@ -99,38 +99,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
 {
   this->setWindowTitle("US Reconstruction");
 
-/*#define input_set_mac "/Users/olevs/data/UL_thunder/Nevro_Spine/SpineData/ultrasoundSample5.mhd", \
-"/Users/olevs/data/UL_thunder/Nevro_Spine/SpineData/ultrasoundSample5.pos", \
-"/Users/olevs/data/UL_thunder/Nevro_Spine/SpineData/ultrasoundSample5.tim", \
-"/Users/olevs/data/UL_thunder/Nevro_Spine/SpineData/ultrasoundSample5.msk", \
-"/Users/olevs/data/UL_thunder/Nevro_Spine/SpineData/ultrasoundSample5.vol", \
-"/Users/olevs/data/UL_thunder/Nevro_Spine/calibration_files/M12L.cal"
-  //#define input_set_mac_origo_x 850.0f
-  //#define input_set_mac_origo_y 10.0f
-  //#define input_set_mac_origo_z 2800.0f
-#define input_set_mac_origo_x 85.0f
-#define input_set_mac_origo_y 1.0f
-#define input_set_mac_origo_z 280.0f*/
-
-//#define CA_DEFS
-
-#ifdef CA_DEFS
-  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
-  QString defFile = "ultrasoundSample5.mhd";
-#else
-  //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
-  //QString defFile = "UsAcq_1.mhd";
-
-  QString defPath = "/Users/olevs/data/UL_thunder/test/coordinateSys_test/";
-  //QString defPath = "/Users/olevs/data/UL_thunder/test/";
-  QString defFile = "USAcq_29.mhd";
-  QSettings* settings = new QSettings();
-  defPath = settings->value("globalPatientDataFolder").toString();
-  defFile = "";
-#endif
-
-  //mInputFile = path + "UsAcq_1.mhd";
-  //mInputFile = path + "ultrasoundSample5.mhd";
   connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
@@ -206,7 +174,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent):
   topLayout->addWidget(mReconstructButton);
   topLayout->addStretch();
 
-  this->selectData(defPath+defFile);
+  //this->selectData(defPath+defFile);
 }
 
 ssc::StringDataInterfacePtr ReconstructionWidget::generateStringDataInterface(QString uid)
@@ -280,7 +248,7 @@ void ReconstructionWidget::selectData(QString filename)
 
   mInputFile = filename;
 
-  std::cout << "selected: " << mInputFile << std::endl;
+  //std::cout << "selected: " << mInputFile << std::endl;
   this->updateComboBox();
   mDataComboBox->setToolTip(mInputFile);
 

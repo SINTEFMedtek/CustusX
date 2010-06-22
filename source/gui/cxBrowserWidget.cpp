@@ -4,9 +4,9 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"

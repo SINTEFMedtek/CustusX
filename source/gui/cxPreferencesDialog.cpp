@@ -1,8 +1,8 @@
 
 #include <QtGui>
 
+#include "sscMessageManager.h"
 #include "cxPreferencesDialog.h"
-#include "cxMessageManager.h"
 #include "cxViewManager.h"
 
 #include <iostream>
