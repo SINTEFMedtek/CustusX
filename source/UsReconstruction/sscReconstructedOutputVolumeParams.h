@@ -94,7 +94,7 @@ public:
     if (volumeSize > mMaxVolumeSize)
     {
       double scaleFactor = pow(volumeSize/double(mMaxVolumeSize),1/3.0);
-      ssc::messageManager()->sendInfo("Downsampled volume - Used scaleFactor : "
+      ssc::messageManager()->sendDebug("Downsampled volume - Used scaleFactor : "
                                       +string_cast(scaleFactor));
 //      mDim /= scaleFactor;
 //      mSpacing *= scaleFactor;
