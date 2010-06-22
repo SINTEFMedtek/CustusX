@@ -169,7 +169,8 @@ SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/${BUNDLE_NAME}")
 IF(APPLE)
   SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
   SET(qtconf_dest_dir ${BUNDLE_NAME}.app/Contents/Resources)
-  SET(CONFIG_DIR ${BUNDLE_NAME}.app/Contents/config)
+  #SET(CONFIG_DIR ${BUNDLE_NAME}.app/Contents/config)
+  SET(CONFIG_DIR config)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}.app")
 ENDIF(APPLE)
 IF(WIN32)
@@ -179,7 +180,7 @@ ENDIF(WIN32)
 
 #install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config DESTINATION target_config COMPONENT config)
 #install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt DESTINATION "/Library/CustusX")# COMPONENT config)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../config/ DESTINATION "${CONFIG_DIR}/config" 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../config/ DESTINATION "${CONFIG_DIR}" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
     #PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE
@@ -209,7 +210,7 @@ if (APPLE)
 endif(APPLE)
 
 # special handling of shared libraries: must copy them into the bundle
-#if (BUILD_SHARED_LIBS)
+if (BUILD_SHARED_LIBS)
     #--------------------------------------------------------------------------------
     # Use BundleUtilities to get all other dependencies for the application to work.
     # It takes a bundle or executable along with possible plugins and inspects it
@@ -238,7 +239,7 @@ endif(APPLE)
         " COMPONENT Runtime)
     #FIXUP_BUNDLE(<app> <libs> <dirs>)
     #message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
-#endif (BUILD_SHARED_LIBS)
+endif (BUILD_SHARED_LIBS)
 
 # To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X
 # where CPackConfig.cmake is created by including CPack

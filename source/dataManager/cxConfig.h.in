@@ -1,0 +1,5 @@
+// position of test data
+#define CX_DATA_ROOT "@CX_DATA_ROOT@/"
+
+// position of configuration folders
+#define CX_CONFIG_ROOT "@CX_CONFIG_ROOT@/"
