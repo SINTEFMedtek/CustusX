@@ -30,10 +30,8 @@ INCLUDE(Dart)
 
 include_directories( /usr/local/include )
 
-if (APPLE AND EXISTS /opt/local/lib) 
-    # location of cppunit library if installed using macport
-    link_directories( /opt/local/lib )
-endif (APPLE AND EXISTS /opt/local/lib)    
+# cppunit
+find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib) 
 
 IF (WIN32)
   ADD_DEFINITIONS(-D__WIN32__)
