@@ -96,6 +96,7 @@ MainWindow::MainWindow() :
   //debugging
   connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
+  ssc::messageManager()->setCoutFlag(false);
 
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 

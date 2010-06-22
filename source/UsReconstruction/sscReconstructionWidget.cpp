@@ -5,6 +5,7 @@
 #include "sscReconstructionWidget.h"
 #include "sscTypeConversions.h"
 #include "sscReconstructOutputValueParamsInterfaces.h"
+#include "sscMessageManager.h"
 
 namespace ssc 
 {
@@ -215,12 +216,12 @@ void ReconstructionWidget::updateComboBox()
   QDir dir = QFileInfo(mInputFile).dir();
   QStringList nameFilters;
   nameFilters << "*.mhd";
-  std::cout << dir.path() << std::endl;
+  //std::cout << dir.path() << std::endl;
   QStringList files = dir.entryList(nameFilters, QDir::Files);
 
   for (int i=0; i<files.size(); ++i)
   {
-    std::cout << files[i] << std::endl;
+    //std::cout << files[i] << std::endl;
     mDataComboBox->addItem(files[i]);
     if (files[i]==QFileInfo(mInputFile).fileName())
       mDataComboBox->setCurrentIndex(i);
@@ -242,7 +243,7 @@ void ReconstructionWidget::selectData(QString filename)
 {
   if(filename.isEmpty())
   {
-    std::cout << "no file selected" << std::endl;
+    ssc::messageManager()->sendWarning("no file selected");
     return;
   }
 
