@@ -12,6 +12,8 @@
 #include "reconstruct_vnn.h"
 #include "sscImage.h"
 #include "sscXmlOptionItem.h"
+#include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace ssc 
 {
@@ -35,13 +37,14 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr frameMask)
 {
   QFileInfo path(THUNDER_KERNEL_PATH+QString("kernels.ocl"));
-  std::cout << "kernels path: " << path.absoluteFilePath().toStdString() << std::endl;
+  ssc::messageManager()->sendInfo("kernels path: " 
+                                  + string_cast(path.absoluteFilePath().toStdString()));
   
   if (!path.exists())
     path = QFileInfo("./kernels.ocl");
   if (!path.exists())
   {
-    std::cout << "Error: Can't find kernels.ocl" << std::endl;
+    ssc::messageManager()->sendWarning("Error: Can't find kernels.ocl");
     return;
   }
   
@@ -53,8 +56,12 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   
   //test
   long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
-  std::cout << "input size: " << size << std::endl;
-  std::cout << "input dimensions: " << data.input_dim[0] << " " << data.input_dim[1] << " " << data.input_dim[2] << std::endl;
+  ssc::messageManager()->sendInfo("input size: " 
+                                  + string_cast(size));
+  ssc::messageManager()->sendInfo("input dimensions: " 
+                                  + string_cast(data.input_dim[0]) + " " 
+                                  + string_cast(data.input_dim[1]) + " " 
+                                  + string_cast(data.input_dim[2]));
   //for (int i = 0; i < size; i++)
   //  data.input[i]=255;
   
@@ -75,7 +82,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   output->GetSpacing(data.output_spacing);
   
   reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str());
-  std::cout << "ThunderVNNReconstructAlgorithm::reconstruct ***success***" << std::endl;
+  ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
 }
   
   
