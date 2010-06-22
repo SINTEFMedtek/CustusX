@@ -63,6 +63,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSlicePlanes3DRep.h
     Widgets/sscAbstractInterface.h
     Widgets/sscHelperWidgets.h
+    Utilities/sscMessageManager.h
     )
 if (USE_GLX_SHARED_CONTEXT)
     SET( SSC_QT_MOC_HEADER_FILES
@@ -141,6 +142,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscDefinitionStrings.cpp
     Utilities/sscTime.h
     Utilities/sscTime.cpp
+    Utilities/sscMessageManager.h
+    Utilities/sscMessageManager.cpp
     sscView.cpp
     sscView.h
     Rep/sscRep.h
