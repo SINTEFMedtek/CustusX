@@ -80,7 +80,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
   // MDH is a volatile format: warn if we dont know the source
   if (( creator!="Ingerid" )&&( creator != "DICOMtoMetadataFilter" ))
   {
-    std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
+    //std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
   }
 
   Transform3D rMd;

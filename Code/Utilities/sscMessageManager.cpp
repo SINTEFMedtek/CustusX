@@ -51,7 +51,16 @@ void MessageManager::sendError(std::string error)
   message.append(&qerror);
   this->sendMessage(message, 0);
 }
-
+  
+void MessageManager::sendDebug(std::string text)
+{
+  QString qdebug(text.c_str());
+  QString message("DEBUG: ");
+  message.append(&qdebug);
+  // Only print debug info to std::cout
+  std::cout << string_cast(message) << std::endl;
+}
+  
 void MessageManager::setCoutFlag(bool onlyCout)
 {
   mOnlyCout = onlyCout;
