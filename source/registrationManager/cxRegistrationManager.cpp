@@ -269,7 +269,7 @@ void RegistrationManager::addXml(QDomNode& parentNode)
 
 void RegistrationManager::parseXml(QDomNode& dataNode)
 {
-  ssc::messageManager()->sendInfo("Inside: void RegistrationManager::parseXml(QDomNode& dataNode)");
+  //ssc::messageManager()->sendInfo("Inside: void RegistrationManager::parseXml(QDomNode& dataNode)");
   QDomNode child = dataNode.firstChild();
   while(!child.isNull())
   {
