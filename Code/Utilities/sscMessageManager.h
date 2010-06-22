@@ -33,12 +33,14 @@ public:
   void sendInfo(std::string info); ///< Used to report successful operations.
   void sendWarning(std::string warning); ///< The program does not need to terminate, but the user might need to do something.
   void sendError(std::string error); ///< The program (might) need to terminate
+  void setCoutFlag(bool onlyCout);///< Tell the MessageManager if messages only should be dumped to cout. Set to false to allow MessageManager to emit messages.
 
 signals:
   void emittedMessage(const QString& message, int timeout); ///< The signal the owner of a statusbar should listen to.
 
 private:
-  MessageManager(){}; ///< Use getInstance().
+  bool mOnlyCout;///< Tells the MessageManager if the message only should be dumped to cout
+  MessageManager(); ///< Use getInstance().
   ~MessageManager(){}; ///< Use destroyInstance().
   MessageManager(const MessageManager&){this->getInstance();}; ///< Copycontructur.
   MessageManager& operator=(const MessageManager&){return *this->getInstance();}; ///< Assignment operator.

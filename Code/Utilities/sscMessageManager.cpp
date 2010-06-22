@@ -1,12 +1,19 @@
 #include "sscMessageManager.h"
 
+#include <iostream>
 #include <QString>
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
 MessageManager* MessageManager::mTheInstance = NULL;
 MessageManager* messageManager() { return MessageManager::getInstance(); }
 
+  
+MessageManager::MessageManager():
+  mOnlyCout(true) 
+{}
+  
 MessageManager* MessageManager::getInstance()
 {
   if(mTheInstance == NULL)
@@ -45,9 +52,17 @@ void MessageManager::sendError(std::string error)
   this->sendMessage(message, 0);
 }
 
+void MessageManager::setCoutFlag(bool onlyCout)
+{
+  mOnlyCout = onlyCout;
+}
+  
 void MessageManager::sendMessage(QString &message, int timeout)
 {
-  emit this->emittedMessage((const QString &)message, timeout);
+  if (mOnlyCout)
+    std::cout << string_cast(message) << std::endl;
+  else
+    emit this->emittedMessage((const QString &)message, timeout);
 }
 
 
