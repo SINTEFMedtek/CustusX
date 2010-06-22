@@ -4,9 +4,9 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include "sscProbeRep.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"
-#include "cxMessageManager.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -71,7 +71,7 @@ void ContextDockWidget::deleteCurrentImageSlot()
 {
   if (mCurrentImage.use_count() == 0)
   {
-    messageManager()->sendWarning("Can't delete image, no current Image!");
+    ssc::messageManager()->sendWarning("Can't delete image, no current Image!");
     return;
   }
   emit deleteImage(mCurrentImage);
@@ -143,7 +143,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   ssc::ImagePtr image = dataManager()->getImage(imageId);
   if(!image)
   {
-    messageManager()->sendError("Could not find the selected image in the DataManager: "+imageId);
+    ssc::messageManager()->sendError("Could not find the selected image in the DataManager: "+imageId);
     return;
   }
 

@@ -17,10 +17,10 @@
 #include "sscTool2DRep.h"
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
+#include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
 //#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 
@@ -66,7 +66,7 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
 
   if (!image->getRefVtkImageData().GetPointer())
   {
-    messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
+    ssc::messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
     return;
   }
 
@@ -117,7 +117,7 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
     return;
   mImage.erase(std::find(mImage.begin(), mImage.end(), image));
 
-  messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
+  ssc::messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
   mView->removeRep(mVolumetricReps[image->getUid()]);
   mVolumetricReps.erase(image->getUid());
 

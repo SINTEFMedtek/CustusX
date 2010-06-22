@@ -1,6 +1,6 @@
 #include "cxRepManager.h"
 
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 
@@ -104,7 +104,7 @@ RepManager::RepManager() :
   {
     addRep<ssc::GeometricRep>(mGeometricRepNames[i], &mGeometricRepMap);
   }
-  messageManager()->sendInfo("All necessary representations have been created.");
+  ssc::messageManager()->sendInfo("All necessary representations have been created.");
 
   /*//connect the two acs-sets so both get updated when we click on one of them
   connect(&(*getInria2DRep(mInriaRep2DNames[0])), SIGNAL(pointPicked(double,double,double)),
@@ -267,12 +267,12 @@ void RepManager::dominantToolChangedSlot(const std::string& toolUid)
   ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
   if(!dominantTool)
   {
-    messageManager()->sendError("Couldn't find a dominant tool to connect the inria2Dreps to.");
+    ssc::messageManager()->sendError("Couldn't find a dominant tool to connect the inria2Dreps to.");
     return;
   }
   if(mConnectedTool == dominantTool)
   {
-	  messageManager()->sendWarning("The new dominant tool was the same as the old one.");
+	  ssc::messageManager()->sendWarning("The new dominant tool was the same as the old one.");
     return;
   }
   /*if(mConnectedTool)

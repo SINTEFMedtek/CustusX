@@ -13,9 +13,10 @@
 #include <QVBoxLayout>
 #include "sscImage.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"

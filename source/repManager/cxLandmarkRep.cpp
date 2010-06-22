@@ -14,7 +14,7 @@
 #include "sscView.h"
 #include "sscTypeConversions.h"
 #include "sscLandmark.h"
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 
 namespace cx
@@ -177,13 +177,13 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    messageManager()->sendWarning("Trying to add rep actors to view renderer, but view is null.");
+    ssc::messageManager()->sendWarning("Trying to add rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    messageManager()->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
+    ssc::messageManager()->sendWarning("Trying to add rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -214,13 +214,13 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   if(view == NULL)
   {
-    messageManager()->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
+    ssc::messageManager()->sendWarning("Trying to remove rep actors to view renderer, but view is null.");
     return;
   }
   vtkRendererPtr renderer = view->getRenderer();
   if(renderer.GetPointer() == NULL)
   {
-    messageManager()->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
+    ssc::messageManager()->sendWarning("Trying to remove rep actors to view renderer, but renderer is null.");
     return;
   }
 
@@ -307,7 +307,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
 
   mSkinPointActors[uid] = skinPointActor;
 
-  messageManager()->sendInfo("Added permanent point to landmark("+uid+"): "+string_cast(coord));
+  ssc::messageManager()->sendInfo("Added permanent point to landmark("+uid+"): "+string_cast(coord));
 
   for(std::set<ssc::View *>::iterator it = mViews.begin();it != mViews.end();it++)
   {

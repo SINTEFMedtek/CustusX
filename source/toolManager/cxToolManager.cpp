@@ -7,10 +7,10 @@
 #include <vtkDoubleArray.h>
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxTool.h"
 #include "cxTracker.h"
-#include "cxMessageManager.h"
 #include "cxToolConfigurationParser.h"
 
 namespace cx
@@ -108,7 +108,7 @@ void ToolManager::configure()
 {
   if(mConfigurationFilePath.empty() || !QFile::exists(QString(mConfigurationFilePath.c_str())))
   {
-    messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
+    ssc::messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
     return;
   }
 
@@ -116,7 +116,7 @@ void ToolManager::configure()
   mTracker = toolConfigurationParser.getTracker();
   if(mTracker->getType() == Tracker::TRACKER_NONE)
   {
-    messageManager()->sendError("Could not configure the toolmanager, tracker is invalid.");
+    ssc::messageManager()->sendError("Could not configure the toolmanager, tracker is invalid.");
     return;
   }
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
@@ -128,7 +128,7 @@ void ToolManager::configure()
   this->connectSignalsAndSlots();
 
   mConfigured = true;
-  messageManager()->sendInfo("ToolManager is configured.");
+  ssc::messageManager()->sendInfo("ToolManager is configured.");
   emit configured();
 }
 void ToolManager::initialize()
@@ -138,7 +138,7 @@ void ToolManager::initialize()
 
   if (!mConfigured)
   {
-    messageManager()->sendWarning("Please configure before trying to initialize.");
+    ssc::messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
   //this->createSymlink();
@@ -193,7 +193,7 @@ void ToolManager::startTracking()
 
   if (!mInitialized)
   {
-    messageManager()->sendWarning("Please initialize before trying to start tracking.");
+    ssc::messageManager()->sendWarning("Please initialize before trying to start tracking.");
     return;
   }
   mTracker->startTracking();
@@ -202,7 +202,7 @@ void ToolManager::stopTracking()
 {
   if (!mTracking)
   {
-    messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
+    ssc::messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
     return;
   }
   mTracker->stopTracking();
@@ -210,7 +210,7 @@ void ToolManager::stopTracking()
 void ToolManager::saveToolsSlot()
 {
   this->saveTransformsAndTimestamps();
-  messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
+  ssc::messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
 ssc::LandmarkMap ToolManager::getLandmarks()
@@ -459,7 +459,7 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state, bool succes
     report.append(toolUid + " reported an unknown message.");
     break;
   }
-  messageManager()->sendInfo(report);
+  ssc::messageManager()->sendInfo(report);
 }
 
 /**
@@ -488,7 +488,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
       if(success){ //Should this really be done here?
         mInitialized = success;
         emit initialized();
-        messageManager()->sendInfo("ToolManager is initialized. (TRACKER_OPEN)");
+        ssc::messageManager()->sendInfo("ToolManager is initialized. (TRACKER_OPEN)");
       }
       report.append("open.");
     } else
@@ -507,7 +507,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
     {
       mInitialized = true;
       emit initialized();
-      messageManager()->sendInfo("ToolManager is initialized.(TRACKER_INITIALIZED");
+      ssc::messageManager()->sendInfo("ToolManager is initialized.(TRACKER_INITIALIZED");
     }
     report.append("initialized.");
     break;
@@ -568,7 +568,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
     report.append(trackerUid + " reported an unknown message.");
     break;
   }
-  messageManager()->sendInfo(report);
+  ssc::messageManager()->sendInfo(report);
 }
 
 void ToolManager::addConnectedTool(std::string uid)
@@ -576,7 +576,7 @@ void ToolManager::addConnectedTool(std::string uid)
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
   if (it == mConfiguredTools->end() || !it->second)
   {
-    messageManager()->sendInfo("Tool with id " + uid
+    ssc::messageManager()->sendInfo("Tool with id " + uid
         + " was not found to be configured "
           ", thus could not add is as a connected tool.");
     return;
@@ -588,7 +588,7 @@ void ToolManager::addConnectedTool(std::string uid)
   connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   
   mConfiguredTools->erase(it);
-  messageManager()->sendInfo("Tool with id " + uid
+  ssc::messageManager()->sendInfo("Tool with id " + uid
       + " was moved from the configured to the connected map.");
 }
 void ToolManager::connectSignalsAndSlots()
@@ -610,7 +610,7 @@ void ToolManager::connectSignalsAndSlots()
         this, SLOT(receiveToolReport(ToolMessage, bool, bool, stdString)));
     it++;
   }
-  //messageManager()->sendInfo("Signals and slots have been connected.");
+  //ssc::messageManager()->sendInfo("Signals and slots have been connected.");
 }
 void ToolManager::checkTimeoutsAndRequestTransform()
 {

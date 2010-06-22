@@ -9,10 +9,10 @@
 #include "vtkMatrix4x4.h"
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
-#include "cxToolManager.h"
-#include "cxMessageManager.h"
-#include "cxDataManager.h"
+#include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "cxToolManager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -44,7 +44,7 @@ void RegistrationManager::initialize()
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
   mMasterImage = image;
-  messageManager()->sendInfo("Master image set to "+image->getUid());
+  ssc::messageManager()->sendInfo("Master image set to "+image->getUid());
 }
 
 ssc::ImagePtr RegistrationManager::getMasterImage()
@@ -67,7 +67,7 @@ void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patie
   //if an offset existed, its no longer valid and should be removed
   mPatientRegistrationOffset.reset();
 
-  messageManager()->sendInfo("Manual patient registration is set.");
+  ssc::messageManager()->sendInfo("Manual patient registration is set.");
 }
 
 ssc::Transform3DPtr RegistrationManager::getManualPatientRegistration()
@@ -103,7 +103,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
   ssc::RegistrationTransform regTrans(newTransform, QDateTime::currentDateTime(), "Manual Patient Offset");
   toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
-  messageManager()->sendInfo("Offset for the patient registration is set.");
+  ssc::messageManager()->sendInfo("Offset for the patient registration is set.");
 }
 
 ssc::Transform3DPtr RegistrationManager::getManualPatientRegistrationOffset()
@@ -165,7 +165,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
-    messageManager()->sendInfo("not enough points to register");
+    ssc::messageManager()->sendInfo("not enough points to register");
     return ssc::Transform3D();
   }
 
@@ -183,7 +183,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 
   if (QString::number(tar_M_src[0][0])=="nan") // harry but quick way to check badness of transform...
   {
-    messageManager()->sendError("landmark transform failed");
+    ssc::messageManager()->sendError("landmark transform failed");
     return ssc::Transform3D();
   }
 
@@ -195,7 +195,7 @@ void RegistrationManager::doPatientRegistration()
 {
   if(!mMasterImage)
   {
-    messageManager()->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
+    ssc::messageManager()->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
     return;
   }
 
@@ -217,7 +217,7 @@ void RegistrationManager::doPatientRegistration()
   mLastRegistrationTime = regTrans.mTimestamp;
 
   emit patientRegistrationPerformed();
-  messageManager()->sendInfo("Patient registration has been performed.");
+  ssc::messageManager()->sendInfo("Patient registration has been performed.");
 }
 
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
@@ -225,7 +225,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //check that the masterimage is set
   if(!mMasterImage)
   {
-    messageManager()->sendError("There isn't set a masterimage in the registrationmanager.");
+    ssc::messageManager()->sendError("There isn't set a masterimage in the registrationmanager.");
     return;
   }
 
@@ -249,7 +249,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
   emit imageRegistrationPerformed();
-  messageManager()->sendInfo("Image registration has been performed.");
+  ssc::messageManager()->sendInfo("Image registration has been performed.");
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)
@@ -262,14 +262,14 @@ void RegistrationManager::addXml(QDomNode& parentNode)
   if(mMasterImage)
   {
     masterImageNode.appendChild(doc.createTextNode(mMasterImage->getUid().c_str()));
-    //messageManager()->sendInfo("SAVED MASTERIMAGE, UID: "+mMasterImage->getUid());
+    //ssc::messageManager()->sendInfo("SAVED MASTERIMAGE, UID: "+mMasterImage->getUid());
   }
   base.appendChild(masterImageNode);
 }
 
 void RegistrationManager::parseXml(QDomNode& dataNode)
 {
-  messageManager()->sendInfo("Inside: void RegistrationManager::parseXml(QDomNode& dataNode)");
+  ssc::messageManager()->sendInfo("Inside: void RegistrationManager::parseXml(QDomNode& dataNode)");
   QDomNode child = dataNode.firstChild();
   while(!child.isNull())
   {

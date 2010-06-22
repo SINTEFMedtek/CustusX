@@ -5,8 +5,8 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QSlider>
+#include "sscMessageManager.h"
 #include "cxView3D.h"
-#include "cxMessageManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
 
@@ -76,7 +76,7 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
 
       View3D* view3D_1Ptr = viewManager()->get3DView("View3D_1");
       view3D_1Ptr->setCameraStyle(View3D::DEFAULT_STYLE);
-      messageManager()->sendInfo("Default camera selected");
+      ssc::messageManager()->sendInfo("Default camera selected");
     }
   }
   else if(this->sender() == mToolCameraStyleRadioButton)
@@ -88,7 +88,7 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
       view3D_1Ptr->setCameraStyle(View3D::TOOL_STYLE, mCameraOffsetSlider->value());
       connect(mCameraOffsetSlider, SIGNAL(valueChanged(int)),
                  view3D_1Ptr, SLOT(setCameraOffsetSlot(int)));
-      messageManager()->sendInfo("Tool camera selected");
+      ssc::messageManager()->sendInfo("Tool camera selected");
     }else
     {
       if(view3D_1Ptr)

@@ -7,7 +7,6 @@ SET(cxProject_MOC_HDRS
   cxMainWindow.h
   cxFileCopied.h
   cxPatientData.h
-  cxMessageManager.h
   cxCustomStatusBar.h
   cxContextDockWidget.h
   cxNavigationWidget.h
@@ -49,8 +48,6 @@ SET(${LIBNAME}_SRCS
     cxMainWindow.cpp 
     cxFileCopied.cpp
     cxPatientData.cpp
-    cxMessageManager.h
-    cxMessageManager.cpp
     cxCustomStatusBar.h
     cxCustomStatusBar.cpp
     cxContextDockWidget.h

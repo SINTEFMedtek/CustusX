@@ -6,9 +6,9 @@
 #include <QVBoxLayout>
 #include "sscImage.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
@@ -110,7 +110,7 @@ void RegistrationHistoryWidget::removeSlot()
   QDateTime lastTime = history.back().mTimestamp;
   lastTime = lastTime.addSecs(-1);
 
-  messageManager()->sendInfo("Removing all registration performed later than " + string_cast(lastTime.toString(ssc::timestampSecondsFormatNice())) + ".");
+  ssc::messageManager()->sendInfo("Removing all registration performed later than " + string_cast(lastTime.toString(ssc::timestampSecondsFormatNice())) + ".");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {
@@ -147,7 +147,7 @@ void RegistrationHistoryWidget::rewindSlot()
   QDateTime lastTime = history.back().mTimestamp;
   lastTime = lastTime.addSecs(-1);
 
-  messageManager()->sendInfo("Setting registration time to " + string_cast(lastTime.toString(ssc::timestampSecondsFormatNice())) + ".");
+  ssc::messageManager()->sendInfo("Setting registration time to " + string_cast(lastTime.toString(ssc::timestampSecondsFormatNice())) + ".");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {
@@ -161,7 +161,7 @@ void RegistrationHistoryWidget::rewindSlot()
 void RegistrationHistoryWidget::forwardSlot()
 {
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  messageManager()->sendInfo("Setting registration time to current.");
+  ssc::messageManager()->sendInfo("Setting registration time to current.");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {

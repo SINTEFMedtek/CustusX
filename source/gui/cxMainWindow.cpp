@@ -3,11 +3,11 @@
 #include <QtGui>
 #include "sscTypeConversions.h"
 #include "sscTime.h"
+#include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
-#include "cxMessageManager.h"
 #include "cxRegistrationManager.h"
 #include "cxCustomStatusBar.h"
 #include "cxContextDockWidget.h"
@@ -94,7 +94,7 @@ MainWindow::MainWindow() :
     mSettings->setValue("shadingOn", true);  
 
   //debugging
-  connect(messageManager(), SIGNAL(emittedMessage(const QString&, int)),
+  connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
 
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
@@ -322,7 +322,7 @@ void MainWindow::newPatientSlot()
   if(!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
   }
 
   QString choosenDir = patientDatafolder + "/" + name;
@@ -347,7 +347,7 @@ void MainWindow::savePatientFileSlot()
 {
   if(mPatientData->getActivePatientFolder().isEmpty())
   {
-    messageManager()->sendWarning("No patient selected, select or create patient before saving!");
+    ssc::messageManager()->sendWarning("No patient selected, select or create patient before saving!");
     this->newPatientSlot();
     return;
   }
@@ -371,14 +371,14 @@ void MainWindow::importDataSlot()
 {
   this->savePatientFileSlot();
 
-  messageManager()->sendInfo("Importing data...");
+  ssc::messageManager()->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
                                   QString(tr("Select data file")),
                                   mSettings->value("globalPatientDataFolder").toString(),
                                   tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
   if(fileName.isEmpty())
   {
-    messageManager()->sendInfo("Import canceled");
+    ssc::messageManager()->sendInfo("Import canceled");
     return;
   }
 
@@ -387,9 +387,9 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-  //  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
-  mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
-  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
+  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
+  //mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
+  //mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -526,7 +526,7 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
     this->deactivateUSAcquisitionState();
     break;
   default:
-    messageManager()->sendWarning("Could not determine what workflow state to deactivate.");
+    ssc::messageManager()->sendWarning("Could not determine what workflow state to deactivate.");
     return;
     break;
   };
@@ -549,7 +549,7 @@ void MainWindow::changeState(WorkflowState fromState, WorkflowState toState)
     this->activateUSAcquisitionState();
     break;
   default:
-    messageManager()->sendWarning("Could not determine what workflow state to activate.");
+    ssc::messageManager()->sendWarning("Could not determine what workflow state to activate.");
     this->activatePatientDataState();
     return;
     break;
@@ -673,7 +673,7 @@ void MainWindow::preferencesSlot()
 }
 void MainWindow::quitSlot()
 {
-  messageManager()->sendInfo("quitSlot - never called?");
+  ssc::messageManager()->sendInfo("quitSlot - never called?");
   //TODO
 }  
   
@@ -720,7 +720,7 @@ void MainWindow::loadPatientRegistrationSlot()
   QFile registrationFile(registrationFilePath);
   if(!registrationFile.open(QIODevice::ReadOnly))
   {
-    messageManager()->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
+    ssc::messageManager()->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
     return;
   }else
   {
@@ -734,7 +734,7 @@ void MainWindow::loadPatientRegistrationSlot()
       QStringList list = line.split(" ", QString::SkipEmptyParts);
       if(list.size() != 4)
       {
-        messageManager()->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
+        ssc::messageManager()->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
         return;
       }
       matrix->SetElement(i,0,list[0].toDouble());
@@ -746,7 +746,7 @@ void MainWindow::loadPatientRegistrationSlot()
     ssc::Transform3DPtr patientRegistration(new ssc::Transform3D(matrix));
     registrationManager()->setManualPatientRegistration(patientRegistration);
     //std::cout << (*patientRegistration.get()) << std::endl;
-    messageManager()->sendInfo("New patient registration is set.");
+    ssc::messageManager()->sendInfo("New patient registration is set.");
   }
 }
 void MainWindow::configureSlot()
@@ -760,7 +760,7 @@ void MainWindow::configureSlot()
         mSettings->value("toolConfigFilePath").toString(),
         tr("Configuration files (*.xml)"));
     mSettings->setValue("toolConfigFilePath", configFile);
-    messageManager()->sendInfo("Tool configuration file is now selected: "+
+    ssc::messageManager()->sendInfo("Tool configuration file is now selected: "+
                               configFile.toStdString());
   }
   toolManager()->setConfigurationFile(configFile.toStdString());
@@ -770,7 +770,7 @@ void MainWindow::configureSlot()
   if(!loggingDir.exists())
   {
     loggingDir.mkdir(loggingPath);
-    messageManager()->sendInfo("Made a folder for logging: "+loggingPath.toStdString());
+    ssc::messageManager()->sendInfo("Made a folder for logging: "+loggingPath.toStdString());
   }
   toolManager()->setLoggingFolder(loggingPath.toStdString());
 
@@ -787,7 +787,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
   mSettings->setValue("mainWindow/geometry", saveGeometry());
   mSettings->setValue("mainWindow/windowState", saveState());
   mSettings->sync();
-  messageManager()->sendInfo("Closing: Save geometry and window state");
+  ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
   QMainWindow::closeEvent(event);
 }
 }//namespace cx

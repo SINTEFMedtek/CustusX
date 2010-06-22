@@ -13,11 +13,11 @@
 #include <sscVector3D.h>
 #include <sscVolumetricRep.h>
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxRegistrationManager.h"
-#include "cxMessageManager.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 
@@ -154,7 +154,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
 {  
   if(!mToolToSample)
   {
-    messageManager()->sendError("mToolToSample is NULL!");
+    ssc::messageManager()->sendError("mToolToSample is NULL!");
     return;
   }
   //TODO What if the reference frame isnt visible?

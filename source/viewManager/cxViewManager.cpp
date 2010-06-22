@@ -11,7 +11,7 @@
 #include "sscProbeRep.h"
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
-#include "cxMessageManager.h"
+#include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
@@ -422,7 +422,7 @@ void ViewManager::activateLayout(LayoutType toType)
     break;
   }
 
-  messageManager()->sendInfo("Layout changed to "+ layoutText(mActiveLayout));
+  ssc::messageManager()->sendInfo("Layout changed to "+ layoutText(mActiveLayout));
 }
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)

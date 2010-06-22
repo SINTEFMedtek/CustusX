@@ -7,8 +7,8 @@
 #include <vtkRenderer.h>
 #include "sscImage.h"
 #include "sscVolumetricRep.h"
+#include "sscMessageManager.h"
 #include "cxRepManager.h"
-#include "cxMessageManager.h"
 #include "cxToolManager.h"
 
 namespace cx
