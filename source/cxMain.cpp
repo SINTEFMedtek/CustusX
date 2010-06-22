@@ -29,9 +29,6 @@ int main(int argc, char *argv[])
 #endif
   mainWin.raise();
 
-  std::cout << "argv[0]: " << argv[0] << std::endl;
-  std::cout << "appname: " << app.applicationFilePath().toStdString() << std::endl;
-
   int retVal = app.exec();
   return retVal;
   
