@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
   cx::MainWindow mainWin;
   mainWin.show();
-#ifdef __MACOSX__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   mainWin.activateWindow();
 #endif
   mainWin.raise();

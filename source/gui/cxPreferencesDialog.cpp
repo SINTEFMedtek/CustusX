@@ -4,14 +4,15 @@
 #include "sscMessageManager.h"
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
-
+#include "cxDataLocations.h"
 #include <iostream>
+#include "sscTypeConversions.h"
 
 namespace cx
 {
 FoldersTab::FoldersTab(QWidget *parent) :
   QWidget(parent),
-  mSettings(new QSettings())
+  mSettings(DataLocations::getSettings())
 {}
 
 void FoldersTab::init(){
@@ -243,7 +244,7 @@ void FoldersTab::saveParametersSlot()
 //------------------------------------------------------------------------------
 PerformanceTab::PerformanceTab(QWidget *parent) :
   QWidget(parent),
-  mSettings(new QSettings())
+  mSettings(DataLocations::getSettings())
 {
 }
 

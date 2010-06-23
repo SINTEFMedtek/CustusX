@@ -13,6 +13,7 @@ class QTimer;
 class QSettings;
 class QTime;
 #include "sscEnumConverter.h"
+typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 
 namespace cx
@@ -146,7 +147,7 @@ protected:
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
   
   bool mShadingOn; ///< Use shading for rendering?
-  QSettings* mSettings; ///< Object for storing all program/user specific settings
+  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 

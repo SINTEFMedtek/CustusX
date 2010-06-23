@@ -35,7 +35,8 @@ class Reconstructer : public QObject
 {
   Q_OBJECT
 public:
-  Reconstructer();
+  Reconstructer(QString appDataPath);
+  virtual ~Reconstructer();
 
   void readFiles(QString mhdFileName, QString calFilesPath);
   void reconstruct(); // assumes readFiles has already been called
@@ -66,6 +67,7 @@ private:
   ReconstructAlgorithmPtr mAlgorithm;
   ProbeXmlConfigParser::Configuration mConfiguration;
   QDomDocument mSettings;
+  QString mSettingsFilename;
   QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
   QString mCalFileName; ///< Name of calibration file
   QString mCalFilesPath; ///< Path to calibration files
@@ -97,6 +99,8 @@ private:
   StringOptionItem getNamedSetting(const QString& uid);
   void clearAll();
   void clearOutput();
+  void saveSettings();
+
 };
 
 }//namespace

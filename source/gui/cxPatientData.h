@@ -13,7 +13,8 @@
 #include <QObject>
 
 class QDomDocument;
-class QSettings;
+//class QSettings;
+typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
@@ -55,7 +56,7 @@ private:
   //Patient
   QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
   //Preferences
-  QSettings* mSettings; ///< Object for storing all program/user specific settings
+  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
 
 };
 

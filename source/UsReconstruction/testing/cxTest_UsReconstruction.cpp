@@ -16,5 +16,5 @@ void TestUsReconstruction::tearDown()
 
 void TestUsReconstruction::testConstructor()
 {
-  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer());
+  ssc::ReconstructerPtr reconstructer(new ssc::Reconstructer(""));
 }

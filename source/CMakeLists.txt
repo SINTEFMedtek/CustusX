@@ -148,11 +148,13 @@ SET ( LINK_LIBRARIES
 TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
 
+SET(BUNDLE_NAME CustusX)
+
 #--------------------------------------------------------------------------------
 # Install the application, on Apple, the bundle is at the root of the
 # install tree, and on other platforms it'll go into the bin directory.
 install(TARGETS CustusX #DESTINATION .
-    BUNDLE DESTINATION . #COMPONENT Runtime
+    BUNDLE DESTINATION ${BUNDLE_NAME} #COMPONENT Runtime
     RUNTIME DESTINATION bin #COMPONENT Runtime
     #COMPONENT application # crashes in installer
     )
@@ -161,31 +163,30 @@ install(TARGETS CustusX #DESTINATION .
 #--------------------------------------------------------------------------------
 # Now the installation stuff below
 #--------------------------------------------------------------------------------
-SET(BUNDLE_NAME CustusX)
-SET(plugin_dest_dir bin)
-SET(qtconf_dest_dir bin)
+#SET(plugin_dest_dir bin)
+#SET(qtconf_dest_dir bin)
 SET(CONFIG_DIR bin)
-SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/${BUNDLE_NAME}")
+SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}/bin/${BUNDLE_NAME}")
 IF(APPLE)
-  SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
-  SET(qtconf_dest_dir ${BUNDLE_NAME}.app/Contents/Resources)
+  #SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
+  #SET(qtconf_dest_dir ${BUNDLE_NAME}.app/Contents/Resources)
   #SET(CONFIG_DIR ${BUNDLE_NAME}.app/Contents/config)
-  SET(CONFIG_DIR config)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}.app")
+  SET(CONFIG_DIR ${BUNDLE_NAME}/config)
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}/${BUNDLE_NAME}.app")
 ENDIF(APPLE)
 IF(WIN32)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/${BUNDLE_NAME}.exe")
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}/bin/${BUNDLE_NAME}.exe")
 ENDIF(WIN32)
 
 
 #install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config DESTINATION target_config COMPONENT config)
 #install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt DESTINATION "/Library/CustusX")# COMPONENT config)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../config/ DESTINATION "${CONFIG_DIR}" 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
     #PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE
     ) # COMPONENT config)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../igstk.links DESTINATION "/Library/CustusX/" 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Library/CustusX/" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
     #PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE

@@ -27,6 +27,7 @@
 #include "sscReconstructionWidget.h"
 #include "cxPatientData.h"
 #include "cxRegistrationHistoryWidget.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -50,13 +51,13 @@ MainWindow::MainWindow() :
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(new ssc::ReconstructionWidget(this)),
+  mReconstructionWidget(new ssc::ReconstructionWidget(this, DataLocations::getAppDataPath() )),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),
   mPatientRegistrationIndex(-1),
   mNavigationIndex(-1),
-  mSettings(new QSettings()),
+  mSettings(DataLocations::getSettings()),
   mPatientData(new PatientData(this))
   //mActivePatientFolder("")
 {
@@ -79,7 +80,8 @@ MainWindow::MainWindow() :
   if (!mSettings->contains("globalPatientDataFolder"))
     mSettings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
   if (!mSettings->contains("toolConfigFilePath"))
-    mSettings->setValue("toolConfigFilePath", QDir::homePath());
+    mSettings->setValue("toolConfigFilePath", DataLocations::getConfigPath()+"/tool/");
+//    mSettings->setValue("toolConfigFilePath", QDir::homePath());
   if (!mSettings->contains("globalApplicationName"))
     mSettings->setValue("globalApplicationName", "Nevro");
   if (!mSettings->contains("globalPatientNumber"))
@@ -753,10 +755,12 @@ void MainWindow::loadPatientRegistrationSlot()
 void MainWindow::configureSlot()
 {
   QString configFile = mSettings->value("toolConfigFilePath").toString();
+  QFileInfo info(configFile);
 
-  if(configFile ==  QDir::homePath() || configFile.isEmpty())
+  if (!info.exists() || info.isDir())
+  //if(configFile ==  QDir::homePath() || configFile.isEmpty())
   {
-    QString configFile = QFileDialog::getOpenFileName(this,
+    configFile = QFileDialog::getOpenFileName(this,
         tr("Select configuration file (*.xml)"),
         mSettings->value("toolConfigFilePath").toString(),
         tr("Configuration files (*.xml)"));

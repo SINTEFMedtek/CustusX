@@ -22,6 +22,7 @@
 #include "cxViewWrapper3D.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
+#include "cxDataLocations.h"
 
 SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
 {
@@ -61,7 +62,7 @@ ViewManager::ViewManager() :
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(15),
   mRenderingTimer(new QTimer(this)),
-  mSettings(new QSettings()),
+  mSettings(DataLocations::getSettings()),
   mRenderingTime(new QTime()),
   mNumberOfRenderings(0),
   mGlobal2DZoom(true),

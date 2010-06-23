@@ -16,6 +16,7 @@
 #include "sscXmlOptionItem.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
+//#include "cxDataLocations.h"
 
 //Windows fix
 #ifndef M_PI
@@ -27,22 +28,22 @@ typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 namespace ssc
 {
 
-Reconstructer::Reconstructer() :
+Reconstructer::Reconstructer(QString appDataPath) :
   mAlgorithm(new ThunderVNNReconstructAlgorithm),
   mOutputRelativePath(""),
   mOutputBasePath("")
 {
-  QString defPath = "/Users/christiana/workspace/sessions/";
-  QString filename = "usReconstruct.xml_";
+  mSettingsFilename = appDataPath+"/usReconstruct.xml";
 
-  QDomDocument doc("us reconstruction");
+  QDomDocument doc("usReconstruction");
   doc.appendChild(doc.createElement("usReconstruct"));
   doc.documentElement().appendChild(doc.createElement("algorithms"));
 
-  QFile file(defPath+filename);
+  QFile file(mSettingsFilename);
   if (!file.open(QIODevice::ReadOnly))
   {
-    ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
+    // ok to not find file - we have nice defaults.
+    //ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
   }
   else
   {
@@ -83,7 +84,33 @@ Reconstructer::Reconstructer() :
     mAlgorithm->getSettings(algo);
   }
 
+  this->saveSettings();
+
   //std::cout << doc.toString(2) << std::endl;
+}
+
+Reconstructer::~Reconstructer()
+{
+  this->saveSettings();
+}
+
+
+void Reconstructer::saveSettings()
+{
+  std::cout << "save settings" << std::endl;
+  QFile file(mSettingsFilename);
+  if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    QTextStream stream(&file);
+    stream << mSettings.toString();
+    file.close();
+    ssc::messageManager()->sendInfo("Created "+file.fileName().toStdString());
+  }
+  else
+  {
+    ssc::messageManager()->sendError("Could not open "+file.fileName().toStdString()
+                               +" Error: "+file.errorString().toStdString());
+  }
 }
 
 QDomElement Reconstructer::getSettings() const
