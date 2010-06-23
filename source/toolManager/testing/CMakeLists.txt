@@ -14,8 +14,11 @@ if (BUILD_TESTING)
      )
     
     set(TM_TEST_SOURCE_FILES
-    cxTest_ToolConfigurationParser.cpp
-    ${CX_TEST_SOURCE_FILES}
+        cxTest_ToolConfigurationParser.h
+        cxTest_ToolConfigurationParser.cpp
+        cxTest_Tracker.h
+        cxTest_Tracker.cpp
+        ${CX_TEST_SOURCE_FILES}
     )
     
     # A CppUnit executable included for debugging purposes.
