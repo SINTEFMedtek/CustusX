@@ -6,7 +6,7 @@
 #include "sscView.h"
 #include "sscImage.h"
 #include "sscDefinitions.h"
-#include "sscForwardDeclarations.h"
+#include "cxForwardDeclarations.h"
 
 class QMenu;
 class QActionGroup;
@@ -69,7 +69,6 @@ protected:
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
 };
-typedef boost::shared_ptr<ViewWrapper> ViewWrapperPtr;
 
 }//namespace cx
 #endif /* CXVIEWWRAPPER_H_ */

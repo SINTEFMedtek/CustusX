@@ -37,16 +37,11 @@ MainWindow::MainWindow() :
   mCurrentWorkflowState(PATIENT_DATA),
   mCentralWidget(new QWidget(this)),
   mContextDockWidget(new ContextDockWidget(this)),
-  //mImageRegistrationWidget(new ImageRegistrationWidget(mContextDockWidget)),
-  //mPatientRegistrationWidget(new PatientRegistrationWidget(mContextDockWidget)),
-  //mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
-  //mShiftCorrectionWidget(new ShiftCorrectionWidget(mContextDockWidget)),
   mImageRegistrationWidget(new ImageRegistrationWidget(NULL)),
   mPatientRegistrationWidget(new PatientRegistrationWidget(NULL)),
   mTransferFunctionWidget(new TransferFunctionWidget(mContextDockWidget)),
   mShiftCorrectionWidget(new ShiftCorrectionWidget(NULL)),
   mBrowserWidget(new BrowserWidget(mContextDockWidget)),
-  //mNavigationWidget(new NavigationWidget(mContextDockWidget)),
   mNavigationWidget(new NavigationWidget(NULL)),
   mCustomStatusBar(new CustomStatusBar()),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
@@ -60,7 +55,6 @@ MainWindow::MainWindow() :
   mNavigationIndex(-1),
   mSettings(DataLocations::getSettings()),
   mPatientData(new PatientData(this))
-  //mActivePatientFolder("")
 {
 #ifdef VERSION_NUMBER_VERBOSE
   this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER_VERBOSE));
@@ -104,26 +98,6 @@ MainWindow::MainWindow() :
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
-  
-  // TODO: Find a better way to do this
-  //if we remove this section some items stack in the upper left corner,
-  //probably some items missing a parent, check it out.
-  // Solution?: Set parent to NULL in constructors
-  /*mImageRegistrationIndex = mContextDockWidget->addTab(mImageRegistrationWidget,
-                                                       QString("Image Registration"));
-  mContextDockWidget->removeTab(mImageRegistrationIndex);
-  mPatientRegistrationIndex = mContextDockWidget->addTab(mPatientRegistrationWidget,
-                                                         QString("Patient Registration"));
-  mContextDockWidget->removeTab(mPatientRegistrationIndex);
-  mNavigationIndex = mContextDockWidget->addTab(mNavigationWidget,
-                                                         QString("Navigation"));
-  mContextDockWidget->removeTab(mNavigationIndex);*/
-    
-
-//  QDockWidget* imagePropertiesDockWidget = new QDockWidget("Image Properties", this);
-//  imagePropertiesDockWidget->setObjectName("ImagePropertiesDockWidget");
-//  imagePropertiesDockWidget->setWidget(mImagePropertiesWidget);
-//  this->addDockWidget(Qt::LeftDockWidgetArea, imagePropertiesDockWidget);
 
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mToolPropertiesWidget);

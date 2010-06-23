@@ -50,6 +50,7 @@ public:
   virtual ~ViewGroup();
 
   void addViewWrapper(ViewWrapperPtr wrapper);
+  ViewWrapperPtr getViewWrapperFromViewUid(std::string viewUid);
   std::vector<ssc::View*> getViews() const;
   ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
   virtual void addImage(ssc::ImagePtr image);
@@ -62,18 +63,13 @@ public:
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);
 
-signals:
-  //void viewGroupZoom2DChanged(double newZoom);
-
 public slots:
-  //void zoom2DChangeSlot(double newZoom);
-  //void orientationChangedSlot(ssc::ORIENTATION_TYPE type);
   void addImage(QString imageUid);
   void removeImage(QString imageUid);
 
 private slots:
   void activateManualToolSlot();
-  void activeImageChangeSlot();
+  void mouseClickInViewGroupSlot();
 
 protected:
   //zoom2d is the same for all viewwrapper2ds in a viewgroup
@@ -97,7 +93,7 @@ protected:
   SyncGroup mZoom2D;
 
   std::vector<ssc::ImagePtr> mImages;
-  std::vector<ViewWrapperPtr> mElements;
+  std::vector<ViewWrapperPtr> mViewWrappers;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
 } // namespace cx
