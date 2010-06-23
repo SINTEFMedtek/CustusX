@@ -141,29 +141,32 @@ void ToolManager::initialize()
     ssc::messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
-  //this->createSymlink();
+  this->createSymlink();
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
 
-/** Assume that IGSTK requires the file /dev/cu.CustusX3 as a rep for the
- *  HW connection.
+/** Assume that IGSTK requires the file /Library/CustusX/igstk.link/cu.CustusX.dev0
+ *  as a rep for the HW connection. Also assume that directory is created with full
+ *  read/write access (by installer or similar).
  *  Create that file as a symlink to the correct device.
  */
 void ToolManager::createSymlink()
 {
   QString linkfile = "/dev/cu.CustusX3";
 //  linkfile = "/Users/christiana/test_file";
+  // the following path is
+  linkfile = "/Library/CustusX/igstk.link/cu.CustusX.dev0";
   QDir devDir("/dev/");
 
   QStringList filters;
   //filters << "*cu.*"; // test
-  filters << "*cu.usbserial*"; //TODO file isn't always called cu.usbserial...
+  filters << "cu.usbserial*" << "cu.*KeyStore*"; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
   std::cout << "Files: " << files.join("\n") << std::endl;
   if (files.empty())
   {
-    std::cout << "Warning: No usb connections found in /dev" << std::endl;
+    std::cout << "Warning: No usb connections found in /dev using filters " << filters.join(";") << std::endl;
     return;
   }
 
@@ -178,11 +181,11 @@ void ToolManager::createSymlink()
   bool val = devFile.link(linkfile);
   if (!val)
   {
-    std::cout << "symlink failed with code " << devFile.error() << std::endl;
+    std::cout << QString("symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(devFile.error()) << std::endl;
   }
   else
   {
-    std::cout << QString("created symlink from %1 to %2").arg(device).arg(linkfile) << std::endl;
+    std::cout << QString("created symlink %1 to device %2").arg(linkfile).arg(device) << std::endl;
   }
 }
 
