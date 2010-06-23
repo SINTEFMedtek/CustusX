@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
   this->setWindowTitle("US reconstruct test app");
   QHBoxLayout* layout = new QHBoxLayout(this);
-  mReconstructionWidget = new ssc::ReconstructionWidget(this, qApp->applicationFilePath());
+  mReconstructionWidget = new ssc::ReconstructionWidget(this, qApp->applicationFilePath(), "");
   
   //#define CA_DEFS
 #ifdef CA_DEFS

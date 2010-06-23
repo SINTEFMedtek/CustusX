@@ -94,9 +94,9 @@ void ComboGroupWidget::dataChanged()
 // --------------------------------------------------------
 
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath):
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath, QString shaderPath):
   QWidget(parent),
-  mReconstructer(new Reconstructer(appDataPath))
+  mReconstructer(new Reconstructer(appDataPath, shaderPath))
 {
   this->setWindowTitle("US Reconstruction");
 

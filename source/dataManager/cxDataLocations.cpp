@@ -35,6 +35,14 @@ QString DataLocations::getConfigPath()
   return CX_CONFIG_ROOT;
 }
 
+QString DataLocations::getShaderPath()
+{
+  QString path(qApp->applicationDirPath()+"/../Resources/shaders");
+  if (QDir(path).exists())
+    return path;
+  return "";
+}
+
 QString DataLocations::getAppDataPath()
 {
   QString path = getBundlePath()+"/config/appdata";

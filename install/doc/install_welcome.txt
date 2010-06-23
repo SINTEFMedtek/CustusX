@@ -1,0 +1,3 @@
+Welcome to installation. This program will guide you through the installation of CustusX3.
+
+<add more text>

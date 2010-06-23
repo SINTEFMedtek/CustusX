@@ -104,7 +104,7 @@ ENDIF(APPLE)
 IF(APPLE)
   SET(MACOSX_BUNDLE_INFO_STRING "CustusX")
   SET(MACOSX_BUNDLE_BUNDLE_NAME "CustusX")
-  SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_NUMBER}")
+  SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_NUMBER_VERBOSE}")
   SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_BUNDLE_VERSION}")
   SET(MACOSX_BUNDLE_LONG_VERSION_STRING "CustusX ${MACOSX_BUNDLE_BUNDLE_VERSION}")
   SET(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")
@@ -149,12 +149,14 @@ TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
 
 SET(BUNDLE_NAME CustusX)
+SET(INSTALL_FOLDER_NAME "${BUNDLE_NAME} ${VERSION_NUMBER}")
+message(STATUS "test: " ${INSTALL_FOLDER_NAME})
 
 #--------------------------------------------------------------------------------
 # Install the application, on Apple, the bundle is at the root of the
 # install tree, and on other platforms it'll go into the bin directory.
 install(TARGETS CustusX #DESTINATION .
-    BUNDLE DESTINATION ${BUNDLE_NAME} #COMPONENT Runtime
+    BUNDLE DESTINATION ${INSTALL_FOLDER_NAME} #COMPONENT Runtime
     RUNTIME DESTINATION bin #COMPONENT Runtime
     #COMPONENT application # crashes in installer
     )
@@ -164,18 +166,18 @@ install(TARGETS CustusX #DESTINATION .
 # Now the installation stuff below
 #--------------------------------------------------------------------------------
 #SET(plugin_dest_dir bin)
-#SET(qtconf_dest_dir bin)
+SET(RESOURCES_DIR bin)
 SET(CONFIG_DIR bin)
-SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}/bin/${BUNDLE_NAME}")
+SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}")
 IF(APPLE)
   #SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
-  #SET(qtconf_dest_dir ${BUNDLE_NAME}.app/Contents/Resources)
+  SET(RESOURCES_DIR ${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app/Contents/Resources)
   #SET(CONFIG_DIR ${BUNDLE_NAME}.app/Contents/config)
-  SET(CONFIG_DIR ${BUNDLE_NAME}/config)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}/${BUNDLE_NAME}.app")
+  SET(CONFIG_DIR ${INSTALL_FOLDER_NAME}/config)
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app")
 ENDIF(APPLE)
 IF(WIN32)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}/bin/${BUNDLE_NAME}.exe")
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}.exe")
 ENDIF(WIN32)
 
 
@@ -184,12 +186,12 @@ ENDIF(WIN32)
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
-    #PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE
+    ) # COMPONENT config)
+install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl DESTINATION ${RESOURCES_DIR}/shaders/ 
     ) # COMPONENT config)
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Library/CustusX/" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
-    #PERMISSIONS WORLD_READ WORLD_WRITE WORLD_EXECUTE
     ) # COMPONENT config)
 
 #set(CPACK_SET_DESTDIR ON)
@@ -199,10 +201,16 @@ set(CPACK_PACKAGE_VENDOR "Sintef blabla")# does not work..?
 set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/gui/icons/CustusX.png")# does not work..?
 #message(STATUS "licence fle: " "${CMAKE_CURRENT_SOURCE_DIR}/config/Licence.txt")
 set(CPACK_RECOURCE_FILE_LICENCE "${CMAKE_CURRENT_SOURCE_DIR}/../config/Licence.txt") # does not work..?
-set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER})
+set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
+
+set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}") # name of .pkg file
+set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
+set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+
 
 #set(CPACK_PACKAGE_EXECUTABLES "CustusX" "CustusX_navn")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "test_pkg_install")

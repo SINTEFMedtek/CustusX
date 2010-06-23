@@ -107,7 +107,7 @@ class ReconstructionWidget : public QWidget
 {
   Q_OBJECT
 public:
-  ReconstructionWidget(QWidget* parent, QString appDataPath);
+  ReconstructionWidget(QWidget* parent, QString appDataPath, QString shaderPath);
   ReconstructerPtr reconstructer() {  return mReconstructer; }
   void selectData(QString inputfile);
 
