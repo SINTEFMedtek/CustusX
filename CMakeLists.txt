@@ -40,17 +40,17 @@ IF (WIN32)
 ENDIF (WIN32)
 
 # name of folder where all executables, config etc are assembled
-SET(INSTALL_FOLDER_NAME "${BUNDLE_NAME} ${VERSION_NUMBER}")
+SET(INSTALL_FOLDER_NAME "CustusX ${VERSION_NUMBER}")
 
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
 add_subdirectory( modules/cxCommon )
 ADD_SUBDIRECTORY ( source )
 
-option(USE_US_ACQUISITION "use us acquisition module" OFF)
-if(USE_US_ACQUISITION)
+option(BUILD_US_ACQUISITION "build us acquisition module" OFF)
+if(BUILD_US_ACQUISITION)
     add_subdirectory(modules/ultrasoundAcquisition)
-endif(USE_US_ACQUISITION)
+endif(BUILD_US_ACQUISITION)
 
 enable_testing()
 add_subdirectory(testing)
