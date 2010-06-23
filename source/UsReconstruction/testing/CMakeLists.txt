@@ -22,7 +22,7 @@ if (BUILD_TESTING)
   # A CppUnit executable included for debugging purposes.
   # Not part of ctest
   add_executable(cxTestUsReconstruction cxCppUnitMain.cpp ${SOURCE_FILES} )
-  target_link_libraries(cxTestUsReconstruction 
+  target_link_libraries(cxTestUsReconstruction
     sscUsReconstructionLib 
     cppunit)
   

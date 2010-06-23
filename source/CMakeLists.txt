@@ -75,6 +75,7 @@ INCLUDE_DIRECTORIES(
     .
     ${SUB_FOLDERS}
     /usr/local/include
+    ${CustusX3_SOURCE_DIR}/modules/cxCommon
     )
     
 
@@ -116,6 +117,7 @@ ENDIF(APPLE)
 SET ( LINK_LIBRARIES
   ${BOOST_LIBRARIES}
   ${QT_LIBRARIES}
+  cxCommon
   gui
   viewManager
   repManager

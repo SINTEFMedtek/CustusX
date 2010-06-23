@@ -10,7 +10,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QSettings>
-#include "sscTypeConversions.h"
+//#include "sscTypeConversions.h"
 #include "cxConfig.h"
 
 namespace cx
@@ -18,7 +18,7 @@ namespace cx
 
 QString DataLocations::getBundlePath()
 {
-#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__
   QString path(qApp->applicationDirPath()+"/../../..");
   return path;
 #else

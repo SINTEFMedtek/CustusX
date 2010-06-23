@@ -30,8 +30,6 @@ SET( SOURCE_FILES
   sscThunderVNNReconstructAlgorithm.cpp
   #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h
   #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.cpp
-  probeXmlConfigParser.h
-  probeXmlConfigParser.cpp
   )
 
 # =========================================================
@@ -52,7 +50,11 @@ link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
 # =========================================================
 # create the target
 add_library( sscUsReconstructionLib ${SOURCE_FILES} )
-target_link_libraries( sscUsReconstructionLib SSC thunder ITKCommon)
+target_link_libraries( sscUsReconstructionLib 
+    SSC
+    cxCommon 
+    thunder 
+    ITKCommon)
 # =========================================================
 
 ADD_SUBDIRECTORY( testing )
