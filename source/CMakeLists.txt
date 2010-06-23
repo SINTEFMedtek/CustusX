@@ -150,7 +150,7 @@ TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
 SET(BUNDLE_NAME CustusX)
 SET(INSTALL_FOLDER_NAME "${BUNDLE_NAME} ${VERSION_NUMBER}")
-message(STATUS "test: " ${INSTALL_FOLDER_NAME})
+#message(STATUS "test: " ${INSTALL_FOLDER_NAME})
 
 #--------------------------------------------------------------------------------
 # Install the application, on Apple, the bundle is at the root of the
