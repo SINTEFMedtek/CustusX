@@ -27,7 +27,7 @@ add_library(cxCommon
     #message(status "custus dir local: " ${CustusX3_SOURCE_DIR})
 
 set (CX_CONFIG_ROOT ${CustusX3_SOURCE_DIR}/config)
-set (CX_DATA_ROOT ${CustusX3_SOURCE_DIR}/data)
+set (CX_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cxConfig.h.in"
