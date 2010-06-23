@@ -15,9 +15,9 @@
 #include "cxRepManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"
-//#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
@@ -163,33 +163,38 @@ ViewGroup::~ViewGroup()
 void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 {
   mViews.push_back(wrapper->getView());
-  mElements.push_back(wrapper);
+  mViewWrappers.push_back(wrapper);
 
   wrapper->setZoom2D(mZoom2D.mActive);
 
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
-          this, SLOT(activeImageChangeSlot()));
+          this, SLOT(mouseClickInViewGroupSlot()));
   connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
-          this, SLOT(activeImageChangeSlot()));
+          this, SLOT(mouseClickInViewGroupSlot()));
 
   connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
   connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
-//  connect(wrapper.get(), SIGNAL(zoom2DChange(double)),
-//          this, SLOT(zoom2DChangeSlot(double)));
-//  connect(wrapper.get(), SIGNAL(orientationChanged(ssc::ORIENTATION_TYPE)),
-//          this, SLOT(orientationChangedSlot(ssc::ORIENTATION_TYPE)));
 }
 
+ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(std::string viewUid)
+{
+  for(unsigned i=0; i<mViewWrappers.size(); ++i)
+  {
+    if(mViewWrappers[i]->getView()->getUid() == viewUid)
+      return mViewWrappers[i];
+  }
+  return ViewWrapperPtr();
+}
 
 void ViewGroup::setGlobal2DZoom(bool use, SyncedValuePtr val)
 {
   mZoom2D.mGlobal = val;
   mZoom2D.activateGlobal(use);
 
-  for (unsigned i=0; i<mElements.size(); ++i)
-    mElements[i]->setZoom2D(mZoom2D.mActive);
+  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+    mViewWrappers[i]->setZoom2D(mZoom2D.mActive);
 }
 
 /**Set the zoom2D factor, only.
@@ -197,53 +202,18 @@ void ViewGroup::setGlobal2DZoom(bool use, SyncedValuePtr val)
 void ViewGroup::setZoom2D(double newZoom)
 {
   mZoom2D.mActive->set(newZoom);
-//  for (unsigned i=0; i<mElements.size(); ++i)
-//  {
-//    mElements[i]->setZoom2D(newZoom);
-//  }
-//
-//  //std::cout << "VIEWGROUP: zoom changed: " + string_cast(newZoom) << std::endl;
-//  emit viewGroupZoom2DChanged(this->getZoom2D());
 }
 
 double ViewGroup::getZoom2D()
 {
   return mZoom2D.mActive->get().toDouble();
-//  double zoom2D = 0.5; //dafault value if no viewwrapper2d exists in this viewgroup
-//  std::vector<ViewWrapperPtr>::iterator it  = find_if(mElements.begin(), mElements.end(), cx::isViewWrapper2D);
-//  if(it != mElements.end() && (*it))
-//  {
-//    zoom2D = (*it)->getZoom2D();
-//  }
-//
-//  return zoom2D;
 }
-
-///**Called when a zoom change is requested from one view wrapper
-// *
-// */
-//void ViewGroup::zoom2DChangeSlot(double newZoom)
-//{
-//  Navigation().centerToTooltip(); // side effect: center on tool
-//
-//  this->setZoom2D(newZoom);
-//}
-
-//void ViewGroup::orientationChangedSlot(ssc::ORIENTATION_TYPE type)
-//{
-//  std::cout << "pling" << std::endl;
-//  std::vector<ViewWrapperPtr>::iterator it = mElements.begin();
-//  for(;it != mElements.end();++it)
-//  {
-//    (*it)->changeOrientationType(type);
-//  }
-//}
 
 void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 {
-  for(unsigned i=0; i<mElements.size(); ++i)
+  for(unsigned i=0; i<mViewWrappers.size(); ++i)
   {
-    mElements[i]->setOrientationMode(val);
+    mViewWrappers[i]->setOrientationMode(val);
   }
 }
 
@@ -271,13 +241,18 @@ void ViewGroup::removeImage(QString imageUid)
   this->removeImage(image);
 }
 
-void ViewGroup::activeImageChangeSlot()
+void ViewGroup::mouseClickInViewGroupSlot()
 {
   //ssc::messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
   if (mImages.empty())
     dataManager()->setActiveImage(ssc::ImagePtr());
   else
     dataManager()->setActiveImage(mImages.front());
+
+  ssc::View* view = static_cast<ssc::View*>(this->sender());
+  if(view)
+    viewManager()->setActiveView(view->getUid());
+
 }
 
 std::vector<ssc::View*> ViewGroup::getViews() const
@@ -290,12 +265,12 @@ std::vector<ssc::View*> ViewGroup::getViews() const
  */
 ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
 {
-  if (index<0 || index>=(int)mElements.size())
+  if (index<0 || index>=(int)mViewWrappers.size())
   {
     ssc::messageManager()->sendError("invalid index in ViewGroup2D");
   }
 
-  mElements[index]->initializePlane(plane);
+  mViewWrappers[index]->initializePlane(plane);
   return mViews[index];
 }
 
@@ -303,28 +278,26 @@ void ViewGroup::addImage(ssc::ImagePtr image)
 {
   if (std::count(mImages.begin(), mImages.end(), image))
     return;
-//  if(mImage == image)
-//    return;
+
   mImages.push_back(image);
-  for (unsigned i=0; i<mElements.size(); ++i)
-    mElements[i]->addImage(image);
+  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+    mViewWrappers[i]->addImage(image);
 }
 
 void ViewGroup::removeImage(ssc::ImagePtr image)
 {
   if (!std::count(mImages.begin(), mImages.end(), image))
     return;
-//  if(mImage != image)
-//    return;
+
   mImages.erase(std::find(mImages.begin(), mImages.end(), image));
-  for (unsigned i=0; i<mElements.size(); ++i)
-    mElements[i]->removeImage(image);
+  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+    mViewWrappers[i]->removeImage(image);
 }
 
 void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
-  for (unsigned i=0; i<mElements.size(); ++i)
-    mElements[i]->setRegistrationMode(mode);
+  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+    mViewWrappers[i]->setRegistrationMode(mode);
 }
 
 void ViewGroup::activateManualToolSlot()
@@ -343,25 +316,11 @@ void ViewGroup::addXml(QDomNode& dataNode)
     dataNode.appendChild(imageNode);
   }
 
-//  if (mImage)
-//  {
-//    QDomElement imageNode = doc.createElement("image");
-//    imageNode.appendChild(doc.createTextNode(qstring_cast(mImage->getUid())));
-//    dataNode.appendChild(imageNode);
-//  }
-
   QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
   zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
   dataNode.appendChild(zoom2DNode);
 }
 
-//bool isViewWrapper2D(ViewWrapperPtr wrapper)
-//{
-//  if(wrapper->getZoom2D() != -1)
-//    return true;
-//  else
-//    return false;
-//}
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {
@@ -378,17 +337,6 @@ void ViewGroup::parseXml(QDomNode dataNode)
          ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
      }
   }
-
-//  QString imageUid = dataNode.namedItem("image").toElement().text();
-//
-//  if (!imageUid.isEmpty())
-//  {
-//    ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
-//    if (image)
-//      this->setImage(image);
-//    else
-//      ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
-//  }
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;

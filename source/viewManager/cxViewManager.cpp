@@ -16,7 +16,6 @@
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxViewGroup.h"
-//#include "cxViewGroupInria.h"
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
@@ -28,9 +27,6 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
 {
   "No_layout",
   "3D_1X1",
-  //"3DACS_2X2_inria",
-  //"3DACS_1X3_inria",
-  //"ACSACS_2X3_inria",
   "3DACS_2X2",
   "3DACS_1X3",
   "3DAny_1X2",
@@ -58,7 +54,6 @@ ViewManager::ViewManager() :
   mActiveLayout(LAYOUT_NONE),
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
-  mActiveView(NULL),
   MAX_3DVIEWS(2),
   MAX_2DVIEWS(15),
   mRenderingTimer(new QTimer(this)),
@@ -127,15 +122,9 @@ ViewManager::ViewManager() :
   group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_15"])));
   mViewGroups.push_back(group);
 
-  /*group.reset(new ViewGroupInria(1,mView2DMap["View2D_1"], mView2DMap["View2D_2"],mView2DMap["View2D_3"]));
-  mViewGroups.push_back(group);
-  group.reset(new ViewGroupInria(2,mView2DMap["View2D_4"], mView2DMap["View2D_5"],mView2DMap["View2D_6"]));
-  mViewGroups.push_back(group);*/
-
   this->syncOrientationMode(SyncedValue::create(0));
 
   // set start layout
-
   this->setActiveLayout(LAYOUT_3DACS_2X2_SNW);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
@@ -161,9 +150,6 @@ std::vector<LayoutType> ViewManager::availableLayouts() const
 {
   std::vector<LayoutType> retval;
   retval.push_back(LAYOUT_3D_1X1);
-//  retval.push_back(LAYOUT_3DACS_2X2);
-//  retval.push_back(LAYOUT_3DACS_1X3);
-//  retval.push_back(LAYOUT_ACSACS_2X3);
   retval.push_back(LAYOUT_3DACS_2X2_SNW);
   retval.push_back(LAYOUT_3DACS_1X3_SNW);
   retval.push_back(LAYOUT_3DAny_1X2_SNW);
@@ -187,24 +173,40 @@ LayoutType ViewManager::getActiveLayout() const
  */
 void ViewManager::setActiveLayout(LayoutType layout)
 {
-  //std::cout << "Setting active layout to "<< layoutText(layout) << std::endl;
   if (mActiveLayout==layout)
     return;
 
   deactivateCurrentLayout();
   activateLayout(layout);
 }
-ssc::View* ViewManager::getActiveView() const
+
+ViewWrapperPtr ViewManager::getActiveView() const
 {
   return mActiveView;
 }
-void ViewManager::setActiveView(ssc::View* view)
+
+void ViewManager::setActiveView(ViewWrapperPtr viewWrapper)
 {
-  if(mActiveView && view && mActiveView->getUid() != view->getUid())
+  if(mActiveView && viewWrapper &&
+      (mActiveView->getView()->getUid() == viewWrapper->getView()->getUid()))
     return;
 
-  mActiveView = view;
+  mActiveView = viewWrapper;
   emit activeViewChanged();
+  ssc::messageManager()->sendInfo("Active view set to "+mActiveView->getView()->getUid());
+}
+
+void ViewManager::setActiveView(std::string viewUid)
+{
+  for(unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(viewUid);
+    if(viewWrapper)
+    {
+      this->setActiveView(viewWrapper);
+      return;
+    }
+  }
 }
 
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
@@ -247,7 +249,7 @@ void ViewManager::addXml(QDomNode& parentNode)
 
   QDomElement activeViewNode = doc.createElement("activeView");
   if(mActiveView)
-    activeViewNode.appendChild(doc.createTextNode(mActiveView->getUid().c_str()));
+    activeViewNode.appendChild(doc.createTextNode(mActiveView->getView()->getUid().c_str()));
   viewManagerNode.appendChild(activeLayoutNode);
 
   QDomElement viewGroupsNode = doc.createElement("viewGroups");
@@ -264,6 +266,7 @@ void ViewManager::addXml(QDomNode& parentNode)
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
+  QString activeViewString;
   QDomNode child = viewmanagerNode.firstChild();
   while(!child.isNull())
   {
@@ -276,16 +279,16 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
         this->setGlobal2DZoom(true);
     }else if(child.toElement().tagName() == "activeLayout")
     {
-      //std::cout << "Found activeLayout tag." << std::endl;
       const QString activeLayoutString = child.toElement().text();
       if(!activeLayoutString.isEmpty())
         this->setActiveLayout(string2enum<LayoutType>(activeLayoutString.toStdString()));
     }
     else if(child.toElement().tagName() == "activeView")
     {
-      const QString activeViewString = child.toElement().text();
-      if(!activeViewString.isEmpty())
-        this->setActiveView(getView(activeViewString.toStdString()));
+      activeViewString = child.toElement().text();
+      //set active view after all viewgroups are properly set up
+      //if(!activeViewString.isEmpty())
+        //this->setActiveView(getViewWrapper(activeViewString.toStdString()));
     }
     child = child.nextSibling();
   }
@@ -312,16 +315,20 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
 
     viewgroup = viewgroup.nextSibling();
   }
+
+  this->setActiveView(activeViewString.toStdString());
 }
 
 QWidget* ViewManager::stealCentralWidget()
 {
   return mMainWindowsCentralWidget;
 }
+
 ViewManager::View2DMap* ViewManager::get2DViews()
 {
   return &mView2DMap;
 }
+
 ViewManager::View3DMap* ViewManager::get3DViews()
 {
   return &mView3DMap;
@@ -342,6 +349,7 @@ ssc::View* ViewManager::getView(const std::string& uid)
   }
   return view;
 }
+
 View2D* ViewManager::get2DView(const std::string& uid)
 {
   View2D* view = NULL;
@@ -352,6 +360,7 @@ View2D* ViewManager::get2DView(const std::string& uid)
   }
   return view;
 }
+
 View3D* ViewManager::get3DView(const std::string& uid)
 {
   View3D* view = NULL;
@@ -370,14 +379,6 @@ void ViewManager::deactivateCurrentLayout()
   for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
     deactivateView(iter->second);
 }
-/*void ViewManager::changeLayout(LayoutType toType)
-{
-  if (mActiveLayout==toType)
-    return;
-
-  deactivateCurrentLayout();
-  activateLayout(toType);
-}*/
 
 /**activate a layout. Assumes the previous layout is already deactivated.
  */
@@ -394,15 +395,6 @@ void ViewManager::activateLayout(LayoutType toType)
   case LAYOUT_3D_1X1:
     this->activateLayout_3D_1X1();
     break;
-  /*case LAYOUT_3DACS_2X2:
-    this->activateLayout_3DACS_2X2();
-    break;
-  case LAYOUT_3DACS_1X3:
-    this->activateLayout_3DACS_1X3();
-    break;
-  case LAYOUT_ACSACS_2X3:
-    this->activateLayout_ACSACS_2X3();
-    break;*/
   case LAYOUT_3DACS_2X2_SNW:
     this->activateLayout_3DACS_2X2_SNW();
     break;
@@ -458,11 +450,6 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
 //  }
 }
   
-/*void ViewManager::activateView(ssc::View* view, int row, int col, int rowSpan, int colSpan) INRIA SPECIFIC?
-{
-  mLayout->addWidget(view, row, col, rowSpan, colSpan );
-  view->show();
-}*/
 void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
 {
   mViewGroups[group]->initializeView(index, plane);
@@ -490,18 +477,6 @@ void ViewManager::activateLayout_3D_1X1()
   mActiveLayout = LAYOUT_3D_1X1;
   emit activeLayoutChanged();
 }
-
-/*void ViewManager::activateLayout_3DACS_2X2() INRIA
-{
-  activate3DView(0, 0,                  0, 0);
-
-  activateView(mView2DMap[mView2DNames[0]],   0, 1);
-  activateView(mView2DMap[mView2DNames[1]],   1, 0);
-  activateView(mView2DMap[mView2DNames[2]],   1, 1);
-
-  mActiveLayout = LAYOUT_3DACS_2X2;
-  emit activeLayoutChanged();
-}*/
 
 void ViewManager::activateLayout_3DACS_2X2_SNW()
 {
@@ -560,32 +535,6 @@ void ViewManager::activateLayout_3DAny_1X2_SNW()
   emit activeLayoutChanged();
 }
 
-/*void ViewManager::activateLayout_3DACS_1X3() INRIA
-{
-  activate3DView(0, 0,                  0, 0, 3, 1);
-
-  activateView(mView2DMap[mView2DNames[0]],   0, 1);
-  activateView(mView2DMap[mView2DNames[1]],   1, 1);
-  activateView(mView2DMap[mView2DNames[2]],   2, 1);
-
-  mActiveLayout = LAYOUT_3DACS_1X3;
-  emit activeLayoutChanged();
-}*/
-
-/*void ViewManager::activateLayout_ACSACS_2X3() INRIA
-{
-  activateView(mView2DMap[mView2DNames[0]],   0, 0);
-  activateView(mView2DMap[mView2DNames[1]],   0, 1);
-  activateView(mView2DMap[mView2DNames[2]],   0, 2);
-
-  activateView(mView2DMap[mView2DNames[3]],   1, 0);
-  activateView(mView2DMap[mView2DNames[4]],   1, 1);
-  activateView(mView2DMap[mView2DNames[5]],   1, 2);
-
-  mActiveLayout = LAYOUT_ACSACS_2X3;
-  emit activeLayoutChanged();
-}*/
-
 void ViewManager::renderAllViewsSlot()
 {
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
@@ -606,7 +555,5 @@ void ViewManager::renderAllViewsSlot()
   else
     mNumberOfRenderings++;
 }
-
-
 
 }//namespace cx

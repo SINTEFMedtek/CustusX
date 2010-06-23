@@ -7,12 +7,13 @@
 #include "sscImage.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
+#include "sscEnumConverter.h"
+
 class QGridLayout;
 class QWidget;
 class QTimer;
 class QSettings;
 class QTime;
-#include "sscEnumConverter.h"
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 
@@ -22,9 +23,6 @@ enum LayoutType
 {
   LAYOUT_NONE=0,
   LAYOUT_3D_1X1,
-  //LAYOUT_3DACS_2X2, inria
-  //LAYOUT_3DACS_1X3, inria
-  //LAYOUT_ACSACS_2X3, inria
   LAYOUT_3DACS_2X2_SNW,
   LAYOUT_3DACS_1X3_SNW,
   LAYOUT_3DAny_1X2_SNW,
@@ -39,6 +37,7 @@ SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, LayoutType);
 namespace cx
 {
 
+class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
 /**
@@ -79,8 +78,9 @@ public:
   LayoutType getActiveLayout() const; ///< returns the active layout type
   void setActiveLayout(LayoutType layout); ///< change the layout
 
-  ssc::View* getActiveView() const; ///< returns the active view
-  void setActiveView(ssc::View* view); ///< change the active view
+  ViewWrapperPtr getActiveView() const; ///< returns the active view
+  void setActiveView(ViewWrapperPtr view); ///< change the active view
+  void setActiveView(std::string viewUid); ///< convenient function for setting the active view
 
   void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
   bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
@@ -109,25 +109,18 @@ protected:
 
   void syncOrientationMode(SyncedValuePtr val);
 
-//  void centerToImageCenter();
-//  void centerToTooltip();
   void deactivateCurrentLayout();
   void activateLayout(LayoutType toType);
-  //void activateView(ssc::View* view, int row, int col, int rowSpan=1, int colSpan=1);
   void activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan=1, int colSpan=1);
   void activate3DView(int group, int index, int row, int col, int rowSpan=1, int colSpan=1);
   void deactivateView(ssc::View* view);
 
   void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
-  //void activateLayout_3DACS_2X2(); ///< activate the 3DACS_2X2 layout, inria
-  //void activateLayout_3DACS_1X3(); ///< activate the 3DACS_1X3 layout, inria
-  //void activateLayout_ACSACS_2X3(); ///< activate the ACSACS_2X3 layout, inria
   void activateLayout_3DAny_1X2_SNW();
   void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
   void activateLayout_3DACS_1X3_SNW(); ///< activate the 3DACS_1X3 layout
   void activateLayout_ACSACS_2X3_SNW();
   void activateLayout_Any_2X3_SNW();
-  //void removeRepFromViews(ssc::RepPtr rep); ///< Remove the rep from all views
 
   static ViewManager* mTheInstance; ///< the only instance of this class
 
@@ -135,7 +128,7 @@ protected:
   QGridLayout*    mLayout;                    ///< the layout
   QWidget*        mMainWindowsCentralWidget;  ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 
-  ssc::View*    mActiveView;            ///< the active view
+  ViewWrapperPtr   mActiveView;            ///< the active view
   const int     MAX_3DVIEWS;            ///< constant defining the max number of 3D views available
   const int     MAX_2DVIEWS;            ///< constant defining the max number of 2D views available
   std::vector<std::string> mView3DNames;///< the name of all the 3D views
