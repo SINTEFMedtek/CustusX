@@ -61,7 +61,10 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerRep.h
     Rep/sscSlicePlanes3DRep.h
-    Widgets/sscAbstractInterface.h
+    Widgets/sscDoubleDataAdapter.h
+    Widgets/sscStringDataAdapter.h
+    Widgets/sscDoubleWidgets.h
+    Widgets/sscStringWidgets.h
     Widgets/sscHelperWidgets.h
     Utilities/sscMessageManager.h
     )
@@ -227,9 +230,17 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
+    Widgets/sscDoubleRange.h
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h
-    Widgets/sscAbstractInterface.h
+    Widgets/sscDoubleDataAdapter.h
+    Widgets/sscDoubleWidgets.h    
+    Widgets/sscDoubleWidgets.cpp    
+    Widgets/sscStringDataAdapter.h
+    Widgets/sscStringWidgets.h    
+    Widgets/sscStringWidgets.cpp    
+    Widgets/sscXmlOptionItem.h    
+    Widgets/sscXmlOptionItem.cpp    
 	) 
 
 # =========================================================
