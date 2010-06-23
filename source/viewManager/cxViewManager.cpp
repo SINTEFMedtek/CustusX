@@ -384,9 +384,6 @@ void ViewManager::deactivateCurrentLayout()
  */
 void ViewManager::activateLayout(LayoutType toType)
 {
-  // reset the center for easier viewing.
-  //Navigation().centerToImageCenter(); // we have buttons for this.
-
   switch(toType)
   {
   case LAYOUT_NONE:

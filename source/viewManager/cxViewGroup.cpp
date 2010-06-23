@@ -21,6 +21,22 @@
 
 namespace cx
 {
+
+/**Place the global center to the center of the image.
+ */
+void Navigation::centerToImage(ssc::ImagePtr image)
+{
+  if(!image)
+    return;
+  ssc::Vector3D p_r = findImageCenter(image);
+
+  // set center to calculated position
+  DataManager::getInstance()->setCenter(p_r);
+
+  this->centerManualTool(p_r);
+  std::cout << "Centered to view." << std::endl;
+}
+
 /**Place the global center to the mean center of
  * all the images in a view(wrapper).
  */
@@ -38,7 +54,7 @@ void Navigation::centerToView(ViewWrapper* viewWrapper)
 /**Place the global center to the mean center of
  * all the loaded images.
  */
-void Navigation::centerToImageCenter()
+void Navigation::centerToGlobalImageCenter()
 {
   ssc::Vector3D p_r = findGlobalImageCenter();
 
@@ -65,6 +81,8 @@ void Navigation::centerToTooltip()
  */
 ssc::Vector3D Navigation::findImageCenter(ssc::ImagePtr image)
 {
+  if(!image)
+    return ssc::Vector3D();
   std::vector<ssc::Vector3D> corners_r;
   ssc::Transform3D rMd = image->get_rMd();
   ssc::DoubleBoundingBox3D bb = image->boundingBox();
