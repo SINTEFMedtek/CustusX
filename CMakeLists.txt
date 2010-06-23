@@ -41,7 +41,13 @@ ENDIF (WIN32)
 
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
+add_subdirectory( modules/cxCommon )
 ADD_SUBDIRECTORY ( source )
+
+option(USE_US_ACQUISITION "use us acquisition module" OFF)
+if(USE_US_ACQUISITION)
+    add_subdirectory(modules/ultrasoundAcquisition)
+endif(USE_US_ACQUISITION)
 
 enable_testing()
 add_subdirectory(testing)
