@@ -21,56 +21,18 @@
 
 namespace cx
 {
-
-
-/**Find the center of all images, defined as the center
- * of the smallest bounding box enclosing all images.
+/**Place the global center to the mean center of
+ * all the images in a view(wrapper).
  */
-ssc::Vector3D Navigation::findGlobalImageCenter()
+void Navigation::centerToView(ViewWrapper* viewWrapper)
 {
-  ssc::Vector3D p_r(0,0,0);
-  if (DataManager::getInstance()->getImages().empty())
-    return p_r;
+  ssc::Vector3D p_r = findViewCenter(viewWrapper);
 
-    //TODO: move this to suitable place... (CA)
-  // must use mean center at the least.
-  std::vector<ssc::Vector3D> coord;
+  // set center to calculated position
+  DataManager::getInstance()->setCenter(p_r);
 
-  ssc::DataManager::ImagesMap images = dataManager()->getImages();
-  ssc::DataManager::ImagesMap::iterator iter;
-
-  for (iter=images.begin(); iter!=images.end(); ++iter)
-  {
-    ssc::ImagePtr image = iter->second;
-    ssc::Transform3D rMd = image->get_rMd();
-    ssc::DoubleBoundingBox3D bb = image->boundingBox();
-
-    coord.push_back(rMd.coord(bb.corner(0,0,0)));
-    coord.push_back(rMd.coord(bb.corner(0,0,1)));
-    coord.push_back(rMd.coord(bb.corner(0,1,0)));
-    coord.push_back(rMd.coord(bb.corner(0,1,1)));
-    coord.push_back(rMd.coord(bb.corner(1,0,0)));
-    coord.push_back(rMd.coord(bb.corner(1,0,1)));
-    coord.push_back(rMd.coord(bb.corner(1,1,0)));
-    coord.push_back(rMd.coord(bb.corner(1,1,1)));
-  }
-
-  //p_r = image->get_rMd().coord(image->boundingBox().center());
-  ssc::Vector3D p_min = coord[0];
-  ssc::Vector3D p_max = coord[0];
-
-  for (unsigned i=0; i<coord.size(); ++i)
-  {
-    for (unsigned j=0; j<3; ++j)
-    {
-      p_min[j] = std::min(p_min[j], coord[i][j]);
-      p_max[j] = std::max(p_max[j], coord[i][j]);
-    }
-  }
-
-  p_r = (p_min+p_max)/2.0;
-
-  return p_r;
+  this->centerManualTool(p_r);
+  std::cout << "Centered to view." << std::endl;
 }
 
 /**Place the global center to the mean center of
@@ -83,14 +45,7 @@ void Navigation::centerToImageCenter()
   // set center to calculated position
   DataManager::getInstance()->setCenter(p_r);
 
-  // move the manual tool to the same position. (this is a side effect... do we want it?)
-  ssc::ManualToolPtr manual = ToolManager::getInstance()->getManualTool();
-  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
-  ssc::Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
-  ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0,0,manual->getTooltipOffset()));
-  ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
-  //ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
-  manual->set_prMt(prM1t);
+  this->centerManualTool(p_r);
 }
 
 /**Place the global center at the current position of the
@@ -101,11 +56,94 @@ void Navigation::centerToTooltip()
   ssc::ToolPtr tool = ToolManager::getInstance()->getDominantTool();
   ssc::Vector3D p_pr = tool->get_prMt().coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
   ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(p_pr);
+
   // set center to calculated position
   DataManager::getInstance()->setCenter(p_r);
 }
+/**Find the center of the images, defined as the center
+ * of the smallest bounding box enclosing the images.
+ */
+ssc::Vector3D Navigation::findImageCenter(ssc::ImagePtr image)
+{
+  std::vector<ssc::Vector3D> corners_r;
+  ssc::Transform3D rMd = image->get_rMd();
+  ssc::DoubleBoundingBox3D bb = image->boundingBox();
 
+  corners_r.push_back(rMd.coord(bb.corner(0,0,0)));
+  corners_r.push_back(rMd.coord(bb.corner(0,0,1)));
+  corners_r.push_back(rMd.coord(bb.corner(0,1,0)));
+  corners_r.push_back(rMd.coord(bb.corner(0,1,1)));
+  corners_r.push_back(rMd.coord(bb.corner(1,0,0)));
+  corners_r.push_back(rMd.coord(bb.corner(1,0,1)));
+  corners_r.push_back(rMd.coord(bb.corner(1,1,0)));
+  corners_r.push_back(rMd.coord(bb.corner(1,1,1)));
 
+  ssc::Vector3D p_min = corners_r[0];
+  ssc::Vector3D p_max = corners_r[0];
+
+  for (unsigned i=0; i<corners_r.size(); ++i)
+  {
+    for (unsigned j=0; j<3; ++j)
+    {
+      p_min[j] = std::min(p_min[j], corners_r[i][j]);
+      p_max[j] = std::max(p_max[j], corners_r[i][j]);
+    }
+  }
+
+  ssc::Vector3D center_r = (p_min+p_max)/2.0;
+
+  return center_r;
+}
+/**Find the center of all images in the view(wrapper), defined as the mean of
+ * all the images center.
+ */
+ssc::Vector3D Navigation::findViewCenter(ViewWrapper* viewWrapper)
+{
+  ssc::Vector3D center_r;
+  std::vector<ssc::ImagePtr> images = viewWrapper->getImages();
+  std::vector<ssc::ImagePtr>::iterator iter;
+
+  for (iter=images.begin(); iter!=images.end(); ++iter)
+  {
+    center_r += this->findImageCenter(*iter);
+  }
+  center_r = center_r/images.size();
+
+  return center_r;
+}
+
+/**Find the center of all images, defined as the mean of
+ * all the images center.
+ */
+ssc::Vector3D Navigation::findGlobalImageCenter()
+{
+  ssc::Vector3D p_r(0,0,0);
+  if (DataManager::getInstance()->getImages().empty())
+    return p_r;
+
+  ssc::DataManager::ImagesMap images = dataManager()->getImages();
+  ssc::DataManager::ImagesMap::iterator iter;
+
+  for (iter=images.begin(); iter!=images.end(); ++iter)
+  {
+    p_r += this->findImageCenter(iter->second);
+  }
+  p_r = p_r/images.size();
+
+  return p_r;
+}
+
+void Navigation::centerManualTool(ssc::Vector3D& p_r)
+{
+  // move the manual tool to the same position. (this is a side effect... do we want it?)
+  ssc::ManualToolPtr manual = ToolManager::getInstance()->getManualTool();
+  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  ssc::Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
+  ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0,0,manual->getTooltipOffset()));
+  ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
+
+  manual->set_prMt(prM1t);
+}
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------

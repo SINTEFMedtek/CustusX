@@ -286,17 +286,11 @@ void ViewWrapper2D::addImage(ssc::ImagePtr image)
   }
   mImage.push_back(image);
 
-//  image = mImage.front(); // always show first in vector
-//
-//  ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
-//  mSliceProxy->setDefaultCenter(c);
-//  mSliceRep->setImage(image);
-//
-//  //update data name text rep
-//  mDataNameText->setText(0, image->getName());
-  updateView();
+  this->updateView();
 
   emit imageAdded(image->getUid().c_str());
+
+  Navigation().centerToView(this);
 }
 
 void ViewWrapper2D::updateView()
