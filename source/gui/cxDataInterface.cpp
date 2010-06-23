@@ -17,20 +17,20 @@
 namespace cx
 {
 
-DoubleDataInterfaceActiveToolOffset::DoubleDataInterfaceActiveToolOffset()
+DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
   connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   dominantToolChangedSlot();
 }
 
-double DoubleDataInterfaceActiveToolOffset::getValue() const
+double DoubleDataAdapterActiveToolOffset::getValue() const
 {
   if (mTool)
     return mTool->getTooltipOffset();
   return 0.0;
 }
 
-bool DoubleDataInterfaceActiveToolOffset::setValue(double val)
+bool DoubleDataAdapterActiveToolOffset::setValue(double val)
 {
   if (!mTool)
     return false;
@@ -38,7 +38,7 @@ bool DoubleDataInterfaceActiveToolOffset::setValue(double val)
   return true;
 }
 
-void DoubleDataInterfaceActiveToolOffset::dominantToolChangedSlot()
+void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
 {
   if (mTool)
   {
@@ -53,7 +53,7 @@ void DoubleDataInterfaceActiveToolOffset::dominantToolChangedSlot()
   }
 }
 
-ssc::DoubleRange DoubleDataInterfaceActiveToolOffset::getValueRange() const
+ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 {
   double range = 200;
   return ssc::DoubleRange(0,range,range/1000.0);
@@ -64,23 +64,23 @@ ssc::DoubleRange DoubleDataInterfaceActiveToolOffset::getValueRange() const
 //---------------------------------------------------------
 
 
-DoubleDataInterfaceActiveImageBase::DoubleDataInterfaceActiveImageBase()
+DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
   connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
-void DoubleDataInterfaceActiveImageBase::activeImageChanged()
+void DoubleDataAdapterActiveImageBase::activeImageChanged()
 {
   mImage = dataManager()->getActiveImage();
   emit changed();
 }
-double DoubleDataInterfaceActiveImageBase::getValue() const
+double DoubleDataAdapterActiveImageBase::getValue() const
 {
   if (!mImage)
     return 0.0;
   return getValueInternal();
 }
-bool DoubleDataInterfaceActiveImageBase::setValue(double val)
+bool DoubleDataAdapterActiveImageBase::setValue(double val)
 {
   if (!mImage)
     return false;
@@ -91,15 +91,15 @@ bool DoubleDataInterfaceActiveImageBase::setValue(double val)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-double DoubleDataInterface2DWindow::getValueInternal() const
+double DoubleDataAdapter2DWindow::getValueInternal() const
 {
   return mImage->getLookupTable2D()->getWindow();
 }
-void DoubleDataInterface2DWindow::setValueInternal(double val)
+void DoubleDataAdapter2DWindow::setValueInternal(double val)
 {
   mImage->getLookupTable2D()->setWindow(val);
 }
-ssc::DoubleRange DoubleDataInterface2DWindow::getValueRange() const
+ssc::DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
 {
   if (!mImage)
     return ssc::DoubleRange();
@@ -111,15 +111,15 @@ ssc::DoubleRange DoubleDataInterface2DWindow::getValueRange() const
 //---------------------------------------------------------
 
 
-double DoubleDataInterface2DLevel::getValueInternal() const
+double DoubleDataAdapter2DLevel::getValueInternal() const
 {
   return mImage->getLookupTable2D()->getLevel();
 }
-void DoubleDataInterface2DLevel::setValueInternal(double val)
+void DoubleDataAdapter2DLevel::setValueInternal(double val)
 {
   mImage->getLookupTable2D()->setLevel(val);
 }
-ssc::DoubleRange DoubleDataInterface2DLevel::getValueRange() const
+ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
 {
   if (!mImage)
     return ssc::DoubleRange();

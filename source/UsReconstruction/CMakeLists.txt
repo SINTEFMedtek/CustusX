@@ -23,6 +23,7 @@ SET( SOURCE_FILES
   sscReconstructer.cpp
   sscReconstructionWidget.cpp
   sscReconstructOutputValueParamsInterfaces.cpp
+  sscReconstructOutputValueParamsInterfaces.h
   sscReconstructedOutputVolumeParams.h
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h

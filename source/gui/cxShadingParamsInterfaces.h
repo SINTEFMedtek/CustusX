@@ -10,7 +10,7 @@
 #define CXSHADINGPARAMSINTERFACES_H_
 
 //#include "sscAbstractInterface.h"
-#include "sscHelperWidgets.h"
+#include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 
 
@@ -19,15 +19,14 @@ namespace cx
 
 /** Superclass for all shading parameters
  */
-class DoubleDataInterfaceShadingBase : public ssc::DoubleDataInterface
+class DoubleDataAdapterShadingBase : public ssc::DoubleDataAdapter
 {
   Q_OBJECT 
 public:
-  DoubleDataInterfaceShadingBase();
-  virtual ~DoubleDataInterfaceShadingBase() {}
+  DoubleDataAdapterShadingBase();
+  virtual ~DoubleDataAdapterShadingBase() {}
   //virtual double getValue() const;
   //virtual bool setValue(double val);
-  virtual QString getValueID() const { return ""; }
   virtual void connectValueSignals(bool on) {}  
 private slots:
   void activeImageChanged();
@@ -37,12 +36,12 @@ protected:
   
 /** Interface for setting the ambient parameter for the shading.
  */
-class DoubleDataInterfaceShadingAmbient : public DoubleDataInterfaceShadingBase
+class DoubleDataAdapterShadingAmbient : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceShadingAmbient() {}
-  virtual ~DoubleDataInterfaceShadingAmbient() {}
+  DoubleDataAdapterShadingAmbient() {}
+  virtual ~DoubleDataAdapterShadingAmbient() {}
   virtual QString getValueName() const { return "Ambient"; }
   ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
@@ -51,12 +50,12 @@ public:
 
 /** Interface for setting the diffuse parameter for the shading.
  */
-class DoubleDataInterfaceShadingDiffuse : public DoubleDataInterfaceShadingBase
+class DoubleDataAdapterShadingDiffuse : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceShadingDiffuse() {}
-  virtual ~DoubleDataInterfaceShadingDiffuse() {}
+  DoubleDataAdapterShadingDiffuse() {}
+  virtual ~DoubleDataAdapterShadingDiffuse() {}
   virtual QString getValueName() const { return "Diffuse"; }
   ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 1.0, 0.01); }
   virtual double getValue() const;
@@ -65,12 +64,12 @@ public:
 
 /** Interface for setting the specular parameter for the shading.
  */
-class DoubleDataInterfaceShadingSpecular : public DoubleDataInterfaceShadingBase
+class DoubleDataAdapterShadingSpecular : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceShadingSpecular() {}
-  virtual ~DoubleDataInterfaceShadingSpecular() {}
+  DoubleDataAdapterShadingSpecular() {}
+  virtual ~DoubleDataAdapterShadingSpecular() {}
   virtual QString getValueName() const { return "Specular"; }
   ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 4.0, 0.01); }
   virtual double getValue() const;
@@ -79,12 +78,12 @@ public:
 
 /** Interface for setting the specular power parameter for the shading.
   */
-class DoubleDataInterfaceShadingSpecularPower : public DoubleDataInterfaceShadingBase
+class DoubleDataAdapterShadingSpecularPower : public DoubleDataAdapterShadingBase
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceShadingSpecularPower() {}
-  virtual ~DoubleDataInterfaceShadingSpecularPower() {}
+  DoubleDataAdapterShadingSpecularPower() {}
+  virtual ~DoubleDataAdapterShadingSpecularPower() {}
   virtual QString getValueName() const { return "Specular Power"; }
   ssc::DoubleRange getValueRange() const  { return ssc::DoubleRange(0.0, 50.0, 0.01); }
   virtual double getValue() const;

@@ -12,24 +12,23 @@
 #include <QString>
 #include <QtGui>
 #include "sscForwardDeclarations.h"
-#include "sscAbstractInterface.h"
-#include "sscHelperWidgets.h"
+#include "sscDoubleDataAdapter.h"
+//#include "sscHelperWidgets.h"
 
 namespace cx
 {
 
 /** Interface to the tool offset of the dominant tool
  */
-class DoubleDataInterfaceActiveToolOffset : public ssc::DoubleDataInterface
+class DoubleDataAdapterActiveToolOffset : public ssc::DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceActiveToolOffset();
-  virtual ~DoubleDataInterfaceActiveToolOffset() {}
+  DoubleDataAdapterActiveToolOffset();
+  virtual ~DoubleDataAdapterActiveToolOffset() {}
   virtual QString getValueName() const { return "Offset (mm)"; }
   virtual double getValue() const;
   virtual bool setValue(double val);
-  virtual QString getValueID() const { return ""; }
   virtual void connectValueSignals(bool on) {}
   ssc::DoubleRange getValueRange() const;
 
@@ -42,15 +41,14 @@ protected:
 
 /** Superclass for all doubles interacting with the active image.
  */
-class DoubleDataInterfaceActiveImageBase : public ssc::DoubleDataInterface
+class DoubleDataAdapterActiveImageBase : public ssc::DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceActiveImageBase();
-  virtual ~DoubleDataInterfaceActiveImageBase() {}
+  DoubleDataAdapterActiveImageBase();
+  virtual ~DoubleDataAdapterActiveImageBase() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
-  virtual QString getValueID() const { return ""; }
   virtual void connectValueSignals(bool on) {}
 private slots:
   void activeImageChanged();
@@ -63,10 +61,10 @@ protected:
 
 /**DataInterface implementation for the LUT 2D window value
  */
-class DoubleDataInterface2DWindow : public DoubleDataInterfaceActiveImageBase
+class DoubleDataAdapter2DWindow : public DoubleDataAdapterActiveImageBase
 {
 public:
-  virtual ~DoubleDataInterface2DWindow() {}
+  virtual ~DoubleDataAdapter2DWindow() {}
   virtual QString getValueName() const { return "Window"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
@@ -75,11 +73,11 @@ public:
 
 /**DataInterface implementation for the LUT 2D level value
  */
-class DoubleDataInterface2DLevel : public DoubleDataInterfaceActiveImageBase
+class DoubleDataAdapter2DLevel : public DoubleDataAdapterActiveImageBase
 {
   Q_OBJECT
 public:
-  virtual ~DoubleDataInterface2DLevel() {}
+  virtual ~DoubleDataAdapter2DLevel() {}
   virtual QString getValueName() const { return "Level"; }
   virtual double getValueInternal() const;
   virtual void setValueInternal(double val);
