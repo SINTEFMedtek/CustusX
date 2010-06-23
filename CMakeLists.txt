@@ -39,6 +39,9 @@ IF (WIN32)
   ADD_DEFINITIONS(-D__WIN32__)
 ENDIF (WIN32)
 
+# name of folder where all executables, config etc are assembled
+SET(INSTALL_FOLDER_NAME "${BUNDLE_NAME} ${VERSION_NUMBER}")
+
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
 add_subdirectory( modules/cxCommon )
