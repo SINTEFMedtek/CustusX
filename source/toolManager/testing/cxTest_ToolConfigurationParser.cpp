@@ -7,7 +7,7 @@
 void TestToolConfigurationParser::setUp()
 {
   mXmlFilePath = QString(ssc::TestUtilities::ExpandDataFileName(
-     "../../../toolConfigurations/Lab/POLARIS_07-198-0838_SW_Pointer_02_AND_02-206-00913_SW_PasRef_01.xml").c_str());
+     "../../../config/tool/Lab/POLARIS_07-198-0838_SW_Pointer_02_AND_02-206-00913_SW_PasRef_01.xml").c_str());
 
   std::string xmlFilePath = mXmlFilePath.toStdString();
   mConfigurationParser = new cx::ToolConfigurationParser(xmlFilePath);
