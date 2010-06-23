@@ -31,6 +31,7 @@
 
 namespace cx
 {
+
   
 MainWindow::MainWindow() :
   mCurrentWorkflowState(PATIENT_DATA),
@@ -51,7 +52,7 @@ MainWindow::MainWindow() :
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(new ssc::ReconstructionWidget(this, DataLocations::getAppDataPath() )),
+  mReconstructionWidget(new ssc::ReconstructionWidget(this, DataLocations::getAppDataPath(), DataLocations::getShaderPath() )),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),
@@ -61,8 +62,8 @@ MainWindow::MainWindow() :
   mPatientData(new PatientData(this))
   //mActivePatientFolder("")
 {
-#ifdef VERSION_NUMBER
-  this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER));
+#ifdef VERSION_NUMBER_VERBOSE
+  this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER_VERBOSE));
 #else
 #endif
   
@@ -666,7 +667,7 @@ void MainWindow::aboutSlot()
                         "<p>Created by SINTEF Medical Technology."
                         "<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
                         "<p>An application for Image Guided Surgery."
-                        "<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(VERSION_NUMBER));
+                        "<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(VERSION_NUMBER_VERBOSE));
 }
 
 void MainWindow::preferencesSlot()

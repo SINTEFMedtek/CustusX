@@ -17,8 +17,9 @@
 
 namespace ssc 
 {
-ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm()
+ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm(QString shaderPath)
 {
+  mShaderPath = shaderPath;
 }
 
 void ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
@@ -36,16 +37,19 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr outputData,
                                                  ImagePtr frameMask)
 {
-  QFileInfo path(THUNDER_KERNEL_PATH+QString("kernels.ocl"));
-  //ssc::messageManager()->sendInfo("kernels path: " 
-  //                                + string_cast(path.absoluteFilePath().toStdString()));
-  
+  QStringList paths;
+  paths << mShaderPath << THUNDER_KERNEL_PATH << ".";
+
+  QFileInfo path;
+  path = QFileInfo(paths[0]+"/kernels.ocl");
+ if (!path.exists())
+   path = QFileInfo(paths[1]+QString("/kernels.ocl"));
   if (!path.exists())
-    path = QFileInfo("./kernels.ocl");
+    path = QFileInfo(paths[2]+"/kernels.ocl");
   if (!path.exists())
   {
-    ssc::messageManager()->sendError("Error: Can't find kernels.ocl in "
-                                     + string_cast(path.absoluteFilePath().toStdString()));
+    ssc::messageManager()->sendError("Error: Can't find kernels.ocl in any of\n  "
+                                      + string_cast(paths.join("  \n")));
     return;
   }
   

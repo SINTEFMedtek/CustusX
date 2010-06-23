@@ -28,8 +28,8 @@ typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 namespace ssc
 {
 
-Reconstructer::Reconstructer(QString appDataPath) :
-  mAlgorithm(new ThunderVNNReconstructAlgorithm),
+Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
+  mAlgorithm(new ThunderVNNReconstructAlgorithm(shaderPath)),
   mOutputRelativePath(""),
   mOutputBasePath("")
 {
@@ -97,7 +97,6 @@ Reconstructer::~Reconstructer()
 
 void Reconstructer::saveSettings()
 {
-  std::cout << "save settings" << std::endl;
   QFile file(mSettingsFilename);
   if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
