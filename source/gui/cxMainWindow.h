@@ -9,7 +9,8 @@ class QAction;
 class QMenu;
 class QActionGroup;
 class QDomDocument;
-class QSettings;
+//class QSettings;
+typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace ssc
 {
@@ -207,7 +208,7 @@ protected:
   int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
 
   //Preferences
-  QSettings* mSettings; ///< Object for storing all program/user specific settings
+  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
 
   PatientDataPtr mPatientData;
 //  //Patient

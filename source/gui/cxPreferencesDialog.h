@@ -2,6 +2,7 @@
 #define CXPREFERANCESDIALOG_H_
 
 #include <QDialog>
+#include "boost/shared_ptr.hpp"
 
 class QTabWidget;
 class QDialogButtonBox;
@@ -12,6 +13,7 @@ class QSettings;
 class QSpinBox;
 class QCheckBox;
 class QGridLayout;
+typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
@@ -56,7 +58,7 @@ private:
   void setCurrentToolConfigFile();
   void setCurrentApplication();
 
-  QSettings* mSettings;
+  QSettingsPtr mSettings;
 
   QComboBox* mPatientDataFolderComboBox;
   //QComboBox* mImportDataFolderComboBox;
@@ -98,7 +100,7 @@ signals:
   void shadingChanged(bool);
 
 protected:
-  QSettings* mSettings;
+  QSettingsPtr mSettings;
   QSpinBox* mRenderingIntervalSpinBox;
   QLabel* mRenderingRateLabel;
   QCheckBox* mShadingCheckBox;

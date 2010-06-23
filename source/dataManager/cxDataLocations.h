@@ -21,8 +21,11 @@ class DataLocations
 public:
   /** return path to the root config folder
    */
-  static QString getConfigPath() const;
-  QSettingsPtr getSettings() const;
+  static QString getBundlePath(); ///< return the folder where the bundle or executable are located.
+  static QString getConfigPath(); ///< return path to root config folder
+  static QString getAppDataPath(); ///< return path to global configuration data.
+  static QSettingsPtr getSettings(); ///< return a settings object for global custusX data
+
 //  {
 //
 //  }

@@ -17,13 +17,14 @@
 #include "cxRegistrationManager.h"
 #include "cxToolManager.h"
 #include "cxFileCopied.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
 
 PatientData::PatientData(QObject* parent) :
     QObject(parent),
-    mSettings(new QSettings())
+    mSettings(DataLocations::getSettings())
 {
 
 }

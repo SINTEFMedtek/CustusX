@@ -51,6 +51,9 @@ public:
   virtual void connectValueSignals(bool on) {}
 };
 
+/**Data interface for interacting with string data in xml form.
+ * The xml data is defined by the class StringOptionItem.
+ */
 class StringDataInterfaceXmlNode : public StringDataInterface
 {
   Q_OBJECT
@@ -104,7 +107,7 @@ class ReconstructionWidget : public QWidget
 {
   Q_OBJECT
 public:
-  ReconstructionWidget(QWidget* parent);
+  ReconstructionWidget(QWidget* parent, QString appDataPath);
   ReconstructerPtr reconstructer() {  return mReconstructer; }
   void selectData(QString inputfile);
 

@@ -4,31 +4,53 @@
  *  Created on: Jun 22, 2010
  *      Author: christiana
  */
-
 #include "cxDataLocations.h"
-#include "cxConfig.h"
 
+#include <iostream>
 #include <QApplication>
+#include <QDir>
+#include <QSettings>
+#include "sscTypeConversions.h"
+#include "cxConfig.h"
 
 namespace cx
 {
 
-QString DataLocations::getConfigPath() const
+QString DataLocations::getBundlePath()
 {
-  QString path(qApp->applicationDirPath()+"/config/");
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+  QString path(qApp->applicationDirPath()+"/../../..");
+  return path;
+#else
+  QString path(qApp->applicationDirPath());
+  return path;
+#endif
+}
+
+QString DataLocations::getConfigPath()
+{
+  QString path = getBundlePath()+"/config";
   if (QDir(path).exists())
     return path;
-  return CX_CONFIG_DIR;
+  return CX_CONFIG_ROOT;
 }
 
-QSettingsPtr DataLocations::getSettings() const
+QString DataLocations::getAppDataPath()
 {
-  QString path(qApp->applicationDirPath()+"/config/");
+  QString path = getBundlePath()+"/config/appdata";
   if (!QDir(path).exists())
+  {
+//    std::cout << "did not find " << path << std::endl;
     path = qApp->applicationDirPath();
-  return QSettingsPtr(new QSettings());
-  //return QSettingsPtr(new QSettings(path, QSettings::IniFormat));
+  }
+  return path;
 }
 
+QSettingsPtr DataLocations::getSettings()
+{
+  QString path = getAppDataPath();
+  //return QSettingsPtr(new QSettings());
+  return QSettingsPtr(new QSettings(path+"/custus.ini", QSettings::IniFormat));
+}
 
 } // namespace cx
