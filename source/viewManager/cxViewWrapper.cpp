@@ -112,7 +112,7 @@ void ViewWrapper::imageActionSlot()
     dataManager()->setActiveImage(ssc::ImagePtr());
   }
 
-  Navigation().centerToImageCenter(); // reset center for convenience
+  Navigation().centerToGlobalImageCenter(); // reset center for convenience
 }
   
 void ViewWrapper::meshActionSlot()
@@ -128,7 +128,7 @@ void ViewWrapper::meshActionSlot()
   this->addMesh(mesh);
   //dataManager()->setActiveImage(mesh);
   
-  Navigation().centerToImageCenter(); // reset center for convenience
+  Navigation().centerToGlobalImageCenter(); // reset center for convenience
 }
   
 void ViewWrapper::connectContextMenu(ssc::View* view)

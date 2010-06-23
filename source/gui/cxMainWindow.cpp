@@ -270,7 +270,7 @@ void MainWindow::createActions()
 
 void MainWindow::centerToImageCenterSlot()
 {
-  Navigation().centerToImageCenter();
+  Navigation().centerToImage(dataManager()->getActiveImage());
 }
 
 void MainWindow::centerToTooltipSlot()
@@ -558,10 +558,7 @@ void MainWindow::activateImageRegistationState()
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 
   ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-/*  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-  viewManager()->get3DView("View3D_1")->addRep(landmarkRep);
-  viewManager()->get3DView("View3D_1")->addRep(probeRep);
-  */
+
   connect(mImageRegistrationWidget, SIGNAL(thresholdChanged(int)),
           probeRep.get(), SLOT(setThresholdSlot(int)));
 
@@ -583,9 +580,6 @@ void MainWindow::deactivateImageRegistationState()
     mImageRegistrationIndex = -1;
     
     ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-/*    LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-    viewManager()->get3DView("View3D_1")->removeRep(landmarkRep);
-    viewManager()->get3DView("View3D_1")->removeRep(probeRep);*/
 
     disconnect(mImageRegistrationWidget, SIGNAL(thresholdChanged(const int)),
             probeRep.get(), SLOT(setThresholdSlot(const int)));
@@ -597,8 +591,6 @@ void MainWindow::activatePatientRegistrationState()
       QString("Patient Registration"));
   
   viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
-//  LandmarkRepPtr landmarkRep = mRepManager->getLandmarkRep("LandmarkRep_1");
-//  viewManager()->get3DView("View3D_1")->addRep(landmarkRep);
   
   mCurrentWorkflowState = PATIENT_REGISTRATION;
 }
@@ -733,7 +725,6 @@ void MainWindow::configureSlot()
   QFileInfo info(configFile);
 
   if (!info.exists() || info.isDir())
-  //if(configFile ==  QDir::homePath() || configFile.isEmpty())
   {
     configFile = QFileDialog::getOpenFileName(this,
         tr("Select configuration file (*.xml)"),
