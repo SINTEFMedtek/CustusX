@@ -21,9 +21,17 @@ namespace cx
 class Navigation
 {
 public:
+  void centerToView(ViewWrapper* viewWrapper);
   void centerToImageCenter();
   void centerToTooltip();
+
+private:
+  ssc::Vector3D findImageCenter(ssc::ImagePtr image);
+  ssc::Vector3D findViewCenter(ViewWrapper* viewWrapper);
   ssc::Vector3D findGlobalImageCenter();
+
+  void centerManualTool(ssc::Vector3D& p_r);
+
 };
 
 /**
