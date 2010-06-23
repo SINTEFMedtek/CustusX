@@ -7,7 +7,7 @@
 #ifndef SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 #define SSCRECONSTRUCTOUTPUTVALUEPARAMSINTERFACES_H_
 
-#include "sscAbstractInterface.h"
+#include "sscDoubleDataAdapter.h"
 #include "sscReconstructer.h"
 
 namespace ssc
@@ -18,15 +18,14 @@ class OutputVolumeParams;
 /** Abstract interface to setting one of the values in class OutputValueParams.
  *  Sublass to get a concrete class.
  */
-class DoubleDataInterfaceOutputValueParams : public DoubleDataInterface
+class DoubleDataAdapterOutputValueParams : public DoubleDataAdapter
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceOutputValueParams(ReconstructerPtr reconstructer);
-  virtual ~DoubleDataInterfaceOutputValueParams() {}
+  DoubleDataAdapterOutputValueParams(ReconstructerPtr reconstructer);
+  virtual ~DoubleDataAdapterOutputValueParams() {}
   virtual double getValue() const;
   virtual bool setValue(double val);
-  virtual QString getValueID() const { return ""; }
   virtual void connectValueSignals(bool on) {}
 
 private slots:
@@ -40,12 +39,12 @@ protected:
 
 /** Interface to setting max size for reconstructed us volume.
  */
-class DoubleDataInterfaceMaxUSVolumeSize : public DoubleDataInterfaceOutputValueParams
+class DoubleDataAdapterMaxUSVolumeSize : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceMaxUSVolumeSize(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer), mFactor(1024*1024) {}
-  virtual ~DoubleDataInterfaceMaxUSVolumeSize() {}
+  DoubleDataAdapterMaxUSVolumeSize(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer), mFactor(1024*1024) {}
+  virtual ~DoubleDataAdapterMaxUSVolumeSize() {}
   virtual QString getValueName() const { return "Volume Size (Mb)"; }
   virtual double convertInternal2Display(double internal) { return internal/mFactor; } ///< conversion from internal value to display value
   virtual double convertDisplay2Internal(double display) { return display*mFactor; } ///< conversion from internal value to display value
@@ -59,12 +58,12 @@ protected:
 
 /** Interface to setting spacing in output volume
  */
-class DoubleDataInterfaceSpacing : public DoubleDataInterfaceOutputValueParams
+class DoubleDataAdapterSpacing : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceSpacing(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceSpacing() {}
+  DoubleDataAdapterSpacing(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  virtual ~DoubleDataAdapterSpacing() {}
   virtual QString getValueName() const { return "Output Spacing (mm)"; }
   DoubleRange getValueRange() const {  return ssc::DoubleRange(0.001,1,0.001); }
 protected:
@@ -74,12 +73,12 @@ protected:
 
 /** Interface to setting dim in output volume
  */
-class DoubleDataInterfaceXDim : public DoubleDataInterfaceOutputValueParams
+class DoubleDataAdapterXDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceXDim(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceXDim() {}
+  DoubleDataAdapterXDim(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  virtual ~DoubleDataAdapterXDim() {}
   virtual QString getValueName() const { return "X Dim"; }
   DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
 protected:
@@ -88,12 +87,12 @@ protected:
 };
 /** Interface to setting dim in output volume
  */
-class DoubleDataInterfaceYDim : public DoubleDataInterfaceOutputValueParams
+class DoubleDataAdapterYDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceYDim(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceYDim() {}
+  DoubleDataAdapterYDim(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  virtual ~DoubleDataAdapterYDim() {}
   virtual QString getValueName() const { return "Y Dim"; }
   DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
 protected:
@@ -102,12 +101,12 @@ protected:
 };
 /** Interface to setting dim in output volume
  */
-class DoubleDataInterfaceZDim : public DoubleDataInterfaceOutputValueParams
+class DoubleDataAdapterZDim : public DoubleDataAdapterOutputValueParams
 {
   Q_OBJECT
 public:
-  DoubleDataInterfaceZDim(ReconstructerPtr reconstructer) : DoubleDataInterfaceOutputValueParams(reconstructer) {}
-  virtual ~DoubleDataInterfaceZDim() {}
+  DoubleDataAdapterZDim(ReconstructerPtr reconstructer) : DoubleDataAdapterOutputValueParams(reconstructer) {}
+  virtual ~DoubleDataAdapterZDim() {}
   virtual QString getValueName() const { return "Z Dim"; }
   DoubleRange getValueRange() const {  return ssc::DoubleRange(1,1000,1); }
 protected:

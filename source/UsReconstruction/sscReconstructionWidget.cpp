@@ -11,84 +11,6 @@ namespace ssc
 {
 
 
-ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataInterfacePtr dataInterface, QGridLayout* gridLayout, int row)
-{
-  mData = dataInterface;
-  connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
-
-  QHBoxLayout* topLayout = new QHBoxLayout;
-  topLayout->setMargin(0);
-  this->setLayout(topLayout);
-
-  mLabel = new QLabel(this);
-  mLabel->setText(mData->getValueName());
-  topLayout->addWidget(mLabel);
-
-  mCombo = new QComboBox(this);
-  topLayout->addWidget(mCombo);
-  connect(mCombo, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(comboIndexChanged(const QString&)));
-
-  if (gridLayout) // add to input gridlayout
-  {
-    gridLayout->addWidget(mLabel,  row, 0);
-    gridLayout->addWidget(mCombo,  row, 1);
-  }
-  else // add directly to this
-  {
-    topLayout->addWidget(mLabel);
-    topLayout->addWidget(mCombo);
-  }
-
-  dataChanged();
-}
-
-void ComboGroupWidget::comboIndexChanged(const QString& val)
-{
-  mData->setValue(val);
-}
-
-//void ComboGroupWidget::doubleValueChanged(double val)
-//{
-//  val = mData->convertDisplay2Internal(val);
-//
-//  if (ssc::similar(val, mData->getValue()))
-//      return;
-//
-//  mData->setValue(val);
-//}
-//
-//void ComboGroupWidget::textEditedSlot(const QString& text)
-//{
-//  double defVal =mData->convertInternal2Display(mData->getValue()); // defval in display space
-//  double newVal = mData->convertDisplay2Internal(mEdit->getDoubleValue(defVal)); // newval iin internal space
-//
-//  if (ssc::similar(newVal, mData->getValue()))
-//      return;
-//
-//  mData->setValue(newVal);
-//}
-
-void ComboGroupWidget::dataChanged()
-{
-  mCombo->blockSignals(true);
-  mCombo->clear();
-
-  QString currentValue = mData->getValue();
-  //std::cout << "datachanged for " << mData->getValueID() << "=" << currentValue << std::endl;
-  QStringList range = mData->getValueRange();
-  for (int i=0; i<range.size(); ++i)
-  {
-    //std::cout << range[i] << std::endl;
-    mCombo->addItem(range[i]);
-    if (range[i]==currentValue)
-      mCombo->setCurrentIndex(i);
-  }
-
-  mCombo->setToolTip(mData->getHelp());
-  mCombo->blockSignals(false);
-}
-
-
 // --------------------------------------------------------
 // --------------------------------------------------------
 // --------------------------------------------------------
@@ -135,16 +57,16 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
   QVBoxLayout* outputVolLayout = new QVBoxLayout(outputVolGroup);
 
   QGridLayout* outputVolGridLayout = new QGridLayout;
-  mMaxVolSizeWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
-  mSpacingWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceSpacing(mReconstructer)), outputVolGridLayout, 1);
-  mDimXWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceXDim(mReconstructer)), outputVolGridLayout, 2);
-  mDimYWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceYDim(mReconstructer)), outputVolGridLayout, 3);
-  mDimZWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataInterfacePtr(new DoubleDataInterfaceZDim(mReconstructer)), outputVolGridLayout, 4);
+  mMaxVolSizeWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
+  mSpacingWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(mReconstructer)), outputVolGridLayout, 1);
+  mDimXWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)), outputVolGridLayout, 2);
+  mDimYWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)), outputVolGridLayout, 3);
+  mDimZWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)), outputVolGridLayout, 4);
 
-  ssc::StringDataInterfacePtr orientation = this->generateStringDataInterface("Orientation");
+  ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
   ssc::ComboGroupWidget* orientationWidget = new ssc::ComboGroupWidget(this, orientation);
 
-  ssc::StringDataInterfacePtr algorithm = this->generateStringDataInterface("Algorithm");
+  ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
   ssc::ComboGroupWidget* algorithmWidget = new ssc::ComboGroupWidget(this, algorithm);
 
   QGroupBox* algorithmGroup = new QGroupBox("Algorithm", this);
@@ -154,7 +76,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
   for (int i=0; i<algoSettings.size(); ++i)
   {
     StringOptionItem item(algoSettings.item(i).toElement());
-    ssc::StringDataInterfaceXmlNodePtr interface(new StringDataInterfaceXmlNode(item));
+    ssc::StringDataAdapterXmlNodePtr interface(new StringDataAdapterXmlNode(item));
     connect(interface.get(), SIGNAL(valueWasSet()), mReconstructer.get(), SLOT(setSettings()));
     connect(mReconstructer.get(), SIGNAL(paramsChanged()), interface.get(), SIGNAL(changed()));
     ssc::ComboGroupWidget* widget = new ssc::ComboGroupWidget(this, interface, algoLayout, i);
@@ -178,11 +100,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
   //this->selectData(defPath+defFile);
 }
 
-ssc::StringDataInterfacePtr ReconstructionWidget::generateStringDataInterface(QString uid)
+ssc::StringDataAdapterPtr ReconstructionWidget::generateStringDataAdapter(QString uid)
 {
   StringOptionItem item = StringOptionItem::fromName(uid, mReconstructer->getSettings());
 
-  ssc::StringDataInterfaceXmlNodePtr interface(new StringDataInterfaceXmlNode(item));
+  ssc::StringDataAdapterXmlNodePtr interface(new StringDataAdapterXmlNode(item));
   connect(interface.get(), SIGNAL(valueWasSet()), mReconstructer.get(), SLOT(setSettings()));
   connect(mReconstructer.get(), SIGNAL(paramsChanged()), interface.get(), SIGNAL(changed()));
   //ssc::ComboGroupWidget* widget = new ssc::ComboGroupWidget(this, interface, algoLayout, 5+i);

@@ -11,25 +11,25 @@
 
 namespace cx
 {
-DoubleDataInterfaceShadingBase::DoubleDataInterfaceShadingBase()
+DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase()
 {
   connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
   connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
-void DoubleDataInterfaceShadingBase::activeImageChanged()
+void DoubleDataAdapterShadingBase::activeImageChanged()
 {  
   mImage = dataManager()->getActiveImage();
   emit changed();
 }
 
-double DoubleDataInterfaceShadingAmbient::getValue() const
+double DoubleDataAdapterShadingAmbient::getValue() const
 {
   if (!mImage)
     return 0.0;
   return mImage->getShadingAmbient();
 }
 
-bool DoubleDataInterfaceShadingAmbient::setValue(double val)
+bool DoubleDataAdapterShadingAmbient::setValue(double val)
 { 
   if (!mImage)
     return false;
@@ -40,13 +40,13 @@ bool DoubleDataInterfaceShadingAmbient::setValue(double val)
 }
 
 
-double DoubleDataInterfaceShadingDiffuse::getValue() const
+double DoubleDataAdapterShadingDiffuse::getValue() const
 {
   if (!mImage)
     return 0.0;
   return mImage->getShadingDiffuse();
 }
-bool DoubleDataInterfaceShadingDiffuse::setValue(double val)
+bool DoubleDataAdapterShadingDiffuse::setValue(double val)
 { 
   if (!mImage)
     return false;
@@ -57,13 +57,13 @@ bool DoubleDataInterfaceShadingDiffuse::setValue(double val)
 }
 
 
-double DoubleDataInterfaceShadingSpecular::getValue() const 
+double DoubleDataAdapterShadingSpecular::getValue() const 
 { 
   if (!mImage)
     return 0.0;
   return mImage->getShadingSpecular();
 }
-bool DoubleDataInterfaceShadingSpecular::setValue(double val)
+bool DoubleDataAdapterShadingSpecular::setValue(double val)
 { 
   if (!mImage)
     return false;
@@ -74,13 +74,13 @@ bool DoubleDataInterfaceShadingSpecular::setValue(double val)
 }
 
 
-double DoubleDataInterfaceShadingSpecularPower::getValue() const 
+double DoubleDataAdapterShadingSpecularPower::getValue() const 
 { 
   if (!mImage)
     return 0.0;
   return mImage->getShadingSpecularPower();
 }
-bool DoubleDataInterfaceShadingSpecularPower::setValue(double val)
+bool DoubleDataAdapterShadingSpecularPower::setValue(double val)
 { 
   if (!mImage)
     return false;

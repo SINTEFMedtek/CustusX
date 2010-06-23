@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscHelperWidgets.h"
+#include "sscDoubleWidgets.h"
 
 namespace cx
 {

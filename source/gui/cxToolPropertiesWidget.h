@@ -10,7 +10,7 @@
 #include <vector>
 #include <QtGui>
 #include "sscForwardDeclarations.h"
-#include "sscHelperWidgets.h"
+#include "sscDoubleWidgets.h"
 
 namespace cx
 {
