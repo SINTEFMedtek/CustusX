@@ -13,6 +13,7 @@ class QDomNode;
 class QDomDocument;
 class QDomNodeList;
 class QTimer;
+class QFileInfo;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 namespace cx
@@ -129,6 +130,8 @@ private:
   ToolManager& operator=(ToolManager const&);
 
   void createSymlink();
+  QFileInfo getSymlink() const;
+  void cleanupSymlink();
 };
 
 /**Shortcut for accessing the toolmanager instance.*/
