@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QList>
 #include <QMetaType>
+#include <QFileInfo>
 #include <vtkDoubleArray.h>
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
@@ -58,7 +59,9 @@ ToolManager::ToolManager() :
 }
 
 ToolManager::~ToolManager()
-{}
+{
+  this->cleanupSymlink();
+}
 
 void ToolManager::initializeManualTool()
 {
@@ -146,34 +149,41 @@ void ToolManager::initialize()
   mTracker->attachTools(mConfiguredTools);
 }
 
-/** Assume that IGSTK requires the file /Library/CustusX/igstk.link/cu.CustusX.dev0
+/** Assume that IGSTK requires the file /Library/CustusX/igstk.links/cu.CustusX.dev0
  *  as a rep for the HW connection. Also assume that directory is created with full
  *  read/write access (by installer or similar).
  *  Create that file as a symlink to the correct device.
  */
 void ToolManager::createSymlink()
 {
-  QString linkfile = "/dev/cu.CustusX3";
-//  linkfile = "/Users/christiana/test_file";
-  // the following path is
-  linkfile = "/Library/CustusX/igstk.link/cu.CustusX.dev0";
+  QFileInfo symlink = this->getSymlink();
+  QDir linkDir(symlink.absolutePath());
+  QString linkfile = symlink.absoluteFilePath();;
+
+  if (!linkDir.exists())
+  {
+    ssc::messageManager()->sendError(string_cast(QString("Folder %1 does not exist. System is not properly installed.").arg(linkDir.path())));
+    return;
+  }
+
   QDir devDir("/dev/");
 
   QStringList filters;
   //filters << "*cu.*"; // test
-  filters << "cu.usbserial*" << "cu.*KeyStore*"; //NOTE: only works with current hardware using aurora or polaris.
+  filters << "cu.usbserial*" << "cu.KeySerial*"; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
-  std::cout << "Files: " << files.join("\n") << std::endl;
+
   if (files.empty())
   {
-    std::cout << "Warning: No usb connections found in /dev using filters " << filters.join(";") << std::endl;
+    ssc::messageManager()->sendError(string_cast(QString("Warning: No usb connections found in /dev using filters %1").arg(filters.join(";"))));
     return;
+  }
+  else
+  {
+    ssc::messageManager()->sendInfo(string_cast(QString("device files: %1").arg(files.join(","))));
   }
 
   QString device = devDir.filePath(files[0]);
-
-  //QString command = QString("sudo ln -s %1 %2").arg(device).arg(linkfile);
-  //std::cout << "Command string: " << command << std::endl;
 
   QFile(linkfile).remove();
   QFile devFile(device);
@@ -181,12 +191,28 @@ void ToolManager::createSymlink()
   bool val = devFile.link(linkfile);
   if (!val)
   {
-    std::cout << QString("symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(devFile.error()) << std::endl;
+    ssc::messageManager()->sendError(string_cast(QString("symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(devFile.error())));
   }
   else
   {
-    std::cout << QString("created symlink %1 to device %2").arg(linkfile).arg(device) << std::endl;
+    ssc::messageManager()->sendInfo(string_cast(QString("created symlink %1 to device %2").arg(linkfile).arg(device)));
   }
+}
+
+QFileInfo ToolManager::getSymlink() const
+{
+  QDir linkDir("/Library/CustusX/igstk.links");
+  QString linkFile = linkDir.path() + "/cu.CustusX.dev0";
+  return QFileInfo(linkDir, linkFile);
+}
+
+/** removes symlinks to tracking system created during setup
+ *
+ */
+void ToolManager::cleanupSymlink()
+{
+  std::cout << "ToolManager::cleanupSymlink()" << std::endl;
+  std::cout << QFile(this->getSymlink().absoluteFilePath()).remove() << std::endl;
 }
 
 void ToolManager::startTracking()
