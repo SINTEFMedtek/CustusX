@@ -116,8 +116,6 @@ void ReconstructionWidget::currentDataComboIndexChanged(const QString& text)
 {
   QDir dir = QFileInfo(mInputFile).dir();
   this->selectData(dir.filePath(text));
-//  std::cout << "selected: " << mInputFile << std::endl;
-//  mDataComboBox->setToolTip(mInputFile);
 }
 
 QString ReconstructionWidget::getCurrentPath()
@@ -140,13 +138,15 @@ void ReconstructionWidget::updateComboBox()
   QDir dir = QFileInfo(mInputFile).dir();
   QStringList nameFilters;
   nameFilters << "*.mhd";
-  //std::cout << dir.path() << std::endl;
   QStringList files = dir.entryList(nameFilters, QDir::Files);
 
   for (int i=0; i<files.size(); ++i)
   {
-    //std::cout << files[i] << std::endl;
     mDataComboBox->addItem(files[i]);
+  }
+  mDataComboBox->setCurrentIndex(-1);
+  for (int i=0; i<files.size(); ++i)
+  {
     if (files[i]==QFileInfo(mInputFile).fileName())
       mDataComboBox->setCurrentIndex(i);
   }
@@ -173,7 +173,6 @@ void ReconstructionWidget::selectData(QString filename)
 
   mInputFile = filename;
 
-  //std::cout << "selected: " << mInputFile << std::endl;
   this->updateComboBox();
   mDataComboBox->setToolTip(mInputFile);
 
