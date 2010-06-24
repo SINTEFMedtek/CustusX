@@ -97,6 +97,9 @@ MainWindow::MainWindow() :
 
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
+  // initialize toolmanager config file
+  toolManager()->setConfigurationFile(string_cast(mSettings->value("toolConfigFilePath").toString()));
+
   this->changeState(PATIENT_DATA, PATIENT_DATA);
 
   this->addAsDockWidget(mImagePropertiesWidget);
@@ -368,6 +371,15 @@ void MainWindow::patientChangedSlot()
   mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
   //mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
   //mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
+
+  QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
+  QDir loggingDir(loggingPath);
+  if(!loggingDir.exists())
+  {
+    loggingDir.mkdir(loggingPath);
+    ssc::messageManager()->sendInfo("Made a folder for tool logging: "+loggingPath.toStdString());
+  }
+  toolManager()->setLoggingFolder(loggingPath.toStdString());
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -721,10 +733,10 @@ void MainWindow::loadPatientRegistrationSlot()
 }
 void MainWindow::configureSlot()
 {
-  QString configFile = mSettings->value("toolConfigFilePath").toString();
-  QFileInfo info(configFile);
+//  QString configFile = mSettings->value("toolConfigFilePath").toString();
+//  QFileInfo info(configFile);
 
-  if (!info.exists() || info.isDir())
+  /*if (!info.exists() || info.isDir())
   {
     configFile = QFileDialog::getOpenFileName(this,
         tr("Select configuration file (*.xml)"),
@@ -733,17 +745,18 @@ void MainWindow::configureSlot()
     mSettings->setValue("toolConfigFilePath", configFile);
     ssc::messageManager()->sendInfo("Tool configuration file is now selected: "+
                               configFile.toStdString());
-  }
-  toolManager()->setConfigurationFile(configFile.toStdString());
+  }*/
+//  toolManager()->setConfigurationFile(configFile.toStdString());
+//  toolManager()->setConfigurationFile(string_cast(mSettings->value("toolConfigFilePath").toString()));
 
-  QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
+/*  QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {
     loggingDir.mkdir(loggingPath);
     ssc::messageManager()->sendInfo("Made a folder for logging: "+loggingPath.toStdString());
   }
-  toolManager()->setLoggingFolder(loggingPath.toStdString());
+  toolManager()->setLoggingFolder(loggingPath.toStdString());*/
 
   toolManager()->configure();
 }

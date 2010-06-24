@@ -7,6 +7,7 @@
 #include "cxDataLocations.h"
 #include <iostream>
 #include "sscTypeConversions.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -236,6 +237,10 @@ void FoldersTab::saveParametersSlot()
   mSettings->setValue("toolConfigFilePath", mCurrentToolConfigFilePath);
   
   mSettings->sync();
+
+  // update toolmanager config file
+  toolManager()->setConfigurationFile(string_cast(mSettings->value("toolConfigFilePath").toString()));
+
   emit savedParameters();
 }
   
