@@ -26,6 +26,7 @@ enum LayoutType
   LAYOUT_3DACS_2X2_SNW,
   LAYOUT_3DACS_1X3_SNW,
   LAYOUT_3DAny_1X2_SNW,
+  LAYOUT_ACS_1X3_SNW,
   LAYOUT_ACSACS_2X3_SNW,
   LAYOUT_Any_2x3_SNW,
   LAYOUT_COUNT
@@ -119,6 +120,7 @@ protected:
   void activateLayout_3DAny_1X2_SNW();
   void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
   void activateLayout_3DACS_1X3_SNW(); ///< activate the 3DACS_1X3 layout
+  void activateLayout_ACS_1X3_SNW();
   void activateLayout_ACSACS_2X3_SNW();
   void activateLayout_Any_2X3_SNW();
 
