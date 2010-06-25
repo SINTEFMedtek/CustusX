@@ -191,6 +191,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     ssc::ToolRep3DPtr toolRep = mToolReps[uid];
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
     toolRep->setTool(iter->second);
+    toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
   }
 
