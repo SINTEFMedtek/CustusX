@@ -92,6 +92,8 @@ public:
   void startTracking();               ///< start tracking
   void stopTracking();                ///< stop tracking
 
+  bool isValid() const;               ///< whether this tracker is constructed correctly or not
+
 signals:
    /**
    * Signal that reports signals received by the the tool
@@ -110,6 +112,7 @@ protected:
   void addLogging(); ///< adds logging to the internal igstk components
 
   InternalStructure mInternalStructure; ///< the trackers type
+  bool mValid;                          ///< whether this tracker is constructed correctly or not
   std::string       mUid;               ///< the trackers unique id
   std::string       mName;              ///< the trackers name
   TrackerType*      mTracker;           ///< pointer to the base class of the internal igstk tracker

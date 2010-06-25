@@ -83,14 +83,19 @@ TrackerPtr ToolConfigurationParser::getTracker()
       internalStructure.mType = Tracker::TRACKER_NONE;
     }
     internalStructure.mLoggingFolderName = this->getLoggingFolder();
-    trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
+
+    TrackerPtr tracker(new Tracker(internalStructure));
+    if(tracker->isValid())
+      trackers.push_back(tracker);
   }
+
   if (trackers.empty())
   {
     internalStructure.mType = Tracker::TRACKER_NONE;
     internalStructure.mLoggingFolderName = this->getLoggingFolder();
     trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
   }
+
   return trackers.at(0);
 }
 
@@ -230,9 +235,12 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     internalStructure.mLoggingFolderName = mLoggingFolder;
 
     Tool* cxTool = new Tool(internalStructure);
-    ssc::ToolPtr tool(cxTool);
-    (*tools)[tool->getUid()] = tool;
-    ssc::messageManager()->sendInfo("Successfully configuring a tool with uid: "+tool->getUid());
+    if(cxTool->isValid())
+    {
+      ssc::ToolPtr tool(cxTool);
+      (*tools)[tool->getUid()] = tool;
+      ssc::messageManager()->sendInfo("Successfully configuring a tool with uid: "+tool->getUid());
+    }
   }
   return tools;
 }
