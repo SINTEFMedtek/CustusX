@@ -24,7 +24,7 @@ if (BUILD_TESTING)
   add_executable(cxTestUsReconstruction cxCppUnitMain.cpp ${SOURCE_FILES} )
   target_link_libraries(cxTestUsReconstruction
     sscUsReconstructionLib 
-    cppunit)
+    ${CPPUNIT_LIBRARIES})
   
   # -----------------------------------------------
   # -- CppUnit - CTest integration. ---------------
@@ -39,7 +39,7 @@ if (BUILD_TESTING)
   target_link_libraries(testUsRec_CppUnit_CTest 
     cisstTestsMain
     sscUsReconstructionLib
-    cppunit
+    ${CPPUNIT_LIBRARIES}
     ${BOOST_LIBRARIES}
 )
   # Generate a CTest list of tests

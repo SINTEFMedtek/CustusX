@@ -11,7 +11,9 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
-
+    # cppunit
+    find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib)
+    
     find_package(SSC REQUIRED)
     include (${SSC_USE_FILE} )
     	
@@ -20,7 +22,7 @@ if (BUILD_TESTING)
     include_directories( /usr/local/include )
          
     # cppunit
-    find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib)  
+    #find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib)  
     
     # test starting the data manager 
     # - ssc::Image
@@ -53,7 +55,7 @@ if (BUILD_TESTING)
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(testCX cxCppUnitMain.cpp ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCX SSC cppunit)
+    target_link_libraries(testCX SSC ${CPPUNIT_LIBRARIES})
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -66,7 +68,7 @@ if (BUILD_TESTING)
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testCX_CppUnit_CTest ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCX_CppUnit_CTest cisstTestsMain SSC cppunit)
+    target_link_libraries(testCX_CppUnit_CTest cisstTestsMain SSC ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testCX_CppUnit_CTest)
     

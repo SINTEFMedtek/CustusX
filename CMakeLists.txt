@@ -33,7 +33,7 @@ INCLUDE(Dart)
 include_directories( /usr/local/include )
 
 # cppunit
-find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib) 
+find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED) 
 
 IF (WIN32)
   ADD_DEFINITIONS(-D__WIN32__)
