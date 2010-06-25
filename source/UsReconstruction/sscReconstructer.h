@@ -10,12 +10,9 @@
 #include <QObject>
 #include <math.h>
 #include "sscReconstructAlgorithm.h"
-#include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
 #include "probeXmlConfigParser.h"
-
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 
 namespace ssc
 {
@@ -83,7 +80,6 @@ private:
   ImagePtr createMaskFromConfigParams();
   ImagePtr generateMask();
   ImagePtr readMaskFile(QString mhdFileName);
-  vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
   ssc::Transform3D applyOutputOrientation();
   void findExtentAndOutputTransform();
 

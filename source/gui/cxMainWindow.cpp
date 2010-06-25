@@ -338,9 +338,17 @@ void MainWindow::savePatientFileSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
+  
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  // Create folder
+  if(!QDir().exists(patientDatafolder))
+  {
+    QDir().mkdir(patientDatafolder);
+    ssc::messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
+  }
   // Open file dialog
   QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-                                                         mSettings->value("globalPatientDataFolder").toString(),
+                                                         patientDatafolder,
                                                          QFileDialog::ShowDirsOnly);
   if (choosenDir == QString::null)
     return; // On cancel
@@ -369,8 +377,8 @@ void MainWindow::importDataSlot()
 void MainWindow::patientChangedSlot()
 {
   mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
-  //mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
-  //mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
+  mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
+  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
 
   QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
   QDir loggingDir(loggingPath);
