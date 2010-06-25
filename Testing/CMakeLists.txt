@@ -65,7 +65,7 @@ if (BUILD_TESTING)
         sscCPPUnitMain.cpp
         ${SSC_TEST_SOURCE_FILES}
         )
-    target_link_libraries(testSSC SSC cppunit)
+    target_link_libraries(testSSC SSC ${CPPUNIT_LIBRARIES})
     set_target_properties(testSSC PROPERTIES LINK_FLAGS "${SNW_LINK_FLAGS}" COMPILE_FLAGS "${SNW_COMPILE_FLAGS}")
     
     # --------------- -------------------------------
@@ -79,7 +79,7 @@ if (BUILD_TESTING)
     
     # link all CppUnit tests to the cisstTestsMain library
     add_executable(testSSC_CppUnit_CTest ${SSC_TEST_SOURCE_FILES} )
-    target_link_libraries(testSSC_CppUnit_CTest cisstTestsMain SSC cppunit)
+    target_link_libraries(testSSC_CppUnit_CTest cisstTestsMain SSC ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testSSC_CppUnit_CTest)
     
