@@ -478,6 +478,11 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
           {
             data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtPOLYDATA);
           }
+          else
+          {
+            messageManager()->sendWarning("Unknown file: "+string_cast(fileInfo.absolutePath()));
+            return;
+          }
           
           if(nameNode.text().isEmpty())
             data->setName(fileInfo.fileName().toStdString());
