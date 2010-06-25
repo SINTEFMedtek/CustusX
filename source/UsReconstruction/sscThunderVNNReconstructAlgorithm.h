@@ -23,7 +23,8 @@ public:
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,
-                           ImagePtr frameMask);
+                           ImagePtr frameMask,
+                           QDomElement settings);
 private:
   QString mShaderPath;
 };

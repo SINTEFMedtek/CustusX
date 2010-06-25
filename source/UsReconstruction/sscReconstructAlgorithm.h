@@ -55,7 +55,8 @@ public:
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,
-                           ImagePtr frameMask) = 0;
+                           ImagePtr frameMask,
+                           QDomElement settings) = 0;
 };
 
 }//namespace

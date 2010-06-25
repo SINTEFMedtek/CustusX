@@ -25,7 +25,8 @@ public:
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,
-                           ImagePtr frameMask);
+                           ImagePtr frameMask,
+                           QDomElement settings);
 private:
   bool validPixel(int x, int y, int* dims, unsigned char* rawPointer)
   {

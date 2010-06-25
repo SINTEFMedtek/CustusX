@@ -6,12 +6,15 @@ MainWindow::MainWindow(QWidget* parent)
 {
   this->setWindowTitle("US reconstruct test app");
   QHBoxLayout* layout = new QHBoxLayout(this);
-  mReconstructionWidget = new ssc::ReconstructionWidget(this, qApp->applicationFilePath(), "");
+  std::cout << qApp->applicationFilePath() << std::endl;
+  mReconstructionWidget = new ssc::ReconstructionWidget(this, qApp->applicationDirPath(), "");
   
-  //#define CA_DEFS
+#define CA_DEFS
 #ifdef CA_DEFS
-  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
-  QString defFile = "ultrasoundSample5.mhd";
+//  QString defPath = "/Users/christiana/workspace/sessions/us_acq_holger_data/";
+//  QString defFile = "ultrasoundSample5.mhd";
+  QString defPath = "/Users/christiana/workspace/data/coordinateSys_test/";
+  QString defFile = "USAcq_29.mhd";
 #else
   //QString defPath = "/Users/olevs/data/UL_thunder/test/1/";
   //QString defFile = "UsAcq_1.mhd";

@@ -35,8 +35,11 @@ void ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
 void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
                                                  ImagePtr frameData,
                                                  ImagePtr outputData,
-                                                 ImagePtr frameMask)
+                                                 ImagePtr frameMask,
+                                                 QDomElement settings)
 {
+  std::cout << "processor: " << StringOptionItem::fromName("Processor", settings).getValue() << std::endl;
+
   QStringList paths;
   paths << mShaderPath << THUNDER_KERNEL_PATH << ".";
 

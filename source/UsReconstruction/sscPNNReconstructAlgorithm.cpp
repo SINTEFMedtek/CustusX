@@ -40,7 +40,8 @@ void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)
 void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
                                                  ImagePtr frameData,
                                                  ImagePtr outputData,
-                                                 ImagePtr frameMask)
+                                                 ImagePtr frameMask,
+                                                 QDomElement settings)
 {
   //std::vector<Planes> planes = generate_planes(frameInfo, frameData);
   
