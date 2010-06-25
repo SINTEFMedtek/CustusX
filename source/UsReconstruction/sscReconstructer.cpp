@@ -939,10 +939,6 @@ ImagePtr Reconstructer::generateOutputVolume()
   image->setFilePath(string_cast(filePath));
   image->set_rMd(mOutputVolumeParams.m_rMd);
   
-  messageManager()->sendDebug("volumeName: " + string_cast(image->getName()));
-  messageManager()->sendDebug("volumeId: " + string_cast(image->getUid()));
-  messageManager()->sendDebug("volumePath: " + string_cast(image->getFilePath()));
-  
   return image;
 }
 
@@ -1059,13 +1055,6 @@ void Reconstructer::reconstruct()
 
   DataManager::getInstance()->loadImage(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
-  
-  
-  messageManager()->sendDebug("volumeName: " + string_cast(mOutput->getName()));
-  messageManager()->sendDebug("volumeId: " + string_cast(mOutput->getUid()));
-  messageManager()->sendDebug("volumePath: " + string_cast(mOutput->getFilePath()));
-  messageManager()->sendDebug("mOutputBasePath: " + string_cast(mOutputBasePath));
-  messageManager()->sendDebug("mOutputRelativePath: " + string_cast(mOutputRelativePath));
   
   //TODO: fix mOutputBasePath
   DataManager::getInstance()->saveImage(mOutput, string_cast(mOutputBasePath));
