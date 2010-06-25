@@ -18,13 +18,15 @@ if (BUILD_TESTING)
         cxTest_ToolConfigurationParser.cpp
         cxTest_Tracker.h
         cxTest_Tracker.cpp
+        cxTest_Tool.h
+        cxTest_Tool.cpp
         ${CX_TEST_SOURCE_FILES}
     )
     
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(cxTestToolManager cxCppUnitMain.cpp ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(cxTestToolManager toolManager cppunit)
+    target_link_libraries(cxTestToolManager toolManager cppunit cxCommon)
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -36,7 +38,7 @@ if (BUILD_TESTING)
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testTM_CppUnit_CTest ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain toolManager cppunit)
+    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain toolManager cppunit cxCommon)
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testTM_CppUnit_CTest)
     

@@ -12,8 +12,9 @@
 namespace cx
 {
 
-Tool::Tool(InternalStructure internalStructure) :
+Tool::Tool(InternalStructure& internalStructure) :
   mInternalStructure(internalStructure),
+  mValid(false),
   mTool(NULL),
   mToolObserver(ObserverType::New()),
   mTransforms(new Transform3DVector()),
@@ -39,11 +40,14 @@ Tool::Tool(InternalStructure internalStructure) :
     this->determineToolsCalibration();
     mTool = this->buildInternalTool();
     this->createPolyData();
+    mValid = true;
   }else
   {
     ssc::messageManager()->sendError("Tool: "+ssc::Tool::mUid+" was created with invalid internal structure.");
+    mValid = false;
   }
 }
+
 Tool::~Tool()
 {}
 
@@ -51,14 +55,17 @@ ssc::Tool::Type Tool::getType() const
 {
   return mInternalStructure.mType;
 }
+
 std::string Tool::getGraphicsFileName() const
 {
   return mInternalStructure.mGraphicsFileName;
 }
+
 vtkPolyDataPtr Tool::getGraphicsPolyData() const
 {
   return mPolyData;
 }
+
 void Tool::saveTransformsAndTimestamps()
 {
   if(this->getType() == Tool::TOOL_REFERENCE)
@@ -112,18 +119,22 @@ void Tool::saveTransformsAndTimestamps()
   mTransforms.reset();
   transforms.close();
 }
+
 void Tool::setTransformSaveFile(const std::string& filename)
 {
   mInternalStructure.mTransformSaveFileName = filename;
 }
+
 ssc::Transform3D Tool::get_prMt() const
 {
   return *m_prMt;
 }
+
 bool Tool::getVisible() const
 {
   return mVisible;
 }
+
 /**
  * @return last recorded transform that will get you from tool- to patient ref space
  */
@@ -134,26 +145,30 @@ bool Tool::getVisible() const
     lastTransform = mTransforms->at(mTransforms->size()-1);
   return lastTransform;
 }*/
+
 std::string Tool::getUid() const
 {
   return ssc::Tool::mUid;
 }
+
 std::string Tool::getName() const
 {
   return ssc::Tool::mName;
 }
+
 bool Tool::isCalibrated() const
 {
   //TODO: What do we want to do here?
   return true;
 }
+
 double Tool::getTooltipOffset() const
 {
   return mToolTipOffset;
 }
+
 void Tool::setTooltipOffset(double val)
 {
-  //std::cout << "Tool::setTooltipOffset" << std::endl;
   if (ssc::similar(val, mToolTipOffset))
     return;
   mToolTipOffset = val;
@@ -163,6 +178,12 @@ Tool::TrackerToolType* Tool::getPointer() const
 {
   return mTool;
 }
+
+bool Tool::isValid() const
+{
+  return mValid;
+}
+
 //copied from ManualTool, move to ssc::Tool?
 void Tool::set_prMt(const ssc::Transform3D& prMt)
 {
@@ -347,12 +368,12 @@ bool Tool::verifyInternalStructure()
     std::cout << "if(mInternalStructure.mTrackerType == Tracker::TRACKER_NONE)" << std::endl;
     return false;
   }
-  if(mInternalStructure.mPortNumber >= 4)
+  if((mInternalStructure.mTrackerType == Tracker::TRACKER_AURORA) && (mInternalStructure.mPortNumber >= 4))
   {
     std::cout << "if(mInternalStructure.mPortNumber >= 4)" << std::endl;
     return false;
   }
-  if(mInternalStructure.mChannelNumber >= 1)
+  if((mInternalStructure.mTrackerType == Tracker::TRACKER_AURORA) && (mInternalStructure.mChannelNumber >= 1))
   {
     std::cout << "if(mInternalStructure.mChannelNumber >= 1)" << std::endl;
     return false;
@@ -382,6 +403,7 @@ bool Tool::verifyInternalStructure()
 
   return true;
 }
+
 Tool::TrackerToolType* Tool::buildInternalTool()
 {
   TrackerToolType* tool = NULL;
@@ -431,6 +453,7 @@ Tool::TrackerToolType* Tool::buildInternalTool()
   }
   return tool;
 }
+
 void Tool::createPolyData()
 {
   QDir dir;
@@ -456,6 +479,7 @@ void Tool::createPolyData()
     mPolyData = coneSource->GetOutput();
   }
 }
+
 void Tool::determineToolsCalibration()
 {
   itk::Matrix<double, 3, 3> calMatrix;
@@ -513,6 +537,7 @@ void Tool::determineToolsCalibration()
   }
   inputStream.close();
 }
+
 void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
@@ -526,6 +551,7 @@ void Tool::addLogging(TrackerToolType* trackerTool)
 
   trackerTool->SetLogger(mLogger);
 }
+
 void Tool::printInternalStructure()
 {
   std::cout << "------------------------------------------------------------------" << std::endl;
@@ -544,4 +570,5 @@ void Tool::printInternalStructure()
   std::cout << "mLoggingFolderName: " << mInternalStructure.mLoggingFolderName  << std::endl;
   std::cout << "------------------------------------------------------------------" << std::endl;
 }
+
 }//namespace cx
