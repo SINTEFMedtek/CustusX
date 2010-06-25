@@ -62,12 +62,12 @@ public:
 	/** write to file all recorded transforms and timestamps */
 	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "") = 0;
 
-  virtual void addXml(QDomNode& parentNode) {} ///< write internal state to node
-  virtual void parseXml(QDomNode& dataNode) {} ///< read internal state from node
+  virtual void addXml(QDomNode& parentNode) { Q_UNUSED(parentNode); } ///< write internal state to node
+  virtual void parseXml(QDomNode& dataNode) { Q_UNUSED(dataNode); } ///< read internal state from node
 	
   virtual ssc::LandmarkMap getLandmarks() { return ssc::LandmarkMap();}
-  virtual void setLandmark(ssc::Landmark landmark) {}
-  virtual void removeLandmark(std::string uid) {}
+  virtual void setLandmark(ssc::Landmark landmark) { Q_UNUSED(landmark); }
+  virtual void removeLandmark(std::string uid) { Q_UNUSED(uid); }
 
 signals:
 	void configured(); ///< signal emitted when the system is configured
