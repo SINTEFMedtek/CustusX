@@ -7,8 +7,6 @@
 #include <algorithm>
 #include <QtCore>
 #include <vtkImageData.h>
-#include <vtkUnsignedCharArray.h>
-#include <vtkPointData.h>
 #include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
 #include "sscDataManagerImpl.h"
@@ -16,23 +14,24 @@
 #include "sscXmlOptionItem.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-//#include "cxDataLocations.h"
+#include "sscThunderVNNReconstructAlgorithm.h"
+#include "sscPNNReconstructAlgorithm.h"
+#include "utils/sscReconstructHelper.h"
 
 //Windows fix
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
-
 namespace ssc
 {
 
 Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
-  mAlgorithm(new ThunderVNNReconstructAlgorithm(shaderPath)),
   mOutputRelativePath(""),
   mOutputBasePath("")
 {
+  //mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(shaderPath));
+  mAlgorithm = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
   mSettingsFilename = appDataPath+"/usReconstruct.xml";
 
   QDomDocument doc("usReconstruction");
@@ -403,47 +402,6 @@ void Reconstructer::readPositionFile(QString posFile, bool alsoReadTimestamps)
   return;
 }
   
-vtkImageDataPtr Reconstructer::generateVtkImageData(Vector3D dim, 
-                                                  Vector3D spacing,
-                                                  const unsigned char initValue)
-{
-  vtkImageDataPtr data = vtkImageDataPtr::New();
-  data->SetSpacing(spacing[0], spacing[1], spacing[2]);
-  data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-  data->SetScalarTypeToUnsignedChar();
-  data->SetNumberOfScalarComponents(1);
-  
-  int scalarSize = dim[0]*dim[1]*dim[2];
-  
-	unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
-  std::fill(rawchars,rawchars+scalarSize, initValue);
-  
-  vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
-  array->SetNumberOfComponents(1);
-  //TODO: Whithout the +1 the volume is black 
-  array->SetArray(rawchars, scalarSize+1, 0); // take ownership
-  data->GetPointData()->SetScalars(array);
-  
-  rawchars[0] = 255;// A trick to get a full LUT in ssc::Image (automatic LUT generation)
-  
-  /*data->AllocateScalars();
-  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
-  unsigned long N = data->GetNumberOfPoints();
-  N--;//Don't understand this
-  for (unsigned long i = 0; i < N; i++)
-    dataPtr[i] = 100;
-  
-  //dataPtr[N] = 255;//This creates a black volume
-  
-  dataPtr[0] = 255;
-  
-  std::cout << "Reconstructer::generateOutputVolume() data->GetNumberOfPoints(): " 
-  << N << std::endl;*/
-  
-  
-  return data;
-}
-  
 ImagePtr Reconstructer::createMaskFromConfigParams()
 {
   //TODO: Use corners instead of edges to allow for CLA and phased probes
@@ -469,7 +427,7 @@ ImagePtr Reconstructer::generateMask()
   dim[2] = 1;
   ssc::Vector3D spacing(mUsRaw->getBaseVtkImageData()->GetSpacing());
   
-  vtkImageDataPtr data = generateVtkImageData(dim, spacing, 255);
+  vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 255);
     
   ImagePtr image = ImagePtr(new Image("mask", data, "mask")) ;
   return image;
@@ -917,7 +875,7 @@ ImagePtr Reconstructer::generateOutputVolume()
   //ssc::messageManager()->sendInfo("output spacing: "
   //                                + string_cast(spacing));  
   
-  vtkImageDataPtr data = this->generateVtkImageData(dim, spacing, 0);
+  vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
   
   // Add _rec to volume name and uid
   QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
@@ -951,6 +909,11 @@ ImagePtr Reconstructer::generateOutputVolume()
 
   image->setFilePath(string_cast(filePath));
   image->set_rMd(mOutputVolumeParams.m_rMd);
+  
+  //messageManager()->sendDebug("volumeName: " + string_cast(image->getName()));
+  //messageManager()->sendDebug("volumeId: " + string_cast(image->getUid()));
+  //messageManager()->sendDebug("volumePath: " + string_cast(image->getFilePath()));
+  
   return image;
 }
 
@@ -1066,6 +1029,13 @@ void Reconstructer::reconstruct()
   DataManager::getInstance()->loadImage(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
   
+  
+  //messageManager()->sendDebug("volumeName: " + string_cast(mOutput->getName()));
+  //messageManager()->sendDebug("volumeId: " + string_cast(mOutput->getUid()));
+  //messageManager()->sendDebug("volumePath: " + string_cast(mOutput->getFilePath()));
+  //messageManager()->sendDebug("mOutputBasePath: " + string_cast(mOutputBasePath));
+  
+  //TODO: fix mOutputBasePath
   DataManager::getInstance()->saveImage(mOutput, string_cast(mOutputBasePath));
 }
 
