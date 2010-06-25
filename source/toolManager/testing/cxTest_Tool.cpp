@@ -6,7 +6,6 @@
 
 void TestTool::setUp()
 {
-  QString toolLabPath(cx::DataLocations::getConfigPath()+QString("/tool/Lab/"));
   QString toolToolPath(cx::DataLocations::getConfigPath()+QString("/tool/Tools/"));
 
   mValidPolarisInternal.mType = ssc::Tool::TOOL_POINTER;
@@ -21,7 +20,7 @@ void TestTool::setUp()
   mValidPolarisInternal.mCalibrationFilename = (toolToolPath+QString("07-198-0838_SW_Pointer_02.cal")).toStdString();
   mValidPolarisInternal.mGraphicsFileName = (toolToolPath+QString("07-198-0838_SW_Pointer_02.stl")).toStdString();
   mValidPolarisInternal.mTransformSaveFileName = QDir::currentPath().toStdString();
-  mValidPolarisInternal.mLoggingFolderName =  QDir::currentPath().toStdString();
+  mValidPolarisInternal.mLoggingFolderName = QDir::currentPath().toStdString();
 
   mValidAuroraInternal.mType = ssc::Tool::TOOL_POINTER;
   mValidAuroraInternal.mName = "Aurora pointer name";

@@ -7,6 +7,7 @@ namespace cx
 {
 Tracker::Tracker(InternalStructure internalStructure) :
   mInternalStructure(internalStructure),
+  mValid(false),
   mUid(""),
   mName(""),
   mCommunication(CommunicationType::New()),
@@ -37,6 +38,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
   case TRACKER_NONE:
     mUid = mName = "None";
     ssc::messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
+    mValid = false;
     return;
     break;
   case TRACKER_POLARIS:
@@ -45,6 +47,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mTempPolarisTracker->SetCommunication(mCommunication);
     ssc::messageManager()->sendInfo("Tracker: Polaris");
     mTracker = mTempPolarisTracker.GetPointer();
+    mValid = true;
     break;
   case TRACKER_POLARIS_SPECTRA:
     mUid = mName = "Polaris Spectra";
@@ -52,6 +55,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mTempPolarisTracker->SetCommunication(mCommunication);
     ssc::messageManager()->sendInfo("Tracker: Polaris Spectra");
     mTracker = mTempPolarisTracker.GetPointer();
+    mValid = true;
     break;
   case TRACKER_POLARIS_VICRA:
     mUid = mName = "Polaris Vicra";
@@ -59,6 +63,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mTempPolarisTracker->SetCommunication(mCommunication);
     ssc::messageManager()->sendInfo("Tracker: Polaris Vicra");
     mTracker = mTempPolarisTracker.GetPointer();
+    mValid = true;
     break;
   case TRACKER_AURORA:
     mUid = mName = "Aurora";
@@ -66,11 +71,13 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mTempAuroraTracker->SetCommunication(mCommunication);
     ssc::messageManager()->sendInfo("Tracker: Aurora");
     mTracker = mTempAuroraTracker.GetPointer();
+    mValid = true;
     break;
   case TRACKER_MICRON:
     mUid = mName = "Micron";
     ssc::messageManager()->sendInfo("Tracker: Micron");
     //TODO: implement support for a micron tracker...
+    mValid = false;
     break;
   default:
     break;
@@ -80,29 +87,36 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mCommunication->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   this->addLogging();
 }
+
 Tracker::~Tracker()
 {}
+
 Tracker::Type Tracker::getType() const
 {
   return mInternalStructure.mType;
 }
+
 std::string Tracker::getName() const
 {
   return mName;
 }
+
 std::string Tracker::getUid() const
 {
   return mUid;
 }
+
 Tracker::TrackerType* Tracker::getPointer() const
 {
   return mTracker;
 }
+
 void Tracker::open()
 {
   mCommunication->OpenCommunication();
   mTracker->RequestOpen();
 }
+
 void Tracker::attachTools(ToolMapPtr tools)
 {
   std::map<std::string, ssc::ToolPtr> toolMap = *tools.get();
@@ -120,14 +134,22 @@ void Tracker::attachTools(ToolMapPtr tools)
     }
   }
 }
+
 void Tracker::startTracking()
 {
   mTracker->RequestStartTracking();
 }
+
 void Tracker::stopTracking()
 {
   mTracker->RequestStopTracking();
 }
+
+bool Tracker::isValid() const
+{
+  return mValid;
+}
+
 void Tracker::trackerTransformCallback(const itk::EventObject &event)
 {
   //successes
@@ -218,6 +240,7 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
     emit trackerReport(TRACKER_COMMUNICATION_OPEN_PORT_ERROR, false, false, mUid);
   }
 }
+
 void Tracker::addLogging()
 {
   std::ofstream* loggerFile = new std::ofstream();

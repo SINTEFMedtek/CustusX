@@ -117,7 +117,7 @@ void ToolManager::configure()
 
   ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath, mLoggingFolder);
   mTracker = toolConfigurationParser.getTracker();
-  if(mTracker->getType() == Tracker::TRACKER_NONE)
+  if(!mTracker->isValid())
   {
     ssc::messageManager()->sendError("Could not configure the toolmanager, tracker is invalid.");
     return;
