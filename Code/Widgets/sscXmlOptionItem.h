@@ -59,6 +59,27 @@ private:
   QDomText safeGetTextNode(QString name);
 };
 
+class XmlOptionFile
+{
+public:
+  XmlOptionFile(QString filename, QDomDocument def);
+  XmlOptionFile();
+
+  StringOptionItem getStringOption(const QString& uid);
+  QDomElement getElement();
+  QDomElement getElement(QString level1);
+  QDomElement getElement(QString level1, QString level2);
+  void save();
+
+private:
+  void load();
+  QDomElement safeGetElement(QDomElement parent, QString childName);
+
+  QDomDocument mDocument;
+  QString mFilename;
+};
+
+
 } // namespace ssc
 
 #endif /* SSCXMLOPTIONITEM_H_ */

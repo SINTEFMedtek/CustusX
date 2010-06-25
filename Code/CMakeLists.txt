@@ -338,7 +338,7 @@ FIND_PATH(SSC_DATA_ROOT sscData.readme
   ${SSC_SOURCE_DIR}/Data
   $ENV{SSC_DATA_ROOT})
   
-set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/../../source/UsReconstruction/Thunder)
+#set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/../../source/UsReconstruction/Thunder)
 
 configure_file(
   "${SSC_SOURCE_DIR}/Code/Utilities/sscConfig.h.in"

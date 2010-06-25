@@ -7,6 +7,9 @@
 #include "sscXmlOptionItem.h"
 
 #include <iostream>
+#include <QtCore>
+#include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -123,6 +126,104 @@ QDomText StringOptionItem::safeGetTextNode(QString name)
     node.appendChild(text);
   }
   return text;
+}
+
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+XmlOptionFile::XmlOptionFile()
+{
+}
+
+XmlOptionFile::XmlOptionFile(QString filename, QDomDocument def) :
+    mFilename(filename),
+    mDocument(def)
+{
+  this->load();
+}
+
+StringOptionItem XmlOptionFile::getStringOption(const QString& uid)
+{
+  return StringOptionItem::fromName(uid, this->getElement());
+}
+
+/**return an element child of parent. Create if not existing.
+ */
+QDomElement XmlOptionFile::safeGetElement(QDomElement parent, QString childName)
+{
+  QDomElement child = parent.namedItem(childName).toElement();
+
+  if (child.isNull())
+  {
+    child = mDocument.createElement(childName);
+    parent.appendChild(child);
+  }
+
+  return child;
+}
+
+QDomElement XmlOptionFile::getElement()
+{
+  return mDocument.documentElement();
+}
+
+QDomElement XmlOptionFile::getElement(QString level1)
+{
+  QDomElement elem1 = this->safeGetElement(mDocument.documentElement(), level1);
+  return elem1;
+}
+
+QDomElement XmlOptionFile::getElement(QString level1, QString level2)
+{
+  QDomElement elem1 = this->safeGetElement(mDocument.documentElement(), level1);
+  QDomElement elem2 = this->safeGetElement(elem1, level2);
+  return elem2;
+}
+
+void XmlOptionFile::save()
+{
+  QFile file(mFilename);
+  if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    QTextStream stream(&file);
+    stream << mDocument.toString();
+    file.close();
+    ssc::messageManager()->sendInfo("Created "+file.fileName().toStdString());
+  }
+  else
+  {
+    ssc::messageManager()->sendError("Could not open "+file.fileName().toStdString()
+                               +" Error: "+file.errorString().toStdString());
+  }
+}
+
+void XmlOptionFile::load()
+{
+  QFile file(mFilename);
+  if (!file.open(QIODevice::ReadOnly))
+  {
+    // ok to not find file - we have nice defaults.
+    //ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
+  }
+  else
+  {
+    QDomDocument loadedDoc;
+    QString error;
+    int line,col;
+    if (!loadedDoc.setContent(&file, &error,&line,&col))
+    {
+      ssc::messageManager()->sendWarning("error setting xml content ["
+                                         + string_cast(line) +  ","
+                                         + string_cast(col) + "]"
+                                         + string_cast(error) );
+    }
+    file.close();
+    mDocument = loadedDoc;
+  }
+
 }
 
 
