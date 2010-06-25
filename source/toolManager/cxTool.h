@@ -85,7 +85,7 @@ public:
       mTransformSaveFileName(""), mLoggingFolderName(""){}; ///< sets up default values for all the members
   };
 
-  Tool(InternalStructure internalStructur);   ///< constructor
+  Tool(InternalStructure& internalStructur);   ///< constructor
   ~Tool();                                    ///< destructor
 
   virtual ssc::Tool::Type getType() const;
@@ -107,6 +107,7 @@ public:
   virtual void set_prMt(const ssc::Transform3D& transform);
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
+  bool isValid() const; ///< whether this tool is constructed correctly or not
 
 signals:
   /**
@@ -131,6 +132,7 @@ protected:
   void printInternalStructure(); ///< for debugging
 
   InternalStructure mInternalStructure;             ///< the tools internal structure
+  bool mValid;                                      ///< whether this tool is constructed correctly or not
   TrackerToolType* mTool;                           ///< pointer to the base class of the igstk tool
   PolarisTrackerToolType::Pointer mTempPolarisTool; ///< internal container for a temp polaris tool
   AuroraTrackerToolType::Pointer mTempAuroraTool;   ///< internal container for a temp aurora too
