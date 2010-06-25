@@ -10,4 +10,5 @@ SET ( ${LIB}_3DUSReconstruction
   cxUsReconstruction.cpp
 )
 
-ADD_LIBRARY ( ${LIB} STATIC ${${LIB}_3DUSReconstruction} )
+ADD_LIBRARY ( ${LIB} ${${LIB}_3DUSReconstruction} )
+target_link_libraries(${LIB} ITKCommon vtkImaging vtkIO)
