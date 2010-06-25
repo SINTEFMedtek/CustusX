@@ -31,66 +31,36 @@ Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
   mOutputBasePath(""),
   mShaderPath(shaderPath)
 {
-  //mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(shaderPath));
-  mAlgorithm = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
-  mSettingsFilename = appDataPath+"/usReconstruct.xml";
-
   QDomDocument doc("usReconstruction");
   doc.appendChild(doc.createElement("usReconstruct"));
   doc.documentElement().appendChild(doc.createElement("algorithms"));
 
-  QFile file(mSettingsFilename);
-  if (!file.open(QIODevice::ReadOnly))
-  {
-    // ok to not find file - we have nice defaults.
-    //ssc::messageManager()->sendWarning("file not found: "+ QString(defPath+filename).toStdString());
-  }
-  else
-  {
-    QString error;
-    int line,col;
-    if (!doc.setContent(&file, &error,&line,&col))
-    {
-      ssc::messageManager()->sendWarning("error setting xml content ["
-                                         + string_cast(line) +  ","
-                                         + string_cast(col) + "]"
-                                         + string_cast(error) );
-      file.close();
-    }
-    file.close();
-  }
-
-  mSettings = doc;
+  mSettings = XmlOptionFile(appDataPath+"/usReconstruct.xml", doc);
 
   StringOptionItem::initialize("Orientation",
       "",
       "Algorithm to use for output volume orientation",
       "MiddleFrame",
       "\"PatientReference\" \"MiddleFrame\"",
-      this->getSettings());
+      mSettings.getElement());
   StringOptionItem::initialize("Algorithm",
       "",
       "",
       "ThunderVNN",
       "\"ThunderVNN\" \"PNN\"",
-      this->getSettings());
+      mSettings.getElement());
 
   createAlgorithm();
-
-  //this->saveSettings();
-
-  //std::cout << doc.toString(2) << std::endl;
 }
 
 Reconstructer::~Reconstructer()
 {
-  this->saveSettings();
+  mSettings.save();
 }
 
 void Reconstructer::createAlgorithm()
 {
-  StringOptionItem option = StringOptionItem::fromName("Algorithm", this->getSettings());
-  QString name = option.getValue();
+  QString name = mSettings.getStringOption("Algorithm").getValue();
 
   if (mAlgorithm && mAlgorithm->getName()==name)
     return;
@@ -106,46 +76,17 @@ void Reconstructer::createAlgorithm()
   // generate settings for new algo
   if (mAlgorithm)
   {
-    QDomElement algorithms = this->getSettings().namedItem("algorithms").toElement();
-
-    if (algorithms.namedItem(mAlgorithm->getName()).isNull())
-    {
-      QDomElement algo = mSettings.createElement(mAlgorithm->getName());
-      algorithms.appendChild(algo);
-      mAlgorithm->getSettings(algo);
-    }
-
+    QDomElement algo = mSettings.getElement("algorithms", mAlgorithm->getName());
+    mAlgorithm->getSettings(algo);
     ssc::messageManager()->sendInfo("Using reconstruction algorithm " + string_cast(mAlgorithm->getName()));
   }
-}
-
-void Reconstructer::saveSettings()
-{
-  QFile file(mSettingsFilename);
-  if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
-  {
-    QTextStream stream(&file);
-    stream << mSettings.toString();
-    file.close();
-    ssc::messageManager()->sendInfo("Created "+file.fileName().toStdString());
-  }
-  else
-  {
-    ssc::messageManager()->sendError("Could not open "+file.fileName().toStdString()
-                               +" Error: "+file.errorString().toStdString());
-  }
-}
-
-QDomElement Reconstructer::getSettings() const
-{
-  return mSettings.documentElement();
 }
 
 void Reconstructer::setSettings()
 {
   this->createAlgorithm();
 
-  QString newOrient = this->getNamedSetting("Orientation").getValue();
+  QString newOrient = mSettings.getStringOption("Orientation").getValue();
   if (newOrient!=mLastAppliedOrientation)
   {
     mLastAppliedOrientation = newOrient;
@@ -158,13 +99,7 @@ void Reconstructer::setSettings()
   // notify that settings xml is changed
   emit paramsChanged();
 
-  //std::cout << mSettings.toString(2) << std::endl;
-  this->saveSettings();
-}
-
-StringOptionItem Reconstructer::getNamedSetting(const QString& uid)
-{
-  return StringOptionItem::fromName(uid, this->getSettings());
+  mSettings.save();
 }
 
 void Reconstructer::clearAll()
@@ -208,21 +143,6 @@ void Reconstructer::setOutputBasePath(QString path)
   mOutputBasePath = path;
 }
   
-//long Reconstructer::getMaxOutputVolumeSize() const
-//{
-//  return mOutputVolumeParams.getMaxVolumeSize();
-//}
-//
-//void Reconstructer::setMaxOutputVolumeSize(long val)
-//{
-//  mOutputVolumeParams.constrainVolumeSize(val);
-//}
-//
-//ssc::DoubleBoundingBox3D Reconstructer::getExtent() const
-//{
-//  return mExtent;
-//}
-  
 QString Reconstructer::changeExtension(QString name, QString ext)
 {
   QStringList splitName = name.split(".");
@@ -234,7 +154,6 @@ bool within(int x, int min, int max)
 {
   return (x>=min) && (x<=max);
 }
-  
   
 void Reconstructer::readUsDataFile(QString mhdFileName)
 {
@@ -801,7 +720,7 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
  */
 ssc::Transform3D Reconstructer::applyOutputOrientation()
 {
-  QString newOrient = this->getNamedSetting("Orientation").getValue();
+  QString newOrient = mSettings.getStringOption("Orientation").getValue();
   ssc::Transform3D prMdd;
 
   if (newOrient=="PatientReference")
@@ -1046,7 +965,7 @@ void Reconstructer::reconstruct()
     std::cout << i << ": " << mFrames[i].mPos.coord(tp) << std::endl;
   }*/
 
-  QDomElement algoSettings = this->getSettings().namedItem("algorithms").toElement().namedItem(mAlgorithm->getName()).toElement();
+  QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
 
   QDateTime pre = QDateTime::currentDateTime();
   mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask, algoSettings);

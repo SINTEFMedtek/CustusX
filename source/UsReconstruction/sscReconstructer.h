@@ -13,6 +13,7 @@
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
 #include "probeXmlConfigParser.h"
+#include "sscXmlOptionItem.h"
 
 namespace ssc
 {
@@ -41,7 +42,7 @@ public:
   ImagePtr reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr getOutput();
   ImagePtr getInput();
-  QDomElement getSettings() const;
+  XmlOptionFile getSettings() const { return mSettings; }
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
@@ -63,8 +64,9 @@ private:
   OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
   ProbeXmlConfigParser::Configuration mConfiguration;
-  QDomDocument mSettings;
-  QString mSettingsFilename;
+  XmlOptionFile mSettings;
+  //QDomDocument mSettings;
+  //QString mSettingsFilename;
   QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
   QString mCalFileName; ///< Name of calibration file
   QString mCalFilesPath; ///< Path to calibration files
@@ -93,10 +95,10 @@ private:
   void calibrate(QString calFilesPath);
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
-  StringOptionItem getNamedSetting(const QString& uid);
+  //StringOptionItem getNamedSetting(const QString& uid);
   void clearAll();
   void clearOutput();
-  void saveSettings();
+  //void saveSettings();
   void createAlgorithm();
 };
 

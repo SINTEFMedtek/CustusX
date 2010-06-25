@@ -72,11 +72,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
   QGroupBox* algorithmGroup = new QGroupBox("Algorithm", this);
   QGridLayout* algoLayout = new QGridLayout(algorithmGroup);
 
-  StringOptionItem algoOption = StringOptionItem::fromName("Algorithm", mReconstructer->getSettings());
+  StringOptionItem algoOption = mReconstructer->getSettings().getStringOption("Algorithm");
   QString algoName = algoOption.getValue();
   std::cout << "algoName" << algoName << std::endl;
 
-  QDomNodeList algoSettings = mReconstructer->getSettings().namedItem("algorithms").namedItem(algoName).childNodes();
+  QDomNodeList algoSettings = mReconstructer->getSettings().getElement("algorithms", algoName).childNodes();
   for (int i=0; i<algoSettings.size(); ++i)
   {
     StringOptionItem item(algoSettings.item(i).toElement());
@@ -106,7 +106,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
 
 ssc::StringDataAdapterPtr ReconstructionWidget::generateStringDataAdapter(QString uid)
 {
-  StringOptionItem item = StringOptionItem::fromName(uid, mReconstructer->getSettings());
+  StringOptionItem item = mReconstructer->getSettings().getStringOption(uid);
 
   ssc::StringDataAdapterXmlNodePtr interface(new StringDataAdapterXmlNode(item));
   connect(interface.get(), SIGNAL(valueWasSet()), mReconstructer.get(), SLOT(setSettings()));
