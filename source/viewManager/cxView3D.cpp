@@ -89,6 +89,8 @@ void View3D::activateCameraDefaultStyle()
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 
   mCameraStyle = View3D::DEFAULT_STYLE;
+
+  ssc::messageManager()->sendDebug("Default camera style activated.");
 }
 void View3D::activateCameraToolStyle(int offset)
 {
@@ -123,6 +125,7 @@ void View3D::activateCameraToolStyle(int offset)
   dominantToolRepPtr->setStayHiddenAfterVisible(true);
 
   mCameraStyle = View3D::TOOL_STYLE;
+  ssc::messageManager()->sendDebug("Tool camera style activated. Following tool with uid: "+mFollowingTool->getUid());
 }
 void View3D::deactivateCameraToolStyle()
 {
@@ -134,11 +137,26 @@ void View3D::deactivateCameraToolStyle()
   disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-  ssc::ToolRep3DPtr followingToolRepPtr = repManager()->getToolRep3DRep("ToolRep3D_1");
+  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
+  ToolRep3DMap::iterator it = toolRep3DMap->begin();
+  while(it != toolRep3DMap->end())
+  {
+    if(it->second->hasTool(mFollowingTool))
+    {
+      //it->second->setOffsetPointVisibleAtZeroOffset(false);
+      it->second->setStayHiddenAfterVisible(false);
+    }
+    ++it;
+  }
+
+  /*ssc::ToolRep3DPtr followingToolRepPtr = repManager()->getToolRep3DRep("ToolRep3D_1");
   if(followingToolRepPtr)
   {
     followingToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
     followingToolRepPtr->setStayHiddenAfterVisible(false);
-  }
+
+  }*/
+
+  ssc::messageManager()->sendDebug("Default camera style deactivated.");
 }
 }//namespace cx
