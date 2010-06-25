@@ -5,9 +5,6 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
-    # -----------------------------------------------
-    # CppUnit test framework: Create executable testCX
-    #
     
     # List of all test units
     QT4_WRAP_CPP( TM_TEST_SOURCE_FILES 
@@ -26,7 +23,7 @@ if (BUILD_TESTING)
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(cxTestToolManager cxCppUnitMain.cpp ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(cxTestToolManager toolManager cppunit cxCommon)
+    target_link_libraries(cxTestToolManager toolManager cxCommon ${CPPUNIT_LIBRARIES})
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -38,7 +35,7 @@ if (BUILD_TESTING)
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testTM_CppUnit_CTest ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain toolManager cppunit cxCommon)
+    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain toolManager cxCommon ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testTM_CppUnit_CTest)
     

@@ -74,7 +74,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
 
   StringOptionItem algoOption = mReconstructer->getSettings().getStringOption("Algorithm");
   QString algoName = algoOption.getValue();
-  std::cout << "algoName" << algoName << std::endl;
 
   QDomNodeList algoSettings = mReconstructer->getSettings().getElement("algorithms", algoName).childNodes();
   for (int i=0; i<algoSettings.size(); ++i)
