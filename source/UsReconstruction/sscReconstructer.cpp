@@ -28,7 +28,8 @@ namespace ssc
 
 Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
   mOutputRelativePath(""),
-  mOutputBasePath("")
+  mOutputBasePath(""),
+  mShaderPath(shaderPath)
 {
   //mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(shaderPath));
   mAlgorithm = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
@@ -64,26 +65,19 @@ Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
   StringOptionItem::initialize("Orientation",
       "",
       "Algorithm to use for output volume orientation",
-      "PatientReference",
+      "MiddleFrame",
       "\"PatientReference\" \"MiddleFrame\"",
       this->getSettings());
   StringOptionItem::initialize("Algorithm",
       "",
       "",
       "ThunderVNN",
-      "\"ThunderVNN\"",
+      "\"ThunderVNN\" \"PNN\"",
       this->getSettings());
 
-  QDomElement algorithms = this->getSettings().namedItem("algorithms").toElement();
+  createAlgorithm();
 
-  if (algorithms.namedItem(mAlgorithm->getName()).isNull())
-  {
-    QDomElement algo = doc.createElement(mAlgorithm->getName());
-    algorithms.appendChild(algo);
-    mAlgorithm->getSettings(algo);
-  }
-
-  this->saveSettings();
+  //this->saveSettings();
 
   //std::cout << doc.toString(2) << std::endl;
 }
@@ -93,6 +87,37 @@ Reconstructer::~Reconstructer()
   this->saveSettings();
 }
 
+void Reconstructer::createAlgorithm()
+{
+  StringOptionItem option = StringOptionItem::fromName("Algorithm", this->getSettings());
+  QString name = option.getValue();
+
+  if (mAlgorithm && mAlgorithm->getName()==name)
+    return;
+
+  // create new algo
+  if (name=="ThunderVNN")
+    mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mShaderPath));
+  else if (name=="PNN")
+    mAlgorithm = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
+  else
+    mAlgorithm.reset();
+
+  // generate settings for new algo
+  if (mAlgorithm)
+  {
+    QDomElement algorithms = this->getSettings().namedItem("algorithms").toElement();
+
+    if (algorithms.namedItem(mAlgorithm->getName()).isNull())
+    {
+      QDomElement algo = mSettings.createElement(mAlgorithm->getName());
+      algorithms.appendChild(algo);
+      mAlgorithm->getSettings(algo);
+    }
+
+    ssc::messageManager()->sendInfo("Using reconstruction algorithm " + string_cast(mAlgorithm->getName()));
+  }
+}
 
 void Reconstructer::saveSettings()
 {
@@ -118,6 +143,8 @@ QDomElement Reconstructer::getSettings() const
 
 void Reconstructer::setSettings()
 {
+  this->createAlgorithm();
+
   QString newOrient = this->getNamedSetting("Orientation").getValue();
   if (newOrient!=mLastAppliedOrientation)
   {
@@ -125,13 +152,14 @@ void Reconstructer::setSettings()
     this->clearOutput();
     // reread everything.
     this->readFiles(mFilename, mCalFilesPath);
+    ssc::messageManager()->sendInfo("set settings - " + string_cast(newOrient));
   }
 
-  emit paramsChanged();
   // notify that settings xml is changed
+  emit paramsChanged();
 
-  ssc::messageManager()->sendInfo("set settings - " + string_cast(newOrient));
   //std::cout << mSettings.toString(2) << std::endl;
+  this->saveSettings();
 }
 
 StringOptionItem Reconstructer::getNamedSetting(const QString& uid)
@@ -1021,9 +1049,11 @@ void Reconstructer::reconstruct()
   {
     std::cout << i << ": " << mFrames[i].mPos.coord(tp) << std::endl;
   }*/
-  
+
+  QDomElement algoSettings = this->getSettings().namedItem("algorithms").toElement().namedItem(mAlgorithm->getName()).toElement();
+
   QDateTime pre = QDateTime::currentDateTime();
-  mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask);
+  mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask, algoSettings);
   ssc::messageManager()->sendInfo("Reconstruct time: "
                                   + string_cast(pre.time().msecsTo(QDateTime::currentDateTime().time())));
 

@@ -73,6 +73,7 @@ private:
   ImagePtr mOutput;///< Output image from reconstruction
   QString mOutputRelativePath;///< Relative path to the output image
   QString mOutputBasePath;///< Global path where the relative path starts, for the output image
+  QString mShaderPath; ///< name of shader folder
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
@@ -96,7 +97,7 @@ private:
   void clearAll();
   void clearOutput();
   void saveSettings();
-
+  void createAlgorithm();
 };
 
 }//namespace

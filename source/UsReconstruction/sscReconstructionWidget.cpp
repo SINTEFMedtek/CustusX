@@ -72,7 +72,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
   QGroupBox* algorithmGroup = new QGroupBox("Algorithm", this);
   QGridLayout* algoLayout = new QGridLayout(algorithmGroup);
 
-  QDomNodeList algoSettings = mReconstructer->getSettings().namedItem("algorithms").namedItem("ThunderVNN").childNodes();
+  StringOptionItem algoOption = StringOptionItem::fromName("Algorithm", mReconstructer->getSettings());
+  QString algoName = algoOption.getValue();
+  std::cout << "algoName" << algoName << std::endl;
+
+  QDomNodeList algoSettings = mReconstructer->getSettings().namedItem("algorithms").namedItem(algoName).childNodes();
   for (int i=0; i<algoSettings.size(); ++i)
   {
     StringOptionItem item(algoSettings.item(i).toElement());
