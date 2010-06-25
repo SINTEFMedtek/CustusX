@@ -76,7 +76,6 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
   unsigned char* maskPointer = static_cast<unsigned char*>(frameMask->getBaseVtkImageData()->GetScalarPointer());
   
   // Traverse all input pixels
-  //for (int record = 0; record < frameInfo.size(); record++)
   for (int record = 0; record < inputDims[2]; record++)
   {
     //messageManager()->sendDebug("record: " + string_cast(record));
