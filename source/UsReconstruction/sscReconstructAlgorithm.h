@@ -11,6 +11,7 @@
 #include <vector>
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include "sscDataAdapter.h"
 
 class QDomElement;
 
@@ -46,7 +47,7 @@ public:
    *  Input is the root node for this algo, filled with stored settings (if any).
    *  On completion, the root is filled with default values for settings.
    */
-  virtual void getSettings(QDomElement root) = 0;
+  virtual std::vector<DataAdapterPtr> getSettings(QDomElement root) = 0;
   /**
    * \param frameInfo Timetags and positions for the input frames
    * \param frameData The frame data. Assumes that the transfrom is identity.

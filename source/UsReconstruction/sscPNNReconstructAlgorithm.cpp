@@ -8,7 +8,8 @@
 
 #include <QFileInfo>
 #include "recConfig.h"
-#include "sscXmlOptionItem.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "utils/sscReconstructHelper.h"
@@ -20,10 +21,23 @@ PNNReconstructAlgorithm::PNNReconstructAlgorithm()
 {
 }
 
-void PNNReconstructAlgorithm::getSettings(QDomElement root)
+std::vector<DataAdapterPtr> PNNReconstructAlgorithm::getSettings(QDomElement root)
 {
+//	mProcessorOption = StringOptionItem::initialize("Processor", "",
+//		      "Which processor to use when reconstructing",
+//		      "CPU", QString("CPU GPU").split(" "),
+//		      root);
+//	mDistanceOption = DoubleOptionItem::initialize("Distance", "",
+//		      "Max distance from frame to voxel when filling output volume. mm.",
+//		      1, ssc::DoubleRange(0.1, 10, 0.01), 0,
+//		      root);
 
+	std::vector<DataAdapterPtr> retval;
+//	retval.push_back(mProcessorOption);
+//	retval.push_back(mDistanceOption);
+	return retval;
 }
+
 
   
 void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)

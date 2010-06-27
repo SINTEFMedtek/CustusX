@@ -11,7 +11,9 @@
 #include "recConfig.h"
 #include "reconstruct_vnn.h"
 #include "sscImage.h"
-#include "sscXmlOptionItem.h"
+//#include "sscXmlOptionItem.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
@@ -22,14 +24,21 @@ ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm(QString shaderPat
   mShaderPath = shaderPath;
 }
 
-void ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
+std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
 {
-  StringOptionItem::initialize("Processor",
-      "",
-      "Which processor to use when reconstructing",
-      "CPU",
-      "\"CPU\" \"GPU\"",
-      root);
+	mProcessorOption = StringDataAdapterXml::initialize("Processor", "",
+		      "Which processor to use when reconstructing",
+		      "CPU", QString("CPU GPU").split(" "),
+		      root);
+	mDistanceOption = DoubleDataAdapterXml::initialize("Distance", "",
+		      "Max distance from frame to voxel when filling output volume. mm.",
+		      1, ssc::DoubleRange(0.1, 10, 0.01), 0,
+		      root);
+
+	std::vector<DataAdapterPtr> retval;
+	retval.push_back(mProcessorOption);
+	retval.push_back(mDistanceOption);
+	return retval;
 }
   
 void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
@@ -38,7 +47,8 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr frameMask,
                                                  QDomElement settings)
 {
-  std::cout << "processor: " << StringOptionItem::fromName("Processor", settings).getValue() << std::endl;
+  std::cout << "processor: " << mProcessorOption->getValue() << std::endl;
+  std::cout << "distance: " << mDistanceOption->getValue() << std::endl;
 
   QStringList paths;
   paths << mShaderPath << THUNDER_KERNEL_PATH << ".";

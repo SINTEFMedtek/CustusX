@@ -52,10 +52,15 @@ private:
     ssc::SliderGroupWidget* mDimYWidget;
     ssc::SliderGroupWidget* mDimZWidget;
 
-    ssc::StringDataAdapterPtr generateStringDataAdapter(QString uid);
+    QGroupBox* mAlgorithmGroup;
+    QGridLayout* mAlgoLayout;
+    std::vector<QWidget*> mAlgoWidgets;
+
+//    ssc::StringDataAdapterPtr generateStringDataAdapter(QString uid);
     QString getCurrentPath();
     void updateComboBox();
     void setInputFile(const QString& inputFile);
+    void repopulateAlgorithmGroup();
 };
 
 }//namespace

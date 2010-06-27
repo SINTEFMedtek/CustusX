@@ -13,11 +13,14 @@
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
 #include "probeXmlConfigParser.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
+//#include "sscStringWidgets.h"
 
 namespace ssc
 {
-class StringOptionItem;
+//class StringOptionItem;
 
 typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 /**
@@ -43,6 +46,9 @@ public:
   ImagePtr getOutput();
   ImagePtr getInput();
   XmlOptionFile getSettings() const { return mSettings; }
+  StringDataAdapterXmlPtr mOrientationAdapter;
+  StringDataAdapterXmlPtr mAlgorithmAdapter;
+  std::vector<DataAdapterPtr> mAlgoOptions;
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
