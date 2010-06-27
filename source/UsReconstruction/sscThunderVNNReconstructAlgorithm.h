@@ -9,7 +9,8 @@
 #define SSCTHUNDERVNNRECONSTRUCTALGORITHM_H_
 
 #include "sscReconstructAlgorithm.h"
-
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 
 namespace ssc
 {
@@ -19,13 +20,15 @@ public:
   ThunderVNNReconstructAlgorithm(QString shaderPath);
   virtual ~ThunderVNNReconstructAlgorithm() {}
   virtual QString getName() const { return "ThunderVNN"; }
-  virtual void getSettings(QDomElement root);
+  virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,
                            ImagePtr frameMask,
                            QDomElement settings);
 private:
+	StringDataAdapterXmlPtr mProcessorOption;
+	DoubleDataAdapterXmlPtr mDistanceOption;
   QString mShaderPath;
 };
 

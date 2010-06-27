@@ -6,6 +6,7 @@
 #include "sscTypeConversions.h"
 #include "sscReconstructOutputValueParamsInterfaces.h"
 #include "sscMessageManager.h"
+#include "sscHelperWidgets.h"
 
 namespace ssc 
 {
@@ -63,28 +64,15 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
   mDimYWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)), outputVolGridLayout, 3);
   mDimZWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)), outputVolGridLayout, 4);
 
-  ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
-  ssc::ComboGroupWidget* orientationWidget = new ssc::ComboGroupWidget(this, orientation);
+  //ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
+  ssc::ComboGroupWidget* orientationWidget = new ssc::ComboGroupWidget(this, mReconstructer->mOrientationAdapter);
 
-  ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
-  ssc::ComboGroupWidget* algorithmWidget = new ssc::ComboGroupWidget(this, algorithm);
+  //ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
+  ssc::ComboGroupWidget* algorithmWidget = new ssc::ComboGroupWidget(this, mReconstructer->mAlgorithmAdapter);
 
-  QGroupBox* algorithmGroup = new QGroupBox("Algorithm", this);
-  QGridLayout* algoLayout = new QGridLayout(algorithmGroup);
-
-  StringOptionItem algoOption = mReconstructer->getSettings().getStringOption("Algorithm");
-  QString algoName = algoOption.getValue();
-
-  QDomNodeList algoSettings = mReconstructer->getSettings().getElement("algorithms", algoName).childNodes();
-  for (int i=0; i<algoSettings.size(); ++i)
-  {
-    StringOptionItem item(algoSettings.item(i).toElement());
-    ssc::StringDataAdapterXmlNodePtr interface(new StringDataAdapterXmlNode(item));
-    connect(interface.get(), SIGNAL(valueWasSet()), mReconstructer.get(), SLOT(setSettings()));
-    connect(mReconstructer.get(), SIGNAL(paramsChanged()), interface.get(), SIGNAL(changed()));
-    ssc::ComboGroupWidget* widget = new ssc::ComboGroupWidget(this, interface, algoLayout, i);
-    widget = widget;
-  }
+  mAlgorithmGroup = new QGroupBox("Algorithm", this);
+  mAlgoLayout = new QGridLayout(mAlgorithmGroup);
+  repopulateAlgorithmGroup();
 
   topLayout->addLayout(dataLayout);
     dataLayout->addWidget(mDataComboBox);
@@ -96,24 +84,47 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
     outputVolLayout->addLayout(outputVolGridLayout);
     outputVolLayout->addWidget(orientationWidget);
   topLayout->addWidget(algorithmWidget);
-  topLayout->addWidget(algorithmGroup);
+  topLayout->addWidget(mAlgorithmGroup);
   topLayout->addWidget(mReconstructButton);
   topLayout->addStretch();
 
   //this->selectData(defPath+defFile);
 }
 
-ssc::StringDataAdapterPtr ReconstructionWidget::generateStringDataAdapter(QString uid)
+void ReconstructionWidget::repopulateAlgorithmGroup()
 {
-  StringOptionItem item = mReconstructer->getSettings().getStringOption(uid);
+	std::cout << "repopulate" << std::endl;
+	//StringOptionItem algoOption = mReconstructer->getSettings().getStringOption("Algorithm");
+	QString algoName = mReconstructer->mAlgorithmAdapter->getValue();
 
-  ssc::StringDataAdapterXmlNodePtr interface(new StringDataAdapterXmlNode(item));
-  connect(interface.get(), SIGNAL(valueWasSet()), mReconstructer.get(), SLOT(setSettings()));
-  connect(mReconstructer.get(), SIGNAL(paramsChanged()), interface.get(), SIGNAL(changed()));
-  //ssc::ComboGroupWidget* widget = new ssc::ComboGroupWidget(this, interface, algoLayout, 5+i);
-  return interface;
+	if (algoName==mAlgorithmGroup->title())
+		return;
+
+	mAlgorithmGroup->setTitle(algoName);
+
+	while (mAlgoLayout->count())
+	{
+		QWidget* child = mAlgoLayout->itemAt(0)->widget();
+		if (!child)
+			break; // ups : found layout inside, bail out
+		child->setVisible(false);
+		mAlgoLayout->removeWidget(child);
+		//delete child;
+	}
+	 mAlgoLayout->update();
+
+	 // delete widget objects (might be different than the widgets removed from the layout
+	 for (unsigned i=0; i<mAlgoWidgets.size(); ++i)
+		 delete mAlgoWidgets[i];
+	 mAlgoWidgets.clear();
+
+	std::vector<DataAdapterPtr> algoOption = mReconstructer->mAlgoOptions;
+	for (unsigned i=0; i<algoOption.size(); ++i)
+	{
+	  QWidget* widget = ssc::createDataWidget(this, algoOption[i], mAlgoLayout, i);
+	  mAlgoWidgets.push_back(widget);
+	}
 }
-
 
 void ReconstructionWidget::currentDataComboIndexChanged(const QString& text)
 {
@@ -192,7 +203,8 @@ void ReconstructionWidget::selectData(QString filename)
  */
 void ReconstructionWidget::paramsChangedSlot()
 {
-  //  ssc::DoubleBoundingBox3D extent = mReconstructer->getExtent();
+	repopulateAlgorithmGroup();
+
     ssc::Vector3D range = mReconstructer->getOutputVolumeParams().mExtent.range();
 
     QString extText = QString("%1,  %2,  %3").arg(range[0],0,'f',1).arg(range[1],0,'f',1).arg(range[2],0,'f',1);

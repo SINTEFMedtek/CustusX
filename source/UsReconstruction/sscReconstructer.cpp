@@ -12,6 +12,8 @@
 #include "sscDataManagerImpl.h"
 #include "sscTypeConversions.h"
 #include "sscXmlOptionItem.h"
+#include "sscStringDataAdapterXml.h"
+#include "sscDoubleDataAdapterXml.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "sscThunderVNNReconstructAlgorithm.h"
@@ -37,18 +39,21 @@ Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
 
   mSettings = XmlOptionFile(appDataPath+"/usReconstruct.xml", doc);
 
-  StringOptionItem::initialize("Orientation",
-      "",
+  mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
       "Algorithm to use for output volume orientation",
       "MiddleFrame",
-      "\"PatientReference\" \"MiddleFrame\"",
+      QString("PatientReference MiddleFrame").split(" "),
       mSettings.getElement());
-  StringOptionItem::initialize("Algorithm",
-      "",
-      "",
+  connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()),   this,                      SLOT(setSettings()));
+  connect(this,                      SIGNAL(paramsChanged()), mOrientationAdapter.get(), SIGNAL(changed()));
+
+  mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
+      "Choose algorithm to use for reconstruction",
       "ThunderVNN",
-      "\"ThunderVNN\" \"PNN\"",
+      QString("ThunderVNN PNN").split(" "),
       mSettings.getElement());
+  connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()),   this,                    SLOT(setSettings()));
+  connect(this,                    SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
 
   createAlgorithm();
 }
@@ -60,7 +65,8 @@ Reconstructer::~Reconstructer()
 
 void Reconstructer::createAlgorithm()
 {
-  QString name = mSettings.getStringOption("Algorithm").getValue();
+//  QString name = mSettings.getStringOption("Algorithm").getValue();
+  QString name = mAlgorithmAdapter->getValue();
 
   if (mAlgorithm && mAlgorithm->getName()==name)
     return;
@@ -77,7 +83,7 @@ void Reconstructer::createAlgorithm()
   if (mAlgorithm)
   {
     QDomElement algo = mSettings.getElement("algorithms", mAlgorithm->getName());
-    mAlgorithm->getSettings(algo);
+    mAlgoOptions = mAlgorithm->getSettings(algo);
     ssc::messageManager()->sendInfo("Using reconstruction algorithm " + string_cast(mAlgorithm->getName()));
   }
 }
@@ -86,7 +92,8 @@ void Reconstructer::setSettings()
 {
   this->createAlgorithm();
 
-  QString newOrient = mSettings.getStringOption("Orientation").getValue();
+//  QString newOrient = mSettings.getStringOption("Orientation").getValue();
+  QString newOrient = mOrientationAdapter->getValue();
   if (newOrient!=mLastAppliedOrientation)
   {
     mLastAppliedOrientation = newOrient;
@@ -720,7 +727,8 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
  */
 ssc::Transform3D Reconstructer::applyOutputOrientation()
 {
-  QString newOrient = mSettings.getStringOption("Orientation").getValue();
+//  QString newOrient = mSettings.getStringOption("Orientation").getValue();
+  QString newOrient = mOrientationAdapter->getValue();
   ssc::Transform3D prMdd;
 
   if (newOrient=="PatientReference")

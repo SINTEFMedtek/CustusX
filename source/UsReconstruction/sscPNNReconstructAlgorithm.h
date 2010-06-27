@@ -21,7 +21,7 @@ public:
   PNNReconstructAlgorithm();
   virtual ~PNNReconstructAlgorithm() {}
   virtual QString getName() const { return "PNN"; }
-  virtual void getSettings(QDomElement root);
+  virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
                            ImagePtr outputData,
