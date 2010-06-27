@@ -93,7 +93,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
 
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
-	std::cout << "repopulate" << std::endl;
+	//std::cout << "repopulate" << std::endl;
 	//StringOptionItem algoOption = mReconstructer->getSettings().getStringOption("Algorithm");
 	QString algoName = mReconstructer->mAlgorithmAdapter->getValue();
 
