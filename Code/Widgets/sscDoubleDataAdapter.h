@@ -11,9 +11,11 @@
 #include <QString>
 #include <QObject>
 #include "sscDoubleRange.h"
+#include "sscDataAdapter.h"
 
 namespace ssc
 {
+
 
 /** Abstract interface for interaction with internal double-valued data
  *
@@ -45,7 +47,7 @@ namespace ssc
  * as a dummy implementation.
  *
  */
-class DoubleDataAdapter : public QObject
+class DoubleDataAdapter : public DataAdapter
 {
   Q_OBJECT
 public:

@@ -12,7 +12,7 @@
 #include <QString>
 #include <QStringList>
 #include <QComboBox>
-
+#include "sscDataAdapter.h"
 
 namespace ssc
 {
@@ -45,7 +45,7 @@ namespace ssc
  * as a dummy implementation.
  *
  */
-class StringDataAdapter : public QObject
+class StringDataAdapter : public DataAdapter
 {
   Q_OBJECT
 public:

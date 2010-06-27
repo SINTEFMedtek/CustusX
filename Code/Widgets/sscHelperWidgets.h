@@ -2,6 +2,8 @@
 #define SSCHELPERWIDGETS_H_
 
 #include <QWidget>
+#include "sscDataAdapter.h"
+class QGridLayout;
 
 namespace ssc
 {
@@ -22,8 +24,12 @@ public:
 	}
 };
 
-
-
+/**Create a widget capable of displaying the input data.
+ * If a gridLayout is provided, the widget will insert its components
+ * into a row in that layout
+ *
+ */
+QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gridLayout=0, int row=0);
 }
 
 #endif

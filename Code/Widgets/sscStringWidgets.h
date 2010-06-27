@@ -13,41 +13,9 @@
 #include <QLabel>
 #include <QGridLayout>
 #include "sscStringDataAdapter.h"
-#include "sscXmlOptionItem.h"
 
 namespace ssc
 {
-
-/**Data interface for interacting with string data in xml form.
- * The xml data is defined by the class StringOptionItem.
- */
-class StringDataAdapterXmlNode : public StringDataAdapter
-{
-  Q_OBJECT
-public:
-  explicit StringDataAdapterXmlNode(StringOptionItem element) : mElement(element) {}
-  virtual ~StringDataAdapterXmlNode()  {}
-  virtual QString getValueName() const { return mElement.getName(); }
-  virtual QString getHelp() const { return mElement.getHelp(); }
-  virtual bool setValue(const QString& value)
-  {
-    QString current = this->getValue();
-    if (current==value)
-      return false;
-    mElement.setValue(value);
-    emit valueWasSet();
-    return true;
-  }
-  virtual QString getValue() const { return mElement.getValue(); }
-  virtual QStringList getValueRange() const { return mElement.getRange(); }
-  virtual void connectValueSignals(bool on) {}
-
-signals:
-  void valueWasSet();
-private:
-  StringOptionItem mElement;
-};
-typedef boost::shared_ptr<StringDataAdapterXmlNode> StringDataAdapterXmlNodePtr;
 
 /**Composite widget for string selection.
  * Consists of <namelabel, combobox>.

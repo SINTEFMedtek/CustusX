@@ -10,7 +10,10 @@ namespace ssc
 {
 
 
-ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row)
+
+///----------------
+
+ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : QWidget(parent)
 {
   mData = dataInterface;
   connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
