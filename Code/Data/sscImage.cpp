@@ -13,6 +13,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -23,47 +24,52 @@ Image::~Image()
 Image::Image(const std::string& uid, const vtkImageDataPtr& data,
     const std::string& name) :
   Data(uid, name),
-	mImageTransferFunctions3D(new ImageTF3D(data)),
-	mImageLookupTable2D(new ImageLUT2D(data)),
 	mBaseImageData(data)
-	//mLandmarks(vtkDoubleArrayPtr::New())
 {
   mShading.on = false;
   mShading.ambient = 0.2;
   mShading.diffuse = 0.9;
   mShading.specular = 0.3;
   mShading.specularPower = 15.0;
-
-	//mLandmarks->SetNumberOfComponents(4);
+  
+  this->resetTransferFunctions();
+}
+  
+void Image::resetTransferFunctions()
+{
+  //messageManager()->sendDebug("Image::reset called");
+  
+  if(!mBaseImageData)
+  {
+    messageManager()->sendWarning("ssc::Image has no image data");
+    return;
+  }
+  
+  mBaseImageData->Update();
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-	//mAlpha = 0.5; 
-	//mTreshold = 1.0;
-	
-//	// provide a resampled volume for algorithms requiring that (such as proberep)
-//	mOrientatorMatrix = vtkMatrix4x4Ptr::New();
-//	mOrientator = vtkImageReslicePtr::New();
-//	mOrientator->SetInput(mBaseImageData);
-//	mOrientator->SetInterpolationModeToLinear();
-//	mOrientator->SetOutputDimensionality( 3);
-//	mOrientator->SetResliceAxes(mOrientatorMatrix);
-//	mOrientator->AutoCropOutputOn();
-//	mReferenceImageData = mOrientator->GetOutput();
-
-	// Add initial values to the transfer functions
+  
+  if(mImageTransferFunctions3D)
+    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+               this, SIGNAL(transferFunctionsChanged()));
+  if(mImageLookupTable2D)
+    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
+               this, SIGNAL(transferFunctionsChanged()));
+  
+  mImageTransferFunctions3D.reset(new ImageTF3D(mBaseImageData));
+	mImageLookupTable2D.reset(new ImageLUT2D(mBaseImageData));
+  
+	// Add initial values to the 3D transfer functions
 	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
 	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
 	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
 	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
-	
-//  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-//					this, SLOT(transferFunctionsChangedSlot())); // TODO: This signal causes VolumetricRep to re-create itself. change to the one below?? (CA)
+  
   connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
           this, SIGNAL(transferFunctionsChanged()));
   connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
 					this, SIGNAL(transferFunctionsChanged()));
-	
-	//setTransform(createTransformTranslate(Vector3D(0,0,0.1)));
 }
+  
 //void Image::set_rMd(Transform3D rMd)
 //{
 //	bool changed = !similar(rMd, m_rMd);
@@ -89,7 +95,7 @@ void Image::transformChangedSlot()
 
 void Image::setVtkImageData(const vtkImageDataPtr& data)
 {
-	//std::cout << "Image::setVtkImageData() " << std::endl;
+	//messageManager()->sendDebug("Image::setVtkImageData()");
 	mBaseImageData = data;
 	mBaseGrayScaleImageData = NULL;
 	
@@ -98,10 +104,7 @@ void Image::setVtkImageData(const vtkImageDataPtr& data)
 		mOrientator->SetInput(mBaseImageData);		
 	}
 
-	//mOutputImageData = mBaseImageData;
-	mImageTransferFunctions3D->setVtkImageData(data);
-	mImageLookupTable2D->setVtkImageData(data);
-
+  this->resetTransferFunctions();
 	emit vtkImageDataChanged();
 }
 vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()

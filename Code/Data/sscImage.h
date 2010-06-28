@@ -102,6 +102,7 @@ protected slots:
   virtual void transformChangedSlot();
 
 protected:
+  void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 	

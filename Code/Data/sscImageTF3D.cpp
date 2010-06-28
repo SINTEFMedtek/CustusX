@@ -17,6 +17,8 @@
 #include <QDomDocument>
 #include <QStringList>
 #include "sscVector3D.h"
+#include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 
@@ -32,7 +34,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorMapPtr(new ColorMap())
 {
 	double max = getScalarMax();
-	//std::cout << "For ImageTF3D image scalar range = "<< max<<std::endl;
+  //messageManager()->sendDebug("For ImageTF3D image scalar range = " + string_cast(max));
 	mLevel = max/2.0; 
 	mWindow = max;
 	mLLR = 0.0;
