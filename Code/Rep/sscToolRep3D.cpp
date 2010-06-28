@@ -169,13 +169,7 @@ void ToolRep3D::updateOffsetGraphics()
 
 	if (similar(0.0, mTool->getTooltipOffset()))
 	{
-	  if(mOffsetPointVisibleAtZeroOffset)
-	  {
-	    mTooltipPoint->getActor()->SetVisibility(true);
-	  }else
-	  {
-	    mTooltipPoint->getActor()->SetVisibility(false);
-	  }
+	    mTooltipPoint->getActor()->SetVisibility(visible && mOffsetPointVisibleAtZeroOffset);
 		mOffsetPoint->getActor()->SetVisibility(false);
 		mOffsetLine->getActor()->SetVisibility(false);
 	}
