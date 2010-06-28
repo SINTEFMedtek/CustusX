@@ -29,8 +29,8 @@ public:
 	void writeValue(const QString& val);
 private:
 	QDomElement findElemFromUid(const QString& uid, QDomNode root) const;
-	QDomElement mRoot;
 	QString mUid;
+	QDomElement mRoot;
 };
 
 
