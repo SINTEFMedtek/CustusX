@@ -103,6 +103,10 @@ void Reconstructer::setSettings()
     ssc::messageManager()->sendInfo("set settings - " + string_cast(newOrient));
   }
 
+
+  ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
+  maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
+
   // notify that settings xml is changed
   emit paramsChanged();
 
@@ -813,7 +817,8 @@ void Reconstructer::findExtentAndOutputTransform()
     mOutputVolumeParams.m_rMd = prMd;
 
   //mOutputVolumeParams.constrainVolumeSize(256*256*256*2);
-  mOutputVolumeParams.constrainVolumeSize(1024*1024*16);
+  ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
+  mOutputVolumeParams.constrainVolumeSize(maxVol.readValue(QString::number(1024*1024*16)).toDouble());
 }
   
 /**
