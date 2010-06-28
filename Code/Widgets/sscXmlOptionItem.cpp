@@ -18,6 +18,56 @@
 namespace ssc
 {
 
+
+XmlOptionItem::XmlOptionItem(const QString& uid,
+	      QDomElement root) :
+	      mUid(uid),
+	      mRoot(root)
+{
+
+}
+
+QString XmlOptionItem::readValue(const QString& defval) const
+{
+	// read value is present
+	QDomElement item = this->findElemFromUid(mUid, mRoot);
+	if (!item.isNull() &&item.hasAttribute("value"))
+	{
+		return item.attribute("value");
+	}
+	return defval;
+}
+
+void XmlOptionItem::writeValue(const QString& val)
+{
+	QDomElement item = findElemFromUid(mUid, mRoot);
+  // create option if not present
+  if (item.isNull())
+  {
+    item = mRoot.ownerDocument().createElement("option");
+    item.setAttribute("id", mUid);
+    mRoot.appendChild(item);
+  }
+  item.setAttribute("value", val);
+}
+
+QDomElement XmlOptionItem::findElemFromUid(const QString& uid, QDomNode root) const
+{
+  QDomNodeList settings = root.childNodes();
+  for (int i=0; i<settings.size(); ++i)
+  {
+	QDomElement item = settings.item(i).toElement();
+    if (item.attribute("id")==uid)
+      return item;
+  }
+  return QDomElement();
+}
+
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+
+
 XmlOptionFile::XmlOptionFile()
 {
 }

@@ -11,6 +11,7 @@
 #include <QDomElement>
 #include <QStringList>
 #include "sscStringDataAdapter.h"
+#include "sscXmlOptionItem.h"
 
 namespace ssc
 {
@@ -27,10 +28,6 @@ class StringDataAdapterXml : public StringDataAdapter
 {
 	Q_OBJECT
 public:
-  /** find and return the setting with id==uid among the children of root.
-   */
-//  static StringOptionItem fromName(const QString& uid, QDomNode root);
-
   /** Make sure one given option exists witin root.
    * If not present, fill inn the input defaults.
    */
@@ -60,10 +57,7 @@ private:
   QString mHelp;
   QString mValue;
   QStringList mRange;
-  QDomElement mRoot;
-
-  QDomElement findElemFromUid(const QString& uid, QDomNode root);
-  void writeValue(const QString& val);
+  XmlOptionItem mStore;
 };
 
 // --------------------------------------------------------

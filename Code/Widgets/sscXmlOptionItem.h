@@ -13,6 +13,25 @@
 namespace ssc
 {
 
+/**Helper class for storing one string value in an xml document.
+ *
+ * Init with the parent (root) node and an uid,
+ * then read/write the value.
+ *
+ */
+class XmlOptionItem
+{
+public:
+	XmlOptionItem() {}
+	XmlOptionItem(const QString& uid,
+		      QDomElement root);
+	QString readValue(const QString& defval) const;
+	void writeValue(const QString& val);
+private:
+	QDomElement findElemFromUid(const QString& uid, QDomNode root) const;
+	QDomElement mRoot;
+	QString mUid;
+};
 
 
 class XmlOptionFile

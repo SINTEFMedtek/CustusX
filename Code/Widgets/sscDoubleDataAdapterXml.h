@@ -12,7 +12,7 @@
 #include <QStringList>
 #include "sscDoubleRange.h"
 #include "sscDoubleDataAdapter.h"
-
+#include "sscXmlOptionItem.h"
 
 namespace ssc
 {
@@ -61,11 +61,9 @@ private:
   double mValue;
   double mDecimals;
   DoubleRange mRange;
-  QDomElement mRoot;
-
-  QDomElement findElemFromUid(const QString& uid, QDomNode root);
-  void writeValue(const QString& val);
+  XmlOptionItem mStore;
 };
+
 
 
 } // namespace ssc
