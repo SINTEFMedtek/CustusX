@@ -59,6 +59,7 @@ public: // basic methods
   virtual double getValue() const = 0; ///< get the data value.
 
 public: // optional methods
+  virtual QString getHelp() const { return QString(); } ///< return a descriptive help string for the data, used for example as a tool tip.
   virtual DoubleRange getValueRange() const { return DoubleRange(0,1,0.01); } /// range of value
   virtual double convertInternal2Display(double internal) { return internal; } ///< conversion from internal value to display value (for example between 0..1 and percent)
   virtual double convertDisplay2Internal(double display) { return display; } ///< conversion from internal value to display value

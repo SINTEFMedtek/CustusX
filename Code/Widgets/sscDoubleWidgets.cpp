@@ -91,6 +91,10 @@ void SliderGroupWidget::dataChanged()
   mSlider->setDoubleValue(mData->convertInternal2Display(mData->getValue()));
   mEdit->setDoubleValue(mData->convertInternal2Display(mData->getValue()));
 
+  mSlider->setToolTip(mData->getHelp());
+  mEdit->setToolTip(mData->getHelp());
+  mLabel->setToolTip(mData->getHelp());
+
   mSlider->blockSignals(false);
   mEdit->blockSignals(false);
 }

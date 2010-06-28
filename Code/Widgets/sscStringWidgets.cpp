@@ -66,6 +66,7 @@ void ComboGroupWidget::dataChanged()
   }
 
   mCombo->setToolTip(mData->getHelp());
+  mLabel->setToolTip(mData->getHelp());
   mCombo->blockSignals(false);
 }
 
