@@ -31,7 +31,8 @@ namespace ssc
 Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
   mOutputRelativePath(""),
   mOutputBasePath(""),
-  mShaderPath(shaderPath)
+  mShaderPath(shaderPath),
+  mLastAppliedMaskReduce("")
 {
   QDomDocument doc("usReconstruction");
   doc.appendChild(doc.createElement("usReconstruct"));
@@ -47,6 +48,15 @@ Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
   connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()),   this,                      SLOT(setSettings()));
   connect(this,                      SIGNAL(paramsChanged()), mOrientationAdapter.get(), SIGNAL(changed()));
 
+  
+  
+	mMaskReduce = StringDataAdapterXml::initialize("Reduce mask (% in 1D)", "",
+                                                 "Speedup by reducing mask size",
+                                                  "3", QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
+                                                  mSettings.getElement());
+  
+  connect(mMaskReduce.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
+  
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
       "ThunderVNN",
@@ -94,9 +104,11 @@ void Reconstructer::setSettings()
 
 //  QString newOrient = mSettings.getStringOption("Orientation").getValue();
   QString newOrient = mOrientationAdapter->getValue();
-  if (newOrient!=mLastAppliedOrientation)
+  if (newOrient!=mLastAppliedOrientation || 
+      mMaskReduce->getValue() != mLastAppliedMaskReduce)
   {
     mLastAppliedOrientation = newOrient;
+    mLastAppliedMaskReduce = mMaskReduce->getValue();
     this->clearOutput();
     // reread everything.
     this->readFiles(mFilename, mCalFilesPath);
@@ -704,6 +716,19 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
         ymax = std::max(ymax, y);
       }
     }
+  
+  //Test: reduce the output volume by reducing the mask when determining 
+  //      output volume size
+  int reduceX = (xmax-xmin) * (mMaskReduce->getValue().toDouble() / 100);
+  int reduceY = (ymax-ymin) * (mMaskReduce->getValue().toDouble() / 100);
+  //messageManager()->sendDebug("reduceX: "+string_cast(reduceX));
+  //messageManager()->sendDebug("reduceY: "+string_cast(reduceY));
+  //messageManager()->sendDebug("test reduceX: "+string_cast(mMaskReduce->getValue().toDouble()));
+  
+  xmin += reduceX;
+  xmax -= reduceX;
+  ymin += reduceY;
+  ymax -= reduceY;  
   
   retval[0] = ssc::Vector3D(xmin*spacing[0], ymin*spacing[1], 0);
   retval[1] = ssc::Vector3D(xmax*spacing[0], ymin*spacing[1], 0);

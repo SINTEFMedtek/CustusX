@@ -66,7 +66,9 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
 
   //ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
   ssc::ComboGroupWidget* orientationWidget = new ssc::ComboGroupWidget(this, mReconstructer->mOrientationAdapter);
-
+  
+  QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
+  
   //ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
   ssc::ComboGroupWidget* algorithmWidget = new ssc::ComboGroupWidget(this, mReconstructer->mAlgorithmAdapter);
 
@@ -83,6 +85,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath,
     outputVolLayout->addLayout(inputSpacingLayout);
     outputVolLayout->addLayout(outputVolGridLayout);
     outputVolLayout->addWidget(orientationWidget);
+    outputVolLayout->addWidget(reduceWidget);
   topLayout->addWidget(algorithmWidget);
   topLayout->addWidget(mAlgorithmGroup);
   topLayout->addWidget(mReconstructButton);
