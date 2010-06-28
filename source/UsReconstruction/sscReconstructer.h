@@ -49,6 +49,7 @@ public:
   StringDataAdapterXmlPtr mOrientationAdapter;
   StringDataAdapterXmlPtr mAlgorithmAdapter;
   std::vector<DataAdapterPtr> mAlgoOptions;
+  StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
@@ -82,6 +83,7 @@ private:
   QString mOutputRelativePath;///< Relative path to the output image
   QString mOutputBasePath;///< Global path where the relative path starts, for the output image
   QString mShaderPath; ///< name of shader folder
+  QString mLastAppliedMaskReduce;///< The last used mask reduction
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);

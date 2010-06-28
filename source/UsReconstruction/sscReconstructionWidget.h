@@ -33,34 +33,34 @@ public slots:
   void reload();
   void currentDataComboIndexChanged(const QString& text);
   void paramsChangedSlot();
-
+  
 private:
-    ReconstructerPtr mReconstructer;
-
-    QString mInputFile;
-
-    QComboBox* mDataComboBox;
-    QToolButton* mSelectDataButton;
-    QPushButton* mReconstructButton;
-    QPushButton* mReloadButton;
-    QAction* mSelectDataAction;
-    QLineEdit* mExtentLineEdit;
-    QLineEdit* mInputSpacingLineEdit;
-    ssc::SliderGroupWidget* mMaxVolSizeWidget;
-    ssc::SliderGroupWidget* mSpacingWidget;
-    ssc::SliderGroupWidget* mDimXWidget;
-    ssc::SliderGroupWidget* mDimYWidget;
-    ssc::SliderGroupWidget* mDimZWidget;
-
-    QGroupBox* mAlgorithmGroup;
-    QGridLayout* mAlgoLayout;
-    std::vector<QWidget*> mAlgoWidgets;
-
-//    ssc::StringDataAdapterPtr generateStringDataAdapter(QString uid);
-    QString getCurrentPath();
-    void updateComboBox();
-    void setInputFile(const QString& inputFile);
-    void repopulateAlgorithmGroup();
+  ReconstructerPtr mReconstructer;
+  
+  QString mInputFile;
+  
+  QComboBox* mDataComboBox;
+  QToolButton* mSelectDataButton;
+  QPushButton* mReconstructButton;
+  QPushButton* mReloadButton;
+  QAction* mSelectDataAction;
+  QLineEdit* mExtentLineEdit;
+  QLineEdit* mInputSpacingLineEdit;
+  ssc::SliderGroupWidget* mMaxVolSizeWidget;
+  ssc::SliderGroupWidget* mSpacingWidget;
+  ssc::SliderGroupWidget* mDimXWidget;
+  ssc::SliderGroupWidget* mDimYWidget;
+  ssc::SliderGroupWidget* mDimZWidget;
+  
+  QGroupBox* mAlgorithmGroup;
+  QGridLayout* mAlgoLayout;
+  std::vector<QWidget*> mAlgoWidgets;
+  
+  //    ssc::StringDataAdapterPtr generateStringDataAdapter(QString uid);
+  QString getCurrentPath();
+  void updateComboBox();
+  void setInputFile(const QString& inputFile);
+  void repopulateAlgorithmGroup();
 };
 
 }//namespace
