@@ -8,8 +8,6 @@
 
 #include <QFileInfo>
 #include "recConfig.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "utils/sscReconstructHelper.h"
@@ -27,14 +25,19 @@ std::vector<DataAdapterPtr> PNNReconstructAlgorithm::getSettings(QDomElement roo
 //		      "Which processor to use when reconstructing",
 //		      "CPU", QString("CPU GPU").split(" "),
 //		      root);
-//	mDistanceOption = DoubleOptionItem::initialize("Distance", "",
-//		      "Max distance from frame to voxel when filling output volume. mm.",
-//		      1, ssc::DoubleRange(0.1, 10, 0.01), 0,
-//		      root);
+//	mInterpolationDistanceOption = DoubleDataAdapterXml::initialize("Distance (mm)", "",
+//		      "Interpolation distance in mm",
+//		      0.5, ssc::DoubleRange(0.1, 10, 0.01), 0,
+//          root);
+	mInterpolationStepsOption = DoubleDataAdapterXml::initialize("Distance (voxels)", "",
+                                                               "Interpolation steps in voxels",
+                                                               3, ssc::DoubleRange(1, 10, 1), 0,
+                                                               root);
 
 	std::vector<DataAdapterPtr> retval;
 //	retval.push_back(mProcessorOption);
-//	retval.push_back(mDistanceOption);
+//	retval.push_back(mInterpolationDistanceOption);
+	retval.push_back(mInterpolationStepsOption);
 	return retval;
 }
 
@@ -160,11 +163,19 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
                                   string_cast(inputDims[1]) + " " +
                                   string_cast(inputDims[2]));
   
+  
+  //ssc::Vector3D spacing(output->GetSpacing());
+  // Assume output spacing is equal in all directions
+  //int interpolationSteps = static_cast<int>((mInterpolationDistanceOption->getValue() / spacing[0]) + 0.5);
+  int interpolationSteps = static_cast<int>(mInterpolationStepsOption->getValue());
+  messageManager()->sendInfo("interpolationSteps: "+ string_cast(interpolationSteps));
+  
   // Traverse all voxels
   for (int x = 0; x < outputDims[0]; x++)
   {
     //messageManager()->sendDebug("x: " + string_cast(x));
     for (int y = 0; y < outputDims[1]; y++)
+    {
       for (int z = 0; z < outputDims[2]; z++)
       {
         int outputIndex = x 
@@ -172,7 +183,6 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
         + z * outputDims[0]*outputDims[1];
         bool interpolated = false;
         int localArea = 0;
-        int interpolationSteps = 3;//TODO: set as input variable
         
         int count = 0;
         double tempVal = 0;
@@ -184,25 +194,25 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
               {
                 //optimize? - The if is to expensive
                 /*if((i == -localArea || i == localArea ||
-                   j == -localArea || j == localArea ||
-                   k == -localArea || k == localArea))*/
-                  //continue;
+                 j == -localArea || j == localArea ||
+                 k == -localArea || k == localArea))*/
+                //continue;
                 /*if(i != -localArea || i != localArea ||
                  j != -localArea || j != localArea ||
                  k != -localArea || k != localArea)*/
                 {
-                
-                int localIndex = outputIndex 
-                + i 
-                + j*outputDims[0] 
-                + k*outputDims[0]*outputDims[1];
-                
-                if (validVoxel(x+i, y+j, z+k, outputDims)
-                    && inputPointer[localIndex] > 0.1)
-                {
-                  tempVal += inputPointer[localIndex];
-                  count++;
-                }
+                  
+                  int localIndex = outputIndex 
+                  + i 
+                  + j*outputDims[0] 
+                  + k*outputDims[0]*outputDims[1];
+                  
+                  if (validVoxel(x+i, y+j, z+k, outputDims)
+                      && inputPointer[localIndex] > 0.1)
+                  {
+                    tempVal += inputPointer[localIndex];
+                    count++;
+                  }
                 }// if optimize
               }//local voxel area
           if (count > 0)
@@ -213,7 +223,8 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
           localArea++;
         } while (localArea <= interpolationSteps && !interpolated);
         
-      }//all voxels
+      }//z
+    }//y
   }//x
 }
   

@@ -34,7 +34,7 @@ void Navigation::centerToImage(ssc::ImagePtr image)
   DataManager::getInstance()->setCenter(p_r);
 
   this->centerManualTool(p_r);
-  std::cout << "Centered to view." << std::endl;
+  //std::cout << "Centered to view." << std::endl;
 }
 
 /**Place the global center to the mean center of
@@ -48,7 +48,7 @@ void Navigation::centerToView(ViewWrapper* viewWrapper)
   DataManager::getInstance()->setCenter(p_r);
 
   this->centerManualTool(p_r);
-  std::cout << "Centered to view." << std::endl;
+  //std::cout << "Centered to view." << std::endl;
 }
 
 /**Place the global center to the mean center of
