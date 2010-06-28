@@ -12,8 +12,6 @@
 #include "reconstruct_vnn.h"
 #include "sscImage.h"
 //#include "sscXmlOptionItem.h"
-#include "sscStringDataAdapterXml.h"
-#include "sscDoubleDataAdapterXml.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 

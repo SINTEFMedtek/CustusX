@@ -11,6 +11,8 @@
 #include <vtkImageData.h>
 #include "sscReconstructAlgorithm.h"
 #include "sscImage.h"
+#include "sscDoubleDataAdapterXml.h"
+//#include "sscStringDataAdapterXml.h"
 
 
 namespace ssc
@@ -28,6 +30,8 @@ public:
                            ImagePtr frameMask,
                            QDomElement settings);
 private:
+  //DoubleDataAdapterXmlPtr mInterpolationDistanceOption;
+  DoubleDataAdapterXmlPtr mInterpolationStepsOption;
   bool validPixel(int x, int y, int* dims, unsigned char* rawPointer)
   {
     return (x >= 0) && (x < dims[0])
