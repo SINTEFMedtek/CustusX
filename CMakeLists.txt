@@ -31,6 +31,7 @@ ADD_DEFINITIONS(-DCustusX3_VERSION_MAJOR=${CustusX3_VERSION_MAJOR}
 INCLUDE(Dart)
 
 include_directories( /usr/local/include )
+include_directories( /opt/local/include )
 
 # cppunit
 find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED) 
