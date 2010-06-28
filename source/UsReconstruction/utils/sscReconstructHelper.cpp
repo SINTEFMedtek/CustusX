@@ -72,7 +72,11 @@ vtkImageDataPtr generateVtkImageData(Vector3D dim,
   array->SetArray(rawchars, scalarSize+1, 0); // take ownership
   data->GetPointData()->SetScalars(array);
   
-  rawchars[0] = 255;// A trick to get a full LUT in ssc::Image (automatic LUT generation)
+  // A trick to get a full LUT in ssc::Image (automatic LUT generation)
+  // Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
+  rawchars[0] = 255;
+	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
+  rawchars[0] = 0;
   
   /*data->AllocateScalars();
    unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
