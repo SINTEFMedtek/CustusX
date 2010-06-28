@@ -30,9 +30,9 @@ public:
 private:
   void load();
   QDomElement safeGetElement(QDomElement parent, QString childName);
-
-  QDomDocument mDocument;
+  
   QString mFilename;
+  QDomDocument mDocument;
 };
 
 
