@@ -197,6 +197,11 @@ void ToolManager::createSymlink()
   {
     ssc::messageManager()->sendInfo(string_cast(QString("created symlink %1 to device %2").arg(linkfile).arg(device)));
   }
+
+  devFile.setPermissions(
+		   QFile::ReadOwner|QFile::WriteOwner|QFile::ExeOwner|
+		   QFile::ReadGroup|QFile::WriteGroup|QFile::ExeGroup|
+		   QFile::ReadOther|QFile::WriteOther|QFile::ExeOther);
 }
 
 QFileInfo ToolManager::getSymlink() const
