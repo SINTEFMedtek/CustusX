@@ -96,6 +96,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 
   std::vector<ssc::Landmark> landmarks =  this->getAllLandmarks();
   ssc::LandmarkMap targetData = this->getTargetLandmarks();
+  ssc::Transform3D rMtarget = this->getTargetTransform();
 
   //ready the table widget
   mLandmarkTableWidget->setRowCount(landmarks.size());
@@ -111,6 +112,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 
     ssc::LandmarkProperty prop = dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
     ssc::Vector3D coord = landmarks[i].getCoord();
+    coord = rMtarget.coord(coord); // display coordinates in space r (in principle, this means all coords should be equal)
 
     items[0] = new QTableWidgetItem(qstring_cast(prop.getName()));
     items[1] = new QTableWidgetItem;
