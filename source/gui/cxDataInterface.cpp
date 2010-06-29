@@ -51,6 +51,8 @@ void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
   {
     connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
   }
+
+  emit changed();
 }
 
 ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
