@@ -60,7 +60,8 @@ ToolManager::ToolManager() :
 
 ToolManager::~ToolManager()
 {
-  this->cleanupSymlink();
+  // ignore: the standalone 32b us-acq need the symlink as well.
+  //this->cleanupSymlink();
 }
 
 void ToolManager::initializeManualTool()
