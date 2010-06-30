@@ -54,11 +54,16 @@ QString DataLocations::getAppDataPath()
   return path;
 }
 
+/** return a settings object for global custusX data
+ *
+ *  The settings object is currently stored in the default location for the OS.
+ */
 QSettingsPtr DataLocations::getSettings()
 {
-  QString path = getAppDataPath();
-  //return QSettingsPtr(new QSettings());
-  return QSettingsPtr(new QSettings(path+"/custus.ini", QSettings::IniFormat));
+  return QSettingsPtr(new QSettings());
+
+  //QString path = getAppDataPath();
+  //return QSettingsPtr(new QSettings(path+"/custus.ini", QSettings::IniFormat));
 }
 
 } // namespace cx
