@@ -182,15 +182,15 @@ IF(WIN32)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}.exe")
 ENDIF(WIN32)
 
-
-#install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/config DESTINATION target_config COMPONENT config)
-#install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt DESTINATION "/Library/CustusX")# COMPONENT config)
+# install configuration files to config folder
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
     ) # COMPONENT config)
+# install openCL shaders into bundle
 install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl DESTINATION ${RESOURCES_DIR}/shaders/ 
     ) # COMPONENT config)
+# install folder for storage of igstk<->CustusX symlinks
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Library/CustusX/" 
     #USE_SOURCE_PERMISSIONS
     FILE_PERMISSIONS
@@ -203,6 +203,12 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Libra
         WORLD_READ WORLD_EXECUTE WORLD_WRITE
     PATTERN ".svn" EXCLUDE
     ) # COMPONENT config)
+# Install all files in install/nextToCustusX direcly into the CustusX folder.
+# Use this to add additional stuff to the installation.
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ DESTINATION ${INSTALL_FOLDER_NAME} 
+    USE_SOURCE_PERMISSIONS
+    PATTERN ".svn" EXCLUDE
+    ) 
 
 #set(CPACK_SET_DESTDIR ON)
 #set(CPACK__PACKAGE_NAME "CustusX")
