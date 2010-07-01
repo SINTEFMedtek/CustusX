@@ -109,6 +109,7 @@ protected:
   virtual ~ViewManager();
 
   void syncOrientationMode(SyncedValuePtr val);
+  void setStretchFactors( int row, int col, int rowSpan, int colSpan, int stretchFactor);
 
   void deactivateCurrentLayout();
   void activateLayout(LayoutType toType);
