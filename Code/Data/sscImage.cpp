@@ -12,7 +12,6 @@
 #include "sscImageLUT2D.h"
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
 namespace ssc

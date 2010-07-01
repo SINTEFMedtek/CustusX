@@ -3,6 +3,8 @@
 
 #include <QObject>
 
+#include "sscTypeConversions.h"
+
 class QString;
 class QDomNode;
 class QDomDocument;

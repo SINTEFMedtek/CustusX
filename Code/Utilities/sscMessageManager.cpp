@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <QString>
-#include "sscTypeConversions.h"
 
 namespace ssc
 {

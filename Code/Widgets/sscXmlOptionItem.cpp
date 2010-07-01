@@ -12,7 +12,6 @@
 #include <QDomElement>
 #include <QStringList>
 
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
 namespace ssc

@@ -1,6 +1,5 @@
 #include "sscRegistrationTransform.h"
 //#include <QtXML>
-#include "sscTypeConversions.h"
 #include <QDomElement>
 #include "sscTime.h"
 #include "sscTypeConversions.h"

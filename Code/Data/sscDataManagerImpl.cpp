@@ -26,7 +26,6 @@ typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformati
 
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 
 namespace ssc
@@ -35,6 +34,7 @@ namespace ssc
 //-----
 ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filename)
 {
+  //messageManager()->sendDebug("load filename: "+string_cast(filename));
   //read the specific TransformMatrix-tag from the header
   Vector3D p_r(0,0,0);
   Vector3D e_x(1,0,0);

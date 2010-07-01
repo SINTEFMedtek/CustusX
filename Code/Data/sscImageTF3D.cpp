@@ -18,7 +18,6 @@
 #include <QStringList>
 #include "sscVector3D.h"
 #include "sscMessageManager.h"
-#include "sscTypeConversions.h"
 
 typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
 
