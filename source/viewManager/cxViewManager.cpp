@@ -126,6 +126,7 @@ ViewManager::ViewManager() :
 
   // set start layout
   this->setActiveLayout(LAYOUT_3DACS_2X2_SNW);
+  this->setActiveLayout(LAYOUT_3DACS_1X3_SNW);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),
@@ -379,6 +380,8 @@ void ViewManager::deactivateCurrentLayout()
 {
   for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
     deactivateView(iter->second);
+
+  this->setStretchFactors( 0, 0, 10, 10, 0);
 }
 
 /**activate a layout. Assumes the previous layout is already deactivated.
@@ -450,18 +453,37 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
 //      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
 //  }
 }
-  
+
+/** Set the stretch factors of columns and rows in mLayout.
+ */
+void ViewManager::setStretchFactors( int row, int col, int rowSpan, int colSpan, int stretchFactor)
+{
+  // set stretch factors for the affected cols to 1 in order to get even distribution
+  for (int i=col; i<col+colSpan; ++i)
+  {
+	  mLayout->setColumnStretch(i,stretchFactor);
+  }
+  // set stretch factors for the affected rows to 1 in order to get even distribution
+  for (int i=row; i<row+rowSpan; ++i)
+  {
+	  mLayout->setRowStretch(i,stretchFactor);
+  }
+}
+
 void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
 {
   mViewGroups[group]->initializeView(index, plane);
   ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, row, col, rowSpan, colSpan );
+  this->setStretchFactors( row, col, rowSpan, colSpan, 1);
+
   view->show();
 }
 void ViewManager::activate3DView(int group, int index, int row, int col, int rowSpan, int colSpan)
 {
   ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, row, col, rowSpan, colSpan );
+  this->setStretchFactors( row, col, rowSpan, colSpan, 1);
   view->show();
 }
 
@@ -492,10 +514,10 @@ void ViewManager::activateLayout_3DACS_2X2_SNW()
 
 void ViewManager::activateLayout_3DACS_1X3_SNW()
 {
-  activate3DView(0, 0,                  0, 0, 3, 1);
-  activate2DView(0, 1, ssc::ptAXIAL,    0, 1);
-  activate2DView(0, 2, ssc::ptCORONAL,  1, 1);
-  activate2DView(0, 3, ssc::ptSAGITTAL, 2, 1);
+  activate3DView(0, 0,                  0, 0, 3, 2);
+  activate2DView(0, 1, ssc::ptAXIAL,    0, 2);
+  activate2DView(0, 2, ssc::ptCORONAL,  1, 2);
+  activate2DView(0, 3, ssc::ptSAGITTAL, 2, 2);
 
   mActiveLayout = LAYOUT_3DACS_1X3_SNW;
   emit activeLayoutChanged();

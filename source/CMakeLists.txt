@@ -208,6 +208,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Libra
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ DESTINATION ${INSTALL_FOLDER_NAME} 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
+    PATTERN "readme.txt" EXCLUDE
     ) 
 
 #set(CPACK_SET_DESTDIR ON)
