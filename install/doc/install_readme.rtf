@@ -1,0 +1,31 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1038\cocoasubrtf320
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww14920\viewh8040\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+
+\f0\b\fs24 \cf0 Readme for CustusX3
+\b0 \
+\
+\ul Qt4 must be installed prior to installing CustusX:\ulnone \
+- Run the installer: qt-mac-cocoa-opensource-4.6.3.dmg\
+\
+\ul CustusX3 installation:\
+\ulnone - Choose application in preferences (Nevro, Lap, Lung, Vasc)\
+- The "Tool configuration folder" in preferences must be set. OR examples:\
+	Lap:   toolConfigurations/Lap,   and a "Tool configuration" file must be selected, ex: "Lap_operation"\
+	Nevro: toolConfigurations/Nevro, and a "Tool configuration" file must be selected, ex: "AuroraConfig"\
+\
+\ul Tracking setup\ulnone \
+- Install NDI USB drivers, run installer: FTDIUSBSerialDriver (NDI).pkg\
+\
+\ul OsiriX with DICOM-to-MetaImage converter plugin\ulnone \
+Use Osirix to be able to import DICOM into CustusX3\
+- Install  Osirix (v.3.7.1 can be found in the folder and works with CX3.0.0 and above, unzip and double-click)\
+- Install the plugin for exporting DICOM to CX3 format: DICOMtoMetadata_v_0_4_Beta.osirixplugin.zip \
+- Unzip the .zip file and double-click the .osirixplugin file\
+- You may need to open OsirisX and delete any current DICOMtoMetadata plugin first (Under Plugins -> Plugin Manager)\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\ql\qnatural\pardirnatural
+\cf0 \ul \ulc0 Additional information\ulnone \
+Patient save files from earlier versions are not supported}

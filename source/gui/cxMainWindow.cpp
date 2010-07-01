@@ -81,7 +81,7 @@ MainWindow::MainWindow() :
   if (!mSettings->contains("globalPatientNumber"))
     mSettings->setValue("globalPatientNumber", 1);
   //if (!mSettings->contains("applicationNames"))
-    mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung");
+    mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
   
   
   if (!mSettings->contains("renderingInterval"))
