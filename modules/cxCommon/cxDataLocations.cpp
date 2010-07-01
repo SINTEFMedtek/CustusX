@@ -26,14 +26,20 @@ QString DataLocations::getBundlePath()
 #endif
 }
 
-QString DataLocations::getConfigPath()
+QString DataLocations::getRootConfigPath()
 {
   QString path = getBundlePath()+"/config";
   if (QDir(path).exists())
     return path;
   return CX_CONFIG_ROOT;
 }
-
+  
+QString DataLocations::getApplicationConfigPath()
+{
+  QString path(getRootConfigPath()+"/tool/"+getSettings()->value("globalApplicationName").toString());
+  return path;
+}
+  
 QString DataLocations::getShaderPath()
 {
   QString path(qApp->applicationDirPath()+"/../Resources/shaders");

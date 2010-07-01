@@ -6,7 +6,7 @@
 
 void TestToolConfigurationParser::setUp()
 {
-  mXmlFilePath = cx::DataLocations::getConfigPath()+QString("/tool/Lab/POLARIS_07-198-0838_SW_Pointer_02_AND_02-206-00913_SW_PasRef_01.xml");
+  mXmlFilePath = cx::DataLocations::getRootConfigPath()+QString("/tool/Lab/POLARIS_07-198-0838_SW_Pointer_02_AND_02-206-00913_SW_PasRef_01.xml");
 
   std::string xmlFilePath = mXmlFilePath.toStdString();
   mConfigurationParser = new cx::ToolConfigurationParser(xmlFilePath);
