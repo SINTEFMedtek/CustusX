@@ -22,7 +22,8 @@ class DataLocations
 public:
   static QString getBundlePath(); ///< return the folder where the bundle or executable are located.
   static QString getRootConfigPath(); ///< return path to root config folder
-  static QString getApplicationConfigPath(); ///< return users path to config folder
+  static QString getApplicationConfigPath(); ///< return path to config folder
+  static QString getConfigFilePath(); ///< return users path to config file
   static QString getShaderPath(); ///< return the path to installed shaders. empty string if not installed.
   static QString getAppDataPath(); ///< return path to global configuration data.
   static QSettingsPtr getSettings(); ///< return a settings object for global custusX data
