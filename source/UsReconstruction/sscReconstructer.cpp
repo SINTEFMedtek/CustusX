@@ -10,7 +10,6 @@
 #include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
 #include "sscDataManagerImpl.h"
-#include "sscTypeConversions.h"
 #include "sscXmlOptionItem.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"

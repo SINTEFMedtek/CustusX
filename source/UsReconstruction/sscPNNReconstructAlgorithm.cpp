@@ -9,7 +9,6 @@
 #include <QFileInfo>
 #include "recConfig.h"
 #include "sscMessageManager.h"
-#include "sscTypeConversions.h"
 #include "utils/sscReconstructHelper.h"
 //#include "sscReconstructer.h"
 

@@ -10,7 +10,6 @@
 #include <vtkImageData.h>
 #include "sscProbeRep.h"
 #include "sscVolumetricRep.h"
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"

@@ -13,7 +13,6 @@
 #include "sscImage.h"
 //#include "sscXmlOptionItem.h"
 #include "sscMessageManager.h"
-#include "sscTypeConversions.h"
 
 namespace ssc 
 {

@@ -1,7 +1,6 @@
 #include "cxMainWindow.h"
 
 #include <QtGui>
-#include "sscTypeConversions.h"
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
@@ -376,11 +375,11 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-  mReconstructionWidget->selectData(mPatientData->getActivePatientFullPath()+"/US_Acq/");
-  mReconstructionWidget->reconstructer()->setOutputBasePath(mSettings->value("globalPatientDataFolder").toString()+ "/" + mPatientData->getActivePatientFolder());
+  mReconstructionWidget->selectData(mPatientData->getActivePatientFolder()+"/US_Acq/");
+  mReconstructionWidget->reconstructer()->setOutputBasePath(mPatientData->getActivePatientFolder());
   mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
 
-  QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
+  QString loggingPath = mPatientData->getActivePatientFolder()+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {
@@ -566,7 +565,7 @@ void MainWindow::deactivatePatientDataState()
 {}
 void MainWindow::activateImageRegistationState()
 {  
-  QString imagesPath = mPatientData->getActivePatientFullPath()+"/Images";
+  QString imagesPath = mPatientData->getActivePatientFolder()+"/Images";
   mShiftCorrectionWidget->init(imagesPath);
   //TODO: Finish ShiftCorrection
   //Don't show ShiftCorrection in release
@@ -757,7 +756,7 @@ void MainWindow::configureSlot()
 //  toolManager()->setConfigurationFile(configFile.toStdString());
 //  toolManager()->setConfigurationFile(string_cast(mSettings->value("toolConfigFilePath").toString()));
 
-/*  QString loggingPath = mPatientData->getActivePatientFullPath()+"/Logs/";
+/*  QString loggingPath = mPatientData->getActivePatientFolder()+"/Logs/";
   QDir loggingDir(loggingPath);
   if(!loggingDir.exists())
   {

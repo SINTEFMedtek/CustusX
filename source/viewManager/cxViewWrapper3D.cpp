@@ -11,7 +11,6 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include "sscView.h"
-#include "sscTypeConversions.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"

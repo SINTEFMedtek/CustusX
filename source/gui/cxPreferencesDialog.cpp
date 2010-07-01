@@ -6,7 +6,6 @@
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
 #include <iostream>
-#include "sscTypeConversions.h"
 #include "cxToolManager.h"
 
 namespace cx

@@ -16,7 +16,6 @@
 #include "cxDataManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
-#include "sscTypeConversions.h"
 
 namespace cx
 {

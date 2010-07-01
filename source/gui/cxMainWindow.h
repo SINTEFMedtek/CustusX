@@ -108,13 +108,6 @@ protected:
 
   void addAsDockWidget(QWidget* widget);
 
-//  //patient
-//  void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (relative to the globalPatientDataFolder)
-//
-//  //saving/loading
-//  void generateSaveDoc(QDomDocument& doc);
-//  void readLoadDoc(QDomDocument& loadDoc);
-
   //Takes care of removing and adding widgets depending on which workflow state the system is in
   void changeState(WorkflowState fromState, WorkflowState toState); ///< used to change state
   void activatePatientDataState(); ///< Should only be used by changeState(...)!
@@ -211,8 +204,6 @@ protected:
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
 
   PatientDataPtr mPatientData;
-//  //Patient
-//  QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
   
 };
 }//namespace cx

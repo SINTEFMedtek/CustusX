@@ -1,7 +1,6 @@
 #include "cxViewWrapper.h"
 
 #include <QMenu>
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxViewGroup.h" //for class Navigation

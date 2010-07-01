@@ -8,7 +8,6 @@
 #define SSCRECONSTRUCTEDOUTPUTVOLUMEPARAMS_H_
 
 #include "sscMessageManager.h"
-#include "sscTypeConversions.h"
 
 namespace ssc
 {
