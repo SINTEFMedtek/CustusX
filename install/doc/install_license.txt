@@ -1,3 +1,1 @@
-CustusX3 license.
-
-<add more text>
+Copyright © 2010 SINTEF. All rights reserved.
