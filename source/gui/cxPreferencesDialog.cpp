@@ -19,7 +19,7 @@ FoldersTab::FoldersTab(QWidget *parent) :
 void FoldersTab::init(){
   mGlobalPatientDataFolder = mSettings->value("globalPatientDataFolder").toString();
 
-  mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
+  //mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
 
   // patientDataFolder
   QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
@@ -32,16 +32,15 @@ void FoldersTab::init(){
           SIGNAL(clicked()), 
           this, 
           SLOT(browsePatientDataFolderSlot()) );
-
+  
   QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
   mToolConfigFilesComboBox = new QComboBox;
-  setToolConfigFiles();
+  //setToolConfigFiles();
   connect( mToolConfigFilesComboBox, 
           SIGNAL(currentIndexChanged(const QString &)), 
           this, 
           SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
-  setCurrentToolConfigFile();
-
+  
   // Choose application name
   QLabel* chooseApplicationLabel = new QLabel(tr("Choose application name:"));
   mChooseApplicationComboBox = new QComboBox();
@@ -50,8 +49,11 @@ void FoldersTab::init(){
           SIGNAL(currentIndexChanged(const QString &)),
           this,
           SLOT(currenApplicationChangedSlot(const QString &)));
-  setCurrentApplication();
-
+  setCurrentApplication();//changes mCurrentToolConfigFile
+  
+  mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
+  setCurrentToolConfigFile();
+  
   // Layout
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addWidget(patientDataFolderLabel, 0, 0);
@@ -79,7 +81,6 @@ void FoldersTab::init(){
   mainLayout->addWidget(mToolConfigFilesComboBox, 9, 1);
  
   setLayout(mainLayout);
-  
 }
 
 FoldersTab::~FoldersTab()
@@ -146,7 +147,6 @@ void FoldersTab::setCurrentApplication()
   
 void FoldersTab::saveParametersSlot()
 {
-  
   // currentPatientDataFolder
   mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
@@ -156,7 +156,7 @@ void FoldersTab::saveParametersSlot()
   mSettings->sync();
 
   // update toolmanager config file
-  toolManager()->setConfigurationFile(string_cast(DataLocations::getApplicationConfigPath()));
+  toolManager()->setConfigurationFile(string_cast(DataLocations::getConfigFilePath()));
 
   emit savedParameters();
 }

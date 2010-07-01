@@ -34,9 +34,21 @@ QString DataLocations::getRootConfigPath()
   return CX_CONFIG_ROOT;
 }
   
+  
 QString DataLocations::getApplicationConfigPath()
 {
-  QString path(getRootConfigPath()+"/tool/"+getSettings()->value("globalApplicationName").toString());
+  QString path(getRootConfigPath()+"/tool/" +
+               getSettings()->value("globalApplicationName").toString());
+  //std::cout << "getApplicationConfigPath: " << path.toStdString() << std::endl;
+  return path;
+}
+  
+QString DataLocations::getConfigFilePath()
+{
+  QString path(getRootConfigPath()+"/tool/" +
+               getSettings()->value("globalApplicationName").toString() + "/" +
+               getSettings()->value("toolConfigFile").toString());
+  //std::cout << "getConfigFilePath: " << path.toStdString() << std::endl;
   return path;
 }
   

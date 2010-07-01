@@ -94,7 +94,7 @@ MainWindow::MainWindow() :
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   // initialize toolmanager config file
-  toolManager()->setConfigurationFile(string_cast(DataLocations::getApplicationConfigPath()));
+  toolManager()->setConfigurationFile(string_cast(DataLocations::getConfigFilePath()));
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
 
