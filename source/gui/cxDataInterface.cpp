@@ -6,7 +6,6 @@
  */
 #include "cxDataInterface.h"
 #include "sscImage.h"
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "sscImageLUT2D.h"

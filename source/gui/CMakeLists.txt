@@ -41,6 +41,7 @@ SET(cxProject_RCCS cxResources.qrc)
 QT4_ADD_RESOURCES(cxProject_RCC_SRCS ${cxProject_RCCS})
 
 SET(${LIBNAME}_SRCS
+    ${cxProject_MOC_HDRS}
     ItkVtkGlue/itkImageToVTKImageFilter.h
     ItkVtkGlue/itkImageToVTKImageFilter.txx
     ItkVtkGlue/itkVTKImageToImageFilter.h

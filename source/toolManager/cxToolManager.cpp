@@ -6,7 +6,6 @@
 #include <QMetaType>
 #include <QFileInfo>
 #include <vtkDoubleArray.h>
-#include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"

@@ -12,7 +12,6 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "sscView.h"
-#include "sscTypeConversions.h"
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"

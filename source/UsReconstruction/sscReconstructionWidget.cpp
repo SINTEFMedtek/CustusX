@@ -3,7 +3,6 @@
  *  Created by Ole Vegard Solberg on 5/4/10.
  */
 #include "sscReconstructionWidget.h"
-#include "sscTypeConversions.h"
 #include "sscReconstructOutputValueParamsInterfaces.h"
 #include "sscMessageManager.h"
 #include "sscHelperWidgets.h"

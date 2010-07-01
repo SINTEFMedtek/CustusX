@@ -12,7 +12,6 @@
 #include <vtkDoubleArray.h>
 #include <sscVector3D.h>
 #include <sscVolumetricRep.h>
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxLandmarkRep.h"
 #include "cxView2D.h"

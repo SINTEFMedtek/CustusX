@@ -10,7 +10,6 @@
 #include <QApplication>
 #include <QDir>
 #include <QSettings>
-//#include "sscTypeConversions.h"
 #include "cxConfig.h"
 
 namespace cx

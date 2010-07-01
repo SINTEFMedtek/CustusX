@@ -10,7 +10,6 @@
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
-#include "sscTypeConversions.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
 

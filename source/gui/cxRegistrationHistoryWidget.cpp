@@ -5,7 +5,6 @@
 #include <QStringList>
 #include <QVBoxLayout>
 #include "sscImage.h"
-#include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxToolManager.h"

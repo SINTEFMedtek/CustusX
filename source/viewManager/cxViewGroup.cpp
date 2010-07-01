@@ -4,7 +4,6 @@
 #include <QtGui>
 #include <vtkRenderWindow.h>
 #include "sscView.h"
-#include "sscTypeConversions.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
 #include "sscTool2DRep.h"

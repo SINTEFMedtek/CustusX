@@ -34,15 +34,9 @@ QString PatientData::getActivePatientFolder() const
   return mActivePatientFolder;
 }
 
-QString PatientData::getActivePatientFullPath() const
-{
-  return mSettings->value("globalPatientDataFolder").toString()
-      + "/"+this->getActivePatientFolder();
-}
-
-
 void PatientData::setActivePatient(const QString& activePatientFolder)
 {
+  //ssc::messageManager()->sendDebug("PatientData::setActivePatient to: "+string_cast(activePatientFolder));
   mActivePatientFolder = activePatientFolder;
   //TODO
   //Update gui in some way to show which patient is active
@@ -53,23 +47,16 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 void PatientData::newPatient(QString choosenDir)
 {
   createPatientFolders(choosenDir);
+  this->setActivePatient(choosenDir);
 }
 
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
-//  // Open file dialog
-//  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
-//                                                         mSettings->value("globalPatientDataFolder").toString(),
-//                                                         QFileDialog::ShowDirsOnly);
+  //ssc::messageManager()->sendDebug("loadPatient() choosenDir: "+string_cast(choosenDir));
   if (choosenDir == QString::null)
     return; // On cancel
-
-  // Set active patient folder, relative to globalPatientDataFolder
-  QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString());
-  //mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
-  this->setActivePatient(patientDataDir.relativeFilePath(choosenDir));
-
+  
   QFile file(choosenDir+"/custusdoc.xml");
   if(file.open(QIODevice::ReadOnly))
   {
@@ -86,14 +73,20 @@ void PatientData::loadPatient(QString choosenDir)
     else
     {
       //Read the xml
-      this->readLoadDoc(doc);
+      this->readLoadDoc(doc, choosenDir);
     }
     file.close();
   }
   else //User have created the directory create xml file and folders
   {
+    //TODO: Ask the user if he want to convert the folder
+    ssc::messageManager()->sendInfo("Found no CX3 data in folder: " +
+                                    string_cast(choosenDir) +
+                                    " Converting the folder to a patent folder...");
     createPatientFolders(choosenDir);
   }
+  
+  this->setActivePatient(choosenDir);
 }
 
 void PatientData::savePatient()
@@ -110,9 +103,7 @@ void PatientData::savePatient()
   QDomDocument doc;
   this->generateSaveDoc(doc);
 
-  QString activePatientDir = mSettings->value("globalPatientDataFolder").toString();
-  activePatientDir += "/"+mActivePatientFolder;
-  QFile file(activePatientDir + "/custusdoc.xml");
+  QFile file(mActivePatientFolder + "/custusdoc.xml");
   if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     QTextStream stream(&file);
@@ -132,9 +123,9 @@ void PatientData::savePatient()
 
 void PatientData::importData(QString fileName)
 {
+  //ssc::messageManager()->sendDebug("PatientData::importData() called");
 //  this->savePatientFileSlot();
 
-//  messageManager()->sendInfo("Importing data...");
 //  QString fileName = QFileDialog::getOpenFileName( this,
 //                                  QString(tr("Select data file")),
 //                                  mSettings->value("globalPatientDataFolder").toString(),
@@ -144,10 +135,9 @@ void PatientData::importData(QString fileName)
     ssc::messageManager()->sendInfo("Import canceled");
     return;
   }
-
-  QString globalPatientFolderPath = mSettings->value("globalPatientDataFolder").toString();
-  QString patientsImageFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Images/";
-  QString patientsSurfaceFolder = globalPatientFolderPath+"/"+mActivePatientFolder+"/Surfaces/";
+  
+  QString patientsImageFolder = mActivePatientFolder+"/Images/";
+  QString patientsSurfaceFolder = mActivePatientFolder+"/Surfaces/";
 
   QDir dir;
   if(!dir.exists(patientsImageFolder))
@@ -189,8 +179,7 @@ void PatientData::importData(QString fileName)
 
   data->setShading(true);
 
-  QDir patientDataDir(mSettings->value("globalPatientDataFolder").toString()
-                      +"/"+mActivePatientFolder);
+  QDir patientDataDir(mActivePatientFolder);
   FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(),
                                           patientDataDir.relativeFilePath(pathToNewFile).toStdString(),
                                           data);
@@ -262,14 +251,10 @@ void PatientData::importData(QString fileName)
 
 void PatientData::createPatientFolders(QString choosenDir)
 {
+  //ssc::messageManager()->sendDebug("PatientData::createPatientFolders() called");
   if(!choosenDir.endsWith(".cx3"))
     choosenDir.append(".cx3");
 
-  // Set active patient folder. Use path relative to the globalPatientDataFolder
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
-  QDir patientDataDir(patientDatafolder);
-  //mActivePatientFolder = patientDataDir.relativeFilePath(choosenDir);
-  this->setActivePatient(patientDataDir.relativeFilePath(choosenDir));
   ssc::messageManager()->sendInfo("Selected a patient to work with.");
 
   // Create folders
@@ -357,8 +342,9 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
 
   ssc::messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
-void PatientData::readLoadDoc(QDomDocument& doc)
+void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 {
+  //ssc::messageManager()->sendDebug("PatientData::readLoadDoc() called");
   //Get all the nodes
   QDomNode patientNode = doc.namedItem("patient");
   QDomNode managerNode = patientNode.namedItem("managers");
@@ -370,16 +356,13 @@ void PatientData::readLoadDoc(QDomDocument& doc)
     QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
     if(!activePatientNode.isNull())
     {
-      //mActivePatientFolder = activePatientNode.text();
-      this->setActivePatient(activePatientNode.text());
       ssc::messageManager()->sendInfo("Active patient loaded to be "
                                 +mActivePatientFolder.toStdString());
     }
   }
   if (!dataManagerNode.isNull())
   {
-    QString absolutePatientPath = mSettings->value("globalPatientDataFolder").toString()+"/"+mActivePatientFolder;
-    dataManager()->parseXml(dataManagerNode, absolutePatientPath);
+    dataManager()->parseXml(dataManagerNode, patientFolder);
   }
 
   QDomNode toolmanagerNode = managerNode.namedItem("toolManager");

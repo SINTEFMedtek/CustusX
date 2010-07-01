@@ -32,7 +32,6 @@ public:
   PatientData(QObject* parent);
   virtual ~PatientData() {}
 
-  QString getActivePatientFullPath() const;
   QString getActivePatientFolder() const;
 
 public slots:
@@ -46,12 +45,12 @@ signals:
 
 private:
   //patient
-  void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (relative to the globalPatientDataFolder)
+  void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (absolute path)
   void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
 
   //saving/loading
   void generateSaveDoc(QDomDocument& doc);
-  void readLoadDoc(QDomDocument& loadDoc);
+  void readLoadDoc(QDomDocument& loadDoc, QString patientFolder);
 
   //Patient
   QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
