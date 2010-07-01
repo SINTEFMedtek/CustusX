@@ -59,7 +59,7 @@ class LineSegment
 	public:
 		LineSegment( vtkRendererPtr renderer );
 		~LineSegment();
-		void setPoints( const Vector3D& point1, const Vector3D& point2 , const RGBColor& color );
+		void setPoints( const Vector3D& point1, const Vector3D& point2 , const RGBColor& color, int stipplePattern=0xFFFF);
 		void setResolution( int res );
 		void updatePosition( const Vector3D& point1, const Vector3D& point2 );
 		vtkActor2DPtr getActor();

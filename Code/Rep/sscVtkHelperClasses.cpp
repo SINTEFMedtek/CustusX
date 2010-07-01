@@ -149,7 +149,7 @@ LineSegment::~LineSegment()
 {
 	mRenderer->RemoveActor(actor2d);
 }
-void LineSegment::setPoints( const Vector3D& point1, const Vector3D& point2 , const RGBColor& color )
+void LineSegment::setPoints( const Vector3D& point1, const Vector3D& point2 , const RGBColor& color, int stipplePattern )
 {
 	Vector3D p1 = point1;
 	Vector3D p2 = point2;
@@ -160,6 +160,7 @@ void LineSegment::setPoints( const Vector3D& point1, const Vector3D& point2 , co
 	mapper2d->SetInputConnection( source->GetOutputPort() );
 	actor2d->SetMapper (mapper2d );
 	actor2d->GetProperty()->SetColor( c.begin() );
+	actor2d->GetProperty()->SetLineStipplePattern (stipplePattern);
 	mRenderer->AddActor(actor2d);
 }
 

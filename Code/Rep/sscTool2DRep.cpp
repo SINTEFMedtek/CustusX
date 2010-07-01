@@ -31,6 +31,7 @@ ToolRep2D::ToolRep2D(const std::string& uid, const std::string& name) :
 	mUseCrosshair = false;
 	mUseToolLine = true;
 	mUseOffsetText = false;
+	mMergeOffsetAndToolLine = false;
 }
 
 ToolRep2D::~ToolRep2D()
@@ -116,6 +117,16 @@ void ToolRep2D::setUseToolLine(bool on)
 void ToolRep2D::setUseOffsetText(bool on)
 {
 	mUseOffsetText = on;
+	setVisibility();
+}
+
+/**Set to merge the rep of the tool and the tool offset into one line, thus making the
+ * location of the physical tool tip invisible.
+ *
+ */
+void ToolRep2D::setMergeOffsetAndToolLine(bool on)
+{
+	mMergeOffsetAndToolLine = on;
 	setVisibility();
 }
 
@@ -226,14 +237,15 @@ void ToolRep2D::setVisibility()
 		cursor->getActor()->SetVisibility(mUseCrosshair && hasTool);
 	if (center2Tool)
 		center2Tool->getActor()->SetVisibility(showOffset());
+		//center2Tool->getActor()->SetVisibility(showOffset() && !mMergeOffsetAndToolLine);
 	if (tool2Back)
 		tool2Back->getActor()->SetVisibility(mUseToolLine && hasTool);
 	if (centerPoint)
 		centerPoint->getActor()->SetVisibility(mUseToolLine && hasTool);
 	if (toolPoint)
-		toolPoint->getActor()->SetVisibility(showOffset());
+		toolPoint->getActor()->SetVisibility(showOffset() && !mMergeOffsetAndToolLine);
 	if (distanceText)
-		distanceText->getActor()->SetVisibility(mUseOffsetText && showOffset());	
+		distanceText->getActor()->SetVisibility(mUseOffsetText && showOffset() && !mMergeOffsetAndToolLine);
 	if (mUSProbe2D)
 		mUSProbe2D->setVisibility(showProbe());
 }
@@ -267,13 +279,22 @@ void ToolRep2D::crossHairResized()
  */
 void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPos )
 {
-	// line from tooltip to offset point
+	RGBColor toolColor(0.25,0.87,0.16);
+
+	// set stipple pattern for center2tool line if mergeOffsetandToolline
+	int stipplePattern = 0xFFFF;
 	RGBColor offsetColor(1.0,0.8,0.0);
+	if (mMergeOffsetAndToolLine)
+	{
+		stipplePattern = 0x0F0F;
+		offsetColor = toolColor;
+	}
+
+	// line from tooltip to offset point
 	center2Tool.reset( new LineSegment(renderer) );
-	center2Tool->setPoints( centerPos, Vector3D(0.0, 0.0, 0.0), offsetColor ) ;
+	center2Tool->setPoints( centerPos, Vector3D(0.0, 0.0, 0.0), offsetColor, stipplePattern) ;
 
 	// line from back infinity to tooltip
-	RGBColor toolColor(0.25,0.87,0.16);
 	tool2Back.reset( new LineSegment(renderer) );
 	tool2Back->setPoints( Vector3D(0.0, 0.0, 0.0), Vector3D(0.0, 0.0, 0.0), toolColor );
 
@@ -317,12 +338,18 @@ void ToolRep2D::updateToolLine(const Vector3D& crossPos, const Vector3D& toolTip
 	center2Tool->updatePosition( crossPos, toolTipPos);
 	tool2Back->updatePosition( toolTipPos, toolTipBackPos );
 
+//	if (mMergeOffsetAndToolLine)
+//	{
+//		center2Tool->updatePosition( crossPos, crossPos);
+//		tool2Back->updatePosition( crossPos, toolTipBackPos );
+//	}
+
 	//points
 	centerPoint->update( crossPos );
 
 	if( getOffset() > 2.0 )
 	{
-		toolPoint->getActor()->VisibilityOn();
+		toolPoint->getActor()->SetVisibility(!mMergeOffsetAndToolLine);
 		toolPoint->update( toolTipPos );
 		toolPoint->setRadius ( 4 );
 	}

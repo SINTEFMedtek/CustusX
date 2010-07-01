@@ -54,6 +54,7 @@ class ToolRep2D : public ssc::RepImpl
 		void setUseCrosshair(bool on);
 		void setUseToolLine(bool on);
 		void setUseOffsetText(bool on);
+		void setMergeOffsetAndToolLine(bool on);
 
 	private slots:
 		void sliceTransformChangedSlot(Transform3D sMr); 
@@ -89,6 +90,7 @@ class ToolRep2D : public ssc::RepImpl
 		bool mUseCrosshair; 
 		bool mUseToolLine; 
 		bool mUseOffsetText;		
+		bool mMergeOffsetAndToolLine; ///<
 //		bool mUseProbe;
 		
 		//double mOffset; 
