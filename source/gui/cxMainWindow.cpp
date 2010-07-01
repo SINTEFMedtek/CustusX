@@ -73,11 +73,8 @@ MainWindow::MainWindow() :
   // Initialize settings if empty
   if (!mSettings->contains("globalPatientDataFolder"))
     mSettings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
-  if (!mSettings->contains("toolConfigFilePath"))
-    mSettings->setValue("toolConfigFilePath", DataLocations::getConfigPath()+"/tool/");
-//    mSettings->setValue("toolConfigFilePath", QDir::homePath());
   if (!mSettings->contains("globalApplicationName"))
-    mSettings->setValue("globalApplicationName", "Nevro");
+    mSettings->setValue("globalApplicationName", "Lab");
   if (!mSettings->contains("globalPatientNumber"))
     mSettings->setValue("globalPatientNumber", 1);
   //if (!mSettings->contains("applicationNames"))
@@ -97,7 +94,7 @@ MainWindow::MainWindow() :
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   // initialize toolmanager config file
-  toolManager()->setConfigurationFile(string_cast(mSettings->value("toolConfigFilePath").toString()));
+  toolManager()->setConfigurationFile(string_cast(DataLocations::getApplicationConfigPath()));
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
 

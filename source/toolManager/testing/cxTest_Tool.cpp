@@ -6,7 +6,7 @@
 
 void TestTool::setUp()
 {
-  QString toolToolPath(cx::DataLocations::getConfigPath()+QString("/tool/Tools/"));
+  QString toolToolPath(cx::DataLocations::getRootConfigPath()+QString("/tool/Tools/"));
 
   mValidPolarisInternal.mType = ssc::Tool::TOOL_POINTER;
   mValidPolarisInternal.mName = "Polaris pointer name";

@@ -46,9 +46,7 @@ signals:
   
 private slots:
   void browsePatientDataFolderSlot();
-  //void browseImportDataFolderSlot();
 
-  void browseToolConfigFolderSlot();
   void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
   void currenApplicationChangedSlot(const QString & newApplicationName);
 
@@ -61,17 +59,13 @@ private:
   QSettingsPtr mSettings;
 
   QComboBox* mPatientDataFolderComboBox;
-  //QComboBox* mImportDataFolderComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
   QComboBox* mToolConfigFilesComboBox;
   QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
-  //QString mCurrentImportDataFolder;
   
-  QString mCurrentToolConfigFilePath;
-  QString mCurrentToolConfigFolder;
   QString mCurrentToolConfigFile;
 
 };
