@@ -126,7 +126,7 @@ ViewManager::ViewManager() :
 
   // set start layout
   this->setActiveLayout(LAYOUT_3DACS_2X2_SNW);
-  this->setActiveLayout(LAYOUT_3DACS_1X3_SNW);
+  //this->setActiveLayout(LAYOUT_3DACS_1X3_SNW);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
   connect(mRenderingTimer, SIGNAL(timeout()),
