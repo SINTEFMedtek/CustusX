@@ -15,7 +15,7 @@ set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. A
 #set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/../install_test/ )
 
 # Set ALPHA to OFF to build release
-SET(ALPHA ON)
+SET(ALPHA OFF)
 
 FIND_PACKAGE(Subversion)
 IF(Subversion_FOUND)

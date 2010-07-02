@@ -35,20 +35,20 @@ QString DataLocations::getRootConfigPath()
 }
   
   
-QString DataLocations::getApplicationConfigPath()
+QString DataLocations::getApplicationToolConfigPath()
 {
   QString path(getRootConfigPath()+"/tool/" +
                getSettings()->value("globalApplicationName").toString());
-  //std::cout << "getApplicationConfigPath: " << path.toStdString() << std::endl;
+  //std::cout << "getApplicationToolConfigPath: " << path.toStdString() << std::endl;
   return path;
 }
   
-QString DataLocations::getConfigFilePath()
+QString DataLocations::getToolConfigFilePath()
 {
   QString path(getRootConfigPath()+"/tool/" +
                getSettings()->value("globalApplicationName").toString() + "/" +
                getSettings()->value("toolConfigFile").toString());
-  //std::cout << "getConfigFilePath: " << path.toStdString() << std::endl;
+  //std::cout << "getToolConfigFilePath: " << path.toStdString() << std::endl;
   return path;
 }
   
