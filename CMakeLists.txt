@@ -11,7 +11,8 @@ SET(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.
 #set(CMAKE_INSTALL_RPATH .;${CMAKE_INSTALL_RPATH})
 #message(STATUS "CMAKE_INSTALL_RPATH " ${CMAKE_INSTALL_RPATH})
 
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/../install_test/ )
+set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
+#set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/../install_test/ )
 
 # Set ALPHA to OFF to build release
 SET(ALPHA ON)
