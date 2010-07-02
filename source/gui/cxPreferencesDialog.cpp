@@ -111,7 +111,7 @@ void FoldersTab::currenApplicationChangedSlot(const QString & newApplicationName
 
 void FoldersTab::setToolConfigFiles()
 {
-	QDir dir(DataLocations::getApplicationConfigPath());
+	QDir dir(DataLocations::getApplicationToolConfigPath());
     dir.setFilter(QDir::Files);
 
     QStringList nameFilters;
@@ -156,7 +156,7 @@ void FoldersTab::saveParametersSlot()
   mSettings->sync();
 
   // update toolmanager config file
-  toolManager()->setConfigurationFile(string_cast(DataLocations::getConfigFilePath()));
+  toolManager()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
 
   emit savedParameters();
 }
