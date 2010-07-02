@@ -191,7 +191,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}"
 install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl DESTINATION ${RESOURCES_DIR}/shaders/ 
     ) # COMPONENT config)
 # install folder for storage of igstk<->CustusX symlinks
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Library/CustusX/" 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Library/CustusX" 
     #USE_SOURCE_PERMISSIONS
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
@@ -213,8 +213,12 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ DESTINATION ${IN
 
 #set(CPACK_SET_DESTDIR ON)
 #set(CPACK__PACKAGE_NAME "CustusX")
+SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
+#SET(CPACK_SET_DESTDIR "ON")
+message(STATUS "DESTDIR:  " $ENV{DESTDIR})
+
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CustusX description summary")# does not work..?
-set(CPACK_PACKAGE_VENDOR "Sintef blabla")# does not work..?
+set(CPACK_PACKAGE_VENDOR "Sintef")# does not work..?
 set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/gui/icons/CustusX.png")# does not work..?
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
@@ -230,7 +234,7 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_lice
 #set(CPACK_PACKAGE_EXECUTABLES "CustusX" "CustusX_navn")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "test_pkg_install")
 if (APPLE)
-    set (CPACK_PACKAGING_INSTALL_PREFIX "/Applications/")  
+    set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
 endif(APPLE)
 
 # special handling of shared libraries: must copy them into the bundle
