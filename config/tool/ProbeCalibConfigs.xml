@@ -1,5 +1,5 @@
 <root>
-	<Version>3.0.5</Version>
+	<Version>3.0.6</Version>
 	<USScanner>
 		<Name>Vivid 7 - Karkirurgen</Name>
 		<USProbe>
@@ -669,6 +669,55 @@
 					<PixelSize>
 						<Width>0.1611</Width>
 						<Height>0.1671</Height>
+					</PixelSize>
+				</Config>
+			</RTSource>
+		</USProbe>
+	</USScanner>
+	<USScanner>
+		<Name>Terason</Name>
+		<USProbe>
+			<Name>4C2</Name>
+			<Type>CurvedLinearArray</Type>
+			<DefaultRTSource>VGA</DefaultRTSource>
+			<RTSource>
+				<Name>VGA</Name>
+				<DefaultConfig>Standard width, 8 cm</DefaultConfig>
+				<Config>
+					<ID>Standard width, 8 cm</ID>
+					<WidthDeg>58.6018</WidthDeg>
+					<Depth>80</Depth>
+					<Offset>63.1391</Offset>
+					<Origin>
+						<Col>358.6825</Col>
+						<Row>-161.8492</Row>
+					</Origin>
+					<NCorners>4</NCorners>
+					<Corner>
+						<Col>205</Col>
+						<Row>112</Row>
+					</Corner>
+					<Corner>
+						<Col>514</Col>
+						<Row>112</Row>
+					</Corner>
+					<Corner>
+						<Col>17</Col>
+						<Row>447</Row>
+					</Corner>
+					<Corner>
+						<Col>704</Col>
+						<Row>447</Row>
+					</Corner>
+					<Edges>
+						<Left>17</Left>
+						<Right>594</Right>
+						<Top>112</Top>
+						<Bottom>537</Bottom>
+					</Edges>
+					<PixelSize>
+						<Width>0.19827</Width>
+						<Height>0.20566</Height>
 					</PixelSize>
 				</Config>
 			</RTSource>
