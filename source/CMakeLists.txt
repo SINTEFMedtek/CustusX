@@ -235,6 +235,11 @@ set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_lice
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "test_pkg_install")
 if (APPLE)
     set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
+    option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
+    option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
+    option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
+    option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+    option (CPACK_SOURCE_TZ "Enable to build TZ source packages" OFF)
 endif(APPLE)
 
 # special handling of shared libraries: must copy them into the bundle
