@@ -215,7 +215,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ DESTINATION ${IN
 #set(CPACK__PACKAGE_NAME "CustusX")
 SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
 #SET(CPACK_SET_DESTDIR "ON")
-message(STATUS "DESTDIR:  " $ENV{DESTDIR})
+#message(STATUS "DESTDIR:  " $ENV{DESTDIR})
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CustusX description summary")# does not work..?
 set(CPACK_PACKAGE_VENDOR "Sintef")# does not work..?
