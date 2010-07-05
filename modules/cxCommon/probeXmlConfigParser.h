@@ -23,9 +23,9 @@ public:
     std::string             mUsProbe;    ///<  probe
     std::string             mRtSource;   ///<  realtime source
     std::string             mConfigId;   ///<  config id
-    int                     mWidthDeg;   ///<  width
+    float                   mWidthDeg;   ///<  width
     int                     mDepth;      ///<  depth
-    int                     mOffset;     ///<  Offset
+    float                   mOffset;     ///<  Offset
     float                   mOriginCol;  ///<  Origin.Col
     float                   mOriginRow;  ///<  Origin.Row
     int                     mNCorners;   ///<  number of corners

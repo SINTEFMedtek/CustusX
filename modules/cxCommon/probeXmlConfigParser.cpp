@@ -105,7 +105,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
     if(element.isNull())
       throw "Can't find WidthDeg";
     bool ok;
-    retval.mWidthDeg = element.text().toInt(&ok);
+    retval.mWidthDeg = element.text().toFloat(&ok);
     if(!ok)
       throw "WidthDeg not a number";
 
@@ -119,7 +119,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
     element = configNode.namedItem("Offset").toElement();
     if(element.isNull())
       throw "Can't find Offset";
-    retval.mOffset = element.text().toInt(&ok);
+    retval.mOffset = element.text().toFloat(&ok);
     if(!ok)
       throw "Offset not a number";
 
@@ -216,7 +216,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
   }
   catch( char * str ) {
-     std::cout << "Exception raised: " << str << std::endl;
+     std::cout << "EXCEPTION RAISED: " << str << std::endl;
   }
   return retval;
 }

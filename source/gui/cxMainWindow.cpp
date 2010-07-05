@@ -343,7 +343,7 @@ void MainWindow::loadPatientFileSlot()
     ssc::messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
   }
   // Open file dialog
-  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Open directory"),
+  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"),
                                                          patientDatafolder,
                                                          QFileDialog::ShowDirsOnly);
   if (choosenDir == QString::null)
@@ -358,7 +358,7 @@ void MainWindow::importDataSlot()
 
   ssc::messageManager()->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName( this,
-                                  QString(tr("Select data file")),
+                                  QString(tr("Select data file for import")),
                                   mSettings->value("globalPatientDataFolder").toString(),
                                   tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
   if(fileName.isEmpty())
