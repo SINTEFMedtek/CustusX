@@ -58,7 +58,7 @@ Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
   
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
-      "ThunderVNN",
+      "PNN",
       QString("ThunderVNN PNN").split(" "),
       mSettings.getElement());
   connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()),   this,                    SLOT(setSettings()));
