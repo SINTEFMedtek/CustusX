@@ -779,6 +779,12 @@ void MainWindow::closeEvent(QCloseEvent *event)
   mSettings->setValue("mainWindow/windowState", saveState());
   mSettings->sync();
   ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
+  
+  if toolManager()->isTracking()
+  {
+    toolManager()->stopTracking();
+    ssc::messageManager()->sendInfo("Stopping tracking");
+  }
   QMainWindow::closeEvent(event);
 }
 }//namespace cx
