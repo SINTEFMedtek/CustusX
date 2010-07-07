@@ -8,6 +8,7 @@
 
 #include "sscMesh.h"
 #include "sscView.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -39,11 +40,21 @@ void GeometricRep::removeRepActorsFromViewRenderer(View* view)
 }
 void GeometricRep::setMesh(MeshPtr mesh)
 {
+  if (mesh == mMesh)
+    return;
+  if(mMesh)
+  {
+    disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+  }
 	mMesh = mesh;
-	mMesh->connectToRep(mSelf);
-
-	mMapper->SetInput( mesh->getVtkPolyData() );
+  if (mMesh)
+  {
+    connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+    meshChangedSlot();
+  }
+  
 }
+  
 MeshPtr GeometricRep::getMesh()
 {
   return mMesh;
@@ -52,11 +63,19 @@ bool GeometricRep::hasMesh(MeshPtr mesh) const
 {
 	return (mMesh != NULL);
 }
-
-void GeometricRep::setColor(const Vector3D& color)
+  
+void GeometricRep::meshChangedSlot()
 {
-  Vector3D c = color;
-  mActor->GetProperty()->SetColor(c.begin());
+	mMesh->connectToRep(mSelf);
+  
+	mMapper->SetInput( mMesh->getVtkPolyData() );
+  
+  //Set mesh color
+  mActor->GetProperty()->SetColor(mMesh->getColor().redF(),
+                                  mMesh->getColor().greenF(),
+                                  mMesh->getColor().blueF());
+  //Set mesh opacity
+  mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
 }
   
 //---------------------------------------------------------

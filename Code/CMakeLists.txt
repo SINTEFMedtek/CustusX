@@ -40,6 +40,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscDataManager.h
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
+    Data/sscMesh.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -61,6 +62,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscCrossHairRep2D.h
     Rep/sscTexture3DSlicerRep.h
     Rep/sscSlicePlanes3DRep.h
+    Rep/sscGeometricRep.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h

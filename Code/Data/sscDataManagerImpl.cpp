@@ -366,7 +366,11 @@ MeshPtr DataManagerImpl::getMesh(const std::string& uid)
 	return mMeshes[uid];
 }
   
-std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() { return std::map<std::string, MeshPtr>();  }
+std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() 
+{
+  return mMeshes;
+}
+
 std::map<std::string, std::string> DataManagerImpl::getMeshUidsWithNames() const 
 {
 	std::map<std::string, std::string> retval;
