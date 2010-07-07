@@ -27,6 +27,7 @@
 #include "cxPatientData.h"
 #include "cxRegistrationHistoryWidget.h"
 #include "cxDataLocations.h"
+#include "cxMeshPropertiesWidget.h"
 
 namespace cx
 {
@@ -45,6 +46,7 @@ MainWindow::MainWindow() :
   mCustomStatusBar(new CustomStatusBar()),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
+  mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
   mReconstructionWidget(new ssc::ReconstructionWidget(this, DataLocations::getAppDataPath(), DataLocations::getShaderPath() )),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
@@ -100,6 +102,7 @@ MainWindow::MainWindow() :
 
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mToolPropertiesWidget);
+  this->addAsDockWidget(mMeshPropertiesWidget);
   this->addAsDockWidget(mPointSamplingWidget);
   this->addAsDockWidget(mReconstructionWidget);
   this->addAsDockWidget(mRegistrationHistoryWidget);
