@@ -782,8 +782,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
   
   if (toolManager()->isTracking())
   {
+    ssc::messageManager()->sendInfo("Closing: Stopping tracking");
     toolManager()->stopTracking();
-    ssc::messageManager()->sendInfo("Stopping tracking");
   }
   QMainWindow::closeEvent(event);
 }
