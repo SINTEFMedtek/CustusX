@@ -626,7 +626,8 @@ void Reconstructer::calibrate(QString calFilesPath)
   ssc::Transform3D R = (Rx*Ry);
   
   int x_u = mConfiguration.mOriginCol * mConfiguration.mPixelWidth;
-  int y_u = mConfiguration.mOriginRow * mConfiguration.mPixelHeight;
+  // Is offset in mm, while col and row is in pixels?
+  int y_u = (mConfiguration.mOriginRow * mConfiguration.mPixelHeight) - mConfiguration.mOffset; //Why minus and not plus?
   ssc::Vector3D origin_u(x_u, y_u, 0);
   ssc::Vector3D origin_rotated = R.coord(origin_u);
   
