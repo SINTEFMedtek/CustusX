@@ -195,6 +195,7 @@ protected:
   CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
   class ImagePropertiesWidget* mImagePropertiesWidget; ///< display and control of image properties for active image.
   class ToolPropertiesWidget* mToolPropertiesWidget; ///< display and control of tool properties for active tool.
+  class MeshPropertiesWidget* mMeshPropertiesWidget; ///< Display and control image properties for active mesh
   class PointSamplingWidget* mPointSamplingWidget;
   ssc::ReconstructionWidget* mReconstructionWidget;
   class RegistrationHistoryWidget* mRegistrationHistoryWidget; ///< look back in registration history.

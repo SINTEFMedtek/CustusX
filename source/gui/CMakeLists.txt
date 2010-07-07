@@ -22,6 +22,7 @@ SET(cxProject_MOC_HDRS
   cxShiftCorrectionWidget.h
   cxRegistrationHistoryWidget.h
   cxImagePropertiesWidget.h
+  cxMeshPropertiesWidget.h
   cxToolPropertiesWidget.h
   cxPointSamplingWidget.h
   cxDataInterface.h
@@ -78,6 +79,8 @@ SET(${LIBNAME}_SRCS
     cxRegistrationHistoryWidget.cpp
     cxImagePropertiesWidget.h
     cxImagePropertiesWidget.cpp
+    cxMeshPropertiesWidget.h
+    cxMeshPropertiesWidget.cpp
     cxToolPropertiesWidget.h
     cxToolPropertiesWidget.cpp
     cxPointSamplingWidget.h
