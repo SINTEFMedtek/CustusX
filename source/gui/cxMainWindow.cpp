@@ -780,7 +780,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
   mSettings->sync();
   ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
   
-  if toolManager()->isTracking()
+  if (toolManager()->isTracking())
   {
     toolManager()->stopTracking();
     ssc::messageManager()->sendInfo("Stopping tracking");
