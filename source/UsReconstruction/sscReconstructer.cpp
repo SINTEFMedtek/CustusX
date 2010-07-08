@@ -627,7 +627,7 @@ void Reconstructer::calibrate(QString calFilesPath)
   
   int x_u = mConfiguration.mOriginCol * mConfiguration.mPixelWidth;
   // Is offset in mm, while col and row is in pixels?
-  int y_u = (mConfiguration.mOriginRow * mConfiguration.mPixelHeight) - mConfiguration.mOffset; //Why minus and not plus?
+  int y_u = (mConfiguration.mOriginRow * mConfiguration.mPixelHeight);// - mConfiguration.mOffset; //Why minus and not plus?
   ssc::Vector3D origin_u(x_u, y_u, 0);
   ssc::Vector3D origin_rotated = R.coord(origin_u);
   
@@ -942,7 +942,12 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
     mMask = this->createMaskFromConfigParams();
   }
 
-  this->calibrateTimeStamps();
+  // Only use this if the time stamps have different formats
+  // The function assumes that both lists of time stamps start at the same time,
+  // and that is not completely corrcet.
+  //this->calibrateTimeStamps();
+  // Use the time calibration from the aquisition module
+  this->calibrateTimeStamps(0.0, 0.0);
 
   this->calibrate(calFilesPath);
   //mPos (in mPositions) is now prMu
