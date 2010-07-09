@@ -157,8 +157,8 @@
 						<Bottom>410</Bottom>
 					</Edges>
 					<PixelSize>
-						<Width>0.1236</Width>
-						<Height>0.1282</Height>
+						<Width>0.1074</Width>
+						<Height>0.1114</Height>
 					</PixelSize>
 				</Config>
 				<Config>
@@ -194,8 +194,8 @@
 						<Bottom>411</Bottom>
 					</Edges>
 					<PixelSize>
-						<Width>0.1545</Width>
-						<Height>0.1603</Height>
+						<Width>0.1343</Width>
+						<Height>0.1393</Height>
 					</PixelSize>
 				</Config>
 				<Config>
@@ -231,8 +231,8 @@
 						<Bottom>411</Bottom>
 					</Edges>
 					<PixelSize>
-						<Width>0.1854</Width>
-						<Height>0.1923</Height>
+						<Width>0.1611</Width>
+						<Height>0.1671</Height>
 					</PixelSize>
 				</Config>
 			</RTSource>
