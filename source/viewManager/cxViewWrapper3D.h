@@ -51,6 +51,7 @@ private:
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   ssc::GeometricRepPtr mGeometricRep;
+  //std::map<std::string, ssc::GeometricRepPtr> mGeometricReps;//TODO: Replace mGeometricRep with this
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
