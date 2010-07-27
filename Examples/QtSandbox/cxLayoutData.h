@@ -56,18 +56,26 @@ public:
     int mGroup; ///< what group to connect to. -1 means not set.
     ssc::PLANE_TYPE mPlane; ///< ptNOPLANE means 3D
     LayoutRegion mRegion;
+
+    void addXml(QDomNode node) const; ///< save state to xml
+    void parseXml(QDomNode node);///< load state from xml
   };
 
   typedef std::vector<ViewData> ViewDataContainer;
   typedef ViewDataContainer::iterator iterator;
+  typedef ViewDataContainer::const_iterator const_iterator;
 
 public:
   LayoutData();
+  QString getName() const { return mName; }
+  void setName(const QString& name) { mName = name; }
 //  const ViewData& get(LayoutPosition pos) const;
   ViewData& get(LayoutPosition pos);
   //void set(ViewData view);
   iterator begin() { return mView.begin(); }
   iterator end()  { return mView.end(); }
+  const_iterator begin() const { return mView.begin(); }
+  const_iterator end() const { return mView.end(); }
   iterator find(LayoutPosition pos);
 
   void split(iterator iter);
@@ -76,8 +84,8 @@ public:
   void resize(int rows, int cols);
   LayoutPosition size() const { return mSize; }
 
-  void addXml(QDomNode& parentNode); ///< save state to xml
-  void parseXml(QDomNode parentNode);///< load state from xml
+  void addXml(QDomNode node) const; ///< save state to xml
+  void parseXml(QDomNode node);///< load state from xml
 
 private:
   QString mName;

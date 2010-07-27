@@ -6,6 +6,8 @@
  */
 #include "cxLayoutData.h"
 #include <iostream>
+#include <QDomElement>
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -21,7 +23,31 @@ LayoutRegion merge(LayoutRegion a, LayoutRegion b)
 }
 
 
-LayoutData::LayoutData()
+void LayoutData::ViewData::addXml(QDomNode node) const
+{
+  QDomElement elem = node.toElement();
+  elem.setAttribute("group", qstring_cast(mGroup));
+  elem.setAttribute("type", qstring_cast((int)mPlane));
+  elem.setAttribute("row", qstring_cast(mRegion.pos.row));
+  elem.setAttribute("col", qstring_cast(mRegion.pos.col));
+  elem.setAttribute("rowSpan", qstring_cast(mRegion.span.row));
+  elem.setAttribute("colSpan", qstring_cast(mRegion.span.col));
+}
+
+void LayoutData::ViewData::parseXml(QDomNode node)
+{
+  QDomElement elem = node.toElement();
+  mGroup = elem.attribute("group").toInt();
+  mGroup = elem.attribute("type").toInt();
+  mRegion.pos.row = elem.attribute("row").toInt();
+  mRegion.pos.col = elem.attribute("col").toInt();
+  mRegion.span.row = elem.attribute("rowSpan").toInt();
+  mRegion.span.col = elem.attribute("colSpan").toInt();
+}
+
+
+LayoutData::LayoutData() :
+  mName("unnamed")
 {
   mSize = LayoutPosition(0,0);
   this->resize(1,3);
@@ -154,6 +180,51 @@ LayoutData::iterator LayoutData::find(LayoutPosition pos)
   return this->end();
 }
 
+void LayoutData::addXml(QDomNode node) const
+{
+  QDomDocument doc = node.ownerDocument();
+  QDomElement elem = node.toElement();
+
+  elem.setAttribute("name", mName);
+
+  for (const_iterator iter=this->begin(); iter!=this->end(); ++iter)
+  {
+    QDomElement view = doc.createElement("view");
+    iter->addXml(view);
+    elem.appendChild(view);
+  }
+//
+//  QDomElement base = doc.createElement("registrationHistory");
+//  parentNode.appendChild(base);
+//
+//  QDomElement currentTime = doc.createElement("currentTime");
+//  currentTime.appendChild(doc.createTextNode(mCurrentTime.toString(timestampSecondsFormat())));
+//  base.appendChild(currentTime);
+//
+//  for (unsigned i = 0; i < mData.size(); ++i)
+//  {
+//    mData[i].addXml(base);
+//  }
+}
+
+void LayoutData::parseXml(QDomNode node)
+{
+  if (node.isNull())
+    return;
+
+  QDomElement elem = node.toElement();
+  mName = elem.attribute("name");
+
+  mView.clear();
+  // iterate over all views
+  QDomElement currentElem = elem.firstChildElement("view");
+  for ( ; !currentElem.isNull(); currentElem = currentElem.nextSiblingElement("view"))
+  {
+    ViewData viewData;
+    viewData.parseXml(currentElem);
+    mView.push_back(viewData);
+  }
+}
 
 
 } // namespace cx

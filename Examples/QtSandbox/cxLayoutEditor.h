@@ -11,7 +11,9 @@
 
 #include <map>
 #include <QWidget>
+#include <QLineEdit>
 class QFrame;
+class QSpinBox;
 class QLabel;
 class QBoxLayout;
 class QGridLayout;
@@ -20,6 +22,22 @@ class QLineEdit;
 
 namespace cx
 {
+
+
+/**A QLineEdit
+ */
+class SmallLineEdit : public QLineEdit
+{
+public:
+  SmallLineEdit(QWidget* parent = 0) : QLineEdit(parent) {}
+  virtual QSize sizeHint() const
+  {
+    QSize size = QLineEdit::minimumSizeHint();
+    size.setWidth(size.height()*2);
+    return size;
+  }
+};
+
 
 class LayoutEditor : public QWidget
 {
@@ -46,11 +64,13 @@ public:
   LayoutEditor(QWidget* parent);
 
 private slots:
+  void accept();
   void rcChanged();
   void contextMenuSlot(const QPoint& point);
   void splitActionSlot();
   void groupActionSlot();
   void typeActionSlot();
+  void nameChanged();
 
   //void setNiceSize();
 private:
@@ -58,8 +78,9 @@ private:
   QBoxLayout* mRCLayout;
   QGridLayout* mLayout;
   //QWidget* mGridWidget;
-  QLineEdit* mRowsEdit;
-  QLineEdit* mColsEdit;
+  QSpinBox* mRowsEdit;
+  QSpinBox* mColsEdit;
+  QLineEdit* mNameEdit;
   void initCache();
   void resizeLayout(int rows, int cols);
   void clearDisplay();

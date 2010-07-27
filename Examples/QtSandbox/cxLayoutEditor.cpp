@@ -10,6 +10,7 @@
 #include <QtGui>
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
+#include "sscUtilHelpers.h"
 
 namespace cx
 {
@@ -19,6 +20,8 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   QWidget(parent)
 {
   mTopLayout = new QVBoxLayout(this);
+  QHBoxLayout* nameLayout = new QHBoxLayout;
+  mTopLayout->addLayout(nameLayout);
   mRCLayout = new QHBoxLayout;
   mTopLayout->addLayout(mRCLayout);
   mLayout = new QGridLayout;
@@ -26,15 +29,31 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   mLayout->setSpacing(2);
   mTopLayout->addLayout(mLayout);
 
+  mNameEdit = new QLineEdit;
+  connect(mNameEdit, SIGNAL(editingFinished()), this, SLOT(nameChanged()));
+  nameLayout->addWidget(new QLabel("Name"));
+  nameLayout->addWidget(mNameEdit);
+
   // create the row/column bar
-  mRowsEdit = new QLineEdit;
-  mColsEdit = new QLineEdit;
-  connect(mRowsEdit, SIGNAL(editingFinished()), this, SLOT(rcChanged()));
-  connect(mColsEdit, SIGNAL(editingFinished()), this, SLOT(rcChanged()));
+  mRowsEdit = new QSpinBox;
+  mRowsEdit->setRange(1,10);
+  mColsEdit = new QSpinBox;
+  mColsEdit->setRange(1,10);
+//  mColsEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+  connect(mRowsEdit, SIGNAL(valueChanged(int)), this, SLOT(rcChanged()));
+  connect(mColsEdit, SIGNAL(valueChanged(int)), this, SLOT(rcChanged()));
+//  connect(mRowsEdit, SIGNAL(editingFinished()), this, SLOT(rcChanged()));
+//  connect(mColsEdit, SIGNAL(editingFinished()), this, SLOT(rcChanged()));
   mRCLayout->addWidget(new QLabel("Rows"));
   mRCLayout->addWidget(mRowsEdit);
   mRCLayout->addWidget(new QLabel("Columns"));
   mRCLayout->addWidget(mColsEdit);
+  mRCLayout->addStretch();
+
+  QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+  mTopLayout->addWidget(buttonBox);
 
   for (int i=ssc::ptNOPLANE; i<ssc::ptCOUNT; ++i)
   {
@@ -46,6 +65,16 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   initCache();
 
   this->updateGrid();
+}
+
+void LayoutEditor::accept()
+{
+  std::cout << streamXml2String(mViewData) << std::endl;
+}
+
+void LayoutEditor::nameChanged()
+{
+  mViewData.setName(mNameEdit->text());
 }
 
 void LayoutEditor::contextMenuSlot(const QPoint& point)
@@ -203,9 +232,12 @@ void LayoutEditor::mouseReleaseEvent(QMouseEvent* event)
  */
 void LayoutEditor::rcChanged()
 {
-  int rows = mRowsEdit->text().toInt();
-  int cols = mColsEdit->text().toInt();
-  this->resizeLayout(rows, cols);
+//  int rows = mRowsEdit->text().toInt();
+//  int cols = mColsEdit->text().toInt();
+//  rows = ssc::constrainValue(rows, 1, 10);
+//  cols = ssc::constrainValue(cols, 1, 10);
+//  this->resizeLayout(rows, cols);
+  this->resizeLayout(mRowsEdit->value(), mColsEdit->value());
 }
 
 /** Merge all views from r1,c1 to and including r2,c2.
@@ -258,8 +290,11 @@ void LayoutEditor::updateGrid()
       gridData.mLabel->setText(QString("%1/%2").arg(iter->mGroup).arg(mPlaneNames[iter->mPlane]));
   }
 
-  mRowsEdit->setText(qstring_cast(mViewData.size().row));
-  mColsEdit->setText(qstring_cast(mViewData.size().col));
+  mNameEdit->setText(mViewData.getName());
+//  mRowsEdit->setText(qstring_cast(mViewData.size().row));
+//  mColsEdit->setText(qstring_cast(mViewData.size().col));
+  mRowsEdit->setValue(mViewData.size().row);
+  mColsEdit->setValue(mViewData.size().col);
 
   this->colorRegion(LayoutRegion(-1,-1,1,1), "lightgrey", "lightgrey");
 
