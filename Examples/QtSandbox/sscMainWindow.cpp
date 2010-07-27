@@ -1,4 +1,5 @@
 #include "sscMainWindow.h"
+#include "cxLayoutEditor.h"
 
 namespace ssc
 {
@@ -21,6 +22,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     //setUnifiedTitleAndToolBarOnMac(true);
 
     createStatusBar();
+
+	cx::LayoutEditor* editor = new cx::LayoutEditor(this);
+    this->setCentralWidget(editor);
 }
 
 void MainWindow::addActions()

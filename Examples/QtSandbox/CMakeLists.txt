@@ -13,11 +13,14 @@ include (${SSC_USE_FILE})
 
 SET( MOC_HEADER_FILES
     sscMainWindow.h
+    cxLayoutEditor.h
     )
 
 # library
 SET( SOURCE_FILES
     sscMainWindow.cpp
+    cxLayoutEditor.cpp
+    cxLayoutData.cpp
     main.cpp
 	) 
 	
