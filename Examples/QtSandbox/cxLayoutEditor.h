@@ -62,6 +62,8 @@ public:
 //    };
 
   LayoutEditor(QWidget* parent);
+  void setLayoutData(const LayoutData& data);
+  LayoutData getLayoutData() const;
 
 private slots:
   void accept();

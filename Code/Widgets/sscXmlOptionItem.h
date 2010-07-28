@@ -46,6 +46,8 @@ public:
   QDomElement getElement(QString level1, QString level2);
   void save();
 
+  static void clean(QDomElement elem);
+
 private:
   void load();
   QDomElement safeGetElement(QDomElement parent, QString childName);

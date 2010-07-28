@@ -111,6 +111,11 @@ QDomElement XmlOptionFile::getElement(QString level1, QString level2)
   return elem2;
 }
 
+void XmlOptionFile::clean(QDomElement elem)
+{
+
+}
+
 void XmlOptionFile::save()
 {
   QFile file(mFilename);

@@ -67,6 +67,17 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   this->updateGrid();
 }
 
+void LayoutEditor::setLayoutData(const LayoutData& data)
+{
+  mViewData = data;
+  this->updateGrid();
+}
+
+LayoutData LayoutEditor::getLayoutData() const
+{
+  return mViewData;
+}
+
 void LayoutEditor::accept()
 {
   std::cout << streamXml2String(mViewData) << std::endl;
