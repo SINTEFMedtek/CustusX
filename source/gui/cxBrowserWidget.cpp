@@ -67,31 +67,31 @@ void BrowserWidget::populateTreeWidget()
   mTreeWidget->resize(this->size());
 
 
-  //make QTreeWidgetItems for all the views
-  LayoutType layoutType = viewManager()->getActiveLayout();
+//  //make QTreeWidgetItems for all the views
+//  LayoutType layoutType = viewManager()->getActiveLayout();
   int numberOf3DViews = 0;
   int numberOf2DViews = 0;
-  switch(layoutType)
-  {
-    case LAYOUT_NONE:
-      break;
-    case LAYOUT_3D_1X1:
-      numberOf3DViews = 1;
-      break;
-    /*case LAYOUT_3DACS_2X2: INRIA
-      numberOf3DViews = 1;
-      numberOf2DViews = 3;
-      break;
-    case LAYOUT_3DACS_1X3: INRIA
-      numberOf3DViews = 1;
-      numberOf2DViews = 3;
-      break;
-    case LAYOUT_ACSACS_2X3: INRIA
-      numberOf2DViews = 6;
-      break;*/
-    default:
-      break;
-  }
+//  switch(layoutType)
+//  {
+//    case LAYOUT_NONE:
+//      break;
+//    case LAYOUT_3D_1X1:
+//      numberOf3DViews = 1;
+//      break;
+//    /*case LAYOUT_3DACS_2X2: INRIA
+//      numberOf3DViews = 1;
+//      numberOf2DViews = 3;
+//      break;
+//    case LAYOUT_3DACS_1X3: INRIA
+//      numberOf3DViews = 1;
+//      numberOf2DViews = 3;
+//      break;
+//    case LAYOUT_ACSACS_2X3: INRIA
+//      numberOf2DViews = 6;
+//      break;*/
+//    default:
+//      break;
+//  }
   QList<QTreeWidgetItem *> viewItems;
   std::map<std::string, View3D*>::iterator view3Diter = view3DMap->begin();
   while(view3Diter != view3DMap->end())

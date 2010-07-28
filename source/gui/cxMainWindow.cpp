@@ -28,6 +28,7 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
+#include "cxLayoutEditor.h"
 
 namespace cx
 {
@@ -57,6 +58,7 @@ MainWindow::MainWindow() :
   mSettings(DataLocations::getSettings()),
   mPatientData(new PatientData(this))
 {
+  mLayoutActionGroup = NULL;
 #ifdef VERSION_NUMBER_VERBOSE
   this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER_VERBOSE));
 #else
@@ -97,6 +99,9 @@ MainWindow::MainWindow() :
 
   // initialize toolmanager config file
   toolManager()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+
+  connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
+  this->layoutChangedSlot();
 
   this->changeState(PATIENT_DATA, PATIENT_DATA);
 
@@ -234,16 +239,26 @@ void MainWindow::createActions()
   connect(mSaveToolsPositionsAction, SIGNAL(triggered()), 
           toolManager(), SLOT(saveToolsSlot()));
 
-  //layout
-  mLayoutActionGroup = new QActionGroup(this);
-  mLayoutActionGroup->setExclusive(true);
+//  //layout
+//  mLayoutActionGroup = new QActionGroup(this);
+//  mLayoutActionGroup->setExclusive(true);
   
-  std::vector<LayoutType> layouts = ViewManager::getInstance()->availableLayouts();
-  for (unsigned i=0; i<layouts.size(); ++i)
-    addLayoutAction(layouts[i]);
+//  std::vector<LayoutType> layouts = ViewManager::getInstance()->availableLayouts();
+//  for (unsigned i=0; i<layouts.size(); ++i)
+//    addLayoutAction(layouts[i]);
 
-  connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
-  layoutChangedSlot();
+//  connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
+//  layoutChangedSlot();
+
+  mNewLayoutAction = new QAction(tr("New Layout"), this);
+  mNewLayoutAction->setToolTip("Create a new Custom Layout");
+  connect(mNewLayoutAction, SIGNAL(triggered()), this, SLOT(newCustomLayoutSlot()));
+  mEditLayoutAction = new QAction(tr("Edit Layout"), this);
+  mEditLayoutAction->setToolTip("Edit the current Custom Layout");
+  connect(mEditLayoutAction, SIGNAL(triggered()), this, SLOT(editCustomLayoutSlot()));
+  mDeleteLayoutAction = new QAction(tr("Delete Layout"), this);
+  mDeleteLayoutAction->setToolTip("Delete the current Custom Layout");
+  connect(mDeleteLayoutAction, SIGNAL(triggered()), this, SLOT(deleteCustomLayoutSlot()));
 
   //context widgets
   this->addDockWidget(Qt::LeftDockWidgetArea, mContextDockWidget);
@@ -393,37 +408,97 @@ void MainWindow::patientChangedSlot()
  */
 void MainWindow::layoutChangedSlot()
 {
-  LayoutType type = viewManager()->getActiveLayout();
-  QList<QAction*> actions = mLayoutActionGroup->actions();
-  for (int i=0; i<actions.size(); ++i)
+  // reset list of available layouts
+  delete mLayoutActionGroup;
+  mLayoutActionGroup = viewManager()->createLayoutActionGroup();
+
+  mLayoutMenu->addActions(mLayoutActionGroup->actions());
+
+  bool editable = viewManager()->isCustomLayout(viewManager()->getActiveLayout());
+  mEditLayoutAction->setEnabled(editable);
+  mDeleteLayoutAction->setEnabled(editable);
+}
+
+/**create and execute a dialog for determining layout.
+ * Return layout data, or invalid layout data if cancelled.
+ */
+LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
+{
+  boost::shared_ptr<QDialog> dialog(new QDialog);
+  dialog->setWindowTitle(title);
+  QVBoxLayout* layout = new QVBoxLayout(dialog.get());
+  layout->setMargin(0);
+
+  LayoutEditor* editor = new LayoutEditor(dialog.get());
+
+  LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
+//  std::cout << "AA:" << streamXml2String(data) << std::endl;
+  if (createNew)
   {
-    if (actions[i]->data().toInt()==static_cast<int>(type))
-      actions[i]->setChecked(true);
+    data.resetUid(viewManager()->generateLayoutUid());
   }
+  editor->setLayoutData(data);
+  layout->addWidget(editor);
+
+  QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  connect(buttonBox, SIGNAL(accepted()), dialog.get(), SLOT(accept()));
+  connect(buttonBox, SIGNAL(rejected()), dialog.get(), SLOT(reject()));
+  layout->addWidget(buttonBox);
+
+  if (!dialog->exec())
+    return LayoutData();
+
+  return editor->getLayoutData();
 }
 
-/** Called when a layout is selected: introspect the sending action
- *  in order to get correct layout; set it.
- */
-void MainWindow::setLayoutSlot()
+void MainWindow::newCustomLayoutSlot()
 {
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (!action)
+  LayoutData data = this->executeLayoutEditorDialog("New Custom Layout", true);
+  if (data.getUid().isEmpty())
     return;
-  LayoutType type = static_cast<LayoutType>(action->data().toInt());
-  viewManager()->setActiveLayout(type);
+  viewManager()->setLayoutData(data);
+  viewManager()->setActiveLayout(data.getUid());
 }
 
-/** Add one layout as an action to the layout menu.
- */
-QAction* MainWindow::addLayoutAction(LayoutType layout)
+void MainWindow::editCustomLayoutSlot()
 {
-  QAction* action = new QAction(qstring_cast(ViewManager::layoutText(layout)), mLayoutActionGroup);
-  action->setCheckable(true);
-  action->setData(QVariant(static_cast<int>(layout)));
-  connect(action, SIGNAL(triggered()), this, SLOT(setLayoutSlot()));
-  return action;
+  LayoutData data = this->executeLayoutEditorDialog("Edit Current Custom Layout", false);
+  if (data.getUid().isEmpty())
+    return;
+  viewManager()->setLayoutData(data);
 }
+
+void MainWindow::deleteCustomLayoutSlot()
+{
+  if (!QMessageBox::question(this, "Delete current layout", "Do you really want to delete the current layout?"))
+    return;
+  viewManager()->deleteLayoutData(viewManager()->getActiveLayout());
+  viewManager()->setActiveLayout(viewManager()->getAvailableLayouts().front()); // revert to existing state
+}
+
+///** Called when a layout is selected: introspect the sending action
+// *  in order to get correct layout; set it.
+// */
+//void MainWindow::setLayoutSlot()
+//{
+//  QAction* action = dynamic_cast<QAction*>(sender());
+//  if (!action)
+//    return;
+////  LayoutType type = static_cast<LayoutType>(action->data().toInt());
+//  viewManager()->setActiveLayout(action->data().toString());
+//}
+
+///** Add one layout as an action to the layout menu.
+// */
+//QAction* MainWindow::addLayoutAction(QString layout)
+//{
+//  LayoutData data = viewManager()->getLayoutData(layout);
+//  QAction* action = new QAction(data.getName(), mLayoutActionGroup);
+//  action->setCheckable(true);
+//  action->setData(QVariant(layout));
+//  connect(action, SIGNAL(triggered()), this, SLOT(setLayoutSlot()));
+//  return action;
+//}
 
 void MainWindow::createMenus()
 {
@@ -477,7 +552,12 @@ void MainWindow::createMenus()
 
   //layout
   this->menuBar()->addMenu(mLayoutMenu);
-  mLayoutMenu->addActions(mLayoutActionGroup->actions());
+//  mLayoutMenu->addActions(mLayoutActionGroup->actions());
+//  mLayoutSeparator = mLayoutMenu->addSeparator();
+  mLayoutMenu->addAction(mNewLayoutAction);
+  mLayoutMenu->addAction(mEditLayoutAction);
+  mLayoutMenu->addAction(mDeleteLayoutAction);
+  mLayoutMenu->addSeparator();
 }
 
 void MainWindow::createToolBars()

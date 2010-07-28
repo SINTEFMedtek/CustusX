@@ -11,6 +11,7 @@
 #include "sscProbeRep.h"
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
+#include "sscXmlOptionItem.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
@@ -21,19 +22,6 @@
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
-
-SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(cx, LayoutType, LAYOUT_COUNT)
-{
-  "No_layout",
-  "3D_1X1",
-  "3DACS_2X2",
-  "3DACS_1X3",
-  "3DAny_1X2",
-  "ACS_1X3",
-  "ACSACS_2X3",
-  "Any_2x3"
-}
-SNW_DEFINE_ENUM_STRING_CONVERTERS_END(cx, LayoutType, LAYOUT_COUNT);
 
 namespace cx
 {
@@ -51,7 +39,6 @@ ViewManager* ViewManager::getInstance()
 void ViewManager::destroyInstance()
 {}
 ViewManager::ViewManager() :
-  mActiveLayout(LAYOUT_NONE),
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
   MAX_3DVIEWS(2),
@@ -63,6 +50,9 @@ ViewManager::ViewManager() :
   mGlobal2DZoom(true),
   mGlobalObliqueOrientation(false)
 {
+  this->addDefaultLayouts();
+  this->loadGlobalSettings();
+
   mLayout->setSpacing(2);
   mLayout->setMargin(4);
   mMainWindowsCentralWidget->setLayout(mLayout);
@@ -125,7 +115,7 @@ ViewManager::ViewManager() :
   this->syncOrientationMode(SyncedValue::create(0));
 
   // set start layout
-  this->setActiveLayout(LAYOUT_3DACS_2X2_SNW);
+  this->setActiveLayout("LAYOUT_3DACS_2X2");
   //this->setActiveLayout(LAYOUT_3DACS_1X3_SNW);
 
   mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
@@ -142,38 +132,20 @@ ViewManager::ViewManager() :
 ViewManager::~ViewManager()
 {}
 
-std::string ViewManager::layoutText(LayoutType type)
-{
-  return string_cast(type);
-}
-
-std::vector<LayoutType> ViewManager::availableLayouts() const
-{
-  std::vector<LayoutType> retval;
-  retval.push_back(LAYOUT_3D_1X1);
-  retval.push_back(LAYOUT_3DACS_2X2_SNW);
-  retval.push_back(LAYOUT_3DACS_1X3_SNW);
-  retval.push_back(LAYOUT_3DAny_1X2_SNW);
-  retval.push_back(LAYOUT_ACS_1X3_SNW);
-  retval.push_back(LAYOUT_ACSACS_2X3_SNW);
-  retval.push_back(LAYOUT_Any_2x3_SNW);
-  return retval;
-}
-
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
   for (unsigned i=0; i<mViewGroups.size(); ++i)
     mViewGroups[i]->setRegistrationMode(mode);
 }
 
-LayoutType ViewManager::getActiveLayout() const
+QString ViewManager::getActiveLayout() const
 {
   return mActiveLayout;
 }
 
 /**Change layout from current to layout.
  */
-void ViewManager::setActiveLayout(LayoutType layout)
+void ViewManager::setActiveLayout(const QString& layout)
 {
   if (mActiveLayout==layout)
     return;
@@ -246,7 +218,7 @@ void ViewManager::addXml(QDomNode& parentNode)
   viewManagerNode.appendChild(global2DZoomNode);
 
   QDomElement activeLayoutNode = doc.createElement("activeLayout");
-  activeLayoutNode.appendChild(doc.createTextNode(layoutText(mActiveLayout).c_str()));
+  activeLayoutNode.appendChild(doc.createTextNode(mActiveLayout));
   viewManagerNode.appendChild(activeLayoutNode);
 
   QDomElement activeViewNode = doc.createElement("activeView");
@@ -264,10 +236,40 @@ void ViewManager::addXml(QDomNode& parentNode)
 
     mViewGroups[i]->addXml(viewGroupNode);
   }
+
+//  QDomElement layoutsNode = doc.createElement("layouts");
+//  viewManagerNode.appendChild(layoutsNode);
+//  for (LayoutDataVector::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+//  {
+//    if (!this->isCustomLayout(iter->getUid()))
+//      continue; // dont store default layouts - they are created automatically.
+//
+//    QDomElement layoutNode = doc.createElement("layout");
+//    layoutsNode.appendChild(layoutNode);
+//    iter->addXml(layoutNode);
+//  }
+
+
 }
 
 void ViewManager::parseXml(QDomNode viewmanagerNode)
 {
+//  mLayouts.clear();
+//
+//  QDomElement layouts = viewmanagerNode.namedItem("layouts").toElement();
+//  QDomNode layout = layouts.firstChild();
+//  for( ; !layout.isNull(); layout = layout.nextSibling())
+//  {
+//    if (layout.toElement().tagName()!="layout")
+//      continue;
+//
+//    LayoutData data;
+//    data.parseXml(layout);
+//    this->setLayoutData(data);
+////    mLayouts.push_back(data);
+//  }
+//  this->addDefaultLayouts(); // ensure we overwrite loaded layouts
+
   QString activeViewString;
   QDomNode child = viewmanagerNode.firstChild();
   while(!child.isNull())
@@ -283,7 +285,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
     {
       const QString activeLayoutString = child.toElement().text();
       if(!activeLayoutString.isEmpty())
-        this->setActiveLayout(string2enum<LayoutType>(activeLayoutString.toStdString()));
+        this->setActiveLayout(activeLayoutString);
     }
     else if(child.toElement().tagName() == "activeView")
     {
@@ -296,7 +298,6 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
   }
 
   QDomElement viewgroups = viewmanagerNode.namedItem("viewGroups").toElement();
-
   QDomNode viewgroup = viewgroups.firstChild();
   while(!viewgroup.isNull())
   {
@@ -381,45 +382,59 @@ void ViewManager::deactivateCurrentLayout()
   for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
     deactivateView(iter->second);
 
-  this->setStretchFactors( 0, 0, 10, 10, 0);
+  this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
 }
 
 /**activate a layout. Assumes the previous layout is already deactivated.
  */
-void ViewManager::activateLayout(LayoutType toType)
+void ViewManager::activateLayout(const QString& toType)
 {
-  switch(toType)
-  {
-  case LAYOUT_NONE:
-    this->activateLayout_3D_1X1();
-    break;
-  case LAYOUT_3D_1X1:
-    this->activateLayout_3D_1X1();
-    break;
-  case LAYOUT_3DACS_2X2_SNW:
-    this->activateLayout_3DACS_2X2_SNW();
-    break;
-  case LAYOUT_3DACS_1X3_SNW:
-    this->activateLayout_3DACS_1X3_SNW();
-    break;
-  case LAYOUT_3DAny_1X2_SNW:
-    this->activateLayout_3DAny_1X2_SNW();
-    break;
-  case LAYOUT_ACS_1X3_SNW:
-    this->activateLayout_ACS_1X3_SNW();
-    break;
-  case LAYOUT_ACSACS_2X3_SNW:
-    this->activateLayout_ACSACS_2X3_SNW();
-    break;
-  case LAYOUT_Any_2x3_SNW:
-    this->activateLayout_Any_2X3_SNW();
-    break;
-  default:
+  LayoutData next = this->getLayoutData(toType);
+  if (next.getUid().isEmpty())
     return;
-    break;
+
+  std::cout << streamXml2String(next) << std::endl;
+
+  //TODO: the indexing into the view vector is both bad and evil. Constrains user and confuses developer. Undo!
+  std::map<int,int> count3D;
+  std::map<int,int> count2D;
+
+  for (LayoutData::iterator iter=next.begin(); iter!=next.end(); ++iter)
+  {
+    LayoutData::ViewData view = *iter;
+
+    if (view.mGroup<0 || view.mPlane==ssc::ptCOUNT)
+      continue;
+
+    if (!count2D.count(view.mGroup))
+      count2D[view.mGroup] = 0;
+    if (!count3D.count(view.mGroup))
+      count3D[view.mGroup] = 0;
+
+    if (view.mPlane == ssc::ptNOPLANE)
+    {
+      if (count3D[view.mGroup]>=1)
+      {
+        ssc::messageManager()->sendError("Adding >1 3D view per group not permitted"); // due to limitations in how views are hardcoded into groups
+        continue;
+      }
+      activate3DView(view.mGroup, count3D[view.mGroup]++, view.mRegion);
+    }
+    else
+    {
+      if (count2D[view.mGroup]>=3)
+      {
+        ssc::messageManager()->sendError("Adding >3 2D views per group not permitted"); // due to limitations in how views are hardcoded into groups
+        continue;
+      }
+      activate2DView(view.mGroup, 1 + count2D[view.mGroup]++, view.mPlane, view.mRegion);
+    }
   }
 
-  ssc::messageManager()->sendInfo("Layout changed to "+ layoutText(mActiveLayout));
+  mActiveLayout = toType;
+  emit activeLayoutChanged();
+
+  ssc::messageManager()->sendInfo("Layout changed to "+ string_cast(this->getLayoutData(mActiveLayout).getName()));
 }
   
 void ViewManager::deleteImageSlot(ssc::ImagePtr image)
@@ -456,34 +471,34 @@ void ViewManager::shadingChangedSlot(bool shadingOn)
 
 /** Set the stretch factors of columns and rows in mLayout.
  */
-void ViewManager::setStretchFactors( int row, int col, int rowSpan, int colSpan, int stretchFactor)
+void ViewManager::setStretchFactors( LayoutRegion region, int stretchFactor)
 {
   // set stretch factors for the affected cols to 1 in order to get even distribution
-  for (int i=col; i<col+colSpan; ++i)
+  for (int i=region.pos.col; i<region.pos.col+region.span.col; ++i)
   {
 	  mLayout->setColumnStretch(i,stretchFactor);
   }
   // set stretch factors for the affected rows to 1 in order to get even distribution
-  for (int i=row; i<row+rowSpan; ++i)
+  for (int i=region.pos.row; i<region.pos.row+region.span.row; ++i)
   {
 	  mLayout->setRowStretch(i,stretchFactor);
   }
 }
 
-void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan, int colSpan)
+void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
   mViewGroups[group]->initializeView(index, plane);
   ssc::View* view = mViewGroups[group]->getViews()[index];
-  mLayout->addWidget(view, row, col, rowSpan, colSpan );
-  this->setStretchFactors( row, col, rowSpan, colSpan, 1);
+  mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
+  this->setStretchFactors( region, 1);
 
   view->show();
 }
-void ViewManager::activate3DView(int group, int index, int row, int col, int rowSpan, int colSpan)
+void ViewManager::activate3DView(int group, int index, LayoutRegion region)
 {
   ssc::View* view = mViewGroups[group]->getViews()[index];
-  mLayout->addWidget(view, row, col, rowSpan, colSpan );
-  this->setStretchFactors( row, col, rowSpan, colSpan, 1);
+  mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
+  this->setStretchFactors( region, 1);
   view->show();
 }
 
@@ -493,79 +508,94 @@ void ViewManager::deactivateView(ssc::View* view)
   mLayout->removeWidget(view);
 }
 
-void ViewManager::activateLayout_3D_1X1()
+void ViewManager::addDefaultLayout(LayoutData data)
 {
-  activate3DView(0, 0,                  0, 0);
-
-  mActiveLayout = LAYOUT_3D_1X1;
-  emit activeLayoutChanged();
+  mDefaultLayouts.push_back(data.getUid());
+  mLayouts.push_back(data);
 }
 
-void ViewManager::activateLayout_3DACS_2X2_SNW()
+/** insert the hardcoded layouts into mLayouts.
+ *
+ */
+void ViewManager::addDefaultLayouts()
 {
-  activate3DView(0, 0,                  0, 0);
-  activate2DView(0, 1, ssc::ptAXIAL,    0, 1);
-  activate2DView(0, 2, ssc::ptCORONAL,  1, 0);
-  activate2DView(0, 3, ssc::ptSAGITTAL, 1, 1);
+  mDefaultLayouts.clear();
 
-  mActiveLayout = LAYOUT_3DACS_2X2_SNW;
-  emit activeLayoutChanged();
-}
-
-void ViewManager::activateLayout_3DACS_1X3_SNW()
-{
-  activate3DView(0, 0,                  0, 0, 3, 2);
-  activate2DView(0, 1, ssc::ptAXIAL,    0, 2);
-  activate2DView(0, 2, ssc::ptCORONAL,  1, 2);
-  activate2DView(0, 3, ssc::ptSAGITTAL, 2, 2);
-
-  mActiveLayout = LAYOUT_3DACS_1X3_SNW;
-  emit activeLayoutChanged();
-}
-
-void ViewManager::activateLayout_ACS_1X3_SNW()
-{
-  activate2DView(0, 1, ssc::ptAXIAL,    0, 0);
-  activate2DView(0, 2, ssc::ptCORONAL,  0, 1);
-  activate2DView(0, 3, ssc::ptSAGITTAL, 0, 2);
-
-  mActiveLayout = LAYOUT_ACS_1X3_SNW;
-  emit activeLayoutChanged();
-}
-
-void ViewManager::activateLayout_ACSACS_2X3_SNW()
-{
-  activate2DView(0, 1, ssc::ptAXIAL,    0, 0);
-  activate2DView(0, 2, ssc::ptCORONAL,  0, 1);
-  activate2DView(0, 3, ssc::ptSAGITTAL, 0, 2);
-  activate2DView(1, 1, ssc::ptAXIAL,    1, 0);
-  activate2DView(1, 2, ssc::ptCORONAL,  1, 1);
-  activate2DView(1, 3, ssc::ptSAGITTAL, 1, 2);
-
-  mActiveLayout = LAYOUT_ACSACS_2X3_SNW;
-  emit activeLayoutChanged();
-}
-
-void ViewManager::activateLayout_Any_2X3_SNW()
-{
-  activate2DView(0, 1, ssc::ptANYPLANE, 0, 0);
-  activate2DView(0, 2, ssc::ptSIDEPLANE, 1, 0);
-  activate2DView(1, 1, ssc::ptANYPLANE, 0, 1);
-  activate2DView(1, 2, ssc::ptSIDEPLANE, 1, 1);
-  activate2DView(2, 1, ssc::ptANYPLANE, 0, 2);
-  activate2DView(2, 2, ssc::ptSIDEPLANE, 1, 2);
-
-  mActiveLayout = LAYOUT_Any_2x3_SNW;
-  emit activeLayoutChanged();
-}
-
-void ViewManager::activateLayout_3DAny_1X2_SNW()
-{
-  activate3DView(0, 0,                  0, 0);
-  activate2DView(0, 1, ssc::ptANYPLANE, 0, 1);
-
-  mActiveLayout = LAYOUT_3DAny_1X2_SNW;
-  emit activeLayoutChanged();
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_3D_1X1");
+    layout.setName("3D 1x1");
+    layout.resize(1,1);
+    layout.setView(0, ssc::ptNOPLANE, LayoutRegion(0, 0));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_3DACS_2X2");
+    layout.setName("3DACS 2x2");
+    layout.resize(2,2);
+    layout.setView(0, ssc::ptNOPLANE,  LayoutRegion(0, 0));
+    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 1));
+    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 0));
+    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(1, 1));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_3DACS_1X3");
+    layout.setName("3DACS 1x3");
+    layout.resize(3,3);
+    layout.setView(0, ssc::ptNOPLANE,  LayoutRegion(0, 0, 3, 2));
+    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 2));
+    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 2));
+    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 2));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_ACS_1X3");
+    layout.setName("ACS 1x3");
+    layout.resize(1,3);
+    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 0));
+    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(0, 1));
+    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(0, 2));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_ACSACS_2X3");
+    layout.setName("ACSACS 2x3");
+    layout.resize(2,3);
+    layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 0));
+    layout.setView(0, ssc::ptCORONAL,  LayoutRegion(0, 1));
+    layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(0, 2));
+    layout.setView(1, ssc::ptAXIAL,    LayoutRegion(1, 0));
+    layout.setView(1, ssc::ptCORONAL,  LayoutRegion(1, 1));
+    layout.setView(1, ssc::ptSAGITTAL, LayoutRegion(1, 2));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_Any_2X3");
+    layout.setName("Any 2x3");
+    layout.resize(2,3);
+    layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 0));
+    layout.setView(0, ssc::ptSIDEPLANE, LayoutRegion(1, 0));
+    layout.setView(1, ssc::ptANYPLANE,  LayoutRegion(0, 1));
+    layout.setView(1, ssc::ptSIDEPLANE, LayoutRegion(1, 1));
+    layout.setView(2, ssc::ptANYPLANE,  LayoutRegion(0, 2));
+    layout.setView(2, ssc::ptSIDEPLANE, LayoutRegion(1, 2));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
+    layout.resetUid("LAYOUT_3DAny_1X2");
+    layout.setName("3DAny 1x2");
+    layout.resize(1,2);
+    layout.setView(0, ssc::ptNOPLANE,   LayoutRegion(0, 0));
+    layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 1));
+    this->addDefaultLayout(layout);
+  }
 }
 
 void ViewManager::renderAllViewsSlot()
@@ -587,6 +617,185 @@ void ViewManager::renderAllViewsSlot()
   }
   else
     mNumberOfRenderings++;
+}
+
+LayoutData ViewManager::getLayoutData(const QString uid) const
+{
+  unsigned pos = this->findLayoutData(uid);
+  if (pos!=mLayouts.size())
+    return mLayouts[pos];
+  return LayoutData();
+}
+
+std::vector<QString> ViewManager::getAvailableLayouts() const
+{
+  std::vector<QString> retval;
+  for (unsigned i=0; i<mLayouts.size(); ++i)
+  {
+    retval.push_back(mLayouts[i].getUid());
+  }
+  return retval;
+}
+
+void ViewManager::setLayoutData(const LayoutData& data)
+{
+  bool activeChange = mActiveLayout==data.getUid();
+  unsigned pos = this->findLayoutData(data.getUid());
+  if (pos==mLayouts.size())
+    mLayouts.push_back(data);
+  else
+    mLayouts[pos] = data;
+
+  if (activeChange)
+  {
+    mActiveLayout = "";
+    this->setActiveLayout(data.getUid());
+  }
+  this->saveGlobalSettings();
+  emit activeLayoutChanged();
+}
+
+QString ViewManager::generateLayoutUid() const
+{
+  int count = 0;
+
+  for (LayoutDataVector::const_iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+  {
+    if (iter->getUid() == qstring_cast(count))
+      count = iter->getUid().toInt() + 1;
+  }
+  return qstring_cast(count);
+}
+
+void ViewManager::deleteLayoutData(const QString uid)
+{
+  mLayouts.erase(mLayouts.begin()+findLayoutData(uid));
+  this->saveGlobalSettings();
+  emit activeLayoutChanged();
+}
+
+unsigned ViewManager::findLayoutData(const QString uid) const
+{
+  for (unsigned i=0; i<mLayouts.size(); ++i)
+  {
+    if (mLayouts[i].getUid() == uid)
+      return i;
+  }
+  return mLayouts.size();
+}
+
+QActionGroup* ViewManager::createLayoutActionGroup()
+{
+  QActionGroup* retval = new QActionGroup(NULL);
+  retval->setExclusive(true);
+
+  // add default layouts
+  //std::vector<QString> layouts = this->getAvailableLayouts();
+  for (unsigned i=0; i<mLayouts.size(); ++i)
+  {
+    if (!this->isCustomLayout(mLayouts[i].getUid()))
+      this->addLayoutAction(mLayouts[i].getUid(), retval);
+  }
+
+  // add separator
+  QAction* sep = new QAction(retval);
+  sep->setSeparator(this);
+  //retval->addAction(sep);
+
+  // add custom layouts
+  for (unsigned i=0; i<mLayouts.size(); ++i)
+  {
+    if (this->isCustomLayout(mLayouts[i].getUid()))
+      this->addLayoutAction(mLayouts[i].getUid(), retval);
+  }
+
+  // set checked status
+  QString type = this->getActiveLayout();
+  QList<QAction*> actions = retval->actions();
+  for (int i=0; i<actions.size(); ++i)
+  {
+    if (actions[i]->data().toString()==type)
+      actions[i]->setChecked(true);
+  }
+
+  return retval;
+}
+
+/** Add one layout as an action to the layout menu.
+ */
+QAction* ViewManager::addLayoutAction(QString layout, QActionGroup* group)
+{
+  LayoutData data = this->getLayoutData(layout);
+  QAction* action = new QAction(data.getName(), group);
+  action->setCheckable(true);
+  action->setData(QVariant(layout));
+  connect(action, SIGNAL(triggered()), this, SLOT(setLayoutActionSlot()));
+  return action;
+}
+
+/** Called when a layout is selected: introspect the sending action
+ *  in order to get correct layout; set it.
+ */
+void ViewManager::setLayoutActionSlot()
+{
+  QAction* action = dynamic_cast<QAction*>(sender());
+  if (!action)
+    return;
+  this->setActiveLayout(action->data().toString());
+}
+
+bool ViewManager::isCustomLayout(const QString& uid) const
+{
+  return !std::count(mDefaultLayouts.begin(), mDefaultLayouts.end(), uid);
+}
+
+void ViewManager::loadGlobalSettings()
+{
+  QDomDocument doc("CustusX");
+  doc.appendChild(doc.createElement("root"));
+  ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
+
+  QDomElement viewmanagerNode = file.getElement("viewmanager");
+  // load custom layouts:
+  mLayouts.clear();
+
+  QDomElement layouts = viewmanagerNode.namedItem("layouts").toElement();
+  QDomNode layout = layouts.firstChild();
+  for( ; !layout.isNull(); layout = layout.nextSibling())
+  {
+    if (layout.toElement().tagName()!="layout")
+      continue;
+
+    LayoutData data;
+    data.parseXml(layout);
+    this->setLayoutData(data);
+//    mLayouts.push_back(data);
+  }
+  this->addDefaultLayouts(); // ensure we overwrite loaded layouts
+}
+
+void ViewManager::saveGlobalSettings()
+{
+  QDomDocument doc("CustusX");
+  doc.appendChild(doc.createElement("root"));
+  ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
+  QDomElement viewmanagerNode = file.getElement("viewmanager");
+
+  file.getElement("viewmanager", "layouts").clear();
+  QDomElement layoutsNode = file.getElement("viewmanager", "layouts");
+  //viewManagerNode.appendChild(layoutsNode);
+  //file.clean(layoutsNode);
+  for (LayoutDataVector::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+  {
+    if (!this->isCustomLayout(iter->getUid()))
+      continue; // dont store default layouts - they are created automatically.
+
+    QDomElement layoutNode = doc.createElement("layout");
+    layoutsNode.appendChild(layoutNode);
+    iter->addXml(layoutNode);
+  }
+
+  file.save();
 }
 
 }//namespace cx

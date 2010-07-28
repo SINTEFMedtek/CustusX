@@ -8,31 +8,16 @@
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
 #include "sscEnumConverter.h"
+#include "cxLayoutData.h"
 
+class QActionGroup;
+class QAction;
 class QGridLayout;
 class QWidget;
 class QTimer;
 class QSettings;
 class QTime;
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
-
-
-namespace cx
-{
-enum LayoutType
-{
-  LAYOUT_NONE=0,
-  LAYOUT_3D_1X1,
-  LAYOUT_3DACS_2X2_SNW,
-  LAYOUT_3DACS_1X3_SNW,
-  LAYOUT_3DAny_1X2_SNW,
-  LAYOUT_ACS_1X3_SNW,
-  LAYOUT_ACSACS_2X3_SNW,
-  LAYOUT_Any_2x3_SNW,
-  LAYOUT_COUNT
-}; ///< the layout types available
-} // namespace cx
-SNW_DECLARE_ENUM_STRING_CONVERTERS(cx, LayoutType);
 
 
 namespace cx
@@ -58,9 +43,14 @@ class ViewManager : public QObject
 
   Q_OBJECT
 public:
-  static std::string layoutText(LayoutType type);
-  static LayoutType layoutTypeFromText(std::string text);
-  std::vector<LayoutType> availableLayouts() const;
+
+  LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
+  std::vector<QString> getAvailableLayouts() const; ///< get uids of all defined layouts
+  void setLayoutData(const LayoutData& data); ///< add or edit a layout
+  QString generateLayoutUid() const; ///< return an uid not used in present layouts.
+  void deleteLayoutData(const QString uid);
+  QActionGroup* createLayoutActionGroup();
+  bool isCustomLayout(const QString& uid) const;
 
   static ViewManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
@@ -76,8 +66,8 @@ public:
 
   void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
 
-  LayoutType getActiveLayout() const; ///< returns the active layout type
-  void setActiveLayout(LayoutType layout); ///< change the layout
+  QString getActiveLayout() const; ///< returns the active layout
+  void setActiveLayout(const QString& uid); ///< change the layout
 
   ViewWrapperPtr getActiveView() const; ///< returns the active view
   void setActiveView(ViewWrapperPtr view); ///< change the active view
@@ -103,31 +93,35 @@ public slots:
 
 protected slots:
   void renderAllViewsSlot(); ///< renders all views
+  void setLayoutActionSlot();
 
 protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
 
   void syncOrientationMode(SyncedValuePtr val);
-  void setStretchFactors( int row, int col, int rowSpan, int colSpan, int stretchFactor);
+  void setStretchFactors(LayoutRegion region, int stretchFactor);
 
   void deactivateCurrentLayout();
-  void activateLayout(LayoutType toType);
-  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, int row, int col, int rowSpan=1, int colSpan=1);
-  void activate3DView(int group, int index, int row, int col, int rowSpan=1, int colSpan=1);
+  void activateLayout(const QString& toType);
+  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region);
+  void activate3DView(int group, int index, LayoutRegion region);
   void deactivateView(ssc::View* view);
+  void addDefaultLayouts();
+  unsigned findLayoutData(const QString uid) const;
+  void addDefaultLayout(LayoutData data);
+  QAction* addLayoutAction(QString layout, QActionGroup* group);
 
-  void activateLayout_3D_1X1(); ///< activate the 3D_1X1 layout
-  void activateLayout_3DAny_1X2_SNW();
-  void activateLayout_3DACS_2X2_SNW(); ///< activate the 3DACS_2X2 layout
-  void activateLayout_3DACS_1X3_SNW(); ///< activate the 3DACS_1X3 layout
-  void activateLayout_ACS_1X3_SNW();
-  void activateLayout_ACSACS_2X3_SNW();
-  void activateLayout_Any_2X3_SNW();
+  void loadGlobalSettings();
+  void saveGlobalSettings();
 
   static ViewManager* mTheInstance; ///< the only instance of this class
 
-  LayoutType      mActiveLayout;              ///< the active layout (type)
+  typedef std::vector<LayoutData> LayoutDataVector;
+  LayoutDataVector mLayouts;
+  std::vector<QString> mDefaultLayouts;
+
+  QString         mActiveLayout;              ///< the active layout (type)
   QGridLayout*    mLayout;                    ///< the layout
   QWidget*        mMainWindowsCentralWidget;  ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 

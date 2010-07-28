@@ -82,7 +82,10 @@ protected slots:
 
   // layout menu
   void layoutChangedSlot();
-  void setLayoutSlot();
+  //void setLayoutSlot();
+  void newCustomLayoutSlot();
+  void editCustomLayoutSlot();
+  void deleteCustomLayoutSlot();
 
   //logging
   void loggingSlot(const QString& message, int timeout); ///< prints messages for debugging
@@ -122,7 +125,8 @@ protected:
   void deactivateUSAcquisitionState(); ///< Should only be used by changeState(...)!
   
 //  void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
-  QAction* addLayoutAction(LayoutType layout);
+  //QAction* addLayoutAction(QString layout);
+  LayoutData executeLayoutEditorDialog(QString title, bool createNew);
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
   
@@ -175,6 +179,10 @@ protected:
 //  QAction* m3DACS_1x3_LayoutAction; ///< action for switching to 3DACS_1x3 view layout
 //  QAction* mACSACS_2x3_LayoutAction; ///< action for switching to ACSACS_2x3 view layout
   QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
+//  QAction* mLayoutSeparator; ///< the separator between specific layouts and layout functions. Used to repopulate menu.
+  QAction* mNewLayoutAction; ///< create a new custom layout
+  QAction* mEditLayoutAction; ///< edit the current custom layout
+  QAction* mDeleteLayoutAction; ///< delete the current custom layout
 
   // actions for image navigation
   QAction* mCenterToImageCenterAction;

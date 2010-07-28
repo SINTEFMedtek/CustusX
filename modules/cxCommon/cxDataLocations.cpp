@@ -83,4 +83,10 @@ QSettingsPtr DataLocations::getSettings()
   //return QSettingsPtr(new QSettings(path+"/custus.ini", QSettings::IniFormat));
 }
 
+QString DataLocations::getXmlSettingsFile()
+{
+  return getAppDataPath() + "/CustusX.xml";
+}
+
+
 } // namespace cx

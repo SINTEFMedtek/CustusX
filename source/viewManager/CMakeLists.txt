@@ -27,6 +27,8 @@ SET ( ${LIB}_viewManager
     cxViewManager.h
     cxViewGroup.h
     cxViewGroup.cpp
+    cxLayoutData.h
+    cxLayoutData.cpp
     #cxViewGroupInria.h
     #cxViewGroupInria.cpp
 )
