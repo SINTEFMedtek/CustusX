@@ -34,8 +34,6 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 {
   mView = view;
   this->connectContextMenu(mView);
-  //mZoomFactor = 0;
-  setZoom2D(SyncedValue::create(1));
 
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
@@ -43,6 +41,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 
   addReps();
 
+  setZoom2D(SyncedValue::create(1));
   setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
   connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
@@ -50,6 +49,12 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
   connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(mouseWheelSlot(QWheelEvent*)));
+}
+
+ViewWrapper2D::~ViewWrapper2D()
+{
+  std::cout << "killing viewwr2d" << std::endl;
+  mView->removeReps();
 }
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)

@@ -51,9 +51,10 @@ public:
   virtual ~ViewGroup();
 
   void addViewWrapper(ViewWrapperPtr wrapper);
+  void deactivateViews();
   ViewWrapperPtr getViewWrapperFromViewUid(std::string viewUid);
   std::vector<ssc::View*> getViews() const;
-  ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
+  //ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
   virtual void addImage(ssc::ImagePtr image);
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);

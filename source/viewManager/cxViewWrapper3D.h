@@ -28,6 +28,7 @@ class ViewWrapper3D : public ViewWrapper
   Q_OBJECT
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
+  virtual ~ViewWrapper3D();
   virtual void addImage(ssc::ImagePtr image);
   virtual void addMesh(ssc::MeshPtr mesh);
   virtual std::vector<ssc::ImagePtr> getImages() const;

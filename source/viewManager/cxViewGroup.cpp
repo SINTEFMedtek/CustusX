@@ -182,8 +182,12 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
   mViews.push_back(wrapper->getView());
   mViewWrappers.push_back(wrapper);
 
+  // add state
   wrapper->setZoom2D(mZoom2D.mActive);
+  for (unsigned i=0; i<mImages.size(); ++i)
+    wrapper->addImage(mImages[i]);
 
+  // connect signals
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
           this, SLOT(activateManualToolSlot()));
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
@@ -193,6 +197,27 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
   connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+}
+
+void ViewGroup::deactivateViews()
+{
+  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+  {
+    ViewWrapperPtr wrapper = mViewWrappers[i];
+
+    disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
+            this, SLOT(activateManualToolSlot()));
+    disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
+            this, SLOT(mouseClickInViewGroupSlot()));
+    disconnect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
+            this, SLOT(mouseClickInViewGroupSlot()));
+
+    disconnect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
+    disconnect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+  }
+
+  mViews.clear();
+  mViewWrappers.clear();
 }
 
 ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(std::string viewUid)
@@ -277,19 +302,19 @@ std::vector<ssc::View*> ViewGroup::getViews() const
   return mViews;
 }
 
-/**Call this on an initialized view, when the plane type is changed.
- *
- */
-ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
-{
-  if (index<0 || index>=(int)mViewWrappers.size())
-  {
-    ssc::messageManager()->sendError("invalid index in ViewGroup2D");
-  }
-
-  mViewWrappers[index]->initializePlane(plane);
-  return mViews[index];
-}
+///**Call this on an initialized view, when the plane type is changed.
+// *
+// */
+//ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
+//{
+//  if (index<0 || index>=(int)mViewWrappers.size())
+//  {
+//    ssc::messageManager()->sendError("invalid index in ViewGroup2D");
+//  }
+//
+//  mViewWrappers[index]->initializePlane(plane);
+//  return mViews[index];
+//}
 
 void ViewGroup::addImage(ssc::ImagePtr image)
 {

@@ -86,7 +86,7 @@ bool LayoutData::merge(LayoutRegion region)
     return false;
   }
 
-  std::cout << "merge views " << std::endl;
+  //std::cout << "merge views " << std::endl;
   this->split(region); // split all existing merges in order to keep consistency
 
   // create new merged view based on the ul corner view.

@@ -26,6 +26,7 @@
 namespace cx
 {
 
+
 ViewManager *ViewManager::mTheInstance = NULL;
 ViewManager* viewManager() { return ViewManager::getInstance(); }
 ViewManager* ViewManager::getInstance()
@@ -41,14 +42,16 @@ void ViewManager::destroyInstance()
 ViewManager::ViewManager() :
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
-  MAX_3DVIEWS(2),
-  MAX_2DVIEWS(15),
+  //MAX_3DVIEWS(2),
+  //MAX_2DVIEWS(15),
   mRenderingTimer(new QTimer(this)),
   mSettings(DataLocations::getSettings()),
   mRenderingTime(new QTime()),
   mNumberOfRenderings(0),
   mGlobal2DZoom(true),
-  mGlobalObliqueOrientation(false)
+  mGlobalObliqueOrientation(false),
+  mViewCache2D(mMainWindowsCentralWidget,"View2D"),
+  mViewCache3D(mMainWindowsCentralWidget,"View3D")
 {
   this->addDefaultLayouts();
   this->loadGlobalSettings();
@@ -57,59 +60,59 @@ ViewManager::ViewManager() :
   mLayout->setMargin(4);
   mMainWindowsCentralWidget->setLayout(mLayout);
 
-  mView3DNames.resize(MAX_3DVIEWS);
-  for (unsigned i=0; i<mView3DNames.size(); ++i)
-    mView3DNames[i] = "View3D_"+string_cast(i+1);
-
-  mView2DNames.resize(MAX_2DVIEWS);
-  for (unsigned i=0; i<mView2DNames.size(); ++i)
-    mView2DNames[i] = "View2D_"+string_cast(i+1);
-
-  for(int i=0; i<MAX_3DVIEWS; i++)
-  {
-    View3D* view = new View3D(mView3DNames[i], mView3DNames[i],
-                              mMainWindowsCentralWidget);
-    view->hide();
-    mView3DMap[view->getUid()] = view;
-    mViewMap[view->getUid()] = view;
-    
-    //Turn off rendering in vtkRenderWindowInteractor
-    view->getRenderWindow()->GetInteractor()->EnableRenderOff();
-  }
-  for(int i=0; i<MAX_2DVIEWS; i++)
-  {
-    View2D* view = new View2D(mView2DNames[i], mView2DNames[i],
-                              mMainWindowsCentralWidget);
-    view->hide();
-    mView2DMap[view->getUid()] = view;
-    mViewMap[view->getUid()] = view;
-    
-    //Turn off rendering in vtkRenderWindowInteractor
-    view->getRenderWindow()->GetInteractor()->EnableRenderOff();
-  }
+//  mView3DNames.resize(MAX_3DVIEWS);
+//  for (unsigned i=0; i<mView3DNames.size(); ++i)
+//    mView3DNames[i] = "View3D_"+string_cast(i+1);
+//
+//  mView2DNames.resize(MAX_2DVIEWS);
+//  for (unsigned i=0; i<mView2DNames.size(); ++i)
+//    mView2DNames[i] = "View2D_"+string_cast(i+1);
+//
+//  for(int i=0; i<MAX_3DVIEWS; i++)
+//  {
+//    View3D* view = new View3D(mView3DNames[i], mView3DNames[i],
+//                              mMainWindowsCentralWidget);
+//    view->hide();
+//    mView3DMap[view->getUid()] = view;
+//    mViewMap[view->getUid()] = view;
+//
+//    //Turn off rendering in vtkRenderWindowInteractor
+//    view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+//  }
+//  for(int i=0; i<MAX_2DVIEWS; i++)
+//  {
+//    View2D* view = new View2D(mView2DNames[i], mView2DNames[i],
+//                              mMainWindowsCentralWidget);
+//    view->hide();
+//    mView2DMap[view->getUid()] = view;
+//    mViewMap[view->getUid()] = view;
+//
+//    //Turn off rendering in vtkRenderWindowInteractor
+//    view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+//  }
 
   // initialize view groups:
   ViewGroupPtr group;
 
   group.reset(new ViewGroup());
-  group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(1, mView3DMap["View3D_1"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_7"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_8"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_9"])));
+//  group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(1, mView3DMap["View3D_1"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_7"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_8"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_9"])));
   mViewGroups.push_back(group);
 
   group.reset(new ViewGroup());
-  group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(2, mView3DMap["View3D_2"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_10"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_11"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_12"])));
+//  group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(2, mView3DMap["View3D_2"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_10"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_11"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_12"])));
   mViewGroups.push_back(group);
 
   group.reset(new ViewGroup());
   //group->addViewWrapper(ViewWrapper3DPtr(new ViewWrapper3D(3, mView3DMap["View3D_3"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_13"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_14"])));
-  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_15"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_13"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_14"])));
+//  group->addViewWrapper(ViewWrapper2DPtr(new ViewWrapper2D(mView2DMap["View2D_15"])));
   mViewGroups.push_back(group);
 
   this->syncOrientationMode(SyncedValue::create(0));
@@ -156,31 +159,45 @@ void ViewManager::setActiveLayout(const QString& layout)
 
 ViewWrapperPtr ViewManager::getActiveView() const
 {
-  return mActiveView;
+ // return mActiveView;
+  for(unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(string_cast(mActiveView));
+    if(viewWrapper)
+    {
+      return viewWrapper;
+    }
+  }
+  return ViewWrapperPtr();
 }
 
-void ViewManager::setActiveView(ViewWrapperPtr viewWrapper)
-{
-  if(mActiveView && viewWrapper &&
-      (mActiveView->getView()->getUid() == viewWrapper->getView()->getUid()))
-    return;
-
-  mActiveView = viewWrapper;
-  emit activeViewChanged();
-  ssc::messageManager()->sendInfo("Active view set to "+mActiveView->getView()->getUid());
-}
+//void ViewManager::setActiveView(ViewWrapperPtr viewWrapper)
+//{
+//  if(mActiveView && viewWrapper &&
+//      (mActiveView->getView()->getUid() == viewWrapper->getView()->getUid()))
+//    return;
+//
+//  mActiveView = viewWrapper;
+//  emit activeViewChanged();
+//  ssc::messageManager()->sendInfo("Active view set to "+mActiveView->getView()->getUid());
+//}
 
 void ViewManager::setActiveView(std::string viewUid)
 {
-  for(unsigned i=0; i<mViewGroups.size(); ++i)
-  {
-    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(viewUid);
-    if(viewWrapper)
-    {
-      this->setActiveView(viewWrapper);
-      return;
-    }
-  }
+  if (mActiveView==qstring_cast(viewUid))
+    return;
+  mActiveView = qstring_cast(viewUid);
+  emit activeViewChanged();
+  ssc::messageManager()->sendInfo("Active view set to "+string_cast(mActiveView));
+//  for(unsigned i=0; i<mViewGroups.size(); ++i)
+//  {
+//    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(viewUid);
+//    if(viewWrapper)
+//    {
+//      this->setActiveView(viewWrapper);
+//      return;
+//    }
+//  }
 }
 
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
@@ -222,9 +239,8 @@ void ViewManager::addXml(QDomNode& parentNode)
   viewManagerNode.appendChild(activeLayoutNode);
 
   QDomElement activeViewNode = doc.createElement("activeView");
-  if(mActiveView)
-    activeViewNode.appendChild(doc.createTextNode(mActiveView->getView()->getUid().c_str()));
-  viewManagerNode.appendChild(activeLayoutNode);
+  activeViewNode.appendChild(doc.createTextNode(mActiveView));
+  viewManagerNode.appendChild(activeViewNode);
 
   QDomElement viewGroupsNode = doc.createElement("viewGroups");
   viewManagerNode.appendChild(viewGroupsNode);
@@ -327,62 +343,90 @@ QWidget* ViewManager::stealCentralWidget()
   return mMainWindowsCentralWidget;
 }
 
-ViewManager::View2DMap* ViewManager::get2DViews()
+//ViewManager::View2DMap* ViewManager::get2DViews()
+//{
+//  return &mView2DMap;
+//}
+//
+//ViewManager::View3DMap* ViewManager::get3DViews()
+//{
+//  return &mView3DMap;
+//}
+
+/**Look for the index'th 3DView in given group.
+ */
+View3D* ViewManager::get3DView(int group, int index)
 {
-  return &mView2DMap;
+  int count = 0;
+  std::vector<ssc::View*> views = mViewGroups[group]->getViews();
+  for (unsigned i=0; i<views.size(); ++i)
+  {
+    View3D* retval = dynamic_cast<View3D*>(views[i]);
+    if (!retval)
+      continue;
+    if (index == count++)
+      return retval;
+  }
+  return NULL;
 }
 
-ViewManager::View3DMap* ViewManager::get3DViews()
-{
-  return &mView3DMap;
-}
-
-ssc::View* ViewManager::getView(const std::string& uid)
-{
-  ssc::View* view = NULL;
-  View2DMap::iterator it2 = mView2DMap.find(uid);
-  if(it2 != mView2DMap.end())
-  {
-    view = (*it2).second;
-  }
-  View3DMap::iterator it3 = mView3DMap.find(uid);
-  if(it3 != mView3DMap.end())
-  {
-    view = (*it3).second;
-  }
-  return view;
-}
-
-View2D* ViewManager::get2DView(const std::string& uid)
-{
-  View2D* view = NULL;
-  View2DMap::iterator it2 = mView2DMap.find(uid);
-  if(it2 != mView2DMap.end())
-  {
-    view = (*it2).second;
-  }
-  return view;
-}
-
-View3D* ViewManager::get3DView(const std::string& uid)
-{
-  View3D* view = NULL;
-  View3DMap::iterator it3 = mView3DMap.find(uid);
-  if(it3 != mView3DMap.end())
-  {
-    view = (*it3).second;
-  }
-  return view;
-}
+//
+//ssc::View* ViewManager::getView(const std::string& uid)
+//{
+//  ssc::View* view = NULL;
+//  View2DMap::iterator it2 = mView2DMap.find(uid);
+//  if(it2 != mView2DMap.end())
+//  {
+//    view = (*it2).second;
+//  }
+//  View3DMap::iterator it3 = mView3DMap.find(uid);
+//  if(it3 != mView3DMap.end())
+//  {
+//    view = (*it3).second;
+//  }
+//  return view;
+//}
+//
+//View2D* ViewManager::get2DView(const std::string& uid)
+//{
+//  View2D* view = NULL;
+//  View2DMap::iterator it2 = mView2DMap.find(uid);
+//  if(it2 != mView2DMap.end())
+//  {
+//    view = (*it2).second;
+//  }
+//  return view;
+//}
+//
+//View3D* ViewManager::get3DView(const std::string& uid)
+//{
+//  View3D* view = NULL;
+//  View3DMap::iterator it3 = mView3DMap.find(uid);
+//  if(it3 != mView3DMap.end())
+//  {
+//    view = (*it3).second;
+//  }
+//  return view;
+//}
 
 /**deactivate the current layout, leaving an empty layout
  */
 void ViewManager::deactivateCurrentLayout()
 {
-  for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
-    deactivateView(iter->second);
+  mViewCache2D.clearUsedViews();
+  mViewCache3D.clearUsedViews();
+  mViewMap.clear();
+
+  for (unsigned i=0; i< mViewGroups.size(); ++i)
+  {
+    mViewGroups[i]->deactivateViews();
+  }
+
+//  for (ViewMap::iterator iter=mViewMap.begin(); iter!=mViewMap.end(); ++iter)
+//    deactivateView(iter->second);
 
   this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
+  this->setActiveView("");
 }
 
 /**activate a layout. Assumes the previous layout is already deactivated.
@@ -393,11 +437,43 @@ void ViewManager::activateLayout(const QString& toType)
   if (next.getUid().isEmpty())
     return;
 
-  std::cout << streamXml2String(next) << std::endl;
-
-  //TODO: the indexing into the view vector is both bad and evil. Constrains user and confuses developer. Undo!
-  std::map<int,int> count3D;
-  std::map<int,int> count2D;
+//  std::cout << streamXml2String(next) << std::endl;
+//
+//  //TODO: the indexing into the view vector is both bad and evil. Constrains user and confuses developer. Undo!
+//  std::map<int,int> count3D;
+//  std::map<int,int> count2D;
+//
+//  for (LayoutData::iterator iter=next.begin(); iter!=next.end(); ++iter)
+//  {
+//    LayoutData::ViewData view = *iter;
+//
+//    if (view.mGroup<0 || view.mPlane==ssc::ptCOUNT)
+//      continue;
+//
+//    if (!count2D.count(view.mGroup))
+//      count2D[view.mGroup] = 0;
+//    if (!count3D.count(view.mGroup))
+//      count3D[view.mGroup] = 0;
+//
+//    if (view.mPlane == ssc::ptNOPLANE)
+//    {
+//      if (count3D[view.mGroup]>=1)
+//      {
+//        ssc::messageManager()->sendError("Adding >1 3D view per group not permitted"); // due to limitations in how views are hardcoded into groups
+//        continue;
+//      }
+//      activate3DView(view.mGroup, count3D[view.mGroup]++, view.mRegion);
+//    }
+//    else
+//    {
+//      if (count2D[view.mGroup]>=3)
+//      {
+//        ssc::messageManager()->sendError("Adding >3 2D views per group not permitted"); // due to limitations in how views are hardcoded into groups
+//        continue;
+//      }
+//      activate2DView(view.mGroup, 1 + count2D[view.mGroup]++, view.mPlane, view.mRegion);
+//    }
+//  }
 
   for (LayoutData::iterator iter=next.begin(); iter!=next.end(); ++iter)
   {
@@ -406,29 +482,10 @@ void ViewManager::activateLayout(const QString& toType)
     if (view.mGroup<0 || view.mPlane==ssc::ptCOUNT)
       continue;
 
-    if (!count2D.count(view.mGroup))
-      count2D[view.mGroup] = 0;
-    if (!count3D.count(view.mGroup))
-      count3D[view.mGroup] = 0;
-
     if (view.mPlane == ssc::ptNOPLANE)
-    {
-      if (count3D[view.mGroup]>=1)
-      {
-        ssc::messageManager()->sendError("Adding >1 3D view per group not permitted"); // due to limitations in how views are hardcoded into groups
-        continue;
-      }
-      activate3DView(view.mGroup, count3D[view.mGroup]++, view.mRegion);
-    }
+      activate3DView(view.mGroup, view.mRegion);
     else
-    {
-      if (count2D[view.mGroup]>=3)
-      {
-        ssc::messageManager()->sendError("Adding >3 2D views per group not permitted"); // due to limitations in how views are hardcoded into groups
-        continue;
-      }
-      activate2DView(view.mGroup, 1 + count2D[view.mGroup]++, view.mPlane, view.mRegion);
-    }
+      activate2DView(view.mGroup, view.mPlane, view.mRegion);
   }
 
   mActiveLayout = toType;
@@ -485,28 +542,53 @@ void ViewManager::setStretchFactors( LayoutRegion region, int stretchFactor)
   }
 }
 
-void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region)
+void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
-  mViewGroups[group]->initializeView(index, plane);
-  ssc::View* view = mViewGroups[group]->getViews()[index];
+  View2D* view = mViewCache2D.retrieveView();
+  mViewMap[view->getUid()] = view;
+  ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
+  wrapper->initializePlane(plane);
+  mViewGroups[group]->addViewWrapper(wrapper);
+  //ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
   this->setStretchFactors( region, 1);
 
   view->show();
 }
-void ViewManager::activate3DView(int group, int index, LayoutRegion region)
+void ViewManager::activate3DView(int group, LayoutRegion region)
 {
-  ssc::View* view = mViewGroups[group]->getViews()[index];
+  View3D* view = mViewCache3D.retrieveView();
+  mViewMap[view->getUid()] = view;
+  ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
+  mViewGroups[group]->addViewWrapper(wrapper);
+//  ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
   this->setStretchFactors( region, 1);
   view->show();
 }
 
-void ViewManager::deactivateView(ssc::View* view)
-{
-  view->hide();
-  mLayout->removeWidget(view);
-}
+//void ViewManager::activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region)
+//{
+//  mViewGroups[group]->initializeView(index, plane);
+//  ssc::View* view = mViewGroups[group]->getViews()[index];
+//  mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
+//  this->setStretchFactors( region, 1);
+//
+//  view->show();
+//}
+//void ViewManager::activate3DView(int group, int index, LayoutRegion region)
+//{
+//  ssc::View* view = mViewGroups[group]->getViews()[index];
+//  mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
+//  this->setStretchFactors( region, 1);
+//  view->show();
+//}
+
+//void ViewManager::deactivateView(ssc::View* view)
+//{
+//  view->hide();
+//  mLayout->removeWidget(view);
+//}
 
 void ViewManager::addDefaultLayout(LayoutData data)
 {
