@@ -113,7 +113,8 @@ QDomElement XmlOptionFile::getElement(QString level1, QString level2)
 
 void XmlOptionFile::clean(QDomElement elem)
 {
-
+  while (elem.hasChildNodes())
+    elem.removeChild(elem.firstChild());
 }
 
 void XmlOptionFile::save()
