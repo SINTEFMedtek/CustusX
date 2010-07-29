@@ -424,7 +424,7 @@ void MainWindow::layoutChangedSlot()
  */
 LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
 {
-  boost::shared_ptr<QDialog> dialog(new QDialog);
+  boost::shared_ptr<QDialog> dialog(new QDialog(NULL, Qt::Dialog));
   dialog->setWindowTitle(title);
   QVBoxLayout* layout = new QVBoxLayout(dialog.get());
   layout->setMargin(0);
@@ -462,7 +462,7 @@ void MainWindow::newCustomLayoutSlot()
 
 void MainWindow::editCustomLayoutSlot()
 {
-  LayoutData data = this->executeLayoutEditorDialog("Edit Current Custom Layout", false);
+  LayoutData data = this->executeLayoutEditorDialog("Edit Current Layout", false);
   if (data.getUid().isEmpty())
     return;
   viewManager()->setLayoutData(data);
@@ -470,7 +470,10 @@ void MainWindow::editCustomLayoutSlot()
 
 void MainWindow::deleteCustomLayoutSlot()
 {
-  if (!QMessageBox::question(this, "Delete current layout", "Do you really want to delete the current layout?"))
+  if (QMessageBox::question(this,
+      "Delete current layout",
+      "Do you really want to delete the current layout?",
+      QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
     return;
   viewManager()->deleteLayoutData(viewManager()->getActiveLayout());
   viewManager()->setActiveLayout(viewManager()->getAvailableLayouts().front()); // revert to existing state

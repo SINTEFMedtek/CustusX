@@ -10,6 +10,7 @@
 
 
 #include <map>
+#include <set>
 #include <QWidget>
 #include <QLineEdit>
 class QFrame;
@@ -48,58 +49,43 @@ public:
     QFrame* mFrame;
     QLabel* mLabel;
   };
-//   struct ViewData
-//    {
-//      ViewData() : mGroup(-1), mPlane(ssc::ptNOPLANE), mRegion(-1,-1,1,1), mFrame(NULL), mLabel(NULL) {}
-//      ViewData(int row, int col, int rowSpan=1, int colSpan=1) : mGroup(-1), mPlane(ssc::ptNOPLANE), mRegion(row,col,rowSpan,colSpan) {}
-//      int mGroup; ///< what group to connect to. -1 means not set.
-//      ssc::PLANE_TYPE mPlane; ///< ptNOPLANE means 3D
-//      //int mRow, mCol, mRowSpan, mColSpan;
-//      LayoutRegion mRegion;
-//
-//      QFrame* mFrame;
-//      QLabel* mLabel;
-//    };
 
   LayoutEditor(QWidget* parent);
   void setLayoutData(const LayoutData& data);
   LayoutData getLayoutData() const;
 
 private slots:
-//  void accept();
-  void rcChanged();
+  void rowsColumnsChangedSlot();
   void contextMenuSlot(const QPoint& point);
   void splitActionSlot();
+  void mergeActionSlot();
   void groupActionSlot();
   void typeActionSlot();
   void nameChanged();
 
-  //void setNiceSize();
 private:
   QBoxLayout* mTopLayout;
   QBoxLayout* mRCLayout;
   QGridLayout* mLayout;
-  //QWidget* mGridWidget;
   QSpinBox* mRowsEdit;
   QSpinBox* mColsEdit;
   QLineEdit* mNameEdit;
   void initCache();
-  void resizeLayout(int rows, int cols);
   void clearDisplay();
   void updateGrid();
-  void mergeViews(LayoutRegion region);
-  void splitView(LayoutRegion region);
   LayoutData::ViewData getViewData(QPoint pt);
   void colorRegion(LayoutRegion region, QString selectColor, QString backColor);
+  std::set<LayoutData::iterator> getSelectedViews();
+  void updateSelection(QPoint pos);
 
   std::vector<std::vector<GridElement> > mViewDataCache; ///< 10x10 grid of all available views
   LayoutData mViewData; ///< RxC grid of currently used views.
   std::map<ssc::PLANE_TYPE, QString> mPlaneNames; ///< names of planes for use in gui
   QPoint mClickPos;
+  LayoutRegion mSelection;
 
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
-  virtual void mouseReleaseEvent(QMouseEvent* event);
 };
 
 

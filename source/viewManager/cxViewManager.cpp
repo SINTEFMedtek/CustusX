@@ -768,7 +768,14 @@ void ViewManager::loadGlobalSettings()
 
     LayoutData data;
     data.parseXml(layout);
-    this->setLayoutData(data);
+    //this->setLayoutData(data);
+
+    unsigned pos = this->findLayoutData(data.getUid());
+    if (pos==mLayouts.size())
+      mLayouts.push_back(data);
+    else
+      mLayouts[pos] = data;
+
 //    mLayouts.push_back(data);
   }
   this->addDefaultLayouts(); // ensure we overwrite loaded layouts
@@ -781,10 +788,10 @@ void ViewManager::saveGlobalSettings()
   ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
   QDomElement viewmanagerNode = file.getElement("viewmanager");
 
-  file.getElement("viewmanager", "layouts").clear();
+  //file.getElement("viewmanager", "layouts").clear();
   QDomElement layoutsNode = file.getElement("viewmanager", "layouts");
   //viewManagerNode.appendChild(layoutsNode);
-  //file.clean(layoutsNode);
+  file.clean(layoutsNode);
   for (LayoutDataVector::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
   {
     if (!this->isCustomLayout(iter->getUid()))

@@ -72,9 +72,7 @@ public:
   void setName(const QString& name) { mName = name; }
   void resetUid(const QString& uid);
   void setView(int group, ssc::PLANE_TYPE type, LayoutRegion region);
-//  const ViewData& get(LayoutPosition pos) const;
   ViewData& get(LayoutPosition pos);
-  //void set(ViewData view);
   iterator begin() { return mView.begin(); }
   iterator end()  { return mView.end(); }
   const_iterator begin() const { return mView.begin(); }

@@ -39,21 +39,13 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   mRowsEdit->setRange(1,10);
   mColsEdit = new QSpinBox;
   mColsEdit->setRange(1,10);
-//  mColsEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
-  connect(mRowsEdit, SIGNAL(valueChanged(int)), this, SLOT(rcChanged()));
-  connect(mColsEdit, SIGNAL(valueChanged(int)), this, SLOT(rcChanged()));
-//  connect(mRowsEdit, SIGNAL(editingFinished()), this, SLOT(rcChanged()));
-//  connect(mColsEdit, SIGNAL(editingFinished()), this, SLOT(rcChanged()));
+  connect(mRowsEdit, SIGNAL(valueChanged(int)), this, SLOT(rowsColumnsChangedSlot()));
+  connect(mColsEdit, SIGNAL(valueChanged(int)), this, SLOT(rowsColumnsChangedSlot()));
   mRCLayout->addWidget(new QLabel("Rows"));
   mRCLayout->addWidget(mRowsEdit);
   mRCLayout->addWidget(new QLabel("Columns"));
   mRCLayout->addWidget(mColsEdit);
   mRCLayout->addStretch();
-
-//  QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-//  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-//  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-//  mTopLayout->addWidget(buttonBox);
 
   for (int i=ssc::ptNOPLANE; i<ssc::ptCOUNT; ++i)
   {
@@ -62,6 +54,7 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   }
   mPlaneNames[ssc::ptNOPLANE] = "3D";
 
+  mSelection = LayoutRegion(-1,-1);
   initCache();
 
   this->updateGrid();
@@ -78,11 +71,6 @@ LayoutData LayoutEditor::getLayoutData() const
   return mViewData;
 }
 
-//void LayoutEditor::accept()
-//{
-//  std::cout << streamXml2String(mViewData) << std::endl;
-//}
-
 void LayoutEditor::nameChanged()
 {
   mViewData.setName(mNameEdit->text());
@@ -96,8 +84,13 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
 
   LayoutData::ViewData viewData = this->getViewData(point);
 
+  QAction* mergeAction = new QAction("merge view", &menu);
+  mergeAction->setEnabled(this->getSelectedViews().size()>1);
+  connect(mergeAction, SIGNAL(triggered()), this, SLOT(mergeActionSlot()));
+  menu.addAction(mergeAction);
+
   QAction* splitAction = new QAction("split view", &menu);
-  splitAction->setEnabled(viewData.mRegion.span.row!=1 || viewData.mRegion.span.col!=1);
+  splitAction->setEnabled(mSelection.span.row!=1 || mSelection.span.col!=1);
   connect(splitAction, SIGNAL(triggered()), this, SLOT(splitActionSlot()));
   menu.addAction(splitAction);
 
@@ -107,7 +100,7 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
   QActionGroup* groupActions = new QActionGroup(this);
   for (int i=0; i<3; ++i)
   {
-    QAction* action = new QAction(QString("%1").arg(i), groupActions);
+    QAction* action = new QAction(QString("Group %1").arg(i), groupActions);
     action->setData(QVariant(i));
     action->setCheckable(true);
     connect(action, SIGNAL(triggered()), this, SLOT(groupActionSlot()));
@@ -115,9 +108,9 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
 //    menu.addAction(action);
   }
 
-  menu.addMenu("View Group")->addActions(groupActions->actions());
-
-  //menu.addActions(groupActions->actions());
+  //menu.addMenu("View Group")->addActions(groupActions->actions());
+  menu.addActions(groupActions->actions());
+  menu.addSeparator();
 
   // actions for view type
   QActionGroup* typeActions = new QActionGroup(this);
@@ -133,18 +126,22 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
     //menu.addAction(action);
   }
 
-  menu.addMenu("View Plane Type")->addActions(typeActions->actions());
+  //menu.addMenu("View Plane Type")->addActions(typeActions->actions());
+  menu.addActions(typeActions->actions());
 
   menu.exec(pointGlobal);
 }
 
 void LayoutEditor::splitActionSlot()
 {
-  QAction* sender = dynamic_cast<QAction*>(this->sender());
-  if (!sender)
-    return;
-  LayoutData::ViewData viewData = this->getViewData(mClickPos);
-  this->splitView(viewData.mRegion);
+  mViewData.split(mSelection);
+  this->updateGrid();
+}
+
+void LayoutEditor::mergeActionSlot()
+{
+  mViewData.merge(mSelection);
+  this->updateGrid();
 }
 
 void LayoutEditor::groupActionSlot()
@@ -152,9 +149,12 @@ void LayoutEditor::groupActionSlot()
   QAction* sender = dynamic_cast<QAction*>(this->sender());
   if (!sender)
     return;
-  LayoutData::ViewData viewData = this->getViewData(mClickPos);
-  mViewData.get(viewData.mRegion.pos).mGroup = sender->data().toInt();
-//  mViewData[viewData.mRegion.pos.row][viewData.mRegion.pos.col].mGroup = sender->data().toInt();
+  int group = sender->data().toInt();
+
+  std::set<LayoutData::iterator> selection = this->getSelectedViews();
+  for (std::set<LayoutData::iterator>::iterator iter=selection.begin(); iter!=selection.end(); ++iter)
+    (*iter)->mGroup = group;
+
   this->updateGrid();
 }
 
@@ -163,19 +163,38 @@ void LayoutEditor::typeActionSlot()
   QAction* sender = dynamic_cast<QAction*>(this->sender());
   if (!sender)
     return;
-  LayoutData::ViewData viewData = this->getViewData(mClickPos);
-  mViewData.get(viewData.mRegion.pos).mPlane = static_cast<ssc::PLANE_TYPE>(sender->data().toInt());
-//  ViewData viewData = this->getViewData(mClickPos);
-//  mViewData[viewData.mRegion.pos.row][viewData.mRegion.pos.col].mPlane = static_cast<ssc::PLANE_TYPE>(sender->data().toInt());
+  ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(sender->data().toInt());
+
+  std::set<LayoutData::iterator> selection = this->getSelectedViews();
+  for (std::set<LayoutData::iterator>::iterator iter=selection.begin(); iter!=selection.end(); ++iter)
+    (*iter)->mPlane = type;
+
   this->updateGrid();
 }
 
 void LayoutEditor::mouseMoveEvent(QMouseEvent* event)
 {
+  this->updateSelection(event->pos());
+}
+
+void LayoutEditor::updateSelection(QPoint pos)
+{
   LayoutData::ViewData start = this->getViewData(mClickPos);
-  LayoutData::ViewData stop = this->getViewData(event->pos());
-  LayoutRegion region = merge(start.mRegion, stop.mRegion);
-  this->colorRegion(region, "dimgrey", "lightgrey");
+  LayoutData::ViewData stop = this->getViewData(pos);
+  mSelection = merge(start.mRegion, stop.mRegion);
+  this->colorRegion(mSelection, "dimgrey", "lightgrey");
+}
+
+/* Return a set of unique iterators into the layout data,
+ * representing the selected region.
+ */
+std::set<LayoutData::iterator> LayoutEditor::getSelectedViews()
+{
+  std::set<LayoutData::iterator> retval;
+  for (int r=mSelection.pos.row; r<mSelection.pos.row+mSelection.span.row; ++r)
+    for (int c=mSelection.pos.col; c<mSelection.pos.col+mSelection.span.col; ++c)
+      retval.insert(mViewData.find(LayoutPosition(r,c)));
+  return retval;
 }
 
 void LayoutEditor::mousePressEvent(QMouseEvent* event)
@@ -184,14 +203,18 @@ void LayoutEditor::mousePressEvent(QMouseEvent* event)
 
   if (event->button()==Qt::RightButton)
   {
+    // reselect if click is outside old selection
+    if (!mSelection.contains(this->getViewData(mClickPos).mRegion.pos))
+      this->updateSelection(event->pos());
+
     std::cout << "mouse press context" << std::endl;
     this->contextMenuSlot(event->pos());
-    return;
   }
-
-  std::cout << "mouse press clean" << std::endl;
-
-  this->colorRegion(this->getViewData(mClickPos).mRegion, "dimgrey", "lightgrey");
+  else
+  {
+    std::cout << "mouse press clean" << std::endl;
+    this->updateSelection(event->pos());
+  }
 }
 
 void LayoutEditor::colorRegion(LayoutRegion region, QString selectColor, QString backColor)
@@ -227,54 +250,13 @@ LayoutData::ViewData LayoutEditor::getViewData(QPoint pt)
   return LayoutData::ViewData();
 }
 
-void LayoutEditor::mouseReleaseEvent(QMouseEvent* event)
-{
-  std::cout << "mouse release" << std::endl;
-  LayoutData::ViewData start = this->getViewData(mClickPos);
-  LayoutData::ViewData stop = this->getViewData(event->pos());
-  LayoutRegion region = merge(start.mRegion, stop.mRegion);
-
-  this->mergeViews(region);
-  this->colorRegion(region, "lightgrey", "lightgrey");
-}
-
 /**called when row/column text boxes changed. Update model.
  *
  */
-void LayoutEditor::rcChanged()
+void LayoutEditor::rowsColumnsChangedSlot()
 {
-//  int rows = mRowsEdit->text().toInt();
-//  int cols = mColsEdit->text().toInt();
-//  rows = ssc::constrainValue(rows, 1, 10);
-//  cols = ssc::constrainValue(cols, 1, 10);
-//  this->resizeLayout(rows, cols);
-  this->resizeLayout(mRowsEdit->value(), mColsEdit->value());
-}
-
-/** Merge all views from r1,c1 to and including r2,c2.
- *  (r1,c1) is the starting point. Previously merged views
- *  partially inside the new region will be split.
- *
- *  Prerequisite: input is inside old boundaries.
- */
-void LayoutEditor::mergeViews(LayoutRegion region)
-{
-  mViewData.merge(region);
+  mViewData.resize(mRowsEdit->value(), mColsEdit->value());
   this->updateGrid();
-}
-
-void LayoutEditor::splitView(LayoutRegion region)
-{
-  mViewData.split(region);
-  this->updateGrid();
-}
-
-void LayoutEditor::resizeLayout(int rows, int cols)
-{
-  std::cout << "resize" << rows << cols << std::endl;
-  mViewData.resize(rows, cols);
-  this->updateGrid();
-  this->colorRegion(LayoutRegion(-1,-1,1,1), "lightgrey", "lightgrey");
 }
 
 /**Set visibility and position of frames in the gridlayout
@@ -283,7 +265,7 @@ void LayoutEditor::resizeLayout(int rows, int cols)
  */
 void LayoutEditor::updateGrid()
 {
-  std::cout << "pre update:" << streamXml2String(mViewData) << std::endl;
+  //std::cout << "pre update:" << streamXml2String(mViewData) << std::endl;
 
   this->clearDisplay();
 
@@ -316,10 +298,11 @@ void LayoutEditor::updateGrid()
   mColsEdit->setValue(mViewData.size().col);
   mColsEdit->blockSignals(false);
 
-  this->colorRegion(LayoutRegion(-1,-1,1,1), "lightgrey", "lightgrey");
+//  this->colorRegion(LayoutRegion(-1,-1,1,1), "lightgrey", "lightgrey");
+  this->colorRegion(mSelection, "dimgrey", "lightgrey");
 
-  this->updateGeometry();
-  QSize msize = mLayout->minimumSize();
+  //this->updateGeometry();
+  //QSize msize = mLayout->minimumSize();
 //  QSize rsize = mGridWidget->size();
   //std::cout << "minsize: " << msize.width() << "," << msize.height() << std::endl;
 //  std::cout << "real size: " << rsize.width() << "," << rsize.height() << std::endl;
@@ -331,7 +314,7 @@ void LayoutEditor::updateGrid()
 //  this->resize(400,700);
 //  QTimer::singleShot(0, this, SLOT(setNiceSize()));
 
-  std::cout << "post update:" << streamXml2String(mViewData) << std::endl;
+ // std::cout << "post update:" << streamXml2String(mViewData) << std::endl;
 
 }
 
