@@ -77,6 +77,11 @@ public:
 
   void addToolRep3D(ssc::ToolRep3DPtr rep);
 
+  /**Get a volumetric rep based on which image you want to  display.
+   * This is useful when creating the rep is expensive and should be done only once.
+   */
+  ssc::VolumetricRepPtr getVolumetricRep(ssc::ImagePtr image);
+
 protected slots:
   void probeRepPointPickedSlot(double x,double y,double z);
 //  void syncInria2DRepsSlot(double x,double y,double z); ///< updates the inria2dreps with a new position on mouseclick and tooltransform
@@ -95,6 +100,8 @@ protected:
 
 
   static RepManager*  mTheInstance;         ///< the only instance of this class
+
+  VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
 
 /*  const int           MAX_INRIAREP3DS; ///< number of Inria3D reps in the pool
   std::string         mInriaRep3DNames[2]; ///< the name of the reps in the pool

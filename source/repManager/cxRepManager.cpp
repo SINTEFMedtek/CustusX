@@ -304,6 +304,22 @@ void RepManager::addToolRep3D(ssc::ToolRep3DPtr rep)
   }
 }
 
+ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
+{
+  if (!image)
+    return ssc::VolumetricRepPtr();
+
+  if (!mVolumetricRepByImageMap.count(image->getUid()))
+  {
+    std::string uid("VolumetricRep_img_" + image->getUid());
+    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+    rep->setImage(image);
+    mVolumetricRepByImageMap[image->getUid()] = rep;
+  }
+  return mVolumetricRepByImageMap[image->getUid()];
+}
+
+
 RepManager* repManager()
 {
   return RepManager::getInstance();

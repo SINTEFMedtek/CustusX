@@ -53,7 +53,6 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 
 ViewWrapper2D::~ViewWrapper2D()
 {
-  std::cout << "killing viewwr2d" << std::endl;
   mView->removeReps();
 }
 
