@@ -79,14 +79,16 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
 
   if (!mVolumetricReps.count(image->getUid()))
   {
-    std::string uid("VolumetricRep_" + image->getUid());
-    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+//    std::string uid("VolumetricRep_" + image->getUid());
+//    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
+//    mVolumetricReps[image->getUid()] = rep;
+////    //Shading
+////    if (QSettings().value("shadingOn").toBool())
+////      rep->getVtkVolume()->GetProperty()->ShadeOn();
+//
+//    rep->setImage(image);
+    ssc::VolumetricRepPtr rep = repManager()->getVolumetricRep(image);
     mVolumetricReps[image->getUid()] = rep;
-//    //Shading
-//    if (QSettings().value("shadingOn").toBool())
-//      rep->getVtkVolume()->GetProperty()->ShadeOn();
-
-    rep->setImage(image);
     mView->addRep(rep);
     emit imageAdded(image->getUid().c_str());
   }

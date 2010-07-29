@@ -125,7 +125,7 @@ void ViewManager::setActiveView(std::string viewUid)
     return;
   mActiveView = qstring_cast(viewUid);
   emit activeViewChanged();
-  ssc::messageManager()->sendInfo("Active view set to "+string_cast(mActiveView));
+  ssc::messageManager()->sendInfo("Active view set to ["+string_cast(mActiveView) + "]");
 }
 
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
