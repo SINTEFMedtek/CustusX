@@ -207,12 +207,12 @@ void LayoutEditor::mousePressEvent(QMouseEvent* event)
     if (!mSelection.contains(this->getViewData(mClickPos).mRegion.pos))
       this->updateSelection(event->pos());
 
-    std::cout << "mouse press context" << std::endl;
+    //std::cout << "mouse press context" << std::endl;
     this->contextMenuSlot(event->pos());
   }
   else
   {
-    std::cout << "mouse press clean" << std::endl;
+    //std::cout << "mouse press clean" << std::endl;
     this->updateSelection(event->pos());
   }
 }

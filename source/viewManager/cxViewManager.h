@@ -9,6 +9,7 @@
 #include "cxForwardDeclarations.h"
 #include "sscEnumConverter.h"
 #include "cxLayoutData.h"
+#include "cxViewCache.h"
 
 class QActionGroup;
 class QAction;
@@ -44,6 +45,8 @@ class ViewManager : public QObject
   Q_OBJECT
 public:
 
+  View3D* get3DView(int group=0, int index=0);
+
   LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
   std::vector<QString> getAvailableLayouts() const; ///< get uids of all defined layouts
   void setLayoutData(const LayoutData& data); ///< add or edit a layout
@@ -57,20 +60,13 @@ public:
 
   QWidget* stealCentralWidget(); ///< lets the viewmanager know where to place its layout
 
-  View2DMap* get2DViews(); ///< returns all possible 2D views
-  View3DMap* get3DViews(); ///< returns all possible 3D views
-
-  ssc::View* getView(const std::string& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
-  View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
-  View3D* get3DView(const std::string& uid); ///< returns a 3D view with a given uid
-
   void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
 
   QString getActiveLayout() const; ///< returns the active layout
   void setActiveLayout(const QString& uid); ///< change the layout
 
   ViewWrapperPtr getActiveView() const; ///< returns the active view
-  void setActiveView(ViewWrapperPtr view); ///< change the active view
+  //void setActiveView(ViewWrapperPtr view); ///< change the active view
   void setActiveView(std::string viewUid); ///< convenient function for setting the active view
 
   void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
@@ -99,14 +95,23 @@ protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
 
+  View2DMap* get2DViews(); ///< returns all possible 2D views
+  View3DMap* get3DViews(); ///< returns all possible 3D views
+
+  ssc::View* getView(const std::string& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
+  View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
+  View3D* get3DView(const std::string& uid); ///< returns a 3D view with a given uid
+
   void syncOrientationMode(SyncedValuePtr val);
   void setStretchFactors(LayoutRegion region, int stretchFactor);
 
   void deactivateCurrentLayout();
   void activateLayout(const QString& toType);
-  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region);
-  void activate3DView(int group, int index, LayoutRegion region);
-  void deactivateView(ssc::View* view);
+  void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
+  void activate3DView(int group, LayoutRegion region);
+//  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region);
+//  void activate3DView(int group, int index, LayoutRegion region);
+  //void deactivateView(ssc::View* view);
   void addDefaultLayouts();
   unsigned findLayoutData(const QString uid) const;
   void addDefaultLayout(LayoutData data);
@@ -125,13 +130,14 @@ protected:
   QGridLayout*    mLayout;                    ///< the layout
   QWidget*        mMainWindowsCentralWidget;  ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 
-  ViewWrapperPtr   mActiveView;            ///< the active view
-  const int     MAX_3DVIEWS;            ///< constant defining the max number of 3D views available
-  const int     MAX_2DVIEWS;            ///< constant defining the max number of 2D views available
-  std::vector<std::string> mView3DNames;///< the name of all the 3D views
-  std::vector<std::string> mView2DNames;///< the name of all the 2D views
-  View2DMap     mView2DMap;             ///< a map of all the 3D views
-  View3DMap     mView3DMap;             ///< a map of all the 2D views
+  QString mActiveView;                    ///< the active view
+//  ViewWrapperPtr   mActiveView;            ///< the active view
+//  const int     MAX_3DVIEWS;            ///< constant defining the max number of 3D views available
+//  const int     MAX_2DVIEWS;            ///< constant defining the max number of 2D views available
+//  std::vector<std::string> mView3DNames;///< the name of all the 3D views
+//  std::vector<std::string> mView2DNames;///< the name of all the 2D views
+//  View2DMap     mView2DMap;             ///< a map of all the 3D views
+//  View3DMap     mView3DMap;             ///< a map of all the 2D views
   ViewMap       mViewMap;               ///< a map of all the views
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
@@ -146,6 +152,9 @@ protected:
   bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
   bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
   SyncedValuePtr mGlobalZoom2DVal;
+
+  ViewCache<View2D> mViewCache2D;
+  ViewCache<View3D> mViewCache3D;
 
 private:
   ViewManager(ViewManager const&);

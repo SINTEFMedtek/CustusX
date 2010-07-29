@@ -267,7 +267,7 @@ void ShiftCorrectionWidget::segmentImage(QString imageName,
   itkToVtkFilter->Update();
   
   //Get 3D view
-  View3D* view = ViewManager::getInstance()->get3DView("View3D_1");
+  View3D* view = ViewManager::getInstance()->get3DView();
   
   //Show converted volume = empty?
   /*ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image(outName.toStdString()+"_segm_volume", 
@@ -441,7 +441,7 @@ void ShiftCorrectionWidget::processImage(QString imageName)
   surfaceRep->setMesh(surface);
   
   //Get 3D view
-  View3D* view = ViewManager::getInstance()->get3DView("View3D_1");
+  View3D* view = ViewManager::getInstance()->get3DView();
   view->addRep(surfaceRep);
   
   //VTK

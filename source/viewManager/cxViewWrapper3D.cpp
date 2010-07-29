@@ -51,6 +51,12 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   toolsAvailableSlot();
 }
 
+ViewWrapper3D::~ViewWrapper3D()
+{
+  mView->removeReps();
+}
+
+
 void ViewWrapper3D::addImage(ssc::ImagePtr image)
 {
   if (!image)
