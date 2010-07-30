@@ -31,6 +31,7 @@ SET ( ${LIB}_viewManager
     cxLayoutData.cpp
     #cxViewGroupInria.h
     #cxViewGroupInria.cpp
+    cxTreeModelItem.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

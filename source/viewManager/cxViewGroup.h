@@ -61,6 +61,7 @@ public:
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
   double getZoom2D();
+  std::vector<ssc::ImagePtr> getImages() { return mImages; }
 
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);
