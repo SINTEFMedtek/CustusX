@@ -48,6 +48,20 @@ View::View(QWidget *parent, Qt::WFlags f) :
 View::~View()
 {
 }
+
+std::string View::getTypeString() const
+{
+  switch(this->getType())
+  {
+  case VIEW: return "View";
+  case VIEW_2D: return "View2D";
+  case VIEW_3D: return "View3D";
+  case VIEW_REAL_TIME: return "ViewRealTime";
+  }
+  return "";
+}
+
+
 std::string View::getUid()
 {
   return mUid;

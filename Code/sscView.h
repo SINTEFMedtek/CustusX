@@ -46,6 +46,7 @@ namespace ssc
 		View(QWidget *parent = NULL, Qt::WFlags f = 0);
 		virtual ~View();
 		virtual Type getType() const { return VIEW;}		///< \return the View type, indicating display dimension.
+		std::string getTypeString() const;
 		virtual std::string getUid();				///< Get a views unique id
 		virtual std::string getName();				///< Get a views name
 		virtual vtkRendererPtr  getRenderer() const;		///< Get the renderer used by this \a View.

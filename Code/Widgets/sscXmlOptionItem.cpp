@@ -39,7 +39,9 @@ QString XmlOptionItem::readValue(const QString& defval) const
 
 void XmlOptionItem::writeValue(const QString& val)
 {
-	QDomElement item = findElemFromUid(mUid, mRoot);
+  if (mRoot.isNull())
+    return;
+  QDomElement item = findElemFromUid(mUid, mRoot);
   // create option if not present
   if (item.isNull())
   {
