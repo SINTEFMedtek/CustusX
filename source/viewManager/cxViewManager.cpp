@@ -675,4 +675,38 @@ void ViewManager::saveGlobalSettings()
   file.save();
 }
 
+void ViewManager::fillModelTree(TreeItemPtr root)
+{
+  //TreeItemPtr item;
+  TreeItemPtr topItem = TreeItemImpl::create(root, "view groups", "", "");
+
+  for (unsigned i = 0; i < mViewGroups.size(); ++i)
+  {
+    ViewGroupPtr group = mViewGroups[i];
+    std::vector<ssc::View*> views = group->getViews();
+    if (views.empty())
+      continue;
+    TreeItemPtr groupItem = TreeItemImpl::create(topItem, "group"+qstring_cast(i), "view group", qstring_cast(i));
+    for (unsigned j=0; j<views.size(); ++j)
+    {
+      TreeItemPtr viewItem = TreeItemImpl::create(groupItem, qstring_cast(views[j]->getName()), qstring_cast(views[j]->getTypeString()), "");
+      std::vector<ssc::RepPtr> reps = views[j]->getReps();
+      for (unsigned k=0; k<reps.size(); ++k)
+      {
+        std::string name = reps[k]->getName();
+        if (name.empty())
+          name = reps[k]->getType();
+        TreeItemImpl::create(viewItem, qstring_cast(name), qstring_cast(reps[k]->getType()), "");
+      }
+    }
+
+    std::vector<ssc::ImagePtr> images = group->getImages();
+    for (unsigned j=0; j<images.size(); ++j)
+    {
+      TreeItemPtr imageItem = TreeItemImage::create(groupItem, images[j]->getName());
+    }
+  }
+}
+
+
 }//namespace cx

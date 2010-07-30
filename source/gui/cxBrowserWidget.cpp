@@ -14,39 +14,258 @@
 
 namespace cx
 {
+
+
+
+BrowserItemModel::BrowserItemModel(QObject* parent)
+{
+  mSelectionModel = NULL;
+
+  mFilter = ssc::StringDataAdapterXml::initialize("filter",
+      "Filter",
+      "Select which items to show in the browser",
+      "all",
+      QString("all views images tools").split(" "),
+      QDomNode());
+  connect(mFilter.get(), SIGNAL(valueWasSet()), this, SLOT(buildTree()));
+
+  this->buildTree();
+}
+
+
+void BrowserItemModel::setSelectionModel(QItemSelectionModel* selectionModel)
+{
+  mSelectionModel = selectionModel;
+  connect(mSelectionModel, SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentItemChangedSlot(const QModelIndex&, const QModelIndex&)));
+}
+
+ssc::StringDataAdapterXmlPtr BrowserItemModel::getFilter()
+{
+  return mFilter;
+}
+
+void BrowserItemModel::buildTree()
+{
+  this->beginResetModel();
+
+  QString filter = mFilter->getValue();
+  bool showViews  = filter=="all" || filter=="views";
+  bool showImages = filter=="all" || filter=="images";
+  bool showTools  = filter=="all" || filter=="tools";
+
+  mTree = TreeItemImpl::create(TreeItemWeakPtr(), "","","");
+
+  if (showViews)
+  {
+    viewManager()->fillModelTree(mTree);
+  }
+
+  if (showImages)
+  {
+    //TreeItemPtr item;
+    TreeItemPtr imagesItem = TreeItemImpl::create(mTree, "images", "", "");
+    ssc::DataManager::ImagesMap images = dataManager()->getImages();
+    for (ssc::DataManager::ImagesMap::iterator iter=images.begin(); iter!=images.end(); ++iter)
+    {
+
+      TreeItemPtr imageItem = TreeItemImage::create(imagesItem, iter->second->getUid());
+  //    TreeItemPtr imageItem = TreeItemImpl::create(imagesItem, qstring_cast(iter->second->getName()), "image", "");
+    }
+  }
+
+  if (showTools)
+  {
+    TreeItemToolManager::create(mTree);
+  }
+
+//  TreeItemPtr item;
+//
+//  item = TreeItemImpl::create(mTree, "A", "dummy", "text1");
+//  TreeItemImpl::create(item, "A1", "dummy", "text2a1");
+//  TreeItemImpl::create(item, "A2", "dummy", "text2a2");
+//
+//  TreeItemImpl::create(mTree, "B", "dummy", "text2");
+//  TreeItemImpl::create(mTree, "C", "dummy", "text3");
+  this->endResetModel();
+
+  emit hasBeenReset();
+}
+
+BrowserItemModel::~BrowserItemModel()
+{
+
+}
+
+void BrowserItemModel::currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous)
+{
+  std::cout << "item changed" << std::endl;
+  TreeItem *item = this->itemFromIndex(current);
+  if (!item)
+    return;
+  item->activate();
+}
+
+TreeItem* BrowserItemModel::itemFromIndex(const QModelIndex& index) const
+{
+  if (!index.isValid())
+      return mTree.get();
+  else
+      return static_cast<TreeItem*>(index.internalPointer());
+}
+
+int BrowserItemModel::columnCount(const QModelIndex& parent) const
+{
+  TreeItem *parentItem = this->itemFromIndex(parent);
+//  if (parent.column() > 0) // ignore for all but first column
+//      return 0;
+  return parentItem->getColumnCount();
+}
+
+int BrowserItemModel::rowCount(const QModelIndex& parent) const
+{
+  TreeItem *parentItem = this->itemFromIndex(parent);
+  if (parent.column() > 0) // ignore for all but first column
+      return 0;
+  return parentItem->getChildCount();
+}
+
+QVariant BrowserItemModel::data(const QModelIndex& index, int role) const
+{
+  if (role==Qt::DisplayRole)
+  {
+    TreeItem *item = this->itemFromIndex(index);
+    if (index.column()==0)
+      return item->getName();
+    if (index.column()==1)
+      return item->getType();
+    if (index.column()==2)
+      return item->getData();
+  }
+  return QVariant();
+}
+
+Qt::ItemFlags BrowserItemModel::flags(const QModelIndex& index) const
+{
+  return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+QVariant BrowserItemModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+  if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
+  {
+    if (section==0)
+      return "Item";
+    if (section==1)
+      return "Type";
+    if (section==2)
+      return "Details";
+  }
+  return QVariant();
+}
+
+QModelIndex BrowserItemModel::index(int row, int column, const QModelIndex& parent) const
+{
+//  if (parent!=QModelIndex())
+//    return QModelIndex(); // valid only for direct siblings of top level
+//  return this->createIndex(row,column, mValues[row]);
+//
+
+//  if (!hasIndex(row, column, parent))
+//      return QModelIndex();
+
+  TreeItem *parentItem = this->itemFromIndex(parent);
+  TreeItem *childItem = parentItem->getChild(row).get();
+  if (childItem)
+      return createIndex(row, column, childItem);
+  else
+      return QModelIndex();
+}
+
+QModelIndex BrowserItemModel::parent(const QModelIndex& index) const
+{
+//  if (!index.isValid())
+//      return QModelIndex();
+
+  TreeItem *childItem = this->itemFromIndex(index);
+
+  if (!childItem)
+    return QModelIndex();
+
+  TreeItem *parentItem = childItem->getParent().lock().get();
+
+  if (parentItem == mTree.get())
+      return QModelIndex();
+
+  // find row of parent within grandparent
+  TreeItemPtr grandParent = parentItem->getParent().lock();
+  int row = 0;
+  if (grandParent)
+  {
+    for (row=0; row<grandParent->getChildCount(); ++row)
+      if (parentItem==grandParent->getChild(row).get())
+        break;
+  }
+
+  return createIndex(row, 0, parentItem);
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 BrowserWidget::BrowserWidget(QWidget* parent) :
     QWidget(parent),
-    mTreeWidget(new QTreeWidget(this)),
-    mVerticalLayout(new QVBoxLayout())
+    //mTreeWidget(new QTreeWidget(this)),
+    mVerticalLayout(new QVBoxLayout(this))
 {
-  //dock widget
   this->setWindowTitle("Browser");
 
+  mModel = new BrowserItemModel(this);
+  connect(mModel, SIGNAL(hasBeenReset()), this, SLOT(resetView()));
+
+  mVerticalLayout->addWidget(new ssc::ComboGroupWidget(this, mModel->getFilter()));
+
   //layout
-  mVerticalLayout->addWidget(mTreeWidget);
+  mTreeView = new QTreeView(this);;
+  mTreeView->setModel(mModel);
+  mModel->setSelectionModel(mTreeView->selectionModel());
+  mVerticalLayout->addWidget(mTreeView);
 }
 BrowserWidget::~BrowserWidget()
 {}
 void BrowserWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
-  connect(dataManager(), SIGNAL(dataLoaded()),
-          this, SLOT(populateTreeWidget()));
-  connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
-          this, SLOT(populateTreeWidget()));
+  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
+  connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
+  connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(populateTreeWidget()));
+  connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(populateTreeWidget()));
+
   this->populateTreeWidget();
 }
 void BrowserWidget::closeEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
-  disconnect(dataManager(), SIGNAL(dataLoaded()),
-             this, SLOT(populateTreeWidget()));
-  disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
-             this, SLOT(populateTreeWidget()));
+  disconnect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
+  disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
 }
+
+void BrowserWidget::resetView()
+{
+  mTreeView->expandToDepth(1);
+  mTreeView->resizeColumnToContents(0);
+}
+
 void BrowserWidget::populateTreeWidget()
 {
-//  //get all images, meshes and tools
+  mModel->buildTree();
+//  mTreeView->expandToDepth(1);
+//  mTreeView->resizeColumnToContents(0);
+
+
+  //  //get all images, meshes and tools
 //  std::map<std::string, std::string> imageUidAndNames =
 //      dataManager()->getImageUidsAndNames();
 //  std::map<std::string, std::string> meshUidAndNames =

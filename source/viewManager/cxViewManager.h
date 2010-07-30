@@ -10,6 +10,7 @@
 #include "sscEnumConverter.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
+#include "cxTreeModelItem.h"
 
 class QActionGroup;
 class QAction;
@@ -46,6 +47,7 @@ class ViewManager : public QObject
 public:
 
   View3D* get3DView(int group=0, int index=0);
+  void fillModelTree(TreeItemPtr root);
 
   LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
   std::vector<QString> getAvailableLayouts() const; ///< get uids of all defined layouts
