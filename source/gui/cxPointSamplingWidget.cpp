@@ -199,11 +199,11 @@ void PointSamplingWidget::addButtonClickedSlot()
 ssc::Vector3D PointSamplingWidget::getSample() const
 {
   // find current tool position:
-  ssc::ToolPtr tool = toolManager()->getDominantTool();
+  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
   if (!tool)
     return ssc::Vector3D(0,0,0);
   ssc::Transform3D prMt = tool->get_prMt();
-  ssc::Transform3D rMpr = *toolManager()->get_rMpr();
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
   ssc::Vector3D pos = (rMpr*prMt).coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
 
   return pos;

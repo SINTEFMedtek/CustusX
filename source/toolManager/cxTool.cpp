@@ -216,7 +216,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     }
 
     const igstk::CoordinateSystem* destination = result.GetDestination();
-    ssc::ToolPtr refTool = toolManager()->getReferenceTool();
+    ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
 
     if(refTool) //if we are tracking with a reftool it must be visible
     {
@@ -229,7 +229,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     }else //if we dont have a reftool we use the tracker as patientref
     {
       //std::cout << "Checking that the incoming transforms destiantion is the TRACKER." << std::endl;
-      TrackerPtr tracker = toolManager()->getTracker();
+      TrackerPtr tracker = ToolManager::getInstance()->getTracker();
       if(!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
         return;
       //std::cout << "Tracker is the destiantion." << std::endl;

@@ -10,7 +10,7 @@
 #include "cxDataManager.h"
 #include "sscImageLUT2D.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "sscTool.h"
 
 namespace cx
@@ -18,7 +18,7 @@ namespace cx
 
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
-  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   dominantToolChangedSlot();
 }
 
@@ -44,7 +44,7 @@ void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
     disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SIGNAL(changed()));
   }
 
-  mTool = toolManager()->getDominantTool();
+  mTool = ssc::toolManager()->getDominantTool();
 
   if (mTool)
   {
@@ -67,12 +67,12 @@ ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 
 DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
-  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
-  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
 void DoubleDataAdapterActiveImageBase::activeImageChanged()
 {
-  mImage = dataManager()->getActiveImage();
+  mImage = ssc::dataManager()->getActiveImage();
   emit changed();
 }
 double DoubleDataAdapterActiveImageBase::getValue() const

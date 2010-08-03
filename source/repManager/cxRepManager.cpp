@@ -17,7 +17,10 @@ RepManager* RepManager::getInstance()
    return mTheInstance;
 }
 void RepManager::destroyInstance()
-{}
+{
+  delete mTheInstance;
+  mTheInstance = NULL;
+}
 RepManager::RepManager() :
   //MAX_INRIAREP3DS(2),
   //MAX_INRIAREP2DS(9),
@@ -113,7 +116,7 @@ RepManager::RepManager() :
             this, SLOT(syncInria2DRepsSlot(double,double,double)));*/
 
   //connect the dominant tool to the acs-sets so they also get update when we move the tool
-  connect(ToolManager::getInstance(), SIGNAL(dominantToolChanged(const std::string&)),
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)),
           this, SLOT(dominantToolChangedSlot(const std::string&)));
 }
 
@@ -147,7 +150,7 @@ void RepManager::probeRepPointPickedSlot(double x,double y,double z)
 {
   //TODO check spaces....
   ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
-  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
   // TODO set center here will not do: must handle
   DataManager::getInstance()->setCenter(p_r);
   ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
@@ -264,7 +267,7 @@ ssc::GeometricRepPtr RepManager::getGeometricRep(const std::string& uid)
 
 void RepManager::dominantToolChangedSlot(const std::string& toolUid)
 {
-  ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
+  ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   if(!dominantTool)
   {
     ssc::messageManager()->sendError("Couldn't find a dominant tool to connect the inria2Dreps to.");

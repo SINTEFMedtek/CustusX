@@ -10,10 +10,10 @@ class QMenu;
 
 namespace cx
 {
-class DataManager;
+//class DataManager;
 class RepManager;
 class MessageManager;
-class ToolManager;
+//class ToolManager;
 
 typedef ssc::Transform3D Transform3D;
 /**

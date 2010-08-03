@@ -22,14 +22,18 @@ int main(int argc, char *argv[])
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
 //  app.setWindowIcon(QIcon(":/icons/.png"));
 
-  cx::MainWindow mainWin;
-  mainWin.show();
+  cx::MainWindow::initialize();
+
+  cx::MainWindow* mainWin = new cx::MainWindow;
+  mainWin->show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
-  mainWin.activateWindow();
+  mainWin->activateWindow();
 #endif
-  mainWin.raise();
+  mainWin->raise();
 
   int retVal = app.exec();
+  delete mainWin;
+  cx::MainWindow::shutdown(); // shutdown all global resources, _after_ gui is deleted.
   return retVal;
   
 }

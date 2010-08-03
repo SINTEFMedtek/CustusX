@@ -10,7 +10,7 @@
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxDataManager.h"
 
 namespace cx
@@ -25,6 +25,13 @@ RegistrationManager* RegistrationManager::getInstance()
   }
   return mCxInstance;
 }
+
+void RegistrationManager::shutdown()
+{
+  delete mCxInstance;
+  mCxInstance = NULL;
+}
+
 
 RegistrationManager::RegistrationManager()
 {}
@@ -61,7 +68,7 @@ void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patie
   mManualPatientRegistration = patientRegistration;
 
   ssc::RegistrationTransform regTrans(*patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
-  toolManager()->get_rMpr_History()->addRegistration(regTrans);
+  ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   //if an offset existed, its no longer valid and should be removed
   mPatientRegistrationOffset.reset();
@@ -90,7 +97,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
   else if (mMasterImage)
   {
     this->resetOffset();
-    currentTransform = *toolManager()->get_rMpr();
+    currentTransform = *ssc::toolManager()->get_rMpr();
   }
   else //if we dont have a masterimage or a manualtransform we just want to save the offset?
   {
@@ -100,7 +107,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
   mPatientRegistrationOffset = offset;
   ssc::Transform3D newTransform = (*mPatientRegistrationOffset) * currentTransform;
   ssc::RegistrationTransform regTrans(newTransform, QDateTime::currentDateTime(), "Manual Patient Offset");
-  toolManager()->get_rMpr_History()->addRegistration(regTrans);
+  ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   ssc::messageManager()->sendInfo("Offset for the patient registration is set.");
 }
@@ -123,7 +130,7 @@ void RegistrationManager::resetOffset()
 std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b)
 {
   std::vector<std::string> retval;
-  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
+  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
   std::map<std::string, ssc::LandmarkProperty>::iterator iter;
 
   for (iter=props.begin(); iter!=props.end(); ++iter)
@@ -199,7 +206,7 @@ void RegistrationManager::doPatientRegistration()
   }
 
   ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
-  ssc::LandmarkMap toolLandmarks = toolManager()->getLandmarks();
+  ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
 
   std::vector<std::string> landmarks = this->getUsableLandmarks(masterLandmarks, toolLandmarks);
 
@@ -212,7 +219,7 @@ void RegistrationManager::doPatientRegistration()
     return;
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
-  toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
   emit patientRegistrationPerformed();
@@ -278,7 +285,7 @@ void RegistrationManager::parseXml(QDomNode& dataNode)
       //std::cout << "RM: Found a masterImage with uid: " << masterImageString.toStdString().c_str() << std::endl;
       if(!masterImageString.isEmpty())
       {
-        ssc::ImagePtr image = dataManager()->getImage(masterImageString.toStdString());
+        ssc::ImagePtr image = ssc::dataManager()->getImage(masterImageString.toStdString());
         //std::cout << "RM: Got an image with uid: " << image->getUid().c_str() << std::endl;
         this->setMasterImage(image);
       }

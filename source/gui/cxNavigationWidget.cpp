@@ -8,7 +8,7 @@
 #include "sscMessageManager.h"
 #include "cxView3D.h"
 #include "cxViewManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
@@ -55,13 +55,13 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   connect(mToolCameraStyleRadioButton, SIGNAL(toggled(bool)),
           this, SLOT(radioButtonToggledSlot(bool)));
 
-  connect(ToolManager::getInstance(), SIGNAL(configured()),
+  connect(ssc::toolManager(), SIGNAL(configured()),
           this, SLOT(trackingConfiguredSlot()));
-  connect(ToolManager::getInstance(), SIGNAL(initialized()),
+  connect(ssc::toolManager(), SIGNAL(initialized()),
           this, SLOT(trackingInitializedSlot()));
-  connect(ToolManager::getInstance(), SIGNAL(trackingStarted()),
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()),
           this, SLOT(trackingStartedSlot()));
-  connect(ToolManager::getInstance(), SIGNAL(trackingStopped()),
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()),
           this, SLOT(trackingStoppedSlot()));
 }
 NavigationWidget::~NavigationWidget()

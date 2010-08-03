@@ -38,7 +38,7 @@ TransferFunctionColorWidget::~TransferFunctionColorWidget()
 
 void TransferFunctionColorWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(mCurrentImage == activeImage)
     return;
 

@@ -35,6 +35,7 @@ public:
   typedef Tool::Message ToolMessage;
   typedef std::string stdString;
 
+  static void initializeObject();
   static ToolManager* getInstance();
 
   virtual bool isConfigured() const; ///< checks if the system is configured
@@ -81,10 +82,10 @@ public slots:
   virtual void saveToolsSlot(); ///< saves transforms and timestamps
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
-  signals:
-  void landmarkRemoved(std::string uid);
-  void landmarkAdded(std::string uid);
-  void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
+//  signals:
+//  void landmarkRemoved(std::string uid);
+//  void landmarkAdded(std::string uid);
+//  void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 
 protected slots:
   void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from tools
@@ -102,7 +103,7 @@ protected:
   void initializeManualTool();
   void configureReferences(); ///<
 
-  static ToolManager* mCxInstance;
+//  static ToolManager* mCxInstance;
 
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder; ///< path to where logging should be saved
@@ -134,8 +135,6 @@ private:
   void cleanupSymlink();
 };
 
-/**Shortcut for accessing the toolmanager instance.*/
-ToolManager* toolManager();
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2); ///< function for sorting tools by type
 
 }//namespace cx

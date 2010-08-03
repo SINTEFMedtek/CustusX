@@ -14,10 +14,11 @@
 #include "cxDataManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "cxRegistrationManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
+#include "sscToolManager.h"
 #include "cxFileCopied.h"
 #include "cxDataLocations.h"
+#include "cxRegistrationManager.h"
 
 namespace cx
 {
@@ -165,14 +166,14 @@ void PatientData::importData(QString fileName)
   if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
      fileType.compare("mha", Qt::CaseInsensitive) == 0)
   {
-    data = dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
+    data = ssc::dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
-    data = dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtSTL);
+    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtSTL);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
-    data = dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtPOLYDATA);
+    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
   data->setName(fileInfo.fileName().toStdString());
@@ -329,8 +330,8 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
   QDomElement managerNode = doc.createElement("managers");
   patientNode.appendChild(managerNode);
 
-  dataManager()->addXml(managerNode);
-  toolManager()->addXml(managerNode);
+  ssc::dataManager()->addXml(managerNode);
+  ssc::toolManager()->addXml(managerNode);
   viewManager()->addXml(managerNode);
   registrationManager()->addXml(managerNode);
 
@@ -362,11 +363,11 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
   }
   if (!dataManagerNode.isNull())
   {
-    dataManager()->parseXml(dataManagerNode, patientFolder);
+    ssc::dataManager()->parseXml(dataManagerNode, patientFolder);
   }
 
   QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-  toolManager()->parseXml(toolmanagerNode);
+  ssc::toolManager()->parseXml(toolmanagerNode);
 
   QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
   viewManager()->parseXml(viewmanagerNode);

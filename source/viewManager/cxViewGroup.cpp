@@ -68,9 +68,9 @@ void Navigation::centerToGlobalImageCenter()
  */
 void Navigation::centerToTooltip()
 {
-  ssc::ToolPtr tool = ToolManager::getInstance()->getDominantTool();
+  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
   ssc::Vector3D p_pr = tool->get_prMt().coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
-  ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(p_pr);
+  ssc::Vector3D p_r = ssc::toolManager()->get_rMpr()->coord(p_pr);
 
   // set center to calculated position
   DataManager::getInstance()->setCenter(p_r);
@@ -138,7 +138,7 @@ ssc::Vector3D Navigation::findGlobalImageCenter()
   if (DataManager::getInstance()->getImages().empty())
     return p_r;
 
-  ssc::DataManager::ImagesMap images = dataManager()->getImages();
+  ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
   ssc::DataManager::ImagesMap::iterator iter;
 
   for (iter=images.begin(); iter!=images.end(); ++iter)
@@ -154,7 +154,7 @@ void Navigation::centerManualTool(ssc::Vector3D& p_r)
 {
   // move the manual tool to the same position. (this is a side effect... do we want it?)
   ssc::ManualToolPtr manual = ToolManager::getInstance()->getManualTool();
-  ssc::Vector3D p_pr = ToolManager::getInstance()->get_rMpr()->inv().coord(p_r);
+  ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
   ssc::Transform3D prM0t = manual->get_prMt(); // modify old pos in order to keep orientation
   ssc::Vector3D t_pr = prM0t.coord(ssc::Vector3D(0,0,manual->getTooltipOffset()));
   ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
@@ -261,7 +261,7 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
 
 void ViewGroup::addImage(QString imageUid)
 {
-  ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
+  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
   if(!image)
   {
     ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
@@ -274,7 +274,7 @@ void ViewGroup::removeImage(QString imageUid)
 {
   //std::cout << "ViewGroup::removeImage [" << imageUid<< "]"<< std::endl;
 
-  ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
+  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
   if(!image)
   {
     ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
@@ -287,9 +287,9 @@ void ViewGroup::mouseClickInViewGroupSlot()
 {
   //ssc::messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
   if (mImages.empty())
-    dataManager()->setActiveImage(ssc::ImagePtr());
+    ssc::dataManager()->setActiveImage(ssc::ImagePtr());
   else
-    dataManager()->setActiveImage(mImages.front());
+    ssc::dataManager()->setActiveImage(mImages.front());
 
   ssc::View* view = static_cast<ssc::View*>(this->sender());
   if(view)
@@ -344,7 +344,7 @@ void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 
 void ViewGroup::activateManualToolSlot()
 {
-  toolManager()->dominantCheckSlot();
+  ToolManager::getInstance()->dominantCheckSlot();
 }
 
 void ViewGroup::addXml(QDomNode& dataNode)
@@ -372,7 +372,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
 
      if (!imageUid.isEmpty())
      {
-       ssc::ImagePtr image = dataManager()->getImage(string_cast(imageUid));
+       ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(imageUid));
        if (image)
          this->addImage(image);
        else

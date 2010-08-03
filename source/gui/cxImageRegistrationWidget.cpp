@@ -83,7 +83,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
     return;
   }
 
-  std::string uid = dataManager()->addLandmark();
+  std::string uid = ssc::dataManager()->addLandmark();
   ssc::Vector3D pos_r = probeRep->getPosition();
   ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
   //std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;

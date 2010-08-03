@@ -17,7 +17,7 @@
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxRegistrationManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxDataManager.h"
 
 namespace cx
@@ -52,14 +52,14 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   connect(mResetOffsetButton, SIGNAL(clicked()), this, SLOT(resetOffsetSlot()));
 
   //toolmanager
-  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot(const std::string&)));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot(const std::string&)));
 
-  connect(toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot(std::string)));
-  connect(toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
+  connect(ssc::toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot(std::string)));
+  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
 
   //registrationmanager
   connect(RegistrationManager::getInstance(), SIGNAL(patientRegistrationPerformed()), this, SLOT(activateManualRegistrationFieldSlot()));
-  connect(ToolManager::getInstance(), SIGNAL(rMprChanged()), this, SLOT(activateManualRegistrationFieldSlot()));
+  connect(ssc::toolManager(), SIGNAL(rMprChanged()), this, SLOT(activateManualRegistrationFieldSlot()));
 
   //sliders
   mXOffsetSlider->setRange(mMinValue,mMaxValue);
@@ -121,7 +121,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
 
   mOffsetWidget->setDisabled(true);
 
-  ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
+  ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   if(dominantTool)
     this->dominantToolChangedSlot(dominantTool->getUid());
 }
@@ -145,7 +145,7 @@ void PatientRegistrationWidget::enableToolSampleButton()
   bool enabled = false;
   enabled = mToolToSample &&
       mToolToSample->getVisible() &&
-      (mToolToSample->getType()!=ssc::Tool::TOOL_MANUAL || dataManager()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
+      (mToolToSample->getType()!=ssc::Tool::TOOL_MANUAL || DataManager::getInstance()->getDebugMode()); // enable only for non-manual tools. ignore this in debug mode.
   mToolSampleButton->setEnabled(enabled);
 }
 
@@ -161,10 +161,10 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   ssc::Vector3D p_pr = lastTransform_prMt.coord(ssc::Vector3D(0,0,mToolToSample->getTooltipOffset()));
 
   // TODO: do we want to allow sampling points not defined in image??
-  if (mActiveLandmark.empty() && !dataManager()->getLandmarkProperties().empty())
-    mActiveLandmark = dataManager()->getLandmarkProperties().begin()->first;
+  if (mActiveLandmark.empty() && !ssc::dataManager()->getLandmarkProperties().empty())
+    mActiveLandmark = ssc::dataManager()->getLandmarkProperties().begin()->first;
 
-  toolManager()->setLandmark(ssc::Landmark(mActiveLandmark, p_pr));
+  ssc::toolManager()->setLandmark(ssc::Landmark(mActiveLandmark, p_pr));
 
   this->nextRow();
 }
@@ -174,7 +174,7 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
   if(mToolToSample && mToolToSample->getUid() == uid)
     return;
 
-  ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
+  ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
 
   if(mToolToSample)
     disconnect(mToolToSample.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
@@ -186,7 +186,7 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 
   //update button
   mToolSampleButton->setText("Sample ("+qstring_cast(mToolToSample->getName())+")");
-  connect(dataManager(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButton()));
+  connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButton()));
   enableToolSampleButton();
 }
 
@@ -237,7 +237,7 @@ void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr ima
  */
 ssc::LandmarkMap PatientRegistrationWidget::getTargetLandmarks() const
 {
-  return toolManager()->getLandmarks();
+  return ssc::toolManager()->getLandmarks();
 }
 
 /** Return transform from target space to reference space
@@ -245,7 +245,7 @@ ssc::LandmarkMap PatientRegistrationWidget::getTargetLandmarks() const
  */
 ssc::Transform3D PatientRegistrationWidget::getTargetTransform() const
 {
-  ssc::Transform3D rMpr = *(toolManager()->get_rMpr());
+  ssc::Transform3D rMpr = *(ssc::toolManager()->get_rMpr());
   return rMpr;
 }
 

@@ -15,19 +15,30 @@
 
 namespace cx
 {
+
+void ToolManager::initializeObject()
+{
+  ssc::ToolManager::setInstance(new ToolManager());
+}
+
 // Doxygen ignores code between \cond and \endcond
 /// \cond
-ToolManager* ToolManager::mCxInstance = NULL;
+//ToolManager* ToolManager::mCxInstance = NULL;
 /// \endcond
-ToolManager* toolManager() { return ToolManager::getInstance(); }
+//ToolManager* toolManager() { return ToolManager::getInstance(); }
+//ToolManager* ToolManager::getInstance()
+//{
+//  if (mCxInstance == NULL)
+//  {
+//    mCxInstance = new ToolManager();
+//    ssc::ToolManager::setInstance(mCxInstance);
+//  }
+//  return mCxInstance;
+//}
+
 ToolManager* ToolManager::getInstance()
 {
-  if (mCxInstance == NULL)
-  {
-    mCxInstance = new ToolManager();
-    ssc::ToolManager::setInstance(mCxInstance);
-  }
-  return mCxInstance;
+  return dynamic_cast<ToolManager*>(ssc::ToolManager::getInstance());
 }
 
 ToolManager::ToolManager() :
@@ -59,6 +70,7 @@ ToolManager::ToolManager() :
 
 ToolManager::~ToolManager()
 {
+  //std::cout << "ToolManager::~ToolManager()" << std::endl;
   // ignore: the standalone 32b us-acq need the symlink as well.
   //this->cleanupSymlink();
 }

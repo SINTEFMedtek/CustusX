@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
@@ -64,7 +64,7 @@ void BrowserItemModel::buildTree()
   {
     //TreeItemPtr item;
     TreeItemPtr imagesItem = TreeItemImpl::create(mTree, "images", "", "");
-    ssc::DataManager::ImagesMap images = dataManager()->getImages();
+    ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
     for (ssc::DataManager::ImagesMap::iterator iter=images.begin(); iter!=images.end(); ++iter)
     {
 
@@ -238,7 +238,7 @@ BrowserWidget::~BrowserWidget()
 void BrowserWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
-  connect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
   connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(populateTreeWidget()));
   connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(populateTreeWidget()));
@@ -248,7 +248,7 @@ void BrowserWidget::showEvent(QShowEvent* event)
 void BrowserWidget::closeEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
-  disconnect(dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
+  disconnect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTreeWidget()));
   disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTreeWidget()));
 }
 

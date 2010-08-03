@@ -55,7 +55,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   
   toptopLayout->addStretch();
 
-  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
   updateSlot();
 }
 
@@ -105,13 +105,13 @@ void MeshPropertiesWidget::visibilityChangedSlot(bool visible)
 {
   if(visible)
   {
-    connect(dataManager(), SIGNAL(dataLoaded()),
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()),
             this, SLOT(populateMeshComboBoxSlot()));
     this->populateMeshComboBoxSlot();
   }
   else
   {
-    disconnect(dataManager(), SIGNAL(dataLoaded()),
+    disconnect(ssc::dataManager(), SIGNAL(dataLoaded()),
                this, SLOT(populateMeshComboBoxSlot()));
   }
 }
@@ -124,7 +124,7 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
   mMeshComboBox->clear();
   
   //get a list of meshes from the datamanager
-  std::map<std::string, ssc::MeshPtr> meshes = dataManager()->getMeshes();
+  std::map<std::string, ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
   if(meshes.size() == 0)
   {
     mMeshComboBox->insertItem(1, QString("Import a mesh to begin..."));
@@ -161,7 +161,7 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
   std::string meshId = comboBoxText.toStdString();
   
   //find the mesh
-  ssc::MeshPtr mesh = dataManager()->getMesh(meshId);
+  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(meshId);
   if(!mesh)
   {
     ssc::messageManager()->sendError("Could not find the selected mesh in the DataManager: "+meshId);
