@@ -48,6 +48,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
+  connect(mView, SIGNAL(mouseMoveSignal(QMouseEvent*)), this, SLOT(mouseMoveSlot(QMouseEvent*)));
   connect(mView, SIGNAL(mouseWheelSignal(QWheelEvent*)), this, SLOT(mouseWheelSlot(QWheelEvent*)));
 }
 
@@ -395,6 +396,19 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
     moveAxisPos(qvp2vp(event->pos()));
   }
 }
+
+/**Part of the mouse interactor:
+ * Move manual tool tip when mouse pressed
+ *
+ */
+void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
+{
+  if (event->buttons() & Qt::LeftButton)
+  {
+    moveAxisPos(qvp2vp(event->pos()));
+  }
+}
+
 
 /**Part of the mouse interactor:
  * Interpret mouse wheel as a zoom operation.

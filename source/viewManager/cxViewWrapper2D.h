@@ -44,6 +44,7 @@ private slots:
   void viewportChanged();
   void showSlot();
   void mousePressSlot(QMouseEvent* event);
+  void mouseMoveSlot(QMouseEvent* event);
   void mouseWheelSlot(QWheelEvent* event);
   void orientationActionSlot();
   void global2DZoomActionSlot();
