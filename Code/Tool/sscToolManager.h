@@ -23,17 +23,9 @@ public:
 	typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
 	/** not sure if this is needed? we have getInstance in subclasses...*/
-	static void setInstance(ToolManager* instance)
-	{
-		mInstance = instance;
-	};
-	static ToolManager* getInstance() { return mInstance; }
-	static void shutdown()
-	{
-		delete mInstance;
-		mInstance = NULL;
-	}
-
+	static void setInstance(ToolManager* instance);  ///< must call this one before calling getInstance()
+	static ToolManager* getInstance();
+	static void shutdown();
 
 	virtual bool isConfigured() const = 0; ///< system is ready to use but not connected to hardware
 	virtual bool isInitialized() const = 0; ///< system is connected to hw and ready
@@ -77,6 +69,7 @@ signals:
 	void dominantToolChanged(const std::string& uId); ///<signal for change of dominant tool
   void landmarkRemoved(std::string uid);
   void landmarkAdded(std::string uid);
+  void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
 
 protected:
 	ToolManager() {} ///< Empty on purpose
@@ -84,6 +77,9 @@ protected:
 
 	static ToolManager* mInstance; ///< The only instance of this class that can exist.
 };
+
+/**Shortcut for accessing the toolmanager instance.*/
+ToolManager* toolManager();
 
 //M_r_tool = toolManager->get_M_ref_pat() * currentTool->get_M_pat_tool();
 //rMt = toolManager->get_rMp() * currentTool->get_pMt();

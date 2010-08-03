@@ -44,6 +44,7 @@ public:
 	typedef std::map<std::string, MeshPtr> MeshMap;
 
 	static DataManager* getInstance();
+  static void shutdown();
 
 	// images
 	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type) = 0;
@@ -73,6 +74,7 @@ public:
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 
+  virtual std::string addLandmark() { return ""; }
   virtual void setLandmarkNames(std::vector<std::string> names) {}
   virtual void setLandmarkName(std::string uid, std::string name) {}
   virtual void setLandmarkActive(std::string uid, bool active) {}
@@ -80,6 +82,8 @@ public:
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
+  virtual void addXml(QDomNode& parentNode) {} ///< adds xml information about the datamanger and its variabels
+  virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString()) {} ///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.
@@ -97,6 +101,8 @@ protected:
 private:
 	static DataManager* mInstance;
 };
+
+DataManager* dataManager();
 
 } // namespace ssc
 

@@ -22,6 +22,12 @@ namespace ssc
 DataManager* DataManager::mInstance = NULL; ///< static member
 // --------------------------------------------------------
 
+void DataManager::shutdown()
+{
+  delete mInstance;
+  mInstance = NULL;
+}
+
 DataManager* DataManager::getInstance()
 {
 	if (!mInstance)
@@ -50,6 +56,11 @@ DataManager::~DataManager()
 
 ImagePtr DataManager::getActiveImage() const { return ImagePtr(); } ///< used for system state
 void DataManager::setActiveImage(ImagePtr activeImage) {} ///< used for system state
+
+DataManager* dataManager()
+{
+  return DataManager::getInstance();
+}
 
 
 } // namespace ssc
