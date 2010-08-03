@@ -243,22 +243,20 @@ void MainWindow::createActions()
   mToolsActionGroup = new QActionGroup(this);
   mConfigureToolsAction =  new QAction(tr("Tool configuration"), mToolsActionGroup);
   mInitializeToolsAction =  new QAction(tr("Initialize"), mToolsActionGroup);
-  mStartTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
-  mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), mToolsActionGroup);
+  //mStartTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
+  //mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), mToolsActionGroup);
+  mTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
   mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
   mConfigureToolsAction->setChecked(true);
 
-  connect(mConfigureToolsAction, SIGNAL(triggered()),
-          this, SLOT(configureSlot()));
-  connect(mInitializeToolsAction, SIGNAL(triggered()),
-      ssc::toolManager(), SLOT(initialize()));
-  connect(mStartTrackingToolsAction, SIGNAL(triggered()),
-      ssc::toolManager(), SLOT(startTracking()));
-  connect(mStopTrackingToolsAction, SIGNAL(triggered()),
-      ssc::toolManager(), SLOT(stopTracking()));
-  connect(mSaveToolsPositionsAction, SIGNAL(triggered()), 
-      ssc::toolManager(), SLOT(saveToolsSlot()));
+  connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
+  connect(mInitializeToolsAction, SIGNAL(triggered()), ssc::toolManager(), SLOT(initialize()));
+  connect(mTrackingToolsAction, SIGNAL(triggered()), this, SLOT(toggleTrackingSlot()));
+  connect(mSaveToolsPositionsAction, SIGNAL(triggered()), ssc::toolManager(), SLOT(saveToolsSlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateTrackingActionSlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateTrackingActionSlot()));
+  this->updateTrackingActionSlot();
 
   mNewLayoutAction = new QAction(tr("New Layout"), this);
   mNewLayoutAction->setToolTip("Create a new Custom Layout");
@@ -303,6 +301,22 @@ void MainWindow::centerToImageCenterSlot()
 void MainWindow::centerToTooltipSlot()
 {
   Navigation().centerToTooltip();
+}
+
+void MainWindow::updateTrackingActionSlot()
+{
+  if (ssc::toolManager()->isTracking())
+    mTrackingToolsAction->setText("Stop Tracking");
+  else
+    mTrackingToolsAction->setText("Start Tracking");
+}
+
+void MainWindow::toggleTrackingSlot()
+{
+ if (ssc::toolManager()->isTracking())
+   ssc::toolManager()->stopTracking();
+ else
+   ssc::toolManager()->startTracking();
 }
 
 //void MainWindow::setActivePatient(const QString& activePatientFolder)
@@ -534,8 +548,8 @@ void MainWindow::createMenus()
   this->menuBar()->addMenu(mToolMenu);
   mToolMenu->addAction(mConfigureToolsAction);
   mToolMenu->addAction(mInitializeToolsAction);
-  mToolMenu->addAction(mStartTrackingToolsAction);
-  mToolMenu->addAction(mStopTrackingToolsAction);
+  mToolMenu->addAction(mTrackingToolsAction);
+  //mToolMenu->addAction(mStopTrackingToolsAction);
   mToolMenu->addSeparator();
   mToolMenu->addAction(mSaveToolsPositionsAction);
 
@@ -557,8 +571,8 @@ void MainWindow::createToolBars()
 
   mToolToolBar = addToolBar("Tools");
   mToolToolBar->setObjectName("ToolToolBar");
-  mToolToolBar->addAction(mStartTrackingToolsAction);
-  mToolToolBar->addAction(mStopTrackingToolsAction);
+  mToolToolBar->addAction(mTrackingToolsAction);
+  //mToolToolBar->addAction(mStopTrackingToolsAction);
 
   mNavigationToolBar = addToolBar("Navigation");
   mNavigationToolBar->setObjectName("NavigationToolBar");
