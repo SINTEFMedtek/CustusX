@@ -163,6 +163,8 @@ void DataManagerImpl::initialize()
 
 DataManagerImpl::DataManagerImpl()
 {
+  mMedicalDomain = mdLABORATORY;
+//  mMedicalDomain = mdLAPAROSCOPY;
 	mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
 	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
 	mMeshReaders[mrtSTL].reset(new StlMeshReader());

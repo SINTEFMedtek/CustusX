@@ -20,13 +20,15 @@ public:
 	virtual ~OrientationAnnotationRep();
 	virtual std::string getType() const { return "vm::OrientationAnnotationRep"; };
 	
-	void setPlaneType( PLANE_TYPE type );
+	void setPlaneType( PLANE_TYPE type);
 	
 protected:
 	OrientationAnnotationRep(const std::string& uid, const std::string& name);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 	
+  void setPlaneTypeNeurology(PLANE_TYPE type);
+  void setPlaneTypeRadiology(PLANE_TYPE type);
 	void createAnnotation();
 	
 	OrientationAnnotationPtr mOrientation;

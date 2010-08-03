@@ -9,7 +9,7 @@
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
-
+#include "sscDataManager.h"
 
 // --------------------------------------------------------
 namespace ssc
@@ -54,34 +54,57 @@ OrientationAnnotationRep::~OrientationAnnotationRep()
 {
 
 }
-void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type )
+
+void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
+{
+  switch (dataManager()->getMedicalDomain())
+  {
+  case mdLAPAROSCOPY:
+  case mdCARDIOLOGY:
+  {
+    this->setPlaneTypeRadiology(type);
+    break;
+  }
+  case mdLABORATORY:
+  case mdNEUROLOGY:
+  default:
+  {
+    this->setPlaneTypeNeurology(type);
+    break;
+  }
+  }
+
+  createAnnotation();
+}
+
+void OrientationAnnotationRep::setPlaneTypeNeurology(PLANE_TYPE type)
 {
   switch (type)
   {
   case ptSAGITTAL:
-	{
-		mNorthAnnotation = "S";
-		mSouthAnnotation = "I";
-		mEastAnnotation = "P";
-		mWestAnnotation = "A";
-		break;
-	}
+  {
+    mNorthAnnotation = "S";
+    mSouthAnnotation = "I";
+    mEastAnnotation = "P";
+    mWestAnnotation = "A";
+    break;
+  }
   case ptCORONAL:
-	{
-		mNorthAnnotation = "S";
-		mSouthAnnotation = "I" ;
-		mEastAnnotation = "R" ;
-		mWestAnnotation = "L";
-		break;
-	}
+  {
+    mNorthAnnotation = "S";
+    mSouthAnnotation = "I" ;
+    mEastAnnotation = "R" ;
+    mWestAnnotation = "L";
+    break;
+  }
   case ptAXIAL:
-	{
-		mNorthAnnotation = "A";
-		mSouthAnnotation = "P";
-		mEastAnnotation = "R";
-		mWestAnnotation = "L";
-		break;
-	}
+  {
+    mNorthAnnotation = "A";
+    mSouthAnnotation = "P";
+    mEastAnnotation = "R";
+    mWestAnnotation = "L";
+    break;
+  }
   default:
   {
     mNorthAnnotation = "";
@@ -90,8 +113,44 @@ void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type )
     mWestAnnotation = "";
   }
   }
+}
 
-  createAnnotation();
+void OrientationAnnotationRep::setPlaneTypeRadiology(PLANE_TYPE type)
+{
+  switch (type)
+  {
+  case ptSAGITTAL:
+  {
+    mNorthAnnotation = "S";
+    mSouthAnnotation = "I";
+    mEastAnnotation = "P";
+    mWestAnnotation = "A";
+    break;
+  }
+  case ptCORONAL:
+  {
+    mNorthAnnotation = "S";
+    mSouthAnnotation = "I" ;
+    mEastAnnotation = "L" ;
+    mWestAnnotation = "R";
+    break;
+  }
+  case ptAXIAL:
+  {
+    mNorthAnnotation = "A";
+    mSouthAnnotation = "P";
+    mEastAnnotation = "L";
+    mWestAnnotation = "R";
+    break;
+  }
+  default:
+  {
+    mNorthAnnotation = "";
+    mSouthAnnotation = "";
+    mEastAnnotation = "";
+    mWestAnnotation = "";
+  }
+  }
 }
 
 void OrientationAnnotationRep::addRepActorsToViewRenderer(ssc::View* view)

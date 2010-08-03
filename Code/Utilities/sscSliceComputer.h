@@ -72,7 +72,7 @@ public:
 	void setToolViewportHeight(double viewportHeight);
 	SlicePlane getPlane() const;	
 
-	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset);
+	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, MEDICAL_DOMAIN domain);
 	void switchOrientationMode(ORIENTATION_TYPE type);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
@@ -83,7 +83,11 @@ private:
 	SlicePlane orientToGravity(const SlicePlane& base) const;
 	SlicePlane applyViewOffset(const SlicePlane& base) const;
 
+	std::pair<Vector3D,Vector3D> generateBasisVectorsNeurology() const;
+	std::pair<Vector3D,Vector3D> generateBasisVectorsRadiology() const;
+
 private:
+	MEDICAL_DOMAIN mMedicalDomain;
 	ORIENTATION_TYPE mOrientType;
 	PLANE_TYPE mPlaneType;
 	FOLLOW_TYPE mFollowType;

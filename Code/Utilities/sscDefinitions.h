@@ -27,6 +27,17 @@ namespace ssc
 		ftFIXED_CENTER, ///< center is set.
 		ftCOUNT
 	};
+	/**Determines the medical domain where the application is to be used.
+	 * Use this to adapt components to that domain« terminology/habits.
+	 */
+	enum MEDICAL_DOMAIN
+	{
+	  mdLABORATORY,
+	  mdNEUROLOGY,
+	  mdLAPAROSCOPY,
+	  mdCARDIOLOGY,
+	  mdCOUNT
+	};
 } //namespace end
 
 //#include "sscDefinitionStrings.h"

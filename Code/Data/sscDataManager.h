@@ -9,6 +9,7 @@
 
 #include "sscVector3D.h"
 #include "sscLandmark.h"
+#include "sscDefinitions.h"
 
 namespace ssc
 {
@@ -79,6 +80,8 @@ public:
   virtual void setLandmarkName(std::string uid, std::string name) {}
   virtual void setLandmarkActive(std::string uid, bool active) {}
   virtual LandmarkPropertyMap getLandmarkProperties() const { return LandmarkPropertyMap(); }
+  virtual MEDICAL_DOMAIN getMedicalDomain() const { return mdLABORATORY; }
+  virtual void setMedicalDomain(MEDICAL_DOMAIN domain) {}
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state

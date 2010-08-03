@@ -26,6 +26,7 @@ bool similar(const SlicePlane& a, const SlicePlane& b)
 /**Initialize the computer with reasonable defaults.
  */
 SliceComputer::SliceComputer() :
+  mMedicalDomain(mdLABORATORY),
 	mOrientType(otORTHOGONAL),
 	mPlaneType(ptAXIAL),
 	mFollowType(ftFIXED_CENTER),
@@ -45,9 +46,10 @@ SliceComputer::~SliceComputer()
 
 /**Group the typical plane definition uses together.
  */
-void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, MEDICAL_DOMAIN domain)
 {
   setPlaneType(plane);
+  mMedicalDomain = domain;
 
   if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
   {
@@ -98,7 +100,7 @@ void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
     }
   }
 
-  initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset);
+  initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mMedicalDomain);
 }
 
 ORIENTATION_TYPE SliceComputer::getOrientationType() const
@@ -251,18 +253,54 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
 {
-	switch (mPlaneType)
-	{
-	case ptAXIAL:       return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0,-1, 0)); 
-	case ptCORONAL:     return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0, 1)); 
-	case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1)); 
-	case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
-	case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
-	case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
-	default:
-		throw std::exception();
-	}
+  switch (mMedicalDomain)
+  {
+  case mdLAPAROSCOPY:
+  case mdCARDIOLOGY:
+    return this->generateBasisVectorsRadiology();
+  case mdLABORATORY:
+  case mdNEUROLOGY:
+  default:
+    return this->generateBasisVectorsNeurology();
+  }
 }
+
+/** definitions of planes for the neurology domain
+ *
+ */
+std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() const
+{
+  switch (mPlaneType)
+  {
+  case ptAXIAL:       return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0,-1, 0));
+  case ptCORONAL:     return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0, 1));
+  case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
+  case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
+  case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
+  case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+  default:
+    throw std::exception();
+  }
+}
+
+/** definitions of planes for the radiology domain
+ *
+ */
+std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() const
+{
+  switch (mPlaneType)
+  {
+  case ptAXIAL:       return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0,-1, 0));
+  case ptCORONAL:     return std::make_pair(Vector3D( 1, 0, 0), Vector3D( 0, 0, 1));
+  case ptSAGITTAL:    return std::make_pair(Vector3D( 0, 1, 0), Vector3D( 0, 0, 1));
+  case ptANYPLANE:    return std::make_pair(Vector3D( 0,-1, 0), Vector3D( 0, 0,-1));
+  case ptSIDEPLANE:   return std::make_pair(Vector3D(-1, 0, 0), Vector3D( 0, 0,-1));
+  case ptRADIALPLANE: return std::make_pair(Vector3D( 0,-1, 0), Vector3D(-1, 0, 0));
+  default:
+    throw std::exception();
+  }
+}
+
 
 /**Generate a viewdata containing a slice that always keeps the center 
  * of the observed image at center, but the z-component varies according 

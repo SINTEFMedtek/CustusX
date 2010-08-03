@@ -119,7 +119,7 @@ void SliceProxy::centerChangedSlot()
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
-  mCutplane.initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset);
+  mCutplane.initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getMedicalDomain());
   changed();
 //	setPlane(plane);
 //	//Logger::log("vm.log"," set plane to proxy ");
