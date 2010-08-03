@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <QtGui>
+#include <QPointer>
 #include "cxForwardDeclarations.h"
 #include "sscData.h"
 #include "sscDefinitions.h"
@@ -73,7 +74,7 @@ private:
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
-  ssc::View* mView;
+  QPointer<ssc::View> mView;
   std::vector<ssc::ImagePtr> mImage;
 
   // sunchronized data

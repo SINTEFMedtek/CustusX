@@ -2,7 +2,7 @@
 
 #include <QLabel>
 #include <QString>
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include <QHBoxLayout>
 #include "sscMessageManager.h"
 #include "cxViewManager.h"
@@ -19,11 +19,11 @@ CustomStatusBar::CustomStatusBar() :
           this,
           SLOT(showMessage(const QString&, int)));
 
-  connect(ToolManager::getInstance(), SIGNAL(trackingStarted()),
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()),
           this, SLOT(connectToToolSignals()));
-  connect(ToolManager::getInstance(), SIGNAL(trackingStopped()),
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()),
             this, SLOT(disconnectFromToolSignals()));
-  connect(ViewManager::getInstance(), SIGNAL(fps(int)),
+  connect(viewManager(), SIGNAL(fps(int)),
           this, SLOT(fpsSlot(int)));
   
   this->addPermanentWidget(mFpsLabel);
@@ -34,7 +34,7 @@ CustomStatusBar::~CustomStatusBar()
 
 void CustomStatusBar::connectToToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = toolManager()->getTools();
+  ssc::ToolManager::ToolMapPtr connectedTools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMap::iterator it = connectedTools->begin();
   while (it != connectedTools->end())
   {
@@ -67,7 +67,7 @@ void CustomStatusBar::connectToToolSignals()
 
 void CustomStatusBar::disconnectFromToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = ToolManager::getInstance()->getTools();
+  ssc::ToolManager::ToolMapPtr connectedTools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMap::iterator toolIt = connectedTools->begin();
   while (toolIt != connectedTools->end())
   {
@@ -85,7 +85,7 @@ void CustomStatusBar::disconnectFromToolSignals()
 
 void CustomStatusBar::receiveToolVisible(bool visible)
 {
-  Tool* tool = dynamic_cast<Tool*>(this->sender());
+  ssc::Tool* tool = dynamic_cast<ssc::Tool*>(this->sender());
   if(!tool)
   {
     ssc::messageManager()->sendWarning("Could not determine which tool changed visibility.");

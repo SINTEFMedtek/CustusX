@@ -33,7 +33,7 @@ public:
   typedef std::map<int, StringBoolPair> NameListType; ///< landmarkindex, name and if point is active or not
 
   static RegistrationManager* getInstance(); ///< get the only instance of this class
-
+  static void shutdown();
   void initialize();
 
   void setMasterImage(ssc::ImagePtr image); ///< set a master image used when registrating

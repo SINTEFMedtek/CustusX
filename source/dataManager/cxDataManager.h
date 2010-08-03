@@ -21,7 +21,9 @@ class DataManager : public ssc::DataManagerImpl
   Q_OBJECT
 public:
   static DataManager* getInstance();
+  virtual ~DataManager();
   
+  static void initialize();
   bool getDebugMode() const;
 
 signals:
@@ -33,9 +35,8 @@ public slots:
   
 protected:
   DataManager(); ///< DataManager is a Singleton. Use getInstance instead
-  ~DataManager(); ///< destructor
   
-  static DataManager* mCxInstance;
+  //static DataManager* mCxInstance;
 
   bool mDebugMode; ///< if set: allow lots of weird debug stuff.
 
@@ -43,6 +44,6 @@ private:
   DataManager(DataManager const&);
   DataManager& operator=(DataManager const&);
 };
-DataManager* dataManager();
+//DataManager* dataManager();
 }//namespace cx
 #endif /* CXDATAMANAGER_H_ */

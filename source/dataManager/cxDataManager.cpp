@@ -3,21 +3,29 @@
 
 namespace cx
 {
-DataManager* DataManager::mCxInstance = NULL;
+//DataManager* DataManager::mCxInstance = NULL;
+
+void DataManager::initialize()
+{
+  setInstance(new DataManager());
+}
 
 DataManager* DataManager::getInstance()
 {
-  if (mCxInstance == NULL)
-  {
-    mCxInstance = new DataManager();
-    ssc::DataManager::setInstance(mCxInstance);
-  }
-  return mCxInstance;
+  return dynamic_cast<DataManager*>(ssc::DataManager::getInstance());
+//  if (mCxInstance == NULL)
+//  {
+//    mCxInstance = new DataManager();
+//    ssc::DataManager::setInstance(mCxInstance);
+//  }
+//  return mCxInstance;
 }
 DataManager::DataManager() : mDebugMode(false)
 {}
 DataManager::~DataManager()
-{}
+{
+  //std::cout << "DataManager::~DataManager()" << std::endl;
+}
   
 bool DataManager::getDebugMode() const
 {
@@ -37,8 +45,8 @@ void DataManager::deleteImageSlot(ssc::ImagePtr image)
   mImages.erase(image->getUid());
   emit currentImageDeleted(image);
 }
-DataManager* dataManager()
-{
-  return DataManager::getInstance();
-}
+//DataManager* dataManager()
+//{
+//  return DataManager::getInstance();
+//}
 }//namespace cx

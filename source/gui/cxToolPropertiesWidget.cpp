@@ -14,7 +14,7 @@
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
@@ -74,15 +74,15 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 //  void trackingStarted(); ///< signal emitted when the system starts tracking
 //  void trackingStopped(); ///< signal emitted when the system stops tracking
 
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
-  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
 
-  connect(toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
-  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -98,7 +98,7 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
-  mActiveTool = toolManager()->getDominantTool();
+  mActiveTool = ssc::toolManager()->getDominantTool();
 
   if (mActiveTool)
     connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
@@ -109,7 +109,7 @@ void ToolPropertiesWidget::referenceToolChangedSlot()
   if (mReferenceTool)
     disconnect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
-  mReferenceTool = toolManager()->getReferenceTool();
+  mReferenceTool = ssc::toolManager()->getReferenceTool();
 
   if (mReferenceTool)
     connect(mReferenceTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
@@ -141,11 +141,11 @@ void ToolPropertiesWidget::updateSlot()
   }
 
   QString status = "Unconfigured";
-  if (toolManager()->isConfigured())
+  if (ssc::toolManager()->isConfigured())
     status = "Configured";
-  if (toolManager()->isInitialized())
+  if (ssc::toolManager()->isInitialized())
     status = "Initialized";
-  if (toolManager()->isTracking())
+  if (ssc::toolManager()->isTracking())
     status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }

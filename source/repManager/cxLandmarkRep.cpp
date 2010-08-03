@@ -33,7 +33,7 @@ LandmarkRep::LandmarkRep(const std::string& uid, const std::string& name) :
 {
   mTextScale[0] = mTextScale[1] = mTextScale[2] = 20;
 
-  connect(dataManager(), SIGNAL(landmarkPropertiesChanged()),
+  connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()),
           this, SLOT(internalUpdate()));
 }
 
@@ -271,7 +271,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
     textMapper = dynamic_cast<vtkPolyDataMapper*>(followerActor->GetMapper());
   }
 
-  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
+  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
   std::string name = props[uid].getName();
   text->SetText(name.c_str());
 
@@ -317,7 +317,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
 
 void LandmarkRep::internalUpdate()
 {
-  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
+  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
   std::map<std::string, vtkVectorTextFollowerPair>::iterator it = mTextFollowerActors.begin();
   while(it != mTextFollowerActors.end())
   {

@@ -50,6 +50,9 @@ public:
   MainWindow(); ///< sets up the initial gui
   ~MainWindow(); ///< empty
   
+  static void initialize();
+  static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
+
 signals:
   void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
 

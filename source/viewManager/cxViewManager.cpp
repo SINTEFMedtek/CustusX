@@ -20,7 +20,7 @@
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxDataLocations.h"
 
 namespace cx
@@ -37,8 +37,13 @@ ViewManager* ViewManager::getInstance()
    }
    return mTheInstance;
 }
+
 void ViewManager::destroyInstance()
-{}
+{
+    delete mTheInstance;
+    mTheInstance = NULL;
+}
+
 ViewManager::ViewManager() :
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),

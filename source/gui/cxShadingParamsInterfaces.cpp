@@ -13,12 +13,12 @@ namespace cx
 {
 DoubleDataAdapterShadingBase::DoubleDataAdapterShadingBase()
 {
-  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
-  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
 void DoubleDataAdapterShadingBase::activeImageChanged()
 {  
-  mImage = dataManager()->getActiveImage();
+  mImage = ssc::dataManager()->getActiveImage();
   emit changed();
 }
 

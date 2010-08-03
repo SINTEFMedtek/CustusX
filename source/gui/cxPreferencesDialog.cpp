@@ -156,7 +156,7 @@ void FoldersTab::saveParametersSlot()
   mSettings->sync();
 
   // update toolmanager config file
-  toolManager()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+  ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
 
   emit savedParameters();
 }

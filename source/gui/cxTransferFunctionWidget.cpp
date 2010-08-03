@@ -28,13 +28,13 @@ void TransferFunctionWidget::init()
 	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
 	mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           mTransferFunctionAlphaWidget, SLOT(activeImageChangedSlot()));
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           mTransferFunctionColorWidget, SLOT(activeImageChangedSlot()));
-  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
           mTransferFunctionAlphaWidget, SLOT(activeImageTransferFunctionsChangedSlot()));
-  connect(dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
           mTransferFunctionColorWidget, SLOT(activeImageTransferFunctionsChangedSlot()));
   
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding, 
@@ -95,7 +95,7 @@ void TransferFunctionWidget::init()
 
 void TransferFunctionWidget::shadingToggledSlot(bool val)
 {
-  ssc::ImagePtr image = dataManager()->getActiveImage();
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   if (image)
   {
     image->setShadingOn(val);
@@ -107,7 +107,7 @@ void TransferFunctionWidget::activeImageChangedSlot()
   if (!mInitialized)
     init();
 
-  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(mCurrentImage == activeImage)
     return;
 

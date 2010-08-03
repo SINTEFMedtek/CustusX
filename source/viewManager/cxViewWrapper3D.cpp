@@ -19,7 +19,7 @@
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 //#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
 
@@ -47,13 +47,14 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
   mView->addRep(mDataNameText);
 
-  connect(toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   toolsAvailableSlot();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
 {
-  mView->removeReps();
+  if (mView)
+    mView->removeReps();
 }
 
 
@@ -169,7 +170,7 @@ ssc::View* ViewWrapper3D::getView()
 
 void ViewWrapper3D::dominantToolChangedSlot()
 {
-  ssc::ToolPtr dominantTool = toolManager()->getDominantTool();
+  ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   mProbeRep->setTool(dominantTool);
   //std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
@@ -182,7 +183,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 //  if (!toolManager()->isConfigured())
 //    return;
 
-  ssc::ToolManager::ToolMapPtr tools = toolManager()->getConfiguredTools();
+  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getConfiguredTools();
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
@@ -229,14 +230,14 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
     mView->removeRep(mLandmarkRep);
     mView->removeRep(mProbeRep);
     
-    disconnect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   }
   if (mode==ssc::rsIMAGE_REGISTRATED)
   {
     mView->addRep(mLandmarkRep);
     mView->addRep(mProbeRep);
 
-    connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
     this->dominantToolChangedSlot();
   }
   if (mode==ssc::rsPATIENT_REGISTRATED)

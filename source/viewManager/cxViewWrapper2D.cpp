@@ -44,7 +44,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   setZoom2D(SyncedValue::create(1));
   setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-  connect(toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
@@ -53,7 +53,8 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 
 ViewWrapper2D::~ViewWrapper2D()
 {
-  mView->removeReps();
+  if (mView)
+    mView->removeReps();
 }
 
 void ViewWrapper2D::appendToContextMenu(QMenu& contextMenu)
@@ -346,7 +347,7 @@ void ViewWrapper2D::removeImage(ssc::ImagePtr image)
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {
-  ssc::ToolPtr dominantTool = ToolManager::getInstance()->getDominantTool();
+  ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   mSliceProxy->setTool(dominantTool);
 }
 
@@ -428,7 +429,7 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
   ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
 
   ssc::Transform3D sMr = mSliceProxy->get_sMr();
-  ssc::Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
   ssc::Transform3D prMt = tool->get_prMt();
 
   // find tool position in s

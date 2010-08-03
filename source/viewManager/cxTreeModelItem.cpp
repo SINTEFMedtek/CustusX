@@ -8,7 +8,7 @@
 #include "cxTreeModelItem.h"
 #include "cxDataManager.h"
 #include "sscTypeConversions.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
@@ -68,14 +68,14 @@ TreeItemPtr TreeItemImage::create(TreeItemWeakPtr parent, std::string uid)
 
 QString TreeItemImage::getName() const
 {
-  if (!dataManager()->getImage(mUid))
+  if (!ssc::dataManager()->getImage(mUid))
     return "";
-  return qstring_cast(dataManager()->getImage(mUid)->getName());
+  return qstring_cast(ssc::dataManager()->getImage(mUid)->getName());
 }
 
 void TreeItemImage::activate()
 {
-  dataManager()->setActiveImage(dataManager()->getImage(mUid));
+  ssc::dataManager()->setActiveImage(ssc::dataManager()->getImage(mUid));
 }
 
 ///--------------------------------------------------------
@@ -88,7 +88,7 @@ TreeItemPtr TreeItemToolManager::create(TreeItemWeakPtr parent)
   if (parent.lock())
     parent.lock()->addChild(retval);
 
-  ssc::ToolManager::ToolMapPtr tools = toolManager()->getTools();
+  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     TreeItemTool::create(retval, iter->second);

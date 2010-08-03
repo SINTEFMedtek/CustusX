@@ -35,8 +35,8 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //add actions to the actiongroups and the contextmenu
-  std::map<std::string, std::string> imageUidsAndNames = dataManager()->getImageUidsAndNames();
-  std::map<std::string, std::string> meshUidsAndNames = dataManager()->getMeshUidsWithNames();
+  std::map<std::string, std::string> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
+  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
 
   std::vector<ssc::ImagePtr> images = this->getImages();
   std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
@@ -55,7 +55,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
 
     //if(this->getImage() && uid == qstring_cast(this->getImage()->getUid()))
     //  imageAction->setChecked(true);
-    imageAction->setChecked(std::count(images.begin(), images.end(), dataManager()->getImage(imageIt->first)));
+    imageAction->setChecked(std::count(images.begin(), images.end(), ssc::dataManager()->getImage(imageIt->first)));
 
     imageIt++;
   }
@@ -95,12 +95,12 @@ void ViewWrapper::imageActionSlot()
     return;
 
   QString imageUid = theAction->data().toString();
-  ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
+  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
 
   if (theAction->isChecked())
   {
     this->addImage(image);
-    dataManager()->setActiveImage(image);
+    ssc::dataManager()->setActiveImage(image);
   }
   else
   {
@@ -108,7 +108,7 @@ void ViewWrapper::imageActionSlot()
     //                                + string_cast(imageUid) + "]" 
     //                                + string_cast(image.get()));
     this->removeImage(image);
-    dataManager()->setActiveImage(ssc::ImagePtr());
+    ssc::dataManager()->setActiveImage(ssc::ImagePtr());
   }
 
   Navigation().centerToGlobalImageCenter(); // reset center for convenience
@@ -122,7 +122,7 @@ void ViewWrapper::meshActionSlot()
     return;
   
   QString meshUid = theAction->data().toString();
-  ssc::MeshPtr mesh= dataManager()->getMesh(meshUid.toStdString());
+  ssc::MeshPtr mesh= ssc::dataManager()->getMesh(meshUid.toStdString());
   
   this->addMesh(mesh);
   //dataManager()->setActiveImage(mesh);

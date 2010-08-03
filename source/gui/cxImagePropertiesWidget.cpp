@@ -7,7 +7,7 @@
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView2D.h"
@@ -47,7 +47,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  connect(dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
   updateSlot();
 }
 
@@ -57,7 +57,7 @@ ImagePropertiesWidget::~ImagePropertiesWidget()
 
 void ImagePropertiesWidget::updateSlot()
 {
-  ssc::ImagePtr image = dataManager()->getActiveImage();
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   if (image)
   {
     mImageNameLabel->setText(qstring_cast(image->getName()));

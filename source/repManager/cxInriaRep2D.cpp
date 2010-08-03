@@ -9,7 +9,7 @@
 #include <vtkMetaImageData.h>
 #include "sscView.h"
 #include "cxTool.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 
 namespace cx
 {

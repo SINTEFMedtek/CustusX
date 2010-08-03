@@ -7,7 +7,7 @@
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
 #include "cxRegistrationManager.h"
-#include "cxToolManager.h"
+#include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxView3D.h"
@@ -46,12 +46,12 @@ ContextDockWidget::ContextDockWidget(QWidget* parent) :
   
   // Delete image
   connect(this, SIGNAL(deleteImage(ssc::ImagePtr)),
-          dataManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
-  connect(dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),
+      ssc::dataManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
+  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),
           viewManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
   
   //listen for active image changed from the datamanager
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           this, SLOT(activeImageChangedSlot()));
 }
 ContextDockWidget::~ContextDockWidget()
@@ -81,7 +81,7 @@ void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
 {
   if(visible)
   {
-    connect(dataManager(), SIGNAL(dataLoaded()),
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()),
             this, SLOT(populateTheImageComboBoxSlot()));
     connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
             this, SLOT(populateTheImageComboBoxSlot()));
@@ -89,7 +89,7 @@ void ContextDockWidget::visibilityOfDockWidgetChangedSlot(bool visible)
   }
   else
   {
-    disconnect(dataManager(), SIGNAL(dataLoaded()),
+    disconnect(ssc::dataManager(), SIGNAL(dataLoaded()),
                this, SLOT(populateTheImageComboBoxSlot()));
     disconnect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)),
                this, SLOT(populateTheImageComboBoxSlot()));
@@ -101,7 +101,7 @@ void ContextDockWidget::populateTheImageComboBoxSlot()
   mImagesComboBox->clear();
 
   //get a list of images from the datamanager
-  std::map<std::string, ssc::ImagePtr> images = dataManager()->getImages();
+  std::map<std::string, ssc::ImagePtr> images = ssc::dataManager()->getImages();
   if(images.size() == 0)
   {
     mImagesComboBox->insertItem(1, QString("Import an image to begin..."));
@@ -131,7 +131,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   {
     // Create empty current image
     mCurrentImage.reset();
-    dataManager()->setActiveImage(mCurrentImage);
+    ssc::dataManager()->setActiveImage(mCurrentImage);
 
     //emit currentImageChanged(mCurrentImage); //TODO remove
     return;
@@ -140,7 +140,7 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
   std::string imageId = comboBoxText.toStdString();
 
   //find the image
-  ssc::ImagePtr image = dataManager()->getImage(imageId);
+  ssc::ImagePtr image = ssc::dataManager()->getImage(imageId);
   if(!image)
   {
     ssc::messageManager()->sendError("Could not find the selected image in the DataManager: "+imageId);
@@ -152,13 +152,13 @@ void ContextDockWidget::imageSelectedSlot(const QString& comboBoxText)
 
   //Set new current image
   mCurrentImage = image;
-  dataManager()->setActiveImage(mCurrentImage);
+  ssc::dataManager()->setActiveImage(mCurrentImage);
 
   //emit currentImageChanged(mCurrentImage); //TODO remove
 }
 void ContextDockWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(mCurrentImage == activeImage || !activeImage)
     return;
 

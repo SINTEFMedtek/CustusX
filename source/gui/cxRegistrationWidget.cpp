@@ -51,7 +51,7 @@ RegistrationWidget::~RegistrationWidget()
 
 void RegistrationWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(mCurrentImage == activeImage)
     return;
 
@@ -109,7 +109,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
   {
     std::vector<QTableWidgetItem*> items(4); // name, status, coordinates, accuracy
 
-    ssc::LandmarkProperty prop = dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
+    ssc::LandmarkProperty prop = ssc::dataManager()->getLandmarkProperties()[landmarks[i].getUid()];
     ssc::Vector3D coord = landmarks[i].getCoord();
     coord = rMtarget.coord(coord); // display coordinates in space r (in principle, this means all coords should be equal)
 
@@ -181,7 +181,7 @@ std::vector<ssc::Landmark> RegistrationWidget::getAllLandmarks() const
 {
   std::vector<ssc::Landmark> retval;
   ssc::LandmarkMap targetData = this->getTargetLandmarks();
-  std::map<std::string, ssc::LandmarkProperty> dataData = dataManager()->getLandmarkProperties();
+  std::map<std::string, ssc::LandmarkProperty> dataData = ssc::dataManager()->getLandmarkProperties();
   std::map<std::string, ssc::LandmarkProperty>::iterator iter;
 
   for (iter=dataData.begin(); iter!=dataData.end(); ++iter)
@@ -203,12 +203,12 @@ void RegistrationWidget::cellChangedSlot(int row,int column)
   if(column==0)
   {
     std::string name = item->text().toStdString();
-    dataManager()->setLandmarkName(uid, name);
+    ssc::dataManager()->setLandmarkName(uid, name);
   }
   if(column==1)
   {
     Qt::CheckState state = item->checkState();
-    dataManager()->setLandmarkActive(uid, state==Qt::Checked);
+    ssc::dataManager()->setLandmarkActive(uid, state==Qt::Checked);
     this->performRegistration();
   }
 }
@@ -226,7 +226,7 @@ void RegistrationWidget::updateAvarageAccuracyLabel()
 
 double RegistrationWidget::getAvarageAccuracy()
 {
-  std::map<std::string, ssc::LandmarkProperty> props = dataManager()->getLandmarkProperties();
+  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
 
   double sum = 0;
   int count = 0;

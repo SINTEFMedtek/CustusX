@@ -27,7 +27,7 @@ TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 {}
 void TransferFunctionAlphaWidget::activeImageChangedSlot()
 {
-  ssc::ImagePtr activeImage = dataManager()->getActiveImage();
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(mCurrentImage == activeImage)
     return;
 

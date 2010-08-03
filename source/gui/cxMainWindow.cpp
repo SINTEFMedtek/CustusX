@@ -98,7 +98,7 @@ MainWindow::MainWindow() :
   connect(mPatientData.get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   // initialize toolmanager config file
-  toolManager()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+  ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
 
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   this->layoutChangedSlot();
@@ -132,7 +132,28 @@ void MainWindow::addAsDockWidget(QWidget* widget)
 }
 
 MainWindow::~MainWindow()
-{}
+{
+//  std::cout << "MainWindow::~MainWindow()" << std::endl;
+}
+
+void MainWindow::initialize()
+{
+  cx::DataManager::initialize();
+  cx::ToolManager::initializeObject();
+}
+
+/** deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
+ *
+ */
+void MainWindow::shutdown()
+{
+  ViewManager::destroyInstance();
+  RegistrationManager::shutdown();
+  RepManager::destroyInstance();
+  cx::ToolManager::shutdown();
+  cx::DataManager::shutdown();
+}
+
 void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
@@ -163,7 +184,7 @@ void MainWindow::createActions()
   mDebugModeAction = new QAction(tr("&Debug Mode"), this);
   mDebugModeAction->setShortcut(tr("Ctrl+D"));
   mDebugModeAction->setCheckable(true);
-  mDebugModeAction->setChecked(dataManager()->getDebugMode());
+  mDebugModeAction->setChecked(DataManager::getInstance()->getDebugMode());
   mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
 
   mQuitAction = new QAction(tr("&Quit"), this);
@@ -172,8 +193,8 @@ void MainWindow::createActions()
   
   connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
   connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
-  connect(mDebugModeAction, SIGNAL(triggered(bool)), dataManager(), SLOT(setDebugMode(bool)));
-  connect(dataManager(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+  connect(mDebugModeAction, SIGNAL(triggered(bool)), DataManager::getInstance(), SLOT(setDebugMode(bool)));
+  connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
   connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
   
   //View
@@ -231,24 +252,13 @@ void MainWindow::createActions()
   connect(mConfigureToolsAction, SIGNAL(triggered()),
           this, SLOT(configureSlot()));
   connect(mInitializeToolsAction, SIGNAL(triggered()),
-          toolManager(), SLOT(initialize()));
+      ssc::toolManager(), SLOT(initialize()));
   connect(mStartTrackingToolsAction, SIGNAL(triggered()),
-          toolManager(), SLOT(startTracking()));
+      ssc::toolManager(), SLOT(startTracking()));
   connect(mStopTrackingToolsAction, SIGNAL(triggered()),
-          toolManager(), SLOT(stopTracking()));
+      ssc::toolManager(), SLOT(stopTracking()));
   connect(mSaveToolsPositionsAction, SIGNAL(triggered()), 
-          toolManager(), SLOT(saveToolsSlot()));
-
-//  //layout
-//  mLayoutActionGroup = new QActionGroup(this);
-//  mLayoutActionGroup->setExclusive(true);
-  
-//  std::vector<LayoutType> layouts = ViewManager::getInstance()->availableLayouts();
-//  for (unsigned i=0; i<layouts.size(); ++i)
-//    addLayoutAction(layouts[i]);
-
-//  connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
-//  layoutChangedSlot();
+      ssc::toolManager(), SLOT(saveToolsSlot()));
 
   mNewLayoutAction = new QAction(tr("New Layout"), this);
   mNewLayoutAction->setToolTip("Create a new Custom Layout");
@@ -274,11 +284,11 @@ void MainWindow::createActions()
   /*connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
           viewManager(), SLOT(currentImageChangedSlot(ssc::ImagePtr)));*/
 
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           mImageRegistrationWidget, SLOT(activeImageChangedSlot()));
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           mPatientRegistrationWidget, SLOT(activeImageChangedSlot()));
-  connect(dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           mTransferFunctionWidget, SLOT(activeImageChangedSlot()));
   
   connect(this, SIGNAL(deleteCurrentImage()),
@@ -287,7 +297,7 @@ void MainWindow::createActions()
 
 void MainWindow::centerToImageCenterSlot()
 {
-  Navigation().centerToImage(dataManager()->getActiveImage());
+  Navigation().centerToImage(ssc::dataManager()->getActiveImage());
 }
 
 void MainWindow::centerToTooltipSlot()
@@ -401,7 +411,7 @@ void MainWindow::patientChangedSlot()
     loggingDir.mkdir(loggingPath);
     ssc::messageManager()->sendInfo("Made a folder for tool logging: "+loggingPath.toStdString());
   }
-  toolManager()->setLoggingFolder(loggingPath.toStdString());
+  ToolManager::getInstance()->setLoggingFolder(loggingPath.toStdString());
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -478,30 +488,6 @@ void MainWindow::deleteCustomLayoutSlot()
   viewManager()->deleteLayoutData(viewManager()->getActiveLayout());
   viewManager()->setActiveLayout(viewManager()->getAvailableLayouts().front()); // revert to existing state
 }
-
-///** Called when a layout is selected: introspect the sending action
-// *  in order to get correct layout; set it.
-// */
-//void MainWindow::setLayoutSlot()
-//{
-//  QAction* action = dynamic_cast<QAction*>(sender());
-//  if (!action)
-//    return;
-////  LayoutType type = static_cast<LayoutType>(action->data().toInt());
-//  viewManager()->setActiveLayout(action->data().toString());
-//}
-
-///** Add one layout as an action to the layout menu.
-// */
-//QAction* MainWindow::addLayoutAction(QString layout)
-//{
-//  LayoutData data = viewManager()->getLayoutData(layout);
-//  QAction* action = new QAction(data.getName(), mLayoutActionGroup);
-//  action->setCheckable(true);
-//  action->setData(QVariant(layout));
-//  connect(action, SIGNAL(triggered()), this, SLOT(setLayoutSlot()));
-//  return action;
-//}
 
 void MainWindow::createMenus()
 {
@@ -848,7 +834,7 @@ void MainWindow::configureSlot()
   }
   toolManager()->setLoggingFolder(loggingPath.toStdString());*/
 
-  toolManager()->configure();
+  ssc::toolManager()->configure();
 }
 void MainWindow::loggingSlot(const QString& message, int timeout)
 {
@@ -863,10 +849,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
   mSettings->sync();
   ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
   
-  if (toolManager()->isTracking())
+  if (ssc::toolManager()->isTracking())
   {
     ssc::messageManager()->sendInfo("Closing: Stopping tracking");
-    toolManager()->stopTracking();
+    ssc::toolManager()->stopTracking();
   }
   QMainWindow::closeEvent(event);
 }

@@ -139,8 +139,8 @@ void ViewGroupInria::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //Get a list of available image and meshes names
-  std::map<std::string, std::string> imageUidsAndNames = dataManager()->getImageUidsAndNames();
-  std::map<std::string, std::string> meshUidsAndNames = dataManager()->getMeshUidsWithNames();
+  std::map<std::string, std::string> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
+  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
 
   //Display the lists to the user
   std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
@@ -161,7 +161,7 @@ void ViewGroupInria::contextMenuSlot(const QPoint& point)
 
   QString imageName = theAction->text();
   QString imageUid = theAction->statusTip();
-  ssc::ImagePtr image = dataManager()->getImage(imageUid.toStdString());
+  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
 
   if(!image)
   {

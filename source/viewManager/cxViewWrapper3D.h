@@ -8,6 +8,7 @@
 #define CXVIEWWRAPPER3D_H_
 
 #include <vector>
+#include <QPointer>
 #include <QObject>
 #include "sscData.h"
 #include "sscDefinitions.h"
@@ -60,7 +61,7 @@ private:
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;
   ssc::MeshPtr mMesh;
-  ssc::View* mView;
+  QPointer<ssc::View> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
 
