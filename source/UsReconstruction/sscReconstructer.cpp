@@ -27,23 +27,30 @@
 namespace ssc
 {
 
-Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
+Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mOutputRelativePath(""),
   mOutputBasePath(""),
   mShaderPath(shaderPath),
   mLastAppliedMaskReduce("")
 {
-  QDomDocument doc("usReconstruction");
-  doc.appendChild(doc.createElement("usReconstruct"));
-  doc.documentElement().appendChild(doc.createElement("algorithms"));
+  mSettings = settings;
 
-  mSettings = XmlOptionFile(appDataPath+"/usReconstruct.xml", doc);
+  //QDomDocument doc("usReconstruction");
+//  doc.appendChild(doc.createElement("usReconstruct"));
+//  doc.documentElement().appendChild(doc.createElement("algorithms"));
+//
+//  mSettings = XmlOptionFile(appDataPath+"/usReconstruct.xml", doc);
+
+  //mSettings = settings.descend("usReconstruction");
+//  mSettings.descend("usReconstruction");
+  mSettings.getElement("algorithms");
 
   mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
       "Algorithm to use for output volume orientation",
       "MiddleFrame",
       QString("PatientReference MiddleFrame").split(" "),
       mSettings.getElement());
+
   connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()),   this,                      SLOT(setSettings()));
   connect(this,                      SIGNAL(paramsChanged()), mOrientationAdapter.get(), SIGNAL(changed()));
 
@@ -69,6 +76,7 @@ Reconstructer::Reconstructer(QString appDataPath, QString shaderPath) :
 
 Reconstructer::~Reconstructer()
 {
+//  std::cout << "Reconstructer::~Reconstructer()" << std::endl;
   mSettings.save();
 }
 

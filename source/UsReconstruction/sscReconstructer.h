@@ -36,7 +36,7 @@ class Reconstructer : public QObject
 {
   Q_OBJECT
 public:
-  Reconstructer(QString appDataPath, QString shaderPath);
+  Reconstructer(XmlOptionFile settings, QString shaderPath);
   virtual ~Reconstructer();
 
   void readFiles(QString mhdFileName, QString calFilesPath);

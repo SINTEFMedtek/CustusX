@@ -626,15 +626,18 @@ bool ViewManager::isCustomLayout(const QString& uid) const
 
 void ViewManager::loadGlobalSettings()
 {
-  QDomDocument doc("CustusX");
-  doc.appendChild(doc.createElement("root"));
-  ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
 
-  QDomElement viewmanagerNode = file.getElement("viewmanager");
+  ssc::XmlOptionFile file = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("viewmanager");
+
+//  QDomDocument doc("CustusX");
+//  doc.appendChild(doc.createElement("root"));
+//  ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
+
+//  QDomElement viewmanagerNode = file.getElement("viewmanager");
   // load custom layouts:
   mLayouts.clear();
 
-  QDomElement layouts = viewmanagerNode.namedItem("layouts").toElement();
+  QDomElement layouts = file.getElement("layouts");
   QDomNode layout = layouts.firstChild();
   for( ; !layout.isNull(); layout = layout.nextSibling())
   {
@@ -653,31 +656,36 @@ void ViewManager::loadGlobalSettings()
 
 //    mLayouts.push_back(data);
   }
+
   this->addDefaultLayouts(); // ensure we overwrite loaded layouts
 }
 
 void ViewManager::saveGlobalSettings()
 {
-  QDomDocument doc("CustusX");
-  doc.appendChild(doc.createElement("root"));
-  ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
-  QDomElement viewmanagerNode = file.getElement("viewmanager");
+  std::cout << "ViewManager::saveGlobalSettings() B" << std::endl;
+  ssc::XmlOptionFile file = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("viewmanager");
+
+//  QDomDocument doc("CustusX");
+//  doc.appendChild(doc.createElement("root"));
+//  ssc::XmlOptionFile file(cx::DataLocations::getXmlSettingsFile(), doc);
+//  QDomElement viewmanagerNode = file.getElement("viewmanager");
 
   //file.getElement("viewmanager", "layouts").clear();
-  QDomElement layoutsNode = file.getElement("viewmanager", "layouts");
+  ssc::XmlOptionFile layoutsNode = file.descend("layouts");
   //viewManagerNode.appendChild(layoutsNode);
-  file.clean(layoutsNode);
+  layoutsNode.removeChildren();
   for (LayoutDataVector::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
   {
     if (!this->isCustomLayout(iter->getUid()))
       continue; // dont store default layouts - they are created automatically.
 
-    QDomElement layoutNode = doc.createElement("layout");
-    layoutsNode.appendChild(layoutNode);
+    QDomElement layoutNode = file.getDocument().createElement("layout");
+    layoutsNode.getElement().appendChild(layoutNode);
     iter->addXml(layoutNode);
   }
 
   file.save();
+  std::cout << "ViewManager::saveGlobalSettings() E" << std::endl;
 }
 
 void ViewManager::fillModelTree(TreeItemPtr root)

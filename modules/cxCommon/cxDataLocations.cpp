@@ -83,9 +83,20 @@ QSettingsPtr DataLocations::getSettings()
   //return QSettingsPtr(new QSettings(path+"/custus.ini", QSettings::IniFormat));
 }
 
+namespace
+{
+QString changeExtension(QString name, QString ext)
+{
+  QStringList splitName = name.split(".");
+  splitName[splitName.size()-1] = ext;
+  return splitName.join(".");
+}
+}
+
 QString DataLocations::getXmlSettingsFile()
 {
-  return getAppDataPath() + "/CustusX.xml";
+  return changeExtension(getSettings()->fileName(), "xml");
+//  return getAppDataPath() + "/CustusX.xml";
 }
 
 

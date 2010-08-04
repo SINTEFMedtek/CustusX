@@ -49,7 +49,7 @@ MainWindow::MainWindow() :
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(new ssc::ReconstructionWidget(this, DataLocations::getAppDataPath(), DataLocations::getShaderPath() )),
+  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("usReconstruction"), DataLocations::getShaderPath() )),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mImageRegistrationIndex(-1),
   mShiftCorrectionIndex(-1),

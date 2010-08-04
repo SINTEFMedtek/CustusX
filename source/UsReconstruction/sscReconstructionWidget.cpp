@@ -16,9 +16,9 @@ namespace ssc
 // --------------------------------------------------------
 
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, QString appDataPath, QString shaderPath):
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, XmlOptionFile settings, QString shaderPath):
   QWidget(parent),
-  mReconstructer(new Reconstructer(appDataPath, shaderPath))
+  mReconstructer(new Reconstructer(settings, shaderPath))
 {
   this->setWindowTitle("US Reconstruction");
 
