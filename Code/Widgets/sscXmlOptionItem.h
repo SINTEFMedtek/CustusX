@@ -33,20 +33,35 @@ private:
 	QDomElement mRoot;
 };
 
-
+/**Helper class for xml files used to store ssc/cx data.
+ *
+ * Both the xml document and filename are stored,
+ * and save/load are provided.
+ *
+ * The object has a current element, which is used to ease work
+ * at a specified level in the hierarchy. Use descend/ascend
+ * to change the current element.
+ *
+ * The getElement() methods are used to retrieve QDomElements relative
+ * to the current element.
+ */
 class XmlOptionFile
 {
 public:
-  XmlOptionFile(QString filename, QDomDocument def);
+  explicit XmlOptionFile(QString filename, QString name=""); ///< create from filename, create trivial document of type name and root node if no file exists.
+  XmlOptionFile(QString filename, QDomDocument defaultDocument); ///< create from filename, use default if no file exists.
   XmlOptionFile();
 
-  //StringOptionItem getStringOption(const QString& uid);
-  QDomElement getElement();
-  QDomElement getElement(QString level1);
-  QDomElement getElement(QString level1, QString level2);
-  void save();
+  XmlOptionFile descend(QString element) const; ///< step one level down in the xml tree
+  XmlOptionFile ascend() const; ///< step one level up in the xml tree
 
-  static void clean(QDomElement elem);
+  QDomDocument getDocument() { return mDocument; }
+  QDomElement getElement(); ///< return the current element
+  QDomElement getElement(QString level1); ///< return a element below the current element. Guaranteed to exist.
+  QDomElement getElement(QString level1, QString level2);; ///< return a element two levels below the current element. Guaranteed to exist.
+  void save(); ///< save entire document.
+
+  void removeChildren(); ///< remove all child nodes of the current element.
 
 private:
   void load();
@@ -54,6 +69,7 @@ private:
   
   QString mFilename;
   QDomDocument mDocument;
+  QDomElement mCurrentElement;
 };
 
 

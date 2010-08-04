@@ -73,11 +73,40 @@ XmlOptionFile::XmlOptionFile()
 {
 }
 
+XmlOptionFile::XmlOptionFile(QString filename, QString name) :
+    mFilename(filename),
+    mDocument(name)
+{
+//  std::cout << "xml fileS " << filename << std::endl;
+  mDocument.appendChild(mDocument.createElement("root"));
+  mCurrentElement = mDocument.documentElement();
+  this->load();
+}
+
+
 XmlOptionFile::XmlOptionFile(QString filename, QDomDocument def) :
     mFilename(filename),
     mDocument(def)
 {
+//  std::cout << "xml fileX " << filename << std::endl;
+  mCurrentElement = mDocument.documentElement();
   this->load();
+}
+
+XmlOptionFile XmlOptionFile::descend(QString element) const
+{
+  XmlOptionFile retval = *this;
+  retval.mCurrentElement = retval.getElement(element);
+  return retval;
+}
+
+XmlOptionFile XmlOptionFile::ascend() const
+{
+  XmlOptionFile retval = *this;
+  retval.mCurrentElement = mCurrentElement.parentNode().toElement();
+  if (retval.mCurrentElement.isNull())
+    return *this;
+  return retval;
 }
 
 /**return an element child of parent. Create if not existing.
@@ -97,26 +126,32 @@ QDomElement XmlOptionFile::safeGetElement(QDomElement parent, QString childName)
 
 QDomElement XmlOptionFile::getElement()
 {
-  return mDocument.documentElement();
+  return mCurrentElement;
 }
 
 QDomElement XmlOptionFile::getElement(QString level1)
 {
-  QDomElement elem1 = this->safeGetElement(mDocument.documentElement(), level1);
+  QDomElement elem1 = this->safeGetElement(mCurrentElement, level1);
   return elem1;
 }
 
 QDomElement XmlOptionFile::getElement(QString level1, QString level2)
 {
-  QDomElement elem1 = this->safeGetElement(mDocument.documentElement(), level1);
+  QDomElement elem1 = this->safeGetElement(mCurrentElement, level1);
   QDomElement elem2 = this->safeGetElement(elem1, level2);
   return elem2;
 }
 
-void XmlOptionFile::clean(QDomElement elem)
+//void XmlOptionFile::clean(QDomElement elem)
+//{
+//  while (elem.hasChildNodes())
+//    elem.removeChild(elem.firstChild());
+//}
+
+void XmlOptionFile::removeChildren()
 {
-  while (elem.hasChildNodes())
-    elem.removeChild(elem.firstChild());
+  while (mCurrentElement.hasChildNodes())
+    mCurrentElement.removeChild(mCurrentElement.firstChild());
 }
 
 void XmlOptionFile::save()
@@ -158,6 +193,7 @@ void XmlOptionFile::load()
     }
     file.close();
     mDocument = loadedDoc;
+    mCurrentElement = mDocument.documentElement();
   }
 
 }
