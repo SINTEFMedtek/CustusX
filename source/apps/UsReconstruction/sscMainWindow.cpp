@@ -1,13 +1,17 @@
 #include "sscMainWindow.h"
 #include "sscDataManager.h"
 #include "sscAxesRep.h"//test
+#include "sscXmlOptionItem.h"
   
 MainWindow::MainWindow(QWidget* parent)
 {
   this->setWindowTitle("US reconstruct test app");
   QHBoxLayout* layout = new QHBoxLayout(this);
   std::cout << qApp->applicationFilePath() << std::endl;
-  mReconstructionWidget = new ssc::ReconstructionWidget(this, qApp->applicationDirPath(), "");
+
+  ssc::XmlOptionFile settings(qApp->applicationDirPath()+"/usReconstruct.xml", "usReconstruction");
+
+  mReconstructionWidget = new ssc::ReconstructionWidget(this, settings, "");
   
 #define CA_DEFS
 #ifdef CA_DEFS
