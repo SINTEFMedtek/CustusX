@@ -56,7 +56,8 @@ MainWindow::MainWindow() :
   mPatientRegistrationIndex(-1),
   mNavigationIndex(-1),
   mSettings(DataLocations::getSettings()),
-  mPatientData(new PatientData(this))
+  mPatientData(new PatientData(this)),
+  mStateMachineManager(new StateMachineManager())
 {
   mLayoutActionGroup = NULL;
 #ifdef VERSION_NUMBER_VERBOSE
@@ -117,7 +118,7 @@ MainWindow::MainWindow() :
   if(!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
     this->resize(QSize(1200,1000));//Set initial size if no previous size exist
   restoreState(mSettings->value("mainWindow/windowState").toByteArray());
-  
+
   // Don't show the Widget before all elements are initialized
   this->show();
 }
@@ -202,7 +203,7 @@ void MainWindow::createActions()
   mToggleContextDockWidgetAction->setText("Context Widget");
   
   //workflow
-  mWorkflowActionGroup = new QActionGroup(this);
+  /*mWorkflowActionGroup = new QActionGroup(this);
   mPatientDataWorkflowAction = new QAction(tr("Acquire patient data"), mWorkflowActionGroup);
   mImageRegistrationWorkflowAction = new QAction(tr("Image registration"), mWorkflowActionGroup);
   mPatientRegistrationWorkflowAction = new QAction(tr("Patient registration"), mWorkflowActionGroup);
@@ -219,7 +220,7 @@ void MainWindow::createActions()
   connect(mNavigationWorkflowAction, SIGNAL(triggered()),
           this, SLOT(navigationWorkflowSlot()));
   connect(mUSAcquisitionWorkflowAction, SIGNAL(triggered()),
-          this, SLOT(usAcquisitionWorkflowSlot()));
+          this, SLOT(usAcquisitionWorkflowSlot()));*/
 
   //data
   mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
@@ -532,11 +533,13 @@ void MainWindow::createMenus()
   
   //workflow
   this->menuBar()->addMenu(mWorkflowMenu);
+  /*
   mWorkflowMenu->addAction(mPatientDataWorkflowAction);
   mWorkflowMenu->addAction(mImageRegistrationWorkflowAction);
   mWorkflowMenu->addAction(mPatientRegistrationWorkflowAction);
   mWorkflowMenu->addAction(mNavigationWorkflowAction);
-  mWorkflowMenu->addAction(mUSAcquisitionWorkflowAction);
+  mWorkflowMenu->addAction(mUSAcquisitionWorkflowAction);*/
+  mStateMachineManager->getWorkflow()->fillMenu(mWorkflowMenu);
 
   //data
   this->menuBar()->addMenu(mDataMenu);

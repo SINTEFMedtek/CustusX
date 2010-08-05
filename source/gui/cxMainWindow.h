@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "sscData.h"
 #include "cxViewManager.h"
+#include "cxStateMachineManager.h"
 
 class QAction;
 class QMenu;
@@ -162,12 +163,12 @@ protected:
 	
   QAction* mToggleContextDockWidgetAction;///< Action for turning dock widget on/off
   
-  QAction* mPatientDataWorkflowAction; ///< action for switching to the patient data workflow
+  /*QAction* mPatientDataWorkflowAction; ///< action for switching to the patient data workflow
   QAction* mImageRegistrationWorkflowAction; ///< action for switching to the image registration workflow
   QAction* mPatientRegistrationWorkflowAction; ///< action for switching to the patient registraiton workflow
   QAction* mNavigationWorkflowAction; ///< action for switching to the navigation workflow
   QAction* mUSAcquisitionWorkflowAction; ///< action for switching to the ultrasound acqusition workflow
-  QActionGroup* mWorkflowActionGroup; ///< grouping the workflow actions
+  QActionGroup* mWorkflowActionGroup; ///< grouping the workflow actions*/
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume
@@ -220,6 +221,8 @@ protected:
 
   PatientDataPtr mPatientData;
   
+  StateMachineManagerPtr mStateMachineManager;
+
 };
 }//namespace cx
 
