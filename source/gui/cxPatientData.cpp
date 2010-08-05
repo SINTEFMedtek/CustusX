@@ -51,6 +51,21 @@ void PatientData::newPatient(QString choosenDir)
   this->setActivePatient(choosenDir);
 }
 
+/**Remove all data referring to the current patient from the system,
+ * enabling us to load new patient data.
+ */
+void PatientData::clearPatient()
+{
+  ssc::dataManager()->clear();
+  ssc::toolManager()->clear();
+  viewManager()->clear();
+  registrationManager()->clear();
+  //rep
+  //usrec?
+
+  this->setActivePatient("");
+}
+
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {

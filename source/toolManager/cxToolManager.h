@@ -66,6 +66,7 @@ public:
 
   void addXml(QDomNode& parentNode); ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
+  virtual void clear(); ///< clear everything loaded from xml
 
   ssc::ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
   virtual ssc::LandmarkMap getLandmarks();

@@ -39,6 +39,7 @@ public slots:
   void loadPatient(QString chosenDir);
   void importData(QString fileName);
   void savePatient();///< Save all application data to XML file
+  void clearPatient();
 
 signals:
   void patientChanged();

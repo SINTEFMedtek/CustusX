@@ -77,6 +77,7 @@ public:
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
   void parseXml(QDomNode viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
+  void clear();
 
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager

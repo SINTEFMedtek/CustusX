@@ -53,6 +53,7 @@ public:
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
   void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
+  void clear();
 
 public slots:
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset); ///< transform for (slightly) moving a patient registration
