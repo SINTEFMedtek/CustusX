@@ -738,8 +738,18 @@ void ToolManager::addXml(QDomNode& parentNode)
   base.appendChild(landmarksNode);
 }
 
+void ToolManager::clear()
+{
+  m_rMpr_History->clear();
+  mManualTool->set_prMt(ssc::Transform3D());
+  mLandmarks.clear();
+}
+
 void ToolManager::parseXml(QDomNode& dataNode)
 {
+  if (dataNode.isNull())
+    return;
+
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMpr_History->parseXml(registrationHistory);
 

@@ -241,6 +241,14 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
   this->setActiveView(activeViewString.toStdString());
 }
 
+void ViewManager::clear()
+{
+  for (unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    mViewGroups[i]->clear();
+  }
+}
+
 QWidget* ViewManager::stealCentralWidget()
 {
   return mMainWindowsCentralWidget;

@@ -363,6 +363,14 @@ void ViewGroup::addXml(QDomNode& dataNode)
   dataNode.appendChild(zoom2DNode);
 }
 
+void ViewGroup::clear()
+{
+  while (!mImages.empty())
+  {
+    this->removeImage(mImages.front());
+  }
+  this->setZoom2D(1.0);
+}
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {

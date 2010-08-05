@@ -294,4 +294,11 @@ void RegistrationManager::parseXml(QDomNode& dataNode)
   }
 }
 
+void RegistrationManager::clear()
+{
+  mLastRegistrationTime = QDateTime();
+  this->setMasterImage(ssc::ImagePtr());
+}
+
+
 }//namespace cx
