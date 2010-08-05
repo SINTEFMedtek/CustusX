@@ -34,4 +34,11 @@ void TestToolConfigurationParser::testGetConfiguredTools()
 {
   cx::ToolMapPtr toolmap = mConfigurationParser->getConfiguredTools();
   CPPUNIT_ASSERT_MESSAGE("Not the right number of tools.", toolmap->size() == 2);
+
+  cx::ToolMap::iterator it;
+  for(it = toolmap->begin(); it != toolmap->end(); ++it)
+  {
+    cx::ToolPtr cxTool = boost::shared_static_cast<cx::Tool>((*it).second);
+    CPPUNIT_ASSERT_MESSAGE("Found an invalid configured tool.", cxTool->isValid());
+  }
 }
