@@ -163,17 +163,34 @@ void DataManagerImpl::initialize()
 
 DataManagerImpl::DataManagerImpl()
 {
-  mMedicalDomain = mdLABORATORY;
+//  mMedicalDomain = mdLABORATORY;
 //  mMedicalDomain = mdLAPAROSCOPY;
 	mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
 	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
 	mMeshReaders[mrtSTL].reset(new StlMeshReader());
-	mCenter = Vector3D(0,0,0);
-	mActiveImage.reset();
+//	mCenter = Vector3D(0,0,0);
+//	mActiveImage.reset();
+	this->clear();
 }
 
 DataManagerImpl::~DataManagerImpl()
 {
+}
+
+void DataManagerImpl::clear()
+{
+  mImages.clear();
+  mCenter = ssc::Vector3D(0,0,0);
+  mMedicalDomain = mdLABORATORY;
+  mMeshes.clear();
+  mActiveImage.reset();
+  mLandmarkProperties.clear();
+
+  emit centerChanged();
+  emit activeImageChanged("");
+  emit activeImageTransferFunctionsChanged();
+  emit landmarkPropertiesChanged();
+  emit dataLoaded();
 }
 
 Vector3D DataManagerImpl::getCenter() const
@@ -425,6 +442,7 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
     iter->second->addXml(dataManagerNode);
   }
 }
+
 void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 {
   QDomNode landmarksNode = dataManagerNode.namedItem("landmarkprops");

@@ -104,6 +104,7 @@ public:
   virtual void setLandmarkName(std::string uid, std::string name);
   virtual void setLandmarkActive(std::string uid, bool active);
   virtual std::map<std::string, LandmarkProperty> getLandmarkProperties() const;
+  virtual void clear(); ///< remove all stuff from manager
 
   //virtual MeshPtr getActiveMesh() const; ///< used for system state
   //virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state

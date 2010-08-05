@@ -126,6 +126,14 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
   setActiveTime(currentTime); // update cache
 }
 
+void RegistrationHistory::clear()
+{
+  mData.clear();
+  mCurrentTime = QDateTime();
+  mTransformCache = Transform3D();
+}
+
+
 /**Add one registration transform to the history.
  */
 void RegistrationHistory::addRegistration(const RegistrationTransform& transform)

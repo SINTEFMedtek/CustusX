@@ -51,6 +51,7 @@ public:
   void setActiveTime(const QDateTime& timestamp);
   QDateTime getActiveTime() const;
   Transform3D getCurrentRegistration() const;
+  void clear(); ///< reset all data loaded from xml
 signals:
   void currentChanged();
 private:
