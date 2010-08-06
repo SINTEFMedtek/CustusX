@@ -166,13 +166,12 @@ void MainWindow::createActions()
   mSaveFileAction->setShortcut(tr("Ctrl+S"));
   mLoadFileAction = new QAction(tr("&Load Patient file"), this);
   mLoadFileAction->setShortcut(tr("Ctrl+L"));
+  mClearPatientAction = new QAction(tr("&Clear Patient"), this);
   
-  connect(mNewPatientAction, SIGNAL(triggered()),
-          this, SLOT(newPatientSlot()));
-  connect(mLoadFileAction, SIGNAL(triggered()),
-          this, SLOT(loadPatientFileSlot()));
-  connect(mSaveFileAction, SIGNAL(triggered()),
-          this, SLOT(savePatientFileSlot()));
+  connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
+  connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
+  connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
+  connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
 
   // Application
   mAboutAction = new QAction(tr("&About"), this);  // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
@@ -363,6 +362,12 @@ void MainWindow::newPatientSlot()
   mPatientData->newPatient(choosenDir);
 }
 
+void MainWindow::clearPatientSlot()
+{
+  mPatientData->clearPatient();
+  ssc::messageManager()->sendWarning("Cleared current patient data");
+}
+
 void MainWindow::savePatientFileSlot()
 {
   if(mPatientData->getActivePatientFolder().isEmpty())
@@ -433,6 +438,11 @@ void MainWindow::patientChangedSlot()
  */
 void MainWindow::layoutChangedSlot()
 {
+//  QByteArray array = this->saveState();
+//  std::cout << "bytearray: " << QString(array) << std::endl;
+//  std::cout << "bytearray: " << QString(array.toBase64()) << std::endl;
+//  this->restoreState(QByteArray::fromBase64(array.toBase64()));
+  //std::cout << "bytearray: " << QString(array) << std::endl;
   // reset list of available layouts
   delete mLayoutActionGroup;
   mLayoutActionGroup = viewManager()->createLayoutActionGroup();
@@ -524,6 +534,7 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mNewPatientAction);
   mFileMenu->addAction(mSaveFileAction);
   mFileMenu->addAction(mLoadFileAction);
+  mFileMenu->addAction(mClearPatientAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
 

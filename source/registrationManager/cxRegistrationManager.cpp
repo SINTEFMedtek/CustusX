@@ -50,7 +50,8 @@ void RegistrationManager::initialize()
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
   mMasterImage = image;
-  ssc::messageManager()->sendInfo("Master image set to "+image->getUid());
+  if (mMasterImage)
+    ssc::messageManager()->sendInfo("Master image set to "+image->getUid());
 }
 
 ssc::ImagePtr RegistrationManager::getMasterImage()

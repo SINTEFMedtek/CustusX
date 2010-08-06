@@ -68,6 +68,7 @@ protected slots:
   void newPatientSlot(); ///< Create new patient with directory structure
   void loadPatientFileSlot();///< Load all application data from XML file
   void savePatientFileSlot();///< Save all application data to XML file
+  void clearPatientSlot();///< clear current patient (debug)
 
   //workflow menu
   void patientDataWorkflowSlot(); ///< change state to patient data
@@ -160,7 +161,8 @@ protected:
   QAction* mNewPatientAction;///< Action for creating a new patient
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
-	
+  QAction* mClearPatientAction;
+
   QAction* mToggleContextDockWidgetAction;///< Action for turning dock widget on/off
   
   /*QAction* mPatientDataWorkflowAction; ///< action for switching to the patient data workflow
