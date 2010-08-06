@@ -439,6 +439,8 @@ void MainWindow::patientChangedSlot()
 void MainWindow::layoutChangedSlot()
 {
 //  QByteArray array = this->saveState();
+//  QSettings settings("/Users/christiana/testini.ini", QSettings::IniFormat);
+//  settings.setValue("testmwstate", array);
 //  std::cout << "bytearray: " << QString(array) << std::endl;
 //  std::cout << "bytearray: " << QString(array.toBase64()) << std::endl;
 //  this->restoreState(QByteArray::fromBase64(array.toBase64()));
