@@ -6,8 +6,12 @@
  */
 #include "cxPatientData.h"
 
-#include <QtGui>
+//#include <QtGui>
 #include <QDomDocument>
+#include <QFile>
+#include <QDir>
+#include <QTimer>
+#include <QTextStream>
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
