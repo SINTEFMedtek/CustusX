@@ -47,6 +47,7 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 
 void PatientData::newPatient(QString choosenDir)
 {
+  this->clearPatient();
   createPatientFolders(choosenDir);
   this->setActivePatient(choosenDir);
 }
