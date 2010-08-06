@@ -69,6 +69,7 @@ void PatientData::clearPatient()
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
+  this->clearPatient();
   //ssc::messageManager()->sendDebug("loadPatient() choosenDir: "+string_cast(choosenDir));
   if (choosenDir == QString::null)
     return; // On cancel
