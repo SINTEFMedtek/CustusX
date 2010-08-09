@@ -274,8 +274,10 @@ void PatientData::importData(QString fileName)
 void PatientData::createPatientFolders(QString choosenDir)
 {
   //ssc::messageManager()->sendDebug("PatientData::createPatientFolders() called");
-  if(!choosenDir.endsWith(".cx3"))
-    choosenDir.append(".cx3");
+  
+  // Allow patient folders without the .cx3 ending
+  //if(!choosenDir.endsWith(".cx3"))
+  //  choosenDir.append(".cx3");
 
   ssc::messageManager()->sendInfo("Selected a patient to work with.");
 
