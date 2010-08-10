@@ -330,9 +330,9 @@ void LayoutEditor::updateGrid()
 
 void LayoutEditor::clearDisplay()
 {
-  for (int r = 0; r < mViewDataCache.size(); ++r)
+  for (unsigned int r = 0; r < mViewDataCache.size(); ++r)
   {
-    for (int c = 0; c < mViewDataCache[r].size(); ++c)
+    for (unsigned int c = 0; c < mViewDataCache[r].size(); ++c)
     {
       mViewDataCache[r][c].mFrame->hide();
     }
