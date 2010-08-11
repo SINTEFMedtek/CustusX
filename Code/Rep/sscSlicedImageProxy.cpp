@@ -85,16 +85,15 @@ typedef vtkSmartPointer<vtkImageAppendComponents > vtkImageAppendComponentsPtr;
 
 void SlicedImageProxy::setImage(ImagePtr image)
 {
-  if (mImage)
-  {
-    disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-  }
-
-  mImage = image;
 	if (mImage)
 	{
-    connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-	  //std::cout << "slicedImageProxy::setImage" << std::endl;
+		disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+	}
+
+	mImage = image;
+	if (mImage)
+	{
+		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		mReslicer->SetInput( mImage->getBaseVtkImageData() );
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
@@ -166,10 +165,8 @@ void SlicedImageProxy::update()
 	/*lock-out render time*/
 	/* this will probably update the pipe*/
 
-
 //	mReslicer->Update(); //and the mapper
 //	mWindowLevel->Update();
-
 }
 
 void SlicedImageProxy::sliceTransformChangedSlot(Transform3D sMr)
@@ -197,11 +194,6 @@ void SlicedImageProxy::printSelf(std::ostream & os, Indent indent)
 
 }
 
-
 //---------------------------------------------------------
 }//end namespace
 //---------------------------------------------------------
-
-
-
-

@@ -1,11 +1,9 @@
-
 #include "sscGPUImageBuffer.h"
 
 #ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
 #include <vtkgl.h>
 
-//#include <GL/glu.h>
 #ifdef __APPLE__
 #include <OpenGL/glu.h>
 #else
@@ -25,26 +23,6 @@
 #include <boost/cstdint.hpp>
 
 #include "sscGLHelpers.h"
-
-//#define report_gl_error() fgl_really_report_gl_errors(__FILE__, __LINE__)
-//
-//namespace{
-//	void fgl_really_report_gl_errors( const char *file, int line )
-//	{
-//		GLenum error;
-//		int i = 0;
-//
-//		while ( ( error = glGetError () ) != GL_NO_ERROR  && i < 20 )
-//		{
-//			printf( "Oops, GL error caught: %s %s:%d\n", gluErrorString( error ), file, line );
-//			++i;
-//		}
-//		if ( i != 0 )
-//		{
-//			abort();
-//		}
-//	}
-//}
 
 namespace ssc
 {
@@ -128,8 +106,8 @@ public:
 		}
 			break; //16UI_EXT; break;
 		default:
-      size = 0;
-      internalType = 0;
+			size = 0;
+			internalType = 0;
 			std::cout << "Bit size not supported!" << std::endl;
 			break;
 		}
@@ -273,7 +251,7 @@ public:
 		vtkgl::GenBuffersARB(1, &lutBuffer);
 		vtkgl::BindBuffer(vtkgl::TEXTURE_BUFFER_EXT, lutBuffer);
 		vtkgl::BufferData(vtkgl::TEXTURE_BUFFER_EXT, mLutDataSize * sizeof(float), &(*mLut.begin()), vtkgl::STATIC_DRAW);
-//
+
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT, textureId);
 		vtkgl::TexBufferEXT(vtkgl::TEXTURE_BUFFER_EXT, vtkgl::RGBA32F_ARB, lutBuffer);
 		report_gl_error();

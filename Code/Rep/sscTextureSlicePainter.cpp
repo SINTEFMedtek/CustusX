@@ -9,32 +9,15 @@
 
 #ifndef WIN32
 #include <QtCore>
-//#include <vtkProperty.h>
 #include <vtkOpenGLExtensionManager.h>
-//#include <vtkOpenGLRepresentationPainter.h>
-//#include <vtkActor.h>
 #include <vtkRenderer.h>
-//
-//#include "sscImage.h"
-//#include "sscGPUImageBuffer.h"
-//
-//
-//#include <vtkActor.h>
 #include <vtkShaderProgram2.h>
 #include <vtkShader2.h>
 #include <vtkShader2Collection.h>
 #include <vtkUniformVariables.h>
 #include <vtkObjectFactory.h>
-//#include <vtkPolyData.h>
-//#include <vtkProperty.h>
-//#include <vtkRenderer.h>
 #include <vtkOpenGLRenderWindow.h>
-//#include <vtkSmartPointer.h>
-//#include <vtkImageData.h>
 #include <vtkgl.h>
-//#include <vtkPointData.h>
-//#include <vtkUnsignedCharArray.h>
-//#include <vtkUnsignedShortArray.h>
 
 #include "/usr/include/X11/Xlib.h"
 
@@ -50,8 +33,6 @@
 #endif
 
 #include "sscGPUImageBuffer.h"
-//#include "SonoWand.h"
-//#include "QtUtilities.h"
 #include "sscTypeConversions.h"
 #include "sscGLHelpers.h"
 
@@ -75,20 +56,15 @@ class SingleVolumePainterHelper
 	float mLevel;
 	float mLLR;
 	float mAlpha;
-	//int mLutSize;
 
 public:
 	explicit SingleVolumePainterHelper(int index)
 	{
-		//GPUImageBufferPtr createGPUImageBuffer(vtkImageDataPtr volume, vtkUnsignedCharArrayPtr lut);
-		//mBuffer.reset(new GPUImageBufferImpl);
 		mIndex = index;
-		//mLutSize = -1;
 	}
 	SingleVolumePainterHelper()
 	{
 		mIndex = -1;
-		//mLutSize = -1;
 	}
 	~SingleVolumePainterHelper()
 	{
@@ -196,8 +172,7 @@ public:
 		}
 	}
 };
-//---------------------------------------------------------
-//---------------------------------------------------------
+
 //---------------------------------------------------------
 TextureSlicePainter::TextureSlicePainter()
 {
@@ -215,7 +190,6 @@ TextureSlicePainter::TextureSlicePainter()
 	else
 	{
 		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
-		//SW_ERROR("TextureSlicer can't read shaderfile ");
 	}
 
 }
@@ -364,7 +338,6 @@ bool TextureSlicePainter::LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr)
 	}
 	return (LoadRequiredExtension(mgr, "GL_VERSION_2_0")
 			&& LoadRequiredExtension(mgr, "GL_VERSION_1_5")
-//			&& mgr->LoadSupportedExtension(mgr, "GL_EXT_texture3D")
 			&& LoadRequiredExtension(mgr, "GL_ARB_vertex_buffer_object")
 			&& LoadRequiredExtension(mgr, "GL_EXT_texture_buffer_object"));
 }
@@ -383,15 +356,11 @@ void TextureSlicePainter::SetColorAttribute(int index, float window, float level
 {
 	mInternals->safeIndex(index).SetColorAttribute(window, level, llr, alpha);
 }
+
 void TextureSlicePainter::releaseGraphicsResources(int index)
 {
 	//mInternals->safeIndex(index).eachRealaseResourses();
 }
-////intput lookuptable is raw imported table
-//void TextureSlicePainter::SetColorMap(int index, vtkUnsignedCharArrayPtr table)
-//{
-//	mInternals->safeIndex(index).SetColorMap(table);
-//}
 
 void TextureSlicePainter::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -401,5 +370,3 @@ void TextureSlicePainter::PrintSelf(ostream& os, vtkIndent indent)
 }//end namespace
 //---------------------------------------------------------
 #endif //WIN32
-
-

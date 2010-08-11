@@ -6,11 +6,8 @@
  */
 
 #include "sscTexture3DSlicerRep.h"
-
-//#include "sscTextureSlicePainter.h" //new gl slicer
-////#include "vmTestApplication/testAppImageProxy.h" //testApp slicer - no colormapping
-
 #include "sscTextureSlicePainter.h"
+
 #include <vtkRenderer.h>
 #include <vtkFloatArray.h>
 #include <vtkPlaneSource.h>

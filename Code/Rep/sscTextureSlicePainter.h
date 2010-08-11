@@ -40,7 +40,6 @@ public:
 	virtual void ReleaseGraphicsResources(vtkWindow *);
 	void PrintSelf(ostream& os, vtkIndent indent);
 
-	//void SetColorMap(int index, vtkUnsignedCharArrayPtr table);
 	void SetColorAttribute(int index, float window, float level, float llr, float alpha);
 	void SetVolumeBuffer(int index, ssc::GPUImageDataBufferPtr buffer);
 	void SetLutBuffer(int index, ssc::GPUImageLutBufferPtr buffer);

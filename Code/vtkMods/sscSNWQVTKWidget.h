@@ -7,20 +7,3 @@
 #else
 	#error "VTK Version not supported"
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
