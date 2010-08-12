@@ -14,6 +14,7 @@
 //#include <vtkDataSetAttributes.h>
 #include <vtkEventQtSlotConnect.h>
 
+#include "sscMessageManager.h"
 #include "sscImage.h"
 #include "sscView.h"
 #include "sscTool.h"
@@ -173,7 +174,7 @@ void ProbeRep::makeLandmarkPermanent(unsigned index)
 }
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-//  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
+  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren =
 		vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
@@ -189,7 +190,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 
 //  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
-  //std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
+  std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
 	this->pickLandmark(clickPoint, mCurrentRenderer);
 }
 /**
@@ -243,7 +244,10 @@ void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {
   if(view == NULL)
+  {
+    messageManager()->sendDebug("Cannot add rep actor to a NULL view.");
     return;
+  }
 
   mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
                        vtkCommand::LeftButtonPressEvent,
