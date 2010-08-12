@@ -50,8 +50,8 @@ public:
   ViewGroup();
   virtual ~ViewGroup();
 
-  void addViewWrapper(ViewWrapperPtr wrapper);
-  void deactivateViews();
+  void addView(ViewWrapperPtr wrapper);
+  void removeViews();
   ViewWrapperPtr getViewWrapperFromViewUid(std::string viewUid);
   std::vector<ssc::View*> getViews() const;
   //ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
@@ -60,7 +60,7 @@ public:
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
-  void clear();
+  void clearPatientData();
   double getZoom2D();
   std::vector<ssc::ImagePtr> getImages() { return mImages; }
 
@@ -98,6 +98,7 @@ protected:
 
   std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mViewWrappers;
+  ssc::REGISTRATION_STATUS mRegistrationMode;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
 } // namespace cx

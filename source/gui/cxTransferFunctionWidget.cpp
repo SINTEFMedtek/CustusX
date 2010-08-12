@@ -18,7 +18,10 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
   QWidget(parent),
   mLayout(new QVBoxLayout(this)),
   mInitialized(false)
-{}
+{
+  this->setObjectName("TransferFunctionWidget");
+  this->setWindowTitle("Transfer Function");
+}
 
 TransferFunctionWidget::~TransferFunctionWidget()
 {}

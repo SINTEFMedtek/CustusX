@@ -104,7 +104,7 @@ QString ViewManager::getActiveLayout() const
  */
 void ViewManager::setActiveLayout(const QString& layout)
 {
-  if (mActiveLayout==layout)
+  if(mActiveLayout==layout)
     return;
 
   deactivateCurrentLayout();
@@ -245,7 +245,7 @@ void ViewManager::clear()
 {
   for (unsigned i=0; i<mViewGroups.size(); ++i)
   {
-    mViewGroups[i]->clear();
+    mViewGroups[i]->clearPatientData();
   }
 }
 
@@ -281,7 +281,7 @@ void ViewManager::deactivateCurrentLayout()
 
   for (unsigned i=0; i< mViewGroups.size(); ++i)
   {
-    mViewGroups[i]->deactivateViews();
+    mViewGroups[i]->removeViews();
   }
 
   this->setStretchFactors(LayoutRegion(0, 0, 10, 10), 0);
@@ -293,8 +293,8 @@ void ViewManager::deactivateCurrentLayout()
 void ViewManager::activateLayout(const QString& toType)
 {
   LayoutData next = this->getLayoutData(toType);
-  if (next.getUid().isEmpty())
-    return;
+  //if (next.getUid().isEmpty())
+    //return;
 
 //  std::cout << streamXml2String(next) << std::endl;
 
@@ -371,7 +371,7 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
   mViewMap[view->getUid()] = view;
   ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
   wrapper->initializePlane(plane);
-  mViewGroups[group]->addViewWrapper(wrapper);
+  mViewGroups[group]->addView(wrapper);
   //ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
   this->setStretchFactors( region, 1);
@@ -384,7 +384,7 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
   View3D* view = mViewCache3D.retrieveView();
   mViewMap[view->getUid()] = view;
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
-  mViewGroups[group]->addViewWrapper(wrapper);
+  mViewGroups[group]->addView(wrapper);
 //  ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
   this->setStretchFactors( region, 1);

@@ -3,6 +3,8 @@ SET (LIB statemachineManager)
 SET( CX_QT_MOC_HEADER_FILES
 	cxWorkflowStateMachine.h
 	cxWorkflowState.h
+	cxPatientData.h
+	cxFileCopied.h
 )
 
 SET ( ${LIB}_statemachineManager
@@ -12,9 +14,13 @@ SET ( ${LIB}_statemachineManager
 	cxWorkflowStateMachine.cpp
 	cxWorkflowState.h
 	cxRequestEnterStateTransition.h
+	cxPatientData.h
+	cxPatientData.cpp
+	cxFileCopied.h
+	cxFileCopied.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_statemachineManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC) 
+target_link_libraries(${LIB} SSC cxCommon viewManager registrationManager)

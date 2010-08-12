@@ -10,7 +10,6 @@ class QAction;
 class QMenu;
 class QActionGroup;
 class QDomDocument;
-//class QSettings;
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace ssc
@@ -21,18 +20,6 @@ namespace ssc
 
 namespace cx
 {
-typedef boost::shared_ptr<class PatientData> PatientDataPtr;
-
-class CustomStatusBar;
-class ContextDockWidget;
-class TransferFunctionWidget;
-class BrowserWidget;
-class NavigationWidget;
-class ImageRegistrationWidget;
-class PatientRegistrationWidget;
-class ShiftCorrectionWidget;
-
-
  
 /**
  * \class MainWindow
@@ -70,12 +57,10 @@ protected slots:
   void savePatientFileSlot();///< Save all application data to XML file
   void clearPatientSlot();///< clear current patient (debug)
 
-  //workflow menu
-  void patientDataWorkflowSlot(); ///< change state to patient data
-  void imageRegistrationWorkflowSlot(); ///< change state to image registration
-  void patientRegistrationWorkflowSlot(); ///< change state to patient registration
-  void navigationWorkflowSlot(); ///< change state to navigation
-  void usAcquisitionWorkflowSlot(); ///< change state to ultrasound acquisition
+  //workflow
+  void onWorkflowStateChangedSlot();
+  void saveDesktopSlot();
+  void resetDesktopSlot();
 
   //data menu
   void importDataSlot(); ///< loads data(images) into the datamanager
@@ -87,7 +72,6 @@ protected slots:
 
   // layout menu
   void layoutChangedSlot();
-  //void setLayoutSlot();
   void newCustomLayoutSlot();
   void editCustomLayoutSlot();
   void deleteCustomLayoutSlot();
@@ -103,15 +87,6 @@ protected slots:
   void toggleTrackingSlot();
 
 protected:
-  enum WorkflowState
-  {
-    PATIENT_DATA,
-    IMAGE_REGISTRATION,
-    PATIENT_REGISTRATION,
-    NAVIGATION,
-    US_ACQUISITION
-  }; ///< the different workflow(-states) the user can choose from
-
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
   void createToolBars(); ///< creates and adds toolbars for convenience
@@ -119,26 +94,9 @@ protected:
 
   void addAsDockWidget(QWidget* widget);
 
-  //Takes care of removing and adding widgets depending on which workflow state the system is in
-  void changeState(WorkflowState fromState, WorkflowState toState); ///< used to change state
-  void activatePatientDataState(); ///< Should only be used by changeState(...)!
-  void deactivatePatientDataState(); ///< Should only be used by changeState(...)!
-  void activateImageRegistationState(); ///< Should only be used by changeState(...)!
-  void deactivateImageRegistationState(); ///< Should only be used by changeState(...)!
-  void activatePatientRegistrationState(); ///< Should only be used by changeState(...)!
-  void deactivatePatientRegistrationState(); ///< Should only be used by changeState(...)!
-  void activateNavigationState(); ///< Should only be used by changeState(...)!
-  void deactivateNavigationState(); ///< Should only be used by changeState(...)!
-  void activateUSAcquisitionState(); ///< Should only be used by changeState(...)!
-  void deactivateUSAcquisitionState(); ///< Should only be used by changeState(...)!
-  
-//  void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
-  //QAction* addLayoutAction(QString layout);
   LayoutData executeLayoutEditorDialog(QString title, bool createNew);
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
-  
-  WorkflowState mCurrentWorkflowState; ///< the current workflow in use
 
   //gui
   QWidget* mCentralWidget; ///< central widget used for views
@@ -146,7 +104,6 @@ protected:
   //menus
   QMenu* mCustusXMenu; ///< Application menu
   QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
-  QMenu* mWindowMenu; ///< Menu for showing / hiding GUI elements
   QMenu* mWorkflowMenu; ///< menu for choosing workflow
   QMenu* mDataMenu; ///< menu for loading data
   QMenu* mToolMenu; ///< menu for interacting with the navigation system
@@ -163,14 +120,7 @@ protected:
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
 
-  QAction* mToggleContextDockWidgetAction;///< Action for turning dock widget on/off
-  
-  /*QAction* mPatientDataWorkflowAction; ///< action for switching to the patient data workflow
-  QAction* mImageRegistrationWorkflowAction; ///< action for switching to the image registration workflow
-  QAction* mPatientRegistrationWorkflowAction; ///< action for switching to the patient registraiton workflow
-  QAction* mNavigationWorkflowAction; ///< action for switching to the navigation workflow
-  QAction* mUSAcquisitionWorkflowAction; ///< action for switching to the ultrasound acqusition workflow
-  QActionGroup* mWorkflowActionGroup; ///< grouping the workflow actions*/
+  QActionGroup* mToggleWidgetActionGroup;
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume
@@ -179,16 +129,10 @@ protected:
   QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
   QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking
-  //QAction* mStopTrackingToolsAction; ///< action for asking the navigation system to stop tracking
   QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
   QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
-//  QAction* m3D_1x1_LayoutAction; ///< action for switching to 3D_1x1 view layout
-//  QAction* m3DACS_2x2_LayoutAction; ///< action for switching to 3DACS_2x2 view layout
-//  QAction* m3DACS_1x3_LayoutAction; ///< action for switching to 3DACS_1x3 view layout
-//  QAction* mACSACS_2x3_LayoutAction; ///< action for switching to ACSACS_2x3 view layout
   QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
-//  QAction* mLayoutSeparator; ///< the separator between specific layouts and layout functions. Used to repopulate menu.
   QAction* mNewLayoutAction; ///< create a new custom layout
   QAction* mEditLayoutAction; ///< edit the current custom layout
   QAction* mDeleteLayoutAction; ///< delete the current custom layout
@@ -197,33 +141,34 @@ protected:
   QAction* mCenterToImageCenterAction;
   QAction* mCenterToTooltipAction;
 
+  //desktop actions
+  QAction* mSaveDesktopAction;
+  QAction* mResetDesktopAction;
+
   //toolbars
   QToolBar* mDataToolBar; ///< toolbar for data actions
   QToolBar* mToolToolBar; ///< toolbar for tracking system actions
   QToolBar* mNavigationToolBar; ///< toolbar for navigation actions
+  QToolBar* mWorkflowToolBar; ///< toolbar for workflow actions
+  QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
 
-  ContextDockWidget*          mContextDockWidget; ///< dock widget for context sensitive widgets
-  ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration
-  PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
-  TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
-  ShiftCorrectionWidget*      mShiftCorrectionWidget; ///< interface for image shift correction
-  BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
-  NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
-  CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
+  class ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration
+  class PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
+  class TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
+  class ShiftCorrectionWidget*      mShiftCorrectionWidget; ///< interface for image shift correction
+  class BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
+  class NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
   class ImagePropertiesWidget* mImagePropertiesWidget; ///< display and control of image properties for active image.
   class ToolPropertiesWidget* mToolPropertiesWidget; ///< display and control of tool properties for active tool.
   class MeshPropertiesWidget* mMeshPropertiesWidget; ///< Display and control image properties for active mesh
   class PointSamplingWidget* mPointSamplingWidget;
   ssc::ReconstructionWidget* mReconstructionWidget;
   class RegistrationHistoryWidget* mRegistrationHistoryWidget; ///< look back in registration history.
-  int mImageRegistrationIndex, mShiftCorrectionIndex, mPatientRegistrationIndex, mNavigationIndex; ///< tab index for removing tabs is ContextDockWidget
+
+  class CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
-
-  PatientDataPtr mPatientData;
-  
-  StateMachineManagerPtr mStateMachineManager;
 
 };
 }//namespace cx

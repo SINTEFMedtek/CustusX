@@ -9,6 +9,9 @@
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "cxRequestEnterStateTransition.h"
+#include "cxStateMachineManager.h"
+#include "cxPatientData.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
@@ -34,11 +37,33 @@ public:
 
   virtual ~WorkflowState(){};
 
-  virtual void onEntry(QEvent * event ){std::cout << "Entering "<< mName << std::endl;};
-  virtual void onExit(QEvent * event ){std::cout << "Exiting "<< mName << std::endl;};
+  virtual void onEntry(QEvent * event )
+  {
+    std::cout << "Entering "<< mName << std::endl;
+    if(mAction)
+      mAction->setChecked(true);
+  };
+  virtual void onExit(QEvent * event )
+  {
+    std::cout << "Exiting "<< mName << std::endl;
+  };
 
   virtual QString getUid() const {return mUid;};
   virtual QString getName() const {return mName;};
+
+  std::vector<WorkflowState*> getChildStates()
+  {
+    QObjectList childrenList = this->children();
+    std::vector<WorkflowState*> retval;
+    for (int i=0; i<childrenList.size(); ++i)
+    {
+      WorkflowState* state = dynamic_cast<WorkflowState*>(childrenList[i]);
+      if (state)
+        retval.push_back(state);
+    }
+    return retval;
+  }
+
 
   QAction* createAction(QActionGroup* group)
   {
@@ -74,6 +99,20 @@ protected:
   QAction* mAction;
 };
 
+class ParentWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  ParentWorkflowState(QState* parent) :
+  WorkflowState(parent, "ParentUid", "Parent")
+  {  };
+
+  virtual ~ParentWorkflowState(){};
+
+  virtual bool canEnter() const {return true;}
+};
+
 class PatientDataWorkflowState : public WorkflowState
 {
   Q_OBJECT
@@ -96,12 +135,153 @@ public:
   NavigationWorkflowState(QState* parent) :
   WorkflowState(parent, "NavigationUid", "Navigation")
   {
-    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+    connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
   };
 
   virtual ~NavigationWorkflowState(){};
 
-  virtual bool canEnter() const {return !ssc::dataManager()->getImages().empty();};
+  virtual bool canEnter() const {return stateManager()->getPatientData()->isPatientValid();};
+};
+
+class RegistrationWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  RegistrationWorkflowState(QState* parent) :
+  WorkflowState(parent, "RegistrationUid", "Registration")
+  {
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+  };
+
+  virtual ~RegistrationWorkflowState(){};
+
+  virtual bool canEnter() const
+  {
+    return !ssc::dataManager()->getImages().empty();
+  };
+};
+
+class ImageRegistrationWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  ImageRegistrationWorkflowState(QState* parent) :
+  WorkflowState(parent, "ImageRegistrationUid", "Image Registration")
+  {
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+  };
+
+  virtual ~ImageRegistrationWorkflowState(){};
+
+  virtual bool canEnter() const
+  {
+    return !ssc::dataManager()->getImages().empty();
+  };
+
+  virtual void onEntry(QEvent * event )
+  {
+    WorkflowState::onEntry(event);
+    viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
+  };
+
+  virtual void onExit(QEvent * event )
+  {
+    WorkflowState::onExit(event);
+    viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+  };
+
+  /*
+  //TODO: MOVE TO SHIFT CORRECTION... and Finish ShiftCorrection
+  QString imagesPath = mPatientData->getActivePatientFolder()+"/Images";
+  mShiftCorrectionWidget->init(imagesPath);
+  //Don't show ShiftCorrection in release
+  //mShiftCorrectionIndex = mContextDockWidget->addTab(mShiftCorrectionWidget,
+  //    QString("Shift correction"));
+*/
+};
+
+class PatientRegistrationWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  PatientRegistrationWorkflowState(QState* parent) :
+  WorkflowState(parent, "PatientRegistrationUid", "Patient Registration")
+  {
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+  };
+
+  virtual ~PatientRegistrationWorkflowState(){};
+
+  virtual bool canEnter() const
+  {
+    //TODO check that data is image registrated
+    return !ssc::dataManager()->getImages().empty();
+  };
+  virtual void onEntry(QEvent * event )
+  {
+    WorkflowState::onEntry(event);
+    viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+  };
+
+  virtual void onExit(QEvent * event )
+  {
+    WorkflowState::onExit(event);
+    viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+  };
+};
+
+class PreOpPlanningWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  PreOpPlanningWorkflowState(QState* parent) :
+  WorkflowState(parent, "PreOpPlanningUid", "Pre Op Planning")
+  {  };
+
+  virtual ~PreOpPlanningWorkflowState(){};
+
+  virtual bool canEnter() const
+  {
+    return !ssc::dataManager()->getImages().empty();
+  }
+};
+
+class IntraOpImagingWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  IntraOpImagingWorkflowState(QState* parent) :
+  WorkflowState(parent, "IntraOpImagingUid", "Intra Op Imaging")
+  {  };
+
+  virtual ~IntraOpImagingWorkflowState(){};
+
+  virtual bool canEnter() const
+  {
+    return stateManager()->getPatientData()->isPatientValid();
+  }
+};
+
+class PostOpControllWorkflowState : public WorkflowState
+{
+  Q_OBJECT
+
+public:
+  PostOpControllWorkflowState(QState* parent) :
+  WorkflowState(parent, "PostOpControllUid", "Post Op Controll")
+  {  };
+
+  virtual ~PostOpControllWorkflowState(){};
+
+  virtual bool canEnter() const
+  {
+    return !ssc::dataManager()->getImages().empty();
+  }
 };
 
 }

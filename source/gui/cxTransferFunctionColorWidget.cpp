@@ -23,6 +23,8 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
   mCurrentClickY(INT_MAX),
   mBorder(5)
 {
+  this->setObjectName("TransferFunctionColorWidget");
+
   mCurrentPoint.reset();
   
   // Create actions

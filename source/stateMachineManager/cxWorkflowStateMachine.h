@@ -5,6 +5,7 @@
 #include <QActionGroup>
 #include "cxForwardDeclarations.h"
 
+class QToolBar;
 class QMenu;
 
 namespace cx
@@ -29,13 +30,25 @@ public:
 
   QActionGroup* getActionGroup();
   void fillMenu(QMenu* menu);
+  void fillToolBar(QToolBar* toolbar);
+
+  QString getActiveUidState();
+
+signals:
+  void activeStateChanged();
 
 private:
+  void fillMenu(QMenu* menu, WorkflowState* current);
+  void fillToolbar(QToolBar* toolbar, WorkflowState* current);
+
+
   QAction* addAction(QString stateUid, QActionGroup* group);
-  void newState(WorkflowState* state);
+  WorkflowState* newState(WorkflowState* state);
 
   typedef std::map<QString, WorkflowState*> WorkflowStateMap;
   WorkflowStateMap mStates;
+  WorkflowState* mParentState;
+  QActionGroup* mActionGroup;
 };
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;

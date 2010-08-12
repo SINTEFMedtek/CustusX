@@ -28,6 +28,7 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
   //widget
+  this->setObjectName("ImageRegistrationWidget");
   this->setWindowTitle("Image Registration");
 
   //pushbuttons
@@ -127,6 +128,19 @@ void ImageRegistrationWidget::cellClickedSlot(int row, int column)
 void ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
   RegistrationWidget::showEvent(event);
+
+  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  connect(this, SIGNAL(thresholdChanged(int)),
+          probeRep.get(), SLOT(setThresholdSlot(int)));
+}
+
+void ImageRegistrationWidget::hideEvent(QHideEvent* event)
+{
+  RegistrationWidget::hideEvent(event);
+
+  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  disconnect(this, SIGNAL(thresholdChanged(const int)),
+          probeRep.get(), SLOT(setThresholdSlot(const int)));
 }
 
 void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)

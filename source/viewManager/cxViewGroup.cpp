@@ -168,6 +168,7 @@ void Navigation::centerManualTool(ssc::Vector3D& p_r)
 
 ViewGroup::ViewGroup()
 {
+  mRegistrationMode = ssc::rsNOT_REGISTRATED;
   mZoom2D.mLocal = SyncedValue::create(1.0);
   mZoom2D.activateGlobal(false);
 }
@@ -177,7 +178,7 @@ ViewGroup::~ViewGroup()
 
 /**Add one view wrapper and setup the necessary connections.
  */
-void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
+void ViewGroup::addView(ViewWrapperPtr wrapper)
 {
   mViews.push_back(wrapper->getView());
   mViewWrappers.push_back(wrapper);
@@ -197,9 +198,11 @@ void ViewGroup::addViewWrapper(ViewWrapperPtr wrapper)
 
   connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
   connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+
+  wrapper->setRegistrationMode(mRegistrationMode);
 }
 
-void ViewGroup::deactivateViews()
+void ViewGroup::removeViews()
 {
   for (unsigned i=0; i<mViewWrappers.size(); ++i)
   {
@@ -338,6 +341,7 @@ void ViewGroup::removeImage(ssc::ImagePtr image)
 
 void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
+  mRegistrationMode = mode;
   for (unsigned i=0; i<mViewWrappers.size(); ++i)
     mViewWrappers[i]->setRegistrationMode(mode);
 }
@@ -363,7 +367,7 @@ void ViewGroup::addXml(QDomNode& dataNode)
   dataNode.appendChild(zoom2DNode);
 }
 
-void ViewGroup::clear()
+void ViewGroup::clearPatientData()
 {
   while (!mImages.empty())
   {
