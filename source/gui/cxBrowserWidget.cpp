@@ -220,6 +220,7 @@ BrowserWidget::BrowserWidget(QWidget* parent) :
     //mTreeWidget(new QTreeWidget(this)),
     mVerticalLayout(new QVBoxLayout(this))
 {
+  this->setObjectName("BrowserWidget");
   this->setWindowTitle("Browser");
 
   mModel = new BrowserItemModel(this);

@@ -33,7 +33,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mShaderPath(shaderPath),
   mLastAppliedMaskReduce("")
 {
-  mSettings = settings;
+  //mSettings = settings;
 
   //QDomDocument doc("usReconstruction");
 //  doc.appendChild(doc.createElement("usReconstruct"));

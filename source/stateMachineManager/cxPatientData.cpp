@@ -27,8 +27,7 @@
 namespace cx
 {
 
-PatientData::PatientData(QObject* parent) :
-    QObject(parent),
+PatientData::PatientData() :
     mSettings(DataLocations::getSettings())
 {
 
@@ -39,9 +38,18 @@ QString PatientData::getActivePatientFolder() const
   return mActivePatientFolder;
 }
 
+bool PatientData::isPatientValid() const
+{
+  ssc::messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
+  return !mActivePatientFolder.isEmpty();
+}
+
 void PatientData::setActivePatient(const QString& activePatientFolder)
 {
-  //ssc::messageManager()->sendDebug("PatientData::setActivePatient to: "+string_cast(activePatientFolder));
+  if(activePatientFolder == mActivePatientFolder)
+    return;
+
+  ssc::messageManager()->sendDebug("PatientData::setActivePatient to: "+string_cast(activePatientFolder));
   mActivePatientFolder = activePatientFolder;
   //TODO
   //Update gui in some way to show which patient is active
@@ -274,10 +282,8 @@ void PatientData::importData(QString fileName)
 void PatientData::createPatientFolders(QString choosenDir)
 {
   //ssc::messageManager()->sendDebug("PatientData::createPatientFolders() called");
-  
-  // Allow patient folders without the .cx3 ending
-  //if(!choosenDir.endsWith(".cx3"))
-  //  choosenDir.append(".cx3");
+  if(!choosenDir.endsWith(".cx3"))
+    choosenDir.append(".cx3");
 
   ssc::messageManager()->sendInfo("Selected a patient to work with.");
 
@@ -375,15 +381,15 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 
   //Evaluate the xml nodes and load what's needed
   QDomNode dataManagerNode = managerNode.namedItem("datamanager");
-  if(!patientNode.isNull())
+  /*if(!patientNode.isNull())
   {
     QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
     if(!activePatientNode.isNull())
     {
-      ssc::messageManager()->sendInfo("Active patient loaded to be "
+      ssc::messageManager()->sendDebugs("Active patient node is"
                                 +mActivePatientFolder.toStdString());
     }
-  }
+  }*/
   if (!dataManagerNode.isNull())
   {
     ssc::dataManager()->parseXml(dataManagerNode, patientFolder);

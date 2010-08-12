@@ -46,6 +46,7 @@ protected slots:
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QHideEvent* event);
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
   virtual ssc::LandmarkMap getTargetLandmarks() const = 0;
   virtual void performRegistration() = 0;

@@ -43,6 +43,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   mDefaultValue(0)
 {
   //Dock widget
+  this->setObjectName("PatientRegistrationWidget");
   this->setWindowTitle("Patient Registration");
 
   //buttons

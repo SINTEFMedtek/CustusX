@@ -1,6 +1,7 @@
 #include "cxWorkflowStateMachine.h"
 #include <QAbstractTransition>
 #include <QMenu>
+#include <QToolBar>
 #include "cxWorkflowState.h"
 #include "cxRequestEnterStateTransition.h"
 
@@ -9,31 +10,35 @@ namespace cx
 
 WorkflowStateMachine::WorkflowStateMachine()
 {
-  QState* topState = new QState();
-  this->addState(topState);
-  this->setInitialState(topState);
+  mActionGroup = new QActionGroup(NULL);
 
-  PatientDataWorkflowState* pd1 = new PatientDataWorkflowState(topState);
-  NavigationWorkflowState* n1 = new NavigationWorkflowState(topState);
+  mParentState = new ParentWorkflowState(this);
 
-  this->newState(pd1);
-  this->newState(n1);
+  WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState));
+  WorkflowState* registration = this->newState(new RegistrationWorkflowState(mParentState));
+  WorkflowState* imageRegistration= this->newState(new ImageRegistrationWorkflowState(registration));
+  WorkflowState* patientRegistration = this->newState(new PatientRegistrationWorkflowState(registration));
+  WorkflowState* preOpPlanning = this->newState(new PreOpPlanningWorkflowState(mParentState));
+  WorkflowState* navigation = this->newState(new NavigationWorkflowState(mParentState));
+  WorkflowState* intraOpImaging = this->newState(new IntraOpImagingWorkflowState(mParentState));
+  WorkflowState* postOpControll = this->newState(new PostOpControllWorkflowState(mParentState));
 
-  RequestEnterStateTransition* tpd1 = new RequestEnterStateTransition(pd1->getUid());
-  tpd1->setTargetState(pd1);
-  topState->addTransition(tpd1);
-
-  RequestEnterStateTransition* tn1 = new RequestEnterStateTransition(n1->getUid());
-  tn1->setTargetState(n1);
-  topState->addTransition(tn1);
-
-  topState->setInitialState(pd1);
+  //set initial state on all levels
+  this->setInitialState(mParentState);
+  mParentState->setInitialState(patientData);
+  registration->setInitialState(imageRegistration);
 }
 
-void WorkflowStateMachine::newState(WorkflowState* state)
+WorkflowState* WorkflowStateMachine::newState(WorkflowState* state)
 {
-  //this->addState(state);
+  RequestEnterStateTransition* transToState = new RequestEnterStateTransition(state->getUid());
+  transToState->setTargetState(state);
+  mParentState->addTransition(transToState);
+
+  connect(state , SIGNAL(entered()), this, SIGNAL(activeStateChanged()));
+
   mStates[state->getUid()] = state;
+  return state;
 }
 
 WorkflowStateMachine::~WorkflowStateMachine()
@@ -41,20 +46,73 @@ WorkflowStateMachine::~WorkflowStateMachine()
 
 QActionGroup* WorkflowStateMachine::getActionGroup()
 {
-  QActionGroup* retval = new QActionGroup(NULL);
-  retval->setExclusive(true);
-
+  mActionGroup->setExclusive(true);
+  //TODO rebuild action list when we need dynamic lists. Must rethink memory management then.
   for (WorkflowStateMap::iterator iter=mStates.begin(); iter!=mStates.end(); ++iter)
   {
-    iter->second->createAction(retval);
+    iter->second->createAction(mActionGroup);
   }
 
-  return retval;
+  return mActionGroup;
 }
 
 void WorkflowStateMachine::fillMenu(QMenu* menu)
 {
-  menu->addActions(this->getActionGroup()->actions());
+  this->fillMenu(menu, mParentState);
+}
+
+void WorkflowStateMachine::fillMenu(QMenu* menu, WorkflowState* current)
+{
+  std::vector<WorkflowState*> childStates = current->getChildStates();
+
+  if (childStates.empty())
+  {
+    menu->addAction(current->createAction(mActionGroup));
+  }
+  else // current is a node. create submenu and fill in recursively
+  {
+    QMenu* submenu = menu;
+    if (current!=mParentState) // ignore creation of submenu for parent state
+      submenu = menu->addMenu(current->getName());
+    for (unsigned i=0; i<childStates.size(); ++i)
+      this->fillMenu(submenu, childStates[i]);
+  }
+}
+
+
+void WorkflowStateMachine::fillToolBar(QToolBar* toolbar)
+{
+  this->fillToolbar(toolbar, mParentState);
+}
+
+void WorkflowStateMachine::fillToolbar(QToolBar* toolbar, WorkflowState* current)
+{
+  std::vector<WorkflowState*> childStates = current->getChildStates();
+
+  if (childStates.empty())
+  {
+    toolbar->addAction(current->createAction(mActionGroup));
+  }
+  else // current is a node. fill in recursively
+  {
+    for (unsigned i=0; i<childStates.size(); ++i)
+      this->fillToolbar(toolbar, childStates[i]);
+  }
+}
+
+
+QString WorkflowStateMachine::getActiveUidState()
+{
+  QSet<QAbstractState *> states = this->configuration();
+  for(QSet<QAbstractState *>::iterator iter=states.begin(); iter!=states.end(); ++iter)
+  {
+    WorkflowState* wfs = dynamic_cast<WorkflowState*>(*iter);
+    if(!wfs || !wfs->getChildStates().empty())
+      continue;
+
+    return wfs->getUid();
+  }
+  return QString();
 }
 
 }//namespace cx

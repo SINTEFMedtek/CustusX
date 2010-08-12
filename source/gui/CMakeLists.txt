@@ -6,10 +6,8 @@ ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
 
 SET(cxProject_MOC_HDRS
   cxMainWindow.h
-  cxFileCopied.h
-  cxPatientData.h
   cxCustomStatusBar.h
-  cxContextDockWidget.h
+  #cxContextDockWidget.h
   cxNavigationWidget.h
   cxBrowserWidget.h
   cxImageRegistrationWidget.h
@@ -50,12 +48,10 @@ SET(${LIBNAME}_SRCS
     ItkVtkGlue/itkVTKImageToImageFilter.txx 
     cxMainWindow.h
     cxMainWindow.cpp 
-    cxFileCopied.cpp
-    cxPatientData.cpp
     cxCustomStatusBar.h
     cxCustomStatusBar.cpp
-    cxContextDockWidget.h
-    cxContextDockWidget.cpp
+    #cxContextDockWidget.h
+    #cxContextDockWidget.cpp
     cxNavigationWidget.h
     cxNavigationWidget.cpp
     cxBrowserWidget.h

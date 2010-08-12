@@ -29,10 +29,11 @@ class PatientData : public QObject
 {
   Q_OBJECT
 public:
-  PatientData(QObject* parent);
+  PatientData();
   virtual ~PatientData() {}
 
   QString getActivePatientFolder() const;
+  bool isPatientValid() const;
 
 public slots:
   void newPatient(QString choosenDir);

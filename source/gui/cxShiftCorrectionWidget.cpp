@@ -67,7 +67,8 @@ ShiftCorrectionWidget::ShiftCorrectionWidget(QWidget* parent) :
   mMovingImageDone(false),
   mRefImageDone(false)
 {
-  
+  this->setObjectName("ShiftCorrectionWidget");
+  this->setWindowTitle("Shift Correction");
 }
 
 ShiftCorrectionWidget::~ShiftCorrectionWidget()

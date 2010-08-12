@@ -21,6 +21,7 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
   mCurrentClickY(INT_MIN),
   mBorder(5)
 {
+  this->setObjectName("TransferFunctionAlphaWidget");
   mCurrentAlphaPoint.reset();
 }
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()

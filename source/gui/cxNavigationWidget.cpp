@@ -25,6 +25,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
     mCameraOffsetSlider(new QSlider(Qt::Horizontal, this)),
     mCameraGroupLayout(new QVBoxLayout())
 {
+  this->setObjectName("NavigationWidget");
   this->setWindowTitle("Navigation");
 
   //tracking status

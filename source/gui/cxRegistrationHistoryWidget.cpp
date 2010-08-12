@@ -21,6 +21,7 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
     QWidget(parent)
 {
   //dock widget
+  this->setObjectName("RegistrationHistoryWidget");
   this->setWindowTitle("RegistrationHistory");
 
   //layout

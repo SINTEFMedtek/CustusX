@@ -34,6 +34,7 @@ RegistrationWidget::RegistrationWidget(QWidget* parent) :
   mAvarageAccuracyLabel(new QLabel(QString(" "), this))
 {
   //widget
+  this->setObjectName("RegistrationWidget");
   this->setWindowTitle("Registration");
 
   //table widget
@@ -84,6 +85,12 @@ void RegistrationWidget::showEvent(QShowEvent* event)
   QWidget::showEvent(event);
   registrationManager()->initialize();
   this->populateTheLandmarkTableWidget(mCurrentImage);
+}
+
+
+void RegistrationWidget::hideEvent(QHideEvent* event)
+{
+  QWidget::hideEvent(event);
 }
 
 void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
