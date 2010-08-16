@@ -634,6 +634,7 @@ bool ViewManager::isCustomLayout(const QString& uid) const
 
 void ViewManager::loadGlobalSettings()
 {
+  std::cout << "ViewManager::loadGlobalSettings() B" << std::endl;
 
   ssc::XmlOptionFile file = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("viewmanager");
 
@@ -666,6 +667,7 @@ void ViewManager::loadGlobalSettings()
   }
 
   this->addDefaultLayouts(); // ensure we overwrite loaded layouts
+  std::cout << "ViewManager::loadGlobalSettings() E" << std::endl;
 }
 
 void ViewManager::saveGlobalSettings()

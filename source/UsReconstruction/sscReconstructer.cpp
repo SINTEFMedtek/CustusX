@@ -33,7 +33,8 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mShaderPath(shaderPath),
   mLastAppliedMaskReduce("")
 {
-  //mSettings = settings;
+  std::cout << "Reconstructer::Reconstructer" << std::endl;
+  mSettings = settings;
 
   //QDomDocument doc("usReconstruction");
 //  doc.appendChild(doc.createElement("usReconstruct"));
@@ -72,6 +73,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   connect(this,                    SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
 
   createAlgorithm();
+  std::cout << "Reconstructer::Reconstructer end" << std::endl;
 }
 
 Reconstructer::~Reconstructer()
