@@ -33,17 +33,9 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mShaderPath(shaderPath),
   mLastAppliedMaskReduce("")
 {
-  std::cout << "Reconstructer::Reconstructer" << std::endl;
+  //std::cout << "Reconstructer::Reconstructer" << std::endl;
   mSettings = settings;
 
-  //QDomDocument doc("usReconstruction");
-//  doc.appendChild(doc.createElement("usReconstruct"));
-//  doc.documentElement().appendChild(doc.createElement("algorithms"));
-//
-//  mSettings = XmlOptionFile(appDataPath+"/usReconstruct.xml", doc);
-
-  //mSettings = settings.descend("usReconstruction");
-//  mSettings.descend("usReconstruction");
   mSettings.getElement("algorithms");
 
   mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
@@ -73,7 +65,6 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   connect(this,                    SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
 
   createAlgorithm();
-  std::cout << "Reconstructer::Reconstructer end" << std::endl;
 }
 
 Reconstructer::~Reconstructer()
