@@ -17,6 +17,58 @@
 namespace ssc
 {
 
+SharedDocuments* XmlOptionFile::mSharedDocuments = NULL;
+
+
+/**Helper class for reusing opened documents instead of creating new instances to them.
+ *
+ */
+class SharedDocuments
+{
+public:
+  QDomDocument getDocument(const QString& filename)
+  {
+    DocumentMap::iterator iter = mDocuments.find(filename);
+    // if filename found, attempt to retrieve document from node.
+    if (iter!=mDocuments.end())
+    {
+      return iter->second.ownerDocument();
+    }
+    return QDomDocument(); // null node
+  }
+
+  void addDocument(const QString& filename, QDomDocument document)
+  {
+    mDocuments[filename] = document.documentElement();
+  }
+
+private:
+  typedef std::map<QString, QDomElement> DocumentMap;
+  DocumentMap mDocuments; ///< QDomElement points to the documentElement. This acts as a weak_ptr.
+
+//    QDomDocument getDocument(const QString& filename)
+//    {
+//      DocumentMap::iterator iter = mDocuments.find(filename);
+//      QDomDocument retval;
+//      // if filename found, attempt to retrieve document from node.
+//      if (iter!=mDocuments.end())
+//      {
+//        retval = iter->second.ownerDocument();
+//      }
+//      // if document is invalid, load file anew.
+//      if (retval.isNull())
+//      {
+//        retval = this->load(filename);
+//        mDocuments[filename] = retval.documentElement();
+//      }
+//      return retval;
+//    }
+
+};
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
 XmlOptionItem::XmlOptionItem(const QString& uid,
 	      QDomElement root) :
@@ -74,23 +126,36 @@ XmlOptionFile::XmlOptionFile()
 }
 
 XmlOptionFile::XmlOptionFile(QString filename, QString name) :
-    mFilename(filename),
-    mDocument(name)
+    mFilename(filename)
 {
-//  std::cout << "xml fileS " << filename << std::endl;
-  mDocument.appendChild(mDocument.createElement("root"));
+  if (!mSharedDocuments)
+  {
+    mSharedDocuments = new SharedDocuments;
+  }
+
+  mDocument = mSharedDocuments->getDocument(filename);
+  if (mDocument.isNull())
+  {
+//    std::cout << "    no doc found, creating new. " << std::endl;
+    this->load();
+    mSharedDocuments->addDocument(filename, mDocument);
+  }
+  else
+  {
+//    std::cout << "    reusing cached document" << std::endl;
+  }
+
   mCurrentElement = mDocument.documentElement();
-  this->load();
+
+  if (mCurrentElement.isNull())
+  {
+    mDocument.appendChild(mDocument.createElement("root"));
+    mCurrentElement = mDocument.documentElement();
+  }
 }
 
-
-XmlOptionFile::XmlOptionFile(QString filename, QDomDocument def) :
-    mFilename(filename),
-    mDocument(def)
+XmlOptionFile::~XmlOptionFile()
 {
-//  std::cout << "xml fileX " << filename << std::endl;
-  mCurrentElement = mDocument.documentElement();
-  this->load();
 }
 
 XmlOptionFile XmlOptionFile::descend(QString element) const

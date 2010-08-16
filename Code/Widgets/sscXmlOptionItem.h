@@ -38,6 +38,9 @@ private:
  * Both the xml document and filename are stored,
  * and save/load are provided.
  *
+ * Several instances of the same object points to the same internal
+ * object, in the same way as QSettings.
+ *
  * The object has a current element, which is used to ease work
  * at a specified level in the hierarchy. Use descend/ascend
  * to change the current element.
@@ -49,8 +52,8 @@ class XmlOptionFile
 {
 public:
   explicit XmlOptionFile(QString filename, QString name=""); ///< create from filename, create trivial document of type name and root node if no file exists.
-  XmlOptionFile(QString filename, QDomDocument defaultDocument); ///< create from filename, use default if no file exists.
   XmlOptionFile();
+  ~XmlOptionFile();
 
   XmlOptionFile descend(QString element) const; ///< step one level down in the xml tree
   XmlOptionFile ascend() const; ///< step one level up in the xml tree
@@ -69,7 +72,9 @@ private:
   
   QString mFilename;
   QDomDocument mDocument;
-  QDomElement mCurrentElement;
+  QDomElement mCurrentElement; ///< all getElement() operations are performed relative to this node.
+
+  static class SharedDocuments* mSharedDocuments;
 };
 
 
