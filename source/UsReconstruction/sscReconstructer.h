@@ -108,6 +108,7 @@ private:
   void clearOutput();
   //void saveSettings();
   void createAlgorithm();
+  QString generateImageName() const;
 };
 
 }//namespace
