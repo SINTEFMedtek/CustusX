@@ -18,6 +18,7 @@
 #include "sscThunderVNNReconstructAlgorithm.h"
 #include "sscPNNReconstructAlgorithm.h"
 #include "utils/sscReconstructHelper.h"
+#include "sscTime.h"
 
 //Windows fix
 #ifndef M_PI
@@ -847,6 +848,31 @@ void Reconstructer::findExtentAndOutputTransform()
   mOutputVolumeParams.constrainVolumeSize(maxVol.readValue(QString::number(1024*1024*16)).toDouble());
 }
   
+/**Generate a pretty name for for volume based on the filename.
+ * Format: US <counter> <hh:mm>, for example US 3 15:34
+ */
+QString Reconstructer::generateImageName() const
+{
+  QString name = mFilename.split("/").back();
+  name = name.split(".").front();
+
+  // retrieve  index counter
+  QString counter = name.split("_").back();
+  if (counter.count("_"))
+    counter = "";
+
+  // retrieve timestamp as HH:MM
+  QRegExp tsReg("[0-9]{8}T[0-9]{6}");
+  if (tsReg.indexIn(name)>0)
+  {
+    QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
+    QString timestamp = datetime.toString("hh:mm");
+    return "US " + counter + " " + timestamp;
+  }
+
+  return name;
+}
+
 /**
  * Pre:  All data read, mExtent is calculated
  * Post: Output volume is initialized
@@ -864,7 +890,8 @@ ImagePtr Reconstructer::generateOutputVolume()
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
   
   // Add _rec to volume name and uid
-  QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
+  //QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
+  QString volumeName = generateImageName();
   QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
   
   std::vector<std::string> imageUids = DataManager::getInstance()->getImageUids();
@@ -880,7 +907,7 @@ ImagePtr Reconstructer::generateOutputVolume()
       numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(newId));
     }
     
-    volumeName += QString::number(recNumber);
+    volumeName += " #" + QString::number(recNumber);
     volumeId += QString::number(recNumber);
   }
   ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
