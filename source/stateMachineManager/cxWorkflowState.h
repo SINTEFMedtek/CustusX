@@ -12,6 +12,7 @@
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxViewManager.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -39,7 +40,7 @@ public:
 
   virtual void onEntry(QEvent * event )
   {
-    std::cout << "Entering "<< mName << std::endl;
+    ssc::messageManager()->sendInfo("Workflow change to [" + string_cast(mName) + "]");
     if(mAction)
       mAction->setChecked(true);
   };

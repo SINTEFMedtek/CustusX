@@ -100,17 +100,6 @@ QString ViewManager::getActiveLayout() const
   return mActiveLayout;
 }
 
-/**Change layout from current to layout.
- */
-void ViewManager::setActiveLayout(const QString& layout)
-{
-  if(mActiveLayout==layout)
-    return;
-
-  deactivateCurrentLayout();
-  activateLayout(layout);
-}
-
 ViewWrapperPtr ViewManager::getActiveView() const
 {
   for(unsigned i=0; i<mViewGroups.size(); ++i)
@@ -288,13 +277,18 @@ void ViewManager::deactivateCurrentLayout()
   this->setActiveView("");
 }
 
-/**activate a layout. Assumes the previous layout is already deactivated.
+/**Change layout from current to layout.
  */
-void ViewManager::activateLayout(const QString& toType)
+void ViewManager::setActiveLayout(const QString& layout)
 {
-  LayoutData next = this->getLayoutData(toType);
-  //if (next.getUid().isEmpty())
-    //return;
+  if(mActiveLayout==layout)
+    return;
+
+  LayoutData next = this->getLayoutData(layout);
+  if (next.getUid().isEmpty())
+    return;
+
+  this->deactivateCurrentLayout();
 
 //  std::cout << streamXml2String(next) << std::endl;
 
@@ -311,7 +305,7 @@ void ViewManager::activateLayout(const QString& toType)
       activate2DView(view.mGroup, view.mPlane, view.mRegion);
   }
 
-  mActiveLayout = toType;
+  mActiveLayout = layout;
   emit activeLayoutChanged();
 
   ssc::messageManager()->sendInfo("Layout changed to "+ string_cast(this->getLayoutData(mActiveLayout).getName()));
