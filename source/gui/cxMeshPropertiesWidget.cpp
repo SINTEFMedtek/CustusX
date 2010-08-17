@@ -94,7 +94,7 @@ void MeshPropertiesWidget::setColorSlot()
 void MeshPropertiesWidget::setColorSlotDelayed()
 {
   
-  QColor result = QColorDialog::getColor( mMesh->getColor(), this);
+  QColor result = QColorDialog::getColor( mMesh->getColor(), this, "Select Mesh Color", QColorDialog::ShowAlphaChannel);
   if (result.isValid() && result != mMesh->getColor())
   {
     mMesh->setColor(result);

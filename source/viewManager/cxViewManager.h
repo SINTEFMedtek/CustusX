@@ -109,7 +109,7 @@ protected:
   void setStretchFactors(LayoutRegion region, int stretchFactor);
 
   void deactivateCurrentLayout();
-  void activateLayout(const QString& toType);
+  //void activateLayout(const QString& toType);
   void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
   void activate3DView(int group, LayoutRegion region);
 //  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region);
