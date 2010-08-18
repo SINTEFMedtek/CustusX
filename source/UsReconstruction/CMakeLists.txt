@@ -34,6 +34,8 @@ SET( SOURCE_FILES
   utils/sscReconstructHelper.cpp
   #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h
   #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.cpp
+  sscUSFrameData.h
+  sscUSFrameData.cpp
   )
 
 # =========================================================

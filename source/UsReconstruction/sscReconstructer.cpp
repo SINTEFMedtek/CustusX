@@ -32,7 +32,8 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mOutputRelativePath(""),
   mOutputBasePath(""),
   mShaderPath(shaderPath),
-  mLastAppliedMaskReduce("")
+  mLastAppliedMaskReduce(""),
+  mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags 
 {
   //std::cout << "Reconstructer::Reconstructer" << std::endl;
   mSettings = settings;
@@ -60,7 +61,8 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
       "PNN",
-      QString("ThunderVNN PNN").split(" "),
+      //QString("ThunderVNN PNN").split(" "),
+      QString("PNN").split(" "),
       mSettings.getElement());
   connect(mAlgorithmAdapter.get(), SIGNAL(valueWasSet()),   this,                    SLOT(setSettings()));
   connect(this,                    SIGNAL(paramsChanged()), mAlgorithmAdapter.get(), SIGNAL(changed()));
@@ -84,7 +86,9 @@ void Reconstructer::createAlgorithm()
 
   // create new algo
   if (name=="ThunderVNN")
-    mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mShaderPath));
+  {
+    //mAlgorithm = ReconstructAlgorithmPtr(new ThunderVNNReconstructAlgorithm(mShaderPath));
+  }
   else if (name=="PNN")
     mAlgorithm = ReconstructAlgorithmPtr(new PNNReconstructAlgorithm());
   else
@@ -198,9 +202,10 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   }
   
   //Use file name as uid
-  mUsRaw = MetaImageReader().load(string_cast(fileName), 
+  ImagePtr UsRaw = MetaImageReader().load(string_cast(fileName), 
                                   string_cast(mhdFileName));
-  mUsRaw->setFilePath(string_cast(filePath));
+  UsRaw->setFilePath(string_cast(filePath));
+  mUsRaw.reset(new USFrameData(UsRaw));
   
   //Read XML info from mdh file
   //Stored in ConfigurationID tag
@@ -258,7 +263,7 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   }
   
   //Allcate place for position and time stamps for all frames
-  mFrames.resize(mUsRaw->getBaseVtkImageData()->GetDimensions()[2]);
+  mFrames.resize(mUsRaw->getDimensions()[2]);
   
   //std::cout << "Reconstructer::readUsDataFile() - succes. Number of frames: " 
   //  << mFrames.size() << std::endl;
@@ -378,7 +383,7 @@ ImagePtr Reconstructer::createMaskFromConfigParams()
   //TODO: Use corners instead of edges to allow for CLA and phased probes
   ssc::ImagePtr retval = this->generateMask();
   vtkImageDataPtr data = retval->getBaseVtkImageData();
-  int* dim(mUsRaw->getBaseVtkImageData()->GetDimensions());
+  int* dim(mUsRaw->getDimensions());
   unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
   for(int x = 0; x < dim[0]; x++)
     for(int y = 0; y < dim[1]; y++)
@@ -394,9 +399,9 @@ ImagePtr Reconstructer::createMaskFromConfigParams()
   
 ImagePtr Reconstructer::generateMask()
 {  
-  ssc::Vector3D dim(mUsRaw->getBaseVtkImageData()->GetDimensions());
+  ssc::Vector3D dim(mUsRaw->getDimensions());
   dim[2] = 1;
-  ssc::Vector3D spacing(mUsRaw->getBaseVtkImageData()->GetSpacing());
+  ssc::Vector3D spacing(mUsRaw->getSpacing());
   
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 255);
     
@@ -490,27 +495,45 @@ Transform3D Reconstructer::interpolate(const Transform3D& a,
 void Reconstructer::interpolatePositions()
 {
   //TODO: Check if the affine transforms still are affine after the linear interpolation
-
-  double scale = mPositions.size() / (double)mFrames.size();
-  for(unsigned i_frame = 0; i_frame < mFrames.size(); i_frame++)
+  
+  //ssc::messageManager()->sendDebug("Frames before interpolation: " + string_cast(mFrames.size()));
+  
+  for(unsigned i_frame = 0; i_frame < mFrames.size();)
   {
-    unsigned i_pos = i_frame*scale;// =floor()
-    if (i_pos < 0)
-      i_pos = 0;
-    else if(i_pos >= mPositions.size()-1)
+    std::vector<TimedPosition>::iterator posIter;
+    posIter= lower_bound(mPositions.begin(), mPositions.end(), mFrames[i_frame]);
+    
+    unsigned i_pos = distance(mPositions.begin(), posIter);
+    if (i_pos != 0)
+      i_pos--;
+     
+    if(i_pos >= mPositions.size()-1)
       i_pos = mPositions.size()-2;
-
-    double t_delta_tracking = mPositions[i_pos+1].mTime - mPositions[i_pos].mTime;
-    double t = 0;
-    if (!similar(t_delta_tracking, 0))
-      t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) / t_delta_tracking;
-    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
-//    mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos,
-//                                        mPositions[i_pos+1].mPos, t);
-
+    
+    // Remove frames too far from the positions
+    // Don't increment frame index since the index now points to the next element
+    if ((fabs(mFrames[i_frame].mTime - mPositions[i_pos].mTime) > mMaxTimeDiff) ||
+        (fabs(mFrames[i_frame].mTime - mPositions[i_pos+1].mTime) > mMaxTimeDiff))
+    {
+      mFrames.erase(mFrames.begin() + i_frame);
+      mUsRaw->removeFrame(i_frame);
+      ssc::messageManager()->sendWarning("Removed input frame: " + string_cast(i_frame));
+    }
+    else
+    {      
+      double t_delta_tracking = mPositions[i_pos+1].mTime - mPositions[i_pos].mTime;
+      double t = 0;
+      if (!similar(t_delta_tracking, 0))
+        t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) / t_delta_tracking;
+      //    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
+      mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos,
+                                          mPositions[i_pos+1].mPos, t);
+      i_frame++;// Only increment if we didn't delete the frame
+    }
     //std::cout << mFrames[i_frame].mPos.inv().coord(ssc::Vector3D(0,0,0));
     //std::cout << std::endl;
   }
+  //ssc::messageManager()->sendDebug("Frames after interpolation: " + string_cast(mFrames.size()));
 }
 
 vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
@@ -698,8 +721,8 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
                                      + "requires mask");
     return retval;
   }
-  int* dims = mUsRaw->getBaseVtkImageData()->GetDimensions();
-  double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
+  int* dims = mUsRaw->getDimensions();
+  ssc::Vector3D spacing = mUsRaw->getSpacing();
   
   int xmin = dims[0];
   int xmax = 0;
@@ -834,9 +857,9 @@ void Reconstructer::findExtentAndOutputTransform()
   }
 
   // Calculate optimal output image spacing and dimensions based on US frame spacing
-  double inputSpacing = std::min(mUsRaw->getBaseVtkImageData()->GetSpacing()[0],
-                                 mUsRaw->getBaseVtkImageData()->GetSpacing()[1]);
-  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mUsRaw->getBaseVtkImageData()->GetDimensions()));
+  double inputSpacing = std::min(mUsRaw->getSpacing()[0],
+                                 mUsRaw->getSpacing()[1]);
+  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mUsRaw->getDimensions()));
 
   if (ssc::ToolManager::getInstance())
     mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
@@ -975,7 +998,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   // and that is not completely corrcet.
   //this->calibrateTimeStamps();
   // Use the time calibration from the aquisition module
-  this->calibrateTimeStamps(0.0, 0.0);
+  this->calibrateTimeStamps(0.0, 1.0);
 
   this->calibrate(calFilesPath);
   //mPos (in mPositions) is now prMu
@@ -1056,9 +1079,9 @@ ImagePtr Reconstructer::getOutput()
 {
   return mOutput;
 }
-ImagePtr Reconstructer::getInput()
+/*ImagePtr Reconstructer::getInput()
 {
   return mUsRaw;
-}
+}*/
   
 }

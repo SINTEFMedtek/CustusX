@@ -44,7 +44,7 @@ public:
 
   ImagePtr reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr getOutput();
-  ImagePtr getInput();
+  //ImagePtr getInput();
   XmlOptionFile getSettings() const { return mSettings; }
   StringDataAdapterXmlPtr mOrientationAdapter;
   StringDataAdapterXmlPtr mAlgorithmAdapter;
@@ -63,7 +63,8 @@ signals:
   void paramsChanged();
 
 private:
-  ImagePtr mUsRaw;///<All imported US data framed packed into one image
+  //ImagePtr mUsRaw;///<All imported US data framed packed into one image
+  USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
   std::vector<TimedPosition> mFrames;
   std::vector<TimedPosition> mPositions;
   ImagePtr mMask;///< Clipping mask for the input data
@@ -84,6 +85,8 @@ private:
   QString mOutputBasePath;///< Global path where the relative path starts, for the output image
   QString mShaderPath; ///< name of shader folder
   QString mLastAppliedMaskReduce;///< The last used mask reduction
+  
+  double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
   void readUsDataFile(QString mhdFileName);
   void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);

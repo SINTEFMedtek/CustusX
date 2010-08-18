@@ -12,22 +12,12 @@
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "sscDataAdapter.h"
+#include "sscUSFrameData.h"
 
 class QDomElement;
 
 namespace ssc
 {
-typedef boost::shared_ptr<class TimedPosition> TimedPositionPtr;
-/** Represents one position with timestamp 
- */
-class TimedPosition
-{
-public:
-  double mTime;
-  Transform3D mPos;
-};
-
-
 typedef boost::shared_ptr<class ReconstructAlgorithm> ReconstructAlgorithmPtr;
 
 /**
@@ -54,7 +44,7 @@ public:
    * \param outputData [Out] The reconstructed volume. Memory must be allocated in advance.
    */
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
-                           ImagePtr frameData,
+                           USFrameDataPtr frameData,
                            ImagePtr outputData,
                            ImagePtr frameMask,
                            QDomElement settings) = 0;

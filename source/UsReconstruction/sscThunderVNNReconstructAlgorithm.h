@@ -14,7 +14,7 @@
 
 namespace ssc
 {
-class ThunderVNNReconstructAlgorithm : public ReconstructAlgorithm
+class ThunderVNNReconstructAlgorithm// : public ReconstructAlgorithm
 {
 public:
   ThunderVNNReconstructAlgorithm(QString shaderPath);

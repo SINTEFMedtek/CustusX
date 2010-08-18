@@ -25,7 +25,7 @@ public:
   virtual QString getName() const { return "PNN"; }
   virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
-                           ImagePtr frameData,
+                           USFrameDataPtr frameData,
                            ImagePtr outputData,
                            ImagePtr frameMask,
                            QDomElement settings);
