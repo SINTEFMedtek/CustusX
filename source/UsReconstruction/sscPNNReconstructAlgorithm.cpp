@@ -54,18 +54,18 @@ void optimizedCoordTransform(ssc::Vector3D* p, boost::array<double, 16> tt)
 }
   
 void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo, 
-                                                 ImagePtr frameData,
+                                                 USFrameDataPtr frameData,
                                                  ImagePtr outputData,
                                                  ImagePtr frameMask,
                                                  QDomElement settings)
 {
   //std::vector<Planes> planes = generate_planes(frameInfo, frameData);
   
-  vtkImageDataPtr input = frameData->getBaseVtkImageData();
+  //vtkImageDataPtr input = frameData->getBaseVtkImageData();
+  USFrameDataPtr input = frameData;
   vtkImageDataPtr target = outputData->getBaseVtkImageData();
   
-  int* inputDims = input->GetDimensions();
-  //ssc::Vector3D inputDims(input->GetDimensions());
+  int* inputDims = frameData->getDimensions();
   
   ssc::Vector3D targetDims(target->GetDimensions());
   ssc::Vector3D targetSpacing(target->GetSpacing());
@@ -82,11 +82,11 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
                                   + string_cast(inputDims[2]) + " != " 
                                   + string_cast(frameInfo.size()));
   
-  ssc::Vector3D inputSpacing(input->GetSpacing());
+  ssc::Vector3D inputSpacing(input->getSpacing());
   ssc::Vector3D outputSpacing(tempOutput->GetSpacing());
   
   //Get raw data pointers
-  unsigned char *inputPointer = static_cast<unsigned char*>( input->GetScalarPointer() );
+  //unsigned char *inputPointer = static_cast<unsigned char*>( input->GetScalarPointer() );
   unsigned char *outputPointer = static_cast<unsigned char*>(tempOutput->GetScalarPointer());
   //unsigned char *outputPointer = static_cast<unsigned char*>(target->GetScalarPointer());
   unsigned char* maskPointer = static_cast<unsigned char*>(frameMask->getBaseVtkImageData()->GetScalarPointer());
@@ -94,6 +94,7 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
   // Traverse all input pixels
   for (int record = 0; record < inputDims[2]; record++)
   {
+    unsigned char *inputPointer = input->getFrame(record);
     //messageManager()->sendDebug("record: " + string_cast(record));
     boost::array<double, 16> recordTransform = frameInfo[record].mPos.flatten();
     
@@ -118,8 +119,8 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
                           + outputVoxelY*outputDims[0] 
                           + outputVoxelZ*outputDims[0]*outputDims[1];
           int inputIndex = beam 
-                         + sample*inputDims[0]
-                         + record*inputDims[0]*inputDims[1];
+                         + sample*inputDims[0];
+                         //+ record*inputDims[0]*inputDims[1];//get new pointer for each record
           outputPointer[outputIndex] = inputPointer[inputIndex];
         }//validVoxel
         
