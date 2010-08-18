@@ -48,13 +48,14 @@ private slots:
   void browsePatientDataFolderSlot();
 
   void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
-  void currenApplicationChangedSlot(const QString & newApplicationName);
+  void currenApplicationChangedSlot(int index);
+  void applicationStateChangedSlot();
 
 private:
-  void setToolConfigFiles();
+  void setToolConfigComboBox();
   void setApplicationComboBox();
-  void setCurrentToolConfigFile();
-  void setCurrentApplication();
+//  void setCurrentToolConfigFile();
+//  void setCurrentApplication();
 
   QSettingsPtr mSettings;
 

@@ -5,6 +5,7 @@
 
 #include "cxForwardDeclarations.h"
 #include "cxWorkflowStateMachine.h"
+#include "cxApplicationStateMachine.h"
 
 namespace cx
 {
@@ -33,6 +34,7 @@ public:
   static void destroyInstance();     ///< destroys the only instance of this class
 
   WorkflowStateMachinePtr getWorkflow();
+  ApplicationStateMachinePtr getApplication();
   PatientDataPtr getPatientData();
 
   Desktop getActiveDesktop();
@@ -52,6 +54,7 @@ private:
   static StateManager* mTheInstance; ///< the only instance of this class
 
   WorkflowStateMachinePtr mWorkflowStateMachine;
+  ApplicationStateMachinePtr mApplicationStateMachine;
   PatientDataPtr mPatientData;
 };
 StateManager* stateManager();

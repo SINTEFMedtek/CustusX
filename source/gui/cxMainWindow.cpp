@@ -52,13 +52,11 @@ MainWindow::MainWindow() :
   mCustomStatusBar(new CustomStatusBar()),
   mSettings(DataLocations::getSettings())
 {
+  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
 
   mLayoutActionGroup = NULL;
-#ifdef VERSION_NUMBER_VERBOSE
-  this->setWindowTitle(QString("CustusX %1").arg(VERSION_NUMBER_VERBOSE));
-#else
-#endif
+  this->updateWindowTitle();
   
   //make sure the transferefunctionwidget it fully initialized
   mTransferFunctionWidget->init();
@@ -83,15 +81,15 @@ MainWindow::MainWindow() :
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
   
-  // Initialize settings if empty
-  if (!mSettings->contains("globalPatientDataFolder"))
-    mSettings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
-  if (!mSettings->contains("globalApplicationName"))
-    mSettings->setValue("globalApplicationName", "Lab");
-  if (!mSettings->contains("globalPatientNumber"))
-    mSettings->setValue("globalPatientNumber", 1);
-  //if (!mSettings->contains("applicationNames"))
-    mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
+//  // Initialize settings if empty
+//  if (!mSettings->contains("globalPatientDataFolder"))
+//    mSettings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
+//  if (!mSettings->contains("globalApplicationName"))
+//    mSettings->setValue("globalApplicationName", "Lab");
+//  if (!mSettings->contains("globalPatientNumber"))
+//    mSettings->setValue("globalPatientNumber", 1);
+//  //if (!mSettings->contains("applicationNames"))
+//    mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
   
   
   if (!mSettings->contains("renderingInterval"))
@@ -360,6 +358,27 @@ void MainWindow::savePatientFileSlot()
 
   stateManager()->getPatientData()->savePatient();
 }
+
+void MainWindow::onApplicationStateChangedSlot()
+{
+  this->updateWindowTitle();
+}
+
+void MainWindow::updateWindowTitle()
+{
+  QString appName;
+  if (stateManager()->getApplication())
+    appName = stateManager()->getApplication()->getActiveStateName();
+
+  QString versionName;
+#ifdef VERSION_NUMBER_VERBOSE
+  versionName = QString("%1").arg(VERSION_NUMBER_VERBOSE);
+#else
+#endif
+
+  this->setWindowTitle("CustusX "+versionName + " - " + appName);
+}
+
 
 void MainWindow::onWorkflowStateChangedSlot()
 {
