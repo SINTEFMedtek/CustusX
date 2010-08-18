@@ -3,6 +3,8 @@ SET (LIB statemachineManager)
 SET( CX_QT_MOC_HEADER_FILES
 	cxWorkflowStateMachine.h
 	cxWorkflowState.h
+	cxApplicationStateMachine.h
+	cxApplicationState.h
 	cxPatientData.h
 	cxFileCopied.h
 )
@@ -13,6 +15,9 @@ SET ( ${LIB}_statemachineManager
 	cxWorkflowStateMachine.h
 	cxWorkflowStateMachine.cpp
 	cxWorkflowState.h
+	cxApplicationStateMachine.cpp
+	cxApplicationStateMachine.h
+	cxApplicationState.h
 	cxRequestEnterStateTransition.h
 	cxPatientData.h
 	cxPatientData.cpp

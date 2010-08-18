@@ -46,7 +46,7 @@ public:
   };
   virtual void onExit(QEvent * event )
   {
-    std::cout << "Exiting "<< mName << std::endl;
+    //std::cout << "Exiting "<< mName << std::endl;
   };
 
   virtual QString getUid() const {return mUid;};
@@ -103,14 +103,12 @@ protected:
 class ParentWorkflowState : public WorkflowState
 {
   Q_OBJECT
-
 public:
   ParentWorkflowState(QState* parent) :
-  WorkflowState(parent, "ParentUid", "Parent")
-  {  };
-
+  WorkflowState(parent, "ParentUid", "Parent") { }
   virtual ~ParentWorkflowState(){};
-
+  virtual void onEntry(QEvent * event ) { }
+  virtual void onExit(QEvent * event ) { }
   virtual bool canEnter() const {return true;}
 };
 

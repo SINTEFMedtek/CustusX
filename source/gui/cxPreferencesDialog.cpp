@@ -8,18 +8,23 @@
 #include <iostream>
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
+#include "cxStateMachineManager.h"
 
 namespace cx
 {
 FoldersTab::FoldersTab(QWidget *parent) :
   QWidget(parent),
   mSettings(DataLocations::getSettings())
-{}
+{
+}
 
-void FoldersTab::init(){
+void FoldersTab::init()
+{
   mGlobalPatientDataFolder = mSettings->value("globalPatientDataFolder").toString();
 
   //mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
+
+  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
 
   // patientDataFolder
   QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
@@ -37,7 +42,7 @@ void FoldersTab::init(){
   mToolConfigFilesComboBox = new QComboBox;
   //setToolConfigFiles();
   connect( mToolConfigFilesComboBox, 
-          SIGNAL(currentIndexChanged(const QString &)), 
+          SIGNAL(currentIndexChanged(const QString &)),
           this, 
           SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
   
@@ -46,13 +51,14 @@ void FoldersTab::init(){
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
   connect(mChooseApplicationComboBox,
-          SIGNAL(currentIndexChanged(const QString &)),
+          SIGNAL(currentIndexChanged(int)),
           this,
-          SLOT(currenApplicationChangedSlot(const QString &)));
-  setCurrentApplication();//changes mCurrentToolConfigFile
-  
+          SLOT(currenApplicationChangedSlot(int)));
+  //setCurrentApplication();//changes mCurrentToolConfigFile
   mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
-  setCurrentToolConfigFile();
+  applicationStateChangedSlot();
+  
+  //setCurrentToolConfigFile();
   
   // Layout
   QGridLayout *mainLayout = new QGridLayout;
@@ -103,13 +109,7 @@ void FoldersTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolC
   mCurrentToolConfigFile = newToolConfigFile;
 }
 
-void FoldersTab::currenApplicationChangedSlot(const QString & newApplicationName)
-{
-  mSettings->setValue("globalApplicationName", newApplicationName);
-  this->setToolConfigFiles();
-}
-
-void FoldersTab::setToolConfigFiles()
+void FoldersTab::setToolConfigComboBox()
 {
 	QDir dir(DataLocations::getApplicationToolConfigPath());
     dir.setFilter(QDir::Files);
@@ -119,31 +119,64 @@ void FoldersTab::setToolConfigFiles()
     dir.setNameFilters(nameFilters);
 
     QStringList list = dir.entryList();
-	
+
     mToolConfigFilesComboBox->clear();
     mToolConfigFilesComboBox->addItems( list );
+
+    int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
+    mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
 }
 
 void FoldersTab::setApplicationComboBox()
 {
-  QString str = mSettings->value("applicationNames").toString();
-  QStringList list = str.split(",");
+  mChooseApplicationComboBox->blockSignals(true);
   mChooseApplicationComboBox->clear();
-  mChooseApplicationComboBox->addItems(list);
+  QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
+  for (int i=0; i<actions.size(); ++i)
+  {
+    mChooseApplicationComboBox->insertItem(i, QIcon(), actions[i]->text(), actions[i]->data());
+    //std::cout << "action " << actions[i]->text() << std::endl;
+    if (actions[i]->isChecked())
+      mChooseApplicationComboBox->setCurrentIndex(i);
+  }
+
+//  mChooseApplicationComboBox->addActions(actions);
+//
+//  QString str = mSettings->value("applicationNames").toString();
+//  QStringList list = str.split(",");
+//  mChooseApplicationComboBox->clear();
+//  mChooseApplicationComboBox->addItems(list);
+  mChooseApplicationComboBox->blockSignals(false);
 }
 
-void FoldersTab::setCurrentToolConfigFile()
+void FoldersTab::applicationStateChangedSlot()
 {
-  int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
-  mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
+  this->setToolConfigComboBox();
+}
+
+
+//void FoldersTab::setCurrentToolConfigFile()
+//{
+//  int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
+//  mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
+//}
+  
+void FoldersTab::currenApplicationChangedSlot(int index)
+{
+  QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
+  if (index<0 || index>=actions.size())
+    return;
+  actions[index]->trigger();
+
+//  mSettings->setValue("globalApplicationName", newApplicationName);
+//  this->setToolConfigFiles();
 }
   
-  
-void FoldersTab::setCurrentApplication()
-{
-  int currentIndex = mChooseApplicationComboBox->findText( mSettings->value("globalApplicationName").toString() );
-  mChooseApplicationComboBox->setCurrentIndex( currentIndex );
-}
+//void FoldersTab::setCurrentApplication()
+//{
+////  int currentIndex = mChooseApplicationComboBox->findText( mSettings->value("globalApplicationName").toString() );
+////  mChooseApplicationComboBox->setCurrentIndex( currentIndex );
+//}
   
 void FoldersTab::saveParametersSlot()
 {

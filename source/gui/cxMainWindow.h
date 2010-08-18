@@ -57,6 +57,8 @@ protected slots:
   void savePatientFileSlot();///< Save all application data to XML file
   void clearPatientSlot();///< clear current patient (debug)
 
+  // application
+  void onApplicationStateChangedSlot();
   //workflow
   void onWorkflowStateChangedSlot();
   void saveDesktopSlot();
@@ -87,6 +89,7 @@ protected slots:
   void toggleTrackingSlot();
 
 protected:
+  void updateWindowTitle();
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
   void createToolBars(); ///< creates and adds toolbars for convenience

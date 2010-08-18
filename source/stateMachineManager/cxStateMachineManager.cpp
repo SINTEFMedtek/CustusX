@@ -2,9 +2,13 @@
 
 #include <iostream>
 #include <QByteArray>
+#include <QSettings>
+#include <QDir>
 #include "sscXmlOptionItem.h"
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
+#include "cxWorkflowStateMachine.h"
+#include "cxApplicationStateMachine.h"
 
 namespace cx
 {
@@ -87,6 +91,10 @@ private:
   std::map<QString, Desktop> mWorkflowDefaultDesktops;
 };
 
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+
 StateManager *StateManager::mTheInstance = NULL;
 StateManager* stateManager() { return StateManager::getInstance(); }
 StateManager* StateManager::getInstance()
@@ -117,10 +125,28 @@ WorkflowStateMachinePtr StateManager::getWorkflow()
 {
   return mWorkflowStateMachine;
 }
+ApplicationStateMachinePtr StateManager::getApplication()
+{
+  return mApplicationStateMachine;
+}
 
 void StateManager::initialize()
 {
+  QSettingsPtr settings = DataLocations::getSettings();
+  // Initialize settings if empty
+  if (!settings->contains("globalPatientDataFolder"))
+    settings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
+  if (!settings->contains("globalApplicationName"))
+    settings->setValue("globalApplicationName", "Lab");
+  if (!settings->contains("globalPatientNumber"))
+    settings->setValue("globalPatientNumber", 1);
+  //if (!mSettings->contains("applicationNames"))
+  //settings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
+
   mPatientData.reset(new PatientData());
+
+  mApplicationStateMachine.reset(new ApplicationStateMachine());
+  mApplicationStateMachine->start();
 
   mWorkflowStateMachine.reset(new WorkflowStateMachine());
   mWorkflowStateMachine->start();
@@ -133,28 +159,21 @@ PatientDataPtr StateManager::getPatientData()
 
 Desktop StateManager::getActiveDesktop()
 {
-  //TODO
-  //which application?
-
   ApplicationsParser parser;
   //std::cout << "Getting desktop for state: " << mWorkflowStateMachine->getActiveUidState().toStdString() << std::endl;
-  return parser.getDesktop("Lab", mWorkflowStateMachine->getActiveUidState());
+  return parser.getDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
 }
 
 void StateManager::saveDesktop(Desktop desktop)
 {
-  //TODO
-  //which application?
   ApplicationsParser parser;
-  parser.setDesktop("Lab", mWorkflowStateMachine->getActiveUidState(),desktop);
+  parser.setDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState(), desktop);
 }
 
 void StateManager::resetDesktop()
 {
-  //TODO
-  //which application?
   ApplicationsParser parser;
-  parser.resetDesktop("Lab", mWorkflowStateMachine->getActiveUidState());
+  parser.resetDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
 }
 
 void StateManager::addXml(QDomNode& dataNode)

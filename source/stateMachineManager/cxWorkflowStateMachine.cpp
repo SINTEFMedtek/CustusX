@@ -23,6 +23,13 @@ WorkflowStateMachine::WorkflowStateMachine()
   WorkflowState* intraOpImaging = this->newState(new IntraOpImagingWorkflowState(mParentState));
   WorkflowState* postOpControll = this->newState(new PostOpControllWorkflowState(mParentState));
 
+  Q_UNUSED(registration);
+  Q_UNUSED(patientRegistration);
+  Q_UNUSED(preOpPlanning);
+  Q_UNUSED(navigation);
+  Q_UNUSED(intraOpImaging);
+  Q_UNUSED(postOpControll);
+
   //set initial state on all levels
   this->setInitialState(mParentState);
   mParentState->setInitialState(patientData);

@@ -40,7 +40,7 @@ QString PatientData::getActivePatientFolder() const
 
 bool PatientData::isPatientValid() const
 {
-  ssc::messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
+  //ssc::messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
   return !mActivePatientFolder.isEmpty();
 }
 
