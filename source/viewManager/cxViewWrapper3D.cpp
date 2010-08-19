@@ -8,6 +8,8 @@
 #include "cxViewWrapper3D.h"
 #include <vector>
 #include <QSettings>
+#include <QAction>
+#include <QMenu>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include "sscView.h"
@@ -59,6 +61,23 @@ ViewWrapper3D::~ViewWrapper3D()
     mView->removeReps();
 }
 
+void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
+{
+  QAction* slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
+  slicePlanesAction->setCheckable(true);
+  //obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
+  slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
+  connect(slicePlanesAction, SIGNAL(triggered(bool)),
+          this, SLOT(showSlicePlanesActionSlot(bool)));
+
+  contextMenu.addSeparator();
+  contextMenu.addAction(slicePlanesAction);
+}
+
+void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
+{
+  mSlicePlanes3DRep->getProxy()->setVisible(checked);
+}
 
 void ViewWrapper3D::addImage(ssc::ImagePtr image)
 {

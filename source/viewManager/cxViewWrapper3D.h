@@ -43,10 +43,11 @@ public:
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void toolsAvailableSlot(); ///< add all tools when configured
+  void showSlicePlanesActionSlot(bool checked);
 
 private:
-  virtual void appendToContextMenu(QMenu& contextMenu){};
-  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
+  virtual void appendToContextMenu(QMenu& contextMenu);
+//  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
   void updateView();
 
 //  ssc::VolumetricRepPtr mVolumetricRep;
