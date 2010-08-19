@@ -11,6 +11,9 @@ typedef vtkSmartPointer<class vtkSphereSource> vtkSphereSourcePtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 typedef vtkSmartPointer<class vtkLineSource> vtkLineSourcePtr;
 typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
+typedef vtkSmartPointer<class vtkCellArray> vtkCellArrayPtr;
+typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
+typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 
 
 namespace ssc
@@ -60,10 +63,21 @@ class Rect3D
 {
 public:
   Rect3D( vtkRendererPtr renderer, const Vector3D& color);
-  ~Rect3D() {}
+  ~Rect3D();
   void updatePosition( const DoubleBoundingBox3D bb, const Transform3D& M);
+  void setLine(bool on, int width);
+  void setSurface(bool on);
+
 private:
-  ssc::GraphicalLine3D a,b,c,d;//,x;
+  //ssc::GraphicalLine3D a,b,c,d;//,x;
+
+  vtkPolyDataMapperPtr mapper;
+  vtkActorPtr actor;
+  vtkRendererPtr mRenderer;
+  vtkPolyDataPtr mPolyData;
+  vtkPointsPtr mPoints;
+  vtkCellArrayPtr mSide;
+  //vtkLineSourcePtr source;
 };
 typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
 

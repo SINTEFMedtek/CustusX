@@ -4,6 +4,7 @@
 #include <vtkLineSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
+#include <vtkCellArray.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
 
@@ -109,24 +110,97 @@ vtkActorPtr GraphicalLine3D::getActor()
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-Rect3D::Rect3D( vtkRendererPtr renderer, const Vector3D& color) :
-  a(renderer),
-  b(renderer),
-  c(renderer),
-  d(renderer)
+Rect3D::Rect3D( vtkRendererPtr renderer, const Vector3D& color) //:
+//  a(renderer),
+//  b(renderer),
+//  c(renderer),
+//  d(renderer)
 {
-  a.setColor(color);
-  b.setColor(color);
-  c.setColor(color);
-  d.setColor(color);
+  mRenderer = renderer;
+  //source = vtkLineSourcePtr::New();
+  mapper = vtkPolyDataMapperPtr::New() ;
+  actor = vtkActorPtr::New() ;
+  actor->GetProperty()->SetColor( Vector3D(color).begin() );
+
+  //mapper->SetInputConnection( source->GetOutputPort() );
+  actor->SetMapper (mapper );
+  if (mRenderer)
+    mRenderer->AddActor(actor);
+
+  mPolyData = vtkPolyDataPtr::New();
+  mPoints = vtkPointsPtr::New();
+  mSide = vtkCellArrayPtr::New();
+
+  vtkIdType cells[5] = { 0,1,2,3,0 };
+  mSide->InsertNextCell(5, cells);
+
+  mPolyData->SetPoints(mPoints);
+  //mPolyData->SetPolys(mSide);
+  //mPolyData->SetLines(mSide);
+
+  mapper->SetInput(mPolyData);
+
+//  a.setColor(color);
+//  b.setColor(color);
+//  c.setColor(color);
+//  d.setColor(color);
+}
+
+void Rect3D::setLine(bool on, int width)
+{
+  if (on)
+  {
+    mPolyData->SetLines(mSide);
+    actor->GetProperty()->SetLineWidth(width);
+  }
+  else
+  {
+    mPolyData->SetLines(NULL);
+  }
+}
+
+void Rect3D::setSurface(bool on)
+{
+  if (on)
+  {
+    mPolyData->SetPolys(mSide);
+    actor->GetProperty()->SetOpacity(1.0); // transparent planes dont work well together with texture volume. Use 1.0
+  }
+  else
+  {
+    mPolyData->SetPolys(NULL);
+  }
+}
+
+
+Rect3D::~Rect3D()
+{
+  if (mRenderer)
+    mRenderer->RemoveActor(actor);
 }
 
 void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
 {
-  a.setValue(M.coord(bb.corner(0,0,0)), M.coord(bb.corner(1,0,0)));
-  b.setValue(M.coord(bb.corner(1,0,0)), M.coord(bb.corner(1,1,0)));
-  c.setValue(M.coord(bb.corner(1,1,0)), M.coord(bb.corner(0,1,0)));
-  d.setValue(M.coord(bb.corner(0,1,0)), M.coord(bb.corner(0,0,0)));
+  mPoints = vtkPointsPtr::New();
+//  mPoints->
+//  std::cout << "------------------------"<< std::endl;
+//  std::cout << M.coord(bb.corner(0,0,0)) << std::endl;
+//  std::cout << M.coord(bb.corner(0,1,0)) << std::endl;
+//  std::cout << M.coord(bb.corner(1,1,0)) << std::endl;
+//  std::cout << M.coord(bb.corner(1,0,0)) << std::endl;
+
+  mPoints->InsertPoint(0, M.coord(bb.corner(0,0,0)).begin());
+  mPoints->InsertPoint(1, M.coord(bb.corner(0,1,0)).begin());
+  mPoints->InsertPoint(2, M.coord(bb.corner(1,1,0)).begin());
+  mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
+//  mPoints->Update();
+  mPolyData->SetPoints(mPoints);
+  mPolyData->Update();
+
+//  a.setValue(M.coord(bb.corner(0,0,0)), M.coord(bb.corner(1,0,0)));
+//  b.setValue(M.coord(bb.corner(1,0,0)), M.coord(bb.corner(1,1,0)));
+//  c.setValue(M.coord(bb.corner(1,1,0)), M.coord(bb.corner(0,1,0)));
+//  d.setValue(M.coord(bb.corner(0,1,0)), M.coord(bb.corner(0,0,0)));
 }
 
 ///--------------------------------------------------------

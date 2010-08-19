@@ -29,10 +29,26 @@ class SlicePlanesProxy : public QObject
 public:	
 	SlicePlanesProxy();
 	
+	/**Modifiable properties for one plane
+	 *
+	 */
+	struct PropertiesType
+	{
+	  std::map<PLANE_TYPE, Vector3D> mColor; /// normalized RGB
+	  std::map<PLANE_TYPE, QString> mSymbol;
+	  int m2DFontSize;
+    int m3DFontSize;
+    Vector3D mPointPos_normvp; ///< position of symbol in normalized space <0..1, 0..1>
+    PLANE_TYPE mClipPlane; ///< what plane to use for 3D clipping
+    int mLineWidth; ///< draw wireframe lines. 0 means no line
+    bool mDrawPlane; ///< turn opaque plane drawing on/off
+	};
+
 	struct DataType
 	{
 		DoubleBoundingBox3D vp_s;
 		ssc::SliceProxyPtr mSliceProxy;
+		QString mSymbol;
 		Vector3D mColor;
 		Vector3D mPointPos_normvp;
 	};
@@ -43,13 +59,15 @@ public:
 
 	void setVisible(bool visible);
 	bool getVisible() const;
+	PropertiesType& getProperties() { return mProperties; } // use this to set properties BEFORE attaching reps/calling setviewportdata()
 		
 signals:
 	void changed();
 private:
+	PropertiesType mProperties;
 	bool mVisible;
 	DataMap mData;
-	std::vector<Vector3D> mColors;	
+//	std::vector<Vector3D> mColors;
 };
 typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 

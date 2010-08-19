@@ -9,6 +9,7 @@
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -16,9 +17,35 @@ namespace ssc
 SlicePlanesProxy::SlicePlanesProxy()
 {
   mVisible = true;
-	mColors.push_back(Vector3D(0,   1,   1));
-	mColors.push_back(Vector3D(0,   0.6, 1));
-	mColors.push_back(Vector3D(0.5, 0.5, 1));
+
+  Vector3D color1(0,   1,   1);
+  Vector3D color2(0,   0.6, 1);
+  Vector3D color3(0.5, 0.5, 1);
+
+  mProperties.mColor[ptAXIAL] = color1;
+  mProperties.mSymbol[ptAXIAL] = "A";
+
+  mProperties.mColor[ptCORONAL] = color2;
+  mProperties.mSymbol[ptCORONAL] = "C";
+
+  mProperties.mColor[ptSAGITTAL] = color3;
+  mProperties.mSymbol[ptSAGITTAL] = "S";
+
+  mProperties.mColor[ptANYPLANE] = color1;
+  mProperties.mSymbol[ptANYPLANE] = "O";
+
+  mProperties.mColor[ptSIDEPLANE] = color2;
+  mProperties.mSymbol[ptSIDEPLANE] = "|";
+
+  mProperties.mColor[ptRADIALPLANE] = color3;
+  mProperties.mSymbol[ptRADIALPLANE] = "X";
+
+  mProperties.m2DFontSize = 20;
+  mProperties.m3DFontSize = 28;
+  mProperties.mPointPos_normvp = Vector3D(0.1,0.8,0.0);
+  mProperties.mClipPlane = ptANYPLANE;
+  mProperties.mLineWidth = 2;
+  mProperties.mDrawPlane = false;
 }
 
 void SlicePlanesProxy::setVisible(bool visible)
@@ -40,10 +67,11 @@ void SlicePlanesProxy::setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice
 	if (!mData.count(type))
 	{
 		DataType data;
-		data.mPointPos_normvp = Vector3D(0.1,0.8,0.0);
+		data.mPointPos_normvp = mProperties.mPointPos_normvp;
 		data.vp_s = vp_s;
 		data.mSliceProxy = slice;
-		data.mColor = mColors[mData.size() % mColors.size()];
+		data.mColor = mProperties.mColor[type];
+    data.mSymbol = mProperties.mSymbol[type];
 		
 		connect(data.mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SIGNAL(changed()));
 		mData[type] = data;		
@@ -145,9 +173,9 @@ void SlicePlanes3DRep::changedSlot()
     if (!data.mText)
 	  {
       data.mText = vtkTextActor3DPtr::New();
-      data.mText->SetInput("O");
+      data.mText->SetInput(cstring_cast(base.mSymbol));
       data.mText->GetTextProperty()->SetColor(base.mColor.begin());
-      data.mText->GetTextProperty()->SetFontSize(20);
+      data.mText->GetTextProperty()->SetFontSize(mProxy->getProperties().m3DFontSize);
       data.mText->GetTextProperty()->BoldOn();
 	    mView->getRenderer()->AddActor(data.mText);
 	  }
@@ -180,6 +208,8 @@ void SlicePlanes3DRep::changedSlot()
 		if (data.mRect)
 		{
 			data.mRect->updatePosition(base.vp_s, rMs);
+			data.mRect->setLine(mProxy->getProperties().mLineWidth!=0, mProxy->getProperties().mLineWidth);
+			data.mRect->setSurface(mProxy->getProperties().mDrawPlane);
 		}
 		if (data.mAxes)
 		{
@@ -236,7 +266,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
 	//Logger::log("vm.log", "SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer");
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 	
-	mText.reset(new ssc::TextDisplay("O", baseData.mColor, 28));
+	mText.reset(new ssc::TextDisplay(string_cast(baseData.mSymbol), baseData.mColor, mProxy->getProperties().m3DFontSize));
 	mText->textProperty()->BoldOn();
 	mText->setPosition(baseData.mPointPos_normvp);
 	mText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -245,6 +275,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
 
 void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
+  view->getRenderer()->RemoveActor(mText->getActor());
 	mText.reset();
 }
 
