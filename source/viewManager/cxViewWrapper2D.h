@@ -76,7 +76,7 @@ private:
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
-  ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarkerIn2DRep;
+  ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
   QPointer<ssc::View> mView;
   std::vector<ssc::ImagePtr> mImage;
 

@@ -26,6 +26,7 @@
 #include "cxViewGroup.h"
 #include "sscDefinitionStrings.h"
 #include "sscSlicePlanes3DRep.h"
+#include "sscDefinitionStrings.h"
 
 namespace cx
 {
@@ -182,9 +183,18 @@ void ViewWrapper2D::viewportChanged()
 
   ssc::DoubleBoundingBox3D BB_vp = getViewport();
   ssc::Transform3D vpMs = get_vpMs();
+  ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
 
   mToolRep2D->setViewportData(vpMs, BB_vp);
-//  mSlicePlanes3DMarkerIn2DRep->getproxy->setViewportData(plane, mSliceProxy, transform(BB_vp, vpMs.inv());
+  if (mSlicePlanes3DMarker)
+  {
+    mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+//    std::cout << "-- " << string_cast(plane) << "-----------------------------------------------------" << std::endl;
+//    std::cout << "BB_vp" << " -- " << BB_vp << std::endl;
+//    std::cout << "vpMs" << " --\n " << vpMs << std::endl;
+//    std::cout << "BB_s" << " -- " << transform(vpMs.inv(), BB_vp) << std::endl;
+//    std::cout << "-----------------------------------------------------" << std::endl;
+  }
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -212,6 +222,13 @@ ssc::Transform3D ViewWrapper2D::get_vpMs() const
 
   ssc::Vector3D p0_w = displayToWorld(p0_d);
   ssc::Vector3D p1_w = displayToWorld(p1_d);
+
+//  std::cout << " -------------------------------------------- "  << std::endl;
+//  std::cout << "p0: " << p0_d << " --- " << p0_w << std::endl;
+//  std::cout << "p1: " << p1_d << " --- " << p1_w << std::endl;
+
+  p0_w[2] = 0;
+  p1_w[2] = 1;
 
   ssc::DoubleBoundingBox3D BB_vp(p0_d, p1_d);
   ssc::DoubleBoundingBox3D BB_s(p0_w, p1_w);
@@ -380,6 +397,7 @@ void ViewWrapper2D::setZoomFactor2D(double zoomFactor)
 {
   zoomFactor = ssc::constrainValue(zoomFactor, 0.2, 10.0);
   mZoom2D->set(zoomFactor);
+  viewportChanged();
 }
 
 double ViewWrapper2D::getZoomFactor2D() const
@@ -469,13 +487,15 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
 
 void ViewWrapper2D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
-  mSlicePlanes3DMarkerIn2DRep = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
+  mSlicePlanes3DMarker = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
   ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
-  mSlicePlanes3DMarkerIn2DRep->setProxy(plane, proxy);
+  mSlicePlanes3DMarker->setProxy(plane, proxy);
 
   ssc::DoubleBoundingBox3D BB_vp = getViewport();
   ssc::Transform3D vpMs = get_vpMs();
-  proxy->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+  mSlicePlanes3DMarker->getProxy()->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
+
+  mView->addRep(mSlicePlanes3DMarker);
 }
 
 //------------------------------------------------------------------------------

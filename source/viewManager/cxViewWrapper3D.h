@@ -58,6 +58,7 @@ private:
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
+  ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
 
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;
