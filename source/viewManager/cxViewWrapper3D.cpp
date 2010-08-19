@@ -248,10 +248,11 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   }
 }
 
-
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
-
+  mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
+  mSlicePlanes3DRep->setProxy(proxy);
+  mView->addRep(mSlicePlanes3DRep);
 }
 
 
