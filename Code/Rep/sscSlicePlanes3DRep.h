@@ -40,12 +40,14 @@ public:
 
 	void setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
 	DataMap getData();
+
+	void setVisible(bool visible);
+	bool getVisible() const;
 		
 signals:
 	void changed();
-private slots:
-	void sliceProxyChanged();
 private:
+	bool mVisible;
 	DataMap mData;
 	std::vector<Vector3D> mColors;	
 };
@@ -64,16 +66,14 @@ public:
 	virtual ~SlicePlanes3DRep();
 	virtual std::string getType() const { return "ssc::SlicePlanes3DRep"; }
 	void setProxy(SlicePlanesProxyPtr proxy);
-	
+  SlicePlanesProxyPtr getProxy() { return mProxy; }
+
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 private slots:
 	void changedSlot();
 private:
-	SlicePlanes3DRep(const std::string& uid, const std::string& name="");
-	SlicePlanesProxyPtr mProxy;
-	
 	struct DataType
 	{
 		vtkTextActor3DPtr mText;
@@ -83,6 +83,12 @@ private:
 	};
 	typedef std::map<PLANE_TYPE, DataType> DataMap;
 	DataMap mData;
+
+	 SlicePlanes3DRep(const std::string& uid, const std::string& name="");
+	 void clearActors();
+//	  void setVisibility(DataType data);
+	  SlicePlanesProxyPtr mProxy;
+	  ssc::View* mView;
 };
 
 typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
@@ -97,6 +103,7 @@ public:
 	virtual ~SlicePlanes3DMarkerIn2DRep();
 	virtual std::string getType() const { return "ssc::SlicePlanes3DMarkerIn2DRep"; }
 	void setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy);
+	SlicePlanesProxyPtr getProxy() { return mProxy; }
 	
 protected:
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
