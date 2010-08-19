@@ -51,6 +51,7 @@ public:
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
+  virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) = 0;
 
   virtual void setZoom2D(SyncedValuePtr value) {}
   virtual void setOrientationMode(SyncedValuePtr value) {}

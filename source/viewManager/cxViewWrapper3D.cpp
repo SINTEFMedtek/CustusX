@@ -22,6 +22,8 @@
 #include "sscToolManager.h"
 //#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
+#include "sscSlicePlanes3DRep.h"
+
 
 namespace cx
 {
@@ -245,6 +247,13 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
     mView->addRep(mLandmarkRep);
   }
 }
+
+
+void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
+{
+
+}
+
 
 //------------------------------------------------------------------------------
 

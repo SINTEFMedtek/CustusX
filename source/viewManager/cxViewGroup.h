@@ -99,6 +99,7 @@ protected:
   std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mViewWrappers;
   ssc::REGISTRATION_STATUS mRegistrationMode;
+  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
 } // namespace cx

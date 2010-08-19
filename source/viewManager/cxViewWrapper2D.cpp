@@ -25,6 +25,7 @@
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
 #include "sscDefinitionStrings.h"
+#include "sscSlicePlanes3DRep.h"
 
 namespace cx
 {
@@ -464,5 +465,13 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 }
+
+void ViewWrapper2D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
+{
+  mSlicePlanes3DMarkerIn2DRep = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
+  //mSlicePlanes3DMarkerIn2DRep->setProxy(mSliceProxy->getComputer().getPlaneType(), proxy);
+ // proxy->setViewportData()
+}
+
 //------------------------------------------------------------------------------
 }
