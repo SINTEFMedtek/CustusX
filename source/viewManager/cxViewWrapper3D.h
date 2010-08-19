@@ -16,6 +16,8 @@
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 
+typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
+
 namespace cx
 {
 
@@ -44,6 +46,7 @@ private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
+  void slicePlanesChangedSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);

@@ -10,8 +10,10 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <vtkAbstractVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkPlane.h>
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
@@ -110,6 +112,18 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
 //
 //    rep->setImage(image);
     ssc::VolumetricRepPtr rep = repManager()->getVolumetricRep(image);
+
+    vtkPlanePtr plane = vtkPlanePtr::New();
+    plane->SetNormal(0,0,1);
+    plane->SetOrigin(100,100,100);
+//    std::cout << "coronal: <" << n << "> <" << p << ">" << std::endl;
+//    std::cout << "BB: " << iter->second->getImage()->boundingBox() << std::endl;
+    //std::cout << "adding cutplane for image" << std::endl;
+
+    //rep->getVtkVolume()->GetMapper()->RemoveAllClippingPlanes();
+    //rep->getVtkVolume()->GetMapper()->AddClippingPlane(plane);
+
+
     mVolumetricReps[image->getUid()] = rep;
     mView->addRep(rep);
     emit imageAdded(image->getUid().c_str());
@@ -267,11 +281,34 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   }
 }
 
+void ViewWrapper3D::slicePlanesChangedSlot()
+{
+  if (!mSlicePlanes3DRep->getProxy()->getData().count(ssc::ptCORONAL))
+    return;
+  ssc::Transform3D sMr = mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy->get_sMr();
+  for (std::map<std::string, ssc::VolumetricRepPtr>::iterator iter=mVolumetricReps.begin(); iter!=mVolumetricReps.end(); ++iter)
+  {
+    ssc::Transform3D rMs = sMr.inv();
+
+    ssc::Vector3D n = rMs.vector(ssc::Vector3D(0,0,-1));
+    ssc::Vector3D p = rMs.coord(ssc::Vector3D(0,0,0));
+    vtkPlanePtr plane = vtkPlanePtr::New();
+    plane->SetNormal(n.begin());
+    plane->SetOrigin(p.begin());
+//    std::cout << "coronal: <" << n << "> <" << p << ">" << std::endl;
+//    std::cout << "BB: " << iter->second->getImage()->boundingBox() << std::endl;
+//
+//    iter->second->getVtkVolume()->GetMapper()->RemoveAllClippingPlanes();
+//    iter->second->getVtkVolume()->GetMapper()->AddClippingPlane(plane);
+  }
+}
+
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
   mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
   mSlicePlanes3DRep->setProxy(proxy);
   mView->addRep(mSlicePlanes3DRep);
+  connect(mSlicePlanes3DRep->getProxy().get(), SIGNAL(changed()), this, SLOT(slicePlanesChangedSlot()));
 }
 
 
