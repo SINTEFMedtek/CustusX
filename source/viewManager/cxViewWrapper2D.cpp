@@ -184,6 +184,7 @@ void ViewWrapper2D::viewportChanged()
   ssc::Transform3D vpMs = get_vpMs();
 
   mToolRep2D->setViewportData(vpMs, BB_vp);
+//  mSlicePlanes3DMarkerIn2DRep->getproxy->setViewportData(plane, mSliceProxy, transform(BB_vp, vpMs.inv());
 }
 
 /**Return the viewport in vtk pixels. (viewport space)
@@ -469,8 +470,12 @@ void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
 void ViewWrapper2D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
   mSlicePlanes3DMarkerIn2DRep = ssc::SlicePlanes3DMarkerIn2DRep::New("uid");
-  //mSlicePlanes3DMarkerIn2DRep->setProxy(mSliceProxy->getComputer().getPlaneType(), proxy);
- // proxy->setViewportData()
+  ssc::PLANE_TYPE plane = mSliceProxy->getComputer().getPlaneType();
+  mSlicePlanes3DMarkerIn2DRep->setProxy(plane, proxy);
+
+  ssc::DoubleBoundingBox3D BB_vp = getViewport();
+  ssc::Transform3D vpMs = get_vpMs();
+  proxy->setViewportData(plane, mSliceProxy, transform(vpMs.inv(), BB_vp));
 }
 
 //------------------------------------------------------------------------------
