@@ -10,6 +10,7 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscUtilHelpers.h"
+#include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
@@ -171,6 +172,7 @@ ViewGroup::ViewGroup()
   mRegistrationMode = ssc::rsNOT_REGISTRATED;
   mZoom2D.mLocal = SyncedValue::create(1.0);
   mZoom2D.activateGlobal(false);
+  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
 }
 
 ViewGroup::~ViewGroup()
@@ -187,6 +189,8 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
   wrapper->setZoom2D(mZoom2D.mActive);
   for (unsigned i=0; i<mImages.size(); ++i)
     wrapper->addImage(mImages[i]);
+
+  wrapper->setSlicePlanesProxy(mSlicePlanesProxy);
 
   // connect signals
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
@@ -221,6 +225,7 @@ void ViewGroup::removeViews()
 
   mViews.clear();
   mViewWrappers.clear();
+  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
 }
 
 ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(std::string viewUid)

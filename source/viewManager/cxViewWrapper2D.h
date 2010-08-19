@@ -38,6 +38,7 @@ public:
   virtual ssc::View* getView();
   virtual void setZoom2D(SyncedValuePtr value);
   virtual void setOrientationMode(SyncedValuePtr value);
+  virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -75,6 +76,7 @@ private:
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
+  ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarkerIn2DRep;
   QPointer<ssc::View> mView;
   std::vector<ssc::ImagePtr> mImage;
 
