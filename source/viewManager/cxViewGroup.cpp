@@ -172,11 +172,18 @@ ViewGroup::ViewGroup()
   mRegistrationMode = ssc::rsNOT_REGISTRATED;
   mZoom2D.mLocal = SyncedValue::create(1.0);
   mZoom2D.activateGlobal(false);
-  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+
+  this->setSlicePlanesProxy();
 }
 
 ViewGroup::~ViewGroup()
 {}
+
+void ViewGroup::setSlicePlanesProxy()
+{
+  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+  //mSlicePlanesProxy->getProperties().mPointPos_normvp = ssc::Vector3D(0.9,0.8,0.0);
+}
 
 /**Add one view wrapper and setup the necessary connections.
  */
@@ -225,7 +232,7 @@ void ViewGroup::removeViews()
 
   mViews.clear();
   mViewWrappers.clear();
-  mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
+  this->setSlicePlanesProxy();
 }
 
 ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(std::string viewUid)

@@ -78,6 +78,7 @@ private slots:
 protected:
   //zoom2d is the same for all viewwrapper2ds in a viewgroup
   void setZoom2D(double newZoom);
+  void setSlicePlanesProxy();
 
   std::vector<ssc::View*> mViews;
 
