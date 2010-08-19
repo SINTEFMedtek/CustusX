@@ -20,7 +20,7 @@ SlicePlanesProxy::SlicePlanesProxy()
 	mColors.push_back(Vector3D(0.5, 0.5, 1));
 }
 
-void SlicePlanesProxy::setViewportData(ssc::VIEW_AREA_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s)
+void SlicePlanesProxy::setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s)
 {
 	if (!slice)
 		return;
@@ -185,7 +185,7 @@ void SlicePlanes3DMarkerIn2DRep::changedSlot()
 {
 }
 
-void SlicePlanes3DMarkerIn2DRep::setProxy(ssc::VIEW_AREA_TYPE type, SlicePlanesProxyPtr proxy)
+void SlicePlanes3DMarkerIn2DRep::setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy)
 {
 	//Logger::log("vm.log", "SlicePlanes3DMarkerIn2DRep::setProxy");
 	mType = type;
