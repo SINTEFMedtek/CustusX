@@ -15,7 +15,7 @@ namespace ssc
 
 SlicePlanesProxy::SlicePlanesProxy()
 {
-  mVisible = false;
+  mVisible = true;
 	mColors.push_back(Vector3D(0,   1,   1));
 	mColors.push_back(Vector3D(0,   0.6, 1));
 	mColors.push_back(Vector3D(0.5, 0.5, 1));
