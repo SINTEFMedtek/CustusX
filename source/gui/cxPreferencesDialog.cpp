@@ -106,11 +106,13 @@ void FoldersTab::browsePatientDataFolderSlot()
 
 void FoldersTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
 {
+  std::cout << "mCurrentToolConfigFileslot" << mCurrentToolConfigFile << std::endl;
   mCurrentToolConfigFile = newToolConfigFile;
 }
 
 void FoldersTab::setToolConfigComboBox()
 {
+  mToolConfigFilesComboBox->blockSignals(true);
 	QDir dir(DataLocations::getApplicationToolConfigPath());
     dir.setFilter(QDir::Files);
 
@@ -123,8 +125,10 @@ void FoldersTab::setToolConfigComboBox()
     mToolConfigFilesComboBox->clear();
     mToolConfigFilesComboBox->addItems( list );
 
+    std::cout << "mCurrentToolConfigFile " << mCurrentToolConfigFile << std::endl;
     int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
     mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
+    mToolConfigFilesComboBox->blockSignals(false);
 }
 
 void FoldersTab::setApplicationComboBox()
@@ -151,7 +155,23 @@ void FoldersTab::setApplicationComboBox()
 
 void FoldersTab::applicationStateChangedSlot()
 {
+  mChooseApplicationComboBox->blockSignals(true);
+  QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
+  for (int i=0; i<actions.size(); ++i)
+  {
+    std::cout << "action " << actions[i]->text() << " - " << actions[i]->isChecked() << std::endl;
+    if (actions[i]->isChecked())
+      mChooseApplicationComboBox->setCurrentIndex(i);
+  }
+
+  mChooseApplicationComboBox->blockSignals(false);
+
   this->setToolConfigComboBox();
+
+  // this hack ensures that the tool folder is reinitialized when changing application.
+  // TODO: move to application state
+  if (mToolConfigFilesComboBox->currentIndex()<0)
+    mToolConfigFilesComboBox->setCurrentIndex(0);
 }
 
 
@@ -184,6 +204,8 @@ void FoldersTab::saveParametersSlot()
   mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
   // currentToolConfigFile
+  std::cout << "mCurrentToolConfigFilesave " << mCurrentToolConfigFile << std::endl;
+
   mSettings->setValue("toolConfigFile", mCurrentToolConfigFile);
   
   mSettings->sync();

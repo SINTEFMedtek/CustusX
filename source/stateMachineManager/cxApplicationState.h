@@ -34,7 +34,7 @@ class ApplicationState : public QState
 public:
   ApplicationState(QState* parent, QString uid, QString name) :
     QState(parent),
-    mUid(uid), mName(name), mAction(NULL)
+    mUid(uid), mName(name), mAction(NULL), mActive(false)
   {
   };
 
@@ -42,12 +42,14 @@ public:
 
   virtual void onEntry(QEvent * event )
   {
+    mActive = true;
     ssc::messageManager()->sendInfo("Application change to [" + string_cast(mName) + "]");
     if(mAction)
       mAction->setChecked(true);
   };
   virtual void onExit(QEvent * event )
   {
+    mActive = false;
     //std::cout << "Exiting application "<< mName << std::endl;
   };
 
@@ -74,6 +76,7 @@ public:
 
     mAction = new QAction(this->getName(), group);
     mAction->setCheckable(true);
+    mAction->setChecked(mActive);
     mAction->setData(QVariant(this->getUid()));
     //this->canEnterSlot();
 
@@ -90,10 +93,10 @@ protected slots:
   };
 
 protected:
-
   QString mUid;
   QString mName;
   QAction* mAction;
+  bool mActive;
 };
 
 class ParentApplicationState : public ApplicationState
