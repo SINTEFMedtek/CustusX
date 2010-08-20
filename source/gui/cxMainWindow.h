@@ -167,7 +167,7 @@ protected:
   class PointSamplingWidget* mPointSamplingWidget;
   ssc::ReconstructionWidget* mReconstructionWidget;
   class RegistrationHistoryWidget* mRegistrationHistoryWidget; ///< look back in registration history.
-
+  class VolumePropertiesWidget* mVolumePropertiesWidget;
   class CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
 
   //Preferences

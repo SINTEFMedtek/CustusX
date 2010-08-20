@@ -32,32 +32,21 @@ class TransferFunctionWidget : public QWidget
 public:
   TransferFunctionWidget(QWidget* parent);
   ~TransferFunctionWidget();
-	void init();///< Initialize TransferFunctionWidget. Create members
 
 public slots:
-  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
-  void shadingToggledSlot(bool val);
   void presetsBoxChangedSlot(const QString& presetName);
 
-
 protected:
+  void init();///< Initialize TransferFunctionWidget. Create members
   //gui
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  //TransferFunctionInfoWidget*  mInfoWidget;
-  QCheckBox* mShadingCheckBox;
   QComboBox* mPresetsComboBox;
 
   PresetTransferFunctions3D mPresets;
-  //QStringList* mPresets;
-  //QDomElement mTransferfunctionPresetCTFire;
-  //QDomElement mTransferfunctionPresetCTBlue;
 
-  ssc::ImagePtr mCurrentImage;
 	bool mInitialized;///< Is TransferFunctionWidget initialized
-  
-  //void initTransferFunctionPresets();
 };
 }
 
