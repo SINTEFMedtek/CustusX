@@ -9,7 +9,7 @@
 #include "cxToolManager.h"
 #include "cxRegistrationManager.h"
 #include "cxCustomStatusBar.h"
-//#include "cxContextDockWidget.h"
+#include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTransferFunctionWidget.h"
@@ -49,6 +49,7 @@ MainWindow::MainWindow() :
   mPointSamplingWidget(new PointSamplingWidget(this)),
   mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("usReconstruction"), DataLocations::getShaderPath() )),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
+  mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mSettings(DataLocations::getSettings())
 {
@@ -58,8 +59,9 @@ MainWindow::MainWindow() :
   mLayoutActionGroup = NULL;
   this->updateWindowTitle();
   
+  this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
   //make sure the transferefunctionwidget it fully initialized
-  mTransferFunctionWidget->init();
+//  mTransferFunctionWidget->init();
 
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mToolPropertiesWidget);
@@ -73,6 +75,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mImageRegistrationWidget);
   this->addAsDockWidget(mPatientRegistrationWidget);
   this->addAsDockWidget(mNavigationWidget);
+  this->addAsDockWidget(mVolumePropertiesWidget);
 
   this->createActions();
   this->createToolBars();
@@ -264,9 +267,9 @@ void MainWindow::createActions()
           mImageRegistrationWidget, SLOT(activeImageChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
           mPatientRegistrationWidget, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
-          mTransferFunctionWidget, SLOT(activeImageChangedSlot()));
-  
+//  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
+//          mTransferFunctionWidget, SLOT(activeImageChangedSlot()));
+//
   //TODO what to do instead?
   //connect(this, SIGNAL(deleteCurrentImage()), mContextDockWidget, SLOT(deleteCurrentImageSlot()));
 

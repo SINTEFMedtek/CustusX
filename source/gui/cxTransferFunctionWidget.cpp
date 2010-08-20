@@ -21,6 +21,8 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
 {
   this->setObjectName("TransferFunctionWidget");
   this->setWindowTitle("Transfer Function");
+
+  this->init();
 }
 
 TransferFunctionWidget::~TransferFunctionWidget()
@@ -45,7 +47,6 @@ void TransferFunctionWidget::init()
   mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding, 
                                               QSizePolicy::Fixed);
   
-  mShadingCheckBox = new QCheckBox("Shading", this);
   mPresetsComboBox = new QComboBox(this);
   
   //Populate presets comboBox
@@ -57,8 +58,6 @@ void TransferFunctionWidget::init()
   mPresetsComboBox->addItems(mPresets.getPresetList());
   //this->initTransferFunctionPresets();
   
-  connect(mShadingCheckBox, SIGNAL(toggled(bool)), 
-          this, SLOT(shadingToggledSlot(bool)));
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)),
           this, SLOT(presetsBoxChangedSlot(const QString&)));
 
@@ -66,122 +65,25 @@ void TransferFunctionWidget::init()
   mLayout->addWidget(mTransferFunctionColorWidget);
   mLayout->addWidget(mPresetsComboBox);
   //mLayout->addWidget(mInfoWidget);
-  
-  
-  QGridLayout* shadingLayput = new QGridLayout();
-  
-  ssc::SliderGroupWidget* shadingAmbientWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingAmbient()), shadingLayput, 0);
-  ssc::SliderGroupWidget* shadingDiffuseWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingDiffuse()), shadingLayput, 1);
-  ssc::SliderGroupWidget* shadingSpecularWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecular()), shadingLayput, 2);
-  ssc::SliderGroupWidget* shadingSpecularPowerWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterShadingSpecularPower()), shadingLayput, 3);
-  
-  
-  shadingAmbientWidget->setEnabled(false);
-  shadingDiffuseWidget->setEnabled(false);
-  shadingSpecularWidget->setEnabled(false);
-  shadingSpecularPowerWidget->setEnabled(false);
-  
-  //QLabel* shadingLabel = new QLabel("Shading", this);
-  mLayout->addWidget(mShadingCheckBox);
-  mLayout->addLayout(shadingLayput);
-  
-  //mLayout->addWidget(shadingLabel);
-  //mLayout->addWidget(shadingAmbientWidget);
-  //mLayout->addWidget(shadingDiffuseWidget);
-  //mLayout->addWidget(shadingSpecularWidget);
-  //mLayout->addWidget(shadingSpecularPowerWidget);
-  
+
   this->setLayout(mLayout);
 
   mInitialized = true;
 }
-
-void TransferFunctionWidget::shadingToggledSlot(bool val)
-{
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  if (image)
-  {
-    image->setShadingOn(val);
-  }
-}
-
-void TransferFunctionWidget::activeImageChangedSlot()
-{
-  if (!mInitialized)
-    init();
-
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  if(mCurrentImage == activeImage)
-    return;
-
-  mCurrentImage = activeImage;
-
-  if (activeImage)
-  {
-    mShadingCheckBox->setChecked(activeImage->getShadingOn());
-  }
-}
-
-/*MOVED TO PresetTransferFunctions3D
- void TransferFunctionWidget::initTransferFunctionPresets()
-{
-  // Use XML structure
-  QDomDocument doc;
-  mTransferfunctionPresetCTFire = doc.createElement("transferfunctions");
-  QDomElement alphaNode = doc.createElement("alpha");
-  QStringList pointStringList;
-  // Add alpha points
-  pointStringList.append(QString("0=0"));
-  pointStringList.append(QString("100=100"));
-  pointStringList.append(QString("150=100"));
-  pointStringList.append(QString("1000=200"));
-  alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-  pointStringList.clear();
-  
-  QDomElement colorNode = doc.createElement("color");  
-  // Add color points
-  pointStringList.append(QString("0=0/0/0"));
-  pointStringList.append(QString("150=255/255/0"));
-  pointStringList.append(QString("1000=255/0/0"));
-  colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-  pointStringList.clear();
-  
-  mTransferfunctionPresetCTFire.appendChild(alphaNode);
-  mTransferfunctionPresetCTFire.appendChild(colorNode);
-  
-  
-  mTransferfunctionPresetCTBlue = doc.createElement("transferfunctions");
-  alphaNode = doc.createElement("alpha");
-  // Add alpha points
-  pointStringList.append(QString("0=0"));
-  pointStringList.append(QString("200=50"));
-  pointStringList.append(QString("1000=255"));
-  alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-  pointStringList.clear();
-  
-  colorNode = doc.createElement("color");  
-  // Add color points
-  pointStringList.append(QString("0=0/0/0"));
-  pointStringList.append(QString("200=255/255/0"));
-  pointStringList.append(QString("1000=0/0/255"));
-  colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-  pointStringList.clear();
-  
-  mTransferfunctionPresetCTBlue.appendChild(alphaNode);
-  mTransferfunctionPresetCTBlue.appendChild(colorNode);
-}*/
   
 void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
 {
-  if(!mCurrentImage)
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+
+  if(!activeImage)
     return;
   
-  ssc::ImageTF3DPtr transferFunctions = mCurrentImage->getTransferFunctions3D();
+  ssc::ImageTF3DPtr transferFunctions = activeImage->getTransferFunctions3D();
   transferFunctions->parseXml(mPresets.getPresetDomElement(presetName));
 
-  mCurrentImage->setShading(mPresets.getShadingPresets(presetName));
+  activeImage->setShading(mPresets.getShadingPresets(presetName));
   
-  mShadingCheckBox->setChecked(mCurrentImage->getShadingOn());
+  //mShadingCheckBox->setChecked(activeImage->getShadingOn());
   
   //transferFunctions->addAlphaPoint(0, 0);
   //transferFunctions->addColorPoint(0, QColor(0,0,0));
@@ -199,10 +101,10 @@ void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
   }*/
 
   //Make sure min and max values for transferfunctions are set
-  transferFunctions->addAlphaPoint(mCurrentImage->getMin(), 0);
-  transferFunctions->addAlphaPoint(mCurrentImage->getMax(), 0);
-  transferFunctions->addColorPoint(mCurrentImage->getMin(), QColor(0,0,0));
-  transferFunctions->addColorPoint(mCurrentImage->getMax(), QColor(0,0,0));
+  transferFunctions->addAlphaPoint(activeImage->getMin(), 0);
+  transferFunctions->addAlphaPoint(activeImage->getMax(), 0);
+  transferFunctions->addColorPoint(activeImage->getMin(), QColor(0,0,0));
+  transferFunctions->addColorPoint(activeImage->getMax(), QColor(0,0,0));
 }
   
 }//namespace cx

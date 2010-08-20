@@ -7,7 +7,9 @@ ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
 SET(cxProject_MOC_HDRS
   cxMainWindow.h
   cxCustomStatusBar.h
-  #cxContextDockWidget.h
+  cxVolumePropertiesWidget.h
+  cxShadingWidget.h
+  cxCroppingWidget.h  
   cxNavigationWidget.h
   cxBrowserWidget.h
   cxImageRegistrationWidget.h
@@ -49,9 +51,13 @@ SET(${LIBNAME}_SRCS
     cxMainWindow.h
     cxMainWindow.cpp 
     cxCustomStatusBar.h
-    cxCustomStatusBar.cpp
-    #cxContextDockWidget.h
-    #cxContextDockWidget.cpp
+    cxCustomStatusBar.cpp    
+    cxVolumePropertiesWidget.h
+    cxVolumePropertiesWidget.cpp
+    cxShadingWidget.h
+    cxShadingWidget.cpp
+    cxCroppingWidget.h
+    cxCroppingWidget.cpp
     cxNavigationWidget.h
     cxNavigationWidget.cpp
     cxBrowserWidget.h

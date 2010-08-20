@@ -16,8 +16,6 @@
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 
-typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
-
 namespace cx
 {
 
@@ -46,7 +44,8 @@ private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
-  void slicePlanesChangedSlot();
+  //void slicePlanesChangedSlot();
+  void clipActionSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
@@ -54,7 +53,8 @@ private:
   void updateView();
 
 //  ssc::VolumetricRepPtr mVolumetricRep;
-  std::map<std::string, ssc::VolumetricRepPtr> mVolumetricReps;
+  typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
+  VolumetricRepMap mVolumetricReps;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   ssc::GeometricRepPtr mGeometricRep;
@@ -63,6 +63,7 @@ private:
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
+  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
 
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;

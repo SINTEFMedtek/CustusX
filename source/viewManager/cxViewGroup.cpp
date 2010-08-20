@@ -183,6 +183,7 @@ void ViewGroup::setSlicePlanesProxy()
 {
   mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
   //mSlicePlanesProxy->getProperties().mPointPos_normvp = ssc::Vector3D(0.9,0.8,0.0);
+  mSlicePlanesProxy->getProperties().mDrawPlane = true;
 }
 
 /**Add one view wrapper and setup the necessary connections.
