@@ -41,6 +41,7 @@ typedef boost::shared_ptr<class AxesRep> AxesRepPtr;
 typedef boost::shared_ptr<class SlicePlanes3DMarkerIn2DRep> SlicePlanes3DMarkerIn2DRepPtr;
 typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
+typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
 } // namespace ssc
 

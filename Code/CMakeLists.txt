@@ -63,6 +63,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscTexture3DSlicerRep.h
     Rep/sscSlicePlanes3DRep.h
     Rep/sscGeometricRep.h
+    Rep/sscSlicePlaneClipper.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h
@@ -203,6 +204,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscVtkHelperClasses.h
     Rep/sscSlicePlanes3DRep.cpp
     Rep/sscSlicePlanes3DRep.h
+    Rep/sscSlicePlaneClipper.h
+    Rep/sscSlicePlaneClipper.cpp
     Data/sscLandmark.h
     Data/sscLandmark.cpp
     Data/sscData.cpp
