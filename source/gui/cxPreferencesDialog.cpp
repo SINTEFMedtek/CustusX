@@ -106,7 +106,6 @@ void FoldersTab::browsePatientDataFolderSlot()
 
 void FoldersTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
 {
-  std::cout << "mCurrentToolConfigFileslot" << mCurrentToolConfigFile << std::endl;
   mCurrentToolConfigFile = newToolConfigFile;
 }
 
@@ -125,7 +124,6 @@ void FoldersTab::setToolConfigComboBox()
     mToolConfigFilesComboBox->clear();
     mToolConfigFilesComboBox->addItems( list );
 
-    std::cout << "mCurrentToolConfigFile " << mCurrentToolConfigFile << std::endl;
     int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
     mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
     mToolConfigFilesComboBox->blockSignals(false);
@@ -139,17 +137,10 @@ void FoldersTab::setApplicationComboBox()
   for (int i=0; i<actions.size(); ++i)
   {
     mChooseApplicationComboBox->insertItem(i, QIcon(), actions[i]->text(), actions[i]->data());
-    //std::cout << "action " << actions[i]->text() << std::endl;
     if (actions[i]->isChecked())
       mChooseApplicationComboBox->setCurrentIndex(i);
   }
 
-//  mChooseApplicationComboBox->addActions(actions);
-//
-//  QString str = mSettings->value("applicationNames").toString();
-//  QStringList list = str.split(",");
-//  mChooseApplicationComboBox->clear();
-//  mChooseApplicationComboBox->addItems(list);
   mChooseApplicationComboBox->blockSignals(false);
 }
 
@@ -159,7 +150,6 @@ void FoldersTab::applicationStateChangedSlot()
   QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
   for (int i=0; i<actions.size(); ++i)
   {
-    std::cout << "action " << actions[i]->text() << " - " << actions[i]->isChecked() << std::endl;
     if (actions[i]->isChecked())
       mChooseApplicationComboBox->setCurrentIndex(i);
   }
@@ -204,8 +194,6 @@ void FoldersTab::saveParametersSlot()
   mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
   // currentToolConfigFile
-  std::cout << "mCurrentToolConfigFilesave " << mCurrentToolConfigFile << std::endl;
-
   mSettings->setValue("toolConfigFile", mCurrentToolConfigFile);
   
   mSettings->sync();
