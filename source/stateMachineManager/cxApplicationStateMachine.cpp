@@ -66,6 +66,7 @@ void ApplicationStateMachine::activeStateChangedSlot()
 
 QActionGroup* ApplicationStateMachine::getActionGroup()
 {
+  QString active = this->getActiveUidState();
   mActionGroup->setExclusive(true);
   //TODO rebuild action list when we need dynamic lists. Must rethink memory management then.
   for (ApplicationStateMap::iterator iter=mStates.begin(); iter!=mStates.end(); ++iter)
