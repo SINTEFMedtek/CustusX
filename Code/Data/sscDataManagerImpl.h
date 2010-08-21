@@ -72,7 +72,6 @@ public:
 	static void initialize();
 
 	// images
-	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
   virtual void loadImage(ImagePtr image);
   virtual void saveImage(ImagePtr image, const std::string& basePath);///< Save image to file \param basePath Absolute path to patient data folder
 	virtual ImagePtr getImage(const std::string& uid);
@@ -82,8 +81,10 @@ public:
 	virtual std::vector<std::string> getImageNames() const;
 	virtual std::vector<std::string> getImageUids() const;
 
+	void loadMesh(MeshPtr data);
+	void loadData(DataPtr data);
+
 	// meshes
-	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType);
 	virtual MeshPtr getMesh(const std::string& uid);
 	virtual std::map<std::string, MeshPtr> getMeshes();
 
@@ -131,6 +132,8 @@ protected:
 	//state
 	ImagePtr mActiveImage;
 	//MeshPtr mActiveMesh;
+    virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
+    virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
   

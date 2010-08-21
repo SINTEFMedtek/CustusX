@@ -16,7 +16,6 @@ typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
-
 #include <QtCore>
 #include <QDomDocument>
 #include <QFileInfo>
@@ -36,31 +35,30 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
 {
   //messageManager()->sendDebug("load filename: "+string_cast(filename));
   //read the specific TransformMatrix-tag from the header
-  Vector3D p_r(0,0,0);
-  Vector3D e_x(1,0,0);
-  Vector3D e_y(0,1,0);
-  Vector3D e_z(0,0,1);
+  Vector3D p_r(0, 0, 0);
+  Vector3D e_x(1, 0, 0);
+  Vector3D e_y(0, 1, 0);
+  Vector3D e_z(0, 0, 1);
 
   QString creator;
   QFile file(filename.c_str());
 
   QString line;
-  if(file.open(QIODevice::ReadOnly))
+  if (file.open(QIODevice::ReadOnly))
   {
     QTextStream t(&file);
-    while(!t.atEnd())
+    while (!t.atEnd())
     {
       line.clear();
       line = t.readLine();
       // do something with the line
-      if(line.startsWith("Position",Qt::CaseInsensitive)
-          || line.startsWith("Offset",Qt::CaseInsensitive))
+      if (line.startsWith("Position", Qt::CaseInsensitive) || line.startsWith("Offset", Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
         p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
       }
-      else if(line.startsWith("TransformMatrix",Qt::CaseInsensitive)
-          || line.startsWith("Orientation",Qt::CaseInsensitive))
+      else if (line.startsWith("TransformMatrix", Qt::CaseInsensitive) || line.startsWith("Orientation",
+          Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
 
@@ -68,7 +66,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
         e_y = Vector3D(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
         e_z = cross(e_x, e_y);
       }
-      else if (line.startsWith("Creator",Qt::CaseInsensitive))
+      else if (line.startsWith("Creator", Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
         creator = list[2];
@@ -78,7 +76,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
   }
 
   // MDH is a volatile format: warn if we dont know the source
-  if (( creator!="Ingerid" )&&( creator != "DICOMtoMetadataFilter" ))
+  if ((creator != "Ingerid") && (creator != "DICOMtoMetadataFilter"))
   {
     //std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
   }
@@ -86,7 +84,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
   Transform3D rMd;
 
   // add rotational part
-  for (unsigned i=0; i<3; ++i)
+  for (unsigned i = 0; i < 3; ++i)
   {
     rMd[i][0] = e_x[i];
     rMd[i][1] = e_y[i];
@@ -94,7 +92,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
   }
 
   // Special Ingerid Reinertsen fix: Position is stored as p_d instead of p_r: convert here
-  if (creator=="Ingerid")
+  if (creator == "Ingerid")
   {
     std::cout << "ingrid fixing" << std::endl;
     p_r = rMd.coord(p_r);
@@ -105,21 +103,20 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
   rMd[1][3] = p_r[1];
   rMd[2][3] = p_r[2];
 
-
   //load the image from file
-	vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-	reader->SetFileName(filename.c_str());
-	reader->ReleaseDataFlagOn();
-	//reader->GetOutput()->ReleaseDataFlagOn();
-	reader->Update();
+  vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
+  reader->SetFileName(filename.c_str());
+  reader->ReleaseDataFlagOn();
+  //reader->GetOutput()->ReleaseDataFlagOn();
+  reader->Update();
 
-	vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
-	zeroer->SetInput(reader->GetOutput());
-  zeroer->SetOutputOrigin(0,0,0);
+  vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+  zeroer->SetInput(reader->GetOutput());
+  zeroer->SetOutputOrigin(0, 0, 0);
 
   vtkImageDataPtr imageData = zeroer->GetOutput();
   imageData->Update();
-  
+
   ImagePtr image(new Image(uid, imageData));
 
   RegistrationTransform regTrans(rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
@@ -132,12 +129,12 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
 //-----
 MeshPtr PolyDataMeshReader::load(const std::string& uid, const std::string& fileName)
 {
-	vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-	reader->SetFileName(fileName.c_str());
-	reader->Update();
-	vtkPolyDataPtr polyData = reader->GetOutput();
+  vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
+  reader->SetFileName(fileName.c_str());
+  reader->Update();
+  vtkPolyDataPtr polyData = reader->GetOutput();
 
-	//return MeshPtr(new Mesh(fileName, fileName, polyData));
+  //return MeshPtr(new Mesh(fileName, fileName, polyData));
   MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
   return tempMesh;
 
@@ -145,32 +142,36 @@ MeshPtr PolyDataMeshReader::load(const std::string& uid, const std::string& file
 
 MeshPtr StlMeshReader::load(const std::string& uid, const std::string& fileName)
 {
-	vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-	reader->SetFileName(fileName.c_str());
-	reader->Update();
-	vtkPolyDataPtr polyData = reader->GetOutput();
+  vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
+  reader->SetFileName(fileName.c_str());
+  reader->Update();
+  vtkPolyDataPtr polyData = reader->GetOutput();
 
-	//return MeshPtr(new Mesh(fileName, fileName, polyData));
+  //return MeshPtr(new Mesh(fileName, fileName, polyData));
   MeshPtr tempMesh(new Mesh(uid, "PolyData", polyData));
   return tempMesh;
 
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 void DataManagerImpl::initialize()
 {
-	setInstance(new DataManagerImpl());
+  setInstance(new DataManagerImpl());
 }
 
 DataManagerImpl::DataManagerImpl()
 {
-//  mMedicalDomain = mdLABORATORY;
-//  mMedicalDomain = mdLAPAROSCOPY;
-	mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
-	mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
-	mMeshReaders[mrtSTL].reset(new StlMeshReader());
-//	mCenter = Vector3D(0,0,0);
-//	mActiveImage.reset();
-	this->clear();
+  //  mMedicalDomain = mdLABORATORY;
+  //  mMedicalDomain = mdLAPAROSCOPY;
+  mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
+  mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
+  mMeshReaders[mrtSTL].reset(new StlMeshReader());
+  //	mCenter = Vector3D(0,0,0);
+  //	mActiveImage.reset();
+  this->clear();
 }
 
 DataManagerImpl::~DataManagerImpl()
@@ -180,7 +181,7 @@ DataManagerImpl::~DataManagerImpl()
 void DataManagerImpl::clear()
 {
   mImages.clear();
-  mCenter = ssc::Vector3D(0,0,0);
+  mCenter = ssc::Vector3D(0, 0, 0);
   mMedicalDomain = mdLABORATORY;
   mMeshes.clear();
   mActiveImage.reset();
@@ -195,12 +196,12 @@ void DataManagerImpl::clear()
 
 Vector3D DataManagerImpl::getCenter() const
 {
-	return mCenter;
+  return mCenter;
 }
 void DataManagerImpl::setCenter(const Vector3D& center)
 {
-	mCenter = center;
-	emit centerChanged();
+  mCenter = center;
+  emit centerChanged();
 }
 ImagePtr DataManagerImpl::getActiveImage() const
 {
@@ -208,33 +209,33 @@ ImagePtr DataManagerImpl::getActiveImage() const
 }
 void DataManagerImpl::setActiveImage(ImagePtr activeImage)
 {
-  if(mActiveImage == activeImage)
+  if (mActiveImage == activeImage)
     return;
 
   if (mActiveImage)
-	{
-		disconnect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		//disconnect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+  {
+    disconnect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+    //disconnect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
     disconnect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-	}
-  
+  }
+
   mActiveImage = activeImage;
-  
-	if (mActiveImage)
-	{
-		connect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
-		//connect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+
+  if (mActiveImage)
+  {
+    connect(mActiveImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
+    //connect(mActiveImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
     connect(mActiveImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-	}
+  }
   this->vtkImageDataChangedSlot();
 }
 
 void DataManagerImpl::setLandmarkNames(std::vector<std::string> names)
 {
   mLandmarkProperties.clear();
-  for(unsigned i=0; i<names.size();++i)
+  for (unsigned i = 0; i < names.size(); ++i)
   {
-    LandmarkProperty prop(string_cast(i+1), names[i]); // generate 1-indexed uids (keep users happy)
+    LandmarkProperty prop(string_cast(i + 1), names[i]); // generate 1-indexed uids (keep users happy)
     mLandmarkProperties[prop.getUid()] = prop;
   }
   emit landmarkPropertiesChanged();
@@ -244,17 +245,16 @@ std::string DataManagerImpl::addLandmark()
 {
   int max = 0;
   std::map<std::string, LandmarkProperty>::iterator iter;
-  for (iter=mLandmarkProperties.begin(); iter!=mLandmarkProperties.end(); ++iter)
+  for (iter = mLandmarkProperties.begin(); iter != mLandmarkProperties.end(); ++iter)
   {
     max = std::max(max, qstring_cast(iter->second.getName()).toInt());
   }
-  std::string uid = string_cast(max+1);
+  std::string uid = string_cast(max + 1);
   mLandmarkProperties[uid] = LandmarkProperty(uid);
 
   emit landmarkPropertiesChanged();
   return uid;
 }
-
 
 void DataManagerImpl::setLandmarkName(std::string uid, std::string name)
 {
@@ -273,27 +273,25 @@ void DataManagerImpl::setLandmarkActive(std::string uid, bool active)
   emit landmarkPropertiesChanged();
 }
 
-
-
 ImagePtr DataManagerImpl::loadImage(const std::string& uid, const std::string& filename, READER_TYPE type)
 {
   //TODO
-	if (mImages.count(uid)) // dont load same image twice
-	{
-		return mImages[uid];
-		std::cout << "WARNING: Image with uid: "+uid+" already exists, abort loading.";
-	}	
-	
-	if (type==rtAUTO)
-	{
-		// do special stuff
-		return ImagePtr();
-	}
+  if (mImages.count(uid)) // dont load same image twice
+  {
+    return mImages[uid];
+    std::cout << "WARNING: Image with uid: " + uid + " already exists, abort loading.";
+  }
 
-	// identify type
-	ImagePtr current = mImageReaders[type]->load(uid, filename);
-	this->loadImage(current);
-	return current;
+  if (type == rtAUTO)
+  {
+    // do special stuff
+    return ImagePtr();
+  }
+
+  // identify type
+  ImagePtr current = mImageReaders[type]->load(uid, filename);
+  this->loadImage(current);
+  return current;
 }
 
 void DataManagerImpl::loadImage(ImagePtr image)
@@ -301,7 +299,31 @@ void DataManagerImpl::loadImage(ImagePtr image)
   if (image)
   {
     mImages[image->getUid()] = image;
+//    std::cout << "DataManagerImpl::loadImage B " << image->getName() << std::endl;
     emit dataLoaded();
+//    std::cout << "DataManagerImpl::loadImage E" << std::endl;
+  }
+}
+void DataManagerImpl::loadMesh(MeshPtr data)
+{
+  if (data)
+  {
+    mMeshes[data->getUid()] = data;
+//    std::cout << "DataManagerImpl::loadImage B " << image->getName() << std::endl;
+    emit dataLoaded();
+//    std::cout << "DataManagerImpl::loadImage E" << std::endl;
+  }
+}
+
+void DataManagerImpl::loadData(DataPtr data)
+{
+  if (boost::shared_dynamic_cast<Image>(data))
+  {
+    this->loadImage(boost::shared_dynamic_cast<Image>(data));
+  }
+  if (boost::shared_dynamic_cast<Mesh>(data))
+  {
+    this->loadMesh(boost::shared_dynamic_cast<Mesh>(data));
   }
 }
 
@@ -312,93 +334,101 @@ void DataManagerImpl::saveImage(ImagePtr image, const std::string& basePath)
   writer->SetFileDimensionality(3);
   std::string filename = basePath + "/" + image->getFilePath();
   writer->SetFileName(filename.c_str());
-  
+
   //Rename ending from .mhd to .raw
   QStringList splitName = qstring_cast(filename).split(".");
-  splitName[splitName.size()-1] = "raw";
+  splitName[splitName.size() - 1] = "raw";
   filename = string_cast(splitName.join("."));
-  
+
   writer->SetRAWFileName(filename.c_str());
   writer->SetCompression(false);
   writer->Update();
   writer->Write();
 }
-  
+
 // meshes
-MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType)
+MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fileName,
+    MESH_READER_TYPE meshType)
 {
   if (mMeshes.count(uid)) // dont load same mesh twice
   {
     return mMeshes[uid];
-    std::cout << "WARNING: Mesh with uid: "+uid+" already exists, abort loading.";
+    std::cout << "WARNING: Mesh with uid: " + uid + " already exists, abort loading.";
   }
-	// identify type
-	MeshPtr newMesh = mMeshReaders[meshType]->load(uid, fileName);
-	if (newMesh)
-	{
-		mMeshes[newMesh->getUid()] = newMesh;
-		emit dataLoaded();
-	}
-	return newMesh;
+  // identify type
+  MeshPtr newMesh = mMeshReaders[meshType]->load(uid, fileName);
+  if (newMesh)
+  {
+    this->loadMesh(newMesh);
+//    mMeshes[newMesh->getUid()] = newMesh;
+//    emit dataLoaded();
+  }
+  return newMesh;
 }
 
 ImagePtr DataManagerImpl::getImage(const std::string& uid)
 {
-	if (!mImages.count(uid))
-		return ImagePtr();
-	return mImages[uid];
+  if (!mImages.count(uid))
+    return ImagePtr();
+  return mImages[uid];
 }
 
 std::map<std::string, ImagePtr> DataManagerImpl::getImages()
 {
-	return mImages;
+  return mImages;
 }
 
 std::map<std::string, std::string> DataManagerImpl::getImageUidsAndNames() const
 {
-	std::map<std::string, std::string> retval;
-	for (ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
-		retval[iter->first] = iter->second->getName();
-	return retval;
+  std::map<std::string, std::string> retval;
+  for (ImagesMap::const_iterator iter = mImages.begin(); iter != mImages.end(); ++iter)
+    retval[iter->first] = iter->second->getName();
+  return retval;
 }
 
 std::vector<std::string> DataManagerImpl::getImageNames() const
 {
-	std::vector<std::string> retval;
-	for (ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
-		retval.push_back(iter->second->getName());
-	return retval;
+  std::vector<std::string> retval;
+  for (ImagesMap::const_iterator iter = mImages.begin(); iter != mImages.end(); ++iter)
+    retval.push_back(iter->second->getName());
+  return retval;
 }
 
 std::vector<std::string> DataManagerImpl::getImageUids() const
 {
-	std::vector<std::string> retval;
-	for (ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
-		retval.push_back(iter->first);
-	return retval;
+  std::vector<std::string> retval;
+  for (ImagesMap::const_iterator iter = mImages.begin(); iter != mImages.end(); ++iter)
+    retval.push_back(iter->first);
+  return retval;
 }
 
-MeshPtr DataManagerImpl::getMesh(const std::string& uid) 
+MeshPtr DataManagerImpl::getMesh(const std::string& uid)
 {
-	if (!mMeshes.count(uid))
-		return MeshPtr();
-	return mMeshes[uid];
+  if (!mMeshes.count(uid))
+    return MeshPtr();
+  return mMeshes[uid];
 }
-  
-std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() 
+
+std::map<std::string, MeshPtr> DataManagerImpl::getMeshes()
 {
   return mMeshes;
 }
 
-std::map<std::string, std::string> DataManagerImpl::getMeshUidsWithNames() const 
+std::map<std::string, std::string> DataManagerImpl::getMeshUidsWithNames() const
 {
-	std::map<std::string, std::string> retval;
-	for (MeshMap::const_iterator iter=mMeshes.begin(); iter!=mMeshes.end(); ++iter)
-		retval[iter->first] = iter->second->getName();
-	return retval;
+  std::map<std::string, std::string> retval;
+  for (MeshMap::const_iterator iter = mMeshes.begin(); iter != mMeshes.end(); ++iter)
+    retval[iter->first] = iter->second->getName();
+  return retval;
 }
-std::vector<std::string> DataManagerImpl::getMeshUids() const {  return std::vector<std::string>(); }
-std::vector<std::string> DataManagerImpl::getMeshNames() const {  return std::vector<std::string>(); }
+std::vector<std::string> DataManagerImpl::getMeshUids() const
+{
+  return std::vector<std::string>();
+}
+std::vector<std::string> DataManagerImpl::getMeshNames() const
+{
+  return std::vector<std::string>();
+}
 
 void DataManagerImpl::addXml(QDomNode& parentNode)
 {
@@ -407,13 +437,13 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   parentNode.appendChild(dataManagerNode);
 
   QDomElement activeImageNode = doc.createElement("activeImageUid");
-  if(mActiveImage)
+  if (mActiveImage)
     activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));
   dataManagerNode.appendChild(activeImageNode);
 
   QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
   LandmarkPropertyMap::iterator it = mLandmarkProperties.begin();
-  for(; it != mLandmarkProperties.end(); ++it)
+  for (; it != mLandmarkProperties.end(); ++it)
   {
     QDomElement landmarkPropNode = doc.createElement("landmarkprop");
     it->second.addXml(landmarkPropNode);
@@ -423,9 +453,9 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
   //TODO
   /*QDomElement activeMeshNode = doc.createElement("activeMesh");
-  if(mActiveMesh)
-    activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));
-  dataManagerNode.appendChild(activeMeshNode);*/
+   if(mActiveMesh)
+   activeMeshNode.appendChild(doc.createTextNode(mActiveMesh->getUid().c_str()));
+   dataManagerNode.appendChild(activeMeshNode);*/
 
   QDomElement centerNode = doc.createElement("center");
   std::stringstream centerStream;
@@ -433,11 +463,11 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   centerNode.appendChild(doc.createTextNode(centerStream.str().c_str()));
   dataManagerNode.appendChild(centerNode);
 
-  for(ImagesMap::const_iterator iter=mImages.begin(); iter!=mImages.end(); ++iter)
+  for (ImagesMap::const_iterator iter = mImages.begin(); iter != mImages.end(); ++iter)
   {
     iter->second->addXml(dataManagerNode);
   }
-  for(std::map<std::string, MeshPtr>::const_iterator iter=mMeshes.begin(); iter!=mMeshes.end(); ++iter)
+  for (std::map<std::string, MeshPtr>::const_iterator iter = mMeshes.begin(); iter != mMeshes.end(); ++iter)
   {
     iter->second->addXml(dataManagerNode);
   }
@@ -464,56 +494,60 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 
   while (!child.isNull())
   {
-    if(child.nodeName() == "image" || child.nodeName() == "mesh")
+    if (child.nodeName() == "image" || child.nodeName() == "mesh")
     {
       QString uidNodeString = child.namedItem("uid").toElement().text();
 
       nameNode = child.namedItem("name").toElement();
       QDomElement filePathNode = child.namedItem("filePath").toElement();
-      if(!filePathNode.isNull()) 
+      if (!filePathNode.isNull())
       {
         path = filePathNode.text();
         QDir relativePath = QDir(QString(path));
-        if(!absolutePath.isEmpty())
-          if(relativePath.isRelative())
-            path = absolutePath+"/"+path;
+        if (!absolutePath.isEmpty())
+          if (relativePath.isRelative())
+            path = absolutePath + "/" + path;
           else //Make relative
           {
             QDir patientDataDir(absolutePath);
             relativePath.setPath(patientDataDir.relativeFilePath(relativePath.path()));
           }
-        
-        if(!path.isEmpty())
+
+        if (!path.isEmpty())
         {
           ssc::DataPtr data;
-          
+
           QFileInfo fileInfo(path);
           QString fileType = fileInfo.suffix();
-          if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-             fileType.compare("mha", Qt::CaseInsensitive) == 0)
+          if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
           {
-            data = this->loadImage(uidNodeString.toStdString(), path.toStdString(), ssc::rtMETAIMAGE);
+            data = mImageReaders[ssc::rtMETAIMAGE]->load(uidNodeString.toStdString(), path.toStdString());
+            //data = this->loadImage(uidNodeString.toStdString(), path.toStdString(), ssc::rtMETAIMAGE);
           }
-          else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
+          else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
           {
-            data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtSTL);
+            data = mMeshReaders[ssc::mrtSTL]->load(uidNodeString.toStdString(), path.toStdString());
+            //data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtSTL);
           }
-          else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+          else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
           {
-            data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtPOLYDATA);
+            data = mMeshReaders[ssc::mrtPOLYDATA]->load(uidNodeString.toStdString(), path.toStdString());
+            //data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtPOLYDATA);
           }
           else
           {
-            messageManager()->sendWarning("Unknown file: "+string_cast(fileInfo.absolutePath()));
+            messageManager()->sendWarning("Unknown file: " + string_cast(fileInfo.absolutePath()));
             return;
           }
-          
-          if(nameNode.text().isEmpty())
+
+          if (nameNode.text().isEmpty())
             data->setName(fileInfo.fileName().toStdString());
           else
             data->setName(nameNode.text().toStdString());
           data->setFilePath(relativePath.path().toStdString());
           data->parseXml(child);
+
+          this->loadData(data);
         }
         else
         {
@@ -535,13 +569,13 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 
   //we need to make sure all images are loaded before we try to set an active image
   child = dataManagerNode.firstChild();
-  while(!child.isNull())
+  while (!child.isNull())
   {
-    if(child.toElement().tagName() == "activeImageUid")
+    if (child.toElement().tagName() == "activeImageUid")
     {
       const QString activeImageString = child.toElement().text();
       //std::cout << "Found a activeImage with uid: " << activeImageString.toStdString().c_str() << std::endl;
-      if(!activeImageString.isEmpty())
+      if (!activeImageString.isEmpty())
       {
         ImagePtr image = this->getImage(activeImageString.toStdString());
         //std::cout << "Got an image with uid: " << image->getUid().c_str() << std::endl;
@@ -549,10 +583,10 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
       }
     }
     //TODO add activeMesh
-    if(child.toElement().tagName() == "center")
+    if (child.toElement().tagName() == "center")
     {
       const QString centerString = child.toElement().text();
-      if(!centerString.isEmpty())
+      if (!centerString.isEmpty())
       {
         Vector3D center = Vector3D::fromString(centerString);
         this->setCenter(center);
@@ -562,18 +596,17 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
     child = child.nextSibling();
   }
 }
-  
+
 void DataManagerImpl::vtkImageDataChangedSlot()
 {
   std::string uid = "";
-  if(mActiveImage)
+  if (mActiveImage)
     uid = mActiveImage->getUid();
-  
+
   emit activeImageChanged(uid);
-  messageManager()->sendInfo("Active image set to "
-                             +string_cast(uid));
+  messageManager()->sendInfo("Active image set to " + string_cast(uid));
 }
-  
+
 void DataManagerImpl::transferFunctionsChangedSlot()
 {
   emit activeImageTransferFunctionsChanged();

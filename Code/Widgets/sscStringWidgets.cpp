@@ -5,7 +5,8 @@
  *      Author: christiana
  */
 #include "sscStringWidgets.h"
-
+#include <iostream>
+#include "sscTypeConversions.h"
 namespace ssc
 {
 
@@ -59,8 +60,7 @@ void ComboGroupWidget::dataChanged()
   QStringList range = mData->getValueRange();
   for (int i=0; i<range.size(); ++i)
   {
-    //std::cout << range[i] << std::endl;
-    mCombo->addItem(range[i]);
+    mCombo->addItem(mData->convertInternal2Display(range[i]));
     if (range[i]==currentValue)
       mCombo->setCurrentIndex(i);
   }
