@@ -157,7 +157,7 @@ protected:
 
   class ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration
   class PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
-  class TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
+  //class TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
   class ShiftCorrectionWidget*      mShiftCorrectionWidget; ///< interface for image shift correction
   class BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
