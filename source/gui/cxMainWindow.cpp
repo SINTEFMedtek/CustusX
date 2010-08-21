@@ -180,6 +180,7 @@ void MainWindow::createActions()
   connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
+  connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
   connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
 
   // Application
