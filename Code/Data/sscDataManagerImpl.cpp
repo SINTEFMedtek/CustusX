@@ -164,7 +164,7 @@ void DataManagerImpl::initialize()
 
 DataManagerImpl::DataManagerImpl()
 {
-  //  mMedicalDomain = mdLABORATORY;
+  mMedicalDomain = mdLABORATORY;
   //  mMedicalDomain = mdLAPAROSCOPY;
   mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
   mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
@@ -182,7 +182,7 @@ void DataManagerImpl::clear()
 {
   mImages.clear();
   mCenter = ssc::Vector3D(0, 0, 0);
-  mMedicalDomain = mdLABORATORY;
+  //mMedicalDomain = mdLABORATORY; must be set explicitly
   mMeshes.clear();
   mActiveImage.reset();
   mLandmarkProperties.clear();
@@ -191,6 +191,7 @@ void DataManagerImpl::clear()
   emit activeImageChanged("");
   emit activeImageTransferFunctionsChanged();
   emit landmarkPropertiesChanged();
+  //emit medicalDomainChanged();
   emit dataLoaded();
 }
 
@@ -611,5 +612,20 @@ void DataManagerImpl::transferFunctionsChangedSlot()
 {
   emit activeImageTransferFunctionsChanged();
 }
+
+MEDICAL_DOMAIN DataManagerImpl::getMedicalDomain() const
+{
+  return mMedicalDomain;
+}
+
+void DataManagerImpl::setMedicalDomain(MEDICAL_DOMAIN domain)
+{
+  if (mMedicalDomain==domain)
+    return;
+  mMedicalDomain = domain;
+  emit medicalDomainChanged();
+}
+
+
 } // namespace ssc
 

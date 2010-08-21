@@ -64,6 +64,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSlicePlanes3DRep.h
     Rep/sscGeometricRep.h
     Rep/sscSlicePlaneClipper.h
+    Rep/sscOrientationAnnotationRep.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h

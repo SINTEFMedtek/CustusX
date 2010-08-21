@@ -114,8 +114,8 @@ public:
 	virtual void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
 	virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
-	virtual MEDICAL_DOMAIN getMedicalDomain() const { return mMedicalDomain; }
-  virtual void setMedicalDomain(MEDICAL_DOMAIN domain) { mMedicalDomain = domain; }
+  virtual MEDICAL_DOMAIN getMedicalDomain() const;
+  virtual void setMedicalDomain(MEDICAL_DOMAIN domain);
 
 protected:
 	DataManagerImpl();

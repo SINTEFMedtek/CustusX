@@ -70,6 +70,7 @@ public:
 	void setToolOffset(double val); 
 	void setToolViewOffset(bool use, double viewportHeight, double viewOffset);
 	void setToolViewportHeight(double viewportHeight);
+	void setMedicalDomain(MEDICAL_DOMAIN domain);
 	SlicePlane getPlane() const;	
 
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, MEDICAL_DOMAIN domain);

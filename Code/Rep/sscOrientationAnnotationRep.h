@@ -15,13 +15,15 @@ typedef  boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotation
 
 class OrientationAnnotationRep : public ssc::RepImpl
 {
+  Q_OBJECT
 public:
 	static OrientationAnnotationRepPtr  New(const std::string& uid,const std::string& name);
 	virtual ~OrientationAnnotationRep();
 	virtual std::string getType() const { return "vm::OrientationAnnotationRep"; };
 	
 	void setPlaneType( PLANE_TYPE type);
-	
+private slots:
+  void medicalDomainChangedSlot();
 protected:
 	OrientationAnnotationRep(const std::string& uid, const std::string& name);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -32,6 +34,7 @@ protected:
 	void createAnnotation();
 	
 	OrientationAnnotationPtr mOrientation;
+	PLANE_TYPE mPlane;
 
 	std::string mNorthAnnotation;
 	std::string mSouthAnnotation;

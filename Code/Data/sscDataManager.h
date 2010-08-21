@@ -96,6 +96,7 @@ signals:
 	void activeImageTransferFunctionsChanged(); ///< emitted when the transfer functions in active image is changed
 	//void activeMeshChanged(const std::string& uId); ///< emitted when the active mesh is changed
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
+	void medicalDomainChanged();
 
 protected:
 	static void setInstance(DataManager* instance);

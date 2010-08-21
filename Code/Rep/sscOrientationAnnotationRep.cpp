@@ -42,7 +42,10 @@ OrientationAnnotation* OrientationAnnotation::New()
 OrientationAnnotationRep::OrientationAnnotationRep( const std::string& uid, const std::string& name) :
 RepImpl(uid, name)
 {
+  mPlane = ptCOUNT;
+  connect(dataManager(), SIGNAL(medicalDomainChanged()), this, SLOT(medicalDomainChangedSlot()));
 }
+
 OrientationAnnotationRepPtr OrientationAnnotationRep::New(const std::string& uid,const std::string& name)
 {
 	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(uid,name));
@@ -53,6 +56,11 @@ OrientationAnnotationRepPtr OrientationAnnotationRep::New(const std::string& uid
 OrientationAnnotationRep::~OrientationAnnotationRep()
 {
 
+}
+
+void OrientationAnnotationRep::medicalDomainChangedSlot()
+{
+  this->setPlaneType(mPlane);
 }
 
 void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
@@ -74,6 +82,7 @@ void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
   }
   }
 
+  mPlane = type;
   createAnnotation();
 }
 

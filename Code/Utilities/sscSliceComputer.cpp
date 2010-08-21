@@ -103,6 +103,11 @@ void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
   initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mMedicalDomain);
 }
 
+void SliceComputer::setMedicalDomain(MEDICAL_DOMAIN domain)
+{
+  mMedicalDomain = domain;
+}
+
 ORIENTATION_TYPE SliceComputer::getOrientationType() const
 {
   return mOrientType;

@@ -23,6 +23,7 @@ std::string SliceProxy::getName() const
 SliceProxy::SliceProxy()
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
+	connect(dataManager(), SIGNAL(medicalDomainChanged()), this, SLOT(medicalDomainChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
 	mDefaultCenter = ssc::DataManager::getInstance()->getCenter();
 	centerChangedSlot();
@@ -113,6 +114,12 @@ void SliceProxy::centerChangedSlot()
 	}	
 	
 	changed();
+}
+
+void SliceProxy::medicalDomainChangedSlot()
+{
+  mCutplane.setMedicalDomain(dataManager()->getMedicalDomain());
+  changed();
 }
 
 /**Group the typical plane definition uses together.
