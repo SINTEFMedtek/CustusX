@@ -33,6 +33,7 @@ public:
   void fillToolBar(QToolBar* toolbar);
 
   QString getActiveUidState();
+  void setActiveState(QString uid);
 
 signals:
   void activeStateChanged();
