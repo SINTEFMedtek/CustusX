@@ -12,7 +12,7 @@
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
 #include "cxNavigationWidget.h"
-#include "cxTransferFunctionWidget.h"
+//#include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxPatientRegistrationWidget.h"
@@ -39,7 +39,7 @@ MainWindow::MainWindow() :
   mToggleWidgetActionGroup(NULL),
   mImageRegistrationWidget(new ImageRegistrationWidget(this)),
   mPatientRegistrationWidget(new PatientRegistrationWidget(this)),
-  mTransferFunctionWidget(new TransferFunctionWidget(this)),
+  //mTransferFunctionWidget(new TransferFunctionWidget(this)),
   mShiftCorrectionWidget(new ShiftCorrectionWidget(this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
@@ -70,7 +70,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mReconstructionWidget);
   this->addAsDockWidget(mRegistrationHistoryWidget);
   this->addAsDockWidget(mBrowserWidget);
-  this->addAsDockWidget(mTransferFunctionWidget);
+  //this->addAsDockWidget(mTransferFunctionWidget);
   this->addAsDockWidget(mShiftCorrectionWidget);
   this->addAsDockWidget(mImageRegistrationWidget);
   this->addAsDockWidget(mPatientRegistrationWidget);
