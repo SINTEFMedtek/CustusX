@@ -18,6 +18,7 @@ SET ( ${LIB}_statemachineManager
 	cxApplicationStateMachine.cpp
 	cxApplicationStateMachine.h
 	cxApplicationState.h
+    cxApplicationState.cpp
 	cxRequestEnterStateTransition.h
 	cxPatientData.h
 	cxPatientData.cpp

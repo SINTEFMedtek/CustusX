@@ -20,6 +20,7 @@
 //#include "cxRepManager.h"
 //#include "cxView3D.h"
 //#include "cxView2D.h"
+#include "sscStringWidgets.h"
 
 #include "cxTransferFunctionWidget.h"
 #include "cxCroppingWidget.h"
@@ -28,121 +29,65 @@
 namespace cx
 {
 
+ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
+{
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),      this, SIGNAL(changed()));
+}
+
+QString ActiveImageStringDataAdapter::getValueName() const
+{
+  return "Active Volume";
+}
+bool ActiveImageStringDataAdapter::setValue(const QString& value)
+{
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  if (newImage==ssc::dataManager()->getActiveImage())
+    return false;
+  ssc::dataManager()->setActiveImage(newImage);
+  return true;
+}
+QString ActiveImageStringDataAdapter::getValue() const
+{
+  if (!ssc::dataManager()->getActiveImage())
+    return "";
+  return qstring_cast(ssc::dataManager()->getActiveImage()->getUid());
+}
+QString ActiveImageStringDataAdapter::getHelp() const
+{
+  return "select the active volume";
+}
+QStringList ActiveImageStringDataAdapter::getValueRange() const
+{
+  std::vector<std::string> uids = ssc::dataManager()->getImageUids();
+  QStringList retval;
+  for (unsigned i=0; i<uids.size(); ++i)
+    retval << qstring_cast(uids[i]);
+  return retval;
+}
+QString ActiveImageStringDataAdapter::convertInternal2Display(QString internal)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(internal));
+  if (!image)
+    return "<no volume>";
+  return qstring_cast(image->getName());
+}
+
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
 
 ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
-  QWidget(parent),
-  mImagesComboBox(new QComboBox(this))
+  QWidget(parent)
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   this->setObjectName("ActiveVolumeWidget");
   layout->setMargin(0);
 
-  //combobox
-  mImagesComboBox->setEditable(false);
-  mImagesComboBox->setEnabled(false);
-  connect(mImagesComboBox, SIGNAL(currentIndexChanged(const QString& )), this, SLOT(imageSelectedSlot(const QString& )));
-
-  //layout
-  layout->addWidget(mImagesComboBox);
-
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateTheImageComboBoxSlot()));
-  connect(viewManager(), SIGNAL(imageDeletedFromViews(ssc::ImagePtr)), this, SLOT(populateTheImageComboBoxSlot()));
-  this->populateTheImageComboBoxSlot();
-
-  // Delete image
-//  connect(this, SIGNAL(deleteImage(ssc::ImagePtr)), ssc::dataManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
-  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)), viewManager(), SLOT(deleteImageSlot(ssc::ImagePtr)));
-
-  //listen for active image changed from the datamanager
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(activeImageChangedSlot()));
+  ssc::ComboGroupWidget*  combo = new ssc::ComboGroupWidget(this, ActiveImageStringDataAdapter::New());
+  layout->addWidget(combo);
 }
-
-ActiveVolumeWidget::~ActiveVolumeWidget()
-{
-}
-
-//void ActiveVolumeWidget::deleteCurrentImageSlot()
-//{
-//  if (mCurrentImage.use_count() == 0)
-//  {
-//    ssc::messageManager()->sendWarning("Can't delete image, no current Image!");
-//    return;
-//  }
-//  emit deleteImage(mCurrentImage);
-//}
-
-void ActiveVolumeWidget::populateTheImageComboBoxSlot()
-{
-  mImagesComboBox->blockSignals(true);
-  mImagesComboBox->clear();
-
-  //get a list of images from the datamanager
-  std::map<std::string, ssc::ImagePtr> images = ssc::dataManager()->getImages();
-  if(images.size() == 0)
-  {
-    mImagesComboBox->insertItem(1, QString("Import an image to begin..."));
-    mImagesComboBox->setEnabled(false);
-    return;
-  }
-
-  mImagesComboBox->setEnabled(true);
-
-  //add these to the combobox
-  typedef std::map<std::string, ssc::ImagePtr>::iterator iterator;
-  mImagesComboBox->insertItem(1, QString("<No image selected>"));
-  int listPosition = 2;
-  for(iterator i = images.begin(); i != images.end(); ++i)
-  {
-    mImagesComboBox->insertItem(listPosition, QString(i->first.c_str()));
-    listPosition++;
-  }
-  mImagesComboBox->blockSignals(false);
-}
-
-void ActiveVolumeWidget::imageSelectedSlot(const QString& comboBoxText)
-{
-  //messageMan()->sendInfo("New image selected: "+comboBoxText.toStdString());
-  if(comboBoxText.isEmpty() || comboBoxText.endsWith("...")
-     || comboBoxText.endsWith(">"))
-  {
-    // Create empty current image
-   // mCurrentImage.reset();
-    ssc::dataManager()->setActiveImage(ssc::ImagePtr());
-
-    //emit currentImageChanged(mCurrentImage); //TODO remove
-    return;
-  }
-
-  std::string imageId = comboBoxText.toStdString();
-
-  //find the image
-  ssc::ImagePtr image = ssc::dataManager()->getImage(imageId);
-  if(!image)
-  {
-    ssc::messageManager()->sendError("Could not find the selected image in the DataManager: "+imageId);
-    return;
-  }
-
-  //Set new current image
-  ssc::dataManager()->setActiveImage(image);
-}
-
-void ActiveVolumeWidget::activeImageChangedSlot()
-{
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-
-  QString uid;
-  if (activeImage)
-      uid = qstring_cast(activeImage->getUid());
-  this->imageSelectedSlot(uid);
-
-  //find the index in the combobox and set it
-  int index = mImagesComboBox->findText(uid);
-  mImagesComboBox->blockSignals(true);
-  mImagesComboBox->setCurrentIndex(index);
-  mImagesComboBox->blockSignals(false);
-}
-
 
 /// -------------------------------------------------------
 /// -------------------------------------------------------
