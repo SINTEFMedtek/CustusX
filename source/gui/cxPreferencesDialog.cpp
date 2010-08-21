@@ -47,7 +47,7 @@ void FoldersTab::init()
           SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
   
   // Choose application name
-  QLabel* chooseApplicationLabel = new QLabel(tr("Choose application name:"));
+  QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
   connect(mChooseApplicationComboBox,

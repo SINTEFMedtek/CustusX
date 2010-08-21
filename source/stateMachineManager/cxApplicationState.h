@@ -21,77 +21,30 @@
 //#include "cxPatientData.h"
 //#include "cxViewManager.h"
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
+#include "cxStateMachineManager.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
+
 /**
  */
-
 class ApplicationState : public QState
 {
   Q_OBJECT
-
 public:
-  ApplicationState(QState* parent, QString uid, QString name) :
-    QState(parent),
-    mUid(uid), mName(name), mAction(NULL), mActive(false)
-  {
-  };
-
-  virtual ~ApplicationState(){};
-
-  virtual void onEntry(QEvent * event )
-  {
-    mActive = true;
-    ssc::messageManager()->sendInfo("Application change to [" + string_cast(mName) + "]");
-    if(mAction)
-      mAction->setChecked(true);
-  };
-  virtual void onExit(QEvent * event )
-  {
-    mActive = false;
-    //std::cout << "Exiting application "<< mName << std::endl;
-  };
-
-  virtual QString getUid() const {return mUid;};
-  virtual QString getName() const {return mName;};
-
-  std::vector<ApplicationState*> getChildStates()
-  {
-    QObjectList childrenList = this->children();
-    std::vector<ApplicationState*> retval;
-    for (int i=0; i<childrenList.size(); ++i)
-    {
-      ApplicationState* state = dynamic_cast<ApplicationState*>(childrenList[i]);
-      if (state)
-        retval.push_back(state);
-    }
-    return retval;
-  }
-
-  QAction* createAction(QActionGroup* group)
-  {
-    if(mAction)
-      return mAction;
-
-    mAction = new QAction(this->getName(), group);
-    mAction->setCheckable(true);
-    mAction->setChecked(mActive);
-    mAction->setData(QVariant(this->getUid()));
-    //this->canEnterSlot();
-
-    connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
-
-    return mAction;
-  };
-
+  ApplicationState(QState* parent, QString uid, QString name);
+  virtual ~ApplicationState();
+  virtual void onEntry(QEvent * event );
+  virtual void onExit(QEvent * event );
+  virtual QString getUid() const;
+  virtual QString getName() const;
+  std::vector<ApplicationState*> getChildStates();
+  QAction* createAction(QActionGroup* group);
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const = 0;
 protected slots:
-
-  void setActionSlot()
-  {
-    this->machine()->postEvent(new RequestEnterStateEvent(this->getUid()));
-  };
-
+  void setActionSlot();
 protected:
   QString mUid;
   QString mName;
@@ -102,59 +55,42 @@ protected:
 class ParentApplicationState : public ApplicationState
 {
   Q_OBJECT
-
 public:
-  ParentApplicationState(QState* parent) :
-    ApplicationState(parent, "ParentUid", "Parent")
-  {  };
-
-  virtual void onEntry(QEvent * event )
-  {
-  };
-  virtual void onExit(QEvent * event )
-  {
-  };
-
+  ParentApplicationState(QState* parent) : ApplicationState(parent, "ParentUid", "Parent") {}
+  virtual void onEntry(QEvent * event ) {}
+  virtual void onExit(QEvent * event ) {}
   virtual ~ParentApplicationState(){};
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdCOUNT; }
 };
 
 class LaboratoryApplicationState : public ApplicationState
 {
   Q_OBJECT
-
 public:
-  LaboratoryApplicationState(QState* parent) :
-    ApplicationState(parent, "Lab", "Laboratory")
-  {  };
+  LaboratoryApplicationState(QState* parent) : ApplicationState(parent, "Lab", "Laboratory") {}
   virtual ~LaboratoryApplicationState(){};
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLABORATORY; }
 };
 
 class NeurologyApplicationState : public ApplicationState
 {
   Q_OBJECT
-
 public:
-  NeurologyApplicationState(QState* parent) :
-    ApplicationState(parent, "Nevro", "Neurology")
-  {  };
-  virtual ~NeurologyApplicationState(){};
+  NeurologyApplicationState(QState* parent) : ApplicationState(parent, "Nevro", "Neurology") {}
+  virtual ~NeurologyApplicationState() {}
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdNEUROLOGY; }
 };
 
 class LaparascopyApplicationState : public ApplicationState
 {
   Q_OBJECT
-
 public:
-  LaparascopyApplicationState(QState* parent) :
-    ApplicationState(parent, "Lap", "Laparascopy")
-  {
-  };
-  virtual ~LaparascopyApplicationState(){};
+  LaparascopyApplicationState(QState* parent) : ApplicationState(parent, "Lap", "Laparascopy") {}
+  virtual ~LaparascopyApplicationState() {}
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLAPAROSCOPY; }
 };
 
-
-
-}
+} // namespace cx
 
 
 #endif /* CXAPPLICATIONSTATE_H_ */

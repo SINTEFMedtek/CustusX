@@ -19,7 +19,7 @@ namespace cx
 {
 class MessageManager;
 class ViewManager;
-  
+
 /**
  * \class FoldersTab
  *

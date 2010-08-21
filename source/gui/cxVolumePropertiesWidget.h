@@ -10,30 +10,41 @@
 
 #include <QWidget>
 #include "sscForwardDeclarations.h"
+#include "sscStringDataAdapter.h"
 class QComboBox;
 
 namespace cx
 {
 
-/**
+/** Adapter that connects to the current active image.
+ */
+class ActiveImageStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveImageStringDataAdapter()); }
+  ActiveImageStringDataAdapter();
+  virtual ~ActiveImageStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
+
+/** Widget that contains a select active image combo box.
  */
 class ActiveVolumeWidget : public QWidget
 {
   Q_OBJECT
 public:
   ActiveVolumeWidget(QWidget* parent);
-  ~ActiveVolumeWidget();
-
-signals:
-  void changeTabIndex(int index); ///< Send a signal when the tab index must be changed
-
-protected slots:
-  void populateTheImageComboBoxSlot(); ///< populates the combobox with the images loaded into the datamanager
-  void imageSelectedSlot(const QString& comboBoxText); ///< sends out a signal and adds reps of the image to the views
-  void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
-
-protected:
-  QComboBox* mImagesComboBox; ///< combobox for displaying available images
+  ~ActiveVolumeWidget() {}
 };
 
 
