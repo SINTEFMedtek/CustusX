@@ -46,6 +46,7 @@ void ApplicationState::onEntry(QEvent * event )
     mAction->setChecked(true);
 
   ssc::dataManager()->setMedicalDomain(this->getMedicalDomain());
+  stateManager()->getWorkflow()->setActiveState("PatientDataUid");
   stateManager()->getPatientData()->clearPatient();
 };
 

@@ -86,6 +86,10 @@ void WorkflowStateMachine::fillMenu(QMenu* menu, WorkflowState* current)
   }
 }
 
+void WorkflowStateMachine::setActiveState(QString uid)
+{
+  this->postEvent(new RequestEnterStateEvent(uid));
+}
 
 void WorkflowStateMachine::fillToolBar(QToolBar* toolbar)
 {
