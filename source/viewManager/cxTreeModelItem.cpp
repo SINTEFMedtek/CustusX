@@ -9,9 +9,17 @@
 #include "cxDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
+#include "cxBrowserWidget.h"
 
 namespace cx
 {
+
+TreeItemPtr TreeItemImpl::create(BrowserItemModel* model)
+{
+  TreeItemImpl* retval = new TreeItemImpl(TreeItemWeakPtr(),"","","");
+  retval->mModel = model;
+  return TreeItemPtr(retval);
+}
 
 TreeItemPtr TreeItemImpl::create(TreeItemWeakPtr parent, QString name, QString type, QString val)
 {
@@ -23,10 +31,14 @@ TreeItemPtr TreeItemImpl::create(TreeItemWeakPtr parent, QString name, QString t
 
 TreeItemImpl::TreeItemImpl(TreeItemWeakPtr parent, QString name, QString type, QString val) :
   mParent(parent),
-  mName(name), mType(type), mData(val)
+  mName(name), mType(type), mData(val), mModel(NULL)
 {
-
+  if (parent.lock())
+  {
+    mModel = parent.lock()->getModel();
+  }
 }
+
 TreeItemPtr TreeItemImpl::addChild(TreeItemPtr child)
 {
   mChildren.push_back(child);
@@ -65,6 +77,36 @@ TreeItemPtr TreeItemImage::create(TreeItemWeakPtr parent, std::string uid)
     parent.lock()->addChild(retval);
   return retval;
 }
+
+TreeItemImage::TreeItemImage(TreeItemWeakPtr parent, std::string uid) :
+    TreeItemImpl(parent,"","image",""),
+    mUid(uid)
+{
+//  QObject::connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), mModel, SLOT(treeItemChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SIGNAL(changed()));
+  connect(this, SIGNAL(changed()), mModel, SLOT(treeItemChangedSlot()));
+}
+
+QFont TreeItemImage::getFont() const
+{
+  QFont retval;
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (image && image->getUid()==mUid)
+  {
+    retval.setBold(true);
+    retval.setItalic(true);
+  }
+  return retval;
+}
+
+
+TreeItemImage::~TreeItemImage()
+{
+  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SIGNAL(changed()));
+  disconnect(this, SIGNAL(changed()), mModel, SLOT(treeItemChangedSlot()));
+//  QObject::disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), mModel, SLOT(treeItemChangedSlot()));
+}
+//void QAbstractItemModel::dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight )
 
 QString TreeItemImage::getName() const
 {

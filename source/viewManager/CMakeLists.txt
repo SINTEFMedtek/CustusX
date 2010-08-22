@@ -9,6 +9,7 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxViewWrapper.h
 	cxViewGroup.h
 	#cxViewGroupInria.h
+	cxTreeModelItem.h
 )
 
 SET ( ${LIB}_viewManager
@@ -31,6 +32,7 @@ SET ( ${LIB}_viewManager
     cxLayoutData.cpp
     #cxViewGroupInria.h
     #cxViewGroupInria.cpp
+    cxTreeModelItem.h
     cxTreeModelItem.cpp
 )
 
