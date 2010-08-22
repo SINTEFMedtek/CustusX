@@ -37,7 +37,8 @@ public:
 
 signals:
   void activeStateChanged();
-
+private slots:
+  void startedSlot();
 private:
   void fillMenu(QMenu* menu, WorkflowState* current);
   void fillToolbar(QToolBar* toolbar, WorkflowState* current);
@@ -50,6 +51,7 @@ private:
   WorkflowStateMap mStates;
   WorkflowState* mParentState;
   QActionGroup* mActionGroup;
+  bool mStarted;
 };
 
 typedef boost::shared_ptr<WorkflowStateMachine> WorkflowStateMachinePtr;

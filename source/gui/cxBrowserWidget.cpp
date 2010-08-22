@@ -53,7 +53,7 @@ void BrowserItemModel::buildTree()
   bool showImages = filter=="all" || filter=="images";
   bool showTools  = filter=="all" || filter=="tools";
 
-  mTree = TreeItemImpl::create(TreeItemWeakPtr(), "","","");
+  mTree = TreeItemImpl::create(this);
 
   if (showViews)
   {
@@ -98,11 +98,21 @@ BrowserItemModel::~BrowserItemModel()
 
 void BrowserItemModel::currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous)
 {
-  std::cout << "item changed" << std::endl;
+  //std::cout << "item changed" << std::endl;
   TreeItem *item = this->itemFromIndex(current);
   if (!item)
     return;
   item->activate();
+}
+
+void BrowserItemModel::treeItemChangedSlot()
+{
+  //std::cout << "BrowserItemModel::treeItemChangedSlot()" << std::endl;
+  TreeItem* item = dynamic_cast<TreeItem*>(sender());
+  //std::cout << "item " << item << std::endl;
+  QModelIndex index = this->createIndex(0,0,item);
+  emit dataChanged(index, index);
+  //void QAbstractItemModel::dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight )
 }
 
 TreeItem* BrowserItemModel::itemFromIndex(const QModelIndex& index) const
@@ -140,6 +150,11 @@ QVariant BrowserItemModel::data(const QModelIndex& index, int role) const
       return item->getType();
     if (index.column()==2)
       return item->getData();
+  }
+  if (role==Qt::FontRole)
+  {
+    TreeItem *item = this->itemFromIndex(index);
+    return item->getFont();
   }
   return QVariant();
 }

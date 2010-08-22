@@ -45,6 +45,7 @@ signals:
 
 public slots:
   void buildTree();
+  void treeItemChangedSlot();
 
 private slots:
   void currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous);

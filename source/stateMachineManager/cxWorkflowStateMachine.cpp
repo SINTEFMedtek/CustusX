@@ -10,6 +10,8 @@ namespace cx
 
 WorkflowStateMachine::WorkflowStateMachine()
 {
+  mStarted = false;
+  connect(this, SIGNAL(started()), this, SLOT(startedSlot()));
   mActionGroup = new QActionGroup(NULL);
 
   mParentState = new ParentWorkflowState(this);
@@ -34,6 +36,11 @@ WorkflowStateMachine::WorkflowStateMachine()
   this->setInitialState(mParentState);
   mParentState->setInitialState(patientData);
   registration->setInitialState(imageRegistration);
+}
+
+void WorkflowStateMachine::startedSlot()
+{
+  mStarted = true;
 }
 
 WorkflowState* WorkflowStateMachine::newState(WorkflowState* state)
@@ -88,7 +95,8 @@ void WorkflowStateMachine::fillMenu(QMenu* menu, WorkflowState* current)
 
 void WorkflowStateMachine::setActiveState(QString uid)
 {
-  this->postEvent(new RequestEnterStateEvent(uid));
+  if (mStarted)
+    this->postEvent(new RequestEnterStateEvent(uid));
 }
 
 void WorkflowStateMachine::fillToolBar(QToolBar* toolbar)

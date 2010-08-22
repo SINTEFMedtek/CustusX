@@ -62,6 +62,7 @@ QStringList ActiveImageStringDataAdapter::getValueRange() const
 {
   std::vector<std::string> uids = ssc::dataManager()->getImageUids();
   QStringList retval;
+  retval << "";
   for (unsigned i=0; i<uids.size(); ++i)
     retval << qstring_cast(uids[i]);
   return retval;
