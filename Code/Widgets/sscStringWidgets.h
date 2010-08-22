@@ -28,7 +28,7 @@ public:
   ComboGroupWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
 private slots:
   void dataChanged();
-  void comboIndexChanged(const QString& val);
+  void comboIndexChanged(int val);
 private:
   QLabel* mLabel;
   QComboBox* mCombo;

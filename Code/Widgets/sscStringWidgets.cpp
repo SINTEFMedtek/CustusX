@@ -29,7 +29,7 @@ ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr da
 
   mCombo = new QComboBox(this);
   topLayout->addWidget(mCombo);
-  connect(mCombo, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(comboIndexChanged(const QString&)));
+  connect(mCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(comboIndexChanged(int)));
 
   if (gridLayout) // add to input gridlayout
   {
@@ -45,11 +45,10 @@ ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr da
   dataChanged();
 }
 
-void ComboGroupWidget::comboIndexChanged(const QString& val)
+void ComboGroupWidget::comboIndexChanged(int index)
 {
-  mData->setValue(val);
+  mData->setValue(mCombo->itemData(index).toString());
 }
-
 
 void ComboGroupWidget::dataChanged()
 {
@@ -61,6 +60,7 @@ void ComboGroupWidget::dataChanged()
   for (int i=0; i<range.size(); ++i)
   {
     mCombo->addItem(mData->convertInternal2Display(range[i]));
+    mCombo->setItemData(i, range[i]);
     if (range[i]==currentValue)
       mCombo->setCurrentIndex(i);
   }
@@ -69,7 +69,6 @@ void ComboGroupWidget::dataChanged()
   mLabel->setToolTip(mData->getHelp());
   mCombo->blockSignals(false);
 }
-
 
 
 } // namespace ssc
