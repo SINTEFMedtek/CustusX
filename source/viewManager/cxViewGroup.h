@@ -63,6 +63,7 @@ public:
   void clearPatientData();
   double getZoom2D();
   std::vector<ssc::ImagePtr> getImages() { return mImages; }
+  ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
 
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);

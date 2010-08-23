@@ -44,6 +44,7 @@ private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
+  void fillSlicePlanesActionSlot(bool checked);
   //void slicePlanesChangedSlot();
   void clipActionSlot();
 
@@ -63,7 +64,7 @@ private:
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
-  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
+//  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
 
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;

@@ -37,7 +37,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->connectContextMenu(mView);
   std::string index = QString::number(startIndex).toStdString();
 
-  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+//  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
 
 //  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
@@ -73,40 +73,52 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   connect(slicePlanesAction, SIGNAL(triggered(bool)),
           this, SLOT(showSlicePlanesActionSlot(bool)));
 
+  QAction* fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
+  fillSlicePlanesAction->setCheckable(true);
+  fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
+  //obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
+  fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
+  connect(fillSlicePlanesAction, SIGNAL(triggered(bool)),
+          this, SLOT(fillSlicePlanesActionSlot(bool)));
+
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
+  contextMenu.addAction(fillSlicePlanesAction);
 
-//  for (unsigned i=0; i<mImage.size(); ++i)
-  for (VolumetricRepMap::iterator iter = mVolumetricReps.begin(); iter!=mVolumetricReps.end(); ++iter)
-  {
-    QAction* clipAction = new QAction("Clip " + qstring_cast(iter->second->getImage()->getName()), &contextMenu);
-    clipAction->setCheckable(true);
-    clipAction->setData(qstring_cast(iter->first));
-    clipAction->setChecked(mSlicePlaneClipper->getVolumes().count(iter->second));
-    connect(clipAction, SIGNAL(triggered()),
-            this, SLOT(clipActionSlot()));
-    contextMenu.addAction(clipAction);
-  }
+//  for (VolumetricRepMap::iterator iter = mVolumetricReps.begin(); iter!=mVolumetricReps.end(); ++iter)
+//  {
+//    QAction* clipAction = new QAction("Clip " + qstring_cast(iter->second->getImage()->getName()), &contextMenu);
+//    clipAction->setCheckable(true);
+//    clipAction->setData(qstring_cast(iter->first));
+//    clipAction->setChecked(mSlicePlaneClipper->getVolumes().count(iter->second));
+//    connect(clipAction, SIGNAL(triggered()),
+//            this, SLOT(clipActionSlot()));
+//    contextMenu.addAction(clipAction);
+//  }
 }
 
 void ViewWrapper3D::clipActionSlot()
 {
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (!action)
-    return;
-  std::string uid = string_cast(action->data().toString());
-
-  ssc::SliceProxyPtr slicer = mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy;
-  mSlicePlaneClipper->setSliceProxy(slicer);
-  if (action->isChecked())
-    mSlicePlaneClipper->addVolume(mVolumetricReps[uid]);
-  else
-    mSlicePlaneClipper->removeVolume(mVolumetricReps[uid]);
+//  QAction* action = dynamic_cast<QAction*>(sender());
+//  if (!action)
+//    return;
+//  std::string uid = string_cast(action->data().toString());
+//
+//  ssc::SliceProxyPtr slicer = mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy;
+//  mSlicePlaneClipper->setSliceProxy(slicer);
+//  if (action->isChecked())
+//    mSlicePlaneClipper->addVolume(mVolumetricReps[uid]);
+//  else
+//    mSlicePlaneClipper->removeVolume(mVolumetricReps[uid]);
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
 {
   mSlicePlanes3DRep->getProxy()->setVisible(checked);
+}
+void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
+{
+  mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
 void ViewWrapper3D::addImage(ssc::ImagePtr image)
