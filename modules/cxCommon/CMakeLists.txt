@@ -5,6 +5,8 @@
 #
 #--------------------------------------------------------------------------------
 
+SET(LIBNAME cxCommon)
+
 # Boost
 #----------
 find_package( Boost REQUIRED )
@@ -17,11 +19,23 @@ include(${QT_USE_FILE})
 
 include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
+SET(${LIBNAME}_MOC_HDRS
+  UsConfigGui.h
+)
+
+IF(WIN32)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} ${QTUI_HEADERFILES} OPTIONS "-D_WINDOWS")
+ELSE(WIN32)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
+ENDIF(WIN32)
+
 add_library(cxCommon
     cxDataLocations.cpp
     cxDataLocations.h
     probeXmlConfigParser.h
     probeXmlConfigParser.cpp
+    UsConfigGui.h
+    UsConfigGui.cpp
     )
     
 target_link_libraries(cxCommon ${QT_LIBRARIES})
