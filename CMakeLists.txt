@@ -50,7 +50,7 @@ IF (WIN32)
 ENDIF (WIN32)
 
 # name of folder where all executables, config etc are assembled
-SET(INSTALL_FOLDER_NAME "CustusX ${VERSION_NUMBER}")
+SET(INSTALL_FOLDER_NAME "CustusX")
 
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
