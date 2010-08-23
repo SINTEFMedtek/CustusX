@@ -28,6 +28,40 @@ namespace cx
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 
+/**Helper class for clipping the active volume using a specific slice plane.
+ * The visible slice planes are the only ones allowed for clipping.
+ */
+class InteractiveClipper : public QObject
+{
+  Q_OBJECT
+public:
+  InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy);
+
+  void setSlicePlane(ssc::PLANE_TYPE plane);
+  void saveClipPlaneToVolume(); ///< save the current clip to image
+  void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
+  ssc::PLANE_TYPE getSlicePlane();
+  bool getUseClipper() const;
+  bool getInvertPlane() const;
+  std::vector<ssc::PLANE_TYPE> getAvailableSlicePlanes() const;
+signals:
+  void changed();
+public slots:
+  void useClipper(bool on);
+  void invertPlane(bool on);
+private slots:
+//  void activeLayoutChangedSlot();
+//  void activeImageChangedSlot();
+  void changedSlot();
+
+private:
+  ssc::PLANE_TYPE getPlaneType();
+  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
+  ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
+  bool mUseClipper;
+};
+typedef boost::shared_ptr<InteractiveClipper> InteractiveClipperPtr;
+
 /**
  * \class ViewManager
  *
@@ -78,6 +112,8 @@ public:
   void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
   void parseXml(QDomNode viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
   void clear();
+
+  InteractiveClipperPtr getClipper();
 
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
@@ -158,6 +194,7 @@ protected:
 
   ViewCache<View2D> mViewCache2D;
   ViewCache<View3D> mViewCache3D;
+  InteractiveClipperPtr mInteractiveClipper;
 
 private:
   ViewManager(ViewManager const&);
