@@ -41,7 +41,6 @@ public:
     Vector3D mPointPos_normvp; ///< position of symbol in normalized space <0..1, 0..1>
     PLANE_TYPE mClipPlane; ///< what plane to use for 3D clipping
     int mLineWidth; ///< draw wireframe lines. 0 means no line
-    bool mDrawPlane; ///< turn opaque plane drawing on/off
 	};
 
 	struct DataType
@@ -54,11 +53,14 @@ public:
 	};
 	typedef std::map<PLANE_TYPE, DataType> DataMap;
 
+	void clearViewports();
 	void setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s);
 	DataMap getData();
 
 	void setVisible(bool visible);
 	bool getVisible() const;
+	void setDrawPlanes(bool on);
+	bool getDrawPlanes() const;
 	PropertiesType& getProperties() { return mProperties; } // use this to set properties BEFORE attaching reps/calling setviewportdata()
 		
 signals:
@@ -66,6 +68,7 @@ signals:
 private:
 	PropertiesType mProperties;
 	bool mVisible;
+  bool mDrawPlane; ///< turn opaque plane drawing on/off
 	DataMap mData;
 //	std::vector<Vector3D> mColors;
 };

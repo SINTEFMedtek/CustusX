@@ -17,6 +17,7 @@ namespace ssc
 SlicePlanesProxy::SlicePlanesProxy()
 {
   mVisible = true;
+  mDrawPlane = false;
 
   Vector3D color1(0,   1,   1);
   Vector3D color2(0,   0.6, 1);
@@ -45,7 +46,12 @@ SlicePlanesProxy::SlicePlanesProxy()
   mProperties.mPointPos_normvp = Vector3D(0.1,0.8,0.0);
   mProperties.mClipPlane = ptANYPLANE;
   mProperties.mLineWidth = 2;
-  mProperties.mDrawPlane = false;
+//  mProperties.mDrawPlane = false;
+}
+
+void SlicePlanesProxy::clearViewports()
+{
+  mData.clear();
 }
 
 void SlicePlanesProxy::setVisible(bool visible)
@@ -58,6 +64,18 @@ bool SlicePlanesProxy::getVisible() const
 {
   return mVisible;
 }
+
+void SlicePlanesProxy::setDrawPlanes(bool on)
+{
+  mDrawPlane = on;
+  emit changed();
+}
+
+bool SlicePlanesProxy::getDrawPlanes() const
+{
+  return mDrawPlane;
+}
+
 
 void SlicePlanesProxy::setViewportData(PLANE_TYPE type, ssc::SliceProxyPtr slice, const DoubleBoundingBox3D& vp_s)
 {
@@ -209,7 +227,7 @@ void SlicePlanes3DRep::changedSlot()
 		{
 			data.mRect->updatePosition(base.vp_s, rMs);
 			data.mRect->setLine(mProxy->getProperties().mLineWidth!=0, mProxy->getProperties().mLineWidth);
-			data.mRect->setSurface(mProxy->getProperties().mDrawPlane);
+			data.mRect->setSurface(mProxy->getDrawPlanes());
 		}
 		if (data.mAxes)
 		{

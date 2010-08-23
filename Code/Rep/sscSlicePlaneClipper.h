@@ -11,6 +11,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "sscForwardDeclarations.h"
+#include "sscVector3D.h"
 
 namespace ssc
 {
@@ -27,17 +28,23 @@ public:
 
   static SlicePlaneClipperPtr New();
   ~SlicePlaneClipper();
-  void setSliceProxy(ssc::SliceProxyPtr slicer);
+  void setSlicer(ssc::SliceProxyPtr slicer);
   void clearVolumes();
   void addVolume(ssc::VolumetricRepPtr volume);
   void removeVolume(ssc::VolumetricRepPtr volume);
   VolumesType getVolumes();
+  ssc::SliceProxyPtr getSlicer();
+  void setInvertPlane(bool on);
+  bool getInvertPlane() const;
 
 private slots:
   void changedSlot();
 private:
+  SlicePlaneClipper();
+  ssc::Vector3D getUnitNormal() const;
   ssc::SliceProxyPtr mSlicer;
   VolumesType mVolumes;
+  bool mInvertPlane;
 };
 
 } // namespace ssc

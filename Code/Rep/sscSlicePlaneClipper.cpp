@@ -25,12 +25,17 @@ SlicePlaneClipperPtr SlicePlaneClipper::New()
   return SlicePlaneClipperPtr(new SlicePlaneClipper());
 }
 
+SlicePlaneClipper::SlicePlaneClipper() :
+  mInvertPlane(false)
+{
+}
+
 SlicePlaneClipper::~SlicePlaneClipper()
 {
   this->clearVolumes();
 }
 
-void SlicePlaneClipper::setSliceProxy(ssc::SliceProxyPtr slicer)
+void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
 {
   if (mSlicer==slicer)
     return;
@@ -41,6 +46,11 @@ void SlicePlaneClipper::setSliceProxy(ssc::SliceProxyPtr slicer)
   mSlicer = slicer;
   connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(changedSlot()));
   this->changedSlot();
+}
+
+ssc::SliceProxyPtr SlicePlaneClipper::getSlicer()
+{
+  return mSlicer;
 }
 
 void SlicePlaneClipper::clearVolumes()
@@ -54,12 +64,16 @@ void SlicePlaneClipper::clearVolumes()
 
 void SlicePlaneClipper::addVolume(ssc::VolumetricRepPtr volume)
 {
+  if (!volume)
+    return;
   mVolumes.insert(volume);
   this->changedSlot();
 }
 
 void SlicePlaneClipper::removeVolume(ssc::VolumetricRepPtr volume)
 {
+  if (!volume)
+    return;
   volume->getVtkVolume()->GetMapper()->RemoveAllClippingPlanes();
   mVolumes.erase(volume);
   this->changedSlot();
@@ -70,10 +84,35 @@ SlicePlaneClipper::VolumesType SlicePlaneClipper::getVolumes()
   return mVolumes;
 }
 
+void SlicePlaneClipper::setInvertPlane(bool on)
+{
+  mInvertPlane = on;
+  changedSlot();
+}
+
+bool SlicePlaneClipper::getInvertPlane() const
+{
+  return mInvertPlane;
+}
+
+/** return an untransformed plane normal to use during clipping.
+ *  The direction is dependent in invertedPlane()
+ */
+ssc::Vector3D SlicePlaneClipper::getUnitNormal() const
+{
+  if (mInvertPlane)
+    return ssc::Vector3D(0,0,1);
+  else
+    return ssc::Vector3D(0,0,-1);
+}
+
 void SlicePlaneClipper::changedSlot()
 {
+  if (!mSlicer)
+    return;
   ssc::Transform3D rMs = mSlicer->get_sMr().inv();
-  ssc::Vector3D n = rMs.vector(ssc::Vector3D(0,0,-1));
+
+  ssc::Vector3D n = rMs.vector(this->getUnitNormal());
   ssc::Vector3D p = rMs.coord(ssc::Vector3D(0,0,0));
   vtkPlanePtr plane = vtkPlanePtr::New();
   plane->SetNormal(n.begin());
@@ -81,9 +120,6 @@ void SlicePlaneClipper::changedSlot()
 
   for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
   {
-//    std::cout << "coronal: <" << n << "> <" << p << ">" << std::endl;
-//    std::cout << "BB: " << iter->second->getImage()->boundingBox() << std::endl;
-//
     (*iter)->getVtkVolume()->GetMapper()->RemoveAllClippingPlanes();
     (*iter)->getVtkVolume()->GetMapper()->AddClippingPlane(plane);
   }
