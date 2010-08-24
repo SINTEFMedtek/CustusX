@@ -20,13 +20,12 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
-#include "cxDataManager.h"
 #include "sscToolManager.h"
-//#include "cxInriaRep2D.h"
-#include "cxLandmarkRep.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscSlicePlaneClipper.h"
+#include "cxLandmarkRep.h"
+#include "cxRepManager.h"
+#include "cxDataManager.h"
 
 namespace cx
 {
@@ -55,7 +54,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mView->addRep(mDataNameText);
 
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-  toolsAvailableSlot();
+  this->toolsAvailableSlot();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
@@ -200,11 +199,11 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
     return;
   mImage.erase(std::find(mImage.begin(), mImage.end(), image));
 
-  ssc::messageManager()->sendInfo("remove image from view group 3d: "+image->getName());
+  ssc::messageManager()->sendDebug("Remove image from view group 3d: "+image->getName());
   mView->removeRep(mVolumetricReps[image->getUid()]);
   mVolumetricReps.erase(image->getUid());
 
-  updateView();
+  this->updateView();
 
   emit imageRemoved(qstring_cast(image->getUid()));
 }
@@ -258,7 +257,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 //  if (!toolManager()->isConfigured())
 //    return;
 
-  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getConfiguredTools();
+  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
@@ -276,6 +275,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     toolRep->setTool(iter->second);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
+    ssc::messageManager()->sendDebug("ToolRep3D for tool "+iter->second->getName()+" added to view "+mView->getName()+".");
   }
 
 //

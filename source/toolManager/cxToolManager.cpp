@@ -46,7 +46,7 @@ ToolManager::ToolManager() :
       mLoggingFolder(""),
       mTracker(TrackerPtr()),
       mConfiguredTools(new ssc::ToolManager::ToolMap), //TODO Why was this commented out???
-      mConnectedTools(new ssc::ToolManager::ToolMap), mDominantTool(
+      mInitializedTools(new ssc::ToolManager::ToolMap), mDominantTool(
           ssc::ToolPtr()), mReferenceTool(ssc::ToolPtr()), mConfigured(false),
       mInitialized(false), mTracking(false), mPulseGenerator(
           igstk::PulseGenerator::New())
@@ -285,14 +285,25 @@ ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
   return mConfiguredTools;
 }
+
+ssc::ToolManager::ToolMapPtr ToolManager::getInitializedTools()
+{
+  return mInitializedTools;
+}
+
 ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 {
-  return mConnectedTools;
+  ssc::ToolManager::ToolMapPtr allTools;
+  allTools->insert(mConfiguredTools->begin(), mConfiguredTools->end());
+  allTools->insert(mInitializedTools->begin(), mInitializedTools->end());
+
+  return allTools;
 }
+
 ssc::ToolPtr ToolManager::getTool(const std::string& uid)
 {
-  ToolMapConstIter it = mConnectedTools->find(uid);
-  if (it != mConnectedTools->end())
+  ToolMapConstIter it = mInitializedTools->find(uid);
+  if (it != mInitializedTools->end())
   {
     return ((*it).second);
   } else
@@ -329,8 +340,8 @@ void ToolManager::setDominantTool(const std::string& uid)
   {
     newTool = iter->second;
   }
-  ToolMapConstIter it = mConnectedTools->find(uid);
-  if (it != mConnectedTools->end())
+  ToolMapConstIter it = mInitializedTools->find(uid);
+  if (it != mInitializedTools->end())
   {
     newTool = it->second;
   }
@@ -354,8 +365,8 @@ std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
 {
   std::map<std::string, std::string> uidsAndNames;
 
-  ToolMapConstIter it = mConnectedTools->begin();
-  while (it != mConnectedTools->end())
+  ToolMapConstIter it = mInitializedTools->begin();
+  while (it != mInitializedTools->end())
   {
     uidsAndNames[((*it).second)->getUid()] = ((*it).second)->getName();
     it++;
@@ -371,8 +382,8 @@ std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
 std::vector<std::string> ToolManager::getToolNames() const
 {
   std::vector<std::string> names;
-  ToolMapConstIter it = mConnectedTools->begin();
-  while (it != mConnectedTools->end())
+  ToolMapConstIter it = mInitializedTools->begin();
+  while (it != mInitializedTools->end())
   {
     names.push_back(((*it).second)->getName());
     it++;
@@ -388,8 +399,8 @@ std::vector<std::string> ToolManager::getToolNames() const
 std::vector<std::string> ToolManager::getToolUids() const
 {
   std::vector<std::string> uids;
-  ToolMapConstIter it = mConnectedTools->begin();
-  while (it != mConnectedTools->end())
+  ToolMapConstIter it = mInitializedTools->begin();
+  while (it != mInitializedTools->end())
   {
     uids.push_back(((*it).second)->getUid());
     it++;
@@ -417,8 +428,8 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
 }
 void ToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
 {
-  ToolMapConstIter it = mConnectedTools->begin();
-  while (it != mConnectedTools->end())
+  ToolMapConstIter it = mInitializedTools->begin();
+  while (it != mInitializedTools->end())
   {
     //((*it).second)->setTransformSaveFile(filePathAndName); is set during tools constructor
     ((*it).second)->saveTransformsAndTimestamps();
@@ -627,7 +638,7 @@ void ToolManager::addConnectedTool(std::string uid)
           ", thus could not add is as a connected tool.");
     return;
   }
-  (*mConnectedTools)[it->first] = it->second;
+  (*mInitializedTools)[it->first] = it->second;
   ssc::ToolPtr tool = it->second;
 
   //connect visible/hidden signal to domiantCheck
@@ -666,8 +677,8 @@ void ToolManager::checkTimeoutsAndRequestTransform()
     return;
 
   ToolPtr refTool = boost::shared_dynamic_cast<Tool>(mReferenceTool);
-  ToolMap::iterator it = mConnectedTools->begin();
-  for(;it != mConnectedTools->end();++it)
+  ToolMap::iterator it = mInitializedTools->begin();
+  for(;it != mInitializedTools->end();++it)
   {
     ToolPtr connectedTool = boost::shared_dynamic_cast<Tool>(it->second);
     if(!refTool || !connectedTool)
@@ -681,8 +692,8 @@ void ToolManager::dominantCheckSlot()
 
   //make a sorted vector of all visible tools
   std::vector<ssc::ToolPtr> visibleTools;
-  for(ToolMap::iterator it = mConnectedTools->begin();
-      it != mConnectedTools->end(); ++it)
+  for(ToolMap::iterator it = mInitializedTools->begin();
+      it != mInitializedTools->end(); ++it)
   {
     if(it->second->getVisible())
       visibleTools.push_back(it->second);

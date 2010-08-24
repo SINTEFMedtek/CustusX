@@ -34,9 +34,9 @@ CustomStatusBar::~CustomStatusBar()
 
 void CustomStatusBar::connectToToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = ssc::toolManager()->getTools();
-  ssc::ToolManager::ToolMap::iterator it = connectedTools->begin();
-  while (it != connectedTools->end())
+  ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
+  ssc::ToolManager::ToolMap::iterator it = initializedTools->begin();
+  while (it != initializedTools->end())
   {
     ssc::Tool* tool = it->second.get();
     if(tool->getType() == ssc::Tool::TOOL_MANUAL)
@@ -67,9 +67,9 @@ void CustomStatusBar::connectToToolSignals()
 
 void CustomStatusBar::disconnectFromToolSignals()
 {
-  ssc::ToolManager::ToolMapPtr connectedTools = ssc::toolManager()->getTools();
-  ssc::ToolManager::ToolMap::iterator toolIt = connectedTools->begin();
-  while (toolIt != connectedTools->end())
+  ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
+  ssc::ToolManager::ToolMap::iterator toolIt = initializedTools->begin();
+  while (toolIt != initializedTools->end())
   {
     disconnect(toolIt->second.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
     toolIt++;
