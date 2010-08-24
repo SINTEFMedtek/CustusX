@@ -30,43 +30,54 @@ void MessageManager::destroyInstance()
 void MessageManager::sendInfo(std::string info)
 {
   QString qinfo(info.c_str());
-  QString message("INFO: ");
-  message.append(&qinfo);
-  this->sendMessage(message, 1500);
+  /*QString message("INFO: ");
+  message.append(&qinfo);*/
+  this->sendMessage(qinfo, mlINFO, 1500);
 }
 
 void MessageManager::sendWarning(std::string warning)
 {
   QString qwarning(warning.c_str());
-  QString message("WARNING: ");
-  message.append(&qwarning);
-  this->sendMessage(message, 3000);
+  /*QString message("WARNING: ");
+  message.append(&qwarning);*/
+  this->sendMessage(qwarning, mlWARNING, 3000);
 }
 
 void MessageManager::sendError(std::string error)
 {
   QString qerror(error.c_str());
-  QString message("ERROR: ");
-  message.append(&qerror);
-  this->sendMessage(message, 0);
+  /*QString message("ERROR: ");
+  message.append(&qerror);*/
+  this->sendMessage(qerror, mlERROR, 0);
 }
   
 void MessageManager::sendDebug(std::string text)
 {
   QString qdebug(text.c_str());
-  QString message("DEBUG: ");
-  message.append(&qdebug);
+  /*QString message("DEBUG: ");
+  message.append(&qdebug);*/
   // Only print debug info to std::cout
-  std::cout << string_cast(message) << std::endl;
+  //std::cout << string_cast(message) << std::endl;
+  this->sendMessage(qdebug, mlDEBUG, 0);
 }
   
 void MessageManager::setCoutFlag(bool onlyCout)
 {
   mOnlyCout = onlyCout;
 }
-  
-void MessageManager::sendMessage(QString &message, int timeout)
+
+void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout)
 {
+  Message message(text, messageLevel, timeout);
+  emit emittedMessage(message);
+
+  //this is for the old system
+  this->sendMessage(message.getPrintableMessage(),timeout);
+}
+
+void MessageManager::sendMessage(QString message, int timeout)
+{
+  //old system
   if (mOnlyCout)
     std::cout << string_cast(message) << std::endl;
   else
