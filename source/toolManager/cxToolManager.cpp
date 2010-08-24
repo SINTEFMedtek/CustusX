@@ -293,7 +293,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::getInitializedTools()
 
 ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 {
-  ssc::ToolManager::ToolMapPtr allTools;
+  ssc::ToolManager::ToolMapPtr allTools(new ToolMap);
   allTools->insert(mConfiguredTools->begin(), mConfiguredTools->end());
   allTools->insert(mInitializedTools->begin(), mInitializedTools->end());
 
