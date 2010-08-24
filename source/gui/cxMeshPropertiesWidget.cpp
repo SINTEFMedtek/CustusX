@@ -15,7 +15,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   mMeshComboBox(new QComboBox(this))
 {
   this->setObjectName("MeshPropertiesWidget");
-  this->setWindowTitle("MeshProperties");
+  this->setWindowTitle("Surface Properties");
 
   // As MeshPropertiesWidget is no dockWidget yet it doesn't have the 
   // visibilityChanged signal
