@@ -96,7 +96,7 @@ SET(${LIBNAME}_SRCS
     cxLayoutEditor.h
     cxLayoutEditor.cpp
     cxConsoleWidget.h
-    #cxConsoleWidget.cpp
+    cxConsoleWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
