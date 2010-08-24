@@ -17,6 +17,7 @@ namespace ssc
   class ReconstructionWidget;
 }
 
+class UsConfigGui;
 
 namespace cx
 {
@@ -168,6 +169,7 @@ protected:
   ssc::ReconstructionWidget* mReconstructionWidget;
   class RegistrationHistoryWidget* mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget* mVolumePropertiesWidget;
+  UsConfigGui* mProbePropertiesWidget; ///< Select probe select set probe width and depth
   class CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
 
   //Preferences

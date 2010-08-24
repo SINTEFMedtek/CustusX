@@ -150,7 +150,7 @@ SET ( LINK_LIBRARIES_____notusedanymore
 
 #----------
 # LINK
-TARGET_LINK_LIBRARIES( CustusX gui )
+TARGET_LINK_LIBRARIES( CustusX gui cxCommon )
 #TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
 
