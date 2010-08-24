@@ -42,8 +42,9 @@ public:
   virtual bool isInitialized() const; ///< checks if the hardware is initialized
   virtual bool isTracking() const; ///< checks if the system is tracking
 
-  virtual ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not connected tools
-  virtual ssc::ToolManager::ToolMapPtr getTools(); ///< get all connected tools
+  virtual ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
+  virtual ssc::ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
+  virtual ssc::ToolManager::ToolMapPtr getTools(); ///< get all configured and initialized tools
   virtual ssc::ToolPtr getTool(const std::string& uid); ///< get a specific tool
 
   virtual ssc::ToolPtr getDominantTool(); ///< get the dominant tool
@@ -83,11 +84,6 @@ public slots:
   virtual void saveToolsSlot(); ///< saves transforms and timestamps
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
-//  signals:
-//  void landmarkRemoved(std::string uid);
-//  void landmarkAdded(std::string uid);
-//  void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
-
 protected slots:
   void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from tools
   void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from trackers
@@ -104,15 +100,13 @@ protected:
   void initializeManualTool();
   void configureReferences(); ///<
 
-//  static ToolManager* mCxInstance;
-
   std::string mConfigurationFilePath; ///< path to the configuration file
   std::string mLoggingFolder; ///< path to where logging should be saved
   QTimer* mTimer; ///< timer controlling the demand of transforms
 
   TrackerPtr mTracker; ///< the tracker to use
   ssc::ToolManager::ToolMapPtr mConfiguredTools; ///< all configured, but not connected, tools
-  ssc::ToolManager::ToolMapPtr mConnectedTools; ///< all connected tools
+  ssc::ToolManager::ToolMapPtr mInitializedTools; ///< all initialized tools
   ssc::ToolPtr mDominantTool; ///< the tool with highest priority
   ssc::ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
   ssc::ManualToolPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
