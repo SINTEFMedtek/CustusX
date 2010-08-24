@@ -29,8 +29,8 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mCommunication->SetStopBits( igstk::SerialCommunication::StopBits1 );
   mCommunication->SetHardwareHandshake(igstk::SerialCommunication::HandshakeOff);
 
-  mCommunication->SetCaptureFileName( "RecordedStreamByCustusX3.txt" );
-  mCommunication->SetCapture( true );
+  //mCommunication->SetCaptureFileName( "RecordedStreamByCustusX3.txt" );
+  //mCommunication->SetCapture( true );
   //mCommunication->SetCapture( false );
 
   switch (mInternalStructure.mType)
@@ -85,7 +85,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mTrackerObserver->SetCallbackFunction(this, &Tracker::trackerTransformCallback);
   mTracker->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   mCommunication->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
-  this->addLogging();
+  //this->addLogging();
 }
 
 Tracker::~Tracker()
