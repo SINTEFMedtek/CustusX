@@ -29,7 +29,7 @@
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
 #include "cxLayoutEditor.h"
-
+#include "UsConfigGui.h"
 namespace cx
 {
 
@@ -50,6 +50,7 @@ MainWindow::MainWindow() :
   mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("usReconstruction"), DataLocations::getShaderPath() )),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
+  mProbePropertiesWidget(new UsConfigGui(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mSettings(DataLocations::getSettings())
 {
@@ -76,6 +77,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mPatientRegistrationWidget);
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mVolumePropertiesWidget);
+  this->addAsDockWidget(mProbePropertiesWidget);
 
   this->createActions();
   this->createToolBars();
