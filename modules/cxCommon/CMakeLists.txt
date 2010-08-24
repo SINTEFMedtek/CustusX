@@ -36,9 +36,10 @@ add_library(cxCommon
     probeXmlConfigParser.cpp
     UsConfigGui.h
     UsConfigGui.cpp
+    ${${LIBNAME}_MOC_SRCS}
     )
     
-target_link_libraries(cxCommon ${QT_LIBRARIES})
+target_link_libraries(cxCommon ${QT_LIBRARIES} )
 
 set (CX_CONFIG_ROOT ${CustusX3_SOURCE_DIR}/config)
 set (CX_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")
