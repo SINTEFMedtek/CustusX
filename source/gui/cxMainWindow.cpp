@@ -11,6 +11,7 @@
 #include "cxCustomStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
+#include "cxConsoleWidget.h"
 #include "cxNavigationWidget.h"
 //#include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
@@ -51,6 +52,7 @@ MainWindow::MainWindow() :
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mProbePropertiesWidget(new UsConfigGui(this)),
+  mConsoleWidget(new ConsoleWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mSettings(DataLocations::getSettings())
 {
@@ -78,6 +80,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mProbePropertiesWidget);
+  this->addAsDockWidget(mConsoleWidget);
 
   this->createActions();
   this->createToolBars();
@@ -106,6 +109,8 @@ MainWindow::MainWindow() :
   connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
   ssc::messageManager()->setCoutFlag(false);
+  //
+
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
 
