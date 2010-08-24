@@ -157,18 +157,19 @@ protected:
 
   class ImageRegistrationWidget*    mImageRegistrationWidget; ///< interface for image registration
   class PatientRegistrationWidget*  mPatientRegistrationWidget; ///< interface for patient registration
-  //class TransferFunctionWidget*     mTransferFunctionWidget; ///< interface for changing a images transfere function
+  //class TransferFunctionWidget*   mTransferFunctionWidget; ///< interface for changing a images transfere function
   class ShiftCorrectionWidget*      mShiftCorrectionWidget; ///< interface for image shift correction
   class BrowserWidget*              mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*           mNavigationWidget; ///< contains settings for navigating
-  class ImagePropertiesWidget* mImagePropertiesWidget; ///< display and control of image properties for active image.
-  class ToolPropertiesWidget* mToolPropertiesWidget; ///< display and control of tool properties for active tool.
-  class MeshPropertiesWidget* mMeshPropertiesWidget; ///< Display and control image properties for active mesh
-  class PointSamplingWidget* mPointSamplingWidget;
-  ssc::ReconstructionWidget* mReconstructionWidget;
-  class RegistrationHistoryWidget* mRegistrationHistoryWidget; ///< look back in registration history.
-  class VolumePropertiesWidget* mVolumePropertiesWidget;
-  class CustomStatusBar*            mCustomStatusBar; //TODO, needs some work
+  class ImagePropertiesWidget*      mImagePropertiesWidget; ///< display and control of image properties for active image.
+  class ToolPropertiesWidget*       mToolPropertiesWidget; ///< display and control of tool properties for active tool.
+  class MeshPropertiesWidget*       mMeshPropertiesWidget; ///< Display and control image properties for active mesh
+  class PointSamplingWidget*        mPointSamplingWidget;
+  ssc::ReconstructionWidget*        mReconstructionWidget;
+  class RegistrationHistoryWidget*  mRegistrationHistoryWidget; ///< look back in registration history.
+  class VolumePropertiesWidget*     mVolumePropertiesWidget;
+  class ConsoleWidget*              mConsoleWidget;
+  class CustomStatusBar*            mCustomStatusBar;
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
