@@ -23,7 +23,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
     QWidget(parent)
 {
   this->setObjectName("ImagePropertiesWidget");
-  this->setWindowTitle("ImageProperties");
+  this->setWindowTitle("Slice Properties");
 
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
