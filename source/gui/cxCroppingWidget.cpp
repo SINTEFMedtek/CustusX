@@ -13,88 +13,61 @@
 #include "sscStringDataAdapter.h"
 #include "sscStringWidgets.h"
 #include "sscDefinitionStrings.h"
+#include "cxInteractiveCropper.h"
 
 namespace cx
 {
 
-ClipPlaneStringDataAdapter::ClipPlaneStringDataAdapter(InteractiveClipperPtr clipper) : mInteractiveClipper(clipper)
-{
-  connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SIGNAL(changed()));
-}
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
-QString ClipPlaneStringDataAdapter::getValueName() const
-{
-  return "Slice Plane";
-}
-bool ClipPlaneStringDataAdapter::setValue(const QString& value)
-{
-  ssc::PLANE_TYPE plane = string2enum<ssc::PLANE_TYPE>(string_cast(value));
-  if (plane==mInteractiveClipper->getSlicePlane())
-    return false;
-  mInteractiveClipper->setSlicePlane(plane);
-  return true;
-}
-QString ClipPlaneStringDataAdapter::getValue() const
-{
-  return qstring_cast(mInteractiveClipper->getSlicePlane());
-}
-QString ClipPlaneStringDataAdapter::getHelp() const
-{
-  return "chose the slice plane to clip with";
-}
-QStringList ClipPlaneStringDataAdapter::getValueRange() const
-{
-  std::vector<ssc::PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<planes.size(); ++i)
-    retval << qstring_cast(planes[i]);
-  return retval;
-}
+InteractiveCropperPtr mInteractiveCropper;
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
+QCheckBox* mUseCropperCheckBox;
+QCheckBox* mShowBoxCheckBox;
+
 
 CroppingWidget::CroppingWidget(QWidget* parent) : QWidget(parent)
 {
-  mInteractiveClipper = viewManager()->getClipper();
-  connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
+  mInteractiveCropper = viewManager()->getCropper();
+  connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));
 
-  this->setObjectName("CroppingWidget");
+  this->setObjectName("ClippingWidget");
   this->setWindowTitle("Crop");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
-  QGroupBox* activeClipGroupBox = new QGroupBox("Interactive clipper");
-  layout->addWidget(activeClipGroupBox);
-  QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
+  QGroupBox* activeGroupBox = new QGroupBox("Interactive cropper");
+  layout->addWidget(activeGroupBox);
+  QVBoxLayout* activeLayout = new QVBoxLayout(activeGroupBox);
 
-  mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
-  ssc::ComboGroupWidget* combo = new ssc::ComboGroupWidget(this, mPlaneAdapter);
+//  mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
+//  ssc::ComboGroupWidget* combo = new ssc::ComboGroupWidget(this, mPlaneAdapter);
 
-  mUseClipperCheckBox = new QCheckBox("Use Clipper");
-  connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
-  activeClipLayout->addWidget(mUseClipperCheckBox);
-  activeClipLayout->addWidget(combo);
-  mInvertPlaneCheckBox = new QCheckBox("Invert plane");
-  connect(mInvertPlaneCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(invertPlane(bool)));
-  activeClipLayout->addWidget(mInvertPlaneCheckBox);
+  mUseCropperCheckBox = new QCheckBox("Use Cropper");
+  connect(mUseCropperCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(useCropping(bool)));
+  activeLayout->addWidget(mUseCropperCheckBox);
+  //activeLayout->addWidget(combo);
+  mShowBoxCheckBox = new QCheckBox("Show box");
+  connect(mShowBoxCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(showBoxWidget(bool)));
+  activeLayout->addWidget(mShowBoxCheckBox);
 
-  QPushButton* saveButton = new QPushButton("Save clip plane");
-  saveButton->setEnabled(false);
-  QPushButton* clearButton = new QPushButton("Clear saved planes");
-  clearButton->setEnabled(false);
-  activeClipLayout->addWidget(saveButton);
-  layout->addWidget(clearButton);
+  layout->addStretch();
+//  QPushButton* saveButton = new QPushButton("Save clip plane");
+//  saveButton->setEnabled(false);
+//  QPushButton* clearButton = new QPushButton("Clear saved planes");
+//  clearButton->setEnabled(false);
+//  activeLayout->addWidget(saveButton);
+//  layout->addWidget(clearButton);
 
-  this->clipperChangedSlot();
+  this->cropperChangedSlot();
 }
 
-void CroppingWidget::clipperChangedSlot()
+void CroppingWidget::cropperChangedSlot()
 {
-  mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
-  mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
+  mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
+  mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
 }
 
 }

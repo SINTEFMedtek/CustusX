@@ -15,6 +15,12 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
+#include "cxInteractiveCropper.h"
+
+//typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
+//typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
+//typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
+//typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 
 namespace cx
 {
@@ -49,6 +55,7 @@ private slots:
   void clipActionSlot();
 
 private:
+//  void startBoxInteraction();
   virtual void appendToContextMenu(QMenu& contextMenu);
 //  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
   void updateView();
@@ -65,6 +72,7 @@ private:
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
 //  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
+  //InteractiveCropperPtr mInteractiveCropper;
 
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;
