@@ -19,6 +19,7 @@
 #include "sscToolManager.h"
 #include "sscView.h"
 #include "sscVtkHelperClasses.h"
+#include "sscMessageManager.h"
 
 namespace ssc
 {
@@ -179,7 +180,7 @@ void ToolRep2D::update()
 	//Logger::log("vm.log", "ToolRep2D::update()");
 
 	if (showProbe())
-	{
+  {
 		setProbeSector(mSlicer->getTool()->getProbeSector());
 	}
 	
@@ -207,6 +208,7 @@ void ToolRep2D::setProbeSector(ssc::ProbeSector data)
 {
 	if (mUSProbe2D)
 	{
+    //messageManager()->sendDebug("setProbeSector: " + string_cast(data.mDepthStart) + " " + string_cast(data.mDepthEnd) + " " + string_cast(data.mWidth));
 		mUSProbe2D->setShape(data.mType, data.mDepthStart, data.mDepthEnd, data.mWidth); 
 	}	
 }
@@ -222,6 +224,7 @@ void ToolRep2D::updateUSProbe(const Transform3D& vpMt)
 bool ToolRep2D::showProbe()
 {
 	return mSlicer->getTool() && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
+  //return true;//test code
 }
 bool ToolRep2D::showOffset()
 {

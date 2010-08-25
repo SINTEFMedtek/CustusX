@@ -4,6 +4,7 @@
 #include <vtkSTLReader.h>
 #include <vtkCursor3D.h>
 #include "sscDummyTool.h"
+#include "sscMessageManager.h"
 
 
 //typedef vtkSmartPointer <class vtkConeSource> vtkConeSourcePtr;
@@ -115,7 +116,15 @@ bool ManualTool::isCalibrated() const
 
 ssc::ProbeSector ManualTool::getProbeSector() const
 {
-	return ssc::ProbeSector();
+	//return ssc::ProbeSector();
+  
+  //Test code 
+  double depthStart = 10;
+  double depthEnd = 100;
+  double width = 50;
+  //ssc::messageManager()->sendDebug("Use ManualTool::getProbeSector() test data");
+  return ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
+  
 }
 
 double ManualTool::getTimestamp() const
