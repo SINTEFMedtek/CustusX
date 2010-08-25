@@ -24,6 +24,7 @@
 
 #include "cxTransferFunctionWidget.h"
 #include "cxCroppingWidget.h"
+#include "cxClippingWidget.h"
 #include "cxShadingWidget.h"
 
 namespace cx
@@ -108,7 +109,8 @@ VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) : QWidget(parent
   layout->addWidget(tabWidget);
   tabWidget->addTab(new TransferFunctionWidget(this), "Transfer Functions");
   tabWidget->addTab(new ShadingWidget(this), "Shading");
-  tabWidget->addTab(new CroppingWidget(this), "Cropping");
+  tabWidget->addTab(new CroppingWidget(this), "Crop");
+  tabWidget->addTab(new ClippingWidget(this), "Clip");
 }
 
 }

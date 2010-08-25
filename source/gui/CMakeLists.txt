@@ -10,6 +10,7 @@ SET(cxProject_MOC_HDRS
   cxVolumePropertiesWidget.h
   cxShadingWidget.h
   cxCroppingWidget.h  
+  cxClippingWidget.h  
   cxNavigationWidget.h
   cxBrowserWidget.h
   cxImageRegistrationWidget.h
@@ -59,6 +60,8 @@ SET(${LIBNAME}_SRCS
     cxShadingWidget.cpp
     cxCroppingWidget.h
     cxCroppingWidget.cpp
+    cxClippingWidget.h  
+    cxClippingWidget.cpp
     cxNavigationWidget.h
     cxNavigationWidget.cpp
     cxBrowserWidget.h
