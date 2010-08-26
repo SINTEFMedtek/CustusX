@@ -18,10 +18,12 @@ typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
 typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
 typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
 typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
+typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
 
 namespace cx
 {
 typedef vtkSmartPointer<class CropBoxCallback> CropBoxCallbackPtr;
+typedef vtkSmartPointer<class CropBoxEnableCallback> CropBoxEnableCallbackPtr;
 
 /**Helper class for cropping the active volume using a
  * bounding box.
@@ -37,7 +39,7 @@ public:
   ssc::DoubleBoundingBox3D getBoundingBox() const; ///< get BB in reference space
   void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_r); ///< set BB in reference space
   void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
-  bool getUseCropping() const;
+  bool getUseCropping();
   bool getShowBoxWidget() const;
 signals:
   void changed();
@@ -48,12 +50,23 @@ private slots:
   void imageChangedSlot();
 
 private:
-  void startBoxInteraction();
+  void boxWasShown(bool val);
+  friend class CropBoxCallback;
+  friend class CropBoxEnableCallback;
+  void setBoxWidgetSize(ssc::DoubleBoundingBox3D& bb_r);
+  ssc::DoubleBoundingBox3D getBoxWidgetSize();
+  void setCroppingRegion(ssc::DoubleBoundingBox3D bb_r);
+  void updateBoxWidgetInteractor();
+
+  vtkVolumeMapperPtr getMapper();
   QPointer<ssc::View> mView;
   //vtkBoxRepresentationPtr mBoxRep;
   //vtkBoxWidget2Ptr mBoxWidget2;
   vtkBoxWidgetPtr mBoxWidget;
   CropBoxCallbackPtr mCropBoxCallback;
+  CropBoxEnableCallbackPtr mCropBoxEnableCallback;
+  CropBoxEnableCallbackPtr mCropBoxDisableCallback;
+  bool mShowBoxWidget;
 };
 
 typedef boost::shared_ptr<InteractiveCropper> InteractiveCropperPtr;
