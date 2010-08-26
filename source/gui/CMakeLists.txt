@@ -30,6 +30,10 @@ SET(cxProject_MOC_HDRS
   cxShadingParamsInterfaces.h
   cxLayoutEditor.h
   cxConsoleWidget.h
+  
+  cxDoubleSpanSlider.h
+  qxtspanslider_p.h
+  qxtspanslider.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -100,6 +104,13 @@ SET(${LIBNAME}_SRCS
     cxLayoutEditor.cpp
     cxConsoleWidget.h
     cxConsoleWidget.cpp
+    
+    cxDoubleSpanSlider.h
+    cxDoubleSpanSlider.cpp
+    qxtspanslider_p.h
+    qxtspanslider.h
+    qxtspanslider.cpp    
+    
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

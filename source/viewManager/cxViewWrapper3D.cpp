@@ -28,10 +28,6 @@
 #include "cxLandmarkRep.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
-#include <vtkBoxWidget2.h>
-#include <vtkBoxWidget.h>
-#include <vtkBoxRepresentation.h>
-#include "sscBoundingBox3D.h"
 
 namespace cx
 {
@@ -78,6 +74,30 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 //  mBoxWidget->AddObserver(vtkCommand::StartInteractionEvent, new CropBoxCallback("start"));
 //  mBoxWidget->AddObserver(vtkCommand::EnableEvent, new CropBoxCallback("enable"));
 ////  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+
+//  mBoxWidget = vtkBoxWidgetPtr::New();
+//  mBoxWidget->RotationEnabledOff();
+//  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
+//
+////  mBoxRep = vtkBoxRepresentationPtr::New();
+////  //boxRep->PlaceWidget(bounds)
+////  //view->getRenderer()->AddActor(mBoxRep);
+////
+////  mBoxWidget = vtkBoxWidget2Ptr::New();
+////  mBoxWidget->RotationEnabledOff();
+////  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
+////  mBoxWidget->SetRepresentation(mBoxRep);
+//
+////  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
+//  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
+//
+//  //std::cout << "bb_r: " << bb << std::endl;
+////  mBoxRep->PlaceWidget(bb.begin());
+//  mBoxWidget->PlaceWidget(bb_hard);
+//
+//
+////  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+//>>>>>>> Stashed changes
 
 //  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
@@ -248,7 +268,10 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
 //  std::cout << "bb_r: " << bb << std::endl;
 ////  mBoxRep->PlaceWidget(bb.begin());
 //  mBoxRep->PlaceWidget(bb_hard);
-//  this->startBoxInteraction();
+//<<<<<<< Updated upstream
+////  this->startBoxInteraction();
+//=======
+//>>>>>>> Stashed changes
 
 
   mView->getRenderer()->ResetCamera();

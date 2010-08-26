@@ -13,12 +13,14 @@
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
 class QCheckBox;
+#include "cxDoubleSpanSlider.h"
 
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
 
 
 namespace cx
 {
+
 
 /**
  *
@@ -33,7 +35,12 @@ private:
 
   QCheckBox* mUseCropperCheckBox;
   QCheckBox* mShowBoxCheckBox;
+  SliderRangeGroupWidget* mXRange;
+  SliderRangeGroupWidget* mYRange;
+  SliderRangeGroupWidget* mZRange;
+
 private slots:
+  void boxValuesChanged();
   void cropperChangedSlot();
 };
 
