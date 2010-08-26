@@ -36,9 +36,10 @@ class InteractiveCropper : public QObject
 public:
   InteractiveCropper();
   void setView(ssc::View* view); ///< adds an interactive box widget to the view. Press 'I' to show
-  ssc::DoubleBoundingBox3D getBoundingBox() const; ///< get BB in reference space
+  ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in reference space
   void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_r); ///< set BB in reference space
   void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
+  ssc::DoubleBoundingBox3D getMaxBoundingBox();
   bool getUseCropping();
   bool getShowBoxWidget() const;
 signals:
@@ -53,7 +54,7 @@ private:
   void boxWasShown(bool val);
   friend class CropBoxCallback;
   friend class CropBoxEnableCallback;
-  void setBoxWidgetSize(ssc::DoubleBoundingBox3D& bb_r);
+  void setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_r);
   ssc::DoubleBoundingBox3D getBoxWidgetSize();
   void setCroppingRegion(ssc::DoubleBoundingBox3D bb_r);
   void updateBoxWidgetInteractor();
