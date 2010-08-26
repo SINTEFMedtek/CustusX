@@ -21,21 +21,89 @@
 #include "cxView3D.h"
 #include "sscImageLUT2D.h"
 #include "cxDataInterface.h"
+#include "UsConfigGui.h"
+#include "sscStringWidgets.h"
 
 namespace cx
 {
 
+ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
+{
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SIGNAL(changed()));
+}
 
+QString ActiveToolStringDataAdapter::getValueName() const
+{
+  return "Active Tool";
+}
+bool ActiveToolStringDataAdapter::setValue(const QString& value)
+{
+  ssc::ToolPtr newTool = ssc::toolManager()->getTool(string_cast(value));
+  if(newTool == ssc::toolManager()->getDominantTool())
+    return false;
+  ssc::toolManager()->setDominantTool(newTool->getUid());
+  return true;
+}
+QString ActiveToolStringDataAdapter::getValue() const
+{
+  if (!ssc::toolManager()->getDominantTool())
+    return "";
+  return qstring_cast(ssc::toolManager()->getDominantTool()->getUid());
+}
+QString ActiveToolStringDataAdapter::getHelp() const
+{
+  return "select the active (dominant) tool";
+}
+QStringList ActiveToolStringDataAdapter::getValueRange() const
+{
+  std::vector<std::string> uids = ssc::toolManager()->getToolUids();
+  QStringList retval;
+  //retval << ""; //Don't add "no tool" choice
+  for (unsigned i=0; i<uids.size(); ++i)
+    retval << qstring_cast(uids[i]);
+  return retval;
+}
+QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
+{
+  ssc::ToolPtr tool = ssc::toolManager()->getTool(string_cast(internal));
+  if (!tool)
+    return "<no tool>";
+  return qstring_cast(tool->getName());
+}
+
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+
+ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
+QWidget(parent)
+{
+  QVBoxLayout* layout = new QVBoxLayout(this);
+  this->setObjectName("ActiveToolWidget");
+  layout->setMargin(0);
+  
+  ssc::ComboGroupWidget*  combo = new ssc::ComboGroupWidget(this, ActiveToolStringDataAdapter::New());
+  layout->addWidget(combo);
+}
+
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+
+  
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
-    QWidget(parent)
+  QWidget(parent),
+  mProbePropertiesWidget(new UsConfigGui(this))
 {
   this->setObjectName("ToolPropertiesWidget");
-  this->setWindowTitle("ToolProperties");
+  this->setWindowTitle("Tool Properties");
 
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
+  toptopLayout->addWidget(new ActiveToolWidget(this));
+  
   QHBoxLayout* generalLayout = new QHBoxLayout;
   mReferenceStatusLabel = new QLabel("Reference frame <undefined>", this);
   generalLayout->addWidget(mReferenceStatusLabel);
@@ -57,6 +125,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mActiveToolVisibleLabel = new QLabel("Visible: NA");
   activeToolLayout->addWidget(mActiveToolVisibleLabel);
   activeGroupLayout->addLayout(activeToolLayout);
+  
+  toptopLayout->addWidget(mProbePropertiesWidget);
 
 //  QGroupBox* group2D = new QGroupBox(this);
 //  group2D->setTitle("2D properties");

@@ -18,6 +18,10 @@ UsConfigGui::UsConfigGui(QWidget* parent) :
   mConfigIdBox(new QComboBox(this)),
   mSettings(new QSettings())
 {
+  
+  this->setObjectName("ProbePropertiesWidget");
+  this->setWindowTitle("US Probe Properties");
+  
   mXmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
   mXml = new ProbeXmlConfigParser(mXmlFileName);
 
