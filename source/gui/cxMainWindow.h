@@ -17,7 +17,6 @@ namespace ssc
   class ReconstructionWidget;
 }
 
-
 namespace cx
 {
  

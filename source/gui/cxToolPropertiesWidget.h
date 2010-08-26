@@ -11,10 +11,44 @@
 #include <QtGui>
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
+#include "sscStringDataAdapter.h"
+
+class UsConfigGui;
 
 namespace cx
 {
 
+/** Adapter that connects to the current active tool.
+ */
+class ActiveToolStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
+  ActiveToolStringDataAdapter();
+  virtual ~ActiveToolStringDataAdapter() {}
+  
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+  
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
+/** Widget that contains a select active tool combo box.
+ */
+class ActiveToolWidget : public QWidget
+{
+  Q_OBJECT
+public:
+  ActiveToolWidget(QWidget* parent);
+~ActiveToolWidget() {}
+};
+  
+  
 /**
  * \class ToolPropertiesWidget
  *
@@ -51,6 +85,8 @@ private:
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
+  
+  UsConfigGui* mProbePropertiesWidget; ///< Select probe select set probe width and depth
 };
 
 }//end namespace cx
