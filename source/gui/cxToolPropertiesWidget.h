@@ -12,6 +12,8 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 
+class UsConfigGui;
+
 namespace cx
 {
 
@@ -51,6 +53,8 @@ private:
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
+  
+  UsConfigGui* mProbePropertiesWidget; ///< Select probe select set probe width and depth
 };
 
 }//end namespace cx
