@@ -30,7 +30,6 @@
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
 #include "cxLayoutEditor.h"
-//#include "UsConfigGui.h"
 namespace cx
 {
 
@@ -52,7 +51,6 @@ MainWindow::MainWindow() :
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mConsoleWidget(new ConsoleWidget(this)),
-  mProbePropertiesWidget(new UsConfigGui(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mSettings(DataLocations::getSettings())
 {
@@ -87,7 +85,6 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mImageRegistrationWidget);
   this->addAsDockWidget(mPatientRegistrationWidget);
   this->addAsDockWidget(mNavigationWidget);
-  //this->addAsDockWidget(mProbePropertiesWidget);
   this->addAsDockWidget(mConsoleWidget);
 
   this->createActions();
