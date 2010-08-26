@@ -89,7 +89,9 @@ Tracker::Tracker(InternalStructure internalStructure) :
 }
 
 Tracker::~Tracker()
-{}
+{
+  std::cout << "Tracker::~Tracker()" << std::endl;
+}
 
 Tracker::Type Tracker::getType() const
 {

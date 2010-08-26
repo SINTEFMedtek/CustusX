@@ -31,6 +31,7 @@ private slots:
 
 private:
   QTextBrowser* mTextBrowser;
+  //std::map<ssc::MESSAGE_LEVEL, >
 };
 } // namespace cx
 #endif /* CXCONSOLEWIDGET_H_ */
