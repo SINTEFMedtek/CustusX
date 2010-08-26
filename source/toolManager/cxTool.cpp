@@ -571,4 +571,15 @@ void Tool::printInternalStructure()
   std::cout << "------------------------------------------------------------------" << std::endl;
 }
 
+  
+ssc::ProbeSector Tool::getProbeSector() const
+{ 
+  //Test data 
+  double depthStart = 10;
+  double depthEnd = 100;
+  double width = 50;
+  ssc::messageManager()->sendDebug("Use getProbeSector() test data");
+  return ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
+}
+  
 }//namespace cx

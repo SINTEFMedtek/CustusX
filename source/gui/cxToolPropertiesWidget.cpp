@@ -21,16 +21,18 @@
 #include "cxView3D.h"
 #include "sscImageLUT2D.h"
 #include "cxDataInterface.h"
+#include "UsConfigGui.h"
 
 namespace cx
 {
 
 
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
-    QWidget(parent)
+  QWidget(parent),
+  mProbePropertiesWidget(new UsConfigGui(this))
 {
   this->setObjectName("ToolPropertiesWidget");
-  this->setWindowTitle("ToolProperties");
+  this->setWindowTitle("Tool Properties");
 
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -57,6 +59,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mActiveToolVisibleLabel = new QLabel("Visible: NA");
   activeToolLayout->addWidget(mActiveToolVisibleLabel);
   activeGroupLayout->addLayout(activeToolLayout);
+  
+  toptopLayout->addWidget(mProbePropertiesWidget);
 
 //  QGroupBox* group2D = new QGroupBox(this);
 //  group2D->setTitle("2D properties");

@@ -30,7 +30,7 @@
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
 #include "cxLayoutEditor.h"
-#include "UsConfigGui.h"
+//#include "UsConfigGui.h"
 namespace cx
 {
 
@@ -66,20 +66,28 @@ MainWindow::MainWindow() :
   //make sure the transferefunctionwidget it fully initialized
 //  mTransferFunctionWidget->init();
 
+  
+  this->addAsDockWidget(mBrowserWidget);
+  
   this->addAsDockWidget(mImagePropertiesWidget);
-  this->addAsDockWidget(mToolPropertiesWidget);
+  this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mMeshPropertiesWidget);
+  
+  //Tried to add a separator. Don't work yet
+  //QAction* separatorAction = new QAction(this);
+  //separatorAction->setSeparator(true);
+  //this->mToggleWidgetActionGroup->addAction(separatorAction);
+  
+  this->addAsDockWidget(mToolPropertiesWidget);
   this->addAsDockWidget(mPointSamplingWidget);
   this->addAsDockWidget(mReconstructionWidget);
   this->addAsDockWidget(mRegistrationHistoryWidget);
-  this->addAsDockWidget(mBrowserWidget);
   //this->addAsDockWidget(mTransferFunctionWidget);
   this->addAsDockWidget(mShiftCorrectionWidget);
   this->addAsDockWidget(mImageRegistrationWidget);
   this->addAsDockWidget(mPatientRegistrationWidget);
   this->addAsDockWidget(mNavigationWidget);
-  this->addAsDockWidget(mVolumePropertiesWidget);
-  this->addAsDockWidget(mProbePropertiesWidget);
+  //this->addAsDockWidget(mProbePropertiesWidget);
   this->addAsDockWidget(mConsoleWidget);
 
   this->createActions();
