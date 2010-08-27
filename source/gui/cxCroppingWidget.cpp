@@ -68,12 +68,13 @@ CroppingWidget::CroppingWidget(QWidget* parent) : QWidget(parent)
   connect(mZRange, SIGNAL(valueChanged(double,double)), this, SLOT(boxValuesChanged()));
   layout->addWidget(mZRange);
 
-  //  QxtSpanSlider* spanSlider = new QxtSpanSlider(this);
-//  spanSlider->setOrientation(Qt::Horizontal);
-//  spanSlider->setRange(-500, 500);
-//  spanSlider->setLowerValue(-200);
-//  spanSlider->setUpperValue(200);
-//  spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+  QxtSpanSlider* spanSlider = new QxtSpanSlider(this);
+  spanSlider->setOrientation(Qt::Horizontal);
+  spanSlider->setRange(-500, 500);
+  spanSlider->setLowerValue(-200);
+  spanSlider->setUpperValue(200);
+  spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+  layout->addWidget(spanSlider);
 
   layout->addStretch();
 //  QPushButton* saveButton = new QPushButton("Save clip plane");
