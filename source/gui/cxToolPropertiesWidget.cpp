@@ -126,6 +126,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   activeToolLayout->addWidget(mActiveToolVisibleLabel);
   activeGroupLayout->addLayout(activeToolLayout);
   
+  //TODO: Add enable/disable US Probe visualization in 2D/3D?
+  //TODO: Only show US probe properties if tool is US Probe
   toptopLayout->addWidget(mProbePropertiesWidget);
 
 //  QGroupBox* group2D = new QGroupBox(this);
