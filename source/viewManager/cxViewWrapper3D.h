@@ -15,6 +15,17 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
+#include "cxInteractiveCropper.h"
+
+//typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
+//typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
+//typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
+//typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
+
+
+typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
+typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
+typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
 
 namespace cx
 {
@@ -49,9 +60,14 @@ private slots:
   void clipActionSlot();
 
 private:
+//  void startBoxInteraction();
   virtual void appendToContextMenu(QMenu& contextMenu);
 //  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
   void updateView();
+
+  vtkBoxRepresentationPtr mBoxRep;
+  vtkBoxWidget2Ptr mBoxWidget2;
+  vtkBoxWidgetPtr mBoxWidget;
 
 //  ssc::VolumetricRepPtr mVolumetricRep;
   typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
@@ -65,6 +81,7 @@ private:
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
 //  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
+  //InteractiveCropperPtr mInteractiveCropper;
 
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;
