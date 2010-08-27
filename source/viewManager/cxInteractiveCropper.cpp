@@ -211,12 +211,19 @@ void InteractiveCropper::useCropping(bool on)
     return;
   mapper->SetCropping(on);
 
-  //ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  if (!ssc::dataManager()->getActiveImage())
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
     return;
+
+  image->setCropping(on);
+
+  //ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+//  if (!ssc::dataManager()->getActiveImage())
+//    return;
 //  ssc::DoubleBoundingBox3D bb_r = transform(image->get_rMd(), image->boundingBox());
 
-  ssc::DoubleBoundingBox3D bb_r = this->getMaxBoundingBox();
+  //ssc::DoubleBoundingBox3D bb_r = this->getMaxBoundingBox();
+  ssc::DoubleBoundingBox3D bb_r = image->getDoubleCroppingBox();
 
   //this->setBoxWidgetSize(bb_r);
   this->setCroppingRegion(bb_r);
@@ -254,13 +261,17 @@ void InteractiveCropper::resetBoundingBox()
 
 void InteractiveCropper::imageChangedSlot()
 {
-  this->useCropping(true);
-
-  if (!ssc::dataManager()->getActiveImage())
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
     return;
 
-  ssc::DoubleBoundingBox3D bb_r = getMaxBoundingBox();
-  this->setBoxWidgetSize(bb_r);
+  this->useCropping(image->getCropping());
+
+//  if (!ssc::dataManager()->getActiveImage())
+//    return;
+//
+//  ssc::DoubleBoundingBox3D bb_r = getMaxBoundingBox();
+//  this->setBoxWidgetSize(bb_r);
 }
 
 bool InteractiveCropper::getUseCropping()
@@ -313,6 +324,8 @@ void InteractiveCropper::setCroppingRegion(ssc::DoubleBoundingBox3D bb_r)
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   if (!image)
     return;
+
+  image->setCroppingBox(bb_r);
 
   ssc::DoubleBoundingBox3D bb_d = ssc::transform(image->get_rMd().inv(), bb_r);
   //std::cout << "bb_image_d: " << image->boundingBox() << std::endl;
