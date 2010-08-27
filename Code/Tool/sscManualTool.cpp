@@ -100,7 +100,11 @@ std::string ManualTool::getName() const
 void ManualTool::setVisible(bool vis)
 {
 	QMutexLocker locker(&mMutex);
+	if (mVisible==vis)
+	  return;
 	mVisible = vis;
+	emit toolVisible(mVisible);
+	//std::cout << "ManualTool::setVisible( " << vis << " )" << std::endl;
 }
 
 void ManualTool::setType(const Type& type)
