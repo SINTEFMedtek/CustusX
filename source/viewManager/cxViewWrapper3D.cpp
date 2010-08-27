@@ -10,7 +10,9 @@
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+#include <vtkTransform.h>
 #include <vtkAbstractVolumeMapper.h>
+#include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 #include "sscView.h"
@@ -30,13 +32,72 @@
 namespace cx
 {
 
+
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mView = view;
   this->connectContextMenu(mView);
   std::string index = QString::number(startIndex).toStdString();
 
-//  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+  view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
+
+//  mInteractiveCropper.reset(new InteractiveCropper());
+//  mInteractiveCropper->setView(view);
+
+//  mBoxWidget = vtkBoxWidgetPtr::New();
+//  mBoxWidget->RotationEnabledOff();
+//  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
+//
+////  mBoxRep = vtkBoxRepresentationPtr::New();
+////  //boxRep->PlaceWidget(bounds)
+////  //view->getRenderer()->AddActor(mBoxRep);
+////
+////  mBoxWidget = vtkBoxWidget2Ptr::New();
+////  mBoxWidget->RotationEnabledOff();
+////  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
+////  mBoxWidget->SetRepresentation(mBoxRep);
+//
+////  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
+////  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
+//  double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
+//
+//  //double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
+////  vtkTransformPtr transform = vtkTransformPtr::New();
+////  transform->setMatrix();
+//
+//  //std::cout << "bb_r: " << bb << std::endl;
+////  mBoxRep->PlaceWidget(bb.begin());
+//  mBoxWidget->PlaceWidget(bb_hard);
+//
+//  CropBoxCallback* mCropBoxCallback = new CropBoxCallback("inter");
+//  mBoxWidget->AddObserver(vtkCommand::InteractionEvent, mCropBoxCallback);
+//  mBoxWidget->AddObserver(vtkCommand::StartInteractionEvent, new CropBoxCallback("start"));
+//  mBoxWidget->AddObserver(vtkCommand::EnableEvent, new CropBoxCallback("enable"));
+////  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+
+//  mBoxWidget = vtkBoxWidgetPtr::New();
+//  mBoxWidget->RotationEnabledOff();
+//  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
+//
+////  mBoxRep = vtkBoxRepresentationPtr::New();
+////  //boxRep->PlaceWidget(bounds)
+////  //view->getRenderer()->AddActor(mBoxRep);
+////
+////  mBoxWidget = vtkBoxWidget2Ptr::New();
+////  mBoxWidget->RotationEnabledOff();
+////  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
+////  mBoxWidget->SetRepresentation(mBoxRep);
+//
+////  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
+//  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
+//
+//  //std::cout << "bb_r: " << bb << std::endl;
+////  mBoxRep->PlaceWidget(bb.begin());
+//  mBoxWidget->PlaceWidget(bb_hard);
+//
+//
+////  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
+//>>>>>>> Stashed changes
 
 //  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
@@ -56,6 +117,34 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   this->toolsAvailableSlot();
 }
+
+//void ViewWrapper3D::startBoxInteraction()
+//{
+//  if (mImage.empty())
+//    return;
+//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+//  if (!image)
+//    image = mImage.front();
+//  double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
+//  //double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
+//  ssc::DoubleBoundingBox3D bb_unit(bb_hard);
+//  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
+//  ssc::Transform3D M = ssc::createTransformNormalize(bb_unit, bb);
+////  std::cout << "BB_image_d " << image->boundingBox() << std::endl;
+////  std::cout << "BB_image_r " << bb << std::endl;
+////return;
+//  //double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
+//  std::cout << "BB_image_d " << image->boundingBox() << std::endl;
+//  std::cout << "BB_image_r " << bb << std::endl;
+//
+//  vtkTransformPtr transform = vtkTransformPtr::New();
+//  transform->SetMatrix(M.matrix());
+//  mBoxWidget->SetTransform(transform);
+//
+//  //std::cout << "bb_r: " << bb << std::endl;
+////  mBoxRep->PlaceWidget(bb.begin());
+////  mBoxWidget->PlaceWidget(bb_hard);
+//}
 
 ViewWrapper3D::~ViewWrapper3D()
 {
@@ -172,6 +261,18 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
   mLandmarkRep->setImage(image);
 
   updateView();
+
+//  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
+//  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
+//
+//  std::cout << "bb_r: " << bb << std::endl;
+////  mBoxRep->PlaceWidget(bb.begin());
+//  mBoxRep->PlaceWidget(bb_hard);
+//<<<<<<< Updated upstream
+////  this->startBoxInteraction();
+//=======
+//>>>>>>> Stashed changes
+
 
   mView->getRenderer()->ResetCamera();
 //  if (mView->isVisible())
