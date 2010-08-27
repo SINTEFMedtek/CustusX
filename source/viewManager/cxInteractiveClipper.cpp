@@ -32,17 +32,9 @@ InteractiveClipper::InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy
     mUseClipper(false)
 {
   mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
-//  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),      this, SLOT(changedSlot()));
   connect(this              , SIGNAL(changed()),                       this, SLOT(changedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SIGNAL(changed()));
-  //connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SIGNAL(changed()));
 
-  //  ssc::SliceProxyPtr slicer = mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy;
-  //  mSlicePlaneClipper->setSliceProxy(slicer);
-  //  if (action->isChecked())
-  //    mSlicePlaneClipper->addVolume(mVolumetricReps[uid]);
-  //  else
-  //    mSlicePlaneClipper->removeVolume(mVolumetricReps[uid]);
   this->changedSlot();
 }
 
@@ -53,7 +45,7 @@ void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
 
   if (mSlicePlanesProxy->getData().count(plane))
   {
-    std::cout << "InteractiveClipper::setSlicePlane(" << plane << ")" << std::endl;
+//    std::cout << "InteractiveClipper::setSlicePlane(" << plane << ")" << std::endl;
     mSlicePlaneClipper->setSlicer(mSlicePlanesProxy->getData()[plane].mSliceProxy);
     emit changed();
   }
@@ -108,36 +100,31 @@ void InteractiveClipper::changedSlot()
   if (mUseClipper)
   {
     ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-//    std::cout << "image: " << image.get() << std::endl;
     mSlicePlaneClipper->clearVolumes();
     mSlicePlaneClipper->addVolume(repManager()->getVolumetricRep(image));
 
+    ssc::PLANE_TYPE currentPlane = this->getPlaneType();
+
     std::vector<ssc::PLANE_TYPE> planes = this->getAvailableSlicePlanes();
-    if (!std::count(planes.begin(), planes.end(), this->getPlaneType()))
-    //if (this->getPlaneType()==ssc::ptCOUNT)
+
+    if (!std::count(planes.begin(), planes.end(), currentPlane))    //if (this->getPlaneType()==ssc::ptCOUNT)
     {
-      std::vector<ssc::PLANE_TYPE> planes = this->getAvailableSlicePlanes();
-      if (planes.empty())
-        return;
-      ssc::PLANE_TYPE plane = planes.front();
-      std::cout << "init slicer(" << plane << ")" << std::endl;
-      mSlicePlaneClipper->setSlicer(mSlicePlanesProxy->getData()[plane].mSliceProxy);
+      if (planes.empty()) // no slices: remove clipping
+      {
+    	  currentPlane = ssc::ptCOUNT;
+      }
+      currentPlane = planes.front();
+//      std::cout << "init slicer(" << currentPlane << ")" << std::endl;
     }
+
+    // reset plane anyway. It might be the same planeType but a different sliceProxy.
+    mSlicePlaneClipper->setSlicer(mSlicePlanesProxy->getData()[currentPlane].mSliceProxy);
   }
   else
   {
     mSlicePlaneClipper->clearVolumes();
   }
 }
-
-//void InteractiveClipper::activeLayoutChangedSlot()
-//{
-//
-//}
-//void InteractiveClipper::activeImageChangedSlot()
-//{
-//
-//}
 
 std::vector<ssc::PLANE_TYPE> InteractiveClipper::getAvailableSlicePlanes() const
 {
