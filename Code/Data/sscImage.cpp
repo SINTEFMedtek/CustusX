@@ -523,6 +523,8 @@ void Image::setCropping(bool on)
 
   if (on)
     mCroppingBox_r = transform(get_rMd(), this->boundingBox());
+
+  emit cropBoxChanged();
 }
 
 bool Image::getCropping() const
@@ -532,7 +534,10 @@ bool Image::getCropping() const
 
 void Image::setCroppingBox(const DoubleBoundingBox3D& bb_r)
 {
+  if (similar(mCroppingBox_r, bb_r))
+    return;
   mCroppingBox_r = bb_r;
+  emit cropBoxChanged();
 }
 
 DoubleBoundingBox3D Image::getDoubleCroppingBox() const

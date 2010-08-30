@@ -103,6 +103,7 @@ signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	void clipPlanesChanged();
+  void cropBoxChanged();
 
 public slots:
   void setLandmark(Landmark landmark);

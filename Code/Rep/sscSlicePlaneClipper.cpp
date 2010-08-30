@@ -12,10 +12,12 @@
 #include <vtkVolume.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkPlaneCollection.h>
+#include <vtkVolumeMapper.h>
 
 #include "sscSliceProxy.h"
 #include "sscVolumetricRep.h"
 #include "sscImage.h"
+#include "sscDataManager.h"
 
 namespace ssc
 {
@@ -174,7 +176,9 @@ ImageMapperMonitor::ImageMapperMonitor(ssc::VolumetricRepPtr volume) : mVolume(v
 
   //std::cout << "ImageMapperMonitor::ImageMapperMonitor()" << std::endl;
   connect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
+  connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(cropBoxChangedSlot()));
   this->fillClipPlanes();
+  this->cropBoxChangedSlot();
 }
 
 ImageMapperMonitor::~ImageMapperMonitor()
@@ -214,6 +218,35 @@ void ImageMapperMonitor::fillClipPlanes()
     //std::cout << "ImageMapperMonitor::fillClipPlanes(" << i << ")" << std::endl;
     mVolume->getVtkVolume()->GetMapper()->AddClippingPlane(mPlanes[i]);
   }
+}
+
+vtkVolumeMapperPtr ImageMapperMonitor::getMapper()
+{
+  vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(mVolume->getVtkVolume()->GetMapper());
+  //mapper->Register();
+  return mapper;
+//  if (!mapper)
+//    return;
+}
+
+void ImageMapperMonitor::cropBoxChangedSlot()
+{
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+    return;
+
+  vtkVolumeMapperPtr mapper = this->getMapper();
+  if (!mapper)
+    return;
+  mapper->SetCropping(image->getCropping());
+
+  ssc::DoubleBoundingBox3D bb_r = image->getDoubleCroppingBox();
+
+  ssc::DoubleBoundingBox3D bb_d = ssc::transform(image->get_rMd().inv(), bb_r);
+  mapper->SetCroppingRegionPlanes(bb_d.begin());
+  mapper->Update();
+
+//  emit changed();
 }
 
 

@@ -16,6 +16,7 @@
 #include "sscVector3D.h"
 
 typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
+typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
 
 
 namespace ssc
@@ -71,10 +72,12 @@ public:
 
 private slots:
   void clipPlanesChangedSlot();
+  void cropBoxChangedSlot();
 private:
   ssc::VolumetricRepPtr mVolume;
   ImagePtr mImage;
   std::vector<vtkPlanePtr> mPlanes;
+  vtkVolumeMapperPtr getMapper();
 
   void clearClipPlanes();
   void fillClipPlanes();
