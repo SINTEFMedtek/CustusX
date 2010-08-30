@@ -378,6 +378,12 @@ void ViewGroup::addXml(QDomNode& dataNode)
   QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
   zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
   dataNode.appendChild(zoom2DNode);
+
+  QDomElement slicePlanes3DNode = doc.createElement("slicePlanes3D");
+  slicePlanes3DNode.setAttribute("use", mSlicePlanesProxy->getVisible());
+  slicePlanes3DNode.setAttribute("opaque", mSlicePlanesProxy->getDrawPlanes());
+  dataNode.appendChild(slicePlanes3DNode);
+
 }
 
 void ViewGroup::clearPatientData()
@@ -412,6 +418,12 @@ void ViewGroup::parseXml(QDomNode dataNode)
     this->setZoom2D(zoom2Ddouble);
   else
     ssc::messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
+
+  QDomElement slicePlanes3DNode = dataNode.namedItem("slicePlanes3D").toElement();
+  mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());
+  mSlicePlanesProxy->setDrawPlanes(slicePlanes3DNode.attribute("opaque").toInt());
+  dataNode.appendChild(slicePlanes3DNode);
+
 }
 
 }//cx
