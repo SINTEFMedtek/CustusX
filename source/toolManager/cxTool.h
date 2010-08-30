@@ -101,6 +101,7 @@ public:
   virtual int getIndex() const{return 0;};
   virtual bool isCalibrated() const; //TODO
   virtual ssc::ProbeSector getProbeSector() const;//{ return ssc::ProbeSector(); }; //TODO
+  void setUSProbeSector(double depthStart, double depthEnd, double width);
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
@@ -151,6 +152,8 @@ protected:
   bool mTracked;            ///< whether the tool is being tracked or not
 
   double mToolTipOffset; ///< distance from tool where point should be shown
+
+  ssc::ProbeSector mProbeSector; ///< Probe sector information
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } //namespace cx
