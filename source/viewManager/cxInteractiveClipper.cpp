@@ -53,11 +53,18 @@ void InteractiveClipper::setSlicePlane(ssc::PLANE_TYPE plane)
 
 void InteractiveClipper::saveClipPlaneToVolume()
 {
-  // not implemented
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+    return;
+
+  image->addClipPlane(mSlicePlaneClipper->getClipPlaneCopy());
 }
 void InteractiveClipper::clearClipPlanesInVolume()
 {
-  // not implemented
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  if (!image)
+    return;
+  image->clearClipPlanes();
 }
 
 ssc::PLANE_TYPE InteractiveClipper::getSlicePlane()
