@@ -38,6 +38,15 @@ namespace ssc
 	  mdCARDIOLOGY,
 	  mdCOUNT
 	};
+
+	enum MESSAGE_LEVEL
+	{
+	  mlINFO,
+	  mlWARNING,
+	  mlERROR,
+	  mlDEBUG,
+	  mlCOUNT
+	};
 } //namespace end
 
 //#include "sscDefinitionStrings.h"

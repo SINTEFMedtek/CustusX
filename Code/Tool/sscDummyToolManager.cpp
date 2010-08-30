@@ -92,6 +92,13 @@ ToolManager::ToolMapPtr DummyToolManager::getConfiguredTools()
 	}
 	return retval;
 }
+
+ToolManager::ToolMapPtr DummyToolManager::getInitializedTools()
+{
+  //TODO?
+  return ToolMapPtr(new ToolMap);
+}
+
 ToolManager::ToolMapPtr DummyToolManager::getTools()
 {
 	//Is there a better way to do this?

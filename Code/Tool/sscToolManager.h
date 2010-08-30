@@ -37,7 +37,8 @@ public:
 	virtual void stopTracking() = 0; ///< stop tracking
 
 	virtual ToolMapPtr getConfiguredTools() = 0; ///< get all configured tools
-	virtual ToolMapPtr getTools() = 0; ///< get connected tools
+	virtual ToolMapPtr getInitializedTools() = 0; ///< get all initialized tools
+	virtual ToolMapPtr getTools() = 0; ///< get configured and initialized tools
 	virtual ToolPtr getTool(const std::string& uid) = 0; ///< get a tool
 
 	virtual ToolPtr getDominantTool() = 0; ///< get the tool that has higest priority when tracking

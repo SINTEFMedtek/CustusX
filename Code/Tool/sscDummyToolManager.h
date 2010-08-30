@@ -34,6 +34,7 @@ public:
 	virtual void stopTracking();
 
 	virtual ToolMapPtr getConfiguredTools();
+	virtual ToolMapPtr getInitializedTools();
 	virtual ToolMapPtr getTools();
 	virtual ToolPtr getTool(const std::string& uid);
 

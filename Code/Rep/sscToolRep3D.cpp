@@ -188,6 +188,8 @@ void ToolRep3D::updateOffsetGraphics()
 
 void ToolRep3D::receiveVisible(bool visible)
 {
+//  std::cout << "ToolRep3D::receiveVisible " << mTool->getName() << std::endl;
+
 	if (!visible && mStayVisibleAfterHide)
 	{
 		return; // don't hide
