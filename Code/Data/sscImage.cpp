@@ -546,6 +546,7 @@ void Image::addClipPlane(vtkPlanePtr plane)
   if (std::count(mClipPlanes.begin(), mClipPlanes.end(), plane))
     return;
   mClipPlanes.push_back(plane);
+  emit clipPlanesChanged();
 }
 
 std::vector<vtkPlanePtr> Image::getClipPlanes()
@@ -556,6 +557,7 @@ std::vector<vtkPlanePtr> Image::getClipPlanes()
 void Image::clearClipPlanes()
 {
   mClipPlanes.clear();
+  emit clipPlanesChanged();
 }
 
 

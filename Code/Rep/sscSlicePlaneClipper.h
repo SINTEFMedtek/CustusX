@@ -8,10 +8,15 @@
 #define SSCSLICEPLANECLIPPER_H_
 
 #include <set>
+#include <vector>
 #include <boost/shared_ptr.hpp>
+#include <vtkSmartPointer.h>
 #include <QObject>
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
+
+typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
+
 
 namespace ssc
 {
@@ -36,15 +41,43 @@ public:
   ssc::SliceProxyPtr getSlicer();
   void setInvertPlane(bool on);
   bool getInvertPlane() const;
+  vtkPlanePtr getClipPlaneCopy();
+
+  void saveClipPlaneToVolume(); ///< save the current clip to image
+  void clearClipPlanesInVolume(); ///< clear all saved clips in the image.
 
 private slots:
   void changedSlot();
 private:
   SlicePlaneClipper();
+  void updateClipPlane();
   ssc::Vector3D getUnitNormal() const;
   ssc::SliceProxyPtr mSlicer;
   VolumesType mVolumes;
   bool mInvertPlane;
+
+  vtkPlanePtr mClipPlane;
+//  std::vector<vtkPlanePtr> mFixedPlanes;
+};
+
+/**Helper class that uses the stored clip planes in a Image to clip it in a mapper.
+ */
+class ImageMapperMonitor : public QObject
+{
+  Q_OBJECT
+public:
+  ImageMapperMonitor(ssc::VolumetricRepPtr volume);
+  ~ImageMapperMonitor();
+
+private slots:
+  void clipPlanesChangedSlot();
+private:
+  ssc::VolumetricRepPtr mVolume;
+  ImagePtr mImage;
+  std::vector<vtkPlanePtr> mPlanes;
+
+  void clearClipPlanes();
+  void fillClipPlanes();
 };
 
 } // namespace ssc

@@ -43,6 +43,8 @@ typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;
 typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
+typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+
 } // namespace ssc
 
 #endif /*SSC_FORWARDDECLARARATIONS_H_*/

@@ -1,5 +1,6 @@
 #include "sscBoundingBox3D.h"
 #include "sscUtilHelpers.h"
+#include "sscTypeConversions.h"
 
 // --------------------------------------------------------
 namespace ssc
@@ -179,6 +180,15 @@ DoubleBoundingBox3D DoubleBoundingBox3D::fromCloud(std::vector<Vector3D> cloud)
   return DoubleBoundingBox3D(a,b);
 }
   
+DoubleBoundingBox3D DoubleBoundingBox3D::fromString(const QString& text)
+{
+  std::vector<double> raw = convertQString2DoubleVector(text);
+  if (raw.size()!=6)
+    return DoubleBoundingBox3D(0,1,0,1,0,1);
+  return DoubleBoundingBox3D((double*)&(*raw.begin()));
+}
+
+
 // --------------------------------------------------------
 } // namespace utils
 } // namespace ssc
