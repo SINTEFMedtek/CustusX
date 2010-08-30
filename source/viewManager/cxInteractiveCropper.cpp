@@ -195,6 +195,7 @@ vtkVolumeMapperPtr InteractiveCropper::getMapper()
   ssc::VolumetricRepPtr volRep = repManager()->getVolumetricRep(image);
 
   vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(volRep->getVtkVolume()->GetMapper());
+  //mapper->Register();
   return mapper;
 //  if (!mapper)
 //    return;
