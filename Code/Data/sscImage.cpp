@@ -6,6 +6,7 @@
 #include <vtkImageData.h>
 #include <vtkMatrix4x4.h>
 #include <vtkImageLuminance.h>
+#include <vtkPlane.h>
 
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
@@ -25,6 +26,9 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
   Data(uid, name),
 	mBaseImageData(data)
 {
+  mUseCropping = false;
+  mCroppingBox_r = DoubleBoundingBox3D(0,0,0,0,0,0);
+
   mShading.on = false;
   mShading.ambient = 0.2;
   mShading.diffuse = 0.9;
@@ -361,6 +365,23 @@ void Image::addXml(QDomNode& parentNode)
   }
   imageNode.appendChild(landmarksNode);
 
+  QDomElement cropNode = doc.createElement("crop");
+  cropNode.setAttribute("use", mUseCropping);
+  //std::cout << "qstring_cast(mCroppingBox_r) " << qstring_cast(mCroppingBox_r) << std::endl;
+  cropNode.appendChild(doc.createTextNode(qstring_cast(mCroppingBox_r)));
+  imageNode.appendChild(cropNode);
+
+  QDomElement clipNode = doc.createElement("clip");
+  for (unsigned i=0; i<mClipPlanes.size(); ++i)
+  {
+    QDomElement planeNode = doc.createElement("plane");
+    ssc::Vector3D normal(mClipPlanes[i]->GetNormal());
+    ssc::Vector3D origin(mClipPlanes[i]->GetOrigin());
+    planeNode.setAttribute("normal", qstring_cast(normal));
+    planeNode.setAttribute("origin", qstring_cast(origin));
+    clipNode.appendChild(planeNode);
+  }
+  imageNode.appendChild(clipNode);
 }
 
 void Image::parseXml(QDomNode& dataNode)
@@ -415,6 +436,26 @@ void Image::parseXml(QDomNode& dataNode)
 	  landmark.parseXml(landmarkNode);
 	  this->setLandmark(landmark);
   }
+
+  QDomElement cropNode = dataNode.namedItem("crop").toElement();
+  if (!cropNode.isNull())
+  {
+    mUseCropping = cropNode.attribute("use").toInt();
+    mCroppingBox_r = DoubleBoundingBox3D::fromString(cropNode.text());
+  }
+
+  QDomElement clipNode = dataNode.namedItem("clip").toElement();
+  QDomElement clipPlaneNode = clipNode.firstChildElement("plane");
+  for (; !clipPlaneNode.isNull(); clipPlaneNode = clipPlaneNode.nextSiblingElement("plane"))
+  {
+    ssc::Vector3D normal = ssc::Vector3D::fromString(clipPlaneNode.attribute("normal"));
+    ssc::Vector3D origin = ssc::Vector3D::fromString(clipPlaneNode.attribute("origin"));
+    vtkPlanePtr plane = vtkPlanePtr::New();
+    plane->SetNormal(normal.begin());
+    plane->SetOrigin(origin.begin());
+    mClipPlanes.push_back(plane);
+  }
+
 }
 
 void Image::setShadingOn(bool on)
@@ -471,5 +512,52 @@ void Image::setShading(Image::shadingStruct shading )
   mShading = shading;
   emit transferFunctionsChanged();
 }
-  
+
+// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper
+void Image::setCropping(bool on)
+{
+  if (mUseCropping==on)
+    return;
+
+  mUseCropping = on;
+
+  if (on)
+    mCroppingBox_r = transform(get_rMd(), this->boundingBox());
+}
+
+bool Image::getCropping() const
+{
+  return mUseCropping;
+}
+
+void Image::setCroppingBox(const DoubleBoundingBox3D& bb_r)
+{
+  mCroppingBox_r = bb_r;
+}
+
+DoubleBoundingBox3D Image::getDoubleCroppingBox() const
+{
+  return mCroppingBox_r;
+}
+
+// methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
+void Image::addClipPlane(vtkPlanePtr plane)
+{
+  if (std::count(mClipPlanes.begin(), mClipPlanes.end(), plane))
+    return;
+  mClipPlanes.push_back(plane);
+}
+
+std::vector<vtkPlanePtr> Image::getClipPlanes()
+{
+  return mClipPlanes;
+}
+
+void Image::clearClipPlanes()
+{
+  mClipPlanes.clear();
+}
+
+
+
 } // namespace ssc

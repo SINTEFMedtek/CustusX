@@ -2,8 +2,10 @@
 #define SSCIMAGE_H_
 
 #include <map>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include "sscLandmark.h"
+#include "sscBoundingBox3D.h"
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -11,6 +13,7 @@ typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
 typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
+typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
 
 #include "sscData.h"
 typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
@@ -83,10 +86,17 @@ public:
 	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
-//	/**Return a reference to a GL texture buffer collection for the image.
-//	 * If no buffer exist, it is created. When noone uses the buffer, it is released. */
-//	GPUImageBufferPtr getGPUBuffer();
+	// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper
+  virtual void setCropping(bool on);
+  virtual bool getCropping() const;
+	virtual void setCroppingBox(const DoubleBoundingBox3D& bb_r);
+	virtual DoubleBoundingBox3D getDoubleCroppingBox() const;
 	
+  // methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
+	virtual void addClipPlane(vtkPlanePtr plane);
+	virtual std::vector<vtkPlanePtr> getClipPlanes();
+	virtual void clearClipPlanes();
+
 signals:
   void landmarkRemoved(std::string uid);
   void landmarkAdded(std::string uid);
@@ -121,6 +131,10 @@ protected:
   double mDiffuse;///< Shading parameter
   double mSpecular;///< Shading parameter
   double mSpecularPower;///< Shading parameter*/
+
+  bool mUseCropping; ///< image should be cropped using mCroppingBox
+  DoubleBoundingBox3D mCroppingBox_r; ///< box defining the cropping size.
+  std::vector<vtkPlanePtr> mClipPlanes;
 };
 
 typedef boost::shared_ptr<Image> ImagePtr;
