@@ -69,6 +69,7 @@ protected slots:
   void updateSlot();
   void dominantToolChangedSlot();
   void referenceToolChangedSlot();
+  void USProbePropertiesChangedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

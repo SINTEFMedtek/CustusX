@@ -787,4 +787,19 @@ ssc::ManualToolPtr ToolManager::getManualTool()
   return mManualTool;
 }
 
+void ToolManager::setUSProbeSector(double depthStart, double depthEnd, double width)
+{
+  ssc::messageManager()->sendDebug("setUSProbeSector: " + string_cast(depthStart)
+      + " " + string_cast(depthEnd) + " " + string_cast(width));
+
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
+  if (tool)
+  {
+    ssc::messageManager()->sendDebug("Found cxTool");
+    tool->setUSProbeSector(depthStart, depthEnd, width);
+  }
+  else
+    ssc::messageManager()->sendDebug("Dominant tool is not cxTool");
+}
+
 }//namespace cx
