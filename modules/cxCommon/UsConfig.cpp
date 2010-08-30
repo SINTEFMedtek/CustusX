@@ -491,6 +491,7 @@ void UsConfig::readConfigParametersSlot(const QString& config)
   catch( char * str ) {
      std::cout << "Exception raised: " << str << std::endl;
   }
+  emit USProbePropertiesChanged();
 }
 
 void UsConfig::probeSelectedSlot(const QString& probe)
