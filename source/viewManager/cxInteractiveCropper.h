@@ -48,6 +48,7 @@ public slots:
   void showBoxWidget(bool on);
   void useCropping(bool on);
 private slots:
+  void imageCropChangedSlot();
   void imageChangedSlot();
 
 private:
@@ -60,6 +61,7 @@ private:
   void updateBoxWidgetInteractor();
 
   vtkVolumeMapperPtr getMapper();
+  ssc::ImagePtr mImage;
   QPointer<ssc::View> mView;
   //vtkBoxRepresentationPtr mBoxRep;
   //vtkBoxWidget2Ptr mBoxWidget2;
