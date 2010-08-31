@@ -50,6 +50,7 @@ public:
 private slots:
   void changedSlot();
 private:
+  void addClipPlane(ssc::VolumetricRepPtr volume, vtkPlanePtr clipPlane);
   SlicePlaneClipper();
   void updateClipPlane();
   ssc::Vector3D getUnitNormal() const;

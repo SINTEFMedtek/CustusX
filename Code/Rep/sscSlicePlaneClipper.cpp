@@ -54,10 +54,27 @@ void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
   this->updateClipPlane();
   for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
   {
-    if (!(*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes()->IsItemPresent(mClipPlane))
-      (*iter)->getVtkVolume()->GetMapper()->AddClippingPlane(mClipPlane);
+//    // debug:
+//    vtkAbstractVolumeMapper* mapper = (*iter)->getVtkVolume()->GetMapper();
+//    std::cout << "mapper: count: " << mapper->GetReferenceCount() << std::endl;
+//    std::cout << "mClipPlane: " << mClipPlane.GetPointer() << std::endl;
+//    std::cout << "GetClippingPlanes ptr: " << (*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes() << std::endl;
+//    mapper->Print(std::cout);
+//    std::cout << "GetClippingPlanes: " << (*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes()->GetNumberOfItems() << "-" << (*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes()->GetReferenceCount() << std::endl;
+
+    this->addClipPlane(*iter, mClipPlane);
   }
   this->changedSlot();
+}
+
+void SlicePlaneClipper::addClipPlane(ssc::VolumetricRepPtr volume, vtkPlanePtr clipPlane)
+{
+  if (!clipPlane)
+    return;
+  vtkAbstractVolumeMapper* mapper = volume->getVtkVolume()->GetMapper();
+  if (mapper->GetClippingPlanes() && mapper->GetClippingPlanes()->IsItemPresent(clipPlane))
+    return;
+  mapper->AddClippingPlane(clipPlane);
 }
 
 ssc::SliceProxyPtr SlicePlaneClipper::getSlicer()
@@ -82,11 +99,13 @@ void SlicePlaneClipper::addVolume(ssc::VolumetricRepPtr volume)
     return;
   mVolumes.insert(volume);
 
-  if (mClipPlane)
-  {
-    if (!volume->getVtkVolume()->GetMapper()->GetClippingPlanes()->IsItemPresent(mClipPlane))
-      volume->getVtkVolume()->GetMapper()->AddClippingPlane(mClipPlane);
-  }
+//  if (mClipPlane)
+//  {
+    this->addClipPlane(volume, mClipPlane);
+//
+//    if (!volume->getVtkVolume()->GetMapper()->GetClippingPlanes()->IsItemPresent(mClipPlane))
+//      volume->getVtkVolume()->GetMapper()->AddClippingPlane(mClipPlane);
+ // }
 
   this->changedSlot();
 }
