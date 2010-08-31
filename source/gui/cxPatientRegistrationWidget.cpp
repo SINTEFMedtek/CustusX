@@ -55,8 +55,8 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   //toolmanager
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot(const std::string&)));
 
-  connect(ssc::toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot(std::string)));
-  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
+  connect(ssc::toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot()));
+  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
 
   //registrationmanager
   connect(RegistrationManager::getInstance(), SIGNAL(patientRegistrationPerformed()), this, SLOT(activateManualRegistrationFieldSlot()));

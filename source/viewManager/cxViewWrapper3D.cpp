@@ -155,6 +155,11 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
   mView->removeRep(mVolumetricReps[image->getUid()]);
   mVolumetricReps.erase(image->getUid());
 
+  if (image==mProbeRep->getImage())
+    mProbeRep->setImage(ssc::ImagePtr());
+  if (image==mLandmarkRep->getImage())
+    mLandmarkRep->setImage(ssc::ImagePtr());
+
   this->updateView();
 
   emit imageRemoved(qstring_cast(image->getUid()));

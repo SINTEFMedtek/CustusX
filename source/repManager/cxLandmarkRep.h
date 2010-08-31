@@ -58,12 +58,16 @@ public:
 public slots:
   void landmarkAddedSlot(std::string );
   void landmarkRemovedSlot(std::string);
+  void transformChangedSlot();
 
 protected:
   LandmarkRep(const std::string& uid, const std::string& name=""); ///< sets default text scaling to 20
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
   void addPoint(ssc::Vector3D coord, std::string caption);
+  void clearAll();
+  void addAll();
+  void setPosition(ssc::Vector3D coord, std::string uid);
 
 protected slots:
   void internalUpdate(); ///< updates the text, color, scale etc
