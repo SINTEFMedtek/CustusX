@@ -132,11 +132,13 @@ void InteractiveCropper::showBoxWidget(bool on)
   emit changed();
 }
 
+/** get current cropping box in ref coords
+ */
 ssc::DoubleBoundingBox3D InteractiveCropper::getBoundingBox()
 {
   if (!mImage)
     return ssc::DoubleBoundingBox3D();
-  return mImage->getDoubleCroppingBox();
+  return transform(mImage->get_rMd(), mImage->getCroppingBox());
 }
 
 void InteractiveCropper::setBoundingBox(const ssc::DoubleBoundingBox3D& bb_r)
@@ -176,7 +178,7 @@ void InteractiveCropper::imageCropChangedSlot()
   if (!mImage)
     return;
 
-  ssc::DoubleBoundingBox3D bb_r = mImage->getDoubleCroppingBox();
+  ssc::DoubleBoundingBox3D bb_r = this->getBoundingBox();
 
   //std::cout << "InteractiveCropper::imageCropChangedSlot" << std::endl;
   this->setBoxWidgetSize(bb_r);
@@ -257,7 +259,7 @@ void InteractiveCropper::setCroppingRegion(ssc::DoubleBoundingBox3D bb_r)
 {
   if (!mImage)
     return;
-  mImage->setCroppingBox(bb_r);
+  mImage->setCroppingBox(transform(mImage->get_rMd().inv(), bb_r));
   emit changed();
 }
 
