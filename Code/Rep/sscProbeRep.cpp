@@ -296,6 +296,9 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
  // std::cout << "ProbeRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
 	//Creating the line from the camera through the picked point into the volume
+  ssc::Transform3D dMr = mImage->get_rMd().inv();
+  p0 = dMr.coord(p0);
+  p1 = dMr.coord(p1);
 	vtkLineSourcePtr lineSource = vtkLineSource::New();
 	lineSource->SetPoint1(p0.begin());
 	lineSource->SetPoint2(p1.begin());
@@ -304,7 +307,8 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 
 	//Creating a probefilter
 	vtkProbeFilterPtr probeFilter = vtkProbeFilter::New();
-	probeFilter->SetSource(mImage->getRefVtkImageData());
+	//probeFilter->SetSource(mImage->getRefVtkImageData());
+	probeFilter->SetSource(mImage->getBaseVtkImageData());
 	probeFilter->SetInputConnection(lineSource->GetOutputPort());
 	probeFilter->Update();
 
@@ -329,6 +333,7 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 		return false;
 
 	Vector3D retval(probeFilterMapper->GetInput()->GetPoint(i));
+	retval = dMr.inv().coord(retval);
 	intersection = retval;
 	return true;
 }
