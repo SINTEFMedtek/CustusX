@@ -27,7 +27,7 @@ Image::Image(const std::string& uid, const vtkImageDataPtr& data,
 	mBaseImageData(data)
 {
   mUseCropping = false;
-  mCroppingBox_r = DoubleBoundingBox3D(0,0,0,0,0,0);
+  mCroppingBox_d = DoubleBoundingBox3D(0,0,0,0,0,0);
 
   mShading.on = false;
   mShading.ambient = 0.2;
@@ -368,7 +368,7 @@ void Image::addXml(QDomNode& parentNode)
   QDomElement cropNode = doc.createElement("crop");
   cropNode.setAttribute("use", mUseCropping);
   //std::cout << "qstring_cast(mCroppingBox_r) " << qstring_cast(mCroppingBox_r) << std::endl;
-  cropNode.appendChild(doc.createTextNode(qstring_cast(mCroppingBox_r)));
+  cropNode.appendChild(doc.createTextNode(qstring_cast(mCroppingBox_d)));
   imageNode.appendChild(cropNode);
 
   QDomElement clipNode = doc.createElement("clip");
@@ -441,7 +441,7 @@ void Image::parseXml(QDomNode& dataNode)
   if (!cropNode.isNull())
   {
     mUseCropping = cropNode.attribute("use").toInt();
-    mCroppingBox_r = DoubleBoundingBox3D::fromString(cropNode.text());
+    mCroppingBox_d = DoubleBoundingBox3D::fromString(cropNode.text());
   }
 
   QDomElement clipNode = dataNode.namedItem("clip").toElement();
@@ -520,10 +520,8 @@ void Image::setCropping(bool on)
     return;
 
   mUseCropping = on;
-
-  if (on)
-    mCroppingBox_r = transform(get_rMd(), this->boundingBox());
-
+  if (similar(mCroppingBox_d, DoubleBoundingBox3D(0,0,0,0,0,0)))
+    mCroppingBox_d = this->boundingBox();
   emit cropBoxChanged();
 }
 
@@ -532,17 +530,17 @@ bool Image::getCropping() const
   return mUseCropping;
 }
 
-void Image::setCroppingBox(const DoubleBoundingBox3D& bb_r)
+void Image::setCroppingBox(const DoubleBoundingBox3D& bb_d)
 {
-  if (similar(mCroppingBox_r, bb_r))
+  if (similar(mCroppingBox_d, bb_d))
     return;
-  mCroppingBox_r = bb_r;
+  mCroppingBox_d = bb_d;
   emit cropBoxChanged();
 }
 
-DoubleBoundingBox3D Image::getDoubleCroppingBox() const
+DoubleBoundingBox3D Image::getCroppingBox() const
 {
-  return mCroppingBox_r;
+  return mCroppingBox_d;
 }
 
 // methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
