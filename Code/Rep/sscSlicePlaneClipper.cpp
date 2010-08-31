@@ -188,7 +188,7 @@ void SlicePlaneClipper::changedSlot()
 
 
 
-ImageMapperMonitor::ImageMapperMonitor(ssc::VolumetricRepPtr volume) : mVolume(volume), mImage(volume->getImage())
+ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mVolume(volume), mImage(image)
 {
   if (!mImage)
     return;
@@ -217,11 +217,9 @@ void ImageMapperMonitor::clearClipPlanes()
   if (!mImage)
     return;
 
- // std::vector<vtkPlanePtr> planes = mImage->getClipPlanes();
   for (unsigned i=0; i<mPlanes.size(); ++i)
   {
-    //std::cout << "ImageMapperMonitor::clearClipPlanes(" << i << ")" << std::endl;
-    mVolume->getVtkVolume()->GetMapper()->RemoveClippingPlane(mPlanes[i]);
+    mVolume->GetMapper()->RemoveClippingPlane(mPlanes[i]);
   }
   mPlanes.clear();
 }
@@ -234,14 +232,13 @@ void ImageMapperMonitor::fillClipPlanes()
   mPlanes = mImage->getClipPlanes();
   for (unsigned i=0; i<mPlanes.size(); ++i)
   {
-    //std::cout << "ImageMapperMonitor::fillClipPlanes(" << i << ")" << std::endl;
-    mVolume->getVtkVolume()->GetMapper()->AddClippingPlane(mPlanes[i]);
+    mVolume->GetMapper()->AddClippingPlane(mPlanes[i]);
   }
 }
 
 vtkVolumeMapperPtr ImageMapperMonitor::getMapper()
 {
-  vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(mVolume->getVtkVolume()->GetMapper());
+  vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(mVolume->GetMapper());
   //mapper->Register();
   return mapper;
 //  if (!mapper)

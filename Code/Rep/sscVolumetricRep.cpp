@@ -13,6 +13,7 @@
 #include "sscView.h"
 #include "sscImage.h"
 #include "sscImageTF3D.h"
+#include "sscSlicePlaneClipper.h"
 
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 
@@ -115,6 +116,7 @@ void VolumetricRep::setImage(ImagePtr image)
     disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
+    mMonitor.reset();
 	}
 
 	mImage = image;
@@ -127,6 +129,7 @@ void VolumetricRep::setImage(ImagePtr image)
     connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
+    mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
 		vtkImageDataChangedSlot();
 	}
 	else
