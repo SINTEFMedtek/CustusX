@@ -56,6 +56,7 @@ private slots:
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
   void fillSlicePlanesActionSlot(bool checked);
+  void resetCameraActionSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);

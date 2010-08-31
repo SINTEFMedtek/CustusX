@@ -14,6 +14,7 @@
 #include "cxView3D.h"
 #include "sscImageLUT2D.h"
 #include "cxDataInterface.h"
+#include  "cxVolumePropertiesWidget.h"
 
 namespace cx
 {
@@ -29,8 +30,9 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  mImageNameLabel = new QLabel(this);
-  toptopLayout->addWidget(mImageNameLabel);
+//  mImageNameLabel = new QLabel(this);
+//  toptopLayout->addWidget(mImageNameLabel);
+  toptopLayout->addWidget(new ActiveVolumeWidget(this));
 
   QVBoxLayout* winlvlLayout = new QVBoxLayout;
   toptopLayout->addLayout(winlvlLayout);
@@ -47,22 +49,22 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
-  updateSlot();
+  //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
+  //updateSlot();
 }
 
 ImagePropertiesWidget::~ImagePropertiesWidget()
 {
 }
 
-void ImagePropertiesWidget::updateSlot()
-{
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  if (image)
-  {
-    mImageNameLabel->setText(qstring_cast(image->getName()));
-  }
-}
+//void ImagePropertiesWidget::updateSlot()
+//{
+//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+//  if (image)
+//  {
+//    mImageNameLabel->setText(qstring_cast(image->getName()));
+//  }
+//}
 
 void ImagePropertiesWidget::showEvent(QShowEvent* event)
 {
