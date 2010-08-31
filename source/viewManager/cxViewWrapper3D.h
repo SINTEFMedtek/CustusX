@@ -56,20 +56,15 @@ private slots:
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
   void fillSlicePlanesActionSlot(bool checked);
-  //void slicePlanesChangedSlot();
-  void clipActionSlot();
 
 private:
-//  void startBoxInteraction();
   virtual void appendToContextMenu(QMenu& contextMenu);
-//  virtual void checkFromContextMenu(QAction* theAction, QActionGroup* theActionGroup){};
   void updateView();
 
   vtkBoxRepresentationPtr mBoxRep;
   vtkBoxWidget2Ptr mBoxWidget2;
   vtkBoxWidgetPtr mBoxWidget;
 
-//  ssc::VolumetricRepPtr mVolumetricRep;
   typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
   VolumetricRepMap mVolumetricReps;
   LandmarkRepPtr mLandmarkRep;
@@ -80,8 +75,6 @@ private:
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
-//  ssc::SlicePlaneClipperPtr mSlicePlaneClipper;
-  //InteractiveCropperPtr mInteractiveCropper;
 
   std::vector<ssc::ImagePtr> mImage;
   //std::vector<ssc::MeshPtr> mMeshes;
