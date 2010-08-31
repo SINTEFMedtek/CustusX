@@ -14,6 +14,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleDataAdapter.h"
 //#include "sscHelperWidgets.h"
+#include "sscStringDataAdapter.h"
 
 namespace cx
 {
@@ -84,6 +85,27 @@ public:
   virtual ssc::DoubleRange getValueRange() const;
 };
 
+
+/** Adapter that connects to the current active image.
+ */
+class ActiveImageStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveImageStringDataAdapter()); }
+  ActiveImageStringDataAdapter();
+  virtual ~ActiveImageStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
 
 
 

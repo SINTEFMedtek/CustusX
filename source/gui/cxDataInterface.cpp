@@ -108,8 +108,13 @@ ssc::DoubleRange DoubleDataAdapter2DWindow::getValueRange() const
   return ssc::DoubleRange(1,range,range/1000.0);
 }
 
+
+
+
 //---------------------------------------------------------
 //---------------------------------------------------------
+
+
 
 
 double DoubleDataAdapter2DLevel::getValueInternal() const
@@ -129,5 +134,60 @@ ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
   return ssc::DoubleRange(1,max,max/1000.0);
 }
 
+
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+
+
+ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
+{
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),      this, SIGNAL(changed()));
+}
+
+QString ActiveImageStringDataAdapter::getValueName() const
+{
+  return "Active Volume";
+}
+bool ActiveImageStringDataAdapter::setValue(const QString& value)
+{
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  if (newImage==ssc::dataManager()->getActiveImage())
+    return false;
+  ssc::dataManager()->setActiveImage(newImage);
+  return true;
+}
+QString ActiveImageStringDataAdapter::getValue() const
+{
+  if (!ssc::dataManager()->getActiveImage())
+    return "";
+  return qstring_cast(ssc::dataManager()->getActiveImage()->getUid());
+}
+QString ActiveImageStringDataAdapter::getHelp() const
+{
+  return "select the active volume";
+}
+QStringList ActiveImageStringDataAdapter::getValueRange() const
+{
+  std::vector<std::string> uids = ssc::dataManager()->getImageUids();
+  QStringList retval;
+  retval << "";
+  for (unsigned i=0; i<uids.size(); ++i)
+    retval << qstring_cast(uids[i]);
+  return retval;
+}
+QString ActiveImageStringDataAdapter::convertInternal2Display(QString internal)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(internal));
+  if (!image)
+    return "<no volume>";
+  return qstring_cast(image->getName());
+}
 
 } // namespace cx

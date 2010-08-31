@@ -69,19 +69,29 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   QAction* slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
   slicePlanesAction->setCheckable(true);
   slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
-  connect(slicePlanesAction, SIGNAL(triggered(bool)),
-          this, SLOT(showSlicePlanesActionSlot(bool)));
+  connect(slicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(showSlicePlanesActionSlot(bool)));
 
   QAction* fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
   fillSlicePlanesAction->setCheckable(true);
   fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
   fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
-  connect(fillSlicePlanesAction, SIGNAL(triggered(bool)),
-          this, SLOT(fillSlicePlanesActionSlot(bool)));
+  connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
 
+  QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
+  //resetCameraAction->setCheckable(true);
+  //resetCameraAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
+  connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
+
+  contextMenu.addSeparator();
+  contextMenu.addAction(resetCameraAction);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
+}
+
+void ViewWrapper3D::resetCameraActionSlot()
+{
+  mView->getRenderer()->ResetCamera();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
