@@ -98,6 +98,7 @@ protected:
   QSettingsPtr mSettings;
   QSpinBox* mRenderingIntervalSpinBox;
   QLabel* mRenderingRateLabel;
+  QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
   
