@@ -49,9 +49,12 @@ void RegistrationManager::initialize()
 
 void RegistrationManager::setMasterImage(ssc::ImagePtr image)
 {
+  if (mMasterImage==image)
+    return;
+
   mMasterImage = image;
   if (mMasterImage)
-    ssc::messageManager()->sendInfo("Master image set to "+image->getUid());
+    ssc::messageManager()->sendInfo("Registration Master image set to "+image->getUid());
 }
 
 ssc::ImagePtr RegistrationManager::getMasterImage()
@@ -169,6 +172,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 {
   *ok = false;
 
+
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
@@ -200,9 +204,10 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 
 void RegistrationManager::doPatientRegistration()
 {
+  //std::cout << "RegistrationManager::doPatientRegistration()" << std::endl;
   if(!mMasterImage)
   {
-    ssc::messageManager()->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
+    //ssc::messageManager()->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
     return;
   }
 
@@ -232,7 +237,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //check that the masterimage is set
   if(!mMasterImage)
   {
-    ssc::messageManager()->sendError("There isn't set a masterimage in the registrationmanager.");
+    //ssc::messageManager()->sendError("There isn't set a masterimage in the registrationmanager.");
     return;
   }
 
@@ -243,6 +248,23 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   vtkPointsPtr p_ref = convertTovtkPoints(landmarks, masterLandmarks, mMasterImage->get_rMd());
   vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D());
 
+  if (landmarks.empty())
+    return;
+/*
+  std::cout << "------------------------" << std::endl;
+  std::cout << "landmarks.size(): "<< landmarks.size() << std::endl;
+  std::cout << "p_data:" << std::endl;
+  for (int i=0; i<p_data->GetNumberOfPoints(); ++i)
+    std::cout << ssc::Vector3D(p_data->GetPoint(i)) << std::endl;
+//  p_data->Print(std::cout);
+//  p_data->GetData()->Print(std::cout);
+  std::cout << "p_ref:" << std::endl;
+  for (int i=0; i<p_ref->GetNumberOfPoints(); ++i)
+    std::cout << ssc::Vector3D(p_ref->GetPoint(i)) << std::endl;
+//  p_ref->Print(std::cout);
+//  p_ref->GetData()->Print(std::cout);
+  std::cout << "------------------------" << std::endl;
+*/
   bool ok = false;
   ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
   if (!ok)
@@ -251,7 +273,18 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::RegistrationTransform regTrans(rMd, QDateTime::currentDateTime(), "Image to Image");
   image->get_rMd_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
+/*
+  std::cout << "rMd:\n" << rMd << std::endl;
+  ssc::Vector3D c0_d0 = mMasterImage->boundingBox().center();
+  ssc::Vector3D c1_d1 = image->boundingBox().center();
+  ssc::Vector3D c0_r = mMasterImage->get_rMd().coord(c0_d0);
+  ssc::Vector3D c1_r = rMd.coord(c1_d1);
+  std::cout << "master center: " << c0_r << " , d="<< c0_d0 << std::endl;
+  std::cout << "active center: " << c1_r << " , d="<< c1_d1 << std::endl;
 
+  std::cout << "------------------------" << std::endl;
+  std::cout << "------------------------" << std::endl;
+*/
   //why did we use the inverse of the transform?
   //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 

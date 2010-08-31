@@ -305,7 +305,12 @@ void ViewGroup::mouseClickInViewGroupSlot()
   if (mImages.empty())
     ssc::dataManager()->setActiveImage(ssc::ImagePtr());
   else
-    ssc::dataManager()->setActiveImage(mImages.front());
+  {
+    if (!std::count(mImages.begin(), mImages.end(), ssc::dataManager()->getActiveImage()))
+    {
+      ssc::dataManager()->setActiveImage(mImages.front());
+    }
+  }
 
   ssc::View* view = static_cast<ssc::View*>(this->sender());
   if(view)
