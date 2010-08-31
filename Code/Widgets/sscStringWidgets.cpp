@@ -39,7 +39,7 @@ ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr da
   else // add directly to this
   {
     topLayout->addWidget(mLabel);
-    topLayout->addWidget(mCombo);
+    topLayout->addWidget(mCombo, 1);
   }
 
   dataChanged();
