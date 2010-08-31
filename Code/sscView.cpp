@@ -1,5 +1,7 @@
 #include "sscView.h"
 #include <QtGui>
+#include <vtkImageActor.h>
+#include <vtkImageData.h>
 
 #include "vtkRenderWindow.h"
 
@@ -211,6 +213,12 @@ void View::mouseMoveEvent(QMouseEvent* event)
 
 void View::mousePressEvent(QMouseEvent* event)
 {
+  // special case for CustusX: when context menu is opened, mousereleaseevent is never called.
+  // this sets the render interactor in a zoom state after each menu call. This hack prevents
+  // the mouse press event in this case.
+  if ((this->contextMenuPolicy()==Qt::CustomContextMenu) && event->buttons().testFlag(Qt::RightButton))
+    return;
+
   inherited::mousePressEvent(event);
   emit mousePressSignal(event);
 }
@@ -250,23 +258,34 @@ void View::render()
   props->InitTraversal();
   for (vtkProp* prop = props->GetNextProp(); prop!=NULL; prop=props->GetNextProp())
   {
-    vtkVolume* volume = vtkVolume::SafeDownCast(prop);
-    if (volume)
+//    vtkProp3D* prop3D = vtkProp3D::SafeDownCast(prop);
+//    if (prop3D)
+//      hash += prop3D->GetMTime();
+    vtkImageActor* imageActor = vtkImageActor::SafeDownCast(prop);
+    if (imageActor && imageActor->GetInput())
     {
-      std::cout << getName() << "\t" << prop->GetRedrawMTime() << "  " << prop->GetMTime() << std::endl;
+//      hash += imageActor->GetMTime();
+      hash += imageActor->GetInput()->GetMTime();
     }
+
+
+//    vtkVolume* volume = vtkVolume::SafeDownCast(prop);
+//    if (volume)
+//    {
+////      std::cout << getName() << "\t" << prop->GetRedrawMTime() << "  " << prop->GetMTime() << std::endl;
+//    }
     //std::cout << "--" << getName() << "\t" << hash << std::endl;
     hash += prop->GetMTime();
     hash += prop->GetRedrawMTime();
   }
-  std::cout << "--" << getName() << "\t" << hash << std::endl;
+//  std::cout << "--" << getName() << "\t" << hash << std::endl;
 
   if ( hash!=mMTimeHash )
   {
     this->getRenderWindow()->Render();
     mMTimeHash = hash;
 //    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
-    std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
+    //std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
   }
 }
 
