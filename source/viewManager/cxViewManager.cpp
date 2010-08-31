@@ -22,7 +22,6 @@
 #include "cxDataManager.h"
 #include "sscToolManager.h"
 #include "cxDataLocations.h"
-#include "sscSlicePlaneClipper.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
