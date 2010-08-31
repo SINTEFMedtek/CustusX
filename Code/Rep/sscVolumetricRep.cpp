@@ -129,8 +129,8 @@ void VolumetricRep::setImage(ImagePtr image)
     connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
-    mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
 		vtkImageDataChangedSlot();
+    mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
 	}
 	else
 	{

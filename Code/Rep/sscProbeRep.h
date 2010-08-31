@@ -42,6 +42,7 @@ public:
 
 	int getThreshold(); ///< gets the probing threshold
 	void setImage(ImagePtr image); ///< set which image points should be picked from
+	ImagePtr getImage();
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
   void setTool(ToolPtr tool); ///< set the tool to listen to
 

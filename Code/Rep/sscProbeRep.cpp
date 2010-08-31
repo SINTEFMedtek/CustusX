@@ -46,6 +46,11 @@ int ProbeRep::getThreshold()
 {
   return mThreshold;
 }
+ImagePtr ProbeRep::getImage()
+{
+  return mImage;
+}
+
 void ProbeRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
@@ -63,6 +68,8 @@ void ProbeRep::setImage(ImagePtr image)
 //    connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
 //        mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
 //  }
+	if (mImage)
+	  mThreshold = mImage->getPosMin() + (mImage->getPosMax()-mImage->getPosMin())/10;
 }
 void ProbeRep::setResolution(const int resolution)
 {
@@ -174,12 +181,14 @@ void ProbeRep::makeLandmarkPermanent(unsigned index)
 }
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
-  std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
+  //std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
 	vtkRenderWindowInteractorPtr iren =
 		vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
 	if(iren == NULL)
 		return;
+	if (!mImage)
+	  return;
 
 	int pickedPoint[2]; //<x,y>
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
@@ -190,7 +199,7 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 
 //  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
-  std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
+  //std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
 	this->pickLandmark(clickPoint, mCurrentRenderer);
 }
 /**
@@ -285,7 +294,7 @@ vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& 
  */
 bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 {
-  std::cout << "ProbeRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
+ // std::cout << "ProbeRep::intersectData(p0<"<<p0<<">,p1<"<<p1<<">) image="<<mImage->getName()<<std::endl;
 	//Creating the line from the camera through the picked point into the volume
 	vtkLineSourcePtr lineSource = vtkLineSource::New();
 	lineSource->SetPoint1(p0.begin());
