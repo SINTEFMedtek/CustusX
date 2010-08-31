@@ -363,8 +363,9 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
 
 void LandmarkRep::setPosition(ssc::Vector3D coord, std::string uid)
 {
-  vtkImageDataPtr imageData = mImage->getRefVtkImageData();
-  ssc::Vector3D imageCenter(imageData->GetCenter());
+  ssc::Vector3D imageCenter = mImage->get_rMd().coord(mImage->boundingBox().center());
+//  vtkImageDataPtr imageData = mImage->getRefVtkImageData();
+//  ssc::Vector3D imageCenter(imageData->GetCenter());
   ssc::Vector3D centerToSkinVector = (coord - imageCenter).normal();
 
   ssc::Vector3D numberPosition = coord + 10.0*centerToSkinVector;
