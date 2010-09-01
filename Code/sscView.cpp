@@ -285,7 +285,7 @@ void View::render()
     this->getRenderWindow()->Render();
     mMTimeHash = hash;
 //    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
-    //std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
+//    std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
   }
 }
 
