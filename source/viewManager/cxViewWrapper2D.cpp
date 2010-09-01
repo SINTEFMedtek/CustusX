@@ -366,6 +366,11 @@ void ViewWrapper2D::removeImage(ssc::ImagePtr image)
   emit imageRemoved(qstring_cast(image->getUid()));
 }
 
+void ViewWrapper2D::removeMesh(ssc::MeshPtr mesh)
+{
+  //TODO
+}
+
 void ViewWrapper2D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();

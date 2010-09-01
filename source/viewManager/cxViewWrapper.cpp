@@ -123,9 +123,18 @@ void ViewWrapper::meshActionSlot()
   
   QString meshUid = theAction->data().toString();
   ssc::MeshPtr mesh= ssc::dataManager()->getMesh(meshUid.toStdString());
-  
-  this->addMesh(mesh);
-  //dataManager()->setActiveImage(mesh);
+
+  if (theAction->isChecked())
+  {
+    this->addMesh(mesh);
+    //ssc::dataManager()->setActiveMesh(mesh);
+  }
+  else
+  {
+    this->removeMesh(mesh);
+    //ssc::dataManager()->setActiveMesh(ssc::MeshPtr);
+    //theAction->setChecked(false);
+  }
   
   Navigation().centerToGlobalImageCenter(); // reset center for convenience
 }
