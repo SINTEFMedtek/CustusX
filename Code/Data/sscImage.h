@@ -89,8 +89,8 @@ public:
 	// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper
   virtual void setCropping(bool on);
   virtual bool getCropping() const;
-	virtual void setCroppingBox(const DoubleBoundingBox3D& bb_r);
-	virtual DoubleBoundingBox3D getDoubleCroppingBox() const;
+	virtual void setCroppingBox(const DoubleBoundingBox3D& bb_d);
+	virtual DoubleBoundingBox3D getCroppingBox() const;
 	
   // methods for defining and storing clip planes. Image does not use these data, this is up to the mapper
 	virtual void addClipPlane(vtkPlanePtr plane);
@@ -103,6 +103,7 @@ signals:
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	void clipPlanesChanged();
+  void cropBoxChanged();
 
 public slots:
   void setLandmark(Landmark landmark);
@@ -134,7 +135,7 @@ protected:
   double mSpecularPower;///< Shading parameter*/
 
   bool mUseCropping; ///< image should be cropped using mCroppingBox
-  DoubleBoundingBox3D mCroppingBox_r; ///< box defining the cropping size.
+  DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
   std::vector<vtkPlanePtr> mClipPlanes;
 };
 

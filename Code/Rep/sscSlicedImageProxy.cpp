@@ -77,7 +77,10 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
+  // needed for view::render() to work properly
   mWindowLevel->Modified();
+  mRedirecter->Modified();
+  mRedirecter->Update();
 }
 
 typedef vtkSmartPointer<vtkImageExtractComponents> vtkImageExtractComponentsPtr;

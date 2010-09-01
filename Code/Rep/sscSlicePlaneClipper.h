@@ -16,6 +16,8 @@
 #include "sscVector3D.h"
 
 typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
+typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
+typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
 
 
 namespace ssc
@@ -49,6 +51,7 @@ public:
 private slots:
   void changedSlot();
 private:
+  void addClipPlane(ssc::VolumetricRepPtr volume, vtkPlanePtr clipPlane);
   SlicePlaneClipper();
   void updateClipPlane();
   ssc::Vector3D getUnitNormal() const;
@@ -61,20 +64,25 @@ private:
 };
 
 /**Helper class that uses the stored clip planes in a Image to clip it in a mapper.
+ *
+ * Used internally by VolumetricRep - No need to use this elsewhere!
  */
 class ImageMapperMonitor : public QObject
 {
   Q_OBJECT
 public:
-  ImageMapperMonitor(ssc::VolumetricRepPtr volume);
+  ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image);
   ~ImageMapperMonitor();
 
 private slots:
   void clipPlanesChangedSlot();
+  void cropBoxChangedSlot();
 private:
-  ssc::VolumetricRepPtr mVolume;
+  //ssc::VolumetricRepPtr mVolume;
+  vtkVolumePtr mVolume;
   ImagePtr mImage;
   std::vector<vtkPlanePtr> mPlanes;
+  vtkVolumeMapperPtr getMapper();
 
   void clearClipPlanes();
   void fillClipPlanes();

@@ -16,6 +16,7 @@ namespace ssc
 typedef boost::shared_ptr<class Image> ImagePtr;
 
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
+typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 
 /**Representation for one Image.
  * Use this to render volumetric image data in a 3D scene.
@@ -50,6 +51,7 @@ protected:
 
 	ImagePtr mImage;
 	double mResampleFactor;
+	ImageMapperMonitorPtr mMonitor; ///< helper object for visualizing clipping/cropping
 
 private slots:
 	void transformChangedSlot();
