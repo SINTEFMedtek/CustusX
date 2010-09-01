@@ -43,6 +43,7 @@ public:
   virtual ~ViewWrapper3D();
   virtual void addImage(ssc::ImagePtr image);
   virtual void addMesh(ssc::MeshPtr mesh);
+  virtual void removeMesh(ssc::MeshPtr mesh);
   virtual std::vector<ssc::ImagePtr> getImages() const;
   virtual ssc::MeshPtr getMesh() const;
   virtual void removeImage(ssc::ImagePtr image);

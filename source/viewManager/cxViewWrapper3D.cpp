@@ -115,12 +115,6 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
     return;
   }
 
-//  if (!image->getRefVtkImageData().GetPointer())
-//  {
-//    ssc::messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
-//    return;
-//  }
-
   mImage.push_back(image);
 
   if (!mVolumetricReps.count(image->getUid()))
@@ -175,9 +169,9 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
   emit imageRemoved(qstring_cast(image->getUid()));
 }
 
-
 void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
 {
+  //TODO: Allow more than one mesh
   if (!mesh)
     return;
   
@@ -192,6 +186,19 @@ void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
   mView->getRenderer()->ResetCamera();
   if(mView->isVisible())
     mView->getRenderWindow()->Render();
+}
+
+void ViewWrapper3D::removeMesh(ssc::MeshPtr mesh)
+{
+  //TODO: Allow more than one mesh
+  if (!mesh)
+    return;
+  if(!mGeometricRep->hasMesh(mesh))
+    return;
+
+  mView->removeRep(mGeometricRep);
+  mMesh.reset();//set empty mesh
+  this->updateView();
 }
 
 std::vector<ssc::ImagePtr> ViewWrapper3D::getImages() const

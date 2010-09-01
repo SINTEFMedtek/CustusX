@@ -214,7 +214,10 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     if(!transform.IsValidNow())
     {
       //What to do? this happens alot, dunno why. Ignore? Seems to work ok.
+      //TODO CA20100901: Probable cause: we work on the main (render) thread. This causes several hundred ms lag. Move IGSTK+Toolmanager internals to separate thread.
     }
+    if (!mVisible)
+      return; // quickfix replacement for IsValidNow()
 
     const igstk::CoordinateSystem* destination = result.GetDestination();
     ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
@@ -248,6 +251,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     mTransforms->push_back(m_prMt);
     mTimestamps->push_back(timestamp);
+
 
     emit toolTransformAndTimestamp((*m_prMt), timestamp);
     emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);
