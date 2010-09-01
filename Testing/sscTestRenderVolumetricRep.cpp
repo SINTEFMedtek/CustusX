@@ -13,6 +13,7 @@
 #include "sscImage.h"
 #include "sscView.h"
 #include "sscVolumetricRep.h"
+#include "sscProgressiveLODVolumetricRep.h"
 
 //namespace ssc
 //{
@@ -55,7 +56,9 @@ int main(int argc, char **argv)
 	layout->addWidget(view);
   std::cout << "test2" << std::endl;
 
-	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
+	//ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
+  ssc::ProgressiveLODVolumetricRepPtr rep = ssc::ProgressiveLODVolumetricRep::New(image1->getUid());
+
 	rep->setImage(image1);
 	view->setRep(rep);
   std::cout << "test3" << std::endl;

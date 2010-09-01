@@ -45,6 +45,7 @@ protected:
 	MeshPtr mMesh;
 private slots:
   void meshChangedSlot();
+  void transformChangedSlot();
 };
 
 } // namespace ssc

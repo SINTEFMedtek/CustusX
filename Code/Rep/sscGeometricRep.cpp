@@ -5,6 +5,7 @@
 #include <vtkProperty.h>
 #include <vtkActor.h>
 #include <vtkRenderer.h>
+#include <vtkMatrix4x4.h>
 
 #include "sscMesh.h"
 #include "sscView.h"
@@ -45,14 +46,16 @@ void GeometricRep::setMesh(MeshPtr mesh)
   if(mMesh)
   {
     disconnect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
+    disconnect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
   }
 	mMesh = mesh;
   if (mMesh)
   {
     connect(mMesh.get(), SIGNAL(meshChanged()), this, SLOT(meshChangedSlot()));
-    meshChangedSlot();
+    connect(mMesh.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+    this->meshChangedSlot();
+    this->transformChangedSlot();
   }
-  
 }
   
 MeshPtr GeometricRep::getMesh()
@@ -77,6 +80,18 @@ void GeometricRep::meshChangedSlot()
   //Set mesh opacity
   mActor->GetProperty()->SetOpacity(mMesh->getColor().alphaF());
 }
+
+/**called when transform is changed
+ * reset it in the prop.*/
+void GeometricRep::transformChangedSlot()
+{
+  if (!mMesh)
+  {
+    return;
+  }
+  mActor->SetUserMatrix(mMesh->get_rMd().matrix());
+}
+
   
 //---------------------------------------------------------
 } // namespace ssc
