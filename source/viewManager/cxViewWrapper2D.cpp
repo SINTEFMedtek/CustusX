@@ -27,6 +27,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscDefinitionStrings.h"
+#include "sscSliceComputer.h"
 
 namespace cx
 {
@@ -363,6 +364,11 @@ void ViewWrapper2D::removeImage(ssc::ImagePtr image)
 
   updateView();
   emit imageRemoved(qstring_cast(image->getUid()));
+}
+
+void ViewWrapper2D::removeMesh(ssc::MeshPtr mesh)
+{
+  //TODO
 }
 
 void ViewWrapper2D::dominantToolChangedSlot()

@@ -49,6 +49,7 @@ public:
   virtual std::vector<ssc::ImagePtr> getImages() const = 0;
   virtual ssc::MeshPtr getMesh() const = 0;
   virtual void removeImage(ssc::ImagePtr image) = 0;
+  virtual void removeMesh(ssc::MeshPtr mesh) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) = 0;
