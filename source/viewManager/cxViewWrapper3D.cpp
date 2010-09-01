@@ -115,12 +115,6 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
     return;
   }
 
-//  if (!image->getRefVtkImageData().GetPointer())
-//  {
-//    ssc::messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
-//    return;
-//  }
-
   mImage.push_back(image);
 
   if (!mVolumetricReps.count(image->getUid()))
