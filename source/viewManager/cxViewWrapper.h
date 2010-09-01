@@ -47,7 +47,7 @@ public:
   virtual void addImage(ssc::ImagePtr image) = 0;
   virtual void addMesh(ssc::MeshPtr mesh) = 0;
   virtual std::vector<ssc::ImagePtr> getImages() const = 0;
-  virtual ssc::MeshPtr getMesh() const = 0;
+  virtual std::vector<ssc::MeshPtr> getMeshes() const = 0;
   virtual void removeImage(ssc::ImagePtr image) = 0;
   virtual void removeMesh(ssc::MeshPtr mesh) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
@@ -61,6 +61,8 @@ signals:
   void orientationChanged(ssc::ORIENTATION_TYPE type);
   void imageAdded(QString uid);
   void imageRemoved(QString uid);
+  void meshAdded(QString uid);
+  void meshRemoved(QString uid);
 
 protected slots:
   void contextMenuSlot(const QPoint& point);

@@ -64,6 +64,8 @@ public:
   double getZoom2D();
   std::vector<ssc::ImagePtr> getImages() { return mImages; }
   ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
+  void addMesh(ssc::MeshPtr data);
+  void removeMesh(ssc::MeshPtr data);
 
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);
@@ -71,6 +73,8 @@ public:
 public slots:
   void addImage(QString imageUid);
   void removeImage(QString imageUid);
+  void addMesh(QString uid);
+  void removeMesh(QString uid);
 
 private slots:
   void activateManualToolSlot();
@@ -98,6 +102,7 @@ protected:
   };
   SyncGroup mZoom2D;
 
+  std::vector<ssc::MeshPtr> mMeshes;
   std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mViewWrappers;
   ssc::REGISTRATION_STATUS mRegistrationMode;
