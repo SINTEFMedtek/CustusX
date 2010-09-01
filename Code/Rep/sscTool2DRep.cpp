@@ -224,7 +224,6 @@ void ToolRep2D::updateUSProbe(const Transform3D& vpMt)
 bool ToolRep2D::showProbe()
 {
 	return mSlicer->getTool() && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
-  //return true;//test code
 }
 bool ToolRep2D::showOffset()
 {
