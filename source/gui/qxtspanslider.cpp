@@ -699,21 +699,25 @@ void QxtSpanSlider::mouseReleaseEvent(QMouseEvent* event)
  */
 void QxtSpanSlider::paintEvent(QPaintEvent* event)
 {
+#define NONE
     Q_UNUSED(event);
     QStylePainter painter(this);
-
     // ticks
     QStyleOptionSlider opt;
     qxt_d().initStyleOption(&opt);
     opt.subControls = QStyle::SC_SliderTickmarks;
+    opt.sliderPosition = qxt_d().lowerPos; // BUGFIX
     painter.drawComplexControl(QStyle::CC_Slider, opt);
-
+    return;
+#ifdef NONE
     // groove
     opt.sliderValue = 0;
     opt.sliderPosition = 0;
     opt.subControls = QStyle::SC_SliderGroove;
     painter.drawComplexControl(QStyle::CC_Slider, opt);
+#endif
 
+#ifdef NONE
     // handle rects
     opt.sliderPosition = qxt_d().lowerPos;
     const QRect lr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
@@ -732,7 +736,9 @@ void QxtSpanSlider::paintEvent(QPaintEvent* event)
     else
         spanRect = QRect(QPoint(c.x() - 2, minv), QPoint(c.x() + 1, maxv));
     qxt_d().drawSpan(&painter, spanRect);
+#endif
 
+#ifdef NONE
     // handles
     switch (qxt_d().lastPressed)
     {
@@ -746,4 +752,5 @@ void QxtSpanSlider::paintEvent(QPaintEvent* event)
         qxt_d().drawHandle(&painter, QxtSpanSliderPrivate::UpperHandle);
         break;
     }
+#endif
 }

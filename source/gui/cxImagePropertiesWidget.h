@@ -25,8 +25,8 @@ public:
 
 signals:
 
-protected slots:
-  void updateSlot();
+//protected slots:
+//  void updateSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -37,7 +37,7 @@ private:
 
   ssc::SliderGroupWidget* mLevelWidget;
   ssc::SliderGroupWidget* mWindowWidget;
-  QLabel* mImageNameLabel;
+//  QLabel* mImageNameLabel;
 };
 
 }//end namespace cx

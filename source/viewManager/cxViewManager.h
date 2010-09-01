@@ -86,6 +86,9 @@ public:
   InteractiveClipperPtr getClipper();
   InteractiveCropperPtr getCropper();
 
+  bool getSmartRender() const;
+  void setSmartRender(bool on);
+
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
   void fps(int number);///< Emits number of frames per second
@@ -162,6 +165,7 @@ protected:
   bool mGlobal2DZoom; ///< controlling whether or not 2D zooming is global
   bool mGlobalObliqueOrientation; ///< controlling whether or not all 2d views should be oblique or orthogonal
   SyncedValuePtr mGlobalZoom2DVal;
+  bool mSmartRender; ///< use ssc::View::render()
 
   ViewCache<View2D> mViewCache2D;
   ViewCache<View3D> mViewCache3D;

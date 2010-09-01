@@ -82,9 +82,11 @@ ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent)
   activeClipLayout->addWidget(mInvertPlaneCheckBox);
 
   QPushButton* saveButton = new QPushButton("Save clip plane");
-  saveButton->setEnabled(false);
+  connect(saveButton, SIGNAL(clicked()), this, SLOT(saveButtonClickedSlot()));
+  //saveButton->setEnabled(false);
   QPushButton* clearButton = new QPushButton("Clear saved planes");
-  clearButton->setEnabled(false);
+  connect(clearButton, SIGNAL(clicked()), this, SLOT(clearButtonClickedSlot()));
+  //clearButton->setEnabled(false);
   activeClipLayout->addWidget(saveButton);
   layout->addWidget(clearButton);
 
@@ -97,6 +99,16 @@ void ClippingWidget::clipperChangedSlot()
 {
   mUseClipperCheckBox->setChecked(mInteractiveClipper->getUseClipper());
   mInvertPlaneCheckBox->setChecked(mInteractiveClipper->getInvertPlane());
+}
+
+void ClippingWidget::clearButtonClickedSlot()
+{
+  mInteractiveClipper->clearClipPlanesInVolume();
+}
+
+void ClippingWidget::saveButtonClickedSlot()
+{
+  mInteractiveClipper->saveClipPlaneToVolume();
 }
 
 }

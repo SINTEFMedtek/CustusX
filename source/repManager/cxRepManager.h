@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <map>
+#include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
@@ -31,6 +32,8 @@ typedef std::map<std::string, ProgressiveVolumetricRepPtr> ProgressiveVolumetric
 typedef std::map<std::string, LandmarkRepPtr> LandmarkRepMap;
 typedef std::map<std::string, ssc::ToolRep3DPtr> ToolRep3DMap;
 typedef std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
+
+//typedef std::map<std::string, ssc::ImageMapperMonitorPtr> ImageMapperMonitorMap;
 
 class MessageManager;
 
@@ -102,6 +105,7 @@ protected:
   static RepManager*  mTheInstance;         ///< the only instance of this class
 
   VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
+//  ImageMapperMonitorMap mImageMapperMonitorMap; ///< used for adding clip decorations to the mappers
 
 /*  const int           MAX_INRIAREP3DS; ///< number of Inria3D reps in the pool
   std::string         mInriaRep3DNames[2]; ///< the name of the reps in the pool

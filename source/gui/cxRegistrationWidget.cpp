@@ -38,10 +38,10 @@ RegistrationWidget::RegistrationWidget(QWidget* parent) :
   this->setWindowTitle("Registration");
 
   //table widget
-  connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)),
-          this, SLOT(cellClickedSlot(int, int)));
-  connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)),
-          this, SLOT(cellChangedSlot(int,int)));
+  connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
+  connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
+
+  connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
 
   this->setLayout(mVerticalLayout);
 }
@@ -59,16 +59,16 @@ void RegistrationWidget::activeImageChangedSlot()
   //disconnect from the old image
   if(mCurrentImage)
   {
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot()));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
   }
 
   mCurrentImage = activeImage;
 
   if(mCurrentImage)
   {
-    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
-    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot(std::string)));
+    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot()));
+    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
   }
 
   //get the images landmarks and populate the landmark table
@@ -95,6 +95,7 @@ void RegistrationWidget::hideEvent(QHideEvent* event)
 
 void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
 {
+  mLandmarkTableWidget->blockSignals(true);
   mLandmarkTableWidget->clear();
 
   if(!image) //Image is deleted
@@ -154,6 +155,7 @@ void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
   }
 
   this->updateAvarageAccuracyLabel();
+  mLandmarkTableWidget->blockSignals(false);
 }
 
 void RegistrationWidget::nextRow()
@@ -211,16 +213,18 @@ void RegistrationWidget::cellChangedSlot(int row,int column)
   {
     std::string name = item->text().toStdString();
     ssc::dataManager()->setLandmarkName(uid, name);
+    //std::cout << "cell changed 0" << std::endl;
   }
   if(column==1)
   {
     Qt::CheckState state = item->checkState();
     ssc::dataManager()->setLandmarkActive(uid, state==Qt::Checked);
-    this->performRegistration();
+    //std::cout << "cell changed 1" << std::endl;
+    //this->performRegistration();
   }
 }
 
-void RegistrationWidget::landmarkUpdatedSlot(std::string uid)
+void RegistrationWidget::landmarkUpdatedSlot()
 {
   this->performRegistration();
   this->populateTheLandmarkTableWidget(mCurrentImage);
@@ -255,6 +259,8 @@ double RegistrationWidget::getAvarageAccuracy()
 
 double RegistrationWidget::getAccuracy(std::string uid)
 {
+  if (!mCurrentImage)
+    return 0;
   ssc::Landmark masterLandmark = mCurrentImage->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
   ssc::Landmark targetLandmark = this->getTargetLandmarks()[uid];
   if(masterLandmark.getUid().empty() || targetLandmark.getUid().empty())

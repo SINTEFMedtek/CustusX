@@ -402,7 +402,7 @@ void MainWindow::onWorkflowStateChangedSlot()
   this->restoreState(desktop.mMainWindowState);
   viewManager()->setActiveLayout(desktop.mLayoutUid);
 
-  std::cout << "LayoutUid: " << desktop.mLayoutUid << std::endl;
+  //std::cout << "LayoutUid: " << desktop.mLayoutUid << std::endl;
 }
 
 void MainWindow::saveDesktopSlot()
