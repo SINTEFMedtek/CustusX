@@ -18,6 +18,7 @@
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
+#include "sscSliceComputer.h"
 
 #include "sscSlicePlaneClipper.h"
 #include "sscSlicePlanes3DRep.h"

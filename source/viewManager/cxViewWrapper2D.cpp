@@ -27,6 +27,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscDefinitionStrings.h"
+#include "sscSliceComputer.h"
 
 namespace cx
 {
