@@ -47,22 +47,32 @@ int main(int argc, char **argv)
 
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);
 
-	QMainWindow mainWindow;
-	ssc::ViewPtr view(new ssc::View(mainWindow.centralWidget()));
-	mainWindow.setCentralWidget(view.get());
+	std::cout << "test" << std::endl;
+	QWidget mainWindow;
+  QHBoxLayout* layout = new QHBoxLayout(&mainWindow);
+	ssc::View* view = new ssc::View(&mainWindow);
+  view->getRenderWindow()->GetInteractor()->EnableRenderOff();
+	layout->addWidget(view);
+  std::cout << "test2" << std::endl;
 
 	ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(image1->getUid());
 	rep->setImage(image1);
 	view->setRep(rep);
+  std::cout << "test3" << std::endl;
 
-	mainWindow.resize(QSize(500,500));
-	mainWindow.show();
+	mainWindow.resize(QSize(1000,1000));
+  std::cout << "test3.1" << std::endl;
 	view->getRenderer()->ResetCamera();
+  std::cout << "test3.2" << std::endl;
+  mainWindow.show();
+  std::cout << "test3.3" << std::endl;
 
-	for (unsigned i=0; i<1; ++i)
+	for (unsigned i=0; i<3; ++i)
 	{
-		doRender(view->getRenderWindow());
+
+	  doRender(view->getRenderWindow());
 	}
+  std::cout << "test4" << std::endl;
 
 //#define USE_TRANSFORM_RESCLICER
 #ifdef USE_TRANSFORM_RESCLICER
@@ -77,7 +87,7 @@ int main(int argc, char **argv)
 #endif
 	std::cout << "Uid       : " << image1->getUid() << std::endl;
 	
-	QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
+	//QTimer::singleShot(SSC_DEFAULT_TEST_TIMEOUT_SECS*1000, &app, SLOT(quit())); // terminate app after some seconds - this is an automated test!!
 	
 	app.exec();
 

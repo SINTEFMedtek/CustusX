@@ -4,6 +4,7 @@
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "sscToolManager.h"
+#include "sscSliceComputer.h"
 
 namespace ssc
 {
@@ -20,7 +21,8 @@ std::string SliceProxy::getName() const
   return mName;
 }
 
-SliceProxy::SliceProxy()
+SliceProxy::SliceProxy() :
+    mCutplane(new SliceComputer())
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
 	connect(dataManager(), SIGNAL(medicalDomainChanged()), this, SLOT(medicalDomainChangedSlot()));
@@ -65,13 +67,16 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 {
 	//std::cout << "proxy get transform" << std::endl;
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-	mCutplane.setToolPosition(rMpr*prMt);	
+	Transform3D rMt = rMpr*prMt;
+	if (similar(rMt, mCutplane->getToolPosition()))
+	  return;
+	mCutplane->setToolPosition(rMt);
 	changed();
 }
 
 void SliceProxy::tooltipOffsetSlot(double val)
 {
-	mCutplane.setToolOffset(val);		
+	mCutplane->setToolOffset(val);
 	changed();
 }
 
@@ -100,7 +105,7 @@ void SliceProxy::centerChangedSlot()
 	if (mTool)
 	{
 		Vector3D c = ssc::DataManager::getInstance()->getCenter();
-		mCutplane.setFixedCenter(c);		
+		mCutplane->setFixedCenter(c);
 	  //std::cout << "center changed: " + string_cast(c) << std::endl;
 	}
 	else
@@ -108,8 +113,8 @@ void SliceProxy::centerChangedSlot()
 		// If no tool is available, ensure only dummy values are used.
 		// It is very important that this volume is completely frozen in order
 		// to avoid any confusion - the user must know it is nonnavigable.
-		mCutplane.setFixedCenter(mDefaultCenter);
-		mCutplane.setToolPosition(getSyntheticToolPos(mDefaultCenter));			
+		mCutplane->setFixedCenter(mDefaultCenter);
+		mCutplane->setToolPosition(getSyntheticToolPos(mDefaultCenter));
 	  //std::cout << "center changed: " + string_cast(mDefaultCenter) << std::endl;
 	}	
 	
@@ -118,7 +123,7 @@ void SliceProxy::centerChangedSlot()
 
 void SliceProxy::medicalDomainChangedSlot()
 {
-  mCutplane.setMedicalDomain(dataManager()->getMedicalDomain());
+  mCutplane->setMedicalDomain(dataManager()->getMedicalDomain());
   changed();
 }
 
@@ -126,7 +131,7 @@ void SliceProxy::medicalDomainChangedSlot()
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
-  mCutplane.initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getMedicalDomain());
+  mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getMedicalDomain());
   changed();
 //	setPlane(plane);
 //	//Logger::log("vm.log"," set plane to proxy ");
@@ -147,45 +152,45 @@ void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Ve
 
 SliceComputer SliceProxy::getComputer() const
 {
-  return mCutplane;
+  return *mCutplane;
 }
 
 void SliceProxy::setComputer(const SliceComputer& val)
 {
-  mCutplane = val;
+  mCutplane.reset(new SliceComputer(val));
   changed();
 }
 
 void SliceProxy::setOrientation(ORIENTATION_TYPE orientation)
 {
-	mCutplane.setOrientationType(orientation);	
+	mCutplane->setOrientationType(orientation);
 	changed();
 }
 
 void SliceProxy::setPlane(PLANE_TYPE plane)
 {
-	mCutplane.setPlaneType(plane);	
+	mCutplane->setPlaneType(plane);
 	changed();
 }
 
 void SliceProxy::setFollowType(FOLLOW_TYPE followType)
 {
-	mCutplane.setFollowType(followType);	
+	mCutplane->setFollowType(followType);
 	changed();
 }
 
 void SliceProxy::setGravity(bool use, const Vector3D& dir)
 {
-	mCutplane.setGravity(use, dir);
+	mCutplane->setGravity(use, dir);
 }
 void SliceProxy::setToolViewOffset(bool use, double viewportHeight, double toolViewOffset)
 {
-	mCutplane.setToolViewOffset(use, viewportHeight, toolViewOffset);
+	mCutplane->setToolViewOffset(use, viewportHeight, toolViewOffset);
 }
  
 void SliceProxy::setToolViewportHeight(double viewportHeight)
 {
-	mCutplane.setToolViewportHeight(viewportHeight);
+	mCutplane->setToolViewportHeight(viewportHeight);
 }
 
 ToolPtr SliceProxy::getTool()
@@ -195,7 +200,7 @@ ToolPtr SliceProxy::getTool()
 
 Transform3D SliceProxy::get_sMr()
 {
-	SlicePlane plane = mCutplane.getPlane();
+	SlicePlane plane = mCutplane->getPlane();
 	//std::cout << "---" << " proxy get transform.c : " << plane.c << std::endl;
 	//std::cout << "proxy get transform -" << getName() <<":\n" << plane << std::endl;
 	return createTransformIJC(plane.i, plane.j, plane.c).inv();	

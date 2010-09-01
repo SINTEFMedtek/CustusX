@@ -118,6 +118,10 @@ PLANE_TYPE SliceComputer::getPlaneType() const
   return mPlaneType;
 }
 
+Transform3D SliceComputer::getToolPosition() const
+{
+  return m_rMt;
+}
 
 /**Set the position of the navigation tool, using the
  * standard definition of a tool transform (given in ssc::Tool).

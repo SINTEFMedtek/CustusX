@@ -151,6 +151,8 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = (*rMprPtr)*prMt;
+	if (similar(rMt, ssc::Transform3D(mToolActor->GetUserMatrix())))
+	  return;
 	mToolActor->SetUserMatrix( rMt.matrix());
 	updateOffsetGraphics();
 }

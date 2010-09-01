@@ -165,6 +165,7 @@ vtkImageDataPtr Image::getRefVtkImageData()
 		mReferenceImageData->Update();		
 
 		this->transformChangedSlot(); // update transform
+		std::cout << "Warning: ssc::Image::getRefVtkImageData() called. Expensive. Do not use." << std::endl;
 	}
 	
 	return mReferenceImageData;

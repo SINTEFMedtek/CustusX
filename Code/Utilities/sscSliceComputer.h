@@ -77,6 +77,7 @@ public:
 	void switchOrientationMode(ORIENTATION_TYPE type);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
+	Transform3D getToolPosition() const;
 
 private:
 	std::pair<Vector3D,Vector3D> generateBasisVectors() const;

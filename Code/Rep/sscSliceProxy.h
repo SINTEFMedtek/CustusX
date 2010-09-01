@@ -4,12 +4,16 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "sscDefinitions.h"
-#include "sscSliceComputer.h"
+//#include "sscSliceComputer.h"
+#include "boost/scoped_ptr.hpp"
 #include "sscTransform3D.h"
 #include "sscIndent.h"
 
+
 namespace ssc
 {
+
+class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;
 
@@ -62,7 +66,7 @@ private slots:
 private:
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	ToolPtr mTool;
-	SliceComputer mCutplane;
+	boost::scoped_ptr<SliceComputer> mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
 	std::string mName; ///< for debug
 };
