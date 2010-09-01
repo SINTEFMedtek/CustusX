@@ -24,7 +24,6 @@
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
 #include "sscSlicePlanes3DRep.h"
-#include "sscSlicePlaneClipper.h"
 #include "cxLandmarkRep.h"
 #include "cxRepManager.h"
 #include "cxDataManager.h"
@@ -41,65 +40,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
-//  mInteractiveCropper.reset(new InteractiveCropper());
-//  mInteractiveCropper->setView(view);
-
-//  mBoxWidget = vtkBoxWidgetPtr::New();
-//  mBoxWidget->RotationEnabledOff();
-//  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
-//
-////  mBoxRep = vtkBoxRepresentationPtr::New();
-////  //boxRep->PlaceWidget(bounds)
-////  //view->getRenderer()->AddActor(mBoxRep);
-////
-////  mBoxWidget = vtkBoxWidget2Ptr::New();
-////  mBoxWidget->RotationEnabledOff();
-////  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
-////  mBoxWidget->SetRepresentation(mBoxRep);
-//
-////  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
-////  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
-//  double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
-//
-//  //double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
-////  vtkTransformPtr transform = vtkTransformPtr::New();
-////  transform->setMatrix();
-//
-//  //std::cout << "bb_r: " << bb << std::endl;
-////  mBoxRep->PlaceWidget(bb.begin());
-//  mBoxWidget->PlaceWidget(bb_hard);
-//
-//  CropBoxCallback* mCropBoxCallback = new CropBoxCallback("inter");
-//  mBoxWidget->AddObserver(vtkCommand::InteractionEvent, mCropBoxCallback);
-//  mBoxWidget->AddObserver(vtkCommand::StartInteractionEvent, new CropBoxCallback("start"));
-//  mBoxWidget->AddObserver(vtkCommand::EnableEvent, new CropBoxCallback("enable"));
-////  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
-
-//  mBoxWidget = vtkBoxWidgetPtr::New();
-//  mBoxWidget->RotationEnabledOff();
-//  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
-//
-////  mBoxRep = vtkBoxRepresentationPtr::New();
-////  //boxRep->PlaceWidget(bounds)
-////  //view->getRenderer()->AddActor(mBoxRep);
-////
-////  mBoxWidget = vtkBoxWidget2Ptr::New();
-////  mBoxWidget->RotationEnabledOff();
-////  mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
-////  mBoxWidget->SetRepresentation(mBoxRep);
-//
-////  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
-//  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
-//
-//  //std::cout << "bb_r: " << bb << std::endl;
-////  mBoxRep->PlaceWidget(bb.begin());
-//  mBoxWidget->PlaceWidget(bb_hard);
-//
-//
-////  mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
-//>>>>>>> Stashed changes
-
-//  mVolumetricRep = repManager()->getVolumetricRep("VolumetricRep_"+index);
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
   mGeometricRep = repManager()->getGeometricRep("GeometricRep_"+index);
@@ -118,34 +58,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->toolsAvailableSlot();
 }
 
-//void ViewWrapper3D::startBoxInteraction()
-//{
-//  if (mImage.empty())
-//    return;
-//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-//  if (!image)
-//    image = mImage.front();
-//  double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
-//  //double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
-//  ssc::DoubleBoundingBox3D bb_unit(bb_hard);
-//  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
-//  ssc::Transform3D M = ssc::createTransformNormalize(bb_unit, bb);
-////  std::cout << "BB_image_d " << image->boundingBox() << std::endl;
-////  std::cout << "BB_image_r " << bb << std::endl;
-////return;
-//  //double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
-//  std::cout << "BB_image_d " << image->boundingBox() << std::endl;
-//  std::cout << "BB_image_r " << bb << std::endl;
-//
-//  vtkTransformPtr transform = vtkTransformPtr::New();
-//  transform->SetMatrix(M.matrix());
-//  mBoxWidget->SetTransform(transform);
-//
-//  //std::cout << "bb_r: " << bb << std::endl;
-////  mBoxRep->PlaceWidget(bb.begin());
-////  mBoxWidget->PlaceWidget(bb_hard);
-//}
-
 ViewWrapper3D::~ViewWrapper3D()
 {
   if (mView)
@@ -156,48 +68,30 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 {
   QAction* slicePlanesAction = new QAction("Show Slice Planes", &contextMenu);
   slicePlanesAction->setCheckable(true);
-  //obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
   slicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
-  connect(slicePlanesAction, SIGNAL(triggered(bool)),
-          this, SLOT(showSlicePlanesActionSlot(bool)));
+  connect(slicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(showSlicePlanesActionSlot(bool)));
 
   QAction* fillSlicePlanesAction = new QAction("Fill Slice Planes", &contextMenu);
   fillSlicePlanesAction->setCheckable(true);
   fillSlicePlanesAction->setEnabled(mSlicePlanes3DRep->getProxy()->getVisible());
-  //obliqueAction->setData(qstring_cast(ssc::otOBLIQUE));
   fillSlicePlanesAction->setChecked(mSlicePlanes3DRep->getProxy()->getDrawPlanes());
-  connect(fillSlicePlanesAction, SIGNAL(triggered(bool)),
-          this, SLOT(fillSlicePlanesActionSlot(bool)));
+  connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
 
+  QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
+  //resetCameraAction->setCheckable(true);
+  //resetCameraAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
+  connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
+
+  contextMenu.addSeparator();
+  contextMenu.addAction(resetCameraAction);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
-
-//  for (VolumetricRepMap::iterator iter = mVolumetricReps.begin(); iter!=mVolumetricReps.end(); ++iter)
-//  {
-//    QAction* clipAction = new QAction("Clip " + qstring_cast(iter->second->getImage()->getName()), &contextMenu);
-//    clipAction->setCheckable(true);
-//    clipAction->setData(qstring_cast(iter->first));
-//    clipAction->setChecked(mSlicePlaneClipper->getVolumes().count(iter->second));
-//    connect(clipAction, SIGNAL(triggered()),
-//            this, SLOT(clipActionSlot()));
-//    contextMenu.addAction(clipAction);
-//  }
 }
 
-void ViewWrapper3D::clipActionSlot()
+void ViewWrapper3D::resetCameraActionSlot()
 {
-//  QAction* action = dynamic_cast<QAction*>(sender());
-//  if (!action)
-//    return;
-//  std::string uid = string_cast(action->data().toString());
-//
-//  ssc::SliceProxyPtr slicer = mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy;
-//  mSlicePlaneClipper->setSliceProxy(slicer);
-//  if (action->isChecked())
-//    mSlicePlaneClipper->addVolume(mVolumetricReps[uid]);
-//  else
-//    mSlicePlaneClipper->removeVolume(mVolumetricReps[uid]);
+  mView->getRenderer()->ResetCamera();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
@@ -221,36 +115,17 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
     return;
   }
 
-  if (!image->getRefVtkImageData().GetPointer())
-  {
-    ssc::messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
-    return;
-  }
+//  if (!image->getRefVtkImageData().GetPointer())
+//  {
+//    ssc::messageManager()->sendWarning("ViewManager::setImage vtk image missing from current image!");
+//    return;
+//  }
 
   mImage.push_back(image);
 
   if (!mVolumetricReps.count(image->getUid()))
   {
-//    std::string uid("VolumetricRep_" + image->getUid());
-//    ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
-//    mVolumetricReps[image->getUid()] = rep;
-////    //Shading
-////    if (QSettings().value("shadingOn").toBool())
-////      rep->getVtkVolume()->GetProperty()->ShadeOn();
-//
-//    rep->setImage(image);
     ssc::VolumetricRepPtr rep = repManager()->getVolumetricRep(image);
-
-//    vtkPlanePtr plane = vtkPlanePtr::New();
-//    plane->SetNormal(0,0,1);
-//    plane->SetOrigin(100,100,100);
-//    std::cout << "coronal: <" << n << "> <" << p << ">" << std::endl;
-//    std::cout << "BB: " << iter->second->getImage()->boundingBox() << std::endl;
-    //std::cout << "adding cutplane for image" << std::endl;
-
-    //rep->getVtkVolume()->GetMapper()->RemoveAllClippingPlanes();
-    //rep->getVtkVolume()->GetMapper()->AddClippingPlane(plane);
-
 
     mVolumetricReps[image->getUid()] = rep;
     mView->addRep(rep);
@@ -262,21 +137,7 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
 
   updateView();
 
-//  ssc::DoubleBoundingBox3D bb = transform(image->get_rMd(), image->boundingBox());
-//  double bb_hard[6] = { -114.775, 114.664,    -250.775, -21.336,      1099.500, 1308.500 };
-//
-//  std::cout << "bb_r: " << bb << std::endl;
-////  mBoxRep->PlaceWidget(bb.begin());
-//  mBoxRep->PlaceWidget(bb_hard);
-//<<<<<<< Updated upstream
-////  this->startBoxInteraction();
-//=======
-//>>>>>>> Stashed changes
-
-
   mView->getRenderer()->ResetCamera();
-//  if (mView->isVisible())
-//    mView->getRenderWindow()->Render();
 }
 
 void ViewWrapper3D::updateView()
@@ -303,6 +164,11 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
   ssc::messageManager()->sendDebug("Remove image from view group 3d: "+image->getName());
   mView->removeRep(mVolumetricReps[image->getUid()]);
   mVolumetricReps.erase(image->getUid());
+
+  if (image==mProbeRep->getImage())
+    mProbeRep->setImage(ssc::ImagePtr());
+  if (image==mLandmarkRep->getImage())
+    mLandmarkRep->setImage(ssc::ImagePtr());
 
   this->updateView();
 
@@ -421,34 +287,6 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
     mView->addRep(mLandmarkRep);
   }
 }
-
-//void ViewWrapper3D::slicePlanesChangedSlot()
-//{
-//  if (!mSlicePlanes3DRep->getProxy()->getData().count(ssc::ptCORONAL))
-//    return;
-////  ssc::Transform3D sMr = mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy->get_sMr();
-//
-//  SlicePlaneClipperPtr clipper = SlicePlaneClipper::New();
-//  clipper->setProxy(mSlicePlanes3DRep->getProxy()->getData()[ssc::ptCORONAL].mSliceProxy);
-//  clipper->addVolumes();
-//
-//  for (std::map<std::string, ssc::VolumetricRepPtr>::iterator iter=mVolumetricReps.begin(); iter!=mVolumetricReps.end(); ++iter)
-//  {
-//    clipper->addVolume(iter->second);
-////    ssc::Transform3D rMs = sMr.inv();
-////
-////    ssc::Vector3D n = rMs.vector(ssc::Vector3D(0,0,-1));
-////    ssc::Vector3D p = rMs.coord(ssc::Vector3D(0,0,0));
-////    vtkPlanePtr plane = vtkPlanePtr::New();
-////    plane->SetNormal(n.begin());
-////    plane->SetOrigin(p.begin());
-//////    std::cout << "coronal: <" << n << "> <" << p << ">" << std::endl;
-//////    std::cout << "BB: " << iter->second->getImage()->boundingBox() << std::endl;
-//////
-////    iter->second->getVtkVolume()->GetMapper()->RemoveAllClippingPlanes();
-////    iter->second->getVtkVolume()->GetMapper()->AddClippingPlane(plane);
-//  }
-//}
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {

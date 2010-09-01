@@ -137,7 +137,7 @@ void PatientData::savePatient()
   if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     QTextStream stream(&file);
-    stream << doc.toString();
+    stream << doc.toString(4);
     file.close();
     ssc::messageManager()->sendInfo("Created "+file.fileName().toStdString());
   }

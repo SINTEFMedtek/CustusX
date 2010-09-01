@@ -56,6 +56,8 @@ private:
   ssc::StringDataAdapterPtr mPlaneAdapter;
 private slots:
   void clipperChangedSlot();
+  void clearButtonClickedSlot();
+  void saveButtonClickedSlot();
 };
 
 }//namespace cx

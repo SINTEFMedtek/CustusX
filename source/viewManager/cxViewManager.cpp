@@ -22,7 +22,6 @@
 #include "cxDataManager.h"
 #include "sscToolManager.h"
 #include "cxDataLocations.h"
-#include "sscSlicePlaneClipper.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
@@ -67,6 +66,8 @@ ViewManager::ViewManager() :
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
+  mSmartRender = mSettings->value("smartRender").toBool();
+
   mLayout->setSpacing(2);
   mLayout->setMargin(4);
   mMainWindowsCentralWidget->setLayout(mLayout);
@@ -110,6 +111,16 @@ InteractiveClipperPtr ViewManager::getClipper()
 InteractiveCropperPtr ViewManager::getCropper()
 {
   return mInteractiveCropper;
+}
+
+bool ViewManager::getSmartRender() const
+{
+  return mSmartRender;
+}
+void ViewManager::setSmartRender(bool on)
+{
+  mSmartRender = on;
+  mSettings->setValue("smartRender", mSmartRender);
 }
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
@@ -508,8 +519,10 @@ void ViewManager::renderAllViewsSlot()
   {
     if(iter->second->isVisible())
     {
-      iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
-      //iter->second->render(); // render only changed scenegraph
+      if (mSmartRender)
+        iter->second->render(); // render only changed scenegraph (shaky but smooth)
+      else
+        iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
     }
   }
   

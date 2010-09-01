@@ -236,6 +236,9 @@ void PerformanceTab::init()
   renderingRateString = renderingRateString+num+" frames/second";
   mRenderingRateLabel = new QLabel(renderingRateString);
   
+  mSmartRenderCheckBox = new QCheckBox("Smart Render");
+  mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
+
   mShadingCheckBox = new QCheckBox(tr("ShadingOn"));
   mShadingCheckBox->setChecked(shadingOn);
   
@@ -244,6 +247,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
+  mMainLayout->addWidget(mSmartRenderCheckBox, 1, 0);
   mMainLayout->addWidget(mShadingCheckBox, 2, 0);
   setLayout(mMainLayout);
 }
@@ -274,6 +278,8 @@ void PerformanceTab::saveParametersSlot()
     mSettings->setValue("shadingOn", mShadingCheckBox->isChecked());
     emit shadingChanged(mShadingCheckBox->isChecked());
   }
+
+  viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
 }
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :

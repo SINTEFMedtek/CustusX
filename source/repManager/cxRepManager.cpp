@@ -3,6 +3,7 @@
 #include "sscMessageManager.h"
 #include "cxToolManager.h"
 #include "cxDataManager.h"
+//#include "sscSlicePlaneClipper.h"
 
 namespace cx
 {
@@ -318,6 +319,7 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
     rep->setImage(image);
     mVolumetricRepByImageMap[image->getUid()] = rep;
+    //mImageMapperMonitorMap[image->getUid()].reset(new ssc::ImageMapperMonitor(rep));
   }
   return mVolumetricRepByImageMap[image->getUid()];
 }

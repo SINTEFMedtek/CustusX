@@ -175,6 +175,8 @@ void ImageRegistrationWidget::thresholdChangedSlot(const int value)
 
 void ImageRegistrationWidget::performRegistration()
 {
+  if (!mCurrentImage)
+    return;
   //make sure the masterImage is set
   ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
   if(!masterImage)

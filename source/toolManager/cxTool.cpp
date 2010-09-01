@@ -25,7 +25,8 @@ Tool::Tool(InternalStructure& internalStructure) :
   mVisible(false),
   mAttachedToTracker(false),
   mTracked(false),
-  mToolTipOffset(0)
+  mToolTipOffset(0),
+  mProbeSector(ssc::ProbeSector())
 {
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
@@ -574,12 +575,11 @@ void Tool::printInternalStructure()
   
 ssc::ProbeSector Tool::getProbeSector() const
 { 
-  //Test data 
-  double depthStart = 10;
-  double depthEnd = 100;
-  double width = 50;
-  ssc::messageManager()->sendDebug("Use getProbeSector() test data");
-  return ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
+  return mProbeSector;
+}
+void Tool::setUSProbeSector(double depthStart, double depthEnd, double width)
+{
+  mProbeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
 }
   
 }//namespace cx
