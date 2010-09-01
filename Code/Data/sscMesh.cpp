@@ -5,6 +5,7 @@
 #include <QColor>
 #include "sscRep.h"
 #include "sscTypeConversions.h"
+#include "sscRegistrationTransform.h"
 
 namespace ssc
 {
@@ -32,11 +33,13 @@ vtkPolyDataPtr Mesh::getVtkPolyData()
 void Mesh::addXml(QDomNode& parentNode)
 {
   //QDomElement datanode = Data::addXml(parentNode);
-  
+
   QDomDocument doc = parentNode.ownerDocument();
   QDomElement meshNode = doc.createElement("mesh");
   parentNode.appendChild(meshNode);
-    
+
+  m_rMd_History->addXml(meshNode); //TODO: should be in the superclass
+
   QDomElement uidNode = doc.createElement("uid");
   uidNode.appendChild(doc.createTextNode(mUid.c_str()));
   meshNode.appendChild(uidNode);
@@ -74,6 +77,9 @@ void Mesh::parseXml(QDomNode& dataNode)
   if (dataNode.isNull())
     return;
   
+  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+  m_rMd_History->parseXml(registrationHistory);
+
   QDomNode colorNode = dataNode.namedItem("color");
   if (!colorNode.isNull())
   {
