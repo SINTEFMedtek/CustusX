@@ -35,6 +35,7 @@ public:
   std::vector<ssc::ImagePtr> getImages() const;
   virtual ssc::MeshPtr getMesh() const {/*TODO*/ std::cout << "This is not implemented" << std::endl; return ssc::MeshPtr(new ssc::Mesh("dummy"));};
   virtual void removeImage(ssc::ImagePtr image);
+  virtual void removeMesh(ssc::MeshPtr mesh);
   virtual ssc::View* getView();
   virtual void setZoom2D(SyncedValuePtr value);
   virtual void setOrientationMode(SyncedValuePtr value);
