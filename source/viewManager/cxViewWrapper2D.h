@@ -33,7 +33,8 @@ public:
   virtual void addImage(ssc::ImagePtr image);
   virtual void addMesh(ssc::MeshPtr mesh) {/*TODO */ std::cout << "This is not implemented" << std::endl;};
   std::vector<ssc::ImagePtr> getImages() const;
-  virtual ssc::MeshPtr getMesh() const {/*TODO*/ std::cout << "This is not implemented" << std::endl; return ssc::MeshPtr(new ssc::Mesh("dummy"));};
+  //virtual ssc::MeshPtr getMesh() const {/*TODO*/ std::cout << "This is not implemented" << std::endl; return ssc::MeshPtr(new ssc::Mesh("dummy"));};
+  virtual std::vector<ssc::MeshPtr> getMeshes() const { return std::vector<ssc::MeshPtr>(); }
   virtual void removeImage(ssc::ImagePtr image);
   virtual void removeMesh(ssc::MeshPtr mesh);
   virtual ssc::View* getView();

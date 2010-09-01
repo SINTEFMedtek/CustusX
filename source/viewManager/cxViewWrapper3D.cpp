@@ -42,7 +42,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
-  mGeometricRep = repManager()->getGeometricRep("GeometricRep_"+index);
+  //mGeometricRep = repManager()->getGeometricRep("GeometricRep_"+index);
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -106,14 +106,9 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 void ViewWrapper3D::addImage(ssc::ImagePtr image)
 {
   if (!image)
-  {
     return;
-  }
-
   if (std::count(mImage.begin(), mImage.end(), image))
-  {
     return;
-  }
 
   mImage.push_back(image);
 
@@ -169,36 +164,55 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
   emit imageRemoved(qstring_cast(image->getUid()));
 }
 
-void ViewWrapper3D::addMesh(ssc::MeshPtr mesh)
+void ViewWrapper3D::addMesh(ssc::MeshPtr data)
 {
-  //TODO: Allow more than one mesh
-  if (!mesh)
+  if (!data)
     return;
-  
-  mMesh = mesh;
-  //mMeshes.push(mesh);
+  if (std::count(mMeshes.begin(), mMeshes.end(), data))
+    return;
 
-  mGeometricRep->setMesh(mesh);
+  mMeshes.push_back(data);
+
+  ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom_rep");
+  rep->setMesh(data);
+  mGeometricReps[data->getUid()] = rep;
   
-  //emit imageChanged(image->getUid().c_str());
-  
-  mView->addRep(mGeometricRep);
+  emit meshAdded(data->getUid().c_str());
+
+  mView->addRep(rep);
+  this->updateView();
+
   mView->getRenderer()->ResetCamera();
-  if(mView->isVisible())
-    mView->getRenderWindow()->Render();
 }
 
-void ViewWrapper3D::removeMesh(ssc::MeshPtr mesh)
+void ViewWrapper3D::removeMesh(ssc::MeshPtr data)
 {
-  //TODO: Allow more than one mesh
-  if (!mesh)
+  if (!data)
     return;
-  if(!mGeometricRep->hasMesh(mesh))
+//  if (!mVolumetricReps.count(image->getUid()))
+//    return;
+  if (!std::count(mMeshes.begin(), mMeshes.end(), data))
     return;
+  mMeshes.erase(std::find(mMeshes.begin(), mMeshes.end(), data));
 
-  mView->removeRep(mGeometricRep);
-  mMesh.reset();//set empty mesh
+  ssc::messageManager()->sendDebug("Remove mesh from view group 3d: "+data->getName());
+  mView->removeRep(mGeometricReps[data->getUid()]);
+  mGeometricReps.erase(data->getUid());
+
   this->updateView();
+  emit meshRemoved(data->getUid().c_str());
+
+  //////////////////////////////////////////////////
+
+//  //TODO: Allow more than one mesh
+//  if (!mesh)
+//    return;
+//  if(!mGeometricRep->hasMesh(mesh))
+//    return;
+//
+//  mView->removeRep(mGeometricRep);
+//  mMesh.reset();//set empty mesh
+//  this->updateView();
 }
 
 std::vector<ssc::ImagePtr> ViewWrapper3D::getImages() const
@@ -206,9 +220,10 @@ std::vector<ssc::ImagePtr> ViewWrapper3D::getImages() const
   return mImage;
 }
 
-ssc::MeshPtr ViewWrapper3D::getMesh() const
+std::vector<ssc::MeshPtr> ViewWrapper3D::getMeshes() const
+//ssc::MeshPtr ViewWrapper3D::getMesh() const
 {
-  return mMesh;
+  return mMeshes;
 }
   
 ssc::View* ViewWrapper3D::getView()

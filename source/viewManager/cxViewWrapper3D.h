@@ -45,7 +45,7 @@ public:
   virtual void addMesh(ssc::MeshPtr mesh);
   virtual void removeMesh(ssc::MeshPtr mesh);
   virtual std::vector<ssc::ImagePtr> getImages() const;
-  virtual ssc::MeshPtr getMesh() const;
+  virtual std::vector<ssc::MeshPtr> getMeshes() const;
   virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
@@ -68,10 +68,11 @@ private:
   vtkBoxWidgetPtr mBoxWidget;
 
   typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
+  typedef  std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
   VolumetricRepMap mVolumetricReps;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
-  ssc::GeometricRepPtr mGeometricRep;
+  GeometricRepMap mGeometricReps;
   //std::map<std::string, ssc::GeometricRepPtr> mGeometricReps;//TODO: Replace mGeometricRep with this
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
@@ -79,8 +80,8 @@ private:
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
 
   std::vector<ssc::ImagePtr> mImage;
-  //std::vector<ssc::MeshPtr> mMeshes;
-  ssc::MeshPtr mMesh;
+  std::vector<ssc::MeshPtr> mMeshes;
+  //ssc::MeshPtr mMesh;
   QPointer<ssc::View> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;

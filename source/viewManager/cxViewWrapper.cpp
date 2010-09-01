@@ -48,19 +48,16 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
     QAction* imageAction = new QAction(name, &contextMenu);
     imageAction->setData(QVariant(uid));
     imageAction->setCheckable(true);
-    connect(imageAction, SIGNAL(triggered()),
-            this, SLOT(imageActionSlot()));
-
+    connect(imageAction, SIGNAL(triggered()), this, SLOT(imageActionSlot()));
     contextMenu.addAction(imageAction);
-
-    //if(this->getImage() && uid == qstring_cast(this->getImage()->getUid()))
-    //  imageAction->setChecked(true);
     imageAction->setChecked(std::count(images.begin(), images.end(), ssc::dataManager()->getImage(imageIt->first)));
 
     imageIt++;
   }
   
   contextMenu.addSeparator();
+
+  std::vector<ssc::MeshPtr> meshes = this->getMeshes();
   std::map<std::string, std::string>::iterator meshIt = meshUidsAndNames.begin();
   while(meshIt != meshUidsAndNames.end())
   {
@@ -70,13 +67,9 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
     QAction* meshAction = new QAction(name, &contextMenu);
     meshAction->setData(QVariant(uid));
     meshAction->setCheckable(true);
-    connect(meshAction, SIGNAL(triggered()),
-            this, SLOT(meshActionSlot()));
-    
+    connect(meshAction, SIGNAL(triggered()), this, SLOT(meshActionSlot()));
     contextMenu.addAction(meshAction);
-    
-    if(this->getMesh() && uid == qstring_cast(this->getMesh()->getUid()))
-      meshAction->setChecked(true);
+    meshAction->setChecked(std::count(meshes.begin(), meshes.end(), ssc::dataManager()->getMesh(meshIt->first)));
     
     meshIt++;
   }
