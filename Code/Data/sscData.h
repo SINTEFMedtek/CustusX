@@ -60,7 +60,8 @@ public:
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
 
-  virtual void parseXml(QDomNode& dataNode) = 0;///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+  virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
+  virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 signals:
   void transformChanged(); ///< emitted when transform is changed

@@ -310,27 +310,27 @@ int Image::getMaxAlphaValue()
 {
 	return 255;
 }
-void Image::addXml(QDomNode& parentNode)
+void Image::addXml(QDomNode& dataNode)
 {
-//  Data::addXml(parentNode);
+  Data::addXml(dataNode);
+  QDomNode imageNode = dataNode;
+  QDomDocument doc = dataNode.ownerDocument();
+//  QDomElement imageNode = doc.createElement("image");
+//  parentNode.appendChild(imageNode);
 
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement imageNode = doc.createElement("image");
-  parentNode.appendChild(imageNode);
+//  m_rMd_History->addXml(imageNode); //TODO: should be in the superclass
 
-  m_rMd_History->addXml(imageNode); //TODO: should be in the superclass
-
-  QDomElement uidNode = doc.createElement("uid");
-  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
-  imageNode.appendChild(uidNode);
-
-  QDomElement nameNode = doc.createElement("name");
-  nameNode.appendChild(doc.createTextNode(mName.c_str()));
-  imageNode.appendChild(nameNode);
-  
-  QDomElement filePathNode = doc.createElement("filePath");
-  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
-  imageNode.appendChild(filePathNode);
+//  QDomElement uidNode = doc.createElement("uid");
+//  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
+//  imageNode.appendChild(uidNode);
+//
+//  QDomElement nameNode = doc.createElement("name");
+//  nameNode.appendChild(doc.createTextNode(mName.c_str()));
+//  imageNode.appendChild(nameNode);
+//
+//  QDomElement filePathNode = doc.createElement("filePath");
+//  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
+//  imageNode.appendChild(filePathNode);
   
   mImageTransferFunctions3D->addXml(imageNode);
   mImageLookupTable2D->addXml(imageNode);
@@ -387,7 +387,7 @@ void Image::addXml(QDomNode& parentNode)
 
 void Image::parseXml(QDomNode& dataNode)
 {
-  //Data::parseXml(dataNode);
+  Data::parseXml(dataNode);
 
   // image node must be parsed in the data manager to create this Image object
   // Only subnodes are parsed here
@@ -395,8 +395,8 @@ void Image::parseXml(QDomNode& dataNode)
 	if (dataNode.isNull())
 		return;
 	
-  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
-  m_rMd_History->parseXml(registrationHistory);
+//  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+//  m_rMd_History->parseXml(registrationHistory);
 
 	//transferefunctions
 	QDomNode transferfunctionsNode = dataNode.namedItem("transferfunctions");

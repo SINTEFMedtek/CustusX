@@ -30,27 +30,30 @@ vtkPolyDataPtr Mesh::getVtkPolyData()
 {
 	return mVtkPolyData;
 }
-void Mesh::addXml(QDomNode& parentNode)
+void Mesh::addXml(QDomNode& dataNode)
 {
-  //QDomElement datanode = Data::addXml(parentNode);
+  Data::addXml(dataNode);
+  QDomDocument doc = dataNode.ownerDocument();
 
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement meshNode = doc.createElement("mesh");
-  parentNode.appendChild(meshNode);
+  QDomNode meshNode = dataNode;
+//
+//  QDomDocument doc = parentNode.ownerDocument();
+//  QDomElement meshNode = doc.createElement("mesh");
+//  parentNode.appendChild(meshNode);
 
-  m_rMd_History->addXml(meshNode); //TODO: should be in the superclass
-
-  QDomElement uidNode = doc.createElement("uid");
-  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
-  meshNode.appendChild(uidNode);
-  
-  QDomElement nameNode = doc.createElement("name");
-  nameNode.appendChild(doc.createTextNode(mName.c_str()));
-  meshNode.appendChild(nameNode);
-  
-  QDomElement filePathNode = doc.createElement("filePath");
-  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
-  meshNode.appendChild(filePathNode);
+//  m_rMd_History->addXml(meshNode); //TODO: should be in the superclass
+//
+//  QDomElement uidNode = doc.createElement("uid");
+//  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
+//  meshNode.appendChild(uidNode);
+//
+//  QDomElement nameNode = doc.createElement("name");
+//  nameNode.appendChild(doc.createTextNode(mName.c_str()));
+//  meshNode.appendChild(nameNode);
+//
+//  QDomElement filePathNode = doc.createElement("filePath");
+//  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
+//  meshNode.appendChild(filePathNode);
   
   
   QDomElement colorNode = doc.createElement("color");
@@ -71,14 +74,16 @@ void Mesh::addXml(QDomNode& parentNode)
   
 void Mesh::parseXml(QDomNode& dataNode)
 {
+  Data::parseXml(dataNode);
+
   // image node must be parsed in the data manager to create this Image object
   // Only subnodes are parsed here
   
   if (dataNode.isNull())
     return;
   
-  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
-  m_rMd_History->parseXml(registrationHistory);
+//  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+//  m_rMd_History->parseXml(registrationHistory);
 
   QDomNode colorNode = dataNode.namedItem("color");
   if (!colorNode.isNull())

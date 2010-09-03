@@ -464,13 +464,18 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
   centerNode.appendChild(doc.createTextNode(centerStream.str().c_str()));
   dataManagerNode.appendChild(centerNode);
 
+
   for (ImagesMap::const_iterator iter = mImages.begin(); iter != mImages.end(); ++iter)
   {
-    iter->second->addXml(dataManagerNode);
+    QDomElement dataNode = doc.createElement("data");
+    dataManagerNode.appendChild(dataNode);
+    iter->second->addXml(dataNode);
   }
   for (std::map<std::string, MeshPtr>::const_iterator iter = mMeshes.begin(); iter != mMeshes.end(); ++iter)
   {
-    iter->second->addXml(dataManagerNode);
+    QDomElement dataNode = doc.createElement("data");
+    dataManagerNode.appendChild(dataNode);
+    iter->second->addXml(dataNode);
   }
 }
 
@@ -495,7 +500,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 
   while (!child.isNull())
   {
-    if (child.nodeName() == "image" || child.nodeName() == "mesh")
+    if (child.nodeName() == "data" || child.nodeName() == "data")
     {
       QString uidNodeString = child.namedItem("uid").toElement().text();
 

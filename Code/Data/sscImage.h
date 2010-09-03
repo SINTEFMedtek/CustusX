@@ -83,7 +83,7 @@ public:
   Image::shadingStruct getShading();
   void setShading(Image::shadingStruct shading );
 
-	void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
+	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 	// methods for defining and storing a cropping box. Image does not use these data, this is up to the mapper

@@ -1,4 +1,6 @@
 #include "sscData.h"
+
+#include <QDomDocument>
 #include "sscRegistrationTransform.h"
 
 
@@ -111,6 +113,36 @@ bool Data::getShading() const
 {
   return false;
 }
+
+
+void Data::addXml(QDomNode& dataNode)
+{
+  QDomDocument doc = dataNode.ownerDocument();
+
+  m_rMd_History->addXml(dataNode); //TODO: should be in the superclass
+
+  QDomElement uidNode = doc.createElement("uid");
+  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
+  dataNode.appendChild(uidNode);
+
+  QDomElement nameNode = doc.createElement("name");
+  nameNode.appendChild(doc.createTextNode(mName.c_str()));
+  dataNode.appendChild(nameNode);
+
+  QDomElement filePathNode = doc.createElement("filePath");
+  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
+  dataNode.appendChild(filePathNode);
+}
+
+void Data::parseXml(QDomNode& dataNode)
+{
+  if (dataNode.isNull())
+    return;
+
+  QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
+  m_rMd_History->parseXml(registrationHistory);
+}
+
 
 
 } // namespace ssc
