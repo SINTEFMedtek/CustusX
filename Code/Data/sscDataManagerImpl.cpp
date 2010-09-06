@@ -31,7 +31,7 @@ namespace ssc
 {
 
 //-----
-ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filename)
+DataPtr MetaImageReader::load(const std::string& uid, const std::string& filename)
 {
   //messageManager()->sendDebug("load filename: "+string_cast(filename));
   //read the specific TransformMatrix-tag from the header
@@ -127,7 +127,7 @@ ImagePtr MetaImageReader::load(const std::string& uid, const std::string& filena
 }
 
 //-----
-MeshPtr PolyDataMeshReader::load(const std::string& uid, const std::string& fileName)
+DataPtr PolyDataMeshReader::load(const std::string& uid, const std::string& fileName)
 {
   vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
   reader->SetFileName(fileName.c_str());
@@ -140,7 +140,7 @@ MeshPtr PolyDataMeshReader::load(const std::string& uid, const std::string& file
 
 }
 
-MeshPtr StlMeshReader::load(const std::string& uid, const std::string& fileName)
+DataPtr StlMeshReader::load(const std::string& uid, const std::string& fileName)
 {
   vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
   reader->SetFileName(fileName.c_str());
@@ -166,9 +166,9 @@ DataManagerImpl::DataManagerImpl()
 {
   mMedicalDomain = mdLABORATORY;
   //  mMedicalDomain = mdLAPAROSCOPY;
-  mImageReaders[rtMETAIMAGE].reset(new MetaImageReader());
-  mMeshReaders[mrtPOLYDATA].reset(new PolyDataMeshReader());
-  mMeshReaders[mrtSTL].reset(new StlMeshReader());
+  mDataReaders[rtMETAIMAGE].reset(new MetaImageReader());
+  mDataReaders[rtPOLYDATA].reset(new PolyDataMeshReader());
+  mDataReaders[rtSTL].reset(new StlMeshReader());
   //	mCenter = Vector3D(0,0,0);
   //	mActiveImage.reset();
   this->clear();
@@ -290,9 +290,9 @@ ImagePtr DataManagerImpl::loadImage(const std::string& uid, const std::string& f
   }
 
   // identify type
-  ImagePtr current = mImageReaders[type]->load(uid, filename);
-  this->loadImage(current);
-  return current;
+  DataPtr current = mDataReaders[type]->load(uid, filename);
+  this->loadData(current);
+  return boost::shared_dynamic_cast<ssc::Image>(current);
 }
 
 void DataManagerImpl::loadImage(ImagePtr image)
@@ -349,7 +349,7 @@ void DataManagerImpl::saveImage(ImagePtr image, const std::string& basePath)
 
 // meshes
 MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fileName,
-    MESH_READER_TYPE meshType)
+    READER_TYPE meshType)
 {
   if (mMeshes.count(uid)) // dont load same mesh twice
   {
@@ -357,14 +357,14 @@ MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fil
     std::cout << "WARNING: Mesh with uid: " + uid + " already exists, abort loading.";
   }
   // identify type
-  MeshPtr newMesh = mMeshReaders[meshType]->load(uid, fileName);
+  DataPtr newMesh = mDataReaders[meshType]->load(uid, fileName);
   if (newMesh)
   {
-    this->loadMesh(newMesh);
+    this->loadData(newMesh);
 //    mMeshes[newMesh->getUid()] = newMesh;
 //    emit dataLoaded();
   }
-  return newMesh;
+  return boost::shared_dynamic_cast<ssc::Mesh>(newMesh);
 }
 
 ImagePtr DataManagerImpl::getImage(const std::string& uid)
@@ -500,7 +500,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 
   while (!child.isNull())
   {
-    if (child.nodeName() == "data" || child.nodeName() == "data")
+    if (child.nodeName() == "data")
     {
       QString uidNodeString = child.namedItem("uid").toElement().text();
 
@@ -525,26 +525,32 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
 
           QFileInfo fileInfo(path);
           QString fileType = fileInfo.suffix();
-          if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
-          {
-            data = mImageReaders[ssc::rtMETAIMAGE]->load(uidNodeString.toStdString(), path.toStdString());
-            //data = this->loadImage(uidNodeString.toStdString(), path.toStdString(), ssc::rtMETAIMAGE);
-          }
-          else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
-          {
-            data = mMeshReaders[ssc::mrtSTL]->load(uidNodeString.toStdString(), path.toStdString());
-            //data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtSTL);
-          }
-          else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-          {
-            data = mMeshReaders[ssc::mrtPOLYDATA]->load(uidNodeString.toStdString(), path.toStdString());
-            //data = this->loadMesh(uidNodeString.toStdString(), path.toStdString(), ssc::mrtPOLYDATA);
-          }
-          else
+          READER_TYPE readerType = this->getReaderType(fileType);
+          data = mDataReaders[readerType]->load(uidNodeString.toStdString(), path.toStdString());
+
+          if (!mDataReaders.count(readerType))
           {
             messageManager()->sendWarning("Unknown file: " + string_cast(fileInfo.absolutePath()));
             return;
           }
+
+//          if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
+//          {
+//            data = mImageReaders[ssc::rtMETAIMAGE]->load(uidNodeString.toStdString(), path.toStdString());
+//          }
+//          else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
+//          {
+//            data = mMeshReaders[ssc::mrtSTL]->load(uidNodeString.toStdString(), path.toStdString());
+//          }
+//          else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+//          {
+//            data = mMeshReaders[ssc::mrtPOLYDATA]->load(uidNodeString.toStdString(), path.toStdString());
+//          }
+//          else
+//          {
+//            messageManager()->sendWarning("Unknown file: " + string_cast(fileInfo.absolutePath()));
+//            return;
+//          }
 
           if (nameNode.text().isEmpty())
             data->setName(fileInfo.fileName().toStdString());
@@ -601,6 +607,23 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString absolutePath)
     }
     child = child.nextSibling();
   }
+}
+
+READER_TYPE DataManagerImpl::getReaderType(QString fileType)
+{
+  if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
+  {
+    return ssc::rtMETAIMAGE;
+  }
+  else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
+  {
+    return ssc::rtSTL;
+  }
+  else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+  {
+    return ssc::rtPOLYDATA;
+  }
+  return ssc::rtCOUNT;
 }
 
 void DataManagerImpl::vtkImageDataChangedSlot()

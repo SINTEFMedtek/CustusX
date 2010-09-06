@@ -23,14 +23,17 @@ enum READER_TYPE
 	rtDICOM,
 	rtSONOWAND_M3D,
 	rtMETAIMAGE,
-	rtAUTO
+  rtPOLYDATA,
+  rtSTL,
+	rtAUTO,
+	rtCOUNT
 };
 //-----
-enum MESH_READER_TYPE
-{
-	mrtPOLYDATA,
-	mrtSTL,
-};
+//enum MESH_READER_TYPE
+//{
+//	mrtPOLYDATA,
+//	mrtSTL,
+//};
 
 /**Manager for images, meshes, and associated data.
  *
@@ -59,7 +62,7 @@ public:
 	virtual std::vector<std::string> getImageUids() const = 0;
 
 	// meshes
-	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType) = 0;
+	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE meshType) = 0;
 	virtual MeshPtr getMesh(const std::string& uid) = 0;
 	virtual std::map<std::string, MeshPtr> getMeshes() = 0;
 

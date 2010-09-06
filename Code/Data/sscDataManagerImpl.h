@@ -18,49 +18,49 @@
 namespace ssc
 {
 
-class ImageReader
+class DataReader
 {
 public:
-	virtual ~ImageReader() {}
+	virtual ~DataReader() {}
 	virtual bool canLoad(const std::string& filename) = 0;
-	virtual ImagePtr load(const std::string& uid, const std::string& filename) = 0;
+	virtual DataPtr load(const std::string& uid, const std::string& filename) = 0;
 };
-typedef boost::shared_ptr<ImageReader> ImageReaderPtr;
+typedef boost::shared_ptr<DataReader> DataReaderPtr;
 
-class MetaImageReader : public ImageReader
+class MetaImageReader : public DataReader
 {
 public:
 	virtual ~MetaImageReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual ImagePtr load(const std::string& uid, const std::string& filename);
+	virtual DataPtr load(const std::string& uid, const std::string& filename);
 };
 
 
-class MeshReader
-{
-public:
-	virtual ~MeshReader() {}
-	virtual bool canLoad(const std::string& filename) = 0;
-	virtual MeshPtr load(const std::string& uid, const std::string& filename) = 0;
-};
-typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
+//class MeshReader :
+//{
+//public:
+//	virtual ~MeshReader() {}
+//	virtual bool canLoad(const std::string& filename) = 0;
+//	virtual MeshPtr load(const std::string& uid, const std::string& filename) = 0;
+//};
+//typedef boost::shared_ptr<MeshReader> MeshReaderPtr;
 
 
-class PolyDataMeshReader : public MeshReader
+class PolyDataMeshReader : public DataReader
 {
 public:
 	virtual ~PolyDataMeshReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual MeshPtr load(const std::string& uid, const std::string& filename);
+	virtual DataPtr load(const std::string& uid, const std::string& filename);
 };
 
 
-class StlMeshReader : public MeshReader
+class StlMeshReader : public DataReader
 {
 public:
 	virtual ~StlMeshReader() {}
 	virtual bool canLoad(const std::string& filename) { return true; }
-	virtual MeshPtr load(const std::string& uid, const std::string& filename);
+	virtual DataPtr load(const std::string& uid, const std::string& filename);
 };
 
 
@@ -124,16 +124,18 @@ protected:
 	ImagesMap mImages;
 	Vector3D mCenter;
 	MEDICAL_DOMAIN mMedicalDomain;
-	std::map<READER_TYPE, ImageReaderPtr> mImageReaders;
+//	std::map<READER_TYPE, ImageReaderPtr> mImageReaders;
 
 	std::map<std::string, MeshPtr> mMeshes;
-	std::map<MESH_READER_TYPE, MeshReaderPtr> mMeshReaders;
+//	std::map<MESH_READER_TYPE, MeshReaderPtr> mMeshReaders;
+  std::map<READER_TYPE, DataReaderPtr> mDataReaders;
 
 	//state
 	ImagePtr mActiveImage;
 	//MeshPtr mActiveMesh;
     virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
-    virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, MESH_READER_TYPE meshType);
+    virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE meshType);
+    READER_TYPE getReaderType(QString fileType);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
   
