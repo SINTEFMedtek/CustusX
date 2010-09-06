@@ -22,13 +22,13 @@ class Navigation
 {
 public:
   void centerToImage(ssc::ImagePtr image);
-  void centerToView(ViewWrapper* viewWrapper);
+  void centerToView(const std::vector<ssc::ImagePtr>& images);
   void centerToGlobalImageCenter();
   void centerToTooltip();
 
 private:
   ssc::Vector3D findImageCenter(ssc::ImagePtr image);
-  ssc::Vector3D findViewCenter(ViewWrapper* viewWrapper);
+  ssc::Vector3D findViewCenter(const std::vector<ssc::ImagePtr>& images);
   ssc::Vector3D findGlobalImageCenter();
 
   void centerManualTool(ssc::Vector3D& p_r);
@@ -55,26 +55,26 @@ public:
   ViewWrapperPtr getViewWrapperFromViewUid(std::string viewUid);
   std::vector<ssc::View*> getViews() const;
   //ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
-  virtual void addImage(ssc::ImagePtr image);
-  virtual void removeImage(ssc::ImagePtr image);
+//  virtual void addImage(ssc::ImagePtr image);
+//  virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
   void clearPatientData();
   double getZoom2D();
-  std::vector<ssc::ImagePtr> getImages() { return mImages; }
+  std::vector<ssc::ImagePtr> getImages();
   ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
-  void addMesh(ssc::MeshPtr data);
-  void removeMesh(ssc::MeshPtr data);
+//  void addMesh(ssc::MeshPtr data);
+//  void removeMesh(ssc::MeshPtr data);
 
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);
 
 public slots:
-  void addImage(QString imageUid);
-  void removeImage(QString imageUid);
-  void addMesh(QString uid);
-  void removeMesh(QString uid);
+//  void addImage(QString imageUid);
+//  void removeImage(QString imageUid);
+//  void addMesh(QString uid);
+//  void removeMesh(QString uid);
 
 private slots:
   void activateManualToolSlot();
@@ -102,8 +102,9 @@ protected:
   };
   SyncGroup mZoom2D;
 
-  std::vector<ssc::MeshPtr> mMeshes;
-  std::vector<ssc::ImagePtr> mImages;
+  ViewGroupDataPtr mViewGroupData;
+//  std::vector<ssc::MeshPtr> mMeshes;
+//  std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mViewWrappers;
   ssc::REGISTRATION_STATUS mRegistrationMode;
   ssc::SlicePlanesProxyPtr mSlicePlanesProxy;

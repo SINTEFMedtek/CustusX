@@ -15,17 +15,6 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "cxInteractiveCropper.h"
-
-//typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
-//typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
-//typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
-//typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-
-
-typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
-typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
-typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
 
 namespace cx
 {
@@ -41,12 +30,6 @@ class ViewWrapper3D : public ViewWrapper
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
   virtual ~ViewWrapper3D();
-  virtual void addImage(ssc::ImagePtr image);
-  virtual void addMesh(ssc::MeshPtr mesh);
-  virtual void removeMesh(ssc::MeshPtr mesh);
-  virtual std::vector<ssc::ImagePtr> getImages() const;
-  virtual std::vector<ssc::MeshPtr> getMeshes() const;
-  virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
   virtual double getZoom2D(){return -1.0;};
@@ -63,9 +46,10 @@ private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
 
-  vtkBoxRepresentationPtr mBoxRep;
-  vtkBoxWidget2Ptr mBoxWidget2;
-  vtkBoxWidgetPtr mBoxWidget;
+  virtual void imageAdded(ssc::ImagePtr image);
+  virtual void meshAdded(ssc::MeshPtr mesh);
+  virtual void imageRemoved(ssc::ImagePtr image);
+  virtual void meshRemoved(ssc::MeshPtr mesh);
 
   typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
   typedef  std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
@@ -73,15 +57,10 @@ private:
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   GeometricRepMap mGeometricReps;
-  //std::map<std::string, ssc::GeometricRepPtr> mGeometricReps;//TODO: Replace mGeometricRep with this
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
-
-  std::vector<ssc::ImagePtr> mImage;
-  std::vector<ssc::MeshPtr> mMeshes;
-  //ssc::MeshPtr mMesh;
   QPointer<ssc::View> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
