@@ -198,11 +198,11 @@ void PatientData::importData(QString fileName)
     data = ssc::dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
   }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
-    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtSTL);
+    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::rtSTL);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
   {
-    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::mrtPOLYDATA);
+    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::rtPOLYDATA);
     pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
   }
   data->setName(fileInfo.fileName().toStdString());
