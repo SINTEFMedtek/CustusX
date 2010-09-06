@@ -23,6 +23,7 @@
 #include "cxDataInterface.h"
 #include "UsConfigGui.h"
 #include "sscStringWidgets.h"
+#include "cxToolManager.h"
 
 namespace cx
 {
@@ -156,6 +157,10 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
 
+  //connect(mProbePropertiesWidget, SIGNAL(USProbeChanged()), ssc::toolManager(), SLOT(USProbeChangedSlot));
+
+  connect(mProbePropertiesWidget, SIGNAL(USProbePropertiesChanged()), this, SLOT(USProbePropertiesChangedSlot()));
+
   dominantToolChangedSlot();
   referenceToolChangedSlot();
   updateSlot();
@@ -220,6 +225,16 @@ void ToolPropertiesWidget::updateSlot()
   if (ssc::toolManager()->isTracking())
     status = "Tracking";
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
+}
+
+void ToolPropertiesWidget::USProbePropertiesChangedSlot()
+{
+  ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
+  double depthStart = config.mOffset;
+  double depthEnd = config.mDepth + depthStart;
+  int widtInPixels = config.mRightEdge - config.mLeftEdge;
+  double width = config.mPixelWidth * widtInPixels;
+  dynamic_cast<ToolManager*>(ssc::toolManager())->setUSProbeSector(depthStart, depthEnd, width);
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)
