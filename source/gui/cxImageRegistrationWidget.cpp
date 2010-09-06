@@ -13,7 +13,7 @@
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
 

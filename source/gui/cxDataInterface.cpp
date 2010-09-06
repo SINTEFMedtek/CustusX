@@ -7,9 +7,8 @@
 #include "cxDataInterface.h"
 #include "sscImage.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
 #include "sscImageLUT2D.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "sscTool.h"
 

@@ -13,7 +13,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxToolManager.h"
 #include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
@@ -31,7 +31,7 @@ void Navigation::centerToImage(ssc::ImagePtr image)
   ssc::Vector3D p_r = findImageCenter(image);
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
   //std::cout << "Centered to view." << std::endl;
@@ -45,7 +45,7 @@ void Navigation::centerToView(ViewWrapper* viewWrapper)
   ssc::Vector3D p_r = findViewCenter(viewWrapper);
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
   //std::cout << "Centered to view." << std::endl;
@@ -59,7 +59,7 @@ void Navigation::centerToGlobalImageCenter()
   ssc::Vector3D p_r = findGlobalImageCenter();
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
 }
@@ -74,7 +74,7 @@ void Navigation::centerToTooltip()
   ssc::Vector3D p_r = ssc::toolManager()->get_rMpr()->coord(p_pr);
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 }
 /**Find the center of the images, defined as the center
  * of the smallest bounding box enclosing the images.
@@ -136,7 +136,7 @@ ssc::Vector3D Navigation::findViewCenter(ViewWrapper* viewWrapper)
 ssc::Vector3D Navigation::findGlobalImageCenter()
 {
   ssc::Vector3D p_r(0,0,0);
-  if (DataManager::getInstance()->getImages().empty())
+  if (ssc::dataManager()->getImages().empty())
     return p_r;
 
   ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();

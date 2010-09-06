@@ -2,7 +2,7 @@
 
 #include <QMenu>
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
 
 namespace cx

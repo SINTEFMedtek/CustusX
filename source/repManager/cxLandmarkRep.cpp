@@ -14,7 +14,7 @@
 #include "sscView.h"
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 
 namespace cx
 {

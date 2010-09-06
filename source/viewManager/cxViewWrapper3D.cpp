@@ -26,7 +26,8 @@
 #include "sscSlicePlanes3DRep.h"
 #include "cxLandmarkRep.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
+#include "sscMesh.h"
 
 namespace cx
 {

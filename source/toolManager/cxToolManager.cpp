@@ -8,7 +8,7 @@
 #include <vtkDoubleArray.h>
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxToolConfigurationParser.h"

@@ -6,7 +6,7 @@
  */
 
 #include "cxTreeModelItem.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "cxBrowserWidget.h"

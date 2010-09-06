@@ -1066,7 +1066,7 @@ void Reconstructer::reconstruct()
   ssc::messageManager()->sendInfo("Reconstruct time: "
                                   + string_cast(pre.time().msecsTo(QDateTime::currentDateTime().time())));
 
-  DataManager::getInstance()->loadImage(mOutput);
+  DataManager::getInstance()->loadData(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
   
   //TODO: fix mOutputBasePath

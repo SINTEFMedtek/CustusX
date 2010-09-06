@@ -17,7 +17,7 @@
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscSliceComputer.h"
 
 #include "sscSlicePlaneClipper.h"
