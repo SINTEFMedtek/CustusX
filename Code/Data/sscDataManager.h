@@ -16,6 +16,7 @@ namespace ssc
 // forward declarations
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
+typedef boost::shared_ptr<class Data> DataPtr;
 
 //-----
 enum READER_TYPE
@@ -44,6 +45,7 @@ class DataManager : public QObject
 {
 	Q_OBJECT
 public:
+  typedef std::map<std::string, DataPtr> DataMap;
 	typedef std::map<std::string, ImagePtr> ImagesMap;
 	typedef std::map<std::string, MeshPtr> MeshMap;
 
@@ -52,10 +54,10 @@ public:
 
 	// images
 	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type) = 0;
-  virtual void loadImage(ImagePtr image) = 0; ///< load an image generated outside the manager.
+  //virtual void loadImage(ImagePtr image) = 0; ///< load an image generated outside the manager.
   virtual void saveImage(ImagePtr image, const std::string& basePath) = 0; ///< Save image to file
-	virtual ImagePtr getImage(const std::string& uid) = 0;
-	virtual std::map<std::string, ImagePtr> getImages() = 0;
+	virtual ImagePtr getImage(const std::string& uid) const = 0;
+	virtual std::map<std::string, ImagePtr> getImages() const = 0;
 
 	virtual std::map<std::string, std::string> getImageUidsAndNames() const = 0;
 	virtual std::vector<std::string> getImageNames() const = 0;
@@ -63,12 +65,18 @@ public:
 
 	// meshes
 	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE meshType) = 0;
-	virtual MeshPtr getMesh(const std::string& uid) = 0;
-	virtual std::map<std::string, MeshPtr> getMeshes() = 0;
+	virtual MeshPtr getMesh(const std::string& uid) const = 0;
+	virtual std::map<std::string, MeshPtr> getMeshes() const = 0;
 
 	virtual std::map<std::string, std::string> getMeshUidsWithNames() const = 0;
 	virtual std::vector<std::string> getMeshUids() const = 0;
 	virtual std::vector<std::string> getMeshNames() const = 0;
+
+	// data
+  virtual void loadData(DataPtr data) = 0;
+  virtual DataPtr loadData(const std::string& uid, const std::string& path, READER_TYPE type) = 0;
+  virtual std::map<std::string, DataPtr> getData() const = 0;
+  virtual DataPtr getData(const std::string& uid) const = 0;
 
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.

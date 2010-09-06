@@ -15,6 +15,8 @@
 #include "sscMesh.h"
 #include "sscDataManager.h"
 
+class QDomElement;
+
 namespace ssc
 {
 
@@ -72,21 +74,22 @@ public:
 	static void initialize();
 
 	// images
-  virtual void loadImage(ImagePtr image);
   virtual void saveImage(ImagePtr image, const std::string& basePath);///< Save image to file \param basePath Absolute path to patient data folder
-	virtual ImagePtr getImage(const std::string& uid);
-	virtual std::map<std::string, ImagePtr> getImages();
+	virtual ImagePtr getImage(const std::string& uid) const;
+	virtual std::map<std::string, ImagePtr> getImages() const;
 
 	virtual std::map<std::string, std::string> getImageUidsAndNames() const;
 	virtual std::vector<std::string> getImageNames() const;
 	virtual std::vector<std::string> getImageUids() const;
 
-	void loadMesh(MeshPtr data);
 	void loadData(DataPtr data);
+	DataPtr loadData(const std::string& uid, const std::string& path, READER_TYPE type);
+	std::map<std::string, DataPtr> getData() const;
+	DataPtr getData(const std::string& uid) const;
 
 	// meshes
-	virtual MeshPtr getMesh(const std::string& uid);
-	virtual std::map<std::string, MeshPtr> getMeshes();
+	virtual MeshPtr getMesh(const std::string& uid) const;
+	virtual std::map<std::string, MeshPtr> getMeshes() const;
 
 	virtual std::map<std::string, std::string> getMeshUidsWithNames() const;
 	virtual std::vector<std::string> getMeshUids() const;
@@ -121,13 +124,9 @@ protected:
 	DataManagerImpl();
 	virtual ~DataManagerImpl();
 protected:
-	ImagesMap mImages;
+	DataMap mData;
 	Vector3D mCenter;
 	MEDICAL_DOMAIN mMedicalDomain;
-//	std::map<READER_TYPE, ImageReaderPtr> mImageReaders;
-
-	std::map<std::string, MeshPtr> mMeshes;
-//	std::map<MESH_READER_TYPE, MeshReaderPtr> mMeshReaders;
   std::map<READER_TYPE, DataReaderPtr> mDataReaders;
 
 	//state
@@ -136,6 +135,8 @@ protected:
     virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type);
     virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE meshType);
     READER_TYPE getReaderType(QString fileType);
+    void loadData(QDomElement node, QString rootPath);
+    DataPtr readData(const std::string& uid, const std::string& path, READER_TYPE type);
 
 	LandmarkPropertyMap mLandmarkProperties; ///< uid and name
   
