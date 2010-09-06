@@ -44,8 +44,12 @@ public:
   int getOriginCol()  {return mOriginCol;}; ///< Get selecetd Origin.Col
   int getOriginRow()  {return mOriginRow;}; ///< Get selecetd Origin.Row
   
+  double getPixelWidth()  {return mPixelWidth;};  ///< Get selecetd pixel width
+  double getPixelHeight() {return mPixelHeight;}; ///< Get selecetd pixel height
+
 signals:
   void probeSelected(const QString& probe); ///< signal that tells what probe is currently selected by the user
+  void USProbePropertiesChanged(); ///< Emitted when the probe properties are changed
 
 protected slots:
   void populateProbeNamesSlot(const QString& scanner);///< Populate the probe combo box for a selected scanner
