@@ -162,6 +162,7 @@ void UsConfigGui::RTsourceDetected(const QString& source)
 void UsConfigGui::configIdChanged(const QString& configId)
 {
   mSettings->setValue("ConfigId", mConfigIdBox->currentText());
+  emit USProbePropertiesChanged();
 }
 
 QStringList UsConfigGui::getConfigurationString()
