@@ -345,13 +345,13 @@ void ViewManager::setActiveLayout(const QString& layout)
   ssc::messageManager()->sendInfo("Layout changed to "+ string_cast(this->getLayoutData(mActiveLayout).getName()));
 }
   
-void ViewManager::deleteImageSlot(ssc::ImagePtr image)
-{
-  for (unsigned i=0; i<mViewGroups.size(); ++i)
-    mViewGroups[i]->removeImage(image);
-
-  emit imageDeletedFromViews(image);
-}
+//void ViewManager::deleteImageSlot(ssc::ImagePtr image)
+//{
+//  for (unsigned i=0; i<mViewGroups.size(); ++i)
+//    mViewGroups[i]->removeImage(image);
+//
+//  emit imageDeletedFromViews(image);
+//}
 
 void ViewManager::renderingIntervalChangedSlot(int interval)
 {

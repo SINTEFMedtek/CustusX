@@ -96,7 +96,7 @@ signals:
   void activeViewChanged(); ///< emitted when the active view changes
 
 public slots:
-  void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
+  //void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
   void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
   void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
 
