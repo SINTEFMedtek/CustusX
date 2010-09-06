@@ -5,7 +5,7 @@
 #include <QStringList>
 #include <QVBoxLayout>
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "cxViewManager.h"
 #include "cxRepManager.h"

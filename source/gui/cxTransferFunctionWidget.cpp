@@ -5,7 +5,7 @@
 #include <QStringList>
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscImageTF3D.h"
 
 //#include "sscAbstractInterface.h"

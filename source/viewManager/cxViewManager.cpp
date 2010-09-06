@@ -19,7 +19,7 @@
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "cxDataLocations.h"
 #include "sscSlicePlanes3DRep.h"
