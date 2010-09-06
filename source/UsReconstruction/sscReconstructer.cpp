@@ -202,8 +202,8 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   }
   
   //Use file name as uid
-  ImagePtr UsRaw = MetaImageReader().load(string_cast(fileName), 
-                                  string_cast(mhdFileName));
+  ImagePtr UsRaw = boost::shared_dynamic_cast<Image>(MetaImageReader().load(string_cast(fileName),
+                                  string_cast(mhdFileName)));
   UsRaw->setFilePath(string_cast(filePath));
   mUsRaw.reset(new USFrameData(UsRaw));
   
