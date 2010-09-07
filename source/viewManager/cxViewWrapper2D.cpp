@@ -309,6 +309,7 @@ void ViewWrapper2D::updateView()
 {
   std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
   ssc::ImagePtr image;
+  //std::cout << "ViewWrapper2D::updateView() " << images.size() << std::endl;
   if (!images.empty())
     image = images.back(); // always show last in vector
 
@@ -326,7 +327,7 @@ void ViewWrapper2D::updateView()
   mDataNameText->setText(0, text);
 }
 
-void ViewWrapper2D::imageRemoved(ssc::ImagePtr image)
+void ViewWrapper2D::imageRemoved(const QString& uid)
 {
   updateView();
 }
