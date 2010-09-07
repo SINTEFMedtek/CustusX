@@ -128,12 +128,16 @@ void ViewWrapper::dataAddedSlot(QString uid)
 
 void ViewWrapper::dataRemovedSlot(QString uid)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(uid));
-  if (image)
-    this->imageRemoved(image);
-  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(string_cast(uid));
-  if (mesh)
-    this->meshRemoved(mesh);
+//  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(uid));
+//  std::cout << "ViewWrapper::dataRemovedSlot(" << uid << ")" << std::endl;
+//  if (image)
+//    this->imageRemoved(image);
+//  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(string_cast(uid));
+//  if (mesh)
+//    this->meshRemoved(mesh);
+
+  this->imageRemoved(uid);
+  this->meshRemoved(uid);
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
