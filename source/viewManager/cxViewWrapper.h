@@ -30,6 +30,28 @@ signals:
   void changed();
 };
 
+typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
+
+/** Container for data shared between all members of a view group
+ */
+class ViewGroupData : public QObject
+{
+  Q_OBJECT
+public:
+  std::vector<ssc::DataPtr> getData() const;
+  void addData(ssc::DataPtr data);
+  void removeData(ssc::DataPtr data);
+  void clearData();
+  std::vector<ssc::ImagePtr> getImages() const;
+  std::vector<ssc::MeshPtr> getMeshes() const;
+
+signals:
+  void dataAdded(QString uid);
+  void dataRemoved(QString uid);
+private:
+  std::vector<ssc::DataPtr> mData;
+};
+
 /**
  * \class cxViewWrapper.h
  *
@@ -44,34 +66,35 @@ class ViewWrapper : public QObject
 public:
   virtual ~ViewWrapper() {}
   virtual void initializePlane(ssc::PLANE_TYPE plane) {}
-  virtual void addImage(ssc::ImagePtr image) = 0;
-  virtual void addMesh(ssc::MeshPtr mesh) = 0;
-  virtual std::vector<ssc::ImagePtr> getImages() const = 0;
-  virtual std::vector<ssc::MeshPtr> getMeshes() const = 0;
-  virtual void removeImage(ssc::ImagePtr image) = 0;
-  virtual void removeMesh(ssc::MeshPtr mesh) = 0;
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) = 0;
+  virtual void setViewGroup(ViewGroupDataPtr group);
 
   virtual void setZoom2D(SyncedValuePtr value) {}
   virtual void setOrientationMode(SyncedValuePtr value) {}
 
 signals:
   void orientationChanged(ssc::ORIENTATION_TYPE type);
-  void imageAdded(QString uid);
-  void imageRemoved(QString uid);
-  void meshAdded(QString uid);
-  void meshRemoved(QString uid);
 
 protected slots:
   void contextMenuSlot(const QPoint& point);
-  void imageActionSlot(); ///< triggered when an imageaction is selected in the contextmenu
-  void meshActionSlot();
+  void dataActionSlot();
+
+  void dataAddedSlot(QString uid);
+  void dataRemovedSlot(QString uid);
 
 protected:
+  virtual void imageAdded(ssc::ImagePtr image) = 0;
+  virtual void meshAdded(ssc::MeshPtr mesh) = 0;
+  virtual void imageRemoved(ssc::ImagePtr image) = 0;
+  virtual void meshRemoved(ssc::MeshPtr mesh) = 0;
+
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
+  void addDataAction(std::string uid, QMenu* contextMenu);
+
+  ViewGroupDataPtr mViewGroup;
 };
 
 }//namespace cx

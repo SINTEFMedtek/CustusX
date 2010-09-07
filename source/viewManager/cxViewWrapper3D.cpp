@@ -26,7 +26,8 @@
 #include "sscSlicePlanes3DRep.h"
 #include "cxLandmarkRep.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
+#include "sscMesh.h"
 
 namespace cx
 {
@@ -42,7 +43,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
-  //mGeometricRep = repManager()->getGeometricRep("GeometricRep_"+index);
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -103,22 +103,14 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
   mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
-void ViewWrapper3D::addImage(ssc::ImagePtr image)
+void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 {
-  if (!image)
-    return;
-  if (std::count(mImage.begin(), mImage.end(), image))
-    return;
-
-  mImage.push_back(image);
-
   if (!mVolumetricReps.count(image->getUid()))
   {
     ssc::VolumetricRepPtr rep = repManager()->getVolumetricRep(image);
 
     mVolumetricReps[image->getUid()] = rep;
     mView->addRep(rep);
-    emit imageAdded(image->getUid().c_str());
   }
 
   mProbeRep->setImage(image);
@@ -131,24 +123,21 @@ void ViewWrapper3D::addImage(ssc::ImagePtr image)
 
 void ViewWrapper3D::updateView()
 {
+  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+
   //update data name text rep
   QStringList text;
-  for (unsigned i = 0; i < mImage.size(); ++i)
+  for (unsigned i = 0; i < images.size(); ++i)
   {
-    text << qstring_cast(mImage[i]->getName());
+    text << qstring_cast(images[i]->getName());
   }
   mDataNameText->setText(0, string_cast(text.join("\n")));
 }
 
-void ViewWrapper3D::removeImage(ssc::ImagePtr image)
+void ViewWrapper3D::imageRemoved(ssc::ImagePtr image)
 {
-  if (!image)
-    return;
   if (!mVolumetricReps.count(image->getUid()))
     return;
-  if (!std::count(mImage.begin(), mImage.end(), image))
-    return;
-  mImage.erase(std::find(mImage.begin(), mImage.end(), image));
 
   ssc::messageManager()->sendDebug("Remove image from view group 3d: "+image->getName());
   mView->removeRep(mVolumetricReps[image->getUid()]);
@@ -160,70 +149,24 @@ void ViewWrapper3D::removeImage(ssc::ImagePtr image)
     mLandmarkRep->setImage(ssc::ImagePtr());
 
   this->updateView();
-
-  emit imageRemoved(qstring_cast(image->getUid()));
 }
 
-void ViewWrapper3D::addMesh(ssc::MeshPtr data)
+void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
 {
-  if (!data)
-    return;
-  if (std::count(mMeshes.begin(), mMeshes.end(), data))
-    return;
-
-  mMeshes.push_back(data);
-
   ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom_rep");
   rep->setMesh(data);
   mGeometricReps[data->getUid()] = rep;
-  
-  emit meshAdded(data->getUid().c_str());
-
   mView->addRep(rep);
   this->updateView();
 
   mView->getRenderer()->ResetCamera();
 }
 
-void ViewWrapper3D::removeMesh(ssc::MeshPtr data)
+void ViewWrapper3D::meshRemoved(ssc::MeshPtr data)
 {
-  if (!data)
-    return;
-//  if (!mVolumetricReps.count(image->getUid()))
-//    return;
-  if (!std::count(mMeshes.begin(), mMeshes.end(), data))
-    return;
-  mMeshes.erase(std::find(mMeshes.begin(), mMeshes.end(), data));
-
-  ssc::messageManager()->sendDebug("Remove mesh from view group 3d: "+data->getName());
   mView->removeRep(mGeometricReps[data->getUid()]);
   mGeometricReps.erase(data->getUid());
-
   this->updateView();
-  emit meshRemoved(data->getUid().c_str());
-
-  //////////////////////////////////////////////////
-
-//  //TODO: Allow more than one mesh
-//  if (!mesh)
-//    return;
-//  if(!mGeometricRep->hasMesh(mesh))
-//    return;
-//
-//  mView->removeRep(mGeometricRep);
-//  mMesh.reset();//set empty mesh
-//  this->updateView();
-}
-
-std::vector<ssc::ImagePtr> ViewWrapper3D::getImages() const
-{
-  return mImage;
-}
-
-std::vector<ssc::MeshPtr> ViewWrapper3D::getMeshes() const
-//ssc::MeshPtr ViewWrapper3D::getMesh() const
-{
-  return mMeshes;
 }
   
 ssc::View* ViewWrapper3D::getView()
@@ -235,7 +178,6 @@ void ViewWrapper3D::dominantToolChangedSlot()
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   mProbeRep->setTool(dominantTool);
-  //std::cout << "ViewWrapper3D::dominantToolChangedSlot(): " << dominantTool.get() << std::endl;
 }
 
 
@@ -315,7 +257,6 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
   mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
   mSlicePlanes3DRep->setProxy(proxy);
   mView->addRep(mSlicePlanes3DRep);
-  //connect(mSlicePlanes3DRep->getProxy().get(), SIGNAL(changed()), this, SLOT(slicePlanesChangedSlot()));
 }
 
 
