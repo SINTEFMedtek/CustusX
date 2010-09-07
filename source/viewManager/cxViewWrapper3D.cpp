@@ -134,18 +134,20 @@ void ViewWrapper3D::updateView()
   mDataNameText->setText(0, string_cast(text.join("\n")));
 }
 
-void ViewWrapper3D::imageRemoved(ssc::ImagePtr image)
+void ViewWrapper3D::imageRemoved(const QString& uid)
 {
-  if (!mVolumetricReps.count(image->getUid()))
+  std::string suid = string_cast(uid);
+
+  if (!mVolumetricReps.count(suid))
     return;
 
-  ssc::messageManager()->sendDebug("Remove image from view group 3d: "+image->getName());
-  mView->removeRep(mVolumetricReps[image->getUid()]);
-  mVolumetricReps.erase(image->getUid());
+  ssc::messageManager()->sendDebug("Remove image from view group 3d: "+suid);
+  mView->removeRep(mVolumetricReps[suid]);
+  mVolumetricReps.erase(suid);
 
-  if (image==mProbeRep->getImage())
+  if (mProbeRep->getImage() && mProbeRep->getImage()->getUid()==suid)
     mProbeRep->setImage(ssc::ImagePtr());
-  if (image==mLandmarkRep->getImage())
+  if (mLandmarkRep->getImage() && mLandmarkRep->getImage()->getUid()==suid)
     mLandmarkRep->setImage(ssc::ImagePtr());
 
   this->updateView();
@@ -162,10 +164,15 @@ void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
   mView->getRenderer()->ResetCamera();
 }
 
-void ViewWrapper3D::meshRemoved(ssc::MeshPtr data)
+void ViewWrapper3D::meshRemoved(const QString& uid)
 {
-  mView->removeRep(mGeometricReps[data->getUid()]);
-  mGeometricReps.erase(data->getUid());
+  std::string suid = string_cast(uid);
+
+  if (!mGeometricReps.count(suid))
+    return;
+
+  mView->removeRep(mGeometricReps[suid]);
+  mGeometricReps.erase(suid);
   this->updateView();
 }
   

@@ -48,8 +48,8 @@ private:
 
   virtual void imageAdded(ssc::ImagePtr image);
   virtual void meshAdded(ssc::MeshPtr mesh);
-  virtual void imageRemoved(ssc::ImagePtr image);
-  virtual void meshRemoved(ssc::MeshPtr mesh);
+  virtual void imageRemoved(const QString& uid);
+  virtual void meshRemoved(const QString& uid);
 
   typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
   typedef  std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;

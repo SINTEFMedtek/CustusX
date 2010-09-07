@@ -87,8 +87,8 @@ protected slots:
 protected:
   virtual void imageAdded(ssc::ImagePtr image) = 0;
   virtual void meshAdded(ssc::MeshPtr mesh) = 0;
-  virtual void imageRemoved(ssc::ImagePtr image) = 0;
-  virtual void meshRemoved(ssc::MeshPtr mesh) = 0;
+  virtual void imageRemoved(const QString& uid) = 0;
+  virtual void meshRemoved(const QString& uid) = 0;
 
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
