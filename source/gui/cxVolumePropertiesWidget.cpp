@@ -10,16 +10,9 @@
 #include <QComboBox>
 #include <QTabWidget>
 #include <QVBoxLayout>
-//#include <QComboBox>
-//#include "sscProbeRep.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
-//#include "cxRegistrationManager.h"
-//#include "sscToolManager.h"
+#include "sscDataManager.h"
 #include "cxViewManager.h"
-//#include "cxRepManager.h"
-//#include "cxView3D.h"
-//#include "cxView2D.h"
 #include "sscStringWidgets.h"
 
 #include "cxTransferFunctionWidget.h"

@@ -18,7 +18,7 @@
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxViewManager.h"
 //#include "cxInriaRep2D.h"
 #include "cxLandmarkRep.h"
@@ -299,31 +299,18 @@ ssc::View* ViewWrapper2D::getView()
 
 /**
  */
-void ViewWrapper2D::addImage(ssc::ImagePtr image)
+void ViewWrapper2D::imageAdded(ssc::ImagePtr image)
 {
-  if (!image)
-  {
-    return;
-  }
-  if (std::count(mImage.begin(), mImage.end(), image))
-  {
-    return;
-  }
-  mImage.push_back(image);
-
   this->updateView();
-
-  emit imageAdded(image->getUid().c_str());
-
-  Navigation().centerToView(this);
+  Navigation().centerToView(mViewGroup->getImages());
 }
 
 void ViewWrapper2D::updateView()
 {
+  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
   ssc::ImagePtr image;
-  if (!mImage.empty())
-//    image = mImage.front(); // always show first in vector
-    image = mImage.back(); // always show last in vector
+  if (!images.empty())
+    image = images.back(); // always show last in vector
 
   std::string text;
 
@@ -339,36 +326,9 @@ void ViewWrapper2D::updateView()
   mDataNameText->setText(0, text);
 }
 
-
-std::vector<ssc::ImagePtr> ViewWrapper2D::getImages() const
+void ViewWrapper2D::imageRemoved(ssc::ImagePtr image)
 {
-  return mImage;
-//  return std::vector<ssc::ImagePtr>(1, mSliceRep->getImage());
-}
-
-void ViewWrapper2D::removeImage(ssc::ImagePtr image)
-{
-  if (!image)
-    return;
-  //std::cout << "remove 2d: " << image->getName() << std::endl;
-  //std::cout << "size " << mImage.size() << std::endl;
-  if (!std::count(mImage.begin(), mImage.end(), image))
-    return;
-  mImage.erase(std::find(mImage.begin(), mImage.end(), image));
-  //std::cout << "size " << mImage.size() << std::endl;
-//
-//  if (mImage.empty())
-//    mSliceRep->setImage(ssc::ImagePtr());
-//  else
-//    mSliceRep->setImage(mImage.front());
-
   updateView();
-  emit imageRemoved(qstring_cast(image->getUid()));
-}
-
-void ViewWrapper2D::removeMesh(ssc::MeshPtr mesh)
-{
-  //TODO
 }
 
 void ViewWrapper2D::dominantToolChangedSlot()

@@ -202,8 +202,8 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
   }
   
   //Use file name as uid
-  ImagePtr UsRaw = MetaImageReader().load(string_cast(fileName), 
-                                  string_cast(mhdFileName));
+  ImagePtr UsRaw = boost::shared_dynamic_cast<Image>(MetaImageReader().load(string_cast(fileName),
+                                  string_cast(mhdFileName)));
   UsRaw->setFilePath(string_cast(filePath));
   mUsRaw.reset(new USFrameData(UsRaw));
   
@@ -1066,7 +1066,7 @@ void Reconstructer::reconstruct()
   ssc::messageManager()->sendInfo("Reconstruct time: "
                                   + string_cast(pre.time().msecsTo(QDateTime::currentDateTime().time())));
 
-  DataManager::getInstance()->loadImage(mOutput);
+  DataManager::getInstance()->loadData(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
   
   //TODO: fix mOutputBasePath

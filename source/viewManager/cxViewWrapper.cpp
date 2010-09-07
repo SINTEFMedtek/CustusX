@@ -2,8 +2,9 @@
 
 #include <QMenu>
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
+#include "sscMesh.h"
 
 namespace cx
 {
@@ -28,6 +29,113 @@ QVariant SyncedValue::get() const
 }
 
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+std::vector<ssc::DataPtr> ViewGroupData::getData() const
+{
+  return mData;
+}
+
+void ViewGroupData::addData(ssc::DataPtr data)
+{
+  if (!data)
+    return;
+  if (std::count(mData.begin(), mData.end(), data))
+    return;
+  mData.push_back(data);
+  emit dataAdded(qstring_cast(data->getUid()));
+}
+
+void ViewGroupData::removeData(ssc::DataPtr data)
+{
+  if (!data)
+    return;
+  if (!std::count(mData.begin(), mData.end(), data))
+    return;
+  mData.erase(std::find(mData.begin(), mData.end(), data));
+  emit dataRemoved(qstring_cast(data->getUid()));
+}
+
+void ViewGroupData::clearData()
+{
+  while (!mData.empty())
+    this->removeData(mData.front());
+}
+
+std::vector<ssc::ImagePtr> ViewGroupData::getImages() const
+{
+  std::vector<ssc::ImagePtr> retval;
+  for (unsigned i=0; i<mData.size(); ++i)
+  {
+    ssc::ImagePtr data = boost::shared_dynamic_cast<ssc::Image>(mData[i]);
+    if (data)
+      retval.push_back(data);
+  }
+  return retval;
+}
+
+std::vector<ssc::MeshPtr> ViewGroupData::getMeshes() const
+{
+  std::vector<ssc::MeshPtr> retval;
+  for (unsigned i=0; i<mData.size(); ++i)
+  {
+    ssc::MeshPtr data = boost::shared_dynamic_cast<ssc::Mesh>(mData[i]);
+    if (data)
+      retval.push_back(data);
+  }
+  return retval;
+}
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
+{
+  mViewGroup = group;
+  connect(mViewGroup.get(), SIGNAL(dataAdded(QString)), SLOT(dataAddedSlot(QString)));
+  connect(mViewGroup.get(), SIGNAL(dataRemoved(QString)), SLOT(dataRemovedSlot(QString)));
+
+  std::vector<ssc::DataPtr> data = mViewGroup->getData();
+  for (unsigned i=0; i<data.size(); ++i)
+  {
+    this->dataAddedSlot(qstring_cast(data[i]->getUid()));
+  }
+
+}
+
+void ViewWrapper::dataAddedSlot(QString uid)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(uid));
+  if (image)
+    this->imageAdded(image);
+  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(string_cast(uid));
+  if (mesh)
+    this->meshAdded(mesh);
+}
+
+void ViewWrapper::dataRemovedSlot(QString uid)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(uid));
+  if (image)
+    this->imageRemoved(image);
+  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(string_cast(uid));
+  if (mesh)
+    this->meshRemoved(mesh);
+}
+
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
   QWidget* sender = dynamic_cast<QWidget*>(this->sender());
@@ -35,43 +143,20 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //add actions to the actiongroups and the contextmenu
+  std::map<std::string, std::string>::iterator iter;
+
   std::map<std::string, std::string> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
-  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
-
-  std::vector<ssc::ImagePtr> images = this->getImages();
-  std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
-  while(imageIt != imageUidsAndNames.end())
+  for(iter=imageUidsAndNames.begin(); iter != imageUidsAndNames.end(); ++iter)
   {
-    const QString uid = imageIt->first.c_str();
-    const QString name = imageIt->second.c_str();
-
-    QAction* imageAction = new QAction(name, &contextMenu);
-    imageAction->setData(QVariant(uid));
-    imageAction->setCheckable(true);
-    connect(imageAction, SIGNAL(triggered()), this, SLOT(imageActionSlot()));
-    contextMenu.addAction(imageAction);
-    imageAction->setChecked(std::count(images.begin(), images.end(), ssc::dataManager()->getImage(imageIt->first)));
-
-    imageIt++;
+    this->addDataAction(iter->first, &contextMenu);
   }
   
   contextMenu.addSeparator();
 
-  std::vector<ssc::MeshPtr> meshes = this->getMeshes();
-  std::map<std::string, std::string>::iterator meshIt = meshUidsAndNames.begin();
-  while(meshIt != meshUidsAndNames.end())
+  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
+  for(iter=meshUidsAndNames.begin(); iter != meshUidsAndNames.end(); ++iter)
   {
-    const QString uid = meshIt->first.c_str();
-    const QString name = meshIt->second.c_str();
-    
-    QAction* meshAction = new QAction(name, &contextMenu);
-    meshAction->setData(QVariant(uid));
-    meshAction->setCheckable(true);
-    connect(meshAction, SIGNAL(triggered()), this, SLOT(meshActionSlot()));
-    contextMenu.addAction(meshAction);
-    meshAction->setChecked(std::count(meshes.begin(), meshes.end(), ssc::dataManager()->getMesh(meshIt->first)));
-    
-    meshIt++;
+    this->addDataAction(iter->first, &contextMenu);
   }
 
   //append specific info from derived classes
@@ -80,55 +165,42 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   contextMenu.exec(pointGlobal);
 }
 
-void ViewWrapper::imageActionSlot()
+void ViewWrapper::addDataAction(std::string uid, QMenu* contextMenu)
 {
-  //ssc::messageManager()->sendInfo("ViewWrapper::imageActionSlot()");
-  QAction* theAction = static_cast<QAction*>(sender());
-  if(!theAction)
-    return;
+  ssc::DataPtr data = ssc::dataManager()->getData(uid);
 
-  QString imageUid = theAction->data().toString();
-  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
-
-  if (theAction->isChecked())
-  {
-    this->addImage(image);
-    ssc::dataManager()->setActiveImage(image);
-  }
-  else
-  {
-    //ssc::messageManager()->sendInfo("ViewGroup::ViewWrapper - remove - [" 
-    //                                + string_cast(imageUid) + "]" 
-    //                                + string_cast(image.get()));
-    this->removeImage(image);
-    ssc::dataManager()->setActiveImage(ssc::ImagePtr());
-  }
-
-  Navigation().centerToGlobalImageCenter(); // reset center for convenience
+  QAction* action = new QAction(qstring_cast(data->getName()), contextMenu);
+  action->setData(QVariant(qstring_cast(uid)));
+  action->setCheckable(true);
+  std::vector<ssc::DataPtr> allVisible = mViewGroup->getData();
+  action->setChecked(std::count(allVisible.begin(), allVisible.end(), data));
+  connect(action, SIGNAL(triggered()), this, SLOT(dataActionSlot()));
+  contextMenu->addAction(action);
 }
-  
-void ViewWrapper::meshActionSlot()
+
+void ViewWrapper::dataActionSlot()
 {
-  ssc::messageManager()->sendInfo("ViewWrapper::meshActionSlot()");
   QAction* theAction = static_cast<QAction*>(sender());
   if(!theAction)
     return;
-  
-  QString meshUid = theAction->data().toString();
-  ssc::MeshPtr mesh= ssc::dataManager()->getMesh(meshUid.toStdString());
+
+  QString uid = theAction->data().toString();
+  ssc::DataPtr data = ssc::dataManager()->getData(uid.toStdString());
+  ssc::ImagePtr image = ssc::dataManager()->getImage(data->getUid());
 
   if (theAction->isChecked())
   {
-    this->addMesh(mesh);
-    //ssc::dataManager()->setActiveMesh(mesh);
+    mViewGroup->addData(data);
+    if (image)
+      ssc::dataManager()->setActiveImage(image);
   }
   else
   {
-    this->removeMesh(mesh);
-    //ssc::dataManager()->setActiveMesh(ssc::MeshPtr);
-    //theAction->setChecked(false);
+    mViewGroup->removeData(data);
+    if (image)
+      ssc::dataManager()->setActiveImage(ssc::ImagePtr());
   }
-  
+
   Navigation().centerToGlobalImageCenter(); // reset center for convenience
 }
   
