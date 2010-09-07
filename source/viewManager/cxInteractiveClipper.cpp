@@ -121,7 +121,10 @@ void InteractiveClipper::changedSlot()
       {
     	  currentPlane = ssc::ptCOUNT;
       }
-      currentPlane = planes.front();
+      else
+      {
+        currentPlane = planes.front();
+      }
 //      std::cout << "init slicer(" << currentPlane << ")" << std::endl;
     }
 
