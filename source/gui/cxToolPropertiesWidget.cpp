@@ -232,9 +232,20 @@ void ToolPropertiesWidget::USProbePropertiesChangedSlot()
   ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
   double depthStart = config.mOffset;
   double depthEnd = config.mDepth + depthStart;
-  int widtInPixels = config.mRightEdge - config.mLeftEdge;
-  double width = config.mPixelWidth * widtInPixels;
-  dynamic_cast<ToolManager*>(ssc::toolManager())->setUSProbeSector(depthStart, depthEnd, width);
+  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
+  if (config.mWidthDeg > 0.1) // Sector probe
+  {
+    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
+    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
+    toolManager->setUSProbeSector(probeSector);
+  }
+  else //Linear probe
+  {
+    int widtInPixels = config.mRightEdge - config.mLeftEdge;
+    double width = config.mPixelWidth * widtInPixels; //width in mm
+    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
+    toolManager->setUSProbeSector(probeSector);
+  }
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)
