@@ -74,7 +74,7 @@ public:
   virtual void setLandmark(ssc::Landmark landmark);
   virtual void removeLandmark(std::string uid);
 
-  void setUSProbeSector(double depthStart, double depthEnd, double width); ///< Set US probe sector on  the dominant tool (if it is a US probe)
+  void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
 
   TrackerPtr getTracker();
 

@@ -23,7 +23,7 @@ public:
     std::string             mUsProbe;    ///<  probe
     std::string             mRtSource;   ///<  realtime source
     std::string             mConfigId;   ///<  config id
-    float                   mWidthDeg;   ///<  width
+    float                   mWidthDeg;   ///<  width in degrees
     int                     mDepth;      ///<  depth
     float                   mOffset;     ///<  Offset
     float                   mOriginCol;  ///<  Origin.Col
