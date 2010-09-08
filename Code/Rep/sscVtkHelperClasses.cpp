@@ -407,6 +407,16 @@ USProbe2D::USProbe2D(vtkRendererPtr renderer) : mRenderer(renderer)
 //	textRep->setPosition(pos);	
 }
 
+USProbe2D::~USProbe2D()
+{
+  if (mRenderer)
+  {
+    mRenderer->RemoveActor(mLeft);
+    mRenderer->RemoveActor(mRight);
+    mRenderer->RemoveActor(mArc);
+  }
+}
+
 vtkLeaderActor2DPtr USProbe2D::createLeaderActor()
 {
 	if (!mRenderer)
