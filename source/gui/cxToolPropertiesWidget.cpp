@@ -130,7 +130,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   //TODO: Add enable/disable US Probe visualization in 2D/3D?
   //TODO: Only show US probe properties if tool is US Probe
 
-  mShowUSSector = new QCheckBox("Show US sector", this);
+  mShowUSSector = new QCheckBox("Show US probe sector", this);
   mToptopLayout->addWidget(mShowUSSector);
   mToptopLayout->addWidget(mProbePropertiesWidget);
   mProbePropertiesWidget->setVisible(false); // Hide this widget initially
@@ -258,13 +258,11 @@ void ToolPropertiesWidget::showUSSectorStateChangedSlot(int state)
   if (state)
   {
     mProbePropertiesWidget->setVisible(true);
-    //mToptopLayout->addWidget(mProbePropertiesWidget);
   }
   else
   {
     mProbePropertiesWidget->setVisible(false);
-    //mToptopLayout->removeWidget(mProbePropertiesWidget);
-    dynamic_cast<ToolManager*>(ssc::toolManager())->setUSProbeSector(ssc::ProbeSector());//Create an empty probe sector. TODO: May want a show/remove instead
+    //TODO: May want a show/remove of probe sector
   }
   mToptopLayout->update();
 }
