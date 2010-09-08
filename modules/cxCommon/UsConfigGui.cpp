@@ -120,8 +120,6 @@ void UsConfigGui::scannerChanged(const QString& scanner)
   this->populateConfigIdBox("");
   
   mSettings->setValue("Scanner", mScannerBox->currentText());
-
-  emit configurationChanged();
 }
 
 void UsConfigGui::probeChanged(const QString& probe)
@@ -132,7 +130,6 @@ void UsConfigGui::probeChanged(const QString& probe)
   mSettings->setValue("Probe", mProbeBox->currentText());
   
   emit probeSelected(probe);
-  emit configurationChanged();
 }
 
 void UsConfigGui::rtSourceChanged(const QString& rtsource)
@@ -141,7 +138,6 @@ void UsConfigGui::rtSourceChanged(const QString& rtsource)
   this->populateConfigIdBox("");
   
   mSettings->setValue("RTSource", mRtSourceBox->currentText());
-  emit configurationChanged();
 }
 
 void UsConfigGui::RTsourceDetected(const QString& source)

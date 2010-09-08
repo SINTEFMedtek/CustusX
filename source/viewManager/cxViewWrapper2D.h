@@ -30,12 +30,6 @@ public:
   ViewWrapper2D(ssc::View* view);
   virtual ~ViewWrapper2D();
   virtual void initializePlane(ssc::PLANE_TYPE plane);
-  virtual void addImage(ssc::ImagePtr image);
-  virtual void addMesh(ssc::MeshPtr mesh) {/*TODO */ std::cout << "This is not implemented" << std::endl;};
-  std::vector<ssc::ImagePtr> getImages() const;
-  virtual ssc::MeshPtr getMesh() const {/*TODO*/ std::cout << "This is not implemented" << std::endl; return ssc::MeshPtr(new ssc::Mesh("dummy"));};
-  virtual void removeImage(ssc::ImagePtr image);
-  virtual void removeMesh(ssc::MeshPtr mesh);
   virtual ssc::View* getView();
   virtual void setZoom2D(SyncedValuePtr value);
   virtual void setOrientationMode(SyncedValuePtr value);
@@ -71,6 +65,11 @@ private:
   ssc::Vector3D displayToWorld(ssc::Vector3D p_d) const;
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
+  virtual void imageAdded(ssc::ImagePtr image);
+  virtual void meshAdded(ssc::MeshPtr mesh) {}
+  virtual void imageRemoved(const QString& uid);
+  virtual void meshRemoved(const QString& uid) {}
+
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
   ssc::ToolRep2DPtr mToolRep2D;
@@ -79,7 +78,6 @@ private:
   ssc::DisplayTextRepPtr mDataNameText;
   ssc::SlicePlanes3DMarkerIn2DRepPtr mSlicePlanes3DMarker;
   QPointer<ssc::View> mView;
-  std::vector<ssc::ImagePtr> mImage;
 
   // sunchronized data
   SyncedValuePtr mZoom2D;

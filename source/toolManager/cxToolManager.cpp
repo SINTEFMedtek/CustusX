@@ -8,7 +8,7 @@
 #include <vtkDoubleArray.h>
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxToolConfigurationParser.h"
@@ -785,6 +785,18 @@ ssc::RegistrationHistoryPtr ToolManager::get_rMpr_History()
 ssc::ManualToolPtr ToolManager::getManualTool()
 {
   return mManualTool;
+}
+
+void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
+{
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
+  if (tool)
+  {
+    ssc::messageManager()->sendDebug("Found cxTool - set US Probe sector");
+    tool->setUSProbeSector(probeSector);
+  }
+  //else
+    //ssc::messageManager()->sendDebug("Dominant tool is not cxTool");
 }
 
 }//namespace cx

@@ -9,7 +9,7 @@
 #include <QMouseEvent>
 #include <QColorDialog>
 #include <QMenu>
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscImageTF3D.h"
 #include <QTimer>
 
