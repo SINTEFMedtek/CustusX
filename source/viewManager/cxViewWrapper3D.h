@@ -15,9 +15,32 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
+#include "sscAxesRep.h"
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
+
+class ToolAxisConnector : public QObject
+{
+	Q_OBJECT
+public:
+	explicit ToolAxisConnector(ssc::ToolPtr tool);
+	ssc::AxesRepPtr getAxis_t();
+	ssc::AxesRepPtr getAxis_s();
+
+private slots:
+	void transformChangedSlot();
+private:
+	ssc::ToolPtr mTool;
+
+	ssc::AxesRepPtr mAxis_t; ///< axis of the tool space
+	ssc::AxesRepPtr mAxis_s; /// axis of the tool sensor space
+	//New(const std::string& uid);
+};
+
+
 
 
 /** Wrapper for a View3D.
@@ -40,6 +63,7 @@ private slots:
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
   void fillSlicePlanesActionSlot(bool checked);
+  void showAxesActionSlot(bool checked);
   void resetCameraActionSlot();
 
 private:
@@ -60,6 +84,11 @@ private:
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
+  std::map<std::string, ToolAxisConnectorPtr> mToolAxis;
+  ssc::AxesRepPtr mRefSpaceAxisRep;
+
+  bool mShowAxes; ///< show 3D axes reps for all tools and ref space
+
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
   QPointer<ssc::View> mView;
 };
