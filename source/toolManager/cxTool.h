@@ -106,6 +106,7 @@ public:
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
   virtual void set_prMt(const ssc::Transform3D& transform);
+  virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not

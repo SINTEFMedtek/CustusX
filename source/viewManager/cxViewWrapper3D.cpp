@@ -33,8 +33,55 @@ namespace cx
 {
 
 
+ssc::AxesRepPtr ToolAxisConnector::getAxis_t()
+{
+	return mAxis_t;
+}
+
+ssc::AxesRepPtr ToolAxisConnector::getAxis_s()
+{
+	return mAxis_s;
+}
+
+ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
+{
+	mTool = tool;
+	mAxis_s = ssc::AxesRep::New(tool->getUid()+"_axis_s");
+	mAxis_t = ssc::AxesRep::New(tool->getUid()+"_axis_t");
+
+	mAxis_t->setAxisLength(40);
+	mAxis_t->setShowAxesLabels(false);
+	mAxis_t->setCaption(tool->getName()+"_t", ssc::Vector3D(1,1,0.7));
+	mAxis_t->setFontSize(0.08);
+
+	mAxis_s->setAxisLength(30);
+	mAxis_s->setShowAxesLabels(false);
+	mAxis_s->setCaption(tool->getName()+"_s", ssc::Vector3D(1,1,0));
+	mAxis_s->setFontSize(0.08);
+
+	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(transformChangedSlot()));
+}
+
+void ToolAxisConnector::transformChangedSlot()
+{
+	ssc::Transform3D rMt = *ssc::toolManager()->get_rMpr() * mTool->get_prMt();
+	ssc::Transform3D sMt = mTool->getCalibration_sMt();
+	mAxis_t->setTransform(rMt);
+	mAxis_s->setTransform(rMt*sMt.inv());
+}
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
+  mShowAxes = false;
   mView = view;
   this->connectContextMenu(mView);
   std::string index = QString::number(startIndex).toStdString();
@@ -82,11 +129,60 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   //resetCameraAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
   connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
 
+  QAction* showAxesAction = new QAction("Show Coordinate Axes", &contextMenu);
+  showAxesAction->setCheckable(true);
+  showAxesAction->setChecked(mShowAxes);
+  connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
+
   contextMenu.addSeparator();
   contextMenu.addAction(resetCameraAction);
+  contextMenu.addAction(showAxesAction);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
+}
+
+void ViewWrapper3D::showAxesActionSlot(bool checked)
+{
+	if (mShowAxes==checked)
+		return;
+
+	mShowAxes = checked;
+
+	if (mShowAxes)
+	{
+		if (!mRefSpaceAxisRep)
+		{
+			  mRefSpaceAxisRep = ssc::AxesRep::New("refspace_axis");
+			  mRefSpaceAxisRep->setCaption("ref", ssc::Vector3D(1,0,0));
+			  mRefSpaceAxisRep->setFontSize(0.03);
+
+			  mView->addRep(mRefSpaceAxisRep);
+		}
+
+		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+		ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
+		for (iter=tools->begin(); iter!=tools->end(); ++iter)
+		{
+			mToolAxis[iter->first].reset(new ToolAxisConnector(iter->second));
+			mToolAxis[iter->first].reset(new ToolAxisConnector(iter->second));
+			mView->addRep(mToolAxis[iter->first]->getAxis_t());
+			mView->addRep(mToolAxis[iter->first]->getAxis_s());
+		}
+	}
+	else
+	{
+		mView->removeRep(mRefSpaceAxisRep);
+		mRefSpaceAxisRep.reset();
+
+		std::map<std::string, ToolAxisConnectorPtr>::iterator iter;
+		for (iter=mToolAxis.begin(); iter!=mToolAxis.end(); ++iter)
+		{
+			mView->removeRep(iter->second->getAxis_t());
+			mView->removeRep(iter->second->getAxis_s());
+		}
+		mToolAxis.clear();
+	}
 }
 
 void ViewWrapper3D::resetCameraActionSlot()
@@ -214,6 +310,10 @@ void ViewWrapper3D::toolsAvailableSlot()
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
     ssc::messageManager()->sendDebug("ToolRep3D for tool "+iter->second->getName()+" added to view "+mView->getName()+".");
+
+//    mToolAxis[uid].reset(new ToolAxisConnector(iter->second));
+//    mView->addRep(mToolAxis[uid]->getAxis_t());
+//    mView->addRep(mToolAxis[uid]->getAxis_s());
   }
 
 //

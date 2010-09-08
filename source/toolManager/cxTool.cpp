@@ -543,6 +543,13 @@ void Tool::determineToolsCalibration()
   inputStream.close();
 }
 
+ssc::Transform3D Tool::getCalibration_sMt() const
+{
+	ssc::Transform3D sMt;
+	mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+	return sMt;
+}
+
 void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
