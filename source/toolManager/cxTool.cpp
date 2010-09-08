@@ -581,9 +581,9 @@ ssc::ProbeSector Tool::getProbeSector() const
 { 
   return mProbeSector;
 }
-void Tool::setUSProbeSector(double depthStart, double depthEnd, double width)
+void Tool::setUSProbeSector(ssc::ProbeSector probeSector)
 {
-  mProbeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
+  mProbeSector = probeSector;
 }
   
 }//namespace cx
