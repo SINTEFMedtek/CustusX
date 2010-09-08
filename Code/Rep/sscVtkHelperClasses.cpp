@@ -481,8 +481,10 @@ void USProbe2D::setPosition()
 	if (mType==1) // sector
 	{
 		Vector3D c = - m_d_start * e_y;  // arc center point
-		Vector3D pr = c + m_d_end * unitVector(M_PI_2 - mWidth/2.0); // left endpoint
-		Vector3D pl = c + m_d_end * unitVector(M_PI_2 + mWidth/2.0); // right endpoint
+    Vector3D sr = c + m_d_start * unitVector(M_PI_2 - mWidth/2.0); // right startpoint
+    Vector3D sl = c + m_d_start * unitVector(M_PI_2 + mWidth/2.0); // left startpoint
+    Vector3D pr = c + m_d_end * unitVector(M_PI_2 - mWidth/2.0); // right endpoint
+    Vector3D pl = c + m_d_end * unitVector(M_PI_2 + mWidth/2.0); // left endpoint
 		double r = - m_d_end / (pl-pr).length();		// normalize on distance between endpoints (vtk spec)
 		
 		c = M.coord(c);
@@ -490,10 +492,12 @@ void USProbe2D::setPosition()
 		pl = M.coord(pl);
 		// change sign on r??
 
-		mLeft->GetPositionCoordinate()->SetValue(c.begin());
+		//mLeft->GetPositionCoordinate()->SetValue(c.begin());
+    mLeft->GetPositionCoordinate()->SetValue(sl.begin());
 		mLeft->GetPosition2Coordinate()->SetValue(pl.begin());
 
-		mRight->GetPositionCoordinate()->SetValue(c.begin());
+		//mRight->GetPositionCoordinate()->SetValue(c.begin());
+    mRight->GetPositionCoordinate()->SetValue(sr.begin());
 		mRight->GetPosition2Coordinate()->SetValue(pr.begin());
 
 		// turn off arc for very tilted views. This because the projection is bad.
