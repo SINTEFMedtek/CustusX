@@ -306,5 +306,10 @@ void DummyTool::setTooltipOffset(double val)
 	emit tooltipOffset(mOffset); 
 }
 
+ssc::Transform3D DummyTool::getCalibration_sMt() const
+{
+	return createTransformTranslate(Vector3D(5,5,20));
+}
+
 
 }//namespace ssc

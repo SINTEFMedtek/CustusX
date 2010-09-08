@@ -143,4 +143,10 @@ void ManualTool::setTooltipOffset(double val)
 	emit tooltipOffset(mOffset);
 }
 
+ssc::Transform3D ManualTool::getCalibration_sMt() const
+{
+	return createTransformTranslate(Vector3D(5,5,20));
+}
+
+
 }//end namespace

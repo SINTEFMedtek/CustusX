@@ -39,6 +39,7 @@ public:
 	virtual double getTooltipOffset() const;
 	virtual void setTooltipOffset(double val);
 
+	virtual Transform3D getCalibration_sMt() const;
 	// extensions:
 	void setVisible(bool vis);
 	void setType(const Type& type);

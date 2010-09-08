@@ -20,11 +20,29 @@ AxesRep::AxesRep(const std::string& uid) :
 	mAssembly->AddPart(mActor);
 	setAxisLength(50);
 
-	addCaption("x", Vector3D(1,0,0));
-	addCaption("y", Vector3D(0,1,0));
-	addCaption("z", Vector3D(0,0,1));
+	this->setShowAxesLabels(true);
 	setTransform(Transform3D());
 	setFontSize(0.04);
+}
+
+void AxesRep::setShowAxesLabels(bool on)
+{
+	if (on)
+	{
+		this->addCaption("x", Vector3D(1,0,0), Vector3D(1,0,0));
+		this->addCaption("y", Vector3D(0,1,0), Vector3D(0,1,0));
+		this->addCaption("z", Vector3D(0,0,1), Vector3D(0,0,1));
+	}
+	else
+	{
+		mCaption.clear();
+		mCaptionPos.clear();
+	}
+}
+
+void AxesRep::setCaption(const std::string& caption, const Vector3D& color)
+{
+	this->addCaption(caption, Vector3D(0,0,0), color);
 }
 
 /**set font size to a fraction of the normalized viewport.
@@ -65,11 +83,11 @@ void AxesRep::setTransform(Transform3D rMt)
 	}
 }
 
-void AxesRep::addCaption(const std::string& label, Vector3D pos)
+void AxesRep::addCaption(const std::string& label, Vector3D pos, Vector3D color)
 {
 	vtkCaptionActor2DPtr cap = vtkCaptionActor2DPtr::New();
 	cap->SetCaption(label.c_str());
-	cap->GetCaptionTextProperty()->SetColor(pos.begin());
+	cap->GetCaptionTextProperty()->SetColor(color.begin());
 	cap->LeaderOff();
 	cap->BorderOff();
 	cap->GetCaptionTextProperty()->ShadowOff();

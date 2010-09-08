@@ -29,11 +29,14 @@ public:
 	void setFontSize(double size);
 	void setAxisLength(double length);
 
+	void setShowAxesLabels(bool on);
+	void setCaption(const std::string& caption, const Vector3D& color);
+
 protected:
 	AxesRep(const std::string& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
-	void addCaption(const std::string& label, Vector3D pos);
+	void addCaption(const std::string& label, Vector3D pos, Vector3D color);
 	vtkAxesActorPtr mActor;
 	vtkAssemblyPtr mAssembly;
 	std::vector<vtkCaptionActor2DPtr> mCaption;
