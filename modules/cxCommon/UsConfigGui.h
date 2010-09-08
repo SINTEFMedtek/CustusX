@@ -30,6 +30,7 @@ public:
   
 signals:
   void probeSelected(const QString& probe); ///< emitted when a user selects a probe
+  void configurationChanged(); ///< emmited whenever the configuration changed
   
 public slots:
   void RTsourceDetected(const QString& source);
