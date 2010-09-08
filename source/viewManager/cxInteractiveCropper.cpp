@@ -16,7 +16,7 @@
 #include <vtkRenderer.h>
 #include "sscTypeConversions.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
 #include "sscBoundingBox3D.h"

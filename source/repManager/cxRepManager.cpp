@@ -2,7 +2,7 @@
 
 #include "sscMessageManager.h"
 #include "cxToolManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 //#include "sscSlicePlaneClipper.h"
 
 namespace cx
@@ -153,7 +153,7 @@ void RepManager::probeRepPointPickedSlot(double x,double y,double z)
   ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
   ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
   // TODO set center here will not do: must handle
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
   ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
 }
 

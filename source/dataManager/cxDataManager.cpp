@@ -42,7 +42,9 @@ void DataManager::setDebugMode(bool on)
 
 void DataManager::deleteImageSlot(ssc::ImagePtr image)
 {
-  mImages.erase(image->getUid());
+  if (!this->getImage(image->getUid()))
+    return;
+  mData.erase(image->getUid());
   emit currentImageDeleted(image);
 }
 //DataManager* dataManager()

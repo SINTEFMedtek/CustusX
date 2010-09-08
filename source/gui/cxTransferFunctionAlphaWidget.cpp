@@ -9,7 +9,7 @@
 #include <QColor>
 #include <QBrush>
 #include <QMouseEvent>
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscImageTF3D.h"
 
 namespace cx

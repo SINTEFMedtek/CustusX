@@ -15,20 +15,32 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "cxInteractiveCropper.h"
-
-//typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
-//typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
-//typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
-//typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-
-
-typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
-typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
-typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
+#include "sscAxesRep.h"
 
 namespace cx
 {
+
+typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
+
+class ToolAxisConnector : public QObject
+{
+	Q_OBJECT
+public:
+	explicit ToolAxisConnector(ssc::ToolPtr tool);
+	ssc::AxesRepPtr getAxis_t();
+	ssc::AxesRepPtr getAxis_s();
+
+private slots:
+	void transformChangedSlot();
+private:
+	ssc::ToolPtr mTool;
+
+	ssc::AxesRepPtr mAxis_t; ///< axis of the tool space
+	ssc::AxesRepPtr mAxis_s; /// axis of the tool sensor space
+	//New(const std::string& uid);
+};
+
+
 
 
 /** Wrapper for a View3D.
@@ -41,12 +53,6 @@ class ViewWrapper3D : public ViewWrapper
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
   virtual ~ViewWrapper3D();
-  virtual void addImage(ssc::ImagePtr image);
-  virtual void addMesh(ssc::MeshPtr mesh);
-  virtual void removeMesh(ssc::MeshPtr mesh);
-  virtual std::vector<ssc::ImagePtr> getImages() const;
-  virtual ssc::MeshPtr getMesh() const;
-  virtual void removeImage(ssc::ImagePtr image);
   virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
   virtual double getZoom2D(){return -1.0;};
@@ -57,30 +63,33 @@ private slots:
   void toolsAvailableSlot(); ///< add all tools when configured
   void showSlicePlanesActionSlot(bool checked);
   void fillSlicePlanesActionSlot(bool checked);
+  void showAxesActionSlot(bool checked);
   void resetCameraActionSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
 
-  vtkBoxRepresentationPtr mBoxRep;
-  vtkBoxWidget2Ptr mBoxWidget2;
-  vtkBoxWidgetPtr mBoxWidget;
+  virtual void imageAdded(ssc::ImagePtr image);
+  virtual void meshAdded(ssc::MeshPtr mesh);
+  virtual void imageRemoved(const QString& uid);
+  virtual void meshRemoved(const QString& uid);
 
   typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
+  typedef  std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
   VolumetricRepMap mVolumetricReps;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
-  ssc::GeometricRepPtr mGeometricRep;
-  //std::map<std::string, ssc::GeometricRepPtr> mGeometricReps;//TODO: Replace mGeometricRep with this
+  GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
-  ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
+  std::map<std::string, ToolAxisConnectorPtr> mToolAxis;
+  ssc::AxesRepPtr mRefSpaceAxisRep;
 
-  std::vector<ssc::ImagePtr> mImage;
-  //std::vector<ssc::MeshPtr> mMeshes;
-  ssc::MeshPtr mMesh;
+  bool mShowAxes; ///< show 3D axes reps for all tools and ref space
+
+  ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
   QPointer<ssc::View> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;

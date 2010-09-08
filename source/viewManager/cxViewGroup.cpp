@@ -13,7 +13,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "cxToolManager.h"
 #include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
@@ -31,7 +31,7 @@ void Navigation::centerToImage(ssc::ImagePtr image)
   ssc::Vector3D p_r = findImageCenter(image);
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
   //std::cout << "Centered to view." << std::endl;
@@ -40,12 +40,12 @@ void Navigation::centerToImage(ssc::ImagePtr image)
 /**Place the global center to the mean center of
  * all the images in a view(wrapper).
  */
-void Navigation::centerToView(ViewWrapper* viewWrapper)
+void Navigation::centerToView(const std::vector<ssc::ImagePtr>& images)
 {
-  ssc::Vector3D p_r = findViewCenter(viewWrapper);
+  ssc::Vector3D p_r = findViewCenter(images);
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
   //std::cout << "Centered to view." << std::endl;
@@ -59,7 +59,7 @@ void Navigation::centerToGlobalImageCenter()
   ssc::Vector3D p_r = findGlobalImageCenter();
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
 }
@@ -74,7 +74,7 @@ void Navigation::centerToTooltip()
   ssc::Vector3D p_r = ssc::toolManager()->get_rMpr()->coord(p_pr);
 
   // set center to calculated position
-  DataManager::getInstance()->setCenter(p_r);
+  ssc::dataManager()->setCenter(p_r);
 }
 /**Find the center of the images, defined as the center
  * of the smallest bounding box enclosing the images.
@@ -115,11 +115,11 @@ ssc::Vector3D Navigation::findImageCenter(ssc::ImagePtr image)
 /**Find the center of all images in the view(wrapper), defined as the mean of
  * all the images center.
  */
-ssc::Vector3D Navigation::findViewCenter(ViewWrapper* viewWrapper)
+ssc::Vector3D Navigation::findViewCenter(const std::vector<ssc::ImagePtr>& images)
 {
   ssc::Vector3D center_r;
-  std::vector<ssc::ImagePtr> images = viewWrapper->getImages();
-  std::vector<ssc::ImagePtr>::iterator iter;
+  //std::vector<ssc::ImagePtr> images = viewWrapper->getImages();
+  std::vector<ssc::ImagePtr>::const_iterator iter;
 
   for (iter=images.begin(); iter!=images.end(); ++iter)
   {
@@ -136,7 +136,7 @@ ssc::Vector3D Navigation::findViewCenter(ViewWrapper* viewWrapper)
 ssc::Vector3D Navigation::findGlobalImageCenter()
 {
   ssc::Vector3D p_r(0,0,0);
-  if (DataManager::getInstance()->getImages().empty())
+  if (ssc::dataManager()->getImages().empty())
     return p_r;
 
   ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
@@ -173,6 +173,10 @@ ViewGroup::ViewGroup()
   mZoom2D.mLocal = SyncedValue::create(1.0);
   mZoom2D.activateGlobal(false);
 
+  mViewGroupData.reset(new ViewGroupData());
+  //connect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(addImage(QString)));
+  //connect(mViewGroupData.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+
   this->setSlicePlanesProxy();
 }
 
@@ -195,21 +199,23 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
 
   // add state
   wrapper->setZoom2D(mZoom2D.mActive);
-  for (unsigned i=0; i<mImages.size(); ++i)
-    wrapper->addImage(mImages[i]);
+//  for (unsigned i=0; i<mImages.size(); ++i)
+//    wrapper->addImage(mImages[i]);
+//  for (unsigned i=0; i<mMeshes.size(); ++i)
+//    wrapper->addMesh(mMeshes[i]);
 
+  wrapper->setViewGroup(mViewGroupData);
   wrapper->setSlicePlanesProxy(mSlicePlanesProxy);
 
   // connect signals
-  connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
-          this, SLOT(activateManualToolSlot()));
-  connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
-          this, SLOT(mouseClickInViewGroupSlot()));
-  connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
-          this, SLOT(mouseClickInViewGroupSlot()));
+  connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(activateManualToolSlot()));
+  connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
+  connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
 
-  connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
-  connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+//  connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
+//  connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+//  connect(wrapper.get(), SIGNAL(meshAdded(QString)), this, SLOT(addMesh(QString)));
+//  connect(wrapper.get(), SIGNAL(meshRemoved(QString)), this, SLOT(removeMesh(QString)));
 
   wrapper->setRegistrationMode(mRegistrationMode);
 }
@@ -220,15 +226,14 @@ void ViewGroup::removeViews()
   {
     ViewWrapperPtr wrapper = mViewWrappers[i];
 
-    disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
-            this, SLOT(activateManualToolSlot()));
-    disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),
-            this, SLOT(mouseClickInViewGroupSlot()));
-    disconnect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),
-            this, SLOT(mouseClickInViewGroupSlot()));
+    disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(activateManualToolSlot()));
+    disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
+    disconnect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
 
-    disconnect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
-    disconnect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+//    disconnect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
+//    disconnect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
+//    disconnect(wrapper.get(), SIGNAL(meshAdded(QString)), this, SLOT(addMesh(QString)));
+//    disconnect(wrapper.get(), SIGNAL(meshRemoved(QString)), this, SLOT(removeMesh(QString)));
   }
 
   mViews.clear();
@@ -275,47 +280,56 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
   }
 }
 
-void ViewGroup::addImage(QString imageUid)
-{
-  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
-  if(!image)
-  {
-    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
-    return;
-  }
-  this->addImage(image);
-}
-
-void ViewGroup::removeImage(QString imageUid)
-{
-  //std::cout << "ViewGroup::removeImage [" << imageUid<< "]"<< std::endl;
-
-  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
-  if(!image)
-  {
-    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
-    return;
-  }
-  this->removeImage(image);
-}
+//void ViewGroup::addImage(QString imageUid)
+//{
+//  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
+//  if(!image)
+//  {
+//    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
+//    return;
+//  }
+//  this->addImage(image);
+//}
+//
+//void ViewGroup::removeImage(QString imageUid)
+//{
+//  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
+//  if(!image)
+//  {
+//    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
+//    return;
+//  }
+//  this->removeImage(image);
+//}
+//
+//
+//void ViewGroup::addMesh(QString uid)
+//{
+//  this->addMesh(ssc::dataManager()->getMesh(string_cast(uid)));
+//}
+//
+//void ViewGroup::removeMesh(QString uid)
+//{
+//  this->removeMesh(ssc::dataManager()->getMesh(string_cast(uid)));
+//}
 
 void ViewGroup::mouseClickInViewGroupSlot()
 {
+  std::vector<ssc::ImagePtr> images = mViewGroupData->getImages();
   //ssc::messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
-  if (mImages.empty())
+  if (images.empty())
     ssc::dataManager()->setActiveImage(ssc::ImagePtr());
   else
   {
-    if (!std::count(mImages.begin(), mImages.end(), ssc::dataManager()->getActiveImage()))
+    if (!std::count(images.begin(), images.end(), ssc::dataManager()->getActiveImage()))
     {
-      ssc::dataManager()->setActiveImage(mImages.front());
+      ssc::dataManager()->setActiveImage(images.front());
     }
   }
 
   ssc::View* view = static_cast<ssc::View*>(this->sender());
   if(view)
     viewManager()->setActiveView(view->getUid());
-
 }
 
 std::vector<ssc::View*> ViewGroup::getViews() const
@@ -337,25 +351,48 @@ std::vector<ssc::View*> ViewGroup::getViews() const
 //  return mViews[index];
 //}
 
-void ViewGroup::addImage(ssc::ImagePtr image)
-{
-  if (std::count(mImages.begin(), mImages.end(), image))
-    return;
+//void ViewGroup::addImage(ssc::ImagePtr image)
+//{
+//  if (std::count(mImages.begin(), mImages.end(), image))
+//    return;
+//
+//  mImages.push_back(image);
+//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+//    mViewWrappers[i]->addImage(image);
+//}
+//
+//void ViewGroup::removeImage(ssc::ImagePtr image)
+//{
+//  if (!std::count(mImages.begin(), mImages.end(), image))
+//    return;
+//
+//  mImages.erase(std::find(mImages.begin(), mImages.end(), image));
+//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+//    mViewWrappers[i]->removeImage(image);
+//}
+//
+//void ViewGroup::addMesh(ssc::MeshPtr data)
+//{
+//  if (!data)
+//    return;
+//  if (std::count(mMeshes.begin(), mMeshes.end(), data))
+//    return;
+//
+//  mMeshes.push_back(data);
+//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+//    mViewWrappers[i]->addMesh(data);
+//}
+//
+//void ViewGroup::removeMesh(ssc::MeshPtr data)
+//{
+//  if (!std::count(mMeshes.begin(), mMeshes.end(), data))
+//    return;
+//
+//  mMeshes.erase(std::find(mMeshes.begin(), mMeshes.end(), data));
+//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+//    mViewWrappers[i]->removeMesh(data);
+//}
 
-  mImages.push_back(image);
-  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-    mViewWrappers[i]->addImage(image);
-}
-
-void ViewGroup::removeImage(ssc::ImagePtr image)
-{
-  if (!std::count(mImages.begin(), mImages.end(), image))
-    return;
-
-  mImages.erase(std::find(mImages.begin(), mImages.end(), image));
-  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-    mViewWrappers[i]->removeImage(image);
-}
 
 void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
@@ -373,12 +410,27 @@ void ViewGroup::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
 
-  for (unsigned i=0; i<mImages.size(); ++i)
+  std::vector<ssc::DataPtr> data = mViewGroupData->getData();
+
+  for (unsigned i=0; i<data.size(); ++i)
   {
-    QDomElement imageNode = doc.createElement("image");
-    imageNode.appendChild(doc.createTextNode(qstring_cast(mImages[i]->getUid())));
+    QDomElement imageNode = doc.createElement("data");
+    imageNode.appendChild(doc.createTextNode(qstring_cast(data[i]->getUid())));
     dataNode.appendChild(imageNode);
   }
+//  for (unsigned i=0; i<mImages.size(); ++i)
+//  {
+//    QDomElement imageNode = doc.createElement("image");
+//    imageNode.appendChild(doc.createTextNode(qstring_cast(mImages[i]->getUid())));
+//    dataNode.appendChild(imageNode);
+//  }
+//  for (unsigned i=0; i<mMeshes.size(); ++i)
+//  {
+//    std::cout << "saving mesh" << std::endl;
+//    QDomElement node = doc.createElement("mesh");
+//    node.appendChild(doc.createTextNode(qstring_cast(mMeshes[i]->getUid())));
+//    dataNode.appendChild(node);
+//  }
 
   QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
   zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
@@ -393,28 +445,53 @@ void ViewGroup::addXml(QDomNode& dataNode)
 
 void ViewGroup::clearPatientData()
 {
-  while (!mImages.empty())
-  {
-    this->removeImage(mImages.front());
-  }
+  mViewGroupData->clearData();
+//  while (!mImages.empty())
+//  {
+//    this->removeImage(mImages.front());
+//  }
   this->setZoom2D(1.0);
 }
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {
-  for (QDomElement elem = dataNode.firstChildElement("image"); !elem.isNull(); elem = elem.nextSiblingElement("image"))
+  for (QDomElement elem = dataNode.firstChildElement("data"); !elem.isNull(); elem = elem.nextSiblingElement("data"))
   {
-    QString imageUid = elem.text();
-
-     if (!imageUid.isEmpty())
-     {
-       ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(imageUid));
-       if (image)
-         this->addImage(image);
-       else
-         ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
-     }
+    QString uid = elem.text();
+//    if (uid.isEmpty())
+//      continue;
+    ssc::DataPtr data = ssc::dataManager()->getData(string_cast(uid));
+    mViewGroupData->addData(data);
+    if (!data)
+      ssc::messageManager()->sendError("Couldn't find the data: ["+string_cast(uid)+"] in the datamanager.");
   }
+
+//  for (QDomElement elem = dataNode.firstChildElement("image"); !elem.isNull(); elem = elem.nextSiblingElement("image"))
+//  {
+//    QString imageUid = elem.text();
+//
+//     if (!imageUid.isEmpty())
+//     {
+//       ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(imageUid));
+//       if (image)
+//         this->addImage(image);
+//       else
+//         ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
+//     }
+//  }
+//  for (QDomElement elem = dataNode.firstChildElement("mesh"); !elem.isNull(); elem = elem.nextSiblingElement("mesh"))
+//  {
+//    QString uid = elem.text();
+//
+//     if (!uid.isEmpty())
+//     {
+//       ssc::MeshPtr data = ssc::dataManager()->getMesh(string_cast(uid));
+//       if (data)
+//         this->addMesh(data);
+//       else
+//         ssc::messageManager()->sendError("Couldn't find the mesh: "+string_cast(uid)+" in the datamanager.");
+//     }
+//  }
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;
@@ -430,5 +507,11 @@ void ViewGroup::parseXml(QDomNode dataNode)
   dataNode.appendChild(slicePlanes3DNode);
 
 }
+
+std::vector<ssc::ImagePtr> ViewGroup::getImages()
+{
+  return mViewGroupData->getImages();
+}
+
 
 }//cx

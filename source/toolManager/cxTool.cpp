@@ -543,6 +543,13 @@ void Tool::determineToolsCalibration()
   inputStream.close();
 }
 
+ssc::Transform3D Tool::getCalibration_sMt() const
+{
+	ssc::Transform3D sMt;
+	mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+	return sMt;
+}
+
 void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
@@ -581,9 +588,9 @@ ssc::ProbeSector Tool::getProbeSector() const
 { 
   return mProbeSector;
 }
-void Tool::setUSProbeSector(double depthStart, double depthEnd, double width)
+void Tool::setUSProbeSector(ssc::ProbeSector probeSector)
 {
-  mProbeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
+  mProbeSector = probeSector;
 }
   
 }//namespace cx

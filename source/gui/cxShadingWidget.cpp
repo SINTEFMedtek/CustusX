@@ -9,7 +9,7 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QStringList>
-#include "cxDataManager.h"
+#include "sscDataManager.h"
 #include "sscImageTF3D.h"
 
 //#include "sscAbstractInterface.h"
