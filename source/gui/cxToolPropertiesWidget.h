@@ -70,6 +70,7 @@ protected slots:
   void dominantToolChangedSlot();
   void referenceToolChangedSlot();
   void USProbePropertiesChangedSlot();
+  void showUSSectorStateChangedSlot(int state);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -81,12 +82,15 @@ private:
   ssc::ToolPtr mReferenceTool;
   ssc::ToolPtr mActiveTool;
 
+  QVBoxLayout* mToptopLayout;
+
   ssc::SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
   
+  QCheckBox* mShowUSSector; ///< Show the US probe sector
   UsConfigGui* mProbePropertiesWidget; ///< Select probe select set probe width and depth
 };
 
