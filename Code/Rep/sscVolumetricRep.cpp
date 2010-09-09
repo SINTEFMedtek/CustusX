@@ -25,7 +25,8 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
 	mTextureMapper3D(vtkVolumeTextureMapper3DPtr::New()),
-	mVolume(vtkVolumePtr::New())
+	mVolume(vtkVolumePtr::New()),
+	mMaxVoxels(0)
 {
 	mResampleFactor = 1.0;
 	//double maxVal = 255;//500.0;
@@ -141,6 +142,22 @@ bool VolumetricRep::hasImage(ImagePtr image) const
 {
 	return (mImage == image);
 }
+
+void VolumetricRep::updateResampleFactor()
+{
+	if (mMaxVoxels==0)
+		return;
+
+	long voxels = mImage->getBaseVtkImageData()->GetNumberOfPoints();
+	double factor = (double)mMaxVoxels/(double)voxels;
+	//factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling is linear?
+	if (factor<0.99)
+	{
+		std::cout << "Downsampling volume in VolumetricRep: " << mImage->getName() << " below " << mMaxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
+		mResampleFactor = std::min(factor, mResampleFactor);
+	}
+}
+
 /**called when the image is changed internally.
  * re-read the lut and vtkimagedata.
  */
@@ -150,6 +167,9 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	{
 		return;
 	}
+
+	this->updateResampleFactor();
+
 	//mVolumeProperty->SetColor(mImage->getTransferFunctions3D()->getColorTF());
 	//mVolumeProperty->SetScalarOpacity(mImage->getTransferFunctions3D()->getOpacityTF());
 
@@ -202,6 +222,12 @@ void VolumetricRep::transferFunctionsChangedSlot()
   mVolumeProperty->SetSpecularPower(mImage->getShadingSpecularPower());
   
 }
+
+void VolumetricRep::setMaxVolumeSize(long maxVoxels)
+{
+	mMaxVoxels = maxVoxels;
+}
+
 
 //---------------------------------------------------------
 } // namespace ssc

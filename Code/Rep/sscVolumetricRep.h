@@ -37,7 +37,8 @@ public:
 	virtual bool hasImage(ImagePtr image) const; ///< check if the reps has the image
 	vtkVolumePtr getVtkVolume() { return mVolume; } ///< get the images vtkVolume
 	virtual void setResampleFactor(double factor); ///< set how detailed the image should be
-	
+	void setMaxVolumeSize(long maxVoxels); ///< set max volume size for rendering. Must be set before setImage()
+
 protected:
 	VolumetricRep(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
@@ -48,6 +49,7 @@ protected:
 	vtkVolumePropertyPtr mVolumeProperty;
 	vtkVolumeTextureMapper3DPtr mTextureMapper3D;
 	vtkVolumePtr mVolume;
+	long mMaxVoxels; ///< always resample volume below this size.
 
 	ImagePtr mImage;
 	double mResampleFactor;
@@ -57,6 +59,8 @@ private slots:
 	void transformChangedSlot();
 	void vtkImageDataChangedSlot();
   void transferFunctionsChangedSlot();
+private:
+	void updateResampleFactor();
 };
 //---------------------------------------------------------
 } // namespace ssc
