@@ -23,8 +23,6 @@ void RepManager::destroyInstance()
   mTheInstance = NULL;
 }
 RepManager::RepManager() :
-  //MAX_INRIAREP3DS(2),
-  //MAX_INRIAREP2DS(9),
   MAX_VOLUMETRICREPS(2),
   MAX_PROGRESSIVEVOLUMETRICREPS(2),
   MAX_PROBEREPS(2),
@@ -32,19 +30,6 @@ RepManager::RepManager() :
   MAX_TOOLREP3DS(5),
   MAX_GEOMETRICREPS(6)
 {
-  /*mInriaRep3DNames[0] = "InriaRep3D_1";
-  mInriaRep3DNames[1] = "InriaRep3D_2";
-
-  mInriaRep2DNames[0] = "InriaRep2D_1";
-  mInriaRep2DNames[1] = "InriaRep2D_2";
-  mInriaRep2DNames[2] = "InriaRep2D_3";
-  mInriaRep2DNames[3] = "InriaRep2D_4";
-  mInriaRep2DNames[4] = "InriaRep2D_5";
-  mInriaRep2DNames[5] = "InriaRep2D_6";
-  mInriaRep2DNames[6] = "InriaRep2D_7";
-  mInriaRep2DNames[7] = "InriaRep2D_8";
-  mInriaRep2DNames[8] = "InriaRep2D_9";*/
-
   mVolumetricRepNames[0] = "VolumetricRep_1";
   mVolumetricRepNames[1] = "VolumetricRep_2";
 
@@ -70,19 +55,6 @@ RepManager::RepManager() :
   mGeometricRepNames[4] = "GeometricRep_5";
   mGeometricRepNames[5] = "GeometricRep_6";
 
-  /*for(int i=0; i<MAX_INRIAREP3DS; i++)
-  {
-    addRep<InriaRep3D>(new InriaRep3D(mInriaRep3DNames[i],mInriaRep3DNames[i]), &mInriaRep3DMap);
-  }
-  for(int i=0; i<MAX_INRIAREP2DS; i++)
-  {
-    InriaRep2DPtr inriaRep2D = addRep<InriaRep2D>(new InriaRep2D(mInriaRep2DNames[i], mInriaRep2DNames[i]), &mInriaRep2DMap);
-    //Remove text from Inria reps
-    inriaRep2D->getVtkViewImage2D()->SetShowAnnotations(false);
-    inriaRep2D->getVtkViewImage2D()->UpdateAnnotations();
-    connect(inriaRep2D.get(), SIGNAL(pointPicked(double,double,double)),
-            this, SLOT(syncInria2DRepsSlot(double,double,double)));
-  }*/
   for(int i=0; i<MAX_VOLUMETRICREPS; i++)
   {
     addRep<ssc::VolumetricRep>(mVolumetricRepNames[i], &mVolumetricRepMap);
@@ -109,12 +81,6 @@ RepManager::RepManager() :
     addRep<ssc::GeometricRep>(mGeometricRepNames[i], &mGeometricRepMap);
   }
   ssc::messageManager()->sendInfo("All necessary representations have been created.");
-
-  /*//connect the two acs-sets so both get updated when we click on one of them
-  connect(&(*getInria2DRep(mInriaRep2DNames[0])), SIGNAL(pointPicked(double,double,double)),
-          this, SLOT(syncInria2DRepsSlot(double,double,double)));
-  connect(&(*getInria2DRep(mInriaRep2DNames[3])), SIGNAL(pointPicked(double,double,double)),
-            this, SLOT(syncInria2DRepsSlot(double,double,double)));*/
 
   //connect the dominant tool to the acs-sets so they also get update when we move the tool
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)),
@@ -175,38 +141,37 @@ RepMap* RepManager::getReps()
 {
   return new RepMap(mRepMap);
 }
-/*InriaRep3DMap* RepManager::getInria3DReps()
-{
-  return &mInriaRep3DMap;
-}
-InriaRep2DMap* RepManager::getInria2DReps()
-{
-  return &mInriaRep2DMap;
-}*/
+
 VolumetricRepMap* RepManager::getVolumetricReps()
 {
   return &mVolumetricRepMap;
 }
+
 ProgressiveVolumetricRepMap* RepManager::getProgressiveVolumetricReps()
 {
   return &mProgressiveVolumetricRepMap;
 }
+
 ProbeRepMap* RepManager::getProbeReps()
 {
   return &mProbeRepMap;
 }
+
 LandmarkRepMap* RepManager::getLandmarkReps()
 {
   return &mLandmarkRepMap;
 }
+
 ToolRep3DMap* RepManager::getToolRep3DReps()
 {
   return &mToolRep3DMap;
 }
+
 GeometricRepMap* RepManager::getGeometricReps()
 {
   return &mGeometricRepMap;
 }
+
 ssc::RepPtr RepManager::getRep(const std::string& uid)
 {
   if (mRepMap.count(uid))
@@ -223,15 +188,6 @@ boost::shared_ptr<REP> RepManager::getRep(const std::string& uid, MAP* specificM
   else
     return boost::shared_ptr<REP>();
 }
-
-/*InriaRep3DPtr RepManager::getInria3DRep(const std::string& uid)
-{
-  return getRep<InriaRep3D>(uid, &mInriaRep3DMap);
-}
-InriaRep2DPtr RepManager::getInria2DRep(const std::string& uid)
-{
-  return getRep<InriaRep2D>(uid, &mInriaRep2DMap);
-}*/
 
 ssc::VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
 {
@@ -259,13 +215,6 @@ ssc::GeometricRepPtr RepManager::getGeometricRep(const std::string& uid)
   return getRep<ssc::GeometricRep>(uid, &mGeometricRepMap);
 }
 
-/*void RepManager::syncInria2DRepsSlot(double x,double y,double z)
-{
-  const double point[3] = {x,y,z};
-  getInria2DRep(mInriaRep2DNames[0])->getVtkViewImage2D()->SyncSetPosition(point);
-  getInria2DRep(mInriaRep2DNames[3])->getVtkViewImage2D()->SyncSetPosition(point);
-}*/
-
 void RepManager::dominantToolChangedSlot(const std::string& toolUid)
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
@@ -276,37 +225,40 @@ void RepManager::dominantToolChangedSlot(const std::string& toolUid)
   }
   if(mConnectedTool == dominantTool)
   {
-	  ssc::messageManager()->sendWarning("The new dominant tool was the same as the old one.");
+	  ssc::messageManager()->sendDebug("The new dominant tool was the same as the old one.");
     return;
   }
-  /*if(mConnectedTool)
-  {
-    disconnect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-               this, SLOT(receiveToolTransfromAndTimeStampSlot(Transform3D, double)));
-  }*/
-  mConnectedTool = dominantTool;
-  /*connect(mConnectedTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-          this, SLOT(receiveToolTransfromAndTimeStampSlot(Transform3D, double)));*/
 
+  mConnectedTool = dominantTool;
 
 }
-/*void RepManager::receiveToolTransfromAndTimeStampSlot(Transform3D prMt, double timestamp)
-{
-  //move the incoming transform into dataref space
-  ssc::Transform3DPtr rMt(new Transform3D((*ToolManager::getInstance()->get_rMpr())*prMt));
-  double x = (*rMt)[0][3];
-  double y = (*rMt)[1][3];
-  double z = (*rMt)[2][3];
-  this->syncInria2DRepsSlot(x,y,z);
-}*/
 
-void RepManager::addToolRep3D(ssc::ToolRep3DPtr rep)
+/** return a rep with the given uid,
+ *  if not found, create and return
+ *
+ */
+ssc::ToolRep3DPtr RepManager::getDynamicToolRep3DRep(std::string uid)
 {
-  if (!this->getToolRep3DRep(rep->getUid()))
+  ssc::ToolRep3DPtr rep = this->getToolRep3DRep(uid);
+  if (!rep)
   {
+    rep = ssc::ToolRep3D::New(uid);
     this->addRep(rep, &mToolRep3DMap);
   }
+  return rep;
+
+  //      mToolReps[uid] = ssc::ToolRep3D::New(uid);
+  //      repManager()->addToolRep3D(mToolReps[uid]);
 }
+
+
+//void RepManager::addToolRep3D(ssc::ToolRep3DPtr rep)
+//{
+//  if (!this->getToolRep3DRep(rep->getUid()))
+//  {
+//    this->addRep(rep, &mToolRep3DMap);
+//  }
+//}
 
 ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 {
