@@ -51,15 +51,18 @@ ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
 
 	mAxis_t->setAxisLength(40);
 	mAxis_t->setShowAxesLabels(false);
-	mAxis_t->setCaption(tool->getName()+"_t", ssc::Vector3D(1,1,0.7));
-	mAxis_t->setFontSize(0.08);
+	//mAxis_t->setCaption(tool->getName()+"_t", ssc::Vector3D(1,1,0.7));
+	mAxis_t->setCaption("t", ssc::Vector3D(0.7,1,0.7));
+	mAxis_t->setFontSize(0.03);
 
 	mAxis_s->setAxisLength(30);
 	mAxis_s->setShowAxesLabels(false);
-	mAxis_s->setCaption(tool->getName()+"_s", ssc::Vector3D(1,1,0));
-	mAxis_s->setFontSize(0.08);
+	mAxis_s->setCaption("s", ssc::Vector3D(1,1,0));
+	mAxis_s->setFontSize(0.03);
 
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(transformChangedSlot()));
+	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(visibleSlot()));
+	visibleSlot();
 }
 
 void ToolAxisConnector::transformChangedSlot()
@@ -70,6 +73,10 @@ void ToolAxisConnector::transformChangedSlot()
 	mAxis_s->setTransform(rMt*sMt.inv());
 }
 
+void ToolAxisConnector::visibleSlot()
+{
+	mAxis_s->setVisible(mTool->getVisible());
+}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -103,6 +110,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   this->toolsAvailableSlot();
+  showAxesActionSlot(true);
 }
 
 ViewWrapper3D::~ViewWrapper3D()
