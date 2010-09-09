@@ -18,6 +18,7 @@ include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
 QT4_WRAP_CPP( SSC_EX_SOURCE_FILES 
     sscExWindow.h)
 set(SSC_EX_SOURCE_FILES
+    sscTransformTester.cpp
     sscExWindow.cpp 
     main.cpp
     ${SSC_EX_SOURCE_FILES}
