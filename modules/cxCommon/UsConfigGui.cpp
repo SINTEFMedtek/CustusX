@@ -134,7 +134,7 @@ void UsConfigGui::probeChanged(const QString& probe)
 
 void UsConfigGui::rtSourceChanged(const QString& rtsource)
 {
-  std::cout << "UsConfigGui::rtSourceChanged " << rtsource.toStdString().c_str() << std::endl;
+  //std::cout << "UsConfigGui::rtSourceChanged " << rtsource.toStdString().c_str() << std::endl;
   this->populateConfigIdBox("");
   
   mSettings->setValue("RTSource", mRtSourceBox->currentText());
@@ -162,7 +162,7 @@ void UsConfigGui::RTsourceDetected(const QString& source)
 void UsConfigGui::configIdChanged(const QString& configId)
 {
   mSettings->setValue("ConfigId", mConfigIdBox->currentText());
-  emit USProbePropertiesChanged();
+  emit configurationChanged();
 }
 
 QStringList UsConfigGui::getConfigurationString()

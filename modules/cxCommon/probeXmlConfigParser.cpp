@@ -169,6 +169,14 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
       cornerNode = cornerNode.nextSibling();
     }
+    //sort the vector
+    ColRowPair center;
+    for(unsigned i=0;i<retval.mCorners.size();++i)
+    {
+      center.first += retval.mCorners[i].first/retval.mCorners.size();
+      center.second += retval.mCorners[i].second/retval.mCorners.size();
+    }
+    std::sort(retval.mCorners.begin(), retval.mCorners.end(), Angular_less(center));
 
     QDomNode edgesNode = configNode.namedItem("Edges");
     element = edgesNode.namedItem("Left").toElement();

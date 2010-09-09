@@ -100,7 +100,7 @@ public:
   virtual std::string getName() const;
   virtual int getIndex() const{return 0;};
   virtual bool isCalibrated() const; //TODO
-  virtual ssc::ProbeSector getProbeSector() const;//{ return ssc::ProbeSector(); }; //TODO
+  virtual ssc::ProbeSector getProbeSector() const;
   void setUSProbeSector(ssc::ProbeSector probeSector);
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.

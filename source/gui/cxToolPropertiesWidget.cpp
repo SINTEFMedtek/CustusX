@@ -100,10 +100,10 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   this->setWindowTitle("Tool Properties");
 
   //layout
-  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+  mToptopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
-  toptopLayout->addWidget(new ActiveToolWidget(this));
+  mToptopLayout->addWidget(new ActiveToolWidget(this));
   
   QHBoxLayout* generalLayout = new QHBoxLayout;
   mReferenceStatusLabel = new QLabel("Reference frame <undefined>", this);
@@ -111,11 +111,11 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mTrackingSystemStatusLabel = new QLabel("Tracking <undefined>", this);
   generalLayout->addWidget(mTrackingSystemStatusLabel);
 
-  toptopLayout->addLayout(generalLayout);
+  mToptopLayout->addLayout(generalLayout);
 
   QGroupBox* activeGroup = new QGroupBox(this);
   activeGroup->setTitle("Active Tool");
-  toptopLayout->addWidget(activeGroup);
+  mToptopLayout->addWidget(activeGroup);
   QVBoxLayout* activeGroupLayout = new QVBoxLayout;
   activeGroup->setLayout(activeGroupLayout);
 
@@ -129,18 +129,22 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   
   //TODO: Add enable/disable US Probe visualization in 2D/3D?
   //TODO: Only show US probe properties if tool is US Probe
-  toptopLayout->addWidget(mProbePropertiesWidget);
+
+  mShowUSSector = new QCheckBox("Show US probe sector", this);
+  mToptopLayout->addWidget(mShowUSSector);
+  mToptopLayout->addWidget(mProbePropertiesWidget);
+  mProbePropertiesWidget->setVisible(false); // Hide this widget initially
 
 //  QGroupBox* group2D = new QGroupBox(this);
 //  group2D->setTitle("2D properties");
-//  toptopLayout->addWidget(group2D);
+//  mToptopLayout->addWidget(group2D);
 
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
 
   mToolOffsetWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
 
-  toptopLayout->addStretch();
+  mToptopLayout->addStretch();
 
 //  void configured(); ///< signal emitted when the system is configured
 //  void initialized(); ///< signal emitted when the system is initialized
@@ -159,7 +163,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   //connect(mProbePropertiesWidget, SIGNAL(USProbeChanged()), ssc::toolManager(), SLOT(USProbeChangedSlot));
 
-  connect(mProbePropertiesWidget, SIGNAL(USProbePropertiesChanged()), this, SLOT(USProbePropertiesChangedSlot()));
+  connect(mShowUSSector, SIGNAL(stateChanged(int)), this, SLOT(showUSSectorStateChangedSlot(int)));
+  connect(mProbePropertiesWidget, SIGNAL(configurationChanged()), this, SLOT(configurationChangedSlot()));
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -227,7 +232,7 @@ void ToolPropertiesWidget::updateSlot()
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
 
-void ToolPropertiesWidget::USProbePropertiesChangedSlot()
+void ToolPropertiesWidget::configurationChangedSlot()
 {
   ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
   double depthStart = config.mOffset;
@@ -246,6 +251,20 @@ void ToolPropertiesWidget::USProbePropertiesChangedSlot()
     ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
     toolManager->setUSProbeSector(probeSector);
   }
+}
+
+void ToolPropertiesWidget::showUSSectorStateChangedSlot(int state)
+{
+  if (state)
+  {
+    mProbePropertiesWidget->setVisible(true);
+  }
+  else
+  {
+    mProbePropertiesWidget->setVisible(false);
+    //TODO: May want a show/remove of probe sector
+  }
+  mToptopLayout->update();
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)
