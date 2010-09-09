@@ -29,6 +29,7 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mOffsetLine.reset(new GraphicalLine3D());
 	mTooltipPoint.reset(new GraphicalPoint3D());
 
+  std::cout << "Tool3DRep: construct " << std::endl;
 
 //	if (pd::Settings::instance()->useDebugAxis())
 //	 	{
@@ -37,7 +38,9 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 }
 
 ToolRep3D::~ToolRep3D()
-{}
+{
+}
+
 ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name)
 {
 	ToolRep3DPtr retval(new ToolRep3D(uid, name));
@@ -101,6 +104,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 		}
 
 		receiveTransforms(mTool->get_prMt(), 0);
+		std::cout << "Tool3DRep: set tool" << std::endl;
 		mToolActor->SetVisibility(mTool->getVisible());
 
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
@@ -114,7 +118,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 
 bool ToolRep3D::hasTool(ToolPtr tool) const
 {
-	return (mTool != NULL);
+	return (mTool == tool);
 }
 
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
@@ -207,6 +211,8 @@ void ToolRep3D::receiveVisible(bool visible)
   {
     mToolActor->SetVisibility(mTool->getVisible());
   }
+
+  std::cout << "Tool3DRep: receiveVisible "<< mTool->getName() << visible << " - " << mStayHiddenAfterVisible << std::endl;
 
 	updateOffsetGraphics();
 }
