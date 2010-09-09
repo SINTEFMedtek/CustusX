@@ -28,6 +28,7 @@ public:
 	void setTransform(Transform3D rMt);
 	void setFontSize(double size);
 	void setAxisLength(double length);
+	void setVisible(bool on);
 
 	void setShowAxesLabels(bool on);
 	void setCaption(const std::string& caption, const Vector3D& color);

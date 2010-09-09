@@ -145,7 +145,18 @@ void ManualTool::setTooltipOffset(double val)
 
 ssc::Transform3D ManualTool::getCalibration_sMt() const
 {
-	return createTransformTranslate(Vector3D(5,5,20));
+//	Transform3D Rz30 = createTransformRotateZ(M_PI/6);
+//	Transform3D Rz60 = createTransformRotateZ(2.0*M_PI/6);
+//	Transform3D Rx90 = createTransformRotateX(M_PI/2);
+//	Transform3D Ry90 = createTransformRotateY(M_PI/2);
+//	Transform3D Rz90 = createTransformRotateZ(M_PI/2);
+//	Transform3D T = createTransformTranslate(Vector3D(10,10,10));
+//	Transform3D sMt = (Rz60*Rx90*Ry90);
+//	std::cout << "sMt\n" << sMt << std::endl;
+//	return sMt*T;
+
+	//return createTransformTranslate(Vector3D(5,5,5));
+	return Transform3D();
 }
 
 

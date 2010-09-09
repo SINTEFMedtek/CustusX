@@ -25,6 +25,11 @@ AxesRep::AxesRep(const std::string& uid) :
 	setFontSize(0.04);
 }
 
+void AxesRep::setVisible(bool on)
+{
+	mAssembly->SetVisibility(on);
+}
+
 void AxesRep::setShowAxesLabels(bool on)
 {
 	if (on)
@@ -54,7 +59,7 @@ void AxesRep::setFontSize(double size)
 
 	for (unsigned i=0; i<mCaption.size(); ++i)
 	{
-		mCaption[i]->SetWidth(mFontSize);
+		//mCaption[i]->SetWidth(mFontSize);
 		mCaption[i]->SetHeight(mFontSize);
 	}
 }
