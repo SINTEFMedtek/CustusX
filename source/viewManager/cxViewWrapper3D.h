@@ -32,6 +32,7 @@ public:
 
 private slots:
 	void transformChangedSlot();
+	void visibleSlot();
 private:
 	ssc::ToolPtr mTool;
 
