@@ -303,44 +303,22 @@ void ViewWrapper3D::toolsAvailableSlot()
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
-    if(iter->second->getType() == ssc::Tool::TOOL_REFERENCE)
+    ssc::ToolPtr tool = iter->second;
+    if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
       continue;
 
-    std::string uid = iter->second->getUid()+"_rep3d_"+this->mView->getUid();
+    std::string uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
     if (!mToolReps.count(uid))
     {
-      mToolReps[uid] = ssc::ToolRep3D::New(uid);
-      repManager()->addToolRep3D(mToolReps[uid]);
+      mToolReps[uid] = repManager()->getDynamicToolRep3DRep(uid);
     }
     ssc::ToolRep3DPtr toolRep = mToolReps[uid];
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
-    toolRep->setTool(iter->second);
+    toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
-    ssc::messageManager()->sendDebug("ToolRep3D for tool "+iter->second->getName()+" added to view "+mView->getName()+".");
-
-//    mToolAxis[uid].reset(new ToolAxisConnector(iter->second));
-//    mView->addRep(mToolAxis[uid]->getAxis_t());
-//    mView->addRep(mToolAxis[uid]->getAxis_s());
+    ssc::messageManager()->sendDebug("ToolRep3D for tool "+tool->getName()+" added to view "+mView->getName()+".");
   }
-
-//
-//  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
-//  ToolRep3DMap::iterator repIt = toolRep3DMap->begin();
-//  ssc::ToolManager::ToolMapPtr tools = toolManager()->getTools();
-//  ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
-//
-//  while((toolIt != tools->end()) && (repIt != toolRep3DMap->end()))
-//  {
-//    if(toolIt->second->getType() != ssc::Tool::TOOL_REFERENCE)
-//    {
-//      std::cout << "setting tool rep " << toolIt->second->getName() << std::endl;
-//      repIt->second->setTool(toolIt->second);
-//      mView->addRep(repIt->second);
-//      repIt++;
-//    }
-//    toolIt++;
-//  }
 }
 
 

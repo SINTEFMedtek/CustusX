@@ -36,6 +36,8 @@ View3D::~View3D()
 
 void View3D::setCameraStyle(View3D::CameraStyle style, int offset)
 {
+  ssc::messageManager()->sendDebug("View3D is trying to set the camerastyle.");
+
   if(mCameraStyle == style)
     return;
 
@@ -115,12 +117,16 @@ void View3D::activateCameraToolStyle(int offset)
     it++;
   }
   if(!dominantToolRepPtr)
+  {
+    ssc::messageManager()->sendWarning("The tool you are requesting to follow does not have a rep associated with it.");
     return; //cannot set the camera to follow a tool if that tool dose not have a rep
+  }
 
   mFollowingTool = dominantToolPtr;
   connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
           this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
+  std::cout << "dominant: " << dominantToolRepPtr->getTool()->getName() << std::endl;
   dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(true);
   dominantToolRepPtr->setStayHiddenAfterVisible(true);
 
