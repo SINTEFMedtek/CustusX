@@ -38,8 +38,12 @@ ssc::Transform3D TransformTest::rotateZ180(ssc::Transform3D M0)
 {
 	ssc::Vector3D c = M0.coord(ssc::Vector3D(0,0,0));
 	ssc::Transform3D Tc = ssc::createTransformTranslate(c);
+	//std::cout << "\nTc\n" << Tc << "\n" << std::endl;
+	//std::cout << "\nTc.inv()\n" << Tc.inv() << "\n" << std::endl;
 	ssc::Transform3D Rz180 = ssc::createTransformRotateZ(M_PI);
-	ssc::Transform3D retval = Tc * Rz180 * Tc.inv();
+	//std::cout << "\nRz180\n" << Rz180 << "\n" << std::endl;
+	//std::cout << "\nRz180*Tc.inv()\n" << Rz180*Tc.inv() << "\n" << std::endl;
+	ssc::Transform3D retval = Tc * Rz180 * M0 * Tc.inv();
 	return retval;
 }
 std::ostream& TransformTest::put(std::ostream& s, ssc::Transform3D M, char newline) const

@@ -30,6 +30,7 @@
 #include "sscDummyTool.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
+#include "sscTransformTester.h"
 
 #include "sscExWindow.h"
 
@@ -41,6 +42,8 @@ using ssc::Transform3D;
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
+
+	TransformTest().test();
 
 	std::vector<std::string> image;
 	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
