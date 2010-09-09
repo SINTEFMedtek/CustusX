@@ -151,7 +151,7 @@ ssc::Transform3D ManualTool::getCalibration_sMt() const
 //	Transform3D Ry90 = createTransformRotateY(M_PI/2);
 //	Transform3D Rz90 = createTransformRotateZ(M_PI/2);
 //	Transform3D T = createTransformTranslate(Vector3D(10,10,10));
-//	Transform3D sMt = (Rz60*Rx90*Ry90);
+//	Transform3D sMt = (Rz30*Rx90*Ry90);
 //	std::cout << "sMt\n" << sMt << std::endl;
 //	return sMt*T;
 
