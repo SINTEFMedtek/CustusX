@@ -130,35 +130,35 @@
 					<Depth>40</Depth>
 					<Offset>0</Offset>
 					<Origin>
-						<Col>317.5</Col>
-						<Row>52</Row>
+						<Col>320.5</Col>
+						<Row>53</Row>
 					</Origin>
 					<NCorners>4</NCorners>
 					<Corner>
-						<Col>146</Col>
-						<Row>52</Row>
+						<Col>148</Col>
+						<Row>53</Row>
 					</Corner>
 					<Corner>
-						<Col>489</Col>
-						<Row>52</Row>
+						<Col>148</Col>
+						<Row>411</Row>
 					</Corner>
 					<Corner>
-						<Col>489</Col>
-						<Row>410</Row>
+						<Col>493</Col>
+						<Row>411</Row>
 					</Corner>
 					<Corner>
-						<Col>146</Col>
-						<Row>410</Row>
+						<Col>493</Col>
+						<Row>53</Row>
 					</Corner>
 					<Edges>
-						<Left>146</Left>
-						<Right>489</Right>
-						<Top>52</Top>
-						<Bottom>410</Bottom>
+						<Left>148</Left>
+						<Right>493</Right>
+						<Top>53</Top>
+						<Bottom>411</Bottom>
 					</Edges>
 					<PixelSize>
-						<Width>0.1074</Width>
-						<Height>0.1114</Height>
+						<Width>0.111731843575419</Width>
+						<Height>0.111731843575419</Height>
 					</PixelSize>
 				</Config>
 				<Config>
@@ -168,34 +168,34 @@
 					<Offset>0</Offset>
 					<Origin>
 						<Col>318</Col>
-						<Row>99</Row>
+						<Row>53</Row>
 					</Origin>
 					<NCorners>4</NCorners>
 					<Corner>
-						<Col>181</Col>
-						<Row>52</Row>
+						<Col>183</Col>
+						<Row>53</Row>
 					</Corner>
 					<Corner>
-						<Col>455</Col>
-						<Row>52</Row>
+						<Col>183</Col>
+						<Row>412</Row>
 					</Corner>
 					<Corner>
-						<Col>455</Col>
-						<Row>411</Row>
+						<Col>459</Col>
+						<Row>412</Row>
 					</Corner>
 					<Corner>
-						<Col>181</Col>
-						<Row>411</Row>
+						<Col>459</Col>
+						<Row>53</Row>
 					</Corner>
 					<Edges>
-						<Left>181</Left>
-						<Right>455</Right>
-						<Top>52</Top>
-						<Bottom>411</Bottom>
+						<Left>183</Left>
+						<Right>459</Right>
+						<Top>53</Top>
+						<Bottom>412</Bottom>
 					</Edges>
 					<PixelSize>
-						<Width>0.1343</Width>
-						<Height>0.1393</Height>
+						<Width>0.139275766016713</Width>
+						<Height>0.139275766016713</Height>
 					</PixelSize>
 				</Config>
 				<Config>
@@ -204,35 +204,35 @@
 					<Depth>60</Depth>
 					<Offset>0</Offset>
 					<Origin>
-						<Col>317.5</Col>
-						<Row>52</Row>
+						<Col>320.5</Col>
+						<Row>53</Row>
 					</Origin>
 					<NCorners>4</NCorners>
 					<Corner>
-						<Col>204</Col>
-						<Row>52</Row>
+						<Col>206</Col>
+						<Row>53</Row>
 					</Corner>
 					<Corner>
-						<Col>431</Col>
-						<Row>52</Row>
+						<Col>206</Col>
+						<Row>412</Row>
 					</Corner>
 					<Corner>
-						<Col>431</Col>
-						<Row>411</Row>
+						<Col>435</Col>
+						<Row>412</Row>
 					</Corner>
 					<Corner>
-						<Col>204</Col>
-						<Row>411</Row>
+						<Col>435</Col>
+						<Row>53</Row>
 					</Corner>
 					<Edges>
-						<Left>204</Left>
-						<Right>431</Right>
-						<Top>52</Top>
-						<Bottom>411</Bottom>
+						<Left>206</Left>
+						<Right>435</Right>
+						<Top>53</Top>
+						<Bottom>412</Bottom>
 					</Edges>
 					<PixelSize>
-						<Width>0.1611</Width>
-						<Height>0.1671</Height>
+						<Width>0.167130919220056</Width>
+						<Height>0.167130919220056</Height>
 					</PixelSize>
 				</Config>
 			</RTSource>
