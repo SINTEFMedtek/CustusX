@@ -317,15 +317,16 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
   {
     std::string uid("VolumetricRep_img_" + image->getUid());
     ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
-    double size = image->getBaseVtkImageData()->GetNumberOfPoints();
-    double maxSize = 20*pow(10,6); // downsample volumes larger than 15 Megavoxels
-    double factor = maxSize/size;
-    //factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling
-    if (factor<0.99)
-    {
-        std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxSize/1000/1000 << "M. Ratio: " << factor << ", original size: " << size/1000/1000 << "M" << std::endl;
-        rep->setResampleFactor(factor);
-    }
+//    double size = image->getBaseVtkImageData()->GetNumberOfPoints();
+    long maxSize = 20*pow(10,6); // downsample volumes larger than 15 Megavoxels
+//    double factor = maxSize/size;
+//    //factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling
+//    if (factor<0.99)
+//    {
+//        std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxSize/1000/1000 << "M. Ratio: " << factor << ", original size: " << size/1000/1000 << "M" << std::endl;
+//        rep->setResampleFactor(factor);
+//    }
+    rep->setMaxVolumeSize(maxSize);
     rep->setImage(image);
     mVolumetricRepByImageMap[image->getUid()] = rep;
     //mImageMapperMonitorMap[image->getUid()].reset(new ssc::ImageMapperMonitor(rep));
