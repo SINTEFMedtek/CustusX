@@ -145,7 +145,7 @@ class USProbe2D
 {
 public:
 	USProbe2D(vtkRendererPtr renderer = vtkRendererPtr());
-	//~USProbe2D();
+	~USProbe2D();
 	void setPosition(const Transform3D& wMt);
 	void setShape(int type, double d_start, double d_end, double width); 
 //	void setRadialShape(double depth, double roc, double angularWidth);
