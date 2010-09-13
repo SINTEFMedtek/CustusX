@@ -63,6 +63,7 @@ ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
 	connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(transformChangedSlot()));
 	connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(visibleSlot()));
 	visibleSlot();
+	transformChangedSlot();
 }
 
 void ToolAxisConnector::transformChangedSlot()
@@ -115,7 +116,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   this->toolsAvailableSlot();
-  showAxesActionSlot(true);
+  //showAxesActionSlot(true);
 }
 
 ViewWrapper3D::~ViewWrapper3D()
