@@ -53,7 +53,8 @@ UsConfigGui::UsConfigGui(QWidget* parent) :
   connect(mScannerBox, SIGNAL(activated(const QString&)), this, SLOT(scannerChanged(const QString&)));
   connect(mProbeBox, SIGNAL(activated(const QString&)), this, SLOT(probeChanged(const QString&)));
   connect(mRtSourceBox, SIGNAL(activated(const QString&)), this, SLOT(rtSourceChanged(const QString&)));
-  connect(mConfigIdBox, SIGNAL(activated(const QString&)), this, SLOT(configIdChanged(const QString&)));
+  //connect(mConfigIdBox, SIGNAL(activated(const QString&)), this, SLOT(configIdChanged(const QString&)));
+  connect(mConfigIdBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(configIdChanged(const QString&)));
 
   this->initComboBoxes();
 }
@@ -146,23 +147,23 @@ void UsConfigGui::RTsourceDetected(const QString& source)
   // Set RT source to VGA or S-VHS according to detected grabber
   if ( (source.compare(QString("VGA")) == 0) || (source.compare(QString("VGA_DVI"))) == 0)  
   {
-    mRtSourceBox->setCurrentIndex(1);
+    mRtSourceBox->setCurrentIndex(mRtSourceBox->findText("VGA"));
     //mSettings->setValue("RTSource", QString("VGA"));
     
   } else {
-    mRtSourceBox->setCurrentIndex(0);
+    mRtSourceBox->setCurrentIndex(mRtSourceBox->findText("SVHS"));
     //mSettings->setValue("RTSource", QString("SVHS"));
   }
 
   mSettings->setValue("RTSource", mRtSourceBox->currentText());
   this->populateConfigIdBox("");
-
 }
 
 void UsConfigGui::configIdChanged(const QString& configId)
 {
   mSettings->setValue("ConfigId", mConfigIdBox->currentText());
   emit configurationChanged();
+  std::cout << "emit configurationChanged(); SHOULD DRAW NOW!!!" << std::endl;
 }
 
 QStringList UsConfigGui::getConfigurationString()
