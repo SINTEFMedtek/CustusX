@@ -28,6 +28,8 @@ AxesRep::AxesRep(const std::string& uid) :
 void AxesRep::setVisible(bool on)
 {
 	mAssembly->SetVisibility(on);
+	for (unsigned i=0; i<mCaption.size(); ++i)
+		mCaption[i]->SetVisibility(on);
 }
 
 void AxesRep::setShowAxesLabels(bool on)
