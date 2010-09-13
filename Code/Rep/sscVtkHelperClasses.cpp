@@ -395,7 +395,8 @@ USProbe2D::USProbe2D(vtkRendererPtr renderer) : mRenderer(renderer)
 
 	mLeft = createLeaderActor();
 	mRight = createLeaderActor();
-	mArc = createLeaderActor();
+	mStartArc = createLeaderActor();
+  mEndArc = createLeaderActor();
 	
 //	if (mRenderer)
 //	{
@@ -413,7 +414,8 @@ USProbe2D::~USProbe2D()
   {
     mRenderer->RemoveActor(mLeft);
     mRenderer->RemoveActor(mRight);
-    mRenderer->RemoveActor(mArc);
+    mRenderer->RemoveActor(mStartArc);
+    mRenderer->RemoveActor(mEndArc);
   }
 }
 
@@ -476,7 +478,8 @@ void USProbe2D::setPosition()
 	Vector3D e_y = unitVector(M_PI_2); 
 	Vector3D e_z(0,0,1);
 	
-	mArc->SetVisibility(mLeft->GetVisibility());	
+	mStartArc->SetVisibility(mLeft->GetVisibility());
+  mEndArc->SetVisibility(mLeft->GetVisibility());
 	
 	if (mType==1) // sector
 	{
@@ -485,19 +488,22 @@ void USProbe2D::setPosition()
     Vector3D sl = c + m_d_start * unitVector(M_PI_2 + mWidth/2.0); // right startpoint
     Vector3D pr = c + m_d_end * unitVector(M_PI_2 - mWidth/2.0); // left endpoint
     Vector3D pl = c + m_d_end * unitVector(M_PI_2 + mWidth/2.0); // right endpoint
-		double r = - m_d_end / (pl-pr).length();		// normalize on distance between endpoints (vtk spec)
+		double re = - m_d_end / (pl-pr).length();   // normalize on distance between endpoints (vtk spec)
+    double rs = - m_d_start / (sl-sr).length(); // normalize on distance between endpoints (vtk spec)
 		
 		c = M.coord(c);
 		pr = M.coord(pr);
 		pl = M.coord(pl);
+    sr = M.coord(sr);
+    sl = M.coord(sl);
 		// change sign on r??
 
 		//mLeft->GetPositionCoordinate()->SetValue(c.begin());
-    mLeft->GetPositionCoordinate()->SetValue(sr.begin());
+    mLeft->GetPositionCoordinate()->SetValue(sl.begin());
 		mLeft->GetPosition2Coordinate()->SetValue(pl.begin());
 
 		//mRight->GetPositionCoordinate()->SetValue(c.begin());
-    mRight->GetPositionCoordinate()->SetValue(sl.begin());
+    mRight->GetPositionCoordinate()->SetValue(sr.begin());
 		mRight->GetPosition2Coordinate()->SetValue(pr.begin());
 
 		// turn off arc for very tilted views. This because the projection is bad.
@@ -505,12 +511,16 @@ void USProbe2D::setPosition()
 		double straightness = dot(M.vector(e_z), e_z);
 		if (fabs(straightness) < 0.5)
 		{
-			mArc->SetVisibility(false);
+		  mEndArc->SetVisibility(false);
+      mStartArc->SetVisibility(false);
 		}
 		
-		mArc->GetPositionCoordinate()->SetValue(pr.begin());
-		mArc->GetPosition2Coordinate()->SetValue(pl.begin());
-		mArc->SetRadius(r);
+		mEndArc->GetPositionCoordinate()->SetValue(pr.begin());
+		mEndArc->GetPosition2Coordinate()->SetValue(pl.begin());
+		mEndArc->SetRadius(re);
+		mStartArc->GetPositionCoordinate()->SetValue(sr.begin());
+		mStartArc->GetPosition2Coordinate()->SetValue(sl.begin());
+		mStartArc->SetRadius(rs);
 
 	}
 	if (mType==2) // linear 
@@ -532,9 +542,12 @@ void USProbe2D::setPosition()
 		mRight->GetPositionCoordinate()->SetValue(cr.begin());
 		mRight->GetPosition2Coordinate()->SetValue(pr.begin());
 
-		mArc->GetPositionCoordinate()->SetValue(pr.begin());
-		mArc->GetPosition2Coordinate()->SetValue(pl.begin());
-		mArc->SetRadius(0);
+		mEndArc->GetPositionCoordinate()->SetValue(pr.begin());
+		mEndArc->GetPosition2Coordinate()->SetValue(pl.begin());
+		mEndArc->SetRadius(0);
+		mStartArc->GetPositionCoordinate()->SetValue(cr.begin());
+		mStartArc->GetPosition2Coordinate()->SetValue(cl.begin());
+    mStartArc->SetRadius(0);
 	}
 	
 //	Vector3D left(0,100,100);
@@ -568,7 +581,8 @@ void USProbe2D::setVisibility(bool val)
 //	val=true;
 	mLeft->SetVisibility(val);
 	mRight->SetVisibility(val);
-	mArc->SetVisibility(val);	
+	mStartArc->SetVisibility(val);
+  mEndArc->SetVisibility(val);
 }
 
 

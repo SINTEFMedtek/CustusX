@@ -158,7 +158,8 @@ private:
 	void setPosition();
  	vtkLeaderActor2DPtr mLeft;
  	vtkLeaderActor2DPtr mRight;
- 	vtkLeaderActor2DPtr mArc;
+ 	vtkLeaderActor2DPtr mStartArc;
+  vtkLeaderActor2DPtr mEndArc;
 	vtkRendererPtr mRenderer;
 	Transform3D m_wMt;
 	//boost::shared_ptr<TextDisplay> mText;
