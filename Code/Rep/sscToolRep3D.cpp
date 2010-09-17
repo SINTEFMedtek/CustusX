@@ -29,7 +29,7 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mOffsetLine.reset(new GraphicalLine3D());
 	mTooltipPoint.reset(new GraphicalPoint3D());
 
-  std::cout << "Tool3DRep: construct " << std::endl;
+  //std::cout << "Tool3DRep: construct " << std::endl;
 
 //	if (pd::Settings::instance()->useDebugAxis())
 //	 	{
@@ -104,7 +104,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 		}
 
 		receiveTransforms(mTool->get_prMt(), 0);
-		std::cout << "Tool3DRep: set tool" << std::endl;
+		//std::cout << "Tool3DRep: set tool" << std::endl;
 		mToolActor->SetVisibility(mTool->getVisible());
 
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
