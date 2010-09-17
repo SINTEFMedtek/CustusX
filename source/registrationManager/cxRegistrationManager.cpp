@@ -237,8 +237,13 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   //check that the masterimage is set
   if(!mMasterImage)
   {
-    //ssc::messageManager()->sendError("There isn't set a masterimage in the registrationmanager.");
     return;
+  }
+
+  // ignore self-registration, this gives no effect bestcase, buggy behaviour worstcase (has been observed)
+  if (image==mMasterImage)
+  {
+	  return;
   }
 
   ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
@@ -250,21 +255,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 
   if (landmarks.empty())
     return;
-/*
-  std::cout << "------------------------" << std::endl;
-  std::cout << "landmarks.size(): "<< landmarks.size() << std::endl;
-  std::cout << "p_data:" << std::endl;
-  for (int i=0; i<p_data->GetNumberOfPoints(); ++i)
-    std::cout << ssc::Vector3D(p_data->GetPoint(i)) << std::endl;
-//  p_data->Print(std::cout);
-//  p_data->GetData()->Print(std::cout);
-  std::cout << "p_ref:" << std::endl;
-  for (int i=0; i<p_ref->GetNumberOfPoints(); ++i)
-    std::cout << ssc::Vector3D(p_ref->GetPoint(i)) << std::endl;
-//  p_ref->Print(std::cout);
-//  p_ref->GetData()->Print(std::cout);
-  std::cout << "------------------------" << std::endl;
-*/
+
   bool ok = false;
   ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
   if (!ok)
@@ -273,20 +264,6 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::RegistrationTransform regTrans(rMd, QDateTime::currentDateTime(), "Image to Image");
   image->get_rMd_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
-/*
-  std::cout << "rMd:\n" << rMd << std::endl;
-  ssc::Vector3D c0_d0 = mMasterImage->boundingBox().center();
-  ssc::Vector3D c1_d1 = image->boundingBox().center();
-  ssc::Vector3D c0_r = mMasterImage->get_rMd().coord(c0_d0);
-  ssc::Vector3D c1_r = rMd.coord(c1_d1);
-  std::cout << "master center: " << c0_r << " , d="<< c0_d0 << std::endl;
-  std::cout << "active center: " << c1_r << " , d="<< c1_d1 << std::endl;
-
-  std::cout << "------------------------" << std::endl;
-  std::cout << "------------------------" << std::endl;
-*/
-  //why did we use the inverse of the transform?
-  //image->set_rMd(transform.inv());//set_rMd() must have an inverted transform wrt the removed setTransform()
 
   emit imageRegistrationPerformed();
   ssc::messageManager()->sendInfo("Image registration has been performed.");
@@ -302,7 +279,6 @@ void RegistrationManager::addXml(QDomNode& parentNode)
   if(mMasterImage)
   {
     masterImageNode.appendChild(doc.createTextNode(mMasterImage->getUid().c_str()));
-    //ssc::messageManager()->sendInfo("SAVED MASTERIMAGE, UID: "+mMasterImage->getUid());
   }
   base.appendChild(masterImageNode);
 }
