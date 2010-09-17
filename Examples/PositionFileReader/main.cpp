@@ -36,7 +36,10 @@ int main(int argc, char **argv)
 	QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
 	boost::uint64_t ret64 = startTime.toTime_t();
 	ret64 *= 1000;
-	boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
+
+	// workaround for compilling 32 bit version:
+	boost::uint64_t tsModifier = ret64 & std::numeric_limits<boost::uint64_t>::max() & 0x00000000;
+	//boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
 
 	ssc::PositionStorageReader reader(posFile);
 	
