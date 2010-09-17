@@ -163,7 +163,7 @@ void UsConfigGui::configIdChanged(const QString& configId)
 {
   mSettings->setValue("ConfigId", mConfigIdBox->currentText());
   emit configurationChanged();
-  std::cout << "emit configurationChanged(); SHOULD DRAW NOW!!!" << std::endl;
+  //std::cout << "emit configurationChanged(); SHOULD DRAW NOW!!!" << std::endl;
 }
 
 QStringList UsConfigGui::getConfigurationString()
