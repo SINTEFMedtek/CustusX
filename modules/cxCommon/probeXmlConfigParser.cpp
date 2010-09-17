@@ -226,6 +226,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   catch( char * str ) {
      std::cout << "EXCEPTION RAISED: " << str << std::endl;
   }
+  retval.mEmpty = false;
   return retval;
 }
 

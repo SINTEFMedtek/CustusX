@@ -36,6 +36,12 @@ public:
     int                     mBottomEdge; ///<  BottomEdge
     double                  mPixelWidth; ///<  Pixel width
     double                  mPixelHeight;///<  Pixel height
+    
+    bool mEmpty;
+    
+    Configuration() : mEmpty(true)
+    {};
+    bool isEmpty(){return mEmpty;};
   };
 
   ProbeXmlConfigParser(QString& pathToXml); ///< opens the file and reads it onto the QDomDocument
