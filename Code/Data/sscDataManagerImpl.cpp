@@ -248,7 +248,8 @@ std::string DataManagerImpl::addLandmark()
   std::map<std::string, LandmarkProperty>::iterator iter;
   for (iter = mLandmarkProperties.begin(); iter != mLandmarkProperties.end(); ++iter)
   {
-    max = std::max(max, qstring_cast(iter->second.getName()).toInt());
+    //max = std::max(max, qstring_cast(iter->second.getName()).toInt());
+    max = std::max(max, qstring_cast(iter->first).toInt());
   }
   std::string uid = string_cast(max + 1);
   mLandmarkProperties[uid] = LandmarkProperty(uid);
