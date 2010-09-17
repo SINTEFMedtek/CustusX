@@ -235,6 +235,8 @@ void ToolPropertiesWidget::updateSlot()
 void ToolPropertiesWidget::configurationChangedSlot()
 {
   ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
+  if(config.isEmpty())
+    return;
   double depthStart = config.mOffset;
   double depthEnd = config.mDepth + depthStart;
   ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
