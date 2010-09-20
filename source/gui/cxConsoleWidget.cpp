@@ -52,7 +52,7 @@ void ConsoleWidget::createTextCharFormats()
   mDebugFormat.setForeground(Qt::blue);
 }
 
-void ConsoleWidget::format(Message message)
+void ConsoleWidget::format(Message& message)
 {
   switch(message.getMessageLevel())
   {
