@@ -24,12 +24,12 @@ ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath,
 
   if (!configurationFile.open(QIODevice::ReadOnly))
   {
-    ssc::messageManager()->sendInfo("Could not open " + configXmlFilePath + ".");
+    ssc::messageManager()->sendError("Could not open " + configXmlFilePath + ".");
     return;
   }
   if (!mConfigureDoc.setContent(&configurationFile))
   {
-    ssc::messageManager()->sendInfo("Could not set the xml content of the file "+ configXmlFilePath);
+    ssc::messageManager()->sendError("Could not set the xml content of the file "+ configXmlFilePath);
     return;
   }
   //std::cout << mConfigureDoc.toString().toStdString() << std::endl;
@@ -56,7 +56,7 @@ TrackerPtr ToolConfigurationParser::getTracker()
     const QDomElement trackerTypeElement = trackerNode.firstChildElement(mTrackerTypeTag);
     if (trackerTypeElement.isNull())
     {
-      ssc::messageManager()->sendInfo("Tracker " + iString + " does not have the required tag <type>.");
+      ssc::messageManager()->sendError("Tracker " + iString + " does not have the required tag <type>.");
       continue;
     }
     QString text = trackerTypeElement.text();
@@ -109,16 +109,11 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
   for (int i = 0; i < toolNodeList.size(); i++)
   {
     Tool::InternalStructure internalStructure;
-    /*QDomNode toolNodes = toolNodeList.at(i);
-    if (toolNodes.size() < 1)
-    {
-      ssc::messageManager()->sendInfo("Found no <tool> tags in the toolxmlfile.");
-      continue;
-    }*/
+
     QDomNode toolNode = toolNodeList.at(i);
     if (toolNode.isNull())
     {
-      ssc::messageManager()->sendInfo("Could not read the <tool> tag.");
+      ssc::messageManager()->sendError("Could not read the <tool> tag.");
       continue;
     }
 
@@ -156,7 +151,7 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
     if (toolSensorElement.isNull())
     {
-      ssc::messageManager()->sendInfo("Could not find the <sensor> tag under the <tool> tag. Aborting this tool.");
+      ssc::messageManager()->sendError("Could not find the <sensor> tag under the <tool> tag. Aborting this tool.");
       continue;
     }
     QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
@@ -219,7 +214,7 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QDomElement toolCalibrationElement = toolNode.firstChildElement(mToolCalibrationTag);
     if (toolCalibrationElement.isNull())
     {
-      ssc::messageManager()->sendInfo(
+      ssc::messageManager()->sendError(
           "Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
       continue;
     }
@@ -272,36 +267,20 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
   QDomNodeList toolFileList = mConfigureDoc.elementsByTagName(mToolfileTag);
   for (int i = 0; i < toolFileList.count(); i++)
   {
-    /*std::string iString = "" + i;
-    QDomNode filenameNode = toolFileList.item(i).firstChild();
-    if (filenameNode.isNull())
-    {
-      messageManager()->sendInfo("Toolfiletag "+iString+" does not containe any usefull info. Skipping this tool.");
-      continue;
-    }
-    QString filename = filenameNode.nodeValue();
-    if (filename.isEmpty())
-    {
-      messageManager()->sendInfo("Toolfiletag "+ iString+" does not contain readable text. Skipping this tool.");
-      continue;
-    }*/
     const QString toolFilename = toolFileList.item(i).firstChild().nodeValue();
     if(toolFilename.isEmpty())
     {
-      ssc::messageManager()->sendWarning("A toolfile tag in the config xml file is not correctly formated. Skipping it.");
+      ssc::messageManager()->sendError("A toolfile tag in the config xml file is not correctly formated. Skipping it.");
       continue;
     }
 
-
     QDir dir(QString(mConfigurationPath.c_str()));
-    //std::cout << "absolutePath dir is " << dir.absolutePath().toStdString() << std::endl;
-    //std::cout << "absolutePath file is " << dir.absoluteFilePath(toolFilename).toStdString() << std::endl;
 
     const QString filepath = dir.absoluteFilePath(toolFilename);
     QFile toolFile(filepath);
     if (!toolFile.exists())
     {
-      ssc::messageManager()->sendInfo(filepath.toStdString()+" does not exists. Skipping this tool.");
+      ssc::messageManager()->sendError(filepath.toStdString()+" does not exists. Skipping this tool.");
       continue;
     } else
     {
@@ -310,7 +289,7 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
     QDomDocument toolDoc;
     if (!toolDoc.setContent(&toolFile))
     {
-      ssc::messageManager()->sendInfo("Could not set the xml content of the file "+toolFilename.toStdString());
+      ssc::messageManager()->sendError("Could not set the xml content of the file "+toolFilename.toStdString());
       continue;
     }
     //there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)
