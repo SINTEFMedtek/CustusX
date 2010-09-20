@@ -21,21 +21,6 @@ void ToolManager::initializeObject()
   ssc::ToolManager::setInstance(new ToolManager());
 }
 
-// Doxygen ignores code between \cond and \endcond
-/// \cond
-//ToolManager* ToolManager::mCxInstance = NULL;
-/// \endcond
-//ToolManager* toolManager() { return ToolManager::getInstance(); }
-//ToolManager* ToolManager::getInstance()
-//{
-//  if (mCxInstance == NULL)
-//  {
-//    mCxInstance = new ToolManager();
-//    ssc::ToolManager::setInstance(mCxInstance);
-//  }
-//  return mCxInstance;
-//}
-
 ToolManager* ToolManager::getInstance()
 {
   return dynamic_cast<ToolManager*>(ssc::ToolManager::getInstance());
@@ -516,7 +501,7 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state, bool succes
     report.append(toolUid + " reported an unknown message.");
     break;
   }
-  ssc::messageManager()->sendInfo(report);
+  //ssc::messageManager()->sendInfo(report);
 }
 
 /**
@@ -545,7 +530,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
       if(success){ //Should this really be done here?
         mInitialized = success;
         emit initialized();
-        ssc::messageManager()->sendInfo("ToolManager is initialized. (TRACKER_OPEN)");
+        //ssc::messageManager()->sendInfo("ToolManager is initialized. (TRACKER_OPEN)");
       }
       report.append("open.");
     } else
@@ -625,7 +610,8 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
     report.append(trackerUid + " reported an unknown message.");
     break;
   }
-  ssc::messageManager()->sendInfo(report);
+  //Tracker now sends messages directly to the messagemanager!s
+  //ssc::messageManager()->sendInfo(report);
 }
 
 void ToolManager::addConnectedTool(std::string uid)
@@ -633,7 +619,7 @@ void ToolManager::addConnectedTool(std::string uid)
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
   if (it == mConfiguredTools->end() || !it->second)
   {
-    ssc::messageManager()->sendInfo("Tool with id " + uid
+    ssc::messageManager()->sendWarning("Tool with id " + uid
         + " was not found to be configured "
           ", thus could not add is as a connected tool.");
     return;
@@ -645,7 +631,7 @@ void ToolManager::addConnectedTool(std::string uid)
   connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   
   mConfiguredTools->erase(it);
-  ssc::messageManager()->sendInfo("Tool with id " + uid
+  ssc::messageManager()->sendDebug("Tool with id " + uid
       + " was moved from the configured to the connected map.");
 }
 void ToolManager::connectSignalsAndSlots()
