@@ -174,8 +174,6 @@ ViewGroup::ViewGroup()
   mZoom2D.activateGlobal(false);
 
   mViewGroupData.reset(new ViewGroupData());
-  //connect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(addImage(QString)));
-  //connect(mViewGroupData.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
 
   this->setSlicePlanesProxy();
 }
@@ -186,8 +184,6 @@ ViewGroup::~ViewGroup()
 void ViewGroup::setSlicePlanesProxy()
 {
   mSlicePlanesProxy.reset(new ssc::SlicePlanesProxy());
-  //mSlicePlanesProxy->getProperties().mPointPos_normvp = ssc::Vector3D(0.9,0.8,0.0);
-  //mSlicePlanesProxy->getProperties().mDrawPlane = true;
 }
 
 /**Add one view wrapper and setup the necessary connections.
@@ -199,10 +195,6 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
 
   // add state
   wrapper->setZoom2D(mZoom2D.mActive);
-//  for (unsigned i=0; i<mImages.size(); ++i)
-//    wrapper->addImage(mImages[i]);
-//  for (unsigned i=0; i<mMeshes.size(); ++i)
-//    wrapper->addMesh(mMeshes[i]);
 
   wrapper->setViewGroup(mViewGroupData);
   wrapper->setSlicePlanesProxy(mSlicePlanesProxy);
@@ -211,11 +203,6 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(activateManualToolSlot()));
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
   connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
-
-//  connect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
-//  connect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
-//  connect(wrapper.get(), SIGNAL(meshAdded(QString)), this, SLOT(addMesh(QString)));
-//  connect(wrapper.get(), SIGNAL(meshRemoved(QString)), this, SLOT(removeMesh(QString)));
 
   wrapper->setRegistrationMode(mRegistrationMode);
 }
@@ -229,11 +216,6 @@ void ViewGroup::removeViews()
     disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(activateManualToolSlot()));
     disconnect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
     disconnect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
-
-//    disconnect(wrapper.get(), SIGNAL(imageAdded(QString)), this, SLOT(addImage(QString)));
-//    disconnect(wrapper.get(), SIGNAL(imageRemoved(QString)), this, SLOT(removeImage(QString)));
-//    disconnect(wrapper.get(), SIGNAL(meshAdded(QString)), this, SLOT(addMesh(QString)));
-//    disconnect(wrapper.get(), SIGNAL(meshRemoved(QString)), this, SLOT(removeMesh(QString)));
   }
 
   mViews.clear();
@@ -280,43 +262,9 @@ void ViewGroup::syncOrientationMode(SyncedValuePtr val)
   }
 }
 
-//void ViewGroup::addImage(QString imageUid)
-//{
-//  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
-//  if(!image)
-//  {
-//    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
-//    return;
-//  }
-//  this->addImage(image);
-//}
-//
-//void ViewGroup::removeImage(QString imageUid)
-//{
-//  ssc::ImagePtr image = ssc::dataManager()->getImage(imageUid.toStdString());
-//  if(!image)
-//  {
-//    ssc::messageManager()->sendError("Couldn't find an image with uid: "+imageUid.toStdString());
-//    return;
-//  }
-//  this->removeImage(image);
-//}
-//
-//
-//void ViewGroup::addMesh(QString uid)
-//{
-//  this->addMesh(ssc::dataManager()->getMesh(string_cast(uid)));
-//}
-//
-//void ViewGroup::removeMesh(QString uid)
-//{
-//  this->removeMesh(ssc::dataManager()->getMesh(string_cast(uid)));
-//}
-
 void ViewGroup::mouseClickInViewGroupSlot()
 {
   std::vector<ssc::ImagePtr> images = mViewGroupData->getImages();
-  //ssc::messageManager()->sendInfo("MousePressEvent and focusInEvent in a viewgroup calls setActiveImage()");
   if (images.empty())
     ssc::dataManager()->setActiveImage(ssc::ImagePtr());
   else
@@ -336,63 +284,6 @@ std::vector<ssc::View*> ViewGroup::getViews() const
 {
   return mViews;
 }
-
-///**Call this on an initialized view, when the plane type is changed.
-// *
-// */
-//ssc::View* ViewGroup::initializeView(int index, ssc::PLANE_TYPE plane)
-//{
-//  if (index<0 || index>=(int)mViewWrappers.size())
-//  {
-//    ssc::messageManager()->sendError("invalid index in ViewGroup2D");
-//  }
-//
-//  mViewWrappers[index]->initializePlane(plane);
-//  return mViews[index];
-//}
-
-//void ViewGroup::addImage(ssc::ImagePtr image)
-//{
-//  if (std::count(mImages.begin(), mImages.end(), image))
-//    return;
-//
-//  mImages.push_back(image);
-//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-//    mViewWrappers[i]->addImage(image);
-//}
-//
-//void ViewGroup::removeImage(ssc::ImagePtr image)
-//{
-//  if (!std::count(mImages.begin(), mImages.end(), image))
-//    return;
-//
-//  mImages.erase(std::find(mImages.begin(), mImages.end(), image));
-//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-//    mViewWrappers[i]->removeImage(image);
-//}
-//
-//void ViewGroup::addMesh(ssc::MeshPtr data)
-//{
-//  if (!data)
-//    return;
-//  if (std::count(mMeshes.begin(), mMeshes.end(), data))
-//    return;
-//
-//  mMeshes.push_back(data);
-//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-//    mViewWrappers[i]->addMesh(data);
-//}
-//
-//void ViewGroup::removeMesh(ssc::MeshPtr data)
-//{
-//  if (!std::count(mMeshes.begin(), mMeshes.end(), data))
-//    return;
-//
-//  mMeshes.erase(std::find(mMeshes.begin(), mMeshes.end(), data));
-//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-//    mViewWrappers[i]->removeMesh(data);
-//}
-
 
 void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
@@ -418,19 +309,10 @@ void ViewGroup::addXml(QDomNode& dataNode)
     imageNode.appendChild(doc.createTextNode(qstring_cast(data[i]->getUid())));
     dataNode.appendChild(imageNode);
   }
-//  for (unsigned i=0; i<mImages.size(); ++i)
-//  {
-//    QDomElement imageNode = doc.createElement("image");
-//    imageNode.appendChild(doc.createTextNode(qstring_cast(mImages[i]->getUid())));
-//    dataNode.appendChild(imageNode);
-//  }
-//  for (unsigned i=0; i<mMeshes.size(); ++i)
-//  {
-//    std::cout << "saving mesh" << std::endl;
-//    QDomElement node = doc.createElement("mesh");
-//    node.appendChild(doc.createTextNode(qstring_cast(mMeshes[i]->getUid())));
-//    dataNode.appendChild(node);
-//  }
+
+  QDomElement cameraNode = doc.createElement("camera3D");
+  mViewGroupData->getCamera3D()->addXml(cameraNode);
+  dataNode.appendChild(cameraNode);
 
   QDomElement zoom2DNode = doc.createElement("zoomFactor2D");
   zoom2DNode.appendChild(doc.createTextNode(qstring_cast(this->getZoom2D())));
@@ -446,10 +328,6 @@ void ViewGroup::addXml(QDomNode& dataNode)
 void ViewGroup::clearPatientData()
 {
   mViewGroupData->clearData();
-//  while (!mImages.empty())
-//  {
-//    this->removeImage(mImages.front());
-//  }
   this->setZoom2D(1.0);
 }
 
@@ -458,40 +336,13 @@ void ViewGroup::parseXml(QDomNode dataNode)
   for (QDomElement elem = dataNode.firstChildElement("data"); !elem.isNull(); elem = elem.nextSiblingElement("data"))
   {
     QString uid = elem.text();
-//    if (uid.isEmpty())
-//      continue;
     ssc::DataPtr data = ssc::dataManager()->getData(string_cast(uid));
     mViewGroupData->addData(data);
     if (!data)
       ssc::messageManager()->sendError("Couldn't find the data: ["+string_cast(uid)+"] in the datamanager.");
   }
 
-//  for (QDomElement elem = dataNode.firstChildElement("image"); !elem.isNull(); elem = elem.nextSiblingElement("image"))
-//  {
-//    QString imageUid = elem.text();
-//
-//     if (!imageUid.isEmpty())
-//     {
-//       ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(imageUid));
-//       if (image)
-//         this->addImage(image);
-//       else
-//         ssc::messageManager()->sendError("Couldn't find the image: "+string_cast(imageUid)+" in the datamanager.");
-//     }
-//  }
-//  for (QDomElement elem = dataNode.firstChildElement("mesh"); !elem.isNull(); elem = elem.nextSiblingElement("mesh"))
-//  {
-//    QString uid = elem.text();
-//
-//     if (!uid.isEmpty())
-//     {
-//       ssc::MeshPtr data = ssc::dataManager()->getMesh(string_cast(uid));
-//       if (data)
-//         this->addMesh(data);
-//       else
-//         ssc::messageManager()->sendError("Couldn't find the mesh: "+string_cast(uid)+" in the datamanager.");
-//     }
-//  }
+  mViewGroupData->getCamera3D()->parseXml(dataNode.namedItem("camera3D"));
 
   QString zoom2D = dataNode.namedItem("zoomFactor2D").toElement().text();
   bool ok;

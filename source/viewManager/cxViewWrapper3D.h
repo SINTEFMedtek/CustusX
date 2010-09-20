@@ -58,6 +58,7 @@ public:
   virtual ssc::View* getView();
   virtual double getZoom2D(){return -1.0;};
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
+  virtual void setViewGroup(ViewGroupDataPtr group);
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
