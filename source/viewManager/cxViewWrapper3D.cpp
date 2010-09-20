@@ -99,7 +99,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->connectContextMenu(mView);
   std::string index = QString::number(startIndex).toStdString();
 
-  view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
+  //view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
+  view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 
   mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
@@ -154,6 +155,14 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
+}
+
+void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
+{
+	ViewWrapper::setViewGroup(group);
+//	std::cout << "ViewWrapper3D::setViewGroup:\n " << streamXml2String(*mViewGroup->getCamera3D()) << std::endl;
+	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
+  mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
 }
 
 void ViewWrapper3D::showAxesActionSlot(bool checked)
@@ -228,7 +237,7 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 
   updateView();
 
-  mView->getRenderer()->ResetCamera();
+  //mView->getRenderer()->ResetCamera();
 }
 
 void ViewWrapper3D::updateView()
@@ -271,7 +280,7 @@ void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
   mView->addRep(rep);
   this->updateView();
 
-  mView->getRenderer()->ResetCamera();
+//  mView->getRenderer()->ResetCamera();
 }
 
 void ViewWrapper3D::meshRemoved(const QString& uid)

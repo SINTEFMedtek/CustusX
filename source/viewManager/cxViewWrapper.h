@@ -10,6 +10,7 @@
 
 class QMenu;
 class QActionGroup;
+typedef vtkSmartPointer<class vtkCamera> vtkCameraPtr;
 
 namespace cx
 {
@@ -30,6 +31,36 @@ signals:
   void changed();
 };
 
+
+typedef boost::shared_ptr<class CameraData> CameraDataPtr;
+
+/** Class encapsulating the view transform of a camera. Use with vtkCamera
+ */
+class CameraData
+{
+public:
+  CameraData();
+  static CameraDataPtr create() { return CameraDataPtr(new CameraData()); }
+//	void writeCamera(vtkCameraPtr camera);
+//	void readCamera(vtkCameraPtr camera);
+
+	void setCamera(vtkCameraPtr camera);
+	vtkCameraPtr getCamera() const;
+
+	void addXml(QDomNode dataNode) const; ///< store internal state info in dataNode
+	void parseXml(QDomNode dataNode);///< load internal state info from dataNode
+
+//	ssc::Vector3D mPosition;
+//	ssc::Vector3D mFocalPoint;
+//	ssc::Vector3D mViewUp;
+//	double mNearClip, mFarClip;
+//	double mParallelScale;
+private:
+	mutable vtkCameraPtr mCamera;
+	void addTextElement(QDomNode parentNode, QString name, QString value) const;
+};
+
+
 typedef boost::shared_ptr<class ViewGroupData> ViewGroupDataPtr;
 
 /** Container for data shared between all members of a view group
@@ -38,6 +69,8 @@ class ViewGroupData : public QObject
 {
   Q_OBJECT
 public:
+  ViewGroupData();
+  void requestInitialize();
   std::vector<ssc::DataPtr> getData() const;
   void addData(ssc::DataPtr data);
   void removeData(ssc::DataPtr data);
@@ -45,11 +78,16 @@ public:
   std::vector<ssc::ImagePtr> getImages() const;
   std::vector<ssc::MeshPtr> getMeshes() const;
 
+  //void setCamera3D(CameraDataPtr transform) { mCamera3D = transform; }
+  CameraDataPtr getCamera3D() { return mCamera3D; }
+
 signals:
   void dataAdded(QString uid);
   void dataRemoved(QString uid);
+  void initialized();
 private:
   std::vector<ssc::DataPtr> mData;
+  CameraDataPtr mCamera3D;
 };
 
 /**
