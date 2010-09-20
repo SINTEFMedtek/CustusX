@@ -187,7 +187,7 @@ void ToolManager::createSymlink()
 
   if (files.empty())
   {
-    ssc::messageManager()->sendError(string_cast(QString("Warning: No usb connections found in /dev using filters %1").arg(filters.join(";"))));
+    ssc::messageManager()->sendError(string_cast(QString("No usb connections found in /dev using filters %1").arg(filters.join(";"))));
     return;
   }
   else
