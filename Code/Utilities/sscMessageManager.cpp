@@ -30,34 +30,24 @@ void MessageManager::destroyInstance()
 void MessageManager::sendInfo(std::string info)
 {
   QString qinfo(info.c_str());
-  /*QString message("INFO: ");
-  message.append(&qinfo);*/
   this->sendMessage(qinfo, mlINFO, 1500);
 }
 
 void MessageManager::sendWarning(std::string warning)
 {
   QString qwarning(warning.c_str());
-  /*QString message("WARNING: ");
-  message.append(&qwarning);*/
   this->sendMessage(qwarning, mlWARNING, 3000);
 }
 
 void MessageManager::sendError(std::string error)
 {
   QString qerror(error.c_str());
-  /*QString message("ERROR: ");
-  message.append(&qerror);*/
   this->sendMessage(qerror, mlERROR, 0);
 }
   
 void MessageManager::sendDebug(std::string text)
 {
   QString qdebug(text.c_str());
-  /*QString message("DEBUG: ");
-  message.append(&qdebug);*/
-  // Only print debug info to std::cout
-  //std::cout << string_cast(message) << std::endl;
   this->sendMessage(qdebug, mlDEBUG, 0);
 }
   

@@ -32,6 +32,16 @@ public:
     return message;
   }
 
+  MESSAGE_LEVEL getMessageLevel()
+  {
+    return mMessageLevel;
+  }
+
+  QString getText()
+  {
+    return mText;
+  }
+
 private:
   QString mText;
   MESSAGE_LEVEL mMessageLevel;
@@ -68,7 +78,7 @@ public:
 
 signals:
   void emittedMessage(const QString& text, int timeout); ///< The signal the owner of a statusbar should listen to. DEPRECATED!
-  void emittedMessage(Message message); ///< The signal the user should listen to
+  void emittedMessage(Message message); ///< The signal the user should listen to!
 
 private:
   bool mOnlyCout;///< Tells the MessageManager if the message only should be dumped to cout
