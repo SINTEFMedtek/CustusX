@@ -2,9 +2,11 @@
 #define MESSAGEMANAGER_H_
 
 #include <QObject>
+#include <QDateTime>
 
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
+#include "sscTime.h"
 
 class QString;
 class QDomNode;
@@ -19,7 +21,8 @@ public:
   Message(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0) :
     mText(text),
     mMessageLevel(messageLevel),
-    mTimeoutTime(timeoutTime)
+    mTimeoutTime(timeoutTime),
+    mTimeStamp(QDateTime::currentDateTime())
   {};
 
   ~Message(){};
@@ -27,7 +30,12 @@ public:
   QString getPrintableMessage()
   {
     QString message;
+    message.append(QString("["));
+    message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
+    message.append(QString("] "));
+    message.append(QString("["));
     message.append(qstring_cast(mMessageLevel));
+    message.append(QString("] "));
     message.append(mText);
     return message;
   }
@@ -42,10 +50,16 @@ public:
     return mText;
   }
 
+  QDateTime* getTimeStamp()
+  {
+    return &mTimeStamp;
+  }
+
 private:
   QString mText;
   MESSAGE_LEVEL mMessageLevel;
   int mTimeoutTime;
+  QDateTime mTimeStamp;
 };
 
 /**
