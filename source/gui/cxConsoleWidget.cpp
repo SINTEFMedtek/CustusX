@@ -49,7 +49,7 @@ void ConsoleWidget::createTextCharFormats()
   mInfoFormat.setForeground(Qt::black);
   mWarningFormat.setForeground(QColor(255,140,0)); //dark orange
   mErrorFormat.setForeground(Qt::red);
-  mDebugFormat.setForeground(Qt::blue);
+  mDebugFormat.setForeground(QColor(135,206,250)); //sky blue
 }
 
 void ConsoleWidget::format(Message& message)
