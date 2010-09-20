@@ -32,7 +32,7 @@ private slots:
 
 private:
   void createTextCharFormats(); ///< sets up the formating rules for the message levels
-  void format(Message message); ///< formats the text to suit the message level
+  void format(Message& message); ///< formats the text to suit the message level
 
   QTextBrowser* mTextBrowser;
 
