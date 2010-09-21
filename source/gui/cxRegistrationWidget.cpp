@@ -24,6 +24,8 @@
 #include "cxView3D.h"
 #include "cxView2D.h"
 #include "cxRegistrationHistoryWidget.h"
+#include "sscTypeConversions.h"
+
 
 namespace cx
 {

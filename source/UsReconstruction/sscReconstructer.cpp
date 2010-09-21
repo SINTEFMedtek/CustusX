@@ -19,6 +19,7 @@
 #include "sscPNNReconstructAlgorithm.h"
 #include "utils/sscReconstructHelper.h"
 #include "sscTime.h"
+#include "sscTypeConversions.h"
 
 //Windows fix
 #ifndef M_PI
