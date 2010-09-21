@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include "sscMessageManager.h"
 
+#include "sscTypeConversions.h"
 #include "cxToolManager.h"
 
 namespace cx
