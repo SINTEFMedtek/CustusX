@@ -11,6 +11,7 @@
 #include <QAction>
 #include <QMenu>
 #include <vtkTransform.h>
+#include <vtkCamera.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
@@ -28,6 +29,10 @@
 #include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
+#include "sscProbeRep.h"
+#include "sscGeometricRep.h"
+#include "sscToolRep3D.h"
+#include "sscVolumetricRep.h"
 
 namespace cx
 {

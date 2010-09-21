@@ -10,12 +10,14 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
+
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "sscDataManager.h"
-#include "cxView3D.h"
-#include "cxView2D.h"
+//#include "cxView3D.h"
+//#include "cxView2D.h"
+#include "sscProbeRep.h"
 
 namespace cx
 {
@@ -68,7 +70,7 @@ void ImageRegistrationWidget::activeImageChangedSlot()
   {
     //set a default treshold
     mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
-    ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+    ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
     mThresholdSlider->setValue(probeRep->getThreshold());
   }
   //enable the add point button
@@ -77,7 +79,7 @@ void ImageRegistrationWidget::activeImageChangedSlot()
 
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
-  ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
     ssc::messageManager()->sendError("Could not find a rep to add the landmark to.");
@@ -95,7 +97,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-  ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   if(!probeRep)
   {
     ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");

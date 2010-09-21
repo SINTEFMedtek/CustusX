@@ -20,6 +20,9 @@
 #include <vtkBoxWidget2.h>
 #include <vtkBoxWidget.h>
 #include "sscBoundingBox3D.h"
+#include "sscImage.h"
+#include "sscTransform3D.h"
+#include "sscVolumetricRep.h"
 
 namespace cx
 {
