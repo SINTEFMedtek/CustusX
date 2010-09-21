@@ -45,6 +45,8 @@ namespace ssc
 	  mlWARNING,
 	  mlERROR,
 	  mlDEBUG,
+	  mlCOUT,
+	  mlCERR,
 	  mlCOUNT
 	};
 } //namespace end

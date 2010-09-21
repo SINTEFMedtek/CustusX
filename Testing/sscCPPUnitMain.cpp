@@ -16,7 +16,6 @@
 //#include "sscTestSpaceOrganizer.h"
 #endif
 
-
 //#include "SonoWand.h"
 
 /**main function for SSC unit tests. 
