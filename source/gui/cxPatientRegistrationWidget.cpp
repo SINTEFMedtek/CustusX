@@ -11,11 +11,12 @@
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
 #include <sscVector3D.h>
-#include <sscVolumetricRep.h>
+
+//#include <sscVolumetricRep.h>
 #include "sscMessageManager.h"
-#include "cxLandmarkRep.h"
-#include "cxView2D.h"
-#include "cxView3D.h"
+//#include "cxLandmarkRep.h"
+//#include "cxView2D.h"
+//#include "cxView3D.h"
 #include "cxRegistrationManager.h"
 #include "sscToolManager.h"
 #include "cxDataManager.h"
