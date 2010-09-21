@@ -556,7 +556,7 @@ void MainWindow::createMenus()
   mCustusXMenu = new QMenu(tr("CustusX"), this);;
 	mFileMenu = new QMenu(tr("File"), this);;
   mWorkflowMenu = new QMenu(tr("Workflow"), this);;
-  mDataMenu = new QMenu(tr("Data"), this);
+  //mDataMenu = new QMenu(tr("Data"), this);
   mToolMenu = new QMenu(tr("Tracking"), this);
   mLayoutMenu = new QMenu(tr("Layouts"), this);
 
@@ -572,6 +572,10 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mLoadFileAction);
   mFileMenu->addAction(mClearPatientAction);
   mFileMenu->addSeparator();
+  mFileMenu->addAction(mImportDataAction);
+  mFileMenu->addAction(mDeleteDataAction);
+  mFileMenu->addAction(mLoadPatientRegistrationFromFile);
+  mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
 
   // View
@@ -584,10 +588,10 @@ void MainWindow::createMenus()
   stateManager()->getWorkflow()->fillMenu(mWorkflowMenu);
 
   //data
-  this->menuBar()->addMenu(mDataMenu);
+  /*this->menuBar()->addMenu(mDataMenu);
   mDataMenu->addAction(mImportDataAction);
   mDataMenu->addAction(mDeleteDataAction);
-  mDataMenu->addAction(mLoadPatientRegistrationFromFile);
+  mDataMenu->addAction(mLoadPatientRegistrationFromFile);*/
 
   //tool
   this->menuBar()->addMenu(mToolMenu);
