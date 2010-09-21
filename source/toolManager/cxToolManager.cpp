@@ -501,7 +501,8 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state, bool succes
     report.append(toolUid + " reported an unknown message.");
     break;
   }
-  //ssc::messageManager()->sendInfo(report);
+  //
+  ssc::messageManager()->sendInfo(report);
 }
 
 /**
