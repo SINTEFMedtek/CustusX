@@ -26,6 +26,7 @@ typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformati
 #include "sscTransform3D.h"
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {

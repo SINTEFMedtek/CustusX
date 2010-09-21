@@ -6,6 +6,7 @@
  */
 #include "sscXmlOptionItem.h"
 
+#include <map>
 #include <iostream>
 #include <QFile>
 #include <QTextStream>
@@ -13,6 +14,7 @@
 #include <QStringList>
 
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {

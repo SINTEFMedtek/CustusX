@@ -3,12 +3,8 @@
 
 #include <QObject>
 #include <QDateTime>
-
-#include "sscTypeConversions.h"
-#include "sscDefinitionStrings.h"
-#include "sscTime.h"
 #include "boost/shared_ptr.hpp"
-
+#include "sscDefinitions.h"
 class QString;
 class QDomNode;
 class QDomDocument;
@@ -19,42 +15,12 @@ namespace ssc
 class Message
 {
 public:
-  Message(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0) :
-    mText(text),
-    mMessageLevel(messageLevel),
-    mTimeoutTime(timeoutTime),
-    mTimeStamp(QDateTime::currentDateTime())
-  {};
-
-  ~Message(){};
-
-  QString getPrintableMessage()
-  {
-    QString message;
-    message.append(QString("["));
-    message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
-    message.append(QString("] "));
-    message.append(QString("["));
-    message.append(qstring_cast(mMessageLevel));
-    message.append(QString("] "));
-    message.append(mText);
-    return message;
-  }
-
-  MESSAGE_LEVEL getMessageLevel()
-  {
-    return mMessageLevel;
-  }
-
-  QString getText()
-  {
-    return mText;
-  }
-
-  QDateTime* getTimeStamp()
-  {
-    return &mTimeStamp;
-  }
+  Message(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0);
+  ~Message();
+  QString getPrintableMessage();
+  MESSAGE_LEVEL getMessageLevel();
+  QString getText();
+  QDateTime* getTimeStamp();
 
 private:
   QString mText;
@@ -62,6 +28,7 @@ private:
   int mTimeoutTime;
   QDateTime mTimeStamp;
 };
+
 
 /**
  * \class MessageManager
@@ -104,8 +71,8 @@ private:
   SingleStreamerImplPtr mCerr;
   MessageManager(); ///< Use getInstance().
   ~MessageManager(){}; ///< Use destroyInstance().
-  MessageManager(const MessageManager&){this->getInstance();}; ///< Copycontructur.
-  MessageManager& operator=(const MessageManager&){return *this->getInstance();}; ///< Assignment operator.
+  MessageManager(const MessageManager&);//{this->getInstance();}; ///< Copycontructur.
+  MessageManager& operator=(const MessageManager&);//{return *this->getInstance();}; ///< Assignment operator.
 
   void sendMessage(QString text, int timeout); ///< Emits the signal that actually sends the message.
 

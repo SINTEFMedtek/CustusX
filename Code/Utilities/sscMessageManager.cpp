@@ -4,12 +4,59 @@
 //#include <streambuf>
 #include "boost/shared_ptr.hpp"
 #include <QString>
+#include "sscTypeConversions.h"
+#include "sscDefinitionStrings.h"
+#include "sscTime.h"
 
 namespace ssc
 {
 
+
+Message::Message(QString text, MESSAGE_LEVEL messageLevel, int timeoutTime) :
+  mText(text),
+  mMessageLevel(messageLevel),
+  mTimeoutTime(timeoutTime),
+  mTimeStamp(QDateTime::currentDateTime())
+{};
+
+Message::~Message(){};
+
+QString Message::getPrintableMessage()
+{
+  QString message;
+  message.append(QString("["));
+  message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
+  message.append(QString("] "));
+  message.append(QString("["));
+  message.append(qstring_cast(mMessageLevel));
+  message.append(QString("] "));
+  message.append(mText);
+  return message;
+}
+
+MESSAGE_LEVEL Message::getMessageLevel()
+{
+  return mMessageLevel;
+}
+
+QString Message::getText()
+{
+  return mText;
+}
+
+QDateTime* Message::getTimeStamp()
+{
+  return &mTimeStamp;
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
 namespace
 {
+// --------------------------------------------------------
+
 
 /** streambuf subclass: used to override either cout or cerr and
  * reroute text to both messagemanager and original stream.

@@ -14,6 +14,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
