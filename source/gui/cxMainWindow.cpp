@@ -116,6 +116,7 @@ MainWindow::MainWindow() :
   connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)),
           this, SLOT(loggingSlot(const QString&, int)));
   ssc::messageManager()->setCoutFlag(false);
+  std::cout << "testing!" << std::endl;
   //
 
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
@@ -724,7 +725,7 @@ void MainWindow::configureSlot()
 void MainWindow::loggingSlot(const QString& message, int timeout)
 {
   //TODO Write to file and a "console" inside CX3 maybe?
-  std::cout << message.toStdString() << std::endl;
+  //std::cout << message.toStdString() << std::endl;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
