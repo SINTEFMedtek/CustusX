@@ -2,6 +2,8 @@
 #include "sscDataManager.h"
 #include "sscAxesRep.h"//test
 #include "sscXmlOptionItem.h"
+#include "sscTypeConversions.h"
+
   
 MainWindow::MainWindow(QWidget* parent)
 {

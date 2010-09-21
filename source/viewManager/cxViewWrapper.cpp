@@ -6,6 +6,7 @@
 #include "sscDataManager.h"
 #include "cxViewGroup.h" //for class Navigation
 #include "sscMesh.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
