@@ -5,6 +5,16 @@
 #include "sscDataManager.h"
 //#include "sscSlicePlaneClipper.h"
 
+#include "sscTransform3D.h"
+#include "sscToolRep3D.h"
+#include "sscVolumetricRep.h"
+#include "sscProbeRep.h"
+#include "sscGeometricRep.h"
+#include "sscProgressiveLODVolumetricRep.h"
+#include "cxTool.h"
+#include "cxLandmarkRep.h"
+
+
 namespace cx
 {
 RepManager* RepManager::mTheInstance = NULL;
@@ -61,11 +71,11 @@ RepManager::RepManager() :
   }
   for(int i=0; i<MAX_PROGRESSIVEVOLUMETRICREPS; i++)
   {
-    addRep<ProgressiveVolumetricRep>(mProgressiveVolumetricRepNames[i], &mProgressiveVolumetricRepMap);
+    addRep<ssc::ProgressiveLODVolumetricRep>(mProgressiveVolumetricRepNames[i], &mProgressiveVolumetricRepMap);
   }
   for(int i=0; i<MAX_PROBEREPS; i++)
   {
-    ProbeRepPtr probeRep = addRep<ProbeRep>(mProbeRepNames[i], &mProbeRepMap);
+    ssc::ProbeRepPtr probeRep = addRep<ssc::ProbeRep>(mProbeRepNames[i], &mProbeRepMap);
     connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
   }
   for(int i=0; i<MAX_LANDMARKREPS; i++)
@@ -194,13 +204,13 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
   return getRep<ssc::VolumetricRep>(uid, &mVolumetricRepMap);
 }
 
-ProgressiveVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
+ssc::ProgressiveLODVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
 {
-  return getRep<ProgressiveVolumetricRep>(uid, &mProgressiveVolumetricRepMap);
+  return getRep<ssc::ProgressiveLODVolumetricRep>(uid, &mProgressiveVolumetricRepMap);
 }
-ProbeRepPtr RepManager::getProbeRep(const std::string& uid)
+ssc::ProbeRepPtr RepManager::getProbeRep(const std::string& uid)
 {
-  return getRep<ProbeRep>(uid, &mProbeRepMap);
+  return getRep<ssc::ProbeRep>(uid, &mProbeRepMap);
 }
 LandmarkRepPtr RepManager::getLandmarkRep(const std::string& uid)
 {

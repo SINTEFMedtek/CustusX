@@ -3,28 +3,29 @@
 
 #include <QObject>
 #include <map>
+#include <vector>
 #include "sscForwardDeclarations.h"
-#include "sscTransform3D.h"
-#include "sscToolRep3D.h"
-#include "sscVolumetricRep.h"
-#include "sscProbeRep.h"
-#include "sscGeometricRep.h"
-#include "sscProgressiveLODVolumetricRep.h"
-#include "cxTool.h"
-#include "cxLandmarkRep.h"
+
+
+namespace ssc
+{
+  typedef boost::shared_ptr<class Rep> RepPtr;
+  typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
+}
 
 namespace cx
 {
-typedef ssc::ProbeRep ProbeRep;
-typedef ssc::Transform3D Transform3D;
-typedef ssc::ProbeRepPtr ProbeRepPtr;
-typedef ssc::ProgressiveLODVolumetricRep ProgressiveVolumetricRep;
-typedef ssc::ProgressiveLODVolumetricRepPtr ProgressiveVolumetricRepPtr;
+typedef boost::shared_ptr<class LandmarkRep> LandmarkRepPtr;
+//typedef ssc::ProbeRep ProbeRep;
+//typedef ssc::Transform3D Transform3D;
+//typedef ssc::ProbeRepPtr ProbeRepPtr;
+//typedef ssc::ProgressiveLODVolumetricRep ProgressiveVolumetricRep;
+//typedef ssc::ProgressiveLODVolumetricRepPtr ProgressiveVolumetricRepPtr;
 
 typedef std::map<std::string, ssc::RepPtr> RepMap;
 typedef std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
-typedef std::map<std::string, ProbeRepPtr> ProbeRepMap;
-typedef std::map<std::string, ProgressiveVolumetricRepPtr> ProgressiveVolumetricRepMap;
+typedef std::map<std::string, ssc::ProbeRepPtr> ProbeRepMap;
+typedef std::map<std::string, ssc::ProgressiveLODVolumetricRepPtr> ProgressiveVolumetricRepMap;
 typedef std::map<std::string, LandmarkRepPtr> LandmarkRepMap;
 typedef std::map<std::string, ssc::ToolRep3DPtr> ToolRep3DMap;
 typedef std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
@@ -64,8 +65,8 @@ public:
 
   ssc::RepPtr getRep(const std::string& uid); ///< get one specific rep
   ssc::VolumetricRepPtr getVolumetricRep(const std::string& uid); ///< get one specific Volumetric rep
-  ProbeRepPtr getProbeRep(const std::string& uid); ///< get one specific Probe rep
-  ProgressiveVolumetricRepPtr getProgressiveVolumetricRep(const std::string& uid); ///< get one specific ProgressiveLODVolumetric rep
+  ssc::ProbeRepPtr getProbeRep(const std::string& uid); ///< get one specific Probe rep
+  ssc::ProgressiveLODVolumetricRepPtr getProgressiveVolumetricRep(const std::string& uid); ///< get one specific ProgressiveLODVolumetric rep
   LandmarkRepPtr getLandmarkRep(const std::string& uid); ///<  get one specific Landmark rep
   ssc::ToolRep3DPtr getToolRep3DRep(const std::string& uid); ///<  get one specific Tool3D rep
   ssc::GeometricRepPtr getGeometricRep(const std::string& uid); ///<  get one specific Geometric rep

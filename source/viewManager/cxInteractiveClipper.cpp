@@ -23,6 +23,7 @@
 #include "sscSlicePlaneClipper.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
+#include "sscImage.h"
 
 
 namespace cx

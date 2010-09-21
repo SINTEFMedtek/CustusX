@@ -7,7 +7,7 @@
 #include "sscImage.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-#include "sscEnumConverter.h"
+//#include "sscEnumConverter.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
 #include "cxTreeModelItem.h"
