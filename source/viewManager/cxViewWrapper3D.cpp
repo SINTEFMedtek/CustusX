@@ -16,6 +16,7 @@
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
@@ -33,6 +34,7 @@
 #include "sscGeometricRep.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

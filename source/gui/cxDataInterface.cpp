@@ -11,6 +11,7 @@
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "sscTool.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {

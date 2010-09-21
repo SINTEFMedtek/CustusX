@@ -12,6 +12,7 @@
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "cxToolConfigurationParser.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
