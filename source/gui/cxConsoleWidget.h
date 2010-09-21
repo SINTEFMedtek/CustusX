@@ -36,10 +36,11 @@ private:
 
   QTextBrowser* mTextBrowser;
 
-  QTextCharFormat        mInfoFormat;
-  QTextCharFormat        mWarningFormat;
-  QTextCharFormat        mErrorFormat;
-  QTextCharFormat        mDebugFormat;
+  std::map<ssc::MESSAGE_LEVEL, QTextCharFormat> mFormat;
+//  QTextCharFormat        mInfoFormat;
+//  QTextCharFormat        mWarningFormat;
+//  QTextCharFormat        mErrorFormat;
+//  QTextCharFormat        mDebugFormat;
 };
 } // namespace cx
 #endif /* CXCONSOLEWIDGET_H_ */
