@@ -17,6 +17,7 @@
 //#include "cxLandmarkRep.h"
 //#include "cxView2D.h"
 //#include "cxView3D.h"
+#include "sscTypeConversions.h"
 #include "cxRegistrationManager.h"
 #include "sscToolManager.h"
 #include "cxDataManager.h"
