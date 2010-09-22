@@ -41,7 +41,7 @@ public:
   ssc::ImagePtr getMasterImage(); ///< get the master image
   bool isMasterImageSet(); ///< check if the master image is set
 
-  void setManualPatientRegistration(ssc::Transform3DPtr patientRegistration); ///< used for when a user wants to
+  void setManualPatientRegistration(ssc::Transform3DPtr patientRegistration); ///< used for when a user wants to ???
   ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
   void resetManualPatientientRegistration(); ///< tells the system not to use a manually added patient registration, after it uses landmarks for patient registration instead
 
