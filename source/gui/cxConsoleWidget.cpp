@@ -51,7 +51,7 @@ void ConsoleWidget::createTextCharFormats()
   mFormat[ssc::mlERROR].setForeground(Qt::red);
   mFormat[ssc::mlDEBUG].setForeground(QColor(135,206,250));
   mFormat[ssc::mlCERR].setForeground(Qt::red);
-  mFormat[ssc::mlCOUT].setForeground(QColor(80,255,80));
+  mFormat[ssc::mlCOUT].setForeground(QColor(34,139,34));
 
 //
 //  mInfoFormat.setForeground(Qt::black);
