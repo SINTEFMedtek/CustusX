@@ -41,12 +41,12 @@ public:
   ssc::ImagePtr getMasterImage(); ///< get the master image
   bool isMasterImageSet(); ///< check if the master image is set
 
-  void setManualPatientRegistration(ssc::Transform3DPtr patientRegistration); ///< used for when a user wants to ???
+  void setManualPatientRegistration(ssc::Transform3D patientRegistration); ///< used for when a user wants to ???
   ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
-  void resetManualPatientientRegistration(); ///< tells the system not to use a manually added patient registration, after it uses landmarks for patient registration instead
+//  void resetManualPatientientRegistration(); ///< tells the system not to use a manually added patient registration, after it uses landmarks for patient registration instead
 
-  ssc::Transform3DPtr getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
-  void resetOffset(); ///< removes the offset, after it uses landmarks for patient registration instead
+  ssc::Transform3D getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
+//  void resetOffset(); ///< removes the offset, after it uses landmarks for patient registration instead
 
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
@@ -57,7 +57,7 @@ public:
   void clear();
 
 public slots:
-  void setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset); ///< transform for (slightly) moving a patient registration
+  void setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset); ///< transform for (slightly) moving a patient registration
 
 signals:
   void imageRegistrationPerformed();
@@ -77,8 +77,8 @@ protected:
   ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
   QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
-  ssc::Transform3DPtr mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
-  ssc::Transform3DPtr mManualPatientRegistration; ///< patient registration loaded from file
+  ssc::Transform3D mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
+  //ssc::Transform3D mManualPatientRegistration; ///< patient registration loaded from file
 
 private:
   RegistrationManager(RegistrationManager const&); ///< not implemented

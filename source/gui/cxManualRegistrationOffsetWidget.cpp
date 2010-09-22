@@ -95,7 +95,7 @@ ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) 
   mVerticalLayout->addLayout(mOffsetsGridLayout);
   mVerticalLayout->addWidget(mResetOffsetButton);
 
-  this->setDisabled(true);
+  this->activateManualRegistrationFieldSlot();
 }
 
 ManualRegistrationOffsetWidget::~ManualRegistrationOffsetWidget()
@@ -111,6 +111,7 @@ void ManualRegistrationOffsetWidget::resetOffsetSlot()
     mYOffsetSlider->setValue(mDefaultValue);
     mZOffsetSlider->setValue(mDefaultValue);
     mResetOffsetButton->setDisabled(true);
+    this->setOffsetSlot(mDefaultValue);
   }
 }
 
@@ -118,18 +119,16 @@ void ManualRegistrationOffsetWidget::setOffsetSlot(int value)
 {
   mResetOffsetButton->setEnabled(true);
 
-  vtkMatrix4x4* offsetMatrix = vtkMatrix4x4::New(); //identity
-  offsetMatrix->SetElement(0, 3, mXOffsetSlider->value());
-  offsetMatrix->SetElement(1, 3, mYOffsetSlider->value());
-  offsetMatrix->SetElement(2, 3, mZOffsetSlider->value());
-
-  ssc::Transform3DPtr offsetPtr(new ssc::Transform3D(offsetMatrix));
-  registrationManager()->setManualPatientRegistrationOffsetSlot(offsetPtr);
+  ssc::Transform3D offset;
+  offset[0][3] = mXOffsetSlider->value();
+  offset[1][3] = mYOffsetSlider->value();
+  offset[2][3] = mZOffsetSlider->value();
+  registrationManager()->setManualPatientRegistrationOffsetSlot(offset);
 }
 
 void ManualRegistrationOffsetWidget::activateManualRegistrationFieldSlot()
 {
-  this->setEnabled(true);
+  this->setEnabled(!ssc::similar(*ssc::toolManager()->get_rMpr(), ssc::Transform3D()));
 }
 
 
