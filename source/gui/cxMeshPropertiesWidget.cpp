@@ -5,6 +5,7 @@
 #include "sscImage.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
@@ -74,7 +75,8 @@ void MeshPropertiesWidget::importTransformSlot()
     return;
   if(!mMesh)
     return;
-  mMesh->set_rMd(image->get_rMd());
+  //mMesh->set_rMd(image->get_rMd());
+  mMesh->get_rMd_History()->setRegistration(image->get_rMd());
   ssc::messageManager()->sendInfo("Assigned rMd from volume [" + image->getName() + "] to surface [" + mMesh->getName() + "]");
 }
 
