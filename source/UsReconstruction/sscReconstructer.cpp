@@ -20,6 +20,7 @@
 #include "utils/sscReconstructHelper.h"
 #include "sscTime.h"
 #include "sscTypeConversions.h"
+#include "sscRegistrationTransform.h"
 
 //Windows fix
 #ifndef M_PI
@@ -946,8 +947,8 @@ ImagePtr Reconstructer::generateOutputVolume()
   filePath += "/" + volumeName + ".mhd";
 
   image->setFilePath(string_cast(filePath));
-  image->set_rMd(mOutputVolumeParams.m_rMd);
-  
+  image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
+
   return image;
 }
 
