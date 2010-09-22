@@ -326,6 +326,7 @@ void DataManagerImpl::loadData(DataPtr data)
 {
   if (data)
   {
+    this->verifyFrameOfReferenceUid(data);
     mData[data->getUid()] = data;
     emit dataLoaded();
   }
@@ -363,6 +364,21 @@ DataPtr DataManagerImpl::getData(const std::string& uid) const
   if (iter==mData.end())
     return DataPtr();
   return iter->second;
+}
+
+void DataManagerImpl::verifyFrameOfReferenceUid(DataPtr data)
+{
+  if(data->getFrameOfReferenceUid().empty())
+  {
+    int max = 0;
+    std::map<std::string, DataPtr>::iterator iter;
+    for (iter = mData.begin(); iter != mData.end(); ++iter)
+    {
+      max = std::max(max, qstring_cast(iter->first).toInt());
+    }
+    std::string frameOfReferenceUid = string_cast(max + 1);
+    data->setFrameOfReferenceUid(frameOfReferenceUid);
+  }
 }
 
 ImagePtr DataManagerImpl::getImage(const std::string& uid) const

@@ -167,7 +167,7 @@ void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Reg
 void RegistrationHistory::setRegistration(const Transform3D& transform)
 {
   mData.clear();
-  addRegistration(RegistrationTransform(transform));
+  this->addRegistration(RegistrationTransform(transform));
 }
 
 std::vector<RegistrationTransform> RegistrationHistory::getData() const

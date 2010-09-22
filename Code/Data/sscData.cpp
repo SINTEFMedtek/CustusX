@@ -12,7 +12,7 @@ Data::Data() :
 }
 
 Data::Data(const std::string& uid, const std::string& name) :
-  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED)
+  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED), mFrameOfReferenceUid("")
 {
   if(name=="")
     mName = mUid;
@@ -49,12 +49,13 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 {
 	mRegistrationStatus = regStat;
 }
+
 /**
  * Set the transform that brings a point from local data space to (data-)ref space
  * Emits the transformChanged() signal.
  * @param rMd the transformation from data to ref
  */
-void Data::set_rMd(Transform3D rMd)
+/*void Data::set_rMd(Transform3D rMd)
 {
   m_rMd_History->setRegistration(rMd);
 //	if (similar(rMd, m_rMd))
@@ -63,8 +64,7 @@ void Data::set_rMd(Transform3D rMd)
 //	}
 //	m_rMd = rMd;
 //	emit transformChanged();
-}
-
+}*/
 
 std::string Data::getUid() const
 {
@@ -114,12 +114,21 @@ bool Data::getShading() const
   return false;
 }
 
+std::string Data::getFrameOfReferenceUid()
+{
+  return mFrameOfReferenceUid;
+}
+
+void Data::setFrameOfReferenceUid(std::string frameOfReferenceUid)
+{
+  mFrameOfReferenceUid = frameOfReferenceUid;
+}
 
 void Data::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
 
-  m_rMd_History->addXml(dataNode); //TODO: should be in the superclass
+  m_rMd_History->addXml(dataNode);
 
   QDomElement uidNode = doc.createElement("uid");
   uidNode.appendChild(doc.createTextNode(mUid.c_str()));
@@ -132,12 +141,19 @@ void Data::addXml(QDomNode& dataNode)
   QDomElement filePathNode = doc.createElement("filePath");
   filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
   dataNode.appendChild(filePathNode);
+
+  QDomElement frameOfReferenceUidNode = doc.createElement("frameOfReferenceUid");
+  frameOfReferenceUidNode.appendChild(doc.createTextNode(mFrameOfReferenceUid.c_str()));
+  dataNode.appendChild(filePathNode);
 }
 
 void Data::parseXml(QDomNode& dataNode)
 {
   if (dataNode.isNull())
     return;
+
+  if(!dataNode.namedItem("frameOfReferenceUid").isNull())
+    mFrameOfReferenceUid = dataNode.namedItem("frameOfReferenceUid").toElement().text().toStdString();
 
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);

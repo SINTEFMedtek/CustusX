@@ -46,7 +46,7 @@ public:
 	void setName(const std::string& name);
 	void setFilePath(const std::string& filePath);///< Set current file path to file
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
-	virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
+	//virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
   virtual RegistrationHistoryPtr get_rMd_History();
 
 	virtual std::string getUid() const; ///< \return unique id for this instance
@@ -56,6 +56,9 @@ public:
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
   virtual void setShading(bool on);
   virtual bool getShading() const;
+
+  virtual std::string getFrameOfReferenceUid();
+  virtual void setFrameOfReferenceUid(std::string frameOfReferenceUid);
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
@@ -73,6 +76,7 @@ protected:
 	std::string mUid;
 	std::string mName;
 	std::string mFilePath;
+	std::string mFrameOfReferenceUid;
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	//Transform3D m_rMd; ///< the transform from data to reference space
