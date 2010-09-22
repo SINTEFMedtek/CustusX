@@ -44,9 +44,9 @@ protected slots:
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
   void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
-  void resetOffsetSlot(); ///< resets the patient registration offset to zero
-  void setOffsetSlot(int value); ///< set the patient registration offset
-  void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
+//  void resetOffsetSlot(); ///< resets the patient registration offset to zero
+//  void setOffsetSlot(int value); ///< set the patient registration offset
+//  void activateManualRegistrationFieldSlot(); ///< activates the manuall offset functionality
   void enableToolSampleButton();
 
 protected:
@@ -58,24 +58,24 @@ protected:
 
   //gui
   QPushButton* mToolSampleButton; ///< the Sample Tool button
-  QLabel* mOffsetLabel; ///< header label for the offset section
-  QWidget* mOffsetWidget; ///< widget for offset functionality
-  QGridLayout* mOffsetsGridLayout; ///< layout to put the offset objects into
-  QLabel* mXLabel; ///< the text X
-  QLabel* mYLabel; ///< the text Y
-  QLabel* mZLabel; ///< the text Z
-  QSlider* mXOffsetSlider; ///< slider for the user to manually adjust a patient registration with an offset
-  QSlider* mYOffsetSlider; ///< slider for the user to manually adjust a patient registration with an offset
-  QSlider* mZOffsetSlider; ///< slider for the user to manually adjust a patient registration with an offset
-  QSpinBox* mXSpinBox; ///< box for showing X value
-  QSpinBox* mYSpinBox; ///< box for showing Y value
-  QSpinBox* mZSpinBox; ///< box for showing Z value
-  QPushButton* mResetOffsetButton; ///< button for resetting the offset to zero
+  //QLabel* mOffsetLabel; ///< header label for the offset section
+  //QWidget* mOffsetWidget; ///< widget for offset functionality
+  //QGridLayout* mOffsetsGridLayout; ///< layout to put the offset objects into
+//  QLabel* mXLabel; ///< the text X
+//  QLabel* mYLabel; ///< the text Y
+//  QLabel* mZLabel; ///< the text Z
+//  QSlider* mXOffsetSlider; ///< slider for the user to manually adjust a patient registration with an offset
+//  QSlider* mYOffsetSlider; ///< slider for the user to manually adjust a patient registration with an offset
+//  QSlider* mZOffsetSlider; ///< slider for the user to manually adjust a patient registration with an offset
+//  QSpinBox* mXSpinBox; ///< box for showing X value
+//  QSpinBox* mYSpinBox; ///< box for showing Y value
+//  QSpinBox* mZSpinBox; ///< box for showing Z value
+//  QPushButton* mResetOffsetButton; ///< button for resetting the offset to zero
 
   //data
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
 
-  int mMinValue, mMaxValue, mDefaultValue; ///< values for the range of the offset
+  //int mMinValue, mMaxValue, mDefaultValue; ///< values for the range of the offset
 
 private:
   PatientRegistrationWidget(); ///< not implemented

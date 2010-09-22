@@ -12,6 +12,7 @@
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
 #include "cxConsoleWidget.h"
+#include "cxManualRegistrationOffsetWidget.h"
 #include "cxNavigationWidget.h"
 //#include "cxTransferFunctionWidget.h"
 #include "cxImageRegistrationWidget.h"
@@ -53,6 +54,7 @@ MainWindow::MainWindow() :
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mConsoleWidget(new ConsoleWidget(this)),
+  mManualRegistrationOffsetWidget(new ManualRegistrationOffsetWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mSettings(DataLocations::getSettings())
 {
@@ -88,6 +90,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mPatientRegistrationWidget);
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mConsoleWidget);
+  this->addAsDockWidget(mManualRegistrationOffsetWidget);
 
   this->createActions();
   this->createToolBars();
