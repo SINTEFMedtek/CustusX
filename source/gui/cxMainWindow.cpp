@@ -233,15 +233,12 @@ void MainWindow::createActions()
   mDeleteDataAction = new QAction(tr("Delete current image"), this);
   mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
 
-  mLoadPatientRegistrationFromFile = new QAction(tr("Load patient registration from file"), this);
-  mLoadPatientRegistrationFromFile->setStatusTip("Select a txt-file to use as patient registration");
+  //mLoadPatientRegistrationFromFile = new QAction(tr("Load patient registration from file"), this);
+  //mLoadPatientRegistrationFromFile->setStatusTip("Select a txt-file to use as patient registration");
 
-  connect(mImportDataAction, SIGNAL(triggered()),
-          this, SLOT(importDataSlot()));
-  connect(mDeleteDataAction, SIGNAL(triggered()),
-          this, SLOT(deleteDataSlot()));
-  connect(mLoadPatientRegistrationFromFile, SIGNAL(triggered()),
-          this, SLOT(loadPatientRegistrationSlot()));
+  connect(mImportDataAction, SIGNAL(triggered()), this, SLOT(importDataSlot()));
+  connect(mDeleteDataAction, SIGNAL(triggered()), this, SLOT(deleteDataSlot()));
+//  connect(mLoadPatientRegistrationFromFile, SIGNAL(triggered()), this, SLOT(loadPatientRegistrationSlot()));
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
@@ -578,7 +575,7 @@ void MainWindow::createMenus()
   mFileMenu->addSeparator();
   mFileMenu->addAction(mImportDataAction);
   mFileMenu->addAction(mDeleteDataAction);
-  mFileMenu->addAction(mLoadPatientRegistrationFromFile);
+  //mFileMenu->addAction(mLoadPatientRegistrationFromFile);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
 
@@ -674,53 +671,55 @@ void MainWindow::deleteDataSlot()
 {
   emit deleteCurrentImage();
 }
-void MainWindow::loadPatientRegistrationSlot()
-{
-  /*Expecting a file that looks like this
-   *00 01 02 03
-   *10 11 12 13
-   *20 21 22 23
-   *30 31 32 33
-   */
 
-  QString registrationFilePath = QFileDialog::getOpenFileName(this,
-      tr("Select patient registration file (*.txt)"),
-      mSettings->value("globalPatientDataFolder").toString(),
-      tr("Patient registration files (*.txt)"));
+//void MainWindow::loadPatientRegistrationSlot()
+//{
+//  /*Expecting a file that looks like this
+//   *00 01 02 03
+//   *10 11 12 13
+//   *20 21 22 23
+//   *30 31 32 33
+//   */
+//
+//  QString registrationFilePath = QFileDialog::getOpenFileName(this,
+//      tr("Select patient registration file (*.txt)"),
+//      mSettings->value("globalPatientDataFolder").toString(),
+//      tr("Patient registration files (*.txt)"));
+//
+//  //Check that the file can be open and read
+//  QFile registrationFile(registrationFilePath);
+//  if(!registrationFile.open(QIODevice::ReadOnly))
+//  {
+//    ssc::messageManager()->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
+//    return;
+//  }else
+//  {
+//    vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
+//    //read the content, 4x4 matrix
+//    QTextStream inStream(&registrationFile);
+//    for(int i=0; i<4; i++)
+//    {
+//      QString line = inStream.readLine();
+//      std::cout << line.toStdString() << std::endl;
+//      QStringList list = line.split(" ", QString::SkipEmptyParts);
+//      if(list.size() != 4)
+//      {
+//        ssc::messageManager()->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
+//        return;
+//      }
+//      matrix->SetElement(i,0,list[0].toDouble());
+//      matrix->SetElement(i,1,list[1].toDouble());
+//      matrix->SetElement(i,2,list[2].toDouble());
+//      matrix->SetElement(i,3,list[3].toDouble());
+//    }
+//    //set the toolmanageres matrix
+//    ssc::Transform3D patientRegistration = ssc::Transform3D(matrix);
+//    registrationManager()->setManualPatientRegistration(patientRegistration);
+//    //std::cout << (*patientRegistration.get()) << std::endl;
+//    ssc::messageManager()->sendInfo("New patient registration is set.");
+//  }
+//}
 
-  //Check that the file can be open and read
-  QFile registrationFile(registrationFilePath);
-  if(!registrationFile.open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
-    return;
-  }else
-  {
-    vtkMatrix4x4* matrix = vtkMatrix4x4::New();
-    //read the content, 4x4 matrix
-    QTextStream inStream(&registrationFile);
-    for(int i=0; i<4; i++)
-    {
-      QString line = inStream.readLine();
-      std::cout << line.toStdString() << std::endl;
-      QStringList list = line.split(" ", QString::SkipEmptyParts);
-      if(list.size() != 4)
-      {
-        ssc::messageManager()->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
-        return;
-      }
-      matrix->SetElement(i,0,list[0].toDouble());
-      matrix->SetElement(i,1,list[1].toDouble());
-      matrix->SetElement(i,2,list[2].toDouble());
-      matrix->SetElement(i,3,list[3].toDouble());
-    }
-    //set the toolmanageres matrix
-    ssc::Transform3DPtr patientRegistration(new ssc::Transform3D(matrix));
-    registrationManager()->setManualPatientRegistration(patientRegistration);
-    //std::cout << (*patientRegistration.get()) << std::endl;
-    ssc::messageManager()->sendInfo("New patient registration is set.");
-  }
-}
 void MainWindow::configureSlot()
 {
   ssc::toolManager()->configure();
