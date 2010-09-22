@@ -69,6 +69,8 @@ bool RegistrationManager::isMasterImageSet()
 
 void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patientRegistration)
 {
+  ssc::messageManager()->sendWarning("RegistrationManager::setManualPatientRegistration NEEDS REFACTORING!!!");
+
   mManualPatientRegistration = patientRegistration;
 
   ssc::RegistrationTransform regTrans(*patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
@@ -144,6 +146,24 @@ std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::Land
       retval.push_back(uid);
   }
   return retval;
+}
+
+void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data)
+{
+  std::string frameOfReferenceUid = data->getFrameOfReferenceUid();
+
+  std::map<std::string, ssc::DataPtr> dataMap = ssc::dataManager()->getData();
+  std::map<std::string, ssc::DataPtr>::iterator it;
+  for(it = dataMap.begin(); it!=dataMap.end(); ++it)
+  {
+    if(frameOfReferenceUid == it->second->getFrameOfReferenceUid())
+    {
+      ssc::RegistrationTransform newTransform = deltaTransform;
+      newTransform.mValue = deltaTransform.mValue * it->second->get_rMd();
+      it->second->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
+    }
+  }
+
 }
 
 /**Convert the landmarks given by uids to vtk points.
@@ -261,8 +281,12 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   if (!ok)
     return;
 
-  ssc::RegistrationTransform regTrans(rMd, QDateTime::currentDateTime(), "Image to Image");
-  image->get_rMd_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  ssc::Transform3D delta = rMd * image->get_rMd().inv();
+
+  ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
+  this->updateRegistration(mLastRegistrationTime, regTrans, image);
+
+  //image->get_rMd_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
   emit imageRegistrationPerformed();
