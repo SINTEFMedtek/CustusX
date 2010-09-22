@@ -67,67 +67,55 @@ bool RegistrationManager::isMasterImageSet()
   return mMasterImage;
 }
 
-void RegistrationManager::setManualPatientRegistration(ssc::Transform3DPtr patientRegistration)
+void RegistrationManager::setManualPatientRegistration(ssc::Transform3D patientRegistration)
 {
   ssc::messageManager()->sendWarning("RegistrationManager::setManualPatientRegistration NEEDS REFACTORING!!!");
 
-  mManualPatientRegistration = patientRegistration;
+  //mManualPatientRegistration = patientRegistration;
 
-  ssc::RegistrationTransform regTrans(*patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
+  ssc::RegistrationTransform regTrans(patientRegistration, QDateTime::currentDateTime(), "Manual Patient");
   ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   //if an offset existed, its no longer valid and should be removed
-  mPatientRegistrationOffset.reset();
+  mPatientRegistrationOffset = ssc::Transform3D();
 
   ssc::messageManager()->sendInfo("Manual patient registration is set.");
 }
 
-ssc::Transform3DPtr RegistrationManager::getManualPatientRegistration()
-{
-  return mManualPatientRegistration;
-}
+//ssc::Transform3DPtr RegistrationManager::getManualPatientRegistration()
+//{
+//  return mManualPatientRegistration;
+//}
 
-void RegistrationManager::resetManualPatientientRegistration()
-{
-  mManualPatientRegistration.reset();
-  this->doPatientRegistration();
-}
+//void RegistrationManager::resetManualPatientientRegistration()
+//{
+//  mManualPatientRegistration.reset();
+//  this->doPatientRegistration();
+//}
 
-void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3DPtr offset)
+void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset)
 {
-  ssc::Transform3D currentTransform;
-  if (mManualPatientRegistration) //we use this if we have it
-  {
-    currentTransform = *mManualPatientRegistration;
-  }
-  else if (mMasterImage)
-  {
-    this->resetOffset();
-    currentTransform = *ssc::toolManager()->get_rMpr();
-  }
-  else //if we dont have a masterimage or a manualtransform we just want to save the offset?
-  {
-    //mPatientRegistrationOffset = offset; ?
-    return;
-  }
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+  ssc::Transform3D deltaOffset = offset*mPatientRegistrationOffset.inv();
+
+  ssc::RegistrationTransform regTrans(deltaOffset*rMpr, QDateTime::currentDateTime(), "Manual Patient Offset");
+  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  mLastRegistrationTime = regTrans.mTimestamp;
+
   mPatientRegistrationOffset = offset;
-  ssc::Transform3D newTransform = (*mPatientRegistrationOffset) * currentTransform;
-  ssc::RegistrationTransform regTrans(newTransform, QDateTime::currentDateTime(), "Manual Patient Offset");
-  ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
-
   ssc::messageManager()->sendInfo("Offset for the patient registration is set.");
 }
 
-ssc::Transform3DPtr RegistrationManager::getManualPatientRegistrationOffset()
+ssc::Transform3D RegistrationManager::getManualPatientRegistrationOffset()
 {
   return mPatientRegistrationOffset;
 }
 
-void RegistrationManager::resetOffset()
-{
-  mPatientRegistrationOffset.reset();
-  this->doPatientRegistration();
-}
+//void RegistrationManager::resetOffset()
+//{
+//  mPatientRegistrationOffset = ssc::Transform3D();
+//  this->doPatientRegistration();
+//}
 
 /**Inspect the landmarks in data a and b, find landmarks defined in both of them and
  * that also is active.
@@ -224,12 +212,8 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 
 void RegistrationManager::doPatientRegistration()
 {
-  //std::cout << "RegistrationManager::doPatientRegistration()" << std::endl;
   if(!mMasterImage)
-  {
-    //ssc::messageManager()->sendWarning("Cannot do a patient registration without having a master image. Mark some landmarks in an image and try again.");
     return;
-  }
 
   ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
   ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
@@ -247,6 +231,8 @@ void RegistrationManager::doPatientRegistration()
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
+
+  mPatientRegistrationOffset = ssc::Transform3D();
 
   emit patientRegistrationPerformed();
   ssc::messageManager()->sendInfo("Patient registration has been performed.");
@@ -286,7 +272,6 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
   this->updateRegistration(mLastRegistrationTime, regTrans, image);
 
-  //image->get_rMd_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
   emit imageRegistrationPerformed();
