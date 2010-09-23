@@ -136,21 +136,31 @@ std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::Land
   return retval;
 }
 
+//class FrameGraphNode
+//{
+//  std::vector<ssc::DataPtr> getAllSiblings()
+//  {
+//
+//  }
+//  QDomNode mNode;
+//};
+
+
 void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data)
 {
-  std::string frameOfReferenceUid = data->getFrameOfReferenceUid();
-
-  std::map<std::string, ssc::DataPtr> dataMap = ssc::dataManager()->getData();
-  std::map<std::string, ssc::DataPtr>::iterator it;
-  for(it = dataMap.begin(); it!=dataMap.end(); ++it)
-  {
-    if(frameOfReferenceUid == it->second->getFrameOfReferenceUid())
-    {
-      ssc::RegistrationTransform newTransform = deltaTransform;
-      newTransform.mValue = deltaTransform.mValue * it->second->get_rMd();
-      it->second->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
-    }
-  }
+//  std::string parentFrame = data->getParentFrame();
+//
+//  std::map<std::string, ssc::DataPtr> dataMap = ssc::dataManager()->getData();
+//  std::map<std::string, ssc::DataPtr>::iterator it;
+//  for(it = dataMap.begin(); it!=dataMap.end(); ++it)
+//  {
+//    if(frameOfReferenceUid == it->second->getFrameOfReferenceUid())
+//    {
+//      ssc::RegistrationTransform newTransform = deltaTransform;
+//      newTransform.mValue = deltaTransform.mValue * it->second->get_rMd();
+//      it->second->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
+//    }
+//  }
 
 }
 
