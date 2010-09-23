@@ -31,6 +31,8 @@
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
 #include "cxLayoutEditor.h"
+#include "cxFrameForest.h"
+
 namespace cx
 {
 
@@ -425,7 +427,7 @@ void MainWindow::resetDesktopSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
-  
+  std::cout << "load" << std::endl;
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   // Create folder
   if(!QDir().exists(patientDatafolder))
@@ -441,6 +443,9 @@ void MainWindow::loadPatientFileSlot()
     return; // On cancel
 
   stateManager()->getPatientData()->loadPatient(choosenDir);
+  std::cout << "end:" << std::endl;
+
+  cx::FrameForest forest;
 }
 
 void MainWindow::importDataSlot()
