@@ -7,6 +7,8 @@ SET( CX_QT_MOC_HEADER_FILES
 SET ( ${LIB}_registrationManager
 	cxRegistrationManager.h
 	cxRegistrationManager.cpp
+	cxFrameForest.h
+    cxFrameForest.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
