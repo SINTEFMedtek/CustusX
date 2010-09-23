@@ -34,6 +34,7 @@ SET(cxProject_MOC_HDRS
   cxDoubleSpanSlider.h
   qxtspanslider_p.h
   qxtspanslider.h
+  cxFrameTreeWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -111,6 +112,8 @@ SET(${LIBNAME}_SRCS
     qxtspanslider_p.h
     qxtspanslider.h
     qxtspanslider.cpp    
+    cxFrameTreeWidget.cpp
+    cxFrameTreeWidget.cpp
     
     ${cxProject_RCC_SRCS} )
 

@@ -168,8 +168,9 @@ protected:
   class RegistrationHistoryWidget*      mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*         mVolumePropertiesWidget;
   class ConsoleWidget*                  mConsoleWidget;
-  class ManualRegistrationOffsetWidget*  mManualRegistrationOffsetWidget;
+  class ManualRegistrationOffsetWidget* mManualRegistrationOffsetWidget;
   class CustomStatusBar*                mCustomStatusBar;
+  class FrameTreeWidget*                mFrameTreeWidget;
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings

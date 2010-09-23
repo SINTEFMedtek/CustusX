@@ -54,6 +54,7 @@ public:
   std::vector<ssc::DataPtr> getAllDataIn(QDomNode node);
   QDomDocument getDocument();
 private:
+  bool isRootNode(QDomNode node);
   QDomNode getNodeAnyway(QString frame);
   bool isAncestorOf(QDomNode node, QDomNode ancestor);
   void insertFrame(ssc::DataPtr data);

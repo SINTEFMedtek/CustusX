@@ -144,11 +144,19 @@ std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::Land
  */
 void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrameUid)
 {
+//  std::cout << "update reg" << std::endl;
+
   FrameForest forest;
   QDomNode target = forest.getNode(qstring_cast(data->getUid()));
   QDomNode masterFrame = forest.getNode(masterFrameUid);
   QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
   std::vector<ssc::DataPtr> targetData = forest.getAllDataIn(targetBase);
+
+//  std::cout << "master frame : " << masterFrame.toElement().tagName() << std::endl;
+//  std::cout << "target frame : " << target.toElement().tagName() << std::endl;
+//std::cout << "targetdata: " << targetData.size() << std::endl;
+//std::cout << "targetBase : " << targetBase.toElement().tagName() << std::endl;
+
 
   // update the transform on all target data:
   for (unsigned i=0; i<targetData.size(); ++i)
@@ -173,6 +181,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   }
   // as we now have mutated the datamanager, forest is now outdated.
 
+  FrameForest forest2;
 }
 
 /**Convert the landmarks given by uids to vtk points.
@@ -205,7 +214,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
-    ssc::messageManager()->sendInfo("not enough points to register");
+    ssc::messageManager()->sendInfo("Landmark registration: not enough points to register");
     return ssc::Transform3D();
   }
 
