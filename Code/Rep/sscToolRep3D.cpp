@@ -175,11 +175,11 @@ void ToolRep3D::update()
   //Transform3D sMr = mSlicer->get_sMr();
   //Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
   //mProbeSector->setPosition(sMr*rMpr*prMt);
-  mProbeSector->setPosition(rMpr*prMt);
+//  mProbeSector->setPosition(rMpr*prMt);
 
   // Testcode
   // Sector code
-  if (this->showProbe())
+  /*if (this->showProbe())
   {
     mProbeSector->setSector(mTool->getProbeSector());
     mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
@@ -188,7 +188,7 @@ void ToolRep3D::update()
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
     mProbeSectorActor->SetVisibility(mTool->getVisible());
-  }
+  }*/
 
   this->updateOffsetGraphics();
 }
