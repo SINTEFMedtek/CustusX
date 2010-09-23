@@ -144,7 +144,7 @@ void Data::addXml(QDomNode& dataNode)
 
   QDomElement parentFrameNode = doc.createElement("parentFrame");
   parentFrameNode.appendChild(doc.createTextNode(mParentFrame.c_str()));
-  dataNode.appendChild(filePathNode);
+  dataNode.appendChild(parentFrameNode);
 }
 
 void Data::parseXml(QDomNode& dataNode)

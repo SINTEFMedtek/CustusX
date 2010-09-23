@@ -374,9 +374,13 @@ void DataManagerImpl::verifyParentFrame(DataPtr data)
     std::map<std::string, DataPtr>::iterator iter;
     for (iter = mData.begin(); iter != mData.end(); ++iter)
     {
-      max = std::max(max, qstring_cast(iter->first).toInt());
+      //max = std::max(max, qstring_cast(iter->first).toInt());
+      QStringList parentList = qstring_cast(iter->second->getParentFrame()).split("_");
+      if (parentList.size()<2)
+        continue;
+      max = std::max(max, parentList[1].toInt());
     }
-    std::string parentFrame = string_cast(max + 1);
+    std::string parentFrame = "frame_" + string_cast(max + 1);
     data->setParentFrame(parentFrame);
   }
 }
