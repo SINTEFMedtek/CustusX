@@ -12,6 +12,7 @@
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
 #include "sscDataManager.h"
+#include "cxFrameForest.h"
 
 namespace cx
 {
@@ -136,31 +137,41 @@ std::vector<std::string> RegistrationManager::getUsableLandmarks(const ssc::Land
   return retval;
 }
 
-//class FrameGraphNode
-//{
-//  std::vector<ssc::DataPtr> getAllSiblings()
-//  {
-//
-//  }
-//  QDomNode mNode;
-//};
-
-
-void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data)
+/** Update the registration for data and all data connected to its space.
+ *
+ * Registration is done relative to masterFrame, i.e. data is moved relative to the masterFrame.
+ *
+ */
+void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrameUid)
 {
-//  std::string parentFrame = data->getParentFrame();
-//
-//  std::map<std::string, ssc::DataPtr> dataMap = ssc::dataManager()->getData();
-//  std::map<std::string, ssc::DataPtr>::iterator it;
-//  for(it = dataMap.begin(); it!=dataMap.end(); ++it)
-//  {
-//    if(frameOfReferenceUid == it->second->getFrameOfReferenceUid())
-//    {
-//      ssc::RegistrationTransform newTransform = deltaTransform;
-//      newTransform.mValue = deltaTransform.mValue * it->second->get_rMd();
-//      it->second->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
-//    }
-//  }
+  FrameForest forest;
+  QDomNode target = forest.getNode(qstring_cast(data->getUid()));
+  QDomNode masterFrame = forest.getNode(masterFrameUid);
+  QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
+  std::vector<ssc::DataPtr> targetData = forest.getAllDataIn(targetBase);
+
+  // update the transform on all target data:
+  for (unsigned i=0; i<targetData.size(); ++i)
+  {
+    ssc::RegistrationTransform newTransform = deltaTransform;
+    newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
+    targetData[i]->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
+  }
+
+  // connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
+  QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
+  // iterate over all target data,
+  //forest.reconnectFrame(targetBase, masterAncestor); // alternative if we move operation below into forest
+
+  for (unsigned i=0; i<targetData.size(); ++i)
+  {
+    std::string masterAncestorUid = string_cast(masterAncestor.toElement().tagName());
+    std::string targetBaseUid = string_cast(targetBase.toElement().tagName());
+
+    if (targetData[i]->getParentFrame() == targetBaseUid)
+      targetData[i]->setParentFrame(masterAncestorUid);
+  }
+  // as we now have mutated the datamanager, forest is now outdated.
 
 }
 
@@ -280,7 +291,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::Transform3D delta = rMd * image->get_rMd().inv();
 
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
-  this->updateRegistration(mLastRegistrationTime, regTrans, image);
+  this->updateRegistration(mLastRegistrationTime, regTrans, image, qstring_cast(mMasterImage->getUid()));
 
   mLastRegistrationTime = regTrans.mTimestamp;
 
