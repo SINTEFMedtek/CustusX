@@ -3,6 +3,7 @@
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
+#include "sscUSProbeSector.h"
 
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
@@ -45,6 +46,7 @@ protected:
 	ToolRep3D(const std::string& uid, const std::string& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
+  bool showProbe();
 
 private slots:
 	/**
@@ -60,6 +62,7 @@ private slots:
 	void receiveVisible(bool visible);
 	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
 private:
+	void update();
 	void updateOffsetGraphics();
 
 	ToolPtr mTool;
@@ -72,6 +75,11 @@ private:
   bool mStayHiddenAfterVisible;
 	bool mStayVisibleAfterHide;
 	bool mOffsetPointVisibleAtZeroOffset;
+
+	//US Probe sector
+	USProbeSectorPtr mProbeSector;
+	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
+	vtkActorPtr mProbeSectorActor;
 };
 } // namespace ssc
 

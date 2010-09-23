@@ -160,8 +160,39 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 //	  return;
 //	std::cout << "passed" << std::endl;
 	mToolActor->SetUserMatrix( rMt.matrix());
-	updateOffsetGraphics();
+	//updateOffsetGraphics();
+	this->update();
 }
+
+void ToolRep3D::update()
+{
+  Transform3D prMt;
+  if (mTool)
+  {
+    prMt = mTool->get_prMt();
+  }
+  Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+  //Transform3D sMr = mSlicer->get_sMr();
+  //Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
+  //mProbeSector->setPosition(sMr*rMpr*prMt);
+  mProbeSector->setPosition(rMpr*prMt);
+
+  // Testcode
+  // Sector code
+  if (this->showProbe())
+  {
+    mProbeSector->setSector(mTool->getProbeSector());
+    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
+    if (mProbeSectorPolyDataMapper->GetInput())
+    {
+      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+    }
+    mProbeSectorActor->SetVisibility(mTool->getVisible());
+  }
+
+  this->updateOffsetGraphics();
+}
+
 
 void ToolRep3D::updateOffsetGraphics()
 {
@@ -214,7 +245,8 @@ void ToolRep3D::receiveVisible(bool visible)
 
   std::cout << "Tool3DRep: receiveVisible "<< mTool->getName() << visible << " - " << mStayHiddenAfterVisible << std::endl;
 
-	updateOffsetGraphics();
+	//updateOffsetGraphics();
+  this->update();
 }
 
 void ToolRep3D::setStayHiddenAfterVisible(bool val)
@@ -241,4 +273,8 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 	updateOffsetGraphics();
 }
 
+bool ToolRep3D::showProbe()
+{
+  return mTool && mTool->getType()==ssc::Tool::TOOL_US_PROBE;
+}
 } // namespace ssc
