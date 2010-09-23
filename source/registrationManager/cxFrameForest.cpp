@@ -28,6 +28,12 @@ FrameForest::FrameForest()
   std::cout << mDocument.toString(4) << std::endl;
 }
 
+QDomDocument FrameForest::getDocument()
+{
+  return mDocument;
+}
+
+
 /** Insert one data in the correct position in the tree
  */
 void FrameForest::insertFrame(ssc::DataPtr data)
@@ -61,7 +67,7 @@ QDomNode FrameForest::getNodeAnyway(QString frame)
   QDomNode retval = this->getNode(frame);
   if (retval.isNull())
   {
-    QDomElement retval = mDocument.createElement(frame);
+    retval = mDocument.createElement(frame);
     mDocument.documentElement().appendChild(retval);
   }
   return retval;
@@ -71,20 +77,32 @@ QDomNode FrameForest::getNodeAnyway(QString frame)
  */
 bool FrameForest::isAncestorOf(QDomNode node, QDomNode ancestor)
 {
-  while (!node.isNull())
+  //std::cout << "isAncestorOf : " << node.toElement().tagName() << "---"  << ancestor.toElement().tagName() << std::endl;
+
+  while (!this->isRootNode(node))
   {
     if (node==ancestor)
+    {
+      //std::cout << "return true" << std::endl;;
       return true;
+    }
     node = node.parentNode();
   }
+  //std::cout << "return false" << std::endl;;
   return false;
+}
+
+bool FrameForest::isRootNode(QDomNode node)
+{
+  return node==mDocument.documentElement();
 }
 
 /** Find the oldest ancestor of node.
  */
 QDomNode FrameForest::getOldestAncestor(QDomNode node)
 {
-  while (!node.parentNode().isNull())
+  //while (!node.parentNode().isNull() && !node.parentNode().toElement().tagName().isEmpty())
+  while (!this->isRootNode(node.parentNode()))
   {
     node = node.parentNode();
   }
@@ -95,15 +113,19 @@ QDomNode FrameForest::getOldestAncestor(QDomNode node)
  */
 QDomNode FrameForest::getOldestAncestorNotCommonToRef(QDomNode node, QDomNode ref)
 {
-  if (this->isAncestorOf(node, ref))
+  //std::cout << "getOldestAncestorNotCommonToRef " << node.toElement().tagName() << " - " << ref.toElement().tagName() << std::endl;
+  if (this->isAncestorOf(ref, node))
     return QDomNode();
 
-  while (!node.parentNode().isNull())
+  while (!this->isRootNode(node.parentNode()))
   {
-    if (this->isAncestorOf(node.parentNode(), ref))
+    //std::cout << "getOldestAncestorNotCommonToRef iterate start: " << node.toElement().tagName()  << std::endl;
+    if (this->isAncestorOf(ref, node.parentNode()))
       break;
     node = node.parentNode();
+    //std::cout << "getOldestAncestorNotCommonToRef iterate stop: " << node.toElement().tagName()  << std::endl;
   }
+  //std::cout << std::endl;
   return node;
 }
 

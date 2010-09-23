@@ -32,6 +32,7 @@
 #include "cxMeshPropertiesWidget.h"
 #include "cxLayoutEditor.h"
 #include "cxFrameForest.h"
+#include "cxFrameTreeWidget.h"
 
 namespace cx
 {
@@ -58,6 +59,7 @@ MainWindow::MainWindow() :
   mConsoleWidget(new ConsoleWidget(this)),
   mManualRegistrationOffsetWidget(new ManualRegistrationOffsetWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
+  mFrameTreeWidget(new FrameTreeWidget(this)),
   mSettings(DataLocations::getSettings())
 {
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
@@ -93,6 +95,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mConsoleWidget);
   this->addAsDockWidget(mManualRegistrationOffsetWidget);
+  this->addAsDockWidget(mFrameTreeWidget);
 
   this->createActions();
   this->createToolBars();
