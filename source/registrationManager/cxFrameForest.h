@@ -46,33 +46,17 @@ class FrameForest
 {
 public:
   FrameForest();
-  void insertFrame(ssc::DataPtr data)
-  {
-      QString parentFrame = qstring_cast(data->getParentFrame());
-      QString currentFrame = qstring_cast(data->getUid());
+  QDomNode getNode(QString frame);
+  QDomNode getOldestAncestor(QDomNode node);
 
-      QDomNode parentNode = this->getNode(parentFrame);
-      QDomNode currentNode = this->getNode(currentFrame);
-
-      // move currentNode to child of parentNode
-      currentNode = currentNode.parentNode().removeChild(currentNode);
-      parentNode.appendChild(currentNode);
-  }
-
-  QDomNode getNode(QString frame)
-  {
-     QDomNodeList list = mDocument.elementsByTagName(frame);
-     if (!list.isEmpty())
-       return list.item(0);
-
-     QDomElement elem = mDocument.createElement(frame);
-     mDocument.documentElement().appendChild(elem);
-     return elem;
-  }
-
-  //FrameGraphNodePtr getOldestAncestorNotCommonToRef(FrameGraphNodePtr child, FrameGraphNodePtr ref);
+  QDomNode getOldestAncestorNotCommonToRef(QDomNode child, QDomNode ref);
+  std::vector<QDomNode> getAllNodesFor(QDomNode node);
+  std::vector<ssc::DataPtr> getAllDataIn(QDomNode node);
   QDomDocument getDocument();
 private:
+  QDomNode getNodeAnyway(QString frame);
+  bool isAncestorOf(QDomNode node, QDomNode ancestor);
+  void insertFrame(ssc::DataPtr data);
   QDomDocument mDocument;
 };
 
