@@ -114,6 +114,18 @@ void ToolRep3D::setTool(ToolPtr tool)
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
 
 	}
+	// Testcode
+	// Sector code
+	if (this->showProbe())
+	{
+	  mProbeSector->setSector(mTool->getProbeSector());
+	  mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
+	  if (mProbeSectorPolyDataMapper->GetInput())
+	  {
+	    mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+	  }
+	  mProbeSectorActor->SetVisibility(mTool->getVisible());
+	}
 }
 
 bool ToolRep3D::hasTool(ToolPtr tool) const
@@ -241,4 +253,8 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 	updateOffsetGraphics();
 }
 
+bool ToolRep3D::showProbe()
+{
+  return mTool && mTool->getType()==ssc::Tool::TOOL_US_PROBE;
+}
 } // namespace ssc

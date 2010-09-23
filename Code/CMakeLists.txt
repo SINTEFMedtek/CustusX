@@ -207,6 +207,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicePlanes3DRep.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscSlicePlaneClipper.cpp
+    Rep/sscUSProbeSector.h
+    Rep/sscUSProbeSector.cpp
     Data/sscLandmark.h
     Data/sscLandmark.cpp
     Data/sscData.cpp
