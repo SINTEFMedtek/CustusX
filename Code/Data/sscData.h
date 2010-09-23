@@ -57,8 +57,8 @@ public:
   virtual void setShading(bool on);
   virtual bool getShading() const;
 
-  virtual std::string getFrameOfReferenceUid();
-  virtual void setFrameOfReferenceUid(std::string frameOfReferenceUid);
+  virtual std::string getParentFrame();
+  virtual void setParentFrame(std::string uid);
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
@@ -76,7 +76,7 @@ protected:
 	std::string mUid;
 	std::string mName;
 	std::string mFilePath;
-	std::string mFrameOfReferenceUid;
+	std::string mParentFrame;
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	//Transform3D m_rMd; ///< the transform from data to reference space

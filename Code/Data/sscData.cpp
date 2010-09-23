@@ -12,7 +12,7 @@ Data::Data() :
 }
 
 Data::Data(const std::string& uid, const std::string& name) :
-  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED), mFrameOfReferenceUid("")
+  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED), mParentFrame("")
 {
   if(name=="")
     mName = mUid;
@@ -114,14 +114,14 @@ bool Data::getShading() const
   return false;
 }
 
-std::string Data::getFrameOfReferenceUid()
+std::string Data::getParentFrame()
 {
-  return mFrameOfReferenceUid;
+  return mParentFrame;
 }
 
-void Data::setFrameOfReferenceUid(std::string frameOfReferenceUid)
+void Data::setParentFrame(std::string uid)
 {
-  mFrameOfReferenceUid = frameOfReferenceUid;
+  mParentFrame = uid;
 }
 
 void Data::addXml(QDomNode& dataNode)
@@ -142,8 +142,8 @@ void Data::addXml(QDomNode& dataNode)
   filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
   dataNode.appendChild(filePathNode);
 
-  QDomElement frameOfReferenceUidNode = doc.createElement("frameOfReferenceUid");
-  frameOfReferenceUidNode.appendChild(doc.createTextNode(mFrameOfReferenceUid.c_str()));
+  QDomElement parentFrameNode = doc.createElement("parentFrame");
+  parentFrameNode.appendChild(doc.createTextNode(mParentFrame.c_str()));
   dataNode.appendChild(filePathNode);
 }
 
@@ -152,8 +152,8 @@ void Data::parseXml(QDomNode& dataNode)
   if (dataNode.isNull())
     return;
 
-  if(!dataNode.namedItem("frameOfReferenceUid").isNull())
-    mFrameOfReferenceUid = dataNode.namedItem("frameOfReferenceUid").toElement().text().toStdString();
+  if(!dataNode.namedItem("parentFrame").isNull())
+    mParentFrame = dataNode.namedItem("parentFrame").toElement().text().toStdString();
 
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);

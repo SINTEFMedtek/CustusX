@@ -326,7 +326,7 @@ void DataManagerImpl::loadData(DataPtr data)
 {
   if (data)
   {
-    this->verifyFrameOfReferenceUid(data);
+    this->verifyParentFrame(data);
     mData[data->getUid()] = data;
     emit dataLoaded();
   }
@@ -366,9 +366,9 @@ DataPtr DataManagerImpl::getData(const std::string& uid) const
   return iter->second;
 }
 
-void DataManagerImpl::verifyFrameOfReferenceUid(DataPtr data)
+void DataManagerImpl::verifyParentFrame(DataPtr data)
 {
-  if(data->getFrameOfReferenceUid().empty())
+  if(data->getParentFrame().empty())
   {
     int max = 0;
     std::map<std::string, DataPtr>::iterator iter;
@@ -376,8 +376,8 @@ void DataManagerImpl::verifyFrameOfReferenceUid(DataPtr data)
     {
       max = std::max(max, qstring_cast(iter->first).toInt());
     }
-    std::string frameOfReferenceUid = string_cast(max + 1);
-    data->setFrameOfReferenceUid(frameOfReferenceUid);
+    std::string parentFrame = string_cast(max + 1);
+    data->setParentFrame(parentFrame);
   }
 }
 
