@@ -122,6 +122,7 @@ std::string Data::getParentFrame()
 void Data::setParentFrame(std::string uid)
 {
   mParentFrame = uid;
+  emit transformChanged();
 }
 
 void Data::addXml(QDomNode& dataNode)
