@@ -1,6 +1,7 @@
 #include "cxMainWindow.h"
 
 #include <QtGui>
+#include "boost/scoped_ptr.hpp"
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxDataManager.h"
@@ -33,6 +34,7 @@
 #include "cxLayoutEditor.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
+#include "cxImportDataWizard.h"
 
 namespace cx
 {
@@ -466,7 +468,13 @@ void MainWindow::importDataSlot()
     return;
   }
 
-  stateManager()->getPatientData()->importData(fileName);
+  ssc::DataPtr data = stateManager()->getPatientData()->importData(fileName);
+
+  if (!data)
+    return;
+
+  boost::scoped_ptr<ImportDataWizard> wizard(new ImportDataWizard(data));
+  wizard->exec();
 }
 
 void MainWindow::patientChangedSlot()
