@@ -64,12 +64,12 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, XmlOptionFile settin
   mDimZWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)), outputVolGridLayout, 4);
 
   //ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
-  ssc::ComboGroupWidget* orientationWidget = new ssc::ComboGroupWidget(this, mReconstructer->mOrientationAdapter);
+  ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mOrientationAdapter);
   
   QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
   
   //ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
-  ssc::ComboGroupWidget* algorithmWidget = new ssc::ComboGroupWidget(this, mReconstructer->mAlgorithmAdapter);
+  ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mAlgorithmAdapter);
 
   mAlgorithmGroup = new QGroupBox("Algorithm", this);
   mAlgoLayout = new QGridLayout(mAlgorithmGroup);

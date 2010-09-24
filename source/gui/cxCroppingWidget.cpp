@@ -11,7 +11,7 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include "sscStringDataAdapter.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "sscDefinitionStrings.h"
 #include "cxInteractiveCropper.h"
 

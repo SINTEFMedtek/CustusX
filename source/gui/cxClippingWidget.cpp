@@ -11,7 +11,7 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include "sscStringDataAdapter.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "sscDefinitionStrings.h"
 
 namespace cx
@@ -71,7 +71,7 @@ ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent)
   QVBoxLayout* activeClipLayout = new QVBoxLayout(activeClipGroupBox);
 
   mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
-  ssc::ComboGroupWidget* combo = new ssc::ComboGroupWidget(this, mPlaneAdapter);
+  ssc::LabeledComboBoxWidget* combo = new ssc::LabeledComboBoxWidget(this, mPlaneAdapter);
 
   mUseClipperCheckBox = new QCheckBox("Use Clipper");
   connect(mUseClipperCheckBox, SIGNAL(toggled(bool)), mInteractiveClipper.get(), SLOT(useClipper(bool)));
