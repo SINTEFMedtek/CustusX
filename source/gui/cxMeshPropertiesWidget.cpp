@@ -6,6 +6,8 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
+#include "sscStringWidgets.h"
+#include "cxDataInterface.h"
 
 namespace cx
 {
@@ -58,6 +60,12 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   gridLayout->addWidget(chooseColor, 2, 0);
   gridLayout->addWidget(importTransformButton, 1, 0);
   
+  mParentFrameAdapter = ParentFrameStringDataAdapter::New();
+
+  ssc::ComboGroupWidget*  combo = new ssc::ComboGroupWidget(this, mParentFrameAdapter);
+  gridLayout->addWidget(combo, 3, 0);
+
+
   toptopLayout->addStretch();
 
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
@@ -190,6 +198,8 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
   
   //Set new current image
   mMesh = mesh;
+  mParentFrameAdapter->setData(mMesh);
+
   //dataManager()->setActiveImage(mCurrentImage);
   
 }

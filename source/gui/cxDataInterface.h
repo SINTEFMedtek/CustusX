@@ -87,6 +87,9 @@ public:
 
 
 /** Adapter that connects to the current active image.
+ * Example: Active image: [DataName]
+ * where active image is the value
+ * and DataName is taken from the valuerange
  */
 class ActiveImageStringDataAdapter : public ssc::StringDataAdapter
 {
@@ -107,7 +110,30 @@ public: // optional methods
   virtual QString convertInternal2Display(QString internal);
 };
 
+typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
 
+class ParentFrameStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ParentFrameStringDataAdapterPtr New() { return ParentFrameStringDataAdapterPtr(new ParentFrameStringDataAdapter()); }
+  ParentFrameStringDataAdapter();
+  void setData(ssc::DataPtr data);
+  virtual ~ParentFrameStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+
+private:
+  ssc::DataPtr mData;
+};
 
 } // namespace cx
 
