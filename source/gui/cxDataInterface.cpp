@@ -171,7 +171,7 @@ QString ActiveImageStringDataAdapter::getValue() const
 }
 QString ActiveImageStringDataAdapter::getHelp() const
 {
-  return "select the active volume";
+  return "Select the active volume";
 }
 QStringList ActiveImageStringDataAdapter::getValueRange() const
 {
@@ -189,5 +189,77 @@ QString ActiveImageStringDataAdapter::convertInternal2Display(QString internal)
     return "<no volume>";
   return qstring_cast(image->getName());
 }
+
+
+
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+
+
+ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
+{
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SIGNAL(changed()));
+}
+
+void ParentFrameStringDataAdapter::setData(ssc::DataPtr data)
+{
+  mData = data;
+  connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(changed()));
+  emit changed();
+}
+
+QString ParentFrameStringDataAdapter::getValueName() const
+{
+  return "Parent Frame";
+}
+
+bool ParentFrameStringDataAdapter::setValue(const QString& value)
+{
+  if (!mData)
+    return false;
+  mData->setParentFrame(string_cast(value));
+  return true;
+}
+
+QString ParentFrameStringDataAdapter::getValue() const
+{
+  if (!mData)
+    return "";
+  return qstring_cast(mData->getParentFrame());
+}
+
+QString ParentFrameStringDataAdapter::getHelp() const
+{
+  if (!mData)
+    return "";
+  return "Select the parent frame for " + qstring_cast(mData->getName()) + ".";
+}
+
+QStringList ParentFrameStringDataAdapter::getValueRange() const
+{
+  QStringList retval;
+  retval << "";
+
+  std::map<std::string, ssc::DataPtr> allData = ssc::dataManager()->getData();
+  for (std::map<std::string, ssc::DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
+  {
+    retval << qstring_cast(iter->first);
+  }
+  return retval;
+}
+
+QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
+{
+  ssc::DataPtr data = ssc::dataManager()->getData(string_cast(internal));
+  if (!data)
+    return "<no data>";
+  return qstring_cast(data->getName());
+}
+
 
 } // namespace cx
