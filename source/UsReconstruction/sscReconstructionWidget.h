@@ -13,7 +13,7 @@
 //#include "sscAbstractInterface.h"
 #include "sscDoubleWidgets.h"
 #include "sscXmlOptionItem.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 
 namespace ssc
 {
