@@ -11,6 +11,7 @@
 #include "boost/shared_ptr.hpp"
 #include <QString>
 #include <QObject>
+#include "sscForwardDeclarations.h"
 
 class QDomDocument;
 //class QSettings;
@@ -38,7 +39,7 @@ public:
 public slots:
   void newPatient(QString choosenDir);
   void loadPatient(QString chosenDir);
-  void importData(QString fileName);
+  ssc::DataPtr importData(QString fileName);
   void savePatient();///< Save all application data to XML file
   void clearPatient();
 
