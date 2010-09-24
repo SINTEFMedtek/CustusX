@@ -4,6 +4,7 @@
 #include <vector>
 #include <QtGui>
 #include "sscMesh.h"
+#include "cxDataInterface.h"
 
 namespace cx
 {
@@ -41,6 +42,7 @@ protected:
 private:
   ssc::MeshPtr mMesh;
   QComboBox* mMeshComboBox; ///< combobox for selecting mesh
+  ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   
   MeshPropertiesWidget();
 };

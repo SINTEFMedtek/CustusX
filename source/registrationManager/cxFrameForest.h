@@ -50,8 +50,8 @@ public:
   QDomNode getOldestAncestor(QDomNode node);
 
   QDomNode getOldestAncestorNotCommonToRef(QDomNode child, QDomNode ref);
-  std::vector<QDomNode> getAllNodesFor(QDomNode node);
-  std::vector<ssc::DataPtr> getAllDataIn(QDomNode node);
+  std::vector<QDomNode> getDescendantsAndSelf(QDomNode node);
+  std::vector<ssc::DataPtr> getDataFromDescendantsAndSelf(QDomNode node);
   QDomDocument getDocument();
 private:
   bool isRootNode(QDomNode node);

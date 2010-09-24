@@ -131,14 +131,14 @@ QDomNode FrameForest::getOldestAncestorNotCommonToRef(QDomNode node, QDomNode re
 
 /** Return the node and all its children recursively in one flat vector.
  */
-std::vector<QDomNode> FrameForest::getAllNodesFor(QDomNode node)
+std::vector<QDomNode> FrameForest::getDescendantsAndSelf(QDomNode node)
 {
   std::vector<QDomNode> retval;
   retval.push_back(node);
 
   for (QDomNode child = node.firstChild(); !child.isNull(); child = child.nextSibling())
   {
-    std::vector<QDomNode> subnodes = this->getAllNodesFor(child);
+    std::vector<QDomNode> subnodes = this->getDescendantsAndSelf(child);
     std::copy(subnodes.begin(), subnodes.end(), back_inserter(retval));
   }
   return retval;
@@ -147,9 +147,9 @@ std::vector<QDomNode> FrameForest::getAllNodesFor(QDomNode node)
 /** As getAllNodesFor(QDomNode), but return the nodes as data objects.
  *  Those frames not representing data are discarded.
  */
-std::vector<ssc::DataPtr> FrameForest::getAllDataIn(QDomNode node)
+std::vector<ssc::DataPtr> FrameForest::getDataFromDescendantsAndSelf(QDomNode node)
 {
-  std::vector<QDomNode> nodes = this->getAllNodesFor(node);
+  std::vector<QDomNode> nodes = this->getDescendantsAndSelf(node);
   std::vector<ssc::DataPtr> retval;
 
   for (unsigned i=0; i<nodes.size(); ++i)
