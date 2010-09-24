@@ -151,7 +151,7 @@ void PatientData::savePatient()
   //TODO Implement when we know what we want to save here...
 }
 
-void PatientData::importData(QString fileName)
+ssc::DataPtr PatientData::importData(QString fileName)
 {
   //ssc::messageManager()->sendDebug("PatientData::importData() called");
 //  this->savePatientFileSlot();
@@ -163,7 +163,7 @@ void PatientData::importData(QString fileName)
   if(fileName.isEmpty())
   {
     ssc::messageManager()->sendInfo("Import canceled");
-    return;
+    return ssc::DataPtr();
   }
   
   QString patientsImageFolder = mActivePatientFolder+"/Images/";
@@ -228,7 +228,7 @@ void PatientData::importData(QString fileName)
     }else
     {
       ssc::messageManager()->sendError("First copy failed!");
-      return;
+      return ssc::DataPtr();
     }
     if(!toFile.flush())
       ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
@@ -251,7 +251,7 @@ void PatientData::importData(QString fileName)
       else
       {
         ssc::messageManager()->sendError("Second copy failed!");
-        return;
+        return ssc::DataPtr();
       }
       if(!toFile.flush())
         ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
@@ -274,10 +274,12 @@ void PatientData::importData(QString fileName)
       else
       {
         ssc::messageManager()->sendError("Second copy failed!");
-        return;
+        return ssc::DataPtr();
       }
     }
   }
+
+  return data;
 }
 
 void PatientData::createPatientFolders(QString choosenDir)
