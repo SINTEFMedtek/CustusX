@@ -6,7 +6,7 @@
 #include "sscImage.h"
 #include "cxTreeModelItem.h"
 #include "sscStringDataAdapterXml.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 class QTreeWidget;
 class QVBoxLayout;
 class QTreeWidgetItem;
