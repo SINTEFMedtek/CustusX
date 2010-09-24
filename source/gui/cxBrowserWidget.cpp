@@ -241,7 +241,7 @@ BrowserWidget::BrowserWidget(QWidget* parent) :
   mModel = new BrowserItemModel(this);
   connect(mModel, SIGNAL(hasBeenReset()), this, SLOT(resetView()));
 
-  mVerticalLayout->addWidget(new ssc::ComboGroupWidget(this, mModel->getFilter()));
+  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mModel->getFilter()));
 
   //layout
   mTreeView = new QTreeView(this);;

@@ -16,7 +16,7 @@
 #include "sscToolManager.h"
 #include "cxDataInterface.h"
 #include "UsConfigGui.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "cxToolManager.h"
 #include "sscTypeConversions.h"
 
@@ -79,7 +79,7 @@ QWidget(parent)
   this->setObjectName("ActiveToolWidget");
   layout->setMargin(0);
   
-  ssc::ComboGroupWidget*  combo = new ssc::ComboGroupWidget(this, ActiveToolStringDataAdapter::New());
+  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveToolStringDataAdapter::New());
   layout->addWidget(combo);
 }
 

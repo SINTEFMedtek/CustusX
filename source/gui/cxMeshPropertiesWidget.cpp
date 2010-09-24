@@ -6,7 +6,7 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 
 namespace cx
@@ -62,7 +62,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   
   mParentFrameAdapter = ParentFrameStringDataAdapter::New();
 
-  ssc::ComboGroupWidget*  combo = new ssc::ComboGroupWidget(this, mParentFrameAdapter);
+  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
   gridLayout->addWidget(combo, 3, 0);
 
 

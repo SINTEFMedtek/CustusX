@@ -13,7 +13,7 @@
 //#include "sscMessageManager.h"
 //#include "sscDataManager.h"
 //#include "cxViewManager.h"
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 
 #include "cxTransferFunctionWidget.h"
 #include "cxCroppingWidget.h"
@@ -36,7 +36,7 @@ ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
   this->setObjectName("ActiveVolumeWidget");
   layout->setMargin(0);
 
-  ssc::ComboGroupWidget*  combo = new ssc::ComboGroupWidget(this, ActiveImageStringDataAdapter::New());
+  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New());
   layout->addWidget(combo);
 }
 
