@@ -8,10 +8,13 @@
 #ifndef CXFRAMETREEWIDGET_H_
 #define CXFRAMETREEWIDGET_H_
 
+#include <map>
+#include <string>
 #include <QWidget>
 class QTreeWidget;
 class QTreeWidgetItem;
 class QDomNode;
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {
@@ -28,7 +31,9 @@ public:
 private:
   QTreeWidget* mTreeWidget;
   void fill(QTreeWidgetItem* parent, QDomNode node);
+  std::map<std::string, ssc::DataPtr> mConnectedData;
 private slots:
+  void dataLoadedSlot();
   void rebuild(); // TODO this must also listen to all changed() in all data
 };
 

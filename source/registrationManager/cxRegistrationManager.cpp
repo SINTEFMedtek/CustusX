@@ -150,7 +150,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   QDomNode target = forest.getNode(qstring_cast(data->getUid()));
   QDomNode masterFrame = forest.getNode(masterFrameUid);
   QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
-  std::vector<ssc::DataPtr> targetData = forest.getAllDataIn(targetBase);
+  std::vector<ssc::DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
 
 //  std::cout << "master frame : " << masterFrame.toElement().tagName() << std::endl;
 //  std::cout << "target frame : " << target.toElement().tagName() << std::endl;

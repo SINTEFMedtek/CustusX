@@ -21,37 +21,52 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   this->setObjectName("FrameTreeWidget");
-  this->setWindowTitle("Frame Tree Widget");
+  this->setWindowTitle("Frame Tree");
 
   //layout->setMargin(0);
 
   mTreeWidget = new QTreeWidget(this);
   layout->addWidget(mTreeWidget);
+  mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   // TODO this must also listen to all changed() in all data
-  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(rebuild()));
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataLoadedSlot()));
+}
+
+void FrameTreeWidget::dataLoadedSlot()
+{
+  for (ssc::DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
+  {
+    disconnect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
+  }
+
+  mConnectedData = ssc::dataManager()->getData();
+
+  for (ssc::DataManager::DataMap::iterator iter=mConnectedData.begin(); iter!=mConnectedData.end(); ++iter)
+  {
+    connect(iter->second.get(), SIGNAL(transformChanged()), this, SLOT(rebuild()));
+  }
+
+  this->rebuild();
 }
 
 void FrameTreeWidget::rebuild()
 {
   mTreeWidget->clear();
-  mTreeWidget->setHeaderLabels(QStringList() << "Frame");
 
   FrameForest forest;
   QDomElement root = forest.getDocument().documentElement();
 
-//  QTreeWidgetItem* rootItem = new QTreeWidgetItem(mTreeWidget, QStringList() << "root");
-//  this->fill(rootItem, root);
+  this->fill(mTreeWidget->invisibleRootItem(), root);
 
-  for (QDomNode child = root.firstChild(); !child.isNull(); child = child.nextSibling())
-  {
-    QTreeWidgetItem* item = new QTreeWidgetItem(mTreeWidget, QStringList() << child.toElement().tagName());
-    this->fill(item, child);
-  }
+//  for (QDomNode child = root.firstChild(); !child.isNull(); child = child.nextSibling())
+//  {
+//    QTreeWidgetItem* item = new QTreeWidgetItem(mTreeWidget, QStringList() << child.toElement().tagName());
+//    this->fill(item, child);
+//  }
 
   mTreeWidget->expandToDepth(5);
   mTreeWidget->resizeColumnToContents(0);
-  //mTreeWidget->setRootIsDecorated(false);
 }
 
 void FrameTreeWidget::fill(QTreeWidgetItem* parent, QDomNode node)
