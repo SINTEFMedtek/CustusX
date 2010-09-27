@@ -1,20 +1,13 @@
-/*
- * sscStringWidgets.cpp
- *
- *  Created on: Jun 23, 2010
- *      Author: christiana
- */
-#include "sscStringWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include <iostream>
 #include "sscTypeConversions.h"
+
 namespace ssc
 {
 
-
-
 ///----------------
 
-ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : QWidget(parent)
+LabeledComboBoxWidget::LabeledComboBoxWidget(QWidget* parent, ssc::StringDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : QWidget(parent)
 {
   mData = dataInterface;
   connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
@@ -45,12 +38,12 @@ ComboGroupWidget::ComboGroupWidget(QWidget* parent, ssc::StringDataAdapterPtr da
   dataChanged();
 }
 
-void ComboGroupWidget::comboIndexChanged(int index)
+void LabeledComboBoxWidget::comboIndexChanged(int index)
 {
   mData->setValue(mCombo->itemData(index).toString());
 }
 
-void ComboGroupWidget::dataChanged()
+void LabeledComboBoxWidget::dataChanged()
 {
   mCombo->blockSignals(true);
   mCombo->clear();

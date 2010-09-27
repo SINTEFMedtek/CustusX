@@ -339,7 +339,7 @@ void Image::addXml(QDomNode& dataNode)
   QDomElement shadingNode = doc.createElement("shading");
   shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
   imageNode.appendChild(shadingNode);
-  std::cout << "created shading" << std::endl;
+  //std::cout << "created shading" << std::endl;
   
   QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
   shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));

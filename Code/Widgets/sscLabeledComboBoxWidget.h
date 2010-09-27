@@ -1,11 +1,5 @@
-/*
- * sscStringWidgets.h
- *
- *  Created on: Jun 23, 2010
- *      Author: christiana
- */
-#ifndef SSCSTRINGWIDGETS_H_
-#define SSCSTRINGWIDGETS_H_
+#ifndef SSCLABELCOMBOBOXWIDGET_H_
+#define SSCLABELCOMBOBOXWIDGET_H_
 
 #include <QWidget>
 #include <QSlider>
@@ -19,13 +13,13 @@ namespace ssc
 
 /**Composite widget for string selection.
  * Consists of <namelabel, combobox>.
- * Insert a subclass of ssc::StringDataAdStringDataAdaptero connect to data.
+ * Insert a subclass of ssc::StringDataAdStringDataAdapter to connect to data.
  */
-class ComboGroupWidget : public QWidget
+class LabeledComboBoxWidget : public QWidget
 {
   Q_OBJECT
 public:
-  ComboGroupWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
+  LabeledComboBoxWidget(QWidget* parent, StringDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
 private slots:
   void dataChanged();
   void comboIndexChanged(int val);
@@ -37,4 +31,4 @@ private:
 
 } // namespace ssc
 
-#endif /* SSCSTRINGWIDGETS_H_ */
+#endif /* SSCLABELCOMBOBOXWIDGET_H_ */

@@ -326,7 +326,7 @@ void DataManagerImpl::loadData(DataPtr data)
 {
   if (data)
   {
-    this->verifyFrameOfReferenceUid(data);
+    this->verifyParentFrame(data);
     mData[data->getUid()] = data;
     emit dataLoaded();
   }
@@ -366,18 +366,22 @@ DataPtr DataManagerImpl::getData(const std::string& uid) const
   return iter->second;
 }
 
-void DataManagerImpl::verifyFrameOfReferenceUid(DataPtr data)
+void DataManagerImpl::verifyParentFrame(DataPtr data)
 {
-  if(data->getFrameOfReferenceUid().empty())
+  if(data->getParentFrame().empty())
   {
     int max = 0;
     std::map<std::string, DataPtr>::iterator iter;
     for (iter = mData.begin(); iter != mData.end(); ++iter)
     {
-      max = std::max(max, qstring_cast(iter->first).toInt());
+      //max = std::max(max, qstring_cast(iter->first).toInt());
+      QStringList parentList = qstring_cast(iter->second->getParentFrame()).split("_");
+      if (parentList.size()<2)
+        continue;
+      max = std::max(max, parentList[1].toInt());
     }
-    std::string frameOfReferenceUid = string_cast(max + 1);
-    data->setFrameOfReferenceUid(frameOfReferenceUid);
+    std::string parentFrame = "frame_" + string_cast(max + 1);
+    data->setParentFrame(parentFrame);
   }
 }
 

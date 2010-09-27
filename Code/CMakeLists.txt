@@ -72,7 +72,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscStringDataAdapterXml.h
     #Widgets/sscXmlOptionItem.h
     Widgets/sscDoubleWidgets.h
-    Widgets/sscStringWidgets.h
+    Widgets/sscLabeledComboBoxWidget.h
     Widgets/sscHelperWidgets.h
     Utilities/sscMessageManager.h
     )
@@ -207,6 +207,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicePlanes3DRep.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscSlicePlaneClipper.cpp
+    Rep/sscUSProbeSector.h
+    Rep/sscUSProbeSector.cpp
     Data/sscLandmark.h
     Data/sscLandmark.cpp
     Data/sscData.cpp
@@ -251,8 +253,8 @@ SET( SSC_SOURCE_FILES
     Widgets/sscDoubleDataAdapterXml.cpp
     Widgets/sscStringDataAdapterXml.h
     Widgets/sscStringDataAdapterXml.cpp
-    Widgets/sscStringWidgets.h    
-    Widgets/sscStringWidgets.cpp    
+    Widgets/sscLabeledComboBoxWidget.h    
+    Widgets/sscLabeledComboBoxWidget.cpp    
     Widgets/sscXmlOptionItem.h    
     Widgets/sscXmlOptionItem.cpp    
 	) 
