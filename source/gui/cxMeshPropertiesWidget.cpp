@@ -54,7 +54,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   connect(chooseColor, SIGNAL(clicked()), this, SLOT(setColorSlot()));
   
   QPushButton* importTransformButton = new QPushButton("Synchronize Transform", this);
-  importTransformButton->setToolTip("Synchronize the surface transform with that of the active volume.");
+  importTransformButton->setToolTip("Synchronize the surface transform with that of the parent volume.");
   connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
   
   gridLayout->addWidget(chooseColor, 2, 0);
@@ -78,12 +78,12 @@ MeshPropertiesWidget::~MeshPropertiesWidget()
 
 void MeshPropertiesWidget::importTransformSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  if (!image)
-    return;
   if(!mMesh)
     return;
-  //mMesh->set_rMd(image->get_rMd());
+  //ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  ssc::ImagePtr image = ssc::dataManager()->getImage(mMesh->getParentFrame());
+  if (!image)
+    return;
   mMesh->get_rMd_History()->setRegistration(image->get_rMd());
   ssc::messageManager()->sendInfo("Assigned rMd from volume [" + image->getName() + "] to surface [" + mMesh->getName() + "]");
 }
