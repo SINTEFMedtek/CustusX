@@ -19,7 +19,10 @@ public:
   ImportDataWizard(ssc::DataPtr data, QWidget* parent=NULL);
   ~ImportDataWizard();
 
+  private slots:
+  void importTransformSlot();
 private:
+  void setInitialGuessForParentFrame();
   ssc::DataPtr mData;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
 };
