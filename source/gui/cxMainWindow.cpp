@@ -77,7 +77,6 @@ MainWindow::MainWindow() :
   //mOrientationRegistrationWidget (?) = new OrientationRegistrationWidget(fastRegistrationsWidget);
   //fastRegistrationsWidget->addTab();
 
-
   mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
   mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
 
