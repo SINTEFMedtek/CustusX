@@ -65,14 +65,15 @@ signals:
 
 private:
   void initialize();
-  bool mOnlyCout;///< Tells the MessageManager if the message only should be dumped to cout
-  typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
-  SingleStreamerImplPtr mCout;
-  SingleStreamerImplPtr mCerr;
   MessageManager(); ///< Use getInstance().
   ~MessageManager(){}; ///< Use destroyInstance().
   MessageManager(const MessageManager&);//{this->getInstance();}; ///< Copycontructur.
   MessageManager& operator=(const MessageManager&);//{return *this->getInstance();}; ///< Assignment operator.
+
+  bool mOnlyCout;///< Tells the MessageManager if the message only should be dumped to cout
+  typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
+  SingleStreamerImplPtr mCout;
+  SingleStreamerImplPtr mCerr;
 
   void sendMessage(QString text, int timeout); ///< Emits the signal that actually sends the message.
 
