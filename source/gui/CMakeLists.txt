@@ -117,6 +117,8 @@ SET(${LIBNAME}_SRCS
     cxFrameTreeWidget.cpp
     cxImportDataWizard.h
     cxImportDataWizard.cpp
+    cxTabbedWidget.h
+    cxTabbedWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
