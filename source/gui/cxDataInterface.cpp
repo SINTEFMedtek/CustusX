@@ -209,7 +209,7 @@ ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
 void ParentFrameStringDataAdapter::setData(ssc::DataPtr data)
 {
   mData = data;
-  connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(changed()));
+  connect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
   emit changed();
 }
 

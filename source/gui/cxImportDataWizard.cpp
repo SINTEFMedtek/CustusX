@@ -47,7 +47,7 @@ ImportDataWizard::ImportDataWizard(ssc::DataPtr data, QWidget* parent) :
   connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
   layout->addWidget(importTransformButton);
 
-  QHBoxLayout* buttons = new QHBoxLayout(this);
+  QHBoxLayout* buttons = new QHBoxLayout;
   layout->addLayout(buttons);
   QPushButton* okButton = new QPushButton("OK", this);
   buttons->addStretch();
@@ -60,7 +60,6 @@ ImportDataWizard::ImportDataWizard(ssc::DataPtr data, QWidget* parent) :
 
 ImportDataWizard::~ImportDataWizard()
 {
-  std::cout << "pang" << std::endl;
 }
 
 /** Use heuristics to guess a parent frame,
@@ -78,8 +77,8 @@ void ImportDataWizard::setInitialGuessForParentFrame()
   {
     if (iter->second==mData)
       continue;
-    QString current = qstring_cast(iter->second->getName());
-    if (current.indexOf(base)>=0)
+    QString current = qstring_cast(iter->second->getName()).split(".")[0];
+    if (base.indexOf(current)>=0)
     {
       mData->setParentFrame(iter->first);
       break;
@@ -92,7 +91,6 @@ void ImportDataWizard::importTransformSlot()
 {
   if(!mData)
     return;
-  //ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   ssc::DataPtr parent = ssc::dataManager()->getData(mData->getParentFrame());
   if (!parent)
     return;
