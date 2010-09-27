@@ -402,7 +402,7 @@ void MainWindow::resetDesktopSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
-  std::cout << "load" << std::endl;
+//  std::cout << "load" << std::endl;
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   // Create folder
   if (!QDir().exists(patientDatafolder))
@@ -417,7 +417,7 @@ void MainWindow::loadPatientFileSlot()
     return; // On cancel
 
   stateManager()->getPatientData()->loadPatient(choosenDir);
-  std::cout << "end:" << std::endl;
+//  std::cout << "end:" << std::endl;
 
   cx::FrameForest forest;
 }
