@@ -15,7 +15,7 @@
 #include "cxConsoleWidget.h"
 #include "cxManualRegistrationOffsetWidget.h"
 #include "cxNavigationWidget.h"
-//#include "cxTransferFunctionWidget.h"
+#include "cxTabbedWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxPatientRegistrationWidget.h"
@@ -39,15 +39,10 @@
 namespace cx
 {
 
-
-
-  
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
   mToggleWidgetActionGroup(NULL),
-  mImageRegistrationWidget(new ImageRegistrationWidget(this)),
-  mPatientRegistrationWidget(new PatientRegistrationWidget(this)),
-  //mTransferFunctionWidget(new TransferFunctionWidget(this)),
+  mRegsitrationMethodsWidget(new TabbedWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mShiftCorrectionWidget(new ShiftCorrectionWidget(this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
@@ -55,7 +50,7 @@ MainWindow::MainWindow() :
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(),"CustusX").descend("usReconstruction"), DataLocations::getShaderPath() )),
+  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mConsoleWidget(new ConsoleWidget(this)),
@@ -69,31 +64,40 @@ MainWindow::MainWindow() :
 
   mLayoutActionGroup = NULL;
   this->updateWindowTitle();
-  
-  this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-  //make sure the transferefunctionwidget it fully initialized
-//  mTransferFunctionWidget->init();
 
-  
+  this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
+
+  TabbedWidget* landmarkRegistrationsWidget = new TabbedWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
+  mImageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
+  landmarkRegistrationsWidget->addTab(mImageRegistrationWidget, "Image Registration");
+  mPatientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
+  landmarkRegistrationsWidget->addTab(mPatientRegistrationWidget, "Patient Registration");
+
+  TabbedWidget* fastRegistrationsWidget = new TabbedWidget("FastAndAproxRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
+  //mOrientationRegistrationWidget (?) = new OrientationRegistrationWidget(fastRegistrationsWidget);
+  //fastRegistrationsWidget->addTab();
+
+
+  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
+  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
+
   this->addAsDockWidget(mBrowserWidget);
-  
+
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mMeshPropertiesWidget);
-  
+
   //Tried to add a separator. Don't work yet
   //QAction* separatorAction = new QAction(this);
   //separatorAction->setSeparator(true);
   //this->mToggleWidgetActionGroup->addAction(separatorAction);
-  
+
   this->addAsDockWidget(mToolPropertiesWidget);
   this->addAsDockWidget(mPointSamplingWidget);
   this->addAsDockWidget(mReconstructionWidget);
   this->addAsDockWidget(mRegistrationHistoryWidget);
-  //this->addAsDockWidget(mTransferFunctionWidget);
   this->addAsDockWidget(mShiftCorrectionWidget);
-  this->addAsDockWidget(mImageRegistrationWidget);
-  this->addAsDockWidget(mPatientRegistrationWidget);
+  this->addAsDockWidget(mRegsitrationMethodsWidget);
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mConsoleWidget);
   this->addAsDockWidget(mManualRegistrationOffsetWidget);
@@ -105,32 +109,15 @@ MainWindow::MainWindow() :
   this->createStatusBar();
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
-  
-//  // Initialize settings if empty
-//  if (!mSettings->contains("globalPatientDataFolder"))
-//    mSettings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
-//  if (!mSettings->contains("globalApplicationName"))
-//    mSettings->setValue("globalApplicationName", "Lab");
-//  if (!mSettings->contains("globalPatientNumber"))
-//    mSettings->setValue("globalPatientNumber", 1);
-//  //if (!mSettings->contains("applicationNames"))
-//    mSettings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
-  
-  
+
   if (!mSettings->contains("renderingInterval"))
     mSettings->setValue("renderingInterval", 33);
   if (!mSettings->contains("shadingOn"))
-    mSettings->setValue("shadingOn", true);  
+    mSettings->setValue("shadingOn", true);
 
-  //debugging
-  connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)),
-          this, SLOT(loggingSlot(const QString&, int)));
   ssc::messageManager()->setCoutFlag(false);
-  std::cout << "testing!" << std::endl;
-  //
 
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
-
 
   // initialize toolmanager config file
   ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
@@ -140,8 +127,8 @@ MainWindow::MainWindow() :
 
   // Restore saved window states
   // Must be done after all DockWidgets are created
-  if(!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
-    this->resize(QSize(1200,1000));//Set initial size if no previous size exist
+  if (!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
+    this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
   restoreState(mSettings->value("mainWindow/windowState").toByteArray());
 
   // Don't show the Widget before all elements are initialized
@@ -150,14 +137,14 @@ MainWindow::MainWindow() :
 
 void MainWindow::addAsDockWidget(QWidget* widget)
 {
-  if(!mToggleWidgetActionGroup)
+  if (!mToggleWidgetActionGroup)
   {
     mToggleWidgetActionGroup = new QActionGroup(this);
     mToggleWidgetActionGroup->setExclusive(false);
   }
 
   QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
-  dockWidget->setObjectName(widget->objectName()+"DockWidget");
+  dockWidget->setObjectName(widget->objectName() + "DockWidget");
   dockWidget->setWidget(widget);
   this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
   dockWidget->setVisible(false); // default visibility
@@ -167,7 +154,6 @@ void MainWindow::addAsDockWidget(QWidget* widget)
 
 MainWindow::~MainWindow()
 {
-//  std::cout << "MainWindow::~MainWindow()" << std::endl;
 }
 
 void MainWindow::initialize()
@@ -192,7 +178,7 @@ void MainWindow::shutdown()
 void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
-	
+
   // File
   mNewPatientAction = new QAction(tr("&New patient"), this);
   mNewPatientAction->setShortcut(tr("Ctrl+N"));
@@ -201,7 +187,7 @@ void MainWindow::createActions()
   mLoadFileAction = new QAction(tr("&Load Patient file"), this);
   mLoadFileAction->setShortcut(tr("Ctrl+L"));
   mClearPatientAction = new QAction(tr("&Clear Patient"), this);
-  
+
   connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
@@ -209,7 +195,7 @@ void MainWindow::createActions()
   connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
 
   // Application
-  mAboutAction = new QAction(tr("&About"), this);  // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
+  mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
   mAboutAction->setShortcut(tr("Ctrl+A"));
   mAboutAction->setStatusTip(tr("Show the application's About box"));
   mPreferencesAction = new QAction(tr("&Preferences"), this);
@@ -225,7 +211,7 @@ void MainWindow::createActions()
   mQuitAction = new QAction(tr("&Quit"), this);
   mQuitAction->setShortcut(tr("Ctrl+Q"));
   mQuitAction->setStatusTip(tr("Exit the application"));
-  
+
   connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
   connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
   connect(mDebugModeAction, SIGNAL(triggered(bool)), DataManager::getInstance(), SLOT(setDebugMode(bool)));
@@ -236,7 +222,7 @@ void MainWindow::createActions()
   mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
   mImportDataAction->setShortcut(tr("Ctrl+I"));
   mImportDataAction->setStatusTip(tr("Import image data"));
-  
+
   mDeleteDataAction = new QAction(tr("Delete current image"), this);
   mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
 
@@ -245,15 +231,15 @@ void MainWindow::createActions()
 
   connect(mImportDataAction, SIGNAL(triggered()), this, SLOT(importDataSlot()));
   connect(mDeleteDataAction, SIGNAL(triggered()), this, SLOT(deleteDataSlot()));
-//  connect(mLoadPatientRegistrationFromFile, SIGNAL(triggered()), this, SLOT(loadPatientRegistrationSlot()));
+  //  connect(mLoadPatientRegistrationFromFile, SIGNAL(triggered()), this, SLOT(loadPatientRegistrationSlot()));
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
-  mConfigureToolsAction =  new QAction(tr("Tool configuration"), mToolsActionGroup);
-  mInitializeToolsAction =  new QAction(tr("Initialize"), mToolsActionGroup);
+  mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
+  mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
   //mStartTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
   //mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), mToolsActionGroup);
-  mTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
+  mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
   mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
   mConfigureToolsAction->setChecked(true);
@@ -281,20 +267,8 @@ void MainWindow::createActions()
   mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
   connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
 
-
-  //TODO remove
-  /*connect(mContextDockWidget, SIGNAL(currentImageChanged(ssc::ImagePtr)),
-          viewManager(), SLOT(currentImageChangedSlot(ssc::ImagePtr)));*/
-
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
-          mImageRegistrationWidget, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
-          mPatientRegistrationWidget, SLOT(activeImageChangedSlot()));
-//  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
-//          mTransferFunctionWidget, SLOT(activeImageChangedSlot()));
-//
-  //TODO what to do instead?
-  //connect(this, SIGNAL(deleteCurrentImage()), mContextDockWidget, SLOT(deleteCurrentImageSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), mImageRegistrationWidget, SLOT(activeImageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), mPatientRegistrationWidget, SLOT(activeImageChangedSlot()));
 
   mSaveDesktopAction = new QAction(tr("Save desktop"), this);
   mSaveDesktopAction->setToolTip("Save desktop for workflow step");
@@ -325,10 +299,10 @@ void MainWindow::updateTrackingActionSlot()
 
 void MainWindow::toggleTrackingSlot()
 {
- if (ssc::toolManager()->isTracking())
-   ssc::toolManager()->stopTracking();
- else
-   ssc::toolManager()->startTracking();
+  if (ssc::toolManager()->isTracking())
+    ssc::toolManager()->stopTracking();
+  else
+    ssc::toolManager()->startTracking();
 }
 
 void MainWindow::newPatientSlot()
@@ -343,19 +317,17 @@ void MainWindow::newPatientSlot()
 
 
   // Create folders
-  if(!QDir().exists(patientDatafolder))
+  if (!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    ssc::messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder.toStdString());
   }
 
   QString choosenDir = patientDatafolder + "/" + name;
   //choosenDir += "/";
   //choosenDir += name;
   // Open file dialog, get patient data folder
-  choosenDir = QFileDialog::getSaveFileName(this,
-                                            tr("Select directory to save patient in"),
-                                            choosenDir);
+  choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
   if (choosenDir == QString::null)
     return; // On cancel
 
@@ -363,7 +335,7 @@ void MainWindow::newPatientSlot()
   int patientNumber = mSettings->value("globalPatientNumber").toInt();
   mSettings->setValue("globalPatientNumber", ++patientNumber);
 
-//  createPatientFolders(choosenDir);
+  //  createPatientFolders(choosenDir);
   stateManager()->getPatientData()->newPatient(choosenDir);
 }
 
@@ -375,7 +347,7 @@ void MainWindow::clearPatientSlot()
 
 void MainWindow::savePatientFileSlot()
 {
-  if(stateManager()->getPatientData()->getActivePatientFolder().isEmpty())
+  if (stateManager()->getPatientData()->getActivePatientFolder().isEmpty())
   {
     ssc::messageManager()->sendWarning("No patient selected, select or create patient before saving!");
     this->newPatientSlot();
@@ -402,9 +374,8 @@ void MainWindow::updateWindowTitle()
 #else
 #endif
 
-  this->setWindowTitle("CustusX "+versionName + " - " + appName);
+  this->setWindowTitle("CustusX " + versionName + " - " + appName);
 }
-
 
 void MainWindow::onWorkflowStateChangedSlot()
 {
@@ -435,15 +406,14 @@ void MainWindow::loadPatientFileSlot()
   std::cout << "load" << std::endl;
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   // Create folder
-  if(!QDir().exists(patientDatafolder))
+  if (!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    ssc::messageManager()->sendInfo("Made a new patient folder: "+patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder.toStdString());
   }
   // Open file dialog
-  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"),
-                                                         patientDatafolder,
-                                                         QFileDialog::ShowDirsOnly);
+  QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
+      QFileDialog::ShowDirsOnly);
   if (choosenDir == QString::null)
     return; // On cancel
 
@@ -458,11 +428,9 @@ void MainWindow::importDataSlot()
   this->savePatientFileSlot();
 
   ssc::messageManager()->sendInfo("Importing data...");
-  QString fileName = QFileDialog::getOpenFileName( this,
-                                  QString(tr("Select data file for import")),
-                                  mSettings->value("globalPatientDataFolder").toString(),
-                                  tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
-  if(fileName.isEmpty())
+  QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")), mSettings->value(
+      "globalPatientDataFolder").toString(), tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
+  if (fileName.isEmpty())
   {
     ssc::messageManager()->sendInfo("Import canceled");
     return;
@@ -480,16 +448,16 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-  mReconstructionWidget->selectData(stateManager()->getPatientData()->getActivePatientFolder()+"/US_Acq/");
+  mReconstructionWidget->selectData(stateManager()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
   mReconstructionWidget->reconstructer()->setOutputBasePath(stateManager()->getPatientData()->getActivePatientFolder());
   mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
 
-  QString loggingPath = stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/";
+  QString loggingPath = stateManager()->getPatientData()->getActivePatientFolder() + "/Logs/";
   QDir loggingDir(loggingPath);
-  if(!loggingDir.exists())
+  if (!loggingDir.exists())
   {
     loggingDir.mkdir(loggingPath);
-    ssc::messageManager()->sendInfo("Made a folder for tool logging: "+loggingPath.toStdString());
+    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath.toStdString());
   }
   ToolManager::getInstance()->setLoggingFolder(loggingPath.toStdString());
 }
@@ -522,7 +490,7 @@ LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
   LayoutEditor* editor = new LayoutEditor(dialog.get());
 
   LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
-//  std::cout << "AA:" << streamXml2String(data) << std::endl;
+  //  std::cout << "AA:" << streamXml2String(data) << std::endl;
   if (createNew)
   {
     data.resetUid(viewManager()->generateLayoutUid());
@@ -560,9 +528,7 @@ void MainWindow::editCustomLayoutSlot()
 
 void MainWindow::deleteCustomLayoutSlot()
 {
-  if (QMessageBox::question(this,
-      "Delete current layout",
-      "Do you really want to delete the current layout?",
+  if (QMessageBox::question(this, "Delete current layout", "Do you really want to delete the current layout?",
       QMessageBox::Cancel | QMessageBox::Ok) != QMessageBox::Ok)
     return;
   viewManager()->deleteLayoutData(viewManager()->getActiveLayout());
@@ -571,10 +537,9 @@ void MainWindow::deleteCustomLayoutSlot()
 
 void MainWindow::createMenus()
 {
-  mCustusXMenu = new QMenu(tr("CustusX"), this);;
-	mFileMenu = new QMenu(tr("File"), this);;
-  mWorkflowMenu = new QMenu(tr("Workflow"), this);;
-  //mDataMenu = new QMenu(tr("Data"), this);
+  mCustusXMenu = new QMenu(tr("CustusX"), this);
+  mFileMenu = new QMenu(tr("File"), this);
+  mWorkflowMenu = new QMenu(tr("Workflow"), this);
   mToolMenu = new QMenu(tr("Tracking"), this);
   mLayoutMenu = new QMenu(tr("Layouts"), this);
 
@@ -582,7 +547,7 @@ void MainWindow::createMenus()
   this->menuBar()->addMenu(mCustusXMenu);
   mCustusXMenu->addAction(mAboutAction);
   mCustusXMenu->addAction(mPreferencesAction);
-  
+
   // File
   this->menuBar()->addMenu(mFileMenu);
   mFileMenu->addAction(mNewPatientAction);
@@ -600,16 +565,10 @@ void MainWindow::createMenus()
   QMenu* popupMenu = this->createPopupMenu();
   popupMenu->setTitle("Window");
   this->menuBar()->addMenu(popupMenu);
-  
+
   //workflow
   this->menuBar()->addMenu(mWorkflowMenu);
   stateManager()->getWorkflow()->fillMenu(mWorkflowMenu);
-
-  //data
-  /*this->menuBar()->addMenu(mDataMenu);
-  mDataMenu->addAction(mImportDataAction);
-  mDataMenu->addAction(mDeleteDataAction);
-  mDataMenu->addAction(mLoadPatientRegistrationFromFile);*/
 
   //tool
   this->menuBar()->addMenu(mToolMenu);
@@ -622,8 +581,6 @@ void MainWindow::createMenus()
 
   //layout
   this->menuBar()->addMenu(mLayoutMenu);
-//  mLayoutMenu->addActions(mLayoutActionGroup->actions());
-//  mLayoutSeparator = mLayoutMenu->addSeparator();
   mLayoutMenu->addAction(mNewLayoutAction);
   mLayoutMenu->addAction(mEditLayoutAction);
   mLayoutMenu->addAction(mDeleteLayoutAction);
@@ -658,18 +615,16 @@ void MainWindow::createToolBars()
 }
 void MainWindow::createStatusBar()
 {
-  //TODO, not working as intended
   this->setStatusBar(mCustomStatusBar);
 }
-  
+
 void MainWindow::aboutSlot()
 {
-  QMessageBox::about(this, tr("About CustusX"),
-                     tr("<h2>CustusX version %1</h2> "
-                        "<p>Created by SINTEF Medical Technology."
-                        "<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
-                        "<p>An application for Image Guided Surgery."
-                        "<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(VERSION_NUMBER_VERBOSE));
+  QMessageBox::about(this, tr("About CustusX"), tr("<h2>CustusX version %1</h2> "
+    "<p>Created by SINTEF Medical Technology."
+    "<p><a href=http://www.sintef.no/Home/Technology-and-Society/Medical-technology> www.sintef.no </a>"
+    "<p>An application for Image Guided Surgery."
+    "<p>Created using Qt, VTK, ITK, IGSTK, SSC.").arg(VERSION_NUMBER_VERBOSE));
 }
 
 void MainWindow::preferencesSlot()
@@ -681,9 +636,8 @@ void MainWindow::quitSlot()
 {
   ssc::messageManager()->sendInfo("quitSlot - never called?");
   //TODO
-}  
-  
-  
+}
+
 void MainWindow::deleteDataSlot()
 {
   emit deleteCurrentImage();
@@ -741,11 +695,6 @@ void MainWindow::configureSlot()
 {
   ssc::toolManager()->configure();
 }
-void MainWindow::loggingSlot(const QString& message, int timeout)
-{
-  //TODO Write to file and a "console" inside CX3 maybe?
-  //std::cout << message.toStdString() << std::endl;
-}
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
@@ -753,7 +702,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
   mSettings->setValue("mainWindow/windowState", saveState());
   mSettings->sync();
   ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
-  
+
   if (ssc::toolManager()->isTracking())
   {
     ssc::messageManager()->sendInfo("Closing: Stopping tracking");
