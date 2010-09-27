@@ -473,7 +473,8 @@ void MainWindow::importDataSlot()
   if (!data)
     return;
 
-  boost::scoped_ptr<ImportDataWizard> wizard(new ImportDataWizard(data));
+  //boost::scoped_ptr<ImportDataWizard> wizard(new ImportDataWizard(data));
+  ImportDataWizard* wizard = new ImportDataWizard(data, this);
   wizard->exec();
 }
 
