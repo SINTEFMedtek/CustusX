@@ -24,8 +24,8 @@ FrameForest::FrameForest()
     this->insertFrame(iter->second);
   }
 
-  std::cout << "Forrest doc:" << std::endl;
-  std::cout << mDocument.toString(4) << std::endl;
+  //std::cout << "Forrest doc:" << std::endl;
+  //std::cout << mDocument.toString(4) << std::endl;
 }
 
 QDomDocument FrameForest::getDocument()

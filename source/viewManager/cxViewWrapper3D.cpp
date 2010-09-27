@@ -123,6 +123,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mView->addRep(mDataNameText);
 
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
   //showAxesActionSlot(true);
 }
@@ -239,8 +240,9 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
     mView->addRep(rep);
   }
 
-  mProbeRep->setImage(image);
-  mLandmarkRep->setImage(image);
+//  mProbeRep->setImage(image);
+//  mLandmarkRep->setImage(image);
+  this->activeImageChangedSlot();
 
   updateView();
 
@@ -271,12 +273,26 @@ void ViewWrapper3D::imageRemoved(const QString& uid)
   mView->removeRep(mVolumetricReps[suid]);
   mVolumetricReps.erase(suid);
 
-  if (mProbeRep->getImage() && mProbeRep->getImage()->getUid()==suid)
-    mProbeRep->setImage(ssc::ImagePtr());
-  if (mLandmarkRep->getImage() && mLandmarkRep->getImage()->getUid()==suid)
-    mLandmarkRep->setImage(ssc::ImagePtr());
+  this->activeImageChangedSlot();
+//  if (mProbeRep->getImage() && mProbeRep->getImage()->getUid()==suid)
+//    mProbeRep->setImage(ssc::ImagePtr());
+//  if (mLandmarkRep->getImage() && mLandmarkRep->getImage()->getUid()==suid)
+//    mLandmarkRep->setImage(ssc::ImagePtr());
 
   this->updateView();
+}
+
+void ViewWrapper3D::activeImageChangedSlot()
+{
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+
+  // only show landmarks belonging to image visible in this view:
+  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+  if (!std::count(images.begin(), images.end(), image))
+    image.reset();
+
+  mProbeRep->setImage(image);
+  mLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::meshAdded(ssc::MeshPtr data)

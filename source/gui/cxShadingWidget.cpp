@@ -75,7 +75,7 @@ void ShadingWidget::activeImageChangedSlot()
 
   if (activeImage)
   {
-    std::cout << "shading updated to " << activeImage->getShadingOn() << std::endl;
+    //std::cout << "shading updated to " << activeImage->getShadingOn() << std::endl;
     mShadingCheckBox->setChecked(activeImage->getShadingOn());
   }
 }
