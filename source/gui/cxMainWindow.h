@@ -77,9 +77,6 @@ protected slots:
   void editCustomLayoutSlot();
   void deleteCustomLayoutSlot();
 
-  //logging
-  void loggingSlot(const QString& message, int timeout); ///< prints messages for debugging
-
   // navigation
   void centerToImageCenterSlot();
   void centerToTooltipSlot();
@@ -107,7 +104,6 @@ protected:
   QMenu* mCustusXMenu; ///< Application menu
   QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
   QMenu* mWorkflowMenu; ///< menu for choosing workflow
-  //QMenu* mDataMenu; ///< menu for loading data
   QMenu* mToolMenu; ///< menu for interacting with the navigation system
   QMenu* mLayoutMenu; ///< menu for changing view layouts
 
@@ -154,9 +150,9 @@ protected:
   QToolBar* mWorkflowToolBar; ///< toolbar for workflow actions
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
 
+  class TabbedWidget*                   mRegsitrationMethodsWidget; ///< container widget for all registrations
   class ImageRegistrationWidget*        mImageRegistrationWidget; ///< interface for image registration
   class PatientRegistrationWidget*      mPatientRegistrationWidget; ///< interface for patient registration
-  //class TransferFunctionWidget*       mTransferFunctionWidget; ///< interface for changing a images transfere function
   class ShiftCorrectionWidget*          mShiftCorrectionWidget; ///< interface for image shift correction
   class BrowserWidget*                  mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*               mNavigationWidget; ///< contains settings for navigating
