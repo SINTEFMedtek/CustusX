@@ -67,6 +67,7 @@ private slots:
   void fillSlicePlanesActionSlot(bool checked);
   void showAxesActionSlot(bool checked);
   void resetCameraActionSlot();
+  void activeImageChangedSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);

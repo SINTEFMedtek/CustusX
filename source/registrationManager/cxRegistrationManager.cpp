@@ -166,18 +166,27 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
   }
 
-  // connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
-  QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
-  // iterate over all target data,
-  //forest.reconnectFrame(targetBase, masterAncestor); // alternative if we move operation below into forest
 
-  for (unsigned i=0; i<targetData.size(); ++i)
+  // reconnect only if the registration is done relative to a base.
+  // if target==targetBase, the registration is done inside an already connected
+  // tree and we dont need (or want - leads to error) to reconnect.
+  if (target!=targetBase)
   {
-    std::string masterAncestorUid = string_cast(masterAncestor.toElement().tagName());
-    std::string targetBaseUid = string_cast(targetBase.toElement().tagName());
+    // connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
+    QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
+    // iterate over all target data,
+    //forest.reconnectFrame(targetBase, masterAncestor); // alternative if we move operation below into forest
+    for (unsigned i=0; i<targetData.size(); ++i)
+    {
+      std::string masterAncestorUid = string_cast(masterAncestor.toElement().tagName());
+      std::string targetBaseUid = string_cast(targetBase.toElement().tagName());
 
-    if (targetData[i]->getParentFrame() == targetBaseUid)
-      targetData[i]->setParentFrame(masterAncestorUid);
+      if (targetData[i]->getParentFrame() == targetBaseUid)
+      {
+        std::cout << "reset parent frame of " << targetData[i]->getName() << " to " << masterAncestorUid << ". targetbase=" << targetBaseUid << std::endl;
+        targetData[i]->setParentFrame(masterAncestorUid);
+      }
+    }
   }
   // as we now have mutated the datamanager, forest is now outdated.
 
@@ -214,7 +223,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
-    ssc::messageManager()->sendInfo("Landmark registration: not enough points to register");
+   // ssc::messageManager()->sendInfo("Landmark registration: not enough points to register");
     return ssc::Transform3D();
   }
 
@@ -232,7 +241,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 
   if (QString::number(tar_M_src[0][0])=="nan") // harry but quick way to check badness of transform...
   {
-    ssc::messageManager()->sendError("landmark transform failed");
+    //ssc::messageManager()->sendError("landmark transform failed");
     return ssc::Transform3D();
   }
 
@@ -256,7 +265,10 @@ void RegistrationManager::doPatientRegistration()
   bool ok = false;
   ssc::Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
   if (!ok)
+  {
+    ssc::messageManager()->sendInfo("P-I Landmark registration: Failed to register: [" + string_cast(p_ref->GetNumberOfPoints()) + "-" + string_cast(p_pr->GetNumberOfPoints()) + "]");
     return;
+  }
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
@@ -295,7 +307,10 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   bool ok = false;
   ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
   if (!ok)
+  {
+    ssc::messageManager()->sendInfo("I-I Landmark registration: Failed to register: [" + string_cast(p_ref->GetNumberOfPoints()) + "-" + string_cast(p_data->GetNumberOfPoints()) + "], "+ image->getName());
     return;
+  }
 
   ssc::Transform3D delta = rMd * image->get_rMd().inv();
 
@@ -305,7 +320,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   mLastRegistrationTime = regTrans.mTimestamp;
 
   emit imageRegistrationPerformed();
-  ssc::messageManager()->sendInfo("Image registration has been performed.");
+  ssc::messageManager()->sendInfo("Image registration has been performed for " + image->getName());
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)

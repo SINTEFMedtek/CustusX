@@ -53,8 +53,8 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   QPushButton* chooseColor = new QPushButton("Choose color...", this);
   connect(chooseColor, SIGNAL(clicked()), this, SLOT(setColorSlot()));
   
-  QPushButton* importTransformButton = new QPushButton("Synchronize Transform", this);
-  importTransformButton->setToolTip("Synchronize the surface transform with that of the parent volume.");
+  QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
+  importTransformButton->setToolTip("Replace data transform with that of the parent data.");
   connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
   
   gridLayout->addWidget(chooseColor, 2, 0);
