@@ -163,7 +163,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   {
     ssc::RegistrationTransform newTransform = deltaTransform;
     newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
-    targetData[i]->get_rMd_History()->updateRegistration(oldTime, deltaTransform);
+    targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
   }
 
 
@@ -266,7 +266,7 @@ void RegistrationManager::doPatientRegistration()
   ssc::Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
   if (!ok)
   {
-    ssc::messageManager()->sendInfo("P-I Landmark registration: Failed to register: [" + string_cast(p_ref->GetNumberOfPoints()) + "-" + string_cast(p_pr->GetNumberOfPoints()) + "]");
+    ssc::messageManager()->sendInfo("P-I Landmark registration: Failed to register: [" + string_cast(p_pr->GetNumberOfPoints()) + "p]");
     return;
   }
 
@@ -308,7 +308,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
   if (!ok)
   {
-    ssc::messageManager()->sendInfo("I-I Landmark registration: Failed to register: [" + string_cast(p_ref->GetNumberOfPoints()) + "-" + string_cast(p_data->GetNumberOfPoints()) + "], "+ image->getName());
+    ssc::messageManager()->sendInfo("I-I Landmark registration: Failed to register: [" + string_cast(p_data->GetNumberOfPoints()) + "p], "+ image->getName());
     return;
   }
 
