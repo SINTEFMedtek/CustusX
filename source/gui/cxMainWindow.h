@@ -151,7 +151,7 @@ protected:
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 
-  class TabbedWidget*                   mRegsitrationMethodsWidget; ///< container widget for all registrations
+  class RegistrationMethodsWidget*      mRegsitrationMethodsWidget; ///< container widget for all registrations
   class FastImageRegistrationWidget*    mFastImageRegistrationWidget;
   class FastPatientRegistrationWidget*  mFastPatientRegistrationWidget;
   class FastOrientationRegistrationWidget* mFastOrientationRegistrationWidget;

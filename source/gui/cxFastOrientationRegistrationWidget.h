@@ -1,7 +1,7 @@
 #ifndef CXFASTORIENTATIONREGISTRATIONWIDGET_H_
 #define CXFASTORIENTATIONREGISTRATIONWIDGET_H_
 
-#include <QWidget>
+#include "cxWhatsThisWidget.h"
 #include "sscForwardDeclarations.h"
 
 class QPushButton;
@@ -17,13 +17,14 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class FastOrientationRegistrationWidget : public QWidget
+class FastOrientationRegistrationWidget : public WhatsThisWidget
 {
   Q_OBJECT
 
 public:
   FastOrientationRegistrationWidget(QWidget* parent);
   ~FastOrientationRegistrationWidget();
+  virtual QString defaultWhatsThis() const;
 
 protected:
   virtual void showEvent(QShowEvent* event);

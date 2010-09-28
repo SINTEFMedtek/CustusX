@@ -37,6 +37,7 @@ class PatientRegistrationWidget : public RegistrationWidget
 public:
   PatientRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   virtual ~PatientRegistrationWidget(); ///< empty
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
 
@@ -48,6 +49,7 @@ protected slots:
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QHideEvent* event);
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
   virtual ssc::LandmarkMap getTargetLandmarks() const;
   virtual ssc::Transform3D getTargetTransform() const;

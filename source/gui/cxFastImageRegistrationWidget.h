@@ -19,6 +19,7 @@ class FastImageRegistrationWidget : public ImageRegistrationWidget
 public:
   FastImageRegistrationWidget(QWidget* parent);
  virtual ~FastImageRegistrationWidget();
+ virtual QString defaultWhatsThis() const;
 
 protected:
   virtual void performRegistration();

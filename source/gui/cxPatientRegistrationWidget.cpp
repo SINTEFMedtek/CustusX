@@ -11,7 +11,7 @@
 #include <QSpinBox>
 #include <vtkDoubleArray.h>
 #include <sscVector3D.h>
-
+#include "cxViewManager.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "cxRegistrationManager.h"
@@ -49,6 +49,15 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
 
 PatientRegistrationWidget::~PatientRegistrationWidget()
 {
+}
+
+QString PatientRegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Landmark based patient registration.</h3>"
+      "<p>Sample points on the patient that corresponds to 3 or more landmarks already sampled in the data set. </p>"
+      "<p><i>Point on the patient using a tool and click the Sample button.</i></p>"
+      "</html>";
 }
 
 void PatientRegistrationWidget::activeImageChangedSlot()
@@ -115,6 +124,13 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 void PatientRegistrationWidget::showEvent(QShowEvent* event)
 {
   RegistrationWidget::showEvent(event);
+  viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+}
+
+void PatientRegistrationWidget::hideEvent(QHideEvent* event)
+{
+  RegistrationWidget::hideEvent(event);
+  viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
 void PatientRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
