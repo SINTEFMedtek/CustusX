@@ -126,6 +126,7 @@ SET(${LIBNAME}_SRCS
     cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.h
     cxFastOrientationRegistrationWidget.cpp
+    cxWhatsThisWidget.h
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

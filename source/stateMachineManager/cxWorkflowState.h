@@ -161,7 +161,7 @@ public:
   };
 };
 
-class ImageRegistrationWorkflowState : public WorkflowState
+/*class ImageRegistrationWorkflowState : public WorkflowState
 {
   Q_OBJECT
 
@@ -191,14 +191,14 @@ public:
     viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
   };
 
-  /*
+
   //TODO: MOVE TO SHIFT CORRECTION... and Finish ShiftCorrection
   QString imagesPath = mPatientData->getActivePatientFolder()+"/Images";
   mShiftCorrectionWidget->init(imagesPath);
   //Don't show ShiftCorrection in release
   //mShiftCorrectionIndex = mContextDockWidget->addTab(mShiftCorrectionWidget,
   //    QString("Shift correction"));
-*/
+
 };
 
 class PatientRegistrationWorkflowState : public WorkflowState
@@ -230,7 +230,7 @@ public:
     WorkflowState::onExit(event);
     viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
   };
-};
+};*/
 
 class PreOpPlanningWorkflowState : public WorkflowState
 {

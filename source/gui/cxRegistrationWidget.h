@@ -12,10 +12,10 @@
 
 
 #include <map>
-#include <QWidget>
 #include "sscVolumetricRep.h"
 #include "sscLandmark.h"
 #include "sscTransform3D.h"
+#include "cxWhatsThisWidget.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -30,7 +30,7 @@ namespace cx
  * \class RegistrationWidget
  * Superclass for Image Registration and Patient Registration
  */
-class RegistrationWidget : public QWidget
+class RegistrationWidget : public WhatsThisWidget
 {
   Q_OBJECT
 

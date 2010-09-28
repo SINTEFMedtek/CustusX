@@ -13,6 +13,7 @@
 namespace cx
 {
 ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) :
+    WhatsThisWidget(parent),
     mVerticalLayout(new QVBoxLayout(this)),
     mOffsetLabel(new QLabel(QString("Manual offset:"), this)),
     mOffsetsGridLayout(new QGridLayout()),
@@ -32,7 +33,6 @@ ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) 
 {
   this->setObjectName("ManualRegistrationOffsetWidget");
   this->setWindowTitle("Manual Registration Offset");
-  this->setWhatsThis("This is what it is!");
 
   mResetOffsetButton->setDisabled(true);
   connect(mResetOffsetButton, SIGNAL(clicked()), this, SLOT(resetOffsetSlot()));
@@ -114,6 +114,15 @@ void ManualRegistrationOffsetWidget::resetOffsetSlot()
     mResetOffsetButton->setDisabled(true);
     this->setOffsetSlot(mDefaultValue);
   }
+}
+
+QString ManualRegistrationOffsetWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Manual offset.</h3>"
+      "<p>Method used for correcting small mismatches.</p>"
+      "<p><i>Drag the sliders to adjust the data set.</i></p>"
+      "</html>";
 }
 
 void ManualRegistrationOffsetWidget::setOffsetSlot(int value)
