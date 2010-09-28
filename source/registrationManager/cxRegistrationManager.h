@@ -50,7 +50,7 @@ public:
 
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
-  void doFastRegistration_Orientation(); ///< use the current dominant tool orientation to find patient orientation
+  void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
 
   //Interface for saving/loading
