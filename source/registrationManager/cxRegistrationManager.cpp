@@ -345,7 +345,13 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::messageManager()->sendInfo("Image registration has been performed for " + image->getName());
 }
 
-void RegistrationManager::doFastRegistration_Orientation()
+/**Perform a fast orientation by setting the patient registration equal to the current dominant
+ * tool position.
+ * Input is an additional transform tMtm that modifies the tool position. Use this to
+ * define DICOM-ish spaces relative to the tool.
+ *
+ */
+void RegistrationManager::doFastRegistration_Orientation(const ssc::Transform3D& tMtm)
 {
   ssc::Transform3DPtr rMpr = ssc::toolManager()->get_rMpr();
   ssc::Transform3D prMt = ssc::toolManager()->getDominantTool()->get_prMt();
@@ -354,7 +360,7 @@ void RegistrationManager::doFastRegistration_Orientation()
   //the tool is defined in DICOM space such that
   //the tool points toward the patients feet and the spheres faces the same
   //direction as the nose
-  ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+  //ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
     ssc::Transform3D tMpr = prMt.inv();
 
 //  ssc::Transform3D tmMpr = prMt *tMtm;
