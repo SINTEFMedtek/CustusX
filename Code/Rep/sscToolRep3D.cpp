@@ -243,7 +243,7 @@ void ToolRep3D::receiveVisible(bool visible)
     mToolActor->SetVisibility(mTool->getVisible());
   }
 
-  std::cout << "Tool3DRep: receiveVisible "<< mTool->getName() << visible << " - " << mStayHiddenAfterVisible << std::endl;
+//  std::cout << "Tool3DRep: receiveVisible "<< mTool->getName() << visible << " - " << mStayHiddenAfterVisible << std::endl;
 
 	//updateOffsetGraphics();
   this->update();
