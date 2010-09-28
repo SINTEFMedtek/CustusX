@@ -106,7 +106,7 @@ void RegistrationManager::setManualPatientRegistrationOffsetSlot(ssc::Transform3
   mLastRegistrationTime = regTrans.mTimestamp;
 
   mPatientRegistrationOffset = offset;
-  ssc::messageManager()->sendInfo("Offset for the patient registration is set.");
+  //ssc::messageManager()->sendInfo("Offset for the patient registration is set."); SPAM!!!
 }
 
 ssc::Transform3D RegistrationManager::getManualPatientRegistrationOffset()
