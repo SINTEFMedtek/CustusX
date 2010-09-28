@@ -50,6 +50,8 @@ public:
 
   void doPatientRegistration(); ///< registrates the master image to the patient
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
+  void doFastRegistration_Orientation(); ///< use the current dominant tool orientation to find patient orientation
+  void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
 
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
@@ -60,8 +62,9 @@ public slots:
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset); ///< transform for (slightly) moving a patient registration
 
 signals:
-  void imageRegistrationPerformed();
+  //void imageRegistrationPerformed();
   void patientRegistrationPerformed();
+  //void fastRegistrationPerformed();
 
 protected:
   RegistrationManager(); ///< use getInstance instead
@@ -69,6 +72,7 @@ protected:
 
   ssc::Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
   vtkPointsPtr convertTovtkPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
+  std::vector<ssc::Vector3D> convertAndTransformToPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
   std::vector<std::string> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
   void updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrame);
 
