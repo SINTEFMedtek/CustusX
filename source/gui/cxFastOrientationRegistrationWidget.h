@@ -5,6 +5,7 @@
 #include "sscForwardDeclarations.h"
 
 class QPushButton;
+class QCheckBox;
 
 namespace cx
 {
@@ -37,6 +38,8 @@ private slots:
 
 private:
   QPushButton* mSetOrientationButton;
+  QCheckBox* mInvertButton;
+
   ssc::ToolPtr mToolToSample; ///< tool to be sampled from
 };
 }
