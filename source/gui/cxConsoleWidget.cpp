@@ -8,10 +8,11 @@ namespace cx
 {
 
 ConsoleWidget::ConsoleWidget(QWidget* parent) :
-    QWidget(parent)
+    WhatsThisWidget(parent)
 {
   this->setObjectName("ConsoleWidget");
   this->setWindowTitle("Console");
+  this->setWhatsThis(this->defaultWhatsThis());
 
   // Create text browser
   mTextBrowser = new QTextBrowser(this);
@@ -37,6 +38,15 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 ConsoleWidget::~ConsoleWidget()
 {}
 
+QString ConsoleWidget::defaultWhatsThis() const
+{
+  return "<html>"
+         "<h3>CustusX3 console.</h3>"
+         "<p>Display device for system administration messages.</p>"
+         "<p><i>Right click for addition options.</i></p>"
+         "</html>";
+}
+
 void ConsoleWidget::printMessage(Message message)
 {
   this->format(message);
@@ -47,17 +57,11 @@ void ConsoleWidget::printMessage(Message message)
 void ConsoleWidget::createTextCharFormats()
 {
   mFormat[ssc::mlINFO].setForeground(Qt::black);
-  mFormat[ssc::mlWARNING].setForeground(QColor(255,140,0));
+  mFormat[ssc::mlWARNING].setForeground(QColor(255,140,0));  //dark orange
   mFormat[ssc::mlERROR].setForeground(Qt::red);
-  mFormat[ssc::mlDEBUG].setForeground(QColor(135,206,250));
+  mFormat[ssc::mlDEBUG].setForeground(QColor(135,206,250)); //sky blue
   mFormat[ssc::mlCERR].setForeground(Qt::red);
   mFormat[ssc::mlCOUT].setForeground(QColor(34,139,34));
-
-//
-//  mInfoFormat.setForeground(Qt::black);
-//  mWarningFormat.setForeground(QColor(255,140,0)); //dark orange
-//  mErrorFormat.setForeground(Qt::red);
-//  mDebugFormat.setForeground(QColor(135,206,250)); //sky blue
 }
 
 void ConsoleWidget::format(Message& message)
@@ -65,24 +69,7 @@ void ConsoleWidget::format(Message& message)
   if (!mFormat.count(message.getMessageLevel()))
     return;
   mTextBrowser->setCurrentCharFormat(mFormat[message.getMessageLevel()]);
-//
-//  switch(message.getMessageLevel())
-//  {
-//  case ssc::mlINFO:
-//    mTextBrowser->setCurrentCharFormat(mInfoFormat);
-//    break;
-//  case ssc::mlWARNING:
-//    mTextBrowser->setCurrentCharFormat(mWarningFormat);
-//    break;
-//  case ssc::mlERROR:
-//    mTextBrowser->setCurrentCharFormat(mErrorFormat);
-//    break;
-//  case ssc::mlDEBUG:
-//    mTextBrowser->setCurrentCharFormat(mDebugFormat);
-//    break;
-//  default:
-//    break;
-//  }
+
 }
 
 }//namespace cx
