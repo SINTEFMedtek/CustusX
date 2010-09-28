@@ -1,5 +1,6 @@
 #include "cxFastOrientationRegistrationWidget.h"
 
+#include <cmath>
 #include <QPushButton>
 #include <QCheckBox>
 #include <QVBoxLayout>
@@ -42,18 +43,18 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
+  ssc::Transform3D tMtm;
+
   if (mInvertButton->isChecked())
   {
-    ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
   }
   else
   {
-    ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
   }
 
-
-  registrationManager()->doFastRegistration_Orientation();
-  registrationManager()->doFastRegistration_Orientation();
+  registrationManager()->doFastRegistration_Orientation(tMtm);
 }
 
 void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
