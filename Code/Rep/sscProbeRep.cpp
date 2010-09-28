@@ -150,7 +150,6 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	Vector3D intersection;
 	if (!this->intersectData(p0, p1, intersection))
 	{
-	  std::cout << "No intersection with data found." << std::endl;
 	  return intersection;
 	}
 
