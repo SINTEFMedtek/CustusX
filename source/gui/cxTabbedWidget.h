@@ -1,8 +1,8 @@
 #ifndef CXTABBEDWIDGET_H_
 #define CXTABBEDWIDGET_H_
 
-#include <QWidget>
 #include <QString>
+#include "cxWhatsThisWidget.h"
 
 class QTabWidget;
 
@@ -17,33 +17,41 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class TabbedWidget : public QWidget
+class TabbedWidget : public WhatsThisWidget
 {
 public:
   TabbedWidget(QString objectName, QString windowTitle, QWidget* parent);
   virtual ~TabbedWidget();
 
-  void addTab(QWidget* newTab, QString newTabName, QString tabsWhatThis);
+  void addTab(WhatsThisWidget* newTab, QString newTabName);
+  virtual QString defaultWhatsThis() const;
 
 protected:
-  virtual QString defaultWhatThis();
-
   QTabWidget* mTabWidget;
-
 };
 
 class RegistrationMethodsWidget : public TabbedWidget
 {
 public:
-  RegistrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-    TabbedWidget(objectName, windowTitle, parent)
-  {}
+  RegistrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~RegistrationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
 
-protected:
-  virtual QString defaultWhatThis()
-  {
-    return "Registration methods ...";
-  };
+class LandmarkRegistrationsWidget : public TabbedWidget
+{
+public:
+  LandmarkRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~LandmarkRegistrationsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+
+class FastRegistrationsWidget : public TabbedWidget
+{
+public:
+  FastRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~FastRegistrationsWidget(){};
+  virtual QString defaultWhatsThis() const;
 };
 }
 #endif /* CXTABBEDWIDGET_H_ */

@@ -10,7 +10,7 @@
 namespace cx
 {
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(QWidget* parent) :
-    QWidget(parent),
+    WhatsThisWidget(parent),
     mSetOrientationButton(new QPushButton("Get Orientation"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
@@ -25,6 +25,14 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(QWidget* pa
 
 FastOrientationRegistrationWidget::~FastOrientationRegistrationWidget()
 {}
+
+QString FastOrientationRegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Fast orientation registration.</h3>"
+      "<p>Fast and approximate method for determining the patient registrations orientation.</p>"
+      "<p><i>Align the Polaris tool so that the tools tip points towards the patients feet and the markers face the same way as the patients nose. Click the Get Orientation button.</i></p></html>";
+}
 
 void FastOrientationRegistrationWidget::showEvent(QShowEvent* event)
 {

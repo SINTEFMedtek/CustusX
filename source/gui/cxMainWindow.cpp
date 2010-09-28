@@ -46,7 +46,7 @@ namespace cx
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
   mToggleWidgetActionGroup(NULL),
-  mRegsitrationMethodsWidget(new TabbedWidget("RegistrationMethodsWidget", "Registration Methods", this)),
+  mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mShiftCorrectionWidget(new ShiftCorrectionWidget(this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
@@ -70,27 +70,24 @@ MainWindow::MainWindow() :
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-  QWhatsThis::enterWhatsThisMode();
-
-  TabbedWidget* landmarkRegistrationsWidget = new TabbedWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
+  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
   mImageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
-  landmarkRegistrationsWidget->addTab(mImageRegistrationWidget, "Image", "Something");
-  //landmarkRegistrationsWidget->setTabWhatsThis(0, "This is landmark base imageregistration.");
+  landmarkRegistrationsWidget->addTab(mImageRegistrationWidget, "Image");
   mPatientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
-  landmarkRegistrationsWidget->addTab(mPatientRegistrationWidget, "Patient", "Something");
+  landmarkRegistrationsWidget->addTab(mPatientRegistrationWidget, "Patient");
 
-  TabbedWidget* fastRegistrationsWidget = new TabbedWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
+  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
   mFastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(mFastOrientationRegistrationWidget, "Orientation", "Something");
+  fastRegistrationsWidget->addTab(mFastOrientationRegistrationWidget, "Orientation");
   mFastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(mFastImageRegistrationWidget, "Image", "Something");
+  fastRegistrationsWidget->addTab(mFastImageRegistrationWidget, "Image");
   mFastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(mFastPatientRegistrationWidget, "Patient", "Something");
+  fastRegistrationsWidget->addTab(mFastPatientRegistrationWidget, "Patient");
 
-  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark", "Something");
-  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast", "Something");
+  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
+  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
-  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual", "Something");
+  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
 
   this->addAsDockWidget(mBrowserWidget);
 

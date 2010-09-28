@@ -23,7 +23,7 @@
 namespace cx
 {
 RegistrationWidget::RegistrationWidget(QWidget* parent) :
-  QWidget(parent),
+  WhatsThisWidget(parent),
   mVerticalLayout(new QVBoxLayout(this)),
   mLandmarkTableWidget(new QTableWidget(this)),
   mAvarageAccuracyLabel(new QLabel(QString(" "), this))
