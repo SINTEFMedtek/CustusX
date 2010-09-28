@@ -17,6 +17,11 @@ FastImageRegistrationWidget::~FastImageRegistrationWidget()
 
 void FastImageRegistrationWidget::performRegistration()
 {
+  //make sure the masterImage is set
+  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
+  if(!masterImage)
+    registrationManager()->setMasterImage(mCurrentImage);
+
   //ssc::messageManager()->sendError("Fast image registration is not implemented yet!!!");
   this->updateAvarageAccuracyLabel();
 }
