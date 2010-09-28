@@ -57,7 +57,7 @@ void FastOrientationRegistrationWidget::setOrientationSlot()
 
   if (mInvertButton->isChecked())
   {
-    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+    tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(-M_PI_2); //?
   }
   else
   {
