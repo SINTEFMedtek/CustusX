@@ -234,10 +234,7 @@ void RepManager::dominantToolChangedSlot(const std::string& toolUid)
     return;
   }
   if(mConnectedTool == dominantTool)
-  {
-	  ssc::messageManager()->sendDebug("The new dominant tool was the same as the old one.");
     return;
-  }
 
   mConnectedTool = dominantTool;
 
