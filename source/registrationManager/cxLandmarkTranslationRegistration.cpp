@@ -242,11 +242,16 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
 namespace cx
 {
 
-
-ssc::Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target)
+/**
+ * Creates a transform that moves target into ref space. (targetMref)
+ * @param ref
+ * @param target
+ * @return
+ */
+ssc::Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target, bool* ok)
 {
   LandmarkTranslation registrator;
-  registrator.registerPoints(ref, target);
+  *ok = registrator.registerPoints(ref, target);
   return registrator.mResult;
 }
 

@@ -20,10 +20,15 @@ TabbedWidget::TabbedWidget(QString objectName, QString windowTitle, QWidget* par
 TabbedWidget::~TabbedWidget()
 {}
 
-void TabbedWidget::addTab(QWidget* newTab, QString newTabName)
+void TabbedWidget::addTab(QWidget* newTab, QString newTabName, QString tabsWhatThis)
 {
-  mTabWidget->addTab(newTab, newTabName);
+  int index = mTabWidget->addTab(newTab, newTabName);
+  mTabWidget->setTabWhatsThis(index, tabsWhatThis);
+}
 
+QString TabbedWidget::defaultWhatThis()
+{
+  return "";
 }
 
 } //namespace cx

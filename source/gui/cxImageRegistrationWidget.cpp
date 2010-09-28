@@ -15,8 +15,6 @@
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "sscDataManager.h"
-//#include "cxView3D.h"
-//#include "cxView2D.h"
 #include "sscProbeRep.h"
 
 namespace cx
@@ -89,7 +87,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
   std::string uid = ssc::dataManager()->addLandmark();
   ssc::Vector3D pos_r = probeRep->getPosition();
   ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
-  std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
+  //std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
   mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
 
   this->nextRow();
@@ -132,8 +130,7 @@ void ImageRegistrationWidget::showEvent(QShowEvent* event)
   RegistrationWidget::showEvent(event);
 
   ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-  connect(this, SIGNAL(thresholdChanged(int)),
-          probeRep.get(), SLOT(setThresholdSlot(int)));
+  connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
 }
 
 void ImageRegistrationWidget::hideEvent(QHideEvent* event)
@@ -141,8 +138,7 @@ void ImageRegistrationWidget::hideEvent(QHideEvent* event)
   RegistrationWidget::hideEvent(event);
 
   ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-  disconnect(this, SIGNAL(thresholdChanged(const int)),
-          probeRep.get(), SLOT(setThresholdSlot(const int)));
+  disconnect(this, SIGNAL(thresholdChanged(const int)), probeRep.get(), SLOT(setThresholdSlot(const int)));
 }
 
 void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
