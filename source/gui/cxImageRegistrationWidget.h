@@ -15,7 +15,7 @@ namespace cx
 /**
  * \class ImageRegistrationWidget
  *
- * \brief Widget used as a tab in the ContextDockWidget for image registration.
+ * \brief Widget for performing landmark based image registration
  *
  * \date Jan 27, 2009
  * \author: Janne Beate Bakeng, SINTEF

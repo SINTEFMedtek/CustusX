@@ -149,8 +149,12 @@ protected:
   QToolBar* mNavigationToolBar; ///< toolbar for navigation actions
   QToolBar* mWorkflowToolBar; ///< toolbar for workflow actions
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
+  QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 
   class TabbedWidget*                   mRegsitrationMethodsWidget; ///< container widget for all registrations
+  class FastImageRegistrationWidget*    mFastImageRegistrationWidget;
+  class FastPatientRegistrationWidget*  mFastPatientRegistrationWidget;
+  class FastOrientationRegistrationWidget* mFastOrientationRegistrationWidget;
   class ImageRegistrationWidget*        mImageRegistrationWidget; ///< interface for image registration
   class PatientRegistrationWidget*      mPatientRegistrationWidget; ///< interface for patient registration
   class ShiftCorrectionWidget*          mShiftCorrectionWidget; ///< interface for image shift correction
@@ -164,7 +168,7 @@ protected:
   class RegistrationHistoryWidget*      mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*         mVolumePropertiesWidget;
   class ConsoleWidget*                  mConsoleWidget;
-  class ManualRegistrationOffsetWidget* mManualRegistrationOffsetWidget;
+  //class ManualRegistrationOffsetWidget* mManualRegistrationOffsetWidget;
   class CustomStatusBar*                mCustomStatusBar;
   class FrameTreeWidget*                mFrameTreeWidget;
 

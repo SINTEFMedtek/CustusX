@@ -1,10 +1,3 @@
-/*
- * cxRegistrationWidget.cpp
- *
- *  Created on: Apr 21, 2010
- *      Author: dev
- */
-
 #include "cxRegistrationWidget.h"
 
 #include <sstream>
@@ -42,8 +35,6 @@ RegistrationWidget::RegistrationWidget(QWidget* parent) :
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
-
-  connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
 
   this->setLayout(mVerticalLayout);
 }
@@ -85,6 +76,10 @@ void RegistrationWidget::cellClickedSlot(int row, int column)
 void RegistrationWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
+  connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(activeImageChangedSlot()));
+  this->activeImageChangedSlot();
+
   registrationManager()->initialize();
   this->populateTheLandmarkTableWidget(mCurrentImage);
 }
@@ -93,6 +88,14 @@ void RegistrationWidget::showEvent(QShowEvent* event)
 void RegistrationWidget::hideEvent(QHideEvent* event)
 {
   QWidget::hideEvent(event);
+  disconnect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
+  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(activeImageChangedSlot()));
+
+  if(mCurrentImage)
+  {
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot()));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+  }
 }
 
 void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)

@@ -1,6 +1,7 @@
 #include "cxMainWindow.h"
 
 #include <QtGui>
+#include <QWhatsThis>
 #include "boost/scoped_ptr.hpp"
 #include "sscTime.h"
 #include "sscMessageManager.h"
@@ -17,6 +18,9 @@
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxImageRegistrationWidget.h"
+#include "cxFastImageRegistrationWidget.h"
+#include "cxFastPatientRegistrationWidget.h"
+#include "cxFastOrientationRegistrationWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
@@ -54,7 +58,6 @@ MainWindow::MainWindow() :
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mConsoleWidget(new ConsoleWidget(this)),
-  mManualRegistrationOffsetWidget(new ManualRegistrationOffsetWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
   mSettings(DataLocations::getSettings())
@@ -67,18 +70,27 @@ MainWindow::MainWindow() :
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
+  QWhatsThis::enterWhatsThisMode();
+
   TabbedWidget* landmarkRegistrationsWidget = new TabbedWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
   mImageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
-  landmarkRegistrationsWidget->addTab(mImageRegistrationWidget, "Image Registration");
+  landmarkRegistrationsWidget->addTab(mImageRegistrationWidget, "Image", "Something");
+  //landmarkRegistrationsWidget->setTabWhatsThis(0, "This is landmark base imageregistration.");
   mPatientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
-  landmarkRegistrationsWidget->addTab(mPatientRegistrationWidget, "Patient Registration");
+  landmarkRegistrationsWidget->addTab(mPatientRegistrationWidget, "Patient", "Something");
 
-  TabbedWidget* fastRegistrationsWidget = new TabbedWidget("FastAndAproxRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
-  //mOrientationRegistrationWidget (?) = new OrientationRegistrationWidget(fastRegistrationsWidget);
-  //fastRegistrationsWidget->addTab();
+  TabbedWidget* fastRegistrationsWidget = new TabbedWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
+  mFastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
+  fastRegistrationsWidget->addTab(mFastOrientationRegistrationWidget, "Orientation", "Something");
+  mFastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
+  fastRegistrationsWidget->addTab(mFastImageRegistrationWidget, "Image", "Something");
+  mFastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
+  fastRegistrationsWidget->addTab(mFastPatientRegistrationWidget, "Patient", "Something");
 
-  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
-  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
+  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark", "Something");
+  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast", "Something");
+  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
+  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual", "Something");
 
   this->addAsDockWidget(mBrowserWidget);
 
@@ -99,7 +111,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mRegsitrationMethodsWidget);
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mConsoleWidget);
-  this->addAsDockWidget(mManualRegistrationOffsetWidget);
+  //this->addAsDockWidget(mManualRegistrationOffsetWidget);
   this->addAsDockWidget(mFrameTreeWidget);
 
   this->createActions();
@@ -265,9 +277,6 @@ void MainWindow::createActions()
   connect(mCenterToImageCenterAction, SIGNAL(triggered()), this, SLOT(centerToImageCenterSlot()));
   mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
   connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
-
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), mImageRegistrationWidget, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), mPatientRegistrationWidget, SLOT(activeImageChangedSlot()));
 
   mSaveDesktopAction = new QAction(tr("Save desktop"), this);
   mSaveDesktopAction->setToolTip("Save desktop for workflow step");
@@ -610,6 +619,10 @@ void MainWindow::createToolBars()
   mDesktopToolBar->setObjectName("DesktopToolBar");
   mDesktopToolBar->addAction(mSaveDesktopAction);
   mDesktopToolBar->addAction(mResetDesktopAction);
+
+  mHelpToolBar = addToolBar("Help");
+  mHelpToolBar->setObjectName("HelpToolBar");
+  mHelpToolBar->addAction(QWhatsThis::createAction());
 
 }
 void MainWindow::createStatusBar()

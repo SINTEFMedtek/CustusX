@@ -12,6 +12,7 @@
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
 #include "sscDataManager.h"
+#include "cxLandmarkTranslationRegistration.h"
 #include "cxFrameForest.h"
 
 namespace cx
@@ -68,6 +69,7 @@ bool RegistrationManager::isMasterImageSet()
   return mMasterImage;
 }
 
+// used for loading a rMpr directly from file. Not in use. Can be reused in user story intraoperative CT (kar)
 void RegistrationManager::setManualPatientRegistration(ssc::Transform3D patientRegistration)
 {
   ssc::messageManager()->sendWarning("RegistrationManager::setManualPatientRegistration NEEDS REFACTORING!!!");
@@ -212,6 +214,19 @@ vtkPointsPtr RegistrationManager::convertTovtkPoints(const std::vector<std::stri
   return retval;
 }
 
+std::vector<ssc::Vector3D> RegistrationManager::convertAndTransformToPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M)
+{
+  std::vector<ssc::Vector3D> retval;
+
+  for (unsigned i=0; i<uids.size(); ++i)
+  {
+    std::string uid = uids[i];
+    ssc::Vector3D p = M.coord(data.find(uid)->second.getCoord());
+    retval.push_back(p);
+  }
+  return retval;
+}
+
 /** Perform a landmark registration between the data sets source and target.
  *  Return transform from source to target.
  */
@@ -319,8 +334,62 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 
   mLastRegistrationTime = regTrans.mTimestamp;
 
-  emit imageRegistrationPerformed();
+  //emit imageRegistrationPerformed();
   ssc::messageManager()->sendInfo("Image registration has been performed for " + image->getName());
+}
+
+void RegistrationManager::doFastRegistration_Orientation()
+{
+  ssc::Transform3DPtr rMpr = ssc::toolManager()->get_rMpr();
+  ssc::Transform3D prMt = ssc::toolManager()->getDominantTool()->get_prMt();
+
+  //create a marked(m) space tm, which is related to tool space (t) as follows:
+  //the tool is defined in DICOM space such that
+  //the tool points toward the patients feet and the spheres faces the same
+  //direction as the nose
+  ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+  ssc::Transform3D tmMpr = prMt *tMtm;
+
+  ssc::RegistrationTransform regTrans(tmMpr, QDateTime::currentDateTime(), "Fast_Orientation");
+  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  mLastRegistrationTime = regTrans.mTimestamp;
+
+  ssc::messageManager()->sendInfo("Fast orientation registration has been performed.");
+}
+
+void RegistrationManager::doFastRegistration_Translation()
+{
+
+  if(!mMasterImage)
+    return;
+
+  ssc::LandmarkMap masterLandmarks = mMasterImage->getLandmarks();
+  ssc::LandmarkMap toolLandmarks = ssc::toolManager()->getLandmarks();
+
+  std::vector<std::string> landmarks = this->getUsableLandmarks(masterLandmarks, toolLandmarks);
+
+  ssc::Transform3D rMd = mMasterImage->get_rMd();
+  ssc::Transform3D rMpr_old = *ssc::toolManager()->get_rMpr();
+  std::vector<ssc::Vector3D> p_pr_old = this->convertAndTransformToPoints(landmarks, masterLandmarks, rMpr_old.inv()*rMd);
+  std::vector<ssc::Vector3D> p_pr_new = this->convertAndTransformToPoints(landmarks, toolLandmarks, ssc::Transform3D());
+
+  LandmarkTranslationRegistration landmarkTransReg;
+  bool ok = false;
+  ssc::Transform3D pr_oldMpr_new = landmarkTransReg.registerPoints(p_pr_old, p_pr_new, &ok);
+  if (!ok)
+  {
+    ssc::messageManager()->sendWarning("Fast translation registration: Failed to register: [" + string_cast(p_pr_old.size()) + "points]");
+    return;
+  }
+
+  ssc::RegistrationTransform regTrans(rMpr_old*pr_oldMpr_new, QDateTime::currentDateTime(), "Fast_Translation");
+  ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
+  mLastRegistrationTime = regTrans.mTimestamp;
+
+  mPatientRegistrationOffset = ssc::Transform3D();
+
+  //emit fastRegistrationPerformed();
+  ssc::messageManager()->sendInfo("Fast translation registration has been performed.");
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)
