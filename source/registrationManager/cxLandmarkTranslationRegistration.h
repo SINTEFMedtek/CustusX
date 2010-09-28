@@ -21,7 +21,8 @@ namespace cx
  */
 class LandmarkTranslationRegistration
 {
-  ssc::Transform3D registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target);
+public:
+  ssc::Transform3D registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target, bool* ok);
 };
 
 }

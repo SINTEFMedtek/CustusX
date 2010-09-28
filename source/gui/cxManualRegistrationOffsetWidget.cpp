@@ -32,6 +32,7 @@ ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) 
 {
   this->setObjectName("ManualRegistrationOffsetWidget");
   this->setWindowTitle("Manual Registration Offset");
+  this->setWhatsThis("This is what it is!");
 
   mResetOffsetButton->setDisabled(true);
   connect(mResetOffsetButton, SIGNAL(clicked()), this, SLOT(resetOffsetSlot()));

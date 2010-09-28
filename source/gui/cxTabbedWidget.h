@@ -23,11 +23,27 @@ public:
   TabbedWidget(QString objectName, QString windowTitle, QWidget* parent);
   virtual ~TabbedWidget();
 
-  void addTab(QWidget* newTab, QString newTabName);
+  void addTab(QWidget* newTab, QString newTabName, QString tabsWhatThis);
 
-private:
+protected:
+  virtual QString defaultWhatThis();
+
   QTabWidget* mTabWidget;
 
+};
+
+class RegistrationMethodsWidget : public TabbedWidget
+{
+public:
+  RegistrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+    TabbedWidget(objectName, windowTitle, parent)
+  {}
+
+protected:
+  virtual QString defaultWhatThis()
+  {
+    return "Registration methods ...";
+  };
 };
 }
 #endif /* CXTABBEDWIDGET_H_ */

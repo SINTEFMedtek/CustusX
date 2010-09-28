@@ -1,5 +1,7 @@
-/*
- * cxRegistrationWidget.h
+/**
+ *\class RegistrationWidget
+ *
+ *\brief
  *
  *  Created on: Apr 21, 2010
  *      Author: dev
