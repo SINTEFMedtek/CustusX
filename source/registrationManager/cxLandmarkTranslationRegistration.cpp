@@ -186,6 +186,7 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
 
   // Scale the translation components of the Transform in the Optimizer
   OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
+  std::cout << "transform->GetNumberOfParameters() " << transform->GetNumberOfParameters() << std::endl;
   scales.Fill( 0.01 );
 
   unsigned long   numberOfIterations =  100;

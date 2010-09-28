@@ -201,7 +201,8 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
   else if (igstk::CompletedEvent().CheckEvent(&event))
   {
     emit trackerReport(TRACKER_COMMUNICATION_COMPLETE, true, true, mUid);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly.");
+    // this seems to appear after every transmit (several times/second
+    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly.");
   }
   //failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))

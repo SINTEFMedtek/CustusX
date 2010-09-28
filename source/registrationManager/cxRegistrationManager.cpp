@@ -355,7 +355,10 @@ void RegistrationManager::doFastRegistration_Orientation()
   //the tool points toward the patients feet and the spheres faces the same
   //direction as the nose
   ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
-  ssc::Transform3D tmMpr = prMt *tMtm;
+    ssc::Transform3D tMpr = prMt.inv();
+
+//  ssc::Transform3D tmMpr = prMt *tMtm;
+  ssc::Transform3D tmMpr = tMtm * tMpr;
 
   ssc::RegistrationTransform regTrans(tmMpr, QDateTime::currentDateTime(), "Fast_Orientation");
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
