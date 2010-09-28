@@ -1,6 +1,7 @@
 #include "cxFastOrientationRegistrationWidget.h"
 
 #include <QPushButton>
+#include <QCheckBox>
 #include <QVBoxLayout>
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
@@ -11,10 +12,13 @@ namespace cx
 {
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(QWidget* parent) :
     QWidget(parent),
-    mSetOrientationButton(new QPushButton("Get Orientation"))
+    mSetOrientationButton(new QPushButton("Get Orientation")),
+    mInvertButton(new QCheckBox("Back face"))
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
+  layout->addWidget(mInvertButton);
   layout->addWidget(mSetOrientationButton);
+  layout->addStretch();
 
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot(const std::string&)));
 
@@ -38,6 +42,17 @@ void FastOrientationRegistrationWidget::hideEvent(QHideEvent* event)
 
 void FastOrientationRegistrationWidget::setOrientationSlot()
 {
+  if (mInvertButton->isChecked())
+  {
+    ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+  }
+  else
+  {
+    ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+  }
+
+
+  registrationManager()->doFastRegistration_Orientation();
   registrationManager()->doFastRegistration_Orientation();
 }
 
