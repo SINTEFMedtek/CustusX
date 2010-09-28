@@ -277,11 +277,15 @@ void RegistrationManager::doPatientRegistration()
   vtkPointsPtr p_ref = this->convertTovtkPoints(landmarks, masterLandmarks, mMasterImage->get_rMd());
   vtkPointsPtr p_pr = this->convertTovtkPoints(landmarks, toolLandmarks, ssc::Transform3D());
 
+  // ignore if too few data.
+  if (p_ref->GetNumberOfPoints() < 3)
+    return;
+
   bool ok = false;
   ssc::Transform3D rMpr = this->performLandmarkRegistration(p_pr, p_ref, &ok);
   if (!ok)
   {
-    ssc::messageManager()->sendInfo("P-I Landmark registration: Failed to register: [" + string_cast(p_pr->GetNumberOfPoints()) + "p]");
+    ssc::messageManager()->sendError("P-I Landmark registration: Failed to register: [" + string_cast(p_pr->GetNumberOfPoints()) + "p]");
     return;
   }
 
@@ -318,12 +322,15 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 
   if (landmarks.empty())
     return;
+  // ignore if too few data.
+  if (p_ref->GetNumberOfPoints() < 3)
+    return;
 
   bool ok = false;
   ssc::Transform3D rMd = this->performLandmarkRegistration(p_data, p_ref, &ok);
   if (!ok)
   {
-    ssc::messageManager()->sendInfo("I-I Landmark registration: Failed to register: [" + string_cast(p_data->GetNumberOfPoints()) + "p], "+ image->getName());
+    ssc::messageManager()->sendError("I-I Landmark registration: Failed to register: [" + string_cast(p_data->GetNumberOfPoints()) + "p], "+ image->getName());
     return;
   }
 
@@ -338,7 +345,13 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::messageManager()->sendInfo("Image registration has been performed for " + image->getName());
 }
 
-void RegistrationManager::doFastRegistration_Orientation()
+/**Perform a fast orientation by setting the patient registration equal to the current dominant
+ * tool position.
+ * Input is an additional transform tMtm that modifies the tool position. Use this to
+ * define DICOM-ish spaces relative to the tool.
+ *
+ */
+void RegistrationManager::doFastRegistration_Orientation(const ssc::Transform3D& tMtm)
 {
   ssc::Transform3DPtr rMpr = ssc::toolManager()->get_rMpr();
   ssc::Transform3D prMt = ssc::toolManager()->getDominantTool()->get_prMt();
@@ -347,19 +360,25 @@ void RegistrationManager::doFastRegistration_Orientation()
   //the tool is defined in DICOM space such that
   //the tool points toward the patients feet and the spheres faces the same
   //direction as the nose
-  ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
-  ssc::Transform3D tmMpr = prMt *tMtm;
+  //ssc::Transform3D tMtm = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2); //?
+    ssc::Transform3D tMpr = prMt.inv();
+
+//  ssc::Transform3D tmMpr = prMt *tMtm;
+  ssc::Transform3D tmMpr = tMtm * tMpr;
 
   ssc::RegistrationTransform regTrans(tmMpr, QDateTime::currentDateTime(), "Fast_Orientation");
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
   ssc::messageManager()->sendInfo("Fast orientation registration has been performed.");
+
+  // also apply the fast translation registration if any (this frees us form doing stuff in a well-defined order.)
+  this->doFastRegistration_Translation();
+
 }
 
 void RegistrationManager::doFastRegistration_Translation()
 {
-
   if(!mMasterImage)
     return;
 
@@ -373,12 +392,16 @@ void RegistrationManager::doFastRegistration_Translation()
   std::vector<ssc::Vector3D> p_pr_old = this->convertAndTransformToPoints(landmarks, masterLandmarks, rMpr_old.inv()*rMd);
   std::vector<ssc::Vector3D> p_pr_new = this->convertAndTransformToPoints(landmarks, toolLandmarks, ssc::Transform3D());
 
+  // ignore if too few data.
+  if (p_pr_old.size() < 1)
+    return;
+
   LandmarkTranslationRegistration landmarkTransReg;
   bool ok = false;
   ssc::Transform3D pr_oldMpr_new = landmarkTransReg.registerPoints(p_pr_old, p_pr_new, &ok);
   if (!ok)
   {
-    ssc::messageManager()->sendWarning("Fast translation registration: Failed to register: [" + string_cast(p_pr_old.size()) + "points]");
+    ssc::messageManager()->sendError("Fast translation registration: Failed to register: [" + string_cast(p_pr_old.size()) + "points]");
     return;
   }
 
