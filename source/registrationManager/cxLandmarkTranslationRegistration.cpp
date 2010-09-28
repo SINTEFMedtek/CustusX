@@ -79,8 +79,8 @@ public:
       return;
       }
 
-    std::cout << "Value = " << optimizer->GetCachedValue() << std::endl;
-    std::cout << "Position = "  << optimizer->GetCachedCurrentPosition();
+    std::cout << "iteration Value = " << optimizer->GetCachedValue() << std::endl;
+    std::cout << "iteration Position = "  << optimizer->GetCachedCurrentPosition();
     std::cout << std::endl << std::endl;
 
     }
@@ -186,6 +186,7 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
 
   // Scale the translation components of the Transform in the Optimizer
   OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
+  std::cout << "transform->GetNumberOfParameters() " << transform->GetNumberOfParameters() << std::endl;
   scales.Fill( 0.01 );
 
   unsigned long   numberOfIterations =  100;
@@ -216,8 +217,8 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
   registration->SetMovingPointSet(   movingPointSet   );
 
   // Connect an observer
-  CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
-  optimizer->AddObserver( itk::IterationEvent(), observer );
+  //CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
+  //optimizer->AddObserver( itk::IterationEvent(), observer );
 
   try
     {
@@ -250,6 +251,29 @@ namespace cx
  */
 ssc::Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<ssc::Vector3D> ref, std::vector<ssc::Vector3D> target, bool* ok)
 {
+  if (ref.size()!=target.size() || ref.size()==0)
+  {
+    std::cout << "Different sizes in ref and target: aborting registration." << std::endl;
+    *ok = false;
+    return ssc::Transform3D();
+  }
+
+  // ad-hoc solution for one and two points: itk doesn't handle this for some reason.
+  if (ref.size()==1)
+  {
+    ssc::Vector3D t = ref[0] - target[0];
+    *ok = true;
+    return ssc::createTransformTranslate(t);
+  }
+  if (ref.size()==2)
+  {
+    ssc::Vector3D rr = (ref[0] + ref[1])/2.0;
+    ssc::Vector3D tt = (target[0] + target[1])/2.0;
+    ssc::Vector3D t = rr - tt;
+    *ok = true;
+    return ssc::createTransformTranslate(t);
+  }
+
   LandmarkTranslation registrator;
   *ok = registrator.registerPoints(ref, target);
   return registrator.mResult;

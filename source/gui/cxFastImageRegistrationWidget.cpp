@@ -26,6 +26,11 @@ QString FastImageRegistrationWidget::defaultWhatsThis() const
 
 void FastImageRegistrationWidget::performRegistration()
 {
+  //make sure the masterImage is set
+  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
+  if(!masterImage)
+    registrationManager()->setMasterImage(mCurrentImage);
+
   this->updateAvarageAccuracyLabel();
 }
 
