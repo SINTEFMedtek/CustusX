@@ -1,7 +1,7 @@
 #ifndef CXMANUALREGISTRATIONOFFSETWIDGET_H_
 #define CXMANUALREGISTRATIONOFFSETWIDGET_H_
 
-#include <QWidget>
+#include "cxWhatsThisWidget.h"
 
 class QLabel;
 class QGridLayout;
@@ -21,13 +21,14 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class ManualRegistrationOffsetWidget : public QWidget
+class ManualRegistrationOffsetWidget : public WhatsThisWidget
 {
   Q_OBJECT
 
 public:
   ManualRegistrationOffsetWidget(QWidget* parent);
   ~ManualRegistrationOffsetWidget();
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void resetOffsetSlot();

@@ -10,10 +10,10 @@
 #include <QSlider>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
+#include "cxViewManager.h"
 #include "sscDataManager.h"
 #include "sscProbeRep.h"
 
@@ -58,6 +58,15 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
 
 ImageRegistrationWidget::~ImageRegistrationWidget()
 {
+}
+
+QString ImageRegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Landmark based image registration.</h3>"
+      "<p>Sample landmarks in the data set. </p>"
+      "<p><i>Click the volume and either add or resample landmarks.</i></p>"
+      "</html>";
 }
 
 void ImageRegistrationWidget::activeImageChangedSlot()
@@ -131,6 +140,7 @@ void ImageRegistrationWidget::showEvent(QShowEvent* event)
 
   ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
+  viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 }
 
 void ImageRegistrationWidget::hideEvent(QHideEvent* event)
@@ -139,6 +149,7 @@ void ImageRegistrationWidget::hideEvent(QHideEvent* event)
 
   ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
   disconnect(this, SIGNAL(thresholdChanged(const int)), probeRep.get(), SLOT(setThresholdSlot(const int)));
+  viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 
 void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)

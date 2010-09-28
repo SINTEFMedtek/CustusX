@@ -18,15 +18,12 @@ WorkflowStateMachine::WorkflowStateMachine()
 
   WorkflowState* patientData = this->newState(new PatientDataWorkflowState(mParentState));
   WorkflowState* registration = this->newState(new RegistrationWorkflowState(mParentState));
-  WorkflowState* imageRegistration= this->newState(new ImageRegistrationWorkflowState(registration));
-  WorkflowState* patientRegistration = this->newState(new PatientRegistrationWorkflowState(registration));
   WorkflowState* preOpPlanning = this->newState(new PreOpPlanningWorkflowState(mParentState));
   WorkflowState* navigation = this->newState(new NavigationWorkflowState(mParentState));
   WorkflowState* intraOpImaging = this->newState(new IntraOpImagingWorkflowState(mParentState));
   WorkflowState* postOpControll = this->newState(new PostOpControllWorkflowState(mParentState));
 
   Q_UNUSED(registration);
-  Q_UNUSED(patientRegistration);
   Q_UNUSED(preOpPlanning);
   Q_UNUSED(navigation);
   Q_UNUSED(intraOpImaging);
@@ -35,7 +32,6 @@ WorkflowStateMachine::WorkflowStateMachine()
   //set initial state on all levels
   this->setInitialState(mParentState);
   mParentState->setInitialState(patientData);
-  registration->setInitialState(imageRegistration);
 }
 
 void WorkflowStateMachine::startedSlot()

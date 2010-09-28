@@ -28,6 +28,7 @@ public:
 
   ImageRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
   virtual ~ImageRegistrationWidget(); ///< empty
+  virtual QString defaultWhatsThis() const;
 
 signals:
   void thresholdChanged(const int value); ///< the value selected by the slider
