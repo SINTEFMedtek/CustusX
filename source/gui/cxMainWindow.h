@@ -151,6 +151,7 @@ protected:
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 
+  class ConsoleWidget*                  mConsoleWidget;
   class RegistrationMethodsWidget*      mRegsitrationMethodsWidget; ///< container widget for all registrations
   class FastImageRegistrationWidget*    mFastImageRegistrationWidget;
   class FastPatientRegistrationWidget*  mFastPatientRegistrationWidget;
@@ -167,8 +168,6 @@ protected:
   ssc::ReconstructionWidget*            mReconstructionWidget;
   class RegistrationHistoryWidget*      mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*         mVolumePropertiesWidget;
-  class ConsoleWidget*                  mConsoleWidget;
-  //class ManualRegistrationOffsetWidget* mManualRegistrationOffsetWidget;
   class CustomStatusBar*                mCustomStatusBar;
   class FrameTreeWidget*                mFrameTreeWidget;
 
