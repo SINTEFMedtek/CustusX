@@ -216,9 +216,9 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
   registration->SetFixedPointSet( fixedPointSet );
   registration->SetMovingPointSet(   movingPointSet   );
 
-  // Connect an observer
-  //CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
-  //optimizer->AddObserver( itk::IterationEvent(), observer );
+//  // Connect an observer
+//  CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
+//  optimizer->AddObserver( itk::IterationEvent(), observer );
 
   try
     {
@@ -230,11 +230,13 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
     return false;
     }
 
-  std::cout << "Solution = " << transform->GetParameters() << std::endl;
 
   mResult = ssc::Transform3D();
   for (unsigned i=0; i<transform->GetNumberOfParameters(); ++i)
     mResult[i][3] = transform->GetParameters()[i];
+
+  //std::cout << "Solution = " << transform->GetParameters() << "\n" << mResult << std::endl;
+  //std::cout << "Solution = " << registration->GetLastTransformParameters() << std::endl;
 
   return true;
 
