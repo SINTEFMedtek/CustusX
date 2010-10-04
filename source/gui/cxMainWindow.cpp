@@ -46,6 +46,7 @@ namespace cx
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
   mToggleWidgetActionGroup(NULL),
+  mConsoleWidget(new ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mShiftCorrectionWidget(new ShiftCorrectionWidget(this)),
   mBrowserWidget(new BrowserWidget(this)),
@@ -57,7 +58,6 @@ MainWindow::MainWindow() :
   mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
-  mConsoleWidget(new ConsoleWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
   mSettings(DataLocations::getSettings())
@@ -108,7 +108,6 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mRegsitrationMethodsWidget);
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mConsoleWidget);
-  //this->addAsDockWidget(mManualRegistrationOffsetWidget);
   this->addAsDockWidget(mFrameTreeWidget);
 
   this->createActions();
