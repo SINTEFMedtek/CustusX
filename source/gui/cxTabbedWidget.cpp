@@ -16,6 +16,7 @@ TabbedWidget::TabbedWidget(QString objectName, QString windowTitle, QWidget* par
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mTabWidget);
+  layout->setMargin(2); // lots of tabbed widgets in layers use up the desktop. Must reduce.
 }
 
 TabbedWidget::~TabbedWidget()

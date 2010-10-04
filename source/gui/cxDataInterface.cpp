@@ -248,6 +248,9 @@ QStringList ParentFrameStringDataAdapter::getValueRange() const
   std::map<std::string, ssc::DataPtr> allData = ssc::dataManager()->getData();
   for (std::map<std::string, ssc::DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
   {
+    if (mData && (mData->getUid() == iter->first))
+      continue;
+
     retval << qstring_cast(iter->first);
   }
   return retval;
