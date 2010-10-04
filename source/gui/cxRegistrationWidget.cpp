@@ -45,6 +45,8 @@ RegistrationWidget::~RegistrationWidget()
 
 void RegistrationWidget::activeImageChangedSlot()
 {
+  if (!this->isVisible())
+    return;
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   if(mCurrentImage == activeImage)
     return;

@@ -40,12 +40,15 @@ ImportDataWizard::ImportDataWizard(ssc::DataPtr data, QWidget* parent) :
   mParentFrameAdapter = ParentFrameStringDataAdapter::New();
   mParentFrameAdapter->setData(data);
   ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
+  combo->setEnabled(ssc::dataManager()->getData().size()>1);
   layout->addWidget(combo);
 
-  QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
-  importTransformButton->setToolTip("Replace data transform with that of the parent data.");
-  connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
-  layout->addWidget(importTransformButton);
+  mImportTransformButton = new QPushButton("Import Transform from Parent", this);
+  mImportTransformButton->setToolTip("Replace data transform with that of the parent data.");
+  connect(mParentFrameAdapter.get(), SIGNAL(changed()), this, SLOT(updateImportTransformButton()));
+  connect(mImportTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
+  layout->addWidget(mImportTransformButton);
+  this->updateImportTransformButton();
 
   QHBoxLayout* buttons = new QHBoxLayout;
   layout->addLayout(buttons);
@@ -85,6 +88,14 @@ void ImportDataWizard::setInitialGuessForParentFrame()
     }
   }
 
+}
+
+void ImportDataWizard::updateImportTransformButton()
+{
+  ssc::DataPtr parent = ssc::dataManager()->getData(string_cast(mParentFrameAdapter->getValue()));
+  bool enabled = bool(parent);
+
+  mImportTransformButton->setEnabled(enabled);
 }
 
 void ImportDataWizard::importTransformSlot()

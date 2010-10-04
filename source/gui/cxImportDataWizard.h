@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "cxDataInterface.h"
+class QPushButton;
 
 namespace cx
 {
@@ -19,12 +20,14 @@ public:
   ImportDataWizard(ssc::DataPtr data, QWidget* parent=NULL);
   ~ImportDataWizard();
 
-  private slots:
+private slots:
+  void updateImportTransformButton();
   void importTransformSlot();
 private:
   void setInitialGuessForParentFrame();
   ssc::DataPtr mData;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
+  QPushButton* mImportTransformButton;
 };
 }//namespace cx
 #endif /* CXIMPORTDATAWIZARD_H_ */

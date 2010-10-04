@@ -95,6 +95,7 @@ ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) 
   mVerticalLayout->addWidget(mOffsetLabel);
   mVerticalLayout->addLayout(mOffsetsGridLayout);
   mVerticalLayout->addWidget(mResetOffsetButton);
+  mVerticalLayout->addStretch();
 
   this->activateManualRegistrationFieldSlot();
 }
