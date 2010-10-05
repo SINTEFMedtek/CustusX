@@ -29,6 +29,10 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mOffsetLine.reset(new GraphicalLine3D());
 	mTooltipPoint.reset(new GraphicalPoint3D());
 
+	mProbeSector.reset(new USProbeSector());
+	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
+	mProbeSectorActor = vtkActorPtr::New();
+
   //std::cout << "Tool3DRep: construct " << std::endl;
 
 //	if (pd::Settings::instance()->useDebugAxis())
@@ -124,6 +128,7 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
 	view->getRenderer()->AddActor(mToolActor);
+  view->getRenderer()->AddActor(mProbeSectorActor);
 
 	mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
 	mOffsetPoint->setRadius(2);
@@ -145,6 +150,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
 	view->getRenderer()->RemoveActor(mToolActor);
+  view->getRenderer()->RemoveActor(mProbeSectorActor);
 
 	mTooltipPoint.reset(new GraphicalPoint3D());
 	mOffsetPoint.reset(new GraphicalPoint3D());
@@ -172,14 +178,9 @@ void ToolRep3D::update()
     prMt = mTool->get_prMt();
   }
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-  //Transform3D sMr = mSlicer->get_sMr();
-  //Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
-  //mProbeSector->setPosition(sMr*rMpr*prMt);
-//  mProbeSector->setPosition(rMpr*prMt);
+  mProbeSector->setPosition(rMpr*prMt);
 
-  // Testcode
-  // Sector code
-  /*if (this->showProbe())
+  if (this->showProbe())
   {
     mProbeSector->setSector(mTool->getProbeSector());
     mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
@@ -188,7 +189,7 @@ void ToolRep3D::update()
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
     mProbeSectorActor->SetVisibility(mTool->getVisible());
-  }*/
+  }
 
   this->updateOffsetGraphics();
 }
