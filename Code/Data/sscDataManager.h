@@ -93,7 +93,7 @@ public:
   virtual LandmarkPropertyMap getLandmarkProperties() const { return LandmarkPropertyMap(); }
   virtual MEDICAL_DOMAIN getMedicalDomain() const { return mdLABORATORY; }
   virtual void setMedicalDomain(MEDICAL_DOMAIN domain) {}
-  virtual void clear() = 0; ///< remove all stuff from manager
+  virtual void clear() {}; ///< remove all stuff from manager
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state

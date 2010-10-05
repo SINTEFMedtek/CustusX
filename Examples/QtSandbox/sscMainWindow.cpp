@@ -82,11 +82,11 @@ void MainWindow::createStatusBar()
 
 void MainWindow::colorCrash()
 {
-#if 1
+#if QT_VERSION >= 0x040500
    QColorDialog dialog(QColor("white"), this);
   dialog.exec();
 #else
-  QColor result = QColorDialog::getColor( newPoint.value, this);
+  QColor result = QColorDialog::getColor(QColor("white"), this);
 #endif
 }
 }

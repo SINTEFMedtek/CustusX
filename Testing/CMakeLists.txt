@@ -19,7 +19,7 @@ if (BUILD_TESTING)
     include_directories( /opt/local/include )
     
     # cppunit
-    find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib)
+    find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib /usr/lib64)
     
     # test starting the data manager 
     # - ssc::Image
