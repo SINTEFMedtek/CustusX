@@ -49,7 +49,7 @@ void Image::resetTransferFunctions()
     return;
   }
   
-  mBaseImageData->Update();
+  //mBaseImageData->Update();
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
   
   if(mImageTransferFunctions3D)
