@@ -11,8 +11,7 @@
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 #include "sscTransform3D.h"
-
-//#include "sscRep.h"
+#include "sscRegistrationTransform.h"
 
 class QDomNode;
 

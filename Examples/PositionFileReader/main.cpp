@@ -5,6 +5,7 @@
 
 #include <QtGui>
 #include <boost/cstdint.hpp>
+#include <limits>
 
 #include "sscTransform3D.h"
 #include "sscPositionStorageFile.h"
@@ -38,7 +39,7 @@ int main(int argc, char **argv)
 	ret64 *= 1000;
 
 	// workaround for compilling 32 bit version:
-	boost::uint64_t tsModifier = ret64 & std::numeric_limits<boost::uint64_t>::max() ^ 0xffffffff; // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
+	boost::uint64_t tsModifier = ret64 & (std::numeric_limits<boost::uint64_t>::max() ^ 0xffffffff); // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
 	//boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
 
 	ssc::PositionStorageReader reader(posFile);
