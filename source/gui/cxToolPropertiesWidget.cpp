@@ -11,6 +11,8 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
+#include <QGroupBox>
+#include <QCheckBox>
 
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
