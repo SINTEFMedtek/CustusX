@@ -54,14 +54,6 @@ void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
   this->updateClipPlane();
   for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
   {
-//    // debug:
-//    vtkAbstractVolumeMapper* mapper = (*iter)->getVtkVolume()->GetMapper();
-//    std::cout << "mapper: count: " << mapper->GetReferenceCount() << std::endl;
-//    std::cout << "mClipPlane: " << mClipPlane.GetPointer() << std::endl;
-//    std::cout << "GetClippingPlanes ptr: " << (*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes() << std::endl;
-//    mapper->Print(std::cout);
-//    std::cout << "GetClippingPlanes: " << (*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes()->GetNumberOfItems() << "-" << (*iter)->getVtkVolume()->GetMapper()->GetClippingPlanes()->GetReferenceCount() << std::endl;
-
     this->addClipPlane(*iter, mClipPlane);
   }
   this->changedSlot();
@@ -84,8 +76,6 @@ ssc::SliceProxyPtr SlicePlaneClipper::getSlicer()
 
 void SlicePlaneClipper::clearVolumes()
 {
-//  std::cout << "SlicePlaneClipper::clearVolumes()" << std::endl;
-
   for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
   {
     (*iter)->getVtkVolume()->GetMapper()->RemoveClippingPlane(mClipPlane);
@@ -99,13 +89,7 @@ void SlicePlaneClipper::addVolume(ssc::VolumetricRepPtr volume)
     return;
   mVolumes.insert(volume);
 
-//  if (mClipPlane)
-//  {
-    this->addClipPlane(volume, mClipPlane);
-//
-//    if (!volume->getVtkVolume()->GetMapper()->GetClippingPlanes()->IsItemPresent(mClipPlane))
-//      volume->getVtkVolume()->GetMapper()->AddClippingPlane(mClipPlane);
- // }
+  this->addClipPlane(volume, mClipPlane);
 
   this->changedSlot();
 }
@@ -177,15 +161,11 @@ void SlicePlaneClipper::changedSlot()
     return;
 
   this->updateClipPlane();
-  //std::cout << "SlicePlaneClipper::changedSlot()" << std::endl;
 }
 
-
-
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
 
 
 ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mVolume(volume), mImage(image)
@@ -193,7 +173,6 @@ ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mV
   if (!mImage)
     return;
 
-  //std::cout << "ImageMapperMonitor::ImageMapperMonitor()" << std::endl;
   connect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
   connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(cropBoxChangedSlot()));
   this->fillClipPlanes();
@@ -207,7 +186,6 @@ ImageMapperMonitor::~ImageMapperMonitor()
 
 void ImageMapperMonitor::clipPlanesChangedSlot()
 {
-  //std::cout << "ImageMapperMonitor::clipPlanesChangedSlot()" << std::endl;
   this->clearClipPlanes();
   this->fillClipPlanes();
 }
@@ -239,30 +217,24 @@ void ImageMapperMonitor::fillClipPlanes()
 vtkVolumeMapperPtr ImageMapperMonitor::getMapper()
 {
   vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(mVolume->GetMapper());
-  //mapper->Register();
   return mapper;
-//  if (!mapper)
-//    return;
 }
 
 void ImageMapperMonitor::cropBoxChangedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  if (!image)
+  if (!mImage)
     return;
 
   vtkVolumeMapperPtr mapper = this->getMapper();
   if (!mapper)
     return;
-  mapper->SetCropping(image->getCropping());
+  mapper->SetCropping(mImage->getCropping());
 
-  ssc::DoubleBoundingBox3D bb_d = image->getCroppingBox();
+  ssc::DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
+  std::cout << "cropBoxChangedSlot() " << mImage->getCropping() << " : " << bb_d << std::endl;
 
-  //ssc::DoubleBoundingBox3D bb_d = ssc::transform(image->get_rMd().inv(), bb_r);
   mapper->SetCroppingRegionPlanes(bb_d.begin());
   mapper->Update();
-
-//  emit changed();
 }
 
 
