@@ -19,7 +19,11 @@ typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 #include "sscBoundingBox3D.h"
-#include "sscProbeSector.h"
+//#include "sscProbeSector.h"
+#include "sscUSProbeSector.h"
+
+typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
+typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
 
 namespace ssc
 {
@@ -31,7 +35,7 @@ typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class OffsetPoint> OffsetPointPtr;
 
 typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
-typedef boost::shared_ptr<class USProbe2D> USProbe2DPtr;
+//typedef boost::shared_ptr<class USProbe2D> USProbe2DPtr;
 
 /**
  *This class will hold all the representation and drawing of 2d tool
@@ -74,11 +78,11 @@ class ToolRep2D : public ssc::RepImpl
 		void setVisibility();
 		void createToolLine(vtkRendererPtr renderer, const Vector3D& centerPos );		
 		void createOffsetText(vtkRendererPtr renderer, const Vector3D& pos );
-		void createUSProbe(vtkRendererPtr renderer);
+		//void createUSProbe(vtkRendererPtr renderer);
 		
 		void updateToolLine(const Vector3D& crossPos, const Vector3D& toolTipPos, const Vector3D toolTipBackPos);
 		void updateOffsetText();
-		void updateUSProbe(const Transform3D& vpMt);		
+		//void updateUSProbe(const Transform3D& vpMt);
 		ToolRep2D(const std::string& uid, const std::string& name="");
 		void crossHairResized();
 
@@ -100,7 +104,12 @@ class ToolRep2D : public ssc::RepImpl
 		OffsetPointPtr centerPoint;
 		OffsetPointPtr toolPoint;
 		TextDisplayPtr distanceText;
-		USProbe2DPtr mUSProbe2D;
+		//USProbe2DPtr mUSProbe2D;
+
+	  //US Probe sector
+	  USProbeSectorPtr mProbeSector;
+	  vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
+	  vtkActorPtr mProbeSectorActor;
 };
 
 
