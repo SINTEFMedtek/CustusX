@@ -247,9 +247,6 @@ void ToolPropertiesWidget::configurationChangedSlot()
     mToptopLayout->update();
     return;
   }
-  mUSSectorConfigLabel->show();
-  mUSSectorConfigBox->show();
-  mToptopLayout->update();
 
   ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
   ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
@@ -260,6 +257,13 @@ void ToolPropertiesWidget::configurationChangedSlot()
       qstring_cast(tool->getInstrumentId()));
   QStringList configIdList = mXml->getConfigIdList(qstring_cast(tool->getInstrumentScannerId()),
       qstring_cast(tool->getInstrumentId()), rtSourceList.at(0));
+
+  // Populate mUSSectorConfigBox
+  mUSSectorConfigBox->clear();
+  mUSSectorConfigBox->insertItems(0, configIdList);
+  mUSSectorConfigLabel->show();
+  mUSSectorConfigBox->show();
+  mToptopLayout->update();
 
   // Set US sector config to first element if empty
   if (mCurrentUSSectorConfig.isEmpty())
