@@ -78,11 +78,14 @@ public:
     std::string       mGraphicsFileName;      ///< path to this tools graphics file
     std::string       mTransformSaveFileName; ///< path to where transforms should be saved
     std::string       mLoggingFolderName;     ///< path to where log should be saved
+    std::string       mInstrumentId;          ///< The instruments id
+    std::string       mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
       mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
-      mTransformSaveFileName(""), mLoggingFolderName(""){}; ///< sets up default values for all the members
+      mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
+      mInstrumentScannerId(""){}; ///< sets up default values for all the members
   };
 
   Tool(InternalStructure& internalStructur);   ///< constructor
@@ -107,6 +110,8 @@ public:
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
   virtual void set_prMt(const ssc::Transform3D& transform);
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+  std::string getInstrumentId() const;
+  std::string getInstrumentScannerId() const;
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
