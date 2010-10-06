@@ -12,6 +12,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 #include "sscStringDataAdapter.h"
+#include "probeXmlConfigParser.h"
 
 class QCheckBox;
 
@@ -72,7 +73,7 @@ protected slots:
   void dominantToolChangedSlot();
   void referenceToolChangedSlot();
   void configurationChangedSlot();
-  void showUSSectorStateChangedSlot(int state);
+  void sectorConfigChangedSlot(const QString&);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -92,8 +93,12 @@ private:
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
   
-  QCheckBox* mShowUSSector; ///< Show the US probe sector
-  UsConfigGui* mProbePropertiesWidget; ///< Select probe select set probe width and depth
+  QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
+  QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
+  QString mCurrentUSSectorConfig; ///< Currently used US sector config parameters
+
+  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+
 };
 
 }//end namespace cx
