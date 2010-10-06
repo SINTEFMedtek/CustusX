@@ -8,6 +8,12 @@
 #include <QAction>
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
+
+#include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
+#include "vtkInteractorStyleUnicam.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+
 #include "sscProbeRep.h"
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
@@ -743,6 +749,52 @@ void ViewManager::fillModelTree(TreeItemPtr root)
       TreeItemPtr imageItem = TreeItemImage::create(groupItem, images[j]->getName());
     }
   }
+}
+
+QActionGroup* ViewManager::createInteractorStyleActionGroup()
+{
+  ssc::View* view = viewManager()->get3DView();
+  vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
+
+  QActionGroup* camGroup = new QActionGroup(NULL);
+  camGroup->setExclusive(true);
+
+  QAction* unicamAction = new QAction("Unicam", camGroup);
+  unicamAction->setCheckable(true);
+  unicamAction->setData("vtkInteractorStyleUnicam");
+  unicamAction->setChecked(QString(interactor->GetInteractorStyle()->GetClassName())=="vtkInteractorStyleUnicam");
+  connect(unicamAction, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
+
+  QAction* normalcamAction = new QAction("Normal Camera", camGroup);
+  normalcamAction->setCheckable(true);
+  normalcamAction->setData("vtkInteractorStyleTrackballCamera");
+  normalcamAction->setChecked(QString(interactor->GetInteractorStyle()->GetClassName())=="vtkInteractorStyleTrackballCamera");
+  connect(normalcamAction, SIGNAL(triggered(bool)), this, SLOT(setInteractionStyleActionSlot()));
+
+  return camGroup;
+}
+
+void ViewManager::setInteractionStyleActionSlot()
+{
+  QAction* theAction = static_cast<QAction*>(sender());
+  if(!theAction)
+    return;
+
+  QString uid = theAction->data().toString();
+
+  ssc::View* view = viewManager()->get3DView();
+  vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
+
+  if (uid=="vtkInteractorStyleTrackballCamera")
+  {
+    interactor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
+  }
+  else if (uid=="vtkInteractorStyleUnicam")
+  {
+    interactor->SetInteractorStyle(vtkInteractorStyleUnicam::New());
+  }
+
+  std::cout << "Set Interactor: " << interactor->GetInteractorStyle()->GetClassName() << std::endl;
 }
 
 
