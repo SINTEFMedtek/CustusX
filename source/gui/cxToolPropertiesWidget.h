@@ -8,11 +8,13 @@
 #define CXTOOLPROPERTIESWIDGET_H_
 
 #include <vector>
-#include <QtGui>
+//#include <QtGui>
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 #include "sscStringDataAdapter.h"
 #include "probeXmlConfigParser.h"
+
+class QCheckBox;
 
 class UsConfigGui;
 
