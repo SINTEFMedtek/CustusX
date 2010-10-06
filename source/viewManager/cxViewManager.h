@@ -59,6 +59,7 @@ public:
   QString generateLayoutUid() const; ///< return an uid not used in present layouts.
   void deleteLayoutData(const QString uid);
   QActionGroup* createLayoutActionGroup();
+  QActionGroup* createInteractorStyleActionGroup();
   bool isCustomLayout(const QString& uid) const;
 
   static ViewManager* getInstance(); ///< returns the only instance of this class
@@ -103,6 +104,7 @@ public slots:
 protected slots:
   void renderAllViewsSlot(); ///< renders all views
   void setLayoutActionSlot();
+  void setInteractionStyleActionSlot();
 
 protected:
   ViewManager(); ///< create all needed views
