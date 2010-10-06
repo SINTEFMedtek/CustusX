@@ -91,8 +91,7 @@ QWidget(parent)
 
   
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
-  QWidget(parent),
-  mCurrentUSSectorConfig("")
+  QWidget(parent)
 {
   this->setObjectName("ToolPropertiesWidget");
   this->setWindowTitle("Tool Properties");
@@ -161,14 +160,11 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
 
-  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(sectorConfigChangedSlot(const QString&)));
+  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
 
   // Read ultrasoundImageConfigs.xml file
   QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
   mXml = new ProbeXmlConfigParser(xmlFileName);
-
-  //TODO: Connect to a US sector depth selector
-  //connect(mProbePropertiesWidget, SIGNAL(configurationChanged()), this, SLOT(configurationChangedSlot()));
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -185,6 +181,21 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
 
   mActiveTool = ssc::toolManager()->getDominantTool();
+
+  if(mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
+  {
+    this->populateUSSectorConfigBox();
+    mUSSectorConfigLabel->show();
+    mUSSectorConfigBox->show();
+    mToptopLayout->update();
+  }
+  else
+  {
+    mUSSectorConfigBox->clear();
+    mUSSectorConfigLabel->hide();
+    mUSSectorConfigBox->hide();
+    mToptopLayout->update();
+  }
 
   if (mActiveTool)
     connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
@@ -209,8 +220,7 @@ void ToolPropertiesWidget::updateSlot()
     mToolNameLabel->setText(qstring_cast(mActiveTool->getName()));
     QString text = mActiveTool->getVisible() ? "Visible" : "Not Visible";
     mActiveToolVisibleLabel->setText(text);
-    //testcode - Show US sector
-    configurationChangedSlot();
+    //configurationChangedSlot();
   }
   else
   {
@@ -238,38 +248,32 @@ void ToolPropertiesWidget::updateSlot()
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
 
-void ToolPropertiesWidget::configurationChangedSlot()
+void ToolPropertiesWidget::populateUSSectorConfigBox()
 {
-  if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
-  {
-    mUSSectorConfigLabel->hide();
-    mUSSectorConfigBox->hide();
-    mToptopLayout->update();
-    return;
-  }
-
-  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
   ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
-
-  //ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
-
   QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(tool->getInstrumentScannerId()),
       qstring_cast(tool->getInstrumentId()));
   QStringList configIdList = mXml->getConfigIdList(qstring_cast(tool->getInstrumentScannerId()),
       qstring_cast(tool->getInstrumentId()), rtSourceList.at(0));
-
-  // Populate mUSSectorConfigBox
+  //mUSSectorConfigBox->blockSignals(true);
   mUSSectorConfigBox->clear();
   mUSSectorConfigBox->insertItems(0, configIdList);
-  mUSSectorConfigLabel->show();
-  mUSSectorConfigBox->show();
-  mToptopLayout->update();
+  //mUSSectorConfigBox->blockSignals(false);
+}
 
-  // Set US sector config to first element if empty
-  if (mCurrentUSSectorConfig.isEmpty())
-    mCurrentUSSectorConfig = configIdList.at(0);
+void ToolPropertiesWidget::configurationChangedSlot(int index)
+{
+  if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
+    return;
+
+  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+
+  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(tool->getInstrumentScannerId()),
+      qstring_cast(tool->getInstrumentId()));
+
   ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(qstring_cast(tool->getInstrumentScannerId()),
-      qstring_cast(tool->getInstrumentId()), rtSourceList.at(0), mCurrentUSSectorConfig);
+      qstring_cast(tool->getInstrumentId()), rtSourceList.at(0), mUSSectorConfigBox->currentText());
   if(config.isEmpty())
     return;
   double depthStart = config.mOffset;
@@ -287,12 +291,6 @@ void ToolPropertiesWidget::configurationChangedSlot()
     ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
     toolManager->setUSProbeSector(probeSector);
   }
-}
-
-void ToolPropertiesWidget::sectorConfigChangedSlot(const QString&)
-{
-  mCurrentUSSectorConfig = mUSSectorConfigBox->currentText();
-  this->configurationChangedSlot();
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)
