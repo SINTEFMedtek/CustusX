@@ -16,11 +16,13 @@
 
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
-#include "cxDataInterface.h"
-#include "UsConfigGui.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "cxToolManager.h"
 #include "sscTypeConversions.h"
+#include "UsConfigGui.h"
+#include "cxDataInterface.h"
+#include "cxToolManager.h"
+#include "cxDataLocations.h"
+#include "cxTool.h"
 
 
 namespace cx
@@ -92,7 +94,7 @@ QWidget(parent)
   
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   QWidget(parent),
-  mProbePropertiesWidget(new UsConfigGui(this))
+  mCurrentUSSectorConfig("")
 {
   this->setObjectName("ToolPropertiesWidget");
   this->setWindowTitle("Tool Properties");
@@ -128,10 +130,12 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   //TODO: Add enable/disable US Probe visualization in 2D/3D?
   //TODO: Only show US probe properties if tool is US Probe
 
-  mShowUSSector = new QCheckBox("Show US probe sector", this);
-  mToptopLayout->addWidget(mShowUSSector);
-  mToptopLayout->addWidget(mProbePropertiesWidget);
-  mProbePropertiesWidget->setVisible(false); // Hide this widget initially
+  mUSSectorConfigBox = new QComboBox(this);
+  mUSSectorConfigLabel = new QLabel("Probe sector configuration:", this);
+  mToptopLayout->addWidget(mUSSectorConfigLabel);
+  mToptopLayout->addWidget(mUSSectorConfigBox);
+  mUSSectorConfigLabel->hide();
+  mUSSectorConfigBox->hide();
 
 //  QGroupBox* group2D = new QGroupBox(this);
 //  group2D->setTitle("2D properties");
@@ -159,10 +163,14 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
 
-  //connect(mProbePropertiesWidget, SIGNAL(USProbeChanged()), ssc::toolManager(), SLOT(USProbeChangedSlot));
+  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(sectorConfigChangedSlot(const QString&)));
 
-  connect(mShowUSSector, SIGNAL(stateChanged(int)), this, SLOT(showUSSectorStateChangedSlot(int)));
-  connect(mProbePropertiesWidget, SIGNAL(configurationChanged()), this, SLOT(configurationChangedSlot()));
+  // Read ultrasoundImageConfigs.xml file
+  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
+  mXml = new ProbeXmlConfigParser(xmlFileName);
+
+  //TODO: Connect to a US sector depth selector
+  //connect(mProbePropertiesWidget, SIGNAL(configurationChanged()), this, SLOT(configurationChangedSlot()));
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -203,6 +211,8 @@ void ToolPropertiesWidget::updateSlot()
     mToolNameLabel->setText(qstring_cast(mActiveTool->getName()));
     QString text = mActiveTool->getVisible() ? "Visible" : "Not Visible";
     mActiveToolVisibleLabel->setText(text);
+    //testcode - Show US sector
+    configurationChangedSlot();
   }
   else
   {
@@ -232,12 +242,36 @@ void ToolPropertiesWidget::updateSlot()
 
 void ToolPropertiesWidget::configurationChangedSlot()
 {
-  ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
+  if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
+  {
+    mUSSectorConfigLabel->hide();
+    mUSSectorConfigBox->hide();
+    mToptopLayout->update();
+    return;
+  }
+  mUSSectorConfigLabel->show();
+  mUSSectorConfigBox->show();
+  mToptopLayout->update();
+
+  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+
+  //ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
+
+  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(tool->getInstrumentScannerId()),
+      qstring_cast(tool->getInstrumentId()));
+  QStringList configIdList = mXml->getConfigIdList(qstring_cast(tool->getInstrumentScannerId()),
+      qstring_cast(tool->getInstrumentId()), rtSourceList.at(0));
+
+  // Set US sector config to first element if empty
+  if (mCurrentUSSectorConfig.isEmpty())
+    mCurrentUSSectorConfig = configIdList.at(0);
+  ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(qstring_cast(tool->getInstrumentScannerId()),
+      qstring_cast(tool->getInstrumentId()), rtSourceList.at(0), mCurrentUSSectorConfig);
   if(config.isEmpty())
     return;
   double depthStart = config.mOffset;
   double depthEnd = config.mDepth + depthStart;
-  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
   if (config.mWidthDeg > 0.1) // Sector probe
   {
     double width = config.mWidthDeg * M_PI / 180.0;//width in radians
@@ -253,18 +287,10 @@ void ToolPropertiesWidget::configurationChangedSlot()
   }
 }
 
-void ToolPropertiesWidget::showUSSectorStateChangedSlot(int state)
+void ToolPropertiesWidget::sectorConfigChangedSlot(const QString&)
 {
-  if (state)
-  {
-    mProbePropertiesWidget->setVisible(true);
-  }
-  else
-  {
-    mProbePropertiesWidget->setVisible(false);
-    //TODO: May want a show/remove of probe sector
-  }
-  mToptopLayout->update();
+  mCurrentUSSectorConfig = mUSSectorConfigBox->currentText();
+  this->configurationChangedSlot();
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)
