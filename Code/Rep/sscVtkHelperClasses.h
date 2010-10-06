@@ -138,41 +138,6 @@ private:
 };
 typedef boost::shared_ptr<Axes3D> Axes3DPtr;
 
-/**Wrapper class for a vtkAxes. Sets up some nice defaults and draws the
- * axes in the world coordinate system.
- */
-class USProbe2D
-{
-public:
-	USProbe2D(vtkRendererPtr renderer = vtkRendererPtr());
-	~USProbe2D();
-	void setPosition(const Transform3D& wMt);
-	void setShape(int type, double d_start, double d_end, double width); 
-//	void setRadialShape(double depth, double roc, double angularWidth);
-//	void setLinearShape(double depth, double width);	
-	//vtkProp3DPtr getProp();
-	void setVisibility(bool val);
-	
-private:
-	vtkLeaderActor2DPtr createLeaderActor();
-	void setPosition();
- 	vtkLeaderActor2DPtr mLeft;
- 	vtkLeaderActor2DPtr mRight;
- 	vtkLeaderActor2DPtr mStartArc;
-  vtkLeaderActor2DPtr mEndArc;
-	vtkRendererPtr mRenderer;
-	Transform3D m_wMt;
-	//boost::shared_ptr<TextDisplay> mText;
-	
-	int mType; ///< 0: none, 1: sector, 2: linear
-	double m_d_start; ///< start depth
-	double m_d_end; ///< end depth
-	double mWidth; ///< width in radians or millimeters, depending on type.
-};
-
-
-
-
 // --------------------------------------------------------
 }//	namespace vm
 // --------------------------------------------------------
