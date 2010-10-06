@@ -610,4 +610,13 @@ void Tool::setUSProbeSector(ssc::ProbeSector probeSector)
   mProbeSector = probeSector;
 }
   
+std::string Tool::getInstrumentId() const
+{
+  return mInternalStructure.mInstrumentId;
+}
+std::string Tool::getInstrumentScannerId() const
+{
+  return mInternalStructure.mInstrumentScannerId;
+}
+
 }//namespace cx
