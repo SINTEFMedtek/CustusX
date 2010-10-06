@@ -231,7 +231,6 @@ void ImageMapperMonitor::cropBoxChangedSlot()
   mapper->SetCropping(mImage->getCropping());
 
   ssc::DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
-  std::cout << "cropBoxChangedSlot() " << mImage->getCropping() << " : " << bb_d << std::endl;
 
   mapper->SetCroppingRegionPlanes(bb_d.begin());
   mapper->Update();
