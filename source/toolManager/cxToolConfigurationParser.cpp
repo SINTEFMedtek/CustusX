@@ -16,7 +16,8 @@ ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath,
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
       mToolSensorChannelnumberTag("channelnumber"), mToolSensorRomFileTag(
           "rom_file"), mToolCalibrationTag("calibration"),
-      mToolCalibrationFileTag("cal_file")
+      mToolCalibrationFileTag("cal_file"),
+      mInstrumentTag("instrument"), mInstrumentIdTag("id"), mInstrumentScannerIdTag("scannerid")
 {
   QFile configurationFile(QString(configXmlFilePath.c_str()));
   QFileInfo configurationFileInfo(configurationFile);
@@ -147,6 +148,22 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       //toolGeofileText = QString(mConfigurationPath.c_str()) + toolGeofileText;
       toolGeofileText = toolFolderAbsolutePaths.at(i) + toolGeofileText;
     internalStructure.mGraphicsFileName = toolGeofileText.toStdString();
+
+    QDomElement toolInstrumentElement = toolNode.firstChildElement(mInstrumentTag);
+    if (toolInstrumentElement.isNull())
+    {
+      ssc::messageManager()->sendError("Could not find the <instrument> tag under the <tool> tag. Aborting this tool.");
+      continue;
+    }
+    QDomElement toolInstrumentIdElement =
+        toolInstrumentElement.firstChildElement(mInstrumentIdTag);
+    QString toolInstrumentIdText = toolInstrumentIdElement.text();
+    internalStructure.mInstrumentId = toolInstrumentIdText.toStdString();
+
+    QDomElement toolInstrumentScannerIdElement =
+        toolInstrumentElement.firstChildElement(mInstrumentScannerIdTag);
+    QString toolInstrumentScannerIdText = toolInstrumentScannerIdElement.text();
+    internalStructure.mInstrumentScannerId = toolInstrumentScannerIdText.toStdString();
 
     QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
     if (toolSensorElement.isNull())
