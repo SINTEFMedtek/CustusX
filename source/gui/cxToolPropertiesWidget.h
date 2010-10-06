@@ -12,6 +12,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 #include "sscStringDataAdapter.h"
+#include "probeXmlConfigParser.h"
 
 class UsConfigGui;
 
@@ -91,7 +92,9 @@ private:
   QLabel* mTrackingSystemStatusLabel;
   
   QCheckBox* mShowUSSector; ///< Show the US probe sector
-  UsConfigGui* mProbePropertiesWidget; ///< Select probe select set probe width and depth
+
+  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+
 };
 
 }//end namespace cx
