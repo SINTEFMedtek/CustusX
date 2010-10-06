@@ -190,6 +190,8 @@ void ToolRep3D::update()
     }
     mProbeSectorActor->SetVisibility(mTool->getVisible());
   }
+  else
+    mProbeSectorActor->SetVisibility(false);
 
   this->updateOffsetGraphics();
 }

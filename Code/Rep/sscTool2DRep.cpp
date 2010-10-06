@@ -148,6 +148,7 @@ void ToolRep2D::addRepActorsToViewRenderer(ssc::View* view)
 	createCrossHair(view->getRenderer() );
 	createOffsetText(view->getRenderer(), Vector3D(0,0,0));
 	//createUSProbe(view->getRenderer());
+  view->getRenderer()->AddActor(mProbeSectorActor);
 	setVisibility();
 	update();
 }
@@ -161,6 +162,7 @@ void ToolRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 	toolPoint.reset();
 	distanceText.reset();
 	//mUSProbe2D.reset();
+  view->getRenderer()->RemoveActor(mProbeSectorActor);
 }
 
 void ToolRep2D::sliceTransformChangedSlot(Transform3D sMr)
@@ -199,8 +201,7 @@ void ToolRep2D::update()
 	Transform3D sMr = mSlicer->get_sMr();
 	Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
 	
-	//testcode: Copied from sscToolRep3D
-  mProbeSector->setPosition(rMpr*prMt);
+  mProbeSector->setPosition(sMr*rMpr*prMt);
   if (this->showProbe())
   {
     mProbeSector->setSector(mSlicer->getTool()->getProbeSector());
@@ -211,6 +212,8 @@ void ToolRep2D::update()
     }
     mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
   }
+  else
+    mProbeSectorActor->SetVisibility(false);
 
 
 	Vector3D cross = vpMt.coord(getOffset() * Vector3D(0,0,1)); // zero position plus offset along z
