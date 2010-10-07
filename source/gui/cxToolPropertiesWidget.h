@@ -12,7 +12,6 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 #include "sscStringDataAdapter.h"
-#include "probeXmlConfigParser.h"
 
 class QCheckBox;
 
@@ -95,10 +94,6 @@ private:
   
   QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
   QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
-  //QString mCurrentUSSectorConfig; ///< Currently used US sector config parameters
-
-  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
-
 };
 
 }//end namespace cx
