@@ -252,15 +252,15 @@ void ToolPropertiesWidget::populateUSSectorConfigBox()
   mUSSectorConfigBox->blockSignals(true);
   mUSSectorConfigBox->clear();
   mUSSectorConfigBox->insertItems(0, tool->getUSSectorConfigList());
-  mUSSectorConfigBox->blockSignals(false);
   //Only set tool's configurationString if it don't have one
   if (tool->getProbeSectorConfigurationString().isEmpty())
     tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
   else
   {
-    int index = mUSSectorConfigBox->findData(tool->getProbeSectorConfigurationString());
+    int index = mUSSectorConfigBox->findText(tool->getProbeSectorConfigurationString());
     mUSSectorConfigBox->setCurrentIndex(index);
   }
+  mUSSectorConfigBox->blockSignals(false);
 }
 
 void ToolPropertiesWidget::configurationChangedSlot(int index)
