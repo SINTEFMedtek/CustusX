@@ -21,7 +21,6 @@
 #include "UsConfigGui.h"
 #include "cxDataInterface.h"
 #include "cxToolManager.h"
-#include "cxDataLocations.h"
 #include "cxTool.h"
 
 
@@ -164,9 +163,6 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
 
-  // Read ultrasoundImageConfigs.xml file
-  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
-  mXml = new ProbeXmlConfigParser(xmlFileName);
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -222,7 +218,6 @@ void ToolPropertiesWidget::updateSlot()
     mToolNameLabel->setText(qstring_cast(mActiveTool->getName()));
     QString text = mActiveTool->getVisible() ? "Visible" : "Not Visible";
     mActiveToolVisibleLabel->setText(text);
-    //configurationChangedSlot();
   }
   else
   {
@@ -253,14 +248,19 @@ void ToolPropertiesWidget::updateSlot()
 void ToolPropertiesWidget::populateUSSectorConfigBox()
 {
   ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
-  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(tool->getInstrumentScannerId()),
-      qstring_cast(tool->getInstrumentId()));
-  QStringList configIdList = mXml->getConfigIdList(qstring_cast(tool->getInstrumentScannerId()),
-      qstring_cast(tool->getInstrumentId()), rtSourceList.at(0));
-  //mUSSectorConfigBox->blockSignals(true);
+
+  mUSSectorConfigBox->blockSignals(true);
   mUSSectorConfigBox->clear();
-  mUSSectorConfigBox->insertItems(0, configIdList);
-  //mUSSectorConfigBox->blockSignals(false);
+  mUSSectorConfigBox->insertItems(0, tool->getUSSectorConfigList());
+  mUSSectorConfigBox->blockSignals(false);
+  //Only set tool's configurationString if it don't have one
+  if (tool->getProbeSectorConfigurationString().isEmpty())
+    tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
+  else
+  {
+    int index = mUSSectorConfigBox->findData(tool->getProbeSectorConfigurationString());
+    mUSSectorConfigBox->setCurrentIndex(index);
+  }
 }
 
 void ToolPropertiesWidget::configurationChangedSlot(int index)
@@ -268,31 +268,8 @@ void ToolPropertiesWidget::configurationChangedSlot(int index)
   if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
     return;
 
-  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
   ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
-
-  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(tool->getInstrumentScannerId()),
-      qstring_cast(tool->getInstrumentId()));
-
-  ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(qstring_cast(tool->getInstrumentScannerId()),
-      qstring_cast(tool->getInstrumentId()), rtSourceList.at(0), mUSSectorConfigBox->currentText());
-  if(config.isEmpty())
-    return;
-  double depthStart = config.mOffset;
-  double depthEnd = config.mDepth + depthStart;
-  if (config.mWidthDeg > 0.1) // Sector probe
-  {
-    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
-    toolManager->setUSProbeSector(probeSector);
-  }
-  else //Linear probe
-  {
-    int widtInPixels = config.mRightEdge - config.mLeftEdge;
-    double width = config.mPixelWidth * widtInPixels; //width in mm
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
-    toolManager->setUSProbeSector(probeSector);
-  }
+  tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)

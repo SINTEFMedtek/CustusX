@@ -5,10 +5,11 @@
 #include <vtkSTLReader.h>
 #include <QDir>
 #include <QDateTime>
+#include <QStringList>
 #include "sscMessageManager.h"
-
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -27,7 +28,8 @@ Tool::Tool(InternalStructure& internalStructure) :
   mAttachedToTracker(false),
   mTracked(false),
   mToolTipOffset(0),
-  mProbeSector(ssc::ProbeSector())
+  mProbeSector(ssc::ProbeSector()),
+  mProbeSectorConfiguration("")
 {
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
@@ -48,6 +50,10 @@ Tool::Tool(InternalStructure& internalStructure) :
     ssc::messageManager()->sendError("Tool: "+ssc::Tool::mUid+" was created with invalid internal structure.");
     mValid = false;
   }
+
+  // Read ultrasoundImageConfigs.xml file
+  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
+  mXml = new ProbeXmlConfigParser(xmlFileName);
 }
 
 Tool::~Tool()
@@ -599,7 +605,6 @@ void Tool::printInternalStructure()
   std::cout << "mLoggingFolderName: " << mInternalStructure.mLoggingFolderName  << std::endl;
   std::cout << "------------------------------------------------------------------" << std::endl;
 }
-
   
 ssc::ProbeSector Tool::getProbeSector() const
 { 
@@ -617,6 +622,49 @@ std::string Tool::getInstrumentId() const
 std::string Tool::getInstrumentScannerId() const
 {
   return mInternalStructure.mInstrumentScannerId;
+}
+
+QStringList Tool::getUSSectorConfigList() const
+{
+  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(this->getInstrumentScannerId()),
+      qstring_cast(this->getInstrumentId()));
+  QStringList configIdList = mXml->getConfigIdList(qstring_cast(this->getInstrumentScannerId()),
+      qstring_cast(this->getInstrumentId()), rtSourceList.at(0));
+  return configIdList;
+}
+
+QString Tool::getProbeSectorConfigurationString() const
+{
+  return mProbeSectorConfiguration;
+}
+
+void Tool::setProbeSectorConfigurationString(QString configString)
+{
+
+  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(this->getInstrumentScannerId()),
+      qstring_cast(this->getInstrumentId()));
+
+  ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(qstring_cast(this->getInstrumentScannerId()),
+      qstring_cast(this->getInstrumentId()), rtSourceList.at(0), configString);
+  if(config.isEmpty())
+    return;
+  double depthStart = config.mOffset;
+  double depthEnd = config.mDepth + depthStart;
+  if (config.mWidthDeg > 0.1) // Sector probe
+  {
+    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
+    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
+    this->setUSProbeSector(probeSector);
+  }
+  else //Linear probe
+  {
+    int widtInPixels = config.mRightEdge - config.mLeftEdge;
+    double width = config.mPixelWidth * widtInPixels; //width in mm
+    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
+    this->setUSProbeSector(probeSector);
+  }
+
+  mProbeSectorConfiguration = configString;
 }
 
 }//namespace cx

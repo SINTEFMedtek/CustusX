@@ -12,6 +12,9 @@
 #include <itkStdStreamLogOutput.h>
 #include "sscTransform3D.h"
 #include "cxTracker.h"
+#include "probeXmlConfigParser.h"
+
+class QStringList;
 
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
@@ -112,6 +115,9 @@ public:
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
   std::string getInstrumentId() const;
   std::string getInstrumentScannerId() const;
+  QStringList getUSSectorConfigList() const;
+  QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
+  void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
@@ -160,6 +166,9 @@ protected:
   double mToolTipOffset; ///< distance from tool where point should be shown
 
   ssc::ProbeSector mProbeSector; ///< Probe sector information
+
+  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+  QString mProbeSectorConfiguration; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } //namespace cx
