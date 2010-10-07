@@ -66,12 +66,13 @@ private:
   ssc::Vector3D viewToDisplay(ssc::Vector3D p_v) const;
 
   virtual void imageAdded(ssc::ImagePtr image);
-  virtual void meshAdded(ssc::MeshPtr mesh) {}
+  virtual void meshAdded(ssc::MeshPtr mesh);
   virtual void imageRemoved(const QString& uid);
-  virtual void meshRemoved(const QString& uid) {}
+  virtual void meshRemoved(const QString& uid);
 
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
+  std::map<std::string, ssc::GeometricRep2DPtr> mGeometricRep;
   ssc::ToolRep2DPtr mToolRep2D;
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
