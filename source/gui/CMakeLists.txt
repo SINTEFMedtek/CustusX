@@ -138,5 +138,5 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager cxCommon)
+target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager)
 
