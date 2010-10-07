@@ -72,8 +72,7 @@ protected slots:
   void updateSlot();
   void dominantToolChangedSlot();
   void referenceToolChangedSlot();
-  void configurationChangedSlot();
-  void sectorConfigChangedSlot(const QString&);
+  void configurationChangedSlot(int index);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -81,6 +80,7 @@ protected:
 
 private:
   ToolPropertiesWidget();
+  void populateUSSectorConfigBox();
 
   ssc::ToolPtr mReferenceTool;
   ssc::ToolPtr mActiveTool;
@@ -95,7 +95,7 @@ private:
   
   QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
   QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
-  QString mCurrentUSSectorConfig; ///< Currently used US sector config parameters
+  //QString mCurrentUSSectorConfig; ///< Currently used US sector config parameters
 
   ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
 
