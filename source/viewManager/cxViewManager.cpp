@@ -828,7 +828,7 @@ void ViewManager::setInteractionStyleActionSlot()
   else if (uid=="vtkInteractorStyleFlight")
     interactor->SetInteractorStyle(vtkInteractorStyleFlight::New());
 
-  ssc::messageManager()->sendInfo("Set Interactor: " + QString(interactor->GetInteractorStyle()->GetClassName()));
+  ssc::messageManager()->sendInfo("Set Interactor: " + std::string(interactor->GetInteractorStyle()->GetClassName()));
 }
 
 
