@@ -28,6 +28,7 @@ typedef boost::weak_ptr<class GPUImageLutBuffer> GPUImageLutBufferWeakPtr;
 
 // reps
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
+typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
 typedef boost::shared_ptr<class GeometricRep> GeometricRepPtr;
 typedef boost::shared_ptr<class ProgressiveLODVolumetricRep> ProgressiveLODVolumetricRepPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;

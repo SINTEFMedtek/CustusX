@@ -20,7 +20,7 @@ typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 namespace ssc
 {
 VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
-	RepImpl(uid, name),
+	VolumetricBaseRep(uid, name),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
@@ -114,10 +114,10 @@ void VolumetricRep::setImage(ImagePtr image)
 		mImage->disconnectFromRep(mSelf);
 		disconnect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+		disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//disconnect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
-    mMonitor.reset();
+		mMonitor.reset();
 	}
 
 	mImage = image;
@@ -127,11 +127,12 @@ void VolumetricRep::setImage(ImagePtr image)
 		mImage->connectToRep(mSelf);
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
-    connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
 		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),
 		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 		vtkImageDataChangedSlot();
-    mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
+		mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
+		emit internalVolumeChanged();
 	}
 	else
 	{
@@ -143,19 +144,39 @@ bool VolumetricRep::hasImage(ImagePtr image) const
 	return (mImage == image);
 }
 
-void VolumetricRep::updateResampleFactor()
+double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 {
-	if (mMaxVoxels==0)
-		return;
+	if (maxVoxels==0)
+		return 1.0;
+	if (!image)
+		return 1.0;
 
-	long voxels = mImage->getBaseVtkImageData()->GetNumberOfPoints();
-	double factor = (double)mMaxVoxels/(double)voxels;
+	long voxels = image->getBaseVtkImageData()->GetNumberOfPoints();
+	double factor = (double)maxVoxels/(double)voxels;
 	//factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling is linear?
 	if (factor<0.99)
 	{
-		std::cout << "Downsampling volume in VolumetricRep: " << mImage->getName() << " below " << mMaxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
-		mResampleFactor = std::min(factor, mResampleFactor);
-	}
+		std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
+		return factor;
+	}	
+	return 1.0;
+}
+
+void VolumetricRep::updateResampleFactor()
+{
+	mResampleFactor = std::min(computeResampleFactor(mMaxVoxels, mImage), mResampleFactor);
+//	
+//	if (mMaxVoxels==0)
+//		return;
+//
+//	long voxels = mImage->getBaseVtkImageData()->GetNumberOfPoints();
+//	double factor = (double)mMaxVoxels/(double)voxels;
+//	//factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling is linear?
+//	if (factor<0.99)
+//	{
+//		std::cout << "Downsampling volume in VolumetricRep: " << mImage->getName() << " below " << mMaxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
+//		mResampleFactor = std::min(factor, mResampleFactor);
+//	}
 }
 
 /**called when the image is changed internally.

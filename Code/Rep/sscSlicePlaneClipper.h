@@ -31,14 +31,14 @@ class SlicePlaneClipper : public QObject
 {
   Q_OBJECT
 public:
-  typedef std::set<ssc::VolumetricRepPtr> VolumesType;
+  typedef std::set<ssc::VolumetricBaseRepPtr> VolumesType;
 
   static SlicePlaneClipperPtr New();
   ~SlicePlaneClipper();
   void setSlicer(ssc::SliceProxyPtr slicer);
   void clearVolumes();
-  void addVolume(ssc::VolumetricRepPtr volume);
-  void removeVolume(ssc::VolumetricRepPtr volume);
+  void addVolume(ssc::VolumetricBaseRepPtr volume);
+  void removeVolume(ssc::VolumetricBaseRepPtr volume);
   VolumesType getVolumes();
   ssc::SliceProxyPtr getSlicer();
   void setInvertPlane(bool on);
@@ -50,8 +50,9 @@ public:
 
 private slots:
   void changedSlot();
+  void volumeRepChangedSlot();
 private:
-  void addClipPlane(ssc::VolumetricRepPtr volume, vtkPlanePtr clipPlane);
+  void addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane);
   SlicePlaneClipper();
   void updateClipPlane();
   ssc::Vector3D getUnitNormal() const;
