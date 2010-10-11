@@ -175,8 +175,12 @@ ToolPropertiesWidget::~ToolPropertiesWidget()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
+  ToolPtr cxTool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+  if (cxTool)
+    disconnect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
@@ -197,6 +201,8 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
 
   if (mActiveTool)
     connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+  if (cxTool)
+    connect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 }
 
 void ToolPropertiesWidget::referenceToolChangedSlot()
@@ -252,14 +258,7 @@ void ToolPropertiesWidget::populateUSSectorConfigBox()
   mUSSectorConfigBox->blockSignals(true);
   mUSSectorConfigBox->clear();
   mUSSectorConfigBox->insertItems(0, tool->getUSSectorConfigList());
-  //Only set tool's configurationString if it don't have one
-  if (tool->getProbeSectorConfigurationString().isEmpty())
-    tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
-  else
-  {
-    int index = mUSSectorConfigBox->findText(tool->getProbeSectorConfigurationString());
-    mUSSectorConfigBox->setCurrentIndex(index);
-  }
+  this->toolsSectorConfigurationChangedSlot();//Read the tool's value into the combo box
   mUSSectorConfigBox->blockSignals(false);
 }
 
@@ -270,6 +269,22 @@ void ToolPropertiesWidget::configurationChangedSlot(int index)
 
   ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
   tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
+}
+
+void ToolPropertiesWidget::toolsSectorConfigurationChangedSlot()
+{
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+  //Only set tool's configurationString if tool don't have one
+  int index = 0;
+  if (!tool->getProbeSectorConfigurationString().isEmpty())
+  {
+    index = mUSSectorConfigBox->findText(tool->getProbeSectorConfigurationString());
+    if (index != -1)
+      mUSSectorConfigBox->setCurrentIndex(index);
+  }
+  // Can't use tool's current value if index is -1. Use default instead
+  if (tool->getProbeSectorConfigurationString().isEmpty() || (index == -1))
+    tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)

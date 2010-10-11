@@ -134,6 +134,7 @@ signals:
    * \param uid     The tools unique id
    */
   void toolReport(ToolMessage message, bool state, bool success, stdString uid);
+  void probeSectorConfigurationChanged();
 
 protected:
   typedef itk::ReceptorMemberCommand<Tool> ObserverType;
