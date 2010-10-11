@@ -735,6 +735,22 @@ void ToolManager::addXml(QDomNode& parentNode)
     landmarksNode.appendChild(landmarkNode);
   }
   base.appendChild(landmarksNode);
+
+  //Tools
+  QDomElement toolsNode = doc.createElement("tools");
+  ssc::ToolManager::ToolMapPtr tools = getTools();
+  ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
+  for(; toolIt != tools->end(); toolIt++)
+  {
+    QDomElement toolNode = doc.createElement("tool");
+    ToolPtr tool = boost::shared_dynamic_cast<Tool>(toolIt->second);
+    if (tool)
+    {
+      tool->addXml(toolNode);
+      toolsNode.appendChild(toolNode);
+    }
+  }
+  base.appendChild(toolsNode);
 }
 
 void ToolManager::clear()
@@ -762,6 +778,21 @@ void ToolManager::parseXml(QDomNode& dataNode)
     ssc::Landmark landmark;
     landmark.parseXml(landmarkNode);
     this->setLandmark(landmark);
+  }
+
+  //Tools
+  ssc::ToolManager::ToolMapPtr tools = getTools();
+  QDomNode toolssNode = dataNode.namedItem("tools");
+  QDomElement toolNode = toolssNode.firstChildElement("tool");
+  for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))
+  {
+    QDomElement base = toolNode.toElement();
+    std::string tool_uid = base.attribute("uid").toStdString();
+    if (tools->find(tool_uid) != tools->end())
+    {
+      ToolPtr tool = boost::shared_dynamic_cast<Tool>(tools->find(tool_uid)->second);
+      tool->parseXml(toolNode);
+    }
   }
 }
 
