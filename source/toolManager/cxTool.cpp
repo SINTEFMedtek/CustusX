@@ -640,10 +640,10 @@ QString Tool::getProbeSectorConfigurationString() const
 
 void Tool::setProbeSectorConfigurationString(QString configString)
 {
-
   QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(this->getInstrumentScannerId()),
       qstring_cast(this->getInstrumentId()));
-
+  if(rtSourceList.isEmpty())
+    return;
   ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(qstring_cast(this->getInstrumentScannerId()),
       qstring_cast(this->getInstrumentId()), rtSourceList.at(0), configString);
   if(config.isEmpty())
@@ -684,6 +684,9 @@ void Tool::parseXml(QDomNode& dataNode)
   if (dataNode.isNull())
     return;
   mProbeSectorConfiguration = dataNode.namedItem("probeSectorConfiguration").toElement().text();
+  //Need to call set function to make sure the values will be applied
+  setProbeSectorConfigurationString(mProbeSectorConfiguration);
+  emit probeSectorConfigurationChanged();
 }
 
 }//namespace cx
