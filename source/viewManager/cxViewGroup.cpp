@@ -34,7 +34,7 @@ void Navigation::centerToImage(ssc::ImagePtr image)
   ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
-  //std::cout << "Centered to view." << std::endl;
+//  std::cout << "Centered to image." << std::endl;
 }
 
 /**Place the global center to the mean center of
@@ -48,7 +48,7 @@ void Navigation::centerToView(const std::vector<ssc::ImagePtr>& images)
   ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
-  //std::cout << "Centered to view." << std::endl;
+//  std::cout << "Centered to view." << std::endl;
 }
 
 /**Place the global center to the mean center of
@@ -62,6 +62,7 @@ void Navigation::centerToGlobalImageCenter()
   ssc::dataManager()->setCenter(p_r);
 
   this->centerManualTool(p_r);
+//  std::cout << "Centered to all images." << std::endl;
 }
 
 /**Place the global center at the current position of the
@@ -161,6 +162,7 @@ void Navigation::centerManualTool(ssc::Vector3D& p_r)
   ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
 
   manual->set_prMt(prM1t);
+  std::cout << "center manual tool" << std::endl;
 }
 //---------------------------------------------------------
 //---------------------------------------------------------
