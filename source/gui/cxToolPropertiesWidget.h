@@ -72,6 +72,7 @@ protected slots:
   void dominantToolChangedSlot();
   void referenceToolChangedSlot();
   void configurationChangedSlot(int index);
+  void toolsSectorConfigurationChangedSlot();///< Update the combo box when the tools configuration is changed outside the widget. Also used initially to read the tools value.
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
