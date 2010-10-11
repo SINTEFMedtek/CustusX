@@ -667,4 +667,23 @@ void Tool::setProbeSectorConfigurationString(QString configString)
   mProbeSectorConfiguration = configString;
 }
 
+void Tool::addXml(QDomNode& dataNode)
+{
+  QDomDocument doc = dataNode.ownerDocument();
+  dataNode.toElement().setAttribute("uid", qstring_cast(this->getUid()));
+  if (!mProbeSectorConfiguration.isEmpty())
+  {
+    QDomElement configNode = doc.createElement("probeSectorConfiguration");
+    configNode.appendChild(doc.createTextNode(mProbeSectorConfiguration));
+    dataNode.appendChild(configNode);
+  }
+}
+
+void Tool::parseXml(QDomNode& dataNode)
+{
+  if (dataNode.isNull())
+    return;
+  mProbeSectorConfiguration = dataNode.namedItem("probeSectorConfiguration").toElement().text();
+}
+
 }//namespace cx
