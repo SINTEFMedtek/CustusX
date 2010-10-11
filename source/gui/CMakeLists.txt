@@ -37,6 +37,7 @@ SET(cxProject_MOC_HDRS
   cxFrameTreeWidget.h
   cxImportDataWizard.h
   cxFastOrientationRegistrationWidget.h
+  cxCameraControlWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -127,6 +128,8 @@ SET(${LIBNAME}_SRCS
     cxFastOrientationRegistrationWidget.h
     cxFastOrientationRegistrationWidget.cpp
     cxWhatsThisWidget.h
+    cxCameraControlWidget.cpp
+    cxCameraControlWidget.h    
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
