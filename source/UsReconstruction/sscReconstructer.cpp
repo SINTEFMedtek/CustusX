@@ -21,6 +21,7 @@
 #include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
+#include "sscUtilHelpers.h"
 
 //Windows fix
 #ifndef M_PI
@@ -171,13 +172,6 @@ void Reconstructer::setOutputRelativePath(QString path)
 void Reconstructer::setOutputBasePath(QString path)
 {
   mOutputBasePath = path;
-}
-  
-QString Reconstructer::changeExtension(QString name, QString ext)
-{
-  QStringList splitName = name.split(".");
-  splitName[splitName.size()-1] = ext;
-  return splitName.join(".");
 }
   
 bool within(int x, int min, int max)
@@ -914,39 +908,49 @@ ImagePtr Reconstructer::generateOutputVolume()
   
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
   
-  // Add _rec to volume name and uid
-  //QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
-  QString volumeName = generateImageName();
-  QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
-  
-  std::vector<std::string> imageUids = DataManager::getInstance()->getImageUids();
- 
-  // Find an uid that is not used before
-  int numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(volumeId));
-  if(numMatches != 0)
-  {
-    int recNumber = 1;
-    while(numMatches != 0)
-    {
-      QString newId = volumeName + QString::number(++recNumber);
-      numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(newId));
-    }
-    
-    volumeName += " #" + QString::number(recNumber);
-    volumeId += QString::number(recNumber);
-  }
-  ImagePtr image = ImagePtr(new Image(string_cast(volumeId), 
-                                      data, 
-                                      string_cast(volumeName))) ;
   //If no output path is selecetd, use the same path as the input
   QString filePath;
   if(mOutputBasePath.isEmpty() && mOutputRelativePath.isEmpty())
     filePath = qstring_cast(mUsRaw->getFilePath());
   else
     filePath = mOutputRelativePath;
-  filePath += "/" + volumeName + ".mhd";
+  //filePath += "/" + volumeName + ".mhd";
 
-  image->setFilePath(string_cast(filePath));
+  ImagePtr image = dataManager()->createImage(data, mUsRaw->getUid() + "_rec%1", string_cast(generateImageName())+" #%1", string_cast(filePath));
+//
+//  // Add _rec to volume name and uid
+//  //QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
+//  QString volumeName = generateImageName();
+//  QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
+//
+//  std::vector<std::string> imageUids = DataManager::getInstance()->getImageUids();
+//
+//  // Find an uid that is not used before
+//  int numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(volumeId));
+//  if(numMatches != 0)
+//  {
+//    int recNumber = 1;
+//    while(numMatches != 0)
+//    {
+//      QString newId = volumeName + QString::number(++recNumber);
+//      numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(newId));
+//    }
+//
+//    volumeName += " #" + QString::number(recNumber);
+//    volumeId += QString::number(recNumber);
+//  }
+//  ImagePtr image = ImagePtr(new Image(string_cast(volumeId),
+//                                      data,
+//                                      string_cast(volumeName))) ;
+//  //If no output path is selecetd, use the same path as the input
+//  QString filePath;
+//  if(mOutputBasePath.isEmpty() && mOutputRelativePath.isEmpty())
+//    filePath = qstring_cast(mUsRaw->getFilePath());
+//  else
+//    filePath = mOutputRelativePath;
+//  filePath += "/" + volumeName + ".mhd";
+//
+//  image->setFilePath(string_cast(filePath));
   image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
 
   return image;
