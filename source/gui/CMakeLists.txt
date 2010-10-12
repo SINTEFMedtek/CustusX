@@ -38,6 +38,8 @@ SET(cxProject_MOC_HDRS
   cxImportDataWizard.h
   cxFastOrientationRegistrationWidget.h
   cxCameraControlWidget.h
+  cxSegmentationWidget.h
+  cxImageSegmentationAndCenterlineWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -127,6 +129,10 @@ SET(${LIBNAME}_SRCS
     cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.h
     cxFastOrientationRegistrationWidget.cpp
+    cxImageSegmentationAndCenterlineWidget.h
+    cxImageSegmentationAndCenterlineWidget.cpp
+    cxSegmentationWidget.h
+    cxSegmentationWidget.cpp
     cxWhatsThisWidget.h
     cxCameraControlWidget.cpp
     cxCameraControlWidget.h    
