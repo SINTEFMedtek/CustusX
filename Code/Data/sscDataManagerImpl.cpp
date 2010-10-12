@@ -27,6 +27,7 @@ typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformati
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscUtilHelpers.h"
 
 namespace ssc
 {
@@ -314,7 +315,7 @@ DataPtr DataManagerImpl::readData(const std::string& uid, const std::string& pat
   if (!current)
     return DataPtr();
 
-  current->setName(fileInfo.fileName().toStdString());
+  current->setName(changeExtension(fileInfo.fileName(), "").toStdString());
   //data->setFilePath(relativePath.path().toStdString());
 
 //  this->loadData(current);
@@ -666,6 +667,58 @@ void DataManagerImpl::setMedicalDomain(MEDICAL_DOMAIN domain)
     return;
   mMedicalDomain = domain;
   emit medicalDomainChanged();
+}
+
+int DataManagerImpl::findUniqueUidNumber(std::string uidBase) const
+{
+  // Find an uid that is not used before
+  int numMatches = 1;
+  int recNumber = 0;
+
+  if(numMatches != 0)
+  {
+    while(numMatches != 0)
+    {
+      QString newId = qstring_cast(uidBase).arg(++recNumber);
+      numMatches = mData.count(string_cast(newId));
+    }
+  }
+  return recNumber;
+}
+
+/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
+ *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
+ *  if %1 is found there
+ *
+ */
+ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
+{
+  int recNumber = this->findUniqueUidNumber(uidBase);
+  std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
+  std::string name = string_cast(qstring_cast(nameBase).arg(recNumber));
+  ImagePtr retval = ImagePtr(new Image(uid, data, name));
+
+  std::string filename = filePath + "/" + uid + ".mhd";
+  retval->setFilePath(filename);
+
+  return retval;
+}
+/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
+ *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
+ *  if %1 is found there
+ *
+ */
+MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
+{
+  int recNumber = this->findUniqueUidNumber(uidBase);
+  std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
+  std::string name = string_cast(qstring_cast(nameBase).arg(recNumber));
+  MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
+
+  std::string filename = filePath + "/" + uid + ".vtk";
+  retval->setFilePath(filename);
+
+  return retval;
 }
 
 

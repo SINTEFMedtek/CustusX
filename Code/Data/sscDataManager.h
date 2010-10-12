@@ -7,9 +7,13 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 
+#include "vtkSmartPointer.h"
 #include "sscVector3D.h"
 #include "sscLandmark.h"
 #include "sscDefinitions.h"
+
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 
 namespace ssc
 {
@@ -94,6 +98,8 @@ public:
   virtual MEDICAL_DOMAIN getMedicalDomain() const { return mdLABORATORY; }
   virtual void setMedicalDomain(MEDICAL_DOMAIN domain) {}
   virtual void clear() {}; ///< remove all stuff from manager
+  virtual ImagePtr createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath="Images") { return ImagePtr(); }
+  virtual MeshPtr createMesh(vtkPolyDataPtr data, std::string uidBase, std::string nameBase, std::string filePath) { return MeshPtr(); }
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
