@@ -8,8 +8,12 @@
 #include "cxCameraControlWidget.h"
 
 #include <QVBoxLayout>
+#include <QScrollBar>
+#include <QTouchEvent>
+
 #include <QToolButton>
 #include <QAction>
+#include <QRadialGradient>
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkSmartPointer.h"
@@ -26,16 +30,54 @@ MousePadWidget::MousePadWidget(QWidget* parent) : QFrame(parent)
 MousePadWidget::~MousePadWidget()
 {
 }
+
+void MousePadWidget::showEvent(QShowEvent* event)
+{
+  mLastPos = QPoint(this->width()/2, this->height()/2);
+  this->update();
+}
+
 void MousePadWidget::mousePressEvent(QMouseEvent* event)
 {
   mLastPos = event->pos();
+  this->update();
 }
 void MousePadWidget::mouseMoveEvent(QMouseEvent* event)
 {
   QPoint delta = event->pos() - mLastPos;
   emit mouseMoved(delta);
   mLastPos = event->pos();
+  this->update();
 }
+void MousePadWidget::mouseReleaseEvent(QMouseEvent* event)
+{
+  mLastPos = QPoint(this->width()/2, this->height()/2);
+  this->update();
+}
+
+void MousePadWidget::paintEvent(QPaintEvent *)
+{
+    QPainter p(this);
+
+    ssc::Vector3D center(this->width()/2, this->height()/2, 0);
+    ssc::Vector3D delta = ssc::Vector3D(mLastPos.x(), mLastPos.y(), 0) - center;
+    double radius = center.length() - delta.length();
+
+
+    QRadialGradient radialGrad(mLastPos, radius);
+    radialGrad.setColorAt(0, Qt::red);
+    radialGrad.setColorAt(0.5, Qt::blue);
+    radialGrad.setColorAt(1, Qt::green);
+
+//    p.drawImage(0, 0, m_shade);
+    QColor color(146, 0, 146);
+    QBrush brush(radialGrad);
+
+    p.setPen(QColor(146, 0, 146));
+    p.setBrush(QColor(146, 0, 146));
+    p.fillRect(0, 0, width() - 1, height() - 1, brush);
+}
+
 
 ///** Interface to the tool offset of the dominant tool
 // */
@@ -96,11 +138,58 @@ void MousePadWidget::mouseMoveEvent(QMouseEvent* event)
 //---------------------------------------------------------
 
 
+GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget *parent)
+    : QGraphicsView(scene, parent), totalScaleFactor(1)
+{
+    viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
+    setDragMode(ScrollHandDrag);
+}
+
+bool GraphicsView::viewportEvent(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::TouchBegin:
+    case QEvent::TouchUpdate:
+    case QEvent::TouchEnd:
+    {
+      std::cout << "hit!!!" << std::endl;
+//        QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
+//        QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+//        if (touchPoints.count() == 2) {
+//            // determine scale factor
+//            const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
+//            const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
+//            qreal currentScaleFactor =
+//                    QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
+//                    / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();
+//            if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
+//                // if one of the fingers is released, remember the current scale
+//                // factor so that adding another finger later will continue zooming
+//                // by adding new scale factor to the existing remembered value.
+//                totalScaleFactor *= currentScaleFactor;
+//                currentScaleFactor = 1;
+//            }
+//            setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
+//                                            totalScaleFactor * currentScaleFactor));
+//        }
+        return true;
+    }
+    default:
+        break;
+    }
+    return QGraphicsView::viewportEvent(event);
+}
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
 
 CameraControlWidget::CameraControlWidget(QWidget* parent) :
     QWidget(parent)
 {
+//  this->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
   this->setObjectName("CameraControlWidget");
   this->setWindowTitle("Camera Control");
 
@@ -111,16 +200,79 @@ CameraControlWidget::CameraControlWidget(QWidget* parent) :
   this->definePanLayout();
   this->defineRotateLayout();
 
-  mTopLayout->addStretch();
+
+//  QGraphicsScene* scene = new QGraphicsScene;
+//  scene->setSceneRect(-300, -300, 600, 600);
+//  scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+////
+////  for (int i = 0; i < MouseCount; ++i) {
+////      Mouse *mouse = new Mouse;
+////      mouse->setPos(::sin((i * 6.28) / MouseCount) * 200,
+////                    ::cos((i * 6.28) / MouseCount) * 200);
+////      scene.addItem(mouse);
+////  }
+//
+//  GraphicsView* view =  new GraphicsView(scene);
+//  view->setRenderHint(QPainter::Antialiasing);
+////  view.setBackgroundBrush(QPixmap(":/images/cheese.jpg"));
+//  view->setCacheMode(QGraphicsView::CacheBackground);
+//  view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+////  view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
+////  view.showMaximized();
+//  mTopLayout->addWidget(view);
+
+
+//  mTopLayout->addStretch();
 
   //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
   //updateSlot();
 }
+//
+//bool CameraControlWidget::viewportEvent(QEvent *event)
+// {
+//  switch (event->type())
+//  {
+//    case QEvent::TouchBegin:
+//    case QEvent::TouchUpdate:
+//    case QEvent::TouchEnd:
+//    {
+//      std::cout << "got touch event" << std::endl;
+//      //         QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
+//      //         QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
+//      //         if (touchPoints.count() == 2) {
+//      //             // determine scale factor
+//      //             const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
+//      //             const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
+//      //             qreal currentScaleFactor =
+//      //                     QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
+//      //                     / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();
+//      //             if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
+//      //                 // if one of the fingers is released, remember the current scale
+//      //                 // factor so that adding another finger later will continue zooming
+//      //                 // by adding new scale factor to the existing remembered value.
+//      //                 totalScaleFactor *= currentScaleFactor;
+//      //                 currentScaleFactor = 1;
+//      //             }
+//      //             setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
+//      //                                             totalScaleFactor * currentScaleFactor));
+//      return true;
+//    }
+//    default:
+//      break;
+//  }
+//  return QWidget::viewportEvent(event);
+//}
+
 
 void CameraControlWidget::defineRotateLayout()
 {
+  QGroupBox* group = new QGroupBox("rotate", this);
+  group->setFlat(true);
+  mTopLayout->addWidget(group);
+
   QHBoxLayout* layout = new QHBoxLayout;
-  mTopLayout->addLayout(layout);
+  layout->setMargin(4);
+  group->setLayout(layout);
 
   mRotateWidget = new MousePadWidget(this);
   mRotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
@@ -128,6 +280,15 @@ void CameraControlWidget::defineRotateLayout()
   connect(mRotateWidget, SIGNAL(mouseMoved(QPoint)), this, SLOT(rotateXZSlot(QPoint)));
 
   layout->addWidget(mRotateWidget);
+
+//  QString style("QFrame { background-color: white; } ");
+  QString style("QFrame { background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #FFOECE, stop: 1 #FFFFFF); } ");
+
+//  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+//                                    stop: 0 #FFOECE, stop: 1 #FFFFFF);
+
+
+  mRotateWidget->setStyleSheet(style);
 
   QVBoxLayout* dollyLayout = new QVBoxLayout;
   layout->addLayout(dollyLayout);
@@ -152,8 +313,13 @@ void CameraControlWidget::defineRotateLayout()
 
 void CameraControlWidget::definePanLayout()
 {
+  QGroupBox* group = new QGroupBox("pan", this);
+  group->setFlat(true);
+  mTopLayout->addWidget(group);
+
   QHBoxLayout* panLayout = new QHBoxLayout;
-  mTopLayout->addLayout(panLayout);
+  panLayout->setMargin(4);
+  group->setLayout(panLayout);
 
   mPanWidget = new MousePadWidget(this);
   mPanWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
