@@ -3,25 +3,29 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscDoubleWidgets.h"
+#include "cxWhatsThisWidget.h"
 
 namespace cx
 {
 
 /**
- * \class SegmentationWidget
+ * \class cxSegmentationWidget.h
  *
+ * \brief Widget for segmenting out parts of volumes using a threshold.
  *
- * \date 2010.10.12
+ * \date 12. okt. 2010
+ * \author: Janne Beate Bakeng
  * \author: Christian Askeland, SINTEF
  */
-class SegmentationWidget : public QWidget
+class SegmentationWidget : public WhatsThisWidget
 {
   Q_OBJECT
 
 public:
   SegmentationWidget(QWidget* parent);
   virtual ~SegmentationWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 signals:
 
@@ -36,6 +40,18 @@ private:
   SegmentationWidget();
 };
 
-}//end namespace cx
+
+
+class CenterlineWidget : public WhatsThisWidget
+{
+  Q_OBJECT
+
+public:
+  CenterlineWidget(QWidget* parent);
+  ~CenterlineWidget();
+  virtual QString defaultWhatsThis() const;
+};
+
+}//namespace cx
 
 #endif /* CXSEGMENTATIONWIDGET_H_ */

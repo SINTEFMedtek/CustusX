@@ -17,17 +17,14 @@ namespace cx
 
 
 SegmentationWidget::SegmentationWidget(QWidget* parent) :
-    QWidget(parent)
+        WhatsThisWidget(parent)
 {
   this->setObjectName("SegmentationWidget");
   this->setWindowTitle("Segmentation");
 
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-  //toptopLayout->setMargin(0);
 
-//  mImageNameLabel = new QLabel(this);
-//  toptopLayout->addWidget(mImageNameLabel);
   toptopLayout->addWidget(new ActiveVolumeWidget(this));
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
@@ -38,38 +35,12 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   toptopLayout->addWidget(contourButton);
   connect(contourButton, SIGNAL(clicked()), this, SLOT(contourSlot()));
 
-  //
-//  QVBoxLayout* winlvlLayout = new QVBoxLayout;
-//  toptopLayout->addLayout(winlvlLayout);
-//
-//  QGroupBox* group2D = new QGroupBox(this);
-//  group2D->setTitle("2D properties");
-//  toptopLayout->addWidget(group2D);
-//
-//  QGridLayout* gridLayout = new QGridLayout(group2D);
-//  //toptopLayout->addLayout(gridLayout);
-//
-//  mLevelWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DLevel), gridLayout, 0);
-//  mWindowWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DWindow), gridLayout, 1);
-
   toptopLayout->addStretch();
-
-  //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
-  //updateSlot();
 }
 
 SegmentationWidget::~SegmentationWidget()
 {
 }
-
-//void SegmentationWidget::updateSlot()
-//{
-//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-//  if (image)
-//  {
-//    mImageNameLabel->setText(qstring_cast(image->getName()));
-//  }
-//}
 
 void SegmentationWidget::showEvent(QShowEvent* event)
 {
@@ -102,4 +73,35 @@ void SegmentationWidget::contourSlot()
 }
 
 
-}//end namespace cx
+QString SegmentationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+        "<h3>Segmentation.</h3>"
+        "<p><i>Segment out blood vessels(?) from the selected image.</i></p>"
+        "</html>";
+}
+
+
+//------------------------------------------------------------------------------
+
+
+CenterlineWidget::CenterlineWidget(QWidget* parent) :
+    WhatsThisWidget(parent)
+{
+  this->setObjectName("CenterlineWidget");
+  this->setWindowTitle("Centerline");
+}
+
+CenterlineWidget::~CenterlineWidget()
+{}
+
+QString CenterlineWidget::defaultWhatsThis() const
+{
+  return "<html>"
+        "<h3>Centerline extraction.</h3>"
+        "<p><i>Extract the centerline from a segment.</i></p>"
+        "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
+        "</html>";
+}
+
+}//namespace cx
