@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <QtGui>
+#include <QGraphicsView>
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "vtkSmartPointer.h"
@@ -30,13 +31,28 @@ public:
 signals:
   void mouseMoved(QPoint delta);
 protected:
+  void paintEvent(QPaintEvent* event);
+  virtual void showEvent (QShowEvent* event);
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
+  void mouseReleaseEvent(QMouseEvent* event);
 private:
   QPoint mLastPos;
 };
 
 
+class GraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+
+public:
+    GraphicsView(QGraphicsScene *scene = 0, QWidget *parent = 0);
+
+    bool viewportEvent(QEvent *event);
+
+private:
+    qreal totalScaleFactor;
+};
 
 /**
  */
@@ -59,6 +75,7 @@ protected slots:
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
+//  virtual bool viewportEvent(QEvent *event);
 
 private:
   MousePadWidget* mPanWidget;
