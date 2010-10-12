@@ -25,6 +25,10 @@ int sign(double x)
 QString changeExtension(QString name, QString ext)
 {
   QStringList splitName = name.split(".");
+
+  if (splitName.size()==1)
+    return name;
+
   splitName[splitName.size()-1] = ext;
 
   if (ext.isEmpty())

@@ -694,8 +694,15 @@ int DataManagerImpl::findUniqueUidNumber(std::string uidBase) const
 ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
 {
   int recNumber = this->findUniqueUidNumber(uidBase);
+
   std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
-  std::string name = string_cast(qstring_cast(nameBase).arg(recNumber));
+  std::string name;
+
+  if (recNumber==1)
+    name = string_cast(qstring_cast(nameBase).arg(""));
+  else
+    name = string_cast(qstring_cast(nameBase).arg("#%1").arg(recNumber));
+
   ImagePtr retval = ImagePtr(new Image(uid, data, name));
 
   std::string filename = filePath + "/" + uid + ".mhd";
