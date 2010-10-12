@@ -39,6 +39,7 @@ SET ( ${LIB}_viewManager
     cxInteractiveClipper.cpp
     cxInteractiveCropper.h
     cxInteractiveCropper.cpp
+
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

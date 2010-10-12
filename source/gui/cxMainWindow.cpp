@@ -40,6 +40,8 @@
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
+#include "cxSegmentationWidget.h"
+
 
 namespace cx
 {
@@ -96,6 +98,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mMeshPropertiesWidget);
   this->addAsDockWidget(new CameraControlWidget(this));
+  this->addAsDockWidget(new SegmentationWidget(this));
 
   //Tried to add a separator. Don't work yet
   //QAction* separatorAction = new QAction(this);
