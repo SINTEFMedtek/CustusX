@@ -157,6 +157,8 @@ protected:
   class ConsoleWidget*                  mConsoleWidget;
   class RegistrationMethodsWidget*      mRegsitrationMethodsWidget; ///< container widget for all registrations
   class FastImageRegistrationWidget*    mFastImageRegistrationWidget;
+  class ImageSegmentationAndCenterlineWidget*  mImage1RegistrationWidget;
+  class ImageSegmentationAndCenterlineWidget*  mImage2RegistrationWidget;
   class FastPatientRegistrationWidget*  mFastPatientRegistrationWidget;
   class FastOrientationRegistrationWidget* mFastOrientationRegistrationWidget;
   class ImageRegistrationWidget*        mImageRegistrationWidget; ///< interface for image registration
