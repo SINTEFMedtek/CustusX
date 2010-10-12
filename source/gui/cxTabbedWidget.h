@@ -53,5 +53,13 @@ public:
   virtual ~FastRegistrationsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
+
+class Image2ImageRegistrationWidget : public TabbedWidget
+{
+public:
+  Image2ImageRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~Image2ImageRegistrationWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
 }
 #endif /* CXTABBEDWIDGET_H_ */

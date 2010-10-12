@@ -19,6 +19,7 @@
 #include "cxTabbedWidget.h"
 #include "cxImageRegistrationWidget.h"
 #include "cxFastImageRegistrationWidget.h"
+#include "cxImageSegmentationAndCenterlineWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxFastOrientationRegistrationWidget.h"
 #include "cxToolPropertiesWidget.h"
@@ -85,10 +86,17 @@ MainWindow::MainWindow() :
   mFastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
   fastRegistrationsWidget->addTab(mFastPatientRegistrationWidget, "Patient");
 
+  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
+  mImage1RegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
+  image2imageWidget->addTab(mImage1RegistrationWidget, "Image 1");
+  mImage2RegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
+  image2imageWidget->addTab(mImage2RegistrationWidget, "Image 2");
+
   mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
   mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
   mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
+  mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
 
   this->addAsDockWidget(mBrowserWidget);
 
@@ -101,6 +109,12 @@ MainWindow::MainWindow() :
   //QAction* separatorAction = new QAction(this);
   //separatorAction->setSeparator(true);
   //this->mToggleWidgetActionGroup->addAction(separatorAction);
+
+  //TODO Remove mShiftCorrectionWidget
+  //---------
+  QString testing("");
+  mShiftCorrectionWidget->init(testing);
+  //---------
 
   this->addAsDockWidget(mToolPropertiesWidget);
   this->addAsDockWidget(mPointSamplingWidget);
