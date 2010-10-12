@@ -16,10 +16,12 @@
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
+#include "sscToolManager.h"
+#include "sscUtilHelpers.h"
+#include "sscToolManager.h"
+
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "sscToolManager.h"
-#include "sscToolManager.h"
 #include "cxFileCopied.h"
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"
@@ -185,28 +187,14 @@ ssc::DataPtr PatientData::importData(QString fileName)
   QString fileType = fileInfo.suffix();
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
-  QString uid = fileInfo.fileName()+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+  QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
+  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+  std::cout << "import: " << strippedFilename << std::endl;
 
   //Need to wait for the copy to finish...
 
   // Read files before copy
   ssc::DataPtr data = ssc::dataManager()->loadData(string_cast(uid), string_cast(fileName), ssc::rtAUTO);
-//  ssc::DataPtr data;
-//
-//  if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-//     fileType.compare("mha", Qt::CaseInsensitive) == 0)
-//  {
-//    data = ssc::dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
-//  }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
-//  {
-//    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::rtSTL);
-//    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
-//  }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-//  {
-//    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::rtPOLYDATA);
-//    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
-//  }
-//  data->setName(fileInfo.fileName().toStdString());
 
   data->setShading(true);
 
