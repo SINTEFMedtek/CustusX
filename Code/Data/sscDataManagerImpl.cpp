@@ -10,9 +10,11 @@ typedef vtkSmartPointer<class vtkMetaImageWriter> vtkMetaImageWriterPtr;
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
+#include <vtkPolyDataWriter.h>
 #include <vtkSTLReader.h>
 #include <vtkImageChangeInformation.h>
 typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
+typedef vtkSmartPointer<class vtkPolyDataWriter> vtkPolyDataWriterPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
@@ -357,6 +359,25 @@ MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fil
 {
   this->loadData(uid,fileName,type);
   return this->getMesh(uid);
+}
+
+void DataManagerImpl::saveMesh(MeshPtr mesh, const std::string& basePath)
+{
+  vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
+  writer->SetInput(mesh->getVtkPolyData());
+  //writer->SetFileDimensionality(3);
+  std::string filename = basePath + "/" + mesh->getFilePath();
+  writer->SetFileName(filename.c_str());
+
+  //Rename ending from .mhd to .raw
+  QStringList splitName = qstring_cast(filename).split(".");
+  splitName[splitName.size() - 1] = "raw";
+  filename = string_cast(splitName.join("."));
+
+  //writer->SetRAWFileName(filename.c_str());
+  //writer->SetCompression(false);
+  writer->Update();
+  writer->Write();
 }
 
 DataPtr DataManagerImpl::getData(const std::string& uid) const

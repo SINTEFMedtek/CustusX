@@ -102,6 +102,7 @@ public:
   DataPtr getData(const std::string& uid) const;
 
   // meshes
+  virtual void saveMesh(MeshPtr mesh, const std::string& basePath);///< Save mesh to file \param basePath Absolute path to patient data folder
   virtual MeshPtr getMesh(const std::string& uid) const;
   virtual std::map<std::string, MeshPtr> getMeshes() const;
 

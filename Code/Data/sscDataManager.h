@@ -68,6 +68,7 @@ public:
 	virtual std::vector<std::string> getImageUids() const = 0;
 
 	// meshes
+  virtual void saveMesh(MeshPtr mesh, const std::string& basePath) = 0; ///< Save mesh to file
 	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE meshType) = 0;
 	virtual MeshPtr getMesh(const std::string& uid) const = 0;
 	virtual std::map<std::string, MeshPtr> getMeshes() const = 0;
