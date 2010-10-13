@@ -24,7 +24,7 @@ QString ImageSegmentationAndCenterlineWidget::defaultWhatsThis() const
 {
   return "<html>"
       "<h3>Segmentation and centerline extraction.</h3>"
-      "<p><i>Segment out blood vessels from the selected image, then extract the centerline using.</i></p>"
+      "<p><i>Segment out blood vessels from the selected image, then extract the centerline.</i></p>"
       "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
       "</html>";
 }

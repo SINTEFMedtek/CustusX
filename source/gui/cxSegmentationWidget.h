@@ -4,12 +4,13 @@
 #include <vector>
 #include <QtGui>
 #include "cxWhatsThisWidget.h"
+#include <QString>
 
 namespace cx
 {
 
 /**
- * \class cxSegmentationWidget.h
+ * \class SegmentationWidget
  *
  * \brief Widget for segmenting out parts of volumes using a threshold.
  *
@@ -27,8 +28,6 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
-signals:
-
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
@@ -38,6 +37,7 @@ private slots:
 
 private:
   SegmentationWidget();
+  void fillImageCombobox();
 };
 
 
