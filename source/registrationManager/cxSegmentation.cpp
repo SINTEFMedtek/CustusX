@@ -25,6 +25,11 @@
 #include <vtkImageData.h>
 #include <vtkMarchingCubes.h>
 #include <vtkPolyData.h>
+#include <vtkImageShrink3D.h>
+#include <vtkWindowedSincPolyDataFilter.h>
+#include <vtkTriangleFilter.h>
+#include <vtkDecimatePro.h>
+#include <vtkPolyDataNormals.h>
 
 typedef vtkSmartPointer<vtkImageExport> vtkImageExportPtr;
 
@@ -44,6 +49,11 @@ typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
 
 typedef vtkSmartPointer<class vtkMarchingCubes> vtkMarchingCubesPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
+typedef vtkSmartPointer<class vtkImageShrink3D> vtkImageShrink3DPtr;
+typedef vtkSmartPointer<class vtkWindowedSincPolyDataFilter> vtkWindowedSincPolyDataFilterPtr;
+typedef vtkSmartPointer<class vtkTriangleFilter> vtkTriangleFilterPtr;
+typedef vtkSmartPointer<class vtkDecimatePro> vtkDecimateProPtr;
+typedef vtkSmartPointer<class vtkPolyDataNormals> vtkPolyDataNormalsPtr;
 
 namespace cx
 {
@@ -57,53 +67,108 @@ itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
   return vtk2itkFilter->GetOutput();
 }
 
-void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold)
+void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
+    double decimation, bool reduceResolution, bool smoothing)
 {
   //itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
     //Create vtkPolyData
-    /*vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
-    convert->SetInput(itkToVtkFilter->GetOutput());
-    convert->SetColorModeToLinear256();
-    convert->Update();*/
+  /*vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
+   convert->SetInput(itkToVtkFilter->GetOutput());
+   convert->SetColorModeToLinear256();
+   convert->Update();*/
 
-    vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
+  //Shrink input volume
+  vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
+  if(reduceResolution)
+  {
+    ssc::messageManager()->sendInfo("Shrinking volume to be contoured...");
+    shrinker->SetInput(image->getBaseVtkImageData());
+    shrinker->SetShrinkFactors(2,2,2);
+    shrinker->Update();
+  }
+
+  // Find countour
+  ssc::messageManager()->sendInfo("Finding surface shape...");
+  vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
+  if(reduceResolution)
+    convert->SetInput(shrinker->GetOutput());
+  else
     convert->SetInput(image->getBaseVtkImageData());
-    //convert->SetValue(0, threshold);
-    convert->Update();
-    //messageManager()->sendInfo("Number of contours: "+QString::number(convert->GetNumberOfContours()).toStdString());
+  //convert->ComputeNormalsOn();
+  convert->SetValue(0, threshold);
+  //convert->SetValue(0, 1);
+  convert->Update();
+  //messageManager()->sendInfo("Number of contours: "+QString::number(convert->GetNumberOfContours()).toStdString());
 
-    vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
-    cubesPolyData = convert->GetOutput();
+  vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
+  cubesPolyData = convert->GetOutput();
+  //cubesPolyData->DeepCopy(convert->GetOutput());
+
+  // Smooth surface model
+  vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
+  if(smoothing)
+  {
+    ssc::messageManager()->sendInfo("Smoothing surface...");
+    smoother->SetInput(cubesPolyData);
+    smoother->Update();
+    cubesPolyData = smoother->GetOutput();
+  }
+
+  //Create a surface of triangles
+
+  //Decimate surface model (remove a percentage of the polygons)
+  vtkTriangleFilterPtr trifilt = vtkTriangleFilter::New();
+  vtkDecimateProPtr deci = vtkDecimatePro::New();
+  vtkPolyDataNormalsPtr normals = vtkPolyDataNormals::New();
+  if (decimation > 0.000001)
+  {
+    ssc::messageManager()->sendInfo("Creating surface triangles...");
+    trifilt->SetInput(cubesPolyData);
+    trifilt->Update();
+    ssc::messageManager()->sendInfo("Decimating surface...");
+    deci->SetInput(trifilt->GetOutput());
+    deci->SetTargetReduction(decimation);
+    deci->PreserveTopologyOff();
+    deci->Update();
+    cubesPolyData = deci->GetOutput();
+  }
+
+  normals->SetInput(cubesPolyData);
+  normals->Update();
+  cubesPolyData = normals->GetOutput();
+
+  //cubesPolyData->Print(std::cout);
+
+  //    vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+  //    rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+  //    // TODO: possible memory problem here - check debug mem system of itk/vtk
 
 
-//    vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-//    rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-//    // TODO: possible memory problem here - check debug mem system of itk/vtk
+  std::string uid = string_cast(ssc::changeExtension(qstring_cast(
+      image->getUid()), "") + "_cont%1");
+  std::string name = image->getName() + " contour %1";
+  //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
+  ssc::MeshPtr result = ssc::dataManager()->createMesh(cubesPolyData, uid,
+      name, "Images");
+  ssc::messageManager()->sendInfo("created contour " + result->getName());
 
+  result->get_rMd_History()->setRegistration(image->get_rMd());
+  result->setParentFrame(image->getUid());
 
-    std::string uid = string_cast(ssc::changeExtension(qstring_cast(image->getUid()), "") + "_cont%1");
-    std::string name = image->getName()+" contour %1";
-    //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
-    ssc::MeshPtr result = ssc::dataManager()->createMesh(cubesPolyData,uid, name, "Images");
-    ssc::messageManager()->sendInfo("created contour " + result->getName());
+  ssc::dataManager()->loadData(result);
+  ssc::dataManager()->saveMesh(result, string_cast(outputBasePath));
 
-    result->get_rMd_History()->setRegistration(image->get_rMd());
-    result->setParentFrame(image->getUid());
-
-    ssc::dataManager()->loadData(result);
-    //ssc::dataManager()->saveImage(result, string_cast(outputBasePath));
-
-//
-//    //print
-//    //itkToVtkFilter->GetOutput()->Print(std::cout);
-//    //cubesPolyData->Print(std::cout);
-//    //vtkPolyData* cubesPolyData = convert->GetOutput();
-//
-//    ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
-//    surface->setVtkPolyData(cubesPolyData);
-//    ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName.toStdString()+"_segm"));
-//    surfaceRep->setMesh(surface);
+  //
+  //    //print
+  //    //itkToVtkFilter->GetOutput()->Print(std::cout);
+  //    //cubesPolyData->Print(std::cout);
+  //    //vtkPolyData* cubesPolyData = convert->GetOutput();
+  //
+  //    ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
+  //    surface->setVtkPolyData(cubesPolyData);
+  //    ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName.toStdString()+"_segm"));
+  //    surfaceRep->setMesh(surface);
 
 }
 
