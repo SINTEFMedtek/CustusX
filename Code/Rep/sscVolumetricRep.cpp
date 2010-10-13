@@ -160,21 +160,6 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 void VolumetricRep::updateResampleFactor()
 {
 	mResampleFactor = std::min(computeResampleFactor(mMaxVoxels, mImage), mResampleFactor);
-<<<<<<< HEAD:Code/Rep/sscVolumetricRep.cpp
-//	
-//	if (mMaxVoxels==0)
-//		return;
-//
-//	long voxels = mImage->getBaseVtkImageData()->GetNumberOfPoints();
-//	double factor = (double)mMaxVoxels/(double)voxels;
-//	//factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling is linear?
-//	if (factor<0.99)
-//	{
-//		std::cout << "Downsampling volume in VolumetricRep: " << mImage->getName() << " below " << mMaxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
-//		mResampleFactor = std::min(factor, mResampleFactor);
-//	}
-=======
->>>>>>> fd321bd6dbdad0c83f5180274670284ded7925cb:Code/Rep/sscVolumetricRep.cpp
 }
 
 /**called when the image is changed internally.
