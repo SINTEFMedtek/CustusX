@@ -102,6 +102,7 @@ public:
   DataPtr getData(const std::string& uid) const;
 
   // meshes
+  virtual void saveMesh(MeshPtr mesh, const std::string& basePath);///< Save mesh to file \param basePath Absolute path to patient data folder
   virtual MeshPtr getMesh(const std::string& uid) const;
   virtual std::map<std::string, MeshPtr> getMeshes() const;
 
@@ -133,6 +134,8 @@ public:
 
   virtual MEDICAL_DOMAIN getMedicalDomain() const;
   virtual void setMedicalDomain(MEDICAL_DOMAIN domain);
+  virtual ImagePtr createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath);
+  virtual MeshPtr createMesh(vtkPolyDataPtr data, std::string uidBase, std::string nameBase, std::string filePath);
 
 protected:
   DataManagerImpl();
@@ -153,6 +156,7 @@ protected:
   READER_TYPE getReaderType(QString fileType);
   void loadData(QDomElement node, QString rootPath);
   DataPtr readData(const std::string& uid, const std::string& path, READER_TYPE type);
+  int findUniqueUidNumber(std::string uidBase) const;
 
   LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 

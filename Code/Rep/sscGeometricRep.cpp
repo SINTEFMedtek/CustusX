@@ -64,7 +64,7 @@ MeshPtr GeometricRep::getMesh()
 }
 bool GeometricRep::hasMesh(MeshPtr mesh) const
 {
-	return (mMesh != NULL);
+	return (mMesh == mesh);
 }
   
 void GeometricRep::meshChangedSlot()

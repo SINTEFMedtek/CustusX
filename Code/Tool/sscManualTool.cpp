@@ -46,6 +46,7 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 {
 	QDateTime time;
 	double timestamp = (double) time.time().msec();
+//  std::cout << "manual tool set " << prMt << std::endl;
 
 	QMutexLocker locker(&mMutex);
 	m_prMt = prMt;

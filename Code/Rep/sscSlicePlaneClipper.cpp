@@ -84,7 +84,7 @@ void SlicePlaneClipper::clearVolumes()
 
 void SlicePlaneClipper::volumeRepChangedSlot()
 {
-    VolumesType volumes = mVolumes;
+	VolumesType volumes = mVolumes;
 	for (VolumesType::iterator iter=volumes.begin(); iter!=volumes.end(); ++iter)
 	{
 		this->removeVolume(*iter);
@@ -181,12 +181,9 @@ void SlicePlaneClipper::changedSlot()
   this->updateClipPlane();
 }
 
-
-
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
 
 
 ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mVolume(volume), mImage(image)
@@ -194,7 +191,6 @@ ImageMapperMonitor::ImageMapperMonitor(vtkVolumePtr volume, ImagePtr image) : mV
   if (!mImage)
     return;
 
-  //std::cout << "ImageMapperMonitor::ImageMapperMonitor()" << std::endl;
   connect(mImage.get(), SIGNAL(clipPlanesChanged()), this, SLOT(clipPlanesChangedSlot()));
   connect(mImage.get(), SIGNAL(cropBoxChanged()), this, SLOT(cropBoxChangedSlot()));
   this->fillClipPlanes();
@@ -208,7 +204,6 @@ ImageMapperMonitor::~ImageMapperMonitor()
 
 void ImageMapperMonitor::clipPlanesChangedSlot()
 {
-  //std::cout << "ImageMapperMonitor::clipPlanesChangedSlot()" << std::endl;
   this->clearClipPlanes();
   this->fillClipPlanes();
 }
@@ -240,30 +235,23 @@ void ImageMapperMonitor::fillClipPlanes()
 vtkVolumeMapperPtr ImageMapperMonitor::getMapper()
 {
   vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(mVolume->GetMapper());
-  //mapper->Register();
   return mapper;
-//  if (!mapper)
-//    return;
 }
 
 void ImageMapperMonitor::cropBoxChangedSlot()
 {
-  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  if (!image)
+  if (!mImage)
     return;
 
   vtkVolumeMapperPtr mapper = this->getMapper();
   if (!mapper)
     return;
-  mapper->SetCropping(image->getCropping());
+  mapper->SetCropping(mImage->getCropping());
 
-  ssc::DoubleBoundingBox3D bb_d = image->getCroppingBox();
+  ssc::DoubleBoundingBox3D bb_d = mImage->getCroppingBox();
 
-  //ssc::DoubleBoundingBox3D bb_d = ssc::transform(image->get_rMd().inv(), bb_r);
   mapper->SetCroppingRegionPlanes(bb_d.begin());
   mapper->Update();
-
-//  emit changed();
 }
 
 

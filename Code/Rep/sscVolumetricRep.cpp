@@ -61,9 +61,6 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 	//mTextureMapper3D->SetPreferredMethodToFragmentProgram();
 	mTextureMapper3D->SetBlendModeToComposite();
 
-//  std::cout << "comp: "<< mTextureMapper3D->GetUseCompressedTexture() << std::endl;
-//	mTextureMapper3D->SetUseCompressedTexture(true);
-//  std::cout << "comp: "<< mTextureMapper3D->GetUseCompressedTexture() << std::endl;
  // mTextureMapper3D->CroppingOff();
 
 	mVolume->SetProperty( mVolumeProperty );
@@ -128,8 +125,6 @@ void VolumetricRep::setImage(ImagePtr image)
 		connect(mImage.get(), SIGNAL(vtkImageDataChanged()), this, SLOT(vtkImageDataChangedSlot()));
 		connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
-		//connect(this, SIGNAL(addPermanentPoint(double, double, double)),
-		//			mImage.get(), SLOT(addLandmarkSlot(double, double, double)));
 		vtkImageDataChangedSlot();
 		mMonitor.reset(new ImageMapperMonitor(mVolume, mImage));
 		emit internalVolumeChanged();
@@ -165,6 +160,7 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 void VolumetricRep::updateResampleFactor()
 {
 	mResampleFactor = std::min(computeResampleFactor(mMaxVoxels, mImage), mResampleFactor);
+<<<<<<< HEAD:Code/Rep/sscVolumetricRep.cpp
 //	
 //	if (mMaxVoxels==0)
 //		return;
@@ -177,6 +173,8 @@ void VolumetricRep::updateResampleFactor()
 //		std::cout << "Downsampling volume in VolumetricRep: " << mImage->getName() << " below " << mMaxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
 //		mResampleFactor = std::min(factor, mResampleFactor);
 //	}
+=======
+>>>>>>> fd321bd6dbdad0c83f5180274670284ded7925cb:Code/Rep/sscVolumetricRep.cpp
 }
 
 /**called when the image is changed internally.

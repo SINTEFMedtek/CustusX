@@ -33,7 +33,6 @@ private:
   vtkPolyDataPtr mPolyData;
   vtkPointsPtr mPoints;
   vtkCellArrayPtr mSides;
-  //ProbeSector mSector;
   Transform3D m_wMt;
   int mType; ///< 0: none, 1: sector, 2: linear
   double m_d_start; ///< start depth

@@ -10,9 +10,11 @@ typedef vtkSmartPointer<class vtkMetaImageWriter> vtkMetaImageWriterPtr;
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
+#include <vtkPolyDataWriter.h>
 #include <vtkSTLReader.h>
 #include <vtkImageChangeInformation.h>
 typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
+typedef vtkSmartPointer<class vtkPolyDataWriter> vtkPolyDataWriterPtr;
 typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
@@ -27,6 +29,7 @@ typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformati
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscUtilHelpers.h"
 
 namespace ssc
 {
@@ -314,7 +317,7 @@ DataPtr DataManagerImpl::readData(const std::string& uid, const std::string& pat
   if (!current)
     return DataPtr();
 
-  current->setName(fileInfo.fileName().toStdString());
+  current->setName(changeExtension(fileInfo.fileName(), "").toStdString());
   //data->setFilePath(relativePath.path().toStdString());
 
 //  this->loadData(current);
@@ -356,6 +359,25 @@ MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fil
 {
   this->loadData(uid,fileName,type);
   return this->getMesh(uid);
+}
+
+void DataManagerImpl::saveMesh(MeshPtr mesh, const std::string& basePath)
+{
+  vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
+  writer->SetInput(mesh->getVtkPolyData());
+  //writer->SetFileDimensionality(3);
+  std::string filename = basePath + "/" + mesh->getFilePath();
+  writer->SetFileName(filename.c_str());
+
+  //Rename ending from .mhd to .raw
+  QStringList splitName = qstring_cast(filename).split(".");
+  splitName[splitName.size() - 1] = "raw";
+  filename = string_cast(splitName.join("."));
+
+  //writer->SetRAWFileName(filename.c_str());
+  //writer->SetCompression(false);
+  writer->Update();
+  writer->Write();
 }
 
 DataPtr DataManagerImpl::getData(const std::string& uid) const
@@ -666,6 +688,65 @@ void DataManagerImpl::setMedicalDomain(MEDICAL_DOMAIN domain)
     return;
   mMedicalDomain = domain;
   emit medicalDomainChanged();
+}
+
+int DataManagerImpl::findUniqueUidNumber(std::string uidBase) const
+{
+  // Find an uid that is not used before
+  int numMatches = 1;
+  int recNumber = 0;
+
+  if(numMatches != 0)
+  {
+    while(numMatches != 0)
+    {
+      QString newId = qstring_cast(uidBase).arg(++recNumber);
+      numMatches = mData.count(string_cast(newId));
+    }
+  }
+  return recNumber;
+}
+
+/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
+ *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
+ *  if %1 is found there
+ *
+ */
+ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
+{
+  int recNumber = this->findUniqueUidNumber(uidBase);
+
+  std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
+  std::string name;
+
+  if (recNumber==1)
+    name = string_cast(qstring_cast(nameBase).arg(""));
+  else
+    name = string_cast(qstring_cast(nameBase).arg("#%1").arg(recNumber));
+
+  ImagePtr retval = ImagePtr(new Image(uid, data, name));
+
+  std::string filename = filePath + "/" + uid + ".mhd";
+  retval->setFilePath(filename);
+
+  return retval;
+}
+/** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
+ *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
+ *  if %1 is found there
+ *
+ */
+MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
+{
+  int recNumber = this->findUniqueUidNumber(uidBase);
+  std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
+  std::string name = string_cast(qstring_cast(nameBase).arg(recNumber));
+  MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
+
+  std::string filename = filePath + "/" + uid + ".vtk";
+  retval->setFilePath(filename);
+
+  return retval;
 }
 
 

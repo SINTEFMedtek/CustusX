@@ -63,6 +63,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscTexture3DSlicerRep.h
     Rep/sscSlicePlanes3DRep.h
     Rep/sscGeometricRep.h
+    Rep/sscGeometricRep2D.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscOrientationAnnotationRep.h
     Widgets/sscDataAdapter.h
@@ -171,6 +172,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscProgressiveLODVolumetricRep.h
     Rep/sscGeometricRep.cpp
     Rep/sscGeometricRep.h
+    Rep/sscGeometricRep2D.cpp
+    Rep/sscGeometricRep2D.h
     Rep/sscToolRep3D.cpp
     Rep/sscToolRep3D.h
     Rep/sscProbeRep.cpp

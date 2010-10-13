@@ -14,6 +14,8 @@
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
 #include <vtkTextProperty.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyData.h>
 
 #include "sscSliceProxy.h"
 #include "sscToolManager.h"
@@ -33,6 +35,10 @@ ToolRep2D::ToolRep2D(const std::string& uid, const std::string& name) :
 	mUseToolLine = true;
 	mUseOffsetText = false;
 	mMergeOffsetAndToolLine = false;
+
+  mProbeSector.reset(new USProbeSector());
+  mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
+  mProbeSectorActor = vtkActorPtr::New();
 }
 
 ToolRep2D::~ToolRep2D()
@@ -131,17 +137,12 @@ void ToolRep2D::setMergeOffsetAndToolLine(bool on)
 	setVisibility();
 }
 
-void ToolRep2D::createUSProbe(vtkRendererPtr renderer)
-{
-	mUSProbe2D.reset( new USProbe2D(renderer) );
-}
-
 void ToolRep2D::addRepActorsToViewRenderer(ssc::View* view)
 {
 	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
 	createOffsetText(view->getRenderer(), Vector3D(0,0,0));
-	createUSProbe(view->getRenderer());
+  view->getRenderer()->AddActor(mProbeSectorActor);
 	setVisibility();
 	update();
 }
@@ -154,7 +155,7 @@ void ToolRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 	centerPoint.reset();
 	toolPoint.reset();
 	distanceText.reset();
-	mUSProbe2D.reset();
+  view->getRenderer()->RemoveActor(mProbeSectorActor);
 }
 
 void ToolRep2D::sliceTransformChangedSlot(Transform3D sMr)
@@ -179,11 +180,6 @@ void ToolRep2D::update()
 	//Logger::log("tool.log", "<"+string_cast(__FUNCTION__)+">"+" -- again!!!");
 	//Logger::log("vm.log", "ToolRep2D::update()");
 
-	if (showProbe())
-  {
-		setProbeSector(mSlicer->getTool()->getProbeSector());
-	}
-	
 	Transform3D prMt;
 	if (mSlicer->getTool())
 	{
@@ -193,6 +189,21 @@ void ToolRep2D::update()
 	Transform3D sMr = mSlicer->get_sMr();
 	Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
 	
+  mProbeSector->setPosition(sMr*rMpr*prMt);
+  if (this->showProbe())
+  {
+    mProbeSector->setSector(mSlicer->getTool()->getProbeSector());
+    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
+    if (mProbeSectorPolyDataMapper->GetInput())
+    {
+      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+    }
+    mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
+  }
+  else
+    mProbeSectorActor->SetVisibility(false);
+
+
 	Vector3D cross = vpMt.coord(getOffset() * Vector3D(0,0,1)); // zero position plus offset along z
 	Vector3D tooltip = vpMt.coord(Vector3D(0,0,0)); // the zero position
 	Vector3D toolback = vpMt.coord(Vector3D(0,0,-1000)); // a point 1m backwards in z
@@ -201,24 +212,6 @@ void ToolRep2D::update()
 		cursor->update(cross, mBB_vp); ///crosshair, shows in Navigation
 	updateOffsetText();	
 	updateToolLine(cross, tooltip, toolback);
-	updateUSProbe(sMr*rMpr*prMt);
-}
-
-void ToolRep2D::setProbeSector(ssc::ProbeSector data)
-{
-	if (mUSProbe2D)
-	{
-    //messageManager()->sendDebug("setProbeSector: " + string_cast(data.mDepthStart) + " " + string_cast(data.mDepthEnd) + " " + string_cast(data.mWidth));
-		mUSProbe2D->setShape(data.mType, data.mDepthStart, data.mDepthEnd, data.mWidth); 
-	}	
-}
-
-void ToolRep2D::updateUSProbe(const Transform3D& vpMt)
-{
-	if (mUSProbe2D)
-	{
-		mUSProbe2D->setPosition(vpMt);
-	}
 }
 
 bool ToolRep2D::showProbe()
@@ -248,8 +241,6 @@ void ToolRep2D::setVisibility()
 		toolPoint->getActor()->SetVisibility(showOffset() && !mMergeOffsetAndToolLine);
 	if (distanceText)
 		distanceText->getActor()->SetVisibility(mUseOffsetText && showOffset() && !mMergeOffsetAndToolLine);
-	if (mUSProbe2D)
-		mUSProbe2D->setVisibility(showProbe());
 }
 
 /**create a yellow crosshair centered at the tool offset pos. 
