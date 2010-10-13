@@ -34,6 +34,7 @@ typedef vtkSmartPointer<vtkImageExport> vtkImageExportPtr;
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"
 #include "sscMesh.h"
+#include "sscMessageManager.h"
 
 const unsigned int Dimension = 3;
 typedef unsigned short PixelType;
@@ -82,9 +83,10 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
 
 
     std::string uid = string_cast(ssc::changeExtension(qstring_cast(image->getUid()), "") + "_cont%1");
-    std::string name = image->getName()+" cont #%1";
-    std::cout << "contoured volume: " << uid << ", " << name << std::endl;
+    std::string name = image->getName()+" contour %1";
+    //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
     ssc::MeshPtr result = ssc::dataManager()->createMesh(cubesPolyData,uid, name, "Images");
+    ssc::messageManager()->sendInfo("created contour " + result->getName());
 
     result->get_rMd_History()->setRegistration(image->get_rMd());
     result->setParentFrame(image->getUid());
@@ -142,9 +144,10 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
 
 
   std::string uid = string_cast(ssc::changeExtension(qstring_cast(image->getUid()), "") + "_seg%1");
-  std::string name = image->getName()+" seg #%1";
-  std::cout << "segmented volume: " << uid << ", " << name << std::endl;
+  std::string name = image->getName()+" segmented %1";
+  //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
   ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
+  ssc::messageManager()->sendInfo("created segment " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
 
