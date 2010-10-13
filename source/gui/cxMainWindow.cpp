@@ -93,6 +93,7 @@ MainWindow::MainWindow() :
   image2imageWidget->addTab(mImage1RegistrationWidget, "Image 1");
   mImage2RegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
   image2imageWidget->addTab(mImage2RegistrationWidget, "Image 2");
+  image2imageWidget->addTab(new RegisterWidget(image2imageWidget),"Register");
 
   mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
   mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");

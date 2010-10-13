@@ -3,6 +3,9 @@
 
 #include "cxWhatsThisWidget.h"
 
+class QGroupBox;
+class QPushButton;
+
 namespace cx
 {
 class SegmentationWidget;
@@ -27,8 +30,31 @@ public:
   virtual QString defaultWhatsThis() const;
 
 private:
+  ImageSegmentationAndCenterlineWidget();
+
   SegmentationWidget* mSegmentationWidget;
   CenterlineWidget*   mCenterlineWidget;
+};
+
+/**
+ * \class RegisterWidget
+ *
+ * \brief Widget for performing the registration between two vessel segments.
+ *
+ * \date 13. okt. 2010
+ * \author: Janne Beate Bakeng
+ */
+class RegisterWidget : public WhatsThisWidget
+{
+public:
+  RegisterWidget(QWidget* parent);
+  ~RegisterWidget();
+  virtual QString defaultWhatsThis() const;
+
+private:
+  RegisterWidget();
+
+  QPushButton* mRegisterButton;
 };
 
 }//namespace cx
