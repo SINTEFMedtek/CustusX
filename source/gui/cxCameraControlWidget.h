@@ -11,6 +11,7 @@
 #include <vector>
 #include <QtGui>
 #include <QGraphicsView>
+#include "sscVector3D.h"
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 #include "vtkSmartPointer.h"
@@ -26,32 +27,25 @@ class MousePadWidget : public QFrame
   Q_OBJECT
 
 public:
-  MousePadWidget(QWidget* parent);
+  MousePadWidget(QWidget* parent, QSize minimumSize);
   virtual ~MousePadWidget();
+  void setFixedXPos(bool on);
+  virtual QSize minimumSizeHint() const { return mMinSize; }
 signals:
-  void mouseMoved(QPoint delta);
+  void mouseMoved(QPointF deltaN);
 protected:
   void paintEvent(QPaintEvent* event);
   virtual void showEvent (QShowEvent* event);
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
-  void mouseReleaseEvent(QMouseEvent* event);
+  virtual void mouseReleaseEvent(QMouseEvent* event);
+  virtual void resizeEvent(QResizeEvent* event);
+
 private:
   QPoint mLastPos;
-};
-
-
-class GraphicsView : public QGraphicsView
-{
-    Q_OBJECT
-
-public:
-    GraphicsView(QGraphicsScene *scene = 0, QWidget *parent = 0);
-
-    bool viewportEvent(QEvent *event);
-
-private:
-    qreal totalScaleFactor;
+  bool mFixPosX;
+  QSize mMinSize;
+  void fixPos();
 };
 
 /**
@@ -67,24 +61,27 @@ public:
 signals:
 
 protected slots:
-  void dollySlot();
-  void panSlot(QPoint delta);
-  void rotateYSlot();
-  void rotateXZSlot(QPoint delta);
+  void dollySlot(QPointF delta);
+  void panXZSlot(QPointF delta);
+  void rotateYSlot(QPointF delta);
+  void rotateXZSlot(QPointF delta);
+  void setStandard3DViewActionSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
-//  virtual bool viewportEvent(QEvent *event);
 
 private:
-  MousePadWidget* mPanWidget;
-  MousePadWidget* mRotateWidget;
   QVBoxLayout* mTopLayout;
+  QSize mMinPadSize;
+  QSize mMinBarSize;
 
   vtkCameraPtr getCamera() const;
   void defineRotateLayout();
   void definePanLayout();
+
+  void createStandard3DViewActions();
+  QAction* addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group);
 };
 
 }//end namespace cx
