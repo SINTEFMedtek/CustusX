@@ -36,6 +36,9 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   connect(contourButton, SIGNAL(clicked()), this, SLOT(contourSlot()));
 
   toptopLayout->addStretch();
+
+  this->fillImageCombobox();
+
 }
 
 SegmentationWidget::~SegmentationWidget()
@@ -81,6 +84,10 @@ QString SegmentationWidget::defaultWhatsThis() const
         "</html>";
 }
 
+void SegmentationWidget::fillImageCombobox()
+{
+
+}
 
 //------------------------------------------------------------------------------
 
