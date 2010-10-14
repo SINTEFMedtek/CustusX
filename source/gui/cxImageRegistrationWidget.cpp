@@ -186,10 +186,11 @@ void ImageRegistrationWidget::performRegistration()
 {
   if (!mCurrentImage)
     return;
-  //make sure the masterImage is set
-  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
-  if(!masterImage)
-    registrationManager()->setMasterImage(mCurrentImage);
+
+  //make sure the fixedData is set
+  ssc::DataPtr fixedData = registrationManager()->getFixedData();
+  if(!fixedData)
+    registrationManager()->setFixedData(mCurrentImage);
 
   registrationManager()->doImageRegistration(mCurrentImage);
 
