@@ -154,27 +154,27 @@ protected:
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 
-  class ConsoleWidget*                  mConsoleWidget;
-  class RegistrationMethodsWidget*      mRegsitrationMethodsWidget; ///< container widget for all registrations
-  class FastImageRegistrationWidget*    mFastImageRegistrationWidget;
-  class ImageSegmentationAndCenterlineWidget*  mImage1RegistrationWidget;
-  class ImageSegmentationAndCenterlineWidget*  mImage2RegistrationWidget;
-  class FastPatientRegistrationWidget*  mFastPatientRegistrationWidget;
-  class FastOrientationRegistrationWidget* mFastOrientationRegistrationWidget;
-  class ImageRegistrationWidget*        mImageRegistrationWidget; ///< interface for image registration
-  class PatientRegistrationWidget*      mPatientRegistrationWidget; ///< interface for patient registration
-  class ShiftCorrectionWidget*          mShiftCorrectionWidget; ///< interface for image shift correction
-  class BrowserWidget*                  mBrowserWidget; ///< contains tree structure with the images, meshes and tools
-  class NavigationWidget*               mNavigationWidget; ///< contains settings for navigating
-  class ImagePropertiesWidget*          mImagePropertiesWidget; ///< display and control of image properties for active image.
-  class ToolPropertiesWidget*           mToolPropertiesWidget; ///< display and control of tool properties for active tool.
-  class MeshPropertiesWidget*           mMeshPropertiesWidget; ///< Display and control image properties for active mesh
-  class PointSamplingWidget*            mPointSamplingWidget;
-  ssc::ReconstructionWidget*            mReconstructionWidget;
-  class RegistrationHistoryWidget*      mRegistrationHistoryWidget; ///< look back in registration history.
-  class VolumePropertiesWidget*         mVolumePropertiesWidget;
-  class CustomStatusBar*                mCustomStatusBar;
-  class FrameTreeWidget*                mFrameTreeWidget;
+  class ConsoleWidget*                          mConsoleWidget;
+  class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
+  class FastImageRegistrationWidget*            mFastImageRegistrationWidget;
+  class ImageSegmentationAndCenterlineWidget*   mImage1RegistrationWidget;
+  class ImageSegmentationAndCenterlineWidget*   mImage2RegistrationWidget;
+  class FastPatientRegistrationWidget*          mFastPatientRegistrationWidget;
+  class FastOrientationRegistrationWidget*      mFastOrientationRegistrationWidget;
+  class ImageRegistrationWidget*                mImageRegistrationWidget; ///< interface for image registration
+  class PatientRegistrationWidget*              mPatientRegistrationWidget; ///< interface for patient registration
+  class ShiftCorrectionWidget*                  mShiftCorrectionWidget; ///< interface for image shift correction
+  class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
+  class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
+  class ImagePropertiesWidget*                  mImagePropertiesWidget; ///< display and control of image properties for active image.
+  class ToolPropertiesWidget*                   mToolPropertiesWidget; ///< display and control of tool properties for active tool.
+  class MeshPropertiesWidget*                   mMeshPropertiesWidget; ///< Display and control image properties for active mesh
+  class PointSamplingWidget*                    mPointSamplingWidget;
+  ssc::ReconstructionWidget*                    mReconstructionWidget;
+  class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
+  class VolumePropertiesWidget*                 mVolumePropertiesWidget;
+  class CustomStatusBar*                        mCustomStatusBar;
+  class FrameTreeWidget*                        mFrameTreeWidget;
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
