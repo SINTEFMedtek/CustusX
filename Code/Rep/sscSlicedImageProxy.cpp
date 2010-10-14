@@ -48,7 +48,7 @@ SlicedImageProxy::~SlicedImageProxy()
  */
 vtkImageDataPtr SlicedImageProxy::createDummyImageData()
 {
-  vtkImageDataPtr dummyImageData = vtkImageData::New();
+  vtkImageDataPtr dummyImageData = vtkImageDataPtr::New();
   dummyImageData->SetExtent(0, 0, 0, 0, 0, 0);
   dummyImageData->SetSpacing(1, 1, 1);
   //dummyImageData->SetScalarTypeToUnsignedShort();

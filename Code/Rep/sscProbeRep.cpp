@@ -34,7 +34,7 @@ ProbeRep::ProbeRep(const std::string& uid, const std::string& name) :
 	mResolution(1000),
 	mPickedPoint(),
 	mPickedPointActor(NULL),
-	mConnections(vtkEventQtSlotConnect::New())
+	mConnections(vtkEventQtSlotConnectPtr::New())
 {}
 ProbeRep::~ProbeRep()
 {}
