@@ -30,7 +30,9 @@ namespace cx
 class CropBoxCallback : public vtkCommand
 {
 public:
-  CropBoxCallback(InteractiveCropper* cropper) : mCropper(cropper) {}
+  CropBoxCallback() {}
+  static CropBoxCallback* New() {return new CropBoxCallback;}
+  void SetCropper(InteractiveCropper* cropper) {mCropper = cropper;}
   virtual void Execute(vtkObject* caller, unsigned long, void*)
   {
  //   std::cout << "executing" << std::endl;
@@ -43,7 +45,9 @@ public:
 class CropBoxEnableCallback : public vtkCommand
 {
 public:
-  CropBoxEnableCallback(bool val, InteractiveCropper* cropper) : mValue(val), mCropper(cropper) {}
+  CropBoxEnableCallback() {}
+  static CropBoxEnableCallback* New() {return new CropBoxEnableCallback;}
+  void SetCropper(bool val, InteractiveCropper* cropper) {mValue = val; mCropper = cropper;}
   virtual void Execute(vtkObject* caller, unsigned long, void*)
   {
     //std::cout << "flip" << std::endl;
@@ -71,14 +75,12 @@ InteractiveCropper::InteractiveCropper()
   double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
   mBoxWidget->PlaceWidget(bb_hard);
 
-  mCropBoxCallback = new CropBoxCallback(this);
-  mCropBoxEnableCallback = new CropBoxEnableCallback(true, this);
-  mCropBoxDisableCallback = new CropBoxEnableCallback(false, this);
-//  mBoxWidget->AddObserver(vtkCommand::InteractionEvent, mCropBoxCallback);
-
- // mBoxWidget->AddObserver(vtkCommand::StartInteractionEvent, new CropBoxCallback("start"));
- // mBoxWidget->AddObserver(vtkCommand::EnableEvent, new CropBoxCallback("enable"));
- // this->useCropping(true);
+  mCropBoxCallback = CropBoxCallbackPtr::New();
+  mCropBoxCallback->SetCropper(this);
+  mCropBoxEnableCallback = CropBoxEnableCallbackPtr::New();
+  mCropBoxEnableCallback->SetCropper(true, this);
+  mCropBoxDisableCallback = CropBoxEnableCallbackPtr::New();
+  mCropBoxDisableCallback->SetCropper(false, this);
 }
 
 void InteractiveCropper::setView(ssc::View* view)
