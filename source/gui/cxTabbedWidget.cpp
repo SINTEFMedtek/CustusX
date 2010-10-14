@@ -6,7 +6,7 @@
 
 namespace cx
 {
-
+//------------------------------------------------------------------------------
 TabbedWidget::TabbedWidget(QString objectName, QString windowTitle, QWidget* parent) :
     WhatsThisWidget(parent),
     mTabWidget(new QTabWidget(this))
@@ -56,6 +56,36 @@ QString RegistrationMethodsWidget::defaultWhatsThis() const
       "</html>";
 }
 
+//------------------------------------------------------------------------------
+SegmentationMethodsWidget::SegmentationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString SegmentationMethodsWidget::defaultWhatsThis() const
+{
+  return"<html>"
+      "<h3>Segmentation methods.</h3>"
+      "<p>Segmentation methods are used to extract parts of a volume.</p>"
+      "<p><i>Choose a method.</i></p>"
+      "</html>";
+}
+//------------------------------------------------------------------------------
+VisualizationMethodsWidget::VisualizationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString VisualizationMethodsWidget::defaultWhatsThis() const
+{
+  return"<html>"
+      "<h3>Visualization methods.</h3>"
+      "<p>These methods creates data structures that can be use in visualization.</p>"
+      "<p><i>Choose a method.</i></p>"
+      "</html>";
+}
 //------------------------------------------------------------------------------
 
 LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent) :

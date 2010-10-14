@@ -52,6 +52,8 @@ MainWindow::MainWindow() :
   mToggleWidgetActionGroup(NULL),
   mConsoleWidget(new ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
+  mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
+  mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
   mShiftCorrectionWidget(new ShiftCorrectionWidget(this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
@@ -74,32 +76,9 @@ MainWindow::MainWindow() :
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
-  mImageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
-  landmarkRegistrationsWidget->addTab(mImageRegistrationWidget, "Image");
-  mPatientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
-  landmarkRegistrationsWidget->addTab(mPatientRegistrationWidget, "Patient");
-
-  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
-  mFastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(mFastOrientationRegistrationWidget, "Orientation");
-  mFastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(mFastImageRegistrationWidget, "Image");
-  mFastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(mFastPatientRegistrationWidget, "Patient");
-
-  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
-  mImage1RegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
-  image2imageWidget->addTab(mImage1RegistrationWidget, "Image 1");
-  mImage2RegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
-  image2imageWidget->addTab(mImage2RegistrationWidget, "Image 2");
-  image2imageWidget->addTab(new RegisterWidget(image2imageWidget),"Register");
-
-  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
-  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
-  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
-  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
-  mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
+  this->populateRegistrationMethodsWidget();
+  this->populateSegmentationMethodsWidget();
+  this->populateVisualizationMethodsWidget();
 
   this->addAsDockWidget(mBrowserWidget);
 
@@ -107,7 +86,6 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mMeshPropertiesWidget);
   this->addAsDockWidget(new CameraControlWidget(this));
-  this->addAsDockWidget(new SegmentationWidget(this));
 
   //Tried to add a separator. Don't work yet
   //QAction* separatorAction = new QAction(this);
@@ -126,6 +104,8 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mRegistrationHistoryWidget);
   this->addAsDockWidget(mShiftCorrectionWidget);
   this->addAsDockWidget(mRegsitrationMethodsWidget);
+  this->addAsDockWidget(mSegmentationMethodsWidget);
+  this->addAsDockWidget(mVisualizationMethodsWidget);
   this->addAsDockWidget(mNavigationWidget);
   this->addAsDockWidget(mConsoleWidget);
   this->addAsDockWidget(mFrameTreeWidget);
@@ -253,19 +233,13 @@ void MainWindow::createActions()
   mDeleteDataAction = new QAction(tr("Delete current image"), this);
   mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
 
-  //mLoadPatientRegistrationFromFile = new QAction(tr("Load patient registration from file"), this);
-  //mLoadPatientRegistrationFromFile->setStatusTip("Select a txt-file to use as patient registration");
-
   connect(mImportDataAction, SIGNAL(triggered()), this, SLOT(importDataSlot()));
   connect(mDeleteDataAction, SIGNAL(triggered()), this, SLOT(deleteDataSlot()));
-  //  connect(mLoadPatientRegistrationFromFile, SIGNAL(triggered()), this, SLOT(loadPatientRegistrationSlot()));
 
   //tool
   mToolsActionGroup = new QActionGroup(this);
   mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
   mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
-  //mStartTrackingToolsAction =  new QAction(tr("Start tracking"), mToolsActionGroup);
-  //mStopTrackingToolsAction =  new QAction(tr("Stop tracking"), mToolsActionGroup);
   mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
   mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
@@ -336,12 +310,8 @@ void MainWindow::newPatientSlot()
 {
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
-  //name += "_";
   name += mSettings->value("globalApplicationName").toString() + "_";
-  //name += "_";
   name += mSettings->value("globalPatientNumber").toString() + ".cx3";
-  //name += ".cx3";
-
 
   // Create folders
   if (!QDir().exists(patientDatafolder))
@@ -351,9 +321,6 @@ void MainWindow::newPatientSlot()
   }
 
   QString choosenDir = patientDatafolder + "/" + name;
-  //choosenDir += "/";
-  //choosenDir += name;
-  // Open file dialog, get patient data folder
   choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
   if (choosenDir == QString::null)
     return; // On cancel
@@ -409,14 +376,11 @@ void MainWindow::onWorkflowStateChangedSlot()
   Desktop desktop = stateManager()->getActiveDesktop();
   this->restoreState(desktop.mMainWindowState);
   viewManager()->setActiveLayout(desktop.mLayoutUid);
-
-  //std::cout << "LayoutUid: " << desktop.mLayoutUid << std::endl;
 }
 
 void MainWindow::saveDesktopSlot()
 {
   Desktop desktop;
-  //std::cout << "QByteArray" << QString(this->saveState().toBase64()) << std::endl;
   desktop.mMainWindowState = this->saveState();
   desktop.mLayoutUid = viewManager()->getActiveLayout();
   stateManager()->saveDesktop(desktop);
@@ -430,7 +394,6 @@ void MainWindow::resetDesktopSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
-//  std::cout << "load" << std::endl;
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
   // Create folder
   if (!QDir().exists(patientDatafolder))
@@ -445,7 +408,6 @@ void MainWindow::loadPatientFileSlot()
     return; // On cancel
 
   stateManager()->getPatientData()->loadPatient(choosenDir);
-//  std::cout << "end:" << std::endl;
 
   cx::FrameForest forest;
 }
@@ -468,7 +430,6 @@ void MainWindow::importDataSlot()
   if (!data)
     return;
 
-  //boost::scoped_ptr<ImportDataWizard> wizard(new ImportDataWizard(data));
   ImportDataWizard* wizard = new ImportDataWizard(data, this);
   wizard->exec();
 }
@@ -517,7 +478,7 @@ LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
   LayoutEditor* editor = new LayoutEditor(dialog.get());
 
   LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
-  //  std::cout << "AA:" << streamXml2String(data) << std::endl;
+
   if (createNew)
   {
     data.resetUid(viewManager()->generateLayoutUid());
@@ -586,7 +547,6 @@ void MainWindow::createMenus()
   mFileMenu->addSeparator();
   mFileMenu->addAction(mImportDataAction);
   mFileMenu->addAction(mDeleteDataAction);
-  //mFileMenu->addAction(mLoadPatientRegistrationFromFile);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
 
@@ -604,7 +564,6 @@ void MainWindow::createMenus()
   mToolMenu->addAction(mConfigureToolsAction);
   mToolMenu->addAction(mInitializeToolsAction);
   mToolMenu->addAction(mTrackingToolsAction);
-  //mToolMenu->addAction(mStopTrackingToolsAction);
   mToolMenu->addSeparator();
   mToolMenu->addAction(mSaveToolsPositionsAction);
 
@@ -635,7 +594,6 @@ void MainWindow::createToolBars()
   mToolToolBar = addToolBar("Tools");
   mToolToolBar->setObjectName("ToolToolBar");
   mToolToolBar->addAction(mTrackingToolsAction);
-  //mToolToolBar->addAction(mStopTrackingToolsAction);
 
   mNavigationToolBar = addToolBar("Navigation");
   mNavigationToolBar->setObjectName("NavigationToolBar");
@@ -661,6 +619,55 @@ void MainWindow::createToolBars()
 void MainWindow::createStatusBar()
 {
   this->setStatusBar(mCustomStatusBar);
+}
+
+void MainWindow::populateRegistrationMethodsWidget()
+{
+  //landmark
+  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
+  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
+  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
+  landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
+  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
+
+  //fast
+  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
+  FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
+  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
+  FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
+  fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
+  fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
+  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient");
+
+  //vessel based image to image
+  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
+  ImageSegmentationAndCenterlineWidget* fixedRegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
+  ImageSegmentationAndCenterlineWidget* movingRegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
+  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed");
+  image2imageWidget->addTab(movingRegistrationWidget, "Moving");
+  image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
+
+  //manual offset
+  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
+
+  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
+  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
+  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
+  mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
+}
+
+void MainWindow::populateSegmentationMethodsWidget()
+{
+  SegmentationWidget* segmentationWidget = new SegmentationWidget(mSegmentationMethodsWidget);
+
+  mSegmentationMethodsWidget->addTab(segmentationWidget, "Threshold");
+}
+
+void MainWindow::populateVisualizationMethodsWidget()
+{
+  SurfaceWidget* surfaceWidget = new SurfaceWidget(mVisualizationMethodsWidget);
+
+  mVisualizationMethodsWidget->addTab(surfaceWidget, "Surface");
 }
 
 void MainWindow::aboutSlot()
