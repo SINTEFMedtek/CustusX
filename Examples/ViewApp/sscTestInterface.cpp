@@ -19,6 +19,8 @@
 #include "sscDummyToolManager.h"
 #include "sscToolRep3D.h"
 
+typedef vtkSmartPointer<vtkCallbackCommand> vtkCallbackCommandPtr;
+
 /**
  * sscTestInterface.cpp
  *
@@ -241,7 +243,7 @@ void TestInterface::timerUpdate(vtkObject* obj, unsigned long, void*, void*)
 }
 void TestInterface::startRendering()
 {
-    mCallback = vtkCallbackCommand::New();
+    mCallback = vtkCallbackCommandPtr::New();
     mCallback->SetCallback(timerUpdate);
 
     mView1->GetInteractor()->AddObserver(vtkCommand::TimerEvent, mCallback);

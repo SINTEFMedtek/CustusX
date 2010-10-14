@@ -9,6 +9,8 @@
 #include "sscImage.h"
 #include "sscImageLUT2D.h"
 
+typedef vtkSmartPointer<vtkImageThreshold> vtkImageThresholdPtr;
+
 namespace ssc
 {
 
@@ -16,8 +18,8 @@ ImageBlenderProxy::ImageBlenderProxy()
 {
 	mBlender = vtkImageBlendPtr::New();
 	mBlender->SetBlendModeToNormal();
-	mTreshold = vtkImageThreshold::New();
-	//mColorMapper = vtkImageMapToWindowLevelColors::New();
+	mTreshold = vtkImageThresholdPtr::New();
+	//mColorMapper = vtkImageMapToWindowLevelColorsPtr::New();
 	firstImage = true;
 }
 

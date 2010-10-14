@@ -72,7 +72,7 @@ void GeometricRep::meshChangedSlot()
 	mMesh->connectToRep(mSelf);
   
 	mMapper->SetInput( mMesh->getVtkPolyData() );
-  
+
   //Set mesh color
   mActor->GetProperty()->SetColor(mMesh->getColor().redF(),
                                   mMesh->getColor().greenF(),

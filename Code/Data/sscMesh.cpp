@@ -10,7 +10,7 @@
 namespace ssc
 {
 Mesh::Mesh(const std::string& uid, const std::string& name) :
-  Data(uid, name), mVtkPolyData(vtkPolyData::New())
+  Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New())
 {
   mColor = QColor(255, 0, 0, 255);
 }
