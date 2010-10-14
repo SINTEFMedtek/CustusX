@@ -104,7 +104,7 @@ class TreeItemTool : public TreeItemImpl
 {
 public:
   static TreeItemPtr create(TreeItemWeakPtr parent, ssc::ToolPtr tool);
-  virtual ~TreeItemTool() {}
+  virtual ~TreeItemTool();
   virtual QString getName() const;
 private:
   TreeItemTool(TreeItemWeakPtr parent, ssc::ToolPtr tool) : TreeItemImpl(parent,"","tool",""), mTool(tool) {}
