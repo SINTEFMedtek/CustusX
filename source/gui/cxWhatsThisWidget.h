@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QTabWidget>
+#include <QGroupBox>
+#include <QVBoxLayout>
 
 namespace cx
 {
@@ -23,6 +25,23 @@ public:
   {};
   virtual ~WhatsThisWidget(){};
   virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
+  QGroupBox* createGroupBox(QWidget* widget, QString boxname, bool checkable = false, bool checked = true)
+  {
+    QGroupBox* groupbox = new QGroupBox(boxname, this);
+
+    groupbox->setCheckable(checkable);
+    if(groupbox->isCheckable())
+    {
+      groupbox->setChecked(checked);
+      connect(groupbox, SIGNAL(clicked(bool)), widget, SLOT(setVisible(bool)));
+    }
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(widget);
+    groupbox->setLayout(vbox);
+
+    return groupbox;
+  }
 };
 }
 #endif /* CXWHATSTHISWIDGET_H_ */
