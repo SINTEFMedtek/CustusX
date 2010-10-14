@@ -56,6 +56,7 @@ void RegistrationManager::setFixedData(ssc::DataPtr fixedData)
   mFixedData = fixedData;
   if (mFixedData)
     ssc::messageManager()->sendInfo("Registration fixed data set to "+mFixedData->getUid());
+  emit fixedDataChanged( (mFixedData) ? qstring_cast(mFixedData->getUid()) : "");
 }
 
 ssc::DataPtr RegistrationManager::getFixedData()
@@ -66,6 +67,7 @@ ssc::DataPtr RegistrationManager::getFixedData()
 void RegistrationManager::setMovingData(ssc::DataPtr movingData)
 {
   mMovingData = movingData;
+  emit movingDataChanged( (mMovingData) ? qstring_cast(mMovingData->getUid()) : "");
 }
 
 ssc::DataPtr RegistrationManager::getMovingData()
