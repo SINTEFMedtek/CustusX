@@ -12,6 +12,7 @@ class QWidget;
 
 namespace cx
 {
+typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 
 /**
  * \class SegmentationWidget
@@ -31,6 +32,9 @@ public:
   virtual ~SegmentationWidget();
   virtual QString defaultWhatsThis() const;
 
+signals:
+  void imageChanged(QString);
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
@@ -42,13 +46,14 @@ private slots:
   void toogleSmoothingSlot(bool on);
   void smoothingSigmaSlot(int value);
   void adjustSizeSlot();
-  void activeImageChangedSlot();
+  //void activeImageChangedSlot();
 
 private:
   SegmentationWidget();
   QWidget* createSegmentationOptionsWidget();
 
-  ssc::ImagePtr mImage;
+  //ssc::ImagePtr mImage;
+  SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
   int mSegmentationThreshold; ///< the threshold value used when segmenting
   bool mBinary; ///< whether or not the segmentation should create a binary volume
@@ -77,6 +82,9 @@ public:
   ~SurfaceWidget();
   virtual QString defaultWhatsThis() const;
 
+signals:
+  void imageChanged(QString);
+
 private slots:
   void surfaceSlot();
   void thresholdSlot(int value);
@@ -85,6 +93,7 @@ private:
   SurfaceWidget();
   QWidget* createSurfaceOptionsWidget();
 
+  SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   int mSurfaceThreshold; ///< the threshold value used when contouring
   QSpinBox* mSurfaceThresholdSpinBox;
 };
