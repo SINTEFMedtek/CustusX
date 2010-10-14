@@ -46,7 +46,7 @@ signals:
 protected slots:
   void patientChangedSlot();
   //application menu
-  void aboutSlot(); ///< TODO
+  void aboutSlot();
   void preferencesSlot();
   void quitSlot(); ///< TODO
   
@@ -66,7 +66,6 @@ protected slots:
   //data menu
   void importDataSlot(); ///< loads data(images) into the datamanager
   void deleteDataSlot(); ///< deletes data(image) from the patient
-//  void loadPatientRegistrationSlot(); ///< loads a patient registration
 
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
@@ -89,7 +88,12 @@ protected:
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
   void createToolBars(); ///< creates and adds toolbars for convenience
-  void createStatusBar();  ///< //TODO
+  void createStatusBar();  ///<
+
+  void populateRegistrationMethodsWidget(); ///< fill the registration methods widget with all available registration methods
+  void populateSegmentationMethodsWidget();
+  void populateVisualizationMethodsWidget();
+
 
   void addAsDockWidget(QWidget* widget);
 
@@ -124,7 +128,6 @@ protected:
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume
-  //QAction* mLoadPatientRegistrationFromFile; ///< action for loading a patient registration from file
 
   QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
@@ -156,13 +159,8 @@ protected:
 
   class ConsoleWidget*                          mConsoleWidget;
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
-  class FastImageRegistrationWidget*            mFastImageRegistrationWidget;
-  class ImageSegmentationAndCenterlineWidget*   mImage1RegistrationWidget;
-  class ImageSegmentationAndCenterlineWidget*   mImage2RegistrationWidget;
-  class FastPatientRegistrationWidget*          mFastPatientRegistrationWidget;
-  class FastOrientationRegistrationWidget*      mFastOrientationRegistrationWidget;
-  class ImageRegistrationWidget*                mImageRegistrationWidget; ///< interface for image registration
-  class PatientRegistrationWidget*              mPatientRegistrationWidget; ///< interface for patient registration
+  class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
+  class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters
   class ShiftCorrectionWidget*                  mShiftCorrectionWidget; ///< interface for image shift correction
   class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
