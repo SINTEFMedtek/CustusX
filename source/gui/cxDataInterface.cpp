@@ -141,16 +141,36 @@ ssc::DoubleRange DoubleDataAdapter2DLevel::getValueRange() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-
-
-
-ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
+SelectImageStringDataAdapterBase::SelectImageStringDataAdapterBase()
 {
   connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
   connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),      this, SIGNAL(changed()));
+}
+QStringList SelectImageStringDataAdapterBase::getValueRange() const
+{
+  std::vector<std::string> uids = ssc::dataManager()->getImageUids();
+  QStringList retval;
+  retval << "";
+  for (unsigned i=0; i<uids.size(); ++i)
+    retval << qstring_cast(uids[i]);
+  return retval;
+}
+QString SelectImageStringDataAdapterBase::convertInternal2Display(QString internal)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(internal));
+  if (!image)
+    return "<no volume>";
+  return qstring_cast(image->getName());
 }
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
+{
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),      this, SIGNAL(changed()));
+}
 QString ActiveImageStringDataAdapter::getValueName() const
 {
   return "Active Volume";
@@ -173,26 +193,105 @@ QString ActiveImageStringDataAdapter::getHelp() const
 {
   return "Select the active volume";
 }
-QStringList ActiveImageStringDataAdapter::getValueRange() const
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter()
 {
-  std::vector<std::string> uids = ssc::dataManager()->getImageUids();
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<uids.size(); ++i)
-    retval << qstring_cast(uids[i]);
-  return retval;
+  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
 }
-QString ActiveImageStringDataAdapter::convertInternal2Display(QString internal)
+QString RegistrationFixedImageStringDataAdapter::getValueName() const
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(internal));
+  return "Fixed Volume";
+}
+
+bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
+{
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  if (newImage==registrationManager()->getFixedData())
+    return false;
+  registrationManager()->setFixedData(newImage);
+  return true;
+}
+QString RegistrationFixedImageStringDataAdapter::getValue() const
+{
+  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(registrationManager()->getFixedData());
   if (!image)
-    return "<no volume>";
-  return qstring_cast(image->getName());
+    return "";
+  return qstring_cast(image->getUid());
+}
+QString RegistrationFixedImageStringDataAdapter::getHelp() const
+{
+  return "Select the fixed registration volume";
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter()
+{
+  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
+}
+QString RegistrationMovingImageStringDataAdapter::getValueName() const
+{
+  return "Moving Volume";
+}
+bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
+{
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  if (newImage==registrationManager()->getMovingData())
+    return false;
+  registrationManager()->setMovingData(newImage);
+  return true;
+}
+QString RegistrationMovingImageStringDataAdapter::getValue() const
+{
+  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(registrationManager()->getMovingData());
+  if (!image)
+    return "";
+  return qstring_cast(image->getUid());
+}
+QString RegistrationMovingImageStringDataAdapter::getHelp() const
+{
+  return "Select the moving registration volume";
 }
 
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
 
-
+SelectImageStringDataAdapter::SelectImageStringDataAdapter()
+{
+}
+QString SelectImageStringDataAdapter::getValueName() const
+{
+  return "Select Volume";
+}
+bool SelectImageStringDataAdapter::setValue(const QString& value)
+{
+  if (value==mImageUid)
+    return false;
+  mImageUid = value;
+  emit changed();
+  emit imageChanged(mImageUid);
+  return true;
+}
+QString SelectImageStringDataAdapter::getValue() const
+{
+  return mImageUid;
+}
+QString SelectImageStringDataAdapter::getHelp() const
+{
+  return "Select a volume";
+}
+ssc::ImagePtr SelectImageStringDataAdapter::getImage()
+{
+  return ssc::dataManager()->getImage(string_cast(mImageUid));
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------

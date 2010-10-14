@@ -4,6 +4,8 @@
 #include <QGroupBox>
 #include <QPushButton>
 #include "cxSegmentationWidget.h"
+#include "cxDataInterface.h"
+#include "sscLabeledComboBoxWidget.h"
 
 namespace cx
 {
@@ -16,9 +18,13 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mSurfaceWidget = new SurfaceWidget(this);
   mCenterlineWidget =  new CenterlineWidget(this);
 
+  // TODO: replace with RegistrationMovingImageStringDataAdapter for the moving widget
+  ssc::StringDataAdapterPtr fixedImage = RegistrationFixedImageStringDataAdapter::New();
+
   layout->addWidget(this->createGroupBox(mSegmentationWidget, "Segmentation", true, true));
   layout->addWidget(this->createGroupBox(mSurfaceWidget, "Surface visualization", true, true));
   layout->addWidget(this->createGroupBox(mCenterlineWidget, "Centerline extraction"));
+  layout->addWidget(new ssc::LabeledComboBoxWidget(this, fixedImage));
   layout->addStretch();
 }
 

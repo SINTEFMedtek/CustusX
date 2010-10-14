@@ -15,6 +15,7 @@
 #include "sscDoubleDataAdapter.h"
 //#include "sscHelperWidgets.h"
 #include "sscStringDataAdapter.h"
+#include "cxRegistrationManager.h"
 
 namespace cx
 {
@@ -84,13 +85,28 @@ public:
   virtual ssc::DoubleRange getValueRange() const;
 };
 
+/** Base class for all DataAdapters that selects an image.
+ */
+class SelectImageStringDataAdapterBase : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  SelectImageStringDataAdapterBase();
+  virtual ~SelectImageStringDataAdapterBase() {}
+
+public: // basic methods
+
+public: // optional methods
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
 
 /** Adapter that connects to the current active image.
  * Example: Active image: [DataName]
  * where active image is the value
  * and DataName is taken from the valuerange
  */
-class ActiveImageStringDataAdapter : public ssc::StringDataAdapter
+class ActiveImageStringDataAdapter : public SelectImageStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -105,12 +121,103 @@ public: // basic methods
 
 public: // optional methods
   virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
 };
 
-typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
+/** Adapter that connects to the fixed image in the registration manager.
+ */
+class RegistrationFixedImageStringDataAdapter : public SelectImageStringDataAdapterBase
+{
+  Q_OBJECT
+public:
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new RegistrationFixedImageStringDataAdapter()); }
+  RegistrationFixedImageStringDataAdapter();
+  virtual ~RegistrationFixedImageStringDataAdapter() {}
 
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+};
+
+/** Adapter that connects to the fixed image in the registration manager.
+ */
+class RegistrationMovingImageStringDataAdapter : public SelectImageStringDataAdapterBase
+{
+  Q_OBJECT
+public:
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new RegistrationMovingImageStringDataAdapter()); }
+  RegistrationMovingImageStringDataAdapter();
+  virtual ~RegistrationMovingImageStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+};
+
+///** Adapter that connects to the current active image.
+// * Example: Active image: [DataName]
+// * where active image is the value
+// * and DataName is taken from the valuerange
+// */
+//class ActiveImageStringDataAdapter : public SelectImageStringDataAdapterBase
+//{
+//  Q_OBJECT
+//public:
+//  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveImageStringDataAdapter()); }
+//  ActiveImageStringDataAdapter();
+//  virtual ~ActiveImageStringDataAdapter() {}
+//
+//public: // basic methods
+//  virtual QString getValueName() const;
+//  virtual bool setValue(const QString& value);
+//  virtual QString getValue() const;
+//
+//public: // optional methods
+//  virtual QString getHelp() const;
+//};
+
+typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+/** Adapter that selects and stores an image.
+ * The image is stored internally in the adapter.
+ * Use setValue/getValue plus changed() to access it.
+ */
+class SelectImageStringDataAdapter : public SelectImageStringDataAdapterBase
+{
+  Q_OBJECT
+public:
+  static SelectImageStringDataAdapterPtr New() { return SelectImageStringDataAdapterPtr(new SelectImageStringDataAdapter()); }
+  SelectImageStringDataAdapter();
+  virtual ~SelectImageStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+
+public: // interface extension
+  ssc::ImagePtr getImage();
+
+signals:
+    void imageChanged(QString);
+
+private:
+  QString mImageUid;
+};
+
+
+typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
+/** Adapter that selects the parent frame of the given ssc::Data.
+ */
 class ParentFrameStringDataAdapter : public ssc::StringDataAdapter
 {
   Q_OBJECT

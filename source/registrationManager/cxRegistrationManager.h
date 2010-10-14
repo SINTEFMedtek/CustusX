@@ -63,6 +63,8 @@ public slots:
 
 signals:
   void patientRegistrationPerformed();
+  void fixedDataChanged(QString uid);
+  void movingDataChanged(QString uid);
 
 protected:
   RegistrationManager(); ///< use getInstance instead
