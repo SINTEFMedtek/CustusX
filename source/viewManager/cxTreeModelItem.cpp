@@ -151,6 +151,10 @@ TreeItemPtr TreeItemTool::create(TreeItemWeakPtr parent, ssc::ToolPtr tool)
   return retval;
 }
 
+TreeItemTool::~TreeItemTool()
+{
+}
+
 QString TreeItemTool::getName() const
 {
   return qstring_cast(mTool->getName());
