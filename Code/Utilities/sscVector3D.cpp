@@ -1,7 +1,10 @@
 #include "sscVector3D.h"
 #include <vtkMath.h>
+#include <vtkSmartPointer.h>
 #include "sscUtilHelpers.h"
 #include "sscTypeConversions.h"
+
+typedef vtkSmartPointer<vtkMath> vtkMathPtr;
 
 // --------------------------------------------------------
 namespace ssc
@@ -16,7 +19,7 @@ bool similar(double a, double b, double tol)
 }
 
 // quick and dirty way to access functionality from vtkMath (this produces a one-time memory leak):
-static vtkMath* mathEngine = vtkMath::New();
+//static vtkMath* mathEngine = vtkMath::New();
 // --------------------------------------------------------
 
 // --------------------------------------------------------
@@ -130,11 +133,14 @@ Vector3D divide_elems(const Vector3D& a, const Vector3D& b)
 Vector3D cross(const Vector3D& a, const Vector3D& b)
 {
 	Vector3D retval;
+	vtkMathPtr mathEngine = vtkMathPtr::New();
+
 	mathEngine->Cross(a.begin(), b.begin(), retval.begin());
 	return retval;
 }
 double dot(const Vector3D& a, const Vector3D& b)
 {
+  vtkMathPtr mathEngine = vtkMathPtr::New();
 	return mathEngine->Dot(a.begin(), b.begin());
 }
 bool similar(const Vector3D& a, const Vector3D& b, double tol)
