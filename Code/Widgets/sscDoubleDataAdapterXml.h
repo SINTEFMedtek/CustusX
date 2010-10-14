@@ -38,7 +38,7 @@ public:
       double value,
       DoubleRange range,
       int decimals,
-      QDomNode root);
+      QDomNode root = QDomNode());
 
 public: // inherited interface
   virtual QString getValueName() const;///< name of data entity. Used for display to user.
