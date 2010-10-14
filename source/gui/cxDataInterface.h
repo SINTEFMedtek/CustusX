@@ -39,7 +39,6 @@ protected:
   ssc::ToolPtr mTool;
 };
 
-
 /** Superclass for all doubles interacting with the active image.
  */
 class DoubleDataAdapterActiveImageBase : public ssc::DoubleDataAdapter
