@@ -17,6 +17,8 @@
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
+#include "cxDataInterface.h"
+#include "sscLabeledComboBoxWidget.h"
 
 namespace cx
 {
@@ -33,7 +35,10 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
 
   QGridLayout* toptopLayout = new QGridLayout(this);
 
-  toptopLayout->addWidget(new ActiveVolumeWidget(this), 0, 0);
+  mSelectedImage = SelectImageStringDataAdapter::New();
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
+  toptopLayout->addWidget(selectImageComboBox, 0, 0);
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));
@@ -66,20 +71,25 @@ QString SegmentationWidget::defaultWhatsThis() const
 void SegmentationWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
+
+  if (ssc::dataManager()->getActiveImage())
+  {
+    mSelectedImage->setValue(qstring_cast(ssc::dataManager()->getActiveImage()->getUid()));
+  }
+//  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
 }
 
 void SegmentationWidget::hideEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
-  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
+  //disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
 }
 
 void SegmentationWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
-  Segmentation().segment(ssc::dataManager()->getActiveImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+  Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
 }
 
 //void SegmentationWidget::contourSlot()
@@ -119,20 +129,20 @@ void SegmentationWidget::adjustSizeSlot()
   this->adjustSize();
 }
 
-void SegmentationWidget::activeImageChangedSlot()
-{
-  mImage = ssc::dataManager()->getActiveImage();
+//void SegmentationWidget::activeImageChangedSlot()
+//{
+////  mImage = ssc::dataManager()->getActiveImage();
+////
+////  int minThreshold = 0;
+////  int maxThreshold = 1000;
+////  if(mImage)
+////  {
+////    minThreshold = mImage->getMin();
+////    maxThreshold = mImage->getMax();
+////  }
+////  mSegmentationThresholdSpinBox->setRange(minThreshold, maxThreshold);
 //
-//  int minThreshold = 0;
-//  int maxThreshold = 1000;
-//  if(mImage)
-//  {
-//    minThreshold = mImage->getMin();
-//    maxThreshold = mImage->getMax();
-//  }
-//  mSegmentationThresholdSpinBox->setRange(minThreshold, maxThreshold);
-
-}
+//}
 
 QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 {
@@ -173,7 +183,7 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
   layout->addWidget(mSmoothingSigmaSpinBox,             3, 0);
   layout->addWidget(mSmoothingSigmaLabel,               3, 1);
 
-  this->activeImageChangedSlot();
+//  this->activeImageChangedSlot();
 
   return retval;
 }
@@ -187,7 +197,12 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
 
   QGridLayout* toptopLayout = new QGridLayout(this);
 
-  toptopLayout->addWidget(new ActiveVolumeWidget(this), 0, 0);
+  mSelectedImage = SelectImageStringDataAdapter::New();
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
+  toptopLayout->addWidget(selectImageComboBox, 0, 0);
+
+//  toptopLayout->addWidget(new ActiveVolumeWidget(this), 0, 0);
 
   QPushButton* surfaceButton = new QPushButton("Surface", this);
   connect(surfaceButton, SIGNAL(clicked()), this, SLOT(surfaceSlot()));
@@ -218,7 +233,7 @@ void SurfaceWidget::surfaceSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
-  Segmentation().contour(ssc::dataManager()->getActiveImage(), outputBasePath, mSurfaceThreshold);
+  Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold);
 }
 
 void SurfaceWidget::thresholdSlot(int value)
