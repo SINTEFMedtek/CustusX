@@ -34,6 +34,10 @@
 #include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
 
+typedef vtkSmartPointer<vtkInteractorStyleFlight> vtkInteractorStyleFlightPtr;
+typedef vtkSmartPointer<vtkInteractorStyleTrackballCamera> vtkInteractorStyleTrackballCameraPtr;
+typedef vtkSmartPointer<vtkInteractorStyleUnicam> vtkInteractorStyleUnicamPtr;
+
 namespace cx
 {
 
@@ -820,13 +824,13 @@ void ViewManager::setInteractionStyleActionSlot()
   vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
 
   if (uid=="vtkInteractorStyleTrackballCamera")
-    interactor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
+    interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
   else if (uid=="vtkInteractorStyleUnicam")
-    interactor->SetInteractorStyle(vtkInteractorStyleUnicam::New());
+    interactor->SetInteractorStyle(vtkInteractorStyleUnicamPtr::New());
 //  else if (uid=="vtkInteractorStyleTrackballActor")
-//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActor::New());
+//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActorPtr::New());
   else if (uid=="vtkInteractorStyleFlight")
-    interactor->SetInteractorStyle(vtkInteractorStyleFlight::New());
+    interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
 
   ssc::messageManager()->sendInfo("Set Interactor: " + std::string(interactor->GetInteractorStyle()->GetClassName()));
 }

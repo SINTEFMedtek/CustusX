@@ -17,7 +17,7 @@ namespace cx
 
 
 
-BrowserItemModel::BrowserItemModel(QObject* parent)
+BrowserItemModel::BrowserItemModel(QObject* parent) : QAbstractItemModel(parent)
 {
   mSelectionModel = NULL;
 
@@ -93,7 +93,6 @@ void BrowserItemModel::buildTree()
 
 BrowserItemModel::~BrowserItemModel()
 {
-
 }
 
 void BrowserItemModel::currentItemChangedSlot(const QModelIndex& current, const QModelIndex& previous)
@@ -250,7 +249,9 @@ BrowserWidget::BrowserWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mTreeView);
 }
 BrowserWidget::~BrowserWidget()
-{}
+{
+}
+
 void BrowserWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
