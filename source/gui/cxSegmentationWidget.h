@@ -3,8 +3,9 @@
 
 #include <vector>
 #include <QtGui>
-#include "cxWhatsThisWidget.h"
 #include <QString>
+#include "sscForwardDeclarations.h"
+#include "cxWhatsThisWidget.h"
 
 class QGroupBox;
 class QWidget;
@@ -36,18 +37,56 @@ protected:
 
 private slots:
   void segmentSlot();
-  void contourSlot();
+  void toogleBinarySlot(bool on);
+  void thresholdSlot(int value);
+  void toogleSmoothingSlot(bool on);
+  void smoothingSigmaSlot(int value);
   void adjustSizeSlot();
+  void activeImageChangedSlot();
 
 private:
   SegmentationWidget();
   QWidget* createSegmentationOptionsWidget();
-  QWidget* createCotourOptionsWidget();
 
-  int mThreshold; ///< the threshold value used when segmenting
+  ssc::ImagePtr mImage;
+
+  int mSegmentationThreshold; ///< the threshold value used when segmenting
   bool mBinary; ///< whether or not the segmentation should create a binary volume
   bool mUseSmothing; ///< whether or not the volume should be smoothed
   double mSmoothSigma; ///< the value used for smoothing (if enabled)
+
+  QSpinBox* mSegmentationThresholdSpinBox;
+  QSpinBox* mSmoothingSigmaSpinBox;
+  QLabel* mSmoothingSigmaLabel;
+};
+
+/**
+ * \class SurfaceWidget
+ *
+ * \brief Widget for finding the surface of a binary volume using marching cubes.
+ *
+ * \date 14. okt. 2010
+ * \author: Janne Beate Bakeng
+ */
+class SurfaceWidget : public WhatsThisWidget
+{
+  Q_OBJECT
+
+public:
+  SurfaceWidget(QWidget* parent);
+  ~SurfaceWidget();
+  virtual QString defaultWhatsThis() const;
+
+private slots:
+  void surfaceSlot();
+  void thresholdSlot(int value);
+
+private:
+  SurfaceWidget();
+  QWidget* createSurfaceOptionsWidget();
+
+  int mSurfaceThreshold; ///< the threshold value used when contouring
+  QSpinBox* mSurfaceThresholdSpinBox;
 };
 
 /**
@@ -76,6 +115,38 @@ private slots:
 
 private:
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
+};
+
+/**
+ * \class RegisterI2IWidget
+ *
+ * \brief Widget for performing the registration between two vessel segments.
+ *
+ * \date 13. okt. 2010
+ * \author: Janne Beate Bakeng
+ */
+class RegisterI2IWidget : public WhatsThisWidget
+{
+  Q_OBJECT
+
+public:
+  RegisterI2IWidget(QWidget* parent);
+  ~RegisterI2IWidget();
+  virtual QString defaultWhatsThis() const;
+
+public slots:
+  void fixedImageSlot(const std::string uid);
+  void movingImageSlot(const std::string uid);
+
+private:
+  RegisterI2IWidget();
+
+  QPushButton* mRegisterButton;
+  QLabel* mFixedImageLabel;
+  QLabel* mMovingImageLabel;
+
+  ssc::ImagePtr mFixedImage;
+  ssc::ImagePtr mMovingImage;
 };
 
 }//namespace cx

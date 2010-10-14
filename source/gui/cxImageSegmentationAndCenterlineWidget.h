@@ -8,9 +8,6 @@ class QPushButton;
 
 namespace cx
 {
-class SegmentationWidget;
-class CenterlineWidget;
-
 /**
  * \class ImageSegmentationAndCenterlineWidget
  *
@@ -32,29 +29,9 @@ public:
 private:
   ImageSegmentationAndCenterlineWidget();
 
-  SegmentationWidget* mSegmentationWidget;
-  CenterlineWidget*   mCenterlineWidget;
-};
-
-/**
- * \class RegisterWidget
- *
- * \brief Widget for performing the registration between two vessel segments.
- *
- * \date 13. okt. 2010
- * \author: Janne Beate Bakeng
- */
-class RegisterWidget : public WhatsThisWidget
-{
-public:
-  RegisterWidget(QWidget* parent);
-  ~RegisterWidget();
-  virtual QString defaultWhatsThis() const;
-
-private:
-  RegisterWidget();
-
-  QPushButton* mRegisterButton;
+  class SegmentationWidget* mSegmentationWidget;
+  class SurfaceWidget*      mSurfaceWidget;
+  class CenterlineWidget*   mCenterlineWidget;
 };
 
 }//namespace cx
