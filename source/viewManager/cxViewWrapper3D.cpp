@@ -35,6 +35,7 @@
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {

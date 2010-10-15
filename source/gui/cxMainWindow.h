@@ -19,7 +19,8 @@ namespace ssc
 
 namespace cx
 {
- 
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+
 /**
  * \class MainWindow
  *
@@ -125,6 +126,7 @@ protected:
   QAction* mClearPatientAction;
 
   QActionGroup* mToggleWidgetActionGroup;
+  QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume
@@ -176,7 +178,7 @@ protected:
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
-
+  CameraControlPtr mCameraControl;
 };
 }//namespace cx
 
