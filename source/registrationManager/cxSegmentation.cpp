@@ -118,9 +118,9 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
   //Create a surface of triangles
 
   //Decimate surface model (remove a percentage of the polygons)
-  vtkTriangleFilterPtr trifilt = vtkTriangleFilter::New();
-  vtkDecimateProPtr deci = vtkDecimatePro::New();
-  vtkPolyDataNormalsPtr normals = vtkPolyDataNormals::New();
+  vtkTriangleFilterPtr trifilt = vtkTriangleFilterPtr::New();
+  vtkDecimateProPtr deci = vtkDecimateProPtr::New();
+  vtkPolyDataNormalsPtr normals = vtkPolyDataNormalsPtr::New();
   if (decimation > 0.000001)
   {
     ssc::messageManager()->sendInfo("Creating surface triangles...");
@@ -136,7 +136,8 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
 
   normals->SetInput(cubesPolyData);
   normals->Update();
-  cubesPolyData = normals->GetOutput();
+//  cubesPolyData = normals->GetOutput();
+  cubesPolyData->DeepCopy(normals->GetOutput());
 
   //cubesPolyData->Print(std::cout);
 
