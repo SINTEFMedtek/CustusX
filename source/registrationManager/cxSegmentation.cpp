@@ -14,7 +14,7 @@
 //#include <itkVTKImageToImageFilter.h>
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
-//#include <itkBinaryThinningImageFilter.h>
+#include <itkBinaryThinningImageFilter.h>
 
 #include "ItkVtkGlue/itkImageToVTKImageFilter.h"
 #include "ItkVtkGlue/itkVTKImageToImageFilter.h"
@@ -222,6 +222,51 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
   ssc::dataManager()->saveImage(result, string_cast(outputBasePath));
 
 }
+
+void Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
+{
+  itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
+
+  //Centerline extraction
+  typedef itk::BinaryThinningImageFilter<itkImageType, itkImageType> centerlineFilterType;
+  centerlineFilterType::Pointer centerlineFilter = centerlineFilterType::New();
+  centerlineFilter->SetInput(itkImage);
+  centerlineFilter->Update();
+  itkImage = centerlineFilter->GetOutput();
+
+  //Convert ITK to VTK
+  itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+  itkToVtkFilter->SetInput(itkImage);
+  itkToVtkFilter->Update();
+
+  vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+  rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+
+  std::string uid = string_cast(ssc::changeExtension(qstring_cast(image->getUid()), "") + "_center%1");
+  std::string name = image->getName()+" centerline %1";
+  //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
+  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
+  ssc::messageManager()->sendInfo("created centerline " + result->getName());
+
+  result->get_rMd_History()->setRegistration(image->get_rMd());
+
+  result->setParentFrame(image->getUid());
+  ssc::dataManager()->loadData(result);
+  ssc::dataManager()->saveImage(result, string_cast(outputBasePath));
+}
+
+/*{
+  //Create vtkPolyData
+  vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
+  convert->SetInput(rawResult);
+  convert->Update();
+  vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
+  cubesPolyData = convert->GetOutput();
+
+  //Show surface
+  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
+  surface->setVtkPolyData(cubesPolyData);
+}*/
 
 } // namespace cx
 
