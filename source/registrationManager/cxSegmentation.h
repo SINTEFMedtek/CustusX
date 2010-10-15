@@ -18,7 +18,7 @@ class Segmentation
 {
 public:
   void contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
-      double decimation=0.9, bool reduceResolution=true, bool smoothing=true);
+      double decimation=0.8, bool reduceResolution=true, bool smoothing=true);
   void segment(ssc::ImagePtr image, QString outputBasePath, int threshold,
       bool useSmothing=true, double smoothSigma=0.5);
 private:
