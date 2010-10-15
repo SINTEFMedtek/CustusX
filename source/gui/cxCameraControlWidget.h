@@ -22,6 +22,11 @@ typedef vtkSmartPointer<class vtkCamera> vtkCameraPtr;
 namespace cx
 {
 
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+
+/**
+ * A touchpad-friendly area  for performing 2D scroll operations.
+ */
 class MousePadWidget : public QFrame
 {
   Q_OBJECT
@@ -48,7 +53,9 @@ private:
   void fixPos();
 };
 
-/**
+/** Widget for controlling the camera in the 3D view.
+ *  This widget is designed for use on a touchpad device.
+ *  Example is to use iPad/iPhone as a secondary screen with this widget on.
  */
 class CameraControlWidget : public QWidget
 {
@@ -65,13 +72,13 @@ protected slots:
   void panXZSlot(QPointF delta);
   void rotateYSlot(QPointF delta);
   void rotateXZSlot(QPointF delta);
-  void setStandard3DViewActionSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
+  CameraControlPtr mCameraControl;
   QVBoxLayout* mTopLayout;
   QSize mMinPadSize;
   QSize mMinBarSize;
@@ -81,7 +88,6 @@ private:
   void definePanLayout();
 
   void createStandard3DViewActions();
-  QAction* addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group);
 };
 
 }//end namespace cx
