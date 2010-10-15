@@ -45,7 +45,7 @@ private slots:
   void thresholdSlot(int value);
   void toogleSmoothingSlot(bool on);
   void smoothingSigmaSlot(int value);
-  void adjustSizeSlot();
+  //void adjustSizeSlot();
   //void activeImageChangedSlot();
 
 private:

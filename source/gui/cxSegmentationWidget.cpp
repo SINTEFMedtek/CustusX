@@ -33,25 +33,28 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   this->setObjectName("SegmentationWidget");
   this->setWindowTitle("Segmentation");
 
-  QGridLayout* toptopLayout = new QGridLayout(this);
+  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+  QGridLayout* topLayout = new QGridLayout();
+  toptopLayout->addLayout(topLayout);
+  toptopLayout->addStretch();
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
-  toptopLayout->addWidget(selectImageComboBox, 0, 0);
+  topLayout->addWidget(selectImageComboBox, 0, 0);
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));
   QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
   segmentationOptionsButton->setCheckable(true);
-  QGroupBox* segmentationOptionsGroupBox = this->createGroupBox(this->createSegmentationOptionsWidget(), "Segmentation options");
+  QGroupBox* segmentationOptionsGroupBox = this->createGroupBox(this->createSegmentationOptionsWidget(), new QWidget(), "Segmentation options");
   connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsGroupBox, SLOT(setVisible(bool)));
   connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
   segmentationOptionsGroupBox->setVisible(segmentationOptionsButton->isChecked());
 
-  toptopLayout->addWidget(segmentationOptionsGroupBox, 1, 0, 1, 2);
-  toptopLayout->addWidget(segmentButton, 2,0);
-  toptopLayout->addWidget(segmentationOptionsButton, 2,1);
+  topLayout->addWidget(segmentationOptionsGroupBox, 1, 0, 1, 2);
+  topLayout->addWidget(segmentButton, 2,0);
+  topLayout->addWidget(segmentationOptionsButton, 2,1);
 
   this->adjustSizeSlot();
 }
@@ -76,13 +79,11 @@ void SegmentationWidget::showEvent(QShowEvent* event)
   {
     mSelectedImage->setValue(qstring_cast(ssc::dataManager()->getActiveImage()->getUid()));
   }
-//  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
 }
 
 void SegmentationWidget::hideEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
-  //disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
 }
 
 void SegmentationWidget::segmentSlot()
@@ -91,13 +92,6 @@ void SegmentationWidget::segmentSlot()
 
   Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
 }
-
-//void SegmentationWidget::contourSlot()
-//{
-//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-//
-//  Segmentation().contour(ssc::dataManager()->getActiveImage(), outputBasePath, mContourThreshold);
-//}
 
 void SegmentationWidget::toogleBinarySlot(bool on)
 {
@@ -123,30 +117,10 @@ void SegmentationWidget::smoothingSigmaSlot(int value)
   mSmoothSigma = value;
 }
 
-void SegmentationWidget::adjustSizeSlot()
-{
-  this->parentWidget()->adjustSize();
-  this->adjustSize();
-}
-
-//void SegmentationWidget::activeImageChangedSlot()
-//{
-////  mImage = ssc::dataManager()->getActiveImage();
-////
-////  int minThreshold = 0;
-////  int maxThreshold = 1000;
-////  if(mImage)
-////  {
-////    minThreshold = mImage->getMin();
-////    maxThreshold = mImage->getMax();
-////  }
-////  mSegmentationThresholdSpinBox->setRange(minThreshold, maxThreshold);
-//
-//}
-
 QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
+
   QGridLayout* layout = new QGridLayout(retval);
 
   mSegmentationThresholdSpinBox = new QSpinBox();
@@ -167,7 +141,6 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSmoothingSlot(bool)));
 
   mSmoothingSigmaSpinBox = new QSpinBox();
-  //mSmoothingSigmaSpinBox->setRange(minThreshold, maxThreshold);
   mSmoothingSigmaSpinBox->setValue(mSmoothSigma);
   mSmoothingSigmaSpinBox->setEnabled(smoothingCheckBox->isChecked());
   mSmoothingSigmaLabel = new QLabel("Smoothing sigma");
@@ -183,8 +156,6 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
   layout->addWidget(mSmoothingSigmaSpinBox,             3, 0);
   layout->addWidget(mSmoothingSigmaLabel,               3, 1);
 
-//  this->activeImageChangedSlot();
-
   return retval;
 }
 //------------------------------------------------------------------------------
@@ -195,27 +166,28 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
 
-  QGridLayout* toptopLayout = new QGridLayout(this);
+  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+  QGridLayout* topLayout = new QGridLayout();
+  toptopLayout->addLayout(topLayout);
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
-  toptopLayout->addWidget(selectImageComboBox, 0, 0);
+  topLayout->addWidget(selectImageComboBox, 0, 0);
 
-//  toptopLayout->addWidget(new ActiveVolumeWidget(this), 0, 0);
 
   QPushButton* surfaceButton = new QPushButton("Surface", this);
   connect(surfaceButton, SIGNAL(clicked()), this, SLOT(surfaceSlot()));
   QPushButton* surfaceOptionsButton = new QPushButton("Options", this);
   surfaceOptionsButton->setCheckable(true);
-  QGroupBox* surfaceOptionsGroupBox = this->createGroupBox(this->createSurfaceOptionsWidget(), "Surface options");
+  QGroupBox* surfaceOptionsGroupBox = this->createGroupBox(this->createSurfaceOptionsWidget(), new QWidget(), "Surface options");
   connect(surfaceOptionsButton, SIGNAL(clicked(bool)), surfaceOptionsGroupBox, SLOT(setVisible(bool)));
-  //connect(surfaceOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
+  connect(surfaceOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
   surfaceOptionsGroupBox->setVisible(surfaceOptionsButton->isChecked());
 
-  toptopLayout->addWidget(surfaceOptionsGroupBox, 1, 0, 1, 2);
-  toptopLayout->addWidget(surfaceButton, 2,0);
-  toptopLayout->addWidget(surfaceOptionsButton,2,1);
+  topLayout->addWidget(surfaceOptionsGroupBox, 1, 0, 1, 2);
+  topLayout->addWidget(surfaceButton, 2,0);
+  topLayout->addWidget(surfaceOptionsButton,2,1);
 }
 
 SurfaceWidget::~SurfaceWidget()
@@ -307,7 +279,9 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
     mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
-  QGridLayout* layout = new QGridLayout(this);
+  QVBoxLayout* topLayout = new QVBoxLayout(this);
+  QGridLayout* layout = new QGridLayout();
+  topLayout->addLayout(layout);
 
   layout->addWidget(mFixedImageLabel, 0, 0);
   layout->addWidget(mMovingImageLabel, 1, 0);
@@ -341,7 +315,6 @@ void RegisterI2IWidget::movingImageSlot(const std::string uid)
   if(!mMovingImage)
     return;
   mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving image: <b>"+mMovingImage->getName()+"</b></font>"));
-
 }
 
 //------------------------------------------------------------------------------

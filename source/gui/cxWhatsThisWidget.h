@@ -19,28 +19,43 @@ namespace cx
 
 class WhatsThisWidget : public QWidget
 {
+  Q_OBJECT
+
 public:
   WhatsThisWidget(QWidget* parent) :
     QWidget(parent)
   {};
   virtual ~WhatsThisWidget(){};
   virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
-  QGroupBox* createGroupBox(QWidget* widget, QString boxname, bool checkable = false, bool checked = true)
+
+  QGroupBox* createGroupBox(QWidget* checkedWidget, QWidget* uncheckedWidget, QString boxname, bool checkable = false, bool checked = true)
   {
     QGroupBox* groupbox = new QGroupBox(boxname, this);
+    groupbox->setFlat(true);
 
     groupbox->setCheckable(checkable);
     if(groupbox->isCheckable())
     {
       groupbox->setChecked(checked);
-      connect(groupbox, SIGNAL(clicked(bool)), widget, SLOT(setVisible(bool)));
+      checkedWidget->setVisible(checked);
+      uncheckedWidget->setHidden(checked);
+      connect(groupbox, SIGNAL(clicked(bool)), checkedWidget, SLOT(setVisible(bool)));
+      connect(groupbox, SIGNAL(clicked(bool)), uncheckedWidget, SLOT(setHidden(bool)));
     }
 
     QVBoxLayout *vbox = new QVBoxLayout;
-    vbox->addWidget(widget);
+    vbox->addWidget(checkedWidget);
+    vbox->addWidget(uncheckedWidget);
     groupbox->setLayout(vbox);
 
     return groupbox;
+  }
+
+public slots:
+  void adjustSizeSlot()
+  {
+    this->parentWidget()->adjustSize();
+    this->adjustSize();
   }
 };
 }

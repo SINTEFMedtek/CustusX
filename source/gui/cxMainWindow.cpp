@@ -641,8 +641,8 @@ void MainWindow::populateRegistrationMethodsWidget()
 
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
-  ImageSegmentationAndCenterlineWidget* fixedRegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
-  ImageSegmentationAndCenterlineWidget* movingRegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
+  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
+  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
   image2imageWidget->addTab(fixedRegistrationWidget, "Fixed");
   image2imageWidget->addTab(movingRegistrationWidget, "Moving");
   image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
