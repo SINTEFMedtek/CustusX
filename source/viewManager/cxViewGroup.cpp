@@ -18,6 +18,7 @@
 #include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {

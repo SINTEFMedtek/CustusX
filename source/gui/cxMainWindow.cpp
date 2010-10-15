@@ -42,7 +42,7 @@
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
-
+#include "cxCameraControl.h"
 
 namespace cx
 {
@@ -50,6 +50,7 @@ namespace cx
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
   mToggleWidgetActionGroup(NULL),
+  mStandard3DViewActions(NULL),
   mConsoleWidget(new ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
@@ -70,6 +71,8 @@ MainWindow::MainWindow() :
 {
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
+
+  mCameraControl.reset(new CameraControl());
 
   mLayoutActionGroup = NULL;
   this->updateWindowTitle();
@@ -185,6 +188,8 @@ void MainWindow::shutdown()
 void MainWindow::createActions()
 {
   //TODO: add shortcuts and tooltips
+
+  mStandard3DViewActions = mCameraControl->createStandard3DViewActions();
 
   // File
   mNewPatientAction = new QAction(tr("&New patient"), this);
@@ -615,6 +620,10 @@ void MainWindow::createToolBars()
   mHelpToolBar->setObjectName("HelpToolBar");
   mHelpToolBar->addAction(QWhatsThis::createAction());
 
+   QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
+   camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
+   camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
+   camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
 }
 void MainWindow::createStatusBar()
 {
