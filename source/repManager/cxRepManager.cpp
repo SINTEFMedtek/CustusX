@@ -13,7 +13,8 @@
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"
 #include "cxLandmarkRep.h"
-
+#include "cxDataLocations.h"
+#include <QSettings>
 
 namespace cx
 {
@@ -276,16 +277,13 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
   {
     std::string uid("VolumetricRep_img_" + image->getUid());
     ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
-//    double size = image->getBaseVtkImageData()->GetNumberOfPoints();
-    long maxSize = 20*pow(10,6); // downsample volumes larger than 15 Megavoxels
-//    double factor = maxSize/size;
-//    //factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling
-//    if (factor<0.99)
-//    {
-//        std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxSize/1000/1000 << "M. Ratio: " << factor << ", original size: " << size/1000/1000 << "M" << std::endl;
-//        rep->setResampleFactor(factor);
-//    }
-    rep->setMaxVolumeSize(maxSize);
+
+    bool ok = true;
+    double maxRenderSize = DataLocations::getSettings()->value("maxRenderSize").toDouble(&ok);
+    if (!ok)
+      maxRenderSize = 20 * pow(10,6);
+
+    rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
     mVolumetricRepByImageMap[image->getUid()] = rep;
     //mImageMapperMonitorMap[image->getUid()].reset(new ssc::ImageMapperMonitor(rep));

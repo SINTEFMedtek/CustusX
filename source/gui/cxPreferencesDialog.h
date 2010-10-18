@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "boost/shared_ptr.hpp"
+#include "sscDoubleDataAdapterXml.h"
 
 class QTabWidget;
 class QDialogButtonBox;
@@ -101,7 +102,8 @@ protected:
   QCheckBox* mSmartRenderCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
-  
+  ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;
+
   private slots:
   void renderingIntervalSlot(int interval);
 };
