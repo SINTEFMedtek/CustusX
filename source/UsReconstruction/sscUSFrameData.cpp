@@ -56,17 +56,17 @@ Vector3D USFrameData::getSpacing()
   return mSpacing;
 }
   
-std::string USFrameData::getName()
+QString USFrameData::getName()
 {
   return mImage->getName();
 }
   
-std::string USFrameData::getUid()
+QString USFrameData::getUid()
 {
   return mImage->getUid();
 }
   
-std::string USFrameData::getFilePath()
+QString USFrameData::getFilePath()
 {
   return mImage->getFilePath();
 }

@@ -35,10 +35,10 @@ class InriaRep2D : public ssc::RepImpl
 
   Q_OBJECT
 public:
-  InriaRep2D(const std::string& uid, const std::string& name=""); ///< constructor
+  InriaRep2D(const QString& uid, const QString& name=""); ///< constructor
   ~InriaRep2D(); ///< empty
 
-  virtual std::string getType() const;
+  virtual QString getType() const;
 	virtual void setImage(ssc::ImagePtr image); ///< Set Image. Used to check if image is used, don't connect the image.
 	virtual ssc::ImagePtr getImage() {return mImage;} ///< Returns the used image
 	virtual bool hasImage(ssc::ImagePtr image) const {return (mImage == image);} ///< Checks if image is used
@@ -63,7 +63,7 @@ protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
-  std::string       mType;    ///< the reps type as a string
+  QString       mType;    ///< the reps type as a string
   Tool*             mTool;    ///< the tool that controls the rep
   vtkViewImage2DPtr mInria;   ///< the inria object
 

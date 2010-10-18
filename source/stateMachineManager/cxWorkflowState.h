@@ -40,7 +40,7 @@ public:
 
   virtual void onEntry(QEvent * event )
   {
-    ssc::messageManager()->sendInfo("Workflow change to [" + string_cast(mName) + "]");
+    ssc::messageManager()->sendInfo("Workflow change to [" + mName + "]");
     if(mAction)
       mAction->setChecked(true);
   };

@@ -18,7 +18,7 @@ namespace cx
 
 DoubleDataAdapterActiveToolOffset::DoubleDataAdapterActiveToolOffset()
 {
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   dominantToolChangedSlot();
 }
 
@@ -67,7 +67,7 @@ ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 
 DoubleDataAdapterActiveImageBase::DoubleDataAdapterActiveImageBase()
 {
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChanged()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChanged()));
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SIGNAL(changed()));
 }
 void DoubleDataAdapterActiveImageBase::activeImageChanged()
@@ -148,7 +148,7 @@ SelectImageStringDataAdapterBase::SelectImageStringDataAdapterBase()
 }
 QStringList SelectImageStringDataAdapterBase::getValueRange() const
 {
-  std::vector<std::string> uids = ssc::dataManager()->getImageUids();
+  std::vector<QString> uids = ssc::dataManager()->getImageUids();
   QStringList retval;
   retval << "";
   for (unsigned i=0; i<uids.size(); ++i)
@@ -157,7 +157,7 @@ QStringList SelectImageStringDataAdapterBase::getValueRange() const
 }
 QString SelectImageStringDataAdapterBase::convertInternal2Display(QString internal)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(internal));
+  ssc::ImagePtr image = ssc::dataManager()->getImage(internal);
   if (!image)
     return "<no volume>";
   return qstring_cast(image->getName());
@@ -169,7 +169,7 @@ QString SelectImageStringDataAdapterBase::convertInternal2Display(QString intern
 
 ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
 {
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),      this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),      this, SIGNAL(changed()));
 }
 QString ActiveImageStringDataAdapter::getValueName() const
 {
@@ -177,7 +177,7 @@ QString ActiveImageStringDataAdapter::getValueName() const
 }
 bool ActiveImageStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(value);
   if (newImage==ssc::dataManager()->getActiveImage())
     return false;
   ssc::dataManager()->setActiveImage(newImage);
@@ -209,7 +209,7 @@ QString RegistrationFixedImageStringDataAdapter::getValueName() const
 
 bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(value);
   if (newImage==registrationManager()->getFixedData())
     return false;
   registrationManager()->setFixedData(newImage);
@@ -241,7 +241,7 @@ QString RegistrationMovingImageStringDataAdapter::getValueName() const
 }
 bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ImagePtr newImage = ssc::dataManager()->getImage(string_cast(value));
+  ssc::ImagePtr newImage = ssc::dataManager()->getImage(value);
   if (newImage==registrationManager()->getMovingData())
     return false;
   registrationManager()->setMovingData(newImage);
@@ -290,7 +290,7 @@ QString SelectImageStringDataAdapter::getHelp() const
 }
 ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 {
-  return ssc::dataManager()->getImage(string_cast(mImageUid));
+  return ssc::dataManager()->getImage(mImageUid);
 }
 
 //---------------------------------------------------------
@@ -321,7 +321,7 @@ bool ParentFrameStringDataAdapter::setValue(const QString& value)
 {
   if (!mData)
     return false;
-  mData->setParentFrame(string_cast(value));
+  mData->setParentFrame(value);
   return true;
 }
 
@@ -344,8 +344,8 @@ QStringList ParentFrameStringDataAdapter::getValueRange() const
   QStringList retval;
   retval << "";
 
-  std::map<std::string, ssc::DataPtr> allData = ssc::dataManager()->getData();
-  for (std::map<std::string, ssc::DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
+  std::map<QString, ssc::DataPtr> allData = ssc::dataManager()->getData();
+  for (std::map<QString, ssc::DataPtr>::iterator iter=allData.begin(); iter!=allData.end(); ++iter)
   {
     if (mData && (mData->getUid() == iter->first))
       continue;
@@ -357,7 +357,7 @@ QStringList ParentFrameStringDataAdapter::getValueRange() const
 
 QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
 {
-  ssc::DataPtr data = ssc::dataManager()->getData(string_cast(internal));
+  ssc::DataPtr data = ssc::dataManager()->getData(internal);
   if (!data)
     return "<no data>";
   return qstring_cast(data->getName());

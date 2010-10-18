@@ -70,7 +70,7 @@ void TreeItemImpl::activate()
 ///--------------------------------------------------------
 
 
-TreeItemPtr TreeItemImage::create(TreeItemWeakPtr parent, std::string uid)
+TreeItemPtr TreeItemImage::create(TreeItemWeakPtr parent, QString uid)
 {
   TreeItemPtr retval(new TreeItemImage(parent,uid));
   if (parent.lock())
@@ -78,12 +78,12 @@ TreeItemPtr TreeItemImage::create(TreeItemWeakPtr parent, std::string uid)
   return retval;
 }
 
-TreeItemImage::TreeItemImage(TreeItemWeakPtr parent, std::string uid) :
+TreeItemImage::TreeItemImage(TreeItemWeakPtr parent, QString uid) :
     TreeItemImpl(parent,"","image",""),
     mUid(uid)
 {
-//  QObject::connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), mModel, SLOT(treeItemChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SIGNAL(changed()));
+//  QObject::connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), mModel, SLOT(treeItemChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(changed()));
   connect(this, SIGNAL(changed()), mModel, SLOT(treeItemChangedSlot()));
 }
 
@@ -102,9 +102,9 @@ QFont TreeItemImage::getFont() const
 
 TreeItemImage::~TreeItemImage()
 {
-  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SIGNAL(changed()));
+  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SIGNAL(changed()));
   disconnect(this, SIGNAL(changed()), mModel, SLOT(treeItemChangedSlot()));
-//  QObject::disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), mModel, SLOT(treeItemChangedSlot()));
+//  QObject::disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), mModel, SLOT(treeItemChangedSlot()));
 }
 //void QAbstractItemModel::dataChanged ( const QModelIndex & topLeft, const QModelIndex & bottomRight )
 

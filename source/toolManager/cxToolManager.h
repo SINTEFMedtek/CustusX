@@ -33,7 +33,7 @@ Q_OBJECT
 public:
   typedef Tracker::Message TrackerMessage;
   typedef Tool::Message ToolMessage;
-  typedef std::string stdString;
+  typedef QString stdString;
 
   static void initializeObject();
   static ToolManager* getInstance();
@@ -45,14 +45,14 @@ public:
   virtual ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< get all configured, but not initialized tools
   virtual ssc::ToolManager::ToolMapPtr getInitializedTools(); ///< get all initialized tools
   virtual ssc::ToolManager::ToolMapPtr getTools(); ///< get all configured and initialized tools
-  virtual ssc::ToolPtr getTool(const std::string& uid); ///< get a specific tool
+  virtual ssc::ToolPtr getTool(const QString& uid); ///< get a specific tool
 
   virtual ssc::ToolPtr getDominantTool(); ///< get the dominant tool
-  virtual void setDominantTool(const std::string& uid); ///< can be set to either a connected or configured tool
+  virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
 
-  virtual std::map<std::string, std::string> getToolUidsAndNames() const; ///< both from configured and connected tools
-  virtual std::vector<std::string> getToolNames() const; ///< both from configured and connected tools
-  virtual std::vector<std::string> getToolUids() const; ///< both from configured and connected tools
+  virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
+  virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
+  virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
 
   virtual ssc::Transform3DPtr get_rMpr() const; ///< get the patient registration transform
   virtual void set_rMpr(const ssc::Transform3DPtr& val); ///<  set the transform from patient to reference space
@@ -60,10 +60,10 @@ public:
   virtual ssc::RegistrationHistoryPtr get_rMpr_History();
 
   virtual ssc::ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
-  virtual void saveTransformsAndTimestamps(std::string filePathAndName = ""); ///<
+  virtual void saveTransformsAndTimestamps(QString filePathAndName = ""); ///<
 
-  void setConfigurationFile(std::string configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
-  void setLoggingFolder(std::string loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
+  void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
+  void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
   void addXml(QDomNode& parentNode); ///< write internal state to node
   void parseXml(QDomNode& dataNode);///< read internal state from node
@@ -72,7 +72,7 @@ public:
   ssc::ManualToolPtr getManualTool(); ///< a mouse-controllable virtual tool that is available even when not tracking.
   virtual ssc::LandmarkMap getLandmarks();
   virtual void setLandmark(ssc::Landmark landmark);
-  virtual void removeLandmark(std::string uid);
+  virtual void removeLandmark(QString uid);
 
   void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
 
@@ -97,13 +97,13 @@ protected:
   ToolManager(); ///< use getInstance instead
   ~ToolManager(); ///< destructor
 
-  void addConnectedTool(std::string uid); ///< moves a tool from configuredTools to connectedTools
+  void addConnectedTool(QString uid); ///< moves a tool from configuredTools to connectedTools
   void connectSignalsAndSlots(); ///< connects signals and slots
   void initializeManualTool();
   void configureReferences(); ///<
 
-  std::string mConfigurationFilePath; ///< path to the configuration file
-  std::string mLoggingFolder; ///< path to where logging should be saved
+  QString mConfigurationFilePath; ///< path to the configuration file
+  QString mLoggingFolder; ///< path to where logging should be saved
   QTimer* mTimer; ///< timer controlling the demand of transforms
 
   TrackerPtr mTracker; ///< the tracker to use
