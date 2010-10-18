@@ -150,7 +150,7 @@ ViewWrapperPtr ViewManager::getActiveView() const
 {
   for(unsigned i=0; i<mViewGroups.size(); ++i)
   {
-    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(string_cast(mActiveView));
+    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
     if(viewWrapper)
     {
       return viewWrapper;
@@ -159,13 +159,13 @@ ViewWrapperPtr ViewManager::getActiveView() const
   return ViewWrapperPtr();
 }
 
-void ViewManager::setActiveView(std::string viewUid)
+void ViewManager::setActiveView(QString viewUid)
 {
   if (mActiveView==qstring_cast(viewUid))
     return;
   mActiveView = qstring_cast(viewUid);
   emit activeViewChanged();
-  ssc::messageManager()->sendInfo("Active view set to ["+string_cast(mActiveView) + "]");
+  ssc::messageManager()->sendInfo("Active view set to ["+mActiveView + "]");
 }
 
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
@@ -273,7 +273,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
     viewgroup = viewgroup.nextSibling();
   }
 
-  this->setActiveView(activeViewString.toStdString());
+  this->setActiveView(activeViewString);
 }
 
 void ViewManager::clear()
@@ -354,7 +354,7 @@ void ViewManager::setActiveLayout(const QString& layout)
   mActiveLayout = layout;
   emit activeLayoutChanged();
 
-  ssc::messageManager()->sendInfo("Layout changed to "+ string_cast(this->getLayoutData(mActiveLayout).getName()));
+  ssc::messageManager()->sendInfo("Layout changed to "+ this->getLayoutData(mActiveLayout).getName());
 }
   
 //void ViewManager::deleteImageSlot(ssc::ImagePtr image)
@@ -742,8 +742,8 @@ void ViewManager::fillModelTree(TreeItemPtr root)
       std::vector<ssc::RepPtr> reps = views[j]->getReps();
       for (unsigned k=0; k<reps.size(); ++k)
       {
-        std::string name = reps[k]->getName();
-        if (name.empty())
+        QString name = reps[k]->getName();
+        if (name.isEmpty())
           name = reps[k]->getType();
         TreeItemImpl::create(viewItem, qstring_cast(name), qstring_cast(reps[k]->getType()), "");
       }
@@ -832,7 +832,7 @@ void ViewManager::setInteractionStyleActionSlot()
   else if (uid=="vtkInteractorStyleFlight")
     interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
 
-  ssc::messageManager()->sendInfo("Set Interactor: " + std::string(interactor->GetInteractorStyle()->GetClassName()));
+  ssc::messageManager()->sendInfo("Set Interactor: " + QString(interactor->GetInteractorStyle()->GetClassName()));
 }
 
 

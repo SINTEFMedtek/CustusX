@@ -44,7 +44,7 @@ protected slots:
   virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   void toolVisibleSlot(bool visible); ///< enables/disables the Sample Tool button
   void toolSampleButtonClickedSlot(); ///< reacts when the Sample Tool button is clicked
-  void dominantToolChangedSlot(const std::string& uid); ///< set which tool to sample from
+  void dominantToolChangedSlot(const QString& uid); ///< set which tool to sample from
   void enableToolSampleButton();
 
 protected:

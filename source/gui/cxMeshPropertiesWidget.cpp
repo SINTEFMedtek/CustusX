@@ -68,7 +68,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(updateSlot()));
   updateSlot();
 }
 
@@ -149,7 +149,7 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
   mMeshComboBox->clear();
   
   //get a list of meshes from the datamanager
-  std::map<std::string, ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
+  std::map<QString, ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
   if(meshes.size() == 0)
   {
     mMeshComboBox->insertItem(1, QString("Import a mesh to begin..."));
@@ -160,12 +160,12 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
   mMeshComboBox->setEnabled(true);
   
   //add these to the combobox
-  typedef std::map<std::string, ssc::MeshPtr>::iterator iterator;
+  typedef std::map<QString, ssc::MeshPtr>::iterator iterator;
   mMeshComboBox->insertItem(1, QString("<No mesh selected>"));
   int listPosition = 2;
   for(iterator i = meshes.begin(); i != meshes.end(); ++i)
   {
-    mMeshComboBox->insertItem(listPosition, QString(i->first.c_str()));
+    mMeshComboBox->insertItem(listPosition, QString(i->first));
     listPosition++;
   }
   mMeshComboBox->blockSignals(false);
@@ -183,7 +183,7 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
     return;
   }
   
-  std::string meshId = comboBoxText.toStdString();
+  QString meshId = comboBoxText;
   
   //find the mesh
   ssc::MeshPtr mesh = ssc::dataManager()->getMesh(meshId);

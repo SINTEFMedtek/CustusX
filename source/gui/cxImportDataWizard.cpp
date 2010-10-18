@@ -75,8 +75,8 @@ void ImportDataWizard::setInitialGuessForParentFrame()
 
   QString base = qstring_cast(mData->getName()).split(".")[0];
 
-  std::map<std::string, ssc::DataPtr> all = ssc::dataManager()->getData();
-  for (std::map<std::string, ssc::DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+  std::map<QString, ssc::DataPtr> all = ssc::dataManager()->getData();
+  for (std::map<QString, ssc::DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
     if (iter->second==mData)
       continue;
@@ -92,7 +92,7 @@ void ImportDataWizard::setInitialGuessForParentFrame()
 
 void ImportDataWizard::updateImportTransformButton()
 {
-  ssc::DataPtr parent = ssc::dataManager()->getData(string_cast(mParentFrameAdapter->getValue()));
+  ssc::DataPtr parent = ssc::dataManager()->getData(mParentFrameAdapter->getValue());
   bool enabled = bool(parent);
 
   mImportTransformButton->setEnabled(enabled);

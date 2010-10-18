@@ -80,15 +80,15 @@ protected:
 class TreeItemImage : public TreeItemImpl
 {
 public:
-  static TreeItemPtr create(TreeItemWeakPtr parent, std::string uid);
+  static TreeItemPtr create(TreeItemWeakPtr parent, QString uid);
   virtual ~TreeItemImage();
   virtual QString getName() const;
   virtual void activate();
   virtual QFont getFont() const;
 
 private:
-  TreeItemImage(TreeItemWeakPtr parent, std::string uid);
-  std::string mUid;
+  TreeItemImage(TreeItemWeakPtr parent, QString uid);
+  QString mUid;
 };
 
 class TreeItemToolManager : public TreeItemImpl

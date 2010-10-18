@@ -56,8 +56,8 @@ protected:
 
   void nextRow(); ///< jump to the next line in the tablewidget, updates active landmark and highlighted row
   std::vector<ssc::Landmark> getAllLandmarks() const; ///< get all the landmarks from the image and the datamanager
-  QString getLandmarkName(std::string uid);
-  double getAccuracy(std::string uid);
+  QString getLandmarkName(QString uid);
+  double getAccuracy(QString uid);
   double getAvarageAccuracy();
 
   //gui
@@ -66,7 +66,7 @@ protected:
   QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy //TODO
 
   //data
-  std::string mActiveLandmark; ///< uid of surrently selected landmark.
+  QString mActiveLandmark; ///< uid of surrently selected landmark.
   ssc::ImagePtr mCurrentImage; ///< the image currently used in image registration
 
 private:

@@ -45,7 +45,7 @@ QDomElement& PresetTransferFunctions3D::getPresetDomElement(const QString& prese
 
 ssc::Image::shadingStruct PresetTransferFunctions3D::getShadingPresets(const QString& presetName)
 {
-  return mShadings[string_cast(presetName)];
+  return mShadings[presetName];
 }
   
 QStringList PresetTransferFunctions3D::generatePresetList()

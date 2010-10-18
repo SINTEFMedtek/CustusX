@@ -35,7 +35,7 @@ private:
   QDomElement& getDefaultPresetDomElement(); ///< returns a default preset
 
   QDomDocument* mPresetDomDocument; ///< the xml document with the presets
-  std::map<std::string, ssc::Image::shadingStruct> mShadings;// Map with the shading presets
+  std::map<QString, ssc::Image::shadingStruct> mShadings;// Map with the shading presets
 
   QDomElement mLastReturnedPreset;
 };

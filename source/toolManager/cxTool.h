@@ -63,26 +63,26 @@ public:
     TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
   };
   typedef Tool::Message ToolMessage;
-  typedef std::string stdString;
+  typedef QString stdString;
 
   /**A tools internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
   {
     ssc::Tool::Type   mType;                  ///< the tools type
-    std::string       mName;                  ///< the tools name
-    std::string       mUid;                   ///< the tools unique id
+    QString       mName;                  ///< the tools name
+    QString       mUid;                   ///< the tools unique id
     Tracker::Type     mTrackerType;           ///< what product the tool belongs to
-    std::string       mSROMFilename;          ///< path to the tools SROM file
+    QString       mSROMFilename;          ///< path to the tools SROM file
     unsigned int      mPortNumber;            ///< the port number the tool is connected to
     unsigned int      mChannelNumber;         ///< the channel the tool is connected to
     bool              mWireless;              ///< whether or not the tool is wireless
     bool              m5DOF;                  ///< whether or not the tool have 5 DOF
-    std::string       mCalibrationFilename;   ///< path to the tools calibration file
-    std::string       mGraphicsFileName;      ///< path to this tools graphics file
-    std::string       mTransformSaveFileName; ///< path to where transforms should be saved
-    std::string       mLoggingFolderName;     ///< path to where log should be saved
-    std::string       mInstrumentId;          ///< The instruments id
-    std::string       mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
+    QString       mCalibrationFilename;   ///< path to the tools calibration file
+    QString       mGraphicsFileName;      ///< path to this tools graphics file
+    QString       mTransformSaveFileName; ///< path to where transforms should be saved
+    QString       mLoggingFolderName;     ///< path to where log should be saved
+    QString       mInstrumentId;          ///< The instruments id
+    QString       mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
       mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
@@ -95,15 +95,15 @@ public:
   ~Tool();                                    ///< destructor
 
   virtual ssc::Tool::Type getType() const;
-  virtual std::string getGraphicsFileName() const;
+  virtual QString getGraphicsFileName() const;
   virtual vtkPolyDataPtr getGraphicsPolyData() const;
   virtual void saveTransformsAndTimestamps();
-  virtual void setTransformSaveFile(const std::string& filename);
+  virtual void setTransformSaveFile(const QString& filename);
   virtual ssc::Transform3D get_prMt() const;
   virtual bool getVisible() const;
   //virtual ssc::Transform3DPtr getLastTransform();
-  virtual std::string getUid() const;
-  virtual std::string getName() const;
+  virtual QString getUid() const;
+  virtual QString getName() const;
   virtual int getIndex() const{return 0;};
   virtual bool isCalibrated() const; //TODO
   virtual ssc::ProbeSector getProbeSector() const;
@@ -113,8 +113,8 @@ public:
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
   virtual void set_prMt(const ssc::Transform3D& transform);
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-  std::string getInstrumentId() const;
-  std::string getInstrumentScannerId() const;
+  QString getInstrumentId() const;
+  QString getInstrumentScannerId() const;
   QStringList getUSSectorConfigList() const;
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml

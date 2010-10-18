@@ -283,16 +283,16 @@ void BrowserWidget::populateTreeWidget()
 
 
   //  //get all images, meshes and tools
-//  std::map<std::string, std::string> imageUidAndNames =
+//  std::map<QString, QString> imageUidAndNames =
 //      dataManager()->getImageUidsAndNames();
-//  std::map<std::string, std::string> meshUidAndNames =
+//  std::map<QString, QString> meshUidAndNames =
 //      dataManager()->getMeshUidsWithNames();
-//  std::map<std::string, std::string> toolUidAndName =
+//  std::map<QString, QString> toolUidAndName =
 //      toolManager()->getToolUidsAndNames();
 //
 //  //get all views
-//  std::map<std::string, View2D*>* view2DMap = viewManager()->get2DViews();
-//  std::map<std::string, View3D*>* view3DMap = viewManager()->get3DViews();
+//  std::map<QString, View2D*>* view2DMap = viewManager()->get2DViews();
+//  std::map<QString, View3D*>* view3DMap = viewManager()->get3DViews();
 //
 //  //ready the tree
 //  mTreeWidget->clear();
@@ -329,7 +329,7 @@ void BrowserWidget::populateTreeWidget()
 ////      break;
 ////  }
 //  QList<QTreeWidgetItem *> viewItems;
-//  std::map<std::string, View3D*>::iterator view3Diter = view3DMap->begin();
+//  std::map<QString, View3D*>::iterator view3Diter = view3DMap->begin();
 //  while(view3Diter != view3DMap->end())
 //  {
 //    if(numberOf3DViews == 0) //only adding the views shown by the layout
@@ -341,7 +341,7 @@ void BrowserWidget::populateTreeWidget()
 //    view3Diter++;
 //    numberOf3DViews--;
 //  }
-//  std::map<std::string, View2D*>::iterator view2Diter = view2DMap->begin();
+//  std::map<QString, View2D*>::iterator view2Diter = view2DMap->begin();
 //  while(view2Diter != view2DMap->end())
 //  {
 //    if(numberOf2DViews == 0) //only adding the views shown by the layout
@@ -367,7 +367,7 @@ void BrowserWidget::populateTreeWidget()
 //    {
 //      //we need to add slightly different things per reptype,
 //      //some rep types (like landmarkRep and probeRep, we dont want to add at all
-//      std::string repType = (*repIter)->getType();
+//      QString repType = (*repIter)->getType();
 //      if(repType == "ssc::VolumetricRep")
 //      {
 //        //add the reps
@@ -378,7 +378,7 @@ void BrowserWidget::populateTreeWidget()
 //        QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
 //        topLevelItem->addChild(repItem);
 //        //add the images
-//        std::string repUid = (*repIter)->getUid();
+//        QString repUid = (*repIter)->getUid();
 //
 //        ssc::VolumetricRepPtr volRep = repManager()->getVolumetricRep(repUid);
 //        if(!volRep)
@@ -395,7 +395,7 @@ void BrowserWidget::populateTreeWidget()
 //        QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
 //        topLevelItem->addChild(repItem);
 //        //add meshes under geometricRep
-//        std::string repUid = (*repIter)->getUid();
+//        QString repUid = (*repIter)->getUid();
 //        ssc::GeometricRepPtr geometricRep = repManager()->getGeometricRep(repUid);
 //        if(!geometricRep)
 //          break;
@@ -411,7 +411,7 @@ void BrowserWidget::populateTreeWidget()
 //        QTreeWidgetItem* repItem = new QTreeWidgetItem(repList);
 //        topLevelItem->addChild(repItem);
 //        //add tools under toolreps
-//        std::string repUid = (*repIter)->getUid();
+//        QString repUid = (*repIter)->getUid();
 //        ssc::ToolRep3DPtr toolRep3D = repManager()->getToolRep3DRep(repUid);
 //        if(!toolRep3D)
 //          break;
@@ -431,7 +431,7 @@ void BrowserWidget::populateTreeWidget()
 
     /*
     //make QTreeWidgetItems of all the images
-    std::map<std::string, std::string>::iterator it1 = imageUidAndNames.begin();
+    std::map<QString, QString>::iterator it1 = imageUidAndNames.begin();
     while(it1 != imageUidAndNames.end())
     {
       QStringList image(QStringList() << QString(it1->second.c_str())
@@ -442,10 +442,10 @@ void BrowserWidget::populateTreeWidget()
       it1++;
     }
     //make QTreeWidgetItems of all the meshes
-    std::map<std::string, std::string>::iterator it2 = meshUidAndNames.begin();
+    std::map<QString, QString>::iterator it2 = meshUidAndNames.begin();
     while(it2 != meshUidAndNames.end())
     {
-      std::map<std::string, std::string>::iterator parentIt; // =
+      std::map<QString, QString>::iterator parentIt; // =
           //imageUidAndNames.find(it2->getParent()); //TODO waiting for the parent function
       if(parentIt != imageUidAndNames.end()) //mesh has a parent
       {
@@ -476,7 +476,7 @@ void BrowserWidget::populateTreeWidget()
       it2++;
     }
     //make QTreeWidgetItems of all the tools
-    std::map<std::string, std::string>::iterator it3 = toolUidAndName.begin();
+    std::map<QString, QString>::iterator it3 = toolUidAndName.begin();
     while(it3 != toolUidAndName.end())
     {
       QStringList tool(QStringList() << QString(it1->second.c_str())

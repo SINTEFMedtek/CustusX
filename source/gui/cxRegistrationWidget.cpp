@@ -54,16 +54,16 @@ void RegistrationWidget::activeImageChangedSlot()
   //disconnect from the old image
   if(mCurrentImage)
   {
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot()));
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
   }
 
   mCurrentImage = activeImage;
 
   if(mCurrentImage)
   {
-    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot()));
-    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+    connect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+    connect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
   }
 
   //get the images landmarks and populate the landmark table
@@ -78,14 +78,14 @@ void RegistrationWidget::cellClickedSlot(int row, int column)
   if(!mLandmarkTableWidget)
     ssc::messageManager()->sendDebug("mLandmarkTableWidget is null");
 
-  mActiveLandmark = string_cast(mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString());
+  mActiveLandmark = mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString();
 }
 
 void RegistrationWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
   connect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(activeImageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   this->activeImageChangedSlot();
 
   registrationManager()->initialize();
@@ -97,12 +97,12 @@ void RegistrationWidget::hideEvent(QHideEvent* event)
 {
   QWidget::hideEvent(event);
   disconnect(ssc::dataManager(), SIGNAL(landmarkPropertiesChanged()), this, SLOT(landmarkUpdatedSlot()));
-  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(activeImageChangedSlot()));
+  disconnect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
 
   if(mCurrentImage)
   {
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkUpdatedSlot()));
-    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
+    disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
   }
 }
 
@@ -195,7 +195,7 @@ void RegistrationWidget::nextRow()
   mLandmarkTableWidget->setCurrentCell(selectedRow, 0);
   //std::cout << "3 Selected row = " << string_cast(selectedRow) << std::endl;
 
-  mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString().toStdString();
+  mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString();
   //std::cout << "ActiveLandmark uid: " << mActiveLandmark << std::endl;
 }
 
@@ -203,8 +203,8 @@ std::vector<ssc::Landmark> RegistrationWidget::getAllLandmarks() const
 {
   std::vector<ssc::Landmark> retval;
   ssc::LandmarkMap targetData = this->getTargetLandmarks();
-  std::map<std::string, ssc::LandmarkProperty> dataData = ssc::dataManager()->getLandmarkProperties();
-  std::map<std::string, ssc::LandmarkProperty>::iterator iter;
+  std::map<QString, ssc::LandmarkProperty> dataData = ssc::dataManager()->getLandmarkProperties();
+  std::map<QString, ssc::LandmarkProperty>::iterator iter;
 
   for (iter=dataData.begin(); iter!=dataData.end(); ++iter)
   {
@@ -220,11 +220,11 @@ std::vector<ssc::Landmark> RegistrationWidget::getAllLandmarks() const
 void RegistrationWidget::cellChangedSlot(int row,int column)
 {
   QTableWidgetItem* item = mLandmarkTableWidget->item(row, column);
-  std::string uid = string_cast(item->data(Qt::UserRole).toString());
+  QString uid = item->data(Qt::UserRole).toString();
 
   if(column==0)
   {
-    std::string name = item->text().toStdString();
+    QString name = item->text();
     ssc::dataManager()->setLandmarkName(uid, name);
     //std::cout << "cell changed 0" << std::endl;
   }
@@ -250,14 +250,14 @@ void RegistrationWidget::updateAvarageAccuracyLabel()
 
 double RegistrationWidget::getAvarageAccuracy()
 {
-  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
+  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
 
   double sum = 0;
   int count = 0;
-  std::map<std::string, ssc::LandmarkProperty>::iterator it = props.begin();
+  std::map<QString, ssc::LandmarkProperty>::iterator it = props.begin();
   for(; it != props.end(); ++it)
   {
-    std::string uid = it->first;
+    QString uid = it->first;
     double val = this->getAccuracy(uid);
     if(!ssc::similar(val, 1000.0))
     {
@@ -270,13 +270,13 @@ double RegistrationWidget::getAvarageAccuracy()
   return sum/count;
 }
 
-double RegistrationWidget::getAccuracy(std::string uid)
+double RegistrationWidget::getAccuracy(QString uid)
 {
   if (!mCurrentImage)
     return 0;
   ssc::Landmark masterLandmark = mCurrentImage->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
   ssc::Landmark targetLandmark = this->getTargetLandmarks()[uid];
-  if(masterLandmark.getUid().empty() || targetLandmark.getUid().empty())
+  if(masterLandmark.getUid().isEmpty() || targetLandmark.getUid().isEmpty())
     return 1000.0;
 
   ssc::Vector3D p_master_master = masterLandmark.getCoord();

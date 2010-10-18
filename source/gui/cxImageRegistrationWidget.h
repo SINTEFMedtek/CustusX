@@ -47,7 +47,7 @@ protected:
   virtual ssc::LandmarkMap getTargetLandmarks() const;
   virtual void performRegistration();
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
-  QString getLandmarkName(std::string uid);
+  QString getLandmarkName(QString uid);
   virtual ssc::Transform3D getTargetTransform() const;
 
   //gui

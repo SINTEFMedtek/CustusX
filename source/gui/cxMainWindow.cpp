@@ -132,7 +132,7 @@ MainWindow::MainWindow() :
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   // initialize toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   this->layoutChangedSlot();
@@ -327,7 +327,7 @@ void MainWindow::newPatientSlot()
   if (!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
   }
 
   QString choosenDir = patientDatafolder + "/" + name;
@@ -417,7 +417,7 @@ void MainWindow::loadPatientFileSlot()
   if (!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
   }
   // Open file dialog
   QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
@@ -463,9 +463,9 @@ void MainWindow::patientChangedSlot()
   if (!loggingDir.exists())
   {
     loggingDir.mkdir(loggingPath);
-    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath.toStdString());
+    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
   }
-  ToolManager::getInstance()->setLoggingFolder(loggingPath.toStdString());
+  ToolManager::getInstance()->setLoggingFolder(loggingPath);
 }
 
 /** Called when the layout is changed: update the layout menu
