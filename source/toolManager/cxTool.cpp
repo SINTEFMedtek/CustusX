@@ -64,7 +64,7 @@ ssc::Tool::Type Tool::getType() const
   return mInternalStructure.mType;
 }
 
-std::string Tool::getGraphicsFileName() const
+QString Tool::getGraphicsFileName() const
 {
   return mInternalStructure.mGraphicsFileName;
 }
@@ -80,7 +80,7 @@ void Tool::saveTransformsAndTimestamps()
     return;  //we don't save transforms and timestamps for reference tools
 
   QDateTime dateTime = QDateTime::currentDateTime();
-  std::string stamp = dateTime.toString(QString("ddMMyyhhmmss")).toStdString();
+  QString stamp = dateTime.toString(QString("ddMMyyhhmmss"));
 
   std::stringstream timestampsName;
   std::stringstream transformsName;
@@ -128,7 +128,7 @@ void Tool::saveTransformsAndTimestamps()
   transforms.close();
 }
 
-void Tool::setTransformSaveFile(const std::string& filename)
+void Tool::setTransformSaveFile(const QString& filename)
 {
   mInternalStructure.mTransformSaveFileName = filename;
 }
@@ -154,12 +154,12 @@ bool Tool::getVisible() const
   return lastTransform;
 }*/
 
-std::string Tool::getUid() const
+QString Tool::getUid() const
 {
   return ssc::Tool::mUid;
 }
 
-std::string Tool::getName() const
+QString Tool::getName() const
 {
   return ssc::Tool::mName;
 }
@@ -344,7 +344,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
   else if (igstk::InvalidPolarisPortNumberErrorEvent().CheckEvent(&event))
   {
     emit toolReport(TOOL_NDI_PORT_NUMBER, true, false, mUid);
-    ssc::messageManager()->sendError("Polaris tool: "+mUid+" sendt invalid Polaris port number: "+ string_cast(mInternalStructure.mPortNumber) +".");
+    ssc::messageManager()->sendError("Polaris tool: "+mUid+" sendt invalid Polaris port number: "+ qstring_cast(mInternalStructure.mPortNumber) +".");
   }
   else if (igstk::InvalidPolarisSROMFilenameErrorEvent().CheckEvent(&event))
   {
@@ -360,7 +360,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
   else if (igstk::InvalidAuroraPortNumberErrorEvent().CheckEvent(&event))
   {
     emit toolReport(TOOL_NDI_PORT_NUMBER, true, false, mUid);
-    ssc::messageManager()->sendError("Aurora tool: "+mUid+" has an invalid port number: "+ string_cast(mInternalStructure.mPortNumber)+".");
+    ssc::messageManager()->sendError("Aurora tool: "+mUid+" has an invalid port number: "+ qstring_cast(mInternalStructure.mPortNumber)+".");
   }
   else if (igstk::InvalidAuroraSROMFilenameErrorEvent().CheckEvent(&event))
   {
@@ -375,7 +375,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
   else if (igstk::InvalidAuroraChannelNumberErrorEvent().CheckEvent(&event))
   {
     emit toolReport(TOOL_AURORA_CHANNEL_NUMBER, true, false, mUid);
-    ssc::messageManager()->sendError("Polaris tool: "+mUid+" has an invalid channel number:"+string_cast(mInternalStructure.mChannelNumber) +".");
+    ssc::messageManager()->sendError("Polaris tool: "+mUid+" has an invalid channel number:"+qstring_cast(mInternalStructure.mChannelNumber) +".");
   }
 }
 
@@ -386,7 +386,7 @@ bool Tool::verifyInternalStructure()
     std::cout << "if(mInternalStructure.mType == ssc::Tool::TOOL_NONE)" << std::endl;
     return false;
   }
-  if(mInternalStructure.mUid.empty())
+  if(mInternalStructure.mUid.isEmpty())
   {
     std::cout << "" << std::endl;
     return false;
@@ -407,23 +407,23 @@ bool Tool::verifyInternalStructure()
     return false;
   }
   QDir dir;
-  if(!mInternalStructure.mSROMFilename.empty() && !dir.exists(QString(mInternalStructure.mSROMFilename.c_str())))
+  if(!mInternalStructure.mSROMFilename.isEmpty() && !dir.exists(mInternalStructure.mSROMFilename))
   {
     std::cout << "if(!dir.exists(QString(mInternalStructure.mSROMFilename.c_str())))" << std::endl;
-    std::cout << "mInternalStructure.mSROMFilename: " << mInternalStructure.mSROMFilename.c_str() << std::endl;
+    std::cout << "mInternalStructure.mSROMFilename: " << mInternalStructure.mSROMFilename << std::endl;
     return false;
   }
-  if(!mInternalStructure.mCalibrationFilename.empty() && !dir.exists(QString(mInternalStructure.mCalibrationFilename.c_str())))
+  if(!mInternalStructure.mCalibrationFilename.isEmpty() && !dir.exists(mInternalStructure.mCalibrationFilename))
   {
     std::cout << "if(!dir.exists(QString(mInternalStructure.mCalibrationFilename.c_str())))" << std::endl;
     return false;
   }
-  if(!mInternalStructure.mTransformSaveFileName.empty() && !dir.exists(QString(mInternalStructure.mTransformSaveFileName.c_str())))
+  if(!mInternalStructure.mTransformSaveFileName.isEmpty() && !dir.exists(mInternalStructure.mTransformSaveFileName))
   {
     std::cout << "if(!dir.exists(QString(mInternalStructure.mTransformSaveFileName.c_str())))" << std::endl;
     return false;
   }
-  if(!mInternalStructure.mLoggingFolderName.empty() && !dir.exists(QString(mInternalStructure.mLoggingFolderName.c_str())))
+  if(!mInternalStructure.mLoggingFolderName.isEmpty() && !dir.exists(mInternalStructure.mLoggingFolderName))
   {
     std::cout << "if(!dir.exists(QString(mInternalStructure.mLoggingFolderName.c_str())))" << std::endl;
     return false;
@@ -449,7 +449,7 @@ Tool::TrackerToolType* Tool::buildInternalTool()
     if(!mInternalStructure.mWireless) //we only support wireless atm
       return tool = mTempPolarisTool.GetPointer();
     mTempPolarisTool->RequestSelectWirelessTrackerTool();
-    mTempPolarisTool->RequestSetSROMFileName(mInternalStructure.mSROMFilename);
+    mTempPolarisTool->RequestSetSROMFileName(string_cast(mInternalStructure.mSROMFilename));
     mTempPolarisTool->RequestConfigure();
     mTempPolarisTool->SetCalibrationTransform(mCalibrationTransform);
     tool = mTempPolarisTool.GetPointer();
@@ -485,10 +485,10 @@ Tool::TrackerToolType* Tool::buildInternalTool()
 void Tool::createPolyData()
 {
   QDir dir;
-  if(!mInternalStructure.mGraphicsFileName.empty() && dir.exists(QString(mInternalStructure.mGraphicsFileName.c_str())))
+  if(!mInternalStructure.mGraphicsFileName.isEmpty() && dir.exists(mInternalStructure.mGraphicsFileName))
   {
     vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-    reader->SetFileName(mInternalStructure.mGraphicsFileName.c_str());
+    reader->SetFileName(cstring_cast(mInternalStructure.mGraphicsFileName));
     mPolyData = reader->GetOutput();
   }
   else
@@ -520,7 +520,7 @@ void Tool::determineToolsCalibration()
    * rot_20 rot_21 rot_22 trans_2
    */
   std::ifstream inputStream;
-  inputStream.open(mInternalStructure.mCalibrationFilename.c_str());
+  inputStream.open(cstring_cast(mInternalStructure.mCalibrationFilename));
   if(inputStream.is_open())
   {
     std::string line;
@@ -576,8 +576,8 @@ ssc::Transform3D Tool::getCalibration_sMt() const
 void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
-  std::string logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
-  loggerFile->open( logFile.c_str() );
+  QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
+  loggerFile->open( cstring_cast(logFile) );
   mLogger = igstk::Logger::New();
   mLogOutput = itk::StdStreamLogOutput::New();
   mLogOutput->SetStream(*loggerFile);
@@ -615,11 +615,11 @@ void Tool::setUSProbeSector(ssc::ProbeSector probeSector)
   mProbeSector = probeSector;
 }
   
-std::string Tool::getInstrumentId() const
+QString Tool::getInstrumentId() const
 {
   return mInternalStructure.mInstrumentId;
 }
-std::string Tool::getInstrumentScannerId() const
+QString Tool::getInstrumentScannerId() const
 {
   return mInternalStructure.mInstrumentScannerId;
 }

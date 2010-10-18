@@ -19,10 +19,10 @@ public:
   typedef std::pair<int,int> ColRowPair;
   struct Configuration ///< a easy-to-work-with struct for a specific xml configuration
   {
-    std::string             mUsScanner;  ///<  scanner
-    std::string             mUsProbe;    ///<  probe
-    std::string             mRtSource;   ///<  realtime source
-    std::string             mConfigId;   ///<  config id
+    QString             mUsScanner;  ///<  scanner
+    QString             mUsProbe;    ///<  probe
+    QString             mRtSource;   ///<  realtime source
+    QString             mConfigId;   ///<  config id
     float                   mWidthDeg;   ///<  width in degrees
     int                     mDepth;      ///<  depth
     float                   mOffset;     ///<  Offset

@@ -29,7 +29,7 @@ namespace cx
 
 ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
 {
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SIGNAL(changed()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
 }
 
 QString ActiveToolStringDataAdapter::getValueName() const
@@ -38,7 +38,7 @@ QString ActiveToolStringDataAdapter::getValueName() const
 }
 bool ActiveToolStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ToolPtr newTool = ssc::toolManager()->getTool(string_cast(value));
+  ssc::ToolPtr newTool = ssc::toolManager()->getTool(value);
   if(newTool == ssc::toolManager()->getDominantTool())
     return false;
   ssc::toolManager()->setDominantTool(newTool->getUid());
@@ -56,7 +56,7 @@ QString ActiveToolStringDataAdapter::getHelp() const
 }
 QStringList ActiveToolStringDataAdapter::getValueRange() const
 {
-  std::vector<std::string> uids = ssc::toolManager()->getToolUids();
+  std::vector<QString> uids = ssc::toolManager()->getToolUids();
   QStringList retval;
   //retval << ""; //Don't add "no tool" choice
   for (unsigned i=0; i<uids.size(); ++i)
@@ -65,7 +65,7 @@ QStringList ActiveToolStringDataAdapter::getValueRange() const
 }
 QString ActiveToolStringDataAdapter::convertInternal2Display(QString internal)
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getTool(string_cast(internal));
+  ssc::ToolPtr tool = ssc::toolManager()->getTool(internal);
   if (!tool)
     return "<no tool>";
   return qstring_cast(tool->getName());
@@ -153,13 +153,13 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(referenceToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(referenceToolChangedSlot()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
   connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
 

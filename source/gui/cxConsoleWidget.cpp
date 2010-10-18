@@ -69,7 +69,7 @@ void ConsoleWidget::printMessage(Message message)
 void ConsoleWidget::lineWrappingSlot(bool checked)
 {
   this->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-  ssc::messageManager()->sendDebug("LineWrapping: " + string_cast(checked));
+  ssc::messageManager()->sendDebug("LineWrapping: " + qstring_cast(checked));
 }
 
 void ConsoleWidget::createTextCharFormats()

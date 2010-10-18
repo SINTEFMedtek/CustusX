@@ -93,7 +93,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
     return;
   }
 
-  std::string uid = ssc::dataManager()->addLandmark();
+  QString uid = ssc::dataManager()->addLandmark();
   ssc::Vector3D pos_r = probeRep->getPosition();
   ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
   //std::cout << "ImageRegistrationWidget::addLandmarkButtonClickedSlot()" << uid << ", " << pos_r << "ci=" << mCurrentImage.get() << std::endl;
@@ -110,7 +110,7 @@ void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
     ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");
     return;
   }
-  std::string uid = mActiveLandmark;
+  QString uid = mActiveLandmark;
   ssc::Vector3D pos_r = probeRep->getPosition();
   ssc::Vector3D pos_d = mCurrentImage->get_rMd().inv().coord(pos_r);
   mCurrentImage->setLandmark(ssc::Landmark(uid, pos_d));
@@ -159,8 +159,8 @@ void ImageRegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image
   std::vector<ssc::Landmark> landmarks =  this->getAllLandmarks();
 
   //update buttons
-  mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.empty());
-  mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.empty());
+  mRemoveLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
+  mEditLandmarkButton->setEnabled(!landmarks.empty() && !mActiveLandmark.isEmpty());
 }
 
 ssc::LandmarkMap ImageRegistrationWidget::getTargetLandmarks() const

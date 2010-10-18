@@ -46,7 +46,7 @@ void CustomStatusBar::connectToToolSignals()
     }
     connect(tool, SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
 
-    QString toolName = QString(tool->getName().c_str());
+    QString toolName = tool->getName();
 
     QLabel* toolLabel = new QLabel();
     toolLabel->setText(toolName);
@@ -92,11 +92,11 @@ void CustomStatusBar::receiveToolVisible(bool visible)
     return;
   }
 
-  std::string name = tool->getName();
+  QString name = tool->getName();
   for(unsigned i=0; i<mToolLabels.size(); ++i)
   {
     QLabel* toolLabel = mToolLabels[i];
-    if(toolLabel->text().compare(QString(name.c_str()), Qt::CaseInsensitive) == 0)
+    if(toolLabel->text().compare(name, Qt::CaseInsensitive) == 0)
     {
       QString color;
       if(tool->getVisible())

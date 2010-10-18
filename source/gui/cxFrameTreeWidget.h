@@ -31,7 +31,7 @@ public:
 private:
   QTreeWidget* mTreeWidget;
   void fill(QTreeWidgetItem* parent, QDomNode node);
-  std::map<std::string, ssc::DataPtr> mConnectedData;
+  std::map<QString, ssc::DataPtr> mConnectedData;
 
 private slots:
   void dataLoadedSlot();

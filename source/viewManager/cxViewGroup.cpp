@@ -226,7 +226,7 @@ void ViewGroup::removeViews()
   mSlicePlanesProxy->clearViewports();
 }
 
-ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(std::string viewUid)
+ViewWrapperPtr ViewGroup::getViewWrapperFromViewUid(QString viewUid)
 {
   for(unsigned i=0; i<mViewWrappers.size(); ++i)
   {
@@ -339,10 +339,10 @@ void ViewGroup::parseXml(QDomNode dataNode)
   for (QDomElement elem = dataNode.firstChildElement("data"); !elem.isNull(); elem = elem.nextSiblingElement("data"))
   {
     QString uid = elem.text();
-    ssc::DataPtr data = ssc::dataManager()->getData(string_cast(uid));
+    ssc::DataPtr data = ssc::dataManager()->getData(uid);
     mViewGroupData->addData(data);
     if (!data)
-      ssc::messageManager()->sendError("Couldn't find the data: ["+string_cast(uid)+"] in the datamanager.");
+      ssc::messageManager()->sendError("Couldn't find the data: ["+uid+"] in the datamanager.");
   }
 
   mViewGroupData->getCamera3D()->parseXml(dataNode.namedItem("camera3D"));
@@ -353,7 +353,7 @@ void ViewGroup::parseXml(QDomNode dataNode)
   if(ok)
     this->setZoom2D(zoom2Ddouble);
   else
-    ssc::messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+string_cast(zoom2D)+"");
+    ssc::messageManager()->sendError("Couldn't convert the zoomfactor to a double: "+qstring_cast(zoom2D)+"");
 
   QDomElement slicePlanes3DNode = dataNode.namedItem("slicePlanes3D").toElement();
   mSlicePlanesProxy->setVisible(slicePlanes3DNode.attribute("use").toInt());

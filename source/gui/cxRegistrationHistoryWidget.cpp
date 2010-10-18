@@ -86,8 +86,8 @@ std::vector<ssc::RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegist
   std::vector<ssc::RegistrationHistoryPtr> retval;
   retval.push_back(ssc::ToolManager::getInstance()->get_rMpr_History());
 
-  std::map<std::string, ssc::ImagePtr> image = ssc::DataManager::getInstance()->getImages();
-  for (std::map<std::string, ssc::ImagePtr>::iterator iter=image.begin(); iter!=image.end(); ++iter)
+  std::map<QString, ssc::ImagePtr> image = ssc::DataManager::getInstance()->getImages();
+  for (std::map<QString, ssc::ImagePtr>::iterator iter=image.begin(); iter!=image.end(); ++iter)
   {
     retval.push_back(iter->second->get_rMd_History());
   }
@@ -108,9 +108,9 @@ void RegistrationHistoryWidget::removeSlot()
     return;
 
   QDateTime lastTime = history.back().mTimestamp;
-  lastTime = lastTime.addSecs(-1);
 
-  ssc::messageManager()->sendInfo("Removing all registration performed later than " + string_cast(lastTime.toString(ssc::timestampSecondsFormatNice())) + ".");
+  lastTime = lastTime.addSecs(-1);
+  ssc::messageManager()->sendInfo("Removing all registration performed later than " + lastTime.toString(ssc::timestampSecondsFormatNice()) + ".");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {
@@ -147,7 +147,7 @@ void RegistrationHistoryWidget::rewindSlot()
   QDateTime lastTime = history.back().mTimestamp;
   lastTime = lastTime.addSecs(-1);
 
-  ssc::messageManager()->sendInfo("Setting registration time to " + string_cast(lastTime.toString(ssc::timestampSecondsFormatNice())) + ".");
+  ssc::messageManager()->sendInfo("Setting registration time to " + lastTime.toString(ssc::timestampSecondsFormatNice()) + ".");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {

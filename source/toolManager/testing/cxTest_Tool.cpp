@@ -12,15 +12,15 @@ void TestTool::setUp()
   mValidPolarisInternal.mName = "Polaris pointer name";
   mValidPolarisInternal.mUid = "Polaris pointer uid";
   mValidPolarisInternal.mTrackerType = cx::Tracker::TRACKER_POLARIS;
-  mValidPolarisInternal.mSROMFilename = (toolToolPath+QString("07-198-0838_SW_Pointer_02.rom")).toStdString();
+  mValidPolarisInternal.mSROMFilename = (toolToolPath+QString("07-198-0838_SW_Pointer_02.rom"));
   //mValidPolarisInternal.mPortNumber; //not needed for polaris, default value should be enough
   //mValidPolarisInternal.mChannelNumber; //not needed for polaris, default value should be enough
   mValidPolarisInternal.mWireless = true; //only support wireless polaris
   //mValidPolarisInternal.m5DOF; //not needed for polaris, default value should be enough
-  mValidPolarisInternal.mCalibrationFilename = (toolToolPath+QString("07-198-0838_SW_Pointer_02.cal")).toStdString();
-  mValidPolarisInternal.mGraphicsFileName = (toolToolPath+QString("07-198-0838_SW_Pointer_02.stl")).toStdString();
-  mValidPolarisInternal.mTransformSaveFileName = QDir::currentPath().toStdString();
-  mValidPolarisInternal.mLoggingFolderName = QDir::currentPath().toStdString();
+  mValidPolarisInternal.mCalibrationFilename = (toolToolPath+QString("07-198-0838_SW_Pointer_02.cal"));
+  mValidPolarisInternal.mGraphicsFileName = (toolToolPath+QString("07-198-0838_SW_Pointer_02.stl"));
+  mValidPolarisInternal.mTransformSaveFileName = QDir::currentPath();
+  mValidPolarisInternal.mLoggingFolderName = QDir::currentPath();
 
   mValidAuroraInternal.mType = ssc::Tool::TOOL_POINTER;
   mValidAuroraInternal.mName = "Aurora pointer name";
@@ -31,10 +31,10 @@ void TestTool::setUp()
   mValidAuroraInternal.mChannelNumber = 0; //only needed for 5DOF
   //mValidAuroraInternal.mWireless; //not needed for aurora, default value should be enough
   mValidAuroraInternal.m5DOF = true;
-  mValidAuroraInternal.mCalibrationFilename = (toolToolPath+QString("probeCalibrationTransform_hypofyse_comp.cal")).toStdString();
+  mValidAuroraInternal.mCalibrationFilename = (toolToolPath+QString("probeCalibrationTransform_hypofyse_comp.cal"));
   //mValidAuroraInternal.mGraphicsFileName; //not needed, and we dont have a stl for a aurora tool atm
-  mValidAuroraInternal.mTransformSaveFileName = QDir::currentPath().toStdString();
-  mValidAuroraInternal.mLoggingFolderName = QDir::currentPath().toStdString();
+  mValidAuroraInternal.mTransformSaveFileName = QDir::currentPath();
+  mValidAuroraInternal.mLoggingFolderName = QDir::currentPath();
 }
 
 void TestTool::tearDown()

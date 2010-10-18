@@ -32,7 +32,7 @@ private slots:
 protected:
   void connectContextMenu();
   void connectContextMenu(ssc::View* view);
-  std::string toString(int i) const;
+  QString toString(int i) const;
   int mStartIndex;
   ssc::ImagePtr mImage;
 };

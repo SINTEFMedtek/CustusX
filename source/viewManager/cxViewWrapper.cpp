@@ -126,10 +126,10 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper::dataAddedSlot(QString uid)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(uid));
+  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if (image)
     this->imageAdded(image);
-  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(string_cast(uid));
+  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(uid);
   if (mesh)
     this->meshAdded(mesh);
 }
@@ -147,9 +147,9 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //add actions to the actiongroups and the contextmenu
-  std::map<std::string, std::string>::iterator iter;
+  std::map<QString, QString>::iterator iter;
 
-  std::map<std::string, std::string> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
+  std::map<QString, QString> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
   for(iter=imageUidsAndNames.begin(); iter != imageUidsAndNames.end(); ++iter)
   {
     this->addDataAction(iter->first, &contextMenu);
@@ -157,7 +157,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   
   contextMenu.addSeparator();
 
-  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
+  std::map<QString, QString> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
   for(iter=meshUidsAndNames.begin(); iter != meshUidsAndNames.end(); ++iter)
   {
     this->addDataAction(iter->first, &contextMenu);
@@ -169,7 +169,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   contextMenu.exec(pointGlobal);
 }
 
-void ViewWrapper::addDataAction(std::string uid, QMenu* contextMenu)
+void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 {
   ssc::DataPtr data = ssc::dataManager()->getData(uid);
 
@@ -189,7 +189,7 @@ void ViewWrapper::dataActionSlot()
     return;
 
   QString uid = theAction->data().toString();
-  ssc::DataPtr data = ssc::dataManager()->getData(uid.toStdString());
+  ssc::DataPtr data = ssc::dataManager()->getData(uid);
   ssc::ImagePtr image = ssc::dataManager()->getImage(data->getUid());
 
   bool firstData = mViewGroup->getData().empty();

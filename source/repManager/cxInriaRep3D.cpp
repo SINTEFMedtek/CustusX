@@ -5,7 +5,7 @@
 
 namespace cx
 {
-InriaRep3D::InriaRep3D(const std::string& uid, const std::string& name) :
+InriaRep3D::InriaRep3D(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name),
   mType("cxInriaRep3D"),
   mInria(vtkViewImage3D::New())
@@ -14,7 +14,7 @@ InriaRep3D::InriaRep3D(const std::string& uid, const std::string& name) :
 }
 InriaRep3D::~InriaRep3D()
 {}
-std::string InriaRep3D::getType() const
+QString InriaRep3D::getType() const
 {
   return mType;
 }
