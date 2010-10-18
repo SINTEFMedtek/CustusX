@@ -44,10 +44,10 @@ public:
     {};
   }; ///< struct representing a rgb color
 
-  static LandmarkRepPtr New(const std::string& uid, const std::string& name=""); ///constructor
+  static LandmarkRepPtr New(const QString& uid, const QString& name=""); ///constructor
   virtual ~LandmarkRep(); ///< empty
 
-  virtual std::string getType() const;
+  virtual QString getType() const;
 
   void setColor(RGB_ color); ///< sets the reps color
   void setTextScale(int& x, int& y,int& z); ///< default is (20,20,20)
@@ -56,31 +56,31 @@ public:
   ssc::ImagePtr getImage() const; ///< returns a pointer to the image being used
 
 public slots:
-  void landmarkAddedSlot(std::string );
-  void landmarkRemovedSlot(std::string);
+  void landmarkAddedSlot(QString );
+  void landmarkRemovedSlot(QString);
   void transformChangedSlot();
 
 protected:
-  LandmarkRep(const std::string& uid, const std::string& name=""); ///< sets default text scaling to 20
+  LandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-  void addPoint(ssc::Vector3D coord, std::string caption);
+  void addPoint(ssc::Vector3D coord, QString caption);
   void clearAll();
   void addAll();
-  void setPosition(ssc::Vector3D coord, std::string uid);
+  void setPosition(ssc::Vector3D coord, QString uid);
 
 protected slots:
   void internalUpdate(); ///< updates the text, color, scale etc
 
 protected:
-  std::string     mType;          ///< description of this reps type
+  QString     mType;          ///< description of this reps type
   RGB_            mColor;         ///< the color of the landmark actors
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
   bool            mShowLandmarks; ///< whether or not the actors should be showed in (all) views
   int             mTextScale[3];  ///< the textscale
 
-  std::map<std::string, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
-  std::map<std::string, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
+  std::map<QString, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
+  std::map<QString, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
 
 private:
   LandmarkRep(); ///< not implemented

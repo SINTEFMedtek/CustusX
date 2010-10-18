@@ -7,7 +7,7 @@
 namespace cx
 {
 
-FileCopied::FileCopied(const std::string& absolutefilePath, const std::string& relativefilePath, ssc::DataPtr data) :
+FileCopied::FileCopied(const QString& absolutefilePath, const QString& relativefilePath, ssc::DataPtr data) :
   mFilePath(absolutefilePath),
   mRelativeFilePath(relativefilePath),
   mData(data)
@@ -17,10 +17,10 @@ void FileCopied::areFileCopiedSlot()
 {
   //messageMan()->sendInfo("Check if file is copied: "+mFilePath);
 
-  QFile file(QString::fromStdString(mFilePath));
+  QFile file(mFilePath);
 
   bool correctCopy = false;
-  QFileInfo fileInfo(mFilePath.c_str());
+  QFileInfo fileInfo(mFilePath);
   QString fileType = fileInfo.suffix();
 
   if (!file.exists() || !file.open(QIODevice::NotOpen|QIODevice::ReadOnly))
@@ -66,7 +66,7 @@ void FileCopied::areFileCopiedSlot()
           rx.indexIn(sLine);
           rx.pos();
           QString elementType = rx.cap();
-          ssc::messageManager()->sendInfo("ElementType: "+elementType.toStdString());
+          ssc::messageManager()->sendInfo("ElementType: "+elementType);
           if(elementType=="MET_USHORT") //16 bit
             elementSize = 2;
           else if(elementType=="MET_SHORT")
@@ -90,7 +90,7 @@ void FileCopied::areFileCopiedSlot()
     else
     {
       QRegExp rxFileype;
-      QString rawFilepath = QString::fromStdString(mFilePath);
+      QString rawFilepath = mFilePath;
       if(rawFilepath.endsWith(".mhd"))
         rxFileype.setPattern("\\.mhd");
       else if(rawFilepath.endsWith(".mha"))
@@ -101,7 +101,7 @@ void FileCopied::areFileCopiedSlot()
 
       //Test if raw file is large enough
       if(rawFile.bytesAvailable() < (numElements * elementSize))
-        ssc::messageManager()->sendWarning("File is not copied correctly: "+rawFilepath.toStdString()+" Parts missing");
+        ssc::messageManager()->sendWarning("File is not copied correctly: "+rawFilepath+" Parts missing");
       else
         correctCopy = true;
 

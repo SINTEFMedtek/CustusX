@@ -25,7 +25,7 @@ class View2D : public ssc::View
 {
   Q_OBJECT
 public:
-  View2D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
+  View2D(const QString& uid, const QString& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
   virtual ~View2D(); ///< empty
 
   virtual Type getType() const { return VIEW_2D;}; ///< get the class type

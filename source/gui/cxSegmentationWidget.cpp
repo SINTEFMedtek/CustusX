@@ -301,7 +301,7 @@ QString RegisterI2IWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void RegisterI2IWidget::fixedImageSlot(const std::string uid)
+void RegisterI2IWidget::fixedImageSlot(const QString uid)
 {
   mFixedImage = ssc::dataManager()->getImage(uid);
   if(!mFixedImage)
@@ -309,7 +309,7 @@ void RegisterI2IWidget::fixedImageSlot(const std::string uid)
   mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed image: <b>"+mFixedImage->getName()+"</b></font>"));
 }
 
-void RegisterI2IWidget::movingImageSlot(const std::string uid)
+void RegisterI2IWidget::movingImageSlot(const QString uid)
 {
   mMovingImage = ssc::dataManager()->getImage(uid);
   if(!mMovingImage)

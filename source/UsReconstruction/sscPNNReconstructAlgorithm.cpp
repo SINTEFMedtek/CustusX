@@ -81,8 +81,8 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
   
   if(inputDims[2] != static_cast<int>(frameInfo.size()))
     messageManager()->sendWarning("inputDims[2] != frameInfo.size()" 
-                                  + string_cast(inputDims[2]) + " != " 
-                                  + string_cast(frameInfo.size()));
+                                  + qstring_cast(inputDims[2]) + " != "
+                                  + qstring_cast(frameInfo.size()));
   
   ssc::Vector3D inputSpacing(input->getSpacing());
   ssc::Vector3D outputSpacing(tempOutput->GetSpacing());
@@ -158,19 +158,19 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
      || (outputDims[1] != inputDims[1])
      || (outputDims[2] != inputDims[2]))
     messageManager()->sendWarning("outputDims != inputDims. output: " +
-                                  string_cast(outputDims[0]) + " " +
-                                  string_cast(outputDims[1]) + " " +
-                                  string_cast(outputDims[2]) + " input: " +
-                                  string_cast(inputDims[0]) + " " +
-                                  string_cast(inputDims[1]) + " " +
-                                  string_cast(inputDims[2]));
+                                  qstring_cast(outputDims[0]) + " " +
+                                  qstring_cast(outputDims[1]) + " " +
+                                  qstring_cast(outputDims[2]) + " input: " +
+                                  qstring_cast(inputDims[0]) + " " +
+                                  qstring_cast(inputDims[1]) + " " +
+                                  qstring_cast(inputDims[2]));
   
   
   //ssc::Vector3D spacing(output->GetSpacing());
   // Assume output spacing is equal in all directions
   //int interpolationSteps = static_cast<int>((mInterpolationDistanceOption->getValue() / spacing[0]) + 0.5);
   int interpolationSteps = static_cast<int>(mInterpolationStepsOption->getValue());
-  messageManager()->sendInfo("interpolationSteps: "+ string_cast(interpolationSteps));
+  messageManager()->sendInfo("interpolationSteps: "+ qstring_cast(interpolationSteps));
   
   // Traverse all voxels
   for (int x = 0; x < outputDims[0]; x++)

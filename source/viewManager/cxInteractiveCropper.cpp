@@ -66,8 +66,8 @@ public:
 
 InteractiveCropper::InteractiveCropper()
 {
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(imageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 
   mBoxWidget = vtkBoxWidgetPtr::New();
   mBoxWidget->RotationEnabledOff();
