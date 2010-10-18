@@ -153,6 +153,7 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 	{
 		std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
 		return factor;
+		//return 1.0;
 	}	
 	return 1.0;
 }
@@ -183,6 +184,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 	if (fabs(1.0-mResampleFactor)>0.01) // resampling
 	{
 		vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+		resampler->SetInterpolationModeToLinear();
 		resampler->SetAxisMagnificationFactor(0, mResampleFactor);
 		resampler->SetAxisMagnificationFactor(1, mResampleFactor);
 		resampler->SetAxisMagnificationFactor(2, mResampleFactor);
