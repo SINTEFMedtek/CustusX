@@ -72,6 +72,18 @@ void RegistrationWidget::activeImageChangedSlot()
 
 void RegistrationWidget::cellClickedSlot(int row, int column)
 {
+  if(row < 0 || column < 0)
+  {
+    ssc::messageManager()->sendWarning("Cell clicked is invalid! Returning.");
+     return;
+  }
+
+  if(!mLandmarkTableWidget)
+    ssc::messageManager()->sendDebug("mLandmarkTableWidget is null");
+
+  std::cout << "row: " <<  row << " col: " << column << std::endl;
+  std::cout << "Objectname: " << this->objectName() << std::endl;
+
   mActiveLandmark = string_cast(mLandmarkTableWidget->item(row, column)->data(Qt::UserRole).toString());
 }
 
