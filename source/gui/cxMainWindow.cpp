@@ -43,6 +43,7 @@
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
 #include "cxCameraControl.h"
+#include "cxControlPanel.h"
 
 namespace cx
 {
@@ -67,6 +68,7 @@ MainWindow::MainWindow() :
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
+  mControlPanel(NULL),
   mSettings(DataLocations::getSettings())
 {
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
@@ -205,6 +207,9 @@ void MainWindow::createActions()
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
   connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
+
+  mShowControlPanelAction = new QAction("Show Control Panel", this);
+  connect(mShowControlPanelAction, SIGNAL(triggered()), this, SLOT(showControlPanelActionSlot()));
 
   // Application
   mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
@@ -397,6 +402,14 @@ void MainWindow::resetDesktopSlot()
   this->onWorkflowStateChangedSlot();
 }
 
+void MainWindow::showControlPanelActionSlot()
+{
+  if (!mControlPanel)
+    mControlPanel = new ControlPanel(this);
+  mControlPanel->show();
+}
+
+
 void MainWindow::loadPatientFileSlot()
 {
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
@@ -554,6 +567,8 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mDeleteDataAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
+  mFileMenu->addSeparator();
+  mFileMenu->addAction(mShowControlPanelAction);
 
   // View
   QMenu* popupMenu = this->createPopupMenu();

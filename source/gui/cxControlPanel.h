@@ -20,7 +20,7 @@ public:
   ControlPanel(QWidget* parent);
   ~ControlPanel();
 private:
-  void addAsDockWidget(QWidget* widget);
+  void addAsDockWidget(QWidget* widget, bool visible);
 };
 
 } // namespace cx
