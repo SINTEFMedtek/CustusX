@@ -57,6 +57,8 @@ protected slots:
   void savePatientFileSlot();///< Save all application data to XML file
   void clearPatientSlot();///< clear current patient (debug)
 
+  void showControlPanelActionSlot();
+
   // application
   void onApplicationStateChangedSlot();
   //workflow
@@ -113,6 +115,8 @@ protected:
   QMenu* mLayoutMenu;     ///< menu for changing view layouts
   QMenu* mNavigationMenu; ///< menu for navigation and interaction
   QMenu* mHelpMenu;
+
+  QAction* mShowControlPanelAction;
 
   //actions and actiongroups
   QAction* mAboutAction;
@@ -175,6 +179,7 @@ protected:
   class VolumePropertiesWidget*                 mVolumePropertiesWidget;
   class CustomStatusBar*                        mCustomStatusBar;
   class FrameTreeWidget*                        mFrameTreeWidget;
+  class ControlPanel*                           mControlPanel;
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
