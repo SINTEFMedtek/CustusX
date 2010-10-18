@@ -51,10 +51,10 @@ public:
   static MessageManager* getInstance(); ///< Returns a reference to the only MessageManager that exists.
   static void destroyInstance(); ///< Should be called by the object that made the MessageManager.
 
-  void sendInfo(std::string info); ///< Used to report successful operations.
-  void sendWarning(std::string warning); ///< The program does not need to terminate, but the user might need to do something.
-  void sendError(std::string error); ///< The program (might) need to terminate
-  void sendDebug(std::string text); ///< Used to output debug info
+  void sendInfo(QString info); ///< Used to report successful operations.
+  void sendWarning(QString warning); ///< The program does not need to terminate, but the user might need to do something.
+  void sendError(QString error); ///< The program (might) need to terminate
+  void sendDebug(QString text); ///< Used to output debug info
   void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0);
 
   void setCoutFlag(bool onlyCout);///< Tell the MessageManager if messages only should be dumped to cout. Set to false to allow MessageManager to emit messages.

@@ -23,6 +23,7 @@
 #include <vtkRenderer.h>
 #include <vtkCursor2D.h>
 #include <vtkLeaderActor2D.h>
+#include "sscTypeConversions.h"
 
 #include "sscBoundingBox3D.h"
 
@@ -271,11 +272,11 @@ vtkActor2DPtr  CrossHair2D::getActor()
 // --------------------------------------------------------
 // TEXT DISPLAY CLASS
 // --------------------------------------------------------
-TextDisplay::TextDisplay( const std::string& text, const Vector3D& color, int fontsize )
+TextDisplay::TextDisplay( const QString& text, const Vector3D& color, int fontsize )
 {
 	Vector3D c = color;
 	mapper = vtkTextMapperPtr::New();
-	mapper->SetInput( text.c_str() );
+	mapper->SetInput( cstring_cast(text) );
 	mapper->GetTextProperty()-> SetColor( c.begin() );
 	mapper->GetTextProperty()-> SetFontSize( fontsize );
 
@@ -296,9 +297,9 @@ void TextDisplay::setPosition( float x, float y  )
 	actor->SetPosition( x, y );
 }
 
-void TextDisplay::updateText( const std::string& text)
+void TextDisplay::updateText( const QString& text)
 {
-	mapper->SetInput( text.c_str() );
+	mapper->SetInput( cstring_cast(text) );
 	//mapper->Update();
 }
 vtkTextProperty* TextDisplay::textProperty()
@@ -364,9 +365,9 @@ vtkProp3DPtr Axes3D::getProp()
 	return mAxes;
 }
 
-void Axes3D::setCaption(vtkCaptionActor2D* captionActor, const std::string& caption, RGBColor color)
+void Axes3D::setCaption(vtkCaptionActor2D* captionActor, const QString& caption, RGBColor color)
 {
-	captionActor->SetCaption(caption.c_str());
+	captionActor->SetCaption(cstring_cast(caption));
 	captionActor->GetCaptionTextProperty()->SetColor(color.begin());
 
 	double fontsize = 0.02;

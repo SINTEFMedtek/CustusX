@@ -1,9 +1,10 @@
 #include "sscRepImpl.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
 
-RepImpl::RepImpl(const std::string& uid, const std::string& name) :
+RepImpl::RepImpl(const QString& uid, const QString& name) :
 	mName(name), mUid(uid)
 {
 }
@@ -12,17 +13,17 @@ RepImpl::~RepImpl()
 {
 }
 
-void RepImpl::setName(std::string name)
+void RepImpl::setName(QString name)
 {
 	mName = name;
 }
 
-std::string RepImpl::getName() const
+QString RepImpl::getName() const
 {
 	return mName;
 }
 
-std::string RepImpl::getUid() const
+QString RepImpl::getUid() const
 {
 	return mUid;
 }

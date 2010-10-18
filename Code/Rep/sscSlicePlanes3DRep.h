@@ -83,9 +83,9 @@ class SlicePlanes3DRep : public ssc::RepImpl
 {
 	Q_OBJECT
 public:
-	static SlicePlanes3DRepPtr New(const std::string& uid, const std::string& name="");
+	static SlicePlanes3DRepPtr New(const QString& uid, const QString& name="");
 	virtual ~SlicePlanes3DRep();
-	virtual std::string getType() const { return "ssc::SlicePlanes3DRep"; }
+	virtual QString getType() const { return "ssc::SlicePlanes3DRep"; }
 	void setProxy(SlicePlanesProxyPtr proxy);
   SlicePlanesProxyPtr getProxy() { return mProxy; }
 
@@ -105,7 +105,7 @@ private:
 	typedef std::map<PLANE_TYPE, DataType> DataMap;
 	DataMap mData;
 
-	 SlicePlanes3DRep(const std::string& uid, const std::string& name="");
+	 SlicePlanes3DRep(const QString& uid, const QString& name="");
 	 void clearActors();
 //	  void setVisibility(DataType data);
 	  SlicePlanesProxyPtr mProxy;
@@ -120,9 +120,9 @@ class SlicePlanes3DMarkerIn2DRep : public ssc::RepImpl
 {
 	Q_OBJECT
 public:
-	static SlicePlanes3DMarkerIn2DRepPtr New(const std::string& uid, const std::string& name="");
+	static SlicePlanes3DMarkerIn2DRepPtr New(const QString& uid, const QString& name="");
 	virtual ~SlicePlanes3DMarkerIn2DRep();
-	virtual std::string getType() const { return "ssc::SlicePlanes3DMarkerIn2DRep"; }
+	virtual QString getType() const { return "ssc::SlicePlanes3DMarkerIn2DRep"; }
 	void setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy);
 	SlicePlanesProxyPtr getProxy() { return mProxy; }
 	
@@ -132,7 +132,7 @@ protected:
 private slots:
 	void changedSlot();
 private:
-	SlicePlanes3DMarkerIn2DRep(const std::string& uid, const std::string& name="");
+	SlicePlanes3DMarkerIn2DRep(const QString& uid, const QString& name="");
 	SlicePlanesProxyPtr mProxy;
 	//ssc::GraphicalPoint3DPtr mPoint;
 	//OffsetPointPtr mPoint;

@@ -10,7 +10,7 @@
 namespace ssc
 {
 
-DisplayTextRep::DisplayTextRep(const std::string& uid, const std::string& name=""):
+DisplayTextRep::DisplayTextRep(const QString& uid, const QString& name=""):
 	RepImpl(uid,name)
 {
 }
@@ -19,7 +19,7 @@ DisplayTextRep::~DisplayTextRep()
 {
 
 }
-DisplayTextRepPtr DisplayTextRep::New(const std::string& uid, const std::string& name="")
+DisplayTextRepPtr DisplayTextRep::New(const QString& uid, const QString& name="")
 {
 	DisplayTextRepPtr retval(new DisplayTextRep(uid, name));
 	retval->mSelf = retval;
@@ -44,7 +44,7 @@ void DisplayTextRep::removeRepActorsFromViewRenderer(View* view)
 /**Add a text with give RGB color at pos.
  * pos is in normalized view space.
  */
-void DisplayTextRep::addText(const Vector3D& color, const std::string& text, const Vector3D& pos)
+void DisplayTextRep::addText(const Vector3D& color, const QString& text, const Vector3D& pos)
 {
 	Vector3D c = color;
 	TextDisplayPtr textRep;
@@ -64,7 +64,7 @@ void DisplayTextRep::addText(const Vector3D& color, const std::string& text, con
 /**Set a text previously set with addText.
  *
  */
-void DisplayTextRep::setText(unsigned i, const std::string& text)
+void DisplayTextRep::setText(unsigned i, const QString& text)
 {
 	if (i<mDisplayText.size())
 		mDisplayText[i]->updateText(text);	

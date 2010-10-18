@@ -2,7 +2,7 @@
 #define SSCTESTUTILITIES_H_
 
 #include <string>
-
+#include <QString>
 #include "sscConfig.h"
 
 namespace ssc
@@ -10,22 +10,22 @@ namespace ssc
 
 struct TestUtilities
 {
-	static inline std::string GetDataRoot();
-	static inline std::string ExpandDataFileName(std::string fileName);
+	static inline QString GetDataRoot();
+	static inline QString ExpandDataFileName(QString fileName);
 };
 
 inline
-std::string TestUtilities::GetDataRoot()
+QString TestUtilities::GetDataRoot()
 {
-	std::string dataRoot = SSC_DATA_ROOT;
+	QString dataRoot = SSC_DATA_ROOT;
 	return dataRoot;
 }
 
 inline
-std::string TestUtilities::ExpandDataFileName(std::string fileName)
+QString TestUtilities::ExpandDataFileName(QString fileName)
 {
-	std::string dataRoot = SSC_DATA_ROOT;
-	std::string expandedName = dataRoot + fileName;
+	QString dataRoot = SSC_DATA_ROOT;
+	QString expandedName = dataRoot + fileName;
 	return expandedName;
 }
 

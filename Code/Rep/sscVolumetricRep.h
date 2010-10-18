@@ -39,7 +39,7 @@ public:
 signals:
 	void internalVolumeChanged(); ///< emitted when the internal vtkVolume has been replaced with a new one (happens with ProgressiveLODVolumetricRep)
 protected:
-	VolumetricBaseRep(const std::string& uid, const std::string& name) : RepImpl(uid,name) {}
+	VolumetricBaseRep(const QString& uid, const QString& name) : RepImpl(uid,name) {}
 };
 
 /**Representation for one Image.
@@ -54,8 +54,8 @@ class VolumetricRep : public VolumetricBaseRep
 public:
 	virtual ~VolumetricRep();
 
-	static VolumetricRepPtr New(const std::string& uid, const std::string& name="");
-	virtual std::string getType() const { return "ssc::VolumetricRep"; }
+	static VolumetricRepPtr New(const QString& uid, const QString& name="");
+	virtual QString getType() const { return "ssc::VolumetricRep"; }
 	virtual void setImage(ImagePtr image); ///< set the reps image
 	virtual ImagePtr getImage(); ///< get the reps image
 	virtual bool hasImage(ImagePtr image) const; ///< check if the reps has the image
@@ -66,7 +66,7 @@ public:
 	static double computeResampleFactor(long maxVoxels, ssc::ImagePtr image);
 	
 protected:
-	VolumetricRep(const std::string& uid, const std::string& name="");
+	VolumetricRep(const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

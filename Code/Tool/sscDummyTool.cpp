@@ -33,7 +33,7 @@ namespace ssc
 
 int DummyTool::mTransformCount = 0;
 
-DummyTool::DummyTool(const std::string& uid) :
+DummyTool::DummyTool(const QString& uid) :
 	mVisible(false),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer()),
@@ -80,7 +80,7 @@ Tool::Type DummyTool::getType() const
 	return TOOL_NONE;
 }
 
-std::string DummyTool::getGraphicsFileName() const
+QString DummyTool::getGraphicsFileName() const
 {
 	//return "DummyToolsDoNotHaveAGraphicsFile";
 
@@ -94,7 +94,7 @@ void DummyTool::saveTransformsAndTimestamps()
 {
 	std::cout << "DummyTools are to dumb to save themselves..." << std::endl;
 }
-void DummyTool::setTransformSaveFile(const std::string& filename)
+void DummyTool::setTransformSaveFile(const QString& filename)
 {
 	mTransformSaveFileName = filename;
 }
@@ -106,11 +106,11 @@ bool DummyTool::getVisible() const
 {
 	return mVisible;
 }
-std::string DummyTool::getUid() const
+QString DummyTool::getUid() const
 {
 	return mUid;
 }
-std::string DummyTool::getName() const
+QString DummyTool::getName() const
 {
 	return mName;
 }

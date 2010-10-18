@@ -11,7 +11,7 @@
 namespace ssc
 {
 
-SliceRepSW::SliceRepSW(const std::string& uid) :
+SliceRepSW::SliceRepSW(const QString& uid) :
 	RepImpl(uid)
 {
 	mImageSlicer.reset(new SlicedImageProxy());
@@ -23,7 +23,7 @@ SliceRepSW::~SliceRepSW()
 {
 }
 
-SliceRepSWPtr SliceRepSW::New(const std::string& uid)
+SliceRepSWPtr SliceRepSW::New(const QString& uid)
 {
 	SliceRepSWPtr retval(new SliceRepSW(uid));
 	retval->mSelf = retval;
@@ -56,7 +56,7 @@ void SliceRepSW::setImage( ImagePtr image )
 	}
 }
 
-std::string SliceRepSW::getImageUid()const
+QString SliceRepSW::getImageUid()const
 {
 	return mImageSlicer->getImage() ? mImageSlicer->getImage()->getUid() : "";  
 }

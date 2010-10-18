@@ -34,16 +34,16 @@ class GeometricRep2D : public RepImpl
 public:
 	virtual ~GeometricRep2D();
 
-	static GeometricRep2DPtr New(const std::string& uid, const std::string& name="");
+	static GeometricRep2DPtr New(const QString& uid, const QString& name="");
 
-	virtual std::string getType() const { return "ssc::GeometricRep2D"; } ///< gives this reps type
+	virtual QString getType() const { return "ssc::GeometricRep2D"; } ///< gives this reps type
 	void setMesh(MeshPtr mesh); ///< sets this reps mesh
 	MeshPtr getMesh(); ///< gives this reps mesh
 	bool hasMesh(MeshPtr mesh) const; ///< checks if this rep has the give mesh
   void setSliceProxy(ssc::SliceProxyPtr slicer);
 
 protected:
-	GeometricRep2D(const std::string& uid, const std::string& name);
+	GeometricRep2D(const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

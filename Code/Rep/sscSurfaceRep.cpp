@@ -14,7 +14,7 @@
 namespace ssc
 {
 
-SurfaceRep::SurfaceRep(const std::string& uid) :
+SurfaceRep::SurfaceRep(const QString& uid) :
 	RepImpl(uid)
 {
 
@@ -47,7 +47,7 @@ SurfaceRep::~SurfaceRep()
 {
 }
 	
-SurfaceRepPtr SurfaceRep::New(const std::string& uid)
+SurfaceRepPtr SurfaceRep::New(const QString& uid)
 {
 	SurfaceRepPtr retval(new SurfaceRep(uid));
 	retval->mSelf = retval;

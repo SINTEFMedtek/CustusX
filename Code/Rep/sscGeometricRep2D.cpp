@@ -21,7 +21,7 @@
 namespace ssc
 {
 
-GeometricRep2D::GeometricRep2D(const std::string& uid, const std::string& name) :
+GeometricRep2D::GeometricRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
   mNormals = vtkPolyDataNormalsPtr::New();
@@ -57,7 +57,7 @@ GeometricRep2D::GeometricRep2D(const std::string& uid, const std::string& name) 
 }
 GeometricRep2D::~GeometricRep2D()
 {}
-GeometricRep2DPtr GeometricRep2D::New(const std::string& uid, const std::string& name)
+GeometricRep2DPtr GeometricRep2D::New(const QString& uid, const QString& name)
 {
 	GeometricRep2DPtr retval(new GeometricRep2D(uid, name));
 	retval->mSelf = retval;

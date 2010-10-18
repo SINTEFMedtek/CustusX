@@ -28,7 +28,7 @@ class SliceProxy : public QObject
 {
 	Q_OBJECT
 public:
-	static SliceProxyPtr New(const std::string& name);
+	static SliceProxyPtr New(const QString& name);
 	SliceProxy();
 	virtual ~SliceProxy();
 
@@ -37,7 +37,7 @@ public:
 	void setPlane(PLANE_TYPE plane );
 	void setFollowType(FOLLOW_TYPE followType);
 	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset);
-	std::string getName() const;
+	QString getName() const;
 	
 	void setGravity(bool use, const Vector3D& dir);
 	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset); 
@@ -68,7 +68,7 @@ private:
 	ToolPtr mTool;
 	boost::scoped_ptr<SliceComputer> mCutplane;
 	Vector3D mDefaultCenter; ///< use this center when no tool is available
-	std::string mName; ///< for debug
+	QString mName; ///< for debug
 };
 
 }

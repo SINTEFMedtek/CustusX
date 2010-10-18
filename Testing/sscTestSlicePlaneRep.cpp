@@ -57,12 +57,12 @@ TestSlicePlaneRep::TestSlicePlaneRep()
 }
 TestSlicePlaneRep::~TestSlicePlaneRep()
 {}
-void TestSlicePlaneRep::generateView(const std::string& uid)
+void TestSlicePlaneRep::generateView(const QString& uid)
 {
 	mLayouts[uid].mView = new ssc::View();
 }
 
-void TestSlicePlaneRep::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
+void TestSlicePlaneRep::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	proxy->setTool(tool);
@@ -80,7 +80,7 @@ void TestSlicePlaneRep::generateSlice(const std::string& uid, ssc::ToolPtr tool,
 	//mLayouts[uid].mView->addRep(rep);
 }
 
-ssc::View* TestSlicePlaneRep::view(const std::string& uid)
+ssc::View* TestSlicePlaneRep::view(const QString& uid)
 {
 	return mLayouts[uid].mView;
 }
@@ -91,9 +91,9 @@ void TestSlicePlaneRep::start()
 	mWidget->setLayout(mainLayout);
 
 	// generate imageFileName
-	std::string imageFileName2 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
-	//std::string imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
+	QString imageFileName2 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	QString imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	//QString imageFileName1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
 	std::cout << imageFileName1 << std::endl;
 	std::cout << imageFileName2 << std::endl;
 	

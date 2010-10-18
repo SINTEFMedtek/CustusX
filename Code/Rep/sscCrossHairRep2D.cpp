@@ -18,7 +18,7 @@
 namespace ssc
 {
 
-CrossHairRep2D::CrossHairRep2D(const std::string& uid, const std::string& name) :
+CrossHairRep2D::CrossHairRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
 }
@@ -27,14 +27,14 @@ CrossHairRep2D::~CrossHairRep2D()
 {
 }
 
-CrossHairRep2DPtr CrossHairRep2D::New(const std::string& uid, const std::string& name)
+CrossHairRep2DPtr CrossHairRep2D::New(const QString& uid, const QString& name)
 {
 	CrossHairRep2DPtr retval(new CrossHairRep2D(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-std::string CrossHairRep2D::getType() const
+QString CrossHairRep2D::getType() const
 {
 	return "vm::CrossHairRep2D";
 }

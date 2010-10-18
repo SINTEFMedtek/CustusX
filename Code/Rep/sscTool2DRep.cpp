@@ -26,7 +26,7 @@
 namespace ssc
 {
 
-ToolRep2D::ToolRep2D(const std::string& uid, const std::string& name) :
+ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mBB_vp(0,1,0,1,0,1)
 {
@@ -45,14 +45,14 @@ ToolRep2D::~ToolRep2D()
 {
 }
 
-ToolRep2DPtr ToolRep2D::New(const std::string& uid, const std::string& name)
+ToolRep2DPtr ToolRep2D::New(const QString& uid, const QString& name)
 {
 	ToolRep2DPtr retval(new ToolRep2D(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-std::string ToolRep2D::getType() const
+QString ToolRep2D::getType() const
 {
 	return "vm::ToolRep2D";
 }
@@ -309,7 +309,7 @@ void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPo
  */
 void ToolRep2D::createOffsetText(vtkRendererPtr renderer, const Vector3D& pos )
 {
-	std::string text;
+	QString text;
 	Vector3D color(0.7372, 0.815, 0.6039);
 	distanceText.reset( new TextDisplay( "---", color, 18) );
 	distanceText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -366,7 +366,7 @@ void ToolRep2D::updateOffsetText()
 		char buffer[100];
 		//snprintf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
 		printf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
-		std::string text = buffer;
+		QString text = buffer;
 		distanceText->updateText( text );
 		distanceText->getActor()->VisibilityOn();
 	}

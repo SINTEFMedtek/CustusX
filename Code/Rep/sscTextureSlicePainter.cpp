@@ -119,13 +119,13 @@ public:
 			lutSize = mLutBuffer->getLutSize();
 		}
 
-		shader->GetUniformVariables()->SetUniformi(cstring_cast("texture"+string_cast(mIndex)), 1, &texture);
-		shader->GetUniformVariables()->SetUniformi(cstring_cast("lut"+string_cast(mIndex)), 1, &lut);
-		shader->GetUniformVariables()->SetUniformi(cstring_cast("lutsize"+string_cast(mIndex)), 1, &lutSize);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("llr"+string_cast(mIndex)), 1, &mLLR);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("level"+string_cast(mIndex)), 1, &mLevel);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("window"+string_cast(mIndex)), 1, &mWindow);
-		shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+string_cast(mIndex)), 1, &mAlpha);
+		shader->GetUniformVariables()->SetUniformi(cstring_cast("texture"+qstring_cast(mIndex)), 1, &texture);
+		shader->GetUniformVariables()->SetUniformi(cstring_cast("lut"+qstring_cast(mIndex)), 1, &lut);
+		shader->GetUniformVariables()->SetUniformi(cstring_cast("lutsize"+qstring_cast(mIndex)), 1, &lutSize);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast("llr"+qstring_cast(mIndex)), 1, &mLLR);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast("level"+qstring_cast(mIndex)), 1, &mLevel);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast("window"+qstring_cast(mIndex)), 1, &mWindow);
+		shader->GetUniformVariables()->SetUniformf(cstring_cast("alpha"+qstring_cast(mIndex)), 1, &mAlpha);
 		report_gl_error();
 	}
 
@@ -184,7 +184,7 @@ TextureSlicePainter::TextureSlicePainter()
 	{
 		fp.open(QFile::ReadOnly);
 		QTextStream shaderfile(&fp);
-		mSource = shaderfile.readAll().toStdString();
+		mSource = shaderfile.readAll();
 		fp.close();
 	}
 	else
@@ -250,7 +250,7 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 
 		vtkShader2Ptr s2 = vtkShader2Ptr::New();
 		s2->SetType(VTK_SHADER_TYPE_FRAGMENT);
-		s2->SetSourceCode(mSource.c_str());
+		s2->SetSourceCode(cstring_cast(mSource));
 		s2->SetContext(pgm->GetContext());
 		pgm->GetShaders()->AddItem(s2);
 		mInternals->Shader = pgm;
@@ -320,7 +320,7 @@ bool TextureSlicePainter::CanRender(vtkRenderer*, vtkActor*)
 	return true;
 }
 
-bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, std::string id)
+bool TextureSlicePainter::LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id)
 {
 	bool loaded = mgr->LoadSupportedExtension(cstring_cast(id));
 	if (!loaded)

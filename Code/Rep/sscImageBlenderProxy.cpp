@@ -193,7 +193,7 @@ vtkImageDataPtr ImageBlenderProxy::getOutput()
 
 void ImageBlenderProxy::removeImage(ImagePtr image)
 {
-	std::string uid = image->getUid();
+	QString uid = image->getUid();
 	for(unsigned int i = 0; i<mImages.size(); ++i)
 	{
 		if( uid == mImages[i]->getUid())

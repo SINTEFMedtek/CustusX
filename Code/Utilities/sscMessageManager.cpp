@@ -101,7 +101,7 @@ public:
   //    virtual int_type overflow(int_type meta=traits_type::eof());
 private:
   bool mEnabledRedirect;
-  std::string mBuffer;
+  QString mBuffer;
   std::streambuf* mOrig;
   MESSAGE_LEVEL mMessageLevel;
 };
@@ -166,28 +166,24 @@ void MessageManager::destroyInstance()
   delete mTheInstance;
 }
 
-void MessageManager::sendInfo(std::string info)
+void MessageManager::sendInfo(QString info)
 {
-  QString qinfo(info.c_str());
-  this->sendMessage(qinfo, mlINFO, 1500);
+  this->sendMessage(info, mlINFO, 1500);
 }
 
-void MessageManager::sendWarning(std::string warning)
+void MessageManager::sendWarning(QString warning)
 {
-  QString qwarning(warning.c_str());
-  this->sendMessage(qwarning, mlWARNING, 3000);
+  this->sendMessage(warning, mlWARNING, 3000);
 }
 
-void MessageManager::sendError(std::string error)
+void MessageManager::sendError(QString error)
 {
-  QString qerror(error.c_str());
-  this->sendMessage(qerror, mlERROR, 0);
+  this->sendMessage(error, mlERROR, 0);
 }
   
-void MessageManager::sendDebug(std::string text)
+void MessageManager::sendDebug(QString text)
 {
-  QString qdebug(text.c_str());
-  this->sendMessage(qdebug, mlDEBUG, 0);
+  this->sendMessage(text, mlDEBUG, 0);
 }
   
 void MessageManager::setCoutFlag(bool onlyCout)
@@ -219,7 +215,7 @@ void MessageManager::sendMessage(QString message, int timeout)
   //if (mOnlyCout)
   //  std::cout << string_cast(message) << std::endl;
   //else
-    emit this->emittedMessage((const QString &)message, timeout);
+    emit this->emittedMessage(QString(message), timeout);
 }
 
 

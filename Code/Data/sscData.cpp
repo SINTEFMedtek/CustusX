@@ -11,7 +11,7 @@ Data::Data() :
 {
 }
 
-Data::Data(const std::string& uid, const std::string& name) :
+Data::Data(const QString& uid, const QString& name) :
   mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED), mParentFrame("")
 {
   if(name=="")
@@ -23,24 +23,24 @@ Data::Data(const std::string& uid, const std::string& name) :
   connect(m_rMd_History.get(), SIGNAL(currentChanged()), this, SLOT(transformChangedSlot()));
 }
 /*
-Data::Data(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData) : 
+Data::Data(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) : 
 	mUID(uid), mName(name), mVtkPolyData(polyData)
 {
 }
 */
 Data::~Data()
 {}
-void Data::setUid(const std::string& uid)
+void Data::setUid(const QString& uid)
 {
 	mUid = uid;
 }
 
-void Data::setName(const std::string& name)
+void Data::setName(const QString& name)
 {
 	mName = name;
 }
 
-void Data::setFilePath(const std::string& filePath)
+void Data::setFilePath(const QString& filePath)
 {
   mFilePath = filePath;
 }
@@ -66,17 +66,17 @@ void Data::setRegistrationStatus(REGISTRATION_STATUS regStat)
 //	emit transformChanged();
 }*/
 
-std::string Data::getUid() const
+QString Data::getUid() const
 {
 	return mUid;
 }
 
-std::string Data::getName() const
+QString Data::getName() const
 {
 	return mName;
 }
 
-std::string Data::getFilePath() const
+QString Data::getFilePath() const
 {
   return mFilePath;
 }
@@ -114,12 +114,12 @@ bool Data::getShading() const
   return false;
 }
 
-std::string Data::getParentFrame()
+QString Data::getParentFrame()
 {
   return mParentFrame;
 }
 
-void Data::setParentFrame(std::string uid)
+void Data::setParentFrame(QString uid)
 {
   mParentFrame = uid;
   emit transformChanged();
@@ -132,19 +132,19 @@ void Data::addXml(QDomNode& dataNode)
   m_rMd_History->addXml(dataNode);
 
   QDomElement uidNode = doc.createElement("uid");
-  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
+  uidNode.appendChild(doc.createTextNode(mUid));
   dataNode.appendChild(uidNode);
 
   QDomElement nameNode = doc.createElement("name");
-  nameNode.appendChild(doc.createTextNode(mName.c_str()));
+  nameNode.appendChild(doc.createTextNode(mName));
   dataNode.appendChild(nameNode);
 
   QDomElement filePathNode = doc.createElement("filePath");
-  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
+  filePathNode.appendChild(doc.createTextNode(mFilePath));
   dataNode.appendChild(filePathNode);
 
   QDomElement parentFrameNode = doc.createElement("parentFrame");
-  parentFrameNode.appendChild(doc.createTextNode(mParentFrame.c_str()));
+  parentFrameNode.appendChild(doc.createTextNode(mParentFrame));
   dataNode.appendChild(parentFrameNode);
 }
 
@@ -154,7 +154,7 @@ void Data::parseXml(QDomNode& dataNode)
     return;
 
   if(!dataNode.namedItem("parentFrame").isNull())
-    mParentFrame = dataNode.namedItem("parentFrame").toElement().text().toStdString();
+    mParentFrame = dataNode.namedItem("parentFrame").toElement().text();
 
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);

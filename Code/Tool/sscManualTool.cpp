@@ -12,7 +12,7 @@
 namespace ssc
 {
 
-ManualTool::ManualTool(const std::string& uid, const std::string& name) :
+ManualTool::ManualTool(const QString& uid, const QString& name) :
     Tool(uid,name), mMutex(QMutex::Recursive)
 {
 	mOffset = 0;
@@ -55,7 +55,7 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 	emit toolTransformAndTimestamp( prMt, timestamp );
 }
 
-std::string ManualTool::getGraphicsFileName() const
+QString ManualTool::getGraphicsFileName() const
 {
 	return "";
 }
@@ -88,12 +88,12 @@ int ManualTool::getIndex() const
 	return -1;
 }
 
-std::string ManualTool::getUid() const
+QString ManualTool::getUid() const
 {
 	return mUid;
 }
 
-std::string ManualTool::getName() const
+QString ManualTool::getName() const
 {
 	return mName;
 }

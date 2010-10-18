@@ -30,7 +30,7 @@ template<class T> QString qstring_cast(const T& val)
 class cstring_cast_Placeholder
 {
 public:
-	explicit cstring_cast_Placeholder(const std::string& val) : mData(val) {}
+	explicit cstring_cast_Placeholder(const QString& val) : mData(val.toStdString()) {}
 	operator const char*() const { return mData.c_str(); }
 	const char* c() const { return mData.c_str(); }
 private:

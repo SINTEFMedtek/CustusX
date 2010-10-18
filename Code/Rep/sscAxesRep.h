@@ -22,22 +22,22 @@ class AxesRep : public RepImpl
 public:
 	virtual ~AxesRep();
 
-	static AxesRepPtr New(const std::string& uid);
+	static AxesRepPtr New(const QString& uid);
 
-	virtual std::string getType() const { return "ssc::AxesRep"; }
+	virtual QString getType() const { return "ssc::AxesRep"; }
 	void setTransform(Transform3D rMt);
 	void setFontSize(double size);
 	void setAxisLength(double length);
 	void setVisible(bool on);
 
 	void setShowAxesLabels(bool on);
-	void setCaption(const std::string& caption, const Vector3D& color);
+	void setCaption(const QString& caption, const Vector3D& color);
 
 protected:
-	AxesRep(const std::string& uid);
+	AxesRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
-	void addCaption(const std::string& label, Vector3D pos, Vector3D color);
+	void addCaption(const QString& label, Vector3D pos, Vector3D color);
 	vtkAxesActorPtr mActor;
 	vtkAssemblyPtr mAssembly;
 	std::vector<vtkCaptionActor2DPtr> mCaption;

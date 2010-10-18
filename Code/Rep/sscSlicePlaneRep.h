@@ -29,16 +29,16 @@ class SlicePlaneRep : public RepImpl
 public:
 	virtual ~SlicePlaneRep();
 
-	static SlicePlaneRepPtr New(const std::string& uid);
+	static SlicePlaneRepPtr New(const QString& uid);
 
-	virtual std::string getType() const { return "ssc::SliceRep"; }
+	virtual QString getType() const { return "ssc::SliceRep"; }
 	void setImage(ImagePtr image);
 	bool hasImage(ImagePtr image) const;
 	void setSliceProxy(SliceProxyPtr proxy);
 	void setSliceReps( std::vector<ssc::SliceRepSWPtr> slicerReps);
 	
 protected:
-	SlicePlaneRep(const std::string& uid);
+	SlicePlaneRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 	

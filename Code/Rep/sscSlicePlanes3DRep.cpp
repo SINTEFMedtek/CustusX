@@ -113,14 +113,14 @@ SlicePlanesProxy::DataMap SlicePlanesProxy::getData()
 ///--------------------------------------------------------
 
 
-SlicePlanes3DRepPtr SlicePlanes3DRep::New(const std::string& uid, const std::string& name)
+SlicePlanes3DRepPtr SlicePlanes3DRep::New(const QString& uid, const QString& name)
 {
 	SlicePlanes3DRepPtr retval(new SlicePlanes3DRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-SlicePlanes3DRep::SlicePlanes3DRep(const std::string& uid, const std::string& name) :
+SlicePlanes3DRep::SlicePlanes3DRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name), mView(NULL)
 {
 }
@@ -263,14 +263,14 @@ void SlicePlanes3DRep::setProxy(SlicePlanesProxyPtr proxy)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-SlicePlanes3DMarkerIn2DRepPtr SlicePlanes3DMarkerIn2DRep::New(const std::string& uid, const std::string& name)
+SlicePlanes3DMarkerIn2DRepPtr SlicePlanes3DMarkerIn2DRep::New(const QString& uid, const QString& name)
 {
 	SlicePlanes3DMarkerIn2DRepPtr retval(new SlicePlanes3DMarkerIn2DRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-SlicePlanes3DMarkerIn2DRep::SlicePlanes3DMarkerIn2DRep(const std::string& uid, const std::string& name) :
+SlicePlanes3DMarkerIn2DRep::SlicePlanes3DMarkerIn2DRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
 }
@@ -284,7 +284,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
 	//Logger::log("vm.log", "SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer");
 	SlicePlanesProxy::DataType baseData = mProxy->getData()[mType];
 	
-	mText.reset(new ssc::TextDisplay(string_cast(baseData.mSymbol), baseData.mColor, mProxy->getProperties().m3DFontSize));
+	mText.reset(new ssc::TextDisplay(baseData.mSymbol, baseData.mColor, mProxy->getProperties().m3DFontSize));
 	mText->textProperty()->BoldOn();
 	mText->setPosition(baseData.mPointPos_normvp);
 	mText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();

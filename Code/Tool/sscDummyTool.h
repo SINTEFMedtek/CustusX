@@ -22,17 +22,17 @@ class DummyTool : public Tool
 {
 	Q_OBJECT
 public:
-	explicit DummyTool(const std::string& uid="dummytool");
+	explicit DummyTool(const QString& uid="dummytool");
 	~DummyTool();
 	virtual Type getType() const;
-	virtual std::string getGraphicsFileName() const;
+	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps();
-	virtual void setTransformSaveFile(const std::string& filename);
+	virtual void setTransformSaveFile(const QString& filename);
 	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
-	virtual std::string getUid() const;
-	virtual std::string getName() const;
+	virtual QString getUid() const;
+	virtual QString getName() const;
 	virtual int getIndex() const{return 0;};
 	virtual bool isCalibrated() const;
 	virtual ProbeSector getProbeSector() const { return ProbeSector(); }	
@@ -66,7 +66,7 @@ private:
 
 	bool mVisible;
 	Transform3D m_prMt;
-	std::string mTransformSaveFileName;
+	QString mTransformSaveFileName;
 	QTimerPtr mTimer;
 	double mOffset;
 	std::vector<Transform3D> mTransforms;

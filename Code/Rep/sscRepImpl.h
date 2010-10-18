@@ -20,21 +20,21 @@ namespace ssc
 class RepImpl : public Rep
 {
 public:
-	RepImpl(const std::string& uid, const std::string& name="");
+	RepImpl(const QString& uid, const QString& name="");
 	virtual ~RepImpl();
-	virtual std::string getType() const = 0;
+	virtual QString getType() const = 0;
 	virtual void connectToView(View *theView);
 	virtual void disconnectFromView(View *theView);
 	virtual bool isConnectedToView(View *theView) const;
-	void setName(std::string name);
-	std::string getName() const; ///< \return a reps name
-	std::string getUid() const; ///< \return a reps unique id
+	void setName(QString name);
+	QString getName() const; ///< \return a reps name
+	QString getUid() const; ///< \return a reps unique id
 	virtual void printSelf(std::ostream & os, Indent indent);
 
 protected:
 	std::set<View *> mViews;
-	std::string mName;
-	std::string mUid;
+	QString mName;
+	QString mUid;
 	RepWeakPtr mSelf;
 	//typedef std::vector<View *>::iterator ViewsIter;
 

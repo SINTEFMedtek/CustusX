@@ -23,8 +23,8 @@ class Mesh : public Data
 {
   Q_OBJECT
 public:
-	Mesh(const std::string& uid, const std::string& name="");
-	Mesh(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData);
+	Mesh(const QString& uid, const QString& name="");
+	Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData);
 	virtual ~Mesh();
 
 	void setVtkPolyData(const vtkPolyDataPtr& polyData);

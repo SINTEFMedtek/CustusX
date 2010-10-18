@@ -14,12 +14,14 @@
 #include "sscImage.h"
 #include "sscImageTF3D.h"
 #include "sscSlicePlaneClipper.h"
+#include "sscTypeConversions.h"
+
 
 typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
 
 namespace ssc
 {
-VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
+VolumetricRep::VolumetricRep(const QString& uid, const QString& name) :
 	VolumetricBaseRep(uid, name),
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
@@ -74,7 +76,7 @@ VolumetricRep::VolumetricRep(const std::string& uid, const std::string& name) :
 }
 VolumetricRep::~VolumetricRep()
 {}
-VolumetricRepPtr VolumetricRep::New(const std::string& uid, const std::string& name)
+VolumetricRepPtr VolumetricRep::New(const QString& uid, const QString& name)
 {
 	VolumetricRepPtr retval(new VolumetricRep(uid, name));
 	retval->mSelf = retval;

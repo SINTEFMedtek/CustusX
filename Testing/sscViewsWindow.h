@@ -31,20 +31,20 @@ public:
 	ViewsWindow(QString displayText, bool showSliders);
 	virtual ~ViewsWindow();
 	
-	void setDescription(const std::string& desc);
-	void define3D(const std::string& imageFilename, int r, int c);
-	void defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
-	void defineGPUSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+	void setDescription(const QString& desc);
+	void define3D(const QString& imageFilename, int r, int c);
+	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+	void defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	bool accepted() const { return mAcceptanceBox->accepted(); }
 	
 	bool mDumpSpeedData;
 	
-	void insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c);
+	void insertView(ssc::View* view, const QString& uid, const QString& volume, int r, int c);
 private:
 	void start(bool showSliders);
-	ssc::View* generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
-	ssc::View* generateGPUSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
-	ssc::ImagePtr loadImage(const std::string& imageFilename);
+	ssc::View* generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
+	ssc::View* generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
+	ssc::ImagePtr loadImage(const QString& imageFilename);
 	
 	ssc::Transform3D get_vpMs(ssc::View* view) const;
 	ssc::DoubleBoundingBox3D getViewport(ssc::View* view) const;

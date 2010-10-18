@@ -7,12 +7,13 @@
 #include <vtkTextProperty.h>
 #include <vtkAssembly.h>
 
+#include "sscTypeConversions.h"
 #include "sscView.h"
 
 namespace ssc
 {
 
-AxesRep::AxesRep(const std::string& uid) :
+AxesRep::AxesRep(const QString& uid) :
 	RepImpl(uid)
 {
 	mAssembly = vtkAssemblyPtr::New();
@@ -47,7 +48,7 @@ void AxesRep::setShowAxesLabels(bool on)
 	}
 }
 
-void AxesRep::setCaption(const std::string& caption, const Vector3D& color)
+void AxesRep::setCaption(const QString& caption, const Vector3D& color)
 {
 	this->addCaption(caption, Vector3D(0,0,0), color);
 }
@@ -90,10 +91,10 @@ void AxesRep::setTransform(Transform3D rMt)
 	}
 }
 
-void AxesRep::addCaption(const std::string& label, Vector3D pos, Vector3D color)
+void AxesRep::addCaption(const QString& label, Vector3D pos, Vector3D color)
 {
 	vtkCaptionActor2DPtr cap = vtkCaptionActor2DPtr::New();
-	cap->SetCaption(label.c_str());
+	cap->SetCaption(cstring_cast(label));
 	cap->GetCaptionTextProperty()->SetColor(color.begin());
 	cap->LeaderOff();
 	cap->BorderOff();
@@ -107,7 +108,7 @@ AxesRep::~AxesRep()
 	// ??
 }
 
-AxesRepPtr AxesRep::New(const std::string& uid)
+AxesRepPtr AxesRep::New(const QString& uid)
 {
 	AxesRepPtr retval(new AxesRep(uid));
 	retval->mSelf = retval;

@@ -24,14 +24,14 @@ public:
 	ViewsWindow();
 	virtual ~ViewsWindow();
 	
-	void define3D(const std::string& imageFilename, int r, int c);
-	void defineGPU_3D(const std::string& imageFilename, int r, int c);
-	void defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
+	void define3D(const QString& imageFilename, int r, int c);
+	void defineGPU_3D(const QString& imageFilename, int r, int c);
+	void defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c);
 	
-	void insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c);
+	void insertView(ssc::View* view, const QString& uid, const QString& volume, int r, int c);
 private:
-	ssc::View* generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
-	ssc::ImagePtr loadImage(const std::string& imageFilename);
+	ssc::View* generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
+	ssc::ImagePtr loadImage(const QString& imageFilename);
 	
 	typedef std::set<ssc::View*> LayoutMap;
 	std::set<ssc::View*> mLayouts;

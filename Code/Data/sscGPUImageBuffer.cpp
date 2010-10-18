@@ -21,6 +21,7 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <boost/cstdint.hpp>
+#include <QString>
 
 #include "sscGLHelpers.h"
 
@@ -363,7 +364,7 @@ public:
 	{
 		mMaxBuffers = val;
 	}
-	void setName(const std::string& name)
+	void setName(const QString& name)
 	{
 		mName = name;
 	}
@@ -442,7 +443,7 @@ private:
 	BufferMap mRemovedData; // those buffers that are removed but still might live outside of the repo.
 	std::list<BufferStore> mData; // newest elems in front
 	unsigned mMaxBuffers;
-	std::string mName; // debug
+	QString mName; // debug
 };
 
 class GPUImageBufferRepositoryInternal

@@ -22,8 +22,8 @@ namespace ssc
 Image::~Image()
 {}
 
-Image::Image(const std::string& uid, const vtkImageDataPtr& data,
-    const std::string& name) :
+Image::Image(const QString& uid, const vtkImageDataPtr& data,
+    const QString& name) :
   Data(uid, name),
 	mBaseImageData(data)
 {
@@ -182,7 +182,7 @@ void Image::setLandmark(Landmark landmark)
   mLandmarks[landmark.getUid()] = landmark;
   emit landmarkAdded(landmark.getUid());
 }
-void Image::removeLandmark(std::string uid)
+void Image::removeLandmark(QString uid)
 {
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
@@ -245,7 +245,7 @@ void Image::printLandmarks()
 	/*for(int i=0; i<= mLandmarks->GetNumberOfTuples()-1; i++)
 	{
 		double* landmark = mLandmarks->GetTuple(i);
-		std::stringstream stream;
+		QStringstream stream;
 		stream << i << ": (";
 		stream << landmark[0];
 		stream << ",";
