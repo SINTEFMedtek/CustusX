@@ -8,7 +8,10 @@ namespace cx
 
 FastImageRegistrationWidget::FastImageRegistrationWidget(QWidget* parent) :
     ImageRegistrationWidget(parent)
-{}
+{
+  this->setObjectName("FastImageRegistrationWidget");
+  this->setWindowTitle("Fast Image Registration");
+}
 
 FastImageRegistrationWidget::~FastImageRegistrationWidget()
 {
