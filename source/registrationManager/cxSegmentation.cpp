@@ -67,8 +67,7 @@ itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
   return vtk2itkFilter->GetOutput();
 }
 
-void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
-    double decimation, bool reduceResolution, bool smoothing)
+void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation, bool reduceResolution, bool smoothing)
 {
   //itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
@@ -224,6 +223,8 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
 
 void Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
 {
+  ssc::messageManager()->sendInfo("Finding "+image->getName()+"s centerline... Please wait!");
+
   itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
   //Centerline extraction
