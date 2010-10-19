@@ -33,6 +33,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
+#include "cxRenderTimer.h"
 
 typedef vtkSmartPointer<vtkInteractorStyleFlight> vtkInteractorStyleFlightPtr;
 typedef vtkSmartPointer<vtkInteractorStyleTrackballCamera> vtkInteractorStyleTrackballCameraPtr;
@@ -68,13 +69,15 @@ ViewManager::ViewManager() :
   mMainWindowsCentralWidget(new QWidget()),
   mRenderingTimer(new QTimer(this)),
   mSettings(DataLocations::getSettings()),
-  mRenderingTime(new QTime()),
-  mNumberOfRenderings(0),
+//  mRenderingTime(new QTime()),
+//  mNumberOfRenderings(0),
   mGlobal2DZoom(true),
   mGlobalObliqueOrientation(false),
   mViewCache2D(mMainWindowsCentralWidget,"View2D"),
   mViewCache3D(mMainWindowsCentralWidget,"View3D")
 {
+  mRenderTimer.reset(new RenderTimer);
+
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
@@ -109,7 +112,7 @@ ViewManager::ViewManager() :
   mGlobalZoom2DVal = SyncedValue::create(1);
   this->setGlobal2DZoom(mGlobal2DZoom);
 
-  mRenderingTime->start();
+//  mRenderingTime->start();
 }
 
 ViewManager::~ViewManager()
@@ -525,8 +528,11 @@ void ViewManager::addDefaultLayouts()
   }
 }
 
+
 void ViewManager::renderAllViewsSlot()
 {
+  mRenderTimer->beginRender();
+
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
   {
     if(iter->second->isVisible())
@@ -538,14 +544,23 @@ void ViewManager::renderAllViewsSlot()
     }
   }
   
-  if(mRenderingTime->elapsed()>1000)
+
+  mRenderTimer->endRender();
+
+  if (mRenderTimer->getTime()->elapsed()>1000)
   {
-    emit fps(mNumberOfRenderings);
-    mRenderingTime->restart();
-    mNumberOfRenderings = 1;
+    emit fps(mRenderTimer->getRenderCount());
+    mRenderTimer->reset();
   }
-  else
-    mNumberOfRenderings++;
+
+//  if(mRenderingTime->elapsed()>1000)
+//  {
+//    emit fps(mNumberOfRenderings);
+//    mRenderingTime->restart();
+//    mNumberOfRenderings = 1;
+//  }
+//  else
+//    mNumberOfRenderings++;
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const
