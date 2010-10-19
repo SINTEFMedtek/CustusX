@@ -113,7 +113,7 @@ void SegmentationWidget::toogleSmoothingSlot(bool on)
   mSmoothingSigmaLabel->setEnabled(on);
 }
 
-void SegmentationWidget::smoothingSigmaSlot(int value)
+void SegmentationWidget::smoothingSigmaSlot(double value)
 {
   mSmoothSigma = value;
 }
@@ -141,12 +141,12 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
   QLabel* smoothingLabel = new QLabel("Smoothing");
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSmoothingSlot(bool)));
 
-  mSmoothingSigmaSpinBox = new QSpinBox();
+  mSmoothingSigmaSpinBox = new QDoubleSpinBox();
   mSmoothingSigmaSpinBox->setValue(mSmoothSigma);
   mSmoothingSigmaSpinBox->setEnabled(smoothingCheckBox->isChecked());
   mSmoothingSigmaLabel = new QLabel("Smoothing sigma");
   mSmoothingSigmaLabel->setEnabled(smoothingCheckBox->isChecked());
-  connect(mSmoothingSigmaSpinBox, SIGNAL(valueChanged(int)), this, SLOT(smoothingSigmaSlot(int)));
+  connect(mSmoothingSigmaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(smoothingSigmaSlot(double)));
 
   layout->addWidget(mSegmentationThresholdSpinBox,      0, 0);
   layout->addWidget(thresholdLabel,                     0, 1);
@@ -163,7 +163,10 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
     WhatsThisWidget(parent),
-    mSurfaceThreshold(100)
+    mSurfaceThreshold(100),
+    mDecimation(0.8),
+    mReduceResolution(true),
+    mSmoothing(true)
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -213,12 +216,27 @@ void SurfaceWidget::surfaceSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
-  Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold);
+  Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, mDecimation, mReduceResolution, mSmoothing);
 }
 
 void SurfaceWidget::thresholdSlot(int value)
 {
   mSurfaceThreshold = value;
+}
+
+void SurfaceWidget::decimationSlot(double value)
+{
+  mDecimation = value;
+}
+
+void SurfaceWidget::reduceResolutionSlot(bool value)
+{
+  mReduceResolution = value;
+}
+
+void SurfaceWidget::smoothingSlot(bool value)
+{
+  mSmoothing = value;
 }
 
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
@@ -231,8 +249,22 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   QLabel* thresholdLabel = new QLabel("Threshold");
   connect(mSurfaceThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(thresholdSlot(int)));
 
+  mDecimationSpinBox = new QDoubleSpinBox();
+  mDecimationSpinBox->setValue(mDecimation);
+  QLabel* decimationLabel = new QLabel("Decimation %");
+  connect(mDecimationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(decimationSlot(double)));
+
+  QCheckBox* reduceResolutionCheckBox = new QCheckBox("reduce resolution");
+  connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
+  QCheckBox* smoothingCheckBox = new QCheckBox("smoothing");
+  connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(smoothingSlot(bool)));
+
   layout->addWidget(mSurfaceThresholdSpinBox,       0, 0);
   layout->addWidget(thresholdLabel,                 0, 1);
+  layout->addWidget(mDecimationSpinBox,             1, 0);
+  layout->addWidget(decimationLabel,                1, 1);
+  layout->addWidget(reduceResolutionCheckBox,       2, 0);
+  layout->addWidget(smoothingCheckBox,              3, 0);
 
   return retval;
 }
@@ -288,8 +320,8 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
 
 void CenterlineWidget::findCenterlineSlot()
 {
-  //TODO Call some fancy centerline algorithm
-  ssc::messageManager()->sendDebug("TODO: Find centerline not connected to algorithm yet!");
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
 }
 //------------------------------------------------------------------------------
 
