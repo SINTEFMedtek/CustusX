@@ -61,6 +61,15 @@ ToolManager::~ToolManager()
   //this->cleanupSymlink();
 }
 
+void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
+{
+    (*mConfiguredTools)[tool->getUid()] = tool;
+    tool->setVisible(true);
+    this->addConnectedTool(tool->getUid());
+    tool->stopTracking();
+    this->setDominantTool(tool->getUid());
+}
+
 void ToolManager::initializeManualTool()
 {
   if (!mManualTool)

@@ -10,7 +10,7 @@
 //#define RUN_ALL_TESTS
 
 #ifndef RUN_ALL_TESTS
-#include "cxTest_Example_CppUnit.h"
+#include "cxTestSpeed.h"
 #endif
 
 /**main function for CX unit tests.
@@ -29,9 +29,9 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-	runner.addTest( new CppUnit::TestCaller<cxTestExamples>(
-                                       "identity transform",
-                                        &cxTestExamples::testIdentityTransform ) );
+	runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
+                                       "init",
+                                        &cxTestSpeed::testInitialize ) );
 	//runner.addTest(cxTestExamples::suite());
 #endif
 	
