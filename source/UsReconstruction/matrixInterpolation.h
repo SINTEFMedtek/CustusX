@@ -35,7 +35,7 @@ std::vector<vnl_matrix_double> matrixInterpolation(
                        vnl_vector<double> DataPoints,
                        std::vector<vnl_matrix_double> DataValues,
                        vnl_vector<double> InterpolationPoints,
-                       std::string InterpolationMethod );
+                       std::string  InterpolationMethod );
 
 
 #endif /* MATRIXINTERPOLATION_H_ */

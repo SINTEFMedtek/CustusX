@@ -2,6 +2,8 @@
 
 #include "sscMessageManager.h"
 #include "cxTool.h"
+#include "sscTypeConversions.h"
+
 
 namespace cx
 {
@@ -98,12 +100,12 @@ Tracker::Type Tracker::getType() const
   return mInternalStructure.mType;
 }
 
-std::string Tracker::getName() const
+QString Tracker::getName() const
 {
   return mName;
 }
 
-std::string Tracker::getUid() const
+QString Tracker::getUid() const
 {
   return mUid;
 }
@@ -121,7 +123,7 @@ void Tracker::open()
 
 void Tracker::attachTools(ToolMapPtr tools)
 {
-  std::map<std::string, ssc::ToolPtr> toolMap = *tools.get();
+  std::map<QString, ssc::ToolPtr> toolMap = *tools.get();
   for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
   {
     ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
@@ -266,8 +268,8 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
 void Tracker::addLogging()
 {
   std::ofstream* loggerFile = new std::ofstream();
-  std::string logFile = mInternalStructure.mLoggingFolderName + "Tracker_Logging.txt";
-  loggerFile->open( logFile.c_str() );
+  QString logFile = mInternalStructure.mLoggingFolderName + "Tracker_Logging.txt";
+  loggerFile->open( cstring_cast(logFile) );
   mTrackerLogger = igstk::Logger::New();
   mTrackerLogOutput = itk::StdStreamLogOutput::New();
   mTrackerLogOutput->SetStream(*loggerFile);

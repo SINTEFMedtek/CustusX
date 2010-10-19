@@ -33,9 +33,9 @@ void TransferFunctionWidget::init()
 	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
 	mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),
           mTransferFunctionAlphaWidget, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)),
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),
           mTransferFunctionColorWidget, SLOT(activeImageChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
           mTransferFunctionAlphaWidget, SLOT(activeImageTransferFunctionsChangedSlot()));

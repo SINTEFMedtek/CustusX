@@ -29,10 +29,10 @@ class InriaRep3D : public ssc::RepImpl
 
   Q_OBJECT
 public:
-  InriaRep3D(const std::string& uid, const std::string& name=""); ///< constructor
+  InriaRep3D(const QString& uid, const QString& name=""); ///< constructor
   ~InriaRep3D(); ///< empty
 
-  virtual std::string getType() const;
+  virtual QString getType() const;
   virtual void connectToView(ssc::View *theView);
   virtual void disconnectFromView(ssc::View *theView);
   vtkViewImage3DPtr getVtkViewImage3D(); ///< returns the internal VtkViewImage3D
@@ -41,7 +41,7 @@ protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view); ///<
   virtual void removeRepActorsFromViewRenderer(ssc::View* view); ///<
 
-  std::string        mType;          ///< the reps type as a string
+  QString        mType;          ///< the reps type as a string
   vtkViewImage3DPtr  mInria;   ///< the inria object
 
 private:

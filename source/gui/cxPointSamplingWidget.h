@@ -54,7 +54,7 @@ protected:
   QTableWidget* mTable; ///< the table widget presenting the landmarks
   typedef std::vector<ssc::Landmark> LandmarkVector;
   LandmarkVector mSamples;
-  std::string mActiveLandmark; ///< uid of surrently selected landmark.
+  QString mActiveLandmark; ///< uid of surrently selected landmark.
 
   QPushButton* mAddButton; ///< the Add Landmark button
   QPushButton* mEditButton; ///< the Edit Landmark button

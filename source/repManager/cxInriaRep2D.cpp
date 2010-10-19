@@ -13,7 +13,7 @@
 
 namespace cx
 {
-InriaRep2D::InriaRep2D(const std::string& uid, const std::string& name) :
+InriaRep2D::InriaRep2D(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name),
   mType("cxInriaRep2D"),
   mTool(NULL),
@@ -32,7 +32,7 @@ InriaRep2D::InriaRep2D(const std::string& uid, const std::string& name) :
 }
 InriaRep2D::~InriaRep2D()
 {}
-std::string InriaRep2D::getType() const
+QString InriaRep2D::getType() const
 {
   return mType;
 } 

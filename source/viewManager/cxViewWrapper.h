@@ -104,7 +104,7 @@ protected:
 
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
-  void addDataAction(std::string uid, QMenu* contextMenu);
+  void addDataAction(QString uid, QMenu* contextMenu);
 
   ViewGroupDataPtr mViewGroup;
 };
