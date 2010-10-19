@@ -154,8 +154,8 @@ public:
   virtual QString defaultWhatsThis() const;
 
 public slots:
-  void fixedImageSlot(const QString uid);
-  void movingImageSlot(const QString uid);
+  void fixedImageSlot(QString uid);
+  void movingImageSlot(QString uid);
 
 private:
   RegisterI2IWidget();
