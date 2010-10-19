@@ -82,6 +82,9 @@ public:
   ~SurfaceWidget();
   virtual QString defaultWhatsThis() const;
 
+public slots:
+  void setImageInputSlot(QString value);
+
 signals:
   void imageChanged(QString);
 
@@ -115,6 +118,12 @@ public:
   ~CenterlineWidget();
   virtual QString defaultWhatsThis() const;
 
+public slots:
+  void setImageInputSlot(QString value);
+
+signals:
+  void imageChanged(QString);
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
@@ -123,6 +132,7 @@ private slots:
   void findCenterlineSlot();
 
 private:
+  SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
 };
 
