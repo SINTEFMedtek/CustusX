@@ -24,7 +24,7 @@ ViewGroupInria::ViewGroupInria(int startIndex, ssc::View* view1,
 ViewGroupInria::~ViewGroupInria()
 {}
 
-std::string ViewGroupInria::toString(int i) const
+QString ViewGroupInria::toString(int i) const
 {
   return QString::number(i).toStdString();
 }
@@ -139,11 +139,11 @@ void ViewGroupInria::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //Get a list of available image and meshes names
-  std::map<std::string, std::string> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
-  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
+  std::map<QString, QString> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
+  std::map<QString, QString> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
 
   //Display the lists to the user
-  std::map<std::string, std::string>::iterator imageIt = imageUidsAndNames.begin();
+  std::map<QString, QString>::iterator imageIt = imageUidsAndNames.begin();
   while(imageIt != imageUidsAndNames.end())
   {
     const QString uid = imageIt->first.c_str();
@@ -165,7 +165,7 @@ void ViewGroupInria::contextMenuSlot(const QPoint& point)
 
   if(!image)
   {
-    std::string error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View.";
+    QString error = "Couldn't find image with uid "+imageUid.toStdString()+" to set in View.";
     messageManager()->sendError(error);
     return;
   }

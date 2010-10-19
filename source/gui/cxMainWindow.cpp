@@ -43,6 +43,7 @@
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
 #include "cxCameraControl.h"
+#include "cxControlPanel.h"
 
 namespace cx
 {
@@ -67,6 +68,7 @@ MainWindow::MainWindow() :
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
+  mControlPanel(NULL),
   mSettings(DataLocations::getSettings())
 {
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
@@ -130,7 +132,7 @@ MainWindow::MainWindow() :
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   // initialize toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   this->layoutChangedSlot();
@@ -205,6 +207,9 @@ void MainWindow::createActions()
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
   connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
+
+  mShowControlPanelAction = new QAction("Show Control Panel", this);
+  connect(mShowControlPanelAction, SIGNAL(triggered()), this, SLOT(showControlPanelActionSlot()));
 
   // Application
   mAboutAction = new QAction(tr("&About"), this); // About burde gitt About CustusX, det gj√∏r det ikke av en eller annen grunn???
@@ -322,7 +327,7 @@ void MainWindow::newPatientSlot()
   if (!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
   }
 
   QString choosenDir = patientDatafolder + "/" + name;
@@ -397,6 +402,14 @@ void MainWindow::resetDesktopSlot()
   this->onWorkflowStateChangedSlot();
 }
 
+void MainWindow::showControlPanelActionSlot()
+{
+  if (!mControlPanel)
+    mControlPanel = new ControlPanel(this);
+  mControlPanel->show();
+}
+
+
 void MainWindow::loadPatientFileSlot()
 {
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
@@ -404,7 +417,7 @@ void MainWindow::loadPatientFileSlot()
   if (!QDir().exists(patientDatafolder))
   {
     QDir().mkdir(patientDatafolder);
-    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: " + patientDatafolder);
   }
   // Open file dialog
   QString choosenDir = QFileDialog::getExistingDirectory(this, tr("Select patient"), patientDatafolder,
@@ -450,9 +463,9 @@ void MainWindow::patientChangedSlot()
   if (!loggingDir.exists())
   {
     loggingDir.mkdir(loggingPath);
-    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath.toStdString());
+    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
   }
-  ToolManager::getInstance()->setLoggingFolder(loggingPath.toStdString());
+  ToolManager::getInstance()->setLoggingFolder(loggingPath);
 }
 
 /** Called when the layout is changed: update the layout menu
@@ -554,6 +567,8 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mDeleteDataAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
+  mFileMenu->addSeparator();
+  mFileMenu->addAction(mShowControlPanelAction);
 
   // View
   QMenu* popupMenu = this->createPopupMenu();

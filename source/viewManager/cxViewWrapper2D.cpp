@@ -50,7 +50,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   setZoom2D(SyncedValue::create(1));
   setOrientationMode(SyncedValue::create(0)); // must set after addreps()
 
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   connect(mView, SIGNAL(resized(QSize)), this, SLOT(viewportChanged()));
   connect(mView, SIGNAL(showSignal(QShowEvent*)), this, SLOT(showSlot()));
   connect(mView, SIGNAL(mousePressSignal(QMouseEvent*)), this, SLOT(mousePressSlot(QMouseEvent*)));
@@ -107,7 +107,7 @@ void ViewWrapper2D::orientationActionSlot()
   if(!theAction)
     return;
 
-  ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(string_cast(theAction->data().toString()));
+  ssc::ORIENTATION_TYPE type = string2enum<ssc::ORIENTATION_TYPE>(theAction->data().toString());
   mOrientationMode->set(type);
 }
 
@@ -256,7 +256,7 @@ void ViewWrapper2D::showSlot()
 void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
   mOrientationAnnotationRep->setPlaneType(plane);
-  mPlaneTypeText->setText(0, string_cast(plane));
+  mPlaneTypeText->setText(0, qstring_cast(plane));
   mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
 
   // do this to force sync global and local type - must think on how we want this to work
@@ -290,7 +290,7 @@ void ViewWrapper2D::orientationModeChanged()
 
   ssc::PLANE_TYPE plane = computer.getPlaneType();
   mOrientationAnnotationRep->setPlaneType(plane);
-  mPlaneTypeText->setText(0, string_cast(plane));
+  mPlaneTypeText->setText(0, qstring_cast(plane));
   mSliceProxy->setComputer(computer);
 }
 
@@ -324,7 +324,7 @@ void ViewWrapper2D::updateView()
   if (!images.empty())
     image = images.back(); // always show last in vector
 
-  std::string text;
+  QString text;
 
   if (image)
   {
@@ -345,7 +345,7 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 
 void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
 {
-//  std::map<std::string, ssc::GeometricRep2DPtr> mGeometricRep;
+//  std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
 
   if (!mesh)
     return;
@@ -369,12 +369,11 @@ void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
 
 void ViewWrapper2D::meshRemoved(const QString& uid)
 {
-  std::string suid = string_cast(uid);
-  if (!mGeometricRep.count(suid))
+  if (!mGeometricRep.count(uid))
     return;
 
-  mView->removeRep(mGeometricRep[suid]);
-  mGeometricRep.erase(suid);
+  mView->removeRep(mGeometricRep[uid]);
+  mGeometricRep.erase(uid);
  // std::cout << "removed mesh " << uid << std::endl;
 }
 

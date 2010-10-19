@@ -108,7 +108,7 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
-  if(mConfigurationFilePath.empty() || !QFile::exists(QString(mConfigurationFilePath.c_str())))
+  if(mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
   {
     ssc::messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
     return;
@@ -161,7 +161,7 @@ void ToolManager::createSymlink()
 
   if (!linkDir.exists())
   {
-    ssc::messageManager()->sendError(string_cast(QString("Folder %1 does not exist. System is not properly installed.").arg(linkDir.path())));
+    ssc::messageManager()->sendError(QString("Folder %1 does not exist. System is not properly installed.").arg(linkDir.path()));
     return;
   }
 
@@ -174,12 +174,12 @@ void ToolManager::createSymlink()
 
   if (files.empty())
   {
-    ssc::messageManager()->sendError(string_cast(QString("No usb connections found in /dev using filters %1").arg(filters.join(";"))));
+    ssc::messageManager()->sendError(QString("No usb connections found in /dev using filters %1").arg(filters.join(";")));
     return;
   }
   else
   {
-    ssc::messageManager()->sendInfo(string_cast(QString("device files: %1").arg(files.join(","))));
+    ssc::messageManager()->sendInfo(QString("device files: %1").arg(files.join(",")));
   }
 
   QString device = devDir.filePath(files[0]);
@@ -190,11 +190,11 @@ void ToolManager::createSymlink()
   bool val = devFile.link(linkfile);
   if (!val)
   {
-    ssc::messageManager()->sendError(string_cast(QString("symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(devFile.error())));
+    ssc::messageManager()->sendError(QString("symlink %1 creation to device %2 failed with code %3").arg(linkfile).arg(device).arg(devFile.error()));
   }
   else
   {
-    ssc::messageManager()->sendInfo(string_cast(QString("created symlink %1 to device %2").arg(linkfile).arg(device)));
+    ssc::messageManager()->sendInfo(QString("created symlink %1 to device %2").arg(linkfile).arg(device));
   }
 
   devFile.setPermissions(
@@ -257,7 +257,7 @@ void ToolManager::setLandmark(ssc::Landmark landmark)
   emit landmarkAdded(landmark.getUid());
 }
 
-void ToolManager::removeLandmark(std::string uid)
+void ToolManager::removeLandmark(QString uid)
 {
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
@@ -287,7 +287,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::getTools()
   return allTools;
 }
 
-ssc::ToolPtr ToolManager::getTool(const std::string& uid)
+ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
   ToolMapConstIter it = mInitializedTools->find(uid);
   if (it != mInitializedTools->end())
@@ -303,7 +303,7 @@ ssc::ToolPtr ToolManager::getDominantTool()
   return mDominantTool;
 }
 
-void ToolManager::setDominantTool(const std::string& uid)
+void ToolManager::setDominantTool(const QString& uid)
 {
   //std::cout << "1: void ToolManager::setDominantTool( "+uid+" )" << std::endl;
   if(mDominantTool && mDominantTool->getUid() == uid)
@@ -350,9 +350,9 @@ void ToolManager::setDominantTool(const std::string& uid)
   emit dominantToolChanged(uid);
 }
 
-std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
+std::map<QString, QString> ToolManager::getToolUidsAndNames() const
 {
-  std::map<std::string, std::string> uidsAndNames;
+  std::map<QString, QString> uidsAndNames;
 
   ToolMapConstIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
@@ -368,9 +368,9 @@ std::map<std::string, std::string> ToolManager::getToolUidsAndNames() const
   }
   return uidsAndNames;
 }
-std::vector<std::string> ToolManager::getToolNames() const
+std::vector<QString> ToolManager::getToolNames() const
 {
-  std::vector<std::string> names;
+  std::vector<QString> names;
   ToolMapConstIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
@@ -385,9 +385,9 @@ std::vector<std::string> ToolManager::getToolNames() const
   }
   return names;
 }
-std::vector<std::string> ToolManager::getToolUids() const
+std::vector<QString> ToolManager::getToolUids() const
 {
-  std::vector<std::string> uids;
+  std::vector<QString> uids;
   ToolMapConstIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
@@ -415,7 +415,7 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
 {
   return mReferenceTool;
 }
-void ToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
+void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 {
   ToolMapConstIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
@@ -425,11 +425,11 @@ void ToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
     it++;
   }
 }
-void ToolManager::setConfigurationFile(std::string configurationFile)
+void ToolManager::setConfigurationFile(QString configurationFile)
 {
   mConfigurationFilePath = configurationFile;
 }
-void ToolManager::setLoggingFolder(std::string loggingFolder)
+void ToolManager::setLoggingFolder(QString loggingFolder)
 {
   mLoggingFolder = loggingFolder;
 }
@@ -443,8 +443,8 @@ void ToolManager::setLoggingFolder(std::string loggingFolder)
  */
 void ToolManager::receiveToolReport(ToolMessage message, bool state, bool success, stdString uid)
 {
-  std::string toolUid = "" + uid;
-  std::string report = "";
+  QString toolUid = "" + uid;
+  QString report = "";
 
   switch (message)
   {
@@ -516,10 +516,10 @@ void ToolManager::receiveToolReport(ToolMessage message, bool state, bool succes
  * \param success Whether or not the request was a success
  * \param uid     The trackers unique id
  */
-void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, bool success, std::string uid)
+void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, bool success, QString uid)
 {
-  std::string trackerUid = uid;
-  std::string report = "";
+  QString trackerUid = uid;
+  QString report = "";
 
   switch (message)
   {
@@ -619,7 +619,7 @@ void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, boo
   //ssc::messageManager()->sendInfo(report);
 }
 
-void ToolManager::addConnectedTool(std::string uid)
+void ToolManager::addConnectedTool(QString uid)
 {  
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
   if (it == mConfiguredTools->end() || !it->second)
@@ -645,7 +645,7 @@ void ToolManager::connectSignalsAndSlots()
   qRegisterMetaType<TrackerMessage> ("TrackerMessage");
   typedef Tool::Message ToolMessage;
   qRegisterMetaType<ToolMessage> ("ToolMessage");
-  typedef std::string stdString;
+  typedef QString stdString;
   qRegisterMetaType<stdString> ("stdString");
 
   connect(mTracker.get(), SIGNAL(trackerReport(TrackerMessage, bool, bool, stdString)),
@@ -696,7 +696,7 @@ void ToolManager::dominantCheckSlot()
   {
     //sort most important tool to the start of the vector:
     sort(visibleTools.begin(), visibleTools.end(), toolTypeSort);
-    const std::string uid = visibleTools.at(0)->getUid();
+    const QString uid = visibleTools.at(0)->getUid();
     this->setDominantTool(uid);
   }
 }
@@ -793,7 +793,7 @@ void ToolManager::parseXml(QDomNode& dataNode)
   for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))
   {
     QDomElement base = toolNode.toElement();
-    std::string tool_uid = base.attribute("uid").toStdString();
+    QString tool_uid = base.attribute("uid");
     if (tools->find(tool_uid) != tools->end())
     {
       ToolPtr tool = boost::shared_dynamic_cast<Tool>(tools->find(tool_uid)->second);

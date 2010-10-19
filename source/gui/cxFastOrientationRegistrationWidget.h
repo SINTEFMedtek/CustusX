@@ -33,7 +33,7 @@ protected:
 
 private slots:
   void setOrientationSlot();
-  void dominantToolChangedSlot(const std::string& uid);
+  void dominantToolChangedSlot(const QString& uid);
   void enableToolSampleButtonSlot();
   void toolVisibleSlot(bool visible);
 

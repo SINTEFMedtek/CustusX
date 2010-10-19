@@ -15,18 +15,19 @@
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
 
-LandmarkRepPtr LandmarkRep::New(const std::string& uid, const std::string& name)
+LandmarkRepPtr LandmarkRep::New(const QString& uid, const QString& name)
 {
   LandmarkRepPtr retval(new LandmarkRep(uid, name));
   retval->mSelf = retval;
   return retval;
 }
 
-LandmarkRep::LandmarkRep(const std::string& uid, const std::string& name) :
+LandmarkRep::LandmarkRep(const QString& uid, const QString& name) :
   RepImpl(uid, name),
   mType("cxLandmarkRep"),
   mShowLandmarks(true)
@@ -40,7 +41,7 @@ LandmarkRep::LandmarkRep(const std::string& uid, const std::string& name) :
 LandmarkRep::~LandmarkRep()
 {}
 
-std::string LandmarkRep::getType() const
+QString LandmarkRep::getType() const
 {
   return mType;
 }
@@ -64,13 +65,13 @@ void LandmarkRep::showLandmarks(bool on)
   if(on == mShowLandmarks)
     return;
 
-  std::map<std::string, vtkVectorTextFollowerPair>::iterator it1 = mTextFollowerActors.begin();
+  std::map<QString, vtkVectorTextFollowerPair>::iterator it1 = mTextFollowerActors.begin();
   while(it1 != mTextFollowerActors.end())
   {
     (it1->second).second->SetVisibility(on);
     it1++;
   }
-  std::map<std::string, vtkActorPtr>::iterator it2 = mSkinPointActors.begin();
+  std::map<QString, vtkActorPtr>::iterator it2 = mSkinPointActors.begin();
   while(it2 != mSkinPointActors.end())
   {
     it2->second->SetVisibility(on);
@@ -88,8 +89,8 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
   {
     //std::cout << "Landmark disconnect: (" << mImage->getName() << ") - " << this->getUid() << std::endl;
     mImage->disconnectFromRep(mSelf);
-    disconnect(mImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkAddedSlot(std::string)));
-    disconnect(mImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkRemovedSlot(std::string)));
+    disconnect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
+    disconnect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
     disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
     this->clearAll();
 //    ssc::LandmarkMap landmarksMap = mImage->getLandmarks();
@@ -109,8 +110,8 @@ void LandmarkRep::setImage(ssc::ImagePtr image)
   {
     //std::cout << "Landmark connect (" << mImage->getName() << ") - "  << this->getUid() << std::endl;
     mImage->connectToRep(mSelf);
-    connect(mImage.get(), SIGNAL(landmarkAdded(std::string)), this, SLOT(landmarkAddedSlot(std::string)));
-    connect(mImage.get(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkRemovedSlot(std::string)));
+    connect(mImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
+    connect(mImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkRemovedSlot(QString)));
     connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
     this->addAll();
 //    ssc::LandmarkMap landmarksMap = mImage->getLandmarks();
@@ -168,7 +169,7 @@ ssc::ImagePtr LandmarkRep::getImage() const
   return mImage;
 }
 
-void LandmarkRep::landmarkAddedSlot(std::string uid)
+void LandmarkRep::landmarkAddedSlot(QString uid)
 {
   ssc::Landmark landmark = mImage->getLandmarks()[uid];
   ssc::Vector3D p_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
@@ -176,10 +177,10 @@ void LandmarkRep::landmarkAddedSlot(std::string uid)
   //std::cout << "LandmarkRep::landmarkAddedSlot(" << uid << ") " << this->getUid() << std::endl;
 }
 
-void LandmarkRep::landmarkRemovedSlot(std::string uid)
+void LandmarkRep::landmarkRemovedSlot(QString uid)
 {
-  std::map<std::string, vtkActorPtr>::iterator skinPointActorToRemove = mSkinPointActors.find(uid);
-  std::map<std::string, vtkVectorTextFollowerPair>::iterator textFollowerActorToRemove = mTextFollowerActors.find(uid);
+  std::map<QString, vtkActorPtr>::iterator skinPointActorToRemove = mSkinPointActors.find(uid);
+  std::map<QString, vtkVectorTextFollowerPair>::iterator textFollowerActorToRemove = mTextFollowerActors.find(uid);
 
   std::set<ssc::View *>::iterator it = mViews.begin();
   while(it != mViews.end())
@@ -230,7 +231,7 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     return;
   }
 
-  std::map<std::string, vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
+  std::map<QString, vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
   while(it1 != mSkinPointActors.end())
   {
     if(!renderer->HasViewProp(it1->second))
@@ -240,7 +241,7 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     }
     it1++;
   }
-  std::map<std::string, vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
+  std::map<QString, vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
   while(it2 != mTextFollowerActors.end())
   {
     if(!renderer->HasViewProp(it2->second.second))
@@ -267,14 +268,14 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
     return;
   }
 
-  std::map<std::string, vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
+  std::map<QString, vtkActorPtr>::iterator it1 = mSkinPointActors.begin();
   while(it1 != mSkinPointActors.end())
   {
     if(renderer->HasViewProp(it1->second))
       renderer->RemoveActor(it1->second);
     it1++;
   }
-  std::map<std::string, vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
+  std::map<QString, vtkVectorTextFollowerPair>::iterator it2 = mTextFollowerActors.begin();
   while(it2 != mTextFollowerActors.end())
   {
     if(renderer->HasViewProp(it2->second.second))
@@ -290,7 +291,7 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
  * @param z world coordinat, ref space
  * @param index the landmarks index
  */
-void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
+void LandmarkRep::addPoint(ssc::Vector3D coord, QString uid)
 {
   //vtkImageDataPtr imageData = mImage->getRefVtkImageData();
   //ssc::Vector3D imageCenter(imageData->GetCenter());
@@ -301,7 +302,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
   vtkVectorTextPtr text;
   vtkFollowerPtr followerActor;
   vtkPolyDataMapperPtr textMapper;
-  std::map<std::string, vtkVectorTextFollowerPair>::iterator textFollowerIt = mTextFollowerActors.find(uid);
+  std::map<QString, vtkVectorTextFollowerPair>::iterator textFollowerIt = mTextFollowerActors.find(uid);
   if(textFollowerIt == mTextFollowerActors.end())
   {
     text = vtkVectorTextPtr::New();
@@ -315,9 +316,9 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
     textMapper = dynamic_cast<vtkPolyDataMapper*>(followerActor->GetMapper());
   }
 
-  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
-  std::string name = props[uid].getName();
-  text->SetText(name.c_str());
+  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
+  QString name = props[uid].getName();
+  text->SetText(cstring_cast(name));
 
   textMapper->SetInput(text->GetOutput());
 
@@ -331,7 +332,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
   vtkSphereSourcePtr sphere = vtkSphereSourcePtr::New();
   vtkPolyDataMapperPtr sphereMapper;
   vtkActorPtr skinPointActor;
-  std::map<std::string, vtkActorPtr>::iterator actorIt = mSkinPointActors.find(uid);
+  std::map<QString, vtkActorPtr>::iterator actorIt = mSkinPointActors.find(uid);
   if(actorIt == mSkinPointActors.end())
   {
     sphereMapper = vtkPolyDataMapperPtr::New();
@@ -361,7 +362,7 @@ void LandmarkRep::addPoint(ssc::Vector3D coord, std::string uid)
   this->setPosition(coord, uid);
 }
 
-void LandmarkRep::setPosition(ssc::Vector3D coord, std::string uid)
+void LandmarkRep::setPosition(ssc::Vector3D coord, QString uid)
 {
   ssc::Vector3D imageCenter = mImage->get_rMd().coord(mImage->boundingBox().center());
 //  vtkImageDataPtr imageData = mImage->getRefVtkImageData();
@@ -376,13 +377,13 @@ void LandmarkRep::setPosition(ssc::Vector3D coord, std::string uid)
 
 void LandmarkRep::internalUpdate()
 {
-  std::map<std::string, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
-  std::map<std::string, vtkVectorTextFollowerPair>::iterator it = mTextFollowerActors.begin();
+  std::map<QString, ssc::LandmarkProperty> props = ssc::dataManager()->getLandmarkProperties();
+  std::map<QString, vtkVectorTextFollowerPair>::iterator it = mTextFollowerActors.begin();
   while(it != mTextFollowerActors.end())
   {
-    std::string uid = it->first;
-    std::string name = props[uid].getName();
-    it->second.first->SetText(name.c_str());
+    QString uid = it->first;
+    QString name = props[uid].getName();
+    it->second.first->SetText(cstring_cast(name));
     it->second.first->Modified();
     it->second.second->GetProperty()->SetColor(mColor.R/255, mColor.G/255, mColor.B/255);
     it->second.second->SetScale(mTextScale[0], mTextScale[1], mTextScale[2]);
