@@ -264,12 +264,13 @@ QString RegistrationMovingImageStringDataAdapter::getHelp() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectImageStringDataAdapter::SelectImageStringDataAdapter()
+SelectImageStringDataAdapter::SelectImageStringDataAdapter() :
+    mValueName("Select volume")
 {
 }
 QString SelectImageStringDataAdapter::getValueName() const
 {
-  return "Select Volume";
+  return mValueName;
 }
 bool SelectImageStringDataAdapter::setValue(const QString& value)
 {
@@ -291,6 +292,11 @@ QString SelectImageStringDataAdapter::getHelp() const
 ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 {
   return ssc::dataManager()->getImage(string_cast(mImageUid));
+}
+
+void SelectImageStringDataAdapter::setValueName(const QString name)
+{
+  mValueName = name;
 }
 
 //---------------------------------------------------------

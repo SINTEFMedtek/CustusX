@@ -2,6 +2,7 @@
 #define CXIMAGESEGMENTATIONANDCENTERLINEWIDGET_H_
 
 #include "cxWhatsThisWidget.h"
+#include "cxDataInterface.h"
 
 class QGroupBox;
 class QPushButton;
@@ -29,6 +30,10 @@ public:
 
 protected:
   QVBoxLayout* mLayout;
+  ssc::StringDataAdapterPtr mOutput;
+
+private slots:
+  void setImageSlot(QString uid);
 
 private:
   ImageSegmentationAndCenterlineWidget();
