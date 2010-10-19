@@ -41,7 +41,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
+  //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(updateSlot()));
   //updateSlot();
 }
 

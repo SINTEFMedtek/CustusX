@@ -41,7 +41,7 @@ ApplicationState::~ApplicationState()
 void ApplicationState::onEntry(QEvent * event )
 {
   mActive = true;
-  ssc::messageManager()->sendInfo("Application change to [" + string_cast(mName) + "]");
+  ssc::messageManager()->sendInfo("Application change to [" + mName + "]");
   if(mAction)
     mAction->setChecked(true);
 

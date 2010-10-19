@@ -13,7 +13,8 @@
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"
 #include "cxLandmarkRep.h"
-
+#include "cxDataLocations.h"
+#include <QSettings>
 
 namespace cx
 {
@@ -93,14 +94,14 @@ RepManager::RepManager() :
   ssc::messageManager()->sendInfo("All necessary representations have been created.");
 
   //connect the dominant tool to the acs-sets so they also get update when we move the tool
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)),
-          this, SLOT(dominantToolChangedSlot(const std::string&)));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)),
+          this, SLOT(dominantToolChangedSlot(const QString&)));
 }
 
 /**Shortcut function for adding new reps to the internal maps
  */
 template<class REP, class MAP>
-boost::shared_ptr<REP> RepManager::addRep(const std::string& uid, MAP* specificMap)
+boost::shared_ptr<REP> RepManager::addRep(const QString& uid, MAP* specificMap)
 {
   return addRep(REP::New(uid, uid), specificMap);
 }
@@ -137,12 +138,12 @@ RepManager::~RepManager()
 {
 }
 
-std::vector<std::pair<std::string, std::string> > RepManager::getRepUidsAndNames()
+std::vector<std::pair<QString, QString> > RepManager::getRepUidsAndNames()
 {
-  std::vector<std::pair<std::string, std::string> > retval;
+  std::vector<std::pair<QString, QString> > retval;
   for(RepMap::iterator it = mRepMap.begin(); it != mRepMap.end(); ++it)
   {
-    retval.push_back(make_pair(it->second->getUid(), it->second->getName()));
+    retval.push_back(std::make_pair(it->second->getUid(), it->second->getName()));
   }
   return retval;
 }
@@ -182,7 +183,7 @@ GeometricRepMap* RepManager::getGeometricReps()
   return &mGeometricRepMap;
 }
 
-ssc::RepPtr RepManager::getRep(const std::string& uid)
+ssc::RepPtr RepManager::getRep(const QString& uid)
 {
   if (mRepMap.count(uid))
     return mRepMap[uid];
@@ -190,7 +191,7 @@ ssc::RepPtr RepManager::getRep(const std::string& uid)
 }
 
 template<class REP, class MAP>
-boost::shared_ptr<REP> RepManager::getRep(const std::string& uid, MAP* specificMap)
+boost::shared_ptr<REP> RepManager::getRep(const QString& uid, MAP* specificMap)
 {
   typename MAP::iterator iter = specificMap->find(uid);
   if (iter != specificMap->end())
@@ -199,33 +200,33 @@ boost::shared_ptr<REP> RepManager::getRep(const std::string& uid, MAP* specificM
     return boost::shared_ptr<REP>();
 }
 
-ssc::VolumetricRepPtr RepManager::getVolumetricRep(const std::string& uid)
+ssc::VolumetricRepPtr RepManager::getVolumetricRep(const QString& uid)
 {
   return getRep<ssc::VolumetricRep>(uid, &mVolumetricRepMap);
 }
 
-ssc::ProgressiveLODVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const std::string& uid)
+ssc::ProgressiveLODVolumetricRepPtr RepManager::getProgressiveVolumetricRep(const QString& uid)
 {
   return getRep<ssc::ProgressiveLODVolumetricRep>(uid, &mProgressiveVolumetricRepMap);
 }
-ssc::ProbeRepPtr RepManager::getProbeRep(const std::string& uid)
+ssc::ProbeRepPtr RepManager::getProbeRep(const QString& uid)
 {
   return getRep<ssc::ProbeRep>(uid, &mProbeRepMap);
 }
-LandmarkRepPtr RepManager::getLandmarkRep(const std::string& uid)
+LandmarkRepPtr RepManager::getLandmarkRep(const QString& uid)
 {
   return getRep<LandmarkRep>(uid, &mLandmarkRepMap);
 }
-ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const std::string& uid)
+ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const QString& uid)
 {
   return getRep<ssc::ToolRep3D>(uid, &mToolRep3DMap);
 }
-ssc::GeometricRepPtr RepManager::getGeometricRep(const std::string& uid)
+ssc::GeometricRepPtr RepManager::getGeometricRep(const QString& uid)
 {
   return getRep<ssc::GeometricRep>(uid, &mGeometricRepMap);
 }
 
-void RepManager::dominantToolChangedSlot(const std::string& toolUid)
+void RepManager::dominantToolChangedSlot(const QString& toolUid)
 {
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   if(!dominantTool)
@@ -244,7 +245,7 @@ void RepManager::dominantToolChangedSlot(const std::string& toolUid)
  *  if not found, create and return
  *
  */
-ssc::ToolRep3DPtr RepManager::getDynamicToolRep3DRep(std::string uid)
+ssc::ToolRep3DPtr RepManager::getDynamicToolRep3DRep(QString uid)
 {
   ssc::ToolRep3DPtr rep = this->getToolRep3DRep(uid);
   if (!rep)
@@ -274,18 +275,15 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
 
   if (!mVolumetricRepByImageMap.count(image->getUid()))
   {
-    std::string uid("VolumetricRep_img_" + image->getUid());
+    QString uid("VolumetricRep_img_" + image->getUid());
     ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
-//    double size = image->getBaseVtkImageData()->GetNumberOfPoints();
-    long maxSize = 20*pow(10,6); // downsample volumes larger than 15 Megavoxels
-//    double factor = maxSize/size;
-//    //factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling
-//    if (factor<0.99)
-//    {
-//        std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxSize/1000/1000 << "M. Ratio: " << factor << ", original size: " << size/1000/1000 << "M" << std::endl;
-//        rep->setResampleFactor(factor);
-//    }
-    rep->setMaxVolumeSize(maxSize);
+
+    bool ok = true;
+    double maxRenderSize = DataLocations::getSettings()->value("maxRenderSize").toDouble(&ok);
+    if (!ok)
+      maxRenderSize = 20 * pow(10,6);
+
+    rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
     mVolumetricRepByImageMap[image->getUid()] = rep;
     //mImageMapperMonitorMap[image->getUid()].reset(new ssc::ImageMapperMonitor(rep));

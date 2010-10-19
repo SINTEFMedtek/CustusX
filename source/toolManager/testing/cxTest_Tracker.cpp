@@ -5,10 +5,10 @@
 void TestTracker::setUp()
 {
   mValidPolarisInternal.mType = cx::Tracker::TRACKER_POLARIS;
-  mValidPolarisInternal.mLoggingFolderName = QDir::currentPath().toStdString();
+  mValidPolarisInternal.mLoggingFolderName = QDir::currentPath();
 
   mValidAuroraInternal.mType = cx::Tracker::TRACKER_AURORA;
-  mValidAuroraInternal.mLoggingFolderName = QDir::currentPath().toStdString();
+  mValidAuroraInternal.mLoggingFolderName = QDir::currentPath();
 }
 
 void TestTracker::tearDown()

@@ -58,7 +58,7 @@ void PointSamplingWidget::itemSelectionChanged()
 
   QTableWidgetItem* item = mTable->currentItem();
 
-  mActiveLandmark = string_cast(item->data(Qt::UserRole).toString());
+  mActiveLandmark = item->data(Qt::UserRole).toString();
 
   for (unsigned i=0; i<mSamples.size(); ++i)
   {
@@ -180,7 +180,7 @@ void PointSamplingWidget::addButtonClickedSlot()
   {
     max = std::max(max, qstring_cast(mSamples[i].getUid()).toInt());
   }
-  std::string uid = string_cast(max+1);
+  QString uid = qstring_cast(max+1);
 
   mSamples.push_back(ssc::Landmark(uid, getSample()));
   mActiveLandmark = uid;

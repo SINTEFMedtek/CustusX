@@ -154,7 +154,7 @@ std::vector<ssc::DataPtr> FrameForest::getDataFromDescendantsAndSelf(QDomNode no
 
   for (unsigned i=0; i<nodes.size(); ++i)
   {
-    ssc::DataPtr data = ssc::dataManager()->getData(string_cast(nodes[i].toElement().tagName()));
+    ssc::DataPtr data = ssc::dataManager()->getData(nodes[i].toElement().tagName());
     if (data)
       retval.push_back(data);
   }

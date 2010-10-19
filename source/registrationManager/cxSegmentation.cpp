@@ -146,9 +146,8 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
   //    // TODO: possible memory problem here - check debug mem system of itk/vtk
 
 
-  std::string uid = string_cast(ssc::changeExtension(qstring_cast(
-      image->getUid()), "") + "_cont%1");
-  std::string name = image->getName() + " contour %1";
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_cont%1";
+  QString name = image->getName() + " contour %1";
   //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
   ssc::MeshPtr result = ssc::dataManager()->createMesh(cubesPolyData, uid,
       name, "Images");
@@ -158,7 +157,7 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
   result->setParentFrame(image->getUid());
 
   ssc::dataManager()->loadData(result);
-  ssc::dataManager()->saveMesh(result, string_cast(outputBasePath));
+  ssc::dataManager()->saveMesh(result, outputBasePath);
 
   //
   //    //print
@@ -209,8 +208,8 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
   // TODO: possible memory problem here - check debug mem system of itk/vtk
 
 
-  std::string uid = string_cast(ssc::changeExtension(qstring_cast(image->getUid()), "") + "_seg%1");
-  std::string name = image->getName()+" segmented %1";
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_seg%1";
+  QString name = image->getName()+" segmented %1";
   //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
   ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
   ssc::messageManager()->sendInfo("created segment " + result->getName());
@@ -219,7 +218,7 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
 
   result->setParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
-  ssc::dataManager()->saveImage(result, string_cast(outputBasePath));
+  ssc::dataManager()->saveImage(result, outputBasePath);
 
 }
 
@@ -242,8 +241,8 @@ void Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
   vtkImageDataPtr rawResult = vtkImageDataPtr::New();
   rawResult->DeepCopy(itkToVtkFilter->GetOutput());
 
-  std::string uid = string_cast(ssc::changeExtension(qstring_cast(image->getUid()), "") + "_center%1");
-  std::string name = image->getName()+" centerline %1";
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_center%1";
+  QString name = image->getName()+" centerline %1";
   //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
   ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
   ssc::messageManager()->sendInfo("created centerline " + result->getName());
@@ -252,7 +251,7 @@ void Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
 
   result->setParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
-  ssc::dataManager()->saveImage(result, string_cast(outputBasePath));
+  ssc::dataManager()->saveImage(result, outputBasePath);
 }
 
 /*{
