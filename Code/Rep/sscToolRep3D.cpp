@@ -29,7 +29,7 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mOffsetLine.reset(new GraphicalLine3D());
 	mTooltipPoint.reset(new GraphicalPoint3D());
 
-	mProbeSector.reset(new USProbeSector());
+	mProbeSector.reset(new USProbeSector(true));
 	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProbeSectorActor = vtkActorPtr::New();
 

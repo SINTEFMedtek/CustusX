@@ -36,7 +36,7 @@ ToolRep2D::ToolRep2D(const std::string& uid, const std::string& name) :
 	mUseOffsetText = false;
 	mMergeOffsetAndToolLine = false;
 
-  mProbeSector.reset(new USProbeSector());
+  mProbeSector.reset(new USProbeSector(false));
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 }

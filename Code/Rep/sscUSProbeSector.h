@@ -23,7 +23,7 @@ namespace ssc
 class USProbeSector
 {
 public:
-  USProbeSector();
+  USProbeSector(bool threeDimentions);
   virtual ~USProbeSector();
   void setSector(ProbeSector sector);
   void setPosition(const Transform3D& wMt);
@@ -38,6 +38,7 @@ private:
   double m_d_start; ///< start depth
   double m_d_end; ///< end depth
   double mWidth; ///< width in radians or millimeters, depending on type.
+  bool mThreeDimensions; //Is the probe sector going to be shown in 3D?
 };
 typedef boost::shared_ptr<class USProbeSector> USProbeSectorPtr;
 

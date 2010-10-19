@@ -12,8 +12,9 @@
 namespace ssc
 {
 
-USProbeSector::USProbeSector():
-    mPolyData(vtkPolyDataPtr::New())
+USProbeSector::USProbeSector(bool threeDimentions):
+    mPolyData(vtkPolyDataPtr::New()),
+    mThreeDimensions(threeDimentions)
 {
 }
 
@@ -61,6 +62,19 @@ void USProbeSector::createSector()
 
   mPoints = vtkPointsPtr::New();
   mSides = vtkCellArrayPtr::New();
+
+  std::cout << M.coord(e_z) << std::endl;
+  if (!mThreeDimensions && !similar(dot(M.coord(e_z), e_z), 1, 0.1))
+  {
+    mPolyData->SetPoints(mPoints);
+    mPolyData->SetLines(mSides);
+    mPolyData->Update();
+    return;
+  }
+
+  //Fix to make sure the sector is shown in front of the 2D volume slice in the 2D views
+  double defZero = 0.001;
+
   if (mType == ProbeSector::tLINEAR)
   {
     Vector3D cr = m_d_start * e_y + mWidth/2 * e_x;
@@ -73,6 +87,14 @@ void USProbeSector::createSector()
     cr = M.coord(cr);
     pl = M.coord(pl);
     pr = M.coord(pr);
+    //Fix to make sure the sector is shown in front of the 2D volume slice in the 2D views
+    if(!mThreeDimensions)
+    {
+      cl[2] += defZero;
+      cr[2] += defZero;
+      pl[2] += defZero;
+      pr[2] += defZero;
+    }
 
     mPoints->Allocate(4);
     mPoints->InsertNextPoint(cl.begin());
@@ -99,6 +121,8 @@ void USProbeSector::createSector()
       double theta = startAngle + i*angleIncrement;
       Vector3D startTheta = c + m_d_start * unitVector(theta);
       startTheta = M.coord(startTheta);
+      if(!mThreeDimensions)
+        startTheta[2] += defZero;
       mPoints->InsertNextPoint(startTheta.begin());
     }
     for(int i = 0; i <= arcRes; i++)
@@ -106,6 +130,8 @@ void USProbeSector::createSector()
       double theta = stopAngle - i*angleIncrement;
       Vector3D endTheta = c + m_d_end * unitVector(theta);
       endTheta = M.coord(endTheta);
+      if(!mThreeDimensions)
+        endTheta[2] += defZero;
       mPoints->InsertNextPoint(endTheta.begin());
     }
 
