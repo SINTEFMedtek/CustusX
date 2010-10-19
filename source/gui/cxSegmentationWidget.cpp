@@ -299,6 +299,9 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
     mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
+  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
+  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
+
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
@@ -321,20 +324,22 @@ QString RegisterI2IWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void RegisterI2IWidget::fixedImageSlot(const QString uid)
+void RegisterI2IWidget::fixedImageSlot(QString uid)
 {
   mFixedImage = ssc::dataManager()->getImage(uid);
   if(!mFixedImage)
     return;
   mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed image: <b>"+mFixedImage->getName()+"</b></font>"));
+  mFixedImageLabel->update();
 }
 
-void RegisterI2IWidget::movingImageSlot(const QString uid)
+void RegisterI2IWidget::movingImageSlot(QString uid)
 {
   mMovingImage = ssc::dataManager()->getImage(uid);
   if(!mMovingImage)
     return;
   mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving image: <b>"+mMovingImage->getName()+"</b></font>"));
+  mMovingImageLabel->update();
 }
 
 //------------------------------------------------------------------------------
