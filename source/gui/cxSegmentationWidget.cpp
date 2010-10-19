@@ -39,6 +39,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   toptopLayout->addStretch();
 
   mSelectedImage = SelectImageStringDataAdapter::New();
+  mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
@@ -47,14 +48,14 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));
   QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
   segmentationOptionsButton->setCheckable(true);
-  QGroupBox* segmentationOptionsGroupBox = this->createGroupBox(this->createSegmentationOptionsWidget(), new QWidget(), "Segmentation options");
-  connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsGroupBox, SLOT(setVisible(bool)));
+  QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
+  connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
   connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
-  segmentationOptionsGroupBox->setVisible(segmentationOptionsButton->isChecked());
+  segmentationOptionsWidget->setVisible(segmentationOptionsButton->isChecked());
 
-  topLayout->addWidget(segmentationOptionsGroupBox, 1, 0, 1, 2);
-  topLayout->addWidget(segmentButton, 2,0);
-  topLayout->addWidget(segmentationOptionsButton, 2,1);
+  topLayout->addWidget(segmentButton, 1,0);
+  topLayout->addWidget(segmentationOptionsButton, 1,1);
+  topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
 
   this->adjustSizeSlot();
 }
@@ -161,7 +162,8 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 //------------------------------------------------------------------------------
 
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
-    WhatsThisWidget(parent), mSurfaceThreshold(100)
+    WhatsThisWidget(parent),
+    mSurfaceThreshold(100)
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -169,25 +171,26 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
+  toptopLayout->addStretch();
 
   mSelectedImage = SelectImageStringDataAdapter::New();
+  mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
-
 
   QPushButton* surfaceButton = new QPushButton("Surface", this);
   connect(surfaceButton, SIGNAL(clicked()), this, SLOT(surfaceSlot()));
   QPushButton* surfaceOptionsButton = new QPushButton("Options", this);
   surfaceOptionsButton->setCheckable(true);
-  QGroupBox* surfaceOptionsGroupBox = this->createGroupBox(this->createSurfaceOptionsWidget(), new QWidget(), "Surface options");
-  connect(surfaceOptionsButton, SIGNAL(clicked(bool)), surfaceOptionsGroupBox, SLOT(setVisible(bool)));
+  QGroupBox* surfaceOptionsWidget = this->createGroupbox(this->createSurfaceOptionsWidget(), "Surface options");
+  connect(surfaceOptionsButton, SIGNAL(clicked(bool)), surfaceOptionsWidget, SLOT(setVisible(bool)));
   connect(surfaceOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
-  surfaceOptionsGroupBox->setVisible(surfaceOptionsButton->isChecked());
+  surfaceOptionsWidget->setVisible(surfaceOptionsButton->isChecked());
 
-  topLayout->addWidget(surfaceOptionsGroupBox, 1, 0, 1, 2);
-  topLayout->addWidget(surfaceButton, 2,0);
-  topLayout->addWidget(surfaceOptionsButton,2,1);
+  topLayout->addWidget(surfaceButton, 1,0);
+  topLayout->addWidget(surfaceOptionsButton,1,1);
+  topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
 }
 
 SurfaceWidget::~SurfaceWidget()
@@ -199,6 +202,11 @@ QString SurfaceWidget::defaultWhatsThis() const
     "<h3>Surfacing.</h3>"
     "<p><i>Find the surface of a binary volume using marching cubes.</i></p>"
     "</html>";
+}
+
+void SurfaceWidget::setImageInputSlot(QString value)
+{
+  mSelectedImage->setValue(value);
 }
 
 void SurfaceWidget::surfaceSlot()
@@ -237,6 +245,13 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
   this->setWindowTitle("Centerline");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
+
+  mSelectedImage = SelectImageStringDataAdapter::New();
+  mSelectedImage->setValueName("Select input: ");
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
+
+  layout->addWidget(selectImageComboBox);
   layout->addWidget(mFindCenterlineButton);
   layout->addStretch();
 
@@ -254,6 +269,11 @@ QString CenterlineWidget::defaultWhatsThis() const
     "<p><i>Extract the centerline from a segment.</i></p>"
     "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
     "</html>";
+}
+
+void CenterlineWidget::setImageInputSlot(QString value)
+{
+  mSelectedImage->setValue(value);
 }
 
 void CenterlineWidget::showEvent(QShowEvent* event)

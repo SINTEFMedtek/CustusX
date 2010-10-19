@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QFrame>
 #include "cxSegmentationWidget.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
@@ -18,27 +19,47 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mSurfaceWidget = new SurfaceWidget(this);
   mCenterlineWidget =  new CenterlineWidget(this);
 
-  SelectImageStringDataAdapterPtr startSegmentImage = SelectImageStringDataAdapter::New();
-  //connect(startSegmentImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  SelectImageStringDataAdapterPtr segmentationOutput = SelectImageStringDataAdapter::New();
+  segmentationOutput->setValueName("Output: ");
+  connect(segmentationOutput.get(), SIGNAL(imageChanged(QString)), mCenterlineWidget, SLOT(setImageInputSlot(QString)));
+  connect(segmentationOutput.get(), SIGNAL(imageChanged(QString)), mSurfaceWidget, SLOT(setImageInputSlot(QString)));
 
-  SelectImageStringDataAdapterPtr startCenterlineImage = SelectImageStringDataAdapter::New();
-  //connect(startCenterlineImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  SelectImageStringDataAdapterPtr surfaceOutput = SelectImageStringDataAdapter::New();
+  surfaceOutput->setValueName("Output: ");
+  //TODO connect to view!
+  //connect(surfaceOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChanged(QString)));
 
-  mLayout->addWidget(this->createGroupBox(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, startSegmentImage), "Generate segmentation", true, false));
-  mLayout->addWidget(this->createGroupBox(mSurfaceWidget, new QWidget(),"Visualize surface <optional>", true, false));
-  mLayout->addWidget(this->createGroupBox(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, startSegmentImage),"Generate centerline", true, false));
+  SelectImageStringDataAdapterPtr centerlineOutput = SelectImageStringDataAdapter::New();
+  centerlineOutput->setValueName("Output: ");
+  connect(centerlineOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(setImageSlot(QString)));
+
+  mLayout->addWidget(this->createHorizontalLine());
+  mLayout->addWidget(this->createMethodWidget(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, segmentationOutput), "Segmentation"));
+  mLayout->addWidget(this->createHorizontalLine());
+  mLayout->addWidget(this->createMethodWidget(mSurfaceWidget, new ssc::LabeledComboBoxWidget(this, surfaceOutput), "Surface"));
+  mLayout->addWidget(this->createHorizontalLine());
+  mLayout->addWidget(this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, centerlineOutput), "Centerline"));
+  mLayout->addWidget(this->createHorizontalLine());
 }
 
 ImageSegmentationAndCenterlineWidget::~ImageSegmentationAndCenterlineWidget()
 {}
+
+void ImageSegmentationAndCenterlineWidget::setImageSlot(QString uid)
+{
+  if(!mOutput)
+    return;
+  mOutput->setValue(uid);
+}
+
 
 //------------------------------------------------------------------------------
 
 FixedImage2ImageWidget::FixedImage2ImageWidget(QWidget* parent) :
     ImageSegmentationAndCenterlineWidget(parent)
 {
-  ssc::StringDataAdapterPtr fixedImage = RegistrationFixedImageStringDataAdapter::New();
-  mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, fixedImage));
+  mOutput = RegistrationFixedImageStringDataAdapter::New();
+  mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
   mLayout->addStretch();
 };
 
@@ -53,13 +74,14 @@ QString FixedImage2ImageWidget::defaultWhatsThis() const
       "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
       "</html>";
 }
+
 //------------------------------------------------------------------------------
 
 MovingImage2ImageWidget::MovingImage2ImageWidget(QWidget* parent) :
     ImageSegmentationAndCenterlineWidget(parent)
 {
-  ssc::StringDataAdapterPtr movingImage = RegistrationMovingImageStringDataAdapter::New();
-  mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, movingImage));
+  mOutput = RegistrationMovingImageStringDataAdapter::New();
+  mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
   mLayout->addStretch();
 };
 
@@ -74,5 +96,6 @@ QString MovingImage2ImageWidget::defaultWhatsThis() const
       "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
       "</html>";
 }
+
 //------------------------------------------------------------------------------
 }//namespace cx

@@ -100,6 +100,7 @@ public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 };
+typedef boost::shared_ptr<class SelectImageStringDataAdapterBase> SelectImageStringDataAdapterBasePtr;
 
 /** Adapter that connects to the current active image.
  * Example: Active image: [DataName]
@@ -206,12 +207,14 @@ public: // optional methods
 
 public: // interface extension
   ssc::ImagePtr getImage();
+  void setValueName(const QString name);
 
 signals:
     void imageChanged(QString);
 
 private:
   QString mImageUid;
+  QString mValueName;
 };
 
 
