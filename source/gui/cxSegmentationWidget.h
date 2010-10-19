@@ -9,6 +9,7 @@
 
 class QGroupBox;
 class QWidget;
+class QDoubleSpinBox;
 
 namespace cx
 {
@@ -44,9 +45,7 @@ private slots:
   void toogleBinarySlot(bool on);
   void thresholdSlot(int value);
   void toogleSmoothingSlot(bool on);
-  void smoothingSigmaSlot(int value);
-  //void adjustSizeSlot();
-  //void activeImageChangedSlot();
+  void smoothingSigmaSlot(double value);
 
 private:
   SegmentationWidget();
@@ -61,7 +60,7 @@ private:
   double mSmoothSigma; ///< the value used for smoothing (if enabled)
 
   QSpinBox* mSegmentationThresholdSpinBox;
-  QSpinBox* mSmoothingSigmaSpinBox;
+  QDoubleSpinBox* mSmoothingSigmaSpinBox;
   QLabel* mSmoothingSigmaLabel;
 };
 
@@ -91,6 +90,9 @@ signals:
 private slots:
   void surfaceSlot();
   void thresholdSlot(int value);
+  void decimationSlot(double value);
+  void reduceResolutionSlot(bool value);
+  void smoothingSlot(bool value);
 
 private:
   SurfaceWidget();
@@ -98,7 +100,11 @@ private:
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   int mSurfaceThreshold; ///< the threshold value used when contouring
+  double mDecimation;
+  bool mReduceResolution;
+  bool mSmoothing;
   QSpinBox* mSurfaceThresholdSpinBox;
+  QDoubleSpinBox* mDecimationSpinBox;
 };
 
 /**
