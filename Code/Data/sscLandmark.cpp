@@ -8,7 +8,7 @@
 namespace ssc
 {
 
-Landmark::Landmark(std::string uid, Vector3D coord) :
+Landmark::Landmark(QString uid, Vector3D coord) :
   mUid(uid), mCoord(coord)
 {
   mTimestamp = QDateTime::currentDateTime();
@@ -17,7 +17,7 @@ Landmark::Landmark(std::string uid, Vector3D coord) :
 Landmark::~Landmark()
 {}
 
-std::string Landmark::getUid() const
+QString Landmark::getUid() const
 {
   return mUid;
 }
@@ -52,7 +52,7 @@ void Landmark::parseXml(QDomNode& dataNode)
 
   QDomElement base = dataNode.toElement();
 
-  mUid = base.attribute("uid").toStdString();
+  mUid = base.attribute("uid");
   mCoord = Vector3D::fromString(dataNode.namedItem("coord").toElement().text());
   mTimestamp = QDateTime::fromString(dataNode.namedItem("timestamp").toElement().text(), timestampSecondsFormat());
 }
@@ -61,13 +61,13 @@ void Landmark::parseXml(QDomNode& dataNode)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-LandmarkProperty::LandmarkProperty(const std::string& uid, const std::string& name, bool active) : mUid(uid), mName(name), mActive(active)
+LandmarkProperty::LandmarkProperty(const QString& uid, const QString& name, bool active) : mUid(uid), mName(name), mActive(active)
 {
-  if (mName.empty())
+  if (mName.isEmpty())
     mName = mUid;
 }
 
-void LandmarkProperty::setName(const std::string& name)
+void LandmarkProperty::setName(const QString& name)
 {
   mName = name;
 }
@@ -77,7 +77,7 @@ void LandmarkProperty::setActive(bool active)
   mActive = active;
 }
 
-std::string LandmarkProperty::getUid() const
+QString LandmarkProperty::getUid() const
 {
   return mUid;
 }
@@ -87,7 +87,7 @@ bool LandmarkProperty::getActive() const
   return mActive;
 }
 
-std::string LandmarkProperty::getName() const
+QString LandmarkProperty::getName() const
 {
   return mName;
 }
@@ -104,9 +104,9 @@ void LandmarkProperty::parseXml(QDomNode& dataNode)
     return;
 
   QDomElement base = dataNode.toElement();
-  mUid = base.attribute("uid").toStdString();
+  mUid = base.attribute("uid");
   mActive = base.attribute("active").toInt();
-  mName = base.attribute("name").toStdString();
+  mName = base.attribute("name");
 }
 
 

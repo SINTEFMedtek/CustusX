@@ -45,9 +45,9 @@ class ToolRep2D : public ssc::RepImpl
 {
 	Q_OBJECT
 	public:
-		static ToolRep2DPtr New(const std::string& uid, const std::string& name="");
+		static ToolRep2DPtr New(const QString& uid, const QString& name="");
 		~ToolRep2D();
-		virtual std::string getType() const;
+		virtual QString getType() const;
 
 		void setSliceProxy(ssc::SliceProxyPtr slicer);
 		void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp);
@@ -79,7 +79,7 @@ class ToolRep2D : public ssc::RepImpl
 		
 		void updateToolLine(const Vector3D& crossPos, const Vector3D& toolTipPos, const Vector3D toolTipBackPos);
 		void updateOffsetText();
-		ToolRep2D(const std::string& uid, const std::string& name="");
+		ToolRep2D(const QString& uid, const QString& name="");
 		void crossHairResized();
 
 		ssc::SliceProxyPtr mSlicer;

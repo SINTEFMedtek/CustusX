@@ -14,6 +14,7 @@
 #include "sscView.h"
 #include "sscVolumetricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
+#include "sscTypeConversions.h"
 
 //namespace ssc
 //{
@@ -42,8 +43,8 @@ int main(int argc, char **argv)
 	QApplication app(argc, argv);
 
 	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
-	std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
-	//std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	//QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	std::cout << testFile1 << std::endl;
 
 	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->loadImage(testFile1, testFile1, ssc::rtMETAIMAGE);

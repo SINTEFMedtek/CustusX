@@ -13,6 +13,7 @@
 #include "sscImage.h"
 #include "sscSliceProxy.h"
 #include "sscImageLUT2D.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {

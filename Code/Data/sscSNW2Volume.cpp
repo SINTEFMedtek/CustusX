@@ -141,7 +141,7 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath, const SNW2VolumeMetaDa
 	retval->mMetaData = metaData;
 	retval->mImageData = imageData;
 	retval->mLut = lut;
-	retval->mImage = ssc::ImagePtr(new ssc::Image("series_"+retval->uid().toStdString(), retval->mImageData));
+	retval->mImage = ssc::ImagePtr(new ssc::Image("series_"+retval->uid(), retval->mImageData));
 	
 	return retval;
 	
@@ -340,7 +340,7 @@ bool SNW2Volume::loadVolumeData()
 	//writeStatus("checksumming lut["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
 
 	mImageData = vtkImageDataPtr::New();
-	mImage = ssc::ImagePtr(new ssc::Image("series_"+uid().toStdString(), mImageData));
+	mImage = ssc::ImagePtr(new ssc::Image("series_"+uid(), mImageData));
 	mLut = vtkLookupTablePtr::New();
 
 	success = success && rawLoadVtkImageData();
@@ -624,7 +624,7 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 	
 	//boost::array<double, 2> range = scalarRange();
 	
-	//std::stringstream ss;
+	//QStringstream ss;
 	//ss << "ensureCenterWindowValid() id: " << uid() <<  std::endl;
 	//ss << "     Pre values:  " << "window " << window << ", level " << level << ", llr " << llr << ", range [" << range[0] << ", " << range[1] << "]" << std::endl;
 	

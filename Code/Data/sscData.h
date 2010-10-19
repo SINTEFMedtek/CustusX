@@ -38,26 +38,26 @@ class Data : public QObject
   Q_OBJECT
 public:
 	Data(); //TODO remove?
-	Data(const std::string& uid, const std::string& name="");
+	Data(const QString& uid, const QString& name="");
 	virtual ~Data();
 
-	void setUid(const std::string& uid);
-	void setName(const std::string& name);
-	void setFilePath(const std::string& filePath);///< Set current file path to file
+	void setUid(const QString& uid);
+	void setName(const QString& name);
+	void setFilePath(const QString& filePath);///< Set current file path to file
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	//virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
   virtual RegistrationHistoryPtr get_rMd_History();
 
-	virtual std::string getUid() const; ///< \return unique id for this instance
-	virtual std::string getName() const; /// \return a descriptive name for this instance
-	virtual std::string getFilePath() const; ///< \return the corresponding file path
+	virtual QString getUid() const; ///< \return unique id for this instance
+	virtual QString getName() const; /// \return a descriptive name for this instance
+	virtual QString getFilePath() const; ///< \return the corresponding file path
 	virtual REGISTRATION_STATUS getRegistrationStatus() const; ///< \return what kind of registration that has been performed on this data object.
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
   virtual void setShading(bool on);
   virtual bool getShading() const;
 
-  virtual std::string getParentFrame();
-  virtual void setParentFrame(std::string uid);
+  virtual QString getParentFrame();
+  virtual void setParentFrame(QString uid);
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
@@ -72,10 +72,10 @@ protected slots:
   virtual void transformChangedSlot() {}
 
 protected:
-	std::string mUid;
-	std::string mName;
-	std::string mFilePath;
-	std::string mParentFrame;
+	QString mUid;
+	QString mName;
+	QString mFilePath;
+	QString mParentFrame;
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	//Transform3D m_rMd; ///< the transform from data to reference space

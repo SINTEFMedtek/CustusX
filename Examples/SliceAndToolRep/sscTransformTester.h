@@ -13,7 +13,7 @@
 
 struct TransformTest
 {
-	ssc::Transform3D readTransform(std::string filename);
+	ssc::Transform3D readTransform(QString filename);
 	ssc::Transform3D rotateZ180(ssc::Transform3D M0);
 	std::ostream& put(std::ostream& s, ssc::Transform3D M, char newline) const;
 	void test();

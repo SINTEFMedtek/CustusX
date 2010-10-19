@@ -31,13 +31,13 @@ class BlendedSliceRep : public RepImpl
 	Q_OBJECT
 public:
 	virtual ~BlendedSliceRep();
-	static BlendedSliceRepPtr New(const std::string& uid);
-	virtual std::string getType() const { return "ssc::LayerSliceRep"; };
+	static BlendedSliceRepPtr New(const QString& uid);
+	virtual QString getType() const { return "ssc::LayerSliceRep"; };
 	void setSliceProxy(SliceProxyPtr slicer); 
 	void setImages(std::vector<ImagePtr> images);
 	void update();
 protected:
-	BlendedSliceRep(const std::string& uid);
+	BlendedSliceRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
 	virtual void removeRepActorsFromViewRenderer(View* view) ;
 	void addInputImages(vtkImageDataPtr slicedImage);

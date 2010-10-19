@@ -17,15 +17,15 @@ class OrientationAnnotationRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
-	static OrientationAnnotationRepPtr  New(const std::string& uid,const std::string& name);
+	static OrientationAnnotationRepPtr  New(const QString& uid,const QString& name);
 	virtual ~OrientationAnnotationRep();
-	virtual std::string getType() const { return "vm::OrientationAnnotationRep"; };
+	virtual QString getType() const { return "vm::OrientationAnnotationRep"; };
 	
 	void setPlaneType( PLANE_TYPE type);
 private slots:
   void medicalDomainChangedSlot();
 protected:
-	OrientationAnnotationRep(const std::string& uid, const std::string& name);
+	OrientationAnnotationRep(const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 	
@@ -36,10 +36,10 @@ protected:
 	OrientationAnnotationPtr mOrientation;
 	PLANE_TYPE mPlane;
 
-	std::string mNorthAnnotation;
-	std::string mSouthAnnotation;
-	std::string mEastAnnotation;
-	std::string mWestAnnotation;
+	QString mNorthAnnotation;
+	QString mSouthAnnotation;
+	QString mEastAnnotation;
+	QString mWestAnnotation;
 	ssc::TextDisplayPtr mNorth;
 	ssc::TextDisplayPtr mSouth;
 	ssc::TextDisplayPtr mWest;

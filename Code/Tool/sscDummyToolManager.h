@@ -19,7 +19,7 @@ class DummyToolManager : public ToolManager
 	Q_OBJECT
 
 public:
-	typedef std::map<std::string, DummyToolPtr> DummyToolMap;
+	typedef std::map<QString, DummyToolPtr> DummyToolMap;
 	typedef boost::shared_ptr<DummyToolMap> DummyToolMapPtr;
 
 	static ToolManager* getInstance();
@@ -36,19 +36,19 @@ public:
 	virtual ToolMapPtr getConfiguredTools();
 	virtual ToolMapPtr getInitializedTools();
 	virtual ToolMapPtr getTools();
-	virtual ToolPtr getTool(const std::string& uid);
+	virtual ToolPtr getTool(const QString& uid);
 
 	virtual ToolPtr getDominantTool();
-	virtual void setDominantTool(const std::string& uid);
+	virtual void setDominantTool(const QString& uid);
 
-	virtual std::map<std::string, std::string> getToolUidsAndNames() const;
-	virtual std::vector<std::string> getToolNames() const;
-	virtual std::vector<std::string> getToolUids() const;
+	virtual std::map<QString, QString> getToolUidsAndNames() const;
+	virtual std::vector<QString> getToolNames() const;
+	virtual std::vector<QString> getToolUids() const;
 
 	virtual Transform3DPtr get_rMpr() const;
 	virtual void set_rMpr(const Transform3DPtr& val);
 	virtual ToolPtr getReferenceTool() const;
-	virtual void saveTransformsAndTimestamps(std::string filePathAndName = "");
+	virtual void saveTransformsAndTimestamps(QString filePathAndName = "");
 
 	static DummyToolManager* getDowncastInstance();
 	void addTool(DummyToolPtr tool);	

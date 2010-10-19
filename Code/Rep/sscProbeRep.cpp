@@ -22,13 +22,13 @@
 
 namespace ssc
 {
-ProbeRepPtr ProbeRep::New(const std::string& uid, const std::string& name)
+ProbeRepPtr ProbeRep::New(const QString& uid, const QString& name)
 {
 	ProbeRepPtr retval(new ProbeRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-ProbeRep::ProbeRep(const std::string& uid, const std::string& name) :
+ProbeRep::ProbeRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mThreshold(25),
 	mResolution(1000),
@@ -38,7 +38,7 @@ ProbeRep::ProbeRep(const std::string& uid, const std::string& name) :
 {}
 ProbeRep::~ProbeRep()
 {}
-std::string ProbeRep::getType() const
+QString ProbeRep::getType() const
 {
 	return "ssc::ProbeRep";
 }

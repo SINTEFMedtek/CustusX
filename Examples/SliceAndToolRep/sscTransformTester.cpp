@@ -12,16 +12,16 @@
 #include "math.h"
 #include "vtkMatrix4x4.h"
 
-ssc::Transform3D TransformTest::readTransform(std::string filename)
+ssc::Transform3D TransformTest::readTransform(QString filename)
 {
   /* File must be in the form
    * rot_00 rot_01 rot_02 trans_0
    * rot_10 rot_11 rot_12 trans_1
    * rot_20 rot_21 rot_22 trans_2
    */
-  std::string fullstring;
+  QString fullstring;
   std::ifstream inputStream;
-  inputStream.open(filename.c_str());
+  inputStream.open(cstring_cast(filename));
   if(inputStream.is_open())
   {
 	std::string line;
@@ -29,7 +29,7 @@ ssc::Transform3D TransformTest::readTransform(std::string filename)
 	while(!inputStream.eof() && lineNumber<3)
 	{
 	  getline(inputStream, line);
-	  fullstring += line;
+	  fullstring += qstring_cast(line);
 	}
   }
   return ssc::Transform3D::fromString(qstring_cast(fullstring));
@@ -48,7 +48,7 @@ ssc::Transform3D TransformTest::rotateZ180(ssc::Transform3D M0)
 }
 std::ostream& TransformTest::put(std::ostream& s, ssc::Transform3D M, char newline) const
 {
-	std::string ind(1, ' ');
+	QString ind(1, ' ');
 
 	std::ostringstream ss; // avoid changing state of input stream
 	ss << setprecision(6) << std::fixed;
@@ -73,7 +73,7 @@ std::ostream& TransformTest::put(std::ostream& s, ssc::Transform3D M, char newli
 
 void TransformTest::test()
 {
-	std::string path("/Users/christiana/christiana/workspace/");
+	QString path("/Users/christiana/christiana/workspace/");
 	ssc::Transform3D M0 = readTransform(path+"Vivid7_M12L_8700449_water.cal");
 	ssc::Transform3D M1 = readTransform(path+"Vivid7_M12L_8700449.cal");
 

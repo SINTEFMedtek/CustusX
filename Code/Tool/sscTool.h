@@ -31,11 +31,11 @@ public:
 		mUid(""),
 		mName("")
 	{};
-	 Tool(const std::string& uid, const std::string& name ="") :
+	 Tool(const QString& uid, const QString& name ="") :
 	    mUid(uid),
 	    mName(name)
 	  {
-	   if(name.empty())
+	   if(name.isEmpty())
 	     mName = uid;
 	  };
 	~Tool(){};
@@ -56,7 +56,7 @@ public:
 	 * usprobe_12L.stl for the SolidWorks format.
 	 * \sa getGraphicsPolyData().
 	 */
-	virtual std::string getGraphicsFileName() const = 0;
+	virtual QString getGraphicsFileName() const = 0;
 	/**Get a pointer to the tools graphical data in the form of vtkPolyData,	
 	 * if any. Either getGraphicsPolyData() or getGraphicsFileName() or both
 	 * should return valid data. \sa getGraphicsFileName().
@@ -67,12 +67,12 @@ public:
 	virtual void saveTransformsAndTimestamps() = 0;
 	/**Which file to use when calling saveTransformsAndTimestamps().
 	 */
-	virtual void setTransformSaveFile(const std::string& filename) = 0;
+	virtual void setTransformSaveFile(const QString& filename) = 0;
 	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
 	//virtual void set_prMt(const Transform3D& transform) = 0; ///< \return transform from tool to patient ref space
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
-	virtual std::string getUid() const = 0; ///< \return an unique id for this instance
-	virtual std::string getName() const = 0; ///< \return a descriptive name for this instance
+	virtual QString getUid() const = 0; ///< \return an unique id for this instance
+	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
 	//virtual int getIndex() const = 0;///<return a index ivar due to a list..
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
 	
@@ -91,8 +91,8 @@ signals:
 	void toolProbeSector();
 
 protected:
-	std::string mUid;
-	std::string mName;
+	QString mUid;
+	QString mName;
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } // namespace ssc

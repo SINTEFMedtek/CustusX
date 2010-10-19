@@ -8,6 +8,7 @@
 
 #include "sscDataManager.h"
 #include "sscImage.h"
+#include "sscTypeConversions.h"
 
 //namespace ssc
 //{
@@ -19,9 +20,9 @@ int main(int argc, char **argv)
 {
 	std::cout << ssc::TestUtilities::GetDataRoot() << std::endl;
 
-	std::string testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	std::string testFile2 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
-	std::string testFile3 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
+	QString testFile1 = ssc::TestUtilities::ExpandDataFileName("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	QString testFile2 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T105136_MRT1.mhd");
+	QString testFile3 = ssc::TestUtilities::ExpandDataFileName("MetaImage/20070309T102309_MRA.mhd");
 	std::cout << testFile1 << std::endl;
 	//std::cout << testFile2 << std::endl;
 	//std::cout << testFile3 << std::endl;
@@ -30,9 +31,9 @@ int main(int argc, char **argv)
 	ssc::ImagePtr image2 = ssc::DataManager::getInstance()->loadImage(testFile2, testFile2, ssc::rtMETAIMAGE);
 	ssc::ImagePtr image3 = ssc::DataManager::getInstance()->loadImage(testFile3, testFile3, ssc::rtMETAIMAGE);
 
-	std::string Uid1 = image1->getUid();
-	std::string Uid2 = image2->getUid();
-	std::string Uid3 = image3->getUid();
+	QString Uid1 = image1->getUid();
+	QString Uid2 = image2->getUid();
+	QString Uid3 = image3->getUid();
 
 	//ssc::ImagePtr imageTmp = ssc::DataManager::instance()->getImage(Uid1);
 
@@ -61,7 +62,7 @@ int main(int argc, char **argv)
 	std::cout << "Bounds    : " << bounds[0] << "/" << bounds[1] << " / " << bounds[2] << "/" << bounds[3] << " / " << bounds[4] << "/" << bounds[5] << std::endl;
 
 
-	//std::vector<std::string> names = ssc::DataManager::instance()->getImageNames();
+	//std::vector<QString> names = ssc::DataManager::instance()->getImageNames();
 
 	return 0;
 }

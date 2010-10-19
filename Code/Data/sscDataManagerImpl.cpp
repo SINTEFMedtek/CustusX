@@ -35,7 +35,7 @@ namespace ssc
 {
 
 //-----
-DataPtr MetaImageReader::load(const std::string& uid, const std::string& filename)
+DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 {
   //messageManager()->sendDebug("load filename: "+string_cast(filename));
   //read the specific TransformMatrix-tag from the header
@@ -45,7 +45,7 @@ DataPtr MetaImageReader::load(const std::string& uid, const std::string& filenam
   Vector3D e_z(0, 0, 1);
 
   QString creator;
-  QFile file(filename.c_str());
+  QFile file(filename);
 
   QString line;
   if (file.open(QIODevice::ReadOnly))
@@ -109,7 +109,7 @@ DataPtr MetaImageReader::load(const std::string& uid, const std::string& filenam
 
   //load the image from file
   vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
-  reader->SetFileName(filename.c_str());
+  reader->SetFileName(cstring_cast(filename));
   reader->ReleaseDataFlagOn();
   //reader->GetOutput()->ReleaseDataFlagOn();
   reader->Update();
@@ -131,10 +131,10 @@ DataPtr MetaImageReader::load(const std::string& uid, const std::string& filenam
 }
 
 //-----
-DataPtr PolyDataMeshReader::load(const std::string& uid, const std::string& fileName)
+DataPtr PolyDataMeshReader::load(const QString& uid, const QString& fileName)
 {
   vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
-  reader->SetFileName(fileName.c_str());
+  reader->SetFileName(cstring_cast(fileName));
   reader->Update();
   vtkPolyDataPtr polyData = reader->GetOutput();
 
@@ -144,10 +144,10 @@ DataPtr PolyDataMeshReader::load(const std::string& uid, const std::string& file
 
 }
 
-DataPtr StlMeshReader::load(const std::string& uid, const std::string& fileName)
+DataPtr StlMeshReader::load(const QString& uid, const QString& fileName)
 {
   vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
-  reader->SetFileName(fileName.c_str());
+  reader->SetFileName(cstring_cast(fileName));
   reader->Update();
   vtkPolyDataPtr polyData = reader->GetOutput();
 
@@ -235,57 +235,57 @@ void DataManagerImpl::setActiveImage(ImagePtr activeImage)
   this->vtkImageDataChangedSlot();
 }
 
-void DataManagerImpl::setLandmarkNames(std::vector<std::string> names)
+void DataManagerImpl::setLandmarkNames(std::vector<QString> names)
 {
   mLandmarkProperties.clear();
   for (unsigned i = 0; i < names.size(); ++i)
   {
-    LandmarkProperty prop(string_cast(i + 1), names[i]); // generate 1-indexed uids (keep users happy)
+    LandmarkProperty prop(qstring_cast(i + 1), names[i]); // generate 1-indexed uids (keep users happy)
     mLandmarkProperties[prop.getUid()] = prop;
   }
   emit landmarkPropertiesChanged();
 }
 
-std::string DataManagerImpl::addLandmark()
+QString DataManagerImpl::addLandmark()
 {
   int max = 0;
-  std::map<std::string, LandmarkProperty>::iterator iter;
+  std::map<QString, LandmarkProperty>::iterator iter;
   for (iter = mLandmarkProperties.begin(); iter != mLandmarkProperties.end(); ++iter)
   {
     //max = std::max(max, qstring_cast(iter->second.getName()).toInt());
     max = std::max(max, qstring_cast(iter->first).toInt());
   }
-  std::string uid = string_cast(max + 1);
+  QString uid = qstring_cast(max + 1);
   mLandmarkProperties[uid] = LandmarkProperty(uid);
 
   emit landmarkPropertiesChanged();
   return uid;
 }
 
-void DataManagerImpl::setLandmarkName(std::string uid, std::string name)
+void DataManagerImpl::setLandmarkName(QString uid, QString name)
 {
   mLandmarkProperties[uid].setName(name);
   emit landmarkPropertiesChanged();
 }
 
-std::map<std::string, LandmarkProperty> DataManagerImpl::getLandmarkProperties() const
+std::map<QString, LandmarkProperty> DataManagerImpl::getLandmarkProperties() const
 {
   return mLandmarkProperties;
 }
 
-void DataManagerImpl::setLandmarkActive(std::string uid, bool active)
+void DataManagerImpl::setLandmarkActive(QString uid, bool active)
 {
   mLandmarkProperties[uid].setActive(active);
   emit landmarkPropertiesChanged();
 }
 
-ImagePtr DataManagerImpl::loadImage(const std::string& uid, const std::string& filename, READER_TYPE type)
+ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename, READER_TYPE type)
 {
   this->loadData(uid,filename,type);
   return this->getImage(uid);
 }
 
-DataPtr DataManagerImpl::loadData(const std::string& uid, const std::string& path, READER_TYPE type)
+DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READER_TYPE type)
 {
   DataPtr data = this->readData(uid,path,type);
   this->loadData(data);
@@ -295,7 +295,7 @@ DataPtr DataManagerImpl::loadData(const std::string& uid, const std::string& pat
 /** Read a data set and return it. Do NOT add it to the datamanager.
  *  Internal method: used by loadData family.
  */
-DataPtr DataManagerImpl::readData(const std::string& uid, const std::string& path, READER_TYPE type)
+DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READER_TYPE type)
 {
   QFileInfo fileInfo(qstring_cast(path));
 
@@ -317,7 +317,7 @@ DataPtr DataManagerImpl::readData(const std::string& uid, const std::string& pat
   if (!current)
     return DataPtr();
 
-  current->setName(changeExtension(fileInfo.fileName(), "").toStdString());
+  current->setName(changeExtension(fileInfo.fileName(), ""));
   //data->setFilePath(relativePath.path().toStdString());
 
 //  this->loadData(current);
@@ -335,44 +335,44 @@ void DataManagerImpl::loadData(DataPtr data)
   }
 }
 
-void DataManagerImpl::saveImage(ImagePtr image, const std::string& basePath)
+void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 {
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
   writer->SetInput(image->getBaseVtkImageData());
   writer->SetFileDimensionality(3);
-  std::string filename = basePath + "/" + image->getFilePath();
-  writer->SetFileName(filename.c_str());
+  QString filename = basePath + "/" + image->getFilePath();
+  writer->SetFileName(cstring_cast(filename));
 
   //Rename ending from .mhd to .raw
   QStringList splitName = qstring_cast(filename).split(".");
   splitName[splitName.size() - 1] = "raw";
-  filename = string_cast(splitName.join("."));
+  filename = splitName.join(".");
 
-  writer->SetRAWFileName(filename.c_str());
+  writer->SetRAWFileName(cstring_cast(filename));
   writer->SetCompression(false);
   writer->Update();
   writer->Write();
 }
 
 // meshes
-MeshPtr DataManagerImpl::loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE type)
+MeshPtr DataManagerImpl::loadMesh(const QString& uid, const QString& fileName, READER_TYPE type)
 {
   this->loadData(uid,fileName,type);
   return this->getMesh(uid);
 }
 
-void DataManagerImpl::saveMesh(MeshPtr mesh, const std::string& basePath)
+void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
 {
   vtkPolyDataWriterPtr writer = vtkPolyDataWriterPtr::New();
   writer->SetInput(mesh->getVtkPolyData());
   //writer->SetFileDimensionality(3);
-  std::string filename = basePath + "/" + mesh->getFilePath();
-  writer->SetFileName(filename.c_str());
+  QString filename = basePath + "/" + mesh->getFilePath();
+  writer->SetFileName(cstring_cast(filename));
 
   //Rename ending from .mhd to .raw
   QStringList splitName = qstring_cast(filename).split(".");
   splitName[splitName.size() - 1] = "raw";
-  filename = string_cast(splitName.join("."));
+  filename = splitName.join(".");
 
   //writer->SetRAWFileName(filename.c_str());
   //writer->SetCompression(false);
@@ -380,7 +380,7 @@ void DataManagerImpl::saveMesh(MeshPtr mesh, const std::string& basePath)
   writer->Write();
 }
 
-DataPtr DataManagerImpl::getData(const std::string& uid) const
+DataPtr DataManagerImpl::getData(const QString& uid) const
 {
   DataMap::const_iterator iter = mData.find(uid);
   if (iter==mData.end())
@@ -390,10 +390,10 @@ DataPtr DataManagerImpl::getData(const std::string& uid) const
 
 void DataManagerImpl::verifyParentFrame(DataPtr data)
 {
-  if(data->getParentFrame().empty())
+  if(data->getParentFrame().isEmpty())
   {
     int max = 0;
-    std::map<std::string, DataPtr>::iterator iter;
+    std::map<QString, DataPtr>::iterator iter;
     for (iter = mData.begin(); iter != mData.end(); ++iter)
     {
       //max = std::max(max, qstring_cast(iter->first).toInt());
@@ -402,24 +402,24 @@ void DataManagerImpl::verifyParentFrame(DataPtr data)
         continue;
       max = std::max(max, parentList[1].toInt());
     }
-    std::string parentFrame = "frame_" + string_cast(max + 1);
+    QString parentFrame = "frame_" + qstring_cast(max + 1);
     data->setParentFrame(parentFrame);
   }
 }
 
-ImagePtr DataManagerImpl::getImage(const std::string& uid) const
+ImagePtr DataManagerImpl::getImage(const QString& uid) const
 {
   return boost::shared_dynamic_cast<Image>(this->getData(uid));
 }
 
-std::map<std::string, DataPtr> DataManagerImpl::getData() const
+std::map<QString, DataPtr> DataManagerImpl::getData() const
 {
   return mData;
 }
 
-std::map<std::string, ImagePtr> DataManagerImpl::getImages() const
+std::map<QString, ImagePtr> DataManagerImpl::getImages() const
 {
-  std::map<std::string, ImagePtr> retval;
+  std::map<QString, ImagePtr> retval;
   for (DataMap::const_iterator iter=mData.begin(); iter!=mData.end(); ++iter)
   {
     ImagePtr image = this->getImage(iter->first);
@@ -430,44 +430,44 @@ std::map<std::string, ImagePtr> DataManagerImpl::getImages() const
   return retval;
 }
 
-std::map<std::string, std::string> DataManagerImpl::getImageUidsAndNames() const
+std::map<QString, QString> DataManagerImpl::getImageUidsAndNames() const
 {
-  std::map<std::string, ImagePtr> images = this->getImages();
+  std::map<QString, ImagePtr> images = this->getImages();
 
-  std::map<std::string, std::string> retval;
+  std::map<QString, QString> retval;
   for (ImagesMap::const_iterator iter = images.begin(); iter != images.end(); ++iter)
     retval[iter->first] = iter->second->getName();
   return retval;
 }
 
-std::vector<std::string> DataManagerImpl::getImageNames() const
+std::vector<QString> DataManagerImpl::getImageNames() const
 {
-  std::map<std::string, ImagePtr> images = this->getImages();
+  std::map<QString, ImagePtr> images = this->getImages();
 
-  std::vector<std::string> retval;
+  std::vector<QString> retval;
   for (ImagesMap::const_iterator iter = images.begin(); iter != images.end(); ++iter)
     retval.push_back(iter->second->getName());
   return retval;
 }
 
-std::vector<std::string> DataManagerImpl::getImageUids() const
+std::vector<QString> DataManagerImpl::getImageUids() const
 {
-  std::map<std::string, ImagePtr> images = this->getImages();
+  std::map<QString, ImagePtr> images = this->getImages();
 
-  std::vector<std::string> retval;
+  std::vector<QString> retval;
   for (ImagesMap::const_iterator iter = images.begin(); iter != images.end(); ++iter)
     retval.push_back(iter->first);
   return retval;
 }
 
-MeshPtr DataManagerImpl::getMesh(const std::string& uid) const
+MeshPtr DataManagerImpl::getMesh(const QString& uid) const
 {
   return boost::shared_dynamic_cast<Mesh>(this->getData(uid));
 }
 
-std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() const
+std::map<QString, MeshPtr> DataManagerImpl::getMeshes() const
 {
-  std::map<std::string, MeshPtr> retval;
+  std::map<QString, MeshPtr> retval;
   for (DataMap::const_iterator iter=mData.begin(); iter!=mData.end(); ++iter)
   {
     MeshPtr mesh = this->getMesh(iter->first);
@@ -478,30 +478,30 @@ std::map<std::string, MeshPtr> DataManagerImpl::getMeshes() const
   return retval;
 }
 
-std::map<std::string, std::string> DataManagerImpl::getMeshUidsWithNames() const
+std::map<QString, QString> DataManagerImpl::getMeshUidsWithNames() const
 {
-  std::map<std::string, MeshPtr> meshes = getMeshes();
+  std::map<QString, MeshPtr> meshes = getMeshes();
 
-  std::map<std::string, std::string> retval;
+  std::map<QString, QString> retval;
   for (MeshMap::const_iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
     retval[iter->first] = iter->second->getName();
   return retval;
 }
-std::vector<std::string> DataManagerImpl::getMeshUids() const
+std::vector<QString> DataManagerImpl::getMeshUids() const
 {
-  std::map<std::string, MeshPtr> meshes = this->getMeshes();
+  std::map<QString, MeshPtr> meshes = this->getMeshes();
 
-  std::vector<std::string> retval;
+  std::vector<QString> retval;
   for (MeshMap::const_iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
     retval.push_back(iter->first);
   return retval;
 }
 
-std::vector<std::string> DataManagerImpl::getMeshNames() const
+std::vector<QString> DataManagerImpl::getMeshNames() const
 {
-  std::map<std::string, MeshPtr> meshes = this->getMeshes();
+  std::map<QString, MeshPtr> meshes = this->getMeshes();
 
-  std::vector<std::string> retval;
+  std::vector<QString> retval;
   for (MeshMap::const_iterator iter = meshes.begin(); iter != meshes.end(); ++iter)
     retval.push_back(iter->second->getName());
   return retval;
@@ -515,7 +515,7 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
 
   QDomElement activeImageNode = doc.createElement("activeImageUid");
   if (mActiveImage)
-    activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid().c_str()));
+    activeImageNode.appendChild(doc.createTextNode(mActiveImage->getUid()));
   dataManagerNode.appendChild(activeImageNode);
 
   QDomElement landmarkPropsNode = doc.createElement("landmarkprops");
@@ -535,9 +535,7 @@ void DataManagerImpl::addXml(QDomNode& parentNode)
    dataManagerNode.appendChild(activeMeshNode);*/
 
   QDomElement centerNode = doc.createElement("center");
-  std::stringstream centerStream;
-  centerStream << mCenter;
-  centerNode.appendChild(doc.createTextNode(centerStream.str().c_str()));
+  centerNode.appendChild(doc.createTextNode(qstring_cast(mCenter)));
   dataManagerNode.appendChild(centerNode);
 
   for (DataMap::const_iterator iter = mData.begin(); iter != mData.end(); ++iter)
@@ -580,7 +578,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
       const QString activeImageString = child.toElement().text();
       if (!activeImageString.isEmpty())
       {
-        ImagePtr image = this->getImage(activeImageString.toStdString());
+        ImagePtr image = this->getImage(activeImageString);
         this->setActiveImage(image);
       }
     }
@@ -629,17 +627,17 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
     return;
   }
 
-  ssc::DataPtr data = this->readData(string_cast(uidNodeString), string_cast(path), rtAUTO);
+  ssc::DataPtr data = this->readData(uidNodeString, path, rtAUTO);
 
   if (!data)
   {
-    messageManager()->sendWarning("Unknown file: " + string_cast(path));
+    messageManager()->sendWarning("Unknown file: " + path);
     return;
   }
 
   if (!nameNode.text().isEmpty())
-    data->setName(string_cast(nameNode.text()));
-  data->setFilePath(relativePath.path().toStdString());
+    data->setName(nameNode.text());
+  data->setFilePath(relativePath.path());
   data->parseXml(node);
 
   this->loadData(data);
@@ -664,12 +662,12 @@ READER_TYPE DataManagerImpl::getReaderType(QString fileType)
 
 void DataManagerImpl::vtkImageDataChangedSlot()
 {
-  std::string uid = "";
+  QString uid = "";
   if (mActiveImage)
     uid = mActiveImage->getUid();
 
   emit activeImageChanged(uid);
-  messageManager()->sendInfo("Active image set to " + string_cast(uid));
+  messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
 
 void DataManagerImpl::transferFunctionsChangedSlot()
@@ -690,7 +688,7 @@ void DataManagerImpl::setMedicalDomain(MEDICAL_DOMAIN domain)
   emit medicalDomainChanged();
 }
 
-int DataManagerImpl::findUniqueUidNumber(std::string uidBase) const
+int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 {
   // Find an uid that is not used before
   int numMatches = 1;
@@ -701,7 +699,7 @@ int DataManagerImpl::findUniqueUidNumber(std::string uidBase) const
     while(numMatches != 0)
     {
       QString newId = qstring_cast(uidBase).arg(++recNumber);
-      numMatches = mData.count(string_cast(newId));
+      numMatches = mData.count(qstring_cast(newId));
     }
   }
   return recNumber;
@@ -712,21 +710,21 @@ int DataManagerImpl::findUniqueUidNumber(std::string uidBase) const
  *  if %1 is found there
  *
  */
-ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
+ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
 {
   int recNumber = this->findUniqueUidNumber(uidBase);
 
-  std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
-  std::string name;
+  QString uid = qstring_cast(uidBase).arg(recNumber);
+  QString name;
 
   if (recNumber==1)
-    name = string_cast(qstring_cast(nameBase).arg(""));
+    name = qstring_cast(nameBase).arg("");
   else
-    name = string_cast(qstring_cast(nameBase).arg("#%1").arg(recNumber));
+    name = qstring_cast(nameBase).arg("#%1").arg(recNumber);
 
   ImagePtr retval = ImagePtr(new Image(uid, data, name));
 
-  std::string filename = filePath + "/" + uid + ".mhd";
+  QString filename = filePath + "/" + uid + ".mhd";
   retval->setFilePath(filename);
 
   return retval;
@@ -736,14 +734,14 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, std::string uidBase,
  *  if %1 is found there
  *
  */
-MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, std::string uidBase, std::string nameBase, std::string filePath)
+MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
 {
   int recNumber = this->findUniqueUidNumber(uidBase);
-  std::string uid = string_cast(qstring_cast(uidBase).arg(recNumber));
-  std::string name = string_cast(qstring_cast(nameBase).arg(recNumber));
+  QString uid = qstring_cast(uidBase).arg(recNumber);
+  QString name = qstring_cast(nameBase).arg(recNumber);
   MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
 
-  std::string filename = filePath + "/" + uid + ".vtk";
+  QString filename = filePath + "/" + uid + ".vtk";
   retval->setFilePath(filename);
 
   return retval;

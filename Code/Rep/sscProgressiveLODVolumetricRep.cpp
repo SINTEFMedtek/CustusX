@@ -8,6 +8,8 @@
 
 #include "sscView.h"
 #include "sscVolumetricRep.h"
+#include "sscTypeConversions.h"
+
 
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
@@ -70,7 +72,7 @@ private:
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const std::string& uid, const std::string& name) :
+ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const QString& uid, const QString& name) :
 	VolumetricBaseRep(uid, name)
 {
 	mMaxVoxels = 0;
@@ -102,7 +104,7 @@ ProgressiveLODVolumetricRep::~ProgressiveLODVolumetricRep()
 	clearThreads();
 }
 
-ProgressiveLODVolumetricRepPtr ProgressiveLODVolumetricRep::New(const std::string& uid, const std::string& name)
+ProgressiveLODVolumetricRepPtr ProgressiveLODVolumetricRep::New(const QString& uid, const QString& name)
 {
 	ProgressiveLODVolumetricRepPtr retval(new ProgressiveLODVolumetricRep(uid));
 	retval->mSelf = retval;
@@ -163,7 +165,7 @@ VolumetricRepPtr ProgressiveLODVolumetricRep::getNextResampleLevel()
 	if (mResampleFactors.empty())
 		return VolumetricRepPtr();
 	double factor = mResampleFactors.back();
-	std::string text = "_" + boost::lexical_cast<std::string>(factor);
+	QString text = "_" + qstring_cast(factor);
 	mResampleFactors.pop_back();
 
 	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text, getName()+text);

@@ -49,39 +49,39 @@ class DataManager : public QObject
 {
 	Q_OBJECT
 public:
-  typedef std::map<std::string, DataPtr> DataMap;
-	typedef std::map<std::string, ImagePtr> ImagesMap;
-	typedef std::map<std::string, MeshPtr> MeshMap;
+  typedef std::map<QString, DataPtr> DataMap;
+	typedef std::map<QString, ImagePtr> ImagesMap;
+	typedef std::map<QString, MeshPtr> MeshMap;
 
 	static DataManager* getInstance();
   static void shutdown();
 
 	// images
-	virtual ImagePtr loadImage(const std::string& uid, const std::string& filename, READER_TYPE type) = 0;
+	virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE type) = 0;
   //virtual void loadImage(ImagePtr image) = 0; ///< load an image generated outside the manager.
-  virtual void saveImage(ImagePtr image, const std::string& basePath) = 0; ///< Save image to file
-	virtual ImagePtr getImage(const std::string& uid) const = 0;
-	virtual std::map<std::string, ImagePtr> getImages() const = 0;
+  virtual void saveImage(ImagePtr image, const QString& basePath) = 0; ///< Save image to file
+	virtual ImagePtr getImage(const QString& uid) const = 0;
+	virtual std::map<QString, ImagePtr> getImages() const = 0;
 
-	virtual std::map<std::string, std::string> getImageUidsAndNames() const = 0;
-	virtual std::vector<std::string> getImageNames() const = 0;
-	virtual std::vector<std::string> getImageUids() const = 0;
+	virtual std::map<QString, QString> getImageUidsAndNames() const = 0;
+	virtual std::vector<QString> getImageNames() const = 0;
+	virtual std::vector<QString> getImageUids() const = 0;
 
 	// meshes
-  virtual void saveMesh(MeshPtr mesh, const std::string& basePath) = 0; ///< Save mesh to file
-	virtual MeshPtr loadMesh(const std::string& uid, const std::string& fileName, READER_TYPE meshType) = 0;
-	virtual MeshPtr getMesh(const std::string& uid) const = 0;
-	virtual std::map<std::string, MeshPtr> getMeshes() const = 0;
+  virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0; ///< Save mesh to file
+	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE meshType) = 0;
+	virtual MeshPtr getMesh(const QString& uid) const = 0;
+	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
 
-	virtual std::map<std::string, std::string> getMeshUidsWithNames() const = 0;
-	virtual std::vector<std::string> getMeshUids() const = 0;
-	virtual std::vector<std::string> getMeshNames() const = 0;
+	virtual std::map<QString, QString> getMeshUidsWithNames() const = 0;
+	virtual std::vector<QString> getMeshUids() const = 0;
+	virtual std::vector<QString> getMeshNames() const = 0;
 
 	// data
   virtual void loadData(DataPtr data) = 0;
-  virtual DataPtr loadData(const std::string& uid, const std::string& path, READER_TYPE type) = 0;
-  virtual std::map<std::string, DataPtr> getData() const = 0;
-  virtual DataPtr getData(const std::string& uid) const = 0;
+  virtual DataPtr loadData(const QString& uid, const QString& path, READER_TYPE type) = 0;
+  virtual std::map<QString, DataPtr> getData() const = 0;
+  virtual DataPtr getData(const QString& uid) const = 0;
 
 	// global data (move to separate class if list grows)
 	virtual Vector3D getCenter() const = 0; ///< current common center point for user viewing.
@@ -91,16 +91,16 @@ public:
 	virtual ImagePtr getActiveImage() const; ///< used for system state
 	virtual void setActiveImage(ImagePtr activeImage); ///< used for system state
 
-  virtual std::string addLandmark() { return ""; }
-  virtual void setLandmarkNames(std::vector<std::string> names) {}
-  virtual void setLandmarkName(std::string uid, std::string name) {}
-  virtual void setLandmarkActive(std::string uid, bool active) {}
+  virtual QString addLandmark() { return ""; }
+  virtual void setLandmarkNames(std::vector<QString> names) {}
+  virtual void setLandmarkName(QString uid, QString name) {}
+  virtual void setLandmarkActive(QString uid, bool active) {}
   virtual LandmarkPropertyMap getLandmarkProperties() const { return LandmarkPropertyMap(); }
   virtual MEDICAL_DOMAIN getMedicalDomain() const { return mdLABORATORY; }
   virtual void setMedicalDomain(MEDICAL_DOMAIN domain) {}
   virtual void clear() {}; ///< remove all stuff from manager
-  virtual ImagePtr createImage(vtkImageDataPtr data, std::string uidBase, std::string nameBase, std::string filePath="Images") { return ImagePtr(); }
-  virtual MeshPtr createMesh(vtkPolyDataPtr data, std::string uidBase, std::string nameBase, std::string filePath) { return MeshPtr(); }
+  virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath="Images") { return ImagePtr(); }
+  virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) { return MeshPtr(); }
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
@@ -110,9 +110,9 @@ public:
 signals:
 	void centerChanged(); ///< emitted when center is changed.
 	void dataLoaded(); ///emitted when data is loaded successfully
-	void activeImageChanged(const std::string& uId); ///< emitted when the active image or the image data inside the image is changed 
+	void activeImageChanged(const QString& uId); ///< emitted when the active image or the image data inside the image is changed 
 	void activeImageTransferFunctionsChanged(); ///< emitted when the transfer functions in active image is changed
-	//void activeMeshChanged(const std::string& uId); ///< emitted when the active mesh is changed
+	//void activeMeshChanged(const QString& uId); ///< emitted when the active mesh is changed
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void medicalDomainChanged();
 

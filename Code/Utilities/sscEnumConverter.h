@@ -4,8 +4,10 @@
 #include <string>
 #include <boost/array.hpp>
 #include <boost/algorithm/string.hpp>
+#include <QString>
+#include "sscTypeConversions.h"
 
-/**Class for easy conversion between an enum and a std::string.
+/**Class for easy conversion between an enum and a QString.
  * 
  * NOTE: Use the helper macros instead of the description below.
  * 
@@ -59,7 +61,7 @@
  * Define the mText array for your enum, for example
  * 
 	template<>
-	boost::array<std::string, vm::vtCOUNT> EnumConverter<vm::VIEW_ZONE_TYPE,vm::vtCOUNT>::mText =
+	boost::array<QString, vm::vtCOUNT> EnumConverter<vm::VIEW_ZONE_TYPE,vm::vtCOUNT>::mText =
 	{
 		{
 			"ACS_3D_LAYOUT",
@@ -69,11 +71,11 @@
  * 
  * Then implement the two nonmember functions to call their respective member functions, as follows:
  * 
-	template<> std::string enum2string<vm::VIEW_ZONE_TYPE>(const vm::VIEW_ZONE_TYPE& val)
+	template<> QString enum2string<vm::VIEW_ZONE_TYPE>(const vm::VIEW_ZONE_TYPE& val)
 	{
 		return EnumConverter<vm::VIEW_ZONE_TYPE, vm::vtCOUNT>::enum2string(val);
 	}
-	template<> vm::VIEW_ZONE_TYPE string2enum<vm::VIEW_ZONE_TYPE>(const std::string& val)
+	template<> vm::VIEW_ZONE_TYPE string2enum<vm::VIEW_ZONE_TYPE>(const QString& val)
 	{
 		return EnumConverter<vm::VIEW_ZONE_TYPE, vm::vtCOUNT>::string2enum(val);
 	}
@@ -87,29 +89,29 @@ template<class ENUM, unsigned COUNT>
 class EnumConverter
 {
 public:
-	static boost::array<std::string, COUNT> mText;
+	static boost::array<QString, COUNT> mText;
 	
-	static std::string enum2string(const ENUM& val)
+	static QString enum2string(const ENUM& val)
 	{
 		if (unsigned(val)<mText.size())	
 			return mText[val];
 		return "UNDEFINED";
 	}
 
-	static ENUM string2enum(const std::string& val)
+	static ENUM string2enum(const QString& val)
 	{
 		for (unsigned i=0; i<mText.size(); ++i)
-			if (boost::to_upper_copy(mText[i])==boost::to_upper_copy(val))
+			if (mText[i].toUpper()==val.toUpper())
 				return static_cast<ENUM>(i);
 		return static_cast<ENUM>(COUNT);
 	}	
 };
 
 template<class ENUM>
-ENUM string2enum(const std::string& val);
+ENUM string2enum(const QString& val);
 
 template<class ENUM>
-std::string enum2string(const ENUM& val);
+QString enum2string(const ENUM& val);
 
 
 
@@ -122,9 +124,9 @@ namespace NS                                                         \
 	std::ostream& operator<<(std::ostream& s, const ENUM_NAME& val); \
 }                                                                    \
 template<>                                                           \
-std::string enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val);    \
+QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val);    \
 template<>                                                           \
-NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const std::string& val);    \
+NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val);    \
 //-----------------------------------------------------------------
 
 /**Use these macros to generate string<-->enum converter functions 
@@ -143,16 +145,16 @@ NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const std::string& val);    \
  */
 #define SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(NS, ENUM_NAME, ENUM_SIZE)                  \
 template<>                                                                                 \
-boost::array<std::string, NS::ENUM_SIZE> EnumConverter<NS::ENUM_NAME,NS::ENUM_SIZE>::mText = \
+boost::array<QString, NS::ENUM_SIZE> EnumConverter<NS::ENUM_NAME,NS::ENUM_SIZE>::mText = \
 {                                                                                          \
 
 #define SNW_DEFINE_ENUM_STRING_CONVERTERS_END(NS, ENUM_NAME, ENUM_SIZE)     \
 };                                                                          \
-template<> std::string enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val) \
+template<> QString enum2string<NS::ENUM_NAME>(const NS::ENUM_NAME& val) \
 {                                                                           \
 	return EnumConverter<NS::ENUM_NAME, NS::ENUM_SIZE>::enum2string(val);   \
 }                                                                           \
-template<> NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const std::string& val) \
+template<> NS::ENUM_NAME string2enum<NS::ENUM_NAME>(const QString& val) \
 {                                                                           \
 	return EnumConverter<NS::ENUM_NAME, NS::ENUM_SIZE>::string2enum(val);   \
 }                                                                           \

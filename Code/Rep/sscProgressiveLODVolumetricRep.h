@@ -33,9 +33,9 @@ class ProgressiveLODVolumetricRep : public VolumetricBaseRep
 public:
 	virtual ~ProgressiveLODVolumetricRep();
 
-	static ProgressiveLODVolumetricRepPtr New(const std::string& uid, const std::string& name="");
+	static ProgressiveLODVolumetricRepPtr New(const QString& uid, const QString& name="");
 
-	virtual std::string getType() const { return "ssc::ProgressiveLODVolumetricRep"; }
+	virtual QString getType() const { return "ssc::ProgressiveLODVolumetricRep"; }
 	virtual void setImage(ImagePtr image);
 	virtual ImagePtr getImage();
 	virtual bool hasImage(ImagePtr image) const;
@@ -49,7 +49,7 @@ public:
 
 
 protected:
-	ProgressiveLODVolumetricRep(const std::string& uid, const std::string& name="");
+	ProgressiveLODVolumetricRep(const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

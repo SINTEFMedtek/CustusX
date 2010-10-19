@@ -25,7 +25,7 @@ DummyToolManager::DummyToolManager() :
 	mDominantTool = tool1;
 	mReferenceTool = tool1;
 
-	mDummyTools->insert(std::pair<std::string, DummyToolPtr>(tool1->getUid(),
+	mDummyTools->insert(std::pair<QString, DummyToolPtr>(tool1->getUid(),
                                                             tool1));
 }
 DummyToolManager::~ DummyToolManager()
@@ -86,7 +86,7 @@ ToolManager::ToolMapPtr DummyToolManager::getConfiguredTools()
 	DummyToolMapIter it = mDummyTools->begin();
 	while(it != mDummyTools->end())
 	{
-		retval->insert(std::pair<std::string, ToolPtr>
+		retval->insert(std::pair<QString, ToolPtr>
                      (((*it).first), (ToolPtr)((*it).second)));
 		it++;
 	}
@@ -106,12 +106,12 @@ ToolManager::ToolMapPtr DummyToolManager::getTools()
 	DummyToolMapIter it = mDummyTools->begin();	
 	while(it != mDummyTools->end())
 	{
-		retval->insert(std::pair<std::string, ToolPtr> (((*it).first), (ToolPtr)((*it).second)));
+		retval->insert(std::pair<QString, ToolPtr> (((*it).first), (ToolPtr)((*it).second)));
 		it++;
 	}
 	return retval;
 }
-ToolPtr DummyToolManager::getTool(const std::string& uid)
+ToolPtr DummyToolManager::getTool(const QString& uid)
 {
 	DummyToolMapConstIter it = mDummyTools->find(uid);
 	return (*it).second;
@@ -121,29 +121,29 @@ ToolPtr DummyToolManager::getDominantTool()
 {
 	return mDominantTool;
 }
-void DummyToolManager::setDominantTool(const std::string& uid)
+void DummyToolManager::setDominantTool(const QString& uid)
 {
 	DummyToolMapConstIter it = mDummyTools->find(uid);
 	mDominantTool = (*it).second;
 	emit dominantToolChanged(uid);
 }
 
-std::map<std::string, std::string> DummyToolManager::getToolUidsAndNames() const
+std::map<QString, QString> DummyToolManager::getToolUidsAndNames() const
 {
-	std::map<std::string, std::string> uidsAndNames;
+	std::map<QString, QString> uidsAndNames;
 
 	DummyToolMapConstIter it = mDummyTools->begin();
 	while(it != mDummyTools->end())
 	{
-		uidsAndNames.insert(std::pair<std::string, std::string>(
+		uidsAndNames.insert(std::pair<QString, QString>(
                            ((*it).second)->getUid(),((*it).second)->getName()));
 		it++;
 	}
 	return uidsAndNames;
 }
-std::vector<std::string> DummyToolManager::getToolNames() const
+std::vector<QString> DummyToolManager::getToolNames() const
 {
-	std::vector<std::string> names;
+	std::vector<QString> names;
 	DummyToolMapConstIter it = mDummyTools->begin();
 	while(it != mDummyTools->end())
 	{
@@ -152,9 +152,9 @@ std::vector<std::string> DummyToolManager::getToolNames() const
 	}
 	return names;
 }
-std::vector<std::string> DummyToolManager::getToolUids() const
+std::vector<QString> DummyToolManager::getToolUids() const
 {
-	std::vector<std::string> uids;
+	std::vector<QString> uids;
 	DummyToolMapConstIter it = mDummyTools->begin();
 	while(it != mDummyTools->end())
 	{
@@ -178,7 +178,7 @@ ToolPtr DummyToolManager::getReferenceTool() const
 {
 	return mReferenceTool;
 }
-void DummyToolManager::saveTransformsAndTimestamps(std::string filePathAndName)
+void DummyToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 {
 	DummyToolMapConstIter it = mDummyTools->begin();
 	while(it != mDummyTools->end())

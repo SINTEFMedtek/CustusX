@@ -23,16 +23,16 @@ class SliceRep : public RepImpl
 public:
 	virtual ~SliceRep();
 
-	static SliceRepPtr New(const std::string& uid);
+	static SliceRepPtr New(const QString& uid);
 
-	virtual std::string getType() const { return "ssc::SliceRep"; }
+	virtual QString getType() const { return "ssc::SliceRep"; }
 	void setImage(ImagePtr image);
 	//void addImage(ImagePtr image);
 	//void removeImage(ImagePtr image);
 	bool hasImage(ImagePtr image) const;
 	
 protected:
-	SliceRep(const std::string& uid);
+	SliceRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

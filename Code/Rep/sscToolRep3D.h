@@ -30,9 +30,9 @@ class ToolRep3D : public RepImpl
 {
 	Q_OBJECT
 public:
-	static ToolRep3DPtr New(const std::string& uid, const std::string& name="");
+	static ToolRep3DPtr New(const QString& uid, const QString& name="");
 	virtual ~ToolRep3D();
-	virtual std::string getType() const;
+	virtual QString getType() const;
 
 	virtual void setTool(ToolPtr tool);
 	virtual bool hasTool(ToolPtr tool) const;
@@ -43,7 +43,7 @@ public:
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 
 protected:
-	ToolRep3D(const std::string& uid, const std::string& name="");
+	ToolRep3D(const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
   bool showProbe();

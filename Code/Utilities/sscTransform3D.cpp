@@ -106,7 +106,7 @@ vtkMatrix4x4Ptr Transform3D::matrix()
 
 std::ostream& Transform3D::put(std::ostream& s, int indent, char newline) const
 {
-	std::string ind(indent, ' ');
+	QString ind(indent, ' ');
 
 	std::ostringstream ss; // avoid changing state of input stream
 	ss << setprecision(3) << std::fixed;
