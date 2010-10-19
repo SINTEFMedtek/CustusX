@@ -63,7 +63,6 @@ void USProbeSector::createSector()
   mPoints = vtkPointsPtr::New();
   mSides = vtkCellArrayPtr::New();
 
-  std::cout << M.coord(e_z) << std::endl;
   if (!mThreeDimensions && !similar(dot(M.coord(e_z), e_z), 1, 0.1))
   {
     mPolyData->SetPoints(mPoints);
