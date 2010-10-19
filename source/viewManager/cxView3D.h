@@ -33,7 +33,7 @@ public:
     TOOL_STYLE
   };
 
-  View3D(const std::string& uid, const std::string& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
+  View3D(const QString& uid, const QString& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
   virtual ~View3D(); ///< empty
 
   virtual Type getType() const { return VIEW_3D;}; ///< get the class type

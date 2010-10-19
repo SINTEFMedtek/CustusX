@@ -60,7 +60,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   if (!path.exists())
   {
     ssc::messageManager()->sendError("Error: Can't find kernels.ocl in any of\n  "
-                                      + string_cast(paths.join("  \n")));
+                                      + paths.join("  \n"));
     return;
   }
   
@@ -73,7 +73,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   //test
   long size = data.input_dim[0]*data.input_dim[1]*data.input_dim[2];
   ssc::messageManager()->sendDebug("input size: " 
-                                   + string_cast(size));
+                                   + qstring_cast(size));
   //ssc::messageManager()->sendInfo("input dimensions: " 
   //                                + string_cast(data.input_dim[0]) + " " 
   //                                + string_cast(data.input_dim[1]) + " " 

@@ -83,10 +83,10 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 {
   Configuration retval;
   
-  retval.mUsScanner = scanner.toStdString();
-  retval.mUsProbe = probe.toStdString();
-  retval.mRtSource = rtsource.toStdString();
-  retval.mConfigId = configId.toStdString();
+  retval.mUsScanner = scanner;
+  retval.mUsProbe = probe;
+  retval.mRtSource = rtsource;
+  retval.mConfigId = configId;
 
   QList<QDomNode> currentConfigNodeList = this->getConfigNodes(scanner, probe, rtsource, configId);
   if(currentConfigNodeList.isEmpty())

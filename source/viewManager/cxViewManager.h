@@ -43,9 +43,9 @@ typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
  */
 class ViewManager : public QObject
 {
-  typedef std::map<std::string, View2D*> View2DMap;
-  typedef std::map<std::string, View3D*> View3DMap;
-  typedef std::map<std::string, ssc::View*> ViewMap;
+  typedef std::map<QString, View2D*> View2DMap;
+  typedef std::map<QString, View3D*> View3DMap;
+  typedef std::map<QString, ssc::View*> ViewMap;
 
   Q_OBJECT
 public:
@@ -74,7 +74,7 @@ public:
 
   ViewWrapperPtr getActiveView() const; ///< returns the active view
   //void setActiveView(ViewWrapperPtr view); ///< change the active view
-  void setActiveView(std::string viewUid); ///< convenient function for setting the active view
+  void setActiveView(QString viewUid); ///< convenient function for setting the active view
 
   void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
   bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
@@ -113,9 +113,9 @@ protected:
   View2DMap* get2DViews(); ///< returns all possible 2D views
   View3DMap* get3DViews(); ///< returns all possible 3D views
 
-  ssc::View* getView(const std::string& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
-  View2D* get2DView(const std::string& uid); ///< returns a 2D view with a given uid
-  View3D* get3DView(const std::string& uid); ///< returns a 3D view with a given uid
+  ssc::View* getView(const QString& uid); ///< returns the view with the given uid, use getType to determine if it's a 2D or 3D view
+  View2D* get2DView(const QString& uid); ///< returns a 2D view with a given uid
+  View3D* get3DView(const QString& uid); ///< returns a 3D view with a given uid
 
   void syncOrientationMode(SyncedValuePtr val);
   void setStretchFactors(LayoutRegion region, int stretchFactor);
@@ -150,8 +150,8 @@ protected:
 //  ViewWrapperPtr   mActiveView;            ///< the active view
 //  const int     MAX_3DVIEWS;            ///< constant defining the max number of 3D views available
 //  const int     MAX_2DVIEWS;            ///< constant defining the max number of 2D views available
-//  std::vector<std::string> mView3DNames;///< the name of all the 3D views
-//  std::vector<std::string> mView2DNames;///< the name of all the 2D views
+//  std::vector<QString> mView3DNames;///< the name of all the 3D views
+//  std::vector<QString> mView2DNames;///< the name of all the 2D views
 //  View2DMap     mView2DMap;             ///< a map of all the 3D views
 //  View3DMap     mView3DMap;             ///< a map of all the 2D views
   ViewMap       mViewMap;               ///< a map of all the views

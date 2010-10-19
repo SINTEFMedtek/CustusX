@@ -19,7 +19,7 @@ namespace cx
  * \param parent the views parent
  * \param f flags
  */
-View2D::View2D(const std::string& uid, const std::string& name,
+View2D::View2D(const QString& uid, const QString& name,
     QWidget *parent, Qt::WFlags f) :
   View(parent, f)
 {

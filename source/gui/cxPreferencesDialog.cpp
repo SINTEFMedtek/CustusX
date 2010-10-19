@@ -9,6 +9,7 @@
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
+#include "sscDoubleWidgets.h"
 
 namespace cx
 {
@@ -199,7 +200,7 @@ void FoldersTab::saveParametersSlot()
   mSettings->sync();
 
   // update toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   emit savedParameters();
 }
@@ -236,6 +237,14 @@ void PerformanceTab::init()
   renderingRateString = renderingRateString+num+" frames/second";
   mRenderingRateLabel = new QLabel(renderingRateString);
   
+  double Mb = pow(10,6);
+  bool ok = true;
+  double maxRenderSize = mSettings->value("maxRenderSize").toDouble(&ok);
+  if (!ok)
+    maxRenderSize = 20 * Mb;
+  mMaxRenderSize = ssc::DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, ssc::DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
+  mMaxRenderSize->setInternal2Display(1.0/Mb);
+
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
 
@@ -245,10 +254,11 @@ void PerformanceTab::init()
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
+  new ssc::SliderGroupWidget(this, mMaxRenderSize, mMainLayout, 1);
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
-  mMainLayout->addWidget(mSmartRenderCheckBox, 1, 0);
-  mMainLayout->addWidget(mShadingCheckBox, 2, 0);
+  mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
+  mMainLayout->addWidget(mShadingCheckBox, 3, 0);
   setLayout(mMainLayout);
 }
 
@@ -278,6 +288,8 @@ void PerformanceTab::saveParametersSlot()
     mSettings->setValue("shadingOn", mShadingCheckBox->isChecked());
     emit shadingChanged(mShadingCheckBox->isChecked());
   }
+
+  mSettings->setValue("maxRenderSize", mMaxRenderSize->getValue());
 
   viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
 }

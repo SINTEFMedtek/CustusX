@@ -72,7 +72,7 @@ private:
 
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
-  std::map<std::string, ssc::GeometricRep2DPtr> mGeometricRep;
+  std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
   ssc::ToolRep2DPtr mToolRep2D;
   ssc::OrientationAnnotationRepPtr mOrientationAnnotationRep;
   ssc::DisplayTextRepPtr mPlaneTypeText;
