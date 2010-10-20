@@ -19,27 +19,31 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mSurfaceWidget = new SurfaceWidget(this);
   mCenterlineWidget =  new CenterlineWidget(this);
 
-  SelectImageStringDataAdapterPtr segmentationOutput = SelectImageStringDataAdapter::New();
-  segmentationOutput->setValueName("Output: ");
-  connect(segmentationOutput.get(), SIGNAL(imageChanged(QString)), mCenterlineWidget, SLOT(setImageInputSlot(QString)));
-  connect(segmentationOutput.get(), SIGNAL(imageChanged(QString)), mSurfaceWidget, SLOT(setImageInputSlot(QString)));
+  mSegmentationOutput = SelectImageStringDataAdapter::New();
+  mSegmentationOutput->setValueName("Output: ");
+  connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mCenterlineWidget, SLOT(setImageInputSlot(QString)));
+  connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mSurfaceWidget, SLOT(setImageInputSlot(QString)));
 
-  SelectImageStringDataAdapterPtr surfaceOutput = SelectImageStringDataAdapter::New();
-  surfaceOutput->setValueName("Output: ");
+  mSurfaceOutput = SelectMeshStringDataAdapter::New();
+  mSurfaceOutput->setValueName("Output: ");
   //TODO connect to view!
-  //connect(surfaceOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChanged(QString)));
+  //connect(surfaceOutput.get(), SIGNAL(meshChanged(QString)), this, SLOT(imageChanged(QString)));
 
-  SelectImageStringDataAdapterPtr centerlineOutput = SelectImageStringDataAdapter::New();
-  centerlineOutput->setValueName("Output: ");
-  connect(centerlineOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(setImageSlot(QString)));
+  mCenterlineOutput = SelectImageStringDataAdapter::New();
+  mCenterlineOutput->setValueName("Output: ");
+  connect(mCenterlineOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(setImageSlot(QString)));
 
   mLayout->addWidget(this->createHorizontalLine());
-  mLayout->addWidget(this->createMethodWidget(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, segmentationOutput), "Segmentation"));
+  mLayout->addWidget(this->createMethodWidget(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, mSegmentationOutput), "Segmentation"));
   mLayout->addWidget(this->createHorizontalLine());
-  mLayout->addWidget(this->createMethodWidget(mSurfaceWidget, new ssc::LabeledComboBoxWidget(this, surfaceOutput), "Surface"));
+  mLayout->addWidget(this->createMethodWidget(mSurfaceWidget, new ssc::LabeledComboBoxWidget(this, mSurfaceOutput), "Surface"));
   mLayout->addWidget(this->createHorizontalLine());
-  mLayout->addWidget(this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, centerlineOutput), "Centerline"));
+  mLayout->addWidget(this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, mCenterlineOutput), "Centerline"));
   mLayout->addWidget(this->createHorizontalLine());
+
+  connect(mSegmentationWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(segmentationOutputArrived(QString)));
+  connect(mSurfaceWidget, SIGNAL(outputMeshChanged(QString)), this, SLOT(surfaceOutputArrived(QString)));
+  connect(mCenterlineWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(centerlineOutputArrived(QString)));
 }
 
 ImageSegmentationAndCenterlineWidget::~ImageSegmentationAndCenterlineWidget()
@@ -52,6 +56,20 @@ void ImageSegmentationAndCenterlineWidget::setImageSlot(QString uid)
   mOutput->setValue(uid);
 }
 
+void ImageSegmentationAndCenterlineWidget::segmentationOutputArrived(QString uid)
+{
+  mSegmentationOutput->setValue(uid);
+}
+
+void ImageSegmentationAndCenterlineWidget::surfaceOutputArrived(QString uid)
+{
+  mSurfaceOutput->setValue(uid);
+}
+
+void ImageSegmentationAndCenterlineWidget::centerlineOutputArrived(QString uid)
+{
+  mCenterlineOutput->setValue(uid);
+}
 
 //------------------------------------------------------------------------------
 

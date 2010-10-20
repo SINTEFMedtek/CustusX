@@ -8,6 +8,7 @@
 
 #include "sscTypeConversions.h"
 #include "sscImage.h"
+#include "sscMesh.h"
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
 #include "sscDoubleWidgets.h"
@@ -42,7 +43,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
@@ -62,7 +63,6 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
 
   this->adjustSizeSlot();
 }
-
 SegmentationWidget::~SegmentationWidget()
 {
 }
@@ -94,7 +94,10 @@ void SegmentationWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
-  Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+  ssc::ImagePtr segmentedImage = Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+  if(!segmentedImage)
+    return;
+  emit outputImageChanged(segmentedImage->getUid());
 }
 
 void SegmentationWidget::toogleBinarySlot(bool on)
@@ -194,7 +197,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
@@ -234,7 +237,10 @@ void SurfaceWidget::surfaceSlot()
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
   double decimation = mDecimation/100;
-  Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+  ssc::MeshPtr outputMesh = Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+  if(!outputMesh)
+    return;
+  emit outputMeshChanged(outputMesh->getUid());
 }
 
 void SurfaceWidget::thresholdSlot(int value)
@@ -308,7 +314,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
 
   layout->addWidget(selectImageComboBox);
@@ -349,7 +355,10 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
+  ssc::ImagePtr centerlineImage = Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
+  if(!centerlineImage)
+    return;
+  emit outputImageChanged(centerlineImage->getUid());
 }
 //------------------------------------------------------------------------------
 
