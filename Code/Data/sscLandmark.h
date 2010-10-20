@@ -20,10 +20,10 @@ namespace ssc
 class Landmark
 {
 public:
-	explicit Landmark(std::string uid="", Vector3D coord=Vector3D(0,0,0));
+	explicit Landmark(QString uid="", Vector3D coord=Vector3D(0,0,0));
 	~Landmark();
 
-	std::string getUid() const;
+	QString getUid() const;
 	ssc::Vector3D getCoord() const;
 	QDateTime getTimestamp() const;
 
@@ -31,31 +31,31 @@ public:
 	void parseXml(QDomNode& dataNode);
 
 private:
-	std::string mUid;
+	QString mUid;
 	ssc::Vector3D mCoord; ///< the landmarks coordinate
 	QDateTime mTimestamp; ///< the time at which the landmark was sample
 };
-typedef std::map<std::string, Landmark> LandmarkMap;
+typedef std::map<QString, Landmark> LandmarkMap;
 
 class LandmarkProperty
 {
 public:
-  explicit LandmarkProperty(const std::string& uid="", const std::string& name="", bool active=true);
+  explicit LandmarkProperty(const QString& uid="", const QString& name="", bool active=true);
   bool getActive() const;
-  std::string getName() const;
-  std::string getUid() const;
-  void setName(const std::string& name);
+  QString getName() const;
+  QString getUid() const;
+  void setName(const QString& name);
   void setActive(bool active);
 
   void addXml(QDomNode& dataNode);
   void parseXml(QDomNode& dataNode);
 
 private:
-  std::string mUid;
-  std::string mName;
+  QString mUid;
+  QString mName;
   bool mActive;
 };
-typedef std::map<std::string, LandmarkProperty> LandmarkPropertyMap;
+typedef std::map<QString, LandmarkProperty> LandmarkPropertyMap;
 
 
 } //namespace ssc

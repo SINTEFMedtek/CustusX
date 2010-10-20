@@ -24,20 +24,20 @@ class SliceRepSW : public RepImpl
 {
 	Q_OBJECT
 public:
-	static SliceRepSWPtr New(const std::string& uid);	
+	static SliceRepSWPtr New(const QString& uid);	
 	virtual ~SliceRepSW();
-	virtual std::string getType() const { return "ssc::SliceRepSW"; };
+	virtual QString getType() const { return "ssc::SliceRepSW"; };
 	bool hasImage(ImagePtr image) const;
 	void setImage(ImagePtr image);
 	ImagePtr getImage();
 	vtkImageActorPtr getActor();
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
-	std::string getImageUid()const;
+	QString getImageUid()const;
 	void update();
 	virtual void printSelf(std::ostream & os, Indent indent);
 
 protected:
-	SliceRepSW(const std::string& uid);
+	SliceRepSW(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view) ;
 	virtual void removeRepActorsFromViewRenderer(View* view) ;
 		

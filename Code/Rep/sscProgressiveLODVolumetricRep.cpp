@@ -8,6 +8,8 @@
 
 #include "sscView.h"
 #include "sscVolumetricRep.h"
+#include "sscTypeConversions.h"
+
 
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
@@ -70,9 +72,10 @@ private:
 // --------------------------------------------------------
 // --------------------------------------------------------
 
-ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const std::string& uid, const std::string& name) :
-	RepImpl(uid, name)
+ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const QString& uid, const QString& name) :
+	VolumetricBaseRep(uid, name)
 {
+	mMaxVoxels = 0;
 	mClearing = false;
 	mAssembly = vtkAssemblyPtr::New();
 	mView = NULL;
@@ -81,11 +84,19 @@ ProgressiveLODVolumetricRep::ProgressiveLODVolumetricRep(const std::string& uid,
 
 void ProgressiveLODVolumetricRep::resetResampleList()
 {
+	double r = VolumetricRep::computeResampleFactor(mMaxVoxels, mImage);
+	
 	mResampleFactors.clear();
-	mResampleFactors.push_back(1.0);
-	mResampleFactors.push_back(0.5);
-	mResampleFactors.push_back(0.25);
-	mResampleFactors.push_back(0.125);
+	mResampleFactors.push_back(r);
+	mResampleFactors.push_back(r/2.0);
+	mResampleFactors.push_back(r/4.0);
+	mResampleFactors.push_back(r/8.0);
+}
+
+
+void ProgressiveLODVolumetricRep::setMaxVolumeSize(long maxVoxels)
+{
+	mMaxVoxels = maxVoxels;
 }
 
 ProgressiveLODVolumetricRep::~ProgressiveLODVolumetricRep()
@@ -93,7 +104,7 @@ ProgressiveLODVolumetricRep::~ProgressiveLODVolumetricRep()
 	clearThreads();
 }
 
-ProgressiveLODVolumetricRepPtr ProgressiveLODVolumetricRep::New(const std::string& uid, const std::string& name)
+ProgressiveLODVolumetricRepPtr ProgressiveLODVolumetricRep::New(const QString& uid, const QString& name)
 {
 	ProgressiveLODVolumetricRepPtr retval(new ProgressiveLODVolumetricRep(uid));
 	retval->mSelf = retval;
@@ -115,6 +126,11 @@ ImagePtr ProgressiveLODVolumetricRep::getImage()
 	return mCurrent->getImage();
 }
 
+vtkVolumePtr ProgressiveLODVolumetricRep::getVtkVolume()
+{
+	return mCurrent->getVtkVolume();
+}
+
 void ProgressiveLODVolumetricRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
@@ -127,16 +143,17 @@ void ProgressiveLODVolumetricRep::setImage(ImagePtr image)
 		mAssembly->RemovePart(mCurrent->getVtkVolume());
 		mCurrent.reset();
 		clearThreads();
-		resetResampleList();
 	}
 
 	mImage = image;
 
 	if (mImage)
 	{
+		this->resetResampleList();
 		mCurrent = getNextResampleLevel();
 		mAssembly->AddPart(mCurrent->getVtkVolume());
-		startThread(getNextResampleLevel());
+		this->startThread(getNextResampleLevel());
+		emit internalVolumeChanged();
 	}
 }
 
@@ -148,7 +165,7 @@ VolumetricRepPtr ProgressiveLODVolumetricRep::getNextResampleLevel()
 	if (mResampleFactors.empty())
 		return VolumetricRepPtr();
 	double factor = mResampleFactors.back();
-	std::string text = "_" + boost::lexical_cast<std::string>(factor);
+	QString text = "_" + qstring_cast(factor);
 	mResampleFactors.pop_back();
 
 	VolumetricRepPtr next = ssc::VolumetricRep::New(getUid()+text, getName()+text);
@@ -205,6 +222,8 @@ void ProgressiveLODVolumetricRep::volumetricThreadFinishedSlot()
 	}
 
 	startThread(getNextResampleLevel());
+	
+	emit internalVolumeChanged();
 }
 
 

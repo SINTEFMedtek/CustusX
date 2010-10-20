@@ -38,7 +38,8 @@ public:
       double value,
       DoubleRange range,
       int decimals,
-      QDomNode root);
+      QDomNode root = QDomNode());
+  void setInternal2Display(double factor);
 
 public: // inherited interface
   virtual QString getValueName() const;///< name of data entity. Used for display to user.
@@ -47,6 +48,8 @@ public: // inherited interface
   virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
   virtual DoubleRange getValueRange() const; /// range of value. Use if data is constrained to a set.
   virtual int getValueDecimals() const; ///< number of relevant decimals in value
+  virtual double convertInternal2Display(double internal) { return mFactor*internal; } ///< conversion from internal value to display value (for example between 0..1 and percent)
+  virtual double convertDisplay2Internal(double display) { return display/mFactor; } ///< conversion from internal value to display value
 
 public:
   QString getUid() const;
@@ -55,6 +58,7 @@ signals:
     void valueWasSet(); /// emitted when the value is set using setValue() (similar to changed(), but more constrained)
 
 private:
+  DoubleDataAdapterXml();
   QString mName;
   QString mUid;
   QString mHelp;
@@ -62,6 +66,7 @@ private:
   double mDecimals;
   DoubleRange mRange;
   XmlOptionItem mStore;
+  double mFactor;
 };
 
 

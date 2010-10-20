@@ -44,9 +44,9 @@ class Texture3DSlicerRep: public ssc::RepImpl
 {
 Q_OBJECT
 public:
-	static Texture3DSlicerRepPtr New(const std::string& uid);
+	static Texture3DSlicerRepPtr New(const QString& uid);
 	virtual ~Texture3DSlicerRep();
-	virtual std::string getType() const
+	virtual QString getType() const
 	{
 		return "vm::Texture3DSlicerRep";
 	}
@@ -56,7 +56,7 @@ public:
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void update();
 protected:
-	Texture3DSlicerRep(const std::string& uid);
+	Texture3DSlicerRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
@@ -67,7 +67,7 @@ private slots:
 private:
 	void createCoordinates(int count);
 	void updateCoordinates(int index);
-	std::string getTCoordName(int index);
+	QString getTCoordName(int index);
 	void setColorAttributes(int i);
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;

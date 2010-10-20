@@ -25,6 +25,7 @@ public:
   MESSAGE_LEVEL getMessageLevel();
   QString getText();
   QDateTime* getTimeStamp();
+  int getTimeout();
 
 private:
   QString mText;

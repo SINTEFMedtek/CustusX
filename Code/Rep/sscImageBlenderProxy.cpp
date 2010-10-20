@@ -9,6 +9,8 @@
 #include "sscImage.h"
 #include "sscImageLUT2D.h"
 
+typedef vtkSmartPointer<vtkImageThreshold> vtkImageThresholdPtr;
+
 namespace ssc
 {
 
@@ -16,8 +18,8 @@ ImageBlenderProxy::ImageBlenderProxy()
 {
 	mBlender = vtkImageBlendPtr::New();
 	mBlender->SetBlendModeToNormal();
-	mTreshold = vtkImageThreshold::New();
-	//mColorMapper = vtkImageMapToWindowLevelColors::New();
+	mTreshold = vtkImageThresholdPtr::New();
+	//mColorMapper = vtkImageMapToWindowLevelColorsPtr::New();
 	firstImage = true;
 }
 
@@ -191,7 +193,7 @@ vtkImageDataPtr ImageBlenderProxy::getOutput()
 
 void ImageBlenderProxy::removeImage(ImagePtr image)
 {
-	std::string uid = image->getUid();
+	QString uid = image->getUid();
 	for(unsigned int i = 0; i<mImages.size(); ++i)
 	{
 		if( uid == mImages[i]->getUid())

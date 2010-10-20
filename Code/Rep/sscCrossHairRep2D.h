@@ -25,9 +25,9 @@ class CrossHairRep2D : public ssc::RepImpl
 {
 	Q_OBJECT
 public:
-	static CrossHairRep2DPtr New(const std::string& uid, const std::string& name="");
+	static CrossHairRep2DPtr New(const QString& uid, const QString& name="");
 	virtual ~CrossHairRep2D();
-	virtual std::string getType() const;
+	virtual QString getType() const;
 
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void set_vpMs(const Transform3D& vpMs);
@@ -38,7 +38,7 @@ private slots:
 	void toolVisibleSlot(bool visible); 
 
 protected:
-	CrossHairRep2D(const std::string& uid, const std::string& name="");
+	CrossHairRep2D(const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 

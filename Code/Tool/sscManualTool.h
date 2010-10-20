@@ -19,17 +19,17 @@ class ManualTool : public ssc::Tool
 	Q_OBJECT
 public:
 
-	explicit ManualTool(const std::string& uid, const std::string& name ="");
+	explicit ManualTool(const QString& uid, const QString& name ="");
 	virtual ~ManualTool();
 	virtual Type getType() const;
-	virtual std::string getGraphicsFileName() const;
+	virtual QString getGraphicsFileName() const;
 	virtual vtkPolyDataPtr getGraphicsPolyData() const;
 	virtual void saveTransformsAndTimestamps(){};
-	virtual void setTransformSaveFile(const std::string& filename){};
+	virtual void setTransformSaveFile(const QString& filename){};
 	virtual Transform3D get_prMt() const;
 	virtual bool getVisible() const;
-	virtual std::string getUid() const;
-	virtual std::string getName() const;
+	virtual QString getUid() const;
+	virtual QString getName() const;
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
 	virtual ssc::ProbeSector getProbeSector() const;
@@ -47,8 +47,8 @@ public:
 private:
 	void read3DCrossHair();
 	// constant data
-	//const std::string mUid; //see sscTool
-	//const std::string mName; //see sscTool
+	//const QString mUid; //see sscTool
+	//const QString mName; //see sscTool
 	vtkPolyDataPtr mPolyData;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;

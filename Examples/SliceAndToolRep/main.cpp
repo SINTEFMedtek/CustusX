@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 
 	TransformTest().test();
 
-	std::vector<std::string> image;
+	std::vector<QString> image;
 	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	image.push_back("MetaImage/20070309T105136_MRT1.mhd");
 	image.push_back("MetaImage/20070309T102309_MRA.mhd");

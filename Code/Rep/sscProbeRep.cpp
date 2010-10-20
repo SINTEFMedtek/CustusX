@@ -22,23 +22,23 @@
 
 namespace ssc
 {
-ProbeRepPtr ProbeRep::New(const std::string& uid, const std::string& name)
+ProbeRepPtr ProbeRep::New(const QString& uid, const QString& name)
 {
 	ProbeRepPtr retval(new ProbeRep(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
-ProbeRep::ProbeRep(const std::string& uid, const std::string& name) :
+ProbeRep::ProbeRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
 	mThreshold(25),
 	mResolution(1000),
 	mPickedPoint(),
 	mPickedPointActor(NULL),
-	mConnections(vtkEventQtSlotConnect::New())
+	mConnections(vtkEventQtSlotConnectPtr::New())
 {}
 ProbeRep::~ProbeRep()
 {}
-std::string ProbeRep::getType() const
+QString ProbeRep::getType() const
 {
 	return "ssc::ProbeRep";
 }
@@ -298,26 +298,26 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
   ssc::Transform3D dMr = mImage->get_rMd().inv();
   p0 = dMr.coord(p0);
   p1 = dMr.coord(p1);
-	vtkLineSourcePtr lineSource = vtkLineSource::New();
+	vtkLineSourcePtr lineSource = vtkLineSourcePtr::New();
 	lineSource->SetPoint1(p0.begin());
 	lineSource->SetPoint2(p1.begin());
 	lineSource->SetResolution(mResolution);
 	lineSource->Update();
 
 	//Creating a probefilter
-	vtkProbeFilterPtr probeFilter = vtkProbeFilter::New();
+	vtkProbeFilterPtr probeFilter = vtkProbeFilterPtr::New();
 	//probeFilter->SetSource(mImage->getRefVtkImageData());
 	probeFilter->SetSource(mImage->getBaseVtkImageData());
 	probeFilter->SetInputConnection(lineSource->GetOutputPort());
 	probeFilter->Update();
 
 	//Mapper for the probe filter
-	vtkPolyDataMapperPtr probeFilterMapper = vtkPolyDataMapper::New();
+	vtkPolyDataMapperPtr probeFilterMapper = vtkPolyDataMapperPtr::New();
 	probeFilterMapper->SetInput(probeFilter->GetPolyDataOutput());
 
 	//Aske the probe filter for point data, find the first one above a threshold.
 	//That is the skin point
-	vtkDataSetAttributesPtr dataSetAttribute = vtkDataSetAttributes::New();
+	vtkDataSetAttributesPtr dataSetAttribute = vtkDataSetAttributesPtr::New();
 	dataSetAttribute = (vtkDataSetAttributes*)(probeFilterMapper->GetInput()->GetPointData());
 
 	double value = -1;

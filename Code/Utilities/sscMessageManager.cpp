@@ -23,7 +23,7 @@ Message::~Message(){};
 
 QString Message::getPrintableMessage()
 {
-  QString message;
+  QString message("");
   message.append(QString("["));
   message.append(mTimeStamp.toString("hh:mm:ss:zzz"));
   message.append(QString("] "));
@@ -31,6 +31,7 @@ QString Message::getPrintableMessage()
   message.append(qstring_cast(mMessageLevel));
   message.append(QString("] "));
   message.append(mText);
+
   return message;
 }
 
@@ -48,7 +49,10 @@ QDateTime* Message::getTimeStamp()
 {
   return &mTimeStamp;
 }
-
+int Message::getTimeout()
+{
+  return mTimeoutTime;
+}
 // --------------------------------------------------------
 // --------------------------------------------------------
 
@@ -101,7 +105,7 @@ public:
   //    virtual int_type overflow(int_type meta=traits_type::eof());
 private:
   bool mEnabledRedirect;
-  std::string mBuffer;
+  QString mBuffer;
   std::streambuf* mOrig;
   MESSAGE_LEVEL mMessageLevel;
 };
@@ -140,7 +144,9 @@ MessageManager* messageManager() { return MessageManager::getInstance(); }
 
 
 MessageManager::MessageManager() :
-    mAbsoluteLoggingFolderPath("")
+    mAbsoluteLoggingFolderPath(""),
+    mConsoleFile(new QFile(mAbsoluteLoggingFolderPath, this)),
+    mConsoleStream(new QTextStream())
 {}
 
 MessageManager::~MessageManager()
@@ -176,10 +182,6 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
     return;
 
   QString filename("/ConsoleLog.txt");
-
-  if(!mConsoleFile)
-    mConsoleFile = new QFile(mAbsoluteLoggingFolderPath+filename,this);
-
   mAbsoluteLoggingFolderPath = absoluteLoggingFolderPath;
   QString consoleFilePath = mAbsoluteLoggingFolderPath+filename;
 
@@ -232,32 +234,26 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
     std::cout << message.getPrintableMessage() << std::endl;
   mCout->setEnableRedirect(true);
 
+  if(mConsoleStream->device())
+  {
+    (*mConsoleStream) << message.getPrintableMessage();
+    (*mConsoleStream) << endl;
+  }
+
   emit emittedMessage(message);
-
-  if(!mConsoleStream)
-    return;
-
-  (*mConsoleStream) << message.getPrintableMessage();
-  (*mConsoleStream) << endl;
+  this->sendMessage(message.getPrintableMessage(), timeout); //old system, see custom statusbar
 }
 
 void MessageManager::sendMessage(QString message, int timeout)
 {
-    emit emittedMessage(QString(message), timeout);
+    emit emittedMessage((const QString &)message, timeout);
 }
 
 bool MessageManager::openLogging(QFile::OpenMode mode)
 {
-  if(!mConsoleFile)
-    return false;
-
   if(mConsoleFile->open(QFile::WriteOnly | mode))
   {
-    if(!mConsoleStream)
-      mConsoleStream = new QTextStream(mConsoleFile);
-    else
-      mConsoleStream->setDevice(mConsoleFile);
-
+    mConsoleStream->setDevice(mConsoleFile);
     ssc::messageManager()->sendInfo("Console log file: "+mConsoleFile->fileName()+".");
   }
   else

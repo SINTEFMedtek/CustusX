@@ -5,11 +5,12 @@
 //#include <cppunit/ui/text/TestRunner.h>
 //#include <cppunit/extensions/HelperMacros.h>
 #include <math.h>
+#include "sscTypeConversions.h"
 
 using ssc::Vector3D;
 using ssc::Transform3D;
 
-void testResultText(const std::string& msg)
+void testResultText(const QString& msg)
 {
 	std::cout << msg;
 }

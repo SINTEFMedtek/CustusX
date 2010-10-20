@@ -32,7 +32,7 @@ public:
 	 * this with its own class name. Subclasses from other namespaces
 	 * (such as cx and snw) should add that namespace as a prefix.
 	 */
-	virtual std::string getType() const = 0;
+	virtual QString getType() const = 0;
 
 	/**
 	 * Do not use this method! It is only used by ssc::View to set up an
@@ -66,15 +66,15 @@ public:
 	 *
 	 * \param name The user-friendly name for this instance.
 	 */
-	virtual void setName(std::string name) = 0;
+	virtual void setName(QString name) = 0;
 	/**\return a user-friendly name for this instance
 	 */
-	virtual std::string getName() const = 0;
+	virtual QString getName() const = 0;
 	/**Return an unique id for this instance, i.e. unique
 	 * over all Rep instances.
 	 * \return the unique id.
 	 */
-	virtual std::string getUid() const = 0;
+	virtual QString getUid() const = 0;
 	
 	virtual void printSelf(std::ostream & os, Indent indent) = 0;
 	

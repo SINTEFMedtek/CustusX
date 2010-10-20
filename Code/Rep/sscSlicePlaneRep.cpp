@@ -15,7 +15,7 @@
 namespace ssc
 {
 
-SlicePlaneRep::SlicePlaneRep(const std::string& uid) :
+SlicePlaneRep::SlicePlaneRep(const QString& uid) :
 	RepImpl(uid)
 {
 	mVtkImagePlaneWidgetA = vtkImagePlaneWidgetPtr::New();
@@ -26,7 +26,7 @@ SlicePlaneRep::~SlicePlaneRep()
 {
 }
 
-SlicePlaneRepPtr SlicePlaneRep::New(const std::string& uid)
+SlicePlaneRepPtr SlicePlaneRep::New(const QString& uid)
 {
 	SlicePlaneRepPtr retval(new SlicePlaneRep(uid));
 	retval->mSelf = retval;

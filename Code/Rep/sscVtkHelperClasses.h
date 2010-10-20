@@ -78,12 +78,12 @@ class LineSegment
 class TextDisplay
 {
 	public:
-		TextDisplay(const std::string& text, const Vector3D& color, int fontsize ) ;
+		TextDisplay(const QString& text, const Vector3D& color, int fontsize ) ;
 		~TextDisplay();
 		void setPosition( float x, float y);
 		void setPosition( const Vector3D& pos );
 		void setCentered();
-		void updateText(const std::string& text );
+		void updateText(const QString& text );
 		vtkTextProperty* textProperty();
 		//	mThermalTextMapper->GetTextProperty()-> SetColor( 1.0, 0.8, 0.0);
 
@@ -131,7 +131,7 @@ public:
 	void setPosition(const Transform3D& pos);
 	vtkProp3DPtr getProp();
 private:
- 	void setCaption(vtkCaptionActor2D* captionActor, const std::string& caption, RGBColor color);
+ 	void setCaption(vtkCaptionActor2D* captionActor, const QString& caption, RGBColor color);
 
  	vtkAxesActorPtr mAxes;
 	vtkRendererPtr mRenderer;

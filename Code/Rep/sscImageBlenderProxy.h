@@ -34,7 +34,7 @@ class ImageBlenderProxy : public QObject
 public:
 	ImageBlenderProxy();
 	virtual ~ImageBlenderProxy();
-	virtual std::string getType() const { return "ssc::ImageBlenderProxy"; }
+	virtual QString getType() const { return "ssc::ImageBlenderProxy"; }
 	bool hasImage(ImagePtr image) const;
 	void clearImages();
 	void addImage(ImagePtr image);
@@ -52,7 +52,7 @@ private:
 	vtkImageDataPtr baseImage;
 	vtkImageBlendPtr mBlender;
 	std::vector<ImagePtr> mImages;
-	std::string mImageUid;
+	QString mImageUid;
 	
 	vtkWindowLevelLookupTablePtr mLookupTable;
 	vtkImageMapToWindowLevelColorsPtr mWindowLevel;

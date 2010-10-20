@@ -18,6 +18,7 @@ typedef vtkRenderWindow ViewRenderWindow;
 #endif
 
 #include "sscRep.h"
+#include "sscTypeConversions.h"
 
 /*! Copy/pasted from qitemdelegate.cpp
   \internal
@@ -51,7 +52,7 @@ View::~View()
 {
 }
 
-std::string View::getTypeString() const
+QString View::getTypeString() const
 {
   switch(this->getType())
   {
@@ -64,11 +65,11 @@ std::string View::getTypeString() const
 }
 
 
-std::string View::getUid()
+QString View::getUid()
 {
   return mUid;
 }
-std::string View::getName()
+QString View::getName()
 {
   return mName;
 }

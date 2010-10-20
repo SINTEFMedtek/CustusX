@@ -9,14 +9,14 @@
 namespace ssc
 {
 
-SliceProxyPtr SliceProxy::New(const std::string& name)
+SliceProxyPtr SliceProxy::New(const QString& name)
 {
   SliceProxyPtr retval(new SliceProxy);
   retval->mName = name;
   return retval;
 }
 
-std::string SliceProxy::getName() const
+QString SliceProxy::getName() const
 {
   return mName;
 }

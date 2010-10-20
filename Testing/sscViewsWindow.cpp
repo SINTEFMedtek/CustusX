@@ -62,9 +62,9 @@ ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(d
 	start(showSliders);
 }
 
-void ViewsWindow::setDescription(const std::string& desc)
+void ViewsWindow::setDescription(const QString& desc)
 {
-	mAcceptanceBox->setText(QString::fromStdString(desc));
+	mAcceptanceBox->setText(desc);
 }
 
 
@@ -72,7 +72,7 @@ ViewsWindow::~ViewsWindow()
 {
 }
 
-ssc::View* ViewsWindow::generateGPUSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
+ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
 	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
@@ -121,7 +121,7 @@ double ViewsWindow::mmPerPix(ssc::View* view) const
 	return retval;
 }
 
-void ViewsWindow::defineGPUSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
 {
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
@@ -133,7 +133,7 @@ void ViewsWindow::defineGPUSlice(const std::string& uid, const std::string& imag
 }
 
 
-ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
+ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
 	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
@@ -151,7 +151,7 @@ ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool,
 	return view;
 }
 
-void ViewsWindow::defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
 {
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
@@ -162,9 +162,9 @@ void ViewsWindow::defineSlice(const std::string& uid, const std::string& imageFi
 	insertView(view, uid, imageFilename, r, c);
 }
 
-ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
+ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
-	std::string filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
+	QString filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, filename, ssc::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
@@ -176,18 +176,18 @@ ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
 	return image;
 }
 
-void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c)
+void ViewsWindow::insertView(ssc::View* view, const QString& uid, const QString& volume, int r, int c)
 {
 	QVBoxLayout* layout = new QVBoxLayout;
 	mSliceLayout->addLayout(layout, r,c);
 	
 	layout->addWidget(view);
-	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume), this));
+	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
+void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 {
-	std::string uid = "3D";
+	QString uid = "3D";
 	ssc::View* view = new ssc::View(centralWidget());
 	mLayouts.insert(view);
 	

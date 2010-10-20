@@ -31,7 +31,7 @@ public:
 	CPPUNIT_TEST_SUITE_END();
 private:
 	class ViewsWindow* widget;
-	std::vector<std::string> image;
+	std::vector<QString> image;
 	bool runWidget();
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestVisualRendering );

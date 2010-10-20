@@ -10,6 +10,7 @@
 #include "sscSliceProxy.h"
 #include "sscVtkHelperClasses.h"
 #include "sscDataManager.h"
+#include "sscTypeConversions.h"
 
 // --------------------------------------------------------
 namespace ssc
@@ -39,14 +40,14 @@ OrientationAnnotation* OrientationAnnotation::New()
 	return new OrientationAnnotation;
 }
 
-OrientationAnnotationRep::OrientationAnnotationRep( const std::string& uid, const std::string& name) :
+OrientationAnnotationRep::OrientationAnnotationRep( const QString& uid, const QString& name) :
 RepImpl(uid, name)
 {
   mPlane = ptCOUNT;
   connect(dataManager(), SIGNAL(medicalDomainChanged()), this, SLOT(medicalDomainChangedSlot()));
 }
 
-OrientationAnnotationRepPtr OrientationAnnotationRep::New(const std::string& uid,const std::string& name)
+OrientationAnnotationRepPtr OrientationAnnotationRep::New(const QString& uid,const QString& name)
 {
 	OrientationAnnotationRepPtr retval(new OrientationAnnotationRep(uid,name));
 	retval->mSelf = retval;
@@ -181,10 +182,10 @@ void OrientationAnnotationRep::createAnnotation()
     mOrientation->SetNonlinearFontScaleFactor (0.35 );
     mOrientation->GetTextProperty()->SetColor(0.7372, 0.815, 0.6039 );
   }
-	mOrientation->SetText(0, mEastAnnotation.c_str() );
-	mOrientation->SetText(1, mNorthAnnotation.c_str() );
-	mOrientation->SetText(2, mWestAnnotation.c_str() );
-	mOrientation->SetText(3, mSouthAnnotation.c_str() );
+	mOrientation->SetText(0, cstring_cast(mEastAnnotation) );
+	mOrientation->SetText(1, cstring_cast(mNorthAnnotation) );
+	mOrientation->SetText(2, cstring_cast(mWestAnnotation) );
+	mOrientation->SetText(3, cstring_cast(mSouthAnnotation) );
 }
 
 OrientationAnnotation::OrientationAnnotation()

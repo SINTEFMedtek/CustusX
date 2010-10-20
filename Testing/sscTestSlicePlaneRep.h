@@ -25,11 +25,11 @@ public:
 private:
 	QWidget* mWidget;
 	void start();
-	ssc::View* view(const std::string& uid);
-	void generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
-	void generateView(const std::string& uid);
+	ssc::View* view(const QString& uid);
+	void generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
+	void generateView(const QString& uid);
 
-	typedef std::map<std::string, SingleLayout> LayoutMap;
+	typedef std::map<QString, SingleLayout> LayoutMap;
 	LayoutMap mLayouts;	
 	LayoutMap::iterator iter; 
 

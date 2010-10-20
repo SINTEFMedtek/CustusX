@@ -19,6 +19,8 @@
 #include "sscDummyToolManager.h"
 #include "sscToolRep3D.h"
 
+typedef vtkSmartPointer<vtkCallbackCommand> vtkCallbackCommandPtr;
+
 /**
  * sscTestInterface.cpp
  *
@@ -89,8 +91,8 @@ void TestInterface::testSwitchingViewsRepsAndImages()
 	widget->setLayout(layout);
 
 	//Create the objects
-	std::string testFile1 = TestUtilities::ExpandDataFileName("/Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	std::string testFile2 = TestUtilities::ExpandDataFileName("/MetaImage/20070309T105136_MRT1.mhd");
+	QString testFile1 = TestUtilities::ExpandDataFileName("/Fantomer/Kaisa/MetaImage/Kaisa.mhd");
+	QString testFile2 = TestUtilities::ExpandDataFileName("/MetaImage/20070309T105136_MRT1.mhd");
 	
 	
 	mImagePtr1 = DataManager::getInstance()->loadImage(testFile1, testFile1, rtMETAIMAGE);
@@ -241,7 +243,7 @@ void TestInterface::timerUpdate(vtkObject* obj, unsigned long, void*, void*)
 }
 void TestInterface::startRendering()
 {
-    mCallback = vtkCallbackCommand::New();
+    mCallback = vtkCallbackCommandPtr::New();
     mCallback->SetCallback(timerUpdate);
 
     mView1->GetInteractor()->AddObserver(vtkCommand::TimerEvent, mCallback);

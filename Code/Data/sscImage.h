@@ -26,7 +26,7 @@ class QDomDocument;
 namespace ssc
 {
 // forward declarations
-typedef std::map<std::string, class Landmark> LandmarkMap;
+typedef std::map<QString, class Landmark> LandmarkMap;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 
@@ -50,7 +50,7 @@ public:
   };
   
 	virtual ~Image();
-	Image(const std::string& uid, const vtkImageDataPtr& data, const std::string& name="");
+	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name="");
 	void setVtkImageData(const vtkImageDataPtr& data);
 
 	virtual vtkImageDataPtr getBaseVtkImageData(); ///< \return the vtkimagedata in the data coordinate space
@@ -98,8 +98,8 @@ public:
 	virtual void clearClipPlanes();
 
 signals:
-  void landmarkRemoved(std::string uid);
-  void landmarkAdded(std::string uid);
+  void landmarkRemoved(QString uid);
+  void landmarkAdded(QString uid);
 	void vtkImageDataChanged(); ///< emitted when the vktimagedata are invalidated and must be retrieved anew.
 	void transferFunctionsChanged(); ///< emitted when image transfer functions in 2D or 3D are changed.
 	void clipPlanesChanged();
@@ -107,7 +107,7 @@ signals:
 
 public slots:
   void setLandmark(Landmark landmark);
-  void removeLandmark(std::string uid);
+  void removeLandmark(QString uid);
 	
 protected slots:
 //	void transferFunctionsChangedSlot();

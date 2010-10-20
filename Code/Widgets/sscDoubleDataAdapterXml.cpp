@@ -35,6 +35,11 @@ DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid,
 	return retval;
 }
 
+void DoubleDataAdapterXml::setInternal2Display(double factor)
+{
+  mFactor = factor;
+}
+
 QString DoubleDataAdapterXml::getUid() const
 {
 	return mUid;
@@ -77,5 +82,9 @@ int DoubleDataAdapterXml::getValueDecimals() const
 	return mDecimals;
 }
 
+DoubleDataAdapterXml::DoubleDataAdapterXml()
+{
+  mFactor = 1.0;
+}
 
 } // namespace ssc

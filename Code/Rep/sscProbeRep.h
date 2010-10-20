@@ -35,10 +35,10 @@ class ProbeRep : public RepImpl
 	Q_OBJECT
 
 public:
-	static ProbeRepPtr New(const std::string& uid, const std::string& name=""); ///< for creating new instances
+	static ProbeRepPtr New(const QString& uid, const QString& name=""); ///< for creating new instances
 	virtual ~ProbeRep(); ///<empty
 
-	virtual std::string getType() const; ///< returns a string identifying this class type
+	virtual QString getType() const; ///< returns a string identifying this class type
 
 	int getThreshold(); ///< gets the probing threshold
 	void setImage(ImagePtr image); ///< set which image points should be picked from
@@ -63,7 +63,7 @@ protected slots:
   void receiveTransforms(Transform3D prMt, double timestamp); ///< receive transforms from the connected tool
 
 protected:
-	ProbeRep(const std::string& uid, const std::string& name=""); ///< use New instead
+	ProbeRep(const QString& uid, const QString& name=""); ///< use New instead
 	virtual void addRepActorsToViewRenderer(View* view); ///< connects to the renderwindowinteractor
 	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor

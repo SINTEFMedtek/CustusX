@@ -14,14 +14,14 @@ typedef boost::shared_ptr<class DisplayTextRep> DisplayTextRepPtr;
 class DisplayTextRep : public ssc::RepImpl
 {
 public:
-	static DisplayTextRepPtr New(const std::string& uid, const std::string& name);
-	virtual std::string getType() const{ return "vm::DisplayTextRep";};
-	void addText(const Vector3D& color, const std::string& text, const Vector3D& pos);
-	void setText(unsigned i, const std::string& text);
+	static DisplayTextRepPtr New(const QString& uid, const QString& name);
+	virtual QString getType() const{ return "vm::DisplayTextRep";};
+	void addText(const Vector3D& color, const QString& text, const Vector3D& pos);
+	void setText(unsigned i, const QString& text);
 	void setColor(const Vector3D& color );
 	virtual ~DisplayTextRep();
 protected:
-	DisplayTextRep(const std::string& uid, const std::string& name);
+	DisplayTextRep(const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);
 	virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 	

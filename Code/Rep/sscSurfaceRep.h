@@ -25,15 +25,15 @@ class SurfaceRep : public RepImpl
 {
   Q_OBJECT
 public:
-	static SurfaceRepPtr New(const std::string& uid);
-	virtual std::string getType() const { return "ssc::SurfaceRep"; }
+	static SurfaceRepPtr New(const QString& uid);
+	virtual QString getType() const { return "ssc::SurfaceRep"; }
 	virtual ~SurfaceRep();
 	void setMesh(MeshPtr mesh);
 	void setImage(ImagePtr image);
 	//void removeImage(ImagePtr image);
 	bool hasMesh(MeshPtr mesh) const;
 protected:
-	SurfaceRep(const std::string& uid);
+	SurfaceRep(const QString& uid);
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 

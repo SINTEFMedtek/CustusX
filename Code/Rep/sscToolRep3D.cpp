@@ -11,11 +11,12 @@
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscView.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
 
-ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
+ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
   mStayHiddenAfterVisible = false;
@@ -29,7 +30,7 @@ ToolRep3D::ToolRep3D(const std::string& uid, const std::string& name) :
 	mOffsetLine.reset(new GraphicalLine3D());
 	mTooltipPoint.reset(new GraphicalPoint3D());
 
-	mProbeSector.reset(new USProbeSector());
+	mProbeSector.reset(new USProbeSector(true));
 	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProbeSectorActor = vtkActorPtr::New();
 
@@ -45,14 +46,14 @@ ToolRep3D::~ToolRep3D()
 {
 }
 
-ToolRep3DPtr ToolRep3D::New(const std::string& uid, const std::string& name)
+ToolRep3DPtr ToolRep3D::New(const QString& uid, const QString& name)
 {
 	ToolRep3DPtr retval(new ToolRep3D(uid, name));
 	retval->mSelf = retval;
 	return retval;
 }
 
-std::string ToolRep3D::getType() const
+QString ToolRep3D::getType() const
 {
 	return "ssc::ToolRep3D";
 }
@@ -84,10 +85,10 @@ void ToolRep3D::setTool(ToolPtr tool)
 	// setup new
 	if (mTool)
 	{
-		std::string filename = mTool->getGraphicsFileName();
-		if (!filename.empty() && filename.compare(filename.size()-3,3,"STL") == 0 )
+		QString filename = mTool->getGraphicsFileName();
+		if (!filename.isEmpty() && filename.endsWith("STL"))
 		{
-			mSTLReader->SetFileName( filename.c_str() );
+			mSTLReader->SetFileName( cstring_cast(filename) );
 			mPolyDataMapper->SetInputConnection( mSTLReader->GetOutputPort() );	 //read a 3D model file of the tool
 		}
 		else

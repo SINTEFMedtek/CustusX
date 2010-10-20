@@ -90,7 +90,6 @@ void SliderGroupWidget::dataChanged()
   //std::cout << "SliderGroup::dataChanged() " << range.min() << "," << range.max() << "," << range.step() << std::endl;
   mSlider->setDoubleValue(mData->convertInternal2Display(mData->getValue()));
   mEdit->setDoubleValue(mData->convertInternal2Display(mData->getValue()));
-
   mSlider->setToolTip(mData->getHelp());
   mEdit->setToolTip(mData->getHelp());
   mLabel->setToolTip(mData->getHelp());

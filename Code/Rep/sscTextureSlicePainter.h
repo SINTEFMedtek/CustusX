@@ -10,6 +10,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <vtkOpenGLRepresentationPainter.h>
+#include <QString>
 
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkOpenGLHardwareSupport > vtkOpenGLHardwareSupportPtr;
@@ -52,11 +53,11 @@ protected:
 
 	bool CanRender(vtkRenderer*, vtkActor*);
 	bool LoadRequiredExtensions(vtkOpenGLExtensionManager* mgr);
-	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, std::string id);
+	bool LoadRequiredExtension(vtkOpenGLExtensionManager* mgr, QString id);
 
 	class vtkInternals;
 	vtkInternals* mInternals;
-	std::string mSource;
+	QString mSource;
 };
 
 //---------------------------------------------------------

@@ -59,7 +59,7 @@ void SlicePlaneClipper::setSlicer(ssc::SliceProxyPtr slicer)
   this->changedSlot();
 }
 
-void SlicePlaneClipper::addClipPlane(ssc::VolumetricRepPtr volume, vtkPlanePtr clipPlane)
+void SlicePlaneClipper::addClipPlane(ssc::VolumetricBaseRepPtr volume, vtkPlanePtr clipPlane)
 {
   if (!clipPlane)
     return;
@@ -76,31 +76,49 @@ ssc::SliceProxyPtr SlicePlaneClipper::getSlicer()
 
 void SlicePlaneClipper::clearVolumes()
 {
-  for (VolumesType::iterator iter=mVolumes.begin(); iter!=mVolumes.end(); ++iter)
-  {
-    (*iter)->getVtkVolume()->GetMapper()->RemoveClippingPlane(mClipPlane);
-  }
-  mVolumes.clear();
+	while(!mVolumes.empty())
+	{
+		this->removeVolume(*mVolumes.begin());
+	}
 }
 
-void SlicePlaneClipper::addVolume(ssc::VolumetricRepPtr volume)
+void SlicePlaneClipper::volumeRepChangedSlot()
+{
+	VolumesType volumes = mVolumes;
+	for (VolumesType::iterator iter=volumes.begin(); iter!=volumes.end(); ++iter)
+	{
+		this->removeVolume(*iter);
+		this->addVolume(*iter);
+	}
+}
+
+void SlicePlaneClipper::addVolume(ssc::VolumetricBaseRepPtr volume)
 {
   if (!volume)
     return;
   mVolumes.insert(volume);
-
+  connect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
   this->addClipPlane(volume, mClipPlane);
-
   this->changedSlot();
 }
 
-void SlicePlaneClipper::removeVolume(ssc::VolumetricRepPtr volume)
+void SlicePlaneClipper::removeVolume(ssc::VolumetricBaseRepPtr volume)
 {
-  if (!volume)
-    return;
-  volume->getVtkVolume()->GetMapper()->RemoveClippingPlane(mClipPlane);
-  mVolumes.erase(volume);
-  this->changedSlot();
+	if (!volume)
+		return;
+	
+	vtkAbstractMapper* mapper = volume->getVtkVolume()->GetMapper();
+	if (mapper)
+	{
+		vtkPlaneCollection* planes = mapper->GetClippingPlanes();
+		if (planes && planes->IsItemPresent(mClipPlane))
+		{
+			mapper->RemoveClippingPlane(mClipPlane);	
+		}		
+	}
+	disconnect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
+	mVolumes.erase(volume);
+	this->changedSlot();
 }
 
 SlicePlaneClipper::VolumesType SlicePlaneClipper::getVolumes()

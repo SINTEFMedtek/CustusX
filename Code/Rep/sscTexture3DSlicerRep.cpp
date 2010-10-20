@@ -32,7 +32,7 @@ namespace ssc
 {
 //---------------------------------------------------------
 
-Texture3DSlicerRep::Texture3DSlicerRep(const std::string& uid) :
+Texture3DSlicerRep::Texture3DSlicerRep(const QString& uid) :
 	RepImpl(uid)
 {
 	std::cout << "create Texture3DSlicerRep" << std::endl;
@@ -46,7 +46,7 @@ Texture3DSlicerRep::~Texture3DSlicerRep()
 	mImages.clear();
 }
 
-Texture3DSlicerRepPtr Texture3DSlicerRep::New(const std::string& uid)
+Texture3DSlicerRepPtr Texture3DSlicerRep::New(const QString& uid)
 {
 	Texture3DSlicerRepPtr retval(new Texture3DSlicerRep(uid));
 	retval->mSelf = retval;
@@ -166,9 +166,9 @@ void Texture3DSlicerRep::createCoordinates(int count)
 	//mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2*count, cstring_cast(getTCoordName(count)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
 }
 
-std::string Texture3DSlicerRep::getTCoordName(int index)
+QString Texture3DSlicerRep::getTCoordName(int index)
 {
-	 return  "texture"+string_cast(index);
+	 return  "texture"+qstring_cast(index);
 }
 
 void Texture3DSlicerRep::updateCoordinates(int index)

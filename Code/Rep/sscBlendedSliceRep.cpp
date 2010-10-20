@@ -10,13 +10,14 @@
 #include "sscImageLUT2D.h"
 #include "sscImage.h"
 #include "sscSlicedImageProxy.h"
+#include "sscTypeConversions.h"
 
 //---------------------------------------------------------
 namespace ssc
 {
 //---------------------------------------------------------
 
-BlendedSliceRep::BlendedSliceRep(const std::string& uid) :
+BlendedSliceRep::BlendedSliceRep(const QString& uid) :
 	RepImpl(uid)
 {
 	mBlender = vtkImageBlendPtr::New();
@@ -32,7 +33,7 @@ BlendedSliceRep::~BlendedSliceRep()
 {
 }
 
-BlendedSliceRepPtr BlendedSliceRep::New(const std::string& uid)
+BlendedSliceRepPtr BlendedSliceRep::New(const QString& uid)
 {
 	BlendedSliceRepPtr retval(new BlendedSliceRep(uid));
 	retval->mSelf = retval;

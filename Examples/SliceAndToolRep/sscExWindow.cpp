@@ -92,7 +92,7 @@ ViewsWindow::~ViewsWindow()
 {
 }
 
-ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
+ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
 	ssc::View* view = new ssc::View(this);
 	mLayouts.insert(view);
@@ -110,7 +110,7 @@ ssc::View* ViewsWindow::generateSlice(const std::string& uid, ssc::ToolPtr tool,
 	return view;
 }
 
-void ViewsWindow::defineSlice(const std::string& uid, const std::string& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
+void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
 {
 	ssc::ToolManager* mToolmanager = ssc::DummyToolManager::getInstance();
 	ssc::ToolPtr tool = mToolmanager->getDominantTool();
@@ -122,9 +122,9 @@ void ViewsWindow::defineSlice(const std::string& uid, const std::string& imageFi
 	view->getRenderer()->ResetCamera();
 }
 
-ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
+ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
-	std::string filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
+	QString filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, filename, ssc::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
@@ -136,7 +136,7 @@ ssc::ImagePtr ViewsWindow::loadImage(const std::string& imageFilename)
 	return image;
 }
 
-void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std::string& volume, int r, int c)
+void ViewsWindow::insertView(ssc::View* view, const QString& uid, const QString& volume, int r, int c)
 {
   view->getRenderWindow()->GetInteractor()->EnableRenderOff();
   view->getRenderer()->GetActiveCamera();
@@ -144,12 +144,12 @@ void ViewsWindow::insertView(ssc::View* view, const std::string& uid, const std:
 	mSliceLayout->addLayout(layout, r,c);
 	
 	layout->addWidget(view);
-	layout->addWidget(new QLabel(QString::fromStdString(uid+" "+volume), this));
+	layout->addWidget(new QLabel(uid+" "+volume, this));
 }
 
-void ViewsWindow::defineGPU_3D(const std::string& imageFilename, int r, int c)
+void ViewsWindow::defineGPU_3D(const QString& imageFilename, int r, int c)
 {
-//	std::string uid = "3D";
+//	QString uid = "3D";
 //	ssc::View* view = new ssc::View(this);
 //	mLayouts.insert(view);
 //
@@ -174,9 +174,9 @@ void ViewsWindow::defineGPU_3D(const std::string& imageFilename, int r, int c)
 }
 
 
-void ViewsWindow::define3D(const std::string& imageFilename, int r, int c)
+void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 {
-	std::string uid = "3D";
+	QString uid = "3D";
 	ssc::View* view = new ssc::View(this);
 	mLayouts.insert(view);
 
@@ -242,10 +242,10 @@ void ViewsWindow::updateRender()
 //
 //	mVolumetricRep->getVtkVolume()->GetMapper()->Print(std::cout);
 
-	std::string text = string_cast(sum);
+	QString text = qstring_cast(sum);
 	for (unsigned i = 0; i < times.size(); ++i)
 	{
-		text += "\t" + string_cast(times[i]);
+		text += "\t" + qstring_cast(times[i]);
 	}
 
 	//std::cout << "render:\t" << text << std::endl;

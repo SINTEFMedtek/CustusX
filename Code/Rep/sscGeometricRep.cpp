@@ -14,7 +14,7 @@
 namespace ssc
 {
 
-GeometricRep::GeometricRep(const std::string& uid, const std::string& name) :
+GeometricRep::GeometricRep(const QString& uid, const QString& name) :
 	RepImpl(uid, name)
 {
 	mMapper = vtkPolyDataMapperPtr::New();
@@ -25,7 +25,7 @@ GeometricRep::GeometricRep(const std::string& uid, const std::string& name) :
 }
 GeometricRep::~GeometricRep()
 {}
-GeometricRepPtr GeometricRep::New(const std::string& uid, const std::string& name)
+GeometricRepPtr GeometricRep::New(const QString& uid, const QString& name)
 {
 	GeometricRepPtr retval(new GeometricRep(uid, name));
 	retval->mSelf = retval;
@@ -72,7 +72,7 @@ void GeometricRep::meshChangedSlot()
 	mMesh->connectToRep(mSelf);
   
 	mMapper->SetInput( mMesh->getVtkPolyData() );
-  
+
   //Set mesh color
   mActor->GetProperty()->SetColor(mMesh->getColor().redF(),
                                   mMesh->getColor().greenF(),

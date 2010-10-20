@@ -9,12 +9,12 @@
 
 namespace ssc
 {
-Mesh::Mesh(const std::string& uid, const std::string& name) :
-  Data(uid, name), mVtkPolyData(vtkPolyData::New())
+Mesh::Mesh(const QString& uid, const QString& name) :
+  Data(uid, name), mVtkPolyData(vtkPolyDataPtr::New())
 {
   mColor = QColor(255, 0, 0, 255);
 }
-Mesh::Mesh(const std::string& uid, const std::string& name, const vtkPolyDataPtr& polyData) : 
+Mesh::Mesh(const QString& uid, const QString& name, const vtkPolyDataPtr& polyData) : 
   Data(uid, name), mVtkPolyData(polyData)
 {
   mColor = QColor(255, 0, 0, 255);

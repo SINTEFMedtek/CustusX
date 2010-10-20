@@ -46,9 +46,9 @@ namespace ssc
 		View(QWidget *parent = NULL, Qt::WFlags f = 0);
 		virtual ~View();
 		virtual Type getType() const { return VIEW;}		///< \return the View type, indicating display dimension.
-		std::string getTypeString() const;
-		virtual std::string getUid();				///< Get a views unique id
-		virtual std::string getName();				///< Get a views name
+		QString getTypeString() const;
+		virtual QString getUid();				///< Get a views unique id
+		virtual QString getName();				///< Get a views name
 		virtual vtkRendererPtr  getRenderer() const;		///< Get the renderer used by this \a View.
 		virtual vtkRenderWindowPtr getRenderWindow() const;	///< Get the vtkRenderWindow used by this \a View.
 		virtual void addRep(const RepPtr& rep);			///< Adds and connects a rep to the view
@@ -75,8 +75,8 @@ namespace ssc
 
 	protected:
     unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
-		std::string mUid;					///< The view's unique id
-		std::string mName;					///< The view's name
+		QString mUid;					///< The view's unique id
+		QString mName;					///< The view's name
 		vtkRendererPtr mRenderer;
 		vtkRenderWindowPtr mRenderWindow;
 		//SNWXOpenGLRenderWindowPtr mRenderWindow;

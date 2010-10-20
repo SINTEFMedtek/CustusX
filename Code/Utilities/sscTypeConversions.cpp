@@ -4,11 +4,11 @@
 
 template<> cstring_cast_Placeholder cstring_cast<QString>(const QString& val)
 {
-	return cstring_cast_Placeholder(val.toStdString());
+	return cstring_cast_Placeholder(val);
 }
 template<> cstring_cast_Placeholder cstring_cast<QVariant>(const QVariant& val)
 {
-	return cstring_cast_Placeholder(val.toString().toStdString());
+	return cstring_cast_Placeholder(val.toString());
 }
 
 /** Helper function overload for streaming a QString to std::cout.
