@@ -42,6 +42,8 @@ SET ( ${LIB}_viewManager
     cxInteractiveCropper.cpp
     cxCameraControl.h
     cxCameraControl.cpp
+    cxRenderTimer.h
+    cxRenderTimer.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

@@ -117,41 +117,9 @@ ELSE(APPLE)
   ADD_EXECUTABLE(CustusX ${SOURCES} )
 ENDIF(APPLE)
 
-SET ( LINK_LIBRARIES_____notusedanymore
-  ${BOOST_LIBRARIES}
-  ${QT_LIBRARIES}
-  cxCommon
-  gui
-  viewManager
-  repManager
-  registrationManager
-  toolManager
-  dataManager
-  #3DUSReconstruction
-  vtkRendering
-  vtkWidgets
-  vtkGraphics
-  vtkIO
-  vtkCommon
-  vtkImaging
-  vtkFiltering
-  vtkHybrid
-  vtkVolumeRendering
-#  ITKCommon
-#  ITKBasicFilters
-#  ITKIO
-  IGSTK
-  #vtkDataManagement
-  #vtkRenderingAddOn
-  QVTK
-  sscUsReconstructionLib  
-  SSC
-)
-
 #----------
 # LINK
 TARGET_LINK_LIBRARIES( CustusX gui cxCommon )
-#TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
 
 SET(BUNDLE_NAME CustusX)
@@ -286,4 +254,4 @@ include(CPack)
 #cpack_add_component(application)
 #cpack_add_component(config DISPLAY_NAME "Configuration files" DESCRIPTION "Detaljert beskrivelse")
     
-      
+add_subdirectory(testing)      

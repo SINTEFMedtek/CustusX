@@ -30,7 +30,7 @@ namespace cx
 class ViewWrapper;
 typedef boost::shared_ptr<class SyncedValue> SyncedValuePtr;
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
-
+typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
 
 /**
  * \class ViewManager
@@ -89,6 +89,7 @@ public:
 
   bool getSmartRender() const;
   void setSmartRender(bool on);
+  RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
@@ -160,8 +161,9 @@ protected:
   
   bool mShadingOn; ///< Use shading for rendering?
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
-  QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
-  int mNumberOfRenderings; ///< Variable used to calculate FPS
+  RenderTimerPtr mRenderTimer;
+//  QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
+//  int mNumberOfRenderings; ///< Variable used to calculate FPS
 
   std::vector<ViewGroupPtr> mViewGroups;
 
