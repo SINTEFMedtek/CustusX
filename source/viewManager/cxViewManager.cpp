@@ -547,9 +547,9 @@ void ViewManager::renderAllViewsSlot()
 
   mRenderTimer->endRender();
 
-  if (mRenderTimer->getTime()->elapsed()>1000)
+  if (mRenderTimer->intervalPassed())
   {
-    emit fps(mRenderTimer->getRenderCount());
+    emit fps(mRenderTimer->getFPS());
     mRenderTimer->reset();
   }
 
