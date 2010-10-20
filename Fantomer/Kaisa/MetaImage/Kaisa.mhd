@@ -1,0 +1,9 @@
+ObjectType = Image 
+NDims = 3 
+BinaryData = True 
+BinaryDataByteOrderMSB = False 
+Offset = -103.604 -114.96 0.0
+ElementSpacing = 0.449 0.449 1.000 
+DimSize = 512 512 210
+ElementType = MET_USHORT 
+ElementDataFile = Kaisa.raw
