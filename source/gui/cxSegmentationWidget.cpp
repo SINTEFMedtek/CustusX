@@ -28,7 +28,9 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mSegmentationThreshold(100),
   mBinary(false),
   mUseSmothing(true),
-  mSmoothSigma(0.5)
+  mSmoothSigma(0.5),
+  mSegmentationThresholdSpinBox(new QSpinBox()),
+  mSmoothingSigmaSpinBox(new QDoubleSpinBox())
 {
   this->setObjectName("SegmentationWidget");
   this->setWindowTitle("Segmentation");
@@ -41,6 +43,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
@@ -118,13 +121,22 @@ void SegmentationWidget::smoothingSigmaSlot(double value)
   mSmoothSigma = value;
 }
 
+void SegmentationWidget::imageChangedSlot(QString uid)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+  if(!image)
+    return;
+  mSegmentationThresholdSpinBox->setRange(image->getMin(), image->getMax());
+  //ssc::messageManager()->sendDebug("Segmentation threshold range set to ["+qstring_cast(image->getMin())+","+qstring_cast(image->getMax())+"]");
+}
+
 QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
 
   QGridLayout* layout = new QGridLayout(retval);
 
-  mSegmentationThresholdSpinBox = new QSpinBox();
+  mSegmentationThresholdSpinBox->setSingleStep(1);
   mSegmentationThresholdSpinBox->setValue(mSegmentationThreshold);
   QLabel* thresholdLabel = new QLabel("Threshold");
   connect(mSegmentationThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(thresholdSlot(int)));
@@ -141,7 +153,8 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
   QLabel* smoothingLabel = new QLabel("Smoothing");
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSmoothingSlot(bool)));
 
-  mSmoothingSigmaSpinBox = new QDoubleSpinBox();
+  mSmoothingSigmaSpinBox->setRange(0,10);
+  mSmoothingSigmaSpinBox->setSingleStep(0.1);
   mSmoothingSigmaSpinBox->setValue(mSmoothSigma);
   mSmoothingSigmaSpinBox->setEnabled(smoothingCheckBox->isChecked());
   mSmoothingSigmaLabel = new QLabel("Smoothing sigma");
@@ -166,7 +179,10 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mSurfaceThreshold(100),
     mDecimation(0.8),
     mReduceResolution(true),
-    mSmoothing(true)
+    mSmoothing(true),
+    mSurfaceThresholdSpinBox(new QSpinBox()),
+    mDecimationSpinBox(new QSpinBox())
+
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -179,6 +195,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(imageChanged(QString)));
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
@@ -216,7 +233,8 @@ void SurfaceWidget::surfaceSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
-  Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, mDecimation, mReduceResolution, mSmoothing);
+  double decimation = mDecimation/100;
+  Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
 }
 
 void SurfaceWidget::thresholdSlot(int value)
@@ -224,7 +242,7 @@ void SurfaceWidget::thresholdSlot(int value)
   mSurfaceThreshold = value;
 }
 
-void SurfaceWidget::decimationSlot(double value)
+void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
 }
@@ -238,21 +256,31 @@ void SurfaceWidget::smoothingSlot(bool value)
 {
   mSmoothing = value;
 }
+void SurfaceWidget::imageChangedSlot(QString uid)
+{
+  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+  if(!image)
+    return;
+  mSurfaceThresholdSpinBox->setRange(image->getMin(), image->getMax());
+  //ssc::messageManager()->sendDebug("Surface threshold range set to ["+qstring_cast(image->getMin())+","+qstring_cast(image->getMax())+"]");
+}
 
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
   QGridLayout* layout = new QGridLayout(retval);
 
-  mSurfaceThresholdSpinBox = new QSpinBox();
   mSurfaceThresholdSpinBox->setValue(mSurfaceThreshold);
+  mSurfaceThresholdSpinBox->setSingleStep(1);
   QLabel* thresholdLabel = new QLabel("Threshold");
   connect(mSurfaceThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(thresholdSlot(int)));
 
-  mDecimationSpinBox = new QDoubleSpinBox();
-  mDecimationSpinBox->setValue(mDecimation);
+  int decimationPercent = mDecimation;
+  mDecimationSpinBox->setValue(decimationPercent);
+  mDecimationSpinBox->setRange(0,100);
+  mDecimationSpinBox->setSingleStep(5);
   QLabel* decimationLabel = new QLabel("Decimation %");
-  connect(mDecimationSpinBox, SIGNAL(valueChanged(double)), this, SLOT(decimationSlot(double)));
+  connect(mDecimationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(decimationSlot(int)));
 
   QCheckBox* reduceResolutionCheckBox = new QCheckBox("reduce resolution");
   connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
