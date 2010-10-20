@@ -63,11 +63,15 @@ ToolManager::~ToolManager()
 
 void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 {
-    (*mConfiguredTools)[tool->getUid()] = tool;
-    tool->setVisible(true);
-    this->addConnectedTool(tool->getUid());
-    tool->stopTracking();
-    this->setDominantTool(tool->getUid());
+  ssc::messageManager()->sendInfo("running dummy tool "+tool->getUid());
+
+  (*mConfiguredTools)[tool->getUid()] = tool;
+  tool->setVisible(true);
+  this->addConnectedTool(tool->getUid());
+  tool->startTracking();
+  this->setDominantTool(tool->getUid());
+
+  emit initialized();
 }
 
 void ToolManager::initializeManualTool()
@@ -327,7 +331,7 @@ void ToolManager::setDominantTool(const QString& uid)
     }
   }
 
-  //std::cout << "void ToolManager::setDominantTool( "+uid+" )" << std::endl;
+//  std::cout << "void ToolManager::setDominantTool( "+uid+" )" << std::endl;
 
   ssc::ToolPtr newTool;
 
