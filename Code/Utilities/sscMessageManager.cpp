@@ -1,9 +1,9 @@
 #include "sscMessageManager.h"
 
 #include <iostream>
-//#include <streambuf>
 #include "boost/shared_ptr.hpp"
 #include <QString>
+#include <QTextStream>
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
 #include "sscTime.h"
@@ -110,7 +110,6 @@ private:
 //---------------------------------------------------------------------------
 }
 
-
 class SingleStreamerImpl
 {
 private:
@@ -139,10 +138,16 @@ public:
 MessageManager* MessageManager::mTheInstance = NULL;
 MessageManager* messageManager() { return MessageManager::getInstance(); }
 
-  
-MessageManager::MessageManager():
-  mOnlyCout(true) 
+
+MessageManager::MessageManager() :
+    mAbsoluteLoggingFolderPath("")
 {}
+
+MessageManager::~MessageManager()
+{
+  mConsoleFile->close();
+  delete mConsoleStream;
+}
 
 MessageManager* MessageManager::getInstance()
 {
@@ -160,39 +165,61 @@ void MessageManager::initialize()
   mCerr.reset(new SingleStreamerImpl(std::cerr, mlCERR));
 }
 
-
 void MessageManager::destroyInstance()
 {
   delete mTheInstance;
 }
 
-void MessageManager::sendInfo(std::string info)
+void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
 {
-  QString qinfo(info.c_str());
-  this->sendMessage(qinfo, mlINFO, 1500);
+  if(mAbsoluteLoggingFolderPath == absoluteLoggingFolderPath)
+    return;
+
+  QString filename("/ConsoleLog.txt");
+
+  if(!mConsoleFile)
+    mConsoleFile = new QFile(mAbsoluteLoggingFolderPath+filename,this);
+
+  mAbsoluteLoggingFolderPath = absoluteLoggingFolderPath;
+  QString consoleFilePath = mAbsoluteLoggingFolderPath+filename;
+
+  if(mConsoleFile->isOpen())
+  {
+    mConsoleFile->close();
+
+    if(QFile::exists(consoleFilePath))
+      QFile::remove(consoleFilePath);
+
+    if(!mConsoleFile->copy(consoleFilePath))
+      ssc::messageManager()->sendWarning("Could not copy to "+consoleFilePath);
+
+    mConsoleFile->setFileName(consoleFilePath);
+    this->openLogging(QFile::Append);
+
+  }else{
+    mConsoleFile->setFileName(consoleFilePath);
+    this->openLogging(QFile::Truncate);
+  }
 }
 
-void MessageManager::sendWarning(std::string warning)
+void MessageManager::sendInfo(QString info)
 {
-  QString qwarning(warning.c_str());
-  this->sendMessage(qwarning, mlWARNING, 3000);
+  this->sendMessage(info, mlINFO, 1500);
 }
 
-void MessageManager::sendError(std::string error)
+void MessageManager::sendWarning(QString warning)
 {
-  QString qerror(error.c_str());
-  this->sendMessage(qerror, mlERROR, 0);
+  this->sendMessage(warning, mlWARNING, 3000);
+}
+
+void MessageManager::sendError(QString error)
+{
+  this->sendMessage(error, mlERROR, 0);
 }
   
-void MessageManager::sendDebug(std::string text)
+void MessageManager::sendDebug(QString debug)
 {
-  QString qdebug(text.c_str());
-  this->sendMessage(qdebug, mlDEBUG, 0);
-}
-  
-void MessageManager::setCoutFlag(bool onlyCout)
-{
-  mOnlyCout = onlyCout;
+  this->sendMessage(debug, mlDEBUG, 0);
 }
 
 void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int timeout)
@@ -205,23 +232,40 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
     std::cout << message.getPrintableMessage() << std::endl;
   mCout->setEnableRedirect(true);
 
-  if (mOnlyCout)
+  emit emittedMessage(message);
+
+  if(!mConsoleStream)
     return;
 
-  emit emittedMessage(message);
-  //this is for the old system
-  this->sendMessage(message.getPrintableMessage(),timeout);
+  (*mConsoleStream) << message.getPrintableMessage();
+  (*mConsoleStream) << endl;
 }
 
 void MessageManager::sendMessage(QString message, int timeout)
 {
-  //old system
-  //if (mOnlyCout)
-  //  std::cout << string_cast(message) << std::endl;
-  //else
-    emit this->emittedMessage((const QString &)message, timeout);
+    emit emittedMessage(QString(message), timeout);
 }
 
+bool MessageManager::openLogging(QFile::OpenMode mode)
+{
+  if(!mConsoleFile)
+    return false;
 
+  if(mConsoleFile->open(QFile::WriteOnly | mode))
+  {
+    if(!mConsoleStream)
+      mConsoleStream = new QTextStream(mConsoleFile);
+    else
+      mConsoleStream->setDevice(mConsoleFile);
+
+    ssc::messageManager()->sendInfo("Console log file: "+mConsoleFile->fileName()+".");
+  }
+  else
+  {
+    ssc::messageManager()->sendWarning("Could not open "+mConsoleFile->fileName()+" for writing the console log.");
+    return false;
+  }
+  return true;
+}
 
 } //End namespace ssc

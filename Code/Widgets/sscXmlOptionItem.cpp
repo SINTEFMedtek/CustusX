@@ -229,12 +229,12 @@ void XmlOptionFile::save()
     QTextStream stream(&file);
     stream << mDocument.toString();
     file.close();
-    ssc::messageManager()->sendInfo("Created "+file.fileName().toStdString());
+    ssc::messageManager()->sendInfo("Created "+file.fileName());
   }
   else
   {
-    ssc::messageManager()->sendError("Could not open "+file.fileName().toStdString()
-                               +" Error: "+file.errorString().toStdString());
+    ssc::messageManager()->sendError("Could not open "+file.fileName()
+                               +" Error: "+file.errorString());
   }
 }
 
@@ -254,9 +254,9 @@ void XmlOptionFile::load()
     if (!loadedDoc.setContent(&file, &error,&line,&col))
     {
       ssc::messageManager()->sendWarning("error setting xml content ["
-                                         + string_cast(line) +  ","
-                                         + string_cast(col) + "]"
-                                         + string_cast(error) );
+                                         + qstring_cast(line) +  ","
+                                         + qstring_cast(col) + "]"
+                                         + qstring_cast(error) );
     }
     file.close();
     mDocument = loadedDoc;

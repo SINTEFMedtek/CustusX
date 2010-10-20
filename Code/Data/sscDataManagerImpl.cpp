@@ -611,7 +611,7 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
   if (!data)
   {
-    messageManager()->sendWarning("Unknown file: " + string_cast(path));
+    messageManager()->sendWarning("Unknown file: " + path);
     return;
   }
 
@@ -647,7 +647,7 @@ void DataManagerImpl::vtkImageDataChangedSlot()
     uid = mActiveImage->getUid();
 
   emit activeImageChanged(uid);
-  messageManager()->sendInfo("Active image set to " + string_cast(uid));
+  messageManager()->sendInfo("Active image set to " + qstring_cast(uid));
 }
 
 void DataManagerImpl::transferFunctionsChangedSlot()
