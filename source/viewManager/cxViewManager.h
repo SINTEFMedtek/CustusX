@@ -89,6 +89,7 @@ public:
 
   bool getSmartRender() const;
   void setSmartRender(bool on);
+  RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
