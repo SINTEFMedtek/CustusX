@@ -46,6 +46,7 @@ private slots:
   void thresholdSlot(int value);
   void toogleSmoothingSlot(bool on);
   void smoothingSigmaSlot(double value);
+  void imageChangedSlot(QString uid);
 
 private:
   SegmentationWidget();
@@ -90,9 +91,10 @@ signals:
 private slots:
   void surfaceSlot();
   void thresholdSlot(int value);
-  void decimationSlot(double value);
+  void decimationSlot(int value);
   void reduceResolutionSlot(bool value);
   void smoothingSlot(bool value);
+  void imageChangedSlot(QString uid);
 
 private:
   SurfaceWidget();
@@ -100,11 +102,11 @@ private:
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   int mSurfaceThreshold; ///< the threshold value used when contouring
-  double mDecimation;
+  int mDecimation;
   bool mReduceResolution;
   bool mSmoothing;
   QSpinBox* mSurfaceThresholdSpinBox;
-  QDoubleSpinBox* mDecimationSpinBox;
+  QSpinBox* mDecimationSpinBox;
 };
 
 /**
