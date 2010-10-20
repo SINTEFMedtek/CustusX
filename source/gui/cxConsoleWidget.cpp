@@ -5,28 +5,27 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include "sscTypeConversions.h"
+#include "cxStateMachineManager.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
 
 ConsoleWidget::ConsoleWidget(QWidget* parent) :
-  QTextBrowser(parent), mLineWrappingAction(new QAction(tr("Line wrapping"), this))
+  QTextBrowser(parent),
+  mLineWrappingAction(new QAction(tr("Line wrapping"), this))
 {
   this->setObjectName("ConsoleWidget");
   this->setWindowTitle("Console");
   this->setWhatsThis(this->defaultWhatsThis());
 
-  // Set it read only
   this->setReadOnly(true);
 
-  // Do not show frames
   this->setFrameStyle(true);
   this->setFrameStyle(QFrame::Plain);
 
-  // Define the text formating
   this->createTextCharFormats();
 
-  // Use layout
   QVBoxLayout* layout = new QVBoxLayout;
   this->setLayout(layout);
 
@@ -38,8 +37,7 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
 }
 
 ConsoleWidget::~ConsoleWidget()
-{
-}
+{}
 
 QString ConsoleWidget::defaultWhatsThis() const
 {
@@ -69,7 +67,7 @@ void ConsoleWidget::printMessage(Message message)
 void ConsoleWidget::lineWrappingSlot(bool checked)
 {
   this->setLineWrapMode(checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
-  ssc::messageManager()->sendDebug("LineWrapping: " + qstring_cast(checked));
+  //ssc::messageManager()->sendDebug("LineWrapping: " + qstring_cast(checked));
 }
 
 void ConsoleWidget::createTextCharFormats()
