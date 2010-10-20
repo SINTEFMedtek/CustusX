@@ -10,6 +10,8 @@
 
 #include "boost/shared_ptr.hpp"
 #include <QTime>
+#include <vector>
+#include <iostream>
 
 namespace cx
 {
@@ -22,49 +24,21 @@ typedef boost::shared_ptr<class RenderTimer> RenderTimerPtr;
 class RenderTimer
 {
 public:
-  RenderTimer()
-  {
-    mRenderingTime = new QTime;
-    mNumberOfRenderings = 0;
-    mRenderingTime->start();
-  }
- ~RenderTimer()
-  {
-    delete mRenderingTime;
-  }
-  void reset()
-  {
-    mRenderingTime->restart();
-    mNumberOfRenderings = 0;
-  }
-  void beginRender()
-  {
-
-  }
-  void endRender()
-  {
-    ++mNumberOfRenderings;
-  }
-  int getRenderCount()
-  {
-    return mNumberOfRenderings;
-  }
-  QTime* getTime()
-  {
-    return mRenderingTime;
-  }
-//  void setInterval(int val)
-//  {
-//    mInterval = val;
-//  }
-//  bool PassedInterval() const
-//  {
-//    return
-//  }
+  RenderTimer();
+  void reset(int interval = 1000);
+  void beginRender();
+  void endRender();
+  double getFPS();
+  bool intervalPassed() const;
+  void dumpStatistics();
 
 private:
+  std::vector<double> mOffRenderTime;
+  std::vector<double> mRenderTime;
+  //QTime mLastBeginRenderTime, mLastEndRenderTime;
+  QTime mRenderClock; ///< clock for counting time between and inside renderings
   int mInterval; ///< the interval between each readout+reset of the calculated values.
-  QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
+  QTime mIntervalClock; ///< Time object used to calculate number of renderings per second (FPS)
   int mNumberOfRenderings; ///< Variable used to calculate FPS
 };
 
