@@ -14,17 +14,11 @@ namespace cx
 CustomStatusBar::CustomStatusBar() :
   mFpsLabel(new QLabel())
 {
-  connect(ssc::messageManager(),
-          SIGNAL(emittedMessage(const QString&, int)),
-          this,
-          SLOT(showMessage(const QString&, int)));
+  connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)), this, SLOT(showMessage(const QString&, int)));
 
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()),
-          this, SLOT(connectToToolSignals()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()),
-            this, SLOT(disconnectFromToolSignals()));
-  connect(viewManager(), SIGNAL(fps(int)),
-          this, SLOT(fpsSlot(int)));
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(connectToToolSignals()));
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(disconnectFromToolSignals()));
+  connect(viewManager(), SIGNAL(fps(int)),this, SLOT(fpsSlot(int)));
   
   this->addPermanentWidget(mFpsLabel);
 }
