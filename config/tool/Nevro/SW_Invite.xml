@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>>Polaris</type>
+</tracker>
+
+<toolfile type="aurora" reference="yes">/Tools/SW_Invite/02-077-0191_Sterile-RefFrame.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/01-117-0329_Planning-Navigator.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/03_941D1018_US-Probe-8FPA.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/03_1179E1003_US-Probe-10FPA-MC.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/04-116-0326_Large-Custom-Navigator.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/05-080-0214_Small-Custom-Navigator.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/07-081-0223_New_Intraoperative-Navigator.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/32_1137D1005_US-Probe-12FLA.xml</toolfile>
+<toolfile type="aurora" reference="no">/Tools/SW_Invite/32_25450YP8_US-Probe-12L.xml</toolfile>
+
+
+</configuration>
