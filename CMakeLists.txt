@@ -63,7 +63,7 @@ if(BUILD_US_ACQUISITION)
 endif(BUILD_US_ACQUISITION)
 
 enable_testing()
-add_subdirectory(testing)
+#add_subdirectory(testing)
 
 
 
