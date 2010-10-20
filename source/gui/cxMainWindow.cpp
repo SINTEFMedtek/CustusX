@@ -71,6 +71,8 @@ MainWindow::MainWindow() :
   mControlPanel(NULL),
   mSettings(DataLocations::getSettings())
 {
+  ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
+
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
 
@@ -126,8 +128,6 @@ MainWindow::MainWindow() :
     mSettings->setValue("renderingInterval", 33);
   if (!mSettings->contains("shadingOn"))
     mSettings->setValue("shadingOn", true);
-
-  ssc::messageManager()->setCoutFlag(false);
 
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
@@ -339,8 +339,8 @@ void MainWindow::newPatientSlot()
   int patientNumber = mSettings->value("globalPatientNumber").toInt();
   mSettings->setValue("globalPatientNumber", ++patientNumber);
 
-  //  createPatientFolders(choosenDir);
   stateManager()->getPatientData()->newPatient(choosenDir);
+  ssc::messageManager()->setLoggingFolder(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs");
 }
 
 void MainWindow::clearPatientSlot()
