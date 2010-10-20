@@ -30,6 +30,8 @@
 #include <vtkTriangleFilter.h>
 #include <vtkDecimatePro.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkTubeFilter.h>
+#include <vtkImageCast.h>
 
 typedef vtkSmartPointer<vtkImageExport> vtkImageExportPtr;
 
@@ -60,14 +62,32 @@ namespace cx
 
 itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
 {
+  if(!image)
+  {
+    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
+    return itkImageType::ConstPointer();
+  }
   itkVTKImageToImageFilterType::Pointer vtk2itkFilter = itkVTKImageToImageFilterType::New();
   //itkToVtkFilter->SetInput(data);
-  vtk2itkFilter->SetInput(image->getBaseVtkImageData());
+  vtkImageDataPtr input = image->getBaseVtkImageData();
+  if (input->GetScalarType() != VTK_UNSIGNED_SHORT)
+  //if (input->GetScalarType() == VTK_UNSIGNED_CHAR)
+  {
+    // convert
+    // May need to use vtkImageShiftScale instead if we got data types other than unsigned char?
+    typedef vtkSmartPointer<class vtkImageCast> vtkImageCastPtr;
+    vtkImageCastPtr imageCast = vtkImageCastPtr::New();
+    imageCast->SetInput(input);
+    imageCast->SetOutputScalarTypeToUnsignedShort();
+    input = imageCast->GetOutput();
+  }
+  vtk2itkFilter->SetInput(input);
   vtk2itkFilter->Update();
   return vtk2itkFilter->GetOutput();
 }
 
-void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation, bool reduceResolution, bool smoothing)
+ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
+    double decimation, bool reduceResolution, bool smoothing)
 {
   //itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
@@ -136,6 +156,7 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
   normals->SetInput(cubesPolyData);
   normals->Update();
 //  cubesPolyData = normals->GetOutput();
+  //normals->GetOutput()->ReleaseDataFlagOn();// Test: see if this release more memory
   cubesPolyData->DeepCopy(normals->GetOutput());
 
   //cubesPolyData->Print(std::cout);
@@ -158,6 +179,7 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveMesh(result, outputBasePath);
 
+  return result;
   //
   //    //print
   //    //itkToVtkFilter->GetOutput()->Print(std::cout);
@@ -171,13 +193,14 @@ void Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int thre
 
 }
 
-void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmothing, double smoothSigma)
+ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmothing, double smoothSigma)
 {
   itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
   //Smoothing
   if(useSmothing)
   {
+    ssc::messageManager()->sendInfo("Smoothing");
     typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
     smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
     smoohingFilter->SetSigma(smoothSigma);
@@ -187,6 +210,7 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
   }
 
   //Thresholding
+  ssc::messageManager()->sendInfo("Thresholding");
   typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
   thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
   thresholdFilter->SetInput(itkImage);
@@ -203,6 +227,7 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
   itkToVtkFilter->Update();
 
   vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+  //itkToVtkFilter->GetOutput()->ReleaseDataFlagOn();// Test: see if this release more memory: No change here
   rawResult->DeepCopy(itkToVtkFilter->GetOutput());
   // TODO: possible memory problem here - check debug mem system of itk/vtk
 
@@ -219,9 +244,10 @@ void Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int thre
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
 
+  return result;
 }
 
-void Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
+ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
 {
   ssc::messageManager()->sendInfo("Finding "+image->getName()+"s centerline... Please wait!");
 
@@ -253,8 +279,36 @@ void Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
   result->setParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
+
+  return result;
 }
 
+/*void Segmentation::tubeContour(ssc::ImagePtr image, QString outputBasePath)
+{
+  //Don't work as vtkTubeFilter need a vtkPolyData as input
+  typedef vtkSmartPointer<class vtkTubeFilter> vtkTubeFilterPtr;
+  vtkTubeFilterPtr tube = vtkTubeFilterPtr::New();
+  tube->SetInput(image->getBaseVtkImageData());
+  tube->SetRadius(1.0);
+  tube->SetNumberOfSides(12);
+  tube->Update();
+  vtkPolyDataPtr tubePolyData = vtkPolyDataPtr::New();
+  tubePolyData = tube->GetOutput();
+
+
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_tube%1";
+  QString name = image->getName() + " tubes %1";
+  //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
+  ssc::MeshPtr result = ssc::dataManager()->createMesh(tubePolyData, uid,
+      name, "Images");
+  ssc::messageManager()->sendInfo("created tubes " + result->getName());
+
+  result->get_rMd_History()->setRegistration(image->get_rMd());
+  result->setParentFrame(image->getUid());
+
+  ssc::dataManager()->loadData(result);
+  ssc::dataManager()->saveMesh(result, outputBasePath);
+}*/
 /*{
   //Create vtkPolyData
   vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
