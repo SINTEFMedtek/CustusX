@@ -47,7 +47,7 @@ DummyTool::DummyTool(const QString& uid) :
 //	std::cout << "dummytool" << std::endl;
 
 //	this->createPolyData();
-    mPolyData = this->createPolyData(140,10,10,3);
+    mPolyData = this->createPolyData(150, 15, 4, 2);
 
 	connect(mTimer.get(), SIGNAL(timeout()),this, SLOT(sendTransform()));
 }
@@ -269,6 +269,39 @@ std::vector<Transform3D> DummyTool::createToolPositionMovement(const DoubleBound
     
     return retval;
 }
+
+/** Create a test trajectory that moves within the given bb.
+ */
+std::vector<Transform3D> DummyTool::createToolPositionMovementTranslationOnly(const DoubleBoundingBox3D& bb) const
+{
+    std::vector<Transform3D> retval;
+
+    Vector3D range = bb.range();
+    // define four points. Traverse them and then back to the starting point.
+//    Vector3D a = bb.center() + Vector3D(range[0]/2, range[0]/10, range[0]/10);
+//    Vector3D b = bb.center();
+//    Vector3D c = b + Vector3D(-range[0]*0.1, -range[0]*0.1, -range[0]*0.1);
+//    Vector3D d = c + Vector3D(range[0]*0.1, range[0]*0.1, range[2]/3);
+    Vector3D a = bb.center() + Vector3D( range[0]*0.4,  range[1]*0.4,  range[2]*0.4);
+    Vector3D b = bb.center();
+    Vector3D c = bb.center() + Vector3D(-range[0]*0.4, -range[1]*0.1, -range[2]*0.1);
+    Vector3D d = bb.center() + Vector3D( range[0]*0.0,  range[1]*0.1,  range[2]*0.3);
+
+    int steps = 200;
+    double step = *std::max_element(range.begin(), range.end()) / steps;
+
+    Transform3D r0 = createTransformRotateX(M_PI)*createTransformRotateZ(-M_PI*0.5);
+    Transform3D R = createTransformRotateZ(-M_PI*0.25)*createTransformRotateX(-M_PI*0.25) * r0;
+    Transform3D T = createTransformTranslate(a);
+
+    createLinearMovement(&retval, &T, R, a, b, step);
+    createLinearMovement(&retval, &T, R, b, c, step);
+    createLinearMovement(&retval, &T, R, c, d, step);
+    createLinearMovement(&retval, &T, R, d, a, step);
+
+    return retval;
+}
+
 
 Transform3D* DummyTool::getNextTransform()
 {
