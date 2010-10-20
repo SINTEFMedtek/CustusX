@@ -217,6 +217,40 @@ private:
   QString mValueName;
 };
 
+typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
+/** Adapter that selects and stores an mesh.
+ * The image is stored internally in the adapter.
+ * Use setValue/getValue plus changed() to access it.
+ */
+class SelectMeshStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static SelectMeshStringDataAdapterPtr New() { return SelectMeshStringDataAdapterPtr(new SelectMeshStringDataAdapter()); }
+  SelectMeshStringDataAdapter();
+  virtual ~SelectMeshStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+
+public: // interface extension
+  ssc::MeshPtr getMesh();
+  void setValueName(const QString name);
+
+signals:
+    void meshChanged(QString);
+
+private:
+  QString mMeshUid;
+  QString mValueName;
+};
 
 typedef boost::shared_ptr<class ParentFrameStringDataAdapter> ParentFrameStringDataAdapterPtr;
 /** Adapter that selects the parent frame of the given ssc::Data.
