@@ -34,7 +34,8 @@ public:
   virtual QString defaultWhatsThis() const;
 
 signals:
-  void imageChanged(QString);
+  void inputImageChanged(QString uid);
+  void outputImageChanged(QString uid);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -86,7 +87,8 @@ public slots:
   void setImageInputSlot(QString value);
 
 signals:
-  void imageChanged(QString);
+  void inputImageChanged(QString uid);
+  void outputMeshChanged(QString uid);
 
 private slots:
   void surfaceSlot();
@@ -130,7 +132,8 @@ public slots:
   void setImageInputSlot(QString value);
 
 signals:
-  void imageChanged(QString);
+void inputImageChanged(QString uid);
+void outputImageChanged(QString uid);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
