@@ -8,6 +8,7 @@
 #include "sscLandmark.h"
 #include "cxTool.h"
 #include "cxTracker.h"
+#include "sscDummyTool.h"
 
 class QDomNode;
 class QDomDocument;
@@ -74,6 +75,7 @@ public:
   virtual void setLandmark(ssc::Landmark landmark);
   virtual void removeLandmark(QString uid);
 
+  void runDummyTool(ssc::DummyToolPtr tool);
   void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
 
   TrackerPtr getTracker();
