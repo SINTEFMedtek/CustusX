@@ -32,9 +32,9 @@ class ToolManager: public ssc::ToolManager
 Q_OBJECT
 
 public:
-  typedef Tracker::Message TrackerMessage;
-  typedef Tool::Message ToolMessage;
-  typedef QString stdString;
+//  typedef Tracker::Message TrackerMessage;
+//  typedef Tool::Message ToolMessage;
+//  typedef QString stdString;
 
   static void initializeObject();
   static ToolManager* getInstance();
@@ -89,8 +89,8 @@ public slots:
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 protected slots:
-  void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from tools
-  void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from trackers
+//  void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from tools
+//  void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from trackers
   void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
 
 protected:
@@ -100,7 +100,7 @@ protected:
   ~ToolManager(); ///< destructor
 
   void addConnectedTool(QString uid); ///< moves a tool from configuredTools to connectedTools
-  void connectSignalsAndSlots(); ///< connects signals and slots
+//  void connectSignalsAndSlots(); ///< connects signals and slots
   void initializeManualTool();
   void configureReferences(); ///<
 
