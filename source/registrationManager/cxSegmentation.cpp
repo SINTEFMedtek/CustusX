@@ -200,7 +200,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   //Smoothing
   if(useSmothing)
   {
-    ssc::messageManager()->sendInfo("Smoothing");
+    ssc::messageManager()->sendDebug("Smoothing...");
     typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
     smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
     smoohingFilter->SetSigma(smoothSigma);
@@ -210,7 +210,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   }
 
   //Thresholding
-  ssc::messageManager()->sendInfo("Thresholding");
+  ssc::messageManager()->sendDebug("Thresholding...");
   typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
   thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
   thresholdFilter->SetInput(itkImage);
