@@ -107,7 +107,7 @@ ViewManager::ViewManager() :
   connect(mRenderingTimer, SIGNAL(timeout()),
           this, SLOT(renderAllViewsSlot()));
   
-  mShadingOn = mSettings->value("shadingOn").toBool();
+//  mShadingOn = mSettings->value("shadingOn").toBool();
 
   mGlobalZoom2DVal = SyncedValue::create(1);
   this->setGlobal2DZoom(mGlobal2DZoom);
@@ -374,23 +374,23 @@ void ViewManager::renderingIntervalChangedSlot(int interval)
   mRenderingTimer->start(interval);
 }
 
-void ViewManager::shadingChangedSlot(bool shadingOn)
-{
-  mShadingOn = shadingOn;
-
-  // currently disabled: shading is now a property in ssc::Image.
-  // Remove this method???
-  
-//  ssc::VolumetricRepPtr volumetricRep
-//  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
-//  if(volumetricRep->getImage())
-//  {
-//    if(shadingOn)
-//      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-//    else
-//      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
-//  }
-}
+//void ViewManager::shadingChangedSlot(bool shadingOn)
+//{
+//  mShadingOn = shadingOn;
+//
+//  // currently disabled: shading is now a property in ssc::Image.
+//  // Remove this method???
+//
+////  ssc::VolumetricRepPtr volumetricRep
+////  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
+////  if(volumetricRep->getImage())
+////  {
+////    if(shadingOn)
+////      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
+////    else
+////      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
+////  }
+//}
 
 /** Set the stretch factors of columns and rows in mLayout.
  */
