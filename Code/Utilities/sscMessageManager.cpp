@@ -241,12 +241,6 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
   }
 
   emit emittedMessage(message);
-  this->sendMessage(message.getPrintableMessage(), timeout); //old system, see custom statusbar
-}
-
-void MessageManager::sendMessage(QString message, int timeout)
-{
-    emit emittedMessage((const QString &)message, timeout);
 }
 
 bool MessageManager::openLogging(QFile::OpenMode mode)

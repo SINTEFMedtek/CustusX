@@ -16,16 +16,25 @@ class QTextStream;
 namespace ssc
 {
 
+/**
+ * \class Message
+ *
+ * \brief A representation of a message.
+ *
+ * \author Janne Beate Lervik Bakeng, SINTEF
+ * \date 24.08.2010
+ */
 class Message
 {
 public:
   Message(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0);
   ~Message();
-  QString getPrintableMessage();
-  MESSAGE_LEVEL getMessageLevel();
-  QString getText();
-  QDateTime* getTimeStamp();
-  int getTimeout();
+
+  QString getPrintableMessage(); ///< Text containing  information appropriate to display
+  MESSAGE_LEVEL getMessageLevel(); ///< The category of the message
+  QString getText(); ///< The raw message.
+  QDateTime* getTimeStamp(); ///< The time at which the message was created.
+  int getTimeout(); ///< Timout tells the statusbar how long it should be displayed, this depends on the message level
 
 private:
   QString mText;
@@ -34,14 +43,13 @@ private:
   QDateTime mTimeStamp;
 };
 
-
 /**
  * \class MessageManager
  *
  * \brief This class handles delivering messages to a statusbar from all the other
  * classes.
  *
- * \author Janne Beate Lervik Bakeng, SINTEF Health Research
+ * \author Janne Beate Lervik Bakeng, SINTEF
  * \date 16.10.2008
  *
  *TODO Sender should be added to the message
@@ -66,7 +74,6 @@ public:
   void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0);
 
 signals:
-  void emittedMessage(const QString& text, int timeout); ///< The signal the owner of a statusbar should listen to. DEPRECATED!
   void emittedMessage(Message message); ///< The signal the user should listen to!
 
 private:
@@ -76,7 +83,6 @@ private:
   MessageManager(const MessageManager&);
   MessageManager& operator=(const MessageManager&);
 
-  void sendMessage(QString text, int timeout); ///< Emits the signal that actually sends the message.
   bool openLogging(QFile::OpenMode mode);
 
   typedef boost::shared_ptr<class SingleStreamerImpl> SingleStreamerImplPtr;
