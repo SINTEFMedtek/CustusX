@@ -55,8 +55,7 @@ public:
     TRACKER_MICRON            ///< Claron Technologys Micron tracker
   };
 
-  enum Message
-  {
+  /*only used for documentation purposes
     TRACKER_INVALID_REQUEST,                    ///< internal state machine didn't accept the request
     TRACKER_OPEN,                               ///< hardware accepted the tracker as open
     TRACKER_INITIALIZED,                        ///< hardware accepted the tracker as initialized
@@ -67,9 +66,9 @@ public:
     TRACKER_COMMUNICATION_INPUT_OUTPUT_ERROR,   ///< communication port failed at completing a task
     TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT, ///< communication port timed out
     TRACKER_COMMUNICATION_OPEN_PORT_ERROR       ///< communication port tried to open or close
-  };
-  typedef Tracker::Message TrackerMessage;
-  typedef QString stdString;
+  */
+//  typedef Tracker::Message TrackerMessage;
+//  typedef QString stdString;
 
   /**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
@@ -102,7 +101,7 @@ signals:
    * \param success Whether or not the request was a success
    * \param uid     The tools unique id
    */
-  void trackerReport(TrackerMessage message, bool state, bool success, stdString uid);
+//  void trackerReport(TrackerMessage message, bool state, bool success, stdString uid);
 
 protected:
   typedef itk::ReceptorMemberCommand<Tracker> ObserverType;

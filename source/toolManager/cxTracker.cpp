@@ -22,7 +22,6 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber4 );
   #else
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
-    //mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber1 );
   #endif //_WINDOWS
 
   mCommunication->SetParity( igstk::SerialCommunication::NoParity );
@@ -91,9 +90,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
 }
 
 Tracker::~Tracker()
-{
-  //std::cout << "Tracker::~Tracker()" << std::endl;
-}
+{}
 
 Tracker::Type Tracker::getType() const
 {
@@ -128,10 +125,10 @@ void Tracker::attachTools(ToolMapPtr tools)
   {
     ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
 
-    //ssc::Tool* toolPtr = ((*it).second).get();
-    //Tool* tool = static_cast<Tool*>(toolPtr);
     if(tool && tool->getPointer())
     {
+      if(tool->getTrackerType() != mInternalStructure.mType)
+        ssc::messageManager()->sendWarning("Tracker is attaching a tool that is not of the correct type. Trackers type: "+qstring_cast(mInternalStructure.mType)+", tools tracker type: "+qstring_cast(tool->getTrackerType()));
       tool->getPointer()->RequestAttachToTracker(mTracker);
       if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
         mTracker->RequestSetReferenceTool(tool->getPointer());
@@ -161,106 +158,106 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
   {
     mInitialized = true;
     mOpen = true;
-    emit trackerReport(TRACKER_OPEN, true, true, mUid);
+    //emit trackerReport(TRACKER_OPEN, true, true, mUid);
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is open.");
   }
   else if (igstk::TrackerCloseEvent().CheckEvent(&event))
   {
     mInitialized = false;
     mOpen = false;
-    emit trackerReport(TRACKER_OPEN, false, true, mUid);
+//    emit trackerReport(TRACKER_OPEN, false, true, mUid);
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is closed.");
   }
   else if (igstk::TrackerInitializeEvent().CheckEvent(&event))
   {
     mInitialized = true;
-    emit trackerReport(TRACKER_INITIALIZED, true, true, mUid);
+//    emit trackerReport(TRACKER_INITIALIZED, true, true, mUid);
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
   }
   else if (igstk::TrackerStartTrackingEvent().CheckEvent(&event))
   {
     mTracking = true;
-    emit trackerReport(TRACKER_TRACKING, true, true, mUid);
+//    emit trackerReport(TRACKER_TRACKING, true, true, mUid);
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is tracking.");
   }
   else if (igstk::TrackerStopTrackingEvent().CheckEvent(&event))
   {
     mTracking = false;
-    emit trackerReport(TRACKER_TRACKING, false, true, mUid);
+//    emit trackerReport(TRACKER_TRACKING, false, true, mUid);
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is stopping.");
   }
   else if (igstk::TrackerUpdateStatusEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_UPDATE_STATUS, true, true, mUid);
+//    emit trackerReport(TRACKER_UPDATE_STATUS, true, true, mUid);
     //ssc::messageManager()->sendDebug("Tracker: "+mUid+" is updated."); //SPAM!
   }
   else if (igstk::TrackerToolTransformUpdateEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_TOOL_TRANSFORM_UPDATED, true, true, mUid);
+//    emit trackerReport(TRACKER_TOOL_TRANSFORM_UPDATED, true, true, mUid);
     //ssc::messageManager()->sendDebug("Tracker: "+mUid+" has updated a transform."); //SPAM
   }
   //communication success
   else if (igstk::CompletedEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_COMMUNICATION_COMPLETE, true, true, mUid);
+//    emit trackerReport(TRACKER_COMMUNICATION_COMPLETE, true, true, mUid);
     // this seems to appear after every transmit (several times/second
     //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly.");
   }
   //failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_INVALID_REQUEST, false, true, mUid);
-    ssc::messageManager()->sendWarning("Tracker: "+mUid+" received an invalid request.");
+//    emit trackerReport(TRACKER_INVALID_REQUEST, false, true, mUid);
+    ssc::messageManager()->sendWarning("Tracker: "+mUid+" received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
   }
   else if (igstk::TrackerOpenErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_OPEN, true, false, mUid);
+//    emit trackerReport(TRACKER_OPEN, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not open.");
   }
   else if (igstk::TrackerCloseErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_OPEN, false, false, mUid);
+//    emit trackerReport(TRACKER_OPEN, false, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not close.");
   }
   else if (igstk::TrackerInitializeErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_INITIALIZED, true, false, mUid);
+//    emit trackerReport(TRACKER_INITIALIZED, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not initialize.");
   }
   else if (igstk::TrackerStartTrackingErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_TRACKING, true, false, mUid);
+//    emit trackerReport(TRACKER_TRACKING, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not start tracking.");
   }
   else if (igstk::TrackerStopTrackingErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_TRACKING, false, false, mUid);
+//    emit trackerReport(TRACKER_TRACKING, false, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not stop tracking.");
   }
   else if (igstk::TrackerUpdateStatusErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_UPDATE_STATUS, true, false, mUid);
+//    emit trackerReport(TRACKER_UPDATE_STATUS, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not update.");
   }
   //communication failure
   else if (igstk::InputOutputErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_COMMUNICATION_INPUT_OUTPUT_ERROR, true, false, mUid);
+//    emit trackerReport(TRACKER_COMMUNICATION_INPUT_OUTPUT_ERROR, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" cannot communicate with input/output.");
   }
   else if (igstk::InputOutputTimeoutEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT, true, false, mUid);
+//    emit trackerReport(TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" input/output communication timed out.");
   }
   else if (igstk::OpenPortErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_COMMUNICATION_OPEN_PORT_ERROR, true, false, mUid);
+//    emit trackerReport(TRACKER_COMMUNICATION_OPEN_PORT_ERROR, true, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not open communication with tracker.");
   }
   else if (igstk::ClosePortErrorEvent().CheckEvent(&event))
   {
-    emit trackerReport(TRACKER_COMMUNICATION_OPEN_PORT_ERROR, false, false, mUid);
+//    emit trackerReport(TRACKER_COMMUNICATION_OPEN_PORT_ERROR, false, false, mUid);
     ssc::messageManager()->sendError("Tracker: "+mUid+" could not close communication with tracker.");
   }
 }

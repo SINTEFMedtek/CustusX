@@ -49,8 +49,7 @@ public:
   typedef igstk::AuroraTrackerTool AuroraTrackerToolType;
   typedef igstk::Transform TransformType;
 
-  enum Message
-  {
+  /* //only used for documentation purposes
     TOOL_INVALID_REQUEST,             ///< internal state machine didn't accept the request
     TOOL_HW_CONFIGURED,               ///< hardware accepted tool as configured
     TOOL_ATTACHED_TO_TRACKER,         ///< tool accepted by hardware as attached
@@ -61,9 +60,10 @@ public:
     TOOL_NDI_SROM_FILENAME,           ///< hardware responds to NDI SROM filename
     TOOL_NDI_PART_NUMBER,             ///< hardware responds to NDI part number
     TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
-  };
-  typedef Tool::Message ToolMessage;
-  typedef QString stdString;
+  */
+
+//  typedef Tool::Message ToolMessage;
+//  typedef QString stdString;
 
   /**A tools internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
@@ -101,7 +101,6 @@ public:
   virtual void setTransformSaveFile(const QString& filename);
   virtual ssc::Transform3D get_prMt() const;
   virtual bool getVisible() const;
-  //virtual ssc::Transform3DPtr getLastTransform();
   virtual QString getUid() const;
   virtual QString getName() const;
   virtual int getIndex() const{return 0;};
@@ -113,6 +112,9 @@ public:
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
   virtual void set_prMt(const ssc::Transform3D& transform);
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+
+  Tracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
+
   QString getInstrumentId() const;
   QString getInstrumentScannerId() const;
   QStringList getUSSectorConfigList() const;
@@ -133,7 +135,7 @@ signals:
    * \param success Whether or not the request was a success
    * \param uid     The tools unique id
    */
-  void toolReport(ToolMessage message, bool state, bool success, stdString uid);
+//  void toolReport(ToolMessage message, bool state, bool success, stdString uid);
   void probeSectorConfigurationChanged();
 
 protected:
@@ -146,7 +148,8 @@ protected:
   void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
   void determineToolsCalibration(); ///< reads the calibration file and saves it as igstk::Transform
   void addLogging(TrackerToolType* trackerTool); ///< adds igstk logging to the internal igstk trackertool
-  void printInternalStructure(); ///< for debugging
+
+  void printInternalStructure(); ///< FOR DEBUGGING
 
   InternalStructure mInternalStructure;             ///< the tools internal structure
   bool mValid;                                      ///< whether this tool is constructed correctly or not
