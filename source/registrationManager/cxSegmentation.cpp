@@ -251,6 +251,8 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
 {
   ssc::messageManager()->sendInfo("Finding "+image->getName()+"s centerline... Please wait!");
 
+  QDateTime timer = QDateTime::currentDateTime();
+
   itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
   //Centerline extraction
@@ -276,6 +278,8 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
 
+  ssc::messageManager()->sendInfo("Generating centerline took: " + qstring_cast(
+      timer.time().msecsTo(QDateTime::currentDateTime().time())));
   result->setParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
