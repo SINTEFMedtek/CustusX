@@ -251,7 +251,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     {
       ssc::ToolPtr tool(cxTool);
       (*tools)[tool->getUid()] = tool;
-      ssc::messageManager()->sendInfo("Successfully configuring a tool with uid: "+tool->getUid());
     }
   }
   return tools;
@@ -299,9 +298,6 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
     {
       ssc::messageManager()->sendError(filepath+" does not exists. Skipping this tool.");
       continue;
-    } else
-    {
-      ssc::messageManager()->sendInfo(filepath + " exists.");
     }
     QDomDocument toolDoc;
     if (!toolDoc.setContent(&toolFile))
