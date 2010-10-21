@@ -14,7 +14,7 @@ namespace cx
 CustomStatusBar::CustomStatusBar() :
   mFpsLabel(new QLabel())
 {
-  connect(ssc::messageManager(), SIGNAL(emittedMessage(const QString&, int)), this, SLOT(showMessage(const QString&, int)));
+  connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(connectToToolSignals()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(disconnectFromToolSignals()));
@@ -107,6 +107,11 @@ void CustomStatusBar::fpsSlot(int numFps)
 {
   QString fpsString = "FPS: "+QString::number(numFps);
   mFpsLabel->setText(fpsString);
+}
+
+void CustomStatusBar::showMessageSlot(Message message)
+{
+  this->showMessage(message.getPrintableMessage(), message.getTimeout());
 }
 
 }//namespace cx
