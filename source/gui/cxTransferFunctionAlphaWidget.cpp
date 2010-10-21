@@ -11,6 +11,7 @@
 #include <QMouseEvent>
 #include "sscDataManager.h"
 #include "sscImageTF3D.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -35,6 +36,10 @@ void TransferFunctionAlphaWidget::activeImageChangedSlot()
   mCurrentImage = activeImage;
   //TODO: call update or not ???
   this->update();
+
+  if ((mCurrentImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
+      (activeImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
+    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
 }
   
 void TransferFunctionAlphaWidget::activeImageTransferFunctionsChangedSlot()
