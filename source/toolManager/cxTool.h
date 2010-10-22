@@ -62,27 +62,24 @@ public:
     TOOL_AURORA_CHANNEL_NUMBER        ///< hardware responds to Aurora channel number
   */
 
-//  typedef Tool::Message ToolMessage;
-//  typedef QString stdString;
-
   /**A tools internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
   {
     ssc::Tool::Type   mType;                  ///< the tools type
-    QString       mName;                  ///< the tools name
-    QString       mUid;                   ///< the tools unique id
+    QString           mName;                  ///< the tools name
+    QString           mUid;                   ///< the tools unique id
     Tracker::Type     mTrackerType;           ///< what product the tool belongs to
-    QString       mSROMFilename;          ///< path to the tools SROM file
+    QString           mSROMFilename;          ///< path to the tools SROM file
     unsigned int      mPortNumber;            ///< the port number the tool is connected to
     unsigned int      mChannelNumber;         ///< the channel the tool is connected to
     bool              mWireless;              ///< whether or not the tool is wireless
     bool              m5DOF;                  ///< whether or not the tool have 5 DOF
-    QString       mCalibrationFilename;   ///< path to the tools calibration file
-    QString       mGraphicsFileName;      ///< path to this tools graphics file
-    QString       mTransformSaveFileName; ///< path to where transforms should be saved
-    QString       mLoggingFolderName;     ///< path to where log should be saved
-    QString       mInstrumentId;          ///< The instruments id
-    QString       mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
+    QString           mCalibrationFilename;   ///< path to the tools calibration file
+    QString           mGraphicsFileName;      ///< path to this tools graphics file
+    QString           mTransformSaveFileName; ///< path to where transforms should be saved
+    QString           mLoggingFolderName;     ///< path to where log should be saved
+    QString           mInstrumentId;          ///< The instruments id
+    QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
       mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
@@ -128,14 +125,6 @@ public:
   void parseXml(QDomNode& dataNode);
 
 signals:
-  /**
-   * Signal that reports signals received by the the tool
-   * \param message What happened to the tool
-   * \param state   Whether the tool was trying to enter or leave a state
-   * \param success Whether or not the request was a success
-   * \param uid     The tools unique id
-   */
-//  void toolReport(ToolMessage message, bool state, bool success, stdString uid);
   void probeSectorConfigurationChanged();
 
 protected:
@@ -156,7 +145,7 @@ protected:
   TrackerToolType* mTool;                           ///< pointer to the base class of the igstk tool
   PolarisTrackerToolType::Pointer mTempPolarisTool; ///< internal container for a temp polaris tool
   AuroraTrackerToolType::Pointer mTempAuroraTool;   ///< internal container for a temp aurora too
-  ObserverType::Pointer mToolObserver;           ///< observer listening for igstk events
+  ObserverType::Pointer mToolObserver;              ///< observer listening for igstk events
   TransformType mCalibrationTransform;              ///< a matrix representing the tools calibration
   Transform3DVectorPtr mTransforms;                 ///< all transforms received by the tool
   DoubleVectorPtr mTimestamps;                      ///< all timestamps received by the tool
