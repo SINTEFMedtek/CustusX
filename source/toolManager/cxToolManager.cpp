@@ -57,7 +57,7 @@ ToolManager::~ToolManager()
 
 void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 {
-  ssc::messageManager()->sendInfo("running dummy tool "+tool->getUid());
+  ssc::messageManager()->sendInfo("Running dummy tool "+tool->getUid());
 
   (*mConfiguredTools)[tool->getUid()] = tool;
   tool->setVisible(true);
@@ -143,12 +143,14 @@ void ToolManager::configure()
     it++;
   }
 
+  std::cout << "TEST" << std::endl;
+
   this->configureReferences();
 
   this->setDominantTool(this->getManualTool()->getUid());
 
   mConfigured = true;
-  ssc::messageManager()->sendInfo("ToolManager is configured.");
+  ssc::messageManager()->sendSuccess("ToolManager is configured.");
   emit configured();
 }
 void ToolManager::initialize()
@@ -457,6 +459,11 @@ void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 
 void ToolManager::setConfigurationFile(QString configurationFile)
 {
+  if(this->isConfigured())
+  {
+    ssc::messageManager()->sendWarning("You already configured, to reconfigure you have to restart CustusX3.");
+    return;
+  }
   mConfigurationFilePath = configurationFile;
 }
 
@@ -514,7 +521,7 @@ void ToolManager::trackerInitializedSlot(bool value)
   mInitialized = value;
   if(mInitialized)
   {
-    ssc::messageManager()->sendInfo("ToolManager is initialized.");
+    ssc::messageManager()->sendSuccess("ToolManager is initialized.");
     emit initialized();
   }
   else
@@ -529,7 +536,7 @@ void ToolManager::trackerTrackingSlot(bool value)
   mTracking = value;
   if(mTracking)
   {
-    ssc::messageManager()->sendInfo("ToolManager started tracking.");
+    ssc::messageManager()->sendSuccess("ToolManager started tracking.");
     mTimer->start(33);
     emit trackingStarted();
   }
