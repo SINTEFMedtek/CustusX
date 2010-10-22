@@ -72,6 +72,7 @@ void GeometricRep::meshChangedSlot()
 	mMesh->connectToRep(mSelf);
   
 	mMapper->SetInput( mMesh->getVtkPolyData() );
+	mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 
   //Set mesh color
   mActor->GetProperty()->SetColor(mMesh->getColor().redF(),
