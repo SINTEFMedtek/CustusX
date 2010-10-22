@@ -13,14 +13,12 @@ SonowandInifile::SonowandInifile(QString filename, CHECK_TYPE checkType) :
 	mCheckSuccess(true),
 	mModified(false)
 {
-//	setIniCodec("ISO-8859-1");
-//	setIniCodec("UTF-8");
+	QString md5file = filename + ".md5";
 	
-	
-	QString md5file = filename.split(".")[0]+".md5";
-	
-	if (( mCheckType==CHECK_MD5 )&&( QFileInfo(filename).exists() && QFileInfo(md5file).exists() ))
-		mCheckSuccess = CheckMD5(fileName().toAscii().constData());	
+	if (mCheckType==CHECK_MD5 && QFileInfo(filename).exists() && QFileInfo(md5file).exists())
+	{
+		mCheckSuccess = CheckMD5(fileName().toAscii().constData());
+	}
 }
 
 SonowandInifile::~SonowandInifile()
