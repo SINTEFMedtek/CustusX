@@ -37,6 +37,8 @@ void TransferFunctionAlphaWidget::activeImageChangedSlot()
   //TODO: call update or not ???
   this->update();
 
+  if (!mCurrentImage)
+    return;
   if ((mCurrentImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
       (activeImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
     ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
