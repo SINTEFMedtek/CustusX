@@ -55,8 +55,6 @@ private slots:
 private:
   void setToolConfigComboBox();
   void setApplicationComboBox();
-//  void setCurrentToolConfigFile();
-//  void setCurrentApplication();
 
   QSettingsPtr mSettings;
 
