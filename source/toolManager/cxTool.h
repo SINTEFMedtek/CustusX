@@ -126,6 +126,7 @@ public:
 
 signals:
   void probeSectorConfigurationChanged();
+  void attachedToTracker(bool);
 
 protected:
   typedef itk::ReceptorMemberCommand<Tool> ObserverType;
@@ -137,6 +138,11 @@ protected:
   void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
   void determineToolsCalibration(); ///< reads the calibration file and saves it as igstk::Transform
   void addLogging(TrackerToolType* trackerTool); ///< adds igstk logging to the internal igstk trackertool
+
+  void internalAttachedToTracker(bool value);
+  void internalTracked(bool value);
+  void internalConfigured(bool value);
+  void internalVisible(bool value);
 
   void printInternalStructure(); ///< FOR DEBUGGING
 

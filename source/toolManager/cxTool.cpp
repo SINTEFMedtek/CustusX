@@ -246,39 +246,37 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
   //Successes
   else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))
   {
-    mConfigured = true;
+    this->internalConfigured(true);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is successfully configured with the tracking system.");
   }
   else if (igstk::TrackerToolAttachmentToTrackerEvent().CheckEvent(&event))
   {
-    mAttachedToTracker = true;
+    this->internalAttachedToTracker(true);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is attached to the tracker.");
   }
   else if (igstk::TrackerToolDetachmentFromTrackerEvent().CheckEvent(&event))
   {
-    mAttachedToTracker = false;
+    this->internalAttachedToTracker(false);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is detached from the tracker.");
   }
   else if (igstk::TrackerToolMadeTransitionToTrackedStateEvent().CheckEvent(&event))
   {
-    mVisible = true;
-    emit toolVisible(true); //signal inherited from ssc::Tool
-    //ssc::messageManager()->sendInfo("Tool: "+mUid+" is visible."); //SPAM
+    this->internalVisible(true);
+    ssc::messageManager()->sendInfo("Tool: "+mUid+" is visible."); //SPAM
   }
   else if (igstk::TrackerToolNotAvailableToBeTrackedEvent().CheckEvent(&event))
   {
-    mVisible = false;
-    emit toolVisible(false); // signal inherited from ssc::Tool
-    //ssc::messageManager()->sendInfo("Tool: "+mUid+" is hidden."); //SPAM
+    this->internalVisible(false);
+    ssc::messageManager()->sendInfo("Tool: "+mUid+" is hidden."); //SPAM
   }
   else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
   {
-    mTracked = true;
+    this->internalTracked(true);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is tracked.");
   }
   else if (igstk::ToolTrackingStoppedEvent().CheckEvent(&event))
   {
-    mTracked = false;
+    this->internalTracked(false);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is not tracked anymore.");
   }
   //Failures
@@ -541,6 +539,7 @@ void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
   QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
+  ssc::messageManager()->sendDebug("Logging tool at "+logFile);
   loggerFile->open( cstring_cast(logFile) );
   mLogger = igstk::Logger::New();
   mLogOutput = itk::StdStreamLogOutput::New();
@@ -549,6 +548,37 @@ void Tool::addLogging(TrackerToolType* trackerTool)
   mLogger->SetPriorityLevel(itk::Logger::DEBUG);
 
   trackerTool->SetLogger(mLogger);
+}
+
+void Tool::internalAttachedToTracker(bool value)
+{
+  if(mAttachedToTracker == value)
+    return;
+  mAttachedToTracker = value;
+  emit attachedToTracker(mAttachedToTracker);
+}
+
+void Tool::internalTracked(bool value)
+{
+  if(mTracked == value)
+    return;
+  mTracked = value;
+}
+
+void Tool::internalConfigured(bool value)
+{
+  if(mConfigured == value)
+    return;
+  mConfigured = value;
+}
+
+void Tool::internalVisible(bool value)
+{
+  if(mVisible == value)
+    std::cout << "Tool " << mUid << " is visible or not." << std::endl;
+    //return;
+  mVisible = value;
+  emit toolVisible(mVisible);
 }
 
 void Tool::printInternalStructure()
