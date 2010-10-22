@@ -16,6 +16,7 @@
   #include "igstkSerialCommunicationForPosix.h"
 #endif
 #include "sscTool.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -67,8 +68,6 @@ public:
     TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT, ///< communication port timed out
     TRACKER_COMMUNICATION_OPEN_PORT_ERROR       ///< communication port tried to open or close
   */
-//  typedef Tracker::Message TrackerMessage;
-//  typedef QString stdString;
 
   /**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
@@ -83,25 +82,22 @@ public:
   ~Tracker();
 
   Type getType() const;               ///< returns the trackers type
-  QString getName() const;        ///< get the trackers name
-  QString getUid() const;         ///< get the tracker unique id
+  QString getName() const;            ///< get the trackers name
+  QString getUid() const;             ///< get the tracker unique id
   TrackerType* getPointer() const;    ///< return a pointer to the internal tracker base
   void open();                        ///< open the tracker for communication
+  void close();                       ///< close the
   void attachTools(ToolMapPtr tools); ///< attach a list of tools to the tracker hw
+  void detachTools(ToolMapPtr tools); ///< detach the list of tools from the tracker hw
   void startTracking();               ///< start tracking
   void stopTracking();                ///< stop tracking
 
   bool isValid() const;               ///< whether this tracker is constructed correctly or not
 
 signals:
-   /**
-   * Signal that reports signals received by the the tool
-   * \param message What happended to the tool
-   * \param state   Whether the tool was trying to enter or leave a state
-   * \param success Whether or not the request was a success
-   * \param uid     The tools unique id
-   */
-//  void trackerReport(TrackerMessage message, bool state, bool success, stdString uid);
+  void initialized(bool);
+  void open(bool);
+  void tracking(bool);
 
 protected:
   typedef itk::ReceptorMemberCommand<Tracker> ObserverType;
@@ -109,6 +105,10 @@ protected:
   Tracker(){}; ///< do not use this one
   void trackerTransformCallback(const itk::EventObject &eventVar); ///< callback receiving events from the observer
   void addLogging(); ///< adds logging to the internal igstk components
+
+  void internalOpen(bool value);
+  void internalInitialized(bool value);
+  void internalTracking(bool value);
 
   InternalStructure mInternalStructure; ///< the trackers type
   bool mValid;                          ///< whether this tracker is constructed correctly or not
