@@ -95,6 +95,8 @@ void ToolManager::configureReferences()
     if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
     {
       mReferenceTool = tool;
+      ssc::messageManager()->sendInfo("Reference set to be "+mReferenceTool->getName());
+      return;
     }
     iter++;
   }
@@ -126,14 +128,17 @@ void ToolManager::configure()
   {
     ssc::messageManager()->sendWarning("Could not configure the toolmanager, tracker is invalid.");
     return;
+  }else
+  {
+    connect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(trackerOpenSlot(bool)));
+    connect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(trackerInitializedSlot(bool)));
+    connect(mTracker.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
   }
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
 
   this->configureReferences();
 
   this->setDominantTool(this->getManualTool()->getUid());
-
-  //this->connectSignalsAndSlots();
 
   mConfigured = true;
   ssc::messageManager()->sendInfo("ToolManager is configured.");
@@ -152,6 +157,17 @@ void ToolManager::initialize()
   this->createSymlink();
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
+}
+
+void ToolManager::uninitialize()
+{
+  if(!this->isInitialized())
+  {
+    ssc::messageManager()->sendInfo("No need to uninitialize, toolmanager is not initialized.");
+    return;
+  }
+  mTracker->detachTools(mConfiguredTools); //not sure we have to detach all tools before we close, read NDI manual
+  mTracker->close();
 }
 
 /** Assume that IGSTK requires the file /Library/CustusX/igstk.links/cu.CustusX.dev0
@@ -216,7 +232,6 @@ QFileInfo ToolManager::getSymlink() const
 }
 
 /** removes symlinks to tracking system created during setup
- *
  */
 void ToolManager::cleanupSymlink()
 {
@@ -428,7 +443,6 @@ void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
   ToolMapConstIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
-    //((*it).second)->setTransformSaveFile(filePathAndName); is set during tools constructor
     ((*it).second)->saveTransformsAndTimestamps();
     it++;
   }
@@ -443,191 +457,6 @@ void ToolManager::setLoggingFolder(QString loggingFolder)
 {
   mLoggingFolder = loggingFolder;
 }
-
-/**
- * Slot that receives reports from tools
- * \param message What happended to the tool
- * \param state   Whether the tool was trying to enter or leave a state
- * \param success Whether or not the request was a success
- * \param uid     The tools unique id
- */
-//void ToolManager::receiveToolReport(ToolMessage message, bool state, bool success, stdString uid)
-//{
-//  QString toolUid = "" + uid;
-//  QString report = "";
-//
-//  switch (message)
-//  {
-//  case Tool::TOOL_INVALID_REQUEST:
-//    report.append(toolUid + " performed an invalid request.");
-//    break;
-//  case Tool::TOOL_HW_CONFIGURED:
-//    report.append(toolUid + " is ");
-//    if (!success)
-//      report.append("not ");
-//    report.append(" hardware configured successfully.");
-//    break;
-//  case Tool::TOOL_ATTACHED_TO_TRACKER:
-//    report.append(toolUid + " was ");
-//    if (!success)
-//      report.append("not ");
-//    if (!state)
-//      report.append("detached from ");
-//    else
-//      report.append("attached to ");
-//    report.append("the tracker.");
-//    if (success && state)
-//      this->addConnectedTool(uid);
-//    break;
-//  case Tool::TOOL_VISIBLE:
-//    report.append(toolUid + " is ");
-//    if (!state)
-//      report.append("not ");
-//    report.append("visible.");
-//    break;
-//  case Tool::TOOL_TRACKED:
-//    report.append(toolUid + " ");
-//    if (state)
-//      report.append("started tracking ");
-//    else
-//      report.append("stopped tracking ");
-//    if (!success)
-//      report.append("not ");
-//    report.append("successfully.");
-//    break;
-//  case Tool::TOOL_COORDINATESYSTEM_TRANSFORM:
-//    report.append(toolUid + " got a new transform and timestamp.");
-//    return; //this is spamming the screen....
-//    break;
-//  case Tool::TOOL_NDI_PORT_NUMBER:
-//    report.append(toolUid + " could not used the given port number.");
-//    break;
-//  case Tool::TOOL_NDI_SROM_FILENAME:
-//    report.append(toolUid + " could not used the given SROM file.");
-//    break;
-//  case Tool::TOOL_NDI_PART_NUMBER:
-//    report.append(toolUid + " did not have a valid part number.");
-//    break;
-//  case Tool::TOOL_AURORA_CHANNEL_NUMBER:
-//    report.append(toolUid + " could not use the given Aurora channel number.");
-//    break;
-//  default:
-//    report.append(toolUid + " reported an unknown message.");
-//    break;
-//  }
-//  //
-//  //ssc::messageManager()->sendInfo(report);
-//}
-
-/**
- * Slot that receives reports from trackers
- * \param message What happended to the tool
- * \param state   Whether the tool was trying to enter or leave a state
- * \param success Whether or not the request was a success
- * \param uid     The trackers unique id
- */
-//void ToolManager::receiveTrackerReport(Tracker::Message message, bool state, bool success, QString uid)
-//{
-//  QString trackerUid = uid;
-//  QString report = "";
-//
-//  switch (message)
-//  {
-//  case Tracker::TRACKER_INVALID_REQUEST:
-//    report.append(trackerUid + " performed an invalid request.");
-//    break;
-//  case Tracker::TRACKER_OPEN:
-//    report.append(trackerUid + " is ");
-//    if (!success)
-//      report.append("not ");
-//    if (state)
-//    {
-//      if(success){ //Should this really be done here?
-//        mInitialized = success;
-//        emit initialized();
-//        //ssc::messageManager()->sendInfo("ToolManager is initialized. (TRACKER_OPEN)");
-//      }
-//      report.append("open.");
-//    } else
-//    {
-//      mInitialized = !success;
-//      report.append("closed.");
-//    }
-//    break;
-//  case Tracker::TRACKER_INITIALIZED:
-//    report.append(trackerUid + " is ");
-//    if (!success)
-//    {
-//      report.append("not ");
-//      mInitialized = false;
-//    } else
-//    {
-//      mInitialized = true;
-//      emit initialized();
-//      ssc::messageManager()->sendInfo("ToolManager is initialized.(TRACKER_INITIALIZED");
-//    }
-//    report.append("initialized.");
-//    break;
-//  case Tracker::TRACKER_TRACKING:
-//    report.append(trackerUid + " could ");
-//    if (!success)
-//      report.append("not ");
-//    if (state)
-//      report.append("start tracking.");
-//    else
-//      report.append("stop tracking.");
-//    if (success && state)
-//    {
-//      mTracking = true;
-//      emit trackingStarted();
-//      mTimer->start(33);
-//    }
-//    if (success && !state)
-//    {
-//      mTracking = false;
-//      emit trackingStopped();
-//      mTimer->stop();
-//    }
-//    break;
-//  case Tracker::TRACKER_UPDATE_STATUS:
-//    report.append(trackerUid + " has a tool that is ");
-//    if (!success)
-//      report.append("not ");
-//    else
-//      return;//this is spamming the screen....
-//    report.append("updated successfully.");
-//    break;
-//  case Tracker::TRACKER_TOOL_TRANSFORM_UPDATED:
-//    report.append(trackerUid + " has a tool that is ");
-//    if (!success)
-//      report.append("not ");
-//    else
-//      return; //this is spamming the screen....
-//    report.append("updated successfully.");
-//    break;
-//  case Tracker::TRACKER_COMMUNICATION_COMPLETE:
-//    return; //this is spamming the screen....
-//    report.append("Communication did something ");
-//    if (!success)
-//      report.append("not ");
-//    report.append("successfully.");
-//    break;
-//  case Tracker::TRACKER_COMMUNICATION_INPUT_OUTPUT_ERROR:
-//    report.append(trackerUid + ": TRACKER_COMMUNICATION_INPUT_OUTPUT_ERROR");
-//    break;
-//  case Tracker::TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT:
-//    report.append(trackerUid + ": TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT");
-//    break;
-//  case Tracker::TRACKER_COMMUNICATION_OPEN_PORT_ERROR:
-//    report.append(trackerUid + ": TRACKER_COMMUNICATION_OPEN_PORT_ERROR");
-//    break;
-//  default:
-//    report.append(trackerUid + " reported an unknown message.");
-//    break;
-//  }
-//  //Tracker now sends messages directly to the messagemanager!s
-//  //ssc::messageManager()->sendInfo(report);
-//}
 
 void ToolManager::addConnectedTool(QString uid)
 {  
@@ -646,29 +475,7 @@ void ToolManager::addConnectedTool(QString uid)
   connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   
   mConfiguredTools->erase(it);
-//  ssc::messageManager()->sendDebug("Tool with id " + uid+ " was moved from the configured to the connected map.");
 }
-
-//void ToolManager::connectSignalsAndSlots()
-//{
-//  typedef Tracker::Message TrackerMessage;
-//  qRegisterMetaType<TrackerMessage> ("TrackerMessage");
-//  typedef Tool::Message ToolMessage;
-//  qRegisterMetaType<ToolMessage> ("ToolMessage");
-//  typedef QString stdString;
-//  qRegisterMetaType<stdString> ("stdString");
-
-//  connect(mTracker.get(), SIGNAL(trackerReport(TrackerMessage, bool, bool, stdString)),
-//      this, SLOT(receiveTrackerReport(TrackerMessage, bool, bool, stdString)));
-
-//  ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->begin();
-//  while (it != mConfiguredTools->end())
-//  {
-//    connect(((*it).second).get(), SIGNAL(toolReport(ToolMessage, bool, bool, stdString)),
-//        this, SLOT(receiveToolReport(ToolMessage, bool, bool, stdString)));
-//    it++;
-//  }
-//}
 
 void ToolManager::checkTimeoutsAndRequestTransform()
 {
@@ -687,6 +494,32 @@ void ToolManager::checkTimeoutsAndRequestTransform()
     connectedTool->getPointer()->RequestComputeTransformTo(refTool->getPointer());
   }
 }
+
+void ToolManager::trackerOpenSlot(bool)
+{
+  //TODO
+  //ToolManager does not care about this at the moment,
+  //but maybe it should?
+}
+
+void ToolManager::trackerInitializedSlot(bool value)
+{
+  mInitialized = value;
+  if(mInitialized)
+    emit initialized();
+  else
+    emit uninitialize();
+}
+
+void ToolManager::trackerTrackingSlot(bool value)
+{
+  mTracking = value;
+  if(mTracking)
+    emit trackingStarted();
+  else
+    emit trackingStopped();
+}
+
 void ToolManager::dominantCheckSlot()
 {
   //make a sorted vector of all visible tools
@@ -815,7 +648,6 @@ void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
   ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
   if (tool)
   {
-    //ssc::messageManager()->sendDebug("Found cxTool - set US Probe sector");
     tool->setUSProbeSector(probeSector);
   }
 }
