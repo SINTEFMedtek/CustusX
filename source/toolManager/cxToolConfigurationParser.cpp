@@ -33,9 +33,7 @@ ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QSt
     ssc::messageManager()->sendError("Could not set the xml content of the file "+ configXmlFilePath);
     return;
   }
-  //std::cout << mConfigureDoc.toString().toStdString() << std::endl;
   mConfigurationPath = configurationFileInfo.absolutePath()+"/";
-  //std::cout << "mConfigurationPath: " << mConfigurationPath << std::endl;
 
   if(mLoggingFolder.isEmpty())
     mLoggingFolder = mConfigurationPath;
@@ -106,7 +104,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
   QList<QDomNode> toolNodeList = this->getToolNodeList(toolFolderAbsolutePaths);
 
   ssc::ToolManager::ToolMapPtr tools(new ssc::ToolManager::ToolMap());
-  //QDomNode node;
   for (int i = 0; i < toolNodeList.size(); i++)
   {
     Tool::InternalStructure internalStructure;
@@ -224,7 +221,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
     QString toolSensorRomFileText = toolSensorRomFileElement.text();
     if (!toolSensorRomFileText.isEmpty())
-      //toolSensorRomFileText = QString(mConfigurationPath.c_str()) + toolSensorRomFileText;
       toolSensorRomFileText = toolFolderAbsolutePaths.at(i) + toolSensorRomFileText;
     internalStructure.mSROMFilename = toolSensorRomFileText;
 
@@ -239,7 +235,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
         toolCalibrationElement.firstChildElement(mToolCalibrationFileTag);
     QString toolCalibrationFileText = toolCalibrationFileElement.text();
     if (!toolCalibrationFileText.isEmpty())
-      //toolCalibrationFileText = QString(mConfigurationPath.c_str()) + toolCalibrationFileText;
       toolCalibrationFileText = toolFolderAbsolutePaths.at(i) + toolCalibrationFileText;
     internalStructure.mCalibrationFilename = toolCalibrationFileText;
 
@@ -251,7 +246,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     {
       ssc::ToolPtr tool(cxTool);
       (*tools)[tool->getUid()] = tool;
-      ssc::messageManager()->sendInfo("Successfully configuring a tool with uid: "+tool->getUid());
     }
   }
   return tools;
@@ -299,9 +293,6 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
     {
       ssc::messageManager()->sendError(filepath+" does not exists. Skipping this tool.");
       continue;
-    } else
-    {
-      ssc::messageManager()->sendInfo(filepath + " exists.");
     }
     QDomDocument toolDoc;
     if (!toolDoc.setContent(&toolFile))

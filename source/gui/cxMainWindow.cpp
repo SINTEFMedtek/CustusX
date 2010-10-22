@@ -449,7 +449,8 @@ void MainWindow::importDataSlot()
     return;
 
   ImportDataWizard* wizard = new ImportDataWizard(data, this);
-  wizard->exec();
+  wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction
+                  //with the system
 }
 
 void MainWindow::patientChangedSlot()
