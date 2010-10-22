@@ -5,7 +5,7 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>reference</type>
+  <type>pointer</type>
   <id>07-081-0223_New_Intraoperative-Navigator</id>
   <name>07-081-0223_New_Intraoperative-Navigator</name>
   <description>07-081-0223_New_Intraoperative-Navigator</description>
@@ -34,7 +34,7 @@
     <portnumber></portnumber>
     <channelnumber></channelnumber>
     <manufacturer>Sonowand</manufacturer>
-    <description>07-081-0223_New_Intraoperative-Navigator>
+    <description>07-081-0223_New_Intraoperative-Navigator</description>
     <rom_file>07-081-0223_New_Intraoperative-Navigator.rom</rom_file>
   </sensor>
 
