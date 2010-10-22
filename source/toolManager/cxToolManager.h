@@ -32,10 +32,6 @@ class ToolManager: public ssc::ToolManager
 Q_OBJECT
 
 public:
-//  typedef Tracker::Message TrackerMessage;
-//  typedef Tool::Message ToolMessage;
-//  typedef QString stdString;
-
   static void initializeObject();
   static ToolManager* getInstance();
 
@@ -81,17 +77,20 @@ public:
   TrackerPtr getTracker();
 
 public slots:
-  virtual void configure(); ///< sets up the software like the xml file suggests
-  virtual void initialize(); ///< connects to the hardware
-  virtual void startTracking(); ///< starts tracking
-  virtual void stopTracking(); ///< stops tracking
-  virtual void saveToolsSlot(); ///< saves transforms and timestamps
+  void configure(); ///< sets up the software like the xml file suggests
+  void initialize(); ///< connects to the hardware
+  void uninitialize(); ///< disconnects from the hardware
+  void startTracking(); ///< starts tracking
+  void stopTracking(); ///< stops tracking
+  void saveToolsSlot(); ///< saves transforms and timestamps
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
 protected slots:
-//  void receiveToolReport(ToolMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from tools
-//  void receiveTrackerReport(TrackerMessage message, bool state, bool success, stdString uid); ///< Slot that receives reports from trackers
   void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
+  void trackerOpenSlot(bool);
+  void trackerInitializedSlot(bool);
+  void trackerTrackingSlot(bool);
+  void toolInitialized(bool);
 
 protected:
   typedef ssc::ToolManager::ToolMap::const_iterator ToolMapConstIter;
@@ -99,10 +98,9 @@ protected:
   ToolManager(); ///< use getInstance instead
   ~ToolManager(); ///< destructor
 
-  void addConnectedTool(QString uid); ///< moves a tool from configuredTools to connectedTools
-//  void connectSignalsAndSlots(); ///< connects signals and slots
+  void addInitializedTool(QString uid); ///< moves a tool from configuredTools to initializedTools
   void initializeManualTool();
-  void configureReferences(); ///<
+  void configureReferences(); ///< specifies a tools as the reference
 
   QString mConfigurationFilePath; ///< path to the configuration file
   QString mLoggingFolder; ///< path to where logging should be saved
