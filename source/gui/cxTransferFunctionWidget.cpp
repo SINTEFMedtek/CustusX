@@ -77,7 +77,7 @@ void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
 
   if(!activeImage)
     return;
-  
+
   ssc::ImageTF3DPtr transferFunctions = activeImage->getTransferFunctions3D();
   transferFunctions->parseXml(mPresets.getPresetDomElement(presetName));
 

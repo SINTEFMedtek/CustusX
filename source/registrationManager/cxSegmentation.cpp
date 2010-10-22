@@ -200,7 +200,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   //Smoothing
   if(useSmothing)
   {
-    ssc::messageManager()->sendInfo("Smoothing");
+    ssc::messageManager()->sendDebug("Smoothing...");
     typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
     smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
     smoohingFilter->SetSigma(smoothSigma);
@@ -210,7 +210,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   }
 
   //Thresholding
-  ssc::messageManager()->sendInfo("Thresholding");
+  ssc::messageManager()->sendDebug("Thresholding...");
   typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
   thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
   thresholdFilter->SetInput(itkImage);
@@ -251,6 +251,8 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
 {
   ssc::messageManager()->sendInfo("Finding "+image->getName()+"s centerline... Please wait!");
 
+  QDateTime startTime = QDateTime::currentDateTime();
+
   itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
   //Centerline extraction
@@ -275,6 +277,10 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   ssc::messageManager()->sendInfo("created centerline " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
+
+  QTime tempTime = QTime(0, 0);
+  tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
+  ssc::messageManager()->sendInfo("Generating centerline time: " + tempTime.toString("hh:mm:ss:zzz"));
 
   result->setParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
