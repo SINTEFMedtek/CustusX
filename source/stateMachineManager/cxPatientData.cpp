@@ -32,7 +32,6 @@ namespace cx
 PatientData::PatientData() :
     mSettings(DataLocations::getSettings())
 {
-
 }
 
 QString PatientData::getActivePatientFolder() const
@@ -189,7 +188,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
   QFile fromFile(fileName);
   QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
   QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
-  std::cout << "import: " << strippedFilename << std::endl;
+  //std::cout << "import: " << strippedFilename << std::endl;
 
   //Need to wait for the copy to finish...
 
@@ -266,7 +265,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
       }
     }
   }
-
+  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
   return data;
 }
 

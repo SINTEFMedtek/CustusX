@@ -1062,10 +1062,11 @@ void Reconstructer::reconstruct()
 
   QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
 
-  QDateTime pre = QDateTime::currentDateTime();
+  QDateTime startTime = QDateTime::currentDateTime();
   mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask, algoSettings);
-  ssc::messageManager()->sendInfo("Reconstruct time: "
-                                  + qstring_cast(pre.time().msecsTo(QDateTime::currentDateTime().time())));
+  QTime tempTime = QTime(0, 0);
+  tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
+  ssc::messageManager()->sendInfo("Reconstruct time: " + tempTime.toString("hh:mm:ss:zzz"));
 
   DataManager::getInstance()->loadData(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
