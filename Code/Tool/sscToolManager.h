@@ -33,6 +33,7 @@ public:
 
 	virtual void configure() = 0; ///< get the system ready without connecting to the tracking hardware
 	virtual void initialize() = 0; ///< connect the system to the tracking hardware
+	virtual void uninitialize() = 0; ///< disconnect the system from the hardware
 	virtual void startTracking() = 0; ///< start tracking
 	virtual void stopTracking() = 0; ///< stop tracking
 
@@ -64,10 +65,11 @@ public:
   virtual void removeLandmark(QString uid) { Q_UNUSED(uid); }
 
 signals:
-	void configured(); ///< signal emitted when the system is configured
-	void initialized(); ///< signal emitted when the system is initialized
-	void trackingStarted(); ///< signal emitted when the system starts tracking
-	void trackingStopped(); ///< signal emitted when the system stops tracking
+	void configured(); ///< system is configured
+	void initialized(); ///< system is initialized
+	void uninitialized(); ///< system is uninitialized
+	void trackingStarted(); ///< system starts tracking
+	void trackingStopped(); ///< system stops tracking
 	void dominantToolChanged(const QString& uId); ///<signal for change of dominant tool
   void landmarkRemoved(QString uid);
   void landmarkAdded(QString uid);

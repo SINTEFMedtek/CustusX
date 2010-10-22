@@ -53,6 +53,11 @@ void DummyToolManager::initialize()
 	mInitialized = true;
 	emit initialized();
 }
+void DummyToolManager::uninitialize()
+{
+  mInitialized = false;
+  emit initialized();
+}
 void DummyToolManager::startTracking()
 {
 	mIsTracking = true;

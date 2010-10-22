@@ -30,6 +30,7 @@ public:
 
 	virtual void configure();
 	virtual void initialize();
+	virtual void uninitialize();
 	virtual void startTracking();
 	virtual void stopTracking();
 
