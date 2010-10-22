@@ -149,8 +149,7 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath, const SNW2VolumeMetaDa
 
 void SNW2Volume::writeStatus(const QString& text) const
 {
-	//Logger::log("pd.log", text);
-	std::cout << text << std::endl;
+	qWarning(text.toAscii().constData());
 }
 
 bool SNW2Volume::loadAll()
@@ -167,11 +166,6 @@ bool SNW2Volume::loadAll()
 		writeStatus("volume["+uid()+"], failed - volume/lut");
 		return false;
 	}
-
-//	theVolume->ensureCenterWindowValid(
-//			&theVolume->mMetaData.Volume.mWindowWidth,
-//			&theVolume->mMetaData.Volume.mWindowCenter,
-//			&theVolume->mMetaData.Volume.mLLR);
 
 	//writeStatus("volume["+uid()+"], loaded volumedata");
 	return true;
@@ -271,7 +265,6 @@ SNW2VolumeMetaData SNW2Volume::rawLoadMetaData() const
 	data.mModality = file.value("Info/Modality").toString();
 	data.mModalityType = file.value("Info/ModalityType").toString();
 	data.mIntraoperative = file.value("Info/Intraoperative").toBool();
-	//std::cout << "data.mIntraoperative:" << data.mIntraoperative << std::endl;
 	data.mName = file.value("Info/Name").toString();
 
 	if (data.mModality=="US")
@@ -301,8 +294,28 @@ SNW2VolumeMetaData SNW2Volume::rawLoadMetaData() const
 	data.DICOM.mSeriesID = file.value("DICOM/SeriesID").toString();
 	data.DICOM.mSeriesDescription = file.value("DICOM/SeriesDescription").toString();
 
-	data.Volume.mSpacing = stringList2Vector3D(file.value("Data/PixelSpacing").toStringList());
-	data.Volume.mDim = stringList2IntArray3(file.value("Data/Dimension").toStringList());
+	QVariant pixelspacing(file.value("Data/PixelSpacing").toStringList().join(","));
+	QVariant picdimension(file.value("Data/Dimension").toStringList().join(","));
+	if (pixelspacing.type() == QVariant::StringList)
+	{
+		data.Volume.mSpacing = stringList2Vector3D(pixelspacing.toStringList());
+	}
+	else
+	{
+		data.Volume.mSpacing = stringList2Vector3D(pixelspacing.toString().split(","));
+	}
+	if (picdimension.type() == QVariant::StringList)
+	{
+		data.Volume.mDim = stringList2IntArray3(picdimension.toStringList());
+	}
+	else
+	{
+		data.Volume.mDim = stringList2IntArray3(picdimension.toString().split(","));
+	}
+	if (data.Volume.mDim[0] <= 0 || data.Volume.mDim[1] <= 0 || data.Volume.mDim[2] <= 0)
+	{
+		writeStatus("metadata bad size");	// TODO, we really need to return a more serious error here
+	}
 	data.Volume.mWindowCenter = file.value("Data/WindowCenter", mMetaData.Volume.mWindowCenter).toDouble();
 	data.Volume.mWindowWidth = file.value("Data/WindowWidth", mMetaData.Volume.mWindowWidth).toDouble();
 	data.Volume.mLLR = file.value("Data/LLR", mMetaData.Volume.mLLR).toDouble();
@@ -387,7 +400,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 		boost::uint8_t *image = (boost::uint8_t*)(rawchars);
 		if (scalarSize!=file.size())
 		{
-			writeStatus("unexpected file size for " + file.fileName());
+			qWarning("unexpected file size for %s should be %d was %d", file.fileName().toAscii().constData(), scalarSize, file.size());
 		}
 
 		vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
@@ -412,8 +425,6 @@ bool SNW2Volume::rawLoadVtkImageData()
 	}
 	else if (mMetaData.Volume.mSamplesPerPixel==3 && mMetaData.Volume.mBitsPerSample==8)
 	{
-		//writeStatus("volume["+uid()+"], loading color data");
-
 		boost::uint8_t *image = (boost::uint8_t*)(rawchars);
 		if (scalarSize*3!=file.size())
 		{
@@ -441,14 +452,9 @@ bool SNW2Volume::checksumData(QString filename, const unsigned char* const data,
 	return CheckMD5InMemory(cstring_cast(filename), data, size);
 }
 
-
 bool SNW2Volume::rawLoadLut(const QString& filename, vtkLookupTablePtr lut) const
 {
 	lut->SetNumberOfTableValues(mMetaData.Lut.mLength);
-
-	QFile file(filename);
-	file.open(QIODevice::ReadOnly);
-	QDataStream stream(&file);
 
 	if (mMetaData.Lut.mType=="None")
 	{
@@ -467,7 +473,21 @@ bool SNW2Volume::rawLoadLut(const QString& filename, vtkLookupTablePtr lut) cons
 	}
 	else if (mMetaData.Lut.mBitsPerSample==8 && mMetaData.Lut.mType=="RGBA")
 	{
+		QFile file(filename);
+		file.open(QIODevice::ReadOnly);
+		QDataStream stream(&file);
 		int lutSize = mMetaData.Lut.mLength;
+
+		if (!file.isOpen())
+		{
+			writeStatus("volume"+uid()+"] "+"could not open LUT file");
+			return false;
+		}
+		if (file.size() != lutSize * 4)
+		{
+			writeStatus("volume"+uid()+"] "+"wrong size RGBA lut");
+			return false;
+		}
 		vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
 		array->SetNumberOfComponents(4);
 		boost::uint8_t *raw = (boost::uint8_t*)malloc(lutSize*4);
