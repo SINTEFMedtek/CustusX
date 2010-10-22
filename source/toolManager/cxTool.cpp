@@ -272,7 +272,7 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
   else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
   {
     this->internalTracked(true);
-    ssc::messageManager()->sendInfo("Tool: "+mUid+" is tracked.");
+    ssc::messageManager()->sendSuccess("Tool: "+mUid+" is tracked.");
   }
   else if (igstk::ToolTrackingStoppedEvent().CheckEvent(&event))
   {
@@ -575,8 +575,7 @@ void Tool::internalConfigured(bool value)
 void Tool::internalVisible(bool value)
 {
   if(mVisible == value)
-    std::cout << "Tool " << mUid << " is visible or not." << std::endl;
-    //return;
+    return;
   mVisible = value;
   emit toolVisible(mVisible);
 }
