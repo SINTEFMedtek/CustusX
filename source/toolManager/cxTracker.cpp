@@ -31,7 +31,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mCommunication->SetHardwareHandshake(igstk::SerialCommunication::HandshakeOff);
 
   //mCommunication->SetCaptureFileName( "RecordedStreamByCustusX3.txt" );
-  //mCommunication->SetCapture( false );
+  //mCommunication->SetCapture( true );
 
   switch (mInternalStructure.mType)
   {
@@ -177,34 +177,27 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
   {
     this->internalInitialized(true);
     this->internalOpen(true);
-    //mInitialized = true;
-    //mOpen = true;
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is open.");
   }
   else if (igstk::TrackerCloseEvent().CheckEvent(&event))
   {
     this->internalInitialized(false);
     this->internalOpen(false);
-    //mInitialized = false;
-    //mOpen = false;
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is closed.");
   }
   else if (igstk::TrackerInitializeEvent().CheckEvent(&event))
   {
     this->internalInitialized(true);
-    //mInitialized = true;
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
   }
   else if (igstk::TrackerStartTrackingEvent().CheckEvent(&event))
   {
     this->internalTracking(true);
-    //mTracking = true;
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is tracking.");
   }
   else if (igstk::TrackerStopTrackingEvent().CheckEvent(&event))
   {
     this->internalTracking(false);
-    //mTracking = false;
     ssc::messageManager()->sendInfo("Tracker: "+mUid+" is stopping.");
   }
   else if (igstk::TrackerUpdateStatusEvent().CheckEvent(&event))
