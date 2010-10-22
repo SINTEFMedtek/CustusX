@@ -217,7 +217,7 @@ PerformanceTab::PerformanceTab(QWidget *parent) :
 void PerformanceTab::init()
 {
   int renderingInterval = mSettings->value("renderingInterval").toInt();
-  bool shadingOn = mSettings->value("shadingOn").toBool();
+  //bool shadingOn = mSettings->value("shadingOn").toBool();
   
   QLabel* renderingIntervalLabel = new QLabel(tr("Rendering interval"));
   
@@ -248,9 +248,9 @@ void PerformanceTab::init()
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
 
-  mShadingCheckBox = new QCheckBox(tr("ShadingOn"));
-  mShadingCheckBox->setChecked(shadingOn);
-  
+//  mShadingCheckBox = new QCheckBox(tr("ShadingOn"));
+//  mShadingCheckBox->setChecked(shadingOn);
+//
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
@@ -258,7 +258,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
-  mMainLayout->addWidget(mShadingCheckBox, 3, 0);
+  //mMainLayout->addWidget(mShadingCheckBox, 3, 0);
   setLayout(mMainLayout);
 }
 
@@ -276,18 +276,18 @@ void PerformanceTab::renderingIntervalSlot(int interval)
 void PerformanceTab::saveParametersSlot()
 {
   int renderingInterval = mSettings->value("renderingInterval").toInt();
-  bool shadingOn = mSettings->value("shadingOn").toBool();
+  //bool shadingOn = mSettings->value("shadingOn").toBool();
   
   if(renderingInterval != mRenderingIntervalSpinBox->value())
   {
     mSettings->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
     emit renderingIntervalChanged(mRenderingIntervalSpinBox->value());
   }
-  if(shadingOn != mShadingCheckBox->isChecked())
-  {
-    mSettings->setValue("shadingOn", mShadingCheckBox->isChecked());
-    emit shadingChanged(mShadingCheckBox->isChecked());
-  }
+//  if(shadingOn != mShadingCheckBox->isChecked())
+//  {
+//    mSettings->setValue("shadingOn", mShadingCheckBox->isChecked());
+//    emit shadingChanged(mShadingCheckBox->isChecked());
+//  }
 
   mSettings->setValue("maxRenderSize", mMaxRenderSize->getValue());
 
@@ -307,11 +307,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
           SIGNAL(renderingIntervalChanged(int)),
           mViewManager,
           SLOT(renderingIntervalChangedSlot(int)));
-  connect(mPerformanceTab,
-          SIGNAL(shadingChanged(bool)),
-          mViewManager,
-          SLOT(shadingChangedSlot(bool)));
-  
+//  connect(mPerformanceTab,
+//          SIGNAL(shadingChanged(bool)),
+//          mViewManager,
+//          SLOT(shadingChangedSlot(bool)));
+//
   tabWidget = new QTabWidget;
 	tabWidget->addTab(mFoldersTab, tr("Folders"));
   tabWidget->addTab(mPerformanceTab, tr("Performance"));

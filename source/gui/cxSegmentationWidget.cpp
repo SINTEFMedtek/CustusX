@@ -131,6 +131,10 @@ void SegmentationWidget::imageChangedSlot(QString uid)
     return;
   mSegmentationThresholdSpinBox->setRange(image->getMin(), image->getMax());
   //ssc::messageManager()->sendDebug("Segmentation threshold range set to ["+qstring_cast(image->getMin())+","+qstring_cast(image->getMax())+"]");
+
+  QString imageName = image->getName();
+  if(imageName.contains("us", Qt::CaseInsensitive)) //assume the image is ultrasound
+    this->toogleSmoothingSlot(true);
 }
 
 QWidget* SegmentationWidget::createSegmentationOptionsWidget()
@@ -180,7 +184,7 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mSurfaceThreshold(100),
-    mDecimation(0.8),
+    mDecimation(80),
     mReduceResolution(true),
     mSmoothing(true),
     mSurfaceThresholdSpinBox(new QSpinBox()),
@@ -276,29 +280,34 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   QWidget* retval = new QWidget(this);
   QGridLayout* layout = new QGridLayout(retval);
 
-  mSurfaceThresholdSpinBox->setValue(mSurfaceThreshold);
   mSurfaceThresholdSpinBox->setSingleStep(1);
+  mSurfaceThresholdSpinBox->setValue(mSurfaceThreshold);
   QLabel* thresholdLabel = new QLabel("Threshold");
   connect(mSurfaceThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(thresholdSlot(int)));
 
-  int decimationPercent = mDecimation;
-  mDecimationSpinBox->setValue(decimationPercent);
   mDecimationSpinBox->setRange(0,100);
   mDecimationSpinBox->setSingleStep(5);
+  mDecimationSpinBox->setValue(mDecimation);
   QLabel* decimationLabel = new QLabel("Decimation %");
   connect(mDecimationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(decimationSlot(int)));
 
-  QCheckBox* reduceResolutionCheckBox = new QCheckBox("reduce resolution");
+  QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
   connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
-  QCheckBox* smoothingCheckBox = new QCheckBox("smoothing");
+  QCheckBox* smoothingCheckBox = new QCheckBox("Smoothing");
+  smoothingCheckBox->setChecked(mSmoothing);
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(smoothingSlot(bool)));
 
-  layout->addWidget(mSurfaceThresholdSpinBox,       0, 0);
-  layout->addWidget(thresholdLabel,                 0, 1);
-  layout->addWidget(mDecimationSpinBox,             1, 0);
-  layout->addWidget(decimationLabel,                1, 1);
+  QLabel* inputLabel = new QLabel("Input:");
+  QLabel* outputLabel = new QLabel("Output:");
+
+  layout->addWidget(inputLabel,                     0, 0, 1, 2);
+  layout->addWidget(mSurfaceThresholdSpinBox,       1, 0);
+  layout->addWidget(thresholdLabel,                 1, 1);
   layout->addWidget(reduceResolutionCheckBox,       2, 0);
-  layout->addWidget(smoothingCheckBox,              3, 0);
+  layout->addWidget(outputLabel,                    3, 0, 1, 2);
+  layout->addWidget(mDecimationSpinBox,             4, 0);
+  layout->addWidget(decimationLabel,                4, 1);
+  layout->addWidget(smoothingCheckBox,              5, 0);
 
   return retval;
 }
