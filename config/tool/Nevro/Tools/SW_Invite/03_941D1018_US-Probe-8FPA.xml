@@ -5,7 +5,7 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>reference</type>
+  <type>usprobe</type>
   <id>03_941D1018_US-Probe-8FPA</id>
   <name>US-Probe-8FPA</name>
   <description>03_941D1018_US-Probe-8FPA</description>
