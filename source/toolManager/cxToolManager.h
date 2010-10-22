@@ -90,6 +90,7 @@ protected slots:
   void trackerOpenSlot(bool);
   void trackerInitializedSlot(bool);
   void trackerTrackingSlot(bool);
+  void toolInitialized(bool);
 
 protected:
   typedef ssc::ToolManager::ToolMap::const_iterator ToolMapConstIter;
@@ -97,7 +98,7 @@ protected:
   ToolManager(); ///< use getInstance instead
   ~ToolManager(); ///< destructor
 
-  void addConnectedTool(QString uid); ///< moves a tool from configuredTools to connectedTools
+  void addInitializedTool(QString uid); ///< moves a tool from configuredTools to initializedTools
   void initializeManualTool();
   void configureReferences(); ///< specifies a tools as the reference
 

@@ -61,7 +61,7 @@ void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 
   (*mConfiguredTools)[tool->getUid()] = tool;
   tool->setVisible(true);
-  this->addConnectedTool(tool->getUid());
+  this->addInitializedTool(tool->getUid());
   tool->startTracking();
   this->setDominantTool(tool->getUid());
 
@@ -76,7 +76,7 @@ void ToolManager::initializeManualTool()
     mManualTool.reset(new ssc::ManualTool("Manual Tool"));
     (*mConfiguredTools)["Manual Tool"] = mManualTool;
     mManualTool->setVisible(true);
-    this->addConnectedTool("Manual Tool");
+    this->addInitializedTool("Manual Tool");
   }
 
   ssc::Transform3D prMt =
@@ -135,6 +135,13 @@ void ToolManager::configure()
     connect(mTracker.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
   }
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
+
+  ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->begin();
+  while(it != mConfiguredTools->end())
+  {
+    connect(((*it).second).get(), SIGNAL(attachedToTracker(bool)), this, SLOT(toolInitialized(bool)));
+    it++;
+  }
 
   this->configureReferences();
 
@@ -458,7 +465,7 @@ void ToolManager::setLoggingFolder(QString loggingFolder)
   mLoggingFolder = loggingFolder;
 }
 
-void ToolManager::addConnectedTool(QString uid)
+void ToolManager::addInitializedTool(QString uid)
 {  
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
   if (it == mConfiguredTools->end() || !it->second)
@@ -506,18 +513,42 @@ void ToolManager::trackerInitializedSlot(bool value)
 {
   mInitialized = value;
   if(mInitialized)
+  {
+    ssc::messageManager()->sendInfo("ToolManager is initialized.");
     emit initialized();
+  }
   else
+  {
+    ssc::messageManager()->sendInfo("ToolManager is uninitialized.");
     emit uninitialize();
+  }
 }
 
 void ToolManager::trackerTrackingSlot(bool value)
 {
   mTracking = value;
   if(mTracking)
+  {
+    ssc::messageManager()->sendInfo("ToolManager started tracking.");
+    mTimer->start(33);
     emit trackingStarted();
+  }
   else
+  {
+    ssc::messageManager()->sendInfo("ToolManager stopped tracking.");
+    mTimer->stop();
     emit trackingStopped();
+  }
+
+}
+
+void ToolManager::toolInitialized(bool value)
+{
+  Tool* tool = static_cast<Tool*>(this->sender());
+  if(tool)
+    this->addInitializedTool(tool->getUid());
+  else
+    ssc::messageManager()->sendWarning("Casting to tool failed... Contact programmer.");
 }
 
 void ToolManager::dominantCheckSlot()
