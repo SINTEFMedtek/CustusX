@@ -7,6 +7,8 @@
 
 #include "cxRenderTimer.h"
 #include <numeric>
+#include <sstream>
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -62,12 +64,17 @@ bool RenderTimer::intervalPassed() const
   return mIntervalClock.elapsed() > mInterval;
 }
 
-void RenderTimer::dumpStatistics()
+QString RenderTimer::dumpStatistics()
 {
-  std::cout << "=== Render time statistics ===" << std::endl;
-  std::cout << "Interval \t= " << mInterval << " ms" << std::endl;
-  std::cout << "Elapsed  \t= " << mIntervalClock.elapsed() <<  " ms" << std::endl;
-  std::cout << "FPS      \t= " << this->getFPS() << " frames/s" <<  std::endl;
+  std::stringstream ss;
+  ss << "=== Render time statistics ===" << std::endl;
+  ss << "Interval \t= " << mInterval << " ms" << std::endl;
+  ss << "Elapsed  \t= " << mIntervalClock.elapsed() <<  " ms" << std::endl;
+  ss << "FPS      \t= " << this->getFPS() << " frames/s" <<  std::endl;
+
+
+  if (mRenderTime.empty() || mOffRenderTime.empty())
+    return qstring_cast(ss.str());
 
   double maxRenderTime = *std::max_element(mRenderTime.begin(), mRenderTime.end());
   double maxOffRenderTime = *std::max_element(mOffRenderTime.begin(), mOffRenderTime.end());
@@ -76,24 +83,25 @@ void RenderTimer::dumpStatistics()
   double meanOffRenderTime = std::accumulate(mOffRenderTime.begin(), mOffRenderTime.end(), 0)/mOffRenderTime.size();
   double meanTotalTime = meanRenderTime + meanOffRenderTime;
 
-  std::cout << "Mean time:\t= " << meanTotalTime << " ms/frame" << std::endl;
-  std::cout << std::endl;
-  std::cout << "Mean times: \t"<< "render: " << meanRenderTime << "\toff: " << meanOffRenderTime << std::endl;
-  std::cout << "Max times: \t" << "render: " << maxRenderTime << "\tother: " << maxOffRenderTime << std::endl;
-  std::cout << std::endl;
+  ss << "Mean time:\t= " << meanTotalTime << " ms/frame" << std::endl;
+  ss << std::endl;
+  ss << "Mean times: \t"<< "render: " << meanRenderTime << "\tother: " << meanOffRenderTime << std::endl;
+  ss << "Max times: \t" << "render: " << maxRenderTime  << "\tother: " << maxOffRenderTime  << std::endl;
+  ss << std::endl;
 
-  std::cout << "Render Times: " << mRenderTime.size() << std::endl;
+  ss << "Render Times: " << mRenderTime.size() << std::endl;
   for (unsigned i = 0; i < mRenderTime.size(); ++i)
-    std::cout << mRenderTime[i] << "  ";
-  std::cout << std::endl;
+    ss << mRenderTime[i] << "  ";
+  ss << std::endl;
 
-  std::cout << "Off Render Times: " << mOffRenderTime.size() << std::endl;
+  ss << "Off Render Times: " << mOffRenderTime.size() << std::endl;
   for (unsigned i = 0; i < mOffRenderTime.size(); ++i)
-    std::cout << mOffRenderTime[i] << "  ";
-  std::cout << std::endl;
+    ss << mOffRenderTime[i] << "  ";
+  ss << std::endl;
 
-  std::cout << "================================" << std::endl;
-  std::cout << std::endl;
+  ss << "================================" << std::endl;
+  ss << std::endl;
+  return qstring_cast(ss.str());
 }
 
 } // namespace cx
