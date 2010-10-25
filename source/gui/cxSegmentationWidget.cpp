@@ -21,6 +21,9 @@
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
 
+//Testing
+#include "vesselReg/SeansVesselReg.hxx"
+
 namespace cx
 {
 
@@ -374,6 +377,7 @@ void CenterlineWidget::findCenterlineSlot()
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mRegisterButton(new QPushButton("Register")),
+    mTestButton(new QPushButton("TEST, legg mnc filene i custusx_build")),
     mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
     mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
@@ -389,6 +393,11 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
   layout->addWidget(mRegisterButton, 2, 0);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
+
+  //TESTING
+  layout->addWidget(this->createHorizontalLine(), 5, 0);
+  layout->addWidget(mTestButton, 6, 0);
+  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()
@@ -418,6 +427,59 @@ void RegisterI2IWidget::movingImageSlot(QString uid)
     return;
   mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving image: <b>"+mMovingImage->getName()+"</b></font>"));
   mMovingImageLabel->update();
+}
+
+void RegisterI2IWidget::testSlot()
+{
+  ssc::messageManager()->sendWarning("===============TESTING START==============");
+
+  int lts_ratio = 80;
+  double stop_delta = 0.001;
+  double lambda = 0;
+  double sigma = 1.0;
+  bool lin_flag = 0;
+  int sample = 1;
+  int single_point_thre = 1;
+  bool verbose = 1;
+
+  SeansVesselReg* theThing = new SeansVesselReg(lts_ratio,
+        stop_delta,
+        lambda,
+        sigma,
+        lin_flag,
+        sample,
+        single_point_thre,
+        verbose);
+
+  QString sourcefile("./center_dim_110555_USA_blur.mnc");
+  if(QFile::exists(sourcefile))
+    ssc::messageManager()->sendInfo(sourcefile+" finnes");
+  else
+  {
+    QFile q_sourcefile(sourcefile);
+    QFileInfo info(q_sourcefile);
+    ssc::messageManager()->sendDebug(info.absoluteFilePath());
+  }
+
+  QString targetfile("./center_dim_MRA_masked_like_110555USA.mnc");
+  if(QFile::exists(targetfile))
+    ssc::messageManager()->sendInfo(targetfile+" finnes");
+  else
+  {
+    QFile q_targetfile(targetfile);
+    QFileInfo info(q_targetfile);
+    ssc::messageManager()->sendDebug(info.absoluteFilePath());
+  }
+
+  //read minc files
+  ssc::ImagePtr source = theThing->loadMinc(cstring_cast(QString(sourcefile)));
+  ssc::ImagePtr target = theThing->loadMinc(cstring_cast(QString(targetfile)));
+
+  //calculate
+  theThing->doItRight(source, target);
+
+  ssc::messageManager()->sendWarning("===============TESTING END==============");
+
 }
 
 //------------------------------------------------------------------------------
