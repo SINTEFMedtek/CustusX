@@ -1,6 +1,8 @@
 #include "cxTestSpeed.h"
 
 #include "cxTestCustusXController.h"
+//#include "cxConfig.h"
+#include "cxDataLocations.h"
 #include <QTimer>
 
 void cxTestSpeed::setUp()
@@ -15,27 +17,45 @@ void cxTestSpeed::tearDown()
 
 /**
  */
-void cxTestSpeed::testInitialize()
+void cxTestSpeed::testKaisaSpeed()
 {
   CustusXController custusX(NULL);
 
+  custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Phantoms/Kaisa/CustusX/Speed_Test_Kaisa.cx3";
   custusX.start();
-  custusX.mPatientFolder = "/Users/christiana/Patients/Kaisa_Speed_Test.cx3";
+  //custusX.mPatientFolder = "/Users/christiana/Patients/Speed_Test_Lap_Large.cx3.cx3";
 
-  QTimer::singleShot(0, &custusX, SLOT(beginCheckRenderSlot()) );
-  QTimer::singleShot(0, &custusX, SLOT(loadPatientSlot()) );
-  QTimer::singleShot(5000, &custusX, SLOT(endCheckRenderSlot()) );
-  QTimer::singleShot(5001, &custusX, SLOT(beginCheckRenderSlot()) );
-  QTimer::singleShot(20000, &custusX, SLOT(endCheckRenderSlot()) );
-  QTimer::singleShot(30*1000, qApp, SLOT(quit()) );
+//  QTimer::singleShot(      0,   &custusX, SLOT(beginCheckRenderSlot()) );
+//  QTimer::singleShot(      0,   &custusX, SLOT(loadPatientSlot()) );
+//  QTimer::singleShot( 5*1000,   &custusX, SLOT(endCheckRenderSlot()) );
+//  QTimer::singleShot( 5*1000+1, &custusX, SLOT(beginCheckRenderSlot()) );
+//  QTimer::singleShot(20*1000,   &custusX, SLOT(endCheckRenderSlot()) );
+//  QTimer::singleShot(21*1000,   &custusX, SLOT(displayResultsSlot()) );
+  //QTimer::singleShot(30*1000,   qApp, SLOT(quit()) );
 
   qApp->exec();
   custusX.stop();
 }
 
-void cxTestSpeed::testMore()
+/**
+ */
+void cxTestSpeed::testLapSpeed()
 {
+  CustusXController custusX(NULL);
 
+  custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Lap/2010-10-18/CustusX/Speed_Test_Lap_Large.cx3";
+  custusX.start();
+
+//  QTimer::singleShot(      0,   &custusX, SLOT(beginCheckRenderSlot()) );
+//  QTimer::singleShot(      0,   &custusX, SLOT(loadPatientSlot()) );
+//  QTimer::singleShot( 5*1000,   &custusX, SLOT(endCheckRenderSlot()) );
+//  QTimer::singleShot( 5*1000+1, &custusX, SLOT(beginCheckRenderSlot()) );
+//  QTimer::singleShot(20*1000,   &custusX, SLOT(endCheckRenderSlot()) );
+//  QTimer::singleShot(21*1000,   &custusX, SLOT(displayResultsSlot()) );
+  //QTimer::singleShot(30*1000,   qApp, SLOT(quit()) );
+
+  qApp->exec();
+  custusX.stop();
 }
 
 
