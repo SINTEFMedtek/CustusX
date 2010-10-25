@@ -168,10 +168,14 @@ public slots:
   void fixedImageSlot(QString uid);
   void movingImageSlot(QString uid);
 
+private slots:
+  void testSlot();
+
 private:
   RegisterI2IWidget();
 
   QPushButton* mRegisterButton;
+  QPushButton* mTestButton;
   QLabel* mFixedImageLabel;
   QLabel* mMovingImageLabel;
 
