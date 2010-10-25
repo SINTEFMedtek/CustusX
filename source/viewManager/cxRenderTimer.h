@@ -30,7 +30,7 @@ public:
   void endRender();
   double getFPS();
   bool intervalPassed() const;
-  void dumpStatistics();
+  QString dumpStatistics();
 
 private:
   std::vector<double> mOffRenderTime;

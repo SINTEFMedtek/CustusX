@@ -20,6 +20,7 @@ class CustusXController : public QObject
 public:
   cx::MainWindow* mMainWindow;
   QString mPatientFolder;
+  QString mTestData;
 
   CustusXController(QObject* parent);
   void start();
@@ -27,8 +28,11 @@ public:
 
 public slots:
   void loadPatientSlot();
-  void beginCheckRenderSlot();
-  void endCheckRenderSlot();
+  void initialBeginCheckRenderSlot();
+  void initialEndCheckRenderSlot();
+//  void secondBeginCheckRenderSlot();
+  void secondEndCheckRenderSlot();
+  void displayResultsSlot();
 
 private:
 };
