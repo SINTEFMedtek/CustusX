@@ -34,6 +34,9 @@ protected:
 
 private slots:
   void setImageSlot(QString uid);
+  void segmentationOutputArrived(QString uid);
+  void surfaceOutputArrived(QString uid);
+  void centerlineOutputArrived(QString uid);
 
 private:
   ImageSegmentationAndCenterlineWidget();
@@ -41,6 +44,10 @@ private:
   class SegmentationWidget* mSegmentationWidget;
   class SurfaceWidget*      mSurfaceWidget;
   class CenterlineWidget*   mCenterlineWidget;
+
+  SelectImageStringDataAdapterPtr mSegmentationOutput;
+  SelectMeshStringDataAdapterPtr mSurfaceOutput;
+  SelectImageStringDataAdapterPtr mCenterlineOutput;
 };
 
 class FixedImage2ImageWidget : public ImageSegmentationAndCenterlineWidget

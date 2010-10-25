@@ -6,6 +6,7 @@
  */
 #include "cxDataInterface.h"
 #include "sscImage.h"
+#include "sscMesh.h"
 #include "sscMessageManager.h"
 #include "sscImageLUT2D.h"
 #include "sscDataManager.h"
@@ -295,6 +296,60 @@ ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 }
 
 void SelectImageStringDataAdapter::setValueName(const QString name)
+{
+  mValueName = name;
+}
+//---------------------------------------------------------
+
+SelectMeshStringDataAdapter::SelectMeshStringDataAdapter() :
+    mValueName("Select mesh")
+{
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+}
+QString SelectMeshStringDataAdapter::getValueName() const
+{
+  return mValueName;
+}
+bool SelectMeshStringDataAdapter::setValue(const QString& value)
+{
+  if (value==mMeshUid)
+    return false;
+  mMeshUid = value;
+  emit changed();
+  emit meshChanged(mMeshUid);
+  return true;
+}
+QString SelectMeshStringDataAdapter::getValue() const
+{
+  return mMeshUid;
+}
+QString SelectMeshStringDataAdapter::getHelp() const
+{
+  return "Select a mesh";
+}
+QStringList SelectMeshStringDataAdapter::getValueRange() const
+{
+  std::vector<QString> uids = ssc::dataManager()->getMeshUids();
+  QStringList retval;
+  retval << "";
+  for (unsigned i=0; i<uids.size(); ++i)
+    retval << qstring_cast(uids[i]);
+  return retval;
+}
+QString SelectMeshStringDataAdapter::convertInternal2Display(QString internal)
+{
+  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(internal);
+  if (!mesh)
+    return "<no mesh>";
+  return qstring_cast(mesh->getName());
+}
+ssc::MeshPtr SelectMeshStringDataAdapter::getMesh()
+{
+  return ssc::dataManager()->getMesh(mMeshUid);
+}
+
+void SelectMeshStringDataAdapter::setValueName(const QString name)
 {
   mValueName = name;
 }
