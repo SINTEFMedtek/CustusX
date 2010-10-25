@@ -3,6 +3,7 @@
 
 #include <QStatusBar>
 #include <map>
+#include "sscMessageManager.h"
 
 class QLabel;
 class QPixmap;
@@ -21,6 +22,8 @@ class CustomStatusBar: public QStatusBar
 {
   Q_OBJECT
 
+  typedef ssc::Message Message;
+
 public:
   CustomStatusBar(); ///< connects signals and slots
   ~CustomStatusBar(); ///< empty
@@ -30,6 +33,7 @@ protected slots:
   void disconnectFromToolSignals(); ///< disconnect from all tool
   void receiveToolVisible(bool visible); ///< updates the color label for a tool
   void fpsSlot(int numFps); ///< Show FPS
+  void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
 
 protected:
   std::vector<QLabel*> mToolLabels; ///< labels indicating the tools visibility
