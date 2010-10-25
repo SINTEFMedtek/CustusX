@@ -7,11 +7,13 @@ class QPushButton;
 
 namespace cx
 {
-/*
- * ImportDataWizard
+/**
+ * \class ImportDataWizard
  *
- *  Created on: Sep 24, 2010
- *      Author: christiana
+ *\brief
+ *
+ * \date Sep 24, 2010
+ *\author christiana
  */
 class ImportDataWizard : public QDialog
 {

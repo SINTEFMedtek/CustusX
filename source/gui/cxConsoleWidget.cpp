@@ -73,11 +73,12 @@ void ConsoleWidget::lineWrappingSlot(bool checked)
 void ConsoleWidget::createTextCharFormats()
 {
   mFormat[ssc::mlINFO].setForeground(Qt::black);
+  mFormat[ssc::mlSUCCESS].setForeground(QColor(60,179,113)); // medium sea green
   mFormat[ssc::mlWARNING].setForeground(QColor(255, 140, 0)); //dark orange
   mFormat[ssc::mlERROR].setForeground(Qt::red);
   mFormat[ssc::mlDEBUG].setForeground(QColor(135, 206, 250)); //sky blue
   mFormat[ssc::mlCERR].setForeground(Qt::red);
-  mFormat[ssc::mlCOUT].setForeground(QColor(34, 139, 34));
+  mFormat[ssc::mlCOUT].setForeground(Qt::darkGray);
 }
 
 void ConsoleWidget::format(Message& message)
