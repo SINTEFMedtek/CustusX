@@ -159,6 +159,7 @@ void MainWindow::addAsDockWidget(QWidget* widget)
   dockWidget->setObjectName(widget->objectName() + "DockWidget");
   dockWidget->setWidget(widget);
   this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+  mDockWidgets.insert(dockWidget);
   dockWidget->setVisible(false); // default visibility
 
   mToggleWidgetActionGroup->addAction(dockWidget->toggleViewAction());
@@ -384,6 +385,12 @@ void MainWindow::updateWindowTitle()
 void MainWindow::onWorkflowStateChangedSlot()
 {
   Desktop desktop = stateManager()->getActiveDesktop();
+
+  for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
+  {
+    this->removeDockWidget(*iter);
+  }
+
   this->restoreState(desktop.mMainWindowState);
   viewManager()->setActiveLayout(desktop.mLayoutUid);
 }
