@@ -295,7 +295,7 @@ void SeansVesselReg::printOutResults(char* fileNamePrefix, vtkGeneralTransform* 
   linearFile += "--Linear";
   linearFile += ".xfm";
 
-  std::cout << "Writing Results:" << std::endl;
+  std::cout << "Writing Results to " << nonLinearFile << " and " <<  linearFile << std::endl;
 
   if (!mt_doOnlyLinear)
   {
