@@ -100,7 +100,7 @@ signals:
 public slots:
   //void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
   void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
-  void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
+//  void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
 
 protected slots:
   void renderAllViewsSlot(); ///< renders all views
@@ -159,7 +159,7 @@ protected:
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
   
-  bool mShadingOn; ///< Use shading for rendering?
+//  bool mShadingOn; ///< Use shading for rendering?
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   RenderTimerPtr mRenderTimer;
 //  QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
