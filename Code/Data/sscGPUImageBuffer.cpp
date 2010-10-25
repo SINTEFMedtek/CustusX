@@ -1,5 +1,7 @@
 #include "sscGPUImageBuffer.h"
 
+#include <QString>
+
 #ifndef WIN32
 #define GL_GLEXT_PROTOTYPES
 #include <vtkgl.h>
@@ -21,7 +23,6 @@
 #include <vtkUnsignedCharArray.h>
 #include <vtkUnsignedShortArray.h>
 #include <boost/cstdint.hpp>
-#include <QString>
 
 #include "sscGLHelpers.h"
 
