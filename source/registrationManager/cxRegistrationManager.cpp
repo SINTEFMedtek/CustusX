@@ -14,6 +14,7 @@
 #include "sscDataManager.h"
 #include "cxLandmarkTranslationRegistration.h"
 #include "cxFrameForest.h"
+#include "vesselReg/SeansVesselReg.hxx"
 
 namespace cx
 {
@@ -145,7 +146,6 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
   }
-
 
   // reconnect only if the registration is done relative to a base.
   // if target==targetBase, the registration is done inside an already connected
@@ -403,6 +403,49 @@ void RegistrationManager::doFastRegistration_Translation()
 
   //emit fastRegistrationPerformed();
   ssc::messageManager()->sendInfo("Fast translation registration has been performed.");
+}
+
+void RegistrationManager::doVesselRegistration()
+{
+
+  int lts_ratio = 80;
+  double stop_delta = 0.001;
+  double lambda = 0;
+  double sigma = 1.0;
+  bool lin_flag = 1;
+  int sample = 1;
+  int single_point_thre = 1;
+  bool verbose = 1;
+
+  SeansVesselReg vesselReg(lts_ratio,
+        stop_delta,
+        lambda,
+        sigma,
+        lin_flag,
+        sample,
+        single_point_thre,
+        verbose);
+
+  ssc::ImagePtr fixedData = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
+  ssc::ImagePtr movingData = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
+
+  if(!fixedData)
+  {
+    ssc::messageManager()->sendError("Could not cast fixeddata to image.");
+    return;
+  }
+  if(!movingData)
+  {
+    ssc::messageManager()->sendError("Could not cast moving data to image.");
+    return;
+  }
+
+  vesselReg.doItRight(fixedData, movingData);
+  ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
+
+  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform.inv() * movingData->get_rMd().inv();
+  ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
+  this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)

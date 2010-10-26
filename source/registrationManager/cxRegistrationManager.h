@@ -52,6 +52,7 @@ public:
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the fixed image
   void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
+  void doVesselRegistration();
 
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
