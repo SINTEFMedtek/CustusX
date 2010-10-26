@@ -335,6 +335,8 @@ void MainWindow::newPatientSlot()
   choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
   if (choosenDir == QString::null)
     return; // On cancel
+  if(!choosenDir.endsWith(".cx3"))
+    choosenDir += QString(".cx3");
 
   // Update global patient number
   int patientNumber = mSettings->value("globalPatientNumber").toInt();

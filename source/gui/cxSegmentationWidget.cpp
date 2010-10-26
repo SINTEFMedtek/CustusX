@@ -19,6 +19,7 @@
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
+#include "cxDataLocations.h"
 #include "sscLabeledComboBoxWidget.h"
 
 //Testing
@@ -377,12 +378,14 @@ void CenterlineWidget::findCenterlineSlot()
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mRegisterButton(new QPushButton("Register")),
-    mTestButton(new QPushButton("TEST, legg mnc filene i custusx_build")),
+    mTestButton(new QPushButton("TEST, loads two minc images into the system.")),
     mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
     mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
+
+  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
@@ -413,31 +416,37 @@ QString RegisterI2IWidget::defaultWhatsThis() const
 
 void RegisterI2IWidget::fixedImageSlot(QString uid)
 {
-  mFixedImage = ssc::dataManager()->getImage(uid);
-  if(!mFixedImage)
+  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
+  if(!fixedImage)
     return;
-  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed image: <b>"+mFixedImage->getName()+"</b></font>"));
+  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed data: <b>"+fixedImage->getName()+"</b></font>"));
   mFixedImageLabel->update();
 }
 
 void RegisterI2IWidget::movingImageSlot(QString uid)
 {
-  mMovingImage = ssc::dataManager()->getImage(uid);
-  if(!mMovingImage)
+  ssc::DataPtr movingImage = registrationManager()->getMovingData();
+  if(!movingImage)
     return;
-  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving image: <b>"+mMovingImage->getName()+"</b></font>"));
+  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving data: <b>"+movingImage->getName()+"</b></font>"));
   mMovingImageLabel->update();
 }
 
 void RegisterI2IWidget::testSlot()
 {
-  ssc::messageManager()->sendWarning("===============TESTING START==============");
+  if(!stateManager()->getPatientData()->isPatientValid())
+  {
+    ssc::messageManager()->sendWarning("Create a new patient before trying to import the minc data.");
+    return;
+  }
+
+  ssc::messageManager()->sendDebug("===============TESTING BUTTON START==============");
 
   int lts_ratio = 80;
   double stop_delta = 0.001;
   double lambda = 0;
   double sigma = 1.0;
-  bool lin_flag = 0;
+  bool lin_flag = 1;
   int sample = 1;
   int single_point_thre = 1;
   bool verbose = 1;
@@ -451,9 +460,9 @@ void RegisterI2IWidget::testSlot()
         single_point_thre,
         verbose);
 
-  QString sourcefile("./center_dim_110555_USA_blur.mnc");
+  QString sourcefile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_110555_USA_blur.mnc");
   if(QFile::exists(sourcefile))
-    ssc::messageManager()->sendInfo(sourcefile+" finnes");
+    ssc::messageManager()->sendInfo(sourcefile+" exists");
   else
   {
     QFile q_sourcefile(sourcefile);
@@ -461,9 +470,9 @@ void RegisterI2IWidget::testSlot()
     ssc::messageManager()->sendDebug(info.absoluteFilePath());
   }
 
-  QString targetfile("./center_dim_MRA_masked_like_110555USA.mnc");
+  QString targetfile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_MRA_masked_like_110555USA.mnc");
   if(QFile::exists(targetfile))
-    ssc::messageManager()->sendInfo(targetfile+" finnes");
+    ssc::messageManager()->sendInfo(targetfile+" exsits");
   else
   {
     QFile q_targetfile(targetfile);
@@ -471,15 +480,21 @@ void RegisterI2IWidget::testSlot()
     ssc::messageManager()->sendDebug(info.absoluteFilePath());
   }
 
-  //read minc files
+  //read minc files and add them to the datamanager
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   ssc::ImagePtr source = theThing->loadMinc(cstring_cast(QString(sourcefile)));
+  ssc::dataManager()->loadData(source);
+  ssc::dataManager()->saveImage(source, outputBasePath);
   ssc::ImagePtr target = theThing->loadMinc(cstring_cast(QString(targetfile)));
+  ssc::dataManager()->loadData(target);
+  ssc::dataManager()->saveImage(target, outputBasePath);
 
-  //calculate
-  theThing->doItRight(source, target);
+  ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
+}
 
-  ssc::messageManager()->sendWarning("===============TESTING END==============");
-
+void RegisterI2IWidget::registerSlot()
+{
+  registrationManager()->doVesselRegistration();
 }
 
 //------------------------------------------------------------------------------
