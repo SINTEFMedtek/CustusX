@@ -170,6 +170,7 @@ public slots:
 
 private slots:
   void testSlot();
+  void registerSlot();
 
 private:
   RegisterI2IWidget();
@@ -178,9 +179,6 @@ private:
   QPushButton* mTestButton;
   QLabel* mFixedImageLabel;
   QLabel* mMovingImageLabel;
-
-  ssc::ImagePtr mFixedImage;
-  ssc::ImagePtr mMovingImage;
 };
 
 }//namespace cx
