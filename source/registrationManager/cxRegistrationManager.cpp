@@ -277,7 +277,7 @@ void RegistrationManager::doPatientRegistration()
   mPatientRegistrationOffset = ssc::Transform3D();
 
   emit patientRegistrationPerformed();
-  ssc::messageManager()->sendInfo("Patient registration has been performed.");
+  ssc::messageManager()->sendSuccess("Patient registration has been performed.");
 }
 
 void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
@@ -328,7 +328,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   mLastRegistrationTime = regTrans.mTimestamp;
 
   //emit imageRegistrationPerformed();
-  ssc::messageManager()->sendInfo("Image registration has been performed for " + image->getName());
+  ssc::messageManager()->sendSuccess("Image registration has been performed for " + image->getName());
 }
 
 /**Perform a fast orientation by setting the patient registration equal to the current dominant
@@ -354,7 +354,7 @@ void RegistrationManager::doFastRegistration_Orientation(const ssc::Transform3D&
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
-  ssc::messageManager()->sendInfo("Fast orientation registration has been performed.");
+  ssc::messageManager()->sendSuccess("Fast orientation registration has been performed.");
 
   // also apply the fast translation registration if any (this frees us form doing stuff in a well-defined order.)
   this->doFastRegistration_Translation();
@@ -402,7 +402,7 @@ void RegistrationManager::doFastRegistration_Translation()
   mPatientRegistrationOffset = ssc::Transform3D();
 
   //emit fastRegistrationPerformed();
-  ssc::messageManager()->sendInfo("Fast translation registration has been performed.");
+  ssc::messageManager()->sendSuccess("Fast translation registration has been performed.");
 }
 
 void RegistrationManager::doVesselRegistration()
@@ -446,6 +446,8 @@ void RegistrationManager::doVesselRegistration()
   ssc::Transform3D delta = fixedData->get_rMd() * linearTransform.inv() * movingData->get_rMd().inv();
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
   this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
+
+  ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)
