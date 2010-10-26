@@ -4,59 +4,61 @@
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "vtkSmartPointer.h"
-//class UserInterfaceThingy;
+
+typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-
-
 typedef vtkSmartPointer<class vtkGeneralTransform> vtkGeneralTransformPtr;
 typedef vtkSmartPointer<class vtkCellLocator> vtkCellLocatorPtr;
+typedef vtkSmartPointer<class vtkMaskPoints> vtkMaskPointsPtr;
+typedef vtkSmartPointer<class vtkThinPlateSplineTransform> vtkThinPlateSplineTransformPtr;
+//typedef vtkSmartPointer<class HackTPSTransform> HackTPSTransformPtr;
+typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
+typedef vtkSmartPointer<class vtkIdList> vtkIdListPtr;
+typedef vtkSmartPointer<class vtkSortDataArray> vtkSortDataArrayPtr;
+typedef vtkSmartPointer<class vtkFloatArray> vtkFloatArrayPtr;
+typedef vtkSmartPointer<class vtkDataArray> vtkDataArrayPtr;
+typedef vtkSmartPointer<class vtkCellArray> vtkCellArrayPtr;
+typedef vtkSmartPointer<class vtkMINCImageReader> vtkMINCImageReaderPtr;
+typedef vtkSmartPointer<class vtkAbstractTransform> vtkAbstractTransformPtr;
 
 class vtkCellArray;
 class vtkPoints;
-//class vtkPolyData;
-//class vtkCellLocator;
 class vtkAbstractTransform;
-//class vtkGeneralTransform;
 
+namespace cx
+{
+/** Vessel - vessel registration algorithm.
+ *
+ * Input is two centerline representations of vessel trees.
+ * Output is either a linear transform or a nonlinear transform (nonlinear not used yet).
+ *
+ * Original authors:
+ *  Ingerid Reinertsen - algorithm.
+ *  Sean (get full name) - refactored code.
+ *
+ */
 class SeansVesselReg
 {
 public:
+  SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose);
+  ~SeansVesselReg();
 
-  SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample,
-      int single_point_thre, bool verbose);
-
-  virtual ~SeansVesselReg();
-
-  void doIt(char* source_file, char* target_file, char* source_landmarks, char* target_landmarks);
-
-  ssc::Transform3D doItRight(ssc::ImagePtr source, ssc::ImagePtr target);
+  void doItRight(ssc::ImagePtr source, ssc::ImagePtr target);
+  ssc::Transform3D getLinearTransform();
+//  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
 
 private:
   vtkPolyDataPtr extractPolyData(ssc::ImagePtr image, int p_neighborhoodFilterThreshold, double p_BoundingBox[6]);
-  ssc::Transform3D getLinearTransform(vtkGeneralTransform* myConcatenation);
+  ssc::Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
 
 protected:
+  void processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCellLocatorPtr myLocator, vtkGeneralTransformPtr myConcatenation);
+  void printOutResults(char* fileNamePrefix, vtkGeneralTransformPtr myConcatenation);
+  vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/);
+  vtkAbstractTransformPtr nonLinearRegistration(vtkPolyDataPtr tpsSourcePolyData, vtkPolyDataPtr tpsTargetPolyData, int numPoints);
 
-  void getSomeData(char *dataFile, int p_neighborhoodFilterThreshold, double p_BoundingBox[6],
-      vtkPolyData *p_thePolyData);
-
-  void processAllStuff(vtkPolyData* currentSourcePolyData, vtkCellLocator* myLocator,
-      vtkGeneralTransform* myConcatenation);
-
-  void weirdStuff2(char* source_landmarks, char* target_landmarks, vtkPolyData* corr_target_poly);
-
-  void printOutResults(char* fileNamePrefix, vtkGeneralTransform* myConcatenation);
-
-  void linearRegistration(vtkPoints *points1, vtkPoints *points2, int n_points,
-      vtkAbstractTransform** myCurrentTransform);
-
-  void nonLinearRegistration(vtkPolyData *tps_source_poly, vtkPolyData *tps_target_poly, int n_points,
-      vtkAbstractTransform** myCurrentTransform);
-
-  //    UserInterfaceThingy* mt_uIThingy;
-  //
   int mt_ltsRatio;
   double mt_distanceDeltaStopThreshold;
   double mt_lambda;
@@ -67,6 +69,8 @@ protected:
   int mt_singlePointThreshold;
   int mt_maximumNumberOfIterations;
   bool mt_verbose;
-};
 
+  ssc::Transform3D mLinearTransformResult;
+};
+}//namespace cx
 #endif
