@@ -50,7 +50,6 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
   if(activePatientFolder == mActivePatientFolder)
     return;
 
-  ssc::messageManager()->sendDebug("PatientData::setActivePatient to: "+activePatientFolder);
   mActivePatientFolder = activePatientFolder;
   //TODO
   //Update gui in some way to show which patient is active
