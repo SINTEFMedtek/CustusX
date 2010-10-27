@@ -3,9 +3,7 @@
 
 #include <vector>
 #include "sscVolumetricRep.h"
-
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkAssembly> vtkAssemblyPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

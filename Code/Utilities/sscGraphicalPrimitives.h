@@ -2,19 +2,8 @@
 #define SSCGRAPHICALPRIMITIVES_H_
 
 #include <boost/shared_ptr.hpp>
-#include <vtkSmartPointer.h>
+#include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
-
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-typedef vtkSmartPointer<class vtkSphereSource> vtkSphereSourcePtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkLineSource> vtkLineSourcePtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkCellArray> vtkCellArrayPtr;
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
-typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
-
 
 namespace ssc
 {

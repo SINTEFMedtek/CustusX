@@ -66,7 +66,8 @@ public:
 
   void setLoggingFolder(QString absoluteLoggingFolderPath);
 
-  void sendInfo(QString info); ///< Used to report successful operations.
+  void sendInfo(QString info); ///< Used to report normal interesting activity
+  void sendSuccess(QString success); ///< Used to report larger successful operations
   void sendWarning(QString warning); ///< The program does not need to terminate, but the user might need to do something.
   void sendError(QString error); ///< The program (might) need to terminate
   void sendDebug(QString debug); ///< Used to output debug info

@@ -1,9 +1,3 @@
-/*
- * sscSlicePlaneClipper.h
- *
- *  Created on: Aug 20, 2010
- *      Author: christiana
- */
 #ifndef SSCSLICEPLANECLIPPER_H_
 #define SSCSLICEPLANECLIPPER_H_
 
@@ -14,18 +8,18 @@
 #include <QObject>
 #include "sscForwardDeclarations.h"
 #include "sscVector3D.h"
-
-typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
-typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
-typedef vtkSmartPointer<class vtkVolume> vtkVolumePtr;
-
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
-
 typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
-/**SlicePlaneClipper uses a SlicePlanesProxy to clip several volumes.
+/**
+ * \class SlicePlaneClipper
+ *
+ * \brief SlicePlaneClipper uses a SlicePlanesProxy to clip several volumes.
+ * \date Aug 20, 2010
+ * \author christiana
  */
 class SlicePlaneClipper : public QObject
 {

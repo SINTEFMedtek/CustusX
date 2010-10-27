@@ -1,9 +1,3 @@
-/*
- * sscDataManagerImpl.h
- *
- *  Created on: Jan 6, 2009
- *      Author: christiana
- */
 
 #ifndef SSCDATAMANAGERIMPL_H_
 #define SSCDATAMANAGERIMPL_H_
@@ -81,6 +75,12 @@ public:
 };
 
 //-----
+/**
+ * \class DataManagerImpl
+ *
+ * \date Jan 6, 2009
+ * \author christiana
+ */
 class DataManagerImpl: public DataManager
 {
 Q_OBJECT

@@ -1,10 +1,3 @@
-/*
- * vmTexture3DSlicerRep.cpp
- *
- *  Created on: Oct 13, 2009
- *      Author: petterw
- */
-
 #include "sscTexture3DSlicerRep.h"
 #include "sscTextureSlicePainter.h"
 
@@ -24,8 +17,6 @@
 #include "sscSliceProxy.h"
 #include "sscTypeConversions.h"
 #include "sscGPUImageBuffer.h"
-
-typedef vtkSmartPointer<class vtkTriangleFilter> vtkTriangleFilterPtr;
 
 //---------------------------------------------------------
 namespace ssc

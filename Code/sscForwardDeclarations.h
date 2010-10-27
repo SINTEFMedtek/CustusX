@@ -47,6 +47,45 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
+typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
+typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
+typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
+typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class Mesh> MeshPtr;
+typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
+typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
+typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
+typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
+typedef boost::shared_ptr<class LineSegment> LineSegmentPtr;
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
+typedef boost::shared_ptr<class OffsetPoint> OffsetPointPtr;
+typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
+typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
+typedef boost::shared_ptr<class GraphicalLine3D> GraphicalLine3DPtr;
+typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
+typedef boost::shared_ptr<class Image> ImagePtr;
+typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
+typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
+typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
+typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
+typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
+
+
 
 } // namespace ssc
 

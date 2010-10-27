@@ -209,6 +209,11 @@ void MessageManager::sendInfo(QString info)
   this->sendMessage(info, mlINFO, 1500);
 }
 
+void MessageManager::sendSuccess(QString success)
+{
+  this->sendMessage(success, mlSUCCESS, 1500);
+}
+
 void MessageManager::sendWarning(QString warning)
 {
   this->sendMessage(warning, mlWARNING, 3000);

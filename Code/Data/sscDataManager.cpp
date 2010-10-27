@@ -2,14 +2,10 @@
 
 #include <vtkImageData.h>
 #include <vtkMetaImageReader.h>
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
 #include <vtkSTLReader.h>
-typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
-typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 #include "sscDataManagerImpl.h"
 #include "sscImage.h"

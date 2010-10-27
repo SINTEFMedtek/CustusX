@@ -47,6 +47,7 @@ namespace ssc
 	  mlDEBUG,
 	  mlCOUT,
 	  mlCERR,
+	  mlSUCCESS,
 	  mlCOUNT
 	};
 } //namespace end

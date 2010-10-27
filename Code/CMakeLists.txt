@@ -120,6 +120,7 @@ endif(WIN32)
 # library
 SET( SSC_SOURCE_FILES
     sscForwardDeclarations.h
+    vtkForwardDeclarations.h
     Utilities/sscBoundingBox3D.cpp
     Utilities/sscBoundingBox3D.h
     Utilities/sscVector3D.cpp

@@ -4,18 +4,7 @@
 #include "sscTransform3D.h"
 #include "sscGraphicalPrimitives.h"
 
-#include <vtkSmartPointer.h>
-// forward declarations for vtk
-class vtkTextProperty;
-typedef vtkSmartPointer<class vtkActor2D> vtkActor2DPtr;
-typedef vtkSmartPointer<class vtkCursor2D> vtkCursor2DPtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper2D> vtkPolyDataMapper2DPtr;
-typedef vtkSmartPointer<class vtkTextMapper> vtkTextMapperPtr;
-typedef vtkSmartPointer<class vtkAxesActor> vtkAxesActorPtr;
-typedef vtkSmartPointer<class vtkCaptionActor2D> vtkCaptionActor2DPtr;
-typedef vtkSmartPointer<class vtkProp3D> vtkProp3DPtr;
-typedef vtkSmartPointer<class vtkLeaderActor2D> vtkLeaderActor2DPtr;
-
+#include "vtkForwardDeclarations.h"
 // --------------------------------------------------------
 namespace ssc
 {

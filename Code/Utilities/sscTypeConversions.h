@@ -32,6 +32,7 @@ class cstring_cast_Placeholder
 public:
 	explicit cstring_cast_Placeholder(const QString& val) : mData(val.toStdString()) {}
 	operator const char*() const { return mData.c_str(); }
+  operator char*() const { return const_cast<char*>(mData.c_str()); } // use with extreme caution.
 	const char* c() const { return mData.c_str(); }
 private:
 	std::string mData;

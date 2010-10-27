@@ -4,9 +4,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
+#include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "sscProbeSector.h"
 #include "sscIndent.h"

@@ -1,17 +1,7 @@
 #ifndef SSCGeometricRep2D_H_
 #define SSCGeometricRep2D_H_
 
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
-typedef	vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkPolyDataNormals> vtkPolyDataNormalsPtr;
-typedef vtkSmartPointer<class vtkCutter> vtkCutterPtr;
-
-typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
-typedef vtkSmartPointer<class vtkStripper> vtkStripperPtr;
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
-
+#include "vtkForwardDeclarations.h"
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 

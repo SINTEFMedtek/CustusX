@@ -3,14 +3,7 @@
 
 #include <vector>
 #include "sscRepImpl.h"
-
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
-typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
-typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageActor> vtkImageActorPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

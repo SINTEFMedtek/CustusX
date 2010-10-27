@@ -7,13 +7,11 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 
-#include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
 #include "sscVector3D.h"
 #include "sscLandmark.h"
 #include "sscDefinitions.h"
 
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 
 namespace ssc
 {

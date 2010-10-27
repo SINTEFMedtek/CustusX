@@ -6,16 +6,9 @@
 #include <boost/shared_ptr.hpp>
 #include "sscLandmark.h"
 #include "sscBoundingBox3D.h"
-
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
-typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
-typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
-typedef vtkSmartPointer<class vtkImageAccumulate> vtkImageAccumulatePtr;
-typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
-
+#include "vtkForwardDeclarations.h"
 #include "sscData.h"
+
 typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
 
 class QDomNode;

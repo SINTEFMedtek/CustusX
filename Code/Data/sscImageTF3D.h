@@ -9,17 +9,9 @@
 #define SSCIMAGETRANSFERFUNCTIONS3D_H_
 
 #include <boost/shared_ptr.hpp>
-
 #include <QObject>
+#include "vtkForwardDeclarations.h"
 
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
-typedef vtkSmartPointer<class vtkScalarsToColors> vtkScalarsToColorsPtr;
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
-typedef vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
-typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
-typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
 
 class QColor;
 class QDomDocument;

@@ -5,21 +5,11 @@
 #include "sscTransform3D.h"
 #include "sscUSProbeSector.h"
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
-// forward declarations
-typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
-typedef boost::shared_ptr<class GraphicalLine3D> GraphicalLine3DPtr;
-
-
-typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
-typedef boost::shared_ptr<class Tool> ToolPtr;
-
 /**Display a 3D representation of a ssc::Tool.
  * The representation to use is extracted from the tool itself.		
  *

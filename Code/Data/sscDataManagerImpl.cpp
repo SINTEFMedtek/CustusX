@@ -5,18 +5,12 @@
 #include <vtkMetaImageReader.h>
 #include <vtkSmartPointer.h>
 #include <vtkMetaImageWriter.h>
-typedef vtkSmartPointer<class vtkMetaImageReader> vtkMetaImageReaderPtr;
-typedef vtkSmartPointer<class vtkMetaImageWriter> vtkMetaImageWriterPtr;
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataReader.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkSTLReader.h>
 #include <vtkImageChangeInformation.h>
-typedef vtkSmartPointer<class vtkPolyDataReader> vtkPolyDataReaderPtr;
-typedef vtkSmartPointer<class vtkPolyDataWriter> vtkPolyDataWriterPtr;
-typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
-typedef vtkSmartPointer<class vtkImageChangeInformation> vtkImageChangeInformationPtr;
 
 #include <QtCore>
 #include <QDomDocument>

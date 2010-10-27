@@ -12,29 +12,16 @@
 #ifndef VMVMTOOL2DREP_H
 #define VMVMTOOL2DREP_H
 
-
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscUSProbeSector.h"
 
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-
 namespace ssc
 {
-// forward declarations
-typedef boost::shared_ptr<class CrossHair2D> CrossHair2DPtr;
-typedef boost::shared_ptr<class LineSegment> LineSegmentPtr;
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class OffsetPoint> OffsetPointPtr;
-
-typedef boost::shared_ptr<class ToolRep2D> ToolRep2DPtr;
-
 /**
  *This class will hold all the representation and drawing of 2d tool
  *in navigation and registration.

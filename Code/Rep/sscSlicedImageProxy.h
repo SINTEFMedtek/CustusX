@@ -3,13 +3,7 @@
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
-
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
-typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
-typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
-typedef vtkSmartPointer<class vtkImageReslice> vtkImageReslicePtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

@@ -4,8 +4,7 @@
 #include <set>
 #include <boost/shared_ptr.hpp>
 
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
+#include "vtkForwardDeclarations.h"
 
 #include <QColor>
 #include "sscData.h"

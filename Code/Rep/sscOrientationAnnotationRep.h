@@ -3,16 +3,12 @@
 
 #include "sscRepImpl.h"
 #include "sscDefinitions.h"
-#include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
-// forward declarations
 typedef vtkSmartPointer<class OrientationAnnotation> OrientationAnnotationPtr;
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
-
-typedef  boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
-
 class OrientationAnnotationRep : public ssc::RepImpl
 {
   Q_OBJECT

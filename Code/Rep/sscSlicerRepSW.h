@@ -3,19 +3,11 @@
 
 #include "sscRepImpl.h"
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkImageActor> vtkImageActorPtr;
+#include "sscForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
-// forward declarations
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
-
-
-typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
-
 /**Slice a volume using a SliceProxy.
  * 
  * Used as main slicer for single volume slicing in Sonowand.
