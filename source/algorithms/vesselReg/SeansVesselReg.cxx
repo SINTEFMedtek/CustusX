@@ -13,8 +13,8 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 
-#include "cxStateMachineManager.h"
-#include "cxPatientData.h"
+//#include "cxStateMachineManager.h"
+//#include "cxPatientData.h"
 
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
@@ -69,7 +69,8 @@ void SeansVesselReg::printOutResults(char* fileNamePrefix, vtkGeneralTransformPt
   }
   std::cout << "Filenameprefix: " << fileNamePrefix << std::endl;
 
-  std::string logsFolder = string_cast(cx::stateManager()->getPatientData()->getActivePatientFolder())+"/Logs/";
+  //std::string logsFolder = string_cast(cx::stateManager()->getPatientData()->getActivePatientFolder())+"/Logs/";
+  std::string logsFolder = "~/Patients/Logs/";
   std::string nonLinearFile = logsFolder+fileNamePrefix;
   nonLinearFile += "--NonLinear";
   nonLinearFile += ".txt";
