@@ -7,6 +7,9 @@
 #include <vtkMatrix4x4.h>
 #include <vtkImageLuminance.h>
 #include <vtkPlane.h>
+#include <vtkPlanes.h>
+//#include <vtkClipVolume.h>
+#include <vtkImageClip.h>
 
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
@@ -15,6 +18,10 @@
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+
+typedef vtkSmartPointer<class vtkPlanes> vtkPlanesPtr;
+//typedef vtkSmartPointer<class vtkClipVolume> vtkClipVolumePtr;
+typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
 
 namespace ssc
 {
@@ -565,6 +572,57 @@ void Image::clearClipPlanes()
   emit clipPlanesChanged();
 }
 
+vtkImageDataPtr Image::CropAndClipImage()
+{
+  //vtkPlanesPtr planes = vtkPlanesPtr::New();
+  //planes->SetBounds(this->getCroppingBox().begin());
+  //TODO: Insert clip planes also
+  //this->getClipPlanes();
 
+//  vtkCutterPtr cutter = vtkCutterPtr::New();
+//  cutter->SetCutFunction(planes);
+//  cutter->SetInput(this->getBaseVtkImageData());
+//  vtkClipVolumePtr clipper = vtkClipVolumePtr::New();
+//  clipper->SetClipFunction(planes);
+//  clipper->SetInput(this->getBaseVtkImageData());
+//  return clipper->GetOutput();
+
+  vtkImageClipPtr clip = vtkImageClipPtr::New();
+  double* bb = this->getCroppingBox().begin();
+  clip->SetInput(this->getBaseVtkImageData());
+
+  double* sp = this->getBaseVtkImageData()->GetSpacing();
+
+  clip->SetOutputWholeExtent(
+      static_cast<int>(bb[0]/sp[0]+0.5), static_cast<int>(bb[1]/sp[1]+0.5),
+      static_cast<int>(bb[2]/sp[1]+0.5), static_cast<int>(bb[3]/sp[1]+0.5),
+      static_cast<int>(bb[4]/sp[2]+0.5), static_cast<int>(bb[5]/sp[2]+0.5));
+
+  clip->ClipDataOn();
+  vtkImageDataPtr retVal = clip->GetOutput();
+
+  retVal->Update();
+  retVal->ComputeBounds();
+
+/*
+  int* in = this->getBaseVtkImageData()->GetWholeExtent();
+  int* ret = retVal->GetWholeExtent();
+  std::cout << "in wholeExtent:     " << in[0] << " " << in[1]<< " " << in[2]<< " " << in[3]<< " " << in[4]<< " " << in[5] << std::endl;
+  std::cout << "retVal wholeExtent: " << ret[0] << " " << ret[1]<< " " << ret[2]<< " " << ret[3]<< " " << ret[4]<< " " << ret[5] << std::endl;
+
+  double* inSpacing = this->getBaseVtkImageData()->GetSpacing();
+  std::cout << "inSpacing: " << inSpacing[0] << " " << inSpacing[1]<< " " << inSpacing[2] << std::endl;
+  int* inExtent = this->getBaseVtkImageData()->GetExtent();
+  std::cout << "inExtent : " << inExtent[0] << " " << inExtent[1]<< " " << inExtent[2] << inExtent[3]<< " " << inExtent[4]<< " " << inExtent[5] << std::endl;
+
+
+  double* bounds = retVal->GetBounds();
+  std::cout << "retBounds: " << bounds[0] << " " << bounds[1]<< " " << bounds[2]<< " " << bounds[3]<< " " << bounds[4]<< " " << bounds[5] << std::endl;
+
+  int* extent = retVal->GetExtent();
+  std::cout << "out Extent[5]: " <<  extent[5] << std::endl;*/
+
+  return retVal;
+}
 
 } // namespace ssc

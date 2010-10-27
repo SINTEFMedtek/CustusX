@@ -96,6 +96,7 @@ public:
 	virtual void addClipPlane(vtkPlanePtr plane);
 	virtual std::vector<vtkPlanePtr> getClipPlanes();
 	virtual void clearClipPlanes();
+	virtual vtkImageDataPtr CropAndClipImage(); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
 
 signals:
   void landmarkRemoved(QString uid);
