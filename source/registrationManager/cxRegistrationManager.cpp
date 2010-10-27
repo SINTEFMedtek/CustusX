@@ -440,7 +440,13 @@ void RegistrationManager::doVesselRegistration()
     return;
   }
 
-  vesselReg.doItRight(fixedData, movingData);
+  bool success = vesselReg.doItRight(fixedData, movingData);
+  if(!success)
+  {
+    ssc::messageManager()->sendWarning("Vessel registration failed.");
+    return;
+  }
+
   ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
 
   ssc::Transform3D delta = fixedData->get_rMd() * linearTransform.inv() * movingData->get_rMd().inv();
