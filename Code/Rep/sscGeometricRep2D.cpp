@@ -118,6 +118,7 @@ void GeometricRep2D::meshChangedSlot()
 	mMesh->connectToRep(mSelf);
 
 	mMapper->SetInput( mMesh->getVtkPolyData() ); // original - show-all method
+  mMapper->ScalarVisibilityOff();//Don't use the LUT from the VtkPolyData
 	//mNormals->SetInputConnection(mMesh->getVtkPolyData()->Get);
 	mNormals->SetInput(mMesh->getVtkPolyData());
 //	mCutter->SetInput(mMesh->getVtkPolyData());
