@@ -148,7 +148,9 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 
 	long voxels = image->getBaseVtkImageData()->GetNumberOfPoints();
 	double factor = (double)maxVoxels/(double)voxels;
-	//factor = pow(factor, 1.0/3.0); did not work. Seems that the resampling is linear?
+	factor = pow(factor, 1.0/3.0);
+	// cubic function leads to trouble for 138M-volume - must downsample to as low as 5-10 Mv in order to succeed on Mac.
+
 	if (factor<0.99)
 	{
 		std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
@@ -192,6 +194,18 @@ void VolumetricRep::vtkImageDataChangedSlot()
 		resampler->GetOutput()->Update();
 		resampler->GetOutput()->GetScalarRange();
 		volume = resampler->GetOutput();
+
+		// did not help for large-volume problem (CA)
+//		volume = vtkImageDataPtr::New();
+//		volume->DeepCopy(resampler->GetOutput());
+
+	  long voxelsDown = volume->GetNumberOfPoints();
+	  long voxelsOrig = mImage->getBaseVtkImageData()->GetNumberOfPoints();
+    std::cout << "Completed downsampling volume in VolumetricRep: " << mImage->getName() << " below " << voxelsDown/1000/1000 << "M. Ratio: " << mResampleFactor << ", original size: " << voxelsOrig/1000/1000 << "M" << std::endl;
+//    std::cout << "=================== org volume: " << std::endl;
+//    mImage->getGrayScaleBaseVtkImageData()->Print(std::cout);
+//    std::cout << "=================== downsampled volume: " << std::endl;
+//    volume->Print(std::cout);
 	}
 
 	mTextureMapper3D->SetInput(volume);
