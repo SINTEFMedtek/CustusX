@@ -66,6 +66,11 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
 
   this->adjustSizeSlot();
+
+  this->toogleBinarySlot(mBinary);
+  this->thresholdSlot(mSegmentationThreshold);
+  this->toogleSmoothingSlot(mUseSmothing);
+  this->smoothingSigmaSlot(mSmoothSigma);
 }
 SegmentationWidget::~SegmentationWidget()
 {
@@ -222,6 +227,11 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   topLayout->addWidget(surfaceButton, 1,0);
   topLayout->addWidget(surfaceOptionsButton,1,1);
   topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
+
+  this->thresholdSlot(mSurfaceThreshold);
+  this->decimationSlot(mDecimation);
+  this->reduceResolutionSlot(mReduceResolution);
+  this->smoothingSlot(mSmoothing);
 }
 
 SurfaceWidget::~SurfaceWidget()
@@ -276,7 +286,6 @@ void SurfaceWidget::imageChangedSlot(QString uid)
   if(!image)
     return;
   mSurfaceThresholdSpinBox->setRange(image->getMin(), image->getMax());
-  //ssc::messageManager()->sendDebug("Surface threshold range set to ["+qstring_cast(image->getMin())+","+qstring_cast(image->getMax())+"]");
 }
 
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
@@ -338,8 +347,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 }
 
 CenterlineWidget::~CenterlineWidget()
-{
-}
+{}
 
 QString CenterlineWidget::defaultWhatsThis() const
 {
