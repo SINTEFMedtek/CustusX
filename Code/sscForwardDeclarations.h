@@ -2,6 +2,8 @@
 #define SSC_FORWARDDECLARARATIONS_H_
 
 #include <boost/shared_ptr.hpp>
+#include <map>
+
 
 /**\file sscForwardDeclarations.h
  *
@@ -47,7 +49,6 @@ typedef boost::shared_ptr<class SlicePlanes3DRep> SlicePlanes3DRepPtr;
 typedef boost::shared_ptr<class SlicePlaneClipper> SlicePlaneClipperPtr;
 
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
 typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
@@ -56,14 +57,11 @@ typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
 typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
 typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class SlicedImageProxy> SlicedImageProxyPtr;
 typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
 typedef boost::shared_ptr<class Texture3DSlicerRep> Texture3DSlicerRepPtr;
 typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
@@ -78,12 +76,14 @@ typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
 typedef boost::shared_ptr<class GraphicalLine3D> GraphicalLine3DPtr;
 typedef boost::shared_ptr<class ToolRep3D> ToolRep3DPtr;
 typedef boost::shared_ptr<class Tool> ToolPtr;
-typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
 typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
 typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
 typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
+typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
+typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
+
 
 
 

@@ -7,9 +7,11 @@
 #include "sscLandmark.h"
 #include "sscBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 #include "sscData.h"
 
 typedef boost::shared_ptr<std::map<int, int> > HistogramMapPtr;
+typedef std::map<QString, class Landmark> LandmarkMap;
 
 class QDomNode;
 class QDomDocument;
@@ -18,15 +20,10 @@ class QDomDocument;
 
 namespace ssc
 {
-// forward declarations
-typedef std::map<QString, class Landmark> LandmarkMap;
-typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
-typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
-
 /**One volumetric data set, represented as a vtkImageData,
  * along with auxiliary data.
  *
- * warning Landmarks are only used by SINTEF atm, so they can change the code
+ * \warning Landmarks are only used by SINTEF atm, so they can change the code
  * at any given point.
  */
 class Image : public Data
@@ -91,6 +88,8 @@ public:
 	virtual void clearClipPlanes();
 	virtual vtkImageDataPtr CropAndClipImage(); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
 
+	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
+
 signals:
   void landmarkRemoved(QString uid);
   void landmarkAdded(QString uid);
@@ -108,7 +107,6 @@ protected slots:
   virtual void transformChangedSlot();
 
 protected:
-  void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 	
@@ -122,19 +120,11 @@ protected:
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
   
   shadingStruct mShading;
-  /*bool mShading; ///< determine if shading effects are to be used for this volume.
-  double mAmbient;///< Shading parameter
-  double mDiffuse;///< Shading parameter
-  double mSpecular;///< Shading parameter
-  double mSpecularPower;///< Shading parameter*/
 
   bool mUseCropping; ///< image should be cropped using mCroppingBox
   DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
   std::vector<vtkPlanePtr> mClipPlanes;
 };
-
-typedef boost::shared_ptr<Image> ImagePtr;
-
 } // end namespace ssc
 
 #endif /*SSCIMAGE_H_*/

@@ -8,9 +8,7 @@
 #include <vtkImageLuminance.h>
 #include <vtkPlane.h>
 #include <vtkPlanes.h>
-//#include <vtkClipVolume.h>
 #include <vtkImageClip.h>
-
 #include "sscImageTF3D.h"
 #include "sscBoundingBox3D.h"
 #include "sscImageLUT2D.h"
@@ -18,10 +16,6 @@
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
-
-typedef vtkSmartPointer<class vtkPlanes> vtkPlanesPtr;
-//typedef vtkSmartPointer<class vtkClipVolume> vtkClipVolumePtr;
-typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
 
 namespace ssc
 {

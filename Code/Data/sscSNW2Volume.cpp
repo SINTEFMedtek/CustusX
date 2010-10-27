@@ -398,7 +398,7 @@ bool SNW2Volume::rawLoadVtkImageData()
 		boost::uint8_t *image = (boost::uint8_t*)(rawchars);
 		if (scalarSize!=file.size())
 		{
-			qWarning("unexpected file size for %s should be %d was %d", file.fileName().toAscii().constData(), scalarSize, file.size());
+			qWarning("unexpected file size for %s should be %d was %lld", file.fileName().toAscii().constData(), scalarSize, file.size());
 		}
 
 		vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();

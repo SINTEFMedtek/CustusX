@@ -220,6 +220,8 @@ typedef vtkSmartPointer<class vtkAxesActor> vtkAxesActorPtr;
 typedef vtkSmartPointer<class vtkCaptionActor2D> vtkCaptionActor2DPtr;
 typedef vtkSmartPointer<class vtkProp3D> vtkProp3DPtr;
 typedef vtkSmartPointer<class vtkLeaderActor2D> vtkLeaderActor2DPtr;
+typedef vtkSmartPointer<class vtkPlanes> vtkPlanesPtr;
+typedef vtkSmartPointer<class vtkImageClip> vtkImageClipPtr;
 
 class vtkTextProperty;
 class vtkOpenGLExtensionManager;
