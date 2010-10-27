@@ -42,6 +42,9 @@ SET(cxProject_MOC_HDRS
   cxImageSegmentationAndCenterlineWidget.h
   cxWhatsThisWidget.h
   cxControlPanel.h
+  cxIGTLinkWidget.h
+  cxIGTLinkClient.h
+
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -138,6 +141,11 @@ SET(${LIBNAME}_SRCS
     cxSegmentationWidget.h
       cxControlPanel.h
       cxControlPanel.cpp
+      cxIGTLinkWidget.h
+      cxIGTLinkWidget.cpp
+      cxIGTLinkClient.h
+      cxIGTLinkClient.cpp
+      
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
@@ -149,5 +157,5 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager)
+target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager OpenIGTLink)
 

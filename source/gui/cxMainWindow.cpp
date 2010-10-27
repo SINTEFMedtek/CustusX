@@ -44,6 +44,7 @@
 #include "cxSegmentationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
+#include "cxIGTLinkWidget.h"
 
 namespace cx
 {
@@ -93,6 +94,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mMeshPropertiesWidget);
   this->addAsDockWidget(new CameraControlWidget(this));
+  this->addAsDockWidget(new IGTLinkWidget(this));
 
   //Tried to add a separator. Don't work yet
   //QAction* separatorAction = new QAction(this);
