@@ -15,9 +15,7 @@
 #include "sscImageTF3D.h"
 #include "sscSlicePlaneClipper.h"
 #include "sscTypeConversions.h"
-
-
-typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

@@ -14,9 +14,7 @@
 #include "sscImage.h"
 #include "sscSnwInifile.h"
 #include "sscMD5Check.h"
-
-typedef vtkSmartPointer<vtkUnsignedShortArray> vtkUnsignedShortArrayPtr;
-typedef vtkSmartPointer<vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

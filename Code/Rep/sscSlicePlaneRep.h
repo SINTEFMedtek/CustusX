@@ -4,19 +4,11 @@
 #include "sscRepImpl.h"
 #include <vector>
 #include "sscTransform3D.h"
-
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkImagePlaneWidget> vtkImagePlaneWidgetPtr;
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
-// forward declarations
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class SliceRepSW> SliceRepSWPtr;
-
-
-typedef boost::shared_ptr<class SlicePlaneRep> SlicePlaneRepPtr;
 
 /**A slicer implementation. 
  * Unknown functionality.

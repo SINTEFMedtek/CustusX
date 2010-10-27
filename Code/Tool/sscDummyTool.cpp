@@ -12,22 +12,6 @@
 #include <vtkPlane.h>
 #include <vtkClipPolyData.h>
 
-typedef vtkSmartPointer<vtkAppendPolyData> vtkAppendPolyDataPtr;
-typedef vtkSmartPointer<vtkCylinderSource> vtkCylinderSourcePtr;
-typedef vtkSmartPointer<vtkTransformPolyDataFilter> vtkTransformPolyDataFilterPtr ;
-typedef vtkSmartPointer<vtkTransform> vtkTransformPtr;
-typedef vtkSmartPointer<vtkPlane> vtkPlanePtr;
-typedef vtkSmartPointer<vtkClipPolyData> vtkClipPolyDataPtr;
-
-/**
- * sscTool.cpp
- *
- * \brief
- *
- * \date Oct 30, 2008
- * \author: jbake
- */
-
 namespace ssc
 {
 

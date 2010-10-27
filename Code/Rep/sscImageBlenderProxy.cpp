@@ -9,8 +9,6 @@
 #include "sscImage.h"
 #include "sscImageLUT2D.h"
 
-typedef vtkSmartPointer<vtkImageThreshold> vtkImageThresholdPtr;
-
 namespace ssc
 {
 

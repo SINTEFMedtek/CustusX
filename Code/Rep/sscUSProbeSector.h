@@ -1,9 +1,3 @@
-/*
- * sscUSProbeSector.h
- *
- *  Created on: Sep 17, 2010
- *      Author: Ole Vegard Solberg
- */
 
 #ifndef SSCUSPROBESECTOR_H_
 #define SSCUSPROBESECTOR_H_
@@ -12,14 +6,16 @@
 #include <vtkSmartPointer.h>
 #include "sscProbeSector.h"
 #include "sscTransform3D.h"
-
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
-typedef vtkSmartPointer<class vtkCellArray> vtkCellArrayPtr;
-typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
-
+/**
+ * \class USProbeSector
+ *
+ * \date Sep 17, 2010
+ * \author Ole Vegard Solberg
+ */
 class USProbeSector
 {
 public:

@@ -5,10 +5,7 @@
 #include <boost/weak_ptr.hpp>
 #include <map>
 #include <list>
-
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

@@ -16,7 +16,6 @@
 namespace ssc
 // --------------------------------------------------------
 {
-
 class OrientationAnnotation : public vtkCornerAnnotation
 {
   vtkTypeMacro(OrientationAnnotation, vtkCornerAnnotation);
@@ -192,9 +191,11 @@ OrientationAnnotation::OrientationAnnotation()
 {
 
 }
+
 OrientationAnnotation::~OrientationAnnotation()
 {
 }
+
 void OrientationAnnotation::SetTextActorsPosition(int vsize[2])
 {
 	//Logger::log("nav.log","set text position");
@@ -221,7 +222,6 @@ void OrientationAnnotation::SetTextActorsJustification()
 	  tprop->SetJustificationToCentered();
 	  tprop->SetVerticalJustificationToTop();
 }
-
 
 // --------------------------------------------------------
 } //end namespace

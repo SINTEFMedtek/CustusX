@@ -3,22 +3,10 @@
 
 #include "sscRepImpl.h"
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkPiecewiseFunction> vtkPiecewiseFunctionPtr;
-typedef	vtkSmartPointer<class vtkColorTransferFunction> vtkColorTransferFunctionPtr;
-typedef vtkSmartPointer<class vtkVolumeProperty> vtkVolumePropertyPtr;
-typedef vtkSmartPointer<class vtkVolumeTextureMapper3D> vtkVolumeTextureMapper3DPtr;
-typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
-typedef	vtkSmartPointer<class vtkVolume> vtkVolumePtr;
-
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 namespace ssc
 {
-typedef boost::shared_ptr<class Image> ImagePtr;
-
-typedef boost::shared_ptr<class VolumetricBaseRep> VolumetricBaseRepPtr;
-typedef boost::shared_ptr<class VolumetricRep> VolumetricRepPtr;
-typedef boost::shared_ptr<class ImageMapperMonitor> ImageMapperMonitorPtr;
-
 /**3D representation for one image.
  * 
  * This abstract interface is implemented by VolumetricRep or ProgressiveLODVolumetricRep.

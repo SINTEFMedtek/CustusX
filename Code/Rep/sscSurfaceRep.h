@@ -1,22 +1,12 @@
 #ifndef SSCSURFACEREP_H_
 #define SSCSURFACEREP_H_
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef	vtkSmartPointer<class vtkContourFilter> vtkContourFilterPtr;
-typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
-typedef	vtkSmartPointer<class vtkActor> vtkActorPtr;
-
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 #include "sscRepImpl.h"
 
 namespace ssc
 {
-// forward declarations
-typedef boost::shared_ptr<class Image> ImagePtr;
-typedef boost::shared_ptr<class Mesh> MeshPtr;
-
-typedef boost::shared_ptr<class SurfaceRep> SurfaceRepPtr;
-
 /**
  * NOT IN USE BY ANYONE! 
  * If you want to use this class, test is thoroughly first!!

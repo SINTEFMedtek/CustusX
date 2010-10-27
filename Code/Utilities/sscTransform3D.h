@@ -3,15 +3,12 @@
 
 #include <boost/shared_ptr.hpp>
 #include <QString>
-#include <vtkSmartPointer.h>
+#include "vtkForwardDeclarations.h"
 #include "sscVector3D.h"
-
-typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 
 // --------------------------------------------------------
 namespace ssc
 {
-
 namespace utils
 {
 // --------------------------------------------------------

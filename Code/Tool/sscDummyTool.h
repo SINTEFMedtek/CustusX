@@ -4,17 +4,17 @@
 #include "sscTool.h"
 #include <vector>
 #include "sscBoundingBox3D.h"
+#include "vtkForwardDeclarations.h"
 
-typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
 typedef boost::shared_ptr<class QTimer> QTimerPtr;
 
 /**
- * sscDummyTool.h
+ * \class DummyTool
  *
  * \brief
  *
  * \date Oct 30, 2008
- * \author: jbake
+ * \author: Janne Beate Bakeng, SINTEF
  */
 namespace ssc
 {

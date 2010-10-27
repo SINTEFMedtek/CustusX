@@ -5,14 +5,7 @@
 #include <QObject>
 #include <vector>
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkImageMapToWindowLevelColors> vtkImageMapToWindowLevelColorsPtr;
-typedef vtkSmartPointer<class vtkWindowLevelLookupTable> vtkWindowLevelLookupTablePtr;
-typedef vtkSmartPointer<class vtkImageMapToColors> vtkImageMapToColorsPtr;
-typedef vtkSmartPointer<class vtkImageResample> vtkImageResamplePtr;
-typedef vtkSmartPointer<class vtkImageBlend> vtkImageBlendPtr;
-class vtkImageThreshold;
+#include "vtkForwardDeclarations.h"
 
 //----------------------------------------------------------
 namespace ssc

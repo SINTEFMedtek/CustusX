@@ -3,20 +3,7 @@
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
-
-class vtkObject;
-class vtkRenderWindowInteractor;
-
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-typedef vtkSmartPointer<class vtkLineSource> vtkLineSourcePtr;
-typedef vtkSmartPointer<class vtkProbeFilter> vtkProbeFilterPtr;
-typedef vtkSmartPointer<class vtkSphereSource> vtkSphereSourcePtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkDataSetAttributes> vtkDataSetAttributesPtr;
-typedef vtkSmartPointer<class vtkEventQtSlotConnect> vtkEventQtSlotConnectPtr;
-typedef vtkSmartPointer<class vtkRenderWindowInteractor> vtkRenderWindowInteractorPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

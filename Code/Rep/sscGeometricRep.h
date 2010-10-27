@@ -1,11 +1,7 @@
 #ifndef SSCGEOMETRICREP_H_
 #define SSCGEOMETRICREP_H_
 
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkProperty> vtkPropertyPtr;
-typedef	vtkSmartPointer<class vtkActor> vtkActorPtr;
-
+#include "vtkForwardDeclarations.h"
 #include "sscRepImpl.h"
 #include "sscVector3D.h"
 

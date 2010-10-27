@@ -12,24 +12,16 @@
 #include <vtkOpenGLRepresentationPainter.h>
 #include <QString>
 
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkOpenGLHardwareSupport > vtkOpenGLHardwareSupportPtr;
-typedef vtkSmartPointer<class vtkShaderProgram2 > vtkShaderProgram2Ptr;
-typedef vtkSmartPointer<class vtkGLSLShaderDeviceAdapter2 > vtkGLSLShaderDeviceAdapter2Ptr;
-typedef vtkSmartPointer<class vtkShader2 > vtkShader2Ptr;
-class vtkOpenGLExtensionManager;
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 //---------------------------------------------------------
 namespace ssc
 {
-//---------------------------------------------------------
-typedef vtkSmartPointer<class TextureSlicePainter > TextureSlicePainterPtr;
-// forward declarations
-typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
-typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
-
-
-/**Helper class for GPU rendering of slices.
+/**
+ * \class TextureSlicePainter
+ *
+ * \brief Helper class for GPU rendering of slices.
  * Used by Texture3DSlicerRep.
  */
 class TextureSlicePainter : public vtkOpenGLRepresentationPainter

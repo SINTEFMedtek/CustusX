@@ -10,14 +10,8 @@
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
 
-
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
-
 namespace ssc
 {
-
-
 /**Helper class for rendering a time-consuming ssc::Rep
  * in another thread. Construct and start the thread,
  * connect to finished() and use the result in the finished()

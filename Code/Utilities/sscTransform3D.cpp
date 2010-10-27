@@ -4,10 +4,9 @@
 #include <vector>
 #include <vtkMatrix4x4.h>
 #include <vtkTransform.h>
-typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
 #include "sscTypeConversions.h"
-
 #include "sscBoundingBox3D.h"
+#include "vtkForwardDeclarations.h"
 
 // --------------------------------------------------------
 namespace ssc

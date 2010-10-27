@@ -18,8 +18,7 @@
 #include "sscView.h"
 #include "sscDummyToolManager.h"
 #include "sscToolRep3D.h"
-
-typedef vtkSmartPointer<vtkCallbackCommand> vtkCallbackCommandPtr;
+#include "vtkForwardDeclarations.h"
 
 /**
  * sscTestInterface.cpp

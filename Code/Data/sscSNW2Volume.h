@@ -1,19 +1,13 @@
 #ifndef SSCSNW2VOLUME_H_
 #define SSCSNW2VOLUME_H_
 
-//#include <QtCore>
 #include <QDateTime>
 #include "sscTransform3D.h"
-
-#include <vtkSmartPointer.h>
-// forward declarations for vtk
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkLookupTable> vtkLookupTablePtr;
+#include "vtkForwardDeclarations.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
-typedef boost::shared_ptr<class Image> ImagePtr;
-
 class SNW2VolumeMetaData
 {
 public:

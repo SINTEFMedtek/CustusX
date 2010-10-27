@@ -3,8 +3,7 @@
 #include <vtkSmartPointer.h>
 #include "sscUtilHelpers.h"
 #include "sscTypeConversions.h"
-
-typedef vtkSmartPointer<vtkMath> vtkMathPtr;
+#include "vtkForwardDeclarations.h"
 
 // --------------------------------------------------------
 namespace ssc
@@ -12,7 +11,6 @@ namespace ssc
 namespace utils
 {
 // --------------------------------------------------------
-
 bool similar(double a, double b, double tol)
 {
 	return fabs(b-a) < tol;

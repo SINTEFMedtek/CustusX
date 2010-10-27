@@ -8,10 +8,8 @@
 #include <boost/weak_ptr.hpp>
 
 #include <QObject>
-#include "vtkSmartPointer.h"
-typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
+#include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
-//#include "sscRegistrationTransform.h" do not include this in a header file: insert in cpp files instead.
 
 class QDomNode;
 

@@ -6,9 +6,6 @@
 #include "sscDummyTool.h"
 #include "sscMessageManager.h"
 
-
-//typedef vtkSmartPointer <class vtkConeSource> vtkConeSourcePtr;
-
 namespace ssc
 {
 

@@ -6,20 +6,11 @@
 #include "sscBoundingBox3D.h"
 #include "sscTransform3D.h"
 #include "sscDefinitions.h"
-#include <vtkSmartPointer.h>
-typedef vtkSmartPointer<class vtkVectorText> vtkVectorTextPtr;
-typedef vtkSmartPointer<class vtkTextActor3D> vtkTextActor3DPtr;
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
+#include "sscForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
-// forward declarations
-typedef boost::shared_ptr<class SliceProxy> SliceProxyPtr;
-typedef boost::shared_ptr<class GraphicalPoint3D> GraphicalPoint3DPtr;
-typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
-typedef boost::shared_ptr<class Axes3D> Axes3DPtr;
-typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
-
 /**Helper for the reps displaying slice planes in 3D and
  * markers for the planes in 2D. 
  */

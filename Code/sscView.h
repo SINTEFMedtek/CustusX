@@ -2,7 +2,7 @@
 #define SSCVIEW_H_
 #include "sscConfig.h"
 #include <boost/shared_ptr.hpp>
-#include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
 #include "sscIndent.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT
@@ -12,13 +12,6 @@ typedef SNWQVTKWidget ViewParent;
 #include "QVTKWidget.h"
 typedef QVTKWidget ViewParent;
 #endif
-
-
-
-
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-typedef vtkSmartPointer<class vtkRenderWindow> vtkRenderWindowPtr;
-typedef vtkSmartPointer<class SNWXOpenGLRenderWindow> SNWXOpenGLRenderWindowPtr;
 
 namespace ssc
 {

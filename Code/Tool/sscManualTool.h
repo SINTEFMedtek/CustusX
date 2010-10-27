@@ -3,8 +3,7 @@
 
 #include <QMutex>
 #include "sscTool.h"
-typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
-typedef vtkSmartPointer<class vtkCursor3D> vtkCursor3DPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {

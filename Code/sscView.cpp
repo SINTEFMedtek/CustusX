@@ -8,9 +8,11 @@
 #ifdef USE_GLX_SHARED_CONTEXT
 #include "sscSNWXOpenGLRenderWindow.h"
 typedef SNWXOpenGLRenderWindow ViewRenderWindow;
+typedef vtkSmartPointer<SNWXOpenGLRenderWindow> ViewRenderWindowPtr;
 #else
 #include "vtkRenderWindow.h"
 typedef vtkRenderWindow ViewRenderWindow;
+typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
 #endif
 #include "vtkRenderer.h"
 #ifdef check
@@ -35,7 +37,6 @@ typedef vtkRenderWindow ViewRenderWindow;
 
   after including AssertMacros.h
 */
-typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
 namespace ssc
 {
 

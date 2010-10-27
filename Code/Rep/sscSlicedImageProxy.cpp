@@ -84,9 +84,6 @@ void SlicedImageProxy::transferFunctionsChangedSlot()
   mRedirecter->Update();
 }
 
-typedef vtkSmartPointer<vtkImageExtractComponents> vtkImageExtractComponentsPtr;
-typedef vtkSmartPointer<vtkImageAppendComponents > vtkImageAppendComponentsPtr;
-
 void SlicedImageProxy::setImage(ImagePtr image)
 {
 	if (mImage)
