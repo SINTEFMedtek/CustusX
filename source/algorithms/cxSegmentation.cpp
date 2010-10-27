@@ -1,27 +1,15 @@
-/*
- * cxSegmentation.cpp
- *
- *  Created on: Oct 12, 2010
- *      Author: christiana
- */
-
 #include "cxSegmentation.h"
 
 //ITK
 #include <itkImage.h>
-//#include <itkVTKImageImport.h>
-//#include <itkImageToVTKImageFilter.h>
-//#include <itkVTKImageToImageFilter.h>
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
 #include <itkBinaryThinningImageFilter.h>
-
 #include "ItkVtkGlue/itkImageToVTKImageFilter.h"
 #include "ItkVtkGlue/itkVTKImageToImageFilter.h"
 
 //VTK
 #include <vtkSmartPointer.h>
-//#include <vtkImageExport.h>
 #include <vtkImageData.h>
 #include <vtkMarchingCubes.h>
 #include <vtkPolyData.h>
@@ -32,9 +20,7 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkTubeFilter.h>
 #include <vtkImageCast.h>
-
-typedef vtkSmartPointer<vtkImageExport> vtkImageExportPtr;
-
+#include "vtkForwardDeclarations.h"
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscImage.h"
@@ -42,20 +28,13 @@ typedef vtkSmartPointer<vtkImageExport> vtkImageExportPtr;
 #include "sscUtilHelpers.h"
 #include "sscMesh.h"
 #include "sscMessageManager.h"
+#include "vtkForwardDeclarations.h"
 
 const unsigned int Dimension = 3;
 typedef unsigned short PixelType;
 typedef itk::Image< PixelType, Dimension >  itkImageType;
 typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkFilterType;
 typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
-
-typedef vtkSmartPointer<class vtkMarchingCubes> vtkMarchingCubesPtr;
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
-typedef vtkSmartPointer<class vtkImageShrink3D> vtkImageShrink3DPtr;
-typedef vtkSmartPointer<class vtkWindowedSincPolyDataFilter> vtkWindowedSincPolyDataFilterPtr;
-typedef vtkSmartPointer<class vtkTriangleFilter> vtkTriangleFilterPtr;
-typedef vtkSmartPointer<class vtkDecimatePro> vtkDecimateProPtr;
-typedef vtkSmartPointer<class vtkPolyDataNormals> vtkPolyDataNormalsPtr;
 
 namespace cx
 {
@@ -75,7 +54,6 @@ itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
   {
     // convert
     // May need to use vtkImageShiftScale instead if we got data types other than unsigned char?
-    typedef vtkSmartPointer<class vtkImageCast> vtkImageCastPtr;
     vtkImageCastPtr imageCast = vtkImageCastPtr::New();
     imageCast->SetInput(input);
     imageCast->SetOutputScalarTypeToUnsignedShort();
