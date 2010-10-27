@@ -6,12 +6,9 @@
 #include <QObject>
 #include <QDateTime>
 #include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
 #include "sscImage.h"
 #include "sscRegistrationTransform.h"
-
-typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
-typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
-typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
 
 namespace cx
 {
