@@ -27,7 +27,7 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mSurfaceOutput = SelectMeshStringDataAdapter::New();
   mSurfaceOutput->setValueName("Output: ");
   //TODO connect to view!
-  //connect(surfaceOutput.get(), SIGNAL(meshChanged(QString)), this, SLOT(imageChanged(QString)));
+  //connect(surfaceOutput.get(), SIGNAL(meshChanged(QString)), this, SLOT(meshChanged(QString)));
 
   mCenterlineOutput = SelectImageStringDataAdapter::New();
   mCenterlineOutput->setValueName("Output: ");
