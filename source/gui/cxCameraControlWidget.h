@@ -14,10 +14,7 @@
 #include "sscVector3D.h"
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
-#include "vtkSmartPointer.h"
-
-typedef vtkSmartPointer<class vtkCamera> vtkCameraPtr;
-
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {

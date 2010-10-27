@@ -34,10 +34,7 @@
 #include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
 #include "cxRenderTimer.h"
-
-typedef vtkSmartPointer<vtkInteractorStyleFlight> vtkInteractorStyleFlightPtr;
-typedef vtkSmartPointer<vtkInteractorStyleTrackballCamera> vtkInteractorStyleTrackballCameraPtr;
-typedef vtkSmartPointer<vtkInteractorStyleUnicam> vtkInteractorStyleUnicamPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
