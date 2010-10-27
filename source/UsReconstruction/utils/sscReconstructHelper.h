@@ -1,24 +1,21 @@
-/*
- *  sscReconstructHelper.h
- *
- *  Created by Ole Vegard Solberg on 23/6/10.
- *
- */
-
 #ifndef SSCRECONSTRUCTHELPER_H_
 #define SSCRECONSTRUCTHELPER_H_
 
 #include <vector>
 #include "sscTransform3D.h"
 #include "sscReconstructAlgorithm.h"
-
-typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
-typedef vtkSmartPointer<class vtkUnsignedCharArray> vtkUnsignedCharArrayPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
-/** This struct contains three points that defines a plane and
+/**
+ *  \class Planes
+ *
+ *\brief This struct contains three points that defines a plane and
  * the elements of the plane equation: n*r+d = 0
+ *
+ *  \author Ole Vegard Solberg
+ *  \date 23/6/10
  */
 struct Planes
 {
