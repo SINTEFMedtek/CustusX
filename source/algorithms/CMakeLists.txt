@@ -10,6 +10,9 @@ SET ( ${LIB}_algorithms
     ItkVtkGlue/itkVTKImageToImageFilter.txx 
     cxSegmentation.h
     cxSegmentation.cpp
+    vesselReg/SeansVesselReg.cxx
+    vesselReg/SeansVesselReg.hxx
+    vesselReg/HackTPSTransform.hxx
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

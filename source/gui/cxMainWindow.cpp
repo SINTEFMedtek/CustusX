@@ -141,7 +141,7 @@ MainWindow::MainWindow() :
   // Must be done after all DockWidgets are created
   if (!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
     this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
-  restoreState(mSettings->value("mainWindow/windowState").toByteArray());
+  //restoreState(mSettings->value("mainWindow/windowState").toByteArray());
 
   // Don't show the Widget before all elements are initialized
   this->show();
@@ -335,6 +335,8 @@ void MainWindow::newPatientSlot()
   choosenDir = QFileDialog::getSaveFileName(this, tr("Select directory to save patient in"), choosenDir);
   if (choosenDir == QString::null)
     return; // On cancel
+  if(!choosenDir.endsWith(".cx3"))
+    choosenDir += QString(".cx3");
 
   // Update global patient number
   int patientNumber = mSettings->value("globalPatientNumber").toInt();
@@ -388,7 +390,8 @@ void MainWindow::onWorkflowStateChangedSlot()
 
   for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
   {
-    this->removeDockWidget(*iter);
+    (*iter)->hide();
+   // this->removeDockWidget(*iter); // wrong: removed the dockwidget altogether
   }
 
   this->restoreState(desktop.mMainWindowState);
@@ -450,12 +453,7 @@ void MainWindow::importDataSlot()
     return;
   }
 
-  ssc::DataPtr data = stateManager()->getPatientData()->importData(fileName);
-
-  if (!data)
-    return;
-
-  ImportDataWizard* wizard = new ImportDataWizard(data, this);
+  ImportDataWizard* wizard = new ImportDataWizard(fileName, this);
   wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction
                   //with the system
 }
