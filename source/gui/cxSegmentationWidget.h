@@ -53,7 +53,6 @@ private:
   SegmentationWidget();
   QWidget* createSegmentationOptionsWidget();
 
-  //ssc::ImagePtr mImage;
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
   int mSegmentationThreshold; ///< the threshold value used when segmenting
