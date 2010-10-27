@@ -204,7 +204,7 @@ void PerformanceTab::init()
   bool ok = true;
   double maxRenderSize = mSettings->value("maxRenderSize").toDouble(&ok);
   if (!ok)
-    maxRenderSize = 20 * Mb;
+    maxRenderSize = 10 * Mb;
   mMaxRenderSize = ssc::DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, ssc::DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
   mMaxRenderSize->setInternal2Display(1.0/Mb);
 
