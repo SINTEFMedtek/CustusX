@@ -42,6 +42,7 @@ private:
 private slots:
   void boxValuesChanged();
   void cropperChangedSlot();
+  ssc::ImagePtr cropClipButtonClickedSlot();///< Crete a new image based on the images crop and clip values
 };
 
 }//namespace cx
