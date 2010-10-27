@@ -2,29 +2,9 @@
 #define SeansVesselSegmentation_hxx
 
 #include "sscForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
 #include "vtkSmartPointer.h"
-
-typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
-typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-typedef vtkSmartPointer<class vtkGeneralTransform> vtkGeneralTransformPtr;
-typedef vtkSmartPointer<class vtkCellLocator> vtkCellLocatorPtr;
-typedef vtkSmartPointer<class vtkMaskPoints> vtkMaskPointsPtr;
-typedef vtkSmartPointer<class vtkThinPlateSplineTransform> vtkThinPlateSplineTransformPtr;
-//typedef vtkSmartPointer<class HackTPSTransform> HackTPSTransformPtr;
-typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
-typedef vtkSmartPointer<class vtkIdList> vtkIdListPtr;
-typedef vtkSmartPointer<class vtkSortDataArray> vtkSortDataArrayPtr;
-typedef vtkSmartPointer<class vtkFloatArray> vtkFloatArrayPtr;
-typedef vtkSmartPointer<class vtkDataArray> vtkDataArrayPtr;
-typedef vtkSmartPointer<class vtkCellArray> vtkCellArrayPtr;
-typedef vtkSmartPointer<class vtkMINCImageReader> vtkMINCImageReaderPtr;
-typedef vtkSmartPointer<class vtkAbstractTransform> vtkAbstractTransformPtr;
-
-class vtkCellArray;
-class vtkPoints;
-class vtkAbstractTransform;
 
 namespace cx
 {
