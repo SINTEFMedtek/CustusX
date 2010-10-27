@@ -6,25 +6,20 @@
 #include <QVBoxLayout>
 
 #include "cxDataInterface.h"
-#include  "cxVolumePropertiesWidget.h"
+#include "sscLabeledComboBoxWidget.h"
 
 namespace cx
 {
-
-
 ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
     QWidget(parent)
 {
   this->setObjectName("ImagePropertiesWidget");
   this->setWindowTitle("Slice Properties");
 
-  //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-  //toptopLayout->setMargin(0);
 
-//  mImageNameLabel = new QLabel(this);
-//  toptopLayout->addWidget(mImageNameLabel);
-  toptopLayout->addWidget(new ActiveVolumeWidget(this));
+  SelectMeshStringDataAdapterPtr mSurfaceOutput = SelectMeshStringDataAdapter::New();
+  toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSurfaceOutput));
 
   QVBoxLayout* winlvlLayout = new QVBoxLayout;
   toptopLayout->addLayout(winlvlLayout);
@@ -34,29 +29,15 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
   toptopLayout->addWidget(group2D);
 
   QGridLayout* gridLayout = new QGridLayout(group2D);
-  //toptopLayout->addLayout(gridLayout);
 
   mLevelWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DLevel), gridLayout, 0);
   mWindowWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DWindow), gridLayout, 1);
 
   toptopLayout->addStretch();
-
-  //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(updateSlot()));
-  //updateSlot();
 }
 
 ImagePropertiesWidget::~ImagePropertiesWidget()
-{
-}
-
-//void ImagePropertiesWidget::updateSlot()
-//{
-//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-//  if (image)
-//  {
-//    mImageNameLabel->setText(qstring_cast(image->getName()));
-//  }
-//}
+{}
 
 void ImagePropertiesWidget::showEvent(QShowEvent* event)
 {
