@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QCheckBox>
 
+#include "sscImageTF3D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscMesh.h"
@@ -118,6 +119,17 @@ void SegmentationWidget::toogleBinarySlot(bool on)
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
+
+  ssc::ImagePtr image = mSelectedImage->getImage();
+  if(!image)
+    return;
+
+  image->resetTransferFunctions();
+  ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+  tf3D->addAlphaPoint(value , 0);
+  tf3D->addAlphaPoint(value+1, image->getMaxAlphaValue());
+  tf3D->addColorPoint(value, Qt::green);
+  tf3D->addColorPoint(image->getMax(), Qt::green);
 }
 
 void SegmentationWidget::toogleSmoothingSlot(bool on)
