@@ -343,7 +343,7 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPolyDataPtr tps
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-void SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
+bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
 {
   ssc::messageManager()->sendDebug("SOURCE: "+source->getUid());
   ssc::messageManager()->sendDebug("TARGET: "+target->getUid());
@@ -380,7 +380,7 @@ void SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
   if (!sourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())
   {
     std::cerr << "Can't execute with empty source or target data" << std::endl;
-    return;
+    return false;
   }
 
   vtkIdType numPoints = sourcePolyData->GetNumberOfPoints();
@@ -404,6 +404,8 @@ void SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
   std::cout << "\n\n\nExecution time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " " << "seconds" << endl;
 
   mLinearTransformResult = this->getLinearTransform(myConcatenation);
+
+  return true;
 }
 
 ssc::Transform3D SeansVesselReg::getLinearTransform()

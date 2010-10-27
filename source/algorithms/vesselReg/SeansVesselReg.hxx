@@ -24,7 +24,7 @@ public:
   SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose);
   ~SeansVesselReg();
 
-  void doItRight(ssc::ImagePtr source, ssc::ImagePtr target);
+  bool doItRight(ssc::ImagePtr source, ssc::ImagePtr target);
   ssc::Transform3D getLinearTransform();
 //  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
