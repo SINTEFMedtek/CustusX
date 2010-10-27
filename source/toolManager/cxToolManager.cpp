@@ -88,7 +88,7 @@ void ToolManager::initializeManualTool()
 
 void ToolManager::configureReferences()
 {
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     ssc::ToolPtr tool = (*iter).second;
@@ -318,7 +318,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 
 ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
-  ToolMapConstIter it = mInitializedTools->find(uid);
+  ToolMapIter it = mInitializedTools->find(uid);
   if (it != mInitializedTools->end())
   {
     return ((*it).second);
@@ -349,12 +349,12 @@ void ToolManager::setDominantTool(const QString& uid)
 
   ssc::ToolPtr newTool;
 
-  ToolMapConstIter iter = mConfiguredTools->find(uid);
+  ToolMapIter iter = mConfiguredTools->find(uid);
   if (iter != mConfiguredTools->end())
   {
     newTool = iter->second;
   }
-  ToolMapConstIter it = mInitializedTools->find(uid);
+  ToolMapIter it = mInitializedTools->find(uid);
   if (it != mInitializedTools->end())
   {
     newTool = it->second;
@@ -380,13 +380,13 @@ std::map<QString, QString> ToolManager::getToolUidsAndNames() const
 {
   std::map<QString, QString> uidsAndNames;
 
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     uidsAndNames[((*it).second)->getUid()] = ((*it).second)->getName();
     it++;
   }
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     uidsAndNames[((*iter).second)->getUid()] = ((*iter).second)->getName();
@@ -398,13 +398,13 @@ std::map<QString, QString> ToolManager::getToolUidsAndNames() const
 std::vector<QString> ToolManager::getToolNames() const
 {
   std::vector<QString> names;
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     names.push_back(((*it).second)->getName());
     it++;
   }
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     names.push_back(((*iter).second)->getName());
@@ -416,13 +416,13 @@ std::vector<QString> ToolManager::getToolNames() const
 std::vector<QString> ToolManager::getToolUids() const
 {
   std::vector<QString> uids;
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     uids.push_back(((*it).second)->getUid());
     it++;
   }
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     uids.push_back(((*iter).second)->getUid());
@@ -449,7 +449,7 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
 
 void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 {
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     ((*it).second)->saveTransformsAndTimestamps();
