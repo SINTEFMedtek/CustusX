@@ -113,7 +113,7 @@ void SegmentationWidget::segmentSlot()
 void SegmentationWidget::toogleBinarySlot(bool on)
 {
   mBinary = on;
-  ssc::messageManager()->sendWarning("The binary checkbox is not connected to anything yet.");
+  ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
 }
 
 void SegmentationWidget::thresholdSlot(int value)

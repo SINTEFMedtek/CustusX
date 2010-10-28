@@ -1,9 +1,3 @@
-/*
- * cxToolWidget.cpp
- *
- *  Created on: Apr 22, 2010
- *      Author: christiana
- */
 
 #include "cxPointSamplingWidget.h"
 
@@ -27,7 +21,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this))
 {
   this->setObjectName("PointSamplingWidget");
-  this->setWindowTitle("PointSampling");
+  this->setWindowTitle("Point sampler/3D ruler");
 
   //table widget
   connect(mTable, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChanged()));
