@@ -5,7 +5,7 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>reference</type>
+  <type>pointer</type>
   <id>05-080-0214_Small-Custom-Navigator</id>
   <name>05-080-0214_Small-Custom-Navigator</name>
   <description>05-080-0214_Small-Custom-Navigator</description>
