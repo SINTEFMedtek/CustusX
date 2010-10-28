@@ -5,7 +5,7 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>reference</type>
+  <type>usprobe</type>
   <id>03_1179E1003_US-Probe-10FPA-MC</id>
   <name>US-Probe-10FPA-MC</name>
   <description>03_1179E1003_US-Probe-10FPA-MC</description>
@@ -40,7 +40,7 @@
 
   <!-- Calibration -->
   <calibration>
-    <cal_file>03_1179E1003_US-Probe-10FPA-MC</cal_file>
+    <cal_file>03_1179E1003_US-Probe-10FPA-MC.cal</cal_file>
     <date>
       <yyyy>2010</yyyy>
       <mm>10</mm>
