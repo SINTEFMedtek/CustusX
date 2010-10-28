@@ -24,7 +24,7 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "sscSlicePlanes3DRep.h"
 #include "cxLandmarkRep.h"
 #include "cxRepManager.h"
@@ -158,9 +158,15 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showAxesAction->setChecked(mShowAxes);
   connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
 
+  QAction* showManualTool = new QAction("Show Manual Tool", &contextMenu);
+  showManualTool->setCheckable(true);
+  showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
+  connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
+
   contextMenu.addSeparator();
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(showAxesAction);
+  contextMenu.addAction(showManualTool);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
@@ -168,9 +174,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 {
-	ViewWrapper::setViewGroup(group);
-//	std::cout << "ViewWrapper3D::setViewGroup:\n " << streamXml2String(*mViewGroup->getCamera3D()) << std::endl;
-	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
+  ViewWrapper::setViewGroup(group);
+
+  connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
   mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
 }
 
@@ -215,6 +221,11 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 		mToolAxis.clear();
 	}
+}
+
+void ViewWrapper3D::showManualToolSlot(bool visible)
+{
+  ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::resetCameraActionSlot()
