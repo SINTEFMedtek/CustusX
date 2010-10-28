@@ -15,7 +15,6 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 	mOffset = 0;
 	mType = TOOL_MANUAL;
 	mVisible = false;
-	//mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);
 	read3DCrossHair();
 }
 
@@ -32,7 +31,6 @@ void ManualTool::read3DCrossHair()
 	  mCrossHair->AxesOn();
 	}
 	int s = 60;
-	//mCrossHair->SetModelBounds(-120,140,-120,140,-120,140);
 	mCrossHair->SetModelBounds(-s,s,-s,s,-s,s+mOffset);
   mCrossHair->SetFocalPoint(0,0,mOffset);
 }
@@ -43,7 +41,6 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 {
 	QDateTime time;
 	double timestamp = (double) time.time().msec();
-//  std::cout << "manual tool set " << prMt << std::endl;
 
 	QMutexLocker locker(&mMutex);
 	m_prMt = prMt;
@@ -64,7 +61,6 @@ ssc::Tool::Type ManualTool::getType() const
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 {
-	//return mPolyData;
 	return mCrossHair->GetOutput();
 }
 
@@ -102,7 +98,6 @@ void ManualTool::setVisible(bool vis)
 	  return;
 	mVisible = vis;
 	emit toolVisible(mVisible);
-	//std::cout << "ManualTool::setVisible( " << vis << " )" << std::endl;
 }
 
 void ManualTool::setType(const Type& type)
