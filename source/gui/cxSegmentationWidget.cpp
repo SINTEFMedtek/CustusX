@@ -67,12 +67,8 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
 
   this->adjustSizeSlot();
-
-  this->toogleBinarySlot(mBinary);
-  this->thresholdSlot(mSegmentationThreshold);
-  this->toogleSmoothingSlot(mUseSmothing);
-  this->smoothingSigmaSlot(mSmoothSigma);
 }
+
 SegmentationWidget::~SegmentationWidget()
 {
 }
@@ -119,6 +115,7 @@ void SegmentationWidget::toogleBinarySlot(bool on)
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
+  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
 
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
@@ -138,11 +135,14 @@ void SegmentationWidget::toogleSmoothingSlot(bool on)
 
   mSmoothingSigmaSpinBox->setEnabled(on);
   mSmoothingSigmaLabel->setEnabled(on);
+
+  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
 }
 
 void SegmentationWidget::smoothingSigmaSlot(double value)
 {
   mSmoothSigma = value;
+  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
 }
 
 void SegmentationWidget::imageChangedSlot(QString uid)
@@ -151,7 +151,6 @@ void SegmentationWidget::imageChangedSlot(QString uid)
   if(!image)
     return;
   mSegmentationThresholdSpinBox->setRange(image->getMin(), image->getMax());
-  //ssc::messageManager()->sendDebug("Segmentation threshold range set to ["+qstring_cast(image->getMin())+","+qstring_cast(image->getMax())+"]");
 
   QString imageName = image->getName();
   if(imageName.contains("us", Qt::CaseInsensitive)) //assume the image is ultrasound
@@ -197,6 +196,11 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
   layout->addWidget(smoothingLabel,                     2, 1);
   layout->addWidget(mSmoothingSigmaSpinBox,             3, 0);
   layout->addWidget(mSmoothingSigmaLabel,               3, 1);
+
+  this->toogleBinarySlot(mBinary);
+  this->thresholdSlot(mSegmentationThreshold);
+  this->toogleSmoothingSlot(mUseSmothing);
+  this->smoothingSigmaSlot(mSmoothSigma);
 
   return retval;
 }

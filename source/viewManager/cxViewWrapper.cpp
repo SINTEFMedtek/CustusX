@@ -142,8 +142,6 @@ void ViewWrapper::dataRemovedSlot(QString uid)
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
-  //  std::cout << "contextMenuSlot start" << std::endl;
-
   QWidget* sender = dynamic_cast<QWidget*>(this->sender());
   QPoint pointGlobal = sender->mapToGlobal(point);
   QMenu contextMenu(sender);
