@@ -73,6 +73,8 @@ void Image::resetTransferFunctions()
           this, SIGNAL(transferFunctionsChanged()));
   connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
 					this, SIGNAL(transferFunctionsChanged()));
+
+  emit transferFunctionsChanged();
 }
   
 //void Image::set_rMd(Transform3D rMd)
@@ -136,6 +138,11 @@ vtkImageDataPtr Image::getGrayScaleBaseVtkImageData()
 ImageTF3DPtr Image::getTransferFunctions3D()
 {
 	return mImageTransferFunctions3D;
+}
+void Image::setTransferFunctions3D(ImageTF3DPtr transferFuntion)
+{
+  mImageTransferFunctions3D = transferFuntion;
+  emit transferFunctionsChanged();
 }
 ImageLUT2DPtr Image::getLookupTable2D()
 {

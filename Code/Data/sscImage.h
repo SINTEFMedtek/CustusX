@@ -49,6 +49,7 @@ public:
 	virtual LandmarkMap getLandmarks(); ///< \return all landmarks defined on the image.
 
 	ImageTF3DPtr getTransferFunctions3D();
+	void setTransferFunctions3D(ImageTF3DPtr transferFuntion);
 	ImageLUT2DPtr getLookupTable2D();
 
 	void printLandmarks(); //TODO: JUST FOR TESTING
