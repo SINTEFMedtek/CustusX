@@ -50,7 +50,7 @@ namespace cx
 
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
-  mToggleWidgetActionGroup(NULL),
+//  mToggleWidgetActionGroup(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
@@ -87,12 +87,6 @@ MainWindow::MainWindow() :
   this->populateSegmentationMethodsWidget();
   this->populateVisualizationMethodsWidget();
 
-  this->addAsDockWidget(mBrowserWidget);
-
-  this->addAsDockWidget(mImagePropertiesWidget);
-  this->addAsDockWidget(mVolumePropertiesWidget);
-  this->addAsDockWidget(mMeshPropertiesWidget);
-  this->addAsDockWidget(new CameraControlWidget(this));
 
   //Tried to add a separator. Don't work yet
   //QAction* separatorAction = new QAction(this);
@@ -105,17 +99,22 @@ MainWindow::MainWindow() :
   mShiftCorrectionWidget->init(testing);
   //---------
 
-  this->addAsDockWidget(mToolPropertiesWidget);
-  this->addAsDockWidget(mPointSamplingWidget);
-  this->addAsDockWidget(mReconstructionWidget);
-  this->addAsDockWidget(mRegistrationHistoryWidget);
+  this->addAsDockWidget(mBrowserWidget, "Browsing");
+  this->addAsDockWidget(mImagePropertiesWidget, "Properties");
+  this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
+  this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
+  this->addAsDockWidget(new CameraControlWidget(this), "Utility");
+  this->addAsDockWidget(mToolPropertiesWidget, "Properties");
+  this->addAsDockWidget(mPointSamplingWidget, "Utility");
+  this->addAsDockWidget(mReconstructionWidget, "Algorithms");
+  this->addAsDockWidget(mRegistrationHistoryWidget, "Browsing");
   this->addAsDockWidget(mShiftCorrectionWidget);
-  this->addAsDockWidget(mRegsitrationMethodsWidget);
-  this->addAsDockWidget(mSegmentationMethodsWidget);
-  this->addAsDockWidget(mVisualizationMethodsWidget);
-  this->addAsDockWidget(mNavigationWidget);
-  this->addAsDockWidget(mConsoleWidget);
-  this->addAsDockWidget(mFrameTreeWidget);
+  this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
+  this->addAsDockWidget(mSegmentationMethodsWidget, "Algorithms");
+  this->addAsDockWidget(mVisualizationMethodsWidget, "Algorithms");
+  this->addAsDockWidget(mNavigationWidget, "Properties");
+  this->addAsDockWidget(mConsoleWidget, "Utility");
+  this->addAsDockWidget(mFrameTreeWidget, "Browsing");
 
   this->createActions();
   this->createToolBars();
@@ -147,14 +146,8 @@ MainWindow::MainWindow() :
   this->show();
 }
 
-void MainWindow::addAsDockWidget(QWidget* widget)
+void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
-  if (!mToggleWidgetActionGroup)
-  {
-    mToggleWidgetActionGroup = new QActionGroup(this);
-    mToggleWidgetActionGroup->setExclusive(false);
-  }
-
   QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
   dockWidget->setObjectName(widget->objectName() + "DockWidget");
   dockWidget->setWidget(widget);
@@ -162,7 +155,24 @@ void MainWindow::addAsDockWidget(QWidget* widget)
   mDockWidgets.insert(dockWidget);
   dockWidget->setVisible(false); // default visibility
 
-  mToggleWidgetActionGroup->addAction(dockWidget->toggleViewAction());
+  this->addToWidgetGroupMap(dockWidget->toggleViewAction(), groupname);
+}
+
+void MainWindow::addToWidgetGroupMap(QAction* action, QString groupname)
+{
+if(mWidgetGroupsMap.find(groupname) != mWidgetGroupsMap.end())
+  {
+    mWidgetGroupsMap[groupname]->addAction(action);
+  }else
+  {
+    QActionGroup* group = new QActionGroup(this);
+    group->setExclusive(false);
+    mWidgetGroupsMap[groupname] = group;
+    QAction* heading = new QAction(groupname, this);
+    heading->setDisabled(true);
+    mWidgetGroupsMap[groupname]->addAction(heading);
+    mWidgetGroupsMap[groupname]->addAction(action);
+  }
 }
 
 MainWindow::~MainWindow()
@@ -186,6 +196,20 @@ void MainWindow::shutdown()
   RepManager::destroyInstance();
   cx::ToolManager::shutdown();
   cx::DataManager::shutdown();
+}
+
+QMenu* MainWindow::createPopupMenu()
+{
+  QMenu* popupMenu = new QMenu(0);
+  std::map<QString, QActionGroup*>::iterator it = mWidgetGroupsMap.begin();
+  for(; it!= mWidgetGroupsMap.end(); ++it)
+  {
+//    it->first; //make some kind of header
+    popupMenu->addSeparator();
+    popupMenu->addActions(it->second->actions());
+  }
+
+  return popupMenu;
 }
 
 void MainWindow::createActions()
@@ -576,7 +600,7 @@ void MainWindow::createMenus()
   mFileMenu->addSeparator();
   mFileMenu->addAction(mShowControlPanelAction);
 
-  // View
+  // window
   QMenu* popupMenu = this->createPopupMenu();
   popupMenu->setTitle("Window");
   this->menuBar()->addMenu(popupMenu);
@@ -616,10 +640,12 @@ void MainWindow::createToolBars()
   mDataToolBar = addToolBar("Data");
   mDataToolBar->setObjectName("DataToolBar");
   mDataToolBar->addAction(mImportDataAction);
+  this->registerToolBar(mDataToolBar, "Toolbar");
 
   mToolToolBar = addToolBar("Tools");
   mToolToolBar->setObjectName("ToolToolBar");
   mToolToolBar->addAction(mTrackingToolsAction);
+  this->registerToolBar(mToolToolBar, "Toolbar");
 
   mNavigationToolBar = addToolBar("Navigation");
   mNavigationToolBar->setObjectName("NavigationToolBar");
@@ -627,25 +653,36 @@ void MainWindow::createToolBars()
   mNavigationToolBar->addAction(mCenterToTooltipAction);
   mNavigationToolBar->addSeparator();
   mNavigationToolBar->addActions(mInteractorStyleActionGroup->actions());
+  this->registerToolBar(mNavigationToolBar, "Toolbar");
 
   mWorkflowToolBar = addToolBar("Workflow");
   mWorkflowToolBar->setObjectName("WorkflowToolBar");
   stateManager()->getWorkflow()->fillToolBar(mWorkflowToolBar);
+  this->registerToolBar(mWorkflowToolBar, "Toolbar");
 
   mDesktopToolBar = addToolBar("Desktop");
   mDesktopToolBar->setObjectName("DesktopToolBar");
   mDesktopToolBar->addAction(mSaveDesktopAction);
   mDesktopToolBar->addAction(mResetDesktopAction);
+  this->registerToolBar(mDesktopToolBar, "Toolbar");
 
   mHelpToolBar = addToolBar("Help");
   mHelpToolBar->setObjectName("HelpToolBar");
   mHelpToolBar->addAction(QWhatsThis::createAction());
+  this->registerToolBar(mHelpToolBar, "Toolbar");
 
    QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
+   this->registerToolBar(mToolToolBar, "Toolbar");
 }
+
+void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
+{
+  this->addToWidgetGroupMap(toolbar->toggleViewAction(), groupname);
+}
+
 void MainWindow::createStatusBar()
 {
   this->setStatusBar(mCustomStatusBar);
