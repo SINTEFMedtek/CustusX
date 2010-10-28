@@ -13,12 +13,7 @@
 #include <vtkSmartPointer.h>
 #include "sscBoundingBox3D.h"
 #include "sscForwardDeclarations.h"
-
-typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
-typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
-typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
-typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {

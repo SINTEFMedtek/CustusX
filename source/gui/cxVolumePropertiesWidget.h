@@ -1,10 +1,3 @@
-/*
- * cxVolumePropertiesWidget.h
- *
- *  Created on: Aug 20, 2010
- *      Author: christiana
- */
-
 #ifndef CXVOLUMEPROPERTIESWIDGET_H_
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
@@ -13,9 +6,11 @@
 
 namespace cx
 {
-
-
-/** Widget that contains a select active image combo box.
+/**
+ * \class ActiveVolumeWidget
+ * \brief Widget that contains a select active image combo box.
+ * \date Aug 20, 2010
+ * \author christiana
  */
 class ActiveVolumeWidget : public QWidget
 {
@@ -25,9 +20,11 @@ public:
   ~ActiveVolumeWidget() {}
 };
 
-
-/** Widget for displaying and manipulating various 3D Volume properties.
- *
+/**
+ * \class VolumePropertiesWidget
+ * \brief Widget for displaying and manipulating various 3D Volume properties.
+ * \date Aug 20, 2010
+ * \author christiana
  */
 class VolumePropertiesWidget : public QWidget
 {

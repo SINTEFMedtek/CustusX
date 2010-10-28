@@ -53,7 +53,6 @@ private:
   SegmentationWidget();
   QWidget* createSegmentationOptionsWidget();
 
-  //ssc::ImagePtr mImage;
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
   int mSegmentationThreshold; ///< the threshold value used when segmenting
@@ -168,15 +167,17 @@ public slots:
   void fixedImageSlot(QString uid);
   void movingImageSlot(QString uid);
 
+private slots:
+  void testSlot();
+  void registerSlot();
+
 private:
   RegisterI2IWidget();
 
   QPushButton* mRegisterButton;
+  QPushButton* mTestButton;
   QLabel* mFixedImageLabel;
   QLabel* mMovingImageLabel;
-
-  ssc::ImagePtr mFixedImage;
-  ssc::ImagePtr mMovingImage;
 };
 
 }//namespace cx

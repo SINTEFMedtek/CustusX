@@ -7,10 +7,8 @@
 
 namespace cx
 {
-
 /**
  * \class ImagePropertiesWidget
- *
  *
  * \date 2010.04.12
  * \author: Christian Askeland, SINTEF
@@ -23,11 +21,6 @@ public:
   ImagePropertiesWidget(QWidget* parent);
   virtual ~ImagePropertiesWidget();
 
-signals:
-
-//protected slots:
-//  void updateSlot();
-
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
@@ -37,7 +30,6 @@ private:
 
   ssc::SliderGroupWidget* mLevelWidget;
   ssc::SliderGroupWidget* mWindowWidget;
-//  QLabel* mImageNameLabel;
 };
 
 }//end namespace cx

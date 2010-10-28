@@ -29,9 +29,12 @@ int main(int argc, char **argv)
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 #else
-	runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
+//	runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
+//                                       "init",
+//                                        &cxTestSpeed::testKaisaSpeed ) );
+  runner.addTest( new CppUnit::TestCaller<cxTestSpeed>(
                                        "init",
-                                        &cxTestSpeed::testInitialize ) );
+                                        &cxTestSpeed::testLapSpeed ) );
 	//runner.addTest(cxTestExamples::suite());
 #endif
 	

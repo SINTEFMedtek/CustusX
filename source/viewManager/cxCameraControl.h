@@ -12,14 +12,11 @@
 #include "sscVector3D.h"
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
-#include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
 
 class QActionGroup;
 class QAction;
 class QDomNode;
-typedef vtkSmartPointer<class vtkCamera> vtkCameraPtr;
-typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
-
 
 namespace cx
 {
