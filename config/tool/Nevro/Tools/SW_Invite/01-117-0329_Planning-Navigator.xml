@@ -5,7 +5,7 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>reference</type>
+  <type>Pointer</type>
   <id>01-117-0329_Planning-Navigator</id>
   <name>Planning-Navigator</name>
   <description>Planning-Navigator</description>

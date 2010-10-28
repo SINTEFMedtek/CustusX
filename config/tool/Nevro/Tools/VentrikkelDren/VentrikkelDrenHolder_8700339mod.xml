@@ -5,11 +5,11 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>usprobe</type>
-  <id>03_941D1018_US-Probe-8FPA</id>
-  <name>US-Probe-8FPA</name>
-  <description>03_941D1018_US-Probe-8FPA</description>
-  <manufacturer>Sonowand</manufacturer>
+  <type>Pointer</type>
+  <id>VentrikkelDrenHolder_8700339mod</id>
+  <name>VentrikkelDrenHolder</name>
+  <description>VentrikkelDrenHolder</description>
+  <manufacturer>SINTEF</manufacturer>
   <clinical_app>Nevro</clinical_app>
   <geo_file></geo_file>
   <pic_file></pic_file>
@@ -17,30 +17,30 @@
 
   <!-- Instrument -->
   <instrument>
-    <type>USProbe</type>
-    <id>US-Probe-8FPA</id>
-    <name>US-Probe-8FPA</name>
-    <manufacturer>Sonowand</manufacturer>
-    <description>US-Probe-8FPA</description>
+    <type>Pointer</type>
+    <id>VentrikkelDrenHolder</id>
+    <name>VentrikkelDrenHolder</name>
+    <manufacturer>SINTEF</manufacturer>
+    <description>VentrikkelDrenHolder</description>
   </instrument>
 
   <!-- Sensor -->
   <sensor>
     <type>Polaris</type>
-    <id>03_941D1018</id>
-    <name>03_941D1018</name>
+    <id>8700339mod</id>
+    <name>8700339mod</name>
     <wireless>yes</wireless>
     <DOF></DOF>
     <portnumber></portnumber>
     <channelnumber></channelnumber>
-    <manufacturer>Sonowand</manufacturer>
-    <description>03_941D1018</description>
-    <rom_file>03_941D1018_US-Probe-8FPA.rom</rom_file>
+    <manufacturer>SINTEF</manufacturer>
+    <description>8700339mod</description>
+    <rom_file>VentrikkelDrenHolder_8700339mod.rom</rom_file>
   </sensor>
 
   <!-- Calibration -->
   <calibration>
-    <cal_file>03_941D1018_US-Probe-8FPA.cal</cal_file>
+    <cal_file>VentrikkelDrenHolder_8700339mod.cal</cal_file>
     <date>
       <yyyy>2010</yyyy>
       <mm>10</mm>
