@@ -62,6 +62,8 @@ void IGTLinkWidget::launchServer()
 
 void IGTLinkWidget::toggleConnect()
 {
+  std::cout << "toggleconnect " << mClient  << std::endl;
+
   if (mClient)
   {
     this->disconnectServer();
@@ -89,7 +91,8 @@ void IGTLinkWidget::disconnectServer()
   std::cout << "disconnect server" << std::endl;
   if (mClient)
   {
-    mClient->terminate();
+    mClient->stop();
+    mClient->quit();
     mClient->wait(); // forever or until dead thread
 
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
