@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QCheckBox>
 
+#include "sscImageTF3D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscMesh.h"
@@ -19,7 +20,11 @@
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
+#include "cxDataLocations.h"
 #include "sscLabeledComboBoxWidget.h"
+
+//Testing
+#include "vesselReg/SeansVesselReg.hxx"
 
 namespace cx
 {
@@ -62,6 +67,11 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
 
   this->adjustSizeSlot();
+
+  this->toogleBinarySlot(mBinary);
+  this->thresholdSlot(mSegmentationThreshold);
+  this->toogleSmoothingSlot(mUseSmothing);
+  this->smoothingSigmaSlot(mSmoothSigma);
 }
 SegmentationWidget::~SegmentationWidget()
 {
@@ -109,6 +119,17 @@ void SegmentationWidget::toogleBinarySlot(bool on)
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
+
+  ssc::ImagePtr image = mSelectedImage->getImage();
+  if(!image)
+    return;
+
+  image->resetTransferFunctions();
+  ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+  tf3D->addAlphaPoint(value , 0);
+  tf3D->addAlphaPoint(value+1, image->getMaxAlphaValue());
+  tf3D->addColorPoint(value, Qt::green);
+  tf3D->addColorPoint(image->getMax(), Qt::green);
 }
 
 void SegmentationWidget::toogleSmoothingSlot(bool on)
@@ -218,6 +239,11 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   topLayout->addWidget(surfaceButton, 1,0);
   topLayout->addWidget(surfaceOptionsButton,1,1);
   topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
+
+  this->thresholdSlot(mSurfaceThreshold);
+  this->decimationSlot(mDecimation);
+  this->reduceResolutionSlot(mReduceResolution);
+  this->smoothingSlot(mSmoothing);
 }
 
 SurfaceWidget::~SurfaceWidget()
@@ -272,7 +298,6 @@ void SurfaceWidget::imageChangedSlot(QString uid)
   if(!image)
     return;
   mSurfaceThresholdSpinBox->setRange(image->getMin(), image->getMax());
-  //ssc::messageManager()->sendDebug("Surface threshold range set to ["+qstring_cast(image->getMin())+","+qstring_cast(image->getMax())+"]");
 }
 
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
@@ -334,8 +359,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 }
 
 CenterlineWidget::~CenterlineWidget()
-{
-}
+{}
 
 QString CenterlineWidget::defaultWhatsThis() const
 {
@@ -374,11 +398,14 @@ void CenterlineWidget::findCenterlineSlot()
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mRegisterButton(new QPushButton("Register")),
+    mTestButton(new QPushButton("TEST, loads two minc images into the system.")),
     mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
     mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
+
+  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
@@ -389,6 +416,11 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
   layout->addWidget(mRegisterButton, 2, 0);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
+
+  //TESTING
+  layout->addWidget(this->createHorizontalLine(), 5, 0);
+  layout->addWidget(mTestButton, 6, 0);
+  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()
@@ -404,20 +436,85 @@ QString RegisterI2IWidget::defaultWhatsThis() const
 
 void RegisterI2IWidget::fixedImageSlot(QString uid)
 {
-  mFixedImage = ssc::dataManager()->getImage(uid);
-  if(!mFixedImage)
+  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
+  if(!fixedImage)
     return;
-  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed image: <b>"+mFixedImage->getName()+"</b></font>"));
+  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed data: <b>"+fixedImage->getName()+"</b></font>"));
   mFixedImageLabel->update();
 }
 
 void RegisterI2IWidget::movingImageSlot(QString uid)
 {
-  mMovingImage = ssc::dataManager()->getImage(uid);
-  if(!mMovingImage)
+  ssc::DataPtr movingImage = registrationManager()->getMovingData();
+  if(!movingImage)
     return;
-  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving image: <b>"+mMovingImage->getName()+"</b></font>"));
+  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving data: <b>"+movingImage->getName()+"</b></font>"));
   mMovingImageLabel->update();
+}
+
+void RegisterI2IWidget::testSlot()
+{
+  if(!stateManager()->getPatientData()->isPatientValid())
+  {
+    ssc::messageManager()->sendWarning("Create a new patient before trying to import the minc data.");
+    return;
+  }
+
+  ssc::messageManager()->sendDebug("===============TESTING BUTTON START==============");
+
+  int lts_ratio = 80;
+  double stop_delta = 0.001;
+  double lambda = 0;
+  double sigma = 1.0;
+  bool lin_flag = 1;
+  int sample = 1;
+  int single_point_thre = 1;
+  bool verbose = 1;
+
+  SeansVesselReg* theThing = new SeansVesselReg(lts_ratio,
+        stop_delta,
+        lambda,
+        sigma,
+        lin_flag,
+        sample,
+        single_point_thre,
+        verbose);
+
+  QString sourcefile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_110555_USA_blur.mnc");
+  if(QFile::exists(sourcefile))
+    ssc::messageManager()->sendInfo(sourcefile+" exists");
+  else
+  {
+    QFile q_sourcefile(sourcefile);
+    QFileInfo info(q_sourcefile);
+    ssc::messageManager()->sendDebug(info.absoluteFilePath());
+  }
+
+  QString targetfile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_MRA_masked_like_110555USA.mnc");
+  if(QFile::exists(targetfile))
+    ssc::messageManager()->sendInfo(targetfile+" exsits");
+  else
+  {
+    QFile q_targetfile(targetfile);
+    QFileInfo info(q_targetfile);
+    ssc::messageManager()->sendDebug(info.absoluteFilePath());
+  }
+
+  //read minc files and add them to the datamanager
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  ssc::ImagePtr source = theThing->loadMinc(cstring_cast(QString(sourcefile)));
+  ssc::dataManager()->loadData(source);
+  ssc::dataManager()->saveImage(source, outputBasePath);
+  ssc::ImagePtr target = theThing->loadMinc(cstring_cast(QString(targetfile)));
+  ssc::dataManager()->loadData(target);
+  ssc::dataManager()->saveImage(target, outputBasePath);
+
+  ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
+}
+
+void RegisterI2IWidget::registerSlot()
+{
+  registrationManager()->doVesselRegistration();
 }
 
 //------------------------------------------------------------------------------

@@ -184,6 +184,7 @@ protected:
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   CameraControlPtr mCameraControl;
+  std::set<QDockWidget*> mDockWidgets;
 };
 }//namespace cx
 

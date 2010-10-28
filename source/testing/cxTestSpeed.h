@@ -14,13 +14,13 @@ public:
 	void setUp();
 	void tearDown();
 
-	void testInitialize();
-	void testMore();
+	void testKaisaSpeed();
+	void testLapSpeed();
 
 public:
 	CPPUNIT_TEST_SUITE( cxTestSpeed );
-		CPPUNIT_TEST( testInitialize );			
-		CPPUNIT_TEST( testMore );
+		CPPUNIT_TEST( testKaisaSpeed );
+		CPPUNIT_TEST( testLapSpeed );
 	CPPUNIT_TEST_SUITE_END();
 private:
 

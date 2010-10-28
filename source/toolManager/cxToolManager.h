@@ -9,13 +9,13 @@
 #include "cxTool.h"
 #include "cxTracker.h"
 #include "sscDummyTool.h"
+#include "vtkForwardDeclarations.h"
 
 class QDomNode;
 class QDomDocument;
 class QDomNodeList;
 class QTimer;
 class QFileInfo;
-typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
 
 namespace cx
 {
@@ -93,7 +93,7 @@ protected slots:
   void toolInitialized(bool);
 
 protected:
-  typedef ssc::ToolManager::ToolMap::const_iterator ToolMapConstIter;
+  typedef ssc::ToolManager::ToolMap::iterator ToolMapIter;
 
   ToolManager(); ///< use getInstance instead
   ~ToolManager(); ///< destructor

@@ -281,7 +281,7 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     bool ok = true;
     double maxRenderSize = DataLocations::getSettings()->value("maxRenderSize").toDouble(&ok);
     if (!ok)
-      maxRenderSize = 20 * pow(10,6);
+      maxRenderSize = 10 * pow(10,6);
 
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
