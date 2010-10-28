@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QCheckBox>
 
+#include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
@@ -395,6 +396,16 @@ void CenterlineWidget::findCenterlineSlot()
   ssc::ImagePtr centerlineImage = Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
   if(!centerlineImage)
     return;
+
+  //automatically generate a mesh from the centerline
+  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
+
+  QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
+  QString name = centerlineImage->getName() + " mesh %1";
+  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+  ssc::dataManager()->loadData(mesh);
+  ssc::dataManager()->saveMesh(mesh, outputBasePath);
+
   emit outputImageChanged(centerlineImage->getUid());
 }
 //------------------------------------------------------------------------------
@@ -512,6 +523,11 @@ void RegisterI2IWidget::testSlot()
   ssc::ImagePtr target = theThing->loadMinc(cstring_cast(QString(targetfile)));
   ssc::dataManager()->loadData(target);
   ssc::dataManager()->saveImage(target, outputBasePath);
+
+  vtkPolyDataPtr sourcePolyData = SeansVesselReg::extractPolyData(source, single_point_thre, 0);
+  ssc::MeshPtr mesh(new ssc::Mesh(source->getUid()+"_meshTEST", source->getName()+"_meshTEST", sourcePolyData));
+  ssc::dataManager()->loadData(mesh);
+  ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
   ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
 }
