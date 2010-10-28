@@ -163,7 +163,7 @@ void Navigation::centerManualTool(ssc::Vector3D& p_r)
   ssc::Transform3D prM1t = createTransformTranslate(p_pr-t_pr) * prM0t;
 
   manual->set_prMt(prM1t);
-  std::cout << "center manual tool" << std::endl;
+//  std::cout << "center manual tool" << std::endl;
 }
 //---------------------------------------------------------
 //---------------------------------------------------------

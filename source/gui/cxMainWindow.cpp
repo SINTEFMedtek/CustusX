@@ -695,8 +695,9 @@ void MainWindow::populateRegistrationMethodsWidget()
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
   FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
   MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
-  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed");
-  image2imageWidget->addTab(movingRegistrationWidget, "Moving");
+
+  image2imageWidget->addTab(movingRegistrationWidget, "US"); //should be application specific
+  image2imageWidget->addTab(fixedRegistrationWidget, "MR"); //should be application specific
   image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
 
   //manual offset
