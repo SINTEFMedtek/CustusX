@@ -321,7 +321,6 @@ void ShiftCorrectionWidget::segmentImage(QString imageName,
   view->addRep(surfaceRep);
   
   //Cone test
-  typedef vtkSmartPointer<vtkConeSource> vtkConeSourcePtr;
   vtkConeSourcePtr coneSource = vtkConeSource::New();
   coneSource->SetResolution(25);
   coneSource->SetRadius(10);

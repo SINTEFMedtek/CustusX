@@ -5,17 +5,12 @@
 
 #include <map>
 #include <sscImage.h>
+#include "vtkForwardDeclarations.h"
 
 namespace ssc
 {
 class View;
 }
-typedef vtkSmartPointer<class vtkSphereSource> vtkSphereSourcePtr;
-typedef vtkSmartPointer<class vtkPolyDataMapper> vtkPolyDataMapperPtr;
-typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
-typedef vtkSmartPointer<class vtkFollower> vtkFollowerPtr;
-typedef vtkSmartPointer<class vtkVectorText> vtkVectorTextPtr;
-typedef std::pair<vtkVectorTextPtr,vtkFollowerPtr> vtkVectorTextFollowerPair;
 namespace cx
 {
 class MessageManager;
