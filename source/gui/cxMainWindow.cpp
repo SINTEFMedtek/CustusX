@@ -28,7 +28,6 @@
 #include "cxView2D.h"
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
-#include "cxShiftCorrectionWidget.h"
 #include "cxImagePropertiesWidget.h"
 #include "cxPointSamplingWidget.h"
 #include "sscReconstructionWidget.h"
@@ -56,7 +55,6 @@ MainWindow::MainWindow() :
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
-  mShiftCorrectionWidget(new ShiftCorrectionWidget(this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
@@ -87,18 +85,6 @@ MainWindow::MainWindow() :
   this->populateSegmentationMethodsWidget();
   this->populateVisualizationMethodsWidget();
 
-
-  //Tried to add a separator. Don't work yet
-  //QAction* separatorAction = new QAction(this);
-  //separatorAction->setSeparator(true);
-  //this->mToggleWidgetActionGroup->addAction(separatorAction);
-
-  //TODO Remove mShiftCorrectionWidget
-  //---------
-  QString testing("");
-  mShiftCorrectionWidget->init(testing);
-  //---------
-
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
@@ -108,7 +94,6 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mPointSamplingWidget, "Utility");
   this->addAsDockWidget(mReconstructionWidget, "Algorithms");
   this->addAsDockWidget(mRegistrationHistoryWidget, "Browsing");
-  this->addAsDockWidget(mShiftCorrectionWidget);
   this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mSegmentationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mVisualizationMethodsWidget, "Algorithms");

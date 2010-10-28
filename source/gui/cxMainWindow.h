@@ -172,7 +172,6 @@ private:
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
   class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
   class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters
-  class ShiftCorrectionWidget*                  mShiftCorrectionWidget; ///< interface for image shift correction
   class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
   class ImagePropertiesWidget*                  mImagePropertiesWidget; ///< display and control of image properties for active image.
