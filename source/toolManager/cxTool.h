@@ -13,12 +13,9 @@
 #include "sscTransform3D.h"
 #include "cxTracker.h"
 #include "probeXmlConfigParser.h"
+#include "vtkForwardDeclarations.h"
 
 class QStringList;
-
-typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
-typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
-typedef vtkSmartPointer<class vtkSTLReader> vtkSTLReaderPtr;
 
 namespace itk
 {

@@ -57,7 +57,7 @@ ToolManager::~ToolManager()
 
 void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 {
-  ssc::messageManager()->sendInfo("running dummy tool "+tool->getUid());
+  ssc::messageManager()->sendInfo("Running dummy tool "+tool->getUid());
 
   (*mConfiguredTools)[tool->getUid()] = tool;
   tool->setVisible(true);
@@ -88,7 +88,7 @@ void ToolManager::initializeManualTool()
 
 void ToolManager::configureReferences()
 {
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     ssc::ToolPtr tool = (*iter).second;
@@ -143,12 +143,14 @@ void ToolManager::configure()
     it++;
   }
 
+  std::cout << "TEST" << std::endl;
+
   this->configureReferences();
 
   this->setDominantTool(this->getManualTool()->getUid());
 
   mConfigured = true;
-  ssc::messageManager()->sendInfo("ToolManager is configured.");
+  ssc::messageManager()->sendSuccess("ToolManager is configured.");
   emit configured();
 }
 void ToolManager::initialize()
@@ -316,7 +318,7 @@ ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 
 ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
-  ToolMapConstIter it = mInitializedTools->find(uid);
+  ToolMapIter it = mInitializedTools->find(uid);
   if (it != mInitializedTools->end())
   {
     return ((*it).second);
@@ -347,12 +349,12 @@ void ToolManager::setDominantTool(const QString& uid)
 
   ssc::ToolPtr newTool;
 
-  ToolMapConstIter iter = mConfiguredTools->find(uid);
+  ToolMapIter iter = mConfiguredTools->find(uid);
   if (iter != mConfiguredTools->end())
   {
     newTool = iter->second;
   }
-  ToolMapConstIter it = mInitializedTools->find(uid);
+  ToolMapIter it = mInitializedTools->find(uid);
   if (it != mInitializedTools->end())
   {
     newTool = it->second;
@@ -378,13 +380,13 @@ std::map<QString, QString> ToolManager::getToolUidsAndNames() const
 {
   std::map<QString, QString> uidsAndNames;
 
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     uidsAndNames[((*it).second)->getUid()] = ((*it).second)->getName();
     it++;
   }
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     uidsAndNames[((*iter).second)->getUid()] = ((*iter).second)->getName();
@@ -396,13 +398,13 @@ std::map<QString, QString> ToolManager::getToolUidsAndNames() const
 std::vector<QString> ToolManager::getToolNames() const
 {
   std::vector<QString> names;
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     names.push_back(((*it).second)->getName());
     it++;
   }
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     names.push_back(((*iter).second)->getName());
@@ -414,13 +416,13 @@ std::vector<QString> ToolManager::getToolNames() const
 std::vector<QString> ToolManager::getToolUids() const
 {
   std::vector<QString> uids;
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     uids.push_back(((*it).second)->getUid());
     it++;
   }
-  ToolMapConstIter iter = mConfiguredTools->begin();
+  ToolMapIter iter = mConfiguredTools->begin();
   while (iter != mConfiguredTools->end())
   {
     uids.push_back(((*iter).second)->getUid());
@@ -447,7 +449,7 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
 
 void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 {
-  ToolMapConstIter it = mInitializedTools->begin();
+  ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     ((*it).second)->saveTransformsAndTimestamps();
@@ -457,6 +459,11 @@ void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
 
 void ToolManager::setConfigurationFile(QString configurationFile)
 {
+  if(this->isConfigured())
+  {
+    ssc::messageManager()->sendWarning("You already configured, to reconfigure you have to restart CustusX3.");
+    return;
+  }
   mConfigurationFilePath = configurationFile;
 }
 
@@ -514,7 +521,7 @@ void ToolManager::trackerInitializedSlot(bool value)
   mInitialized = value;
   if(mInitialized)
   {
-    ssc::messageManager()->sendInfo("ToolManager is initialized.");
+    ssc::messageManager()->sendSuccess("ToolManager is initialized.");
     emit initialized();
   }
   else
@@ -529,7 +536,7 @@ void ToolManager::trackerTrackingSlot(bool value)
   mTracking = value;
   if(mTracking)
   {
-    ssc::messageManager()->sendInfo("ToolManager started tracking.");
+    ssc::messageManager()->sendSuccess("ToolManager started tracking.");
     mTimer->start(33);
     emit trackingStarted();
   }

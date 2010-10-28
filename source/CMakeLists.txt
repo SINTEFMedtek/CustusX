@@ -58,6 +58,7 @@ set(SUB_FOLDERS
     dataManager
     3DUSReconstruction
     UsReconstruction
+    algorithms
     )
     
 foreach (ITER ${SUB_FOLDERS})
@@ -82,6 +83,7 @@ INCLUDE_DIRECTORIES(
     
 
 ADD_SUBDIRECTORY(gui)
+ADD_SUBDIRECTORY(algorithms)
 ADD_SUBDIRECTORY(viewManager)
 ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(toolManager)

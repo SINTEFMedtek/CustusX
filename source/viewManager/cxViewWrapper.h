@@ -6,11 +6,11 @@
 #include "sscView.h"
 #include "sscImage.h"
 #include "sscDefinitions.h"
+#include "vtkForwardDeclarations.h"
 #include "cxForwardDeclarations.h"
 
 class QMenu;
 class QActionGroup;
-typedef vtkSmartPointer<class vtkCamera> vtkCameraPtr;
 
 namespace cx
 {
