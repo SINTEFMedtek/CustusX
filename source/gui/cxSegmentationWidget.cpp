@@ -211,7 +211,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mSurfaceThreshold(100),
     mDecimation(80),
-    mReduceResolution(true),
+    mReduceResolution(false),
     mSmoothing(true),
     mSurfaceThresholdSpinBox(new QSpinBox()),
     mDecimationSpinBox(new QSpinBox())
@@ -286,11 +286,13 @@ void SurfaceWidget::thresholdSlot(int value)
 void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
+  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
 }
 
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
+  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
 }
 
 void SurfaceWidget::smoothingSlot(bool value)
@@ -322,7 +324,9 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   connect(mDecimationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(decimationSlot(int)));
 
   QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
+  reduceResolutionCheckBox->setChecked(mReduceResolution);
   connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
+
   QCheckBox* smoothingCheckBox = new QCheckBox("Smoothing");
   smoothingCheckBox->setChecked(mSmoothing);
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(smoothingSlot(bool)));
@@ -525,7 +529,9 @@ void RegisterI2IWidget::testSlot()
   ssc::dataManager()->saveImage(target, outputBasePath);
 
   vtkPolyDataPtr sourcePolyData = SeansVesselReg::extractPolyData(source, single_point_thre, 0);
-  ssc::MeshPtr mesh(new ssc::Mesh(source->getUid()+"_meshTEST", source->getName()+"_meshTEST", sourcePolyData));
+  QString uid = ssc::changeExtension(source->getUid(), "") + "_mesh%1";
+  QString name = source->getName() + " mesh %1";
+  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(sourcePolyData, uid, name, "Images");
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 

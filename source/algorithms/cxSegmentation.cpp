@@ -67,6 +67,8 @@ itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
 ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
     double decimation, bool reduceResolution, bool smoothing)
 {
+  ssc::messageManager()->sendDebug("Contour, threshold: "+qstring_cast(threshold)+", decimation: "+qstring_cast(decimation)+", reduce resolution: "+qstring_cast(reduceResolution)+", smoothing: "+qstring_cast(smoothing));
+
   //itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
     //Create vtkPolyData
