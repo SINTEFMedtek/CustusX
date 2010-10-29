@@ -63,7 +63,7 @@ protected:
   //gui
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mLandmarkTableWidget; ///< the table widget presenting the landmarks
-  QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy //TODO
+  QLabel* mAvarageAccuracyLabel; ///< label showing the average accuracy
 
   //data
   QString mActiveLandmark; ///< uid of surrently selected landmark.

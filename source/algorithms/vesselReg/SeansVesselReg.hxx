@@ -29,8 +29,15 @@ public:
 //  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
 
+  /**
+   * Extract polydata from a image.
+   * @param image
+   * @param p_neighborhoodFilterThreshold
+   * @param p_BoundingBox
+   * @return
+   */
+  static vtkPolyDataPtr extractPolyData(ssc::ImagePtr image, int p_neighborhoodFilterThreshold, double p_BoundingBox[6]);
 private:
-  vtkPolyDataPtr extractPolyData(ssc::ImagePtr image, int p_neighborhoodFilterThreshold, double p_BoundingBox[6]);
   ssc::Transform3D getLinearTransform(vtkGeneralTransformPtr myConcatenation);
 
 protected:
@@ -51,6 +58,11 @@ protected:
   bool mt_verbose;
 
   ssc::Transform3D mLinearTransformResult;
+
+  //---------------------------------------------------------------------------
+  //TODO non-linear needs to handle this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  bool mInvertedTransform; ///< the calculated registration goes from target to source instead of source to target
+  //---------------------------------------------------------------------------
 };
 }//namespace cx
 #endif
