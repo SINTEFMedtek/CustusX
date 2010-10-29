@@ -53,30 +53,14 @@ public:
     return retval;
   }
 
-  QGroupBox* createGroupbox(QWidget* widget/*, QWidget* uncheckedWidget*/, QString boxname/*, bool checkable = false, bool checked = true*/)
+  QGroupBox* createGroupbox(QWidget* widget, QString boxname)
   {
     QGroupBox* retval = new QGroupBox(this);
     QVBoxLayout* toplayout = new QVBoxLayout(retval);
 
-//    if(checkable)
-//    {
-//      QCheckBox* checkBox = new QCheckBox(boxname, this);
-//      checkBox->setChecked(checked);
-//
-//      checkedWidget->setVisible(checked);
-//      uncheckedWidget->setHidden(checked);
-//      connect(checkBox, SIGNAL(clicked(bool)), checkedWidget, SLOT(setVisible(bool)));
-//      connect(checkBox, SIGNAL(clicked(bool)), uncheckedWidget, SLOT(setHidden(bool)));
-//
-//      toplayout->addWidget(checkBox);
-//    }else
-//    {
-      QLabel* nameLabel = new QLabel(boxname);
-      toplayout->addWidget(nameLabel);
-//    }
-
+    QLabel* nameLabel = new QLabel(boxname);
+    toplayout->addWidget(nameLabel);
     toplayout->addWidget(widget);
-    //toplayout->addWidget(uncheckedWidget);
 
     return retval;
   }

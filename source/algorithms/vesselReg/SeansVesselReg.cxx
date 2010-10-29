@@ -44,7 +44,8 @@ SeansVesselReg::SeansVesselReg(int lts_ratio, double stop_delta, double lambda, 
   mt_sampleRatio(sample),
   mt_singlePointThreshold(single_point_thre),
   mt_maximumNumberOfIterations(100),
-  mt_verbose(verbose)
+  mt_verbose(verbose),
+  mInvertedTransform(false)
 {}
 
 SeansVesselReg::~SeansVesselReg()
@@ -383,6 +384,13 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
     return false;
   }
 
+  if (sourcePolyData->GetNumberOfPoints() < targetPolyData->GetNumberOfPoints())
+  {
+    //INVERT
+    mInvertedTransform = true;
+    std::swap(sourcePolyData, targetPolyData);
+  }
+
   vtkIdType numPoints = sourcePolyData->GetNumberOfPoints();
   std::cout << "total number of points:" << numPoints << endl;
   std::cout << "number of points to be sampled:" << ((int)(numPoints * mt_ltsRatio) / 100) << "\n" << endl;
@@ -410,7 +418,11 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
 
 ssc::Transform3D SeansVesselReg::getLinearTransform()
 {
-  return mLinearTransformResult;
+  ssc::Transform3D retval = mLinearTransformResult;
+  if(mInvertedTransform)
+    retval = retval.inv();
+
+  return retval;
 }
 
 ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
