@@ -73,7 +73,7 @@ int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Po
   return 0;
 }
 
-int ReceiveImage(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
+bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
   std::cerr << "Receiving IMAGE data type." << std::endl;
 
@@ -84,7 +84,14 @@ int ReceiveImage(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Point
   imgMsg->AllocatePack();
 
   // Receive transform data from the socket
-  socket->Receive(imgMsg->GetPackBodyPointer(), imgMsg->GetPackBodySize());
+  // ignore if not enough data (yet)
+  if (socket->bytesAvailable()<imgMsg->GetPackBodySize())
+  {
+    //std::cout << "Incomplete body received, ignoring. " << std::endl;
+    return false;
+  }
+
+  socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
   // Deserialize the transform data
   // If you want to skip CRC check, call Unpack() without argument.
   int c = imgMsg->Unpack(1);
@@ -111,10 +118,11 @@ int ReceiveImage(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Point
 //    std::cerr << "Sub-Volume dimensions : (" << svsize[0] << ", " << svsize[1] << ", " << svsize[2] << ")" << std::endl;
 //    std::cerr << "Sub-Volume offset     : (" << svoffset[0] << ", " << svoffset[1] << ", " << svoffset[2] << ")"
 //        << std::endl;
-    return 1;
+    return true;
   }
 
-  return 0;
+  std::cout << "body crc failed!" << std::endl;
+  return true;
 
 }
 
@@ -149,11 +157,15 @@ int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Poin
 
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 namespace cx
 {
 
 IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
-  QThread(parent), mStopped(false), mAddress(address), mPort(port)
+  QThread(parent), mHeadingReceived(false), mStopped(false), mAddress(address), mPort(port)
 {
   std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }
@@ -171,12 +183,23 @@ void IGTLinkClient::run()
 
   //------------------------------------------------------------
   // Establish Connection
-  mSocket = igtl::ClientSocket::New();
-  int r = mSocket->ConnectToServer(cstring_cast(mAddress), mPort);
+//  mSocket = igtl::ClientSocket::New();
+  mSocket = new QTcpSocket();
+  connect(mSocket, SIGNAL(readyRead()), this, SLOT(readyReadSlot()), Qt::DirectConnection);
+  connect(mSocket, SIGNAL(hostFound()), this, SLOT(hostFoundSlot()), Qt::DirectConnection);
+  connect(mSocket, SIGNAL(connected()), this, SLOT(connectedSlot()), Qt::DirectConnection);
+  connect(mSocket, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()), Qt::DirectConnection);
+  connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)), Qt::DirectConnection);
 
-  if (r != 0)
+  std::cout << "Looking for host: " << this->hostDescription() << std::endl;
+  mSocket->connectToHost(mAddress, mPort);
+
+  int timeout = 5000;
+  if (!mSocket->waitForConnected(timeout))
   {
-    std::cerr << "Cannot connect to the server." << std::endl;
+    std::cout << "Timeout looking for host " << this->hostDescription() << std::endl;
+    mSocket->disconnectFromHost();
+    this->stop();
     return;
   }
 
@@ -185,11 +208,11 @@ void IGTLinkClient::run()
   mHeaderMsg = igtl::MessageHeader::New();
 
 
-  while (!mStopped)
-  {
-    tick();
-    QThread::msleep(20);
-  }
+//  while (!mStopped)
+//  {
+//    tick();
+//    QThread::msleep(20);
+//  }
 //
 //  // start a timer for ticks
 //  QTimer* timer = new QTimer;
@@ -197,80 +220,97 @@ void IGTLinkClient::run()
 //  connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
 //  timer->start(200); // ms
 //
-//  // run event loop
-//  this->exec();
+  // run event loop
+  this->exec();
 //
 //  timer->stop();
 //  delete timer;
   //------------------------------------------------------------
   // Close connection
-  mSocket->CloseSocket();
+//  mSocket->CloseSocket();
+  mSocket->disconnectFromHost();
   std::cout << "finished openIGTLink client thread" << std::endl;
+  delete mSocket;
 }
 
-void IGTLinkClient::tick()
+QString IGTLinkClient::hostDescription() const
 {
-  std::cout << "client::tick thread: " << QThread::currentThread() << std::endl;
+  return mAddress + ":" + qstring_cast(mPort);
+}
 
-  if (mStopped)
+void IGTLinkClient::hostFoundSlot()
+{
+  std::cout << "Host found: " << this->hostDescription() << std::endl;
+}
+void IGTLinkClient::connectedSlot()
+{
+  std::cout << "Connected to host " << this->hostDescription() << std::endl;
+}
+void IGTLinkClient::disconnectedSlot()
+{
+  std::cout << "Disconnected from host " << this->hostDescription() << std::endl;
+}
+void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
+{
+  std::cout << "Socket error [Host=" << this->hostDescription() <<", Code=" << socketError << "]\n" << mSocket->errorString() << std::endl;
+}
+
+void IGTLinkClient::readyReadSlot()
+{
+ // std::cout << "client::tick thread: " << QThread::currentThread() << std::endl;
+
+  //std::cout << "tick " << std::endl;
+
+  if (!mHeadingReceived)
   {
-    this->quit();
-    return;
+    // Initialize receive buffer
+    mHeaderMsg->InitPack();
+
+    // ignore if not enough data (yet)
+    if (mSocket->bytesAvailable() < mHeaderMsg->GetPackSize())
+    {
+      //std::cout << "Incomplete heading received, ignoring. " << std::endl;
+      //std::cout << "available: " << mSocket->bytesAvailable() << ", needed " << mHeaderMsg->GetPackSize() << std::endl;
+      return;
+    }
+
+    // after peek: read to increase pos
+    mSocket->read(reinterpret_cast<char*>(mHeaderMsg->GetPackPointer()), mHeaderMsg->GetPackSize());
+    mHeadingReceived = true;
+
+    // Deserialize the header
+    mHeaderMsg->Unpack();
   }
 
-  std::cout << "tick " << std::endl;
+  if (mHeadingReceived)
+  {
+    bool success = false;
+    // Check data type and receive data body
+//    if (strcmp(mHeaderMsg->GetDeviceType(), "TRANSFORM") == 0)
+//    {
+//      ReceiveTransform(mSocket, mHeaderMsg);
+//    }
+//    else if (strcmp(mHeaderMsg->GetDeviceType(), "POSITION") == 0)
+//    {
+//      ReceivePosition(mSocket, mHeaderMsg);
+//    }
+    if (strcmp(mHeaderMsg->GetDeviceType(), "IMAGE") == 0)
+    {
+      success = ReceiveImage(mSocket, mHeaderMsg);
+    }
+//    else if (strcmp(mHeaderMsg->GetDeviceType(), "STATUS") == 0)
+//    {
+//      ReceiveStatus(mSocket, mHeaderMsg);
+//    }
+    else
+    {
+      std::cerr << "Receiving : " << mHeaderMsg->GetDeviceType() << std::endl;
+      mSocket->read(mHeaderMsg->GetBodySizeToRead());
+    }
 
-  //  while (1)
-  //    {
-  //------------------------------------------------------------
-  // loop
-  //for (int i = 0; i < 100; i ++)
-  //  {
-
-  // Initialize receive buffer
-  mHeaderMsg->InitPack();
-  // Receive generic header from the socket
-  int r = mSocket->Receive(mHeaderMsg->GetPackPointer(), mHeaderMsg->GetPackSize()); // this blocks until something appears on the socket
-  if (r == 0)
-  {
-    mSocket->CloseSocket();
-    std::cout << "Socket failure: terminating " << std::endl;
-    this->quit();
-    return;
+    if (success)
+      mHeadingReceived = false; // restart
   }
-  if (r != mHeaderMsg->GetPackSize())
-  {
-    std::cout << "Packet size inconsistency: ignoring. " << std::endl;
-    return;
-  }
-
-  // Deserialize the header
-  mHeaderMsg->Unpack();
-
-  // Check data type and receive data body
-  if (strcmp(mHeaderMsg->GetDeviceType(), "TRANSFORM") == 0)
-  {
-    ReceiveTransform(mSocket, mHeaderMsg);
-  }
-  else if (strcmp(mHeaderMsg->GetDeviceType(), "POSITION") == 0)
-  {
-    ReceivePosition(mSocket, mHeaderMsg);
-  }
-  else if (strcmp(mHeaderMsg->GetDeviceType(), "IMAGE") == 0)
-  {
-    ReceiveImage(mSocket, mHeaderMsg);
-  }
-  else if (strcmp(mHeaderMsg->GetDeviceType(), "STATUS") == 0)
-  {
-    ReceiveStatus(mSocket, mHeaderMsg);
-  }
-  else
-  {
-    std::cerr << "Receiving : " << mHeaderMsg->GetDeviceType() << std::endl;
-    mSocket->Skip(mHeaderMsg->GetBodySizeToRead(), 0);
-  }
-  //      }
-  //    }
 }
 
 

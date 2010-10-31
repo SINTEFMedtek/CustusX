@@ -10,9 +10,11 @@
 #include <QApplication>
 #include <iostream>
 #include "cxMainWindow.h"
+#include "sscMessageManager.h"
 
 int main(int argc, char *argv[])
 {
+  qRegisterMetaType<sscMessage>();
   Q_INIT_RESOURCE(cxResources);
   
   QApplication app(argc, argv);

@@ -78,7 +78,7 @@ void IGTLinkWidget::connectServer()
 {
   if (mClient)
     return;
-  std::cout << "connect to server" << std::endl;
+  std::cout << "IGTLinkWidget::connect to server" << std::endl;
   mClient.reset(new IGTLinkClient(mAddressEdit->text(), mPortEdit->text().toInt(), this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   mClient->start();
@@ -88,12 +88,12 @@ void IGTLinkWidget::connectServer()
 
 void IGTLinkWidget::disconnectServer()
 {
-  std::cout << "disconnect server" << std::endl;
+  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
   if (mClient)
   {
     mClient->stop();
     mClient->quit();
-    mClient->wait(); // forever or until dead thread
+    mClient->wait(2000); // forever or until dead thread
 
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
     mClient.reset();
