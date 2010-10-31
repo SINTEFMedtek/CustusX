@@ -3,8 +3,9 @@
 
 #include <vector>
 #include <QtCore>
+#include <QTcpSocket>
 #include "boost/shared_ptr.hpp"
-
+class QTcpSocket;
 #include "igtlMessageHeader.h"
 #include "igtlClientSocket.h"
 
@@ -23,13 +24,22 @@ protected:
   virtual void run();
 
 private slots:
-  void tick();
+//  void tick();
+  void readyReadSlot();
+
+  void hostFoundSlot();
+  void connectedSlot();
+  void disconnectedSlot();
+  void errorSlot(QAbstractSocket::SocketError);
 
 private:
+  QString hostDescription() const;
+  bool mHeadingReceived;
   bool mStopped;
   QString mAddress;
   int mPort;
-  igtl::ClientSocket::Pointer mSocket;
+  QTcpSocket* mSocket;
+//  igtl::ClientSocket::Pointer mSocket;
   igtl::MessageHeader::Pointer mHeaderMsg;
 };
 
