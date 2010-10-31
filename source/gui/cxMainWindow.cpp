@@ -173,6 +173,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::initialize()
 {
+  ssc::MessageManager::getInstance();
+
   cx::DataManager::initialize();
   cx::ToolManager::initializeObject();
 }
