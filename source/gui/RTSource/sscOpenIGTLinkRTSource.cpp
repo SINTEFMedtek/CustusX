@@ -12,88 +12,100 @@
 #include <vtkDataSetMapper.h>
 #include <vtkTimerLog.h>
 
+#include "sscOpenIGTLinkClient.h"
+
 namespace ssc
 {
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
-  mImageWidth( 0),
-  mImageHeight( 0),
   mImageImport(vtkImageImportPtr::New())
 {
-  //mUSSession = -1;
-  mUSTextBuf = NULL;
-
   mImageImport->SetNumberOfScalarComponents(1);
-//  mImageImport->SetNumberOfScalarComponents(4);
-  mImageImport->SetDataScalarTypeToUnsignedChar();
-
-  mImageData = mImageImport->GetOutput();
+  this->setEmptyImage();
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
 {
   //disconnect();
+  if (mClient)
+  {
+    mClient->terminate();
+    mClient->wait(); // forever or until dead thread
+  }
 }
 
 QDateTime OpenIGTLinkRTSource::getTimestamp()
 {
+  //TODO: get ts from messge
   return QDateTime();
 }
 
-
 bool OpenIGTLinkRTSource::connected() const
 {
-  //return (mUSSession != -1);
-  return true;
+  return mClient;
 }
 
-//void OpenIGTLinkRTSource::reconnect()
-//{
-//  if (!connected())
-//    return;
-//  int temp = m_shmtKey;
-//  disconnect();
-//  connect(temp);
-//}
+void OpenIGTLinkRTSource::connectServer(QString address, int port)
+{
+  if (mClient)
+    return;
+  std::cout << "OpenIGTLinkRTSource::connect to server" << std::endl;
+  mClient.reset(new IGTLinkClient(address, port, this));
+  connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+  connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 
-///**connect to shared memory
-// */
-//void OpenIGTLinkRTSource::connect(int shmtKey)
-//{
-//  if (mUSSession != -1)
-//  {
-//    disconnect();
-//  }
-//
-//  m_shmtKey = shmtKey;
-//  int err = SHM_Connect(shmtKey, &mUSSession);
-//
-//  if (err != kNoError)
-//  {
-//    mUSSession = -1;
-//    SW_LOG( "Failed connecting to shared buffer with key %d, status: %d", shmtKey, err );
-//    return;
-//  }
-//  SW_LOG( "Connected to shared buffer with key %d", shmtKey );
-//
-//  update();
-//}
-//
-///**disconnect from shared memory
-// */
-//void OpenIGTLinkRTSource::disconnect()
-//{
-//  if (mUSSession != -1)
-//  {
-//    SHM_Done(mUSSession);
-//    mUSSession = -1;
-//  }
-//
-//  initializeBuffer(0,0);
-//}
+  mClient->start();
+
+  emit serverStatusChanged();
+}
+
+void OpenIGTLinkRTSource::imageReceivedSlot()
+{
+  this->updateImage(mClient->getLastImageMessage());
+}
+
+void OpenIGTLinkRTSource::disconnectServer()
+{
+  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
+  if (mClient)
+  {
+    mClient->stop();
+    mClient->quit();
+    mClient->wait(2000); // forever or until dead thread
+
+    disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+    disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+    mClient.reset();
+  }
+
+  emit serverStatusChanged();
+}
+
+void OpenIGTLinkRTSource::clientFinishedSlot()
+{
+  if (!mClient)
+    return;
+  if (mClient->isRunning())
+    return;
+  this->disconnectServer();
+}
+
+void OpenIGTLinkRTSource::setEmptyImage()
+{
+  mImageMessage = igtl::ImageMessage::Pointer();
+  mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
+  mImageImport->SetDataExtent(0,0,0,0,0,0);
+  mImageImport->SetDataScalarTypeToUnsignedChar();
+  mZero = 0;
+  mImageImport->SetImportVoidPointer(&mZero);
+  mImageImport->Modified();
+}
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 {
+  if (!message)
+    this->setEmptyImage();
+
   mImageMessage = message;
   // Retrive the image data
   int size[3]; // image dimension
@@ -102,125 +114,79 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   int svoffset[3]; // sub-volume offset
   int scalarType; // scalar type
 
+  // Note: subvolumes is not supported. Implement when needed.
+
   scalarType = message->GetScalarType();
   message->GetDimensions(size);
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
 
-//  snw_us::UltrasoundImage *us_image= NULL;
+  switch (scalarType)
+  {
+  case igtl::ImageMessage::TYPE_INT8:
+    std::cout << "signed char is not supported. Falling back to unsigned char." << std::endl;
+    mImageImport->SetDataScalarTypeToUnsignedChar();
+    break;
+  case igtl::ImageMessage::TYPE_UINT8:
+    mImageImport->SetDataScalarTypeToUnsignedChar();
+    break;
+  case igtl::ImageMessage::TYPE_INT16:
+    mImageImport->SetDataScalarTypeToShort();
+    break;
+  case igtl::ImageMessage::TYPE_UINT16:
+    mImageImport->SetDataScalarTypeToUnsignedShort();
+    break;
+  case igtl::ImageMessage::TYPE_INT32:
+    mImageImport->SetDataScalarTypeToInt();
+    break;
+  case igtl::ImageMessage::TYPE_UINT32:
+    std::cout << "unsigned int is not supported. Falling back to int." << std::endl;
+    mImageImport->SetDataScalarTypeToInt();
+    break;
+  case igtl::ImageMessage::TYPE_FLOAT32:
+    mImageImport->SetDataScalarTypeToFloat();
+    break;
+  case igtl::ImageMessage::TYPE_FLOAT64:
+    mImageImport->SetDataScalarTypeToDouble();
+    break;
+  default:
+    std::cout << "unknown type. Falling back to unsigned char." << std::endl;
+    mImageImport->SetDataScalarTypeToUnsignedChar();
+  }
 
-//  int32_t dummy_index;
-//  us_image = ( snw_us::UltrasoundImage* ) SHM_GetReadBuffer(mUSSession, &dummy_index);
-//  if (!us_image)
-//  {
-//    SW_LOG("US Image couldn't be loaded.");
-//    return;
-//  }
+  mImageImport->SetDataOrigin(0,0,0);
+  mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 
-  mImageWidth = size[0];
-  mImageHeight = size[1];
-
-  mImageImport->SetWholeExtent(0, mImageWidth - 1, 0, mImageHeight - 1, 0, 0);
+  mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2]-1);
   mImageImport->SetDataExtentToWholeExtent();
   mImageImport->SetImportVoidPointer(mImageMessage->GetPackBodyPointer());
 
-
-  //this->initializeBuffer(size[0], size[1]);
-
-  //mUSTextBuf->
-
-//  // This is where the image is decoded
-//  if (snw_us::DecodeUltrasoundImage(mUSTextBuf, mImageWidth, mImageHeight, *us_image) != kNoError)
-//  {
-//    SW_LOG( "US Image couldn't be decoded." );
-//    return;
-//  }
-
-//  std::stringstream ss;
-//  ss << "connected(): " << connected() << std::endl;
-//  ss << "mImageWidth: " << mImageWidth << std::endl;
-//  ss << "mImageHeight: " << mImageHeight << std::endl;
-//  ss << "us_image->width: " << us_image->width << std::endl;
-//  ss << "us_image->height: " << us_image->height << std::endl;
-//  Logger::state("vm.us.state", ss.str());
-//
-// //debug code: speckle the image with pink in order to see better
-//  static int COUNT = 0;
-//  for (int i=0; i<mImageWidth*mImageHeight; ++i)
-//  {
-//    if (i%4==0)
-//    {
-//      //printf("mUSTextBuf[i] = %d\n" , mUSTextBuf[i] );
-//      mUSTextBuf[i] = 0xFFFF00FF;
-//      mUSTextBuf[i]+= (10*COUNT++)*0xFF;
-//    }
-//    else
-//      mUSTextBuf[i] = 0x00FF00FF;
-//  }
-
-
-//  Logger::log("vm.log", "us update "+ string_cast(mImageWidth) + ", " + string_cast(mImageHeight) );
   mImageImport->Modified();
-}
-
-/**Change size of buffers if changed (or new)
- * Connect to mImageImport.
- */
-void OpenIGTLinkRTSource::initializeBuffer(int newWidth, int newHeight)
-{
- // padBox(&newWidth, &newHeight); // remove to use input bb
-
-  // already ok: ignore
-  if (mImageWidth==newWidth && mImageHeight==newHeight)
-  {
-    return;
-  }
-
-  mImageWidth = newWidth;
-  mImageHeight = newHeight;
-
-
-  mImageImport->SetWholeExtent(0, mImageWidth - 1, 0, mImageHeight - 1, 0, 0);
-  mImageImport->SetDataExtentToWholeExtent();
-  int size = mImageWidth * mImageHeight;
-  delete[] mUSTextBuf;
-  mUSTextBuf = NULL;
-  if (size>0)
-  {
-    mUSTextBuf = new uint32_t[size];
-    memset(mUSTextBuf, 0, sizeof(int32_t) * size);
-    mImageImport->SetImportVoidPointer(mUSTextBuf);
-    //Logger::log("vm.log", "connected us buffer to vtkImageImport, size=("+string_cast(mImageWidth) + "," + string_cast(mImageHeight)+")");
-  }
-  else
-  {
-    mImageImport->SetImportVoidPointer(NULL);
-    //Logger::log("vm.log", "disconnected us buffer from vtkImageImport");
-  }
 }
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-  return mImageData;
+  return mImageImport->GetOutput();
+//  return mImageData;
 }
 
-/** increase input bounding box to a power of 2.
- */
-void OpenIGTLinkRTSource::padBox(int* x, int* y) const
-{
-  if (*x==0 || *y==0)
-    return;
-
-  int x_org = *x;
-  int y_org = *y;
-
-  *x = 1;
-  *y = 1;
-  while (*x < x_org)
-    (*x) *= 2;
-  while (*y < y_org)
-    (*y) *= 2;
-}
+///** increase input bounding box to a power of 2.
+// */
+//void OpenIGTLinkRTSource::padBox(int* x, int* y) const
+//{
+//  if (*x==0 || *y==0)
+//    return;
+//
+//  int x_org = *x;
+//  int y_org = *y;
+//
+//  *x = 1;
+//  *y = 1;
+//  while (*x < x_org)
+//    (*x) *= 2;
+//  while (*y < y_org)
+//    (*y) *= 2;
+//}
 
 
 }

@@ -31,19 +31,17 @@ class RealTimeStream2DRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
-  RealTimeStream2DRep(RealTimeStreamSourcePtr data, const QString& uid, const QString& name="");
+  RealTimeStream2DRep(const QString& uid, const QString& name="");
   virtual ~RealTimeStream2DRep();
   virtual QString getType() const { return "ssc::RealTimeStream2DRep"; }
-  void setCamera();
+  void setRealtimeStream(RealTimeStreamSourcePtr data);
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 private slots:
-  void statusChangedSlot();
   void newDataSlot();
 private:
   void initializeSize(int imageWidth, int imageHeight);
-  void formatMechTermIndex();
   void setup();
   RealTimeStreamSourcePtr mData;
   ssc::TextDisplayPtr mStatusText;

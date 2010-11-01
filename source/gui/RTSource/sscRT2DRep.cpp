@@ -16,6 +16,7 @@
 #include <vtkTexture.h>
 #include <vtkCamera.h>
 
+#include "sscBoundingBox3D.h"
 #include "sscView.h"
 
 namespace ssc
@@ -24,17 +25,17 @@ namespace ssc
 
 
 
-RealTimeStream2DRep::RealTimeStream2DRep(RealTimeStreamSourcePtr data, const QString& uid, const QString& name) :
+RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name),
   mPlaneActor(vtkActorPtr::New()),
   mPlaneSource(vtkPlaneSourcePtr::New()),
   mUsTexture(vtkTexturePtr::New() )
 {
-  mData = data;
-  //connect(mData.get(), SIGNAL(statusChanged()), this, SLOT(statusChangedSlot()));
-  connect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
+//  mData = data;
+//  //connect(mData.get(), SIGNAL(statusChanged()), this, SLOT(statusChangedSlot()));
+//  connect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
 
-  mUsTexture->SetInput(mData->getVtkImageData());
+//  mUsTexture->SetInput(mData->getVtkImageData());
 
   vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
   tMapper->SetInput(mPlaneSource->GetOutput());
@@ -53,7 +54,7 @@ RealTimeStream2DRep::RealTimeStream2DRep(RealTimeStreamSourcePtr data, const QSt
   mPlaneActor->SetMapper(mapper2);
 
   setup();
-  statusChangedSlot();
+//  statusChangedSlot();
   //Logger::log("vm.log", "RealTimeStream2DRep::RealTimeStream2DRep()");
 }
 
@@ -62,11 +63,33 @@ RealTimeStream2DRep::~RealTimeStream2DRep()
 //  Logger::log("vm.log", "RealTimeStream2DRep::~RealTimeStream2DRep()");
 }
 
+void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
+{
+  if (mData)
+  {
+    disconnect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
+    mUsTexture->SetInput(NULL);
+  }
+
+  mData = data;
+
+  if (mData)
+  {
+    connect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
+    mUsTexture->SetInput(mData->getVtkImageData());
+  }
+
+  this->newDataSlot();
+}
+
 void RealTimeStream2DRep::newDataSlot()
 {
+  mPlaneActor->SetVisibility(mData!=NULL);
+  if (!mData)
+    return;
   this->initializeSize(mData->getVtkImageData()->GetDimensions()[0], mData->getVtkImageData()->GetDimensions()[1]);
-    mPlaneActor->SetVisibility(true);
-    setCamera();
+//    mPlaneActor->SetVisibility(true);
+//    setCamera();
 }
 
 void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
@@ -76,42 +99,45 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
   {
     return;
   }
-  mPlaneSource->SetPoint2( 0.0, imageHeight - 1, 0.0 );
-  mPlaneSource->SetPoint1(imageWidth - 1, 0.0, 0.0 );
+  DoubleBoundingBox3D extent(mData->getVtkImageData()->GetExtent());
+//  mPlaneSource->SetPoint2( 0.0, imageHeight - 1, 0.0 );
+//  mPlaneSource->SetPoint1(imageWidth - 1, 0.0, 0.0 );
+  mPlaneSource->SetPoint1(0, 0, 0);
+  mPlaneSource->SetPoint2(extent[1], extent[3], 0.0);
 }
 
-void RealTimeStream2DRep::statusChangedSlot()
-{
-//  initializeSize(mData->width(), mData->height());
-//  mPlaneActor->SetVisibility(mData->valid());
-//  formatMechTermIndex();
-//  mStatusText->updateText(mData->statusString() );
-//  setCamera();
+//void RealTimeStream2DRep::statusChangedSlot()
+//{
+////  initializeSize(mData->width(), mData->height());
+////  mPlaneActor->SetVisibility(mData->valid());
+////  formatMechTermIndex();
+////  mStatusText->updateText(mData->statusString() );
+////  setCamera();
+////
+////  Logger::log("vm.log", "US statusChanged: " + string_cast(mData->width()) + ", " + string_cast(mData->height())
+////      + ", connected: " + string_cast(mData->connected()) );
 //
-//  Logger::log("vm.log", "US statusChanged: " + string_cast(mData->width()) + ", " + string_cast(mData->height())
-//      + ", connected: " + string_cast(mData->connected()) );
+//}
 
-}
-
-/**We need this here, even if it belongs in singlelayout.
- * Reason: must call setcamera after last change of size of plane actor.
- * TODO fix it.
- */
-void RealTimeStream2DRep::setCamera()
-{
-  if (!mRenderer)
-    return;
-  vtkCamera* camera = mRenderer->GetActiveCamera();
-  camera->ParallelProjectionOn();
-  mRenderer->ResetCamera();
-
-  double scale = camera->GetParallelScale();
-
-  //SW_LOG("%p, %p, %f", mRenderer.GetPointer(), this, scale);
-
-  //SW_LOG("Scale %f ", scale );
-  camera->SetParallelScale(scale*0.6);
-}
+///**We need this here, even if it belongs in singlelayout.
+// * Reason: must call setcamera after last change of size of plane actor.
+// * TODO fix it.
+// */
+//void RealTimeStream2DRep::setCamera()
+//{
+//  if (!mRenderer)
+//    return;
+//  vtkCamera* camera = mRenderer->GetActiveCamera();
+//  camera->ParallelProjectionOn();
+//  mRenderer->ResetCamera();
+//
+//  double scale = camera->GetParallelScale();
+//
+//  //SW_LOG("%p, %p, %f", mRenderer.GetPointer(), this, scale);
+//
+//  //SW_LOG("Scale %f ", scale );
+//  camera->SetParallelScale(scale*0.6);
+//}
 
 
 void RealTimeStream2DRep::addRepActorsToViewRenderer(ssc::View* view)
