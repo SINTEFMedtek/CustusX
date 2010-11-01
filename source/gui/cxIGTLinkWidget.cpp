@@ -5,9 +5,13 @@
 #include <QStringList>
 #include <QVBoxLayout>
 
+#include "vtkRenderWindow.h"
+
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "cxIGTLinkClient.h"
+#include "RTSource/cxIGTLinkClient.h"
+#include "RTSource/sscRT2DRep.h"
+
 
 namespace cx
 {
@@ -19,6 +23,8 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 {
   this->setObjectName("IGTLinkWidget");
   this->setWindowTitle("IGTLink Test");
+
+  mRTSource.reset(new ssc::OpenIGTLinkRTSource());
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
@@ -43,7 +49,17 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnect()));
   gridLayout->addWidget(mConnectButton, 3, 1);
 
-  toptopLayout->addStretch();
+  mView = new ssc::View();
+  toptopLayout->addWidget(mView);
+  mRenderTimer = new QTimer(this);
+  connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
+  mRenderTimer->start(200);
+
+  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep(mRTSource, "rtrep", "rtrep"));
+  mView->addRep(rtRep);
+
+
+//  toptopLayout->addStretch();
 }
 
 IGTLinkWidget::~IGTLinkWidget()
@@ -53,6 +69,11 @@ IGTLinkWidget::~IGTLinkWidget()
     mClient->terminate();
     mClient->wait(); // forever or until dead thread
   }
+}
+
+void IGTLinkWidget::renderSlot()
+{
+  mView->GetRenderWindow()->Render();
 }
 
 void IGTLinkWidget::launchServer()
@@ -81,9 +102,16 @@ void IGTLinkWidget::connectServer()
   std::cout << "IGTLinkWidget::connect to server" << std::endl;
   mClient.reset(new IGTLinkClient(mAddressEdit->text(), mPortEdit->text().toInt(), this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+  connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+
   mClient->start();
 
   mConnectButton->setText("Disconnect Server");
+}
+
+void IGTLinkWidget::imageReceivedSlot()
+{
+  mRTSource->updateImage(mClient->getLastImageMessage());
 }
 
 void IGTLinkWidget::disconnectServer()
@@ -96,6 +124,7 @@ void IGTLinkWidget::disconnectServer()
     mClient->wait(2000); // forever or until dead thread
 
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
+    disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
     mClient.reset();
   }
 

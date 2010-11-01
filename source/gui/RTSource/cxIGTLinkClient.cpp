@@ -73,58 +73,7 @@ int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Po
   return 0;
 }
 
-bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
-{
-  std::cerr << "Receiving IMAGE data type." << std::endl;
 
-  // Create a message buffer to receive transform data
-  igtl::ImageMessage::Pointer imgMsg;
-  imgMsg = igtl::ImageMessage::New();
-  imgMsg->SetMessageHeader(header);
-  imgMsg->AllocatePack();
-
-  // Receive transform data from the socket
-  // ignore if not enough data (yet)
-  if (socket->bytesAvailable()<imgMsg->GetPackBodySize())
-  {
-    //std::cout << "Incomplete body received, ignoring. " << std::endl;
-    return false;
-  }
-
-  socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
-  // Deserialize the transform data
-  // If you want to skip CRC check, call Unpack() without argument.
-  int c = imgMsg->Unpack(1);
-
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
-  {
-    // Retrive the image data
-    int size[3]; // image dimension
-    float spacing[3]; // spacing (mm/pixel)
-    int svsize[3]; // sub-volume size
-    int svoffset[3]; // sub-volume offset
-    int scalarType; // scalar type
-
-    scalarType = imgMsg->GetScalarType();
-    imgMsg->GetDimensions(size);
-    imgMsg->GetSpacing(spacing);
-    imgMsg->GetSubVolume(svsize, svoffset);
-
-//    std::cerr << "Device Name           : " << imgMsg->GetDeviceName() << std::endl;
-//    std::cerr << "Scalar Type           : " << scalarType << std::endl;
-//    std::cerr << "Dimensions            : (" << size[0] << ", " << size[1] << ", " << size[2] << ")" << std::endl;
-//    std::cerr << "Spacing               : (" << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << ")"
-//        << std::endl;
-//    std::cerr << "Sub-Volume dimensions : (" << svsize[0] << ", " << svsize[1] << ", " << svsize[2] << ")" << std::endl;
-//    std::cerr << "Sub-Volume offset     : (" << svoffset[0] << ", " << svoffset[1] << ", " << svoffset[2] << ")"
-//        << std::endl;
-    return true;
-  }
-
-  std::cout << "body crc failed!" << std::endl;
-  return true;
-
-}
 
 int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
 {
@@ -255,6 +204,30 @@ void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
   std::cout << "Socket error [Host=" << this->hostDescription() <<", Code=" << socketError << "]\n" << mSocket->errorString() << std::endl;
 }
 
+/** add the message to a thread-safe queue
+ */
+void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
+{
+  QMutexLocker sentry(&mImageMutex);
+  mMutexedImageMessageQueue.push_back(imgMsg);
+  sentry.unlock();
+  emit imageReceived(); // emit signal outside lock, catch possibly in another thread
+}
+
+/** Threadsafe retrieval of last image message.
+ *
+ */
+igtl::ImageMessage::Pointer IGTLinkClient::getLastImageMessage()
+{
+  QMutexLocker sentry(&mImageMutex);
+  if (mMutexedImageMessageQueue.empty())
+    return igtl::ImageMessage::Pointer();
+  igtl::ImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
+  mMutexedImageMessageQueue.pop_front();
+  return retval;
+}
+
+
 void IGTLinkClient::readyReadSlot()
 {
  // std::cout << "client::tick thread: " << QThread::currentThread() << std::endl;
@@ -296,7 +269,7 @@ void IGTLinkClient::readyReadSlot()
 //    }
     if (strcmp(mHeaderMsg->GetDeviceType(), "IMAGE") == 0)
     {
-      success = ReceiveImage(mSocket, mHeaderMsg);
+      success = this->ReceiveImage(mSocket, mHeaderMsg);
     }
 //    else if (strcmp(mHeaderMsg->GetDeviceType(), "STATUS") == 0)
 //    {
@@ -313,5 +286,60 @@ void IGTLinkClient::readyReadSlot()
   }
 }
 
+bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
+{
+  std::cerr << "Receiving IMAGE data type." << std::endl;
+
+  // Create a message buffer to receive transform data
+  igtl::ImageMessage::Pointer imgMsg;
+  imgMsg = igtl::ImageMessage::New();
+  imgMsg->SetMessageHeader(header);
+  imgMsg->AllocatePack();
+
+  // Receive transform data from the socket
+  // ignore if not enough data (yet)
+  if (socket->bytesAvailable()<imgMsg->GetPackBodySize())
+  {
+    //std::cout << "Incomplete body received, ignoring. " << std::endl;
+    return false;
+  }
+
+  socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
+  // Deserialize the transform data
+  // If you want to skip CRC check, call Unpack() without argument.
+  int c = imgMsg->Unpack(1);
+
+  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+  {
+    // Retrive the image data
+    int size[3]; // image dimension
+    float spacing[3]; // spacing (mm/pixel)
+    int svsize[3]; // sub-volume size
+    int svoffset[3]; // sub-volume offset
+    int scalarType; // scalar type
+
+    scalarType = imgMsg->GetScalarType();
+    imgMsg->GetDimensions(size);
+    imgMsg->GetSpacing(spacing);
+    imgMsg->GetSubVolume(svsize, svoffset);
+
+//    std::cerr << "Device Name           : " << imgMsg->GetDeviceName() << std::endl;
+//    std::cerr << "Scalar Type           : " << scalarType << std::endl;
+//    std::cerr << "Dimensions            : (" << size[0] << ", " << size[1] << ", " << size[2] << ")" << std::endl;
+//    std::cerr << "Spacing               : (" << spacing[0] << ", " << spacing[1] << ", " << spacing[2] << ")"
+//        << std::endl;
+//    std::cerr << "Sub-Volume dimensions : (" << svsize[0] << ", " << svsize[1] << ", " << svsize[2] << ")" << std::endl;
+//    std::cerr << "Sub-Volume offset     : (" << svoffset[0] << ", " << svoffset[1] << ", " << svoffset[2] << ")"
+//        << std::endl;
+
+    this->addImageToQueue(imgMsg);
+
+    return true;
+  }
+
+  std::cout << "body crc failed!" << std::endl;
+  return true;
+
+}
 
 }//end namespace cx
