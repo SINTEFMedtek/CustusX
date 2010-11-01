@@ -4,6 +4,8 @@
 #include <vector>
 #include <QtGui>
 #include "sscDoubleWidgets.h"
+#include "sscView.h"
+#include "RTSource/sscOpenIGTLinkRTSource.h"
 
 namespace cx
 {
@@ -27,7 +29,8 @@ private slots:
   void launchServer();
   void toggleConnect();
   void clientFinishedSlot();
-
+  void renderSlot();
+  void imageReceivedSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -42,6 +45,10 @@ private:
   QPushButton* mConnectButton;
   QPushButton* mLaunchServerButton;
   IGTLinkClientPtr mClient;
+  ssc::OpenIGTLinkRTSourcePtr mRTSource;
+
+  ssc::View* mView;
+  QTimer* mRenderTimer;
 };
 
 }//end namespace cx
