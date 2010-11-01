@@ -1,5 +1,5 @@
-#ifndef CXIGTLINKCLIENT_H_
-#define CXIGTLINKCLIENT_H_
+#ifndef SSCOPENIGTLINKCLIENT_H_
+#define SSCOPENIGTLINKCLIENT_H_
 
 #include <vector>
 #include <QtCore>
@@ -10,7 +10,7 @@ class QTcpSocket;
 #include "igtlClientSocket.h"
 #include "igtlImageMessage.h"
 
-namespace cx
+namespace ssc
 {
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 
@@ -55,6 +55,6 @@ private:
 
 };
 
-}//end namespace cx
+}//end namespace ssc
 
-#endif /* CXIGTLINKCLIENT_H_ */
+#endif /* SSCOPENIGTLINKCLIENT_H_ */

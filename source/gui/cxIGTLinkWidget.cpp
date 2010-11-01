@@ -9,7 +9,7 @@
 
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "RTSource/cxIGTLinkClient.h"
+//#include "RTSource/cxIGTLinkClient.h"
 #include "RTSource/sscRT2DRep.h"
 
 
@@ -25,6 +25,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   this->setWindowTitle("IGTLink Test");
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
+  connect(mRTSource.get(), SIGNAL(serverStatusChanged()), this, SLOT(serverStatusChangedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
@@ -55,20 +56,15 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
   mRenderTimer->start(200);
 
-  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep(mRTSource, "rtrep", "rtrep"));
+  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+  rtRep->setRealtimeStream(mRTSource);
   mView->addRep(rtRep);
-
 
 //  toptopLayout->addStretch();
 }
 
 IGTLinkWidget::~IGTLinkWidget()
 {
-  if (mClient)
-  {
-    mClient->terminate();
-    mClient->wait(); // forever or until dead thread
-  }
 }
 
 void IGTLinkWidget::renderSlot()
@@ -83,72 +79,24 @@ void IGTLinkWidget::launchServer()
 
 void IGTLinkWidget::toggleConnect()
 {
-  std::cout << "toggleconnect " << mClient  << std::endl;
-
-  if (mClient)
+  if (!mRTSource->connected())
   {
-    this->disconnectServer();
+    mRTSource->connectServer(mAddressEdit->text(), mPortEdit->text().toInt());
   }
   else
   {
-    this->connectServer();
+    mRTSource->disconnectServer();
   }
 }
 
-void IGTLinkWidget::connectServer()
+void IGTLinkWidget::serverStatusChangedSlot()
 {
-  if (mClient)
-    return;
-  std::cout << "IGTLinkWidget::connect to server" << std::endl;
-  mClient.reset(new IGTLinkClient(mAddressEdit->text(), mPortEdit->text().toInt(), this));
-  connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
-  connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-
-  mClient->start();
-
-  mConnectButton->setText("Disconnect Server");
+  if (mRTSource->connected())
+    mConnectButton->setText("Disconnect Server");
+  else
+    mConnectButton->setText("Connect Server");
 }
 
-void IGTLinkWidget::imageReceivedSlot()
-{
-  mRTSource->updateImage(mClient->getLastImageMessage());
-}
-
-void IGTLinkWidget::disconnectServer()
-{
-  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
-  if (mClient)
-  {
-    mClient->stop();
-    mClient->quit();
-    mClient->wait(2000); // forever or until dead thread
-
-    disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
-    disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
-    mClient.reset();
-  }
-
-  mConnectButton->setText("Connect Server");
-}
-
-void IGTLinkWidget::clientFinishedSlot()
-{
-  if (!mClient)
-    return;
-  if (mClient->isRunning())
-    return;
-  this->disconnectServer();
-}
-
-void IGTLinkWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void IGTLinkWidget::hideEvent(QCloseEvent* event)
-{
-  QWidget::closeEvent(event);
-}
 
 
 }//end namespace cx

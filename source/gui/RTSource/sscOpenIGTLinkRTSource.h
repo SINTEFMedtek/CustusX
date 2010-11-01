@@ -10,13 +10,14 @@
 
 #include "sscRealTimeSource.h"
 
-
 #include "igtlImageMessage.h"
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 
 namespace ssc
 {
+
+typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 
 
 /**Synchronize data with source,
@@ -32,32 +33,32 @@ public:
   virtual QDateTime getTimestamp();
   virtual bool connected() const;
 
-  void updateImage(igtl::ImageMessage::Pointer message); // called by receiving thread when new data arrives.
+  // non-inherited methods
+  void connectServer(QString address, int port);
+  void disconnectServer();
+
 
 signals:
   void newData();
+  void serverStatusChanged();
 
 public:
-//  void connect(int shmtKey);
-//  void reconnect();
-//  void disconnect();
-//  void update();
-  int width() const { return mImageWidth; }
-  int height() const { return mImageHeight; }
+  void updateImage(igtl::ImageMessage::Pointer message); // called by receiving thread when new data arrives.
+
+private slots:
+  void clientFinishedSlot();
+  void imageReceivedSlot();
 
 private:
-  void initializeBuffer(int newWidth, int newHeight);
-  void padBox(int* x, int* y) const;
+//  void padBox(int* x, int* y) const;
+  void setEmptyImage();
 
-  //int m_shmtKey;
-  //int mUSSession;
-  uint32_t *mUSTextBuf;
-  int mImageWidth;
-  int mImageHeight;
-  vtkImageDataPtr mImageData;
+  unsigned char mZero;
   vtkImageImportPtr mImageImport;
   QDateTime mTimestamp;
   igtl::ImageMessage::Pointer mImageMessage;
+  IGTLinkClientPtr mClient;
+
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
