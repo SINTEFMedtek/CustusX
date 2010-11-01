@@ -43,7 +43,10 @@ SET(cxProject_MOC_HDRS
   cxWhatsThisWidget.h
   cxControlPanel.h
   cxIGTLinkWidget.h
-  cxIGTLinkClient.h
+  RTSource/cxIGTLinkClient.h
+  RTSource/sscOpenIGTLinkRTSource.h
+  RTSource/sscRealTimeSource.h
+  RTSource/sscRT2DRep.h
 
 )
 
@@ -143,8 +146,13 @@ SET(${LIBNAME}_SRCS
       cxControlPanel.cpp
       cxIGTLinkWidget.h
       cxIGTLinkWidget.cpp
-      cxIGTLinkClient.h
-      cxIGTLinkClient.cpp
+  RTSource/cxIGTLinkClient.h
+  RTSource/cxIGTLinkClient.cpp
+  RTSource/sscOpenIGTLinkRTSource.h
+  RTSource/sscOpenIGTLinkRTSource.cpp
+  RTSource/sscRealTimeSource.h
+  RTSource/sscRT2DRep.h
+  RTSource/sscRT2DRep.cpp
       
     ${cxProject_RCC_SRCS} )
 

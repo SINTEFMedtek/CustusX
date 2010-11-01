@@ -8,6 +8,7 @@
 class QTcpSocket;
 #include "igtlMessageHeader.h"
 #include "igtlClientSocket.h"
+#include "igtlImageMessage.h"
 
 namespace cx
 {
@@ -18,7 +19,11 @@ class IGTLinkClient : public QThread
   Q_OBJECT
 public:
   IGTLinkClient(QString address, int port, QObject* parent = NULL);
-  void stop();
+  void stop(); // do not use
+  igtl::ImageMessage::Pointer getLastImageMessage();
+
+signals:
+  void imageReceived();
 
 protected:
   virtual void run();
@@ -33,6 +38,9 @@ private slots:
   void errorSlot(QAbstractSocket::SocketError);
 
 private:
+  bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
+  void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
+
   QString hostDescription() const;
   bool mHeadingReceived;
   bool mStopped;
@@ -41,6 +49,10 @@ private:
   QTcpSocket* mSocket;
 //  igtl::ClientSocket::Pointer mSocket;
   igtl::MessageHeader::Pointer mHeaderMsg;
+
+  QMutex mImageMutex;
+  std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
+
 };
 
 }//end namespace cx
