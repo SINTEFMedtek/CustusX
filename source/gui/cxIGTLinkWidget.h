@@ -28,23 +28,14 @@ public:
 private slots:
   void launchServer();
   void toggleConnect();
-  void clientFinishedSlot();
   void renderSlot();
-  void imageReceivedSlot();
-
-protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
+  void serverStatusChangedSlot();
 
 private:
-  void connectServer();
-  void disconnectServer();
-
   QLineEdit* mAddressEdit;
   QLineEdit* mPortEdit;
   QPushButton* mConnectButton;
   QPushButton* mLaunchServerButton;
-  IGTLinkClientPtr mClient;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
 
   ssc::View* mView;
