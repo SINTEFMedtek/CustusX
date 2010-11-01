@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QFile>
 #include <QStringList>
+#include <algorithm>
 
 ProbeXmlConfigParser::ProbeXmlConfigParser(QString& pathToXml)
 {
