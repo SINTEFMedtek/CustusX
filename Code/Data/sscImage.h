@@ -87,7 +87,7 @@ public:
 	virtual void addClipPlane(vtkPlanePtr plane);
 	virtual std::vector<vtkPlanePtr> getClipPlanes();
 	virtual void clearClipPlanes();
-	virtual vtkImageDataPtr CropAndClipImage(); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
+  virtual ImagePtr CropAndClipImage(QString outputBasePath); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
 
 	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
 
@@ -108,6 +108,8 @@ protected slots:
   virtual void transformChangedSlot();
 
 protected:
+  virtual vtkImageDataPtr CropAndClipImageTovtkImageData(); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr. WARNING: the returned extent is incompatible with CustusX formats. Use Image-returning method
+
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 	
