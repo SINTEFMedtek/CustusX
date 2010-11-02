@@ -52,7 +52,7 @@ set(SUB_FOLDERS
     gui
     viewManager
     repManager
-    statemachineManager
+    stateMachineManager
     registrationManager
     toolManager
     dataManager
@@ -87,7 +87,7 @@ ADD_SUBDIRECTORY(algorithms)
 ADD_SUBDIRECTORY(viewManager)
 ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(toolManager)
-ADD_SUBDIRECTORY(statemachineManager)
+ADD_SUBDIRECTORY(stateMachineManager)
 ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
