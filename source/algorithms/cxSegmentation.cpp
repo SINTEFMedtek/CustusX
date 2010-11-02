@@ -4,7 +4,7 @@
 #include <itkImage.h>
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
-#include <itkBinaryThinningImageFilter.h>
+#include <itkBinaryThinningImageFilter3D.h>
 #include "ItkVtkGlue/itkImageToVTKImageFilter.h"
 #include "ItkVtkGlue/itkVTKImageToImageFilter.h"
 
@@ -67,6 +67,8 @@ itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
 ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
     double decimation, bool reduceResolution, bool smoothing)
 {
+  ssc::messageManager()->sendDebug("Contour, threshold: "+qstring_cast(threshold)+", decimation: "+qstring_cast(decimation)+", reduce resolution: "+qstring_cast(reduceResolution)+", smoothing: "+qstring_cast(smoothing));
+
   //itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
     //Create vtkPolyData
@@ -234,7 +236,7 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
 
   //Centerline extraction
-  typedef itk::BinaryThinningImageFilter<itkImageType, itkImageType> centerlineFilterType;
+  typedef itk::BinaryThinningImageFilter3D<itkImageType, itkImageType> centerlineFilterType;
   centerlineFilterType::Pointer centerlineFilter = centerlineFilterType::New();
   centerlineFilter->SetInput(itkImage);
   centerlineFilter->Update();

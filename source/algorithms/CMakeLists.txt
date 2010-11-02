@@ -13,9 +13,11 @@ SET ( ${LIB}_algorithms
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
+    itkBinaryThinningImageFilter3D.h
+    itkBinaryThinningImageFilter3D.txx
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_algorithms} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} dataManager ITKCommon itkBasicFilters) 
+target_link_libraries(${LIB} dataManager ITKCommon ITKBasicFilters) 

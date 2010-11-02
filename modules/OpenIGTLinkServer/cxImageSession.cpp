@@ -182,7 +182,8 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
 {
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
-  mTimer->start(500);
+//  mTimer->start(500);
+  mTimer->start(40);
 }
 
 void ImageSender::tick()

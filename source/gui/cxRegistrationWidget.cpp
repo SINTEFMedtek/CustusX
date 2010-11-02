@@ -257,6 +257,8 @@ double RegistrationWidget::getAvarageAccuracy()
   std::map<QString, ssc::LandmarkProperty>::iterator it = props.begin();
   for(; it != props.end(); ++it)
   {
+    if(!it->second.getActive()) //we don't want to take into account not active landmarks
+      continue;
     QString uid = it->first;
     double val = this->getAccuracy(uid);
     if(!ssc::similar(val, 1000.0))
