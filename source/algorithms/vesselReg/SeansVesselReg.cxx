@@ -44,7 +44,8 @@ SeansVesselReg::SeansVesselReg(int lts_ratio, double stop_delta, double lambda, 
   mt_sampleRatio(sample),
   mt_singlePointThreshold(single_point_thre),
   mt_maximumNumberOfIterations(100),
-  mt_verbose(verbose)
+  mt_verbose(verbose),
+  mInvertedTransform(false)
 {}
 
 SeansVesselReg::~SeansVesselReg()
@@ -383,6 +384,13 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
     return false;
   }
 
+  if (sourcePolyData->GetNumberOfPoints() < targetPolyData->GetNumberOfPoints())
+  {
+    //INVERT
+    mInvertedTransform = true;
+    std::swap(sourcePolyData, targetPolyData);
+  }
+
   vtkIdType numPoints = sourcePolyData->GetNumberOfPoints();
   std::cout << "total number of points:" << numPoints << endl;
   std::cout << "number of points to be sampled:" << ((int)(numPoints * mt_ltsRatio) / 100) << "\n" << endl;
@@ -410,7 +418,11 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
 
 ssc::Transform3D SeansVesselReg::getLinearTransform()
 {
-  return mLinearTransformResult;
+  ssc::Transform3D retval = mLinearTransformResult;
+  if(mInvertedTransform)
+    retval = retval.inv();
+
+  return retval;
 }
 
 ssc::ImagePtr SeansVesselReg::loadMinc(char* p_dataFile)
@@ -465,6 +477,7 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
 
   int l_dimensions[3];
   image->getBaseVtkImageData()->GetDimensions(l_dimensions);
+  ssc::Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
 
   //set the transform
   vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
@@ -481,7 +494,7 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
   int l_dimY = l_dimensions[1];
   int l_dimZ = l_dimensions[2];
 
-  double* l_tempPoint;
+  double l_tempPoint[3];
   //Offsets variables
   int l_offsetI = 0;
   int l_offsetJ = 0;
@@ -547,7 +560,11 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
         //See if this voxel contain a vessel center, if so do some more processing
         if (*(l_allTheData->GetTuple(l_offsetI)))
         {
-          l_tempPoint = l_dataTransform->TransformPoint(i, j, k);
+          // added by CA: use spacing when creating point. TODO: check  with Ingrid if any other data are affected.
+          l_tempPoint[0] = spacing[0] * i;
+          l_tempPoint[1] = spacing[1] * j;
+          l_tempPoint[2] = spacing[2] * k;
+          l_dataTransform->TransformPoint(l_tempPoint, l_tempPoint);
 
           //Do stuff if there is no bounding box, or if there is one check if the
           //point is in the bounding box

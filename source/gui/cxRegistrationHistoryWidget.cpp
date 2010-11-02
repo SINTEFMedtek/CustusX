@@ -22,7 +22,7 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
 {
   //dock widget
   this->setObjectName("RegistrationHistoryWidget");
-  this->setWindowTitle("RegistrationHistory");
+  this->setWindowTitle("Registration History");
 
   //layout
   QHBoxLayout* toptopLayout = new QHBoxLayout(this);
