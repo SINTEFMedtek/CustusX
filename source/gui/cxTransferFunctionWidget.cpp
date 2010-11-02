@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QStringList>
+#include <QPushButton>
 #include "cxTransferFunctionAlphaWidget.h"
 #include "cxTransferFunctionColorWidget.h"
 #include "sscDataManager.h"
@@ -48,6 +49,9 @@ void TransferFunctionWidget::init()
                                               QSizePolicy::Fixed);
   
   mPresetsComboBox = new QComboBox(this);
+
+  QPushButton* resetButton = new QPushButton("Reset transfer function", this);
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
   
   //Populate presets comboBox
   /*mPresets = new QStringList();
@@ -65,6 +69,7 @@ void TransferFunctionWidget::init()
   mLayout->addWidget(mTransferFunctionColorWidget);
   mLayout->addWidget(mPresetsComboBox);
   //mLayout->addWidget(mInfoWidget);
+  mLayout->addWidget(resetButton);
 
   this->setLayout(mLayout);
 
@@ -106,5 +111,11 @@ void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
   transferFunctions->addColorPoint(activeImage->getMin(), QColor(0,0,0));
   transferFunctions->addColorPoint(activeImage->getMax(), QColor(0,0,0));
 }
-  
+
+void TransferFunctionWidget::resetSlot()
+{
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+  activeImage->resetTransferFunctions();
+}
+
 }//namespace cx

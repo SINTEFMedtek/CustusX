@@ -66,6 +66,7 @@ private slots:
   void showSlicePlanesActionSlot(bool checked);
   void fillSlicePlanesActionSlot(bool checked);
   void showAxesActionSlot(bool checked);
+  void showManualToolSlot(bool visible);
   void resetCameraActionSlot();
   void activeImageChangedSlot();
 

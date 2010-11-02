@@ -14,7 +14,7 @@
 
 int main(int argc, char *argv[])
 {
-  qRegisterMetaType<sscMessage>();
+  //qRegisterMetaType<sscMessage>();
   Q_INIT_RESOURCE(cxResources);
   
   QApplication app(argc, argv);

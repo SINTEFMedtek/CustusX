@@ -54,7 +54,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   toptopLayout->addWidget(mView);
   mRenderTimer = new QTimer(this);
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
-  mRenderTimer->start(200);
+  mRenderTimer->start(50);
 
   ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(mRTSource);
