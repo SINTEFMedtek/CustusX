@@ -477,6 +477,7 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
 
   int l_dimensions[3];
   image->getBaseVtkImageData()->GetDimensions(l_dimensions);
+  ssc::Vector3D spacing(image->getBaseVtkImageData()->GetSpacing());
 
   //set the transform
   vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
@@ -493,7 +494,7 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
   int l_dimY = l_dimensions[1];
   int l_dimZ = l_dimensions[2];
 
-  double* l_tempPoint;
+  double l_tempPoint[3];
   //Offsets variables
   int l_offsetI = 0;
   int l_offsetJ = 0;
@@ -559,7 +560,11 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
         //See if this voxel contain a vessel center, if so do some more processing
         if (*(l_allTheData->GetTuple(l_offsetI)))
         {
-          l_tempPoint = l_dataTransform->TransformPoint(i, j, k);
+          // added by CA: use spacing when creating point. TODO: check  with Ingrid if any other data are affected.
+          l_tempPoint[0] = spacing[0] * i;
+          l_tempPoint[1] = spacing[1] * j;
+          l_tempPoint[2] = spacing[2] * k;
+          l_dataTransform->TransformPoint(l_tempPoint, l_tempPoint);
 
           //Do stuff if there is no bounding box, or if there is one check if the
           //point is in the bounding box
