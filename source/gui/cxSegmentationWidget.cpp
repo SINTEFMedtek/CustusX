@@ -6,6 +6,8 @@
 #include <QGridLayout>
 #include <QCheckBox>
 
+#include <vtkPolyData.h>
+
 #include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
 #include "sscTypeConversions.h"
@@ -397,8 +399,11 @@ void CenterlineWidget::findCenterlineSlot()
   if(!centerlineImage)
     return;
 
+  std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
+
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
+  std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
 
   QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
   QString name = centerlineImage->getName() + " mesh %1";
