@@ -50,4 +50,4 @@ private:
   typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
 }//namespace ssc
 
-#endif SSCUSFRAMEDATA_H_
+#endif // SSCUSFRAMEDATA_H_
