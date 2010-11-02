@@ -112,8 +112,11 @@ void InteractiveCropper::updateBoxWidgetInteractor()
     mBoxWidget->RemoveObserver(vtkCommand::EnableEvent);
     mBoxWidget->RemoveObserver(vtkCommand::DisableEvent);
    // mBoxWidget->RemoveObserver(vtkCommand::InteractionEvent);
-    mBoxWidget->SetInteractor(NULL);
+    //mBoxWidget->SetInteractor(NULL); // this one lead to a vtk crash. Try using only disable instead.
   }
+  return mBoxWidget->SetEnabled(this->getUseCropping());
+
+
   //std::cout << "Enabled  " << mBoxWidget->GetEnabled() << std::endl;
 }
 
