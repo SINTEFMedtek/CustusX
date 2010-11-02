@@ -6,41 +6,41 @@
 <!-- ==== -->
 <tool>
   <type>Pointer</type>
-  <id>01-117-0329_Planning-Navigator</id>
-  <name>Planning-Navigator</name>
-  <description>Planning-Navigator</description>
-  <manufacturer>Sonowand</manufacturer>
+  <id>VentrikkelDrenHolder_8700339mod</id>
+  <name>VentrikkelDrenHolder</name>
+  <description>VentrikkelDrenHolder</description>
+  <manufacturer>SINTEF</manufacturer>
   <clinical_app>Nevro</clinical_app>
-  <geo_file>01-117-0329_Planning-Navigator.stl</geo_file>
+  <geo_file>VentrikkelDrenHolder_8700339mod.stl</geo_file>
   <pic_file></pic_file>
   <doc_file></doc_file>  
 
   <!-- Instrument -->
   <instrument>
     <type>Pointer</type>
-    <id></id>
-    <name>Planning-Navigator</name>
-    <manufacturer>Sonowand</manufacturer>
-    <description>Planning-Navigator</description>
+    <id>VentrikkelDrenHolder</id>
+    <name>VentrikkelDrenHolder</name>
+    <manufacturer>SINTEF</manufacturer>
+    <description>VentrikkelDrenHolder</description>
   </instrument>
 
   <!-- Sensor -->
   <sensor>
     <type>Polaris</type>
-    <id>01-117-0329_Planning-Navigator</id>
-    <name>Planning-Navigator</name>
+    <id>8700339mod</id>
+    <name>8700339mod</name>
     <wireless>yes</wireless>
     <DOF></DOF>
     <portnumber></portnumber>
     <channelnumber></channelnumber>
-    <manufacturer>Sonowand</manufacturer>
-    <description>01-117-0329_Planning-Navigator</description>
-    <rom_file>01-117-0329_Planning-Navigator.rom</rom_file>
+    <manufacturer>SINTEF</manufacturer>
+    <description>8700339mod</description>
+    <rom_file>VentrikkelDrenHolder_8700339mod.rom</rom_file>
   </sensor>
 
   <!-- Calibration -->
   <calibration>
-    <cal_file>01-117-0329_Planning-Navigator.cal</cal_file>
+    <cal_file>VentrikkelDrenHolder_8700339mod.cal</cal_file>
     <date>
       <yyyy>2010</yyyy>
       <mm>10</mm>

@@ -41,6 +41,8 @@ public:
   static void initialize();
   static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
 
+  virtual QMenu* createPopupMenu();
+
 signals:
   void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
 
@@ -86,7 +88,7 @@ protected slots:
   void updateTrackingActionSlot();
   void toggleTrackingSlot();
 
-protected:
+private:
   void updateWindowTitle();
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
@@ -97,8 +99,9 @@ protected:
   void populateSegmentationMethodsWidget();
   void populateVisualizationMethodsWidget();
 
-
-  void addAsDockWidget(QWidget* widget);
+  void addAsDockWidget(QWidget* widget, QString groupname = "");
+  void registerToolBar(QToolBar* toolbar, QString groupname="");
+  void addToWidgetGroupMap(QAction* action, QString groupname);
 
   LayoutData executeLayoutEditorDialog(QString title, bool createNew);
 
@@ -129,7 +132,7 @@ protected:
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
 
-  QActionGroup* mToggleWidgetActionGroup;
+//  QActionGroup* mToggleWidgetActionGroup;
   QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
@@ -163,11 +166,12 @@ protected:
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 
+  std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
+
   class ConsoleWidget*                          mConsoleWidget;
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
   class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
   class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters
-  class ShiftCorrectionWidget*                  mShiftCorrectionWidget; ///< interface for image shift correction
   class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
   class ImagePropertiesWidget*                  mImagePropertiesWidget; ///< display and control of image properties for active image.

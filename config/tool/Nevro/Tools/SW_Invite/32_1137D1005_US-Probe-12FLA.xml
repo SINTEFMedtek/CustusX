@@ -5,7 +5,7 @@
 <!-- Tool -->
 <!-- ==== -->
 <tool>
-  <type>reference</type>
+  <type>usprobe</type>
   <id>32_1137D1005_US-Probe-12FLA</id>
   <name>US-Probe-12FLA</name>
   <description>32_1137D1005_US-Probe-12FLA</description>
