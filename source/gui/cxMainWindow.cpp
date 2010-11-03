@@ -41,6 +41,7 @@
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
+#include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
 
@@ -49,12 +50,12 @@ namespace cx
 
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
-//  mToggleWidgetActionGroup(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
+  mCalibrationMethodsWidget(new CalibrationMethodsWidget("CalibrationMethodsWidget", "Calibration Methods", this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
@@ -84,6 +85,7 @@ MainWindow::MainWindow() :
   this->populateRegistrationMethodsWidget();
   this->populateSegmentationMethodsWidget();
   this->populateVisualizationMethodsWidget();
+  this->populateCalibrationMethodsWidget();
 
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
@@ -97,6 +99,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mSegmentationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mVisualizationMethodsWidget, "Algorithms");
+  this->addAsDockWidget(mCalibrationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mNavigationWidget, "Properties");
   this->addAsDockWidget(mConsoleWidget, "Utility");
   this->addAsDockWidget(mFrameTreeWidget, "Browsing");
@@ -721,6 +724,13 @@ void MainWindow::populateVisualizationMethodsWidget()
   SurfaceWidget* surfaceWidget = new SurfaceWidget(mVisualizationMethodsWidget);
 
   mVisualizationMethodsWidget->addTab(surfaceWidget, "Surface");
+}
+
+void MainWindow::populateCalibrationMethodsWidget()
+{
+  ToolTipCalibrationWidget* toolTipCalibrationWidget = new ToolTipCalibrationWidget(mCalibrationMethodsWidget);
+
+  mCalibrationMethodsWidget->addTab(toolTipCalibrationWidget, "Tool Tip");
 }
 
 void MainWindow::aboutSlot()
