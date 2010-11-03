@@ -39,7 +39,7 @@ signals:
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
+  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
 private slots:
   void segmentSlot();
@@ -48,6 +48,7 @@ private slots:
   void toogleSmoothingSlot(bool on);
   void smoothingSigmaSlot(double value);
   void imageChangedSlot(QString uid);
+  void revertTransferFunctions();
 
 private:
   SegmentationWidget();
@@ -63,6 +64,10 @@ private:
   QSpinBox* mSegmentationThresholdSpinBox;
   QDoubleSpinBox* mSmoothingSigmaSpinBox;
   QLabel* mSmoothingSigmaLabel;
+
+  ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
+  ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
+  ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
 };
 
 /**
