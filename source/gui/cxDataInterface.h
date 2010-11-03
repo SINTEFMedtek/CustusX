@@ -10,11 +10,10 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QString>
-//#include <QtGui>
 #include "sscForwardDeclarations.h"
 #include "sscDoubleDataAdapter.h"
-//#include "sscHelperWidgets.h"
 #include "sscStringDataAdapter.h"
+#include "sscDefinitions.h"
 #include "cxRegistrationManager.h"
 
 namespace cx
@@ -101,6 +100,23 @@ public: // optional methods
   virtual QString convertInternal2Display(QString internal);
 };
 typedef boost::shared_ptr<class SelectImageStringDataAdapterBase> SelectImageStringDataAdapterBasePtr;
+
+/** Base class for all DataAdapters that selects a coordinatesystem.
+ */
+class SelectCoordinateSystemStringDataAdapterBase : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  SelectCoordinateSystemStringDataAdapterBase();
+  virtual ~SelectCoordinateSystemStringDataAdapterBase() {}
+
+public: // basic methods
+
+public: // optional methods
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
+typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapterBase> SelectCoordinateSystemStringDataAdapterBasePtr;
 
 /** Adapter that connects to the current active image.
  * Example: Active image: [DataName]
@@ -216,6 +232,36 @@ private:
   QString mImageUid;
   QString mValueName;
 };
+
+typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapter> SelectCoordinateSystemStringDataAdapterPtr;
+/** Adapter that selects and stores a coordinate systems.
+ * The coordinatesystem is stored internally in the adapter.
+ * Use setValue/getValue plus changed() to access it.
+ */
+class SelectCoordinateSystemStringDataAdapter : public SelectCoordinateSystemStringDataAdapterBase
+{
+  Q_OBJECT
+public:
+  static SelectCoordinateSystemStringDataAdapterPtr New() { return SelectCoordinateSystemStringDataAdapterPtr(new SelectCoordinateSystemStringDataAdapter()); }
+  SelectCoordinateSystemStringDataAdapter();
+  virtual ~SelectCoordinateSystemStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+
+public: // interface extension
+  ssc::COORDINATE_SYSTEM getCoordinateSystem();
+
+private:
+    ssc::COORDINATE_SYSTEM mCoordinateSystem;
+  QString mValueName;
+};
+
 
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;
 /** Adapter that selects and stores an mesh.

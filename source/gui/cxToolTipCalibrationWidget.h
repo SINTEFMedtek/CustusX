@@ -3,6 +3,7 @@
 
 #include "cxWhatsThisWidget.h"
 #include "sscCoordinateSystemHelpers.h"
+#include "cxDataInterface.h"
 
 class QShowEvent;
 class QCloseEvent;
@@ -37,6 +38,7 @@ private slots:
   void calibrateSlot();
   void testSlot();
   void sampleSlot();
+  void coordChangedSlot();
 
 private:
   QGroupBox* createSampleGroupBox();
@@ -46,6 +48,7 @@ private:
   QPushButton* mSampleButton;
   QLineEdit* mFilenameBox;
   ssc::CoordinateSystem mToCoord;
+  SelectCoordinateSystemStringDataAdapterPtr mCoordinateSystems;
 
 };
 }//namespace cx
