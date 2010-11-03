@@ -42,6 +42,25 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	this->setBaseLookupTable(bwLut);
 }
 
+ImageLUT2DPtr ImageLUT2D::createCopy()
+{
+  ImageLUT2DPtr retval(new ImageLUT2D(mBase));
+
+  retval->mOutputLUT->DeepCopy(mOutputLUT);
+  if (mBaseLUT)
+  {
+    retval->mBaseLUT = vtkLookupTablePtr::New();
+    retval->mBaseLUT->DeepCopy(mBaseLUT);
+  }
+  retval->mBase = mBase;
+  retval->mLevel = mLevel;
+  retval->mWindow = mWindow;
+  retval->mLLR = mLLR;
+  retval->mAlpha = mAlpha;
+
+  return retval;
+}
+
 void ImageLUT2D::setVtkImageData(vtkImageDataPtr base)
 {
 	mBase = base;

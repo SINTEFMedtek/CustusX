@@ -55,29 +55,66 @@ void Image::resetTransferFunctions()
   //mBaseImageData->Update();
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
   
+	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)), ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
+//
+//	if(mImageTransferFunctions3D)
+//    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+//               this, SIGNAL(transferFunctionsChanged()));
+//  if(mImageLookupTable2D)
+//    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
+//               this, SIGNAL(transferFunctionsChanged()));
+//
+//  mImageTransferFunctions3D.reset(new ImageTF3D(mBaseImageData));
+//	mImageLookupTable2D.reset(new ImageLUT2D(mBaseImageData));
+//
+//	// Add initial values to the 3D transfer functions
+//	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
+//	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
+//	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
+//	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
+//
+//  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+//          this, SIGNAL(transferFunctionsChanged()));
+//  connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
+//					this, SIGNAL(transferFunctionsChanged()));
+//
+//  emit transferFunctionsChanged();
+}
+
+void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D)
+{
+  if(!mBaseImageData)
+  {
+    messageManager()->sendWarning("ssc::Image has no image data");
+    return;
+  }
+
   if(mImageTransferFunctions3D)
-    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-               this, SIGNAL(transferFunctionsChanged()));
+  {
+    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChange d()));
+  }
   if(mImageLookupTable2D)
-    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
-               this, SIGNAL(transferFunctionsChanged()));
-  
-  mImageTransferFunctions3D.reset(new ImageTF3D(mBaseImageData));
-	mImageLookupTable2D.reset(new ImageLUT2D(mBaseImageData));
-  
-	// Add initial values to the 3D transfer functions
-	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
-	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
-	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
-	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
-  
-  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-          this, SIGNAL(transferFunctionsChanged()));
-  connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
-					this, SIGNAL(transferFunctionsChanged()));
+  {
+    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
+
+  mImageTransferFunctions3D = imageTransferFunctions3D;
+  mImageLookupTable2D = imageLookupTable2D;
+
+  if(mImageTransferFunctions3D)
+  {
+    mImageTransferFunctions3D->setVtkImageData(mBaseImageData);
+    connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
+  if(mImageLookupTable2D)
+  {
+    mImageLookupTable2D->setVtkImageData(mBaseImageData);
+    connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
 
   emit transferFunctionsChanged();
 }
+
   
 //void Image::set_rMd(Transform3D rMd)
 //{
@@ -593,15 +630,15 @@ ImagePtr Image::CropAndClipImage(QString outputBasePath)
   extent[4] -= diff[2];
   extent[5] -= diff[2];
 
-  std::cout << "cropped volume pre move:" << std::endl;
-  rawResult->Print(std::cout);
+//  std::cout << "cropped volume pre move:" << std::endl;
+//  rawResult->Print(std::cout);
 
   rawResult->SetExtent(extent.begin());
   rawResult->SetWholeExtent(extent.begin());
   rawResult->SetUpdateExtentToWholeExtent();
   rawResult->ComputeBounds();
-  std::cout << "cropped volume pre update:" << std::endl;
-  rawResult->Print(std::cout);
+//  std::cout << "cropped volume pre update:" << std::endl;
+//  rawResult->Print(std::cout);
   rawResult->Update();
 
   vtkImageDataPtr copyData = vtkImageDataPtr::New();
@@ -613,18 +650,17 @@ ImagePtr Image::CropAndClipImage(QString outputBasePath)
   QString name = this->getName()+" clipped %1";
   //std::cout << "clipped volume: " << uid << ", " << name << std::endl;
   ImagePtr result = dataManager()->createImage(rawResult,uid, name);
+  result->resetTransferFunction(this->getTransferFunctions3D()->createCopy(), this->getLookupTable2D()->createCopy());
   messageManager()->sendInfo("Created volume " + result->getName());
 
-  std::cout << "cropped volume:" << std::endl;
-  rawResult->Print(std::cout);
+//  std::cout << "cropped volume:" << std::endl;
+//  rawResult->Print(std::cout);
 
 //  DoubleBoundingBox3D bb = image->getCroppingBox();
 //  clip->SetInput(this->getBaseVtkImageData());
 //  DoubleBoundingBox3D bb_orig = image->boundingBox();
   Vector3D shift = this->getCroppingBox().corner(0,0,0) - this->boundingBox().corner(0,0,0);
-//  ssc::Vector3D spacing
-//  ssc::Vector3D shift();
-  std::cout << "shift: " << shift << std::endl;
+//  std::cout << "shift: " << shift << std::endl;
 
   result->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(shift));
   result->setParentFrame(this->getUid());

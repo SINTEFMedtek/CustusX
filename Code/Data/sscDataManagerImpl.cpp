@@ -741,6 +741,16 @@ MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uidBase, QStrin
   return retval;
 }
 
+void DataManagerImpl::removeData(const QString& uid)
+{
+  if (this->getActiveImage() && this->getActiveImage()->getUid()==uid)
+    this->setActiveImage(ImagePtr());
+
+  mData.erase(uid);
+
+  emit dataRemoved(uid);
+  emit dataLoaded(); // this should alert everybody interested in the data as a collection.
+}
 
 } // namespace ssc
 
