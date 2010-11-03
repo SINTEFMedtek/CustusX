@@ -86,6 +86,7 @@ public:
   SurfaceWidget(QWidget* parent);
   ~SurfaceWidget();
   virtual QString defaultWhatsThis() const;
+  void setDefaultColor(QColor color);
 
 public slots:
   void setImageInputSlot(QString value);
@@ -113,6 +114,7 @@ private:
   bool mSmoothing;
   QSpinBox* mSurfaceThresholdSpinBox;
   QSpinBox* mDecimationSpinBox;
+  QColor mDefaultColor;
 };
 
 /**
@@ -131,6 +133,7 @@ public:
   CenterlineWidget(QWidget* parent);
   ~CenterlineWidget();
   virtual QString defaultWhatsThis() const;
+  void setDefaultColor(QColor color);
 
 public slots:
   void setImageInputSlot(QString value);
@@ -149,6 +152,7 @@ private slots:
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
+  QColor mDefaultColor;
 };
 
 /**
