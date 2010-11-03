@@ -91,7 +91,7 @@ void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLU
 
   if(mImageTransferFunctions3D)
   {
-    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChange d()));
+    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
   }
   if(mImageLookupTable2D)
   {

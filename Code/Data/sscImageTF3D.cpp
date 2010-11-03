@@ -44,6 +44,11 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	
 	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
+
+  this->addAlphaPoint(this->getScalarMin(), 0);
+  this->addAlphaPoint(this->getScalarMax(), 255);
+  this->addColorPoint(this->getScalarMin(), Qt::black);
+  this->addColorPoint(this->getScalarMax(), Qt::white);
 }
 	
 ImageTF3DPtr ImageTF3D::createCopy()
@@ -373,13 +378,16 @@ void ImageTF3D::parseXml(QDomNode& dataNode)
 	
 	QDomNode alphaNode = dataNode.namedItem("alpha");
 	// Read alpha node if it exists
-	if (!alphaNode.isNull())
+	if (!alphaNode.isNull() && !alphaNode.toElement().text().isEmpty())
 	{
+    QString alphaString = alphaNode.toElement().text();
 		mOpacityMapPtr->clear();
-		QStringList alphaStringList = alphaNode.toElement().text().split(" ");
+		QStringList alphaStringList = alphaString.split(" ");
 		for (int i = 0; i < alphaStringList.size(); i++)
 		{
 			QStringList pointStringList = alphaStringList[i].split("=");
+			if (pointStringList.size()<2)
+			  continue;
 			addAlphaPoint(pointStringList[0].toInt(), pointStringList[1].toInt());
 		}
 	}
@@ -391,7 +399,7 @@ void ImageTF3D::parseXml(QDomNode& dataNode)
 	
 	QDomNode colorNode = dataNode.namedItem("color");
 	// Read color node if it exists
-	if (!colorNode.isNull())
+	if (!colorNode.isNull() && !colorNode.toElement().text().isEmpty())
 	{
 		mColorMapPtr->clear();
 		QStringList colorStringList = colorNode.toElement().text().split(" ");
