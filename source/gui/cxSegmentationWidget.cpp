@@ -10,6 +10,7 @@
 
 #include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscMesh.h"
@@ -49,10 +50,12 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
+
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+  //connect(mSelectedImage.get(), SIGNAL(imageChanged()), this, SLOT(revertTransferFunctions()));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
@@ -94,14 +97,16 @@ void SegmentationWidget::showEvent(QShowEvent* event)
   }
 }
 
-void SegmentationWidget::hideEvent(QCloseEvent* event)
+void SegmentationWidget::hideEvent(QHideEvent* event)
 {
-  QWidget::closeEvent(event);
+  QWidget::hideEvent(event);
+  this->revertTransferFunctions();
 }
 
 void SegmentationWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  this->revertTransferFunctions();
 
   ssc::ImagePtr segmentedImage = Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
   if(!segmentedImage)
@@ -115,6 +120,18 @@ void SegmentationWidget::toogleBinarySlot(bool on)
   ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
 }
 
+void SegmentationWidget::revertTransferFunctions()
+{
+  if (!mModifiedImage)
+    return;
+
+  mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
+
+  mTF3D_original.reset();
+  mTF2D_original.reset();
+  mModifiedImage.reset();
+}
+
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
@@ -124,6 +141,12 @@ void SegmentationWidget::thresholdSlot(int value)
   if(!image)
     return;
 
+  if (!mModifiedImage)
+  {
+    mModifiedImage = image;
+    mTF3D_original = image->getTransferFunctions3D()->createCopy();
+    mTF2D_original = image->getLookupTable2D()->createCopy();
+  }
   image->resetTransferFunctions();
   ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
   tf3D->addAlphaPoint(value , 0);
@@ -150,6 +173,8 @@ void SegmentationWidget::smoothingSigmaSlot(double value)
 
 void SegmentationWidget::imageChangedSlot(QString uid)
 {
+  this->revertTransferFunctions();
+
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
     return;
