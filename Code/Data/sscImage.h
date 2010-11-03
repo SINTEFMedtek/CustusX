@@ -90,6 +90,7 @@ public:
   virtual ImagePtr CropAndClipImage(QString outputBasePath); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
 
 	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
+	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 
 signals:
   void landmarkRemoved(QString uid);

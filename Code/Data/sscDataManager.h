@@ -99,6 +99,7 @@ public:
   virtual void clear() {}; ///< remove all stuff from manager
   virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath="Images") { return ImagePtr(); }
   virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) { return MeshPtr(); }
+  virtual void removeData(const QString& uid) {} ///< remove data from datamanger, emit signal
 
 	//virtual MeshPtr getActiveMesh() const = 0; ///< used for system state
 	//virtual void setActiveMesh(MeshPtr activeMesh) = 0; ///< used for system state
@@ -107,7 +108,8 @@ public:
 
 signals:
 	void centerChanged(); ///< emitted when center is changed.
-	void dataLoaded(); ///emitted when data is loaded successfully
+	void dataLoaded(); ///< emitted when data is loaded successfully
+	void dataRemoved(QString uid); ///< emitted when data is removed
 	void activeImageChanged(const QString& uId); ///< emitted when the active image or the image data inside the image is changed 
 	void activeImageTransferFunctionsChanged(); ///< emitted when the transfer functions in active image is changed
 	//void activeMeshChanged(const QString& uId); ///< emitted when the active mesh is changed

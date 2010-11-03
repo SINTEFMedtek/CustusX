@@ -124,6 +124,7 @@ public:
   virtual void setLandmarkActive(QString uid, bool active);
   virtual std::map<QString, LandmarkProperty> getLandmarkProperties() const;
   virtual void clear(); ///< remove all stuff from manager
+  virtual void removeData(const QString& uid);
 
   //virtual MeshPtr getActiveMesh() const; ///< used for system state
   //virtual void setActiveMesh(MeshPtr activeMesh); ///< used for system state

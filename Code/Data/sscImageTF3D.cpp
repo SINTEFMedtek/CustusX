@@ -26,7 +26,6 @@ namespace ssc
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mOpacityTF(vtkPiecewiseFunctionPtr::New()),
 	mColorTF(vtkColorTransferFunctionPtr::New()),	
-	mVolumeProperty(vtkVolumePropertyPtr::New()),
 	mBase(base),
 	mOpacityMapPtr(new IntIntMap()),
 	mColorMapPtr(new ColorMap())
@@ -47,6 +46,25 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
 }
 	
+ImageTF3DPtr ImageTF3D::createCopy()
+{
+  ImageTF3DPtr retval(new ImageTF3D(mBase));
+  retval->mOpacityTF->DeepCopy(mOpacityTF);
+  retval->mColorTF->DeepCopy(mColorTF);
+  retval->mOpacityMapPtr.reset(new IntIntMap(*mOpacityMapPtr));
+  retval->mColorMapPtr.reset(new ColorMap(*mColorMapPtr));
+  if (mLut)
+  {
+    retval->mLut = vtkLookupTablePtr::New();
+    retval->mLut->DeepCopy(mLut);
+  }
+  retval->mLevel = mLevel;
+  retval->mWindow = mWindow;
+  retval->mLLR = mLLR;
+  retval->mAlpha = mAlpha;
+  return retval;
+}
+
 void ImageTF3D::setVtkImageData(vtkImageDataPtr base)
 {
 	mBase = base;
