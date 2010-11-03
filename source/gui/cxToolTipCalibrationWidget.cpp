@@ -6,9 +6,11 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
+#include "sscDataManager.h"
 #include "sscVector3D.h"
-#include "cxDataLocations.h"
 #include "sscDefinitionStrings.h"
+#include "sscLabeledComboBoxWidget.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -21,6 +23,9 @@ ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
 {
   this->setObjectName("ToolTipCalibrationWidget");
   this->setWindowTitle("Tool Tip");
+
+  mCoordinateSystems = SelectCoordinateSystemStringDataAdapter::New();
+  connect(mCoordinateSystems.get(), SIGNAL(changed()), this, SLOT(coordChangedSlot()));
 
   mToCoord.mId = ssc::csTOOL;
   mToCoord.mRefObject = ssc::toolManager()->getDominantTool()->getUid();
@@ -94,6 +99,29 @@ void ToolTipCalibrationWidget::sampleSlot()
   ssc::messageManager()->sendInfo("Sampled point in "+qstring_cast(mToCoord.mId)+" ("+mToCoord.mRefObject+") space, result: "+sampledPoint);
 }
 
+void ToolTipCalibrationWidget::coordChangedSlot()
+{
+  mToCoord.mId = string2enum<ssc::COORDINATE_SYSTEM>(mCoordinateSystems->getValue());
+
+  switch (mToCoord.mId)
+  {
+  case ssc::csDATA:
+//    mSelectData->show();
+    //mToCoord.mRefObject = ssc::dataManager()->getActiveImage()->getUid();
+    break;
+  case ssc::csTOOL:
+    //mToCoord.mRefObject = ssc::toolManager()->getDominantTool()->getUid();
+//    mSelectTool->show();
+    break;
+  default:
+//    mSelectData->hide();
+//    mSelectTool->hide();
+    break;
+  };
+
+  ssc::messageManager()->sendDebug(qstring_cast(mToCoord.mId)+" space selected, with "+mToCoord.mRefObject+" as reference object.");
+}
+
 QGroupBox* ToolTipCalibrationWidget::createSampleGroupBox()
 {
   QGroupBox* retval = new QGroupBox("Sample points", this);
@@ -104,6 +132,7 @@ QGroupBox* ToolTipCalibrationWidget::createSampleGroupBox()
 
   toplayout->addWidget(mSampleButton);
   toplayout->addWidget(mFilenameBox);
+  toplayout->addWidget(new ssc::LabeledComboBoxWidget(this, mCoordinateSystems));
   toplayout->addStretch();
 
   return retval;

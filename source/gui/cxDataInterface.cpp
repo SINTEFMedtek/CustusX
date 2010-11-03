@@ -13,6 +13,8 @@
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
+#include "sscDefinitionStrings.h"
+#include "sscEnumConverter.h"
 
 namespace cx
 {
@@ -168,6 +170,31 @@ QString SelectImageStringDataAdapterBase::convertInternal2Display(QString intern
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+SelectCoordinateSystemStringDataAdapterBase::SelectCoordinateSystemStringDataAdapterBase()
+{
+}
+QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
+{
+  QStringList retval;
+  retval << qstring_cast(ssc::csREF);
+  retval << qstring_cast(ssc::csDATA);
+  retval << qstring_cast(ssc::csPATIENTREF);
+  retval << qstring_cast(ssc::csTOOL);
+  retval << qstring_cast(ssc::csSENSOR);
+  return retval;
+}
+QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QString internal)
+{
+  if (internal.isEmpty())
+    return "<no coordinate system>";
+  return internal;
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 ActiveImageStringDataAdapter::ActiveImageStringDataAdapter()
 {
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),      this, SIGNAL(changed()));
@@ -299,6 +326,34 @@ void SelectImageStringDataAdapter::setValueName(const QString name)
 {
   mValueName = name;
 }
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
+{
+}
+QString SelectCoordinateSystemStringDataAdapter::getValueName() const
+{
+  return "Select coordinate system";
+}
+bool SelectCoordinateSystemStringDataAdapter::setValue(const QString& value)
+{
+  if (value==qstring_cast(mCoordinateSystem))
+    return false;
+  mCoordinateSystem = string2enum<ssc::COORDINATE_SYSTEM>(value);
+  emit changed();
+  return true;
+}
+QString SelectCoordinateSystemStringDataAdapter::getValue() const
+{
+  return qstring_cast(mCoordinateSystem);
+}
+QString SelectCoordinateSystemStringDataAdapter::getHelp() const
+{
+  return "Select a coordinate system";
+}
+
 //---------------------------------------------------------
 
 SelectMeshStringDataAdapter::SelectMeshStringDataAdapter() :
