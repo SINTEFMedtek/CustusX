@@ -400,7 +400,7 @@ void MainWindow::onWorkflowStateChangedSlot()
   for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
   {
     (*iter)->hide();
-   // this->removeDockWidget(*iter); // wrong: removed the dockwidget altogether
+   // this->DockWidget(*iter); // wrong: removed the dockwidget altogether
   }
 
   this->restoreState(desktop.mMainWindowState);
@@ -745,7 +745,9 @@ void MainWindow::quitSlot()
 
 void MainWindow::deleteDataSlot()
 {
-  emit deleteCurrentImage();
+  if (!ssc::dataManager()->getActiveImage())
+    return;
+  ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
 }
 
 //void MainWindow::loadPatientRegistrationSlot()
