@@ -44,6 +44,8 @@ private slots:
   void saveFileSlot();
 
 private:
+  QGroupBox* createCalibrateGroupBox();
+  QGroupBox* createTestGroupBox();
   QGroupBox* createSampleGroupBox();
 
   QPushButton* mCalibrateButton;
