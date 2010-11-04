@@ -39,6 +39,7 @@ SET(cxProject_MOC_HDRS
   cxFastOrientationRegistrationWidget.h
   cxCameraControlWidget.h
   cxSegmentationWidget.h
+  cxToolTipCalibrationWidget.h
   cxImageSegmentationAndCenterlineWidget.h
   cxWhatsThisWidget.h
   cxControlPanel.h
@@ -142,18 +143,19 @@ SET(${LIBNAME}_SRCS
     cxCameraControlWidget.h    
     cxSegmentationWidget.cpp
     cxSegmentationWidget.h
-      cxControlPanel.h
-      cxControlPanel.cpp
-      cxIGTLinkWidget.h
-      cxIGTLinkWidget.cpp
-  RTSource/sscOpenIGTLinkClient.h
-  RTSource/sscOpenIGTLinkClient.cpp
-  RTSource/sscOpenIGTLinkRTSource.h
-  RTSource/sscOpenIGTLinkRTSource.cpp
-  RTSource/sscRealTimeSource.h
-  RTSource/sscRT2DRep.h
-  RTSource/sscRT2DRep.cpp
-      
+    cxIGTLinkWidget.h
+    cxIGTLinkWidget.cpp
+    RTSource/sscOpenIGTLinkClient.h
+    RTSource/sscOpenIGTLinkClient.cpp
+    RTSource/sscOpenIGTLinkRTSource.h
+    RTSource/sscOpenIGTLinkRTSource.cpp
+    RTSource/sscRealTimeSource.h
+    RTSource/sscRT2DRep.h
+    RTSource/sscRT2DRep.cpp
+    cxToolTipCalibrationWidget.h
+    cxToolTipCalibrationWidget.cpp
+    cxControlPanel.h
+    cxControlPanel.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
