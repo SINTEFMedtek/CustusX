@@ -454,6 +454,8 @@ void RegistrationManager::doVesselRegistration()
   this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
 
   ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
+
+  std::cout << "linear result:\n" << linearTransform << std::endl;
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)
@@ -468,24 +470,38 @@ void RegistrationManager::addXml(QDomNode& parentNode)
     fixedDataNode.appendChild(doc.createTextNode(mFixedData->getUid()));
   }
   base.appendChild(fixedDataNode);
+
+  QDomElement movingDataNode = doc.createElement("movingDataUid");
+  if(mMovingData)
+  {
+    movingDataNode.appendChild(doc.createTextNode(mMovingData->getUid()));
+  }
+  base.appendChild(movingDataNode);
 }
 
 void RegistrationManager::parseXml(QDomNode& dataNode)
 {
-  QDomNode child = dataNode.firstChild();
-  while(!child.isNull())
-  {
-    if(child.toElement().tagName() == "fixedDataUid")
-    {
-      const QString fixedDataString = child.toElement().text();
-      if(!fixedDataString.isEmpty())
-      {
-        ssc::DataPtr data = ssc::dataManager()->getData(fixedDataString);
-        this->setFixedData(data);
-      }
-    }
-    child = child.nextSibling();
-  }
+  QString fixedData = dataNode.namedItem("fixedDataUid").toElement().text();
+  this->setFixedData(ssc::dataManager()->getData(fixedData));
+
+  QString movingData = dataNode.namedItem("movingDataUid").toElement().text();
+  this->setMovingData(ssc::dataManager()->getData(movingData));
+
+//
+//  QDomNode child = dataNode.firstChild();
+//  while(!child.isNull())
+//  {
+//    if(child.toElement().tagName() == "fixedDataUid")
+//    {
+//      const QString fixedDataString = child.toElement().text();
+//      if(!fixedDataString.isEmpty())
+//      {
+//        ssc::DataPtr data = ssc::dataManager()->getData(fixedDataString);
+//        this->setFixedData(data);
+//      }
+//    }
+//    child = child.nextSibling();
+//  }
 }
 
 void RegistrationManager::clear()
