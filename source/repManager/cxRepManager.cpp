@@ -283,6 +283,12 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     if (!ok)
       maxRenderSize = 10 * pow(10,6);
 
+    bool useGPURender = DataLocations::getSettings()->value("useGPUVolumeRayCastMapper").toBool();
+    if (useGPURender)
+    	rep->setUseGPUVolumeRayCastMapper();
+    else
+    	rep->setUseVolumeTextureMapper();
+
     rep->setMaxVolumeSize(maxRenderSize);
     rep->setImage(image);
     mVolumetricRepByImageMap[image->getUid()] = rep;
