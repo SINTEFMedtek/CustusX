@@ -49,8 +49,8 @@ ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
   connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));
   connect(mSampleButton, SIGNAL(clicked()), this, SLOT(sampleSlot()));
 
-  topLayout->addWidget(mCalibrateButton, 1,0);
-  topLayout->addWidget(mTestButton, 2,0);
+  topLayout->addWidget(this->createCalibrateGroupBox(), 1,0);
+  topLayout->addWidget(this->createTestGroupBox(), 2,0);
   topLayout->addWidget(this->createSampleGroupBox(), 3,0);
 
   this->coordChangedSlot();
@@ -103,6 +103,7 @@ void ToolTipCalibrationWidget::sampleSlot()
   QString sampledPoint = qstring_cast(toolPoint);
 
   QTextStream streamer(&samplingFile);
+//  streamer << QDateTime::currentDateTime().toString();
   streamer << sampledPoint;
   streamer << endl;
 
@@ -160,6 +161,28 @@ void ToolTipCalibrationWidget::saveFileSlot()
     return;
 
   mSaveToFileNameLabel->setText(fileName);
+}
+
+QGroupBox* ToolTipCalibrationWidget::createCalibrateGroupBox()
+{
+  QGroupBox* retval = new QGroupBox("Calibrate tool", this);
+  QVBoxLayout* toplayout = new QVBoxLayout(retval);
+
+  toplayout->addWidget(mCalibrateButton);
+  toplayout->addStretch();
+
+  return retval;
+}
+
+QGroupBox* ToolTipCalibrationWidget::createTestGroupBox()
+{
+  QGroupBox* retval = new QGroupBox("Test calibration", this);
+  QVBoxLayout* toplayout = new QVBoxLayout(retval);
+
+  toplayout->addWidget(mTestButton);
+  toplayout->addStretch();
+
+  return retval;
 }
 
 QGroupBox* ToolTipCalibrationWidget::createSampleGroupBox()
