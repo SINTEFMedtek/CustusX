@@ -38,7 +38,14 @@ QVariant SyncedValue::get() const
 ViewGroupData::ViewGroupData() :
     mCamera3D(CameraData::create())
 {
+  connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+}
 
+void ViewGroupData::removeDataSlot(QString uid)
+{
+  for (unsigned i=0; i<mData.size(); ++i)
+    if (mData[i]->getUid()==uid)
+      this->removeData(mData[i]);
 }
 
 void ViewGroupData::requestInitialize()

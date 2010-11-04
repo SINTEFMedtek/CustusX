@@ -13,6 +13,8 @@
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
+#include "sscDefinitionStrings.h"
+#include "sscEnumConverter.h"
 
 namespace cx
 {
@@ -163,6 +165,98 @@ QString SelectImageStringDataAdapterBase::convertInternal2Display(QString intern
     return "<no volume>";
   return qstring_cast(image->getName());
 }
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase()
+{
+  connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(currentImageDeleted(ssc::ImagePtr)),   this, SIGNAL(changed()));
+}
+QStringList SelectDataStringDataAdapterBase::getValueRange() const
+{
+  std::vector<QString> meshUids = ssc::dataManager()->getMeshUids();
+  std::vector<QString> imageUids = ssc::dataManager()->getImageUids();
+  QStringList retval;
+  retval << "";
+  for (unsigned i=0; i<meshUids.size(); ++i)
+    retval << qstring_cast(meshUids[i]);
+  for (unsigned i=0; i<imageUids.size(); ++i)
+    retval << qstring_cast(imageUids[i]);
+  return retval;
+}
+QString SelectDataStringDataAdapterBase::convertInternal2Display(QString internal)
+{
+  ssc::DataPtr data = ssc::dataManager()->getData(internal);
+  if (!data)
+    return "<no data>";
+  return qstring_cast(data->getName());
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectToolStringDataAdapterBase::SelectToolStringDataAdapterBase()
+{
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
+}
+QStringList SelectToolStringDataAdapterBase::getValueRange() const
+{
+  std::vector<QString> uids = ssc::toolManager()->getToolUids();
+  QStringList retval;
+  retval << "";
+  for (unsigned i=0; i<uids.size(); ++i)
+    retval << qstring_cast(uids[i]);
+  return retval;
+}
+QString SelectToolStringDataAdapterBase::convertInternal2Display(QString internal)
+{
+  ssc::ToolPtr tool = ssc::toolManager()->getTool(internal);
+  if (!tool)
+  {
+    return "<no tool>";
+  }
+  return qstring_cast(tool->getName());
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectCoordinateSystemStringDataAdapterBase::SelectCoordinateSystemStringDataAdapterBase()
+{
+}
+QStringList SelectCoordinateSystemStringDataAdapterBase::getValueRange() const
+{
+  QStringList retval;
+  retval << "";
+  retval << qstring_cast(ssc::csREF);
+  retval << qstring_cast(ssc::csDATA);
+  retval << qstring_cast(ssc::csPATIENTREF);
+  retval << qstring_cast(ssc::csTOOL);
+  retval << qstring_cast(ssc::csSENSOR);
+  return retval;
+}
+QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QString internal)
+{
+  if (internal.isEmpty())
+    return "<no coordinate system>";
+
+  //as requested by Frank
+  if(internal == "reference")
+    return "data reference";
+  if(internal == "data")
+    return "data (image/mesh)";
+  if(internal == "patient reference")
+    return "patient/tool reference";
+  if(internal == "tool")
+    return "tool";
+  if(internal == "sensor")
+    return "tools sensor";
+
+  return internal;
+}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -298,6 +392,109 @@ ssc::ImagePtr SelectImageStringDataAdapter::getImage()
 void SelectImageStringDataAdapter::setValueName(const QString name)
 {
   mValueName = name;
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
+{
+}
+QString SelectCoordinateSystemStringDataAdapter::getValueName() const
+{
+  return "Select coordinate system";
+}
+bool SelectCoordinateSystemStringDataAdapter::setValue(const QString& value)
+{
+//  if (value==qstring_cast(mCoordinateSystem))
+//    return false;
+  mCoordinateSystem = string2enum<ssc::COORDINATE_SYSTEM>(value);
+  emit changed();
+  return true;
+}
+QString SelectCoordinateSystemStringDataAdapter::getValue() const
+{
+  return qstring_cast(mCoordinateSystem);
+}
+QString SelectCoordinateSystemStringDataAdapter::getHelp() const
+{
+  return "Select a coordinate system";
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectToolStringDataAdapter::SelectToolStringDataAdapter()
+{
+  //mTool = ssc::toolManager()->getDominantTool();
+}
+QString SelectToolStringDataAdapter::getValueName() const
+{
+  return "Select a tool";
+}
+bool SelectToolStringDataAdapter::setValue(const QString& value)
+{
+  if(mTool && value==mTool->getUid())
+    return false;
+  ssc::ToolPtr temp = ssc::toolManager()->getTool(value);
+  if(!temp)
+    return false;
+
+  mTool = temp;
+  emit changed();
+  return true;
+}
+QString SelectToolStringDataAdapter::getValue() const
+{
+  if(!mTool)
+    return "<no tool>";
+  return mTool->getUid();
+}
+QString SelectToolStringDataAdapter::getHelp() const
+{
+  return "Select a tool";
+}
+ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
+{
+  return mTool;
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+SelectDataStringDataAdapter::SelectDataStringDataAdapter()
+{
+}
+QString SelectDataStringDataAdapter::getValueName() const
+{
+  return "Select data";
+}
+bool SelectDataStringDataAdapter::setValue(const QString& value)
+{
+  if (mData && value==mData->getUid())
+    return false;
+  ssc::DataPtr temp = ssc::dataManager()->getData(value);
+  if(!temp)
+    return false;
+
+  mData = temp;
+  emit changed();
+  return true;
+}
+QString SelectDataStringDataAdapter::getValue() const
+{
+  if(!mData)
+    return "<no data>";
+  return mData->getUid();
+}
+QString SelectDataStringDataAdapter::getHelp() const
+{
+  return "Select data";
+}
+ssc::DataPtr SelectDataStringDataAdapter::getData() const
+{
+  return mData;
 }
 //---------------------------------------------------------
 
