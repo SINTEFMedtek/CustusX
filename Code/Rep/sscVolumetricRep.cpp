@@ -4,6 +4,7 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkVolumeProperty.h>
 #include <vtkVolumeTextureMapper3D.h>
+#include <vtkGPUVolumeRayCastMapper.h>
 #include <vtkImageData.h>
 #include <vtkVolume.h>
 #include <vtkRenderer.h>
@@ -17,6 +18,8 @@
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
 
+typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
+
 namespace ssc
 {
 VolumetricRep::VolumetricRep(const QString& uid, const QString& name) :
@@ -24,7 +27,6 @@ VolumetricRep::VolumetricRep(const QString& uid, const QString& name) :
 	mOpacityTransferFunction(vtkPiecewiseFunctionPtr::New()),
 	mColorTransferFunction(vtkColorTransferFunctionPtr::New()),
 	mVolumeProperty(vtkVolumePropertyPtr::New()),
-	mTextureMapper3D(vtkVolumeTextureMapper3DPtr::New()),
 	mVolume(vtkVolumePtr::New()),
 	mMaxVoxels(0)
 {
@@ -56,24 +58,51 @@ VolumetricRep::VolumetricRep(const QString& uid, const QString& name) :
 	mVolumeProperty->SetScalarOpacityUnitDistance(0.8919);
 //	mVolumeProperty->SetInterpolationTypeToNearest();
 
-	// from snws
-	mTextureMapper3D->SetPreferredMethodToNVidia();
-	//mTextureMapper3D->SetPreferredMethodToFragmentProgram();
-	mTextureMapper3D->SetBlendModeToComposite();
+	this->setUseVolumeTextureMapper();
+//	vtkGPUVolumeRayCastMapperPtr mapper = vtkGPUVolumeRayCastMapperPtr::New();
+//	//vtkVolumeTextureMapper3DPtr mapper = vtkVolumeTextureMapper3DPtr::New();
+//	mMapper = mapper;
+//
+//	// from snws
+//	//mapper->SetPreferredMethodToNVidia();
+//	//mTextureMapper3D->SetPreferredMethodToFragmentProgram();
+//	mMapper->SetBlendModeToComposite();
 
  // mTextureMapper3D->CroppingOff();
 
 	mVolume->SetProperty( mVolumeProperty );
-	mVolume->SetMapper( mTextureMapper3D );
+//	mVolume->SetMapper( mMapper );
+
 
 //	if (!mTextureMapper3D->IsRenderSupported(mVolumeProperty))
 //	{
 //	  std::cout << "Warning: texture rendering not supported" << std::endl;
 //	}
-
 }
+
 VolumetricRep::~VolumetricRep()
 {}
+
+void VolumetricRep::setUseGPUVolumeRayCastMapper()
+{
+	vtkGPUVolumeRayCastMapperPtr mapper = vtkGPUVolumeRayCastMapperPtr::New();
+	mMapper = mapper;
+	mMapper->SetBlendModeToComposite();
+	mVolume->SetMapper( mMapper );
+}
+
+void VolumetricRep::setUseVolumeTextureMapper()
+{
+	vtkVolumeTextureMapper3DPtr mapper = vtkVolumeTextureMapper3DPtr::New();
+	mMapper = mapper;
+
+	// from snws
+	mapper->SetPreferredMethodToNVidia();
+	mMapper->SetBlendModeToComposite();
+
+	mVolume->SetMapper( mMapper );
+}
+
 VolumetricRepPtr VolumetricRep::New(const QString& uid, const QString& name)
 {
 	VolumetricRepPtr retval(new VolumetricRep(uid, name));
@@ -131,7 +160,7 @@ void VolumetricRep::setImage(ImagePtr image)
 	}
 	else
 	{
-		mTextureMapper3D->SetInput( (vtkImageData*)NULL );
+		mMapper->SetInput( (vtkImageData*)NULL );
 	}
 }
 bool VolumetricRep::hasImage(ImagePtr image) const
@@ -208,7 +237,7 @@ void VolumetricRep::vtkImageDataChangedSlot()
 //    volume->Print(std::cout);
 	}
 
-	mTextureMapper3D->SetInput(volume);
+	mMapper->SetInput(volume);
 
 	transferFunctionsChangedSlot();
 	transformChangedSlot();
