@@ -38,9 +38,7 @@ private slots:
   void surfaceOutputArrived(QString uid);
   void centerlineOutputArrived(QString uid);
 
-private:
-  ImageSegmentationAndCenterlineWidget();
-
+protected:
   class SegmentationWidget* mSegmentationWidget;
   class SurfaceWidget*      mSurfaceWidget;
   class CenterlineWidget*   mCenterlineWidget;
@@ -58,7 +56,6 @@ public:
   virtual QString defaultWhatsThis() const;
 
 private:
-  FixedImage2ImageWidget();
 };
 
 class MovingImage2ImageWidget : public ImageSegmentationAndCenterlineWidget
@@ -69,7 +66,6 @@ public:
   virtual QString defaultWhatsThis() const;
 
 private:
-  MovingImage2ImageWidget();
 };
 
 }//namespace cx
