@@ -11,6 +11,7 @@
 #include "sscRealTimeSource.h"
 
 #include "igtlImageMessage.h"
+class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 
@@ -33,13 +34,22 @@ public:
   virtual QDateTime getTimestamp();
   virtual bool connected() const;
 
+  virtual QString getInfoString() const;
+  virtual QString getStatusString() const;
+
+  virtual void start();
+  virtual void pause();
+  virtual void stop();
+
+  virtual bool validData() const;
+
   // non-inherited methods
   void connectServer(QString address, int port);
   void disconnectServer();
 
 
 signals:
-  void newData();
+//  void newData();
   void serverStatusChanged();
 
 public:
@@ -48,6 +58,7 @@ public:
 private slots:
   void clientFinishedSlot();
   void imageReceivedSlot();
+  void timeout();
 
 private:
 //  void padBox(int* x, int* y) const;
@@ -59,6 +70,8 @@ private:
   igtl::ImageMessage::Pointer mImageMessage;
   IGTLinkClientPtr mClient;
 
+  bool mTimeout;
+  QTimer* mTimeoutTimer;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
