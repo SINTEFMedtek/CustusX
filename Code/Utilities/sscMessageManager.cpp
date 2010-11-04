@@ -3,6 +3,7 @@
 #include <iostream>
 #include "boost/shared_ptr.hpp"
 #include <QString>
+#include <QSound>
 #include <QTextStream>
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
@@ -246,6 +247,16 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
   }
 
   emit emittedMessage(message);
+}
+
+void MessageManager::sendSuccessSound()
+{
+  //QSound::play("/Users/jbake/jbake/dev/CustusX3.git/config/Electro_bip.wav");
+}
+
+void MessageManager::sendErrorSound()
+{
+  //QSound::play("/Users/jbake/jbake/dev/CustusX3.git/config/Gromb.wav");
 }
 
 bool MessageManager::openLogging(QFile::OpenMode mode)
