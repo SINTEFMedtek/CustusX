@@ -98,6 +98,7 @@ protected:
   QSpinBox* mRenderingIntervalSpinBox;
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
+  QCheckBox* mGPURenderCheckBox;
   QCheckBox* mShadingCheckBox;
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;

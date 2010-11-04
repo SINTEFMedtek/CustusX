@@ -4,3 +4,4 @@ build
 .project
 .metadata
 config/ConsoleLog.txt
+config/SampledPoints.txt

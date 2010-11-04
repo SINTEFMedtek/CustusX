@@ -57,6 +57,14 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
+class CalibrationMethodsWidget : public TabbedWidget
+{
+public:
+  CalibrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~CalibrationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
 class LandmarkRegistrationsWidget : public TabbedWidget
 {
 public:
