@@ -53,11 +53,11 @@ namespace ssc
 
 	enum COORDINATE_SYSTEM
 	{
-	  csREF,
-	  csDATA,
-	  csPATIENTREF,
-	  csTOOL,
-	  csSENSOR,
+	  csREF, ///< the data reference space (r)
+	  csDATA, ///< a datas space (d)
+	  csPATIENTREF, ///< the patient/tool reference space (pr)
+	  csTOOL, ///< a tools rspace (t)
+	  csSENSOR, ///< a tools sensor space (s)
 	  csCOUNT
 	};
 } //namespace end

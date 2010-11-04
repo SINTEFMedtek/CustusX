@@ -8,14 +8,15 @@ namespace ssc
 {
 struct CoordinateSystem
 {
-  COORDINATE_SYSTEM mId;
-  QString           mRefObject;
+  COORDINATE_SYSTEM mId; ///< the type of coordinate system
+  QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
 };
 
 /**
  * \class CoordinateSystemHelpers
  *
- * \brief
+ * \brief Helper class that gets you from any coordinate system to any
+ * other coordinate system in CustusX
  *
  * \date 3. nov. 2010
  * \author: Janne Beate Bakeng
@@ -29,7 +30,7 @@ public:
   static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
 private:
-  Transform3D get_rMto(CoordinateSystem to) const; ///< ref_M_to
+  Transform3D get_rMfrom(CoordinateSystem from) const; ///< ref_M_from
 
   Transform3D get_rMr() const; ///< ref_M_ref
   Transform3D get_rMd(QString uid) const; ///< ref_M_d

@@ -33,37 +33,37 @@ Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, b
 Transform3D CoordinateSystemHelpers::get_toMfrom(CoordinateSystem from, CoordinateSystem to)
 {
   CoordinateSystemHelpers helper;
-  Transform3D to_M_from = helper.get_rMto(to).inv() * helper.get_rMto(from);
+  Transform3D to_M_from = helper.get_rMfrom(to).inv() * helper.get_rMfrom(from);
   return to_M_from;
 }
 
-Transform3D CoordinateSystemHelpers::get_rMto(CoordinateSystem to) const
+Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
 {
-  Transform3D rMto;
+  Transform3D rMfrom;
 
-  switch(to.mId)
+  switch(from.mId)
   {
   case csREF:
-    rMto = this->get_rMr();
+    rMfrom = this->get_rMr();
     break;
   case csDATA:
-    rMto = this->get_rMd(to.mRefObject);
+    rMfrom = this->get_rMd(from.mRefObject);
     break;
   case csPATIENTREF:
-    rMto = this->get_rMpr();
+    rMfrom = this->get_rMpr();
     break;
   case csTOOL:
-    rMto = this->get_rMt(to.mRefObject);
+    rMfrom = this->get_rMt(from.mRefObject);
     break;
   case csSENSOR:
-    rMto = this->get_rMs(to.mRefObject);
+    rMfrom = this->get_rMs(from.mRefObject);
     break;
   default:
 
     break;
   };
 
-  return rMto;
+  return rMfrom;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr() const
