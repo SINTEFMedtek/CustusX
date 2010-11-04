@@ -4,7 +4,11 @@
 #include <vtkColorTransferFunction.h>
 #include <vtkVolumeProperty.h>
 #include <vtkVolumeTextureMapper3D.h>
-#include <vtkGPUVolumeRayCastMapper.h>
+
+#if VTK_MINOR_VERSION >= 6
+	#include <vtkGPUVolumeRayCastMapper.h>
+#endif
+
 #include <vtkImageData.h>
 #include <vtkVolume.h>
 #include <vtkRenderer.h>
@@ -85,10 +89,12 @@ VolumetricRep::~VolumetricRep()
 
 void VolumetricRep::setUseGPUVolumeRayCastMapper()
 {
+#if VTK_MINOR_VERSION >= 6
 	vtkGPUVolumeRayCastMapperPtr mapper = vtkGPUVolumeRayCastMapperPtr::New();
 	mMapper = mapper;
 	mMapper->SetBlendModeToComposite();
 	mVolume->SetMapper( mMapper );
+#endif
 }
 
 void VolumetricRep::setUseVolumeTextureMapper()
