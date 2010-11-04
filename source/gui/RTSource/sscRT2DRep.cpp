@@ -53,7 +53,16 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mPlaneActor->SetTexture(mUsTexture);
   mPlaneActor->SetMapper(mapper2);
 
-  setup();
+  mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
+  mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+  mInfoText->setCentered();
+  mInfoText->setPosition(0.5, 0.05);
+
+  mStatusText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 20));
+  mStatusText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+  mStatusText->setCentered();
+  mStatusText->setPosition(0.5, 0.5);
+  mStatusText->updateText("testimage");
 //  statusChangedSlot();
   //Logger::log("vm.log", "RealTimeStream2DRep::RealTimeStream2DRep()");
 }
@@ -65,9 +74,11 @@ RealTimeStream2DRep::~RealTimeStream2DRep()
 
 void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
 {
+  std::cout << "RealTimeStream2DRep::setRealtimeStream()" << std::endl;
+
   if (mData)
   {
-    disconnect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
+    disconnect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
     mUsTexture->SetInput(NULL);
   }
 
@@ -75,7 +86,7 @@ void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
 
   if (mData)
   {
-    connect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
+    connect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
     mUsTexture->SetInput(mData->getVtkImageData());
   }
 
@@ -84,12 +95,23 @@ void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
 
 void RealTimeStream2DRep::newDataSlot()
 {
+//  std::cout << "p1" << ssc::Vector3D(mPlaneSource->GetPoint1()) << std::endl;
+//  std::cout << "p2" << ssc::Vector3D(mPlaneSource->GetPoint2()) << std::endl;
+//  std::cout << "RealTimeStream2DRep::newDataSlot()" << std::endl;
   mPlaneActor->SetVisibility(mData!=NULL);
   if (!mData)
     return;
   this->initializeSize(mData->getVtkImageData()->GetDimensions()[0], mData->getVtkImageData()->GetDimensions()[1]);
 //    mPlaneActor->SetVisibility(true);
 //    setCamera();
+
+  mPlaneActor->SetVisibility(mData->validData());
+  mInfoText->updateText(mData->getInfoString());
+  mStatusText->updateText(mData->getStatusString());
+  mStatusText->getActor()->SetVisibility(!mData->validData());
+  //std::cout << "vis: " << mPlaneActor->GetVisibility() << std::endl;
+
+  this->setCamera();
 }
 
 void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
@@ -100,10 +122,16 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
     return;
   }
   DoubleBoundingBox3D extent(mData->getVtkImageData()->GetExtent());
-//  mPlaneSource->SetPoint2( 0.0, imageHeight - 1, 0.0 );
-//  mPlaneSource->SetPoint1(imageWidth - 1, 0.0, 0.0 );
-  mPlaneSource->SetPoint1(0, 0, 0);
-  mPlaneSource->SetPoint2(extent[1], extent[3], 0.0);
+  if (ssc::similar(extent.range()[0], 0.0) || ssc::similar(extent.range()[1], 0.0))
+    return;
+
+  //mPlaneSource->SetPoint2( 0.0, imageHeight - 1, 0.0 );
+  //mPlaneSource->SetPoint1(imageWidth - 1, 0.0, 0.0 );
+  mPlaneSource->SetOrigin(extent.corner(0,0,0).begin());
+  mPlaneSource->SetPoint1(extent.corner(1,0,0).begin());
+  mPlaneSource->SetPoint2(extent.corner(0,1,0).begin());
+//  std::cout << "extent " << extent << std::endl;
+//  mPlaneSource->Print(std::cout);
 }
 
 //void RealTimeStream2DRep::statusChangedSlot()
@@ -119,25 +147,25 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
 //
 //}
 
-///**We need this here, even if it belongs in singlelayout.
-// * Reason: must call setcamera after last change of size of plane actor.
-// * TODO fix it.
-// */
-//void RealTimeStream2DRep::setCamera()
-//{
-//  if (!mRenderer)
-//    return;
-//  vtkCamera* camera = mRenderer->GetActiveCamera();
-//  camera->ParallelProjectionOn();
-//  mRenderer->ResetCamera();
-//
-//  double scale = camera->GetParallelScale();
-//
-//  //SW_LOG("%p, %p, %f", mRenderer.GetPointer(), this, scale);
-//
-//  //SW_LOG("Scale %f ", scale );
-//  camera->SetParallelScale(scale*0.6);
-//}
+/**We need this here, even if it belongs in singlelayout.
+ * Reason: must call setcamera after last change of size of plane actor.
+ * TODO fix it.
+ */
+void RealTimeStream2DRep::setCamera()
+{
+  if (!mRenderer)
+    return;
+  vtkCamera* camera = mRenderer->GetActiveCamera();
+  camera->ParallelProjectionOn();
+  mRenderer->ResetCamera();
+
+  double scale = camera->GetParallelScale();
+
+  //SW_LOG("%p, %p, %f", mRenderer.GetPointer(), this, scale);
+
+  //SW_LOG("Scale %f ", scale );
+  camera->SetParallelScale(scale*0.6);
+}
 
 
 void RealTimeStream2DRep::addRepActorsToViewRenderer(ssc::View* view)
@@ -160,21 +188,21 @@ void RealTimeStream2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
   view->getRenderer()->RemoveActor(mStatusText->getActor());
 }
 
-void RealTimeStream2DRep::setup()
-{
-  mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
-  mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-  mInfoText->setCentered();
-  mInfoText->setPosition(0.5, 0.05);
-
-  mStatusText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 20));
-  mStatusText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-  mStatusText->setCentered();
-  mStatusText->setPosition(0.5, 0.5);
-  mStatusText->updateText("testimage");
-
-  //setCamera();
-}
+//void RealTimeStream2DRep::setup()
+//{
+//  mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
+//  mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+//  mInfoText->setCentered();
+//  mInfoText->setPosition(0.5, 0.05);
+//
+//  mStatusText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 20));
+//  mStatusText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+//  mStatusText->setCentered();
+//  mStatusText->setPosition(0.5, 0.5);
+//  mStatusText->updateText("testimage");
+//
+//  //setCamera();
+//}
 
 //void RealTimeStream2DRep::formatMechTermIndex()
 //{

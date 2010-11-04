@@ -42,7 +42,8 @@ private slots:
   void newDataSlot();
 private:
   void initializeSize(int imageWidth, int imageHeight);
-  void setup();
+  void setCamera();
+ void setup();
   RealTimeStreamSourcePtr mData;
   ssc::TextDisplayPtr mStatusText;
   ssc::TextDisplayPtr mInfoText;
