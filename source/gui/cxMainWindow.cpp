@@ -41,6 +41,7 @@
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
+#include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
 #include "cxIGTLinkWidget.h"
@@ -50,12 +51,12 @@ namespace cx
 
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
-//  mToggleWidgetActionGroup(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
+  mCalibrationMethodsWidget(new CalibrationMethodsWidget("CalibrationMethodsWidget", "Calibration Methods", this)),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
@@ -85,6 +86,7 @@ MainWindow::MainWindow() :
   this->populateRegistrationMethodsWidget();
   this->populateSegmentationMethodsWidget();
   this->populateVisualizationMethodsWidget();
+  this->populateCalibrationMethodsWidget();
 
   this->addAsDockWidget(new IGTLinkWidget(this), "Utililty");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
@@ -99,6 +101,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mSegmentationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mVisualizationMethodsWidget, "Algorithms");
+  this->addAsDockWidget(mCalibrationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mNavigationWidget, "Properties");
   this->addAsDockWidget(mConsoleWidget, "Utility");
   this->addAsDockWidget(mFrameTreeWidget, "Browsing");
@@ -404,7 +407,7 @@ void MainWindow::onWorkflowStateChangedSlot()
   for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
   {
     (*iter)->hide();
-   // this->removeDockWidget(*iter); // wrong: removed the dockwidget altogether
+   // this->DockWidget(*iter); // wrong: removed the dockwidget altogether
   }
 
   this->restoreState(desktop.mMainWindowState);
@@ -700,8 +703,8 @@ void MainWindow::populateRegistrationMethodsWidget()
   FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
   MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
-  image2imageWidget->addTab(movingRegistrationWidget, "US"); //should be application specific
-  image2imageWidget->addTab(fixedRegistrationWidget, "MR"); //should be application specific
+  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed (US)"); //should be application specific
+  image2imageWidget->addTab(movingRegistrationWidget, "Moving (MR)"); //should be application specific
   image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
 
   //manual offset
@@ -727,6 +730,13 @@ void MainWindow::populateVisualizationMethodsWidget()
   mVisualizationMethodsWidget->addTab(surfaceWidget, "Surface");
 }
 
+void MainWindow::populateCalibrationMethodsWidget()
+{
+  ToolTipCalibrationWidget* toolTipCalibrationWidget = new ToolTipCalibrationWidget(mCalibrationMethodsWidget);
+
+  mCalibrationMethodsWidget->addTab(toolTipCalibrationWidget, "Tool Tip");
+}
+
 void MainWindow::aboutSlot()
 {
   QMessageBox::about(this, tr("About CustusX"), tr("<h2>CustusX version %1</h2> "
@@ -749,7 +759,9 @@ void MainWindow::quitSlot()
 
 void MainWindow::deleteDataSlot()
 {
-  emit deleteCurrentImage();
+  if (!ssc::dataManager()->getActiveImage())
+    return;
+  ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
 }
 
 //void MainWindow::loadPatientRegistrationSlot()
