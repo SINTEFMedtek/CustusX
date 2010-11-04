@@ -2,7 +2,7 @@
 
 #include <QPushButton>
 #include <QTextStream>
-#include <QLineEdit>
+#include <QFileDialog>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
@@ -19,16 +19,26 @@ ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
   mCalibrateButton(new QPushButton("Calibrate", this)),
   mTestButton(new QPushButton("Test calibration", this)),
   mSampleButton(new QPushButton("Sample")),
-  mFilenameBox(new QLineEdit("", this))
+  mSaveFileButton(new QPushButton("Save to..."))
 {
   this->setObjectName("ToolTipCalibrationWidget");
   this->setWindowTitle("Tool Tip");
 
+  mSaveToFileNameLabel = new QLabel(DataLocations::getRootConfigPath()+"/SampledPoints.txt", this);
+
+  connect(mSaveFileButton, SIGNAL(clicked()), this, SLOT(saveFileSlot()));
+
   mCoordinateSystems = SelectCoordinateSystemStringDataAdapter::New();
   connect(mCoordinateSystems.get(), SIGNAL(changed()), this, SLOT(coordChangedSlot()));
 
-  mToCoord.mId = ssc::csTOOL;
-  mToCoord.mRefObject = ssc::toolManager()->getDominantTool()->getUid();
+  mTools = SelectToolStringDataAdapter::New();
+  connect(mTools.get(), SIGNAL(changed()), this, SLOT(referenceObjectChanged()));
+
+  mData = SelectDataStringDataAdapter::New();
+  connect(mData.get(), SIGNAL(changed()), this, SLOT(referenceObjectChanged()));
+
+  mToCoordinateSystem.mId = ssc::csTOOL;
+  mToCoordinateSystem.mRefObject = ssc::toolManager()->getDominantTool()->getUid();
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
@@ -42,6 +52,8 @@ ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
   topLayout->addWidget(mCalibrateButton, 1,0);
   topLayout->addWidget(mTestButton, 2,0);
   topLayout->addWidget(this->createSampleGroupBox(), 3,0);
+
+  this->coordChangedSlot();
 }
 
 ToolTipCalibrationWidget::~ToolTipCalibrationWidget()
@@ -78,9 +90,7 @@ void ToolTipCalibrationWidget::testSlot()
 
 void ToolTipCalibrationWidget::sampleSlot()
 {
-  QString configPath = DataLocations::getRootConfigPath();
-  QString filePath(configPath+"/"+mFilenameBox->text());
-  QFile samplingFile(filePath);
+  QFile samplingFile(mSaveToFileNameLabel->text());
 
   if(!samplingFile.open(QIODevice::WriteOnly | QIODevice::Append))
   {
@@ -88,7 +98,7 @@ void ToolTipCalibrationWidget::sampleSlot()
     return;
   }
 
-  ssc::Vector3D toolPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(mToCoord, false);
+  ssc::Vector3D toolPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(mToCoordinateSystem, false);
 
   QString sampledPoint = qstring_cast(toolPoint);
 
@@ -96,30 +106,60 @@ void ToolTipCalibrationWidget::sampleSlot()
   streamer << sampledPoint;
   streamer << endl;
 
-  ssc::messageManager()->sendInfo("Sampled point in "+qstring_cast(mToCoord.mId)+" ("+mToCoord.mRefObject+") space, result: "+sampledPoint);
+  ssc::messageManager()->sendInfo("Sampled point in "+qstring_cast(mToCoordinateSystem.mId)+" ("+mToCoordinateSystem.mRefObject+") space, result: "+sampledPoint);
 }
 
 void ToolTipCalibrationWidget::coordChangedSlot()
 {
-  mToCoord.mId = string2enum<ssc::COORDINATE_SYSTEM>(mCoordinateSystems->getValue());
+  mToCoordinateSystem.mId = string2enum<ssc::COORDINATE_SYSTEM>(mCoordinateSystems->getValue());
 
-  switch (mToCoord.mId)
+  switch (mToCoordinateSystem.mId)
   {
   case ssc::csDATA:
-//    mSelectData->show();
-    //mToCoord.mRefObject = ssc::dataManager()->getActiveImage()->getUid();
+    mDataComboBox->show();
+    mToolComboBox->hide();
     break;
   case ssc::csTOOL:
-    //mToCoord.mRefObject = ssc::toolManager()->getDominantTool()->getUid();
-//    mSelectTool->show();
+    mToolComboBox->show();
+    mDataComboBox->hide();
+    break;
+  case ssc::csSENSOR:
+    mToolComboBox->show();
+    mDataComboBox->hide();
     break;
   default:
-//    mSelectData->hide();
-//    mSelectTool->hide();
+    mDataComboBox->hide();
+    mToolComboBox->hide();
     break;
   };
 
-  ssc::messageManager()->sendDebug(qstring_cast(mToCoord.mId)+" space selected, with "+mToCoord.mRefObject+" as reference object.");
+//  ssc::messageManager()->sendDebug(qstring_cast(mToCoordinateSystem.mId)+" space selected, with "+mToCoordinateSystem.mRefObject+" as reference object. (1)");
+}
+
+void ToolTipCalibrationWidget::referenceObjectChanged()
+{
+  QString uid = "";
+  if(static_cast<SelectToolStringDataAdapter*>(this->sender()) && mTools->getTool())
+    uid = mTools->getTool()->getUid();
+
+  if(static_cast<SelectDataStringDataAdapter*>(this->sender()) && mData->getData())
+    uid = mData->getData()->getUid();
+
+  mToCoordinateSystem.mRefObject = uid;
+//  ssc::messageManager()->sendDebug(qstring_cast(mToCoordinateSystem.mId)+" space selected, with "+mToCoordinateSystem.mRefObject+" as reference object.(2)");
+}
+
+void ToolTipCalibrationWidget::saveFileSlot()
+{
+  QString configPath = DataLocations::getRootConfigPath();
+
+  QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                             configPath+"/SampledPoints.txt",
+                             tr("Text (*.txt)"));
+  if(fileName.isEmpty())
+    return;
+
+  mSaveToFileNameLabel->setText(fileName);
 }
 
 QGroupBox* ToolTipCalibrationWidget::createSampleGroupBox()
@@ -127,12 +167,22 @@ QGroupBox* ToolTipCalibrationWidget::createSampleGroupBox()
   QGroupBox* retval = new QGroupBox("Sample points", this);
   QVBoxLayout* toplayout = new QVBoxLayout(retval);
 
-  QString defaultFileName("SampledPoints.txt");
-  mFilenameBox->setText(defaultFileName);
+  mCoordinateSystemComboBox = new ssc::LabeledComboBoxWidget(this, mCoordinateSystems);
+  mToolComboBox = new ssc::LabeledComboBoxWidget(this, mTools);
+  mDataComboBox = new ssc::LabeledComboBoxWidget(this, mData);
 
+
+  toplayout->addWidget(mSaveFileButton);
+  toplayout->addWidget(mSaveToFileNameLabel);
+//  toplayout->addSpacing(15);
+  toplayout->addWidget(this->createHorizontalLine());
+  toplayout->addWidget(new QLabel("<b>Select coordinate system to sample in: </b>", retval));
+  toplayout->addWidget(mCoordinateSystemComboBox);
+  toplayout->addWidget(mToolComboBox);
+  toplayout->addWidget(mDataComboBox);
+//  toplayout->addSpacing(15);
+  toplayout->addWidget(this->createHorizontalLine());
   toplayout->addWidget(mSampleButton);
-  toplayout->addWidget(mFilenameBox);
-  toplayout->addWidget(new ssc::LabeledComboBoxWidget(this, mCoordinateSystems));
   toplayout->addStretch();
 
   return retval;
