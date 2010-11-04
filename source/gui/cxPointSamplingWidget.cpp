@@ -8,6 +8,7 @@
 
 #include "cxToolManager.h"
 #include "sscTypeConversions.h"
+#include "sscCoordinateSystemHelpers.h"
 
 namespace cx
 {
@@ -184,15 +185,21 @@ void PointSamplingWidget::addButtonClickedSlot()
 
 ssc::Vector3D PointSamplingWidget::getSample() const
 {
-  // find current tool position:
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-  if (!tool)
-    return ssc::Vector3D(0,0,0);
-  ssc::Transform3D prMt = tool->get_prMt();
-  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-  ssc::Vector3D pos = (rMpr*prMt).coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
+// find current tool position:
+//  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+//  if (!tool)
+//    return ssc::Vector3D(0,0,0);
+//  ssc::Transform3D prMt = tool->get_prMt();
+//  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+//  ssc::Vector3D pos = (rMpr*prMt).coord(ssc::Vector3D(0,0,tool->getTooltipOffset()));
 
-  return pos;
+  ssc::CoordinateSystem ref;
+  ref.mId = ssc::csREF;
+  ref.mRefObject = "";
+
+  ssc::Vector3D P_ref = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(ref, true);
+
+  return P_ref;
 }
 
 void PointSamplingWidget::editButtonClickedSlot()

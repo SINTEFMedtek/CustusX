@@ -98,6 +98,7 @@ private:
   void populateRegistrationMethodsWidget(); ///< fill the registration methods widget with all available registration methods
   void populateSegmentationMethodsWidget();
   void populateVisualizationMethodsWidget();
+  void populateCalibrationMethodsWidget();
 
   void addAsDockWidget(QWidget* widget, QString groupname = "");
   void registerToolBar(QToolBar* toolbar, QString groupname="");
@@ -172,6 +173,7 @@ private:
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
   class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
   class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters
+  class CalibrationMethodsWidget*               mCalibrationMethodsWidget; ///< container widget for all calibration methods
   class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
   class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
   class ImagePropertiesWidget*                  mImagePropertiesWidget; ///< display and control of image properties for active image.
