@@ -55,6 +55,8 @@ public:
   //void setCamera3D(CameraDataPtr transform) { mCamera3D = transform; }
   CameraDataPtr getCamera3D() { return mCamera3D; }
 
+private slots:
+  void removeDataSlot(QString uid);
 signals:
   void dataAdded(QString uid);
   void dataRemoved(QString uid);
