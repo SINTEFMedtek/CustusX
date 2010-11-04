@@ -6,8 +6,11 @@
 #include <QGridLayout>
 #include <QCheckBox>
 
+#include <vtkPolyData.h>
+
 #include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
 #include "sscMesh.h"
@@ -47,10 +50,12 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
+
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+  //connect(mSelectedImage.get(), SIGNAL(imageChanged()), this, SLOT(revertTransferFunctions()));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
@@ -92,14 +97,16 @@ void SegmentationWidget::showEvent(QShowEvent* event)
   }
 }
 
-void SegmentationWidget::hideEvent(QCloseEvent* event)
+void SegmentationWidget::hideEvent(QHideEvent* event)
 {
-  QWidget::closeEvent(event);
+  QWidget::hideEvent(event);
+  this->revertTransferFunctions();
 }
 
 void SegmentationWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  this->revertTransferFunctions();
 
   ssc::ImagePtr segmentedImage = Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
   if(!segmentedImage)
@@ -113,6 +120,18 @@ void SegmentationWidget::toogleBinarySlot(bool on)
   ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
 }
 
+void SegmentationWidget::revertTransferFunctions()
+{
+  if (!mModifiedImage)
+    return;
+
+  mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
+
+  mTF3D_original.reset();
+  mTF2D_original.reset();
+  mModifiedImage.reset();
+}
+
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
@@ -122,6 +141,12 @@ void SegmentationWidget::thresholdSlot(int value)
   if(!image)
     return;
 
+  if (!mModifiedImage)
+  {
+    mModifiedImage = image;
+    mTF3D_original = image->getTransferFunctions3D()->createCopy();
+    mTF2D_original = image->getLookupTable2D()->createCopy();
+  }
   image->resetTransferFunctions();
   ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
   tf3D->addAlphaPoint(value , 0);
@@ -148,6 +173,8 @@ void SegmentationWidget::smoothingSigmaSlot(double value)
 
 void SegmentationWidget::imageChangedSlot(QString uid)
 {
+  this->revertTransferFunctions();
+
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
     return;
@@ -211,11 +238,11 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mSurfaceThreshold(100),
     mDecimation(80),
-    mReduceResolution(true),
+    mReduceResolution(false),
     mSmoothing(true),
     mSurfaceThresholdSpinBox(new QSpinBox()),
-    mDecimationSpinBox(new QSpinBox())
-
+    mDecimationSpinBox(new QSpinBox()),
+    mDefaultColor("red")
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -275,6 +302,8 @@ void SurfaceWidget::surfaceSlot()
   ssc::MeshPtr outputMesh = Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
   if(!outputMesh)
     return;
+  outputMesh->setColor(mDefaultColor);
+
   emit outputMeshChanged(outputMesh->getUid());
 }
 
@@ -286,11 +315,13 @@ void SurfaceWidget::thresholdSlot(int value)
 void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
+  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
 }
 
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
+  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
 }
 
 void SurfaceWidget::smoothingSlot(bool value)
@@ -303,6 +334,10 @@ void SurfaceWidget::imageChangedSlot(QString uid)
   if(!image)
     return;
   mSurfaceThresholdSpinBox->setRange(image->getMin(), image->getMax());
+}
+void SurfaceWidget::setDefaultColor(QColor color)
+{
+  mDefaultColor = color;
 }
 
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
@@ -322,7 +357,9 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   connect(mDecimationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(decimationSlot(int)));
 
   QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
+  reduceResolutionCheckBox->setChecked(mReduceResolution);
   connect(reduceResolutionCheckBox, SIGNAL(toggled(bool)), this, SLOT(reduceResolutionSlot(bool)));
+
   QCheckBox* smoothingCheckBox = new QCheckBox("Smoothing");
   smoothingCheckBox->setChecked(mSmoothing);
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(smoothingSlot(bool)));
@@ -344,7 +381,9 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 //------------------------------------------------------------------------------
 
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
-  WhatsThisWidget(parent), mFindCenterlineButton(new QPushButton("Find centerline"))
+  WhatsThisWidget(parent),
+  mFindCenterlineButton(new QPushButton("Find centerline")),
+  mDefaultColor("red")
 {
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
@@ -390,6 +429,11 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
+void CenterlineWidget::setDefaultColor(QColor color)
+{
+  mDefaultColor = color;
+}
+
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
@@ -397,12 +441,17 @@ void CenterlineWidget::findCenterlineSlot()
   if(!centerlineImage)
     return;
 
+  std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
+
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
+  std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
 
   QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
   QString name = centerlineImage->getName() + " mesh %1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+  mesh->setColor(mDefaultColor);
+  mesh->setParentFrame(centerlineImage->getUid());
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
@@ -525,7 +574,9 @@ void RegisterI2IWidget::testSlot()
   ssc::dataManager()->saveImage(target, outputBasePath);
 
   vtkPolyDataPtr sourcePolyData = SeansVesselReg::extractPolyData(source, single_point_thre, 0);
-  ssc::MeshPtr mesh(new ssc::Mesh(source->getUid()+"_meshTEST", source->getName()+"_meshTEST", sourcePolyData));
+  QString uid = ssc::changeExtension(source->getUid(), "") + "_mesh%1";
+  QString name = source->getName() + " mesh %1";
+  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(sourcePolyData, uid, name, "Images");
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 

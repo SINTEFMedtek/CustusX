@@ -87,6 +87,21 @@ QString VisualizationMethodsWidget::defaultWhatsThis() const
       "</html>";
 }
 //------------------------------------------------------------------------------
+CalibrationMethodsWidget::CalibrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString CalibrationMethodsWidget::defaultWhatsThis() const
+{
+  return"<html>"
+      "<h3>Calibration methods.</h3>"
+      "<p>These methods creates data structures that can be use in visualization.</p>"
+      "<p><i>Choose a method.</i></p>"
+      "</html>";
+}
+//------------------------------------------------------------------------------
 
 LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent) :
   TabbedWidget(objectName, windowTitle, parent)

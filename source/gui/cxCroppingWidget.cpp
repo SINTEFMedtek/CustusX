@@ -20,6 +20,7 @@
 #include "cxInteractiveCropper.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include <vtkImageData.h>
 
 namespace cx
 {
@@ -128,20 +129,65 @@ void CroppingWidget::cropperChangedSlot()
 ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  vtkImageDataPtr rawResult = image->CropAndClipImage();
-
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_clip%1";
-  QString name = image->getName()+" clipped %1";
-  //std::cout << "clipped volume: " << uid << ", " << name << std::endl;
-  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
-  ssc::messageManager()->sendInfo("Created volume " + result->getName());
-
-  result->get_rMd_History()->setRegistration(image->get_rMd());
-  result->setParentFrame(image->getUid());
-  ssc::dataManager()->loadData(result);
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  ssc::dataManager()->saveImage(result, outputBasePath);
-  return result;
+
+  ssc::ImagePtr retval = image->CropAndClipImage(outputBasePath);
+  return retval;
+//  vtkImageDataPtr rawResult = image->CropAndClipImage();
+//
+//  // the internal CustusX format does not handle extents starting at non-zero.
+//  // Move extent to zero and change rMd.
+//  ssc::IntBoundingBox3D extent(rawResult->GetExtent());
+//  int diff[3];
+//  diff[0] = extent[0];
+//  diff[1] = extent[2];
+//  diff[2] = extent[4];
+//  extent[0] -= diff[0];
+//  extent[1] -= diff[0];
+//  extent[2] -= diff[1];
+//  extent[3] -= diff[1];
+//  extent[4] -= diff[2];
+//  extent[5] -= diff[2];
+//
+//  std::cout << "cropped volume pre move:" << std::endl;
+//  rawResult->Print(std::cout);
+//
+//  rawResult->SetExtent(extent.begin());
+//  rawResult->SetWholeExtent(extent.begin());
+//  rawResult->SetUpdateExtentToWholeExtent();
+//  rawResult->ComputeBounds();
+//  std::cout << "cropped volume pre update:" << std::endl;
+//  rawResult->Print(std::cout);
+//  rawResult->Update();
+//
+//  vtkImageDataPtr copyData = vtkImageDataPtr::New();
+//  copyData->DeepCopy(rawResult);
+//  copyData->Update();
+//  rawResult = copyData;
+//
+//  QString uid = ssc::changeExtension(image->getUid(), "") + "_clip%1";
+//  QString name = image->getName()+" clipped %1";
+//  //std::cout << "clipped volume: " << uid << ", " << name << std::endl;
+//  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
+//  ssc::messageManager()->sendInfo("Created volume " + result->getName());
+//
+//  std::cout << "cropped volume:" << std::endl;
+//  rawResult->Print(std::cout);
+//
+////  DoubleBoundingBox3D bb = image->getCroppingBox();
+////  clip->SetInput(this->getBaseVtkImageData());
+////  DoubleBoundingBox3D bb_orig = image->boundingBox();
+//  ssc::Vector3D shift = image->getCroppingBox().corner(0,0,0) - image->boundingBox().corner(0,0,0);
+////  ssc::Vector3D spacing
+////  ssc::Vector3D shift();
+//  std::cout << "shift: " << shift << std::endl;
+//
+//  result->get_rMd_History()->setRegistration(image->get_rMd() * createTransformTranslate(shift));
+//  result->setParentFrame(image->getUid());
+//  ssc::dataManager()->loadData(result);
+//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+//  ssc::dataManager()->saveImage(result, outputBasePath);
+//  return result;
 }
 
 }
