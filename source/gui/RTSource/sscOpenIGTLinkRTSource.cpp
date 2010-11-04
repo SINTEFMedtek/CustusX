@@ -11,7 +11,7 @@
 #include <vtkImageImport.h>
 #include <vtkDataSetMapper.h>
 #include <vtkTimerLog.h>
-
+#include <QTimer>
 #include "sscOpenIGTLinkClient.h"
 
 namespace ssc
@@ -22,6 +22,11 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 {
   mImageImport->SetNumberOfScalarComponents(1);
   this->setEmptyImage();
+
+  mTimeout = false;
+  mTimeoutTimer = new QTimer(this);
+  mTimeoutTimer->setInterval(1000);
+  connect( mTimeoutTimer, SIGNAL(timeout()),this, SLOT(timeout()) );
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
@@ -32,6 +37,50 @@ OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
     mClient->terminate();
     mClient->wait(); // forever or until dead thread
   }
+}
+
+void OpenIGTLinkRTSource::timeout()
+{
+  std::cout << "timeout!" << std::endl;
+  mTimeout = true;
+  emit changed();
+}
+
+
+QString OpenIGTLinkRTSource::getInfoString() const
+{
+  if (!mClient)
+    return "";
+  return mClient->hostDescription();
+}
+
+QString OpenIGTLinkRTSource::getStatusString() const
+{
+  if (!mClient)
+    return "Not connected";
+  if (mTimeout)
+    return "Timeout";
+  return "Running";
+}
+
+void OpenIGTLinkRTSource::start()
+{
+
+}
+
+void OpenIGTLinkRTSource::pause()
+{
+
+}
+
+void OpenIGTLinkRTSource::stop()
+{
+
+}
+
+bool OpenIGTLinkRTSource::validData() const
+{
+  return mClient && !mTimeout;
 }
 
 QDateTime OpenIGTLinkRTSource::getTimestamp()
@@ -55,12 +104,16 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
 
   mClient->start();
+  mTimeoutTimer->start();
 
+  emit changed();
   emit serverStatusChanged();
 }
 
 void OpenIGTLinkRTSource::imageReceivedSlot()
 {
+  if (!mClient)
+    return;
   this->updateImage(mClient->getLastImageMessage());
 }
 
@@ -78,6 +131,9 @@ void OpenIGTLinkRTSource::disconnectServer()
     mClient.reset();
   }
 
+  mTimeoutTimer->stop();
+
+  emit changed();
   emit serverStatusChanged();
 }
 
@@ -162,6 +218,11 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   mImageImport->SetImportVoidPointer(mImageMessage->GetPackBodyPointer());
 
   mImageImport->Modified();
+
+  mTimeout = false;
+  mTimeoutTimer->start();
+
+  emit changed();
 }
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
