@@ -242,9 +242,21 @@ QString SelectCoordinateSystemStringDataAdapterBase::convertInternal2Display(QSt
 {
   if (internal.isEmpty())
     return "<no coordinate system>";
+
+  //as requested by Frank
+  if(internal == "reference")
+    return "data reference";
+  if(internal == "data")
+    return "data (image/mesh)";
+  if(internal == "patient reference")
+    return "patient/tool reference";
+  if(internal == "tool")
+    return "tool";
+  if(internal == "sensor")
+    return "tools sensor";
+
   return internal;
 }
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------

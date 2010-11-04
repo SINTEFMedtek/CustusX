@@ -241,8 +241,8 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mReduceResolution(false),
     mSmoothing(true),
     mSurfaceThresholdSpinBox(new QSpinBox()),
-    mDecimationSpinBox(new QSpinBox())
-
+    mDecimationSpinBox(new QSpinBox()),
+    mDefaultColor("red")
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -302,6 +302,8 @@ void SurfaceWidget::surfaceSlot()
   ssc::MeshPtr outputMesh = Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
   if(!outputMesh)
     return;
+  outputMesh->setColor(mDefaultColor);
+
   emit outputMeshChanged(outputMesh->getUid());
 }
 
@@ -332,6 +334,10 @@ void SurfaceWidget::imageChangedSlot(QString uid)
   if(!image)
     return;
   mSurfaceThresholdSpinBox->setRange(image->getMin(), image->getMax());
+}
+void SurfaceWidget::setDefaultColor(QColor color)
+{
+  mDefaultColor = color;
 }
 
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
@@ -375,7 +381,9 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 //------------------------------------------------------------------------------
 
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
-  WhatsThisWidget(parent), mFindCenterlineButton(new QPushButton("Find centerline"))
+  WhatsThisWidget(parent),
+  mFindCenterlineButton(new QPushButton("Find centerline")),
+  mDefaultColor("red")
 {
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
@@ -421,6 +429,11 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
   QWidget::closeEvent(event);
 }
 
+void CenterlineWidget::setDefaultColor(QColor color)
+{
+  mDefaultColor = color;
+}
+
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
@@ -437,6 +450,8 @@ void CenterlineWidget::findCenterlineSlot()
   QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
   QString name = centerlineImage->getName() + " mesh %1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+  mesh->setColor(mDefaultColor);
+  mesh->setParentFrame(centerlineImage->getUid());
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
