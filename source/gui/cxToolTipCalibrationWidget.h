@@ -3,6 +3,7 @@
 
 #include "cxWhatsThisWidget.h"
 #include "sscCoordinateSystemHelpers.h"
+#include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 
 class QShowEvent;
@@ -39,6 +40,8 @@ private slots:
   void testSlot();
   void sampleSlot();
   void coordChangedSlot();
+  void referenceObjectChanged();
+  void saveFileSlot();
 
 private:
   QGroupBox* createSampleGroupBox();
@@ -46,9 +49,15 @@ private:
   QPushButton* mCalibrateButton;
   QPushButton* mTestButton;
   QPushButton* mSampleButton;
-  QLineEdit* mFilenameBox;
-  ssc::CoordinateSystem mToCoord;
+  QLabel*      mSaveToFileNameLabel;
+  QPushButton* mSaveFileButton;
+  ssc::CoordinateSystem mToCoordinateSystem;
   SelectCoordinateSystemStringDataAdapterPtr mCoordinateSystems;
+  SelectToolStringDataAdapterPtr mTools;
+  SelectDataStringDataAdapterPtr mData;
+  ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
+  ssc::LabeledComboBoxWidget* mToolComboBox;
+  ssc::LabeledComboBoxWidget* mDataComboBox;
 
 };
 }//namespace cx
