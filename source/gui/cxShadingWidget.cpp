@@ -52,6 +52,8 @@ void ShadingWidget::init()
   shadingSpecularWidget->setEnabled(false);
   shadingSpecularPowerWidget->setEnabled(false);
 
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+
   mLayout->addLayout(shadingLayput);
   mLayout->addStretch(1);
 
