@@ -338,11 +338,11 @@ void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
 	(*mColorMapPtr)[colorPosition] = colorValue;
 	emit transferFunctionsChanged();
 }
-void ImageTF3D::addXml(QDomNode& parentNode)
+void ImageTF3D::addXml(QDomNode dataNode)
 {
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
-  parentNode.appendChild(transferfunctionsNode);
+  QDomDocument doc = dataNode.ownerDocument();
+//  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
+//  parentNode.appendChild(transferfunctionsNode);
 
   QDomElement alphaNode = doc.createElement("alpha");
   // Use QStringList to put all points in the same string instead of storing
@@ -368,10 +368,10 @@ void ImageTF3D::addXml(QDomNode& parentNode)
                            arg(colorPoint->second.blue()));
   colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
 
-  transferfunctionsNode.appendChild(alphaNode);
-  transferfunctionsNode.appendChild(colorNode);
+  dataNode.appendChild(alphaNode);
+  dataNode.appendChild(colorNode);
 }
-void ImageTF3D::parseXml(QDomNode& dataNode)
+void ImageTF3D::parseXml(QDomNode dataNode)
 {
 	if (dataNode.isNull())
 		return;
@@ -418,6 +418,8 @@ void ImageTF3D::parseXml(QDomNode& dataNode)
 		std::cout << "Warning: ImageTF3D::parseXml() found no color transferfunction";
 		std::cout << std::endl;
 	}
+
+	std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
 }
