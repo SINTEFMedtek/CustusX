@@ -337,7 +337,7 @@ void PatientData::createPatientFolders(QString choosenDir)
  */
 void PatientData::generateSaveDoc(QDomDocument& doc)
 {
-  doc.appendChild(doc.createProcessingInstruction("xml version =", "'2.0'"));
+  doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 
   QDomElement patientNode = doc.createElement("patient");
   QDomElement activePatientNode = doc.createElement("active_patient");
