@@ -146,10 +146,12 @@ void OpenIGTLinkRTSource::clientFinishedSlot()
   this->disconnectServer();
 }
 
+/** chrash-avoiding measure -  for startup
+ */
 void OpenIGTLinkRTSource::setEmptyImage()
 {
   mImageMessage = igtl::ImageMessage::Pointer();
-  mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
+  mImageImport->SetWholeExtent(0, 0, 0, 0, 0, 0);
   mImageImport->SetDataExtent(0,0,0,0,0,0);
   mImageImport->SetDataScalarTypeToUnsignedChar();
   mZero = 0;
