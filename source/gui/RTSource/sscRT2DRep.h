@@ -19,7 +19,7 @@ typedef vtkSmartPointer<class vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<class vtkActor> vtkActorPtr;
 typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
-
+typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
 
 namespace ssc
@@ -49,8 +49,14 @@ private:
   ssc::TextDisplayPtr mInfoText;
   vtkActorPtr mPlaneActor;
   vtkPlaneSourcePtr mPlaneSource;
-  vtkTexturePtr mUsTexture;
+  vtkTexturePtr mTexture;
   vtkRendererPtr mRenderer;
+  View* mView;
+
+  vtkImageThresholdPtr mMapZeroToOne;
+  vtkImageDataPtr mUSMaskData;
+  vtkImageMaskPtr mMaskFilter;
+
 };
 
 
