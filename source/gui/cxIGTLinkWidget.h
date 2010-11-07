@@ -6,6 +6,7 @@
 #include "sscDoubleWidgets.h"
 #include "sscView.h"
 #include "RTSource/sscOpenIGTLinkRTSource.h"
+#include "cxRenderTimer.h"
 
 namespace cx
 {
@@ -37,9 +38,12 @@ private:
   QPushButton* mConnectButton;
   QPushButton* mLaunchServerButton;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
-
+  QGridLayout* mGridLayout;
+  QVBoxLayout* mToptopLayout;
   ssc::View* mView;
   QTimer* mRenderTimer;
+  RenderTimer mRenderTimerW;
+  QLabel* mRenderLabel;
 };
 
 }//end namespace cx

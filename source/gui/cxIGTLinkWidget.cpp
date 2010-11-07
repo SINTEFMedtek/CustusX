@@ -11,7 +11,7 @@
 #include "sscLabeledComboBoxWidget.h"
 //#include "RTSource/cxIGTLinkClient.h"
 #include "RTSource/sscRT2DRep.h"
-
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -28,9 +28,11 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   connect(mRTSource.get(), SIGNAL(serverStatusChanged()), this, SLOT(serverStatusChangedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+  mToptopLayout = toptopLayout;
 
   QGridLayout* gridLayout = new QGridLayout;
   toptopLayout->addLayout(gridLayout);
+  mGridLayout = gridLayout;
 
   gridLayout->addWidget(new QLabel("IP Address", this), 0, 0);
   mAddressEdit = new QLineEdit(this);
@@ -46,7 +48,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(launchServer()));
   gridLayout->addWidget(mLaunchServerButton, 2, 1);
 
-  mConnectButton = new QPushButton("connect to image server", this);
+  mConnectButton = new QPushButton("Connect Server", this);
   connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnect()));
   gridLayout->addWidget(mConnectButton, 3, 1);
 
@@ -60,6 +62,9 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   rtRep->setRealtimeStream(mRTSource);
   mView->addRep(rtRep);
 
+  mRenderLabel = new QLabel("-");
+  toptopLayout->addWidget(mRenderLabel);
+
 //  toptopLayout->addStretch();
 }
 
@@ -69,7 +74,20 @@ IGTLinkWidget::~IGTLinkWidget()
 
 void IGTLinkWidget::renderSlot()
 {
-  mView->GetRenderWindow()->Render();
+  mRenderTimerW.beginRender();
+
+  if (mView->isVisible())
+    mView->GetRenderWindow()->Render();
+
+  mRenderTimerW.endRender();
+
+  if (mRenderTimerW.intervalPassed())
+  {
+    mRenderLabel->setText(QString::number(mRenderTimerW.getFPS(),'f',0)+ "FPS");
+    mRenderTimerW.reset();
+  }
+
+
 }
 
 void IGTLinkWidget::launchServer()
@@ -95,6 +113,10 @@ void IGTLinkWidget::serverStatusChangedSlot()
     mConnectButton->setText("Disconnect Server");
   else
     mConnectButton->setText("Connect Server");
+
+//  mConnectButton->update();
+//  mGridLayout->invalidate();
+//  mToptopLayout->invalidate();
 }
 
 
