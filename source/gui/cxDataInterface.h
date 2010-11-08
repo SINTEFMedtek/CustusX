@@ -15,6 +15,7 @@
 #include "sscStringDataAdapter.h"
 #include "sscDefinitions.h"
 #include "cxRegistrationManager.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
@@ -249,6 +250,8 @@ typedef boost::shared_ptr<class SelectCoordinateSystemStringDataAdapter> SelectC
 /** Adapter that selects and stores a coordinate systems.
  * The coordinatesystem is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
+ *
+ * Class reacts to toolmanagers configurerd signal and automatically sets patientref as default
  */
 class SelectCoordinateSystemStringDataAdapter : public SelectCoordinateSystemStringDataAdapterBase
 {
@@ -269,6 +272,9 @@ public: // optional methods
 public: // interface extension
   ssc::COORDINATE_SYSTEM getCoordinateSystem();
 
+private slots: //interface extension
+  void setDefaultSlot();
+
 private:
     ssc::COORDINATE_SYSTEM mCoordinateSystem;
   QString mValueName;
@@ -278,6 +284,7 @@ typedef boost::shared_ptr<class SelectToolStringDataAdapter> SelectToolStringDat
 /** Adapter that selects and stores a tool.
  * The tool is stored internally in the adapter.
  * Use setValue/getValue plus changed() to access it.
+ *
  */
 class SelectToolStringDataAdapter : public SelectToolStringDataAdapterBase
 {

@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QStringList>
+#include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
@@ -150,13 +151,6 @@ QString Tool::getName() const
   return ssc::Tool::mName;
 }
 
-bool Tool::isCalibrated() const
-{
-  //TODO
-  ssc::messageManager()->sendDebug("cx::Tool::isCalibrated() is not properly implemented.");
-  return true;
-}
-
 double Tool::getTooltipOffset() const
 {
   return mToolTipOffset;
@@ -262,12 +256,12 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
   else if (igstk::TrackerToolMadeTransitionToTrackedStateEvent().CheckEvent(&event))
   {
     this->internalVisible(true);
-    ssc::messageManager()->sendInfo("Tool: "+mUid+" is visible."); //SPAM
+    //ssc::messageManager()->sendInfo("Tool: "+mUid+" is visible."); //SPAM
   }
   else if (igstk::TrackerToolNotAvailableToBeTrackedEvent().CheckEvent(&event))
   {
     this->internalVisible(false);
-    ssc::messageManager()->sendInfo("Tool: "+mUid+" is hidden."); //SPAM
+    //ssc::messageManager()->sendInfo("Tool: "+mUid+" is hidden."); //SPAM
   }
   else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
   {
@@ -523,11 +517,33 @@ void Tool::determineToolsCalibration()
   inputStream.close();
 }
 
+bool Tool::isCalibrated() const
+{
+  ssc::Transform3D identity;
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+  return !ssc::similar(sMt, identity);
+}
+
 ssc::Transform3D Tool::getCalibration_sMt() const
 {
   ssc::Transform3D sMt;
   mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
   return sMt;
+}
+
+void Tool::setCalibration_sMt(ssc::Transform3D calibration)
+{
+  //apply the calibration
+  mCalibrationTransform.ImportTransform(*calibration.matrix());
+  mTool->SetCalibrationTransform(mCalibrationTransform);
+
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to "+qstring_cast(sMt));
+
+  //write to file
+  this->writeCalibrationToFile();
 }
 
 Tracker::Type Tool::getTrackerType()
@@ -660,6 +676,11 @@ void Tool::setProbeSectorConfigurationString(QString configString)
   mProbeSectorConfiguration = configString;
 }
 
+ssc::Vector3D Tool::getReferencePoint() const
+{
+  return mInternalStructure.mReferencePoint;
+}
+
 void Tool::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
@@ -680,6 +701,46 @@ void Tool::parseXml(QDomNode& dataNode)
   //Need to call set function to make sure the values will be applied
   setProbeSectorConfigurationString(mProbeSectorConfiguration);
   emit probeSectorConfigurationChanged();
+}
+
+void Tool::writeCalibrationToFile()
+{
+  QFile calibrationFile(this);
+  if(!mInternalStructure.mCalibrationFilename.isEmpty() && QFile::exists(mInternalStructure.mCalibrationFilename))
+  {
+    //Calibration file exists, overwrite
+    calibrationFile.setFileName(mInternalStructure.mCalibrationFilename);
+  }
+  else
+  {
+    //Make a new file, use rom file name as base name
+    QString calibrationFileName = mInternalStructure.mSROMFilename.remove(".rom", Qt::CaseInsensitive);
+    calibrationFileName.append(".cal");
+    calibrationFile.setFileName(calibrationFileName);
+  }
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+
+  ssc::messageManager()->sendDebug("Calibration file "+calibrationFile.fileName() +" would now contain: \n"+qstring_cast(sMt));
+
+//  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//  {
+//    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
+//    return;
+//  }
+//
+//
+//  QTextStream streamer(&calibrationFile);
+//  streamer << qstring_cast(sMt);
+//  streamer << endl;
+//
+//  calibrationFile.close();
+//
+//  /* File must be in the form
+//   * rot_00 rot_01 rot_02 trans_0
+//   * rot_10 rot_11 rot_12 trans_1
+//   * rot_20 rot_21 rot_22 trans_2
+//   */
 }
 
 }//namespace cx

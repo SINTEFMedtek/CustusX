@@ -135,7 +135,7 @@ void SegmentationWidget::revertTransferFunctions()
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
-  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
+//  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
 
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
@@ -162,13 +162,13 @@ void SegmentationWidget::toogleSmoothingSlot(bool on)
   mSmoothingSigmaSpinBox->setEnabled(on);
   mSmoothingSigmaLabel->setEnabled(on);
 
-  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
+//  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
 }
 
 void SegmentationWidget::smoothingSigmaSlot(double value)
 {
   mSmoothSigma = value;
-  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
+//  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
 }
 
 void SegmentationWidget::imageChangedSlot(QString uid)
@@ -315,13 +315,13 @@ void SurfaceWidget::thresholdSlot(int value)
 void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
-  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
+//  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
 }
 
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
-  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
+//  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
 }
 
 void SurfaceWidget::smoothingSlot(bool value)
