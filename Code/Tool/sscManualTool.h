@@ -39,6 +39,8 @@ public:
 	virtual void setTooltipOffset(double val);
 
 	virtual Transform3D getCalibration_sMt() const;
+	virtual ssc::Vector3D getReferencePoint() const {return ssc::Vector3D();};
+
 	// extensions:
 	void setVisible(bool vis);
 	void setType(const Type& type);
