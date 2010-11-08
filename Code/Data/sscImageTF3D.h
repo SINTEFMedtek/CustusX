@@ -70,8 +70,8 @@ public:
 	void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
 	void setColorValue(int colorPosition, QColor colorValue);///< Change value of an existing color transfer function point
 
-	void addXml(QDomNode& parentNode); ///< adds xml information about the transferfunction and its variabels
-	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+	void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
+	void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 signals:
 	void transferFunctionsChanged();

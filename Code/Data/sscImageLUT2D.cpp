@@ -267,16 +267,17 @@ void ImageLUT2D::refreshOutput()
 //}
 
 
-void ImageLUT2D::addXml(QDomNode& parentNode)
+void ImageLUT2D::addXml(QDomNode& dataNode)
 {
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement dataNode = doc.createElement("lookuptable2D");
-  parentNode.appendChild(dataNode);
+  QDomDocument doc = dataNode.ownerDocument();
+  QDomElement elem = dataNode.toElement();
+  //QDomElement dataNode = doc.createElement("lookuptable2D");
+//  parentNode.appendChild(dataNode);
   //std::cout << "Saving window: " << mWindow << std::endl;
-  dataNode.setAttribute("window", mWindow);
-  dataNode.setAttribute("level", mLevel);
-  dataNode.setAttribute("llr", mLLR);
-  dataNode.setAttribute("alpha", mAlpha);
+  elem.setAttribute("window", mWindow);
+  elem.setAttribute("level", mLevel);
+  elem.setAttribute("llr", mLLR);
+  elem.setAttribute("alpha", mAlpha);
 
   //TODO: missing save of BaseLut
 }

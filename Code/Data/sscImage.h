@@ -30,15 +30,22 @@ class Image : public Data
 {
 	Q_OBJECT
 public:
-  struct shadingStruct
+  struct ShadingStruct
   {
     bool on;
     double ambient;
     double diffuse;
     double specular;
     double specularPower;
+
+    ShadingStruct();
+	void addXml(QDomNode dataNode);
+	void parseXml(QDomNode dataNode);
+
+  private:
+	double loadAttribute(QDomNode dataNode, QString name, double defVal);
   };
-  
+
 	virtual ~Image();
 	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name="");
 	void setVtkImageData(const vtkImageDataPtr& data);
@@ -71,8 +78,8 @@ public:
   double getShadingDiffuse();                         ///<Get shading diffuse parmeter
   double getShadingSpecular();                        ///<Get shading specular parmeter
   double getShadingSpecularPower();                   ///<Get shading specular power parmeter
-  Image::shadingStruct getShading();
-  void setShading(Image::shadingStruct shading );
+  Image::ShadingStruct getShading();
+  void setShading(Image::ShadingStruct shading );
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -123,7 +130,7 @@ protected:
 
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
   
-  shadingStruct mShading;
+  ShadingStruct mShading;
 
   bool mUseCropping; ///< image should be cropped using mCroppingBox
   DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.

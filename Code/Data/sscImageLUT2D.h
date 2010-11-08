@@ -46,7 +46,7 @@ public:
 
 	double getScalarMax() const;
 
-  void addXml(QDomNode& parentNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
+  void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
   void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 signals:

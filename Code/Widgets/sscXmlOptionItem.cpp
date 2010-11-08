@@ -167,6 +167,40 @@ XmlOptionFile XmlOptionFile::descend(QString element) const
   return retval;
 }
 
+XmlOptionFile XmlOptionFile::descend(QString element, QString attributeName, QString attributeValue) const
+{
+	XmlOptionFile retval = this->tryDescend(element, attributeName, attributeValue);
+	if (!retval.getDocument().isNull())
+		return retval;
+
+	// create a new element if not found
+	retval = *this;
+	QDomElement current = retval.getDocument().createElement(element);
+	current.setAttribute(attributeName, attributeValue);
+	retval.mCurrentElement.appendChild(current);
+	retval.mCurrentElement = current;
+	return retval;
+}
+
+XmlOptionFile XmlOptionFile::tryDescend(QString element, QString attributeName, QString attributeValue) const
+{
+	  XmlOptionFile retval = *this;
+
+	  QDomNodeList presetNodeList = retval.getElement().elementsByTagName(element);
+	  for(int i=0; i < presetNodeList.count(); ++i)
+	  {
+		QDomElement current = presetNodeList.item(i).toElement();
+	    QString name = current.attribute(attributeName);
+	    if(attributeValue == name)
+	    {
+	    	retval.mCurrentElement = current;
+	    	return retval;
+	    }
+	  }
+
+	  return XmlOptionFile();
+}
+
 XmlOptionFile XmlOptionFile::ascend() const
 {
   XmlOptionFile retval = *this;

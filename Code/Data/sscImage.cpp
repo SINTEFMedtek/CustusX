@@ -21,6 +21,52 @@
 
 namespace ssc
 {
+
+Image::ShadingStruct::ShadingStruct()
+{
+	on = false;
+	ambient = 0.2;
+	diffuse = 0.9;
+	specular = 0.3;
+	specularPower = 15.0;
+}
+
+double Image::ShadingStruct::loadAttribute(QDomNode dataNode, QString name, double defVal)
+{
+  QString text = dataNode.toElement().attribute(name);
+  bool ok;
+  double val = text.toDouble(&ok);
+  if (ok)
+    return val;
+  return defVal;
+}
+
+void Image::ShadingStruct::addXml(QDomNode dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+	elem.setAttribute("on", on);
+	elem.setAttribute("ambient", ambient);
+	elem.setAttribute("diffuse", diffuse);
+	elem.setAttribute("specular", specular);
+	elem.setAttribute("specularPower", specularPower);
+}
+
+void Image::ShadingStruct::parseXml(QDomNode dataNode)
+{
+	if (dataNode.isNull())
+		return;
+
+	on = dataNode.toElement().attribute("on").toInt();
+	std::cout << "attrib on: " << dataNode.toElement().attribute("on")  << " : " << on << std::endl;
+	ambient = loadAttribute(dataNode, "ambient", ambient);
+	diffuse = loadAttribute(dataNode, "diffuse", diffuse);
+	specular = loadAttribute(dataNode, "specular", specular);
+	specularPower = loadAttribute(dataNode, "specularPower", specularPower);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
   
 Image::~Image()
 {}
@@ -33,11 +79,11 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data,
   mUseCropping = false;
   mCroppingBox_d = DoubleBoundingBox3D(0,0,0,0,0,0);
 
-  mShading.on = false;
-  mShading.ambient = 0.2;
-  mShading.diffuse = 0.9;
-  mShading.specular = 0.3;
-  mShading.specularPower = 15.0;
+//  mShading.on = false;
+//  mShading.ambient = 0.2;
+//  mShading.diffuse = 0.9;
+//  mShading.specular = 0.3;
+//  mShading.specularPower = 15.0;
   
   this->resetTransferFunctions();
 }
@@ -380,29 +426,38 @@ void Image::addXml(QDomNode& dataNode)
 //  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
 //  imageNode.appendChild(filePathNode);
   
-  mImageTransferFunctions3D->addXml(imageNode);
-  mImageLookupTable2D->addXml(imageNode);
+  QDomElement tf3DNode = doc.createElement("transferfunctions");
+  mImageTransferFunctions3D->addXml(tf3DNode);
+  imageNode.appendChild(tf3DNode);
+
+  QDomElement lut2DNode = doc.createElement("lookuptable2D");
+  mImageLookupTable2D->addXml(lut2DNode);
+  imageNode.appendChild(lut2DNode);
 
   QDomElement shadingNode = doc.createElement("shading");
-  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
+  mShading.addXml(shadingNode);
   imageNode.appendChild(shadingNode);
-  //std::cout << "created shading" << std::endl;
-  
-  QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
-  shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));
-  imageNode.appendChild(shadingAmbientNode);
-  
-  QDomElement shadingDiffuseNode = doc.createElement("shadingDiffuse");
-  shadingDiffuseNode.appendChild(doc.createTextNode(qstring_cast(mShading.diffuse)));
-  imageNode.appendChild(shadingDiffuseNode);
-  
-  QDomElement shadingSpecularNode = doc.createElement("shadingSpecular");
-  shadingSpecularNode.appendChild(doc.createTextNode(qstring_cast(mShading.specular)));
-  imageNode.appendChild(shadingSpecularNode);
-  
-  QDomElement shadingSpecularPowerNode = doc.createElement("shadingSpecularPower");
-  shadingSpecularPowerNode.appendChild(doc.createTextNode(qstring_cast(mShading.specularPower)));
-  imageNode.appendChild(shadingSpecularPowerNode);
+
+//
+//  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
+//  imageNode.appendChild(shadingNode);
+//  //std::cout << "created shading" << std::endl;
+//
+//  QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
+//  shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));
+//  imageNode.appendChild(shadingAmbientNode);
+//
+//  QDomElement shadingDiffuseNode = doc.createElement("shadingDiffuse");
+//  shadingDiffuseNode.appendChild(doc.createTextNode(qstring_cast(mShading.diffuse)));
+//  imageNode.appendChild(shadingDiffuseNode);
+//
+//  QDomElement shadingSpecularNode = doc.createElement("shadingSpecular");
+//  shadingSpecularNode.appendChild(doc.createTextNode(qstring_cast(mShading.specular)));
+//  imageNode.appendChild(shadingSpecularNode);
+//
+//  QDomElement shadingSpecularPowerNode = doc.createElement("shadingSpecularPower");
+//  shadingSpecularPowerNode.appendChild(doc.createTextNode(qstring_cast(mShading.specularPower)));
+//  imageNode.appendChild(shadingSpecularPowerNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");
   LandmarkMap::iterator it = mLandmarks.begin();
@@ -458,6 +513,7 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
 
+	// backward compatibility:
 	mShading.on = dataNode.namedItem("shading").toElement().text().toInt();
   //Assign default values if the shading nodes don't exists to allow backward compability
   if(!dataNode.namedItem("shadingAmbient").isNull())
@@ -477,6 +533,9 @@ void Image::parseXml(QDomNode& dataNode)
   //else
   //  mShading.specularPower = 15.0;
   
+  // new way:
+  mShading.parseXml(dataNode.namedItem("shading"));
+
 	QDomNode landmarksNode = dataNode.namedItem("landmarks");
 	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
 	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
@@ -551,12 +610,12 @@ double Image::getShadingSpecular()
 double Image::getShadingSpecularPower()
 {return mShading.specularPower;}  
 
-Image::shadingStruct Image::getShading()
+Image::ShadingStruct Image::getShading()
 {
   return mShading;
 }
 
-void Image::setShading(Image::shadingStruct shading )
+void Image::setShading(Image::ShadingStruct shading )
 {
   mShading = shading;
   emit transferFunctionsChanged();

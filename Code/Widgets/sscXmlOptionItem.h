@@ -56,7 +56,9 @@ public:
   ~XmlOptionFile();
 
   XmlOptionFile descend(QString element) const; ///< step one level down in the xml tree
+  XmlOptionFile descend(QString element, QString attributeName, QString attributeValue) const; // stepdown to element with given attribute
   XmlOptionFile ascend() const; ///< step one level up in the xml tree
+  XmlOptionFile tryDescend(QString element, QString attributeName, QString attributeValue) const; // stepdown only if present
 
   QDomDocument getDocument() { return mDocument; }
   QDomElement getElement(); ///< return the current element
