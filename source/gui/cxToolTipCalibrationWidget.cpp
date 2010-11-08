@@ -256,14 +256,15 @@ void ToolTipSampleWidget::sampleSlot()
 {
   QFile samplingFile(mSaveToFileNameLabel->text());
 
-  if(!samplingFile.open(QIODevice::WriteOnly | QIODevice::Append))
-  {
-    ssc::messageManager()->sendError("Could not open "+samplingFile.fileName());
-    return;
-  }
-
   ssc::CoordinateSystem to = this->getSelectedCoordinateSystem();
   ssc::Vector3D toolPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to, false);
+
+  if(!samplingFile.open(QIODevice::WriteOnly | QIODevice::Append))
+  {
+    ssc::messageManager()->sendWarning("Could not open "+samplingFile.fileName());
+    ssc::messageManager()->sendInfo("Sampled point: "+qstring_cast(toolPoint));
+    return;
+  }
 
   QString sampledPoint = qstring_cast(toolPoint);
 
