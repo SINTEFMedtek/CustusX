@@ -540,7 +540,7 @@ void Tool::setCalibration_sMt(ssc::Transform3D calibration)
 
   ssc::Transform3D sMt;
   mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
-  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to "+qstring_cast(sMt));
+  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to \n"+qstring_cast(sMt));
 
   //write to file
   this->writeCalibrationToFile();
@@ -723,24 +723,19 @@ void Tool::writeCalibrationToFile()
 
   ssc::messageManager()->sendDebug("Calibration file "+calibrationFile.fileName() +" would now contain: \n"+qstring_cast(sMt));
 
-//  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-//  {
-//    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
-//    return;
-//  }
-//
-//
-//  QTextStream streamer(&calibrationFile);
-//  streamer << qstring_cast(sMt);
-//  streamer << endl;
-//
-//  calibrationFile.close();
-//
-//  /* File must be in the form
-//   * rot_00 rot_01 rot_02 trans_0
-//   * rot_10 rot_11 rot_12 trans_1
-//   * rot_20 rot_21 rot_22 trans_2
-//   */
+  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
+    return;
+  }
+
+  QTextStream streamer(&calibrationFile);
+  streamer << qstring_cast(sMt);
+  streamer << endl;
+
+  calibrationFile.close();
+
+  ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
 }
 
 }//namespace cx

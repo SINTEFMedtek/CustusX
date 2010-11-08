@@ -125,12 +125,11 @@ void ToolTipCalibrateWidget::calibrateSlot()
   if(!refTool || (ssc::similar(refTool->getReferencePoint(), ssc::Vector3D(0.000,0.000,0.000))))
     return;
 
-  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(refTool);
-  ssc::Vector3D sampledPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
-
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(tool);
+  ssc::Vector3D P_t = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
 
-  ToolTipCalibrationCalculator calc(tool, refTool, sampledPoint);
+  ToolTipCalibrationCalculator calc(tool, refTool, P_t);
   ssc::Transform3D calibration = calc.get_calibration_sMt();
 
   QMessageBox msgBox;
@@ -142,8 +141,6 @@ void ToolTipCalibrateWidget::calibrateSlot()
 
   if(ret == QMessageBox::Ok)
     tool->setCalibration_sMt(calibration);
-
-  ssc::messageManager()->sendInfo("Calibration:\n"+qstring_cast(calibration));
 }
 
 void ToolTipCalibrateWidget::testCalibrationSlot()
@@ -152,15 +149,15 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || (ssc::similar(selectedTool->getReferencePoint(), ssc::Vector3D(0.000,0.000,0.000))))
     return;
 
-  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(selectedTool);
+  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(ssc::toolManager()->getDominantTool());
   ssc::Vector3D sampledPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(ssc::toolManager()->getDominantTool(), selectedTool, sampledPoint);
   ssc::Vector3D delta_selectedTool = calc.get_delta_ref();
 
-  ssc::messageManager()->sendInfo("Delta:\n"+qstring_cast(delta_selectedTool));
-
   mDeltaLabel->setText("<b>Delta:</b> "+qstring_cast(delta_selectedTool)+" <br> <b>Length:</b>  "+qstring_cast(delta_selectedTool.length()));
+
+  ssc::messageManager()->sendInfo("Delta: "+qstring_cast(delta_selectedTool)+" Length:   "+qstring_cast(delta_selectedTool.length()));
 }
 
 void ToolTipCalibrateWidget::toolSelectedSlot()
@@ -334,7 +331,7 @@ ToolTipCalibrationCalculator::~ToolTipCalibrationCalculator()
 
 ssc::Vector3D ToolTipCalibrationCalculator::get_delta_ref()
 {
-  return get_sampledPoint_ref() - get_referencePoint_ref(); //or the other way around?
+  return get_referencePoint_ref() - get_sampledPoint_ref();
 }
 
 ssc::Transform3D ToolTipCalibrationCalculator::get_calibration_sMt()
@@ -349,8 +346,8 @@ ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
 
 ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 {
-  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTool);
-  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getCoordinateSystem(mRef);
+  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTool); //from
+  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getCoordinateSystem(mRef); //to
 
   ssc::Transform3D refMt = ssc::CoordinateSystemHelpers::get_toMfrom(csT, csRef);
 
@@ -366,10 +363,16 @@ ssc::Vector3D ToolTipCalibrationCalculator::get_referencePoint_ref()
 
 ssc::Transform3D ToolTipCalibrationCalculator::get_sMt_new()
 {
-  ssc::Transform3D delta_ref = ssc::createTransformTranslate(get_delta_ref());
   ssc::Transform3D sMt_old = mTool->getCalibration_sMt();
 
-  return sMt_old * delta_ref;
+  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTool); //to
+  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getCoordinateSystem(mRef); //from
+  ssc::Transform3D tMref = ssc::CoordinateSystemHelpers::get_toMfrom(csRef, csT);
+
+  ssc::Vector3D delta_t = tMref.vector(this->get_delta_ref());
+  ssc::Transform3D T_delta_t = ssc::createTransformTranslate(delta_t);
+
+  return sMt_old * T_delta_t;
 }
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
