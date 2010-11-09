@@ -318,11 +318,16 @@ ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 
 ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
-  ToolMapIter it = mInitializedTools->find(uid);
-  if (it != mInitializedTools->end())
+  ToolMapIter itInit = mInitializedTools->find(uid);
+  ToolMapIter itConf = mConfiguredTools->find(uid);
+  if (itInit != mInitializedTools->end())
   {
-    return ((*it).second);
-  } else
+    return ((*itInit).second);
+  } else if (itConf != mConfiguredTools->end())
+  {
+    return ((*itConf).second);
+  }
+  else
   {
     return boost::shared_ptr<ssc::Tool>();
   }

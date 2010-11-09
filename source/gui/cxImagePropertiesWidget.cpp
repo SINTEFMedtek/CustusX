@@ -18,8 +18,7 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
-  SelectMeshStringDataAdapterPtr mSurfaceOutput = SelectMeshStringDataAdapter::New();
-  toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSurfaceOutput));
+  toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New()));
 
   QVBoxLayout* winlvlLayout = new QVBoxLayout;
   toptopLayout->addLayout(winlvlLayout);
