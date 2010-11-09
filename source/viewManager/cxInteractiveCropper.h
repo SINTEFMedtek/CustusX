@@ -13,12 +13,7 @@
 #include <vtkSmartPointer.h>
 #include "sscBoundingBox3D.h"
 #include "sscForwardDeclarations.h"
-
-typedef vtkSmartPointer<class vtkBoxWidget> vtkBoxWidgetPtr;
-typedef vtkSmartPointer<class vtkBoxWidget2> vtkBoxWidget2Ptr;
-typedef vtkSmartPointer<class vtkBoxRepresentation> vtkBoxRepresentationPtr;
-typedef vtkSmartPointer<class vtkTransform> vtkTransformPtr;
-typedef vtkSmartPointer<class vtkVolumeMapper> vtkVolumeMapperPtr;
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -36,8 +31,8 @@ class InteractiveCropper : public QObject
 public:
   InteractiveCropper();
   void setView(ssc::View* view); ///< adds an interactive box widget to the view. Press 'I' to show
-  ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in reference space
-  void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_r); ///< set BB in reference space
+  ssc::DoubleBoundingBox3D getBoundingBox(); ///< get BB in data space
+  void setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d); ///< set BB in reference space
   void resetBoundingBox(); ///< set bounding box back to initial size (entire volume)
   ssc::DoubleBoundingBox3D getMaxBoundingBox();
   bool getUseCropping();
@@ -55,9 +50,9 @@ private:
   void boxWasShown(bool val);
   friend class CropBoxCallback;
   friend class CropBoxEnableCallback;
-  void setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_r);
+  void setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d);
   ssc::DoubleBoundingBox3D getBoxWidgetSize();
-  void setCroppingRegion(ssc::DoubleBoundingBox3D bb_r);
+  void setCroppingRegion(ssc::DoubleBoundingBox3D bb_d);
   void updateBoxWidgetInteractor();
 
   vtkVolumeMapperPtr getMapper();

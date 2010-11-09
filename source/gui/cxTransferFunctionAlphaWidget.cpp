@@ -11,6 +11,7 @@
 #include <QMouseEvent>
 #include "sscDataManager.h"
 #include "sscImageTF3D.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -35,6 +36,12 @@ void TransferFunctionAlphaWidget::activeImageChangedSlot()
   mCurrentImage = activeImage;
   //TODO: call update or not ???
   this->update();
+
+  if (!mCurrentImage)
+    return;
+  if ((mCurrentImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
+      (activeImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
+    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
 }
   
 void TransferFunctionAlphaWidget::activeImageTransferFunctionsChangedSlot()
@@ -147,7 +154,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)//TODO: replace with above line
 	{
 		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
-		y = log(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1) * barHeightMult;
+		y = log(static_cast<double*>(histogram->GetOutput()->GetScalarPointer())[i]+1) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
       painter.drawLine(x + mBorder, height() - mBorder, 

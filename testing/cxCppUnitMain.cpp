@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	runner.addTest( new CppUnit::TestCaller<cxTestExamples>(
                                        "identity transform",
                                         &cxTestExamples::testIdentityTransform ) );
-	runner.addTest(cxTestExamples::suite());
+	//runner.addTest(cxTestExamples::suite());
 #endif
 	
 	

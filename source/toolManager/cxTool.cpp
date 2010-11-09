@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "cxTool.h"
 
 #include <vtkPolyData.h>
@@ -6,6 +7,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QStringList>
+#include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
@@ -34,9 +36,6 @@ Tool::Tool(InternalStructure& internalStructure) :
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
 
-  //For debugging
-  //this->printInternalStructure();
-
   mToolObserver->SetCallbackFunction(this, &Tool::toolTransformCallback);
 
   if(this->verifyInternalStructure())
@@ -64,7 +63,7 @@ ssc::Tool::Type Tool::getType() const
   return mInternalStructure.mType;
 }
 
-std::string Tool::getGraphicsFileName() const
+QString Tool::getGraphicsFileName() const
 {
   return mInternalStructure.mGraphicsFileName;
 }
@@ -80,7 +79,7 @@ void Tool::saveTransformsAndTimestamps()
     return;  //we don't save transforms and timestamps for reference tools
 
   QDateTime dateTime = QDateTime::currentDateTime();
-  std::string stamp = dateTime.toString(QString("ddMMyyhhmmss")).toStdString();
+  QString stamp = dateTime.toString(QString("ddMMyyhhmmss"));
 
   std::stringstream timestampsName;
   std::stringstream transformsName;
@@ -128,7 +127,7 @@ void Tool::saveTransformsAndTimestamps()
   transforms.close();
 }
 
-void Tool::setTransformSaveFile(const std::string& filename)
+void Tool::setTransformSaveFile(const QString& filename)
 {
   mInternalStructure.mTransformSaveFileName = filename;
 }
@@ -143,31 +142,14 @@ bool Tool::getVisible() const
   return mVisible;
 }
 
-/**
- * @return last recorded transform that will get you from tool- to patient ref space
- */
-/*ssc::Transform3DPtr Tool::getLastTransform()
-{
-  ssc::Transform3DPtr lastTransform;
-  if(mTransforms->size() > 0)
-    lastTransform = mTransforms->at(mTransforms->size()-1);
-  return lastTransform;
-}*/
-
-std::string Tool::getUid() const
+QString Tool::getUid() const
 {
   return ssc::Tool::mUid;
 }
 
-std::string Tool::getName() const
+QString Tool::getName() const
 {
   return ssc::Tool::mName;
-}
-
-bool Tool::isCalibrated() const
-{
-  //TODO: What do we want to do here?
-  return true;
 }
 
 double Tool::getTooltipOffset() const
@@ -231,27 +213,21 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     if(refTool) //if we are tracking with a reftool it must be visible
     {
-      //std::cout << "Checking that the incoming transforms destiantion is the referenceTOOL." << std::endl;
       ssc::Tool* tool = refTool.get();
       Tool* ref = dynamic_cast<Tool*>(tool);
       if(!ref->getPointer()->IsCoordinateSystem(destination))
         return;
-      //std::cout << "RefTool is the destiantion." << std::endl;
     }else //if we dont have a reftool we use the tracker as patientref
     {
-      //std::cout << "Checking that the incoming transforms destiantion is the TRACKER." << std::endl;
       TrackerPtr tracker = ToolManager::getInstance()->getTracker();
       if(!tracker || !tracker->getPointer()->IsCoordinateSystem(destination))
         return;
-      //std::cout << "Tracker is the destiantion." << std::endl;
     }
 
     vtkMatrix4x4Ptr vtkMatrix =  vtkMatrix4x4Ptr::New();
     transform.ExportTransform(*vtkMatrix.GetPointer());
 
     const ssc::Transform3D prMt(vtkMatrix.GetPointer()); //prMt, transform from tool to patientref
-    //ssc::Transform3D rMpr = *((ToolManager::getInstance()->get_rMpr()).get()); //rMpr, transform from patientref to global ref
-    //ssc::Transform3D rMt = rMpr * prMt; //rMt, transform from tool to global ref
     double timestamp = transform.GetStartTime();
 
     m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(prMt));
@@ -261,171 +237,147 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
 
     emit toolTransformAndTimestamp((*m_prMt), timestamp);
-    emit toolReport(TOOL_COORDINATESYSTEM_TRANSFORM, true, true, mUid);
-    //ssc::messageManager()->sendInfo("Tool: "+mUid+" received a coordinatesystem transform."); //SPAM???
   }
   //Successes
   else if (igstk::TrackerToolConfigurationEvent().CheckEvent(&event))
   {
-    mConfigured = true;
-    emit toolReport(TOOL_HW_CONFIGURED, true, true, mUid);
-    ssc::messageManager()->sendInfo("Tool: "+mUid+" is configured with the tracking system.");
+    this->internalConfigured(true);
+    ssc::messageManager()->sendInfo("Tool: "+mUid+" is successfully configured with the tracking system.");
   }
   else if (igstk::TrackerToolAttachmentToTrackerEvent().CheckEvent(&event))
   {
-    mAttachedToTracker = true;
-    emit toolReport(TOOL_ATTACHED_TO_TRACKER, true, true, mUid);
+    this->internalAttachedToTracker(true);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is attached to the tracker.");
   }
   else if (igstk::TrackerToolDetachmentFromTrackerEvent().CheckEvent(&event))
   {
-    mAttachedToTracker = false;
-    emit toolReport(TOOL_ATTACHED_TO_TRACKER, false, true, mUid);
+    this->internalAttachedToTracker(false);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is detached from the tracker.");
   }
   else if (igstk::TrackerToolMadeTransitionToTrackedStateEvent().CheckEvent(&event))
   {
-    mVisible = true;
-    emit toolReport(TOOL_VISIBLE, true, true, mUid);
-    emit toolVisible(true); //signal inherited from ssc::Tool
+    this->internalVisible(true);
     //ssc::messageManager()->sendInfo("Tool: "+mUid+" is visible."); //SPAM
   }
   else if (igstk::TrackerToolNotAvailableToBeTrackedEvent().CheckEvent(&event))
   {
-    mVisible = false;
-    emit toolReport(TOOL_VISIBLE, false, true, mUid);
-    emit toolVisible(false); // signal inherited from ssc::Tool
+    this->internalVisible(false);
     //ssc::messageManager()->sendInfo("Tool: "+mUid+" is hidden."); //SPAM
   }
   else if (igstk::ToolTrackingStartedEvent().CheckEvent(&event))
   {
-    mTracked = true;
-    emit toolReport(TOOL_TRACKED, true, true, mUid);
-    ssc::messageManager()->sendInfo("Tool: "+mUid+" is tracked.");
+    this->internalTracked(true);
+    ssc::messageManager()->sendSuccess("Tool: "+mUid+" is tracked.");
   }
   else if (igstk::ToolTrackingStoppedEvent().CheckEvent(&event))
   {
-    mTracked = false;
-    emit toolReport(TOOL_TRACKED, false, true, mUid);
+    this->internalTracked(false);
     ssc::messageManager()->sendInfo("Tool: "+mUid+" is not tracked anymore.");
   }
   //Failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_INVALID_REQUEST, false, true, mUid);
-    ssc::messageManager()->sendWarning("Tool: "+mUid+" received an invalid request.");
+    ssc::messageManager()->sendWarning("Tool: "+mUid+" received an invalid request.  This means that the internal igstk trackertool did not accept the request. Do not know which request.");
   }
   else if (igstk::TrackerToolConfigurationErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_HW_CONFIGURED, true, false, mUid);
     ssc::messageManager()->sendError("Tool: "+mUid+" could not configure with the tracking system.");
   }
   else if (igstk::InvalidRequestToAttachTrackerToolErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_INVALID_REQUEST, true, false, mUid);
     ssc::messageManager()->sendError("Tool: "+mUid+" could not request to attach to tracker.");
   }
   else if (igstk::InvalidRequestToDetachTrackerToolErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_INVALID_REQUEST, false, false, mUid);
     ssc::messageManager()->sendError("Tool: "+mUid+" could not request to detach from tracker.");
   }
   else if (igstk::TrackerToolAttachmentToTrackerErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_ATTACHED_TO_TRACKER, true, false, mUid);
     ssc::messageManager()->sendError("Tool: "+mUid+" could not attach to tracker.");
   }
   else if (igstk::TrackerToolDetachmentFromTrackerErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_ATTACHED_TO_TRACKER, false, false, mUid);
     ssc::messageManager()->sendError("Tool: "+mUid+" could not detach from tracker.");
   }
   //Polaris specific failures
   else if (igstk::InvalidPolarisPortNumberErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_NDI_PORT_NUMBER, true, false, mUid);
-    ssc::messageManager()->sendError("Polaris tool: "+mUid+" sendt invalid Polaris port number: "+ string_cast(mInternalStructure.mPortNumber) +".");
+    ssc::messageManager()->sendError("Polaris tool: "+mUid+" sendt invalid Polaris port number: "+ qstring_cast(mInternalStructure.mPortNumber) +".");
   }
   else if (igstk::InvalidPolarisSROMFilenameErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_NDI_SROM_FILENAME, true, false, mUid);
     ssc::messageManager()->sendError("Polaris tool: "+mUid+" sendt invalid ROM file: "+mInternalStructure.mSROMFilename);
   }
   else if (igstk::InvalidPolarisPartNumberErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_NDI_PART_NUMBER, true, false, mUid);
     ssc::messageManager()->sendError("Polaris tool: "+mUid+" has an invalid part number.");
   }
   //Aurora specific failures
   else if (igstk::InvalidAuroraPortNumberErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_NDI_PORT_NUMBER, true, false, mUid);
-    ssc::messageManager()->sendError("Aurora tool: "+mUid+" has an invalid port number: "+ string_cast(mInternalStructure.mPortNumber)+".");
+    ssc::messageManager()->sendError("Aurora tool: "+mUid+" has an invalid port number: "+ qstring_cast(mInternalStructure.mPortNumber)+".");
   }
   else if (igstk::InvalidAuroraSROMFilenameErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_NDI_SROM_FILENAME, true, false, mUid);
     ssc::messageManager()->sendError("Aurora tool: "+mUid+" sendt invalid ROM file: "+ mInternalStructure.mSROMFilename);
   }
   else if (igstk::InvalidAuroraPartNumberErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_NDI_PART_NUMBER, true, false, mUid);
     ssc::messageManager()->sendError("Aurora tool: "+mUid+" has an invalid part number.");
   }
   else if (igstk::InvalidAuroraChannelNumberErrorEvent().CheckEvent(&event))
   {
-    emit toolReport(TOOL_AURORA_CHANNEL_NUMBER, true, false, mUid);
-    ssc::messageManager()->sendError("Polaris tool: "+mUid+" has an invalid channel number:"+string_cast(mInternalStructure.mChannelNumber) +".");
+    ssc::messageManager()->sendError("Polaris tool: "+mUid+" has an invalid channel number:"+qstring_cast(mInternalStructure.mChannelNumber) +".");
   }
 }
 
 bool Tool::verifyInternalStructure()
 {
+  QString verificationError("Internal verification of tool "+mUid+" failed! REASON: ");
   if(mInternalStructure.mType == ssc::Tool::TOOL_NONE)
   {
-    std::cout << "if(mInternalStructure.mType == ssc::Tool::TOOL_NONE)" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <tool>::<type> is invalid ["+qstring_cast(mInternalStructure.mType)+"]. Valid types: [pointer, usprobe, reference]");
     return false;
   }
-  if(mInternalStructure.mUid.empty())
+  if(mInternalStructure.mUid.isEmpty())
   {
-    std::cout << "" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <tool>::<uid> is empty. Give tool a unique id.");
     return false;
   }
   if(mInternalStructure.mTrackerType == Tracker::TRACKER_NONE)
   {
-    std::cout << "if(mInternalStructure.mTrackerType == Tracker::TRACKER_NONE)" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<type> is invalid ["+qstring_cast(mInternalStructure.mTrackerType)+"]. Valid types: [polaris, spectra, vicra, aurora, micron (NOT SUPPORTED YET)]");
     return false;
   }
   if((mInternalStructure.mTrackerType == Tracker::TRACKER_AURORA) && (mInternalStructure.mPortNumber >= 4))
   {
-    std::cout << "if(mInternalStructure.mPortNumber >= 4)" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<portnumber> is invalid ["+qstring_cast(mInternalStructure.mPortNumber)+"]. Valid numbers: [0, 1, 2, 3]");
     return false;
   }
   if((mInternalStructure.mTrackerType == Tracker::TRACKER_AURORA) && (mInternalStructure.mChannelNumber >= 1))
   {
-    std::cout << "if(mInternalStructure.mChannelNumber >= 1)" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<channelnumber> is invalid ["+qstring_cast(mInternalStructure.mChannelNumber)+"]. Valid numbers: [0, 1]");
     return false;
   }
   QDir dir;
-  if(!mInternalStructure.mSROMFilename.empty() && !dir.exists(QString(mInternalStructure.mSROMFilename.c_str())))
+  if(!mInternalStructure.mSROMFilename.isEmpty() && !dir.exists(mInternalStructure.mSROMFilename))
   {
-    std::cout << "if(!dir.exists(QString(mInternalStructure.mSROMFilename.c_str())))" << std::endl;
-    std::cout << "mInternalStructure.mSROMFilename: " << mInternalStructure.mSROMFilename.c_str() << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<rom_file> is invalid ["+mInternalStructure.mSROMFilename+"]. Valid path: relative path to existing rom file.");
     return false;
   }
-  if(!mInternalStructure.mCalibrationFilename.empty() && !dir.exists(QString(mInternalStructure.mCalibrationFilename.c_str())))
+  if(!mInternalStructure.mCalibrationFilename.isEmpty() && !dir.exists(mInternalStructure.mCalibrationFilename))
   {
-    std::cout << "if(!dir.exists(QString(mInternalStructure.mCalibrationFilename.c_str())))" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Tag <calibration>::<cal_file> is invalid ["+mInternalStructure.mCalibrationFilename+"]. Valid path: relative path to existing calibration file.");
     return false;
   }
-  if(!mInternalStructure.mTransformSaveFileName.empty() && !dir.exists(QString(mInternalStructure.mTransformSaveFileName.c_str())))
+  if(!mInternalStructure.mTransformSaveFileName.isEmpty() && !dir.exists(mInternalStructure.mTransformSaveFileName))
   {
-    std::cout << "if(!dir.exists(QString(mInternalStructure.mTransformSaveFileName.c_str())))" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Logging folder is invalid. Contact programmer! :)");
     return false;
   }
-  if(!mInternalStructure.mLoggingFolderName.empty() && !dir.exists(QString(mInternalStructure.mLoggingFolderName.c_str())))
+  if(!mInternalStructure.mLoggingFolderName.isEmpty() && !dir.exists(mInternalStructure.mLoggingFolderName))
   {
-    std::cout << "if(!dir.exists(QString(mInternalStructure.mLoggingFolderName.c_str())))" << std::endl;
+    ssc::messageManager()->sendError(verificationError+" Logging folder is invalid. Contact programmer! :)");
     return false;
   }
 
@@ -449,7 +401,7 @@ Tool::TrackerToolType* Tool::buildInternalTool()
     if(!mInternalStructure.mWireless) //we only support wireless atm
       return tool = mTempPolarisTool.GetPointer();
     mTempPolarisTool->RequestSelectWirelessTrackerTool();
-    mTempPolarisTool->RequestSetSROMFileName(mInternalStructure.mSROMFilename);
+    mTempPolarisTool->RequestSetSROMFileName(string_cast(mInternalStructure.mSROMFilename));
     mTempPolarisTool->RequestConfigure();
     mTempPolarisTool->SetCalibrationTransform(mCalibrationTransform);
     tool = mTempPolarisTool.GetPointer();
@@ -485,15 +437,15 @@ Tool::TrackerToolType* Tool::buildInternalTool()
 void Tool::createPolyData()
 {
   QDir dir;
-  if(!mInternalStructure.mGraphicsFileName.empty() && dir.exists(QString(mInternalStructure.mGraphicsFileName.c_str())))
+  if(!mInternalStructure.mGraphicsFileName.isEmpty() && dir.exists(mInternalStructure.mGraphicsFileName))
   {
-    vtkSTLReaderPtr reader = vtkSTLReader::New();
-    reader->SetFileName(mInternalStructure.mGraphicsFileName.c_str());
+    vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
+    reader->SetFileName(cstring_cast(mInternalStructure.mGraphicsFileName));
     mPolyData = reader->GetOutput();
   }
   else
   {
-    vtkConeSourcePtr coneSource = vtkConeSource::New();
+    vtkConeSourcePtr coneSource = vtkConeSourcePtr::New();
     coneSource->SetResolution(25);
     coneSource->SetRadius(10);
     coneSource->SetHeight(100);
@@ -520,7 +472,7 @@ void Tool::determineToolsCalibration()
    * rot_20 rot_21 rot_22 trans_2
    */
   std::ifstream inputStream;
-  inputStream.open(mInternalStructure.mCalibrationFilename.c_str());
+  inputStream.open(cstring_cast(mInternalStructure.mCalibrationFilename));
   if(inputStream.is_open())
   {
     std::string line;
@@ -566,18 +518,46 @@ void Tool::determineToolsCalibration()
   inputStream.close();
 }
 
+bool Tool::isCalibrated() const
+{
+  ssc::Transform3D identity;
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+  return !ssc::similar(sMt, identity);
+}
+
 ssc::Transform3D Tool::getCalibration_sMt() const
 {
-	ssc::Transform3D sMt;
-	mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
-	return sMt;
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+  return sMt;
+}
+
+void Tool::setCalibration_sMt(ssc::Transform3D calibration)
+{
+  //apply the calibration
+  mCalibrationTransform.ImportTransform(*calibration.matrix());
+  mTool->SetCalibrationTransform(mCalibrationTransform);
+
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to \n"+qstring_cast(sMt));
+
+  //write to file
+  this->writeCalibrationToFile();
+}
+
+Tracker::Type Tool::getTrackerType()
+{
+  return mInternalStructure.mTrackerType;
 }
 
 void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
-  std::string logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
-  loggerFile->open( logFile.c_str() );
+  QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
+  ssc::messageManager()->sendDebug("Logging tool at "+logFile);
+  loggerFile->open( cstring_cast(logFile) );
   mLogger = igstk::Logger::New();
   mLogOutput = itk::StdStreamLogOutput::New();
   mLogOutput->SetStream(*loggerFile);
@@ -585,6 +565,36 @@ void Tool::addLogging(TrackerToolType* trackerTool)
   mLogger->SetPriorityLevel(itk::Logger::DEBUG);
 
   trackerTool->SetLogger(mLogger);
+}
+
+void Tool::internalAttachedToTracker(bool value)
+{
+  if(mAttachedToTracker == value)
+    return;
+  mAttachedToTracker = value;
+  emit attachedToTracker(mAttachedToTracker);
+}
+
+void Tool::internalTracked(bool value)
+{
+  if(mTracked == value)
+    return;
+  mTracked = value;
+}
+
+void Tool::internalConfigured(bool value)
+{
+  if(mConfigured == value)
+    return;
+  mConfigured = value;
+}
+
+void Tool::internalVisible(bool value)
+{
+  if(mVisible == value)
+    return;
+  mVisible = value;
+  emit toolVisible(mVisible);
 }
 
 void Tool::printInternalStructure()
@@ -615,11 +625,11 @@ void Tool::setUSProbeSector(ssc::ProbeSector probeSector)
   mProbeSector = probeSector;
 }
   
-std::string Tool::getInstrumentId() const
+QString Tool::getInstrumentId() const
 {
   return mInternalStructure.mInstrumentId;
 }
-std::string Tool::getInstrumentScannerId() const
+QString Tool::getInstrumentScannerId() const
 {
   return mInternalStructure.mInstrumentScannerId;
 }
@@ -667,6 +677,11 @@ void Tool::setProbeSectorConfigurationString(QString configString)
   mProbeSectorConfiguration = configString;
 }
 
+ssc::Vector3D Tool::getReferencePoint() const
+{
+  return mInternalStructure.mReferencePoint;
+}
+
 void Tool::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
@@ -687,6 +702,41 @@ void Tool::parseXml(QDomNode& dataNode)
   //Need to call set function to make sure the values will be applied
   setProbeSectorConfigurationString(mProbeSectorConfiguration);
   emit probeSectorConfigurationChanged();
+}
+
+void Tool::writeCalibrationToFile()
+{
+  QFile calibrationFile(this);
+  if(!mInternalStructure.mCalibrationFilename.isEmpty() && QFile::exists(mInternalStructure.mCalibrationFilename))
+  {
+    //Calibration file exists, overwrite
+    calibrationFile.setFileName(mInternalStructure.mCalibrationFilename);
+  }
+  else
+  {
+    //Make a new file, use rom file name as base name
+    QString calibrationFileName = mInternalStructure.mSROMFilename.remove(".rom", Qt::CaseInsensitive);
+    calibrationFileName.append(".cal");
+    calibrationFile.setFileName(calibrationFileName);
+  }
+  ssc::Transform3D sMt;
+  mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
+
+  ssc::messageManager()->sendDebug("Calibration file "+calibrationFile.fileName() +" would now contain: \n"+qstring_cast(sMt));
+
+  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
+    return;
+  }
+
+  QTextStream streamer(&calibrationFile);
+  streamer << qstring_cast(sMt);
+  streamer << endl;
+
+  calibrationFile.close();
+
+  ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
 }
 
 }//namespace cx

@@ -33,10 +33,10 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   connect(mToolSampleButton, SIGNAL(clicked()), this, SLOT(toolSampleButtonClickedSlot()));
 
   //toolmanager
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot(const std::string&)));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
-//  connect(ssc::toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot()));
-//  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
@@ -91,7 +91,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   ssc::Vector3D p_pr = lastTransform_prMt.coord(ssc::Vector3D(0,0,mToolToSample->getTooltipOffset()));
 
   // TODO: do we want to allow sampling points not defined in image??
-  if (mActiveLandmark.empty() && !ssc::dataManager()->getLandmarkProperties().empty())
+  if (mActiveLandmark.isEmpty() && !ssc::dataManager()->getLandmarkProperties().empty())
     mActiveLandmark = ssc::dataManager()->getLandmarkProperties().begin()->first;
 
   ssc::toolManager()->setLandmark(ssc::Landmark(mActiveLandmark, p_pr));
@@ -99,7 +99,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
   this->nextRow();
 }
 
-void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
+void PatientRegistrationWidget::dominantToolChangedSlot(const QString& uid)
 {
   if(mToolToSample && mToolToSample->getUid() == uid)
     return;
@@ -124,8 +124,8 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
 void PatientRegistrationWidget::showEvent(QShowEvent* event)
 {
   RegistrationWidget::showEvent(event);
-  connect(ssc::toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot()));
-  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+  connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
 }
@@ -133,8 +133,8 @@ void PatientRegistrationWidget::showEvent(QShowEvent* event)
 void PatientRegistrationWidget::hideEvent(QHideEvent* event)
 {
   RegistrationWidget::hideEvent(event);
-  disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(std::string)),   this, SLOT(landmarkUpdatedSlot()));
-  disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(std::string)), this, SLOT(landmarkUpdatedSlot()));
+  disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }

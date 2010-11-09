@@ -28,7 +28,7 @@ QString ClipPlaneStringDataAdapter::getValueName() const
 }
 bool ClipPlaneStringDataAdapter::setValue(const QString& value)
 {
-  ssc::PLANE_TYPE plane = string2enum<ssc::PLANE_TYPE>(string_cast(value));
+  ssc::PLANE_TYPE plane = string2enum<ssc::PLANE_TYPE>(value);
   if (plane==mInteractiveClipper->getSlicePlane())
     return false;
   mInteractiveClipper->setSlicePlane(plane);

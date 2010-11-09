@@ -313,15 +313,14 @@ void ShiftCorrectionWidget::segmentImage(QString imageName,
   cubesPolyData->Print(std::cout);
   //vtkPolyData* cubesPolyData = convert->GetOutput();
   
-  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
+  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName+"_segm"));
   surface->setVtkPolyData(cubesPolyData);
-  ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName.toStdString()+"_segm"));
+  ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName+"_segm"));
   surfaceRep->setMesh(surface);
     
   view->addRep(surfaceRep);
   
   //Cone test
-  typedef vtkSmartPointer<vtkConeSource> vtkConeSourcePtr;
   vtkConeSourcePtr coneSource = vtkConeSource::New();
   coneSource->SetResolution(25);
   coneSource->SetRadius(10);
@@ -436,9 +435,9 @@ void ShiftCorrectionWidget::processImage(QString imageName)
    actor->SetMapper(mapper);*/
      
   //Show surface
-  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
+  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName+"_segm"));
   surface->setVtkPolyData(cubesPolyData);
-  ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName.toStdString()+"_segm"));
+  ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName+"_segm"));
   surfaceRep->setMesh(surface);
   
   //Get 3D view
@@ -481,8 +480,8 @@ void ShiftCorrectionWidget::processImage(QString imageName)
    
    writer->SetFileName(outFileName.toStdString().c_str());
    writer->SetFileDimensionality(3);
-   writer->SetFileName(std::string(outFileName.toStdString()+".mhd").c_str());
-   writer->SetRAWFileName(std::string(outFileName.toStdString()+".raw").c_str());
+   writer->SetFileName(QString(outFileName.toStdString()+".mhd").c_str());
+   writer->SetRAWFileName(QString(outFileName.toStdString()+".raw").c_str());
    writer->SetCompression(false);
    writer->Update();
    writer->Write();*/

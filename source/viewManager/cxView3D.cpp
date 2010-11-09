@@ -12,6 +12,7 @@
 #include "cxRepManager.h"
 #include "sscToolManager.h"
 #include "sscToolRep3D.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -21,7 +22,7 @@ namespace cx
  * \param parent the views parent
  * \param f flags
  */
-View3D::View3D(const std::string& uid, const std::string& name, QWidget *parent, Qt::WFlags f) :
+View3D::View3D(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
   ssc::View(parent, f),
   mCameraStyle(DEFAULT_STYLE),
   mCameraOffset(-1)

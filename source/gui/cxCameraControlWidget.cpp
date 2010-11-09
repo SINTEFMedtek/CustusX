@@ -20,38 +20,69 @@
 #include "cxViewManager.h"
 #include "cxView3D.h"
 #include "cxDataInterface.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {
 
-MousePadWidget::MousePadWidget(QWidget* parent) : QFrame(parent)
+MousePadWidget::MousePadWidget(QWidget* parent, QSize minimumSize) : QFrame(parent), mFixPosX(false), mMinSize(minimumSize)
 {
 }
+
 MousePadWidget::~MousePadWidget()
 {
+}
+
+void MousePadWidget::setFixedXPos(bool on)
+{
+  mFixPosX = on;
+  this->fixPos();
+}
+
+void MousePadWidget::fixPos()
+{
+  if (mFixPosX)
+  {
+    mLastPos.rx() = this->width()/2;
+  }
 }
 
 void MousePadWidget::showEvent(QShowEvent* event)
 {
   mLastPos = QPoint(this->width()/2, this->height()/2);
+  this->fixPos();
   this->update();
 }
 
 void MousePadWidget::mousePressEvent(QMouseEvent* event)
 {
   mLastPos = event->pos();
+  this->fixPos();
   this->update();
 }
 void MousePadWidget::mouseMoveEvent(QMouseEvent* event)
 {
   QPoint delta = event->pos() - mLastPos;
-  emit mouseMoved(delta);
+
+  double padSize = (this->size().width() + this->size().height())/2.0; // pixel size of trackpad
+  QPointF deltaN(double(delta.x())/padSize, double(delta.y())/padSize);
+  emit mouseMoved(deltaN);
+
   mLastPos = event->pos();
+  this->fixPos();
   this->update();
 }
 void MousePadWidget::mouseReleaseEvent(QMouseEvent* event)
 {
   mLastPos = QPoint(this->width()/2, this->height()/2);
+  this->fixPos();
+  this->update();
+}
+
+void MousePadWidget::resizeEvent(QResizeEvent* event)
+{
+  mLastPos = QPoint(this->width()/2, this->height()/2);
+  this->fixPos();
   this->update();
 }
 
@@ -61,123 +92,25 @@ void MousePadWidget::paintEvent(QPaintEvent *)
 
     ssc::Vector3D center(this->width()/2, this->height()/2, 0);
     ssc::Vector3D delta = ssc::Vector3D(mLastPos.x(), mLastPos.y(), 0) - center;
-    double radius = center.length() - delta.length();
+    double radius = center.length();
+    QPoint qcenter(this->width()/2, this->height()/2);
 
+    //QRadialGradient radialGrad(mLastPos, radius, qcenter);
+    QRadialGradient radialGrad(qcenter, radius, mLastPos);
+    //radialGrad.setColorAt(0, QColor("ivory"));
+    radialGrad.setColorAt(0.0, QColor("khaki"));
+    radialGrad.setColorAt(0.4, QColor("lightgrey"));
+    radialGrad.setColorAt(1, QColor("dimgrey"));
+//    radialGrad.setColorAt(0, Qt::red);
+//    radialGrad.setColorAt(0.5, Qt::blue);
+//    radialGrad.setColorAt(1, Qt::green);
 
-    QRadialGradient radialGrad(mLastPos, radius);
-    radialGrad.setColorAt(0, Qt::red);
-    radialGrad.setColorAt(0.5, Qt::blue);
-    radialGrad.setColorAt(1, Qt::green);
-
-//    p.drawImage(0, 0, m_shade);
     QColor color(146, 0, 146);
     QBrush brush(radialGrad);
 
     p.setPen(QColor(146, 0, 146));
     p.setBrush(QColor(146, 0, 146));
     p.fillRect(0, 0, width() - 1, height() - 1, brush);
-}
-
-
-///** Interface to the tool offset of the dominant tool
-// */
-//class DoubleDataAdapterCamera3DControl : public ssc::DoubleDataAdapter
-//{
-//  Q_OBJECT
-//public:
-//  DoubleDataAdapterCamera3DControl();
-//  virtual ~DoubleDataAdapterCamera3DControl() {}
-//  virtual QString getValueName() const { return "Zoom"; }
-//  virtual double getValue() const;
-//  virtual bool setValue(double val);
-//  virtual void connectValueSignals(bool on) {}
-//  ssc::DoubleRange getValueRange() const;
-//
-//private slots:
-//protected:
-//  vtkCameraPtr getCamera() const;
-//};
-//
-//DoubleDataAdapterCamera3DControl::DoubleDataAdapterCamera3DControl()
-//{
-//}
-//
-//vtkCameraPtr DoubleDataAdapterCamera3DControl::getCamera() const
-//{
-//  return viewManager()->get3DView()->GetRenderer()->GetActiveCamera();
-//}
-//
-//double DoubleDataAdapterCamera3DControl::getValue() const
-//{
-//  if (!this->getCamera())
-//    return 1.0;
-////  this->getCamera()->();
-////  if (mTool)
-////    return mTool->getTooltipOffset();
-////  return 0.0;
-//}
-//
-//bool DoubleDataAdapterCamera3DControl::setValue(double val)
-//{
-//  if (!this->getCamera())
-//    return false;
-//  this->getCamera()->Dolly(1.1);
-//  return true;
-//}
-//
-//ssc::DoubleRange DoubleDataAdapterCamera3DControl::getValueRange() const
-//{
-//  double range = 10;
-//  return ssc::DoubleRange(0.1,range,range/1000.0);
-//}
-//
-
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-
-GraphicsView::GraphicsView(QGraphicsScene *scene, QWidget *parent)
-    : QGraphicsView(scene, parent), totalScaleFactor(1)
-{
-    viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
-    setDragMode(ScrollHandDrag);
-}
-
-bool GraphicsView::viewportEvent(QEvent *event)
-{
-    switch (event->type()) {
-    case QEvent::TouchBegin:
-    case QEvent::TouchUpdate:
-    case QEvent::TouchEnd:
-    {
-      std::cout << "hit!!!" << std::endl;
-//        QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
-//        QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
-//        if (touchPoints.count() == 2) {
-//            // determine scale factor
-//            const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
-//            const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
-//            qreal currentScaleFactor =
-//                    QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
-//                    / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();
-//            if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
-//                // if one of the fingers is released, remember the current scale
-//                // factor so that adding another finger later will continue zooming
-//                // by adding new scale factor to the existing remembered value.
-//                totalScaleFactor *= currentScaleFactor;
-//                currentScaleFactor = 1;
-//            }
-//            setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
-//                                            totalScaleFactor * currentScaleFactor));
-//        }
-        return true;
-    }
-    default:
-        break;
-    }
-    return QGraphicsView::viewportEvent(event);
 }
 
 
@@ -189,80 +122,32 @@ bool GraphicsView::viewportEvent(QEvent *event)
 CameraControlWidget::CameraControlWidget(QWidget* parent) :
     QWidget(parent)
 {
-//  this->viewport()->setAttribute(Qt::WA_AcceptTouchEvents);
   this->setObjectName("CameraControlWidget");
   this->setWindowTitle("Camera Control");
+
+  mCameraControl.reset(new CameraControl());
+
+  mMinPadSize = QSize(50,50);
+  mMinBarSize = QSize(20,50);
 
   //layout
   mTopLayout = new QVBoxLayout(this);
   //toptopLayout->setMargin(0);
 
+  this->createStandard3DViewActions();
   this->definePanLayout();
   this->defineRotateLayout();
-
-
-//  QGraphicsScene* scene = new QGraphicsScene;
-//  scene->setSceneRect(-300, -300, 600, 600);
-//  scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-////
-////  for (int i = 0; i < MouseCount; ++i) {
-////      Mouse *mouse = new Mouse;
-////      mouse->setPos(::sin((i * 6.28) / MouseCount) * 200,
-////                    ::cos((i * 6.28) / MouseCount) * 200);
-////      scene.addItem(mouse);
-////  }
-//
-//  GraphicsView* view =  new GraphicsView(scene);
-//  view->setRenderHint(QPainter::Antialiasing);
-////  view.setBackgroundBrush(QPixmap(":/images/cheese.jpg"));
-//  view->setCacheMode(QGraphicsView::CacheBackground);
-//  view->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-////  view.setWindowTitle(QT_TRANSLATE_NOOP(QGraphicsView, "Colliding Mice"));
-////  view.showMaximized();
-//  mTopLayout->addWidget(view);
-
-
-//  mTopLayout->addStretch();
-
-  //connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
-  //updateSlot();
 }
-//
-//bool CameraControlWidget::viewportEvent(QEvent *event)
-// {
-//  switch (event->type())
-//  {
-//    case QEvent::TouchBegin:
-//    case QEvent::TouchUpdate:
-//    case QEvent::TouchEnd:
-//    {
-//      std::cout << "got touch event" << std::endl;
-//      //         QTouchEvent *touchEvent = static_cast<QTouchEvent *>(event);
-//      //         QList<QTouchEvent::TouchPoint> touchPoints = touchEvent->touchPoints();
-//      //         if (touchPoints.count() == 2) {
-//      //             // determine scale factor
-//      //             const QTouchEvent::TouchPoint &touchPoint0 = touchPoints.first();
-//      //             const QTouchEvent::TouchPoint &touchPoint1 = touchPoints.last();
-//      //             qreal currentScaleFactor =
-//      //                     QLineF(touchPoint0.pos(), touchPoint1.pos()).length()
-//      //                     / QLineF(touchPoint0.startPos(), touchPoint1.startPos()).length();
-//      //             if (touchEvent->touchPointStates() & Qt::TouchPointReleased) {
-//      //                 // if one of the fingers is released, remember the current scale
-//      //                 // factor so that adding another finger later will continue zooming
-//      //                 // by adding new scale factor to the existing remembered value.
-//      //                 totalScaleFactor *= currentScaleFactor;
-//      //                 currentScaleFactor = 1;
-//      //             }
-//      //             setTransform(QTransform().scale(totalScaleFactor * currentScaleFactor,
-//      //                                             totalScaleFactor * currentScaleFactor));
-//      return true;
-//    }
-//    default:
-//      break;
-//  }
-//  return QWidget::viewportEvent(event);
-//}
 
+void CameraControlWidget::createStandard3DViewActions()
+{
+  QActionGroup* group = mCameraControl->createStandard3DViewActions();
+
+  QToolBar* toolBar = new QToolBar(this);
+  mTopLayout->addWidget(toolBar);
+  toolBar->addActions(group->actions());
+  toolBar->addSeparator();
+}
 
 void CameraControlWidget::defineRotateLayout()
 {
@@ -274,40 +159,18 @@ void CameraControlWidget::defineRotateLayout()
   layout->setMargin(4);
   group->setLayout(layout);
 
-  mRotateWidget = new MousePadWidget(this);
-  mRotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  mRotateWidget->setLineWidth(3);
-  connect(mRotateWidget, SIGNAL(mouseMoved(QPoint)), this, SLOT(rotateXZSlot(QPoint)));
+  MousePadWidget* rotateWidget = new MousePadWidget(this, mMinPadSize);
+  rotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  rotateWidget->setLineWidth(3);
+  connect(rotateWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateXZSlot(QPointF)));
+  layout->addWidget(rotateWidget, 4);
 
-  layout->addWidget(mRotateWidget);
-
-//  QString style("QFrame { background-color: white; } ");
-  QString style("QFrame { background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #FFOECE, stop: 1 #FFFFFF); } ");
-
-//  background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-//                                    stop: 0 #FFOECE, stop: 1 #FFFFFF);
-
-
-  mRotateWidget->setStyleSheet(style);
-
-  QVBoxLayout* dollyLayout = new QVBoxLayout;
-  layout->addLayout(dollyLayout);
-
-  QAction* mDollyInAction = new QAction("RollUp", this);
-  mDollyInAction->setData(5);
-  connect(mDollyInAction, SIGNAL(triggered()), this, SLOT(rotateYSlot()));
-  QToolButton* mDollyInButton = new QToolButton(this);
-  mDollyInButton->setArrowType(Qt::UpArrow);
-  mDollyInButton->setDefaultAction(mDollyInAction);
-  dollyLayout->addWidget(mDollyInButton);
-
-  QAction* mDollyOutAction = new QAction("RollDown", this);
-  mDollyOutAction->setData(-5);
-  connect(mDollyOutAction, SIGNAL(triggered()), this, SLOT(rotateYSlot()));
-  QToolButton* mDollyOutButton = new QToolButton(this);
-  mDollyOutButton->setArrowType(Qt::DownArrow);
-  mDollyOutButton->setDefaultAction(mDollyOutAction);
-  dollyLayout->addWidget(mDollyOutButton);
+  MousePadWidget* rotateYWidget = new MousePadWidget(this, mMinBarSize);
+  rotateYWidget->setFixedXPos(true);
+  rotateYWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  rotateYWidget->setLineWidth(3);
+  connect(rotateYWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateYSlot(QPointF)));
+  layout->addWidget(rotateYWidget, 1);
 }
 
 
@@ -321,31 +184,18 @@ void CameraControlWidget::definePanLayout()
   panLayout->setMargin(4);
   group->setLayout(panLayout);
 
-  mPanWidget = new MousePadWidget(this);
-  mPanWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  mPanWidget->setLineWidth(3);
-  connect(mPanWidget, SIGNAL(mouseMoved(QPoint)), this, SLOT(panSlot(QPoint)));
+  MousePadWidget* panWidget = new MousePadWidget(this, mMinPadSize);
+  panWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  panWidget->setLineWidth(3);
+  connect(panWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(panXZSlot(QPointF)));
+  panLayout->addWidget(panWidget, 4);
 
-  panLayout->addWidget(mPanWidget);
-
-  QVBoxLayout* dollyLayout = new QVBoxLayout;
-  panLayout->addLayout(dollyLayout);
-
-  QAction* mDollyInAction = new QAction("ZIn", this);
-  mDollyInAction->setData(1.1);
-  connect(mDollyInAction, SIGNAL(triggered()), this, SLOT(dollySlot()));
-  QToolButton* mDollyInButton = new QToolButton(this);
-  mDollyInButton->setArrowType(Qt::UpArrow);
-  mDollyInButton->setDefaultAction(mDollyInAction);
-  dollyLayout->addWidget(mDollyInButton);
-
-  QAction* mDollyOutAction = new QAction("ZIn", this);
-  mDollyOutAction->setData(0.9);
-  connect(mDollyOutAction, SIGNAL(triggered()), this, SLOT(dollySlot()));
-  QToolButton* mDollyOutButton = new QToolButton(this);
-  mDollyOutButton->setArrowType(Qt::DownArrow);
-  mDollyOutButton->setDefaultAction(mDollyOutAction);
-  dollyLayout->addWidget(mDollyOutButton);
+  MousePadWidget* dollyWidget = new MousePadWidget(this, mMinBarSize);
+  dollyWidget->setFixedXPos(true);
+  dollyWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+  dollyWidget->setLineWidth(3);
+  connect(dollyWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(dollySlot(QPointF)));
+  panLayout->addWidget(dollyWidget, 1);
 }
 
 vtkCameraPtr CameraControlWidget::getCamera() const
@@ -353,53 +203,31 @@ vtkCameraPtr CameraControlWidget::getCamera() const
   return viewManager()->get3DView()->getRenderer()->GetActiveCamera();
 }
 
-void CameraControlWidget::rotateYSlot()
+void CameraControlWidget::rotateYSlot(QPointF delta)
 {
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (!action)
-    return;
-  double factor = action->data().toDouble();
+  double scale = 180;
+  double factor = scale * delta.y();
+
   this->getCamera()->Roll(factor);
 }
 
-void CameraControlWidget::rotateXZSlot(QPoint delta)
+void CameraControlWidget::rotateXZSlot(QPointF delta)
 {
   vtkCameraPtr camera = this->getCamera();
-//  ssc::Vector3D position(camera->GetPosition());
-//  ssc::Vector3D focus(camera->GetFocalPoint());
-//  ssc::Vector3D vup(camera->GetViewUp());
-//
-//  ssc::Vector3D e_x = cross(focus-position, vup).normal();
-//  ssc::Vector3D e_y = vup.normal();
-//
-//  ssc::DoubleBoundingBox3D bb(viewManager()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
-
-  int padSize = (mRotateWidget->size().width() + mRotateWidget->size().height())/2.0; // pixel size of trackpad
-//  double volSize = bb.range().length() / pow(3, 1.0/3.0); // mm size of volume
-  double scale = 180/padSize;
+  double scale = 180;
 
   camera->Azimuth(-scale * delta.x());
   camera->Elevation(scale * delta.y());
-//
-//  ssc::Vector3D t = scale * (-delta.x() * e_x + delta.y() * e_y);
-//
-//  position += t;
-//  focus += t;
-//
-//  camera->SetPosition(position.begin());
-//  camera->SetFocalPoint(focus.begin());
 }
 
-void CameraControlWidget::dollySlot()
+void CameraControlWidget::dollySlot(QPointF delta)
 {
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (!action)
-    return;
-  double factor = action->data().toDouble();
+  double factor = 1 + delta.y();
   this->getCamera()->Dolly(factor);
+  viewManager()->get3DView()->getRenderer()->ResetCameraClippingRange();
 }
 
-void CameraControlWidget::panSlot(QPoint delta)
+void CameraControlWidget::panXZSlot(QPointF delta)
 {
   vtkCameraPtr camera = this->getCamera();
   ssc::Vector3D position(camera->GetPosition());
@@ -411,11 +239,8 @@ void CameraControlWidget::panSlot(QPoint delta)
 
   ssc::DoubleBoundingBox3D bb(viewManager()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
 
-  int padSize = (mPanWidget->size().width() + mPanWidget->size().height())/2.0; // pixel size of trackpad
   double volSize = bb.range().length() / pow(3, 1.0/3.0); // mm size of volume
-  //int padSize = 100; // pixel size of trackpad
-  //double volSize = 200; // mm size of volume
-  double scale = volSize/padSize;
+  double scale = volSize;///padSize;
   ssc::Vector3D t = scale * (-delta.x() * e_x + delta.y() * e_y);
 
   position += t;
@@ -428,15 +253,6 @@ void CameraControlWidget::panSlot(QPoint delta)
 CameraControlWidget::~CameraControlWidget()
 {
 }
-
-//void ImagePropertiesWidget::updateSlot()
-//{
-//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-//  if (image)
-//  {
-//    mImageNameLabel->setText(qstring_cast(image->getName()));
-//  }
-//}
 
 void CameraControlWidget::showEvent(QShowEvent* event)
 {

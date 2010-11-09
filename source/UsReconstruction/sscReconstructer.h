@@ -97,7 +97,6 @@ private:
   ssc::Transform3D applyOutputOrientation();
   void findExtentAndOutputTransform();
 
-  QString changeExtension(QString name, QString ext);
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
   Transform3D readTransformFromFile(QString fileName);
   void calibrateTimeStamps();

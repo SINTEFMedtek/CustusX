@@ -20,7 +20,7 @@ SET(cxProject_MOC_HDRS
   cxTransferFunctionAlphaWidget.h
   cxTransferFunctionColorWidget.h
   cxPreferencesDialog.h
-  cxShiftCorrectionWidget.h
+  #cxShiftCorrectionWidget.h
   cxRegistrationHistoryWidget.h
   cxImagePropertiesWidget.h
   cxMeshPropertiesWidget.h
@@ -38,6 +38,11 @@ SET(cxProject_MOC_HDRS
   cxImportDataWizard.h
   cxFastOrientationRegistrationWidget.h
   cxCameraControlWidget.h
+  cxSegmentationWidget.h
+  cxToolTipCalibrationWidget.h
+  cxImageSegmentationAndCenterlineWidget.h
+  cxWhatsThisWidget.h
+  cxControlPanel.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -54,10 +59,6 @@ QT4_ADD_RESOURCES(cxProject_RCC_SRCS ${cxProject_RCCS})
 
 SET(${LIBNAME}_SRCS
     ${cxProject_MOC_HDRS}
-    ItkVtkGlue/itkImageToVTKImageFilter.h
-    ItkVtkGlue/itkImageToVTKImageFilter.txx
-    ItkVtkGlue/itkVTKImageToImageFilter.h
-    ItkVtkGlue/itkVTKImageToImageFilter.txx 
     cxMainWindow.h
     cxMainWindow.cpp 
     cxCustomStatusBar.h
@@ -88,8 +89,8 @@ SET(${LIBNAME}_SRCS
     cxTransferFunctionColorWidget.cpp
     cxPreferencesDialog.h
     cxPreferencesDialog.cpp
-    cxShiftCorrectionWidget.h
-    cxShiftCorrectionWidget.cpp
+    #cxShiftCorrectionWidget.h
+    #cxShiftCorrectionWidget.cpp
     cxRegistrationHistoryWidget.h
     cxRegistrationHistoryWidget.cpp
     cxImagePropertiesWidget.h
@@ -127,9 +128,17 @@ SET(${LIBNAME}_SRCS
     cxFastPatientRegistrationWidget.cpp
     cxFastOrientationRegistrationWidget.h
     cxFastOrientationRegistrationWidget.cpp
+    cxImageSegmentationAndCenterlineWidget.h
+    cxImageSegmentationAndCenterlineWidget.cpp
+    cxSegmentationWidget.h
+    cxSegmentationWidget.cpp
     cxWhatsThisWidget.h
     cxCameraControlWidget.cpp
     cxCameraControlWidget.h    
+    cxToolTipCalibrationWidget.h
+    cxToolTipCalibrationWidget.cpp
+    cxControlPanel.h
+    cxControlPanel.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
@@ -141,5 +150,5 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager)
+target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager dataManager)
 

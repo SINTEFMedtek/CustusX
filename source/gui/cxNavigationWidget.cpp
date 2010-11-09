@@ -26,7 +26,7 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
     mCameraGroupLayout(new QVBoxLayout())
 {
   this->setObjectName("NavigationWidget");
-  this->setWindowTitle("Navigation");
+  this->setWindowTitle("Navigation Properties");
 
   //tracking status
   mTrackingStatusGroupBox->setLayout(mTrackingStatusGroupLayout);

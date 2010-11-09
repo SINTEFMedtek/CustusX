@@ -19,10 +19,10 @@ public:
   typedef std::pair<int,int> ColRowPair;
   struct Configuration ///< a easy-to-work-with struct for a specific xml configuration
   {
-    std::string             mUsScanner;  ///<  scanner
-    std::string             mUsProbe;    ///<  probe
-    std::string             mRtSource;   ///<  realtime source
-    std::string             mConfigId;   ///<  config id
+    QString             mUsScanner;  ///<  scanner
+    QString             mUsProbe;    ///<  probe
+    QString             mRtSource;   ///<  realtime source
+    QString             mConfigId;   ///<  config id
     float                   mWidthDeg;   ///<  width in degrees
     int                     mDepth;      ///<  depth
     float                   mOffset;     ///<  Offset
@@ -99,8 +99,8 @@ public:
   
   int angle(ProbeXmlConfigParser::ColRowPair pair1)
   {
-    double pi = atan(1)*4;
-    return fmod(  ( ( atan2((pair1.first - mCenter.first), (pair1.second - mCenter.second)) ) + 3*pi/4) , 2*pi);
+	double pi = atan(1.0)*4;
+    return fmod(  ( ( atan2((double)(pair1.first - mCenter.first), (double)(pair1.second - mCenter.second)) ) + 3*pi/4) , 2*pi);
   }
   ProbeXmlConfigParser::ColRowPair mCenter;
 };

@@ -3,6 +3,7 @@
 
 #include <QDomElement>
 #include "sscImage.h"
+#include "sscXmlOptionItem.h"
 
 class QString;
 class QStringList;
@@ -25,18 +26,24 @@ public:
   PresetTransferFunctions3D();
   ~PresetTransferFunctions3D();
 
+  void save(QString name, ssc::ImagePtr image);
+  void load(QString name, ssc::ImagePtr image);
+
   QStringList getPresetList(); ///< returns a list of the preset names
-  QDomElement& getPresetDomElement(const QString& presetName); ///< returns a specific presets QDomElement representation
-  ssc::Image::shadingStruct getShadingPresets(const QString& presetName);///< Returns a struct with specific shading presets
+  //ssc::Image::ShadingStruct getShadingPresets(const QString& presetName);///< Returns a struct with specific shading presets
+  //void save(QString name, ssc::ImagePtr image);
 
 private:
+//  QDomElement& getPresetDomElement(const QString& presetName); ///< returns a specific presets QDomElement representation
   QStringList generatePresetList(); ///< internally generate the preset list
-  void initializeDomDocument(); ///< internally populate the dom document with the available presets
-  QDomElement& getDefaultPresetDomElement(); ///< returns a default preset
+//  void initializeDomDocument(); ///< internally populate the dom document with the available presets
+//  QDomElement& getDefaultPresetDomElement(); ///< returns a default preset
+  ssc::XmlOptionFile getPresetNode(const QString& presetName);
+  ssc::XmlOptionFile getCustomFile();
 
-  QDomDocument* mPresetDomDocument; ///< the xml document with the presets
-  std::map<std::string, ssc::Image::shadingStruct> mShadings;// Map with the shading presets
-
+  //QDomDocument* mPresetDomDocument; ///< the xml document with the presets
+  std::map<QString, ssc::Image::ShadingStruct> mShadings;// Map with the shading presets
+  ssc::XmlOptionFile mPresetFile;
   QDomElement mLastReturnedPreset;
 };
 }//namespace cx

@@ -1,18 +1,7 @@
-/*
- * cxVolumePropertiesWidget.cpp
- *
- *  Created on: Aug 20, 2010
- *      Author: christiana
- */
 #include "cxVolumePropertiesWidget.h"
-
-
 #include <QComboBox>
 #include <QTabWidget>
 #include <QVBoxLayout>
-//#include "sscMessageManager.h"
-//#include "sscDataManager.h"
-//#include "cxViewManager.h"
 #include "sscLabeledComboBoxWidget.h"
 
 #include "cxTransferFunctionWidget.h"
@@ -23,7 +12,6 @@
 
 namespace cx
 {
-
 
 /// -------------------------------------------------------
 /// -------------------------------------------------------

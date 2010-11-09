@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+
+<!-- Maybe just type (and rom+cal files) should be required, name=type if empty -->
+
+<!-- Tool -->
+<!-- ==== -->
+<tool>
+  <type>pointer</type>
+  <id>04-116-0326_Large-Custom-Navigator</id>
+  <name>04-116-0326_Large-Custom-Navigator</name>
+  <description>04-116-0326_Large-Custom-Navigator</description>
+  <manufacturer>Sonowand</manufacturer>
+  <clinical_app>Nevro</clinical_app>
+  <geo_file></geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type>NN</type>
+    <id>NN</id>
+    <name>NN</name>
+    <manufacturer>NN</manufacturer>
+    <description>NN</description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>04-116-0326_Large-Custom-Navigator</id>
+    <name>04-116-0326_Large-Custom-Navigator</name>
+    <wireless>yes</wireless>
+    <DOF></DOF>
+    <portnumber></portnumber>
+    <channelnumber></channelnumber>
+    <manufacturer>Sonowand</manufacturer>
+    <description>04-116-0326_Large-Custom-Navigator</description>
+    <rom_file>04-116-0326_Large-Custom-Navigator.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file>04-116-0326_Large-Custom-Navigator.cal</cal_file>
+    <date>
+      <yyyy>2010</yyyy>
+      <mm>10</mm>
+      <dd>20</dd>
+    </date>
+    <time>
+      <hh>14</hh>
+      <mm>30</mm>
+      <ss>50</ss>
+    </time>
+  </calibration>
+</tool>

@@ -38,7 +38,7 @@ private:
 
 	ssc::AxesRepPtr mAxis_t; ///< axis of the tool space
 	ssc::AxesRepPtr mAxis_s; /// axis of the tool sensor space
-	//New(const std::string& uid);
+	//New(const QString& uid);
 };
 
 
@@ -66,6 +66,7 @@ private slots:
   void showSlicePlanesActionSlot(bool checked);
   void fillSlicePlanesActionSlot(bool checked);
   void showAxesActionSlot(bool checked);
+  void showManualToolSlot(bool visible);
   void resetCameraActionSlot();
   void activeImageChangedSlot();
 
@@ -78,17 +79,18 @@ private:
   virtual void imageRemoved(const QString& uid);
   virtual void meshRemoved(const QString& uid);
 
-  typedef  std::map<std::string, ssc::VolumetricRepPtr> VolumetricRepMap;
-  typedef  std::map<std::string, ssc::GeometricRepPtr> GeometricRepMap;
+  typedef  std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
+  typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
   VolumetricRepMap mVolumetricReps;
   LandmarkRepPtr mLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
-  std::map<std::string, ssc::ToolRep3DPtr> mToolReps;
-  std::map<std::string, ToolAxisConnectorPtr> mToolAxis;
+  std::map<QString, ssc::ToolRep3DPtr> mToolReps;
+  std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
+  std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 

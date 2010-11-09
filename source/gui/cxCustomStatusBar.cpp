@@ -14,17 +14,11 @@ namespace cx
 CustomStatusBar::CustomStatusBar() :
   mFpsLabel(new QLabel())
 {
-  connect(ssc::messageManager(),
-          SIGNAL(emittedMessage(const QString&, int)),
-          this,
-          SLOT(showMessage(const QString&, int)));
+  connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
 
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()),
-          this, SLOT(connectToToolSignals()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()),
-            this, SLOT(disconnectFromToolSignals()));
-  connect(viewManager(), SIGNAL(fps(int)),
-          this, SLOT(fpsSlot(int)));
+  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(connectToToolSignals()));
+  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(disconnectFromToolSignals()));
+  connect(viewManager(), SIGNAL(fps(int)),this, SLOT(fpsSlot(int)));
   
   this->addPermanentWidget(mFpsLabel);
 }
@@ -46,7 +40,7 @@ void CustomStatusBar::connectToToolSignals()
     }
     connect(tool, SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible(bool)));
 
-    QString toolName = QString(tool->getName().c_str());
+    QString toolName = tool->getName();
 
     QLabel* toolLabel = new QLabel();
     toolLabel->setText(toolName);
@@ -92,11 +86,11 @@ void CustomStatusBar::receiveToolVisible(bool visible)
     return;
   }
 
-  std::string name = tool->getName();
+  QString name = tool->getName();
   for(unsigned i=0; i<mToolLabels.size(); ++i)
   {
     QLabel* toolLabel = mToolLabels[i];
-    if(toolLabel->text().compare(QString(name.c_str()), Qt::CaseInsensitive) == 0)
+    if(toolLabel->text().compare(name, Qt::CaseInsensitive) == 0)
     {
       QString color;
       if(tool->getVisible())
@@ -113,6 +107,11 @@ void CustomStatusBar::fpsSlot(int numFps)
 {
   QString fpsString = "FPS: "+QString::number(numFps);
   mFpsLabel->setText(fpsString);
+}
+
+void CustomStatusBar::showMessageSlot(Message message)
+{
+  this->showMessage(message.getPrintableMessage(), message.getTimeout());
 }
 
 }//namespace cx
