@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "cxTool.h"
 
 #include <vtkPolyData.h>
