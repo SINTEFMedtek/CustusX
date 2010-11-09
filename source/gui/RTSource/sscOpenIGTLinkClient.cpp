@@ -288,7 +288,6 @@ void IGTLinkClient::readyReadSlot()
 
 bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)
 {
-  std::cerr << "Receiving IMAGE data type." << std::endl;
 
   // Create a message buffer to receive transform data
   igtl::ImageMessage::Pointer imgMsg;
@@ -303,6 +302,7 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
     //std::cout << "Incomplete body received, ignoring. " << std::endl;
     return false;
   }
+  //std::cout << "Receiving IMAGE data type." << std::endl;
 
   socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
   // Deserialize the transform data

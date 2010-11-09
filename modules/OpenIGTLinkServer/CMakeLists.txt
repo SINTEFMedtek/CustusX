@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 2.6)
 #----------
 find_package( Boost REQUIRED )
 
+# VTK
+#----------
+FIND_PACKAGE(VTK REQUIRED)
+INCLUDE(${VTK_USE_FILE})
+
 # Qt
 #----------
 # find and setup Qt4 for this project
@@ -41,5 +46,12 @@ SET ( cxOpenIGTLinkServer_FILES
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 add_executable( cxOpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
-target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES} )
+target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}     vtkIO 
+    vtkRendering 
+    vtkImaging 
+    vtkCommon 
+    vtkHybrid 
+    vtkWidgets 
+    vtkFiltering 
+    vtkVolumeRendering  )
       
