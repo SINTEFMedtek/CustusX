@@ -73,6 +73,9 @@ signals:
   void inputImageChanged(QString uid);
   void outputImageChanged(QString uid);
 
+public slots:
+  void setImageInputSlot(QString value);
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff

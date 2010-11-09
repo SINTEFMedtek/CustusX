@@ -48,14 +48,14 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+//  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
   mReferenceImage = SelectImageStringDataAdapter::New();
   mReferenceImage->setValueName("Select reference: ");
-  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+//  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+//  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
   topLayout->addWidget(referenceImageComboBox, 1, 0);
 
@@ -210,6 +210,11 @@ void SegmentationWidget::hideEvent(QHideEvent* event)
 {
   QWidget::hideEvent(event);
   this->revertTransferFunctions();
+}
+
+void SegmentationWidget::setImageInputSlot(QString value)
+{
+  mSelectedImage->setValue(value);
 }
 
 void SegmentationWidget::segmentSlot()

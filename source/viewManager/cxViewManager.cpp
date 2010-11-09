@@ -425,7 +425,7 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 {
   View3D* view = mViewCache3D.retrieveView();
   QColor background = mSettings->value("backgroundColor").value<QColor>();
-  std::cout << "bk " << background.redF() << "," << background.greenF() << "," << background.blueF() << std::endl;
+  //std::cout << "bk " << background.redF() << "," << background.greenF() << "," << background.blueF() << std::endl;
   view->setBackgoundColor(background);
   mViewMap[view->getUid()] = view;
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
