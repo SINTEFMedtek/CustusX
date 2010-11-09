@@ -8,6 +8,7 @@ if (BUILD_TESTING)
   # -----------------------------------------------
   # CppUnit test framework: Create executable testCX
   #
+  include_directories( ${CPPUNIT_INCLUDE_DIR})
   
   # List of all test units
   QT4_WRAP_CPP( SOURCE_FILES 
