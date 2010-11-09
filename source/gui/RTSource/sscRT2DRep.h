@@ -41,7 +41,9 @@ protected:
 private slots:
   void newDataSlot();
 private:
+  void setMask();
   void initializeSize(int imageWidth, int imageHeight);
+  void setLookupTable();
   void setCamera();
  void setup();
   RealTimeStreamSourcePtr mData;
