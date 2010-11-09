@@ -34,7 +34,7 @@ public:
   {
     if (mCached.empty())
     {
-      std::string uid = string_cast(mTypeText) + "-" + string_cast(mNameGenerator++);
+      QString uid = qstring_cast(mTypeText) + "-" + qstring_cast(mNameGenerator++);
       VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
       view->hide();
       //Turn off rendering in vtkRenderWindowInteractor

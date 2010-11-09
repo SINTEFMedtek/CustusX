@@ -40,7 +40,7 @@ void LayoutData::ViewData::parseXml(QDomNode node)
 {
   QDomElement elem = node.toElement();
   mGroup = elem.attribute("group").toInt();
-  mPlane = string2enum<ssc::PLANE_TYPE>(string_cast(elem.attribute("type")));
+  mPlane = string2enum<ssc::PLANE_TYPE>(elem.attribute("type"));
   mRegion.pos.row = elem.attribute("row").toInt();
   mRegion.pos.col = elem.attribute("col").toInt();
   mRegion.span.row = elem.attribute("rowSpan").toInt();

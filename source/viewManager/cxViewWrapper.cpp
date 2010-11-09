@@ -7,6 +7,7 @@
 #include "cxViewGroup.h" //for class Navigation
 #include "sscMesh.h"
 #include "sscTypeConversions.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {
@@ -29,70 +30,6 @@ QVariant SyncedValue::get() const
 }
 
 
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-CameraData::CameraData()
-{
-}
-
-void CameraData::setCamera(vtkCameraPtr camera)
-{
-  mCamera = camera;
-}
-
-vtkCameraPtr CameraData::getCamera() const
-{
-  if (!mCamera)
-    mCamera = vtkCameraPtr::New();
-  return mCamera;
-}
-
-void CameraData::addTextElement(QDomNode parentNode, QString name, QString value) const
-{
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement node = doc.createElement(name);
-  node.appendChild(doc.createTextNode(value));
-  parentNode.appendChild(node);
-}
-
-void CameraData::addXml(QDomNode dataNode) const
-{
-  if (!mCamera)
-    return;
-
-  this->addTextElement(dataNode, "position",      qstring_cast(ssc::Vector3D(mCamera->GetPosition())));
-  this->addTextElement(dataNode, "focalPoint",    qstring_cast(ssc::Vector3D(mCamera->GetFocalPoint())));
-  this->addTextElement(dataNode, "viewUp",        qstring_cast(ssc::Vector3D(mCamera->GetViewUp())));
-  this->addTextElement(dataNode, "nearClip",      qstring_cast(mCamera->GetClippingRange()[0]));
-  this->addTextElement(dataNode, "farClip",       qstring_cast(mCamera->GetClippingRange()[1]));
-  this->addTextElement(dataNode, "parallelScale", qstring_cast(mCamera->GetParallelScale()));
-}
-
-void CameraData::parseXml(QDomNode dataNode)
-{
-  ssc::Vector3D vup = ssc::Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
-  if (ssc::similar(vup.length(), 0.0))
-    return; // ignore reading if undefined data
-
-  this->getCamera();
-
-  ssc::Vector3D position =   ssc::Vector3D::fromString(dataNode.namedItem("position").toElement().text());
-  ssc::Vector3D focalPoint = ssc::Vector3D::fromString(dataNode.namedItem("focalPoint").toElement().text());
-  ssc::Vector3D viewUp =     ssc::Vector3D::fromString(dataNode.namedItem("viewUp").toElement().text());
-  double nearClip =      dataNode.namedItem("nearClip").toElement().text().toDouble();
-  double farClip =       dataNode.namedItem("farClip").toElement().text().toDouble();
-  double parallelScale = dataNode.namedItem("parallelScale").toElement().text().toDouble();
-
-  mCamera->SetClippingRange(nearClip, farClip);
-  mCamera->SetPosition(position.begin());
-  mCamera->SetFocalPoint(focalPoint.begin());
-  mCamera->ComputeViewPlaneNormal();
-  mCamera->SetViewUp(viewUp.begin());
-  mCamera->SetParallelScale(parallelScale);
-}
-
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
@@ -101,7 +38,14 @@ void CameraData::parseXml(QDomNode dataNode)
 ViewGroupData::ViewGroupData() :
     mCamera3D(CameraData::create())
 {
+  connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(removeDataSlot(QString)));
+}
 
+void ViewGroupData::removeDataSlot(QString uid)
+{
+  for (unsigned i=0; i<mData.size(); ++i)
+    if (mData[i]->getUid()==uid)
+      this->removeData(mData[i]);
 }
 
 void ViewGroupData::requestInitialize()
@@ -189,10 +133,10 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper::dataAddedSlot(QString uid)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(string_cast(uid));
+  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if (image)
     this->imageAdded(image);
-  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(string_cast(uid));
+  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(uid);
   if (mesh)
     this->meshAdded(mesh);
 }
@@ -210,9 +154,9 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //add actions to the actiongroups and the contextmenu
-  std::map<std::string, std::string>::iterator iter;
+  std::map<QString, QString>::iterator iter;
 
-  std::map<std::string, std::string> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
+  std::map<QString, QString> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
   for(iter=imageUidsAndNames.begin(); iter != imageUidsAndNames.end(); ++iter)
   {
     this->addDataAction(iter->first, &contextMenu);
@@ -220,7 +164,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   
   contextMenu.addSeparator();
 
-  std::map<std::string, std::string> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
+  std::map<QString, QString> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
   for(iter=meshUidsAndNames.begin(); iter != meshUidsAndNames.end(); ++iter)
   {
     this->addDataAction(iter->first, &contextMenu);
@@ -232,7 +176,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   contextMenu.exec(pointGlobal);
 }
 
-void ViewWrapper::addDataAction(std::string uid, QMenu* contextMenu)
+void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 {
   ssc::DataPtr data = ssc::dataManager()->getData(uid);
 
@@ -252,7 +196,7 @@ void ViewWrapper::dataActionSlot()
     return;
 
   QString uid = theAction->data().toString();
-  ssc::DataPtr data = ssc::dataManager()->getData(uid.toStdString());
+  ssc::DataPtr data = ssc::dataManager()->getData(uid);
   ssc::ImagePtr image = ssc::dataManager()->getImage(data->getUid());
 
   bool firstData = mViewGroup->getData().empty();

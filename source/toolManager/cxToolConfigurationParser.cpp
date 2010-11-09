@@ -7,19 +7,19 @@
 
 namespace cx
 {
-ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath, std::string loggingFolder) :
+ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder) :
       mLoggingFolder(loggingFolder), mTrackerTag("tracker"),
       mTrackerTypeTag("type"), mToolfileTag("toolfile"), mToolTag("tool"),
       mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
       mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
       mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
-      mToolSensorChannelnumberTag("channelnumber"), mToolSensorRomFileTag(
-          "rom_file"), mToolCalibrationTag("calibration"),
+      mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
+      mToolSensorRomFileTag("rom_file"), mToolCalibrationTag("calibration"),
       mToolCalibrationFileTag("cal_file"),
       mInstrumentTag("instrument"), mInstrumentIdTag("id"), mInstrumentScannerIdTag("scannerid")
 {
-  QFile configurationFile(QString(configXmlFilePath.c_str()));
+  QFile configurationFile(configXmlFilePath);
   QFileInfo configurationFileInfo(configurationFile);
   QString configurationPath = configurationFileInfo.path() + "/";
 
@@ -33,11 +33,9 @@ ToolConfigurationParser::ToolConfigurationParser(std::string& configXmlFilePath,
     ssc::messageManager()->sendError("Could not set the xml content of the file "+ configXmlFilePath);
     return;
   }
-  //std::cout << mConfigureDoc.toString().toStdString() << std::endl;
-  mConfigurationPath = configurationFileInfo.absolutePath().toStdString()+"/";
-  //std::cout << "mConfigurationPath: " << mConfigurationPath << std::endl;
+  mConfigurationPath = configurationFileInfo.absolutePath()+"/";
 
-  if(mLoggingFolder.empty())
+  if(mLoggingFolder.isEmpty())
     mLoggingFolder = mConfigurationPath;
 }
 
@@ -52,7 +50,7 @@ TrackerPtr ToolConfigurationParser::getTracker()
   Tracker::InternalStructure internalStructure;
   for (int i = 0; i < trackerNodeList.count(); i++)
   {
-    std::string iString = "" + i;
+    QString iString = "" + i;
     QDomNode trackerNode = trackerNodeList.at(i);
     const QDomElement trackerTypeElement = trackerNode.firstChildElement(mTrackerTypeTag);
     if (trackerTypeElement.isNull())
@@ -106,7 +104,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
   QList<QDomNode> toolNodeList = this->getToolNodeList(toolFolderAbsolutePaths);
 
   ssc::ToolManager::ToolMapPtr tools(new ssc::ToolManager::ToolMap());
-  //QDomNode node;
   for (int i = 0; i < toolNodeList.size(); i++)
   {
     Tool::InternalStructure internalStructure;
@@ -136,18 +133,18 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
 
     QDomElement toolIdElement = toolNode.firstChildElement(mToolIdTag);
     QString toolIdText = toolIdElement.text();
-    internalStructure.mUid = toolIdText.toStdString();
+    internalStructure.mUid = toolIdText;
 
     QDomElement toolNameElement = toolNode.firstChildElement(mToolNameTag);
     QString toolNameText = toolNameElement.text();
-    internalStructure.mName = toolNameText.toStdString();
+    internalStructure.mName = toolNameText;
 
     QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
     QString toolGeofileText = toolGeofileElement.text();
     if (!toolGeofileText.isEmpty())
       //toolGeofileText = QString(mConfigurationPath.c_str()) + toolGeofileText;
       toolGeofileText = toolFolderAbsolutePaths.at(i) + toolGeofileText;
-    internalStructure.mGraphicsFileName = toolGeofileText.toStdString();
+    internalStructure.mGraphicsFileName = toolGeofileText;
 
     QDomElement toolInstrumentElement = toolNode.firstChildElement(mInstrumentTag);
     if (toolInstrumentElement.isNull())
@@ -158,12 +155,12 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QDomElement toolInstrumentIdElement =
         toolInstrumentElement.firstChildElement(mInstrumentIdTag);
     QString toolInstrumentIdText = toolInstrumentIdElement.text();
-    internalStructure.mInstrumentId = toolInstrumentIdText.toStdString();
+    internalStructure.mInstrumentId = toolInstrumentIdText;
 
     QDomElement toolInstrumentScannerIdElement =
         toolInstrumentElement.firstChildElement(mInstrumentScannerIdTag);
     QString toolInstrumentScannerIdText = toolInstrumentScannerIdElement.text();
-    internalStructure.mInstrumentScannerId = toolInstrumentScannerIdText.toStdString();
+    internalStructure.mInstrumentScannerId = toolInstrumentScannerIdText;
 
     QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
     if (toolSensorElement.isNull())
@@ -221,12 +218,16 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
 
+    QDomElement toolSensorReferencePointElement =
+        toolSensorElement.firstChildElement(mToolSensorReferencePointTag);
+    QString toolSensorReferencePointText = toolSensorReferencePointElement.text();
+    internalStructure.mReferencePoint = ssc::Vector3D::fromString(toolSensorReferencePointText);
+
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
     QString toolSensorRomFileText = toolSensorRomFileElement.text();
     if (!toolSensorRomFileText.isEmpty())
-      //toolSensorRomFileText = QString(mConfigurationPath.c_str()) + toolSensorRomFileText;
       toolSensorRomFileText = toolFolderAbsolutePaths.at(i) + toolSensorRomFileText;
-    internalStructure.mSROMFilename = toolSensorRomFileText.toStdString();
+    internalStructure.mSROMFilename = toolSensorRomFileText;
 
     QDomElement toolCalibrationElement = toolNode.firstChildElement(mToolCalibrationTag);
     if (toolCalibrationElement.isNull())
@@ -239,9 +240,8 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
         toolCalibrationElement.firstChildElement(mToolCalibrationFileTag);
     QString toolCalibrationFileText = toolCalibrationFileElement.text();
     if (!toolCalibrationFileText.isEmpty())
-      //toolCalibrationFileText = QString(mConfigurationPath.c_str()) + toolCalibrationFileText;
       toolCalibrationFileText = toolFolderAbsolutePaths.at(i) + toolCalibrationFileText;
-    internalStructure.mCalibrationFilename = toolCalibrationFileText.toStdString();
+    internalStructure.mCalibrationFilename = toolCalibrationFileText;
 
     internalStructure.mTransformSaveFileName = mLoggingFolder;
     internalStructure.mLoggingFolderName = mLoggingFolder;
@@ -251,13 +251,12 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     {
       ssc::ToolPtr tool(cxTool);
       (*tools)[tool->getUid()] = tool;
-      ssc::messageManager()->sendInfo("Successfully configuring a tool with uid: "+tool->getUid());
     }
   }
   return tools;
 }
 
-std::string ToolConfigurationParser::getLoggingFolder() const
+QString ToolConfigurationParser::getLoggingFolder() const
 {
   return mLoggingFolder;
 }
@@ -291,22 +290,19 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
       continue;
     }
 
-    QDir dir(QString(mConfigurationPath.c_str()));
+    QDir dir(mConfigurationPath);
 
     const QString filepath = dir.absoluteFilePath(toolFilename);
     QFile toolFile(filepath);
     if (!toolFile.exists())
     {
-      ssc::messageManager()->sendError(filepath.toStdString()+" does not exists. Skipping this tool.");
+      ssc::messageManager()->sendError(filepath+" does not exists. Skipping this tool.");
       continue;
-    } else
-    {
-      ssc::messageManager()->sendInfo(filepath.toStdString() + " exists.");
     }
     QDomDocument toolDoc;
     if (!toolDoc.setContent(&toolFile))
     {
-      ssc::messageManager()->sendError("Could not set the xml content of the file "+toolFilename.toStdString());
+      ssc::messageManager()->sendError("Could not set the xml content of the file "+toolFilename);
       continue;
     }
     //there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)

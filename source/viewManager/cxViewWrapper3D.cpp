@@ -24,7 +24,7 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "sscToolManager.h"
+#include "cxToolManager.h"
 #include "sscSlicePlanes3DRep.h"
 #include "cxLandmarkRep.h"
 #include "cxRepManager.h"
@@ -35,6 +35,7 @@
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
+#include "cxCameraControl.h"
 
 namespace cx
 {
@@ -104,7 +105,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mShowAxes = false;
   mView = view;
   this->connectContextMenu(mView);
-  std::string index = QString::number(startIndex).toStdString();
+  QString index = QString::number(startIndex);
 
   //view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
@@ -123,7 +124,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mView->addRep(mDataNameText);
 
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(activeImageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
   //showAxesActionSlot(true);
 }
@@ -157,9 +158,15 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showAxesAction->setChecked(mShowAxes);
   connect(showAxesAction, SIGNAL(triggered(bool)), this, SLOT(showAxesActionSlot(bool)));
 
+  QAction* showManualTool = new QAction("Show Manual Tool", &contextMenu);
+  showManualTool->setCheckable(true);
+  showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
+  connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
+
   contextMenu.addSeparator();
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(showAxesAction);
+  contextMenu.addAction(showManualTool);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
@@ -167,9 +174,9 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 
 void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 {
-	ViewWrapper::setViewGroup(group);
-//	std::cout << "ViewWrapper3D::setViewGroup:\n " << streamXml2String(*mViewGroup->getCamera3D()) << std::endl;
-	connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
+  ViewWrapper::setViewGroup(group);
+
+  connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
   mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
 }
 
@@ -191,6 +198,19 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			  mView->addRep(mRefSpaceAxisRep);
 		}
 
+//	  ssc::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
+	  std::vector<ssc::DataPtr> data = mViewGroup->getData();
+	  for (unsigned i=0; i<data.size(); ++i)
+	  {
+	    ssc::AxesRepPtr rep = ssc::AxesRep::New(data[i]->getName()+"_axis");
+      rep->setCaption(data[i]->getName(), ssc::Vector3D(1,0,0));
+      rep->setFontSize(0.03);
+      rep->setTransform(data[i]->get_rMd());
+      mDataSpaceAxisRep[data[i]->getUid()] = rep;
+      mView->addRep(rep);
+	  }
+
+
 		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 		ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
 		for (iter=tools->begin(); iter!=tools->end(); ++iter)
@@ -206,7 +226,13 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		mView->removeRep(mRefSpaceAxisRep);
 		mRefSpaceAxisRep.reset();
 
-		std::map<std::string, ToolAxisConnectorPtr>::iterator iter;
+    for (std::map<QString, ssc::AxesRepPtr>::iterator iter=mDataSpaceAxisRep.begin(); iter!=mDataSpaceAxisRep.end(); ++iter)
+    {
+      mView->removeRep(iter->second);
+    }
+    mDataSpaceAxisRep.clear();
+
+    std::map<QString, ToolAxisConnectorPtr>::iterator iter;
 		for (iter=mToolAxis.begin(); iter!=mToolAxis.end(); ++iter)
 		{
 			mView->removeRep(iter->second->getAxis_t());
@@ -214,6 +240,11 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		}
 		mToolAxis.clear();
 	}
+}
+
+void ViewWrapper3D::showManualToolSlot(bool visible)
+{
+  ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::resetCameraActionSlot()
@@ -259,19 +290,17 @@ void ViewWrapper3D::updateView()
   {
     text << qstring_cast(images[i]->getName());
   }
-  mDataNameText->setText(0, string_cast(text.join("\n")));
+  mDataNameText->setText(0, text.join("\n"));
 }
 
 void ViewWrapper3D::imageRemoved(const QString& uid)
 {
-  std::string suid = string_cast(uid);
-
-  if (!mVolumetricReps.count(suid))
+  if (!mVolumetricReps.count(uid))
     return;
 
-  ssc::messageManager()->sendDebug("Remove image from view group 3d: "+suid);
-  mView->removeRep(mVolumetricReps[suid]);
-  mVolumetricReps.erase(suid);
+  ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
+  mView->removeRep(mVolumetricReps[uid]);
+  mVolumetricReps.erase(uid);
 
   this->activeImageChangedSlot();
 //  if (mProbeRep->getImage() && mProbeRep->getImage()->getUid()==suid)
@@ -308,13 +337,11 @@ void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
 
 void ViewWrapper3D::meshRemoved(const QString& uid)
 {
-  std::string suid = string_cast(uid);
-
-  if (!mGeometricReps.count(suid))
+  if (!mGeometricReps.count(uid))
     return;
 
-  mView->removeRep(mGeometricReps[suid]);
-  mGeometricReps.erase(suid);
+  mView->removeRep(mGeometricReps[uid]);
+  mGeometricReps.erase(uid);
   this->updateView();
 }
   
@@ -345,7 +372,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
       continue;
 
-    std::string uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
+    QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
     if (!mToolReps.count(uid))
     {
       mToolReps[uid] = repManager()->getDynamicToolRep3DRep(uid);
@@ -367,14 +394,14 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
     mView->removeRep(mLandmarkRep);
     mView->removeRep(mProbeRep);
     
-    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   }
   if (mode==ssc::rsIMAGE_REGISTRATED)
   {
     mView->addRep(mLandmarkRep);
     mView->addRep(mProbeRep);
 
-    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot()));
+    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
     this->dominantToolChangedSlot();
   }
   if (mode==ssc::rsPATIENT_REGISTRATED)

@@ -16,10 +16,11 @@
   #include "igstkSerialCommunicationForPosix.h"
 #endif
 #include "sscTool.h"
+#include "cxForwardDeclarations.h"
 
 namespace cx
 {
-typedef std::map<std::string, ssc::ToolPtr> ToolMap;
+typedef std::map<QString, ssc::ToolPtr> ToolMap;
 typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
 /**
@@ -55,8 +56,7 @@ public:
     TRACKER_MICRON            ///< Claron Technologys Micron tracker
   };
 
-  enum Message
-  {
+  /*only used for documentation purposes
     TRACKER_INVALID_REQUEST,                    ///< internal state machine didn't accept the request
     TRACKER_OPEN,                               ///< hardware accepted the tracker as open
     TRACKER_INITIALIZED,                        ///< hardware accepted the tracker as initialized
@@ -67,15 +67,13 @@ public:
     TRACKER_COMMUNICATION_INPUT_OUTPUT_ERROR,   ///< communication port failed at completing a task
     TRACKER_COMMUNICATION_INPUT_OUTPUT_TIMEOUT, ///< communication port timed out
     TRACKER_COMMUNICATION_OPEN_PORT_ERROR       ///< communication port tried to open or close
-  };
-  typedef Tracker::Message TrackerMessage;
-  typedef std::string stdString;
+  */
 
   /**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
   {
     Type            mType;              ///< the trackers type
-    std::string     mLoggingFolderName; ///< path to where log should be saved
+    QString     mLoggingFolderName; ///< path to where log should be saved
     InternalStructure() :
       mType(TRACKER_NONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
   };
@@ -84,25 +82,22 @@ public:
   ~Tracker();
 
   Type getType() const;               ///< returns the trackers type
-  std::string getName() const;        ///< get the trackers name
-  std::string getUid() const;         ///< get the tracker unique id
+  QString getName() const;            ///< get the trackers name
+  QString getUid() const;             ///< get the tracker unique id
   TrackerType* getPointer() const;    ///< return a pointer to the internal tracker base
   void open();                        ///< open the tracker for communication
+  void close();                       ///< close the
   void attachTools(ToolMapPtr tools); ///< attach a list of tools to the tracker hw
+  void detachTools(ToolMapPtr tools); ///< detach the list of tools from the tracker hw
   void startTracking();               ///< start tracking
   void stopTracking();                ///< stop tracking
 
   bool isValid() const;               ///< whether this tracker is constructed correctly or not
 
 signals:
-   /**
-   * Signal that reports signals received by the the tool
-   * \param message What happended to the tool
-   * \param state   Whether the tool was trying to enter or leave a state
-   * \param success Whether or not the request was a success
-   * \param uid     The tools unique id
-   */
-  void trackerReport(TrackerMessage message, bool state, bool success, stdString uid);
+  void initialized(bool);
+  void open(bool);
+  void tracking(bool);
 
 protected:
   typedef itk::ReceptorMemberCommand<Tracker> ObserverType;
@@ -111,10 +106,14 @@ protected:
   void trackerTransformCallback(const itk::EventObject &eventVar); ///< callback receiving events from the observer
   void addLogging(); ///< adds logging to the internal igstk components
 
+  void internalOpen(bool value);
+  void internalInitialized(bool value);
+  void internalTracking(bool value);
+
   InternalStructure mInternalStructure; ///< the trackers type
   bool mValid;                          ///< whether this tracker is constructed correctly or not
-  std::string       mUid;               ///< the trackers unique id
-  std::string       mName;              ///< the trackers name
+  QString       mUid;               ///< the trackers unique id
+  QString       mName;              ///< the trackers name
   TrackerType*      mTracker;           ///< pointer to the base class of the internal igstk tracker
 
   PolarisTrackerType::Pointer       mTempPolarisTracker;    ///< pointer to a temp polaris tracker

@@ -19,7 +19,8 @@ namespace ssc
 
 namespace cx
 {
- 
+typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
+
 /**
  * \class MainWindow
  *
@@ -40,13 +41,15 @@ public:
   static void initialize();
   static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
 
+  virtual QMenu* createPopupMenu();
+
 signals:
   void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
 
 protected slots:
   void patientChangedSlot();
   //application menu
-  void aboutSlot(); ///< TODO
+  void aboutSlot();
   void preferencesSlot();
   void quitSlot(); ///< TODO
   
@@ -55,6 +58,8 @@ protected slots:
   void loadPatientFileSlot();///< Load all application data from XML file
   void savePatientFileSlot();///< Save all application data to XML file
   void clearPatientSlot();///< clear current patient (debug)
+
+  void showControlPanelActionSlot();
 
   // application
   void onApplicationStateChangedSlot();
@@ -66,7 +71,6 @@ protected slots:
   //data menu
   void importDataSlot(); ///< loads data(images) into the datamanager
   void deleteDataSlot(); ///< deletes data(image) from the patient
-//  void loadPatientRegistrationSlot(); ///< loads a patient registration
 
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
@@ -84,14 +88,21 @@ protected slots:
   void updateTrackingActionSlot();
   void toggleTrackingSlot();
 
-protected:
+private:
   void updateWindowTitle();
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
   void createToolBars(); ///< creates and adds toolbars for convenience
-  void createStatusBar();  ///< //TODO
+  void createStatusBar();  ///<
 
-  void addAsDockWidget(QWidget* widget);
+  void populateRegistrationMethodsWidget(); ///< fill the registration methods widget with all available registration methods
+  void populateSegmentationMethodsWidget();
+  void populateVisualizationMethodsWidget();
+  void populateCalibrationMethodsWidget();
+
+  void addAsDockWidget(QWidget* widget, QString groupname = "");
+  void registerToolBar(QToolBar* toolbar, QString groupname="");
+  void addToWidgetGroupMap(QAction* action, QString groupname);
 
   LayoutData executeLayoutEditorDialog(QString title, bool createNew);
 
@@ -109,6 +120,8 @@ protected:
   QMenu* mNavigationMenu; ///< menu for navigation and interaction
   QMenu* mHelpMenu;
 
+  QAction* mShowControlPanelAction;
+
   //actions and actiongroups
   QAction* mAboutAction;
   QAction* mPreferencesAction;
@@ -120,11 +133,11 @@ protected:
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
 
-  QActionGroup* mToggleWidgetActionGroup;
+//  QActionGroup* mToggleWidgetActionGroup;
+  QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume
-  //QAction* mLoadPatientRegistrationFromFile; ///< action for loading a patient registration from file
 
   QAction* mConfigureToolsAction; ///< action for configuring the toolmanager
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
@@ -154,29 +167,30 @@ protected:
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
 
-  class ConsoleWidget*                  mConsoleWidget;
-  class RegistrationMethodsWidget*      mRegsitrationMethodsWidget; ///< container widget for all registrations
-  class FastImageRegistrationWidget*    mFastImageRegistrationWidget;
-  class FastPatientRegistrationWidget*  mFastPatientRegistrationWidget;
-  class FastOrientationRegistrationWidget* mFastOrientationRegistrationWidget;
-  class ImageRegistrationWidget*        mImageRegistrationWidget; ///< interface for image registration
-  class PatientRegistrationWidget*      mPatientRegistrationWidget; ///< interface for patient registration
-  class ShiftCorrectionWidget*          mShiftCorrectionWidget; ///< interface for image shift correction
-  class BrowserWidget*                  mBrowserWidget; ///< contains tree structure with the images, meshes and tools
-  class NavigationWidget*               mNavigationWidget; ///< contains settings for navigating
-  class ImagePropertiesWidget*          mImagePropertiesWidget; ///< display and control of image properties for active image.
-  class ToolPropertiesWidget*           mToolPropertiesWidget; ///< display and control of tool properties for active tool.
-  class MeshPropertiesWidget*           mMeshPropertiesWidget; ///< Display and control image properties for active mesh
-  class PointSamplingWidget*            mPointSamplingWidget;
-  ssc::ReconstructionWidget*            mReconstructionWidget;
-  class RegistrationHistoryWidget*      mRegistrationHistoryWidget; ///< look back in registration history.
-  class VolumePropertiesWidget*         mVolumePropertiesWidget;
-  class CustomStatusBar*                mCustomStatusBar;
-  class FrameTreeWidget*                mFrameTreeWidget;
+  std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
+
+  class ConsoleWidget*                          mConsoleWidget;
+  class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
+  class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
+  class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters
+  class CalibrationMethodsWidget*               mCalibrationMethodsWidget; ///< container widget for all calibration methods
+  class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
+  class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
+  class ImagePropertiesWidget*                  mImagePropertiesWidget; ///< display and control of image properties for active image.
+  class ToolPropertiesWidget*                   mToolPropertiesWidget; ///< display and control of tool properties for active tool.
+  class MeshPropertiesWidget*                   mMeshPropertiesWidget; ///< Display and control image properties for active mesh
+  class PointSamplingWidget*                    mPointSamplingWidget;
+  ssc::ReconstructionWidget*                    mReconstructionWidget;
+  class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
+  class VolumePropertiesWidget*                 mVolumePropertiesWidget;
+  class CustomStatusBar*                        mCustomStatusBar;
+  class FrameTreeWidget*                        mFrameTreeWidget;
+  class ControlPanel*                           mControlPanel;
 
   //Preferences
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
-
+  CameraControlPtr mCameraControl;
+  std::set<QDockWidget*> mDockWidgets;
 };
 }//namespace cx
 

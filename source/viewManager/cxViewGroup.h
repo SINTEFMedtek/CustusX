@@ -52,7 +52,7 @@ public:
 
   void addView(ViewWrapperPtr wrapper);
   void removeViews();
-  ViewWrapperPtr getViewWrapperFromViewUid(std::string viewUid);
+  ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
   std::vector<ssc::View*> getViews() const;
   //ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
 //  virtual void addImage(ssc::ImagePtr image);
