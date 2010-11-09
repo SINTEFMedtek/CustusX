@@ -198,6 +198,19 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			  mView->addRep(mRefSpaceAxisRep);
 		}
 
+//	  ssc::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
+	  std::vector<ssc::DataPtr> data = mViewGroup->getData();
+	  for (unsigned i=0; i<data.size(); ++i)
+	  {
+	    ssc::AxesRepPtr rep = ssc::AxesRep::New(data[i]->getName()+"_axis");
+      rep->setCaption(data[i]->getName(), ssc::Vector3D(1,0,0));
+      rep->setFontSize(0.03);
+      rep->setTransform(data[i]->get_rMd());
+      mDataSpaceAxisRep[data[i]->getUid()] = rep;
+      mView->addRep(rep);
+	  }
+
+
 		ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 		ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
 		for (iter=tools->begin(); iter!=tools->end(); ++iter)
@@ -213,7 +226,13 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 		mView->removeRep(mRefSpaceAxisRep);
 		mRefSpaceAxisRep.reset();
 
-		std::map<QString, ToolAxisConnectorPtr>::iterator iter;
+    for (std::map<QString, ssc::AxesRepPtr>::iterator iter=mDataSpaceAxisRep.begin(); iter!=mDataSpaceAxisRep.end(); ++iter)
+    {
+      mView->removeRep(iter->second);
+    }
+    mDataSpaceAxisRep.clear();
+
+    std::map<QString, ToolAxisConnectorPtr>::iterator iter;
 		for (iter=mToolAxis.begin(); iter!=mToolAxis.end(); ++iter)
 		{
 			mView->removeRep(iter->second->getAxis_t());

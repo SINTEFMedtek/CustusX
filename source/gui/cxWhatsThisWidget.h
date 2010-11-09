@@ -38,7 +38,7 @@ public:
     toplayout->addLayout(layout);
     toplayout->addStretch();
 
-    QLabel* methodLabel = new QLabel(methodname);
+    QLabel* methodLabel = new QLabel("<b>"+methodname+"</b>");
     QCheckBox* checkBox = new QCheckBox("generate");
 
     inputWidget->setVisible(inputChecked);

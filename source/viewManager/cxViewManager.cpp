@@ -408,6 +408,8 @@ void ViewManager::setStretchFactors( LayoutRegion region, int stretchFactor)
 void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
   View2D* view = mViewCache2D.retrieveView();
+  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  view->setBackgoundColor(background);
   mViewMap[view->getUid()] = view;
   ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
   wrapper->initializePlane(plane);
@@ -422,6 +424,9 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
   View3D* view = mViewCache3D.retrieveView();
+  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  std::cout << "bk " << background.redF() << "," << background.greenF() << "," << background.blueF() << std::endl;
+  view->setBackgoundColor(background);
   mViewMap[view->getUid()] = view;
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
   mViewGroups[group]->addView(wrapper);
