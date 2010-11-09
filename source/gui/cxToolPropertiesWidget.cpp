@@ -11,14 +11,17 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
+#include <QGroupBox>
+#include <QCheckBox>
 
 #include "sscMessageManager.h"
 #include "sscToolManager.h"
-#include "cxDataInterface.h"
-#include "UsConfigGui.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "cxToolManager.h"
 #include "sscTypeConversions.h"
+#include "UsConfigGui.h"
+#include "cxDataInterface.h"
+#include "cxToolManager.h"
+#include "cxTool.h"
 
 
 namespace cx
@@ -89,8 +92,7 @@ QWidget(parent)
 
   
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
-  QWidget(parent),
-  mProbePropertiesWidget(new UsConfigGui(this))
+  QWidget(parent)
 {
   this->setObjectName("ToolPropertiesWidget");
   this->setWindowTitle("Tool Properties");
@@ -126,10 +128,12 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   //TODO: Add enable/disable US Probe visualization in 2D/3D?
   //TODO: Only show US probe properties if tool is US Probe
 
-  mShowUSSector = new QCheckBox("Show US probe sector", this);
-  mToptopLayout->addWidget(mShowUSSector);
-  mToptopLayout->addWidget(mProbePropertiesWidget);
-  mProbePropertiesWidget->setVisible(false); // Hide this widget initially
+  mUSSectorConfigBox = new QComboBox(this);
+  mUSSectorConfigLabel = new QLabel("Probe sector configuration:", this);
+  mToptopLayout->addWidget(mUSSectorConfigLabel);
+  mToptopLayout->addWidget(mUSSectorConfigBox);
+  mUSSectorConfigLabel->hide();
+  mUSSectorConfigBox->hide();
 
 //  QGroupBox* group2D = new QGroupBox(this);
 //  group2D->setTitle("2D properties");
@@ -157,10 +161,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(updateSlot()));
 
-  //connect(mProbePropertiesWidget, SIGNAL(USProbeChanged()), ssc::toolManager(), SLOT(USProbeChangedSlot));
+  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
 
-  connect(mShowUSSector, SIGNAL(stateChanged(int)), this, SLOT(showUSSectorStateChangedSlot(int)));
-  connect(mProbePropertiesWidget, SIGNAL(configurationChanged()), this, SLOT(configurationChangedSlot()));
 
   dominantToolChangedSlot();
   referenceToolChangedSlot();
@@ -173,13 +175,34 @@ ToolPropertiesWidget::~ToolPropertiesWidget()
 
 void ToolPropertiesWidget::dominantToolChangedSlot()
 {
+  ToolPtr cxTool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+  if (cxTool)
+    disconnect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
+  if(mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
+  {
+    this->populateUSSectorConfigBox();
+    mUSSectorConfigLabel->show();
+    mUSSectorConfigBox->show();
+    mToptopLayout->update();
+  }
+  else
+  {
+    mUSSectorConfigBox->clear();
+    mUSSectorConfigLabel->hide();
+    mUSSectorConfigBox->hide();
+    mToptopLayout->update();
+  }
+
   if (mActiveTool)
     connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
+  if (cxTool)
+    connect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 }
 
 void ToolPropertiesWidget::referenceToolChangedSlot()
@@ -228,41 +251,40 @@ void ToolPropertiesWidget::updateSlot()
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
 
-void ToolPropertiesWidget::configurationChangedSlot()
+void ToolPropertiesWidget::populateUSSectorConfigBox()
 {
-  ProbeXmlConfigParser::Configuration config = mProbePropertiesWidget->getConfiguration();
-  if(config.isEmpty())
-    return;
-  double depthStart = config.mOffset;
-  double depthEnd = config.mDepth + depthStart;
-  ToolManager *toolManager = dynamic_cast<ToolManager*>(ssc::toolManager());
-  if (config.mWidthDeg > 0.1) // Sector probe
-  {
-    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
-    toolManager->setUSProbeSector(probeSector);
-  }
-  else //Linear probe
-  {
-    int widtInPixels = config.mRightEdge - config.mLeftEdge;
-    double width = config.mPixelWidth * widtInPixels; //width in mm
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
-    toolManager->setUSProbeSector(probeSector);
-  }
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+
+  mUSSectorConfigBox->blockSignals(true);
+  mUSSectorConfigBox->clear();
+  mUSSectorConfigBox->insertItems(0, tool->getUSSectorConfigList());
+  this->toolsSectorConfigurationChangedSlot();//Read the tool's value into the combo box
+  mUSSectorConfigBox->blockSignals(false);
 }
 
-void ToolPropertiesWidget::showUSSectorStateChangedSlot(int state)
+void ToolPropertiesWidget::configurationChangedSlot(int index)
 {
-  if (state)
+  if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
+    return;
+
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+  tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
+}
+
+void ToolPropertiesWidget::toolsSectorConfigurationChangedSlot()
+{
+  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+  //Only set tool's configurationString if tool don't have one
+  int index = 0;
+  if (!tool->getProbeSectorConfigurationString().isEmpty())
   {
-    mProbePropertiesWidget->setVisible(true);
+    index = mUSSectorConfigBox->findText(tool->getProbeSectorConfigurationString());
+    if (index != -1)
+      mUSSectorConfigBox->setCurrentIndex(index);
   }
-  else
-  {
-    mProbePropertiesWidget->setVisible(false);
-    //TODO: May want a show/remove of probe sector
-  }
-  mToptopLayout->update();
+  // Can't use tool's current value if index is -1. Use default instead
+  if (tool->getProbeSectorConfigurationString().isEmpty() || (index == -1))
+    tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
 }
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)

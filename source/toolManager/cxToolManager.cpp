@@ -77,6 +77,7 @@ void ToolManager::initializeManualTool()
       ssc::createTransformRotateY(M_PI) *
       ssc::createTransformRotateZ(M_PI_2);
   mManualTool->set_prMt(prMt);
+  //std::cout << "manual tool init" << std::endl;
 }
 
 void ToolManager::configureReferences()
@@ -339,6 +340,8 @@ void ToolManager::setDominantTool(const std::string& uid)
     {
       mManualTool->set_prMt(mDominantTool->get_prMt());
       mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
+//      std::cout << "manual tool set" << std::endl;
+
     }
     mManualTool->setVisible(true);
   }
@@ -735,6 +738,22 @@ void ToolManager::addXml(QDomNode& parentNode)
     landmarksNode.appendChild(landmarkNode);
   }
   base.appendChild(landmarksNode);
+
+  //Tools
+  QDomElement toolsNode = doc.createElement("tools");
+  ssc::ToolManager::ToolMapPtr tools = getTools();
+  ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
+  for(; toolIt != tools->end(); toolIt++)
+  {
+    QDomElement toolNode = doc.createElement("tool");
+    ToolPtr tool = boost::shared_dynamic_cast<Tool>(toolIt->second);
+    if (tool)
+    {
+      tool->addXml(toolNode);
+      toolsNode.appendChild(toolNode);
+    }
+  }
+  base.appendChild(toolsNode);
 }
 
 void ToolManager::clear()
@@ -742,6 +761,8 @@ void ToolManager::clear()
   m_rMpr_History->clear();
   mManualTool->set_prMt(ssc::Transform3D());
   mLandmarks.clear();
+//  std::cout << "clear tools" << std::endl;
+
 }
 
 void ToolManager::parseXml(QDomNode& dataNode)
@@ -754,6 +775,7 @@ void ToolManager::parseXml(QDomNode& dataNode)
 
   QString manualToolText = dataNode.namedItem("manualTool").toElement().text();
   mManualTool->set_prMt(ssc::Transform3D::fromString(manualToolText));
+//  std::cout << "loading manual tool matrix: " << mManualTool->get_prMt() << std::endl;
 
   QDomNode landmarksNode = dataNode.namedItem("landmarks");
   QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
@@ -762,6 +784,21 @@ void ToolManager::parseXml(QDomNode& dataNode)
     ssc::Landmark landmark;
     landmark.parseXml(landmarkNode);
     this->setLandmark(landmark);
+  }
+
+  //Tools
+  ssc::ToolManager::ToolMapPtr tools = getTools();
+  QDomNode toolssNode = dataNode.namedItem("tools");
+  QDomElement toolNode = toolssNode.firstChildElement("tool");
+  for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))
+  {
+    QDomElement base = toolNode.toElement();
+    std::string tool_uid = base.attribute("uid").toStdString();
+    if (tools->find(tool_uid) != tools->end())
+    {
+      ToolPtr tool = boost::shared_dynamic_cast<Tool>(tools->find(tool_uid)->second);
+      tool->parseXml(toolNode);
+    }
   }
 }
 

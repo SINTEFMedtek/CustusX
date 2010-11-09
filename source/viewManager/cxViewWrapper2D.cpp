@@ -28,6 +28,7 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscDefinitionStrings.h"
 #include "sscSliceComputer.h"
+#include "sscGeometricRep2D.h"
 
 namespace cx
 {
@@ -41,6 +42,8 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   // disable vtk interactor: this wrapper IS an interactor
   mView->getRenderWindow()->GetInteractor()->Disable();
   mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
+  double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
+  mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth/2.0, clipDepth/2.0);
 
   addReps();
 
@@ -180,6 +183,12 @@ void ViewWrapper2D::viewportChanged()
 
   double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
   mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
+
+//  vtkCameraPtr camera = mView->getRenderer()->GetActiveCamera();
+//  std::cout << ssc::Vector3D(camera->GetFocalPoint()) << std::endl;
+//  std::cout << camera->GetClippingRange()[0] << ", " << camera->GetClippingRange()[1] << std::endl;
+//  std::cout << camera->GetDistance() << std::endl;
+
   //std::cout << "ViewWrapper2D::viewportChanged(): zoom:" << mZoomFactor << ", parallelScale:" << parallelScale << ", " << planeToString(mPlaneType) <<  std::endl;
 
   ssc::DoubleBoundingBox3D BB_vp = getViewport();
@@ -302,7 +311,9 @@ ssc::View* ViewWrapper2D::getView()
 void ViewWrapper2D::imageAdded(ssc::ImagePtr image)
 {
   this->updateView();
-  Navigation().centerToView(mViewGroup->getImages());
+
+  // removed this side effect: unwanted when loading a patient, might also be unwanted to change scene when adding/removing via gui?
+  //Navigation().centerToView(mViewGroup->getImages());
 }
 
 void ViewWrapper2D::updateView()
@@ -331,6 +342,42 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
 {
   updateView();
 }
+
+void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
+{
+//  std::map<std::string, ssc::GeometricRep2DPtr> mGeometricRep;
+
+  if (!mesh)
+    return;
+  if (mGeometricRep.count(mesh->getUid()))
+    return;
+
+  ssc::GeometricRep2DPtr rep = ssc::GeometricRep2D::New(mesh->getUid()+"_rep2D");
+  rep->setSliceProxy(mSliceProxy);
+  rep->setMesh(mesh);
+  mView->addRep(rep);
+  mGeometricRep[mesh->getUid()] = rep;
+  //std::cout << "added mesh " << mesh->getName() << std::endl;
+//
+//  std::vector<ssc::MeshPtr> images = mViewGroup->getMeshes();
+//
+//  // slice rep
+//  mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
+//  mSliceRep->setSliceProxy(mSliceProxy);
+//  mView->addRep(mSliceRep);
+}
+
+void ViewWrapper2D::meshRemoved(const QString& uid)
+{
+  std::string suid = string_cast(uid);
+  if (!mGeometricRep.count(suid))
+    return;
+
+  mView->removeRep(mGeometricRep[suid]);
+  mGeometricRep.erase(suid);
+ // std::cout << "removed mesh " << uid << std::endl;
+}
+
 
 void ViewWrapper2D::dominantToolChangedSlot()
 {

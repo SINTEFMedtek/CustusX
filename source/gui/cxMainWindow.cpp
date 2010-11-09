@@ -39,6 +39,7 @@
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataWizard.h"
+#include "cxCameraControlWidget.h"
 
 namespace cx
 {
@@ -94,6 +95,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mImagePropertiesWidget);
   this->addAsDockWidget(mVolumePropertiesWidget);
   this->addAsDockWidget(mMeshPropertiesWidget);
+  this->addAsDockWidget(new CameraControlWidget(this));
 
   //Tried to add a separator. Don't work yet
   //QAction* separatorAction = new QAction(this);
@@ -281,6 +283,9 @@ void MainWindow::createActions()
   mResetDesktopAction = new QAction(tr("Reset desktop"), this);
   mResetDesktopAction->setToolTip("Reset desktop for workflow step");
   connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
+
+  mInteractorStyleActionGroup = viewManager()->createInteractorStyleActionGroup();
+
 }
 
 void MainWindow::centerToImageCenterSlot()
@@ -546,6 +551,8 @@ void MainWindow::createMenus()
   mWorkflowMenu = new QMenu(tr("Workflow"), this);
   mToolMenu = new QMenu(tr("Tracking"), this);
   mLayoutMenu = new QMenu(tr("Layouts"), this);
+  mNavigationMenu = new QMenu(tr("Navigation"), this);
+  mHelpMenu = new QMenu(tr("Help"), this);
 
   // Application
   this->menuBar()->addMenu(mCustusXMenu);
@@ -589,6 +596,16 @@ void MainWindow::createMenus()
   mLayoutMenu->addAction(mEditLayoutAction);
   mLayoutMenu->addAction(mDeleteLayoutAction);
   mLayoutMenu->addSeparator();
+
+  this->menuBar()->addMenu(mNavigationMenu);
+  mNavigationMenu->addAction(mCenterToImageCenterAction);
+  mNavigationMenu->addAction(mCenterToTooltipAction);
+  mNavigationMenu->addSeparator();
+  mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
+
+  this->menuBar()->addMenu(mHelpMenu);
+  mHelpMenu->addAction(QWhatsThis::createAction());
+
 }
 
 void MainWindow::createToolBars()
@@ -606,6 +623,8 @@ void MainWindow::createToolBars()
   mNavigationToolBar->setObjectName("NavigationToolBar");
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
   mNavigationToolBar->addAction(mCenterToTooltipAction);
+  mNavigationToolBar->addSeparator();
+  mNavigationToolBar->addActions(mInteractorStyleActionGroup->actions());
 
   mWorkflowToolBar = addToolBar("Workflow");
   mWorkflowToolBar->setObjectName("WorkflowToolBar");

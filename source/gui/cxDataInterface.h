@@ -10,7 +10,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QString>
-#include <QtGui>
+//#include <QtGui>
 #include "sscForwardDeclarations.h"
 #include "sscDoubleDataAdapter.h"
 //#include "sscHelperWidgets.h"
