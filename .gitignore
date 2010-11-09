@@ -4,3 +4,9 @@ build
 .project
 .metadata
 config/ConsoleLog.txt
+.cproject
+Makefile
+config/transferFunctions/
+Build_mvs08/
+Build_Eclipse_NMake/
+CustusX3.git.cpp
