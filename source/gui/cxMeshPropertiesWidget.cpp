@@ -56,24 +56,36 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   QPushButton* importTransformButton = new QPushButton("Import Transform from Parent", this);
   importTransformButton->setToolTip("Replace data transform with that of the parent data.");
   connect(importTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
+
+  QPushButton* deleteButton = new QPushButton("Delete", this);
+  deleteButton->setToolTip("Remove the selected surface from the system.");
+  connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteDataSlot()));
   
   gridLayout->addWidget(chooseColor, 2, 0);
   gridLayout->addWidget(importTransformButton, 1, 0);
+  gridLayout->addWidget(deleteButton, 3, 0);
   
   mParentFrameAdapter = ParentFrameStringDataAdapter::New();
 
   ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
-  gridLayout->addWidget(combo, 3, 0);
+  gridLayout->addWidget(combo, 4, 0);
 
 
   toptopLayout->addStretch();
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const std::string&)), this, SLOT(updateSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(updateSlot()));
   updateSlot();
 }
 
 MeshPropertiesWidget::~MeshPropertiesWidget()
 {
+}
+
+void MeshPropertiesWidget::deleteDataSlot()
+{
+  if(!mMesh)
+    return;
+  ssc::dataManager()->removeData(mMesh->getUid());
 }
 
 void MeshPropertiesWidget::importTransformSlot()
@@ -149,7 +161,7 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
   mMeshComboBox->clear();
   
   //get a list of meshes from the datamanager
-  std::map<std::string, ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
+  std::map<QString, ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
   if(meshes.size() == 0)
   {
     mMeshComboBox->insertItem(1, QString("Import a mesh to begin..."));
@@ -160,12 +172,12 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
   mMeshComboBox->setEnabled(true);
   
   //add these to the combobox
-  typedef std::map<std::string, ssc::MeshPtr>::iterator iterator;
+  typedef std::map<QString, ssc::MeshPtr>::iterator iterator;
   mMeshComboBox->insertItem(1, QString("<No mesh selected>"));
   int listPosition = 2;
   for(iterator i = meshes.begin(); i != meshes.end(); ++i)
   {
-    mMeshComboBox->insertItem(listPosition, QString(i->first.c_str()));
+    mMeshComboBox->insertItem(listPosition, QString(i->first));
     listPosition++;
   }
   mMeshComboBox->blockSignals(false);
@@ -183,7 +195,7 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
     return;
   }
   
-  std::string meshId = comboBoxText.toStdString();
+  QString meshId = comboBoxText;
   
   //find the mesh
   ssc::MeshPtr mesh = ssc::dataManager()->getMesh(meshId);

@@ -9,6 +9,7 @@
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
+#include "sscDoubleWidgets.h"
 
 namespace cx
 {
@@ -21,8 +22,6 @@ FoldersTab::FoldersTab(QWidget *parent) :
 void FoldersTab::init()
 {
   mGlobalPatientDataFolder = mSettings->value("globalPatientDataFolder").toString();
-
-  //mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
 
@@ -40,7 +39,6 @@ void FoldersTab::init()
   
   QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
   mToolConfigFilesComboBox = new QComboBox;
-  //setToolConfigFiles();
   connect( mToolConfigFilesComboBox, 
           SIGNAL(currentIndexChanged(const QString &)),
           this, 
@@ -54,31 +52,14 @@ void FoldersTab::init()
           SIGNAL(currentIndexChanged(int)),
           this,
           SLOT(currenApplicationChangedSlot(int)));
-  //setCurrentApplication();//changes mCurrentToolConfigFile
   mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
   applicationStateChangedSlot();
-  
-  //setCurrentToolConfigFile();
   
   // Layout
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addWidget(patientDataFolderLabel, 0, 0);
   mainLayout->addWidget(mPatientDataFolderComboBox, 0, 1);
   mainLayout->addWidget(patientDataFolderButton, 0, 2);
-  
-  //mainLayout->addWidget(importDataFolderLabel, 1, 0);
-  //mainLayout->addWidget(mImportDataFolderComboBox, 1, 1);
-  //mainLayout->addWidget(importDataFolderButton, 1, 2);
-  
-  //mainLayout->addWidget(currentPatientLabel, 2, 0);
-  //mainLayout->addWidget(currentPatientComboBox, 3, 0);
-
-  //mainLayout->addWidget(dummyLabel, 4, 0);
-  //mainLayout->addWidget(dummyLabel, 5, 0);
-
-  //mainLayout->addWidget(toolConfigFolderLabel, 6, 0);
-  //mainLayout->addWidget(mToolConfigFolderComboBox, 6, 1);
-  //mainLayout->addWidget(toolConfigFolderButton, 6, 2);
   
   mainLayout->addWidget(chooseApplicationLabel, 8, 0);
   mainLayout->addWidget(mChooseApplicationComboBox, 8, 1);
@@ -163,13 +144,6 @@ void FoldersTab::applicationStateChangedSlot()
   if (mToolConfigFilesComboBox->currentIndex()<0)
     mToolConfigFilesComboBox->setCurrentIndex(0);
 }
-
-
-//void FoldersTab::setCurrentToolConfigFile()
-//{
-//  int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
-//  mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
-//}
   
 void FoldersTab::currenApplicationChangedSlot(int index)
 {
@@ -177,16 +151,7 @@ void FoldersTab::currenApplicationChangedSlot(int index)
   if (index<0 || index>=actions.size())
     return;
   actions[index]->trigger();
-
-//  mSettings->setValue("globalApplicationName", newApplicationName);
-//  this->setToolConfigFiles();
 }
-  
-//void FoldersTab::setCurrentApplication()
-//{
-////  int currentIndex = mChooseApplicationComboBox->findText( mSettings->value("globalApplicationName").toString() );
-////  mChooseApplicationComboBox->setCurrentIndex( currentIndex );
-//}
   
 void FoldersTab::saveParametersSlot()
 {
@@ -199,7 +164,7 @@ void FoldersTab::saveParametersSlot()
   mSettings->sync();
 
   // update toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(string_cast(DataLocations::getToolConfigFilePath()));
+  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   emit savedParameters();
 }
@@ -216,7 +181,6 @@ PerformanceTab::PerformanceTab(QWidget *parent) :
 void PerformanceTab::init()
 {
   int renderingInterval = mSettings->value("renderingInterval").toInt();
-  bool shadingOn = mSettings->value("shadingOn").toBool();
   
   QLabel* renderingIntervalLabel = new QLabel(tr("Rendering interval"));
   
@@ -236,19 +200,34 @@ void PerformanceTab::init()
   renderingRateString = renderingRateString+num+" frames/second";
   mRenderingRateLabel = new QLabel(renderingRateString);
   
+  double Mb = pow(10.0,6);
+  bool ok = true;
+  double maxRenderSize = mSettings->value("maxRenderSize").toDouble(&ok);
+  if (!ok)
+    maxRenderSize = 10 * Mb;
+  mMaxRenderSize = ssc::DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, ssc::DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
+  mMaxRenderSize->setInternal2Display(1.0/Mb);
+
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
 
-  mShadingCheckBox = new QCheckBox(tr("ShadingOn"));
-  mShadingCheckBox->setChecked(shadingOn);
-  
+  bool useGPURender = mSettings->value("useGPUVolumeRayCastMapper").toBool();
+  mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
+  mGPURenderCheckBox->setChecked(useGPURender);
+
+  QPushButton* backgroundColorButton = new QPushButton("Background Color", this);
+  connect(backgroundColorButton, SIGNAL(clicked()), this, SLOT(setBackgroundColorSlot()));
+
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
+  new ssc::SliderGroupWidget(this, mMaxRenderSize, mMainLayout, 1);
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
-  mMainLayout->addWidget(mSmartRenderCheckBox, 1, 0);
-  mMainLayout->addWidget(mShadingCheckBox, 2, 0);
+  mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
+  mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
+  mMainLayout->addWidget(backgroundColorButton, 4, 0);
+
   setLayout(mMainLayout);
 }
 
@@ -266,20 +245,24 @@ void PerformanceTab::renderingIntervalSlot(int interval)
 void PerformanceTab::saveParametersSlot()
 {
   int renderingInterval = mSettings->value("renderingInterval").toInt();
-  bool shadingOn = mSettings->value("shadingOn").toBool();
   
   if(renderingInterval != mRenderingIntervalSpinBox->value())
   {
     mSettings->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
     emit renderingIntervalChanged(mRenderingIntervalSpinBox->value());
   }
-  if(shadingOn != mShadingCheckBox->isChecked())
-  {
-    mSettings->setValue("shadingOn", mShadingCheckBox->isChecked());
-    emit shadingChanged(mShadingCheckBox->isChecked());
-  }
+
+  mSettings->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
+  mSettings->setValue("maxRenderSize", mMaxRenderSize->getValue());
 
   viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
+}
+
+void PerformanceTab::setBackgroundColorSlot()
+{
+  QColor orgval = mSettings->value("backgroundColor").value<QColor>();
+  QColor result = QColorDialog::getColor( orgval, this);
+  mSettings->setValue("backgroundColor", result);
 }
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
@@ -295,16 +278,12 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
           SIGNAL(renderingIntervalChanged(int)),
           mViewManager,
           SLOT(renderingIntervalChangedSlot(int)));
-  connect(mPerformanceTab,
-          SIGNAL(shadingChanged(bool)),
-          mViewManager,
-          SLOT(shadingChangedSlot(bool)));
-  
+
   tabWidget = new QTabWidget;
-	tabWidget->addTab(mFoldersTab, tr("Folders"));
+  tabWidget->addTab(mFoldersTab, tr("Folders"));
   tabWidget->addTab(mPerformanceTab, tr("Performance"));
-	
-	buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
+  buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
   connect(buttonBox, SIGNAL(accepted()), mFoldersTab, SLOT(saveParametersSlot()));
   connect(buttonBox, SIGNAL(accepted()), mPerformanceTab, SLOT(saveParametersSlot()));
   connect(mFoldersTab, SIGNAL(savedParameters()), this, SLOT(accept()));
@@ -314,12 +293,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   mainLayout->addWidget(tabWidget);
   mainLayout->addWidget(buttonBox);
   setLayout(mainLayout);
-	resize(700, 300);
+  resize(700, 300);
 
 }
 
 PreferencesDialog::~PreferencesDialog()
-{
-}
+{}
 
 }//namespace cx

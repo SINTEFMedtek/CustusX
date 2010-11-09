@@ -37,9 +37,9 @@ public:
   unsigned char* getFrame(unsigned int index);
   int* getDimensions();
   Vector3D getSpacing();
-  std::string getName();
-  std::string getUid();
-  std::string getFilePath();
+  QString getName();
+  QString getUid();
+  QString getFilePath();
 private:
   ImagePtr mImage;
   std::vector<unsigned char*> mFrames;
@@ -50,4 +50,4 @@ private:
   typedef boost::shared_ptr<USFrameData> USFrameDataPtr;
 }//namespace ssc
 
-#endif SSCUSFRAMEDATA_H_
+#endif // SSCUSFRAMEDATA_H_

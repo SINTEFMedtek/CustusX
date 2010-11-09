@@ -35,6 +35,8 @@ public:
 
 public slots:
   void presetsBoxChangedSlot(const QString& presetName);
+  void resetSlot();
+  void saveSlot();
 
 protected:
   void init();///< Initialize TransferFunctionWidget. Create members

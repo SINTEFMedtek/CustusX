@@ -37,7 +37,7 @@ void ShadingWidget::init()
 //  mLayout->addWidget(mShadingCheckBox);
 //  mShadingCheckBox->setEnabled(true);
 //
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SLOT(activeImageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(mShadingCheckBox, SIGNAL(toggled(bool)), this, SLOT(shadingToggledSlot(bool)));
 
   QGridLayout* shadingLayput = new QGridLayout();
@@ -51,6 +51,8 @@ void ShadingWidget::init()
   shadingDiffuseWidget->setEnabled(false);
   shadingSpecularWidget->setEnabled(false);
   shadingSpecularPowerWidget->setEnabled(false);
+
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
   mLayout->addLayout(shadingLayput);
   mLayout->addStretch(1);

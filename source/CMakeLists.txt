@@ -52,12 +52,13 @@ set(SUB_FOLDERS
     gui
     viewManager
     repManager
-    statemachineManager
+    stateMachineManager
     registrationManager
     toolManager
     dataManager
     3DUSReconstruction
     UsReconstruction
+    algorithms
     )
     
 foreach (ITER ${SUB_FOLDERS})
@@ -82,10 +83,11 @@ INCLUDE_DIRECTORIES(
     
 
 ADD_SUBDIRECTORY(gui)
+ADD_SUBDIRECTORY(algorithms)
 ADD_SUBDIRECTORY(viewManager)
 ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(toolManager)
-ADD_SUBDIRECTORY(statemachineManager)
+ADD_SUBDIRECTORY(stateMachineManager)
 ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
@@ -114,44 +116,17 @@ IF(APPLE)
   SET(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")
   ADD_EXECUTABLE(CustusX MACOSX_BUNDLE ${SOURCES} )
 ELSE(APPLE)
-  ADD_EXECUTABLE(CustusX ${SOURCES} )
+  IF (WIN32)
+    ADD_EXECUTABLE(CustusX ${SOURCES} )
+  ELSE (WIN32)
+    #LINUX
+    ADD_EXECUTABLE(CustusX ${SOURCES} )
+  ENDIF (WIN32)
 ENDIF(APPLE)
-
-SET ( LINK_LIBRARIES_____notusedanymore
-  ${BOOST_LIBRARIES}
-  ${QT_LIBRARIES}
-  cxCommon
-  gui
-  viewManager
-  repManager
-  registrationManager
-  toolManager
-  dataManager
-  #3DUSReconstruction
-  vtkRendering
-  vtkWidgets
-  vtkGraphics
-  vtkIO
-  vtkCommon
-  vtkImaging
-  vtkFiltering
-  vtkHybrid
-  vtkVolumeRendering
-#  ITKCommon
-#  ITKBasicFilters
-#  ITKIO
-  IGSTK
-  #vtkDataManagement
-  #vtkRenderingAddOn
-  QVTK
-  sscUsReconstructionLib  
-  SSC
-)
 
 #----------
 # LINK
 TARGET_LINK_LIBRARIES( CustusX gui cxCommon )
-#TARGET_LINK_LIBRARIES( CustusX ${LINK_LIBRARIES} )
 
 
 SET(BUNDLE_NAME CustusX)
@@ -286,4 +261,4 @@ include(CPack)
 #cpack_add_component(application)
 #cpack_add_component(config DISPLAY_NAME "Configuration files" DESCRIPTION "Detaljert beskrivelse")
     
-      
+add_subdirectory(testing)      

@@ -33,6 +33,8 @@
 #include "sscSlicePlanes3DRep.h"
 #include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
+#include "cxRenderTimer.h"
+#include "vtkForwardDeclarations.h"
 
 namespace cx
 {
@@ -64,13 +66,15 @@ ViewManager::ViewManager() :
   mMainWindowsCentralWidget(new QWidget()),
   mRenderingTimer(new QTimer(this)),
   mSettings(DataLocations::getSettings()),
-  mRenderingTime(new QTime()),
-  mNumberOfRenderings(0),
+//  mRenderingTime(new QTime()),
+//  mNumberOfRenderings(0),
   mGlobal2DZoom(true),
   mGlobalObliqueOrientation(false),
   mViewCache2D(mMainWindowsCentralWidget,"View2D"),
   mViewCache3D(mMainWindowsCentralWidget,"View3D")
 {
+  mRenderTimer.reset(new RenderTimer);
+
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
@@ -100,12 +104,12 @@ ViewManager::ViewManager() :
   connect(mRenderingTimer, SIGNAL(timeout()),
           this, SLOT(renderAllViewsSlot()));
   
-  mShadingOn = mSettings->value("shadingOn").toBool();
+//  mShadingOn = mSettings->value("shadingOn").toBool();
 
   mGlobalZoom2DVal = SyncedValue::create(1);
   this->setGlobal2DZoom(mGlobal2DZoom);
 
-  mRenderingTime->start();
+//  mRenderingTime->start();
 }
 
 ViewManager::~ViewManager()
@@ -146,7 +150,7 @@ ViewWrapperPtr ViewManager::getActiveView() const
 {
   for(unsigned i=0; i<mViewGroups.size(); ++i)
   {
-    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(string_cast(mActiveView));
+    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
     if(viewWrapper)
     {
       return viewWrapper;
@@ -155,13 +159,13 @@ ViewWrapperPtr ViewManager::getActiveView() const
   return ViewWrapperPtr();
 }
 
-void ViewManager::setActiveView(std::string viewUid)
+void ViewManager::setActiveView(QString viewUid)
 {
   if (mActiveView==qstring_cast(viewUid))
     return;
   mActiveView = qstring_cast(viewUid);
   emit activeViewChanged();
-  ssc::messageManager()->sendInfo("Active view set to ["+string_cast(mActiveView) + "]");
+  ssc::messageManager()->sendInfo("Active view set to ["+mActiveView + "]");
 }
 
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
@@ -269,7 +273,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
     viewgroup = viewgroup.nextSibling();
   }
 
-  this->setActiveView(activeViewString.toStdString());
+  this->setActiveView(activeViewString);
 }
 
 void ViewManager::clear()
@@ -350,7 +354,7 @@ void ViewManager::setActiveLayout(const QString& layout)
   mActiveLayout = layout;
   emit activeLayoutChanged();
 
-  ssc::messageManager()->sendInfo("Layout changed to "+ string_cast(this->getLayoutData(mActiveLayout).getName()));
+  ssc::messageManager()->sendInfo("Layout changed to "+ this->getLayoutData(mActiveLayout).getName());
 }
   
 //void ViewManager::deleteImageSlot(ssc::ImagePtr image)
@@ -367,23 +371,23 @@ void ViewManager::renderingIntervalChangedSlot(int interval)
   mRenderingTimer->start(interval);
 }
 
-void ViewManager::shadingChangedSlot(bool shadingOn)
-{
-  mShadingOn = shadingOn;
-
-  // currently disabled: shading is now a property in ssc::Image.
-  // Remove this method???
-  
-//  ssc::VolumetricRepPtr volumetricRep
-//  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
-//  if(volumetricRep->getImage())
-//  {
-//    if(shadingOn)
-//      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-//    else
-//      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
-//  }
-}
+//void ViewManager::shadingChangedSlot(bool shadingOn)
+//{
+//  mShadingOn = shadingOn;
+//
+//  // currently disabled: shading is now a property in ssc::Image.
+//  // Remove this method???
+//
+////  ssc::VolumetricRepPtr volumetricRep
+////  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
+////  if(volumetricRep->getImage())
+////  {
+////    if(shadingOn)
+////      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
+////    else
+////      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
+////  }
+//}
 
 /** Set the stretch factors of columns and rows in mLayout.
  */
@@ -404,6 +408,8 @@ void ViewManager::setStretchFactors( LayoutRegion region, int stretchFactor)
 void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
   View2D* view = mViewCache2D.retrieveView();
+  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  view->setBackgoundColor(background);
   mViewMap[view->getUid()] = view;
   ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
   wrapper->initializePlane(plane);
@@ -418,6 +424,9 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
   View3D* view = mViewCache3D.retrieveView();
+  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  //std::cout << "bk " << background.redF() << "," << background.greenF() << "," << background.blueF() << std::endl;
+  view->setBackgoundColor(background);
   mViewMap[view->getUid()] = view;
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
   mViewGroups[group]->addView(wrapper);
@@ -521,8 +530,11 @@ void ViewManager::addDefaultLayouts()
   }
 }
 
+
 void ViewManager::renderAllViewsSlot()
 {
+  mRenderTimer->beginRender();
+
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
   {
     if(iter->second->isVisible())
@@ -534,14 +546,23 @@ void ViewManager::renderAllViewsSlot()
     }
   }
   
-  if(mRenderingTime->elapsed()>1000)
+
+  mRenderTimer->endRender();
+
+  if (mRenderTimer->intervalPassed())
   {
-    emit fps(mNumberOfRenderings);
-    mRenderingTime->restart();
-    mNumberOfRenderings = 1;
+    emit fps(mRenderTimer->getFPS());
+    mRenderTimer->reset();
   }
-  else
-    mNumberOfRenderings++;
+
+//  if(mRenderingTime->elapsed()>1000)
+//  {
+//    emit fps(mNumberOfRenderings);
+//    mRenderingTime->restart();
+//    mNumberOfRenderings = 1;
+//  }
+//  else
+//    mNumberOfRenderings++;
 }
 
 LayoutData ViewManager::getLayoutData(const QString uid) const
@@ -738,8 +759,8 @@ void ViewManager::fillModelTree(TreeItemPtr root)
       std::vector<ssc::RepPtr> reps = views[j]->getReps();
       for (unsigned k=0; k<reps.size(); ++k)
       {
-        std::string name = reps[k]->getName();
-        if (name.empty())
+        QString name = reps[k]->getName();
+        if (name.isEmpty())
           name = reps[k]->getType();
         TreeItemImpl::create(viewItem, qstring_cast(name), qstring_cast(reps[k]->getType()), "");
       }
@@ -820,15 +841,15 @@ void ViewManager::setInteractionStyleActionSlot()
   vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
 
   if (uid=="vtkInteractorStyleTrackballCamera")
-    interactor->SetInteractorStyle(vtkInteractorStyleTrackballCamera::New());
+    interactor->SetInteractorStyle(vtkInteractorStyleTrackballCameraPtr::New());
   else if (uid=="vtkInteractorStyleUnicam")
-    interactor->SetInteractorStyle(vtkInteractorStyleUnicam::New());
+    interactor->SetInteractorStyle(vtkInteractorStyleUnicamPtr::New());
 //  else if (uid=="vtkInteractorStyleTrackballActor")
-//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActor::New());
+//    interactor->SetInteractorStyle(vtkInteractorStyleTrackballActorPtr::New());
   else if (uid=="vtkInteractorStyleFlight")
-    interactor->SetInteractorStyle(vtkInteractorStyleFlight::New());
+    interactor->SetInteractorStyle(vtkInteractorStyleFlightPtr::New());
 
-  ssc::messageManager()->sendInfo("Set Interactor: " + std::string(interactor->GetInteractorStyle()->GetClassName()));
+  ssc::messageManager()->sendInfo("Set Interactor: " + QString(interactor->GetInteractorStyle()->GetClassName()));
 }
 
 
