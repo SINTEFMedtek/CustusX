@@ -33,6 +33,115 @@
 namespace cx
 {
 
+
+ResampleWidget::ResampleWidget(QWidget* parent) :
+  WhatsThisWidget(parent)
+{
+  this->setObjectName("ResampleWidget");
+  this->setWindowTitle("Resample");
+
+  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
+  QGridLayout* topLayout = new QGridLayout();
+  toptopLayout->addLayout(topLayout);
+  toptopLayout->addStretch();
+
+  mSelectedImage = SelectImageStringDataAdapter::New();
+  mSelectedImage->setValueName("Select input: ");
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+//  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
+  topLayout->addWidget(selectImageComboBox, 0, 0);
+
+  mReferenceImage = SelectImageStringDataAdapter::New();
+  mReferenceImage->setValueName("Select reference: ");
+//  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+//  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
+  ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
+  topLayout->addWidget(referenceImageComboBox, 1, 0);
+
+  QPushButton* resampleButton = new QPushButton("Resample", this);
+  connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
+//  QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
+//  segmentationOptionsButton->setCheckable(true);
+//  QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
+//  connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
+//  connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
+//  segmentationOptionsWidget->setVisible(segmentationOptionsButton->isChecked());
+
+  topLayout->addWidget(resampleButton, 2,0);
+//  topLayout->addWidget(segmentationOptionsButton, 1,1);
+//  topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
+
+  this->adjustSizeSlot();
+}
+
+ResampleWidget::~ResampleWidget()
+{
+}
+
+QString ResampleWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Resample.</h3>"
+    "<p><i>Resample the volume into the space of the fixed volume. Crop to the same volume.</i></p>"
+    "</html>";
+}
+
+void ResampleWidget::showEvent(QShowEvent* event)
+{
+  QWidget::showEvent(event);
+
+  if (ssc::dataManager()->getActiveImage())
+  {
+    mSelectedImage->setValue(qstring_cast(ssc::dataManager()->getActiveImage()->getUid()));
+  }
+}
+
+void ResampleWidget::hideEvent(QHideEvent* event)
+{
+  QWidget::hideEvent(event);
+}
+
+void ResampleWidget::resampleSlot()
+{
+//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+//  this->revertTransferFunctions();
+//
+//  ssc::ImagePtr input = mSelectedImage->getImage();
+//  if(!input)
+//    return;
+//  ssc::ImagePtr reference = mReferenceImage->getImage();
+//  if(!reference)
+//    return;
+
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  double margin = 20; //mm
+
+  ssc::ImagePtr output = Segmentation().resample(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+  if(!output)
+    return;
+  emit outputImageChanged(output->getUid());
+
+
+//  emit outputImageChanged(segmentedImage->getUid());
+}
+
+
+
+QWidget* ResampleWidget::createOptionsWidget()
+{
+  QWidget* retval = new QWidget(this);
+  return retval;
+}
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+
+// --------------------------------------------------------
+
 SegmentationWidget::SegmentationWidget(QWidget* parent) :
   WhatsThisWidget(parent),
   mSegmentationThreshold(100),
@@ -103,6 +212,11 @@ void SegmentationWidget::hideEvent(QHideEvent* event)
   this->revertTransferFunctions();
 }
 
+void SegmentationWidget::setImageInputSlot(QString value)
+{
+  mSelectedImage->setValue(value);
+}
+
 void SegmentationWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
@@ -135,7 +249,7 @@ void SegmentationWidget::revertTransferFunctions()
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
-  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
+//  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
 
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
@@ -162,13 +276,13 @@ void SegmentationWidget::toogleSmoothingSlot(bool on)
   mSmoothingSigmaSpinBox->setEnabled(on);
   mSmoothingSigmaLabel->setEnabled(on);
 
-  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
+//  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
 }
 
 void SegmentationWidget::smoothingSigmaSlot(double value)
 {
   mSmoothSigma = value;
-  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
+//  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
 }
 
 void SegmentationWidget::imageChangedSlot(QString uid)
@@ -315,13 +429,13 @@ void SurfaceWidget::thresholdSlot(int value)
 void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
-  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
+//  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
 }
 
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
-  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
+//  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
 }
 
 void SurfaceWidget::smoothingSlot(bool value)
@@ -383,6 +497,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   WhatsThisWidget(parent),
   mFindCenterlineButton(new QPushButton("Find centerline")),
+//  mGenerateVisualizationButton(new QPushButton("Visualize")),
   mDefaultColor("red")
 {
   this->setObjectName("CenterlineWidget");
@@ -397,9 +512,11 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 
   layout->addWidget(selectImageComboBox);
   layout->addWidget(mFindCenterlineButton);
+//  layout->addWidget(mGenerateVisualizationButton);
   layout->addStretch();
 
   connect(mFindCenterlineButton, SIGNAL(clicked()), this, SLOT(findCenterlineSlot()));
+//  connect(mGenerateVisualizationButton, SIGNAL(clicked()), this, SLOT(visualizeSlot()));
 }
 
 CenterlineWidget::~CenterlineWidget()
@@ -440,6 +557,32 @@ void CenterlineWidget::findCenterlineSlot()
   ssc::ImagePtr centerlineImage = Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
   if(!centerlineImage)
     return;
+//
+//  std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
+//
+//  //automatically generate a mesh from the centerline
+//  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
+//  std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
+//
+//  QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
+//  QString name = centerlineImage->getName() + " mesh %1";
+//  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+//  mesh->setColor(mDefaultColor);
+//  mesh->setParentFrame(centerlineImage->getUid());
+//  ssc::dataManager()->loadData(mesh);
+//  ssc::dataManager()->saveMesh(mesh, outputBasePath);
+
+  emit outputImageChanged(centerlineImage->getUid());
+}
+
+void CenterlineWidget::visualizeSlot(QString inputUid)
+{
+  std::cout << "visualizeSlot " << inputUid << std::endl;
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+
+  ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
+  if(!centerlineImage)
+    return;
 
   std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
 
@@ -457,7 +600,10 @@ void CenterlineWidget::findCenterlineSlot()
 
   emit outputImageChanged(centerlineImage->getUid());
 }
+
 //------------------------------------------------------------------------------
+
+
 
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
