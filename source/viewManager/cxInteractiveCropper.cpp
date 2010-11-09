@@ -74,6 +74,7 @@ InteractiveCropper::InteractiveCropper()
 
   double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
   mBoxWidget->PlaceWidget(bb_hard);
+  mBoxWidget->SetEnabled(false);
 
   mCropBoxCallback = CropBoxCallbackPtr::New();
   mCropBoxCallback->SetCropper(this);
@@ -115,14 +116,17 @@ void InteractiveCropper::updateBoxWidgetInteractor()
     //mBoxWidget->SetInteractor(NULL); // this one lead to a vtk crash. Try using only disable instead.
   }
 
-  if (mBoxWidget->GetInteractor()!=NULL)
-    mBoxWidget->SetEnabled(this->getUseCropping());
+  // dont auto-show: causes span during normal viewing.
+  //if (mBoxWidget->GetInteractor()!=NULL)
+  //  mBoxWidget->SetEnabled(this->getUseCropping());
 
   //std::cout << "Enabled  " << mBoxWidget->GetEnabled() << std::endl;
 }
 
 void InteractiveCropper::showBoxWidget(bool on)
 {
+//  std::cout << "InteractiveCropper::showBoxWidget(" << on << ")" << std::endl;
+
   if (!mImage)
     return;
   if (this->getShowBoxWidget()==on)
