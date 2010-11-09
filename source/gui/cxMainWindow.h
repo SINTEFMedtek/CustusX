@@ -101,11 +101,13 @@ protected:
   QWidget* mCentralWidget; ///< central widget used for views
 
   //menus
-  QMenu* mCustusXMenu; ///< Application menu
-  QMenu* mFileMenu; ///< Menu for file operations (ex: save/load)
-  QMenu* mWorkflowMenu; ///< menu for choosing workflow
-  QMenu* mToolMenu; ///< menu for interacting with the navigation system
-  QMenu* mLayoutMenu; ///< menu for changing view layouts
+  QMenu* mCustusXMenu;    ///< Application menu
+  QMenu* mFileMenu;       ///< Menu for file operations (ex: save/load)
+  QMenu* mWorkflowMenu;   ///< menu for choosing workflow
+  QMenu* mToolMenu;       ///< menu for interacting with the navigation system
+  QMenu* mLayoutMenu;     ///< menu for changing view layouts
+  QMenu* mNavigationMenu; ///< menu for navigation and interaction
+  QMenu* mHelpMenu;
 
   //actions and actiongroups
   QAction* mAboutAction;
@@ -138,6 +140,7 @@ protected:
   // actions for image navigation
   QAction* mCenterToImageCenterAction;
   QAction* mCenterToTooltipAction;
+  QActionGroup* mInteractorStyleActionGroup;
 
   //desktop actions
   QAction* mSaveDesktopAction;
