@@ -13,6 +13,10 @@
 #include <QThread>
 class QTimer;
 
+#include "vtkSmartPointer.h"
+typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+
+
 namespace cx
 {
 
@@ -33,6 +37,7 @@ private:
   QTcpSocket* mSocket;
   QTimer* mTimer;
   int mCounter;
+  vtkImageDataPtr mImageData;
   QString mImageFileDir;
 private slots:
   void tick();

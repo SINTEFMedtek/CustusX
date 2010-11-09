@@ -23,6 +23,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 {
   this->setObjectName("IGTLinkWidget");
   this->setWindowTitle("IGTLink Test");
+  this->resize(100, 600);
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
   connect(mRTSource.get(), SIGNAL(serverStatusChanged()), this, SLOT(serverStatusChangedSlot()));
@@ -114,6 +115,9 @@ void IGTLinkWidget::serverStatusChangedSlot()
   else
     mConnectButton->setText("Connect Server");
 
+  this->adjustSize();
+//  mConnectButton->adjustSize();
+//  mView->adjustSize();
 //  mConnectButton->update();
 //  mGridLayout->invalidate();
 //  mToptopLayout->invalidate();
