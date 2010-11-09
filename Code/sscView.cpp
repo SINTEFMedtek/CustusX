@@ -112,7 +112,7 @@ void View::clear()
 
 	mRenderWindow->RemoveRenderer(mRenderer);
 	mRenderer = vtkRendererPtr::New();
-	mRenderer->SetBackground(0.0,0.0,0.0);
+	mRenderer->SetBackground(0.3,0.2,0.5);
 	mRenderWindow->AddRenderer(mRenderer);
 }
 
