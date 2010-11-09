@@ -34,6 +34,7 @@ protected slots:
   void populateMeshComboBoxSlot();
   void meshSelectedSlot(const QString& comboBoxText);
   void importTransformSlot();
+  void deleteDataSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

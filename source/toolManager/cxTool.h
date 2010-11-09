@@ -69,6 +69,7 @@ public:
     QString           mSROMFilename;          ///< path to the tools SROM file
     unsigned int      mPortNumber;            ///< the port number the tool is connected to
     unsigned int      mChannelNumber;         ///< the channel the tool is connected to
+    ssc::Vector3D     mReferencePoint;        ///< optional point on the frame, specifying a known reference point, 0,0,0 is default
     bool              mWireless;              ///< whether or not the tool is wireless
     bool              m5DOF;                  ///< whether or not the tool have 5 DOF
     QString           mCalibrationFilename;   ///< path to the tools calibration file
@@ -98,14 +99,16 @@ public:
   virtual QString getUid() const;
   virtual QString getName() const;
   virtual int getIndex() const{return 0;};
-  virtual bool isCalibrated() const; //TODO
   virtual ssc::ProbeSector getProbeSector() const;
   void setUSProbeSector(ssc::ProbeSector probeSector);
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
   virtual void set_prMt(const ssc::Transform3D& transform);
+
+  virtual bool isCalibrated() const; ///< true if calibration is different from identity
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+  virtual void setCalibration_sMt(ssc::Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
 
   Tracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
 
@@ -114,6 +117,7 @@ public:
   QStringList getUSSectorConfigList() const;
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
+  virtual ssc::Vector3D getReferencePoint() const; ///< Get the optional reference point from this tool, will be 0,0,0 if it is not specified
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
@@ -126,6 +130,8 @@ signals:
   void attachedToTracker(bool);
 
 protected:
+  void writeCalibrationToFile();
+
   typedef itk::ReceptorMemberCommand<Tool> ObserverType;
 
   Tool(){}; ///< do not use this constructor
