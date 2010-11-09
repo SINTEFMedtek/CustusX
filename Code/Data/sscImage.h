@@ -95,6 +95,9 @@ public:
 	virtual std::vector<vtkPlanePtr> getClipPlanes();
 	virtual void clearClipPlanes();
   virtual ImagePtr CropAndClipImage(QString outputBasePath); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
+  void mergevtkOriginIntosscTransform();
+//  virtual ImagePtr resample(const Transform3D rMd_new); ///<
+//  virtual ImagePtr resample(const Vector3D spacing); ///<
 
 	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
 	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);

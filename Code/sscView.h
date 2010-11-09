@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
 #include "sscIndent.h"
+class QColor;
 
 #ifdef USE_GLX_SHARED_CONTEXT
 #include "sscSNWQVTKWidget.h"
@@ -51,6 +52,7 @@ namespace ssc
 		virtual std::vector<RepPtr> getReps();			///< Returns all reps in the view
 		virtual void removeReps();				///< Removes all reps in the view
 		virtual void clear();					///< Removes everything in the view, inluding reps.
+		virtual void setBackgoundColor(QColor color);
 
 		virtual void render(); ///< render the view contents if vtk-MTimes are changed
 
@@ -67,6 +69,7 @@ namespace ssc
     void focusInSignal(QFocusEvent* event);
 
 	protected:
+    QColor mBackgroundColor;
     unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 		QString mUid;					///< The view's unique id
 		QString mName;					///< The view's name

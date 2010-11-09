@@ -38,6 +38,20 @@ public:
   virtual DataPtr load(const QString& uid, const QString& filename);
 };
 
+class MincImageReader: public DataReader
+{
+public:
+  virtual ~MincImageReader()
+  {
+  }
+  virtual bool canLoad(const QString& filename)
+  {
+    return true;
+  }
+  virtual DataPtr load(const QString& uid, const QString& filename);
+};
+
+
 //class MeshReader :
 //{
 //public:
