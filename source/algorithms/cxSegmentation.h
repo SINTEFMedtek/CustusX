@@ -22,7 +22,7 @@ public:
   ssc::ImagePtr segment(ssc::ImagePtr image, QString outputBasePath, int threshold,
       bool useSmothing=true, double smoothSigma=0.5);
   ssc::ImagePtr centerline(ssc::ImagePtr image, QString outputBasePath);
-  //void tubeContour(ssc::ImagePtr image, QString outputBasePath);
+  ssc::ImagePtr resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
 private:
 };
 
