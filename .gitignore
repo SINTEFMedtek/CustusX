@@ -3,6 +3,7 @@ xcode32
 build
 .project
 .metadata
+config/SampledPoints.txt
 config/ConsoleLog.txt
 .cproject
 Makefile
