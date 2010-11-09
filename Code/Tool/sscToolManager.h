@@ -5,6 +5,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
+#include <QDomNode>
 #include "sscTransform3D.h"
 #include "sscTool.h"
 #include "sscLandmark.h"

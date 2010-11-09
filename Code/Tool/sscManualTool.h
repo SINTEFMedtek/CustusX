@@ -46,6 +46,8 @@ public:
 private:
 	void read3DCrossHair();
 	// constant data
+	//const QString mUid; //see sscTool
+	//const QString mName; //see sscTool
 	vtkPolyDataPtr mPolyData;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
@@ -56,6 +58,8 @@ private:
 	bool mVisible;
 	Transform3D m_prMt;
 	mutable QMutex mMutex;
+
+//	void createPolyData();
 };
 
 typedef boost::shared_ptr<ManualTool> ManualToolPtr;

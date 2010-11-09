@@ -80,6 +80,7 @@ public:
 	
 	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
+	typedef utils::Transform3D Transform3D;
 	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
 
 signals:

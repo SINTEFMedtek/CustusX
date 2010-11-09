@@ -33,6 +33,13 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	mProbeSector.reset(new USProbeSector(true));
 	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProbeSectorActor = vtkActorPtr::New();
+
+  //std::cout << "Tool3DRep: construct " << std::endl;
+
+//	if (pd::Settings::instance()->useDebugAxis())
+//	 	{
+//		 	mTool->AddPart( Axes3D().getProp() );
+//	 	}
 }
 
 ToolRep3D::~ToolRep3D()
@@ -102,6 +109,7 @@ void ToolRep3D::setTool(ToolPtr tool)
 		}
 
 		receiveTransforms(mTool->get_prMt(), 0);
+		//std::cout << "Tool3DRep: set tool" << std::endl;
 		mToolActor->SetVisibility(mTool->getVisible());
 
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
@@ -130,6 +138,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 	mTooltipPoint.reset(new GraphicalPoint3D(view->getRenderer()));
 	mTooltipPoint->setRadius(2);
 	mTooltipPoint->setColor(Vector3D(1,0.8,0)); //light green
+	//mTooltipPoint->setColor(Vector3D(0.25,0.87,0.16)); //light green
 
 	mOffsetLine.reset(new GraphicalLine3D(view->getRenderer()));
 	mOffsetLine->setColor(Vector3D(1,0.8,0));
@@ -153,9 +162,12 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = (*rMprPtr)*prMt;
-
+//	std::cout << "tool " << mTool->getUid() << std::endl;
+//	if (mToolActor->GetUserMatrix() && similar(rMt, ssc::Transform3D(mToolActor->GetUserMatrix())))
+//	  return;
+//	std::cout << "passed" << std::endl;
 	mToolActor->SetUserMatrix( rMt.matrix());
-
+	//updateOffsetGraphics();
 	this->update();
 }
 
@@ -219,6 +231,8 @@ void ToolRep3D::updateOffsetGraphics()
 
 void ToolRep3D::receiveVisible(bool visible)
 {
+//  std::cout << "ToolRep3D::receiveVisible " << mTool->getName() << std::endl;
+
 	if (!visible && mStayVisibleAfterHide)
 	{
 		return; // don't hide
@@ -232,6 +246,10 @@ void ToolRep3D::receiveVisible(bool visible)
   {
     mToolActor->SetVisibility(mTool->getVisible());
   }
+
+//  std::cout << "Tool3DRep: receiveVisible "<< mTool->getName() << visible << " - " << mStayHiddenAfterVisible << std::endl;
+
+	//updateOffsetGraphics();
   this->update();
 }
 
@@ -250,12 +268,10 @@ void ToolRep3D::setStayVisibleAfterHide(bool val)
 {
 	mStayVisibleAfterHide = val;
 }
-
 void ToolRep3D::setOffsetPointVisibleAtZeroOffset(bool val)
 {
   mOffsetPointVisibleAtZeroOffset = val;
 }
-
 void ToolRep3D::tooltipOffsetSlot(double val)
 {
 	updateOffsetGraphics();

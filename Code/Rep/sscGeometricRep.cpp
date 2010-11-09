@@ -22,12 +22,9 @@ GeometricRep::GeometricRep(const QString& uid, const QString& name) :
 	mActor = vtkActorPtr::New();
 	mActor->SetMapper( mMapper );
 	mActor->SetProperty( mProperty );
-	mProperty->SetPointSize(2);
 }
-
 GeometricRep::~GeometricRep()
 {}
-
 GeometricRepPtr GeometricRep::New(const QString& uid, const QString& name)
 {
 	GeometricRepPtr retval(new GeometricRep(uid, name));
@@ -100,4 +97,3 @@ void GeometricRep::transformChangedSlot()
 //---------------------------------------------------------
 } // namespace ssc
 //---------------------------------------------------------
-

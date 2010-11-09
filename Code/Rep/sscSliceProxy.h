@@ -51,6 +51,8 @@ public:
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	void printSelf(std::ostream & os, Indent indent);
 	
+	typedef utils::Transform3D Transform3D;
+
 signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
