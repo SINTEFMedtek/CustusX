@@ -54,7 +54,7 @@ protected:
   bool mt_doStepping;
   int mt_sampleRatio;
   int mt_singlePointThreshold;
-  int mt_maximumNumberOfIterations;
+  const int mt_maximumNumberOfIterations;
   bool mt_verbose;
 
   ssc::Transform3D mLinearTransformResult;

@@ -99,8 +99,8 @@ public:
   
   int angle(ProbeXmlConfigParser::ColRowPair pair1)
   {
-    double pi = atan(1)*4;
-    return fmod(  ( ( atan2((pair1.first - mCenter.first), (pair1.second - mCenter.second)) ) + 3*pi/4) , 2*pi);
+	double pi = atan(1.0)*4;
+    return fmod(  ( ( atan2((double)(pair1.first - mCenter.first), (double)(pair1.second - mCenter.second)) ) + 3*pi/4) , 2*pi);
   }
   ProbeXmlConfigParser::ColRowPair mCenter;
 };
