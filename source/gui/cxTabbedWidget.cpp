@@ -1,11 +1,12 @@
 #include "cxTabbedWidget.h"
 
+#include <iostream>
 #include <QTabWidget>
 #include <QVBoxLayout>
 
 namespace cx
 {
-
+//------------------------------------------------------------------------------
 TabbedWidget::TabbedWidget(QString objectName, QString windowTitle, QWidget* parent) :
     WhatsThisWidget(parent),
     mTabWidget(new QTabWidget(this))
@@ -56,6 +57,51 @@ QString RegistrationMethodsWidget::defaultWhatsThis() const
 }
 
 //------------------------------------------------------------------------------
+SegmentationMethodsWidget::SegmentationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString SegmentationMethodsWidget::defaultWhatsThis() const
+{
+  return"<html>"
+      "<h3>Segmentation methods.</h3>"
+      "<p>Segmentation methods are used to extract parts of a volume.</p>"
+      "<p><i>Choose a method.</i></p>"
+      "</html>";
+}
+//------------------------------------------------------------------------------
+VisualizationMethodsWidget::VisualizationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString VisualizationMethodsWidget::defaultWhatsThis() const
+{
+  return"<html>"
+      "<h3>Visualization methods.</h3>"
+      "<p>These methods creates data structures that can be use in visualization.</p>"
+      "<p><i>Choose a method.</i></p>"
+      "</html>";
+}
+//------------------------------------------------------------------------------
+CalibrationMethodsWidget::CalibrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString CalibrationMethodsWidget::defaultWhatsThis() const
+{
+  return"<html>"
+      "<h3>Calibration methods.</h3>"
+      "<p>These methods creates data structures that can be use in visualization.</p>"
+      "<p><i>Choose a method.</i></p>"
+      "</html>";
+}
+//------------------------------------------------------------------------------
 
 LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent) :
   TabbedWidget(objectName, windowTitle, parent)
@@ -85,6 +131,23 @@ QString FastRegistrationsWidget::defaultWhatsThis() const
   return "<html>"
       "<h3>Fast and approximate registration.</h3>"
       "<p>This is a method designed to be quick and easy, it uses a tools orientation and a landmarks translation to determine where the image is relative to the patient.</p>"
+      "<p><i>Choose a step to continue.</i></p>"
+      "</html>";
+}
+
+//------------------------------------------------------------------------------
+
+Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString Image2ImageRegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Image to image registration.</h3>"
+      "<p>This is a method used to registrate one image to another using segments of the images.</p>"
       "<p><i>Choose a step to continue.</i></p>"
       "</html>";
 }

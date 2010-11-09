@@ -13,7 +13,14 @@
 #include "sscStringDataAdapter.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscDefinitionStrings.h"
+#include "sscDataManager.h"
+#include "sscUtilHelpers.h"
+#include "sscMessageManager.h"
+#include "sscRegistrationTransform.h"
 #include "cxInteractiveCropper.h"
+#include "cxStateMachineManager.h"
+#include "cxPatientData.h"
+#include <vtkImageData.h>
 
 namespace cx
 {
@@ -68,6 +75,11 @@ CroppingWidget::CroppingWidget(QWidget* parent) : QWidget(parent)
   connect(mZRange, SIGNAL(valueChanged(double,double)), this, SLOT(boxValuesChanged()));
   layout->addWidget(mZRange);
 
+
+  QPushButton* cropClipButton = new QPushButton("Create new cropped and clipped volume)");
+  connect(cropClipButton, SIGNAL(clicked()), this, SLOT(cropClipButtonClickedSlot()));
+  layout->addWidget(cropClipButton);
+
 //  QxtSpanSlider* spanSlider = new QxtSpanSlider(this);
 //  spanSlider->setOrientation(Qt::Horizontal);
 //  spanSlider->setRange(-500, 500);
@@ -112,6 +124,15 @@ void CroppingWidget::cropperChangedSlot()
   mXRange->setValue(std::make_pair(box.begin()[0], box.begin()[1]));
   mYRange->setValue(std::make_pair(box.begin()[2], box.begin()[3]));
   mZRange->setValue(std::make_pair(box.begin()[4], box.begin()[5]));
+}
+
+ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()
+{
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+
+  ssc::ImagePtr retval = image->CropAndClipImage(outputBasePath);
+  return retval;
 }
 
 }

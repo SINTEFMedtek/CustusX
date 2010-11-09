@@ -5,6 +5,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 if (BUILD_TESTING)
+include_directories( ${CPPUNIT_INCLUDE_DIR})
     
     # List of all test units
     QT4_WRAP_CPP( TM_TEST_SOURCE_FILES 

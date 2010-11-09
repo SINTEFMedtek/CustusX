@@ -35,7 +35,7 @@ InteractiveClipper::InteractiveClipper(ssc::SlicePlanesProxyPtr slicePlanesProxy
 {
   mSlicePlaneClipper = ssc::SlicePlaneClipper::New();
   connect(this              , SIGNAL(changed()),                       this, SLOT(changedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(std::string)), this, SIGNAL(changed()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
 
   this->changedSlot();
 }

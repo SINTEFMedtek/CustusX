@@ -24,24 +24,24 @@ namespace cx
 class ToolConfigurationParser
 {
 public:
-  ToolConfigurationParser(std::string& configXmlFilePath, std::string loggingFolder = ""); ///< opens the xml file and readies it for reading
+  ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder = ""); ///< opens the xml file and readies it for reading
   ~ToolConfigurationParser();
 
   TrackerPtr getTracker(); ///< return the tracker created from the xml file
   ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< return all tools created from the xml files
 
 private:
-  std::string     getLoggingFolder() const;
+  QString     getLoggingFolder() const;
   QList<QDomNode> getTrackerNodeList(); ///< returns a list of tracker nodes
   QList<QDomNode> getToolNodeList(std::vector<QString>& toolFolderAbsolutePaths); ///< returns a list of tool nodes
 
-  std::string mConfigurationPath; ///< path to the configuration file
-  std::string mLoggingFolder; ///< path to where logging should be saved, default is the folder where configfile is found
+  QString mConfigurationPath; ///< path to the configuration file
+  QString mLoggingFolder; ///< path to where logging should be saved, default is the folder where configfile is found
   const QString mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
                     mToolTypeTag, mToolIdTag, mToolNameTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
-                    mToolSensorChannelnumberTag, mToolSensorRomFileTag,
+                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,
                     mToolCalibrationTag, mToolCalibrationFileTag,
                     mInstrumentTag, mInstrumentIdTag, mInstrumentScannerIdTag;
                     ///< names of necessary tags in the configuration file

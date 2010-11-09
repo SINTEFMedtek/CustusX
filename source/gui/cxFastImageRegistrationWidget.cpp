@@ -8,7 +8,10 @@ namespace cx
 
 FastImageRegistrationWidget::FastImageRegistrationWidget(QWidget* parent) :
     ImageRegistrationWidget(parent)
-{}
+{
+  this->setObjectName("FastImageRegistrationWidget");
+  this->setWindowTitle("Fast Image Registration");
+}
 
 FastImageRegistrationWidget::~FastImageRegistrationWidget()
 {
@@ -27,9 +30,9 @@ QString FastImageRegistrationWidget::defaultWhatsThis() const
 void FastImageRegistrationWidget::performRegistration()
 {
   //make sure the masterImage is set
-  ssc::ImagePtr masterImage = registrationManager()->getMasterImage();
-  if(!masterImage)
-    registrationManager()->setMasterImage(mCurrentImage);
+  ssc::DataPtr fixedData = registrationManager()->getFixedData();
+  if(!fixedData)
+    registrationManager()->setFixedData(mCurrentImage);
 
   this->updateAvarageAccuracyLabel();
 }

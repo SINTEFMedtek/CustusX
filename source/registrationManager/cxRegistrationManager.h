@@ -6,12 +6,9 @@
 #include <QObject>
 #include <QDateTime>
 #include "vtkSmartPointer.h"
+#include "vtkForwardDeclarations.h"
 #include "sscImage.h"
 #include "sscRegistrationTransform.h"
-
-typedef vtkSmartPointer<class vtkDoubleArray> vtkDoubleArrayPtr;
-typedef vtkSmartPointer<class vtkPoints> vtkPointsPtr;
-typedef vtkSmartPointer<class vtkLandmarkTransform> vtkLandmarkTransformPtr;
 
 namespace cx
 {
@@ -30,28 +27,29 @@ class RegistrationManager : public QObject
   Q_OBJECT
 
 public:
-  typedef std::pair<std::string, bool> StringBoolPair; ///< name and if the point is active or not
+  typedef std::pair<QString, bool> StringBoolPair; ///< name and if the point is active or not
   typedef std::map<int, StringBoolPair> NameListType; ///< landmarkindex, name and if point is active or not
 
   static RegistrationManager* getInstance(); ///< get the only instance of this class
   static void shutdown();
   void initialize();
 
-  void setMasterImage(ssc::ImagePtr image); ///< set a master image used when registrating
-  ssc::ImagePtr getMasterImage(); ///< get the master image
-  bool isMasterImageSet(); ///< check if the master image is set
+  void setFixedData(ssc::DataPtr fixedData);
+  ssc::DataPtr getFixedData();
+
+  void setMovingData(ssc::DataPtr movingData);
+  ssc::DataPtr getMovingData();
 
   void setManualPatientRegistration(ssc::Transform3D patientRegistration); ///< used for when a user wants to ???
   ssc::Transform3DPtr getManualPatientRegistration(); ///< get the manually set patient registration
-//  void resetManualPatientientRegistration(); ///< tells the system not to use a manually added patient registration, after it uses landmarks for patient registration instead
 
   ssc::Transform3D getManualPatientRegistrationOffset(); ///< get the offset transform that moves the patient registration
-//  void resetOffset(); ///< removes the offset, after it uses landmarks for patient registration instead
 
-  void doPatientRegistration(); ///< registrates the master image to the patient
-  void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the master image
+  void doPatientRegistration(); ///< registrates the fixed image to the patient
+  void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the fixed image
   void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
+  void doVesselRegistration();
 
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
@@ -62,35 +60,38 @@ public slots:
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset); ///< transform for (slightly) moving a patient registration
 
 signals:
-  //void imageRegistrationPerformed();
   void patientRegistrationPerformed();
-  //void fastRegistrationPerformed();
+  void fixedDataChanged(QString uid);
+  void movingDataChanged(QString uid);
 
 protected:
   RegistrationManager(); ///< use getInstance instead
   ~RegistrationManager(); ///< destructor
 
   ssc::Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
-  vtkPointsPtr convertTovtkPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
-  std::vector<ssc::Vector3D> convertAndTransformToPoints(const std::vector<std::string>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
-  std::vector<std::string> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
+  vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
+  std::vector<ssc::Vector3D> convertAndTransformToPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);
+  std::vector<QString> getUsableLandmarks(const ssc::LandmarkMap& data_a, const ssc::LandmarkMap& data_b);
   void updateRegistration(QDateTime oldTime, ssc::RegistrationTransform deltaTransform, ssc::DataPtr data, QString masterFrame);
 
   static RegistrationManager* mCxInstance; ///< the only instance of this class
 
-  ssc::ImagePtr mMasterImage; ///< the master image used to register all other images against
+  ssc::DataPtr mFixedData; ///< the data that shouldn't update its matrices during a registrations
+  ssc::DataPtr mMovingData; ///< the data that should update its matrices during a registration
+
   QDateTime mLastRegistrationTime; ///< last timestamp for registration during this session. All registrations in one session results in only one reg transform.
 
   ssc::Transform3D mPatientRegistrationOffset; ///< manually set offset for that will be added to the patientregistration
-  //ssc::Transform3D mManualPatientRegistration; ///< patient registration loaded from file
 
 private:
   RegistrationManager(RegistrationManager const&); ///< not implemented
   RegistrationManager& operator=(RegistrationManager const&); ///< not implemented
 };
+
 /**Shortcut for accessing the registrationmanager instance.
  */
 RegistrationManager* registrationManager();
+
 }//namespace cx
 
 #endif /* CXREGISTRATIONMANAGER_H_ */

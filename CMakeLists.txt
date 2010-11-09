@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(CustusX3_VERSION_MAJOR	3)
 SET(CustusX3_VERSION_MINOR	0)
-SET(CustusX3_VERSION_PATCH	9)
+SET(CustusX3_VERSION_PATCH	10)
 SET(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 SET(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
@@ -42,8 +42,34 @@ INCLUDE(Dart)
 include_directories( /usr/local/include )
 include_directories( /opt/local/include )
 
-# cppunit
-find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED) 
+# cppunit -start
+FIND_PATH(CPPUNIT_INCLUDE_DIR cppunit/TestCase.h
+  /usr/local/include
+  /usr/include
+)
+
+if (WIN32)
+  FIND_LIBRARY(CPPUNIT_LIBRARY cppunit
+               ${CPPUNIT_INCLUDE_DIR}/../lib
+               /usr/local/lib
+               /usr/lib)
+  FIND_LIBRARY(CPPUNIT_DEBUG_LIBRARY cppunitd
+               ${CPPUNIT_INCLUDE_DIR}/../lib
+               /usr/local/lib
+               /usr/lib)
+ELSE (WIN32)
+  find_library(CPPUNIT_LIBRARIES cppunit /opt/local/lib REQUIRED)
+ENDIF (WIN32)
+
+IF(CPPUNIT_INCLUDE_DIR)
+  IF(CPPUNIT_LIBRARY)
+    SET(CPPUNIT_FOUND "YES")
+    SET(CPPUNIT_LIBRARIES ${CPPUNIT_LIBRARY} ${CMAKE_DL_LIBS})
+    SET(CPPUNIT_DEBUG_LIBRARIES ${CPPUNIT_DEBUG_LIBRARY}
+${CMAKE_DL_LIBS})
+  ENDIF(CPPUNIT_LIBRARY)
+ENDIF(CPPUNIT_INCLUDE_DIR)
+# cppunit -end
 
 IF (WIN32)
   ADD_DEFINITIONS(-D__WIN32__)
@@ -63,7 +89,7 @@ if(BUILD_US_ACQUISITION)
 endif(BUILD_US_ACQUISITION)
 
 enable_testing()
-add_subdirectory(testing)
+#add_subdirectory(testing)
 
 
 

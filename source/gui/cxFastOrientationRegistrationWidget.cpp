@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "cxFastOrientationRegistrationWidget.h"
 
 #include <cmath>
@@ -21,7 +22,7 @@ FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(QWidget* pa
   layout->addWidget(mSetOrientationButton);
   layout->addStretch();
 
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const std::string&)), this, SLOT(dominantToolChangedSlot(const std::string&)));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
   ssc::ToolPtr dominantTool = ssc::toolManager()->getDominantTool();
   if(dominantTool)
@@ -77,7 +78,7 @@ void FastOrientationRegistrationWidget::enableToolSampleButtonSlot()
   mSetOrientationButton->setEnabled(enabled);
 }
 
-void FastOrientationRegistrationWidget::dominantToolChangedSlot(const std::string& uid)
+void FastOrientationRegistrationWidget::dominantToolChangedSlot(const QString& uid)
 {
   if(mToolToSample && mToolToSample->getUid() == uid)
     return;

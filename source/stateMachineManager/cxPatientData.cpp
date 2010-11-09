@@ -16,10 +16,12 @@
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
+#include "sscToolManager.h"
+#include "sscUtilHelpers.h"
+#include "sscToolManager.h"
+
 #include "cxViewManager.h"
 #include "cxRepManager.h"
-#include "sscToolManager.h"
-#include "sscToolManager.h"
 #include "cxFileCopied.h"
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"
@@ -30,7 +32,6 @@ namespace cx
 PatientData::PatientData() :
     mSettings(DataLocations::getSettings())
 {
-
 }
 
 QString PatientData::getActivePatientFolder() const
@@ -49,7 +50,6 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
   if(activePatientFolder == mActivePatientFolder)
     return;
 
-  ssc::messageManager()->sendDebug("PatientData::setActivePatient to: "+string_cast(activePatientFolder));
   mActivePatientFolder = activePatientFolder;
   //TODO
   //Update gui in some way to show which patient is active
@@ -97,8 +97,8 @@ void PatientData::loadPatient(QString choosenDir)
     if (!doc.setContent(&file, false, &emsg, &eline, &ecolumn))
     {
       ssc::messageManager()->sendError("Could not parse XML file :"
-                                 +file.fileName().toStdString()+" because: "
-                                 +emsg.toStdString()+"");
+                                 +file.fileName()+" because: "
+                                 +emsg+"");
     }
     else
     {
@@ -111,7 +111,7 @@ void PatientData::loadPatient(QString choosenDir)
   {
     //TODO: Ask the user if he want to convert the folder
     ssc::messageManager()->sendInfo("Found no CX3 data in folder: " +
-                                    string_cast(choosenDir) +
+                                    choosenDir +
                                     " Converting the folder to a patent folder...");
     createPatientFolders(choosenDir);
   }
@@ -139,12 +139,12 @@ void PatientData::savePatient()
     QTextStream stream(&file);
     stream << doc.toString(4);
     file.close();
-    ssc::messageManager()->sendInfo("Created "+file.fileName().toStdString());
+    ssc::messageManager()->sendInfo("Created "+file.fileName());
   }
   else
   {
-    ssc::messageManager()->sendError("Could not open "+file.fileName().toStdString()
-                               +" Error: "+file.errorString().toStdString());
+    ssc::messageManager()->sendError("Could not open "+file.fileName()
+                               +" Error: "+file.errorString());
   }
 
   //Write the data to file, fx modified images... etc...
@@ -173,50 +173,39 @@ ssc::DataPtr PatientData::importData(QString fileName)
   if(!dir.exists(patientsImageFolder))
   {
     dir.mkpath(patientsImageFolder);
-    ssc::messageManager()->sendInfo("Made new directory: "+patientsImageFolder.toStdString());
+    ssc::messageManager()->sendInfo("Made new directory: "+patientsImageFolder);
   }
   if(!dir.exists(patientsSurfaceFolder))
   {
     dir.mkpath(patientsSurfaceFolder);
-    ssc::messageManager()->sendInfo("Made new directory: "+patientsSurfaceFolder.toStdString());
+    ssc::messageManager()->sendInfo("Made new directory: "+patientsSurfaceFolder);
   }
 
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
-  QString uid = fileInfo.fileName()+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+  QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
+  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+  //std::cout << "import: " << strippedFilename << std::endl;
 
   //Need to wait for the copy to finish...
 
   // Read files before copy
-  ssc::DataPtr data = ssc::dataManager()->loadData(string_cast(uid), string_cast(fileName), ssc::rtAUTO);
-//  ssc::DataPtr data;
-//
-//  if(fileType.compare("mhd", Qt::CaseInsensitive) == 0 ||
-//     fileType.compare("mha", Qt::CaseInsensitive) == 0)
-//  {
-//    data = ssc::dataManager()->loadImage(uid.toStdString(), fileName.toStdString(), ssc::rtMETAIMAGE);
-//  }else if(fileType.compare("stl", Qt::CaseInsensitive) == 0)
-//  {
-//    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::rtSTL);
-//    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
-//  }else if(fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-//  {
-//    data = ssc::dataManager()->loadMesh(uid.toStdString(), fileName.toStdString(), ssc::rtPOLYDATA);
-//    pathToNewFile = patientsSurfaceFolder+fileInfo.fileName();
-//  }
-//  data->setName(fileInfo.fileName().toStdString());
+  ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
 
   data->setShading(true);
 
   QDir patientDataDir(mActivePatientFolder);
-  FileCopied *fileCopied = new FileCopied(pathToNewFile.toStdString(),
-                                          patientDataDir.relativeFilePath(pathToNewFile).toStdString(),
-                                          data);
-  connect(fileCopied, SIGNAL(fileCopiedCorrectly()),
-          this, SLOT(savePatient()));
-  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
+//  FileCopied *fileCopied = new FileCopied(pathToNewFile,
+//                                          patientDataDir.relativeFilePath(pathToNewFile),
+//                                          data);
+//  connect(fileCopied, SIGNAL(fileCopiedCorrectly()),
+//          this, SLOT(savePatient()));
+//  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
+
+  data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
+
 
   //Copy file
   if(fileName != pathToNewFile) //checks if we need to copy
@@ -225,15 +214,17 @@ ssc::DataPtr PatientData::importData(QString fileName)
     if(fromFile.copy(toFile.fileName()))
     {
       //messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-    }else
+    }
+    else
     {
       ssc::messageManager()->sendError("First copy failed!");
       return ssc::DataPtr();
     }
     if(!toFile.flush())
-      ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
+      ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName());
     if(!toFile.exists())
       ssc::messageManager()->sendWarning("File not copied");
+
     //make sure we also copy the .raw file in case if mhd/mha
     if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
     {
@@ -254,11 +245,12 @@ ssc::DataPtr PatientData::importData(QString fileName)
         return ssc::DataPtr();
       }
       if(!toFile.flush())
-        ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName().toStdString());
+        ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName());
       if(!toFile.exists())
         ssc::messageManager()->sendWarning("File not copied");
 
-    }else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
+    }
+    else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
     {
       //presuming the other file is a raw file
       //TODO: what if it's not?
@@ -278,6 +270,9 @@ ssc::DataPtr PatientData::importData(QString fileName)
       }
     }
   }
+  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
+
+  this->savePatient();
 
   return data;
 }
@@ -294,7 +289,7 @@ void PatientData::createPatientFolders(QString choosenDir)
   if(!QDir().exists(choosenDir))
   {
     QDir().mkdir(choosenDir);
-    ssc::messageManager()->sendInfo("Made a new patient folder: "+choosenDir.toStdString());
+    ssc::messageManager()->sendInfo("Made a new patient folder: "+choosenDir);
   }
 
   QString newDir = choosenDir;
@@ -302,7 +297,7 @@ void PatientData::createPatientFolders(QString choosenDir)
   if(!QDir().exists(newDir))
   {
     QDir().mkdir(newDir);
-    ssc::messageManager()->sendInfo("Made a new image folder: "+newDir.toStdString());
+    ssc::messageManager()->sendInfo("Made a new image folder: "+newDir);
   }
 
   newDir = choosenDir;
@@ -310,7 +305,7 @@ void PatientData::createPatientFolders(QString choosenDir)
   if(!QDir().exists(newDir))
   {
     QDir().mkdir(newDir);
-    ssc::messageManager()->sendInfo("Made a new surface folder: "+newDir.toStdString());
+    ssc::messageManager()->sendInfo("Made a new surface folder: "+newDir);
   }
 
   newDir = choosenDir;
@@ -318,7 +313,7 @@ void PatientData::createPatientFolders(QString choosenDir)
   if(!QDir().exists(newDir))
   {
     QDir().mkdir(newDir);
-    ssc::messageManager()->sendInfo("Made a new logging folder: "+newDir.toStdString());
+    ssc::messageManager()->sendInfo("Made a new logging folder: "+newDir);
   }
 
   this->savePatient();
@@ -351,7 +346,7 @@ void PatientData::createPatientFolders(QString choosenDir)
  */
 void PatientData::generateSaveDoc(QDomDocument& doc)
 {
-  doc.appendChild(doc.createProcessingInstruction("xml version =", "'2.0'"));
+  doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 
   QDomElement patientNode = doc.createElement("patient");
   QDomElement activePatientNode = doc.createElement("active_patient");

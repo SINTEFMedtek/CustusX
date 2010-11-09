@@ -28,8 +28,11 @@ public:
 
 protected:
   QTabWidget* mTabWidget;
-};
 
+private:
+  TabbedWidget();
+};
+//------------------------------------------------------------------------------
 class RegistrationMethodsWidget : public TabbedWidget
 {
 public:
@@ -37,7 +40,31 @@ public:
   virtual ~RegistrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
-
+//------------------------------------------------------------------------------
+class SegmentationMethodsWidget : public TabbedWidget
+{
+public:
+  SegmentationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~SegmentationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+class VisualizationMethodsWidget : public TabbedWidget
+{
+public:
+  VisualizationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~VisualizationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+class CalibrationMethodsWidget : public TabbedWidget
+{
+public:
+  CalibrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~CalibrationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
 class LandmarkRegistrationsWidget : public TabbedWidget
 {
 public:
@@ -45,7 +72,7 @@ public:
   virtual ~LandmarkRegistrationsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
-
+//------------------------------------------------------------------------------
 class FastRegistrationsWidget : public TabbedWidget
 {
 public:
@@ -53,5 +80,14 @@ public:
   virtual ~FastRegistrationsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
+//------------------------------------------------------------------------------
+class Image2ImageRegistrationWidget : public TabbedWidget
+{
+public:
+  Image2ImageRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~Image2ImageRegistrationWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
 }
 #endif /* CXTABBEDWIDGET_H_ */

@@ -15,6 +15,11 @@
 namespace cx
 {
 
+QString DataLocations::getTestDataPath()
+{
+  return CX_DATA_ROOT;
+}
+
 QString DataLocations::getBundlePath()
 {
 #ifdef __APPLE__

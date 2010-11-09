@@ -11,6 +11,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxTreeModelItem.h
     cxInteractiveClipper.h
     cxInteractiveCropper.h
+    cxCameraControl.h
 )
 
 SET ( ${LIB}_viewManager
@@ -39,6 +40,10 @@ SET ( ${LIB}_viewManager
     cxInteractiveClipper.cpp
     cxInteractiveCropper.h
     cxInteractiveCropper.cpp
+    cxCameraControl.h
+    cxCameraControl.cpp
+    cxRenderTimer.h
+    cxRenderTimer.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
