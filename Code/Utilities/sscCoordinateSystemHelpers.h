@@ -3,6 +3,7 @@
 
 #include "sscTransform3D.h"
 #include "sscDefinitions.h"
+#include "sscForwardDeclarations.h"
 
 namespace ssc
 {
@@ -28,6 +29,9 @@ public:
 
   static Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
   static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
+
+  static ssc::CoordinateSystem getCoordinateSystem(ssc::ToolPtr tool);
+  static ssc::CoordinateSystem getCoordinateSystem(ssc::DataPtr data);
 
 private:
   Transform3D get_rMfrom(CoordinateSystem from) const; ///< ref_M_from

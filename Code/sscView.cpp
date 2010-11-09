@@ -44,6 +44,7 @@ View::View(QWidget *parent, Qt::WFlags f) :
 	ViewParent(parent, f), mRenderWindow( ViewRenderWindowPtr::New())
 {
   mMTimeHash = 0;
+  mBackgroundColor = QColor("black");
 
 	this->SetRenderWindow(mRenderWindow);
 	clear();
@@ -101,6 +102,12 @@ void View::setRep(const RepPtr& rep)
 	addRep(rep);
 }
 
+void View::setBackgoundColor(QColor color)
+{
+  mBackgroundColor = color;
+  this->clear();
+}
+
 /**clear all content of the view. This ensures that props added from
  * outside the rep system also is cleared, and data not cleared with
  * RemoveAllViewProps() (added to fix problem in snw ultrasound rep,
@@ -112,7 +119,7 @@ void View::clear()
 
 	mRenderWindow->RemoveRenderer(mRenderer);
 	mRenderer = vtkRendererPtr::New();
-	mRenderer->SetBackground(0.3,0.2,0.5);
+	mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
 	mRenderWindow->AddRenderer(mRenderer);
 }
 

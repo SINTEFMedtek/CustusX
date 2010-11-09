@@ -13,6 +13,7 @@ include (${SSC_USE_FILE} )
 	
 include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )
 include_directories( ${SSC_SOURCE_DIR}/Examples/SliceAndToolRep )
+include_directories( ${CPPUNIT_INCLUDE_DIR})
 
 
 QT4_WRAP_CPP( SSC_EX_SOURCE_FILES 

@@ -11,6 +11,8 @@
 #include <vtkPolyDataWriter.h>
 #include <vtkSTLReader.h>
 #include <vtkImageChangeInformation.h>
+#include "vtkMINCImageReader.h"
+#include "vtkTransform.h"
 
 #include <QtCore>
 #include <QDomDocument>
@@ -27,6 +29,55 @@
 
 namespace ssc
 {
+
+//-----
+DataPtr MincImageReader::load(const QString& uid, const QString& filename)
+{
+  std::cout << "Reading " << filename << std::endl;
+
+  //Read data input file
+  vtkMINCImageReaderPtr l_dataReader = vtkMINCImageReaderPtr::New();
+  l_dataReader->SetFileName(cstring_cast(filename));
+  l_dataReader->Update();
+
+  double l_dataOrigin[3];
+  l_dataReader->GetOutput()->GetOrigin(l_dataOrigin);
+  int l_dimensions[3];
+  l_dataReader->GetOutput()->GetDimensions(l_dimensions);
+
+  //set the transform
+  vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
+  l_dataTransform->SetMatrix(l_dataReader->GetDirectionCosines());
+  l_dataTransform->Translate(l_dataReader->GetDataOrigin());
+  //l_dataTransform->GetInverse()->TransformPoint(l_dataOrigin, l_dataOrigin);
+  //l_dataTransform->Translate(l_dataOrigin);
+  //l_dataTransform->Scale(l_dataReader->GetOutput()->GetSpacing());
+
+  ssc::Transform3D rMd(l_dataTransform->GetMatrix());
+
+  // TODO: ensure rMd is correct in CustusX terms
+
+  vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
+  zeroer->SetInput(l_dataReader->GetOutput());
+  zeroer->SetOutputOrigin(0, 0, 0);
+  zeroer->Update();
+//  vtkImageDataPtr imageData = zeroer->GetOutput();
+  vtkImageDataPtr imageData = zeroer->GetOutput();
+
+
+  QFile file(filename);
+  QFileInfo info(file);
+  //QString uid(info.completeBaseName()+"_minc_%1");
+  QString name = uid;
+
+  ImagePtr image(new Image(uid, imageData));
+  //ssc::ImagePtr image = ssc::dataManager()->createImage(l_dataReader->GetOutput(),uid, name);
+  image->get_rMd_History()->addRegistration(ssc::RegistrationTransform(rMd, info.lastModified(), "from Minc file"));
+  image->getBaseVtkImageData()->Print(std::cout);
+
+  return image;
+    //////////////////////////////
+}
 
 //-----
 DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
@@ -165,6 +216,7 @@ DataManagerImpl::DataManagerImpl()
   mMedicalDomain = mdLABORATORY;
   //  mMedicalDomain = mdLAPAROSCOPY;
   mDataReaders[rtMETAIMAGE].reset(new MetaImageReader());
+  mDataReaders[rtMINCIMAGE].reset(new MincImageReader());
   mDataReaders[rtPOLYDATA].reset(new PolyDataMeshReader());
   mDataReaders[rtSTL].reset(new StlMeshReader());
   //	mCenter = Vector3D(0,0,0);
@@ -291,6 +343,8 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READE
  */
 DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READER_TYPE type)
 {
+//  std::cout << "DataManagerImpl::readData " << path << ", "<< uid << std::endl;
+
   QFileInfo fileInfo(qstring_cast(path));
 
   if (mData.count(uid)) // dont load same image twice
@@ -303,6 +357,12 @@ DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READE
   {
     QString fileType = fileInfo.suffix();
     type = this->getReaderType(fileType);
+  }
+
+  if (!mDataReaders.count(type))
+  {
+    std::cout << "no reader found for file type " << path << ", " << uid << std::endl;
+    return DataPtr();
   }
 
   // identify type
@@ -642,6 +702,10 @@ READER_TYPE DataManagerImpl::getReaderType(QString fileType)
   if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
   {
     return ssc::rtMETAIMAGE;
+  }
+  else if (fileType.compare("mnc", Qt::CaseInsensitive) == 0)
+  {
+    return ssc::rtMINCIMAGE;
   }
   else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
   {
