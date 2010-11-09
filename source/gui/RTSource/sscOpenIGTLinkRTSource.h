@@ -9,8 +9,9 @@
 #define SSCOPENIGTLINKRTSOURCE_H_
 
 #include "sscRealTimeSource.h"
-
+#include <boost/array.hpp>
 #include "igtlImageMessage.h"
+#include <vector>
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
@@ -63,8 +64,10 @@ private slots:
 private:
 //  void padBox(int* x, int* y) const;
   void setEmptyImage();
+  std::vector<unsigned char> mTestData;
+  void setTestImage();
 
-  unsigned char mZero;
+  boost::array<unsigned char, 100> mZero;
   vtkImageImportPtr mImageImport;
   QDateTime mTimestamp;
   igtl::ImageMessage::Pointer mImageMessage;

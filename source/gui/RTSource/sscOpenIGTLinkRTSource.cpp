@@ -22,6 +22,7 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 {
   mImageImport->SetNumberOfScalarComponents(1);
   this->setEmptyImage();
+  this->setTestImage();
 
   mTimeout = false;
   mTimeoutTimer = new QTimer(this);
@@ -114,7 +115,13 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
 {
   if (!mClient)
     return;
+//  if (!mClient->getLastImageMessage())
+//    return;
   this->updateImage(mClient->getLastImageMessage());
+//
+//  // debug
+//  mClient->stop();
+//  mClient->quit();
 }
 
 void OpenIGTLinkRTSource::disconnectServer()
@@ -151,18 +158,50 @@ void OpenIGTLinkRTSource::clientFinishedSlot()
 void OpenIGTLinkRTSource::setEmptyImage()
 {
   mImageMessage = igtl::ImageMessage::Pointer();
-  mImageImport->SetWholeExtent(0, 0, 0, 0, 0, 0);
-  mImageImport->SetDataExtent(0,0,0,0,0,0);
+  mImageImport->SetWholeExtent(0, 1, 0, 1, 0, 0);
+  mImageImport->SetDataExtent(0,1,0,1,0,0);
   mImageImport->SetDataScalarTypeToUnsignedChar();
-  mZero = 0;
-  mImageImport->SetImportVoidPointer(&mZero);
+  std::fill(mZero.begin(), mZero.end(), 0);
+  mImageImport->SetImportVoidPointer(mZero.begin());
   mImageImport->Modified();
 }
 
+void OpenIGTLinkRTSource::setTestImage()
+{
+  int W = 512;
+  int H = 512;
+
+  mImageMessage = igtl::ImageMessage::Pointer();
+  mImageImport->SetWholeExtent(0, W-1, 0, H-1, 0, 0);
+  mImageImport->SetDataExtent(0,W-1,0,H-1,0,0);
+  mImageImport->SetDataScalarTypeToUnsignedChar();
+  mTestData.resize(W*H);
+  std::fill(mTestData.begin(), mTestData.end(), 50);
+
+  for (unsigned y=0; y<H; ++y)
+    for (unsigned x=0; x<W; ++x)
+    {
+      mTestData[x+W*y] = x/2;
+    }
+
+  mImageImport->SetImportVoidPointer(&(*mTestData.begin()));
+  mImageImport->Modified();
+}
+
+
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 {
+//  mImageImport->Modified();
+//  mTimeout = false;
+//  mTimeoutTimer->start();
+//  emit changed();
+//  return;
+
   if (!message)
+  {
     this->setEmptyImage();
+    return;
+  }
 
   mImageMessage = message;
   // Retrive the image data
@@ -192,6 +231,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
     mImageImport->SetDataScalarTypeToShort();
     break;
   case igtl::ImageMessage::TYPE_UINT16:
+    //std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
     mImageImport->SetDataScalarTypeToUnsignedShort();
     break;
   case igtl::ImageMessage::TYPE_INT32:
@@ -223,6 +263,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 
   mTimeout = false;
   mTimeoutTimer->start();
+
 
   emit changed();
 }

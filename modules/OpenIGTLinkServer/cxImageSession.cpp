@@ -11,7 +11,11 @@
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
 #include "igtlServerSocket.h"
+#include "vtkImageData.h"
+#include "vtkSmartPointer.h"
+#include "vtkMetaImageReader.h"
 
+typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 
 namespace cx
 {
@@ -20,6 +24,88 @@ namespace cx
 int GetTestImage(igtl::ImageMessage::Pointer& msg, const char* dir, int i);
 void GetRandomTestMatrix(igtl::Matrix4x4& matrix);
 igtl::ImageMessage::Pointer getImageMessage(int index);
+
+vtkImageDataPtr loadImage(QString filename)
+{
+  //load the image from file
+  vtkMetaImageReader* reader = vtkMetaImageReader::New();
+  reader->SetFileName(filename.toStdString().c_str());
+  reader->ReleaseDataFlagOn();
+  reader->Update();
+
+  return reader->GetOutput();
+}
+
+igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
+{
+  static int counter = 0;
+  //------------------------------------------------------------
+  // size parameters
+  int   size[]     = {256, 256, 1};       // image dimension
+  image->GetDimensions(size);
+  size[2] = 1; // grab only one frame
+
+  double spacingD[]  = {1.0, 1.0, 5.0};     // spacing (mm/pixel)
+  float spacingF[]  = {1.0, 1.0, 5.0};     // spacing (mm/pixel)
+  image->GetSpacing(spacingD);
+  spacingF[0] = spacingD[0];
+  spacingF[1] = spacingD[1];
+  spacingF[2] = spacingD[2];
+  int*   svsize   = size;
+  int   svoffset[] = {0, 0, 0};           // sub-volume offset
+  int   scalarType = -1;
+
+  if (image->GetScalarType()==VTK_UNSIGNED_SHORT)
+  {
+    scalarType = igtl::ImageMessage::TYPE_UINT16;// scalar type
+  }
+  else if (image->GetScalarType()==VTK_UNSIGNED_CHAR)
+  {
+    scalarType = igtl::ImageMessage::TYPE_UINT8;// scalar type
+  }
+  else
+  {
+    std::cerr << "unknown image type" << std::endl;
+    exit(0);
+  }
+
+
+  //------------------------------------------------------------
+  // Create a new IMAGE type message
+  igtl::ImageMessage::Pointer imgMsg = igtl::ImageMessage::New();
+  imgMsg->SetDimensions(size);
+  imgMsg->SetSpacing(spacingF);
+  imgMsg->SetScalarType(scalarType);
+  imgMsg->SetDeviceName("cxTestImage");
+  imgMsg->SetSubVolume(svsize, svoffset);
+  imgMsg->AllocateScalars();
+
+  //------------------------------------------------------------
+  // Set image data (See GetTestImage() bellow for the details)
+//  GetTestImage(imgMsg, filedir, index);
+
+  int fsize = imgMsg->GetImageSize();
+  int frame = (counter++) % image->GetDimensions()[2];
+  memcpy(imgMsg->GetScalarPointer(), image->GetScalarPointer(0,0,frame), fsize);
+//  size_t b = fread(msg->GetScalarPointer(), 1, fsize, fp);
+
+
+  //------------------------------------------------------------
+  // Get randome orientation matrix and set it.
+  igtl::Matrix4x4 matrix;
+  GetRandomTestMatrix(matrix);
+  imgMsg->SetMatrix(matrix);
+
+//  //------------------------------------------------------------
+//  // Pack (serialize) and send
+//  imgMsg->Pack();
+//  socket->Send(imgMsg->GetPackPointer(), imgMsg->GetPackSize());
+//
+//  igtl::Sleep(interval); // wait
+
+  return imgMsg;
+}
+
 
 igtl::ImageMessage::Pointer getImageMessage(const char* filedir, int index)
 {
@@ -139,6 +225,8 @@ void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 }
 
 
+
+
 ImageSession::ImageSession(int socketDescriptor, QString imageFileDir, QObject* parent) :
     QThread(parent),
     mSocketDescriptor(socketDescriptor),
@@ -180,16 +268,21 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
     mCounter(0),
     mImageFileDir(imageFileDir)
 {
+  mImageData = loadImage(mImageFileDir);
+
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
 //  mTimer->start(500);
   mTimer->start(40);
+
 }
 
 void ImageSender::tick()
 {
   std::cout << "tick" << std::endl;
-  igtl::ImageMessage::Pointer imgMsg = getImageMessage(mImageFileDir.toStdString().c_str(), (mCounter++) % 5);
+  //igtl::ImageMessage::Pointer imgMsg = getImageMessage(mImageFileDir.toStdString().c_str(), (mCounter++) % 5);
+  igtl::ImageMessage::Pointer imgMsg = getVtkImageMessage(mImageData);
+
   //------------------------------------------------------------
   // Pack (serialize) and send
   imgMsg->Pack();
