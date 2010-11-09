@@ -89,6 +89,53 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   retval.mRtSource = rtsource;
   retval.mConfigId = configId;
 
+  /*
+   *
+   */
+  QList<QDomNode> currentScannerNodeList = this->getScannerNodes(scanner);
+  if(currentScannerNodeList.isEmpty())
+  {
+    std::cout << "currentScannerNodeList found an empty list for: \n";
+    std::cout << scanner.toStdString() << "\n"
+    << std::endl;
+
+    return retval;
+  }
+  QDomNode scannerNode = currentScannerNodeList.first();
+  QDomElement element = scannerNode.namedItem("Notes").toElement();
+  retval.mNotes = element.text();
+  if(retval.mNotes.isNull())
+    retval.mNotes = "Found no notes.";
+  std::cout << "Found notes: " << retval.mNotes.toStdString() << std::endl;
+
+  /*
+   *
+   */
+  QList<QDomNode> currentRtSourceNodeList = this->getRTSourceNodes(scanner, probe, rtsource);
+  if(currentRtSourceNodeList.isEmpty())
+  {
+    std::cout << "currentRtSourceNodeList found an empty list for: \n";
+    std::cout << scanner.toStdString() << "\n"
+    << probe.toStdString() << "\n"
+    << rtsource.toStdString() << "\n"
+    << std::endl;
+
+    return retval;
+  }
+  QDomNode rtSourceNode = currentRtSourceNodeList.first();
+  element = rtSourceNode.namedItem("HorizontalOffset").toElement();
+
+  try
+  {
+    bool ok;
+    retval.mHorizontalOffset = element.text().toInt(&ok);
+    std::cout << "Found HorizontalOffset: " << retval.mHorizontalOffset << std::endl;
+    if(!ok)
+      throw "HorizontalOffset not an int";
+  }  catch( char * str ) {
+    std::cout << "EXCEPTION RAISED: " << str << std::endl;
+  }
+
   QList<QDomNode> currentConfigNodeList = this->getConfigNodes(scanner, probe, rtsource, configId);
   if(currentConfigNodeList.isEmpty())
   {
@@ -102,7 +149,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
   try
   {
-    QDomElement element = configNode.namedItem("WidthDeg").toElement();
+    element = configNode.namedItem("WidthDeg").toElement();
     if(element.isNull())
       throw "Can't find WidthDeg";
     bool ok;
@@ -113,7 +160,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
     element = configNode.namedItem("Depth").toElement();
     if(element.isNull())
       throw "Can't find Depth";
-    retval.mDepth = element.text().toInt(&ok);
+    retval.mDepth = element.text().toFloat(&ok);
     if(!ok)
       throw "Depth not a number";
 
@@ -155,14 +202,14 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
       element = cornerNode.namedItem("Col").toElement();
       if(element.isNull())
         throw "Can't find Corner.Col";
-      int col = element.text().toInt(&ok);
+      int col = element.text().toFloat(&ok);
       if(!ok)
         throw "Corner.Col not a number";
 
       element = cornerNode.namedItem("Row").toElement();
       if(element.isNull())
         throw "Can't find Corner.Row";
-      int row = element.text().toInt(&ok);
+      int row = element.text().toFloat(&ok);
       if(!ok)
         throw "Corner.Row not a number";
 
@@ -179,7 +226,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
     }
     std::sort(retval.mCorners.begin(), retval.mCorners.end(), Angular_less(center));
 
-    QDomNode edgesNode = configNode.namedItem("Edges");
+    QDomNode edgesNode = configNode.namedItem("CroppingEdges");
     element = edgesNode.namedItem("Left").toElement();
     if(element.isNull())
       throw "Can't find Left";

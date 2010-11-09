@@ -11,10 +11,10 @@
 #include "sscImageLUT2D.h"
 #include "sscDataManager.h"
 #include "sscToolManager.h"
-#include "sscTool.h"
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
 #include "sscEnumConverter.h"
+#include "sscTool.h"
 
 namespace cx
 {
@@ -399,6 +399,7 @@ void SelectImageStringDataAdapter::setValueName(const QString name)
 
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
 }
 QString SelectCoordinateSystemStringDataAdapter::getValueName() const
 {
@@ -406,8 +407,6 @@ QString SelectCoordinateSystemStringDataAdapter::getValueName() const
 }
 bool SelectCoordinateSystemStringDataAdapter::setValue(const QString& value)
 {
-//  if (value==qstring_cast(mCoordinateSystem))
-//    return false;
   mCoordinateSystem = string2enum<ssc::COORDINATE_SYSTEM>(value);
   emit changed();
   return true;
@@ -420,14 +419,16 @@ QString SelectCoordinateSystemStringDataAdapter::getHelp() const
 {
   return "Select a coordinate system";
 }
-
+void SelectCoordinateSystemStringDataAdapter::setDefaultSlot()
+{
+  this->setValue(qstring_cast(ssc::csPATIENTREF));
+}
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 SelectToolStringDataAdapter::SelectToolStringDataAdapter()
 {
-  //mTool = ssc::toolManager()->getDominantTool();
 }
 QString SelectToolStringDataAdapter::getValueName() const
 {
@@ -459,6 +460,7 @@ ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
 {
   return mTool;
 }
+
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
