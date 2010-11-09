@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include "sscTestUtilityClasses.h"
 
 #include <iostream>

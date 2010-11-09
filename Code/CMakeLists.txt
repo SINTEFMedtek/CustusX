@@ -302,6 +302,8 @@ if (USE_GLX_SHARED_CONTEXT)
         #Data/sscGPUImageBuffer.h
         #Rep/sscTextureSlicePainter.cpp
         #Rep/sscTextureSlicePainter.h
+        #Rep/sscTexture3DSlicerRep.h
+        #Rep/sscTexture3DSlicerRep.cpp
         #Utilities/sscGLHelpers.cpp
         #Utilities/sscGLHelpers.h
         )

@@ -52,6 +52,8 @@ public:
 	virtual void setTooltipOffset(double val);	
 	virtual Transform3D getCalibration_sMt() const;
 
+	virtual ssc::Vector3D getReferencePoint() const {return ssc::Vector3D();};
+
 	static vtkPolyDataPtr createPolyData(double h1, double h2, double r1, double r2);	
 	
 private slots:

@@ -39,6 +39,8 @@ public:
 	virtual void setTooltipOffset(double val);
 
 	virtual Transform3D getCalibration_sMt() const;
+	virtual ssc::Vector3D getReferencePoint() const {return ssc::Vector3D();};
+
 	// extensions:
 	void setVisible(bool vis);
 	void setType(const Type& type);
@@ -46,6 +48,8 @@ public:
 private:
 	void read3DCrossHair();
 	// constant data
+	//const QString mUid; //see sscTool
+	//const QString mName; //see sscTool
 	vtkPolyDataPtr mPolyData;
 	vtkSTLReaderPtr mSTLReader;
 	vtkCursor3DPtr mCrossHair;
@@ -56,6 +60,8 @@ private:
 	bool mVisible;
 	Transform3D m_prMt;
 	mutable QMutex mMutex;
+
+//	void createPolyData();
 };
 
 typedef boost::shared_ptr<ManualTool> ManualToolPtr;

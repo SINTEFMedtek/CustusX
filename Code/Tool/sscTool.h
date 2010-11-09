@@ -9,6 +9,8 @@
 #include "sscProbeSector.h"
 #include "sscIndent.h"
 
+  typedef ssc::utils::Transform3D Transform3D;
+
 namespace ssc
 {
 
@@ -72,7 +74,10 @@ public:
 	virtual QString getUid() const = 0; ///< \return an unique id for this instance
 	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
 	//virtual int getIndex() const = 0;///<return a index ivar due to a list..
+
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
+	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+	virtual void setCalibration_sMt(ssc::Transform3D calibration){}; ///< requests to use the calibration and replaces the tools calibration file
 	
 	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe.
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
@@ -80,7 +85,7 @@ public:
 	
 	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
-	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+	virtual ssc::Vector3D getReferencePoint() const = 0; ///< Get the optional reference point from this tool, will be 0,0,0 if it is not specified
 
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);

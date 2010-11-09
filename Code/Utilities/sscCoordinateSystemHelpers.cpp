@@ -66,6 +66,37 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
   return rMfrom;
 }
 
+ssc::CoordinateSystem CoordinateSystemHelpers::getCoordinateSystem(ssc::ToolPtr tool)
+{
+  ssc::CoordinateSystem retval;
+  if(!tool)
+    return retval;
+
+  ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  if(refTool && (tool == refTool))
+  {
+    retval.mId = ssc::csPATIENTREF;
+  }
+  else
+    retval.mId = ssc::csTOOL;
+
+  retval.mRefObject = tool->getUid();
+
+  return retval;
+}
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getCoordinateSystem(ssc::DataPtr data)
+{
+  ssc::CoordinateSystem retval;
+  if(!data)
+    return retval;
+
+  retval.mId = ssc::csDATA;
+  retval.mRefObject = data->getUid();
+
+  return retval;
+}
+
 Transform3D CoordinateSystemHelpers::get_rMr() const
 {
   return Transform3D(); // ref_M_ref
