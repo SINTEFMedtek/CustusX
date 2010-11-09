@@ -28,6 +28,8 @@ typedef boost::shared_ptr<ColorMap> ColorMapPtr;
 namespace ssc
 {
 
+typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
+
 /**Handler for the transfer functions used in 3d image volumes.
  * Used by Image.
  */
@@ -37,6 +39,8 @@ class ImageTF3D : public QObject
 public:
 	ImageTF3D(vtkImageDataPtr base);
 	void setVtkImageData(vtkImageDataPtr base);
+
+	ImageTF3DPtr createCopy();
 
 	void setOpacityTF(vtkPiecewiseFunctionPtr tf);
 	vtkPiecewiseFunctionPtr getOpacityTF();
@@ -66,8 +70,8 @@ public:
 	void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
 	void setColorValue(int colorPosition, QColor colorValue);///< Change value of an existing color transfer function point
 
-	void addXml(QDomNode& parentNode); ///< adds xml information about the transferfunction and its variabels
-	void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+	void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
+	void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
 
 signals:
 	void transferFunctionsChanged();
@@ -79,7 +83,6 @@ private:
 	//vtkPiecewiseFunctionPtr mGradientOpacityTF; // implement when needed.
 	vtkPiecewiseFunctionPtr mOpacityTF;
 	vtkColorTransferFunctionPtr mColorTF;
-	vtkVolumePropertyPtr mVolumeProperty;
 	
 	vtkImageDataPtr mBase;
 	double mLLR;
@@ -92,7 +95,6 @@ private:
 	ColorMapPtr mColorMapPtr;
 };
 	
-typedef boost::shared_ptr<ImageTF3D> ImageTF3DPtr;
 
 } // end namespace ssc
 

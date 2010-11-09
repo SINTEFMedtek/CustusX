@@ -74,6 +74,9 @@ public:
 
   void sendMessage(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeout=0);
 
+  void sendSuccessSound(); ///< Sends audio to signal a success
+  void sendErrorSound(); ///< Sends audio to signal a error
+
 signals:
   void emittedMessage(Message message); ///< The signal the user should listen to!
 

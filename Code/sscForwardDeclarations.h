@@ -84,6 +84,7 @@ typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationR
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
 
+class LabeledComboBoxWidget;
 
 
 

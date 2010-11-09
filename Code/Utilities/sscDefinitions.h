@@ -50,6 +50,16 @@ namespace ssc
 	  mlSUCCESS,
 	  mlCOUNT
 	};
+
+	enum COORDINATE_SYSTEM
+	{
+	  csREF, ///< the data reference space (r)
+	  csDATA, ///< a datas space (d)
+	  csPATIENTREF, ///< the patient/tool reference space (pr)
+	  csTOOL, ///< a tools rspace (t)
+	  csSENSOR, ///< a tools sensor space (s)
+	  csCOUNT
+	};
 } //namespace end
 
 //#include "sscDefinitionStrings.h"

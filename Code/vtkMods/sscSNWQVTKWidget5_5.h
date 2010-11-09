@@ -1,9 +1,7 @@
 #ifndef SSCSNWQVTKWIDGET_H_
 #define SSCSNWQVTKWIDGET_H_
-#include <qwidget.h>
 
-//#include "QVTKWidget.h"
-//class QPaintEngine;
+#include <QWidget>
 
 class vtkRenderWindow;
 class QVTKInteractor;
@@ -13,9 +11,6 @@ class QVTKPaintEngine;
 #include <vtkConfigure.h>
 #include <vtkToolkits.h>
 class vtkImageData;
-
-#include <qwidget.h>
-//class QPaintEngine;
 
 class vtkRenderWindow;
 class QVTKInteractor;
@@ -38,16 +33,22 @@ class vtkImageData;
 # endif
 #endif
 
-
 #if defined(QVTK_USE_CARBON) && QT_VERSION >= 0x040000
 #include <Carbon/Carbon.h>    // Event handling for dirty region
 #endif
 
+#ifdef Q_WS_WIN
 #include "QVTKWin32Header.h"
+#endif
 
 #include "vtkTDxConfigure.h" // defines VTK_USE_TDX
 #if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
 class vtkTDxWinDevice;
+#endif
+
+// For VTK 5.6, where this does not exist anymore
+#ifndef QVTK_EXPORT
+#define QVTK_EXPORT
 #endif
 
 //! QVTKWidget displays a VTK window in a Qt window.

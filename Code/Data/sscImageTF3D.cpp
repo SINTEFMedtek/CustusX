@@ -26,7 +26,6 @@ namespace ssc
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mOpacityTF(vtkPiecewiseFunctionPtr::New()),
 	mColorTF(vtkColorTransferFunctionPtr::New()),	
-	mVolumeProperty(vtkVolumePropertyPtr::New()),
 	mBase(base),
 	mOpacityMapPtr(new IntIntMap()),
 	mColorMapPtr(new ColorMap())
@@ -45,8 +44,32 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	
 	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
+
+  this->addAlphaPoint(this->getScalarMin(), 0);
+  this->addAlphaPoint(this->getScalarMax(), 255);
+  this->addColorPoint(this->getScalarMin(), Qt::black);
+  this->addColorPoint(this->getScalarMax(), Qt::white);
 }
 	
+ImageTF3DPtr ImageTF3D::createCopy()
+{
+  ImageTF3DPtr retval(new ImageTF3D(mBase));
+  retval->mOpacityTF->DeepCopy(mOpacityTF);
+  retval->mColorTF->DeepCopy(mColorTF);
+  retval->mOpacityMapPtr.reset(new IntIntMap(*mOpacityMapPtr));
+  retval->mColorMapPtr.reset(new ColorMap(*mColorMapPtr));
+  if (mLut)
+  {
+    retval->mLut = vtkLookupTablePtr::New();
+    retval->mLut->DeepCopy(mLut);
+  }
+  retval->mLevel = mLevel;
+  retval->mWindow = mWindow;
+  retval->mLLR = mLLR;
+  retval->mAlpha = mAlpha;
+  return retval;
+}
+
 void ImageTF3D::setVtkImageData(vtkImageDataPtr base)
 {
 	mBase = base;
@@ -315,11 +338,11 @@ void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
 	(*mColorMapPtr)[colorPosition] = colorValue;
 	emit transferFunctionsChanged();
 }
-void ImageTF3D::addXml(QDomNode& parentNode)
+void ImageTF3D::addXml(QDomNode dataNode)
 {
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
-  parentNode.appendChild(transferfunctionsNode);
+  QDomDocument doc = dataNode.ownerDocument();
+//  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
+//  parentNode.appendChild(transferfunctionsNode);
 
   QDomElement alphaNode = doc.createElement("alpha");
   // Use QStringList to put all points in the same string instead of storing
@@ -345,23 +368,26 @@ void ImageTF3D::addXml(QDomNode& parentNode)
                            arg(colorPoint->second.blue()));
   colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
 
-  transferfunctionsNode.appendChild(alphaNode);
-  transferfunctionsNode.appendChild(colorNode);
+  dataNode.appendChild(alphaNode);
+  dataNode.appendChild(colorNode);
 }
-void ImageTF3D::parseXml(QDomNode& dataNode)
+void ImageTF3D::parseXml(QDomNode dataNode)
 {
 	if (dataNode.isNull())
 		return;
 	
 	QDomNode alphaNode = dataNode.namedItem("alpha");
 	// Read alpha node if it exists
-	if (!alphaNode.isNull())
+	if (!alphaNode.isNull() && !alphaNode.toElement().text().isEmpty())
 	{
+    QString alphaString = alphaNode.toElement().text();
 		mOpacityMapPtr->clear();
-		QStringList alphaStringList = alphaNode.toElement().text().split(" ");
+		QStringList alphaStringList = alphaString.split(" ");
 		for (int i = 0; i < alphaStringList.size(); i++)
 		{
 			QStringList pointStringList = alphaStringList[i].split("=");
+			if (pointStringList.size()<2)
+			  continue;
 			addAlphaPoint(pointStringList[0].toInt(), pointStringList[1].toInt());
 		}
 	}
@@ -373,7 +399,7 @@ void ImageTF3D::parseXml(QDomNode& dataNode)
 	
 	QDomNode colorNode = dataNode.namedItem("color");
 	// Read color node if it exists
-	if (!colorNode.isNull())
+	if (!colorNode.isNull() && !colorNode.toElement().text().isEmpty())
 	{
 		mColorMapPtr->clear();
 		QStringList colorStringList = colorNode.toElement().text().split(" ");
@@ -392,6 +418,8 @@ void ImageTF3D::parseXml(QDomNode& dataNode)
 		std::cout << "Warning: ImageTF3D::parseXml() found no color transferfunction";
 		std::cout << std::endl;
 	}
+
+	std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
 }

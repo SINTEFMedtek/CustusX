@@ -30,15 +30,22 @@ class Image : public Data
 {
 	Q_OBJECT
 public:
-  struct shadingStruct
+  struct ShadingStruct
   {
     bool on;
     double ambient;
     double diffuse;
     double specular;
     double specularPower;
+
+    ShadingStruct();
+	void addXml(QDomNode dataNode);
+	void parseXml(QDomNode dataNode);
+
+  private:
+	double loadAttribute(QDomNode dataNode, QString name, double defVal);
   };
-  
+
 	virtual ~Image();
 	Image(const QString& uid, const vtkImageDataPtr& data, const QString& name="");
 	void setVtkImageData(const vtkImageDataPtr& data);
@@ -71,8 +78,8 @@ public:
   double getShadingDiffuse();                         ///<Get shading diffuse parmeter
   double getShadingSpecular();                        ///<Get shading specular parmeter
   double getShadingSpecularPower();                   ///<Get shading specular power parmeter
-  Image::shadingStruct getShading();
-  void setShading(Image::shadingStruct shading );
+  Image::ShadingStruct getShading();
+  void setShading(Image::ShadingStruct shading );
 
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels \param parentNode Parent node in the XML tree \return The created subnode
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
@@ -87,9 +94,10 @@ public:
 	virtual void addClipPlane(vtkPlanePtr plane);
 	virtual std::vector<vtkPlanePtr> getClipPlanes();
 	virtual void clearClipPlanes();
-	virtual vtkImageDataPtr CropAndClipImage(); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
+  virtual ImagePtr CropAndClipImage(QString outputBasePath); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr
 
 	void resetTransferFunctions();///< Resets the transfer functions and creates new defaut values.
+	void resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D);
 
 signals:
   void landmarkRemoved(QString uid);
@@ -108,6 +116,8 @@ protected slots:
   virtual void transformChangedSlot();
 
 protected:
+  virtual vtkImageDataPtr CropAndClipImageTovtkImageData(); ///<Apply cropping box and clipping planes to image and return this as a vtkImageDataPtr. WARNING: the returned extent is incompatible with CustusX formats. Use Image-returning method
+
 	ImageTF3DPtr mImageTransferFunctions3D;
 	ImageLUT2DPtr mImageLookupTable2D;
 	
@@ -120,7 +130,7 @@ protected:
 
 	LandmarkMap mLandmarks; ///< map with all landmarks always in space d (data).
   
-  shadingStruct mShading;
+  ShadingStruct mShading;
 
   bool mUseCropping; ///< image should be cropped using mCroppingBox
   DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.

@@ -15,10 +15,58 @@
 #include "sscRegistrationTransform.h"
 #include "sscLandmark.h"
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
 #include "sscTypeConversions.h"
+#include "sscUtilHelpers.h"
 
 namespace ssc
 {
+
+Image::ShadingStruct::ShadingStruct()
+{
+	on = false;
+	ambient = 0.2;
+	diffuse = 0.9;
+	specular = 0.3;
+	specularPower = 15.0;
+}
+
+double Image::ShadingStruct::loadAttribute(QDomNode dataNode, QString name, double defVal)
+{
+  QString text = dataNode.toElement().attribute(name);
+  bool ok;
+  double val = text.toDouble(&ok);
+  if (ok)
+    return val;
+  return defVal;
+}
+
+void Image::ShadingStruct::addXml(QDomNode dataNode)
+{
+	QDomElement elem = dataNode.toElement();
+	elem.setAttribute("on", on);
+	elem.setAttribute("ambient", ambient);
+	elem.setAttribute("diffuse", diffuse);
+	elem.setAttribute("specular", specular);
+	elem.setAttribute("specularPower", specularPower);
+}
+
+void Image::ShadingStruct::parseXml(QDomNode dataNode)
+{
+	if (dataNode.isNull())
+		return;
+
+	on = dataNode.toElement().attribute("on").toInt();
+	std::cout << "attrib on: " << dataNode.toElement().attribute("on")  << " : " << on << std::endl;
+	ambient = loadAttribute(dataNode, "ambient", ambient);
+	diffuse = loadAttribute(dataNode, "diffuse", diffuse);
+	specular = loadAttribute(dataNode, "specular", specular);
+	specularPower = loadAttribute(dataNode, "specularPower", specularPower);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
   
 Image::~Image()
 {}
@@ -31,11 +79,11 @@ Image::Image(const QString& uid, const vtkImageDataPtr& data,
   mUseCropping = false;
   mCroppingBox_d = DoubleBoundingBox3D(0,0,0,0,0,0);
 
-  mShading.on = false;
-  mShading.ambient = 0.2;
-  mShading.diffuse = 0.9;
-  mShading.specular = 0.3;
-  mShading.specularPower = 15.0;
+//  mShading.on = false;
+//  mShading.ambient = 0.2;
+//  mShading.diffuse = 0.9;
+//  mShading.specular = 0.3;
+//  mShading.specularPower = 15.0;
   
   this->resetTransferFunctions();
 }
@@ -53,29 +101,66 @@ void Image::resetTransferFunctions()
   //mBaseImageData->Update();
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
   
+	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)), ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
+//
+//	if(mImageTransferFunctions3D)
+//    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+//               this, SIGNAL(transferFunctionsChanged()));
+//  if(mImageLookupTable2D)
+//    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
+//               this, SIGNAL(transferFunctionsChanged()));
+//
+//  mImageTransferFunctions3D.reset(new ImageTF3D(mBaseImageData));
+//	mImageLookupTable2D.reset(new ImageLUT2D(mBaseImageData));
+//
+//	// Add initial values to the 3D transfer functions
+//	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
+//	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
+//	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
+//	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
+//
+//  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
+//          this, SIGNAL(transferFunctionsChanged()));
+//  connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
+//					this, SIGNAL(transferFunctionsChanged()));
+//
+//  emit transferFunctionsChanged();
+}
+
+void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D)
+{
+  if(!mBaseImageData)
+  {
+    messageManager()->sendWarning("ssc::Image has no image data");
+    return;
+  }
+
   if(mImageTransferFunctions3D)
-    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-               this, SIGNAL(transferFunctionsChanged()));
+  {
+    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
   if(mImageLookupTable2D)
-    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
-               this, SIGNAL(transferFunctionsChanged()));
-  
-  mImageTransferFunctions3D.reset(new ImageTF3D(mBaseImageData));
-	mImageLookupTable2D.reset(new ImageLUT2D(mBaseImageData));
-  
-	// Add initial values to the 3D transfer functions
-	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
-	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
-	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
-	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
-  
-  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-          this, SIGNAL(transferFunctionsChanged()));
-  connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
-					this, SIGNAL(transferFunctionsChanged()));
+  {
+    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
+
+  mImageTransferFunctions3D = imageTransferFunctions3D;
+  mImageLookupTable2D = imageLookupTable2D;
+
+  if(mImageTransferFunctions3D)
+  {
+    mImageTransferFunctions3D->setVtkImageData(mBaseImageData);
+    connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
+  if(mImageLookupTable2D)
+  {
+    mImageLookupTable2D->setVtkImageData(mBaseImageData);
+    connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()), this, SIGNAL(transferFunctionsChanged()));
+  }
 
   emit transferFunctionsChanged();
 }
+
   
 //void Image::set_rMd(Transform3D rMd)
 //{
@@ -341,29 +426,38 @@ void Image::addXml(QDomNode& dataNode)
 //  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
 //  imageNode.appendChild(filePathNode);
   
-  mImageTransferFunctions3D->addXml(imageNode);
-  mImageLookupTable2D->addXml(imageNode);
+  QDomElement tf3DNode = doc.createElement("transferfunctions");
+  mImageTransferFunctions3D->addXml(tf3DNode);
+  imageNode.appendChild(tf3DNode);
+
+  QDomElement lut2DNode = doc.createElement("lookuptable2D");
+  mImageLookupTable2D->addXml(lut2DNode);
+  imageNode.appendChild(lut2DNode);
 
   QDomElement shadingNode = doc.createElement("shading");
-  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
+  mShading.addXml(shadingNode);
   imageNode.appendChild(shadingNode);
-  //std::cout << "created shading" << std::endl;
-  
-  QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
-  shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));
-  imageNode.appendChild(shadingAmbientNode);
-  
-  QDomElement shadingDiffuseNode = doc.createElement("shadingDiffuse");
-  shadingDiffuseNode.appendChild(doc.createTextNode(qstring_cast(mShading.diffuse)));
-  imageNode.appendChild(shadingDiffuseNode);
-  
-  QDomElement shadingSpecularNode = doc.createElement("shadingSpecular");
-  shadingSpecularNode.appendChild(doc.createTextNode(qstring_cast(mShading.specular)));
-  imageNode.appendChild(shadingSpecularNode);
-  
-  QDomElement shadingSpecularPowerNode = doc.createElement("shadingSpecularPower");
-  shadingSpecularPowerNode.appendChild(doc.createTextNode(qstring_cast(mShading.specularPower)));
-  imageNode.appendChild(shadingSpecularPowerNode);
+
+//
+//  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
+//  imageNode.appendChild(shadingNode);
+//  //std::cout << "created shading" << std::endl;
+//
+//  QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
+//  shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));
+//  imageNode.appendChild(shadingAmbientNode);
+//
+//  QDomElement shadingDiffuseNode = doc.createElement("shadingDiffuse");
+//  shadingDiffuseNode.appendChild(doc.createTextNode(qstring_cast(mShading.diffuse)));
+//  imageNode.appendChild(shadingDiffuseNode);
+//
+//  QDomElement shadingSpecularNode = doc.createElement("shadingSpecular");
+//  shadingSpecularNode.appendChild(doc.createTextNode(qstring_cast(mShading.specular)));
+//  imageNode.appendChild(shadingSpecularNode);
+//
+//  QDomElement shadingSpecularPowerNode = doc.createElement("shadingSpecularPower");
+//  shadingSpecularPowerNode.appendChild(doc.createTextNode(qstring_cast(mShading.specularPower)));
+//  imageNode.appendChild(shadingSpecularPowerNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");
   LandmarkMap::iterator it = mLandmarks.begin();
@@ -385,8 +479,8 @@ void Image::addXml(QDomNode& dataNode)
   for (unsigned i=0; i<mClipPlanes.size(); ++i)
   {
     QDomElement planeNode = doc.createElement("plane");
-    ssc::Vector3D normal(mClipPlanes[i]->GetNormal());
-    ssc::Vector3D origin(mClipPlanes[i]->GetOrigin());
+    Vector3D normal(mClipPlanes[i]->GetNormal());
+    Vector3D origin(mClipPlanes[i]->GetOrigin());
     planeNode.setAttribute("normal", qstring_cast(normal));
     planeNode.setAttribute("origin", qstring_cast(origin));
     clipNode.appendChild(planeNode);
@@ -419,6 +513,7 @@ void Image::parseXml(QDomNode& dataNode)
 
 	mImageLookupTable2D->parseXml(dataNode.namedItem("lookuptable2D"));
 
+	// backward compatibility:
 	mShading.on = dataNode.namedItem("shading").toElement().text().toInt();
   //Assign default values if the shading nodes don't exists to allow backward compability
   if(!dataNode.namedItem("shadingAmbient").isNull())
@@ -438,6 +533,9 @@ void Image::parseXml(QDomNode& dataNode)
   //else
   //  mShading.specularPower = 15.0;
   
+  // new way:
+  mShading.parseXml(dataNode.namedItem("shading"));
+
 	QDomNode landmarksNode = dataNode.namedItem("landmarks");
 	QDomElement landmarkNode = landmarksNode.firstChildElement("landmark");
 	for (; !landmarkNode.isNull(); landmarkNode = landmarkNode.nextSiblingElement("landmark"))
@@ -458,8 +556,8 @@ void Image::parseXml(QDomNode& dataNode)
   QDomElement clipPlaneNode = clipNode.firstChildElement("plane");
   for (; !clipPlaneNode.isNull(); clipPlaneNode = clipPlaneNode.nextSiblingElement("plane"))
   {
-    ssc::Vector3D normal = ssc::Vector3D::fromString(clipPlaneNode.attribute("normal"));
-    ssc::Vector3D origin = ssc::Vector3D::fromString(clipPlaneNode.attribute("origin"));
+    Vector3D normal = Vector3D::fromString(clipPlaneNode.attribute("normal"));
+    Vector3D origin = Vector3D::fromString(clipPlaneNode.attribute("origin"));
     vtkPlanePtr plane = vtkPlanePtr::New();
     plane->SetNormal(normal.begin());
     plane->SetOrigin(origin.begin());
@@ -512,12 +610,12 @@ double Image::getShadingSpecular()
 double Image::getShadingSpecularPower()
 {return mShading.specularPower;}  
 
-Image::shadingStruct Image::getShading()
+Image::ShadingStruct Image::getShading()
 {
   return mShading;
 }
 
-void Image::setShading(Image::shadingStruct shading )
+void Image::setShading(Image::ShadingStruct shading )
 {
   mShading = shading;
   emit transferFunctionsChanged();
@@ -573,7 +671,65 @@ void Image::clearClipPlanes()
   emit clipPlanesChanged();
 }
 
-vtkImageDataPtr Image::CropAndClipImage()
+ImagePtr Image::CropAndClipImage(QString outputBasePath)
+{
+  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
+
+  // the internal CustusX format does not handle extents starting at non-zero.
+  // Move extent to zero and change rMd.
+  IntBoundingBox3D extent(rawResult->GetExtent());
+  int diff[3];
+  diff[0] = extent[0];
+  diff[1] = extent[2];
+  diff[2] = extent[4];
+  extent[0] -= diff[0];
+  extent[1] -= diff[0];
+  extent[2] -= diff[1];
+  extent[3] -= diff[1];
+  extent[4] -= diff[2];
+  extent[5] -= diff[2];
+
+//  std::cout << "cropped volume pre move:" << std::endl;
+//  rawResult->Print(std::cout);
+
+  rawResult->SetExtent(extent.begin());
+  rawResult->SetWholeExtent(extent.begin());
+  rawResult->SetUpdateExtentToWholeExtent();
+  rawResult->ComputeBounds();
+//  std::cout << "cropped volume pre update:" << std::endl;
+//  rawResult->Print(std::cout);
+  rawResult->Update();
+
+  vtkImageDataPtr copyData = vtkImageDataPtr::New();
+  copyData->DeepCopy(rawResult);
+  copyData->Update();
+  rawResult = copyData;
+
+  QString uid = changeExtension(this->getUid(), "") + "_clip%1";
+  QString name = this->getName()+" clipped %1";
+  //std::cout << "clipped volume: " << uid << ", " << name << std::endl;
+  ImagePtr result = dataManager()->createImage(rawResult,uid, name);
+  result->resetTransferFunction(this->getTransferFunctions3D()->createCopy(), this->getLookupTable2D()->createCopy());
+  messageManager()->sendInfo("Created volume " + result->getName());
+
+//  std::cout << "cropped volume:" << std::endl;
+//  rawResult->Print(std::cout);
+
+//  DoubleBoundingBox3D bb = image->getCroppingBox();
+//  clip->SetInput(this->getBaseVtkImageData());
+//  DoubleBoundingBox3D bb_orig = image->boundingBox();
+  Vector3D shift = this->getCroppingBox().corner(0,0,0) - this->boundingBox().corner(0,0,0);
+//  std::cout << "shift: " << shift << std::endl;
+
+  result->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(shift));
+  result->setParentFrame(this->getUid());
+  dataManager()->loadData(result);
+//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  dataManager()->saveImage(result, outputBasePath);
+  return result;
+}
+
+vtkImageDataPtr Image::CropAndClipImageTovtkImageData()
 {
   //vtkPlanesPtr planes = vtkPlanesPtr::New();
   //planes->SetBounds(this->getCroppingBox().begin());
@@ -589,8 +745,17 @@ vtkImageDataPtr Image::CropAndClipImage()
 //  return clipper->GetOutput();
 
   vtkImageClipPtr clip = vtkImageClipPtr::New();
-  double* bb = this->getCroppingBox().begin();
+  DoubleBoundingBox3D bb = this->getCroppingBox();
   clip->SetInput(this->getBaseVtkImageData());
+
+//  DoubleBoundingBox3D bb_orig = this->boundingBox();
+//  Vector3D shift = bb.corner(0,0,0) - bb_orig.corner(0,0,0);
+//  Vector3D c_orig(this->getBaseVtkImageData()->GetOrigin());
+//  this->getBaseVtkImageData()->Print(std::cout);
+//  std::cout << "bb_orig" << bb_orig << std::endl;
+//  std::cout << "bb_CLIP" << bb << std::endl;
+//  std::cout << "c_orig" << c_orig << std::endl;
+//  std::cout << "shift" << shift << std::endl;
 
   double* sp = this->getBaseVtkImageData()->GetSpacing();
 
@@ -604,6 +769,30 @@ vtkImageDataPtr Image::CropAndClipImage()
 
   retVal->Update();
   retVal->ComputeBounds();
+//  Vector3D c_new(retVal->GetOrigin());
+//  std::cout << "bb_new" << DoubleBoundingBox3D(retVal->GetBounds()) << std::endl;
+//  std::cout << "c_new" << c_new << std::endl;
+//  retVal->Print(std::cout);
+//
+//  IntBoundingBox3D extent(retVal->GetExtent());
+//  int diff[3];
+//  diff[0] = extent[0];
+//  diff[1] = extent[2];
+//  diff[2] = extent[4];
+//  extent[0] -= diff[0];
+//  extent[1] -= diff[0];
+//  extent[2] -= diff[1];
+//  extent[3] -= diff[1];
+//  extent[4] -= diff[2];
+//  extent[5] -= diff[2];
+//
+//  retVal->SetExtent(extent.begin());
+//  retVal->SetWholeExtent(extent.begin());
+//  retVal->SetUpdateExtentToWholeExtent();
+//  retVal->ComputeBounds();
+//  std::cout << "flyttet data" << std::endl;
+//  retVal->Update();
+//  retVal->Print(std::cout);
 
 /*
   int* in = this->getBaseVtkImageData()->GetWholeExtent();

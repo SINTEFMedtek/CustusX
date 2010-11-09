@@ -121,6 +121,8 @@ endif(WIN32)
 SET( SSC_SOURCE_FILES
     sscForwardDeclarations.h
     vtkForwardDeclarations.h
+    Utilities/sscCoordinateSystemHelpers.h
+    Utilities/sscCoordinateSystemHelpers.cpp
     Utilities/sscBoundingBox3D.cpp
     Utilities/sscBoundingBox3D.h
     Utilities/sscVector3D.cpp
