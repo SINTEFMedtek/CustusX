@@ -211,6 +211,10 @@ void PerformanceTab::init()
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
 
+  bool useGPURender = mSettings->value("useGPUVolumeRayCastMapper").toBool();
+  mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
+  mGPURenderCheckBox->setChecked(useGPURender);
+
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
@@ -218,6 +222,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingIntervalSpinBox, 0, 1);
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
+  mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
 
   setLayout(mMainLayout);
 }
@@ -243,6 +248,7 @@ void PerformanceTab::saveParametersSlot()
     emit renderingIntervalChanged(mRenderingIntervalSpinBox->value());
   }
 
+  mSettings->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
   mSettings->setValue("maxRenderSize", mMaxRenderSize->getValue());
 
   viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
