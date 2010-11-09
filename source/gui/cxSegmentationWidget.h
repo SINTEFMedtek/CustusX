@@ -15,6 +15,42 @@ namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 
+
+class ResampleWidget : public WhatsThisWidget
+{
+  Q_OBJECT
+
+public:
+  ResampleWidget(QWidget* parent);
+  virtual ~ResampleWidget();
+  virtual QString defaultWhatsThis() const;
+
+signals:
+  void inputImageChanged(QString uid);
+  void outputImageChanged(QString uid);
+
+protected:
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
+
+private slots:
+  void resampleSlot();
+//  void toogleBinarySlot(bool on);
+//  void thresholdSlot(int value);
+//  void toogleSmoothingSlot(bool on);
+//  void smoothingSigmaSlot(double value);
+//  void imageChangedSlot(QString uid);
+//  void revertTransferFunctions();
+
+private:
+  ResampleWidget();
+  QWidget* createOptionsWidget();
+
+  SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
+  SelectImageStringDataAdapterPtr mReferenceImage; ///< holds the currently reference, resample to this volume.
+};
+
+
 /**
  * \class SegmentationWidget
  *
@@ -36,6 +72,9 @@ public:
 signals:
   void inputImageChanged(QString uid);
   void outputImageChanged(QString uid);
+
+public slots:
+  void setImageInputSlot(QString value);
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -137,6 +176,7 @@ public:
 
 public slots:
   void setImageInputSlot(QString value);
+  void visualizeSlot(QString uid);
 
 signals:
 void inputImageChanged(QString uid);
@@ -153,6 +193,7 @@ private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
   QColor mDefaultColor;
+  //QPushButton* mGenerateVisualizationButton;
 };
 
 /**
