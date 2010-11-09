@@ -90,6 +90,7 @@ private:
   std::map<QString, ssc::ToolRep3DPtr> mToolReps;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
+  std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
