@@ -200,7 +200,7 @@ void PerformanceTab::init()
   renderingRateString = renderingRateString+num+" frames/second";
   mRenderingRateLabel = new QLabel(renderingRateString);
   
-  double Mb = pow(10,6);
+  double Mb = pow(10.0,6);
   bool ok = true;
   double maxRenderSize = mSettings->value("maxRenderSize").toDouble(&ok);
   if (!ok)
