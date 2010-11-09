@@ -215,6 +215,9 @@ void PerformanceTab::init()
   mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
   mGPURenderCheckBox->setChecked(useGPURender);
 
+  QPushButton* backgroundColorButton = new QPushButton("Background Color", this);
+  connect(backgroundColorButton, SIGNAL(clicked()), this, SLOT(setBackgroundColorSlot()));
+
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(renderingIntervalLabel, 0, 0);
@@ -223,6 +226,7 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mRenderingRateLabel, 0, 2);
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
+  mMainLayout->addWidget(backgroundColorButton, 4, 0);
 
   setLayout(mMainLayout);
 }
@@ -252,6 +256,13 @@ void PerformanceTab::saveParametersSlot()
   mSettings->setValue("maxRenderSize", mMaxRenderSize->getValue());
 
   viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
+}
+
+void PerformanceTab::setBackgroundColorSlot()
+{
+  QColor orgval = mSettings->value("backgroundColor").value<QColor>();
+  QColor result = QColorDialog::getColor( orgval, this);
+  mSettings->setValue("backgroundColor", result);
 }
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :

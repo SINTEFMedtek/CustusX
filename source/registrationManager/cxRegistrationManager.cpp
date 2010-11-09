@@ -145,6 +145,9 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     ssc::RegistrationTransform newTransform = deltaTransform;
     newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
+
+    std::cout << "updated registration of data " << targetData[i]->getName() << std::endl;
+    std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
   }
 
   // reconnect only if the registration is done relative to a base.
@@ -449,7 +452,13 @@ void RegistrationManager::doVesselRegistration()
 
   ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
 
-  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform.inv() * movingData->get_rMd().inv();
+//  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform * movingData->get_rMd().inv();
+
+  // The registration is performed in space r. Thus, given an old data position rMd, we find the
+  // new one as rM'd = Q * rMd, where Q is the inverted registration output.
+  // Delta is thus equal to Q:
+  ssc::Transform3D delta = linearTransform.inv();
+  std::cout << "delta:\n" << delta << std::endl;
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
   this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
 
