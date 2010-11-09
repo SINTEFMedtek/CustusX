@@ -21,6 +21,7 @@ typedef boost::shared_ptr<class ViewGroup2D> ViewGroup2DPtr;
 typedef boost::shared_ptr<class ViewGroup3D> ViewGroup3DPtr;
 typedef boost::shared_ptr<class ViewWrapper> ViewWrapperPtr;
 typedef boost::shared_ptr<class PatientData> PatientDataPtr;
+typedef boost::shared_ptr<class Tool> ToolPtr;
 
 } // namespace cx
 

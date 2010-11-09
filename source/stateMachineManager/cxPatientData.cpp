@@ -197,12 +197,15 @@ ssc::DataPtr PatientData::importData(QString fileName)
   data->setShading(true);
 
   QDir patientDataDir(mActivePatientFolder);
-  FileCopied *fileCopied = new FileCopied(pathToNewFile,
-                                          patientDataDir.relativeFilePath(pathToNewFile),
-                                          data);
-  connect(fileCopied, SIGNAL(fileCopiedCorrectly()),
-          this, SLOT(savePatient()));
-  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
+//  FileCopied *fileCopied = new FileCopied(pathToNewFile,
+//                                          patientDataDir.relativeFilePath(pathToNewFile),
+//                                          data);
+//  connect(fileCopied, SIGNAL(fileCopiedCorrectly()),
+//          this, SLOT(savePatient()));
+//  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
+
+  data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
+
 
   //Copy file
   if(fileName != pathToNewFile) //checks if we need to copy
@@ -211,7 +214,8 @@ ssc::DataPtr PatientData::importData(QString fileName)
     if(fromFile.copy(toFile.fileName()))
     {
       //messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-    }else
+    }
+    else
     {
       ssc::messageManager()->sendError("First copy failed!");
       return ssc::DataPtr();
@@ -220,6 +224,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
       ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName());
     if(!toFile.exists())
       ssc::messageManager()->sendWarning("File not copied");
+
     //make sure we also copy the .raw file in case if mhd/mha
     if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
     {
@@ -244,7 +249,8 @@ ssc::DataPtr PatientData::importData(QString fileName)
       if(!toFile.exists())
         ssc::messageManager()->sendWarning("File not copied");
 
-    }else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
+    }
+    else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
     {
       //presuming the other file is a raw file
       //TODO: what if it's not?
@@ -265,6 +271,9 @@ ssc::DataPtr PatientData::importData(QString fileName)
     }
   }
   ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
+
+  this->savePatient();
+
   return data;
 }
 

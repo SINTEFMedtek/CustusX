@@ -16,7 +16,7 @@
 class ProbeXmlConfigParser
 {
 public:
-  typedef std::pair<int,int> ColRowPair;
+  typedef std::pair<float,float> ColRowPair;
   struct Configuration ///< a easy-to-work-with struct for a specific xml configuration
   {
     QString             mUsScanner;  ///<  scanner
@@ -24,7 +24,7 @@ public:
     QString             mRtSource;   ///<  realtime source
     QString             mConfigId;   ///<  config id
     float                   mWidthDeg;   ///<  width in degrees
-    int                     mDepth;      ///<  depth
+    float                   mDepth;      ///<  depth
     float                   mOffset;     ///<  Offset
     float                   mOriginCol;  ///<  Origin.Col
     float                   mOriginRow;  ///<  Origin.Row
@@ -36,6 +36,8 @@ public:
     int                     mBottomEdge; ///<  BottomEdge
     double                  mPixelWidth; ///<  Pixel width
     double                  mPixelHeight;///<  Pixel height
+    int                     mHorizontalOffset; ///< parameter for the grabber
+    QString                 mNotes; ///< useful information
     
     bool mEmpty;
     
@@ -99,8 +101,8 @@ public:
   
   int angle(ProbeXmlConfigParser::ColRowPair pair1)
   {
-    double pi = atan(1)*4;
-    return fmod(  ( ( atan2((pair1.first - mCenter.first), (pair1.second - mCenter.second)) ) + 3*pi/4) , 2*pi);
+	double pi = atan(1.0)*4;
+    return fmod(  ( ( atan2((double)(pair1.first - mCenter.first), (double)(pair1.second - mCenter.second)) ) + 3*pi/4) , 2*pi);
   }
   ProbeXmlConfigParser::ColRowPair mCenter;
 };
