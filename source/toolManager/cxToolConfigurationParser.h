@@ -42,7 +42,8 @@ private:
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
                     mToolSensorChannelnumberTag, mToolSensorRomFileTag,
-                    mToolCalibrationTag, mToolCalibrationFileTag;
+                    mToolCalibrationTag, mToolCalibrationFileTag,
+                    mInstrumentTag, mInstrumentIdTag, mInstrumentScannerIdTag;
                     ///< names of necessary tags in the configuration file
 
   QDomDocument mConfigureDoc; ///< the config xml document
