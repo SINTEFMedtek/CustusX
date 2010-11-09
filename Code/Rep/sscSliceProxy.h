@@ -10,6 +10,8 @@
 #include "sscIndent.h"
 
 
+typedef ssc::utils::Transform3D Transform3D;
+
 namespace ssc
 {
 
@@ -50,8 +52,6 @@ public:
 	ToolPtr getTool();
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	void printSelf(std::ostream & os, Indent indent);
-	
-	typedef utils::Transform3D Transform3D;
 
 signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
