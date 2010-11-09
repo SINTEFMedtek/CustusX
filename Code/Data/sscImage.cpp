@@ -60,7 +60,7 @@ void Image::ShadingStruct::parseXml(QDomNode dataNode)
 		return;
 
 	on = dataNode.toElement().attribute("on").toInt();
-	std::cout << "attrib on: " << dataNode.toElement().attribute("on")  << " : " << on << std::endl;
+//	std::cout << "attrib on: " << dataNode.toElement().attribute("on")  << " : " << on << std::endl;
 	ambient = loadAttribute(dataNode, "ambient", ambient);
 	diffuse = loadAttribute(dataNode, "diffuse", diffuse);
 	specular = loadAttribute(dataNode, "specular", specular);

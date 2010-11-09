@@ -21,6 +21,7 @@
 #include "sscSlicePlaneClipper.h"
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
+#include "sscMessageManager.h"
 
 typedef vtkSmartPointer<class vtkGPUVolumeRayCastMapper> vtkGPUVolumeRayCastMapperPtr;
 
@@ -188,7 +189,7 @@ double VolumetricRep::computeResampleFactor(long maxVoxels, ssc::ImagePtr image)
 
 	if (factor<0.99)
 	{
-		std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
+		//std::cout << "Downsampling volume in VolumetricRep: " << image->getName() << " below " << maxVoxels/1000/1000 << "M. Ratio: " << factor << ", original size: " << voxels/1000/1000 << "M" << std::endl;
 		return factor;
 		//return 1.0;
 	}	
@@ -236,7 +237,11 @@ void VolumetricRep::vtkImageDataChangedSlot()
 
 	  long voxelsDown = volume->GetNumberOfPoints();
 	  long voxelsOrig = mImage->getBaseVtkImageData()->GetNumberOfPoints();
-    std::cout << "Completed downsampling volume in VolumetricRep: " << mImage->getName() << " below " << voxelsDown/1000/1000 << "M. Ratio: " << mResampleFactor << ", original size: " << voxelsOrig/1000/1000 << "M" << std::endl;
+    messageManager()->sendInfo("Completed downsampling volume in VolumetricRep: "
+        + mImage->getName()
+        + " below " + qstring_cast(voxelsDown/1000/1000) + "M. "
+        + "Ratio: " + qstring_cast(mResampleFactor) + ", "
+        + "Original size: " + qstring_cast(voxelsOrig/1000/1000) + "M.");
 //    std::cout << "=================== org volume: " << std::endl;
 //    mImage->getGrayScaleBaseVtkImageData()->Print(std::cout);
 //    std::cout << "=================== downsampled volume: " << std::endl;

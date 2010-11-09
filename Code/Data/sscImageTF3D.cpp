@@ -419,7 +419,7 @@ void ImageTF3D::parseXml(QDomNode dataNode)
 		std::cout << std::endl;
 	}
 
-	std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
+//	std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
 }
