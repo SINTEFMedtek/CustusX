@@ -39,7 +39,7 @@ signals:
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
+  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
 private slots:
   void segmentSlot();
@@ -48,6 +48,7 @@ private slots:
   void toogleSmoothingSlot(bool on);
   void smoothingSigmaSlot(double value);
   void imageChangedSlot(QString uid);
+  void revertTransferFunctions();
 
 private:
   SegmentationWidget();
@@ -63,6 +64,10 @@ private:
   QSpinBox* mSegmentationThresholdSpinBox;
   QDoubleSpinBox* mSmoothingSigmaSpinBox;
   QLabel* mSmoothingSigmaLabel;
+
+  ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
+  ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
+  ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
 };
 
 /**
@@ -81,6 +86,7 @@ public:
   SurfaceWidget(QWidget* parent);
   ~SurfaceWidget();
   virtual QString defaultWhatsThis() const;
+  void setDefaultColor(QColor color);
 
 public slots:
   void setImageInputSlot(QString value);
@@ -108,6 +114,7 @@ private:
   bool mSmoothing;
   QSpinBox* mSurfaceThresholdSpinBox;
   QSpinBox* mDecimationSpinBox;
+  QColor mDefaultColor;
 };
 
 /**
@@ -126,6 +133,7 @@ public:
   CenterlineWidget(QWidget* parent);
   ~CenterlineWidget();
   virtual QString defaultWhatsThis() const;
+  void setDefaultColor(QColor color);
 
 public slots:
   void setImageInputSlot(QString value);
@@ -144,6 +152,7 @@ private slots:
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
+  QColor mDefaultColor;
 };
 
 /**

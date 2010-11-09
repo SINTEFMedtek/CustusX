@@ -79,6 +79,9 @@ FixedImage2ImageWidget::FixedImage2ImageWidget(QWidget* parent) :
   mOutput = RegistrationFixedImageStringDataAdapter::New();
   mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
   mLayout->addStretch();
+
+  mCenterlineWidget->setDefaultColor(QColor("green"));
+  mSurfaceWidget->setDefaultColor(QColor("green"));
 };
 
 FixedImage2ImageWidget::~FixedImage2ImageWidget()
@@ -101,6 +104,9 @@ MovingImage2ImageWidget::MovingImage2ImageWidget(QWidget* parent) :
   mOutput = RegistrationMovingImageStringDataAdapter::New();
   mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
   mLayout->addStretch();
+
+  mCenterlineWidget->setDefaultColor(QColor("blue"));
+  mSurfaceWidget->setDefaultColor(QColor("blue"));
 };
 
 MovingImage2ImageWidget::~MovingImage2ImageWidget()
