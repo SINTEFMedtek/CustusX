@@ -12,6 +12,9 @@
 #include <itkStdStreamLogOutput.h>
 #include "sscTransform3D.h"
 #include "cxTracker.h"
+#include "probeXmlConfigParser.h"
+
+class QStringList;
 
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 typedef vtkSmartPointer<class vtkConeSource> vtkConeSourcePtr;
@@ -78,11 +81,14 @@ public:
     std::string       mGraphicsFileName;      ///< path to this tools graphics file
     std::string       mTransformSaveFileName; ///< path to where transforms should be saved
     std::string       mLoggingFolderName;     ///< path to where log should be saved
+    std::string       mInstrumentId;          ///< The instruments id
+    std::string       mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
       mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
-      mTransformSaveFileName(""), mLoggingFolderName(""){}; ///< sets up default values for all the members
+      mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
+      mInstrumentScannerId(""){}; ///< sets up default values for all the members
   };
 
   Tool(InternalStructure& internalStructur);   ///< constructor
@@ -107,9 +113,17 @@ public:
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
   virtual void set_prMt(const ssc::Transform3D& transform);
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
+  std::string getInstrumentId() const;
+  std::string getInstrumentScannerId() const;
+  QStringList getUSSectorConfigList() const;
+  QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
+  void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
+
+  void addXml(QDomNode& dataNode);
+  void parseXml(QDomNode& dataNode);
 
 signals:
   /**
@@ -120,6 +134,7 @@ signals:
    * \param uid     The tools unique id
    */
   void toolReport(ToolMessage message, bool state, bool success, stdString uid);
+  void probeSectorConfigurationChanged();
 
 protected:
   typedef itk::ReceptorMemberCommand<Tool> ObserverType;
@@ -155,6 +170,9 @@ protected:
   double mToolTipOffset; ///< distance from tool where point should be shown
 
   ssc::ProbeSector mProbeSector; ///< Probe sector information
+
+  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+  QString mProbeSectorConfiguration; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 } //namespace cx
