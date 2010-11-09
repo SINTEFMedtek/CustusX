@@ -85,6 +85,7 @@ public:
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
 	virtual ssc::Vector3D getReferencePoint() const = 0; ///< Get the optional reference point from this tool, will be 0,0,0 if it is not specified
 
+	typedef Transform3D Transform3D;
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
