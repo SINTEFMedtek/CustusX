@@ -392,6 +392,7 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
   if (sourcePolyData->GetNumberOfPoints() < targetPolyData->GetNumberOfPoints())
   {
     //INVERT
+    std::cout << "inverted vessel reg" << std::endl;
     mInvertedTransform = true;
     std::swap(sourcePolyData, targetPolyData);
   }

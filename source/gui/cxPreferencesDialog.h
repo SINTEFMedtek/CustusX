@@ -105,6 +105,7 @@ protected:
 
   private slots:
   void renderingIntervalSlot(int interval);
+  void setBackgroundColorSlot();
 };
 
 /**
