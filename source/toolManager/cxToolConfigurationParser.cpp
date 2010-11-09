@@ -14,8 +14,8 @@ ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QSt
       mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
       mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
-      mToolSensorChannelnumberTag("channelnumber"), mToolSensorRomFileTag(
-          "rom_file"), mToolCalibrationTag("calibration"),
+      mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
+      mToolSensorRomFileTag("rom_file"), mToolCalibrationTag("calibration"),
       mToolCalibrationFileTag("cal_file"),
       mInstrumentTag("instrument"), mInstrumentIdTag("id"), mInstrumentScannerIdTag("scannerid")
 {
@@ -217,6 +217,11 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
         toolSensorElement.firstChildElement(mToolSensorChannelnumberTag);
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
+
+    QDomElement toolSensorReferencePointElement =
+        toolSensorElement.firstChildElement(mToolSensorReferencePointTag);
+    QString toolSensorReferencePointText = toolSensorReferencePointElement.text();
+    internalStructure.mReferencePoint = ssc::Vector3D::fromString(toolSensorReferencePointText);
 
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
     QString toolSensorRomFileText = toolSensorRomFileElement.text();

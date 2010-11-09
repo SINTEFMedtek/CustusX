@@ -281,7 +281,7 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     bool ok = true;
     double maxRenderSize = DataLocations::getSettings()->value("maxRenderSize").toDouble(&ok);
     if (!ok)
-      maxRenderSize = 10 * pow(10,6);
+      maxRenderSize = 10 * pow(10.0,6);
 
     bool useGPURender = DataLocations::getSettings()->value("useGPUVolumeRayCastMapper").toBool();
     if (useGPURender)
