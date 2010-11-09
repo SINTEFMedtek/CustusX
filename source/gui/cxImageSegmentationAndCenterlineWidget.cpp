@@ -15,9 +15,14 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
     WhatsThisWidget(parent)
 {
   mLayout = new QVBoxLayout(this);
+  mResampleWidget =  new ResampleWidget(this);
   mSegmentationWidget = new SegmentationWidget(this);
   mSurfaceWidget = new SurfaceWidget(this);
   mCenterlineWidget =  new CenterlineWidget(this);
+
+  mResampleOutput = SelectImageStringDataAdapter::New();
+  mResampleOutput->setValueName("Output: ");
+  connect(mResampleOutput.get(), SIGNAL(imageChanged(QString)), mSegmentationWidget, SLOT(setImageInputSlot(QString)));
 
   mSegmentationOutput = SelectImageStringDataAdapter::New();
   mSegmentationOutput->setValueName("Output: ");
@@ -34,6 +39,8 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   connect(mCenterlineOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(setImageSlot(QString)));
 
   mLayout->addWidget(this->createHorizontalLine());
+  mLayout->addWidget(this->createMethodWidget(mResampleWidget, new ssc::LabeledComboBoxWidget(this, mResampleOutput), "Resample"));
+  mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, mSegmentationOutput), "Segmentation"));
   mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mSurfaceWidget, new ssc::LabeledComboBoxWidget(this, mSurfaceOutput), "Surface"));
@@ -41,6 +48,7 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mLayout->addWidget(this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, mCenterlineOutput), "Centerline"));
   mLayout->addWidget(this->createHorizontalLine());
 
+  connect(mResampleWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(resampleOutputArrived(QString)));
   connect(mSegmentationWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(segmentationOutputArrived(QString)));
   connect(mSurfaceWidget, SIGNAL(outputMeshChanged(QString)), this, SLOT(surfaceOutputArrived(QString)));
   connect(mCenterlineWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(centerlineOutputArrived(QString)));
@@ -53,7 +61,14 @@ void ImageSegmentationAndCenterlineWidget::setImageSlot(QString uid)
 {
   if(!mOutput)
     return;
+
+  mCenterlineWidget->visualizeSlot(uid);
   mOutput->setValue(uid);
+}
+
+void ImageSegmentationAndCenterlineWidget::resampleOutputArrived(QString uid)
+{
+  mResampleOutput->setValue(uid);
 }
 
 void ImageSegmentationAndCenterlineWidget::segmentationOutputArrived(QString uid)
