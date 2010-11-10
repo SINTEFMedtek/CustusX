@@ -292,18 +292,26 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
   //TODO: upsample
 
   rawResult->Update();
-  rawResult->Print(std::cout);
+//  rawResult->Print(std::cout);
 
   QString uid = ssc::changeExtension(image->getUid(), "") + "_or_res%1";
   QString name = image->getName()+" _or_resampled %1";
   ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
   oriented->get_rMd_History()->setRegistration(reference->get_rMd());
-  oriented->setCroppingBox(reference->boundingBox());
   oriented->mergevtkOriginIntosscTransform();
+
+  ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+  ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
+
+  oriented->setCroppingBox(bb_crop);
 
   ssc::dataManager()->loadData(oriented);
   ssc::dataManager()->saveImage(oriented, outputBasePath);
 
+  std::cout << "PRE CROP" << std::endl;
+  oriented->getBaseVtkImageData()->Update();
+  oriented->getBaseVtkImageData()->UpdateInformation();
+  oriented->getBaseVtkImageData()->Print(std::cout);
 
   ssc::ImagePtr cropped = oriented->CropAndClipImage(outputBasePath);
 
