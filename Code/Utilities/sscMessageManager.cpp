@@ -3,6 +3,7 @@
 #include <iostream>
 #include "boost/shared_ptr.hpp"
 #include <QString>
+#include <QMutex>
 #include <QSound>
 #include <QTextStream>
 #include "sscTypeConversions.h"
@@ -88,11 +89,16 @@ public:
     {
       if (single == '\n')
       {
-        messageManager()->sendMessage(qstring_cast(mBuffer), mMessageLevel, 0);
+        QMutexLocker sentry(&mMutex);
+        QString buffer = qstring_cast(mBuffer);
         mBuffer.clear();
+        sentry.unlock();
+
+        messageManager()->sendMessage(buffer, mMessageLevel, 0);
       }
       else
       {
+        QMutexLocker sentry(&mMutex);
         mBuffer += single;
       }
     }
@@ -109,6 +115,7 @@ private:
   QString mBuffer;
   std::streambuf* mOrig;
   MESSAGE_LEVEL mMessageLevel;
+  QMutex mMutex;
 };
 //---------------------------------------------------------------------------
 
