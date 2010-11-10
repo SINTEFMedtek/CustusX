@@ -206,7 +206,7 @@ void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
   }
 
   mData = data;
-  bool useMask = false;
+  bool useMask = true;
 
   if (mData)
   {
