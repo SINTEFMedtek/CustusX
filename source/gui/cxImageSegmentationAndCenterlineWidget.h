@@ -34,15 +34,18 @@ protected:
 
 private slots:
   void setImageSlot(QString uid);
+  void resampleOutputArrived(QString uid);
   void segmentationOutputArrived(QString uid);
   void surfaceOutputArrived(QString uid);
   void centerlineOutputArrived(QString uid);
 
 protected:
+  class ResampleWidget*     mResampleWidget;
   class SegmentationWidget* mSegmentationWidget;
   class SurfaceWidget*      mSurfaceWidget;
   class CenterlineWidget*   mCenterlineWidget;
 
+  SelectImageStringDataAdapterPtr mResampleOutput;
   SelectImageStringDataAdapterPtr mSegmentationOutput;
   SelectMeshStringDataAdapterPtr mSurfaceOutput;
   SelectImageStringDataAdapterPtr mCenterlineOutput;
