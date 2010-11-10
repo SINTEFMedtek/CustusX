@@ -74,7 +74,6 @@ InteractiveCropper::InteractiveCropper()
 
   double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
   mBoxWidget->PlaceWidget(bb_hard);
-  mBoxWidget->SetEnabled(false);
 
   mCropBoxCallback = CropBoxCallbackPtr::New();
   mCropBoxCallback->SetCropper(this);
@@ -245,6 +244,10 @@ bool InteractiveCropper::getShowBoxWidget() const
  */
 void InteractiveCropper::setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d)
 {
+  if (!mImage)
+    return;
+
+
   double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
   ssc::DoubleBoundingBox3D bb_unit(bb_hard);
   ssc::Transform3D M = ssc::createTransformNormalize(bb_unit, bb_d);
