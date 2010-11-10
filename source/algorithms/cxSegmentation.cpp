@@ -22,6 +22,8 @@
 #include <vtkImageCast.h>
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
+#include <vtkImageResample.h>
+#include <vtkImageClip.h>
 
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
@@ -31,12 +33,142 @@
 #include "sscMesh.h"
 #include "sscMessageManager.h"
 #include "vtkForwardDeclarations.h"
+#include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
 
 const unsigned int Dimension = 3;
 typedef unsigned short PixelType;
 typedef itk::Image< PixelType, Dimension >  itkImageType;
 typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkFilterType;
 typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
+
+
+//namespace ssc
+//{
+
+///** Crop the image to the bounding box bb_q.
+// *  bb_q is given in the output space q, defined relative to the image space d
+// *  with qMd. If qMd is non-identity, image is resampled to space q.
+// *  outputSpacing can be used to resample the volume (after cropping).
+// */
+//ImagePtr cropImage(ImagePtr image, Transform3D qMd, DoubleBoundingBox3D bb_q, Vector3D outputSpacing)
+//{
+//  if (!image)
+//    return ssc::ImagePtr();
+//
+//  std::cout << "qMd\n" << qMd << std::endl;
+//  std::cout << "bb_q" << bb_q << std::endl;
+//  std::cout << "outputSpacing" << outputSpacing << std::endl;
+//
+////  ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
+//
+//  // provide a resampled volume for algorithms requiring that (such as proberep)
+//
+//  // transform data into new space q, using qMd:
+//  vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
+//  vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
+//  orientator->SetInput(image->getBaseVtkImageData());
+//  orientator->SetInterpolationModeToLinear();
+//  orientator->SetOutputDimensionality(3);
+//  orientator->SetResliceAxes(qMd.inv().matrix());
+//  orientator->AutoCropOutputOn();
+//  vtkImageDataPtr rawOriented = orientator->GetOutput();
+//  rawOriented->Update();
+//  rawOriented->UpdateInformation();
+//
+//  // rawOriented is given in space q.
+//
+//  // clip data using bb_q
+//  vtkImageClipPtr clip = vtkImageClipPtr::New();
+//  //DoubleBoundingBox3D bb = this->getCroppingBox();
+//  clip->SetInput(rawOriented);
+//  ssc::Vector3D sp(image->getBaseVtkImageData()->GetSpacing());
+//  clip->SetOutputWholeExtent(
+//      static_cast<int>(bb_q[0]/sp[0]+0.5), static_cast<int>(bb_q[1]/sp[1]+0.5),
+//      static_cast<int>(bb_q[2]/sp[1]+0.5), static_cast<int>(bb_q[3]/sp[1]+0.5),
+//      static_cast<int>(bb_q[4]/sp[2]+0.5), static_cast<int>(bb_q[5]/sp[2]+0.5));
+//  clip->ClipDataOn();
+//  vtkImageDataPtr rawClipped = clip->GetOutput();
+//  rawClipped->Update();
+//  rawClipped->UpdateInformation();
+//  rawClipped->ComputeBounds();
+//
+//  // resample data to new spacing
+//  vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+//  resampler->SetInput(rawClipped);
+//  resampler->SetAxisOutputSpacing(0, outputSpacing[0]);
+//  resampler->SetAxisOutputSpacing(1, outputSpacing[1]);
+//  resampler->SetAxisOutputSpacing(2, outputSpacing[2]);
+//  vtkImageDataPtr rawResampled = resampler->GetOutput();
+//  rawResampled->Update();
+//
+//  QString uid = ssc::changeExtension(image->getUid(), "") + "_resampled%1";
+//  QString name = image->getName()+" _resampled %1";
+//  ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResampled, uid, name);
+//  retval->get_rMd_History()->setRegistration(image->get_rMd()*qMd.inv());
+//  retval->mergevtkSettingsIntosscTransform();
+//  retval->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
+//  messageManager()->sendInfo("Created volume " + retval->getName());
+//  retval->setParentFrame(image->getUid());
+//
+//  ssc::dataManager()->loadData(retval);
+//  //ssc::dataManager()->saveImage(retval, outputBasePath);
+//  return retval;
+//
+////  return retVal;
+//
+//
+////  QString uid = ssc::changeExtension(image->getUid(), "") + "_or_res%1";
+////  QString name = image->getName()+" _or_resampled %1";
+////  ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
+////  oriented->get_rMd_History()->setRegistration(reference->get_rMd());
+////  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
+////  oriented->mergevtkSettingsIntosscTransform();
+////  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
+////
+////  ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+////  ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
+////
+////  oriented->setCroppingBox(bb_crop);
+////
+////  ssc::dataManager()->loadData(oriented);
+////  ssc::dataManager()->saveImage(oriented, outputBasePath);
+//
+//
+//
+//
+////  ssc::ImagePtr cropped = oriented->CropAndClipImage(outputBasePath);
+////
+////  ssc::ImagePtr resampled = cropped->resample(ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()));
+////  ssc::dataManager()->saveImage(resampled, outputBasePath);
+////
+////  std::cout << "bb_image " << image->boundingBox() << std::endl; // in MR space
+////  std::cout << "bb_reslice " << oriented->boundingBox() << std::endl; // US space
+////  std::cout << "bb_ref " << reference->boundingBox() << std::endl;
+////  std::cout << "cropbox_img " << oriented->getCroppingBox() << std::endl;
+////  std::cout << "bb_cropped " << cropped->boundingBox() << std::endl;
+////  std::cout << "rMd at end oriented\n" << oriented->get_rMd() << std::endl;
+////
+////  resampled->getBaseVtkImageData()->Print(std::cout);
+////
+////
+//////
+//////  QString uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
+//////  QString name = image->getName()+" resampled %1";
+//////  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult, uid, name);
+//////  ssc::messageManager()->sendInfo("created resampled " + result->getName());
+//////
+//////  result->get_rMd_History()->setRegistration(reference->get_rMd());
+//////
+//////  result->setParentFrame(image->getUid());
+//////  ssc::dataManager()->loadData(result);
+//////  ssc::dataManager()->saveImage(result, outputBasePath);
+////
+//////  return result;
+////  return resampled;
+//
+//}
+//} // namespace ssc
 
 namespace cx
 {
@@ -271,13 +403,24 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   return result;
 }
 
-ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
+//ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
+//{
+//  if (!image || !reference)
+//    return ssc::ImagePtr();
+//
+//  ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
+//  ssc::DoubleBoundingBox3D bb_crop = reference->boundingBox();
+//  ssc::Vector3D spacing(reference->getBaseVtkImageData()->GetSpacing());
+//
+//  ssc::ImagePtr retval = cropImage(image, refMi, bb_crop, spacing);
+//
+//  ssc::dataManager()->loadData(retval);
+//  ssc::dataManager()->saveImage(retval, outputBasePath);
+//  return retval;
+//}
+
+ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D refMi)
 {
-  if (!image || !reference)
-    return ssc::ImagePtr();
-
-  ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
-
   // provide a resampled volume for algorithms requiring that (such as proberep)
   vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
   vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
@@ -288,17 +431,34 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
   orientator->AutoCropOutputOn();
   vtkImageDataPtr rawResult = orientator->GetOutput();
 
-  //TODO: add bounding box
-  //TODO: upsample
-
   rawResult->Update();
 //  rawResult->Print(std::cout);
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_or_res%1";
-  QString name = image->getName()+" _or_resampled %1";
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_or%1";
+  QString name = image->getName()+" _or %1";
   ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
-  oriented->get_rMd_History()->setRegistration(reference->get_rMd());
-  oriented->mergevtkOriginIntosscTransform();
+  //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
+  oriented->get_rMd_History()->setRegistration(image->get_rMd() * refMi.inv());
+//  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
+  oriented->mergevtkSettingsIntosscTransform();
+//  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
+  oriented->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
+
+  return oriented;
+}
+
+/** Crop the image to the bounding box bb_q.
+ *  bb_q is given in the output space q, defined relative to the image space d
+ *  with qMd. If qMd is non-identity, image is resampled to space q.
+ *  outputSpacing can be used to resample the volume (after cropping).
+ */
+ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
+{
+  if (!image || !reference)
+    return ssc::ImagePtr();
+
+  ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
+  ssc::ImagePtr oriented = resampleImage(image, refMi);
 
   ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
   ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
@@ -308,22 +468,21 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
   ssc::dataManager()->loadData(oriented);
   ssc::dataManager()->saveImage(oriented, outputBasePath);
 
-  std::cout << "PRE CROP" << std::endl;
-  oriented->getBaseVtkImageData()->Update();
-  oriented->getBaseVtkImageData()->UpdateInformation();
-  oriented->getBaseVtkImageData()->Print(std::cout);
-
   ssc::ImagePtr cropped = oriented->CropAndClipImage(outputBasePath);
 
-  std::cout << "CROPPED" << std::endl;
-  cropped->getBaseVtkImageData()->Print(std::cout);
+  ssc::ImagePtr resampled = cropped->resample(ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()));
+  ssc::dataManager()->saveImage(resampled, outputBasePath);
 
-  std::cout << "bb_image " << image->boundingBox() << std::endl; // in MR space
+//  std::cout << "bb_image " << image->boundingBox() << std::endl; // in MR space
+//  std::cout << "bb_reslice " << oriented->boundingBox() << std::endl; // US space
+//  std::cout << "bb_ref " << reference->boundingBox() << std::endl;
+//  std::cout << "cropbox_img " << oriented->getCroppingBox() << std::endl;
+//  std::cout << "bb_cropped " << cropped->boundingBox() << std::endl;
+//  std::cout << "rMd at end oriented\n" << oriented->get_rMd() << std::endl;
 
-  std::cout << "bb_reslice " << oriented->boundingBox() << std::endl; // US space
-  std::cout << "bb_ref " << reference->boundingBox() << std::endl;
-  std::cout << "cropbox_img " << oriented->getCroppingBox() << std::endl;
-  std::cout << "bb_cropped " << cropped->boundingBox() << std::endl;
+  resampled->getBaseVtkImageData()->Print(std::cout);
+
+
 //
 //  QString uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
 //  QString name = image->getName()+" resampled %1";
@@ -337,8 +496,80 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
 //  ssc::dataManager()->saveImage(result, outputBasePath);
 
 //  return result;
-  return cropped;
+  return resampled;
 }
+
+
+
+//ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
+//{
+//  if (!image || !reference)
+//    return ssc::ImagePtr();
+//
+//  ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
+//
+//  // provide a resampled volume for algorithms requiring that (such as proberep)
+//  vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
+//  vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
+//  orientator->SetInput(image->getBaseVtkImageData());
+//  orientator->SetInterpolationModeToLinear();
+//  orientator->SetOutputDimensionality(3);
+//  orientator->SetResliceAxes(refMi.inv().matrix());
+//  orientator->AutoCropOutputOn();
+//  vtkImageDataPtr rawResult = orientator->GetOutput();
+//
+//  //TODO: add bounding box with extra size
+//  //TODO: upsample
+//
+//  rawResult->Update();
+////  rawResult->Print(std::cout);
+//
+//  QString uid = ssc::changeExtension(image->getUid(), "") + "_or_res%1";
+//  QString name = image->getName()+" _or_resampled %1";
+//  ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
+//  oriented->get_rMd_History()->setRegistration(reference->get_rMd());
+//  std::cout << "rMd pre merge oriented\n" << oriented->get_rMd() << std::endl;
+//  oriented->mergevtkSettingsIntosscTransform();
+//  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
+//
+//  ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+//  ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
+//
+//  oriented->setCroppingBox(bb_crop);
+//
+//  ssc::dataManager()->loadData(oriented);
+//  ssc::dataManager()->saveImage(oriented, outputBasePath);
+//
+//  ssc::ImagePtr cropped = oriented->CropAndClipImage(outputBasePath);
+//
+//  ssc::ImagePtr resampled = cropped->resample(ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()));
+//  ssc::dataManager()->saveImage(resampled, outputBasePath);
+//
+//  std::cout << "bb_image " << image->boundingBox() << std::endl; // in MR space
+//  std::cout << "bb_reslice " << oriented->boundingBox() << std::endl; // US space
+//  std::cout << "bb_ref " << reference->boundingBox() << std::endl;
+//  std::cout << "cropbox_img " << oriented->getCroppingBox() << std::endl;
+//  std::cout << "bb_cropped " << cropped->boundingBox() << std::endl;
+//  std::cout << "rMd at end oriented\n" << oriented->get_rMd() << std::endl;
+//
+//  resampled->getBaseVtkImageData()->Print(std::cout);
+//
+//
+////
+////  QString uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
+////  QString name = image->getName()+" resampled %1";
+////  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult, uid, name);
+////  ssc::messageManager()->sendInfo("created resampled " + result->getName());
+////
+////  result->get_rMd_History()->setRegistration(reference->get_rMd());
+////
+////  result->setParentFrame(image->getUid());
+////  ssc::dataManager()->loadData(result);
+////  ssc::dataManager()->saveImage(result, outputBasePath);
+//
+////  return result;
+//  return resampled;
+//}
 
 
 
