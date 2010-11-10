@@ -41,7 +41,7 @@ private:
                     mToolTypeTag, mToolIdTag, mToolNameTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
-                    mToolSensorChannelnumberTag, mToolSensorRomFileTag,
+                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,
                     mToolCalibrationTag, mToolCalibrationFileTag,
                     mInstrumentTag, mInstrumentIdTag, mInstrumentScannerIdTag;
                     ///< names of necessary tags in the configuration file
