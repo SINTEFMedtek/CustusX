@@ -14,6 +14,7 @@
 #include "vtkImageData.h"
 #include "vtkSmartPointer.h"
 #include "vtkMetaImageReader.h"
+#include "vtkImageImport.h"
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 
@@ -35,6 +36,8 @@ vtkImageDataPtr loadImage(QString filename)
 
   return reader->GetOutput();
 }
+
+
 
 igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 {
@@ -86,7 +89,18 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 
   int fsize = imgMsg->GetImageSize();
   int frame = (counter++) % image->GetDimensions()[2];
+  //int frame = 0;
   memcpy(imgMsg->GetScalarPointer(), image->GetScalarPointer(0,0,frame), fsize);
+//  std::cout << "first voxel: ";
+//  for (int i=0; i<1000; ++i)
+//  {
+//    //    std::cout << (int)(*reinterpret_cast<unsigned char*>(image->GetScalarPointer(0+i,0,frame))) << " ";
+//    unsigned char* p = reinterpret_cast<unsigned char*>(image->GetScalarPointer());
+//    std::cout << (int)(p[i]) << " ";
+//  }
+//  std::cout << std::endl;
+
+
 //  size_t b = fread(msg->GetScalarPointer(), 1, fsize, fp);
 
 
@@ -232,7 +246,6 @@ ImageSession::ImageSession(int socketDescriptor, QString imageFileDir, QObject* 
     mSocketDescriptor(socketDescriptor),
     mImageFileDir(imageFileDir)
 {
-
 }
 
 ImageSession::~ImageSession()
@@ -261,6 +274,31 @@ void ImageSession::run()
   //mSocket->deleteLater();
 }
 
+void ImageSender::setTestImage()
+{
+  int W = 512;
+  int H = 512;
+
+  mImageImport = vtkImageImportPtr::New();
+  mImageImport->SetNumberOfScalarComponents(1);
+
+  mImageImport->SetWholeExtent(0, W-1, 0, H-1, 0, 0);
+  mImageImport->SetDataExtent(0,W-1,0,H-1,0,0);
+  mImageImport->SetDataScalarTypeToUnsignedChar();
+  mTestData.resize(W*H);
+  std::fill(mTestData.begin(), mTestData.end(), 50);
+
+  for (unsigned y=0; y<H; ++y)
+    for (unsigned x=0; x<W; ++x)
+    {
+      mTestData[x+W*y] = x/2;
+    }
+
+  mImageImport->SetImportVoidPointer(&(*mTestData.begin()));
+  mImageImport->Modified();
+  mImageImport->GetOutput()->Update();
+//  return mImageImport-GetOutput();
+}
 
 ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* parent) :
     QObject(parent),
@@ -268,7 +306,9 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
     mCounter(0),
     mImageFileDir(imageFileDir)
 {
+  this->setTestImage();
   mImageData = loadImage(mImageFileDir);
+//  mImageData = mImageImport->GetOutput();
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
