@@ -170,7 +170,8 @@ void SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
   vtkPointsPtr closesetPoint = vtkPointsPtr::New();
   closesetPoint->SetNumberOfPoints(numPoints);
 
-  float mean_distance[mt_maximumNumberOfIterations];
+  //float mean_distance[mt_maximumNumberOfIterations];
+  float* mean_distance = new float[mt_maximumNumberOfIterations];
   bool l_keepRunning = 1;
   double difference = 100;
 
@@ -184,7 +185,8 @@ void SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
     IdList->SetNumberOfIds(numPoints);
     double total_distance = 0;
     double distanceSquared = 0;
-    double distance[numPoints];
+    //double distance[numPoints];
+	double* distance = new double[numPoints];
 
     //Find closest points to all source points
     for (int i = 0; i < numPoints; ++i)
@@ -197,6 +199,7 @@ void SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
       distance[i] = sqrt(distanceSquared);
       total_distance += distance[i];
     }
+	delete distance;
     mean_distance[myNumberOfIterations] = total_distance / numPoints;
 
     vtkSortDataArrayPtr sort = vtkSortDataArrayPtr::New();
@@ -298,6 +301,8 @@ void SeansVesselReg::processAllStuff(vtkPolyDataPtr currentSourcePolyData, vtkCe
     std::cout << myNumberOfIterations << " ";
     std::cout.flush();
   }
+  delete mean_distance;
+
   std::cout << endl;
 
   myConcatenation->Update();
@@ -387,6 +392,7 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
   if (sourcePolyData->GetNumberOfPoints() < targetPolyData->GetNumberOfPoints())
   {
     //INVERT
+    std::cout << "inverted vessel reg" << std::endl;
     mInvertedTransform = true;
     std::swap(sourcePolyData, targetPolyData);
   }

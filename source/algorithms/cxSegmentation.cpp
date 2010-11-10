@@ -20,7 +20,9 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkTubeFilter.h>
 #include <vtkImageCast.h>
-#include "vtkForwardDeclarations.h"
+#include <vtkImageReslice.h>
+#include <vtkMatrix4x4.h>
+
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscImage.h"
@@ -269,6 +271,77 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   return result;
 }
 
+ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
+{
+  if (!image || !reference)
+    return ssc::ImagePtr();
+
+  ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
+
+  // provide a resampled volume for algorithms requiring that (such as proberep)
+  vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
+  vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
+  orientator->SetInput(image->getBaseVtkImageData());
+  orientator->SetInterpolationModeToLinear();
+  orientator->SetOutputDimensionality(3);
+  orientator->SetResliceAxes(refMi.inv().matrix());
+  orientator->AutoCropOutputOn();
+  vtkImageDataPtr rawResult = orientator->GetOutput();
+
+  //TODO: add bounding box
+  //TODO: upsample
+
+  rawResult->Update();
+//  rawResult->Print(std::cout);
+
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_or_res%1";
+  QString name = image->getName()+" _or_resampled %1";
+  ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
+  oriented->get_rMd_History()->setRegistration(reference->get_rMd());
+  oriented->mergevtkOriginIntosscTransform();
+
+  ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+  ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
+
+  oriented->setCroppingBox(bb_crop);
+
+  ssc::dataManager()->loadData(oriented);
+  ssc::dataManager()->saveImage(oriented, outputBasePath);
+
+  std::cout << "PRE CROP" << std::endl;
+  oriented->getBaseVtkImageData()->Update();
+  oriented->getBaseVtkImageData()->UpdateInformation();
+  oriented->getBaseVtkImageData()->Print(std::cout);
+
+  ssc::ImagePtr cropped = oriented->CropAndClipImage(outputBasePath);
+
+  std::cout << "CROPPED" << std::endl;
+  cropped->getBaseVtkImageData()->Print(std::cout);
+
+  std::cout << "bb_image " << image->boundingBox() << std::endl; // in MR space
+
+  std::cout << "bb_reslice " << oriented->boundingBox() << std::endl; // US space
+  std::cout << "bb_ref " << reference->boundingBox() << std::endl;
+  std::cout << "cropbox_img " << oriented->getCroppingBox() << std::endl;
+  std::cout << "bb_cropped " << cropped->boundingBox() << std::endl;
+//
+//  QString uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
+//  QString name = image->getName()+" resampled %1";
+//  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult, uid, name);
+//  ssc::messageManager()->sendInfo("created resampled " + result->getName());
+//
+//  result->get_rMd_History()->setRegistration(reference->get_rMd());
+//
+//  result->setParentFrame(image->getUid());
+//  ssc::dataManager()->loadData(result);
+//  ssc::dataManager()->saveImage(result, outputBasePath);
+
+//  return result;
+  return cropped;
+}
+
+
+
 /*void Segmentation::tubeContour(ssc::ImagePtr image, QString outputBasePath)
 {
   //Don't work as vtkTubeFilter need a vtkPolyData as input
@@ -475,3 +548,5 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
 //  writer->SetFileName( outFileName.toLatin1() );
 //  writer->Update();
 //}
+
+
