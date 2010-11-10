@@ -8,6 +8,7 @@
 #include <vtkImageLuminance.h>
 #include <vtkPlane.h>
 #include <vtkPlanes.h>
+#include <vtkImageResample.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageClip.h>
 #include "sscImageTF3D.h"
@@ -683,7 +684,7 @@ void Image::clearClipPlanes()
  * This operation is needed because ssc::Image dont support vtkImageData
  * with a nonzero origin or nonzero extent. These must be removed during creation.
  */
-void Image::mergevtkOriginIntosscTransform()
+void Image::mergevtkSettingsIntosscTransform()
 {
 //  std::cout << "REMOVE ORIGIN START:" << std::endl;
 //  mBaseImageData->Print(std::cout);
@@ -716,95 +717,64 @@ void Image::mergevtkOriginIntosscTransform()
   emit cropBoxChanged();
 }
 
+ImagePtr Image::resample(const Vector3D spacing)
+{
+  std::cout << "oldspacing: " << ssc::Vector3D(this->getBaseVtkImageData()->GetSpacing()) << std::endl;
+  std::cout << "spacing: " << spacing << std::endl;
+  vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
+  resampler->SetInput(this->getBaseVtkImageData());
+  resampler->SetAxisOutputSpacing(0, spacing[0]);
+  resampler->SetAxisOutputSpacing(1, spacing[1]);
+  resampler->SetAxisOutputSpacing(2, spacing[2]);
+  vtkImageDataPtr rawResult = resampler->GetOutput();
+
+  rawResult->Update();
+
+  QString uid = ssc::changeExtension(this->getUid(), "") + "_resampled%1";
+  QString name = this->getName()+" _resampled %1";
+  ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
+  retval->get_rMd_History()->setRegistration(this->get_rMd());
+  retval->resetTransferFunction(this->getTransferFunctions3D()->createCopy(), this->getLookupTable2D()->createCopy());
+
+  ssc::dataManager()->loadData(retval);
+  //ssc::dataManager()->saveImage(retval, outputBasePath);
+  return retval;
+}
 
 ImagePtr Image::CropAndClipImage(QString outputBasePath)
 {
-  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
-  std::cout << "RAW CROP" << std::endl;
-  rawResult->Print(std::cout);
+//  std::cout << "PRE CROP" << std::endl;
+//  std::cout << "rMd\n" << this->get_rMd() << std::endl;
+  this->getBaseVtkImageData()->Update();
+  this->getBaseVtkImageData()->UpdateInformation();
+//  this->getBaseVtkImageData()->Print(std::cout);
 
-//  // the internal CustusX format does not handle extents starting at non-zero.
-//  // Move extent to zero and change rMd.
-//  IntBoundingBox3D extent(rawResult->GetExtent());
-//  int diff[3];
-//  diff[0] = extent[0];
-//  diff[1] = extent[2];
-//  diff[2] = extent[4];
-//  extent[0] -= diff[0];
-//  extent[1] -= diff[0];
-//  extent[2] -= diff[1];
-//  extent[3] -= diff[1];
-//  extent[4] -= diff[2];
-//  extent[5] -= diff[2];
-//
-////  std::cout << "cropped volume pre move:" << std::endl;
-////  rawResult->Print(std::cout);
-//
-//  rawResult->SetExtent(extent.begin());
-//  rawResult->SetWholeExtent(extent.begin());
-//  rawResult->SetUpdateExtentToWholeExtent();
-//  rawResult->ComputeBounds();
-////  std::cout << "cropped volume pre update:" << std::endl;
-////  rawResult->Print(std::cout);
-//  rawResult->Update();
-//
-//  vtkImageDataPtr copyData = vtkImageDataPtr::New();
-//  copyData->DeepCopy(rawResult);
-//  copyData->Update();
-//  rawResult = copyData;
+  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
 
   QString uid = changeExtension(this->getUid(), "") + "_clip%1";
   QString name = this->getName()+" clipped %1";
-  //std::cout << "clipped volume: " << uid << ", " << name << std::endl;
   ImagePtr result = dataManager()->createImage(rawResult,uid, name);
-  result->mergevtkOriginIntosscTransform();
+  result->get_rMd_History()->setRegistration(this->get_rMd());
+  result->mergevtkSettingsIntosscTransform();
   result->resetTransferFunction(this->getTransferFunctions3D()->createCopy(), this->getLookupTable2D()->createCopy());
   messageManager()->sendInfo("Created volume " + result->getName());
 
-//  std::cout << "cropped volume:" << std::endl;
-//  rawResult->Print(std::cout);
-
-//  DoubleBoundingBox3D bb = image->getCroppingBox();
-//  clip->SetInput(this->getBaseVtkImageData());
-//  DoubleBoundingBox3D bb_orig = image->boundingBox();
-//  Vector3D shift = this->getCroppingBox().corner(0,0,0) - this->boundingBox().corner(0,0,0);
-////  std::cout << "shift: " << shift << std::endl;
-//
-//  result->get_rMd_History()->setRegistration(this->get_rMd() * createTransformTranslate(shift));
   result->setParentFrame(this->getUid());
   dataManager()->loadData(result);
-//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   dataManager()->saveImage(result, outputBasePath);
+
+//  std::cout << "CROPPED" << std::endl;
+//  std::cout << "rMd\n" << result->get_rMd() << std::endl;
+//  result->getBaseVtkImageData()->Print(std::cout);
+
   return result;
 }
 
 vtkImageDataPtr Image::CropAndClipImageTovtkImageData()
 {
-  //vtkPlanesPtr planes = vtkPlanesPtr::New();
-  //planes->SetBounds(this->getCroppingBox().begin());
-  //TODO: Insert clip planes also
-  //this->getClipPlanes();
-
-//  vtkCutterPtr cutter = vtkCutterPtr::New();
-//  cutter->SetCutFunction(planes);
-//  cutter->SetInput(this->getBaseVtkImageData());
-//  vtkClipVolumePtr clipper = vtkClipVolumePtr::New();
-//  clipper->SetClipFunction(planes);
-//  clipper->SetInput(this->getBaseVtkImageData());
-//  return clipper->GetOutput();
-
   vtkImageClipPtr clip = vtkImageClipPtr::New();
   DoubleBoundingBox3D bb = this->getCroppingBox();
   clip->SetInput(this->getBaseVtkImageData());
-
-//  DoubleBoundingBox3D bb_orig = this->boundingBox();
-//  Vector3D shift = bb.corner(0,0,0) - bb_orig.corner(0,0,0);
-//  Vector3D c_orig(this->getBaseVtkImageData()->GetOrigin());
-//  this->getBaseVtkImageData()->Print(std::cout);
-//  std::cout << "bb_orig" << bb_orig << std::endl;
-//  std::cout << "bb_CLIP" << bb << std::endl;
-//  std::cout << "c_orig" << c_orig << std::endl;
-//  std::cout << "shift" << shift << std::endl;
 
   double* sp = this->getBaseVtkImageData()->GetSpacing();
 
@@ -819,48 +789,6 @@ vtkImageDataPtr Image::CropAndClipImageTovtkImageData()
   retVal->Update();
   retVal->UpdateInformation();
   retVal->ComputeBounds();
-//  Vector3D c_new(retVal->GetOrigin());
-//  std::cout << "bb_new" << DoubleBoundingBox3D(retVal->GetBounds()) << std::endl;
-//  std::cout << "c_new" << c_new << std::endl;
-//  retVal->Print(std::cout);
-//
-//  IntBoundingBox3D extent(retVal->GetExtent());
-//  int diff[3];
-//  diff[0] = extent[0];
-//  diff[1] = extent[2];
-//  diff[2] = extent[4];
-//  extent[0] -= diff[0];
-//  extent[1] -= diff[0];
-//  extent[2] -= diff[1];
-//  extent[3] -= diff[1];
-//  extent[4] -= diff[2];
-//  extent[5] -= diff[2];
-//
-//  retVal->SetExtent(extent.begin());
-//  retVal->SetWholeExtent(extent.begin());
-//  retVal->SetUpdateExtentToWholeExtent();
-//  retVal->ComputeBounds();
-//  std::cout << "flyttet data" << std::endl;
-//  retVal->Update();
-//  retVal->Print(std::cout);
-
-/*
-  int* in = this->getBaseVtkImageData()->GetWholeExtent();
-  int* ret = retVal->GetWholeExtent();
-  std::cout << "in wholeExtent:     " << in[0] << " " << in[1]<< " " << in[2]<< " " << in[3]<< " " << in[4]<< " " << in[5] << std::endl;
-  std::cout << "retVal wholeExtent: " << ret[0] << " " << ret[1]<< " " << ret[2]<< " " << ret[3]<< " " << ret[4]<< " " << ret[5] << std::endl;
-
-  double* inSpacing = this->getBaseVtkImageData()->GetSpacing();
-  std::cout << "inSpacing: " << inSpacing[0] << " " << inSpacing[1]<< " " << inSpacing[2] << std::endl;
-  int* inExtent = this->getBaseVtkImageData()->GetExtent();
-  std::cout << "inExtent : " << inExtent[0] << " " << inExtent[1]<< " " << inExtent[2] << inExtent[3]<< " " << inExtent[4]<< " " << inExtent[5] << std::endl;
-
-
-  double* bounds = retVal->GetBounds();
-  std::cout << "retBounds: " << bounds[0] << " " << bounds[1]<< " " << bounds[2]<< " " << bounds[3]<< " " << bounds[4]<< " " << bounds[5] << std::endl;
-
-  int* extent = retVal->GetExtent();
-  std::cout << "out Extent[5]: " <<  extent[5] << std::endl;*/
 
   return retVal;
 }
