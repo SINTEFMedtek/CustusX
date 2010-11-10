@@ -1,7 +1,7 @@
 #include <QApplication>
 //#include <boost/scoped_ptr.hpp>
 
-#include <cppunit/extensions/TestFactoryRegistry.h> 
+#include "cppunit/extensions/TestFactoryRegistry.h"
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include <cppunit/TestResult.h> 
