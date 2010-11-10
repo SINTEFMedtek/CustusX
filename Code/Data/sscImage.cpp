@@ -720,6 +720,8 @@ void Image::mergevtkOriginIntosscTransform()
 ImagePtr Image::CropAndClipImage(QString outputBasePath)
 {
   vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
+  std::cout << "RAW CROP" << std::endl;
+  rawResult->Print(std::cout);
 
 //  // the internal CustusX format does not handle extents starting at non-zero.
 //  // Move extent to zero and change rMd.
@@ -815,6 +817,7 @@ vtkImageDataPtr Image::CropAndClipImageTovtkImageData()
   vtkImageDataPtr retVal = clip->GetOutput();
 
   retVal->Update();
+  retVal->UpdateInformation();
   retVal->ComputeBounds();
 //  Vector3D c_new(retVal->GetOrigin());
 //  std::cout << "bb_new" << DoubleBoundingBox3D(retVal->GetBounds()) << std::endl;
