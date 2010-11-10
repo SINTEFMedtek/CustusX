@@ -257,9 +257,17 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 
   mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2]-1);
   mImageImport->SetDataExtentToWholeExtent();
-  mImageImport->SetImportVoidPointer(mImageMessage->GetPackBodyPointer());
+  mImageImport->SetImportVoidPointer(mImageMessage->GetScalarPointer());
 
   mImageImport->Modified();
+//  std::cout << "first voxel: " << *reinterpret_cast<unsigned short*>(mImageImport->GetOutput()->GetScalarPointer(0,0,0)) << std::endl;;
+
+//  std::cout << "first voxel: ";
+//  for (int i=0; i<1000; ++i)
+//    std::cout << (int)(reinterpret_cast<unsigned char*>(mImageImport->GetOutput()->GetScalarPointer())[i]) << " ";
+////    std::cout << (int)(*reinterpret_cast<unsigned char*>(mImageImport->GetOutput()->GetScalarPointer(0+i,0,0))) << " ";
+//  std::cout << std::endl;
+
 
   mTimeout = false;
   mTimeoutTimer->start();
@@ -270,6 +278,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
+  mImageImport->GetOutput()->Update();
   return mImageImport->GetOutput();
 //  return mImageData;
 }
