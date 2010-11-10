@@ -54,6 +54,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   gridLayout->addWidget(mConnectButton, 3, 1);
 
   mView = new ssc::View();
+  mView->setBackgoundColor(QColor("khaki"));
   toptopLayout->addWidget(mView);
   mRenderTimer = new QTimer(this);
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));

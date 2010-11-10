@@ -15,6 +15,7 @@ class QTimer;
 
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 
 
 namespace cx
@@ -39,6 +40,9 @@ private:
   int mCounter;
   vtkImageDataPtr mImageData;
   QString mImageFileDir;
+  std::vector<unsigned char> mTestData;
+  vtkImageImportPtr mImageImport;
+  void setTestImage();
 private slots:
   void tick();
 
@@ -58,6 +62,7 @@ private:
   QTcpSocket* mSocket;
   int mSocketDescriptor;
   QString mImageFileDir;
+
 private slots:
 
 };
