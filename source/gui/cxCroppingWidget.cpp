@@ -21,6 +21,7 @@
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include <vtkImageData.h>
+#include "sscImageAlgorithms.h"
 
 namespace cx
 {
@@ -131,7 +132,9 @@ ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
-  ssc::ImagePtr retval = image->CropAndClipImage(outputBasePath);
+  ssc::ImagePtr retval = cropImage(image);
+  ssc::dataManager()->loadData(retval);
+  ssc::dataManager()->saveImage(retval, outputBasePath);
   return retval;
 }
 
