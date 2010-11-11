@@ -49,7 +49,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
 
 void PointSamplingWidget::itemSelectionChanged()
 {
-  std::cout << "pling" << std::endl;
+  //std::cout << "pling" << std::endl;
 
   QTableWidgetItem* item = mTable->currentItem();
 
