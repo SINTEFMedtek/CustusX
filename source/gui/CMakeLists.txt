@@ -139,6 +139,8 @@ SET(${LIBNAME}_SRCS
     cxToolTipCalibrationWidget.cpp
     cxControlPanel.h
     cxControlPanel.cpp
+    cxPlateRegistrationWidget.h
+    cxPlateRegistrationWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
