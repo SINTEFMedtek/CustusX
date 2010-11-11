@@ -66,6 +66,7 @@ private:
   ssc::LabeledComboBoxWidget* mCalibrateToolComboBox;
   QLabel* mReferencePointLabel;
   QPushButton* mTestButton;
+  QLabel* mCalibrationLabel;
   QLabel* mDeltaLabel;
   SelectToolStringDataAdapterPtr mTools;
   ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
@@ -105,6 +106,7 @@ private:
   ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
   ssc::LabeledComboBoxWidget* mToolComboBox;
   ssc::LabeledComboBoxWidget* mDataComboBox;
+  bool mTruncateFile;
 };
 
 /**
