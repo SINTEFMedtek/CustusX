@@ -138,6 +138,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   QDomNode masterFrame = forest.getNode(masterFrameUid);
   QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
   std::vector<ssc::DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
+  ssc::messageManager()->sendInfo("Update Registration using master " + masterFrameUid + " with delta matrix\n"+qstring_cast(deltaTransform.mValue));
 
   // update the transform on all target data:
   for (unsigned i=0; i<targetData.size(); ++i)
@@ -146,14 +147,20 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     newTransform.mValue = deltaTransform.mValue * targetData[i]->get_rMd();
     targetData[i]->get_rMd_History()->updateRegistration(oldTime, newTransform);
 
-    std::cout << "updated registration of data " << targetData[i]->getName() << std::endl;
-    std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
+    ssc::messageManager()->sendInfo("Updated registration of data " + targetData[i]->getName());
+    //std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
   }
 
+  //error:
   // reconnect only if the registration is done relative to a base.
   // if target==targetBase, the registration is done inside an already connected
   // tree and we dont need (or want - leads to error) to reconnect.
-  if (target!=targetBase)
+  //if (target!=targetBase)
+
+  // reconnect only if master and target are unconnected, i.e. share a common ancestor.
+  // If we are registrating inside an already connected tree we only want to change transforms,
+  // not change the topology of the tree.
+  if (forest.getOldestAncestor(target) != forest.getOldestAncestor(masterFrame))
   {
     // connect the target to the master's ancestor, i.e. replace targetBase with masterAncestor:
     QDomNode masterAncestor = forest.getOldestAncestor(masterFrame);
@@ -166,7 +173,7 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
 
       if (targetData[i]->getParentFrame() == targetBaseUid)
       {
-        std::cout << "reset parent frame of " << targetData[i]->getName() << " to " << masterAncestorUid << ". targetbase=" << targetBaseUid << std::endl;
+        ssc::messageManager()->sendInfo("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
         targetData[i]->setParentFrame(masterAncestorUid);
       }
     }
@@ -451,6 +458,7 @@ void RegistrationManager::doVesselRegistration()
   }
 
   ssc::Transform3D linearTransform = vesselReg.getLinearTransform();
+  std::cout << "v2v linear result:\n" << linearTransform << std::endl;
 
 //  ssc::Transform3D delta = fixedData->get_rMd() * linearTransform * movingData->get_rMd().inv();
 
@@ -458,13 +466,12 @@ void RegistrationManager::doVesselRegistration()
   // new one as rM'd = Q * rMd, where Q is the inverted registration output.
   // Delta is thus equal to Q:
   ssc::Transform3D delta = linearTransform.inv();
-  std::cout << "delta:\n" << delta << std::endl;
+  //std::cout << "delta:\n" << delta << std::endl;
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
   this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
 
   ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
 
-  std::cout << "linear result:\n" << linearTransform << std::endl;
 }
 
 void RegistrationManager::addXml(QDomNode& parentNode)
