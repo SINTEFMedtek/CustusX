@@ -13,6 +13,8 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataLocations.h"
 #include "cxTool.h"
+#include "cxStateMachineManager.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -69,6 +71,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
     mTestButton(new QPushButton("Test calibration")),
+    mCalibrationLabel(new QLabel("Calibration: \n")),
     mDeltaLabel(new QLabel("Delta:"))
 {
   this->setObjectName("ToolTipCalibrateWidget");
@@ -83,6 +86,7 @@ ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
   toplayout->addWidget(mCalibrateToolComboBox);
   toplayout->addWidget(mReferencePointLabel);
   toplayout->addWidget(mCalibrateButton);
+  toplayout->addWidget(mCalibrationLabel);
   toplayout->addWidget(this->createHorizontalLine());
   toplayout->addWidget(mTestButton);
   toplayout->addWidget(mDeltaLabel);
@@ -122,7 +126,9 @@ void ToolTipCalibrateWidget::hideEvent(QHideEvent* event)
 void ToolTipCalibrateWidget::calibrateSlot()
 {
   ssc::ToolPtr refTool = mTools->getTool();
-  if(!refTool || (ssc::similar(refTool->getReferencePoint(), ssc::Vector3D(0.000,0.000,0.000))))
+  //Todo, we only allow the reference point with id 1 to be used to calibrate
+  //this could be done more dynamic.
+  if(!refTool || !refTool->hasReferencePointWithId(1))
     return;
 
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
@@ -140,13 +146,16 @@ void ToolTipCalibrateWidget::calibrateSlot()
   int ret = msgBox.exec();
 
   if(ret == QMessageBox::Ok)
+  {
     tool->setCalibration_sMt(calibration);
+    mCalibrationLabel->setText("Calibration:\n"+qstring_cast(calibration));
+  }
 }
 
 void ToolTipCalibrateWidget::testCalibrationSlot()
 {
   ssc::ToolPtr selectedTool = mTools->getTool();
-  if(!selectedTool || (ssc::similar(selectedTool->getReferencePoint(), ssc::Vector3D(0.000,0.000,0.000))))
+  if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
   ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(ssc::toolManager()->getDominantTool());
@@ -169,11 +178,15 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
   if(mTools->getTool())
   {
     ToolPtr tool = boost::dynamic_pointer_cast<Tool>(mTools->getTool());
-    if(tool && !(ssc::similar(tool->getReferencePoint(), ssc::Vector3D(0.000,0.000,0.000))))
+    if(tool && tool->hasReferencePointWithId(1))
     {
-      text = "Ref. point: "+qstring_cast(tool->getReferencePoint());
+      text = "Ref. point: "+qstring_cast(tool->getReferencePoints()[1]);
       mCalibrateButton->setEnabled(true);
       mTestButton->setEnabled(true);
+    }
+    if(tool)
+    {
+      mCalibrationLabel->setText("Calibration:\n"+qstring_cast(tool->getCalibration_sMt()));
     }
   }
 
@@ -184,7 +197,8 @@ ToolTipSampleWidget::ToolTipSampleWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
-    mSaveFileButton(new QPushButton("Save to..."))
+    mSaveFileButton(new QPushButton("Save to...")),
+    mTruncateFile(false)
 {
   this->setObjectName("ToolTipSampleWidget");
   this->setWindowTitle("Tool Tip Sampling");
@@ -242,12 +256,16 @@ void ToolTipSampleWidget::hideEvent(QHideEvent* event)
 void ToolTipSampleWidget::saveFileSlot()
 {
   QString configPath = DataLocations::getRootConfigPath();
+  if(stateManager()->getPatientData()->isPatientValid())
+    configPath = stateManager()->getPatientData()->getActivePatientFolder();
 
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                              configPath+"/SampledPoints.txt",
                              tr("Text (*.txt)"));
   if(fileName.isEmpty())
     return;
+  else if(QFile::exists(fileName))
+    mTruncateFile = true;
 
   mSaveToFileNameLabel->setText(fileName);
 }
@@ -259,11 +277,16 @@ void ToolTipSampleWidget::sampleSlot()
   ssc::CoordinateSystem to = this->getSelectedCoordinateSystem();
   ssc::Vector3D toolPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to, false);
 
-  if(!samplingFile.open(QIODevice::WriteOnly | QIODevice::Append))
+  if(!samplingFile.open(QIODevice::WriteOnly | (mTruncateFile ? QIODevice::Truncate : QIODevice::Append)))
   {
     ssc::messageManager()->sendWarning("Could not open "+samplingFile.fileName());
     ssc::messageManager()->sendInfo("Sampled point: "+qstring_cast(toolPoint));
     return;
+  }
+  else
+  {
+    if(mTruncateFile)
+      mTruncateFile = false;
   }
 
   QString sampledPoint = qstring_cast(toolPoint);
@@ -359,7 +382,7 @@ ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 
 ssc::Vector3D ToolTipCalibrationCalculator::get_referencePoint_ref()
 {
-  return mRef->getReferencePoint();
+  return mRef->getReferencePoints()[1];
 }
 
 ssc::Transform3D ToolTipCalibrationCalculator::get_sMt_new()
