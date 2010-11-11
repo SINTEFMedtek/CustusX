@@ -18,6 +18,7 @@ namespace cx
  */
 class PlateRegistrationWidget : public WhatsThisWidget
 {
+  Q_OBJECT
 public:
   PlateRegistrationWidget(QWidget* parent);
   virtual ~PlateRegistrationWidget();
