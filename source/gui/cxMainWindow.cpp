@@ -41,6 +41,7 @@
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
+#include "cxPlateRegistrationWidget.h"
 #include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
@@ -710,10 +711,18 @@ void MainWindow::populateRegistrationMethodsWidget()
   //manual offset
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
 
+  //plate
+  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget("PlateRegistrationWidget", "Plate", mRegsitrationMethodsWidget);
+  ImageRegistrationWidget* platesImageRegistrationWidget = new ImageRegistrationWidget(imageAndPlateRegistrationWidget);
+  PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
+  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
+  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
+
   mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
   mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
   mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
   mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
+  mRegsitrationMethodsWidget->addTab(imageAndPlateRegistrationWidget, "Plate");
 }
 
 void MainWindow::populateSegmentationMethodsWidget()

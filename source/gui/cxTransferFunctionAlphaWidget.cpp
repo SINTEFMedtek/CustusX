@@ -154,7 +154,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)//TODO: replace with above line
 	{
 		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
-		y = log(static_cast<double*>(histogram->GetOutput()->GetScalarPointer())[i]+1) * barHeightMult;
+		y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1)) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
       painter.drawLine(x + mBorder, height() - mBorder, 

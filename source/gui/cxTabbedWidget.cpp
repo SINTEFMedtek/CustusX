@@ -153,4 +153,21 @@ QString Image2ImageRegistrationWidget::defaultWhatsThis() const
 }
 
 //------------------------------------------------------------------------------
+
+Image2PlateRegistrationWidget::Image2PlateRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent) :
+  TabbedWidget(objectName, windowTitle, parent)
+{
+  this->setWhatsThis(this->defaultWhatsThis());
+}
+
+QString Image2PlateRegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Image to plate registration.</h3>"
+      "<p>This is a method used to registrate one image to a specific aurora tool (a plastic plate with ct markers).</p>"
+      "<p><i>Choose a step to continue.</i></p>"
+      "</html>";
+}
+
+//------------------------------------------------------------------------------
 } //namespace cx
