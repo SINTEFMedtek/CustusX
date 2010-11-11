@@ -2,6 +2,7 @@
 #define SSCTOOL_H_
 
 #include <string>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
@@ -85,7 +86,8 @@ public:
 	
 	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
-	virtual ssc::Vector3D getReferencePoint() const = 0; ///< Get the optional reference point from this tool, will be 0,0,0 if it is not specified
+	virtual std::map<int, Vector3D> getReferencePoints() const = 0; ///< Get the optional reference points from this tool
+  virtual bool hasReferencePointWithId(int id){return false;};
 
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
