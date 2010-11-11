@@ -43,6 +43,7 @@ SET(cxProject_MOC_HDRS
   cxImageSegmentationAndCenterlineWidget.h
   cxWhatsThisWidget.h
   cxControlPanel.h
+  cxPlateRegistrationWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
