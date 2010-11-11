@@ -677,9 +677,18 @@ void Tool::setProbeSectorConfigurationString(QString configString)
   mProbeSectorConfiguration = configString;
 }
 
-ssc::Vector3D Tool::getReferencePoint() const
+std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
 {
-  return mInternalStructure.mReferencePoint;
+  return mInternalStructure.mReferencePoints;
+}
+
+bool Tool::hasReferencePointWithId(int id)
+{
+  bool retval = false;
+  if(!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000,0.000,0.000))))
+      retval = true;
+//  std::cout << "Reference point with id " << string_cast(id) << " has coords " << string_cast(this->getReferencePoints()[id]) << " returning "<< string_cast(retval)<<std::endl;
+  return retval;
 }
 
 void Tool::addXml(QDomNode& dataNode)
