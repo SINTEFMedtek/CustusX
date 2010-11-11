@@ -15,6 +15,8 @@ SET ( ${LIB}_algorithms
     vesselReg/HackTPSTransform.hxx
     itkBinaryThinningImageFilter3D.h
     itkBinaryThinningImageFilter3D.txx
+    sscImageAlgorithms.h
+    sscImageAlgorithms.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
