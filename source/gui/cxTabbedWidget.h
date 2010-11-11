@@ -89,5 +89,13 @@ public:
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
+class Image2PlateRegistrationWidget : public TabbedWidget
+{
+public:
+  Image2PlateRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent);
+  virtual ~Image2PlateRegistrationWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
 }
 #endif /* CXTABBEDWIDGET_H_ */
