@@ -13,10 +13,6 @@
 
 #include "sscTransform3D.h"
 
-//namespace ssc
-//{
-//  ImagePtr cropImage(ImagePtr image, Transform3D qMd, DoubleBoundingBox3D bb_q, Vector3D outputSpacing);
-//}
 
 namespace cx
 {

@@ -104,16 +104,6 @@ void ResampleWidget::hideEvent(QHideEvent* event)
 
 void ResampleWidget::resampleSlot()
 {
-//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-//  this->revertTransferFunctions();
-//
-//  ssc::ImagePtr input = mSelectedImage->getImage();
-//  if(!input)
-//    return;
-//  ssc::ImagePtr reference = mReferenceImage->getImage();
-//  if(!reference)
-//    return;
-
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   double margin = 20; //mm
 
@@ -121,12 +111,7 @@ void ResampleWidget::resampleSlot()
   if(!output)
     return;
   emit outputImageChanged(output->getUid());
-
-
-//  emit outputImageChanged(segmentedImage->getUid());
 }
-
-
 
 QWidget* ResampleWidget::createOptionsWidget()
 {
