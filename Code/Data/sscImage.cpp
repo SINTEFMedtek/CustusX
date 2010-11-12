@@ -284,76 +284,9 @@ void Image::removeLandmark(QString uid)
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
 }
-/** If index is found, it's treated as an edit operation, else
- * it's an add operation.
- * @param x
- * @param y
- * @param z
- * @param index
- */
-/*void Image::addLandmarkSlot(double x, double y, double z, unsigned int index)
-{
-	double addLandmark[4] = {x, y, z, (double)index};
-
-	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
-	//if index exists, we treat it as an edit operation
-	for(int i=0; i<= numberOfLandmarks-1; i++)
-	{
-		double* landmark = mLandmarks->GetTuple(i);
-		if(landmark[3] == index)
-		{
-			mLandmarks->SetTupleValue(i, addLandmark);
-			emit landmarkAdded(x, y, z, index);
-			return;
-		}
-	}
-	//else it's an add operation
-	mLandmarks->InsertNextTupleValue(addLandmark);
-	emit landmarkAdded(x, y, z, index);
-}*/
-/** If index is found that tuple(landmark) is removed from the array, else
- * it's just ignored.
- * @param x
- * @param y
- * @param z
- * @param index
- */
-/*void Image::removeLandmarkSlot(double x, double y, double z, unsigned int index)
-{
-	int numberOfLandmarks = mLandmarks->GetNumberOfTuples();
-	for(int i=0; i<= numberOfLandmarks-1; i++)
-	{
-		double* landmark = mLandmarks->GetTuple(i);
-		if(landmark[3] == index)
-		{
-			mLandmarks->RemoveTuple(i);
-			emit landmarkRemoved(x, y, z, index);
-		}
-	}
-}*/
-//
-//void Image::transferFunctionsChangedSlot()
-//{
-//	emit vtkImageDataChanged();
-//}
 void Image::printLandmarks()
 {
 	std::cout << "Landmarks: " << std::endl;
-	/*for(int i=0; i<= mLandmarks->GetNumberOfTuples()-1; i++)
-	{
-		double* landmark = mLandmarks->GetTuple(i);
-		QStringstream stream;
-		stream << i << ": (";
-		stream << landmark[0];
-		stream << ",";
-		stream << landmark[1];
-		stream << ",";
-		stream << landmark[2];
-		stream << ",";
-		stream << landmark[3];
-		stream << ")";
-		std::cout << stream.str() << std::endl;
-	}*/
 }
 DoubleBoundingBox3D Image::boundingBox() const
 {
@@ -413,23 +346,7 @@ void Image::addXml(QDomNode& dataNode)
   Data::addXml(dataNode);
   QDomNode imageNode = dataNode;
   QDomDocument doc = dataNode.ownerDocument();
-//  QDomElement imageNode = doc.createElement("image");
-//  parentNode.appendChild(imageNode);
 
-//  m_rMd_History->addXml(imageNode); //TODO: should be in the superclass
-
-//  QDomElement uidNode = doc.createElement("uid");
-//  uidNode.appendChild(doc.createTextNode(mUid.c_str()));
-//  imageNode.appendChild(uidNode);
-//
-//  QDomElement nameNode = doc.createElement("name");
-//  nameNode.appendChild(doc.createTextNode(mName.c_str()));
-//  imageNode.appendChild(nameNode);
-//
-//  QDomElement filePathNode = doc.createElement("filePath");
-//  filePathNode.appendChild(doc.createTextNode(mFilePath.c_str()));
-//  imageNode.appendChild(filePathNode);
-  
   QDomElement tf3DNode = doc.createElement("transferfunctions");
   mImageTransferFunctions3D->addXml(tf3DNode);
   imageNode.appendChild(tf3DNode);
@@ -441,27 +358,6 @@ void Image::addXml(QDomNode& dataNode)
   QDomElement shadingNode = doc.createElement("shading");
   mShading.addXml(shadingNode);
   imageNode.appendChild(shadingNode);
-
-//
-//  shadingNode.appendChild(doc.createTextNode(qstring_cast(mShading.on)));
-//  imageNode.appendChild(shadingNode);
-//  //std::cout << "created shading" << std::endl;
-//
-//  QDomElement shadingAmbientNode = doc.createElement("shadingAmbient");
-//  shadingAmbientNode.appendChild(doc.createTextNode(qstring_cast(mShading.ambient)));
-//  imageNode.appendChild(shadingAmbientNode);
-//
-//  QDomElement shadingDiffuseNode = doc.createElement("shadingDiffuse");
-//  shadingDiffuseNode.appendChild(doc.createTextNode(qstring_cast(mShading.diffuse)));
-//  imageNode.appendChild(shadingDiffuseNode);
-//
-//  QDomElement shadingSpecularNode = doc.createElement("shadingSpecular");
-//  shadingSpecularNode.appendChild(doc.createTextNode(qstring_cast(mShading.specular)));
-//  imageNode.appendChild(shadingSpecularNode);
-//
-//  QDomElement shadingSpecularPowerNode = doc.createElement("shadingSpecularPower");
-//  shadingSpecularPowerNode.appendChild(doc.createTextNode(qstring_cast(mShading.specularPower)));
-//  imageNode.appendChild(shadingSpecularPowerNode);
 
   QDomElement landmarksNode = doc.createElement("landmarks");
   LandmarkMap::iterator it = mLandmarks.begin();
@@ -683,6 +579,9 @@ void Image::clearClipPlanes()
  *
  * This operation is needed because ssc::Image dont support vtkImageData
  * with a nonzero origin or nonzero extent. These must be removed during creation.
+ *
+ * Use this method only when you, by using some vtk algorithm, have created a vtkImageData
+ * that in nonconform with the ssc::Image spec.
  */
 void Image::mergevtkSettingsIntosscTransform()
 {
@@ -715,82 +614,6 @@ void Image::mergevtkSettingsIntosscTransform()
   emit transferFunctionsChanged();
   emit clipPlanesChanged();
   emit cropBoxChanged();
-}
-
-ImagePtr Image::resample(const Vector3D spacing)
-{
-  std::cout << "oldspacing: " << ssc::Vector3D(this->getBaseVtkImageData()->GetSpacing()) << std::endl;
-  std::cout << "spacing: " << spacing << std::endl;
-  vtkImageResamplePtr resampler = vtkImageResamplePtr::New();
-  resampler->SetInput(this->getBaseVtkImageData());
-  resampler->SetAxisOutputSpacing(0, spacing[0]);
-  resampler->SetAxisOutputSpacing(1, spacing[1]);
-  resampler->SetAxisOutputSpacing(2, spacing[2]);
-  vtkImageDataPtr rawResult = resampler->GetOutput();
-
-  rawResult->Update();
-
-  QString uid = ssc::changeExtension(this->getUid(), "") + "_resampled%1";
-  QString name = this->getName()+" _resampled %1";
-  ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
-  retval->get_rMd_History()->setRegistration(this->get_rMd());
-  retval->resetTransferFunction(this->getTransferFunctions3D()->createCopy(), this->getLookupTable2D()->createCopy());
-
-  ssc::dataManager()->loadData(retval);
-  //ssc::dataManager()->saveImage(retval, outputBasePath);
-  return retval;
-}
-
-ImagePtr Image::CropAndClipImage(QString outputBasePath)
-{
-//  std::cout << "PRE CROP" << std::endl;
-//  std::cout << "rMd\n" << this->get_rMd() << std::endl;
-  this->getBaseVtkImageData()->Update();
-  this->getBaseVtkImageData()->UpdateInformation();
-//  this->getBaseVtkImageData()->Print(std::cout);
-
-  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
-
-  QString uid = changeExtension(this->getUid(), "") + "_clip%1";
-  QString name = this->getName()+" clipped %1";
-  ImagePtr result = dataManager()->createImage(rawResult,uid, name);
-  result->get_rMd_History()->setRegistration(this->get_rMd());
-  result->mergevtkSettingsIntosscTransform();
-  result->resetTransferFunction(this->getTransferFunctions3D()->createCopy(), this->getLookupTable2D()->createCopy());
-  messageManager()->sendInfo("Created volume " + result->getName());
-
-  result->setParentFrame(this->getUid());
-  dataManager()->loadData(result);
-  dataManager()->saveImage(result, outputBasePath);
-
-//  std::cout << "CROPPED" << std::endl;
-//  std::cout << "rMd\n" << result->get_rMd() << std::endl;
-//  result->getBaseVtkImageData()->Print(std::cout);
-
-  return result;
-}
-
-vtkImageDataPtr Image::CropAndClipImageTovtkImageData()
-{
-  vtkImageClipPtr clip = vtkImageClipPtr::New();
-  DoubleBoundingBox3D bb = this->getCroppingBox();
-  clip->SetInput(this->getBaseVtkImageData());
-
-  double* sp = this->getBaseVtkImageData()->GetSpacing();
-
-  clip->SetOutputWholeExtent(
-      static_cast<int>(bb[0]/sp[0]+0.5), static_cast<int>(bb[1]/sp[1]+0.5),
-      static_cast<int>(bb[2]/sp[1]+0.5), static_cast<int>(bb[3]/sp[1]+0.5),
-      static_cast<int>(bb[4]/sp[2]+0.5), static_cast<int>(bb[5]/sp[2]+0.5));
-
-  clip->ClipDataOn();
-  vtkImageDataPtr retVal = clip->GetOutput();
-
-  retVal->Update();
-  retVal->UpdateInformation();
-  retVal->ComputeBounds();
-
-  return retVal;
 }
 
 } // namespace ssc
