@@ -36,5 +36,32 @@ void FastImageRegistrationWidget::performRegistration()
 
   this->updateAvarageAccuracyLabel();
 }
+//------------------------------------------------------------------------------
+PlateImageRegistrationWidget::PlateImageRegistrationWidget(QWidget* parent) :
+    FastImageRegistrationWidget(parent)
+{
+  this->setObjectName("FastImageRegistrationWidget");
+  this->setWindowTitle("Fast Image Registration");
+}
+
+PlateImageRegistrationWidget::~PlateImageRegistrationWidget()
+{}
+
+QString PlateImageRegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Image registration.</h3>"
+      "<p>Select landmarks in the data set that you want to use for performing plate registration.</p>"
+      "<p><i>Click in the dataset and push the add or resample button.</i></p>"
+      "</html>";
+}
+
+void PlateImageRegistrationWidget::performRegistration()
+{
+  FastImageRegistrationWidget::performRegistration();
+  registrationManager()->doFastRegistration_Translation();
+  ssc::messageManager()->sendDebug("Fast translation registration requested.");
+}
+//------------------------------------------------------------------------------
 
 }//namespace cx

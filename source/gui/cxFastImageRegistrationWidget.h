@@ -25,5 +25,16 @@ protected:
   virtual void performRegistration();
 };
 
+class PlateImageRegistrationWidget : public FastImageRegistrationWidget
+{
+public:
+  PlateImageRegistrationWidget(QWidget* parent);
+ virtual ~PlateImageRegistrationWidget();
+ virtual QString defaultWhatsThis() const;
+
+protected:
+  virtual void performRegistration();
+};
+
 }//namespace cx
 #endif /* CXFASTIMAGEREGISTRATIONWIDGET_H_ */
