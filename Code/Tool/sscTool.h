@@ -1,4 +1,4 @@
-	#ifndef SSCTOOL_H_
+#ifndef SSCTOOL_H_
 #define SSCTOOL_H_
 
 #include <string>
@@ -9,8 +9,6 @@
 #include "sscTransform3D.h"
 #include "sscProbeSector.h"
 #include "sscIndent.h"
-
-  typedef ssc::utils::Transform3D Transform3D;
 
 namespace ssc
 {
@@ -31,7 +29,7 @@ public:
 	Tool() :
 		mUid(""),
 		mName("")
-	{};
+	{}
 	 Tool(const QString& uid, const QString& name ="") :
 	    mUid(uid),
 	    mName(name)
@@ -39,7 +37,7 @@ public:
 	   if(name.isEmpty())
 	     mName = uid;
 	  };
-	~Tool(){};
+	~Tool(){}
 
 	/**Enumerates the general type of tool.
 	 */
@@ -78,7 +76,7 @@ public:
 
 	virtual bool isCalibrated() const = 0; ///< a tool may not be calibrated, then no tracking i allowed
 	virtual Transform3D getCalibration_sMt() const = 0; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
-	virtual void setCalibration_sMt(ssc::Transform3D calibration){}; ///< requests to use the calibration and replaces the tools calibration file
+	virtual void setCalibration_sMt(ssc::Transform3D calibration){} ///< requests to use the calibration and replaces the tools calibration file
 	
 	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe.
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
@@ -86,8 +84,8 @@ public:
 	
 	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
-	virtual std::map<int, Vector3D> getReferencePoints() const = 0; ///< Get the optional reference points from this tool
-  virtual bool hasReferencePointWithId(int id){return false;};
+	virtual std::map<int, Vector3D> getReferencePoints() { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
+	virtual bool hasReferencePointWithId(int id){return false;}
 
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);

@@ -428,3 +428,4 @@ else(APPLE)
 endif(APPLE)
 # =========================================================
 
+SET_TARGET_PROPERTIES( SSC PROPERTIES COMPILE_FLAGS "-g" )
