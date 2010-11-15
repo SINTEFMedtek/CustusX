@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 #----------
 find_package( Boost REQUIRED )
 
+
 # VTK
 #----------
 FIND_PACKAGE(VTK REQUIRED)
@@ -35,6 +36,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxImageServer.h
     cxImageSession.h
 )
+
+include_directories(${Boost_INCLUDE_DIRS})
 
 SET ( cxOpenIGTLinkServer_FILES
     cxImageServer.h
