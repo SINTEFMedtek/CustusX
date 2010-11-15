@@ -114,25 +114,18 @@ namespace ssc
 {
 
 IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
-  QThread(parent), mHeadingReceived(false), mStopped(false), mAddress(address), mPort(port)
+  QThread(parent), mHeadingReceived(false), mAddress(address), mPort(port)
 {
-  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
-}
-
-void IGTLinkClient::stop()
-{
-  mStopped = true;
-  std::cout << "stop " << mStopped << std::endl;
+//  std::cout << "client::create thread: " << QThread::currentThread() << std::endl;
 }
 
 void IGTLinkClient::run()
 {
-  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
-  std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
+ // std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
+  //std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
 
   //------------------------------------------------------------
   // Establish Connection
-//  mSocket = igtl::ClientSocket::New();
   mSocket = new QTcpSocket();
   connect(mSocket, SIGNAL(readyRead()), this, SLOT(readyReadSlot()), Qt::DirectConnection);
   connect(mSocket, SIGNAL(hostFound()), this, SLOT(hostFoundSlot()), Qt::DirectConnection);
@@ -148,37 +141,17 @@ void IGTLinkClient::run()
   {
     std::cout << "Timeout looking for host " << this->hostDescription() << std::endl;
     mSocket->disconnectFromHost();
-    this->stop();
     return;
   }
 
-  //------------------------------------------------------------
   // Create a message buffer to receive header
   mHeaderMsg = igtl::MessageHeader::New();
 
-
-//  while (!mStopped)
-//  {
-//    tick();
-//    QThread::msleep(20);
-//  }
-//
-//  // start a timer for ticks
-//  QTimer* timer = new QTimer;
-//  std::cout << "client::timer thread: " << timer->thread() << std::endl;
-//  connect(timer, SIGNAL(timeout()), this, SLOT(tick()));
-//  timer->start(200); // ms
-//
   // run event loop
   this->exec();
-//
-//  timer->stop();
-//  delete timer;
-  //------------------------------------------------------------
-  // Close connection
-//  mSocket->CloseSocket();
+
   mSocket->disconnectFromHost();
-  std::cout << "finished openIGTLink client thread" << std::endl;
+  //std::cout << "finished openIGTLink client thread" << std::endl;
   delete mSocket;
 }
 

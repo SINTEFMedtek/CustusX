@@ -29,14 +29,6 @@ ImageServer::~ImageServer()
 {
 }
 
-//ImageServer::connectionClosed()
-//{
-//  QThread* thread = dynamic_cast<QThread*>(sender());
-//  if (!thread)
-//    return;
-//  delete thread;
-//}
-
 void ImageServer::incomingConnection(int socketDescriptor)
 {
   std::cout << "Server: Incoming connection..." << std::endl;

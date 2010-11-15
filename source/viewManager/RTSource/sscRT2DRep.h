@@ -55,6 +55,7 @@ private:
   void setLookupTable();
   void setCamera();
   void setup();
+  vtkPolyDataPtr createTestPolyData();
 
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
@@ -66,6 +67,8 @@ private:
   vtkTexturePtr mTexture;
   vtkRendererPtr mRenderer;
   View* mView;
+
+  vtkPolyDataPtr mTestPoly;
 
   vtkImageThresholdPtr mMapZeroToOne;
   vtkImageDataPtr mUSMaskData;
