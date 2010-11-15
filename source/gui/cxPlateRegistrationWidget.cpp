@@ -5,6 +5,8 @@
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
+#include "cxRegistrationManager.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
@@ -39,6 +41,29 @@ QString PlateRegistrationWidget::defaultWhatsThis() const
       "<p>Internally register the reference plates reference points as landmarks.</p>"
       "<p><i>Click the button to load landmarks.</i></p>"
       "</html>";
+}
+
+void PlateRegistrationWidget::showEvent(QShowEvent* event)
+{
+  WhatsThisWidget::showEvent(event);
+  connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+
+  viewManager()->setRegistrationMode(ssc::rsPATIENT_REGISTRATED);
+}
+
+void PlateRegistrationWidget::hideEvent(QHideEvent* event)
+{
+  WhatsThisWidget::hideEvent(event);
+  disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
+  disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
+
+  viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
+}
+
+void PlateRegistrationWidget::landmarkUpdatedSlot()
+{
+  registrationManager()->doFastRegistration_Translation();
 }
 
 void PlateRegistrationWidget::plateRegistrationSlot()
