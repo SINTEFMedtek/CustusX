@@ -369,8 +369,9 @@ void ViewWrapper3D::toolsAvailableSlot()
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     ssc::ToolPtr tool = iter->second;
-    if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
-      continue;
+    //experiment with showing toolrep for reference tools
+//    if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
+//      continue;
 
     QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
     if (!mToolReps.count(uid))
