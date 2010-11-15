@@ -15,7 +15,6 @@
 #include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "cxToolManager.h"
-#include "cxLandmarkRep.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewManager.h"
 #include "cxCameraControl.h"
