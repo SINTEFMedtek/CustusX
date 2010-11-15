@@ -41,6 +41,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
+    Data/sscRealTimeStreamSource.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -248,6 +249,8 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
+    Tool/sscProbeData.h 
+    Tool/sscProbeData.cpp 
     Widgets/sscDoubleRange.h
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h

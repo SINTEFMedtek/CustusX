@@ -18,10 +18,11 @@
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 #include "sscBoundingBox3D.h"
-#include "sscUSProbeSector.h"
 
 namespace ssc
 {
+class ProbeSector;
+
 /**
  *This class will hold all the representation and drawing of 2d tool
  *in navigation and registration.
@@ -88,7 +89,7 @@ class ToolRep2D : public ssc::RepImpl
 		TextDisplayPtr distanceText;
 
 	  //US Probe sector
-	  USProbeSectorPtr mProbeSector;
+		ProbeDataPtr mProbeSector;
 	  vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	  vtkActorPtr mProbeSectorActor;
 };

@@ -43,7 +43,7 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 {
 	QDateTime time;
 	double timestamp = (double) time.time().msec();
-//  std::cout << "manual tool set " << prMt << std::endl;
+  //std::cout << "manual tool set " << prMt << std::endl;
 
 	QMutexLocker locker(&mMutex);
 	m_prMt = prMt;
@@ -118,7 +118,7 @@ bool ManualTool::isCalibrated() const
 
 ssc::ProbeSector ManualTool::getProbeSector() const
 {
-	return ssc::ProbeSector();
+	return ssc::ProbeSector(ssc::ProbeSector::tSECTOR, 0, 350, M_PI_2);
 }
 
 double ManualTool::getTimestamp() const

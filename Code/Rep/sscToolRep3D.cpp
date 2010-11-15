@@ -11,6 +11,8 @@
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscView.h"
+#include "sscUSProbeSector.h"
+
 #include "sscTypeConversions.h"
 
 namespace ssc
@@ -30,7 +32,7 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	mOffsetLine.reset(new GraphicalLine3D());
 	mTooltipPoint.reset(new GraphicalPoint3D());
 
-	mProbeSector.reset(new USProbeSector(true));
+	mProbeSector.reset(new ProbeData());
 	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProbeSectorActor = vtkActorPtr::New();
 
@@ -179,16 +181,21 @@ void ToolRep3D::update()
     prMt = mTool->get_prMt();
   }
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-  mProbeSector->setPosition(rMpr*prMt);
+//  mProbeSector->setPosition(rMpr*prMt);
 
   if (this->showProbe())
   {
+//    mProbeData = ProbeData(mTool->getProbeSector());
+
+//    mProbeSector->setSector(mTool->getProbeSector());
     mProbeSector->setSector(mTool->getProbeSector());
-    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
+
+    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSector());
     if (mProbeSectorPolyDataMapper->GetInput())
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
+    mProbeSectorActor->SetUserMatrix((rMpr*prMt).matrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
   }
   else
@@ -279,6 +286,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-  return mTool && mTool->getType()==ssc::Tool::TOOL_US_PROBE;
+//  return mTool && mTool->getType()==ssc::Tool::TOOL_US_PROBE;
+  return mTool;;
 }
 } // namespace ssc

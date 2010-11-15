@@ -3,7 +3,6 @@
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
-#include "sscUSProbeSector.h"
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
@@ -67,7 +66,8 @@ private:
 	bool mOffsetPointVisibleAtZeroOffset;
 
 	//US Probe sector
-	USProbeSectorPtr mProbeSector;
+	ProbeDataPtr mProbeSector;
+	//USProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
 };

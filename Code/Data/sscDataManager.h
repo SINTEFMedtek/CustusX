@@ -19,6 +19,7 @@ namespace ssc
 typedef boost::shared_ptr<class Image> ImagePtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class Data> DataPtr;
+typedef boost::shared_ptr<class RealTimeStreamSource> RealTimeStreamSourcePtr;
 
 //-----
 enum READER_TYPE
@@ -51,9 +52,15 @@ public:
   typedef std::map<QString, DataPtr> DataMap;
 	typedef std::map<QString, ImagePtr> ImagesMap;
 	typedef std::map<QString, MeshPtr> MeshMap;
+  typedef std::map<QString, RealTimeStreamSourcePtr> StreamMap;
 
 	static DataManager* getInstance();
   static void shutdown();
+
+  // streams
+  virtual RealTimeStreamSourcePtr getStream(const QString& uid) const { return RealTimeStreamSourcePtr(); }
+  virtual StreamMap getStreams() const { return StreamMap(); }
+  virtual void loadStream(RealTimeStreamSourcePtr stream) {}
 
 	// images
 	virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE type) = 0;

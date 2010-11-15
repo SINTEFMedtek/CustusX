@@ -16,12 +16,13 @@
 #include <vtkTextProperty.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyData.h>
-
+#include <vtkMatrix4x4.h>
 #include "sscSliceProxy.h"
 #include "sscToolManager.h"
 #include "sscView.h"
 #include "sscVtkHelperClasses.h"
 #include "sscMessageManager.h"
+#include "sscUSProbeSector.h"
 
 namespace ssc
 {
@@ -36,7 +37,7 @@ ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
 	mUseOffsetText = false;
 	mMergeOffsetAndToolLine = false;
 
-  mProbeSector.reset(new USProbeSector(false));
+  mProbeSector.reset(new ProbeData());
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 }
@@ -187,17 +188,25 @@ void ToolRep2D::update()
 	}
 	Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D sMr = mSlicer->get_sMr();
-	Transform3D vpMt = m_vpMs*sMr*rMpr*prMt;
-	
-  mProbeSector->setPosition(sMr*rMpr*prMt);
-  if (this->showProbe())
+	Transform3D sMt = sMr*rMpr*prMt;
+	Transform3D vpMt = m_vpMs*sMt;
+
+	// only show probe if aligned with the slice plane:
+	double dotted = dot(Vector3D(0,0,1),sMt.vector(Vector3D(1,0,0)));
+  bool aligned = similar(fabs(dotted), 1.0, 0.1);
+
+  //mProbeSector->setPosition(sMr*rMpr*prMt);
+  if (this->showProbe() && aligned)
   {
+    Transform3D T = createTransformTranslate(Vector3D(0, 0, 0.1));
+
     mProbeSector->setSector(mSlicer->getTool()->getProbeSector());
-    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getPolyData());
+    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSector());
     if (mProbeSectorPolyDataMapper->GetInput())
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
+    mProbeSectorActor->SetUserMatrix((T*sMt).matrix());
     mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
   }
   else
@@ -216,7 +225,7 @@ void ToolRep2D::update()
 
 bool ToolRep2D::showProbe()
 {
-	return mSlicer->getTool() && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
+	return mSlicer->getTool();// && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
 }
 bool ToolRep2D::showOffset()
 {
