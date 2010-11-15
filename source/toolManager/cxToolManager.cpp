@@ -294,6 +294,16 @@ void ToolManager::removeLandmark(QString uid)
   emit landmarkRemoved(uid);
 }
 
+void ToolManager::removeLandmarks()
+{
+  ssc::LandmarkMap landmarks = ssc::toolManager()->getLandmarks();
+  ssc::LandmarkMap::iterator it = landmarks.begin();
+  for(;it != landmarks.end(); ++it)
+  {
+    ssc::toolManager()->removeLandmark(it->first);
+  }
+}
+
 TrackerPtr ToolManager::getTracker()
 {
   return mTracker;
