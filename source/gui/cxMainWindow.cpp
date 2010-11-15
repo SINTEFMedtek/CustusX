@@ -713,7 +713,7 @@ void MainWindow::populateRegistrationMethodsWidget()
 
   //plate
   Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget("PlateRegistrationWidget", "Plate", mRegsitrationMethodsWidget);
-  ImageRegistrationWidget* platesImageRegistrationWidget = new ImageRegistrationWidget(imageAndPlateRegistrationWidget);
+  PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
   PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
   imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
