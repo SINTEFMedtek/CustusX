@@ -26,6 +26,9 @@ public:
   virtual QString defaultWhatsThis() const;
 
 private slots:
+  virtual void showEvent(QShowEvent* event);
+  virtual void hideEvent(QHideEvent* event);
+  void landmarkUpdatedSlot();
   void plateRegistrationSlot();
   void referenceToolInfoSlot();
 
