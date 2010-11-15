@@ -9,8 +9,10 @@
 #define SSCRT2DREP_H_
 
 #include "sscRepImpl.h"
-#include "sscRealTimeSource.h"
+#include "sscRealTimeStreamSource.h"
 #include "sscVtkHelperClasses.h"
+#include "sscForwardDeclarations.h"
+#include "sscProbeData.h"
 
 typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;
 typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
@@ -35,17 +37,25 @@ public:
   virtual ~RealTimeStream2DRep();
   virtual QString getType() const { return "ssc::RealTimeStream2DRep"; }
   void setRealtimeStream(RealTimeStreamSourcePtr data);
+  void setTool(ToolPtr tool);
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 private slots:
   void newDataSlot();
+
+  void receiveTransforms(Transform3D matrix, double timestamp);
+  void receiveVisible(bool visible);
+
 private:
-  void setMask();
+//  void setMask();
   void initializeSize(int imageWidth, int imageHeight);
   void setLookupTable();
   void setCamera();
- void setup();
+  void setup();
+
+  ToolPtr mTool;
+  ssc::ProbeData mProbeData;
   RealTimeStreamSourcePtr mData;
   ssc::TextDisplayPtr mStatusText;
   ssc::TextDisplayPtr mInfoText;
@@ -58,7 +68,7 @@ private:
   vtkImageThresholdPtr mMapZeroToOne;
   vtkImageDataPtr mUSMaskData;
   vtkImageMaskPtr mMaskFilter;
-
+  bool mOverrideCamera;
 };
 
 

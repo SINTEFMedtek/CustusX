@@ -44,10 +44,7 @@ SET(cxProject_MOC_HDRS
   cxWhatsThisWidget.h
   cxControlPanel.h
   cxIGTLinkWidget.h
-  RTSource/sscOpenIGTLinkClient.h
-  RTSource/sscOpenIGTLinkRTSource.h
-  RTSource/sscRealTimeSource.h
-  RTSource/sscRT2DRep.h
+
 
 )
 
@@ -145,13 +142,6 @@ SET(${LIBNAME}_SRCS
     cxSegmentationWidget.h
     cxIGTLinkWidget.h
     cxIGTLinkWidget.cpp
-    RTSource/sscOpenIGTLinkClient.h
-    RTSource/sscOpenIGTLinkClient.cpp
-    RTSource/sscOpenIGTLinkRTSource.h
-    RTSource/sscOpenIGTLinkRTSource.cpp
-    RTSource/sscRealTimeSource.h
-    RTSource/sscRT2DRep.h
-    RTSource/sscRT2DRep.cpp
     cxToolTipCalibrationWidget.h
     cxToolTipCalibrationWidget.cpp
     cxControlPanel.h
@@ -169,5 +159,5 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager dataManager OpenIGTLink)
+target_link_libraries(${LIBNAME} viewManager registrationManager sscUsReconstructionLib statemachineManager dataManager)
 
