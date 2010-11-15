@@ -38,6 +38,8 @@ public:
   virtual QString getType() const { return "ssc::RealTimeStream2DRep"; }
   void setRealtimeStream(RealTimeStreamSourcePtr data);
   void setTool(ToolPtr tool);
+  void setLockCameraToStream(bool on);
+
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);

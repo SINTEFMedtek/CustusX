@@ -64,6 +64,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 
   ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(mRTSource);
+  rtRep->setLockCameraToStream(true);
   mView->addRep(rtRep);
 
   mRenderLabel = new QLabel("-");

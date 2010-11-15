@@ -88,6 +88,11 @@ RealTimeStream2DRep::~RealTimeStream2DRep()
 {
 }
 
+void RealTimeStream2DRep::setLockCameraToStream(bool on)
+{
+  mOverrideCamera = on;
+}
+
 void RealTimeStream2DRep::setTool(ToolPtr tool)
 {
   if (tool==mTool)
