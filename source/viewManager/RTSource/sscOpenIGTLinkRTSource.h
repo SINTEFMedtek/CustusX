@@ -8,7 +8,7 @@
 #ifndef SSCOPENIGTLINKRTSOURCE_H_
 #define SSCOPENIGTLINKRTSOURCE_H_
 
-#include "sscRealTimeSource.h"
+#include "sscRealTimeStreamSource.h"
 #include <boost/array.hpp>
 #include "igtlImageMessage.h"
 #include <vector>
@@ -31,6 +31,8 @@ class OpenIGTLinkRTSource : public RealTimeStreamSource
 public:
   OpenIGTLinkRTSource();
   virtual ~OpenIGTLinkRTSource();
+  virtual QString getUid() { return "us_openigtlink_source"; }
+  virtual QString getName() { return "US RT Stream over OpenIGTLink"; }
   virtual vtkImageDataPtr getVtkImageData();
   virtual QDateTime getTimestamp();
   virtual bool connected() const;
