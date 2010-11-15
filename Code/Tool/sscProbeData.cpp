@@ -48,11 +48,12 @@ ProbeData::ProbeData() : mType(tNONE)
   // testdata:
   mType = tSECTOR;
   mDepthStart = 0;
-  mDepthEnd = 350;
+//  mDepthEnd = 350;
+  mDepthEnd = 200;
   mWidth = M_PI/2;
 //  mSpacing = Vector3D(0.928,0.928,1);
-//  mSpacing = Vector3D(0.2,0.2,0);
   mSpacing = Vector3D(1,1,1); // using this spacing gives correct image - investigate!
+  mSpacing = Vector3D(0.5,0.5,0);
   mSize = QSize(512,512);
 
   //mOrigin_u = multiply_elems(Vector3D(mSize.width()/2, mSize.height()*0.75, 0), mSpacing);

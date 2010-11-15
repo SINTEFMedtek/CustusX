@@ -118,7 +118,8 @@ bool ManualTool::isCalibrated() const
 
 ssc::ProbeSector ManualTool::getProbeSector() const
 {
-	return ssc::ProbeSector(ssc::ProbeSector::tSECTOR, 0, 350, M_PI_2);
+	//return ssc::ProbeSector(ssc::ProbeSector::tSECTOR, 0, 350, M_PI_2);
+  return ssc::ProbeSector(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);
 }
 
 double ManualTool::getTimestamp() const
