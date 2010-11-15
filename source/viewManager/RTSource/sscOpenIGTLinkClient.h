@@ -19,7 +19,6 @@ class IGTLinkClient : public QThread
   Q_OBJECT
 public:
   IGTLinkClient(QString address, int port, QObject* parent = NULL);
-  void stop(); // do not use
   igtl::ImageMessage::Pointer getLastImageMessage(); // threadsafe
   QString hostDescription() const; // threadsafe
 
@@ -43,7 +42,6 @@ private:
   void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
 
   bool mHeadingReceived;
-  bool mStopped;
   QString mAddress;
   int mPort;
   QTcpSocket* mSocket;
