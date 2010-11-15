@@ -21,6 +21,8 @@
 #include <vtkLookupTable.h>
 #include <vtkImageThreshold.h>
 #include <vtkFloatArray.h>
+#include <vtkTextureMapToPlane.h>
+#include <vtkCellArray.h>
 
 #include "sscBoundingBox3D.h"
 #include "sscToolManager.h"
@@ -49,15 +51,20 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mMapZeroToOne->SetReplaceIn(true);
 
   mUSMaskData = mProbeData.getMask();
-  mUSMaskData->Print(std::cout);
+//  mUSMaskData->Print(std::cout);
 
   // set the filter that applies a mask to the stream data
   mMaskFilter = vtkImageMaskPtr::New();
   mMaskFilter->SetMaskInput(mUSMaskData);
   mMaskFilter->SetMaskedOutputValue(0.0);
 
+  mTestPoly = this->createTestPolyData();
+
   vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
   tMapper->SetInput(mPlaneSource->GetOutput());
+//  tMapper->SetOrigin(0,0,0);
+//  tMapper->SetPoint1(255,0,0);
+//  tMapper->SetPoint2(0,255,0);
 
   vtkTransformTextureCoordsPtr transform = vtkTransformTextureCoordsPtr::New();
   transform->SetInput(tMapper->GetOutput() );
@@ -67,6 +74,7 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
 
   vtkDataSetMapperPtr mapper2 = vtkDataSetMapperPtr::New();
   mapper2->SetInput(transform->GetOutput() );
+//  mapper2->SetInput(mTestPoly );
   mapper2->Update();
 
   mPlaneActor->SetTexture(mTexture);
@@ -163,7 +171,7 @@ void RealTimeStream2DRep::setLookupTable()
 
 void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
 {
-  std::cout << "RealTimeStream2DRep::setRealtimeStream()" << std::endl;
+//  std::cout << "RealTimeStream2DRep::setRealtimeStream()" << std::endl;
 
   if (mData)
   {
@@ -254,43 +262,99 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
   if (ssc::similar(extent.range()[0], 0.0) || ssc::similar(extent.range()[1], 0.0))
     return;
 
-  mPlaneSource->SetOrigin(extent.corner(0,0,0).begin());
-  mPlaneSource->SetPoint1(extent.corner(1,0,0).begin());
-  mPlaneSource->SetPoint2(extent.corner(0,1,0).begin());
+  DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
+
+  //std::cout << "bounds " << bounds << std::endl;
+  mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
+  mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
+  mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
 //  std::cout << "extent " << extent << std::endl;
 //  mPlaneSource->Print(std::cout);
 
-//  int numPts = 3;
-//  vtkFloatArray* newTCoords = vtkFloatArray::New();
-//  newTCoords->SetNumberOfComponents(2);
-//  newTCoords->Allocate(2*numPts);
+//  vtkTextureMapToPlane* texMapper = vtkTextureMapToPlane::New();
+//  texMapper->SetOrigin(0,0);
+//  texMapper->SetPoint1(1,0);
+//  texMapper->SetPoint2(0,1);
 //
-//  float tc[2];
+//  texMapper->SetInput(mPlaneSource);
+
+  int numPts = 4;
+  vtkFloatArray* newTCoords = vtkFloatArray::New();
+  newTCoords->SetNumberOfComponents(2);
+  newTCoords->Allocate(2*numPts);
+
+  float tc[2];
+  tc[0] = 0;
+  tc[1] = 0;
+  newTCoords->InsertTuple(0,tc);
+  tc[0] = 1;
+  tc[1] = 0;
+  newTCoords->InsertTuple(1,tc);
+  tc[0] = 1;
+  tc[1] = 1;
+  newTCoords->InsertTuple(2,tc);
+  tc[0] = 0;
+  tc[1] = 1;
+  newTCoords->InsertTuple(3,tc);
 //  tc[0] = 0;
 //  tc[1] = 0;
-//  newTCoords->InsertTuple(0,tc);
-//  tc[0] = 1;
-//  tc[1] = 1;
-//  newTCoords->InsertTuple(1,tc);
-//  tc[0] = 0;
-//  tc[1] = 1;
-//  newTCoords->InsertTuple(2,tc);
-////  tc[0] = 0;
-////  tc[1] = 0;
-////  newTCoords->InsertTuple(3,tc);
-////  tc[0] = 0;
-////  tc[1] = 0;
-////  newTCoords->InsertTuple(4,tc);
-//  newTCoords->SetName("TextureCoordinates");
-//
-//  mPlaneSource->GetOutput()->GetPointData()->SetTCoords(newTCoords);
-//  mPlaneSource->GetOutput()->GetPointData()->Modified();
-//  mPlaneSource->GetOutput()->Modified();
+//  newTCoords->InsertTuple(4,tc);
+  newTCoords->SetName("TextureCoordinates");
 
-  //std::cout << "RealTimeStream2DRep::initializeSize end" << std::endl;
-  //mPlaneSource->GetOutput()->GetPointData()->Print(std::cout);
+  mPlaneSource->GetOutput()->GetPointData()->SetTCoords(newTCoords);
+  mPlaneSource->GetOutput()->GetPointData()->Modified();
+  mPlaneSource->GetOutput()->Modified();
+//
+//  std::cout << "RealTimeStream2DRep::initializeSize end" << std::endl;
+//  mPlaneSource->GetOutput()->GetPointData()->Print(std::cout);
 }
 
+vtkPolyDataPtr RealTimeStream2DRep::createTestPolyData()
+{
+  vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+
+  vtkPointsPtr points = vtkPointsPtr::New();
+  double W=255;
+  points->InsertNextPoint(0, 0, 0);
+  points->InsertNextPoint(W, 0, 0);
+  points->InsertNextPoint(W, W, 0);
+  points->InsertNextPoint(0, W, 0);
+//  points->InsertNextPoint(W/2, W,  0);
+//  points->InsertNextPoint(W,   W/2,0);
+//  points->InsertNextPoint(W/2, 0,  0);
+//  points->InsertNextPoint(0, W/2,  0);
+
+
+  vtkCellArrayPtr newPolys = vtkCellArrayPtr::New();
+  newPolys->Allocate(newPolys->EstimateSize(4,4));
+
+  vtkCellArrayPtr strips = vtkCellArrayPtr::New();
+  strips->InsertCellPoint(0);
+  strips->InsertCellPoint(1);
+  strips->InsertCellPoint(2);
+  strips->InsertCellPoint(3);
+  strips->InsertCellPoint(0);
+
+  vtkFloatArrayPtr newTCoords = vtkFloatArrayPtr::New();
+  newTCoords->SetNumberOfComponents(2);
+//  newTCoords->InsertNextTuple2(0.5, 1);
+//  newTCoords->InsertNextTuple2(1,   0.5);
+//  newTCoords->InsertNextTuple2(0.5, 0);
+//  newTCoords->InsertNextTuple2(0,   0.5);
+  newTCoords->InsertNextTuple2(0, 0);
+  newTCoords->InsertNextTuple2(1, 0);
+  newTCoords->InsertNextTuple2(1, 1);
+  newTCoords->InsertNextTuple2(0, 1);
+
+  retval->SetPoints(points);
+  retval->SetStrips(strips);
+  retval->SetPolys(newPolys);
+  retval->GetPointData()->SetTCoords(newTCoords);
+
+  retval->Update();
+//  retval->Print(std::cout);
+  return retval;
+}
 
 /**We need this here, even if it belongs in singlelayout.
  * Reason: must call setcamera after last change of size of plane actor.
@@ -304,11 +368,11 @@ void RealTimeStream2DRep::setCamera()
   camera->ParallelProjectionOn();
   mRenderer->ResetCamera();
 
-  DoubleBoundingBox3D extent(mData->getVtkImageData()->GetExtent());
-  if (ssc::similar(extent.range()[0], 0.0) || ssc::similar(extent.range()[1], 0.0))
+  DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
+  if (ssc::similar(bounds.range()[0], 0.0) || ssc::similar(bounds.range()[1], 0.0))
     return;
 
-  camera->SetParallelScale(extent.range()[1]/2); // exactly fill the viewport height
+  camera->SetParallelScale(bounds.range()[1]/2); // exactly fill the viewport height
 }
 
 

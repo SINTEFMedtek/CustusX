@@ -99,7 +99,7 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
 {
   if (mClient)
     return;
-  std::cout << "OpenIGTLinkRTSource::connect to server" << std::endl;
+//  std::cout << "OpenIGTLinkRTSource::connect to server" << std::endl;
   mClient.reset(new IGTLinkClient(address, port, this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
@@ -115,21 +115,14 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
 {
   if (!mClient)
     return;
-//  if (!mClient->getLastImageMessage())
-//    return;
   this->updateImage(mClient->getLastImageMessage());
-//
-//  // debug
-//  mClient->stop();
-//  mClient->quit();
 }
 
 void OpenIGTLinkRTSource::disconnectServer()
 {
-  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
+  //std::cout << "IGTLinkWidget::disconnect server" << std::endl;
   if (mClient)
   {
-    mClient->stop();
     mClient->quit();
     mClient->wait(2000); // forever or until dead thread
 
@@ -178,8 +171,8 @@ void OpenIGTLinkRTSource::setTestImage()
   mTestData.resize(W*H);
   std::fill(mTestData.begin(), mTestData.end(), 50);
 
-  for (unsigned y=0; y<H; ++y)
-    for (unsigned x=0; x<W; ++x)
+  for (int y=0; y<H; ++y)
+    for (int x=0; x<W; ++x)
     {
       mTestData[x+W*y] = x/2;
     }
