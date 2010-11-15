@@ -17,42 +17,20 @@
 #include <vtkCamera.h>
 #include "vtkImageMask.h"
 #include <vtkPointData.h>
+#include <vtkMatrix4x4.h>
 #include <vtkLookupTable.h>
 #include <vtkImageThreshold.h>
+#include <vtkFloatArray.h>
+
 #include "sscBoundingBox3D.h"
+#include "sscToolManager.h"
 #include "sscView.h"
+#include "sscTool.h"
 #include "sscTypeConversions.h"
+
+
 namespace ssc
 {
-
-
-vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue)
-{
-  vtkImageDataPtr data = vtkImageDataPtr::New();
-  data->SetSpacing(spacing[0], spacing[1], spacing[2]);
-  data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-  data->SetScalarTypeToUnsignedChar();
-  data->SetNumberOfScalarComponents(1);
-
-  int scalarSize = dim[0]*dim[1]*dim[2];
-
-  unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
-  std::fill(rawchars,rawchars+scalarSize, initValue);
-
-  vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
-  array->SetNumberOfComponents(1);
-  //TODO: Whithout the +1 the volume is black
-  array->SetArray(rawchars, scalarSize+1, 0); // take ownership
-  data->GetPointData()->SetScalars(array);
-
-  // A trick to get a full LUT in ssc::Image (automatic LUT generation)
-  // Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
-  rawchars[0] = 255;
-  data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
-  rawchars[0] = 0;
-
-  return data;
-}
 
 RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name),
@@ -61,7 +39,7 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mTexture(vtkTexturePtr::New() )
 {
   this->setLookupTable();
-
+  mOverrideCamera = false;
 
   // set a filter that map all zeros in the input to ones. This enables us to
   // use zero as a special transparency value, to be used in masking.
@@ -70,24 +48,13 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mMapZeroToOne->SetInValue(1);
   mMapZeroToOne->SetReplaceIn(true);
 
-//  mAllOneData = generateVtkImageData(Vector3D(256,256,1), Vector3D(1,1,1), 1);
-//  mMaskZeroToOneFilter = vtkImageMaskPtr::New();
-//  mMaskZeroToOneFilter->SetMaskInput(mAllOneData);
-//  mMaskZeroToOneFilter->SetMaskedOutputValue(0.1);
-
-
-  this->setMask();
+  mUSMaskData = mProbeData.getMask();
+  mUSMaskData->Print(std::cout);
 
   // set the filter that applies a mask to the stream data
   mMaskFilter = vtkImageMaskPtr::New();
   mMaskFilter->SetMaskInput(mUSMaskData);
   mMaskFilter->SetMaskedOutputValue(0.0);
-
-//  mData = data;
-//  //connect(mData.get(), SIGNAL(statusChanged()), this, SLOT(statusChangedSlot()));
-//  connect(mData.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
-
-//  mTexture->SetInput(mData->getVtkImageData());
 
   vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
   tMapper->SetInput(mPlaneSource->GetOutput());
@@ -115,40 +82,34 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mStatusText->setCentered();
   mStatusText->setPosition(0.5, 0.5);
   mStatusText->updateText("testimage");
-//  statusChangedSlot();
-  //Logger::log("vm.log", "RealTimeStream2DRep::RealTimeStream2DRep()");
 }
 
 RealTimeStream2DRep::~RealTimeStream2DRep()
 {
-//  Logger::log("vm.log", "RealTimeStream2DRep::~RealTimeStream2DRep()");
 }
 
-/** Create a mask that is to be applied to the stream data.
- *  The mask represents (fex) the us probe sector shape.
- *
- */
-void RealTimeStream2DRep::setMask()
+void RealTimeStream2DRep::setTool(ToolPtr tool)
 {
-//  mUSMaskData = generateVtkImageData(Vector3D(512,512,1), Vector3D(1,1,1), 1);
-//  return; // test: bypass mask
+  if (tool==mTool)
+    return;
 
-  // use data from probe here
-  mUSMaskData = generateVtkImageData(Vector3D(512,512,1), Vector3D(1,1,1), 0);
+  if (mTool)
+  {
+    disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+    disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+  }
 
-  int* dim(mUSMaskData->GetDimensions());
-  unsigned char* dataPtr = static_cast<unsigned char*>(mUSMaskData->GetScalarPointer());
-  for(int x = 0; x < dim[0]; x++)
-    for(int y = 0; y < dim[1]; y++)
-    {
-      bool inside = (Vector3D(x,y,0)-Vector3D(255,255,0)).length() < 250;
+  mTool = tool;
 
+  // setup new
+  if (mTool)
+  {
+    connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+    connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 
-      if(inside)
-        dataPtr[x + y*dim[0]] = 1;
-      else
-        dataPtr[x + y*dim[0]] = 0;
-    }
+    receiveTransforms(mTool->get_prMt(), 0);
+//    mToolActor->SetVisibility(mTool->getVisible());
+  }
 }
 
 /** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
@@ -230,6 +191,24 @@ void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
   this->newDataSlot();
 }
 
+
+
+void RealTimeStream2DRep::receiveTransforms(Transform3D prMt, double timestamp)
+{
+  //mProbeData.test();
+  Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+  Transform3D tMu = mProbeData.get_tMu();
+  //Transform3D rMt = rMpr * prMt;
+  Transform3D rMu = rMpr * prMt * tMu;
+//  mPlaneActor->SetUserMatrix(rMt.matrix());
+  mPlaneActor->SetUserMatrix(rMu.matrix());
+}
+
+void RealTimeStream2DRep::receiveVisible(bool visible)
+{
+
+}
+
 void RealTimeStream2DRep::newDataSlot()
 {
 //  std::cout << "p1" << ssc::Vector3D(mPlaneSource->GetPoint1()) << std::endl;
@@ -248,11 +227,18 @@ void RealTimeStream2DRep::newDataSlot()
   mStatusText->getActor()->SetVisibility(!mData->validData());
   //std::cout << "vis: " << mPlaneActor->GetVisibility() << std::endl;
 
-  this->setCamera();
+//  vtkImageDataPtr tex = mMaskFilter->GetOutput();
+//  tex->Update();
+//  std::cout << "dim " << Vector3D(tex->GetDimensions()) << ", sp " << Vector3D(tex->GetSpacing()) << std::endl;
+
+  if (mOverrideCamera)
+    this->setCamera();
 }
 
 void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
 {
+//  std::cout << "RealTimeStream2DRep::initializeSize start" << std::endl;
+//  mPlaneSource->GetOutput()->GetPointData()->Print(std::cout);
   //std::cout << "RealTimeStream2DRep::initializeSize("+string_cast(imageWidth)+","+string_cast(imageHeight)+")"  << std::endl;;
   if (imageWidth==0 || imageHeight==0)
   {
@@ -263,30 +249,43 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
   if (ssc::similar(extent.range()[0], 0.0) || ssc::similar(extent.range()[1], 0.0))
     return;
 
-//  std::cout << "max: " << mData->getVtkImageData()->GetScalarRange()[1] << std::endl;
-//  mData->getVtkImageData()->Print(std::cout);
-//  mTexture->Print(std::cout);
-
-//  for (int x=0; x<512; ++x)
-//  {
-//    for (int y=0; y<512; ++y)
-//    {
-//      void* val = mData->getVtkImageData()->GetScalarPointer(x,y,0);
-//      std::cout << *reinterpret_cast<unsigned short*>(val) << " ";
-//    }
-//    std::cout << std::endl;
-//  }
-//
-//  exit(0);
-
-  //mPlaneSource->SetPoint2( 0.0, imageHeight - 1, 0.0 );
-  //mPlaneSource->SetPoint1(imageWidth - 1, 0.0, 0.0 );
   mPlaneSource->SetOrigin(extent.corner(0,0,0).begin());
   mPlaneSource->SetPoint1(extent.corner(1,0,0).begin());
   mPlaneSource->SetPoint2(extent.corner(0,1,0).begin());
 //  std::cout << "extent " << extent << std::endl;
 //  mPlaneSource->Print(std::cout);
+
+//  int numPts = 3;
+//  vtkFloatArray* newTCoords = vtkFloatArray::New();
+//  newTCoords->SetNumberOfComponents(2);
+//  newTCoords->Allocate(2*numPts);
+//
+//  float tc[2];
+//  tc[0] = 0;
+//  tc[1] = 0;
+//  newTCoords->InsertTuple(0,tc);
+//  tc[0] = 1;
+//  tc[1] = 1;
+//  newTCoords->InsertTuple(1,tc);
+//  tc[0] = 0;
+//  tc[1] = 1;
+//  newTCoords->InsertTuple(2,tc);
+////  tc[0] = 0;
+////  tc[1] = 0;
+////  newTCoords->InsertTuple(3,tc);
+////  tc[0] = 0;
+////  tc[1] = 0;
+////  newTCoords->InsertTuple(4,tc);
+//  newTCoords->SetName("TextureCoordinates");
+//
+//  mPlaneSource->GetOutput()->GetPointData()->SetTCoords(newTCoords);
+//  mPlaneSource->GetOutput()->GetPointData()->Modified();
+//  mPlaneSource->GetOutput()->Modified();
+
+  //std::cout << "RealTimeStream2DRep::initializeSize end" << std::endl;
+  //mPlaneSource->GetOutput()->GetPointData()->Print(std::cout);
 }
+
 
 /**We need this here, even if it belongs in singlelayout.
  * Reason: must call setcamera after last change of size of plane actor.
