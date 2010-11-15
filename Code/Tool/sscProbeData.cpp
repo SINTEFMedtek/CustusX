@@ -126,7 +126,7 @@ bool ProbeData::isInside(Vector3D p_v)
  */
 vtkImageDataPtr ProbeData::getMask()
 {
-  std::cout << "start" << std::endl;
+//  std::cout << "start" << std::endl;
   mCachedCenter_v = this->get_uMv().inv().coord(mOrigin_u) - mDepthStart * Vector3D(0,1,0);
  // std::cout << "mCachedCenter_v " << mCachedCenter_v << std::endl;
 
@@ -154,8 +154,8 @@ vtkImageDataPtr ProbeData::getMask()
 
 //  retval->SetSpacing(1,1,1);
 
-  std::cout << "mCachedCenter_v " << mCachedCenter_v << std::endl;
-  std::cout << "end" << std::endl;
+//  std::cout << "mCachedCenter_v " << mCachedCenter_v << std::endl;
+//  std::cout << "end" << std::endl;
   return retval;
 }
 
