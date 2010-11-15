@@ -44,7 +44,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 
   gridLayout->addWidget(new QLabel("Port number", this), 1, 0);
   mPortEdit = new QLineEdit(this);
-  mPortEdit->setText("18944");
+  mPortEdit->setText("18333");
   gridLayout->addWidget(mPortEdit, 1, 1);
 
   mLaunchServerButton = new QPushButton("launch image server", this);

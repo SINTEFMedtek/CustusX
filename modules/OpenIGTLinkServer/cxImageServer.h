@@ -25,7 +25,6 @@ public:
 protected:
   void incomingConnection(int socketDescriptor);
 private slots:
-//  void preSessionDelete();
 private:
   QString mImageFileDir;
 
