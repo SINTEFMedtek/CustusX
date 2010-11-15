@@ -11,6 +11,7 @@
 #include "sscLabeledComboBoxWidget.h"
 //#include "RTSource/cxIGTLinkClient.h"
 #include "RTSource/sscRT2DRep.h"
+#include "sscDataManager.h"
 #include "sscTypeConversions.h"
 
 namespace cx
@@ -26,6 +27,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   this->resize(100, 600);
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
+  ssc::dataManager()->loadStream(mRTSource);
   connect(mRTSource.get(), SIGNAL(serverStatusChanged()), this, SLOT(serverStatusChangedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
