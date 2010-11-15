@@ -44,8 +44,7 @@ SET(cxProject_MOC_HDRS
   cxWhatsThisWidget.h
   cxControlPanel.h
   cxIGTLinkWidget.h
-
-
+  cxPlateRegistrationWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
