@@ -4,6 +4,7 @@
 #include "cxWhatsThisWidget.h"
 
 class QPushButton;
+class QLabel;
 
 namespace cx
 {
@@ -18,6 +19,7 @@ namespace cx
  */
 class PlateRegistrationWidget : public WhatsThisWidget
 {
+  Q_OBJECT
 public:
   PlateRegistrationWidget(QWidget* parent);
   virtual ~PlateRegistrationWidget();
@@ -25,9 +27,11 @@ public:
 
 private slots:
   void plateRegistrationSlot();
+  void referenceToolInfoSlot();
 
 private:
    QPushButton* mPlateRegistrationButton;
+   QLabel*      mReferenceToolInfoLabel;
 };
 }
 #endif /* CXPLATEREGISTRATIONWIDGET_H_ */
