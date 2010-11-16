@@ -89,6 +89,11 @@ if(BUILD_US_ACQUISITION)
     add_subdirectory(modules/ultrasoundAcquisition)
 endif(BUILD_US_ACQUISITION)
 
+option(BUILD_GRABBER_SERVER "build grabber server" OFF)
+if(BUILD_GRABBER_SERVER)
+    add_subdirectory( modules/grabberServer )
+endif(BUILD_GRABBER_SERVER)
+
 enable_testing()
 #add_subdirectory(testing)
 
