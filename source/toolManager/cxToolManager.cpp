@@ -285,6 +285,7 @@ ssc::LandmarkMap ToolManager::getLandmarks()
 void ToolManager::setLandmark(ssc::Landmark landmark)
 {
   mLandmarks[landmark.getUid()] = landmark;
+  ssc::messageManager()->sendDebug("Added landmark: "+landmark.getUid()+" with vector "+qstring_cast(landmark.getCoord()));
   emit landmarkAdded(landmark.getUid());
 }
 
@@ -292,6 +293,16 @@ void ToolManager::removeLandmark(QString uid)
 {
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
+}
+
+void ToolManager::removeLandmarks()
+{
+  ssc::LandmarkMap landmarks = ssc::toolManager()->getLandmarks();
+  ssc::LandmarkMap::iterator it = landmarks.begin();
+  for(;it != landmarks.end(); ++it)
+  {
+    ssc::toolManager()->removeLandmark(it->first);
+  }
 }
 
 TrackerPtr ToolManager::getTracker()
