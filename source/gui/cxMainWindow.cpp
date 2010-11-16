@@ -41,9 +41,11 @@
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
+#include "cxPlateRegistrationWidget.h"
 #include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
+#include "cxIGTLinkWidget.h"
 
 namespace cx
 {
@@ -87,6 +89,7 @@ MainWindow::MainWindow() :
   this->populateVisualizationMethodsWidget();
   this->populateCalibrationMethodsWidget();
 
+  this->addAsDockWidget(new IGTLinkWidget(this), "Utililty");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
@@ -169,6 +172,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::initialize()
 {
+  ssc::MessageManager::getInstance();
+
   cx::DataManager::initialize();
   cx::ToolManager::initializeObject();
 }
@@ -706,10 +711,18 @@ void MainWindow::populateRegistrationMethodsWidget()
   //manual offset
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
 
+  //plate
+  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget("PlateRegistrationWidget", "Plate", mRegsitrationMethodsWidget);
+  PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
+  PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
+  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
+  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
+
   mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
   mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
   mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
   mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
+  mRegsitrationMethodsWidget->addTab(imageAndPlateRegistrationWidget, "Plate");
 }
 
 void MainWindow::populateSegmentationMethodsWidget()

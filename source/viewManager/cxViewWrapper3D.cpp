@@ -36,6 +36,8 @@
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
 #include "cxCameraControl.h"
+#include "sscRealTimeStreamSource.h"
+#include "RTSource/sscRT2DRep.h"
 
 namespace cx
 {
@@ -369,8 +371,9 @@ void ViewWrapper3D::toolsAvailableSlot()
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     ssc::ToolPtr tool = iter->second;
-    if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
-      continue;
+    //experiment with showing toolrep for reference tools
+//    if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
+//      continue;
 
     QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
     if (!mToolReps.count(uid))
@@ -383,7 +386,19 @@ void ViewWrapper3D::toolsAvailableSlot()
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
    // ssc::messageManager()->sendDebug("ToolRep3D for tool "+tool->getName()+" added to view "+mView->getName()+".");
+
+    if (!mRTStreamRep)
+    {
+      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
+      mRTStreamRep.reset(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
+      mRTStreamRep->setTool(tool);
+      mView->addRep(mRTStreamRep);
+    }
   }
+
+
 }
 
 

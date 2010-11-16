@@ -6,6 +6,7 @@ endif(COMMAND cmake_policy)
 
 FIND_PACKAGE(OpenGL)
 FIND_PACKAGE(GLUT)
+
 IF (APPLE)
   FIND_LIBRARY(OPENCL_LIBRARIES OpenCL DOC "OpenCL lib for OSX")
   FIND_PATH(OPENCL_INCLUDE_DIR OpenCL/cl.h DOC "Include for OpenCL on OSX")
