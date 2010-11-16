@@ -69,7 +69,7 @@ public:
     QString           mSROMFilename;          ///< path to the tools SROM file
     unsigned int      mPortNumber;            ///< the port number the tool is connected to
     unsigned int      mChannelNumber;         ///< the channel the tool is connected to
-    ssc::Vector3D     mReferencePoint;        ///< optional point on the frame, specifying a known reference point, 0,0,0 is default
+    std::map<int, ssc::Vector3D>     mReferencePoints;        ///< optional point on the frame, specifying a known reference point, 0,0,0 is default
     bool              mWireless;              ///< whether or not the tool is wireless
     bool              m5DOF;                  ///< whether or not the tool have 5 DOF
     QString           mCalibrationFilename;   ///< path to the tools calibration file
@@ -117,7 +117,8 @@ public:
   QStringList getUSSectorConfigList() const;
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
-  virtual ssc::Vector3D getReferencePoint() const; ///< Get the optional reference point from this tool, will be 0,0,0 if it is not specified
+  virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference point from this tool
+  virtual bool hasReferencePointWithId(int id);
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not

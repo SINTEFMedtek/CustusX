@@ -91,6 +91,7 @@ private:
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
+  ssc::RealTimeStream2DRepPtr mRTStreamRep;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
