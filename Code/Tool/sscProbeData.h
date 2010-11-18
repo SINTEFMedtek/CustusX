@@ -33,9 +33,11 @@ public:
 	bool isInside(Vector3D p_u);
   vtkImageDataPtr getMask();
   vtkPolyDataPtr getSector(); ///< get a polydata representation of the us sector
+  vtkPolyDataPtr getSectorLinesOnly(); ///< get a polydata representation of the us sector
   Transform3D get_tMu() const; ///< get transform from image space u to probe tool space t.
   Transform3D get_uMv() const; ///< get transform from inverted image space v (origin in ul corner) to image space u.
-  void updateSector(); ///<update the us sector polydata.
+//  void updateSector(); ///<update the us sector polydata.
+  void updateSector();
 
   ProbeSector mData;
 //	TYPE mType; ///< type of probe

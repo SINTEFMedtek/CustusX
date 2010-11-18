@@ -44,6 +44,7 @@ private slots:
 	 *\param timestamp	The time at which the transform was recorded
 	 */
 	void receiveTransforms(Transform3D matrix, double timestamp);
+	void probeSectorChanged();
 	/**
 	 * Receive whether or not the tool is visible to the tracking system
 	 *\param visible Whether or not the tool is visible to the tracking system.

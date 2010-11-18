@@ -72,12 +72,10 @@ void ToolRep3D::setTool(ToolPtr tool)
 	
 	if (mTool)
 	{
-		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-				this, SLOT(receiveTransforms(Transform3D, double)));
-
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)),
-				this, SLOT(receiveVisible(bool)));
+		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 		disconnect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
+    disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 
 		mToolActor->SetMapper(NULL);
 	}
@@ -114,12 +112,12 @@ void ToolRep3D::setTool(ToolPtr tool)
 		//std::cout << "Tool3DRep: set tool" << std::endl;
 		mToolActor->SetVisibility(mTool->getVisible());
 
-		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
-				this, SLOT(receiveTransforms(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)),
-				this, SLOT(receiveVisible(bool)));
+		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+		connect(mTool.get(), SIGNAL(toolVisible(bool)),	this, SLOT(receiveVisible(bool)));
 		connect(mTool.get(), SIGNAL(tooltipOffset(double)), this, SLOT(tooltipOffsetSlot(double)));
+    connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 
+    this->probeSectorChanged();
 	}
 }
 
@@ -185,23 +183,48 @@ void ToolRep3D::update()
 
   if (this->showProbe())
   {
-//    mProbeData = ProbeData(mTool->getProbeSector());
-
 //    mProbeSector->setSector(mTool->getProbeSector());
-    mProbeSector->setSector(mTool->getProbeSector());
+    Transform3D tMu = mProbeSector->get_tMu();
 
-    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSector());
-    if (mProbeSectorPolyDataMapper->GetInput())
-    {
-      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
-    }
-    mProbeSectorActor->SetUserMatrix((rMpr*prMt).matrix());
+//    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+//    if (mProbeSectorPolyDataMapper->GetInput())
+//    {
+//      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+//    }
+    mProbeSectorActor->SetUserMatrix((rMpr*prMt*tMu).matrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
   }
   else
     mProbeSectorActor->SetVisibility(false);
 
   this->updateOffsetGraphics();
+}
+
+
+void ToolRep3D::probeSectorChanged()
+{
+  if (!mTool)
+    return;
+
+  Transform3D prMt = mTool->get_prMt();
+  Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+
+  if (this->showProbe())
+  {
+    mProbeSector->setSector(mTool->getProbeSector());
+    Transform3D tMu = mProbeSector->get_tMu();
+
+    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+    if (mProbeSectorPolyDataMapper->GetInput())
+    {
+      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+    }
+    mProbeSectorActor->SetUserMatrix((rMpr*prMt*tMu).matrix());
+    mProbeSectorActor->SetVisibility(mTool->getVisible());
+  }
+  else
+    mProbeSectorActor->SetVisibility(false);
+
 }
 
 
