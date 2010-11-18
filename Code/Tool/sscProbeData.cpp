@@ -42,45 +42,34 @@ namespace
   }
 }
 
-ProbeData::ProbeData() : mType(tNONE)
+ProbeData::ProbeData()// : mType(ProbeSector::tNONE)
 {
 
   // testdata:
-  mType = tSECTOR;
-  mDepthStart = 0;
+  mData.mType = ProbeSector::tSECTOR;
+  mData.mDepthStart = 0;
 //  mDepthEnd = 350;
-  mDepthEnd = 200;
-  mWidth = M_PI/2;
-//  mSpacing = Vector3D(0.928,0.928,1);
-  mSpacing = Vector3D(1,1,1); // using this spacing gives correct image - investigate!
-  mSpacing = Vector3D(0.5,0.5,0);
-  mSize = QSize(512,512);
+  mData.mDepthEnd = 200;
+  mData.mWidth = M_PI/2;
+  mData.mImage.mSpacing = Vector3D(0.928,0.928,1);
+//  mSpacing = Vector3D(1,1,1); // using this spacing gives correct image - investigate!
+  mData.mImage.mSpacing = Vector3D(0.5,0.5,0);
+  mData.mImage.mSize = QSize(512,512);
 
   //mOrigin_u = multiply_elems(Vector3D(mSize.width()/2, mSize.height()*0.75, 0), mSpacing);
-  mOrigin_u = multiply_elems(Vector3D(mSize.width()/2, mSize.height()*1.0, 0), mSpacing);
+  mData.mImage.mOrigin_u = multiply_elems(Vector3D(mData.mImage.mSize.width()/2, mData.mImage.mSize.height()*1.0, 0), mData.mImage.mSpacing);
 
   //mCachedCenter_v = this->get_uMv().inv().coord(mOrigin_u) - mDepthStart * Vector3D(0,1,0);
 }
 
 void ProbeData::setSector(ProbeSector data)
 {
-  mType = (TYPE) data.mType;
-  mDepthStart = data.mDepthStart;
-  mDepthEnd = data.mDepthEnd;
-  mWidth = data.mWidth;
+  mData = data;
+//  mType = (TYPE) data.mType;
+//  mDepthStart = data.mDepthStart;
+//  mDepthEnd = data.mDepthEnd;
+//  mWidth = data.mWidth;
 }
-
-
-//ProbeData::ProbeData(TYPE type, double depthStart, double depthEnd, double width) :
-//	mType(type),
-//	mDepthStart(depthStart),
-//	mDepthEnd(depthEnd),
-//	mWidth(width),
-//  mOrigin_u(0,0,0),
-//  mSpacing(1,1,1),
-//  mSize(256,256)
-//{
-//}
 
 /**return true if p_v, given in the upper-left space v,
  * is inside the us beam sector
@@ -92,7 +81,7 @@ bool ProbeData::isInside(Vector3D p_v)
 //  ssc::Vector3D d = p_u - mOrigin_u;
 //  std::cout << "d " << d << std::endl;
 
-  if (mType==tSECTOR)
+  if (mData.mType==ProbeSector::tSECTOR)
   {
     double angle = atan2(d[1], d[0]);
     angle -= M_PI_2; // center angle on us probe axis at 90*.
@@ -101,21 +90,21 @@ bool ProbeData::isInside(Vector3D p_v)
 //    std::cout << "angle " << angle << std::endl;
 //    std::cout << "|d| " << d.length() << std::endl;
 
-    if (fabs(angle) > mWidth/2.0)
+    if (fabs(angle) > mData.mWidth/2.0)
       return false;
-    if (d.length() < mDepthStart)
+    if (d.length() < mData.mDepthStart)
       return false;
-    if (d.length() > mDepthEnd)
+    if (d.length() > mData.mDepthEnd)
       return false;
     return true;
   }
   else // tLINEAR
   {
-    if (fabs(d[0]) > mWidth/2.0)
+    if (fabs(d[0]) > mData.mWidth/2.0)
       return false;
-    if (d[1] < mDepthStart)
+    if (d[1] < mData.mDepthStart)
       return false;
-    if (d[1] > mDepthEnd)
+    if (d[1] > mData.mDepthEnd)
       return false;
     return true;
   }
@@ -127,7 +116,7 @@ bool ProbeData::isInside(Vector3D p_v)
 vtkImageDataPtr ProbeData::getMask()
 {
 //  std::cout << "start" << std::endl;
-  mCachedCenter_v = this->get_uMv().inv().coord(mOrigin_u) - mDepthStart * Vector3D(0,1,0);
+  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.mOrigin_u) - mData.mDepthStart * Vector3D(0,1,0);
  // std::cout << "mCachedCenter_v " << mCachedCenter_v << std::endl;
 
 //  Vector3D p_test = multiply_elems(Vector3D(256,10,0), mSpacing);
@@ -136,14 +125,14 @@ vtkImageDataPtr ProbeData::getMask()
 
   vtkImageDataPtr retval;
   // use data from probe here
-  retval = generateVtkImageData(Vector3D(mSize.width(),mSize.height(),1), mSpacing, 0);
+  retval = generateVtkImageData(Vector3D(mData.mImage.mSize.width(),mData.mImage.mSize.height(),1), mData.mImage.mSpacing, 0);
 
   int* dim(retval->GetDimensions());
   unsigned char* dataPtr = static_cast<unsigned char*>(retval->GetScalarPointer());
   for(int x = 0; x < dim[0]; x++)
     for(int y = 0; y < dim[1]; y++)
     {
-      bool inside = this->isInside(multiply_elems(Vector3D(x,y,0), mSpacing));
+      bool inside = this->isInside(multiply_elems(Vector3D(x,y,0), mData.mImage.mSpacing));
 //      bool inside = (Vector3D(x,y,0)-Vector3D(255,255,0)).length() < 250;
 
       if(inside)
@@ -167,7 +156,7 @@ void ProbeData::test()
   Vector3D e_z(0,0,1);
 
   // zero = tMu * mOrigin_u
-  std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mOrigin_u) << ", mOrigin_u: " << mOrigin_u << std::endl;
+  std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.mImage.mOrigin_u) << ", mOrigin_u: " << mData.mImage.mOrigin_u << std::endl;
 
   // e_z = tMu * -e_y
   std::cout << "e_z = tMu * -e_y " << tMu.vector(-e_y) <<std::endl;
@@ -181,7 +170,7 @@ Transform3D ProbeData::get_tMu() const
   Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
   Transform3D Rz = ssc::createTransformRotateY(M_PI/2.0);
   ssc::Transform3D R = (Rx*Rz);
-  ssc::Transform3D T = ssc::createTransformTranslate(-mOrigin_u);
+  ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.mOrigin_u);
 
   ssc::Transform3D tMu = R*T;
   return tMu;
@@ -189,7 +178,7 @@ Transform3D ProbeData::get_tMu() const
 
 Transform3D ProbeData::get_uMv() const
 {
-  double H = mSize.height() * mSpacing[1];
+  double H = mData.mImage.mSize.height() * mData.mImage.mSpacing[1];
   return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0,-H,0));
 //  return createTransformTranslate(Vector3D(0,H,0)) * createTransformRotateX(M_PI);
 }
@@ -212,7 +201,6 @@ void ProbeData::updateSector()
   // then transform to global space.
   Transform3D tMl = createTransformIJC(Vector3D(0,1,0), Vector3D(0,0,1), Vector3D(0,0,0));
 
-//  Transform3D M = m_wMt*tMl;
   Transform3D M = tMl;
   Vector3D e_x = unitVector(0);
   Vector3D e_y = unitVector(M_PI_2);
@@ -221,37 +209,18 @@ void ProbeData::updateSector()
   vtkPointsPtr points = vtkPointsPtr::New();
   vtkCellArrayPtr sides = vtkCellArrayPtr::New();
 
-//  if (!mThreeDimensions && !similar(dot(M.coord(e_z), e_z), 1, 0.1))
-//  {
-//    mPolyData->SetPoints(points);
-//    mPolyData->SetLines(sides);
-//    mPolyData->Update();
-//    return;
-//  }
-
-  //Fix to make sure the sector is shown in front of the 2D volume slice in the 2D views
-  //double defZero = 0.001;
-
-  if (mType == tLINEAR)
+  if (mData.mType == ProbeSector::tLINEAR)
   {
-    Vector3D cr = mDepthStart * e_y + mWidth/2 * e_x;
-    Vector3D cl = mDepthStart * e_y - mWidth/2 * e_x;
+    Vector3D cr = mData.mDepthStart * e_y + mData.mWidth/2 * e_x;
+    Vector3D cl = mData.mDepthStart * e_y - mData.mWidth/2 * e_x;
 
-    Vector3D pr = mDepthEnd * e_y + mWidth/2 * e_x;
-    Vector3D pl = mDepthEnd * e_y - mWidth/2 * e_x;
+    Vector3D pr = mData.mDepthEnd * e_y + mData.mWidth/2 * e_x;
+    Vector3D pl = mData.mDepthEnd * e_y - mData.mWidth/2 * e_x;
 
     cl = M.coord(cl);
     cr = M.coord(cr);
     pl = M.coord(pl);
     pr = M.coord(pr);
-//    //Fix to make sure the sector is shown in front of the 2D volume slice in the 2D views
-//    if(!mThreeDimensions)
-//    {
-//      cl[2] += defZero;
-//      cr[2] += defZero;
-//      pl[2] += defZero;
-//      pr[2] += defZero;
-//    }
 
     points->Allocate(4);
     points->InsertNextPoint(cl.begin());
@@ -262,33 +231,28 @@ void ProbeData::updateSector()
     vtkIdType cells[5] = { 0,1,2,3,0};
     sides->InsertNextCell(5, cells);
   }
-  else if (mType == tSECTOR)
+  else if (mData.mType == ProbeSector::tSECTOR)
   {
-
-    Vector3D c = - mDepthStart * e_y;  // arc center point
+    Vector3D c = - mData.mDepthStart * e_y;  // arc center point
 
     int arcRes = 20;//Number of points in arc
-    double angleIncrement = mWidth/arcRes;
-    double startAngle = M_PI_2 - mWidth/2.0;
-    double stopAngle = M_PI_2 + mWidth/2.0;
+    double angleIncrement = mData.mWidth/arcRes;
+    double startAngle = M_PI_2 - mData.mWidth/2.0;
+    double stopAngle = M_PI_2 + mData.mWidth/2.0;
 
     points->Allocate(arcRes*2);//TODO: Don't use the same number of points in top as in bottom?
     for(int i = 0; i <= arcRes; i++)
     {
       double theta = startAngle + i*angleIncrement;
-      Vector3D startTheta = c + mDepthStart * unitVector(theta);
+      Vector3D startTheta = c + mData.mDepthStart * unitVector(theta);
       startTheta = M.coord(startTheta);
-//      if(!mThreeDimensions)
-//        startTheta[2] += defZero;
       points->InsertNextPoint(startTheta.begin());
     }
     for(int i = 0; i <= arcRes; i++)
     {
       double theta = stopAngle - i*angleIncrement;
-      Vector3D endTheta = c + mDepthEnd * unitVector(theta);
+      Vector3D endTheta = c + mData.mDepthEnd * unitVector(theta);
       endTheta = M.coord(endTheta);
-//      if(!mThreeDimensions)
-//        endTheta[2] += defZero;
       points->InsertNextPoint(endTheta.begin());
     }
 
