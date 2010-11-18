@@ -451,8 +451,7 @@ std::vector<QString> ToolManager::getToolUids() const
 
 ssc::Transform3DPtr ToolManager::get_rMpr() const
 {
-  return ssc::Transform3DPtr(new ssc::Transform3D(
-      m_rMpr_History->getCurrentRegistration()));
+  return ssc::Transform3DPtr(new ssc::Transform3D(m_rMpr_History->getCurrentRegistration().mValue));
 }
 
 void ToolManager::set_rMpr(const ssc::Transform3DPtr& val)
