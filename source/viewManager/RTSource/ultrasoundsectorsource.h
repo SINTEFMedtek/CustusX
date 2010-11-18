@@ -21,6 +21,17 @@ mapped onto this polygon.
 #include "sscProbeSector.h"
 #include "sscTransform3D.h"
 
+/**Source for an Ultrasound sector.
+ * The output vtkPolyData contains a polygon plus texture coordinates.
+ * The output is given in space u: a xy vtk image space with origin in the lower-left corner,
+ *
+ * The class is an adapter: The polydata is set with setProbeSector, and
+ * its contents are copied into the output during Execute. No other (real)
+ * work is done.
+ *
+ * Adapted from same-named class in CustusX1
+ *
+ */
 class UltrasoundSectorSource : public vtkPolyDataSource 
 {
 public:
@@ -28,7 +39,7 @@ public:
   vtkTypeRevisionMacro(UltrasoundSectorSource,vtkPolyDataSource);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void setProbeData(const ssc::ProbeSector& data);
+  void setProbeSector(vtkPolyDataPtr sector);
 
 protected:
   UltrasoundSectorSource();
@@ -36,11 +47,8 @@ protected:
 
   void Execute();
 
-
 private:
-  void updateSector();
-  ssc::Transform3D get_tMu() const;
-  ssc::ProbeSector mData;
+  vtkPolyDataPtr mSector; ///< polydata representation of the sector provided externally. Used as basis during Execute().
 
   UltrasoundSectorSource(const UltrasoundSectorSource&);  // Not implemented.
   void operator=(const UltrasoundSectorSource&);  // Not implemented.
