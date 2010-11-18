@@ -49,6 +49,7 @@ private slots:
 
   void receiveTransforms(Transform3D matrix, double timestamp);
   void receiveVisible(bool visible);
+  void probeSectorChanged();
 
 private:
 //  void setMask();
@@ -56,6 +57,7 @@ private:
   void setLookupTable();
   void setCamera();
   void setup();
+
 //  vtkPolyDataPtr createTestPolyData();
 
   ToolPtr mTool;
@@ -69,6 +71,8 @@ private:
   vtkRendererPtr mRenderer;
   View* mView;
   UltrasoundSectorSource* mUSSource;
+  vtkDataSetMapperPtr mDataSetMapper;
+
 
 //  vtkPolyDataPtr mTestPoly;
 
