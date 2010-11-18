@@ -23,6 +23,7 @@ typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
+class UltrasoundSectorSource;
 
 namespace ssc
 {
@@ -55,7 +56,7 @@ private:
   void setLookupTable();
   void setCamera();
   void setup();
-  vtkPolyDataPtr createTestPolyData();
+//  vtkPolyDataPtr createTestPolyData();
 
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
@@ -67,8 +68,9 @@ private:
   vtkTexturePtr mTexture;
   vtkRendererPtr mRenderer;
   View* mView;
+  UltrasoundSectorSource* mUSSource;
 
-  vtkPolyDataPtr mTestPoly;
+//  vtkPolyDataPtr mTestPoly;
 
   vtkImageThresholdPtr mMapZeroToOne;
   vtkImageDataPtr mUSMaskData;
