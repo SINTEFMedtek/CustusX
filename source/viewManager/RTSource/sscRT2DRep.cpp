@@ -41,6 +41,7 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mTexture(vtkTexturePtr::New() )
 {
   mUSSource = UltrasoundSectorSource::New();
+  mUSSource->setProbeSector(mProbeData.getSector());
 
   this->setLookupTable();
   mOverrideCamera = false;
@@ -53,7 +54,7 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mMapZeroToOne->SetReplaceIn(true);
 
   mUSMaskData = mProbeData.getMask();
-  mUSSource->setProbeData(mProbeData.mData);
+  //mUSSource->setProbeData(mProbeData.mData);
 //  mUSMaskData->Print(std::cout);
 
   // set the filter that applies a mask to the stream data
@@ -77,13 +78,13 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   transform->SetScale( 1, 1, 0);
   transform->FlipROn();
 
-  vtkDataSetMapperPtr mapper2 = vtkDataSetMapperPtr::New();
-//  mapper2->SetInput(transform->GetOutput() );
-  mapper2->SetInput(mUSSource->GetOutput() );
-  mapper2->Update();
+  mDataSetMapper = vtkDataSetMapperPtr::New();
+  mDataSetMapper->SetInput(transform->GetOutput() );
+//  mapper2->SetInput(mUSSource->GetOutput() );
+  mDataSetMapper->Update();
 
   mPlaneActor->SetTexture(mTexture);
-  mPlaneActor->SetMapper(mapper2);
+  mPlaneActor->SetMapper(mDataSetMapper);
 
   mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
   mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -115,6 +116,7 @@ void RealTimeStream2DRep::setTool(ToolPtr tool)
   {
     disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
     disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+    disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
   }
 
   mTool = tool;
@@ -124,10 +126,29 @@ void RealTimeStream2DRep::setTool(ToolPtr tool)
   {
     connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
     connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+    connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 
-    receiveTransforms(mTool->get_prMt(), 0);
+//    receiveTransforms(mTool->get_prMt(), 0);
+//    mProbeData.setSector(mTool->getProbeSector());
+//    mUSSource->setProbeSector(mProbeData.getSector());
+//    std::cout << "setting tool in rt rep" << std::endl;
 //    mToolActor->SetVisibility(mTool->getVisible());
+
+    // now that we have a tool: use the ultraound source, updated by the probe
+    mDataSetMapper->SetInput(mUSSource->GetOutput() );
+
+    this->probeSectorChanged();
   }
+}
+
+void RealTimeStream2DRep::probeSectorChanged()
+{
+  if (!mTool)
+    return;
+
+  receiveTransforms(mTool->get_prMt(), 0);
+  mProbeData.setSector(mTool->getProbeSector());
+  mUSSource->setProbeSector(mProbeData.getSector());
 }
 
 /** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
@@ -271,7 +292,7 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
 
   DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
 
-  std::cout << "bounds " << bounds << std::endl;
+//  std::cout << "bounds " << bounds << std::endl;
   mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
   mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
   mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
