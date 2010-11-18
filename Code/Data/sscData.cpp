@@ -12,7 +12,7 @@ Data::Data() :
 }
 
 Data::Data(const QString& uid, const QString& name) :
-  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED), mParentFrame("")
+  mUid(uid), mRegistrationStatus(rsNOT_REGISTRATED)//, mParentFrame("")
 {
   if(name=="")
     mName = mUid;
@@ -90,7 +90,7 @@ REGISTRATION_STATUS Data::getRegistrationStatus() const
  */
 Transform3D Data::get_rMd() const
 {
-  return m_rMd_History->getCurrentRegistration();
+  return m_rMd_History->getCurrentRegistration().mValue;
 }
 void Data::connectToRep(const RepWeakPtr& rep)
 {
@@ -116,14 +116,21 @@ bool Data::getShading() const
 
 QString Data::getParentFrame()
 {
-  return mParentFrame;
+  return m_rMd_History->getCurrentParentFrame().mValue;
+//  return mParentFrame;
 }
 
-void Data::setParentFrame(QString uid)
-{
-  mParentFrame = uid;
-  emit transformChanged();
-}
+//void Data::setParentFrame(QString uid)
+//{
+//  RegistrationTransform transform = m_rMd_History->getCurrentRegistration();
+//  transform.mParentFrame = uid;
+//  transform.mType = "Set Parent Frame";
+//  transform.mTimestamp = QDateTime::currentDateTime();
+//  m_rMd_History->addRegistration(transform);
+//
+//  //mParentFrame = uid;
+//  //emit transformChanged();
+//}
 
 void Data::addXml(QDomNode& dataNode)
 {
@@ -143,9 +150,9 @@ void Data::addXml(QDomNode& dataNode)
   filePathNode.appendChild(doc.createTextNode(mFilePath));
   dataNode.appendChild(filePathNode);
 
-  QDomElement parentFrameNode = doc.createElement("parentFrame");
-  parentFrameNode.appendChild(doc.createTextNode(mParentFrame));
-  dataNode.appendChild(parentFrameNode);
+//  QDomElement parentFrameNode = doc.createElement("parentFrame");
+//  parentFrameNode.appendChild(doc.createTextNode(mParentFrame));
+//  dataNode.appendChild(parentFrameNode);
 }
 
 void Data::parseXml(QDomNode& dataNode)
@@ -153,11 +160,19 @@ void Data::parseXml(QDomNode& dataNode)
   if (dataNode.isNull())
     return;
 
+  // backward compatibility per 20101117: remove sometime in 2011
+  QString parentFrame;
   if(!dataNode.namedItem("parentFrame").isNull())
-    mParentFrame = dataNode.namedItem("parentFrame").toElement().text();
+    parentFrame = dataNode.namedItem("parentFrame").toElement().text();
 
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);
+
+  if (!parentFrame.isEmpty())
+  {
+    m_rMd_History->addParentFrame(parentFrame);
+//    this->setParentFrame(parentFrame);
+  }
 }
 
 

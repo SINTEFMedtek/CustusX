@@ -483,7 +483,7 @@ void DataManagerImpl::verifyParentFrame(DataPtr data)
       max = std::max(max, parentList[1].toInt());
     }
     QString parentFrame = "frame_" + qstring_cast(max + 1);
-    data->setParentFrame(parentFrame);
+    data->get_rMd_History()->addParentFrame(parentFrame);
   }
 }
 
