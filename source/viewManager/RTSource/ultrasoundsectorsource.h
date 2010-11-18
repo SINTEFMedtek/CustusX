@@ -19,38 +19,14 @@ mapped onto this polygon.
 
 #include "vtkPolyDataSource.h"
 #include "sscProbeSector.h"
+#include "sscTransform3D.h"
 
 class UltrasoundSectorSource : public vtkPolyDataSource 
 {
-#define VIDEO_WIDTH 768
-#define VIDEO_HEIGHT 576
-//#define TEXTURESIZE 1024.0
-#define TEXTURESIZE 512.0
-
 public:
   static UltrasoundSectorSource *New();
   vtkTypeRevisionMacro(UltrasoundSectorSource,vtkPolyDataSource);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Specify inner radius of hole in disc.
-  vtkSetClampMacro(InnerRadius,double,0.0,VTK_DOUBLE_MAX)
-  vtkGetMacro(InnerRadius,double);
-
-  // Description:
-  // Specify outer radius of disc.
-  vtkSetClampMacro(OuterRadius,double,0.0,VTK_DOUBLE_MAX)
-  vtkGetMacro(OuterRadius,double);
-
-  // Description:
-  // Set the number of points in radius direction.
-  vtkSetClampMacro(RadialResolution,int,1,VTK_LARGE_INTEGER)
-  vtkGetMacro(RadialResolution,int);
-
-  // Description:
-  // Set the number of points in circumferential direction.
-  vtkSetClampMacro(CircumferentialResolution,int,3,VTK_LARGE_INTEGER)
-  vtkGetMacro(CircumferentialResolution,int);
 
   void setProbeData(const ssc::ProbeSector& data);
 
@@ -59,17 +35,17 @@ protected:
   ~UltrasoundSectorSource() {};
 
   void Execute();
-  double InnerRadius;
-  double OuterRadius;
-  int RadialResolution;
-  int CircumferentialResolution;
-  ssc::ProbeSector mData;
+
 
 private:
   void updateSector();
+  ssc::Transform3D get_tMu() const;
+  ssc::ProbeSector mData;
+
   UltrasoundSectorSource(const UltrasoundSectorSource&);  // Not implemented.
   void operator=(const UltrasoundSectorSource&);  // Not implemented.
 };
+
 
 #endif
 

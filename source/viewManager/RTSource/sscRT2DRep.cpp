@@ -41,8 +41,6 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mTexture(vtkTexturePtr::New() )
 {
   mUSSource = UltrasoundSectorSource::New();
-  mUSSource->SetCircumferentialResolution(10);
-  mUSSource->SetRadialResolution(1);
 
   this->setLookupTable();
   mOverrideCamera = false;
@@ -80,8 +78,8 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   transform->FlipROn();
 
   vtkDataSetMapperPtr mapper2 = vtkDataSetMapperPtr::New();
-  mapper2->SetInput(transform->GetOutput() );
-//  mapper2->SetInput(mTestPoly );
+//  mapper2->SetInput(transform->GetOutput() );
+  mapper2->SetInput(mUSSource->GetOutput() );
   mapper2->Update();
 
   mPlaneActor->SetTexture(mTexture);
@@ -152,7 +150,7 @@ void RealTimeStream2DRep::setLookupTable()
   lut->SetHueRange (0, 0);
   lut->SetValueRange (0, 1);
   lut->Build();
-  lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
+//  lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
 
 //  lut->SetNumberOfTableValues(3);
 //  lut->SetTableRange(0, pow(2, 16)-1);
@@ -187,7 +185,7 @@ void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
   }
 
   mData = data;
-  bool useMask = true;
+  bool useMask = false;
 
   if (mData)
   {
@@ -219,9 +217,11 @@ void RealTimeStream2DRep::receiveTransforms(Transform3D prMt, double timestamp)
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D tMu = mProbeData.get_tMu();
   //Transform3D rMt = rMpr * prMt;
+  Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
 //  mPlaneActor->SetUserMatrix(rMt.matrix());
   mPlaneActor->SetUserMatrix(rMu.matrix());
+//  mPlaneActor->SetUserMatrix(rMt.matrix());
 }
 
 void RealTimeStream2DRep::receiveVisible(bool visible)
@@ -278,90 +278,9 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
 //  std::cout << "extent " << extent << std::endl;
 //  mPlaneSource->Print(std::cout);
 
-//  vtkTextureMapToPlane* texMapper = vtkTextureMapToPlane::New();
-//  texMapper->SetOrigin(0,0);
-//  texMapper->SetPoint1(1,0);
-//  texMapper->SetPoint2(0,1);
-//
-//  texMapper->SetInput(mPlaneSource);
-
-//  int numPts = 4;
-//  vtkFloatArray* newTCoords = vtkFloatArray::New();
-//  newTCoords->SetNumberOfComponents(2);
-//  newTCoords->Allocate(2*numPts);
-//
-//  float tc[2];
-//  tc[0] = 0;
-//  tc[1] = 0;
-//  newTCoords->InsertTuple(0,tc);
-//  tc[0] = 1;
-//  tc[1] = 0;
-//  newTCoords->InsertTuple(1,tc);
-//  tc[0] = 1;
-//  tc[1] = 1;
-//  newTCoords->InsertTuple(2,tc);
-//  tc[0] = 0;
-//  tc[1] = 1;
-//  newTCoords->InsertTuple(3,tc);
-////  tc[0] = 0;
-////  tc[1] = 0;
-////  newTCoords->InsertTuple(4,tc);
-//  newTCoords->SetName("TextureCoordinates");
-
-//  mPlaneSource->GetOutput()->GetPointData()->SetTCoords(newTCoords);
   mPlaneSource->GetOutput()->GetPointData()->Modified();
   mPlaneSource->GetOutput()->Modified();
-//
-//  std::cout << "RealTimeStream2DRep::initializeSize end" << std::endl;
-//  mPlaneSource->GetOutput()->GetPointData()->Print(std::cout);
 }
-
-//vtkPolyDataPtr RealTimeStream2DRep::createTestPolyData()
-//{
-//  vtkPolyDataPtr retval = vtkPolyDataPtr::New();
-//
-//  vtkPointsPtr points = vtkPointsPtr::New();
-//  double W=474;
-//  points->InsertNextPoint(0, 0, 0);
-//  points->InsertNextPoint(W, 0, 0);
-//  points->InsertNextPoint(W, W, 0);
-//  points->InsertNextPoint(0, W, 0);
-////  points->InsertNextPoint(W/2, W,  0);
-////  points->InsertNextPoint(W,   W/2,0);
-////  points->InsertNextPoint(W/2, 0,  0);
-////  points->InsertNextPoint(0, W/2,  0);
-//
-//
-//  vtkCellArrayPtr newPolys = vtkCellArrayPtr::New();
-//  newPolys->Allocate(newPolys->EstimateSize(4,4));
-//
-//  vtkCellArrayPtr strips = vtkCellArrayPtr::New();
-//  strips->InsertCellPoint(0);
-//  strips->InsertCellPoint(1);
-//  strips->InsertCellPoint(2);
-//  strips->InsertCellPoint(3);
-//  //strips->InsertCellPoint(0);
-//
-//  vtkFloatArrayPtr newTCoords = vtkFloatArrayPtr::New();
-//  newTCoords->SetNumberOfComponents(2);
-////  newTCoords->InsertNextTuple2(0.5, 1);
-////  newTCoords->InsertNextTuple2(1,   0.5);
-////  newTCoords->InsertNextTuple2(0.5, 0);
-////  newTCoords->InsertNextTuple2(0,   0.5);
-//  newTCoords->InsertNextTuple2(0, 0);
-//  newTCoords->InsertNextTuple2(1, 0);
-//  newTCoords->InsertNextTuple2(1, 1);
-//  newTCoords->InsertNextTuple2(0, 1);
-//
-//  retval->SetPoints(points);
-//  retval->SetStrips(strips);
-////  retval->SetPolys(newPolys);
-////  retval->GetPointData()->SetTCoords(newTCoords);
-//
-//  retval->Update();
-////  retval->Print(std::cout);
-//  return retval;
-//}
 
 /**We need this here, even if it belongs in singlelayout.
  * Reason: must call setcamera after last change of size of plane actor.
