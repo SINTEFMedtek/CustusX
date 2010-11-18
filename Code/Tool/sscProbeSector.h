@@ -1,8 +1,18 @@
 #ifndef SSCPROBESECTOR_H_
 #define SSCPROBESECTOR_H_
 
+#include <QSize>
+#include "sscVector3D.h"
+
 namespace ssc
 {
+
+struct ProbeImageData
+{
+  ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
+  ssc::Vector3D mSpacing;
+  QSize mSize;
+};
 
 /**Definition of characteristics for an Ultrasound Probe.
  */
@@ -20,7 +30,8 @@ public:
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
 	double mDepthEnd; ///< end of sector, mm
-	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR). 
+	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR).
+	ProbeImageData mImage;
 };
 
 } // namespace ssc

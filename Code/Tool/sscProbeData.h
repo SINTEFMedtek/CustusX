@@ -21,10 +21,10 @@ typedef boost::shared_ptr<class ProbeData> ProbeDataPtr;
 class ProbeData
 {
 public: 
-	enum TYPE { tNONE=0,   ///< undefined
-				tSECTOR=1, ///< US beam is emitted radially in a flat cone. 
-				tLINEAR=2  ///< US beam is emitted straight forward.
-				};	
+//	enum TYPE { tNONE=0,   ///< undefined
+//				tSECTOR=1, ///< US beam is emitted radially in a flat cone.
+//				tLINEAR=2  ///< US beam is emitted straight forward.
+//				};
 public:
 	ProbeData();
 	ProbeData(ProbeSector data);
@@ -37,14 +37,15 @@ public:
   Transform3D get_uMv() const; ///< get transform from inverted image space v (origin in ul corner) to image space u.
   void updateSector(); ///<update the us sector polydata.
 
-	TYPE mType; ///< type of probe
-	double mDepthStart; ///< start of sector, mm
-	double mDepthEnd; ///< end of sector, mm
-	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR). 
-
-	Vector3D mOrigin_u; ///< probe origin in image space u.
-	Vector3D mSpacing;
-	QSize mSize;
+  ProbeSector mData;
+//	TYPE mType; ///< type of probe
+//	double mDepthStart; ///< start of sector, mm
+//	double mDepthEnd; ///< end of sector, mm
+//	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR).
+//
+//	Vector3D mOrigin_u; ///< probe origin in image space u.
+//	Vector3D mSpacing;
+//	QSize mSize;
 
   void test();
 
