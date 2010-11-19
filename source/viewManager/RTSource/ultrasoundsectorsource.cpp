@@ -1,18 +1,7 @@
 #include "ultrasoundsectorsource.h"
 
-#include "vtkCellArray.h"
-#include "vtkMath.h"
 #include "vtkObjectFactory.h"
-#include "vtkPoints.h"
 #include <vtkPointData.h>
-#include "vtkPolyData.h"
-#include <vtkFloatArray.h>
-
-#include "sscVector3D.h"
-#include "sscTransform3D.h"
-#include "sscBoundingBox3D.h"
-
-using namespace ssc;
 
 vtkCxxRevisionMacro(UltrasoundSectorSource, "$Revision: 3.0 $")
 ;
@@ -32,8 +21,9 @@ void UltrasoundSectorSource::Execute()
 
   output->SetPoints(mSector->GetPoints());
   output->GetPointData()->SetTCoords(mSector->GetPointData()->GetTCoords());
-  output->SetLines(mSector->GetLines());
-  output->SetPolys(mSector->GetPolys());
+  //output->SetLines(mSector->GetLines());
+  //output->SetPolys(mSector->GetPolys());
+  output->SetStrips(mSector->GetStrips());
 }
 
 void UltrasoundSectorSource::setProbeSector(vtkPolyDataPtr sector)
