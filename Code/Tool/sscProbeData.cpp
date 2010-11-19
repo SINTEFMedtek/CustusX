@@ -62,6 +62,7 @@ ProbeData::ProbeData()// : mType(ProbeSector::tNONE)
   mData.mImage.mOrigin_u = multiply_elems(Vector3D(mData.mImage.mSize.width()/2, mData.mImage.mSize.height()*1.0, 0), mData.mImage.mSpacing);
 
   //mCachedCenter_v = this->get_uMv().inv().coord(mOrigin_u) - mDepthStart * Vector3D(0,1,0);
+  mPolyData = vtkPolyDataPtr::New();
 }
 
 void ProbeData::setSector(ProbeSector data)
@@ -193,6 +194,8 @@ vtkPolyDataPtr ProbeData::getSector()
 
 vtkPolyDataPtr ProbeData::getSectorLinesOnly()
 {
+  if (mData.mType == ProbeSector::tNONE)
+    return mPolyData;
 
   this->updateSector();
 
@@ -288,9 +291,12 @@ vtkPolyDataPtr ProbeData::getSectorLinesOnly()
 
 void ProbeData::updateSector()
 {
-  std::cout << "update sector " << mData.mDepthEnd << std::endl;
-  if (!mPolyData)
-    mPolyData = vtkPolyDataPtr::New();
+  if (mData.mType == ProbeSector::tNONE)
+    return;
+
+  //std::cout << "update sector " << mData.mDepthEnd << std::endl;
+//  if (!mPolyData)
+//    mPolyData = vtkPolyDataPtr::New();
 
 //  vtkPolyData *mPolyData = this->GetOutput();
 //  double mDepthStart = 30;
@@ -318,7 +324,7 @@ void ProbeData::updateSector()
   Transform3D texMl = texMu * uMt * tMl;
   Transform3D uMl = uMt * tMl;
 
-  Transform3D M = tMl;
+  //Transform3D M = tMl;
   Vector3D e_x = unitVector(0);
   Vector3D e_y = unitVector(M_PI_2);
   Vector3D e_z(0,0,1);
@@ -328,7 +334,7 @@ void ProbeData::updateSector()
   vtkCellArrayPtr strips = vtkCellArrayPtr::New();
   vtkCellArrayPtr polys = vtkCellArrayPtr::New();
 
-  if (0)
+  if (mData.mType == ProbeSector::tLINEAR)
   {
     Vector3D cr = mData.mDepthStart * e_y + mData.mWidth/2 * e_x;
     Vector3D cl = mData.mDepthStart * e_y - mData.mWidth/2 * e_x;
@@ -336,24 +342,31 @@ void ProbeData::updateSector()
     Vector3D pr = mData.mDepthEnd * e_y + mData.mWidth/2 * e_x;
     Vector3D pl = mData.mDepthEnd * e_y - mData.mWidth/2 * e_x;
 
-    cl = M.coord(cl);
-    cr = M.coord(cr);
-    pl = M.coord(pl);
-    pr = M.coord(pr);
+//    cl = M.coord(cl);
+//    cr = M.coord(cr);
+//    pl = M.coord(pl);
+//    pr = M.coord(pr);
 
     points->Allocate(4);
-    points->InsertNextPoint(cl.begin());
-    points->InsertNextPoint(cr.begin());
-    points->InsertNextPoint(pr.begin());
-    points->InsertNextPoint(pl.begin());
+    points->InsertNextPoint(uMl.coord(cl).begin());
+    points->InsertNextPoint(uMl.coord(cr).begin());
+    points->InsertNextPoint(uMl.coord(pr).begin());
+    points->InsertNextPoint(uMl.coord(pl).begin());
+
+    newTCoords->Allocate(4);
+    newTCoords->InsertNextTuple(texMl.coord(cl).begin());
+    newTCoords->InsertNextTuple(texMl.coord(cr).begin());
+    newTCoords->InsertNextTuple(texMl.coord(pr).begin());
+    newTCoords->InsertNextTuple(texMl.coord(pl).begin());
 
 //    newTCoords->Allocate(2 * 4);
 //    newTCoords->InsertTuple((i + j), tc);
 
     vtkIdType cells[5] = { 0,1,2,3,0};
     sides->InsertNextCell(5, cells);
+    polys->InsertNextCell(5, cells);
   }
-  else if (1)
+  else if (mData.mType == ProbeSector::tSECTOR)
   {
     Vector3D c = - mData.mDepthStart * e_y;  // arc center point
 

@@ -215,6 +215,7 @@ void ToolRep3D::probeSectorChanged()
     Transform3D tMu = mProbeSector->get_tMu();
 
     mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+//    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSector());
     if (mProbeSectorPolyDataMapper->GetInput())
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
