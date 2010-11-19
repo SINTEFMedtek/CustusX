@@ -13,6 +13,7 @@
 #include "RTSource/sscRT2DRep.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
@@ -65,6 +66,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(mRTSource);
   rtRep->setLockCameraToStream(true);
+  //rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(rtRep);
 
   mRenderLabel = new QLabel("-");

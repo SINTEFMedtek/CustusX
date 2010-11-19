@@ -29,7 +29,7 @@
 #include "sscView.h"
 #include "sscTool.h"
 #include "sscTypeConversions.h"
-
+#include  "ultrasoundsectorsource.h"
 
 namespace ssc
 {
@@ -40,6 +40,9 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mPlaneSource(vtkPlaneSourcePtr::New()),
   mTexture(vtkTexturePtr::New() )
 {
+  mUSSource = UltrasoundSectorSource::New();
+  mUSSource->setProbeSector(mProbeData.getSector());
+
   this->setLookupTable();
   mOverrideCamera = false;
 
@@ -51,6 +54,7 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mMapZeroToOne->SetReplaceIn(true);
 
   mUSMaskData = mProbeData.getMask();
+  //mUSSource->setProbeData(mProbeData.mData);
 //  mUSMaskData->Print(std::cout);
 
   // set the filter that applies a mask to the stream data
@@ -58,9 +62,11 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   mMaskFilter->SetMaskInput(mUSMaskData);
   mMaskFilter->SetMaskedOutputValue(0.0);
 
-  mTestPoly = this->createTestPolyData();
+//  mTestPoly = this->createTestPolyData();
 
   vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
+//  tMapper->SetInput(mTestPoly);
+//  tMapper->SetInput(mUSSource->GetOutput());
   tMapper->SetInput(mPlaneSource->GetOutput());
 //  tMapper->SetOrigin(0,0,0);
 //  tMapper->SetPoint1(255,0,0);
@@ -72,13 +78,13 @@ RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name
   transform->SetScale( 1, 1, 0);
   transform->FlipROn();
 
-  vtkDataSetMapperPtr mapper2 = vtkDataSetMapperPtr::New();
-  mapper2->SetInput(transform->GetOutput() );
-//  mapper2->SetInput(mTestPoly );
-  mapper2->Update();
+  mDataSetMapper = vtkDataSetMapperPtr::New();
+  mDataSetMapper->SetInput(transform->GetOutput() );
+//  mapper2->SetInput(mUSSource->GetOutput() );
+  mDataSetMapper->Update();
 
   mPlaneActor->SetTexture(mTexture);
-  mPlaneActor->SetMapper(mapper2);
+  mPlaneActor->SetMapper(mDataSetMapper);
 
   mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
   mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -110,6 +116,7 @@ void RealTimeStream2DRep::setTool(ToolPtr tool)
   {
     disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
     disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+    disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
   }
 
   mTool = tool;
@@ -119,10 +126,29 @@ void RealTimeStream2DRep::setTool(ToolPtr tool)
   {
     connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
     connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+    connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
 
-    receiveTransforms(mTool->get_prMt(), 0);
+//    receiveTransforms(mTool->get_prMt(), 0);
+//    mProbeData.setSector(mTool->getProbeSector());
+//    mUSSource->setProbeSector(mProbeData.getSector());
+//    std::cout << "setting tool in rt rep" << std::endl;
 //    mToolActor->SetVisibility(mTool->getVisible());
+
+    // now that we have a tool: use the ultraound source, updated by the probe
+    mDataSetMapper->SetInput(mUSSource->GetOutput() );
+
+    this->probeSectorChanged();
   }
+}
+
+void RealTimeStream2DRep::probeSectorChanged()
+{
+  if (!mTool)
+    return;
+
+  receiveTransforms(mTool->get_prMt(), 0);
+  mProbeData.setSector(mTool->getProbeSector());
+  mUSSource->setProbeSector(mProbeData.getSector());
 }
 
 /** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
@@ -145,7 +171,7 @@ void RealTimeStream2DRep::setLookupTable()
   lut->SetHueRange (0, 0);
   lut->SetValueRange (0, 1);
   lut->Build();
-  lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
+//  lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
 
 //  lut->SetNumberOfTableValues(3);
 //  lut->SetTableRange(0, pow(2, 16)-1);
@@ -180,7 +206,7 @@ void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
   }
 
   mData = data;
-  bool useMask = true;
+  bool useMask = false;
 
   if (mData)
   {
@@ -212,9 +238,11 @@ void RealTimeStream2DRep::receiveTransforms(Transform3D prMt, double timestamp)
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D tMu = mProbeData.get_tMu();
   //Transform3D rMt = rMpr * prMt;
+  Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
 //  mPlaneActor->SetUserMatrix(rMt.matrix());
   mPlaneActor->SetUserMatrix(rMu.matrix());
+//  mPlaneActor->SetUserMatrix(rMt.matrix());
 }
 
 void RealTimeStream2DRep::receiveVisible(bool visible)
@@ -264,96 +292,15 @@ void RealTimeStream2DRep::initializeSize(int imageWidth, int imageHeight)
 
   DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
 
-  //std::cout << "bounds " << bounds << std::endl;
+//  std::cout << "bounds " << bounds << std::endl;
   mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
   mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
   mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
 //  std::cout << "extent " << extent << std::endl;
 //  mPlaneSource->Print(std::cout);
 
-//  vtkTextureMapToPlane* texMapper = vtkTextureMapToPlane::New();
-//  texMapper->SetOrigin(0,0);
-//  texMapper->SetPoint1(1,0);
-//  texMapper->SetPoint2(0,1);
-//
-//  texMapper->SetInput(mPlaneSource);
-
-  int numPts = 4;
-  vtkFloatArray* newTCoords = vtkFloatArray::New();
-  newTCoords->SetNumberOfComponents(2);
-  newTCoords->Allocate(2*numPts);
-
-  float tc[2];
-  tc[0] = 0;
-  tc[1] = 0;
-  newTCoords->InsertTuple(0,tc);
-  tc[0] = 1;
-  tc[1] = 0;
-  newTCoords->InsertTuple(1,tc);
-  tc[0] = 1;
-  tc[1] = 1;
-  newTCoords->InsertTuple(2,tc);
-  tc[0] = 0;
-  tc[1] = 1;
-  newTCoords->InsertTuple(3,tc);
-//  tc[0] = 0;
-//  tc[1] = 0;
-//  newTCoords->InsertTuple(4,tc);
-  newTCoords->SetName("TextureCoordinates");
-
-  mPlaneSource->GetOutput()->GetPointData()->SetTCoords(newTCoords);
   mPlaneSource->GetOutput()->GetPointData()->Modified();
   mPlaneSource->GetOutput()->Modified();
-//
-//  std::cout << "RealTimeStream2DRep::initializeSize end" << std::endl;
-//  mPlaneSource->GetOutput()->GetPointData()->Print(std::cout);
-}
-
-vtkPolyDataPtr RealTimeStream2DRep::createTestPolyData()
-{
-  vtkPolyDataPtr retval = vtkPolyDataPtr::New();
-
-  vtkPointsPtr points = vtkPointsPtr::New();
-  double W=255;
-  points->InsertNextPoint(0, 0, 0);
-  points->InsertNextPoint(W, 0, 0);
-  points->InsertNextPoint(W, W, 0);
-  points->InsertNextPoint(0, W, 0);
-//  points->InsertNextPoint(W/2, W,  0);
-//  points->InsertNextPoint(W,   W/2,0);
-//  points->InsertNextPoint(W/2, 0,  0);
-//  points->InsertNextPoint(0, W/2,  0);
-
-
-  vtkCellArrayPtr newPolys = vtkCellArrayPtr::New();
-  newPolys->Allocate(newPolys->EstimateSize(4,4));
-
-  vtkCellArrayPtr strips = vtkCellArrayPtr::New();
-  strips->InsertCellPoint(0);
-  strips->InsertCellPoint(1);
-  strips->InsertCellPoint(2);
-  strips->InsertCellPoint(3);
-  strips->InsertCellPoint(0);
-
-  vtkFloatArrayPtr newTCoords = vtkFloatArrayPtr::New();
-  newTCoords->SetNumberOfComponents(2);
-//  newTCoords->InsertNextTuple2(0.5, 1);
-//  newTCoords->InsertNextTuple2(1,   0.5);
-//  newTCoords->InsertNextTuple2(0.5, 0);
-//  newTCoords->InsertNextTuple2(0,   0.5);
-  newTCoords->InsertNextTuple2(0, 0);
-  newTCoords->InsertNextTuple2(1, 0);
-  newTCoords->InsertNextTuple2(1, 1);
-  newTCoords->InsertNextTuple2(0, 1);
-
-  retval->SetPoints(points);
-  retval->SetStrips(strips);
-  retval->SetPolys(newPolys);
-  retval->GetPointData()->SetTCoords(newTCoords);
-
-  retval->Update();
-//  retval->Print(std::cout);
-  return retval;
 }
 
 /**We need this here, even if it belongs in singlelayout.
