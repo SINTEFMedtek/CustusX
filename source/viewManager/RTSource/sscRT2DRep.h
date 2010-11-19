@@ -52,13 +52,10 @@ private slots:
   void probeSectorChanged();
 
 private:
-//  void setMask();
   void initializeSize(int imageWidth, int imageHeight);
   void setLookupTable();
   void setCamera();
   void setup();
-
-//  vtkPolyDataPtr createTestPolyData();
 
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
@@ -72,9 +69,6 @@ private:
   View* mView;
   UltrasoundSectorSource* mUSSource;
   vtkDataSetMapperPtr mDataSetMapper;
-
-
-//  vtkPolyDataPtr mTestPoly;
 
   vtkImageThresholdPtr mMapZeroToOne;
   vtkImageDataPtr mUSMaskData;
