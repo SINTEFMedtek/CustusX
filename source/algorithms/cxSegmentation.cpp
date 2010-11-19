@@ -162,7 +162,7 @@ ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, 
   ssc::messageManager()->sendInfo("created contour " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
-  result->setParentFrame(image->getUid());
+  result->get_rMd_History()->addParentFrame(image->getUid());
 
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveMesh(result, outputBasePath);
@@ -227,8 +227,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   ssc::messageManager()->sendInfo("created segment " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
-
-  result->setParentFrame(image->getUid());
+  result->get_rMd_History()->addParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
 
@@ -270,7 +269,7 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
   ssc::messageManager()->sendInfo("Generating centerline time: " + tempTime.toString("hh:mm:ss:zzz"));
 
-  result->setParentFrame(image->getUid());
+  result->get_rMd_History()->addParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
 

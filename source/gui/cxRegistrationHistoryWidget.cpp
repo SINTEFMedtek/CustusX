@@ -86,8 +86,8 @@ std::vector<ssc::RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegist
   std::vector<ssc::RegistrationHistoryPtr> retval;
   retval.push_back(ssc::ToolManager::getInstance()->get_rMpr_History());
 
-  std::map<QString, ssc::ImagePtr> image = ssc::DataManager::getInstance()->getImages();
-  for (std::map<QString, ssc::ImagePtr>::iterator iter=image.begin(); iter!=image.end(); ++iter)
+  std::map<QString, ssc::DataPtr> data = ssc::DataManager::getInstance()->getData();
+  for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
     retval.push_back(iter->second->get_rMd_History());
   }
