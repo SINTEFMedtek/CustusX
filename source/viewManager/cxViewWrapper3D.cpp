@@ -387,15 +387,15 @@ void ViewWrapper3D::toolsAvailableSlot()
     mView->addRep(toolRep);
    // ssc::messageManager()->sendDebug("ToolRep3D for tool "+tool->getName()+" added to view "+mView->getName()+".");
 
-//    if (!mRTStreamRep)
-//    {
-//      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
-//      mRTStreamRep.reset(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
-//    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
-//      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
-//      mRTStreamRep->setTool(tool);
-//      mView->addRep(mRTStreamRep);
-//    }
+    if (!mRTStreamRep)
+    {
+      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
+      mRTStreamRep.reset(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
+      mRTStreamRep->setTool(tool);
+      mView->addRep(mRTStreamRep);
+    }
   }
 
 
