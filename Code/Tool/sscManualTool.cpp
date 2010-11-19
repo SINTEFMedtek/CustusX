@@ -118,7 +118,7 @@ bool ManualTool::isCalibrated() const
 
 ssc::ProbeSector ManualTool::getProbeSector() const
 {
-  return ssc::ProbeSector();
+//  return ssc::ProbeSector();
   //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
 	ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 200, M_PI_2);
   //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);

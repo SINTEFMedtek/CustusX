@@ -179,18 +179,10 @@ void ToolRep3D::update()
     prMt = mTool->get_prMt();
   }
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
-//  mProbeSector->setPosition(rMpr*prMt);
 
   if (this->showProbe())
   {
-//    mProbeSector->setSector(mTool->getProbeSector());
     Transform3D tMu = mProbeSector->get_tMu();
-
-//    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
-//    if (mProbeSectorPolyDataMapper->GetInput())
-//    {
-//      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
-//    }
     mProbeSectorActor->SetUserMatrix((rMpr*prMt*tMu).matrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
   }
@@ -215,7 +207,6 @@ void ToolRep3D::probeSectorChanged()
     Transform3D tMu = mProbeSector->get_tMu();
 
     mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
-//    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSector());
     if (mProbeSectorPolyDataMapper->GetInput())
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
