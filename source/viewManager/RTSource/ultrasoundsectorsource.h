@@ -18,8 +18,9 @@ mapped onto this polygon.
 #define __UltrasoundSectorSource_h
 
 #include "vtkPolyDataSource.h"
-#include "sscProbeSector.h"
-#include "sscTransform3D.h"
+#include "vtkPolyData.h"
+#include "vtkSmartPointer.h"
+typedef vtkSmartPointer<vtkPolyData> vtkPolyDataPtr;
 
 /**Source for an Ultrasound sector.
  * The output vtkPolyData contains a polygon plus texture coordinates.
