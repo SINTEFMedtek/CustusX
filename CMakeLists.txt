@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(CustusX3_VERSION_MAJOR	3)
 SET(CustusX3_VERSION_MINOR	0)
-SET(CustusX3_VERSION_PATCH	10)
+SET(CustusX3_VERSION_PATCH	11)
 SET(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 SET(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
@@ -15,7 +15,7 @@ set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. A
 #set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/../install_test/ )
 
 # Set ALPHA to OFF to build release
-SET(ALPHA ON)
+SET(ALPHA OFF)
 
 #FIND_PACKAGE(Subversion)
 #IF(Subversion_FOUND)
