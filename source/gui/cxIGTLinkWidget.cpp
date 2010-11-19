@@ -63,10 +63,10 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
   mRenderTimer->start(50);
 
-  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+  ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(mRTSource);
-  rtRep->setLockCameraToStream(true);
-  //rtRep->setTool(ssc::toolManager()->getDominantTool());
+//  rtRep->setLockCameraToStream(true);
+  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(rtRep);
 
   mRenderLabel = new QLabel("-");
