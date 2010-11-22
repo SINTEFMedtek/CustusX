@@ -70,15 +70,15 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
   tMapper->SetInput(mPlaneSource->GetOutput());
 
-  vtkTransformTextureCoordsPtr transform = vtkTransformTextureCoordsPtr::New();
-  transform->SetInput(tMapper->GetOutput() );
-  transform->SetOrigin( 0, 0, 0);
-  transform->SetScale( 1, 1, 0);
-  //transform->FlipROn();
+  mTransformTextureCoords = vtkTransformTextureCoordsPtr::New();
+  mTransformTextureCoords->SetInput(tMapper->GetOutput() );
+  mTransformTextureCoords->SetOrigin( 0, 0, 0);
+  mTransformTextureCoords->SetScale( 1, 1, 0);
+  mTransformTextureCoords->FlipROn();
 
   // all paths to go into the DataSetMapper
   mDataSetMapper = vtkDataSetMapperPtr::New();
-  mDataSetMapper->SetInput(transform->GetOutput() );
+  mDataSetMapper->SetInput(mTransformTextureCoords->GetOutput() );
 //  mapper2->SetInput(mUSSource->GetOutput() );
   mDataSetMapper->Update();
 
@@ -134,7 +134,9 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
     else
     {
       // now that we have a tool: use the ultraound source, updated by the probe
-      mDataSetMapper->SetInput(mUSSource->GetOutput() );
+      //mDataSetMapper->SetInput(mUSSource->GetOutput() );
+      mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
+
     }
 
     this->probeSectorChanged();
@@ -351,7 +353,7 @@ void RealTimeStream2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
 RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name)
 {
-  mRTGraphics.reset(new RealTimeStreamGraphics(true));
+  mRTGraphics.reset(new RealTimeStreamGraphics());
   connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
   mRTGraphics->setIgnoreToolTransform(true);
 
@@ -405,11 +407,12 @@ void RealTimeStreamFixedPlaneRep::setCamera()
   camera->ParallelProjectionOn();
   mRenderer->ResetCamera();
 
-  DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
+//  DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
+  DoubleBoundingBox3D bounds(mRTGraphics->getActor()->GetBounds());
   if (ssc::similar(bounds.range()[0], 0.0) || ssc::similar(bounds.range()[1], 0.0))
     return;
 
-  camera->SetParallelScale(bounds.range()[1]/2); // exactly fill the viewport height
+  camera->SetParallelScale(bounds.range()[1]/2*1.1); // exactly fill the viewport height
 }
 
 
