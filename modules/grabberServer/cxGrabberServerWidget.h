@@ -2,7 +2,7 @@
 #define CXGRABBERSERVERWIDGET_H_
 
 #include <QObject>
-#include <QMacCocoaViewContainer>
+#include <qwidget.h>
 
 #include "cxGrabber.h"
 
@@ -20,7 +20,7 @@ namespace cx
  * \author: Janne Beate Bakeng, SINTEF
  */
 
-class GrabberServerWidget : public QMacCocoaViewContainer
+class GrabberServerWidget : public QWidget
 {
   Q_OBJECT
 public:
@@ -33,12 +33,13 @@ private slots:
 private:
   void updateInfoLabel();
 
+  QWidget*     mPreviewParent;
   QPushButton* mStartButton;
   QLabel*      mInfoLabel;
   
 //  GrabberPreviewWidget* mPreviewWidget;
 //  OpenIGTLinkServerPtr mServer;
-  GrabberPtr mGrabber;
+  MacGrabber* mGrabber;
 };
 
 }//namespace cx

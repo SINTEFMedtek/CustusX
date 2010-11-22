@@ -11,6 +11,9 @@ MainWindow::MainWindow() :
   this->setCentralWidget(new QWidget());
   mGrabberServerWidget = new GrabberServerWidget(this->centralWidget());
   this->setCentralWidget(mGrabberServerWidget);
+  //this->layout()->addWidget(mGrabberServerWidget);
+  
+  this->setMinimumSize(800,600);
 }
 
 MainWindow::~MainWindow()
