@@ -4,6 +4,8 @@
 #include <QObject>
 #include <boost/shared_ptr.hpp>
 
+class QMacCocoaViewContainer;
+
 namespace cx
 {
 
@@ -26,12 +28,19 @@ public:
   
   virtual void start() = 0;
   virtual void stop() = 0;
-  virtual QWidget* getPreviewWidget() = 0;
 
 signals:
   void frame();
   
 protected:
+};
+
+struct Frame
+{
+  int mWidth;
+  int mHeight;
+  //int mPixelFormat;
+  //char* mFirstPixel;  
 };
 
 /**
@@ -58,11 +67,20 @@ public:
   
   virtual void start();
   virtual void stop();
-  virtual QWidget* getPreviewWidget();
+  QMacCocoaViewContainer* getPreviewWidget(QWidget* parent);
   
 private:
   bool findConnectedDevice();
   bool openDevice();
+  bool closeDevice();
+  
+  bool startSession();
+  void stopSession();
+  
+  //void enablePreview();
+  void enableTransmission();
+  
+  void setFrame(Frame frame);
 
   //Helper class for combining objective-c with c++/Qt
   //instead of using void* and reinterpret_cast
@@ -71,6 +89,7 @@ private:
 };
 
 typedef boost::shared_ptr<class Grabber> GrabberPtr;
+typedef boost::shared_ptr<class MacGrabber> MacGrabberPtr;
 
 }
 #endif /* CXEPIPHANGRABBER_H_ */

@@ -4,6 +4,7 @@
 #include "cxGrabber.h"
 #include <iostream>
 #include <QWidget>
+#include <QMacCocoaViewContainer>
 
 //#include "sscMessageManager.h"
 
@@ -19,7 +20,7 @@
 
 - (id)init;
 - (void)dealloc;
-- (void)setCallback:(QTCaptureDecompressedVideoOutput*)videoStream;
+- (void)setCallback:(QTCaptureOutput*)videoStream;
 - (int)getFrameCount;
 @end
 
@@ -37,7 +38,7 @@
     [super dealloc];
 }
 
-- (void)setCallback:(QTCaptureDecompressedVideoOutput*)videoStream {
+- (void)setCallback:(QTCaptureOutput*)videoStream {
     [videoStream setDelegate:self];
     
 }
@@ -49,7 +50,7 @@
 //method that receives the frames from the grabber, 
 //connected via [mObjectiveC->mVideoObserver setCallback:mObjectiveC->mCaptureDecompressedVideoOutput]
 - (void)captureOutput:(QTCaptureFileOutput *)captureOutput didOutputVideoFrame:(CVImageBufferRef)videoFrame withSampleBuffer:(QTSampleBuffer *)sampleBuffer fromConnection:(QTCaptureConnection *)connection
-{  
+{
   //width and height of the incoming image
   int width = CVPixelBufferGetWidth(videoFrame);
   int height = CVPixelBufferGetHeight(videoFrame);
@@ -59,25 +60,25 @@
   unsigned char* bufferAddr = reinterpret_cast<unsigned char*>(CVPixelBufferGetBaseAddress(videoFrame));
   unsigned char pixel;
   
-  for (int i=0; i<(width*height); i++)
-  {
-    pixel = *bufferAddr;
-    pixel = 255 - pixel;    // Pixel values are inverted from QuickTime (White is zero)
+  //for (int i=0; i<(width*height); i++)
+  //{
+    //pixel = *bufferAddr;
+    //pixel = 255 - pixel;    // Pixel values are inverted from QuickTime (White is zero)
 
     //TODO
     //DO SOMETHING WITH THE IMAGE!!!!!
     //create some structure we can live with
     //vtkImage???
-    //TODO
+    //TODO  
     
-    bufferAddr++;
-  }
+    //bufferAddr++;
+  //}
   //TODO!!!!
   //call function in MacGrabber::sendFrame() which emits a signal with the frame that the server is connected to
   //TODO!!!
   CVPixelBufferUnlockBaseAddress(videoFrame, 0);
   mFrameCount++;
-  std::cout << "Frame written..." << std::endl;
+  //std::cout << "Frame written..." << std::endl;
   
   //finding the timetag of the image
   QTTime  timetag = [sampleBuffer presentationTime];
@@ -90,13 +91,11 @@
     //std::cout << "Starting to save frames, mFirstTimeTag is now set to: " << mFirstTimeTag << std::endl;
   }
   
-  /*
    NSLog(@"PixelFormatType : %d",CVPixelBufferGetPixelFormatType(videoFrame));
    NSLog(@"Pixelbuffer width : %d",CVPixelBufferGetWidth(videoFrame));
    NSLog(@"Pixelbuffer height : %d",CVPixelBufferGetHeight(videoFrame));
    NSLog(@"Pixelbuffer bytes per row : %d",CVPixelBufferGetBytesPerRow(videoFrame));
    NSLog(@"Pixelbuffer data size : %d",CVPixelBufferGetDataSize(videoFrame));
-   */
 }
 @end
 
@@ -108,10 +107,18 @@ class MacGrabber::ObjectiveC
 {
 public:
     NSAutoreleasePool*                    mPool;
+    //device
     QTCaptureDevice*                      mSelectedDevice;
-    QTCaptureSession*                     mCaptureSession;
+    //input
     QTCaptureDeviceInput*                 mCaptureDeviceInput;
+    //session
+    QTCaptureSession*                     mCaptureSession;
+    //output
     QTCaptureDecompressedVideoOutput*     mCaptureDecompressedVideoOutput;
+    QTCaptureVideoPreviewOutput*          mVideoPreviewOutput;
+    //view
+    QTCaptureView*                        mCaptureView;
+    //observer
     VideoObserver*                        mVideoObserver;
 };
 //==============================================================================
@@ -120,14 +127,15 @@ MacGrabber::MacGrabber() :
   Grabber(),
   mObjectiveC(new ObjectiveC)
 {
+  //allocate memory
   mObjectiveC->mPool = [[NSAutoreleasePool alloc] init];
-  
-  //make a capture session for receiving frames to save to file
   mObjectiveC->mCaptureSession = [[QTCaptureSession alloc] init];
 }
 
 MacGrabber::~MacGrabber()
-{}
+{
+  [mObjectiveC->mPool release];
+}
 
 void MacGrabber::start()
 {
@@ -135,6 +143,8 @@ void MacGrabber::start()
   {
     if(!this->openDevice())
       std::cout << "Could not open the selected device. Aborting." << std::endl;
+    else
+      this->startSession();
   } else
   {
     std::cout << "Could not find a connected device. Aborting." << std::endl;
@@ -142,11 +152,16 @@ void MacGrabber::start()
 }
 
 void MacGrabber::stop()
-{}
-
-QWidget* MacGrabber::getPreviewWidget()
 {
-  QWidget* retval = new QWidget();
+  this->stopSession();
+}
+
+QMacCocoaViewContainer* MacGrabber::getPreviewWidget(QWidget* parent)
+{
+  QMacCocoaViewContainer* retval = new QMacCocoaViewContainer(0 ,parent);
+  retval->setCocoaView(mObjectiveC->mCaptureView);
+  retval->setFixedSize(800,600);
+  
   return retval;
 }
 
@@ -211,60 +226,79 @@ bool MacGrabber::openDevice()
   //try to open the selected device
   NSError* error;
   bool success = [mObjectiveC->mSelectedDevice open:&error];
-  if (!success)
-    return success;
-  
+  return success;
+}
+
+bool MacGrabber::closeDevice()
+{
+  return true;
+}
+
+bool MacGrabber::startSession()
+{
   //try to connect the device to the pipeline
+  NSError* error;
   mObjectiveC->mCaptureDeviceInput = [[QTCaptureDeviceInput alloc] initWithDevice:mObjectiveC->mSelectedDevice];
-  success = [mObjectiveC->mCaptureSession addInput:mObjectiveC->mCaptureDeviceInput error:&error];
+  bool success = [mObjectiveC->mCaptureSession addInput:mObjectiveC->mCaptureDeviceInput error:&error];
   
   if (!success)
     return success;
   
-  //set the pixel format to 8 bits (whiteIsZero)
+  this->enableTransmission();
+  //this->enablePreview();
+  
+  [mObjectiveC->mCaptureSession startRunning];
+  
+  return success;
+}
+
+void MacGrabber::stopSession()
+{
+  [mObjectiveC->mCaptureSession stopRunning];
+}
+
+/*void MacGrabber::enablePreview()
+{
+  //setup preview
+  NSError* error;
+  mObjectiveC->mVideoPreviewOutput = [[QTCaptureVideoPreviewOutput alloc] init];
+  bool success = [mObjectiveC->mCaptureSession addOutput:mObjectiveC->mVideoPreviewOutput error:&error];
+  if (!success)
+  {
+    std::cout << "Could not connect to the preview output." << std::endl;
+  }
+  //mObjectiveC->mCaptureView = [[QTCaptureView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600)];
+  mObjectiveC->mCaptureView = [[QTCaptureView alloc] init];
+  [mObjectiveC->mCaptureView setCaptureSession:mObjectiveC->mCaptureSession];
+}*/
+
+void MacGrabber::enableTransmission()
+{
+  //catch the frames and transmitt them using a signal
   mObjectiveC->mCaptureDecompressedVideoOutput = [[QTCaptureDecompressedVideoOutput alloc] init];
-  [mObjectiveC->mCaptureDecompressedVideoOutput setPixelBufferAttributes:[NSDictionary
-                                                                          dictionaryWithObjectsAndKeys:
-                                                                          [NSNumber numberWithUnsignedInt:kCVPixelFormatType_8IndexedGray_WhiteIsZero], 
-                                                                          (id)kCVPixelBufferPixelFormatTypeKey,
-                                                                          nil
-                                                                          ]];
-  success = [mObjectiveC->mCaptureSession addOutput:mObjectiveC->mCaptureDecompressedVideoOutput error:&error];
-  /*if (!success) {
-      [[NSAlert alertWithError:error] runModal];
-      return;
-  }*/
-  if (!success)
-    return success;
+
+  NSError* error;
+  bool success = [mObjectiveC->mCaptureSession addOutput:mObjectiveC->mCaptureDecompressedVideoOutput error:&error];
+  if(!success)
+    return; //TODO
 
   //Create a observer that listens to the videosignal from the captured decompressed video output
   mObjectiveC->mVideoObserver = [[VideoObserver alloc] init];
-  //mObjectiveC->mVideoObserver = observer;
-  [mObjectiveC->mVideoObserver setCallback:mObjectiveC->mCaptureDecompressedVideoOutput];
+  [mObjectiveC->mVideoObserver setCallback:mObjectiveC->mCaptureDecompressedVideoOutput]; //may not drop frames
+  //[mObjectiveC->mVideoObserver setCallback:mObjectiveC->mVideoPreviewOutput]; //may drop frames
   
+  mObjectiveC->mCaptureView = [[QTCaptureView alloc] init];
+  [mObjectiveC->mCaptureView setCaptureSession:mObjectiveC->mCaptureSession];
   
   //TODO
-  //setup preview
-  //[mObjectiveC->mVideoPreView setupCaptureSession:mObjectiveC->mCaptureSession];
-
-  
-  //REMOVE???
-  /*QTCaptureConnection* connection;
-  NSEnumerator* connectionEnumerator = [[mObjectiveC->mCaptureMovieFileOutput connections] objectEnumerator];
-  while ((connection = [connectionEnumerator nextObject])) {
-      NSString* mediaType = [connection mediaType];
-      QTCompressionOptions* compressionOptions = nil;
-      
-      if ([mediaType isEqualToString:QTMediaTypeVideo]) {
-          compressionOptions = [QTCompressionOptions compressionOptionsWithIdentifier:@"QTCompressionOptionsLosslessAppleIntermediateVideo"];
-      }
-      [mObjectiveC->mCaptureMovieFileOutput setCompressionOptions:compressionOptions forConnection:connection];
-      //insert the capturesession into a capturelayer
-      //[mObjectiveC->mVideoPreView setupCaptureSession:mObjectiveC->mCaptureSession];
-  }*/
-  
-  [mObjectiveC->mCaptureSession startRunning];
-        
-  return success;
+  //need to try this because we want to see excatly what we are grabbing!!!
+  //[mObjectiveC->mCaptureView setVideoPreviewConnection:mObjectiveC->mCaptureDecompressedVideoOutput];
 }
+
+void MacGrabber::setFrame(Frame frame)
+{
+  //if(frame.mWidth && frame.mHeight)
+      //[mObjectiveC->mCaptureView setFrameSize:NSMakeSize(mWidth, mHeight)];
+}
+
 }//namespace cx
