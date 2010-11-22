@@ -35,49 +35,48 @@ namespace ssc
 {
 
 
-RealTimeStreamGraphics::RealTimeStreamGraphics() :
+RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   mPlaneActor(vtkActorPtr::New()),
   mPlaneSource(vtkPlaneSourcePtr::New()),
   mTexture(vtkTexturePtr::New() )
 {
+  mUseMask = useMaskFilter;
   mIgnoreToolTransform = false;
   mUSSource = UltrasoundSectorSource::New();
   mUSSource->setProbeSector(mProbeData.getSector());
 
   this->setLookupTable();
 
-  // set a filter that map all zeros in the input to ones. This enables us to
-  // use zero as a special transparency value, to be used in masking.
-  mMapZeroToOne = vtkImageThresholdPtr::New();
-  mMapZeroToOne->ThresholdByLower(1.0);
-  mMapZeroToOne->SetInValue(1);
-  mMapZeroToOne->SetReplaceIn(true);
+  if (mUseMask)
+  {
+    // set a filter that map all zeros in the input to ones. This enables us to
+    // use zero as a special transparency value, to be used in masking.
+    mMapZeroToOne = vtkImageThresholdPtr::New();
+    mMapZeroToOne->ThresholdByLower(1.0);
+    mMapZeroToOne->SetInValue(1);
+    mMapZeroToOne->SetReplaceIn(true);
 
-  mUSMaskData = mProbeData.getMask();
-  //mUSSource->setProbeData(mProbeData.mData);
-//  mUSMaskData->Print(std::cout);
+//    mUSMaskData = mProbeData.getMask();
+    //mUSSource->setProbeData(mProbeData.mData);
+  //  mUSMaskData->Print(std::cout);
 
-  // set the filter that applies a mask to the stream data
-  mMaskFilter = vtkImageMaskPtr::New();
-  mMaskFilter->SetMaskInput(mUSMaskData);
-  mMaskFilter->SetMaskedOutputValue(0.0);
+    // set the filter that applies a mask to the stream data
+    mMaskFilter = vtkImageMaskPtr::New();
+    mMaskFilter->SetMaskInput(mProbeData.getMask());
+    mMaskFilter->SetMaskedOutputValue(0.0);
+  }
 
-//  mTestPoly = this->createTestPolyData();
-
+  // generate texture coords for mPlaneSource
   vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
-//  tMapper->SetInput(mTestPoly);
-//  tMapper->SetInput(mUSSource->GetOutput());
   tMapper->SetInput(mPlaneSource->GetOutput());
-//  tMapper->SetOrigin(0,0,0);
-//  tMapper->SetPoint1(255,0,0);
-//  tMapper->SetPoint2(0,255,0);
 
   vtkTransformTextureCoordsPtr transform = vtkTransformTextureCoordsPtr::New();
   transform->SetInput(tMapper->GetOutput() );
   transform->SetOrigin( 0, 0, 0);
   transform->SetScale( 1, 1, 0);
-  transform->FlipROn();
+  //transform->FlipROn();
 
+  // all paths to go into the DataSetMapper
   mDataSetMapper = vtkDataSetMapperPtr::New();
   mDataSetMapper->SetInput(transform->GetOutput() );
 //  mapper2->SetInput(mUSSource->GetOutput() );
@@ -128,8 +127,15 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
 //    std::cout << "setting tool in rt rep" << std::endl;
 //    mToolActor->SetVisibility(mTool->getVisible());
 
-    // now that we have a tool: use the ultraound source, updated by the probe
-    mDataSetMapper->SetInput(mUSSource->GetOutput() );
+    if (mUseMask)
+    {
+      // do nothing: keep the pipeline from PlaneSource
+    }
+    else
+    {
+      // now that we have a tool: use the ultraound source, updated by the probe
+      mDataSetMapper->SetInput(mUSSource->GetOutput() );
+    }
 
     this->probeSectorChanged();
   }
@@ -140,9 +146,18 @@ void RealTimeStreamGraphics::probeSectorChanged()
   if (!mTool)
     return;
 
-  receiveTransforms(mTool->get_prMt(), 0);
   mProbeData.setSector(mTool->getProbeSector());
-  mUSSource->setProbeSector(mProbeData.getSector());
+
+  if (mUseMask)
+  {
+    mMaskFilter->SetMaskInput(mProbeData.getMask());
+  }
+  else
+  {
+    mUSSource->setProbeSector(mProbeData.getSector());
+  }
+
+  receiveTransforms(mTool->get_prMt(), 0);
 }
 
 /** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
@@ -165,7 +180,10 @@ void RealTimeStreamGraphics::setLookupTable()
   lut->SetHueRange (0, 0);
   lut->SetValueRange (0, 1);
   lut->Build();
-//  lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
+  if (mUseMask)
+  {
+    lut->SetTableValue(0, 0, 0, 0, 0); // set the lowest value to transparent. This will make the masked values transparent, but nothing else
+  }
 
 //  lut->SetNumberOfTableValues(3);
 //  lut->SetTableRange(0, pow(2, 16)-1);
@@ -200,12 +218,12 @@ void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
   }
 
   mData = data;
-  bool useMask = false;
 
   if (mData)
   {
     connect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
-    if (!useMask) // send data directly to texture, no mask.
+
+    if (!mUseMask) // send data directly to texture, no mask.
     {
       mTexture->SetInput(mData->getVtkImageData());
     }
@@ -333,7 +351,7 @@ void RealTimeStream2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
 RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name)
 {
-  mRTGraphics.reset(new RealTimeStreamGraphics());
+  mRTGraphics.reset(new RealTimeStreamGraphics(true));
   connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
   mRTGraphics->setIgnoreToolTransform(true);
 

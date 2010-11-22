@@ -34,7 +34,7 @@ class RealTimeStreamGraphics : public QObject
 {
   Q_OBJECT
 public:
-  RealTimeStreamGraphics();
+  RealTimeStreamGraphics(bool useMaskFilter=false);
   virtual ~RealTimeStreamGraphics();
 
   void setRealtimeStream(RealTimeStreamSourcePtr data);
@@ -56,6 +56,8 @@ private:
   void initializeSize(int imageWidth, int imageHeight);
   void setLookupTable();
 
+  bool mUseMask;
+
   bool mIgnoreToolTransform;
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
@@ -69,7 +71,7 @@ private:
   vtkDataSetMapperPtr mDataSetMapper;
 
   vtkImageThresholdPtr mMapZeroToOne;
-  vtkImageDataPtr mUSMaskData;
+//  vtkImageDataPtr mUSMaskData;
   vtkImageMaskPtr mMaskFilter;
 };
 
