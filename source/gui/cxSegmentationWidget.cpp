@@ -579,7 +579,7 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
   QString name = centerlineImage->getName() + " mesh %1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
   mesh->setColor(mDefaultColor);
-  mesh->setParentFrame(centerlineImage->getUid());
+  mesh->get_rMd_History()->addParentFrame(centerlineImage->getUid());
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 

@@ -151,6 +151,10 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
     //std::cout << "rMd_new\n" << newTransform.mValue << std::endl;
   }
 
+//  skriv om update registration:
+//  - ta inn enten transform3D eller parent frame + time, modifiser transformen men behold gamle data.
+//  - sjekk ut alle setParentFrame (spesielt den nedenfor)
+
   //error:
   // reconnect only if the registration is done relative to a base.
   // if target==targetBase, the registration is done inside an already connected
@@ -174,7 +178,14 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
       if (targetData[i]->getParentFrame() == targetBaseUid)
       {
         ssc::messageManager()->sendInfo("Reset parent frame of " + targetData[i]->getName() + " to " + masterAncestorUid + ". targetbase=" + targetBaseUid);
-        targetData[i]->setParentFrame(masterAncestorUid);
+//        //targetData[i]->setParentFrame(masterAncestorUid);
+//        if (targetData[i]->get_rMd_History()->getData().empty())
+//          return;
+//        ssc::RegistrationTransform t = targetData[i]->get_rMd_History()->getData().back();
+//        t.mParentFrame = masterAncestorUid;
+//        void updateParentFrame(const QDateTime& oldTime, const ParentFrame& newTransform);
+
+        targetData[i]->get_rMd_History()->updateParentFrame(oldTime, ssc::ParentFrame(masterAncestorUid, deltaTransform.mTimestamp, deltaTransform.mType));
       }
     }
   }

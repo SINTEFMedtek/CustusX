@@ -581,7 +581,7 @@ bool ParentFrameStringDataAdapter::setValue(const QString& value)
 {
   if (!mData)
     return false;
-  mData->setParentFrame(value);
+  mData->get_rMd_History()->addParentFrame(value);
   return true;
 }
 

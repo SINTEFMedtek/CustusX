@@ -143,7 +143,7 @@ void ImportDataWizard::setInitialGuessForParentFrame()
     QString current = qstring_cast(iter->second->getName()).split(".")[0];
     if (base.indexOf(current)>=0)
     {
-      mData->setParentFrame(iter->first);
+      mData->get_rMd_History()->addParentFrame(iter->first);
       break;
     }
   }
