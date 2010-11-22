@@ -53,6 +53,8 @@ SET ( ${LIB}_viewManager
     RTSource/sscOpenIGTLinkRTSource.cpp
     RTSource/sscRT2DRep.h
     RTSource/sscRT2DRep.cpp
+    RTSource/ultrasoundsectorsource.h
+    RTSource/ultrasoundsectorsource.cpp
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

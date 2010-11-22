@@ -23,9 +23,58 @@ typedef vtkSmartPointer<class vtkRenderer> vtkRendererPtr;
 typedef vtkSmartPointer<class vtkTextureMapToPlane> vtkTextureMapToPlanePtr;
 typedef vtkSmartPointer<class vtkImageMask> vtkImageMaskPtr;
 
+class UltrasoundSectorSource;
 
 namespace ssc
 {
+
+typedef boost::shared_ptr<class RealTimeStreamGraphics> RealTimeStreamGraphicsPtr;
+
+class RealTimeStreamGraphics : public QObject
+{
+  Q_OBJECT
+public:
+  RealTimeStreamGraphics(bool useMaskFilter=false);
+  virtual ~RealTimeStreamGraphics();
+
+  void setRealtimeStream(RealTimeStreamSourcePtr data);
+  void setTool(ToolPtr tool);
+  void setIgnoreToolTransform(bool on);
+
+  vtkActorPtr getActor();
+
+signals:
+  void newData();
+
+private slots:
+  void newDataSlot();
+  void receiveTransforms(Transform3D matrix, double timestamp);
+  void receiveVisible(bool visible);
+  void probeSectorChanged();
+
+private:
+  void initializeSize(int imageWidth, int imageHeight);
+  void setLookupTable();
+
+  bool mUseMask;
+
+  bool mIgnoreToolTransform;
+  ToolPtr mTool;
+  ssc::ProbeData mProbeData;
+  RealTimeStreamSourcePtr mData;
+  vtkActorPtr mPlaneActor;
+  vtkPlaneSourcePtr mPlaneSource;
+  vtkTexturePtr mTexture;
+//  vtkRendererPtr mRenderer;
+//  View* mView;
+  UltrasoundSectorSource* mUSSource;
+  vtkDataSetMapperPtr mDataSetMapper;
+
+  vtkImageThresholdPtr mMapZeroToOne;
+//  vtkImageDataPtr mUSMaskData;
+  vtkImageMaskPtr mMaskFilter;
+};
+
 
 typedef boost::shared_ptr<class RealTimeStream2DRep> RealTimeStream2DRepPtr;
 
@@ -38,7 +87,34 @@ public:
   virtual QString getType() const { return "ssc::RealTimeStream2DRep"; }
   void setRealtimeStream(RealTimeStreamSourcePtr data);
   void setTool(ToolPtr tool);
-  void setLockCameraToStream(bool on);
+
+protected:
+  virtual void addRepActorsToViewRenderer(ssc::View* view);
+  virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+private slots:
+
+private:
+  RealTimeStreamGraphicsPtr mRTGraphics;
+  vtkRendererPtr mRenderer;
+  View* mView;
+};
+
+typedef boost::shared_ptr<class RealTimeStreamFixedPlaneRep> RealTimeStreamFixedPlaneRepPtr;
+
+/**A rep visualizing a RT stream directly into the view plane.
+ * It does not follow the tool, but controls the camera in order to
+ * fill the entire view.
+ */
+class RealTimeStreamFixedPlaneRep : public ssc::RepImpl
+{
+  Q_OBJECT
+public:
+  RealTimeStreamFixedPlaneRep(const QString& uid, const QString& name="");
+  virtual ~RealTimeStreamFixedPlaneRep();
+  virtual QString getType() const { return "ssc::RealTimeStreamFixedPlaneRep"; }
+  void setRealtimeStream(RealTimeStreamSourcePtr data);
+  void setTool(ToolPtr tool);
+//  void setLockCameraToStream(bool on);
 
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -46,34 +122,27 @@ protected:
 private slots:
   void newDataSlot();
 
-  void receiveTransforms(Transform3D matrix, double timestamp);
-  void receiveVisible(bool visible);
+//  void receiveTransforms(Transform3D matrix, double timestamp);
+//  void receiveVisible(bool visible);
+//  void probeSectorChanged();
 
 private:
-//  void setMask();
-  void initializeSize(int imageWidth, int imageHeight);
-  void setLookupTable();
+//  void initializeSize(int imageWidth, int imageHeight);
+//  void setLookupTable();
   void setCamera();
-  void setup();
-  vtkPolyDataPtr createTestPolyData();
+//  void setup();
+
+  RealTimeStreamGraphicsPtr mRTGraphics;
 
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
   RealTimeStreamSourcePtr mData;
+
   ssc::TextDisplayPtr mStatusText;
   ssc::TextDisplayPtr mInfoText;
-  vtkActorPtr mPlaneActor;
-  vtkPlaneSourcePtr mPlaneSource;
-  vtkTexturePtr mTexture;
+
   vtkRendererPtr mRenderer;
   View* mView;
-
-  vtkPolyDataPtr mTestPoly;
-
-  vtkImageThresholdPtr mMapZeroToOne;
-  vtkImageDataPtr mUSMaskData;
-  vtkImageMaskPtr mMaskFilter;
-  bool mOverrideCamera;
 };
 
 
