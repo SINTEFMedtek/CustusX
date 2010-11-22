@@ -12,6 +12,10 @@ int main(int argc, char **argv)
 
   cx::MainWindow window;
   window.show();
+  #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+  window.activateWindow();
+#endif
+  window.raise();
 
   int retVal = app.exec();
   return retVal;
