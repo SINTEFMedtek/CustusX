@@ -30,7 +30,7 @@ private slots:
   virtual void hideEvent(QHideEvent* event);
   void landmarkUpdatedSlot();
   void plateRegistrationSlot();
-  void referenceToolInfoSlot();
+  void internalUpdate();
 
 private:
    QPushButton* mPlateRegistrationButton;

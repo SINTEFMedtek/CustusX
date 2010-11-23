@@ -12,10 +12,11 @@
 #include <QObject>
 #include "sscData.h"
 #include "sscDefinitions.h"
+#include "sscAxesRep.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "sscAxesRep.h"
+#include "cxImageLandmarkRep.h"
 
 namespace cx
 {
@@ -82,7 +83,7 @@ private:
   typedef  std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
   typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
   VolumetricRepMap mVolumetricReps;
-  LandmarkRepPtr mLandmarkRep;
+  ImageLandmarkRepPtr mImageLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;

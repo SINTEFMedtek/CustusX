@@ -26,7 +26,7 @@
 #include "sscMessageManager.h"
 #include "cxToolManager.h"
 #include "sscSlicePlanes3DRep.h"
-#include "cxLandmarkRep.h"
+//#include "cxLandmarkRep.h"
 #include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
@@ -112,7 +112,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   //view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 
-  mLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
+  //mImageLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
+  mImageLandmarkRep = ImageLandmarkRep::New("LandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
 
   // plane type text rep
@@ -274,7 +275,7 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
   }
 
 //  mProbeRep->setImage(image);
-//  mLandmarkRep->setImage(image);
+//  mImageLandmarkRep->setImage(image);
   this->activeImageChangedSlot();
 
   updateView();
@@ -307,8 +308,8 @@ void ViewWrapper3D::imageRemoved(const QString& uid)
   this->activeImageChangedSlot();
 //  if (mProbeRep->getImage() && mProbeRep->getImage()->getUid()==suid)
 //    mProbeRep->setImage(ssc::ImagePtr());
-//  if (mLandmarkRep->getImage() && mLandmarkRep->getImage()->getUid()==suid)
-//    mLandmarkRep->setImage(ssc::ImagePtr());
+//  if (mImageLandmarkRep->getImage() && mImageLandmarkRep->getImage()->getUid()==suid)
+//    mImageLandmarkRep->setImage(ssc::ImagePtr());
 
   this->updateView();
 }
@@ -323,7 +324,7 @@ void ViewWrapper3D::activeImageChangedSlot()
     image.reset();
 
   mProbeRep->setImage(image);
-  mLandmarkRep->setImage(image);
+  mImageLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
@@ -406,14 +407,14 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
   if (mode==ssc::rsNOT_REGISTRATED)
   {
-    mView->removeRep(mLandmarkRep);
+    mView->removeRep(mImageLandmarkRep);
     mView->removeRep(mProbeRep);
     
     disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   }
   if (mode==ssc::rsIMAGE_REGISTRATED)
   {
-    mView->addRep(mLandmarkRep);
+    mView->addRep(mImageLandmarkRep);
     mView->addRep(mProbeRep);
 
     connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
@@ -421,7 +422,7 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   }
   if (mode==ssc::rsPATIENT_REGISTRATED)
   {
-    mView->addRep(mLandmarkRep);
+    mView->addRep(mImageLandmarkRep);
   }
 }
 
