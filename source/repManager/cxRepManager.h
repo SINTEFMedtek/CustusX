@@ -59,7 +59,7 @@ public:
   VolumetricRepMap* getVolumetricReps(); ///< get all Volumetric reps in the pool
   ProbeRepMap* getProbeReps(); ///< get all Probe reps in the pool
   ProgressiveVolumetricRepMap* getProgressiveVolumetricReps(); ///< get all ProgressiveLODVolumetric reps in the pool
-  LandmarkRepMap* getLandmarkReps(); ///< get all Landmark reps in the pool
+//  LandmarkRepMap* getLandmarkReps(); ///< get all Landmark reps in the pool
   ToolRep3DMap* getToolRep3DReps(); ///< get all Tool3D reps in the pool
   GeometricRepMap* getGeometricReps(); ///< get all Geometric reps in the pool
 
@@ -67,7 +67,7 @@ public:
   ssc::VolumetricRepPtr getVolumetricRep(const QString& uid); ///< get one specific Volumetric rep
   ssc::ProbeRepPtr getProbeRep(const QString& uid); ///< get one specific Probe rep
   ssc::ProgressiveLODVolumetricRepPtr getProgressiveVolumetricRep(const QString& uid); ///< get one specific ProgressiveLODVolumetric rep
-  LandmarkRepPtr getLandmarkRep(const QString& uid); ///<  get one specific Landmark rep
+//  LandmarkRepPtr getLandmarkRep(const QString& uid); ///<  get one specific Landmark rep
   ssc::ToolRep3DPtr getToolRep3DRep(const QString& uid); ///<  get one specific Tool3D rep
   ssc::GeometricRepPtr getGeometricRep(const QString& uid); ///<  get one specific Geometric rep
 

@@ -3,8 +3,8 @@
 #include "sscMessageManager.h"
 #include "cxToolManager.h"
 #include "sscDataManager.h"
-//#include "sscSlicePlaneClipper.h"
 
+#include "sscImage.h"
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
@@ -12,7 +12,7 @@
 #include "sscGeometricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"
-#include "cxLandmarkRep.h"
+//#include "cxImageLandmarkRep.h"
 #include "cxDataLocations.h"
 #include <QSettings>
 
@@ -50,8 +50,8 @@ RepManager::RepManager() :
   mProbeRepNames[0] = "ProbeRep_1";
   mProbeRepNames[1] = "ProbeRep_2";
 
-  mLandmarkRepNames[0] = "LandmarkRep_1";
-  mLandmarkRepNames[1] = "LandmarkRep_2";
+//  mLandmarkRepNames[0] = "LandmarkRep_1";
+//  mLandmarkRepNames[1] = "LandmarkRep_2";
 
   mToolRep3DNames[0] = "ToolRep3D_1";
   mToolRep3DNames[1] = "ToolRep3D_2";
@@ -79,10 +79,10 @@ RepManager::RepManager() :
     ssc::ProbeRepPtr probeRep = addRep<ssc::ProbeRep>(mProbeRepNames[i], &mProbeRepMap);
     connect(probeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
   }
-  for(int i=0; i<MAX_LANDMARKREPS; i++)
-  {
-    addRep<LandmarkRep>(mLandmarkRepNames[i], &mLandmarkRepMap);
-  }
+//  for(int i=0; i<MAX_LANDMARKREPS; i++)
+//  {
+//    addRep<ImageLandmarkRep>(mLandmarkRepNames[i], &mLandmarkRepMap);
+//  }
   for(int i=0; i<MAX_TOOLREP3DS; i++)
   {
     addRep<ssc::ToolRep3D>(mToolRep3DNames[i], &mToolRep3DMap);
@@ -168,10 +168,10 @@ ProbeRepMap* RepManager::getProbeReps()
   return &mProbeRepMap;
 }
 
-LandmarkRepMap* RepManager::getLandmarkReps()
-{
-  return &mLandmarkRepMap;
-}
+//LandmarkRepMap* RepManager::getLandmarkReps()
+//{
+//  return &mLandmarkRepMap;
+//}
 
 ToolRep3DMap* RepManager::getToolRep3DReps()
 {
@@ -213,10 +213,10 @@ ssc::ProbeRepPtr RepManager::getProbeRep(const QString& uid)
 {
   return getRep<ssc::ProbeRep>(uid, &mProbeRepMap);
 }
-LandmarkRepPtr RepManager::getLandmarkRep(const QString& uid)
-{
-  return getRep<LandmarkRep>(uid, &mLandmarkRepMap);
-}
+//LandmarkRepPtr RepManager::getLandmarkRep(const QString& uid)
+//{
+//  return getRep<LandmarkRep>(uid, &mLandmarkRepMap);
+//}
 ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const QString& uid)
 {
   return getRep<ssc::ToolRep3D>(uid, &mToolRep3DMap);

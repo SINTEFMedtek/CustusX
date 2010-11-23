@@ -40,8 +40,8 @@ void FastImageRegistrationWidget::performRegistration()
 PlateImageRegistrationWidget::PlateImageRegistrationWidget(QWidget* parent) :
     FastImageRegistrationWidget(parent)
 {
-  this->setObjectName("FastImageRegistrationWidget");
-  this->setWindowTitle("Fast Image Registration");
+  this->setObjectName("PlateImageRegistrationWidget");
+  this->setWindowTitle("Plate Image Registration");
 }
 
 PlateImageRegistrationWidget::~PlateImageRegistrationWidget()
@@ -60,7 +60,6 @@ void PlateImageRegistrationWidget::performRegistration()
 {
   FastImageRegistrationWidget::performRegistration();
   registrationManager()->doFastRegistration_Translation();
-  ssc::messageManager()->sendDebug("Fast translation registration requested.");
 }
 //------------------------------------------------------------------------------
 
