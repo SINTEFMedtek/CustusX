@@ -69,6 +69,7 @@ private:
 //  View* mView;
   UltrasoundSectorSource* mUSSource;
   vtkDataSetMapperPtr mDataSetMapper;
+  vtkTransformTextureCoordsPtr mTransformTextureCoords;
 
   vtkImageThresholdPtr mMapZeroToOne;
 //  vtkImageDataPtr mUSMaskData;
