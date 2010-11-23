@@ -19,14 +19,14 @@ PlateRegistrationWidget::PlateRegistrationWidget(QWidget* parent) :
   this->setWindowTitle("Fast Image Registration");
 
   connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(referenceToolInfoSlot()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   toptopLayout->addWidget(mReferenceToolInfoLabel);
   toptopLayout->addWidget(mPlateRegistrationButton);
   toptopLayout->addStretch();
 
-  this->referenceToolInfoSlot();
+  this->internalUpdate();
 }
 
 PlateRegistrationWidget::~PlateRegistrationWidget()
@@ -90,15 +90,24 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   }
 }
 
-void PlateRegistrationWidget::referenceToolInfoSlot()
+void PlateRegistrationWidget::internalUpdate()
 {
   ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
-  if(!refTool)
-    return;
 
-  QString labelText = "<b>Reference tool selected:</b> <br>";
-  labelText.append("Tool name: <i>"+refTool->getName()+"</i><br>");
-  labelText.append("Number of defined reference points: <i>"+qstring_cast(refTool->getReferencePoints().size())+"</i>");
+  QString labelText = "";
+  if(!refTool || refTool->getReferencePoints().size()<1)
+  {
+    mPlateRegistrationButton->setDisabled(true);
+
+    labelText.append("Configure the tracker to have <br>a reference frame that has at least <br>one reference point.");
+  }else
+  {
+    mPlateRegistrationButton->setEnabled(true);
+
+    labelText = "<b>Reference tool selected:</b> <br>";
+    labelText.append("Tool name: <i>"+refTool->getName()+"</i><br>");
+    labelText.append("Number of defined reference points: <i>"+qstring_cast(refTool->getReferencePoints().size())+"</i>");
+  }
 
   mReferenceToolInfoLabel->setText(labelText);
 }
