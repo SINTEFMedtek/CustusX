@@ -178,8 +178,8 @@ void RealTimeStreamGraphics::setLookupTable()
   lut->SetNumberOfTableValues(N);
   //lut->SetTableRange (0, 1024); // the window of the input
   lut->SetTableRange (0, N-1); // the window of the input
-  lut->SetSaturationRange (0, 0);
-  lut->SetHueRange (0, 0);
+  lut->SetSaturationRange (0, 0.5);
+  lut->SetHueRange (0, 0.5);
   lut->SetValueRange (0, 1);
   lut->Build();
   if (mUseMask)

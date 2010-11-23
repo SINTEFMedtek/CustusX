@@ -13,6 +13,11 @@
 #include <vtkTimerLog.h>
 #include <QTimer>
 #include "sscOpenIGTLinkClient.h"
+#include "vtkForwardDeclarations.h"
+#include <vtkDataSetMapper.h>
+#include <vtkLookupTable.h>
+#include <vtkAlgorithmOutput.h>
+typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 
 namespace ssc
 {
@@ -181,6 +186,29 @@ void OpenIGTLinkRTSource::setTestImage()
   mImageImport->Modified();
 }
 
+vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
+{
+    int N = 1400;
+    //make a default system set lookuptable, grayscale...
+    vtkLookupTablePtr lut = vtkLookupTablePtr::New();
+    lut->SetNumberOfTableValues(N);
+    //lut->SetTableRange (0, 1024); // the window of the input
+    lut->SetTableRange (0, N-1); // the window of the input
+    lut->SetSaturationRange (0, 0.5);
+    lut->SetHueRange (0, 0.5);
+    lut->SetValueRange (0, 1);
+    lut->Build();
+
+    vtkDataSetMapperPtr mapper = vtkDataSetMapper::New();
+    mapper->SetInput(input);
+    mapper->SetLookupTable(lut);
+    mapper->GetOutputPort()->Print(std::cout);
+
+    return vtkImageDataPtr();
+//    return mapper->GetOutputPort();
+}
+
+
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 {
@@ -260,6 +288,8 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 //    std::cout << (int)(reinterpret_cast<unsigned char*>(mImageImport->GetOutput()->GetScalarPointer())[i]) << " ";
 ////    std::cout << (int)(*reinterpret_cast<unsigned char*>(mImageImport->GetOutput()->GetScalarPointer(0+i,0,0))) << " ";
 //  std::cout << std::endl;
+//  vtkImageDataPtr colored = convertToTestColorImage(mImageImport->GetOutput());
+  //colored->Print(std::cout);
 
 
   mTimeout = false;
