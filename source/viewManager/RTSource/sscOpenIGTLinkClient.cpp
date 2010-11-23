@@ -10,6 +10,7 @@
 
 #include "sscTypeConversions.h"
 
+
 int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
 {
   std::cerr << "Receiving TRANSFORM data type." << std::endl;
