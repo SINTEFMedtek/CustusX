@@ -118,6 +118,7 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
+  // << "Inside configure" << std::endl;
   if(mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
   {
     ssc::messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
@@ -137,15 +138,15 @@ void ToolManager::configure()
     connect(mTracker.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
   }
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
+  //std::cout << "Found " << mConfiguredTools->size() << " configured tools." << std::endl;
 
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->begin();
   while(it != mConfiguredTools->end())
   {
+    //std::cout << "Tool: " << it->first << std::endl;
     connect(((*it).second).get(), SIGNAL(attachedToTracker(bool)), this, SLOT(toolInitialized(bool)));
     it++;
   }
-
-  std::cout << "TEST" << std::endl;
 
   this->configureReferences();
 
@@ -202,6 +203,7 @@ void ToolManager::createSymlink()
 
   QStringList filters;
   filters << "cu.usbserial*" << "cu.KeySerial*"; //NOTE: only works with current hardware using aurora or polaris.
+  //filters << "cu.usbserial*" << "cu.USA19H*"; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
 
   if (files.empty())
@@ -559,7 +561,7 @@ void ToolManager::trackerTrackingSlot(bool value)
   }
   else
   {
-    ssc::messageManager()->sendInfo("ToolManager stopped tracking.");
+    ssc::messageManager()->sendSuccess("ToolManager stopped tracking.");
     mTimer->stop();
     emit trackingStopped();
   }

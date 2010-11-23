@@ -219,13 +219,8 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
 
-//    QDomElement toolSensorReferencePointElement =
-//        toolSensorElement.firstChildElement(mToolSensorReferencePointTag);
-//    QString toolSensorReferencePointText = toolSensorReferencePointElement.text();
-//    std::cout << "Found " << string_cast(toolSensorReferencePointText) << " reference point." << std::endl;
-
     QDomNodeList toolSensorReferencePointList = toolSensorElement.elementsByTagName(mToolSensorReferencePointTag);
-//    std::cout << "Found " << string_cast(toolSensorReferencePointList.count()) << " reference points." << std::endl;
+    //std::cout << "Found " << string_cast(toolSensorReferencePointList.count()) << " reference points." << std::endl;
     for (int j = 0; j < toolSensorReferencePointList.count(); j++)
     {
       QDomNode node = toolSensorReferencePointList.item(j);
@@ -243,8 +238,9 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       }
       QString toolSensorReferencePointText = node.toElement().text();
       ssc::Vector3D vector = ssc::Vector3D::fromString(toolSensorReferencePointText);
-//      std::cout << "Reference point with id "<<id<<" has coords " << string_cast(vector) << std::endl;
+      //std::cout << "Tool: "<< internalStructure.mName <<": Reference point with id "<<id<<" has coords " << string_cast(vector) << std::endl;
       internalStructure.mReferencePoints[id] = vector;
+      //std::cout << "map size: " << string_cast(internalStructure.mReferencePoints.size()) << std::endl;
     }
 
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
@@ -275,6 +271,9 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     {
       ssc::ToolPtr tool(cxTool);
       (*tools)[tool->getUid()] = tool;
+    } else
+    {
+     ssc::messageManager()->sendWarning("Tool: "+internalStructure.mUid+" is not valid.");
     }
   }
   return tools;
