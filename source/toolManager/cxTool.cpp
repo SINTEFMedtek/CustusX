@@ -189,6 +189,7 @@ void Tool::set_prMt(const ssc::Transform3D& prMt)
 
 void Tool::toolTransformCallback(const itk::EventObject &event)
 {
+  //std::cout << "Tool " << mUid << " got an event..." << std::endl;
   if(igstk::CoordinateSystemTransformToEvent().CheckEvent(&event))
   {
     const igstk::CoordinateSystemTransformToEvent *transformEvent;
@@ -396,7 +397,7 @@ Tool::TrackerToolType* Tool::buildInternalTool()
   case Tracker::TRACKER_POLARIS_VICRA:
   case Tracker::TRACKER_POLARIS:
     mTempPolarisTool = PolarisTrackerToolType::New();
-    //this->addLogging(mTempPolarisTool);
+    this->addLogging(mTempPolarisTool);
     mTempPolarisTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
     if(!mInternalStructure.mWireless) //we only support wireless atm
       return tool = mTempPolarisTool.GetPointer();
@@ -408,7 +409,7 @@ Tool::TrackerToolType* Tool::buildInternalTool()
     break;
   case Tracker::TRACKER_AURORA:
     mTempAuroraTool = AuroraTrackerToolType::New();
-    //this->addLogging(mTempAuroraTool);
+    this->addLogging(mTempAuroraTool);
     mTempAuroraTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
     if(mInternalStructure.m5DOF)
     {
@@ -607,6 +608,7 @@ void Tool::printInternalStructure()
   std::cout << "mSROMFilename: " << mInternalStructure.mSROMFilename << std::endl;
   std::cout << "mPortNumber: " << mInternalStructure.mPortNumber << std::endl;
   std::cout << "mChannelNumber: " << mInternalStructure.mChannelNumber << std::endl;
+  std::cout << "mReferencePoints: " << string_cast(mInternalStructure.mReferencePoints.size()) << std::endl;
   std::cout << "mWireless: " << mInternalStructure.mWireless << std::endl;
   std::cout << "m5DOF: " << mInternalStructure.m5DOF << std::endl;
   std::cout << "mCalibrationFilename: " << mInternalStructure.mCalibrationFilename << std::endl;
@@ -687,7 +689,7 @@ bool Tool::hasReferencePointWithId(int id)
   bool retval = false;
   if(!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000,0.000,0.000))))
       retval = true;
-//  std::cout << "Reference point with id " << string_cast(id) << " has coords " << string_cast(this->getReferencePoints()[id]) << " returning "<< string_cast(retval)<<std::endl;
+  std::cout << "Reference point with id " << string_cast(id) << " has coords " << string_cast(this->getReferencePoints()[id]) << " returning "<< string_cast(retval)<<std::endl;
   return retval;
 }
 
