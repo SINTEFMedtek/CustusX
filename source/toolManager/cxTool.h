@@ -80,7 +80,7 @@ public:
     QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
       mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
-      mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX),
+      mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX), mReferencePoints(),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
       mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
       mInstrumentScannerId(""){}; ///< sets up default values for all the members
@@ -117,7 +117,7 @@ public:
   QStringList getUSSectorConfigList() const;
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
-  virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference point from this tool
+  virtual std::map<int, ssc::utils::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
