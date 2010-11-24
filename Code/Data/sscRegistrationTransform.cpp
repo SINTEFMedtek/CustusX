@@ -280,6 +280,11 @@ std::vector<RegistrationTransform> RegistrationHistory::getData() const
   return mData;
 }
 
+std::vector<ParentFrame> RegistrationHistory::getParentFrames() const
+{
+  return mParentFrames;
+}
+
 void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
 {
   if (!timestamp.isValid())
