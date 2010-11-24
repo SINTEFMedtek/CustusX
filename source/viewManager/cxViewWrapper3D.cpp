@@ -158,23 +158,24 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
-//  QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
-//  showRefTool->setDisabled(true);
-//  showRefTool->setCheckable(true);
-//  ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
-//  if(refTool)
-//  {
-//    showRefTool->setText("Show "+refTool->getName());
-//    showRefTool->setEnabled(true);
-//    showRefTool->setChecked(refTool->getVisible());
-//    connect(showRefTool, SIGNAL(triggered(bool)), this, SLOT(showRefToolSlot(bool)));
-//  }
+  QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
+  showRefTool->setDisabled(true);
+  showRefTool->setCheckable(true);
+  ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
+  if(refTool)
+  {
+    showRefTool->setText("Show "+refTool->getName());
+    showRefTool->setEnabled(true);
+    showRefTool->setChecked(refTool->getVisible());
+    connect(showRefTool, SIGNAL(triggered(bool)), this, SLOT(showRefToolSlot(bool)));
+  }
+
   contextMenu.addSeparator();
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(showAxesAction);
   contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
-//  contextMenu.addAction(showRefTool);
+  contextMenu.addAction(showRefTool);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
@@ -323,6 +324,22 @@ void ViewWrapper3D::activeImageChangedSlot()
 
   mProbeRep->setImage(image);
   mImageLandmarkRep->setImage(image);
+}
+
+void ViewWrapper3D::showRefToolSlot(bool checked)
+{
+  ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  ssc::ToolRep3DPtr refRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool);
+  if(!refRep)
+    refRep = ssc::ToolRep3D::New(refTool->getUid()+"_rep3d_"+this->mView->getUid());
+
+  if(checked) //should show
+  {
+    mView->addRep(refRep);
+  }else//should not show
+  {
+    mView->removeRep(refRep);
+  }
 }
 
 void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
