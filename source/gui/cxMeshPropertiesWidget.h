@@ -44,6 +44,7 @@ private:
   ssc::MeshPtr mMesh;
   QComboBox* mMeshComboBox; ///< combobox for selecting mesh
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
+  DataNameEditableStringDataAdapterPtr mNameAdapter;
   
   MeshPropertiesWidget();
 };
