@@ -71,6 +71,7 @@ private slots:
   void showManualToolSlot(bool visible);
   void resetCameraActionSlot();
   void activeImageChangedSlot();
+  void showRefToolSlot(bool checked);
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
