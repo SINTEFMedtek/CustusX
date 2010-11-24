@@ -65,7 +65,7 @@ void FrameTreeWidget::rebuild()
 //    this->fill(item, child);
 //  }
 
-  mTreeWidget->expandToDepth(5);
+  mTreeWidget->expandToDepth(10);
   mTreeWidget->resizeColumnToContents(0);
 }
 
@@ -73,7 +73,14 @@ void FrameTreeWidget::fill(QTreeWidgetItem* parent, QDomNode node)
 {
   for (QDomNode child = node.firstChild(); !child.isNull(); child = child.nextSibling())
   {
-    QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList() << child.toElement().tagName());
+    QString frameName = child.toElement().tagName();
+
+    // if frame refers to a data, use its name instead.
+    ssc::DataPtr data = ssc::dataManager()->getData(frameName);
+    if (data)
+      frameName = data->getName();
+
+    QTreeWidgetItem* item = new QTreeWidgetItem(parent, QStringList() << frameName);
     this->fill(item, child);
   }
 }
