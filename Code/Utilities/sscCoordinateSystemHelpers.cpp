@@ -66,7 +66,7 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
   return rMfrom;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getCoordinateSystem(ssc::ToolPtr tool)
+ssc::CoordinateSystem CoordinateSystemHelpers::getT(ssc::ToolPtr tool)
 {
   ssc::CoordinateSystem retval;
   if(!tool)
@@ -85,7 +85,7 @@ ssc::CoordinateSystem CoordinateSystemHelpers::getCoordinateSystem(ssc::ToolPtr 
   return retval;
 }
 
-ssc::CoordinateSystem CoordinateSystemHelpers::getCoordinateSystem(ssc::DataPtr data)
+ssc::CoordinateSystem CoordinateSystemHelpers::getD(ssc::DataPtr data)
 {
   ssc::CoordinateSystem retval;
   if(!data)
@@ -95,6 +95,22 @@ ssc::CoordinateSystem CoordinateSystemHelpers::getCoordinateSystem(ssc::DataPtr 
   retval.mRefObject = data->getUid();
 
   return retval;
+}
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getPr()
+{
+  CoordinateSystem pr;
+  pr.mId = ssc::csPATIENTREF;
+  pr.mRefObject = "";
+  return pr;
+}
+
+ssc::CoordinateSystem CoordinateSystemHelpers::getR()
+{
+  CoordinateSystem pr;
+  pr.mId = ssc::csREF;
+  pr.mRefObject = "";
+  return pr;
 }
 
 Transform3D CoordinateSystemHelpers::get_rMr() const
