@@ -84,7 +84,7 @@ public:
 	
 	virtual double getTooltipOffset() const { return 0; } ///< get a virtual offset extending from the tool tip.
 	virtual void setTooltipOffset(double val) { Q_UNUSED(val); } ///< set a virtual offset extending from the tool tip.
-	virtual std::map<int, Vector3D> getReferencePoints() { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
+	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id){return false;}
 
 signals:

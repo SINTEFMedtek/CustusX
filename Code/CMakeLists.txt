@@ -75,6 +75,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     #Widgets/sscXmlOptionItem.h
     Widgets/sscDoubleWidgets.h
     Widgets/sscLabeledComboBoxWidget.h
+    Widgets/sscLabeledLineEditWidget.h
     Widgets/sscHelperWidgets.h
     Utilities/sscMessageManager.h
     )
@@ -263,7 +264,9 @@ SET( SSC_SOURCE_FILES
     Widgets/sscStringDataAdapterXml.h
     Widgets/sscStringDataAdapterXml.cpp
     Widgets/sscLabeledComboBoxWidget.h    
-    Widgets/sscLabeledComboBoxWidget.cpp    
+    Widgets/sscLabeledComboBoxWidget.cpp  
+    Widgets/sscLabeledLineEditWidget.h
+    Widgets/sscLabeledLineEditWidget.cpp  
     Widgets/sscXmlOptionItem.h    
     Widgets/sscXmlOptionItem.cpp    
 	) 

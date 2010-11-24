@@ -118,15 +118,15 @@ bool ManualTool::isCalibrated() const
 
 ssc::ProbeSector ManualTool::getProbeSector() const
 {
-//  return ssc::ProbeSector();
+  return ssc::ProbeSector();
   //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
-	ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 200, M_PI_2);
+	ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 300, M_PI_2);
   //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);
 
   dummy.mImage.mSpacing = Vector3D(0.928,0.928,1);
-  dummy.mImage.mSpacing = Vector3D(0.5,0.5,0);
+  //dummy.mImage.mSpacing = Vector3D(0.5,0.5,0);
   dummy.mImage.mSize = QSize(512,512);
-  dummy.mImage.mOrigin_u = multiply_elems(Vector3D(dummy.mImage.mSize.width()/2, dummy.mImage.mSize.height()*1.0, 0), dummy.mImage.mSpacing);
+  dummy.mImage.mOrigin_u = multiply_elems(Vector3D(dummy.mImage.mSize.width()/2, dummy.mImage.mSize.height()*0.8, 0), dummy.mImage.mSpacing);
 
   return dummy;
 }
