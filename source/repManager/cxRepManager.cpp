@@ -38,7 +38,7 @@ RepManager::RepManager() :
   MAX_PROGRESSIVEVOLUMETRICREPS(2),
   MAX_PROBEREPS(2),
   MAX_LANDMARKREPS(2),
-  MAX_TOOLREP3DS(5),
+//  MAX_TOOLREP3DS(5),
   MAX_GEOMETRICREPS(6)
 {
   mVolumetricRepNames[0] = "VolumetricRep_1";
@@ -53,11 +53,11 @@ RepManager::RepManager() :
 //  mLandmarkRepNames[0] = "LandmarkRep_1";
 //  mLandmarkRepNames[1] = "LandmarkRep_2";
 
-  mToolRep3DNames[0] = "ToolRep3D_1";
-  mToolRep3DNames[1] = "ToolRep3D_2";
-  mToolRep3DNames[2] = "ToolRep3D_3";
-  mToolRep3DNames[3] = "ToolRep3D_4";
-  mToolRep3DNames[4] = "ToolRep3D_5";
+//  mToolRep3DNames[0] = "ToolRep3D_1";
+//  mToolRep3DNames[1] = "ToolRep3D_2";
+//  mToolRep3DNames[2] = "ToolRep3D_3";
+//  mToolRep3DNames[3] = "ToolRep3D_4";
+//  mToolRep3DNames[4] = "ToolRep3D_5";
 
   mGeometricRepNames[0] = "GeometricRep_1";
   mGeometricRepNames[1] = "GeometricRep_2";
@@ -83,10 +83,10 @@ RepManager::RepManager() :
 //  {
 //    addRep<ImageLandmarkRep>(mLandmarkRepNames[i], &mLandmarkRepMap);
 //  }
-  for(int i=0; i<MAX_TOOLREP3DS; i++)
-  {
-    addRep<ssc::ToolRep3D>(mToolRep3DNames[i], &mToolRep3DMap);
-  }
+//  for(int i=0; i<MAX_TOOLREP3DS; i++)
+//  {
+//    addRep<ssc::ToolRep3D>(mToolRep3DNames[i], &mToolRep3DMap);
+//  }
   for(int i=0; i<MAX_GEOMETRICREPS; i++)
   {
     addRep<ssc::GeometricRep>(mGeometricRepNames[i], &mGeometricRepMap);
@@ -173,10 +173,10 @@ ProbeRepMap* RepManager::getProbeReps()
 //  return &mLandmarkRepMap;
 //}
 
-ToolRep3DMap* RepManager::getToolRep3DReps()
-{
-  return &mToolRep3DMap;
-}
+//ToolRep3DMap* RepManager::getToolRep3DReps()
+//{
+//  return &mToolRep3DMap;
+//}
 
 GeometricRepMap* RepManager::getGeometricReps()
 {
@@ -217,10 +217,10 @@ ssc::ProbeRepPtr RepManager::getProbeRep(const QString& uid)
 //{
 //  return getRep<LandmarkRep>(uid, &mLandmarkRepMap);
 //}
-ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const QString& uid)
-{
-  return getRep<ssc::ToolRep3D>(uid, &mToolRep3DMap);
-}
+//ssc::ToolRep3DPtr RepManager::getToolRep3DRep(const QString& uid)
+//{
+//  return getRep<ssc::ToolRep3D>(uid, &mToolRep3DMap);
+//}
 ssc::GeometricRepPtr RepManager::getGeometricRep(const QString& uid)
 {
   return getRep<ssc::GeometricRep>(uid, &mGeometricRepMap);
@@ -245,19 +245,19 @@ void RepManager::dominantToolChangedSlot(const QString& toolUid)
  *  if not found, create and return
  *
  */
-ssc::ToolRep3DPtr RepManager::getDynamicToolRep3DRep(QString uid)
-{
-  ssc::ToolRep3DPtr rep = this->getToolRep3DRep(uid);
-  if (!rep)
-  {
-    rep = ssc::ToolRep3D::New(uid);
-    this->addRep(rep, &mToolRep3DMap);
-  }
-  return rep;
-
-  //      mToolReps[uid] = ssc::ToolRep3D::New(uid);
-  //      repManager()->addToolRep3D(mToolReps[uid]);
-}
+//ssc::ToolRep3DPtr RepManager::getDynamicToolRep3DRep(QString uid)
+//{
+//  ssc::ToolRep3DPtr rep = this->getToolRep3DRep(uid);
+//  if (!rep)
+//  {
+//    rep = ssc::ToolRep3D::New(uid);
+//    this->addRep(rep, &mToolRep3DMap);
+//  }
+//  return rep;
+//
+//  //      mToolReps[uid] = ssc::ToolRep3D::New(uid);
+//  //      repManager()->addToolRep3D(mToolReps[uid]);
+//}
 
 
 //void RepManager::addToolRep3D(ssc::ToolRep3DPtr rep)

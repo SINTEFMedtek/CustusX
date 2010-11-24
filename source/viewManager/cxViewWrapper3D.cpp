@@ -1,10 +1,3 @@
-/*
- * cxViewWrapper3D.cpp
- *
- *  Created on: Mar 24, 2010
- *      Author: christiana
- */
-
 #include "cxViewWrapper3D.h"
 #include <vector>
 #include <QSettings>
@@ -26,7 +19,6 @@
 #include "sscMessageManager.h"
 #include "cxToolManager.h"
 #include "sscSlicePlanes3DRep.h"
-//#include "cxLandmarkRep.h"
 #include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
@@ -112,8 +104,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   //view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 
-  //mImageLandmarkRep = repManager()->getLandmarkRep("LandmarkRep_"+index);
-  mImageLandmarkRep = ImageLandmarkRep::New("LandmarkRep_"+index);
+  mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
+  mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
 
   // plane type text rep
@@ -166,10 +158,23 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
+//  QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
+//  showRefTool->setDisabled(true);
+//  showRefTool->setCheckable(true);
+//  ssc::ToolPtr refTool = ToolManager::getInstance()->getReferenceTool();
+//  if(refTool)
+//  {
+//    showRefTool->setText("Show "+refTool->getName());
+//    showRefTool->setEnabled(true);
+//    showRefTool->setChecked(refTool->getVisible());
+//    connect(showRefTool, SIGNAL(triggered(bool)), this, SLOT(showRefToolSlot(bool)));
+//  }
   contextMenu.addSeparator();
   contextMenu.addAction(resetCameraAction);
   contextMenu.addAction(showAxesAction);
+  contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
+//  contextMenu.addAction(showRefTool);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
@@ -274,13 +279,10 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
     mView->addRep(rep);
   }
 
-//  mProbeRep->setImage(image);
-//  mImageLandmarkRep->setImage(image);
   this->activeImageChangedSlot();
 
   updateView();
 
-  //mView->getRenderer()->ResetCamera();
 }
 
 void ViewWrapper3D::updateView()
@@ -306,10 +308,6 @@ void ViewWrapper3D::imageRemoved(const QString& uid)
   mVolumetricReps.erase(uid);
 
   this->activeImageChangedSlot();
-//  if (mProbeRep->getImage() && mProbeRep->getImage()->getUid()==suid)
-//    mProbeRep->setImage(ssc::ImagePtr());
-//  if (mImageLandmarkRep->getImage() && mImageLandmarkRep->getImage()->getUid()==suid)
-//    mImageLandmarkRep->setImage(ssc::ImagePtr());
 
   this->updateView();
 }
@@ -335,7 +333,6 @@ void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
   mView->addRep(rep);
   this->updateView();
 
-//  mView->getRenderer()->ResetCamera();
 }
 
 void ViewWrapper3D::meshRemoved(const QString& uid)
@@ -362,26 +359,28 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
- // std::cout <<"void ViewWrapper3D::toolsAvailableSlot() " << std::endl;
-  // we want to do this also when nonconfigured and manual tool is present
-//  if (!toolManager()->isConfigured())
-//    return;
 
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     ssc::ToolPtr tool = iter->second;
-    //TODO: experiment with showing toolrep for reference tools
     if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
       continue;
 
-    QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
-    if (!mToolReps.count(uid))
+    ssc::ToolRep3DPtr toolRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
+    if(!toolRep)
     {
-      mToolReps[uid] = repManager()->getDynamicToolRep3DRep(uid);
+      toolRep = ssc::ToolRep3D::New(tool->getUid()+"_rep3d_"+this->mView->getUid());
     }
-    ssc::ToolRep3DPtr toolRep = mToolReps[uid];
+
+//    QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
+//    if (!mToolReps.count(uid))
+//    {
+//      mToolReps[uid] = repManager()->getDynamicToolRep3DRep(uid);
+//    }
+//    ssc::ToolRep3DPtr toolRep = mToolReps[uid];
+
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
@@ -407,6 +406,7 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
   if (mode==ssc::rsNOT_REGISTRATED)
   {
+    mView->removeRep(mPatientLandmarkRep);
     mView->removeRep(mImageLandmarkRep);
     mView->removeRep(mProbeRep);
     
@@ -414,6 +414,7 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   }
   if (mode==ssc::rsIMAGE_REGISTRATED)
   {
+    mView->addRep(mPatientLandmarkRep);
     mView->addRep(mImageLandmarkRep);
     mView->addRep(mProbeRep);
 
@@ -422,6 +423,7 @@ void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   }
   if (mode==ssc::rsPATIENT_REGISTRATED)
   {
+    mView->addRep(mPatientLandmarkRep);
     mView->addRep(mImageLandmarkRep);
   }
 }
