@@ -51,7 +51,7 @@ void LandmarkRep::setColor(RGB_ color)
   mColor = color;
 }
 
-void LandmarkRep::setTextScale(int& x, int& y,int& z)
+void LandmarkRep::setTextScale(int x, int y,int z)
 {
   mTextScale[0] = x;
   mTextScale[1] = y;

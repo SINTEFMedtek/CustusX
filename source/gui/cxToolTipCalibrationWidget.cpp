@@ -132,7 +132,7 @@ void ToolTipCalibrateWidget::calibrateSlot()
     return;
 
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(tool);
+  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getT(tool);
   ssc::Vector3D P_t = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(tool, refTool, P_t);
@@ -158,7 +158,7 @@ void ToolTipCalibrateWidget::testCalibrationSlot()
   if(!selectedTool || !selectedTool->hasReferencePointWithId(1))
     return;
 
-  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getCoordinateSystem(ssc::toolManager()->getDominantTool());
+  ssc::CoordinateSystem to = ssc::CoordinateSystemHelpers::getT(ssc::toolManager()->getDominantTool());
   ssc::Vector3D sampledPoint = ssc::CoordinateSystemHelpers::getDominantToolTipPoint(to);
 
   ToolTipCalibrationCalculator calc(ssc::toolManager()->getDominantTool(), selectedTool, sampledPoint);
@@ -330,13 +330,13 @@ ssc::CoordinateSystem ToolTipSampleWidget::getSelectedCoordinateSystem()
   switch (retval.mId)
   {
   case ssc::csDATA:
-    retval = ssc::CoordinateSystemHelpers::getCoordinateSystem(mData->getData());
+    retval = ssc::CoordinateSystemHelpers::getD(mData->getData());
     break;
   case ssc::csTOOL:
-    retval = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTools->getTool());
+    retval = ssc::CoordinateSystemHelpers::getT(mTools->getTool());
     break;
   case ssc::csSENSOR:
-    retval = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTools->getTool());
+    retval = ssc::CoordinateSystemHelpers::getT(mTools->getTool());
     break;
   default:
     retval.mRefObject = "";
@@ -370,8 +370,8 @@ ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_t()
 
 ssc::Vector3D ToolTipCalibrationCalculator::get_sampledPoint_ref()
 {
-  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTool); //from
-  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getCoordinateSystem(mRef); //to
+  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getT(mTool); //from
+  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getT(mRef); //to
 
   ssc::Transform3D refMt = ssc::CoordinateSystemHelpers::get_toMfrom(csT, csRef);
 
@@ -389,8 +389,8 @@ ssc::Transform3D ToolTipCalibrationCalculator::get_sMt_new()
 {
   ssc::Transform3D sMt_old = mTool->getCalibration_sMt();
 
-  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getCoordinateSystem(mTool); //to
-  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getCoordinateSystem(mRef); //from
+  ssc::CoordinateSystem csT = ssc::CoordinateSystemHelpers::getT(mTool); //to
+  ssc::CoordinateSystem csRef = ssc::CoordinateSystemHelpers::getT(mRef); //from
   ssc::Transform3D tMref = ssc::CoordinateSystemHelpers::get_toMfrom(csRef, csT);
 
   ssc::Vector3D delta_t = tMref.vector(this->get_delta_ref());

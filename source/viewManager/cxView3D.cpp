@@ -107,18 +107,19 @@ void View3D::activateCameraToolStyle(int offset)
     return;
 
   //Need the toolrep to get the direction the camera should point in
-  ssc::ToolRep3DPtr dominantToolRepPtr;
-  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
-  ToolRep3DMap::iterator it = toolRep3DMap->begin();
-  while(it != toolRep3DMap->end())
-  {
-    if(it->second->hasTool(dominantToolPtr) && //there must be a rep for the dominant tool
-       this->hasRep(it->second)) //and this view must have it
-    {
-      dominantToolRepPtr = it->second;
-    }
-    it++;
-  }
+  ssc::ToolRep3DPtr dominantToolRepPtr = repManager()->findFirstRep<ssc::ToolRep3D>(this->getReps(), dominantToolPtr);
+
+//  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
+//  ToolRep3DMap::iterator it = toolRep3DMap->begin();
+//  while(it != toolRep3DMap->end())
+//  {
+//    if(it->second->hasTool(dominantToolPtr) && //there must be a rep for the dominant tool
+//       this->hasRep(it->second)) //and this view must have it
+//    {
+//      dominantToolRepPtr = it->second;
+//    }
+//    it++;
+//  }
   if(!dominantToolRepPtr)
   {
     ssc::messageManager()->sendWarning("The tool you are requesting to follow does not have a rep associated with it.");
@@ -129,7 +130,7 @@ void View3D::activateCameraToolStyle(int offset)
   connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
           this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-  std::cout << "dominant: " << dominantToolRepPtr->getTool()->getName() << std::endl;
+//  std::cout << "dominant: " << dominantToolRepPtr->getTool()->getName() << std::endl;
   dominantToolRepPtr->setOffsetPointVisibleAtZeroOffset(true);
   dominantToolRepPtr->setStayHiddenAfterVisible(true);
 
@@ -146,25 +147,23 @@ void View3D::deactivateCameraToolStyle()
   disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)),
       this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
 
-  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
-  ToolRep3DMap::iterator it = toolRep3DMap->begin();
-  while(it != toolRep3DMap->end())
-  {
-    if(it->second->hasTool(mFollowingTool))
-    {
-      //it->second->setOffsetPointVisibleAtZeroOffset(false);
-      it->second->setStayHiddenAfterVisible(false);
-    }
-    ++it;
-  }
+  ssc::ToolRep3DPtr toolRep = repManager()->findFirstRep<ssc::ToolRep3D>(this->getReps(), mFollowingTool);
+  if(toolRep)
+    toolRep->setStayHiddenAfterVisible(false);
 
-  /*ssc::ToolRep3DPtr followingToolRepPtr = repManager()->getToolRep3DRep("ToolRep3D_1");
-  if(followingToolRepPtr)
-  {
-    followingToolRepPtr->setOffsetPointVisibleAtZeroOffset(false);
-    followingToolRepPtr->setStayHiddenAfterVisible(false);
 
-  }*/
+//  ToolRep3DMap* toolRep3DMap = repManager()->getToolRep3DReps();
+//  ToolRep3DMap::iterator it = toolRep3DMap->begin();
+//  while(it != toolRep3DMap->end())
+//  {
+//    if(it->second->hasTool(mFollowingTool))
+//    {
+//      //it->second->setOffsetPointVisibleAtZeroOffset(false);
+//      it->second->setStayHiddenAfterVisible(false);
+//    }
+//    ++it;
+//  }
+
 
   ssc::messageManager()->sendDebug("Default camera style deactivated.");
 }

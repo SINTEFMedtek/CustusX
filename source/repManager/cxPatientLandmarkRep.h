@@ -5,6 +5,7 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
 /**
  * \class PatientLandmarkRep
  *
@@ -17,7 +18,20 @@ namespace cx
 class PatientLandmarkRep : public LandmarkRep
 {
 public:
-private:
+  static PatientLandmarkRepPtr New(const QString& uid, const QString& name=""); ///constructor
+  virtual ~PatientLandmarkRep();
+
+  virtual QString getType() const;
+
+public slots:
+  virtual void landmarkAddedSlot(QString );
+  virtual void transformChangedSlot();
+
+protected:
+  PatientLandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
+  virtual void clearAll();
+  virtual void addAll();
+  virtual void setPosition(ssc::Vector3D coord, QString uid);
 };
 
 }//namespace cx

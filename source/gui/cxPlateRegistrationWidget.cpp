@@ -5,6 +5,7 @@
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 
@@ -86,7 +87,17 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   std::map<int, ssc::Vector3D>::iterator it = referencePoints.begin();
   for(; it != referencePoints.end(); ++it)
   {
-    ssc::toolManager()->setLandmark(ssc::Landmark(qstring_cast(it->first), it->second));
+    QString uid = ssc::dataManager()->addLandmark();
+    ssc::dataManager()->setLandmarkName(uid, qstring_cast(it->first));
+    ssc::toolManager()->setLandmark(ssc::Landmark(uid, it->second));
+  }
+
+  // set all landmarks as not active as default
+  ssc::LandmarkPropertyMap map = ssc::dataManager()->getLandmarkProperties();
+  ssc::LandmarkPropertyMap::iterator landmarkIt = map.begin();
+  for(; landmarkIt != map.end(); ++landmarkIt)
+  {
+    ssc::dataManager()->setLandmarkActive(landmarkIt->first, false);
   }
 }
 
