@@ -17,6 +17,7 @@
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
 #include "cxImageLandmarkRep.h"
+#include "cxPatientLandmarkRep.h"
 
 namespace cx
 {
@@ -84,11 +85,12 @@ private:
   typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
   VolumetricRepMap mVolumetricReps;
   ImageLandmarkRepPtr mImageLandmarkRep;
+  PatientLandmarkRepPtr mPatientLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
-  std::map<QString, ssc::ToolRep3DPtr> mToolReps;
+//  std::map<QString, ssc::ToolRep3DPtr> mToolReps;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;

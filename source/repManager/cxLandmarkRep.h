@@ -44,7 +44,7 @@ public:
   virtual QString getType() const = 0;
 
   void setColor(RGB_ color); ///< sets the reps color
-  void setTextScale(int& x, int& y,int& z); ///< default is (20,20,20)
+  void setTextScale(int x, int y,int z); ///< default is (20,20,20)
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   //TODO remove
 //  void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
