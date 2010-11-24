@@ -32,6 +32,7 @@ protected slots:
   void rewindSlot();
   void removeSlot();
   void forwardSlot();
+  void fastForwardSlot();
   void updateSlot();
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -39,10 +40,19 @@ protected:
 
 private:
   RegistrationHistoryWidget();
+  void debugDump();
+
+  typedef std::map<QDateTime,QString> TimeMap;
+  TimeMap getRegistrationTimes();
+  QDateTime getActiveTime();
+  void setActiveTime(QDateTime active);
+  TimeMap::iterator findCurrentActiveIter(TimeMap& times);
+  QGroupBox* mGroup;
 
   QPushButton* mRewindButton;
   QPushButton* mRemoveButton;
   QPushButton* mForwardButton;
+  QPushButton* mFastForwardButton;
   bool isUsingNewestRegistration();
   std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);

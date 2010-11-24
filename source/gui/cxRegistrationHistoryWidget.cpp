@@ -27,26 +27,31 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
   //layout
   QHBoxLayout* toptopLayout = new QHBoxLayout(this);
   toptopLayout->setMargin(0);
-  QGroupBox* group = new QGroupBox;
+  mGroup = new QGroupBox;
   //group->setFlat(true);
-  toptopLayout->addWidget(group);
-  group->setTitle("Registration Time Control");
-  QHBoxLayout* topLayout = new QHBoxLayout(group);
+  toptopLayout->addWidget(mGroup);
+  mGroup->setTitle("Registration Time Control");
+  QHBoxLayout* topLayout = new QHBoxLayout(mGroup);
 
   mRewindButton = new QPushButton("Rewind");
-  mRewindButton->setToolTip("Use previous registration");
+  mRewindButton->setToolTip("One step back in registration history");
   connect(mRewindButton, SIGNAL(clicked()), this, SLOT(rewindSlot()));
   topLayout->addWidget(mRewindButton);
 
   mRemoveButton = new QPushButton("Remove");
-  mRemoveButton->setToolTip("Remove the latest registration");
+  mRemoveButton->setToolTip("Remove all registrations after the current");
   connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeSlot()));
   topLayout->addWidget(mRemoveButton);
 
   mForwardButton = new QPushButton("Forward");
-  mForwardButton->setToolTip("Use latest registration");
+  mForwardButton->setToolTip("One step forward in registration history");
   connect(mForwardButton, SIGNAL(clicked()), this, SLOT(forwardSlot()));
   topLayout->addWidget(mForwardButton);
+
+  mFastForwardButton = new QPushButton("Fast Forward");
+  mFastForwardButton->setToolTip("Step to latest registration");
+  connect(mFastForwardButton, SIGNAL(clicked()), this, SLOT(fastForwardSlot()));
+  topLayout->addWidget(mFastForwardButton);
 }
 
 RegistrationHistoryWidget::~RegistrationHistoryWidget()
@@ -73,10 +78,75 @@ void RegistrationHistoryWidget::hideEvent(QCloseEvent* event)
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
   {
-    connect(raw[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
+    disconnect(raw[i].get(), SIGNAL(currentChanged()), this, SLOT(updateSlot()));
   }
 }
 
+/** get a map of all registration times and their corresponding descriptions.
+ * Near-simultaneous times are filtered out, keeping only the newest in the group.
+ */
+std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
+{
+  TimeMap retval;
+
+  std::vector<ssc::RegistrationHistoryPtr> allHistories = this->getAllRegistrationHistories();
+
+  for (unsigned i=0; i<allHistories.size(); ++i)
+  {
+    std::vector<ssc::RegistrationTransform> current = allHistories[i]->getData();
+    for (unsigned j=0; j<current.size(); ++j)
+    {
+      retval[current[j].mTimestamp] = current[j].mType;
+    }
+    std::vector<ssc::ParentFrame> frames = allHistories[i]->getParentFrames();
+    for (unsigned j=0; j<frames.size(); ++j)
+    {
+      retval[frames[j].mTimestamp] = frames[j].mType;
+    }
+  }
+
+  return retval;
+}
+
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentActiveIter(TimeMap& times)
+{
+  QDateTime active = this->getActiveTime();
+
+  if (!active.isValid())
+    return times.end();
+
+  for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
+  {
+    if (iter->first >= active)
+      return iter;
+  }
+  return times.end();
+}
+
+/** return the current active time
+ *
+ */
+QDateTime RegistrationHistoryWidget::getActiveTime()
+{
+  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  if (raw.empty())
+    return QDateTime();
+  return raw.back()->getActiveTime();
+}
+
+/**set a new active time
+ *
+ */
+void RegistrationHistoryWidget::setActiveTime(QDateTime active)
+{
+  ssc::messageManager()->sendInfo("setting active registration time " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
+
+  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
+  for (unsigned i=0; i<raw.size(); ++i)
+  {
+    raw[i]->setActiveTime(active);
+  }
+}
 
 /**collect registration histories from the tool manager (patient registration)
  * and images (image registration) and return.
@@ -95,29 +165,21 @@ std::vector<ssc::RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegist
   return retval;
 }
 
-/**Remove the latest registration event (image or patient)
- * inserted into the system.
+/**Remove all registrations later than current active time.
  */
 void RegistrationHistoryWidget::removeSlot()
 {
-  //search among all images and patient reg, find latest, remove that one.
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
-
-  if (history.empty())
+  QDateTime active = this->getActiveTime();
+  if (!active.isValid()) // if invalid: we are already at head
     return;
 
-  QDateTime lastTime = history.back().mTimestamp;
+  ssc::messageManager()->sendInfo("Removing all registration performed later than " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
 
-  lastTime = lastTime.addSecs(-1);
-  ssc::messageManager()->sendInfo("Removing all registration performed later than " + lastTime.toString(ssc::timestampSecondsFormatNice()) + ".");
-
+  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
   {
-    raw[i]->removeNewerThan(lastTime);
+    raw[i]->removeNewerThan(active);
   }
-
-  //updateSlot();
 }
 
 std::vector<ssc::RegistrationTransform> RegistrationHistoryWidget::mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories)
@@ -138,30 +200,85 @@ std::vector<ssc::RegistrationTransform> RegistrationHistoryWidget::mergeHistory(
  */
 void RegistrationHistoryWidget::rewindSlot()
 {
-  std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
+//  this->debugDump();
 
-  if (history.empty())
+  TimeMap times = this->getRegistrationTimes();
+//  QDateTime active = this->getActiveTime();
+
+  if (times.size()<=1)
     return;
 
-  QDateTime lastTime = history.back().mTimestamp;
-  lastTime = lastTime.addSecs(-1);
+  // current points to the timestamp currently in use. end() is current time.
+  std::map<QDateTime,QString>::iterator current = this->findCurrentActiveIter(times);
 
-  ssc::messageManager()->sendInfo("Setting registration time to " + lastTime.toString(ssc::timestampSecondsFormatNice()) + ".");
+  if (current==times.begin())
+    return;
 
-  for (unsigned i=0; i<raw.size(); ++i)
+  if (current==times.end())
+    --current; // ignore the last entry
+
+  --current;
+  ssc::messageManager()->sendInfo("Rewind: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+  this->setActiveTime(current->first);
+  std::cout << "finished rewind" << std::endl;
+
+//  this->debugDump();
+}
+
+void RegistrationHistoryWidget::debugDump()
+{
+  TimeMap times = this->getRegistrationTimes();
+
+  std::stringstream ss;
+  if (!this->getActiveTime().isValid())
+    ss << "active time: Current \n";
+  else
+    ss << "active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "\n";
+  for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
   {
-    raw[i]->setActiveTime(lastTime);
+    ss << "\t" << iter->first.toString(ssc::timestampSecondsFormatNice()) << "\t" << iter->second << "\n";
+  }
+
+  std::cout << ss.str() << std::endl;
+}
+
+/** jump forward to one second ahead of the NEXT registration
+ */
+void RegistrationHistoryWidget::forwardSlot()
+{
+  std::map<QDateTime,QString> times = this->getRegistrationTimes();
+//  QDateTime active = this->getActiveTime();
+
+  if (times.empty())
+    return;
+
+  // current points to the timestamp currently in use. end() is current time.
+  TimeMap::iterator current = this->findCurrentActiveIter(times);
+
+  if (current==times.end()) // already at end, ignore
+    return;
+  ++current;
+
+  if (current==times.end() || times.rbegin()->first==current->first) //
+  {
+    ssc::messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
+    this->setActiveTime(QDateTime());
+  }
+  else
+  {
+    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+    this->setActiveTime(current->first);
   }
 }
+
 
 /**Use the newest available registration.
  * Negates any call to usePreviousRegistration.
  */
-void RegistrationHistoryWidget::forwardSlot()
+void RegistrationHistoryWidget::fastForwardSlot()
 {
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
-  ssc::messageManager()->sendInfo("Setting registration time to current.");
+  ssc::messageManager()->sendInfo("Fast Forward: Setting registration time to current.");
 
   for (unsigned i=0; i<raw.size(); ++i)
   {
@@ -171,15 +288,35 @@ void RegistrationHistoryWidget::forwardSlot()
 
 void RegistrationHistoryWidget::updateSlot()
 {
+//  this->debugDump();
+
   //std::cout << "RegistrationHistoryWidget::updateSlot()" << std::endl;
 
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
 
-  bool newest = isUsingNewestRegistration();
-  mRewindButton->setEnabled(newest && !history.empty());
-  mRemoveButton->setEnabled(!history.empty());
-  mForwardButton->setEnabled(!newest && !history.empty());
+
+  TimeMap times = this->getRegistrationTimes();
+  std::map<QDateTime,QString>::iterator current = this->findCurrentActiveIter(times);
+//  int behind = distance(times.begin(), current);
+  int infront = distance(current, times.end()) - 1;
+  if (infront<0)
+    infront=0;
+  int behind = times.size() - infront;
+
+  mRewindButton->setText("Rewind (" + qstring_cast(behind) + ")");
+  mForwardButton->setText("Forward (" + qstring_cast(infront) + ")");
+
+//  bool newest = isUsingNewestRegistration();
+//  mRewindButton->setEnabled(newest && !history.empty());
+//  mRemoveButton->setEnabled(!history.empty());
+//  mForwardButton->setEnabled(!newest && !history.empty());
+  mRewindButton->setEnabled(behind>1);
+  mRemoveButton->setEnabled(infront!=0);
+  mForwardButton->setEnabled(infront!=0);
+  mFastForwardButton->setEnabled(infront!=0);
+//  mGroup->adjustSize();
+//  this->adjustSize();
 }
 
 /**Return true if the system is currently using the newest
