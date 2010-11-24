@@ -398,6 +398,49 @@ private:
   ssc::DataPtr mData;
 };
 
+typedef boost::shared_ptr<class DataNameEditableStringDataAdapter> DataNameEditableStringDataAdapterPtr;
+/** Adapter for displaying and changing name of a ssc::Data.
+ */
+class DataNameEditableStringDataAdapter : public ssc::EditableStringDataAdapter
+{
+  Q_OBJECT
+public:
+  static DataNameEditableStringDataAdapterPtr New() { return DataNameEditableStringDataAdapterPtr(new DataNameEditableStringDataAdapter()); }
+  DataNameEditableStringDataAdapter();
+  virtual void setData(ssc::DataPtr data);
+  virtual ~DataNameEditableStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+private:
+  ssc::DataPtr mData;
+};
+
+typedef boost::shared_ptr<class DataUidEditableStringDataAdapter> DataUidEditableStringDataAdapterPtr;
+/** Adapter for displaying and changing name of a ssc::Data.
+ */
+class DataUidEditableStringDataAdapter : public ssc::EditableStringDataAdapter
+{
+  Q_OBJECT
+public:
+  static DataUidEditableStringDataAdapterPtr New() { return DataUidEditableStringDataAdapterPtr(new DataUidEditableStringDataAdapter()); }
+  DataUidEditableStringDataAdapter();
+  virtual void setData(ssc::DataPtr data);
+  virtual ~DataUidEditableStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+  virtual bool isReadOnly() const { return true; }
+
+private:
+  ssc::DataPtr mData;
+};
+
 } // namespace cx
 
 #endif /* CXDATAINTERFACE_H_ */
