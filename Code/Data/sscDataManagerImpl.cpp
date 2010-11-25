@@ -26,6 +26,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
+#include "sscRealTimeStreamSource.h"
 
 namespace ssc
 {
@@ -245,6 +246,31 @@ void DataManagerImpl::clear()
   emit dataLoaded();
 }
 
+
+
+// streams
+RealTimeStreamSourcePtr DataManagerImpl::getStream(const QString& uid) const
+{
+  if (mStreams.count(uid))
+    return mStreams.find(uid)->second;
+  return RealTimeStreamSourcePtr();
+}
+
+DataManager::StreamMap DataManagerImpl::getStreams() const
+{
+  return mStreams;
+}
+
+void DataManagerImpl::loadStream(RealTimeStreamSourcePtr stream)
+{
+  if (!stream)
+    return;
+  mStreams[stream->getUid()] = stream;
+}
+
+std::map<QString, RealTimeStreamSourcePtr> mStreams;
+
+
 Vector3D DataManagerImpl::getCenter() const
 {
   return mCenter;
@@ -457,7 +483,7 @@ void DataManagerImpl::verifyParentFrame(DataPtr data)
       max = std::max(max, parentList[1].toInt());
     }
     QString parentFrame = "frame_" + qstring_cast(max + 1);
-    data->setParentFrame(parentFrame);
+    data->get_rMd_History()->addParentFrame(parentFrame);
   }
 }
 

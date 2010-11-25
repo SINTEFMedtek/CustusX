@@ -3,7 +3,6 @@
 
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
-#include "sscUSProbeSector.h"
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
@@ -45,12 +44,14 @@ private slots:
 	 *\param timestamp	The time at which the transform was recorded
 	 */
 	void receiveTransforms(Transform3D matrix, double timestamp);
+	void probeSectorChanged();
 	/**
 	 * Receive whether or not the tool is visible to the tracking system
 	 *\param visible Whether or not the tool is visible to the tracking system.
 	 */
 	void receiveVisible(bool visible);
 	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
+
 private:
 	void update();
 	void updateOffsetGraphics();
@@ -67,7 +68,8 @@ private:
 	bool mOffsetPointVisibleAtZeroOffset;
 
 	//US Probe sector
-	USProbeSectorPtr mProbeSector;
+	ProbeDataPtr mProbeSector;
+	//USProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
 };

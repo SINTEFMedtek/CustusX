@@ -21,6 +21,7 @@ typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
 
 #include "sscRep.h"
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 /*! Copy/pasted from qitemdelegate.cpp
   \internal

@@ -41,6 +41,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
+    Data/sscRealTimeStreamSource.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -74,6 +75,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     #Widgets/sscXmlOptionItem.h
     Widgets/sscDoubleWidgets.h
     Widgets/sscLabeledComboBoxWidget.h
+    Widgets/sscLabeledLineEditWidget.h
     Widgets/sscHelperWidgets.h
     Utilities/sscMessageManager.h
     )
@@ -248,6 +250,8 @@ SET( SSC_SOURCE_FILES
     Tool/sscManualTool.h
     Tool/sscProbeSector.cpp
     Tool/sscProbeSector.h
+    Tool/sscProbeData.h 
+    Tool/sscProbeData.cpp 
     Widgets/sscDoubleRange.h
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h
@@ -260,7 +264,9 @@ SET( SSC_SOURCE_FILES
     Widgets/sscStringDataAdapterXml.h
     Widgets/sscStringDataAdapterXml.cpp
     Widgets/sscLabeledComboBoxWidget.h    
-    Widgets/sscLabeledComboBoxWidget.cpp    
+    Widgets/sscLabeledComboBoxWidget.cpp  
+    Widgets/sscLabeledLineEditWidget.h
+    Widgets/sscLabeledLineEditWidget.cpp  
     Widgets/sscXmlOptionItem.h    
     Widgets/sscXmlOptionItem.cpp    
 	) 
@@ -428,3 +434,4 @@ else(APPLE)
 endif(APPLE)
 # =========================================================
 
+SET_TARGET_PROPERTIES( SSC PROPERTIES COMPILE_FLAGS "-g" )

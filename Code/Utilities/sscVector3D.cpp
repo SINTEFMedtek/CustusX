@@ -150,6 +150,14 @@ std::ostream& operator<<(std::ostream& s, const Vector3D& data)
 	return stream_range(s, data.begin(), data.end());
 }
 // --------------------------------------------------------
+Vector3D unitVector(double thetaXY, double thetaZ)
+{
+  Vector3D e;
+  e[0] = cos(thetaXY)*cos(thetaZ);
+  e[1] = sin(thetaXY)*cos(thetaZ);
+  e[2] = sin(thetaZ);
+  return e;
+}
 
 // --------------------------------------------------------
 } // namespace utils

@@ -80,6 +80,31 @@ public:
 //  virtual void connectValueSignals(bool on) {}
 };
 
+/** Abstract interface for interaction with internal string-valued data.
+ *
+ * This class differ from the StringDataAdapter in that there is no range of
+ * allowed values: any value will do.
+ *
+ */
+class EditableStringDataAdapter : public DataAdapter
+{
+  Q_OBJECT
+public:
+  virtual ~EditableStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const = 0;///< name of data entity. Used for display to user.
+  virtual bool setValue(const QString& value) = 0; ///< set the data value.
+  virtual QString getValue() const = 0; ///< get the data value.
+
+public: // optional methods
+  virtual QString getHelp() const { return QString(); } ///< return a descriptive help string for the data, used for example as a tool tip.
+  virtual bool isReadOnly() const { return false; }
+
+  //  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
+};
+typedef boost::shared_ptr<EditableStringDataAdapter> EditableStringDataAdapterPtr;
+
 
 } // namespace ssc
 

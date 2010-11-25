@@ -64,6 +64,7 @@ public:
   virtual ssc::LandmarkMap getLandmarks() { return ssc::LandmarkMap();}
   virtual void setLandmark(ssc::Landmark landmark) { Q_UNUSED(landmark); }
   virtual void removeLandmark(QString uid) { Q_UNUSED(uid); }
+  virtual void removeLandmarks(){};
 
 signals:
 	void configured(); ///< system is configured

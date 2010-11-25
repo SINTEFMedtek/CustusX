@@ -9,9 +9,6 @@
 #include "sscTransform3D.h"
 #include "sscIndent.h"
 
-
-typedef ssc::utils::Transform3D Transform3D;
-
 namespace ssc
 {
 

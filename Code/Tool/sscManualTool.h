@@ -39,7 +39,7 @@ public:
 	virtual void setTooltipOffset(double val);
 
 	virtual Transform3D getCalibration_sMt() const;
-	virtual ssc::Vector3D getReferencePoint() const {return ssc::Vector3D();};
+	virtual std::map<int, Vector3D> getReferencePoints() const {return std::map<int, Vector3D>();};
 
 	// extensions:
 	void setVisible(bool vis);

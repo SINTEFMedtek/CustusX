@@ -55,7 +55,7 @@ public:
   virtual bool getShading() const;
 
   virtual QString getParentFrame();
-  virtual void setParentFrame(QString uid);
+//  virtual void setParentFrame(QString uid);
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
@@ -73,7 +73,7 @@ protected:
 	QString mUid;
 	QString mName;
 	QString mFilePath;
-	QString mParentFrame;
+//	QString mParentFrame;
 
 	REGISTRATION_STATUS mRegistrationStatus;
 	//Transform3D m_rMd; ///< the transform from data to reference space
