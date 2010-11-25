@@ -10,8 +10,10 @@
 #include "sscProbeSector.h"
 #include "sscIndent.h"
 
+
 namespace ssc
 {
+
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
  *
