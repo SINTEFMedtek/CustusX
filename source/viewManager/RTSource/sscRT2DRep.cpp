@@ -247,7 +247,6 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
 {
   if (mIgnoreToolTransform)
     return;
-  //mProbeData.test();
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D tMu = mProbeData.get_tMu();
   //Transform3D rMt = rMpr * prMt;

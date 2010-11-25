@@ -32,6 +32,9 @@ public:
  virtual ~PlateImageRegistrationWidget();
  virtual QString defaultWhatsThis() const;
 
+protected slots:
+ virtual void editLandmarkButtonClickedSlot();
+
 protected:
   virtual void performRegistration();
 };

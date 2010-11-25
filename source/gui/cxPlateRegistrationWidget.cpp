@@ -99,6 +99,9 @@ void PlateRegistrationWidget::plateRegistrationSlot()
   {
     ssc::dataManager()->setLandmarkActive(landmarkIt->first, false);
   }
+
+  //we don't want the user to load the landmarks twice, it will result in alot of global landmarks...
+  mPlateRegistrationButton->setDisabled(true);
 }
 
 void PlateRegistrationWidget::internalUpdate()

@@ -189,7 +189,6 @@ void Tool::set_prMt(const ssc::Transform3D& prMt)
 
 void Tool::toolTransformCallback(const itk::EventObject &event)
 {
-  //std::cout << "Tool " << mUid << " got an event..." << std::endl;
   if(igstk::CoordinateSystemTransformToEvent().CheckEvent(&event))
   {
     const igstk::CoordinateSystemTransformToEvent *transformEvent;
@@ -689,7 +688,6 @@ bool Tool::hasReferencePointWithId(int id)
   bool retval = false;
   if(!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000,0.000,0.000))))
       retval = true;
-  std::cout << "Reference point with id " << string_cast(id) << " has coords " << string_cast(this->getReferencePoints()[id]) << " returning "<< string_cast(retval)<<std::endl;
   return retval;
 }
 
@@ -732,8 +730,6 @@ void Tool::writeCalibrationToFile()
   }
   ssc::Transform3D sMt;
   mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
-
-  ssc::messageManager()->sendDebug("Calibration file "+calibrationFile.fileName() +" would now contain: \n"+qstring_cast(sMt));
 
   if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {

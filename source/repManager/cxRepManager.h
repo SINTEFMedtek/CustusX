@@ -5,6 +5,9 @@
 #include <map>
 #include <vector>
 #include "sscForwardDeclarations.h"
+#include "sscMessageManager.h"
+#include "sscTool.h"
+#include "sscTypeConversions.h"
 
 
 namespace ssc
@@ -54,7 +57,9 @@ public:
     {
       boost::shared_ptr<REP> rep = boost::shared_dynamic_cast<REP>(reps[i]);
       if(rep && rep->hasTool(tool))
+      {
         return rep;
+      }
     }
     return boost::shared_ptr<REP>();
   }
