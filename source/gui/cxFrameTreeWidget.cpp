@@ -24,7 +24,6 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
   this->setWindowTitle("Frame Tree");
 
   //layout->setMargin(0);
-
   mTreeWidget = new QTreeWidget(this);
   layout->addWidget(mTreeWidget);
   mTreeWidget->setHeaderLabels(QStringList() << "Frame");
@@ -58,12 +57,6 @@ void FrameTreeWidget::rebuild()
   QDomElement root = forest.getDocument().documentElement();
 
   this->fill(mTreeWidget->invisibleRootItem(), root);
-
-//  for (QDomNode child = root.firstChild(); !child.isNull(); child = child.nextSibling())
-//  {
-//    QTreeWidgetItem* item = new QTreeWidgetItem(mTreeWidget, QStringList() << child.toElement().tagName());
-//    this->fill(item, child);
-//  }
 
   mTreeWidget->expandToDepth(10);
   mTreeWidget->resizeColumnToContents(0);
