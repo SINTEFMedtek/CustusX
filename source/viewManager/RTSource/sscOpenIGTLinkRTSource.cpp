@@ -17,6 +17,7 @@
 #include <vtkDataSetMapper.h>
 #include <vtkLookupTable.h>
 #include <vtkAlgorithmOutput.h>
+#include <vtkImageMapToColors.h>
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 
 namespace ssc
@@ -186,28 +187,32 @@ void OpenIGTLinkRTSource::setTestImage()
   mImageImport->Modified();
 }
 
-vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
-{
-    int N = 1400;
-    //make a default system set lookuptable, grayscale...
-    vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-    lut->SetNumberOfTableValues(N);
-    //lut->SetTableRange (0, 1024); // the window of the input
-    lut->SetTableRange (0, N-1); // the window of the input
-    lut->SetSaturationRange (0, 0.5);
-    lut->SetHueRange (0, 0.5);
-    lut->SetValueRange (0, 1);
-    lut->Build();
-
-    vtkDataSetMapperPtr mapper = vtkDataSetMapper::New();
-    mapper->SetInput(input);
-    mapper->SetLookupTable(lut);
-    mapper->GetOutputPort()->Print(std::cout);
-
-    return vtkImageDataPtr();
-//    return mapper->GetOutputPort();
-}
-
+//vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
+//{
+//    int N = 1400;
+//    //make a default system set lookuptable, grayscale...
+//    vtkLookupTablePtr lut = vtkLookupTablePtr::New();
+//    lut->SetNumberOfTableValues(N);
+//    //lut->SetTableRange (0, 1024); // the window of the input
+//    lut->SetTableRange (0, N-1); // the window of the input
+//    lut->SetSaturationRange (0, 0.5);
+//    lut->SetHueRange (0, 1);
+//    lut->SetValueRange (0, 1);
+//    lut->Build();
+//
+////    vtkDataSetMapperPtr mapper = vtkDataSetMapper::New();
+////    mapper->SetInput(input);
+////    mapper->SetLookupTable(lut);
+////    mapper->GetOutputPort()->Print(std::cout);
+//
+//    vtkImageMapToColorsPtr mapper = vtkImageMapToColorsPtr::New();
+//    mapper->SetInput(input);
+//    mapper->SetLookupTable(lut);
+//    mapper->Update();
+//    return mapper->GetOutput();
+////    return mapper->GetOutputPort();
+//}
+//
 
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
@@ -239,6 +244,8 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
 
+  mImageImport->SetNumberOfScalarComponents(1);
+
   switch (scalarType)
   {
   case igtl::ImageMessage::TYPE_INT8:
@@ -256,11 +263,12 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
     mImageImport->SetDataScalarTypeToUnsignedShort();
     break;
   case igtl::ImageMessage::TYPE_INT32:
-    mImageImport->SetDataScalarTypeToInt();
-    break;
   case igtl::ImageMessage::TYPE_UINT32:
-    std::cout << "unsigned int is not supported. Falling back to int." << std::endl;
-    mImageImport->SetDataScalarTypeToInt();
+    // assume RGBA unsigned colors
+    mImageImport->SetNumberOfScalarComponents(4);
+//    mImageImport->SetDataScalarTypeToInt();
+    mImageImport->SetDataScalarTypeToUnsignedChar();
+//    std::cout << "32bit received" << std::endl;
     break;
   case igtl::ImageMessage::TYPE_FLOAT32:
     mImageImport->SetDataScalarTypeToFloat();
@@ -301,8 +309,19 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-  mImageImport->GetOutput()->Update();
-  return mImageImport->GetOutput();
+//  if (false)
+//  {
+//    vtkImageDataPtr colored = convertToTestColorImage(mImageImport->GetOutput());
+//    return colored;
+//  }
+//  else
+//  {
+    mImageImport->GetOutput()->Update();
+    return mImageImport->GetOutput();
+//  }
+
+
+
 //  return mImageData;
 }
 
