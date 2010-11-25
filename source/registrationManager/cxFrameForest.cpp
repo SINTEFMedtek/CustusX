@@ -15,7 +15,7 @@ namespace cx
  */
 FrameForest::FrameForest()
 {
-  //std::cout << "Forrest doc2:" << std::endl;
+//  std::cout << "Forrest doc2:" << std::endl;
   ssc::DataManager::DataMap allData = ssc::dataManager()->getData();
   mDocument.appendChild(mDocument.createElement("root"));
 
@@ -24,8 +24,8 @@ FrameForest::FrameForest()
     this->insertFrame(iter->second);
   }
 
-  //std::cout << "Forrest doc:" << std::endl;
-  //std::cout << mDocument.toString(4) << std::endl;
+//  std::cout << "Forrest doc:" << std::endl;
+//  std::cout << mDocument.toString(4) << std::endl;
 }
 
 QDomDocument FrameForest::getDocument()
@@ -43,6 +43,9 @@ void FrameForest::insertFrame(ssc::DataPtr data)
 
     QDomNode parentNode = this->getNodeAnyway(parentFrame);
     QDomNode currentNode = this->getNodeAnyway(currentFrame);
+
+    if (parentNode.isNull())
+      return;
 
     // move currentNode to child of parentNode
     currentNode = currentNode.parentNode().removeChild(currentNode);
