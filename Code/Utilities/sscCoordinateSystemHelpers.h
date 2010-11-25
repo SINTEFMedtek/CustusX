@@ -12,6 +12,7 @@ struct CoordinateSystem
   COORDINATE_SYSTEM mId; ///< the type of coordinate system
   QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
 };
+typedef CoordinateSystem Space;
 
 /**
  * \class CoordinateSystemHelpers
@@ -30,8 +31,10 @@ public:
   static Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
   static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
-  static ssc::CoordinateSystem getCoordinateSystem(ssc::ToolPtr tool);
-  static ssc::CoordinateSystem getCoordinateSystem(ssc::DataPtr data);
+  static ssc::CoordinateSystem getT(ssc::ToolPtr tool);
+  static ssc::CoordinateSystem getD(ssc::DataPtr data);
+  static ssc::CoordinateSystem getPr();
+  static ssc::CoordinateSystem getR();
 
 private:
   Transform3D get_rMfrom(CoordinateSystem from) const; ///< ref_M_from
@@ -42,5 +45,6 @@ private:
   Transform3D get_rMt(QString uid) const; ///< ref_M_t
   Transform3D get_rMs(QString uid) const; ///< ref_M_s
 };
+typedef CoordinateSystemHelpers SpaceHelpers;
 }//namespace ssc
 #endif /* SSCCOORDINATESYSTEMHELPERS_H_ */

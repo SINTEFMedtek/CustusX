@@ -72,6 +72,7 @@ public:
   void updateParentFrame(const QDateTime& oldTime, const ParentFrame& newParent);
 
   std::vector<RegistrationTransform> getData() const;
+  std::vector<ParentFrame> getParentFrames() const;
   void removeNewerThan(const QDateTime& timestamp);
   void setActiveTime(const QDateTime& timestamp);
   QDateTime getActiveTime() const;
