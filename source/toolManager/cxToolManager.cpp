@@ -166,7 +166,9 @@ void ToolManager::initialize()
     ssc::messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
+  #ifndef _WINDOWS
   this->createSymlink();
+  #endif
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
@@ -182,6 +184,7 @@ void ToolManager::uninitialize()
   mTracker->close();
 }
 
+#ifndef _WINDOWS
 /** Assume that IGSTK requires the file /Library/CustusX/igstk.links/cu.CustusX.dev0
  *  as a rep for the HW connection. Also assume that directory is created with full
  *  read/write access (by installer or similar).
@@ -255,6 +258,7 @@ void ToolManager::cleanupSymlink()
   ssc::messageManager()->sendInfo("Cleaning up symlinks.");
   QFile(this->getSymlink().absoluteFilePath()).remove();
 }
+#endif //_WINDOWS
 
 void ToolManager::startTracking()
 {
