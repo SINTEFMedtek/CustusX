@@ -128,9 +128,11 @@ private:
   ToolManager(ToolManager const&);
   ToolManager& operator=(ToolManager const&);
 
+#ifndef _WINDOWS
   void createSymlink();
   QFileInfo getSymlink() const;
   void cleanupSymlink();
+#endif //_WINDOWS
 };
 
 bool toolTypeSort(const ssc::ToolPtr tool1, const ssc::ToolPtr tool2); ///< function for sorting tools by type
