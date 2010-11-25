@@ -140,9 +140,6 @@ void RegistrationHistory::parseXml(QDomNode& dataNode)///< read internal state f
     return;
 
   mData.clear();
-//std::cout << "RegistrationHistory::parseXml" << std::endl;
-  //emit currentChanged();
-  //return;
   QString currentTimeRaw = dataNode.namedItem("currentTime").toElement().text();
   QDateTime currentTime = QDateTime::fromString(currentTimeRaw, timestampSecondsFormat());
 
@@ -204,35 +201,6 @@ void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Reg
   this->addRegistration(newTransform);
 }
 
-///**Replace the registration matrix performed at oldTime with the new one.
-// *
-// */
-//void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Transform3D& newTransform)
-//{
-//  for (std::vector<RegistrationTransform>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
-//  {
-//    if (iter->mTimestamp != oldTime)
-//      continue;
-//    //mData.erase(iter);
-//    iter->mValue = newTransform;
-//    break;
-//  }
-////  this->addRegistration(newTransform);
-//}
-//
-///**Update the registration performed at
-// */
-//void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const QString parentFrame)
-//{
-//  for (std::vector<RegistrationTransform>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
-//  {
-//    if (iter->mTimestamp != oldTime)
-//      continue;
-//    iter->mParentFrame = parentFrame;
-//    break;
-//  }
-//}
-
 /**Set a registration transform, overwriting all history.
  * Use this when registration history is not needed.
  */
@@ -289,16 +257,10 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
 {
   if (!timestamp.isValid())
     return;
-  //std::remove_if(mData.begin(), mData.end(), );
-//... remove_if etc etc.
-  //std::cout << "RegistrationHistory::removeNewerThan("<< timestamp.toString(timestampSecondsFormatNice()) <<")" << std::endl;
 
   for (std::vector<RegistrationTransform>::iterator iter=mData.begin(); iter!=mData.end(); )
   {
-    //std::cout << "  iter->mTimestamp: " << iter->mTimestamp.toString(timestampSecondsFormatNice()) << std::endl;
-    //std::cout << "  (iter->mTimestamp >= timestamp): " << (iter->mTimestamp >= timestamp) << std::endl;
-
-    if (iter->mTimestamp >= timestamp)
+    if (iter->mTimestamp > timestamp)
     {
       std::cout << "RegistrationHistory::removeNewerThan("<< timestamp.toString(timestampSecondsFormatNice()) <<"): removed [" << iter->mTimestamp.toString(timestampSecondsFormatNice()) << ", " << iter->mType << "]" << std::endl;
       iter = mData.erase(iter);
@@ -311,7 +273,7 @@ void RegistrationHistory::removeNewerThan(const QDateTime& timestamp)
 
   for (std::vector<ParentFrame>::iterator iter=mParentFrames.begin(); iter!=mParentFrames.end(); )
   {
-    if (iter->mTimestamp >= timestamp)
+    if (iter->mTimestamp > timestamp)
     {
       std::cout << "RegistrationHistory::removeNewerThan("<< timestamp.toString(timestampSecondsFormatNice()) <<"): removed parent frame [" << iter->mTimestamp.toString(timestampSecondsFormatNice()) << ", " << iter->mType << "]" << std::endl;
       iter = mParentFrames.erase(iter);
@@ -334,13 +296,6 @@ void RegistrationHistory::setCache(const RegistrationTransform& val, const Paren
   mTransformCache = val;
   mParentFrameCache = parent;
 
-//  std::cout << "--------------------------------" << std::endl;
-//  std::cout << "mTransformCache\n" << mTransformCache << std::endl;
-//  std::cout << streamXml2String(*this) << std::endl;
-//  std::cout << "--------------------------------" << std::endl;
-
-//  std::cout << "RegistrationHistory::setCache() " << this << std::endl;
-
   emit currentChanged();
 }
 
@@ -349,37 +304,9 @@ void RegistrationHistory::setCache(const RegistrationTransform& val, const Paren
  */
 void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
 {
-//  std::cout << "RegistrationHistory::setActiveTime " << this << std::endl;
-
   RegistrationTransform val;
   ParentFrame parent;
-
-//  if (mData.empty())
-//  {
-//    val = RegistrationTransform();
-//////    std::cout << "setActiveTime1\n" << Transform3D() << std::endl;
-////    setCache(RegistrationTransform(), ParentFrame(), timestamp);
-////    return;
-//  }
-
-//  // set to running time
-//  if (!timestamp.isValid())
-//  {
-////    std::cout << "--------------------------------" << std::endl;
-////    std::cout << "setActiveTime2\n" << mData.back().mValue << std::endl;
-////    std::cout << "mData.size() " << mData.size() << std::endl;
-////    std::cout << "mData.front().mTimestamp < mData.back().mTimestamp: " << (mData.front().mTimestamp < mData.back().mTimestamp) << std::endl;
-////    std::cout << "mData.front() < mData.back(): " << (mData.front() < mData.back()) << std::endl;
-////     std::cout << streamXml2String(*this) << std::endl;
-////    std::cout << "--------------------------------" << std::endl;
-//
-//    setCache(mData.back(), timestamp);
-//    return;
-//  }
-
-//  std::cout << "setActiveTime3" << std::endl;
   // set to specified time
-  //RegistrationTransform val;
   if (timestamp.isValid())
   {
     for (std::vector<RegistrationTransform>::iterator iter=mData.begin(); iter!=mData.end(); ++iter)
@@ -400,24 +327,6 @@ void RegistrationHistory::setActiveTime(const QDateTime& timestamp)
     if (!mParentFrames.empty())
       parent = mParentFrames.back();
   }
-
-//  // debug:
-//  ///
-//  if (!mData.empty())
-//  {
-//    RegistrationTransform head = mData.back();
-//    if (!(head==val))
-//    {
-//      std::cout << "cache value differ from head" << std::endl;
-//    }
-//    if (mData.size()==1)
-//    {
-//      std::cout << "mData.size==1" << std::endl;
-//      std::cout << "head: " << streamXml2String(head) << std::endl;
-//      std::cout << "val: " << streamXml2String(val) << std::endl;
-//    }
-//  }
-//  ///
 
   setCache(val, parent, timestamp);
 }
