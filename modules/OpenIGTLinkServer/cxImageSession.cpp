@@ -15,8 +15,12 @@
 #include "vtkSmartPointer.h"
 #include "vtkMetaImageReader.h"
 #include "vtkImageImport.h"
+#include "vtkLookupTable.h"
+#include "vtkImageMapToColors.h"
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
+typedef vtkSmartPointer<vtkImageMapToColors> vtkImageMapToColorsPtr;
+typedef vtkSmartPointer<vtkLookupTable> vtkLookupTablePtr;
 
 namespace cx
 {
@@ -35,7 +39,31 @@ vtkImageDataPtr loadImage(QString filename)
   return reader->GetOutput();
 }
 
+vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
+{
+    int N = 1400;
+    //make a default system set lookuptable, grayscale...
+    vtkLookupTablePtr lut = vtkLookupTablePtr::New();
+    lut->SetNumberOfTableValues(N);
+    //lut->SetTableRange (0, 1024); // the window of the input
+    lut->SetTableRange (0, N-1); // the window of the input
+    lut->SetSaturationRange (0, 0.5);
+    lut->SetHueRange (0, 1);
+    lut->SetValueRange (0, 1);
+    lut->Build();
 
+//    vtkDataSetMapperPtr mapper = vtkDataSetMapper::New();
+//    mapper->SetInput(input);
+//    mapper->SetLookupTable(lut);
+//    mapper->GetOutputPort()->Print(std::cout);
+
+    vtkImageMapToColorsPtr mapper = vtkImageMapToColorsPtr::New();
+    mapper->SetInput(input);
+    mapper->SetLookupTable(lut);
+    mapper->Update();
+    return mapper->GetOutput();
+//    return mapper->GetOutputPort();
+}
 
 igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 {
@@ -56,15 +84,27 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
   int   svoffset[] = {0, 0, 0};           // sub-volume offset
   int   scalarType = -1;
 
-  if (image->GetScalarType()==VTK_UNSIGNED_SHORT)
+  if (image->GetNumberOfScalarComponents()==4)
   {
-    scalarType = igtl::ImageMessage::TYPE_UINT16;// scalar type
+    if (image->GetScalarType()==VTK_UNSIGNED_CHAR)
+    {
+      scalarType = igtl::ImageMessage::TYPE_UINT32;// scalar type
+    }
   }
-  else if (image->GetScalarType()==VTK_UNSIGNED_CHAR)
+
+  if (image->GetNumberOfScalarComponents()==1)
   {
-    scalarType = igtl::ImageMessage::TYPE_UINT8;// scalar type
+    if (image->GetScalarType()==VTK_UNSIGNED_SHORT)
+    {
+      scalarType = igtl::ImageMessage::TYPE_UINT16;// scalar type
+    }
+    else if (image->GetScalarType()==VTK_UNSIGNED_CHAR)
+    {
+      scalarType = igtl::ImageMessage::TYPE_UINT8;// scalar type
+    }
   }
-  else
+
+  if (scalarType==-1)
   {
     std::cerr << "unknown image type" << std::endl;
     exit(0);
@@ -123,6 +163,7 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
     mImageFileDir(imageFileDir)
 {
   mImageData = loadImage(mImageFileDir);
+  mImageData = convertToTestColorImage(mImageData);
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
