@@ -89,6 +89,8 @@ Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const
 // --------------------------------------------------------
 } // namespace utils
 typedef boost::shared_ptr<Transform3D> Transform3DPtr;
+using namespace utils;
+
 } // namespace ssc
 // --------------------------------------------------------
 

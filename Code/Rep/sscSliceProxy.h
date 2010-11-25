@@ -11,7 +11,9 @@
 
 namespace ssc
 {
-typedef ssc::utils::Transform3D Transform3D;
+using namespace utils;
+
+//typedef ssc::utils::Transform3D Transform3D;
 class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;

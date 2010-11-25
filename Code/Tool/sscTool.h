@@ -10,9 +10,12 @@
 #include "sscProbeSector.h"
 #include "sscIndent.h"
 
+
 namespace ssc
 {
-  typedef ssc::utils::Transform3D Transform3D;
+using namespace utils;
+
+//  typedef ssc::utils::Transform3D Transform3D;
 
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
