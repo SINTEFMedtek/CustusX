@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QMacCocoaViewContainer>
 
-//#include "sscMessageManager.h"
+#include "sscMessageManager.h"
 
 //==============================================================================
 //Class that connects to the videosignal and receives frames
