@@ -44,6 +44,15 @@ IF(IGSTK_FOUND)
   INCLUDE(${IGSTK_USE_FILE})
 ENDIF(IGSTK_FOUND)
 
+# SSC
+#----------
+find_package (SSC PATHS "../../externals/ssc/CMake" REQUIRED)
+#if (SSC_FOUND)
+	include (${SSC_USE_FILE})
+#	link_directories (${SSC_DIR}/Code)
+#endif (SSC_FOUND) 
+#----------
+
 #Foundation
 #----------
 IF(APPLE)
@@ -111,6 +120,7 @@ ADD_EXECUTABLE(GrabberServer MACOSX_BUNDLE ${SOURCES})
 # Link
 #------------------------------------------------------------------------------
 SET ( LINK_LIBRARIES
+  SSC
   ${QT_LIBRARIES}
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
