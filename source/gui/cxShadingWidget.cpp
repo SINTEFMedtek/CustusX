@@ -62,12 +62,10 @@ void ShadingWidget::init()
 
 void ShadingWidget::shadingToggledSlot(bool val)
 {
-  std::cout << "shading attempt set to " << val << std::endl;
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   if (image)
   {
     image->setShadingOn(val);
-    std::cout << "shading set to " << val << std::endl;
   }
 }
 
