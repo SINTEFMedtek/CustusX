@@ -17,6 +17,20 @@
 namespace cx
 {
 
+template<class T>
+QAction* RegistrationHistoryWidget::createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot)
+{
+  QAction* action = new QAction(QIcon(iconName), text, this);
+  action->setStatusTip(tip);
+  action->setToolTip(tip);
+  connect(action, SIGNAL(triggered()), this, slot);
+  QToolButton* button = new QToolButton();
+  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+  button->setDefaultAction(action);
+  layout->addWidget(button);
+  return action;
+}
+
 RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
     QWidget(parent)
 {
@@ -26,33 +40,85 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
 
   //layout
   QHBoxLayout* toptopLayout = new QHBoxLayout(this);
-  toptopLayout->setMargin(0);
-  mGroup = new QGroupBox;
+//  toptopLayout->setMargin(0);
+  //mGroup = new QGroupBox;
   //group->setFlat(true);
-  toptopLayout->addWidget(mGroup);
-  mGroup->setTitle("Registration Time Control");
-  QHBoxLayout* topLayout = new QHBoxLayout(mGroup);
+  //mGroup->setTitle("Registration Time Control");
+  QHBoxLayout* topLayout = new QHBoxLayout;
+//  toptopLayout->setMargin(0);
+  toptopLayout->addLayout(topLayout);
+  toptopLayout->addStretch();
 
-  mRewindButton = new QPushButton("Rewind");
-  mRewindButton->setToolTip("One step back in registration history");
-  connect(mRewindButton, SIGNAL(clicked()), this, SLOT(rewindSlot()));
-  topLayout->addWidget(mRewindButton);
 
-  mRemoveButton = new QPushButton("Remove");
-  mRemoveButton->setToolTip("Remove all registrations after the current");
-  connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeSlot()));
-  topLayout->addWidget(mRemoveButton);
+//  QString iconname = ":/icons/Tango/scalable/actions/go-first.svg";
+//  QString iconname = ":/icons/Tango/32x32/actions/go-first.png";
+//  QString iconname = ":/icons/arrow-left.png";
+//  QString iconname = ":/icons/openx.png";
+//  QString iconname = ":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png";
 
-  mForwardButton = new QPushButton("Forward");
-  mForwardButton->setToolTip("One step forward in registration history");
-  connect(mForwardButton, SIGNAL(clicked()), this, SLOT(forwardSlot()));
-  topLayout->addWidget(mForwardButton);
+  mRemoveAction = createAction(topLayout,
+        ":/icons/open_icon_library/png/64x64/actions/dialog-close.png",
+        "Remove",
+        "Remove all registrations after the current",
+        SLOT(removeSlot()));
 
-  mFastForwardButton = new QPushButton("Fast Forward");
-  mFastForwardButton->setToolTip("Step to latest registration");
-  connect(mFastForwardButton, SIGNAL(clicked()), this, SLOT(fastForwardSlot()));
-  topLayout->addWidget(mFastForwardButton);
+  mBehindLabel = new QLabel(this);
+  mBehindLabel->setToolTip("Number of registrations before current time");
+  topLayout->addWidget(mBehindLabel);
+
+  mRewindAction = createAction(topLayout,
+      ":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png",
+      "Rewind",
+      "One step back in registration history",
+      SLOT(rewindSlot()));
+
+  mForwardAction = createAction(topLayout,
+      ":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png",
+      "Rewind",
+      "One step forward in registration history",
+      SLOT(forwardSlot()));
+
+  mInFrontLabel = new QLabel(this);
+  mInFrontLabel->setToolTip("Number of registrations after current time");
+  topLayout->addWidget(mInFrontLabel);
+
+  mFastForwardAction = createAction(topLayout,
+      ":/icons/open_icon_library/png/64x64/actions/arrow-right-double-3.png",
+      "Fast Forward",
+      "Step to latest registration",
+      SLOT(fastForwardSlot()));
+
+  topLayout->addStretch();
+
+//  mRewindAction = new QAction(QIcon(iconname), "Rewind", this);
+//  mRewindAction->setStatusTip("One step back in registration history");
+//  connect(mRewindAction, SIGNAL(triggered()), this, SLOT(rewindSlot()));
+//  QToolButton* rewindButton = new QToolButton();
+//  rewindButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+//  rewindButton->setDefaultAction(mRewindAction);
+//  topLayout->addWidget(rewindButton);
+
+//  mRewindButton = new QPushButton("Rewind");
+//  mRewindButton->setToolTip("One step back in registration history");
+//  connect(mRewindButton, SIGNAL(clicked()), this, SLOT(rewindSlot()));
+//  topLayout->addWidget(mRewindButton);
+//
+//  mRemoveButton = new QPushButton("Remove");
+//  mRemoveButton->setToolTip("Remove all registrations after the current");
+//  connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeSlot()));
+//  topLayout->addWidget(mRemoveButton);
+//
+//  mForwardButton = new QPushButton("Forward");
+//  mForwardButton->setToolTip("One step forward in registration history");
+//  connect(mForwardButton, SIGNAL(clicked()), this, SLOT(forwardSlot()));
+//  topLayout->addWidget(mForwardButton);
+//
+//  mFastForwardButton = new QPushButton("Fast Forward");
+//  mFastForwardButton->setToolTip("Step to latest registration");
+//  connect(mFastForwardButton, SIGNAL(clicked()), this, SLOT(fastForwardSlot()));
+//  topLayout->addWidget(mFastForwardButton);
 }
+
 
 RegistrationHistoryWidget::~RegistrationHistoryWidget()
 {
@@ -155,7 +221,7 @@ QDateTime RegistrationHistoryWidget::getActiveTime()
  */
 void RegistrationHistoryWidget::setActiveTime(QDateTime active)
 {
-  ssc::messageManager()->sendInfo("setting active registration time " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
+//  ssc::messageManager()->sendInfo("setting active registration time " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
 
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
@@ -238,7 +304,7 @@ void RegistrationHistoryWidget::rewindSlot()
   --current;
   ssc::messageManager()->sendInfo("Rewind: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
   this->setActiveTime(current->first);
-  std::cout << "finished rewind" << std::endl;
+//  std::cout << "finished rewind" << std::endl;
 }
 
 void RegistrationHistoryWidget::debugDump()
@@ -311,16 +377,21 @@ void RegistrationHistoryWidget::updateSlot()
   int behind = std::min<int>(distance(times.begin(), current), times.size()-1);
   int infront = times.size() - 1 - behind;
 
-  mRewindButton->setText("Rewind (" + qstring_cast(behind) + ")");
-  mForwardButton->setText("Forward (" + qstring_cast(infront) + ")");
+  mRewindAction->setText("Rewind (" + qstring_cast(behind) + ")");
+//  mRewindAction->setText("Rewind (" + qstring_cast(behind) + ")");
+  mForwardAction->setText("Forward (" + qstring_cast(infront) + ")");
 
-  mRewindButton->setEnabled(behind>0);
-  mRemoveButton->setEnabled(infront!=0);
-  mForwardButton->setEnabled(infront!=0);
-  mFastForwardButton->setEnabled(infront!=0);
+  mBehindLabel->setText("(" + qstring_cast(behind) + ")");
+  mInFrontLabel->setText("(" + qstring_cast(infront) + ")");
+
+  mRewindAction->setEnabled(behind>0);
+  mRewindAction->setEnabled(behind>0);
+  mRemoveAction->setEnabled(infront!=0);
+  mForwardAction->setEnabled(infront!=0);
+  mFastForwardAction->setEnabled(infront!=0);
 //  mGroup->adjustSize();
 //  this->adjustSize();
-  std::cout << "RegistrationHistoryWidget::updateSlot() " << behind << "/" << infront << std::endl;
+//  std::cout << "RegistrationHistoryWidget::updateSlot() " << behind << "/" << infront << std::endl;
 }
 
 
