@@ -11,7 +11,6 @@
 
 namespace ssc
 {
-typedef ssc::utils::Transform3D Transform3D;
 class SliceComputer;
 // forward declarations
 typedef boost::shared_ptr<class Tool> ToolPtr;
@@ -39,7 +38,7 @@ public:
 	QString getName() const;
 	
 	void setGravity(bool use, const Vector3D& dir);
-	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset); 
+	void setToolViewOffset(bool use, double viewportHeight, double toolViewOffset);
 	void setToolViewportHeight(double viewportHeight);
 	void setDefaultCenter(const Vector3D& c);
 	
@@ -50,13 +49,17 @@ public:
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	void printSelf(std::ostream & os, Indent indent);
 
+#ifdef _WINDOWS
+  typedef ssc::utils::Transform3D Transform3D;
+#endif
+
 signals:
 	void transformChanged(Transform3D sMr); ///< emitted when transform is changed.
 	void toolTransformAndTimestamp(Transform3D prMt, double timestamp); ///< forwarded from tool
 	void toolVisible(bool visible); ///< forwarding of visible in tool
 	
 private slots:
-    void medicalDomainChangedSlot();
+  void medicalDomainChangedSlot();
 	void tooltipOffsetSlot(double val);
 	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 	void toolVisibleSlot(bool visible); 
