@@ -202,7 +202,8 @@ void ToolManager::createSymlink()
   QDir devDir("/dev/");
 
   QStringList filters;
-  filters << "cu.usbserial*" << "cu.KeySerial*"; //NOTE: only works with current hardware using aurora or polaris.
+  // cu* applies to Mac, ttyUSB applies to Linux
+  filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "ttyUSB*" ; //NOTE: only works with current hardware using aurora or polaris.
   //filters << "cu.usbserial*" << "cu.USA19H*"; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
 
@@ -239,7 +240,10 @@ void ToolManager::createSymlink()
 
 QFileInfo ToolManager::getSymlink() const
 {
-  QDir linkDir("/Library/CustusX/igstk.links");
+  QString name("/Library/CustusX/igstk.links");
+//  QDir linkDir("/Library/CustusX/igstk.links");
+  QDir linkDir(name);
+  QDir::root().mkdir(name); // only works if run with sudo
   QString linkFile = linkDir.path() + "/cu.CustusX.dev0";
   return QFileInfo(linkDir, linkFile);
 }
