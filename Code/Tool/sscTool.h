@@ -12,6 +12,7 @@
 
 namespace ssc
 {
+  typedef ssc::utils::Transform3D Transform3D;
 
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
@@ -87,7 +88,7 @@ public:
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id){return false;}
 
-  typedef ssc::Transform3D Transform3D;
+
 signals:
 	void toolTransformAndTimestamp(Transform3D matrix, double timestamp);
 	void toolVisible(bool visible);
