@@ -35,13 +35,6 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
 	mProbeSector.reset(new ProbeData());
 	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
 	mProbeSectorActor = vtkActorPtr::New();
-
-  //std::cout << "Tool3DRep: construct " << std::endl;
-
-//	if (pd::Settings::instance()->useDebugAxis())
-//	 	{
-//		 	mTool->AddPart( Axes3D().getProp() );
-//	 	}
 }
 
 ToolRep3D::~ToolRep3D()
@@ -109,7 +102,6 @@ void ToolRep3D::setTool(ToolPtr tool)
 		}
 
 		receiveTransforms(mTool->get_prMt(), 0);
-		//std::cout << "Tool3DRep: set tool" << std::endl;
 		mToolActor->SetVisibility(mTool->getVisible());
 
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
@@ -162,12 +154,7 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
 	Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
 	Transform3D rMt = (*rMprPtr)*prMt;
-//	std::cout << "tool " << mTool->getUid() << std::endl;
-//	if (mToolActor->GetUserMatrix() && similar(rMt, ssc::Transform3D(mToolActor->GetUserMatrix())))
-//	  return;
-//	std::cout << "passed" << std::endl;
-	mToolActor->SetUserMatrix( rMt.matrix());
-	//updateOffsetGraphics();
+	mToolActor->SetUserMatrix(rMt.matrix());
 	this->update();
 }
 

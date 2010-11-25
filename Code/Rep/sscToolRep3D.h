@@ -51,6 +51,7 @@ private slots:
 	 */
 	void receiveVisible(bool visible);
 	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
+
 private:
 	void update();
 	void updateOffsetGraphics();
