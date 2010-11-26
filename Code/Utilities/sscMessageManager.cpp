@@ -155,7 +155,10 @@ MessageManager::MessageManager() :
     mAbsoluteLoggingFolderPath(""),
     mConsoleFile(new QFile(mAbsoluteLoggingFolderPath, this)),
     mConsoleStream(new QTextStream())
-{}
+{
+  typedef ssc::Message Message;
+  qRegisterMetaType<Message>("Message");
+}
 
 MessageManager::~MessageManager()
 {

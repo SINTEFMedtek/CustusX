@@ -1,6 +1,7 @@
 #ifndef MESSAGEMANAGER_H_
 #define MESSAGEMANAGER_H_
 
+#include <QMetaType>
 #include <QObject>
 #include <QDateTime>
 #include <QFile>
@@ -15,7 +16,6 @@ class QTextStream;
 
 namespace ssc
 {
-
 /**
  * \class Message
  *
@@ -27,7 +27,7 @@ namespace ssc
 class Message
 {
 public:
-  Message(QString text, MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0);
+  Message(QString text ="", MESSAGE_LEVEL messageLevel=mlDEBUG, int timeoutTime=0);
   ~Message();
 
   QString getPrintableMessage(); ///< Text containing  information appropriate to display
@@ -105,5 +105,9 @@ private:
 MessageManager* messageManager();
 
 } //namespace ssc
+
+typedef ssc::Message Message;
+Q_DECLARE_METATYPE(Message);
+
 
 #endif /* MESSAGEMANAGER_H_ */
