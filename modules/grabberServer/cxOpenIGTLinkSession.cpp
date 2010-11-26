@@ -18,6 +18,8 @@ OpenIGTLinkSession::~OpenIGTLinkSession()
 
 void OpenIGTLinkSession::run()
 {
+  //QThread::currentThread().print();
+
   mSocket = new QTcpSocket();
   mSocket->setSocketDescriptor(mSocketDescriptor);
   connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
@@ -40,18 +42,20 @@ void OpenIGTLinkSession::run()
 OpenIGTLinkSender::OpenIGTLinkSender(QTcpSocket* socket, QObject* parent) :
     QObject(parent),
     mSocket(socket)
-{}
+{
+  //connect(this, SIGNAL(newFrame()), this, SLOT(sendOpenIGTLinkImage()), Qt::DirectConnection);
+}
 
 OpenIGTLinkSender::~OpenIGTLinkSender()
 {}
 
-void OpenIGTLinkSender::receiveFrameSlot()
+void OpenIGTLinkSender::receiveFrameSlot(/*Frame*/)
 {
   //TODO
   mGrabber;//->getFrame();
 
-  igtl::ImageMessage::Pointer message = this->convertFrame();
-  this->sendOpenIGTLinkImage(message);
+  //mMessage = this->convertFrame(Frame);
+  //emit newFrame();
 }
 
 igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(/*something*/)
