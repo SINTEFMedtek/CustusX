@@ -14,6 +14,7 @@ find_package( Boost REQUIRED )
 #----------
 # find and setup Qt4 for this project
 SET (QT_USE_QTXML TRUE)
+SET (QT_USE_QTNETWORK TRUE)
 find_package(Qt4 REQUIRED)
 IF(QT_USE_FILE)
   INCLUDE(${QT_USE_FILE})
@@ -44,14 +45,15 @@ IF(IGSTK_FOUND)
   INCLUDE(${IGSTK_USE_FILE})
 ENDIF(IGSTK_FOUND)
 
+# OpenIGTLink
+#----------
+find_package(OpenIGTLink REQUIRED)
+include(${OpenIGTLink_USE_FILE})
+
 # SSC
 #----------
 find_package (SSC PATHS "../../externals/ssc/CMake" REQUIRED)
-#if (SSC_FOUND)
-	include (${SSC_USE_FILE})
-#	link_directories (${SSC_DIR}/Code)
-#endif (SSC_FOUND) 
-#----------
+include (${SSC_USE_FILE})
 
 #Foundation
 #----------
@@ -84,6 +86,8 @@ SET(${LIBNAME}_MOC_HDRS
     cxMainWindow.h
     cxGrabberServerWidget.h
     cxGrabber.h
+    cxServer.h
+    cxOpenIGTLinkSession.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -101,6 +105,8 @@ SET(SOURCES
     cxMainWindow.cpp
     cxGrabberServerWidget.cpp
     cxGrabber.mm
+    cxServer.cpp
+    cxOpenIGTLinkSession.cpp
     ${${LIBNAME}_MOC_HDRS}
     ${${LIBNAME}_MOC_SRCS}
 )
@@ -121,6 +127,7 @@ ADD_EXECUTABLE(GrabberServer MACOSX_BUNDLE ${SOURCES})
 #------------------------------------------------------------------------------
 SET ( LINK_LIBRARIES
   SSC
+  OpenIGTLink
   ${QT_LIBRARIES}
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
