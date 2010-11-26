@@ -662,19 +662,30 @@ void Tool::setProbeSectorConfigurationString(QString configString)
     return;
   double depthStart = config.mOffset;
   double depthEnd = config.mDepth + depthStart;
+
+  ssc::ProbeImageData imageData;
+  imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
+  imageData.mSize = QSize(config.mColumns, config.mRows);
+  // find the origin in a mm-based, lower-left-corner coord space:
+  ssc::Vector3D c(config.mOriginRow, config.mRows - config.mOriginCol - 1, 0);
+  c = multiply_elems(c, imageData.mSpacing);
+  imageData.mOrigin_u = c;
+
+  ssc::ProbeSector probeSector;
   if (config.mWidthDeg > 0.1) // Sector probe
   {
     double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
-    this->setUSProbeSector(probeSector);
+    probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
   }
   else //Linear probe
   {
     int widtInPixels = config.mRightEdge - config.mLeftEdge;
     double width = config.mPixelWidth * widtInPixels; //width in mm
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
-    this->setUSProbeSector(probeSector);
+    probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
   }
+
+  probeSector.mImage = imageData;
+  this->setUSProbeSector(probeSector);
 
   mProbeSectorConfiguration = configString;
 }

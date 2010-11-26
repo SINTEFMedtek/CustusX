@@ -100,7 +100,6 @@ public:
   virtual QString getName() const;
   virtual int getIndex() const{return 0;};
   virtual ssc::ProbeSector getProbeSector() const;
-  void setUSProbeSector(ssc::ProbeSector probeSector);
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
@@ -131,6 +130,7 @@ signals:
   void attachedToTracker(bool);
 
 protected:
+  void setUSProbeSector(ssc::ProbeSector probeSector);
   void writeCalibrationToFile();
 
   typedef itk::ReceptorMemberCommand<Tool> ObserverType;

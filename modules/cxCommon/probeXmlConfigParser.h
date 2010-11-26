@@ -38,6 +38,8 @@ public:
     double                  mPixelHeight;///<  Pixel height
     int                     mHorizontalOffset; ///< parameter for the grabber
     QString                 mNotes; ///< useful information
+    int                     mColumns; ///< X dim
+    int                     mRows;    ///< Y dim
     
     bool mEmpty;
     
