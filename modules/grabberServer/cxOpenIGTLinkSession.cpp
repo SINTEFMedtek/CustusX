@@ -28,7 +28,7 @@ void OpenIGTLinkSession::run()
   ssc::messageManager()->sendInfo("Connected to "+qstring_cast(clientName)+". Session started.");
 
   OpenIGTLinkSender* sender = new OpenIGTLinkSender(mSocket);
-  connect(this, SIGNAL(frame()), sender, SLOT(receiveFrameSlot()), Qt::DirectConnection);
+  connect(this, SIGNAL(frame(Frame)), sender, SLOT(receiveFrameSlot(Frame)), Qt::DirectConnection);
 
   this->exec();
 
@@ -43,22 +43,28 @@ OpenIGTLinkSender::OpenIGTLinkSender(QTcpSocket* socket, QObject* parent) :
     QObject(parent),
     mSocket(socket)
 {
-  //connect(this, SIGNAL(newFrame()), this, SLOT(sendOpenIGTLinkImage()), Qt::DirectConnection);
+  //connect(this, SIGNAL(frameUpdated()), this, SLOT(sendOpenIGTLinkImage()), Qt::DirectConnection);
 }
 
 OpenIGTLinkSender::~OpenIGTLinkSender()
 {}
 
-void OpenIGTLinkSender::receiveFrameSlot(/*Frame*/)
+void OpenIGTLinkSender::receiveFrameSlot(Frame frame)
 {
+  //I now receive frames
+  //ssc::messageManager()->sendInfo("Received frame: timestamp:"+qstring_cast(frame.mTimestamp));
+
   //TODO
-  mGrabber;//->getFrame();
+  //convert
+  //put on queue
+  //emit signal
 
   //mMessage = this->convertFrame(Frame);
-  //emit newFrame();
+  //Queue->push_back()
+  //emit frame(Frame);
 }
 
-igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(/*something*/)
+igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame frame)
 {
   //TODO
 }

@@ -28,7 +28,7 @@ public:
   virtual ~OpenIGTLinkSession();
 
 signals:
-  void frame();
+  void frame(Frame frame);
 
 protected:
   virtual void run();
@@ -59,14 +59,16 @@ public:
   virtual ~OpenIGTLinkSender();
 
 public slots:
-  void receiveFrameSlot();
+  void receiveFrameSlot(Frame frame);
+
+signals:
+  void frameUpdated(); //means that a new igtl::ImageMessage is in the message queue
 
 private:
-  igtl::ImageMessage::Pointer convertFrame(/*something*/);
+  igtl::ImageMessage::Pointer convertFrame(Frame frame);
   void sendOpenIGTLinkImage(igtl::ImageMessage::Pointer message);
 
   QTcpSocket* mSocket;
-  GrabberPtr  mGrabber;
 
   //QMutex mImageMutex;
   //std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
