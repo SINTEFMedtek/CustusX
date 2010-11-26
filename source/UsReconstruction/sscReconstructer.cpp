@@ -22,6 +22,10 @@
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
 #include "sscUtilHelpers.h"
+#include "cxCreateProbeDataFromConfiguration.h"
+
+#include "cxToolManager.h"
+#include "sscManualTool.h"
 
 //Windows fix
 #ifndef M_PI
@@ -244,10 +248,15 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
     ssc::messageManager()->sendInfo("Use mCalFilesPath: " + mCalFilesPath);
     QString xmlPath = mCalFilesPath+"ProbeCalibConfigs.xml";
     ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
-    mConfiguration = xmlConfigParser->getConfiguration(configList[0], 
+
+    ProbeXmlConfigParser::Configuration configuration;
+    configuration = xmlConfigParser->getConfiguration(configList[0],
                                                        configList[1], 
                                                        configList[2], 
                                                        configList[3]);
+    //TODO insert line:
+    mProbeData.setSector(createProbeDataFromConfiguration(configuration));
+    cx::ToolManager::getInstance()->getManualTool()->setProbeSector(createProbeDataFromConfiguration(configuration));
   }
   
   if(!foundCalFile)
@@ -373,21 +382,44 @@ void Reconstructer::readPositionFile(QString posFile, bool alsoReadTimestamps)
   
 ImagePtr Reconstructer::createMaskFromConfigParams()
 {
-  //TODO: Use corners instead of edges to allow for CLA and phased probes
-  ssc::ImagePtr retval = this->generateMask();
-  vtkImageDataPtr data = retval->getBaseVtkImageData();
-  int* dim(mUsRaw->getDimensions());
-  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
-  for(int x = 0; x < dim[0]; x++)
-    for(int y = 0; y < dim[1]; y++)
-    {
-      if(   (x < mConfiguration.mLeftEdge)
-         || (x > mConfiguration.mRightEdge)
-         || (y < mConfiguration.mTopEdge)
-         || (y > mConfiguration.mBottomEdge) )
-        dataPtr[x + y*dim[0]] = 0;
-    }
-  return retval;
+//  ssc::ImagePtr retval = this->generateMask();
+//  return retval;
+
+  vtkImageDataPtr mask = mProbeData.getMask();
+  ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
+
+  ssc::Vector3D usDim(mUsRaw->getDimensions());
+  usDim[2] = 1;
+  ssc::Vector3D usSpacing(mUsRaw->getSpacing());
+
+  // checking
+  bool spacingOK = similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
+  bool dimOK = similar(usDim, ssc::Vector3D(mask->GetDimensions()));
+  if (!dimOK || !spacingOK)
+  {
+    ssc::messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
+    if (!dimOK)
+      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetDimensions())));
+    if (!spacingOK)
+      ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
+  }
+//
+//  //TODO: Use corners instead of edges to allow for CLA and phased probes
+//  ssc::ImagePtr retval = this->generateMask();
+//  vtkImageDataPtr data = retval->getBaseVtkImageData();
+//  int* dim(mUsRaw->getDimensions());
+//  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
+//  for(int x = 0; x < dim[0]; x++)
+//    for(int y = 0; y < dim[1]; y++)
+//    {
+//      if(   (x < mConfiguration.mLeftEdge)
+//         || (x > mConfiguration.mRightEdge)
+//         || (y < mConfiguration.mTopEdge)
+//         || (y > mConfiguration.mBottomEdge) )
+//        dataPtr[x + y*dim[0]] = 0;
+//    }
+//  return retval;
+  return image;
 }
   
 ImagePtr Reconstructer::generateMask()
@@ -620,87 +652,115 @@ Transform3D Reconstructer::readTransformFromFile(QString fileName)
   return retval;
 }
 
-  
 /**
  * Pre:  mPos is sMpr
  * Post: mPos is uMpr
  */
 void Reconstructer::calibrate(QString calFilesPath)
 {
+  // mProbeData exists
+//  ssc::ProbeData mProbeData;
+
   // Calibration from tool space to localizer = sMt
   Transform3D sMt = this->readTransformFromFile(calFilesPath+mCalFileName);
-      
-  //testcode: Transform from image coordinate syst with origin in lower left corner
-  //Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
-  //Transform3D Rz = ssc::createTransformRotateZ(-M_PI/2.0);
-  //ssc::Transform3D R = (Rz*Rx);
-  
   
   // Transform from image coordinate syst with origin in upper left corner
-  // to t (tool) space
-  Transform3D Rx = ssc::createTransformRotateX(M_PI/2.0);
-  Transform3D Ry = ssc::createTransformRotateY(-M_PI/2.0);
-  // Calibration from frame space u to tool space t
-  ssc::Transform3D R = (Rx*Ry);
-  
-  int x_u = mConfiguration.mOriginCol * mConfiguration.mPixelWidth;
-  // Is offset in mm, while col and row is in pixels?
-  int y_u = (mConfiguration.mOriginRow * mConfiguration.mPixelHeight);// - mConfiguration.mOffset; //Why minus and not plus?
-  ssc::Vector3D origin_u(x_u, y_u, 0);
-  ssc::Vector3D origin_rotated = R.coord(origin_u);
-  
-  ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
-  
-  ssc::Transform3D tMu = T*R;
+  // to t (tool) space. TODO check is u is ul corner or ll corner.
+  ssc::Transform3D tMu = mProbeData.get_tMu() * mProbeData.get_uMv();
   
   ssc::Transform3D sMu = sMt*tMu;
   
-  ssc::Vector3D ex_u(1,0,0);
-  ssc::Vector3D ey_u(0,1,0);
-  ssc::Vector3D ex_t = tMu.vector(ex_u);
-  ssc::Vector3D ey_t = tMu.vector(ey_u);
-  ssc::Vector3D origin_t = tMu.coord(origin_u);
-  
-  if (!similar(ex_t, ssc::Vector3D(0,-1,0)))
-  {
-    ssc::messageManager()->sendWarning("error ex_t: " + qstring_cast(ex_t));
-  }
-  if (!similar(ey_t, ssc::Vector3D(0,0,1)))
-  {
-    ssc::messageManager()->sendWarning("error ey_t: " + qstring_cast(ey_t));
-  }
-  if (!similar(origin_t, ssc::Vector3D(0,0,0)))
-  {
-    ssc::messageManager()->sendWarning("error origin_t: " 
-                                       + qstring_cast(origin_t));
-  }
-  
   //mPos is prMs
-  for (unsigned int i = 0; i < mPositions.size(); i++)
+  for (unsigned i = 0; i < mPositions.size(); i++)
   {
     ssc::Transform3D prMs = mPositions[i].mPos;
-    //Calibration * Input position
-    //ssc::Transform3D tMpr = tMs * sMpr;
-    //ssc::Transform3D tMpr = tMs * prMs.inv();
-    //ssc::Transform3D tMpr = sMt.inv() * sMpr;
-    
-    //ssc::Transform3D prMt = prMs * tMs.inv();
-    //ssc::Transform3D prMt = prMs * sMt; 
-    
-    //std::cout << prMt.vector(ssc::Vector3D(0,1,0));
-    //std::cout << prMt.coord(ssc::Vector3D(0,0,0));
-    //std::cout << std::endl;
-    
     mPositions[i].mPos = prMs * sMu;
-        
     ssc::Transform3D prMu = prMs * sMu;
-    //std::cout << prMu.vector(ssc::Vector3D(1,0,0));
-    //std::cout << prMu.coord(ssc::Vector3D(0,0,0));
-    //std::cout << std::endl;
   }
   //mPos is prMu
-  
 }
+
+  
+///**
+// * Pre:  mPos is sMpr
+// * Post: mPos is uMpr
+// */
+//void Reconstructer::calibrate(QString calFilesPath)
+//{
+//  // Calibration from tool space to localizer = sMt
+//  Transform3D sMt = this->readTransformFromFile(calFilesPath+mCalFileName);
+//
+//  //testcode: Transform from image coordinate syst with origin in lower left corner
+//  //Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
+//  //Transform3D Rz = ssc::createTransformRotateZ(-M_PI/2.0);
+//  //ssc::Transform3D R = (Rz*Rx);
+//
+//
+//  // Transform from image coordinate syst with origin in upper left corner
+//  // to t (tool) space
+//  Transform3D Rx = ssc::createTransformRotateX(M_PI/2.0);
+//  Transform3D Ry = ssc::createTransformRotateY(-M_PI/2.0);
+//  // Calibration from frame space u to tool space t
+//  ssc::Transform3D R = (Rx*Ry);
+//
+//  int x_u = mConfiguration.mOriginCol * mConfiguration.mPixelWidth;
+//  // Is offset in mm, while col and row is in pixels?
+//  int y_u = (mConfiguration.mOriginRow * mConfiguration.mPixelHeight);// - mConfiguration.mOffset; //Why minus and not plus?
+//  ssc::Vector3D origin_u(x_u, y_u, 0);
+//  ssc::Vector3D origin_rotated = R.coord(origin_u);
+//
+//  ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
+//
+//  ssc::Transform3D tMu = T*R;
+//
+//  ssc::Transform3D sMu = sMt*tMu;
+//
+//  ssc::Vector3D ex_u(1,0,0);
+//  ssc::Vector3D ey_u(0,1,0);
+//  ssc::Vector3D ex_t = tMu.vector(ex_u);
+//  ssc::Vector3D ey_t = tMu.vector(ey_u);
+//  ssc::Vector3D origin_t = tMu.coord(origin_u);
+//
+//  if (!similar(ex_t, ssc::Vector3D(0,-1,0)))
+//  {
+//    ssc::messageManager()->sendWarning("error ex_t: " + qstring_cast(ex_t));
+//  }
+//  if (!similar(ey_t, ssc::Vector3D(0,0,1)))
+//  {
+//    ssc::messageManager()->sendWarning("error ey_t: " + qstring_cast(ey_t));
+//  }
+//  if (!similar(origin_t, ssc::Vector3D(0,0,0)))
+//  {
+//    ssc::messageManager()->sendWarning("error origin_t: "
+//                                       + qstring_cast(origin_t));
+//  }
+//
+//  //mPos is prMs
+//  for (unsigned int i = 0; i < mPositions.size(); i++)
+//  {
+//    ssc::Transform3D prMs = mPositions[i].mPos;
+//    //Calibration * Input position
+//    //ssc::Transform3D tMpr = tMs * sMpr;
+//    //ssc::Transform3D tMpr = tMs * prMs.inv();
+//    //ssc::Transform3D tMpr = sMt.inv() * sMpr;
+//
+//    //ssc::Transform3D prMt = prMs * tMs.inv();
+//    //ssc::Transform3D prMt = prMs * sMt;
+//
+//    //std::cout << prMt.vector(ssc::Vector3D(0,1,0));
+//    //std::cout << prMt.coord(ssc::Vector3D(0,0,0));
+//    //std::cout << std::endl;
+//
+//    mPositions[i].mPos = prMs * sMu;
+//
+//    ssc::Transform3D prMu = prMs * sMu;
+//    //std::cout << prMu.vector(ssc::Vector3D(1,0,0));
+//    //std::cout << prMu.coord(ssc::Vector3D(0,0,0));
+//    //std::cout << std::endl;
+//  }
+//  //mPos is prMu
+//
+//}
   
 /**
  * Generate a rectangle (2D) defining ROI in input image space

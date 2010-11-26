@@ -109,5 +109,4 @@ public:
   ProbeXmlConfigParser::ColRowPair mCenter;
 };
 
-
 #endif /* PROBEXMLCONFIGPARSER_H_ */

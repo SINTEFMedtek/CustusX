@@ -33,6 +33,9 @@ private slots:
   void serverStatusChangedSlot();
 
 private:
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
+
   QLineEdit* mAddressEdit;
   QLineEdit* mPortEdit;
   QPushButton* mConnectButton;
