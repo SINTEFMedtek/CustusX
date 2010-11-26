@@ -44,10 +44,12 @@ public:
 	// extensions:
 	void setVisible(bool vis);
 	void setType(const Type& type);
+  void setProbeSector(ssc::ProbeSector sector); // for testing
 
 private:
 	void read3DCrossHair();
 	// constant data
+	ssc::ProbeSector mSector;
 	//const QString mUid; //see sscTool
 	//const QString mName; //see sscTool
 	vtkPolyDataPtr mPolyData;

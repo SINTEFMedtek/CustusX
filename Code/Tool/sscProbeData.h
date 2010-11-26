@@ -23,7 +23,7 @@ class ProbeData
 public: 
 public:
 	ProbeData();
-	ProbeData(ProbeSector data);
+	//ProbeData(ProbeSector data);
   void setSector(ProbeSector data);
 	
   vtkImageDataPtr getMask();
