@@ -51,7 +51,7 @@ struct Frame
  * Supported grabbers are:
  * -new VGA grabber (Epiphan)
  * -old VGA grabber (Epiphan)
- * -S-VHS grabber
+ * -S-VIDEO grabber
  * -buildt in apple i-sight camera
  *
  * \date 16. nov. 2010
@@ -67,6 +67,7 @@ public:
   
   virtual void start();
   virtual void stop();
+
   QMacCocoaViewContainer* getPreviewWidget(QWidget* parent);
   
 private:
