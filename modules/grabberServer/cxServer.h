@@ -2,6 +2,7 @@
 #define CXSERVER_H_
 
 #include <QTcpServer>
+//#include "igtlImageMessage.h"
 #include "cxGrabber.h"
 
 namespace cx
@@ -29,7 +30,7 @@ public:
   int getPort();
 
 signals:
-  void frame();
+  void frame(Frame frame);
 
 protected:
   virtual void incomingConnection(int socketDescriptor) = 0;
@@ -37,7 +38,6 @@ protected:
 private:
   int     mPort;
 };
-
 
 /**
  * \class OpenIGTLinkServer
