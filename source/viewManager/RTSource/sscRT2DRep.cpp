@@ -284,8 +284,9 @@ void RealTimeStreamGraphics::initializeSize(int imageWidth, int imageHeight)
 
   // apply a lut only if the input data is monochrome
   int numComp = mData->getVtkImageData()->GetNumberOfScalarComponents();
+  bool is8bit = mData->getVtkImageData()->GetScalarType()==VTK_UNSIGNED_CHAR;
 //  std::cout << "numComp " << numComp << std::endl;
-  if (numComp==1)
+  if (numComp==1 && !is8bit)
     mTexture->MapColorScalarsThroughLookupTableOn();
   else
     mTexture->MapColorScalarsThroughLookupTableOff();
@@ -421,7 +422,22 @@ void RealTimeStreamFixedPlaneRep::setCamera()
   if (ssc::similar(bounds.range()[0], 0.0) || ssc::similar(bounds.range()[1], 0.0))
     return;
 
-  camera->SetParallelScale(bounds.range()[1]/2*1.1); // exactly fill the viewport height
+//  std::cout << "-------------" << std::endl;
+
+  double* vpRange = mRenderer->GetAspect();
+
+  double vw = vpRange[0];
+  double vh = vpRange[1];
+
+  double w = bounds.range()[0];
+  double h = bounds.range()[1];
+
+  double scale = 1;
+  double w_vp = vh * (w/h); // width of image in viewport space
+  if (w_vp > vw) // if image too wide: reduce scale
+    scale = w_vp/vw;
+
+  camera->SetParallelScale(h/2*scale*1.01); // exactly fill the viewport height
 }
 
 

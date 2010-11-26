@@ -177,5 +177,6 @@ protected:
   QString mProbeSectorConfiguration; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
+
 } //namespace cx
 #endif /* CXTOOL_H_ */

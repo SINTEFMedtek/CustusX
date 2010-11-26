@@ -12,6 +12,8 @@
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
+#include "sscProbeSector.h"
+#include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
 {
@@ -660,33 +662,9 @@ void Tool::setProbeSectorConfigurationString(QString configString)
       qstring_cast(this->getInstrumentId()), rtSourceList.at(0), configString);
   if(config.isEmpty())
     return;
-  double depthStart = config.mOffset;
-  double depthEnd = config.mDepth + depthStart;
 
-  ssc::ProbeImageData imageData;
-  imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
-  imageData.mSize = QSize(config.mColumns, config.mRows);
-  // find the origin in a mm-based, lower-left-corner coord space:
-  ssc::Vector3D c(config.mOriginRow, config.mRows - config.mOriginCol - 1, 0);
-  c = multiply_elems(c, imageData.mSpacing);
-  imageData.mOrigin_u = c;
-
-  ssc::ProbeSector probeSector;
-  if (config.mWidthDeg > 0.1) // Sector probe
-  {
-    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
-  }
-  else //Linear probe
-  {
-    int widtInPixels = config.mRightEdge - config.mLeftEdge;
-    double width = config.mPixelWidth * widtInPixels; //width in mm
-    probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
-  }
-
-  probeSector.mImage = imageData;
+  ssc::ProbeSector probeSector = createProbeDataFromConfiguration(config);
   this->setUSProbeSector(probeSector);
-
   mProbeSectorConfiguration = configString;
 }
 
@@ -760,5 +738,6 @@ void Tool::writeCalibrationToFile()
 
   ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
 }
+
 
 }//namespace cx

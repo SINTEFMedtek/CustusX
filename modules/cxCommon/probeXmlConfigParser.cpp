@@ -419,3 +419,6 @@ QList<QDomNode> ProbeXmlConfigParser::nodeListToListOfNodes(QDomNodeList list)
     }
     return retval;
 }
+
+
+
