@@ -61,12 +61,11 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   toptopLayout->addWidget(mView);
   mRenderTimer = new QTimer(this);
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
-  mRenderTimer->start(50);
+  mRenderTimer->setInterval(50);
 
   ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(mRTSource);
-//  rtRep->setLockCameraToStream(true);
-  rtRep->setTool(ssc::toolManager()->getDominantTool());
+//  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(rtRep);
 
   mRenderLabel = new QLabel("-");
@@ -79,8 +78,21 @@ IGTLinkWidget::~IGTLinkWidget()
 {
 }
 
+void IGTLinkWidget::showEvent(QShowEvent* event)
+{
+  mRenderTimer->start();
+}
+
+void IGTLinkWidget::hideEvent(QHideEvent* event)
+{
+  mRenderTimer->stop();
+}
+
 void IGTLinkWidget::renderSlot()
 {
+  if (this->visibleRegion().isEmpty()) // needed to avoid drawing errors: checking visible is not enough
+    return;
+
   mRenderTimerW.beginRender();
 
   if (mView->isVisible())
