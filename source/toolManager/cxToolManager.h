@@ -73,7 +73,7 @@ public:
   virtual void removeLandmarks();
 
   void runDummyTool(ssc::DummyToolPtr tool);
-  void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
+//  void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
 
   TrackerPtr getTracker();
 
