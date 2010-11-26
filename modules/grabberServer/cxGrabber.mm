@@ -91,11 +91,11 @@
     //std::cout << "Starting to save frames, mFirstTimeTag is now set to: " << mFirstTimeTag << std::endl;
   }
   
-   NSLog(@"PixelFormatType : %d",CVPixelBufferGetPixelFormatType(videoFrame));
-   NSLog(@"Pixelbuffer width : %d",CVPixelBufferGetWidth(videoFrame));
-   NSLog(@"Pixelbuffer height : %d",CVPixelBufferGetHeight(videoFrame));
-   NSLog(@"Pixelbuffer bytes per row : %d",CVPixelBufferGetBytesPerRow(videoFrame));
-   NSLog(@"Pixelbuffer data size : %d",CVPixelBufferGetDataSize(videoFrame));
+//   NSLog(@"PixelFormatType : %d",CVPixelBufferGetPixelFormatType(videoFrame));
+//   NSLog(@"Pixelbuffer width : %d",CVPixelBufferGetWidth(videoFrame));
+//   NSLog(@"Pixelbuffer height : %d",CVPixelBufferGetHeight(videoFrame));
+//   NSLog(@"Pixelbuffer bytes per row : %d",CVPixelBufferGetBytesPerRow(videoFrame));
+//   NSLog(@"Pixelbuffer data size : %d",CVPixelBufferGetDataSize(videoFrame));
 }
 @end
 
@@ -142,12 +142,12 @@ void MacGrabber::start()
   if(this->findConnectedDevice())
   {
     if(!this->openDevice())
-      std::cout << "Could not open the selected device. Aborting." << std::endl;
+      ssc::messageManager()->sendError("Could not open the selected device. Aborting.");
     else
       this->startSession();
   } else
   {
-    std::cout << "Could not find a connected device. Aborting." << std::endl;
+    ssc::messageManager()->sendError("Could not find a connected device. Aborting.");
   }
 }
 

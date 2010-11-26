@@ -68,6 +68,9 @@ private:
   QTcpSocket* mSocket;
   GrabberPtr  mGrabber;
 
+  //QMutex mImageMutex;
+  //std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
+
 };
 
 }//namespace cx

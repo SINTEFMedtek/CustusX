@@ -27,7 +27,7 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
 
   connect(mStartButton, SIGNAL(clicked()), this, SLOT(startServerSlot()));
   
-  connect(mGrabber.get(), SIGNAL(frame()), mServer, SIGNAL(frame()), Qt::DirectConnection);
+  connect(mGrabber.get(), SIGNAL(frame(Frame)), mServer, SIGNAL(frame()), Qt::DirectConnection);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   QGridLayout* gridLayout = new QGridLayout();
