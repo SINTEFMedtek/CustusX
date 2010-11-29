@@ -47,19 +47,19 @@ namespace
 ProbeData::ProbeData()// : mType(ProbeSector::tNONE)
 {
 
-  // testdata:
-  mData.mType = ProbeSector::tSECTOR;
-  mData.mDepthStart = 0;
-//  mDepthEnd = 350;
-  mData.mDepthEnd = 300;
-  mData.mWidth = M_PI/4;
-  mData.mImage.mSpacing = Vector3D(0.928,0.928,1);
-//  mSpacing = Vector3D(1,1,1); // using this spacing gives correct image - investigate!
-  mData.mImage.mSpacing = Vector3D(0.5,0.5,0);
-  mData.mImage.mSize = QSize(512,512);
-
-  //mOrigin_u = multiply_elems(Vector3D(mSize.width()/2, mSize.height()*0.75, 0), mSpacing);
-  mData.mImage.mOrigin_u = multiply_elems(Vector3D(mData.mImage.mSize.width()/2, mData.mImage.mSize.height()*1.0, 0), mData.mImage.mSpacing);
+//  // testdata:
+//  mData.mType = ProbeSector::tSECTOR;
+//  mData.mDepthStart = 0;
+////  mDepthEnd = 350;
+//  mData.mDepthEnd = 300;
+//  mData.mWidth = M_PI/4;
+//  mData.mImage.mSpacing = Vector3D(0.928,0.928,1);
+////  mSpacing = Vector3D(1,1,1); // using this spacing gives correct image - investigate!
+//  mData.mImage.mSpacing = Vector3D(0.5,0.5,0);
+//  mData.mImage.mSize = QSize(512,512);
+//
+//  //mOrigin_u = multiply_elems(Vector3D(mSize.width()/2, mSize.height()*0.75, 0), mSpacing);
+//  mData.mImage.mOrigin_u = multiply_elems(Vector3D(mData.mImage.mSize.width()/2, mData.mImage.mSize.height()*1.0, 0), mData.mImage.mSpacing);
 
   //mCachedCenter_v = this->get_uMv().inv().coord(mOrigin_u) - mDepthStart * Vector3D(0,1,0);
   mPolyData = vtkPolyDataPtr::New();
@@ -163,7 +163,7 @@ Transform3D ProbeData::get_tMu() const
 Transform3D ProbeData::get_uMv() const
 {
   double H = mData.mImage.mSize.height() * mData.mImage.mSpacing[1];
-  return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0,-(H-1),0));
+  return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0,-(H-1),0)); // use H-1 because we use the pixel centers, thus distance top-bottom is one less
 }
 
 vtkPolyDataPtr ProbeData::getSector()
