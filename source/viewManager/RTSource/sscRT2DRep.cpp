@@ -181,6 +181,7 @@ void RealTimeStreamGraphics::setLookupTable()
   lut->SetSaturationRange (0, 0);
   lut->SetHueRange (0, 0);
   lut->SetValueRange (0, 1);
+  lut->SetAlpha(0.5);
   lut->Build();
   if (mUseMask)
   {
@@ -318,7 +319,7 @@ void RealTimeStreamGraphics::initializeSize(int imageWidth, int imageHeight)
 RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name)
 {
-    mRTGraphics.reset(new RealTimeStreamGraphics());
+    mRTGraphics.reset(new RealTimeStreamGraphics(true));
 }
 
 RealTimeStream2DRep::~RealTimeStream2DRep()
