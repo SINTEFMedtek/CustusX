@@ -8,6 +8,10 @@ SET( CX_QT_MOC_HEADER_FILES
 SET ( ${LIB}_repManager
     cxLandmarkRep.h
     cxLandmarkRep.cpp
+    cxImageLandmarkRep.h
+    cxImageLandmarkRep.cpp
+    cxPatientLandmarkRep.h
+    cxPatientLandmarkRep.cpp
     cxRepManager.h
     cxRepManager.cpp
 )

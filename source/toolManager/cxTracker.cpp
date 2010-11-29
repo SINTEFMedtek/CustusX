@@ -4,6 +4,8 @@
 #include "cxTool.h"
 #include "sscTypeConversions.h"
 
+#include <time.h>
+
 
 namespace cx
 {
@@ -22,6 +24,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber4 );
   #else
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
+
   #endif //_WINDOWS
 
   mCommunication->SetParity( igstk::SerialCommunication::NoParity );
@@ -30,8 +33,9 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mCommunication->SetStopBits( igstk::SerialCommunication::StopBits1 );
   mCommunication->SetHardwareHandshake(igstk::SerialCommunication::HandshakeOff);
 
-  //mCommunication->SetCaptureFileName( "RecordedStreamByCustusX3.txt" );
-  //mCommunication->SetCapture( true );
+  QString comLogging = mInternalStructure.mLoggingFolderName + "RecordedStreamByCustusX3.txt";
+  mCommunication->SetCaptureFileName(cstring_cast(comLogging));
+  mCommunication->SetCapture( true );
 
   switch (mInternalStructure.mType)
   {
@@ -85,7 +89,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mTrackerObserver->SetCallbackFunction(this, &Tracker::trackerTransformCallback);
   mTracker->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   mCommunication->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
-  //this->addLogging();
+  this->addLogging();
 }
 
 Tracker::~Tracker()
@@ -134,7 +138,10 @@ void Tracker::attachTools(ToolMapPtr tools)
     {
       if(tool->getTrackerType() != mInternalStructure.mType)
         ssc::messageManager()->sendWarning("Tracker is attaching a tool that is not of the correct type. Trackers type: "+qstring_cast(mInternalStructure.mType)+", tools tracker type: "+qstring_cast(tool->getTrackerType()));
+
       tool->getPointer()->RequestAttachToTracker(mTracker);
+      //std::cout << "Attaching tool " << tool->getUid() << "to tracker "<< mTracker->GetNameOfClass() << std::endl;
+
       if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
         mTracker->RequestSetReferenceTool(tool->getPointer());
     }

@@ -118,6 +118,7 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
+  // << "Inside configure" << std::endl;
   if(mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
   {
     ssc::messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
@@ -137,15 +138,15 @@ void ToolManager::configure()
     connect(mTracker.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
   }
   mConfiguredTools = toolConfigurationParser.getConfiguredTools();
+  //std::cout << "Found " << mConfiguredTools->size() << " configured tools." << std::endl;
 
   ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->begin();
   while(it != mConfiguredTools->end())
   {
+    //std::cout << "Tool: " << it->first << std::endl;
     connect(((*it).second).get(), SIGNAL(attachedToTracker(bool)), this, SLOT(toolInitialized(bool)));
     it++;
   }
-
-  std::cout << "TEST" << std::endl;
 
   this->configureReferences();
 
@@ -165,7 +166,9 @@ void ToolManager::initialize()
     ssc::messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
+  #ifndef _WINDOWS
   this->createSymlink();
+  #endif
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
@@ -181,6 +184,7 @@ void ToolManager::uninitialize()
   mTracker->close();
 }
 
+#ifndef _WINDOWS
 /** Assume that IGSTK requires the file /Library/CustusX/igstk.links/cu.CustusX.dev0
  *  as a rep for the HW connection. Also assume that directory is created with full
  *  read/write access (by installer or similar).
@@ -201,7 +205,9 @@ void ToolManager::createSymlink()
   QDir devDir("/dev/");
 
   QStringList filters;
-  filters << "cu.usbserial*" << "cu.KeySerial*"; //NOTE: only works with current hardware using aurora or polaris.
+  // cu* applies to Mac, ttyUSB applies to Linux
+  filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "ttyUSB*" ; //NOTE: only works with current hardware using aurora or polaris.
+  //filters << "cu.usbserial*" << "cu.USA19H*"; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
 
   if (files.empty())
@@ -237,7 +243,10 @@ void ToolManager::createSymlink()
 
 QFileInfo ToolManager::getSymlink() const
 {
-  QDir linkDir("/Library/CustusX/igstk.links");
+  QString name("/Library/CustusX/igstk.links");
+//  QDir linkDir("/Library/CustusX/igstk.links");
+  QDir linkDir(name);
+  QDir::root().mkdir(name); // only works if run with sudo
   QString linkFile = linkDir.path() + "/cu.CustusX.dev0";
   return QFileInfo(linkDir, linkFile);
 }
@@ -249,6 +258,7 @@ void ToolManager::cleanupSymlink()
   ssc::messageManager()->sendInfo("Cleaning up symlinks.");
   QFile(this->getSymlink().absoluteFilePath()).remove();
 }
+#endif //_WINDOWS
 
 void ToolManager::startTracking()
 {
@@ -285,6 +295,7 @@ ssc::LandmarkMap ToolManager::getLandmarks()
 void ToolManager::setLandmark(ssc::Landmark landmark)
 {
   mLandmarks[landmark.getUid()] = landmark;
+  ssc::messageManager()->sendDebug("Added landmark: "+landmark.getUid()+" with vector "+qstring_cast(landmark.getCoord()));
   emit landmarkAdded(landmark.getUid());
 }
 
@@ -292,6 +303,16 @@ void ToolManager::removeLandmark(QString uid)
 {
   mLandmarks.erase(uid);
   emit landmarkRemoved(uid);
+}
+
+void ToolManager::removeLandmarks()
+{
+  ssc::LandmarkMap landmarks = ssc::toolManager()->getLandmarks();
+  ssc::LandmarkMap::iterator it = landmarks.begin();
+  for(;it != landmarks.end(); ++it)
+  {
+    ssc::toolManager()->removeLandmark(it->first);
+  }
 }
 
 TrackerPtr ToolManager::getTracker()
@@ -440,8 +461,7 @@ std::vector<QString> ToolManager::getToolUids() const
 
 ssc::Transform3DPtr ToolManager::get_rMpr() const
 {
-  return ssc::Transform3DPtr(new ssc::Transform3D(
-      m_rMpr_History->getCurrentRegistration()));
+  return ssc::Transform3DPtr(new ssc::Transform3D(m_rMpr_History->getCurrentRegistration().mValue));
 }
 
 void ToolManager::set_rMpr(const ssc::Transform3DPtr& val)
@@ -549,7 +569,7 @@ void ToolManager::trackerTrackingSlot(bool value)
   }
   else
   {
-    ssc::messageManager()->sendInfo("ToolManager stopped tracking.");
+    ssc::messageManager()->sendSuccess("ToolManager stopped tracking.");
     mTimer->stop();
     emit trackingStopped();
   }
@@ -687,14 +707,14 @@ ssc::ManualToolPtr ToolManager::getManualTool()
 {
   return mManualTool;
 }
-
-void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
-{
-  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
-  if (tool)
-  {
-    tool->setUSProbeSector(probeSector);
-  }
-}
+//
+//void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
+//{
+//  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
+//  if (tool)
+//  {
+//    tool->setUSProbeSector(probeSector);
+//  }
+//}
 
 }//namespace cx

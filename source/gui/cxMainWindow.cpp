@@ -13,7 +13,6 @@
 #include "cxCustomStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
-#include "cxConsoleWidget.h"
 #include "cxManualRegistrationOffsetWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
@@ -41,9 +40,11 @@
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
 #include "cxSegmentationWidget.h"
+#include "cxPlateRegistrationWidget.h"
 #include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
+#include "cxIGTLinkWidget.h"
 
 namespace cx
 {
@@ -51,7 +52,7 @@ namespace cx
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
   mStandard3DViewActions(NULL),
-  mConsoleWidget(new ConsoleWidget(this)),
+  mConsoleWidget(new ssc::ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
@@ -87,6 +88,7 @@ MainWindow::MainWindow() :
   this->populateVisualizationMethodsWidget();
   this->populateCalibrationMethodsWidget();
 
+  this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
@@ -169,6 +171,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::initialize()
 {
+  ssc::MessageManager::getInstance();
+
   cx::DataManager::initialize();
   cx::ToolManager::initializeObject();
 }
@@ -699,17 +703,25 @@ void MainWindow::populateRegistrationMethodsWidget()
   FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
   MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
-  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed (US)"); //should be application specific
-  image2imageWidget->addTab(movingRegistrationWidget, "Moving (MR)"); //should be application specific
+  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
+  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed"); //should be application specific
   image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
 
   //manual offset
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
 
+  //plate
+  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget("PlateRegistrationWidget", "Plate", mRegsitrationMethodsWidget);
+  PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
+  PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
+  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
+  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
+
   mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
   mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
   mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
   mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
+  mRegsitrationMethodsWidget->addTab(imageAndPlateRegistrationWidget, "Plate");
 }
 
 void MainWindow::populateSegmentationMethodsWidget()

@@ -12,10 +12,12 @@
 #include <QObject>
 #include "sscData.h"
 #include "sscDefinitions.h"
+#include "sscAxesRep.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "sscAxesRep.h"
+#include "cxImageLandmarkRep.h"
+#include "cxPatientLandmarkRep.h"
 
 namespace cx
 {
@@ -69,6 +71,7 @@ private slots:
   void showManualToolSlot(bool visible);
   void resetCameraActionSlot();
   void activeImageChangedSlot();
+  void showRefToolSlot(bool checked);
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
@@ -82,15 +85,17 @@ private:
   typedef  std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
   typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
   VolumetricRepMap mVolumetricReps;
-  LandmarkRepPtr mLandmarkRep;
+  ImageLandmarkRepPtr mImageLandmarkRep;
+  PatientLandmarkRepPtr mPatientLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
   GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
-  std::map<QString, ssc::ToolRep3DPtr> mToolReps;
+//  std::map<QString, ssc::ToolRep3DPtr> mToolReps;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
+  ssc::RealTimeStream2DRepPtr mRTStreamRep;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 

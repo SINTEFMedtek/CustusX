@@ -22,6 +22,8 @@
 #include <vtkImageCast.h>
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
+#include <vtkImageResample.h>
+#include <vtkImageClip.h>
 
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
@@ -31,12 +33,16 @@
 #include "sscMesh.h"
 #include "sscMessageManager.h"
 #include "vtkForwardDeclarations.h"
+#include "sscImageTF3D.h"
+#include "sscImageLUT2D.h"
+#include "sscImageAlgorithms.h"
 
 const unsigned int Dimension = 3;
 typedef unsigned short PixelType;
 typedef itk::Image< PixelType, Dimension >  itkImageType;
 typedef itk::ImageToVTKImageFilter<itkImageType> itkToVtkFilterType;
 typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
+
 
 namespace cx
 {
@@ -156,7 +162,7 @@ ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, 
   ssc::messageManager()->sendInfo("created contour " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
-  result->setParentFrame(image->getUid());
+  result->get_rMd_History()->addParentFrame(image->getUid());
 
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveMesh(result, outputBasePath);
@@ -221,8 +227,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   ssc::messageManager()->sendInfo("created segment " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
-
-  result->setParentFrame(image->getUid());
+  result->get_rMd_History()->addParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
 
@@ -264,281 +269,56 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
   ssc::messageManager()->sendInfo("Generating centerline time: " + tempTime.toString("hh:mm:ss:zzz"));
 
-  result->setParentFrame(image->getUid());
+  result->get_rMd_History()->addParentFrame(image->getUid());
   ssc::dataManager()->loadData(result);
   ssc::dataManager()->saveImage(result, outputBasePath);
 
   return result;
 }
 
+
+
+/** Crop the image to the bounding box bb_q.
+ *  bb_q is given in the output space q, defined relative to the image space d
+ *  with qMd. If qMd is non-identity, image is resampled to space q.
+ *  outputSpacing can be used to resample the volume (after cropping).
+ */
 ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
 {
   if (!image || !reference)
     return ssc::ImagePtr();
 
   ssc::Transform3D refMi = reference->get_rMd().inv() * image->get_rMd();
+  ssc::ImagePtr oriented = resampleImage(image, refMi);
 
-  // provide a resampled volume for algorithms requiring that (such as proberep)
-  vtkMatrix4x4Ptr orientatorMatrix = vtkMatrix4x4Ptr::New();
-  vtkImageReslicePtr orientator = vtkImageReslicePtr::New();
-  orientator->SetInput(image->getBaseVtkImageData());
-  orientator->SetInterpolationModeToLinear();
-  orientator->SetOutputDimensionality(3);
-  orientator->SetResliceAxes(refMi.inv().matrix());
-  orientator->AutoCropOutputOn();
-  vtkImageDataPtr rawResult = orientator->GetOutput();
+  ssc::Transform3D orient_M_ref = oriented->get_rMd().inv() * reference->get_rMd();
+  ssc::DoubleBoundingBox3D bb_crop = transform(orient_M_ref, reference->boundingBox());
 
-  //TODO: add bounding box
-  //TODO: upsample
+  // increase bb size by margin
+  bb_crop[0] -= margin;
+  bb_crop[1] += margin;
+  bb_crop[2] -= margin;
+  bb_crop[3] += margin;
+  bb_crop[4] -= margin;
+  bb_crop[5] += margin;
 
-  rawResult->Update();
-  rawResult->Print(std::cout);
+  oriented->setCroppingBox(bb_crop);
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_or_res%1";
-  QString name = image->getName()+" _or_resampled %1";
-  ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
-  oriented->get_rMd_History()->setRegistration(reference->get_rMd());
-  oriented->setCroppingBox(reference->boundingBox());
-  oriented->mergevtkOriginIntosscTransform();
+//  ssc::dataManager()->loadData(oriented);
+//  ssc::dataManager()->saveImage(oriented, outputBasePath);
 
-  ssc::dataManager()->loadData(oriented);
-  ssc::dataManager()->saveImage(oriented, outputBasePath);
+  ssc::ImagePtr cropped = cropImage(oriented);
+//  dataManager()->loadData(cropped);
+//  dataManager()->saveImage(cropped, outputBasePath);
 
+  ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()));
+  ssc::dataManager()->loadData(resampled);
+  ssc::dataManager()->saveImage(resampled, outputBasePath);
 
-  ssc::ImagePtr cropped = oriented->CropAndClipImage(outputBasePath);
-
-  std::cout << "CROPPED" << std::endl;
-  cropped->getBaseVtkImageData()->Print(std::cout);
-
-  std::cout << "bb_image " << image->boundingBox() << std::endl; // in MR space
-
-  std::cout << "bb_reslice " << oriented->boundingBox() << std::endl; // US space
-  std::cout << "bb_ref " << reference->boundingBox() << std::endl;
-  std::cout << "cropbox_img " << oriented->getCroppingBox() << std::endl;
-  std::cout << "bb_cropped " << cropped->boundingBox() << std::endl;
-//
-//  QString uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
-//  QString name = image->getName()+" resampled %1";
-//  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult, uid, name);
-//  ssc::messageManager()->sendInfo("created resampled " + result->getName());
-//
-//  result->get_rMd_History()->setRegistration(reference->get_rMd());
-//
-//  result->setParentFrame(image->getUid());
-//  ssc::dataManager()->loadData(result);
-//  ssc::dataManager()->saveImage(result, outputBasePath);
-
-//  return result;
-  return cropped;
+  resampled->getBaseVtkImageData()->Print(std::cout);
+  return resampled;
 }
 
-
-
-/*void Segmentation::tubeContour(ssc::ImagePtr image, QString outputBasePath)
-{
-  //Don't work as vtkTubeFilter need a vtkPolyData as input
-  typedef vtkSmartPointer<class vtkTubeFilter> vtkTubeFilterPtr;
-  vtkTubeFilterPtr tube = vtkTubeFilterPtr::New();
-  tube->SetInput(image->getBaseVtkImageData());
-  tube->SetRadius(1.0);
-  tube->SetNumberOfSides(12);
-  tube->Update();
-  vtkPolyDataPtr tubePolyData = vtkPolyDataPtr::New();
-  tubePolyData = tube->GetOutput();
-
-
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_tube%1";
-  QString name = image->getName() + " tubes %1";
-  //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
-  ssc::MeshPtr result = ssc::dataManager()->createMesh(tubePolyData, uid,
-      name, "Images");
-  ssc::messageManager()->sendInfo("created tubes " + result->getName());
-
-  result->get_rMd_History()->setRegistration(image->get_rMd());
-  result->setParentFrame(image->getUid());
-
-  ssc::dataManager()->loadData(result);
-  ssc::dataManager()->saveMesh(result, outputBasePath);
-}*/
-/*{
-  //Create vtkPolyData
-  vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
-  convert->SetInput(rawResult);
-  convert->Update();
-  vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
-  cubesPolyData = convert->GetOutput();
-
-  //Show surface
-  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
-  surface->setVtkPolyData(cubesPolyData);
-}*/
-
 } // namespace cx
-
-
-//void ShiftCorrectionWidget::segmentImage(QString imageName,
-//                                         int thresholdValue,
-//                                         bool smoothing)
-//{
-//  QString filePath = mWorkingFolder+"/"+imageName;
-//
-//  //Read image file
-//  //ITK
-//  ImageReaderType::Pointer  reader  = ImageReaderType::New();
-//  reader->SetFileName(filePath.toLatin1());
-//  reader->Update();
-//
-//  ImageDirectionType direction = reader->GetOutput()->GetDirection();
-//  //std::cout << "Matrix = " << std::endl << direction << std::endl;
-//  int i,j;
-//  vtkMatrix4x4 *matrix = vtkMatrix4x4::New();
-//  for (i=0;i<3;i++)
-//  {
-//    for(j=0;j<3;j++)
-//    {
-//      matrix->SetElement(i, j, direction.GetVnlMatrix()[i][j]);
-//      //std::cout << "Matrix element = " << matrix->GetElement(i,j) << std::endl;
-//    }
-//  }
-//
-//  ImageType::Pointer data = reader->GetOutput();
-//
-//  //Smooting
-//  if(smoothing)
-//  {
-//    typedef itk::SmoothingRecursiveGaussianImageFilter<ImageType, ImageType> smoothingFilterType;
-//    smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
-//    smoohingFilter->SetSigma(0.5);
-//    smoohingFilter->SetInput(data);
-//    smoohingFilter->Update();
-//    data = smoohingFilter->GetOutput();
-//  }
-//
-//  //Thresholding
-//  typedef itk::BinaryThresholdImageFilter<ImageType, ImageType> thresholdFilterType;
-//  thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
-//  thresholdFilter->SetInput(data);
-//  thresholdFilter->SetOutsideValue(0);
-//  thresholdFilter->SetInsideValue(1);
-//  thresholdFilter->SetLowerThreshold(thresholdValue);
-//  thresholdFilter->Update();
-//  data = thresholdFilter->GetOutput();
-//
-//  //Test writer
-//  QString outName = filePath;
-//  if(outName.endsWith(".mhd"))
-//    outName.replace(QString(".mhd"), QString(""));
-//  if(outName.endsWith(".mha"))
-//    outName.replace(QString(".mha"), QString(""));
-//
-//  QString outFileName = outName+"_segm_converted.mhd";
-//  QString rawFileName = outName+"_segm_converted.raw";
-//
-//
-//  //Convert ITK to VTK
-//  itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-//  //itkToVtkFilter->SetInput(data);
-//  itkToVtkFilter->SetInput(thresholdFilter->GetOutput());
-//  itkToVtkFilter->Update();
-//
-//  //Get 3D view
-//  View3D* view = ViewManager::getInstance()->get3DView();
-//
-//  //Show converted volume = empty?
-//  /*ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image(outName.toStdString()+"_segm_volume",
-//                                                     itkToVtkFilter->GetOutput()));
-//  ssc::VolumetricRepPtr volumetricRep(ssc::VolumetricRep::New(outName.toStdString()+"_segm_volume"));
-//  volumetricRep->setImage(image);
-//
-//  //Crash???
-//  view->setRep(volumetricRep);*/
-//
-//
-//  //test Save vtk object
-//  /*typedef vtkSmartPointer<vtkMetaImageWriter> vtkMetaImageWriterPtr;
-//  vtkMetaImageWriterPtr vtkWriter = vtkMetaImageWriterPtr::New();
-//  vtkWriter->SetInput(itkToVtkFilter->GetOutput());
-//  vtkWriter->SetFileName( outFileName.toLatin1() );
-//  vtkWriter->SetRAWFileName( rawFileName.toLatin1() );
-//  vtkWriter->SetCompression(false);
-//  vtkWriter->Update();
-//  vtkWriter->Write();*/
-//
-//
-//  outFileName = outName+"_segm.mhd";
-//
-//  //Create vtkPolyData
-//  /*vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
-//  convert->SetInput(itkToVtkFilter->GetOutput());
-//  convert->SetColorModeToLinear256();
-//  convert->Update();*/
-//
-//  vtkMarchingCubesPtr convert = vtkMarchingCubesPtr::New();
-//  convert->SetInput(itkToVtkFilter->GetOutput());
-//  //convert->SetValue(0, 150);
-//  convert->Update();
-//  //messageManager()->sendInfo("Number of contours: "+QString::number(convert->GetNumberOfContours()).toStdString());
-//
-//  vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
-//  cubesPolyData = convert->GetOutput();
-//
-//  //print
-//  //itkToVtkFilter->GetOutput()->Print(std::cout);
-//  cubesPolyData->Print(std::cout);
-//  //vtkPolyData* cubesPolyData = convert->GetOutput();
-//
-//  ssc::MeshPtr surface = ssc::MeshPtr(new ssc::Mesh(outName.toStdString()+"_segm"));
-//  surface->setVtkPolyData(cubesPolyData);
-//  ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName.toStdString()+"_segm"));
-//  surfaceRep->setMesh(surface);
-//
-//  view->addRep(surfaceRep);
-//
-//  //Cone test
-//  typedef vtkSmartPointer<vtkConeSource> vtkConeSourcePtr;
-//  vtkConeSourcePtr coneSource = vtkConeSource::New();
-//  coneSource->SetResolution(25);
-//  coneSource->SetRadius(10);
-//  coneSource->SetHeight(100);
-//
-//  coneSource->SetDirection(0,0,1);
-//  double newCenter[3];
-//  coneSource->GetCenter(newCenter);
-//  newCenter[2] = newCenter[2] - coneSource->GetHeight()/2;
-//  coneSource->SetCenter(newCenter);
-//
-//  //Cone rep visialization
-//  ssc::MeshPtr coneSurface = ssc::MeshPtr(new ssc::Mesh("cone"));
-//  coneSurface->setVtkPolyData(coneSource->GetOutput());
-//  ssc::GeometricRepPtr coneSurfaceRep(ssc::GeometricRep::New("cone"));
-//  coneSurfaceRep->setMesh(coneSurface);
-//  view->addRep(coneSurfaceRep);
-//
-//  //print
-//  coneSource->Update();
-//  coneSource->GetOutput()->Print(std::cout);
-//  //vtkPolyData* conePolyData = coneSource->GetOutput();
-//
-//  //vtkPolyData* surface = convert->GetOutput();
-//
-//  //test: Show surface
-//  /*vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
-//  mapper->SetInput(surface);
-//  mapper->Update();
-//  vtkActor* actor = vtkActor::New();
-//  actor->SetMapper(mapper);
-//  actor->GetProperty()->SetColor(1.0, 0.0, 0.0);
-//  actor->SetVisibility(true);
-//  actor->SetUserMatrix(matrix);
-//
-//  ViewManager::getInstance()->get3DView("View3D_1")->getRenderer()->AddActor(actor);
-//  */
-//
-//  //Test save ITK object
-//  ImageWriterType::Pointer writer = ImageWriterType::New();
-//  writer->SetInput(data);
-//  writer->SetFileName( outFileName.toLatin1() );
-//  writer->Update();
-//}
 
 
