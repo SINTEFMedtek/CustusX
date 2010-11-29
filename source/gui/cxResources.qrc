@@ -7,5 +7,9 @@
     <file>icons/open.png</file>
     <file>icons/paste.png</file>
     <file>icons/save.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/arrow-left-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/arrow-right-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/arrow-right-double-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/dialog-close.png</file>
 </qresource>
 </RCC>

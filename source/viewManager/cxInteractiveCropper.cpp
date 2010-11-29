@@ -35,7 +35,7 @@ public:
   void SetCropper(InteractiveCropper* cropper) {mCropper = cropper;}
   virtual void Execute(vtkObject* caller, unsigned long, void*)
   {
- //   std::cout << "executing" << std::endl;
+    std::cout << "executing" << std::endl;
     ssc::DoubleBoundingBox3D bb_new = mCropper->getBoxWidgetSize();
     mCropper->setCroppingRegion(bb_new);
   }
@@ -68,13 +68,18 @@ InteractiveCropper::InteractiveCropper()
 {
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(imageChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SIGNAL(changed()));
+}
+
+void InteractiveCropper::initialize()
+{
+  if (mBoxWidget) // already initialized
+    return;
 
   mBoxWidget = vtkBoxWidgetPtr::New();
   mBoxWidget->RotationEnabledOff();
 
   double bb_hard[6] = { -1,1,  -1,1,  -1,1 };
   mBoxWidget->PlaceWidget(bb_hard);
-  mBoxWidget->SetEnabled(false);
 
   mCropBoxCallback = CropBoxCallbackPtr::New();
   mCropBoxCallback->SetCropper(this);
@@ -82,12 +87,15 @@ InteractiveCropper::InteractiveCropper()
   mCropBoxEnableCallback->SetCropper(true, this);
   mCropBoxDisableCallback = CropBoxEnableCallbackPtr::New();
   mCropBoxDisableCallback->SetCropper(false, this);
+
+  mBoxWidget->SetInteractor(mView->getRenderWindow()->GetInteractor());
+
+  mBoxWidget->SetEnabled(false);
 }
 
 void InteractiveCropper::setView(ssc::View* view)
 {
   mView = view;
-  //mBoxWidget->SetInteractor(view->getRenderWindow()->GetInteractor());
   this->updateBoxWidgetInteractor();
 }
 
@@ -96,11 +104,10 @@ void InteractiveCropper::updateBoxWidgetInteractor()
   if (!mView)
     return;
 
+  this->initialize();
+
   if (this->getUseCropping())
   {
-    //std::cout << "IInteractiveCropper::updateBoxWidgetInteractor(on)" << std::endl;
-
-  //  mBoxWidget->AddObserver(vtkCommand::InteractionEvent, mCropBoxCallback);
     mBoxWidget->SetInteractor(mView->getRenderWindow()->GetInteractor());
     mBoxWidget->AddObserver(vtkCommand::InteractionEvent, mCropBoxCallback);
     mBoxWidget->AddObserver(vtkCommand::EnableEvent, mCropBoxEnableCallback);
@@ -108,26 +115,17 @@ void InteractiveCropper::updateBoxWidgetInteractor()
   }
   else
   {
-   // std::cout << "IInteractiveCropper::updateBoxWidgetInteractor(off)" << std::endl;
     mBoxWidget->RemoveObserver(vtkCommand::InteractionEvent);
     mBoxWidget->RemoveObserver(vtkCommand::EnableEvent);
     mBoxWidget->RemoveObserver(vtkCommand::DisableEvent);
-   // mBoxWidget->RemoveObserver(vtkCommand::InteractionEvent);
-    //mBoxWidget->SetInteractor(NULL); // this one lead to a vtk crash. Try using only disable instead.
   }
-
-  // dont auto-show: causes span during normal viewing.
-  //if (mBoxWidget->GetInteractor()!=NULL)
-  //  mBoxWidget->SetEnabled(this->getUseCropping());
-
-  //std::cout << "Enabled  " << mBoxWidget->GetEnabled() << std::endl;
 }
 
 void InteractiveCropper::showBoxWidget(bool on)
 {
-//  std::cout << "InteractiveCropper::showBoxWidget(" << on << ")" << std::endl;
-
   if (!mImage)
+    return;
+  if (!mBoxWidget)
     return;
   if (this->getShowBoxWidget()==on)
     return;
@@ -140,8 +138,6 @@ void InteractiveCropper::showBoxWidget(bool on)
   }
 
   mBoxWidget->SetEnabled(on);
-
-  //std::cout << "Enabled  " << mBoxWidget->GetEnabled() << std::endl;
   emit changed();
 }
 
@@ -149,18 +145,15 @@ void InteractiveCropper::showBoxWidget(bool on)
  */
 ssc::DoubleBoundingBox3D InteractiveCropper::getBoundingBox()
 {
-  if (!mImage)
+  if (!mImage || !mBoxWidget)
     return ssc::DoubleBoundingBox3D();
   return mImage->getCroppingBox();
-  //return transform(mImage->get_rMd(), mImage->getCroppingBox());
 }
 
 void InteractiveCropper::setBoundingBox(const ssc::DoubleBoundingBox3D& bb_d)
 {
- // std::cout << "setBB" << std::endl;
   this->setCroppingRegion(bb_d);
   this->setBoxWidgetSize(bb_d);
-//  emit changed();
 }
 
 vtkVolumeMapperPtr InteractiveCropper::getMapper()
@@ -170,10 +163,7 @@ vtkVolumeMapperPtr InteractiveCropper::getMapper()
   ssc::VolumetricRepPtr volRep = repManager()->getVolumetricRep(mImage);
 
   vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(volRep->getVtkVolume()->GetMapper());
-  //mapper->Register();
   return mapper;
-//  if (!mapper)
-//    return;
 }
 
 void InteractiveCropper::useCropping(bool on)
@@ -193,8 +183,6 @@ void InteractiveCropper::imageCropChangedSlot()
     return;
 
   ssc::DoubleBoundingBox3D bb_d = this->getBoundingBox();
-
-  //std::cout << "InteractiveCropper::imageCropChangedSlot" << std::endl;
   this->setBoxWidgetSize(bb_d);
   this->updateBoxWidgetInteractor();
 
@@ -238,6 +226,8 @@ bool InteractiveCropper::getUseCropping()
 
 bool InteractiveCropper::getShowBoxWidget() const
 {
+  if (!mBoxWidget)
+    return false;
   return mBoxWidget->GetEnabled();
 }
 
@@ -245,6 +235,9 @@ bool InteractiveCropper::getShowBoxWidget() const
  */
 void InteractiveCropper::setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d)
 {
+  if (!mImage || !mBoxWidget)
+    return;
+
   double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
   ssc::DoubleBoundingBox3D bb_unit(bb_hard);
   ssc::Transform3D M = ssc::createTransformNormalize(bb_unit, bb_d);
@@ -260,6 +253,11 @@ void InteractiveCropper::setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d)
  */
 ssc::DoubleBoundingBox3D InteractiveCropper::getBoxWidgetSize()
 {
+  if (!mImage || !mBoxWidget)
+  {
+    return ssc::DoubleBoundingBox3D();
+  }
+
   double bb_hard[6] = { -0.5,0.5,  -0.5,0.5,  -0.5,0.5 };
   ssc::DoubleBoundingBox3D bb_unit(bb_hard);
 
@@ -271,6 +269,7 @@ ssc::DoubleBoundingBox3D InteractiveCropper::getBoxWidgetSize()
   M = rMd.inv() * M;
 
   ssc::DoubleBoundingBox3D bb_new_r = ssc::transform(M, bb_unit);
+
   return bb_new_r;
 }
 
@@ -278,7 +277,6 @@ void InteractiveCropper::setCroppingRegion(ssc::DoubleBoundingBox3D bb_d)
 {
   if (!mImage)
     return;
-//  mImage->setCroppingBox(transform(mImage->get_rMd().inv(), bb_r));
   mImage->setCroppingBox(bb_d);
   emit changed();
 }
@@ -296,8 +294,6 @@ ssc::DoubleBoundingBox3D InteractiveCropper::getMaxBoundingBox()
   if (!mImage)
     return ssc::DoubleBoundingBox3D();
   return mImage->boundingBox();
-//  ssc::DoubleBoundingBox3D bb_r = transform(mImage->get_rMd(), mImage->boundingBox());
-//  return bb_r;
 }
 
 

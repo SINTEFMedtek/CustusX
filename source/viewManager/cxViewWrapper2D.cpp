@@ -20,8 +20,6 @@
 #include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
-//#include "cxInriaRep2D.h"
-#include "cxLandmarkRep.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
 #include "sscDefinitionStrings.h"

@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -218,10 +219,29 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
 
-    QDomElement toolSensorReferencePointElement =
-        toolSensorElement.firstChildElement(mToolSensorReferencePointTag);
-    QString toolSensorReferencePointText = toolSensorReferencePointElement.text();
-    internalStructure.mReferencePoint = ssc::Vector3D::fromString(toolSensorReferencePointText);
+    QDomNodeList toolSensorReferencePointList = toolSensorElement.elementsByTagName(mToolSensorReferencePointTag);
+    //std::cout << "Found " << string_cast(toolSensorReferencePointList.count()) << " reference points." << std::endl;
+    for (int j = 0; j < toolSensorReferencePointList.count(); j++)
+    {
+      QDomNode node = toolSensorReferencePointList.item(j);
+      if(!node.hasAttributes())
+      {
+        ssc::messageManager()->sendWarning("Found reference point without id attribute. Skipping.");
+        continue;
+      }
+      bool ok;
+      int id = node.toElement().attribute("id").toInt(&ok);
+      if(!ok)
+      {
+        ssc::messageManager()->sendWarning("Attribute id of a reference point was not an int. Skipping.");
+        continue;
+      }
+      QString toolSensorReferencePointText = node.toElement().text();
+      ssc::Vector3D vector = ssc::Vector3D::fromString(toolSensorReferencePointText);
+      //std::cout << "Tool: "<< internalStructure.mName <<": Reference point with id "<<id<<" has coords " << string_cast(vector) << std::endl;
+      internalStructure.mReferencePoints[id] = vector;
+      //std::cout << "map size: " << string_cast(internalStructure.mReferencePoints.size()) << std::endl;
+    }
 
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
     QString toolSensorRomFileText = toolSensorRomFileElement.text();
@@ -251,6 +271,9 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     {
       ssc::ToolPtr tool(cxTool);
       (*tools)[tool->getUid()] = tool;
+    } else
+    {
+     ssc::messageManager()->sendWarning("Tool: "+internalStructure.mUid+" is not valid.");
     }
   }
   return tools;
@@ -302,7 +325,7 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
     QDomDocument toolDoc;
     if (!toolDoc.setContent(&toolFile))
     {
-      ssc::messageManager()->sendError("Could not set the xml content of the file "+toolFilename);
+      ssc::messageManager()->sendError("Could not set the xml content of the tool file "+toolFilename);
       continue;
     }
     //there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)

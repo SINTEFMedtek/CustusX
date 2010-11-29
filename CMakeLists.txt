@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.6)
 
 SET(CustusX3_VERSION_MAJOR	3)
 SET(CustusX3_VERSION_MINOR	0)
-SET(CustusX3_VERSION_PATCH	10)
+SET(CustusX3_VERSION_PATCH	12)
 SET(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 SET(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
@@ -81,12 +81,18 @@ SET(INSTALL_FOLDER_NAME "CustusX")
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
 add_subdirectory( modules/cxCommon )
+add_subdirectory( modules/OpenIGTLinkServer )
 ADD_SUBDIRECTORY ( source )
 
 option(BUILD_US_ACQUISITION "build us acquisition module" OFF)
 if(BUILD_US_ACQUISITION)
     add_subdirectory(modules/ultrasoundAcquisition)
 endif(BUILD_US_ACQUISITION)
+
+option(BUILD_GRABBER_SERVER "build grabber server" OFF)
+if(BUILD_GRABBER_SERVER)
+    add_subdirectory( modules/grabberServer )
+endif(BUILD_GRABBER_SERVER)
 
 enable_testing()
 #add_subdirectory(testing)
