@@ -23,6 +23,11 @@ SET(${LIBNAME}_MOC_HDRS
   UsConfigGui.h
 )
 
+# SSC
+#----------
+find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
+include (${SSC_USE_FILE})
+
 IF(WIN32)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} ${QTUI_HEADERFILES} OPTIONS "-D_WINDOWS")
 ELSE(WIN32)
@@ -34,12 +39,14 @@ add_library(cxCommon
     cxDataLocations.h
     probeXmlConfigParser.h
     probeXmlConfigParser.cpp
+    cxCreateProbeDataFromConfiguration.h
+    cxCreateProbeDataFromConfiguration.cpp
     UsConfigGui.h
     UsConfigGui.cpp
     ${${LIBNAME}_MOC_SRCS}
     )
     
-target_link_libraries(cxCommon ${QT_LIBRARIES} )
+target_link_libraries(cxCommon SSC ${QT_LIBRARIES} )
 
 set (CX_CONFIG_ROOT ${CustusX3_SOURCE_DIR}/config)
 set (CX_DATA_ROOT ${CustusX3_SOURCE_DIR}/data CACHE PATH "path to CustusX data root")

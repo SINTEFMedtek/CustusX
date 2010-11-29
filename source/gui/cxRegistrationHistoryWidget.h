@@ -32,18 +32,40 @@ protected slots:
   void rewindSlot();
   void removeSlot();
   void forwardSlot();
+  void fastForwardSlot();
   void updateSlot();
+  void reconnectSlot();
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
 
 private:
   RegistrationHistoryWidget();
+  void debugDump();
+  template<class T>
+  QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 
-  QPushButton* mRewindButton;
-  QPushButton* mRemoveButton;
-  QPushButton* mForwardButton;
-  bool isUsingNewestRegistration();
+  typedef std::map<QDateTime,QString> TimeMap;
+  TimeMap getRegistrationTimes();
+  QDateTime getActiveTime();
+  void setActiveTime(QDateTime active);
+  TimeMap::iterator findCurrentActiveIter(TimeMap& times);
+  QGroupBox* mGroup;
+  std::vector<ssc::RegistrationHistoryPtr> mHistories;
+  QAction* mRewindAction;
+  QAction* mRemoveAction;
+  QAction* mForwardAction;
+  QAction* mFastForwardAction;
+
+  QLabel* mBehindLabel;
+  QLabel* mInFrontLabel;
+
+  //
+//  QPushButton* mRewindButton;
+//  QPushButton* mRemoveButton;
+//  QPushButton* mForwardButton;
+//  QPushButton* mFastForwardButton;
   std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };

@@ -54,6 +54,7 @@ private:
   ssc::DoubleBoundingBox3D getBoxWidgetSize();
   void setCroppingRegion(ssc::DoubleBoundingBox3D bb_d);
   void updateBoxWidgetInteractor();
+  void initialize();
 
   vtkVolumeMapperPtr getMapper();
   ssc::ImagePtr mImage;

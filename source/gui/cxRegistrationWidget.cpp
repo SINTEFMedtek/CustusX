@@ -175,12 +175,10 @@ void RegistrationWidget::nextRow()
 {
   int selectedRow = mLandmarkTableWidget->currentRow();
 
-  //std::cout << "1 Selected row = " << string_cast(selectedRow) << std::endl;
   if(selectedRow == -1 && mLandmarkTableWidget->rowCount() != 0) //no row is selected yet
   {
     mLandmarkTableWidget->selectRow(0);
     selectedRow = mLandmarkTableWidget->currentRow();
-    //std::cout << "2 Selected row = " << string_cast(selectedRow) << std::endl;
   }
 
   int nextRow = selectedRow+1;
@@ -193,10 +191,8 @@ void RegistrationWidget::nextRow()
   selectedRow = nextRow;
   mLandmarkTableWidget->selectRow(selectedRow);
   mLandmarkTableWidget->setCurrentCell(selectedRow, 0);
-  //std::cout << "3 Selected row = " << string_cast(selectedRow) << std::endl;
 
   mActiveLandmark = mLandmarkTableWidget->currentItem()->data(Qt::UserRole).toString();
-  //std::cout << "ActiveLandmark uid: " << mActiveLandmark << std::endl;
 }
 
 std::vector<ssc::Landmark> RegistrationWidget::getAllLandmarks() const
@@ -226,14 +222,11 @@ void RegistrationWidget::cellChangedSlot(int row,int column)
   {
     QString name = item->text();
     ssc::dataManager()->setLandmarkName(uid, name);
-    //std::cout << "cell changed 0" << std::endl;
   }
   if(column==1)
   {
     Qt::CheckState state = item->checkState();
     ssc::dataManager()->setLandmarkActive(uid, state==Qt::Checked);
-    //std::cout << "cell changed 1" << std::endl;
-    //this->performRegistration();
   }
 }
 

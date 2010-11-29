@@ -104,16 +104,6 @@ void ResampleWidget::hideEvent(QHideEvent* event)
 
 void ResampleWidget::resampleSlot()
 {
-//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-//  this->revertTransferFunctions();
-//
-//  ssc::ImagePtr input = mSelectedImage->getImage();
-//  if(!input)
-//    return;
-//  ssc::ImagePtr reference = mReferenceImage->getImage();
-//  if(!reference)
-//    return;
-
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   double margin = 20; //mm
 
@@ -121,12 +111,7 @@ void ResampleWidget::resampleSlot()
   if(!output)
     return;
   emit outputImageChanged(output->getUid());
-
-
-//  emit outputImageChanged(segmentedImage->getUid());
 }
-
-
 
 QWidget* ResampleWidget::createOptionsWidget()
 {
@@ -594,7 +579,7 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
   QString name = centerlineImage->getName() + " mesh %1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
   mesh->setColor(mDefaultColor);
-  mesh->setParentFrame(centerlineImage->getUid());
+  mesh->get_rMd_History()->addParentFrame(centerlineImage->getUid());
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
@@ -609,8 +594,10 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mRegisterButton(new QPushButton("Register")),
     mTestButton(new QPushButton("TEST, loads two minc images into the system.")),
-    mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
-    mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
+    mFixedImageLabel(new QLabel("Fixed image:")),
+    mMovingImageLabel(new QLabel("Moving image:"))
+//mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
+//mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
@@ -649,7 +636,8 @@ void RegisterI2IWidget::fixedImageSlot(QString uid)
   ssc::DataPtr fixedImage = registrationManager()->getFixedData();
   if(!fixedImage)
     return;
-  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed data: <b>"+fixedImage->getName()+"</b></font>"));
+//  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed data: <b>"+fixedImage->getName()+"</b></font>"));
+  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
   mFixedImageLabel->update();
 }
 
@@ -658,7 +646,8 @@ void RegisterI2IWidget::movingImageSlot(QString uid)
   ssc::DataPtr movingImage = registrationManager()->getMovingData();
   if(!movingImage)
     return;
-  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving data: <b>"+movingImage->getName()+"</b></font>"));
+  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
+//  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving data: <b>"+movingImage->getName()+"</b></font>"));
   mMovingImageLabel->update();
 }
 

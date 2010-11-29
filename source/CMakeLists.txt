@@ -26,10 +26,11 @@ INCLUDE(${VTK_USE_FILE})
 FIND_PACKAGE(ITK REQUIRED)
 INCLUDE(${ITK_USE_FILE})
 
-# vtkINRIA3D
+# IGTL
 #----------
-#FIND_PACKAGE(vtkINRIA3D REQUIRED)
-#INCLUDE(${vtkINRIA3D_USE_FILE})
+FIND_PACKAGE(OpenIGTLink REQUIRED)
+INCLUDE(${OpenIGTLink_USE_FILE})
+
 
 # IGSTK
 #----------
@@ -196,20 +197,31 @@ SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CustusX description summary")# does not work..?
 set(CPACK_PACKAGE_VENDOR "Sintef")# does not work..?
-set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/gui/icons/CustusX.png")# does not work..?
+if (WIN32)
+	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons\\CustusX.png")
+else (WIN32)
+	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
+endif (WIN32)
+
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}") # name of .pkg file
-set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+if (WIN32)
+	set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc\\install_welcome.txt")
+	set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc\\install_readme.rtf")
+	set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc\\install_license.txt")
+else (WIN32)
+	set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
+	set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
+	set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+endif (WIN32)
 
 
 #set(CPACK_PACKAGE_EXECUTABLES "CustusX" "CustusX_navn")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "test_pkg_install")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 if (APPLE)
     set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
     option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)

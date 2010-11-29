@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "sscData.h"
+#include "sscConsoleWidget.h"
 #include "cxViewManager.h"
 #include "cxStateMachineManager.h"
 
@@ -169,7 +170,7 @@ private:
 
   std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
-  class ConsoleWidget*                          mConsoleWidget;
+  ssc::ConsoleWidget*                           mConsoleWidget;
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
   class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
   class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters

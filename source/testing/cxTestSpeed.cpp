@@ -43,7 +43,8 @@ void cxTestSpeed::testLapSpeed()
 {
   CustusXController custusX(NULL);
 
-  custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Lap/2010-10-18/CustusX/Speed_Test_Lap_Large.cx3";
+  custusX.mPatientFolder = "/Users/christiana/Patients/Speed_Test_Lap_Large.cx3";
+//  custusX.mPatientFolder = cx::DataLocations::getTestDataPath() + "/Lap/2010-10-18/CustusX/Speed_Test_Lap_Large.cx3";
   custusX.start();
 
 //  QTimer::singleShot(      0,   &custusX, SLOT(beginCheckRenderSlot()) );

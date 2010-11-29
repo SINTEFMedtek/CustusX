@@ -567,8 +567,11 @@ ParentFrameStringDataAdapter::ParentFrameStringDataAdapter()
 
 void ParentFrameStringDataAdapter::setData(ssc::DataPtr data)
 {
+  if (mData)
+    disconnect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
   mData = data;
-  connect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
+  if (mData)
+    connect(mData.get(), SIGNAL(transformChanged()), this, SIGNAL(changed()));
   emit changed();
 }
 
@@ -581,7 +584,7 @@ bool ParentFrameStringDataAdapter::setValue(const QString& value)
 {
   if (!mData)
     return false;
-  mData->setParentFrame(value);
+  mData->get_rMd_History()->addParentFrame(value);
   return true;
 }
 
@@ -621,6 +624,71 @@ QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
   if (!data)
     return "<no data>";
   return qstring_cast(data->getName());
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+DataNameEditableStringDataAdapter::DataNameEditableStringDataAdapter()
+{
+}
+
+QString DataNameEditableStringDataAdapter::getValueName() const
+{
+  return "Name";
+}
+
+bool DataNameEditableStringDataAdapter::setValue(const QString& value)
+{
+  if (!mData)
+    return false;
+  mData->setName(value);
+  return true;
+}
+
+QString DataNameEditableStringDataAdapter::getValue() const
+{
+  if (mData)
+    return mData->getName();
+  return "";
+}
+
+void DataNameEditableStringDataAdapter::setData(ssc::DataPtr data)
+{
+  mData = data;
+  emit changed();
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+DataUidEditableStringDataAdapter::DataUidEditableStringDataAdapter()
+{
+}
+
+QString DataUidEditableStringDataAdapter::getValueName() const
+{
+  return "Uid";
+}
+
+bool DataUidEditableStringDataAdapter::setValue(const QString& value)
+{
+  return false;
+}
+
+QString DataUidEditableStringDataAdapter::getValue() const
+{
+  if (mData)
+    return mData->getUid();
+  return "";
+}
+
+void DataUidEditableStringDataAdapter::setData(ssc::DataPtr data)
+{
+  mData = data;
+  emit changed();
 }
 
 
