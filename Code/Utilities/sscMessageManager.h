@@ -3,6 +3,7 @@
 
 #include <QMetaType>
 #include <QObject>
+#include <QMutex>
 #include <QDateTime>
 #include <QFile>
 #include "boost/shared_ptr.hpp"
@@ -93,6 +94,7 @@ private:
   SingleStreamerImplPtr mCout;
   SingleStreamerImplPtr mCerr;
 
+  QMutex mConsoleMutex;
   QString mAbsoluteLoggingFolderPath;
   QFile* mConsoleFile;
   QTextStream* mConsoleStream;

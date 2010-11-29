@@ -196,6 +196,7 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
   mAbsoluteLoggingFolderPath = absoluteLoggingFolderPath;
   QString consoleFilePath = mAbsoluteLoggingFolderPath+filename;
 
+  QMutexLocker sentry(&mConsoleMutex);
   if(mConsoleFile->isOpen())
   {
     mConsoleFile->close();
@@ -204,13 +205,20 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
       QFile::remove(consoleFilePath);
 
     if(!mConsoleFile->copy(consoleFilePath))
+    {
+      sentry.unlock();
       ssc::messageManager()->sendWarning("Could not copy to "+consoleFilePath);
+      sentry.relock();
+    }
 
     mConsoleFile->setFileName(consoleFilePath);
     this->openLogging(QFile::Append);
 
-  }else{
+  }
+  else
+  {
     mConsoleFile->setFileName(consoleFilePath);
+    sentry.unlock();
     this->openLogging(QFile::Truncate);
   }
 }
@@ -250,11 +258,13 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
     std::cout << message.getPrintableMessage() << std::endl;
   mCout->setEnableRedirect(true);
 
+  QMutexLocker sentry(&mConsoleMutex);
   if(mConsoleStream->device())
   {
     (*mConsoleStream) << message.getPrintableMessage();
     (*mConsoleStream) << endl;
   }
+  sentry.unlock();
 
   emit emittedMessage(message);
 }
@@ -271,13 +281,16 @@ void MessageManager::sendErrorSound()
 
 bool MessageManager::openLogging(QFile::OpenMode mode)
 {
+  QMutexLocker sentry(&mConsoleMutex);
   if(mConsoleFile->open(QFile::WriteOnly | mode))
   {
     mConsoleStream->setDevice(mConsoleFile);
+    sentry.unlock();
     ssc::messageManager()->sendInfo("Console log file: "+mConsoleFile->fileName()+".");
   }
   else
   {
+    sentry.unlock();
     ssc::messageManager()->sendWarning("Could not open "+mConsoleFile->fileName()+" for writing the console log.");
     return false;
   }
