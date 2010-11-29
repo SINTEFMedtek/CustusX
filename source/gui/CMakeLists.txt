@@ -29,7 +29,6 @@ SET(cxProject_MOC_HDRS
   cxDataInterface.h
   cxShadingParamsInterfaces.h
   cxLayoutEditor.h
-  cxConsoleWidget.h
   cxManualRegistrationOffsetWidget.h
   cxDoubleSpanSlider.h
   qxtspanslider_p.h
@@ -109,8 +108,6 @@ SET(${LIBNAME}_SRCS
     cxShadingParamsInterfaces.cpp
     cxLayoutEditor.h
     cxLayoutEditor.cpp
-    cxConsoleWidget.h
-    cxConsoleWidget.cpp
     cxManualRegistrationOffsetWidget.h
     cxManualRegistrationOffsetWidget.cpp
     cxDoubleSpanSlider.h
