@@ -163,7 +163,7 @@ Transform3D ProbeData::get_tMu() const
 Transform3D ProbeData::get_uMv() const
 {
   double H = mData.mImage.mSize.height() * mData.mImage.mSpacing[1];
-  return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0,-H,0));
+  return createTransformRotateX(M_PI) * createTransformTranslate(Vector3D(0,-(H-1),0));
 }
 
 vtkPolyDataPtr ProbeData::getSector()
