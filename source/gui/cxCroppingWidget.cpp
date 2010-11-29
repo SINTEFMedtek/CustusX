@@ -114,6 +114,10 @@ void CroppingWidget::cropperChangedSlot()
   mUseCropperCheckBox->setChecked(mInteractiveCropper->getUseCropping());
   mShowBoxCheckBox->setChecked(mInteractiveCropper->getShowBoxWidget());
 
+  mXRange->blockSignals(true);
+  mYRange->blockSignals(true);
+  mZRange->blockSignals(true);
+
   ssc::DoubleBoundingBox3D range =  mInteractiveCropper->getMaxBoundingBox();
 //std::cout << "CroppingWidget::cropperChangedSlot(" << box << ")" << std::endl;
   mXRange->setRange(ssc::DoubleRange(range.begin()[0], range.begin()[1], 1));
@@ -125,6 +129,10 @@ void CroppingWidget::cropperChangedSlot()
   mXRange->setValue(std::make_pair(box.begin()[0], box.begin()[1]));
   mYRange->setValue(std::make_pair(box.begin()[2], box.begin()[3]));
   mZRange->setValue(std::make_pair(box.begin()[4], box.begin()[5]));
+
+  mXRange->blockSignals(false);
+  mYRange->blockSignals(false);
+  mZRange->blockSignals(false);
 }
 
 ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()
