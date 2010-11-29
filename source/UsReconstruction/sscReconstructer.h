@@ -16,6 +16,7 @@
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
+#include "sscProbeData.h"
 //#include "sscStringWidgets.h"
 
 namespace ssc
@@ -71,7 +72,8 @@ private:
 
   OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
-  ProbeXmlConfigParser::Configuration mConfiguration;
+//  ProbeXmlConfigParser::Configuration mConfiguration;
+  ssc::ProbeData mProbeData;
   XmlOptionFile mSettings;
   //QDomDocument mSettings;
   //QString mSettingsFilename;

@@ -11,6 +11,9 @@
 #include <QString>
 #include "sscForwardDeclarations.h"
 
+#include "sscTransform3D.h"
+
+
 namespace cx
 {
 
@@ -23,6 +26,7 @@ public:
       bool useSmothing=true, double smoothSigma=0.5);
   ssc::ImagePtr centerline(ssc::ImagePtr image, QString outputBasePath);
   ssc::ImagePtr resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
+
 private:
 };
 

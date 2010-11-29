@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "sscForwardDeclarations.h"
+#include "cxDataInterface.h"
 
 namespace cx
 {
@@ -18,6 +19,41 @@ class ActiveVolumeWidget : public QWidget
 public:
   ActiveVolumeWidget(QWidget* parent);
   ~ActiveVolumeWidget() {}
+};
+
+/**Widget for displaying various volume information.
+ * Part of the VolumePropertiesWidget.
+ */
+class VolumeInfoWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  VolumeInfoWidget(QWidget* parent);
+  virtual ~VolumeInfoWidget();
+
+signals:
+
+protected slots:
+  void updateSlot();
+//  void setColorSlot();
+//  void setColorSlotDelayed();
+//  void visibilityChangedSlot(bool visible);
+//  void populateMeshComboBoxSlot();
+//  void meshSelectedSlot(const QString& comboBoxText);
+//  void importTransformSlot();
+  void deleteDataSlot();
+
+protected:
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
+
+private:
+//  ssc::MeshPtr mMesh;
+//  QComboBox* mMeshComboBox; ///< combobox for selecting mesh
+  ParentFrameStringDataAdapterPtr mParentFrameAdapter;
+  DataNameEditableStringDataAdapterPtr mNameAdapter;
+  DataUidEditableStringDataAdapterPtr mUidAdapter;
 };
 
 /**

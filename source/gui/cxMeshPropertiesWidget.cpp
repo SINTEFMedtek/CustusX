@@ -7,6 +7,7 @@
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "sscLabeledLineEditWidget.h"
 #include "cxDataInterface.h"
 
 namespace cx
@@ -66,10 +67,12 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   gridLayout->addWidget(deleteButton, 3, 0);
   
   mParentFrameAdapter = ParentFrameStringDataAdapter::New();
-
   ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
   gridLayout->addWidget(combo, 4, 0);
 
+  mNameAdapter = DataNameEditableStringDataAdapter::New();
+  ssc::LabeledLineEditWidget*  nameEdit = new ssc::LabeledLineEditWidget(this, mNameAdapter);
+  gridLayout->addWidget(nameEdit, 5, 0);
 
   toptopLayout->addStretch();
 
@@ -211,6 +214,7 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
   //Set new current image
   mMesh = mesh;
   mParentFrameAdapter->setData(mMesh);
+  mNameAdapter->setData(mMesh);
 
   //dataManager()->setActiveImage(mCurrentImage);
   

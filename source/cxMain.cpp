@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <iostream>
 #include "cxMainWindow.h"
+#include "sscMessageManager.h"
 
 int main(int argc, char *argv[])
 {
