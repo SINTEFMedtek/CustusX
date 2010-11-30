@@ -407,7 +407,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     if (!mRTStreamRep)
     {
       std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
-      mRTStreamRep.reset(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+      mRTStreamRep.reset(new ssc::RealTimeStreamRep("rtrep", "rtrep"));
     //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
       mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
       mRTStreamRep->setTool(tool);
