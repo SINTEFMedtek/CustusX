@@ -5,6 +5,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxView3D.h
     cxViewWrapper2D.h
     cxViewWrapper3D.h
+    cxViewWrapperRTStream.h
     cxViewManager.h
     cxViewWrapper.h
     cxViewGroup.h
@@ -25,6 +26,8 @@ SET ( ${LIB}_viewManager
     cxView3D.h
     cxViewWrapper2D.cpp
     cxViewWrapper2D.h
+    cxViewWrapperRTStream.cpp
+    cxViewWrapperRTStream.h
     cxViewWrapper3D.cpp
     cxViewWrapper3D.h
     cxViewWrapper.h

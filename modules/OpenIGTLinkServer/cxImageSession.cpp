@@ -163,7 +163,7 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
     mImageFileDir(imageFileDir)
 {
   mImageData = loadImage(mImageFileDir);
-  //mImageData = convertToTestColorImage(mImageData);
+  mImageData = convertToTestColorImage(mImageData);
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.

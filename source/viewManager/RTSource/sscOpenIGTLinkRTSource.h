@@ -32,7 +32,8 @@ public:
   OpenIGTLinkRTSource();
   virtual ~OpenIGTLinkRTSource();
   virtual QString getUid() { return "us_openigtlink_source"; }
-  virtual QString getName() { return "US RT Stream over OpenIGTLink"; }
+//  virtual QString getName() { return "US RT Stream over OpenIGTLink"; }
+  virtual QString getName();
   virtual vtkImageDataPtr getVtkImageData();
   virtual QDateTime getTimestamp();
   virtual bool connected() const;
@@ -74,7 +75,7 @@ private:
   QDateTime mTimestamp;
   igtl::ImageMessage::Pointer mImageMessage;
   IGTLinkClientPtr mClient;
-
+  QString mDeviceName;
   bool mTimeout;
   QTimer* mTimeoutTimer;
 };
