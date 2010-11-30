@@ -30,6 +30,7 @@ void LayoutData::ViewData::addXml(QDomNode node) const
   QDomElement elem = node.toElement();
   elem.setAttribute("group", qstring_cast(mGroup));
   elem.setAttribute("type", qstring_cast(mPlane));
+  elem.setAttribute("view", qstring_cast(mType));
   elem.setAttribute("row", qstring_cast(mRegion.pos.row));
   elem.setAttribute("col", qstring_cast(mRegion.pos.col));
   elem.setAttribute("rowSpan", qstring_cast(mRegion.span.row));
@@ -41,6 +42,8 @@ void LayoutData::ViewData::parseXml(QDomNode node)
   QDomElement elem = node.toElement();
   mGroup = elem.attribute("group").toInt();
   mPlane = string2enum<ssc::PLANE_TYPE>(elem.attribute("type"));
+//  mType = string2enum<ssc::View::Type>(elem.attribute("view"));
+  mType = static_cast<ssc::View::Type>(elem.attribute("view").toInt());
   mRegion.pos.row = elem.attribute("row").toInt();
   mRegion.pos.col = elem.attribute("col").toInt();
   mRegion.span.row = elem.attribute("rowSpan").toInt();
@@ -71,7 +74,19 @@ void LayoutData::setView(int group, ssc::PLANE_TYPE type, LayoutRegion region)
   ViewData& view = get(region.pos);
   view.mGroup = group;
   view.mPlane = type;
+  view.mType = ssc::View::VIEW_2D;
 }
+
+void LayoutData::setView(int group, ssc::View::Type type, LayoutRegion region)
+{
+  if (!this->merge(region))
+    return;
+  ViewData& view = get(region.pos);
+  view.mGroup = group;
+  view.mPlane = ssc::ptNOPLANE;
+  view.mType = type;
+}
+
 
 /** Merge all views inside input region.
  *  Previously merged views partially inside the new region will be split.

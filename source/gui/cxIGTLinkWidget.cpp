@@ -23,6 +23,9 @@ namespace cx
 IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
     QWidget(parent)
 {
+  mView = NULL;
+  mRenderTimer = NULL;
+
   this->setObjectName("IGTLinkWidget");
   this->setWindowTitle("IGTLink Test");
   this->resize(100, 600);
@@ -48,30 +51,19 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   mPortEdit->setText("18333");
   gridLayout->addWidget(mPortEdit, 1, 1);
 
-  mLaunchServerButton = new QPushButton("launch image server", this);
-  connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(launchServer()));
-  gridLayout->addWidget(mLaunchServerButton, 2, 1);
+//  mLaunchServerButton = new QPushButton("launch image server", this);
+//  connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(launchServer()));
+//  gridLayout->addWidget(mLaunchServerButton, 2, 1);
+
+  mShowStreamButton = new QPushButton("show stream", this);
+  connect(mShowStreamButton, SIGNAL(clicked()), this, SLOT(showStream()));
+  gridLayout->addWidget(mShowStreamButton, 2, 1);
 
   mConnectButton = new QPushButton("Connect Server", this);
   connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnect()));
   gridLayout->addWidget(mConnectButton, 3, 1);
 
-  mView = new ssc::View();
-  mView->setBackgoundColor(QColor("khaki"));
-  toptopLayout->addWidget(mView);
-  mRenderTimer = new QTimer(this);
-  connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
-  mRenderTimer->setInterval(50);
-
-  ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
-  rtRep->setRealtimeStream(mRTSource);
-//  rtRep->setTool(ssc::toolManager()->getDominantTool());
-  mView->addRep(rtRep);
-
-  mRenderLabel = new QLabel("-");
-  toptopLayout->addWidget(mRenderLabel);
-
-//  toptopLayout->addStretch();
+  toptopLayout->addStretch();
 }
 
 IGTLinkWidget::~IGTLinkWidget()
@@ -80,16 +72,22 @@ IGTLinkWidget::~IGTLinkWidget()
 
 void IGTLinkWidget::showEvent(QShowEvent* event)
 {
-  mRenderTimer->start();
+  if (mRenderTimer)
+    mRenderTimer->start();
+  std::cout << "render start" << std::endl;
+
 }
 
 void IGTLinkWidget::hideEvent(QHideEvent* event)
 {
-  mRenderTimer->stop();
+  if (mRenderTimer)
+    mRenderTimer->stop();
+  std::cout << "render stop" << std::endl;
 }
 
 void IGTLinkWidget::renderSlot()
 {
+//  std::cout << "arender" << std::endl;
   if (this->visibleRegion().isEmpty()) // needed to avoid drawing errors: checking visible is not enough
     return;
 
@@ -105,13 +103,33 @@ void IGTLinkWidget::renderSlot()
     mRenderLabel->setText(QString::number(mRenderTimerW.getFPS(),'f',0)+ "FPS");
     mRenderTimerW.reset();
   }
-
-
+//  std::cout << "render" << std::endl;
 }
 
 void IGTLinkWidget::launchServer()
 {
 
+}
+
+void IGTLinkWidget::showStream()
+{
+  if (mView)
+    return;
+
+  mView = new ssc::View();
+  mView->setBackgoundColor(QColor("khaki"));
+  mToptopLayout->addWidget(mView, 1);
+  mRenderTimer = new QTimer(this);
+  connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
+  mRenderTimer->setInterval(50);
+
+  ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
+  rtRep->setRealtimeStream(mRTSource);
+//  rtRep->setTool(ssc::toolManager()->getDominantTool());
+  mView->addRep(rtRep);
+
+  mRenderLabel = new QLabel("-");
+  mToptopLayout->addWidget(mRenderLabel);
 }
 
 void IGTLinkWidget::toggleConnect()

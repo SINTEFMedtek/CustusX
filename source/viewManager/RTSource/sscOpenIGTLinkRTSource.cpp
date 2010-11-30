@@ -48,11 +48,18 @@ OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
 
 void OpenIGTLinkRTSource::timeout()
 {
-  std::cout << "timeout!" << std::endl;
+  if (!mTimeout)
+    std::cout << "timeout!" << std::endl;
   mTimeout = true;
   emit changed();
 }
 
+QString OpenIGTLinkRTSource::getName()
+{
+  if (mDeviceName.isEmpty())
+    return "IGTLink";
+  return mDeviceName;
+}
 
 QString OpenIGTLinkRTSource::getInfoString() const
 {
@@ -243,6 +250,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   message->GetDimensions(size);
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
+  mDeviceName = message->GetDeviceName();
 
   mImageImport->SetNumberOfScalarComponents(1);
 
@@ -281,6 +289,10 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
     mImageImport->SetDataScalarTypeToUnsignedChar();
   }
 
+  spacing[0] = 1;
+  spacing[1] = 1;
+  spacing[2] = 1;
+
   mImageImport->SetDataOrigin(0,0,0);
   mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 
@@ -299,6 +311,8 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 //  vtkImageDataPtr colored = convertToTestColorImage(mImageImport->GetOutput());
   //colored->Print(std::cout);
 
+  mImageImport->GetOutput()->Update();
+//  mImageImport->GetOutput()->Print(std::cout);
 
   mTimeout = false;
   mTimeoutTimer->start();

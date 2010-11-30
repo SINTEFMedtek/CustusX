@@ -211,7 +211,7 @@ void RealTimeStreamGraphics::setLookupTable()
 
 void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
 {
-//  std::cout << "RealTimeStream2DRep::setRealtimeStream()" << std::endl;
+//  std::cout << "RealTimeStreamRep::setRealtimeStream()" << std::endl;
 
   if (mData)
   {
@@ -315,27 +315,27 @@ void RealTimeStreamGraphics::initializeSize(int imageWidth, int imageHeight)
 //---------------------------------------------------------
 
 
-RealTimeStream2DRep::RealTimeStream2DRep(const QString& uid, const QString& name) :
+RealTimeStreamRep::RealTimeStreamRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name)
 {
     mRTGraphics.reset(new RealTimeStreamGraphics());
 }
 
-RealTimeStream2DRep::~RealTimeStream2DRep()
+RealTimeStreamRep::~RealTimeStreamRep()
 {
 }
 
-void RealTimeStream2DRep::setTool(ToolPtr tool)
+void RealTimeStreamRep::setTool(ToolPtr tool)
 {
   mRTGraphics->setTool(tool);
 }
 
-void RealTimeStream2DRep::setRealtimeStream(RealTimeStreamSourcePtr data)
+void RealTimeStreamRep::setRealtimeStream(RealTimeStreamSourcePtr data)
 {
   mRTGraphics->setRealtimeStream(data);
 }
 
-void RealTimeStream2DRep::addRepActorsToViewRenderer(ssc::View* view)
+void RealTimeStreamRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   mView = view;
   mRenderer = view->getRenderer();
@@ -343,7 +343,7 @@ void RealTimeStream2DRep::addRepActorsToViewRenderer(ssc::View* view)
   view->getRenderer()->AddActor(mRTGraphics->getActor());
 }
 
-void RealTimeStream2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void RealTimeStreamRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   mRenderer = vtkRendererPtr();
   view->getRenderer()->RemoveActor(mRTGraphics->getActor());

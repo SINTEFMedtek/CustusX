@@ -84,6 +84,17 @@ private:
   QPoint mClickPos;
   LayoutRegion mSelection;
 
+  struct ViewNamesType
+  {
+    ViewNamesType() {}
+    ViewNamesType(ssc::PLANE_TYPE plane, ssc::View::Type view, QString name) : mPlane(plane), mView(view), mName(name) {}
+    ssc::PLANE_TYPE mPlane;
+    ssc::View::Type mView;
+    QString mName;
+  };
+  std::vector<ViewNamesType> mViewNames;
+  QString getViewName(LayoutData::ViewData data) const;
+
   virtual void mouseMoveEvent(QMouseEvent* event);
   virtual void mousePressEvent(QMouseEvent* event);
 };
