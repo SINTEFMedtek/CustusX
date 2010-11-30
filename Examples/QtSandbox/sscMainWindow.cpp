@@ -1,5 +1,4 @@
 #include "sscMainWindow.h"
-#include "cxLayoutEditor.h"
 
 namespace ssc
 {
@@ -23,8 +22,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 
     createStatusBar();
 
-	cx::LayoutEditor* editor = new cx::LayoutEditor(this);
-    this->setCentralWidget(editor);
+//	cx::LayoutEditor* editor = new cx::LayoutEditor(this);
+//    this->setCentralWidget(editor);
 }
 
 void MainWindow::addActions()

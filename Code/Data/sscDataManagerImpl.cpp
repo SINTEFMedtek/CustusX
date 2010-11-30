@@ -266,6 +266,7 @@ void DataManagerImpl::loadStream(RealTimeStreamSourcePtr stream)
   if (!stream)
     return;
   mStreams[stream->getUid()] = stream;
+  emit streamLoaded();
 }
 
 std::map<QString, RealTimeStreamSourcePtr> mStreams;

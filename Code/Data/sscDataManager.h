@@ -123,6 +123,7 @@ signals:
 	//void activeMeshChanged(const QString& uId); ///< emitted when the active mesh is changed
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
 	void medicalDomainChanged();
+	void streamLoaded();
 
 protected:
 	static void setInstance(DataManager* instance);
