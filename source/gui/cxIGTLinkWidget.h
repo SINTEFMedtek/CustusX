@@ -28,6 +28,7 @@ public:
 
 private slots:
   void launchServer();
+  void showStream();
   void toggleConnect();
   void renderSlot();
   void serverStatusChangedSlot();
@@ -39,7 +40,8 @@ private:
   QLineEdit* mAddressEdit;
   QLineEdit* mPortEdit;
   QPushButton* mConnectButton;
-  QPushButton* mLaunchServerButton;
+  QPushButton* mShowStreamButton;
+//  QPushButton* mLaunchServerButton;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
   QGridLayout* mGridLayout;
   QVBoxLayout* mToptopLayout;

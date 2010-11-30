@@ -204,12 +204,12 @@ igtl::ImageMessage::Pointer IGTLinkClient::getLastImageMessage()
 
 void IGTLinkClient::readyReadSlot()
 {
- // std::cout << "client::tick thread: " << QThread::currentThread() << std::endl;
 
   //std::cout << "tick " << std::endl;
 
   if (!mHeadingReceived)
   {
+//    std::cout << "client::tick: received: " << mSocket->bytesAvailable() << ", head needed: " << mHeaderMsg->GetPackSize() << std::endl;
     // Initialize receive buffer
     mHeaderMsg->InitPack();
 
@@ -231,6 +231,7 @@ void IGTLinkClient::readyReadSlot()
 
   if (mHeadingReceived)
   {
+//    std::cout << "client::tick: received: " << mSocket->bytesAvailable() << ", body needed: " << mHeaderMsg->GetBodySizeToRead() << std::endl;
     bool success = false;
     // Check data type and receive data body
 //    if (strcmp(mHeaderMsg->GetDeviceType(), "TRANSFORM") == 0)

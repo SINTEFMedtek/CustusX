@@ -77,15 +77,15 @@ private:
 };
 
 
-typedef boost::shared_ptr<class RealTimeStream2DRep> RealTimeStream2DRepPtr;
+typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
 
-class RealTimeStream2DRep : public ssc::RepImpl
+class RealTimeStreamRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
-  RealTimeStream2DRep(const QString& uid, const QString& name="");
-  virtual ~RealTimeStream2DRep();
-  virtual QString getType() const { return "ssc::RealTimeStream2DRep"; }
+  RealTimeStreamRep(const QString& uid, const QString& name="");
+  virtual ~RealTimeStreamRep();
+  virtual QString getType() const { return "ssc::RealTimeStreamRep"; }
   void setRealtimeStream(RealTimeStreamSourcePtr data);
   void setTool(ToolPtr tool);
 
