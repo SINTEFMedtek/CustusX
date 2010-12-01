@@ -31,8 +31,9 @@ private slots:
   void showStream();
   void toggleConnect();
   void renderSlot();
+  void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
-//  void hostCurrentIndexChanged(const QString& text);
+  void serverProcessError(QProcess::ProcessError error);
 
 private:
   void updateHostHistory();
@@ -44,7 +45,7 @@ private:
   QLineEdit* mPortEdit;
   QPushButton* mConnectButton;
   QPushButton* mShowStreamButton;
-//  QPushButton* mLaunchServerButton;
+  QPushButton* mLaunchServerButton;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
   QGridLayout* mGridLayout;
   QVBoxLayout* mToptopLayout;
@@ -52,6 +53,8 @@ private:
   QTimer* mRenderTimer;
   RenderTimer mRenderTimerW;
   QLabel* mRenderLabel;
+
+  QProcess* mServer;
 };
 
 }//end namespace cx
