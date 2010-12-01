@@ -56,10 +56,6 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
     mMapZeroToOne->SetInValue(1);
     mMapZeroToOne->SetReplaceIn(true);
 
-//    mUSMaskData = mProbeData.getMask();
-    //mUSSource->setProbeData(mProbeData.mData);
-  //  mUSMaskData->Print(std::cout);
-
     // set the filter that applies a mask to the stream data
     mMaskFilter = vtkImageMaskPtr::New();
     mMaskFilter->SetMaskInput(mProbeData.getMask());
@@ -134,9 +130,7 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
     else
     {
       // now that we have a tool: use the ultraound source, updated by the probe
-      //mDataSetMapper->SetInput(mUSSource->GetOutput() );
       mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
-
     }
 
     this->probeSectorChanged();
@@ -151,13 +145,9 @@ void RealTimeStreamGraphics::probeSectorChanged()
   mProbeData.setSector(mTool->getProbeSector());
 
   if (mUseMask)
-  {
     mMaskFilter->SetMaskInput(mProbeData.getMask());
-  }
   else
-  {
     mUSSource->setProbeSector(mProbeData.getSector());
-  }
 
   receiveTransforms(mTool->get_prMt(), 0);
 }
@@ -167,6 +157,7 @@ void RealTimeStreamGraphics::probeSectorChanged()
  */
 void RealTimeStreamGraphics::setLookupTable()
 {
+  // applies only to mask:
   // Create a lut of size at least equal to the data range. Set the tableRange[0] to zero.
   // This will force input zero to be mapped onto the first table value (the transparent one),
   // and inputs [1, -> > is mapped to larger values, not transparent.
@@ -193,8 +184,6 @@ void RealTimeStreamGraphics::setLookupTable()
 //  lut->SetTableValue(1, 0, 0, 0, 1);
 //  lut->SetTableValue(1400, 1, 1, 1, 1);
 
-
-
 //  std::cout << "lut # " << lut->GetNumberOfTableValues() << std::endl;
 //  double N = lut->GetNumberOfTableValues();
 //  for (int i=0; i<N; ++i)
@@ -211,8 +200,6 @@ void RealTimeStreamGraphics::setLookupTable()
 
 void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
 {
-//  std::cout << "RealTimeStreamRep::setRealtimeStream()" << std::endl;
-
   if (mData)
   {
     disconnect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
@@ -233,15 +220,12 @@ void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
     {
       mMapZeroToOne->SetInput(mData->getVtkImageData());
       mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
-      //mMaskFilter->SetImageInput(mData->getVtkImageData());
       mTexture->SetInput(mMaskFilter->GetOutput());
     }
   }
 
   this->newDataSlot();
 }
-
-
 
 void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
@@ -265,46 +249,34 @@ void RealTimeStreamGraphics::receiveVisible(bool visible)
 
 void RealTimeStreamGraphics::newDataSlot()
 {
+//  std::cout << "RealTimeStreamGraphics::newDataSlot()" << std::endl;
   mPlaneActor->SetVisibility(mData!=NULL);
   if (!mData)
     return;
-  this->initializeSize(mData->getVtkImageData()->GetDimensions()[0], mData->getVtkImageData()->GetDimensions()[1]);
-
-  mPlaneActor->SetVisibility(mData->validData());
-
-  emit newData();
-}
-
-void RealTimeStreamGraphics::initializeSize(int imageWidth, int imageHeight)
-{
-  if (imageWidth==0 || imageHeight==0)
-  {
-    return;
-  }
 
   // apply a lut only if the input data is monochrome
   int numComp = mData->getVtkImageData()->GetNumberOfScalarComponents();
   bool is8bit = mData->getVtkImageData()->GetScalarType()==VTK_UNSIGNED_CHAR;
-//  std::cout << "numComp " << numComp << std::endl;
   if (numComp==1 && !is8bit)
     mTexture->MapColorScalarsThroughLookupTableOn();
   else
     mTexture->MapColorScalarsThroughLookupTableOff();
 
-  DoubleBoundingBox3D extent(mData->getVtkImageData()->GetExtent());
-  if (ssc::similar(extent.range()[0], 0.0) || ssc::similar(extent.range()[1], 0.0))
-    return;
-
+  // set the planesource where we have no probedata.
   DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
+  if (!ssc::similar(bounds.range()[0], 0.0) || !ssc::similar(bounds.range()[1], 0.0))
+  {
+    mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
+    mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
+    mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
+    mPlaneSource->GetOutput()->GetPointData()->Modified();
+    mPlaneSource->GetOutput()->Modified();
+  }
 
-  mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
-  mPlaneSource->SetPoint1(bounds.corner(1,0,0).begin());
-  mPlaneSource->SetPoint2(bounds.corner(0,1,0).begin());
+  mPlaneActor->SetVisibility(mData->validData());
 
-  mPlaneSource->GetOutput()->GetPointData()->Modified();
-  mPlaneSource->GetOutput()->Modified();
+  emit newData();
 }
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
