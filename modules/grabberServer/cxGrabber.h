@@ -9,26 +9,14 @@ class QMacCocoaViewContainer;
 
 namespace cx
 {
-
-enum PixelFormat{
-  TYPE_INT8    = 2,
-  TYPE_UINT8   = 3,
-  TYPE_INT16   = 4,
-  TYPE_UINT16  = 5,
-  TYPE_INT32   = 6,
-  TYPE_UINT32  = 7,
-  TYPE_FLOAT32 = 10,
-  TYPE_FLOAT64 = 11
-};
-
 class Frame
 {
 public:
   float mTimestamp;
   int mWidth;
   int mHeight;
-  PixelFormat mPixelFormat;
-  void* mFirstPixel;
+  int mPixelFormat;
+  char* mFirstPixel;
 };
 
 /**
@@ -52,7 +40,7 @@ public:
   virtual void stop() = 0;
 
 signals:
-  void frame(Frame frame);
+  void frame(Frame& frame);
   
 protected:
 };
@@ -84,7 +72,7 @@ public:
   virtual void stop();
 
   QMacCocoaViewContainer* getPreviewWidget(QWidget* parent);
-  void sendFrame(Frame frame);
+  void sendFrame(Frame& frame);
   
 private:
   bool findConnectedDevice();

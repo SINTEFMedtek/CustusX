@@ -28,20 +28,22 @@ public:
   GrabberServerWidget(QWidget* parent);
   virtual ~GrabberServerWidget();
 
+  MacGrabberPtr getGrabber();
+  OpenIGTLinkServerPtr getServer();
+
 private slots:
   void startServerSlot();
   void portChangedSlot(const QString& port);
+
 
 private:
   void updateInfoLabel();
 
   QWidget*              mPreviewParent;
   QPushButton*          mStartButton;
-  QLabel*               mInfoLabel;
   QLineEdit*            mPortEdit;
   
-//  GrabberPreviewWidget* mPreviewWidget;
-  OpenIGTLinkServer* mServer;
+  OpenIGTLinkServerPtr mServer;
   MacGrabberPtr mGrabber;
 };
 
