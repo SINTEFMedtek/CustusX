@@ -23,6 +23,9 @@ public:
     QString             mUsProbe;    ///<  probe
     QString             mRtSource;   ///<  realtime source
     QString             mConfigId;   ///<  config id
+    QString             mName;       ///<  Name of config set
+    int                     mImageWidth;      ///< Width of the used image format
+    int                     mImageHeight;     ///< Height of the used image format
     float                   mWidthDeg;   ///<  width in degrees
     float                   mDepth;      ///<  depth
     float                   mOffset;     ///<  Offset
