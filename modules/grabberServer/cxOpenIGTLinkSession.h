@@ -3,10 +3,10 @@
 
 #include <QObject>
 #include <QThread>
+#include <QMutex>
+#include <QTcpSocket>
 #include "igtlImageMessage.h"
 #include "cxGrabber.h"
-
-class QTcpSocket;
 
 namespace cx
 {
@@ -28,7 +28,7 @@ public:
   virtual ~OpenIGTLinkSession();
 
 signals:
-  void frame(Frame frame);
+  void frame(Frame& frame);
 
 protected:
   virtual void run();
@@ -59,19 +59,22 @@ public:
   virtual ~OpenIGTLinkSender();
 
 public slots:
-  void receiveFrameSlot(Frame frame);
+  void receiveFrameSlot(Frame& frame);
+  void sendOpenIGTLinkImageSlot();
+  void errorSlot(QAbstractSocket::SocketError);
 
 signals:
-  void frameUpdated(); //means that a new igtl::ImageMessage is in the message queue
+  void imageOnQueue(); //means that a new igtl::ImageMessage is in the message queue
 
 private:
-  igtl::ImageMessage::Pointer convertFrame(Frame frame);
-  void sendOpenIGTLinkImage(igtl::ImageMessage::Pointer message);
+  igtl::ImageMessage::Pointer convertFrame(Frame& frame);
+  void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
+  igtl::ImageMessage::Pointer getLastImageMessageFromQueue();
 
   QTcpSocket* mSocket;
 
-  //QMutex mImageMutex;
-  //std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
+  QMutex mImageMutex;
+  std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue;
 
 };
 
