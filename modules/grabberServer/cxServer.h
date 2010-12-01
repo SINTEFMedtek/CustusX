@@ -2,7 +2,7 @@
 #define CXSERVER_H_
 
 #include <QTcpServer>
-//#include "igtlImageMessage.h"
+#include <boost/shared_ptr.hpp>
 #include "cxGrabber.h"
 
 namespace cx
@@ -30,7 +30,7 @@ public:
   int getPort();
 
 signals:
-  void frame(Frame frame);
+  void frame(Frame& frame); /// emitted whenever a new frame arrived
 
 protected:
   virtual void incomingConnection(int socketDescriptor) = 0;
@@ -61,5 +61,8 @@ protected:
 
 private:
 };
+
+typedef boost::shared_ptr<class Server> ServerPtr;
+typedef boost::shared_ptr<class OpenIGTLinkServer> OpenIGTLinkServerPtr;
 }//namespace cx
 #endif /* CXSERVER_H_ */
