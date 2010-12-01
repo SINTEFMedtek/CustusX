@@ -62,7 +62,7 @@ void OpenIGTLinkServer::incomingConnection(int socketDescriptor)
   //create a thread
   OpenIGTLinkSession* session = new OpenIGTLinkSession(socketDescriptor);
   connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-  connect(this, SIGNAL(frame(Frame)), session, SIGNAL(frame(Frame)), Qt::DirectConnection);
+  connect(this, SIGNAL(frame(Frame&)), session, SIGNAL(frame(Frame&)), Qt::DirectConnection);
   session->start();
 }
 
