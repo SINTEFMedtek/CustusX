@@ -13,12 +13,11 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
     QWidget(parent),
     mPreviewParent(new QWidget(this)),
     mStartButton(new QPushButton("Start server", this)),
-    mInfoLabel(new QLabel("", this)),
     mPortEdit(new QLineEdit())
 
 {
   mGrabber = MacGrabberPtr(new MacGrabber());
-  mServer = new OpenIGTLinkServer();
+  mServer = OpenIGTLinkServerPtr(new OpenIGTLinkServer());
 
   mPortEdit->setText(qstring_cast(mServer->getPort()));
   connect(mPortEdit, SIGNAL(textChanged(const QString&)), this, SLOT(portChangedSlot(const QString&)));
@@ -27,7 +26,7 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
 
   connect(mStartButton, SIGNAL(clicked()), this, SLOT(startServerSlot()));
   
-  connect(mGrabber.get(), SIGNAL(frame(Frame)), mServer, SIGNAL(frame(Frame)), Qt::DirectConnection);
+  connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   QGridLayout* gridLayout = new QGridLayout();
@@ -36,11 +35,20 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
   gridLayout->addWidget(new QLabel("Port: "), 0, 0);
   gridLayout->addWidget(mPortEdit, 0, 1);
   gridLayout->addWidget(mStartButton, 0, 2);
-  //layout->addWidget(mInfoLabel); //TODO
 }
 
 GrabberServerWidget::~GrabberServerWidget()
 {}
+
+MacGrabberPtr GrabberServerWidget::getGrabber()
+{
+  return mGrabber;
+}
+
+OpenIGTLinkServerPtr GrabberServerWidget::getServer()
+{
+  return mServer;
+}
 
 void GrabberServerWidget::startServerSlot()
 {
@@ -56,7 +64,6 @@ void GrabberServerWidget::startServerSlot()
     mGrabber->stop();
     mStartButton->setText("Start server");
   }
-  //this->updateInfoLabel();
 }
 
 void GrabberServerWidget::portChangedSlot(const QString& port)
@@ -71,15 +78,5 @@ void GrabberServerWidget::portChangedSlot(const QString& port)
 
   mServer->setPort(newPort);
 }
-
-void GrabberServerWidget::updateInfoLabel()
-{
-  //TODO
-  //move to statusbar
-  /*
-  Print info about pixel format, height, width, bytes per row and data size...
-  */
-}
-
 
 }//Namespace cx
