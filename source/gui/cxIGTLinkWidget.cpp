@@ -15,6 +15,7 @@
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -24,6 +25,7 @@ namespace cx
 IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
     QWidget(parent)
 {
+  mServer = NULL;
   mView = NULL;
   mRenderTimer = NULL;
 
@@ -59,17 +61,17 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   mPortEdit->setText("18333");
   gridLayout->addWidget(mPortEdit, 1, 1);
 
-//  mLaunchServerButton = new QPushButton("launch image server", this);
-//  connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(launchServer()));
-//  gridLayout->addWidget(mLaunchServerButton, 2, 1);
+  mLaunchServerButton = new QPushButton("launch image server", this);
+  connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(launchServer()));
+  gridLayout->addWidget(mLaunchServerButton, 2, 1);
 
   mShowStreamButton = new QPushButton("show stream", this);
   connect(mShowStreamButton, SIGNAL(clicked()), this, SLOT(showStream()));
-  gridLayout->addWidget(mShowStreamButton, 2, 1);
+  gridLayout->addWidget(mShowStreamButton, 3, 1);
 
   mConnectButton = new QPushButton("Connect Server", this);
   connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnect()));
-  gridLayout->addWidget(mConnectButton, 3, 1);
+  gridLayout->addWidget(mConnectButton, 4, 1);
 
   toptopLayout->addStretch();
 }
@@ -135,8 +137,61 @@ void IGTLinkWidget::renderSlot()
 
 void IGTLinkWidget::launchServer()
 {
+  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
+  QStringList arguments;
+  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
 
+  if (!mServer)
+  {
+    mServer = new QProcess(this);
+    connect(mServer, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
+    connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
+  }
+
+  if (mServer->state()==QProcess::NotRunning)
+    mServer->start(program, arguments);
+  else if (mServer->state()==QProcess::Running)
+    mServer->close();
 }
+
+void IGTLinkWidget::serverProcessError(QProcess::ProcessError error)
+{
+  QString msg;
+  msg += "RT Source server reported an error: ";
+
+  switch (error)
+  {
+  case QProcess::FailedToStart: msg += "Failed to start"; break;
+  case QProcess::Crashed: msg += "Crashed"; break;
+  case QProcess::Timedout: msg += "Timed out"; break;
+  case QProcess::WriteError: msg += "Write Error"; break;
+  case QProcess::ReadError: msg += "Read Error"; break;
+  case QProcess::UnknownError: msg += "Unknown Error"; break;
+  default: msg += "Invalid error";
+  }
+
+  ssc::messageManager()->sendError(msg);
+}
+
+void IGTLinkWidget::serverProcessStateChanged(QProcess::ProcessState newState)
+{
+  if (newState==QProcess::Running)
+  {
+    ssc::messageManager()->sendInfo("Local RT Source Server running.");
+    mLaunchServerButton->setText("Close Local Server");
+  }
+  if (newState==QProcess::NotRunning)
+  {
+    ssc::messageManager()->sendInfo("Local RT Source Server not running.");
+    mLaunchServerButton->setText("Launch Local Server");
+  }
+  if (newState==QProcess::Starting)
+  {
+    ssc::messageManager()->sendInfo("Local RT Source Server starting.");
+    mLaunchServerButton->setText("Starting...");
+  }
+}
+
 
 void IGTLinkWidget::showStream()
 {
