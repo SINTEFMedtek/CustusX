@@ -32,12 +32,15 @@ private slots:
   void toggleConnect();
   void renderSlot();
   void serverStatusChangedSlot();
+//  void hostCurrentIndexChanged(const QString& text);
 
 private:
+  void updateHostHistory();
+
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
-  QLineEdit* mAddressEdit;
+  QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
   QPushButton* mConnectButton;
   QPushButton* mShowStreamButton;
