@@ -9,6 +9,7 @@ class QTcpSocket;
 #include "igtlMessageHeader.h"
 #include "igtlClientSocket.h"
 #include "igtlImageMessage.h"
+#include "cxRenderTimer.h"
 
 namespace ssc
 {
@@ -24,6 +25,7 @@ public:
 
 signals:
   void imageReceived();
+  void fps(double);
 
 protected:
   virtual void run();
@@ -38,6 +40,7 @@ private slots:
   void errorSlot(QAbstractSocket::SocketError);
 
 private:
+  cx::RenderTimer mFPSTimer;
   bool ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header);
   void addImageToQueue(igtl::ImageMessage::Pointer imgMsg);
 
