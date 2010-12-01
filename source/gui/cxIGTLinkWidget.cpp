@@ -7,6 +7,7 @@
 
 #include "vtkRenderWindow.h"
 
+#include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
 //#include "RTSource/cxIGTLinkClient.h"
@@ -41,9 +42,16 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   toptopLayout->addLayout(gridLayout);
   mGridLayout = gridLayout;
 
+  QStringList hostHistory = DataLocations::getSettings()->value("IGTLink/hostHistory").toStringList();
+  if (hostHistory.isEmpty())
+    hostHistory << "127.0.0.1";
+
   gridLayout->addWidget(new QLabel("IP Address", this), 0, 0);
-  mAddressEdit = new QLineEdit(this);
-  mAddressEdit->setText("127.0.0.1");
+  mAddressEdit = new QComboBox(this);
+  mAddressEdit->setEditable(true);
+  mAddressEdit->setInsertPolicy(QComboBox::InsertAtTop);
+  mAddressEdit->addItems(hostHistory);
+
   gridLayout->addWidget(mAddressEdit, 0, 1);
 
   gridLayout->addWidget(new QLabel("Port number", this), 1, 0);
@@ -68,26 +76,46 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 
 IGTLinkWidget::~IGTLinkWidget()
 {
+  QStringList hostHistory;
+  for (int i=0; i<mAddressEdit->count(); ++i)
+    hostHistory << mAddressEdit->itemText(i);
+  DataLocations::getSettings()->setValue("IGTLink/hostHistory", hostHistory);
+}
+
+void IGTLinkWidget::updateHostHistory()
+{
+  mAddressEdit->blockSignals(true);
+
+  if (mAddressEdit->currentIndex()!=0)
+  {
+    QString from = mAddressEdit->currentText();
+
+    mAddressEdit->removeItem(mAddressEdit->currentIndex());
+    mAddressEdit->insertItem(0, from);
+    mAddressEdit->setCurrentIndex(0);
+  }
+
+  while (mAddressEdit->count() > 5)
+  {
+    mAddressEdit->removeItem(mAddressEdit->count()-1);
+  }
+  mAddressEdit->blockSignals(false);
 }
 
 void IGTLinkWidget::showEvent(QShowEvent* event)
 {
   if (mRenderTimer)
     mRenderTimer->start();
-  std::cout << "render start" << std::endl;
-
 }
 
 void IGTLinkWidget::hideEvent(QHideEvent* event)
 {
   if (mRenderTimer)
     mRenderTimer->stop();
-  std::cout << "render stop" << std::endl;
 }
 
 void IGTLinkWidget::renderSlot()
 {
-//  std::cout << "arender" << std::endl;
   if (this->visibleRegion().isEmpty()) // needed to avoid drawing errors: checking visible is not enough
     return;
 
@@ -103,7 +131,6 @@ void IGTLinkWidget::renderSlot()
     mRenderLabel->setText(QString::number(mRenderTimerW.getFPS(),'f',0)+ "FPS");
     mRenderTimerW.reset();
   }
-//  std::cout << "render" << std::endl;
 }
 
 void IGTLinkWidget::launchServer()
@@ -120,8 +147,10 @@ void IGTLinkWidget::showStream()
   mView->setBackgoundColor(QColor("khaki"));
   mToptopLayout->addWidget(mView, 1);
   mRenderTimer = new QTimer(this);
+  std::cout << "start stream" << std::endl;
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
   mRenderTimer->setInterval(50);
+  mRenderTimer->start();
 
   ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(mRTSource);
@@ -136,7 +165,9 @@ void IGTLinkWidget::toggleConnect()
 {
   if (!mRTSource->connected())
   {
-    mRTSource->connectServer(mAddressEdit->text(), mPortEdit->text().toInt());
+    this->updateHostHistory();
+
+    mRTSource->connectServer(mAddressEdit->currentText(), mPortEdit->text().toInt());
   }
   else
   {

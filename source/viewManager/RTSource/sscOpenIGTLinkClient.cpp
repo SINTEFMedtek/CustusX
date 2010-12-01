@@ -148,6 +148,8 @@ void IGTLinkClient::run()
   // Create a message buffer to receive header
   mHeaderMsg = igtl::MessageHeader::New();
 
+  mFPSTimer.reset(2000);
+
   // run event loop
   this->exec();
 
@@ -182,6 +184,14 @@ void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
  */
 void IGTLinkClient::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
 {
+  mFPSTimer.beginRender();
+  mFPSTimer.endRender();
+  if (mFPSTimer.intervalPassed())
+  {
+    emit fps(mFPSTimer.getFPS());
+    mFPSTimer.reset(2000);
+  }
+
   QMutexLocker sentry(&mImageMutex);
   mMutexedImageMessageQueue.push_back(imgMsg);
   sentry.unlock();
