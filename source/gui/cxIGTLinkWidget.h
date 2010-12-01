@@ -34,6 +34,7 @@ private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
   void serverProcessError(QProcess::ProcessError error);
+  void browseLocalServerSlot();
 
 private:
   void updateHostHistory();
@@ -54,6 +55,7 @@ private:
   RenderTimer mRenderTimerW;
   QLabel* mRenderLabel;
 
+  QLineEdit* mLocalServerEdit;
   QProcess* mServer;
 };
 
