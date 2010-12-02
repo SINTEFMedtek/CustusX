@@ -639,10 +639,10 @@ QString Tool::getInstrumentScannerId() const
 
 QStringList Tool::getUSSectorConfigList() const
 {
-  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(this->getInstrumentScannerId()),
-      qstring_cast(this->getInstrumentId()));
-  QStringList configIdList = mXml->getConfigIdList(qstring_cast(this->getInstrumentScannerId()),
-      qstring_cast(this->getInstrumentId()), rtSourceList.at(0));
+  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
+  if (rtSourceList.empty())
+    return QStringList();
+  QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0));
   return configIdList;
 }
 
