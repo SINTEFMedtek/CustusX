@@ -18,9 +18,9 @@ ssc::ProbeSector createProbeDataFromConfiguration(ProbeXmlConfigParser::Configur
 
   ssc::ProbeImageData imageData;
   imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
-  imageData.mSize = QSize(config.mColumns, config.mRows);
+  imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
   // find the origin in a mm-based, lower-left-corner coord space:
-  ssc::Vector3D c(config.mOriginCol, config.mRows - config.mOriginRow - 1, 0);
+  ssc::Vector3D c(config.mOriginCol, config.mImageHeight - config.mOriginRow - 1, 0);
   c = multiply_elems(c, imageData.mSpacing);
   imageData.mOrigin_u = c;
 
