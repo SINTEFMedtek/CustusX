@@ -85,7 +85,6 @@ ENDIF(APPLE)
 SET(${LIBNAME}_MOC_HDRS
     cxMainWindow.h
     cxGrabberServerWidget.h
-    cxGrabberServerPropertiesWidget.h
     cxGrabber.h
     cxServer.h
     cxGrabberServer.h
@@ -106,7 +105,6 @@ SET(SOURCES
     main.cpp
     cxMainWindow.cpp
     cxGrabberServerWidget.cpp
-    cxGrabberServerPropertiesWidget.cpp
     cxGrabber.mm
     cxServer.cpp
     cxGrabberServer.cpp

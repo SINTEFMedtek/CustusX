@@ -6,25 +6,13 @@
 
 namespace cx
 {
+
+//=============================================================================
 GrabberServer::GrabberServer(QObject* parent) :
-  QObject(parent),
-  mReady(false)
-{
-  mGrabber = MacGrabberPtr(new MacGrabber());
-  connect(mGrabber.get(), SIGNAL(started()), this, SLOT(readySlot()));
-  connect(mGrabber.get(), SIGNAL(stopped()), this, SLOT(readySlot()));
-
-  mServer = OpenIGTLinkServerPtr(new OpenIGTLinkServer());
-  connect(mServer.get(), SIGNAL(open()), this, SLOT(readySlot()));
-  connect(mServer.get(), SIGNAL(closed()), this, SLOT(readySlot()));
-
-  connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
-}
-
-GrabberServer::~GrabberServer()
+    QObject(parent),
+    mReady(false)
 {
 }
-
 void GrabberServer::start()
 {
   mServer->start();
@@ -37,9 +25,9 @@ void GrabberServer::stop()
   mServer->stop();
 }
 
-QMacCocoaViewContainer* GrabberServer::getPreviewWidget(QWidget* parent)
+void GrabberServer::displayPreview(QWidget* parent)
 {
-  return mGrabber->getPreviewWidget(parent);
+  mGrabber->displayPreview(parent);
 }
 
 int GrabberServer::getPort()
@@ -55,8 +43,37 @@ void GrabberServer::setPort(int port)
 void GrabberServer::readySlot()
 {
   mReady =  mServer->isOpen() && mGrabber->isGrabbing();
-  //ssc::messageManager()->sendDebug("Server: "+qstring_cast(mServer->isOpen())+", Grabber: "+qstring_cast(mGrabber->isGrabbing())+", Ready: "+qstring_cast(mReady));
   emit ready(mReady);
 }
+
+
+//=============================================================================
+
+MacGrabberServer::MacGrabberServer(QObject* parent) :
+  GrabberServer(parent)
+{
+  this->connectGrabber();
+  this->connectServer();
+  connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
+}
+
+MacGrabberServer::~MacGrabberServer()
+{
+}
+
+void MacGrabberServer::connectGrabber()
+{
+  mGrabber = GrabberPtr(new MacGrabber());
+  connect(mGrabber.get(), SIGNAL(started()), this, SLOT(readySlot()));
+  connect(mGrabber.get(), SIGNAL(stopped()), this, SLOT(readySlot()));
+}
+
+void MacGrabberServer::connectServer()
+{
+  mServer = ServerPtr(new OpenIGTLinkServer());
+  connect(mServer.get(), SIGNAL(open()), this, SLOT(readySlot()));
+  connect(mServer.get(), SIGNAL(closed()), this, SLOT(readySlot()));
+}
+
 
 }//namespace cx
