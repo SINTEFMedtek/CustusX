@@ -4,7 +4,6 @@
  *  Created on: Oct 31, 2010
  *      Author: christiana
  */
-
 #ifndef SSCOPENIGTLINKRTSOURCE_H_
 #define SSCOPENIGTLINKRTSOURCE_H_
 
@@ -14,13 +13,12 @@
 #include <vector>
 class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
-
+typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 
 namespace ssc
 {
 
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
-
 
 /**Synchronize data with source,
  * provide data as a vtkImageData.
@@ -32,7 +30,7 @@ public:
   OpenIGTLinkRTSource();
   virtual ~OpenIGTLinkRTSource();
   virtual QString getUid() { return "us_openigtlink_source"; }
-  virtual QString getName() { return "US RT Stream over OpenIGTLink"; }
+  virtual QString getName();
   virtual vtkImageDataPtr getVtkImageData();
   virtual QDateTime getTimestamp();
   virtual bool connected() const;
@@ -52,7 +50,6 @@ public:
 
 
 signals:
-//  void newData();
   void serverStatusChanged();
 
 public:
@@ -62,21 +59,26 @@ private slots:
   void clientFinishedSlot();
   void imageReceivedSlot();
   void timeout();
+  void fpsSlot(double fps);
 
 private:
-//  void padBox(int* x, int* y) const;
   void setEmptyImage();
   std::vector<unsigned char> mTestData;
   void setTestImage();
+  vtkImageDataPtr createFilterARGB2RGBA(vtkImageDataPtr input);
+  void updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message);
 
   boost::array<unsigned char, 100> mZero;
   vtkImageImportPtr mImageImport;
+  vtkImageDataPtr mFilter_ARGB_RGBA;
   QDateTime mTimestamp;
+  vtkImageAlgorithmPtr mRedirecter;
   igtl::ImageMessage::Pointer mImageMessage;
   IGTLinkClientPtr mClient;
-
+  QString mDeviceName;
   bool mTimeout;
   QTimer* mTimeoutTimer;
+  double mFPS;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 

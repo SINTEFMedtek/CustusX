@@ -43,6 +43,8 @@ protected:
 private:
   RegistrationHistoryWidget();
   void debugDump();
+  template<class T>
+  QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 
   typedef std::map<QDateTime,QString> TimeMap;
   TimeMap getRegistrationTimes();
@@ -51,11 +53,19 @@ private:
   TimeMap::iterator findCurrentActiveIter(TimeMap& times);
   QGroupBox* mGroup;
   std::vector<ssc::RegistrationHistoryPtr> mHistories;
+  QAction* mRewindAction;
+  QAction* mRemoveAction;
+  QAction* mForwardAction;
+  QAction* mFastForwardAction;
 
-  QPushButton* mRewindButton;
-  QPushButton* mRemoveButton;
-  QPushButton* mForwardButton;
-  QPushButton* mFastForwardButton;
+  QLabel* mBehindLabel;
+  QLabel* mInFrontLabel;
+
+  //
+//  QPushButton* mRewindButton;
+//  QPushButton* mRemoveButton;
+//  QPushButton* mForwardButton;
+//  QPushButton* mFastForwardButton;
   std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };

@@ -12,6 +12,8 @@
 #include "sscTypeConversions.h"
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
+#include "sscProbeSector.h"
+#include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
 {
@@ -659,22 +661,9 @@ void Tool::setProbeSectorConfigurationString(QString configString)
       qstring_cast(this->getInstrumentId()), rtSourceList.at(0), configString);
   if(config.isEmpty())
     return;
-  double depthStart = config.mOffset;
-  double depthEnd = config.mDepth + depthStart;
-  if (config.mWidthDeg > 0.1) // Sector probe
-  {
-    double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
-    this->setUSProbeSector(probeSector);
-  }
-  else //Linear probe
-  {
-    int widtInPixels = config.mRightEdge - config.mLeftEdge;
-    double width = config.mPixelWidth * widtInPixels; //width in mm
-    ssc::ProbeSector probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
-    this->setUSProbeSector(probeSector);
-  }
 
+  ssc::ProbeSector probeSector = createProbeDataFromConfiguration(config);
+  this->setUSProbeSector(probeSector);
   mProbeSectorConfiguration = configString;
 }
 
@@ -745,5 +734,6 @@ void Tool::writeCalibrationToFile()
 
   ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
 }
+
 
 }//namespace cx

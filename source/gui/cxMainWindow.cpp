@@ -13,7 +13,6 @@
 #include "cxCustomStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
-#include "cxConsoleWidget.h"
 #include "cxManualRegistrationOffsetWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
@@ -53,7 +52,7 @@ namespace cx
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
   mStandard3DViewActions(NULL),
-  mConsoleWidget(new ConsoleWidget(this)),
+  mConsoleWidget(new ssc::ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
@@ -89,7 +88,7 @@ MainWindow::MainWindow() :
   this->populateVisualizationMethodsWidget();
   this->populateCalibrationMethodsWidget();
 
-  this->addAsDockWidget(new IGTLinkWidget(this), "Utililty");
+  this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
