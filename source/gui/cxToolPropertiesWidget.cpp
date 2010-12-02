@@ -30,6 +30,7 @@ namespace cx
 ActiveToolStringDataAdapter::ActiveToolStringDataAdapter()
 {
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SIGNAL(changed()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SIGNAL(changed()));
 }
 
 QString ActiveToolStringDataAdapter::getValueName() const
@@ -90,6 +91,60 @@ QWidget(parent)
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
+ActiveToolConfigurationStringDataAdapter::ActiveToolConfigurationStringDataAdapter()
+{
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+}
+void ActiveToolConfigurationStringDataAdapter::dominantToolChanged()
+{
+  if (mTool)
+    disconnect(mTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SIGNAL(changed()));
+
+  mTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+
+  if (mTool)
+    connect(mTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SIGNAL(changed()));
+
+  emit changed();
+}
+QString ActiveToolConfigurationStringDataAdapter::getValueName() const
+{
+  return "Probe Config";
+}
+bool ActiveToolConfigurationStringDataAdapter::setValue(const QString& value)
+{
+  if (!mTool)
+    return false;
+  mTool->setProbeSectorConfigurationString(value);
+  return true;
+}
+QString ActiveToolConfigurationStringDataAdapter::getValue() const
+{
+  if (!mTool)
+    return "";
+  return mTool->getProbeSectorConfigurationString();
+}
+QString ActiveToolConfigurationStringDataAdapter::getHelp() const
+{
+  return "Select a probe configuration for the active tool.";
+}
+QStringList ActiveToolConfigurationStringDataAdapter::getValueRange() const
+{
+  if (!mTool)
+    return QStringList();
+  return mTool->getUSSectorConfigList();
+}
+QString ActiveToolConfigurationStringDataAdapter::convertInternal2Display(QString internal)
+{
+  if (!mTool)
+    return "<no tool>";
+  return mTool->getNameOfProbeSectorConfiguration(internal); ///< get a name for the given configuration
+}
+
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+/// -------------------------------------------------------
+
   
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   QWidget(parent)
@@ -128,12 +183,16 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   //TODO: Add enable/disable US Probe visualization in 2D/3D?
   //TODO: Only show US probe properties if tool is US Probe
 
-  mUSSectorConfigBox = new QComboBox(this);
-  mUSSectorConfigLabel = new QLabel("Probe sector configuration:", this);
-  mToptopLayout->addWidget(mUSSectorConfigLabel);
+  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New());
   mToptopLayout->addWidget(mUSSectorConfigBox);
-  mUSSectorConfigLabel->hide();
   mUSSectorConfigBox->hide();
+
+//  mUSSectorConfigBox = new QComboBox(this);
+//  mUSSectorConfigLabel = new QLabel("Probe sector configuration:", this);
+//  mToptopLayout->addWidget(mUSSectorConfigLabel);
+//  mToptopLayout->addWidget(mUSSectorConfigBox);
+//  mUSSectorConfigLabel->hide();
+//  mUSSectorConfigBox->hide();
 
 //  QGroupBox* group2D = new QGroupBox(this);
 //  group2D->setTitle("2D properties");
@@ -161,7 +220,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(updateSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(updateSlot()));
 
-  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
+//  connect(mUSSectorConfigBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configurationChangedSlot(int)));
 
 
   dominantToolChangedSlot();
@@ -177,32 +236,44 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
 {
   ToolPtr cxTool = boost::shared_dynamic_cast<Tool>(mActiveTool);
 
+
   if (mActiveTool)
     disconnect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
-  if (cxTool)
-    disconnect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
+//  if (cxTool)
+//    disconnect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
   if(mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
   {
-    this->populateUSSectorConfigBox();
-    mUSSectorConfigLabel->show();
+//    if (cxTool)
+//      std::cout << "config: " << cxTool->getProbeSectorConfigurationString() << std::endl;
+//    std::cout << "width: " << mActiveTool->getProbeSector().mWidth << std::endl;
+//    std::cout << "dstart: " << mActiveTool->getProbeSector().mDepthStart<< std::endl;
+//    std::cout << "dend: " << mActiveTool->getProbeSector().mDepthEnd << std::endl;
+//    std::cout << "type: " << mActiveTool->getProbeSector().mType << std::endl;
+//    std::cout << "w: " << mActiveTool->getProbeSector().mImage.mSize.width() << std::endl;
+//    std::cout << "h: " << mActiveTool->getProbeSector().mImage.mSize.height() << std::endl;
+//    std::cout << "c: " << mActiveTool->getProbeSector().mImage.mOrigin_u << std::endl;
+//    std::cout << "s: " << mActiveTool->getProbeSector().mImage.mSpacing << std::endl;
+
+    //    this->populateUSSectorConfigBox();
+//    mUSSectorConfigLabel->show();
     mUSSectorConfigBox->show();
     mToptopLayout->update();
   }
   else
   {
-    mUSSectorConfigBox->clear();
-    mUSSectorConfigLabel->hide();
+//    mUSSectorConfigBox->clear();
+//    mUSSectorConfigLabel->hide();
     mUSSectorConfigBox->hide();
     mToptopLayout->update();
   }
 
   if (mActiveTool)
     connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
-  if (cxTool)
-    connect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
+//  if (cxTool)
+//    connect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 }
 
 void ToolPropertiesWidget::referenceToolChangedSlot()
@@ -251,41 +322,41 @@ void ToolPropertiesWidget::updateSlot()
   mTrackingSystemStatusLabel->setText("Tracking status: " + status);
 }
 
-void ToolPropertiesWidget::populateUSSectorConfigBox()
-{
-  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+//void ToolPropertiesWidget::populateUSSectorConfigBox()
+//{
+//  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+//
+//  mUSSectorConfigBox->blockSignals(true);
+//  mUSSectorConfigBox->clear();
+//  mUSSectorConfigBox->insertItems(0, tool->getUSSectorConfigList());
+//  this->toolsSectorConfigurationChangedSlot();//Read the tool's value into the combo box
+//  mUSSectorConfigBox->blockSignals(false);
+//}
 
-  mUSSectorConfigBox->blockSignals(true);
-  mUSSectorConfigBox->clear();
-  mUSSectorConfigBox->insertItems(0, tool->getUSSectorConfigList());
-  this->toolsSectorConfigurationChangedSlot();//Read the tool's value into the combo box
-  mUSSectorConfigBox->blockSignals(false);
-}
+//void ToolPropertiesWidget::configurationChangedSlot(int index)
+//{
+//  if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
+//    return;
+//
+//  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+//  tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
+//}
 
-void ToolPropertiesWidget::configurationChangedSlot(int index)
-{
-  if(mActiveTool->getType() != ssc::Tool::TOOL_US_PROBE)//Only draw sectors for tools defined as US probes
-    return;
-
-  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
-  tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
-}
-
-void ToolPropertiesWidget::toolsSectorConfigurationChangedSlot()
-{
-  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
-  //Only set tool's configurationString if tool don't have one
-  int index = 0;
-  if (!tool->getProbeSectorConfigurationString().isEmpty())
-  {
-    index = mUSSectorConfigBox->findText(tool->getProbeSectorConfigurationString());
-    if (index != -1)
-      mUSSectorConfigBox->setCurrentIndex(index);
-  }
-  // Can't use tool's current value if index is -1. Use default instead
-  if (tool->getProbeSectorConfigurationString().isEmpty() || (index == -1))
-    tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
-}
+//void ToolPropertiesWidget::toolsSectorConfigurationChangedSlot()
+//{
+//  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mActiveTool);
+//  //Only set tool's configurationString if tool don't have one
+//  int index = 0;
+//  if (!tool->getProbeSectorConfigurationString().isEmpty())
+//  {
+//    index = mUSSectorConfigBox->findText(tool->getProbeSectorConfigurationString());
+//    if (index != -1)
+//      mUSSectorConfigBox->setCurrentIndex(index);
+//  }
+//  // Can't use tool's current value if index is -1. Use default instead
+//  if (tool->getProbeSectorConfigurationString().isEmpty() || (index == -1))
+//    tool->setProbeSectorConfigurationString(mUSSectorConfigBox->currentText());
+//}
 
 void ToolPropertiesWidget::showEvent(QShowEvent* event)
 {
