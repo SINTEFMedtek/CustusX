@@ -26,7 +26,7 @@ public:
 private:
   GrabberServerWidget* mGrabberServerWidget;
   ssc::ConsoleWidget*   mConsoleWidget;
-  GrabberServerPropertiesWidget*  mPropertiesWidget;
+  //GrabberServerPropertiesWidget*  mPropertiesWidget;
 };
 
 }
