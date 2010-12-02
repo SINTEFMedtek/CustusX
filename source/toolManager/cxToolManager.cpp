@@ -167,7 +167,9 @@ void ToolManager::initialize()
     ssc::messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
+  #ifndef _WINDOWS
   this->createSymlink();
+  #endif
   mTracker->open();
   mTracker->attachTools(mConfiguredTools);
 }
@@ -183,6 +185,7 @@ void ToolManager::uninitialize()
   mTracker->close();
 }
 
+#ifndef _WINDOWS
 /** Assume that IGSTK requires the file /Library/CustusX/igstk.links/cu.CustusX.dev0
  *  as a rep for the HW connection. Also assume that directory is created with full
  *  read/write access (by installer or similar).
@@ -203,7 +206,8 @@ void ToolManager::createSymlink()
   QDir devDir("/dev/");
 
   QStringList filters;
-  filters << "cu.usbserial*" << "cu.KeySerial*"; //NOTE: only works with current hardware using aurora or polaris.
+  // cu* applies to Mac, ttyUSB applies to Linux
+  filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "ttyUSB*" ; //NOTE: only works with current hardware using aurora or polaris.
   //filters << "cu.usbserial*" << "cu.USA19H*"; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
 
@@ -240,7 +244,10 @@ void ToolManager::createSymlink()
 
 QFileInfo ToolManager::getSymlink() const
 {
-  QDir linkDir("/Library/CustusX/igstk.links");
+  QString name("/Library/CustusX/igstk.links");
+//  QDir linkDir("/Library/CustusX/igstk.links");
+  QDir linkDir(name);
+  QDir::root().mkdir(name); // only works if run with sudo
   QString linkFile = linkDir.path() + "/cu.CustusX.dev0";
   return QFileInfo(linkDir, linkFile);
 }
@@ -252,6 +259,7 @@ void ToolManager::cleanupSymlink()
   ssc::messageManager()->sendInfo("Cleaning up symlinks.");
   QFile(this->getSymlink().absoluteFilePath()).remove();
 }
+#endif //_WINDOWS
 
 void ToolManager::startTracking()
 {
@@ -707,14 +715,14 @@ ssc::ManualToolPtr ToolManager::getManualTool()
 {
   return mManualTool;
 }
-
-void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
-{
-  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
-  if (tool)
-  {
-    tool->setUSProbeSector(probeSector);
-  }
-}
+//
+//void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
+//{
+//  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
+//  if (tool)
+//  {
+//    tool->setUSProbeSector(probeSector);
+//  }
+//}
 
 }//namespace cx

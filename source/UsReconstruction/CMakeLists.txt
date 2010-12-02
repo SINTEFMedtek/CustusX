@@ -60,6 +60,7 @@ target_link_libraries( sscUsReconstructionLib
     SSC
     cxCommon 
     thunder 
+    toolManager
     ITKCommon)
 # =========================================================
 
