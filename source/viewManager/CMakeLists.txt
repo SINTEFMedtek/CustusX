@@ -5,6 +5,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxView3D.h
     cxViewWrapper2D.h
     cxViewWrapper3D.h
+    cxViewWrapperRTStream.h
     cxViewManager.h
     cxViewWrapper.h
     cxViewGroup.h
@@ -12,9 +13,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxInteractiveClipper.h
     cxInteractiveCropper.h
     cxCameraControl.h
-      RTSource/sscOpenIGTLinkClient.h
-  RTSource/sscOpenIGTLinkRTSource.h
-  RTSource/sscRT2DRep.h
+    RTSource/sscOpenIGTLinkClient.h
+    RTSource/sscOpenIGTLinkRTSource.h
 )
 
 SET ( ${LIB}_viewManager
@@ -25,6 +25,8 @@ SET ( ${LIB}_viewManager
     cxView3D.h
     cxViewWrapper2D.cpp
     cxViewWrapper2D.h
+    cxViewWrapperRTStream.cpp
+    cxViewWrapperRTStream.h
     cxViewWrapper3D.cpp
     cxViewWrapper3D.h
     cxViewWrapper.h
@@ -51,10 +53,6 @@ SET ( ${LIB}_viewManager
     RTSource/sscOpenIGTLinkClient.cpp
     RTSource/sscOpenIGTLinkRTSource.h
     RTSource/sscOpenIGTLinkRTSource.cpp
-    RTSource/sscRT2DRep.h
-    RTSource/sscRT2DRep.cpp
-    RTSource/ultrasoundsectorsource.h
-    RTSource/ultrasoundsectorsource.cpp
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
