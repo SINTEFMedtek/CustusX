@@ -69,9 +69,9 @@ ENDIF(APPLE)
 
 #QuickTime
 #---------
-IF(APPLE)
-  FIND_LIBRARY(QUICKTIME_LIBRARY QuickTime)
-ENDIF(APPLE)
+#IF(APPLE)
+#  FIND_LIBRARY(QUICKTIME_LIBRARY QuickTime)
+#ENDIF(APPLE)
 
 #Quartz
 #------
@@ -88,6 +88,7 @@ SET(${LIBNAME}_MOC_HDRS
     cxGrabberServerPropertiesWidget.h
     cxGrabber.h
     cxServer.h
+    cxGrabberServer.h
     cxOpenIGTLinkSession.h
 )
 
@@ -108,6 +109,7 @@ SET(SOURCES
     cxGrabberServerPropertiesWidget.cpp
     cxGrabber.mm
     cxServer.cpp
+    cxGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
     ${${LIBNAME}_MOC_HDRS}
     ${${LIBNAME}_MOC_SRCS}
@@ -133,7 +135,7 @@ SET ( LINK_LIBRARIES
   ${QT_LIBRARIES}
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
-  ${QUICKTIME_LIBRARY}
+  #${QUICKTIME_LIBRARY}
   ${QUARTZCORE_LIBRARY}
 )
 
