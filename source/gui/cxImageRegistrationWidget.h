@@ -36,7 +36,7 @@ signals:
 protected slots:
   virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed
   void addLandmarkButtonClickedSlot(); ///< reacts when the Add Landmark button is clicked
-  void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
+  virtual void editLandmarkButtonClickedSlot(); ///< reacts when the Edit Landmark button is clicked
   void removeLandmarkButtonClickedSlot(); ///< reacts when the Remove Landmark button is clicked
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider

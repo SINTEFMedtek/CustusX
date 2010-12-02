@@ -191,7 +191,6 @@ void Tool::set_prMt(const ssc::Transform3D& prMt)
 
 void Tool::toolTransformCallback(const itk::EventObject &event)
 {
-  //std::cout << "Tool " << mUid << " got an event..." << std::endl;
   if(igstk::CoordinateSystemTransformToEvent().CheckEvent(&event))
   {
     const igstk::CoordinateSystemTransformToEvent *transformEvent;
@@ -640,10 +639,10 @@ QString Tool::getInstrumentScannerId() const
 
 QStringList Tool::getUSSectorConfigList() const
 {
-  QStringList rtSourceList = mXml->getRtSourceList(qstring_cast(this->getInstrumentScannerId()),
-      qstring_cast(this->getInstrumentId()));
-  QStringList configIdList = mXml->getConfigIdList(qstring_cast(this->getInstrumentScannerId()),
-      qstring_cast(this->getInstrumentId()), rtSourceList.at(0));
+  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
+  if (rtSourceList.empty())
+    return QStringList();
+  QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0));
   return configIdList;
 }
 
@@ -678,7 +677,6 @@ bool Tool::hasReferencePointWithId(int id)
   bool retval = false;
   if(!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000,0.000,0.000))))
       retval = true;
-  std::cout << "Reference point with id " << string_cast(id) << " has coords " << string_cast(this->getReferencePoints()[id]) << " returning "<< string_cast(retval)<<std::endl;
   return retval;
 }
 
@@ -721,8 +719,6 @@ void Tool::writeCalibrationToFile()
   }
   ssc::Transform3D sMt;
   mCalibrationTransform.ExportTransform(*(sMt.matrix().GetPointer()));
-
-  ssc::messageManager()->sendDebug("Calibration file "+calibrationFile.fileName() +" would now contain: \n"+qstring_cast(sMt));
 
   if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
