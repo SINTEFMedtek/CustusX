@@ -92,6 +92,7 @@ protected slots:
   void trackerInitializedSlot(bool);
   void trackerTrackingSlot(bool);
   void toolInitialized(bool);
+  void updateReferenceTransformSlot();
 
 protected:
   typedef ssc::ToolManager::ToolMap::iterator ToolMapIter;
