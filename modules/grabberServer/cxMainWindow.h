@@ -3,11 +3,10 @@
 
 #include <QMainWindow>
 #include "sscConsoleWidget.h"
-#include "cxGrabberServerPropertiesWidget.h"
+#include "cxGrabberServerWidget.h"
 
 namespace cx
 {
-class GrabberServerWidget;
 /**
  * \class MainWindow
  *
@@ -26,7 +25,6 @@ public:
 private:
   GrabberServerWidget* mGrabberServerWidget;
   ssc::ConsoleWidget*   mConsoleWidget;
-  //GrabberServerPropertiesWidget*  mPropertiesWidget;
 };
 
 }
