@@ -12,6 +12,7 @@
 class QDomNode;
 #include <QString>
 #include "sscDefinitions.h"
+#include "sscView.h"
 
 namespace cx
 {
@@ -51,10 +52,11 @@ public:
    */
   struct ViewData
   {
-    ViewData() : mGroup(-1), mPlane(ssc::ptCOUNT), mRegion(-1,-1,1,1) {}
-    ViewData(int row, int col, int rowSpan=1, int colSpan=1) : mGroup(-1), mPlane(ssc::ptCOUNT), mRegion(row,col,rowSpan,colSpan) {}
+    ViewData() : mGroup(-1), mPlane(ssc::ptCOUNT), mType(ssc::View::VIEW), mRegion(-1,-1,1,1) {}
+    ViewData(int row, int col, int rowSpan=1, int colSpan=1) : mGroup(-1), mPlane(ssc::ptCOUNT), mType(ssc::View::VIEW), mRegion(row,col,rowSpan,colSpan) {}
     int mGroup; ///< what group to connect to. -1 means not set.
     ssc::PLANE_TYPE mPlane; ///< ptNOPLANE means 3D
+    ssc::View::Type mType;
     LayoutRegion mRegion;
 
     void addXml(QDomNode node) const; ///< save state to xml
@@ -72,6 +74,7 @@ public:
   void setName(const QString& name) { mName = name; }
   void resetUid(const QString& uid);
   void setView(int group, ssc::PLANE_TYPE type, LayoutRegion region);
+  void setView(int group, ssc::View::Type type, LayoutRegion region);
   ViewData& get(LayoutPosition pos);
   iterator begin() { return mView.begin(); }
   iterator end()  { return mView.end(); }

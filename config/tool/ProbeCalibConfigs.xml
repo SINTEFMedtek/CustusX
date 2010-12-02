@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-   <Version>3.1.0</Version>
+   <Version>3.2.0</Version>
    <USScanner>
       <Name>Vivid 7 - Karkirurgen</Name>
       <USProbe>
@@ -10,10 +10,15 @@
          <Notes>Image size: Small (default)</Notes>
          <RTSource>
             <Name>VGA</Name>
-            <DefaultConfig>Width: Max, Depth: 50 mm</DefaultConfig>
+            <DefaultConfig>WidthMaxDepth40</DefaultConfig>
+            <ImageSize>
+               <Width>800</Width>
+               <Height>600</Height>
+            </ImageSize>
             <HorizontalOffset>-30</HorizontalOffset>
             <Config>
-               <ID>Width: Max, Depth: 40 mm</ID>
+               <ID>WidthMaxDepth40</ID>
+               <Name>Width: Max, Depth: 40 mm</Name>
                <WidthDeg>0</WidthDeg>
                <Depth>358</Depth>
                <Offset>0</Offset>
@@ -50,7 +55,8 @@
                </PixelSize>
             </Config>
             <Config>
-               <ID>Width: Max, Depth: 50 mm</ID>
+               <ID>WidthMaxDepth50</ID>
+               <Name>Width: Max, Depth: 50 mm</Name>
                <WidthDeg>0</WidthDeg>
                <Depth>359</Depth>
                <Offset>0</Offset>
@@ -87,7 +93,8 @@
                </PixelSize>
             </Config>
             <Config>
-               <ID>Width: Max, Depth: 60 mm</ID>
+               <ID>WidthMaxDepth60</ID>
+               <Name>Width: Max, Depth: 60 mm</Name>
                <WidthDeg>0</WidthDeg>
                <Depth>359</Depth>
                <Offset>0</Offset>
@@ -133,9 +140,14 @@
          <RTSource>
             <Name>VGA</Name>
             <DefaultConfig>Width: Max, Depth: 25 mm</DefaultConfig>
+            <ImageSize>
+               <Width>800</Width>
+               <Height>600</Height>
+            </ImageSize>
             <HorizontalOffset>-30</HorizontalOffset>
             <Config>
-               <ID>Width: Max, Depth: 20 mm</ID>
+               <ID>WidthMaxDepth20</ID>
+               <Name>Width: Max, Depth: 20 mm</Name>
                <WidthDeg>0</WidthDeg>
                <Depth>389</Depth>
                <Offset>0</Offset>
@@ -172,7 +184,8 @@
                </PixelSize>
             </Config>
             <Config>
-               <ID>Width: Max, Depth: 25 mm</ID>
+               <ID>WidthMaxDepth25</ID>
+               <Name>Width: Max, Depth: 25 mm</Name>
                <WidthDeg>0</WidthDeg>
                <Depth>389</Depth>
                <Offset>0</Offset>
@@ -209,7 +222,8 @@
                </PixelSize>
             </Config>
             <Config>
-               <ID>Width: Max, Depth: 30 mm</ID>
+               <ID>WidthMaxDepth30</ID>
+               <Name>Width: Max, Depth: 30 mm</Name>
                <WidthDeg>0</WidthDeg>
                <Depth>389</Depth>
                <Offset>0</Offset>
@@ -251,16 +265,59 @@
    <USScanner>
       <Name>Hitachi</Name>
       <USProbe>
-         <Name>EUP-OL531</Name>
+         <Name>OL531</Name>
          <Type>CurvedLinearArray</Type>
-         <DefaultRTSource>VHS</DefaultRTSource>
-         <Notes/>
+         <DefaultRTSource>S-Video</DefaultRTSource>
+         <Notes>If the entire ultrasound plane is not visible, try turning off the acquisition program, unplug and replug the videograbber and restart the acquistion program.</Notes>
          <RTSource>
-            <Name>VHS</Name>
-            <DefaultConfig>Custom setting, Width: Max, Depth: 65 mm</DefaultConfig>
-            <HorizontalOffset>-30</HorizontalOffset>
+            <Name>S-Video</Name>
+            <DefaultConfig>Width6Depth40</DefaultConfig>
+            <ImageSize>
+               <Width>768</Width>
+               <Height>576</Height>
+            </ImageSize>
+            <HorizontalOffset>0</HorizontalOffset>
             <Config>
-               <ID>Custom setting, Width: Max, Depth: 65 mm</ID>
+               <ID>Width6Depth65</ID>
+               <Name>Width: 6, Depth: 40 mm</Name>
+               <WidthDeg>116.64</WidthDeg>
+               <Depth>425.6361</Depth>
+               <Offset>108.8338</Offset>
+               <Origin>
+                  <Col>436.2601</Col>
+                  <Row>8.046</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>343.6432</Col>
+                  <Row>65.2027</Row>
+               </Corner>
+               <Corner>
+                  <Col>-18.5708</Col>
+                  <Row>288.736</Row>
+               </Corner>
+               <Corner>
+                  <Col>890.4292</Col>
+                  <Row>289.8057</Row>
+               </Corner>
+               <Corner>
+                  <Col>528.6432</Col>
+                  <Row>65.58</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>182</Left>
+                  <Right>713</Right>
+                  <Top>66</Top>
+                  <Bottom>488</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.090314</Width>
+                  <Height>0.093677</Height>
+               </PixelSize>
+            </Config>
+            <Config>
+               <ID>Width6Depth65</ID>
+               <Name>Width: 6, Depth: 65 mm</Name>
                <WidthDeg>117.2333</WidthDeg>
                <Depth>427.4111</Depth>
                <Offset>66.9615</Offset>
@@ -294,6 +351,82 @@
                <PixelSize>
                   <Width>0.15061</Width>
                   <Height>0.15622</Height>
+               </PixelSize>
+            </Config>
+            <Config>
+               <ID>Width6Depth85</ID>
+               <Name>Width: 6, Depth: 85 mm</Name>
+               <WidthDeg>116.64</WidthDeg>
+               <Depth>427.1412</Depth>
+               <Offset>51.2407</Offset>
+               <Origin>
+                  <Col>436.964</Col>
+                  <Row>36.8595</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>393.3584</Col>
+                  <Row>63.7698</Row>
+               </Corner>
+               <Corner>
+                  <Col>29.8636</Col>
+                  <Row>288.0936</Row>
+               </Corner>
+               <Corner>
+                  <Col>843.8636</Col>
+                  <Row>288.4186</Row>
+               </Corner>
+               <Corner>
+                  <Col>480.3584</Col>
+                  <Row>64.1089</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>182</Left>
+                  <Right>713</Right>
+                  <Top>64</Top>
+                  <Bottom>488</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.19186</Width>
+                  <Height>0.199</Height>
+               </PixelSize>
+            </Config>
+            <Config>
+               <ID>Width6Depth125</ID>
+               <Name>Width: 6, Depth: 125 mm</Name>
+               <WidthDeg>116.64</WidthDeg>
+               <Depth>426.184</Depth>
+               <Offset>34.8407</Offset>
+               <Origin>
+                  <Col>436.5911</Col>
+                  <Row>44.9252</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>406.9419</Col>
+                  <Row>63.2227</Row>
+               </Corner>
+               <Corner>
+                  <Col>44.2617</Col>
+                  <Row>287.0437</Row>
+               </Corner>
+               <Corner>
+                  <Col>828.2617</Col>
+                  <Row>288.1081</Row>
+               </Corner>
+               <Corner>
+                  <Col>465.9419</Col>
+                  <Row>63.6977</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>182</Left>
+                  <Right>713</Right>
+                  <Top>64</Top>
+                  <Bottom>488</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.28218</Width>
+                  <Height>0.29268</Height>
                </PixelSize>
             </Config>
          </RTSource>
