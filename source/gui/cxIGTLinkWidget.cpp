@@ -41,6 +41,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   mServer = NULL;
   mView = NULL;
   mRenderTimer = NULL;
+  mAutoLaunchIsTried = false;
 
   this->setObjectName("IGTLinkWidget");
   this->setWindowTitle("IGTLink Test");
@@ -59,7 +60,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 
   QStringList hostHistory = DataLocations::getSettings()->value("IGTLink/hostHistory").toStringList();
   if (hostHistory.isEmpty())
-    hostHistory << "127.0.0.1";
+    hostHistory << "Localhost";
 
   gridLayout->addWidget(new QLabel("IP Address", this), 0, 0);
   mAddressEdit = new QComboBox(this);
@@ -88,17 +89,20 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   mLocalServerEdit->setText(localServerName);
   gridLayout->addWidget(mLocalServerEdit, 2, 1);
 
+  QHBoxLayout* buttonsLayout = new QHBoxLayout;
+  toptopLayout->addLayout(buttonsLayout);
+
   mLaunchServerButton = new QPushButton("Launch Local Server", this);
-  connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(launchServer()));
-  gridLayout->addWidget(mLaunchServerButton, 3, 1);
+  connect(mLaunchServerButton, SIGNAL(clicked()), this, SLOT(toggleLaunchServer()));
+  buttonsLayout->addWidget(mLaunchServerButton);
 
   mShowStreamButton = new QPushButton("Show Stream View", this);
   connect(mShowStreamButton, SIGNAL(clicked()), this, SLOT(showStream()));
-  gridLayout->addWidget(mShowStreamButton, 4, 1);
+  buttonsLayout->addWidget(mShowStreamButton);
 
   mConnectButton = new QPushButton("Connect Server", this);
-  connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnect()));
-  gridLayout->addWidget(mConnectButton, 5, 1);
+  connect(mConnectButton, SIGNAL(clicked()), this, SLOT(toggleConnectServer()));
+  toptopLayout->addWidget(mConnectButton);
 
   toptopLayout->addStretch();
 }
@@ -190,8 +194,14 @@ void IGTLinkWidget::launchServer()
 
   if (mServer->state()==QProcess::NotRunning)
     mServer->start(program, arguments);
-  else if (mServer->state()==QProcess::Running)
-    mServer->close();
+}
+
+void IGTLinkWidget::toggleLaunchServer()
+{
+  if (( mServer )&&( mServer->state()==QProcess::Running ))
+      mServer->close();
+  else
+    this->launchServer();
 }
 
 void IGTLinkWidget::serverProcessError(QProcess::ProcessError error)
@@ -256,18 +266,46 @@ void IGTLinkWidget::showStream()
   mToptopLayout->addWidget(mRenderLabel);
 }
 
-void IGTLinkWidget::toggleConnect()
+void IGTLinkWidget::toggleConnectServer()
 {
   if (!mRTSource->connected())
   {
-    this->updateHostHistory();
-
-    mRTSource->connectServer(mAddressEdit->currentText(), mPortEdit->text().toInt());
+    this->connectServer();
+    QTimer::singleShot(1000, this, SLOT(autoLaunchLocalServer()));
   }
   else
   {
     mRTSource->disconnectServer();
   }
+
+  mAutoLaunchIsTried = false;
+}
+
+void IGTLinkWidget::connectServer()
+{
+  if (!mRTSource->connected())
+  {
+    this->updateHostHistory();
+    mRTSource->connectServer(mAddressEdit->currentText(), mPortEdit->text().toInt());
+  }
+}
+
+/**Use this slot to autolaunch the local server if a connection attempt fails,
+ * and a local server is defined, and the host is set to local.
+ */
+void IGTLinkWidget::autoLaunchLocalServer()
+{
+  if (mRTSource->connected()) // connected: everything OK.
+    return;
+  if (mAutoLaunchIsTried)
+    return;
+  if (( mAddressEdit->currentText()!="127.0.0.1" )&&( mAddressEdit->currentText()!="Localhost" ))
+    return;
+
+  ssc::messageManager()->sendInfo("Connect server failed: attempting to launch local server and reconnect.");
+  this->launchServer();
+  QTimer::singleShot(1000, this, SLOT(connectServer()));
+  mAutoLaunchIsTried = true;
 }
 
 void IGTLinkWidget::serverStatusChangedSlot()

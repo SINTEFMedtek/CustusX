@@ -27,14 +27,17 @@ public:
   virtual ~IGTLinkWidget();
 
 private slots:
+  void toggleLaunchServer();
   void launchServer();
   void showStream();
-  void toggleConnect();
+  void toggleConnectServer();
+  void connectServer();
   void renderSlot();
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
   void serverProcessError(QProcess::ProcessError error);
   void browseLocalServerSlot();
+  void autoLaunchLocalServer();
 
 private:
   void updateHostHistory();
@@ -57,6 +60,7 @@ private:
 
   QLineEdit* mLocalServerEdit;
   QProcess* mServer;
+  bool mAutoLaunchIsTried;
 };
 
 }//end namespace cx
