@@ -23,24 +23,48 @@ namespace cx
 class GrabberServerWidget : public QWidget
 {
   Q_OBJECT
+
 public:
   GrabberServerWidget(QWidget* parent);
-  virtual ~GrabberServerWidget();
+  virtual ~GrabberServerWidget(){};
+
+protected:
+  virtual void connectGrabberServer() = 0;
+
+  GrabberServerPtr mGrabberServer;
+
+protected slots:
+  void portChangedSlot(const QString& port);
 
 private slots:
   void startServerSlot(bool);
-  void portChangedSlot(const QString& port);
-  void serverReadySlot(bool);
-
+  void grabberServerReadySlot(bool);
 
 private:
-  void updateInfoLabel();
-
   QWidget*              mPreviewParent;
   QPushButton*          mStartButton;
   QLineEdit*            mPortEdit;
-  
-  GrabberServerPtr mGrabberServer;
+};
+
+/**
+ * \class MacGrabberServerWidget
+ *
+ * \brief
+ *
+ * \date 16. nov. 2010
+ * \author: Janne Beate Bakeng, SINTEF
+ */
+
+class MacGrabberServerWidget : public GrabberServerWidget
+{
+  Q_OBJECT
+
+public:
+  MacGrabberServerWidget(QWidget* parent);
+  virtual ~MacGrabberServerWidget(){};
+
+protected:
+  virtual void connectGrabberServer();
 };
 
 }//namespace cx
