@@ -11,7 +11,7 @@
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
 //#include "RTSource/cxIGTLinkClient.h"
-#include "RTSource/sscRT2DRep.h"
+#include "sscRTStreamRep.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"

@@ -9,7 +9,7 @@
 #include "sscDefinitions.h"
 #include "sscMesh.h"
 #include "cxViewWrapper.h"
-#include "RTSource/sscRT2DRep.h"
+#include "sscRTStreamRep.h"
 
 namespace cx
 {
