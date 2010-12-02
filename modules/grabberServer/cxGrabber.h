@@ -38,9 +38,10 @@ public:
   Grabber();
   virtual ~Grabber(){};
   
-  virtual void start() = 0;
-  virtual void stop() = 0;
-  virtual bool isGrabbing() = 0;
+  virtual void start(){};
+  virtual void stop(){};
+  virtual bool isGrabbing(){return false;};
+  virtual void displayPreview(QWidget* parent){};
 
 signals:
   void frame(Frame& frame);
@@ -76,8 +77,8 @@ public:
   virtual void start();
   virtual void stop();
   virtual bool isGrabbing();
+  virtual void displayPreview(QWidget* parent);
 
-  QMacCocoaViewContainer* getPreviewWidget(QWidget* parent);
   void sendFrame(Frame& frame);
   
   void printAvailablePixelFormats();

@@ -17,35 +17,58 @@ namespace cx
  * \date 2. des. 2010
  * \author: Janne Beate Bakeng, SINTEF
  */
-
 class GrabberServer : public QObject
 {
   Q_OBJECT
 
 public:
   GrabberServer(QObject* parent = NULL);
-  ~GrabberServer();
+  virtual ~GrabberServer(){};
 
-  void start();
-  void stop();
-
-  QMacCocoaViewContainer* getPreviewWidget(QWidget* parent);
-  int getPort();
-  void setPort(int port);
+  virtual void start();
+  virtual void stop();
+  virtual void displayPreview(QWidget* parent);
+  virtual int getPort();
+  virtual void setPort(int port);
 
 signals:
   void ready(bool ready);
 
-private slots:
+protected slots:
   void readySlot();
 
-private:
-  MacGrabberPtr mGrabber;
-  OpenIGTLinkServerPtr mServer;
+protected:
+  virtual void connectGrabber() = 0;
+  virtual void connectServer() = 0;
 
+  GrabberPtr mGrabber;
+  ServerPtr mServer;
   bool mReady;
 };
 
+/**
+ * \class MacGrabberServer
+ *
+ * \brief
+ *
+ * \date 2. des. 2010
+ * \author: Janne Beate Bakeng, SINTEF
+ */
+
+class MacGrabberServer : public GrabberServer
+{
+  Q_OBJECT
+
+public:
+  MacGrabberServer(QObject* parent = NULL);
+  virtual ~MacGrabberServer();
+
+protected:
+  virtual void connectGrabber();
+  virtual void connectServer();
+};
+
 typedef boost::shared_ptr<class GrabberServer> GrabberServerPtr;
+typedef boost::shared_ptr<class MacGrabberServer> MacGrabberServerPtr;
 }//namespace cx
 #endif /* CXGRABBERSERVER_H_ */
