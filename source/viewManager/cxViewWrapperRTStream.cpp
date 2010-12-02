@@ -27,7 +27,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscSliceComputer.h"
 #include "sscGeometricRep2D.h"
-#include "RTSource/sscRT2DRep.h"
+#include "sscRTStreamRep.h"
 
 namespace cx
 {
@@ -65,7 +65,7 @@ void ViewWrapperRTStream::appendToContextMenu(QMenu& contextMenu)
 
 void ViewWrapperRTStream::streamLoadedSlot()
 {
-  std::cout << "attempt add stream to rt view" << std::endl;
+//  std::cout << "attempt add stream to rt view" << std::endl;
   if (ssc::dataManager()->getStreams().empty())
     return;
 
@@ -77,7 +77,7 @@ void ViewWrapperRTStream::streamLoadedSlot()
 //  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(mStreamRep);
   mDataNameText->setText(0, "initialized");
-  std::cout << "added stream to rt view" << std::endl;
+//  std::cout << "added stream to rt view" << std::endl;
 }
 
 void ViewWrapperRTStream::updateSlot()
