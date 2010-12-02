@@ -16,17 +16,14 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
     mPortEdit(new QLineEdit())
 
 {
-  mGrabber = MacGrabberPtr(new MacGrabber());
-  mServer = OpenIGTLinkServerPtr(new OpenIGTLinkServer());
+  mGrabberServer = GrabberServerPtr(new GrabberServer());
+  connect(mGrabberServer.get(), SIGNAL(ready(bool)), this, SLOT(serverReadySlot(bool)));
 
-  mPortEdit->setText(qstring_cast(mServer->getPort()));
+  mPortEdit->setText(qstring_cast(mGrabberServer->getPort()));
   connect(mPortEdit, SIGNAL(textChanged(const QString&)), this, SLOT(portChangedSlot(const QString&)));
 
   mStartButton->setCheckable(true);
-
-  connect(mStartButton, SIGNAL(clicked()), this, SLOT(startServerSlot()));
-  
-  connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
+  connect(mStartButton, SIGNAL(clicked(bool)), this, SLOT(startServerSlot(bool)));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   QGridLayout* gridLayout = new QGridLayout();
@@ -40,30 +37,14 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
 GrabberServerWidget::~GrabberServerWidget()
 {}
 
-MacGrabberPtr GrabberServerWidget::getGrabber()
+void GrabberServerWidget::startServerSlot(bool start)
 {
-  return mGrabber;
-}
+  mStartButton->setChecked(false);
 
-OpenIGTLinkServerPtr GrabberServerWidget::getServer()
-{
-  return mServer;
-}
-
-void GrabberServerWidget::startServerSlot()
-{
-  if(mStartButton->isChecked())
-  {
-    mServer->start();
-    mGrabber->start();
-    mGrabber->getPreviewWidget(mPreviewParent); //TODO change name
-    mStartButton->setText("Stop server");
-  } else
-  {
-    mServer->stop();
-    mGrabber->stop();
-    mStartButton->setText("Start server");
-  }
+  if(start)
+    mGrabberServer->start();
+  else
+    mGrabberServer->stop();
 }
 
 void GrabberServerWidget::portChangedSlot(const QString& port)
@@ -73,10 +54,25 @@ void GrabberServerWidget::portChangedSlot(const QString& port)
   if(!ok)
     return;
 
-  if(mServer->getPort() == newPort)
+  if(mGrabberServer->getPort() == newPort)
     return;
 
-  mServer->setPort(newPort);
+  mGrabberServer->setPort(newPort);
+}
+
+void GrabberServerWidget::serverReadySlot(bool ready)
+{
+  if(ready)
+  {
+    mGrabberServer->getPreviewWidget(mPreviewParent);
+    mStartButton->setText("Stop server");
+    mStartButton->setChecked(true);
+  }
+  else
+  {
+    mStartButton->setText("Start server");
+    mStartButton->setChecked(false);
+  }
 }
 
 }//Namespace cx
