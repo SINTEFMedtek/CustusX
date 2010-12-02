@@ -17,18 +17,18 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 	mVisible = false;
 	//mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);
 	read3DCrossHair();
+#if 0
+  //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
+  ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 300, M_PI_2);
+  //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);
 
-//  //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
-//  ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 300, M_PI_2);
-//  //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);
-//
-//  dummy.mImage.mSpacing = Vector3D(0.928,0.928,1);
-//  //dummy.mImage.mSpacing = Vector3D(0.5,0.5,0);
-//  dummy.mImage.mSize = QSize(512,512);
-//  dummy.mImage.mOrigin_u = multiply_elems(Vector3D(dummy.mImage.mSize.width()/2, dummy.mImage.mSize.height()*0.8, 0), dummy.mImage.mSpacing);
-//
-//  mSector = dummy;
+  dummy.mImage.mSpacing = Vector3D(0.928,0.928,1);
+  //dummy.mImage.mSpacing = Vector3D(0.5,0.5,0);
+  dummy.mImage.mSize = QSize(512,512);
+  dummy.mImage.mOrigin_u = multiply_elems(Vector3D(dummy.mImage.mSize.width()/2, dummy.mImage.mSize.height()*0.8, 0), dummy.mImage.mSpacing);
 
+  mSector = dummy;
+#endif
 }
 
 ManualTool::~ManualTool()

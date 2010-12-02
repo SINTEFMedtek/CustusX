@@ -67,6 +67,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscGeometricRep2D.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscOrientationAnnotationRep.h
+    Rep/sscRTStreamRep.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h
@@ -217,6 +218,10 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicePlaneClipper.cpp
     Rep/sscUSProbeSector.h
     Rep/sscUSProbeSector.cpp
+    Rep/sscRTStreamRep.h
+    Rep/sscRTStreamRep.cpp
+    Rep/ultrasoundsectorsource.h
+    Rep/ultrasoundsectorsource.cpp
     Data/sscLandmark.h
     Data/sscLandmark.cpp
     Data/sscData.cpp

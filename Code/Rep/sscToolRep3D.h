@@ -9,6 +9,9 @@
 
 namespace ssc
 {
+
+typedef boost::shared_ptr<class RealTimeStreamGraphics> RealTimeStreamGraphicsPtr;
+
 /**Display a 3D representation of a ssc::Tool.
  * The representation to use is extracted from the tool itself.		
  *
@@ -51,6 +54,7 @@ private slots:
 	 */
 	void receiveVisible(bool visible);
 	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
+	void streamLoadedSlot();
 
 private:
 	void update();
@@ -72,6 +76,8 @@ private:
 	//USProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
+  RealTimeStreamGraphicsPtr mRTStream;
+
 };
 } // namespace ssc
 
