@@ -50,13 +50,16 @@ void LabeledComboBoxWidget::dataChanged()
 
   QString currentValue = mData->getValue();
   QStringList range = mData->getValueRange();
+  int currentIndex = -1;
   for (int i=0; i<range.size(); ++i)
   {
     mCombo->addItem(mData->convertInternal2Display(range[i]));
     mCombo->setItemData(i, range[i]);
     if (range[i]==currentValue)
-      mCombo->setCurrentIndex(i);
+      currentIndex = i;
+//      mCombo->setCurrentIndex(i);
   }
+  mCombo->setCurrentIndex(currentIndex);
 
   mCombo->setToolTip(mData->getHelp());
   mLabel->setToolTip(mData->getHelp());
