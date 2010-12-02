@@ -29,7 +29,7 @@
 #include "sscTypeConversions.h"
 #include "cxCameraControl.h"
 #include "sscRealTimeStreamSource.h"
-#include "RTSource/sscRT2DRep.h"
+#include "sscRTStreamRep.h"
 
 namespace cx
 {
@@ -101,7 +101,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->connectContextMenu(mView);
   QString index = QString::number(startIndex);
 
-  //view->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
@@ -121,7 +120,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
-  //showAxesActionSlot(true);
 }
 
 ViewWrapper3D::~ViewWrapper3D()
@@ -144,8 +142,6 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   connect(fillSlicePlanesAction, SIGNAL(triggered(bool)), this, SLOT(fillSlicePlanesActionSlot(bool)));
 
   QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
-  //resetCameraAction->setCheckable(true);
-  //resetCameraAction->setChecked(mSlicePlanes3DRep->getProxy()->getVisible());
   connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
 
   QAction* showAxesAction = new QAction("Show Coordinate Axes", &contextMenu);
@@ -166,8 +162,8 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   {
     showRefTool->setText("Show "+refTool->getName());
     showRefTool->setEnabled(true);
-    showRefTool->setChecked(refTool->getVisible());
-    connect(showRefTool, SIGNAL(triggered(bool)), this, SLOT(showRefToolSlot(bool)));
+    showRefTool->setChecked(repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool));
+    connect(showRefTool, SIGNAL(toggled(bool)), this, SLOT(showRefToolSlot(bool)));
   }
 
   contextMenu.addSeparator();
@@ -329,17 +325,19 @@ void ViewWrapper3D::activeImageChangedSlot()
 void ViewWrapper3D::showRefToolSlot(bool checked)
 {
   ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
+  if(!refTool)
+    return;
   ssc::ToolRep3DPtr refRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool);
   if(!refRep)
+  {
     refRep = ssc::ToolRep3D::New(refTool->getUid()+"_rep3d_"+this->mView->getUid());
+    refRep->setTool(refTool);
+  }
 
   if(checked) //should show
-  {
     mView->addRep(refRep);
-  }else//should not show
-  {
+  else//should not show
     mView->removeRep(refRep);
-  }
 }
 
 void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
@@ -376,7 +374,6 @@ void ViewWrapper3D::dominantToolChangedSlot()
 
 void ViewWrapper3D::toolsAvailableSlot()
 {
-
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   ssc::ToolManager::ToolMapPtr::value_type::iterator iter;
   for (iter=tools->begin(); iter!=tools->end(); ++iter)
@@ -404,20 +401,18 @@ void ViewWrapper3D::toolsAvailableSlot()
     mView->addRep(toolRep);
    // ssc::messageManager()->sendDebug("ToolRep3D for tool "+tool->getName()+" added to view "+mView->getName()+".");
 
-    if (!mRTStreamRep)
-    {
-      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
-      mRTStreamRep.reset(new ssc::RealTimeStreamRep("rtrep", "rtrep"));
-    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
-      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
-      mRTStreamRep->setTool(tool);
-      mView->addRep(mRTStreamRep);
-    }
+//    flytt denne koden inn i tool3d. flytt rtrep inn i ssc
+//    if (!mRTStreamRep)
+//    {
+//      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
+//      mRTStreamRep.reset(new ssc::RealTimeStreamRep("rtrep", "rtrep"));
+//    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
+//      mRTStreamRep->setTool(tool);
+//      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
+//      mView->addRep(mRTStreamRep);
+//    }
   }
-
-
 }
-
 
 void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
@@ -451,9 +446,5 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
   mSlicePlanes3DRep->setProxy(proxy);
   mView->addRep(mSlicePlanes3DRep);
 }
-
-
 //------------------------------------------------------------------------------
-
-
 }

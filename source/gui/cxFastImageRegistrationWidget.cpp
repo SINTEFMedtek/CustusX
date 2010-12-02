@@ -1,6 +1,7 @@
 #include "cxFastImageRegistrationWidget.h"
 
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
 #include "cxRegistrationManager.h"
 
 namespace cx
@@ -54,6 +55,12 @@ QString PlateImageRegistrationWidget::defaultWhatsThis() const
       "<p>Select landmarks in the data set that you want to use for performing plate registration.</p>"
       "<p><i>Click in the dataset and push the add or resample button.</i></p>"
       "</html>";
+}
+
+void PlateImageRegistrationWidget::editLandmarkButtonClickedSlot()
+{
+  ssc::dataManager()->setLandmarkActive(mActiveLandmark, true);
+  ImageRegistrationWidget::editLandmarkButtonClickedSlot();
 }
 
 void PlateImageRegistrationWidget::performRegistration()
