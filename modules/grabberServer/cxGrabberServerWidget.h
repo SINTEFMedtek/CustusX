@@ -3,8 +3,7 @@
 
 #include <QObject>
 #include <qwidget.h>
-#include "cxGrabber.h"
-#include "cxServer.h"
+#include "cxGrabberServer.h"
 
 class QPushButton;
 class QLabel;
@@ -28,12 +27,10 @@ public:
   GrabberServerWidget(QWidget* parent);
   virtual ~GrabberServerWidget();
 
-  MacGrabberPtr getGrabber();
-  OpenIGTLinkServerPtr getServer();
-
 private slots:
-  void startServerSlot();
+  void startServerSlot(bool);
   void portChangedSlot(const QString& port);
+  void serverReadySlot(bool);
 
 
 private:
@@ -43,8 +40,7 @@ private:
   QPushButton*          mStartButton;
   QLineEdit*            mPortEdit;
   
-  OpenIGTLinkServerPtr mServer;
-  MacGrabberPtr mGrabber;
+  GrabberServerPtr mGrabberServer;
 };
 
 }//namespace cx
