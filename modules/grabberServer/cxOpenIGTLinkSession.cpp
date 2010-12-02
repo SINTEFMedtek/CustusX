@@ -67,7 +67,7 @@ igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
   //extract data needed variables from the frame
   int size[] = {frame.mWidth, frame.mHeight, 1};
   int offset[] = {0, 0, 0};
-  float spacing[] = {1.0, 1.0, 1.0};
+  //float spacing[] = {1.0, 1.0, 1.0};
 //  ssc::messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
 //  ssc::messageManager()->sendDebug("Width/Height: "+qstring_cast(frame.mWidth)+"/"+qstring_cast(frame.mHeight));
 

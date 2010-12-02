@@ -25,12 +25,15 @@ public:
 
   virtual void start();
   virtual void stop();
+  virtual bool isOpen();
 
   virtual void setPort(int port);
   int getPort();
 
 signals:
   void frame(Frame& frame); /// emitted whenever a new frame arrived
+  void open();
+  void closed();
 
 protected:
   virtual void incomingConnection(int socketDescriptor) = 0;
