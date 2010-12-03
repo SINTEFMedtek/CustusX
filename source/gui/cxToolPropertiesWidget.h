@@ -19,6 +19,7 @@ class UsConfigGui;
 
 namespace cx
 {
+typedef boost::shared_ptr<class Tool> ToolPtr;
 
 /** Adapter that connects to the current active tool.
  */
@@ -49,7 +50,34 @@ public:
   ActiveToolWidget(QWidget* parent);
 ~ActiveToolWidget() {}
 };
+
+/** Adapter that connects to the current active tool.
+ */
+class ActiveToolConfigurationStringDataAdapter : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolConfigurationStringDataAdapter()); }
+  ActiveToolConfigurationStringDataAdapter();
+  virtual ~ActiveToolConfigurationStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
   
+public: // optional methods
+  virtual QString getHelp() const;
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+
+private slots:
+  void dominantToolChanged();
+private:
+  ToolPtr mTool;
+};
+
+
   
 /**
  * \class ToolPropertiesWidget
@@ -71,8 +99,8 @@ protected slots:
   void updateSlot();
   void dominantToolChangedSlot();
   void referenceToolChangedSlot();
-  void configurationChangedSlot(int index);
-  void toolsSectorConfigurationChangedSlot();///< Update the combo box when the tools configuration is changed outside the widget. Also used initially to read the tools value.
+//  void configurationChangedSlot(int index);
+//  void toolsSectorConfigurationChangedSlot();///< Update the combo box when the tools configuration is changed outside the widget. Also used initially to read the tools value.
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -80,7 +108,7 @@ protected:
 
 private:
   ToolPropertiesWidget();
-  void populateUSSectorConfigBox();
+//  void populateUSSectorConfigBox();
 
   ssc::ToolPtr mReferenceTool;
   ssc::ToolPtr mActiveTool;
@@ -93,8 +121,9 @@ private:
   QLabel* mReferenceStatusLabel;
   QLabel* mTrackingSystemStatusLabel;
   
-  QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
-  QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
+  ssc::LabeledComboBoxWidget* mUSSectorConfigBox;
+//  QLabel* mUSSectorConfigLabel;   ///< Label for the mUSSectorConfigBox
+//  QComboBox* mUSSectorConfigBox;  ///< List of US sector config parameters: depth (and width)
 };
 
 }//end namespace cx
