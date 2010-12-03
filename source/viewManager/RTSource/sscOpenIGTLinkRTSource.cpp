@@ -17,7 +17,10 @@
 #include <vtkDataSetMapper.h>
 #include <vtkLookupTable.h>
 #include <vtkAlgorithmOutput.h>
+#include <vtkImageExtractComponents.h>
 #include <vtkImageMapToColors.h>
+#include <vtkImageAppendComponents.h>
+#include <vtkImageChangeInformation.h>
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 
 namespace ssc
@@ -26,6 +29,9 @@ namespace ssc
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New())
 {
+  mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+  mRedirecter->SetInput(mImageImport->GetOutput());
+
   mImageImport->SetNumberOfScalarComponents(1);
   this->setEmptyImage();
   this->setTestImage();
@@ -48,17 +54,31 @@ OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
 
 void OpenIGTLinkRTSource::timeout()
 {
+  if (mTimeout)
+    return;
+
   std::cout << "timeout!" << std::endl;
   mTimeout = true;
   emit changed();
 }
 
+QString OpenIGTLinkRTSource::getName()
+{
+  if (mDeviceName.isEmpty())
+    return "IGTLink";
+  return mDeviceName;
+}
+
+void OpenIGTLinkRTSource::fpsSlot(double fps)
+{
+  mFPS = fps;
+}
 
 QString OpenIGTLinkRTSource::getInfoString() const
 {
   if (!mClient)
     return "";
-  return mClient->hostDescription();
+  return mClient->hostDescription() + " - " + QString::number(mFPS,'f',1) + " fps";
 }
 
 QString OpenIGTLinkRTSource::getStatusString() const
@@ -109,6 +129,7 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
   mClient.reset(new IGTLinkClient(address, port, this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+  connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
 
   mClient->start();
   mTimeoutTimer->start();
@@ -123,6 +144,7 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
     return;
   this->updateImage(mClient->getLastImageMessage());
 }
+
 
 void OpenIGTLinkRTSource::disconnectServer()
 {
@@ -170,65 +192,33 @@ void OpenIGTLinkRTSource::setTestImage()
   int W = 512;
   int H = 512;
 
+  int numberOfComponents = 4;
   mImageMessage = igtl::ImageMessage::Pointer();
   mImageImport->SetWholeExtent(0, W-1, 0, H-1, 0, 0);
   mImageImport->SetDataExtent(0,W-1,0,H-1,0,0);
   mImageImport->SetDataScalarTypeToUnsignedChar();
-  mTestData.resize(W*H);
+  mImageImport->SetNumberOfScalarComponents(numberOfComponents);
+  mTestData.resize(W*H*numberOfComponents);
   std::fill(mTestData.begin(), mTestData.end(), 50);
+  std::vector<unsigned char>::iterator current;
 
   for (int y=0; y<H; ++y)
     for (int x=0; x<W; ++x)
     {
-      mTestData[x+W*y] = x/2;
+      current = mTestData.begin() + int((x+W*y)*numberOfComponents);
+      current[0] = 255;
+      current[1] = 0;
+      current[2] = x/2;
+      current[3] = 0;
+//      mTestData[x+W*y] = x/2;
     }
 
   mImageImport->SetImportVoidPointer(&(*mTestData.begin()));
   mImageImport->Modified();
 }
 
-//vtkImageDataPtr convertToTestColorImage(vtkImageDataPtr input)
-//{
-//    int N = 1400;
-//    //make a default system set lookuptable, grayscale...
-//    vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-//    lut->SetNumberOfTableValues(N);
-//    //lut->SetTableRange (0, 1024); // the window of the input
-//    lut->SetTableRange (0, N-1); // the window of the input
-//    lut->SetSaturationRange (0, 0.5);
-//    lut->SetHueRange (0, 1);
-//    lut->SetValueRange (0, 1);
-//    lut->Build();
-//
-////    vtkDataSetMapperPtr mapper = vtkDataSetMapper::New();
-////    mapper->SetInput(input);
-////    mapper->SetLookupTable(lut);
-////    mapper->GetOutputPort()->Print(std::cout);
-//
-//    vtkImageMapToColorsPtr mapper = vtkImageMapToColorsPtr::New();
-//    mapper->SetInput(input);
-//    mapper->SetLookupTable(lut);
-//    mapper->Update();
-//    return mapper->GetOutput();
-////    return mapper->GetOutputPort();
-//}
-//
-
-
-void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
+void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Pointer message)
 {
-//  mImageImport->Modified();
-//  mTimeout = false;
-//  mTimeoutTimer->start();
-//  emit changed();
-//  return;
-
-  if (!message)
-  {
-    this->setEmptyImage();
-    return;
-  }
-
   mImageMessage = message;
   // Retrive the image data
   int size[3]; // image dimension
@@ -243,6 +233,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   message->GetDimensions(size);
   message->GetSpacing(spacing);
   message->GetSubVolume(svsize, svoffset);
+  mDeviceName = message->GetDeviceName();
 
   mImageImport->SetNumberOfScalarComponents(1);
 
@@ -289,59 +280,62 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   mImageImport->SetImportVoidPointer(mImageMessage->GetScalarPointer());
 
   mImageImport->Modified();
-//  std::cout << "first voxel: " << *reinterpret_cast<unsigned short*>(mImageImport->GetOutput()->GetScalarPointer(0,0,0)) << std::endl;;
+}
 
-//  std::cout << "first voxel: ";
-//  for (int i=0; i<1000; ++i)
-//    std::cout << (int)(reinterpret_cast<unsigned char*>(mImageImport->GetOutput()->GetScalarPointer())[i]) << " ";
-////    std::cout << (int)(*reinterpret_cast<unsigned char*>(mImageImport->GetOutput()->GetScalarPointer(0+i,0,0))) << " ";
-//  std::cout << std::endl;
-//  vtkImageDataPtr colored = convertToTestColorImage(mImageImport->GetOutput());
-  //colored->Print(std::cout);
+void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
+{
+#if 1 // remove to use test image
+    if (!message)
+    {
+      std::cout << "got empty image !!!" << std::endl;
+      this->setEmptyImage();
+      return;
+    }
 
+    this->updateImageImportFromIGTMessage(message);
+    mImageImport->GetOutput()->Update();
+#endif
 
   mTimeout = false;
   mTimeoutTimer->start();
 
+  // insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
+  if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
+  {
+    mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
+
+    mRedirecter->SetInput(mFilter_ARGB_RGBA);
+  }
 
   emit changed();
 }
 
-vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
+/**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)
+ * into a vtk-style RGBA image.
+ *
+ */
+vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input)
 {
-//  if (false)
-//  {
-//    vtkImageDataPtr colored = convertToTestColorImage(mImageImport->GetOutput());
-//    return colored;
-//  }
-//  else
-//  {
-    mImageImport->GetOutput()->Update();
-    return mImageImport->GetOutput();
-//  }
+  vtkImageAppendComponentsPtr merger = vtkImageAppendComponentsPtr::New();
 
+  /// extract the RGB part of input (1,2,3) and insert as (0,1,2) in output
+  vtkImageExtractComponentsPtr splitterRGB = vtkImageExtractComponentsPtr::New();
+  splitterRGB->SetInput(input);
+  splitterRGB->SetComponents(1,2,3);
+  merger->SetInput(0, splitterRGB->GetOutput());
 
+  /// extract the A part of input (0) and insert as (3) in output
+  vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
+  splitterA->SetInput(input);
+  splitterA->SetComponents(0);
+  merger->SetInput(1, splitterA->GetOutput());
 
-//  return mImageData;
+  return merger->GetOutput();
 }
 
-///** increase input bounding box to a power of 2.
-// */
-//void OpenIGTLinkRTSource::padBox(int* x, int* y) const
-//{
-//  if (*x==0 || *y==0)
-//    return;
-//
-//  int x_org = *x;
-//  int y_org = *y;
-//
-//  *x = 1;
-//  *y = 1;
-//  while (*x < x_org)
-//    (*x) *= 2;
-//  while (*y < y_org)
-//    (*y) *= 2;
-//}
-
+vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
+{
+    return mRedirecter->GetOutput();
+}
 
 }

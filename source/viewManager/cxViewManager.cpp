@@ -9,6 +9,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkImageData.h>
 
+#include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkInteractorStyleUnicam.h"
@@ -27,6 +28,7 @@
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
+#include "cxViewWrapperRTStream.h"
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "cxDataLocations.h"
@@ -345,10 +347,17 @@ void ViewManager::setActiveLayout(const QString& layout)
     if (view.mGroup<0 || view.mPlane==ssc::ptCOUNT)
       continue;
 
-    if (view.mPlane == ssc::ptNOPLANE)
-      activate3DView(view.mGroup, view.mRegion);
+    if (view.mPlane == ssc::ptNOPLANE || view.mPlane == ssc::ptCOUNT)
+    {
+      if (view.mType==ssc::View::VIEW_3D)
+        this->activate3DView(view.mGroup, view.mRegion);
+      else if (view.mType==ssc::View::VIEW_REAL_TIME)
+        this->activateRTStreamView(view.mGroup, view.mRegion);
+    }
     else
-      activate2DView(view.mGroup, view.mPlane, view.mRegion);
+    {
+      this->activate2DView(view.mGroup, view.mPlane, view.mRegion);
+    }
   }
 
   mActiveLayout = layout;
@@ -357,37 +366,11 @@ void ViewManager::setActiveLayout(const QString& layout)
   ssc::messageManager()->sendInfo("Layout changed to "+ this->getLayoutData(mActiveLayout).getName());
 }
   
-//void ViewManager::deleteImageSlot(ssc::ImagePtr image)
-//{
-//  for (unsigned i=0; i<mViewGroups.size(); ++i)
-//    mViewGroups[i]->removeImage(image);
-//
-//  emit imageDeletedFromViews(image);
-//}
-
 void ViewManager::renderingIntervalChangedSlot(int interval)
 {
   mRenderingTimer->stop();
   mRenderingTimer->start(interval);
 }
-
-//void ViewManager::shadingChangedSlot(bool shadingOn)
-//{
-//  mShadingOn = shadingOn;
-//
-//  // currently disabled: shading is now a property in ssc::Image.
-//  // Remove this method???
-//
-////  ssc::VolumetricRepPtr volumetricRep
-////  = RepManager::getInstance()->getVolumetricRep("VolumetricRep_1");
-////  if(volumetricRep->getImage())
-////  {
-////    if(shadingOn)
-////      volumetricRep->getVtkVolume()->GetProperty()->ShadeOn();
-////    else
-////      volumetricRep->getVtkVolume()->GetProperty()->ShadeOff();
-////  }
-//}
 
 /** Set the stretch factors of columns and rows in mLayout.
  */
@@ -405,39 +388,49 @@ void ViewManager::setStretchFactors( LayoutRegion region, int stretchFactor)
   }
 }
 
-void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
+void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region)
 {
-  View2D* view = mViewCache2D.retrieveView();
-  QColor background = mSettings->value("backgroundColor").value<QColor>();
-  view->setBackgoundColor(background);
+  ssc::View* view = wrapper->getView();
   mViewMap[view->getUid()] = view;
-  ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
-  wrapper->initializePlane(plane);
   mViewGroups[group]->addView(wrapper);
-  //ssc::View* view = mViewGroups[group]->getViews()[index];
   mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
   this->setStretchFactors( region, 1);
 
   view->show();
 }
 
+void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
+{
+  View2D* view = mViewCache2D.retrieveView();
+  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  view->setBackgoundColor(background);
+  ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
+  wrapper->initializePlane(plane);
+  this->activateView(wrapper, group, region);
+}
+
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
   View3D* view = mViewCache3D.retrieveView();
   QColor background = mSettings->value("backgroundColor").value<QColor>();
-  //std::cout << "bk " << background.redF() << "," << background.greenF() << "," << background.blueF() << std::endl;
   view->setBackgoundColor(background);
-  mViewMap[view->getUid()] = view;
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
-  mViewGroups[group]->addView(wrapper);
   if (group==0)
   {
     mInteractiveCropper->setView(view);
   }
-//  ssc::View* view = mViewGroups[group]->getViews()[index];
-  mLayout->addWidget(view, region.pos.row, region.pos.col, region.span.row, region.span.col );
-  this->setStretchFactors( region, 1);
-  view->show();
+
+  this->activateView(wrapper, group, region);
+}
+
+
+void ViewManager::activateRTStreamView(int group, LayoutRegion region)
+{
+  View2D* view = mViewCache2D.retrieveView();
+  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  view->setBackgoundColor(background);
+  ViewWrapperRTStreamPtr wrapper(new ViewWrapperRTStream(view));
+  this->activateView(wrapper, group, region);
 }
 
 void ViewManager::addDefaultLayout(LayoutData data)
@@ -455,10 +448,18 @@ void ViewManager::addDefaultLayouts()
 
   {
     LayoutData layout;
+    layout.resetUid("LAYOUT_RT_1X1");
+    layout.setName("RT 1x1");
+    layout.resize(1,1);
+    layout.setView(0, ssc::View::VIEW_REAL_TIME, LayoutRegion(0, 0));
+    this->addDefaultLayout(layout);
+  }
+  {
+    LayoutData layout;
     layout.resetUid("LAYOUT_3D_1X1");
     layout.setName("3D 1x1");
     layout.resize(1,1);
-    layout.setView(0, ssc::ptNOPLANE, LayoutRegion(0, 0));
+    layout.setView(0, ssc::View::VIEW_3D, LayoutRegion(0, 0));
     this->addDefaultLayout(layout);
   }
   {
@@ -466,7 +467,7 @@ void ViewManager::addDefaultLayouts()
     layout.resetUid("LAYOUT_3DACS_2X2");
     layout.setName("3DACS 2x2");
     layout.resize(2,2);
-    layout.setView(0, ssc::ptNOPLANE,  LayoutRegion(0, 0));
+    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0));
     layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 1));
     layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 0));
     layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(1, 1));
@@ -477,7 +478,7 @@ void ViewManager::addDefaultLayouts()
     layout.resetUid("LAYOUT_3DACS_1X3");
     layout.setName("3DACS 1x3");
     layout.resize(3,3);
-    layout.setView(0, ssc::ptNOPLANE,  LayoutRegion(0, 0, 3, 2));
+    layout.setView(0, ssc::View::VIEW_3D,  LayoutRegion(0, 0, 3, 2));
     layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 2));
     layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 2));
     layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 2));
@@ -524,7 +525,7 @@ void ViewManager::addDefaultLayouts()
     layout.resetUid("LAYOUT_3DAny_1X2");
     layout.setName("3DAny 1x2");
     layout.resize(1,2);
-    layout.setView(0, ssc::ptNOPLANE,   LayoutRegion(0, 0));
+    layout.setView(0, ssc::View::VIEW_3D,   LayoutRegion(0, 0));
     layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 1));
     this->addDefaultLayout(layout);
   }

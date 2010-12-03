@@ -67,12 +67,6 @@ IF(APPLE)
   FIND_LIBRARY(QTKIT_LIBRARY QtKit)
 ENDIF(APPLE)
 
-#QuickTime
-#---------
-IF(APPLE)
-  FIND_LIBRARY(QUICKTIME_LIBRARY QuickTime)
-ENDIF(APPLE)
-
 #Quartz
 #------
 IF(APPLE)
@@ -87,6 +81,7 @@ SET(${LIBNAME}_MOC_HDRS
     cxGrabberServerWidget.h
     cxGrabber.h
     cxServer.h
+    cxGrabberServer.h
     cxOpenIGTLinkSession.h
 )
 
@@ -106,6 +101,7 @@ SET(SOURCES
     cxGrabberServerWidget.cpp
     cxGrabber.mm
     cxServer.cpp
+    cxGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
     ${${LIBNAME}_MOC_HDRS}
     ${${LIBNAME}_MOC_SRCS}
@@ -113,7 +109,7 @@ SET(SOURCES
 
 INCLUDE_DIRECTORIES(
     .
-    ${Boost_INCLUDE_DIRS}
+    #${Boost_INCLUDE_DIRS}    
     ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
 )
 
@@ -131,7 +127,6 @@ SET ( LINK_LIBRARIES
   ${QT_LIBRARIES}
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
-  ${QUICKTIME_LIBRARY}
   ${QUARTZCORE_LIBRARY}
 )
 

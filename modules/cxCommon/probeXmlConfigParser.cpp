@@ -89,22 +89,24 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   retval.mRtSource = rtsource;
   retval.mConfigId = configId;
 
-  // set hardcoded image dimensions based on the RT source type:
-  if (retval.mRtSource=="VGA")
-  {
-    retval.mColumns = 800;
-    retval.mRows = 600;
-  }
-  else if ((retval.mRtSource=="SVIDEO")||(retval.mRtSource=="VHS")) //note: VHS is a bug in the xml files.
-  {
-    retval.mColumns = 768;
-    retval.mRows = 576;
-  }
-  else
-  {
-    retval.mColumns = 0;
-    retval.mRows = 0;
-  }
+  // replaced with height/width:
+
+//  // set hardcoded image dimensions based on the RT source type:
+//  if (retval.mRtSource=="VGA")
+//  {
+//    retval.mColumns = 800;
+//    retval.mRows = 600;
+//  }
+//  else if ((retval.mRtSource=="SVIDEO")||(retval.mRtSource=="VHS")) //note: VHS is a bug in the xml files.
+//  {
+//    retval.mColumns = 768;
+//    retval.mRows = 576;
+//  }
+//  else
+//  {
+//    retval.mColumns = 0;
+//    retval.mRows = 0;
+//  }
 //  if (retval.mRtSource=="iSight")
 //  {
 //    retval.mColumns = 640;
@@ -145,15 +147,35 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
     return retval;
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();
-  element = rtSourceNode.namedItem("HorizontalOffset").toElement();
 
   try
   {
+    QDomNode sizeNode = rtSourceNode.namedItem("ImageSize");
+    element = sizeNode.toElement();
+    if(element.isNull())
+      throw "Can't find ImageSize node";
+
     bool ok;
-    retval.mHorizontalOffset = element.text().toInt(&ok);
+    element = sizeNode.namedItem("Width").toElement();
+    if(element.isNull())
+      throw "Can't find ImageSize/Width node";
+    retval.mImageWidth = element.text().toInt(&ok);
+    if(!ok)
+      throw "ImageSize/Width not a number";
+
+    element = sizeNode.namedItem("Height").toElement();
+    if(element.isNull())
+      throw "Can't find  ImageSize/Height node";
+    retval.mImageHeight = element.text().toInt(&ok);
+    if(!ok)
+      throw "ImageSize/Height not a number";
+
+    element = rtSourceNode.namedItem("HorizontalOffset").toElement();
+    retval.mHorizontalOffset = element.text().toDouble(&ok);
     std::cout << "Found HorizontalOffset: " << retval.mHorizontalOffset << std::endl;
     if(!ok)
-      throw "HorizontalOffset not an int";
+      throw "HorizontalOffset not a number";
+
   }  catch( char * str ) {
     std::cout << "EXCEPTION RAISED: " << str << std::endl;
   }
@@ -171,6 +193,11 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
   try
   {
+    element = configNode.namedItem("Name").toElement();
+    if(element.isNull())
+      throw "Can't find Name";
+    retval.mName = element.text();
+
     element = configNode.namedItem("WidthDeg").toElement();
     if(element.isNull())
       throw "Can't find WidthDeg";

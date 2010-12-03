@@ -97,6 +97,7 @@ void ToolManager::configureReferences()
     if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
     {
       mReferenceTool = tool;
+      connect(this, SIGNAL(rMprChanged()), this, SLOT(updateReferenceTransformSlot()));
       ssc::messageManager()->sendInfo("Reference set to be "+mReferenceTool->getName());
       return;
     }
@@ -295,7 +296,6 @@ ssc::LandmarkMap ToolManager::getLandmarks()
 void ToolManager::setLandmark(ssc::Landmark landmark)
 {
   mLandmarks[landmark.getUid()] = landmark;
-  ssc::messageManager()->sendDebug("Added landmark: "+landmark.getUid()+" with vector "+qstring_cast(landmark.getCoord()));
   emit landmarkAdded(landmark.getUid());
 }
 
@@ -583,6 +583,14 @@ void ToolManager::toolInitialized(bool value)
     this->addInitializedTool(tool->getUid());
   else
     ssc::messageManager()->sendWarning("Casting to tool failed... Contact programmer.");
+}
+
+void ToolManager::updateReferenceTransformSlot()
+{
+  ToolPtr refTool = boost::shared_dynamic_cast<Tool>(mReferenceTool);
+  if(!refTool)
+    return;
+  refTool->set_prMt(refTool->get_prMt());
 }
 
 void ToolManager::dominantCheckSlot()
