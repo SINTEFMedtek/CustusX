@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-   <Version>3.2.0</Version>
+   <Version>3.2.1</Version>
    <USScanner>
       <Name>Vivid 7 - Karkirurgen</Name>
       <USProbe>
@@ -273,10 +273,10 @@
             <Name>S-Video</Name>
             <DefaultConfig>Width6Depth40</DefaultConfig>
             <ImageSize>
-               <Width>768</Width>
-               <Height>576</Height>
+               <Width>800</Width>
+               <Height>600</Height>
             </ImageSize>
-            <HorizontalOffset>0</HorizontalOffset>
+            <HorizontalOffset>-22</HorizontalOffset>
             <Config>
                <ID>Width6Depth65</ID>
                <Name>Width: 6, Depth: 40 mm</Name>
@@ -427,6 +427,65 @@
                <PixelSize>
                   <Width>0.28218</Width>
                   <Height>0.29268</Height>
+               </PixelSize>
+            </Config>
+         </RTSource>
+      </USProbe>
+   </USScanner>
+   <USScanner>
+      <Name>Terason</Name>
+      <USProbe>
+         <Name>4C2</Name>
+         <Type>CurvedLinearArray</Type>
+         <DefaultRTSource>VGA</DefaultRTSource>
+         <RTSource>
+            <Name>VGA</Name>
+            <ImageSize>
+               <Width>800</Width>
+               <Height>600</Height>
+            </ImageSize>
+            <HorizontalOffset>-30</HorizontalOffset>
+            <DefaultConfig>WidthMaxDepth80</DefaultConfig>
+            <Config>
+               <ID>WidthMaxDepth80</ID>
+               <Name>Width: Max, Depth: 80 mm</Name>
+               <WidthDeg>58.6018</WidthDeg>
+               <Depth>80</Depth>
+               <ImageSize>
+                    <Width>800</Width>
+                    <Height>600</Height>
+               </ImageSize>
+               <Offset>64.411</Offset>
+               <Origin>
+                  <Col>358.6825</Col>
+                  <Row>-161.8492</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>205</Col>
+                  <Row>112</Row>
+               </Corner>
+               <Corner>
+                  <Col>514</Col>
+                  <Row>112</Row>
+               </Corner>
+               <Corner>
+                  <Col>17</Col>
+                  <Row>447</Row>
+               </Corner>
+               <Corner>
+                  <Col>704</Col>
+                  <Row>447</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>17</Left>
+                  <Right>594</Right>
+                  <Top>112</Top>
+                  <Bottom>537</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.19827</Width>
+                  <Height>0.20566</Height>
                </PixelSize>
             </Config>
          </RTSource>
