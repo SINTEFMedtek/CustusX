@@ -27,18 +27,28 @@ public:
   virtual ~IGTLinkWidget();
 
 private slots:
+  void toggleLaunchServer();
   void launchServer();
-  void toggleConnect();
+  void showStream();
+  void toggleConnectServer();
+  void connectServer();
   void renderSlot();
+  void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverStatusChangedSlot();
+  void serverProcessError(QProcess::ProcessError error);
+  void browseLocalServerSlot();
+  void autoLaunchLocalServer();
 
 private:
+  void updateHostHistory();
+
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
-  QLineEdit* mAddressEdit;
+  QComboBox* mAddressEdit;
   QLineEdit* mPortEdit;
   QPushButton* mConnectButton;
+  QPushButton* mShowStreamButton;
   QPushButton* mLaunchServerButton;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
   QGridLayout* mGridLayout;
@@ -47,6 +57,10 @@ private:
   QTimer* mRenderTimer;
   RenderTimer mRenderTimerW;
   QLabel* mRenderLabel;
+
+  QLineEdit* mLocalServerEdit;
+  QProcess* mServer;
+  bool mAutoLaunchIsTried;
 };
 
 }//end namespace cx
