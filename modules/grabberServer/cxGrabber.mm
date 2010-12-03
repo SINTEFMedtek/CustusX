@@ -156,13 +156,11 @@ void MacGrabber::stop()
   this->stopSession();
 }
 
-QMacCocoaViewContainer* MacGrabber::getPreviewWidget(QWidget* parent)
+void MacGrabber::displayPreview(QWidget* parent)
 {
-  QMacCocoaViewContainer* retval = new QMacCocoaViewContainer(0 ,parent);
-  retval->setCocoaView(mObjectiveC->mCaptureView);
-  retval->setFixedSize(800,600); //todo?
-  
-  return retval;
+  QMacCocoaViewContainer* container = new QMacCocoaViewContainer(0 ,parent);
+  container->setCocoaView(mObjectiveC->mCaptureView);
+  container->setFixedSize(800,600); //todo?
 }
 
 bool MacGrabber::isGrabbing()

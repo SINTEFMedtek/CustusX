@@ -14,12 +14,10 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
     mPreviewParent(new QWidget(this)),
     mStartButton(new QPushButton("Start server", this)),
     mPortEdit(new QLineEdit())
-
 {
-  mGrabberServer = GrabberServerPtr(new GrabberServer());
-  connect(mGrabberServer.get(), SIGNAL(ready(bool)), this, SLOT(serverReadySlot(bool)));
+  this->setObjectName("GrabberServerWidget");
+  this->setWindowTitle("Grabber Server Widget");
 
-  mPortEdit->setText(qstring_cast(mGrabberServer->getPort()));
   connect(mPortEdit, SIGNAL(textChanged(const QString&)), this, SLOT(portChangedSlot(const QString&)));
 
   mStartButton->setCheckable(true);
@@ -33,9 +31,6 @@ GrabberServerWidget::GrabberServerWidget(QWidget* parent) :
   gridLayout->addWidget(mPortEdit, 0, 1);
   gridLayout->addWidget(mStartButton, 0, 2);
 }
-
-GrabberServerWidget::~GrabberServerWidget()
-{}
 
 void GrabberServerWidget::startServerSlot(bool start)
 {
@@ -54,17 +49,19 @@ void GrabberServerWidget::portChangedSlot(const QString& port)
   if(!ok)
     return;
 
+  mPortEdit->setText(port);
+
   if(mGrabberServer->getPort() == newPort)
     return;
 
   mGrabberServer->setPort(newPort);
 }
 
-void GrabberServerWidget::serverReadySlot(bool ready)
+void GrabberServerWidget::grabberServerReadySlot(bool ready)
 {
   if(ready)
   {
-    mGrabberServer->getPreviewWidget(mPreviewParent);
+    mGrabberServer->displayPreview(mPreviewParent);
     mStartButton->setText("Stop server");
     mStartButton->setChecked(true);
   }
@@ -74,5 +71,24 @@ void GrabberServerWidget::serverReadySlot(bool ready)
     mStartButton->setChecked(false);
   }
 }
+//=============================================================================
+MacGrabberServerWidget::MacGrabberServerWidget(QWidget* parent) :
+    GrabberServerWidget(parent)
+{
+  this->setObjectName("MacGrabberServerWidget");
+  this->setWindowTitle("Mac Grabber Server Widget");
+
+  this->connectGrabberServer();
+  connect(mGrabberServer.get(), SIGNAL(ready(bool)), this, SLOT(grabberServerReadySlot(bool)));
+  this->portChangedSlot(qstring_cast(mGrabberServer->getPort()));
+}
+
+void MacGrabberServerWidget::connectGrabberServer()
+{
+  mGrabberServer = GrabberServerPtr(new MacGrabberServer());
+  this->portChangedSlot(qstring_cast(mGrabberServer->getPort()));
+}
+
+//=============================================================================
 
 }//Namespace cx
