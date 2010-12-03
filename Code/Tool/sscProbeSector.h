@@ -2,6 +2,7 @@
 #define SSCPROBESECTOR_H_
 
 #include <QSize>
+class QDomNode;
 #include "sscVector3D.h"
 
 namespace ssc
@@ -26,7 +27,8 @@ public:
 public:
 	ProbeSector();
 	ProbeSector(TYPE type, double depthStart, double depthEnd, double width);
-	
+  void addXml(QDomNode& dataNode) const; ///< write internal state to node
+
 	TYPE mType; ///< type of probe
 	double mDepthStart; ///< start of sector, mm
 	double mDepthEnd; ///< end of sector, mm

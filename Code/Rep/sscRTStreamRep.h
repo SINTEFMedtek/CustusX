@@ -51,6 +51,7 @@ private slots:
   void receiveTransforms(Transform3D matrix, double timestamp);
   void receiveVisible(bool visible);
   void probeSectorChanged();
+  void checkDataIntegrity();
 
 private:
   void setLookupTable();
@@ -61,6 +62,7 @@ private:
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
   RealTimeStreamSourcePtr mData;
+  vtkImageChangeInformationPtr mDataRedirecter;
   vtkActorPtr mPlaneActor;
   vtkPlaneSourcePtr mPlaneSource;
   vtkTexturePtr mTexture;

@@ -23,7 +23,7 @@
 #include <vtkFloatArray.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkCellArray.h>
-
+#include <vtkImageChangeInformation.h>
 #include "sscBoundingBox3D.h"
 #include "sscToolManager.h"
 #include "sscView.h"
@@ -40,6 +40,7 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   mPlaneSource(vtkPlaneSourcePtr::New()),
   mTexture(vtkTexturePtr::New() )
 {
+  mDataRedirecter = vtkImageChangeInformationPtr::New();
   mUseMask = useMaskFilter;
   mIgnoreToolTransform = false;
   mUSSource = UltrasoundSectorSource::New();
@@ -142,7 +143,9 @@ void RealTimeStreamGraphics::probeSectorChanged()
   if (!mTool)
     return;
 
+  std::cout << "RealTimeStreamGraphics::probeSectorChanged()" << std::endl;
   mProbeData.setSector(mTool->getProbeSector());
+  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
 
   if (mUseMask)
     mMaskFilter->SetMaskInput(mProbeData.getMask());
@@ -212,13 +215,18 @@ void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
   {
     connect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
 
+    mDataRedirecter->SetInput(mData->getVtkImageData());
+//    mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
+//    mDataRedirecter->GetOutput();
+
+
     if (!mUseMask) // send data directly to texture, no mask.
     {
-      mTexture->SetInput(mData->getVtkImageData());
+      mTexture->SetInput(mDataRedirecter->GetOutput());
     }
     else    // these lines convert zeros to ones, then applies the mask.
     {
-      mMapZeroToOne->SetInput(mData->getVtkImageData());
+      mMapZeroToOne->SetInput(mDataRedirecter->GetOutput());
       mMaskFilter->SetImageInput(mMapZeroToOne->GetOutput());
       mTexture->SetInput(mMaskFilter->GetOutput());
     }
@@ -247,6 +255,16 @@ void RealTimeStreamGraphics::receiveVisible(bool visible)
 
 }
 
+
+void RealTimeStreamGraphics::checkDataIntegrity()
+{
+  if (!mData || !mTool)
+    return;
+
+  std::cout << "probe sector " << mTool->getUid() << " " << streamXml2String(mTool->getProbeSector()) << std::endl;
+//  mDataRedirecter->GetOutput()->Print(std::cout);
+}
+
 void RealTimeStreamGraphics::newDataSlot()
 {
 //  std::cout << "RealTimeStreamGraphics::newDataSlot()" << std::endl;
@@ -254,16 +272,23 @@ void RealTimeStreamGraphics::newDataSlot()
   if (!mData)
     return;
 
+//  mDataRedirecter->SetInput(mData->getVtkImageData());
+//  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
+//  mDataRedirecter->GetOutput();
+
+  mDataRedirecter->GetOutput()->Update();
+//  this->checkDataIntegrity();
+
   // apply a lut only if the input data is monochrome
-  int numComp = mData->getVtkImageData()->GetNumberOfScalarComponents();
-  bool is8bit = mData->getVtkImageData()->GetScalarType()==VTK_UNSIGNED_CHAR;
+  int numComp = mDataRedirecter->GetOutput()->GetNumberOfScalarComponents();
+  bool is8bit = mDataRedirecter->GetOutput()->GetScalarType()==VTK_UNSIGNED_CHAR;
   if (numComp==1 && !is8bit)
     mTexture->MapColorScalarsThroughLookupTableOn();
   else
     mTexture->MapColorScalarsThroughLookupTableOff();
 
   // set the planesource where we have no probedata.
-  DoubleBoundingBox3D bounds(mData->getVtkImageData()->GetBounds());
+  DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
   if (!ssc::similar(bounds.range()[0], 0.0) || !ssc::similar(bounds.range()[1], 0.0))
   {
     mPlaneSource->SetOrigin(bounds.corner(0,0,0).begin());
