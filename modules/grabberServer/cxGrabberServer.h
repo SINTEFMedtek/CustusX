@@ -12,7 +12,7 @@ namespace cx
 /**
  * \class GrabberServer
  *
- * \brief
+ * \brief Abstract interface that combines and syncs a specific grabber and server.
  *
  * \date 2. des. 2010
  * \author: Janne Beate Bakeng, SINTEF
@@ -25,31 +25,31 @@ public:
   GrabberServer(QObject* parent = NULL);
   virtual ~GrabberServer(){};
 
-  virtual void start();
-  virtual void stop();
-  virtual void displayPreview(QWidget* parent);
-  virtual int getPort();
-  virtual void setPort(int port);
+  virtual void start(); ///< Starts both the server and the grabber
+  virtual void stop();  ///< Stops both the server and the grabber
+  virtual void displayPreview(QWidget* parent); ///< Places a previewwidget into the parent widget for showing the grabbed stream.
+  virtual int getPort(); ///< The port the server is listening to.
+  virtual void setPort(int port); ///< For changing what port the server should listen to.
 
 signals:
-  void ready(bool ready);
+  void ready(bool ready); ///< Emitted when the grabberserver is fully set up
 
 protected slots:
-  void readySlot();
+  void readySlot(); ///< Determines when the grabberserver is fully set up
 
 protected:
-  virtual void connectGrabber() = 0;
-  virtual void connectServer() = 0;
+  virtual void connectGrabber() = 0; ///< Determines what specific grabber is used. Must be implemented by subclasses.
+  virtual void connectServer() = 0; ///< Determines what specific server is used. Must be implemented by subclasses.
 
-  GrabberPtr mGrabber;
-  ServerPtr mServer;
-  bool mReady;
+  GrabberPtr mGrabber; ///< The grabber.
+  ServerPtr mServer; ///< The server.
+  bool mReady; ///< Fully set up or not.
 };
 
 /**
  * \class MacGrabberServer
  *
- * \brief
+ * \brief Combines and syns a MacGrabber and a OpenIGTLinkServer
  *
  * \date 2. des. 2010
  * \author: Janne Beate Bakeng, SINTEF
@@ -64,8 +64,8 @@ public:
   virtual ~MacGrabberServer();
 
 protected:
-  virtual void connectGrabber();
-  virtual void connectServer();
+  virtual void connectGrabber(); ///< Connects a MacGrabber.
+  virtual void connectServer(); ///< Connects a OpenIGTLinkServer.
 };
 
 typedef boost::shared_ptr<class GrabberServer> GrabberServerPtr;
