@@ -114,6 +114,7 @@ public:
   QString getInstrumentId() const;
   QString getInstrumentScannerId() const;
   QStringList getUSSectorConfigList() const;
+  QString getNameOfProbeSectorConfiguration(QString configString); ///< get a name for the given configuration
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   virtual std::map<int, ssc::utils::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
