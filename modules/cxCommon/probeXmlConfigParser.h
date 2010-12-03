@@ -24,8 +24,8 @@ public:
     QString             mRtSource;   ///<  realtime source
     QString             mConfigId;   ///<  config id
     QString             mName;       ///<  Name of config set
-    int                     mImageWidth;      ///< Width of the used image format
-    int                     mImageHeight;     ///< Height of the used image format
+    int                     mImageWidth;      ///< Width of the used image format (x dim)
+    int                     mImageHeight;     ///< Height of the used image format (y dim)
     float                   mWidthDeg;   ///<  width in degrees
     float                   mDepth;      ///<  depth
     float                   mOffset;     ///<  Offset
@@ -41,8 +41,8 @@ public:
     double                  mPixelHeight;///<  Pixel height
     int                     mHorizontalOffset; ///< parameter for the grabber
     QString                 mNotes; ///< useful information
-    int                     mColumns; ///< X dim
-    int                     mRows;    ///< Y dim
+//    int                     mColumns; ///< X dim
+//    int                     mRows;    ///< Y dim
     
     bool mEmpty;
     
