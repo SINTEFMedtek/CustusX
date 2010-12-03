@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-   <Version>3.2.0</Version>
+   <Version>3.2.2</Version>
    <USScanner>
       <Name>Vivid 7 - Karkirurgen</Name>
       <USProbe>
@@ -427,6 +427,137 @@
                <PixelSize>
                   <Width>0.28218</Width>
                   <Height>0.29268</Height>
+               </PixelSize>
+            </Config>
+         </RTSource>
+      </USProbe>
+   </USScanner>
+   <USScanner>
+      <Name>Terason</Name>
+      <USProbe>
+         <Name>4C2</Name>
+         <Type>CurvedLinearArray</Type>
+         <DefaultRTSource>VGA</DefaultRTSource>
+         <RTSource>
+            <Name>VGA</Name>
+            <DefaultConfig>WidthMaxDepth80</DefaultConfig>
+            <ImageSize>
+               <Width>800</Width>
+               <Height>600</Height>
+            </ImageSize>
+            <HorizontalOffset>-17</HorizontalOffset>
+            <Config>
+               <ID>WidthMaxDepth8</ID>
+               <Name>Width: Max, Depth: 8 cm</Name>
+               <WidthDeg>59.8124</WidthDeg>
+               <Depth>382.8531</Depth>
+               <Offset>317.7879</Offset>
+               <Origin>
+                  <Col>367.7173</Col>
+                  <Row>-162.324</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>209.2741</Col>
+                  <Row>113.1482</Row>
+               </Corner>
+               <Corner>
+                  <Col>18.3907</Col>
+                  <Row>445.0217</Row>
+               </Corner>
+               <Corner>
+                  <Col>716.3907</Col>
+                  <Row>445.3969</Row>
+               </Corner>
+               <Corner>
+                  <Col>525.2741</Col>
+                  <Row>113.6561</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>19</Left>
+                  <Right>716</Right>
+                  <Top>114</Top>
+                  <Bottom>538</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.20566</Width>
+                  <Height>0.20566</Height>
+               </PixelSize>
+            </Config>
+            <Config>
+               <ID>WidthMaxDepth12</ID>
+               <Name>Width: Max, Depth: 12 cm</Name>
+               <WidthDeg>59.8124</WidthDeg>
+               <Depth>451.3605</Depth>
+               <Offset>247.2999</Offset>
+               <Origin>
+                  <Col>367.3943</Col>
+                  <Row>-130.1734</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>244.0952</Col>
+                  <Row>84.1967</Row>
+               </Corner>
+               <Corner>
+                  <Col>19.0553</Col>
+                  <Row>475.4553</Row>
+               </Corner>
+               <Corner>
+                  <Col>715.0553</Col>
+                  <Row>475.8449</Row>
+               </Corner>
+               <Corner>
+                  <Col>490.0952</Col>
+                  <Row>84.5397</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>20</Left>
+                  <Right>715</Right>
+                  <Top>85</Top>
+                  <Bottom>568</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.26316</Width>
+                  <Height>0.26316</Height>
+               </PixelSize>
+            </Config>
+            <Config>
+               <ID>WidthMaxDepth16</ID>
+               <Name>Width: Max, Depth: 16 cm</Name>
+               <WidthDeg>59.8124</WidthDeg>
+               <Depth>459.8605</Depth>
+               <Offset>187.8994</Offset>
+               <Origin>
+                  <Col>367.2824</Col>
+                  <Row>-78.6999</Row>
+               </Origin>
+               <NCorners>4</NCorners>
+               <Corner>
+                  <Col>273.5993</Col>
+                  <Row>84.1793</Row>
+               </Corner>
+               <Corner>
+                  <Col>44.3214</Col>
+                  <Row>482.8062</Row>
+               </Corner>
+               <Corner>
+                  <Col>689.3214</Col>
+                  <Row>483.3355</Row>
+               </Corner>
+               <Corner>
+                  <Col>460.5993</Col>
+                  <Row>84.3894</Row>
+               </Corner>
+               <CroppingEdges>
+                  <Left>45</Left>
+                  <Right>689</Right>
+                  <Top>85</Top>
+                  <Bottom>568</Bottom>
+               </CroppingEdges>
+               <PixelSize>
+                  <Width>0.34483</Width>
+                  <Height>0.34483</Height>
                </PixelSize>
             </Config>
          </RTSource>
