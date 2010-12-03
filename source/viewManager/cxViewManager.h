@@ -123,8 +123,10 @@ protected:
 
   void deactivateCurrentLayout();
   //void activateLayout(const QString& toType);
+  void activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region);
   void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
   void activate3DView(int group, LayoutRegion region);
+  void activateRTStreamView(int group, LayoutRegion region);
 //  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region);
 //  void activate3DView(int group, int index, LayoutRegion region);
   //void deactivateView(ssc::View* view);

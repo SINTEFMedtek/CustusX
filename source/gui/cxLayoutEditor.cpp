@@ -51,8 +51,12 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   {
     ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
     mPlaneNames[type] = qstring_cast(type);
+    mViewNames.push_back(ViewNamesType(type,ssc::View::VIEW_2D, qstring_cast(type)));
   }
-  mPlaneNames[ssc::ptNOPLANE] = "3D";
+  mViewNames.push_back(ViewNamesType(ssc::ptNOPLANE,ssc::View::VIEW_3D, "3D"));
+  mViewNames.push_back(ViewNamesType(ssc::ptNOPLANE,ssc::View::VIEW_REAL_TIME, "RT"));
+//  mPlaneNames[ssc::ptNOPLANE] = "3D";
+//  mPlaneNames[static_cast<ssc::PLANE_TYPE>(-1)] = "RT";
 
   mSelection = LayoutRegion(-1,-1);
   initCache();
@@ -114,17 +118,31 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
 
   // actions for view type
   QActionGroup* typeActions = new QActionGroup(this);
-  for (int i=ssc::ptNOPLANE; i<ssc::ptCOUNT; ++i)
+//  for (std::map<ssc::PLANE_TYPE, QString>::iterator iter=mPlaneNames.begin(); iter!=mPlaneNames.end(); ++iter)
+  for (unsigned i=0; i<mViewNames.size(); ++i)
   {
-    ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
+    ViewNamesType current = mViewNames[i];
+//    ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
+//    ssc::PLANE_TYPE type = iter->first;
+//    QString name = iter->second;
 
-    QAction* action = new QAction(QString("%1").arg(mPlaneNames[type]), typeActions);
-    action->setData(QVariant(i));
+    QAction* action = new QAction(QString("%1").arg(current.mName), typeActions);
+//    action->setData(QVariant(t));
     action->setCheckable(true);
     connect(action, SIGNAL(triggered()), this, SLOT(typeActionSlot()));
-    action->setChecked(viewData.mPlane==type);
-    //menu.addAction(action);
+    action->setChecked(viewData.mPlane==current.mPlane && viewData.mType==current.mView);
   }
+//  for (int i=ssc::ptNOPLANE; i<ssc::ptCOUNT; ++i)
+//  {
+//    ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(i);
+//
+//    QAction* action = new QAction(QString("%1").arg(mPlaneNames[type]), typeActions);
+//    action->setData(QVariant(i));
+//    action->setCheckable(true);
+//    connect(action, SIGNAL(triggered()), this, SLOT(typeActionSlot()));
+//    action->setChecked(viewData.mPlane==type);
+//    //menu.addAction(action);
+//  }
 
   //menu.addMenu("View Plane Type")->addActions(typeActions->actions());
   menu.addActions(typeActions->actions());
@@ -163,11 +181,18 @@ void LayoutEditor::typeActionSlot()
   QAction* sender = dynamic_cast<QAction*>(this->sender());
   if (!sender)
     return;
-  ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(sender->data().toInt());
+//  ssc::PLANE_TYPE type = static_cast<ssc::PLANE_TYPE>(sender->data().toInt());
+  ViewNamesType type;
+  for (unsigned i=0; i<mViewNames.size(); ++i)
+    if (mViewNames[i].mName == sender->text())
+      type=mViewNames[i];
 
   std::set<LayoutData::iterator> selection = this->getSelectedViews();
   for (std::set<LayoutData::iterator>::iterator iter=selection.begin(); iter!=selection.end(); ++iter)
-    (*iter)->mPlane = type;
+  {
+    (*iter)->mPlane = type.mPlane;
+    (*iter)->mType = type.mView;
+  }
 
   this->updateGrid();
 }
@@ -259,6 +284,16 @@ void LayoutEditor::rowsColumnsChangedSlot()
   this->updateGrid();
 }
 
+QString LayoutEditor::getViewName(LayoutData::ViewData data) const
+{
+  for (unsigned i=0; i<mViewNames.size(); ++i)
+  {
+    if (mViewNames[i].mPlane==data.mPlane && mViewNames[i].mView==data.mType)
+      return mViewNames[i].mName;
+  }
+  return "NA";
+}
+
 /**Set visibility and position of frames in the gridlayout
  * according to the contents of mViewData.
  *
@@ -280,10 +315,11 @@ void LayoutEditor::updateGrid()
     gridData.mFrame->show();
 
     // set view text
-    if (iter->mGroup<0 && iter->mPlane==ssc::ptCOUNT)
+    QString name = this->getViewName(*iter);
+    if (iter->mGroup<0 && name.isEmpty())
       gridData.mLabel->setText("NA");
     else
-      gridData.mLabel->setText(QString("%1/%2").arg(iter->mGroup).arg(mPlaneNames[iter->mPlane]));
+      gridData.mLabel->setText(QString("%1/%2").arg(iter->mGroup).arg(name));
   }
 
   mNameEdit->setText(mViewData.getName());
