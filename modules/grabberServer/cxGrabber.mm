@@ -215,13 +215,13 @@ bool MacGrabber::findConnectedDevice()
         found = true;
       }
       
-      //buildt in apple i-sight camera
+/*      //buildt in apple i-sight camera
       compareResult = [grabberName localizedCompare:@"Built-in iSight"];
       if (compareResult == NSOrderedSame)
       {
         mObjectiveC->mSelectedDevice = captureDevice;
         found = true;
-      }
+      }*/
   }
   return found;
 }
