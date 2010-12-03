@@ -14,7 +14,7 @@ namespace cx
 /**
  * \class GrabberServerWidget
  *
- * \brief
+ * \brief Abstract interface for gui for interacting with a grabber and a server.
  *
  * \date 16. nov. 2010
  * \author: Janne Beate Bakeng, SINTEF
@@ -29,27 +29,27 @@ public:
   virtual ~GrabberServerWidget(){};
 
 protected:
-  virtual void connectGrabberServer() = 0;
+  virtual void connectGrabberServer() = 0; ///< Connects to a specific grabberserver. Must be implemented by subclasses.
 
   GrabberServerPtr mGrabberServer;
 
 protected slots:
-  void portChangedSlot(const QString& port);
+  void portChangedSlot(const QString& port); ///< Reacts to when the user changes the specific server port
 
 private slots:
-  void startServerSlot(bool);
-  void grabberServerReadySlot(bool);
+  void startServerSlot(bool); ///< Starts/stops the grabberserver
+  void grabberServerReadySlot(bool); ///< Updates the gui when the grabberserver is ready
 
 private:
-  QWidget*              mPreviewParent;
-  QPushButton*          mStartButton;
-  QLineEdit*            mPortEdit;
+  QWidget*              mPreviewParent; ///< Preview of grabbed stream
+  QPushButton*          mStartButton; ///< The start/stop button
+  QLineEdit*            mPortEdit; ///< Editable line for the port nr
 };
 
 /**
  * \class MacGrabberServerWidget
  *
- * \brief
+ * \brief Gui for interacting with a MacGrabber and a OpenIGTLinkServer.
  *
  * \date 16. nov. 2010
  * \author: Janne Beate Bakeng, SINTEF
@@ -64,7 +64,7 @@ public:
   virtual ~MacGrabberServerWidget(){};
 
 protected:
-  virtual void connectGrabberServer();
+  virtual void connectGrabberServer(); ///< Connects to a MacGrabberServer
 };
 
 }//namespace cx
