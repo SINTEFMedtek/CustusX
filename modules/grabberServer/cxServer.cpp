@@ -21,20 +21,32 @@ void Server::start()
   bool started = this->listen(QHostAddress::Any, mPort);
 
   if(started)
+  {
     ssc::messageManager()->sendSuccess("Server is listening to port "+qstring_cast(this->serverPort()));
+    emit open();
+  }
   else
     ssc::messageManager()->sendError("Server failed to start: "+qstring_cast(this->errorString()));
 }
 
 void Server::stop()
 {
+  if(!this->isListening())
+    return;
+
   this->close();
   ssc::messageManager()->sendSuccess("Server stopped listening and is closed.");
+  emit closed();
+}
+
+bool Server::isOpen()
+{
+  return this->isListening();
 }
 
 void Server::setPort(int port)
 {
-  if(this->isListening())
+  if(this->isOpen())
     this->stop();
   
   mPort = port;
@@ -62,7 +74,7 @@ void OpenIGTLinkServer::incomingConnection(int socketDescriptor)
   //create a thread
   OpenIGTLinkSession* session = new OpenIGTLinkSession(socketDescriptor);
   connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
-  connect(this, SIGNAL(frame(Frame)), session, SIGNAL(frame(Frame)), Qt::DirectConnection);
+  connect(this, SIGNAL(frame(Frame&)), session, SIGNAL(frame(Frame&)), Qt::DirectConnection);
   session->start();
 }
 

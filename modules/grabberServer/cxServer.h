@@ -2,7 +2,7 @@
 #define CXSERVER_H_
 
 #include <QTcpServer>
-//#include "igtlImageMessage.h"
+#include <boost/shared_ptr.hpp>
 #include "cxGrabber.h"
 
 namespace cx
@@ -10,7 +10,7 @@ namespace cx
 /**
  * \class Server
  *
- * \brief Server that is listening to default port 18333.
+ * \brief Abstract interface to a server that is listening to default port 18333.
  *
  * \date 26. nov. 2010
  * \author: Janne Beate Bakeng, SINTEF
@@ -23,20 +23,23 @@ public:
   Server(QObject* parent = NULL);
   virtual ~Server(){};
 
-  virtual void start();
-  virtual void stop();
+  virtual void start(); ///< Start listening to the port.
+  virtual void stop(); ///< Stop listening.
+  virtual bool isOpen(); ///< Is listening or not.
 
-  virtual void setPort(int port);
-  int getPort();
+  virtual void setPort(int port); ///< Changes the port the server listens to. Will automatically try to start listening to this port.
+  int getPort(); ///< The port the server is currently listening to.
 
 signals:
-  void frame(Frame frame);
+  void frame(Frame& frame); ///< Emitted whenever a new frame arrived.
+  void open(); ///< Emitted when the server is listening to a port.
+  void closed(); ///< Emitted when the server no longer is listening.
 
 protected:
-  virtual void incomingConnection(int socketDescriptor) = 0;
+  virtual void incomingConnection(int socketDescriptor) = 0; ///< Connects the server to a specific session. Must be implemented by subclasses.
 
 private:
-  int     mPort;
+  int     mPort; ///< The port the server listens to.
 };
 
 /**
@@ -57,9 +60,12 @@ public:
   virtual ~OpenIGTLinkServer();
 
 protected:
-  virtual void incomingConnection(int socketDescriptor);
+  virtual void incomingConnection(int socketDescriptor); ///< Connects to a OpenIGTLinkSession.
 
 private:
 };
+
+typedef boost::shared_ptr<class Server> ServerPtr;
+typedef boost::shared_ptr<class OpenIGTLinkServer> OpenIGTLinkServerPtr;
 }//namespace cx
 #endif /* CXSERVER_H_ */

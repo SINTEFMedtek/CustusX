@@ -3,14 +3,14 @@
 
 #include <QMainWindow>
 #include "sscConsoleWidget.h"
+#include "cxGrabberServerWidget.h"
 
 namespace cx
 {
-class GrabberServerWidget;
 /**
  * \class MainWindow
  *
- * \brief
+ * \brief Mainwindow for displaying a GrabberServerWidget and a ConsoleWidget.
  *
  * \date 16. nov. 2010
  * \author: Janne Beate Bakeng, SINTEF
