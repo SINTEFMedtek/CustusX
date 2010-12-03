@@ -17,8 +17,6 @@ OpenIGTLinkSession::~OpenIGTLinkSession()
 
 void OpenIGTLinkSession::run()
 {
-  //std::cout << "TreadId (Session): " << QThread::currentThread() << std::endl;
-
   mSocket = new QTcpSocket();
   mSocket->setSocketDescriptor(mSocketDescriptor);
   connect(mSocket, SIGNAL(disconnected()), this, SLOT(quit()), Qt::DirectConnection); // quit thread when disconnected
@@ -47,15 +45,10 @@ OpenIGTLinkSender::OpenIGTLinkSender(QTcpSocket* socket, QObject* parent) :
 }
 
 OpenIGTLinkSender::~OpenIGTLinkSender()
-{
-  std::cout << "Destructor: ~OpenIGTLinkSender()" << std::endl;
-}
+{}
 
 void OpenIGTLinkSender::receiveFrameSlot(Frame& frame)
 {
-  //I now receive frames
-  //ssc::messageManager()->sendInfo("Received frame: timestamp:"+qstring_cast(frame.mTimestamp));
-
   igtl::ImageMessage::Pointer imgMsg = convertFrame(frame);
   this->addImageToQueue(imgMsg);
 }
@@ -67,9 +60,6 @@ igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
   //extract data needed variables from the frame
   int size[] = {frame.mWidth, frame.mHeight, 1};
   int offset[] = {0, 0, 0};
-  //float spacing[] = {1.0, 1.0, 1.0};
-//  ssc::messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
-//  ssc::messageManager()->sendDebug("Width/Height: "+qstring_cast(frame.mWidth)+"/"+qstring_cast(frame.mHeight));
 
   // Create a new IMAGE type message
   retval->SetDimensions(size);
@@ -88,7 +78,6 @@ igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
 
   // Set image data
   int fsize = retval->GetImageSize();
-  //int frame = (staticCounter++) % image->GetDimensions()[2];
   memcpy(retval->GetScalarPointer(), frame.mFirstPixel, fsize); // not sure if we need to copy
 
   return retval;
@@ -96,12 +85,9 @@ igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
 
 void OpenIGTLinkSender::sendOpenIGTLinkImageSlot()
 {
-  //std::cout << "TreadId: " << QThread::currentThread() << std::endl;
-
   igtl::ImageMessage::Pointer message = this->getLastImageMessageFromQueue();
   message->Pack();
   mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
-  //ssc::messageManager()->sendInfo("Package sendt to socket.");
 }
 
 /** Add the message to a thread-safe queue
@@ -113,7 +99,6 @@ void OpenIGTLinkSender::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
   sentry.unlock();
   ssc::messageManager()->sendInfo("Images in queue: "+qstring_cast(mMutexedImageMessageQueue.size()));
   emit imageOnQueue(); // emit signal outside lock, catch possibly in another thread
-  //ssc::messageManager()->sendInfo("Image added to queue.");
 }
 
 /** Threadsafe retrieval of last image message.
