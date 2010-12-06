@@ -39,7 +39,7 @@ public:
 
 private:
   bool isInside(Vector3D p_u);
-  vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space t
+  vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
 	mutable Vector3D mCachedCenter_v; ///< center of beam sector for sector probes. Used in isInside()
 };
 

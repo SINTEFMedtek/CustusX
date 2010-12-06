@@ -250,6 +250,11 @@ void ProbeData::updateSector()
   else if (mData.mType == ProbeSector::tSECTOR)
   {
     Vector3D c = - mData.mDepthStart * e_y;  // arc center point
+//    std::cout << "c_local " << c << std::endl;
+//    std::cout << "c_u " << uMl.coord(c) << std::endl;
+//    Vector3D c_e = c + mData.mDepthStart * unitVector(M_PI_2);
+//    std::cout << "c_e_local " << c_e << std::endl;
+//    std::cout << "c_e_u " << uMl.coord(c_e) << std::endl;
 
     int arcRes = 20;//Number of points in arc
     double angleIncrement = mData.mWidth/arcRes;

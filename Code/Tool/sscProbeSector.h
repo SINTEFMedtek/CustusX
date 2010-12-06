@@ -8,19 +8,68 @@ class QDomNode;
 namespace ssc
 {
 
-struct ProbeImageData
-{
-  ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
-  ssc::Vector3D mSpacing;
-  QSize mSize;
-};
-
 /**Definition of characteristics for an Ultrasound Probe.
+ *
+ *  * Definitions of probe geometry:
+ *
+ *  Sector probe:
+ *
+ *                    '   -------------- arc center (implicit)
+ *                  '   '
+ *                '       '
+ *              '           '
+ *            '  '         '  '
+ *          '      ' '*' '      '  ----- depth start, origin (*) marks physical probe tip.
+ *        '                       '
+ *      '                           '
+ *        ' ' '               ' ' '
+ *              ' ' ' ' ' ' '  --------- depth end
+ *
+ *             width in radians
+ *
+ *
+ * Linear probe:
+ *
+ *         ' ' ' ' ' '*' ' ' ' ' ------- depth start, origin (*) marks physical probe tip.
+ *         '                   '
+ *         '                   '
+ *         '                   '
+ *         '                   '
+ *         '                   '
+ *         '                   '
+ *         ' ' ' ' ' ' ' ' ' ' ' ------- depth end
+ *
+ *              width in mm
+ *
+ *
+ * Associated image:
+ *
+ *            x                   coordinate space v: origin upper left corner
+ *      v*---->
+ *       |
+ *       | ' ' ' ' ' ' ' ' ' ' '  size: pixel dimensions (width, height)
+ *      y. '                   '  spacing: pixel size (width, height)
+ *         '         *         '  origin_u: physical probe tip in space u, dimensions mm
+ *         '                   '
+ *      y^ '                   '
+ *       | '                   '
+ *       | ' ' ' ' ' ' ' ' ' ' '
+ *      u*---->                  coordinate space u: origin lower left corner
+ *            x
+ *
+ *
  */
 class ProbeSector
 {
 public: 
-	enum TYPE { tNONE=0,   ///< undefined
+  struct ProbeImageData
+  {
+    ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
+    ssc::Vector3D mSpacing;
+    QSize mSize;
+  };
+
+  enum TYPE { tNONE=0,   ///< undefined
 				tSECTOR=1, ///< US beam is emitted radially in a flat cone. 
 				tLINEAR=2  ///< US beam is emitted straight forward.
 				};	
