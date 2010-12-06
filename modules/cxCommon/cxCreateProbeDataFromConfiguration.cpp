@@ -16,12 +16,13 @@ ssc::ProbeSector createProbeDataFromConfiguration(ProbeXmlConfigParser::Configur
   double depthStart = config.mOffset * config.mPixelHeight;
   double depthEnd = config.mDepth * config.mPixelHeight + depthStart;
 
-  ssc::ProbeImageData imageData;
+  ssc::ProbeSector::ProbeImageData imageData;
   imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
   imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
   // find the origin in a mm-based, lower-left-corner coord space:
   ssc::Vector3D c(config.mOriginCol, config.mImageHeight - config.mOriginRow - 1, 0);
   c = multiply_elems(c, imageData.mSpacing);
+  c[1] -= depthStart; // config def of origin is before offset, probesector def is after offset (physical probe tip)
   imageData.mOrigin_u = c;
 
   ssc::ProbeSector probeSector;
