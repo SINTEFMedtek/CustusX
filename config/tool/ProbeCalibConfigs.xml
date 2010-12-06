@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-<<<<<<< HEAD
    <Version>3.2.2</Version>
-=======
-   <Version>3.2.1</Version>
->>>>>>> bc6e5b6cd8bf7a948f43680149bdca2a49552160
    <USScanner>
       <Name>Vivid 7 - Karkirurgen</Name>
       <USProbe>
@@ -444,15 +440,11 @@
          <DefaultRTSource>VGA</DefaultRTSource>
          <RTSource>
             <Name>VGA</Name>
-<<<<<<< HEAD
-            <DefaultConfig>WidthMaxDepth80</DefaultConfig>
-=======
->>>>>>> bc6e5b6cd8bf7a948f43680149bdca2a49552160
+            <DefaultConfig>WidthMaxDepth8</DefaultConfig>
             <ImageSize>
                <Width>800</Width>
                <Height>600</Height>
             </ImageSize>
-<<<<<<< HEAD
             <HorizontalOffset>-17</HorizontalOffset>
             <Config>
                <ID>WidthMaxDepth8</ID>
@@ -568,52 +560,6 @@
                   <Height>0.34483</Height>
                </PixelSize>
             </Config>
-=======
-            <HorizontalOffset>-30</HorizontalOffset>
-            <DefaultConfig>WidthMaxDepth80</DefaultConfig>
-            <Config>
-               <ID>WidthMaxDepth80</ID>
-               <Name>Width: Max, Depth: 80 mm</Name>
-               <WidthDeg>58.6018</WidthDeg>
-               <Depth>80</Depth>
-               <ImageSize>
-                    <Width>800</Width>
-                    <Height>600</Height>
-               </ImageSize>
-               <Offset>64.411</Offset>
-               <Origin>
-                  <Col>358.6825</Col>
-                  <Row>-161.8492</Row>
-               </Origin>
-               <NCorners>4</NCorners>
-               <Corner>
-                  <Col>205</Col>
-                  <Row>112</Row>
-               </Corner>
-               <Corner>
-                  <Col>514</Col>
-                  <Row>112</Row>
-               </Corner>
-               <Corner>
-                  <Col>17</Col>
-                  <Row>447</Row>
-               </Corner>
-               <Corner>
-                  <Col>704</Col>
-                  <Row>447</Row>
-               </Corner>
-               <CroppingEdges>
-                  <Left>17</Left>
-                  <Right>594</Right>
-                  <Top>112</Top>
-                  <Bottom>537</Bottom>
-               </CroppingEdges>
-               <PixelSize>
-                  <Width>0.19827</Width>
-                  <Height>0.20566</Height>
-               </PixelSize>
-            </Config>
->>>>>>> bc6e5b6cd8bf7a948f43680149bdca2a49552160
          </RTSource>
       </USProbe>
    </USScanner>
