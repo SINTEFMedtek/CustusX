@@ -111,7 +111,8 @@ bool ProbeData::isInside(Vector3D p_v)
  */
 vtkImageDataPtr ProbeData::getMask()
 {
-  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.mOrigin_u) - mData.mDepthStart * Vector3D(0,1,0);
+//  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.mOrigin_u) - mData.mDepthStart * Vector3D(0,1,0);
+  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.mOrigin_u);
 
   vtkImageDataPtr retval;
   retval = generateVtkImageData(Vector3D(mData.mImage.mSize.width(),mData.mImage.mSize.height(),1), mData.mImage.mSpacing, 0);
@@ -249,7 +250,9 @@ void ProbeData::updateSector()
   }
   else if (mData.mType == ProbeSector::tSECTOR)
   {
-    Vector3D c = - mData.mDepthStart * e_y;  // arc center point
+    Vector3D c(0,0,0);  // arc center point
+//    Vector3D c = - mData.mDepthStart * e_y;  // arc center point
+
 //    std::cout << "c_local " << c << std::endl;
 //    std::cout << "c_u " << uMl.coord(c) << std::endl;
 //    Vector3D c_e = c + mData.mDepthStart * unitVector(M_PI_2);

@@ -14,12 +14,12 @@ namespace ssc
  *
  *  Sector probe:
  *
- *                    '   -------------- arc center (implicit)
+ *                    *   -------------- origin of t space
  *                  '   '
  *                '       '
  *              '           '
  *            '  '         '  '
- *          '      ' '*' '      '  ----- depth start, origin (*) marks physical probe tip.
+ *          '      ' ' ' '      '  ----- depth start
  *        '                       '
  *      '                           '
  *        ' ' '               ' ' '
@@ -30,7 +30,7 @@ namespace ssc
  *
  * Linear probe:
  *
- *         ' ' ' ' ' '*' ' ' ' ' ------- depth start, origin (*) marks physical probe tip.
+ *         ' ' ' ' ' '*' ' ' ' ' ------- depth start, origin (*) of t space
  *         '                   '
  *         '                   '
  *         '                   '
@@ -49,7 +49,7 @@ namespace ssc
  *       |
  *       | ' ' ' ' ' ' ' ' ' ' '  size: pixel dimensions (width, height)
  *      y. '                   '  spacing: pixel size (width, height)
- *         '         *         '  origin_u: physical probe tip in space u, dimensions mm
+ *         '         *         '  origin_u: calibration center in space u, dimensions mm. origin of t space.
  *         '                   '
  *      y^ '                   '
  *       | '                   '
