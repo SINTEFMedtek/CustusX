@@ -9,6 +9,7 @@
 #include <vtkRenderer.h>
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkCamera.h"
 
 #include "sscTestUtilities.h"
 #include "sscDataManager.h"
@@ -48,6 +49,7 @@ namespace {
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
+	m_test_view = NULL;
 	mDumpSpeedData = false;
 	mRenderCount = 0;
 	mTotalRender = 0;
@@ -75,6 +77,9 @@ ViewsWindow::~ViewsWindow()
 ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
 	ssc::View* view = new ssc::View(centralWidget());
+	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+	view->GetRenderWindow()->GetInteractor()->Disable();
+
 	mLayouts.insert(view);
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
@@ -89,6 +94,10 @@ ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, 
 	rep->setSliceProxy(proxy);
 
 	view->addRep(rep);
+
+	m_test_rep = rep;
+	m_test_view = view;
+
 	return view;
 }
 
@@ -96,11 +105,14 @@ Transform3D ViewsWindow::get_vpMs(ssc::View* view) const
 {
 	Vector3D center_vp = getViewport(view).center();
 
-	double zoomFactor = 1; // real magnification
+	double zoomFactor = 0.3; // real magnification
 	double scale = zoomFactor/mmPerPix(view);
 	Transform3D S = createTransformScale(Vector3D(scale, scale, scale));
 	Transform3D T = createTransformTranslate(center_vp);// center of viewport in viewport coordinates
 	Transform3D M_vp_w = T*S; // first scale , then translate to center.
+
+//	std::cout << "vpMs " <<  M_vp_w << std::endl;
+
 	return M_vp_w;
 }
 
@@ -109,7 +121,9 @@ Transform3D ViewsWindow::get_vpMs(ssc::View* view) const
 ssc::DoubleBoundingBox3D ViewsWindow::getViewport(ssc::View* view) const
 {
 	QSize size = view->size();
-	return ssc::DoubleBoundingBox3D(0, size.width(), 0, size.height(), 0, 1);
+	ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 1);
+//	std::cout << "vp " << vp << std::endl;
+	return vp;
 }
 
 double ViewsWindow::mmPerPix(ssc::View* view) const
@@ -136,6 +150,8 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
 	ssc::View* view = new ssc::View(centralWidget());
+	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+	view->GetRenderWindow()->GetInteractor()->Disable();
 	mLayouts.insert(view);
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
@@ -276,8 +292,33 @@ void ViewsWindow::brightness(int val)
 //	image1->getLookupTable2D().setLevel(val/1.0);
 }
 
+
+//void ViewsWindow::zoom2D()
+//{
+//}
+
 void ViewsWindow::updateRender()
 {
+	double factor = 0.3;
+
+	for (std::set<ssc::View*>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
+	{
+		ssc::View* view = *iter;
+		ssc::DoubleBoundingBox3D bb  = getViewport(view);
+		double viewPortHeightPix = bb.range()[1];
+
+		vtkCamera* camera = view->getRenderer()->GetActiveCamera();
+		double viewportHeightmm = viewPortHeightPix*mmPerPix(view);
+		double parallelscale = viewportHeightmm/2/factor;
+		camera->SetParallelScale(parallelscale);
+	}
+
+	if (m_test_view)
+	{
+//		std::cout << "pling" << std::endl;
+		m_test_rep->setViewportData(get_vpMs(m_test_view), getViewport(m_test_view));
+	}
+
 	if (mRenderCount==1)
 	{
 		mTotalRender = 0;
