@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	QString posFile(argv[arg++]);
 	ssc::PositionStorageReader reader(posFile);
 	QString startTS;
-	if (argc == arg)
+	if (argc == arg + 1)
 	{
 		startTS = QString(argv[arg++]);
 	}
