@@ -18,22 +18,29 @@
 int main(int argc, char **argv)
 {
 	QApplication app(argc, argv);
+	int arg = 1;
 	
-	if (argc<3)
+	if (argc<2)
 	{
 		std::cout << "usage: sscPositionFileReader [-v] <filename> <timestamp>" << std::endl;
 		return 0;
 	}
 
-	QString posFile(argv[1]);
-	QString startTS(argv[2]);
-	bool verbose = argc>2 && QString(argv[1])=="-v";
-	if (verbose)
+
+	bool verbose = (QString(argv[1]) == "-v");
+	if (verbose) arg++;
+	QString posFile(argv[arg++]);
+	ssc::PositionStorageReader reader(posFile);
+	QString startTS;
+	if (argc == arg)
 	{
-		posFile = QString(argv[2]);		
-		startTS = QString(argv[3]);
+		startTS = QString(argv[arg++]);
 	}
-	
+	else if (reader.version() == 1)
+	{
+		std::cout << "This is a version 1 of the record format, and requires a timestamp parameter.";
+		return 0;
+	}
 	QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
 	boost::uint64_t ret64 = startTime.toTime_t();
 	ret64 *= 1000;
@@ -41,8 +48,6 @@ int main(int argc, char **argv)
 	// workaround for compilling 32 bit version:
 	boost::uint64_t tsModifier = ret64 & (std::numeric_limits<boost::uint64_t>::max() ^ 0xffffffff); // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
 	//boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
-
-	ssc::PositionStorageReader reader(posFile);
 	
 	ssc::Transform3D T;
 	double timestamp;
@@ -56,7 +61,10 @@ int main(int argc, char **argv)
 	{
 		reader.read(&T, &timestamp, &toolIndex);
 		boost::uint64_t ts64 = (boost::uint64_t)timestamp;
-		ts64 |= tsModifier;
+		if (reader.version() == 1)
+		{
+			ts64 |= tsModifier;
+		}
 
 		if (verbose)
 		{
