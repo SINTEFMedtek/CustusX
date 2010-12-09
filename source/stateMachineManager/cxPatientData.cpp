@@ -400,7 +400,7 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
   registrationManager()->parseXml(registrationNode);
 
   QDomNode stateManagerNode = managerNode.namedItem("stateManager");
-  stateManager()->parseXml(registrationNode);
+  stateManager()->parseXml(stateManagerNode);
 }
 
 
