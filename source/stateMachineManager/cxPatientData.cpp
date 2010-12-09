@@ -148,6 +148,7 @@ void PatientData::savePatient()
                                +" Error: "+file.errorString());
   }
 
+  ssc::toolManager()->savePositionHistory();
   //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...
 }
