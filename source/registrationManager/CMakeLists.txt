@@ -10,6 +10,8 @@ SET ( ${LIB}_registrationManager
 	cxFrameForest.h
     cxFrameForest.cpp
     cxLandmarkTranslationRegistration.cpp
+    cxRecordSession.h
+    cxRecordSession.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

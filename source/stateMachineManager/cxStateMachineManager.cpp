@@ -175,8 +175,56 @@ void StateManager::resetDesktop()
   parser.resetDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
 }
 
-void StateManager::addXml(QDomNode& dataNode)
-{}
+void StateManager::addRecordSession(RecordSessionPtr session)
+{
+  mRecordSessions.push_back(session);
+  emit recordedSessionsChanged();
+}
+
+void StateManager::removeRecordSession(RecordSessionPtr session)
+{
+  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
+  for(; it != mRecordSessions.end(); ++it)
+  {
+    if((*it)->getUid() == session->getUid())
+      mRecordSessions.erase(it);
+  }
+  emit recordedSessionsChanged();
+}
+
+std::vector<RecordSessionPtr> StateManager::getRecordSessions()
+{
+  return mRecordSessions;
+}
+
+RecordSessionPtr StateManager::getRecordSession(QString uid)
+{
+  RecordSessionPtr retval;
+  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
+  for(; it != mRecordSessions.end(); ++it)
+  {
+    if((*it)->getUid() == uid)
+      retval = (*it);
+  }
+  return retval;
+}
+
+void StateManager::addXml(QDomNode& parentNode)
+{
+  QDomDocument doc = parentNode.ownerDocument();
+  QDomElement base = doc.createElement("stateManager");
+  parentNode.appendChild(base);
+
+  QDomElement sessionsNode = doc.createElement("recordSessions");
+  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
+  for(; it != mRecordSessions.end(); ++it)
+  {
+    QDomElement sessionNode = doc.createElement("recordSession");
+    (*it)->addXml(sessionNode);
+    sessionsNode.appendChild(sessionNode);
+  }
+  base.appendChild(sessionsNode);
+}
 
 void StateManager::parseXml(QDomNode& dataNode)
 {}
