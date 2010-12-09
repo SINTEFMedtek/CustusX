@@ -92,8 +92,9 @@ public:
   virtual ssc::Tool::Type getType() const;
   virtual QString getGraphicsFileName() const;
   virtual vtkPolyDataPtr getGraphicsPolyData() const;
-  virtual void saveTransformsAndTimestamps();
-  virtual void setTransformSaveFile(const QString& filename);
+  virtual ssc::TimedTransformMapPtr getPositionHistory();
+//  virtual void saveTransformsAndTimestamps();
+//  virtual void setTransformSaveFile(const QString& filename);
   virtual ssc::Transform3D get_prMt() const;
   virtual bool getVisible() const;
   virtual QString getUid() const;
@@ -158,8 +159,9 @@ protected:
   AuroraTrackerToolType::Pointer mTempAuroraTool;   ///< internal container for a temp aurora too
   ObserverType::Pointer mToolObserver;              ///< observer listening for igstk events
   TransformType mCalibrationTransform;              ///< a matrix representing the tools calibration
-  Transform3DVectorPtr mTransforms;                 ///< all transforms received by the tool
-  DoubleVectorPtr mTimestamps;                      ///< all timestamps received by the tool
+//  Transform3DVectorPtr mTransforms;                 ///< all transforms received by the tool
+//  DoubleVectorPtr mTimestamps;                      ///< all timestamps received by the tool
+  ssc::TimedTransformMapPtr mPositionHistory;
   vtkPolyDataPtr mPolyData;                         ///< the polydata used to represent the tool graphically
   ssc::Transform3DPtr m_prMt;                       ///< the transform from the tool to the patient reference
   igstk::Logger::Pointer mLogger;                   ///< logging the internal igstk behavior
