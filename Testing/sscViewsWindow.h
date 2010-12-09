@@ -65,6 +65,9 @@ private:
 	ssc::AcceptanceBoxWidget* mAcceptanceBox; 
 	
 	
+	ssc::Texture3DSlicerRepPtr m_test_rep;
+	ssc::View* m_test_view;
+
 public slots:
 	void updateRender();
 	void contrast(int val);
