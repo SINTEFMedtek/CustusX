@@ -6,6 +6,8 @@
 #include "cxForwardDeclarations.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
+#include "cxRecordSession.h"
+#include <QObject>
 
 namespace cx
 {
@@ -27,8 +29,10 @@ struct Desktop
  * \date 4. aug. 2010
  * \author: Janne Beate Bakeng, SINTEF
  */
-class StateManager
+class StateManager : public QObject
 {
+  Q_OBJECT
+
 public:
   static StateManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
@@ -41,9 +45,17 @@ public:
   void saveDesktop(Desktop desktop);
   void resetDesktop();
 
+  void addRecordSession(RecordSessionPtr session);
+  void removeRecordSession(RecordSessionPtr session);
+  std::vector<RecordSessionPtr> getRecordSessions();
+  RecordSessionPtr getRecordSession(QString uid);
+
   //Interface for saving/loading
   void addXml(QDomNode& dataNode); ///< adds xml information about the StateManager and its variabels
   void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateManager.
+
+signals:
+  void  recordedSessionsChanged();
 
 private:
   StateManager();
@@ -56,6 +68,8 @@ private:
   WorkflowStateMachinePtr mWorkflowStateMachine;
   ApplicationStateMachinePtr mApplicationStateMachine;
   PatientDataPtr mPatientData;
+
+  std::vector<RecordSessionPtr> mRecordSessions;
 };
 StateManager* stateManager();
 }
