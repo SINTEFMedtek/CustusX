@@ -4,6 +4,7 @@
 #include <QString>
 #include <QFile>
 #include <QDataStream>
+#include <boost/cstdint.hpp>
 
 #include "sscTransform3D.h"
 
@@ -44,10 +45,12 @@ public:
   bool read(Transform3D* matrix, double* timestamp, QString* toolUid);
 	bool atEnd() const;
 	static QString timestampToString(double timestamp);
+	int version();
 private:
   QString mCurrentToolUid; ///< the tool currently being written.
 	QFile positions;
-	QDataStream stream;	
+	QDataStream stream;
+	quint8 mVersion;
 };
 
 /** Writer class for the position file.
@@ -63,9 +66,8 @@ class PositionStorageWriter
 public:
 	PositionStorageWriter(QString filename);
 	~PositionStorageWriter();
-	void write(Transform3D matrix, double timestamp, int toolIndex);
-  void write(Transform3D matrix, double timestamp, QString toolUid);
-
+	void write(Transform3D matrix, uint64_t timestamp, int toolIndex);
+  void write(Transform3D matrix, uint64_t timestamp, QString toolUid);
 private:
   QString mCurrentToolUid; ///< the tool currently being written.
 	QFile positions;

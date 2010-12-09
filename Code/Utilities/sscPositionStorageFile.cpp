@@ -16,10 +16,10 @@ PositionStorageReader::PositionStorageReader(QString filename) : positions(filen
 
   char header[6] = "     ";
   stream.readRawData(header, 6);
-  quint8 version = 0;
-  stream >> version;
+  mVersion = 0;
+  stream >> mVersion;
 
-  if (QString(header)!="SNWPOS" || version<1)
+  if (QString(header)!="SNWPOS" || mVersion<1)
   {
     std::cout << "Error in header for file [" << filename.toStdString() << "]" << std::endl;
     positions.close();
@@ -29,6 +29,11 @@ PositionStorageReader::PositionStorageReader(QString filename) : positions(filen
 PositionStorageReader::~PositionStorageReader()
 {
 
+}
+
+int PositionStorageReader::version()
+{
+  return mVersion;
 }
 
 bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, int* toolIndex)
@@ -144,7 +149,7 @@ PositionStorageWriter::PositionStorageWriter(QString filename) : positions(filen
 	if (positions.size() == 0)
 	{
 		stream.writeRawData("SNWPOS", 6);
-		stream << (quint8)2;
+		stream << (quint8)2; // version 1 had only 32 bit timestamps
 	}
 }
 
@@ -154,7 +159,7 @@ PositionStorageWriter::~PositionStorageWriter()
 }
 
 
-void PositionStorageWriter::write(Transform3D matrix, double timestamp, int toolIndex)
+void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, int toolIndex)
 {
 	ssc::Frame3D frame = ssc::Frame3D::create(matrix);
 	
@@ -170,7 +175,7 @@ void PositionStorageWriter::write(Transform3D matrix, double timestamp, int tool
 	stream << (double)frame.mPos[2];
 }
 
-void PositionStorageWriter::write(Transform3D matrix, double timestamp, QString toolUid)
+void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QString toolUid)
 {
   if (toolUid!=mCurrentToolUid)
   {
