@@ -493,6 +493,11 @@ void ToolManager::savePositionHistory()
 //    typedef std::map<double, ssc::Transform3D> TimedTransformMap;
 //    typedef boost::shared_ptr<TimestampedTransformMap> TimedTransformMapPtr;
     ssc::TimedTransformMapPtr data = current->getPositionHistory();
+    if(!data)
+    {
+      ssc::messageManager()->sendInfo("No position history available to save.");
+      return;
+    }
 
     for (ssc::TimedTransformMap::iterator iter = data->begin(); iter!=data->end(); ++iter)
     {

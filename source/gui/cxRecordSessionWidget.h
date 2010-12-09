@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class QPushButton;
+class QLineEdit;
 
 namespace cx
 {
@@ -20,7 +21,7 @@ class RecordSessionWidget : public QWidget
   Q_OBJECT
 
 public:
-  RecordSessionWidget(QWidget* parent);
+  RecordSessionWidget(QWidget* parent, QString defaultDescription = "Record Session");
   ~RecordSessionWidget();
 
 private slots:
@@ -31,8 +32,9 @@ private:
   void stopRecording();
 
   QPushButton* mStartStopButton;
-  double mStartTime; //in MICROseconds since epoch
-  double mStopTime; //in MICROseconds since epoch
+  QLineEdit* mDescriptionLine;
+  double mStartTime; //in milliseconds since epoch
+  double mStopTime; //in milliseconds since epoch
 };
 
 }//namespace cx
