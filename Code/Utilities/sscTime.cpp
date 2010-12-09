@@ -28,4 +28,13 @@ double getMicroSecondsSinceEpoch()
 #endif
 }
 
+double getMilliSecondsSinceEpoch()
+{
+#if QT_VERSION >= 0x040700
+  return QDateTime().toMSecsSinceEpoch(); //milliseconds
+#else
+  return QDateTime().toTime_t(); //milliseconds
+#endif
+}
+
 } // namespace ssc

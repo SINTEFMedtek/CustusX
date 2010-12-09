@@ -24,10 +24,13 @@ QString timestampSecondsFormat();
  */
 QString timestampSecondsFormatNice();
 
-/**
- * Mircro seconds since epoch (1970)
+/** Mircro seconds since epoch (1970)
  */
 double getMicroSecondsSinceEpoch();
+
+/** Milli seconds since epoch (1970)
+ */
+double getMilliSecondsSinceEpoch();
 
 //} // time
 } // ssc
