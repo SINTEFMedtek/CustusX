@@ -23,8 +23,9 @@ Tool::Tool(InternalStructure& internalStructure) :
   mValid(false),
   mTool(NULL),
   mToolObserver(ObserverType::New()),
-  mTransforms(new Transform3DVector()),
-  mTimestamps(new DoubleVector()),
+//  mTransforms(new Transform3DVector()),
+//  mTimestamps(new DoubleVector()),
+  mPositionHistory(new ssc::TimedTransformMap()),
   mPolyData(NULL),
   m_prMt(new ssc::Transform3D()),
   mConfigured(false),
@@ -37,7 +38,6 @@ Tool::Tool(InternalStructure& internalStructure) :
 {
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
-
   mToolObserver->SetCallbackFunction(this, &Tool::toolTransformCallback);
 
   if(this->verifyInternalStructure())
@@ -79,64 +79,69 @@ vtkPolyDataPtr Tool::getGraphicsPolyData() const
   return mPolyData;
 }
 
-void Tool::saveTransformsAndTimestamps()
+ssc::TimedTransformMapPtr Tool::getPositionHistory()
 {
-  if(this->getType() == Tool::TOOL_REFERENCE)
-    return;  //we don't save transforms and timestamps for reference tools
-
-  QDateTime dateTime = QDateTime::currentDateTime();
-  QString stamp = dateTime.toString(QString("ddMMyyhhmmss"));
-
-  std::stringstream timestampsName;
-  std::stringstream transformsName;
-  timestampsName << mInternalStructure.mTransformSaveFileName 
-  << ssc::Tool::mName << "_" << stamp << "_timestamps.txt";
-  transformsName << mInternalStructure.mTransformSaveFileName 
-  << ssc::Tool::mName << "_" << stamp << "_transforms.txt";
-  
-  //Save the timestamps
-  std::ofstream timestamps;
-  timestamps.open(timestampsName.str().c_str());
-  timestamps << std::fixed;
-  timestamps << mTimestamps->size();
-  timestamps << std::endl;
-  DoubleVector::iterator it1 = mTimestamps->begin();
-  while(it1 != mTimestamps->end())
-  {
-    timestamps << (*it1) << " ";
-    timestamps << std::endl;
-    it1++;
-  }
-  mTimestamps.reset();
-  timestamps.close();
-  
-  //Save the transforms
-  std::ofstream transforms;
-  transforms.open(transformsName.str().c_str());
-  transforms << mTransforms->size();
-  transforms << std::endl;
-  Transform3DVector::iterator it2 = mTransforms->begin();
-  while(it2 != mTransforms->end())
-  {
-    for(int row=0; row<3; row++)
-    {
-      transforms << (*it2)->matrix()->GetElement(row, 0) << " ";
-      transforms << (*it2)->matrix()->GetElement(row, 1) << " ";
-      transforms << (*it2)->matrix()->GetElement(row, 2) << " ";
-      transforms << (*it2)->matrix()->GetElement(row, 3);
-      transforms << std::endl;
-    }
-    transforms << std::endl;
-    it2++;
-  }
-  mTransforms.reset();
-  transforms.close();
+  return mPositionHistory;
 }
 
-void Tool::setTransformSaveFile(const QString& filename)
-{
-  mInternalStructure.mTransformSaveFileName = filename;
-}
+//void Tool::saveTransformsAndTimestamps()
+//{
+//  if(this->getType() == Tool::TOOL_REFERENCE)
+//    return;  //we don't save transforms and timestamps for reference tools
+//
+//  QDateTime dateTime = QDateTime::currentDateTime();
+//  QString stamp = dateTime.toString(QString("ddMMyyhhmmss"));
+//
+//  std::stringstream timestampsName;
+//  std::stringstream transformsName;
+//  timestampsName << mInternalStructure.mTransformSaveFileName
+//  << ssc::Tool::mName << "_" << stamp << "_timestamps.txt";
+//  transformsName << mInternalStructure.mTransformSaveFileName
+//  << ssc::Tool::mName << "_" << stamp << "_transforms.txt";
+//
+//  //Save the timestamps
+//  std::ofstream timestamps;
+//  timestamps.open(timestampsName.str().c_str());
+//  timestamps << std::fixed;
+//  timestamps << mTimestamps->size();
+//  timestamps << std::endl;
+//  DoubleVector::iterator it1 = mTimestamps->begin();
+//  while(it1 != mTimestamps->end())
+//  {
+//    timestamps << (*it1) << " ";
+//    timestamps << std::endl;
+//    it1++;
+//  }
+//  mTimestamps.reset();
+//  timestamps.close();
+//
+//  //Save the transforms
+//  std::ofstream transforms;
+//  transforms.open(transformsName.str().c_str());
+//  transforms << mTransforms->size();
+//  transforms << std::endl;
+//  Transform3DVector::iterator it2 = mTransforms->begin();
+//  while(it2 != mTransforms->end())
+//  {
+//    for(int row=0; row<3; row++)
+//    {
+//      transforms << (*it2)->matrix()->GetElement(row, 0) << " ";
+//      transforms << (*it2)->matrix()->GetElement(row, 1) << " ";
+//      transforms << (*it2)->matrix()->GetElement(row, 2) << " ";
+//      transforms << (*it2)->matrix()->GetElement(row, 3);
+//      transforms << std::endl;
+//    }
+//    transforms << std::endl;
+//    it2++;
+//  }
+//  mTransforms.reset();
+//  transforms.close();
+//}
+//
+//void Tool::setTransformSaveFile(const QString& filename)
+//{
+//  mInternalStructure.mTransformSaveFileName = filename;
+//}
 
 ssc::Transform3D Tool::get_prMt() const
 {
@@ -238,8 +243,9 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
 
     m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(prMt));
 
-    mTransforms->push_back(m_prMt);
-    mTimestamps->push_back(timestamp);
+    (*mPositionHistory)[timestamp] = *m_prMt;
+//    mTransforms->push_back(m_prMt);
+//    mTimestamps->push_back(timestamp);
 
 
     emit toolTransformAndTimestamp((*m_prMt), timestamp);

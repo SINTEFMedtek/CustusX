@@ -15,6 +15,7 @@
 #include "cxTracker.h"
 #include "cxToolConfigurationParser.h"
 #include "sscTypeConversions.h"
+#include "sscPositionStorageFile.h"
 
 namespace cx
 {
@@ -284,7 +285,7 @@ void ToolManager::stopTracking()
 }
 void ToolManager::saveToolsSlot()
 {
-  this->saveTransformsAndTimestamps();
+  this->savePositionHistory();
   ssc::messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
@@ -474,15 +475,58 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
   return mReferenceTool;
 }
 
-void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
+
+
+void ToolManager::savePositionHistory()
 {
+  QString filename = mLoggingFolder + "/toolpositions.snwpos";
+
+  // todo: save only positions newer than last load/save time. The writer is appending.
+
+  ssc::PositionStorageWriter writer(filename);
+
   ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
-    ((*it).second)->saveTransformsAndTimestamps();
-    it++;
+    ssc::ToolPtr current = (it++)->second;
+
+//    typedef std::map<double, ssc::Transform3D> TimedTransformMap;
+//    typedef boost::shared_ptr<TimestampedTransformMap> TimedTransformMapPtr;
+    ssc::TimedTransformMapPtr data = current->getPositionHistory();
+
+    for (ssc::TimedTransformMap::iterator iter = data->begin(); iter!=data->end(); ++iter)
+    {
+      writer.write(iter->second, iter->first, current->getUid());
+    }
+
+//    ((*it).second)->saveTransformsAndTimestamps();
+//    it++;
   }
 }
+
+void ToolManager::loadPositionHistory()
+{
+  QString filename = mLoggingFolder + "/toolpositions.snwpos";
+
+  ssc::PositionStorageReader reader(filename);
+
+  ssc::Transform3D matrix;
+  double timestamp;
+  QString toolUid;
+
+  while (!reader.atEnd())
+  {
+    if (!reader.read(&matrix, &timestamp, &toolUid))
+      break;
+
+    ssc::ToolPtr current = this->getTool(toolUid);
+    if (current)
+    {
+      (*current->getPositionHistory())[timestamp] = matrix;
+    }
+  }
+}
+
 
 void ToolManager::setConfigurationFile(QString configurationFile)
 {
