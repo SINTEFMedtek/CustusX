@@ -21,7 +21,11 @@ QString timestampSecondsFormatNice()
 
 double getMicroSecondsSinceEpoch()
 {
+#if QT_VERSION >= 0x040700
   return QDateTime().toMSecsSinceEpoch()*1000; //microseconds
+#else
+  return QDateTime().toTime_t()*1000; //microseconds
+#endif
 }
 
 } // namespace ssc
