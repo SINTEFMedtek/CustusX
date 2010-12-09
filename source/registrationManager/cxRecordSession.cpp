@@ -15,7 +15,6 @@ RecordSession::RecordSession(double startTime, double stopTime, QString descript
 {
   mUid = this->getNewUid();
   mDescription.append(" ("+mUid+")");
-  ssc::messageManager()->sendDebug("Made a new Record Session with uid: "+mUid);
 }
 
 RecordSession::~RecordSession()

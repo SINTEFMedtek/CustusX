@@ -16,7 +16,7 @@
 #include "sscDefinitions.h"
 #include "cxRegistrationManager.h"
 #include "cxForwardDeclarations.h"
-//#include "cxRecordSession.h"
+#include "cxRecordSession.h"
 
 namespace cx
 {
@@ -136,23 +136,23 @@ public: // optional methods
   virtual QString convertInternal2Display(QString internal);
 };
 typedef boost::shared_ptr<class SelectToolStringDataAdapterBase> SelectToolStringDataAdapterBasePtr;
-//
-///** Base class for all DataAdapters that selects a record session.
-// */
-//class SelectRecordSessionStringDataAdapterBase : public ssc::StringDataAdapter
-//{
-//  Q_OBJECT
-//public:
-//  SelectRecordSessionStringDataAdapterBase();
-//  virtual ~SelectRecordSessionStringDataAdapterBase() {}
-//
-//public: // basic methods
-//
-//public: // optional methods
-//  virtual QStringList getValueRange() const;
-//  virtual QString convertInternal2Display(QString internal);
-//};
-//typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapterBase> SelectRecordSessionStringDataAdapterBasePtr;
+
+/** Base class for all DataAdapters that selects a record session.
+ */
+class SelectRecordSessionStringDataAdapterBase : public ssc::StringDataAdapter
+{
+  Q_OBJECT
+public:
+  SelectRecordSessionStringDataAdapterBase();
+  virtual ~SelectRecordSessionStringDataAdapterBase() {}
+
+public: // basic methods
+
+public: // optional methods
+  virtual QStringList getValueRange() const;
+  virtual QString convertInternal2Display(QString internal);
+};
+typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapterBase> SelectRecordSessionStringDataAdapterBasePtr;
 
 /** Base class for all DataAdapters that selects a coordinatesystem.
  */
@@ -327,34 +327,34 @@ private:
   ssc::ToolPtr mTool;
 };
 
-//typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapter> SelectRecordSessionStringDataAdapterPtr;
-///** Adapter that selects and stores a tool.
-// * The tool is stored internally in the adapter.
-// * Use setValue/getValue plus changed() to access it.
-// *
-// */
-//class SelectRecordSessionStringDataAdapter : public SelectRecordSessionStringDataAdapterBase
-//{
-//  Q_OBJECT
-//public:
-//  static SelectRecordSessionStringDataAdapterPtr New() { return SelectRecordSessionStringDataAdapterPtr(new SelectRecordSessionStringDataAdapter()); }
-//  SelectRecordSessionStringDataAdapter();
-//  virtual ~SelectRecordSessionStringDataAdapter() {}
-//
-//public: // basic methods
-//  virtual QString getValueName() const;
-//  virtual bool setValue(const QString& value);
-//  virtual QString getValue() const;
-//
-//public: // optional methods
-//  virtual QString getHelp() const;
-//
-//public: //interface extencion
-//  RecordSessionPtr getRecordSession();
-//
-//private:
-//  RecordSessionPtr mRecordSession;
-//};
+typedef boost::shared_ptr<class SelectRecordSessionStringDataAdapter> SelectRecordSessionStringDataAdapterPtr;
+/** Adapter that selects and stores a tool.
+ * The tool is stored internally in the adapter.
+ * Use setValue/getValue plus changed() to access it.
+ *
+ */
+class SelectRecordSessionStringDataAdapter : public SelectRecordSessionStringDataAdapterBase
+{
+  Q_OBJECT
+public:
+  static SelectRecordSessionStringDataAdapterPtr New() { return SelectRecordSessionStringDataAdapterPtr(new SelectRecordSessionStringDataAdapter()); }
+  SelectRecordSessionStringDataAdapter();
+  virtual ~SelectRecordSessionStringDataAdapter() {}
+
+public: // basic methods
+  virtual QString getValueName() const;
+  virtual bool setValue(const QString& value);
+  virtual QString getValue() const;
+
+public: // optional methods
+  virtual QString getHelp() const;
+
+public: //interface extencion
+  RecordSessionPtr getRecordSession();
+
+private:
+  RecordSessionPtr mRecordSession;
+};
 
 typedef boost::shared_ptr<class SelectDataStringDataAdapter> SelectDataStringDataAdapterPtr;
 /** Adapter that selects and stores a data.
