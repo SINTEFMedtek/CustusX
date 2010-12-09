@@ -126,6 +126,7 @@ protected:
   igstk::PulseGenerator::Pointer mPulseGenerator;
 
   ssc::LandmarkMap mLandmarks; ///< in space patient reference.
+  double mLastLoadPositionHistory;
 
 private:
   ToolManager(ToolManager const&);
