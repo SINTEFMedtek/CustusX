@@ -51,7 +51,7 @@ int main(int argc, char **argv)
 	
 	ssc::Transform3D T;
 	double timestamp;
-	int toolIndex;
+	QString toolIndex;
 	
 	std::cout << "reading file [" << posFile.toStdString() << "]" << std::endl;
 	if (!verbose)
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
 		{
 			std::cout 
 			 	<< "index:\t"<< index << '\t'
-				<< "tool id:\t" << toolIndex << '\t' 
+				<< "tool id:\t" << toolIndex.toStdString() << '\t'
 //				<< "timestamp:\t" << timestamp << '\n'
 				<< "timestamp:\t" << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\n'
 				<< "matrix:\n" << T << '\n' 
@@ -78,7 +78,7 @@ int main(int argc, char **argv)
 		}
 		else
 		{		
-			std::cout << "[" << index << "]\t" << toolIndex << '\t' << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
+			std::cout << "[" << index << "]\t" << toolIndex.toStdString() << '\t' << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
 			boost::array<double, 16>  val = T.flatten();
 			ssc::stream_range(std::cout, val.begin(), val.end(), ' ');
 			std::cout << std::endl;

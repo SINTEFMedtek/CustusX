@@ -164,7 +164,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, int to
 	ssc::Frame3D frame = ssc::Frame3D::create(matrix);
 	
 	stream << (quint8)1;	// Type - there is only one
-	stream << (quint8)15;	// Size of data following this point
+	stream << (quint8)(8+1+6*10);	// Size of data following this point
 	stream << (quint64)timestamp;	// Microseconds since Epoch
 	stream << (quint8)toolIndex;	// tool index
 	stream << (double)frame.mThetaXY;
@@ -191,7 +191,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
     ssc::Frame3D frame = ssc::Frame3D::create(matrix);
 
     stream << (quint8)3;  // Type -
-    stream << (quint8)15; // Size of data following this point
+    stream << (quint8)(8+6*10); // Size of data following this point
     stream << (quint64)timestamp; // Microseconds since Epoch
     stream << (double)frame.mThetaXY;
     stream << (double)frame.mThetaZ;
