@@ -479,7 +479,9 @@ void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
   ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
-    ((*it).second)->saveTransformsAndTimestamps();
+    ssc::ToolPtr tool = ((*it).second);
+    tool->setTransformSaveFile(filePathAndName);
+    tool->saveTransformsAndTimestamps();
     it++;
   }
 }

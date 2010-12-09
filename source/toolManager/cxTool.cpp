@@ -81,6 +81,10 @@ vtkPolyDataPtr Tool::getGraphicsPolyData() const
 
 void Tool::saveTransformsAndTimestamps()
 {
+  //TODO save with new fileformat
+  //CAS!!!
+
+  /*
   if(this->getType() == Tool::TOOL_REFERENCE)
     return;  //we don't save transforms and timestamps for reference tools
 
@@ -131,6 +135,7 @@ void Tool::saveTransformsAndTimestamps()
   }
   mTransforms.reset();
   transforms.close();
+  */
 }
 
 void Tool::setTransformSaveFile(const QString& filename)
