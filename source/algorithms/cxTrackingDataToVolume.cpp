@@ -5,8 +5,10 @@
 
 #include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
+#include "sscToolManager.h"
 #include "utils/sscReconstructHelper.h"
 #include "sscRegistrationTransform.h"
+#include "sscCoordinateSystemHelpers.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 
@@ -14,8 +16,7 @@ namespace cx
 {
 TrackingDataToVolume::TrackingDataToVolume() :
     mSpacing(0.2)
-{
-}
+{}
 
 TrackingDataToVolume::~TrackingDataToVolume()
 {}
@@ -51,22 +52,36 @@ ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D ex
   return image;
 }
 
-void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_pr, std::vector<ssc::Vector3D> points_pr)
+void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::Vector3D> points_pr)
 {
-//TODO
-  vtkImageDataPtr data_pr = image_pr->getBaseVtkImageData();
-  //unsigned char* dataPtr = data_pr->GetScalarPointer();
+  //TODO get someone to "double-check these numbers..." :P
+
+  vtkImageDataPtr data_pr = image_d->getBaseVtkImageData();
+
+  //convert points into image space (d) and insert a binary value into the image at the points location in the image
+  std::vector<ssc::Vector3D>::iterator it = points_pr.begin();
+  ssc::CoordinateSystem pr = ssc::CoordinateSystemHelpers::getPr();
+  ssc::CoordinateSystem d = ssc::CoordinateSystemHelpers::getD(image_d);
+
+  unsigned char point_value = 1;
+  for(; it != points_pr.end(); ++it)
+  {
+    ssc::Transform3D dMpr = ssc::CoordinateSystemHelpers::get_toMfrom(pr, d);
+    ssc::Vector3D point_d = dMpr.coord((*it));
+    unsigned char* voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_d[0], point_d[1], point_d[2]));
+    (*voxel_d) = point_value;
+  }
 }
 
 void TrackingDataToVolume::setInput(ssc::TimedTransformMap map_prMt)
 {
-  ssc::DoubleBoundingBox3D extent_pr = getBoundingBox(map_prMt);
-  mImage = createEmptyImage(extent_pr, mSpacing);
+  ssc::DoubleBoundingBox3D extent = getBoundingBox(map_prMt);
+  mImage = createEmptyImage(extent, mSpacing);
+  //TODO Should it be identity or rMpr.inv()???
+  mImage->get_rMd_History()->setRegistration(ssc::toolManager()->get_rMpr()->inv());
 
   std::vector<ssc::Vector3D> data_pr = this->extractPoints(map_prMt);
   this->insertPoints(mImage, data_pr);
-
-  mImage->get_rMd_History()->setRegistration(ssc::Transform3D());
 }
 
 ssc::ImagePtr TrackingDataToVolume::getOutput()
