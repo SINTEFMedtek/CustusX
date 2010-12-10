@@ -91,6 +91,11 @@ ssc::TimedTransformMap TrackedCenterlineWidget::getSessionTrackingData(QString s
   ssc::TimedTransformMap retval;
   std::map<ssc::ToolPtr, ssc::TimedTransformMap> toolTransformMap; //TODO toolmanager need to have a function for getting this kind of data?
   ssc::messageManager()->sendDebug("TODO: implement TrackedCenterlineWidget::getSessionTrackingData(QString sessionId)");
+
+  //TODO HACK!!!
+  retval = (*ssc::toolManager()->getDominantTool()->getPositionHistory().get());
+  //TODO HACK!!!
+
   if(toolTransformMap.size() == 1)
   {
     return toolTransformMap.begin()->second;
