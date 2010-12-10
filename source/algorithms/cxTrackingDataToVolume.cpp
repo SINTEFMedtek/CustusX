@@ -59,14 +59,14 @@ void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::
   vtkImageDataPtr data_pr = image_d->getBaseVtkImageData();
 
   //convert points into image space (d) and insert a binary value into the image at the points location in the image
-  std::vector<ssc::Vector3D>::iterator it = points_pr.begin();
   ssc::CoordinateSystem pr = ssc::CoordinateSystemHelpers::getPr();
   ssc::CoordinateSystem d = ssc::CoordinateSystemHelpers::getD(image_d);
+  ssc::Transform3D dMpr = ssc::CoordinateSystemHelpers::get_toMfrom(pr, d);
 
-  unsigned char point_value = 1;
+  std::vector<ssc::Vector3D>::iterator it = points_pr.begin();
+  unsigned char point_value = 1; //or 255???
   for(; it != points_pr.end(); ++it)
   {
-    ssc::Transform3D dMpr = ssc::CoordinateSystemHelpers::get_toMfrom(pr, d);
     ssc::Vector3D point_d = dMpr.coord((*it));
     unsigned char* voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_d[0], point_d[1], point_d[2]));
     (*voxel_d) = point_value;
