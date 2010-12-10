@@ -16,6 +16,7 @@
 #include "cxToolConfigurationParser.h"
 #include "sscTypeConversions.h"
 #include "sscPositionStorageFile.h"
+#include "sscTime.h"
 
 namespace cx
 {
@@ -31,14 +32,10 @@ ToolManager* ToolManager::getInstance()
 }
 
 ToolManager::ToolManager() :
-      mConfigurationFilePath(""),
-      mLoggingFolder(""),
-      mTracker(TrackerPtr()),
-      mConfiguredTools(new ssc::ToolManager::ToolMap),
-      mInitializedTools(new ssc::ToolManager::ToolMap), mDominantTool(
-          ssc::ToolPtr()), mReferenceTool(ssc::ToolPtr()), mConfigured(false),
-      mInitialized(false), mTracking(false), mPulseGenerator(
-          igstk::PulseGenerator::New())
+  mConfigurationFilePath(""), mLoggingFolder(""), mTracker(TrackerPtr()), mConfiguredTools(
+      new ssc::ToolManager::ToolMap), mInitializedTools(new ssc::ToolManager::ToolMap), mDominantTool(ssc::ToolPtr()),
+      mReferenceTool(ssc::ToolPtr()), mConfigured(false), mInitialized(false), mTracking(false), mPulseGenerator(
+          igstk::PulseGenerator::New()), mLastLoadPositionHistory(0)
 {
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransform()));
@@ -481,32 +478,29 @@ void ToolManager::savePositionHistory()
 {
   QString filename = mLoggingFolder + "/toolpositions.snwpos";
 
-  // todo: save only positions newer than last load/save time. The writer is appending.
-
   ssc::PositionStorageWriter writer(filename);
 
   ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
     ssc::ToolPtr current = (it++)->second;
-
-//    typedef std::map<double, ssc::Transform3D> TimedTransformMap;
-//    typedef boost::shared_ptr<TimestampedTransformMap> TimedTransformMapPtr;
     ssc::TimedTransformMapPtr data = current->getPositionHistory();
-    if(!data)
-    {
-      ssc::messageManager()->sendInfo("No position history available to save.");
-      return;
-    }
 
-    for (ssc::TimedTransformMap::iterator iter = data->begin(); iter!=data->end(); ++iter)
+    if (!data)
+      continue;
+
+    // save only data acquired after mLastLoadPositionHistory:
+    ssc::TimedTransformMap::iterator iter = data->lower_bound(mLastLoadPositionHistory);
+    for (; iter!=data->end(); ++iter)
     {
-      writer.write(iter->second, iter->first, current->getUid());
+      writer.write(iter->second, (iter->first), current->getUid());
     }
 
 //    ((*it).second)->saveTransformsAndTimestamps();
 //    it++;
   }
+
+  mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
 }
 
 void ToolManager::loadPositionHistory()
@@ -530,6 +524,8 @@ void ToolManager::loadPositionHistory()
       (*current->getPositionHistory())[timestamp] = matrix;
     }
   }
+
+  mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
 }
 
 
