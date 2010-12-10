@@ -2,9 +2,10 @@
 
 #include <QPushButton>
 #include <QLineEdit>
+#include <QLabel>
 #include <QVBoxLayout>
 #include "sscTime.h"
-#include "sscLabeledComboBoxWidget.h"
+//#include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
@@ -17,8 +18,8 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
     QWidget(parent),
     mStartStopButton(new QPushButton("Start")),
     mDescriptionLine(new QLineEdit(defaultDescription)),
-    mStartTime(-1),
-    mStopTime(-1)
+    mStartTimeMSec(-1),
+    mStopTimeMSec(-1)
 {
   this->setObjectName("RecordSessionWidget");
   this->setWindowTitle("Record Tracking");
@@ -36,6 +37,16 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
 RecordSessionWidget::~RecordSessionWidget()
 {}
 
+void RecordSessionWidget::changeEvent(QEvent* event)
+{
+  QWidget::changeEvent(event);
+  if(event->type() != QEvent::EnabledChange)
+    return;
+
+  if(!this->isEnabled())
+    this->stopRecording();
+}
+
 void RecordSessionWidget::startStopSlot(bool checked)
 {
   if(checked)
@@ -46,18 +57,42 @@ void RecordSessionWidget::startStopSlot(bool checked)
 
 void RecordSessionWidget::startRecording()
 {
-  mStartTime = ssc::getMilliSecondsSinceEpoch();
+  if(this->isRecording())
+  {
+    ssc::messageManager()->sendInfo("Already recording a session, stop before trying to start a new record session.");
+    return;
+  }
+
+  mStartTimeMSec = ssc::getMilliSecondsSinceEpoch();
   mStartStopButton->setText("Stop");
 }
 
 void RecordSessionWidget::stopRecording()
 {
-  mStopTime = ssc::getMilliSecondsSinceEpoch();
+  if(!this->isRecording())
+    return;
+
+  mStopTimeMSec = ssc::getMilliSecondsSinceEpoch();
   mStartStopButton->setText("Start");
 
-  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mStartTime, mStopTime, mDescriptionLine->text()));
+  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
   stateManager()->addRecordSession(session);
 
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamp
+
+  emit newSession(session->getUid());
+
+  this->reset();
+}
+
+bool RecordSessionWidget::isRecording()
+{
+  return (mStartTimeMSec > -1);
+}
+
+void RecordSessionWidget::reset()
+{
+  mStartTimeMSec = -1;
+  mStopTimeMSec = -1;
 }
 }
