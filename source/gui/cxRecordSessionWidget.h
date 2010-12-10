@@ -24,17 +24,26 @@ public:
   RecordSessionWidget(QWidget* parent, QString defaultDescription = "Record Session");
   ~RecordSessionWidget();
 
+signals:
+  void newSession(QString);
+
+protected:
+  void changeEvent(QEvent* event);
+
 private slots:
   void startStopSlot(bool);
 
 private:
   void startRecording();
   void stopRecording();
+  bool isRecording();
+
+  void reset();
 
   QPushButton* mStartStopButton;
   QLineEdit* mDescriptionLine;
-  double mStartTime; //in milliseconds since epoch
-  double mStopTime; //in milliseconds since epoch
+  double mStartTimeMSec;
+  double mStopTimeMSec;
 };
 
 }//namespace cx

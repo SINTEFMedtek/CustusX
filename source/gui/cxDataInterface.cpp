@@ -170,6 +170,31 @@ QString SelectImageStringDataAdapterBase::convertInternal2Display(QString intern
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+SelectRTSourceStringDataAdapterBase::SelectRTSourceStringDataAdapterBase()
+{
+  connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SIGNAL(changed()));
+}
+QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
+{
+  ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
+  QStringList retval;
+  retval << "";
+  ssc::DataManager::StreamMap::iterator it = streams.begin();
+  for (; it !=streams.end(); ++it)
+    retval << qstring_cast(it->second->getUid());
+  return retval;
+}
+QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString internal)
+{
+  ssc::RealTimeStreamSourcePtr rtSource = ssc::dataManager()->getStream(internal);
+  if (!rtSource)
+    return "<no real time source>";
+  return qstring_cast(rtSource->getName());
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase()
 {
   connect(ssc::dataManager(), SIGNAL(dataLoaded()),                         this, SIGNAL(changed()));
@@ -425,6 +450,55 @@ void SelectImageStringDataAdapter::setValueName(const QString name)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+SelectRTSourceStringDataAdapter::SelectRTSourceStringDataAdapter() :
+    mValueName("Select Real Time Source")
+{
+  connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(setDefaultSlot()));
+  this->setDefaultSlot();
+}
+QString SelectRTSourceStringDataAdapter::getValueName() const
+{
+  return mValueName;
+}
+bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
+{
+  if (value==mRTSourceUid)
+    return false;
+  mRTSourceUid = value;
+  emit changed();
+  emit rtSourceChanged();
+  return true;
+}
+QString SelectRTSourceStringDataAdapter::getValue() const
+{
+  return mRTSourceUid ;
+}
+QString SelectRTSourceStringDataAdapter::getHelp() const
+{
+  return "Select a real time source";
+}
+ssc::RealTimeStreamSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
+{
+  return ssc::dataManager()->getStream(mRTSourceUid);
+}
+
+void SelectRTSourceStringDataAdapter::setValueName(const QString name)
+{
+  mValueName = name;
+}
+void SelectRTSourceStringDataAdapter::setDefaultSlot()
+{
+  ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
+  ssc::DataManager::StreamMap::iterator it = streams.begin();
+  if(it != streams.end())
+  {
+    this->setValue(it->first);
+  }
+}
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 SelectCoordinateSystemStringDataAdapter::SelectCoordinateSystemStringDataAdapter()
 {
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(setDefaultSlot()));
@@ -495,6 +569,8 @@ ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
 
 SelectRecordSessionStringDataAdapter::SelectRecordSessionStringDataAdapter()
 {
+  connect(stateManager(), SIGNAL(recordedSessionsChanged()), this, SLOT(setDefaultSlot()));
+  this->setDefaultSlot();
 }
 QString SelectRecordSessionStringDataAdapter::getValueName() const
 {
@@ -525,6 +601,12 @@ QString SelectRecordSessionStringDataAdapter::getHelp() const
 RecordSessionPtr SelectRecordSessionStringDataAdapter::getRecordSession()
 {
   return mRecordSession;
+}
+void SelectRecordSessionStringDataAdapter::setDefaultSlot()
+{
+  std::vector<RecordSessionPtr> sessions = stateManager()->getRecordSessions();
+  if(sessions.size() > 0)
+    this->setValue(sessions.at(0)->getUid());
 }
 
 //---------------------------------------------------------
