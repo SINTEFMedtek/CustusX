@@ -2,6 +2,7 @@
 #define CXRECORDBASEWIDGET_H_
 
 #include <QWidget>
+#include "sscTool.h"
 #include "cxDataInterface.h"
 
 class QLabel;
@@ -32,7 +33,7 @@ signals:
 
 protected slots:
   virtual void checkIfReadySlot() = 0;
-  virtual void postProcessingSlot() = 0;
+  virtual void postProcessingSlot(QString sessionId) = 0;
 
 protected:
   void setWhatsMissingInfo(QString info);
@@ -61,7 +62,10 @@ public:
 
 protected slots:
   void checkIfReadySlot();
-  void postProcessingSlot();
+  void postProcessingSlot(QString sessionId);
+
+private:
+  ssc::TimedTransformMap getSessionTrackingData(QString sessionId);
 };
 
 /**
@@ -81,7 +85,7 @@ public:
 
 protected slots:
   void checkIfReadySlot();
-  void postProcessingSlot();
+  void postProcessingSlot(QString sessionId);
 
 private slots:
   void rtSourceChangedSlot();
