@@ -49,6 +49,7 @@ namespace {
 
 ViewsWindow::ViewsWindow(QString displayText, bool showSliders) : mDisplayText(displayText)
 {
+  mZoomFactor = 1;
 	m_test_view = NULL;
 	mDumpSpeedData = false;
 	mRenderCount = 0;
@@ -74,66 +75,39 @@ ViewsWindow::~ViewsWindow()
 {
 }
 
+ssc::View* ViewsWindow::getView2D()
+{
+  ssc::View* view = new ssc::View(centralWidget());
+  view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
+  view->GetRenderWindow()->GetInteractor()->Disable();
+  view->setZoomFactor(mZoomFactor);
+
+  mLayouts.insert(view);
+  return view;
+}
+
 ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-	ssc::View* view = new ssc::View(centralWidget());
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
+  ssc::View* view = this->getView2D();
 
-	mLayouts.insert(view);
+  ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
+  proxy->setTool(tool);
 
-	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
-	proxy->setTool(tool);
+  proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 
-	proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
+  ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
+  rep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+  rep->setImages(std::vector<ssc::ImagePtr>(1, image));
+  rep->setSliceProxy(proxy);
 
-	ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-	//rep->setImage(image);
-	rep->setViewportData(get_vpMs(view), getViewport(view));
-	rep->setImages(std::vector<ssc::ImagePtr>(1, image));
-	rep->setSliceProxy(proxy);
+  view->addRep(rep);
 
-	view->addRep(rep);
+  m_test_rep = rep;
+  m_test_view = view;
 
-	m_test_rep = rep;
-	m_test_view = view;
-
-	return view;
+  return view;
 }
 
-Transform3D ViewsWindow::get_vpMs(ssc::View* view) const
-{
-	Vector3D center_vp = getViewport(view).center();
-
-	double zoomFactor = 0.3; // real magnification
-	double scale = zoomFactor/mmPerPix(view);
-	Transform3D S = createTransformScale(Vector3D(scale, scale, scale));
-	Transform3D T = createTransformTranslate(center_vp);// center of viewport in viewport coordinates
-	Transform3D M_vp_w = T*S; // first scale , then translate to center.
-
-//	std::cout << "vpMs " <<  M_vp_w << std::endl;
-
-	return M_vp_w;
-}
-
-/**return the pixel viewport.
- */
-ssc::DoubleBoundingBox3D ViewsWindow::getViewport(ssc::View* view) const
-{
-	QSize size = view->size();
-	ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 1);
-//	std::cout << "vp " << vp << std::endl;
-	return vp;
-}
-
-double ViewsWindow::mmPerPix(ssc::View* view) const
-{
-	QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(view));
-	double r_h = (double)screen->heightMM()/(double)screen->geometry().height();
-	double r_w = (double)screen->widthMM()/(double)screen->geometry().width();
-	double retval = (r_h+r_w)/2.0;
-	return retval;
-}
 
 void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilename, ssc::PLANE_TYPE plane, int r, int c)
 {
@@ -149,10 +123,7 @@ void ViewsWindow::defineGPUSlice(const QString& uid, const QString& imageFilenam
 
 ssc::View* ViewsWindow::generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane)
 {
-	ssc::View* view = new ssc::View(centralWidget());
-	view->getRenderer()->GetActiveCamera()->ParallelProjectionOn();
-	view->GetRenderWindow()->GetInteractor()->Disable();
-	mLayouts.insert(view);
+  ssc::View* view = this->getView2D();
 
 	ssc::SliceProxyPtr proxy(new ssc::SliceProxy());
 	proxy->setTool(tool);
@@ -181,13 +152,14 @@ void ViewsWindow::defineSlice(const QString& uid, const QString& imageFilename, 
 ssc::ImagePtr ViewsWindow::loadImage(const QString& imageFilename)
 {
 	QString filename = ssc::TestUtilities::ExpandDataFileName(imageFilename);
+//	std::cout << imageFilename.toStdString() << std::endl;
 	ssc::ImagePtr image = ssc::DataManager::getInstance()->loadImage(filename, filename, ssc::rtMETAIMAGE);
 	Vector3D center = image->boundingBox().center();
 	center = image->get_rMd().coord(center);
 	ssc::DataManager::getInstance()->setCenter(center);
 	
 	// side effect: set tool movement box to data box,
-	dummyTool()->setToolPositionMovementBB(image->boundingBox());
+	dummyTool()->setToolPositionMovementBB(transform(image->get_rMd(), image->boundingBox()));
 	
 	return image;
 }
@@ -211,6 +183,8 @@ void ViewsWindow::define3D(const QString& imageFilename, int r, int c)
 
 	// volume rep
 	ssc::VolumetricRepPtr mRepPtr = ssc::VolumetricRep::New( image->getUid() );
+	mRepPtr->setMaxVolumeSize(10*1000*1000);
+	mRepPtr->setUseGPUVolumeRayCastMapper(); // if available
 	mRepPtr->setImage(image);
 	mRepPtr->setName(image->getName());
 	view->addRep(mRepPtr);
@@ -257,66 +231,31 @@ void ViewsWindow::start(bool showSliders)
 	controlLayout->addStretch();
 	mainLayout->addLayout(controlLayout); //Buttons
 
-//	if (showSliders)
-//	{
-//		QVBoxLayout* slidersLayout = new QVBoxLayout;
-//		mBrightnessSlider = new QSlider(Qt::Horizontal);
-//		mBrightnessSlider->setTickInterval(10);
-//		mContrastSlider= new QSlider(Qt::Horizontal);
-//		mContrastSlider->setTickInterval(10);
-//		slidersLayout->addWidget(new QLabel(tr("Brightness")) );
-//		slidersLayout->addWidget(mContrastSlider);
-//		slidersLayout->addWidget(new QLabel(tr("Contrasst")) );
-//		slidersLayout->addWidget(mBrightnessSlider);
-//		controlLayout->addLayout(slidersLayout);
-//
-//		connect(mContrastSlider, SIGNAL(sliderMoved(int)), this, SLOT(contrast(int)) );
-//		connect(mBrightnessSlider, SIGNAL(sliderMoved(int)), this, SLOT(brightness(int)) );
-//		mContrastSlider->setMaximum(256);
-//		mContrastSlider->setValue(256);
-//		mBrightnessSlider->setMaximum(256);
-//		mBrightnessSlider->setValue(128);
-//	}
 }
 
 void ViewsWindow::contrast(int val)
 {
-//	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->getImage(imageFileName1);	
-//	
-//	image1->getLookupTable2D().setWindow(val/1.0);	
 }
 	
 void ViewsWindow::brightness(int val)
 {
-//	ssc::ImagePtr image1 = ssc::DataManager::getInstance()->getImage(imageFileName1);
-//	image1->getLookupTable2D().setLevel(val/1.0);
 }
-
-
-//void ViewsWindow::zoom2D()
-//{
-//}
 
 void ViewsWindow::updateRender()
 {
-	double factor = 0.3;
-
 	for (std::set<ssc::View*>::iterator iter=mLayouts.begin(); iter!=mLayouts.end(); ++iter)
 	{
 		ssc::View* view = *iter;
-		ssc::DoubleBoundingBox3D bb  = getViewport(view);
-		double viewPortHeightPix = bb.range()[1];
+
+		if (view->getZoomFactor()<0)
+		  continue;
+
+    ssc::DoubleBoundingBox3D bb_s  = view->getViewport_s();
+		double viewportHeightmm = bb_s.range()[1];//viewPortHeightPix*mmPerPix(view);
+		double parallelscale = viewportHeightmm/2/view->getZoomFactor();
 
 		vtkCamera* camera = view->getRenderer()->GetActiveCamera();
-		double viewportHeightmm = viewPortHeightPix*mmPerPix(view);
-		double parallelscale = viewportHeightmm/2/factor;
 		camera->SetParallelScale(parallelscale);
-	}
-
-	if (m_test_view)
-	{
-//		std::cout << "pling" << std::endl;
-		m_test_rep->setViewportData(get_vpMs(m_test_view), getViewport(m_test_view));
 	}
 
 	if (mRenderCount==1)

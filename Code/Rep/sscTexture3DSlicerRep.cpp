@@ -26,10 +26,25 @@ namespace ssc
 Texture3DSlicerRep::Texture3DSlicerRep(const QString& uid) :
 	RepImpl(uid)
 {
-	std::cout << "create Texture3DSlicerRep" << std::endl;
+  mView = NULL;
+//	std::cout << "create Texture3DSlicerRep" << std::endl;
 	mActor = vtkActorPtr::New();
 	mPainter = TextureSlicePainterPtr::New();
+	// default shader for sonowand: override using setshaderfile()
+	mPainter->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
 	mPainterPolyDatamapper = vtkPainterPolyDataMapperPtr::New();
+
+	mPlaneSource = vtkPlaneSourcePtr::New();
+
+  vtkTriangleFilterPtr triangleFilter = vtkTriangleFilterPtr::New(); //create triangle polygons from input polygons
+  triangleFilter->SetInputConnection( mPlaneSource->GetOutputPort() ); //in this case a Planesource
+
+  vtkStripperPtr stripper = vtkStripperPtr::New();
+  stripper->SetInputConnection(triangleFilter->GetOutputPort());
+  stripper->Update();
+
+  mPolyData = stripper->GetOutput();
+  mPolyData->GetPointData()->SetNormals(NULL);
 }
 
 Texture3DSlicerRep::~Texture3DSlicerRep()
@@ -42,6 +57,21 @@ Texture3DSlicerRepPtr Texture3DSlicerRep::New(const QString& uid)
 	Texture3DSlicerRepPtr retval(new Texture3DSlicerRep(uid));
 	retval->mSelf = retval;
 	return retval;
+}
+
+void Texture3DSlicerRep::setShaderFile(QString shaderFile)
+{
+  mPainter->setShaderFile(shaderFile);
+}
+
+void Texture3DSlicerRep::viewChanged()
+{
+  if (!mView)
+    return;
+  if (!mView->getZoomFactor()<0)
+    return; // ignore if zoom is invalid
+  this->setViewportData(mView->get_vpMs(), mView->getViewport());
+//  std::cout << "void Texture3DSlicerRep::viewChanged()" << std::endl;
 }
 
 void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
@@ -57,30 +87,10 @@ void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBo
 
 void Texture3DSlicerRep::createGeometryPlane( Vector3D point1_s,  Vector3D point2_s, Vector3D origin_s )
 {
-	if (!mPlaneSource)
-	{
-		mPlaneSource = vtkPlaneSourcePtr::New();
-
-		mPlaneSource->SetPoint1( point1_s.begin() );
-		mPlaneSource->SetPoint2( point2_s.begin() );
-		mPlaneSource->SetOrigin( origin_s.begin() );
-
-		vtkTriangleFilterPtr triangleFilter = vtkTriangleFilterPtr::New(); //create triangle polygons from input polygons
-		triangleFilter->SetInputConnection( mPlaneSource->GetOutputPort() ); //in this case a Planesource
-
-		mStripper = vtkStripperPtr::New();
-		mStripper->SetInputConnection(triangleFilter->GetOutputPort());
-		mStripper->Update();
-
-		mPolyData = mStripper->GetOutput();
-		mPolyData->GetPointData()->SetNormals(NULL);
-	}
-
 	mPlaneSource->SetPoint1( point1_s.begin() );
 	mPlaneSource->SetPoint2( point2_s.begin() );
 	mPlaneSource->SetOrigin( origin_s.begin() );
-	mStripper->Update();
-
+	mPolyData->Update();
 	// each stripper->update() resets the contents of polydata, thus we must reinsert the data here.
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
@@ -94,7 +104,6 @@ void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
 	mImages = images;
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
-		//vtkImageDataPtr inputImage = images[i]->getGrayScaleBaseVtkImageData() ;//
 		vtkImageDataPtr inputImage = images[i]->getBaseVtkImageData() ;//
 
 		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(inputImage);
@@ -139,10 +148,18 @@ void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View* view)
 
 	mActor->SetMapper(mPainterPolyDatamapper);
 	view->getRenderer()->AddActor(mActor);
+
+	mView = view;
+	connect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+	this->viewChanged();
+
 }
 void Texture3DSlicerRep::createCoordinates(int count)
 {
-	vtkFloatArrayPtr TCoords = vtkFloatArrayPtr::New();
+  if (!mPolyData)
+    return;
+
+  vtkFloatArrayPtr TCoords = vtkFloatArrayPtr::New();
 	TCoords->SetNumberOfComponents(3);
 	TCoords->Allocate(4* 3 );
 	TCoords->InsertNextTuple3( 0.0, 0.0, 0.0 );
@@ -151,8 +168,8 @@ void Texture3DSlicerRep::createCoordinates(int count)
 	TCoords->InsertNextTuple3( 0.0, 0.0, 0.0 );
 	TCoords->SetName(cstring_cast(getTCoordName(count)) );
 
-	if (!mPolyData)
-		std::cerr << "Error in Texture3DSlicerRep: setViewport was not called" << std::endl;
+//	if (!mPolyData)
+//		std::cerr << "Error in Texture3DSlicerRep: setViewport was not called" << std::endl;
 	mPolyData->GetPointData()->AddArray(TCoords);
 	//mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2*count, cstring_cast(getTCoordName(count)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
 }
@@ -164,6 +181,9 @@ QString Texture3DSlicerRep::getTCoordName(int index)
 
 void Texture3DSlicerRep::updateCoordinates(int index)
 {
+  if (!mPolyData)
+    return;
+
 		//vtkImageDataPtr volume = mImages[index]->getGrayScaleBaseVtkImageData();
 		vtkImageDataPtr volume = mImages[index]->getBaseVtkImageData();
 		// create a bb describing the volume in physical (raw data) space
@@ -218,6 +238,9 @@ void Texture3DSlicerRep::updateCoordinates(int index)
 void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	view->getRenderer()->RemoveActor(mActor);
+
+	mView = NULL;
+	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 }
 
 void Texture3DSlicerRep::printSelf(std::ostream & os, ssc::Indent indent)
@@ -259,15 +282,8 @@ void Texture3DSlicerRep::sliceTransformChangedSlot(Transform3D sMr)
 
 void Texture3DSlicerRep::update()
 {
-//	Vector3D p1(mBB_s[1], mBB_s[2], mBB_s[4]);
-//	Vector3D p2(mBB_s[0], mBB_s[3], mBB_s[4]);
-//	Vector3D origin(mBB_s[0], mBB_s[2], 0);
-//
-//	createGeometryPlane(p1, p2, origin);
-
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
-//		createCoordinates(i);
 		updateCoordinates(i);
 	}
 

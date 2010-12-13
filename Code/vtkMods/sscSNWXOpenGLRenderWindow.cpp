@@ -861,7 +861,7 @@ void SNWXOpenGLRenderWindow::CreateOffScreenWindow(int width, int height)
           {
           // Load GLX 1.3
           vtkOpenGLExtensionManager *manager=vtkOpenGLExtensionManager::New();
-          int loaded = vtkgl::LoadExtension("GLX_VERSION_1_3", manager);
+          int loaded = manager->LoadSupportedExtension("GLX_VERSION_1_3");
           manager->Delete();
 
           if(loaded)

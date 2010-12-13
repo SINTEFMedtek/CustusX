@@ -22,7 +22,8 @@ typedef vtkSmartPointer<ViewRenderWindow> ViewRenderWindowPtr;
 #include "sscRep.h"
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
-
+#include "sscBoundingBox3D.h"
+#include "sscTransform3D.h"
 /*! Copy/pasted from qitemdelegate.cpp
   \internal
 
@@ -42,11 +43,10 @@ namespace ssc
 {
 
 View::View(QWidget *parent, Qt::WFlags f) :
-	ViewParent(parent, f), mRenderWindow( ViewRenderWindowPtr::New())
+	ViewParent(parent, f), mRenderWindow( ViewRenderWindowPtr::New()), mZoomFactor(-1.0) // set zoom to negative value to signify invalid.
 {
   mMTimeHash = 0;
   mBackgroundColor = QColor("black");
-
 	this->SetRenderWindow(mRenderWindow);
 	clear();
 }
@@ -297,6 +297,60 @@ void View::render()
 //    std::cout << getName() << "\t" << mTime << " " << mTime_W << std::endl;
 //    std::cout << "RENDER " << getName() << "\t" << hash << std::endl;
   }
+}
+
+
+void View::setZoomFactor(double factor)
+{
+  if (similar(factor, mZoomFactor))
+    return;
+
+  mZoomFactor = factor;
+  emit resized(this->size());
+}
+
+double View::getZoomFactor() const
+{
+  return mZoomFactor;
+}
+
+ssc::DoubleBoundingBox3D View::getViewport_s() const
+{
+  return transform(this->get_vpMs().inv(), this->getViewport());
+}
+
+Transform3D View::get_vpMs() const
+{
+  Vector3D center_vp = this->getViewport().center();
+
+//  double zoomFactor = 0.3; // real magnification
+  double scale = mZoomFactor/this->mmPerPix();
+  Transform3D S = createTransformScale(Vector3D(scale, scale, scale));
+  Transform3D T = createTransformTranslate(center_vp);// center of viewport in viewport coordinates
+  Transform3D M_vp_w = T*S; // first scale , then translate to center.
+
+//  std::cout << "vpMs " <<  M_vp_w << std::endl;
+
+  return M_vp_w;
+}
+
+/**return the pixel viewport.
+ */
+ssc::DoubleBoundingBox3D View::getViewport() const
+{
+  QSize size = this->size();
+  ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 1);
+//  std::cout << "vp " << vp << std::endl;
+  return vp;
+}
+
+double View::mmPerPix() const
+{
+  QWidget* screen = qApp->desktop()->screen(qApp->desktop()->screenNumber(this));
+  double r_h = (double)screen->heightMM()/(double)screen->geometry().height();
+  double r_w = (double)screen->widthMM()/(double)screen->geometry().width();
+  double retval = (r_h+r_w)/2.0;
+  return retval;
 }
 
 

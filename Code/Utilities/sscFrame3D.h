@@ -7,9 +7,9 @@
 namespace ssc
 {
 
-namespace utils
-{
-// --------------------------------------------------------
+//namespace utils
+//{
+//// --------------------------------------------------------
 
 /**
  * Defines an axis-angle representation of a position+orientation in 3D space.
@@ -47,8 +47,8 @@ private:
 std::ostream& operator<<(std::ostream& s, const Frame3D& t);
 
 
-// --------------------------------------------------------
-} // namespace utils
+//// --------------------------------------------------------
+//} // namespace utils
 } // namespace ssc
 // --------------------------------------------------------
 

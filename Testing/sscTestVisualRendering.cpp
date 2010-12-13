@@ -134,6 +134,8 @@ void TestVisualRendering::test_ACS_3Volumes_GPU()
 {
 	widget->setDescription("ACS 3 volumes, moving tool, GPU");
 
+//	widget->defineGPUSlice("A", image[0], ssc::ptAXIAL, 0, 0);
+
 	for (unsigned i = 0; i < 3; ++i)
 	{
 		widget->defineGPUSlice("A", image[i], ssc::ptAXIAL, 0, i);

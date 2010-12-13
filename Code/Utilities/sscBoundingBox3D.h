@@ -8,8 +8,8 @@
 // --------------------------------------------------------
 namespace ssc
 {
-namespace utils
-{
+//namespace utils
+//{
 // --------------------------------------------------------
 
 /** Representation of an integer bounding box in 3D.
@@ -67,8 +67,8 @@ bool similar(const DoubleBoundingBox3D& a, const DoubleBoundingBox3D& b, double 
 std::ostream& operator<<(std::ostream& s, const DoubleBoundingBox3D& data);
 
 // --------------------------------------------------------
-} // namespace utils
-using namespace utils;
+//} // namespace utils
+//using namespace utils;
 } // namespace ssc
 // --------------------------------------------------------
 

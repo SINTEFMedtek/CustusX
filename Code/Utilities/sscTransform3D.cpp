@@ -11,8 +11,8 @@
 // --------------------------------------------------------
 namespace ssc
 {
-namespace utils
-{
+//namespace utils
+//{
 // --------------------------------------------------------
 
 /**creates a  transform from double[16].
@@ -362,6 +362,6 @@ const Transform3D::RowProxy Transform3D::operator[](unsigned row) const
 
 
 // --------------------------------------------------------
-} // namespace utils
+//} // namespace utils
 } // namespace ssc
 // --------------------------------------------------------

@@ -11,7 +11,7 @@ using ssc::Vector3D;
 
 /**Tests for minor classes in the code/Utilities section
  */
-class TestUtilities : public CppUnit::TestFixture
+class TestUtilityClasses : public CppUnit::TestFixture
 {
 public:
 	void setUp();
@@ -20,7 +20,7 @@ public:
 	void testFrame();
 	
 public:
-	CPPUNIT_TEST_SUITE( TestUtilities );
+	CPPUNIT_TEST_SUITE( TestUtilityClasses );
 		CPPUNIT_TEST( testTransform3DAccess );					
 		CPPUNIT_TEST( testFrame );					
 	CPPUNIT_TEST_SUITE_END();
@@ -28,7 +28,7 @@ private:
 	void singleTestFrameRotationAxis(const Vector3D& k);
 	void singleTestFrame(const Transform3D& transform);
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestUtilities );
+CPPUNIT_TEST_SUITE_REGISTRATION( TestUtilityClasses );
 
 
 #endif /*SSCTESTUTILITYCLASSES_H_*/

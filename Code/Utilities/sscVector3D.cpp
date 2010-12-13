@@ -8,8 +8,8 @@
 // --------------------------------------------------------
 namespace ssc
 {
-namespace utils
-{
+//namespace utils
+//{
 // --------------------------------------------------------
 bool similar(double a, double b, double tol)
 {
@@ -160,7 +160,7 @@ Vector3D unitVector(double thetaXY, double thetaZ)
 }
 
 // --------------------------------------------------------
-} // namespace utils
+//} // namespace utils
 } // namespace ssc
 // --------------------------------------------------------
 

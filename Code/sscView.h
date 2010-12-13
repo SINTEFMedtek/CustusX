@@ -16,6 +16,8 @@ typedef QVTKWidget ViewParent;
 
 namespace ssc
 {
+  class DoubleBoundingBox3D;
+  class Transform3D;
 	typedef boost::shared_ptr<class Rep> RepPtr;
 
 	/**
@@ -59,6 +61,13 @@ namespace ssc
 		void print(std::ostream& os);
 		virtual void printSelf(std::ostream & os, Indent indent);
 
+		void setZoomFactor(double factor);
+    double getZoomFactor() const;
+		Transform3D get_vpMs() const;
+		ssc::DoubleBoundingBox3D getViewport() const;
+    ssc::DoubleBoundingBox3D getViewport_s() const;
+		double mmPerPix() const;
+
 	signals:
 		void resized(QSize size);
 		void mouseMoveSignal(QMouseEvent* event);
@@ -69,6 +78,7 @@ namespace ssc
     void focusInSignal(QFocusEvent* event);
 
 	protected:
+    double mZoomFactor; ///< zoom factor for this view. 1 means that 1m on screen is 1m
     QColor mBackgroundColor;
     unsigned long mMTimeHash; ///< sum of all MTimes in objects rendered
 		QString mUid;					///< The view's unique id

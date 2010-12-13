@@ -7,8 +7,8 @@ class QString;
 // --------------------------------------------------------
 namespace ssc
 {
-namespace utils
-{
+//namespace utils
+//{
 // --------------------------------------------------------
 
 bool similar(double a, double b, double tol=1.0E-6);    ///< check for equality with a tolerance: |b-a|<tol
@@ -49,8 +49,8 @@ bool similar(const Vector3D& a, const Vector3D& b, double tol=1.0E-6);  ///< che
 std::ostream& operator<<(std::ostream& s, const Vector3D& data);
 Vector3D unitVector(double thetaXY, double thetaZ=0.0);                     ///< compute a unit vector given angles xy in the xy plane and z meaning the elevation from the xy plane.
 // --------------------------------------------------------
-} // namespace utils
-using namespace utils;
+//} // namespace utils
+//using namespace utils;
 } // namespace ssc
 // --------------------------------------------------------
 

@@ -45,10 +45,11 @@ private:
 	ssc::View* generateSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	ssc::View* generateGPUSlice(const QString& uid, ssc::ToolPtr tool, ssc::ImagePtr image, ssc::PLANE_TYPE plane);
 	ssc::ImagePtr loadImage(const QString& imageFilename);
-	
-	ssc::Transform3D get_vpMs(ssc::View* view) const;
-	ssc::DoubleBoundingBox3D getViewport(ssc::View* view) const;
-	double mmPerPix(ssc::View* view) const;
+	ssc::View* getView2D();
+
+//	ssc::Transform3D get_vpMs(ssc::View* view) const;
+//	ssc::DoubleBoundingBox3D getViewport(ssc::View* view) const;
+//	double mmPerPix(ssc::View* view) const;
 
 	QSlider* mBrightnessSlider;
 	QSlider *mContrastSlider;
@@ -58,6 +59,7 @@ private:
 	QGridLayout* mSliceLayout;
 	QString mDisplayText;
 	
+	double mZoomFactor;
 	int mRenderCount;
 	int mTotalRender;
 	int mTotalOther;

@@ -177,21 +177,46 @@ public:
 TextureSlicePainter::TextureSlicePainter()
 {
 	mInternals = new vtkInternals();
-	QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
-	//QFile fp(QString("/home/chrask/workspace/ssc/Sandbox/Texture3DOverlay.frag"));
+}
 
-	if (fp.exists())
-	{
-		fp.open(QFile::ReadOnly);
-		QTextStream shaderfile(&fp);
-		mSource = shaderfile.readAll();
-		fp.close();
-	}
-	else
-	{
-		std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
-	}
+void TextureSlicePainter::setShaderFile(QString shaderFile)
+{
+  mShaderFile = shaderFile;
+//  //QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
+////  QFile fp(QString("/home/chrask/workspace/CustusX/CustusX/externals/ssc/Sandbox/Texture3DOverlay.frag"));
+//  QFile fp(mShaderFile);
+//
+//  if (fp.exists())
+//  {
+//    fp.open(QFile::ReadOnly);
+//    QTextStream shaderfile(&fp);
+//    mSource = shaderfile.readAll();
+//    fp.close();
+//  }
+//  else
+//  {
+//    std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
+//  }
+}
 
+QString TextureSlicePainter::loadShaderFile(QString shaderFile)
+{
+  //QFile fp(QString("/Data/Resources/Shaders/Texture3DOverlay.frag"));
+//  QFile fp(QString("/home/chrask/workspace/CustusX/CustusX/externals/ssc/Sandbox/Texture3DOverlay.frag"));
+  QFile fp(shaderFile);
+
+  if (fp.exists())
+  {
+    fp.open(QFile::ReadOnly);
+    QTextStream shaderfile(&fp);
+    return shaderfile.readAll();
+//    fp.close();
+  }
+  else
+  {
+    std::cout << "TextureSlicer can't read shaderfile [" << fp.fileName() << "]" << std::endl;
+  }
+  return "";
 }
 
 TextureSlicePainter::~TextureSlicePainter()
@@ -244,6 +269,7 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 
 	if (!mInternals->Shader)
 	{
+	  mSource = this->loadShaderFile(mShaderFile);
 
 		vtkShaderProgram2Ptr pgm = vtkShaderProgram2Ptr::New();
 		pgm->SetContext(static_cast<vtkOpenGLRenderWindow *> (renWin));

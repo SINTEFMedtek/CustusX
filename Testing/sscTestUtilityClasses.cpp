@@ -17,17 +17,17 @@
 #include "sscTransform3D.h"
 #include "sscFrame3D.h"
 
-using namespace ssc::utils;
+using namespace ssc;
 
-void TestUtilities::setUp()
+void TestUtilityClasses::setUp()
 {
 }
 
-void TestUtilities::tearDown()
+void TestUtilityClasses::tearDown()
 {
 }
 
-void TestUtilities::testTransform3DAccess()
+void TestUtilityClasses::testTransform3DAccess()
 {
 	Transform3D t = createTransformRotateY(M_PI/4)*createTransformRotateX(M_PI/3)*createTransformTranslate(Vector3D(3,4,5));
 	//const Transform3D ct = t;
@@ -45,7 +45,7 @@ void TestUtilities::testTransform3DAccess()
 	}
 }
 
-void TestUtilities::singleTestFrame(const Transform3D& transform)
+void TestUtilityClasses::singleTestFrame(const Transform3D& transform)
 {
 	Frame3D frame = Frame3D::create(transform);
 	Transform3D restored = frame.transform();
@@ -74,7 +74,7 @@ void TestUtilities::singleTestFrame(const Transform3D& transform)
 	CPPUNIT_ASSERT(similar(transform, restored));
 }
 
-void TestUtilities::singleTestFrameRotationAxis(const Vector3D& k)
+void TestUtilityClasses::singleTestFrameRotationAxis(const Vector3D& k)
 {
 	Frame3D frame;
 	frame.setRotationAxis(k);
@@ -85,7 +85,7 @@ void TestUtilities::singleTestFrameRotationAxis(const Vector3D& k)
 //#define SINGLE_TEST_FRAME(expr) std::cout << "testing: " << # expr << std::endl; singleTestFrame(expr);
 #define SINGLE_TEST_FRAME(expr) singleTestFrame(expr);
 
-void TestUtilities::testFrame()
+void TestUtilityClasses::testFrame()
 {
 	singleTestFrameRotationAxis((ssc::createTransformRotateZ(M_PI/4)).vector(Vector3D(1,0,0)));
 	singleTestFrameRotationAxis((ssc::createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));

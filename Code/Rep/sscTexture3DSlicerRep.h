@@ -37,6 +37,7 @@ public:
 	{
 		return "vm::Texture3DSlicerRep";
 	}
+	void setShaderFile(QString shaderFile);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
 	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp);
 	void setImages(std::vector<ssc::ImagePtr> images);
@@ -51,6 +52,7 @@ protected:
 private slots:
 	void sliceTransformChangedSlot(Transform3D sMr);
 	void updateColorAttributeSlot();
+	void viewChanged();
 private:
 	void createCoordinates(int count);
 	void updateCoordinates(int index);
@@ -59,15 +61,13 @@ private:
 	DoubleBoundingBox3D mBB_s;
 	std::vector<ssc::ImagePtr> mImages;
 	ssc::SliceProxyPtr mSliceProxy;
+	View* mView;
 
 	TextureSlicePainterPtr mPainter;
 	vtkActorPtr mActor;
 	vtkPolyDataPtr mPolyData;
 	vtkPlaneSourcePtr mPlaneSource;
-	vtkStripperPtr mStripper;
 	vtkPainterPolyDataMapperPtr mPainterPolyDatamapper;
-
-	//std::vector<testApp::SlicedImageProxyPtr> mSlices;
 };
 //---------------------------------------------------------
 }//end namespace
