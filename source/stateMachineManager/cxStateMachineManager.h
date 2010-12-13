@@ -6,7 +6,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
-//#include "cxRecordSession.h"
+#include "cxRecordSession.h"
 #include <QObject>
 
 namespace cx
@@ -45,10 +45,10 @@ public:
   void saveDesktop(Desktop desktop);
   void resetDesktop();
 
-//  void addRecordSession(RecordSessionPtr session);
-//  void removeRecordSession(RecordSessionPtr session);
-//  std::vector<RecordSessionPtr> getRecordSessions();
-//  RecordSessionPtr getRecordSession(QString uid);
+  void addRecordSession(RecordSessionPtr session);
+  void removeRecordSession(RecordSessionPtr session);
+  std::vector<RecordSessionPtr> getRecordSessions();
+  RecordSessionPtr getRecordSession(QString uid);
 
   //Interface for saving/loading
   void addXml(QDomNode& dataNode); ///< adds xml information about the StateManager and its variabels
@@ -69,7 +69,7 @@ private:
   ApplicationStateMachinePtr mApplicationStateMachine;
   PatientDataPtr mPatientData;
 
-//  std::vector<RecordSessionPtr> mRecordSessions;
+  std::vector<RecordSessionPtr> mRecordSessions;
 };
 StateManager* stateManager();
 }
