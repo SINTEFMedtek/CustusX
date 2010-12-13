@@ -15,6 +15,8 @@
 #include "cxTracker.h"
 #include "cxToolConfigurationParser.h"
 #include "sscTypeConversions.h"
+#include "sscPositionStorageFile.h"
+#include "sscTime.h"
 
 namespace cx
 {
@@ -30,14 +32,10 @@ ToolManager* ToolManager::getInstance()
 }
 
 ToolManager::ToolManager() :
-      mConfigurationFilePath(""),
-      mLoggingFolder(""),
-      mTracker(TrackerPtr()),
-      mConfiguredTools(new ssc::ToolManager::ToolMap),
-      mInitializedTools(new ssc::ToolManager::ToolMap), mDominantTool(
-          ssc::ToolPtr()), mReferenceTool(ssc::ToolPtr()), mConfigured(false),
-      mInitialized(false), mTracking(false), mPulseGenerator(
-          igstk::PulseGenerator::New())
+  mConfigurationFilePath(""), mLoggingFolder(""), mTracker(TrackerPtr()), mConfiguredTools(
+      new ssc::ToolManager::ToolMap), mInitializedTools(new ssc::ToolManager::ToolMap), mDominantTool(ssc::ToolPtr()),
+      mReferenceTool(ssc::ToolPtr()), mConfigured(false), mInitialized(false), mTracking(false), mPulseGenerator(
+          igstk::PulseGenerator::New()), mLastLoadPositionHistory(0)
 {
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransform()));
@@ -284,7 +282,7 @@ void ToolManager::stopTracking()
 }
 void ToolManager::saveToolsSlot()
 {
-  this->saveTransformsAndTimestamps();
+  this->savePositionHistory();
   ssc::messageManager()->sendInfo("Transforms and timestamps are saved for connected tools.");
 }
 
@@ -474,15 +472,62 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
   return mReferenceTool;
 }
 
-void ToolManager::saveTransformsAndTimestamps(QString filePathAndName)
+
+
+void ToolManager::savePositionHistory()
 {
+  QString filename = mLoggingFolder + "/toolpositions.snwpos";
+
+  ssc::PositionStorageWriter writer(filename);
+
   ToolMapIter it = mInitializedTools->begin();
   while (it != mInitializedTools->end())
   {
-    ((*it).second)->saveTransformsAndTimestamps();
-    it++;
+    ssc::ToolPtr current = (it++)->second;
+    ssc::TimedTransformMapPtr data = current->getPositionHistory();
+
+    if (!data)
+      continue;
+
+    // save only data acquired after mLastLoadPositionHistory:
+    ssc::TimedTransformMap::iterator iter = data->lower_bound(mLastLoadPositionHistory);
+    for (; iter!=data->end(); ++iter)
+    {
+      writer.write(iter->second, (iter->first), current->getUid());
+    }
+
+//    ((*it).second)->saveTransformsAndTimestamps();
+//    it++;
   }
+
+  mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
 }
+
+void ToolManager::loadPositionHistory()
+{
+  QString filename = mLoggingFolder + "/toolpositions.snwpos";
+
+  ssc::PositionStorageReader reader(filename);
+
+  ssc::Transform3D matrix;
+  double timestamp;
+  QString toolUid;
+
+  while (!reader.atEnd())
+  {
+    if (!reader.read(&matrix, &timestamp, &toolUid))
+      break;
+
+    ssc::ToolPtr current = this->getTool(toolUid);
+    if (current)
+    {
+      (*current->getPositionHistory())[timestamp] = matrix;
+    }
+  }
+
+  mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
+}
+
 
 void ToolManager::setConfigurationFile(QString configurationFile)
 {
