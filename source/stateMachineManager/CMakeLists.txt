@@ -7,10 +7,10 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxApplicationState.h
 	cxPatientData.h
 	cxFileCopied.h
+	cxStateMachineManager.h
 )
 
 SET ( ${LIB}_statemachineManager
-	cxStateMachineManager.h
 	cxStateMachineManager.cpp
 	cxWorkflowStateMachine.h
 	cxWorkflowStateMachine.cpp

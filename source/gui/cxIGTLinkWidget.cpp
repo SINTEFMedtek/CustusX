@@ -10,7 +10,6 @@
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
-//#include "RTSource/cxIGTLinkClient.h"
 #include "sscRTStreamRep.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
@@ -19,21 +18,6 @@
 
 namespace cx
 {
-
-//template<class T>
-//QAction* IGTLinkWidget::createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot)
-//{
-//  QAction* action = new QAction(QIcon(iconName), text, this);
-//  action->setStatusTip(tip);
-//  action->setToolTip(tip);
-//  connect(action, SIGNAL(triggered()), this, slot);
-//  QToolButton* button = new QToolButton();
-//  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//  button->setDefaultAction(action);
-//  layout->addWidget(button);
-//  return action;
-//}
-
 
 IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
     QWidget(parent)
@@ -49,7 +33,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
   ssc::dataManager()->loadStream(mRTSource);
-  connect(mRTSource.get(), SIGNAL(serverStatusChanged()), this, SLOT(serverStatusChangedSlot()));
+  connect(mRTSource.get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   mToptopLayout = toptopLayout;
@@ -268,7 +252,7 @@ void IGTLinkWidget::showStream()
 
 void IGTLinkWidget::toggleConnectServer()
 {
-  if (!mRTSource->connected())
+  if (!mRTSource->isConnected())
   {
     this->connectServer();
     QTimer::singleShot(1000, this, SLOT(autoLaunchLocalServer()));
@@ -283,7 +267,7 @@ void IGTLinkWidget::toggleConnectServer()
 
 void IGTLinkWidget::connectServer()
 {
-  if (!mRTSource->connected())
+  if (!mRTSource->isConnected())
   {
     this->updateHostHistory();
     mRTSource->connectServer(mAddressEdit->currentText(), mPortEdit->text().toInt());
@@ -295,7 +279,7 @@ void IGTLinkWidget::connectServer()
  */
 void IGTLinkWidget::autoLaunchLocalServer()
 {
-  if (mRTSource->connected()) // connected: everything OK.
+  if (mRTSource->isConnected()) // connected: everything OK.
     return;
   if (mAutoLaunchIsTried)
     return;
@@ -310,17 +294,12 @@ void IGTLinkWidget::autoLaunchLocalServer()
 
 void IGTLinkWidget::serverStatusChangedSlot()
 {
-  if (mRTSource->connected())
+  if (mRTSource->isConnected())
     mConnectButton->setText("Disconnect Server");
   else
     mConnectButton->setText("Connect Server");
 
   this->adjustSize();
-//  mConnectButton->adjustSize();
-//  mView->adjustSize();
-//  mConnectButton->update();
-//  mGridLayout->invalidate();
-//  mToptopLayout->invalidate();
 }
 
 

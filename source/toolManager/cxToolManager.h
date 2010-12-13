@@ -57,7 +57,9 @@ public:
   virtual ssc::RegistrationHistoryPtr get_rMpr_History();
 
   virtual ssc::ToolPtr getReferenceTool() const; ///< get the tool that is used as a reference, if any
-  virtual void saveTransformsAndTimestamps(QString filePathAndName = ""); ///<
+
+  virtual void savePositionHistory();
+  virtual void loadPositionHistory();
 
   void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
   void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
@@ -124,6 +126,7 @@ protected:
   igstk::PulseGenerator::Pointer mPulseGenerator;
 
   ssc::LandmarkMap mLandmarks; ///< in space patient reference.
+  double mLastLoadPositionHistory;
 
 private:
   ToolManager(ToolManager const&);
