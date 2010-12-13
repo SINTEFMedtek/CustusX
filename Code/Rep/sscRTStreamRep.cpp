@@ -212,7 +212,7 @@ void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
 
   if (mData)
   {
-    connect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
+    connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 
     mDataRedirecter->SetInput(mData->getVtkImageData());
 //    mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());

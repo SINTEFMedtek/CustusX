@@ -55,7 +55,9 @@ public:
   virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); } ///< interface to rMpr history.
   virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 	/** write to file all recorded transforms and timestamps */
-	virtual void saveTransformsAndTimestamps(QString filePathAndName = "") = 0;
+	//virtual void saveTransformsAndTimestamps(QString filePathAndName = "") = 0; replaced with load/save position history
+  virtual void savePositionHistory() {}
+  virtual void loadPositionHistory() {}
 
   virtual void addXml(QDomNode& parentNode) { Q_UNUSED(parentNode); } ///< write internal state to node
   virtual void parseXml(QDomNode& dataNode) { Q_UNUSED(dataNode); } ///< read internal state from node

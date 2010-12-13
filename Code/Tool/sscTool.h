@@ -13,6 +13,8 @@
 
 namespace ssc
 {
+typedef std::map<double, Transform3D> TimedTransformMap;
+typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
@@ -62,12 +64,15 @@ public:
 	 * should return valid data. \sa getGraphicsFileName().
 	 */
 	virtual vtkPolyDataPtr getGraphicsPolyData() const = 0;
-	/**Saves the tools internal buffers of transforms and timestamps to file.
-	 */
-	virtual void saveTransformsAndTimestamps() = 0;
-	/**Which file to use when calling saveTransformsAndTimestamps().
-	 */
-	virtual void setTransformSaveFile(const QString& filename) = 0;
+
+
+//	/**Saves the tools internal buffers of transforms and timestamps to file.
+//	 */
+  virtual TimedTransformMapPtr getPositionHistory() {  return TimedTransformMapPtr(); }
+//	virtual void saveTransformsAndTimestamps() = 0;
+//	/**Which file to use when calling saveTransformsAndTimestamps().
+//	 */
+//	virtual void setTransformSaveFile(const QString& filename) = 0;
 	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
 	//virtual void set_prMt(const Transform3D& transform) = 0; ///< \return transform from tool to patient ref space
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool

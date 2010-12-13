@@ -24,6 +24,17 @@ QString timestampSecondsFormat();
  */
 QString timestampSecondsFormatNice();
 
+QString timestampMilliSecondsFormatNice();
+
+
+/** Microseconds since epoch (1970)
+ */
+double getMicroSecondsSinceEpoch();
+
+/** Milliseconds since epoch (1970)
+ */
+double getMilliSecondsSinceEpoch();
+
 //} // time
 } // ssc
 
