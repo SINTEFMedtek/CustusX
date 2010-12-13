@@ -7,7 +7,6 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxApplicationState.h
 	cxPatientData.h
 	cxFileCopied.h
-#	cxRecordSessionWidget.h
 	cxStateMachineManager.h
 )
 
@@ -25,7 +24,6 @@ SET ( ${LIB}_statemachineManager
 	cxPatientData.cpp
 	cxFileCopied.h
 	cxFileCopied.cpp
-#	cxRecordSessionWidget.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

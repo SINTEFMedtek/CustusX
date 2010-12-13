@@ -124,6 +124,8 @@ public:
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
 
+
+
   void addXml(QDomNode& dataNode);
   void parseXml(QDomNode& dataNode);
 
