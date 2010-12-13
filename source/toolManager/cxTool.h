@@ -117,7 +117,7 @@ public:
   QString getNameOfProbeSectorConfiguration(QString configString); ///< get a name for the given configuration
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
-  virtual std::map<int, ssc::utils::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
+  virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
