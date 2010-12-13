@@ -39,7 +39,7 @@ public:
 	}
 	void setShaderFile(QString shaderFile);
 	virtual void printSelf(std::ostream & os, ssc::Indent indent);
-	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp);
+	void setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp); // DEPRECATED: use zoomfactor in View and the object will auto-update
 	void setImages(std::vector<ssc::ImagePtr> images);
 	void setSliceProxy(ssc::SliceProxyPtr slicer);
 	void update();
