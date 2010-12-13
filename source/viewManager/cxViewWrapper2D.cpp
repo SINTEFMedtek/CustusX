@@ -27,6 +27,11 @@
 #include "sscDefinitionStrings.h"
 #include "sscSliceComputer.h"
 #include "sscGeometricRep2D.h"
+#include "sscTexture3DSlicerRep.h"
+
+#ifdef USE_GLX_SHARED_CONTEXT
+  #define USE_2D_GPU_RENDER
+#endif
 
 namespace cx
 {
@@ -141,9 +146,16 @@ void ViewWrapper2D::addReps()
   mSliceProxy = ssc::SliceProxy::New("sliceproxy_("+ mView->getName() +")");
 
   // slice rep
+#ifdef USE_2D_GPU_RENDER
+  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
+  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+  mMultiSliceRep->setSliceProxy(mSliceProxy);
+  mView->addRep(mMultiSliceRep);
+#else
   mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
   mSliceRep->setSliceProxy(mSliceProxy);
   mView->addRep(mSliceRep);
+#endif
 
   // tool rep
   mToolRep2D = ssc::ToolRep2D::New("Tool2D_"+mView->getName());
@@ -178,6 +190,8 @@ void ViewWrapper2D::viewportChanged()
 {
   if (!mView->getRenderer()->IsActiveCameraCreated())
     return;
+
+  mView->setZoomFactor(mZoom2D->get().toDouble());
 
   double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
   mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
@@ -331,7 +345,13 @@ void ViewWrapper2D::updateView()
     text = image->getName();
   }
 
+  // slice rep
+#ifdef USE_2D_GPU_RENDER
+  mMultiSliceRep->setImages(images);
+#else
   mSliceRep->setImage(image);
+#endif
+
   //update data name text rep
   mDataNameText->setText(0, text);
 }
