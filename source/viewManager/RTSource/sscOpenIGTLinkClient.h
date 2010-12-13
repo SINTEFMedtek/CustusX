@@ -26,6 +26,7 @@ public:
 signals:
   void imageReceived();
   void fps(double);
+  void connected(bool on);
 
 protected:
   virtual void run();
