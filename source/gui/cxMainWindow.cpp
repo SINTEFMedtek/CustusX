@@ -45,6 +45,7 @@
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
 #include "cxIGTLinkWidget.h"
+#include "cxRecordBaseWidget.h"
 
 namespace cx
 {
@@ -88,6 +89,8 @@ MainWindow::MainWindow() :
   this->populateVisualizationMethodsWidget();
   this->populateCalibrationMethodsWidget();
 
+  this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
+  this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
