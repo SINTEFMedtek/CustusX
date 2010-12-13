@@ -10,8 +10,10 @@
 #include "sscTransform3D.h"
 #include "sscPositionStorageFile.h"
 #include "sscUtilHelpers.h"
+#include "sscTime.h"
+#include "sscTypeConversions.h"
 
-#define EVENT_DATE_FORMAT "yyyyMMddHHmmss.zzz000"
+#define EVENT_DATE_FORMAT "yyyy:MM:dd-HH:mm:ss.zzz000"
 
 /** 
  */
@@ -53,13 +55,28 @@ int main(int argc, char **argv)
 	double timestamp;
 	QString toolIndex;
 	
+//  QDateTime now = QDateTime::currentDateTime();
+//  boost::uint64_t now_t64 = now.toTime_t();
+//  now_t64 *= 1000;
+//  now_t64 += now.time().msec();
+//
+//  std::cout << "now_t64 " << now_t64 << std::endl;
+//  uint now_t = now.toTime_t()*1000 + now.time().msec(); //milliseconds
+//  std::cout << "now.toTime_t() " << now.toTime_t() << std::endl;
+//  std::cout << "now.toTime_t()*1000 + now.time().msec() " << now_t << std::endl;
+//  std::cout << "test dir: " << ssc::PositionStorageReader::timestampToString(now_t64) << std::endl;
+	std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMilliSecondsSinceEpoch()) << std::endl;
+  std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMicroSecondsSinceEpoch()/1000) << std::endl;
+
+
 	std::cout << "reading file [" << posFile.toStdString() << "]" << std::endl;
 	if (!verbose)
-		std::cout << "[index]\ttoolIndex\ttimestamp\tmatrix" << std::endl;
+		std::cout << "[index]\ttimestamp\tmatrix\ttoolIndex" << std::endl;
 	int index = 0;
 	while (!reader.atEnd())
 	{
-		reader.read(&T, &timestamp, &toolIndex);
+		if (!reader.read(&T, &timestamp, &toolIndex))
+		  break;
 		boost::uint64_t ts64 = (boost::uint64_t)timestamp;
 		if (reader.version() == 1)
 		{
@@ -78,9 +95,11 @@ int main(int argc, char **argv)
 		}
 		else
 		{		
-			std::cout << "[" << index << "]\t" << toolIndex.toStdString() << '\t' << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
+      std::cout << "[" << index << "]" << '\t';
+      std::cout << ssc::PositionStorageReader::timestampToString((double)ts64).toStdString() << '\t';
 			boost::array<double, 16>  val = T.flatten();
 			ssc::stream_range(std::cout, val.begin(), val.end(), ' ');
+      std::cout << '\t' << toolIndex.toStdString();
 			std::cout << std::endl;
 		}
 

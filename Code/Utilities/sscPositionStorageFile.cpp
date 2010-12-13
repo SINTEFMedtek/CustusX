@@ -2,6 +2,7 @@
 #include <QDateTime>
 #include <boost/cstdint.hpp>
 #include "sscFrame3D.h"
+#include "sscTime.h"
 
 
 namespace ssc
@@ -10,6 +11,7 @@ namespace ssc
 
 PositionStorageReader::PositionStorageReader(QString filename) : positions(filename)
 {
+  mError = false;
   positions.open(QIODevice::ReadOnly);
   stream.setDevice(&positions);
   stream.setByteOrder(QDataStream::LittleEndian);
@@ -69,6 +71,8 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
   quint8 type;
   quint8 size;
 
+  stream >> type; // read type and make ready for a new read below
+
   if (type==2) // change tool format
   {
     stream >> size;
@@ -96,7 +100,7 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
     *matrix = frame.transform();
     *timestamp = ts;
     *toolUid = QString::number(tool);
-    return (size==15);
+    return (size==69);
   }
   else if (type==3) // position only format
   {
@@ -111,28 +115,28 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
     *matrix = frame.transform();
     *timestamp = ts;
     *toolUid = mCurrentToolUid;
-    return true;
-  }
-  else
-  {
-    return false;
+    return (size==68);
   }
 
+  mError = true;
   return false;
 }
 
 bool PositionStorageReader::atEnd() const
 {
-  return !positions.isReadable() || stream.atEnd();
+  return !positions.isReadable() || stream.atEnd() || mError;
 }
 
+/** convert a timestamp to a string. Input format is 64 bit millisecond time.
+ *
+ */
 QString PositionStorageReader::timestampToString(double timestamp)
 {
   QDateTime retval;
   boost::uint64_t ts = static_cast<boost::uint64_t>(timestamp);
   retval.setTime_t(ts/1000);
   retval = retval.addMSecs(ts%1000);
-  return retval.toString("yyyyMMddhhmmss.zzz");
+  return retval.toString(ssc::timestampMilliSecondsFormatNice());
 }
 
 
@@ -165,7 +169,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, int to
 	
 	stream << (quint8)1;	// Type - there is only one
 	stream << (quint8)(8+1+6*10);	// Size of data following this point
-	stream << (quint64)timestamp;	// Microseconds since Epoch
+	stream << (quint64)timestamp;	// Milliseconds since Epoch
 	stream << (quint8)toolIndex;	// tool index
 	stream << (double)frame.mThetaXY;
 	stream << (double)frame.mThetaZ;
@@ -192,7 +196,7 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
 
     stream << (quint8)3;  // Type -
     stream << (quint8)(8+6*10); // Size of data following this point
-    stream << (quint64)timestamp; // Microseconds since Epoch
+    stream << (quint64)timestamp; // Milliseconds since Epoch
     stream << (double)frame.mThetaXY;
     stream << (double)frame.mThetaZ;
     stream << (double)frame.mPhi;
