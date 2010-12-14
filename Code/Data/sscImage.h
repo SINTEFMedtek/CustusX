@@ -135,6 +135,8 @@ protected:
   DoubleBoundingBox3D mCroppingBox_d; ///< box defining the cropping size.
   std::vector<vtkPlanePtr> mClipPlanes;
 };
+
+
 } // end namespace ssc
 
 #endif /*SSCIMAGE_H_*/

@@ -162,6 +162,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscTime.cpp
     Utilities/sscMessageManager.h
     Utilities/sscMessageManager.cpp
+    Utilities/sscVolumeHelpers.h
+    Utilities/sscVolumeHelpers.cpp
     sscView.cpp
     sscView.h
     Rep/sscRep.h
