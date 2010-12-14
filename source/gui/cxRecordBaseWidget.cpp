@@ -61,8 +61,10 @@ void TrackedCenterlineWidget::checkIfReadySlot()
     emit ready(true);
   }
   else
+  {
     RecordBaseWidget::setWhatsMissingInfo("<font color=red>Need to start tracking.</font>");
-  emit ready(false);
+    emit ready(false);
+  }
 }
 
 void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
