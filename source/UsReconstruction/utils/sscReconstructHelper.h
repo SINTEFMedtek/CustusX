@@ -26,7 +26,6 @@ struct Planes
   
   std::vector<Planes> generate_planes(std::vector<TimedPosition> frameInfo, 
                                       ImagePtr frameData);
-  vtkImageDataPtr generateVtkImageData(Vector3D dim, Vector3D spacing, const unsigned char initValue); 
 
 }//namespace ssc
 #endif //SSCRECONSTRUCTHELPER_H_

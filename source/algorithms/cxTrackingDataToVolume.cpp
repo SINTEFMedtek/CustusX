@@ -6,16 +6,15 @@
 #include "sscBoundingBox3D.h"
 #include "sscDataManager.h"
 #include "sscToolManager.h"
-#include "utils/sscReconstructHelper.h"
 #include "sscRegistrationTransform.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include "sscVolumeHelpers.h"
 
 namespace cx
 {
-TrackingDataToVolume::TrackingDataToVolume() :
-    mSpacing(0.2)
+TrackingDataToVolume::TrackingDataToVolume()
 {}
 
 TrackingDataToVolume::~TrackingDataToVolume()
@@ -40,15 +39,26 @@ ssc::DoubleBoundingBox3D TrackingDataToVolume::getBoundingBox(ssc::TimedTransfor
   return ssc::DoubleBoundingBox3D::fromCloud(positions_pr);
 }
 
-ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D extent_pr, int spacing)
+ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bounds_pr, double spacing)
 {
-  ssc::Vector3D dim = extent_pr.range() / spacing;
+  std::cout << "bounds:" << bounds_pr << std::endl;
+  std::cout << "range:" << bounds_pr.range() << std::endl;
+  ssc::Vector3D dim = ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1);
+
+  double maxVolumeSize = 10000000;//TODO: Set a good max value or set this as a parameter
+  double size = dim[0]*dim[1]*dim[2];
+  if(size > maxVolumeSize)
+  {
+    spacing *= pow(size / maxVolumeSize, 1.0/3);
+    dim = ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1);
+  }
+
   ssc::Vector3D spacingVector = ssc::Vector3D(1,1,1) * spacing;
+  std::cout << "dim: " << dim << std::endl;
   vtkImageDataPtr data_pr = ssc::generateVtkImageData(dim, spacingVector, 0);
 
-  QString filePath;
-  filePath = stateManager()->getPatientData()->getActivePatientFolder() + "/Images/";
-  ssc::ImagePtr image = ssc::dataManager()->createImage(data_pr, "tc%1", "Tracked centerline #%1", filePath);
+  ssc::ImagePtr image = ssc::dataManager()->createImage(data_pr, "tc%1", "Tracked centerline #%1", "Images");
+  ssc::dataManager()->loadData(image);
   return image;
 }
 
@@ -68,17 +78,26 @@ void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::
   for(; it != points_pr.end(); ++it)
   {
     ssc::Vector3D point_d = dMpr.coord((*it));
-    unsigned char* voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_d[0], point_d[1], point_d[2]));
+    ssc::Vector3D point_voxel = divide_elems(point_d, ssc::Vector3D(data_pr->GetSpacing()));
+    point_voxel = round(point_voxel);
+    unsigned char* voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_voxel[0], point_voxel[1], point_voxel[2]));
     (*voxel_d) = point_value;
   }
 }
 
 void TrackingDataToVolume::setInput(ssc::TimedTransformMap map_prMt)
 {
-  ssc::DoubleBoundingBox3D extent = getBoundingBox(map_prMt);
-  mImage = createEmptyImage(extent, mSpacing);
+  ssc::DoubleBoundingBox3D bounds = getBoundingBox(map_prMt);
+  double initialSpacing = 0.2;
+  mImage = createEmptyImage(bounds, initialSpacing);
+
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+  std::cout << "rMpr\n" << rMpr << std::endl;
+  ssc::Transform3D rMd = rMpr * ssc::createTransformTranslate(bounds.corner(0,0,0)); // TODO + eller - ?????
+  std::cout << "rMd\n" << rMd << std::endl;
+
   //TODO Should it be identity or rMpr.inv()???
-  mImage->get_rMd_History()->setRegistration(ssc::toolManager()->get_rMpr()->inv());
+  mImage->get_rMd_History()->setRegistration(rMd);
 
   std::vector<ssc::Vector3D> data_pr = this->extractPoints(map_prMt);
   this->insertPoints(mImage, data_pr);

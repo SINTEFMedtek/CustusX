@@ -50,50 +50,5 @@ std::vector<Planes> generate_planes(std::vector<TimedPosition> frameInfo,
   }
   return retval;
 }
-
-vtkImageDataPtr generateVtkImageData(Vector3D dim, 
-                                     Vector3D spacing,
-                                     const unsigned char initValue)
-{
-  vtkImageDataPtr data = vtkImageDataPtr::New();
-  data->SetSpacing(spacing[0], spacing[1], spacing[2]);
-  data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-  data->SetScalarTypeToUnsignedChar();
-  data->SetNumberOfScalarComponents(1);
-  
-  int scalarSize = dim[0]*dim[1]*dim[2];
-  
-  unsigned char *rawchars = (unsigned char*)malloc(scalarSize+1);
-  std::fill(rawchars,rawchars+scalarSize, initValue);
-  
-  vtkUnsignedCharArrayPtr array = vtkUnsignedCharArrayPtr::New();
-  array->SetNumberOfComponents(1);
-  //TODO: Whithout the +1 the volume is black 
-  array->SetArray(rawchars, scalarSize+1, 0); // take ownership
-  data->GetPointData()->SetScalars(array);
-  
-  // A trick to get a full LUT in ssc::Image (automatic LUT generation)
-  // Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
-  rawchars[0] = 255;
-	data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
-  rawchars[0] = 0;
-  
-  /*data->AllocateScalars();
-   unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
-   unsigned long N = data->GetNumberOfPoints();
-   N--;//Don't understand this
-   for (unsigned long i = 0; i < N; i++)
-   dataPtr[i] = 100;
-   
-   //dataPtr[N] = 255;//This creates a black volume
-   
-   dataPtr[0] = 255;
-   
-   std::cout << "Reconstructer::generateOutputVolume() data->GetNumberOfPoints(): " 
-   << N << std::endl;*/
-  
-  
-  return data;
-}
   
 }//namespace
