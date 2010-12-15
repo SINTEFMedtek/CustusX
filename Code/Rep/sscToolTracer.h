@@ -34,13 +34,18 @@ public:
 
   void setColor(QColor color);
 
-//  void start();
-//  void stop();
-//  void clear();
+  void start();
+  void stop();
+  void clear();
+  bool isRunning() const;
 
 private slots:
   void receiveTransforms(Transform3D prMt, double timestamp);
 private:
+  void connectTool();
+  void disconnectTool();
+
+  bool mRunning;
   vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
   vtkActorPtr mActor;
   ToolPtr mTool;

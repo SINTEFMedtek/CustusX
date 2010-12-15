@@ -30,6 +30,7 @@ public:
 	virtual void setTool(ToolPtr tool);
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
+	ToolTracerPtr getTracer();
 
   void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.

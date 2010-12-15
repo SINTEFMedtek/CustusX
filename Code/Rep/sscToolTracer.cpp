@@ -22,6 +22,7 @@ namespace ssc
 
 ToolTracer::ToolTracer()
 {
+  mRunning = false;
   mPolyData = vtkPolyDataPtr::New();
   mActor = vtkActorPtr::New();
   mPolyDataMapper = vtkPolyDataMapperPtr::New();
@@ -43,6 +44,47 @@ ToolTracer::ToolTracer()
   mPolyData->SetVerts(mLines);
 }
 
+void ToolTracer::start()
+{
+	if (mRunning)
+		return;
+	mRunning = true;
+	this->connectTool();
+}
+
+void ToolTracer::stop()
+{
+	if (!mRunning)
+		return;
+	this->disconnectTool();
+	mRunning = false;
+}
+
+void ToolTracer::clear()
+{
+	mPoints->Initialize();
+	mLines->Initialize();
+	mPolyData->Modified();
+}
+
+void ToolTracer::connectTool()
+{
+	if (mTool && mRunning)
+	{
+		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+	}
+}
+
+void ToolTracer::disconnectTool()
+{
+	if (mTool && mRunning)
+	{
+		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
+		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+	}
+}
+
 void ToolTracer::setColor(QColor color)
 {
   mActor->GetProperty()->SetColor(color.redF(), color.greenF(), color.blueF());
@@ -50,19 +92,9 @@ void ToolTracer::setColor(QColor color)
 
 void ToolTracer::setTool(ToolPtr tool)
 {
-  if (mTool)
-  {
-    disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
-    disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
-  }
-
-  mTool = tool;
-
-  if (mTool)
-  {
-    connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
-    connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
-  }
+	this->disconnectTool();
+	mTool = tool;
+	this->connectTool();
 }
 
 vtkPolyDataPtr ToolTracer::getPolyData()
@@ -75,6 +107,10 @@ vtkActorPtr ToolTracer::getActor()
   return mActor;
 }
 
+bool ToolTracer::isRunning() const
+{
+	return mRunning;
+}
 
 void ToolTracer::receiveTransforms(Transform3D prMt, double timestamp)
 {

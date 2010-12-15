@@ -288,7 +288,7 @@ void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPo
 	RGBColor offsetColor(1.0,0.8,0.0);
 	if (mMergeOffsetAndToolLine)
 	{
-		stipplePattern = 0x0F0F;
+		//stipplePattern = 0x0F0F; // stippled line not to be used
 		offsetColor = toolColor;
 	}
 

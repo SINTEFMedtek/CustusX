@@ -45,6 +45,11 @@ ToolRep3D::~ToolRep3D()
 {
 }
 
+ToolTracerPtr ToolRep3D::getTracer()
+{
+	return mTracer;
+}
+
 ToolRep3DPtr ToolRep3D::New(const QString& uid, const QString& name)
 {
   ToolRep3DPtr retval(new ToolRep3D(uid, name));
