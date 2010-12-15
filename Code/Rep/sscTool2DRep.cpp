@@ -225,7 +225,7 @@ void ToolRep2D::update()
 
 bool ToolRep2D::showProbe()
 {
-	return mSlicer->getTool();// && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
+	return mSlicer->getTool() && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
 }
 bool ToolRep2D::showOffset()
 {
