@@ -66,21 +66,26 @@ void Texture3DSlicerRep::setShaderFile(QString shaderFile)
 
 void Texture3DSlicerRep::viewChanged()
 {
+//  std::cout << "void Texture3DSlicerRep::viewChanged() pre " << mView->getZoomFactor() << std::endl;
   if (!mView)
     return;
   if (!mView->getZoomFactor()<0)
     return; // ignore if zoom is invalid
   this->setViewportData(mView->get_vpMs(), mView->getViewport());
-//  std::cout << "void Texture3DSlicerRep::viewChanged()" << std::endl;
+//  std::cout << "void Texture3DSlicerRep::viewChanged() " << mView->getZoomFactor() << std::endl;
 }
 
 void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
 {
 	mBB_s = transform(vpMs.inv(), vp);
 
-	Vector3D p1(mBB_s[1], mBB_s[2], mBB_s[4]);
-	Vector3D p2(mBB_s[0], mBB_s[3], mBB_s[4]);
+//	Vector3D p1(mBB_s[1], mBB_s[2], mBB_s[4]);
+//	Vector3D p2(mBB_s[0], mBB_s[3], mBB_s[4]);
+  Vector3D p1(mBB_s[1], mBB_s[2], 0);
+  Vector3D p2(mBB_s[0], mBB_s[3], 0);
 	Vector3D origin(mBB_s[0], mBB_s[2], 0);
+
+//	std::cout << p1 << ", " << p2 << ", " << origin << std::endl;
 
 	createGeometryPlane(p1, p2, origin);
 }
@@ -101,6 +106,16 @@ void Texture3DSlicerRep::createGeometryPlane( Vector3D point1_s,  Vector3D point
 
 void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
 {
+  if (mImages.size()==images.size())
+  {
+    bool equal = true;
+    for (unsigned i=0; i<mImages.size(); ++i)
+      equal &= (mImages[i]==images[i]);
+    if (equal)
+      return;
+  }
+//  std::cout << "Texture3DSlicerRep::setImages" << std::endl;
+
 	mImages = images;
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
@@ -114,46 +129,36 @@ void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
 		createCoordinates(i);
 	}
 	updateColorAttributeSlot();
+
+  mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
+  mPainterPolyDatamapper->SetPainter(mPainter);
+  mPainterPolyDatamapper->SetInput(mPolyData);
+  for (unsigned i = 0; i < mImages.size(); ++i)
+  {
+    mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2 * i, cstring_cast(this->getTCoordName(i)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
+  }
+
+  mActor->SetMapper(mPainterPolyDatamapper);
 }
 
 void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
 {
+	if (mSliceProxy)
+		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
 	mSliceProxy = slicer;
 	if (mSliceProxy)
-	{
-		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,
-				SLOT(sliceTransformChangedSlot(Transform3D)));
-	}
-	mSliceProxy = slicer;
-	if (mSliceProxy)
-	{
-		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,
-				SLOT(sliceTransformChangedSlot(Transform3D)));
-	}
+		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(sliceTransformChangedSlot(Transform3D)));
 }
 
 void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View* view)
 {
-	if (mImages.empty())
-	{
-		return;
-	}
-	mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
-	mPainterPolyDatamapper->SetPainter(mPainter);
-	mPainterPolyDatamapper->SetInput(mPolyData);
-	for (unsigned i=0; i<mImages.size(); ++i)
-	{
-		mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2*i, cstring_cast(getTCoordName(i)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
-	}
-
-	mActor->SetMapper(mPainterPolyDatamapper);
+//  std::cout << "void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View* view)" << std::endl;
 	view->getRenderer()->AddActor(mActor);
-
 	mView = view;
 	connect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
 	this->viewChanged();
-
 }
+
 void Texture3DSlicerRep::createCoordinates(int count)
 {
   if (!mPolyData)
@@ -168,10 +173,7 @@ void Texture3DSlicerRep::createCoordinates(int count)
 	TCoords->InsertNextTuple3( 0.0, 0.0, 0.0 );
 	TCoords->SetName(cstring_cast(getTCoordName(count)) );
 
-//	if (!mPolyData)
-//		std::cerr << "Error in Texture3DSlicerRep: setViewport was not called" << std::endl;
 	mPolyData->GetPointData()->AddArray(TCoords);
-	//mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2*count, cstring_cast(getTCoordName(count)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
 }
 
 QString Texture3DSlicerRep::getTCoordName(int index)
@@ -184,7 +186,6 @@ void Texture3DSlicerRep::updateCoordinates(int index)
   if (!mPolyData)
     return;
 
-		//vtkImageDataPtr volume = mImages[index]->getGrayScaleBaseVtkImageData();
 		vtkImageDataPtr volume = mImages[index]->getBaseVtkImageData();
 		// create a bb describing the volume in physical (raw data) space
 		Vector3D origin(volume->GetOrigin());
@@ -202,6 +203,7 @@ void Texture3DSlicerRep::updateCoordinates(int index)
 
 		// create transform from slice space to raw data space
 		Transform3D iMs = mImages[index]->get_rMd().inv() * mSliceProxy->get_sMr().inv();
+//		std::cout << "Texture3DSlicerRep iMs " << this <<  "\n" << iMs << std::endl;
 		// create transform from image space to texture normalized space
 		Transform3D nMi = createTransformNormalize( imageSize, textureSpace);
 		// total transform from slice space to texture space
@@ -234,13 +236,11 @@ void Texture3DSlicerRep::updateCoordinates(int index)
 		mPolyData->Modified();
 }
 
-
 void Texture3DSlicerRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	view->getRenderer()->RemoveActor(mActor);
-
-	mView = NULL;
 	disconnect(view, SIGNAL(resized(QSize)), this, SLOT(viewChanged()));
+  mView = NULL;
 }
 
 void Texture3DSlicerRep::printSelf(std::ostream & os, ssc::Indent indent)
@@ -252,9 +252,7 @@ void Texture3DSlicerRep::updateColorAttributeSlot()
 {
 	for (unsigned i = 0; i < mImages.size(); ++i)
 	{
-		//vtkImageDataPtr inputImage = mImages[i]->getGrayScaleBaseVtkImageData() ;
 		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;
-		//inputImage->Update();
 
 		vtkLookupTablePtr lut = mImages[i]->getLookupTable2D()->getBaseLookupTable();
 		ssc::GPUImageLutBufferPtr lutBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageLutBuffer(lut->GetTable());
@@ -265,7 +263,6 @@ void Texture3DSlicerRep::updateColorAttributeSlot()
 			mPainter->SetLutBuffer(i, lutBuffer);
 		}
 
-		//Logger::log("vm.log", "i="+string_cast(i)+", smax="+string_cast(inputImage->GetScalarTypeMax())+", win="+string_cast(mImages[i]->getLookupTable2D()->getWindow()));
 		int scalarTypeMax = (int)inputImage->GetScalarTypeMax();
 		float window = (float) mImages[i]->getLookupTable2D()->getWindow() / scalarTypeMax;
 		float llr = (float) mImages[i]->getLookupTable2D()->getLLR() / scalarTypeMax;
