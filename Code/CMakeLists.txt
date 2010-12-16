@@ -131,6 +131,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscBoundingBox3D.h
     Utilities/sscVector3D.cpp
     Utilities/sscVector3D.h
+    Utilities/sscMeshHelpers.cpp
+    Utilities/sscMeshHelpers.h
     Utilities/sscTransform3D.cpp 
     Utilities/sscTransform3D.h
     Utilities/sscSliceComputer.cpp 
