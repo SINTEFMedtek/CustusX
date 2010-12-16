@@ -4,7 +4,7 @@
 #include "sscUtilHelpers.h"
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
-
+#include <cmath>
 // --------------------------------------------------------
 namespace ssc
 {
@@ -157,6 +157,23 @@ Vector3D unitVector(double thetaXY, double thetaZ)
   e[1] = sin(thetaXY)*cos(thetaZ);
   e[2] = sin(thetaZ);
   return e;
+}
+
+Vector3D round(const Vector3D& a)
+{
+  Vector3D retval;
+  for (int i=0; i<3; ++i)
+    retval[i] = (int)(a[i] + 0.5);
+
+  return retval;
+}
+Vector3D ceil(const Vector3D& a)
+{
+  Vector3D retval;
+  for (int i=0; i<3; ++i)
+    retval[i] = std::ceil(a[i]);
+
+  return retval;
 }
 
 // --------------------------------------------------------

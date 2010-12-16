@@ -68,6 +68,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscSlicePlaneClipper.h
     Rep/sscOrientationAnnotationRep.h
     Rep/sscRTStreamRep.h
+    Rep/sscToolTracer.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
     Widgets/sscStringDataAdapter.h
@@ -162,6 +163,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscTime.cpp
     Utilities/sscMessageManager.h
     Utilities/sscMessageManager.cpp
+    Utilities/sscVolumeHelpers.h
+    Utilities/sscVolumeHelpers.cpp
     sscView.cpp
     sscView.h
     Rep/sscRep.h
@@ -222,6 +225,8 @@ SET( SSC_SOURCE_FILES
     Rep/sscRTStreamRep.cpp
     Rep/ultrasoundsectorsource.h
     Rep/ultrasoundsectorsource.cpp
+    Rep/sscToolTracer.h
+    Rep/sscToolTracer.cpp
     Data/sscLandmark.h
     Data/sscLandmark.cpp
     Data/sscData.cpp

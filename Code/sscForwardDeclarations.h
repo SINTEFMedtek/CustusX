@@ -90,7 +90,6 @@ typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
 class LabeledComboBoxWidget;
 
 
-
 } // namespace ssc
 
 #endif /*SSC_FORWARDDECLARARATIONS_H_*/

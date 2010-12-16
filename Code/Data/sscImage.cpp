@@ -616,4 +616,5 @@ void Image::mergevtkSettingsIntosscTransform()
   emit cropBoxChanged();
 }
 
+
 } // namespace ssc

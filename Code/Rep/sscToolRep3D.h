@@ -11,6 +11,7 @@ namespace ssc
 {
 
 typedef boost::shared_ptr<class RealTimeStreamGraphics> RealTimeStreamGraphicsPtr;
+typedef boost::shared_ptr<class ToolTracer> ToolTracerPtr;
 
 /**Display a 3D representation of a ssc::Tool.
  * The representation to use is extracted from the tool itself.		
@@ -29,6 +30,7 @@ public:
 	virtual void setTool(ToolPtr tool);
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
+	ToolTracerPtr getTracer();
 
   void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
@@ -70,6 +72,7 @@ private:
   bool mStayHiddenAfterVisible;
 	bool mStayVisibleAfterHide;
 	bool mOffsetPointVisibleAtZeroOffset;
+	ToolTracerPtr mTracer;
 
 	//US Probe sector
 	ProbeDataPtr mProbeSector;

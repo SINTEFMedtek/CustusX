@@ -93,6 +93,8 @@ public:
 	virtual std::map<int, Vector3D> getReferencePoints() const { return std::map<int, Vector3D>(); } ///< Get the optional reference points from this tool
 	virtual bool hasReferencePointWithId(int id){ Q_UNUSED(id); return false; }
 
+	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime){Q_UNUSED(startTime); Q_UNUSED(stopTime); return TimedTransformMap();}; ///< Get a tools transforms from within a given session
+
 #ifdef _WINDOWS
   typedef ssc::utils::Transform3D Transform3D;
 #endif

@@ -15,6 +15,7 @@
 #include "sscRTStreamRep.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
+#include "sscToolTracer.h"
 
 namespace ssc
 {
@@ -36,10 +37,17 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   mProbeSector.reset(new ProbeData());
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
+
+  mTracer.reset(new ToolTracer());
 }
 
 ToolRep3D::~ToolRep3D()
 {
+}
+
+ToolTracerPtr ToolRep3D::getTracer()
+{
+	return mTracer;
 }
 
 ToolRep3DPtr ToolRep3D::New(const QString& uid, const QString& name)
@@ -63,6 +71,8 @@ void ToolRep3D::setTool(ToolPtr tool)
 {
   if (tool == mTool)
     return;
+
+  mTracer->setTool(tool);
 
   if (mTool)
   {
@@ -121,6 +131,8 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
 
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
+  view->getRenderer()->AddActor(mTracer->getActor());
+
   view->getRenderer()->AddActor(mToolActor);
   view->getRenderer()->AddActor(mProbeSectorActor);
 
@@ -146,6 +158,7 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 
 void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
 {
+  view->getRenderer()->AddActor(mTracer->getActor());
   view->getRenderer()->RemoveActor(mToolActor);
   view->getRenderer()->RemoveActor(mProbeSectorActor);
   if (mRTStream)
