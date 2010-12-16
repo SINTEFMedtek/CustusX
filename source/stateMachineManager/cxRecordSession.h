@@ -3,6 +3,7 @@
 
 #include <QString>
 #include "boost/shared_ptr.hpp"
+#include "cxToolManager.h"
 
 class QDomNode;
 
@@ -24,6 +25,10 @@ public:
 
   QString getUid();
   QString getDescription();
+  double getStartTime();
+  double getStopTime();
+
+  ssc::SessionToolHistoryMap getSessionHistory();
 
   void addXml(QDomNode& dataNode);
   void parseXml(QDomNode& dataNode);

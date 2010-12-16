@@ -74,7 +74,7 @@ void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::
   ssc::Transform3D dMpr = ssc::CoordinateSystemHelpers::get_toMfrom(pr, d);
 
   std::vector<ssc::Vector3D>::iterator it = points_pr.begin();
-  unsigned char point_value = 1; //or 255???
+  unsigned char point_value = 255; //or 255???
   for(; it != points_pr.end(); ++it)
   {
     ssc::Vector3D point_d = dMpr.coord((*it));

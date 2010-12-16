@@ -69,8 +69,10 @@ void TrackedCenterlineWidget::checkIfReadySlot()
 
 void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 {
+  RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
+
   //get the transforms from the session
-  ssc::TimedTransformMap transforms_prMt = this->getSessionTrackingData(sessionId);
+  ssc::TimedTransformMap transforms_prMt = this->getSessionTrackingData(session);
   if(transforms_prMt.empty())
   {
     ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Aborting centerline extraction.");
@@ -88,25 +90,23 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
   ssc::ImagePtr centerLineImage_d = segmentation.centerline(image_d, savepath);
 }
 
-ssc::TimedTransformMap TrackedCenterlineWidget::getSessionTrackingData(QString sessionId)
+ssc::TimedTransformMap TrackedCenterlineWidget::getSessionTrackingData(RecordSessionPtr session)
 {
   ssc::TimedTransformMap retval;
-  std::map<ssc::ToolPtr, ssc::TimedTransformMap> toolTransformMap; //TODO toolmanager need to have a function for getting this kind of data?
-  ssc::messageManager()->sendDebug("TODO: implement TrackedCenterlineWidget::getSessionTrackingData(QString sessionId)");
-
-  //TODO HACK!!!
-  retval = (*ssc::toolManager()->getDominantTool()->getPositionHistory().get());
-  //TODO HACK!!!
+  ssc::SessionToolHistoryMap toolTransformMap = session->getSessionHistory();
 
   if(toolTransformMap.size() == 1)
   {
-    return toolTransformMap.begin()->second;
+    ssc::messageManager()->sendInfo("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
+    retval = toolTransformMap.begin()->second;
   }
   else if(toolTransformMap.size() > 1)
   {
-    //TODO make the user select which tool they wanna use.
     ssc::messageManager()->sendWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
-    ssc::messageManager()->sendDebug("TODO: implement TrackedCenterlineWidget::getSessionTrackingData(QString sessionId)");
+    retval = toolTransformMap.begin()->second; //TODO make the user select which tool they wanna use.
+  }else if(toolTransformMap.empty())
+  {
+    ssc::messageManager()->sendWarning("Could not find any session history for given session.");
   }
   return retval;
 }
