@@ -339,7 +339,7 @@ Transform3D View::get_vpMs() const
 ssc::DoubleBoundingBox3D View::getViewport() const
 {
   QSize size = this->size();
-  ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 1);
+  ssc::DoubleBoundingBox3D vp(0, size.width(), 0, size.height(), 0, 0);
 //  std::cout << "vp " << vp << std::endl;
   return vp;
 }
