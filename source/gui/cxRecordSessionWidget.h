@@ -25,6 +25,8 @@ public:
   ~RecordSessionWidget();
 
 signals:
+  void started();
+  void stopped();
   void newSession(QString);
 
 protected:
