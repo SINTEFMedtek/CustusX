@@ -80,12 +80,11 @@ vtkPolyDataPtr TrackedCenterlineWidget::PolydataFromTransforms(ssc::TimedTransfo
   ssc::Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
 
   vtkPointsPtr points = vtkPointsPtr::New();
-  vtkCellArrayPtr sides = vtkCellArrayPtr::New();
+  vtkCellArrayPtr lines = vtkCellArrayPtr::New();
 
   points->Allocate(transformMap.size());
 
   ssc::TimedTransformMap::iterator mapIter = transformMap.begin();
-  int i = 0;
   while(mapIter != transformMap.end())
   {
     ssc::Vector3D point_t = ssc::Vector3D(0,0,0);
@@ -96,13 +95,17 @@ vtkPolyDataPtr TrackedCenterlineWidget::PolydataFromTransforms(ssc::TimedTransfo
     ssc::Vector3D p = rMt.coord(point_t);
     points->InsertNextPoint(p.begin());
 
-    sides->InsertNextCell(i);
-    i++;
     mapIter++;
   }
 
+  lines->Initialize();
+    std::vector<vtkIdType> ids(points->GetNumberOfPoints());
+    for (unsigned i=0; i<ids.size(); ++i)
+      ids[i] = i;
+    lines->InsertNextCell(ids.size(), &(*ids.begin()));
+
   retval->SetPoints(points);
-  retval->SetLines(sides);
+  retval->SetLines(lines);
   return retval;
 }
 
