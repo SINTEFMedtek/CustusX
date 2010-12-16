@@ -11,5 +11,7 @@
     <file>icons/open_icon_library/png/64x64/actions/arrow-right-3.png</file>
     <file>icons/open_icon_library/png/64x64/actions/arrow-right-double-3.png</file>
     <file>icons/open_icon_library/png/64x64/actions/dialog-close.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/media-record-3.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/media-playback-stop.png</file>
 </qresource>
 </RCC>
