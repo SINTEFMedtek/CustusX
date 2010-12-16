@@ -255,6 +255,7 @@ void MainWindow::createActions()
   connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
   connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
 
+
   //data
   mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
   mImportDataAction->setShortcut(tr("Ctrl+I"));
@@ -594,6 +595,8 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mDebugModeAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mShowControlPanelAction);
+  mFileMenu->addAction(mQuitAction);
+
 
   // window
   QMenu* popupMenu = this->createPopupMenu();
@@ -762,10 +765,11 @@ void MainWindow::preferencesSlot()
   PreferencesDialog prefDialog(this);
   prefDialog.exec();
 }
+
 void MainWindow::quitSlot()
 {
-  ssc::messageManager()->sendInfo("quitSlot - never called?");
-  //TODO
+  ssc::messageManager()->sendInfo("Shutting down CustusX");
+  qApp->quit();
 }
 
 void MainWindow::deleteDataSlot()
