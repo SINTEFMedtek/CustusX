@@ -62,8 +62,8 @@ void ToolTracer::stop()
 
 void ToolTracer::clear()
 {
-	mPoints->Initialize();
-	mLines->Initialize();
+	mPoints->Reset();
+	mLines->Reset();
 	mPolyData->Modified();
 }
 
@@ -72,7 +72,7 @@ void ToolTracer::connectTool()
 	if (mTool && mRunning)
 	{
 		connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
-		connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+		//connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 	}
 }
 
@@ -81,7 +81,7 @@ void ToolTracer::disconnectTool()
 	if (mTool && mRunning)
 	{
 		disconnect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
-		disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
+		//disconnect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
 	}
 }
 
