@@ -29,6 +29,19 @@ public:
   ssc::ImagePtr getOutput(); ///< the generated image in image (d) space
 
 private:
+  inline bool rangeCheck(int x, int y, int z, int* extent)
+  {
+    if (x < extent[0] ||
+        x > extent[1] ||
+        y < extent[2] ||
+        y > extent[3] ||
+        z < extent[4] ||
+        z > extent[5])
+      return false;
+    else
+      return true;
+  }
+
   ssc::DoubleBoundingBox3D getBoundingBox(ssc::TimedTransformMap& map_prMt);///< Create bounding box around input positions
   ssc::ImagePtr createEmptyImage(ssc::DoubleBoundingBox3D bounds_pr, double spacing);///< Create an empty sscImage. Creates an unsigned char volume.
   std::vector<ssc::Vector3D> extractPoints(ssc::TimedTransformMap& map_prMt);///< Extracts the tool point (0,0,0) (aka: the tooltip) in pr space
