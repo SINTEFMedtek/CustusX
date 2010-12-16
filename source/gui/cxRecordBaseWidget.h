@@ -34,6 +34,8 @@ signals:
 protected slots:
   virtual void checkIfReadySlot() = 0;
   virtual void postProcessingSlot(QString sessionId) = 0;
+  virtual void startedSlot() = 0;
+  virtual void stoppedSlot() = 0;
 
 protected:
   void setWhatsMissingInfo(QString info);
@@ -63,10 +65,11 @@ public:
 protected slots:
   void checkIfReadySlot();
   void postProcessingSlot(QString sessionId);
+  void startedSlot();
+  void stoppedSlot();
 
 private:
   ssc::TimedTransformMap getSessionTrackingData(RecordSessionPtr session);
-//  vtkPolyDataPtr polydataFromTransforms(ssc::TimedTransformMap transformMap);
 };
 
 /**
