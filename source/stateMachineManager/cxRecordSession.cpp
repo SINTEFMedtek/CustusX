@@ -30,6 +30,21 @@ QString RecordSession::getDescription()
   return mDescription;
 }
 
+double RecordSession::getStartTime()
+{
+  return mStartTime;
+}
+
+double RecordSession::getStopTime()
+{
+  return mStopTime;
+}
+
+ssc::SessionToolHistoryMap RecordSession::getSessionHistory()
+{
+  return ssc::toolManager()->getSessionHistory(mStartTime, mStopTime);
+}
+
 void RecordSession::addXml(QDomNode& parentNode)
 {
   QDomDocument doc = parentNode.ownerDocument();

@@ -11,12 +11,13 @@
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
-#include "cxTool.h"
-#include "cxTracker.h"
-#include "cxToolConfigurationParser.h"
 #include "sscTypeConversions.h"
 #include "sscPositionStorageFile.h"
 #include "sscTime.h"
+#include "cxTool.h"
+#include "cxTracker.h"
+#include "cxToolConfigurationParser.h"
+#include "cxRecordSession.h"
 
 namespace cx
 {
@@ -311,6 +312,22 @@ void ToolManager::removeLandmarks()
   {
     ssc::toolManager()->removeLandmark(it->first);
   }
+}
+
+ssc::SessionToolHistoryMap ToolManager::getSessionHistory(double startTime, double stopTime)
+{
+  ssc::SessionToolHistoryMap retval;
+
+  ssc::ToolManager::ToolMapPtr tools = this->getTools();
+  ssc::ToolManager::ToolMap::iterator it = tools->begin();
+  for(; it != tools->end(); ++it)
+  {
+    ssc::TimedTransformMap toolMap = it->second->getSessionHistory(startTime, stopTime);
+    if(toolMap.empty())
+      continue;
+    retval[it->second] = toolMap;
+  }
+  return retval;
 }
 
 TrackerPtr ToolManager::getTracker()
