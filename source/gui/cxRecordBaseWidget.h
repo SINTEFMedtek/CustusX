@@ -66,6 +66,7 @@ protected slots:
 
 private:
   ssc::TimedTransformMap getSessionTrackingData(RecordSessionPtr session);
+//  vtkPolyDataPtr polydataFromTransforms(ssc::TimedTransformMap transformMap);
 };
 
 /**
