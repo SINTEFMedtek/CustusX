@@ -42,8 +42,8 @@ ssc::DoubleBoundingBox3D TrackingDataToVolume::getBoundingBox(ssc::TimedTransfor
 
 ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bounds_pr, double spacing)
 {
-  std::cout << "bounds:" << bounds_pr << std::endl;
-  std::cout << "range:" << bounds_pr.range() << std::endl;
+  //std::cout << "bounds:" << bounds_pr << std::endl;
+  //std::cout << "range:" << bounds_pr.range() << std::endl;
   ssc::Vector3D dim = ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1);
 
   double maxVolumeSize = 10000000;//TODO: Set a good max value or set this as a parameter
@@ -56,18 +56,16 @@ ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bo
   }
 
   ssc::Vector3D spacingVector = ssc::Vector3D(1,1,1) * spacing;
-  std::cout << "dim: " << dim << std::endl;
+  //std::cout << "dim: " << dim << std::endl;
   vtkImageDataPtr data_pr = ssc::generateVtkImageData(dim, spacingVector, 0);
 
-  ssc::ImagePtr image = ssc::dataManager()->createImage(data_pr, "tc%1", "Tool positions #%1", "Images");
+  ssc::ImagePtr image = ssc::dataManager()->createImage(data_pr, "tc%1", "Tool positions %1", "Images");
   ssc::dataManager()->loadData(image);
   return image;
 }
 
-void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::Vector3D> points_pr)
+void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::Vector3D> points_pr, int padding_voxels)
 {
-  //TODO get someone to "double-check these numbers..." :P
-
   vtkImageDataPtr data_pr = image_d->getBaseVtkImageData();
 
   //convert points into image space (d) and insert a binary value into the image at the points location in the image
@@ -76,49 +74,58 @@ void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::
   ssc::Transform3D dMpr = ssc::CoordinateSystemHelpers::get_toMfrom(pr, d);
 
   std::vector<ssc::Vector3D>::iterator it = points_pr.begin();
-  unsigned char point_value = 255; //or 255???
   for(; it != points_pr.end(); ++it)
   {
     ssc::Vector3D point_d = dMpr.coord((*it));
     ssc::Vector3D point_voxel = divide_elems(point_d, ssc::Vector3D(data_pr->GetSpacing()));
     point_voxel = round(point_voxel);
+    this->writeVoxelValuesWithPadding(point_voxel, data_pr, padding_voxels);
+  }
+}
 
-    //TODO make function
-    unsigned char* voxel_d;
-    int a = 25;
-    for(int i=-a; i<=a; ++i)
+void TrackingDataToVolume::writeVoxelValuesWithPadding(ssc::Vector3D point_voxel, vtkImageDataPtr data_pr, int padding_voxels)
+{
+  unsigned char* voxel_d;
+  unsigned char point_value = 255;
+  for(int i=-padding_voxels; i<=padding_voxels; ++i)
+  {
+    for(int j=-padding_voxels; j<=padding_voxels; ++j)
     {
-      for(int j=-a; j<=a; ++j)
+      for(int k=-padding_voxels; k<=padding_voxels; ++k)
       {
-        for(int k=-a; k<=a; ++k)
+        if(rangeCheck(point_voxel[0]+i, point_voxel[1]+j, point_voxel[2]+k, data_pr->GetExtent()))
         {
-          if(rangeCheck(point_voxel[0]+i, point_voxel[1]+j, point_voxel[2]+k, data_pr->GetExtent()))
-          {
-            voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_voxel[0]+i, point_voxel[1]+j, point_voxel[2]+k));
-            (*voxel_d) = point_value;
-          }
+          voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_voxel[0]+i, point_voxel[1]+j, point_voxel[2]+k));
+          (*voxel_d) = point_value;
         }
       }
     }
   }
 }
 
-void TrackingDataToVolume::setInput(ssc::TimedTransformMap map_prMt)
+void TrackingDataToVolume::setInput(ssc::TimedTransformMap map_prMt, int padding_voxels)
 {
-  ssc::DoubleBoundingBox3D bounds = getBoundingBox(map_prMt);
-  double initialSpacing = 0.2;
-  mImage = createEmptyImage(bounds, initialSpacing);
+  double initialSpacing_mm = 0.2;
+  double padding_mm = padding_voxels*initialSpacing_mm;
+
+  ssc::DoubleBoundingBox3D bounds_mm = getBoundingBox(map_prMt);
+  bounds_mm[0] += -padding_mm;
+  bounds_mm[1] += padding_mm;
+  bounds_mm[2] += -padding_mm;
+  bounds_mm[3] += padding_mm;
+  bounds_mm[4] += -padding_mm;
+  bounds_mm[5] += padding_mm;
+  mImage = createEmptyImage(bounds_mm, initialSpacing_mm);
 
   ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
-  std::cout << "rMpr\n" << rMpr << std::endl;
-  ssc::Transform3D rMd = rMpr * ssc::createTransformTranslate(bounds.corner(0,0,0)); // TODO + eller - ?????
-  std::cout << "rMd\n" << rMd << std::endl;
+  //std::cout << "rMpr\n" << rMpr << std::endl;
+  ssc::Transform3D rMd = rMpr * ssc::createTransformTranslate(bounds_mm.corner(0,0,0)); // TODO + eller - ?????
+  //std::cout << "rMd\n" << rMd << std::endl;
 
-  //TODO Should it be identity or rMpr.inv()???
   mImage->get_rMd_History()->setRegistration(rMd);
 
   std::vector<ssc::Vector3D> data_pr = this->extractPoints(map_prMt);
-  this->insertPoints(mImage, data_pr);
+  this->insertPoints(mImage, data_pr, padding_voxels);
 }
 
 ssc::ImagePtr TrackingDataToVolume::getOutput()
