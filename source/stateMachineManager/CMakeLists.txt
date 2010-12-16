@@ -24,6 +24,8 @@ SET ( ${LIB}_statemachineManager
 	cxPatientData.cpp
 	cxFileCopied.h
 	cxFileCopied.cpp
+	cxRecordSession.h
+    cxRecordSession.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
