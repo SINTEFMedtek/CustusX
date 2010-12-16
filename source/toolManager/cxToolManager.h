@@ -74,6 +74,8 @@ public:
   virtual void removeLandmark(QString uid);
   virtual void removeLandmarks();
 
+  virtual ssc::SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
+
   void runDummyTool(ssc::DummyToolPtr tool);
 //  void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
 

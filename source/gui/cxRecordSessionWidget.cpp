@@ -78,7 +78,7 @@ void RecordSessionWidget::stopRecording()
   RecordSessionPtr session = RecordSessionPtr(new RecordSession(mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
   stateManager()->addRecordSession(session);
 
-  ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamp
+  ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 
   emit newSession(session->getUid());
 

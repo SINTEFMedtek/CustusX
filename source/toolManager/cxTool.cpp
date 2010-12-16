@@ -10,9 +10,9 @@
 #include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscProbeSector.h"
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
-#include "sscProbeSector.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
@@ -696,6 +696,15 @@ bool Tool::hasReferencePointWithId(int id)
   bool retval = false;
   if(!(ssc::similar(this->getReferencePoints()[id], ssc::Vector3D(0.000,0.000,0.000))))
       retval = true;
+  return retval;
+}
+
+ssc::TimedTransformMap Tool::getSessionHistory(double startTime, double stopTime)
+{
+  ssc::TimedTransformMap::iterator startIt = mPositionHistory->lower_bound(startTime);
+  ssc::TimedTransformMap::iterator stopIt = mPositionHistory->upper_bound(stopTime);
+
+  ssc::TimedTransformMap retval(startIt, stopIt);;
   return retval;
 }
 

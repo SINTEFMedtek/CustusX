@@ -65,7 +65,7 @@ protected slots:
   void postProcessingSlot(QString sessionId);
 
 private:
-  ssc::TimedTransformMap getSessionTrackingData(QString sessionId);
+  ssc::TimedTransformMap getSessionTrackingData(RecordSessionPtr session);
 };
 
 /**
