@@ -67,6 +67,7 @@ void RecordSessionWidget::startRecording()
   mStartTimeMSec = ssc::getMilliSecondsSinceEpoch();
   mStartStopButton->setText("Stop");
   mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
+  emit started();
 }
 
 void RecordSessionWidget::stopRecording()
@@ -86,6 +87,7 @@ void RecordSessionWidget::stopRecording()
   emit newSession(session->getUid());
 
   this->reset();
+  emit stopped();
 }
 
 bool RecordSessionWidget::isRecording()
