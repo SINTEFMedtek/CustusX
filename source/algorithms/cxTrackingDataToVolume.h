@@ -30,12 +30,11 @@ public:
 
 private:
   ssc::DoubleBoundingBox3D getBoundingBox(ssc::TimedTransformMap& map_prMt);///< Create bounding box around input positions
-  ssc::ImagePtr createEmptyImage(ssc::DoubleBoundingBox3D extent_pr, int spacing);///< Create an empty sscImage. Creates an unsigned char volume.
+  ssc::ImagePtr createEmptyImage(ssc::DoubleBoundingBox3D bounds_pr, double spacing);///< Create an empty sscImage. Creates an unsigned char volume.
   std::vector<ssc::Vector3D> extractPoints(ssc::TimedTransformMap& map_prMt);///< Extracts the tool point (0,0,0) (aka: the tooltip) in pr space
   void insertPoints(ssc::ImagePtr image_d, std::vector<ssc::Vector3D> points_pr);///< Insert points as dots(value 1) in a volume.
 
   ssc::ImagePtr mImage;
-  int mSpacing; ///< the spacing used to create the image
 };
 }//cx
 
