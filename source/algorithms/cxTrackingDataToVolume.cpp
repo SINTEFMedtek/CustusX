@@ -8,9 +8,10 @@
 #include "sscToolManager.h"
 #include "sscRegistrationTransform.h"
 #include "sscCoordinateSystemHelpers.h"
+#include "sscVolumeHelpers.h"
+#include "sscMessageManager.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
-#include "sscVolumeHelpers.h"
 
 namespace cx
 {
@@ -49,6 +50,7 @@ ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bo
   double size = dim[0]*dim[1]*dim[2];
   if(size > maxVolumeSize)
   {
+    ssc::messageManager()->sendWarning("Tool position volume is going to be to big, making a smaller one.");
     spacing *= pow(size / maxVolumeSize, 1.0/3);
     dim = ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1);
   }
@@ -57,7 +59,7 @@ ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bo
   std::cout << "dim: " << dim << std::endl;
   vtkImageDataPtr data_pr = ssc::generateVtkImageData(dim, spacingVector, 0);
 
-  ssc::ImagePtr image = ssc::dataManager()->createImage(data_pr, "tc%1", "Tracked centerline #%1", "Images");
+  ssc::ImagePtr image = ssc::dataManager()->createImage(data_pr, "tc%1", "Tool positions #%1", "Images");
   ssc::dataManager()->loadData(image);
   return image;
 }
@@ -80,8 +82,24 @@ void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::
     ssc::Vector3D point_d = dMpr.coord((*it));
     ssc::Vector3D point_voxel = divide_elems(point_d, ssc::Vector3D(data_pr->GetSpacing()));
     point_voxel = round(point_voxel);
-    unsigned char* voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_voxel[0], point_voxel[1], point_voxel[2]));
-    (*voxel_d) = point_value;
+
+    //TODO make function
+    unsigned char* voxel_d;
+    int a = 25;
+    for(int i=-a; i<=a; ++i)
+    {
+      for(int j=-a; j<=a; ++j)
+      {
+        for(int k=-a; k<=a; ++k)
+        {
+          if(rangeCheck(point_voxel[0]+i, point_voxel[1]+j, point_voxel[2]+k, data_pr->GetExtent()))
+          {
+            voxel_d = static_cast<unsigned char*>(data_pr->GetScalarPointer(point_voxel[0]+i, point_voxel[1]+j, point_voxel[2]+k));
+            (*voxel_d) = point_value;
+          }
+        }
+      }
+    }
   }
 }
 

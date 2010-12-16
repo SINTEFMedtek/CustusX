@@ -2,9 +2,15 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
+#include <vtkPointData.h>
+#include <vtkPolyData.h>
+#include <vtkCellArray.h>
 #include "sscToolManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
+#include "sscMesh.h"
+#include "sscTransform3D.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxSegmentation.h"
@@ -67,6 +73,43 @@ void TrackedCenterlineWidget::checkIfReadySlot()
   }
 }
 
+//vtkPolyDataPtr TrackedCenterlineWidget::polydataFromTransforms(ssc::TimedTransformMap transformMap)
+//{
+//  vtkPolyDataPtr retval = vtkPolyDataPtr::New();
+//
+//  ssc::Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
+//
+//  vtkPointsPtr points = vtkPointsPtr::New();
+//  vtkCellArrayPtr sides = vtkCellArrayPtr::New();
+//
+//  std::cout << "transformMap.size(): " << transformMap.size() << std::endl;
+//  points->Allocate(transformMap.size());
+//
+//  ssc::TimedTransformMap::iterator mapIter = transformMap.begin();
+//  int i = 0;
+//  while(mapIter != transformMap.end())
+//  {
+//    ssc::Vector3D point_t = ssc::Vector3D(0,0,0);
+//    //points->InsertNextPoint(mapIter->second.coord(point_t).begin());
+//
+//    ssc::Transform3D prMt = mapIter->second;
+//    ssc::Transform3D rMt = rMpr * prMt;
+//    ssc::Vector3D p = rMt.coord(point_t);
+//    points->InsertNextPoint(p.begin());
+//    std::cout << "Inserted point " << p << std::endl;
+//
+//    sides->InsertNextCell(i);
+//    i++;
+//    mapIter++;
+//  }
+//
+//  retval->SetPoints(points);
+//  retval->SetLines(sides);
+//  retval->Update();
+//  retval->Print(std::cout);
+//  return retval;
+//}
+
 void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 {
   RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
@@ -79,15 +122,27 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
     return;
   }
 
+  //TODO MOVE
+//  //Test: create polydata from positions
+//  vtkPolyDataPtr centerlinePolydata = polydataFromTransforms(transforms_prMt);
+//
+//  QString uid = "trackedCenterline_mesh%1";
+//  QString name = "Tracked centerline mesh %1";
+//  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolydata, uid, name, "Images");
+//  mesh->setColor(QColor("red"));
+//  //mesh->get_rMd_History()->addParentFrame(centerlineImage->getUid());
+//  ssc::dataManager()->loadData(mesh);
+  //TODO MOVE
+
   //convert the transforms into a binary image
   TrackingDataToVolume converter;
   converter.setInput(transforms_prMt);
   ssc::ImagePtr image_d = converter.getOutput();
 
   //extract the centerline
-  QString savepath = stateManager()->getPatientData()->getActivePatientFolder();
-  Segmentation segmentation;
-  ssc::ImagePtr centerLineImage_d = segmentation.centerline(image_d, savepath);
+  //QString savepath = stateManager()->getPatientData()->getActivePatientFolder();
+  //Segmentation segmentation;
+  //ssc::ImagePtr centerLineImage_d = segmentation.centerline(image_d, savepath);
 }
 
 ssc::TimedTransformMap TrackedCenterlineWidget::getSessionTrackingData(RecordSessionPtr session)
