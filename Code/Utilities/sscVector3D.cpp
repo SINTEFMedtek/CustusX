@@ -4,8 +4,7 @@
 #include "sscUtilHelpers.h"
 #include "sscTypeConversions.h"
 #include "vtkForwardDeclarations.h"
-#include <math.h>
-
+#include <cmath>
 // --------------------------------------------------------
 namespace ssc
 {
@@ -172,10 +171,11 @@ Vector3D ceil(const Vector3D& a)
 {
   Vector3D retval;
   for (int i=0; i<3; ++i)
-    retval[i] = ::ceil(a[i]);
+    retval[i] = std::ceil(a[i]);
 
   return retval;
 }
+
 // --------------------------------------------------------
 //} // namespace utils
 } // namespace ssc

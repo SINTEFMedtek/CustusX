@@ -225,7 +225,7 @@ void ToolRep2D::update()
 
 bool ToolRep2D::showProbe()
 {
-	return mSlicer->getTool();// && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
+	return mSlicer->getTool() && mSlicer->getTool()->getType()==ssc::Tool::TOOL_US_PROBE;
 }
 bool ToolRep2D::showOffset()
 {
@@ -288,7 +288,7 @@ void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPo
 	RGBColor offsetColor(1.0,0.8,0.0);
 	if (mMergeOffsetAndToolLine)
 	{
-		stipplePattern = 0x0F0F;
+		//stipplePattern = 0x0F0F; // stippled line not to be used
 		offsetColor = toolColor;
 	}
 
