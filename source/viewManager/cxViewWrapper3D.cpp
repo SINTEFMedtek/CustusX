@@ -201,11 +201,11 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
   if (activeRep3D->getTracer()->isRunning())
   {
     activeRep3D->getTracer()->stop();
+    activeRep3D->getTracer()->clear();
   }
   else
   {
     activeRep3D->getTracer()->start();
-    activeRep3D->getTracer()->clear();
   }
 
   DataLocations::getSettings()->setValue("showToolPath", checked);
