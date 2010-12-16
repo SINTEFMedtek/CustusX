@@ -14,7 +14,9 @@ class QDomNode;
 
 namespace ssc
 {
-  typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
+
+typedef std::map<ToolPtr, TimedTransformMap> SessionToolHistoryMap;
+typedef boost::shared_ptr<class RegistrationHistory> RegistrationHistoryPtr;
 
 class ToolManager : public QObject
 {
@@ -54,7 +56,8 @@ public:
 	virtual void set_rMpr(const Transform3DPtr& val) = 0; ///< set transform from patient ref to ref space
   virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); } ///< interface to rMpr history.
   virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
-	/** write to file all recorded transforms and timestamps */
+
+  /** write to file all recorded transforms and timestamps */
 	//virtual void saveTransformsAndTimestamps(QString filePathAndName = "") = 0; replaced with load/save position history
   virtual void savePositionHistory() {}
   virtual void loadPositionHistory() {}
@@ -67,6 +70,8 @@ public:
   virtual void setLandmark(ssc::Landmark landmark) { Q_UNUSED(landmark); }
   virtual void removeLandmark(QString uid) { Q_UNUSED(uid); }
   virtual void removeLandmarks(){};
+
+  virtual SessionToolHistoryMap getSessionHistory(double startTime, double stopTime) {Q_UNUSED(startTime); Q_UNUSED(stopTime); return SessionToolHistoryMap();};
 
 signals:
 	void configured(); ///< system is configured
