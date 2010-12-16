@@ -16,7 +16,8 @@ namespace cx
 {
 RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescription) :
     QWidget(parent),
-    mStartStopButton(new QPushButton("Start")),
+    //mStartStopButton(new QPushButton("Start")),
+    mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
     mDescriptionLine(new QLineEdit(defaultDescription)),
     mStartTimeMSec(-1),
     mStopTimeMSec(-1)
@@ -65,6 +66,7 @@ void RecordSessionWidget::startRecording()
 
   mStartTimeMSec = ssc::getMilliSecondsSinceEpoch();
   mStartStopButton->setText("Stop");
+  mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
 }
 
 void RecordSessionWidget::stopRecording()
@@ -74,6 +76,7 @@ void RecordSessionWidget::stopRecording()
 
   mStopTimeMSec = ssc::getMilliSecondsSinceEpoch();
   mStartStopButton->setText("Start");
+  mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
 
   RecordSessionPtr session = RecordSessionPtr(new RecordSession(mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
   stateManager()->addRecordSession(session);
