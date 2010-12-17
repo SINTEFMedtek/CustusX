@@ -101,7 +101,7 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
   ssc::ImagePtr centerLineImage_d = segmentation.centerline(image_d, savepath);
 }
 
-void startedSlot()
+void TrackedCenterlineWidget::startedSlot()
 {
 
   //TODO
@@ -120,7 +120,7 @@ void startedSlot()
 //  }
 }
 
-void stoppedSlot()
+void TrackedCenterlineWidget::stoppedSlot()
 {
   //TODO
 }
@@ -202,6 +202,16 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 {
   //TODO
   //generate the files needed for reconstruction
+}
+
+void USAcqusitionWidget::startedSlot()
+{
+  //TODO
+}
+
+void USAcqusitionWidget::stoppedSlot()
+{
+  //TODO
 }
 //----------------------------------------------------------------------------------------------------------------------
 }//namespace cx

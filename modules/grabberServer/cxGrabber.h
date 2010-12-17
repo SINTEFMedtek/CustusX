@@ -14,7 +14,7 @@ namespace cx
 class Frame
 {
 public:
-  float mTimestamp; ///< Timestamp in milliseconds
+  double mTimestamp; ///< Timestamp in milliseconds
   int mWidth; ///< Width in pixels
   int mHeight; ///< Height in pixels
   int mPixelFormat; ///< Pixel format in OSType (FourCC)
