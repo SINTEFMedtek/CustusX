@@ -29,6 +29,7 @@ namespace ssc
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New())
 {
+  mLastTimestamp = 0;
   mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
   mRedirecter->SetInput(mImageImport->GetOutput());
@@ -113,10 +114,11 @@ bool OpenIGTLinkRTSource::validData() const
   return mClient && !mTimeout;
 }
 
-QDateTime OpenIGTLinkRTSource::getTimestamp()
+double OpenIGTLinkRTSource::getTimestamp()
 {
   //TODO: get ts from messge
-  return QDateTime();
+  return mLastTimestamp;
+//  double timestamp = getMilliSecondsSinceEpoch(); //TODO get timestamp from source
 }
 
 bool OpenIGTLinkRTSource::isConnected() const
@@ -287,6 +289,11 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
     std::cout << "unknown type. Falling back to unsigned char." << std::endl;
     mImageImport->SetDataScalarTypeToUnsignedChar();
   }
+
+  // get timestamp from igtl second-format:
+  igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+  mImageMessage->GetTimeStamp(timestamp);
+  mLastTimestamp = timestamp->GetTimeStamp() * 1000;
 
   mImageImport->SetDataOrigin(0,0,0);
   mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
