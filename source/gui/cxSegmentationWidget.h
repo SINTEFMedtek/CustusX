@@ -188,12 +188,15 @@ protected:
 
 private slots:
   void findCenterlineSlot();
+  void handleFinished();
 
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
   QColor mDefaultColor;
   //QPushButton* mGenerateVisualizationButton;
+  QFuture<ssc::ImagePtr> mFutureResult;
+  QFutureWatcher<ssc::ImagePtr > mWatcher;
 };
 
 /**
