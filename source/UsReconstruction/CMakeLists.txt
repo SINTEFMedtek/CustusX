@@ -36,6 +36,8 @@ SET( SOURCE_FILES
   #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.cpp
   sscUSFrameData.h
   sscUSFrameData.cpp
+  cxUsReconstructionFileMaker.h
+  cxUsReconstructionFileMaker.cpp
   )
 
 # =========================================================
