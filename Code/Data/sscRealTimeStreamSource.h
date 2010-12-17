@@ -39,7 +39,7 @@ public:
   virtual QString getUid() = 0;
   virtual QString getName() = 0;
   virtual vtkImageDataPtr getVtkImageData() = 0;
-  virtual QDateTime getTimestamp() = 0;
+  virtual double getTimestamp() = 0;
 
   virtual QString getInfoString() const = 0; ///< an information text intended to be visible along with the data stream at all times
   virtual QString getStatusString() const = 0; ///< status text describing the stream state, display instead of stream when the stream is invalid.

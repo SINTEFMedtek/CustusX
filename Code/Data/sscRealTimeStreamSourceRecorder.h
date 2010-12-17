@@ -22,8 +22,9 @@ namespace ssc
 
 /** Recorder for a RealTimeStreamSource.
  */
-class RealTimeStreamSourceRecorder
+class RealTimeStreamSourceRecorder : public QObject
 {
+  Q_OBJECT
 public:
   typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:
@@ -32,6 +33,12 @@ public:
   virtual void startRecord();
   virtual void stopRecord();
   virtual DataType getRecording(double start, double stop);
+
+private slots:
+  void newFrameSlot();
+private:
+  DataType mData;
+  RealTimeStreamSourcePtr mSource;
 };
 
 typedef boost::shared_ptr<RealTimeStreamSourceRecorder> RealTimeStreamSourceRecorderPtr;
