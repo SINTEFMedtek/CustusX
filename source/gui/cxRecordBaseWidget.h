@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "sscTool.h"
 #include "cxDataInterface.h"
+#include "sscRealTimeStreamSourceRecorder.h"
 
 class QLabel;
 class QVBoxLayout;
@@ -48,6 +49,31 @@ private:
 };
 
 /**
+ * TrackedRecordWidget
+ *
+ * \brief
+ *
+ * \date Dec 17, 2010
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class TrackedRecordWidget : public RecordBaseWidget
+{
+  Q_OBJECT
+public:
+  TrackedRecordWidget(QWidget* parent, QString description);
+  virtual ~TrackedRecordWidget();
+
+protected slots:
+  virtual void checkIfReadySlot() = 0;
+  virtual void postProcessingSlot(QString sessionId) = 0;
+  virtual void startedSlot() = 0;
+  virtual void stoppedSlot() = 0;
+
+protected:
+  ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+};
+
+/**
  * TrackedCenterlineWidget
  *
  * \brief
@@ -55,7 +81,7 @@ private:
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class TrackedCenterlineWidget : public RecordBaseWidget
+class TrackedCenterlineWidget : public TrackedRecordWidget
 {
   Q_OBJECT
 public:
@@ -67,9 +93,6 @@ protected slots:
   void postProcessingSlot(QString sessionId);
   void startedSlot();
   void stoppedSlot();
-
-private:
-  ssc::TimedTransformMap getSessionTrackingData(RecordSessionPtr session);
 };
 
 /**
@@ -80,7 +103,7 @@ private:
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class USAcqusitionWidget : public RecordBaseWidget
+class USAcqusitionWidget : public TrackedRecordWidget
 {
   Q_OBJECT
 public:
@@ -99,6 +122,7 @@ private slots:
 private:
   SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
   ssc::RealTimeStreamSourcePtr mRTSource;
+  ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
 };
 }//namespace cx
 #endif /* CXRECORDBASEWIDGET_H_ */
