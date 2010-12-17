@@ -32,7 +32,7 @@ public:
   virtual QString getUid() { return "us_openigtlink_source"; }
   virtual QString getName();
   virtual vtkImageDataPtr getVtkImageData();
-  virtual QDateTime getTimestamp();
+  virtual double getTimestamp();
   virtual bool isConnected() const;
 
   virtual QString getInfoString() const;
@@ -72,7 +72,7 @@ private:
   boost::array<unsigned char, 100> mZero;
   vtkImageImportPtr mImageImport;
   vtkImageDataPtr mFilter_ARGB_RGBA;
-  QDateTime mTimestamp;
+//  QDateTime mTimestamp;
   vtkImageAlgorithmPtr mRedirecter;
   igtl::ImageMessage::Pointer mImageMessage;
   IGTLinkClientPtr mClient;
@@ -81,6 +81,7 @@ private:
   bool mTimeout;
   QTimer* mTimeoutTimer;
   double mFPS;
+  double mLastTimestamp;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
