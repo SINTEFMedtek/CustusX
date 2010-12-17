@@ -51,8 +51,14 @@ public:
   virtual bool isConnected() const = 0; ///< return true when a connection to the data source is established.
   virtual bool isStreaming() const = 0; ///< return true when the source is streaming data.
 
-//  virtual startRecord() = 0;
-//  virtual vector<ImagesAndTimestamps> stopRecord() = 0;
+
+  //virtual void startRecord() = 0;
+  //virtual void stopRecord() = 0;
+  //Data getRecording(double start, double stop) = 0;
+  //void clearRecording();
+
+//  virtual startRecord(double startTime) = 0;
+//  virtual vector<ImagesAndTimestamps> stopRecord(double stopTime) = 0;
 
 signals:
   void streaming(bool on); // emitted when streaming started/stopped

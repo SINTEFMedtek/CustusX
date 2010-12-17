@@ -42,6 +42,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
     Data/sscRealTimeStreamSource.h
+    Data/sscRealTimeStreamSourceRecorder.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -251,6 +252,8 @@ SET( SSC_SOURCE_FILES
     Data/sscSNW2Volume.h
     Data/sscRegistrationTransform.cpp
     Data/sscRegistrationTransform.h
+    Data/sscRealTimeStreamSourceRecorder.h
+    Data/sscRealTimeStreamSourceRecorder.cpp
     Tool/sscToolManager.cpp
     Tool/sscToolManager.h
     Tool/sscTool.h 

@@ -34,10 +34,10 @@ public:
 
   void setColor(QColor color);
 
-  void start();
-  void stop();
-  void clear();
-  bool isRunning() const;
+  void start(); // start path tracking
+  void stop(); // stop tracking
+  void clear(); // erase stored tracking data.
+  bool isRunning() const; // true if started and not stopped.
 
 private slots:
   void receiveTransforms(Transform3D prMt, double timestamp);
