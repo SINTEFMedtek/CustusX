@@ -3,6 +3,8 @@
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include "sscToolManager.h"
+#include "sscDataManager.h"
+#include "sscMesh.h"
 
 namespace ssc
 {
@@ -47,9 +49,9 @@ void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt)
   vtkPolyDataPtr centerlinePolydata = ssc::polydataFromTransforms(transforms_prMt);
   QString uid = "tool_positions_mesh_%1";
   QString name = "Tool positions mesh %1";
-  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolydata, uid, name, "Images");
+  MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolydata, uid, name, "Images");
   mesh->setColor(QColor("red"));
-  ssc::dataManager()->loadData(mesh);
+  dataManager()->loadData(mesh);
 }
 }//namespace ssc
 
