@@ -90,6 +90,8 @@ public:
 protected slots:
   void checkIfReadySlot();
   void postProcessingSlot(QString sessionId);
+  void startedSlot();
+  void stoppedSlot();
 
 private slots:
   void rtSourceChangedSlot();
