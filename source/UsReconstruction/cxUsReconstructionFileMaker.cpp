@@ -42,12 +42,13 @@ QString UsReconstructionFileMaker::makeFolder(QString patientFolder, RecordSessi
   QString subfolder = session->getDescription();
   if(patientDir.mkdir(subfolder))
   {
+    patientDir.cd(subfolder);
     std::cout << "patientDir (sub?): " << patientDir.absolutePath() << std::endl;
     ssc::messageManager()->sendInfo("Made reconstruction folder: "+patientDir.absolutePath());
   }
   else
   {
-    ssc::messageManager()->sendError("Could not create the reconstruction folder, putting files in patient folder.");
+    ssc::messageManager()->sendError("Could not create the reconstruction folder, putting files in patient folder. Maybe folder already exits?");
   }
   return  retval = patientDir.absolutePath();;
 }
@@ -143,6 +144,11 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
   QTextStream mhdStream(&mhdFile);
 
   ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin();
+  if(it == mStreamRecordedData.end())
+  {
+    //no data to write, what to do?
+    return;
+  }
   vtkImageDataPtr image = it->second;
 
   int scalarComponents = image->GetNumberOfScalarComponents();
@@ -164,7 +170,7 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
   if(scalarType == VTK_UNSIGNED_CHAR && scalarComponents == 1)
     mhdStream << "ElementType = MET_UCHAR" << '\n'; //8 bit gray
   if(scalarType == VTK_UNSIGNED_CHAR  && scalarComponents == 4)
-    mhdStream << "ElementType = MET_UCHAR" << '\n'; //32 bit RGBA
+    mhdStream << "ElementType = MET_UINT" << '\n'; //32 bit RGBA
   if(scalarType == VTK_SHORT)
     mhdStream << "ElementType = MET_SHORT" << '\n';
   if(scalarType == VTK_UNSIGNED_SHORT)
@@ -193,6 +199,7 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
   unsigned int nBytes = (frameDims[0]*frameDims[1])*scalarComponents;
   if(image->GetScalarSize() != 8)
     ssc::messageManager()->sendError("One scalar is not 8 bit, something is wrong!!!");
+  ssc::messageManager()->sendDebug("image->GetScalarSize(): "+qstring_cast(image->GetScalarSize()));
 
   it = mStreamRecordedData.begin();
   for(; it != mStreamRecordedData.end(); ++it)
