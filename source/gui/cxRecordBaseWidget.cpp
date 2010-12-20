@@ -111,12 +111,12 @@ void TrackedCenterlineWidget::checkIfReadySlot()
 {
   if(ssc::toolManager()->isTracking())
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>\n");
     emit ready(true);
   }
   else
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=red>Need to start tracking.</font>");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=red>Need to start tracking.</font>\n");
     emit ready(false);
   }
 }
@@ -159,6 +159,8 @@ void TrackedCenterlineWidget::startedSlot()
   for(; toolIt != tools->end(); ++toolIt)
   {
     activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
+    if(!activeRep3D)
+      continue;
     activeRep3D->getTracer()->clear();
     activeRep3D->getTracer()->start();
   }
@@ -175,6 +177,8 @@ void TrackedCenterlineWidget::stoppedSlot()
   for(; toolIt != tools->end(); ++toolIt)
   {
     activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
+    if(!activeRep3D)
+      continue;
     if (activeRep3D->getTracer()->isRunning())
     {
       activeRep3D->getTracer()->stop();
@@ -200,6 +204,7 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(mRTSourceDataAdapter.get(), SIGNAL(rtSourceChanged()), this, SLOT(rtSourceChangedSlot()));
 
   this->checkIfReadySlot();
+  this->rtSourceChangedSlot();
 }
 
 USAcqusitionWidget::~USAcqusitionWidget()
@@ -207,21 +212,21 @@ USAcqusitionWidget::~USAcqusitionWidget()
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
-  ssc::messageManager()->sendDebug("TODO: implement USAcqusitionWidget::checkIfReadySlot()");
   if(ssc::toolManager()->isTracking() && mRTSource && mRTSource->isStreaming() && mRTRecorder)
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>\n");
     emit ready(true);
   }
   else
   {
     QString whatsMissing("");
     if(!ssc::toolManager()->isTracking())
-      whatsMissing.append("<font color=red>Need to start tracking.</font> ");
+      whatsMissing.append("<font color=red>Need to start tracking.</font> \n");
     if(mRTSource && !mRTSource->isStreaming())
-      whatsMissing.append("<font color=red>Need to start streaming.</font> ");
+      whatsMissing.append("<font color=red>Need to start streaming.</font> \n");
+
     if(mRTRecorder)
-          whatsMissing.append("<font color=red>Need connect to a recorder.</font> ");
+          whatsMissing.append("<font color=red>Need connect to a recorder.</font> \n");
 
     RecordBaseWidget::setWhatsMissingInfo(whatsMissing);
     emit ready(false);
@@ -230,14 +235,20 @@ void USAcqusitionWidget::checkIfReadySlot()
 
 void USAcqusitionWidget::rtSourceChangedSlot()
 {
+  ssc::messageManager()->sendDebug("Real time source changed.");
   if(mRTSource)
   {
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
   }
 
   mRTSource = mRTSourceDataAdapter->getRTSource();
-  connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-  mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+  if(mRTSource)
+  {
+    ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
+    connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
+    mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+  }
+  this->checkIfReadySlot();
 }
 
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
