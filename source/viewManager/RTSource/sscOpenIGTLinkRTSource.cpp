@@ -29,6 +29,8 @@ namespace ssc
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New())
 {
+  mLastTimestamp = 0;
+  mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
   mRedirecter->SetInput(mImageImport->GetOutput());
 
@@ -40,6 +42,8 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mTimeoutTimer = new QTimer(this);
   mTimeoutTimer->setInterval(1000);
   connect( mTimeoutTimer, SIGNAL(timeout()),this, SLOT(timeout()) );
+  connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
+  connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
@@ -59,7 +63,7 @@ void OpenIGTLinkRTSource::timeout()
 
   std::cout << "timeout!" << std::endl;
   mTimeout = true;
-  emit changed();
+  emit newFrame();
 }
 
 QString OpenIGTLinkRTSource::getName()
@@ -95,10 +99,10 @@ void OpenIGTLinkRTSource::start()
 
 }
 
-void OpenIGTLinkRTSource::pause()
-{
-
-}
+//void OpenIGTLinkRTSource::pause()
+//{
+//
+//}
 
 void OpenIGTLinkRTSource::stop()
 {
@@ -110,15 +114,26 @@ bool OpenIGTLinkRTSource::validData() const
   return mClient && !mTimeout;
 }
 
-QDateTime OpenIGTLinkRTSource::getTimestamp()
+double OpenIGTLinkRTSource::getTimestamp()
 {
   //TODO: get ts from messge
-  return QDateTime();
+  return mLastTimestamp;
+//  double timestamp = getMilliSecondsSinceEpoch(); //TODO get timestamp from source
 }
 
-bool OpenIGTLinkRTSource::connected() const
+bool OpenIGTLinkRTSource::isConnected() const
 {
-  return mClient;
+  return mClient && mConnected;
+}
+
+bool OpenIGTLinkRTSource::isStreaming() const
+{
+  return this->isConnected();
+}
+
+void OpenIGTLinkRTSource::connectedSlot(bool on)
+{
+  mConnected = on;
 }
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
@@ -130,12 +145,13 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
   connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+  connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
 
   mClient->start();
   mTimeoutTimer->start();
 
-  emit changed();
-  emit serverStatusChanged();
+//  emit changed();
+//  emit serverStatusChanged();
 }
 
 void OpenIGTLinkRTSource::imageReceivedSlot()
@@ -156,13 +172,15 @@ void OpenIGTLinkRTSource::disconnectServer()
 
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
     disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
+    disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
+    disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
     mClient.reset();
   }
 
   mTimeoutTimer->stop();
 
-  emit changed();
-  emit serverStatusChanged();
+//  emit changed();
+//  emit serverStatusChanged();
 }
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
@@ -272,6 +290,11 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
     mImageImport->SetDataScalarTypeToUnsignedChar();
   }
 
+  // get timestamp from igtl second-format:
+  igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
+  mImageMessage->GetTimeStamp(timestamp);
+  mLastTimestamp = timestamp->GetTimeStamp() * 1000;
+
   mImageImport->SetDataOrigin(0,0,0);
   mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
 
@@ -307,7 +330,7 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
 
-  emit changed();
+  emit newFrame();
 }
 
 /**Create a pipeline that convert the input 4-component ARGB image (from QuickTime-Mac)

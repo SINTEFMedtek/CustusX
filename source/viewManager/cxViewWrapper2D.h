@@ -70,6 +70,8 @@ private:
   virtual void imageRemoved(const QString& uid);
   virtual void meshRemoved(const QString& uid);
 
+  ssc::Texture3DSlicerRepPtr mMultiSliceRep;
+
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
   std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;

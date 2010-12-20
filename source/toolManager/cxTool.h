@@ -92,8 +92,9 @@ public:
   virtual ssc::Tool::Type getType() const;
   virtual QString getGraphicsFileName() const;
   virtual vtkPolyDataPtr getGraphicsPolyData() const;
-  virtual void saveTransformsAndTimestamps();
-  virtual void setTransformSaveFile(const QString& filename);
+  virtual ssc::TimedTransformMapPtr getPositionHistory();
+//  virtual void saveTransformsAndTimestamps();
+//  virtual void setTransformSaveFile(const QString& filename);
   virtual ssc::Transform3D get_prMt() const;
   virtual bool getVisible() const;
   virtual QString getUid() const;
@@ -117,8 +118,10 @@ public:
   QString getNameOfProbeSectorConfiguration(QString configString); ///< get a name for the given configuration
   QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
   void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
-  virtual std::map<int, ssc::utils::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
+  virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
+
+  virtual ssc::TimedTransformMap getSessionHistory(double startTime, double stopTime); ///< Get a tools transforms from within a given session
 
   TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
@@ -158,8 +161,9 @@ protected:
   AuroraTrackerToolType::Pointer mTempAuroraTool;   ///< internal container for a temp aurora too
   ObserverType::Pointer mToolObserver;              ///< observer listening for igstk events
   TransformType mCalibrationTransform;              ///< a matrix representing the tools calibration
-  Transform3DVectorPtr mTransforms;                 ///< all transforms received by the tool
-  DoubleVectorPtr mTimestamps;                      ///< all timestamps received by the tool
+//  Transform3DVectorPtr mTransforms;                 ///< all transforms received by the tool
+//  DoubleVectorPtr mTimestamps;                      ///< all timestamps received by the tool
+  ssc::TimedTransformMapPtr mPositionHistory;
   vtkPolyDataPtr mPolyData;                         ///< the polydata used to represent the tool graphically
   ssc::Transform3DPtr m_prMt;                       ///< the transform from the tool to the patient reference
   igstk::Logger::Pointer mLogger;                   ///< logging the internal igstk behavior

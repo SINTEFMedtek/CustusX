@@ -1,5 +1,7 @@
 #include "cxSegmentationWidget.h"
 
+#include <boost/bind.hpp>
+
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QStringList>
@@ -26,6 +28,7 @@
 #include "cxDataInterface.h"
 #include "cxDataLocations.h"
 #include "sscLabeledComboBoxWidget.h"
+
 
 //Testing
 #include "vesselReg/SeansVesselReg.hxx"
@@ -488,6 +491,8 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
 
+  connect(&mWatcher, SIGNAL(finished()), this, SLOT(handleFinished()));
+
   QVBoxLayout* layout = new QVBoxLayout(this);
 
   mSelectedImage = SelectImageStringDataAdapter::New();
@@ -536,26 +541,27 @@ void CenterlineWidget::setDefaultColor(QColor color)
   mDefaultColor = color;
 }
 
+
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  ssc::ImagePtr centerlineImage = Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
+//  ssc::ImagePtr centerlineImage = Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
+
+  mFutureResult = QtConcurrent::run(boost::bind(&Segmentation::centerline, Segmentation(), mSelectedImage->getImage(), outputBasePath));
+  mWatcher.setFuture(mFutureResult);
+//  centerlineImage = mFutureResult.result();
+//  if(!centerlineImage)
+//    return;
+//
+//  emit outputImageChanged(centerlineImage->getUid());
+}
+
+void CenterlineWidget::handleFinished()
+{
+  ssc::ImagePtr centerlineImage = mWatcher.future().result();
+//  centerlineImage = mFutureResult.result();
   if(!centerlineImage)
     return;
-//
-//  std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
-//
-//  //automatically generate a mesh from the centerline
-//  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
-//  std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
-//
-//  QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
-//  QString name = centerlineImage->getName() + " mesh %1";
-//  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
-//  mesh->setColor(mDefaultColor);
-//  mesh->setParentFrame(centerlineImage->getUid());
-//  ssc::dataManager()->loadData(mesh);
-//  ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
   emit outputImageChanged(centerlineImage->getUid());
 }
