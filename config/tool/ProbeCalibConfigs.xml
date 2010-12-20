@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-   <Version>3.2.2</Version>
+   <Version>3.2.3</Version>
    <USScanner>
       <Name>Vivid 7 - Karkirurgen</Name>
       <USProbe>
@@ -139,7 +139,7 @@
          <Notes>Image size: Large (default)</Notes>
          <RTSource>
             <Name>VGA</Name>
-            <DefaultConfig>Width: Max, Depth: 25 mm</DefaultConfig>
+            <DefaultConfig>WidthMaxDepth25</DefaultConfig>
             <ImageSize>
                <Width>800</Width>
                <Height>600</Height>
@@ -273,12 +273,12 @@
             <Name>S-Video</Name>
             <DefaultConfig>Width6Depth40</DefaultConfig>
             <ImageSize>
-               <Width>800</Width>
-               <Height>600</Height>
+               <Width>768</Width>
+               <Height>576</Height>
             </ImageSize>
-            <HorizontalOffset>-22</HorizontalOffset>
+            <HorizontalOffset>0</HorizontalOffset>
             <Config>
-               <ID>Width6Depth65</ID>
+               <ID>Width6Depth40</ID>
                <Name>Width: 6, Depth: 40 mm</Name>
                <WidthDeg>116.64</WidthDeg>
                <Depth>425.6361</Depth>
