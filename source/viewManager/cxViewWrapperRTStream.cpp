@@ -70,7 +70,7 @@ void ViewWrapperRTStream::streamLoadedSlot()
     return;
 
   mSource = ssc::dataManager()->getStreams().begin()->second;
-  connect(mSource.get(), SIGNAL(changed()), this, SLOT(updateSlot()));
+  connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
 
   mStreamRep.reset(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
   mStreamRep->setRealtimeStream(mSource);

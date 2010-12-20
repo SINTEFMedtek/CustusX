@@ -23,6 +23,7 @@
 #include "sscRegistrationTransform.h"
 #include "sscUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
+#include "sscVolumeHelpers.h"
 
 #include "cxToolManager.h"
 #include "sscManualTool.h"

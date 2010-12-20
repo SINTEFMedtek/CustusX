@@ -170,10 +170,12 @@ void IGTLinkClient::hostFoundSlot()
 void IGTLinkClient::connectedSlot()
 {
   std::cout << "Connected to host " << this->hostDescription() << std::endl;
+  emit connected(true);
 }
 void IGTLinkClient::disconnectedSlot()
 {
   std::cout << "Disconnected from host " << this->hostDescription() << std::endl;
+  emit connected(false);
 }
 void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
 {
