@@ -32,25 +32,25 @@ public:
   virtual QString getUid() { return "us_openigtlink_source"; }
   virtual QString getName();
   virtual vtkImageDataPtr getVtkImageData();
-  virtual QDateTime getTimestamp();
-  virtual bool connected() const;
+  virtual double getTimestamp();
+  virtual bool isConnected() const;
 
   virtual QString getInfoString() const;
   virtual QString getStatusString() const;
 
   virtual void start();
-  virtual void pause();
+//  virtual void pause();
   virtual void stop();
 
   virtual bool validData() const;
+  virtual bool isStreaming() const;
 
   // non-inherited methods
   void connectServer(QString address, int port);
   void disconnectServer();
 
-
-signals:
-  void serverStatusChanged();
+//signals:
+//  void serverStatusChanged();
 
 public:
   void updateImage(igtl::ImageMessage::Pointer message); // called by receiving thread when new data arrives.
@@ -60,6 +60,7 @@ private slots:
   void imageReceivedSlot();
   void timeout();
   void fpsSlot(double fps);
+  void connectedSlot(bool on);
 
 private:
   void setEmptyImage();
@@ -71,14 +72,16 @@ private:
   boost::array<unsigned char, 100> mZero;
   vtkImageImportPtr mImageImport;
   vtkImageDataPtr mFilter_ARGB_RGBA;
-  QDateTime mTimestamp;
+//  QDateTime mTimestamp;
   vtkImageAlgorithmPtr mRedirecter;
   igtl::ImageMessage::Pointer mImageMessage;
   IGTLinkClientPtr mClient;
+  bool mConnected;
   QString mDeviceName;
   bool mTimeout;
   QTimer* mTimeoutTimer;
   double mFPS;
+  double mLastTimestamp;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 

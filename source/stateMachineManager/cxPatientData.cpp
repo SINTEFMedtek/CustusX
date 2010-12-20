@@ -25,6 +25,7 @@
 #include "cxFileCopied.h"
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"
+#include "cxStateMachineManager.h"
 
 namespace cx
 {
@@ -147,6 +148,7 @@ void PatientData::savePatient()
                                +" Error: "+file.errorString());
   }
 
+  ssc::toolManager()->savePositionHistory();
   //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...
 }
@@ -361,12 +363,7 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
   ssc::toolManager()->addXml(managerNode);
   viewManager()->addXml(managerNode);
   registrationManager()->addXml(managerNode);
-
-  //TODO Implement
-  /*
-  ssc::messageManager()->getXml(doc); //TODO
-  repManager->getXml(doc); //TODO
-  */
+  stateManager()->addXml(managerNode);
 
   ssc::messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
@@ -401,6 +398,9 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 
   QDomNode registrationNode = managerNode.namedItem("registrationManager");
   registrationManager()->parseXml(registrationNode);
+
+  QDomNode stateManagerNode = managerNode.namedItem("stateManager");
+  stateManager()->parseXml(stateManagerNode);
 }
 
 

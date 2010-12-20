@@ -114,7 +114,7 @@ private:
   void roundDim()
   {
     for (int i=0; i<3; ++i)
-      mDim[i] = ceil(mDim[i]);
+      mDim[i] = ::ceil(mDim[i]);
   }
 };
 

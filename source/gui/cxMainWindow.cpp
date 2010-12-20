@@ -45,6 +45,7 @@
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
 #include "cxIGTLinkWidget.h"
+#include "cxRecordBaseWidget.h"
 
 namespace cx
 {
@@ -88,6 +89,8 @@ MainWindow::MainWindow() :
   this->populateVisualizationMethodsWidget();
   this->populateCalibrationMethodsWidget();
 
+  this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
+  this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
@@ -251,6 +254,7 @@ void MainWindow::createActions()
   connect(mDebugModeAction, SIGNAL(triggered(bool)), DataManager::getInstance(), SLOT(setDebugMode(bool)));
   connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
   connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
+
 
   //data
   mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
@@ -591,6 +595,8 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mDebugModeAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mShowControlPanelAction);
+  mFileMenu->addAction(mQuitAction);
+
 
   // window
   QMenu* popupMenu = this->createPopupMenu();
@@ -759,10 +765,11 @@ void MainWindow::preferencesSlot()
   PreferencesDialog prefDialog(this);
   prefDialog.exec();
 }
+
 void MainWindow::quitSlot()
 {
-  ssc::messageManager()->sendInfo("quitSlot - never called?");
-  //TODO
+  ssc::messageManager()->sendInfo("Shutting down CustusX");
+  qApp->quit();
 }
 
 void MainWindow::deleteDataSlot()

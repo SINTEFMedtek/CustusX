@@ -10,6 +10,7 @@
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
 
+#include "cxDataLocations.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
@@ -30,6 +31,7 @@
 #include "cxCameraControl.h"
 #include "sscRealTimeStreamSource.h"
 #include "sscRTStreamRep.h"
+#include "sscToolTracer.h"
 
 namespace cx
 {
@@ -154,6 +156,13 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
+  QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
+  showToolPath->setCheckable(true);
+  ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
+  showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
+  connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
+
+
   QAction* showRefTool = new QAction("Show Reference Tool", &contextMenu);
   showRefTool->setDisabled(true);
   showRefTool->setCheckable(true);
@@ -172,6 +181,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
   contextMenu.addAction(showRefTool);
+  contextMenu.addAction(showToolPath);
   contextMenu.addSeparator();
   contextMenu.addAction(slicePlanesAction);
   contextMenu.addAction(fillSlicePlanesAction);
@@ -184,6 +194,25 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
   connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
   mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
 }
+
+void ViewWrapper3D::showToolPathSlot(bool checked)
+{
+  ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
+  if (activeRep3D->getTracer()->isRunning())
+  {
+    activeRep3D->getTracer()->stop();
+    activeRep3D->getTracer()->clear();
+  }
+  else
+  {
+    activeRep3D->getTracer()->start();
+  }
+
+  DataLocations::getSettings()->setValue("showToolPath", checked);
+//  showToolPath->setChecked(DataLocations::getSettings()->value("showToolPath"));
+//  ssc::toolManager()->getDominantTool()->setShowPath(checked);
+}
+
 
 void ViewWrapper3D::showAxesActionSlot(bool checked)
 {
@@ -260,6 +289,7 @@ void ViewWrapper3D::resetCameraActionSlot()
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
 {
   mSlicePlanes3DRep->getProxy()->setVisible(checked);
+  DataLocations::getSettings()->setValue("showSlicePlanes", checked);
 }
 void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 {
@@ -386,6 +416,8 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(!toolRep)
     {
       toolRep = ssc::ToolRep3D::New(tool->getUid()+"_rep3d_"+this->mView->getUid());
+      if (DataLocations::getSettings()->value("showToolPath").toBool())
+        toolRep->getTracer()->start();
     }
 
 //    QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
@@ -444,6 +476,9 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
   mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
   mSlicePlanes3DRep->setProxy(proxy);
+  bool show = DataLocations::getSettings()->value("showSlicePlanes").toBool();
+  mSlicePlanes3DRep->getProxy()->setVisible(show); // init with default value
+
   mView->addRep(mSlicePlanes3DRep);
 }
 //------------------------------------------------------------------------------

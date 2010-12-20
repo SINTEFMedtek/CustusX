@@ -65,7 +65,7 @@
   
   //setting up the frame
   Frame frame;
-  frame.mTimestamp = ((float)timetag.timeValue / (float)timetag.timeScale) * 1000;
+  frame.mTimestamp = ((double)timetag.timeValue / (double)timetag.timeScale) * 1000;
   frame.mWidth = width;
   frame.mHeight = height;
   frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));
