@@ -559,6 +559,11 @@ void Tool::setCalibration_sMt(ssc::Transform3D calibration)
   this->writeCalibrationToFile();
 }
 
+QString Tool::getCalibrationFileName() const
+{
+  return mInternalStructure.mCalibrationFilename;
+}
+
 Tracker::Type Tool::getTrackerType()
 {
   return mInternalStructure.mTrackerType;
