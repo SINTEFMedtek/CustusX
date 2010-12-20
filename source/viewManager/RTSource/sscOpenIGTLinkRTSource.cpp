@@ -12,7 +12,6 @@
 #include <vtkDataSetMapper.h>
 #include <vtkTimerLog.h>
 #include <QTimer>
-#include "sscOpenIGTLinkClient.h"
 #include "vtkForwardDeclarations.h"
 #include <vtkDataSetMapper.h>
 #include <vtkLookupTable.h>
@@ -21,6 +20,10 @@
 #include <vtkImageMapToColors.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageChangeInformation.h>
+#include "sscTypeConversions.h"
+#include "sscOpenIGTLinkClient.h"
+#include "sscMessageManager.h"
+#include "sscTime.h"
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 
 namespace ssc
@@ -117,8 +120,8 @@ bool OpenIGTLinkRTSource::validData() const
 double OpenIGTLinkRTSource::getTimestamp()
 {
   //TODO: get ts from messge
-  return mLastTimestamp;
-//  double timestamp = getMilliSecondsSinceEpoch(); //TODO get timestamp from source
+  //return mLastTimestamp;
+  return getMilliSecondsSinceEpoch(); //TODO get timestamp from source
 }
 
 bool OpenIGTLinkRTSource::isConnected() const
@@ -128,6 +131,7 @@ bool OpenIGTLinkRTSource::isConnected() const
 
 bool OpenIGTLinkRTSource::isStreaming() const
 {
+  ssc::messageManager()->sendDebug("Is streaming : "+qstring_cast(this->isConnected()));
   return this->isConnected();
 }
 
@@ -326,6 +330,8 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
   {
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
+    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
+    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
 
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
@@ -358,7 +364,9 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-    return mRedirecter->GetOutput();
+  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
+  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
+  return mRedirecter->GetOutput();
 }
 
 }
