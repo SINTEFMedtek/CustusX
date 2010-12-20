@@ -67,17 +67,28 @@ ssc::TimedTransformMap TrackedRecordWidget::getRecording(RecordSessionPtr sessio
   if(toolTransformMap.size() == 1)
   {
     ssc::messageManager()->sendInfo("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
+    mTool = boost::dynamic_pointer_cast<Tool>(toolTransformMap.begin()->first);
     retval = toolTransformMap.begin()->second;
   }
   else if(toolTransformMap.size() > 1)
   {
     ssc::messageManager()->sendWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
-    retval = toolTransformMap.begin()->second; //TODO make the user select which tool they wanna use!!! Pop-up???
+    //TODO make the user select which tool they wanna use!!! Pop-up???
+    mTool = boost::dynamic_pointer_cast<Tool>(toolTransformMap.begin()->first);
+    retval = toolTransformMap.begin()->second;
+    //TODO
   }else if(toolTransformMap.empty())
   {
     ssc::messageManager()->sendWarning("Could not find any session history for given session.");
   }
   return retval;
+}
+
+ToolPtr TrackedRecordWidget::getTool()
+{
+  if(!mTool)
+    ssc::messageManager()->sendWarning("No tool has been set for the session yet, try calling getRecording() before getTool() in TrackedRecordWidget.");
+  return mTool;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,9 +252,9 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
     return;
   }
 
-  //TODO: generate the files needed for reconstruction
-  //usReconstructionFileMaker.makefiles();
-  UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, stateManager()->getPatientData()->getActivePatientFolder());
+  ToolPtr probe = TrackedRecordWidget::getTool();
+  UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
+  filemaker.write();
 }
 
 void USAcqusitionWidget::startedSlot()
