@@ -109,6 +109,7 @@ public:
   virtual bool isCalibrated() const; ///< true if calibration is different from identity
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
   virtual void setCalibration_sMt(ssc::Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
+  QString getCalibrationFileName() const; ///< returns the path to the tools calibration file
 
   Tracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
 
