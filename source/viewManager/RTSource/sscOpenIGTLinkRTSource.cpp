@@ -119,9 +119,7 @@ bool OpenIGTLinkRTSource::validData() const
 
 double OpenIGTLinkRTSource::getTimestamp()
 {
-  //TODO: get ts from messge
-  //return mLastTimestamp;
-  return getMilliSecondsSinceEpoch(); //TODO get timestamp from source
+  return mLastTimestamp;
 }
 
 bool OpenIGTLinkRTSource::isConnected() const
