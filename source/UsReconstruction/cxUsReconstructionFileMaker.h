@@ -33,6 +33,7 @@ public:
 
 private:
   QString makeFolder(QString patientFolder, RecordSessionPtr session);
+  vtkImageDataPtr mergeFrames();
 
   void writeTrackerTimestamps(QString reconstructionFolder);
   void writeTrackerTransforms(QString reconstructionFolder);
