@@ -15,7 +15,8 @@ namespace ssc
 USFrameData::USFrameData(ImagePtr inputFrameData)
 {
   mImage = inputFrameData;
-  vtkImageDataPtr input = mImage->getBaseVtkImageData();
+//  vtkImageDataPtr input = mImage->getBaseVtkImageData();
+  vtkImageDataPtr input = mImage->getGrayScaleBaseVtkImageData(); // remove color, if any
   mDimensions = input->GetDimensions();
   mSpacing = Vector3D(input->GetSpacing());
   
