@@ -69,6 +69,12 @@ igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
   retval->SetSubVolume(size,offset);
   retval->AllocateScalars();
 
+  igtl::TimeStamp::Pointer ts;
+  ts = igtl::TimeStamp::New();
+  double seconds = frame.mTimestamp*1000;
+  ts->SetTime(seconds); //in seconds
+  retval->SetTimeStamp(ts);
+
   igtl::Matrix4x4 matrix;
   matrix[0][0] = 1.0;  matrix[1][0] = 0.0;  matrix[2][0] = 0.0; matrix[3][0] = 0.0;
   matrix[0][1] = 0.0;  matrix[1][1] = 1.0;  matrix[2][1] = 0.0; matrix[3][1] = 0.0;
