@@ -3,6 +3,10 @@
 #include <QDir>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
+#include "vtkImageAppend.h"
+#include "vtkMetaImageWriter.h"
+
+typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace cx
 {
@@ -124,8 +128,64 @@ void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
   file.close();
 }
 
+/** Merge all us frames into one vtkImageData
+ *
+ */
+vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
+{
+  vtkImageAppendPtr filter = vtkImageAppendPtr::New();
+  filter->SetAppendAxis(2); // append along z-axis
+
+  int i=0;
+  for(ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
+  {
+    filter->SetInput(i++, it->second);
+  }
+
+  filter->Update();
+  return filter->GetOutput();
+}
+
 void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
 {
+  QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
+
+  vtkImageDataPtr usData = this->mergeFrames();
+
+  std::cout << "start write mhd file " << mhdFilename << std::endl;
+  // write file to disk
+  vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
+  writer->SetInput(usData);
+  writer->SetFileName(cstring_cast(mhdFilename));
+  writer->SetCompression(false);
+  writer->Write();
+  std::cout << "finished write mhd file " << mhdFilename << std::endl;
+  writer = NULL; // ensure file is closed (might not be necessary)
+
+  //mhd - custom fields
+  //--------------------------------------------------------------------------------------------------------------------
+  QFile mhdFile(mhdFilename);
+  if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Append))
+  {
+    ssc::messageManager()->sendError("Cannot open "+mhdFile.fileName());
+    return;
+  }
+  QTextStream mhdStream(&mhdFile);
+  if (mTool)
+  {
+    mhdStream << "ConfigurationID = " << mTool->getProbeSectorConfigurationString() << '\n';
+    mhdStream << "ProbeCalibration = " << mTool->getCalibrationFileName() << '\n';
+  }
+  //--------------------------------------------------------------------------------------------------------------------
+  mhdFile.close();
+
+}
+
+/*
+void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
+{
+  std::cout << "UsReconstructionFileMaker::writeUSImages sta" << std::endl;
+
   QFile mhdFile(reconstructionFolder+"/"+mSession->getDescription()+".mdh");
   QFile rawFile(reconstructionFolder+"/"+mSession->getDescription()+".raw");
   if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -186,15 +246,19 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
 
   mhdStream << "ElementDataFile = " << rawInfo.fileName() <<   '\n';
 
-  mhdStream << "ConfigurationID = " << mTool->getProbeSectorConfigurationString() << '\n';
-
-  mhdStream << "ProbeCalibration = " << mTool->getCalibrationFileName() << '\n';
+  if (mTool)
+  {
+    mhdStream << "ConfigurationID = " << mTool->getProbeSectorConfigurationString() << '\n';
+    mhdStream << "ProbeCalibration = " << mTool->getCalibrationFileName() << '\n';
+  }
   //--------------------------------------------------------------------------------------------------------------------
   mhdFile.close();
 
   //raw
   //--------------------------------------------------------------------------------------------------------------------
   QDataStream rawStream(&rawFile);
+
+  std::cout << "UsReconstructionFileMaker::writeUSImages " << rawFile.fileName() << std::endl;
 
   unsigned int nBytes = (frameDims[0]*frameDims[1])*scalarComponents;
   if(image->GetScalarSize() != 8)
@@ -211,4 +275,6 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
   //--------------------------------------------------------------------------------------------------------------------
   rawFile.close();
 }
+*/
+
 }//namespace cx

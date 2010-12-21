@@ -328,8 +328,8 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
   {
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
-    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
-    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
+//    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
+//    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
 
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
@@ -362,8 +362,8 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
-  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
+//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
+//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
   return mRedirecter->GetOutput();
 }
 
