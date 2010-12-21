@@ -32,8 +32,6 @@ void RealTimeStreamSourceRecorder::newFrameSlot()
   double timestamp = mSource->getTimestamp();
   vtkImageDataPtr frame = vtkImageDataPtr::New();
   frame->DeepCopy(mSource->getVtkImageData());
-//  std::cout << "void RealTimeStreamSourceRecorder::newFrameSlot(): frames scalar size " << frame->GetScalarSize() << std::endl;
-//  std::cout << "void RealTimeStreamSourceRecorder::newFrameSlot(): mSource->getVtkImageData() scalar size " << mSource->getVtkImageData()->GetScalarSize() << std::endl;
   mData[timestamp] = frame;
 }
 
