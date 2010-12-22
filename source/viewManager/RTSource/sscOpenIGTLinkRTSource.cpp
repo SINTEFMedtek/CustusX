@@ -54,8 +54,13 @@ OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
   //disconnect();
   if (mClient)
   {
-    mClient->terminate();
-    mClient->wait(); // forever or until dead thread
+    mClient->quit();
+    mClient->wait(2000);
+    if (mClient->isRunning())
+    {
+      mClient->terminate();
+      mClient->wait(); // forever or until dead thread
+    }
   }
 }
 
