@@ -212,21 +212,27 @@ USAcqusitionWidget::~USAcqusitionWidget()
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
+  std::cout << "void USAcqusitionWidget::checkIfReadySlot()" << std::endl;
   if(ssc::toolManager()->isTracking() && mRTSource && mRTSource->isStreaming() && mRTRecorder)
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>\n");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font><br>");
     emit ready(true);
   }
   else
   {
     QString whatsMissing("");
     if(!ssc::toolManager()->isTracking())
-      whatsMissing.append("<font color=red>Need to start tracking.</font> \n");
-    if(mRTSource && !mRTSource->isStreaming())
-      whatsMissing.append("<font color=red>Need to start streaming.</font> \n");
-
-    if(mRTRecorder)
-          whatsMissing.append("<font color=red>Need connect to a recorder.</font> \n");
+      whatsMissing.append("<font color=red>Need to start tracking.</font><br>");
+    if(mRTSource)
+    {
+      if(!mRTSource->isStreaming())
+        whatsMissing.append("<font color=red>Need to start streaming.</font><br>");
+    }else
+    {
+      whatsMissing.append("<font color=red>Need to get a stream.</font><br>");
+    }
+    if(!mRTRecorder)
+       whatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
 
     RecordBaseWidget::setWhatsMissingInfo(whatsMissing);
     emit ready(false);

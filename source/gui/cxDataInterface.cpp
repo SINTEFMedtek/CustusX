@@ -178,7 +178,7 @@ QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
 {
   ssc::DataManager::StreamMap streams = ssc::dataManager()->getStreams();
   QStringList retval;
-  retval << "";
+  retval << "<no real time source>";
   ssc::DataManager::StreamMap::iterator it = streams.begin();
   for (; it !=streams.end(); ++it)
     retval << qstring_cast(it->second->getUid());
