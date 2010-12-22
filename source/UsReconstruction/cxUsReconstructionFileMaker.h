@@ -38,7 +38,9 @@ private:
   void writeTrackerTimestamps(QString reconstructionFolder);
   void writeTrackerTransforms(QString reconstructionFolder);
   void writeUSTimestamps(QString reconstructionFolder);
-  void writeUSImages(QString reconstructionFolder);
+  void writeUSImages(QString reconstructionFolder, QString calibrationFile);
+  QString copyCalibrationFile(QString reconstructionFolder);
+  void copyProbeCalibConfigsXml(QString reconstructionFolder);
 
   ssc::TimedTransformMap mTrackerRecordedData;
   ssc::RealTimeStreamSourceRecorder::DataType mStreamRecordedData;

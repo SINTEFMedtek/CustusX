@@ -352,11 +352,12 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
   splitterRGB->SetComponents(1,2,3);
   merger->SetInput(0, splitterRGB->GetOutput());
 
-  /// extract the A part of input (0) and insert as (3) in output
-  vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
-  splitterA->SetInput(input);
-  splitterA->SetComponents(0);
-  merger->SetInput(1, splitterA->GetOutput());
+// Removed adding of Alpha channel: this is always 1 anyway (cross fingers)
+//  /// extract the A part of input (0) and insert as (3) in output
+//  vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
+//  splitterA->SetInput(input);
+//  splitterA->SetComponents(0);
+//  merger->SetInput(1, splitterA->GetOutput());
 
   return merger->GetOutput();
 }
