@@ -464,6 +464,7 @@ bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
 {
   if (value==mRTSourceUid)
     return false;
+
   mRTSourceUid = value;
   emit changed();
   emit rtSourceChanged();
