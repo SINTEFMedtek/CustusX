@@ -72,7 +72,6 @@ void RecordSessionWidget::startRecording()
 
 void RecordSessionWidget::stopRecording()
 {
-  ssc::messageManager()->sendDebug("void RecordSessionWidget::stopRecording()");
   if(!this->isRecording())
     return;
 
@@ -86,7 +85,6 @@ void RecordSessionWidget::stopRecording()
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 
   this->reset();
-  ssc::messageManager()->sendDebug("void RecordSessionWidget::stopRecording() EMIT STOPPED");
   emit stopped();
 
   emit newSession(session->getUid());

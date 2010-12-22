@@ -130,7 +130,6 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   retval.mNotes = element.text();
   if(retval.mNotes.isNull())
     retval.mNotes = "Found no notes.";
-  std::cout << "Found notes: " << retval.mNotes.toStdString() << std::endl;
 
   /*
    *
@@ -172,7 +171,6 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
 
     element = rtSourceNode.namedItem("HorizontalOffset").toElement();
     retval.mHorizontalOffset = element.text().toDouble(&ok);
-    std::cout << "Found HorizontalOffset: " << retval.mHorizontalOffset << std::endl;
     if(!ok)
       throw "HorizontalOffset not a number";
 
