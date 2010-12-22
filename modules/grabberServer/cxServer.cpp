@@ -34,7 +34,7 @@ void Server::stop()
   if(!this->isListening())
     return;
 
-  this->close();
+  this->close(); //TODO undefined behavior????
   ssc::messageManager()->sendSuccess("Server stopped listening and is closed.");
   emit closed();
 }
