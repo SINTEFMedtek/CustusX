@@ -573,7 +573,6 @@ void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
   QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
-  ssc::messageManager()->sendDebug("Logging tool at "+logFile);
   loggerFile->open( cstring_cast(logFile) );
   mLogger = igstk::Logger::New();
   mLogOutput = itk::StdStreamLogOutput::New();

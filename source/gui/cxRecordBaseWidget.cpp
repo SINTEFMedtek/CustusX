@@ -235,7 +235,6 @@ void USAcqusitionWidget::checkIfReadySlot()
 
 void USAcqusitionWidget::rtSourceChangedSlot()
 {
-  ssc::messageManager()->sendDebug("Real time source changed.");
   if(mRTSource)
   {
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));

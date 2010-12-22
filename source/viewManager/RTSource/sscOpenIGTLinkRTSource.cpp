@@ -131,7 +131,6 @@ bool OpenIGTLinkRTSource::isConnected() const
 
 bool OpenIGTLinkRTSource::isStreaming() const
 {
-  ssc::messageManager()->sendDebug("Is streaming : "+qstring_cast(this->isConnected()));
   return this->isConnected();
 }
 
@@ -366,6 +365,7 @@ vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
 //  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
 //  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
+
   return mRedirecter->GetOutput();
 }
 
