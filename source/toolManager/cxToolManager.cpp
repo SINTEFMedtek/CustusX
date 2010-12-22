@@ -54,7 +54,10 @@ ToolManager::ToolManager() :
 }
 
 ToolManager::~ToolManager()
-{}
+{
+  if(this->isTracking())
+    this->stopTracking();
+}
 
 void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 {

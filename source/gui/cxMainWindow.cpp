@@ -272,6 +272,7 @@ void MainWindow::createActions()
   mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
   mInitializeToolsAction = new QAction(tr("Initialize"), mToolsActionGroup);
   mTrackingToolsAction = new QAction(tr("Start tracking"), mToolsActionGroup);
+  mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
   mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
   mConfigureToolsAction->setChecked(true);
