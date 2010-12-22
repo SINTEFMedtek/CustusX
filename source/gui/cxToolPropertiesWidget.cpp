@@ -115,14 +115,14 @@ bool ActiveToolConfigurationStringDataAdapter::setValue(const QString& value)
 {
   if (!mTool)
     return false;
-  mTool->setProbeSectorConfigurationString(value);
+  mTool->setProbeSectorConfigIdString(value);
   return true;
 }
 QString ActiveToolConfigurationStringDataAdapter::getValue() const
 {
   if (!mTool)
     return "";
-  return mTool->getProbeSectorConfigurationString();
+  return mTool->getProbeSectorConfigIdString();
 }
 QString ActiveToolConfigurationStringDataAdapter::getHelp() const
 {
@@ -138,7 +138,7 @@ QString ActiveToolConfigurationStringDataAdapter::convertInternal2Display(QStrin
 {
   if (!mTool)
     return "<no tool>";
-  return mTool->getNameOfProbeSectorConfiguration(internal); ///< get a name for the given configuration
+  return mTool->getNameOfProbeSectorConfigId(internal); ///< get a name for the given configuration
 }
 
 /// -------------------------------------------------------
