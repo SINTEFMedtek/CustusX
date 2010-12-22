@@ -119,7 +119,9 @@ bool OpenIGTLinkRTSource::validData() const
 
 double OpenIGTLinkRTSource::getTimestamp()
 {
-  return mLastTimestamp;
+  //HACK we need time sync before we can use the real timetags delivered with the image
+  return ssc::getMilliSecondsSinceEpoch();
+  //return mLastTimestamp;
 }
 
 bool OpenIGTLinkRTSource::isConnected() const
