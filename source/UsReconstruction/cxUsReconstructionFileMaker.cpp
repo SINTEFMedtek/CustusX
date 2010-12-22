@@ -1,10 +1,14 @@
 #include "cxUsReconstructionFileMaker.h"
 
 #include <QDir>
+#include <QFile>
+#include <QFileInfo>
+#include <vtkImageChangeInformation.h>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
+#include "cxDataLocations.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -35,7 +39,9 @@ void UsReconstructionFileMaker::write()
   this->writeTrackerTimestamps(reconstructionFolder);
   this->writeTrackerTransforms(reconstructionFolder);
   this->writeUSTimestamps(reconstructionFolder);
-  this->writeUSImages(reconstructionFolder);
+  QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
+  this->writeUSImages(reconstructionFolder, calibrationFile);
+  this->copyProbeCalibConfigsXml(reconstructionFolder);
 }
 
 QString UsReconstructionFileMaker::makeFolder(QString patientFolder, RecordSessionPtr session)
@@ -146,11 +152,24 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   return filter->GetOutput();
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
+void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
   QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
 
   vtkImageDataPtr usData = this->mergeFrames();
+//  ProbeXmlConfigParser::Configuration config = mTool->getConfiguration();
+
+  if(mTool)
+  {
+    vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
+    redirecter->SetInput(usData);
+    redirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
+    usData = redirecter->GetOutput();
+    usData->Update();
+
+//    usData->SetSpacing(config.mPixelWidth, config.mPixelHeight, 1);
+  }
+
 
   std::cout << "start write mhd file " << mhdFilename << std::endl;
   // write file to disk
@@ -173,12 +192,41 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
   QTextStream mhdStream(&mhdFile);
   if (mTool)
   {
-    mhdStream << "ConfigurationID = " << mTool->getProbeSectorConfigurationString() << '\n';
-    mhdStream << "ProbeCalibration = " << mTool->getCalibrationFileName() << '\n';
+    mhdStream << "ConfigurationID = " << mTool->getConfigurationString() << '\n';
+    mhdStream << "ProbeCalibration = " << calibrationFile << '\n';
   }
   //--------------------------------------------------------------------------------------------------------------------
   mhdFile.close();
 
+}
+
+QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFolder)
+{
+  QString calibFileName = mTool->getCalibrationFileName();
+  QFile calibFile(calibFileName);
+  QFileInfo info(calibFile);
+  const QString filename = info.fileName();
+  QString newFilePath = reconstructionFolder+"/"+filename;
+  if(calibFile.exists())
+  {
+    if(!calibFile.copy(newFilePath))
+      ssc::messageManager()->sendWarning("Could not copy calibration file ("+calibFileName+") to reconstruction folder. Maybe it already exitst in the destinbation folder?");
+  }
+  return filename;
+
+}
+
+void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionFolder)
+{
+  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
+  QFile xmlFile(xmlFileName);
+  QFileInfo info(xmlFile);
+  const QString filename = info.fileName();
+  if(xmlFile.exists())
+  {
+    if(!xmlFile.copy(reconstructionFolder+"/"+filename))
+      ssc::messageManager()->sendWarning("Could not copy xml file ("+xmlFileName+") to reconstruction folder. Maybe it already exitst in the destinbation folder?");
+  }
 }
 
 /*

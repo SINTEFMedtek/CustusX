@@ -116,9 +116,11 @@ public:
   QString getInstrumentId() const;
   QString getInstrumentScannerId() const;
   QStringList getUSSectorConfigList() const;
-  QString getNameOfProbeSectorConfiguration(QString configString); ///< get a name for the given configuration
-  QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
-  void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
+  QString getNameOfProbeSectorConfigId(QString configIdString); ///< get a name for the given config id
+  QString getProbeSectorConfigIdString() const;///< Get the probe sector config id string matching the config id in ultrasoundImageConfigs.xml
+  QString getConfigurationString() const;///< Gets the string for identifying the probe config in the XML file
+  void setProbeSectorConfigIdString(QString configIdString);///< Set the probe sector config id string matching the config id in ultrasoundImageConfigs.xml
+  ProbeXmlConfigParser::Configuration getConfiguration() const;
   virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
 
