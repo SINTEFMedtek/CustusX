@@ -33,6 +33,7 @@ public:
 
 private:
   QString makeFolder(QString patientFolder, RecordSessionPtr session);
+  bool createSubfolder(QString subfolderAbsolutePath);
   vtkImageDataPtr mergeFrames();
 
   void writeTrackerTimestamps(QString reconstructionFolder);
