@@ -973,7 +973,7 @@ ImagePtr Reconstructer::generateOutputVolume()
     filePath = mOutputRelativePath;
   //filePath += "/" + volumeName + ".mhd";
 
-  ImagePtr image = dataManager()->createImage(data, mUsRaw->getUid() + "_rec%1", generateImageName()+" #%1", filePath);
+  ImagePtr image = dataManager()->createImage(data, mUsRaw->getUid() + "_rec%1", generateImageName()+" %1", filePath);
 //
 //  // Add _rec to volume name and uid
 //  //QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
