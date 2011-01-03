@@ -28,7 +28,7 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   mAutoLaunchIsTried = false;
 
   this->setObjectName("IGTLinkWidget");
-  this->setWindowTitle("IGTLink Test");
+  this->setWindowTitle("IGTLink Client");
   this->resize(100, 600);
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());

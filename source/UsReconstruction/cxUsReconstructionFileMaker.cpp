@@ -48,19 +48,28 @@ QString UsReconstructionFileMaker::makeFolder(QString patientFolder, RecordSessi
 {
   QString retval("");
   QDir patientDir(patientFolder);
-  std::cout << "patientDir: " << string_cast(patientDir.absolutePath()) << std::endl;
+
   QString subfolder = session->getDescription();
-  if(patientDir.mkdir(subfolder))
+  QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
+  int i=1;
+  while(!this->createSubfolder(subfolderAbsolutePath))
   {
-    patientDir.cd(subfolder);
-    std::cout << "patientDir (sub?): " << patientDir.absolutePath() << std::endl;
-    ssc::messageManager()->sendInfo("Made reconstruction folder: "+patientDir.absolutePath());
+    subfolderAbsolutePath = subfolderAbsolutePath.append("_").append(QString::number(i++));
   }
-  else
-  {
-    ssc::messageManager()->sendError("Could not create the reconstruction folder, putting files in patient folder. Maybe folder already exits?");
-  }
+  patientDir.cd(subfolderAbsolutePath);
   return  retval = patientDir.absolutePath();;
+}
+
+bool UsReconstructionFileMaker::createSubfolder(QString subfolderAbsolutePath)
+{
+  QDir dir;
+  if(dir.exists(subfolderAbsolutePath))
+    return false;
+
+  dir.mkpath(subfolderAbsolutePath);
+  dir.cd(subfolderAbsolutePath);
+  ssc::messageManager()->sendInfo("Made reconstruction folder: "+dir.absolutePath());
+  return true;
 }
 
 void UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder)

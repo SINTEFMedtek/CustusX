@@ -200,6 +200,7 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 
   RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
+  mLayout->addStretch();
 
   connect(mRTSourceDataAdapter.get(), SIGNAL(rtSourceChanged()), this, SLOT(rtSourceChangedSlot()));
 
@@ -212,7 +213,7 @@ USAcqusitionWidget::~USAcqusitionWidget()
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
-  std::cout << "void USAcqusitionWidget::checkIfReadySlot()" << std::endl;
+  //std::cout << "void USAcqusitionWidget::checkIfReadySlot()" << std::endl;
   if(ssc::toolManager()->isTracking() && mRTSource && mRTSource->isStreaming() && mRTRecorder)
   {
     RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font><br>");
