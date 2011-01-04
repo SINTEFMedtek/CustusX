@@ -51,12 +51,14 @@ QString UsReconstructionFileMaker::makeFolder(QString patientFolder, RecordSessi
 
   QString subfolder = session->getDescription();
   QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
+  QString newPathName = subfolderAbsolutePath;
   int i=1;
-  while(!this->createSubfolder(subfolderAbsolutePath))
+  while(!this->createSubfolder(newPathName))
   {
-    subfolderAbsolutePath = subfolderAbsolutePath.append("_").append(QString::number(i++));
+    //newPathName = newPathName.append("_").append(QString::number(i++));
+    newPathName = subfolderAbsolutePath+"_"+QString::number(i++);
   }
-  patientDir.cd(subfolderAbsolutePath);
+  patientDir.cd(newPathName);
   return  retval = patientDir.absolutePath();;
 }
 
