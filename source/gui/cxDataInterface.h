@@ -307,14 +307,14 @@ public: // interface extension
   ssc::RealTimeStreamSourcePtr getRTSource();
   void setValueName(const QString name);
 
-signals:
-    void rtSourceChanged();
+//signals:
+//    void rtSourceChanged();
 
 private slots:
   void setDefaultSlot();
 
 private:
-  QString mRTSourceUid;
+  ssc::RealTimeStreamSourcePtr mRTSource;
   QString mValueName;
 };
 
@@ -348,7 +348,7 @@ private slots: //interface extension
   void setDefaultSlot();
 
 private:
-    ssc::COORDINATE_SYSTEM mCoordinateSystem;
+  ssc::COORDINATE_SYSTEM mCoordinateSystem;
   QString mValueName;
 };
 

@@ -462,17 +462,28 @@ QString SelectRTSourceStringDataAdapter::getValueName() const
 }
 bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
 {
-  if (value==mRTSourceUid)
+  if(mRTSource && (mRTSource->getUid() == value))
     return false;
 
-  mRTSourceUid = value;
+  if(mRTSource)
+    disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
+
+  ssc::RealTimeStreamSourcePtr rtSource = ssc::dataManager()->getStream(value);
+  if(!rtSource)
+    return false;
+
+  mRTSource = rtSource;
+  connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
+
   emit changed();
-  emit rtSourceChanged();
+  //emit rtSourceChanged();
   return true;
 }
 QString SelectRTSourceStringDataAdapter::getValue() const
 {
-  return mRTSourceUid ;
+  if(!mRTSource)
+    return "<no real time source>";
+  return mRTSource->getUid();
 }
 QString SelectRTSourceStringDataAdapter::getHelp() const
 {
@@ -480,7 +491,7 @@ QString SelectRTSourceStringDataAdapter::getHelp() const
 }
 ssc::RealTimeStreamSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
 {
-  return ssc::dataManager()->getStream(mRTSourceUid);
+  return mRTSource;
 }
 
 void SelectRTSourceStringDataAdapter::setValueName(const QString name)

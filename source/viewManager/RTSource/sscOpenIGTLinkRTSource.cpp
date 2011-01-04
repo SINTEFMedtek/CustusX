@@ -46,7 +46,7 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mTimeoutTimer->setInterval(1000);
   connect( mTimeoutTimer, SIGNAL(timeout()),this, SLOT(timeout()) );
   connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
-  connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
+  //connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
@@ -142,6 +142,7 @@ bool OpenIGTLinkRTSource::isStreaming() const
 void OpenIGTLinkRTSource::connectedSlot(bool on)
 {
   mConnected = on;
+  emit connected(on);
 }
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
@@ -153,7 +154,8 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
   connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-  connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+  //connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+  connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
   mClient->start();
   mTimeoutTimer->start();
@@ -181,7 +183,8 @@ void OpenIGTLinkRTSource::disconnectServer()
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
     disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
     disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-    disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+    //disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+    disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
     mClient.reset();
   }
 
