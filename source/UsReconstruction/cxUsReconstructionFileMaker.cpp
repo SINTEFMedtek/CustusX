@@ -168,7 +168,6 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
 
   vtkImageDataPtr usData = this->mergeFrames();
-//  ProbeXmlConfigParser::Configuration config = mTool->getConfiguration();
 
   if(mTool)
   {
@@ -177,19 +176,17 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
     redirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
     usData = redirecter->GetOutput();
     usData->Update();
-
-//    usData->SetSpacing(config.mPixelWidth, config.mPixelHeight, 1);
   }
 
 
-  std::cout << "start write mhd file " << mhdFilename << std::endl;
+  //std::cout << "start write mhd file " << mhdFilename << std::endl;
   // write file to disk
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
   writer->SetInput(usData);
   writer->SetFileName(cstring_cast(mhdFilename));
   writer->SetCompression(false);
   writer->Write();
-  std::cout << "finished write mhd file " << mhdFilename << std::endl;
+  //std::cout << "finished write mhd file " << mhdFilename << std::endl;
   writer = NULL; // ensure file is closed (might not be necessary)
 
   //mhd - custom fields
@@ -240,12 +237,12 @@ void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionF
   }
 }
 
-/*
-void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
-{
-  std::cout << "UsReconstructionFileMaker::writeUSImages sta" << std::endl;
 
-  QFile mhdFile(reconstructionFolder+"/"+mSession->getDescription()+".mdh");
+/*void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
+{
+  //std::cout << "UsReconstructionFileMaker::writeUSImages sta" << std::endl;
+
+  QFile mhdFile(reconstructionFolder+"/"+mSession->getDescription()+".mhd");
   QFile rawFile(reconstructionFolder+"/"+mSession->getDescription()+".raw");
   if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
@@ -307,7 +304,7 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
 
   if (mTool)
   {
-    mhdStream << "ConfigurationID = " << mTool->getProbeSectorConfigurationString() << '\n';
+    mhdStream << "ConfigurationID = " << mTool->getConfigurationString() << '\n';
     mhdStream << "ProbeCalibration = " << mTool->getCalibrationFileName() << '\n';
   }
   //--------------------------------------------------------------------------------------------------------------------
@@ -333,7 +330,7 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder)
   }
   //--------------------------------------------------------------------------------------------------------------------
   rawFile.close();
-}
-*/
+}*/
+
 
 }//namespace cx

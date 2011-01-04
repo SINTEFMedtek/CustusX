@@ -63,7 +63,7 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
 	ssc::XmlOptionFile node = this->getPresetNode(name);
 
-	std::cout << "load " << name << ", " << node.getElement().namedItem("transferfunctions").isNull() << std::endl;;
+	//std::cout << "load " << name << ", " << node.getElement().namedItem("transferfunctions").isNull() << std::endl;;
 	transferFunctions->parseXml(node.getElement().namedItem("transferfunctions"));
 
 	ssc::Image::ShadingStruct shading = image->getShading();
@@ -84,12 +84,12 @@ ssc::XmlOptionFile PresetTransferFunctions3D::getPresetNode(const QString& prese
 {
   ssc::XmlOptionFile retval = mPresetFile;
   retval = retval.tryDescend("Preset", "name", presetName);
-  std::cout << "def: " << retval.getDocument().isNull() << std::endl;
+  //std::cout << "def: " << retval.getDocument().isNull() << std::endl;
   if (!retval.getDocument().isNull())
     return retval;
 
   retval = this->getCustomFile();
-  std::cout << "custom: " << retval.getDocument().isNull() << std::endl;
+  //std::cout << "custom: " << retval.getDocument().isNull() << std::endl;
   retval = retval.descend("Preset", "name", presetName);
   return retval;
 }
