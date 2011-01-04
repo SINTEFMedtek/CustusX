@@ -330,7 +330,7 @@ void ViewWrapper3D::imageRemoved(const QString& uid)
   if (!mVolumetricReps.count(uid))
     return;
 
-  ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
+  //ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
   mView->removeRep(mVolumetricReps[uid]);
   mVolumetricReps.erase(uid);
 
