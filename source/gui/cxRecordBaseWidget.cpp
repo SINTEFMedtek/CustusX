@@ -202,7 +202,7 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
   mLayout->addStretch();
 
-  connect(mRTSourceDataAdapter.get(), SIGNAL(rtSourceChanged()), this, SLOT(rtSourceChangedSlot()));
+  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
 
   this->checkIfReadySlot();
   this->rtSourceChangedSlot();
@@ -248,9 +248,10 @@ void USAcqusitionWidget::rtSourceChangedSlot()
   }
 
   mRTSource = mRTSourceDataAdapter->getRTSource();
+
   if(mRTSource)
   {
-    ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
+    //ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
     mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
   }
