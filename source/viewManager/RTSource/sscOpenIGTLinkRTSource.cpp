@@ -11,6 +11,7 @@
 #include <vtkImageImport.h>
 #include <vtkDataSetMapper.h>
 #include <vtkTimerLog.h>
+#include <vtkImageFlip.h>
 #include <QTimer>
 #include "vtkForwardDeclarations.h"
 #include <vtkDataSetMapper.h>
@@ -25,6 +26,7 @@
 #include "sscMessageManager.h"
 #include "sscTime.h"
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
+typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
 namespace ssc
 {
@@ -35,6 +37,12 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mLastTimestamp = 0;
   mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+
+  //image flip
+//  vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+//  flipper->SetFilteredAxes(0); //flipp around Y axis
+//  flipper->SetInput(mImageImport->GetOutput());
+//  mRedirecter->SetInput(flipper->GetOutput());
   mRedirecter->SetInput(mImageImport->GetOutput());
 
   mImageImport->SetNumberOfScalarComponents(1);
@@ -336,6 +344,10 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   // insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
   if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
   {
+//    vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+//    flipper->SetFilteredAxes(0); //flipp around X axis
+//    flipper->SetInput(mImageImport->GetOutput());
+//    mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(flipper->GetOutput());
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
 //    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
 //    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
