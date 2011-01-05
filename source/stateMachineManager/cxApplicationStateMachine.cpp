@@ -26,9 +26,11 @@ ApplicationStateMachine::ApplicationStateMachine()
   ApplicationState* laboratory = this->newState(new LaboratoryApplicationState(mParentState));
   ApplicationState* neurology = this->newState(new NeurologyApplicationState(mParentState));
   ApplicationState* laparascopy = this->newState(new LaparascopyApplicationState(mParentState));
+  ApplicationState* lung = this->newState(new LungApplicationState(mParentState));
 
   Q_UNUSED(neurology);
   Q_UNUSED(laparascopy);
+  Q_UNUSED(lung);
 
   //set initial state on all levels
   this->setInitialState(mParentState);

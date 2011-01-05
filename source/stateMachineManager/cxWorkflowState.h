@@ -239,7 +239,9 @@ class PreOpPlanningWorkflowState : public WorkflowState
 public:
   PreOpPlanningWorkflowState(QState* parent) :
   WorkflowState(parent, "PreOpPlanningUid", "Pre Op Planning")
-  {  };
+  {
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+  };
 
   virtual ~PreOpPlanningWorkflowState(){};
 
@@ -256,7 +258,9 @@ class IntraOpImagingWorkflowState : public WorkflowState
 public:
   IntraOpImagingWorkflowState(QState* parent) :
   WorkflowState(parent, "IntraOpImagingUid", "Intra Op Imaging")
-  {  };
+  {
+    connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+  };
 
   virtual ~IntraOpImagingWorkflowState(){};
 
@@ -273,7 +277,9 @@ class PostOpControllWorkflowState : public WorkflowState
 public:
   PostOpControllWorkflowState(QState* parent) :
   WorkflowState(parent, "PostOpControllUid", "Post Op Controll")
-  {  };
+  {
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
+  };
 
   virtual ~PostOpControllWorkflowState(){};
 
