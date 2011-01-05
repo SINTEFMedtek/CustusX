@@ -71,7 +71,7 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   mTransformTextureCoords->SetInput(tMapper->GetOutput() );
   mTransformTextureCoords->SetOrigin( 0, 0, 0);
   mTransformTextureCoords->SetScale( 1, 1, 0);
-  mTransformTextureCoords->FlipROn();
+  mTransformTextureCoords->FlipROn(); //r axis
 
   // all paths to go into the DataSetMapper
   mDataSetMapper = vtkDataSetMapperPtr::New();

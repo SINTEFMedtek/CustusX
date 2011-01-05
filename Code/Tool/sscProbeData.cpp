@@ -123,7 +123,7 @@ void ProbeData::test()
 Transform3D ProbeData::get_tMu() const
 {
   Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
-  Transform3D Rz = ssc::createTransformRotateY(M_PI/2.0);
+  Transform3D Rz = ssc::createTransformRotateY(-M_PI/2.0);
   ssc::Transform3D R = (Rx*Rz);
   ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.mOrigin_u);
 
