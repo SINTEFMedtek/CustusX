@@ -100,6 +100,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(QWidget* parent) :
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
+  mLayout->addStretch();
 
   this->checkIfReadySlot();
 }
