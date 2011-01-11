@@ -117,11 +117,15 @@ void ProgressiveLODVolumetricRep::removeRepActorsFromViewRenderer(View* view)
 
 ImagePtr ProgressiveLODVolumetricRep::getImage()
 {
+  if (!mCurrent)
+    return ImagePtr();
 	return mCurrent->getImage();
 }
 
 vtkVolumePtr ProgressiveLODVolumetricRep::getVtkVolume()
 {
+  if (!mCurrent)
+    return vtkVolumePtr();
 	return mCurrent->getVtkVolume();
 }
 
