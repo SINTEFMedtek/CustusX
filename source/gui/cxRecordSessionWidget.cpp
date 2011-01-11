@@ -84,10 +84,10 @@ void RecordSessionWidget::stopRecording()
 
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 
-  emit newSession(session->getUid());
-
   this->reset();
   emit stopped();
+
+  emit newSession(session->getUid());
 }
 
 bool RecordSessionWidget::isRecording()

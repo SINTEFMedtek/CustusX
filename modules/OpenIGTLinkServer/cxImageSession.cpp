@@ -17,6 +17,7 @@
 #include "vtkImageImport.h"
 #include "vtkLookupTable.h"
 #include "vtkImageMapToColors.h"
+#include "vtkMetaImageWriter.h"
 
 typedef vtkSmartPointer<vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<vtkImageMapToColors> vtkImageMapToColorsPtr;
@@ -163,7 +164,24 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
     mImageFileDir(imageFileDir)
 {
   mImageData = loadImage(mImageFileDir);
-//  mImageData = convertToTestColorImage(mImageData);
+  mImageData = convertToTestColorImage(mImageData);
+
+/*
+  vtkMetaImageWriter* writer = vtkMetaImageWriter::New();
+  writer->SetInput(mImageData);
+  writer->SetFileName(   "/Users/christiana/christiana/workspace/test.mhd");
+//  writer->SetRAWFileName("/Users/christiana/christiana/workspace/test.raw");
+//  writer->Update();
+  writer->SetCompression(false);
+  writer->Write();
+  std::cout << "finished write mhd file" << std::endl;
+
+
+  vtkMetaImageReader* reader = vtkMetaImageReader::New();
+  reader->SetFileName("/Users/christiana/christiana/workspace/test.mhd");
+  reader->Update();
+  mImageData = reader->GetOutput();
+*/
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.

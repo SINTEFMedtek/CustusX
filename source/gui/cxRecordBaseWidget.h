@@ -71,6 +71,10 @@ protected slots:
 
 protected:
   ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+  ToolPtr getTool();
+
+private:
+  ToolPtr mTool;
 };
 
 /**

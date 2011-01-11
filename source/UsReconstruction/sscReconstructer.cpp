@@ -235,6 +235,7 @@ void Reconstructer::readUsDataFile(QString mhdFileName)
       QStringList list = line.split("=", QString::SkipEmptyParts);
       mCalFileName = list[1].trimmed();
       foundCalFile = true;
+      std::cout << "Calibration file used: " << mCalFileName.toStdString() << std::endl;
     }
   }
   if(!foundConfig)
@@ -669,12 +670,17 @@ void Reconstructer::calibrate(QString calFilesPath)
   // to t (tool) space. TODO check is u is ul corner or ll corner.
   ssc::Transform3D tMu = mProbeData.get_tMu() * mProbeData.get_uMv();
   
+  ssc::Vector3D origo_u = tMu.inv().coord(Vector3D(0,0,0));
+  std::cout << "Origo_u: "<< origo_u << std::endl;
+
   ssc::Transform3D sMu = sMt*tMu;
   
   //mPos is prMs
   for (unsigned i = 0; i < mPositions.size(); i++)
   {
-    ssc::Transform3D prMs = mPositions[i].mPos;
+    //ssc::Transform3D prMs = mPositions[i].mPos;
+    ssc::Transform3D prMt = mPositions[i].mPos;
+    ssc::Transform3D prMs = prMt * sMt.inv();
     mPositions[i].mPos = prMs * sMu;
     ssc::Transform3D prMu = prMs * sMu;
   }
@@ -973,7 +979,7 @@ ImagePtr Reconstructer::generateOutputVolume()
     filePath = mOutputRelativePath;
   //filePath += "/" + volumeName + ".mhd";
 
-  ImagePtr image = dataManager()->createImage(data, mUsRaw->getUid() + "_rec%1", generateImageName()+" #%1", filePath);
+  ImagePtr image = dataManager()->createImage(data, mUsRaw->getUid() + "_rec%1", generateImageName()+" %1", filePath);
 //
 //  // Add _rec to volume name and uid
 //  //QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";

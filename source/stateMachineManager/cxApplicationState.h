@@ -72,6 +72,17 @@ public:
   virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLABORATORY; }
 };
 
+//HACK
+class LungApplicationState : public ApplicationState
+{
+  Q_OBJECT
+public:
+  LungApplicationState(QState* parent) : ApplicationState(parent, "Lung", "Lung") {}
+  virtual ~LungApplicationState(){};
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLABORATORY; }
+};
+//HACK
+
 class NeurologyApplicationState : public ApplicationState
 {
   Q_OBJECT

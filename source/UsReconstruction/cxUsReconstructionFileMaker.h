@@ -1,12 +1,18 @@
 #ifndef CXUSRECONSTRUCTIONFILEMAKER_H_
 #define CXUSRECONSTRUCTIONFILEMAKER_H_
 
+#include <QFile>
 #include <QString>
-#include "sscTool.h"
+#include <QTextStream>
+#include "boost/shared_ptr.hpp"
 #include "sscRealTimeStreamSourceRecorder.h"
+#include "cxRecordSession.h"
+#include "cxTool.h"
 
 namespace cx
 {
+typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
+
 /**
  * UsReconstructionFileMaker
  *
@@ -20,10 +26,29 @@ namespace cx
 class UsReconstructionFileMaker
 {
 public:
-  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, QString activepatientPath);
+  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, RecordSessionPtr session, QString activepatientPath, ToolPtr tool);
   ~UsReconstructionFileMaker();
 
+  void write();
+
 private:
+  QString makeFolder(QString patientFolder, RecordSessionPtr session);
+  bool createSubfolder(QString subfolderAbsolutePath);
+  vtkImageDataPtr mergeFrames();
+
+  void writeTrackerTimestamps(QString reconstructionFolder);
+  void writeTrackerTransforms(QString reconstructionFolder);
+  void writeUSTimestamps(QString reconstructionFolder);
+  void writeUSImages(QString reconstructionFolder, QString calibrationFile);
+  QString copyCalibrationFile(QString reconstructionFolder);
+  void copyProbeCalibConfigsXml(QString reconstructionFolder);
+
+  ssc::TimedTransformMap mTrackerRecordedData;
+  ssc::RealTimeStreamSourceRecorder::DataType mStreamRecordedData;
+  RecordSessionPtr mSession;
+  QString mActivepatientPath;
+  ToolPtr mTool;
+
 };
 }
 #endif /* CXUSRECONSTRUCTIONFILEMAKER_H_ */
