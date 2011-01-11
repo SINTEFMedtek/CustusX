@@ -58,7 +58,7 @@ Tool::Tool(InternalStructure& internalStructure) :
 
   QStringList configs = this->getUSSectorConfigList();
   if (!configs.isEmpty())
-    this->setProbeSectorConfigurationString(configs[0]);
+    this->setProbeSectorConfigIdString(configs[0]);
 }
 
 Tool::~Tool()
@@ -559,6 +559,11 @@ void Tool::setCalibration_sMt(ssc::Transform3D calibration)
   this->writeCalibrationToFile();
 }
 
+QString Tool::getCalibrationFileName() const
+{
+  return mInternalStructure.mCalibrationFilename;
+}
+
 Tracker::Type Tool::getTrackerType()
 {
   return mInternalStructure.mTrackerType;
@@ -568,7 +573,6 @@ void Tool::addLogging(TrackerToolType* trackerTool)
 {
   std::ofstream* loggerFile = new std::ofstream();
   QString logFile = mInternalStructure.mLoggingFolderName + "Tool_" + mName +"_Logging.txt";
-  ssc::messageManager()->sendDebug("Logging tool at "+logFile);
   loggerFile->open( cstring_cast(logFile) );
   mLogger = igstk::Logger::New();
   mLogOutput = itk::StdStreamLogOutput::New();
@@ -657,7 +661,7 @@ QStringList Tool::getUSSectorConfigList() const
   return configIdList;
 }
 
-QString Tool::getNameOfProbeSectorConfiguration(QString configString) ///< get a name for the given configuration
+QString Tool::getNameOfProbeSectorConfigId(QString configString) ///< get a name for the given configuration
 {
   QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
   if(rtSourceList.isEmpty())
@@ -666,12 +670,21 @@ QString Tool::getNameOfProbeSectorConfiguration(QString configString) ///< get a
   return config.mName;
 }
 
-QString Tool::getProbeSectorConfigurationString() const
+QString Tool::getProbeSectorConfigIdString() const
 {
   return mProbeSectorConfiguration;
 }
+QString Tool::getConfigurationString() const
+{
+  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
+    if(rtSourceList.isEmpty())
+      return "";
+  QString retval = this->getInstrumentScannerId() + ":" + this->getInstrumentId()
+      + ":" + rtSourceList.at(0) + ":" + this->getProbeSectorConfigIdString();
+  return retval;
+}
 
-void Tool::setProbeSectorConfigurationString(QString configString)
+void Tool::setProbeSectorConfigIdString(QString configString)
 {
   QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
   if(rtSourceList.isEmpty())
@@ -684,6 +697,16 @@ void Tool::setProbeSectorConfigurationString(QString configString)
 //  std::cout << "setting probe settings data" << std::endl;
   mProbeSectorConfiguration = configString;
   this->setUSProbeSector(probeSector);
+}
+
+ProbeXmlConfigParser::Configuration Tool::getConfiguration() const
+{
+  ProbeXmlConfigParser::Configuration config;
+  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
+  if(rtSourceList.isEmpty())
+    return config;
+  config = mXml->getConfiguration(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0), this->getProbeSectorConfigIdString());
+  return config;
 }
 
 std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
@@ -728,7 +751,7 @@ void Tool::parseXml(QDomNode& dataNode)
   //Need to call set function to make sure the values will be applied
   if (mProbeSectorConfiguration.isEmpty())
     return;
-  setProbeSectorConfigurationString(mProbeSectorConfiguration);
+  setProbeSectorConfigIdString(mProbeSectorConfiguration);
   emit probeSectorConfigurationChanged();
 }
 
