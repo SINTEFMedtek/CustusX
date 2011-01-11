@@ -67,17 +67,28 @@ ssc::TimedTransformMap TrackedRecordWidget::getRecording(RecordSessionPtr sessio
   if(toolTransformMap.size() == 1)
   {
     ssc::messageManager()->sendInfo("Found one tool("+toolTransformMap.begin()->first->getName()+") with relevant data.");
+    mTool = boost::dynamic_pointer_cast<Tool>(toolTransformMap.begin()->first);
     retval = toolTransformMap.begin()->second;
   }
   else if(toolTransformMap.size() > 1)
   {
     ssc::messageManager()->sendWarning("Found more than one tool with relevant data, user needs to choose which one to use for tracked centerline extraction.");
-    retval = toolTransformMap.begin()->second; //TODO make the user select which tool they wanna use!!! Pop-up???
+    //TODO make the user select which tool they wanna use!!! Pop-up???
+    mTool = boost::dynamic_pointer_cast<Tool>(toolTransformMap.begin()->first);
+    retval = toolTransformMap.begin()->second;
+    //TODO
   }else if(toolTransformMap.empty())
   {
     ssc::messageManager()->sendWarning("Could not find any session history for given session.");
   }
   return retval;
+}
+
+ToolPtr TrackedRecordWidget::getTool()
+{
+  if(!mTool)
+    ssc::messageManager()->sendWarning("No tool has been set for the session yet, try calling getRecording() before getTool() in TrackedRecordWidget.");
+  return mTool;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,6 +100,7 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(QWidget* parent) :
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
+  mLayout->addStretch();
 
   this->checkIfReadySlot();
 }
@@ -100,12 +112,12 @@ void TrackedCenterlineWidget::checkIfReadySlot()
 {
   if(ssc::toolManager()->isTracking())
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>\n");
     emit ready(true);
   }
   else
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=red>Need to start tracking.</font>");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=red>Need to start tracking.</font>\n");
     emit ready(false);
   }
 }
@@ -148,6 +160,8 @@ void TrackedCenterlineWidget::startedSlot()
   for(; toolIt != tools->end(); ++toolIt)
   {
     activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
+    if(!activeRep3D)
+      continue;
     activeRep3D->getTracer()->clear();
     activeRep3D->getTracer()->start();
   }
@@ -164,6 +178,8 @@ void TrackedCenterlineWidget::stoppedSlot()
   for(; toolIt != tools->end(); ++toolIt)
   {
     activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
+    if(!activeRep3D)
+      continue;
     if (activeRep3D->getTracer()->isRunning())
     {
       activeRep3D->getTracer()->stop();
@@ -185,10 +201,12 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 
   RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
+  mLayout->addStretch();
 
-  connect(mRTSourceDataAdapter.get(), SIGNAL(rtSourceChanged()), this, SLOT(rtSourceChangedSlot()));
+  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
 
   this->checkIfReadySlot();
+  this->rtSourceChangedSlot();
 }
 
 USAcqusitionWidget::~USAcqusitionWidget()
@@ -196,21 +214,27 @@ USAcqusitionWidget::~USAcqusitionWidget()
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
-  ssc::messageManager()->sendDebug("TODO: implement USAcqusitionWidget::checkIfReadySlot()");
+  //std::cout << "void USAcqusitionWidget::checkIfReadySlot()" << std::endl;
   if(ssc::toolManager()->isTracking() && mRTSource && mRTSource->isStreaming() && mRTRecorder)
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>");
+    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font><br>");
     emit ready(true);
   }
   else
   {
     QString whatsMissing("");
     if(!ssc::toolManager()->isTracking())
-      whatsMissing.append("<font color=red>Need to start tracking.</font> ");
-    if(mRTSource && !mRTSource->isStreaming())
-      whatsMissing.append("<font color=red>Need to start streaming.</font> ");
-    if(mRTRecorder)
-          whatsMissing.append("<font color=red>Need connect to a recorder.</font> ");
+      whatsMissing.append("<font color=red>Need to start tracking.</font><br>");
+    if(mRTSource)
+    {
+      if(!mRTSource->isStreaming())
+        whatsMissing.append("<font color=red>Need to start streaming.</font><br>");
+    }else
+    {
+      whatsMissing.append("<font color=red>Need to get a stream.</font><br>");
+    }
+    if(!mRTRecorder)
+       whatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
 
     RecordBaseWidget::setWhatsMissingInfo(whatsMissing);
     emit ready(false);
@@ -225,8 +249,14 @@ void USAcqusitionWidget::rtSourceChangedSlot()
   }
 
   mRTSource = mRTSourceDataAdapter->getRTSource();
-  connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-  mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+
+  if(mRTSource)
+  {
+    //ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
+    connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
+    mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+  }
+  this->checkIfReadySlot();
 }
 
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
@@ -241,9 +271,9 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
     return;
   }
 
-  //TODO: generate the files needed for reconstruction
-  //usReconstructionFileMaker.makefiles();
-  UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, stateManager()->getPatientData()->getActivePatientFolder());
+  ToolPtr probe = TrackedRecordWidget::getTool();
+  UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
+  filemaker.write();
 }
 
 void USAcqusitionWidget::startedSlot()

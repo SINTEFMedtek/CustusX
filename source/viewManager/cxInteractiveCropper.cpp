@@ -35,7 +35,7 @@ public:
   void SetCropper(InteractiveCropper* cropper) {mCropper = cropper;}
   virtual void Execute(vtkObject* caller, unsigned long, void*)
   {
-    std::cout << "executing" << std::endl;
+    //std::cout << "executing" << std::endl;
     ssc::DoubleBoundingBox3D bb_new = mCropper->getBoxWidgetSize();
     mCropper->setCroppingRegion(bb_new);
   }

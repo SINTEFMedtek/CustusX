@@ -11,8 +11,8 @@
 #include <vtkImageImport.h>
 #include <vtkDataSetMapper.h>
 #include <vtkTimerLog.h>
+#include <vtkImageFlip.h>
 #include <QTimer>
-#include "sscOpenIGTLinkClient.h"
 #include "vtkForwardDeclarations.h"
 #include <vtkDataSetMapper.h>
 #include <vtkLookupTable.h>
@@ -21,7 +21,12 @@
 #include <vtkImageMapToColors.h>
 #include <vtkImageAppendComponents.h>
 #include <vtkImageChangeInformation.h>
+#include "sscTypeConversions.h"
+#include "sscOpenIGTLinkClient.h"
+#include "sscMessageManager.h"
+#include "sscTime.h"
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
+typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
 namespace ssc
 {
@@ -32,6 +37,12 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mLastTimestamp = 0;
   mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
+
+  //image flip
+//  vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+//  flipper->SetFilteredAxes(0); //flipp around Y axis
+//  flipper->SetInput(mImageImport->GetOutput());
+//  mRedirecter->SetInput(flipper->GetOutput());
   mRedirecter->SetInput(mImageImport->GetOutput());
 
   mImageImport->SetNumberOfScalarComponents(1);
@@ -43,7 +54,7 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mTimeoutTimer->setInterval(1000);
   connect( mTimeoutTimer, SIGNAL(timeout()),this, SLOT(timeout()) );
   connect(this, SIGNAL(connected(bool)), this, SIGNAL(streaming(bool))); // define connected as streaming.
-  connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
+  //connect(this, SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool))); // define connected as streaming.
 }
 
 OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
@@ -51,8 +62,13 @@ OpenIGTLinkRTSource::~OpenIGTLinkRTSource()
   //disconnect();
   if (mClient)
   {
-    mClient->terminate();
-    mClient->wait(); // forever or until dead thread
+    mClient->quit();
+    mClient->wait(2000);
+    if (mClient->isRunning())
+    {
+      mClient->terminate();
+      mClient->wait(); // forever or until dead thread
+    }
   }
 }
 
@@ -116,9 +132,9 @@ bool OpenIGTLinkRTSource::validData() const
 
 double OpenIGTLinkRTSource::getTimestamp()
 {
-  //TODO: get ts from messge
-  return mLastTimestamp;
-//  double timestamp = getMilliSecondsSinceEpoch(); //TODO get timestamp from source
+  //HACK we need time sync before we can use the real timetags delivered with the image
+  return ssc::getMilliSecondsSinceEpoch();
+  //return mLastTimestamp;
 }
 
 bool OpenIGTLinkRTSource::isConnected() const
@@ -134,6 +150,7 @@ bool OpenIGTLinkRTSource::isStreaming() const
 void OpenIGTLinkRTSource::connectedSlot(bool on)
 {
   mConnected = on;
+  emit connected(on);
 }
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
@@ -145,7 +162,8 @@ void OpenIGTLinkRTSource::connectServer(QString address, int port)
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
   connect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
   connect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-  connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+  //connect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+  connect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
 
   mClient->start();
   mTimeoutTimer->start();
@@ -173,7 +191,8 @@ void OpenIGTLinkRTSource::disconnectServer()
     disconnect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
     disconnect(mClient.get(), SIGNAL(imageReceived()), this, SLOT(imageReceivedSlot())); // thread-bridging connection
     disconnect(mClient.get(), SIGNAL(fps(double)), this, SLOT(fpsSlot(double))); // thread-bridging connection
-    disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+    //disconnect(mClient.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool))); // thread-bridging connection
+    disconnect(mClient.get(), SIGNAL(connected(bool)), this, SLOT(connectedSlot(bool)));
     mClient.reset();
   }
 
@@ -325,7 +344,13 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
   // insert a ARGB->RBGA filter. TODO: need to check the input more thoroughly here, this applies only to the internal CustusX US pipeline.
   if (mImageImport->GetOutput()->GetNumberOfScalarComponents()==4 && !mFilter_ARGB_RGBA)
   {
+//    vtkImageFlipPtr flipper = vtkImageFlipPtr::New();
+//    flipper->SetFilteredAxes(0); //flipp around X axis
+//    flipper->SetInput(mImageImport->GetOutput());
+//    mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(flipper->GetOutput());
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
+//    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
+//    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
 
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
@@ -347,18 +372,22 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
   splitterRGB->SetComponents(1,2,3);
   merger->SetInput(0, splitterRGB->GetOutput());
 
-  /// extract the A part of input (0) and insert as (3) in output
-  vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
-  splitterA->SetInput(input);
-  splitterA->SetComponents(0);
-  merger->SetInput(1, splitterA->GetOutput());
+// Removed adding of Alpha channel: this is always 1 anyway (cross fingers)
+//  /// extract the A part of input (0) and insert as (3) in output
+//  vtkImageExtractComponentsPtr splitterA = vtkImageExtractComponentsPtr::New();
+//  splitterA->SetInput(input);
+//  splitterA->SetComponents(0);
+//  merger->SetInput(1, splitterA->GetOutput());
 
   return merger->GetOutput();
 }
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-    return mRedirecter->GetOutput();
+//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
+//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
+
+  return mRedirecter->GetOutput();
 }
 
 }
