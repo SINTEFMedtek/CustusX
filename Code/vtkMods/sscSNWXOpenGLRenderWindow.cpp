@@ -1,6 +1,5 @@
 #ifndef VTK_IMPLEMENT_MESA_CXX
 #include "sscSNWXOpenGLRenderWindow.h" ///-> new sonowand subclass
-//#include "vtkXOpenGLRenderWindow.h"
 #include "vtkOpenGLRenderer.h"
 #include "vtkOpenGLProperty.h"
 #include "vtkOpenGLTexture.h"
@@ -110,8 +109,6 @@ vtkXOpenGLRenderWindowInternal::vtkXOpenGLRenderWindowInternal(
 vtkCxxRevisionMacro(SNWXOpenGLRenderWindow, "$Revision: 1.104 $");
 vtkStandardNewMacro(SNWXOpenGLRenderWindow);
 #endif
-
-
 
 #define MAX_LIGHTS 8
 
@@ -396,6 +393,7 @@ XVisualInfo *SNWXOpenGLRenderWindow::GetDesiredVisualInfo()
     }
   return ( v );
 }
+
 static GLXContext test = 0;
 SNWXOpenGLRenderWindow::SNWXOpenGLRenderWindow()
 {
@@ -427,7 +425,6 @@ SNWXOpenGLRenderWindow::SNWXOpenGLRenderWindow()
   this->XCHand   =  0;
 
   this->Capabilities = 0;
-
 }
 
 // free up memory & close the window
@@ -446,7 +443,6 @@ std::cout << "destroy SNWXOpenGLRenderWindow " << endl;
     }
   test = 0;
   delete this->Internal;
-
 }
 
 // End the rendering process and display the image.
@@ -615,17 +611,15 @@ void SNWXOpenGLRenderWindow::CreateAWindow()
 
   if (!this->Internal->ContextId)
     {
-	std::cout << "vtk Opengl window context:" << test<< std::endl;
 	  if(!test)
 		{
 			this->Internal->ContextId = glXCreateContext(this->DisplayId, v, 0, GL_TRUE);
 			test = this->Internal->ContextId;
-//			std::cout << "glXCreateContext with 0!!" << endl;
 		}
 		else
 		{
+		    // glXCreateContext with share list
 		    this->Internal->ContextId = glXCreateContext(this->DisplayId, v, test, GL_TRUE);
-//		    std::cout << "glXCreateContext with share list!!" << endl;
 		}
     }
 
@@ -915,14 +909,7 @@ void SNWXOpenGLRenderWindow::CreateOffScreenWindow(int width, int height)
       if(!this->Internal->PbufferContextId && !this->Internal->PixmapContextId)
         {
         v = this->GetDesiredVisualInfo();
-        std::cout << " Pbuffer creation " << endl;
-
         this->Internal->PixmapContextId = glXCreateContext(this->DisplayId, v, 0, GL_FALSE);
-
-
-
-
-
         this->Internal->pixmap=
           XCreatePixmap(this->DisplayId,
                         XRootWindow(this->DisplayId,v->screen),
@@ -944,7 +931,6 @@ void SNWXOpenGLRenderWindow::CreateOffScreenWindow(int width, int height)
   this->Mapped = 0;
   this->Size[0] = width;
   this->Size[1] = height;
-
 
   this->MakeCurrent();
 
@@ -1364,19 +1350,6 @@ void SNWXOpenGLRenderWindow::MakeCurrent()
              || this->ForceMakeCurrent))
           {
         	glXMakeCurrent(this->DisplayId,this->WindowId, this->Internal->ContextId);
-        	//glXMakeCurrent(this->DisplayId,this->WindowId, test);
-
-//        	if(!test)
-//       			{
-//       				glXMakeCurrent(this->DisplayId,this->WindowId, this->Internal->ContextId);
-//       				test = this->Internal->ContextId;
-//       				std::cout << "glXMakeCurrent with 0!!" << endl;
-//       			}
-//       			else
-//       			{
-//       				//glXMakeCurrent(this->DisplayId,this->WindowId, test);
-//       			    std::cout << "glXMakeCurrent with share list!!" << endl;
-//       			}
           this->ForceMakeCurrent = 0;
           }
         }
@@ -2072,8 +2045,3 @@ void SNWXOpenGLRenderWindow::SetCurrentCursor(int shape)
       break;
     }
 }
-
-
-
-
-
