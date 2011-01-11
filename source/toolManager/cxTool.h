@@ -109,15 +109,18 @@ public:
   virtual bool isCalibrated() const; ///< true if calibration is different from identity
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
   virtual void setCalibration_sMt(ssc::Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
+  QString getCalibrationFileName() const; ///< returns the path to the tools calibration file
 
   Tracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
 
   QString getInstrumentId() const;
   QString getInstrumentScannerId() const;
   QStringList getUSSectorConfigList() const;
-  QString getNameOfProbeSectorConfiguration(QString configString); ///< get a name for the given configuration
-  QString getProbeSectorConfigurationString() const;///< Set the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
-  void setProbeSectorConfigurationString(QString configString);///< Get the probe sector configuration string matching the config id in ultrasoundImageConfigs.xml
+  QString getNameOfProbeSectorConfigId(QString configIdString); ///< get a name for the given config id
+  QString getProbeSectorConfigIdString() const;///< Get the probe sector config id string matching the config id in ultrasoundImageConfigs.xml
+  QString getConfigurationString() const;///< Gets the string for identifying the probe config in the XML file
+  void setProbeSectorConfigIdString(QString configIdString);///< Set the probe sector config id string matching the config id in ultrasoundImageConfigs.xml
+  ProbeXmlConfigParser::Configuration getConfiguration() const;
   virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
 
