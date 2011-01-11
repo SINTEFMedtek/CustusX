@@ -108,18 +108,20 @@ void SlicePlaneClipper::removeVolume(ssc::VolumetricBaseRepPtr volume)
 {
 	if (!volume)
 		return;
-  if (!volume->getVtkVolume())
-    return;
 
-	vtkAbstractMapper* mapper = volume->getVtkVolume()->GetMapper();
-	if (mapper)
+	if (volume->getVtkVolume())
 	{
-		vtkPlaneCollection* planes = mapper->GetClippingPlanes();
-		if (planes && planes->IsItemPresent(mClipPlane))
-		{
-			mapper->RemoveClippingPlane(mClipPlane);	
-		}		
+	  vtkAbstractMapper* mapper = volume->getVtkVolume()->GetMapper();
+	  if (mapper)
+	  {
+	    vtkPlaneCollection* planes = mapper->GetClippingPlanes();
+	    if (planes && planes->IsItemPresent(mClipPlane))
+	    {
+	      mapper->RemoveClippingPlane(mClipPlane);
+	    }
+	  }
 	}
+
 	disconnect(volume.get(), SIGNAL(internalVolumeChanged()), this, SLOT(volumeRepChangedSlot()));
 	mVolumes.erase(volume);
 	this->changedSlot();
