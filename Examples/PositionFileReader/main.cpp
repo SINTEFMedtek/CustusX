@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	
 	if (argc<2)
 	{
-		std::cout << "usage: sscPositionFileReader [-v] <filename> <timestamp>" << std::endl;
+		std::cout << "Usage: sscPositionFileReader [-v] <filename> <timestamp>\nTimestamp format " << EVENT_DATE_FORMAT << std::endl;
 		return 0;
 	}
 
@@ -43,13 +43,20 @@ int main(int argc, char **argv)
 		std::cout << "This is a version 1 of the record format, and requires a timestamp parameter.";
 		return 0;
 	}
-	QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
-	boost::uint64_t ret64 = startTime.toTime_t();
-	ret64 *= 1000;
 
-	// workaround for compilling 32 bit version:
-	boost::uint64_t tsModifier = ret64 & (std::numeric_limits<boost::uint64_t>::max() ^ 0xffffffff); // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
-	//boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
+  boost::uint64_t tsModifier;
+  if (reader.version() == 1)
+  {
+    QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);
+    boost::uint64_t ret64 = startTime.toTime_t();
+    ret64 *= 1000;
+
+    // workaround for compilling 32 bit version:
+    tsModifier = ret64 & (std::numeric_limits<boost::uint64_t>::max() ^ 0xffffffff); // ffffffffffffffff XOR 00000000ffffffff = ffffffff00000000
+    //boost::uint64_t tsModifier = ret64 & 0xffffffff00000000;
+    std::cout << "Start time: " << startTS << ", converted to " << startTime.toString(EVENT_DATE_FORMAT) << std::endl;
+  }
+
 	
 	ssc::Transform3D T;
 	double timestamp;
@@ -65,8 +72,8 @@ int main(int argc, char **argv)
 //  std::cout << "now.toTime_t() " << now.toTime_t() << std::endl;
 //  std::cout << "now.toTime_t()*1000 + now.time().msec() " << now_t << std::endl;
 //  std::cout << "test dir: " << ssc::PositionStorageReader::timestampToString(now_t64) << std::endl;
-	std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMilliSecondsSinceEpoch()) << std::endl;
-  std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMicroSecondsSinceEpoch()/1000) << std::endl;
+//	std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMilliSecondsSinceEpoch()) << std::endl;
+//  std::cout << "test now: " << ssc::PositionStorageReader::timestampToString(ssc::getMicroSecondsSinceEpoch()/1000) << std::endl;
 
 
 	std::cout << "reading file [" << posFile.toStdString() << "]" << std::endl;
@@ -75,8 +82,19 @@ int main(int argc, char **argv)
 	int index = 0;
 	while (!reader.atEnd())
 	{
-		if (!reader.read(&T, &timestamp, &toolIndex))
-		  break;
+    if (reader.version() == 1)
+    {
+      int index = 0;
+      if (!reader.read(&T, &timestamp, &index))
+        break;
+      toolIndex = QString(index);
+    }
+    else
+    {
+      if (!reader.read(&T, &timestamp, &toolIndex))
+        break;
+    }
+
 		boost::uint64_t ts64 = (boost::uint64_t)timestamp;
 		if (reader.version() == 1)
 		{

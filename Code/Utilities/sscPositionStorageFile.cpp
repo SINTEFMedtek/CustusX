@@ -21,8 +21,14 @@ PositionStorageReader::PositionStorageReader(QString filename) : positions(filen
   mVersion = 0;
   stream >> mVersion;
 
+  if (!positions.exists())
+  {
+    std::cout << "Error: File [" << filename.toStdString() << "] does not exist." << std::endl;
+  }
+
   if (QString(header)!="SNWPOS" || mVersion<1)
   {
+//    std::cout << QString(header).toStdString() << "-" << int(mVersion) << std::endl;
     std::cout << "Error in header for file [" << filename.toStdString() << "]" << std::endl;
     positions.close();
   }
