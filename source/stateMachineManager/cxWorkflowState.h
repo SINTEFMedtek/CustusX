@@ -238,7 +238,7 @@ class PreOpPlanningWorkflowState : public WorkflowState
 
 public:
   PreOpPlanningWorkflowState(QState* parent) :
-  WorkflowState(parent, "PreOpPlanningUid", "Pre Op Planning")
+  WorkflowState(parent, "PreOpPlanningUid", "Planning")
   {
     connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
   };
@@ -257,13 +257,17 @@ class IntraOpImagingWorkflowState : public WorkflowState
 
 public:
   IntraOpImagingWorkflowState(QState* parent) :
-  WorkflowState(parent, "IntraOpImagingUid", "Intra Op Imaging")
+  WorkflowState(parent, "IntraOpImagingUid", "Imaging")
   {
     connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
   };
 
   virtual ~IntraOpImagingWorkflowState(){};
+  virtual void onEntry(QEvent * event )
+  {
+    ssc::toolManager()->startTracking();
 
+  }
   virtual bool canEnter() const
   {
     return stateManager()->getPatientData()->isPatientValid();
@@ -276,7 +280,7 @@ class PostOpControllWorkflowState : public WorkflowState
 
 public:
   PostOpControllWorkflowState(QState* parent) :
-  WorkflowState(parent, "PostOpControllUid", "Post Op Controll")
+  WorkflowState(parent, "PostOpControllUid", "Control")
   {
     connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
   };
