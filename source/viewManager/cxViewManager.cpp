@@ -529,6 +529,16 @@ void ViewManager::addDefaultLayouts()
     layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 1));
     this->addDefaultLayout(layout);
   }
+  {
+      LayoutData layout;
+      layout.resetUid("LAYOUT_US_Acquisition");
+      layout.setName("US Acquisition");
+      layout.resize(2,3);
+      layout.setView(0, ssc::ptANYPLANE,           LayoutRegion(1, 2, 1, 1));
+      layout.setView(0, ssc::View::VIEW_3D,        LayoutRegion(0, 2, 1, 1));
+      layout.setView(0, ssc::View::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
+      this->addDefaultLayout(layout);
+    }
 }
 
 
