@@ -24,10 +24,11 @@ int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::P
   // Receive transform data from the socket
   socket->Receive(transMsg->GetPackBodyPointer(), transMsg->GetPackBodySize());
   // Deserialize the transform data
+  // If you want to do a CRC check, call Unpack(1).
   // If you want to skip CRC check, call Unpack() without argument.
-  int c = transMsg->Unpack(1);
+  int c = transMsg->Unpack();
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the transform data
     igtl::Matrix4x4 matrix;
@@ -52,10 +53,11 @@ int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Po
   // Receive position position data from the socket
   socket->Receive(positionMsg->GetPackBodyPointer(), positionMsg->GetPackBodySize());
   // Deserialize the transform data
+  // If you want to do a CRC check, call Unpack(1).
   // If you want to skip CRC check, call Unpack() without argument.
-  int c = positionMsg->Unpack(1);
+  int c = positionMsg->Unpack();
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the transform data
     float position[3];
@@ -90,10 +92,11 @@ int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Poin
   // Receive transform data from the socket
   socket->Receive(statusMsg->GetPackBodyPointer(), statusMsg->GetPackBodySize());
   // Deserialize the transform data
+  // If you want to do a CRC check, call Unpack(1).
   // If you want to skip CRC check, call Unpack() without argument.
-  int c = statusMsg->Unpack(1);
+  int c = statusMsg->Unpack();
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     std::cerr << "========== STATUS ==========" << std::endl;
     std::cerr << " Code      : " << statusMsg->GetCode() << std::endl;
@@ -293,10 +296,11 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
 
   socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
   // Deserialize the transform data
+  // If you want to do a CRC check, call Unpack(1).
   // If you want to skip CRC check, call Unpack() without argument.
-  int c = imgMsg->Unpack(1);
+  int c = imgMsg->Unpack();
 
-  if (c & igtl::MessageHeader::UNPACK_BODY) // if CRC check is OK
+  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the image data
     int size[3]; // image dimension
