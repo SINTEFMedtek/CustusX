@@ -299,14 +299,18 @@ void MainWindow::createActions()
   connect(mDeleteLayoutAction, SIGNAL(triggered()), this, SLOT(deleteCustomLayoutSlot()));
 
   mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
+  mCenterToImageCenterAction->setIcon(QIcon(":/icons/center_image.png"));
   connect(mCenterToImageCenterAction, SIGNAL(triggered()), this, SLOT(centerToImageCenterSlot()));
   mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
+  mCenterToTooltipAction->setIcon(QIcon(":/icons/center_tool.png"));
   connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
 
-  mSaveDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/go-down-4.png"), tr("Save desktop"), this);
+//  mSaveDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/go-down-4.png"), tr("Save desktop"), this);
+  mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
   mSaveDesktopAction->setToolTip("Save desktop for workflow step");
   connect(mSaveDesktopAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
-  mResetDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/edit-undo-8.png"), tr("Reset desktop"), this);
+//  mResetDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/edit-undo-8.png"), tr("Reset desktop"), this);
+  mResetDesktopAction = new QAction(QIcon(":/icons/workflow_state_revert.png"), tr("Reset desktop"), this);
   mResetDesktopAction->setToolTip("Reset desktop for workflow step");
   connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
 
@@ -327,9 +331,15 @@ void MainWindow::centerToTooltipSlot()
 void MainWindow::updateTrackingActionSlot()
 {
   if (ssc::toolManager()->isTracking())
+  {
+    mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
     mTrackingToolsAction->setText("Stop Tracking");
+  }
   else
+  {
+    mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-red.png"));
     mTrackingToolsAction->setText("Start Tracking");
+  }
 }
 
 void MainWindow::toggleTrackingSlot()
