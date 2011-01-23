@@ -118,6 +118,7 @@ QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, s
   QAction* action = new QAction(caption, group);
   action->setStatusTip(help);
   action->setWhatsThis(help);
+  action->setIcon(QIcon(":/icons/camera_view_"+caption+".png"));
   QFont font;
   font.setBold(true);
   if (font.pointSize()>=0)
