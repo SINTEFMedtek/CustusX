@@ -19,6 +19,34 @@
     <file>icons/open_icon_library/png/64x64/actions/document-open-7.png</file>
    
     <file>icons/open_icon_library/png/64x64/actions/edit-undo-8.png</file>
-    <file>icons/open_icon_library/png/64x64/actions/go-down-4.png</file>    
+    <file>icons/open_icon_library/png/64x64/actions/go-down-4.png</file>
+        
+    <file>icons/workflow_state_patient_data.png</file>
+    <file>icons/workflow_state_planning.png</file>
+    <file>icons/workflow_state_registration.png</file>
+    <file>icons/workflow_state_navigation.png</file>
+    <file>icons/workflow_state_acquisition.png</file>
+    <file>icons/workflow_state_post_op.png</file>
+    <file>icons/workflow_state_revert.png</file>
+    <file>icons/workflow_state_save.png</file>
+    <file>icons/polaris.png</file>
+    <file>icons/polaris-red.png</file>
+    <file>icons/polaris-green.png</file>
+    
+    
+    <file>icons/camera_view_A.png</file>
+    <file>icons/camera_view_P.png</file>
+    <file>icons/camera_view_S.png</file>
+    <file>icons/camera_view_I.png</file>
+    <file>icons/camera_view_L.png</file>
+    <file>icons/camera_view_R.png</file>
+    <file>icons/camera_view_O.png</file>
+   
+    <file>icons/center_image.png</file>
+    <file>icons/center_tool.png</file>
+    <file>icons/camera-f.png</file>
+    <file>icons/camera-u.png</file>
+    <file>icons/camera-n.png</file>
+    <file>icons/camera-o.png</file>
 </qresource>
 </RCC>

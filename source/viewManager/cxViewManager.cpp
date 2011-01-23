@@ -793,10 +793,10 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
   QActionGroup* camGroup = new QActionGroup(NULL);
   camGroup->setExclusive(true);
 
-  this->addInteractorStyleAction("Unicam",        camGroup, "vtkInteractorStyleUnicam",           "Set 3D interaction to a single-button style, useful for touch screens.");
-  this->addInteractorStyleAction("Normal Camera", camGroup, "vtkInteractorStyleTrackballCamera",  "Set 3D interaction to the normal camera-oriented style.");
-  this->addInteractorStyleAction("Object",        camGroup, "vtkInteractorStyleTrackballActor",   "Set 3D interaction to a object-oriented style.");
-  this->addInteractorStyleAction("Flight",        camGroup, "vtkInteractorStyleFlight",           "Set 3D interaction to a flight style.");
+  this->addInteractorStyleAction("Unicam",        camGroup, "vtkInteractorStyleUnicam",           QIcon(":/icons/camera-u.png"), "Set 3D interaction to a single-button style, useful for touch screens.");
+  this->addInteractorStyleAction("Normal Camera", camGroup, "vtkInteractorStyleTrackballCamera",  QIcon(":/icons/camera-n.png"), "Set 3D interaction to the normal camera-oriented style.");
+  this->addInteractorStyleAction("Object",        camGroup, "vtkInteractorStyleTrackballActor",   QIcon(":/icons/camera-o.png"), "Set 3D interaction to a object-oriented style.");
+  this->addInteractorStyleAction("Flight",        camGroup, "vtkInteractorStyleFlight",           QIcon(":/icons/camera-f.png"), "Set 3D interaction to a flight style.");
 //
 //  QAction* unicamAction = new QAction("Unicam", camGroup);
 //  unicamAction->setCheckable(true);
@@ -826,12 +826,13 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
   return camGroup;
 }
 
-void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QString helptext)
+void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon, QString helptext)
 {
   ssc::View* view = viewManager()->get3DView();
   vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
 
   QAction* action = new QAction(caption, group);
+  action->setIcon(icon);
   action->setCheckable(true);
   action->setData(className);
   action->setToolTip(helptext);
