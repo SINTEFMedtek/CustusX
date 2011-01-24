@@ -148,6 +148,11 @@ install(TARGETS CustusX #DESTINATION .
 #SET(plugin_dest_dir bin)
 SET(RESOURCES_DIR bin)
 SET(CONFIG_DIR bin)
+SET(SYMLINK_DIR bin)
+if(APPLE)
+    SET(SYMLINK_DIR /Library/CustusX)
+endif(APPLE)
+  
 SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}")
 IF(APPLE)
   #SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
@@ -169,7 +174,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}"
 install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl DESTINATION ${RESOURCES_DIR}/shaders/ 
     ) # COMPONENT config)
 # install folder for storage of igstk<->CustusX symlinks
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION "/Library/CustusX" 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLINK_DIR} 
     #USE_SOURCE_PERMISSIONS
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
@@ -233,6 +238,7 @@ endif(APPLE)
 
 # special handling of shared libraries: must copy them into the bundle
 if (BUILD_SHARED_LIBS)
+    message("bygger shared libs")
     #--------------------------------------------------------------------------------
     # Use BundleUtilities to get all other dependencies for the application to work.
     # It takes a bundle or executable along with possible plugins and inspects it

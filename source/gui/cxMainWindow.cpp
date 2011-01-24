@@ -214,12 +214,15 @@ void MainWindow::createActions()
   mStandard3DViewActions = mCameraControl->createStandard3DViewActions();
 
   // File
-  mNewPatientAction = new QAction(tr("&New patient"), this);
+  mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-new-8.png"), tr("&New patient"), this);
   mNewPatientAction->setShortcut(tr("Ctrl+N"));
-  mSaveFileAction = new QAction(tr("&Save Patient file"), this);
+  mNewPatientAction->setStatusTip(tr("Create a new patient file"));
+  mSaveFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-save-5.png"), tr("&Save Patient"), this);
   mSaveFileAction->setShortcut(tr("Ctrl+S"));
-  mLoadFileAction = new QAction(tr("&Load Patient file"), this);
+  mSaveFileAction->setStatusTip(tr("Save patient file"));
+  mLoadFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-open-7.png"), tr("&Load Patient"), this);
   mLoadFileAction->setShortcut(tr("Ctrl+L"));
+  mLoadFileAction->setStatusTip(tr("Load patient file"));
   mClearPatientAction = new QAction(tr("&Clear Patient"), this);
 
   connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
@@ -257,7 +260,7 @@ void MainWindow::createActions()
 
 
   //data
-  mImportDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Import data"), this);
+  mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr("&Import data"), this);
   mImportDataAction->setShortcut(tr("Ctrl+I"));
   mImportDataAction->setStatusTip(tr("Import image data"));
 
@@ -296,15 +299,18 @@ void MainWindow::createActions()
   connect(mDeleteLayoutAction, SIGNAL(triggered()), this, SLOT(deleteCustomLayoutSlot()));
 
   mCenterToImageCenterAction = new QAction(tr("Center Image"), this);
+  mCenterToImageCenterAction->setIcon(QIcon(":/icons/center_image.png"));
   connect(mCenterToImageCenterAction, SIGNAL(triggered()), this, SLOT(centerToImageCenterSlot()));
   mCenterToTooltipAction = new QAction(tr("Center Tool"), this);
+  mCenterToTooltipAction->setIcon(QIcon(":/icons/center_tool.png"));
   connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
 
-  mSaveDesktopAction = new QAction(tr("Save desktop"), this);
+//  mSaveDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/go-down-4.png"), tr("Save desktop"), this);
+  mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
   mSaveDesktopAction->setToolTip("Save desktop for workflow step");
   connect(mSaveDesktopAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
-
-  mResetDesktopAction = new QAction(tr("Reset desktop"), this);
+//  mResetDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/edit-undo-8.png"), tr("Reset desktop"), this);
+  mResetDesktopAction = new QAction(QIcon(":/icons/workflow_state_revert.png"), tr("Reset desktop"), this);
   mResetDesktopAction->setToolTip("Reset desktop for workflow step");
   connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
 
@@ -325,9 +331,15 @@ void MainWindow::centerToTooltipSlot()
 void MainWindow::updateTrackingActionSlot()
 {
   if (ssc::toolManager()->isTracking())
+  {
+    mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-green.png"));
     mTrackingToolsAction->setText("Stop Tracking");
+  }
   else
+  {
+    mTrackingToolsAction->setIcon(QIcon(":/icons/polaris-red.png"));
     mTrackingToolsAction->setText("Start Tracking");
+  }
 }
 
 void MainWindow::toggleTrackingSlot()
@@ -638,6 +650,9 @@ void MainWindow::createToolBars()
 {
   mDataToolBar = addToolBar("Data");
   mDataToolBar->setObjectName("DataToolBar");
+  mDataToolBar->addAction(mNewPatientAction);
+  mDataToolBar->addAction(mLoadFileAction);
+  mDataToolBar->addAction(mSaveFileAction);
   mDataToolBar->addAction(mImportDataAction);
   this->registerToolBar(mDataToolBar, "Toolbar");
 
@@ -674,7 +689,7 @@ void MainWindow::createToolBars()
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
-   this->registerToolBar(mToolToolBar, "Toolbar");
+   this->registerToolBar(camera3DViewToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)

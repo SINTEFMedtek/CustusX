@@ -529,6 +529,16 @@ void ViewManager::addDefaultLayouts()
     layout.setView(0, ssc::ptANYPLANE,  LayoutRegion(0, 1));
     this->addDefaultLayout(layout);
   }
+  {
+      LayoutData layout;
+      layout.resetUid("LAYOUT_US_Acquisition");
+      layout.setName("US Acquisition");
+      layout.resize(2,3);
+      layout.setView(0, ssc::ptANYPLANE,           LayoutRegion(1, 2, 1, 1));
+      layout.setView(0, ssc::View::VIEW_3D,        LayoutRegion(0, 2, 1, 1));
+      layout.setView(0, ssc::View::VIEW_REAL_TIME, LayoutRegion(0, 0, 2, 2));
+      this->addDefaultLayout(layout);
+    }
 }
 
 
@@ -783,10 +793,10 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
   QActionGroup* camGroup = new QActionGroup(NULL);
   camGroup->setExclusive(true);
 
-  this->addInteractorStyleAction("Unicam",        camGroup, "vtkInteractorStyleUnicam",           "Set 3D interaction to a single-button style, useful for touch screens.");
-  this->addInteractorStyleAction("Normal Camera", camGroup, "vtkInteractorStyleTrackballCamera",  "Set 3D interaction to the normal camera-oriented style.");
-  this->addInteractorStyleAction("Object",        camGroup, "vtkInteractorStyleTrackballActor",   "Set 3D interaction to a object-oriented style.");
-  this->addInteractorStyleAction("Flight",        camGroup, "vtkInteractorStyleFlight",           "Set 3D interaction to a flight style.");
+  this->addInteractorStyleAction("Unicam",        camGroup, "vtkInteractorStyleUnicam",           QIcon(":/icons/camera-u.png"), "Set 3D interaction to a single-button style, useful for touch screens.");
+  this->addInteractorStyleAction("Normal Camera", camGroup, "vtkInteractorStyleTrackballCamera",  QIcon(":/icons/camera-n.png"), "Set 3D interaction to the normal camera-oriented style.");
+  this->addInteractorStyleAction("Object",        camGroup, "vtkInteractorStyleTrackballActor",   QIcon(":/icons/camera-o.png"), "Set 3D interaction to a object-oriented style.");
+  this->addInteractorStyleAction("Flight",        camGroup, "vtkInteractorStyleFlight",           QIcon(":/icons/camera-f.png"), "Set 3D interaction to a flight style.");
 //
 //  QAction* unicamAction = new QAction("Unicam", camGroup);
 //  unicamAction->setCheckable(true);
@@ -816,12 +826,13 @@ QActionGroup* ViewManager::createInteractorStyleActionGroup()
   return camGroup;
 }
 
-void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QString helptext)
+void ViewManager::addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon, QString helptext)
 {
   ssc::View* view = viewManager()->get3DView();
   vtkRenderWindowInteractor* interactor = view->getRenderWindow()->GetInteractor();
 
   QAction* action = new QAction(caption, group);
+  action->setIcon(icon);
   action->setCheckable(true);
   action->setData(className);
   action->setToolTip(helptext);
