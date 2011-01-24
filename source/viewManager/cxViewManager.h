@@ -135,7 +135,7 @@ protected:
   void addDefaultLayout(LayoutData data);
   QAction* addLayoutAction(QString layout, QActionGroup* group);
 
-  void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QString helptext);
+  void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon, QString helptext);
   void loadGlobalSettings();
   void saveGlobalSettings();
 

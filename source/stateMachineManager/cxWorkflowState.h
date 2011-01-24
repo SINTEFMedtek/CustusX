@@ -72,6 +72,8 @@ public:
       return mAction;
 
     mAction = new QAction(this->getName(), group);
+    mAction->setIcon(this->getIcon());
+    mAction->setStatusTip(this->getName());
     mAction->setCheckable(true);
     mAction->setData(QVariant(this->getUid()));
     this->canEnterSlot();
@@ -94,6 +96,8 @@ protected slots:
 
 protected:
   virtual bool canEnter() const = 0;
+  virtual QIcon getIcon() const = 0;
+
 
   QString mUid;
   QString mName;
@@ -110,6 +114,7 @@ public:
   virtual void onEntry(QEvent * event ) { }
   virtual void onExit(QEvent * event ) { }
   virtual bool canEnter() const {return true;}
+  virtual QIcon getIcon() const { return QIcon(""); }
 };
 
 class PatientDataWorkflowState : public WorkflowState
@@ -122,6 +127,7 @@ public:
   {  };
 
   virtual ~PatientDataWorkflowState(){};
+  virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_patient_data.png"); }
 
   virtual bool canEnter() const {return true;};
 };
@@ -138,7 +144,7 @@ public:
   };
 
   virtual ~NavigationWorkflowState(){};
-
+  virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_navigation.png"); }
   virtual bool canEnter() const {return stateManager()->getPatientData()->isPatientValid();};
 };
 
@@ -154,6 +160,7 @@ public:
   };
 
   virtual ~RegistrationWorkflowState(){};
+  virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_registration.png"); }
 
   virtual bool canEnter() const
   {
@@ -238,12 +245,13 @@ class PreOpPlanningWorkflowState : public WorkflowState
 
 public:
   PreOpPlanningWorkflowState(QState* parent) :
-  WorkflowState(parent, "PreOpPlanningUid", "Pre Op Planning")
+  WorkflowState(parent, "PreOpPlanningUid", "Preoperative Planning")
   {
     connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
   };
 
   virtual ~PreOpPlanningWorkflowState(){};
+  virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_planning.png"); }
 
   virtual bool canEnter() const
   {
@@ -257,13 +265,19 @@ class IntraOpImagingWorkflowState : public WorkflowState
 
 public:
   IntraOpImagingWorkflowState(QState* parent) :
-  WorkflowState(parent, "IntraOpImagingUid", "Intra Op Imaging")
+  WorkflowState(parent, "IntraOpImagingUid", "Intraoperative Imaging")
   {
     connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
   };
 
   virtual ~IntraOpImagingWorkflowState(){};
+  virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_acquisition.png"); }
 
+  virtual void onEntry(QEvent * event )
+  {
+    ssc::toolManager()->startTracking();
+
+  }
   virtual bool canEnter() const
   {
     return stateManager()->getPatientData()->isPatientValid();
@@ -276,12 +290,13 @@ class PostOpControllWorkflowState : public WorkflowState
 
 public:
   PostOpControllWorkflowState(QState* parent) :
-  WorkflowState(parent, "PostOpControllUid", "Post Op Controll")
+  WorkflowState(parent, "PostOpControllUid", "Postoperative Control")
   {
     connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
   };
 
   virtual ~PostOpControllWorkflowState(){};
+  virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_post_op.png"); }
 
   virtual bool canEnter() const
   {
