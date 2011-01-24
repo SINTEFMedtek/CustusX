@@ -113,6 +113,8 @@ private:
   //void saveSettings();
   void createAlgorithm();
   QString generateImageName() const;
+
+  bool isValid(); ///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 
 }//namespace

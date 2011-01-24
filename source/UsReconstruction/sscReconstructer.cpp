@@ -125,6 +125,11 @@ void Reconstructer::setSettings()
     this->clearOutput();
     // reread everything.
     this->readFiles(mFilename, mCalFilesPath);
+    if(!this->isValid())
+    {
+      ssc::messageManager()->sendWarning("Cannot set settings, no valid frames available.");
+      return;
+    }
     ssc::messageManager()->sendInfo("set settings - " + newOrient);
   }
 
@@ -544,7 +549,7 @@ void Reconstructer::interpolatePositions()
     {
       mFrames.erase(mFrames.begin() + i_frame);
       mUsRaw->removeFrame(i_frame);
-      ssc::messageManager()->sendWarning("Removed input frame: " + qstring_cast(i_frame));
+      ssc::messageManager()->sendWarning("Time difference is too large.Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(fabs(mFrames[i_frame].mTime - mPositions[i_pos].mTime)) + " or "+ qstring_cast(fabs(mFrames[i_frame].mTime - mPositions[i_pos+1].mTime)));
     }
     else
     {      
@@ -954,6 +959,15 @@ QString Reconstructer::generateImageName() const
 
   return name;
 }
+bool Reconstructer::isValid()
+{
+  bool valid = false;
+
+  if(!mFrames.empty())
+    valid = true;
+
+  return valid;
+}
 
 /**
  * Pre:  All data read, mExtent is calculated
@@ -1022,7 +1036,7 @@ ImagePtr Reconstructer::generateOutputVolume()
 
 void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 {
-  //std::cout << "calFilesPath: " << string_cast(calFilesPath) << std::endl;
+  std::cout << "calFilesPath: " << string_cast(calFilesPath) << std::endl;
   this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
@@ -1030,7 +1044,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
   {
     // There may not be any files here due to the automatic calling of the function
-    //std::cout << "File not found: " << changeExtension(fileName, "mhd") <<", reconstruct load failed" << std::endl;
+    std::cout << "File not found: " << changeExtension(fileName, "mhd") <<", reconstruct load failed" << std::endl;
     return;
   }
 
@@ -1062,7 +1076,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
     mMask = this->createMaskFromConfigParams();
   }
 
-  // Only use this if the time stamps have different formats
+  // Only use this if the time stamps have different formatsh
   // The function assumes that both lists of time stamps start at the same time,
   // and that is not completely corrcet.
   //this->calibrateTimeStamps();
@@ -1074,6 +1088,11 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 
   this->interpolatePositions();
   // mFrames: now mPos as prMu
+  if(!this->isValid())
+  {
+    ssc::messageManager()->sendError("No frames with valid positions.");
+    return;
+  }
 
   this->findExtentAndOutputTransform();
 //  mOutput = this->generateOutputVolume();
@@ -1089,6 +1108,11 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
   //std::cout << "Use calibration file: " << calFileName << std::endl;
 
   this->readFiles(mhdFileName, calFilesPath);
+  if(!this->isValid())
+  {
+    ssc::messageManager()->sendWarning("Cannot reconstruct, no valid frames available.");
+    return ImagePtr();
+  }
   mOutput = this->generateOutputVolume();
 
   this->reconstruct();
