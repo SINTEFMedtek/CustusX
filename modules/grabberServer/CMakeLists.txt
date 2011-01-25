@@ -83,6 +83,7 @@ SET(${LIBNAME}_MOC_HDRS
     cxServer.h
     cxGrabberServer.h
     cxOpenIGTLinkSession.h
+    cxIGTLinkImageMessage.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -103,6 +104,7 @@ SET(SOURCES
     cxServer.cpp
     cxGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
+    cxIGTLinkImageMessage.cpp
     ${${LIBNAME}_MOC_HDRS}
     ${${LIBNAME}_MOC_SRCS}
 )
