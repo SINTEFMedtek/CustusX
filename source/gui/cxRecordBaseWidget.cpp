@@ -254,7 +254,7 @@ void USAcqusitionWidget::rtSourceChangedSlot()
   {
     //ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-    mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+    mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
   }
   this->checkIfReadySlot();
 }
@@ -274,6 +274,8 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
   ToolPtr probe = TrackedRecordWidget::getTool();
   UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
   filemaker.write();
+
+  mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
 }
 
 void USAcqusitionWidget::startedSlot()
