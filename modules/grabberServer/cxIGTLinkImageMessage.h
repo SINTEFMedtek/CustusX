@@ -13,13 +13,13 @@ namespace cx
  * \date Jan 25, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class IGTLinkImageMessage : public ImageMessage
+class IGTLCommon_EXPORT IGTLinkImageMessage : public igtl::ImageMessage
 {
 public:
   typedef IGTLinkImageMessage       Self;
-  typedef ImageMessage              Superclass;
-  typedef SmartPointer<Self>        Pointer;
-  typedef SmartPointer<const Self>  ConstPointer;
+  typedef igtl::ImageMessage        Superclass;
+  typedef igtl::SmartPointer<Self>        Pointer;
+  typedef igtl::SmartPointer<const Self>  ConstPointer;
 
   igtlTypeMacro(IGTLinkImageMessage, igtl::ImageMessage)
   igtlNewMacro(IGTLinkImageMessage);
@@ -27,8 +27,11 @@ public:
 public:
   // Pack() serializes the header and body based on the member variables.
   // PackBody() must be implemented in the child class.
-  int Pack()
-  {std::cout << "New pack..." << std::endl;};
+  int Pack();
+
+protected:
+  IGTLinkImageMessage();
+  ~IGTLinkImageMessage();
 
 private:
 };
