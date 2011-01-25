@@ -28,7 +28,7 @@ int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::P
   // If you want to skip CRC check, call Unpack() without argument.
   int c = transMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the transform data
     igtl::Matrix4x4 matrix;
@@ -57,7 +57,7 @@ int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Po
   // If you want to skip CRC check, call Unpack() without argument.
   int c = positionMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the transform data
     float position[3];
@@ -96,7 +96,7 @@ int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Poin
   // If you want to skip CRC check, call Unpack() without argument.
   int c = statusMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     std::cerr << "========== STATUS ==========" << std::endl;
     std::cerr << " Code      : " << statusMsg->GetCode() << std::endl;
@@ -300,7 +300,7 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
   // If you want to skip CRC check, call Unpack() without argument.
   int c = imgMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the image data
     int size[3]; // image dimension
