@@ -5,7 +5,8 @@
 #include <QThread>
 #include <QMutex>
 #include <QTcpSocket>
-#include "igtlImageMessage.h"
+//#include "igtlImageMessage.h"
+#include "cxIGTLinkImageMessage.h"
 #include "cxGrabber.h"
 
 namespace cx
@@ -67,14 +68,18 @@ signals:
   void imageOnQueue(); ///< Emitted when there is a new igtl::ImageMessage is in the message queue
 
 private:
-  igtl::ImageMessage::Pointer convertFrame(Frame& frame); ///< Converst the frame into a OpenIGTLink ImageMessage
-  void addImageToQueue(igtl::ImageMessage::Pointer imgMsg); ///< Adds a OpenIGTLink ImageMessage to the queue
-  igtl::ImageMessage::Pointer getLastImageMessageFromQueue(); ///< Gets the oldes message from the queue-
+  //igtl::ImageMessage::Pointer convertFrame(Frame& frame); ///< Converst the frame into a OpenIGTLink ImageMessage
+  IGTLinkImageMessage::Pointer convertFrame(Frame& frame); ///< Converst the frame into a OpenIGTLink ImageMessage
+  //void addImageToQueue(igtl::ImageMessage::Pointer imgMsg); ///< Adds a OpenIGTLink ImageMessage to the queue
+  void addImageToQueue(IGTLinkImageMessage::Pointer imgMsg); ///< Adds a OpenIGTLink ImageMessage to the queue
+  //igtl::ImageMessage::Pointer getLastImageMessageFromQueue(); ///< Gets the oldes message from the queue-
+  IGTLinkImageMessage::Pointer getLastImageMessageFromQueue(); ///< Gets the oldes message from the queue-
 
   QTcpSocket* mSocket; ///< The socket to send messages to.
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
-  std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
+  //std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
+  std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
 
 };
 
