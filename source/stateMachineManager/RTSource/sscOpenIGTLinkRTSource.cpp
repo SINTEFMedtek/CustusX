@@ -150,13 +150,20 @@ bool OpenIGTLinkRTSource::isStreaming() const
 void OpenIGTLinkRTSource::connectedSlot(bool on)
 {
   mConnected = on;
+
+  if (!on)
+    this->disconnectServer();
+
   emit connected(on);
 }
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
 {
   if (mClient)
+  {
+    std::cout << "no client - returning" << std::endl;
     return;
+  }
 //  std::cout << "OpenIGTLinkRTSource::connect to server" << std::endl;
   mClient.reset(new IGTLinkClient(address, port, this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
@@ -179,10 +186,9 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
   this->updateImage(mClient->getLastImageMessage());
 }
 
-
 void OpenIGTLinkRTSource::disconnectServer()
 {
-  //std::cout << "IGTLinkWidget::disconnect server" << std::endl;
+  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
   if (mClient)
   {
     mClient->quit();
@@ -204,6 +210,7 @@ void OpenIGTLinkRTSource::disconnectServer()
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
 {
+  std::cout << "IGTLinkWidget::clientFinishedSlot" << std::endl;
   if (!mClient)
     return;
   if (mClient->isRunning())
