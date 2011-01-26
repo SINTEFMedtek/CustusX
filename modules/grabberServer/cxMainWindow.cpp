@@ -1,11 +1,12 @@
 #include "cxMainWindow.h"
 
 #include <QDockWidget>
+#include "iostream"
 
 namespace cx
 {
 
-MainWindow::MainWindow() :
+MainWindow::MainWindow(QStringList arguments) :
   QMainWindow(0),
   mConsoleWidget(new ssc::ConsoleWidget(this))
 {
@@ -20,9 +21,18 @@ MainWindow::MainWindow() :
   consoleDockWidget->setVisible(true); // default visibility
 
   this->setMinimumSize(800,600);
+
+  this->handleArguments(arguments);
 }
 
 MainWindow::~MainWindow()
 {}
 
+void MainWindow::handleArguments(QStringList& arguments)
+{
+  if(arguments.contains("--auto"))
+  {
+    mGrabberServerWidget->startServerSlot(true);
+  }
+}
 }//namespace cx
