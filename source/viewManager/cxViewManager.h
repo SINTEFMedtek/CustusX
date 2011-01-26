@@ -91,6 +91,7 @@ public:
   void setSmartRender(bool on);
   RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
+
 signals:
   void imageDeletedFromViews(ssc::ImagePtr image);///< Emitted when an image is deleted from the views in the cxViewManager
   void fps(int number);///< Emits number of frames per second
@@ -176,6 +177,7 @@ protected:
 
   ViewCache<View2D> mViewCache2D;
   ViewCache<View3D> mViewCache3D;
+  ViewCache<ssc::View> mViewCacheRT;
   InteractiveClipperPtr mInteractiveClipper;
   InteractiveCropperPtr mInteractiveCropper;
 

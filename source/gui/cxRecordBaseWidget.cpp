@@ -21,6 +21,8 @@
 #include "cxViewManager.h"
 #include "cxView3D.h"
 #include "cxUsReconstructionFileMaker.h"
+#include "cxToolPropertiesWidget.h"
+#include "RTSource/cxOpenIGTLinkConnection.h"
 
 namespace cx
 {
@@ -195,15 +197,19 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
 
-  mRTSourceDataAdapter = SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter());
+//  mRTSourceDataAdapter = SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter());
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 
-  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
+  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
+//  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New());
+//  mToptopLayout->addWidget(mUSSectorConfigBox);
+
+//  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
   mLayout->addStretch();
 
-  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
+//  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
 
   this->checkIfReadySlot();
   this->rtSourceChangedSlot();
@@ -214,20 +220,23 @@ USAcqusitionWidget::~USAcqusitionWidget()
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
+  bool tracking = ssc::toolManager()->isTracking();
+  bool streaming = mRTSource && mRTSource->isStreaming();
+
   //std::cout << "void USAcqusitionWidget::checkIfReadySlot()" << std::endl;
-  if(ssc::toolManager()->isTracking() && mRTSource && mRTSource->isStreaming() && mRTRecorder)
+  if(tracking && streaming && mRTRecorder)
   {
     RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font><br>");
-    emit ready(true);
+//    emit ready(true);
   }
   else
   {
     QString whatsMissing("");
-    if(!ssc::toolManager()->isTracking())
+    if(!tracking)
       whatsMissing.append("<font color=red>Need to start tracking.</font><br>");
     if(mRTSource)
     {
-      if(!mRTSource->isStreaming())
+      if(!streaming)
         whatsMissing.append("<font color=red>Need to start streaming.</font><br>");
     }else
     {
@@ -237,8 +246,11 @@ void USAcqusitionWidget::checkIfReadySlot()
        whatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
 
     RecordBaseWidget::setWhatsMissingInfo(whatsMissing);
-    emit ready(false);
+//    emit ready(false);
   }
+
+  // do not require tracking to be present in order to perform an acquisition.
+  emit ready(streaming && mRTRecorder);
 }
 
 void USAcqusitionWidget::rtSourceChangedSlot()
@@ -248,7 +260,8 @@ void USAcqusitionWidget::rtSourceChangedSlot()
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
   }
 
-  mRTSource = mRTSourceDataAdapter->getRTSource();
+//  mRTSource = mRTSourceDataAdapter->getRTSource();
+  mRTSource = stateManager()->getIGTLinkConnection()->getRTSource();
 
   if(mRTSource)
   {
@@ -267,8 +280,8 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
   ssc::TimedTransformMap trackerRecordedData = TrackedRecordWidget::getRecording(session);
   if(trackerRecordedData.empty())
   {
-    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
-    return;
+    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Volume data only will be written.");
+//    return;
   }
 
   ToolPtr probe = TrackedRecordWidget::getTool();

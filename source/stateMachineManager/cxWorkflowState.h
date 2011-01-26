@@ -7,11 +7,7 @@
 #include <QString>
 #include <QAction>
 #include "sscTypeConversions.h"
-#include "sscDataManager.h"
 #include "cxRequestEnterStateTransition.h"
-#include "cxStateMachineManager.h"
-#include "cxPatientData.h"
-#include "cxViewManager.h"
 #include "sscMessageManager.h"
 
 namespace cx
@@ -38,12 +34,7 @@ public:
 
   virtual ~WorkflowState(){};
 
-  virtual void onEntry(QEvent * event )
-  {
-    ssc::messageManager()->sendInfo("Workflow change to [" + mName + "]");
-    if(mAction)
-      mAction->setChecked(true);
-  };
+  virtual void onEntry(QEvent * event );
   virtual void onExit(QEvent * event )
   {
     //std::cout << "Exiting "<< mName << std::endl;
@@ -52,52 +43,16 @@ public:
   virtual QString getUid() const {return mUid;};
   virtual QString getName() const {return mName;};
 
-  std::vector<WorkflowState*> getChildStates()
-  {
-    QObjectList childrenList = this->children();
-    std::vector<WorkflowState*> retval;
-    for (int i=0; i<childrenList.size(); ++i)
-    {
-      WorkflowState* state = dynamic_cast<WorkflowState*>(childrenList[i]);
-      if (state)
-        retval.push_back(state);
-    }
-    return retval;
-  }
-
-
-  QAction* createAction(QActionGroup* group)
-  {
-    if(mAction)
-      return mAction;
-
-    mAction = new QAction(this->getName(), group);
-    mAction->setIcon(this->getIcon());
-    mAction->setStatusTip(this->getName());
-    mAction->setCheckable(true);
-    mAction->setData(QVariant(this->getUid()));
-    this->canEnterSlot();
-
-    connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
-
-    return mAction;
-  };
+  std::vector<WorkflowState*> getChildStates();
+  QAction* createAction(QActionGroup* group);
 
 protected slots:
-  void canEnterSlot()
-  {
-    if (mAction) mAction->setEnabled(this->canEnter());
-  };
-
-  void setActionSlot()
-  {
-    this->machine()->postEvent(new RequestEnterStateEvent(this->getUid()));
-  };
+  void canEnterSlot();
+  void setActionSlot();
 
 protected:
   virtual bool canEnter() const = 0;
   virtual QIcon getIcon() const = 0;
-
 
   QString mUid;
   QString mName;
@@ -137,15 +92,11 @@ class NavigationWorkflowState : public WorkflowState
   Q_OBJECT
 
 public:
-  NavigationWorkflowState(QState* parent) :
-  WorkflowState(parent, "NavigationUid", "Navigation")
-  {
-    connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
-  };
-
+  NavigationWorkflowState(QState* parent);
   virtual ~NavigationWorkflowState(){};
   virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_navigation.png"); }
-  virtual bool canEnter() const {return stateManager()->getPatientData()->isPatientValid();};
+  virtual void onEntry(QEvent* event);
+  virtual bool canEnter() const;
 };
 
 class RegistrationWorkflowState : public WorkflowState
@@ -153,19 +104,12 @@ class RegistrationWorkflowState : public WorkflowState
   Q_OBJECT
 
 public:
-  RegistrationWorkflowState(QState* parent) :
-  WorkflowState(parent, "RegistrationUid", "Registration")
-  {
-    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
-  };
+  RegistrationWorkflowState(QState* parent);
 
   virtual ~RegistrationWorkflowState(){};
   virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_registration.png"); }
 
-  virtual bool canEnter() const
-  {
-    return !ssc::dataManager()->getImages().empty();
-  };
+  virtual bool canEnter() const;
 };
 
 /*class ImageRegistrationWorkflowState : public WorkflowState
@@ -244,19 +188,12 @@ class PreOpPlanningWorkflowState : public WorkflowState
   Q_OBJECT
 
 public:
-  PreOpPlanningWorkflowState(QState* parent) :
-  WorkflowState(parent, "PreOpPlanningUid", "Preoperative Planning")
-  {
-    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
-  };
+  PreOpPlanningWorkflowState(QState* parent);
 
   virtual ~PreOpPlanningWorkflowState(){};
   virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_planning.png"); }
 
-  virtual bool canEnter() const
-  {
-    return !ssc::dataManager()->getImages().empty();
-  }
+  virtual bool canEnter() const;
 };
 
 class IntraOpImagingWorkflowState : public WorkflowState
@@ -264,24 +201,12 @@ class IntraOpImagingWorkflowState : public WorkflowState
   Q_OBJECT
 
 public:
-  IntraOpImagingWorkflowState(QState* parent) :
-  WorkflowState(parent, "IntraOpImagingUid", "Intraoperative Imaging")
-  {
-    connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
-  };
-
+  IntraOpImagingWorkflowState(QState* parent);
   virtual ~IntraOpImagingWorkflowState(){};
   virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_acquisition.png"); }
 
-  virtual void onEntry(QEvent * event )
-  {
-    ssc::toolManager()->startTracking();
-
-  }
-  virtual bool canEnter() const
-  {
-    return stateManager()->getPatientData()->isPatientValid();
-  }
+  virtual void onEntry(QEvent* event);
+  virtual bool canEnter() const;
 };
 
 class PostOpControllWorkflowState : public WorkflowState
@@ -289,19 +214,11 @@ class PostOpControllWorkflowState : public WorkflowState
   Q_OBJECT
 
 public:
-  PostOpControllWorkflowState(QState* parent) :
-  WorkflowState(parent, "PostOpControllUid", "Postoperative Control")
-  {
-    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(canEnterSlot()));
-  };
-
+  PostOpControllWorkflowState(QState* parent);
   virtual ~PostOpControllWorkflowState(){};
   virtual QIcon getIcon() const { return QIcon(":/icons/workflow_state_post_op.png"); }
 
-  virtual bool canEnter() const
-  {
-    return !ssc::dataManager()->getImages().empty();
-  }
+  virtual bool canEnter() const;
 };
 
 }

@@ -73,7 +73,8 @@ ViewManager::ViewManager() :
   mGlobal2DZoom(true),
   mGlobalObliqueOrientation(false),
   mViewCache2D(mMainWindowsCentralWidget,"View2D"),
-  mViewCache3D(mMainWindowsCentralWidget,"View3D")
+  mViewCache3D(mMainWindowsCentralWidget,"View3D"),
+  mViewCacheRT(mMainWindowsCentralWidget,"ViewRT")
 {
   mRenderTimer.reset(new RenderTimer);
 
@@ -102,16 +103,14 @@ ViewManager::ViewManager() :
   // set start layout
   this->setActiveLayout("LAYOUT_3DACS_2X2");
 
-  mRenderingTimer->start(mSettings->value("renderingInterval").toInt());
-  connect(mRenderingTimer, SIGNAL(timeout()),
-          this, SLOT(renderAllViewsSlot()));
-  
-//  mShadingOn = mSettings->value("shadingOn").toBool();
+  int interval = mSettings->value("renderingInterval").toInt();
+  if (interval==0)
+	  interval = 30;
+  mRenderingTimer->start(interval);
+  connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(renderAllViewsSlot()));
 
   mGlobalZoom2DVal = SyncedValue::create(1);
   this->setGlobal2DZoom(mGlobal2DZoom);
-
-//  mRenderingTime->start();
 }
 
 ViewManager::~ViewManager()
@@ -314,6 +313,7 @@ void ViewManager::deactivateCurrentLayout()
 {
   mViewCache2D.clearUsedViews();
   mViewCache3D.clearUsedViews();
+  mViewCacheRT.clearUsedViews();
   mViewMap.clear();
 
   for (unsigned i=0; i< mViewGroups.size(); ++i)
@@ -426,7 +426,7 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
-  View2D* view = mViewCache2D.retrieveView();
+  ssc::View* view = mViewCacheRT.retrieveView();
   QColor background = mSettings->value("backgroundColor").value<QColor>();
   view->setBackgoundColor(background);
   ViewWrapperRTStreamPtr wrapper(new ViewWrapperRTStream(view));
