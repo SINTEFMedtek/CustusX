@@ -51,6 +51,19 @@ View::View(QWidget *parent, Qt::WFlags f) :
 	clear();
 }
 
+View::View(const QString& uid, const QString& name, QWidget *parent, Qt::WFlags f) :
+  ViewParent(parent, f), mRenderWindow( ViewRenderWindowPtr::New()), mZoomFactor(-1.0) // set zoom to negative value to signify invalid.
+{
+  mMTimeHash = 0;
+  mBackgroundColor = QColor("black");
+  this->SetRenderWindow(mRenderWindow);
+  clear();
+
+  mUid = uid;
+  mName = name;
+//  this->setContextMenuPolicy(Qt::CustomContextMenu);
+}
+
 View::~View()
 {
 }
