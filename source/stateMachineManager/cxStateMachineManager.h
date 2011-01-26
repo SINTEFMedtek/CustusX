@@ -11,6 +11,7 @@
 
 namespace cx
 {
+typedef boost::shared_ptr<class IGTLinkConnection> IGTLinkConnectionPtr;
 
 struct Desktop
 {
@@ -40,6 +41,7 @@ public:
   WorkflowStateMachinePtr getWorkflow();
   ApplicationStateMachinePtr getApplication();
   PatientDataPtr getPatientData();
+  IGTLinkConnectionPtr getIGTLinkConnection();
 
   Desktop getActiveDesktop();
   void saveDesktop(Desktop desktop);
@@ -68,6 +70,7 @@ private:
   WorkflowStateMachinePtr mWorkflowStateMachine;
   ApplicationStateMachinePtr mApplicationStateMachine;
   PatientDataPtr mPatientData;
+  IGTLinkConnectionPtr mIGTLinkConnection;
 
   std::vector<RecordSessionPtr> mRecordSessions;
 };

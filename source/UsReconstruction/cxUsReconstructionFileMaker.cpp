@@ -210,6 +210,8 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 
 QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFolder)
 {
+  if (!mTool)
+    return "";
   QString calibFileName = mTool->getCalibrationFileName();
   QFile calibFile(calibFileName);
   QFileInfo info(calibFile);

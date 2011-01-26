@@ -22,7 +22,7 @@ class RecordSessionWidget : public QWidget
 
 public:
   RecordSessionWidget(QWidget* parent, QString defaultDescription = "Record Session");
-  ~RecordSessionWidget();
+  virtual ~RecordSessionWidget();
 
 signals:
   void started();
@@ -34,6 +34,7 @@ protected:
 
 private slots:
   void startStopSlot(bool);
+  void cancelSlot();
 
 private:
   void startRecording();
@@ -43,6 +44,7 @@ private:
   void reset();
 
   QPushButton* mStartStopButton;
+  QPushButton* mCancelButton;
   QLineEdit* mDescriptionLine;
   double mStartTimeMSec;
   double mStopTimeMSec;

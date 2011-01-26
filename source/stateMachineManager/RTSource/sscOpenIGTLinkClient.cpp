@@ -292,16 +292,20 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
     //std::cout << "Incomplete body received, ignoring. " << std::endl;
     return false;
   }
-  //std::cout << "Receiving IMAGE data type." << std::endl;
 
   socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
   // Deserialize the transform data
   // If you want to do a CRC check, call Unpack(1).
   // If you want to skip CRC check, call Unpack() without argument.
+//  std::cout << "unpack" << std::endl;
   int c = imgMsg->Unpack();
+//  int a = (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
+//  int b = c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
+//  std::cout << "finished unpack " << c << " " << a << " " << b  << std::endl;
 
   if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
+//    std::cout << "ok" << std::endl;
     // Retrive the image data
     int size[3]; // image dimension
     float spacing[3]; // spacing (mm/pixel)
