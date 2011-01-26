@@ -1,6 +1,7 @@
 #include <QApplication>
 
 #include "cxMainWindow.h"
+#include <iostream>
 
 
 int main(int argc, char **argv)
@@ -13,9 +14,21 @@ int main(int argc, char **argv)
   app.setOrganizationDomain("www.sintef.no");
   app.setApplicationName("Grabber Server");
 
-  cx::MainWindow window;
+  /*int i;
+  printf("argc = %d\n", argc);
+
+  for (i = 0; i<argc; i++)
+    printf("argv[%d] = %s\n", i, argv[i]);*/
+
+  QStringList arguments;
+  for(int i=1; i<argc ; ++i)
+  {
+    arguments.push_back(QString(argv[i]));
+  }
+
+  cx::MainWindow window(arguments);
   window.show();
-  #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
+#ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   window.activateWindow();
 #endif
   window.raise();

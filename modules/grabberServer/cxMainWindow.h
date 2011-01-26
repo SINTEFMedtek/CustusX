@@ -19,8 +19,10 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 public:
-  MainWindow();
+  MainWindow(QStringList arguments = QStringList());
   ~MainWindow();
+
+  void handleArguments(QStringList& arguments);
 
 private:
   GrabberServerWidget* mGrabberServerWidget;
