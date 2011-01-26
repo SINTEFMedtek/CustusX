@@ -49,13 +49,13 @@ OpenIGTLinkSender::~OpenIGTLinkSender()
 
 void OpenIGTLinkSender::receiveFrameSlot(Frame& frame)
 {
-  igtl::ImageMessage::Pointer imgMsg = convertFrame(frame);
+  IGTLinkImageMessage::Pointer imgMsg = convertFrame(frame);
   this->addImageToQueue(imgMsg);
 }
 
-igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
+IGTLinkImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
 {
-  igtl::ImageMessage::Pointer retval = igtl::ImageMessage::New();
+  IGTLinkImageMessage::Pointer retval = IGTLinkImageMessage::New();
 
   //extract data needed variables from the frame
   int size[] = {frame.mWidth, frame.mHeight, 1};
@@ -91,14 +91,15 @@ igtl::ImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
 
 void OpenIGTLinkSender::sendOpenIGTLinkImageSlot()
 {
-  igtl::ImageMessage::Pointer message = this->getLastImageMessageFromQueue();
+  //igtl::ImageMessage::Pointer message = this->getLastImageMessageFromQueue();
+  IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
   message->Pack();
   mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
 }
 
 /** Add the message to a thread-safe queue
  */
-void OpenIGTLinkSender::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
+void OpenIGTLinkSender::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 {
   QMutexLocker sentry(&mImageMutex);
   mMutexedImageMessageQueue.push_back(imgMsg);
@@ -109,12 +110,12 @@ void OpenIGTLinkSender::addImageToQueue(igtl::ImageMessage::Pointer imgMsg)
 
 /** Threadsafe retrieval of last image message.
  */
-igtl::ImageMessage::Pointer OpenIGTLinkSender::getLastImageMessageFromQueue()
+IGTLinkImageMessage::Pointer OpenIGTLinkSender::getLastImageMessageFromQueue()
 {
   QMutexLocker sentry(&mImageMutex);
   if (mMutexedImageMessageQueue.empty())
-    return igtl::ImageMessage::Pointer();
-  igtl::ImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
+    return IGTLinkImageMessage::Pointer();
+  IGTLinkImageMessage::Pointer retval = mMutexedImageMessageQueue.front();
   mMutexedImageMessageQueue.pop_front();
   return retval;
 }
