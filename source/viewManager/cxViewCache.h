@@ -32,10 +32,12 @@ public:
    */
   VIEW_TYPE* retrieveView()
   {
+//    mCached.clear();
     if (mCached.empty())
     {
       QString uid = qstring_cast(mTypeText) + "-" + qstring_cast(mNameGenerator++);
       VIEW_TYPE* view = new VIEW_TYPE(uid, uid, mCentralWidget);
+      view->setContextMenuPolicy(Qt::CustomContextMenu);
       view->hide();
       //Turn off rendering in vtkRenderWindowInteractor
       view->getRenderWindow()->GetInteractor()->EnableRenderOff();
