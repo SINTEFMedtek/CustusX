@@ -10,6 +10,7 @@
 #include "cxPatientData.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
+#include "RTSource/cxOpenIGTLinkConnection.h"
 
 namespace cx
 {
@@ -145,6 +146,8 @@ void StateManager::initialize()
 
   mPatientData.reset(new PatientData());
 
+  mIGTLinkConnection.reset(new IGTLinkConnection());
+
   mApplicationStateMachine.reset(new ApplicationStateMachine());
   mApplicationStateMachine->start();
 
@@ -155,6 +158,11 @@ void StateManager::initialize()
 PatientDataPtr StateManager::getPatientData()
 {
   return mPatientData;
+}
+
+IGTLinkConnectionPtr StateManager::getIGTLinkConnection()
+{
+  return mIGTLinkConnection;
 }
 
 Desktop StateManager::getActiveDesktop()
