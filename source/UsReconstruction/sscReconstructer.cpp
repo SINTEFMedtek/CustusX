@@ -1033,6 +1033,28 @@ ImagePtr Reconstructer::generateOutputVolume()
   return image;
 }
 
+void Reconstructer::selectData(QString filename)
+{
+  if(filename.isEmpty())
+  {
+    ssc::messageManager()->sendWarning("no file selected");
+    return;
+  }
+
+  //mInputFile = filename;
+
+//  this->updateComboBox();
+//  mDataComboBox->setToolTip(mInputFile);
+
+  // read data into reconstructer
+
+  QStringList list = filename.split("/");
+  list[list.size()-1] = "";
+  QString calFilesPath = list.join("/")+"/";
+  this->readFiles(filename, calFilesPath);
+
+  emit inputDataSelected(filename);
+}
 
 void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 {
@@ -1075,6 +1097,10 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
     //mMask = this->generateMask();
     mMask = this->createMaskFromConfigParams();
   }
+
+
+  if (mFrames.empty() || mPositions.empty())
+    return;
 
   // Only use this if the time stamps have different formatsh
   // The function assumes that both lists of time stamps start at the same time,

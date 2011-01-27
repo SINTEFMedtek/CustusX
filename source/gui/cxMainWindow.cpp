@@ -64,7 +64,7 @@ MainWindow::MainWindow() :
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
+//  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
@@ -72,6 +72,8 @@ MainWindow::MainWindow() :
   mControlPanel(NULL),
   mSettings(DataLocations::getSettings())
 {
+  mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
+
   ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));

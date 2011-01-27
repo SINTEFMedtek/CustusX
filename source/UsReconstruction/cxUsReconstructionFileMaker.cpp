@@ -32,7 +32,7 @@ UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trac
 UsReconstructionFileMaker::~UsReconstructionFileMaker()
 {}
 
-void UsReconstructionFileMaker::write()
+QString UsReconstructionFileMaker::write()
 {
   QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSession);
 
@@ -42,12 +42,20 @@ void UsReconstructionFileMaker::write()
   QString calibrationFile = this->copyCalibrationFile(reconstructionFolder);
   this->writeUSImages(reconstructionFolder, calibrationFile);
   this->copyProbeCalibConfigsXml(reconstructionFolder);
+
+  return reconstructionFolder;
+}
+
+QString UsReconstructionFileMaker::getMhdFilename(QString reconstructionFolder)
+{
+  QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
+  return mhdFilename;
 }
 
 QString UsReconstructionFileMaker::makeFolder(QString patientFolder, RecordSessionPtr session)
 {
   QString retval("");
-  QDir patientDir(patientFolder);
+  QDir patientDir(patientFolder + "/US_Acq");
 
   QString subfolder = session->getDescription();
   QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
@@ -165,7 +173,8 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
 
 void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
-  QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
+  QString mhdFilename = this->getMhdFilename(reconstructionFolder);
+//  QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
 
   vtkImageDataPtr usData = this->mergeFrames();
 

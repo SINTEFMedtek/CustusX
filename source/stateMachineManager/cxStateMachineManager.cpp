@@ -11,6 +11,7 @@
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 #include "RTSource/cxOpenIGTLinkConnection.h"
+#include "sscReconstructer.h"
 
 namespace cx
 {
@@ -148,6 +149,9 @@ void StateManager::initialize()
 
   mIGTLinkConnection.reset(new IGTLinkConnection());
 
+  ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
+  mReconstructer.reset(new ssc::Reconstructer(xmlFile, DataLocations::getShaderPath()));
+
   mApplicationStateMachine.reset(new ApplicationStateMachine());
   mApplicationStateMachine->start();
 
@@ -163,6 +167,11 @@ PatientDataPtr StateManager::getPatientData()
 IGTLinkConnectionPtr StateManager::getIGTLinkConnection()
 {
   return mIGTLinkConnection;
+}
+
+ssc::ReconstructerPtr StateManager::getReconstructer()
+{
+  return mReconstructer;
 }
 
 Desktop StateManager::getActiveDesktop()
