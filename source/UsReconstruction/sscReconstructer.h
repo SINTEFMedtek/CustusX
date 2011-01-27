@@ -114,7 +114,10 @@ private:
   void clearOutput();
   //void saveSettings();
   void createAlgorithm();
-  QString generateImageName() const;
+
+  QString generateOutputUid();
+  QString generateImageName(QString uid) const;
+
 
   bool isValid(); ///< checks if internal states is valid (that it actually has frames to reconstruct)
 };

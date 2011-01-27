@@ -24,6 +24,7 @@
 #include "cxToolPropertiesWidget.h"
 #include "RTSource/cxOpenIGTLinkConnection.h"
 #include  "sscReconstructer.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -31,8 +32,8 @@ namespace cx
 RecordBaseWidget::RecordBaseWidget(QWidget* parent, QString description):
     QWidget(parent),
     mLayout(new QVBoxLayout(this)),
-    mInfoLabel(new QLabel("Will never be ready... Derive from this class!")),
-    mRecordSessionWidget(new RecordSessionWidget(this, description))
+    mRecordSessionWidget(new RecordSessionWidget(this, description)),
+    mInfoLabel(new QLabel("Will never be ready... Derive from this class!"))
 {
   this->setObjectName("RecordBaseWidget");
   this->setWindowTitle("Record Base");
@@ -193,10 +194,12 @@ void TrackedCenterlineWidget::stoppedSlot()
 }
 //----------------------------------------------------------------------------------------------------------------------
 USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, "US Acquisition")
+    TrackedRecordWidget(parent, DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString())
 {
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
+
+  mRecordSessionWidget->setDescriptionVisibility(false);
 
 //  mRTSourceDataAdapter = SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter());
 
@@ -296,6 +299,8 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 
 void USAcqusitionWidget::startedSlot()
 {
+  mRecordSessionWidget->setDescription(DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString());
+
   mRTRecorder->startRecord();
 }
 
