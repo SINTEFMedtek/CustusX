@@ -132,18 +132,55 @@ ApplicationStateMachinePtr StateManager::getApplication()
   return mApplicationStateMachine;
 }
 
-void StateManager::initialize()
+template<class T>
+void StateManager::fillDefault(QString name, T value)
 {
   QSettingsPtr settings = DataLocations::getSettings();
-  // Initialize settings if empty
-  if (!settings->contains("globalPatientDataFolder"))
-    settings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
-  if (!settings->contains("globalApplicationName"))
-    settings->setValue("globalApplicationName", "Lab");
-  if (!settings->contains("globalPatientNumber"))
-    settings->setValue("globalPatientNumber", 1);
+  if (!settings->contains(name))
+    settings->setValue(name, value);
+}
+
+/**Enter all default QSettings here.
+ *
+ */
+void StateManager::fillDefaultSettings()
+{
+  this->fillDefault("Automation/autoStartTracking", true);
+  this->fillDefault("Automation/autoStartStreaming", true);
+  this->fillDefault("Automation/autoReconstruct", true);
+  this->fillDefault("renderingInterval", 33);
+  this->fillDefault("globalPatientDataFolder", QDir::homePath()+"/Patients");
+  this->fillDefault("globalApplicationName", "Lab");
+  this->fillDefault("globalPatientNumber", 1);
+  this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
+
+//
+//
+//  if (!settings->contains("Automation/autoStartTracking"))
+//    settings->setValue("Automation/autoStartTracking", true);
+//  if (!settings->contains("Automation/autoStartStreaming"))
+//    settings->setValue("Automation/autoStartStreaming", true);
+//  if (!settings->contains("Automation/autoReconstruct"))
+//    settings->setValue("Automation/autoReconstruct", true);
+
+//  // Initialize settings if empty
+//  if (!settings->contains("renderingInterval"))
+//    settings->setValue("renderingInterval", 33);
+////  if (!settings->contains("shadingOn"))
+////    settings->setValue("shadingOn", true);
+//  if (!settings->contains("globalPatientDataFolder"))
+//    settings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
+//  if (!settings->contains("globalApplicationName"))
+//    settings->setValue("globalApplicationName", "Lab");
+//  if (!settings->contains("globalPatientNumber"))
+//    settings->setValue("globalPatientNumber", 1);
   //if (!mSettings->contains("applicationNames"))
   //settings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
+}
+
+void StateManager::initialize()
+{
+  this->fillDefaultSettings();
 
   mPatientData.reset(new PatientData());
 

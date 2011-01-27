@@ -70,6 +70,9 @@ private:
   ~StateManager();
 
   void initialize(); ///< init stuff that is dependent of the statemanager
+  void fillDefaultSettings();
+  template<class T>
+  void fillDefault(QString name, T value);
 
   static StateManager* mTheInstance; ///< the only instance of this class
 

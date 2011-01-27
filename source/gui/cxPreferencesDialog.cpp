@@ -265,6 +265,80 @@ void PerformanceTab::setBackgroundColorSlot()
   mSettings->setValue("backgroundColor", result);
 }
 
+
+// --------------------------------------------------------
+
+//==============================================================================
+// AutomationTab
+//------------------------------------------------------------------------------
+AutomationTab::AutomationTab(QWidget *parent) :
+  QWidget(parent),
+  mSettings(DataLocations::getSettings())
+{
+}
+
+void AutomationTab::init()
+{
+  bool autoStartTracking = mSettings->value("Automation/autoStartTracking").toBool();
+  mAutoStartTrackingCheckBox = new QCheckBox("Auto Start Tracking");
+  mAutoStartTrackingCheckBox->setChecked(autoStartTracking);
+
+  bool autoStartStreaming = mSettings->value("Automation/autoStartStreaming").toBool();
+  mAutoStartStreamingCheckBox = new QCheckBox("Auto Start Streaming");
+  mAutoStartStreamingCheckBox->setChecked(autoStartStreaming);
+
+  bool autoReconstruct = mSettings->value("Automation/autoReconstruct").toBool();
+  mAutoReconstructCheckBox = new QCheckBox("Auto Reconstruct");
+  mAutoReconstructCheckBox->setChecked(autoReconstruct);
+
+  //Layout
+  mMainLayout = new QVBoxLayout;
+  mMainLayout->addWidget(mAutoStartTrackingCheckBox);
+  mMainLayout->addWidget(mAutoStartStreamingCheckBox);
+  mMainLayout->addWidget(mAutoReconstructCheckBox);
+  mMainLayout->addStretch();
+
+  this->setLayout(mMainLayout);
+}
+
+void AutomationTab::saveParametersSlot()
+{
+  mSettings->setValue("Automation/autoStartTracking", mAutoStartTrackingCheckBox->isChecked());
+  mSettings->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
+  mSettings->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
+}
+
+
+//==============================================================================
+// UltrasoundTab
+//------------------------------------------------------------------------------
+UltrasoundTab::UltrasoundTab(QWidget *parent) :
+  QWidget(parent),
+  mSettings(DataLocations::getSettings())
+{
+}
+
+void UltrasoundTab::init()
+{
+  QVBoxLayout* toplayout = new QVBoxLayout(this);
+  QHBoxLayout* acqNameLayout = new QHBoxLayout;
+  toplayout->addLayout(acqNameLayout);
+
+  acqNameLayout->addWidget(new QLabel("Description"));
+  mAcquisitionNameLineEdit = new QLineEdit(mSettings->value("Ultrasound/acquisitionName").toString());
+  acqNameLayout->addWidget(mAcquisitionNameLineEdit);
+}
+
+void UltrasoundTab::saveParametersSlot()
+{
+  mSettings->setValue("Ultrasound/acquisitionName", mAcquisitionNameLineEdit->text());
+}
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
   QDialog(parent),
   mViewManager(ViewManager::getInstance())
@@ -273,6 +347,10 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   mFoldersTab->init();
   mPerformanceTab = new PerformanceTab;
   mPerformanceTab->init();
+  mAutomationTab = new AutomationTab;
+  mAutomationTab->init();
+//  mUltrasoundTab = new UltrasoundTab;
+//  mUltrasoundTab->init();
   
   connect(mPerformanceTab,
           SIGNAL(renderingIntervalChanged(int)),
@@ -282,10 +360,15 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   tabWidget = new QTabWidget;
   tabWidget->addTab(mFoldersTab, tr("Folders"));
   tabWidget->addTab(mPerformanceTab, tr("Performance"));
+  tabWidget->addTab(mAutomationTab, tr("Automation"));
 
   buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+
   connect(buttonBox, SIGNAL(accepted()), mFoldersTab, SLOT(saveParametersSlot()));
   connect(buttonBox, SIGNAL(accepted()), mPerformanceTab, SLOT(saveParametersSlot()));
+  connect(buttonBox, SIGNAL(accepted()), mAutomationTab, SLOT(saveParametersSlot()));
+//  connect(buttonBox, SIGNAL(accepted()), mUltrasoundTab, SLOT(saveParametersSlot()));
+
   connect(mFoldersTab, SIGNAL(savedParameters()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   
