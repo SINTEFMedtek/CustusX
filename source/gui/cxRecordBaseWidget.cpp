@@ -23,6 +23,7 @@
 #include "cxUsReconstructionFileMaker.h"
 #include "cxToolPropertiesWidget.h"
 #include "RTSource/cxOpenIGTLinkConnection.h"
+#include  "sscReconstructer.h"
 
 namespace cx
 {
@@ -286,7 +287,9 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 
   ToolPtr probe = TrackedRecordWidget::getTool();
   UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
-  filemaker.write();
+  QString targetFolder = filemaker.write();
+
+  stateManager()->getReconstructer()->selectData(filemaker.getMhdFilename(targetFolder));
 
   mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
 }

@@ -29,7 +29,8 @@ public:
   UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, RecordSessionPtr session, QString activepatientPath, ToolPtr tool);
   ~UsReconstructionFileMaker();
 
-  void write();
+  QString write();
+  QString getMhdFilename(QString reconstructionFolder);
 
 private:
   QString makeFolder(QString patientFolder, RecordSessionPtr session);

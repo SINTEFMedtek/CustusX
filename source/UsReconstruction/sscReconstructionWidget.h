@@ -23,7 +23,7 @@ class ReconstructionWidget : public QWidget
 {
   Q_OBJECT
 public:
-  ReconstructionWidget(QWidget* parent, XmlOptionFile settings, QString shaderPath);
+  ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer);
   ReconstructerPtr reconstructer() {  return mReconstructer; }
   void selectData(QString inputfile);
 
@@ -33,7 +33,9 @@ public slots:
   void reload();
   void currentDataComboIndexChanged(const QString& text);
   void paramsChangedSlot();
-  
+private slots:
+  void inputDataSelected(QString mhdFileName);
+
 private:
   ReconstructerPtr mReconstructer;
   
