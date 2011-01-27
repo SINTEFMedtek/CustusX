@@ -27,7 +27,8 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
   this->setWindowTitle("Record Tracking");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->addWidget(new QLabel("Description:"));
+  mDescriptionLabel = new QLabel("Description:");
+  layout->addWidget(mDescriptionLabel);
   layout->addWidget(mDescriptionLine);
   layout->addWidget(mStartStopButton);
   layout->addWidget(mCancelButton);
@@ -39,8 +40,19 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
   mCancelButton->setEnabled(false);
 }
 
+void RecordSessionWidget::setDescriptionVisibility(bool value)
+{
+    mDescriptionLine->setVisible(value);
+    mDescriptionLabel->setVisible(value);
+}
+
 RecordSessionWidget::~RecordSessionWidget()
 {}
+
+void RecordSessionWidget::setDescription(QString text)
+{
+  mDescriptionLine->setText(text);
+}
 
 void RecordSessionWidget::changeEvent(QEvent* event)
 {

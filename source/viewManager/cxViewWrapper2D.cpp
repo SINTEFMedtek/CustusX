@@ -193,8 +193,21 @@ void ViewWrapper2D::viewportChanged()
 
   mView->setZoomFactor(mZoom2D->get().toDouble());
 
-  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
-  mView->getRenderer()->GetActiveCamera()->SetParallelScale(parallelScale);
+  double viewHeight = mView->heightMM() / getZoomFactor2D();
+//  double parallelScale = mView->heightMM() / 2.0 / getZoomFactor2D();
+  mView->getRenderer()->GetActiveCamera()->SetParallelScale(viewHeight/2);
+
+  mSliceProxy->setToolViewportHeight(viewHeight);
+//std::cout << "mView->heightMM() " << mView->heightMM() << ", " << mView->height() << "," << mView->physicalDpiY() << std::endl;
+//
+//int width() const { return metric(PdmWidth); }
+//int height() const { return metric(PdmHeight); }
+//int widthMM() const { return metric(PdmWidthMM); }
+//int heightMM() const { return metric(PdmHeightMM); }
+//int logicalDpiX() const { return metric(PdmDpiX); }
+//int logicalDpiY() const { return metric(PdmDpiY); }
+//int physicalDpiX() const { return metric(PdmPhysicalDpiX); }
+//int physicalDpiY() const { return metric(PdmPhysicalDpiY); }
 
 //  vtkCameraPtr camera = mView->getRenderer()->GetActiveCamera();
 //  std::cout << ssc::Vector3D(camera->GetFocalPoint()) << std::endl;
@@ -269,7 +282,8 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 {
   mOrientationAnnotationRep->setPlaneType(plane);
   mPlaneTypeText->setText(0, qstring_cast(plane));
-  mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), false, 1, 0.25);
+  double viewHeight = mView->heightMM() / this->getZoomFactor2D();
+  mSliceProxy->initializeFromPlane(plane, false, ssc::Vector3D(0,0,1), true, viewHeight, 0.25);
 
   // do this to force sync global and local type - must think on how we want this to work
   this->changeOrientationType(getOrientationType());

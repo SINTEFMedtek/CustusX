@@ -53,6 +53,7 @@ protected slots:
 protected:
   virtual bool canEnter() const = 0;
   virtual QIcon getIcon() const = 0;
+  void autoStartHardware();
 
   QString mUid;
   QString mName;

@@ -42,10 +42,10 @@ protected:
   void setWhatsMissingInfo(QString info);
 
   QVBoxLayout* mLayout;
+  RecordSessionWidget* mRecordSessionWidget;
 
 private:
   QLabel* mInfoLabel;
-  RecordSessionWidget* mRecordSessionWidget;
 };
 
 /**

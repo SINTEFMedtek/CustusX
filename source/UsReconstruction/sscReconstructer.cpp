@@ -935,18 +935,53 @@ void Reconstructer::findExtentAndOutputTransform()
   mOutputVolumeParams.constrainVolumeSize(maxVol.readValue(QString::number(1024*1024*16)).toDouble());
 }
   
-/**Generate a pretty name for for volume based on the filename.
- * Format: US <counter> <hh:mm>, for example US 3 15:34
+
+/** Generate an output uid based on the assumption that input uid
+ * is on the format "US-Acq_01_20001224T170000".
+ * Change to "US_01_20001224T170000",
+ * or add a "rec" postfix if a different name format is detected.
  */
-QString Reconstructer::generateImageName() const
+QString Reconstructer::generateOutputUid()
 {
+  QString base = mUsRaw->getUid();
   QString name = mFilename.split("/").back();
   name = name.split(".").front();
 
-  // retrieve  index counter
-  QString counter = name.split("_").back();
-  if (counter.count("_"))
-    counter = "";
+  QStringList split = name.split("_");
+  QStringList prefix = split.front().split("-");
+  if (prefix.size()==2)
+  {
+    split[0] = prefix[0];
+  }
+  else
+  {
+    split[0] += "rec";
+  }
+
+  return split.join("_");
+}
+
+
+/**Generate a pretty name for for volume based on the filename.
+ * Assume filename has format US-Acq_01_20001224T170000 or similar.
+ * Format: US <counter> <hh:mm>, for example US 3 15:34
+ */
+QString Reconstructer::generateImageName(QString uid) const
+{
+  QString name = uid.split("/").back();
+  name = name.split(".").front();
+  QString prefix = name.split("_").front(); // retrieve US-Acq part
+  prefix = name.split("-").front(); // retrieve US part.
+  if (prefix.isEmpty())
+    prefix = "US";
+
+  // retrieve  index counter from _99_
+  QString counter = "";
+  QRegExp countReg("_[0-9]{2}_");
+  if (countReg.indexIn(name)>0)
+  {
+    counter = countReg.cap(0);
+  }
 
   // retrieve timestamp as HH:MM
   QRegExp tsReg("[0-9]{8}T[0-9]{6}");
@@ -954,7 +989,7 @@ QString Reconstructer::generateImageName() const
   {
     QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
     QString timestamp = datetime.toString("hh:mm");
-    return "US " + counter + " " + timestamp;
+    return prefix + " " + counter + " " + timestamp;
   }
 
   return name;
@@ -993,41 +1028,10 @@ ImagePtr Reconstructer::generateOutputVolume()
     filePath = mOutputRelativePath;
   //filePath += "/" + volumeName + ".mhd";
 
-  ImagePtr image = dataManager()->createImage(data, mUsRaw->getUid() + "_rec%1", generateImageName()+" %1", filePath);
-//
-//  // Add _rec to volume name and uid
-//  //QString volumeName = qstring_cast(mUsRaw->getName()) + "_rec";
-//  QString volumeName = generateImageName();
-//  QString volumeId = qstring_cast(mUsRaw->getUid()) + "_rec";
-//
-//  std::vector<QString> imageUids = DataManager::getInstance()->getImageUids();
-//
-//  // Find an uid that is not used before
-//  int numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(volumeId));
-//  if(numMatches != 0)
-//  {
-//    int recNumber = 1;
-//    while(numMatches != 0)
-//    {
-//      QString newId = volumeName + QString::number(++recNumber);
-//      numMatches = std::count(imageUids.begin(), imageUids.end(), string_cast(newId));
-//    }
-//
-//    volumeName += " #" + QString::number(recNumber);
-//    volumeId += QString::number(recNumber);
-//  }
-//  ImagePtr image = ImagePtr(new Image(string_cast(volumeId),
-//                                      data,
-//                                      string_cast(volumeName))) ;
-//  //If no output path is selecetd, use the same path as the input
-//  QString filePath;
-//  if(mOutputBasePath.isEmpty() && mOutputRelativePath.isEmpty())
-//    filePath = qstring_cast(mUsRaw->getFilePath());
-//  else
-//    filePath = mOutputRelativePath;
-//  filePath += "/" + volumeName + ".mhd";
-//
-//  image->setFilePath(string_cast(filePath));
+  QString uid = this->generateOutputUid();
+  QString name = this->generateImageName(uid);
+
+  ImagePtr image = dataManager()->createImage(data, uid + "_%1", name + " %1", filePath);
   image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
 
   return image;

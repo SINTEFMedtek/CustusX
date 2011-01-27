@@ -11,6 +11,7 @@
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 //#include "cxViewManager.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -63,6 +64,15 @@ void WorkflowState::setActionSlot()
   this->machine()->postEvent(new RequestEnterStateEvent(this->getUid()));
 };
 
+void WorkflowState::autoStartHardware()
+{
+  if (DataLocations::getSettings()->value("Automation/autoStartTracking").toBool())
+    ssc::toolManager()->startTracking();
+  if (DataLocations::getSettings()->value("Automation/autoStartStreaming").toBool())
+    stateManager()->getIGTLinkConnection()->launchAndConnectServer();
+}
+
+
 // --------------------------------------------------------
 // --------------------------------------------------------
 
@@ -77,8 +87,7 @@ NavigationWorkflowState::NavigationWorkflowState(QState* parent) :
 
 void NavigationWorkflowState::onEntry(QEvent * event)
 {
-  ssc::toolManager()->startTracking();
-  stateManager()->getIGTLinkConnection()->launchAndConnectServer();
+  this->autoStartHardware();
 }
 
 bool NavigationWorkflowState::canEnter() const
@@ -136,8 +145,7 @@ IntraOpImagingWorkflowState::IntraOpImagingWorkflowState(QState* parent) :
 
 void IntraOpImagingWorkflowState::onEntry(QEvent * event)
 {
-  ssc::toolManager()->startTracking();
-  stateManager()->getIGTLinkConnection()->launchAndConnectServer();
+  this->autoStartHardware();
 }
 
 bool IntraOpImagingWorkflowState::canEnter() const
