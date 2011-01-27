@@ -40,6 +40,7 @@ public:
   Reconstructer(XmlOptionFile settings, QString shaderPath);
   virtual ~Reconstructer();
 
+  void selectData(QString filename);
   void readFiles(QString mhdFileName, QString calFilesPath);
   void reconstruct(); // assumes readFiles has already been called
 
@@ -62,6 +63,7 @@ public slots:
 
 signals:
   void paramsChanged();
+  void inputDataSelected(QString mhdFileName);
 
 private:
   //ImagePtr mUsRaw;///<All imported US data framed packed into one image
