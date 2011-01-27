@@ -88,6 +88,8 @@ protected slots:
 
   void updateTrackingActionSlot();
   void toggleTrackingSlot();
+  void toggleStreamingSlot();
+  void updateStreamingActionSlot();
 
 private:
   void updateWindowTitle();
@@ -144,6 +146,7 @@ private:
   QAction* mInitializeToolsAction; ///< action for initializing contact with the navigation system
   QAction* mTrackingToolsAction; ///< action for asking the navigation system to start/stop tracking
   QAction* mSaveToolsPositionsAction; ///< action for saving the tool positions
+  QAction* mStartStreamingAction; ///< start streaming of the default RT source.
   QActionGroup* mToolsActionGroup; ///< grouping the actions for contacting the navigation system
 
   QActionGroup* mLayoutActionGroup; ///< grouping the view layout actions
