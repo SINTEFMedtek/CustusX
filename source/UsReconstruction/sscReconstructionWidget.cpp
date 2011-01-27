@@ -16,13 +16,15 @@ namespace ssc
 // --------------------------------------------------------
 
 
-ReconstructionWidget::ReconstructionWidget(QWidget* parent, XmlOptionFile settings, QString shaderPath):
+ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer):
   QWidget(parent),
-  mReconstructer(new Reconstructer(settings, shaderPath))
+  mReconstructer(reconstructer)
 {
   this->setWindowTitle("US Reconstruction");
 
   connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
+
+  connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
@@ -178,6 +180,23 @@ void ReconstructionWidget::reload()
 {
   this->selectData(mInputFile);
 }
+
+/**Called when data is loaded into reconstructer.
+ *
+ */
+void ReconstructionWidget::inputDataSelected(QString mhdFileName)
+{
+  if(mhdFileName.isEmpty())
+  {
+    return;
+  }
+
+  mInputFile = mhdFileName;
+
+  this->updateComboBox();
+  mDataComboBox->setToolTip(mInputFile);
+}
+
 
 void ReconstructionWidget::selectData(QString filename)
 {
