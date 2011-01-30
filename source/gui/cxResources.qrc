@@ -33,8 +33,10 @@
     <file>icons/polaris.png</file>
     <file>icons/polaris-red.png</file>
     <file>icons/polaris-green.png</file>
+    <file>icons/streaming_green.png</file>    
+    <file>icons/streaming_red.png</file>    
     
-    
+  
     <file>icons/camera_view_A.png</file>
     <file>icons/camera_view_P.png</file>
     <file>icons/camera_view_S.png</file>
