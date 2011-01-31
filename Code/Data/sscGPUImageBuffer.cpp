@@ -40,12 +40,10 @@ public:
 
 	GPUImageDataBufferImpl()
 	{
-		//std::cout << "create GPUImageDataBufferImpl()" << std::endl;
 		mAllocated = false;
 	}
 	virtual ~GPUImageDataBufferImpl()
 	{
-		//std::cout << "delete GPUImageDataBufferImpl()" << std::endl;
 		release();
 	}
 
@@ -134,8 +132,6 @@ public:
 		glDisable(GL_TEXTURE_3D);
 
 		report_gl_error();
-		std::cout << "this=[" << this << "] tex=[" << mTexture << "] allocated buffer" << std::endl;
-
 		mAllocated = true;
 	}
 
@@ -157,15 +153,12 @@ public:
 
 	virtual void release()
 	{
-		//std::cout<< "GPUImageDataBuffer::release"<<std::endl;
 		if (glIsTexture(textureId) )
 		{
-			//std::cout << "glHasTexture " << std::endl;
 			glBindTexture(GL_TEXTURE_3D,0);
 			glDisable(GL_TEXTURE_3D);
 			glDisable(GL_TEXTURE_2D);
 			glDeleteTextures(1, &textureId);
-			//std::cout << "this=[" << this << "] tex=[" << mTexture << "] release buffer" << std::endl;
 		}
 
 	}
@@ -200,13 +193,11 @@ public:
 
 	GPUImageLutBufferImpl()
 	{
-		//std::cout << "create GPUImageLutBufferImpl()" << std::endl;
 		mAllocated = false;
 		mLutSize = 0;
 	}
 	virtual ~GPUImageLutBufferImpl()
 	{
-		//std::cout << "delete GPUImageLutBufferImpl()" << std::endl;
 		release();
 	}
 
@@ -214,7 +205,6 @@ public:
 	virtual void SetColorMap(vtkUnsignedCharArrayPtr table)
 	{
 		mLutSize = table->GetNumberOfTuples();
-		//std::cout << "setting color map: " << mLutSize << std::endl;
 		mLutDataSize = mLutSize * table->GetNumberOfComponents();
 		mLut.resize(mLutDataSize);
 
@@ -285,7 +275,6 @@ public:
 
 	virtual void release()
 	{
-		//std::cout<< "GPUImageDataBuffer::release"<<std::endl;
 		glBindTexture(vtkgl::TEXTURE_BUFFER_EXT,0);
 		vtkgl::DeleteBuffersARB(1,&lutBuffer);
 	}
@@ -383,7 +372,6 @@ public:
 			{
 				typename BufferMap::iterator temp = iter;
 				++iter;
-				//std::cout << "GPU-Buffer[" << mName << "]\tclear" << std::endl;
 				mRemovedData.erase(temp);
 			}
 			else
@@ -399,7 +387,6 @@ public:
 			if (object)
 			{
 				mData.push_front(BufferStore(data, object));
-				//std::cout << "GPU-Buffer[" << mName << "]\treclaim" << std::endl;
 				mRemovedData.erase(data);
 			}
 		}
@@ -411,7 +398,6 @@ public:
 			if (iter->mData==data)
 			{
 				retval = iter->mBuffer; // retrieve data
-				//std::cout << "GPU-Buffer[" << mName << "]\tretrieve" << std::endl;
 				mData.push_front(*iter); // push on queue front (most recent)
 				mData.erase(iter); // erase from old position
 				break;
@@ -422,7 +408,6 @@ public:
 		if (!retval)
 		{
 			retval = createGPUImageBuffer<BUFFER>(data);
-			//std::cout << "GPU-Buffer[" << mName << "]\tcreate" << std::endl;
 			mData.push_front(BufferStore(data, retval));
 		}
 
@@ -430,11 +415,8 @@ public:
 		while (mData.size()>mMaxBuffers)
 		{
 			mRemovedData[mData.back().mData] = mData.back().mBuffer;
-			//std::cout << "GPU-Buffer[" << mName << "]\tpop" << std::endl;
 			mData.pop_back();;
 		}
-
-		//std::cout << "GPU-Buffer[" << mName << "]\tcount: " << mData.size() << "+" << mRemovedData.size() << std::endl;
 
 		return retval;
 	}
