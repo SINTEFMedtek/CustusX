@@ -40,6 +40,7 @@ namespace ssc
 			VIEW_REAL_TIME
 		}; ///< type describing the view
 		View(QWidget *parent = NULL, Qt::WFlags f = 0);
+		View(const QString& uid, const QString& name="", QWidget *parent = NULL, Qt::WFlags f = 0); ///< constructor
 		virtual ~View();
 		virtual Type getType() const { return VIEW;}		///< \return the View type, indicating display dimension.
 		QString getTypeString() const;

@@ -18,6 +18,7 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 	//mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);
 	read3DCrossHair();
 #if 0
+    mType = TOOL_US_PROBE;
   //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
   ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 300, M_PI_2);
   //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);

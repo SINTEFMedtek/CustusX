@@ -23,6 +23,7 @@
 #include "sscVtkHelperClasses.h"
 #include "sscMessageManager.h"
 #include "sscUSProbeSector.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -196,18 +197,22 @@ void ToolRep2D::update()
   bool aligned = similar(fabs(dotted), 1.0, 0.1);
 
   //mProbeSector->setPosition(sMr*rMpr*prMt);
+//  std::cout << "(this->showProbe() && aligned)" << this->showProbe() << ", " << aligned << std::endl;
   if (this->showProbe() && aligned)
   {
     Transform3D T = createTransformTranslate(Vector3D(0, 0, 0.1));
 
     mProbeSector->setSector(mSlicer->getTool()->getProbeSector());
-    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSector());
+    Transform3D tMu = mProbeSector->get_tMu();
+    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
     if (mProbeSectorPolyDataMapper->GetInput())
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
-    mProbeSectorActor->SetUserMatrix((T*sMt).matrix());
+    mProbeSectorActor->SetUserMatrix((T*sMt*tMu).matrix());
     mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
+//    std::cout << "vis: " << mProbeSectorActor->GetVisibility() << std::endl;
+//    std::cout << "mSlicer->getTool()->getProbeSector()" << streamXml2String(mSlicer->getTool()->getProbeSector()) << std::endl;
   }
   else
     mProbeSectorActor->SetVisibility(false);
