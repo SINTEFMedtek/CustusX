@@ -21,7 +21,8 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription)),
     mStartTimeMSec(-1),
-    mStopTimeMSec(-1)
+    mStopTimeMSec(-1),
+    mPostProcessing(false)
 {
   this->setObjectName("RecordSessionWidget");
   this->setWindowTitle("Record Tracking");
@@ -64,6 +65,21 @@ void RecordSessionWidget::changeEvent(QEvent* event)
     this->stopRecording();
 }
 
+void RecordSessionWidget::startPostProcessing(QString description)
+{
+  mPostProcessing = true;
+
+  mCancelButton->setEnabled(true);
+  mStartStopButton->setText(description);
+  mStartStopButton->setEnabled(false);
+}
+
+void RecordSessionWidget::stopPostProcessing()
+{
+  this->reset();
+}
+
+
 void RecordSessionWidget::startStopSlot(bool checked)
 {
   if(checked)
@@ -74,7 +90,7 @@ void RecordSessionWidget::startStopSlot(bool checked)
 
 void RecordSessionWidget::cancelSlot()
 {
-  if(!this->isRecording())
+  if(!this->isRecording() && !mPostProcessing)
     return;
 
   std::cout << "cancel" << std::endl;
@@ -122,11 +138,14 @@ bool RecordSessionWidget::isRecording()
 
 void RecordSessionWidget::reset()
 {
+  mPostProcessing = false;
+
   mStartStopButton->blockSignals(true);
   mStartStopButton->setChecked(false);
   mStartStopButton->blockSignals(false);
   mStartStopButton->setText("Start");
   mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
+  mStartStopButton->setEnabled(true);
 
   mCancelButton->setEnabled(false);
 
