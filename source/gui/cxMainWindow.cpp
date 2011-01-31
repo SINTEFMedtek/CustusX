@@ -279,6 +279,7 @@ void MainWindow::createActions()
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
   connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
+  this->updateStreamingActionSlot();
 
   mConfigureToolsAction->setChecked(true);
 
@@ -336,10 +337,12 @@ void MainWindow::updateStreamingActionSlot()
 {
   if (stateManager()->getIGTLinkConnection()->getRTSource()->isStreaming())
   {
+    mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
     mStartStreamingAction->setText("Stop Streaming");
   }
   else
   {
+    mStartStreamingAction->setIcon(QIcon(":/icons/streaming_red.png"));
     mStartStreamingAction->setText("Start Streaming");
   }
 }
