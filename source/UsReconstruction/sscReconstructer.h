@@ -8,6 +8,7 @@
 #define SSCRECONSTRUCTER_H_
 
 #include <QObject>
+#include <QThread>
 #include <math.h>
 #include "sscReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
@@ -37,12 +38,17 @@ class Reconstructer : public QObject
 {
   Q_OBJECT
 public:
+  friend class ThreadedReconstructer;
+
   Reconstructer(XmlOptionFile settings, QString shaderPath);
   virtual ~Reconstructer();
 
   void selectData(QString filename);
   void readFiles(QString mhdFileName, QString calFilesPath);
   void reconstruct(); // assumes readFiles has already been called
+  bool validReconstructData() const;
+  void clearAll();
+  QString getSelectedData() const { return mFilename; }
 
   ImagePtr reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr getOutput();
@@ -64,6 +70,7 @@ public slots:
 signals:
   void paramsChanged();
   void inputDataSelected(QString mhdFileName);
+  void reconstructFinished();
 
 private:
   //ImagePtr mUsRaw;///<All imported US data framed packed into one image
@@ -110,7 +117,6 @@ private:
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
   //StringOptionItem getNamedSetting(const QString& uid);
-  void clearAll();
   void clearOutput();
   //void saveSettings();
   void createAlgorithm();
@@ -118,9 +124,31 @@ private:
   QString generateOutputUid();
   QString generateImageName(QString uid) const;
 
+  void threadedPreReconstruct();
+  void threadedReconstruct();
+  void threadedPostReconstruct();
 
   bool isValid(); ///< checks if internal states is valid (that it actually has frames to reconstruct)
+
 };
+
+/**Execution of a reconstruction in another thread.
+ * The class replaces the Reconstructer::reconstruct() method.
+ *
+ */
+class ThreadedReconstructer : public QThread
+{
+  Q_OBJECT
+
+public:
+  ThreadedReconstructer(ReconstructerPtr reconstructer);
+  virtual void run();
+private slots:
+  void postReconstructionSlot();
+private:
+  ReconstructerPtr mReconstructer;
+};
+typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
 
 }//namespace
 #endif //SSCRECONSTRUCTER_H_

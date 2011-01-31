@@ -5,6 +5,7 @@
 #include "sscTool.h"
 #include "cxDataInterface.h"
 #include "sscRealTimeStreamSourceRecorder.h"
+#include "sscReconstructer.h"
 
 class QLabel;
 class QVBoxLayout;
@@ -122,11 +123,13 @@ protected slots:
 
 private slots:
   void rtSourceChangedSlot();
+  void reconstructFinishedSlot();
 
 private:
   SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
   ssc::RealTimeStreamSourcePtr mRTSource;
   ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
+  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
 };
 }//namespace cx
 #endif /* CXRECORDBASEWIDGET_H_ */
