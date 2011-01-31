@@ -278,6 +278,8 @@ void USAcqusitionWidget::rtSourceChangedSlot()
 
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 {
+//  std::cout << "post processing" << std::endl;
+
   //get session data
   RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
   ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
@@ -292,9 +294,32 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
   UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
   QString targetFolder = filemaker.write();
 
+//  std::cout << "select data" << std::endl;
   stateManager()->getReconstructer()->selectData(filemaker.getMhdFilename(targetFolder));
+//  std::cout << "selected data" << std::endl;
 
   mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+
+  if (DataLocations::getSettings()->value("Automation/autoReconstruct").toBool())
+  {
+//    std::cout << "start threaded reconstruct" << std::endl;
+    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
+    connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+    mThreadedReconstructer->start();
+    mRecordSessionWidget->startPostProcessing("Reconstructing");
+//    std::cout << "started threaded reconstruct" << std::endl;
+
+//    stateManager()->getReconstructer()->reconstruct();
+  }
+}
+
+void USAcqusitionWidget::reconstructFinishedSlot()
+{
+//  std::cout << "finished threaded reconstruct" << std::endl;
+  mRecordSessionWidget->stopPostProcessing();
+  mThreadedReconstructer.reset();
+
+  // show data in view from here if applicable.
 }
 
 void USAcqusitionWidget::startedSlot()
@@ -304,8 +329,22 @@ void USAcqusitionWidget::startedSlot()
   mRTRecorder->startRecord();
 }
 
+//void USAcqusitionWidget::cancelledSlot()
+//{
+//}
+
 void USAcqusitionWidget::stoppedSlot()
 {
+  if (mThreadedReconstructer)
+  {
+    mThreadedReconstructer->terminate();
+    mThreadedReconstructer->wait();
+    stateManager()->getReconstructer()->selectData(stateManager()->getReconstructer()->getSelectedData());
+
+
+    // TODO perform cleanup of all resources connected to this recording.
+  }
+
   mRTRecorder->stopRecord();
 }
 //----------------------------------------------------------------------------------------------------------------------

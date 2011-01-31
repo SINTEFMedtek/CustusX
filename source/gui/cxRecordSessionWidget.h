@@ -28,6 +28,8 @@ public:
   void setDescription(QString text);
   void setDescriptionVisibility(bool value);
 
+  void startPostProcessing(QString description);
+  void stopPostProcessing();
 
 signals:
   void started();
@@ -54,6 +56,7 @@ private:
   QLineEdit* mDescriptionLine;
   double mStartTimeMSec;
   double mStopTimeMSec;
+  bool mPostProcessing;
 };
 
 }//namespace cx
