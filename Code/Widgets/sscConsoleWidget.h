@@ -31,6 +31,7 @@ public:
 
 protected slots:
   void contextMenuEvent(QContextMenuEvent* event);
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
 
 private slots:
   void printMessage(Message message); ///< prints the message into the console

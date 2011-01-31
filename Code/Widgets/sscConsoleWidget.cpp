@@ -3,6 +3,7 @@
 #include <iostream>
 #include <QVBoxLayout>
 #include <QMenu>
+#include <QScrollBar>
 #include <QContextMenuEvent>
 #include "sscTypeConversions.h"
 
@@ -17,15 +18,11 @@ ConsoleWidget::ConsoleWidget(QWidget* parent) :
   this->setWindowTitle("Console");
   this->setWhatsThis(this->defaultWhatsThis());
 
-  this->setReadOnly(true);
-
-  this->setFrameStyle(true);
-  this->setFrameStyle(QFrame::Plain);
-
-  this->createTextCharFormats();
-
   QVBoxLayout* layout = new QVBoxLayout;
   this->setLayout(layout);
+
+  this->setReadOnly(true);
+  this->createTextCharFormats();
 
   connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(printMessage(Message)));
 
@@ -53,6 +50,11 @@ void ConsoleWidget::contextMenuEvent(QContextMenuEvent* event)
   menu->addAction(mLineWrappingAction);
   menu->exec(event->globalPos());
   delete menu;
+}
+
+void ConsoleWidget::showEvent(QShowEvent* event)
+{
+  this->horizontalScrollBar()->setValue(this->horizontalScrollBar()->minimum());
 }
 
 void ConsoleWidget::printMessage(Message message)
