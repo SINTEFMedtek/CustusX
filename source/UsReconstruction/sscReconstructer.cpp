@@ -1152,9 +1152,24 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
 
 void Reconstructer::reconstruct()
 {
-  if (mFrames.empty() || !mUsRaw)
+  if (!this->validReconstructData())
   {
     ssc::messageManager()->sendError("Reconstruct failed: no data loaded");
+    return;
+  }
+
+  this->threadedPreReconstruct();
+  this->threadedReconstruct();
+  this->threadedPostReconstruct();
+}
+
+/**The reconstruct part that must be fun pre-rec in the main thread.
+ *
+ */
+void Reconstructer::threadedPreReconstruct()
+{
+  if (!this->validReconstructData())
+  {
     return;
   }
 
@@ -1163,7 +1178,27 @@ void Reconstructer::reconstruct()
 //  {
     mOutput = this->generateOutputVolume();
 //  }
-  
+}
+
+bool Reconstructer::validReconstructData() const
+{
+  if (mFrames.empty() || !mUsRaw || mPositions.empty())
+  {
+    return false;
+  }
+
+  return true;
+}
+
+/**The reconstruct part that can be run in a separate thread.
+ *
+ */
+void Reconstructer::threadedReconstruct()
+{
+  if (!this->validReconstructData())
+  {
+    return;
+  }
   // reconstruction expects the inverted matrix direction: give it that.
   //std::vector<TimedPosition> mInvFrames = mFrames;
   
@@ -1188,6 +1223,17 @@ void Reconstructer::reconstruct()
   QTime tempTime = QTime(0, 0);
   tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
   ssc::messageManager()->sendInfo("Reconstruct time: " + tempTime.toString("hh:mm:ss:zzz"));
+}
+
+/**The reconstruct part that must be fun post-rec in the main thread.
+ *
+ */
+void Reconstructer::threadedPostReconstruct()
+{
+  if (!this->validReconstructData())
+  {
+    return;
+  }
 
   DataManager::getInstance()->loadData(mOutput);
   //DataManager::getInstance()->loadImage(mUsRaw);
@@ -1196,8 +1242,6 @@ void Reconstructer::reconstruct()
   DataManager::getInstance()->saveImage(mOutput, mOutputBasePath);
 }
 
- 
-  
 ImagePtr Reconstructer::getOutput()
 {
   return mOutput;
@@ -1206,5 +1250,32 @@ ImagePtr Reconstructer::getOutput()
 {
   return mUsRaw;
 }*/
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+ThreadedReconstructer::ThreadedReconstructer(ReconstructerPtr reconstructer)
+{
+//  std::cout << "pre threaded reconstruct" << std::endl;
+  mReconstructer = reconstructer;
+  mReconstructer->threadedPreReconstruct();
+  connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
+}
+void ThreadedReconstructer::run()
+{
+//  std::cout << "run threaded reconstruct" << std::endl;
+//  QThread::sleep(10);
+  mReconstructer->threadedReconstruct();
+//  std::cout << "end run threaded reconstruct" << std::endl;
+}
+void ThreadedReconstructer::postReconstructionSlot()
+{
+//  std::cout << "post threaded reconstruct" << std::endl;
+  mReconstructer->threadedPostReconstruct();
+}
+
+
   
 }
