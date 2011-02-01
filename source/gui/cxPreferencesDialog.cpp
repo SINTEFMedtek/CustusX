@@ -327,12 +327,26 @@ void UltrasoundTab::init()
   acqNameLayout->addWidget(new QLabel("Description"));
   mAcquisitionNameLineEdit = new QLineEdit(mSettings->value("Ultrasound/acquisitionName").toString());
   acqNameLayout->addWidget(mAcquisitionNameLineEdit);
-  acqNameLayout->addStretch();
+
+  bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
+
+  m24bitRadioButton = new QRadioButton("Save acquisition as 24bit", this);
+  m24bitRadioButton->setChecked(!bw);
+  m8bitRadioButton = new QRadioButton("Save acquisition as 8bit", this);
+  m8bitRadioButton->setChecked(bw);
+
+  toplayout->addSpacing(5);
+  toplayout->addWidget(m24bitRadioButton);
+  toplayout->addWidget(m8bitRadioButton);
+
+  toplayout->addStretch();
 }
 
 void UltrasoundTab::saveParametersSlot()
 {
   mSettings->setValue("Ultrasound/acquisitionName", mAcquisitionNameLineEdit->text());
+  DataLocations::getSettings()->setValue("Ultrasound/8bitAcquisitionData", m8bitRadioButton->isChecked());
+
 }
 
 // --------------------------------------------------------
@@ -369,7 +383,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   connect(buttonBox, SIGNAL(accepted()), mFoldersTab, SLOT(saveParametersSlot()));
   connect(buttonBox, SIGNAL(accepted()), mPerformanceTab, SLOT(saveParametersSlot()));
   connect(buttonBox, SIGNAL(accepted()), mAutomationTab, SLOT(saveParametersSlot()));
-//  connect(buttonBox, SIGNAL(accepted()), mUltrasoundTab, SLOT(saveParametersSlot()));
+  connect(buttonBox, SIGNAL(accepted()), mUltrasoundTab, SLOT(saveParametersSlot()));
 
   connect(mFoldersTab, SIGNAL(savedParameters()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
