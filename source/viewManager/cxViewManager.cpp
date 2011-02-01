@@ -546,17 +546,26 @@ void ViewManager::renderAllViewsSlot()
 {
   mRenderTimer->beginRender();
 
+  // do a full render anyway at low rate. This is a convenience hack for rendering
+  // occational effects that the smart render is too dumb to see.
+  bool smart = mSmartRender;
+  int smartInterval = mRenderingTimer->interval() * 40;
+  if (mLastFullRender.msecsTo(QDateTime::currentDateTime())>smartInterval)
+    smart = false;
+
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
   {
     if(iter->second->isVisible())
     {
-      if (mSmartRender)
+      if (smart)
         iter->second->render(); // render only changed scenegraph (shaky but smooth)
       else
         iter->second->getRenderWindow()->Render(); // previous version: renders even when nothing is changed
     }
   }
   
+  if (!smart)
+    mLastFullRender = QDateTime::currentDateTime();
 
   mRenderTimer->endRender();
 

@@ -30,6 +30,8 @@ public:
 private slots:
   void streamLoadedSlot();
   void updateSlot();
+  void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
+  void showSectorActionSlot(bool checked);
 
 protected:
   virtual void imageAdded(ssc::ImagePtr image) {}
