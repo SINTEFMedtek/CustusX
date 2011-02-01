@@ -15,6 +15,8 @@
 #include <vtkDataSetMapper.h>
 #include <vtkTexture.h>
 #include <vtkCamera.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
 #include "vtkImageMask.h"
 #include <vtkPointData.h>
 #include <vtkMatrix4x4.h>
@@ -30,6 +32,7 @@
 #include "sscTool.h"
 #include "sscTypeConversions.h"
 #include  "ultrasoundsectorsource.h"
+
 
 namespace ssc
 {
@@ -95,6 +98,16 @@ void RealTimeStreamGraphics::setIgnoreToolTransform(bool on)
 vtkActorPtr RealTimeStreamGraphics::getActor()
 {
   return mPlaneActor;
+}
+
+ToolPtr RealTimeStreamGraphics::getTool()
+{
+  return mTool;
+}
+
+ssc::ProbeData RealTimeStreamGraphics::getProbeData()
+{
+  return mProbeData;
 }
 
 void RealTimeStreamGraphics::setTool(ToolPtr tool)
@@ -238,15 +251,11 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
 {
   if (mIgnoreToolTransform)
     return;
-  //mProbeData.test();
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D tMu = mProbeData.get_tMu();
-  //Transform3D rMt = rMpr * prMt;
   Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
-//  mPlaneActor->SetUserMatrix(rMt.matrix());
   mPlaneActor->SetUserMatrix(rMu.matrix());
-//  mPlaneActor->SetUserMatrix(rMt.matrix());
 }
 
 void RealTimeStreamGraphics::receiveVisible(bool visible)
@@ -308,6 +317,7 @@ void RealTimeStreamGraphics::newDataSlot()
   }
 
   mPlaneActor->SetVisibility(mData->validData());
+  mPlaneActor->Modified();
 
   emit newData();
 }
@@ -383,15 +393,47 @@ RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, con
   mStatusText->setCentered();
   mStatusText->setPosition(0.5, 0.5);
   mStatusText->updateText("testimage");
+
+  mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
+  mProbeSectorActor = vtkActorPtr::New();
+  mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0);
 }
 
 RealTimeStreamFixedPlaneRep::~RealTimeStreamFixedPlaneRep()
 {
 }
 
+void RealTimeStreamFixedPlaneRep::setShowSector(bool on)
+{
+  mShowSector = on;
+  this->updateSector();
+}
+
+bool RealTimeStreamFixedPlaneRep::getShowSector() const
+{
+  return mShowSector;
+}
+
+void RealTimeStreamFixedPlaneRep::updateSector()
+{
+  mProbeSectorActor->SetVisibility(mTool!=0 && this->getShowSector());
+  if (!mTool || !this->getShowSector())
+    return;
+
+  mProbeData.setSector(mTool->getProbeSector());
+  mProbeSectorPolyDataMapper->SetInput(mProbeData.getSectorLinesOnly());
+  if (mProbeSectorPolyDataMapper->GetInput())
+  {
+    mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+  }
+  mProbeSectorActor->SetVisibility(mTool->getVisible());
+
+}
+
 void RealTimeStreamFixedPlaneRep::setTool(ToolPtr tool)
 {
-  mRTGraphics->setTool(tool);
+//  mRTGraphics->setTool(tool);
+  mTool = tool;
 }
 
 void RealTimeStreamFixedPlaneRep::setRealtimeStream(RealTimeStreamSourcePtr data)
@@ -409,6 +451,7 @@ void RealTimeStreamFixedPlaneRep::newDataSlot()
   mStatusText->updateText(mData->getStatusString());
   mStatusText->getActor()->SetVisibility(!mData->validData());
   this->setCamera();
+  this->updateSector();
 }
 
 /**We need this here, even if it belongs in singlelayout.
@@ -455,6 +498,8 @@ void RealTimeStreamFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
   view->getRenderer()->AddActor(mRTGraphics->getActor());
   view->getRenderer()->AddActor(mInfoText->getActor());
   view->getRenderer()->AddActor(mStatusText->getActor());
+
+  view->getRenderer()->AddActor(mProbeSectorActor);
   //setCamera();
 }
 
@@ -464,6 +509,8 @@ void RealTimeStreamFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* vie
   view->getRenderer()->RemoveActor(mRTGraphics->getActor());
   view->getRenderer()->RemoveActor(mInfoText->getActor());
   view->getRenderer()->RemoveActor(mStatusText->getActor());
+
+  view->getRenderer()->RemoveActor(mProbeSectorActor);
 }
 
 } // namespace ssc

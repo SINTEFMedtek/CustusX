@@ -39,6 +39,9 @@ public:
 
   void setRealtimeStream(RealTimeStreamSourcePtr data);
   void setTool(ToolPtr tool);
+  ToolPtr getTool();
+  ssc::ProbeData getProbeData();
+
   void setIgnoreToolTransform(bool on);
 
   vtkActorPtr getActor();
@@ -114,6 +117,9 @@ public:
   void setRealtimeStream(RealTimeStreamSourcePtr data);
   void setTool(ToolPtr tool);
 
+  void setShowSector(bool on);
+  bool getShowSector() const;
+
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
@@ -122,8 +128,10 @@ private slots:
 
 private:
   void setCamera();
+  void updateSector();
 
   RealTimeStreamGraphicsPtr mRTGraphics;
+  bool mShowSector;
 
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
@@ -131,6 +139,9 @@ private:
 
   ssc::TextDisplayPtr mStatusText;
   ssc::TextDisplayPtr mInfoText;
+
+  vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
+  vtkActorPtr mProbeSectorActor;
 
   vtkRendererPtr mRenderer;
   View* mView;
