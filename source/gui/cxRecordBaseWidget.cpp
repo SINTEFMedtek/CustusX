@@ -66,7 +66,8 @@ TrackedRecordWidget::~TrackedRecordWidget()
 ssc::TimedTransformMap TrackedRecordWidget::getRecording(RecordSessionPtr session)
 {
   ssc::TimedTransformMap retval;
-  ssc::SessionToolHistoryMap toolTransformMap = session->getSessionHistory();
+  //ssc::SessionToolHistoryMap toolTransformMap = session->getSessionHistory();
+  ssc::SessionToolHistoryMap toolTransformMap = ssc::toolManager()->getSessionHistory(session->getStartTime(), session->getStopTime());;
 
   if(toolTransformMap.size() == 1)
   {
@@ -291,7 +292,7 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
   }
 
   ToolPtr probe = TrackedRecordWidget::getTool();
-  UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
+  UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe);
   QString targetFolder = filemaker.write();
 
 //  std::cout << "select data" << std::endl;

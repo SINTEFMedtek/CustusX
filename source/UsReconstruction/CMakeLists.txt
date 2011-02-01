@@ -63,7 +63,7 @@ target_link_libraries( sscUsReconstructionLib
     cxCommon 
     thunder 
     toolManager
-    statemachineManager
+    #statemachineManager
     ITKCommon)
 # =========================================================
 
