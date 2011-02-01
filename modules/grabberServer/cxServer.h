@@ -32,6 +32,7 @@ public:
 
 signals:
   void frame(Frame& frame); ///< Emitted whenever a new frame arrived.
+  void queueSize(int); ///< Emitted whenever the queue size changes
   void open(); ///< Emitted when the server is listening to a port.
   void closed(); ///< Emitted when the server no longer is listening.
 

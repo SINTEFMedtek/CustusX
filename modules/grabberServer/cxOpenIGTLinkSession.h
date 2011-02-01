@@ -30,6 +30,7 @@ public:
 
 signals:
   void frame(Frame& frame); ///< Emitted whenever the session receives a new frame
+  void queueSize(int); ///< Emitted whenever the queue size changes
 
 protected:
   virtual void run(); ///< Creates and connects to a socket and the OpenIGTLinkSender that sends frames to the socket.
@@ -66,6 +67,7 @@ public slots:
 
 signals:
   void imageOnQueue(); ///< Emitted when there is a new igtl::ImageMessage is in the message queue
+  void queueSize(int); ///< Emitted whenever the queue size changes
 
 private:
   //igtl::ImageMessage::Pointer convertFrame(Frame& frame); ///< Converst the frame into a OpenIGTLink ImageMessage
