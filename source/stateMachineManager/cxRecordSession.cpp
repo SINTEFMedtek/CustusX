@@ -87,7 +87,8 @@ QString RecordSession::getNewUid()
   std::vector<RecordSessionPtr>::iterator iter;
   for (iter = recordsessions.begin(); iter != recordsessions.end(); ++iter)
   {
-    max = std::max(max, qstring_cast((*iter)->getUid()).toInt());
+    QString index = (*iter)->getUid().split("_").front();
+    max = std::max(max, index.toInt());
   }
 
 //  retval = qstring_cast(max + 1);
