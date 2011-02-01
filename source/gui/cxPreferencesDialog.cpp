@@ -327,6 +327,7 @@ void UltrasoundTab::init()
   acqNameLayout->addWidget(new QLabel("Description"));
   mAcquisitionNameLineEdit = new QLineEdit(mSettings->value("Ultrasound/acquisitionName").toString());
   acqNameLayout->addWidget(mAcquisitionNameLineEdit);
+  acqNameLayout->addStretch();
 }
 
 void UltrasoundTab::saveParametersSlot()
@@ -349,8 +350,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   mPerformanceTab->init();
   mAutomationTab = new AutomationTab;
   mAutomationTab->init();
-//  mUltrasoundTab = new UltrasoundTab;
-//  mUltrasoundTab->init();
+  mUltrasoundTab = new UltrasoundTab;
+  mUltrasoundTab->init();
   
   connect(mPerformanceTab,
           SIGNAL(renderingIntervalChanged(int)),
@@ -361,6 +362,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   tabWidget->addTab(mFoldersTab, tr("Folders"));
   tabWidget->addTab(mPerformanceTab, tr("Performance"));
   tabWidget->addTab(mAutomationTab, tr("Automation"));
+  tabWidget->addTab(mUltrasoundTab, tr("Ultrasound"));
 
   buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
