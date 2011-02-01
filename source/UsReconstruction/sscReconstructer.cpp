@@ -1062,7 +1062,6 @@ void Reconstructer::selectData(QString filename)
 
 void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 {
-  std::cout << "calFilesPath: " << string_cast(calFilesPath) << std::endl;
   this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
@@ -1070,7 +1069,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
   {
     // There may not be any files here due to the automatic calling of the function
-    std::cout << "File not found: " << changeExtension(fileName, "mhd") <<", reconstruct load failed" << std::endl;
+    ssc::messageManager()->sendWarning("File not found: "+changeExtension(fileName, "mhd")+", reconstruct load failed");
     return;
   }
 

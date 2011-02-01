@@ -9,6 +9,7 @@
 #include "igtlStatusMessage.h"
 
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 
 int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
@@ -137,13 +138,13 @@ void IGTLinkClient::run()
   connect(mSocket, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()), Qt::DirectConnection);
   connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)), Qt::DirectConnection);
 
-  std::cout << "Looking for host: " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Looking for host: "+this->hostDescription());
   mSocket->connectToHost(mAddress, mPort);
 
   int timeout = 5000;
   if (!mSocket->waitForConnected(timeout))
   {
-    std::cout << "Timeout looking for host " << this->hostDescription() << std::endl;
+    ssc::messageManager()->sendWarning("Timeout looking for host "+this->hostDescription());
     mSocket->disconnectFromHost();
     return;
   }
@@ -168,21 +169,21 @@ QString IGTLinkClient::hostDescription() const
 
 void IGTLinkClient::hostFoundSlot()
 {
-  std::cout << "Host found: " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Host found: "+this->hostDescription());
 }
 void IGTLinkClient::connectedSlot()
 {
-  std::cout << "Connected to host " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Connected to host "+this->hostDescription());
   emit connected(true);
 }
 void IGTLinkClient::disconnectedSlot()
 {
-  std::cout << "Disconnected from host " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Disconnected to host "+this->hostDescription());
   emit connected(false);
 }
 void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
 {
-  std::cout << "Socket error [Host=" << this->hostDescription() <<", Code=" << socketError << "]\n" << mSocket->errorString() << std::endl;
+  ssc::messageManager()->sendError("Socket error [Host="+this->hostDescription()+", Code="+socketError+"]\n"+mSocket->errorString());
 }
 
 /** add the message to a thread-safe queue
