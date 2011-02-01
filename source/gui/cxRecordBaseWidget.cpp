@@ -341,6 +341,8 @@ void USAcqusitionWidget::startedSlot()
   mRecordSessionWidget->setDescription(DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString());
 
   mRTRecorder->startRecord();
+
+  //sleep(60);
 }
 
 //void USAcqusitionWidget::cancelledSlot()

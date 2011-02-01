@@ -77,7 +77,7 @@ void OpenIGTLinkRTSource::timeout()
   if (mTimeout)
     return;
 
-  std::cout << "timeout!" << std::endl;
+  ssc::messageManager()->sendWarning("Timeout!");
   mTimeout = true;
   emit newFrame();
 }
