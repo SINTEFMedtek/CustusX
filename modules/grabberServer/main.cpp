@@ -27,11 +27,16 @@ int main(int argc, char **argv)
   }
 
   cx::MainWindow window(arguments);
-  window.show();
+  if(arguments.contains("--auto"))
+    window.showMinimized();
+  else
+  {
+    window.show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   window.activateWindow();
 #endif
   window.raise();
+  }
 
   int retVal = app.exec();
   return retVal;
