@@ -174,7 +174,7 @@ void IGTLinkConnection::delayedAutoConnectServer()
   if (mConnectWhenLocalServerRunning)
   {
     --mConnectWhenLocalServerRunning;
-    QTimer::singleShot(200, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening.
+    QTimer::singleShot(400, this, SLOT(connectServer())); // the process need some time to get its tcp server up and listening. GrabberServer seems to need more than 500ms
   }
 }
 
