@@ -155,6 +155,7 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
   this->fillDefault("Ultrasound/8bitAcquisitionData", true);
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
+  this->fillDefault("showSectorInRTView", true);
 
 //
 //
