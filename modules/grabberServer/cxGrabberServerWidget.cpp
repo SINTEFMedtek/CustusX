@@ -87,6 +87,8 @@ void MacGrabberServerWidget::connectGrabberServer()
 {
   mGrabberServer = GrabberServerPtr(new MacGrabberServer());
   this->portChangedSlot(qstring_cast(mGrabberServer->getPort()));
+
+  connect(mGrabberServer.get(), SIGNAL(queueSize(int)), this, SIGNAL(queueSize(int)));
 }
 
 //=============================================================================
