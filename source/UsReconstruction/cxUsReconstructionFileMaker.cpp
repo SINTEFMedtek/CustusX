@@ -3,7 +3,9 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QSettings>
 #include <vtkImageChangeInformation.h>
+#include <vtkImageLuminance.h>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "vtkImageAppend.h"
@@ -14,10 +16,10 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace cx
 {
-UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, RecordSessionPtr session, QString activepatientPath, ToolPtr tool) :
+UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool) :
     mTrackerRecordedData(trackerRecordedData),
     mStreamRecordedData(streamRecordedData),
-    mSession(session),
+    mSessionDescription(sessionDescription),
     mActivepatientPath(activepatientPath),
     mTool(tool)
 {
@@ -34,7 +36,8 @@ UsReconstructionFileMaker::~UsReconstructionFileMaker()
 
 QString UsReconstructionFileMaker::write()
 {
-  QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSession);
+//  std::cout << "UsReconstructionFileMaker::write() start" << std::endl;
+  QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
 
   this->writeTrackerTimestamps(reconstructionFolder);
   this->writeTrackerTransforms(reconstructionFolder);
@@ -43,21 +46,22 @@ QString UsReconstructionFileMaker::write()
   this->writeUSImages(reconstructionFolder, calibrationFile);
   this->copyProbeCalibConfigsXml(reconstructionFolder);
 
+//  std::cout << "UsReconstructionFileMaker::write() stop" << std::endl;
   return reconstructionFolder;
 }
 
 QString UsReconstructionFileMaker::getMhdFilename(QString reconstructionFolder)
 {
-  QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
+  QString mhdFilename = reconstructionFolder+"/"+mSessionDescription+".mhd";
   return mhdFilename;
 }
 
-QString UsReconstructionFileMaker::makeFolder(QString patientFolder, RecordSessionPtr session)
+QString UsReconstructionFileMaker::makeFolder(QString patientFolder, QString sessionDescription)
 {
   QString retval("");
   QDir patientDir(patientFolder + "/US_Acq");
 
-  QString subfolder = session->getDescription();
+  QString subfolder = sessionDescription;
   QString subfolderAbsolutePath = patientDir.absolutePath()+"/"+subfolder;
   QString newPathName = subfolderAbsolutePath;
   int i=1;
@@ -84,7 +88,7 @@ bool UsReconstructionFileMaker::createSubfolder(QString subfolderAbsolutePath)
 
 void UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder)
 {
-  QFile file(reconstructionFolder+"/"+mSession->getDescription()+".tts");
+  QFile file(reconstructionFolder+"/"+mSessionDescription+".tts");
   if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+file.fileName());
@@ -103,7 +107,7 @@ void UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFol
 
 void UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder)
 {
-  QFile file(reconstructionFolder+"/"+mSession->getDescription()+".tp");
+  QFile file(reconstructionFolder+"/"+mSessionDescription+".tp");
   if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+file.fileName());
@@ -136,7 +140,7 @@ void UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFol
 
 void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
 {
-  QFile file(reconstructionFolder+"/"+mSession->getDescription()+".fts");
+  QFile file(reconstructionFolder+"/"+mSessionDescription+".fts");
   if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+file.fileName());
@@ -158,23 +162,39 @@ void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
  */
 vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
 {
+//  std::cout << "UsReconstructionFileMaker::mergeFrames() start " << std::endl;
+
   vtkImageAppendPtr filter = vtkImageAppendPtr::New();
   filter->SetAppendAxis(2); // append along z-axis
+
+  bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
   int i=0;
   for(ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
-    filter->SetInput(i++, it->second);
+    vtkImageDataPtr input = it->second;
+    if (bw)
+    {
+      if (it->second->GetNumberOfScalarComponents()>2) // color
+      {
+        vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+        luminance->SetInput(input);
+        input = luminance->GetOutput();
+      }
+    }
+
+    filter->SetInput(i++, input);
   }
 
   filter->Update();
+//  std::cout << "UsReconstructionFileMaker::mergeFrames() stop " << std::endl;
   return filter->GetOutput();
 }
 
 void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
   QString mhdFilename = this->getMhdFilename(reconstructionFolder);
-//  QString mhdFilename = reconstructionFolder+"/"+mSession->getDescription()+".mhd";
+//  QString mhdFilename = reconstructionFolder+"/"+mSessionDescription->getDescription()+".mhd";
 
   vtkImageDataPtr usData = this->mergeFrames();
 
@@ -194,7 +214,9 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   writer->SetInput(usData);
   writer->SetFileName(cstring_cast(mhdFilename));
   writer->SetCompression(false);
+//  std::cout << "UsReconstructionFileMaker::writeUSImages start write" << std::endl;
   writer->Write();
+//  std::cout << "UsReconstructionFileMaker::writeUSImages stop write" << std::endl;
   //std::cout << "finished write mhd file " << mhdFilename << std::endl;
   writer = NULL; // ensure file is closed (might not be necessary)
 
@@ -253,8 +275,8 @@ void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionF
 {
   //std::cout << "UsReconstructionFileMaker::writeUSImages sta" << std::endl;
 
-  QFile mhdFile(reconstructionFolder+"/"+mSession->getDescription()+".mhd");
-  QFile rawFile(reconstructionFolder+"/"+mSession->getDescription()+".raw");
+  QFile mhdFile(reconstructionFolder+"/"+mSessionDescription->getDescription()+".mhd");
+  QFile rawFile(reconstructionFolder+"/"+mSessionDescription->getDescription()+".raw");
   if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+mhdFile.fileName());

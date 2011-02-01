@@ -41,4 +41,4 @@ SET ( ${LIB}_statemachineManager
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_statemachineManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC cxCommon viewManager registrationManager)
+target_link_libraries(${LIB} SSC cxCommon viewManager registrationManager sscUsReconstructionLib)
