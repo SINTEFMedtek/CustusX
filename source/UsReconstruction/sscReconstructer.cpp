@@ -971,7 +971,7 @@ QString Reconstructer::generateImageName(QString uid) const
   QString name = uid.split("/").back();
   name = name.split(".").front();
   QString prefix = name.split("_").front(); // retrieve US-Acq part
-  prefix = name.split("-").front(); // retrieve US part.
+  prefix = prefix.split("-").front(); // retrieve US part.
   if (prefix.isEmpty())
     prefix = "US";
 
