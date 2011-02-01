@@ -12,6 +12,7 @@
 #include "cxPatientData.h"
 //#include "cxViewManager.h"
 #include "cxDataLocations.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
