@@ -186,7 +186,7 @@ void IGTLinkConnection::launchAndConnectServer()
 
     if (mServer->state()!=QProcess::Running)
     {
-      mConnectWhenLocalServerRunning = 3; // attempt 3 connects
+      mConnectWhenLocalServerRunning = 5; // attempt N connects
     }
     else
     {
