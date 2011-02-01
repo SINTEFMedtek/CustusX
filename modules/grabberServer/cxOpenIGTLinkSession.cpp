@@ -26,6 +26,7 @@ void OpenIGTLinkSession::run()
 
   OpenIGTLinkSender* sender = new OpenIGTLinkSender(mSocket);
   connect(this, SIGNAL(frame(Frame&)), sender, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
+  connect(sender, SIGNAL(queueSize(int)), this, SIGNAL(queueSize(int)));
 
   this->exec();
 
@@ -104,7 +105,7 @@ void OpenIGTLinkSender::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
   QMutexLocker sentry(&mImageMutex);
   mMutexedImageMessageQueue.push_back(imgMsg);
   sentry.unlock();
-  ssc::messageManager()->sendInfo("Images in queue: "+qstring_cast(mMutexedImageMessageQueue.size()));
+  emit queueSize(mMutexedImageMessageQueue.size());
   emit imageOnQueue(); // emit signal outside lock, catch possibly in another thread
 }
 
