@@ -977,10 +977,10 @@ QString Reconstructer::generateImageName(QString uid) const
 
   // retrieve  index counter from _99_
   QString counter = "";
-  QRegExp countReg("_[0-9]{2}_");
+  QRegExp countReg("_[0-9]{1,2}_");
   if (countReg.indexIn(name)>0)
   {
-    counter = countReg.cap(0);
+    counter = countReg.cap(0).remove("_");
   }
 
   // retrieve timestamp as HH:MM
