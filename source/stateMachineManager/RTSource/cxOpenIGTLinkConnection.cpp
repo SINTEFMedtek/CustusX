@@ -52,7 +52,7 @@ QString IGTLinkConnection::getLocalServerCommandLine()
 {
   QString cmd = DataLocations::getSettings()->value("IGTLink/localServer").toString();
   if (cmd.isEmpty())
-    cmd = "GrabberServer --auto";
+    cmd = "GrabberServer.app --auto";
   return cmd;
 }
 
@@ -133,9 +133,8 @@ void IGTLinkConnection::launchServer()
   QStringList arguments = text;
   arguments.pop_front();
 
-  ;
   if (!QFileInfo(program).isAbsolute())
-    program = qApp->applicationDirPath() + "/" + program;
+    program = DataLocations::getBundlePath() + "/" + program;
 
   if (!QFileInfo(program).exists())
   {
