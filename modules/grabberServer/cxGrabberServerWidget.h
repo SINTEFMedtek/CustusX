@@ -65,6 +65,9 @@ public:
   MacGrabberServerWidget(QWidget* parent);
   virtual ~MacGrabberServerWidget(){};
 
+signals:
+  void queueSize(int);
+
 protected:
   virtual void connectGrabberServer(); ///< Connects to a MacGrabberServer
 };

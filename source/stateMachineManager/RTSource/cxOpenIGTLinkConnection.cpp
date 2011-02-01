@@ -118,7 +118,6 @@ void IGTLinkConnection::launchServer()
   //  QStringList arguments;
   //  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
 
-
   QString commandline = this->getLocalServerCommandLine();
 
   if (commandline.isEmpty())
