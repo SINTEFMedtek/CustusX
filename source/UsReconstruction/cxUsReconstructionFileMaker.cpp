@@ -3,7 +3,9 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QSettings>
 #include <vtkImageChangeInformation.h>
+#include <vtkImageLuminance.h>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "vtkImageAppend.h"
@@ -34,6 +36,7 @@ UsReconstructionFileMaker::~UsReconstructionFileMaker()
 
 QString UsReconstructionFileMaker::write()
 {
+//  std::cout << "UsReconstructionFileMaker::write() start" << std::endl;
   QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
 
   this->writeTrackerTimestamps(reconstructionFolder);
@@ -43,6 +46,7 @@ QString UsReconstructionFileMaker::write()
   this->writeUSImages(reconstructionFolder, calibrationFile);
   this->copyProbeCalibConfigsXml(reconstructionFolder);
 
+//  std::cout << "UsReconstructionFileMaker::write() stop" << std::endl;
   return reconstructionFolder;
 }
 
@@ -158,16 +162,32 @@ void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
  */
 vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
 {
+//  std::cout << "UsReconstructionFileMaker::mergeFrames() start " << std::endl;
+
   vtkImageAppendPtr filter = vtkImageAppendPtr::New();
   filter->SetAppendAxis(2); // append along z-axis
+
+  bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
   int i=0;
   for(ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
-    filter->SetInput(i++, it->second);
+    vtkImageDataPtr input = it->second;
+    if (bw)
+    {
+      if (it->second->GetNumberOfScalarComponents()>2) // color
+      {
+        vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
+        luminance->SetInput(input);
+        input = luminance->GetOutput();
+      }
+    }
+
+    filter->SetInput(i++, input);
   }
 
   filter->Update();
+//  std::cout << "UsReconstructionFileMaker::mergeFrames() stop " << std::endl;
   return filter->GetOutput();
 }
 
@@ -194,7 +214,9 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   writer->SetInput(usData);
   writer->SetFileName(cstring_cast(mhdFilename));
   writer->SetCompression(false);
+//  std::cout << "UsReconstructionFileMaker::writeUSImages start write" << std::endl;
   writer->Write();
+//  std::cout << "UsReconstructionFileMaker::writeUSImages stop write" << std::endl;
   //std::cout << "finished write mhd file " << mhdFilename << std::endl;
   writer = NULL; // ensure file is closed (might not be necessary)
 

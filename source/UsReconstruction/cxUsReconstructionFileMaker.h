@@ -26,7 +26,6 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 class UsReconstructionFileMaker
 {
 public:
-  //UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, RecordSessionPtr session, QString activepatientPath, ToolPtr tool);
   UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool);
   ~UsReconstructionFileMaker();
 
@@ -53,5 +52,8 @@ private:
   ToolPtr mTool;
 
 };
+
+typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+
 }
 #endif /* CXUSRECONSTRUCTIONFILEMAKER_H_ */

@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <vtkPolyData.h>
+#include "boost/bind.hpp"
 #include "sscToolManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
@@ -200,6 +201,8 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
 
+  connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
+
   mRecordSessionWidget->setDescriptionVisibility(false);
 
 //  mRTSourceDataAdapter = SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter());
@@ -291,12 +294,22 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 //    return;
   }
 
+//  std::cout << "pre save" << std::endl;
   ToolPtr probe = TrackedRecordWidget::getTool();
-  UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe);
-  QString targetFolder = filemaker.write();
+  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe));
+
+  mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
+  mFileMakerFutureWatcher.setFuture(mFileMakerFuture);
+//  std::cout << "save started" << std::endl;
+//  QString targetFolder = filemaker.write();
+}
+
+void USAcqusitionWidget::fileMakerWriteFinished()
+{
+  QString targetFolder = mFileMakerFutureWatcher.future().result();
 
 //  std::cout << "select data" << std::endl;
-  stateManager()->getReconstructer()->selectData(filemaker.getMhdFilename(targetFolder));
+  stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
 //  std::cout << "selected data" << std::endl;
 
   mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
