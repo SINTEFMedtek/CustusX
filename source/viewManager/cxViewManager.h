@@ -161,7 +161,8 @@ protected:
   ViewMap       mViewMap;               ///< a map of all the views
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
-  
+  QDateTime mLastFullRender;
+
 //  bool mShadingOn; ///< Use shading for rendering?
   QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   RenderTimerPtr mRenderTimer;
