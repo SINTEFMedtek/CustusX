@@ -153,6 +153,7 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("globalApplicationName", "Lab");
   this->fillDefault("globalPatientNumber", 1);
   this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
+  this->fillDefault("Ultrasound/8bitAcquisitionData", true);
 
 //
 //

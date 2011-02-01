@@ -13,6 +13,7 @@ class QPushButton;
 class QSettings;
 class QSpinBox;
 class QCheckBox;
+class QRadioButton;
 class QGridLayout;
 class QVBoxLayout;
 class QLineEdit;
@@ -157,11 +158,13 @@ public:
 public slots:
   void saveParametersSlot();
 
-
 protected:
   QSettingsPtr mSettings;
   QLineEdit* mAcquisitionNameLineEdit;
   QVBoxLayout *mMainLayout;
+
+  QRadioButton* m24bitRadioButton;
+  QRadioButton* m8bitRadioButton;
 };
 
 /**
