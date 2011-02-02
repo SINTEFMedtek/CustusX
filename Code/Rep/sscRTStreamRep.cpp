@@ -43,6 +43,7 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   mPlaneSource(vtkPlaneSourcePtr::New()),
   mTexture(vtkTexturePtr::New() )
 {
+  mClipSector = true;
   mDataRedirecter = vtkImageChangeInformationPtr::New();
   mUseMask = useMaskFilter;
   mIgnoreToolTransform = false;
@@ -67,11 +68,11 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   }
 
   // generate texture coords for mPlaneSource
-  vtkTextureMapToPlanePtr tMapper = vtkTextureMapToPlanePtr::New();
-  tMapper->SetInput(mPlaneSource->GetOutput());
+  mTextureMapToPlane = vtkTextureMapToPlanePtr::New();
+  mTextureMapToPlane->SetInput(mPlaneSource->GetOutput());
 
   mTransformTextureCoords = vtkTransformTextureCoordsPtr::New();
-  mTransformTextureCoords->SetInput(tMapper->GetOutput() );
+  mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
   mTransformTextureCoords->SetOrigin( 0, 0, 0);
   mTransformTextureCoords->SetScale( 1, 1, 0);
   mTransformTextureCoords->FlipROn(); //r axis
@@ -137,19 +138,55 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
 //    std::cout << "setting tool in rt rep" << std::endl;
 //    mToolActor->SetVisibility(mTool->getVisible());
 
+    this->clipToSectorChanged();
+//
+//    if (mUseMask)
+//    {
+//      // do nothing: keep the pipeline from PlaneSource
+//    }
+//    else
+//    {
+//      // now that we have a tool: use the ultraound source, updated by the probe
+//      mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
+//    }
+
+    this->probeSectorChanged();
+  }
+}
+
+/**Turn sector clipping on/off.
+ * If on, only the area inside the probe sector is shown.
+ *
+ */
+void RealTimeStreamGraphics::setClipToSector(bool on)
+{
+  mClipSector = on;
+  this->clipToSectorChanged();
+}
+
+/**
+ */
+void RealTimeStreamGraphics::clipToSectorChanged()
+{
+  if (mClipSector)
+  {
     if (mUseMask)
     {
-      // do nothing: keep the pipeline from PlaneSource
+      // keep the pipeline from PlaneSource
+      mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
     }
     else
     {
       // now that we have a tool: use the ultraound source, updated by the probe
       mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
     }
-
-    this->probeSectorChanged();
+  }
+  else
+  {
+    mTransformTextureCoords->SetInput(mTextureMapToPlane->GetOutput() );
   }
 }
+
 
 void RealTimeStreamGraphics::probeSectorChanged()
 {
@@ -382,6 +419,7 @@ RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, con
   mRTGraphics.reset(new RealTimeStreamGraphics());
   connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
   mRTGraphics->setIgnoreToolTransform(true);
+  mRTGraphics->setClipToSector(false);
 
   mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
   mInfoText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -392,7 +430,7 @@ RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, con
   mStatusText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
   mStatusText->setCentered();
   mStatusText->setPosition(0.5, 0.5);
-  mStatusText->updateText("testimage");
+  mStatusText->updateText("Not Connected");
 
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
@@ -432,7 +470,7 @@ void RealTimeStreamFixedPlaneRep::updateSector()
 
 void RealTimeStreamFixedPlaneRep::setTool(ToolPtr tool)
 {
-//  mRTGraphics->setTool(tool);
+  mRTGraphics->setTool(tool);
   mTool = tool;
 }
 
