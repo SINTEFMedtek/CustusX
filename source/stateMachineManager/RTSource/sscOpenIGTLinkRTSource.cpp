@@ -35,6 +35,7 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New())
 {
   mLastTimestamp = 0;
+  mTimestampCalibration = 0;
   mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
@@ -128,6 +129,14 @@ void OpenIGTLinkRTSource::stop()
 bool OpenIGTLinkRTSource::validData() const
 {
   return mClient && !mTimeout;
+}
+
+/**Set a time shift that is added to every timestamp acquired from the source.
+ * This can be used to calibrate time shifts between source and client.
+ */
+void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
+{
+  mTimestampCalibration = delta;
 }
 
 double OpenIGTLinkRTSource::getTimestamp()
@@ -320,6 +329,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
   mImageMessage->GetTimeStamp(timestamp);
   mLastTimestamp = timestamp->GetTimeStamp() * 1000;
+  mLastTimestamp += mTimestampCalibration;
 
   mImageImport->SetDataOrigin(0,0,0);
   mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);

@@ -82,7 +82,7 @@ VolumeInfoWidget::~VolumeInfoWidget()
 
 void VolumeInfoWidget::deleteDataSlot()
 {
-  if (ssc::dataManager()->getActiveImage())
+  if (!ssc::dataManager()->getActiveImage())
     return;
   ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
 }
