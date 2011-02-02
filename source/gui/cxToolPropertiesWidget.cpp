@@ -97,6 +97,12 @@ ActiveToolConfigurationStringDataAdapter::ActiveToolConfigurationStringDataAdapt
 }
 void ActiveToolConfigurationStringDataAdapter::dominantToolChanged()
 {
+  // ignore tool changes to something non-probeish.
+  // This gives the user a chance to use the widget without having to show the probe.
+  ssc::ToolPtr newTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!newTool || newTool->getProbeSector().mType==ssc::ProbeSector::tNONE)
+    return;
+
   if (mTool)
     disconnect(mTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SIGNAL(changed()));
 
