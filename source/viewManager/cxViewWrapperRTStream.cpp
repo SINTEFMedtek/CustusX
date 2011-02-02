@@ -101,7 +101,13 @@ void ViewWrapperRTStream::streamLoadedSlot()
 
 void ViewWrapperRTStream::dominantToolChangedSlot()
 {
-  mStreamRep->setTool(ssc::toolManager()->getDominantTool());
+  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+
+  // ignore non-probe tools
+  if (!tool || tool->getProbeSector().mType==ssc::ProbeSector::tNONE)
+    return;
+
+  mStreamRep->setTool(tool);
 }
 
 void ViewWrapperRTStream::updateSlot()

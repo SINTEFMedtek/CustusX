@@ -342,7 +342,7 @@ void USAcqusitionWidget::startedSlot()
 
   mRTRecorder->startRecord();
 
-  //sleep(60);
+  //sleep(120);
 }
 
 //void USAcqusitionWidget::cancelledSlot()
