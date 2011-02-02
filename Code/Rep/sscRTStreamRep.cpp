@@ -46,7 +46,7 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   mClipSector = true;
   mDataRedirecter = vtkImageChangeInformationPtr::New();
   mUseMask = useMaskFilter;
-  mIgnoreToolTransform = false;
+  mShowInToolSpace = true;
   mUSSource = UltrasoundSectorSource::New();
   mUSSource->setProbeSector(mProbeData.getSector());
 
@@ -91,9 +91,9 @@ RealTimeStreamGraphics::~RealTimeStreamGraphics()
 {
 }
 
-void RealTimeStreamGraphics::setIgnoreToolTransform(bool on)
+void RealTimeStreamGraphics::setShowInToolSpace(bool on)
 {
-  mIgnoreToolTransform = on;
+  mShowInToolSpace = on;
 }
 
 vtkActorPtr RealTimeStreamGraphics::getActor()
@@ -123,10 +123,14 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
     disconnect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
   }
 
-  mTool = tool;
+  // accept only tool with a probe sector
+  if (tool && tool->getProbeSector().mType!=ssc::ProbeSector::tNONE)
+  {
+    mTool = tool;
+  }
 
   // setup new
-  if (mTool)
+  if (mTool )
   {
     connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
     connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
@@ -138,7 +142,6 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
 //    std::cout << "setting tool in rt rep" << std::endl;
 //    mToolActor->SetVisibility(mTool->getVisible());
 
-    this->clipToSectorChanged();
 //
 //    if (mUseMask)
 //    {
@@ -150,8 +153,9 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
 //      mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
 //    }
 
-    this->probeSectorChanged();
   }
+  this->clipToSectorChanged();
+  this->probeSectorChanged();
 }
 
 /**Turn sector clipping on/off.
@@ -286,7 +290,7 @@ void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
 
 void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
-  if (mIgnoreToolTransform)
+  if (!mShowInToolSpace)
     return;
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D tMu = mProbeData.get_tMu();
@@ -353,7 +357,13 @@ void RealTimeStreamGraphics::newDataSlot()
     mPlaneSource->GetOutput()->Modified();
   }
 
-  mPlaneActor->SetVisibility(mData->validData());
+  bool visible = mData->validData();
+  if (mShowInToolSpace)
+  {
+    visible = visible && mTool && mTool->getVisible();
+  }
+
+  mPlaneActor->SetVisibility(visible);
   mPlaneActor->Modified();
 
   emit newData();
@@ -418,7 +428,8 @@ RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, con
 {
   mRTGraphics.reset(new RealTimeStreamGraphics());
   connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
-  mRTGraphics->setIgnoreToolTransform(true);
+//  mRTGraphics->setIgnoreToolTransform(true);
+  mRTGraphics->setShowInToolSpace(false);
   mRTGraphics->setClipToSector(false);
 
   mInfoText.reset(new ssc::TextDisplay("", Vector3D(1.0, 0.8, 0.0), 16));
@@ -454,8 +465,10 @@ bool RealTimeStreamFixedPlaneRep::getShowSector() const
 
 void RealTimeStreamFixedPlaneRep::updateSector()
 {
-  mProbeSectorActor->SetVisibility(mTool!=0 && this->getShowSector());
-  if (!mTool || !this->getShowSector())
+  bool show = mTool && this->getShowSector() && mTool->getProbeSector().mType!=ssc::ProbeSector::tNONE;
+
+  mProbeSectorActor->SetVisibility(show);
+  if (!show)
     return;
 
   mProbeData.setSector(mTool->getProbeSector());
@@ -464,7 +477,8 @@ void RealTimeStreamFixedPlaneRep::updateSector()
   {
     mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
   }
-  mProbeSectorActor->SetVisibility(mTool->getVisible());
+//  mProbeSectorActor->SetVisibility(mTool->getVisible());
+  mProbeSectorActor->SetVisibility(true);
 
 }
 

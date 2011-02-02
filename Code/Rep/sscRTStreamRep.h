@@ -42,7 +42,7 @@ public:
   ToolPtr getTool();
   ssc::ProbeData getProbeData();
   void setClipToSector(bool on);
-  void setIgnoreToolTransform(bool on);
+  void setShowInToolSpace(bool on);
   vtkActorPtr getActor();
 
 signals:
@@ -62,7 +62,7 @@ private:
   bool mUseMask;
   bool mClipSector;
 
-  bool mIgnoreToolTransform;
+  bool mShowInToolSpace;
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
   RealTimeStreamSourcePtr mData;
