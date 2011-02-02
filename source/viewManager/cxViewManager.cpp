@@ -550,7 +550,7 @@ void ViewManager::renderAllViewsSlot()
   // occational effects that the smart render is too dumb to see.
   bool smart = mSmartRender;
   int smartInterval = mRenderingTimer->interval() * 40;
-  if (mLastFullRender.msecsTo(QDateTime::currentDateTime())>smartInterval)
+  if (mLastFullRender.time().msecsTo(QDateTime::currentDateTime().time())>smartInterval)
     smart = false;
 
   for(ViewMap::iterator iter=mViewMap.begin(); iter != mViewMap.end(); ++iter)
