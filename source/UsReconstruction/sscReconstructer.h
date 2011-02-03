@@ -13,7 +13,7 @@
 #include "sscReconstructAlgorithm.h"
 #include "sscBoundingBox3D.h"
 #include "sscReconstructedOutputVolumeParams.h"
-#include "probeXmlConfigParser.h"
+//#include "probeXmlConfigParser.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
