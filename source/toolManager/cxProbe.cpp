@@ -76,7 +76,7 @@ QStringList Probe::getConfigIdList() const
 //QString Probe::getNameOfProbeSectorConfigId(QString configString) ///< get a name for the given configuration
 QString Probe::getConfigName(QString configString) ///< get a name for the given configuration
 {
-  ProbeXmlConfigParser::Configuration config = this->getConfiguration(this->getConfigId());
+  ProbeXmlConfigParser::Configuration config = this->getConfiguration(configString);
   return config.mName;
 }
 

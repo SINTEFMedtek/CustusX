@@ -25,6 +25,8 @@
 #include "sscOpenIGTLinkClient.h"
 #include "sscMessageManager.h"
 #include "sscTime.h"
+#include "sscVector3D.h"
+
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
@@ -136,7 +138,10 @@ bool OpenIGTLinkRTSource::validData() const
  */
 void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
 {
-  ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
+  if (ssc::similar(mTimestampCalibration,delta))
+      return;
+  if (!ssc::similar(delta, 0.0))
+    ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
   mTimestampCalibration = delta;
 }
 
