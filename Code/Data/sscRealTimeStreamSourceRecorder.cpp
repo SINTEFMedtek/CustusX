@@ -12,9 +12,11 @@
 namespace ssc
 {
 
-RealTimeStreamSourceRecorder::RealTimeStreamSourceRecorder(RealTimeStreamSourcePtr source) :
+RealTimeStreamSourceRecorder::RealTimeStreamSourceRecorder(RealTimeStreamSourcePtr source, bool sync) :
     mSource(source)
 {
+  mSynced = !sync;
+  mSyncShift = 0;
 }
 
 void RealTimeStreamSourceRecorder::startRecord()
@@ -30,6 +32,12 @@ void RealTimeStreamSourceRecorder::stopRecord()
 void RealTimeStreamSourceRecorder::newFrameSlot()
 {
   double timestamp = mSource->getTimestamp();
+
+  if (!mSynced)
+  {
+    mSyncShift = ssc::getMilliSecondsSinceEpoch() - timestamp;
+  }
+
   vtkImageDataPtr frame = vtkImageDataPtr::New();
   frame->DeepCopy(mSource->getVtkImageData());
   mData[timestamp] = frame;
@@ -37,6 +45,9 @@ void RealTimeStreamSourceRecorder::newFrameSlot()
 
 RealTimeStreamSourceRecorder::DataType RealTimeStreamSourceRecorder::getRecording(double start, double stop)
 {
+  start -= mSyncShift;
+  stop -= mSyncShift;
+
   RealTimeStreamSourceRecorder::DataType retval = mData;
 
   retval.erase(retval.begin(), retval.lower_bound(start)); // erase all data earlier than start
