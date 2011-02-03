@@ -9,7 +9,7 @@
 #include <vtkImageData.h>
 #include "matrixInterpolation.h"
 #include "sscBoundingBox3D.h"
-#include "sscDataManagerImpl.h"
+#include "sscDataManager.h"
 #include "sscXmlOptionItem.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
@@ -24,6 +24,7 @@
 #include "sscUtilHelpers.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
+#include "cxUsReconstructionFileReader.h"
 
 #include "cxToolManager.h"
 #include "sscManualTool.h"
@@ -43,9 +44,9 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mLastAppliedMaskReduce(""),
   mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags 
 {
-  //std::cout << "Reconstructer::Reconstructer" << std::endl;
-  mSettings = settings;
+  mFileReader.reset(new cx::UsReconstructionFileReader());
 
+  mSettings = settings;
   mSettings.getElement("algorithms");
 
   mOrientationAdapter = StringDataAdapterXml::initialize("Orientation", "",
@@ -80,13 +81,11 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 
 Reconstructer::~Reconstructer()
 {
-//  std::cout << "Reconstructer::~Reconstructer()" << std::endl;
   mSettings.save();
 }
 
 void Reconstructer::createAlgorithm()
 {
-//  QString name = mSettings.getStringOption("Algorithm").getValue();
   QString name = mAlgorithmAdapter->getValue();
 
   if (mAlgorithm && mAlgorithm->getName()==name)
@@ -125,7 +124,7 @@ void Reconstructer::setSettings()
     this->clearOutput();
     // reread everything.
     this->readFiles(mFilename, mCalFilesPath);
-    if(!this->isValid())
+    if(!this->validInputData())
     {
       ssc::messageManager()->sendWarning("Cannot set settings, no valid frames available.");
       return;
@@ -149,11 +148,7 @@ void Reconstructer::clearAll()
   mFrames.clear();
   mPositions.clear();
   mOutputVolumeParams = OutputVolumeParams();
-  mMask.reset();///< Clipping mask for the input data
-  //ReconstructAlgorithmPtr mAlgorithm;
-  //ProbeXmlConfigParser::Configuration mConfiguration;
-  //QDomDocument mSettings;
-  //QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
+  mMask.reset();
   this->clearOutput();
 }
 
@@ -188,210 +183,9 @@ bool within(int x, int min, int max)
 {
   return (x>=min) && (x<=max);
 }
-  
-void Reconstructer::readUsDataFile(QString mhdFileName)
-{
-  //Read US images
-  
-  //Split mhdFileName into file name and file path
-  QStringList list = mhdFileName.split("/");
-  QString fileName = list[list.size()-1];
-  list[list.size()-1] = "";
-  QString filePath = list.join("/");//+"/";
-  
-  // Remove file ending from file name
-  list = fileName.split(".");
-  if(list.size() > 1)
-  {
-    list[list.size()-1] = "";
-    fileName = list.join("");
-  }
-  
-  //Use file name as uid
-  ImagePtr UsRaw = boost::shared_dynamic_cast<Image>(MetaImageReader().load(fileName, mhdFileName));
-  UsRaw->setFilePath(filePath);
-  mUsRaw.reset(new USFrameData(UsRaw));
-  
-  //Read XML info from mdh file
-  //Stored in ConfigurationID tag
-  QFile file(mhdFileName);
-  if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-  {
-    ssc::messageManager()->sendWarning("Error in Reconstructer::readUsDataFile(): Can't open file: "
-                                       + mhdFileName);
-  }
-  bool foundConfig = false;
-  QStringList configList;
-  bool foundCalFile = false;
-  while (!file.atEnd())
-  {
-    //QByteArray array = file.readLine();
-    //QString line = QString(array);
-    QString line = file.readLine();
-    if(line.startsWith("ConfigurationID", Qt::CaseInsensitive))
-    {
-      QStringList tempList = line.split("=", QString::SkipEmptyParts);
-      configList = tempList[1].trimmed().split(":", QString::SkipEmptyParts);
-      configList[3] = configList[3].trimmed();
-      foundConfig = true;
-    }
-    else if(line.startsWith("ProbeCalibration", Qt::CaseInsensitive))
-    {
-      QStringList list = line.split("=", QString::SkipEmptyParts);
-      mCalFileName = list[1].trimmed();
-      foundCalFile = true;
-      std::cout << "Calibration file used: " << mCalFileName.toStdString() << std::endl;
-    }
-  }
-  if(!foundConfig)
-  {
-    ssc::messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
-                                       + "Can't find ConfigurationID in file: "
-                                       + mhdFileName);
-  }
-  else
-  {
-    //Assumes ProbeCalibConfigs.xml file and calfiles have the same path
-    ssc::messageManager()->sendInfo("Use mCalFilesPath: " + mCalFilesPath);
-    QString xmlPath = mCalFilesPath+"ProbeCalibConfigs.xml";
-    ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
 
-    ProbeXmlConfigParser::Configuration configuration;
-    configuration = xmlConfigParser->getConfiguration(configList[0],
-                                                       configList[1], 
-                                                       configList[2], 
-                                                       configList[3]);
-    //TODO insert line:
-    mProbeData.setSector(createProbeDataFromConfiguration(configuration));
-    cx::ToolManager::getInstance()->getManualTool()->setProbeSector(createProbeDataFromConfiguration(configuration));
-  }
-  
-  if(!foundCalFile)
-  {
-    ssc::messageManager()->sendWarning(QString("Error in Reconstructer::readUsDataFile(): ")
-                                       + "Can't find ProbeCalibration in file: "
-                                       + mhdFileName);
-  }
-  
-  //Allcate place for position and time stamps for all frames
-  mFrames.resize(mUsRaw->getDimensions()[2]);
-  
-  //std::cout << "Reconstructer::readUsDataFile() - succes. Number of frames: " 
-  //  << mFrames.size() << std::endl;
-  return;
-}
-
-void Reconstructer::readTimeStampsFile(QString fileName, 
-                                       std::vector<TimedPosition>* timedPos)
-{
-  QFile file(fileName);
-  if(!file.open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Can't open file: " + fileName);
-    return;
-  }
-  bool ok = true;
-  
-  unsigned int i = 0;
-  while (!file.atEnd() && i<timedPos->size())
-  {
-    QByteArray array = file.readLine();
-    double time = QString(array).toDouble(&ok);
-    if (!ok)
-    {
-      ssc::messageManager()->sendWarning("Can't read double in file: " + fileName);
-      return;
-    }
-    timedPos->at(i).mTime = time;
-    i++;
-  }
-  
-  if(i!=timedPos->size())
-  {
-    ssc::messageManager()->sendWarning(QString("Reconstructer::readTimeStampsFile() ")
-                                       + "timedPos->size(): " 
-                                       + qstring_cast(timedPos->size())
-                                       + ", read number of time stamps: "
-                                       + qstring_cast(i));
-  }
-  else
-  {
-    //std::cout << "Reconstructer::readTimeStampsFile() - succes. ";
-    //std::cout << "Number of time stamps: ";
-    //std::cout << timedPos->size() << std::endl;
-  }
-  return;
-}
-  
-void Reconstructer::readPositionFile(QString posFile, bool alsoReadTimestamps)
-{
-  QFile file(posFile);
-  if(!file.open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Can't open file: "
-                                       + posFile);
-    return;
-  }
-  bool ok = true;
-
-  int i = 0;
-  while (!file.atEnd())
-  {
-    TimedPosition position;
-    if (alsoReadTimestamps)
-    {
-      //old format - timestamps embedded in pos file);
-      QByteArray array = file.readLine();
-      position.mTime = QString(array).toDouble(&ok);
-      if (!ok)
-      {
-        ssc::messageManager()->sendWarning("Can't read double in file: " 
-                                           + posFile);
-        return;
-      }
-    }
-    
-    QString positionString = file.readLine();
-    positionString += " " + file.readLine();
-    positionString += " " + file.readLine();
-    positionString += " 0 0 0 1";
-    position.mPos = Transform3D::fromString(positionString, &ok);
-    if (!ok)
-    { 
-      ssc::messageManager()->sendWarning("Can't read position number: "
-                                         + qstring_cast(mPositions.size())
-                                         + " from file: " 
-                                         + posFile
-                                         + "values: "
-                                         + qstring_cast(position.mPos[0][0]));
-      return;
-    }
-    mPositions.push_back(position);
-    //std::cout << positionString << std::endl;
-    //std::cout << position.mPos << std::endl;
-    //std::cout << position.mPos.inv().coord(ssc::Vector3D(0,0,0));  
-    //std::cout << std::endl;
-    i++;
-  }
-  
-  //old format
-  /*if(i!=numPos)
-  {
-    std::cout << "Reconstructer::readPositionFile() - warning. ";
-    std::cout << "numPos: " << numPos << ", read number of pos: ";
-    std::cout << mPositions.size() << std::endl;
-  }*/
-  //std::cout << "Reconstructer::readPositionFile() - succes. ";
-  //std::cout << "Number of positions: ";
-  //std::cout << mPositions.size() << std::endl;
-  return;
-}
-  
 ImagePtr Reconstructer::createMaskFromConfigParams()
 {
-//  ssc::ImagePtr retval = this->generateMask();
-//  return retval;
-
   vtkImageDataPtr mask = mProbeData.getMask();
   ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
 
@@ -410,22 +204,6 @@ ImagePtr Reconstructer::createMaskFromConfigParams()
     if (!spacingOK)
       ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
   }
-//
-//  //TODO: Use corners instead of edges to allow for CLA and phased probes
-//  ssc::ImagePtr retval = this->generateMask();
-//  vtkImageDataPtr data = retval->getBaseVtkImageData();
-//  int* dim(mUsRaw->getDimensions());
-//  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
-//  for(int x = 0; x < dim[0]; x++)
-//    for(int y = 0; y < dim[1]; y++)
-//    {
-//      if(   (x < mConfiguration.mLeftEdge)
-//         || (x > mConfiguration.mRightEdge)
-//         || (y < mConfiguration.mTopEdge)
-//         || (y > mConfiguration.mBottomEdge) )
-//        dataPtr[x + y*dim[0]] = 0;
-//    }
-//  return retval;
   return image;
 }
   
@@ -441,24 +219,7 @@ ImagePtr Reconstructer::generateMask()
   return image;
 }
   
-ImagePtr Reconstructer::readMaskFile(QString mhdFileName)
-{  
-  ssc::ImagePtr retval = this->generateMask();
-  vtkImageDataPtr data = retval->getBaseVtkImageData();
-    
-  QString fileName = changeExtension(mhdFileName, "msk");
-    
-  QFile file(fileName);
-  file.open(QIODevice::ReadOnly);
-  QDataStream stream(&file);    
-        
-  unsigned char* dataPtr = static_cast<unsigned char*>(data->GetScalarPointer());
-  char *rawchars = reinterpret_cast<char*>(dataPtr);
-  
-  stream.readRawData(rawchars, file.size());
-  
-  return retval;
-}
+
   
 /**
  * Apply time calibration function y = ax + b, where
@@ -501,7 +262,7 @@ void Reconstructer::calibrateTimeStamps()
   //                                 + string_cast(offset)
   //                                 + " scale: "
   //                                 + string_cast(scale));
-  calibrateTimeStamps(offset, scale);
+  this->calibrateTimeStamps(offset, scale);
 }
 
 /**
@@ -588,77 +349,6 @@ ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
   return dst;
 }
 
-//void Reconstructer::interpolatePositions()
-//{
-//  vnl_vector<double> DataPoints(mPositions.size());
-//  std::vector<vnl_matrix_double> DataValues(mPositions.size());
-//  vnl_vector<double> InterpolationPoints(mFrames.size());
-//  QString InterpolationMethod = "linear";
-////  QString InterpolationMethod = "closest point";
-//
-//  for (unsigned i=0; i<mPositions.size(); ++i)
-//  {
-//    DataValues[i] = convertSSC2VNL(mPositions[i].mPos.inv());
-//    DataPoints[i] = mPositions[i].mTime;
-//  }
-//  for (unsigned i=0; i<mFrames.size(); ++i)
-//  {
-//    InterpolationPoints[i] = mFrames[i].mTime;
-//  }
-////  std::cout << "--------------------------------" << std::endl;
-////  std::cout << "--------------------------------" << std::endl;
-////  std::cout << "--------------------------------" << std::endl;
-//
-//  std::vector<vnl_matrix_double> result = matrixInterpolation(
-//                         DataPoints,
-//                         DataValues,
-//                         InterpolationPoints,
-//                         InterpolationMethod );
-//
-//  if (result.size()!=mFrames.size())
-//  {
-//    std::cout << "ERROR: failed to interpolate matrices" << std::endl;
-//    return;
-//  }
-//
-//  for (unsigned i=0; i<mFrames.size(); ++i)
-//  {
-//    mFrames[i].mPos = convertVNL2SSC(result[i]).inv();
-//  }
-//}
-
-/**
- * Reads a whitespace separated 4x4 matrix from file
- * \param fileName Input file
- * \return  The matrix
- */
-Transform3D Reconstructer::readTransformFromFile(QString fileName)
-{
-  Transform3D retval;
-  QFile file(fileName);
-  if(!file.open(QIODevice::ReadOnly))
-  {
-    ssc::messageManager()->sendWarning("Can't open file: " 
-                                       + fileName);
-    return retval;
-  }
-  bool ok = true;
-  QString positionString = file.readLine();
-  positionString += " " + file.readLine();
-  positionString += " " + file.readLine();
-  positionString += " " + file.readLine();
-  retval = Transform3D::fromString(positionString, &ok);
-  if (!ok)
-  { 
-    ssc::messageManager()->sendWarning("Can't read calibration from file: "
-                                       + fileName
-                                       + "values: " 
-                                       + qstring_cast(retval[0][0]));
-    return retval;
-  }
-  return retval;
-}
-
 /**
  * Pre:  mPos is sMpr
  * Post: mPos is uMpr
@@ -669,14 +359,14 @@ void Reconstructer::calibrate(QString calFilesPath)
 //  ssc::ProbeData mProbeData;
 
   // Calibration from tool space to localizer = sMt
-  Transform3D sMt = this->readTransformFromFile(calFilesPath+mCalFileName);
+  Transform3D sMt = mFileReader->readTransformFromFile(calFilesPath+mCalFileName);
   
   // Transform from image coordinate syst with origin in upper left corner
   // to t (tool) space. TODO check is u is ul corner or ll corner.
   ssc::Transform3D tMu = mProbeData.get_tMu() * mProbeData.get_uMv();
   
   ssc::Vector3D origo_u = tMu.inv().coord(Vector3D(0,0,0));
-  std::cout << "Origo_u: "<< origo_u << std::endl;
+//  std::cout << "Origo_u: "<< origo_u << std::endl;
 
   ssc::Transform3D sMu = sMt*tMu;
   
@@ -692,88 +382,7 @@ void Reconstructer::calibrate(QString calFilesPath)
   //mPos is prMu
 }
 
-  
-///**
-// * Pre:  mPos is sMpr
-// * Post: mPos is uMpr
-// */
-//void Reconstructer::calibrate(QString calFilesPath)
-//{
-//  // Calibration from tool space to localizer = sMt
-//  Transform3D sMt = this->readTransformFromFile(calFilesPath+mCalFileName);
-//
-//  //testcode: Transform from image coordinate syst with origin in lower left corner
-//  //Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
-//  //Transform3D Rz = ssc::createTransformRotateZ(-M_PI/2.0);
-//  //ssc::Transform3D R = (Rz*Rx);
-//
-//
-//  // Transform from image coordinate syst with origin in upper left corner
-//  // to t (tool) space
-//  Transform3D Rx = ssc::createTransformRotateX(M_PI/2.0);
-//  Transform3D Ry = ssc::createTransformRotateY(-M_PI/2.0);
-//  // Calibration from frame space u to tool space t
-//  ssc::Transform3D R = (Rx*Ry);
-//
-//  int x_u = mConfiguration.mOriginCol * mConfiguration.mPixelWidth;
-//  // Is offset in mm, while col and row is in pixels?
-//  int y_u = (mConfiguration.mOriginRow * mConfiguration.mPixelHeight);// - mConfiguration.mOffset; //Why minus and not plus?
-//  ssc::Vector3D origin_u(x_u, y_u, 0);
-//  ssc::Vector3D origin_rotated = R.coord(origin_u);
-//
-//  ssc::Transform3D T = ssc::createTransformTranslate(-origin_rotated);
-//
-//  ssc::Transform3D tMu = T*R;
-//
-//  ssc::Transform3D sMu = sMt*tMu;
-//
-//  ssc::Vector3D ex_u(1,0,0);
-//  ssc::Vector3D ey_u(0,1,0);
-//  ssc::Vector3D ex_t = tMu.vector(ex_u);
-//  ssc::Vector3D ey_t = tMu.vector(ey_u);
-//  ssc::Vector3D origin_t = tMu.coord(origin_u);
-//
-//  if (!similar(ex_t, ssc::Vector3D(0,-1,0)))
-//  {
-//    ssc::messageManager()->sendWarning("error ex_t: " + qstring_cast(ex_t));
-//  }
-//  if (!similar(ey_t, ssc::Vector3D(0,0,1)))
-//  {
-//    ssc::messageManager()->sendWarning("error ey_t: " + qstring_cast(ey_t));
-//  }
-//  if (!similar(origin_t, ssc::Vector3D(0,0,0)))
-//  {
-//    ssc::messageManager()->sendWarning("error origin_t: "
-//                                       + qstring_cast(origin_t));
-//  }
-//
-//  //mPos is prMs
-//  for (unsigned int i = 0; i < mPositions.size(); i++)
-//  {
-//    ssc::Transform3D prMs = mPositions[i].mPos;
-//    //Calibration * Input position
-//    //ssc::Transform3D tMpr = tMs * sMpr;
-//    //ssc::Transform3D tMpr = tMs * prMs.inv();
-//    //ssc::Transform3D tMpr = sMt.inv() * sMpr;
-//
-//    //ssc::Transform3D prMt = prMs * tMs.inv();
-//    //ssc::Transform3D prMt = prMs * sMt;
-//
-//    //std::cout << prMt.vector(ssc::Vector3D(0,1,0));
-//    //std::cout << prMt.coord(ssc::Vector3D(0,0,0));
-//    //std::cout << std::endl;
-//
-//    mPositions[i].mPos = prMs * sMu;
-//
-//    ssc::Transform3D prMu = prMs * sMu;
-//    //std::cout << prMu.vector(ssc::Vector3D(1,0,0));
-//    //std::cout << prMu.coord(ssc::Vector3D(0,0,0));
-//    //std::cout << std::endl;
-//  }
-//  //mPos is prMu
-//
-//}
-  
+
 /**
  * Generate a rectangle (2D) defining ROI in input image space
  */
@@ -994,15 +603,14 @@ QString Reconstructer::generateImageName(QString uid) const
 
   return name;
 }
-bool Reconstructer::isValid()
+
+bool Reconstructer::validInputData() const
 {
-  bool valid = false;
-
-  if(!mFrames.empty())
-    valid = true;
-
-  return valid;
+  if (mFrames.empty() || !mUsRaw || mPositions.empty())
+    return false;
+  return true;
 }
+
 
 /**
  * Pre:  All data read, mExtent is calculated
@@ -1045,13 +653,6 @@ void Reconstructer::selectData(QString filename)
     return;
   }
 
-  //mInputFile = filename;
-
-//  this->updateComboBox();
-//  mDataComboBox->setToolTip(mInputFile);
-
-  // read data into reconstructer
-
   QStringList list = filename.split("/");
   list[list.size()-1] = "";
   QString calFilesPath = list.join("/")+"/";
@@ -1065,6 +666,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
+  QString mhdFileName = changeExtension(fileName, "mhd");
 
   if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
   {
@@ -1073,34 +675,23 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
     return;
   }
 
-  readUsDataFile(changeExtension(fileName, "mhd"));
-    
-  bool useOldFormat = !QFileInfo(changeExtension(fileName, "fts")).exists();
+  //Read US images
+  mUsRaw = mFileReader->readUsDataFile(mhdFileName);
 
-  if (useOldFormat)
-  {
-    readTimeStampsFile(changeExtension(fileName, "tim"), &mFrames);
-    readPositionFile(changeExtension(fileName, "pos"), true);
-  }
-  else
-  {
-    readTimeStampsFile(changeExtension(fileName, "fts"), &mFrames);
-    readPositionFile(changeExtension(fileName, "tp"), false);
-    readTimeStampsFile(changeExtension(fileName, "tts"), &mPositions);
-  }
+  QStringList probeConfigPath;
+  mFileReader->readCustomMhdTags(mhdFileName, &probeConfigPath, &mCalFileName);
+  ProbeXmlConfigParser::Configuration configuration = mFileReader->readProbeConfiguration(mCalFilesPath, probeConfigPath);
+  mProbeData.setSector(createProbeDataFromConfiguration(configuration));
+
+  mFrames = mFileReader->readFrameTimestamps(fileName);
+  mPositions = mFileReader->readPositions(fileName);
 
   //mPos is now prMs
-
-  if (QFileInfo(changeExtension(fileName, "msk")).exists())
+  mMask = this->generateMask();
+  if (!mFileReader->readMaskFile(fileName, mMask))
   {
-    mMask = this->readMaskFile(changeExtension(fileName, "msk"));
-  }
-  else
-  {
-    //mMask = this->generateMask();
     mMask = this->createMaskFromConfigParams();
   }
-
 
   if (mFrames.empty() || mPositions.empty())
     return;
@@ -1117,9 +708,9 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 
   this->interpolatePositions();
   // mFrames: now mPos as prMu
-  if(!this->isValid())
+  if(!this->validInputData())
   {
-    ssc::messageManager()->sendError("No frames with valid positions.");
+    ssc::messageManager()->sendError("Invalid reconstruct input.");
     return;
   }
 
@@ -1137,9 +728,9 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
   //std::cout << "Use calibration file: " << calFileName << std::endl;
 
   this->readFiles(mhdFileName, calFilesPath);
-  if(!this->isValid())
+  if(!this->validInputData())
   {
-    ssc::messageManager()->sendWarning("Cannot reconstruct, no valid frames available.");
+    ssc::messageManager()->sendWarning("Cannot reconstruct, invalid input.");
     return ImagePtr();
   }
   mOutput = this->generateOutputVolume();
@@ -1151,7 +742,7 @@ ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
 
 void Reconstructer::reconstruct()
 {
-  if (!this->validReconstructData())
+  if (!this->validInputData())
   {
     ssc::messageManager()->sendError("Reconstruct failed: no data loaded");
     return;
@@ -1167,26 +758,9 @@ void Reconstructer::reconstruct()
  */
 void Reconstructer::threadedPreReconstruct()
 {
-  if (!this->validReconstructData())
-  {
+  if (!this->validInputData())
     return;
-  }
-
-  // do anyway: the dim might have changed
-//  if (!mOutput)
-//  {
-    mOutput = this->generateOutputVolume();
-//  }
-}
-
-bool Reconstructer::validReconstructData() const
-{
-  if (mFrames.empty() || !mUsRaw || mPositions.empty())
-  {
-    return false;
-  }
-
-  return true;
+  mOutput = this->generateOutputVolume();
 }
 
 /**The reconstruct part that can be run in a separate thread.
@@ -1194,26 +768,8 @@ bool Reconstructer::validReconstructData() const
  */
 void Reconstructer::threadedReconstruct()
 {
-  if (!this->validReconstructData())
-  {
+  if (!this->validInputData())
     return;
-  }
-  // reconstruction expects the inverted matrix direction: give it that.
-  //std::vector<TimedPosition> mInvFrames = mFrames;
-  
-  //test
-  //for (unsigned int i=0; i < mFrames.size(); i++)
-  //  mInvFrames[i].mPos = mFrames[i].mPos.inv();
-  
-  //test
-  //DataManager::getInstance()->loadImage(mUsRaw);
-  
-  /*double* spacing = mUsRaw->getBaseVtkImageData()->GetSpacing();
-  ssc::Vector3D tp = ssc::Vector3D(370*spacing[0], 150*spacing[1], 0);
-  for (int i = 0; i < mFrames.size(); i++)
-  {
-    std::cout << i << ": " << mFrames[i].mPos.coord(tp) << std::endl;
-  }*/
 
   QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
 
@@ -1229,15 +785,10 @@ void Reconstructer::threadedReconstruct()
  */
 void Reconstructer::threadedPostReconstruct()
 {
-  if (!this->validReconstructData())
-  {
+  if (!this->validInputData())
     return;
-  }
 
   DataManager::getInstance()->loadData(mOutput);
-  //DataManager::getInstance()->loadImage(mUsRaw);
-  
-  //TODO: fix mOutputBasePath
   DataManager::getInstance()->saveImage(mOutput, mOutputBasePath);
 }
 
@@ -1245,10 +796,6 @@ ImagePtr Reconstructer::getOutput()
 {
   return mOutput;
 }
-/*ImagePtr Reconstructer::getInput()
-{
-  return mUsRaw;
-}*/
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -1257,21 +804,16 @@ ImagePtr Reconstructer::getOutput()
 
 ThreadedReconstructer::ThreadedReconstructer(ReconstructerPtr reconstructer)
 {
-//  std::cout << "pre threaded reconstruct" << std::endl;
   mReconstructer = reconstructer;
   mReconstructer->threadedPreReconstruct();
   connect(this, SIGNAL(finished()), this, SLOT(postReconstructionSlot())); // ensure this slot is run before all other listeners.
 }
 void ThreadedReconstructer::run()
 {
-//  std::cout << "run threaded reconstruct" << std::endl;
-//  QThread::sleep(10);
   mReconstructer->threadedReconstruct();
-//  std::cout << "end run threaded reconstruct" << std::endl;
 }
 void ThreadedReconstructer::postReconstructionSlot()
 {
-//  std::cout << "post threaded reconstruct" << std::endl;
   mReconstructer->threadedPostReconstruct();
 }
 

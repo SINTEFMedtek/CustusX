@@ -19,6 +19,7 @@
 #include "sscXmlOptionItem.h"
 #include "sscProbeData.h"
 //#include "sscStringWidgets.h"
+#include "cxUsReconstructionFileReader.h"
 
 namespace ssc
 {
@@ -46,7 +47,7 @@ public:
   void selectData(QString filename);
   void readFiles(QString mhdFileName, QString calFilesPath);
   void reconstruct(); // assumes readFiles has already been called
-  bool validReconstructData() const;
+//  bool validReconstructData() const;
   void clearAll();
   QString getSelectedData() const { return mFilename; }
 
@@ -81,16 +82,13 @@ private:
 
   OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
-//  ProbeXmlConfigParser::Configuration mConfiguration;
   ssc::ProbeData mProbeData;
   XmlOptionFile mSettings;
-  //QDomDocument mSettings;
-  //QString mSettingsFilename;
   QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
   QString mCalFileName; ///< Name of calibration file
   QString mCalFilesPath; ///< Path to calibration files
   QString mFilename; ///< filename used for current data read
-  QString mCalFilename; /// filename used for current cal read
+//  QString mCalFilename; /// filename used for current cal read
   ImagePtr mOutput;///< Output image from reconstruction
   QString mOutputRelativePath;///< Relative path to the output image
   QString mOutputBasePath;///< Global path where the relative path starts, for the output image
@@ -99,17 +97,14 @@ private:
   
   double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
-  void readUsDataFile(QString mhdFileName);
-  void readTimeStampsFile(QString fileName, std::vector<TimedPosition>* timedPos);
-  void readPositionFile(QString posFile, bool alsoReadTimestamps);
+  cx::UsReconstructionFileReaderPtr mFileReader;
+
   ImagePtr createMaskFromConfigParams();
   ImagePtr generateMask();
-  ImagePtr readMaskFile(QString mhdFileName);
   ssc::Transform3D applyOutputOrientation();
   void findExtentAndOutputTransform();
 
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
-  Transform3D readTransformFromFile(QString fileName);
   void calibrateTimeStamps();
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();
@@ -128,8 +123,7 @@ private:
   void threadedReconstruct();
   void threadedPostReconstruct();
 
-  bool isValid(); ///< checks if internal states is valid (that it actually has frames to reconstruct)
-
+  bool validInputData() const;///< checks if internal states is valid (that it actually has frames to reconstruct)
 };
 
 /**Execution of a reconstruction in another thread.
