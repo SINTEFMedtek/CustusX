@@ -136,6 +136,7 @@ bool OpenIGTLinkRTSource::validData() const
  */
 void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
 {
+  ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
   mTimestampCalibration = delta;
 }
 
