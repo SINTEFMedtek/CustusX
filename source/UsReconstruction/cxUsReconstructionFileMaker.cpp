@@ -231,7 +231,7 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   QTextStream mhdStream(&mhdFile);
   if (mTool)
   {
-    mhdStream << "ConfigurationID = " << mTool->getConfigurationString() << '\n';
+    mhdStream << "ConfigurationID = " << mTool->getProbe()->getConfigurationPath() << '\n';
     mhdStream << "ProbeCalibration = " << calibrationFile << '\n';
   }
   //--------------------------------------------------------------------------------------------------------------------

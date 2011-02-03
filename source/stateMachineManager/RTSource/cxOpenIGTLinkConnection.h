@@ -55,6 +55,7 @@ public slots:
 private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverProcessError(QProcess::ProcessError error);
+  void connectSourceToTool();
 private:
   void delayedAutoConnectServer();
 

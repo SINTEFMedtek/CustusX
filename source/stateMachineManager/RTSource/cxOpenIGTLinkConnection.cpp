@@ -18,6 +18,9 @@
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
+#include "cxProbe.h"
+#include "probeXmlConfigParser.h"
+
 
 namespace cx
 {
@@ -33,6 +36,9 @@ IGTLinkConnection::IGTLinkConnection()
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
   ssc::dataManager()->loadStream(mRTSource);
   //connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
+  connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
+
+  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
 }
 
 IGTLinkConnection::~IGTLinkConnection()
@@ -233,5 +239,40 @@ void IGTLinkConnection::serverProcessStateChanged(QProcess::ProcessState newStat
     ssc::messageManager()->sendInfo("Local RT Source Server starting.");
   }
 }
+
+/**insert the rt source into the (first) probe tool
+ * in the tool manager.
+ *
+ * Apply time calibration to the source.
+ *
+ */
+void IGTLinkConnection::connectSourceToTool()
+{
+  // find probe in tool manager
+  // set source in cxTool
+  // insert timecalibration using config
+  if (!mRTSource->isConnected())
+    return;
+
+  ProbePtr cxProbe;
+//  ToolPtr cxTool;
+  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+  {
+    if (iter->second->getProbe()->isValid())
+    {
+//      cxTool = boost::shared_dynamic_cast<Tool>(*iter);
+      cxProbe = boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
+      break;
+    }
+  }
+
+  if (!cxProbe)
+    return;
+
+  mRTSource->setTimestampCalibration(cxProbe->getConfiguration().mImageTimestampCalibration);
+  cxProbe->setRealTimeStreamSource(mRTSource);
+}
+
 
 }//end namespace cx
