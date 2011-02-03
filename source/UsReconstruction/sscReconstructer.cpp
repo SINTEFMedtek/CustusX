@@ -365,7 +365,7 @@ void Reconstructer::calibrate(QString calFilesPath)
   // to t (tool) space. TODO check is u is ul corner or ll corner.
   ssc::Transform3D tMu = mProbeData.get_tMu() * mProbeData.get_uMv();
   
-  ssc::Vector3D origo_u = tMu.inv().coord(Vector3D(0,0,0));
+//  ssc::Vector3D origo_u = tMu.inv().coord(Vector3D(0,0,0));
 //  std::cout << "Origo_u: "<< origo_u << std::endl;
 
   ssc::Transform3D sMu = sMt*tMu;
@@ -377,7 +377,7 @@ void Reconstructer::calibrate(QString calFilesPath)
     ssc::Transform3D prMt = mPositions[i].mPos;
     ssc::Transform3D prMs = prMt * sMt.inv();
     mPositions[i].mPos = prMs * sMu;
-    ssc::Transform3D prMu = prMs * sMu;
+    //ssc::Transform3D prMu = prMs * sMu;
   }
   //mPos is prMu
 }
@@ -693,7 +693,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
     mMask = this->createMaskFromConfigParams();
   }
 
-  if (mFrames.empty() || mPositions.empty())
+  if (!this->validInputData())
     return;
 
   // Only use this if the time stamps have different formatsh
@@ -722,22 +722,10 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 }
 
   
-ImagePtr Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
+void Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
 {
-  ssc::messageManager()->sendInfo("Perform reconstruction on: " + mhdFileName);
-  //std::cout << "Use calibration file: " << calFileName << std::endl;
-
   this->readFiles(mhdFileName, calFilesPath);
-  if(!this->validInputData())
-  {
-    ssc::messageManager()->sendWarning("Cannot reconstruct, invalid input.");
-    return ImagePtr();
-  }
-  mOutput = this->generateOutputVolume();
-
   this->reconstruct();
-
-  return mOutput;
 }
 
 void Reconstructer::reconstruct()
@@ -747,6 +735,7 @@ void Reconstructer::reconstruct()
     ssc::messageManager()->sendError("Reconstruct failed: no data loaded");
     return;
   }
+  ssc::messageManager()->sendInfo("Perform reconstruction on: " + mFilename);
 
   this->threadedPreReconstruct();
   this->threadedReconstruct();
@@ -771,10 +760,11 @@ void Reconstructer::threadedReconstruct()
   if (!this->validInputData())
     return;
 
-  QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
-
   QDateTime startTime = QDateTime::currentDateTime();
+
+  QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
   mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask, algoSettings);
+
   QTime tempTime = QTime(0, 0);
   tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
   ssc::messageManager()->sendInfo("Reconstruct time: " + tempTime.toString("hh:mm:ss:zzz"));
