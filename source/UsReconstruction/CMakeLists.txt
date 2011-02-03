@@ -38,6 +38,8 @@ SET( SOURCE_FILES
   sscUSFrameData.cpp
   cxUsReconstructionFileMaker.h
   cxUsReconstructionFileMaker.cpp
+  cxUsReconstructionFileReader.h
+  cxUsReconstructionFileReader.cpp
   )
 
 # =========================================================
