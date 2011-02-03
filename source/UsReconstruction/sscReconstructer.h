@@ -51,7 +51,7 @@ public:
   void clearAll();
   QString getSelectedData() const { return mFilename; }
 
-  ImagePtr reconstruct(QString mhdFileName, QString calFilesPath); // do everything
+  void reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr getOutput();
   //ImagePtr getInput();
   XmlOptionFile getSettings() const { return mSettings; }
