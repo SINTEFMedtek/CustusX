@@ -21,7 +21,6 @@
 #include "cxProbe.h"
 #include "probeXmlConfigParser.h"
 
-
 namespace cx
 {
 
@@ -259,7 +258,7 @@ void IGTLinkConnection::connectSourceToTool()
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
   {
-    if (iter->second->getProbe()->isValid())
+    if (iter->second->getProbe() && iter->second->getProbe()->isValid())
     {
 //      cxTool = boost::shared_dynamic_cast<Tool>(*iter);
       cxProbe = boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
