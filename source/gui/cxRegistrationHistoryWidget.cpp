@@ -39,22 +39,23 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
   this->setWindowTitle("Registration History");
 
   //layout
-  QHBoxLayout* toptopLayout = new QHBoxLayout(this);
+  QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 //  toptopLayout->setMargin(0);
-  //mGroup = new QGroupBox;
-  //group->setFlat(true);
-  //mGroup->setTitle("Registration Time Control");
+  mGroup = new QFrame;
+  //mGroup->setFlat(true);
+//  mGroup->setTitle("Registration Time Control");
   QHBoxLayout* topLayout = new QHBoxLayout;
+  toptopLayout->addWidget(mGroup);
+  mGroup->setLayout(topLayout);
+//  topLayout->setMargin(20);
 //  toptopLayout->setMargin(0);
-  toptopLayout->addLayout(topLayout);
+//  toptopLayout->addLayout(topLayout);
+  mTextEdit = new QTextEdit;
+  mTextEdit->setVisible(false);
+  mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+  toptopLayout->addWidget(mTextEdit, 1);
+
   toptopLayout->addStretch();
-
-
-//  QString iconname = ":/icons/Tango/scalable/actions/go-first.svg";
-//  QString iconname = ":/icons/Tango/32x32/actions/go-first.png";
-//  QString iconname = ":/icons/arrow-left.png";
-//  QString iconname = ":/icons/openx.png";
-//  QString iconname = ":/icons/open_icon_library/png/64x64/actions/arrow-right-3.png";
 
   mRemoveAction = createAction(topLayout,
         ":/icons/open_icon_library/png/64x64/actions/dialog-close.png",
@@ -88,35 +89,13 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
       "Step to latest registration",
       SLOT(fastForwardSlot()));
 
+  mDetailsAction = createAction(topLayout,
+      ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
+      "Details",
+      "Show registration history",
+      SLOT(showDetailsSlot()));
+
   topLayout->addStretch();
-
-//  mRewindAction = new QAction(QIcon(iconname), "Rewind", this);
-//  mRewindAction->setStatusTip("One step back in registration history");
-//  connect(mRewindAction, SIGNAL(triggered()), this, SLOT(rewindSlot()));
-//  QToolButton* rewindButton = new QToolButton();
-//  rewindButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//  rewindButton->setDefaultAction(mRewindAction);
-//  topLayout->addWidget(rewindButton);
-
-//  mRewindButton = new QPushButton("Rewind");
-//  mRewindButton->setToolTip("One step back in registration history");
-//  connect(mRewindButton, SIGNAL(clicked()), this, SLOT(rewindSlot()));
-//  topLayout->addWidget(mRewindButton);
-//
-//  mRemoveButton = new QPushButton("Remove");
-//  mRemoveButton->setToolTip("Remove all registrations after the current");
-//  connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeSlot()));
-//  topLayout->addWidget(mRemoveButton);
-//
-//  mForwardButton = new QPushButton("Forward");
-//  mForwardButton->setToolTip("One step forward in registration history");
-//  connect(mForwardButton, SIGNAL(clicked()), this, SLOT(forwardSlot()));
-//  topLayout->addWidget(mForwardButton);
-//
-//  mFastForwardButton = new QPushButton("Fast Forward");
-//  mFastForwardButton->setToolTip("Step to latest registration");
-//  connect(mFastForwardButton, SIGNAL(clicked()), this, SLOT(fastForwardSlot()));
-//  topLayout->addWidget(mFastForwardButton);
 }
 
 
@@ -307,21 +286,38 @@ void RegistrationHistoryWidget::rewindSlot()
 //  std::cout << "finished rewind" << std::endl;
 }
 
-void RegistrationHistoryWidget::debugDump()
+QString RegistrationHistoryWidget::debugDump()
 {
   TimeMap times = this->getRegistrationTimes();
-
+  bool addedBreak = false;
   std::stringstream ss;
+  ss << "<html>";
+  ss << "<i>";
   if (!this->getActiveTime().isValid())
-    ss << "active time: Current \n";
+    ss << "Active time: Current \n";
   else
-    ss << "active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "\n";
+    ss << "Active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "\n";
+  ss << "</i>";
+
+  ss << "<p style=\"color:blue\">";
   for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
   {
-    ss << "\t" << iter->first.toString(ssc::timestampSecondsFormatNice()) << "\t" << iter->second << "\n";
+    if (iter->first > this->getActiveTime() && !addedBreak && this->getActiveTime().isValid())
+    {
+      ss << "</p> <p style=\"color:gray\">";
+//      ss << "</p> <hr /> <p style=\"color:gray\">";
+      addedBreak = true;
+    }
+    else
+    {
+      ss << "<br />";
+    }
+    ss << iter->first.toString(ssc::timestampSecondsFormatNice()) << "\t" << iter->second;
   }
+  ss << "</p>";
 
-  std::cout << ss.str() << std::endl;
+  return qstring_cast(ss.str());
+//  std::cout << ss.str() << std::endl;
 }
 
 /** jump forward to one second ahead of the NEXT registration
@@ -367,6 +363,11 @@ void RegistrationHistoryWidget::fastForwardSlot()
   }
 }
 
+void RegistrationHistoryWidget::showDetailsSlot()
+{
+  mTextEdit->setVisible(!mTextEdit->isVisible());
+}
+
 void RegistrationHistoryWidget::updateSlot()
 {
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
@@ -392,6 +393,28 @@ void RegistrationHistoryWidget::updateSlot()
 //  mGroup->adjustSize();
 //  this->adjustSize();
 //  std::cout << "RegistrationHistoryWidget::updateSlot() " << behind << "/" << infront << std::endl;
+
+  QString color;
+  if(infront==0)
+  {
+//    color = QString("QFrame { background-color: green }");
+//    color = QString("QFrame { border-color: red blue; border-width: 2px 4px }");
+//    color = QString("QFrame {background: qradialgradient(cx:0.5, cy:0.5, radius: 1, fx:0.5, fy:0.5, stop:0 rgb(255,30,0), stop:0.3 rgb(255,50,0), stop:1 lightgray) }");
+//    color += QString("QLabel { background-color: transparent }");
+//    color = QString("QFrame {background: qconicalgradient(cx:0.5, cy:0.5, angle:30, stop:0 white, stop:1 #00FF00) }");
+    color = "";
+  }
+  else
+  {
+    color = QString("QFrame {background: qradialgradient(cx:0.5, cy:0.5, radius: 0.5, fx:0.5, fy:0.5, stop:0 rgb(255,30,0), stop:0.8 rgb(255,50,0), stop:1 transparent) }");
+    color += QString("QLabel { background-color: transparent }");
+  }
+
+  mGroup->setStyleSheet(color);
+
+  mTextEdit->setText(debugDump());
+
+
 }
 
 
