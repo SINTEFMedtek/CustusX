@@ -645,7 +645,7 @@ ImagePtr Reconstructer::generateOutputVolume()
   return image;
 }
 
-void Reconstructer::selectData(QString filename)
+void Reconstructer::selectData(QString filename, QString calFilesPath)
 {
   if(filename.isEmpty())
   {
@@ -653,9 +653,12 @@ void Reconstructer::selectData(QString filename)
     return;
   }
 
-  QStringList list = filename.split("/");
-  list[list.size()-1] = "";
-  QString calFilesPath = list.join("/")+"/";
+  if (calFilesPath.isEmpty())
+  {
+    QStringList list = filename.split("/");
+    list[list.size()-1] = "";
+    QString calFilesPath = list.join("/")+"/";
+  }
   this->readFiles(filename, calFilesPath);
 
   emit inputDataSelected(filename);

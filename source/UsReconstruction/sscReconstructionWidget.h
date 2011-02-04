@@ -39,8 +39,6 @@ private slots:
 private:
   ReconstructerPtr mReconstructer;
   
-  QString mInputFile;
-  
   QComboBox* mDataComboBox;
   QToolButton* mSelectDataButton;
   QPushButton* mReconstructButton;
@@ -48,11 +46,11 @@ private:
   QAction* mSelectDataAction;
   QLineEdit* mExtentLineEdit;
   QLineEdit* mInputSpacingLineEdit;
-  ssc::SliderGroupWidget* mMaxVolSizeWidget;
-  ssc::SliderGroupWidget* mSpacingWidget;
-  ssc::SliderGroupWidget* mDimXWidget;
-  ssc::SliderGroupWidget* mDimYWidget;
-  ssc::SliderGroupWidget* mDimZWidget;
+  ssc::SpinBoxGroupWidget* mMaxVolSizeWidget;
+  ssc::SpinBoxGroupWidget* mSpacingWidget;
+  ssc::SpinBoxGroupWidget* mDimXWidget;
+  ssc::SpinBoxGroupWidget* mDimYWidget;
+  ssc::SpinBoxGroupWidget* mDimZWidget;
   
   QGroupBox* mAlgorithmGroup;
   QGridLayout* mAlgoLayout;

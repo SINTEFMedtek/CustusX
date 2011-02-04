@@ -23,7 +23,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
   this->setWindowTitle("US Reconstruction");
 
   connect(mReconstructer.get(), SIGNAL(paramsChanged()), this, SLOT(paramsChangedSlot()));
-
   connect(mReconstructer.get(), SIGNAL(inputDataSelected(QString)), this, SLOT(inputDataSelected(QString)));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
@@ -59,11 +58,15 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
   QVBoxLayout* outputVolLayout = new QVBoxLayout(outputVolGroup);
 
   QGridLayout* outputVolGridLayout = new QGridLayout;
-  mMaxVolSizeWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
-  mSpacingWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(mReconstructer)), outputVolGridLayout, 1);
-  mDimXWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)), outputVolGridLayout, 2);
-  mDimYWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)), outputVolGridLayout, 3);
-  mDimZWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)), outputVolGridLayout, 4);
+  mMaxVolSizeWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterMaxUSVolumeSize(mReconstructer)), outputVolGridLayout, 0);
+  mSpacingWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterSpacing(mReconstructer)), outputVolGridLayout, 1);
+  mDimXWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterXDim(mReconstructer)));
+  mDimYWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterYDim(mReconstructer)));
+  mDimZWidget = new ssc::SpinBoxGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterZDim(mReconstructer)));
+  QHBoxLayout* outputVolDimLayout = new QHBoxLayout;
+  outputVolDimLayout->addWidget(mDimXWidget);
+  outputVolDimLayout->addWidget(mDimYWidget);
+  outputVolDimLayout->addWidget(mDimZWidget);
 
   //ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
   ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mOrientationAdapter);
@@ -81,24 +84,21 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
     dataLayout->addWidget(mDataComboBox);
     dataLayout->addWidget(mSelectDataButton);
   //topLayout->addWidget(mReloadButton);
+    topLayout->addLayout(inputSpacingLayout);
   topLayout->addWidget(outputVolGroup);
     outputVolLayout->addLayout(extentLayout);
-    outputVolLayout->addLayout(inputSpacingLayout);
     outputVolLayout->addLayout(outputVolGridLayout);
+    outputVolLayout->addLayout(outputVolDimLayout);
     outputVolLayout->addWidget(orientationWidget);
     outputVolLayout->addWidget(reduceWidget);
   topLayout->addWidget(algorithmWidget);
   topLayout->addWidget(mAlgorithmGroup);
   topLayout->addWidget(mReconstructButton);
   topLayout->addStretch();
-
-  //this->selectData(defPath+defFile);
 }
 
 void ReconstructionWidget::repopulateAlgorithmGroup()
 {
-	//std::cout << "repopulate" << std::endl;
-	//StringOptionItem algoOption = mReconstructer->getSettings().getStringOption("Algorithm");
 	QString algoName = mReconstructer->mAlgorithmAdapter->getValue();
 
 	if (algoName==mAlgorithmGroup->title())
@@ -132,13 +132,13 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 
 void ReconstructionWidget::currentDataComboIndexChanged(const QString& text)
 {
-  QDir dir = QFileInfo(mInputFile).dir();
+  QDir dir = QFileInfo(mReconstructer->getSelectedData()).dir();
   this->selectData(dir.filePath(text));
 }
 
 QString ReconstructionWidget::getCurrentPath()
 {
-  return QFileInfo(mInputFile).dir().absolutePath();
+  return QFileInfo(mReconstructer->getSelectedData()).dir().absolutePath();
 }
 
 void ReconstructionWidget::reconstruct()
@@ -150,10 +150,11 @@ void ReconstructionWidget::reconstruct()
 
 void ReconstructionWidget::updateComboBox()
 {
+  QString inputfile = mReconstructer->getSelectedData();
   mDataComboBox->blockSignals(true);
   mDataComboBox->clear();
 
-  QDir dir = QFileInfo(mInputFile).dir();
+  QDir dir = QFileInfo(inputfile).dir();
   QStringList nameFilters;
   nameFilters << "*.mhd";
   QStringList files = dir.entryList(nameFilters, QDir::Files);
@@ -165,20 +166,19 @@ void ReconstructionWidget::updateComboBox()
   mDataComboBox->setCurrentIndex(-1);
   for (int i=0; i<files.size(); ++i)
   {
-    if (files[i]==QFileInfo(mInputFile).fileName())
+    if (files[i]==QFileInfo(inputfile).fileName())
       mDataComboBox->setCurrentIndex(i);
   }
 
-  mDataComboBox->setToolTip(mInputFile);
+  mDataComboBox->setToolTip(inputfile);
 
-  //mDataComboBox->addItem(mInputFile);
   mDataComboBox->blockSignals(false);
 
 }
 
 void ReconstructionWidget::reload()
 {
-  this->selectData(mInputFile);
+  this->selectData(mReconstructer->getSelectedData());
 }
 
 /**Called when data is loaded into reconstructer.
@@ -186,15 +186,13 @@ void ReconstructionWidget::reload()
  */
 void ReconstructionWidget::inputDataSelected(QString mhdFileName)
 {
-  if(mhdFileName.isEmpty())
+  if(mReconstructer->getSelectedData().isEmpty())
   {
     return;
   }
 
-  mInputFile = mhdFileName;
-
   this->updateComboBox();
-  mDataComboBox->setToolTip(mInputFile);
+  mDataComboBox->setToolTip(mReconstructer->getSelectedData());
 }
 
 
@@ -206,17 +204,8 @@ void ReconstructionWidget::selectData(QString filename)
     return;
   }
 
-  mInputFile = filename;
-
-  this->updateComboBox();
-  mDataComboBox->setToolTip(mInputFile);
-
-  // read data into reconstructer
-
-  QStringList list = mInputFile.split("/");
-  list[list.size()-1] = "";
-  QString calFilesPath = list.join("/")+"/";
-  mReconstructer->readFiles(mInputFile, calFilesPath);
+//  mInputFile = filename;
+  mReconstructer->selectData(filename);
 }
 
 /** Called when parameters in the reconstructer has changed
