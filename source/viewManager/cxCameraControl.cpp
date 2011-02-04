@@ -97,6 +97,22 @@ CameraControl::~CameraControl()
 
 }
 
+/*Move the camera focus to p_r. Keep the view direction and distance constant
+ * (i.e. keep pos of camera constant relative to focus).
+ *
+ */
+void CameraControl::translateByFocusTo(ssc::Vector3D p_r)
+{
+  vtkCameraPtr camera = this->getCamera();
+
+  ssc::Vector3D f(camera->GetFocalPoint());
+  ssc::Vector3D p(camera->GetPosition());
+  ssc::Vector3D delta = p_r-f;
+  f += delta;
+  p += delta;
+  camera->SetFocalPoint(f.begin());
+  camera->SetPosition(p.begin());
+}
 
 QActionGroup* CameraControl::createStandard3DViewActions()
 {

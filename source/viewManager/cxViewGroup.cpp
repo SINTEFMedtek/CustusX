@@ -28,10 +28,15 @@ void Navigation::centerToImage(ssc::ImagePtr image)
 {
   if(!image)
     return;
-  ssc::Vector3D p_r = findImageCenter(image);
+  ssc::Vector3D p_r = this->findImageCenter(image);
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
+
+  CameraControl().translateByFocusTo(p_r);
+//  std::vector<ViewGroupPtr> groups = viewManager()->getViewGroups();
+//  for (unsigned i=0; i<groups.size(); ++i)
+//    groups[i]->getData()->getCamera3D()->translateByFocusTo(p_r);
 
   this->centerManualTool(p_r);
 //  std::cout << "Centered to image." << std::endl;
@@ -56,7 +61,7 @@ void Navigation::centerToView(const std::vector<ssc::ImagePtr>& images)
  */
 void Navigation::centerToGlobalImageCenter()
 {
-  ssc::Vector3D p_r = findGlobalImageCenter();
+  ssc::Vector3D p_r = this->findGlobalImageCenter();
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
@@ -76,6 +81,8 @@ void Navigation::centerToTooltip()
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
+
+  CameraControl().translateByFocusTo(p_r);
 }
 /**Find the center of the images, defined as the center
  * of the smallest bounding box enclosing the images.
@@ -171,7 +178,7 @@ void Navigation::centerManualTool(ssc::Vector3D& p_r)
 
 ViewGroup::ViewGroup()
 {
-  mRegistrationMode = ssc::rsNOT_REGISTRATED;
+//  mRegistrationMode = ssc::rsNOT_REGISTRATED;
   mZoom2D.mLocal = SyncedValue::create(1.0);
   mZoom2D.activateGlobal(false);
 
@@ -206,7 +213,7 @@ void ViewGroup::addView(ViewWrapperPtr wrapper)
   connect(wrapper->getView(), SIGNAL(mousePressSignal(QMouseEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
   connect(wrapper->getView(), SIGNAL(focusInSignal(QFocusEvent*)),this, SLOT(mouseClickInViewGroupSlot()));
 
-  wrapper->setRegistrationMode(mRegistrationMode);
+//  wrapper->setRegistrationMode(mRegistrationMode);
 }
 
 void ViewGroup::removeViews()
@@ -287,12 +294,12 @@ std::vector<ssc::View*> ViewGroup::getViews() const
   return mViews;
 }
 
-void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
-{
-  mRegistrationMode = mode;
-  for (unsigned i=0; i<mViewWrappers.size(); ++i)
-    mViewWrappers[i]->setRegistrationMode(mode);
-}
+//void ViewGroup::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
+//{
+//  mRegistrationMode = mode;
+//  for (unsigned i=0; i<mViewWrappers.size(); ++i)
+//    mViewWrappers[i]->setRegistrationMode(mode);
+//}
 
 void ViewGroup::activateManualToolSlot()
 {

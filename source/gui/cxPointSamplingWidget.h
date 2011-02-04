@@ -46,6 +46,7 @@ protected slots:
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QHideEvent* event);
   void setManualTool(const ssc::Vector3D& p_r);
   ssc::Vector3D getSample() const;
   void enablebuttons();

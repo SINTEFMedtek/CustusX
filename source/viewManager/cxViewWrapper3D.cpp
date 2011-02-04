@@ -102,6 +102,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mView = view;
   this->connectContextMenu(mView);
   QString index = QString::number(startIndex);
+//  connect(ssc::dataManager(), SIGNAL(centerChanged()), this, SLOT(centerChangedSlot()));
 
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
 
@@ -124,6 +125,22 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->toolsAvailableSlot();
 }
 
+///**Change the camera focal point to the datamanager::center.
+// * Keep pos of camera constant relative to the focus.
+// */
+//void ViewWrapper3D::centerChangedSlot()
+//{
+//  ssc::Vector3D c = ssc::DataManager::getInstance()->getCenter();
+//  vtkCameraPtr camera = mViewGroup->getCamera3D()->getCamera();
+//  ssc::Vector3D f(camera->GetFocalPoint());
+//  ssc::Vector3D p(camera->GetPosition());
+//  ssc::Vector3D delta = c-f;
+//  f += delta;
+//  p += delta;
+//  camera->SetFocalPoint(f.begin());
+//  camera->SetPosition(p.begin());
+//}
+
 ViewWrapper3D::~ViewWrapper3D()
 {
   if (mView)
@@ -145,6 +162,12 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 
   QAction* resetCameraAction = new QAction("Reset Camera (r)", &contextMenu);
   connect(resetCameraAction, SIGNAL(triggered()), this, SLOT(resetCameraActionSlot()));
+
+  QAction* centerImageAction = new QAction("Center to image", &contextMenu);
+  connect(centerImageAction, SIGNAL(triggered()), this, SLOT(centerImageActionSlot()));
+
+  QAction* centerToolAction = new QAction("Center to tool", &contextMenu);
+  connect(centerToolAction, SIGNAL(triggered()), this, SLOT(centerToolActionSlot()));
 
   QAction* showAxesAction = new QAction("Show Coordinate Axes", &contextMenu);
   showAxesAction->setCheckable(true);
@@ -177,6 +200,8 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 
   contextMenu.addSeparator();
   contextMenu.addAction(resetCameraAction);
+  contextMenu.addAction(centerImageAction);
+  contextMenu.addAction(centerToolAction);
   contextMenu.addAction(showAxesAction);
   contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
@@ -192,6 +217,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
   ViewWrapper::setViewGroup(group);
 
   connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
+  connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
   mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
 }
 
@@ -284,6 +310,15 @@ void ViewWrapper3D::showManualToolSlot(bool visible)
 void ViewWrapper3D::resetCameraActionSlot()
 {
   mView->getRenderer()->ResetCamera();
+}
+
+void ViewWrapper3D::centerImageActionSlot()
+{
+  Navigation().centerToImage(ssc::dataManager()->getActiveImage());
+}
+void ViewWrapper3D::centerToolActionSlot()
+{
+  Navigation().centerToTooltip();
 }
 
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
@@ -446,31 +481,75 @@ void ViewWrapper3D::toolsAvailableSlot()
   }
 }
 
-void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
+void ViewWrapper3D::optionChangedSlot()
 {
-  if (mode==ssc::rsNOT_REGISTRATED)
+  ViewGroupData::Options options = mViewGroup->getOptions();
+
+  this->showLandmarks(options.mShowLandmarks);
+  this->showPointPickerProbe(options.mShowPointPickerProbe);
+}
+
+void ViewWrapper3D::showLandmarks(bool on)
+{
+  if (mImageLandmarkRep->isConnectedToView(mView) == on)
+    return;
+
+  if (on)
+  {
+    mView->addRep(mPatientLandmarkRep);
+    mView->addRep(mImageLandmarkRep);
+  }
+  else
   {
     mView->removeRep(mPatientLandmarkRep);
     mView->removeRep(mImageLandmarkRep);
-    mView->removeRep(mProbeRep);
-    
-    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   }
-  if (mode==ssc::rsIMAGE_REGISTRATED)
-  {
-    mView->addRep(mPatientLandmarkRep);
-    mView->addRep(mImageLandmarkRep);
-    mView->addRep(mProbeRep);
+}
 
+void ViewWrapper3D::showPointPickerProbe(bool on)
+{
+  if (mProbeRep->isConnectedToView(mView) == on)
+    return;
+
+  if (on)
+  {
+    mView->addRep(mProbeRep);
     connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
     this->dominantToolChangedSlot();
   }
-  if (mode==ssc::rsPATIENT_REGISTRATED)
+  else
   {
-    mView->addRep(mPatientLandmarkRep);
-    mView->addRep(mImageLandmarkRep);
+    mView->removeRep(mProbeRep);
+    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   }
 }
+
+
+//void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
+//{
+//  if (mode==ssc::rsNOT_REGISTRATED)
+//  {
+//    mView->removeRep(mPatientLandmarkRep);
+//    mView->removeRep(mImageLandmarkRep);
+//    mView->removeRep(mProbeRep);
+//
+//    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+//  }
+//  if (mode==ssc::rsIMAGE_REGISTRATED)
+//  {
+//    mView->addRep(mPatientLandmarkRep);
+//    mView->addRep(mImageLandmarkRep);
+//    mView->addRep(mProbeRep);
+//
+//    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+//    this->dominantToolChangedSlot();
+//  }
+//  if (mode==ssc::rsPATIENT_REGISTRATED)
+//  {
+//    mView->addRep(mPatientLandmarkRep);
+//    mView->addRep(mImageLandmarkRep);
+//  }
+//}
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {

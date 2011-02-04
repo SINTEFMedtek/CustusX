@@ -54,10 +54,11 @@ public:
   void removeViews();
   ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
   std::vector<ssc::View*> getViews() const;
+  ViewGroupDataPtr getData() { return mViewGroupData; }
   //ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
 //  virtual void addImage(ssc::ImagePtr image);
 //  virtual void removeImage(ssc::ImagePtr image);
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
+//  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
   void clearPatientData();
@@ -106,7 +107,7 @@ protected:
 //  std::vector<ssc::MeshPtr> mMeshes;
 //  std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mViewWrappers;
-  ssc::REGISTRATION_STATUS mRegistrationMode;
+//  ssc::REGISTRATION_STATUS mRegistrationMode;
   ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
