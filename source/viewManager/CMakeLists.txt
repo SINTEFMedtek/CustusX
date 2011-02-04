@@ -13,8 +13,6 @@ SET( CX_QT_MOC_HEADER_FILES
     cxInteractiveClipper.h
     cxInteractiveCropper.h
     cxCameraControl.h
-    RTSource/sscOpenIGTLinkClient.h
-    RTSource/sscOpenIGTLinkRTSource.h
 )
 
 SET ( ${LIB}_viewManager
@@ -49,10 +47,6 @@ SET ( ${LIB}_viewManager
     cxCameraControl.cpp
     cxRenderTimer.h
     cxRenderTimer.cpp
-    RTSource/sscOpenIGTLinkClient.h
-    RTSource/sscOpenIGTLinkClient.cpp
-    RTSource/sscOpenIGTLinkRTSource.h
-    RTSource/sscOpenIGTLinkRTSource.cpp
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

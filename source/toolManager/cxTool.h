@@ -12,10 +12,14 @@
 #include <itkStdStreamLogOutput.h>
 #include "sscTransform3D.h"
 #include "cxTracker.h"
-#include "probeXmlConfigParser.h"
+//#include "probeXmlConfigParser.h"
 #include "vtkForwardDeclarations.h"
 
 class QStringList;
+
+namespace ssc
+{
+}
 
 namespace itk
 {
@@ -28,6 +32,9 @@ typedef std::vector<double> DoubleVector;
 typedef boost::shared_ptr<DoubleVector> DoubleVectorPtr;
 typedef std::vector<ssc::Transform3DPtr> Transform3DVector;
 typedef boost::shared_ptr<Transform3DVector> Transform3DVectorPtr;
+
+typedef boost::shared_ptr<class Probe> ProbePtr;
+
 
 /**
  * \class Tool
@@ -101,6 +108,7 @@ public:
   virtual QString getName() const;
   virtual int getIndex() const{return 0;};
   virtual ssc::ProbeSector getProbeSector() const;
+  virtual ssc::ProbePtr getProbe() const;
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
@@ -113,14 +121,8 @@ public:
 
   Tracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
 
-  QString getInstrumentId() const;
-  QString getInstrumentScannerId() const;
-  QStringList getUSSectorConfigList() const;
-  QString getNameOfProbeSectorConfigId(QString configIdString); ///< get a name for the given config id
-  QString getProbeSectorConfigIdString() const;///< Get the probe sector config id string matching the config id in ultrasoundImageConfigs.xml
-  QString getConfigurationString() const;///< Gets the string for identifying the probe config in the XML file
-  void setProbeSectorConfigIdString(QString configIdString);///< Set the probe sector config id string matching the config id in ultrasoundImageConfigs.xml
-  ProbeXmlConfigParser::Configuration getConfiguration() const;
+//  QString getInstrumentId() const;
+//  QString getInstrumentScannerId() const;
   virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
 
@@ -133,11 +135,9 @@ public:
   void parseXml(QDomNode& dataNode);
 
 signals:
-  void probeSectorConfigurationChanged();
   void attachedToTracker(bool);
 
 protected:
-  void setUSProbeSector(ssc::ProbeSector probeSector);
   void writeCalibrationToFile();
 
   typedef itk::ReceptorMemberCommand<Tool> ObserverType;
@@ -179,10 +179,11 @@ protected:
 
   double mToolTipOffset; ///< distance from tool where point should be shown
 
-  ssc::ProbeSector mProbeSector; ///< Probe sector information
-
-  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
-  QString mProbeSectorConfiguration; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
+  ProbePtr mProbe;
+//  ssc::ProbeSector mProbeSector; ///< Probe sector information
+//
+//  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
+//  QString mProbeSectorConfiguration; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 

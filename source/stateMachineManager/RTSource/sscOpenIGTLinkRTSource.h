@@ -48,6 +48,7 @@ public:
   // non-inherited methods
   void connectServer(QString address, int port);
   void disconnectServer();
+  void setTimestampCalibration(double delta);
 
 //signals:
 //  void serverStatusChanged();
@@ -82,6 +83,7 @@ private:
   QTimer* mTimeoutTimer;
   double mFPS;
   double mLastTimestamp;
+  double mTimestampCalibration;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 

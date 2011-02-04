@@ -73,6 +73,7 @@ void MacGrabberServer::connectServer()
   mServer = ServerPtr(new OpenIGTLinkServer());
   connect(mServer.get(), SIGNAL(open()), this, SLOT(readySlot()));
   connect(mServer.get(), SIGNAL(closed()), this, SLOT(readySlot()));
+  connect(mServer.get(), SIGNAL(queueSize(int)), this, SIGNAL(queueSize(int)));
 }
 
 

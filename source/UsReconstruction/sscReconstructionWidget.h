@@ -23,7 +23,7 @@ class ReconstructionWidget : public QWidget
 {
   Q_OBJECT
 public:
-  ReconstructionWidget(QWidget* parent, XmlOptionFile settings, QString shaderPath);
+  ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer);
   ReconstructerPtr reconstructer() {  return mReconstructer; }
   void selectData(QString inputfile);
 
@@ -33,11 +33,11 @@ public slots:
   void reload();
   void currentDataComboIndexChanged(const QString& text);
   void paramsChangedSlot();
-  
+private slots:
+  void inputDataSelected(QString mhdFileName);
+
 private:
   ReconstructerPtr mReconstructer;
-  
-  QString mInputFile;
   
   QComboBox* mDataComboBox;
   QToolButton* mSelectDataButton;
@@ -46,11 +46,11 @@ private:
   QAction* mSelectDataAction;
   QLineEdit* mExtentLineEdit;
   QLineEdit* mInputSpacingLineEdit;
-  ssc::SliderGroupWidget* mMaxVolSizeWidget;
-  ssc::SliderGroupWidget* mSpacingWidget;
-  ssc::SliderGroupWidget* mDimXWidget;
-  ssc::SliderGroupWidget* mDimYWidget;
-  ssc::SliderGroupWidget* mDimZWidget;
+  ssc::SpinBoxGroupWidget* mMaxVolSizeWidget;
+  ssc::SpinBoxGroupWidget* mSpacingWidget;
+  ssc::SpinBoxGroupWidget* mDimXWidget;
+  ssc::SpinBoxGroupWidget* mDimYWidget;
+  ssc::SpinBoxGroupWidget* mDimZWidget;
   
   QGroupBox* mAlgorithmGroup;
   QGridLayout* mAlgoLayout;
