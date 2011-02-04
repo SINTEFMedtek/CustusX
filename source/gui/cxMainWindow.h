@@ -73,6 +73,9 @@ protected slots:
   void importDataSlot(); ///< loads data(images) into the datamanager
   void deleteDataSlot(); ///< deletes data(image) from the patient
 
+  void togglePointPickerActionSlot();
+  void updatePointPickerActionSlot();
+
   //tool menu
   void configureSlot(); ///< lets the user choose which configuration files to use for the navigation
 
@@ -138,6 +141,7 @@ private:
 
 //  QActionGroup* mToggleWidgetActionGroup;
   QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
+  QAction* mShowPointPickerAction;
 
   QAction* mImportDataAction; ///< action for loading data into the datamanager
   QAction* mDeleteDataAction; ///< action for deleting the current volume

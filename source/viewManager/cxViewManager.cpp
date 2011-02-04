@@ -138,8 +138,27 @@ void ViewManager::setSmartRender(bool on)
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
 {
-  for (unsigned i=0; i<mViewGroups.size(); ++i)
-    mViewGroups[i]->setRegistrationMode(mode);
+  ViewGroupDataPtr data = this->getViewGroups()[0]->getData();
+  ViewGroupData::Options options = data->getOptions();
+
+  options.mShowLandmarks = false;
+  options.mShowPointPickerProbe = false;
+
+  if (mode==ssc::rsIMAGE_REGISTRATED)
+  {
+    options.mShowLandmarks = true;
+    options.mShowPointPickerProbe = true;
+  }
+  if (mode==ssc::rsPATIENT_REGISTRATED)
+  {
+    options.mShowLandmarks = true;
+    options.mShowPointPickerProbe = false;
+  }
+
+  data->setOptions(options);
+//
+//  for (unsigned i=0; i<mViewGroups.size(); ++i)
+//    mViewGroups[i]->setRegistrationMode(mode);
 }
 
 QString ViewManager::getActiveLayout() const

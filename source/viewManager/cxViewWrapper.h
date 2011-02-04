@@ -55,15 +55,29 @@ public:
   //void setCamera3D(CameraDataPtr transform) { mCamera3D = transform; }
   CameraDataPtr getCamera3D() { return mCamera3D; }
 
+  // view options for this group.
+  struct Options
+  {
+    Options() : mShowLandmarks(false), mShowPointPickerProbe(false) {}
+
+    bool mShowLandmarks;
+    bool mShowPointPickerProbe;
+  };
+
+  Options getOptions() const;
+  void setOptions(Options options);
+
 private slots:
   void removeDataSlot(QString uid);
 signals:
   void dataAdded(QString uid);
   void dataRemoved(QString uid);
   void initialized();
+  void optionsChanged();
 private:
   std::vector<ssc::DataPtr> mData;
   CameraDataPtr mCamera3D;
+  Options mOptions;
 };
 
 /**
@@ -80,7 +94,7 @@ class ViewWrapper : public QObject
 public:
   virtual ~ViewWrapper() {}
   virtual void initializePlane(ssc::PLANE_TYPE plane) {}
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
+//  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode) {}
   virtual ssc::View* getView() = 0;
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) = 0;
   virtual void setViewGroup(ViewGroupDataPtr group);
