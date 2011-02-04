@@ -28,6 +28,9 @@ public:
   GrabberServerWidget(QWidget* parent);
   virtual ~GrabberServerWidget(){};
 
+public slots:
+  void startServerSlot(bool); ///< Starts/stops the grabberserver
+
 protected:
   virtual void connectGrabberServer() = 0; ///< Connects to a specific grabberserver. Must be implemented by subclasses.
 
@@ -37,7 +40,6 @@ protected slots:
   void portChangedSlot(const QString& port); ///< Reacts to when the user changes the specific server port
 
 private slots:
-  void startServerSlot(bool); ///< Starts/stops the grabberserver
   void grabberServerReadySlot(bool); ///< Updates the gui when the grabberserver is ready
 
 private:
@@ -62,6 +64,9 @@ class MacGrabberServerWidget : public GrabberServerWidget
 public:
   MacGrabberServerWidget(QWidget* parent);
   virtual ~MacGrabberServerWidget(){};
+
+signals:
+  void queueSize(int);
 
 protected:
   virtual void connectGrabberServer(); ///< Connects to a MacGrabberServer

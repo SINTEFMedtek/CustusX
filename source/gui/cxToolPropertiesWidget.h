@@ -48,7 +48,7 @@ class ActiveToolWidget : public QWidget
   Q_OBJECT
 public:
   ActiveToolWidget(QWidget* parent);
-~ActiveToolWidget() {}
+  virtual ~ActiveToolWidget() {}
 };
 
 /** Adapter that connects to the current active tool.

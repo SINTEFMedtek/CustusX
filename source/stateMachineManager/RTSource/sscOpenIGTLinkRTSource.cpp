@@ -25,6 +25,8 @@
 #include "sscOpenIGTLinkClient.h"
 #include "sscMessageManager.h"
 #include "sscTime.h"
+#include "sscVector3D.h"
+
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
@@ -35,6 +37,7 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
   mImageImport(vtkImageImportPtr::New())
 {
   mLastTimestamp = 0;
+  mTimestampCalibration = 0;
   mConnected = false;
   mRedirecter = vtkSmartPointer<vtkImageChangeInformation>::New(); // used for forwarding only.
 
@@ -77,7 +80,7 @@ void OpenIGTLinkRTSource::timeout()
   if (mTimeout)
     return;
 
-  std::cout << "timeout!" << std::endl;
+  ssc::messageManager()->sendWarning("Timeout!");
   mTimeout = true;
   emit newFrame();
 }
@@ -130,6 +133,18 @@ bool OpenIGTLinkRTSource::validData() const
   return mClient && !mTimeout;
 }
 
+/**Set a time shift that is added to every timestamp acquired from the source.
+ * This can be used to calibrate time shifts between source and client.
+ */
+void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
+{
+  if (ssc::similar(mTimestampCalibration,delta))
+      return;
+  if (!ssc::similar(delta, 0.0))
+    ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
+  mTimestampCalibration = delta;
+}
+
 double OpenIGTLinkRTSource::getTimestamp()
 {
   //HACK we need time sync before we can use the real timetags delivered with the image
@@ -150,13 +165,20 @@ bool OpenIGTLinkRTSource::isStreaming() const
 void OpenIGTLinkRTSource::connectedSlot(bool on)
 {
   mConnected = on;
+
+  if (!on)
+    this->disconnectServer();
+
   emit connected(on);
 }
 
 void OpenIGTLinkRTSource::connectServer(QString address, int port)
 {
   if (mClient)
+  {
+    std::cout << "no client - returning" << std::endl;
     return;
+  }
 //  std::cout << "OpenIGTLinkRTSource::connect to server" << std::endl;
   mClient.reset(new IGTLinkClient(address, port, this));
   connect(mClient.get(), SIGNAL(finished()), this, SLOT(clientFinishedSlot()));
@@ -179,10 +201,9 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
   this->updateImage(mClient->getLastImageMessage());
 }
 
-
 void OpenIGTLinkRTSource::disconnectServer()
 {
-  //std::cout << "IGTLinkWidget::disconnect server" << std::endl;
+  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
   if (mClient)
   {
     mClient->quit();
@@ -204,6 +225,7 @@ void OpenIGTLinkRTSource::disconnectServer()
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
 {
+  std::cout << "IGTLinkWidget::clientFinishedSlot" << std::endl;
   if (!mClient)
     return;
   if (mClient->isRunning())
@@ -313,6 +335,7 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
   mImageMessage->GetTimeStamp(timestamp);
   mLastTimestamp = timestamp->GetTimeStamp() * 1000;
+  mLastTimestamp += mTimestampCalibration;
 
   mImageImport->SetDataOrigin(0,0,0);
   mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);

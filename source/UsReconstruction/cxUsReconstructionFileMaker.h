@@ -6,7 +6,7 @@
 #include <QTextStream>
 #include "boost/shared_ptr.hpp"
 #include "sscRealTimeStreamSourceRecorder.h"
-#include "cxRecordSession.h"
+//#include "cxRecordSession.h"
 #include "cxTool.h"
 
 namespace cx
@@ -26,13 +26,14 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 class UsReconstructionFileMaker
 {
 public:
-  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, RecordSessionPtr session, QString activepatientPath, ToolPtr tool);
+  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool);
   ~UsReconstructionFileMaker();
 
-  void write();
+  QString write();
+  QString getMhdFilename(QString reconstructionFolder);
 
 private:
-  QString makeFolder(QString patientFolder, RecordSessionPtr session);
+  QString makeFolder(QString patientFolder, QString sessionDescription);
   bool createSubfolder(QString subfolderAbsolutePath);
   vtkImageDataPtr mergeFrames();
 
@@ -45,10 +46,14 @@ private:
 
   ssc::TimedTransformMap mTrackerRecordedData;
   ssc::RealTimeStreamSourceRecorder::DataType mStreamRecordedData;
-  RecordSessionPtr mSession;
+  //RecordSessionPtr mSession;
+  QString mSessionDescription;
   QString mActivepatientPath;
   ToolPtr mTool;
 
 };
+
+typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
+
 }
 #endif /* CXUSRECONSTRUCTIONFILEMAKER_H_ */

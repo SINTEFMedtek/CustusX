@@ -9,8 +9,14 @@
 #include "cxRecordSession.h"
 #include <QObject>
 
+namespace ssc
+{
+  typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
+}
+
 namespace cx
 {
+typedef boost::shared_ptr<class IGTLinkConnection> IGTLinkConnectionPtr;
 
 struct Desktop
 {
@@ -40,6 +46,8 @@ public:
   WorkflowStateMachinePtr getWorkflow();
   ApplicationStateMachinePtr getApplication();
   PatientDataPtr getPatientData();
+  IGTLinkConnectionPtr getIGTLinkConnection();
+  ssc::ReconstructerPtr getReconstructer();
 
   Desktop getActiveDesktop();
   void saveDesktop(Desktop desktop);
@@ -62,12 +70,17 @@ private:
   ~StateManager();
 
   void initialize(); ///< init stuff that is dependent of the statemanager
+  void fillDefaultSettings();
+  template<class T>
+  void fillDefault(QString name, T value);
 
   static StateManager* mTheInstance; ///< the only instance of this class
 
   WorkflowStateMachinePtr mWorkflowStateMachine;
   ApplicationStateMachinePtr mApplicationStateMachine;
   PatientDataPtr mPatientData;
+  IGTLinkConnectionPtr mIGTLinkConnection;
+  ssc::ReconstructerPtr mReconstructer;
 
   std::vector<RecordSessionPtr> mRecordSessions;
 };

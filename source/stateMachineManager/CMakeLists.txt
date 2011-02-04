@@ -8,6 +8,9 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxPatientData.h
 	cxFileCopied.h
 	cxStateMachineManager.h
+    RTSource/cxOpenIGTLinkConnection.h
+    RTSource/sscOpenIGTLinkClient.h
+    RTSource/sscOpenIGTLinkRTSource.h
 )
 
 SET ( ${LIB}_statemachineManager
@@ -15,6 +18,7 @@ SET ( ${LIB}_statemachineManager
 	cxWorkflowStateMachine.h
 	cxWorkflowStateMachine.cpp
 	cxWorkflowState.h
+	cxWorkflowState.cpp
 	cxApplicationStateMachine.cpp
 	cxApplicationStateMachine.h
 	cxApplicationState.h
@@ -26,9 +30,15 @@ SET ( ${LIB}_statemachineManager
 	cxFileCopied.cpp
 	cxRecordSession.h
     cxRecordSession.cpp
+    RTSource/cxOpenIGTLinkConnection.h
+    RTSource/cxOpenIGTLinkConnection.cpp
+    RTSource/sscOpenIGTLinkClient.h
+    RTSource/sscOpenIGTLinkClient.cpp
+    RTSource/sscOpenIGTLinkRTSource.h
+    RTSource/sscOpenIGTLinkRTSource.cpp    
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_statemachineManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC cxCommon viewManager registrationManager)
+target_link_libraries(${LIB} SSC cxCommon viewManager registrationManager sscUsReconstructionLib)

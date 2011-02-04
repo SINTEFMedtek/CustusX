@@ -9,6 +9,7 @@
 #include "igtlStatusMessage.h"
 
 #include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 
 
 int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Pointer& header)
@@ -28,7 +29,7 @@ int ReceiveTransform(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::P
   // If you want to skip CRC check, call Unpack() without argument.
   int c = transMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the transform data
     igtl::Matrix4x4 matrix;
@@ -57,7 +58,7 @@ int ReceivePosition(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Po
   // If you want to skip CRC check, call Unpack() without argument.
   int c = positionMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     // Retrive the transform data
     float position[3];
@@ -96,7 +97,7 @@ int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Poin
   // If you want to skip CRC check, call Unpack() without argument.
   int c = statusMsg->Unpack();
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
     std::cerr << "========== STATUS ==========" << std::endl;
     std::cerr << " Code      : " << statusMsg->GetCode() << std::endl;
@@ -137,13 +138,13 @@ void IGTLinkClient::run()
   connect(mSocket, SIGNAL(disconnected()), this, SLOT(disconnectedSlot()), Qt::DirectConnection);
   connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)), Qt::DirectConnection);
 
-  std::cout << "Looking for host: " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Looking for host: "+this->hostDescription());
   mSocket->connectToHost(mAddress, mPort);
 
   int timeout = 5000;
   if (!mSocket->waitForConnected(timeout))
   {
-    std::cout << "Timeout looking for host " << this->hostDescription() << std::endl;
+    ssc::messageManager()->sendWarning("Timeout looking for host "+this->hostDescription());
     mSocket->disconnectFromHost();
     return;
   }
@@ -168,21 +169,21 @@ QString IGTLinkClient::hostDescription() const
 
 void IGTLinkClient::hostFoundSlot()
 {
-  std::cout << "Host found: " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Host found: "+this->hostDescription());
 }
 void IGTLinkClient::connectedSlot()
 {
-  std::cout << "Connected to host " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Connected to host "+this->hostDescription());
   emit connected(true);
 }
 void IGTLinkClient::disconnectedSlot()
 {
-  std::cout << "Disconnected from host " << this->hostDescription() << std::endl;
+  ssc::messageManager()->sendInfo("Disconnected to host "+this->hostDescription());
   emit connected(false);
 }
 void IGTLinkClient::errorSlot(QAbstractSocket::SocketError socketError)
 {
-  std::cout << "Socket error [Host=" << this->hostDescription() <<", Code=" << socketError << "]\n" << mSocket->errorString() << std::endl;
+  ssc::messageManager()->sendError("Socket error [Host="+this->hostDescription()+", Code="+socketError+"]\n"+mSocket->errorString());
 }
 
 /** add the message to a thread-safe queue
@@ -292,16 +293,20 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
     //std::cout << "Incomplete body received, ignoring. " << std::endl;
     return false;
   }
-  //std::cout << "Receiving IMAGE data type." << std::endl;
 
   socket->read(reinterpret_cast<char*>(imgMsg->GetPackBodyPointer()), imgMsg->GetPackBodySize());
   // Deserialize the transform data
   // If you want to do a CRC check, call Unpack(1).
   // If you want to skip CRC check, call Unpack() without argument.
+//  std::cout << "unpack" << std::endl;
   int c = imgMsg->Unpack();
+//  int a = (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
+//  int b = c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF);
+//  std::cout << "finished unpack " << c << " " << a << " " << b  << std::endl;
 
-  if (c & (igtl::MessageHeader::UNPACK_BODY || igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
+  if (c & (igtl::MessageHeader::UNPACK_BODY | igtl::MessageHeader::UNPACK_UNDEF)) // if CRC check is OK or skipped
   {
+//    std::cout << "ok" << std::endl;
     // Retrive the image data
     int size[3]; // image dimension
     float spacing[3]; // spacing (mm/pixel)

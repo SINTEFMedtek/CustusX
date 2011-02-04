@@ -15,25 +15,25 @@
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
+#include "RTSource/cxOpenIGTLinkConnection.h"
+#include "cxStateMachineManager.h"
 
 namespace cx
 {
 
+
 IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
     QWidget(parent)
 {
-  mServer = NULL;
   mView = NULL;
   mRenderTimer = NULL;
-  mAutoLaunchIsTried = false;
 
   this->setObjectName("IGTLinkWidget");
   this->setWindowTitle("IGTLink Client");
   this->resize(100, 600);
 
-  mRTSource.reset(new ssc::OpenIGTLinkRTSource());
-  ssc::dataManager()->loadStream(mRTSource);
-  connect(mRTSource.get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
+  connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
+  connect(getServer(), SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   mToptopLayout = toptopLayout;
@@ -42,36 +42,35 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   toptopLayout->addLayout(gridLayout);
   mGridLayout = gridLayout;
 
-  QStringList hostHistory = DataLocations::getSettings()->value("IGTLink/hostHistory").toStringList();
-  if (hostHistory.isEmpty())
-    hostHistory << "Localhost";
 
   gridLayout->addWidget(new QLabel("IP Address", this), 0, 0);
   mAddressEdit = new QComboBox(this);
   mAddressEdit->setEditable(true);
   mAddressEdit->setInsertPolicy(QComboBox::InsertAtTop);
-  mAddressEdit->addItems(hostHistory);
+  this->updateHostHistory();
   gridLayout->addWidget(mAddressEdit, 0, 1);
 
   gridLayout->addWidget(new QLabel("Port number", this), 1, 0);
   mPortEdit = new QLineEdit(this);
-  mPortEdit->setText("18333");
+  mPortEdit->setText(QString::number(getConnection()->getPort()));
   gridLayout->addWidget(mPortEdit, 1, 1);
 
   QAction* browseLocalServerAction = new QAction(QIcon(":/icons/open.png"), "Browse", this);
   browseLocalServerAction->setStatusTip("Select a local server application");
-//  browseLocalServerAction->setToolTip(tip);
   connect(browseLocalServerAction, SIGNAL(triggered()), this, SLOT(browseLocalServerSlot()));
   QToolButton* button = new QToolButton();
-  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setDefaultAction(browseLocalServerAction);
-  gridLayout->addWidget(button, 2, 2);
+  gridLayout->addWidget(button, 3, 2);
 
-  gridLayout->addWidget(new QLabel("Local Server", this), 2, 0);
+  mUseLocalServer = new QCheckBox("Use Local Server", this);
+  mUseLocalServer->setChecked(getConnection()->getUseLocalServer());
+  connect(mUseLocalServer, SIGNAL(toggled(bool)), this, SLOT(guiChanged()));
+  gridLayout->addWidget(mUseLocalServer, 2, 0, 1, 2);
+
+  gridLayout->addWidget(new QLabel("Local Server", this), 3, 0);
   mLocalServerEdit = new QLineEdit(this);
-  QString localServerName = DataLocations::getSettings()->value("IGTLink/localServer").toString();
-  mLocalServerEdit->setText(localServerName);
-  gridLayout->addWidget(mLocalServerEdit, 2, 1);
+  mLocalServerEdit->setText(getConnection()->getLocalServerCommandLine());
+  gridLayout->addWidget(mLocalServerEdit, 3, 1);
 
   QHBoxLayout* buttonsLayout = new QHBoxLayout;
   toptopLayout->addLayout(buttonsLayout);
@@ -89,43 +88,58 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   toptopLayout->addWidget(mConnectButton);
 
   toptopLayout->addStretch();
+
+  this->dataChanged();
+}
+
+QProcess* IGTLinkWidget::getServer()
+{
+  return getConnection()->getProcess();
+}
+
+ssc::OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
+{
+  return getConnection()->getRTSource();
+}
+
+IGTLinkConnectionPtr IGTLinkWidget::getConnection()
+{
+  return stateManager()->getIGTLinkConnection();
 }
 
 IGTLinkWidget::~IGTLinkWidget()
 {
-  QStringList hostHistory;
-  for (int i=0; i<mAddressEdit->count(); ++i)
-    hostHistory << mAddressEdit->itemText(i);
-  DataLocations::getSettings()->setValue("IGTLink/hostHistory", hostHistory);
+}
 
-  DataLocations::getSettings()->setValue("IGTLink/localServer", mLocalServerEdit->text());
+void IGTLinkWidget::guiChanged()
+{
+  this->writeSettings();
+  this->dataChanged();
+}
+
+void IGTLinkWidget::dataChanged()
+{
+  mAddressEdit->setEnabled(!getConnection()->getUseLocalServer());
+  mLocalServerEdit->setEnabled(getConnection()->getUseLocalServer());
+  mLaunchServerButton->setEnabled(getConnection()->getUseLocalServer());
+
+  mShowStreamButton->setEnabled(getConnection()->getRTSource()->isConnected());
 }
 
 void IGTLinkWidget::updateHostHistory()
 {
   mAddressEdit->blockSignals(true);
-
-  if (mAddressEdit->currentIndex()!=0)
-  {
-    QString from = mAddressEdit->currentText();
-
-    mAddressEdit->removeItem(mAddressEdit->currentIndex());
-    mAddressEdit->insertItem(0, from);
-    mAddressEdit->setCurrentIndex(0);
-  }
-
-  while (mAddressEdit->count() > 5)
-  {
-    mAddressEdit->removeItem(mAddressEdit->count()-1);
-  }
+  mAddressEdit->clear();
+  mAddressEdit->addItems(getConnection()->getHostHistory());
   mAddressEdit->blockSignals(false);
 }
 
 void IGTLinkWidget::browseLocalServerSlot()
 {
   QString fileName = QFileDialog::getOpenFileName(this, tr("Select Server"), "~");
-  if (!fileName.isEmpty())
-    mLocalServerEdit->setText(fileName);
+  if (fileName.isEmpty())
+    return;
+  mLocalServerEdit->setText(fileName);
 }
 
 void IGTLinkWidget::showEvent(QShowEvent* event)
@@ -161,71 +175,34 @@ void IGTLinkWidget::renderSlot()
 
 void IGTLinkWidget::launchServer()
 {
-//  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
-//  QStringList arguments;
-//  arguments << "18333" <<  "/Users/christiana/Patients/20101126T114627_Lab_66.cx3/US_Acq/USAcq_20100909T111205_5.mhd";
-  QStringList text = mLocalServerEdit->text().split(" ");
-  QString program = text[0];
-  QStringList arguments = text;
-  arguments.pop_front();
-
-  if (!mServer)
-  {
-    mServer = new QProcess(this);
-    connect(mServer, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
-    connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
-  }
-
-  if (mServer->state()==QProcess::NotRunning)
-    mServer->start(program, arguments);
+  this->writeSettings();
+  getConnection()->launchServer();
 }
 
 void IGTLinkWidget::toggleLaunchServer()
 {
-  if (( mServer )&&( mServer->state()==QProcess::Running ))
-      mServer->close();
+  if (( getServer() )&&( getServer()->state()==QProcess::Running ))
+    getServer()->close();
   else
     this->launchServer();
 }
 
-void IGTLinkWidget::serverProcessError(QProcess::ProcessError error)
-{
-  QString msg;
-  msg += "RT Source server reported an error: ";
-
-  switch (error)
-  {
-  case QProcess::FailedToStart: msg += "Failed to start"; break;
-  case QProcess::Crashed: msg += "Crashed"; break;
-  case QProcess::Timedout: msg += "Timed out"; break;
-  case QProcess::WriteError: msg += "Write Error"; break;
-  case QProcess::ReadError: msg += "Read Error"; break;
-  case QProcess::UnknownError: msg += "Unknown Error"; break;
-  default: msg += "Invalid error";
-  }
-
-  ssc::messageManager()->sendError(msg);
-}
 
 void IGTLinkWidget::serverProcessStateChanged(QProcess::ProcessState newState)
 {
   if (newState==QProcess::Running)
   {
-    ssc::messageManager()->sendInfo("Local RT Source Server running.");
     mLaunchServerButton->setText("Close Local Server");
   }
   if (newState==QProcess::NotRunning)
   {
-    ssc::messageManager()->sendInfo("Local RT Source Server not running.");
     mLaunchServerButton->setText("Launch Local Server");
   }
   if (newState==QProcess::Starting)
   {
-    ssc::messageManager()->sendInfo("Local RT Source Server starting.");
     mLaunchServerButton->setText("Starting...");
   }
 }
-
 
 void IGTLinkWidget::showStream()
 {
@@ -236,13 +213,12 @@ void IGTLinkWidget::showStream()
   mView->setBackgoundColor(QColor("khaki"));
   mToptopLayout->addWidget(mView, 1);
   mRenderTimer = new QTimer(this);
-  std::cout << "start stream" << std::endl;
   connect(mRenderTimer, SIGNAL(timeout()), this, SLOT(renderSlot()));
   mRenderTimer->setInterval(50);
   mRenderTimer->start();
 
   ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
-  rtRep->setRealtimeStream(mRTSource);
+  rtRep->setRealtimeStream(getRTSource());
 //  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(rtRep);
 
@@ -252,56 +228,43 @@ void IGTLinkWidget::showStream()
 
 void IGTLinkWidget::toggleConnectServer()
 {
-  if (!mRTSource->isConnected())
+  if (!getRTSource()->isConnected())
   {
     this->connectServer();
-    QTimer::singleShot(1000, this, SLOT(autoLaunchLocalServer()));
   }
   else
   {
-    mRTSource->disconnectServer();
+    getRTSource()->disconnectServer();
   }
+}
 
-  mAutoLaunchIsTried = false;
+void IGTLinkWidget::writeSettings()
+{
+//  std::cout << "guiChanged" << std::endl;
+  getConnection()->setLocalServerCommandLine(mLocalServerEdit->text());
+  getConnection()->setHost(mAddressEdit->currentText());
+  getConnection()->setPort(mPortEdit->text().toInt());
+  getConnection()->setUseLocalServer(mUseLocalServer->isChecked());
+  this->updateHostHistory();
 }
 
 void IGTLinkWidget::connectServer()
 {
-  if (!mRTSource->isConnected())
+  if (!getRTSource()->isConnected())
   {
-    this->updateHostHistory();
-    mRTSource->connectServer(mAddressEdit->currentText(), mPortEdit->text().toInt());
+    this->writeSettings();
+    getConnection()->launchAndConnectServer();
   }
-}
-
-/**Use this slot to autolaunch the local server if a connection attempt fails,
- * and a local server is defined, and the host is set to local.
- */
-void IGTLinkWidget::autoLaunchLocalServer()
-{
-  if (mRTSource->isConnected()) // connected: everything OK.
-    return;
-  if (mAutoLaunchIsTried)
-    return;
-  if (( mAddressEdit->currentText()!="127.0.0.1" )&&( mAddressEdit->currentText()!="Localhost" ))
-    return;
-
-  ssc::messageManager()->sendInfo("Connect server failed: attempting to launch local server and reconnect.");
-  this->launchServer();
-  QTimer::singleShot(1000, this, SLOT(connectServer()));
-  mAutoLaunchIsTried = true;
 }
 
 void IGTLinkWidget::serverStatusChangedSlot()
 {
-  if (mRTSource->isConnected())
+  if (getRTSource()->isConnected())
     mConnectButton->setText("Disconnect Server");
   else
     mConnectButton->setText("Connect Server");
 
   this->adjustSize();
 }
-
-
 
 }//end namespace cx

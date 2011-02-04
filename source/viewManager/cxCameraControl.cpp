@@ -115,15 +115,15 @@ QActionGroup* CameraControl::createStandard3DViewActions()
  */
 QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, ssc::Vector3D viewDirection, QActionGroup* group)
 {
-  QAction* action = new QAction(caption, group);
+  QAction* action = new QAction(help, group);
   action->setStatusTip(help);
   action->setWhatsThis(help);
   action->setIcon(QIcon(":/icons/camera_view_"+caption+".png"));
-  QFont font;
-  font.setBold(true);
-  if (font.pointSize()>=0)
-    font.setPointSize(font.pointSize()*1.5);
-  action->setFont(font);
+//  QFont font;
+//  font.setBold(true);
+//  if (font.pointSize()>=0)
+//    font.setPointSize(font.pointSize()*1.5);
+//  action->setFont(font);
   action->setData(QVariant(qstring_cast(viewDirection)));
   connect(action, SIGNAL(triggered()), this, SLOT(setStandard3DViewActionSlot()));
   return action;

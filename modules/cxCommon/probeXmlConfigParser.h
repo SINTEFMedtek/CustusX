@@ -41,6 +41,7 @@ public:
     double                  mPixelHeight;///<  Pixel height
     int                     mHorizontalOffset; ///< parameter for the grabber
     QString                 mNotes; ///< useful information
+    double                  mImageTimestampCalibration; ///< delay in timestamping in grabber source relative to master clock.
 //    int                     mColumns; ///< X dim
 //    int                     mRows;    ///< Y dim
     

@@ -5,6 +5,7 @@
 
 class QPushButton;
 class QLineEdit;
+class QLabel;
 
 namespace cx
 {
@@ -22,7 +23,13 @@ class RecordSessionWidget : public QWidget
 
 public:
   RecordSessionWidget(QWidget* parent, QString defaultDescription = "Record Session");
-  ~RecordSessionWidget();
+  virtual ~RecordSessionWidget();
+
+  void setDescription(QString text);
+  void setDescriptionVisibility(bool value);
+
+  void startPostProcessing(QString description);
+  void stopPostProcessing();
 
 signals:
   void started();
@@ -34,6 +41,7 @@ protected:
 
 private slots:
   void startStopSlot(bool);
+  void cancelSlot();
 
 private:
   void startRecording();
@@ -43,9 +51,12 @@ private:
   void reset();
 
   QPushButton* mStartStopButton;
+  QPushButton* mCancelButton;
+  QLabel* mDescriptionLabel;
   QLineEdit* mDescriptionLine;
   double mStartTimeMSec;
   double mStopTimeMSec;
+  bool mPostProcessing;
 };
 
 }//namespace cx

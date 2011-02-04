@@ -5,6 +5,7 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxStateMachineManager.h"
+#include "sscTime.h"
 
 namespace cx
 {
@@ -14,7 +15,7 @@ RecordSession::RecordSession(double startTime, double stopTime, QString descript
     mDescription(description)
 {
   mUid = this->getNewUid();
-  mDescription.append(" ("+mUid+")");
+  mDescription.append("_"+mUid+"");
 }
 
 RecordSession::~RecordSession()
@@ -40,10 +41,10 @@ double RecordSession::getStopTime()
   return mStopTime;
 }
 
-ssc::SessionToolHistoryMap RecordSession::getSessionHistory()
+/*ssc::SessionToolHistoryMap RecordSession::getSessionHistory()
 {
   return ssc::toolManager()->getSessionHistory(mStartTime, mStopTime);
-}
+}*/
 
 void RecordSession::addXml(QDomNode& parentNode)
 {
@@ -86,9 +87,13 @@ QString RecordSession::getNewUid()
   std::vector<RecordSessionPtr>::iterator iter;
   for (iter = recordsessions.begin(); iter != recordsessions.end(); ++iter)
   {
-    max = std::max(max, qstring_cast((*iter)->getUid()).toInt());
+    QString index = (*iter)->getUid().split("_").front();
+    max = std::max(max, index.toInt());
   }
-  retval = qstring_cast(max + 1);
+
+//  retval = qstring_cast(max + 1);
+  retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
+  retval += "_" + QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
   return retval;
 }
 
