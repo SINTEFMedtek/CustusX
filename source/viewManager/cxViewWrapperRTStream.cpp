@@ -18,6 +18,7 @@
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
 #include "cxRepManager.h"
+#include "cxDataLocations.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
@@ -44,8 +45,10 @@ ViewWrapperRTStream::ViewWrapperRTStream(ssc::View* view)
   mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth/2.0, clipDepth/2.0);
 
   connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(streamLoadedSlot()));
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
 
   addReps();
+  this->dominantToolChangedSlot();
 }
 
 ViewWrapperRTStream::~ViewWrapperRTStream()
@@ -61,6 +64,19 @@ ssc::View* ViewWrapperRTStream::getView()
 
 void ViewWrapperRTStream::appendToContextMenu(QMenu& contextMenu)
 {
+  QAction* showSectorAction = new QAction("Show Sector", &contextMenu);
+  showSectorAction->setCheckable(true);
+  showSectorAction->setChecked(mStreamRep->getShowSector());
+  connect(showSectorAction, SIGNAL(triggered(bool)), this, SLOT(showSectorActionSlot(bool)));
+
+  contextMenu.addSeparator();
+  contextMenu.addAction(showSectorAction);
+}
+
+void ViewWrapperRTStream::showSectorActionSlot(bool checked)
+{
+  mStreamRep->setShowSector(checked);
+  DataLocations::getSettings()->setValue("showSectorInRTView", checked);
 }
 
 void ViewWrapperRTStream::streamLoadedSlot()
@@ -77,7 +93,21 @@ void ViewWrapperRTStream::streamLoadedSlot()
 //  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(mStreamRep);
   mDataNameText->setText(0, "initialized");
+
+  mStreamRep->setShowSector(DataLocations::getSettings()->value("showSectorInRTView").toBool());
+
 //  std::cout << "added stream to rt view" << std::endl;
+}
+
+void ViewWrapperRTStream::dominantToolChangedSlot()
+{
+  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+
+  // ignore non-probe tools
+  if (!tool || tool->getProbeSector().mType==ssc::ProbeSector::tNONE)
+    return;
+
+  mStreamRep->setTool(tool);
 }
 
 void ViewWrapperRTStream::updateSlot()

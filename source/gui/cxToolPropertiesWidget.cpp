@@ -91,19 +91,26 @@ QWidget(parent)
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
+
 ActiveToolConfigurationStringDataAdapter::ActiveToolConfigurationStringDataAdapter()
 {
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
 }
 void ActiveToolConfigurationStringDataAdapter::dominantToolChanged()
 {
+  // ignore tool changes to something non-probeish.
+  // This gives the user a chance to use the widget without having to show the probe.
+  ssc::ToolPtr newTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!newTool || newTool->getProbeSector().mType==ssc::ProbeSector::tNONE)
+    return;
+
   if (mTool)
-    disconnect(mTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SIGNAL(changed()));
+    disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
   mTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
 
   if (mTool)
-    connect(mTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SIGNAL(changed()));
+    connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
 
   emit changed();
 }
@@ -115,14 +122,14 @@ bool ActiveToolConfigurationStringDataAdapter::setValue(const QString& value)
 {
   if (!mTool)
     return false;
-  mTool->setProbeSectorConfigIdString(value);
+  mTool->getProbe()->setConfigId(value);
   return true;
 }
 QString ActiveToolConfigurationStringDataAdapter::getValue() const
 {
   if (!mTool)
     return "";
-  return mTool->getProbeSectorConfigIdString();
+  return mTool->getProbe()->getConfigId();
 }
 QString ActiveToolConfigurationStringDataAdapter::getHelp() const
 {
@@ -132,13 +139,13 @@ QStringList ActiveToolConfigurationStringDataAdapter::getValueRange() const
 {
   if (!mTool)
     return QStringList();
-  return mTool->getUSSectorConfigList();
+  return mTool->getProbe()->getConfigIdList();
 }
 QString ActiveToolConfigurationStringDataAdapter::convertInternal2Display(QString internal)
 {
   if (!mTool)
     return "<no tool>";
-  return mTool->getNameOfProbeSectorConfigId(internal); ///< get a name for the given configuration
+  return mTool->getProbe()->getConfigName(internal); ///< get a name for the given configuration
 }
 
 /// -------------------------------------------------------

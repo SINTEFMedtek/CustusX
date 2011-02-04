@@ -2,6 +2,7 @@
 #define MAINWINDOW_H_
 
 #include <QMainWindow>
+#include <QLabel>
 #include "sscConsoleWidget.h"
 #include "cxGrabberServerWidget.h"
 
@@ -19,12 +20,19 @@ class MainWindow : public QMainWindow
 {
   Q_OBJECT
 public:
-  MainWindow();
+  MainWindow(QStringList arguments = QStringList());
   ~MainWindow();
+
+  void handleArguments(QStringList& arguments);
+
+private slots:
+  void queueSizeSlot(int queueSize);
 
 private:
   GrabberServerWidget* mGrabberServerWidget;
   ssc::ConsoleWidget*   mConsoleWidget;
+
+  QLabel* mQueueSizeLabel;
 };
 
 }

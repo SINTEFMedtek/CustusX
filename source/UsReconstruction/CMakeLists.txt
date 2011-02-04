@@ -38,6 +38,8 @@ SET( SOURCE_FILES
   sscUSFrameData.cpp
   cxUsReconstructionFileMaker.h
   cxUsReconstructionFileMaker.cpp
+  cxUsReconstructionFileReader.h
+  cxUsReconstructionFileReader.cpp
   )
 
 # =========================================================
@@ -63,7 +65,7 @@ target_link_libraries( sscUsReconstructionLib
     cxCommon 
     thunder 
     toolManager
-    statemachineManager
+    #statemachineManager
     ITKCommon)
 # =========================================================
 

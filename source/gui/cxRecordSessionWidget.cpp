@@ -18,25 +18,42 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
     QWidget(parent),
     //mStartStopButton(new QPushButton("Start")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
+    mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription)),
     mStartTimeMSec(-1),
-    mStopTimeMSec(-1)
+    mStopTimeMSec(-1),
+    mPostProcessing(false)
 {
   this->setObjectName("RecordSessionWidget");
   this->setWindowTitle("Record Tracking");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
-  layout->addWidget(new QLabel("Desciption:"));
+  mDescriptionLabel = new QLabel("Description:");
+  layout->addWidget(mDescriptionLabel);
   layout->addWidget(mDescriptionLine);
   layout->addWidget(mStartStopButton);
+  layout->addWidget(mCancelButton);
   //layout->addWidget(new ssc::LabeledComboBoxWidget(this, SelectRecordSessionStringDataAdapterPtr(new SelectRecordSessionStringDataAdapter())));
 
   mStartStopButton->setCheckable(true);
   connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
+  connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
+  mCancelButton->setEnabled(false);
+}
+
+void RecordSessionWidget::setDescriptionVisibility(bool value)
+{
+    mDescriptionLine->setVisible(value);
+    mDescriptionLabel->setVisible(value);
 }
 
 RecordSessionWidget::~RecordSessionWidget()
 {}
+
+void RecordSessionWidget::setDescription(QString text)
+{
+  mDescriptionLine->setText(text);
+}
 
 void RecordSessionWidget::changeEvent(QEvent* event)
 {
@@ -48,12 +65,37 @@ void RecordSessionWidget::changeEvent(QEvent* event)
     this->stopRecording();
 }
 
+void RecordSessionWidget::startPostProcessing(QString description)
+{
+  mPostProcessing = true;
+
+  mCancelButton->setEnabled(true);
+  mStartStopButton->setText(description);
+  mStartStopButton->setEnabled(false);
+}
+
+void RecordSessionWidget::stopPostProcessing()
+{
+  this->reset();
+}
+
+
 void RecordSessionWidget::startStopSlot(bool checked)
 {
   if(checked)
     this->startRecording();
   else
     this->stopRecording();
+}
+
+void RecordSessionWidget::cancelSlot()
+{
+  if(!this->isRecording() && !mPostProcessing)
+    return;
+
+  std::cout << "cancel" << std::endl;
+  this->reset();
+  emit stopped();
 }
 
 void RecordSessionWidget::startRecording()
@@ -67,6 +109,7 @@ void RecordSessionWidget::startRecording()
   mStartTimeMSec = ssc::getMilliSecondsSinceEpoch();
   mStartStopButton->setText("Stop");
   mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
+  mCancelButton->setEnabled(true);
   emit started();
 }
 
@@ -76,8 +119,6 @@ void RecordSessionWidget::stopRecording()
     return;
 
   mStopTimeMSec = ssc::getMilliSecondsSinceEpoch();
-  mStartStopButton->setText("Start");
-  mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
 
   RecordSessionPtr session = RecordSessionPtr(new RecordSession(mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
   stateManager()->addRecordSession(session);
@@ -97,6 +138,17 @@ bool RecordSessionWidget::isRecording()
 
 void RecordSessionWidget::reset()
 {
+  mPostProcessing = false;
+
+  mStartStopButton->blockSignals(true);
+  mStartStopButton->setChecked(false);
+  mStartStopButton->blockSignals(false);
+  mStartStopButton->setText("Start");
+  mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"));
+  mStartStopButton->setEnabled(true);
+
+  mCancelButton->setEnabled(false);
+
   mStartTimeMSec = -1;
   mStopTimeMSec = -1;
 }

@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <vtkPolyData.h>
+#include "boost/bind.hpp"
 #include "sscToolManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
@@ -21,6 +22,10 @@
 #include "cxViewManager.h"
 #include "cxView3D.h"
 #include "cxUsReconstructionFileMaker.h"
+#include "cxToolPropertiesWidget.h"
+#include "RTSource/cxOpenIGTLinkConnection.h"
+#include  "sscReconstructer.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -28,8 +33,8 @@ namespace cx
 RecordBaseWidget::RecordBaseWidget(QWidget* parent, QString description):
     QWidget(parent),
     mLayout(new QVBoxLayout(this)),
-    mInfoLabel(new QLabel("Will never be ready... Derive from this class!")),
-    mRecordSessionWidget(new RecordSessionWidget(this, description))
+    mRecordSessionWidget(new RecordSessionWidget(this, description)),
+    mInfoLabel(new QLabel("Will never be ready... Derive from this class!"))
 {
   this->setObjectName("RecordBaseWidget");
   this->setWindowTitle("Record Base");
@@ -62,7 +67,8 @@ TrackedRecordWidget::~TrackedRecordWidget()
 ssc::TimedTransformMap TrackedRecordWidget::getRecording(RecordSessionPtr session)
 {
   ssc::TimedTransformMap retval;
-  ssc::SessionToolHistoryMap toolTransformMap = session->getSessionHistory();
+  //ssc::SessionToolHistoryMap toolTransformMap = session->getSessionHistory();
+  ssc::SessionToolHistoryMap toolTransformMap = ssc::toolManager()->getSessionHistory(session->getStartTime(), session->getStopTime());;
 
   if(toolTransformMap.size() == 1)
   {
@@ -190,20 +196,28 @@ void TrackedCenterlineWidget::stoppedSlot()
 }
 //----------------------------------------------------------------------------------------------------------------------
 USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, "US Acquisition")
+    TrackedRecordWidget(parent, DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString())
 {
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
 
-  mRTSourceDataAdapter = SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter());
+  connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
+
+  mRecordSessionWidget->setDescriptionVisibility(false);
+
+//  mRTSourceDataAdapter = SelectRTSourceStringDataAdapterPtr(new SelectRTSourceStringDataAdapter());
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 
-  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
+  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
+//  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New());
+//  mToptopLayout->addWidget(mUSSectorConfigBox);
+
+//  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
   mLayout->addStretch();
 
-  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
+//  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
 
   this->checkIfReadySlot();
   this->rtSourceChangedSlot();
@@ -214,20 +228,23 @@ USAcqusitionWidget::~USAcqusitionWidget()
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
+  bool tracking = ssc::toolManager()->isTracking();
+  bool streaming = mRTSource && mRTSource->isStreaming();
+
   //std::cout << "void USAcqusitionWidget::checkIfReadySlot()" << std::endl;
-  if(ssc::toolManager()->isTracking() && mRTSource && mRTSource->isStreaming() && mRTRecorder)
+  if(tracking && streaming && mRTRecorder)
   {
     RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font><br>");
-    emit ready(true);
+//    emit ready(true);
   }
   else
   {
     QString whatsMissing("");
-    if(!ssc::toolManager()->isTracking())
+    if(!tracking)
       whatsMissing.append("<font color=red>Need to start tracking.</font><br>");
     if(mRTSource)
     {
-      if(!mRTSource->isStreaming())
+      if(!streaming)
         whatsMissing.append("<font color=red>Need to start streaming.</font><br>");
     }else
     {
@@ -237,8 +254,11 @@ void USAcqusitionWidget::checkIfReadySlot()
        whatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
 
     RecordBaseWidget::setWhatsMissingInfo(whatsMissing);
-    emit ready(false);
+//    emit ready(false);
   }
+
+  // do not require tracking to be present in order to perform an acquisition.
+  emit ready(streaming && mRTRecorder);
 }
 
 void USAcqusitionWidget::rtSourceChangedSlot()
@@ -248,41 +268,99 @@ void USAcqusitionWidget::rtSourceChangedSlot()
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
   }
 
-  mRTSource = mRTSourceDataAdapter->getRTSource();
+//  mRTSource = mRTSourceDataAdapter->getRTSource();
+  mRTSource = stateManager()->getIGTLinkConnection()->getRTSource();
 
   if(mRTSource)
   {
     //ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-    mRTRecorder = ssc::RealTimeStreamSourceRecorderPtr(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+    mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
   }
   this->checkIfReadySlot();
 }
 
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 {
+//  std::cout << "post processing" << std::endl;
+
   //get session data
   RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
   ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
   ssc::TimedTransformMap trackerRecordedData = TrackedRecordWidget::getRecording(session);
   if(trackerRecordedData.empty())
   {
-    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Aborting volume tracking data generation.");
-    return;
+    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Volume data only will be written.");
+//    return;
   }
 
+//  std::cout << "pre save" << std::endl;
   ToolPtr probe = TrackedRecordWidget::getTool();
-  UsReconstructionFileMaker filemaker(trackerRecordedData, streamRecordedData, session, stateManager()->getPatientData()->getActivePatientFolder(), probe);
-  filemaker.write();
+  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe));
+
+  mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
+  mFileMakerFutureWatcher.setFuture(mFileMakerFuture);
+//  std::cout << "save started" << std::endl;
+//  QString targetFolder = filemaker.write();
+}
+
+void USAcqusitionWidget::fileMakerWriteFinished()
+{
+  QString targetFolder = mFileMakerFutureWatcher.future().result();
+
+//  std::cout << "select data" << std::endl;
+  stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
+//  std::cout << "selected data" << std::endl;
+
+  mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+
+  if (DataLocations::getSettings()->value("Automation/autoReconstruct").toBool())
+  {
+//    std::cout << "start threaded reconstruct" << std::endl;
+    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
+    connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+    mThreadedReconstructer->start();
+    mRecordSessionWidget->startPostProcessing("Reconstructing");
+//    std::cout << "started threaded reconstruct" << std::endl;
+
+//    stateManager()->getReconstructer()->reconstruct();
+  }
+}
+
+void USAcqusitionWidget::reconstructFinishedSlot()
+{
+//  std::cout << "finished threaded reconstruct" << std::endl;
+  mRecordSessionWidget->stopPostProcessing();
+  mThreadedReconstructer.reset();
+
+  // show data in view from here if applicable.
 }
 
 void USAcqusitionWidget::startedSlot()
 {
+  mRecordSessionWidget->setDescription(DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString());
+
   mRTRecorder->startRecord();
+
+  //sleep(120);
 }
+
+//void USAcqusitionWidget::cancelledSlot()
+//{
+//}
 
 void USAcqusitionWidget::stoppedSlot()
 {
+  if (mThreadedReconstructer)
+  {
+    mThreadedReconstructer->terminate();
+    mThreadedReconstructer->wait();
+    stateManager()->getReconstructer()->selectData(stateManager()->getReconstructer()->getSelectedData());
+
+
+    // TODO perform cleanup of all resources connected to this recording.
+  }
+
   mRTRecorder->stopRecord();
 }
 //----------------------------------------------------------------------------------------------------------------------

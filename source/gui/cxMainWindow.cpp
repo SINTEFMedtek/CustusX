@@ -46,6 +46,7 @@
 #include "cxControlPanel.h"
 #include "cxIGTLinkWidget.h"
 #include "cxRecordBaseWidget.h"
+#include "RTSource/cxOpenIGTLinkConnection.h"
 
 namespace cx
 {
@@ -64,7 +65,7 @@ MainWindow::MainWindow() :
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
+//  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
@@ -72,6 +73,8 @@ MainWindow::MainWindow() :
   mControlPanel(NULL),
   mSettings(DataLocations::getSettings())
 {
+  mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
+
   ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
@@ -115,11 +118,6 @@ MainWindow::MainWindow() :
   this->createStatusBar();
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
-
-  if (!mSettings->contains("renderingInterval"))
-    mSettings->setValue("renderingInterval", 33);
-  if (!mSettings->contains("shadingOn"))
-    mSettings->setValue("shadingOn", true);
 
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
@@ -278,6 +276,11 @@ void MainWindow::createActions()
   mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
   mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
+  mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
+  connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
+  connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
+  this->updateStreamingActionSlot();
+
   mConfigureToolsAction->setChecked(true);
 
   connect(mConfigureToolsAction, SIGNAL(triggered()), this, SLOT(configureSlot()));
@@ -316,6 +319,32 @@ void MainWindow::createActions()
 
   mInteractorStyleActionGroup = viewManager()->createInteractorStyleActionGroup();
 
+}
+
+void MainWindow::toggleStreamingSlot()
+{
+  if (stateManager()->getIGTLinkConnection()->getRTSource()->isStreaming())
+  {
+    stateManager()->getIGTLinkConnection()->getRTSource()->disconnectServer();
+  }
+  else
+  {
+    stateManager()->getIGTLinkConnection()->launchAndConnectServer();
+  }
+}
+
+void MainWindow::updateStreamingActionSlot()
+{
+  if (stateManager()->getIGTLinkConnection()->getRTSource()->isStreaming())
+  {
+    mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
+    mStartStreamingAction->setText("Stop Streaming");
+  }
+  else
+  {
+    mStartStreamingAction->setIcon(QIcon(":/icons/streaming_red.png"));
+    mStartStreamingAction->setText("Start Streaming");
+  }
 }
 
 void MainWindow::centerToImageCenterSlot()
@@ -627,6 +656,8 @@ void MainWindow::createMenus()
   mToolMenu->addAction(mTrackingToolsAction);
   mToolMenu->addSeparator();
   mToolMenu->addAction(mSaveToolsPositionsAction);
+  mToolMenu->addSeparator();
+  mToolMenu->addAction(mStartStreamingAction);
 
   //layout
   this->menuBar()->addMenu(mLayoutMenu);
@@ -659,6 +690,7 @@ void MainWindow::createToolBars()
   mToolToolBar = addToolBar("Tools");
   mToolToolBar->setObjectName("ToolToolBar");
   mToolToolBar->addAction(mTrackingToolsAction);
+  mToolToolBar->addAction(mStartStreamingAction);
   this->registerToolBar(mToolToolBar, "Toolbar");
 
   mNavigationToolBar = addToolBar("Navigation");

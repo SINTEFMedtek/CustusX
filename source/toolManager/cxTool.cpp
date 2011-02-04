@@ -12,8 +12,9 @@
 #include "sscTypeConversions.h"
 #include "sscProbeSector.h"
 #include "cxToolManager.h"
-#include "cxDataLocations.h"
-#include "cxCreateProbeDataFromConfiguration.h"
+#include "cxProbe.h"
+//#include "cxDataLocations.h"
+//#include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
 {
@@ -32,9 +33,9 @@ Tool::Tool(InternalStructure& internalStructure) :
   mVisible(false),
   mAttachedToTracker(false),
   mTracked(false),
-  mToolTipOffset(0),
-  mProbeSector(ssc::ProbeSector()),
-  mProbeSectorConfiguration("")
+  mToolTipOffset(0)
+//  mProbeSector(ssc::ProbeSector()),
+//  mProbeSectorConfiguration("")
 {
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
@@ -52,14 +53,18 @@ Tool::Tool(InternalStructure& internalStructure) :
     mValid = false;
   }
 
-  // Read ultrasoundImageConfigs.xml file
-  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
-  mXml = new ProbeXmlConfigParser(xmlFileName);
-
-  QStringList configs = this->getUSSectorConfigList();
-  if (!configs.isEmpty())
-    this->setProbeSectorConfigIdString(configs[0]);
+  mProbe.reset(new Probe(mInternalStructure.mInstrumentId, mInternalStructure.mInstrumentScannerId));
+  connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
+//
+//  // Read ultrasoundImageConfigs.xml file
+//  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
+//  mXml = new ProbeXmlConfigParser(xmlFileName);
+//
+//  QStringList configs = this->getUSSectorConfigList();
+//  if (!configs.isEmpty())
+//    this->setProbeSectorConfigIdString(configs[0]);
 }
+
 
 Tool::~Tool()
 {}
@@ -82,6 +87,11 @@ vtkPolyDataPtr Tool::getGraphicsPolyData() const
 ssc::TimedTransformMapPtr Tool::getPositionHistory()
 {
   return mPositionHistory;
+}
+
+ssc::ProbePtr Tool::getProbe() const
+{
+  return mProbe;
 }
 
 //void Tool::saveTransformsAndTimestamps()
@@ -635,79 +645,17 @@ void Tool::printInternalStructure()
   
 ssc::ProbeSector Tool::getProbeSector() const
 { 
-  return mProbeSector;
-}
-void Tool::setUSProbeSector(ssc::ProbeSector probeSector)
-{
-  mProbeSector = probeSector;
-  emit toolProbeSector();
+  return mProbe->getSector();
 }
   
-QString Tool::getInstrumentId() const
-{
-  return mInternalStructure.mInstrumentId;
-}
-QString Tool::getInstrumentScannerId() const
-{
-  return mInternalStructure.mInstrumentScannerId;
-}
-
-QStringList Tool::getUSSectorConfigList() const
-{
-  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-  if (rtSourceList.empty())
-    return QStringList();
-  QStringList configIdList = mXml->getConfigIdList(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0));
-  return configIdList;
-}
-
-QString Tool::getNameOfProbeSectorConfigId(QString configString) ///< get a name for the given configuration
-{
-  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-  if(rtSourceList.isEmpty())
-    return "";
-  ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0), configString);
-  return config.mName;
-}
-
-QString Tool::getProbeSectorConfigIdString() const
-{
-  return mProbeSectorConfiguration;
-}
-QString Tool::getConfigurationString() const
-{
-  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-    if(rtSourceList.isEmpty())
-      return "";
-  QString retval = this->getInstrumentScannerId() + ":" + this->getInstrumentId()
-      + ":" + rtSourceList.at(0) + ":" + this->getProbeSectorConfigIdString();
-  return retval;
-}
-
-void Tool::setProbeSectorConfigIdString(QString configString)
-{
-  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-  if(rtSourceList.isEmpty())
-    return;
-  ProbeXmlConfigParser::Configuration config = mXml->getConfiguration(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0), configString);
-  if(config.isEmpty())
-    return;
-
-  ssc::ProbeSector probeSector = createProbeDataFromConfiguration(config);
-//  std::cout << "setting probe settings data" << std::endl;
-  mProbeSectorConfiguration = configString;
-  this->setUSProbeSector(probeSector);
-}
-
-ProbeXmlConfigParser::Configuration Tool::getConfiguration() const
-{
-  ProbeXmlConfigParser::Configuration config;
-  QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
-  if(rtSourceList.isEmpty())
-    return config;
-  config = mXml->getConfiguration(this->getInstrumentScannerId(), this->getInstrumentId(), rtSourceList.at(0), this->getProbeSectorConfigIdString());
-  return config;
-}
+//QString Tool::getInstrumentId() const
+//{
+//  return mInternalStructure.mInstrumentId;
+//}
+//QString Tool::getInstrumentScannerId() const
+//{
+//  return mInternalStructure.mInstrumentScannerId;
+//}
 
 std::map<int, ssc::Vector3D> Tool::getReferencePoints() const
 {
@@ -735,11 +683,12 @@ void Tool::addXml(QDomNode& dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
   dataNode.toElement().setAttribute("uid", qstring_cast(this->getUid()));
-  if (!mProbeSectorConfiguration.isEmpty())
+  if (mProbe->isValid())
   {
-    QDomElement configNode = doc.createElement("probeSectorConfiguration");
-    configNode.appendChild(doc.createTextNode(mProbeSectorConfiguration));
-    dataNode.appendChild(configNode);
+    QDomElement probeNode = doc.createElement("probe");
+    mProbe->addXml(probeNode);
+//    configNode.appendChild(doc.createTextNode(mProbeSectorConfiguration));
+    dataNode.appendChild(probeNode);
   }
 }
 
@@ -747,12 +696,8 @@ void Tool::parseXml(QDomNode& dataNode)
 {
   if (dataNode.isNull())
     return;
-  mProbeSectorConfiguration = dataNode.namedItem("probeSectorConfiguration").toElement().text();
-  //Need to call set function to make sure the values will be applied
-  if (mProbeSectorConfiguration.isEmpty())
-    return;
-  setProbeSectorConfigIdString(mProbeSectorConfiguration);
-  emit probeSectorConfigurationChanged();
+  QDomNode probeNode = dataNode.namedItem("probe");
+  mProbe->parseXml(probeNode);
 }
 
 void Tool::writeCalibrationToFile()

@@ -2,6 +2,7 @@ SET (LIB toolManager)
 
 SET( CX_QT_MOC_HEADER_FILES
     cxToolManager.h
+    cxProbe.h
     cxTool.h
     cxTracker.h
 )
@@ -10,6 +11,8 @@ SET ( ${LIB}_toolManager
     ${CX_QT_MOC_HEADER_FILES}
     cxToolManager.h
     cxToolManager.cpp
+    cxProbe.h
+    cxProbe.cpp
     cxTool.h
     cxTool.cpp
     cxTracker.h
