@@ -35,6 +35,7 @@ protected slots:
   void fastForwardSlot();
   void updateSlot();
   void reconnectSlot();
+  void showDetailsSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -42,7 +43,7 @@ protected:
 
 private:
   RegistrationHistoryWidget();
-  void debugDump();
+  QString  debugDump();
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 
@@ -51,15 +52,17 @@ private:
   QDateTime getActiveTime();
   void setActiveTime(QDateTime active);
   TimeMap::iterator findCurrentActiveIter(TimeMap& times);
-  QGroupBox* mGroup;
+  QFrame* mGroup;
   std::vector<ssc::RegistrationHistoryPtr> mHistories;
   QAction* mRewindAction;
   QAction* mRemoveAction;
   QAction* mForwardAction;
   QAction* mFastForwardAction;
+  QAction* mDetailsAction;
 
   QLabel* mBehindLabel;
   QLabel* mInFrontLabel;
+  QTextEdit* mTextEdit;
 
   //
 //  QPushButton* mRewindButton;

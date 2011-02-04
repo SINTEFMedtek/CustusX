@@ -55,27 +55,17 @@ public:
   ViewWrapperPtr getViewWrapperFromViewUid(QString viewUid);
   std::vector<ssc::View*> getViews() const;
   ViewGroupDataPtr getData() { return mViewGroupData; }
-  //ssc::View* initializeView(int index, ssc::PLANE_TYPE plane);
-//  virtual void addImage(ssc::ImagePtr image);
-//  virtual void removeImage(ssc::ImagePtr image);
-//  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual void addXml(QDomNode& dataNode); ///< store internal state info in dataNode
   virtual void parseXml(QDomNode dataNode);///< load internal state info from dataNode
   void clearPatientData();
   double getZoom2D();
   std::vector<ssc::ImagePtr> getImages();
   ssc::SlicePlanesProxyPtr getSlicePlanesProxy() { return mSlicePlanesProxy; }
-//  void addMesh(ssc::MeshPtr data);
-//  void removeMesh(ssc::MeshPtr data);
 
   void setGlobal2DZoom(bool use, SyncedValuePtr val);
   void syncOrientationMode(SyncedValuePtr val);
 
 public slots:
-//  void addImage(QString imageUid);
-//  void removeImage(QString imageUid);
-//  void addMesh(QString uid);
-//  void removeMesh(QString uid);
 
 private slots:
   void activateManualToolSlot();
@@ -104,10 +94,7 @@ protected:
   SyncGroup mZoom2D;
 
   ViewGroupDataPtr mViewGroupData;
-//  std::vector<ssc::MeshPtr> mMeshes;
-//  std::vector<ssc::ImagePtr> mImages;
   std::vector<ViewWrapperPtr> mViewWrappers;
-//  ssc::REGISTRATION_STATUS mRegistrationMode;
   ssc::SlicePlanesProxyPtr mSlicePlanesProxy;
 };
 bool isViewWrapper2D(ViewWrapperPtr wrapper);
