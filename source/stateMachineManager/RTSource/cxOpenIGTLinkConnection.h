@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <QtGui>
-#include "sscDoubleWidgets.h"
+//#include "sscDoubleWidgets.h"
 #include "sscView.h"
 #include "RTSource/sscOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
