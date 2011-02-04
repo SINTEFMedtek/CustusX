@@ -13,6 +13,7 @@
     <file>icons/open_icon_library/png/64x64/actions/dialog-close.png</file>
     <file>icons/open_icon_library/png/64x64/actions/media-record-3.png</file>
     <file>icons/open_icon_library/png/64x64/actions/media-playback-stop.png</file>
+    <file>icons/open_icon_library/png/64x64/actions/process-stop-7.png</file>
     <file>icons/open_icon_library/png/64x64/actions/document-new-8.png</file>
     <file>icons/open_icon_library/png/64x64/actions/document-import-2.png</file>
     <file>icons/open_icon_library/png/64x64/actions/document-save-5.png</file>
@@ -32,8 +33,10 @@
     <file>icons/polaris.png</file>
     <file>icons/polaris-red.png</file>
     <file>icons/polaris-green.png</file>
+    <file>icons/streaming_green.png</file>    
+    <file>icons/streaming_red.png</file>    
     
-    
+  
     <file>icons/camera_view_A.png</file>
     <file>icons/camera_view_P.png</file>
     <file>icons/camera_view_S.png</file>

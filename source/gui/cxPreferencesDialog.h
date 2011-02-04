@@ -13,7 +13,10 @@ class QPushButton;
 class QSettings;
 class QSpinBox;
 class QCheckBox;
+class QRadioButton;
 class QGridLayout;
+class QVBoxLayout;
+class QLineEdit;
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
@@ -36,7 +39,7 @@ class FoldersTab : public QWidget
 
 public:
   FoldersTab(QWidget *parent = 0);
-  ~FoldersTab();
+  virtual ~FoldersTab();
   void init();
 
 public slots:
@@ -109,6 +112,62 @@ protected:
 };
 
 /**
+ * \class AutomationTab
+ *
+ * \brief Automatic execution of actions when applicable
+ *
+ * \date Jan 27, 2011
+ * \author Christian Askeland, SINTEF
+ */
+class AutomationTab : public QWidget
+{
+  Q_OBJECT
+
+public:
+  AutomationTab(QWidget *parent = 0);
+  void init();
+
+public slots:
+  void saveParametersSlot();
+
+
+protected:
+  QSettingsPtr mSettings;
+  QCheckBox* mAutoStartTrackingCheckBox;
+  QCheckBox* mAutoStartStreamingCheckBox;
+  QCheckBox* mAutoReconstructCheckBox;
+  QVBoxLayout *mMainLayout;
+};
+
+/**
+ * \class UltrasoundTab
+ *
+ * \brief Various parameters related to ultrasound acquisition and reconstruction.
+ *
+ * \date Jan 27, 2011
+ * \author Christian Askeland, SINTEF
+ */
+class UltrasoundTab : public QWidget
+{
+  Q_OBJECT
+
+public:
+  UltrasoundTab(QWidget *parent = 0);
+  void init();
+
+public slots:
+  void saveParametersSlot();
+
+protected:
+  QSettingsPtr mSettings;
+  QLineEdit* mAcquisitionNameLineEdit;
+  QVBoxLayout *mMainLayout;
+
+  QRadioButton* m24bitRadioButton;
+  QRadioButton* m8bitRadioButton;
+};
+
+/**
  * \class PreferencesDialog
  *
  * \brief Set application preferences
@@ -122,15 +181,18 @@ class PreferencesDialog : public QDialog
 
 public:
   PreferencesDialog(QWidget *parent = 0);
-  ~PreferencesDialog();	
-  
+  virtual ~PreferencesDialog();
+
 protected:
   ViewManager* mViewManager; ///< controls layout of views and has a pool of views
   FoldersTab *mFoldersTab;
   PerformanceTab *mPerformanceTab;
+  AutomationTab* mAutomationTab;
+  UltrasoundTab* mUltrasoundTab;
   QTabWidget *tabWidget;
   QDialogButtonBox *buttonBox;
 };
+
 
 
 }//namespace cx
