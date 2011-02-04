@@ -9,7 +9,7 @@
 #ifndef CXSHADINGPARAMSINTERFACES_H_
 #define CXSHADINGPARAMSINTERFACES_H_
 
-//#include "sscAbstractInterface.h"
+#include "sscDoubleRange.h"
 #include "sscDoubleWidgets.h"
 #include "sscForwardDeclarations.h"
 

@@ -44,8 +44,7 @@ public:
   Reconstructer(XmlOptionFile settings, QString shaderPath);
   virtual ~Reconstructer();
 
-  void selectData(QString filename);
-  void readFiles(QString mhdFileName, QString calFilesPath);
+  void selectData(QString filename, QString calFilesPath="");
   void reconstruct(); // assumes readFiles has already been called
 //  bool validReconstructData() const;
   void clearAll();
@@ -98,7 +97,7 @@ private:
   double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
   cx::UsReconstructionFileReaderPtr mFileReader;
-
+  void readFiles(QString mhdFileName, QString calFilesPath);
   ImagePtr createMaskFromConfigParams();
   ImagePtr generateMask();
   ssc::Transform3D applyOutputOrientation();
