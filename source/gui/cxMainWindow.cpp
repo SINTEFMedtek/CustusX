@@ -268,6 +268,13 @@ void MainWindow::createActions()
   connect(mImportDataAction, SIGNAL(triggered()), this, SLOT(importDataSlot()));
   connect(mDeleteDataAction, SIGNAL(triggered()), this, SLOT(deleteDataSlot()));
 
+  mShowPointPickerAction = new QAction(tr("PP"), this);
+  mShowPointPickerAction->setCheckable(true);
+  mShowPointPickerAction->setToolTip("Activate the Point Picker Probe");
+  connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
+  connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this, SLOT(updatePointPickerActionSlot()));
+  this->updatePointPickerActionSlot();
+
   //tool
   mToolsActionGroup = new QActionGroup(this);
   mConfigureToolsAction = new QAction(tr("Tool configuration"), mToolsActionGroup);
@@ -355,6 +362,27 @@ void MainWindow::centerToImageCenterSlot()
 void MainWindow::centerToTooltipSlot()
 {
   Navigation().centerToTooltip();
+}
+
+void MainWindow::togglePointPickerActionSlot()
+{
+  ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+  ViewGroupData::Options options = data->getOptions();
+  options.mShowPointPickerProbe = !options.mShowPointPickerProbe;
+  data->setOptions(options);
+}
+void MainWindow::updatePointPickerActionSlot()
+{
+  bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
+  mShowPointPickerAction->setChecked(show);
+//  if (show)
+//  {
+//    mShowPointPickerAction->setText("Hide PP");
+//  }
+//  else
+//  {
+//    mShowPointPickerAction->setText("Show PP");
+//  }
 }
 
 void MainWindow::updateTrackingActionSlot()
@@ -669,6 +697,7 @@ void MainWindow::createMenus()
   this->menuBar()->addMenu(mNavigationMenu);
   mNavigationMenu->addAction(mCenterToImageCenterAction);
   mNavigationMenu->addAction(mCenterToTooltipAction);
+  mNavigationMenu->addAction(mShowPointPickerAction);
   mNavigationMenu->addSeparator();
   mNavigationMenu->addActions(mInteractorStyleActionGroup->actions());
 
@@ -697,6 +726,7 @@ void MainWindow::createToolBars()
   mNavigationToolBar->setObjectName("NavigationToolBar");
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
   mNavigationToolBar->addAction(mCenterToTooltipAction);
+  mNavigationToolBar->addAction(mShowPointPickerAction);
   mNavigationToolBar->addSeparator();
   mNavigationToolBar->addActions(mInteractorStyleActionGroup->actions());
   this->registerToolBar(mNavigationToolBar, "Toolbar");

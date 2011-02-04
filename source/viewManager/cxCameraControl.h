@@ -62,6 +62,7 @@ public:
   virtual ~CameraControl();
 
   QActionGroup* createStandard3DViewActions();
+  void translateByFocusTo(ssc::Vector3D p_r);
 
 signals:
 

@@ -108,6 +108,16 @@ std::vector<ssc::MeshPtr> ViewGroupData::getMeshes() const
   return retval;
 }
 
+ViewGroupData::Options ViewGroupData::getOptions() const
+{
+  return mOptions;
+}
+
+void ViewGroupData::setOptions(ViewGroupData::Options options)
+{
+  mOptions = options;
+  emit optionsChanged();
+}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------

@@ -50,7 +50,6 @@ public:
   void clearAll();
   QString getSelectedData() const { return mFilename; }
 
-  void reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr getOutput();
   //ImagePtr getInput();
   XmlOptionFile getSettings() const { return mSettings; }
@@ -98,6 +97,7 @@ private:
 
   cx::UsReconstructionFileReaderPtr mFileReader;
   void readFiles(QString mhdFileName, QString calFilesPath);
+//  void reconstruct(QString mhdFileName, QString calFilesPath); // do everything
   ImagePtr createMaskFromConfigParams();
   ImagePtr generateMask();
   ssc::Transform3D applyOutputOrientation();
