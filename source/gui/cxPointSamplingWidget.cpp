@@ -9,6 +9,9 @@
 #include "cxToolManager.h"
 #include "sscTypeConversions.h"
 #include "sscCoordinateSystemHelpers.h"
+#include "cxViewManager.h"
+#include "cxViewGroup.h"
+#include "cxViewWrapper.h"
 
 namespace cx
 {
@@ -73,7 +76,18 @@ PointSamplingWidget::~PointSamplingWidget()
 void PointSamplingWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
+
+  ViewGroupDataPtr data = viewManager()->getViewGroups()[0]->getData();
+  ViewGroupData::Options options = data->getOptions();
+  options.mShowPointPickerProbe = true;
+  data->setOptions(options);
+
   this->updateSlot();
+}
+
+void PointSamplingWidget::hideEvent(QHideEvent* event)
+{
+  QWidget::hideEvent(event);
 }
 
 void PointSamplingWidget::updateSlot()

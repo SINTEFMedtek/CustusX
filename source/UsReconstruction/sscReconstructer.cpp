@@ -725,11 +725,11 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 }
 
   
-void Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
-{
-  this->readFiles(mhdFileName, calFilesPath);
-  this->reconstruct();
-}
+//void Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
+//{
+//  this->readFiles(mhdFileName, calFilesPath);
+//  this->reconstruct();
+//}
 
 void Reconstructer::reconstruct()
 {

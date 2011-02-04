@@ -56,7 +56,7 @@ class ViewWrapper3D : public ViewWrapper
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
   virtual ~ViewWrapper3D();
-  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
+//  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
   virtual double getZoom2D(){return -1.0;};
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
@@ -73,10 +73,17 @@ private slots:
   void activeImageChangedSlot();
   void showRefToolSlot(bool checked);
   void showToolPathSlot(bool checked);
+//  void centerChangedSlot();
+  void centerImageActionSlot();
+  void centerToolActionSlot();
+  void optionChangedSlot();
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
+
+  void showLandmarks(bool on);
+  void showPointPickerProbe(bool on);
 
   virtual void imageAdded(ssc::ImagePtr image);
   virtual void meshAdded(ssc::MeshPtr mesh);
