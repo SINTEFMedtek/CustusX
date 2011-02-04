@@ -99,6 +99,10 @@ void SliderGroupWidget::dataChanged()
 }
 
 // --------------------------------------------------------
+// --------------------------------------------------------
+
+// --------------------------------------------------------
+// --------------------------------------------------------
 
 
 QSize DoubleLineEdit::sizeHint() const
@@ -117,5 +121,77 @@ QSize DoubleLineEdit::minimumSizeHint() const
   //size.setWidth(size.height()*2);
   return size;
 }
+
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+
+
+
+SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) : QWidget(parent)
+{
+  mData = dataInterface;
+  connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
+
+  QHBoxLayout* topLayout = new QHBoxLayout;
+  topLayout->setMargin(0);
+  this->setLayout(topLayout);
+
+  mLabel = new QLabel(this);
+  mLabel->setText(mData->getValueName());
+  topLayout->addWidget(mLabel);
+
+  mSpinBox = new QDoubleSpinBox(this);
+  topLayout->addWidget(mSpinBox);
+  connect(mSpinBox, SIGNAL(valueChanged(double)), this, SLOT(doubleValueChanged(double)));
+
+  if (gridLayout) // add to input gridlayout
+  {
+    gridLayout->addWidget(mLabel,  row, 0);
+    gridLayout->addWidget(mSpinBox,   row, 1);
+  }
+  else // add directly to this
+  {
+    topLayout->addWidget(mLabel);
+    topLayout->addWidget(mSpinBox);
+  }
+
+  dataChanged();
+}
+
+void SpinBoxGroupWidget::doubleValueChanged(double val)
+{
+  val = mData->convertDisplay2Internal(val);
+  if (ssc::similar(val, mData->getValue()))
+      return;
+  mData->setValue(val);
+}
+
+void SpinBoxGroupWidget::dataChanged()
+{
+  mSpinBox->blockSignals(true);
+
+  DoubleRange range = mData->getValueRange();
+  DoubleRange dRange(
+      mData->convertInternal2Display(range.min()),
+      mData->convertInternal2Display(range.max()),
+      mData->convertInternal2Display(range.step()));
+  mSpinBox->setRange(dRange.min(), dRange.max()); // in case the image is changed
+  mSpinBox->setSingleStep(dRange.step());
+  mSpinBox->setDecimals(mData->getValueDecimals());
+
+  mSpinBox->setValue(mData->convertInternal2Display(mData->getValue()));
+
+  mSpinBox->setToolTip(mData->getHelp());
+  mLabel->setToolTip(mData->getHelp());
+
+  mSpinBox->blockSignals(false);
+}
+
+// --------------------------------------------------------
+
 
 } // namespace ssc

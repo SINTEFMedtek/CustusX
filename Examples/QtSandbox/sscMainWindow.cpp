@@ -29,12 +29,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
 void MainWindow::addActions()
 {
 	mAction1 = new QAction("Action1", this);
-    mAction1->setIcon(QIcon(":/images/go-home.png"));
+//    mAction1->setIcon(QIcon(":/images/go-home.png"));
+    mAction1->setIcon(QIcon(":/images/workflow_state_navigation.png"));
+
 
 	mAction2 = new QAction("Action2", this);
-    mAction2->setIcon(QIcon(":/images/application-exit.png"));
+//    mAction2->setIcon(QIcon(":/images/application-exit.png"));
+    mAction2->setIcon(QIcon(":/images/workflow_state_navigation2.png"));
 
-    mAboutQtAct = new QAction(tr("About &Qt"), this);
+  mAction3 = new QAction("Action3", this);
+  mAction3->setIcon(QIcon(":/images/workflow_state_patient_data.png"));
+
+  mAction4 = new QAction("Action4", this);
+  mAction4->setIcon(QIcon(":/images/workflow_state_patient_data2.png"));
+
+      mAboutQtAct = new QAction(tr("About &Qt"), this);
     mAboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
     connect(mAboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
@@ -51,6 +60,8 @@ void MainWindow::addToolbar()
 	mToolbar = this->addToolBar("Mytoolbar");
 	mToolbar->addAction(mAction1);
 	mToolbar->addAction(mAction2);
+  mToolbar->addAction(mAction3);
+  mToolbar->addAction(mAction4);
 	mToolbar->addAction(mCrashAct);
 }
 
@@ -59,6 +70,8 @@ void MainWindow::addMenu()
     QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(mAction1);
     fileMenu->addAction(mAction2);
+    fileMenu->addAction(mAction3);
+    fileMenu->addAction(mAction4);
     fileMenu->addAction(mCrashAct);
 
     QMenu* helpMenu = menuBar()->addMenu(tr("&Help"));

@@ -25,6 +25,8 @@ private:
 
 	QAction* mAction1;
 	QAction* mAction2;
+  QAction* mAction3;
+  QAction* mAction4;
     QAction* mAboutQtAct;
     QAction* mAboutAct;
 
