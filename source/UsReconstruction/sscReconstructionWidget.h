@@ -51,6 +51,8 @@ private:
   ssc::SpinBoxGroupWidget* mDimXWidget;
   ssc::SpinBoxGroupWidget* mDimYWidget;
   ssc::SpinBoxGroupWidget* mDimZWidget;
+//  ssc::CheckBoxWidget* mAlignTimestampsWidget;
+//  ssc::SpinBoxGroupWidget* mTimeCalibrationWidget;
   
   QGroupBox* mAlgorithmGroup;
   QGridLayout* mAlgoLayout;
