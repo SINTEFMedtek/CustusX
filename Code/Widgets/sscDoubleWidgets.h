@@ -12,6 +12,7 @@
 #include <QWidget>
 #include <QSlider>
 #include <QLineEdit>
+#include <QDoubleSpinBox>
 #include <QLabel>
 #include <QGridLayout>
 
@@ -112,6 +113,27 @@ private:
   DoubleSlider* mSlider;
   QLabel* mLabel;
   DoubleLineEdit* mEdit;
+  DoubleDataAdapterPtr mData;
+};
+
+/**Composite widget for scalar data manipulation.
+ * Consists of <namelabel, valueedit, slider>.
+ * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ *
+ * Uses a QDoubleSpinBox instead of a slider - this gives a more compact widget.
+ */
+class SpinBoxGroupWidget : public QWidget
+{
+  Q_OBJECT
+public:
+  SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
+private slots:
+  void dataChanged();
+  void doubleValueChanged(double val);
+
+private:
+  QDoubleSpinBox* mSpinBox;
+  QLabel* mLabel;
   DoubleDataAdapterPtr mData;
 };
 

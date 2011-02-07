@@ -8,6 +8,7 @@
 
 #include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "sscCheckBoxWidget.h"
 
 namespace ssc
 {
@@ -26,7 +27,13 @@ QWidget* createDataWidget(QWidget* parent, DataAdapterPtr data, QGridLayout* gri
 		return new ssc::SliderGroupWidget(parent, dbl, gridLayout, row);
 	}
 
-	return NULL;
+  BoolDataAdapterPtr bl = boost::shared_dynamic_cast<ssc::BoolDataAdapter>(data);
+  if (bl)
+  {
+    return new ssc::CheckBoxWidget(parent, bl, gridLayout, row);
+  }
+
+  return NULL;
 }
 
 

@@ -75,10 +75,13 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscStringDataAdapter.h
     Widgets/sscDoubleDataAdapterXml.h
     Widgets/sscStringDataAdapterXml.h
+    Widgets/sscBoolDataAdapter.h
+    Widgets/sscBoolDataAdapterXml.h
     Widgets/sscConsoleWidget.h
     Widgets/sscDoubleWidgets.h
     Widgets/sscLabeledComboBoxWidget.h
     Widgets/sscLabeledLineEditWidget.h
+    Widgets/sscCheckBoxWidget.h
     Widgets/sscHelperWidgets.h
     Utilities/sscMessageManager.h
     )
@@ -271,17 +274,22 @@ SET( SSC_SOURCE_FILES
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h
     Widgets/sscDoubleDataAdapter.h
+    Widgets/sscBoolDataAdapter.h
     Widgets/sscDoubleWidgets.h    
     Widgets/sscDoubleWidgets.cpp    
     Widgets/sscStringDataAdapter.h
     Widgets/sscDoubleDataAdapterXml.h
     Widgets/sscDoubleDataAdapterXml.cpp
+    Widgets/sscBoolDataAdapterXml.h
+    Widgets/sscBoolDataAdapterXml.cpp
     Widgets/sscStringDataAdapterXml.h
     Widgets/sscStringDataAdapterXml.cpp
     Widgets/sscLabeledComboBoxWidget.h    
     Widgets/sscLabeledComboBoxWidget.cpp  
     Widgets/sscLabeledLineEditWidget.h
     Widgets/sscLabeledLineEditWidget.cpp  
+    Widgets/sscCheckBoxWidget.h
+    Widgets/sscCheckBoxWidget.cpp
     Widgets/sscXmlOptionItem.h    
     Widgets/sscXmlOptionItem.cpp
     Widgets/sscConsoleWidget.h

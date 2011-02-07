@@ -41,9 +41,8 @@ public:
   void setTool(ToolPtr tool);
   ToolPtr getTool();
   ssc::ProbeData getProbeData();
-
-  void setIgnoreToolTransform(bool on);
-
+  void setClipToSector(bool on);
+  void setShowInToolSpace(bool on);
   vtkActorPtr getActor();
 
 signals:
@@ -58,10 +57,12 @@ private slots:
 
 private:
   void setLookupTable();
+  void clipToSectorChanged();
 
   bool mUseMask;
+  bool mClipSector;
 
-  bool mIgnoreToolTransform;
+  bool mShowInToolSpace;
   ToolPtr mTool;
   ssc::ProbeData mProbeData;
   RealTimeStreamSourcePtr mData;
@@ -72,6 +73,7 @@ private:
   UltrasoundSectorSource* mUSSource;
   vtkDataSetMapperPtr mDataSetMapper;
   vtkTransformTextureCoordsPtr mTransformTextureCoords;
+  vtkTextureMapToPlanePtr mTextureMapToPlane;
 
   vtkImageThresholdPtr mMapZeroToOne;
   vtkImageMaskPtr mMaskFilter;
