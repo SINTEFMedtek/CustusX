@@ -397,8 +397,6 @@ XVisualInfo *SNWXOpenGLRenderWindow::GetDesiredVisualInfo()
 static GLXContext test = 0;
 SNWXOpenGLRenderWindow::SNWXOpenGLRenderWindow()
 {
-	//std::cout << "create SNWXOpenGLRenderWindow " << endl;
-	//Logger::log("vm.log","create SNWXOpenGLRenderWindow " );
   this->ParentId = static_cast<Window>(NULL);
   this->ScreenSize[0] = 0;
   this->ScreenSize[1] = 0;
@@ -431,7 +429,6 @@ SNWXOpenGLRenderWindow::SNWXOpenGLRenderWindow()
 SNWXOpenGLRenderWindow::~SNWXOpenGLRenderWindow()
 {
   // close-down all system-specific drawing resources
-std::cout << "destroy SNWXOpenGLRenderWindow " << endl;
 	this->Finalize();
   vtkRenderer* ren;
   this->Renderers->InitTraversal();

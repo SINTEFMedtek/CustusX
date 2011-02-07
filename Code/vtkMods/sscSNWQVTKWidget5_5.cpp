@@ -1,4 +1,3 @@
-
 #ifdef _MSC_VER
 // Disable warnings that Qt headers give.
 #pragma warning(disable:4127)
@@ -9,10 +8,6 @@
 
 #if defined(VTK_USE_TDX) && defined(Q_WS_WIN)
 #include "vtkTDxWinDevice.h"
-#endif
-
-#if QT_VERSION >= 0x040000
-//#include "QVTKPaintEngine.h"
 #endif
 
 #include "qevent.h"
@@ -47,8 +42,6 @@ static const char* qt_key_to_key_sym(Qt::Key);
 // function to dirty cache when a render occurs.
 static void dirty_cache(vtkObject *, unsigned long, void *, void *);
 
-
-
 #if QT_VERSION < 0x040000
 /*! constructor */
 SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
@@ -61,7 +54,6 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
       cachedImageCleanFlag(false),
       automaticImageCache(false), maxImageCacheRenderRate(1.0)
 {
-		std::cout << "SNWQVTKWidget " << endl;
   this->UseTDx=false;
 
   // no background
@@ -95,7 +87,6 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
     automaticImageCache(false), maxImageCacheRenderRate(1.0)
 
 {
-	 std::cout << " create SNWQVTKWidget 5_5 " << std::endl;
   this->UseTDx=false;
   // no background
   this->setAttribute(Qt::WA_NoBackground);
@@ -114,8 +105,6 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
     QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding )
     );
 
-  //mPaintEngine = new QVTKPaintEngine;
-
   this->mCachedImage = vtkImageData::New();
   this->mCachedImage->SetScalarTypeToUnsignedChar();
   this->mCachedImage->SetOrigin(0,0,0);
@@ -125,7 +114,6 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
   this->DirtyRegionHandler = 0;
   this->DirtyRegionHandlerUPP = 0;
 #endif
-
 }
 #endif
 
@@ -134,18 +122,9 @@ SNWQVTKWidget::SNWQVTKWidget(QWidget* parent, const char* name, Qt::WFlags f)
 
 SNWQVTKWidget::~SNWQVTKWidget()
 {
-	std::cout << "destructor SNWQVTKWidget 5_5" << std::endl;
   // get rid of the VTK window
   this->SetRenderWindow(NULL);
-
   this->mCachedImage->Delete();
-
-//#if QT_VERSION >= 0x040000
-//  if(mPaintEngine)
-//    {
-//    delete mPaintEngine;
-//    }
-//#endif
 }
 
 // ----------------------------------------------------------------------------
