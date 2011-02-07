@@ -76,21 +76,27 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
   //ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
   ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mAlgorithmAdapter);
 
+  QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->mAlignTimestamps);
+  QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->mTimeCalibration);
+
+
   mAlgorithmGroup = new QGroupBox("Algorithm", this);
   mAlgoLayout = new QGridLayout(mAlgorithmGroup);
   repopulateAlgorithmGroup();
 
   topLayout->addLayout(dataLayout);
-    dataLayout->addWidget(mDataComboBox);
-    dataLayout->addWidget(mSelectDataButton);
+  dataLayout->addWidget(mDataComboBox);
+  dataLayout->addWidget(mSelectDataButton);
   //topLayout->addWidget(mReloadButton);
-    topLayout->addLayout(inputSpacingLayout);
+  topLayout->addLayout(inputSpacingLayout);
   topLayout->addWidget(outputVolGroup);
-    outputVolLayout->addLayout(extentLayout);
-    outputVolLayout->addLayout(outputVolGridLayout);
-    outputVolLayout->addLayout(outputVolDimLayout);
-    outputVolLayout->addWidget(orientationWidget);
-    outputVolLayout->addWidget(reduceWidget);
+  outputVolLayout->addLayout(extentLayout);
+  outputVolLayout->addLayout(outputVolGridLayout);
+  outputVolLayout->addLayout(outputVolDimLayout);
+  outputVolLayout->addWidget(orientationWidget);
+  outputVolLayout->addWidget(reduceWidget);
+  outputVolLayout->addWidget(alignTimestampsWidget);
+  outputVolLayout->addWidget(timeCalibrationWidget);
   topLayout->addWidget(algorithmWidget);
   topLayout->addWidget(mAlgorithmGroup);
   topLayout->addWidget(mReconstructButton);

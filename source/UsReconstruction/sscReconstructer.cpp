@@ -64,9 +64,19 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
                                                  "Speedup by reducing mask size",
                                                   "3", QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
                                                   mSettings.getElement());
-  
   connect(mMaskReduce.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
   
+  mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
+                                                 "Align the first of tracker and frame timestamps, ignoring lags.",
+                                                  false, mSettings.getElement());
+  connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
+  
+
+  mTimeCalibration = DoubleDataAdapterXml::initialize("Time Calibration", "",
+                                                 "Set an offset in the frame timestamps",
+                                                  0.0, DoubleRange(-1000, 1000, 10), 0,
+                                                  mSettings.getElement());
+
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
       "PNN",
