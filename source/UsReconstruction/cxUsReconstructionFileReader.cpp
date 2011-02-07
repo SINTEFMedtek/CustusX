@@ -55,7 +55,7 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
       QStringList list = line.split("=", QString::SkipEmptyParts);
       *calFileName = list[1].trimmed();
       foundCalFile = true;
-      std::cout << "Calibration file used: " << *calFileName << std::endl;
+//      std::cout << "Calibration file used: " << *calFileName << std::endl;
     }
   }
   if(!foundConfig)
