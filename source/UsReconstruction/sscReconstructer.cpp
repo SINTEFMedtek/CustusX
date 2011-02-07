@@ -657,7 +657,7 @@ void Reconstructer::selectData(QString filename, QString calFilesPath)
   {
     QStringList list = filename.split("/");
     list[list.size()-1] = "";
-    QString calFilesPath = list.join("/")+"/";
+    calFilesPath = list.join("/")+"/";
   }
   this->readFiles(filename, calFilesPath);
 
@@ -669,6 +669,11 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
+
+  // ignore if a directory is read - store folder name only
+  if (QFileInfo(fileName).isDir())
+    return;
+
   QString mhdFileName = changeExtension(fileName, "mhd");
 
   if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
