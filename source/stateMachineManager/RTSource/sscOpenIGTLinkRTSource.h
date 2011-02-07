@@ -49,6 +49,7 @@ public:
   void connectServer(QString address, int port);
   void disconnectServer();
   void setTimestampCalibration(double delta);
+  double getTimestampCalibration() { return mTimestampCalibration; }
 
 //signals:
 //  void serverStatusChanged();

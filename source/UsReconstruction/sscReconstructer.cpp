@@ -243,7 +243,7 @@ void Reconstructer::calibrateTimeStamps(double offset, double scale)
  * Calculate timestamp calibration in an adhoc way, by assuming that 
  * images and positions start and stop at the exact same time
  */
-void Reconstructer::calibrateTimeStamps()
+void Reconstructer::alignTimeSeries()
 {
   //TODO: Use data from a time calibration instead of this function
   ssc::messageManager()->sendInfo("Generate time calibration based on input time stamps.");
@@ -263,6 +263,30 @@ void Reconstructer::calibrateTimeStamps()
   //                                 + " scale: "
   //                                 + string_cast(scale));
   this->calibrateTimeStamps(offset, scale);
+}
+
+/** Calibrate the input tracker and frame timestamps.
+ *
+ *  Add a  constant time shift if set. (this comes in addition to
+ *  a time calibration set in the probe calibration file).
+ *
+ *  If set, ignore the relative positioning between time series
+ *  and rather set the first tracker and frame time equal.
+ *
+ */
+void Reconstructer::applyTimeCalibration()
+{
+  double timeshift = 0;
+
+  // The shift is on frames. The calibrate function applies to tracker positions,
+  // hence the negative sign.
+  this->calibrateTimeStamps(-timeshift, 1.0);
+
+  // ignore calibrations
+  if (false)
+  {
+    this->alignTimeSeries();
+  }
 }
 
 /**
@@ -709,9 +733,11 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   // and that is not completely corrcet.
   //this->calibrateTimeStamps();
   // Use the time calibration from the aquisition module
-  this->calibrateTimeStamps(0.0, 1.0);
+  //this->calibrateTimeStamps(0.0, 1.0);
+  this->applyTimeCalibration();
 
   this->calibrate(calFilesPath);
+
   //mPos (in mPositions) is now prMu
 
   this->interpolatePositions();
