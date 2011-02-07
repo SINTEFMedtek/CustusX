@@ -66,6 +66,18 @@ Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
   return rMfrom;
 }
 
+ssc::CoordinateSystem CoordinateSystemHelpers::getS(ssc::ToolPtr tool)
+{
+  ssc::CoordinateSystem retval;
+  if(!tool)
+    return retval;
+
+  retval.mId = ssc::csSENSOR;
+  retval.mRefObject = tool->getUid();
+
+  return retval;
+}
+
 ssc::CoordinateSystem CoordinateSystemHelpers::getT(ssc::ToolPtr tool)
 {
   ssc::CoordinateSystem retval;

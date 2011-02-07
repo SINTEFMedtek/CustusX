@@ -31,10 +31,11 @@ public:
   static Vector3D getDominantToolTipPoint(CoordinateSystem to, bool useOffset = false); ///< P_to, dominant tools current point in coord
   static Transform3D get_toMfrom(CoordinateSystem from, CoordinateSystem to); ///< to_M_from
 
-  static ssc::CoordinateSystem getT(ssc::ToolPtr tool);
-  static ssc::CoordinateSystem getD(ssc::DataPtr data);
-  static ssc::CoordinateSystem getPr();
-  static ssc::CoordinateSystem getR();
+  static ssc::CoordinateSystem getS(ssc::ToolPtr tool); ///<tools sensor coordinate system
+  static ssc::CoordinateSystem getT(ssc::ToolPtr tool); ///<tools coordinate system
+  static ssc::CoordinateSystem getD(ssc::DataPtr data);///<datas coordinate system
+  static ssc::CoordinateSystem getPr(); ///<patient references coordinate system
+  static ssc::CoordinateSystem getR(); ///<data references coordinate system
 
 private:
   Transform3D get_rMfrom(CoordinateSystem from) const; ///< ref_M_from
