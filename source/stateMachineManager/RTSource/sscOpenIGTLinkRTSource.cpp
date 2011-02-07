@@ -147,9 +147,10 @@ void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
 
 double OpenIGTLinkRTSource::getTimestamp()
 {
-  //HACK we need time sync before we can use the real timetags delivered with the image
-  return ssc::getMilliSecondsSinceEpoch();
-  //return mLastTimestamp;
+  //oldHACK we need time sync before we can use the real timetags delivered with the image
+  //return ssc::getMilliSecondsSinceEpoch();
+
+  return mLastTimestamp;
 }
 
 bool OpenIGTLinkRTSource::isConnected() const
