@@ -107,7 +107,8 @@ private:
   void findExtentAndOutputTransform();
 
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
-  void calibrateTimeStamps();
+  void alignTimeSeries();
+  void applyTimeCalibration();
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();
   void calibrate(QString calFilesPath);

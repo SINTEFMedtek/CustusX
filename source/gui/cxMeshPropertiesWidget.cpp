@@ -62,17 +62,24 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   deleteButton->setToolTip("Remove the selected surface from the system.");
   connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteDataSlot()));
   
-  gridLayout->addWidget(chooseColor, 2, 0);
-  gridLayout->addWidget(importTransformButton, 1, 0);
-  gridLayout->addWidget(deleteButton, 3, 0);
+  int position = 1;
   
-  mParentFrameAdapter = ParentFrameStringDataAdapter::New();
-  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
-  gridLayout->addWidget(combo, 4, 0);
+  mUidAdapter = DataUidEditableStringDataAdapter::New();
+  ssc::LabeledLineEditWidget*  uidEdit = new ssc::LabeledLineEditWidget(this, mUidAdapter);
+  gridLayout->addWidget(uidEdit, position++, 0);
 
   mNameAdapter = DataNameEditableStringDataAdapter::New();
   ssc::LabeledLineEditWidget*  nameEdit = new ssc::LabeledLineEditWidget(this, mNameAdapter);
-  gridLayout->addWidget(nameEdit, 5, 0);
+  gridLayout->addWidget(nameEdit, position++, 0);
+
+  mParentFrameAdapter = ParentFrameStringDataAdapter::New();
+  ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
+  gridLayout->addWidget(combo, position++, 0);
+
+  gridLayout->addWidget(deleteButton, position++, 0);
+
+  gridLayout->addWidget(chooseColor, position++, 0);
+  gridLayout->addWidget(importTransformButton, position++, 0);
 
   toptopLayout->addStretch();
 
@@ -215,6 +222,7 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
   mMesh = mesh;
   mParentFrameAdapter->setData(mMesh);
   mNameAdapter->setData(mMesh);
+  mUidAdapter->setData(mMesh);
 
   //dataManager()->setActiveImage(mCurrentImage);
   
