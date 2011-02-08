@@ -1,6 +1,7 @@
 #import <Foundation/NSAutoreleasePool.h>
 #import <QTKit/QTKit.h>
 
+#include "sscTime.h"
 #include "sscTypeConversions.h"
 #include "cxGrabber.h"
 #include <iostream>
@@ -56,7 +57,7 @@
   int height = CVPixelBufferGetHeight(videoFrame);  
   
   //finding the timetag of the image
-  QTTime  timetag = [sampleBuffer presentationTime];
+  QTTime  timetag = [sampleBuffer presentationTime]; //presentationTime seems to be relative to a (unknown) time, probably something driver specific which we cannot controll via QtKit
   
   //OSType pixelFormat = CVPixelBufferGetPixelFormatType(videoFrame);
   //CFDictionaryRef dictonary = CVPixelFormatDescriptionCreateWithPixelFormatType(kCFAllocatorDefault, pixelFormat);
@@ -65,7 +66,8 @@
   
   //setting up the frame
   Frame frame;
-  frame.mTimestamp = ((double)timetag.timeValue / (double)timetag.timeScale) * 1000;
+  //frame.mTimestamp = ((double)timetag.timeValue / (double)timetag.timeScale) * 1000;
+  frame.mTimestamp = ssc::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
   frame.mWidth = width;
   frame.mHeight = height;
   frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));

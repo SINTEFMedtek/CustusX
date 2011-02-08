@@ -36,8 +36,13 @@
     <file>icons/polaris-green.png</file>
     <file>icons/streaming_green.png</file>    
     <file>icons/streaming_red.png</file>    
-    
-  
+    <file>icons/point_picker.png</file>        
+    <file>icons/patient_new.png</file>
+    <file>icons/patient_clear.png</file>
+    <file>icons/patient_import.png</file>
+    <file>icons/patient_save.png</file>
+    <file>icons/patient_load.png</file>
+ 
     <file>icons/camera_view_A.png</file>
     <file>icons/camera_view_P.png</file>
     <file>icons/camera_view_S.png</file>

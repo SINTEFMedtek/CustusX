@@ -29,6 +29,42 @@
 
 namespace cx
 {
+
+ssc::DoubleDataAdapterPtr DoubleDataAdapterTimeCalibration::New()
+{
+  return ssc::DoubleDataAdapterPtr(new DoubleDataAdapterTimeCalibration());
+}
+
+DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
+{
+  connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(changed()));
+}
+
+double DoubleDataAdapterTimeCalibration::getValue() const
+{
+  return stateManager()->getIGTLinkConnection()->getRTSource()->getTimestampCalibration();
+}
+
+QString DoubleDataAdapterTimeCalibration::getHelp() const
+{
+  return "Set a time shift to add to input RT source frames. Will NOT be saved.";
+}
+
+bool DoubleDataAdapterTimeCalibration::setValue(double val)
+{
+  stateManager()->getIGTLinkConnection()->getRTSource()->setTimestampCalibration(val);
+  return true;
+}
+
+ssc::DoubleRange DoubleDataAdapterTimeCalibration::getValueRange() const
+{
+  return ssc::DoubleRange(-1000,1000,1);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 //----------------------------------------------------------------------------------------------------------------------
 RecordBaseWidget::RecordBaseWidget(QWidget* parent, QString description):
     QWidget(parent),
@@ -211,11 +247,13 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
 
   RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
+
 //  mUSSectorConfigBox = new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New());
 //  mToptopLayout->addWidget(mUSSectorConfigBox);
 
 //  RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mRTSourceDataAdapter));
   mLayout->addStretch();
+  RecordBaseWidget::mLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
 
 //  connect(mRTSourceDataAdapter.get(), SIGNAL(changed()), this, SLOT(rtSourceChangedSlot()));
 
