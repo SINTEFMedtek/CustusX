@@ -286,14 +286,16 @@ void Reconstructer::alignTimeSeries()
  */
 void Reconstructer::applyTimeCalibration()
 {
-  double timeshift = 0;
-
+  double timeshift = mTimeCalibration->getValue();
   // The shift is on frames. The calibrate function applies to tracker positions,
   // hence the negative sign.
-  this->calibrateTimeStamps(-timeshift, 1.0);
+  timeshift = -timeshift;
+  if (!ssc::similar(0.0, timeshift))
+    ssc::messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(timeshift) + "ms");
+  this->calibrateTimeStamps(timeshift, 1.0);
 
   // ignore calibrations
-  if (false)
+  if (mAlignTimestamps->getValue())
   {
     this->alignTimeSeries();
   }
