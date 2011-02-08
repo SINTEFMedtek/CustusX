@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
   app.setApplicationName("CustusX3");
   app.setWindowIcon(QIcon(":/icons/CustusX.png"));
 //  app.setWindowIcon(QIcon(":/icons/.png"));
+  app.setAttribute(Qt::AA_DontShowIconsInMenus, false);
 
   cx::MainWindow::initialize();
 

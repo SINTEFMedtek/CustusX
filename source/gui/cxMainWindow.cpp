@@ -212,16 +212,21 @@ void MainWindow::createActions()
   mStandard3DViewActions = mCameraControl->createStandard3DViewActions();
 
   // File
+
   mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-new-8.png"), tr("&New patient"), this);
+//  mNewPatientAction->setIcon(QIcon(":/icons/patient_new.png"));
   mNewPatientAction->setShortcut(tr("Ctrl+N"));
   mNewPatientAction->setStatusTip(tr("Create a new patient file"));
   mSaveFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-save-5.png"), tr("&Save Patient"), this);
+//  mSaveFileAction->setIcon(QIcon(":/icons/patient_save.png"));
   mSaveFileAction->setShortcut(tr("Ctrl+S"));
   mSaveFileAction->setStatusTip(tr("Save patient file"));
   mLoadFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-open-7.png"), tr("&Load Patient"), this);
+//  mLoadFileAction->setIcon(QIcon(":/icons/patient_load.png"));
   mLoadFileAction->setShortcut(tr("Ctrl+L"));
   mLoadFileAction->setStatusTip(tr("Load patient file"));
   mClearPatientAction = new QAction(tr("&Clear Patient"), this);
+//  mClearPatientAction->setIcon(QIcon(":/icons/patient_clear.png"));
 
   connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
@@ -261,6 +266,7 @@ void MainWindow::createActions()
   mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr("&Import data"), this);
   mImportDataAction->setShortcut(tr("Ctrl+I"));
   mImportDataAction->setStatusTip(tr("Import image data"));
+//  mImportDataAction->setIcon(QIcon(":/icons/patient_import.png"));
 
   mDeleteDataAction = new QAction(tr("Delete current image"), this);
   mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
@@ -268,9 +274,10 @@ void MainWindow::createActions()
   connect(mImportDataAction, SIGNAL(triggered()), this, SLOT(importDataSlot()));
   connect(mDeleteDataAction, SIGNAL(triggered()), this, SLOT(deleteDataSlot()));
 
-  mShowPointPickerAction = new QAction(tr("PP"), this);
+  mShowPointPickerAction = new QAction(tr("Point Picker"), this);
   mShowPointPickerAction->setCheckable(true);
-  mShowPointPickerAction->setToolTip("Activate the Point Picker Probe");
+  mShowPointPickerAction->setToolTip("Activate the 3D Point Picker Probe");
+  mShowPointPickerAction->setIcon(QIcon(":/icons/point_picker.png"));
   connect(mShowPointPickerAction, SIGNAL(triggered()), this, SLOT(togglePointPickerActionSlot()));
   connect(viewManager()->getViewGroups()[0]->getData().get(), SIGNAL(optionsChanged()), this, SLOT(updatePointPickerActionSlot()));
   this->updatePointPickerActionSlot();
@@ -375,14 +382,6 @@ void MainWindow::updatePointPickerActionSlot()
 {
   bool show = viewManager()->getViewGroups()[0]->getData()->getOptions().mShowPointPickerProbe;
   mShowPointPickerAction->setChecked(show);
-//  if (show)
-//  {
-//    mShowPointPickerAction->setText("Hide PP");
-//  }
-//  else
-//  {
-//    mShowPointPickerAction->setText("Show PP");
-//  }
 }
 
 void MainWindow::updateTrackingActionSlot()

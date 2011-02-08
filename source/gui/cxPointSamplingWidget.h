@@ -43,6 +43,7 @@ protected slots:
   void editButtonClickedSlot();
   void removeButtonClickedSlot();
   void gotoButtonClickedSlot();
+  void loadReferencePointsSlot();
 
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -50,6 +51,7 @@ protected:
   void setManualTool(const ssc::Vector3D& p_r);
   ssc::Vector3D getSample() const;
   void enablebuttons();
+  void addPoint(ssc::Vector3D point);
 
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mTable; ///< the table widget presenting the landmarks
@@ -60,6 +62,7 @@ protected:
   QPushButton* mAddButton; ///< the Add Landmark button
   QPushButton* mEditButton; ///< the Edit Landmark button
   QPushButton* mRemoveButton; ///< the Remove Landmark button
+  QPushButton* mLoadReferencePointsButton; ///< button for loading a reference tools reference points
 
 private:
   PointSamplingWidget();
