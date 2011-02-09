@@ -676,6 +676,13 @@ void MainWindow::createMenus()
   this->menuBar()->addMenu(mWorkflowMenu);
   stateManager()->getWorkflow()->fillMenu(mWorkflowMenu);
 
+  QList<QAction *> actions = mWorkflowMenu->actions();
+  for(int i=1; i <= actions.size(); ++i)
+  {
+    QString shortcut = "Ctrl+"+QString::number(i);
+    actions[i-1]->setShortcut(shortcut);
+  }
+
   //tool
   this->menuBar()->addMenu(mToolMenu);
   mToolMenu->addAction(mConfigureToolsAction);
