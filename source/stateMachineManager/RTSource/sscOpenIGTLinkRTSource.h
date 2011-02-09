@@ -49,6 +49,7 @@ public:
   void connectServer(QString address, int port);
   void disconnectServer();
   void setTimestampCalibration(double delta);
+  void setSoundSpeedCompensation(double gamma); ///< gamma is the correction factor for the distance along the sound direction
 
 //signals:
 //  void serverStatusChanged();
@@ -84,6 +85,7 @@ private:
   double mFPS;
   double mLastTimestamp;
   double mTimestampCalibration;
+  double mLinearSoundSpeedCompesation;
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 

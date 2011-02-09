@@ -34,7 +34,8 @@ namespace ssc
 {
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
-  mImageImport(vtkImageImportPtr::New())
+  mImageImport(vtkImageImportPtr::New()),
+  mLinearSoundSpeedCompesation(1.0)
 {
   mLastTimestamp = 0;
   mTimestampCalibration = 0;
@@ -143,6 +144,11 @@ void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
   if (!ssc::similar(delta, 0.0))
     ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
   mTimestampCalibration = delta;
+}
+
+void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
+{
+  mLinearSoundSpeedCompesation = gamma;
 }
 
 double OpenIGTLinkRTSource::getTimestamp()
@@ -339,7 +345,11 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   mLastTimestamp += mTimestampCalibration;
 
   mImageImport->SetDataOrigin(0,0,0);
-  mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
+
+  //for linear probes used in other substance than the scanner is calibrated for we want to compensate
+  //for the change in sound of speed in that substance, do this by changing spacing in the images y-direction,
+  //this is only valid for linear probes
+  mImageImport->SetDataSpacing(spacing[0], spacing[1]*mLinearSoundSpeedCompesation, spacing[2]);
 
   mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2]-1);
   mImageImport->SetDataExtentToWholeExtent();
