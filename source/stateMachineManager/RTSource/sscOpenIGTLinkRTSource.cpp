@@ -149,6 +149,7 @@ void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
 void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
 {
   mLinearSoundSpeedCompesation = gamma;
+  ssc::messageManager()->sendInfo("Linear sound speed compensation set to: "+qstring_cast(mLinearSoundSpeedCompesation));
 }
 
 double OpenIGTLinkRTSource::getTimestamp()
