@@ -45,6 +45,7 @@ private:
   QComboBox* mMeshComboBox; ///< combobox for selecting mesh
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
+  DataUidEditableStringDataAdapterPtr mUidAdapter;
   
   MeshPropertiesWidget();
 };

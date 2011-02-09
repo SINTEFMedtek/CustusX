@@ -19,6 +19,25 @@ class QPushButton;
 namespace cx
 {
 
+/** Interface to the tool offset of the dominant tool
+ */
+class DoubleDataAdapterTimeCalibration : public ssc::DoubleDataAdapter
+{
+  Q_OBJECT
+public:
+  static ssc::DoubleDataAdapterPtr New();
+  DoubleDataAdapterTimeCalibration();
+  virtual ~DoubleDataAdapterTimeCalibration() {}
+  virtual QString getValueName() const { return "Time Calibration"; }
+  virtual double getValue() const;
+  virtual QString getHelp() const;
+  virtual bool setValue(double val);
+  ssc::DoubleRange getValueRange() const;
+
+private slots:
+protected:
+};
+
 class RecordSessionWidget;
 /**
  * RecordBaseWidget
