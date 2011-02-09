@@ -417,6 +417,8 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
     mSoundSpeedSpinBox(new QDoubleSpinBox()),
     mWaterDegreeSpinBox(new QDoubleSpinBox())
 {
+  QVBoxLayout* vLayout = new QVBoxLayout(this);
+
   connect(mApplyButton, SIGNAL(clicked()), this, SLOT(applySoundSpeedCompensationFactorSlot()));
 
   mWaterDegreeSpinBox->setRange(0.0, 50.0);
@@ -429,12 +431,15 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
   mSoundSpeedSpinBox->setValue(mToSoundSpeed);
   connect(mSoundSpeedSpinBox, SIGNAL(valueChanged(double)), this, SLOT(waterSoundSpeedChangedSlot()));
 
-  QHBoxLayout* speedLayout = new QHBoxLayout(this);
+  QHBoxLayout* speedLayout = new QHBoxLayout();
   speedLayout->addWidget(new QLabel("Water sound speed: "));
   speedLayout->addWidget(mSoundSpeedSpinBox);
   speedLayout->addWidget(new QLabel("m/s, or"));
   speedLayout->addWidget(mWaterDegreeSpinBox);
   speedLayout->addWidget(new QLabel("C"+QString::fromUtf8("\302\260"))); //\302\260 is the degree sign
+
+  vLayout->addLayout(speedLayout);
+  vLayout->addWidget(mApplyButton);
 }
 
 SoundSpeedConverterWidget::~SoundSpeedConverterWidget()
