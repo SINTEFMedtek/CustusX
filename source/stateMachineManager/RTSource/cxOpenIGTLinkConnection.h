@@ -49,6 +49,8 @@ public:
   QProcess* getProcess() { return mServer; }
   ssc::OpenIGTLinkRTSourcePtr getRTSource() { return mRTSource; }
 
+  void setSoundSpeedCompensationFactor(double factor);
+
 public slots:
   void connectServer();
 

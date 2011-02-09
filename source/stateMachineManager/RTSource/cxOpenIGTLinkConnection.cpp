@@ -203,6 +203,11 @@ void IGTLinkConnection::launchAndConnectServer()
 
 }
 
+void IGTLinkConnection::setSoundSpeedCompensationFactor(double factor)
+{
+  mRTSource->setSoundSpeedCompensation(factor);
+}
+
 void IGTLinkConnection::serverProcessError(QProcess::ProcessError error)
 {
   QString msg;
