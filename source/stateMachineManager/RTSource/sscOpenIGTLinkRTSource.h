@@ -49,6 +49,7 @@ public:
   void connectServer(QString address, int port);
   void disconnectServer();
   void setTimestampCalibration(double delta);
+  double getTimestampCalibration() { return mTimestampCalibration; }
   void setSoundSpeedCompensation(double gamma); ///< gamma is the correction factor for the distance along the sound direction
 
 //signals:

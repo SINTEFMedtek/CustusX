@@ -37,6 +37,19 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
   //dock widget
   this->setObjectName("RegistrationHistoryWidget");
   this->setWindowTitle("Registration History");
+  QString whatsThis = "<html>"
+      "<h3>Registration history.</h3>"
+      "<p>"
+      "Use the registration history to rewind the system to previous time. When history is rewinded, "
+      "all registrations performed after the active time is ignored by the system."
+      "</p>"
+      "<p>"
+      "<b><h4>Note!</h4> While a previous time is active, <em>no new registrations or adding of data</em> should be performed. "
+      "This will lead to undefined behaviour!</b>"
+      "</p>"
+      "</html>";
+  this->setWhatsThis(whatsThis);
+  this->setStatusTip(whatsThis);
 
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -60,17 +73,17 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
   mRemoveAction = createAction(topLayout,
         ":/icons/open_icon_library/png/64x64/actions/dialog-close.png",
         "Remove",
-        "Remove all registrations after the current",
+        "Delete all registrations after the active time",
         SLOT(removeSlot()));
 
   mBehindLabel = new QLabel(this);
-  mBehindLabel->setToolTip("Number of registrations before current time");
+  mBehindLabel->setToolTip("Number of registrations before the active time");
   topLayout->addWidget(mBehindLabel);
 
   mRewindAction = createAction(topLayout,
       ":/icons/open_icon_library/png/64x64/actions/arrow-left-3.png",
       "Rewind",
-      "One step back in registration history",
+      "One step back in registration history, changing active time.\nThis enables looking at a previous system state,\nbut take care to not add more registrations while this state.",
       SLOT(rewindSlot()));
 
   mForwardAction = createAction(topLayout,
@@ -80,7 +93,7 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
       SLOT(forwardSlot()));
 
   mInFrontLabel = new QLabel(this);
-  mInFrontLabel->setToolTip("Number of registrations after current time");
+  mInFrontLabel->setToolTip("Number of registrations after active time");
   topLayout->addWidget(mInFrontLabel);
 
   mFastForwardAction = createAction(topLayout,
@@ -292,29 +305,29 @@ QString RegistrationHistoryWidget::debugDump()
   bool addedBreak = false;
   std::stringstream ss;
   ss << "<html>";
-  ss << "<i>";
+  ss << "<p><i>";
   if (!this->getActiveTime().isValid())
     ss << "Active time: Current \n";
   else
     ss << "Active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "\n";
-  ss << "</i>";
+  ss << "</i></p>";
 
-  ss << "<p style=\"color:blue\">";
+  ss << "<p><span style=\"color:blue\">";
   for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
   {
     if (iter->first > this->getActiveTime() && !addedBreak && this->getActiveTime().isValid())
     {
-      ss << "</p> <p style=\"color:gray\">";
+      ss << "</span> <span style=\"color:gray\">";
 //      ss << "</p> <hr /> <p style=\"color:gray\">";
       addedBreak = true;
     }
-    else
+    //else
     {
       ss << "<br />";
     }
     ss << iter->first.toString(ssc::timestampSecondsFormatNice()) << "\t" << iter->second;
   }
-  ss << "</p>";
+  ss << "</span></p>";
 
   return qstring_cast(ss.str());
 //  std::cout << ss.str() << std::endl;
