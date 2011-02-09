@@ -64,9 +64,19 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
                                                  "Speedup by reducing mask size",
                                                   "3", QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
                                                   mSettings.getElement());
-  
   connect(mMaskReduce.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
   
+  mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
+                                                 "Align the first of tracker and frame timestamps, ignoring lags.",
+                                                  false, mSettings.getElement());
+  connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
+  
+
+  mTimeCalibration = DoubleDataAdapterXml::initialize("Time Calibration", "",
+                                                 "Set an offset in the frame timestamps",
+                                                  0.0, DoubleRange(-1000, 1000, 10), 0,
+                                                  mSettings.getElement());
+
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
       "PNN",
@@ -243,7 +253,7 @@ void Reconstructer::calibrateTimeStamps(double offset, double scale)
  * Calculate timestamp calibration in an adhoc way, by assuming that 
  * images and positions start and stop at the exact same time
  */
-void Reconstructer::calibrateTimeStamps()
+void Reconstructer::alignTimeSeries()
 {
   //TODO: Use data from a time calibration instead of this function
   ssc::messageManager()->sendInfo("Generate time calibration based on input time stamps.");
@@ -263,6 +273,32 @@ void Reconstructer::calibrateTimeStamps()
   //                                 + " scale: "
   //                                 + string_cast(scale));
   this->calibrateTimeStamps(offset, scale);
+}
+
+/** Calibrate the input tracker and frame timestamps.
+ *
+ *  Add a  constant time shift if set. (this comes in addition to
+ *  a time calibration set in the probe calibration file).
+ *
+ *  If set, ignore the relative positioning between time series
+ *  and rather set the first tracker and frame time equal.
+ *
+ */
+void Reconstructer::applyTimeCalibration()
+{
+  double timeshift = mTimeCalibration->getValue();
+  // The shift is on frames. The calibrate function applies to tracker positions,
+  // hence the negative sign.
+  timeshift = -timeshift;
+  if (!ssc::similar(0.0, timeshift))
+    ssc::messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(timeshift) + "ms");
+  this->calibrateTimeStamps(timeshift, 1.0);
+
+  // ignore calibrations
+  if (mAlignTimestamps->getValue())
+  {
+    this->alignTimeSeries();
+  }
 }
 
 /**
@@ -709,9 +745,11 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   // and that is not completely corrcet.
   //this->calibrateTimeStamps();
   // Use the time calibration from the aquisition module
-  this->calibrateTimeStamps(0.0, 1.0);
+  //this->calibrateTimeStamps(0.0, 1.0);
+  this->applyTimeCalibration();
 
   this->calibrate(calFilesPath);
+
   //mPos (in mPositions) is now prMu
 
   this->interpolatePositions();

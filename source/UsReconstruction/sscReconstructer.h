@@ -16,6 +16,7 @@
 //#include "probeXmlConfigParser.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscDoubleDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
 #include "sscProbeData.h"
 //#include "sscStringWidgets.h"
@@ -57,6 +58,8 @@ public:
   StringDataAdapterXmlPtr mAlgorithmAdapter;
   std::vector<DataAdapterPtr> mAlgoOptions;
   StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
+  BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
+  DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
@@ -104,7 +107,8 @@ private:
   void findExtentAndOutputTransform();
 
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
-  void calibrateTimeStamps();
+  void alignTimeSeries();
+  void applyTimeCalibration();
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();
   void calibrate(QString calFilesPath);
