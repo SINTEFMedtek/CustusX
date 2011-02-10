@@ -72,7 +72,7 @@ IGTLinkImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
 
   igtl::TimeStamp::Pointer ts;
   ts = igtl::TimeStamp::New();
-  double seconds = frame.mTimestamp*1000;
+  double seconds = frame.mTimestamp;
   ts->SetTime(seconds); //in seconds
   retval->SetTimeStamp(ts);
 
