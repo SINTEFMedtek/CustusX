@@ -17,6 +17,7 @@
 #include "sscTransform3D.h"
 #include "sscToolRep3D.h"
 #include "sscToolTracer.h"
+#include "sscReconstructer.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxSegmentation.h"
@@ -28,8 +29,8 @@
 #include "cxUsReconstructionFileMaker.h"
 #include "cxToolPropertiesWidget.h"
 #include "RTSource/cxOpenIGTLinkConnection.h"
-#include  "sscReconstructer.h"
 #include "cxDataLocations.h"
+#include "cxProbe.h"
 
 namespace cx
 {
@@ -447,8 +448,20 @@ SoundSpeedConverterWidget::~SoundSpeedConverterWidget()
 
 void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 {
+  if(!mProbe)
+  {
+    ssc::messageManager()->sendWarning("Don't know which probe to set the sound speed compensation for...");
+    return;
+  }
+
   double factor = this->getSoundSpeedCompensationFactor();
-  stateManager()->getIGTLinkConnection()->setSoundSpeedCompensationFactor(factor);
+  //stateManager()->getIGTLinkConnection()->setSoundSpeedCompensationFactor(factor);
+
+  ProbePtr probe = boost::dynamic_pointer_cast<Probe>(mProbe->getProbe());
+  if(probe)
+    probe->setSoundSpeedCompensationFactor(factor);
+  else
+    ssc::messageManager()->sendDebug("Could not cast probe to a cx probe...");
 }
 
 double SoundSpeedConverterWidget::getSoundSpeedCompensationFactor()
@@ -462,6 +475,11 @@ double SoundSpeedConverterWidget::getWaterSoundSpeed()
   double retval = 1402.40 + 5.01*waterDegree - 0.055*pow(waterDegree, 2) + 0.00022*pow(waterDegree, 3);
 
   return retval;
+}
+
+void SoundSpeedConverterWidget::setProbe(ToolPtr probe)
+{
+  mProbe = probe;
 }
 
 void SoundSpeedConverterWidget::waterSoundSpeedChangedSlot()

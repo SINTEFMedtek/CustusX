@@ -203,11 +203,6 @@ void IGTLinkConnection::launchAndConnectServer()
 
 }
 
-void IGTLinkConnection::setSoundSpeedCompensationFactor(double factor)
-{
-  mRTSource->setSoundSpeedCompensation(factor);
-}
-
 void IGTLinkConnection::serverProcessError(QProcess::ProcessError error)
 {
   QString msg;
@@ -258,24 +253,32 @@ void IGTLinkConnection::connectSourceToTool()
   if (!mRTSource->isConnected())
     return;
 
-  ProbePtr cxProbe;
 //  ToolPtr cxTool;
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
   for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     if (iter->second->getProbe() && iter->second->getProbe()->isValid())
     {
-//      cxTool = boost::shared_dynamic_cast<Tool>(*iter);
-      cxProbe = boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
+      if(mProbe)
+        disconnect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+      mProbe = boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
       break;
     }
   }
 
-  if (!cxProbe)
+  if (!mProbe)
     return;
 
-  mRTSource->setTimestampCalibration(cxProbe->getConfiguration().mImageTimestampCalibration);
-  cxProbe->setRealTimeStreamSource(mRTSource);
+  connect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+  this->probeChangedSlot();
+
+  mRTSource->setTimestampCalibration(mProbe->getConfiguration().mImageTimestampCalibration);
+  mProbe->setRealTimeStreamSource(mRTSource);
+}
+
+void IGTLinkConnection::probeChangedSlot()
+{
+  mRTSource->setSoundSpeedCompensation(mSoundSpeedCompensationFactor);
 }
 
 
