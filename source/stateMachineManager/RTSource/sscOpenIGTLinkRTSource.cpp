@@ -342,6 +342,11 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   // get timestamp from igtl second-format:
   igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
   mImageMessage->GetTimeStamp(timestamp);
+//  static double last = 0;
+//  if (last==0)
+//    last = timestamp->GetTimeStamp();
+//  std::cout << "raw time" << timestamp->GetTimeStamp() << ", " << timestamp->GetTimeStamp() - last << std::endl;
+
   mLastTimestamp = timestamp->GetTimeStamp() * 1000;
   mLastTimestamp += mTimestampCalibration;
 
@@ -386,7 +391,6 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
 //    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
 //    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
-
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
 
@@ -419,9 +423,6 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
-//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
-
   return mRedirecter->GetOutput();
 }
 
