@@ -171,7 +171,9 @@ public:
   ~SoundSpeedConverterWidget();
 
   double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
-  double getWaterSoundSpeed(); ///<
+  double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
+
+  void setProbe(ToolPtr probe);
 
 public slots:
   void applySoundSpeedCompensationFactorSlot(); ///< sets the sounds speed conversion factor on the rt source
@@ -183,6 +185,8 @@ private slots:
 private:
   const double mFromSoundSpeed; //m/s
   double mToSoundSpeed; //m/s
+
+  ToolPtr mProbe;
 
   QPushButton*    mApplyButton; //applies the compensation on the rt source
   QDoubleSpinBox* mSoundSpeedSpinBox; //m/s
