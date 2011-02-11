@@ -7,6 +7,8 @@
 #include "cxProbe.h"
 
 #include <QStringList>
+#include "sscRealTimeStreamSource.h"
+#include "sscMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscProbeSector.h"
@@ -16,7 +18,9 @@ namespace cx
 {
 
 Probe::Probe(QString instrumentUid, QString scannerUid) :
-    mInstrumentUid(instrumentUid), mScannerUid(scannerUid)
+    mSoundSpeedCompensationFactor(1.0),
+    mInstrumentUid(instrumentUid),
+    mScannerUid(scannerUid)
 {
   // Read ultrasoundImageConfigs.xml file
   QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
@@ -100,8 +104,6 @@ QString Probe::getConfigName(QString configString) ///< get a name for the given
   return config.mName;
 }
 
-
-
 //QString Probe::getProbeSectorConfigIdString() const
 QString Probe::getConfigId() const
 {
@@ -145,13 +147,28 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
   return config;
 }
 
+void Probe::setSoundSpeedCompensationFactor(double factor)
+{
+  mSoundSpeedCompensationFactor = factor;
+  emit sectorChanged();
+}
+
 ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 {
   ProbeXmlConfigParser::Configuration config;
   QStringList rtSourceList = mXml->getRtSourceList(mScannerUid, mInstrumentUid);
   if(rtSourceList.isEmpty())
     return config;
+
   config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSourceList.at(0), uid);
+
+  //compensating for different speed of sound in what is scanned by the probe and what is assumed by the scanner
+  if(config.mWidthDeg ==  0) //linear probe
+  {
+    config.mPixelHeight *=mSoundSpeedCompensationFactor;
+    ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed comensation factor.");
+  }
+
   return config;
 }
 

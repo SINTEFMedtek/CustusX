@@ -12,6 +12,7 @@
 //#include "sscDoubleWidgets.h"
 #include "sscView.h"
 #include "RTSource/sscOpenIGTLinkRTSource.h"
+#include "cxProbe.h"
 #include "cxRenderTimer.h"
 
 namespace cx
@@ -56,9 +57,13 @@ private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverProcessError(QProcess::ProcessError error);
   void connectSourceToTool();
+  void probeChangedSlot();
+
 private:
   void delayedAutoConnectServer();
 
+  ProbePtr mProbe;
+  double mSoundSpeedCompensationFactor;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
   QProcess* mServer;
   int mConnectWhenLocalServerRunning;
