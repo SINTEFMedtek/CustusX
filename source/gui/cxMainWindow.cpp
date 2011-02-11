@@ -135,6 +135,26 @@ MainWindow::MainWindow() :
 
   // Don't show the Widget before all elements are initialized
   this->show();
+  std::cout << "end construct main win" << std::endl;
+
+  this->startupLoadPatient();
+}
+
+/**Parse the command line and load a patient if the switch --patient is found
+ *
+ */
+void MainWindow::startupLoadPatient()
+{
+  int doLoad = QApplication::arguments().indexOf("--load");
+  if (doLoad<0)
+    return;
+  std::cout << "!!!!!!!!!!!!!! load " << doLoad << std::endl;
+  if (doLoad+1 >= QApplication::arguments().size())
+    return;
+
+  QString folder = QApplication::arguments()[doLoad + 1];
+  std::cout << "load " << folder << std::endl;
+  stateManager()->getPatientData()->loadPatient(folder);
 }
 
 void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
@@ -526,7 +546,7 @@ void MainWindow::loadPatientFileSlot()
 
   stateManager()->getPatientData()->loadPatient(choosenDir);
 
-  cx::FrameForest forest;
+//  cx::FrameForest forest;
 }
 
 void MainWindow::importDataSlot()

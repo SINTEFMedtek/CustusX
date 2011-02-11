@@ -9,6 +9,7 @@
 #include <QStringList>
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
+#include "sscProbeSector.h"
 
 
 namespace cx
@@ -26,12 +27,31 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
     this->setConfigId(configs[0]);
 }
 
-bool Probe::isValid() const
+ssc::ProbeSectorPtr Probe::getSector()
 {
-  return mSector.mType!=ssc::ProbeSector::tNONE;
+  ssc::ProbeSectorPtr retval(new ssc::ProbeSector());
+  retval->setData(this->getData());
+  return retval;
 }
 
-ssc::ProbeSector Probe::getSector() const
+bool Probe::isValid() const
+{
+  return mSector.mType!=ssc::ProbeData::tNONE;
+}
+
+void Probe::setTemporalCalibration(double val)
+{
+  mSector.mTemporalCalibration = val;
+  emit sectorChanged();
+}
+
+void Probe::setSoundSpeedCompensationFactor(double val)
+{
+  mSector.mSoundSpeedCompensationFactor = val;
+  emit sectorChanged();
+}
+
+ssc::ProbeData Probe::getData() const
 {
   return mSector;
 }
@@ -106,13 +126,13 @@ void Probe::setConfigId(QString uid)
   if(config.isEmpty())
     return;
 
-  ssc::ProbeSector probeSector = createProbeDataFromConfiguration(config);
+  ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
   mConfigurationId = uid;
   this->setUSProbeSector(probeSector);
 }
 
 
-void Probe::setUSProbeSector(ssc::ProbeSector probeSector)
+void Probe::setUSProbeSector(ssc::ProbeData probeSector)
 {
   mSector = probeSector;
   emit sectorChanged();

@@ -8,15 +8,15 @@
 #include "cxCreateProbeDataFromConfiguration.h"
 #include <iostream>
 
-ssc::ProbeSector createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
+ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config)
 {
   if(config.isEmpty())
-    return ssc::ProbeSector();
+    return ssc::ProbeData();
 
   double depthStart = config.mOffset * config.mPixelHeight;
   double depthEnd = config.mDepth * config.mPixelHeight + depthStart;
 
-  ssc::ProbeSector::ProbeImageData imageData;
+  ssc::ProbeData::ProbeImageData imageData;
   imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
   imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
   // find the origin in a mm-based, lower-left-corner coord space:
@@ -25,17 +25,17 @@ ssc::ProbeSector createProbeDataFromConfiguration(ProbeXmlConfigParser::Configur
 //  c[1] -= depthStart; // config def of origin is before offset, probesector def is after offset (physical probe tip)
   imageData.mOrigin_u = c;
 
-  ssc::ProbeSector probeSector;
+  ssc::ProbeData probeSector;
   if (config.mWidthDeg > 0.1) // Sector probe
   {
     double width = config.mWidthDeg * M_PI / 180.0;//width in radians
-    probeSector = ssc::ProbeSector(ssc::ProbeSector::tSECTOR, depthStart, depthEnd, width);
+    probeSector = ssc::ProbeData(ssc::ProbeData::tSECTOR, depthStart, depthEnd, width);
   }
   else //Linear probe
   {
     int widtInPixels = config.mRightEdge - config.mLeftEdge;
     double width = config.mPixelWidth * widtInPixels; //width in mm
-    probeSector = ssc::ProbeSector(ssc::ProbeSector::tLINEAR, depthStart, depthEnd, width);
+    probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
   }
 
   probeSector.mImage = imageData;
