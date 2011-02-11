@@ -10,7 +10,7 @@
 #include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
-#include "sscProbeSector.h"
+#include "sscProbeData.h"
 #include "cxToolManager.h"
 #include "cxProbe.h"
 //#include "cxDataLocations.h"
@@ -643,9 +643,9 @@ void Tool::printInternalStructure()
   std::cout << "------------------------------------------------------------------" << std::endl;
 }
   
-ssc::ProbeSector Tool::getProbeSector() const
+ssc::ProbeData Tool::getProbeSector() const
 { 
-  return mProbe->getSector();
+  return mProbe->getData();
 }
   
 //QString Tool::getInstrumentId() const

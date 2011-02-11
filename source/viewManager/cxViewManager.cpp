@@ -350,6 +350,7 @@ void ViewManager::setActiveLayout(const QString& layout)
 {
   if(mActiveLayout==layout)
     return;
+  std::cout << "set active layout " <<layout << std::endl;
 
   LayoutData next = this->getLayoutData(layout);
   if (next.getUid().isEmpty())
@@ -445,11 +446,14 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
+  std::cout << "activateRTStreamView begin" << std::endl;
+
   ssc::View* view = mViewCacheRT.retrieveView();
   QColor background = mSettings->value("backgroundColor").value<QColor>();
   view->setBackgoundColor(background);
   ViewWrapperRTStreamPtr wrapper(new ViewWrapperRTStream(view));
   this->activateView(wrapper, group, region);
+  std::cout << "activateRTStreamView end" << std::endl;
 }
 
 void ViewManager::addDefaultLayout(LayoutData data)

@@ -37,7 +37,7 @@ ssc::DoubleDataAdapterPtr DoubleDataAdapterTimeCalibration::New()
 
 DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
 {
-  connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(changed()));
+  connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(connected(bool)), this, SIGNAL(changed()));
 }
 
 double DoubleDataAdapterTimeCalibration::getValue() const

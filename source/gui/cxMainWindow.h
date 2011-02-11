@@ -111,6 +111,7 @@ private:
   void addToWidgetGroupMap(QAction* action, QString groupname);
 
   LayoutData executeLayoutEditorDialog(QString title, bool createNew);
+  void startupLoadPatient();
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
