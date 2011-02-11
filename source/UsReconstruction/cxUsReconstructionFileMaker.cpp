@@ -172,9 +172,11 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   int i=0;
   for(ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
+//    std::cout << "one frame" << std::endl;
     vtkImageDataPtr input = it->second;
     if (bw)
     {
+//      std::cout << "one frame bw" << std::endl;
       if (it->second->GetNumberOfScalarComponents()>2) // color
       {
         vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
@@ -197,6 +199,7 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 //  QString mhdFilename = reconstructionFolder+"/"+mSessionDescription->getDescription()+".mhd";
 
   vtkImageDataPtr usData = this->mergeFrames();
+//  std::cout << "write " << ssc::DoubleBoundingBox3D(usData->GetExtent()) << std::endl;
 
   if(mTool)
   {
