@@ -725,7 +725,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   QStringList probeConfigPath;
   mFileReader->readCustomMhdTags(mhdFileName, &probeConfigPath, &mCalFileName);
   ProbeXmlConfigParser::Configuration configuration = mFileReader->readProbeConfiguration(mCalFilesPath, probeConfigPath);
-  mProbeData.setSector(createProbeDataFromConfiguration(configuration));
+  mProbeData.setData(createProbeDataFromConfiguration(configuration));
 
   mFrames = mFileReader->readFrameTimestamps(fileName);
   mPositions = mFileReader->readPositions(fileName);

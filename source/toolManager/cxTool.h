@@ -107,7 +107,7 @@ public:
   virtual QString getUid() const;
   virtual QString getName() const;
   virtual int getIndex() const{return 0;};
-  virtual ssc::ProbeSector getProbeSector() const;
+  virtual ssc::ProbeData getProbeSector() const;
   virtual ssc::ProbePtr getProbe() const;
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.

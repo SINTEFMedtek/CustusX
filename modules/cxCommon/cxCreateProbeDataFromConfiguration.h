@@ -8,10 +8,10 @@
 #ifndef CXCREATEPROBEDATAFROMCONFIGURATION_H_
 #define CXCREATEPROBEDATAFROMCONFIGURATION_H_
 
-#include "sscProbeSector.h"
+#include "sscProbeData.h"
 #include "probeXmlConfigParser.h"
 
-ssc::ProbeSector createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
+ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configuration config);
 
 
 #endif /* CXCREATEPROBEDATAFROMCONFIGURATION_H_ */

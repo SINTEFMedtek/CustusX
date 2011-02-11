@@ -18,7 +18,7 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscBoolDataAdapterXml.h"
 #include "sscXmlOptionItem.h"
-#include "sscProbeData.h"
+#include "sscProbeSector.h"
 //#include "sscStringWidgets.h"
 #include "cxUsReconstructionFileReader.h"
 
@@ -83,7 +83,7 @@ private:
 
   OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
-  ssc::ProbeData mProbeData;
+  ssc::ProbeSector mProbeData;
   XmlOptionFile mSettings;
   QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
   QString mCalFileName; ///< Name of calibration file

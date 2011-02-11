@@ -104,7 +104,7 @@ void ViewWrapperRTStream::dominantToolChangedSlot()
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
 
   // ignore non-probe tools
-  if (!tool || tool->getProbeSector().mType==ssc::ProbeSector::tNONE)
+  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
     return;
 
   mStreamRep->setTool(tool);
