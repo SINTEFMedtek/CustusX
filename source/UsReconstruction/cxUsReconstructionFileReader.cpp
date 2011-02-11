@@ -74,6 +74,8 @@ void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringL
 
 ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath)
 {
+  if (probeConfigPath.size()!=4)
+    return ProbeXmlConfigParser::Configuration();
   //Assumes ProbeCalibConfigs.xml file and calfiles have the same path
   ssc::messageManager()->sendInfo("Use mCalFilesPath: " + calFilesPath);
   QString xmlPath = calFilesPath+"ProbeCalibConfigs.xml";

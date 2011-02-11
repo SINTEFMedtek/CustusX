@@ -34,7 +34,8 @@ namespace ssc
 {
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
-  mImageImport(vtkImageImportPtr::New())
+  mImageImport(vtkImageImportPtr::New()),
+  mLinearSoundSpeedCompesation(1.0)
 {
   mLastTimestamp = 0;
   mTimestampCalibration = 0;
@@ -143,6 +144,12 @@ void OpenIGTLinkRTSource::setTimestampCalibration(double delta)
   if (!ssc::similar(delta, 0.0))
     ssc::messageManager()->sendInfo("set time calibration in rt source: " + qstring_cast(delta) + "ms");
   mTimestampCalibration = delta;
+}
+
+void OpenIGTLinkRTSource::setSoundSpeedCompensation(double gamma)
+{
+  mLinearSoundSpeedCompesation = gamma;
+  ssc::messageManager()->sendInfo("Linear sound speed compensation set to: "+qstring_cast(mLinearSoundSpeedCompesation));
 }
 
 double OpenIGTLinkRTSource::getTimestamp()
@@ -335,11 +342,20 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
   // get timestamp from igtl second-format:
   igtl::TimeStamp::Pointer timestamp = igtl::TimeStamp::New();
   mImageMessage->GetTimeStamp(timestamp);
+//  static double last = 0;
+//  if (last==0)
+//    last = timestamp->GetTimeStamp();
+//  std::cout << "raw time" << timestamp->GetTimeStamp() << ", " << timestamp->GetTimeStamp() - last << std::endl;
+
   mLastTimestamp = timestamp->GetTimeStamp() * 1000;
   mLastTimestamp += mTimestampCalibration;
 
   mImageImport->SetDataOrigin(0,0,0);
-  mImageImport->SetDataSpacing(spacing[0], spacing[1], spacing[2]);
+
+  //for linear probes used in other substance than the scanner is calibrated for we want to compensate
+  //for the change in sound of speed in that substance, do this by changing spacing in the images y-direction,
+  //this is only valid for linear probes
+  mImageImport->SetDataSpacing(spacing[0], spacing[1]*mLinearSoundSpeedCompesation, spacing[2]);
 
   mImageImport->SetWholeExtent(0, size[0] - 1, 0, size[1] - 1, 0, size[2]-1);
   mImageImport->SetDataExtentToWholeExtent();
@@ -375,7 +391,6 @@ void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
     mFilter_ARGB_RGBA = this->createFilterARGB2RGBA(mImageImport->GetOutput());
 //    std::cout << "filters scalar type: " << mFilter_ARGB_RGBA->GetScalarTypeAsString() << std::endl;
 //    std::cout << "fileters scalar size:" << mFilter_ARGB_RGBA->GetScalarSize() << std::endl;
-
     mRedirecter->SetInput(mFilter_ARGB_RGBA);
   }
 
@@ -408,9 +423,6 @@ vtkImageDataPtr OpenIGTLinkRTSource::createFilterARGB2RGBA(vtkImageDataPtr input
 
 vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData()
 {
-//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar size " << mRedirecter->GetOutput()->GetScalarSize() << std::endl;
-//  std::cout << "vtkImageDataPtr OpenIGTLinkRTSource::getVtkImageData(): mRedirecter scalar type " << mRedirecter->GetOutput()->GetScalarTypeAsString() << std::endl;
-
   return mRedirecter->GetOutput();
 }
 

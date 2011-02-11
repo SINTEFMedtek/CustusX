@@ -41,6 +41,7 @@ public:
   // non-inherited methods
   void setRealTimeStreamSource(ssc::RealTimeStreamSourcePtr source);
   ProbeXmlConfigParser::Configuration getConfiguration() const;
+  void setSoundSpeedCompensationFactor(double factor);
 
 private:
   void setUSProbeSector(ssc::ProbeData probeSector);
@@ -50,6 +51,8 @@ private:
 
   ssc::ProbeData mSector; ///< Probe sector information
   ssc::RealTimeStreamSourcePtr mSource;
+
+  double mSoundSpeedCompensationFactor;
 
   QString mInstrumentUid;
   QString mScannerUid;

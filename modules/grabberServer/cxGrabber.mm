@@ -191,6 +191,14 @@ bool MacGrabber::findConnectedDevice()
       
       NSComparisonResult compareResult;
       
+      //buildt in apple i-sight camera
+      compareResult = [grabberName localizedCompare:@"Built-in iSight"];
+      if (compareResult == NSOrderedSame)
+      {
+        mObjectiveC->mSelectedDevice = captureDevice;
+        found = true;
+      }
+
       //new VGA grabber (Epiphan)
       compareResult = [grabberName localizedCompare:@"D4U24488"];
       if (compareResult == NSOrderedSame)
@@ -214,14 +222,6 @@ bool MacGrabber::findConnectedDevice()
         mObjectiveC->mSelectedDevice = captureDevice;
         found = true;
       }
-      
-/*      //buildt in apple i-sight camera
-      compareResult = [grabberName localizedCompare:@"Built-in iSight"];
-      if (compareResult == NSOrderedSame)
-      {
-        mObjectiveC->mSelectedDevice = captureDevice;
-        found = true;
-      }*/
   }
   return found;
 }
