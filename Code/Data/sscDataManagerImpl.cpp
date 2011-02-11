@@ -105,21 +105,26 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
       if (line.startsWith("Position", Qt::CaseInsensitive) || line.startsWith("Offset", Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
+        if (list.size()==5)
+          p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
       }
       else if (line.startsWith("TransformMatrix", Qt::CaseInsensitive) || line.startsWith("Orientation",
           Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
 
-        e_x = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
-        e_y = Vector3D(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
-        e_z = cross(e_x, e_y);
+        if (list.size()==8)
+        {
+          e_x = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
+          e_y = Vector3D(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
+          e_z = cross(e_x, e_y);
+        }
       }
       else if (line.startsWith("Creator", Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        creator = list[2];
+        if (list.size()==3)
+          creator = list[2];
       }
     }
     file.close();

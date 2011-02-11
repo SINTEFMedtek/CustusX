@@ -147,7 +147,7 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath, const SNW2VolumeMetaDa
 
 void SNW2Volume::writeStatus(const QString& text) const
 {
-	qWarning(text.toAscii().constData());
+	qWarning("%s", text.toAscii().constData());
 }
 
 bool SNW2Volume::loadAll()
