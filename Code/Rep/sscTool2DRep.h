@@ -21,7 +21,7 @@
 
 namespace ssc
 {
-class ProbeSector;
+class ProbeData;
 
 /**
  *This class will hold all the representation and drawing of 2d tool
@@ -58,7 +58,7 @@ class ToolRep2D : public ssc::RepImpl
 		virtual void addRepActorsToViewRenderer(ssc::View* view);
 		virtual void removeRepActorsFromViewRenderer(ssc::View* view);		
 	private:
-		void setProbeSector(ssc::ProbeSector data);				
+		void setProbeSector(ssc::ProbeData data);				
 		double getOffset();
 		void createCrossHair(vtkRendererPtr renderer);
 		void setVisibility();
@@ -89,7 +89,7 @@ class ToolRep2D : public ssc::RepImpl
 		TextDisplayPtr distanceText;
 
 	  //US Probe sector
-		ProbeDataPtr mProbeSector;
+		ProbeSectorPtr mProbeSector;
 	  vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	  vtkActorPtr mProbeSectorActor;
 };

@@ -266,10 +266,10 @@ SET( SSC_SOURCE_FILES
     Tool/sscDummyTool.h
     Tool/sscManualTool.cpp
     Tool/sscManualTool.h
-    Tool/sscProbeSector.cpp
-    Tool/sscProbeSector.h
-    Tool/sscProbeData.h 
-    Tool/sscProbeData.cpp 
+    Tool/sscProbeData.cpp
+    Tool/sscProbeData.h
+    Tool/sscProbeSector.h 
+    Tool/sscProbeSector.cpp 
     Widgets/sscDoubleRange.h
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h

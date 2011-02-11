@@ -35,7 +35,7 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const{return 0;};
 	virtual bool isCalibrated() const;
-	virtual ProbeSector getProbeSector() const { return ProbeSector(); }	
+	virtual ProbeData getProbeSector() const { return ProbeData(); }
 	virtual double getTimestamp() const { return 0; }
 
 	void startTracking(int interval=33);

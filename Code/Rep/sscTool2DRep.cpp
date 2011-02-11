@@ -38,7 +38,7 @@ ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
 	mUseOffsetText = false;
 	mMergeOffsetAndToolLine = false;
 
-  mProbeSector.reset(new ProbeData());
+  mProbeSector.reset(new ProbeSector());
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 }
@@ -202,7 +202,7 @@ void ToolRep2D::update()
   {
     Transform3D T = createTransformTranslate(Vector3D(0, 0, 0.1));
 
-    mProbeSector->setSector(mSlicer->getTool()->getProbeSector());
+    mProbeSector->setData(mSlicer->getTool()->getProbeSector());
     Transform3D tMu = mProbeSector->get_tMu();
     mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
     if (mProbeSectorPolyDataMapper->GetInput())

@@ -240,7 +240,7 @@ void TextureSlicePainter::ReleaseGraphicsResources(vtkWindow* win)
 
 void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* actor)
 {
-
+//  std::cout << this << " TextureSlicePainter::PrepareForRendering" << std::endl;
 	if (!CanRender(renderer, actor))
 	{
 		std::cout << "Can not Render !!!!!!!!!!!." << endl;
@@ -307,6 +307,8 @@ void TextureSlicePainter::PrepareForRendering(vtkRenderer* renderer, vtkActor* a
 void TextureSlicePainter::RenderInternal(vtkRenderer* renderer, vtkActor* actor, unsigned long typeflags,
 		bool forceCompileOnly)
 {
+//  std::cout << this << " TextureSlicePainter::RenderInternal" << std::endl;
+
 	// Save context state to be able to restore.
 	mInternals->Shader->Build();
 	if (mInternals->Shader->GetLastBuildStatus() != VTK_SHADER_PROGRAM2_LINK_SUCCEEDED)

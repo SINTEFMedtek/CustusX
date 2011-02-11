@@ -12,7 +12,7 @@
 #include "sscRealTimeStreamSource.h"
 #include "sscVtkHelperClasses.h"
 #include "sscForwardDeclarations.h"
-#include "sscProbeData.h"
+#include "sscProbeSector.h"
 
 typedef vtkSmartPointer<class vtkPlaneSource> vtkPlaneSourcePtr;
 typedef vtkSmartPointer<class vtkTexture> vtkTexturePtr;
@@ -40,7 +40,7 @@ public:
   void setRealtimeStream(RealTimeStreamSourcePtr data);
   void setTool(ToolPtr tool);
   ToolPtr getTool();
-  ssc::ProbeData getProbeData();
+  ssc::ProbeSector getProbeData();
   void setClipToSector(bool on);
   void setShowInToolSpace(bool on);
   vtkActorPtr getActor();
@@ -64,7 +64,7 @@ private:
 
   bool mShowInToolSpace;
   ToolPtr mTool;
-  ssc::ProbeData mProbeData;
+  ssc::ProbeSector mProbeData;
   RealTimeStreamSourcePtr mData;
   vtkImageChangeInformationPtr mDataRedirecter;
   vtkActorPtr mPlaneActor;
@@ -136,7 +136,7 @@ private:
   bool mShowSector;
 
   ToolPtr mTool;
-  ssc::ProbeData mProbeData;
+  ssc::ProbeSector mProbeData;
   RealTimeStreamSourcePtr mData;
 
   ssc::TextDisplayPtr mStatusText;

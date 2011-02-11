@@ -9,7 +9,7 @@ typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
 #include "sscTransform3D.h"
 
 #include <boost/shared_ptr.hpp>
-//#include "sscProbeSector.h"
+//#include "sscProbeData.h"
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 

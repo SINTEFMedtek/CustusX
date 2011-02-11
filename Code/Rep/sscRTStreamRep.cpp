@@ -106,7 +106,7 @@ ToolPtr RealTimeStreamGraphics::getTool()
   return mTool;
 }
 
-ssc::ProbeData RealTimeStreamGraphics::getProbeData()
+ssc::ProbeSector RealTimeStreamGraphics::getProbeData()
 {
   return mProbeData;
 }
@@ -124,7 +124,7 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
   }
 
   // accept only tool with a probe sector
-  if (tool && tool->getProbeSector().mType!=ssc::ProbeSector::tNONE)
+  if (tool && tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
   {
     mTool = tool;
   }
@@ -197,7 +197,7 @@ void RealTimeStreamGraphics::probeSectorChanged()
   if (!mTool)
     return;
 
-  mProbeData.setSector(mTool->getProbeSector());
+  mProbeData.setData(mTool->getProbeSector());
   mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
 
   if (mUseMask)
@@ -465,13 +465,13 @@ bool RealTimeStreamFixedPlaneRep::getShowSector() const
 
 void RealTimeStreamFixedPlaneRep::updateSector()
 {
-  bool show = mTool && this->getShowSector() && mTool->getProbeSector().mType!=ssc::ProbeSector::tNONE;
+  bool show = mTool && this->getShowSector() && mTool->getProbeSector().mType!=ssc::ProbeData::tNONE;
 
   mProbeSectorActor->SetVisibility(show);
   if (!show)
     return;
 
-  mProbeData.setSector(mTool->getProbeSector());
+  mProbeData.setData(mTool->getProbeSector());
   mProbeSectorPolyDataMapper->SetInput(mProbeData.getSectorLinesOnly());
   if (mProbeSectorPolyDataMapper->GetInput())
   {

@@ -20,7 +20,7 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 #if 0
     mType = TOOL_US_PROBE;
   //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
-  ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 100, 300, M_PI_2);
+  ssc::ProbeData dummy(ssc::ProbeData::tSECTOR, 100, 300, M_PI_2);
   //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);
 
   dummy.mImage.mSpacing = Vector3D(0.928,0.928,1);
@@ -129,12 +129,12 @@ bool ManualTool::isCalibrated() const
 	return false;
 }
 
-ssc::ProbeSector ManualTool::getProbeSector() const
+ssc::ProbeData ManualTool::getProbeSector() const
 {
   return mSector;
 }
 
-void ManualTool::setProbeSector(ssc::ProbeSector sector)
+void ManualTool::setProbeSector(ssc::ProbeData sector)
 {
   mSector = sector;
   emit toolProbeSector();

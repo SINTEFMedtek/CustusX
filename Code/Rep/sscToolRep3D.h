@@ -75,7 +75,7 @@ private:
 	ToolTracerPtr mTracer;
 
 	//US Probe sector
-	ProbeDataPtr mProbeSector;
+	ProbeSectorPtr mProbeSector;
 	//USProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;

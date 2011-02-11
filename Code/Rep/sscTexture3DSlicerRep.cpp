@@ -45,6 +45,11 @@ Texture3DSlicerRep::Texture3DSlicerRep(const QString& uid) :
 
   mPolyData = stripper->GetOutput();
   mPolyData->GetPointData()->SetNormals(NULL);
+
+  mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
+  mPainterPolyDatamapper->SetPainter(mPainter);
+  mPainterPolyDatamapper->SetInput(mPolyData);
+  mActor->SetMapper(mPainterPolyDatamapper);
 }
 
 Texture3DSlicerRep::~Texture3DSlicerRep()
@@ -87,15 +92,24 @@ void Texture3DSlicerRep::setViewportData(const Transform3D& vpMs, const DoubleBo
 
 //	std::cout << p1 << ", " << p2 << ", " << origin << std::endl;
 
+	if (similar(mBB_s.range()[0] * mBB_s.range()[1], 0.0))
+	{
+	  std::cout << "zero-size bounding box in texture slicer- ignoring" << std::endl;
+	  return;
+	}
+
 	createGeometryPlane(p1, p2, origin);
 }
 
 void Texture3DSlicerRep::createGeometryPlane( Vector3D point1_s,  Vector3D point2_s, Vector3D origin_s )
 {
+//  std::cout << "createGeometryPlane " << point1_s << ", " << point2_s << ", " << origin_s << std::endl;
 	mPlaneSource->SetPoint1( point1_s.begin() );
 	mPlaneSource->SetPoint2( point2_s.begin() );
 	mPlaneSource->SetOrigin( origin_s.begin() );
+//  std::cout << "createGeometryPlane update begin" << std::endl;
 	mPolyData->Update();
+//  std::cout << "createGeometryPlane update end" << std::endl;
 	// each stripper->update() resets the contents of polydata, thus we must reinsert the data here.
 	for (unsigned i=0; i<mImages.size(); ++i)
 	{
@@ -130,16 +144,20 @@ void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
 	}
 	updateColorAttributeSlot();
 
-  mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
-  mPainterPolyDatamapper->SetPainter(mPainter);
-  mPainterPolyDatamapper->SetInput(mPolyData);
+	// this led to painter == delegate after second call - moved to constructor
+//  mPainter->SetDelegatePainter(mPainterPolyDatamapper->GetPainter());
+//  mPainterPolyDatamapper->SetPainter(mPainter);
+//  mPainterPolyDatamapper->SetInput(mPolyData);
   for (unsigned i = 0; i < mImages.size(); ++i)
   {
     mPainterPolyDatamapper->MapDataArrayToMultiTextureAttribute(2 * i, cstring_cast(this->getTCoordName(i)), vtkDataObject::FIELD_ASSOCIATION_POINTS);
   }
 
-  mActor->SetMapper(mPainterPolyDatamapper);
+//  std::cout << this << "\tpainter: " << mPainter.GetPointer() << "\t" << mPainter->GetDelegatePainter() << std::endl;
+
+//  mActor->SetMapper(mPainterPolyDatamapper);
 }
+
 
 void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
 {

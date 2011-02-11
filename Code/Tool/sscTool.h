@@ -7,7 +7,7 @@
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
-#include "sscProbeSector.h"
+#include "sscProbeData.h"
 #include "sscIndent.h"
 
 
@@ -17,6 +17,7 @@ typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 typedef boost::shared_ptr<class Probe> ProbePtr;
 typedef boost::shared_ptr<class RealTimeStreamSource> RealTimeStreamSourcePtr;
+typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 
 /**Probe interface. Available from Tool when Tool is a Probe.
  */
@@ -26,7 +27,8 @@ class Probe : public QObject
 public:
   virtual ~Probe() {}
   virtual bool isValid() const = 0;
-  virtual ProbeSector getSector() const = 0;
+  virtual ProbeData getData() const = 0;
+  virtual ProbeSectorPtr getSector() = 0;
   virtual RealTimeStreamSourcePtr getRealTimeStreamSource() const = 0;
 
   virtual void addXml(QDomNode& dataNode) = 0;
@@ -38,6 +40,8 @@ public:
   virtual QString getConfigurationPath() const = 0;
 
   virtual void setConfigId(QString uid) = 0;
+  virtual void setTemporalCalibration(double val) = 0;
+  virtual void setSoundSpeedCompensationFactor(double val) = 0;
 
 signals:
   void sectorChanged();
@@ -116,7 +120,7 @@ public:
 	virtual void setCalibration_sMt(ssc::Transform3D calibration){ Q_UNUSED(calibration); } ///< requests to use the calibration and replaces the tools calibration file
 	
   virtual ProbePtr getProbe() const { return ProbePtr(); } ///< additional information if the tool represents an US Probe. Extends getProbeSector()
-	virtual ProbeSector getProbeSector() const = 0; ///< additional information if the tool represents an US Probe. Obsolete - use getProbe()
+	virtual ProbeData getProbeSector() const = 0; ///< additional information if the tool represents an US Probe. Obsolete - use getProbe()
 	virtual double getTimestamp() const = 0; ///< latest valid timestamp for the position matrix. 0 means indeterminate (for f.ex. manual tools)
 	virtual void printSelf(std::ostream &os, Indent indent) { Q_UNUSED(os); Q_UNUSED(indent); } ///< dump internal debug data
 	

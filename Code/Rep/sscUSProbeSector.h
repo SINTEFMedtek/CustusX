@@ -4,10 +4,10 @@
 
 #include <boost/shared_ptr.hpp>
 #include <vtkSmartPointer.h>
-#include "sscProbeSector.h"
+#include "sscProbeData.h"
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
-#include "sscProbeData.h"
+#include "sscProbeSector.h"
 
 namespace ssc
 {

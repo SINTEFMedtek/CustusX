@@ -31,7 +31,7 @@ public:
 	virtual QString getName() const;
 	virtual int getIndex() const;
 	virtual bool isCalibrated() const;
-	virtual ssc::ProbeSector getProbeSector() const;
+	virtual ssc::ProbeData getProbeSector() const;
 	virtual double getTimestamp() const;
 	virtual void set_prMt(const Transform3D& prMt);
 
@@ -44,12 +44,12 @@ public:
 	// extensions:
 	void setVisible(bool vis);
 	void setType(const Type& type);
-  void setProbeSector(ssc::ProbeSector sector); // for testing
+  void setProbeSector(ssc::ProbeData sector); // for testing
 
 private:
 	void read3DCrossHair();
 	// constant data
-	ssc::ProbeSector mSector;
+	ssc::ProbeData mSector;
 	//const QString mUid; //see sscTool
 	//const QString mName; //see sscTool
 	vtkPolyDataPtr mPolyData;

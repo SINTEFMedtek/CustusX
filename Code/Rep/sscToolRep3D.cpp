@@ -34,7 +34,7 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   mOffsetLine.reset(new GraphicalLine3D());
   mTooltipPoint.reset(new GraphicalPoint3D());
 
-  mProbeSector.reset(new ProbeData());
+  mProbeSector.reset(new ProbeSector());
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 
@@ -208,7 +208,7 @@ void ToolRep3D::probeSectorChanged()
 
   if (this->showProbe())
   {
-    mProbeSector->setSector(mTool->getProbeSector());
+    mProbeSector->setData(mTool->getProbeSector());
     Transform3D tMu = mProbeSector->get_tMu();
 
     mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
@@ -325,7 +325,7 @@ void ToolRep3D::tooltipOffsetSlot(double val)
 
 bool ToolRep3D::showProbe()
 {
-  return mTool && (mTool->getType()==ssc::Tool::TOOL_US_PROBE) && (mTool->getProbeSector().mType!=ssc::ProbeSector::tNONE);
+  return mTool && (mTool->getType()==ssc::Tool::TOOL_US_PROBE) && (mTool->getProbeSector().mType!=ssc::ProbeData::tNONE);
 //  return mTool;;
 }
 } // namespace ssc
