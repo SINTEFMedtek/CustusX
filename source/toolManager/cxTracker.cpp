@@ -117,7 +117,14 @@ Tracker::TrackerType* Tracker::getPointer() const
 
 void Tracker::open()
 {
-  mCommunication->OpenCommunication();
+  igstk::SerialCommunication::ResultType result = igstk::SerialCommunication::FAILURE;
+  for(int i=0; i<5; ++i)
+  {
+    result = mCommunication->OpenCommunication();
+    std::cout << "Trying to open tracker communication: "<< string_cast(result) << std::endl;
+    if(result == igstk::SerialCommunication::SUCCESS)
+      break;
+  }
   mTracker->RequestOpen();
 }
 
