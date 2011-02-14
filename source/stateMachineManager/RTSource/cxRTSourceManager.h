@@ -1,5 +1,5 @@
 /*
- * cxOpenIGTLinkConnection.h
+ * cxRTSourceManager.h
  *
  *  Created on: Jan 25, 2011
  *      Author: christiana
@@ -25,12 +25,12 @@ namespace cx
  * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
  *
  */
-class IGTLinkConnection : public QObject
+class RTSourceManager : public QObject
 {
   Q_OBJECT
 public:
-  IGTLinkConnection();
-  virtual ~IGTLinkConnection();
+  RTSourceManager();
+  virtual ~RTSourceManager();
 
   void setLocalServerCommandLine(QString commandline);
   QString getLocalServerCommandLine();
@@ -49,6 +49,7 @@ public:
 
   QProcess* getProcess() { return mServer; }
   ssc::OpenIGTLinkRTSourcePtr getRTSource() { return mRTSource; }
+  ssc::ToolPtr getStreamingProbe();
 
 public slots:
   void connectServer();
@@ -57,18 +58,19 @@ private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverProcessError(QProcess::ProcessError error);
   void connectSourceToTool();
-  void probeChangedSlot();
+//  void probeChangedSlot();
 
 private:
   void delayedAutoConnectServer();
+  ssc::ToolPtr findSuitableProbe();
 
-  ProbePtr mProbe;
+  ssc::ToolPtr mProbe;
   double mSoundSpeedCompensationFactor;
   ssc::OpenIGTLinkRTSourcePtr mRTSource;
   QProcess* mServer;
   int mConnectWhenLocalServerRunning;
 };
-typedef boost::shared_ptr<IGTLinkConnection> IGTLinkConnectionPtr;
+typedef boost::shared_ptr<RTSourceManager> IGTLinkConnectionPtr;
 
 }//end namespace cx
 

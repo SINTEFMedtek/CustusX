@@ -12,7 +12,9 @@
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscProbeSector.h"
-
+#include "sscProbeAdapterRTSource.h"
+#include "sscTypeConversions.h"
+#include "sscVector3D.h"
 
 namespace cx
 {
@@ -22,11 +24,15 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
     mInstrumentUid(instrumentUid),
     mScannerUid(scannerUid)
 {
+  mOverrideTemporalCalibration = false;
+  mTemporalCalibration = 0;
+
   // Read ultrasoundImageConfigs.xml file
   QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
   mXml.reset(new ProbeXmlConfigParser(xmlFileName));
 
   QStringList configs = this->getConfigIdList();
+  std::cout << "!!! configidlist " << configs.join("") << std::endl;
   if (!configs.isEmpty())
     this->setConfigId(configs[0]);
 }
@@ -40,24 +46,25 @@ ssc::ProbeSectorPtr Probe::getSector()
 
 bool Probe::isValid() const
 {
-  return mSector.mType!=ssc::ProbeData::tNONE;
+  return mData.mType!=ssc::ProbeData::tNONE;
 }
 
 void Probe::setTemporalCalibration(double val)
 {
-  mSector.mTemporalCalibration = val;
-  emit sectorChanged();
+  mOverrideTemporalCalibration = true;
+  mTemporalCalibration = val;
+  this->setConfigId(mConfigurationId);
 }
 
-void Probe::setSoundSpeedCompensationFactor(double val)
+void Probe::setSoundSpeedCompensationFactor(double factor)
 {
-  mSector.mSoundSpeedCompensationFactor = val;
-  emit sectorChanged();
+  mSoundSpeedCompensationFactor = factor;
+  this->setConfigId(mConfigurationId);
 }
 
 ssc::ProbeData Probe::getData() const
 {
-  return mSector;
+  return mData;
 }
 
 ssc::RealTimeStreamSourcePtr Probe::getRealTimeStreamSource() const
@@ -65,9 +72,18 @@ ssc::RealTimeStreamSourcePtr Probe::getRealTimeStreamSource() const
   return mSource;
 }
 
+ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
+{
+  Probe* object = new Probe(instrumentUid, scannerUid);
+  ProbePtr retval(object);
+  object->mSelf = retval;
+  return retval;
+}
+
 void Probe::setRealTimeStreamSource(ssc::RealTimeStreamSourcePtr source)
 {
-  mSource =  source;
+  ssc::RealTimeStreamSourcePtr adapter(new ssc::ProbeAdapterRTSource(source->getUid()+"_probe", mSelf.lock(), source));
+  mSource = adapter;
   emit sectorChanged();
 }
 
@@ -87,7 +103,6 @@ void Probe::parseXml(QDomNode& dataNode)
   this->setConfigId(cfg);
 }
 
-//QStringList Probe::getUSSectorConfigList() const
 QStringList Probe::getConfigIdList() const
 {
   QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
@@ -97,20 +112,17 @@ QStringList Probe::getConfigIdList() const
   return configIdList;
 }
 
-//QString Probe::getNameOfProbeSectorConfigId(QString configString) ///< get a name for the given configuration
 QString Probe::getConfigName(QString configString) ///< get a name for the given configuration
 {
   ProbeXmlConfigParser::Configuration config = this->getConfiguration(configString);
   return config.mName;
 }
 
-//QString Probe::getProbeSectorConfigIdString() const
 QString Probe::getConfigId() const
 {
   return mConfigurationId;
 }
 
-//QString Probe::getConfigurationString() const
 QString Probe::getConfigurationPath() const
 {
   QStringList rtSourceList = mXml->getRtSourceList(this->getInstrumentScannerId(), this->getInstrumentId());
@@ -121,7 +133,6 @@ QString Probe::getConfigurationPath() const
   return retval.join(":");
 }
 
-//void Probe::setProbeSectorConfigIdString(QString configString)
 void Probe::setConfigId(QString uid)
 {
   ProbeXmlConfigParser::Configuration config = this->getConfiguration(uid);
@@ -130,15 +141,18 @@ void Probe::setConfigId(QString uid)
 
   ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
   mConfigurationId = uid;
-  this->setUSProbeSector(probeSector);
-}
-
-
-void Probe::setUSProbeSector(ssc::ProbeData probeSector)
-{
-  mSector = probeSector;
+//  this->setUSProbeSector(probeSector);
+  std::cout << "set config " + streamXml2String(probeSector);
+  mData = probeSector;
   emit sectorChanged();
 }
+
+//
+//void Probe::setUSProbeSector(ssc::ProbeData probeSector)
+//{
+//  mSector = probeSector;
+//  emit sectorChanged();
+//}
 
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
@@ -147,11 +161,7 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
   return config;
 }
 
-void Probe::setSoundSpeedCompensationFactor(double factor)
-{
-  mSoundSpeedCompensationFactor = factor;
-  emit sectorChanged();
-}
+
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 {
@@ -165,9 +175,13 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
   //compensating for different speed of sound in what is scanned by the probe and what is assumed by the scanner
   if(config.mWidthDeg ==  0) //linear probe
   {
+    if (!ssc::similar(mSoundSpeedCompensationFactor, 1.0))
     config.mPixelHeight *=mSoundSpeedCompensationFactor;
-    ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed comensation factor.");
+    ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed compensation factor.");
   }
+
+  if (mOverrideTemporalCalibration)
+    config.mImageTimestampCalibration = mTemporalCalibration;
 
   return config;
 }
