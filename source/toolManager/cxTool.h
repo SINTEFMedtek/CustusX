@@ -85,13 +85,13 @@ public:
     QString           mLoggingFolderName;     ///< path to where log should be saved
     QString           mInstrumentId;          ///< The instruments id
     QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
-    bool              mUseAsManualTool;       ///< Use properties from this tool as input to the manual tool (debug use)
+//    bool              mUseAsManualTool;       ///< Use properties from this tool as input to the manual tool (debug use)
     InternalStructure() :
       mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX), mReferencePoints(),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
       mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
-      mInstrumentScannerId(""), mUseAsManualTool(false) {}; ///< sets up default values for all the members
+      mInstrumentScannerId("") {}; ///< sets up default values for all the members
   };
 
   Tool(InternalStructure& internalStructur);   ///< constructor
