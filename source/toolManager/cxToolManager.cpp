@@ -18,6 +18,7 @@
 #include "cxTracker.h"
 #include "cxToolConfigurationParser.h"
 #include "cxRecordSession.h"
+#include "cxManualToolAdapter.h"
 
 namespace cx
 {
@@ -50,7 +51,7 @@ ToolManager::ToolManager() :
   mPulseGenerator->RequestStart();
 
   this->initializeManualTool();
-  this->setDominantTool("Manual Tool");
+  this->setDominantTool("ManualTool");
 }
 
 ToolManager::~ToolManager()
@@ -77,10 +78,10 @@ void ToolManager::initializeManualTool()
   if (!mManualTool)
   {
     //adding a manual tool as default
-    mManualTool.reset(new ssc::ManualTool("Manual Tool"));
-    (*mConfiguredTools)["Manual Tool"] = mManualTool;
+    mManualTool.reset(new ManualToolAdapter("ManualTool"));
+    (*mConfiguredTools)["ManualTool"] = mManualTool;
     mManualTool->setVisible(true);
-    this->addInitializedTool("Manual Tool");
+    this->addInitializedTool("ManualTool");
   }
 
   ssc::Transform3D prMt =
@@ -150,6 +151,10 @@ void ToolManager::configure()
     connect(((*it).second).get(), SIGNAL(attachedToTracker(bool)), this, SLOT(toolInitialized(bool)));
     it++;
   }
+
+//  // debug
+//  if (!mConfiguredTools->empty())
+//    mManualTool->setBase(mConfiguredTools->begin()->second);
 
   this->configureReferences();
 

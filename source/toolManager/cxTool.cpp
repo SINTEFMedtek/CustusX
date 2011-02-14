@@ -53,7 +53,7 @@ Tool::Tool(InternalStructure& internalStructure) :
     mValid = false;
   }
 
-  mProbe.reset(new Probe(mInternalStructure.mInstrumentId, mInternalStructure.mInstrumentScannerId));
+  mProbe = Probe::New(mInternalStructure.mInstrumentId, mInternalStructure.mInstrumentScannerId);
   connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 //
 //  // Read ultrasoundImageConfigs.xml file

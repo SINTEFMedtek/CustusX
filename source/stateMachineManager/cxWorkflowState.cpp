@@ -6,7 +6,7 @@
  */
 
 #include "cxWorkflowState.h"
-#include "RTSource/cxOpenIGTLinkConnection.h"
+#include "RTSource/cxRTSourceManager.h"
 #include "sscDataManager.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"

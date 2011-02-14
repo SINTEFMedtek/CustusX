@@ -10,7 +10,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
-typedef boost::shared_ptr<class IGTLinkConnection> IGTLinkConnectionPtr;
+typedef boost::shared_ptr<class RTSourceManager> IGTLinkConnectionPtr;
 
 
 /**
