@@ -2,6 +2,7 @@
 
 #include "cxToolManager.h"
 
+#include <QSettings>
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -19,6 +20,7 @@
 #include "cxToolConfigurationParser.h"
 #include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -152,9 +154,12 @@ void ToolManager::configure()
     it++;
   }
 
-//  // debug
-//  if (!mConfiguredTools->empty())
-//    mManualTool->setBase(mConfiguredTools->begin()->second);
+  // debug
+  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
+  {
+    if (!mConfiguredTools->empty())
+      mManualTool->setBase(mConfiguredTools->begin()->second);
+  }
 
   this->configureReferences();
 
