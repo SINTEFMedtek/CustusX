@@ -1,7 +1,7 @@
 #include "cxSoundSpeedConversionWidget.h"
 
-#include <QPushButton>;
-#include <QDoubleSpinBox>;
+#include <QPushButton>
+#include <QDoubleSpinBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
