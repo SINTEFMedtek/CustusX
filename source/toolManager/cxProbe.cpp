@@ -32,7 +32,6 @@ Probe::Probe(QString instrumentUid, QString scannerUid) :
   mXml.reset(new ProbeXmlConfigParser(xmlFileName));
 
   QStringList configs = this->getConfigIdList();
-  std::cout << "!!! configidlist " << configs.join("") << std::endl;
   if (!configs.isEmpty())
     this->setConfigId(configs[0]);
 }
@@ -142,7 +141,6 @@ void Probe::setConfigId(QString uid)
   ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
   mConfigurationId = uid;
 //  this->setUSProbeSector(probeSector);
-  std::cout << "set config " + streamXml2String(probeSector);
   mData = probeSector;
   emit sectorChanged();
 }
@@ -176,8 +174,10 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
   if(config.mWidthDeg ==  0) //linear probe
   {
     if (!ssc::similar(mSoundSpeedCompensationFactor, 1.0))
-    config.mPixelHeight *=mSoundSpeedCompensationFactor;
-    ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed compensation factor.");
+    {
+      config.mPixelHeight *=mSoundSpeedCompensationFactor;
+      ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed compensation factor.");
+    }
   }
 
   if (mOverrideTemporalCalibration)

@@ -256,32 +256,21 @@ void RTSourceManager::connectSourceToTool()
   if (mProbe)
     return;
 
-//  std::cout << "!!!!! RTSourceManager::connectSourceToTool " << std::endl;
-
   ssc::ToolPtr probe = this->findSuitableProbe();
   if (!probe)
     return;
-
-//  std::cout << "!!!!! RTSourceManager::connectSourceToTool hit" << std::endl;
-
-//  if(mProbe)
-//  {
-//    disconnect(mProbe->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-//  }
 
   mProbe = probe;
 
   if (mProbe)
   {
-//    connect(mProbe->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-
     ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(mProbe->getProbe());
     if (!probeInterface)
     {
       ssc::messageManager()->sendError("Probe not a cx instance.");
     }
     probeInterface->setRealTimeStreamSource(mRTSource);
-    std::cout << "RTSourceManager::connectSourceToTool() " << probeInterface->getRealTimeStreamSource()->getName() << " completed" << std::endl;
+//    std::cout << "RTSourceManager::connectSourceToTool() " << probeInterface->getRealTimeStreamSource()->getName() << " completed" << std::endl;
   }
 }
 
@@ -296,19 +285,13 @@ ssc::ToolPtr RTSourceManager::getStreamingProbe()
 ssc::ToolPtr RTSourceManager::findSuitableProbe()
 {
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-//  std::cout << "!!!!! RTSourceManager::findSuitableProbe " << std::endl;
 
   // look for visible probes
   for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
   {
-//    std::cout << iter->second->getProbe() << " " << iter->first << std::endl;
-//    if (iter->second->getProbe())
-//      std::cout << iter->second->getProbe()->isValid() << " " << iter->second->getVisible() << std::endl;
-
     if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
     {
       return iter->second;
-//      return boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
     }
   }
 
@@ -318,17 +301,11 @@ ssc::ToolPtr RTSourceManager::findSuitableProbe()
     if (iter->second->getProbe() && iter->second->getProbe()->isValid())
     {
       return iter->second;
-//      return boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
     }
   }
 
   return ssc::ToolPtr();
 }
-
-//void RTSourceManager::probeChangedSlot()
-//{
-//  mRTSource->setSoundSpeedCompensation(mSoundSpeedCompensationFactor);
-//}
 
 
 }//end namespace cx

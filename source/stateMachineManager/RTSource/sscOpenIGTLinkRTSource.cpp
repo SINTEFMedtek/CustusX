@@ -211,7 +211,7 @@ void OpenIGTLinkRTSource::imageReceivedSlot()
 
 void OpenIGTLinkRTSource::disconnectServer()
 {
-  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
+//  std::cout << "IGTLinkWidget::disconnect server" << std::endl;
   if (mClient)
   {
     mClient->quit();
@@ -233,7 +233,7 @@ void OpenIGTLinkRTSource::disconnectServer()
 
 void OpenIGTLinkRTSource::clientFinishedSlot()
 {
-  std::cout << "IGTLinkWidget::clientFinishedSlot" << std::endl;
+//  std::cout << "IGTLinkWidget::clientFinishedSlot" << std::endl;
   if (!mClient)
     return;
   if (mClient->isRunning())
