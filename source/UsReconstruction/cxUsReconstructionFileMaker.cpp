@@ -201,14 +201,14 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   vtkImageDataPtr usData = this->mergeFrames();
 //  std::cout << "write " << ssc::DoubleBoundingBox3D(usData->GetExtent()) << std::endl;
 
-  if(mTool)
-  {
-    vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
-    redirecter->SetInput(usData);
-    redirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
-    usData = redirecter->GetOutput();
-    usData->Update();
-  }
+//  if(mTool)
+//  {
+//    vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
+//    redirecter->SetInput(usData);
+//    redirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
+//    usData = redirecter->GetOutput();
+//    usData->Update();
+//  }
 
 
   //std::cout << "start write mhd file " << mhdFilename << std::endl;

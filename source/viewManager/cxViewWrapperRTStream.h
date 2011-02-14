@@ -17,6 +17,9 @@ namespace cx
 /** Wrapper for a View that displays a RealTimeStream.
  *  Handles the connections between specific reps and the view.
  *
+ *  The view displays either a raw rt source or a us probe, depending on
+ *  whats available.
+ *
  */
 class ViewWrapperRTStream : public ViewWrapper
 {
@@ -28,10 +31,11 @@ public:
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
 
 private slots:
-  void streamLoadedSlot();
   void updateSlot();
-  void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
+//  void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void showSectorActionSlot(bool checked);
+  void probeChangedSlot();
+  void configureSlot();
 
 protected:
   virtual void imageAdded(ssc::ImagePtr image) {}
@@ -40,14 +44,18 @@ protected:
   virtual void meshRemoved(const QString& uid) {}
 
 private:
+  void loadStream();
   virtual void appendToContextMenu(QMenu& contextMenu);
   void addReps();
+  ssc::ToolPtr getProbe();
+  void setupRep(ssc::RealTimeStreamSourcePtr source, ssc::ToolPtr tool);
 
   ssc::RealTimeStreamFixedPlaneRepPtr mStreamRep;
   ssc::RealTimeStreamSourcePtr mSource;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   QPointer<ssc::View> mView;
+  ssc::ToolPtr mTool;
 };
 typedef boost::shared_ptr<ViewWrapperRTStream> ViewWrapperRTStreamPtr;
 

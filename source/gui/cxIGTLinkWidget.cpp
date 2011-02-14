@@ -15,7 +15,7 @@
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "RTSource/cxOpenIGTLinkConnection.h"
+#include "RTSource/cxRTSourceManager.h"
 #include "cxStateMachineManager.h"
 
 namespace cx

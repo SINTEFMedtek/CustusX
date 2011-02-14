@@ -17,14 +17,14 @@ typedef boost::shared_ptr<class Probe> ProbePtr;
 
 class Probe : public ssc::Probe
 {
+  Q_OBJECT
 public:
+  static ProbePtr New(QString instrumentUid, QString scannerUid);
   virtual ~Probe() {}
   virtual bool isValid() const;
   virtual ssc::ProbeData getData() const;
   virtual ssc::RealTimeStreamSourcePtr getRealTimeStreamSource() const;
   virtual ssc::ProbeSectorPtr getSector();
-
-  Probe(QString instrumentUid, QString scannerUid);
 
   virtual void addXml(QDomNode& dataNode);
   virtual void parseXml(QDomNode& dataNode);
@@ -41,18 +41,21 @@ public:
   // non-inherited methods
   void setRealTimeStreamSource(ssc::RealTimeStreamSourcePtr source);
   ProbeXmlConfigParser::Configuration getConfiguration() const;
-  void setSoundSpeedCompensationFactor(double factor);
 
 private:
-  void setUSProbeSector(ssc::ProbeData probeSector);
+  Probe(QString instrumentUid, QString scannerUid);
+//  void setUSProbeSector(ssc::ProbeData probeSector);
   ProbeXmlConfigParser::Configuration getConfiguration(QString uid) const;
   QString getInstrumentId() const;
   QString getInstrumentScannerId() const;
 
-  ssc::ProbeData mSector; ///< Probe sector information
+  ssc::ProbeData mData; ///< Probe sector information
   ssc::RealTimeStreamSourcePtr mSource;
+  ssc::ProbeWeakPtr mSelf;
 
   double mSoundSpeedCompensationFactor;
+  bool mOverrideTemporalCalibration;
+  double mTemporalCalibration;
 
   QString mInstrumentUid;
   QString mScannerUid;

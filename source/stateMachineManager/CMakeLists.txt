@@ -8,7 +8,7 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxPatientData.h
 	cxFileCopied.h
 	cxStateMachineManager.h
-    RTSource/cxOpenIGTLinkConnection.h
+    RTSource/cxRTSourceManager.h
     RTSource/sscOpenIGTLinkClient.h
     RTSource/sscOpenIGTLinkRTSource.h
 )
@@ -30,8 +30,8 @@ SET ( ${LIB}_statemachineManager
 	cxFileCopied.cpp
 	cxRecordSession.h
     cxRecordSession.cpp
-    RTSource/cxOpenIGTLinkConnection.h
-    RTSource/cxOpenIGTLinkConnection.cpp
+    RTSource/cxRTSourceManager.h
+    RTSource/cxRTSourceManager.cpp
     RTSource/sscOpenIGTLinkClient.h
     RTSource/sscOpenIGTLinkClient.cpp
     RTSource/sscOpenIGTLinkRTSource.h

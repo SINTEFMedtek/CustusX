@@ -10,7 +10,7 @@
 #include "cxPatientData.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
-#include "RTSource/cxOpenIGTLinkConnection.h"
+#include "RTSource/cxRTSourceManager.h"
 #include "sscReconstructer.h"
 
 namespace cx
@@ -187,7 +187,7 @@ void StateManager::initialize()
 
   mPatientData.reset(new PatientData());
 
-  mIGTLinkConnection.reset(new IGTLinkConnection());
+  mIGTLinkConnection.reset(new RTSourceManager());
 
   ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
   mReconstructer.reset(new ssc::Reconstructer(xmlFile, DataLocations::getShaderPath()));

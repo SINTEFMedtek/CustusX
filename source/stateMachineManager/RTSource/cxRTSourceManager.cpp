@@ -5,7 +5,7 @@
  *      Author: christiana
  */
 
-#include "cxOpenIGTLinkConnection.h"
+#include "cxRTSourceManager.h"
 #include <QStringList>
 
 #include "vtkRenderWindow.h"
@@ -24,7 +24,7 @@
 namespace cx
 {
 
-IGTLinkConnection::IGTLinkConnection()
+RTSourceManager::RTSourceManager()
 {
   mConnectWhenLocalServerRunning = 0;
 
@@ -33,14 +33,14 @@ IGTLinkConnection::IGTLinkConnection()
   connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
-  ssc::dataManager()->loadStream(mRTSource);
+  //ssc::dataManager()->loadStream(mRTSource);
   //connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
 
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
 }
 
-IGTLinkConnection::~IGTLinkConnection()
+RTSourceManager::~RTSourceManager()
 {
   mRTSource->disconnectServer();
   // avoid getting crash reports: disable signal
@@ -48,12 +48,12 @@ IGTLinkConnection::~IGTLinkConnection()
   mServer->close();
 }
 
-void IGTLinkConnection::setLocalServerCommandLine(QString commandline)
+void RTSourceManager::setLocalServerCommandLine(QString commandline)
 {
   DataLocations::getSettings()->setValue("IGTLink/localServer", commandline);
 }
 
-QString IGTLinkConnection::getLocalServerCommandLine()
+QString RTSourceManager::getLocalServerCommandLine()
 {
   QString cmd = DataLocations::getSettings()->value("IGTLink/localServer").toString();
   if (cmd.isEmpty())
@@ -61,12 +61,12 @@ QString IGTLinkConnection::getLocalServerCommandLine()
   return cmd;
 }
 
-void IGTLinkConnection::setPort(int port)
+void RTSourceManager::setPort(int port)
 {
   DataLocations::getSettings()->setValue("IGTLink/port", port);
 }
 
-int IGTLinkConnection::getPort()
+int RTSourceManager::getPort()
 {
   QVariant var = DataLocations::getSettings()->value("IGTLink/port");
   if (var.canConvert<int>())
@@ -74,12 +74,12 @@ int IGTLinkConnection::getPort()
   return 18333;
 }
 
-void IGTLinkConnection::setUseLocalServer(bool use)
+void RTSourceManager::setUseLocalServer(bool use)
 {
   DataLocations::getSettings()->setValue("IGTLink/useLocalServer", use);
 }
 
-bool IGTLinkConnection::getUseLocalServer()
+bool RTSourceManager::getUseLocalServer()
 {
   QVariant var = DataLocations::getSettings()->value("IGTLink/useLocalServer");
   if (var.canConvert<bool>())
@@ -90,7 +90,7 @@ bool IGTLinkConnection::getUseLocalServer()
 /**Get list of recent hosts. The first is the current.
  *
  */
-QStringList IGTLinkConnection::getHostHistory()
+QStringList RTSourceManager::getHostHistory()
 {
   QStringList hostHistory = DataLocations::getSettings()->value("IGTLink/hostHistory").toStringList();
   if (hostHistory.isEmpty())
@@ -98,12 +98,12 @@ QStringList IGTLinkConnection::getHostHistory()
   return hostHistory;
 }
 
-QString IGTLinkConnection::getHost()
+QString RTSourceManager::getHost()
 {
   return this->getHostHistory().front(); // history will always contain elements.
 }
 
-void IGTLinkConnection::setHost(QString host)
+void RTSourceManager::setHost(QString host)
 {
   QStringList history = this->getHostHistory();
   history.prepend(host);
@@ -117,7 +117,7 @@ void IGTLinkConnection::setHost(QString host)
 }
 
 
-void IGTLinkConnection::launchServer()
+void RTSourceManager::launchServer()
 {
   //  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
   //  QStringList arguments;
@@ -152,7 +152,7 @@ void IGTLinkConnection::launchServer()
     mServer->start(program, arguments);
 }
 
-void IGTLinkConnection::connectServer()
+void RTSourceManager::connectServer()
 {
   if (!mRTSource->isConnected())
   {
@@ -169,7 +169,7 @@ void IGTLinkConnection::connectServer()
  * and the server is unconnected.
  *
  */
-void IGTLinkConnection::delayedAutoConnectServer()
+void RTSourceManager::delayedAutoConnectServer()
 {
   if (mRTSource->isConnected())
     mConnectWhenLocalServerRunning = 0;
@@ -181,7 +181,7 @@ void IGTLinkConnection::delayedAutoConnectServer()
   }
 }
 
-void IGTLinkConnection::launchAndConnectServer()
+void RTSourceManager::launchAndConnectServer()
 {
   if (this->getUseLocalServer())
   {
@@ -203,7 +203,7 @@ void IGTLinkConnection::launchAndConnectServer()
 
 }
 
-void IGTLinkConnection::serverProcessError(QProcess::ProcessError error)
+void RTSourceManager::serverProcessError(QProcess::ProcessError error)
 {
   QString msg;
   msg += "RT Source server reported an error: ";
@@ -222,7 +222,7 @@ void IGTLinkConnection::serverProcessError(QProcess::ProcessError error)
   ssc::messageManager()->sendError(msg);
 }
 
-void IGTLinkConnection::serverProcessStateChanged(QProcess::ProcessState newState)
+void RTSourceManager::serverProcessStateChanged(QProcess::ProcessState newState)
 {
   if (newState==QProcess::Running)
   {
@@ -245,7 +245,7 @@ void IGTLinkConnection::serverProcessStateChanged(QProcess::ProcessState newStat
  * Apply time calibration to the source.
  *
  */
-void IGTLinkConnection::connectSourceToTool()
+void RTSourceManager::connectSourceToTool()
 {
   // find probe in tool manager
   // set source in cxTool
@@ -253,33 +253,82 @@ void IGTLinkConnection::connectSourceToTool()
   if (!mRTSource->isConnected())
     return;
 
-//  ToolPtr cxTool;
+  if (mProbe)
+    return;
+
+//  std::cout << "!!!!! RTSourceManager::connectSourceToTool " << std::endl;
+
+  ssc::ToolPtr probe = this->findSuitableProbe();
+  if (!probe)
+    return;
+
+//  std::cout << "!!!!! RTSourceManager::connectSourceToTool hit" << std::endl;
+
+//  if(mProbe)
+//  {
+//    disconnect(mProbe->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+//  }
+
+  mProbe = probe;
+
+  if (mProbe)
+  {
+//    connect(mProbe->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+
+    ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(mProbe->getProbe());
+    if (!probeInterface)
+    {
+      ssc::messageManager()->sendError("Probe not a cx instance.");
+    }
+    probeInterface->setRealTimeStreamSource(mRTSource);
+    std::cout << "RTSourceManager::connectSourceToTool() " << probeInterface->getRealTimeStreamSource()->getName() << " completed" << std::endl;
+  }
+}
+
+ssc::ToolPtr RTSourceManager::getStreamingProbe()
+{
+  return mProbe;
+}
+
+/**Find a probe that can be connected to a rt source.
+ *
+ */
+ssc::ToolPtr RTSourceManager::findSuitableProbe()
+{
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+//  std::cout << "!!!!! RTSourceManager::findSuitableProbe " << std::endl;
+
+  // look for visible probes
+  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+  {
+//    std::cout << iter->second->getProbe() << " " << iter->first << std::endl;
+//    if (iter->second->getProbe())
+//      std::cout << iter->second->getProbe()->isValid() << " " << iter->second->getVisible() << std::endl;
+
+    if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
+    {
+      return iter->second;
+//      return boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
+    }
+  }
+
+  // pick the first probe, visible or not.
   for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
   {
     if (iter->second->getProbe() && iter->second->getProbe()->isValid())
     {
-      if(mProbe)
-        disconnect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-      mProbe = boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
-      break;
+      return iter->second;
+//      return boost::shared_dynamic_cast<Probe>(iter->second->getProbe());
     }
   }
 
-  if (!mProbe)
-    return;
-
-  connect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-  this->probeChangedSlot();
-
-  mRTSource->setTimestampCalibration(mProbe->getConfiguration().mImageTimestampCalibration);
-  mProbe->setRealTimeStreamSource(mRTSource);
+  return ssc::ToolPtr();
 }
 
-void IGTLinkConnection::probeChangedSlot()
-{
-  mRTSource->setSoundSpeedCompensation(mSoundSpeedCompensationFactor);
-}
+//void RTSourceManager::probeChangedSlot()
+//{
+//  mRTSource->setSoundSpeedCompensation(mSoundSpeedCompensationFactor);
+//}
 
 
 }//end namespace cx
