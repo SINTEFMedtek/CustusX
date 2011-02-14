@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
@@ -18,6 +19,7 @@ typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 typedef boost::shared_ptr<class Probe> ProbePtr;
 typedef boost::shared_ptr<class RealTimeStreamSource> RealTimeStreamSourcePtr;
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
+typedef boost::weak_ptr<class Probe> ProbeWeakPtr;
 
 /**Probe interface. Available from Tool when Tool is a Probe.
  */

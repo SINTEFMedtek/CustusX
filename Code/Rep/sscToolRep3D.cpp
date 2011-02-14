@@ -38,6 +38,8 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 
+  mRTStream.reset(new RealTimeStreamGraphics());
+
   mTracer.reset(new ToolTracer());
 }
 
@@ -219,13 +221,18 @@ void ToolRep3D::probeSectorChanged()
     mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
 
-    if (!mRTStream)
-    {
-      mRTStream.reset(new RealTimeStreamGraphics());
-      connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(streamLoadedSlot()));
-      mRTStream->setTool(mTool);
-      this->streamLoadedSlot();
-    }
+//    std::cout << "!!!! ToolRep3D::probeSectorChanged()" << std::endl;
+//    if (!mRTStream)
+//    {
+//      mRTStream.reset(new RealTimeStreamGraphics());
+//      connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(streamLoadedSlot()));
+//      mRTStream->setTool(mTool);
+//      this->streamLoadedSlot();
+//      std::cout << "!!!! ToolRep3D::probeSectorChanged() set tool" << std::endl;
+//    }
+    mRTStream->setTool(mTool);
+    mRTStream->setRealtimeStream(mTool->getProbe()->getRealTimeStreamSource());
+//    std::cout << "!!!! ToolRep3D::probeSectorChanged() stream " << mTool->getUid() << " " << mTool->getProbe()->getRealTimeStreamSource().get() << std::endl;
   }
   else
   {
@@ -233,16 +240,16 @@ void ToolRep3D::probeSectorChanged()
   }
 }
 
-void ToolRep3D::streamLoadedSlot()
-{
-  if (ssc::dataManager()->getStreams().empty())
-    return;
-  if (!mRTStream)
-    return;
-
-  ssc::RealTimeStreamSourcePtr source = ssc::dataManager()->getStreams().begin()->second;
-  mRTStream->setRealtimeStream(source);
-}
+//void ToolRep3D::streamLoadedSlot()
+//{
+//  if (ssc::dataManager()->getStreams().empty())
+//    return;
+//  if (!mRTStream)
+//    return;
+//
+//  ssc::RealTimeStreamSourcePtr source = ssc::dataManager()->getStreams().begin()->second;
+//  mRTStream->setRealtimeStream(source);
+//}
 
 void ToolRep3D::updateOffsetGraphics()
 {

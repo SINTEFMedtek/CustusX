@@ -83,7 +83,6 @@ public:
 	double mDepthEnd; ///< end of sector, mm
 	double mWidth; ///< width of sector in radians (SECTOR) or millimeters (LINEAR).
   double mTemporalCalibration;
-  double mSoundSpeedCompensationFactor; ///< factor that modifies the sound of speed in the rt source. 1 means no change.
 	ProbeImageData mImage;
 };
 

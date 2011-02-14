@@ -85,6 +85,7 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
 
   mPlaneActor->SetTexture(mTexture);
   mPlaneActor->SetMapper(mDataSetMapper);
+  mPlaneActor->SetVisibility(false);
 }
 
 RealTimeStreamGraphics::~RealTimeStreamGraphics()
@@ -127,6 +128,11 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
   if (tool && tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
   {
     mTool = tool;
+//    std::cout << "!!!!!!!!!!!!!!1 set rt tool" << mTool->getName() << " " << mTool->getVisible() << std::endl;
+  }
+  else
+  {
+//    std::cout << "!!!!!!!!!!!!!! kill rt tool" << std::endl;
   }
 
   // setup new
@@ -198,7 +204,7 @@ void RealTimeStreamGraphics::probeSectorChanged()
     return;
 
   mProbeData.setData(mTool->getProbeSector());
-  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
+//  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
 
   if (mUseMask)
     mMaskFilter->SetMaskInput(mProbeData.getMask());
@@ -363,6 +369,7 @@ void RealTimeStreamGraphics::newDataSlot()
     visible = visible && mTool && mTool->getVisible();
   }
 
+//  std::cout << "visible " << mTool->getUid() << " " << mData->validData() << " " << mTool->getVisible() << " " << visible << std::endl;
   mPlaneActor->SetVisibility(visible);
   mPlaneActor->Modified();
 
