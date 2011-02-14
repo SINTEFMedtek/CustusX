@@ -128,11 +128,6 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
   if (tool && tool->getProbeSector().mType!=ssc::ProbeData::tNONE)
   {
     mTool = tool;
-//    std::cout << "!!!!!!!!!!!!!!1 set rt tool" << mTool->getName() << " " << mTool->getVisible() << std::endl;
-  }
-  else
-  {
-//    std::cout << "!!!!!!!!!!!!!! kill rt tool" << std::endl;
   }
 
   // setup new
@@ -141,24 +136,6 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
     connect(mTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(receiveTransforms(Transform3D, double)));
     connect(mTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveVisible(bool)));
     connect(mTool.get(), SIGNAL(toolProbeSector()), this, SLOT(probeSectorChanged()));
-
-//    receiveTransforms(mTool->get_prMt(), 0);
-//    mProbeData.setSector(mTool->getProbeSector());
-//    mUSSource->setProbeSector(mProbeData.getSector());
-//    std::cout << "setting tool in rt rep" << std::endl;
-//    mToolActor->SetVisibility(mTool->getVisible());
-
-//
-//    if (mUseMask)
-//    {
-//      // do nothing: keep the pipeline from PlaneSource
-//    }
-//    else
-//    {
-//      // now that we have a tool: use the ultraound source, updated by the probe
-//      mTransformTextureCoords->SetInput(mUSSource->GetOutput() );
-//    }
-
   }
   this->clipToSectorChanged();
   this->probeSectorChanged();
@@ -204,7 +181,6 @@ void RealTimeStreamGraphics::probeSectorChanged()
     return;
 
   mProbeData.setData(mTool->getProbeSector());
-//  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
 
   if (mUseMask)
     mMaskFilter->SetMaskInput(mProbeData.getMask());

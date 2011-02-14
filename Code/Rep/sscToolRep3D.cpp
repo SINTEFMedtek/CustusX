@@ -221,35 +221,14 @@ void ToolRep3D::probeSectorChanged()
     mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
 
-//    std::cout << "!!!! ToolRep3D::probeSectorChanged()" << std::endl;
-//    if (!mRTStream)
-//    {
-//      mRTStream.reset(new RealTimeStreamGraphics());
-//      connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(streamLoadedSlot()));
-//      mRTStream->setTool(mTool);
-//      this->streamLoadedSlot();
-//      std::cout << "!!!! ToolRep3D::probeSectorChanged() set tool" << std::endl;
-//    }
     mRTStream->setTool(mTool);
     mRTStream->setRealtimeStream(mTool->getProbe()->getRealTimeStreamSource());
-//    std::cout << "!!!! ToolRep3D::probeSectorChanged() stream " << mTool->getUid() << " " << mTool->getProbe()->getRealTimeStreamSource().get() << std::endl;
   }
   else
   {
     mProbeSectorActor->SetVisibility(false);
   }
 }
-
-//void ToolRep3D::streamLoadedSlot()
-//{
-//  if (ssc::dataManager()->getStreams().empty())
-//    return;
-//  if (!mRTStream)
-//    return;
-//
-//  ssc::RealTimeStreamSourcePtr source = ssc::dataManager()->getStreams().begin()->second;
-//  mRTStream->setRealtimeStream(source);
-//}
 
 void ToolRep3D::updateOffsetGraphics()
 {
