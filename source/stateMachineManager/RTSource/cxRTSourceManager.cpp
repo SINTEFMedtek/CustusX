@@ -33,7 +33,7 @@ RTSourceManager::RTSourceManager()
   connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
-  //ssc::dataManager()->loadStream(mRTSource);
+  ssc::dataManager()->loadStream(mRTSource);
   //connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
 

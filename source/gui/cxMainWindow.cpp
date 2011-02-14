@@ -310,6 +310,14 @@ void MainWindow::createActions()
   mTrackingToolsAction->setShortcut(tr("Ctrl+T"));
   mSaveToolsPositionsAction = new QAction(tr("Save positions"), this);
 
+  mManualToolPhysicalProperties = new QAction(tr("Debug manual tool"), mToolsActionGroup);
+  mManualToolPhysicalProperties->setToolTip("give manual tool the properties of the first physical tool");
+  mManualToolPhysicalProperties->setCheckable(true);
+  connect(mManualToolPhysicalProperties, SIGNAL(triggered()), this, SLOT(manualToolPhysicalPropertiesSlot()));
+  this->updateManualToolPhysicalProperties();
+
+//  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
+
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
   connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
@@ -353,6 +361,17 @@ void MainWindow::createActions()
 
   mInteractorStyleActionGroup = viewManager()->createInteractorStyleActionGroup();
 
+}
+
+
+void MainWindow::manualToolPhysicalPropertiesSlot()
+{
+  DataLocations::getSettings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalProperties->isChecked());
+}
+void MainWindow::updateManualToolPhysicalProperties()
+{
+  bool set = DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool();
+  mManualToolPhysicalProperties->setChecked(set);
 }
 
 void MainWindow::toggleStreamingSlot()
@@ -712,6 +731,9 @@ void MainWindow::createMenus()
   mToolMenu->addAction(mSaveToolsPositionsAction);
   mToolMenu->addSeparator();
   mToolMenu->addAction(mStartStreamingAction);
+  mToolMenu->addSeparator();
+  mToolMenu->addAction(mManualToolPhysicalProperties);
+
 
   //layout
   this->menuBar()->addMenu(mLayoutMenu);

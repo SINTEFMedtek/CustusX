@@ -87,7 +87,7 @@ void ViewWrapperRTStream::showSectorActionSlot(bool checked)
  */
 void ViewWrapperRTStream::configureSlot()
 {
-//  std::cout << "!!!!! ViewWrapperRTStream::configureSlot" << std::endl;
+  std::cout << "!!!!! ViewWrapperRTStream::configureSlot " << ssc::dataManager()->getStreams().empty() << " "<< mTool.get() << std::endl;
 
   // if datamanager stream: connect it to rep
   if (!ssc::dataManager()->getStreams().empty() && !mTool)
@@ -109,7 +109,7 @@ void ViewWrapperRTStream::probeChangedSlot()
 {
   if (!mTool)
     return;
-//  std::cout << "!!!!! ViewWrapperRTStream::probeChangedSlot" << std::endl;
+  std::cout << "!!!!! ViewWrapperRTStream::probeChangedSlot" << std::endl;
 
   // if probe has a stream, connect stream and probe to rep.
   this->setupRep(mTool->getProbe()->getRealTimeStreamSource(), mTool);
@@ -117,7 +117,7 @@ void ViewWrapperRTStream::probeChangedSlot()
 
 void ViewWrapperRTStream::setupRep(ssc::RealTimeStreamSourcePtr source, ssc::ToolPtr tool)
 {
-//  std::cout << "setup rt view rep" << std::endl;
+  std::cout << "setup rt view rep" << std::endl;
 
   if (mSource)
   {
