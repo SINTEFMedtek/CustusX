@@ -27,7 +27,6 @@ public:
 signals:
 
 protected slots:
-  void updateSlot();
   void setColorSlot();
   void setColorSlotDelayed();
   void visibilityChangedSlot(bool visible);
@@ -43,6 +42,7 @@ protected:
 private:
   ssc::MeshPtr mMesh;
   QComboBox* mMeshComboBox; ///< combobox for selecting mesh
+  QGroupBox* mMeshPropertiesGroupBox;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;

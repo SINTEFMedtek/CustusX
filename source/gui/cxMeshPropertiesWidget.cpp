@@ -16,40 +16,26 @@ namespace cx
 
 MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   QWidget(parent),
-  mMeshComboBox(new QComboBox(this))
+  mMeshComboBox(new QComboBox(this)),
+  mMeshPropertiesGroupBox(new QGroupBox(this))
 {
   this->setObjectName("MeshPropertiesWidget");
   this->setWindowTitle("Surface Properties");
 
-  // As MeshPropertiesWidget is no dockWidget yet it doesn't have the 
-  // visibilityChanged signal
-  //connect(this, SIGNAL(visibilityChanged(bool)),
-  //        this, SLOT(visibilityChangedSlot(bool)));
   this->visibilityChangedSlot(true);
   
   //combobox
   mMeshComboBox->setEditable(false);
   mMeshComboBox->setEnabled(false);
-  connect(mMeshComboBox, SIGNAL(currentIndexChanged(const QString&)),
-          this, SLOT(meshSelectedSlot(const QString&)));
+  connect(mMeshComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(meshSelectedSlot(const QString&)));
   
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-  //toptopLayout->setMargin(0);
 
-  //mImageNameLabel = new QLabel(this);
-  //toptopLayout->addWidget(mImageNameLabel);
   toptopLayout->addWidget(mMeshComboBox);
-  
-  QVBoxLayout* winlvlLayout = new QVBoxLayout;
-  toptopLayout->addLayout(winlvlLayout);
 
-  QGroupBox* group2D = new QGroupBox(this);
-  //group2D->setTitle("2D properties");
-  toptopLayout->addWidget(group2D);
-
-  QGridLayout* gridLayout = new QGridLayout(group2D);
-  //toptopLayout->addLayout(gridLayout);
+  toptopLayout->addWidget(mMeshPropertiesGroupBox);
+  QGridLayout* gridLayout = new QGridLayout(mMeshPropertiesGroupBox);
 
   QPushButton* chooseColor = new QPushButton("Choose color...", this);
   connect(chooseColor, SIGNAL(clicked()), this, SLOT(setColorSlot()));
@@ -83,8 +69,7 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
 
   toptopLayout->addStretch();
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(updateSlot()));
-  updateSlot();
+  this->meshSelectedSlot("...");
 }
 
 MeshPropertiesWidget::~MeshPropertiesWidget()
@@ -102,21 +87,11 @@ void MeshPropertiesWidget::importTransformSlot()
 {
   if(!mMesh)
     return;
-  //ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   ssc::ImagePtr image = ssc::dataManager()->getImage(mMesh->getParentFrame());
   if (!image)
     return;
   mMesh->get_rMd_History()->setRegistration(image->get_rMd());
   ssc::messageManager()->sendInfo("Assigned rMd from volume [" + image->getName() + "] to surface [" + mMesh->getName() + "]");
-}
-
-void MeshPropertiesWidget::updateSlot()
-{
-  //ssc::ImagePtr image = dataManager()->getActiveImage();
-  //if (image)
-  //{
-  //  mImageNameLabel->setText(qstring_cast(image->getName()));
-  //}
 }
 
 void MeshPropertiesWidget::showEvent(QShowEvent* event)
@@ -195,15 +170,15 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
 
 void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
 {
-  //messageMan()->sendInfo("New image selected: "+comboBoxText.toStdString());
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("...") 
      || comboBoxText.endsWith(">"))
   {
+    mMeshPropertiesGroupBox->setEnabled(false);
     // Create empty current mesh
     mMesh.reset();
-    //dataManager()->setActiveImage(mCurrentImage);
     return;
   }
+  mMeshPropertiesGroupBox->setEnabled(true);
   
   QString meshId = comboBoxText;
   
@@ -223,9 +198,6 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
   mParentFrameAdapter->setData(mMesh);
   mNameAdapter->setData(mMesh);
   mUidAdapter->setData(mMesh);
-
-  //dataManager()->setActiveImage(mCurrentImage);
-  
 }
   
 }//end namespace cx
