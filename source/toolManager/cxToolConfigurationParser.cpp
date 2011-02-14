@@ -116,6 +116,9 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       continue;
     }
 
+    if (i==0) // debug
+      internalStructure.mUseAsManualTool = true;
+
     QDomElement toolTypeElement = toolNode.firstChildElement(mToolTypeTag);
     QString toolTypeText = toolTypeElement.text();
     if (toolTypeText.contains("reference", Qt::CaseInsensitive))

@@ -28,36 +28,59 @@
 #include "cxView3D.h"
 #include "cxUsReconstructionFileMaker.h"
 #include "cxToolPropertiesWidget.h"
-#include "RTSource/cxOpenIGTLinkConnection.h"
+#include "RTSource/cxRTSourceManager.h"
 #include "cxDataLocations.h"
 #include "cxProbe.h"
 
 namespace cx
 {
 
+DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
+{
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChanged()));
+}
+
+void DoubleDataAdapterTimeCalibration::dominantToolChanged()
+{
+  // ignore tool changes to something non-probeish.
+  // This gives the user a chance to use the widget without having to show the probe.
+  ssc::ToolPtr newTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+  if (!newTool || newTool->getProbeSector().mType==ssc::ProbeData::tNONE)
+    return;
+
+  if (mTool)
+    disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+
+  mTool = boost::shared_dynamic_cast<Tool>(ssc::toolManager()->getDominantTool());
+
+  if (mTool)
+    connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SIGNAL(changed()));
+
+  emit changed();
+}
+
 ssc::DoubleDataAdapterPtr DoubleDataAdapterTimeCalibration::New()
 {
   return ssc::DoubleDataAdapterPtr(new DoubleDataAdapterTimeCalibration());
 }
 
-DoubleDataAdapterTimeCalibration::DoubleDataAdapterTimeCalibration()
-{
-  connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(connected(bool)), this, SIGNAL(changed()));
-}
-
 double DoubleDataAdapterTimeCalibration::getValue() const
 {
-  return stateManager()->getIGTLinkConnection()->getRTSource()->getTimestampCalibration();
+  if (!mTool)
+    return 0;
+  return mTool->getProbe()->getData().mTemporalCalibration;
 }
 
 QString DoubleDataAdapterTimeCalibration::getHelp() const
 {
-  return "Set a time shift to add to input RT source frames. Will NOT be saved.";
+  return "Set a temporal shift to add to input probe frames. Will NOT be saved.";
 }
 
 bool DoubleDataAdapterTimeCalibration::setValue(double val)
 {
-  stateManager()->getIGTLinkConnection()->getRTSource()->setTimestampCalibration(val);
+  if (!mTool)
+    return 0;
+  mTool->getProbe()->setTemporalCalibration(val);
   return true;
 }
 

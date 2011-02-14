@@ -16,7 +16,7 @@ namespace ssc
 
 namespace cx
 {
-typedef boost::shared_ptr<class IGTLinkConnection> IGTLinkConnectionPtr;
+typedef boost::shared_ptr<class RTSourceManager> IGTLinkConnectionPtr;
 
 struct Desktop
 {

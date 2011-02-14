@@ -29,6 +29,7 @@
 #include "sscSliceComputer.h"
 #include "sscGeometricRep2D.h"
 #include "sscRTStreamRep.h"
+#include "cxStateMachineManager.h"
 
 namespace cx
 {
@@ -44,11 +45,12 @@ ViewWrapperRTStream::ViewWrapperRTStream(ssc::View* view)
   double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
   mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth/2.0, clipDepth/2.0);
 
-  connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(streamLoadedSlot()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(streamLoaded()), this, SLOT(configureSlot()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(configureSlot()));
 
   addReps();
-  this->dominantToolChangedSlot();
+
+  this->configureSlot();
 }
 
 ViewWrapperRTStream::~ViewWrapperRTStream()
@@ -66,7 +68,8 @@ void ViewWrapperRTStream::appendToContextMenu(QMenu& contextMenu)
 {
   QAction* showSectorAction = new QAction("Show Sector", &contextMenu);
   showSectorAction->setCheckable(true);
-  showSectorAction->setChecked(mStreamRep->getShowSector());
+  if (mStreamRep)
+    showSectorAction->setChecked(mStreamRep->getShowSector());
   connect(showSectorAction, SIGNAL(triggered(bool)), this, SLOT(showSectorActionSlot(bool)));
 
   contextMenu.addSeparator();
@@ -79,35 +82,176 @@ void ViewWrapperRTStream::showSectorActionSlot(bool checked)
   DataLocations::getSettings()->setValue("showSectorInRTView", checked);
 }
 
-void ViewWrapperRTStream::streamLoadedSlot()
+/** Setup connections to stream. Called when a stream is loaded into the datamanager, or if a probe is initialized
+ *
+ */
+void ViewWrapperRTStream::configureSlot()
 {
-//  std::cout << "attempt add stream to rt view" << std::endl;
-  if (ssc::dataManager()->getStreams().empty())
-    return;
+//  std::cout << "!!!!! ViewWrapperRTStream::configureSlot" << std::endl;
 
-  mSource = ssc::dataManager()->getStreams().begin()->second;
-  connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+  // if datamanager stream: connect it to rep
+  if (!ssc::dataManager()->getStreams().empty() && !mTool)
+  {
+    this->setupRep(ssc::dataManager()->getStreams().begin()->second, ssc::ToolPtr());
+  }
+
+  // if probe tool exist, connect to probeChanged()
+  if (mTool)
+    disconnect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+  mTool = this->getProbe();
+  if (mTool)
+    connect(mTool->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+
+  this->probeChangedSlot();
+}
+
+void ViewWrapperRTStream::probeChangedSlot()
+{
+  if (!mTool)
+    return;
+//  std::cout << "!!!!! ViewWrapperRTStream::probeChangedSlot" << std::endl;
+
+  // if probe has a stream, connect stream and probe to rep.
+  this->setupRep(mTool->getProbe()->getRealTimeStreamSource(), mTool);
+}
+
+void ViewWrapperRTStream::setupRep(ssc::RealTimeStreamSourcePtr source, ssc::ToolPtr tool)
+{
+//  std::cout << "setup rt view rep" << std::endl;
+
+  if (mSource)
+  {
+    disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+  }
+  mSource = source;
+  if (mSource)
+  {
+    connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+  }
+
+//  std::cout << "ViewWrapperRTStream::mSource " << mSource << std::endl;
+  if (!mSource)
+    return;
+//  connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
 
   mStreamRep.reset(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
   mStreamRep->setRealtimeStream(mSource);
-//  rtRep->setTool(ssc::toolManager()->getDominantTool());
+  mStreamRep->setTool(tool);
   mView->addRep(mStreamRep);
   mDataNameText->setText(0, "initialized");
-
   mStreamRep->setShowSector(DataLocations::getSettings()->value("showSectorInRTView").toBool());
 
-//  std::cout << "added stream to rt view" << std::endl;
+  ssc::messageManager()->sendInfo("Setup rt rep with source="+source->getName()+" and tool="+(tool?tool->getName():"none"));
+//  std::cout << "completed rt view setup" << std::endl;
+
 }
 
-void ViewWrapperRTStream::dominantToolChangedSlot()
+//void ViewWrapperRTStream::streamLoadedSlot()
+//{
+//  this->loadStream();
+//
+////  ssc::ToolPtr probe;
+////  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+////  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+////  {
+////    if (iter->second->getProbe() && iter->second->getProbe()->isValid())
+////    {
+////      probe = iter->second;;
+////      break;
+////    }
+////  }
+////
+////  if (!probe)
+////    return;
+////
+////  std::cout << "ViewWrapperRTStream::streamLoadedSlot() " << probe->getName() << std::endl;
+////
+////  this->loadStream(probe);
+////
+//////  std::cout << "attempt add stream to rt view" << std::endl;
+////  if (ssc::dataManager()->getStreams().empty())
+////    return;
+////
+////  mSource = ssc::dataManager()->getStreams().begin()->second;
+////  connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+////
+////  mStreamRep.reset(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
+////  mStreamRep->setRealtimeStream(mSource);
+//////  rtRep->setTool(ssc::toolManager()->getDominantTool());
+////  mView->addRep(mStreamRep);
+////  mDataNameText->setText(0, "initialized");
+////
+////  mStreamRep->setShowSector(DataLocations::getSettings()->value("showSectorInRTView").toBool());
+////
+//////  std::cout << "added stream to rt view" << std::endl;
+//}
+
+//void ViewWrapperRTStream::loadStream()
+//{
+//  std::cout << "attempt add stream to rt view" << std::endl;
+//
+//  if (ssc::dataManager()->getStreams().empty())
+//    return;
+//
+//  if (mSource)
+//  {
+//    disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+//    disconnect(mSource.get(), SIGNAL(connected()), this, SLOT(connectSlot()));
+//  }
+//  mSource = ssc::dataManager()->getStreams().begin()->second;
+//  if (mSource)
+//  {
+//    connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+//    connect(mSource.get(), SIGNAL(connected()), this, SLOT(connectSlot()));
+//  }
+//
+////  mSource = stateManager()->getIGTLinkConnection()->getRTSource();
+//
+//  std::cout << "ViewWrapperRTStream::mSource " << mSource << std::endl;
+//  if (!mSource)
+//    return;
+////  connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(updateSlot()));
+//
+//  mStreamRep.reset(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
+//  mStreamRep->setRealtimeStream(mSource);
+////  mStreamRep->setTool(stateManager()->getIGTLinkConnection()->getStreamingProbe());
+////  rtRep->setTool(ssc::toolManager()->getDominantTool());
+//  mView->addRep(mStreamRep);
+//  mDataNameText->setText(0, "initialized");
+//
+//  mStreamRep->setShowSector(DataLocations::getSettings()->value("showSectorInRTView").toBool());
+//
+//  std::cout << "added stream to rt view" << std::endl;
+//}
+
+//void ViewWrapperRTStream::connectSlot()
+//{
+//  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+//
+//  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+//  {
+//    if (!iter->second->getProbe() || !iter->second->getProbe()->isValid())
+//      continue;
+//    mStreamRep->setTool(iter->second);
+//  }
+//
+//}
+
+ssc::ToolPtr ViewWrapperRTStream::getProbe()
 {
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
+  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 
-  // ignore non-probe tools
-  if (!tool || tool->getProbeSector().mType==ssc::ProbeData::tNONE)
-    return;
+  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+  {
+//    std::cout << "!!!!! ViewWrapperRTStream::getProbe checking " << iter->first << std::endl;
+    if (!iter->second->getProbe() || !iter->second->getProbe()->isValid())
+      continue;
+//    std::cout << "!!!!! ViewWrapperRTStream::getProbe " << iter->first << std::endl;
 
-  mStreamRep->setTool(tool);
+    return iter->second;
+  }
+
+  return ssc::ToolPtr();
 }
 
 void ViewWrapperRTStream::updateSlot()
@@ -128,16 +272,7 @@ void ViewWrapperRTStream::addReps()
   mDataNameText = ssc::DisplayTextRep::New("dataNameText_"+mView->getName(), "");
   mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
   mView->addRep(mDataNameText);
-
-  this->streamLoadedSlot();
 }
-
-
-//void ViewWrapperRTStream::showSlot()
-//{
-////  dominantToolChangedSlot();
-////  viewportChanged();
-//}
 
 
 

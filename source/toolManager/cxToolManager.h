@@ -10,6 +10,7 @@
 #include "cxTracker.h"
 #include "sscDummyTool.h"
 #include "vtkForwardDeclarations.h"
+#include "cxManualToolAdapter.h"
 
 class QDomNode;
 class QDomDocument;
@@ -102,7 +103,7 @@ protected:
   typedef ssc::ToolManager::ToolMap::iterator ToolMapIter;
 
   ToolManager(); ///< use getInstance instead
-  ~ToolManager(); ///< destructor
+  virtual ~ToolManager(); ///< destructor
 
   void addInitializedTool(QString uid); ///< moves a tool from configuredTools to initializedTools
   void initializeManualTool();
@@ -117,7 +118,7 @@ protected:
   ssc::ToolManager::ToolMapPtr mInitializedTools; ///< all initialized tools
   ssc::ToolPtr mDominantTool; ///< the tool with highest priority
   ssc::ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
-  ssc::ManualToolPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
+  ManualToolAdapterPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
 
   ssc::RegistrationHistoryPtr m_rMpr_History; ///< transform from the patient reference to the reference, along with historical data.
 

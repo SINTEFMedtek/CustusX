@@ -251,7 +251,7 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
 
   mActiveTool = ssc::toolManager()->getDominantTool();
 
-  if(mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
+  if(mActiveTool && mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
   {
 //    if (cxTool)
 //      std::cout << "config: " << cxTool->getProbeSectorConfigurationString() << std::endl;
