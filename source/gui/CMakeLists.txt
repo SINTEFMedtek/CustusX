@@ -46,6 +46,8 @@ SET(cxProject_MOC_HDRS
   cxPlateRegistrationWidget.h
   cxRecordSessionWidget.h
   cxRecordBaseWidget.h
+  cxTrackedCenterlineWidget.h
+  cxUSAcqusitionWidget.h
   cxSoundSpeedConversionWidget.h
 )
 
@@ -151,6 +153,10 @@ SET(${LIBNAME}_SRCS
     cxRecordSessionWidget.cpp
     cxRecordBaseWidget.h
     cxRecordBaseWidget.cpp
+    cxTrackedCenterlineWidget.h
+    cxTrackedCenterlineWidget.cpp
+    cxUSAcqusitionWidget.h
+    cxUSAcqusitionWidget.cpp
     cxSoundSpeedConversionWidget.h
     cxSoundSpeedConversionWidget.cpp
     ${cxProject_RCC_SRCS} )
