@@ -121,7 +121,7 @@ void Tracker::open()
   for(int i=0; i<5; ++i)
   {
     result = mCommunication->OpenCommunication();
-    std::cout << "Trying to open tracker communication: "<< string_cast(result) << std::endl;
+    //std::cout << "Trying to open tracker communication: "<< string_cast(result) << std::endl;
     if(result == igstk::SerialCommunication::SUCCESS)
       break;
   }
