@@ -52,9 +52,9 @@ public:
   virtual bool isStreaming() const = 0; ///< return true when the source is streaming data.
 
 signals:
-  void streaming(bool on); // emitted when streaming started/stopped
-  void connected(bool on); // emitted when source is connected/disconnected
-  void newFrame();          // emitted when a new frame has arrived (getVtkImageData() returns something new). info/status/name/valid might also have changed
+  void streaming(bool on); ///< emitted when streaming started/stopped
+  void connected(bool on); ///< emitted when source is connected/disconnected
+  void newFrame();          ///< emitted when a new frame has arrived (getVtkImageData() returns something new). info/status/name/valid might also have changed
 };
 typedef boost::shared_ptr<RTSource> RTSourcePtr;
 

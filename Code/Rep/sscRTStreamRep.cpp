@@ -240,7 +240,7 @@ void RealTimeStreamGraphics::setRealtimeStream(RTSourcePtr data)
 {
   if (mData)
   {
-    disconnect(mData.get(), SIGNAL(changed()), this, SLOT(newDataSlot()));
+    disconnect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
     mTexture->SetInput(NULL);
   }
 
@@ -253,7 +253,6 @@ void RealTimeStreamGraphics::setRealtimeStream(RTSourcePtr data)
     mDataRedirecter->SetInput(mData->getVtkImageData());
 //    mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
 //    mDataRedirecter->GetOutput();
-
 
     if (!mUseMask) // send data directly to texture, no mask.
     {
