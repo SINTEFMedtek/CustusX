@@ -383,7 +383,7 @@ void USAcqusitionWidget::fileMakerWriteFinished()
   stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
 //  std::cout << "selected data" << std::endl;
 
-  mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
+  mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource)); // reclaim memory
 
   if (DataLocations::getSettings()->value("Automation/autoReconstruct").toBool())
   {
