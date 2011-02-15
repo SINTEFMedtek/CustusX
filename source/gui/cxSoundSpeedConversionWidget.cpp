@@ -31,11 +31,11 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
   connect(mSoundSpeedSpinBox, SIGNAL(valueChanged(double)), this, SLOT(waterSoundSpeedChangedSlot()));
 
   QHBoxLayout* speedLayout = new QHBoxLayout();
-  speedLayout->addWidget(new QLabel("Sound speed: "));
+  speedLayout->addWidget(new QLabel("Water sound speed: "));
   speedLayout->addWidget(mSoundSpeedSpinBox);
   speedLayout->addWidget(new QLabel("m/s, or "));
   speedLayout->addWidget(mWaterDegreeSpinBox);
-  speedLayout->addWidget(new QLabel("C"+QString::fromUtf8("\302\260")+" water temperature")); //\302\260 is the degree sign
+  speedLayout->addWidget(new QLabel("C"+QString::fromUtf8("\302\260")+"")); //\302\260 is the degree sign
 
   QHBoxLayout* buttonLayout = new QHBoxLayout();
   buttonLayout->addWidget(mApplyButton);

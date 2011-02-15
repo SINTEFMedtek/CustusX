@@ -8,9 +8,6 @@
 #include "sscReconstructer.h"
 #include "cxUsReconstructionFileMaker.h"
 
- #include <QFuture>
- #include <QFutureWatcher>
-
 class QLabel;
 class QVBoxLayout;
 class QDoubleSpinBox;
@@ -39,7 +36,6 @@ private slots:
 
 private:
   ssc::ToolPtr mTool;
-
 };
 
 class RecordSessionWidget;
@@ -111,70 +107,5 @@ private:
   ToolPtr mTool;
 };
 
-/**
- * TrackedCenterlineWidget
- *
- * \brief
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class TrackedCenterlineWidget : public TrackedRecordWidget
-{
-  Q_OBJECT
-public:
-  TrackedCenterlineWidget(QWidget* parent);
-  virtual ~TrackedCenterlineWidget();
-
-protected slots:
-  void checkIfReadySlot();
-  void postProcessingSlot(QString sessionId);
-  void startedSlot();
-  void stoppedSlot();
-
-private:
-  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
-  ToolPtr findTool(double startTime, double stopTime);
-};
-
-/**
- * USAcqusitionWidget
- *
- * \brief
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
- */
-class USAcqusitionWidget : public TrackedRecordWidget
-{
-  Q_OBJECT
-public:
-  USAcqusitionWidget(QWidget* parent);
-  virtual ~USAcqusitionWidget();
-
-protected slots:
-  void checkIfReadySlot();
-  void postProcessingSlot(QString sessionId);
-  void startedSlot();
-  void stoppedSlot();
-
-private slots:
-  void probeChangedSlot();
-  void reconstructFinishedSlot();
-  void fileMakerWriteFinished();
-  void dominantToolChangedSlot();
-
-private:
-  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
-
-  SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
-  ssc::RTSourcePtr mRTSource;
-  ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
-  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
-
-  QFuture<QString> mFileMakerFuture;
-  QFutureWatcher<QString> mFileMakerFutureWatcher;
-  UsReconstructionFileMakerPtr mFileMaker;
-};
 }//namespace cx
 #endif /* CXRECORDBASEWIDGET_H_ */
