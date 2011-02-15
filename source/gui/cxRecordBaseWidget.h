@@ -38,7 +38,7 @@ private slots:
   void dominantToolChanged();
 
 private:
-  ToolPtr mTool;
+  ssc::ToolPtr mTool;
 
 };
 
