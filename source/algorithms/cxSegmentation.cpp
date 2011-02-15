@@ -221,7 +221,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
 
 
   QString uid = ssc::changeExtension(image->getUid(), "") + "_seg%1";
-  QString name = image->getName()+" segmented %1";
+  QString name = image->getName()+" seg%1";
   //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
   ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
   ssc::messageManager()->sendInfo("created segment " + result->getName());
@@ -257,8 +257,8 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   vtkImageDataPtr rawResult = vtkImageDataPtr::New();
   rawResult->DeepCopy(itkToVtkFilter->GetOutput());
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_center%1";
-  QString name = image->getName()+" centerline %1";
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_cl%1";
+  QString name = image->getName()+" cl%1";
   //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
   ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
   ssc::messageManager()->sendInfo("created centerline " + result->getName());
