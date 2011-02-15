@@ -167,7 +167,7 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
     if (!ssc::similar(mSoundSpeedCompensationFactor, 1.0))
     {
       config.mPixelHeight *=mSoundSpeedCompensationFactor;
-      ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed compensation factor.");
+      //ssc::messageManager()->sendDebug("Modifying configuration for a linear probe with the sound speed compensation factor.");
     }
   }
 

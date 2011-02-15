@@ -135,7 +135,7 @@ MainWindow::MainWindow() :
 
   // Don't show the Widget before all elements are initialized
   this->show();
-  std::cout << "end construct main win" << std::endl;
+  //std::cout << "end construct main win" << std::endl;
 
   this->startupLoadPatient();
 }
