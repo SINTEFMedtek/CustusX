@@ -153,6 +153,71 @@ void PatientData::savePatient()
   //TODO Implement when we know what we want to save here...
 }
 
+bool PatientData::copyFile(QString source, QString dest)
+{
+  if (source==dest)
+    return true;
+
+  QFileInfo info(dest);
+
+  if (info.exists())
+  {
+    ssc::messageManager()->sendWarning("File already exists: "+dest+", copy skipped.");
+    return true;
+  }
+
+  QDir().mkpath(info.path());
+
+  QFile toFile(dest);
+  if(QFile(source).copy(toFile.fileName()))
+  {
+    //messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
+  }
+//  else
+//  {
+//    ssc::messageManager()->sendError("First copy failed!");
+//    return false;
+//  }
+  if(!toFile.flush())
+  {
+    ssc::messageManager()->sendWarning("Failed to copy file: "+source);
+    return false;
+  }
+  if(!toFile.exists())
+  {
+    ssc::messageManager()->sendWarning("File not copied: " + source);
+    return false;
+  }
+
+  ssc::messageManager()->sendInfo("Copied " + source + " -> " + dest);
+
+
+  return true;
+}
+
+/**Copy filename and all files with the same name (and different extension)
+ * to destFolder.
+ *
+ */
+bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder)
+{
+  QDir sourceFolder(QFileInfo(fileName).path());
+  QStringList filter;
+  filter << QFileInfo(fileName).completeBaseName() + ".*";
+  QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
+//  std::cout << "found files: " << sourceFiles.join(" ") << std::endl;;
+
+  for (int i=0; i<sourceFiles.size(); ++i)
+  {
+    QString sourceFile = sourceFolder.path() + "/" + sourceFiles[i];
+    QString destFile = destFolder + "/" + QFileInfo(sourceFiles[i]).fileName();
+    this->copyFile(sourceFile, destFile);
+  }
+
+  return true;
+}
+
+
 ssc::DataPtr PatientData::importData(QString fileName)
 {
   //ssc::messageManager()->sendDebug("PatientData::importData() called");
@@ -169,19 +234,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
   }
   
   QString patientsImageFolder = mActivePatientFolder+"/Images/";
-  QString patientsSurfaceFolder = mActivePatientFolder+"/Surfaces/";
-
-  QDir dir;
-  if(!dir.exists(patientsImageFolder))
-  {
-    dir.mkpath(patientsImageFolder);
-    ssc::messageManager()->sendInfo("Made new directory: "+patientsImageFolder);
-  }
-  if(!dir.exists(patientsSurfaceFolder))
-  {
-    dir.mkpath(patientsSurfaceFolder);
-    ssc::messageManager()->sendInfo("Made new directory: "+patientsSurfaceFolder);
-  }
+//  QString patientsSurfaceFolder = mActivePatientFolder+"/Surfaces/";
 
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
@@ -189,9 +242,12 @@ ssc::DataPtr PatientData::importData(QString fileName)
   QFile fromFile(fileName);
   QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
   QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
-  //std::cout << "import: " << strippedFilename << std::endl;
 
-  //Need to wait for the copy to finish...
+  if (ssc::dataManager()->getData(uid))
+  {
+    ssc::messageManager()->sendWarning("Data with uid "+ uid + " already exists. Impoirt cancelled.");
+    return ssc::DataPtr();
+  }
 
   // Read files before copy
   ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
@@ -199,80 +255,11 @@ ssc::DataPtr PatientData::importData(QString fileName)
   data->setShading(true);
 
   QDir patientDataDir(mActivePatientFolder);
-//  FileCopied *fileCopied = new FileCopied(pathToNewFile,
-//                                          patientDataDir.relativeFilePath(pathToNewFile),
-//                                          data);
-//  connect(fileCopied, SIGNAL(fileCopiedCorrectly()),
-//          this, SLOT(savePatient()));
-//  QTimer::singleShot(5000, fileCopied, SLOT(areFileCopiedSlot()));// Wait 5 seconds
 
   data->setFilePath(patientDataDir.relativeFilePath(pathToNewFile)); // Update file path
 
-
-  //Copy file
-  if(fileName != pathToNewFile) //checks if we need to copy
-  {
-    QFile toFile(pathToNewFile);
-    if(fromFile.copy(toFile.fileName()))
-    {
-      //messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
-    }
-    else
-    {
-      ssc::messageManager()->sendError("First copy failed!");
-      return ssc::DataPtr();
-    }
-    if(!toFile.flush())
-      ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName());
-    if(!toFile.exists())
-      ssc::messageManager()->sendWarning("File not copied");
-
-    //make sure we also copy the .raw file in case if mhd/mha
-    if(fileType.compare("mhd", Qt::CaseInsensitive) == 0)
-    {
-      //presuming the other file is a raw file
-      //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".mhd", ".raw");
-      QString newRawFile = pathToNewFile.replace(".mhd", ".raw");
-      fromFile.setFileName(originalRawFile);
-      toFile.setFileName(newRawFile);
-
-      if(fromFile.copy(toFile.fileName()))
-      {
-        //messageMan()->sendInfo("File copied to new location: "+newRawFile.toStdString());
-      }
-      else
-      {
-        ssc::messageManager()->sendError("Second copy failed!");
-        return ssc::DataPtr();
-      }
-      if(!toFile.flush())
-        ssc::messageManager()->sendWarning("Failed to copy file"+toFile.fileName());
-      if(!toFile.exists())
-        ssc::messageManager()->sendWarning("File not copied");
-
-    }
-    else if(fileType.compare("mha", Qt::CaseInsensitive) == 0)
-    {
-      //presuming the other file is a raw file
-      //TODO: what if it's not?
-      QString originalRawFile = fileName.replace(".mha", ".raw");
-      QString newRawFile = pathToNewFile.replace(".mha", ".raw");
-      fromFile.setFileName(originalRawFile);
-      toFile.setFileName(newRawFile);
-
-      if(fromFile.copy(toFile.fileName()))
-      {
-        //messageMan()->sendInfo("File copied to new location: "+newRawFile.toStdString());
-      }
-      else
-      {
-        ssc::messageManager()->sendError("Second copy failed!");
-        return ssc::DataPtr();
-      }
-    }
-  }
-  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
+  this->copyAllSimilarFiles(fileName, patientsImageFolder);
+//  ssc::messageManager()->sendDebug("Data is now copied into the patient folder!");
 
   this->savePatient();
 
@@ -365,7 +352,7 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
   registrationManager()->addXml(managerNode);
   stateManager()->addXml(managerNode);
 
-  ssc::messageManager()->sendInfo("Xml file ready to be written to disk.");
+  //ssc::messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
 void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 {
