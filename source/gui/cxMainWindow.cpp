@@ -46,6 +46,8 @@
 #include "cxControlPanel.h"
 #include "cxIGTLinkWidget.h"
 #include "cxRecordBaseWidget.h"
+#include "cxTrackedCenterlineWidget.h"
+#include "cxUSAcqusitionWidget.h"
 #include "RTSource/cxRTSourceManager.h"
 
 namespace cx

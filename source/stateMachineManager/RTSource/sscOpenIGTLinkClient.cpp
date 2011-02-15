@@ -173,7 +173,7 @@ void IGTLinkClient::hostFoundSlot()
 }
 void IGTLinkClient::connectedSlot()
 {
-  ssc::messageManager()->sendInfo("Connected to host "+this->hostDescription());
+  ssc::messageManager()->sendSuccess("Connected to host "+this->hostDescription());
   emit connected(true);
 }
 void IGTLinkClient::disconnectedSlot()
