@@ -138,7 +138,7 @@ void ViewWrapperRTStream::setupRep(ssc::RTSourcePtr source, ssc::ToolPtr tool)
   mDataNameText->setText(0, "initialized");
   mStreamRep->setShowSector(DataLocations::getSettings()->value("showSectorInRTView").toBool());
 
-  ssc::messageManager()->sendInfo("Setup rt rep with source="+source->getName()+" and tool="+(tool?tool->getName():"none"));
+  //ssc::messageManager()->sendInfo("Setup rt rep with source="+source->getName()+" and tool="+(tool?tool->getName():"none"));
 }
 
 

@@ -572,7 +572,7 @@ void MainWindow::importDataSlot()
 {
   this->savePatientFileSlot();
 
-  ssc::messageManager()->sendInfo("Importing data...");
+  //ssc::messageManager()->sendInfo("Importing data...");
   QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")), mSettings->value(
       "globalPatientDataFolder").toString(), tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
   if (fileName.isEmpty())
