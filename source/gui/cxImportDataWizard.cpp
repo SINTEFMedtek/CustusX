@@ -89,11 +89,11 @@ ImportDataWizard::ImportDataWizard(QString filename, QWidget* parent) :
 
   QHBoxLayout* buttons = new QHBoxLayout;
   layout->addLayout(buttons);
-  QPushButton* okButton = new QPushButton("OK", this);
+  mOkButton = new QPushButton("OK", this);
   buttons->addStretch();
-  buttons->addWidget(okButton);
-  connect(okButton, SIGNAL(clicked()), this, SLOT(accept()));
-  okButton->setDefault(true);
+  buttons->addWidget(mOkButton);
+  connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
+  mOkButton->setDefault(true);
 
   ssc::messageManager()->sendInfo("Importing data...");
 }
@@ -114,7 +114,12 @@ void ImportDataWizard::importDataSlot()
   mData = stateManager()->getPatientData()->importData(mFilename);
 
   if (!mData)
+  {
+    mUidLabel->setText(mFilename);
+    mNameLabel->setText("Import failed");
+    mOkButton->setText("Exit");
     return;
+  }
 
   mUidLabel->setText("Data uid:  " + qstring_cast(mData->getUid()));
   mNameLabel->setText("Data name: " + qstring_cast(mData->getName()));
