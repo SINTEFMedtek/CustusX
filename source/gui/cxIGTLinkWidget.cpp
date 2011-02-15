@@ -104,7 +104,7 @@ ssc::OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
 
 IGTLinkConnectionPtr IGTLinkWidget::getConnection()
 {
-  return stateManager()->getIGTLinkConnection();
+  return stateManager()->getRTSourceManager();
 }
 
 IGTLinkWidget::~IGTLinkWidget()

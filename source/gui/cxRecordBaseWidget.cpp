@@ -340,13 +340,13 @@ void USAcqusitionWidget::rtSourceChangedSlot()
   }
 
 //  mRTSource = mRTSourceDataAdapter->getRTSource();
-  mRTSource = stateManager()->getIGTLinkConnection()->getRTSource();
+  mRTSource = stateManager()->getRTSourceManager()->getRTSource();
 
   if(mRTSource)
   {
     //ssc::messageManager()->sendDebug("New real time source is "+mRTSource->getName());
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-    mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+    mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
   }
   this->checkIfReadySlot();
 }
@@ -357,7 +357,7 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 
   //get session data
   RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
-  ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
+  ssc::RTSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
   ssc::TimedTransformMap trackerRecordedData = TrackedRecordWidget::getRecording(session);
   if(trackerRecordedData.empty())
   {
@@ -383,7 +383,7 @@ void USAcqusitionWidget::fileMakerWriteFinished()
   stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
 //  std::cout << "selected data" << std::endl;
 
-  mRTRecorder.reset(new ssc::RealTimeStreamSourceRecorder(mRTSource));
+  mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
 
   if (DataLocations::getSettings()->value("Automation/autoReconstruct").toBool())
   {

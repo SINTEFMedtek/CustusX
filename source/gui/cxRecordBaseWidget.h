@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "sscTool.h"
 #include "cxDataInterface.h"
-#include "sscRealTimeStreamSourceRecorder.h"
+#include "sscRTSourceRecorder.h"
 #include "sscReconstructer.h"
 #include "cxUsReconstructionFileMaker.h"
 
@@ -156,7 +156,7 @@ private slots:
 
 private:
   SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
-  ssc::RealTimeStreamSourcePtr mRTSource;
+  ssc::RTSourcePtr mRTSource;
   ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
   ssc::ThreadedReconstructerPtr mThreadedReconstructer;
 

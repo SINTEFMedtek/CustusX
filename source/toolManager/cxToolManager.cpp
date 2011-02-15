@@ -790,14 +790,5 @@ ssc::ManualToolPtr ToolManager::getManualTool()
 {
   return mManualTool;
 }
-//
-//void ToolManager::setUSProbeSector(ssc::ProbeSector probeSector)
-//{
-//  ToolPtr tool = boost::shared_dynamic_cast<Tool>(mDominantTool);
-//  if (tool)
-//  {
-//    tool->setUSProbeSector(probeSector);
-//  }
-//}
 
 }//namespace cx

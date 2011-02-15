@@ -7,7 +7,7 @@
 #ifndef SSCOPENIGTLINKRTSOURCE_H_
 #define SSCOPENIGTLINKRTSOURCE_H_
 
-#include "sscRealTimeStreamSource.h"
+#include "sscRTSource.h"
 #include <boost/array.hpp>
 #include "igtlImageMessage.h"
 #include <vector>
@@ -23,7 +23,7 @@ typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 /**Synchronize data with source,
  * provide data as a vtkImageData.
  */
-class OpenIGTLinkRTSource : public RealTimeStreamSource
+class OpenIGTLinkRTSource : public RTSource
 {
   Q_OBJECT
 public:
