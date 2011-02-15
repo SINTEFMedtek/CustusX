@@ -39,7 +39,7 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
   }
 
   probeSector.mImage = imageData;
-
+  probeSector.mTemporalCalibration = config.mTemporalCalibration;
 
 //  std::cout << "DepthStart" << probeSector.mDepthStart << std::endl;
 //  std::cout << "DepthEnd" << probeSector.mDepthEnd << std::endl;

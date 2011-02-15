@@ -20,6 +20,7 @@
 #include "sscMessageManager.h"
 #include "cxProbe.h"
 #include "probeXmlConfigParser.h"
+#include "sscToolManager.h"
 
 namespace cx
 {
@@ -270,6 +271,7 @@ void RTSourceManager::connectSourceToTool()
       ssc::messageManager()->sendError("Probe not a cx instance.");
     }
     probeInterface->setRTSource(mRTSource);
+    ssc::toolManager()->setDominantTool(mProbe->getUid());
 //    std::cout << "RTSourceManager::connectSourceToTool() " << probeInterface->getRealTimeStreamSource()->getName() << " completed" << std::endl;
   }
 }

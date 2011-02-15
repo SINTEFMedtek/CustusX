@@ -156,6 +156,7 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
     retval.mTemporalCalibration = element.text().toDouble(&ok);
     if (!ok)
       retval.mTemporalCalibration = 0;
+//    std::cout << "retval.mTemporalCalibration" << retval.mTemporalCalibration << std::endl;
   }
 
   try

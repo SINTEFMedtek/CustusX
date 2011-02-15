@@ -50,6 +50,7 @@ bool Probe::isValid() const
 
 void Probe::setTemporalCalibration(double val)
 {
+//  std::cout << "Probe::setTemporalCalibration " << val << std::endl;
   mOverrideTemporalCalibration = true;
   mTemporalCalibration = val;
   this->setConfigId(mConfigurationId);
@@ -139,6 +140,7 @@ void Probe::setConfigId(QString uid)
     return;
 
   ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
+//  std::cout << "probeSector.mTemporalCalibration" << probeSector.mTemporalCalibration << std::endl;
   mConfigurationId = uid;
   mData = probeSector;
   emit sectorChanged();
@@ -159,7 +161,10 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
   if(rtSourceList.isEmpty())
     return config;
 
+
   config = mXml->getConfiguration(mScannerUid, mInstrumentUid, rtSourceList.at(0), uid);
+//  std::cout << "uids " << mScannerUid << " " << mInstrumentUid << " " << rtSourceList.at(0) << " " << uid << std::endl;
+//  std::cout << "config.mTemporalCalibration " << config.mTemporalCalibration << std::endl;
 
   //compensating for different speed of sound in what is scanned by the probe and what is assumed by the scanner
   if(config.mWidthDeg ==  0) //linear probe
@@ -173,6 +178,7 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
 
   if (mOverrideTemporalCalibration)
     config.mTemporalCalibration = mTemporalCalibration;
+//  std::cout << "config.mTemporalCalibration " << config.mTemporalCalibration << std::endl;
 
   return config;
 }

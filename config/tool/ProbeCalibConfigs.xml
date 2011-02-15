@@ -570,6 +570,7 @@
          <Type>LinearArray</Type>
          <DefaultRTSource>DVI</DefaultRTSource>
          <RTSource>
+       	<TemporalCalibration>170</TemporalCalibration>
             <__ImageTimestampCalibration>170</__ImageTimestampCalibration>
             <Name>DVI</Name>
             <DefaultConfig>WidthMaxDepth4</DefaultConfig>
