@@ -235,7 +235,7 @@ void StateManager::resetDesktop()
 
 void StateManager::addRecordSession(RecordSessionPtr session)
 {
-  ssc::messageManager()->sendDebug("Added session with description "+session->getDescription());
+  //ssc::messageManager()->sendDebug("Added session with description "+session->getDescription());
   mRecordSessions.push_back(session);
   emit recordedSessionsChanged();
 }
