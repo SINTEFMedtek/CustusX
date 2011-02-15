@@ -39,6 +39,8 @@ private:
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   QPushButton* mImportTransformButton;
   QWidget* mParentFrameCombo;
+  QPushButton* mOkButton;
+
 };
 }//namespace cx
 #endif /* CXIMPORTDATAWIZARD_H_ */
