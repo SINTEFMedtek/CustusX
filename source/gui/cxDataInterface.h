@@ -14,7 +14,7 @@
 #include "sscDoubleDataAdapter.h"
 #include "sscStringDataAdapter.h"
 #include "sscDefinitions.h"
-#include "sscRealTimeStreamSource.h"
+#include "sscRTSource.h"
 #include "cxRegistrationManager.h"
 #include "cxForwardDeclarations.h"
 #include "cxRecordSession.h"
@@ -304,7 +304,7 @@ public: // optional methods
   virtual QString getHelp() const;
 
 public: // interface extension
-  ssc::RealTimeStreamSourcePtr getRTSource();
+  ssc::RTSourcePtr getRTSource();
   void setValueName(const QString name);
 
 //signals:
@@ -314,7 +314,7 @@ private slots:
   void setDefaultSlot();
 
 private:
-  ssc::RealTimeStreamSourcePtr mRTSource;
+  ssc::RTSourcePtr mRTSource;
   QString mValueName;
 };
 

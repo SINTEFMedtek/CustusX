@@ -70,7 +70,7 @@ void WorkflowState::autoStartHardware()
   if (DataLocations::getSettings()->value("Automation/autoStartTracking").toBool())
     ssc::toolManager()->startTracking();
   if (DataLocations::getSettings()->value("Automation/autoStartStreaming").toBool())
-    stateManager()->getIGTLinkConnection()->launchAndConnectServer();
+    stateManager()->getRTSourceManager()->launchAndConnectServer();
 }
 
 

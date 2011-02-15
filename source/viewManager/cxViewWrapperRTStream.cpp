@@ -109,10 +109,10 @@ void ViewWrapperRTStream::probeChangedSlot()
     return;
 
   // if probe has a stream, connect stream and probe to rep.
-  this->setupRep(mTool->getProbe()->getRealTimeStreamSource(), mTool);
+  this->setupRep(mTool->getProbe()->getRTSource(), mTool);
 }
 
-void ViewWrapperRTStream::setupRep(ssc::RealTimeStreamSourcePtr source, ssc::ToolPtr tool)
+void ViewWrapperRTStream::setupRep(ssc::RTSourcePtr source, ssc::ToolPtr tool)
 {
   if (mSource)
   {

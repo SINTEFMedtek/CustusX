@@ -46,7 +46,7 @@ public:
   WorkflowStateMachinePtr getWorkflow();
   ApplicationStateMachinePtr getApplication();
   PatientDataPtr getPatientData();
-  IGTLinkConnectionPtr getIGTLinkConnection();
+  IGTLinkConnectionPtr getRTSourceManager();
   ssc::ReconstructerPtr getReconstructer();
 
   Desktop getActiveDesktop();

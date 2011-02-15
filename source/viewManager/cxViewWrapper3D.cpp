@@ -29,7 +29,7 @@
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
 #include "cxCameraControl.h"
-#include "sscRealTimeStreamSource.h"
+#include "sscRTSource.h"
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
 
