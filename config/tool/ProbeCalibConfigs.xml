@@ -9,6 +9,7 @@
          <DefaultRTSource>VGA</DefaultRTSource>
          <Notes>Image size: Small (default)</Notes>
          <RTSource>
+            <TemporalCalibration>170</TemporalCalibration>
             <Name>VGA</Name>
             <DefaultConfig>WidthMaxDepth40</DefaultConfig>
             <ImageSize>
