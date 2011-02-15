@@ -350,7 +350,7 @@ void ViewManager::setActiveLayout(const QString& layout)
 {
   if(mActiveLayout==layout)
     return;
-  std::cout << "set active layout " <<layout << std::endl;
+  //std::cout << "set active layout " <<layout << std::endl;
 
   LayoutData next = this->getLayoutData(layout);
   if (next.getUid().isEmpty())

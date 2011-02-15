@@ -36,6 +36,7 @@ public:
 
 private slots:
   void dominantToolChanged();
+
 private:
   ToolPtr mTool;
 
@@ -92,6 +93,9 @@ public:
   TrackedRecordWidget(QWidget* parent, QString description);
   virtual ~TrackedRecordWidget();
 
+signals:
+  void toolChanged();
+
 protected slots:
   virtual void checkIfReadySlot() = 0;
   virtual void postProcessingSlot(QString sessionId) = 0;
@@ -99,7 +103,8 @@ protected slots:
   virtual void stoppedSlot() = 0;
 
 protected:
-  ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
+  void setTool(ToolPtr tool);
   ToolPtr getTool();
 
 private:
@@ -126,6 +131,10 @@ protected slots:
   void postProcessingSlot(QString sessionId);
   void startedSlot();
   void stoppedSlot();
+
+private:
+  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session); ///< gets the tracking data from all relevant tool for the given session
+  ToolPtr findTool(double startTime, double stopTime);
 };
 
 /**
@@ -150,11 +159,14 @@ protected slots:
   void stoppedSlot();
 
 private slots:
-  void rtSourceChangedSlot();
+  void probeChangedSlot();
   void reconstructFinishedSlot();
   void fileMakerWriteFinished();
+  void dominantToolChangedSlot();
 
 private:
+  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
+
   SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
   ssc::RTSourcePtr mRTSource;
   ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;

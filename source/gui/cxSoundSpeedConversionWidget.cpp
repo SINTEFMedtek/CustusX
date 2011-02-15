@@ -6,6 +6,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include "sscMessageManager.h"
+#include "sscToolManager.h"
 #include "cxProbe.h"
 
 namespace cx
@@ -13,34 +14,38 @@ namespace cx
 
 SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
     QWidget(parent),
-    mFromSoundSpeed(1540.0),
-    mApplyButton(new QPushButton("Apply")),
+    mScannerSoundSpeed(1540.0),
+    mApplyButton(new QPushButton("Apply compensation")),
+    mResetButton(new QPushButton("Reset")),
     mSoundSpeedSpinBox(new QDoubleSpinBox()),
     mWaterDegreeSpinBox(new QDoubleSpinBox())
 {
   QVBoxLayout* vLayout = new QVBoxLayout(this);
 
   connect(mApplyButton, SIGNAL(clicked()), this, SLOT(applySoundSpeedCompensationFactorSlot()));
+  connect(mResetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
   mWaterDegreeSpinBox->setRange(0.0, 50.0);
-  mWaterDegreeSpinBox->setValue(25.0);
   connect(mWaterDegreeSpinBox, SIGNAL(valueChanged(double)), this, SLOT(waterDegreeChangedSlot()));
-
-  mToSoundSpeed = this->getWaterSoundSpeed();
-
   mSoundSpeedSpinBox->setRange(1000.0, 2000.0); //what's a suitable range?
-  mSoundSpeedSpinBox->setValue(mToSoundSpeed);
   connect(mSoundSpeedSpinBox, SIGNAL(valueChanged(double)), this, SLOT(waterSoundSpeedChangedSlot()));
 
   QHBoxLayout* speedLayout = new QHBoxLayout();
-  speedLayout->addWidget(new QLabel("Water sound speed: "));
+  speedLayout->addWidget(new QLabel("Sound speed: "));
   speedLayout->addWidget(mSoundSpeedSpinBox);
-  speedLayout->addWidget(new QLabel("m/s, or"));
+  speedLayout->addWidget(new QLabel("m/s, or "));
   speedLayout->addWidget(mWaterDegreeSpinBox);
-  speedLayout->addWidget(new QLabel("C"+QString::fromUtf8("\302\260"))); //\302\260 is the degree sign
+  speedLayout->addWidget(new QLabel("C"+QString::fromUtf8("\302\260")+" water temperature")); //\302\260 is the degree sign
+
+  QHBoxLayout* buttonLayout = new QHBoxLayout();
+  buttonLayout->addWidget(mApplyButton);
+  buttonLayout->addWidget(mResetButton);
 
   vLayout->addLayout(speedLayout);
-  vLayout->addWidget(mApplyButton);
+  vLayout->addLayout(buttonLayout);
+
+  this->resetSlot();
+  this->updateButtons();
 }
 
 SoundSpeedConverterWidget::~SoundSpeedConverterWidget()
@@ -55,17 +60,21 @@ void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
   }
 
   double factor = this->getSoundSpeedCompensationFactor();
+  mProbe->setSoundSpeedCompensationFactor(factor);
+}
 
-  ProbePtr probe = boost::dynamic_pointer_cast<Probe>(mProbe->getProbe());
-  if(probe)
-    probe->setSoundSpeedCompensationFactor(factor);
-  else
-    ssc::messageManager()->sendDebug("Could not cast probe to a cx probe...");
+void SoundSpeedConverterWidget::setToolSlot(const QString& uid)
+{
+  ssc::ToolPtr tool = ssc::toolManager()->getTool(uid);
+  ssc::ProbePtr probe = tool->getProbe();
+  if(!probe)
+    return;
+  this->setProbe(probe);
 }
 
 double SoundSpeedConverterWidget::getSoundSpeedCompensationFactor()
 {
-  return mToSoundSpeed/mFromSoundSpeed;
+  return mToSoundSpeed/mScannerSoundSpeed;
 }
 
 double SoundSpeedConverterWidget::getWaterSoundSpeed()
@@ -76,9 +85,10 @@ double SoundSpeedConverterWidget::getWaterSoundSpeed()
   return retval;
 }
 
-void SoundSpeedConverterWidget::setProbe(ToolPtr probe)
+void SoundSpeedConverterWidget::setProbe(ssc::ProbePtr probe)
 {
   mProbe = probe;
+  this->updateButtons();
 }
 
 void SoundSpeedConverterWidget::waterSoundSpeedChangedSlot()
@@ -101,4 +111,30 @@ void SoundSpeedConverterWidget::waterDegreeChangedSlot()
   font.setStrikeOut(false);
   mWaterDegreeSpinBox->setFont(font);
 }
+
+void SoundSpeedConverterWidget::resetSlot()
+{
+  this->setSoundSpeed(mScannerSoundSpeed);
+
+  if(!mProbe)
+    return;
+  this->applySoundSpeedCompensationFactorSlot();
+}
+
+void SoundSpeedConverterWidget::setSoundSpeed(double soundspeed)
+{
+  mSoundSpeedSpinBox->setValue(soundspeed);
+}
+
+void SoundSpeedConverterWidget::setWaterDegree(double degree)
+{
+  mWaterDegreeSpinBox->setValue(degree);
+}
+
+void SoundSpeedConverterWidget::updateButtons()
+{
+  mApplyButton->setEnabled(mProbe);
+  mResetButton->setEnabled(true);
+}
+
 }//namespace cx
