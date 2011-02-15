@@ -16,7 +16,7 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace cx
 {
-UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool) :
+UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RTSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool) :
     mTrackerRecordedData(trackerRecordedData),
     mStreamRecordedData(streamRecordedData),
     mSessionDescription(sessionDescription),
@@ -148,7 +148,7 @@ void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
   }
   QTextStream stream(&file);
 
-  ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin();
+  ssc::RTSourceRecorder::DataType::iterator it = mStreamRecordedData.begin();
   for(; it != mStreamRecordedData.end(); ++it)
   {
     stream << qstring_cast(it->first);
@@ -170,7 +170,7 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
   int i=0;
-  for(ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
+  for(ssc::RTSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
 //    std::cout << "one frame" << std::endl;
     vtkImageDataPtr input = it->second;

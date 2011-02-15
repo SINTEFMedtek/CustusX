@@ -204,7 +204,7 @@ PatientDataPtr StateManager::getPatientData()
   return mPatientData;
 }
 
-IGTLinkConnectionPtr StateManager::getIGTLinkConnection()
+IGTLinkConnectionPtr StateManager::getRTSourceManager()
 {
   return mIGTLinkConnection;
 }

@@ -7,7 +7,7 @@
 #include "cxProbe.h"
 
 #include <QStringList>
-#include "sscRealTimeStreamSource.h"
+#include "sscRTSource.h"
 #include "sscMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
@@ -66,7 +66,7 @@ ssc::ProbeData Probe::getData() const
   return mData;
 }
 
-ssc::RealTimeStreamSourcePtr Probe::getRealTimeStreamSource() const
+ssc::RTSourcePtr Probe::getRTSource() const
 {
   return mSource;
 }
@@ -79,9 +79,9 @@ ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
   return retval;
 }
 
-void Probe::setRealTimeStreamSource(ssc::RealTimeStreamSourcePtr source)
+void Probe::setRTSource(ssc::RTSourcePtr source)
 {
-  ssc::RealTimeStreamSourcePtr adapter(new ssc::ProbeAdapterRTSource(source->getUid()+"_probe", mSelf.lock(), source));
+  ssc::RTSourcePtr adapter(new ssc::ProbeAdapterRTSource(source->getUid()+"_probe", mSelf.lock(), source));
   mSource = adapter;
   emit sectorChanged();
 }
@@ -140,18 +140,9 @@ void Probe::setConfigId(QString uid)
 
   ssc::ProbeData probeSector = createProbeDataFromConfiguration(config);
   mConfigurationId = uid;
-//  this->setUSProbeSector(probeSector);
   mData = probeSector;
   emit sectorChanged();
 }
-
-//
-//void Probe::setUSProbeSector(ssc::ProbeData probeSector)
-//{
-//  mSector = probeSector;
-//  emit sectorChanged();
-//}
-
 
 ProbeXmlConfigParser::Configuration Probe::getConfiguration() const
 {
@@ -181,7 +172,7 @@ ProbeXmlConfigParser::Configuration Probe::getConfiguration(QString uid) const
   }
 
   if (mOverrideTemporalCalibration)
-    config.mImageTimestampCalibration = mTemporalCalibration;
+    config.mTemporalCalibration = mTemporalCalibration;
 
   return config;
 }

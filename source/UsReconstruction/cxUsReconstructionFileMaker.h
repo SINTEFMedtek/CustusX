@@ -5,7 +5,7 @@
 #include <QString>
 #include <QTextStream>
 #include "boost/shared_ptr.hpp"
-#include "sscRealTimeStreamSourceRecorder.h"
+#include "sscRTSourceRecorder.h"
 //#include "cxRecordSession.h"
 #include "cxTool.h"
 
@@ -26,7 +26,7 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 class UsReconstructionFileMaker
 {
 public:
-  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RealTimeStreamSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool);
+  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RTSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool);
   ~UsReconstructionFileMaker();
 
   QString write();
@@ -45,7 +45,7 @@ private:
   void copyProbeCalibConfigsXml(QString reconstructionFolder);
 
   ssc::TimedTransformMap mTrackerRecordedData;
-  ssc::RealTimeStreamSourceRecorder::DataType mStreamRecordedData;
+  ssc::RTSourceRecorder::DataType mStreamRecordedData;
   //RecordSessionPtr mSession;
   QString mSessionDescription;
   QString mActivepatientPath;
