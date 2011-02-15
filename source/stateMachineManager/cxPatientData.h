@@ -55,6 +55,9 @@ private:
   void generateSaveDoc(QDomDocument& doc);
   void readLoadDoc(QDomDocument& loadDoc, QString patientFolder);
 
+  bool copyFile(QString source, QString dest);
+  bool copyAllSimilarFiles(QString fileName, QString destFolder);
+
   //Patient
   QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
   //Preferences
