@@ -76,7 +76,6 @@ private:
 
 	//US Probe sector
 	ProbeSectorPtr mProbeSector;
-	//USProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
   RealTimeStreamGraphicsPtr mRTStream;

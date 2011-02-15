@@ -14,7 +14,7 @@
 namespace ssc
 {
 
-ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc::RealTimeStreamSourcePtr source) :
+ProbeAdapterRTSource::ProbeAdapterRTSource(QString uid, ssc::ProbePtr probe, ssc::RTSourcePtr source) :
     mUid(uid), mProbe(probe), mBase(source)
 {
   connect(mProbe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));

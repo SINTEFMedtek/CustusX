@@ -11,7 +11,7 @@
 class QString;
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscRealTimeStreamSource.h"
+#include "sscRTSource.h"
 #include "sscTool.h"
 
 namespace ssc
@@ -20,11 +20,11 @@ namespace ssc
 /**RTSource that applies the parameters from a probe to the rtsource.
  *
  */
-class ProbeAdapterRTSource : public ssc::RealTimeStreamSource
+class ProbeAdapterRTSource : public ssc::RTSource
 {
   Q_OBJECT
 public:
-  ProbeAdapterRTSource(QString uid, ProbePtr probe, RealTimeStreamSourcePtr source);
+  ProbeAdapterRTSource(QString uid, ProbePtr probe, RTSourcePtr source);
   virtual ~ProbeAdapterRTSource() {}
 
   virtual QString getUid();
@@ -47,7 +47,7 @@ private slots:
 
 private:
   QString mUid;
-  ssc::RealTimeStreamSourcePtr mBase;
+  ssc::RTSourcePtr mBase;
   ssc::ProbePtr mProbe;
   vtkImageChangeInformationPtr mRedirecter;
 };

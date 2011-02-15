@@ -41,8 +41,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
-    Data/sscRealTimeStreamSource.h
-    Data/sscRealTimeStreamSourceRecorder.h
+    Data/sscRTSource.h
+    Data/sscRTSourceRecorder.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -226,8 +226,6 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicePlanes3DRep.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscSlicePlaneClipper.cpp
-    Rep/sscUSProbeSector.h
-    Rep/sscUSProbeSector.cpp
     Rep/sscRTStreamRep.h
     Rep/sscRTStreamRep.cpp
     Rep/ultrasoundsectorsource.h
@@ -256,8 +254,8 @@ SET( SSC_SOURCE_FILES
     Data/sscSNW2Volume.h
     Data/sscRegistrationTransform.cpp
     Data/sscRegistrationTransform.h
-    Data/sscRealTimeStreamSourceRecorder.h
-    Data/sscRealTimeStreamSourceRecorder.cpp
+    Data/sscRTSourceRecorder.h
+    Data/sscRTSourceRecorder.cpp
     Tool/sscToolManager.cpp
     Tool/sscToolManager.h
     Tool/sscTool.h 

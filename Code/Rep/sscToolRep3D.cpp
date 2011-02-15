@@ -11,7 +11,6 @@
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscView.h"
-#include "sscUSProbeSector.h"
 #include "sscRTStreamRep.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
@@ -222,7 +221,7 @@ void ToolRep3D::probeSectorChanged()
     mProbeSectorActor->SetVisibility(mTool->getVisible());
 
     mRTStream->setTool(mTool);
-    mRTStream->setRealtimeStream(mTool->getProbe()->getRealTimeStreamSource());
+    mRTStream->setRealtimeStream(mTool->getProbe()->getRTSource());
   }
   else
   {

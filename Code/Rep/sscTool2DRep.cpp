@@ -22,8 +22,8 @@
 #include "sscView.h"
 #include "sscVtkHelperClasses.h"
 #include "sscMessageManager.h"
-#include "sscUSProbeSector.h"
 #include "sscTypeConversions.h"
+#include "sscProbeSector.h"
 
 namespace ssc
 {

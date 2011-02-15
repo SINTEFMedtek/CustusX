@@ -17,7 +17,7 @@ namespace ssc
 typedef std::map<double, Transform3D> TimedTransformMap;
 typedef boost::shared_ptr<TimedTransformMap> TimedTransformMapPtr;
 typedef boost::shared_ptr<class Probe> ProbePtr;
-typedef boost::shared_ptr<class RealTimeStreamSource> RealTimeStreamSourcePtr;
+typedef boost::shared_ptr<class RTSource> RTSourcePtr;
 typedef boost::shared_ptr<class ProbeSector> ProbeSectorPtr;
 typedef boost::weak_ptr<class Probe> ProbeWeakPtr;
 
@@ -31,7 +31,7 @@ public:
   virtual bool isValid() const = 0;
   virtual ProbeData getData() const = 0;
   virtual ProbeSectorPtr getSector() = 0;
-  virtual RealTimeStreamSourcePtr getRealTimeStreamSource() const = 0;
+  virtual RTSourcePtr getRTSource() const = 0;
 
   virtual void addXml(QDomNode& dataNode) = 0;
   virtual void parseXml(QDomNode& dataNode) = 0;

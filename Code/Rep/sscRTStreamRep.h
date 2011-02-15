@@ -9,7 +9,7 @@
 #define SSCRTSTREAMREP_H_
 
 #include "sscRepImpl.h"
-#include "sscRealTimeStreamSource.h"
+#include "sscRTSource.h"
 #include "sscVtkHelperClasses.h"
 #include "sscForwardDeclarations.h"
 #include "sscProbeSector.h"
@@ -37,7 +37,7 @@ public:
   RealTimeStreamGraphics(bool useMaskFilter=false);
   virtual ~RealTimeStreamGraphics();
 
-  void setRealtimeStream(RealTimeStreamSourcePtr data);
+  void setRealtimeStream(RTSourcePtr data);
   void setTool(ToolPtr tool);
   ToolPtr getTool();
   ssc::ProbeSector getProbeData();
@@ -65,7 +65,7 @@ private:
   bool mShowInToolSpace;
   ToolPtr mTool;
   ssc::ProbeSector mProbeData;
-  RealTimeStreamSourcePtr mData;
+  RTSourcePtr mData;
   vtkImageChangeInformationPtr mDataRedirecter;
   vtkActorPtr mPlaneActor;
   vtkPlaneSourcePtr mPlaneSource;
@@ -89,7 +89,7 @@ public:
   RealTimeStreamRep(const QString& uid, const QString& name="");
   virtual ~RealTimeStreamRep();
   virtual QString getType() const { return "ssc::RealTimeStreamRep"; }
-  void setRealtimeStream(RealTimeStreamSourcePtr data);
+  void setRealtimeStream(RTSourcePtr data);
   void setTool(ToolPtr tool);
 
 protected:
@@ -116,7 +116,7 @@ public:
   RealTimeStreamFixedPlaneRep(const QString& uid, const QString& name="");
   virtual ~RealTimeStreamFixedPlaneRep();
   virtual QString getType() const { return "ssc::RealTimeStreamFixedPlaneRep"; }
-  void setRealtimeStream(RealTimeStreamSourcePtr data);
+  void setRealtimeStream(RTSourcePtr data);
   void setTool(ToolPtr tool);
 
   void setShowSector(bool on);
@@ -137,7 +137,7 @@ private:
 
   ToolPtr mTool;
   ssc::ProbeSector mProbeData;
-  RealTimeStreamSourcePtr mData;
+  RTSourcePtr mData;
 
   ssc::TextDisplayPtr mStatusText;
   ssc::TextDisplayPtr mInfoText;

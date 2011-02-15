@@ -102,9 +102,9 @@ public:
   static void initialize();
 
   // streams
-  virtual RealTimeStreamSourcePtr getStream(const QString& uid) const;
+  virtual RTSourcePtr getStream(const QString& uid) const;
   virtual StreamMap getStreams() const;
-  virtual void loadStream(RealTimeStreamSourcePtr stream);
+  virtual void loadStream(RTSourcePtr stream);
 
   // images
   virtual void saveImage(ImagePtr image, const QString& basePath);///< Save image to file \param basePath Absolute path to patient data folder
@@ -163,7 +163,7 @@ protected:
   virtual void verifyParentFrame(DataPtr data); ///< checks if data has a valid frameOfReferenceUid, generates and adds it if not
 
 protected:
-  std::map<QString, RealTimeStreamSourcePtr> mStreams;
+  std::map<QString, RTSourcePtr> mStreams;
   DataMap mData;
   Vector3D mCenter;
   MEDICAL_DOMAIN mMedicalDomain;

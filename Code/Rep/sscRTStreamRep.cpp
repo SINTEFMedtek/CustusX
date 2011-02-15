@@ -236,7 +236,7 @@ void RealTimeStreamGraphics::setLookupTable()
 
 }
 
-void RealTimeStreamGraphics::setRealtimeStream(RealTimeStreamSourcePtr data)
+void RealTimeStreamGraphics::setRealtimeStream(RTSourcePtr data)
 {
   if (mData)
   {
@@ -376,7 +376,7 @@ void RealTimeStreamRep::setTool(ToolPtr tool)
   mRTGraphics->setTool(tool);
 }
 
-void RealTimeStreamRep::setRealtimeStream(RealTimeStreamSourcePtr data)
+void RealTimeStreamRep::setRealtimeStream(RTSourcePtr data)
 {
   mRTGraphics->setRealtimeStream(data);
 }
@@ -471,7 +471,7 @@ void RealTimeStreamFixedPlaneRep::setTool(ToolPtr tool)
   mTool = tool;
 }
 
-void RealTimeStreamFixedPlaneRep::setRealtimeStream(RealTimeStreamSourcePtr data)
+void RealTimeStreamFixedPlaneRep::setRealtimeStream(RTSourcePtr data)
 {
   mRTGraphics->setRealtimeStream(data);
   mData = data;
