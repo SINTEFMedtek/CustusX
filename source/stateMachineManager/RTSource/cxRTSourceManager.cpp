@@ -269,7 +269,7 @@ void RTSourceManager::connectSourceToTool()
     {
       ssc::messageManager()->sendError("Probe not a cx instance.");
     }
-    probeInterface->setRealTimeStreamSource(mRTSource);
+    probeInterface->setRTSource(mRTSource);
 //    std::cout << "RTSourceManager::connectSourceToTool() " << probeInterface->getRealTimeStreamSource()->getName() << " completed" << std::endl;
   }
 }

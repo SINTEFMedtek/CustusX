@@ -147,15 +147,15 @@ ProbeXmlConfigParser::Configuration ProbeXmlConfigParser::getConfiguration(QStri
   }
   QDomNode rtSourceNode = currentRtSourceNodeList.first();
 
-  retval.mImageTimestampCalibration = 0;
-  QDomNode imageTimestampCalibrationNode = rtSourceNode.namedItem("ImageTimestampCalibration");
+  retval.mTemporalCalibration = 0;
+  QDomNode imageTimestampCalibrationNode = rtSourceNode.namedItem("TemporalCalibration");
   element = imageTimestampCalibrationNode.toElement();
   bool ok;
   if(!element.isNull())
   {
-    retval.mImageTimestampCalibration = element.text().toDouble(&ok);
+    retval.mTemporalCalibration = element.text().toDouble(&ok);
     if (!ok)
-      retval.mImageTimestampCalibration = 0;
+      retval.mTemporalCalibration = 0;
   }
 
   try

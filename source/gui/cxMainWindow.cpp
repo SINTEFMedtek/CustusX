@@ -320,7 +320,7 @@ void MainWindow::createActions()
 
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-  connect(stateManager()->getIGTLinkConnection()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
+  connect(stateManager()->getRTSourceManager()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
   this->updateStreamingActionSlot();
 
   mConfigureToolsAction->setChecked(true);
@@ -376,19 +376,19 @@ void MainWindow::updateManualToolPhysicalProperties()
 
 void MainWindow::toggleStreamingSlot()
 {
-  if (stateManager()->getIGTLinkConnection()->getRTSource()->isStreaming())
+  if (stateManager()->getRTSourceManager()->getRTSource()->isStreaming())
   {
-    stateManager()->getIGTLinkConnection()->getRTSource()->disconnectServer();
+    stateManager()->getRTSourceManager()->getRTSource()->disconnectServer();
   }
   else
   {
-    stateManager()->getIGTLinkConnection()->launchAndConnectServer();
+    stateManager()->getRTSourceManager()->launchAndConnectServer();
   }
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-  if (stateManager()->getIGTLinkConnection()->getRTSource()->isStreaming())
+  if (stateManager()->getRTSourceManager()->getRTSource()->isStreaming())
   {
     mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
     mStartStreamingAction->setText("Stop Streaming");
