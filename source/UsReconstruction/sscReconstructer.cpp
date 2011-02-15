@@ -824,6 +824,8 @@ void Reconstructer::threadedPostReconstruct()
   if (!this->validInputData())
     return;
 
+  ssc::messageManager()->sendSuccess("Reconstruction done, "+mOutput->getName());
+
   DataManager::getInstance()->loadData(mOutput);
   DataManager::getInstance()->saveImage(mOutput, mOutputBasePath);
 }
