@@ -13,6 +13,7 @@
 #include <vtkImageChangeInformation.h>
 #include "vtkMINCImageReader.h"
 #include "vtkTransform.h"
+#include "vtkCommand.h"
 
 #include <QtCore>
 #include <QDomDocument>
@@ -78,6 +79,39 @@ DataPtr MincImageReader::load(const QString& uid, const QString& filename)
 
   return image;
     //////////////////////////////
+}
+
+class ErrorObserver : public vtkCommand
+{
+public:
+  ErrorObserver() {}
+  static ErrorObserver* New() {return new ErrorObserver;}
+  virtual void Execute(vtkObject* caller, unsigned long, void* text)
+  {
+    mMessage = QString(reinterpret_cast<char*>(text));
+    std::cout << "executing" << std::endl;
+  }
+  QString mMessage;
+
+
+  static bool checkedRead(vtkSmartPointer<vtkAlgorithm> reader, QString filename)
+  {
+    vtkSmartPointer<ErrorObserver> errorObserver = vtkSmartPointer<ErrorObserver>::New();
+    reader->AddObserver("ErrorEvent", errorObserver);
+
+    reader->Update();
+
+    if (!errorObserver->mMessage.isEmpty())
+    {
+      ssc::messageManager()->sendError("Load of data " + filename + " failed with message:\n" + errorObserver->mMessage);
+      return false;
+    }
+    return true;
+  }
+
+};
+namespace
+{
 }
 
 //-----
@@ -162,8 +196,9 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
   vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
   reader->SetFileName(cstring_cast(filename));
   reader->ReleaseDataFlagOn();
-  //reader->GetOutput()->ReleaseDataFlagOn();
-  reader->Update();
+
+  if (!ErrorObserver::checkedRead(reader, filename))
+    return DataPtr();
 
   vtkImageChangeInformationPtr zeroer = vtkImageChangeInformationPtr::New();
   zeroer->SetInput(reader->GetOutput());
@@ -186,7 +221,10 @@ DataPtr PolyDataMeshReader::load(const QString& uid, const QString& fileName)
 {
   vtkPolyDataReaderPtr reader = vtkPolyDataReaderPtr::New();
   reader->SetFileName(cstring_cast(fileName));
-  reader->Update();
+
+  if (!ErrorObserver::checkedRead(reader, fileName))
+    return DataPtr();
+
   vtkPolyDataPtr polyData = reader->GetOutput();
 
   //return MeshPtr(new Mesh(fileName, fileName, polyData));
@@ -195,11 +233,15 @@ DataPtr PolyDataMeshReader::load(const QString& uid, const QString& fileName)
 
 }
 
+
 DataPtr StlMeshReader::load(const QString& uid, const QString& fileName)
 {
   vtkSTLReaderPtr reader = vtkSTLReaderPtr::New();
   reader->SetFileName(cstring_cast(fileName));
-  reader->Update();
+
+  if (!ErrorObserver::checkedRead(reader, fileName))
+    return DataPtr();
+
   vtkPolyDataPtr polyData = reader->GetOutput();
 
   //return MeshPtr(new Mesh(fileName, fileName, polyData));
@@ -375,8 +417,6 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READE
  */
 DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READER_TYPE type)
 {
-//  std::cout << "DataManagerImpl::readData " << path << ", "<< uid << std::endl;
-
   QFileInfo fileInfo(qstring_cast(path));
 
   if (mData.count(uid)) // dont load same image twice
