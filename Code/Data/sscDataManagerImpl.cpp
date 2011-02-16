@@ -139,7 +139,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
       if (line.startsWith("Position", Qt::CaseInsensitive) || line.startsWith("Offset", Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        if (list.size()==5)
+        if (list.size()>=5)
           p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
       }
       else if (line.startsWith("TransformMatrix", Qt::CaseInsensitive) || line.startsWith("Orientation",
@@ -147,7 +147,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
 
-        if (list.size()==8)
+        if (list.size()>=8)
         {
           e_x = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
           e_y = Vector3D(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
@@ -157,7 +157,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
       else if (line.startsWith("Creator", Qt::CaseInsensitive))
       {
         QStringList list = line.split(" ", QString::SkipEmptyParts);
-        if (list.size()==3)
+        if (list.size()>=3)
           creator = list[2];
       }
     }
