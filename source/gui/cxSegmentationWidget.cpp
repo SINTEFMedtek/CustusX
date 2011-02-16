@@ -549,8 +549,8 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
   std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
 
-  QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_mesh%1";
-  QString name = centerlineImage->getName() + " mesh %1";
+  QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_ge%1";
+  QString name = centerlineImage->getName() + " ge%1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
   mesh->setColor(mDefaultColor);
   mesh->get_rMd_History()->addParentFrame(centerlineImage->getUid());
