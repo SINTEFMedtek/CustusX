@@ -41,7 +41,6 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   mOutputRelativePath(""),
   mOutputBasePath(""),
   mShaderPath(shaderPath),
-  mLastAppliedMaskReduce(""),
   mMaxTimeDiff(100)// TODO: Change default value for max allowed time difference between tracking and image time tags 
 {
   mFileReader.reset(new cx::UsReconstructionFileReader());
@@ -76,6 +75,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
                                                  "Set an offset in the frame timestamps",
                                                   0.0, DoubleRange(-1000, 1000, 10), 0,
                                                   mSettings.getElement());
+  connect(mTimeCalibration.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
@@ -124,41 +124,23 @@ void Reconstructer::setSettings()
 {
   this->createAlgorithm();
 
-//  QString newOrient = mSettings.getStringOption("Orientation").getValue();
-  QString newOrient = mOrientationAdapter->getValue();
-  if (newOrient!=mLastAppliedOrientation || 
-      mMaskReduce->getValue() != mLastAppliedMaskReduce)
-  {
-    mLastAppliedOrientation = newOrient;
-    mLastAppliedMaskReduce = mMaskReduce->getValue();
-    this->clearOutput();
-    // reread everything.
-    this->readFiles(mFilename, mCalFilesPath);
-    if(!this->validInputData())
-    {
-      ssc::messageManager()->sendWarning("Cannot set settings, no valid frames available.");
-      return;
-    }
-    ssc::messageManager()->sendInfo("set settings - " + newOrient);
-  }
-
+  this->updateFromOriginalFileData();
+  if (!this->validInputData())
+    return;
 
   ssc::XmlOptionItem maxVol("MaxVolumeSize", mSettings.getElement());
   maxVol.writeValue(QString::number(mOutputVolumeParams.getMaxVolumeSize()));
 
-  // notify that settings xml is changed
-  emit paramsChanged();
-
   mSettings.save();
+
+  emit paramsChanged();
 }
 
 void Reconstructer::clearAll()
 {
-  mUsRaw.reset();
-  mFrames.clear();
-  mPositions.clear();
+  mFileData = FileData();
+  mOriginalFileData = FileData();
   mOutputVolumeParams = OutputVolumeParams();
-  mMask.reset();
   this->clearOutput();
 }
 
@@ -196,12 +178,12 @@ bool within(int x, int min, int max)
 
 ImagePtr Reconstructer::createMaskFromConfigParams()
 {
-  vtkImageDataPtr mask = mProbeData.getMask();
+  vtkImageDataPtr mask = mOriginalFileData.mProbeData.getMask();
   ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
 
-  ssc::Vector3D usDim(mUsRaw->getDimensions());
+  ssc::Vector3D usDim(mOriginalFileData.mUsRaw->getDimensions());
   usDim[2] = 1;
-  ssc::Vector3D usSpacing(mUsRaw->getSpacing());
+  ssc::Vector3D usSpacing(mOriginalFileData.mUsRaw->getSpacing());
 
   // checking
   bool spacingOK = similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
@@ -219,17 +201,15 @@ ImagePtr Reconstructer::createMaskFromConfigParams()
   
 ImagePtr Reconstructer::generateMask()
 {  
-  ssc::Vector3D dim(mUsRaw->getDimensions());
+  ssc::Vector3D dim(mOriginalFileData.mUsRaw->getDimensions());
   dim[2] = 1;
-  ssc::Vector3D spacing(mUsRaw->getSpacing());
+  ssc::Vector3D spacing(mOriginalFileData.mUsRaw->getSpacing());
   
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 255);
     
   ImagePtr image = ImagePtr(new Image("mask", data, "mask")) ;
   return image;
 }
-  
-
   
 /**
  * Apply time calibration function y = ax + b, where
@@ -242,36 +222,27 @@ ImagePtr Reconstructer::generateMask()
  */
 void Reconstructer::calibrateTimeStamps(double offset, double scale)
 {
-  for (unsigned int i = 0; i < mPositions.size(); i++)
+  for (unsigned int i = 0; i < mFileData.mPositions.size(); i++)
   {
-    mPositions[i].mTime = scale * mPositions[i].mTime + offset;
-    //std::cout << "postime: " << mPositions[i].mTime << std::endl;
+    mFileData.mPositions[i].mTime = scale * mFileData.mPositions[i].mTime + offset;
   }
 }
 
 /**
  * Calculate timestamp calibration in an adhoc way, by assuming that 
- * images and positions start and stop at the exact same time
+ * images and positions start and stop at the exact same time.
+ *
+ * This is an option only - use with care!
  */
 void Reconstructer::alignTimeSeries()
 {
-  //TODO: Use data from a time calibration instead of this function
   ssc::messageManager()->sendInfo("Generate time calibration based on input time stamps.");
-  double framesSpan = mFrames.back().mTime - mFrames.front().mTime;
-  double positionsSpan = mPositions.back().mTime - mPositions.front().mTime;
+  double framesSpan = mFileData.mFrames.back().mTime - mFileData.mFrames.front().mTime;
+  double positionsSpan = mFileData.mPositions.back().mTime - mFileData.mPositions.front().mTime;
   double scale = framesSpan / positionsSpan;
-  //ssc::messageManager()->sendDebug("framesTimeSpan: " 
-  //                                 + string_cast(framesSpan)
-  //                                 + ", positionsTimeSpan: " 
-  //                                 + string_cast(positionsSpan));
   
-  double offset = mFrames.front().mTime - scale * mPositions.front().mTime;
+  double offset = mFileData.mFrames.front().mTime - scale * mFileData.mPositions.front().mTime;
   
-  //ssc::messageManager()->sendDebug(string_cast("Reconstructor::calibrateTimeStamps()")
-  //                                 + "NB!!! generated offset: " 
-  //                                 + string_cast(offset)
-  //                                 + " scale: "
-  //                                 + string_cast(scale));
   this->calibrateTimeStamps(offset, scale);
 }
 
@@ -289,6 +260,7 @@ void Reconstructer::applyTimeCalibration()
   double timeshift = mTimeCalibration->getValue();
   // The shift is on frames. The calibrate function applies to tracker positions,
   // hence the negative sign.
+  std::cout << "TIMESHIFT " << timeshift << std::endl;
   timeshift = -timeshift;
   if (!ssc::similar(0.0, timeshift))
     ssc::messageManager()->sendInfo("Applying reconstruction-time calibration to tracking data: " + qstring_cast(timeshift) + "ms");
@@ -325,50 +297,46 @@ void Reconstructer::interpolatePositions()
 {
   //TODO: Check if the affine transforms still are affine after the linear interpolation
   
-  //ssc::messageManager()->sendDebug("Frames before interpolation: " + string_cast(mFrames.size()));
-  
-  for(unsigned i_frame = 0; i_frame < mFrames.size();)
+  for(unsigned i_frame = 0; i_frame < mFileData.mFrames.size();)
   {
     std::vector<TimedPosition>::iterator posIter;
-    posIter= lower_bound(mPositions.begin(), mPositions.end(), mFrames[i_frame]);
+    posIter= lower_bound(mFileData.mPositions.begin(), mFileData.mPositions.end(), mFileData.mFrames[i_frame]);
     
-    unsigned i_pos = distance(mPositions.begin(), posIter);
+    unsigned i_pos = distance(mFileData.mPositions.begin(), posIter);
     if (i_pos != 0)
       i_pos--;
      
-    if(i_pos >= mPositions.size()-1)
-      i_pos = mPositions.size()-2;
+    if(i_pos >= mFileData.mPositions.size()-1)
+      i_pos = mFileData.mPositions.size()-2;
     
     // Remove frames too far from the positions
     // Don't increment frame index since the index now points to the next element
-    if ((fabs(mFrames[i_frame].mTime - mPositions[i_pos].mTime) > mMaxTimeDiff) ||
-        (fabs(mFrames[i_frame].mTime - mPositions[i_pos+1].mTime) > mMaxTimeDiff))
+    if ((fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) > mMaxTimeDiff) ||
+        (fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos+1].mTime) > mMaxTimeDiff))
     {
-      mFrames.erase(mFrames.begin() + i_frame);
-      mUsRaw->removeFrame(i_frame);
-      ssc::messageManager()->sendWarning("Time difference is too large.Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(fabs(mFrames[i_frame].mTime - mPositions[i_pos].mTime)) + " or "+ qstring_cast(fabs(mFrames[i_frame].mTime - mPositions[i_pos+1].mTime)));
+      mFileData.mFrames.erase(mFileData.mFrames.begin() + i_frame);
+      mFileData.mUsRaw->removeFrame(i_frame);
+
+      double diff1 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
+      double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos+1].mTime);
+      ssc::messageManager()->sendWarning("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
     }
     else
     {      
-      double t_delta_tracking = mPositions[i_pos+1].mTime - mPositions[i_pos].mTime;
+      double t_delta_tracking = mFileData.mPositions[i_pos+1].mTime - mFileData.mPositions[i_pos].mTime;
       double t = 0;
       if (!similar(t_delta_tracking, 0))
-        t = (mFrames[i_frame].mTime - mPositions[i_pos].mTime) / t_delta_tracking;
+        t = (mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime) / t_delta_tracking;
       //    mFrames[i_frame].mPos = mPositions[i_pos].mPos;
-      mFrames[i_frame].mPos = interpolate(mPositions[i_pos].mPos,
-                                          mPositions[i_pos+1].mPos, t);
+      mFileData.mFrames[i_frame].mPos = interpolate(mFileData.mPositions[i_pos].mPos,
+          mFileData.mPositions[i_pos+1].mPos, t);
       i_frame++;// Only increment if we didn't delete the frame
     }
-    //std::cout << mFrames[i_frame].mPos.inv().coord(ssc::Vector3D(0,0,0));
-    //std::cout << std::endl;
   }
-  //ssc::messageManager()->sendDebug("Frames after interpolation: " + string_cast(mFrames.size()));
 }
 
 vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
 {
-//  std::cout << src[0][3] << " " << src[1][3] << " " << src[2][3] << " " << std::endl;
-
   vnl_matrix_double dst(4,4);
   for (int i=0; i<4; ++i)
     for (int j=0; j<4; ++j)
@@ -391,29 +359,21 @@ ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
  */
 void Reconstructer::calibrate(QString calFilesPath)
 {
-  // mProbeData exists
-//  ssc::ProbeData mProbeData;
-
   // Calibration from tool space to localizer = sMt
   Transform3D sMt = mFileReader->readTransformFromFile(calFilesPath+mCalFileName);
   
   // Transform from image coordinate syst with origin in upper left corner
   // to t (tool) space. TODO check is u is ul corner or ll corner.
-  ssc::Transform3D tMu = mProbeData.get_tMu() * mProbeData.get_uMv();
-  
-//  ssc::Vector3D origo_u = tMu.inv().coord(Vector3D(0,0,0));
-//  std::cout << "Origo_u: "<< origo_u << std::endl;
+  ssc::Transform3D tMu = mFileData.mProbeData.get_tMu() * mFileData.mProbeData.get_uMv();
 
   ssc::Transform3D sMu = sMt*tMu;
   
   //mPos is prMs
-  for (unsigned i = 0; i < mPositions.size(); i++)
+  for (unsigned i = 0; i < mFileData.mPositions.size(); i++)
   {
-    //ssc::Transform3D prMs = mPositions[i].mPos;
-    ssc::Transform3D prMt = mPositions[i].mPos;
+    ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
     ssc::Transform3D prMs = prMt * sMt.inv();
-    mPositions[i].mPos = prMs * sMu;
-    //ssc::Transform3D prMu = prMs * sMu;
+    mFileData.mPositions[i].mPos = prMs * sMu;
   }
   //mPos is prMu
 }
@@ -425,19 +385,19 @@ void Reconstructer::calibrate(QString calFilesPath)
 std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
 {
   std::vector<ssc::Vector3D> retval(4);
-  if(!mMask)
+  if(!mFileData.mMask)
   {
     ssc::messageManager()->sendError("Reconstructer::generateInputRectangle() + requires mask");
     return retval;
   }
-  int* dims = mUsRaw->getDimensions();
-  ssc::Vector3D spacing = mUsRaw->getSpacing();
+  int* dims = mFileData.mUsRaw->getDimensions();
+  ssc::Vector3D spacing = mFileData.mUsRaw->getSpacing();
   
   int xmin = dims[0];
   int xmax = 0;
   int ymin = dims[1];
   int ymax = 0;
-  unsigned char* ptr = static_cast<unsigned char*>(mMask->getBaseVtkImageData()->GetScalarPointer());
+  unsigned char* ptr = static_cast<unsigned char*>(mFileData.mMask->getBaseVtkImageData()->GetScalarPointer());
   for (int x = 0; x < dims[0]; x++)
     for(int y = 0; y < dims[1]; y++)
     {
@@ -455,9 +415,6 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
   //      output volume size
   int reduceX = (xmax-xmin) * (mMaskReduce->getValue().toDouble() / 100);
   int reduceY = (ymax-ymin) * (mMaskReduce->getValue().toDouble() / 100);
-  //messageManager()->sendDebug("reduceX: "+string_cast(reduceX));
-  //messageManager()->sendDebug("reduceY: "+string_cast(reduceY));
-  //messageManager()->sendDebug("test reduceX: "+string_cast(mMaskReduce->getValue().toDouble()));
   
   xmin += reduceX;
   xmax -= reduceX;
@@ -469,16 +426,6 @@ std::vector<ssc::Vector3D> Reconstructer::generateInputRectangle()
   retval[2] = ssc::Vector3D(xmin*spacing[0], ymax*spacing[1], 0);
   retval[3] = ssc::Vector3D(xmax*spacing[0], ymax*spacing[1], 0);
   
-  //ssc::messageManager()->sendInfo("x and y, min and max: " 
-  //                                + string_cast(xmin) + " "
-  //                                + string_cast(xmax) + " " 
-  //                                + string_cast(ymin) + " "
-  //                                + string_cast(ymax));
-  
-  /*retval[0] = ssc::Vector3D(0,0,0);
-  retval[1] = ssc::Vector3D(dims[0]*spacing[0],0,0);
-  retval[2] = ssc::Vector3D(0,dims[1]*spacing[1],0);
-  retval[3] = ssc::Vector3D(dims[0]*spacing[0],dims[1]*spacing[1],0);*/
   return retval;
 }
 
@@ -500,7 +447,7 @@ ssc::Transform3D Reconstructer::applyOutputOrientation()
   }
   else if (newOrient=="MiddleFrame")
   {
-    prMdd = mFrames[mFrames.size()/2].mPos;
+    prMdd = mFileData.mFrames[mFileData.mFrames.size()/2].mPos;
   }
   else
   {
@@ -509,10 +456,10 @@ ssc::Transform3D Reconstructer::applyOutputOrientation()
 
   // apply the selected orientation to the frames.
   ssc::Transform3D ddMpr = prMdd.inv();
-  for (unsigned i = 0; i < mFrames.size(); i++)
+  for (unsigned i = 0; i < mFileData.mFrames.size(); i++)
   {
     // mPos = prMu
-    mFrames[i].mPos = ddMpr * mFrames[i].mPos;
+    mFileData.mFrames[i].mPos = ddMpr * mFileData.mFrames[i].mPos;
     // mPos = ddMu
   }
 
@@ -539,36 +486,29 @@ void Reconstructer::findExtentAndOutputTransform()
   // Find extent of all frames as a point cloud
   std::vector<ssc::Vector3D> inputRect = this->generateInputRectangle();
   std::vector<ssc::Vector3D> outputRect;
-  for(unsigned slice = 0; slice < mFrames.size(); slice++)
+  for(unsigned slice = 0; slice < mFileData.mFrames.size(); slice++)
   {
-    Transform3D dMu = mFrames[slice].mPos;
+    Transform3D dMu = mFileData.mFrames[slice].mPos;
     for (unsigned i = 0; i < inputRect.size(); i++)
     {
       outputRect.push_back(dMu.coord(inputRect[i]));
     }
   }
-  
-  /*std::cout << "1st dMus:  " << mFrames.front().mPos.inv().coord(ssc::Vector3D(0,0,0));  
-  std::cout << std::endl;
-  std::cout << "last dMus: " << mFrames.back().mPos.inv().coord(ssc::Vector3D(0,0,0)); 
-  std::cout << std::endl;*/
-    
+
   ssc::DoubleBoundingBox3D extent = ssc::DoubleBoundingBox3D::fromCloud(outputRect);
     
   // Translate dMu to output volume origo
   ssc::Transform3D T_origo = ssc::createTransformTranslate(extent.corner(0,0,0));
   ssc::Transform3D prMd = prMdd * T_origo; // transform from output space to patref, use when storing volume.
-  for (unsigned i = 0; i < mFrames.size(); i++)
+  for (unsigned i = 0; i < mFileData.mFrames.size(); i++)
   {
-    mFrames[i].mPos = T_origo.inv() * mFrames[i].mPos;
-    //std::cout << mFrames[i].mPos.inv().coord(ssc::Vector3D(0,0,0));  
-    //std::cout << std::endl;
+    mFileData.mFrames[i].mPos = T_origo.inv() * mFileData.mFrames[i].mPos;
   }
 
   // Calculate optimal output image spacing and dimensions based on US frame spacing
-  double inputSpacing = std::min(mUsRaw->getSpacing()[0],
-                                 mUsRaw->getSpacing()[1]);
-  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mUsRaw->getDimensions()));
+  double inputSpacing = std::min(mFileData.mUsRaw->getSpacing()[0],
+      mFileData.mUsRaw->getSpacing()[1]);
+  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mFileData.mUsRaw->getDimensions()));
 
   if (ssc::ToolManager::getInstance())
     mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
@@ -588,7 +528,7 @@ void Reconstructer::findExtentAndOutputTransform()
  */
 QString Reconstructer::generateOutputUid()
 {
-  QString base = mUsRaw->getUid();
+  QString base = mFileData.mUsRaw->getUid();
   QString name = mFilename.split("/").back();
   name = name.split(".").front();
 
@@ -642,7 +582,7 @@ QString Reconstructer::generateImageName(QString uid) const
 
 bool Reconstructer::validInputData() const
 {
-  if (mFrames.empty() || !mUsRaw || mPositions.empty())
+  if (mOriginalFileData.mFrames.empty() || !mOriginalFileData.mUsRaw || mOriginalFileData.mPositions.empty())
     return false;
   return true;
 }
@@ -657,20 +597,14 @@ ImagePtr Reconstructer::generateOutputVolume()
   ssc::Vector3D dim = mOutputVolumeParams.getDim();
   ssc::Vector3D spacing = ssc::Vector3D(1,1,1) * mOutputVolumeParams.getSpacing();
   
-  //ssc::messageManager()->sendInfo("output dim: "
-  //                                + string_cast(dim));
-  //ssc::messageManager()->sendInfo("output spacing: "
-  //                                + string_cast(spacing));  
-  
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);
   
   //If no output path is selecetd, use the same path as the input
   QString filePath;
   if(mOutputBasePath.isEmpty() && mOutputRelativePath.isEmpty())
-    filePath = qstring_cast(mUsRaw->getFilePath());
+    filePath = qstring_cast(mFileData.mUsRaw->getFilePath());
   else
     filePath = mOutputRelativePath;
-  //filePath += "/" + volumeName + ".mhd";
 
   QString uid = this->generateOutputUid();
   QString name = this->generateImageName(uid);
@@ -695,14 +629,19 @@ void Reconstructer::selectData(QString filename, QString calFilesPath)
     list[list.size()-1] = "";
     calFilesPath = list.join("/")+"/";
   }
-  this->readFiles(filename, calFilesPath);
+
+  this->clearAll();
+  this->readCoreFiles(filename, calFilesPath);
+  this->updateFromOriginalFileData();
 
   emit inputDataSelected(filename);
 }
 
-void Reconstructer::readFiles(QString fileName, QString calFilesPath)
+/**Read from file into mOriginalFileData.
+ * These data are not changed before clearAll() or this method is called again.
+ */
+void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
 {
-  this->clearAll();
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
 
@@ -720,25 +659,40 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   }
 
   //Read US images
-  mUsRaw = mFileReader->readUsDataFile(mhdFileName);
+  mOriginalFileData.mUsRaw = mFileReader->readUsDataFile(mhdFileName);
 
   QStringList probeConfigPath;
   mFileReader->readCustomMhdTags(mhdFileName, &probeConfigPath, &mCalFileName);
   ProbeXmlConfigParser::Configuration configuration = mFileReader->readProbeConfiguration(mCalFilesPath, probeConfigPath);
-  mProbeData.setData(createProbeDataFromConfiguration(configuration));
+  ProbeData probeData = createProbeDataFromConfiguration(configuration);
+  // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
+  probeData.mImage.mSpacing = Vector3D(mOriginalFileData.mUsRaw->getSpacing());
+  mOriginalFileData.mProbeData.setData(probeData);
 
-  mFrames = mFileReader->readFrameTimestamps(fileName);
-  mPositions = mFileReader->readPositions(fileName);
+  mOriginalFileData.mFrames = mFileReader->readFrameTimestamps(fileName);
+  mOriginalFileData.mPositions = mFileReader->readPositions(fileName);
 
   //mPos is now prMs
-  mMask = this->generateMask();
-  if (!mFileReader->readMaskFile(fileName, mMask))
+  mOriginalFileData.mMask = this->generateMask();
+  if (!mFileReader->readMaskFile(fileName, mOriginalFileData.mMask))
   {
-    mMask = this->createMaskFromConfigParams();
+    mOriginalFileData.mMask = this->createMaskFromConfigParams();
   }
+
+}
+
+/**Use the mOriginalFileData structure to rebuild all internal data.
+ * Useful when settings have changed or data is loaded.
+ */
+void Reconstructer::updateFromOriginalFileData()
+{
+  this->clearOutput();
 
   if (!this->validInputData())
     return;
+
+  mFileData = mOriginalFileData;
+  mFileData.mUsRaw.reset(new ssc::USFrameData(mOriginalFileData.mUsRaw->getBase()));
 
   // Only use this if the time stamps have different formatsh
   // The function assumes that both lists of time stamps start at the same time,
@@ -748,7 +702,7 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
   //this->calibrateTimeStamps(0.0, 1.0);
   this->applyTimeCalibration();
 
-  this->calibrate(calFilesPath);
+  this->calibrate(mCalFilesPath);
 
   //mPos (in mPositions) is now prMu
 
@@ -766,13 +720,6 @@ void Reconstructer::readFiles(QString fileName, QString calFilesPath)
 
   emit paramsChanged();
 }
-
-  
-//void Reconstructer::reconstruct(QString mhdFileName, QString calFilesPath )
-//{
-//  this->readFiles(mhdFileName, calFilesPath);
-//  this->reconstruct();
-//}
 
 void Reconstructer::reconstruct()
 {
@@ -809,7 +756,7 @@ void Reconstructer::threadedReconstruct()
   QDateTime startTime = QDateTime::currentDateTime();
 
   QDomElement algoSettings = mSettings.getElement("algorithms", mAlgorithm->getName());
-  mAlgorithm->reconstruct(mFrames, mUsRaw, mOutput, mMask, algoSettings);
+  mAlgorithm->reconstruct(mFileData.mFrames, mFileData.mUsRaw, mOutput, mFileData.mMask, algoSettings);
 
   QTime tempTime = QTime(0, 0);
   tempTime = tempTime.addMSecs(startTime.time().msecsTo(QDateTime::currentDateTime().time()));
