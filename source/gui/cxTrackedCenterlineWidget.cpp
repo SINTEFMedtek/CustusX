@@ -9,7 +9,7 @@
 #include "cxViewManager.h"
 #include "cxView3D.h"
 #include "cxRepManager.h"
-#include "cxSegmentation.h"
+#include "cxCenterline.h"
 #include "cxStateMachineManager.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
@@ -21,6 +21,8 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(QWidget* parent) :
 {
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
+
+  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(centerlineFinishedSlot()));
 
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
@@ -69,8 +71,13 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 
   //extract the centerline
   QString savepath = stateManager()->getPatientData()->getActivePatientFolder();
-  Segmentation segmentation;
-  ssc::ImagePtr centerLineImage_d = segmentation.centerline(image_d, savepath);
+  mCenterlineAlgorithm.setInput(image_d, savepath);
+  this->setWhatsMissingInfo("<font color=orange>Generating centerline... Please wait!</font>\n");
+}
+
+void TrackedCenterlineWidget::centerlineFinishedSlot()
+{
+  this->checkIfReadySlot();
 }
 
 void TrackedCenterlineWidget::startedSlot()
