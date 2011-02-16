@@ -1,17 +1,20 @@
-
 #ifndef CXSEGMENTATION_H_
 #define CXSEGMENTATION_H_
 
+#include <QtGui>
+#include <QDateTime>
+#include "sscMessageManager.h"
+
+#include <QObject>
 #include <QString>
 #include "sscForwardDeclarations.h"
 
 #include "sscTransform3D.h"
 
-
 namespace cx
 {
 /**
- * Segmentation
+ * \class Segmentation
  *
  * \brief
  *
@@ -26,14 +29,12 @@ public:
 
   ssc::ImagePtr segment(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmothing=true, double smoothSigma=0.5);
 
-  ssc::ImagePtr centerline(ssc::ImagePtr image, QString outputBasePath); ///< finds the images centerline, saves the new centerline volume and adds it internally to the datamanager
+  //ssc::ImagePtr centerline(ssc::ImagePtr image, QString outputBasePath); ///< finds the images centerline, saves the new centerline volume and adds it internally to the datamanager
 
   ssc::ImagePtr resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
-
-private:
 };
 
+//----------------------------------------------------------------------------------------------------------------------
+
 } // namespace cx
-
-
 #endif /* CXSEGMENTATION_H_ */
