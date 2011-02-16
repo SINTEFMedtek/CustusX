@@ -3,6 +3,9 @@ SET (LIB cxAlgorithms)
 SET( CX_QT_MOC_HEADER_FILES
     cxTimedAlgorithm.h
     cxCenterline.h
+    cxResample.h
+    cxSegmentation.h
+    cxContour.h
 )
 
 SET ( ${LIB}_algorithms
@@ -10,8 +13,8 @@ SET ( ${LIB}_algorithms
     ItkVtkGlue/itkImageToVTKImageFilter.txx
     ItkVtkGlue/itkVTKImageToImageFilter.h
     ItkVtkGlue/itkVTKImageToImageFilter.txx 
-    cxSegmentation.h
-    cxSegmentation.cpp
+    #cxSegmentationOld.h
+    #cxSegmentationOld.cpp
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
@@ -25,6 +28,12 @@ SET ( ${LIB}_algorithms
     cxTimedAlgorithm.cpp
     cxCenterline.h
     cxCenterline.cpp
+    cxResample.h
+    cxResample.cpp
+    cxSegmentation.h
+    cxSegmentation.cpp
+    cxContour.h
+    cxContour.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

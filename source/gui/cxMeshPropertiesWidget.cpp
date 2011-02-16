@@ -140,7 +140,6 @@ void MeshPropertiesWidget::visibilityChangedSlot(bool visible)
 // cxContectDockWidget. Should be merged with this later.
 void MeshPropertiesWidget::populateMeshComboBoxSlot()
 {
-  std::cout << "void MeshPropertiesWidget::populateMeshComboBoxSlot()" << std::endl;
   //mMeshComboBox->blockSignals(true);
   mMeshComboBox->clear();
   
@@ -169,7 +168,6 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
 
 void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
 {
-  std::cout << "void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)" << std::endl;
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("...") 
      || comboBoxText.endsWith(">"))
   {
