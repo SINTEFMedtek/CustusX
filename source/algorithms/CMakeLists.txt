@@ -5,6 +5,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxCenterline.h
     cxResample.h
     cxSegmentation.h
+    cxContour.h
 )
 
 SET ( ${LIB}_algorithms
@@ -12,8 +13,8 @@ SET ( ${LIB}_algorithms
     ItkVtkGlue/itkImageToVTKImageFilter.txx
     ItkVtkGlue/itkVTKImageToImageFilter.h
     ItkVtkGlue/itkVTKImageToImageFilter.txx 
-    cxSegmentationOld.h
-    cxSegmentationOld.cpp
+    #cxSegmentationOld.h
+    #cxSegmentationOld.cpp
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
@@ -31,6 +32,8 @@ SET ( ${LIB}_algorithms
     cxResample.cpp
     cxSegmentation.h
     cxSegmentation.cpp
+    cxContour.h
+    cxContour.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

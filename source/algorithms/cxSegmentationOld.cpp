@@ -72,18 +72,17 @@ itkImageType::ConstPointer getITKfromSSCImageOld(ssc::ImagePtr image)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-ssc::MeshPtr SegmentationOld::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
-    double decimation, bool reduceResolution, bool smoothing)
+/*ssc::MeshPtr SegmentationOld::contour(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation, bool reduceResolution, bool smoothing)
 {
   ssc::messageManager()->sendDebug("Contour, threshold: "+qstring_cast(threshold)+", decimation: "+qstring_cast(decimation)+", reduce resolution: "+qstring_cast(reduceResolution)+", smoothing: "+qstring_cast(smoothing));
 
   //itkImageType::ConstPointer itkImage = getITKfromSSCImageOld(image);
 
     //Create vtkPolyData
-  /*vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
-   convert->SetInput(itkToVtkFilter->GetOutput());
-   convert->SetColorModeToLinear256();
-   convert->Update();*/
+   //vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
+   //convert->SetInput(itkToVtkFilter->GetOutput());
+   //convert->SetColorModeToLinear256();
+   //convert->Update();
 
   //Shrink input volume
   vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
@@ -179,7 +178,7 @@ ssc::MeshPtr SegmentationOld::contour(ssc::ImagePtr image, QString outputBasePat
   //    ssc::GeometricRepPtr surfaceRep(ssc::GeometricRep::New(outName.toStdString()+"_segm"));
   //    surfaceRep->setMesh(surface);
 
-}
+}*/
 //----------------------------------------------------------------------------------------------------------------------
 /*ssc::ImagePtr SegmentationOld::segment(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmothing, double smoothSigma)
 {

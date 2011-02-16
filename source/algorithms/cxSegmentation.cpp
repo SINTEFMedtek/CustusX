@@ -44,8 +44,6 @@ void Segmentation::finishedSlot()
     return;
   }
 
-  ssc::messageManager()->sendInfo("Created segment " + mOutput->getName());
-
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
   mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
   ssc::dataManager()->loadData(mOutput);
