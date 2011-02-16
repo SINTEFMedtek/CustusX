@@ -21,7 +21,7 @@
 #include "sscDoubleWidgets.h"
 #include "cxDataInterface.h"
 #include "cxVolumePropertiesWidget.h"
-#include "cxSegmentation.h"
+#include "cxSegmentationOld.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
@@ -40,6 +40,8 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
 {
   this->setObjectName("ResampleWidget");
   this->setWindowTitle("Resample");
+
+  connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
@@ -97,9 +99,15 @@ void ResampleWidget::resampleSlot()
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   double margin = 20; //mm
 
-  ssc::ImagePtr output = Segmentation().resample(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+  mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+}
+
+void ResampleWidget::handleFinishedSlot()
+{
+  ssc::ImagePtr output = mResampleAlgorithm.getOutput();
   if(!output)
     return;
+
   emit outputImageChanged(output->getUid());
 }
 
@@ -127,6 +135,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
+  connect(&mSegmentationAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -190,7 +199,13 @@ void SegmentationWidget::segmentSlot()
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   this->revertTransferFunctions();
 
-  ssc::ImagePtr segmentedImage = Segmentation().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+  mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+}
+
+void SegmentationWidget::handleFinishedSlot()
+{
+  //ssc::ImagePtr segmentedImage = SegmentationOld().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
   if(!segmentedImage)
     return;
   emit outputImageChanged(segmentedImage->getUid());
@@ -329,6 +344,8 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
 
+  connect(&mContourAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
@@ -381,7 +398,13 @@ void SurfaceWidget::surfaceSlot()
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
   double decimation = mDecimation/100;
-  ssc::MeshPtr outputMesh = Segmentation().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+
+  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+}
+
+void SurfaceWidget::handleFinishedSlot()
+{
+  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
   if(!outputMesh)
     return;
   outputMesh->setColor(mDefaultColor);
@@ -470,7 +493,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
 
-  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinished()));
+  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -525,7 +548,7 @@ void CenterlineWidget::findCenterlineSlot()
   mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath);
 }
 
-void CenterlineWidget::handleFinished()
+void CenterlineWidget::handleFinishedSlot()
 {
   ssc::ImagePtr centerlineImage = mCenterlineAlgorithm.getOutput();
   if(!centerlineImage)

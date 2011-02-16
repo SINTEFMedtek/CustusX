@@ -7,6 +7,9 @@
 #include "sscForwardDeclarations.h"
 #include "cxWhatsThisWidget.h"
 #include "cxCenterline.h"
+#include "cxResample.h"
+#include "cxSegmentation.h"
+#include "cxContour.h"
 
 class QGroupBox;
 class QWidget;
@@ -36,6 +39,7 @@ protected:
 
 private slots:
   void resampleSlot();
+  void handleFinishedSlot();
 
 private:
   ResampleWidget();
@@ -43,6 +47,8 @@ private:
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   SelectImageStringDataAdapterPtr mReferenceImage; ///< holds the currently reference, resample to this volume.
+
+  Resample mResampleAlgorithm;
 };
 
 
@@ -83,6 +89,7 @@ private slots:
   void smoothingSigmaSlot(double value);
   void imageChangedSlot(QString uid);
   void revertTransferFunctions();
+  void handleFinishedSlot();
 
 private:
   SegmentationWidget();
@@ -102,6 +109,8 @@ private:
   ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
   ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
   ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
+
+  Segmentation mSegmentationAlgorithm;
 };
 
 /**
@@ -136,6 +145,7 @@ private slots:
   void reduceResolutionSlot(bool value);
   void smoothingSlot(bool value);
   void imageChangedSlot(QString uid);
+  void handleFinishedSlot();
 
 private:
   SurfaceWidget();
@@ -149,6 +159,8 @@ private:
   QSpinBox* mSurfaceThresholdSpinBox;
   QSpinBox* mDecimationSpinBox;
   QColor mDefaultColor;
+
+  Contour mContourAlgorithm;
 };
 
 /**
@@ -183,7 +195,7 @@ protected:
 
 private slots:
   void findCenterlineSlot();
-  void handleFinished();
+  void handleFinishedSlot();
 
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)

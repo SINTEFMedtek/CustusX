@@ -39,25 +39,29 @@ void Centerline::generate()
 
 void Centerline::finishedSlot()
 {
-  ssc::ImagePtr centerlineImage = mWatcher.future().result();
-  if(!centerlineImage)
+  vtkImageDataPtr rawResult = mWatcher.future().result();
+  if(!rawResult)
   {
     ssc::messageManager()->sendError("Centerline extraction failed.");
     return;
   }
 
-  centerlineImage->get_rMd_History()->setRegistration(mInput->get_rMd());
-  centerlineImage->get_rMd_History()->addParentFrame(mInput->getUid());
-  ssc::dataManager()->loadData(centerlineImage);
-  ssc::dataManager()->saveImage(centerlineImage, mOutputBasePath);
+  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_cl%1";
+  QString name = mInput->getName()+" cl%1";
+  mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
+
+  mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
+  mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
+  ssc::dataManager()->loadData(mOutput);
+  ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
   this->stopTiming();
-  ssc::messageManager()->sendSuccess("Created centerline \"" + centerlineImage->getName()+"\"");
+  ssc::messageManager()->sendSuccess("Created centerline \"" + mOutput->getName()+"\"");
 
   emit finished();
 }
 
-ssc::ImagePtr Centerline::calculate()
+vtkImageDataPtr Centerline::calculate()
 {
   ssc::messageManager()->sendInfo("Generating \""+mInput->getName()+"\" centerline... Please wait!");
 
@@ -78,11 +82,6 @@ ssc::ImagePtr Centerline::calculate()
   vtkImageDataPtr rawResult = vtkImageDataPtr::New();
   rawResult->DeepCopy(itkToVtkFilter->GetOutput());
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_cl%1";
-  QString name = mInput->getName()+" cl%1";
-
-  ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
-
-  return result;
+  return rawResult;
 }
 }//namespace cx
