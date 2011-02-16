@@ -7,6 +7,7 @@
 #include "sscForwardDeclarations.h"
 #include "cxWhatsThisWidget.h"
 #include "cxCenterline.h"
+#include "cxResample.h"
 
 class QGroupBox;
 class QWidget;
@@ -36,6 +37,7 @@ protected:
 
 private slots:
   void resampleSlot();
+  void handleFinished();
 
 private:
   ResampleWidget();
@@ -43,6 +45,8 @@ private:
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   SelectImageStringDataAdapterPtr mReferenceImage; ///< holds the currently reference, resample to this volume.
+
+  Resample mResampleAlgorithm;
 };
 
 
