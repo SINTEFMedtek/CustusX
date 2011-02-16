@@ -285,7 +285,7 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
  *  with qMd. If qMd is non-identity, image is resampled to space q.
  *  outputSpacing can be used to resample the volume (after cropping).
  */
-ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
+/*ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin)
 {
   if (!image || !reference)
     return ssc::ImagePtr();
@@ -319,7 +319,7 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
 
   resampled->getBaseVtkImageData()->Print(std::cout);
   return resampled;
-}
+}*/
 
 //----------------------------------------------------------------------------------------------------------------------
 } // namespace cx

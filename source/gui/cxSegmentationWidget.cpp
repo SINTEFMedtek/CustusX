@@ -41,6 +41,8 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
   this->setObjectName("ResampleWidget");
   this->setWindowTitle("Resample");
 
+  connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinished()));
+
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
@@ -97,9 +99,15 @@ void ResampleWidget::resampleSlot()
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   double margin = 20; //mm
 
-  ssc::ImagePtr output = Segmentation().resample(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+  mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+}
+
+void ResampleWidget::handleFinished()
+{
+  ssc::ImagePtr output = mResampleAlgorithm.getOutput();
   if(!output)
     return;
+
   emit outputImageChanged(output->getUid());
 }
 
