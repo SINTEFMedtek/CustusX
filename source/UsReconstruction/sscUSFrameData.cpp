@@ -71,5 +71,11 @@ QString USFrameData::getFilePath()
 {
   return mImage->getFilePath();
 }
+
+ImagePtr USFrameData::getBase()
+{
+  return mImage;
+}
+
   
 }//namespace ssc
