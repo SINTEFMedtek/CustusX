@@ -1,40 +1,47 @@
 #ifndef CXSEGMENTATION_H_
 #define CXSEGMENTATION_H_
 
+#include "cxTimedAlgorithm.h"
+
 #include <QtGui>
-#include <QDateTime>
-#include "sscMessageManager.h"
-
-#include <QObject>
-#include <QString>
-#include "sscForwardDeclarations.h"
-
-#include "sscTransform3D.h"
 
 namespace cx
 {
 /**
  * \class Segmentation
  *
- * \brief
+ * \brief Threaded segmentation.
  *
- * \date Oct 12, 2010
- * \author Christian Askeland, SINTEF
+ * \date Feb 16, 2011
+ * \author Janne Beate Bakeng, SINTEF
  */
-
-class Segmentation
+class Segmentation : public TimedAlgorithm
 {
+  Q_OBJECT
+
 public:
-  ssc::MeshPtr contour(ssc::ImagePtr image, QString outputBasePath, int threshold, double decimation=0.8, bool reduceResolution=false, bool smoothing=true);
+  Segmentation();
+  virtual ~Segmentation();
 
-  ssc::ImagePtr segment(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmothing=true, double smoothSigma=0.5);
+  void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing=true, double smoothSigma=0.5);
+  ssc::ImagePtr getOutput();
 
-  //ssc::ImagePtr centerline(ssc::ImagePtr image, QString outputBasePath); ///< finds the images centerline, saves the new centerline volume and adds it internally to the datamanager
+protected slots:
+  virtual void finishedSlot();
 
-  //ssc::ImagePtr resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
+private:
+  virtual void generate();
+  vtkImageDataPtr calculate();
+
+  QString       mOutputBasePath;
+  ssc::ImagePtr mInput;
+  ssc::ImagePtr mOutput;
+  int           mTheshold;
+  bool          mUseSmoothing;
+  double        mSmoothingSigma;
+
+  QFuture<vtkImageDataPtr> mFutureResult;
+  QFutureWatcher<vtkImageDataPtr> mWatcher;
 };
-
-//----------------------------------------------------------------------------------------------------------------------
-
-} // namespace cx
+}//namespace cx
 #endif /* CXSEGMENTATION_H_ */

@@ -8,6 +8,7 @@
 #include "cxWhatsThisWidget.h"
 #include "cxCenterline.h"
 #include "cxResample.h"
+#include "cxSegmentation.h"
 
 class QGroupBox;
 class QWidget;
@@ -37,7 +38,7 @@ protected:
 
 private slots:
   void resampleSlot();
-  void handleFinished();
+  void handleFinishedSlot();
 
 private:
   ResampleWidget();
@@ -87,6 +88,7 @@ private slots:
   void smoothingSigmaSlot(double value);
   void imageChangedSlot(QString uid);
   void revertTransferFunctions();
+  void handleFinishedSlot();
 
 private:
   SegmentationWidget();
@@ -106,6 +108,8 @@ private:
   ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
   ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
   ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
+
+  Segmentation mSegmentationAlgorithm;
 };
 
 /**
@@ -187,7 +191,7 @@ protected:
 
 private slots:
   void findCenterlineSlot();
-  void handleFinished();
+  void handleFinishedSlot();
 
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
