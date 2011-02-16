@@ -135,6 +135,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
+  connect(&mSegmentationAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -343,6 +344,8 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
 
+  connect(&mContourAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
@@ -396,7 +399,12 @@ void SurfaceWidget::surfaceSlot()
 
   double decimation = mDecimation/100;
 
-  ssc::MeshPtr outputMesh = SegmentationOld().contour(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+}
+
+void SurfaceWidget::handleFinishedSlot()
+{
+  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
   if(!outputMesh)
     return;
   outputMesh->setColor(mDefaultColor);
