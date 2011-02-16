@@ -6,6 +6,7 @@
 #include <QString>
 #include "sscForwardDeclarations.h"
 #include "cxWhatsThisWidget.h"
+#include "cxCenterline.h"
 
 class QGroupBox;
 class QWidget;
@@ -35,12 +36,6 @@ protected:
 
 private slots:
   void resampleSlot();
-//  void toogleBinarySlot(bool on);
-//  void thresholdSlot(int value);
-//  void toogleSmoothingSlot(bool on);
-//  void smoothingSigmaSlot(double value);
-//  void imageChangedSlot(QString uid);
-//  void revertTransferFunctions();
 
 private:
   ResampleWidget();
@@ -194,9 +189,8 @@ private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
   QColor mDefaultColor;
-  //QPushButton* mGenerateVisualizationButton;
-  QFuture<ssc::ImagePtr> mFutureResult;
-  QFutureWatcher<ssc::ImagePtr > mWatcher;
+
+  Centerline  mCenterlineAlgorithm;
 };
 
 /**
@@ -221,14 +215,14 @@ public slots:
   void movingImageSlot(QString uid);
 
 private slots:
-  void testSlot();
+  //void testSlot(); //TESTING
   void registerSlot();
 
 private:
   RegisterI2IWidget();
 
   QPushButton* mRegisterButton;
-  QPushButton* mTestButton;
+  //QPushButton* mTestButton; //TESTING
   QLabel* mFixedImageLabel;
   QLabel* mMovingImageLabel;
 };

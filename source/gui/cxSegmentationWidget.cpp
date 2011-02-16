@@ -35,8 +35,6 @@
 
 namespace cx
 {
-
-
 ResampleWidget::ResampleWidget(QWidget* parent) :
   WhatsThisWidget(parent)
 {
@@ -51,29 +49,18 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-//  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
   mReferenceImage = SelectImageStringDataAdapter::New();
   mReferenceImage->setValueName("Select reference: ");
-//  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-//  connect(mReferenceImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
   ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
   topLayout->addWidget(referenceImageComboBox, 1, 0);
 
   QPushButton* resampleButton = new QPushButton("Resample", this);
   connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
-//  QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
-//  segmentationOptionsButton->setCheckable(true);
-//  QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
-//  connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
-//  connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
-//  segmentationOptionsWidget->setVisible(segmentationOptionsButton->isChecked());
 
   topLayout->addWidget(resampleButton, 2,0);
-//  topLayout->addWidget(segmentationOptionsButton, 1,1);
-//  topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
 
   this->adjustSizeSlot();
 }
@@ -122,13 +109,6 @@ QWidget* ResampleWidget::createOptionsWidget()
   return retval;
 }
 //------------------------------------------------------------------------------
-
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-
-
-// --------------------------------------------------------
 
 SegmentationWidget::SegmentationWidget(QWidget* parent) :
   WhatsThisWidget(parent),
@@ -485,13 +465,12 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   WhatsThisWidget(parent),
   mFindCenterlineButton(new QPushButton("Find centerline")),
-//  mGenerateVisualizationButton(new QPushButton("Visualize")),
   mDefaultColor("red")
 {
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
 
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(handleFinished()));
+  connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinished()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -502,11 +481,9 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 
   layout->addWidget(selectImageComboBox);
   layout->addWidget(mFindCenterlineButton);
-//  layout->addWidget(mGenerateVisualizationButton);
   layout->addStretch();
 
   connect(mFindCenterlineButton, SIGNAL(clicked()), this, SLOT(findCenterlineSlot()));
-//  connect(mGenerateVisualizationButton, SIGNAL(clicked()), this, SLOT(visualizeSlot()));
 }
 
 CenterlineWidget::~CenterlineWidget()
@@ -545,21 +522,12 @@ void CenterlineWidget::setDefaultColor(QColor color)
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-//  ssc::ImagePtr centerlineImage = Segmentation().centerline(mSelectedImage->getImage(), outputBasePath);
-
-  mFutureResult = QtConcurrent::run(boost::bind(&Segmentation::centerline, Segmentation(), mSelectedImage->getImage(), outputBasePath));
-  mWatcher.setFuture(mFutureResult);
-//  centerlineImage = mFutureResult.result();
-//  if(!centerlineImage)
-//    return;
-//
-//  emit outputImageChanged(centerlineImage->getUid());
+  mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath);
 }
 
 void CenterlineWidget::handleFinished()
 {
-  ssc::ImagePtr centerlineImage = mWatcher.future().result();
-//  centerlineImage = mFutureResult.result();
+  ssc::ImagePtr centerlineImage = mCenterlineAlgorithm.getOutput();
   if(!centerlineImage)
     return;
 
@@ -594,16 +562,12 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
 
 //------------------------------------------------------------------------------
 
-
-
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mRegisterButton(new QPushButton("Register")),
-    mTestButton(new QPushButton("TEST, loads two minc images into the system.")),
+    //mTestButton(new QPushButton("TEST, loads two minc images into the system.")), //TESTING
     mFixedImageLabel(new QLabel("Fixed image:")),
     mMovingImageLabel(new QLabel("Moving image:"))
-//mFixedImageLabel(new QLabel("<font color=\"green\">Fixed image: </font>")),
-//mMovingImageLabel(new QLabel("<font color=\"blue\">Moving image: </font>"))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
@@ -621,9 +585,9 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
 
   //TESTING
-  layout->addWidget(this->createHorizontalLine(), 5, 0);
+  /*layout->addWidget(this->createHorizontalLine(), 5, 0);
   layout->addWidget(mTestButton, 6, 0);
-  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));
+  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));*/
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()
@@ -642,7 +606,6 @@ void RegisterI2IWidget::fixedImageSlot(QString uid)
   ssc::DataPtr fixedImage = registrationManager()->getFixedData();
   if(!fixedImage)
     return;
-//  mFixedImageLabel->setText(qstring_cast("<font color=\"green\"> Fixed data: <b>"+fixedImage->getName()+"</b></font>"));
   mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
   mFixedImageLabel->update();
 }
@@ -653,11 +616,10 @@ void RegisterI2IWidget::movingImageSlot(QString uid)
   if(!movingImage)
     return;
   mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
-//  mMovingImageLabel->setText(qstring_cast("<font color=\"blue\">Moving data: <b>"+movingImage->getName()+"</b></font>"));
   mMovingImageLabel->update();
 }
 
-void RegisterI2IWidget::testSlot()
+/*void RegisterI2IWidget::testSlot()
 {
   if(!stateManager()->getPatientData()->isPatientValid())
   {
@@ -722,7 +684,7 @@ void RegisterI2IWidget::testSlot()
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
   ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
-}
+}*/
 
 void RegisterI2IWidget::registerSlot()
 {

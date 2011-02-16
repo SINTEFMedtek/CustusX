@@ -1,6 +1,5 @@
 #include "cxSegmentation.h"
 
-//ITK
 #include <itkImage.h>
 #include <itkSmoothingRecursiveGaussianImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
@@ -8,7 +7,6 @@
 #include "ItkVtkGlue/itkImageToVTKImageFilter.h"
 #include "ItkVtkGlue/itkVTKImageToImageFilter.h"
 
-//VTK
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>
 #include <vtkMarchingCubes.h>
@@ -46,12 +44,12 @@ typedef itk::VTKImageToImageFilter<itkImageType> itkVTKImageToImageFilterType;
 
 namespace cx
 {
-
-itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
+//----------------------------------------------------------------------------------------------------------------------
+itkImageType::ConstPointer getITKfromSSCImageOld(ssc::ImagePtr image)
 {
   if(!image)
   {
-    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
+    std::cout << "getITKfromSSCImageOld(): NO image!!!" << std::endl;
     return itkImageType::ConstPointer();
   }
   itkVTKImageToImageFilterType::Pointer vtk2itkFilter = itkVTKImageToImageFilterType::New();
@@ -72,12 +70,14 @@ itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image)
   return vtk2itkFilter->GetOutput();
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+
 ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, int threshold,
     double decimation, bool reduceResolution, bool smoothing)
 {
   ssc::messageManager()->sendDebug("Contour, threshold: "+qstring_cast(threshold)+", decimation: "+qstring_cast(decimation)+", reduce resolution: "+qstring_cast(reduceResolution)+", smoothing: "+qstring_cast(smoothing));
 
-  //itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
+  //itkImageType::ConstPointer itkImage = getITKfromSSCImageOld(image);
 
     //Create vtkPolyData
   /*vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
@@ -180,10 +180,10 @@ ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, 
   //    surfaceRep->setMesh(surface);
 
 }
-
+//----------------------------------------------------------------------------------------------------------------------
 ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmothing, double smoothSigma)
 {
-  itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
+  itkImageType::ConstPointer itkImage = getITKfromSSCImageOld(image);
 
   //Smoothing
   if(useSmothing)
@@ -234,13 +234,15 @@ ssc::ImagePtr Segmentation::segment(ssc::ImagePtr image, QString outputBasePath,
   return result;
 }
 
-ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
+//----------------------------------------------------------------------------------------------------------------------
+
+/*ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePath)
 {
   ssc::messageManager()->sendInfo("Finding "+image->getName()+"s centerline... Please wait!");
 
   QDateTime startTime = QDateTime::currentDateTime();
 
-  itkImageType::ConstPointer itkImage = getITKfromSSCImage(image);
+  itkImageType::ConstPointer itkImage = getITKfromSSCImageOld(image);
 
   //Centerline extraction
   typedef itk::BinaryThinningImageFilter3D<itkImageType, itkImageType> centerlineFilterType;
@@ -261,7 +263,7 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   QString name = image->getName()+" cl%1";
   //std::cout << "segmented volume: " << uid << ", " << name << std::endl;
   ssc::ImagePtr result = ssc::dataManager()->createImage(rawResult,uid, name);
-  ssc::messageManager()->sendInfo("created centerline " + result->getName());
+  ssc::messageManager()->sendInfo("Created centerline " + result->getName());
 
   result->get_rMd_History()->setRegistration(image->get_rMd());
 
@@ -274,9 +276,9 @@ ssc::ImagePtr Segmentation::centerline(ssc::ImagePtr image, QString outputBasePa
   ssc::dataManager()->saveImage(result, outputBasePath);
 
   return result;
-}
+}*/
 
-
+//----------------------------------------------------------------------------------------------------------------------
 
 /** Crop the image to the bounding box bb_q.
  *  bb_q is given in the output space q, defined relative to the image space d
@@ -319,6 +321,7 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
   return resampled;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
 } // namespace cx
 
 
