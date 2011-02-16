@@ -10,7 +10,7 @@ namespace cx
 /**
  * \class Resample
  *
- * \brief
+ * \brief Threaded resampler.
  *
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
