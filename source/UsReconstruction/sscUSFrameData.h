@@ -40,6 +40,7 @@ public:
   QString getName();
   QString getUid();
   QString getFilePath();
+  ImagePtr getBase();
 private:
   ImagePtr mImage;
   std::vector<unsigned char*> mFrames;
