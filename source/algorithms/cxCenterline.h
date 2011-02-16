@@ -33,14 +33,14 @@ protected slots:
 
 private:
   virtual void generate();
-  ssc::ImagePtr calculate();
+  vtkImageDataPtr calculate();
 
   QString       mOutputBasePath;
   ssc::ImagePtr mInput;
   ssc::ImagePtr mOutput;
 
-  QFuture<ssc::ImagePtr> mFutureResult;
-  QFutureWatcher<ssc::ImagePtr > mWatcher;
+  QFuture<vtkImageDataPtr> mFutureResult;
+  QFutureWatcher<vtkImageDataPtr> mWatcher;
 };
 
 }//namespace cx
