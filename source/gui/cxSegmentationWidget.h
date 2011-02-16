@@ -9,6 +9,7 @@
 #include "cxCenterline.h"
 #include "cxResample.h"
 #include "cxSegmentation.h"
+#include "cxContour.h"
 
 class QGroupBox;
 class QWidget;
@@ -144,6 +145,7 @@ private slots:
   void reduceResolutionSlot(bool value);
   void smoothingSlot(bool value);
   void imageChangedSlot(QString uid);
+  void handleFinishedSlot();
 
 private:
   SurfaceWidget();
@@ -157,6 +159,8 @@ private:
   QSpinBox* mSurfaceThresholdSpinBox;
   QSpinBox* mDecimationSpinBox;
   QColor mDefaultColor;
+
+  Contour mContourAlgorithm;
 };
 
 /**
