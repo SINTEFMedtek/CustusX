@@ -96,6 +96,8 @@ RepManager::RepManager() :
   //connect the dominant tool to the acs-sets so they also get update when we move the tool
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)),
           this, SLOT(dominantToolChangedSlot(const QString&)));
+
+  connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(volumeRemovedSlot(QString)));
 }
 
 /**Shortcut function for adding new reps to the internal maps
@@ -295,6 +297,15 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     //mImageMapperMonitorMap[image->getUid()].reset(new ssc::ImageMapperMonitor(rep));
   }
   return mVolumetricRepByImageMap[image->getUid()];
+}
+
+/**always remove from cache after deleting a volume, because we _might_ import the same volume again,
+ * with the _same_ uid.
+ *
+ */
+void RepManager::volumeRemovedSlot(QString uid)
+{
+  mVolumetricRepByImageMap.erase(uid);
 }
 
 
