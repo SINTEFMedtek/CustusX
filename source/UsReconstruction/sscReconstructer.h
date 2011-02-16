@@ -39,21 +39,19 @@ typedef boost::shared_ptr<class Reconstructer> ReconstructerPtr;
 class Reconstructer : public QObject
 {
   Q_OBJECT
-public:
   friend class ThreadedReconstructer;
 
+public:
   Reconstructer(XmlOptionFile settings, QString shaderPath);
   virtual ~Reconstructer();
 
   void selectData(QString filename, QString calFilesPath="");
   void reconstruct(); // assumes readFiles has already been called
-//  bool validReconstructData() const;
-  void clearAll();
   QString getSelectedData() const { return mFilename; }
 
   ImagePtr getOutput();
-  //ImagePtr getInput();
   XmlOptionFile getSettings() const { return mSettings; }
+
   StringDataAdapterXmlPtr mOrientationAdapter;
   StringDataAdapterXmlPtr mAlgorithmAdapter;
   std::vector<DataAdapterPtr> mAlgoOptions;
@@ -75,32 +73,31 @@ signals:
   void reconstructFinished();
 
 private:
-  //ImagePtr mUsRaw;///<All imported US data framed packed into one image
-  USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-  std::vector<TimedPosition> mFrames;
-  std::vector<TimedPosition> mPositions;
-  ImagePtr mMask;///< Clipping mask for the input data
+  struct FileData
+  {
+    USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+    std::vector<TimedPosition> mFrames;
+    std::vector<TimedPosition> mPositions;
+    ImagePtr mMask;///< Clipping mask for the input data
+    ssc::ProbeSector mProbeData;
+  };
+  FileData mFileData;
+  FileData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
+  cx::UsReconstructionFileReaderPtr mFileReader;
   OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
-  ssc::ProbeSector mProbeData;
   XmlOptionFile mSettings;
-  QString mLastAppliedOrientation; ///< the orientation algorithm used for the currently calculated extent.
   QString mCalFileName; ///< Name of calibration file
   QString mCalFilesPath; ///< Path to calibration files
   QString mFilename; ///< filename used for current data read
-//  QString mCalFilename; /// filename used for current cal read
   ImagePtr mOutput;///< Output image from reconstruction
   QString mOutputRelativePath;///< Relative path to the output image
   QString mOutputBasePath;///< Global path where the relative path starts, for the output image
   QString mShaderPath; ///< name of shader folder
-  QString mLastAppliedMaskReduce;///< The last used mask reduction
-  
   double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
-  cx::UsReconstructionFileReaderPtr mFileReader;
-  void readFiles(QString mhdFileName, QString calFilesPath);
-//  void reconstruct(QString mhdFileName, QString calFilesPath); // do everything
+  void readCoreFiles(QString fileName, QString calFilesPath);
   ImagePtr createMaskFromConfigParams();
   ImagePtr generateMask();
   ssc::Transform3D applyOutputOrientation();
@@ -114,10 +111,10 @@ private:
   void calibrate(QString calFilesPath);
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
-  //StringOptionItem getNamedSetting(const QString& uid);
   void clearOutput();
-  //void saveSettings();
   void createAlgorithm();
+  void updateFromOriginalFileData();
+  void clearAll();
 
   QString generateOutputUid();
   QString generateImageName(QString uid) const;
