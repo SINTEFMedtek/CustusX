@@ -127,14 +127,12 @@ void MeshPropertiesWidget::visibilityChangedSlot(bool visible)
 {
   if(visible)
   {
-    connect(ssc::dataManager(), SIGNAL(dataLoaded()),
-            this, SLOT(populateMeshComboBoxSlot()));
+    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateMeshComboBoxSlot()));
     this->populateMeshComboBoxSlot();
   }
   else
   {
-    disconnect(ssc::dataManager(), SIGNAL(dataLoaded()),
-               this, SLOT(populateMeshComboBoxSlot()));
+    disconnect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateMeshComboBoxSlot()));
   }
 }
   
@@ -142,7 +140,8 @@ void MeshPropertiesWidget::visibilityChangedSlot(bool visible)
 // cxContectDockWidget. Should be merged with this later.
 void MeshPropertiesWidget::populateMeshComboBoxSlot()
 {
-  mMeshComboBox->blockSignals(true);
+  std::cout << "void MeshPropertiesWidget::populateMeshComboBoxSlot()" << std::endl;
+  //mMeshComboBox->blockSignals(true);
   mMeshComboBox->clear();
   
   //get a list of meshes from the datamanager
@@ -165,11 +164,12 @@ void MeshPropertiesWidget::populateMeshComboBoxSlot()
     mMeshComboBox->insertItem(listPosition, QString(i->first));
     listPosition++;
   }
-  mMeshComboBox->blockSignals(false);
+  //mMeshComboBox->blockSignals(false);
 }
 
 void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
 {
+  std::cout << "void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)" << std::endl;
   if(comboBoxText.isEmpty() || comboBoxText.endsWith("...") 
      || comboBoxText.endsWith(">"))
   {
