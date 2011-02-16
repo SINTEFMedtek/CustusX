@@ -31,7 +31,7 @@ public:
 
   //ssc::ImagePtr centerline(ssc::ImagePtr image, QString outputBasePath); ///< finds the images centerline, saves the new centerline volume and adds it internally to the datamanager
 
-  ssc::ImagePtr resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
+  //ssc::ImagePtr resample(ssc::ImagePtr image, ssc::ImagePtr reference, QString outputBasePath, double margin);
 };
 
 //----------------------------------------------------------------------------------------------------------------------

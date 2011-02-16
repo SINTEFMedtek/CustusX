@@ -3,6 +3,7 @@ SET (LIB cxAlgorithms)
 SET( CX_QT_MOC_HEADER_FILES
     cxTimedAlgorithm.h
     cxCenterline.h
+    cxResample.h
 )
 
 SET ( ${LIB}_algorithms
@@ -25,6 +26,8 @@ SET ( ${LIB}_algorithms
     cxTimedAlgorithm.cpp
     cxCenterline.h
     cxCenterline.cpp
+    cxResample.h
+    cxResample.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
