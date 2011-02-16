@@ -154,8 +154,8 @@ ssc::MeshPtr Segmentation::contour(ssc::ImagePtr image, QString outputBasePath, 
   //    // TODO: possible memory problem here - check debug mem system of itk/vtk
 
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_cont%1";
-  QString name = image->getName() + " contour %1";
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_ge%1";
+  QString name = image->getName() + " ge%1";
   //std::cout << "contoured volume: " << uid << ", " << name << std::endl;
   ssc::MeshPtr result = ssc::dataManager()->createMesh(cubesPolyData, uid,
       name, "Images");
@@ -313,7 +313,11 @@ ssc::ImagePtr Segmentation::resample(ssc::ImagePtr image, ssc::ImagePtr referenc
 //  dataManager()->loadData(cropped);
 //  dataManager()->saveImage(cropped, outputBasePath);
 
-  ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()));
+  // override default name generation
+  QString uid = ssc::changeExtension(image->getUid(), "") + "_resample%1";
+  QString name = image->getName()+" resample%1";
+
+  ssc::ImagePtr resampled = resampleImage(cropped, ssc::Vector3D(reference->getBaseVtkImageData()->GetSpacing()), uid, name);
   ssc::dataManager()->loadData(resampled);
   ssc::dataManager()->saveImage(resampled, outputBasePath);
 

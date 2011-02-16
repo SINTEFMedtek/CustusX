@@ -72,7 +72,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
 /** Return an image that is resampled with a new output spacing.
  *  The image is not added to the data manager nor saved.
  */
-ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing)
+ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid, QString name)
 {
   std::cout << "oldspacing: " << ssc::Vector3D(image->getBaseVtkImageData()->GetSpacing()) << std::endl;
   std::cout << "spacing: " << spacing << std::endl;
@@ -85,8 +85,11 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing)
 
   rawResult->Update();
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
-  QString name = image->getName()+" res%1";
+  if (uid.isEmpty())
+  {
+    uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
+    name = image->getName()+" res%1";
+  }
   ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
   retval->get_rMd_History()->setRegistration(image->get_rMd());
   retval->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
