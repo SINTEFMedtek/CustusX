@@ -40,7 +40,7 @@ vtkImageDataPtr ProbeAdapterRTSource::getVtkImageData()
 
 double ProbeAdapterRTSource::getTimestamp()
 {
-  return mBase->getTimestamp() + mProbe->getData().mTemporalCalibration;
+  return mBase->getTimestamp() - mProbe->getData().mTemporalCalibration;
 }
 
 void ProbeAdapterRTSource::probeChangedSlot()
