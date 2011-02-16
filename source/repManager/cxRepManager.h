@@ -105,6 +105,7 @@ public:
 protected slots:
   void probeRepPointPickedSlot(double x,double y,double z);
   void dominantToolChangedSlot(const QString& toolUid); ///< makes sure the inriareps are connected to the right tool
+  void volumeRemovedSlot(QString uid);
 
 protected:
   template<class REP, class MAP>
@@ -155,6 +156,8 @@ private:
   ~RepManager(); ///< empty
   RepManager(RepManager const&); ///< not implemented
   RepManager& operator=(RepManager const&); ///< not implemented
+
+
 };
 RepManager* repManager();
 }//namespace cx
