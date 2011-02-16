@@ -10,19 +10,6 @@
 #include <vtkImageReslice.h>
 #include <vtkMatrix4x4.h>
 
-//#include <vtkImageReslice.h>
-//#include <vtkMatrix4x4.h>
-//#include <vtkImageResample.h>
-//#include <vtkSmartPointer.h>
-//#include <vtkMarchingCubes.h>
-//#include <vtkPolyData.h>
-//#include <vtkImageShrink3D.h>
-//#include <vtkWindowedSincPolyDataFilter.h>
-//#include <vtkTriangleFilter.h>
-//#include <vtkDecimatePro.h>
-//#include <vtkPolyDataNormals.h>
-//#include <vtkTubeFilter.h>
-//#include <vtkImageCast.h>
 #include <vtkImageResample.h>
 #include <vtkImageClip.h>
 
