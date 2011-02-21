@@ -64,7 +64,9 @@ class ProbeData
 public: 
   struct ProbeImageData
   {
-    ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
+//    ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
+    ssc::Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
+    ssc::Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
     ssc::Vector3D mSpacing;
     QSize mSize;
   };

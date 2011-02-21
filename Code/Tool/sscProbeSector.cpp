@@ -82,7 +82,7 @@ bool ProbeSector::isInside(Vector3D p_v)
 vtkImageDataPtr ProbeSector::getMask()
 {
 //  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.mOrigin_u) - mData.mDepthStart * Vector3D(0,1,0);
-  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.mOrigin_u);
+  mCachedCenter_v = this->get_uMv().inv().coord(mData.mImage.getOrigin_u());
 
   vtkImageDataPtr retval;
   retval = generateVtkImageData(Vector3D(mData.mImage.mSize.width(),mData.mImage.mSize.height(),1), mData.mImage.mSpacing, 0);
@@ -105,19 +105,19 @@ vtkImageDataPtr ProbeSector::getMask()
 
 void ProbeSector::test()
 {
-  Transform3D tMu = this->get_tMu();
-  Vector3D e_x(1,0,0);
-  Vector3D e_y(0,1,0);
-  Vector3D e_z(0,0,1);
-
-  // zero = tMu * mOrigin_u
-  std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.mImage.mOrigin_u) << ", mOrigin_u: " << mData.mImage.mOrigin_u << std::endl;
-
-  // e_z = tMu * -e_y
-  std::cout << "e_z = tMu * -e_y " << tMu.vector(-e_y) <<std::endl;
-
-  // e_y = tMu * -e_x
-  std::cout << "e_y = tMu * -e_x " << tMu.vector(-e_x) <<std::endl;
+//  Transform3D tMu = this->get_tMu();
+//  Vector3D e_x(1,0,0);
+//  Vector3D e_y(0,1,0);
+//  Vector3D e_z(0,0,1);
+//
+//  // zero = tMu * mOrigin_u
+//  std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.mImage.mOrigin_u) << ", mOrigin_u: " << mData.mImage.mOrigin_u << std::endl;
+//
+//  // e_z = tMu * -e_y
+//  std::cout << "e_z = tMu * -e_y " << tMu.vector(-e_y) <<std::endl;
+//
+//  // e_y = tMu * -e_x
+//  std::cout << "e_y = tMu * -e_x " << tMu.vector(-e_x) <<std::endl;
 }
 
 Transform3D ProbeSector::get_tMu() const
@@ -125,7 +125,7 @@ Transform3D ProbeSector::get_tMu() const
   Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
   Transform3D Rz = ssc::createTransformRotateY(-M_PI/2.0);
   ssc::Transform3D R = (Rx*Rz);
-  ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.mOrigin_u);
+  ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.getOrigin_u());
 
   ssc::Transform3D tMu = R*T;
   return tMu;
