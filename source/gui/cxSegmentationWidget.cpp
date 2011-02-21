@@ -19,6 +19,7 @@
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
 #include "sscDoubleWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxSegmentationOld.h"
@@ -27,8 +28,7 @@
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
 #include "cxDataLocations.h"
-#include "sscLabeledComboBoxWidget.h"
-
+#include "cxSeansVesselRegistrationWidget.h"
 
 //Testing
 #include "vesselReg/SeansVesselReg.hxx"
@@ -587,23 +587,25 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
 
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
-    mRegisterButton(new QPushButton("Register")),
+    mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
+//    mRegisterButton(new QPushButton("Register")),
     //mTestButton(new QPushButton("TEST, loads two minc images into the system.")), //TESTING
-    mFixedImageLabel(new QLabel("Fixed image:")),
-    mMovingImageLabel(new QLabel("Moving image:"))
+//    mFixedImageLabel(new QLabel("Fixed image:")),
+//    mMovingImageLabel(new QLabel("Moving image:"))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
 
-  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+//  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
 
-  layout->addWidget(mFixedImageLabel, 0, 0);
-  layout->addWidget(mMovingImageLabel, 1, 0);
-  layout->addWidget(mRegisterButton, 2, 0);
+//  layout->addWidget(mFixedImageLabel, 0, 0);
+//  layout->addWidget(mMovingImageLabel, 1, 0);
+//  layout->addWidget(mRegisterButton, 2, 0);
+  layout->addWidget(mSeansVesselRegsitrationWidget);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
 
@@ -626,20 +628,22 @@ QString RegisterI2IWidget::defaultWhatsThis() const
 
 void RegisterI2IWidget::fixedImageSlot(QString uid)
 {
-  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
-  if(!fixedImage)
-    return;
-  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
-  mFixedImageLabel->update();
+  mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
+//  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
+//  if(!fixedImage)
+//    return;
+//  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
+//  mFixedImageLabel->update();
 }
 
 void RegisterI2IWidget::movingImageSlot(QString uid)
 {
-  ssc::DataPtr movingImage = registrationManager()->getMovingData();
-  if(!movingImage)
-    return;
-  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
-  mMovingImageLabel->update();
+  mSeansVesselRegsitrationWidget->movingImageSlot(uid);
+//  ssc::DataPtr movingImage = registrationManager()->getMovingData();
+//  if(!movingImage)
+//    return;
+//  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
+//  mMovingImageLabel->update();
 }
 
 /*void RegisterI2IWidget::testSlot()
@@ -709,10 +713,10 @@ void RegisterI2IWidget::movingImageSlot(QString uid)
   ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
 }*/
 
-void RegisterI2IWidget::registerSlot()
-{
-  registrationManager()->doVesselRegistration();
-}
+//void RegisterI2IWidget::registerSlot()
+//{
+//  registrationManager()->doVesselRegistration();
+//}
 
 //------------------------------------------------------------------------------
 
