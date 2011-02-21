@@ -1,5 +1,5 @@
-#ifndef SSCPROBEDATA_H_
-#define SSCPROBEDATA_H_
+#ifndef SSCPROBESECTOR_H_
+#define SSCPROBESECTOR_H_
 
 #include <QSize>
 #include "vtkSmartPointer.h"
@@ -45,4 +45,4 @@ private:
 
 } // namespace ssc
 
-#endif /*SSCPROBEDATA_H_*/
+#endif /*SSCPROBEDECTOR_H_*/

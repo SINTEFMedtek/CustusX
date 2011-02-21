@@ -1,5 +1,5 @@
-#ifndef SSCPROBESECTOR_H_
-#define SSCPROBESECTOR_H_
+#ifndef SSCPROBEDATA_H_
+#define SSCPROBEDATA_H_
 
 #include <QSize>
 class QDomNode;
@@ -90,4 +90,4 @@ public:
 
 } // namespace ssc
 
-#endif /*SSCPROBESECTOR_H_*/
+#endif /*SSCPROBEDATA_H_*/
