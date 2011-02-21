@@ -117,7 +117,7 @@ TrackedRecordWidget::TrackedRecordWidget(QWidget* parent, QString description) :
 TrackedRecordWidget::~TrackedRecordWidget()
 {}
 
-void TrackedRecordWidget::setTool(ToolPtr tool)
+void TrackedRecordWidget::setTool(ssc::ToolPtr tool)
 {
   if(mTool && tool && (mTool->getUid() == tool->getUid()))
     return;
@@ -126,7 +126,7 @@ void TrackedRecordWidget::setTool(ToolPtr tool)
   emit toolChanged();
 }
 
-ToolPtr TrackedRecordWidget::getTool()
+ssc::ToolPtr TrackedRecordWidget::getTool()
 {
   return mTool;
 }

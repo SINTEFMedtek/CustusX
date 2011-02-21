@@ -106,7 +106,7 @@ ssc::TimedTransformMap USAcqusitionWidget::getRecording(RecordSessionPtr session
 {
   ssc::TimedTransformMap retval;
 
-  ToolPtr tool = this->getTool();
+  ssc::ToolPtr tool = this->getTool();
   if(tool)
     retval = tool->getSessionHistory(session->getStartTime(), session->getStopTime());
 
@@ -125,7 +125,7 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
     ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Volume data only will be written.");
   }
 
-  ToolPtr probe = this->getTool();
+  ssc::ToolPtr probe = this->getTool();
   mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
@@ -156,11 +156,17 @@ void USAcqusitionWidget::dominantToolChangedSlot()
   if(!probe)
     return;
 
-  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(tool);
-  if(!cxTool)
-    return;
+  // REmoved: cannot rely on just one specialization: makes testing impossible.
+//  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(tool);
+//  if(!cxTool)
+//    return;
 
-  this->setTool(cxTool);
+  if (this->getTool() && this->getTool()->getProbe())
+    disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+
+  connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
+
+  this->setTool(tool);
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
