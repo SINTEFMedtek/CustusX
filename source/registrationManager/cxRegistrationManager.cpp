@@ -426,17 +426,18 @@ void RegistrationManager::doFastRegistration_Translation()
   ssc::messageManager()->sendSuccess("Fast translation registration has been performed.");
 }
 
-void RegistrationManager::doVesselRegistration()
+void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose)
 {
 
-  int lts_ratio = 80;
+  //Default values
+  /*int lts_ratio = 80;
   double stop_delta = 0.001;
   double lambda = 0;
   double sigma = 1.0;
   bool lin_flag = 1;
   int sample = 1;
   int single_point_thre = 1;
-  bool verbose = 1;
+  bool verbose = 1;*/
 
   SeansVesselReg vesselReg(lts_ratio,
         stop_delta,
