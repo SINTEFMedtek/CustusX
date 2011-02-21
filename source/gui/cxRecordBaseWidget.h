@@ -100,11 +100,11 @@ protected slots:
 
 protected:
   virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session) = 0; ///< gets the tracking data from all relevant tool for the given session
-  void setTool(ToolPtr tool);
-  ToolPtr getTool();
+  void setTool(ssc::ToolPtr tool);
+  ssc::ToolPtr getTool();
 
 private:
-  ToolPtr mTool;
+  ssc::ToolPtr mTool;
 };
 
 }//namespace cx
