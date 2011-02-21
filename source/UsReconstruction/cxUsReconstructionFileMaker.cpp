@@ -16,7 +16,7 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace cx
 {
-UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RTSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ToolPtr tool) :
+UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::RTSourceRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool) :
     mTrackerRecordedData(trackerRecordedData),
     mStreamRecordedData(streamRecordedData),
     mSessionDescription(sessionDescription),
@@ -244,9 +244,11 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 
 QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFolder)
 {
+  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mTool);
   if (!mTool)
     return "";
-  QString calibFileName = mTool->getCalibrationFileName();
+
+  QString calibFileName = cxTool->getCalibrationFileName();
   QFile calibFile(calibFileName);
   QFileInfo info(calibFile);
   const QString filename = info.fileName();
