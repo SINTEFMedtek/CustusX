@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<toolfile type="polaris" reference="yes">../Tools/AccuracyPhantom.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/8700340.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/07-198-0838_SW_Pointer_02.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Vivid7_Karkirurgen_M12L_8700449_water.xml</toolfile>
+
+</configuration>
