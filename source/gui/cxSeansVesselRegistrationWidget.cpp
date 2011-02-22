@@ -7,6 +7,8 @@
 #include "sscMessageManager.h"
 #include "cxRegistrationManager.h"
 
+#include "cxTimedAlgorithm.h"
+
 namespace cx
 {
 

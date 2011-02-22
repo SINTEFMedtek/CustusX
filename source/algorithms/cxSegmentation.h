@@ -3,8 +3,6 @@
 
 #include "cxTimedAlgorithm.h"
 
-#include <QtGui>
-
 namespace cx
 {
 /**
@@ -15,7 +13,7 @@ namespace cx
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class Segmentation : public TimedAlgorithm
+class Segmentation : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
   Q_OBJECT
 
@@ -27,11 +25,10 @@ public:
   ssc::ImagePtr getOutput();
 
 protected slots:
-  virtual void finishedSlot();
+  virtual void postProcessingSlot();
 
 private:
-  virtual void generate();
-  vtkImageDataPtr calculate();
+  virtual vtkImageDataPtr calculate();
 
   QString       mOutputBasePath;
   ssc::ImagePtr mInput;
@@ -39,9 +36,6 @@ private:
   int           mTheshold;
   bool          mUseSmoothing;
   double        mSmoothingSigma;
-
-  QFuture<vtkImageDataPtr> mFutureResult;
-  QFutureWatcher<vtkImageDataPtr> mWatcher;
 };
 }//namespace cx
 #endif /* CXSEGMENTATION_H_ */
