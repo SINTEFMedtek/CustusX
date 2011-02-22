@@ -70,7 +70,6 @@ vtkImageDataPtr Segmentation::calculate()
   //Smoothing
   if(mUseSmoothing)
   {
-    //ssc::messageManager()->sendDebug("Smoothing...");
     typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
     smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
     smoohingFilter->SetSigma(mSmoothingSigma);
@@ -79,12 +78,10 @@ vtkImageDataPtr Segmentation::calculate()
     itkImage = smoohingFilter->GetOutput();
   }
 
-  //Thresholding
-  //ssc::messageManager()->sendDebug("Thresholding...");
+  //Binary Thresholding
   typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
   thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
   thresholdFilter->SetInput(itkImage);
-  //TODO:  support non-binary images
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
   thresholdFilter->SetLowerThreshold(mTheshold);
@@ -97,7 +94,6 @@ vtkImageDataPtr Segmentation::calculate()
   itkToVtkFilter->Update();
 
   vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-  //itkToVtkFilter->GetOutput()->ReleaseDataFlagOn();// Test: see if this release more memory: No change here
   rawResult->DeepCopy(itkToVtkFilter->GetOutput());
   // TODO: possible memory problem here - check debug mem system of itk/vtk
 
