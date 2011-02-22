@@ -141,14 +141,16 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
-  //connect(mSelectedImage.get(), SIGNAL(imageChanged()), this, SLOT(revertTransferFunctions()));
+
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));
+
   QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
   segmentationOptionsButton->setCheckable(true);
+
   QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
   connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
   connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
@@ -204,7 +206,6 @@ void SegmentationWidget::segmentSlot()
 
 void SegmentationWidget::handleFinishedSlot()
 {
-  //ssc::ImagePtr segmentedImage = SegmentationOld().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
   ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
   if(!segmentedImage)
     return;
@@ -214,7 +215,7 @@ void SegmentationWidget::handleFinishedSlot()
 void SegmentationWidget::toogleBinarySlot(bool on)
 {
   mBinary = on;
-  ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
+  //ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
 }
 
 void SegmentationWidget::revertTransferFunctions()
@@ -232,7 +233,6 @@ void SegmentationWidget::revertTransferFunctions()
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
-//  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
 
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
@@ -258,14 +258,11 @@ void SegmentationWidget::toogleSmoothingSlot(bool on)
 
   mSmoothingSigmaSpinBox->setEnabled(on);
   mSmoothingSigmaLabel->setEnabled(on);
-
-//  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
 }
 
 void SegmentationWidget::smoothingSigmaSlot(double value)
 {
   mSmoothSigma = value;
-//  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
 }
 
 void SegmentationWidget::imageChangedSlot(QString uid)
@@ -295,7 +292,8 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 
   QCheckBox* binaryCheckbox = new QCheckBox();
   binaryCheckbox->setChecked(mBinary);
-  binaryCheckbox->setChecked(false);
+  binaryCheckbox->setChecked(true); // atm we only support binary thresholding
+  binaryCheckbox->setEnabled(false); //TODO enable when the segmentation routine supports other than binary thresholding
   QLabel* binaryLabel = new QLabel("Binary");
   connect(binaryCheckbox, SIGNAL(toggled(bool)), this, SLOT(toogleBinarySlot(bool)));
 
