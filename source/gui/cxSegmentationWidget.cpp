@@ -418,13 +418,11 @@ void SurfaceWidget::thresholdSlot(int value)
 void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
-//  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
 }
 
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
-//  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
 }
 
 void SurfaceWidget::smoothingSlot(bool value)
@@ -557,18 +555,18 @@ void CenterlineWidget::handleFinishedSlot()
 
 void CenterlineWidget::visualizeSlot(QString inputUid)
 {
-  std::cout << "visualizeSlot " << inputUid << std::endl;
+  //std::cout << "visualizeSlot " << inputUid << std::endl;
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
   ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
   if(!centerlineImage)
     return;
 
-  std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
+  //std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
 
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
-  std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
+  //std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
 
   QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_ge%1";
   QString name = centerlineImage->getName() + " ge%1";
@@ -586,31 +584,17 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
-//    mRegisterButton(new QPushButton("Register")),
-    //mTestButton(new QPushButton("TEST, loads two minc images into the system.")), //TESTING
-//    mFixedImageLabel(new QLabel("Fixed image:")),
-//    mMovingImageLabel(new QLabel("Moving image:"))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
-
-//  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
 
-//  layout->addWidget(mFixedImageLabel, 0, 0);
-//  layout->addWidget(mMovingImageLabel, 1, 0);
-//  layout->addWidget(mRegisterButton, 2, 0);
   layout->addWidget(mSeansVesselRegsitrationWidget);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
-
-  //TESTING
-  /*layout->addWidget(this->createHorizontalLine(), 5, 0);
-  layout->addWidget(mTestButton, 6, 0);
-  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));*/
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()
@@ -627,94 +611,12 @@ QString RegisterI2IWidget::defaultWhatsThis() const
 void RegisterI2IWidget::fixedImageSlot(QString uid)
 {
   mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
-//  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
-//  if(!fixedImage)
-//    return;
-//  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
-//  mFixedImageLabel->update();
 }
 
 void RegisterI2IWidget::movingImageSlot(QString uid)
 {
   mSeansVesselRegsitrationWidget->movingImageSlot(uid);
-//  ssc::DataPtr movingImage = registrationManager()->getMovingData();
-//  if(!movingImage)
-//    return;
-//  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
-//  mMovingImageLabel->update();
 }
-
-/*void RegisterI2IWidget::testSlot()
-{
-  if(!stateManager()->getPatientData()->isPatientValid())
-  {
-    ssc::messageManager()->sendWarning("Create a new patient before trying to import the minc data.");
-    return;
-  }
-
-  ssc::messageManager()->sendDebug("===============TESTING BUTTON START==============");
-
-  int lts_ratio = 80;
-  double stop_delta = 0.001;
-  double lambda = 0;
-  double sigma = 1.0;
-  bool lin_flag = 1;
-  int sample = 1;
-  int single_point_thre = 1;
-  bool verbose = 1;
-
-  SeansVesselReg* theThing = new SeansVesselReg(lts_ratio,
-        stop_delta,
-        lambda,
-        sigma,
-        lin_flag,
-        sample,
-        single_point_thre,
-        verbose);
-
-  QString sourcefile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_110555_USA_blur.mnc");
-  if(QFile::exists(sourcefile))
-    ssc::messageManager()->sendInfo(sourcefile+" exists");
-  else
-  {
-    QFile q_sourcefile(sourcefile);
-    QFileInfo info(q_sourcefile);
-    ssc::messageManager()->sendDebug(info.absoluteFilePath());
-  }
-
-  QString targetfile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_MRA_masked_like_110555USA.mnc");
-  if(QFile::exists(targetfile))
-    ssc::messageManager()->sendInfo(targetfile+" exsits");
-  else
-  {
-    QFile q_targetfile(targetfile);
-    QFileInfo info(q_targetfile);
-    ssc::messageManager()->sendDebug(info.absoluteFilePath());
-  }
-
-  //read minc files and add them to the datamanager
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  ssc::ImagePtr source = theThing->loadMinc(cstring_cast(QString(sourcefile)));
-  ssc::dataManager()->loadData(source);
-  ssc::dataManager()->saveImage(source, outputBasePath);
-  ssc::ImagePtr target = theThing->loadMinc(cstring_cast(QString(targetfile)));
-  ssc::dataManager()->loadData(target);
-  ssc::dataManager()->saveImage(target, outputBasePath);
-
-  vtkPolyDataPtr sourcePolyData = SeansVesselReg::extractPolyData(source, single_point_thre, 0);
-  QString uid = ssc::changeExtension(source->getUid(), "") + "_mesh%1";
-  QString name = source->getName() + " mesh %1";
-  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(sourcePolyData, uid, name, "Images");
-  ssc::dataManager()->loadData(mesh);
-  ssc::dataManager()->saveMesh(mesh, outputBasePath);
-
-  ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
-}*/
-
-//void RegisterI2IWidget::registerSlot()
-//{
-//  registrationManager()->doVesselRegistration();
-//}
 
 //------------------------------------------------------------------------------
 

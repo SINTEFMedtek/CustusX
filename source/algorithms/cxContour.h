@@ -3,8 +3,6 @@
 
 #include "cxTimedAlgorithm.h"
 
-#include <QtGui>
-
 namespace cx
 {
 /**
@@ -15,7 +13,7 @@ namespace cx
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng
  */
-class Contour : public TimedAlgorithm
+class Contour : public ThreadedTimedAlgorithm<vtkPolyDataPtr>
 {
   Q_OBJECT
 
@@ -27,11 +25,10 @@ public:
   ssc::MeshPtr getOutput();
 
 protected slots:
-  virtual void finishedSlot();
+  virtual void postProcessingSlot();
 
 private:
-  virtual void generate();
-  vtkPolyDataPtr calculate();
+  virtual vtkPolyDataPtr calculate();
 
   ssc::ImagePtr mInput;
   QString       mOutputBasePath;
@@ -40,10 +37,8 @@ private:
   bool          mUseReduceResolution;
   bool          mUseSmoothing;
   ssc::MeshPtr mOutput;
-
-  QFuture<vtkPolyDataPtr> mFutureResult;
-  QFutureWatcher<vtkPolyDataPtr> mWatcher;
 };
+
 
 }//namespace cx
 #endif /* CXCONTOUR_H_ */

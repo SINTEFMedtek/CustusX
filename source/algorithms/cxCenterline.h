@@ -3,7 +3,6 @@
 
 #include "cxTimedAlgorithm.h"
 
-#include <QtGui>
 #include "sscImage.h"
 
 namespace cx
@@ -16,8 +15,7 @@ namespace cx
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-
-class Centerline : public TimedAlgorithm
+class Centerline : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
   Q_OBJECT
 
@@ -28,19 +26,15 @@ public:
   void setInput(ssc::ImagePtr inputImage, QString outputBasePath);
   ssc::ImagePtr getOutput();
 
-protected slots:
-  virtual void finishedSlot();
+private slots:
+  virtual void postProcessingSlot();
 
 private:
-  virtual void generate();
-  vtkImageDataPtr calculate();
+  virtual vtkImageDataPtr calculate();
 
   QString       mOutputBasePath;
   ssc::ImagePtr mInput;
   ssc::ImagePtr mOutput;
-
-  QFuture<vtkImageDataPtr> mFutureResult;
-  QFutureWatcher<vtkImageDataPtr> mWatcher;
 };
 
 }//namespace cx

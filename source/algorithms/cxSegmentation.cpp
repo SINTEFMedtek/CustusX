@@ -7,10 +7,8 @@
 namespace cx
 {
 Segmentation::Segmentation() :
-  TimedAlgorithm("segmenting", 10)
-{
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-}
+    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
+{}
 
 Segmentation::~Segmentation()
 {}
@@ -31,9 +29,9 @@ ssc::ImagePtr Segmentation::getOutput()
   return mOutput;
 }
 
-void Segmentation::finishedSlot()
+void Segmentation::postProcessingSlot()
 {
-  vtkImageDataPtr rawResult = mWatcher.future().result();
+  vtkImageDataPtr rawResult = this->getResult();
 
   QString uid = ssc::changeExtension(mInput->getUid(), "") + "_seg%1";
   QString name = mInput->getName()+" seg%1";
@@ -49,18 +47,9 @@ void Segmentation::finishedSlot()
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
-  this->stopTiming();
   ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
   emit finished();
-}
-
-void Segmentation::generate()
-{
-  this->startTiming();
-
-  mFutureResult = QtConcurrent::run(this, &Segmentation::calculate);
-  mWatcher.setFuture(mFutureResult);
 }
 
 vtkImageDataPtr Segmentation::calculate()
@@ -99,5 +88,6 @@ vtkImageDataPtr Segmentation::calculate()
 
   return rawResult;
 }
+
 
 }//namespace cx

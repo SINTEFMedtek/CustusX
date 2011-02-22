@@ -8,10 +8,8 @@
 namespace cx
 {
 Centerline::Centerline() :
-    TimedAlgorithm("centerline", 10)
-{
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-}
+    ThreadedTimedAlgorithm<vtkImageDataPtr>("centerline", 10)
+{}
 
 Centerline::~Centerline()
 {}
@@ -29,17 +27,9 @@ ssc::ImagePtr Centerline::getOutput()
   return mOutput;
 }
 
-void Centerline::generate()
+void Centerline::postProcessingSlot()
 {
-  this->startTiming();
-
-  mFutureResult = QtConcurrent::run(this, &Centerline::calculate);
-  mWatcher.setFuture(mFutureResult);
-}
-
-void Centerline::finishedSlot()
-{
-  vtkImageDataPtr rawResult = mWatcher.future().result();
+  vtkImageDataPtr rawResult = this->getResult();
   if(!rawResult)
   {
     ssc::messageManager()->sendError("Centerline extraction failed.");
@@ -55,7 +45,6 @@ void Centerline::finishedSlot()
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
-  this->stopTiming();
   ssc::messageManager()->sendSuccess("Created centerline \"" + mOutput->getName()+"\"");
 
   emit finished();
