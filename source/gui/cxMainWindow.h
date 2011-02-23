@@ -64,6 +64,7 @@ protected slots:
 
   // application
   void onApplicationStateChangedSlot();
+
   //workflow
   void onWorkflowStateChangedSlot();
   void saveDesktopSlot();

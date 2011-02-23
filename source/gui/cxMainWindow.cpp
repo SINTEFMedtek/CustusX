@@ -321,6 +321,7 @@ void MainWindow::createActions()
 //  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
 
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
+  mStartStreamingAction->setShortcut(tr("Ctrl+V"));
   connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
   connect(stateManager()->getRTSourceManager()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
   this->updateStreamingActionSlot();
@@ -511,7 +512,15 @@ void MainWindow::updateWindowTitle()
 #else
 #endif
 
-  this->setWindowTitle("CustusX " + versionName + " - " + appName);
+  QString activePatientFolder = stateManager()->getPatientData()->getActivePatientFolder();
+  QString patientName;
+  if(!activePatientFolder.isEmpty())
+  {
+    QFileInfo info(activePatientFolder);
+    patientName = info.baseName();
+  }
+
+  this->setWindowTitle("CustusX " + versionName + " - " + appName + " - " + patientName);
 }
 
 void MainWindow::onWorkflowStateChangedSlot()
@@ -602,6 +611,8 @@ void MainWindow::patientChangedSlot()
     ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
   }
   ToolManager::getInstance()->setLoggingFolder(loggingPath);
+
+  this->updateWindowTitle();
 }
 
 /** Called when the layout is changed: update the layout menu
