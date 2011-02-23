@@ -283,6 +283,17 @@ void MainWindow::createActions()
   connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
   connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
 
+  mShootScreenAction = new QAction(tr("Shoot Screen"), this);
+  mShootScreenAction->setIcon(QIcon(":/icons/screenshot-screen.png"));
+  mShootScreenAction->setShortcut(tr("Ctrl+f"));
+  mShootScreenAction->setStatusTip(tr("Save a screenshot to the patient folder."));
+  connect(mShootScreenAction, SIGNAL(triggered()), this, SLOT(shootScreen()));
+
+  mShootWindowAction = new QAction(tr("Shoot Window"), this);
+  mShootWindowAction->setIcon(QIcon(":/icons/screenshot-window.png"));
+  mShootWindowAction->setShortcut(tr("Ctrl+Shift+f"));
+  mShootWindowAction->setStatusTip(tr("Save an image of the application to the patient folder."));
+  connect(mShootWindowAction, SIGNAL(triggered()), this, SLOT(shootWindow()));
 
   //data
   mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr("&Import data"), this);
@@ -366,6 +377,27 @@ void MainWindow::createActions()
 
 }
 
+void MainWindow::shootScreen()
+{
+  this->saveScreenShot(QPixmap::grabWindow(QApplication::desktop()->winId()));
+}
+
+void MainWindow::shootWindow()
+{
+  this->saveScreenShot(QPixmap::grabWindow(this->winId()));
+}
+
+void MainWindow::saveScreenShot(QPixmap pixmap)
+{
+  QString folder = stateManager()->getPatientData()->getActivePatientFolder()+"/Screenshots/";
+  QDir().mkpath(folder);
+  QString format = ssc::timestampSecondsFormatNice();
+  format.replace(' ', "_");
+  QString filename = QDateTime::currentDateTime().toString(format)+".png";
+  pixmap.save(folder + "/" + filename, "png");
+  std::cout << "folder " << folder << std::endl;
+  ssc::messageManager()->sendInfo("Saved screenshot to " + filename);
+}
 
 void MainWindow::manualToolPhysicalPropertiesSlot()
 {
@@ -714,6 +746,8 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mDeleteDataAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mDebugModeAction);
+  mFileMenu->addAction(mShootScreenAction);
+  mFileMenu->addAction(mShootWindowAction);
   mFileMenu->addSeparator();
   mFileMenu->addAction(mShowControlPanelAction);
   mFileMenu->addAction(mQuitAction);
@@ -782,6 +816,12 @@ void MainWindow::createToolBars()
   mToolToolBar->addAction(mTrackingToolsAction);
   mToolToolBar->addAction(mStartStreamingAction);
   this->registerToolBar(mToolToolBar, "Toolbar");
+
+  mScreenshotToolBar = addToolBar("Screenshot");
+  mScreenshotToolBar->setObjectName("ScreenshotToolBar");
+  mScreenshotToolBar->addAction(mShootScreenAction);
+  mScreenshotToolBar->addAction(mShootWindowAction);
+  this->registerToolBar(mScreenshotToolBar, "Toolbar");
 
   mNavigationToolBar = addToolBar("Navigation");
   mNavigationToolBar->setObjectName("NavigationToolBar");
