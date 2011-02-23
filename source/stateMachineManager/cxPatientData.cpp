@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QTextStream>
+#include <QSettings>
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
@@ -77,7 +78,9 @@ void PatientData::clearPatient()
   //rep
   //usrec?
 
-  this->setActivePatient("");
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+
+  this->setActivePatient(patientDatafolder + "/NoPatient");
 }
 
 //void PatientData::loadPatientFileSlot()

@@ -43,6 +43,9 @@
     <file>icons/patient_save.png</file>
     <file>icons/patient_load.png</file>
  
+    <file>icons/screenshot-window.png</file>
+    <file>icons/screenshot-screen.png</file>
+ 
     <file>icons/camera_view_A.png</file>
     <file>icons/camera_view_P.png</file>
     <file>icons/camera_view_S.png</file>
