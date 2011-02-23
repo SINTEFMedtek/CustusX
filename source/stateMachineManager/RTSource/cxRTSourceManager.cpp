@@ -248,6 +248,13 @@ void RTSourceManager::serverProcessStateChanged(QProcess::ProcessState newState)
  */
 void RTSourceManager::connectSourceToTool()
 {
+  if (!mRTSource)
+ {
+    ssc::messageManager()->sendError("no rt source.");
+    return;
+ }
+
+//    return;
   // find probe in tool manager
   // set source in cxTool
   // insert timecalibration using config
@@ -269,6 +276,7 @@ void RTSourceManager::connectSourceToTool()
     if (!probeInterface)
     {
       ssc::messageManager()->sendError("Probe not a cx instance.");
+      return;
     }
     probeInterface->setRTSource(mRTSource);
     ssc::toolManager()->setDominantTool(mProbe->getUid());
