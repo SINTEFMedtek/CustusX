@@ -96,7 +96,11 @@ protected slots:
   void toggleStreamingSlot();
   void updateStreamingActionSlot();
 
+  void shootScreen();
+  void shootWindow();
+
 private:
+  void saveScreenShot(QPixmap pixmap);
   void updateWindowTitle();
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
@@ -138,6 +142,9 @@ private:
   QAction* mDebugModeAction;
   QAction* mQuitAction;
   
+  QAction* mShootScreenAction;
+  QAction* mShootWindowAction;
+
   QAction* mNewPatientAction;///< Action for creating a new patient
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
@@ -179,6 +186,7 @@ private:
   QToolBar* mWorkflowToolBar; ///< toolbar for workflow actions
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
+  QToolBar* mScreenshotToolBar;
 
   std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
