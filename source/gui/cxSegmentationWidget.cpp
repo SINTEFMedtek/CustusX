@@ -484,7 +484,8 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   WhatsThisWidget(parent),
   mFindCenterlineButton(new QPushButton("Find centerline")),
-  mDefaultColor("red")
+  mDefaultColor("red"),
+  mStatusLabel(new QLabel(""))
 {
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
@@ -500,6 +501,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 
   layout->addWidget(selectImageComboBox);
   layout->addWidget(mFindCenterlineButton);
+  layout->addWidget(mStatusLabel);
   layout->addStretch();
 
   connect(mFindCenterlineButton, SIGNAL(clicked()), this, SLOT(findCenterlineSlot()));
@@ -537,11 +539,12 @@ void CenterlineWidget::setDefaultColor(QColor color)
   mDefaultColor = color;
 }
 
-
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath);
+
+  mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
 }
 
 void CenterlineWidget::handleFinishedSlot()
@@ -550,23 +553,21 @@ void CenterlineWidget::handleFinishedSlot()
   if(!centerlineImage)
     return;
 
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
+
   emit outputImageChanged(centerlineImage->getUid());
 }
 
 void CenterlineWidget::visualizeSlot(QString inputUid)
 {
-  //std::cout << "visualizeSlot " << inputUid << std::endl;
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
   ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
   if(!centerlineImage)
     return;
 
-  //std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
-
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
-  //std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
 
   QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_ge%1";
   QString name = centerlineImage->getName() + " ge%1";

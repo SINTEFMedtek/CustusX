@@ -201,6 +201,7 @@ private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
   QColor mDefaultColor;
+  QLabel* mStatusLabel;
 
   Centerline  mCenterlineAlgorithm;
 };
@@ -226,17 +227,10 @@ public slots:
   void fixedImageSlot(QString uid);
   void movingImageSlot(QString uid);
 
-//private slots:
-//  void registerSlot();
-
 private:
   RegisterI2IWidget();
 
   SeansVesselRegistrationWidget* mSeansVesselRegsitrationWidget;
-
-//  QPushButton* mRegisterButton;
-//  QLabel* mFixedImageLabel;
-//  QLabel* mMovingImageLabel;
 };
 
 }//namespace cx
