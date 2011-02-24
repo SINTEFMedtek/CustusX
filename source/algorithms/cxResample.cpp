@@ -6,10 +6,8 @@
 namespace cx
 {
 Resample::Resample() :
-    TimedAlgorithm("resampling", 5)
-{
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-}
+    ThreadedTimedAlgorithm<ssc::ImagePtr>("resampling", 5)
+{}
 
 Resample::~Resample()
 {}
@@ -29,9 +27,9 @@ ssc::ImagePtr Resample::getOutput()
   return mOutput;
 }
 
-void Resample::finishedSlot()
+void Resample::postProcessingSlot()
 {
-  mOutput = mWatcher.future().result();
+  mOutput = this->getResult();
   if(!mOutput)
   {
     ssc::messageManager()->sendError("Resampling failed.");
@@ -41,18 +39,9 @@ void Resample::finishedSlot()
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
-  this->stopTiming();
   ssc::messageManager()->sendSuccess("Done resampling: \"" + mOutput->getName()+"\"");
 
   emit finished();
-}
-
-void Resample::generate()
-{
-  this->startTiming();
-
-  mFutureResult = QtConcurrent::run(this, &Resample::calculate);
-  mWatcher.setFuture(mFutureResult);
 }
 
 /** Crop the image to the bounding box bb_q.
