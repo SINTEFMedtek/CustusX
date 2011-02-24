@@ -167,6 +167,8 @@ void USAcqusitionWidget::dominantToolChangedSlot()
   connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
   this->setTool(tool);
+
+  this->probeChangedSlot();
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()
