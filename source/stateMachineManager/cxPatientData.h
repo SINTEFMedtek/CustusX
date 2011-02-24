@@ -48,6 +48,7 @@ signals:
 
 private:
   //patient
+  QString getNullFolder() const;
   void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (absolute path)
   void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
 
