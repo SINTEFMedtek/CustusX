@@ -49,6 +49,8 @@ private:
   SelectImageStringDataAdapterPtr mReferenceImage; ///< holds the currently reference, resample to this volume.
 
   Resample mResampleAlgorithm;
+
+  QLabel* mStatusLabel;
 };
 
 
@@ -105,6 +107,7 @@ private:
   QSpinBox* mSegmentationThresholdSpinBox;
   QDoubleSpinBox* mSmoothingSigmaSpinBox;
   QLabel* mSmoothingSigmaLabel;
+  QLabel* mStatusLabel;
 
   ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
   ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
@@ -159,6 +162,7 @@ private:
   QSpinBox* mSurfaceThresholdSpinBox;
   QSpinBox* mDecimationSpinBox;
   QColor mDefaultColor;
+  QLabel* mStatusLabel;
 
   Contour mContourAlgorithm;
 };
