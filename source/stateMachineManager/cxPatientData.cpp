@@ -44,7 +44,7 @@ QString PatientData::getActivePatientFolder() const
 bool PatientData::isPatientValid() const
 {
   //ssc::messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
-  return !mActivePatientFolder.isEmpty();
+  return !mActivePatientFolder.isEmpty() && (mActivePatientFolder!=this->getNullFolder());
 }
 
 void PatientData::setActivePatient(const QString& activePatientFolder)
@@ -80,9 +80,14 @@ void PatientData::clearPatient()
 
   QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
 
-  this->setActivePatient(patientDatafolder + "/NoPatient");
+  this->setActivePatient(this->getNullFolder());
 }
 
+QString PatientData::getNullFolder() const
+{
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  return patientDatafolder + "/NoPatient";
+}
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
