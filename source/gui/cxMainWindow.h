@@ -150,7 +150,6 @@ private:
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
 
-//  QActionGroup* mToggleWidgetActionGroup;
   QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
   QAction* mShowPointPickerAction;
 
@@ -190,6 +189,7 @@ private:
 
   std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
+  //widgets
   ssc::ConsoleWidget*                           mConsoleWidget;
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
   class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
