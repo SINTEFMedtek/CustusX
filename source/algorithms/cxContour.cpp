@@ -66,15 +66,6 @@ void Contour::postProcessingSlot()
 
 vtkPolyDataPtr Contour::calculate()
 {
-  ssc::messageManager()->sendDebug("Contour, mThreshold: "+qstring_cast(mThreshold)+", mDecimation: "+qstring_cast(mDecimation)+", reduce resolution: "+qstring_cast(mUseReduceResolution)+", mUseSmoothing: "+qstring_cast(mUseSmoothing));
-
-  //itkImageType::ConstPointer itkImage = getITKfromSSCImageOld(image);
-
-    //Create vtkPolyData
-  /*vtkImageToPolyDataFilter* convert = vtkImageToPolyDataFilter::New();
-   convert->SetInput(itkToVtkFilter->GetOutput());
-   convert->SetColorModeToLinear256();
-   convert->Update();*/
 
   //Shrink input volume
   vtkImageShrink3DPtr shrinker = vtkImageShrink3DPtr::New();
@@ -91,14 +82,12 @@ vtkPolyDataPtr Contour::calculate()
     convert->SetInput(shrinker->GetOutput());
   else
     convert->SetInput(mInput->getBaseVtkImageData());
-  //convert->ComputeNormalsOn();
+
   convert->SetValue(0, mThreshold);
-  //convert->SetValue(0, 1);
   convert->Update();
 
   vtkPolyDataPtr cubesPolyData = vtkPolyDataPtr::New();
   cubesPolyData = convert->GetOutput();
-  //cubesPolyData->DeepCopy(convert->GetOutput());
 
   // Smooth surface model
   vtkWindowedSincPolyDataFilterPtr smoother = vtkWindowedSincPolyDataFilterPtr::New();
