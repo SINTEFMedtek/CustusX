@@ -392,8 +392,7 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 {
   QString folder = stateManager()->getPatientData()->getActivePatientFolder()+"/Screenshots/";
   QDir().mkpath(folder);
-  QString format = ssc::timestampSecondsFormatNice();
-  format.replace(' ', "_");
+  QString format = ssc::timestampSecondsFormat();
   QString filename = QDateTime::currentDateTime().toString(format)+".png";
   pixmap.save(folder + "/" + filename, "png");
   std::cout << "folder " << folder << std::endl;
