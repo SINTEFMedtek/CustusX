@@ -39,6 +39,7 @@ namespace cx
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
     mOrientationActionGroup(new QActionGroup(view))
 {
+//  std::cout << "ViewWrapper2D create" << std::endl;
   mView = view;
   this->connectContextMenu(mView);
 
@@ -63,6 +64,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 
 ViewWrapper2D::~ViewWrapper2D()
 {
+//  std::cout << "ViewWrapper2D delete" << std::endl;
   if (mView)
     mView->removeReps();
 }
@@ -147,10 +149,12 @@ void ViewWrapper2D::addReps()
 
   // slice rep
 #ifdef USE_2D_GPU_RENDER
-  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
-  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
-  mMultiSliceRep->setSliceProxy(mSliceProxy);
-  mView->addRep(mMultiSliceRep);
+//  this->resetMultiSlicer(); ignore until addimage
+
+//  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
+//  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+//  mMultiSliceRep->setSliceProxy(mSliceProxy);
+//  mView->addRep(mMultiSliceRep);
 #else
   mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
   mSliceRep->setSliceProxy(mSliceProxy);
@@ -162,6 +166,23 @@ void ViewWrapper2D::addReps()
   mToolRep2D->setSliceProxy(mSliceProxy);
   mToolRep2D->setUseCrosshair(true);
   mView->addRep(mToolRep2D);
+}
+
+/**Hack: gpu slicer recreate and fill with images every time,
+ * due to internal instabilities.
+ *
+ */
+void ViewWrapper2D::resetMultiSlicer()
+{
+  if (mMultiSliceRep)
+    mView->removeRep(mMultiSliceRep);
+  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
+  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+  mMultiSliceRep->setSliceProxy(mSliceProxy);
+  mView->addRep(mMultiSliceRep);
+  if (mViewGroup)
+    mMultiSliceRep->setImages(mViewGroup->getImages());
+  this->viewportChanged();
 }
 
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
@@ -361,7 +382,8 @@ void ViewWrapper2D::updateView()
 
   // slice rep
 #ifdef USE_2D_GPU_RENDER
-  mMultiSliceRep->setImages(images);
+  this->resetMultiSlicer();
+//  mMultiSliceRep->setImages(images);
 #else
   mSliceRep->setImage(image);
 #endif
