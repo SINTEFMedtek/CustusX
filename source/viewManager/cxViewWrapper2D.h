@@ -70,6 +70,7 @@ private:
   virtual void imageRemoved(const QString& uid);
   virtual void meshRemoved(const QString& uid);
 
+  void resetMultiSlicer();
   ssc::Texture3DSlicerRepPtr mMultiSliceRep;
 
   ssc::SliceProxyPtr mSliceProxy;
