@@ -81,6 +81,7 @@ MainWindow::MainWindow() :
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
+  connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
 
   mCameraControl.reset(new CameraControl());
 
