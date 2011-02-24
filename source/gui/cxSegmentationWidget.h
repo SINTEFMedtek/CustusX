@@ -18,7 +18,7 @@ class QDoubleSpinBox;
 namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
-
+class SeansVesselRegistrationWidget;
 
 class ResampleWidget : public WhatsThisWidget
 {
@@ -226,17 +226,17 @@ public slots:
   void fixedImageSlot(QString uid);
   void movingImageSlot(QString uid);
 
-private slots:
-  //void testSlot(); //TESTING
-  void registerSlot();
+//private slots:
+//  void registerSlot();
 
 private:
   RegisterI2IWidget();
 
-  QPushButton* mRegisterButton;
-  //QPushButton* mTestButton; //TESTING
-  QLabel* mFixedImageLabel;
-  QLabel* mMovingImageLabel;
+  SeansVesselRegistrationWidget* mSeansVesselRegsitrationWidget;
+
+//  QPushButton* mRegisterButton;
+//  QLabel* mFixedImageLabel;
+//  QLabel* mMovingImageLabel;
 };
 
 }//namespace cx

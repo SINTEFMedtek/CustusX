@@ -49,7 +49,7 @@ public:
   void doImageRegistration(ssc::ImagePtr image); ///< registrates the image to the fixed image
   void doFastRegistration_Orientation(const ssc::Transform3D& tMtm); ///< use the current dominant tool orientation to find patient orientation
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
-  void doVesselRegistration();
+  void doVesselRegistration(int lts_ratio = 80, double stop_delta = 0.001, double lambda = 0, double sigma = 1.0, bool lin_flag = 1, int sample = 1, int single_point_thre = 1, bool verbose = 1);
 
   //Interface for saving/loading
   void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
