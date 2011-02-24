@@ -129,17 +129,23 @@ void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
       return;
   }
 //  std::cout << "Texture3DSlicerRep::setImages" << std::endl;
+  for (unsigned i=0; i<mImages.size(); ++i)
+  {
+    disconnect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+  }
 
 	mImages = images;
+
 	for (unsigned i = 0; i < mImages .size(); ++i)
 	{
-		vtkImageDataPtr inputImage = images[i]->getBaseVtkImageData() ;//
+    connect(mImages[i].get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
+		vtkImageDataPtr inputImage = mImages[i]->getBaseVtkImageData() ;//
 
 		ssc::GPUImageDataBufferPtr dataBuffer = ssc::GPUImageBufferRepository::getInstance()->getGPUImageDataBuffer(inputImage);
 
 		mPainter->SetVolumeBuffer(i, dataBuffer);
 
-		connect(images[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
+		connect(mImages[i].get(), SIGNAL(transferFunctionsChanged()), this, SLOT(updateColorAttributeSlot()));
 		createCoordinates(i);
 	}
 	updateColorAttributeSlot();
@@ -162,10 +168,10 @@ void Texture3DSlicerRep::setImages(std::vector<ssc::ImagePtr> images)
 void Texture3DSlicerRep::setSliceProxy(ssc::SliceProxyPtr slicer)
 {
 	if (mSliceProxy)
-		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
+		disconnect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
 	mSliceProxy = slicer;
 	if (mSliceProxy)
-		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(sliceTransformChangedSlot(Transform3D)));
+		connect(mSliceProxy.get(), SIGNAL(transformChanged(Transform3D)), this,	SLOT(transformChangedSlot()));
 }
 
 void Texture3DSlicerRep::addRepActorsToViewRenderer(ssc::View* view)
@@ -290,7 +296,7 @@ void Texture3DSlicerRep::updateColorAttributeSlot()
 	}
 }
 
-void Texture3DSlicerRep::sliceTransformChangedSlot(Transform3D sMr)
+void Texture3DSlicerRep::transformChangedSlot()
 {
 	update();
 }

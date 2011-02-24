@@ -32,7 +32,7 @@ public:
 	void printSelf(std::ostream & os, Indent indent);
 
 private slots:
-	void sliceTransformChangedSlot(Transform3D sMr);
+	void transformChangedSlot();
 	void transferFunctionsChangedSlot();
 
 private: 	

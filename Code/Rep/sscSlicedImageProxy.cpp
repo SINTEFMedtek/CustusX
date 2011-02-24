@@ -65,12 +65,12 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 {
 	if (mSlicer)
 	{
-		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
+		disconnect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
 	}
 	mSlicer = slicer;
 	if (mSlicer)
 	{
-		connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(sliceTransformChangedSlot(Transform3D)));
+		connect(mSlicer.get(), SIGNAL(transformChanged(Transform3D)), this, SLOT(transformChangedSlot()));
 		update();
 	}
 }
@@ -89,12 +89,14 @@ void SlicedImageProxy::setImage(ImagePtr image)
 	if (mImage)
 	{
 		disconnect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+    disconnect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 	}
 
 	mImage = image;
 	if (mImage)
 	{
 		connect(mImage.get(), SIGNAL(transferFunctionsChanged()), this, SLOT(transferFunctionsChangedSlot()));
+    connect(mImage.get(), SIGNAL(transformChanged()), this, SLOT(transformChangedSlot()));
 		mReslicer->SetInput( mImage->getBaseVtkImageData() );
 		mWindowLevel->SetLookupTable(image->getLookupTable2D()->getOutputLookupTable());
 		mWindowLevel->Update();
@@ -170,7 +172,7 @@ void SlicedImageProxy::update()
 //	mWindowLevel->Update();
 }
 
-void SlicedImageProxy::sliceTransformChangedSlot(Transform3D sMr)
+void SlicedImageProxy::transformChangedSlot()
 {
 	update();
 }

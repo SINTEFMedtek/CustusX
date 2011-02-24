@@ -50,7 +50,7 @@ protected:
 	void createGeometryPlane(Vector3D point1_s, Vector3D point2_s, Vector3D origin_s);
 
 private slots:
-	void sliceTransformChangedSlot(Transform3D sMr);
+	void transformChangedSlot();
 	void updateColorAttributeSlot();
 	void viewChanged();
 private:
