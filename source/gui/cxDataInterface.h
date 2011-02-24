@@ -545,6 +545,9 @@ private:
   ssc::DataPtr mData;
 };
 
+
+
+
 } // namespace cx
 
 #endif /* CXDATAINTERFACE_H_ */

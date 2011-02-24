@@ -29,8 +29,8 @@ signals:
 protected slots:
   void setColorSlot();
   void setColorSlotDelayed();
-  void visibilityChangedSlot(bool visible);
-  void populateMeshComboBoxSlot();
+//  void visibilityChangedSlot(bool visible);
+//  void populateMeshComboBoxSlot();
   void meshSelectedSlot(const QString& comboBoxText);
   void importTransformSlot();
   void deleteDataSlot();
@@ -41,11 +41,12 @@ protected:
 
 private:
   ssc::MeshPtr mMesh;
-  QComboBox* mMeshComboBox; ///< combobox for selecting mesh
+//  QComboBox* mMeshComboBox; ///< combobox for selecting mesh
   QGroupBox* mMeshPropertiesGroupBox;
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
+  SelectMeshStringDataAdapterPtr mSelectMeshWidget;
   
   MeshPropertiesWidget();
 };
