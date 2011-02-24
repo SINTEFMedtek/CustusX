@@ -40,6 +40,9 @@ class AlgorithmHelper
 {
 public:
   static itkImageType::ConstPointer getITKfromSSCImage(ssc::ImagePtr image);
+
+private:
+  static itkImageType::ConstPointer getITKfromSSCImageViaFile(ssc::ImagePtr image);
 };
 
 
