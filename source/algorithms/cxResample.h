@@ -3,8 +3,6 @@
 
 #include "cxTimedAlgorithm.h"
 
-#include <QtGui>
-
 namespace cx
 {
 /**
@@ -15,7 +13,7 @@ namespace cx
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class Resample : public TimedAlgorithm
+class Resample : public ThreadedTimedAlgorithm<ssc::ImagePtr>
 {
   Q_OBJECT
 
@@ -27,20 +25,17 @@ public:
   ssc::ImagePtr getOutput();
 
 protected slots:
-  virtual void finishedSlot();
+  virtual void postProcessingSlot();
 
 private:
-  virtual void generate();
-  ssc::ImagePtr calculate();
+  virtual ssc::ImagePtr calculate();
 
   double mMargin;
   QString       mOutputBasePath;
   ssc::ImagePtr mInput;
   ssc::ImagePtr mInputReference;
   ssc::ImagePtr mOutput;
-
-  QFuture<ssc::ImagePtr> mFutureResult;
-  QFutureWatcher<ssc::ImagePtr > mWatcher;
 };
+
 }//namespace cx
 #endif /* CXRESAMPLE_H_ */

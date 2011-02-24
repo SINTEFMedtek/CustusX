@@ -67,5 +67,71 @@ void TimedAlgorithm::timeoutSlot()
 {
   ssc::messageManager()->sendInfo("Still working on generating the "+mProduct+", "+this->getTimePassed().toString()+" has passed.");
 }
+//---------------------------------------------------------------------------------------------------------------------
+template <class T>
+ThreadedTimedAlgorithm<T>::ThreadedTimedAlgorithm(QString product, int secondsBetweenAnnounce) :
+  TimedAlgorithm(product, secondsBetweenAnnounce)
+{
+  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
+  connect(&mWatcher, SIGNAL(finished()), this, SLOT(postProcessingSlot()));
+}
+
+template <class T>
+ThreadedTimedAlgorithm<T>::~ThreadedTimedAlgorithm()
+{}
+
+template <class T>
+void ThreadedTimedAlgorithm<T>::finishedSlot()
+{
+  TimedAlgorithm::stopTiming();
+}
+
+template <class T>
+void ThreadedTimedAlgorithm<T>::generate()
+{
+  TimedAlgorithm::startTiming();
+
+  mFutureResult = QtConcurrent::run(this, &ThreadedTimedAlgorithm<T>::calculate);
+  mWatcher.setFuture(mFutureResult);
+}
+template <class T>
+T ThreadedTimedAlgorithm<T>::getResult()
+{
+  T result = mWatcher.future().result();
+  return result;
+}
+
+
+template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
+template class ThreadedTimedAlgorithm<ssc::ImagePtr>; //resample
+//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //segmentation
+template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
+
+
+//---------------------------------------------------------------------------------------------------------------------
+Example::Example() :
+    ThreadedTimedAlgorithm<QString>("TestProduct", 1)
+{
+  std::cout << "Test::Test()" << std::endl;
+  this->generate();
+}
+
+Example::~Example()
+{}
+
+void Example::postProcessingSlot()
+{
+  QString result = this->getResult();
+  std::cout << "void Test::postProcessingSlot(), result: "<< result.toStdString() << std::endl;
+}
+
+QString Example::calculate()
+{
+  std::cout << " QString Test::calculate()" << std::endl;
+
+  sleep(5);
+
+  return QString("Test successful!!!");
+}
 }//namespace cx
 
