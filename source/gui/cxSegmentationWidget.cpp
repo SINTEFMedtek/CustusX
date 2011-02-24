@@ -1,4 +1,4 @@
-#include "cxSegmentationWidget.h"
+  #include "cxSegmentationWidget.h"
 
 #include <boost/bind.hpp>
 
@@ -36,33 +36,35 @@
 namespace cx
 {
 ResampleWidget::ResampleWidget(QWidget* parent) :
-  WhatsThisWidget(parent)
+  WhatsThisWidget(parent),
+  mStatusLabel(new QLabel(""))
 {
   this->setObjectName("ResampleWidget");
   this->setWindowTitle("Resample");
 
   connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
+  mSelectedImage = SelectImageStringDataAdapter::New();
+  mSelectedImage->setValueName("Select input: ");
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
+
+  mReferenceImage = SelectImageStringDataAdapter::New();
+  mReferenceImage->setValueName("Select reference: ");
+  ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
+
+  QPushButton* resampleButton = new QPushButton("Resample", this);
+  connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
+
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
-  mSelectedImage = SelectImageStringDataAdapter::New();
-  mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
-
-  mReferenceImage = SelectImageStringDataAdapter::New();
-  mReferenceImage->setValueName("Select reference: ");
-  ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
   topLayout->addWidget(referenceImageComboBox, 1, 0);
-
-  QPushButton* resampleButton = new QPushButton("Resample", this);
-  connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
-
-  topLayout->addWidget(resampleButton, 2,0);
+  topLayout->addWidget(mStatusLabel, 2, 0);
+  topLayout->addWidget(resampleButton, 3, 0);
 
   this->adjustSizeSlot();
 }
@@ -100,6 +102,7 @@ void ResampleWidget::resampleSlot()
   double margin = 20; //mm
 
   mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+  mStatusLabel->setText("<font color=orange> Generating resampling... Please wait!</font>\n");
 }
 
 void ResampleWidget::handleFinishedSlot()
@@ -107,6 +110,8 @@ void ResampleWidget::handleFinishedSlot()
   ssc::ImagePtr output = mResampleAlgorithm.getOutput();
   if(!output)
     return;
+
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputImageChanged(output->getUid());
 }
@@ -125,7 +130,8 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mUseSmothing(true),
   mSmoothSigma(0.5),
   mSegmentationThresholdSpinBox(new QSpinBox()),
-  mSmoothingSigmaSpinBox(new QDoubleSpinBox())
+  mSmoothingSigmaSpinBox(new QDoubleSpinBox()),
+  mStatusLabel(new QLabel(""))
 {
   this->setObjectName("SegmentationWidget");
   this->setWindowTitle("Segmentation");
@@ -159,6 +165,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   topLayout->addWidget(segmentButton, 1,0);
   topLayout->addWidget(segmentationOptionsButton, 1,1);
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
+  topLayout->addWidget(mStatusLabel);
 
   this->adjustSizeSlot();
 }
@@ -202,6 +209,8 @@ void SegmentationWidget::segmentSlot()
   this->revertTransferFunctions();
 
   mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+
+  mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
 }
 
 void SegmentationWidget::handleFinishedSlot()
@@ -209,13 +218,15 @@ void SegmentationWidget::handleFinishedSlot()
   ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
   if(!segmentedImage)
     return;
+
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
+
   emit outputImageChanged(segmentedImage->getUid());
 }
 
 void SegmentationWidget::toogleBinarySlot(bool on)
 {
   mBinary = on;
-  //ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
 }
 
 void SegmentationWidget::revertTransferFunctions()
@@ -337,7 +348,8 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mSmoothing(true),
     mSurfaceThresholdSpinBox(new QSpinBox()),
     mDecimationSpinBox(new QSpinBox()),
-    mDefaultColor("red")
+    mDefaultColor("red"),
+    mStatusLabel(new QLabel(""))
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -368,6 +380,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   topLayout->addWidget(surfaceButton, 1,0);
   topLayout->addWidget(surfaceOptionsButton,1,1);
   topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
+  topLayout->addWidget(mStatusLabel);
 
   this->thresholdSlot(mSurfaceThreshold);
   this->decimationSlot(mDecimation);
@@ -398,6 +411,8 @@ void SurfaceWidget::surfaceSlot()
   double decimation = mDecimation/100;
 
   mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+
+  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
 
 void SurfaceWidget::handleFinishedSlot()
@@ -405,7 +420,9 @@ void SurfaceWidget::handleFinishedSlot()
   ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
   if(!outputMesh)
     return;
+
   outputMesh->setColor(mDefaultColor);
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputMeshChanged(outputMesh->getUid());
 }
