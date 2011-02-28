@@ -36,6 +36,24 @@
 namespace cx
 {
 
+class InteractionCallback : public vtkCommand
+{
+public:
+  InteractionCallback() {}
+  static InteractionCallback* New() {return new InteractionCallback;}
+//  void SetCropper(InteractiveCropper* cropper) {mCropper = cropper;}
+  virtual void Execute(vtkObject* caller, unsigned long, void*)
+  {
+//    this->callback();
+    std::cout << "executing InteractionCallback" << std::endl;
+  }
+};
+
+
+// --------------------------------------------------------
+// --------------------------------------------------------
+// --------------------------------------------------------
+
 
 ssc::AxesRepPtr ToolAxisConnector::getAxis_t()
 {
@@ -123,6 +141,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
+
+  InteractionCallback* callback = new InteractionCallback;
+  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, callback);
+  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::EndInteractionEvent, callback);
 }
 
 ///**Change the camera focal point to the datamanager::center.
