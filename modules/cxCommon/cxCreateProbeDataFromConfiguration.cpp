@@ -36,6 +36,11 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
   {
     int widtInPixels = config.mRightEdge - config.mLeftEdge;
     double width = config.mPixelWidth * widtInPixels; //width in mm
+    // correct for top/bottom edges if applicable
+    depthStart = std::max(depthStart, (config.mTopEdge-config.mOriginRow) * config.mPixelHeight);
+    depthEnd = std::min(depthEnd, (config.mBottomEdge-config.mOriginRow) * config.mPixelHeight);
+
+
     probeSector = ssc::ProbeData(ssc::ProbeData::tLINEAR, depthStart, depthEnd, width);
   }
 
