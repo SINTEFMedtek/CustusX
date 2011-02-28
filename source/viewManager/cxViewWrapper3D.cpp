@@ -1,14 +1,21 @@
 #include "cxViewWrapper3D.h"
+
 #include <vector>
+
+#include "boost/bind.hpp"
+#include "boost/function.hpp"
+
 #include <QSettings>
 #include <QAction>
 #include <QMenu>
+
 #include <vtkTransform.h>
 #include <vtkCamera.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkVolumeMapper.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkInteractorObserver.h>
 
 #include "cxDataLocations.h"
 #include "sscView.h"
@@ -33,20 +40,27 @@
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
 
+
 namespace cx
 {
 
 class InteractionCallback : public vtkCommand
 {
+  typedef boost::function<void ()> CallbackType;
 public:
   InteractionCallback() {}
   static InteractionCallback* New() {return new InteractionCallback;}
-//  void SetCropper(InteractiveCropper* cropper) {mCropper = cropper;}
+  void setCallback(CallbackType f)
+  {
+   mCallback = f;
+  }
   virtual void Execute(vtkObject* caller, unsigned long, void*)
   {
-//    this->callback();
-    std::cout << "executing InteractionCallback" << std::endl;
+    mCallback();
   }
+
+private:
+  CallbackType mCallback;
 };
 
 
@@ -142,9 +156,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
 
-  InteractionCallback* callback = new InteractionCallback;
-  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, callback);
-  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::EndInteractionEvent, callback);
+  mInteractorCallback = new InteractionCallback;
+  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
+  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, mInteractorCallback);
+  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::EndInteractionEvent, mInteractorCallback);
 }
 
 ///**Change the camera focal point to the datamanager::center.
@@ -167,6 +182,25 @@ ViewWrapper3D::~ViewWrapper3D()
 {
   if (mView)
     mView->removeReps();
+
+  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
+  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
+}
+
+void ViewWrapper3D::viewChanged()
+{
+  if (!mView || !mView->getRenderer())
+    return;
+  if (mView->getRenderer()->GetSize()[0]==0)
+    return;
+
+  ssc::DoubleBoundingBox3D vp_w(-1,1,-1,1,-1,1);
+  mView->getRenderer()->ViewToWorld(vp_w[0], vp_w[2], vp_w[4]);
+  mView->getRenderer()->ViewToWorld(vp_w[1], vp_w[3], vp_w[5]);
+//  std::cout << "    vp_w " << vp_w << std::endl;
+//  std::cout << this << " dim " << vp_w.range() << std::endl;
+  double size = (vp_w.range()[0] + vp_w.range()[1]) / 2;
+
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
