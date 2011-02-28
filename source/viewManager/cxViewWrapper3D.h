@@ -81,6 +81,7 @@ private slots:
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
+  void viewChanged();
 
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
@@ -104,6 +105,7 @@ private:
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
 //  ssc::RealTimeStreamRepPtr mRTStreamRep;
+  vtkSmartPointer<class InteractionCallback> mInteractorCallback;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
