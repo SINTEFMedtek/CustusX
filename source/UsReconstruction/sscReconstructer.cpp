@@ -652,7 +652,7 @@ void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
   mCalFilesPath = calFilesPath;
 
   // ignore if a directory is read - store folder name only
-  if (QFileInfo(fileName).isDir())
+  if (QFileInfo(fileName).suffix()!="mhd")
     return;
 
   QString mhdFileName = changeExtension(fileName, "mhd");
