@@ -480,7 +480,14 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
 {
   if (event->buttons() & Qt::LeftButton)
   {
-    moveAxisPos(qvp2vp(event->pos()));
+    if (this->getOrientationType()==ssc::otORTHOGONAL)
+    {
+      setAxisPos(qvp2vp(event->pos()));
+    }
+    else
+    {
+      mClickPos = qvp2vp(event->pos());
+    }
   }
 }
 
@@ -492,7 +499,16 @@ void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
 {
   if (event->buttons() & Qt::LeftButton)
   {
-    moveAxisPos(qvp2vp(event->pos()));
+    if (this->getOrientationType()==ssc::otORTHOGONAL)
+    {
+      setAxisPos(qvp2vp(event->pos()));
+    }
+    else
+    {
+      ssc::Vector3D p = qvp2vp(event->pos());
+      this->shiftAxisPos(p-mClickPos);
+      mClickPos = p;
+    }
   }
 }
 
@@ -523,9 +539,30 @@ ssc::Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 }
 
 /**Move the tool pos / axis pos to a new position given
+ * by delta movement in vp space.
+ */
+void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
+{
+  delta_vp = -delta_vp;
+  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+
+  ssc::Transform3D sMr = mSliceProxy->get_sMr();
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+  ssc::Transform3D prMt = tool->get_prMt();
+  ssc::Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
+
+  ssc::Vector3D delta_pr = (rMpr.inv()*sMr.inv()).vector(delta_s);
+
+  // MD is the actual tool movement in patient space, matrix form
+  ssc::Transform3D MD = createTransformTranslate(delta_pr);
+  // set new tool position to old modified by MD:
+  tool->set_prMt(MD*prMt);
+}
+
+/**Move the tool pos / axis pos to a new position given
  * by the input click position in vp space.
  */
-void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
+void ViewWrapper2D::setAxisPos(ssc::Vector3D click_vp)
 {
   ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
 
