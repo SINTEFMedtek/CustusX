@@ -6,6 +6,9 @@
 #include "sscDoubleDataAdapterXml.h"
 
 class QTabWidget;
+class QToolBox;
+class QToolBar;
+class QStackedWidget;
 class QDialogButtonBox;
 class QLabel;
 class QComboBox;
@@ -17,12 +20,29 @@ class QRadioButton;
 class QGridLayout;
 class QVBoxLayout;
 class QLineEdit;
+class QActionGroup;
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
 class MessageManager;
 class ViewManager;
+
+class PreferencesTab : public QWidget
+{
+  Q_OBJECT
+public:
+  PreferencesTab(QWidget *parent = 0);
+
+  virtual void init() = 0;
+public slots:
+  virtual void saveParametersSlot() = 0;
+signals:
+  void savedParameters();
+protected:
+  QSettingsPtr mSettings;
+  QVBoxLayout* mTopLayout;
+};
 
 /**
  * \class FoldersTab
@@ -33,7 +53,7 @@ class ViewManager;
  * \author Frank Lindseth, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class FoldersTab : public QWidget
+class FoldersTab : public PreferencesTab
 {
   Q_OBJECT
 
@@ -45,8 +65,8 @@ public:
 public slots:
   void saveParametersSlot();
 
-signals:
-  void savedParameters();
+//signals:
+//  void savedParameters();
   
 private slots:
   void browsePatientDataFolderSlot();
@@ -58,8 +78,6 @@ private slots:
 private:
   void setToolConfigComboBox();
   void setApplicationComboBox();
-
-  QSettingsPtr mSettings;
 
   QComboBox* mPatientDataFolderComboBox;
 
@@ -81,7 +99,7 @@ private:
  * \date Mar 8, 2010
  * \author Ole Vegard Solberg, SINTEF
  */
-class PerformanceTab : public QWidget
+class PerformanceTab : public PreferencesTab
 {
     Q_OBJECT
 
@@ -97,7 +115,6 @@ signals:
   void shadingChanged(bool);
 
 protected:
-  QSettingsPtr mSettings;
   QSpinBox* mRenderingIntervalSpinBox;
   QLabel* mRenderingRateLabel;
   QCheckBox* mSmartRenderCheckBox;
@@ -106,8 +123,27 @@ protected:
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mMaxRenderSize;
 
-  private slots:
+private slots:
   void renderingIntervalSlot(int interval);
+};
+
+class View3DTab : public PreferencesTab
+{
+    Q_OBJECT
+public:
+  View3DTab(QWidget *parent = 0);
+  void init();
+
+  public slots:
+  void saveParametersSlot();
+
+signals:
+
+protected:
+  QGridLayout *mMainLayout;
+  ssc::DoubleDataAdapterXmlPtr mSphereRadius;
+
+private slots:
   void setBackgroundColorSlot();
 };
 
@@ -119,7 +155,7 @@ protected:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class AutomationTab : public QWidget
+class AutomationTab : public PreferencesTab
 {
   Q_OBJECT
 
@@ -132,7 +168,6 @@ public slots:
 
 
 protected:
-  QSettingsPtr mSettings;
   QCheckBox* mAutoStartTrackingCheckBox;
   QCheckBox* mAutoStartStreamingCheckBox;
   QCheckBox* mAutoReconstructCheckBox;
@@ -147,7 +182,7 @@ protected:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class UltrasoundTab : public QWidget
+class UltrasoundTab : public PreferencesTab
 {
   Q_OBJECT
 
@@ -159,7 +194,6 @@ public slots:
   void saveParametersSlot();
 
 protected:
-  QSettingsPtr mSettings;
   QLineEdit* mAcquisitionNameLineEdit;
   QVBoxLayout *mMainLayout;
 
@@ -182,14 +216,15 @@ class PreferencesDialog : public QDialog
 public:
   PreferencesDialog(QWidget *parent = 0);
   virtual ~PreferencesDialog();
+private slots:
+  void selectTabSlot();
 
 protected:
-  ViewManager* mViewManager; ///< controls layout of views and has a pool of views
-  FoldersTab *mFoldersTab;
-  PerformanceTab *mPerformanceTab;
-  AutomationTab* mAutomationTab;
-  UltrasoundTab* mUltrasoundTab;
-  QTabWidget *tabWidget;
+  void addTab(PreferencesTab* widget, QString name);
+
+  QActionGroup* mActionGroup;
+  QStackedWidget* tabWidget;
+  QToolBar* mToolBar;
   QDialogButtonBox *buttonBox;
 };
 
