@@ -81,10 +81,11 @@ private slots:
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
-  void viewChanged();
+//  void viewChanged();
 
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
+//  void test(double v);
 
   virtual void imageAdded(ssc::ImagePtr image);
   virtual void meshAdded(ssc::MeshPtr mesh);
