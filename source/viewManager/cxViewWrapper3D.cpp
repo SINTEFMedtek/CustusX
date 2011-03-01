@@ -44,24 +44,25 @@
 namespace cx
 {
 
-class InteractionCallback : public vtkCommand
-{
-  typedef boost::function<void ()> CallbackType;
-public:
-  InteractionCallback() {}
-  static InteractionCallback* New() {return new InteractionCallback;}
-  void setCallback(CallbackType f)
-  {
-   mCallback = f;
-  }
-  virtual void Execute(vtkObject* caller, unsigned long, void*)
-  {
-    mCallback();
-  }
-
-private:
-  CallbackType mCallback;
-};
+//class InteractionCallback : public vtkCommand
+//{
+//  typedef boost::function<void ()> CallbackType;
+//public:
+//  InteractionCallback() {}
+//  static InteractionCallback* New() {return new InteractionCallback;}
+//  void setCallback(CallbackType f)
+//  {
+//   mCallback = f;
+//  }
+//  virtual void Execute(vtkObject* caller, unsigned long, void*)
+//  {
+//    mCallback();
+////    std::cout << "callback" << std::endl;
+//  }
+//
+//private:
+//  CallbackType mCallback;
+//};
 
 
 // --------------------------------------------------------
@@ -141,6 +142,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
   mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
+  mProbeRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -156,52 +158,55 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
 
-  mInteractorCallback = new InteractionCallback;
-  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
-  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, mInteractorCallback);
-  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::EndInteractionEvent, mInteractorCallback);
+//  mInteractorCallback = new InteractionCallback;
+//  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
+//  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, mInteractorCallback);
+//  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::EndInteractionEvent, mInteractorCallback);
+//  mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 }
-
-///**Change the camera focal point to the datamanager::center.
-// * Keep pos of camera constant relative to the focus.
-// */
-//void ViewWrapper3D::centerChangedSlot()
-//{
-//  ssc::Vector3D c = ssc::DataManager::getInstance()->getCenter();
-//  vtkCameraPtr camera = mViewGroup->getCamera3D()->getCamera();
-//  ssc::Vector3D f(camera->GetFocalPoint());
-//  ssc::Vector3D p(camera->GetPosition());
-//  ssc::Vector3D delta = c-f;
-//  f += delta;
-//  p += delta;
-//  camera->SetFocalPoint(f.begin());
-//  camera->SetPosition(p.begin());
-//}
 
 ViewWrapper3D::~ViewWrapper3D()
 {
   if (mView)
+  {
     mView->removeReps();
-
-  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
-  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
+//    mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
+//    mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
+  }
 }
 
-void ViewWrapper3D::viewChanged()
-{
-  if (!mView || !mView->getRenderer())
-    return;
-  if (mView->getRenderer()->GetSize()[0]==0)
-    return;
+//void ViewWrapper3D::test(double v)
+//{
+//  ssc::Vector3D p0(-1,-1, v);
+//  ssc::Vector3D p1( 1,-1, v);
+//  ssc::Vector3D p2(-1, 1, v);
+//  mView->getRenderer()->ViewToWorld(p0[0],p0[1],p0[2]);
+//  mView->getRenderer()->ViewToWorld(p1[0],p1[1],p1[2]);
+//  mView->getRenderer()->ViewToWorld(p2[0],p2[1],p2[2]);
+////  std::cout << "    vp_w " << vp_w << std::endl;
+//  std::cout << this << " dim " << setprecision(4) << (p1-p0).length() << " " << setprecision(4) << (p2-p0).length() << std::endl;
+////  double size = (vp_w.range()[0] + vp_w.range()[1]) / 2;
+//
+//}
 
-  ssc::DoubleBoundingBox3D vp_w(-1,1,-1,1,-1,1);
-  mView->getRenderer()->ViewToWorld(vp_w[0], vp_w[2], vp_w[4]);
-  mView->getRenderer()->ViewToWorld(vp_w[1], vp_w[3], vp_w[5]);
-//  std::cout << "    vp_w " << vp_w << std::endl;
-//  std::cout << this << " dim " << vp_w.range() << std::endl;
-  double size = (vp_w.range()[0] + vp_w.range()[1]) / 2;
 
-}
+//void ViewWrapper3D::viewChanged()
+//{
+//  if (!mView || !mView->getRenderer())
+//    return;
+//  if (mView->getRenderer()->GetSize()[0]==0)
+//    return;
+//
+////  mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
+// double vp[4];
+//  mView->getRenderer()->GetViewport(vp);
+//  std::cout << "  vp  " << vp[0] <<" "<< vp[1] <<" "<<vp[2] <<" "<<vp[3] << std::endl;
+////  std::cout << "pp " << mView->getRenderer()->GetActiveCamera()->GetParallelProjection() << std::endl;;
+//
+//  this->test(-1);
+//  this->test(0);
+//  this->test(1);
+//}
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 {
@@ -519,6 +524,9 @@ void ViewWrapper3D::toolsAvailableSlot()
 //    ssc::ToolRep3DPtr toolRep = mToolReps[uid];
 
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
+
+    toolRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
+
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
