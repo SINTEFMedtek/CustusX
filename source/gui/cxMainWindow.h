@@ -149,6 +149,7 @@ private:
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
+  QAction* mExportPatientAction;
 
   QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
   QAction* mShowPointPickerAction;
