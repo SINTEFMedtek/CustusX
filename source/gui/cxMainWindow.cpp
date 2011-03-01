@@ -250,11 +250,13 @@ void MainWindow::createActions()
   mLoadFileAction->setStatusTip(tr("Load patient file"));
   mClearPatientAction = new QAction(tr("&Clear Patient"), this);
 //  mClearPatientAction->setIcon(QIcon(":/icons/patient_clear.png"));
+  mExportPatientAction = new QAction(tr("&Export Patient"), this);
 
   connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
   connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
+  connect(mExportPatientAction, SIGNAL(triggered()), stateManager()->getPatientData().get(), SLOT(exportPatient()));
   connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
 
   mShowControlPanelAction = new QAction("Show Control Panel", this);
@@ -742,6 +744,7 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mLoadFileAction);
   mFileMenu->addAction(mClearPatientAction);
   mFileMenu->addSeparator();
+  mFileMenu->addAction(mExportPatientAction);
   mFileMenu->addAction(mImportDataAction);
   mFileMenu->addAction(mDeleteDataAction);
   mFileMenu->addSeparator();
