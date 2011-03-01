@@ -31,6 +31,7 @@ public:
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
 	ToolTracerPtr getTracer();
+  void setSphereRadius(double radius);
 
   void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
@@ -62,6 +63,7 @@ private:
 	void update();
 	void updateOffsetGraphics();
 
+  double mSphereRadius;
 	ToolPtr mTool;
 	vtkActorPtr mToolActor;
 	vtkPolyDataMapperPtr mPolyDataMapper;

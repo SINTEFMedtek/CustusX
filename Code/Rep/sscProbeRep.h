@@ -36,6 +36,7 @@ public:
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
 	Vector3D getPosition() const;
+	void setSphereRadius(double radius);
 
 signals:
 	void addPermanentPoint(double x, double y, double z, unsigned int); ///< signal requesting this point be made permanent
@@ -64,7 +65,8 @@ protected:
 	Vector3D            mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image
 	vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
 	vtkRendererPtr      mCurrentRenderer;                 ///< the renderer set to use
-
+	vtkSphereSourcePtr  mPickedPointSphereSource;
+	double mSphereRadius;
 	vtkEventQtSlotConnectPtr mConnections;                ///< used to sending signals and events between vtk and qt
 };
 

@@ -32,6 +32,7 @@ DoubleDataAdapterXmlPtr DoubleDataAdapterXml::initialize(const QString& uid,
 	retval->mRange = range;
 	retval->mStore = XmlOptionItem(uid, root.toElement());
 	retval->mValue = retval->mStore.readValue(QString::number(value)).toDouble();
+	retval->mDecimals = decimals;
 	return retval;
 }
 

@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include "sscVector3D.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {

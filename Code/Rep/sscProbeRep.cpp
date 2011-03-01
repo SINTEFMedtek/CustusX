@@ -34,6 +34,7 @@ ProbeRep::ProbeRep(const QString& uid, const QString& name) :
 	mResolution(1000),
 	mPickedPoint(),
 	mPickedPointActor(NULL),
+  mSphereRadius(2),
 	mConnections(vtkEventQtSlotConnectPtr::New())
 {}
 ProbeRep::~ProbeRep()
@@ -49,6 +50,13 @@ int ProbeRep::getThreshold()
 ImagePtr ProbeRep::getImage()
 {
   return mImage;
+}
+
+void ProbeRep::setSphereRadius(double radius)
+{
+  mSphereRadius = radius;
+  if (mPickedPointSphereSource)
+    mPickedPointSphereSource->SetRadius(mSphereRadius);
 }
 
 void ProbeRep::setImage(ImagePtr image)
@@ -213,10 +221,10 @@ void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 
   if(mPickedPointActor == NULL )
   {
-    vtkSphereSourcePtr pickedPointSphereSource = vtkSphereSourcePtr::New();
-    pickedPointSphereSource->SetRadius(2);
+    mPickedPointSphereSource = vtkSphereSourcePtr::New();
+    mPickedPointSphereSource->SetRadius(mSphereRadius);
     vtkPolyDataMapperPtr pickedPointMapper = vtkPolyDataMapperPtr::New();
-    pickedPointMapper->SetInputConnection(pickedPointSphereSource->GetOutputPort());
+    pickedPointMapper->SetInputConnection(mPickedPointSphereSource->GetOutputPort());
     mPickedPointActor = vtkActorPtr::New();
     mPickedPointActor->SetMapper(pickedPointMapper);
     mPickedPointActor->GetProperty()->SetColor(0,0,1);

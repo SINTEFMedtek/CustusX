@@ -22,6 +22,7 @@ namespace ssc
 ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   RepImpl(uid, name)
 {
+  mSphereRadius = 2;
   mStayHiddenAfterVisible = false;
   mStayVisibleAfterHide = false;
   mOffsetPointVisibleAtZeroOffset = false;
@@ -130,6 +131,15 @@ bool ToolRep3D::hasTool(ToolPtr tool) const
   return (mTool == tool);
 }
 
+void ToolRep3D::setSphereRadius(double radius)
+{
+  mSphereRadius = radius;
+  if (mOffsetPoint)
+    mOffsetPoint->setRadius(mSphereRadius);
+  if (mTooltipPoint)
+    mTooltipPoint->setRadius(mSphereRadius);
+}
+
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
   view->getRenderer()->AddActor(mTracer->getActor());
@@ -138,11 +148,11 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
   view->getRenderer()->AddActor(mProbeSectorActor);
 
   mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
-  mOffsetPoint->setRadius(2);
+  mOffsetPoint->setRadius(mSphereRadius);
   mOffsetPoint->setColor(Vector3D(1, 0.8, 0));
 
   mTooltipPoint.reset(new GraphicalPoint3D(view->getRenderer()));
-  mTooltipPoint->setRadius(2);
+  mTooltipPoint->setRadius(mSphereRadius);
   mTooltipPoint->setColor(Vector3D(1, 0.8, 0)); //light green
   //mTooltipPoint->setColor(Vector3D(0.25,0.87,0.16)); //light green
 
