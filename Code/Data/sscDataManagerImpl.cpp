@@ -793,17 +793,9 @@ int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
  *  if %1 is found there
  *
  */
-ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath)
+ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString name, QString filePath)
 {
-  int recNumber = this->findUniqueUidNumber(uidBase);
-
-  QString uid = qstring_cast(uidBase).arg(recNumber);
-  QString name;
-
-  if (recNumber==1)
-    name = qstring_cast(nameBase).arg("");
-  else
-    name = qstring_cast(nameBase).arg("#%1").arg(recNumber);
+  this->generateUidAndName(&uid, &name);
 
   ImagePtr retval = ImagePtr(new Image(uid, data, name));
 
@@ -812,20 +804,41 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uidBase, QSt
 
   return retval;
 }
+
+/**Insert uid and name containing %1 placeholders for insertion of unique integers.
+ * Return unique values.
+ * If input does not contain %1, nothing happens.
+ */
+void DataManagerImpl::generateUidAndName(QString* _uid, QString* _name)
+{
+  QString& uid = *_uid;
+  QString& name = *_name;
+
+  int recNumber = this->findUniqueUidNumber(uid);
+
+  if (uid.contains("%"))
+  {
+    uid = uid.arg(recNumber);
+  }
+
+  if (name.contains("%"))
+  {
+    if (recNumber==1)
+      name = name.arg("");
+    else
+      name = name.arg(recNumber);
+  }
+}
+
 /** Create an image with unique uid. The input uidBase may contain %1 as a placeholder for a running integer that
  *  data manager can increment in order to obtain an unique uid. The same integer will be inserted into nameBase
  *  if %1 is found there
  *
  */
-MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
+MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString name, QString filePath)
 {
-  int recNumber = this->findUniqueUidNumber(uidBase);
-  QString uid = uidBase;
-  QString name = nameBase;
-  if (uid.contains("%"))
-    uid = uidBase.arg(recNumber);
-  if (name.contains("%"))
-    name = nameBase.arg(recNumber);
+  this->generateUidAndName(&uid, &name);
+
   MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
 
   QString filename = filePath + "/" + uid + ".vtk";

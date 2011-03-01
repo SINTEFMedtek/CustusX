@@ -179,6 +179,7 @@ protected:
   void loadData(QDomElement node, QString rootPath);
   DataPtr readData(const QString& uid, const QString& path, READER_TYPE type);
   int findUniqueUidNumber(QString uidBase) const;
+  void generateUidAndName(QString* _uid, QString* _name);
 
   LandmarkPropertyMap mLandmarkProperties; ///< uid and name
 
