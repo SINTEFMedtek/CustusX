@@ -39,4 +39,4 @@ SET ( ${LIB}_algorithms
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_algorithms} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} dataManager ITKCommon ITKBasicFilters) 
+target_link_libraries(${LIB} dataManager ITKIO ITKCommon ITKBasicFilters) 
