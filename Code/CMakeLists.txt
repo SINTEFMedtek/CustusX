@@ -172,6 +172,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscMessageManager.cpp
     Utilities/sscVolumeHelpers.h
     Utilities/sscVolumeHelpers.cpp
+    Utilities/sscCustomMetaImage.h
+    Utilities/sscCustomMetaImage.cpp
     sscView.cpp
     sscView.h
     Rep/sscRep.h

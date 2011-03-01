@@ -119,6 +119,7 @@ public:
   DataPtr loadData(const QString& uid, const QString& path, READER_TYPE type);
   std::map<QString, DataPtr> getData() const;
   DataPtr getData(const QString& uid) const;
+//  virtual void saveData(DataPtr image, const QString& basePath, bool headerOnly=false);///< Save image to file \param basePath Absolute path to patient data folder
 
   // meshes
   virtual void saveMesh(MeshPtr mesh, const QString& basePath);///< Save mesh to file \param basePath Absolute path to patient data folder

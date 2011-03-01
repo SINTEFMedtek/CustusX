@@ -28,9 +28,12 @@
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
 #include "sscRTSource.h"
+#include "sscCustomMetaImage.h"
 
 namespace ssc
 {
+
+
 
 //-----
 DataPtr MincImageReader::load(const QString& uid, const QString& filename)
@@ -117,80 +120,8 @@ namespace
 //-----
 DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 {
-  //messageManager()->sendDebug("load filename: "+string_cast(filename));
-  //read the specific TransformMatrix-tag from the header
-  Vector3D p_r(0, 0, 0);
-  Vector3D e_x(1, 0, 0);
-  Vector3D e_y(0, 1, 0);
-  Vector3D e_z(0, 0, 1);
-
-  QString creator;
-  QFile file(filename);
-
-  QString line;
-  if (file.open(QIODevice::ReadOnly))
-  {
-    QTextStream t(&file);
-    while (!t.atEnd())
-    {
-      line.clear();
-      line = t.readLine();
-      // do something with the line
-      if (line.startsWith("Position", Qt::CaseInsensitive) || line.startsWith("Offset", Qt::CaseInsensitive))
-      {
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
-        if (list.size()>=5)
-          p_r = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
-      }
-      else if (line.startsWith("TransformMatrix", Qt::CaseInsensitive) || line.startsWith("Orientation",
-          Qt::CaseInsensitive))
-      {
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
-
-        if (list.size()>=8)
-        {
-          e_x = Vector3D(list[2].toDouble(), list[3].toDouble(), list[4].toDouble());
-          e_y = Vector3D(list[5].toDouble(), list[6].toDouble(), list[7].toDouble());
-          e_z = cross(e_x, e_y);
-        }
-      }
-      else if (line.startsWith("Creator", Qt::CaseInsensitive))
-      {
-        QStringList list = line.split(" ", QString::SkipEmptyParts);
-        if (list.size()>=3)
-          creator = list[2];
-      }
-    }
-    file.close();
-  }
-
-  // MDH is a volatile format: warn if we dont know the source
-  if ((creator != "Ingerid") && (creator != "DICOMtoMetadataFilter"))
-  {
-    //std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
-  }
-
-  Transform3D rMd;
-
-  // add rotational part
-  for (unsigned i = 0; i < 3; ++i)
-  {
-    rMd[i][0] = e_x[i];
-    rMd[i][1] = e_y[i];
-    rMd[i][2] = e_z[i];
-  }
-
-  // Special Ingerid Reinertsen fix: Position is stored as p_d instead of p_r: convert here
-  if (creator == "Ingerid")
-  {
-    std::cout << "ingrid fixing" << std::endl;
-    p_r = rMd.coord(p_r);
-  }
-
-  // add translational part
-  rMd[0][3] = p_r[0];
-  rMd[1][3] = p_r[1];
-  rMd[2][3] = p_r[2];
+  CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+  Transform3D rMd = customReader->readTransform();
 
   //load the image from file
   vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
@@ -209,7 +140,7 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 
   ImagePtr image(new Image(uid, imageData));
 
-  RegistrationTransform regTrans(rMd, QFileInfo(file.fileName()).lastModified(), "From MHD file");
+  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
   image->get_rMd_History()->addRegistration(regTrans);
 
   //std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
@@ -461,6 +392,13 @@ void DataManagerImpl::loadData(DataPtr data)
   }
 }
 
+//void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
+//{
+//  ImagePtr image = boost::shared_dynamic_cast<Image>(data);
+//  if (image)
+//    this->saveImage(image, basePath);
+//}
+
 void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 {
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
@@ -468,16 +406,29 @@ void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
   writer->SetFileDimensionality(3);
   QString filename = basePath + "/" + image->getFilePath();
   writer->SetFileName(cstring_cast(filename));
+  QDir().mkpath(QFileInfo(filename).path());
 
   //Rename ending from .mhd to .raw
   QStringList splitName = qstring_cast(filename).split(".");
   splitName[splitName.size() - 1] = "raw";
-  filename = splitName.join(".");
+  QString rawfilename = splitName.join(".");
 
-  writer->SetRAWFileName(cstring_cast(filename));
+  writer->SetRAWFileName(cstring_cast(rawfilename));
   writer->SetCompression(false);
   writer->Update();
   writer->Write();
+
+  writer = 0;
+
+  CustomMetaImagePtr customReader = CustomMetaImage::create(filename);
+  customReader->setTransform(image->get_rMd());
+
+//  QSettings header(filename, QSettings::IniFormat);
+//  std::cout << "fn: " << header.fileName() << std::endl;
+//  QStringList transform;
+//  transform << "3" << "4" << "5";
+//  header.setValue("TransformMatrix", transform);
+
 }
 
 // meshes
@@ -495,10 +446,10 @@ void DataManagerImpl::saveMesh(MeshPtr mesh, const QString& basePath)
   QString filename = basePath + "/" + mesh->getFilePath();
   writer->SetFileName(cstring_cast(filename));
 
-  //Rename ending from .mhd to .raw
-  QStringList splitName = qstring_cast(filename).split(".");
-  splitName[splitName.size() - 1] = "raw";
-  filename = splitName.join(".");
+//  //Rename ending from .mhd to .raw
+//  QStringList splitName = qstring_cast(filename).split(".");
+//  splitName[splitName.size() - 1] = "raw";
+//  filename = splitName.join(".");
 
   //writer->SetRAWFileName(filename.c_str());
   //writer->SetCompression(false);
@@ -820,6 +771,8 @@ void DataManagerImpl::setMedicalDomain(MEDICAL_DOMAIN domain)
 
 int DataManagerImpl::findUniqueUidNumber(QString uidBase) const
 {
+  if (!uidBase.contains("%"))
+    return -1;
   // Find an uid that is not used before
   int numMatches = 1;
   int recNumber = 0;
@@ -867,8 +820,12 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uidBase, QSt
 MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath)
 {
   int recNumber = this->findUniqueUidNumber(uidBase);
-  QString uid = qstring_cast(uidBase).arg(recNumber);
-  QString name = qstring_cast(nameBase).arg(recNumber);
+  QString uid = uidBase;
+  QString name = nameBase;
+  if (uid.contains("%"))
+    uid = uidBase.arg(recNumber);
+  if (name.contains("%"))
+    name = nameBase.arg(recNumber);
   MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
 
   QString filename = filePath + "/" + uid + ".vtk";
