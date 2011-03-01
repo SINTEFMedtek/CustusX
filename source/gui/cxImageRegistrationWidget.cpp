@@ -33,18 +33,14 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
 
   //pushbuttons
   mAddLandmarkButton->setDisabled(true);
-  connect(mAddLandmarkButton, SIGNAL(clicked()),
-          this, SLOT(addLandmarkButtonClickedSlot()));
+  connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
   mEditLandmarkButton->setDisabled(true);
-  connect(mEditLandmarkButton, SIGNAL(clicked()),
-          this, SLOT(editLandmarkButtonClickedSlot()));
+  connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
   mRemoveLandmarkButton->setDisabled(true);
-  connect(mRemoveLandmarkButton, SIGNAL(clicked()),
-          this, SLOT(removeLandmarkButtonClickedSlot()));
+  connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
   //slider
-  connect(mThresholdSlider, SIGNAL(valueChanged(int)),
-          this, SLOT(thresholdChangedSlot(int)));
+  connect(mThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdChangedSlot(int)));
 
   //layout
   mVerticalLayout->addWidget(mLandmarkTableWidget);
