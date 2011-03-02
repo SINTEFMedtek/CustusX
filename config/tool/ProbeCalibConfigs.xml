@@ -339,7 +339,7 @@
                <Width>800</Width>
                <Height>600</Height>
             </ImageSize>
-            <HorizontalOffset>-30</HorizontalOffset>
+            <HorizontalOffset>0</HorizontalOffset>
             <Config>
                <ID>WidthMaxDepth20</ID>
                <Name>Width: Max, Depth: 20 mm</Name>
@@ -347,35 +347,35 @@
                <Depth>389</Depth>
                <Offset>0</Offset>
                <Origin>
-                  <Col>313.5</Col>
+                  <Col>297</Col>
                   <Row>54</Row>
                </Origin>
                <NCorners>4</NCorners>
                <Corner>
-                  <Col>190</Col>
+                  <Col>169</Col>
                   <Row>54</Row>
                </Corner>
                <Corner>
-                  <Col>190</Col>
-                  <Row>443</Row>
+                  <Col>169</Col>
+                  <Row>442</Row>
                </Corner>
                <Corner>
-                  <Col>437</Col>
-                  <Row>443</Row>
+                  <Col>425</Col>
+                  <Row>442</Row>
                </Corner>
                <Corner>
-                  <Col>437</Col>
+                  <Col>425</Col>
                   <Row>54</Row>
                </Corner>
                <CroppingEdges>
-                  <Left>190</Left>
-                  <Right>437</Right>
+                  <Left>169</Left>
+                  <Right>425</Right>
                   <Top>54</Top>
-                  <Bottom>443</Bottom>
+                  <Bottom>442</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.051282</Width>
-                  <Height>0.051282</Height>
+                  <Width>0.051546</Width>
+                  <Height>0.051546</Height>
                </PixelSize>
             </Config>
             <Config>
@@ -385,35 +385,35 @@
                <Depth>389</Depth>
                <Offset>0</Offset>
                <Origin>
-                  <Col>313.5</Col>
+                  <Col>297</Col>
                   <Row>54</Row>
                </Origin>
                <NCorners>4</NCorners>
                <Corner>
-                  <Col>215</Col>
+                  <Col>195</Col>
                   <Row>54</Row>
                </Corner>
                <Corner>
-                  <Col>215</Col>
-                  <Row>443</Row>
+                  <Col>195</Col>
+                  <Row>442</Row>
                </Corner>
                <Corner>
-                  <Col>412</Col>
-                  <Row>443</Row>
+                  <Col>399</Col>
+                  <Row>442</Row>
                </Corner>
                <Corner>
-                  <Col>412</Col>
+                  <Col>399</Col>
                   <Row>54</Row>
                </Corner>
                <CroppingEdges>
-                  <Left>215</Left>
-                  <Right>412</Right>
+                  <Left>195</Left>
+                  <Right>399</Right>
                   <Top>54</Top>
-                  <Bottom>443</Bottom>
+                  <Bottom>442</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.064103</Width>
-                  <Height>0.064103</Height>
+                  <Width>0.064433</Width>
+                  <Height>0.064433</Height>
                </PixelSize>
             </Config>
             <Config>
@@ -423,35 +423,35 @@
                <Depth>389</Depth>
                <Offset>0</Offset>
                <Origin>
-                  <Col>313</Col>
+                  <Col>297</Col>
                   <Row>54</Row>
                </Origin>
                <NCorners>4</NCorners>
                <Corner>
-                  <Col>231</Col>
+                  <Col>212</Col>
                   <Row>54</Row>
                </Corner>
                <Corner>
-                  <Col>231</Col>
-                  <Row>443</Row>
+                  <Col>212</Col>
+                  <Row>442</Row>
                </Corner>
                <Corner>
-                  <Col>395</Col>
-                  <Row>443</Row>
+                  <Col>382</Col>
+                  <Row>442</Row>
                </Corner>
                <Corner>
-                  <Col>395</Col>
+                  <Col>382</Col>
                   <Row>54</Row>
                </Corner>
                <CroppingEdges>
-                  <Left>231</Left>
-                  <Right>395</Right>
+                  <Left>212</Left>
+                  <Right>382</Right>
                   <Top>54</Top>
-                  <Bottom>443</Bottom>
+                  <Bottom>442</Bottom>
                </CroppingEdges>
                <PixelSize>
-                  <Width>0.076923</Width>
-                  <Height>0.076923</Height>
+                  <Width>0.077320</Width>
+                  <Height>0.077320</Height>
                </PixelSize>
             </Config>
          </RTSource>
