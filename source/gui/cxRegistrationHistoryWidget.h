@@ -46,6 +46,7 @@ private:
   QString  debugDump();
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
+  bool validRegistrationType(QString type) const;
 
   typedef std::map<QDateTime,QString> TimeMap;
   TimeMap getRegistrationTimes();
