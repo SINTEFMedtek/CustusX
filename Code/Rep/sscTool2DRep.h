@@ -88,10 +88,10 @@ class ToolRep2D : public ssc::RepImpl
 		OffsetPointPtr toolPoint;
 		TextDisplayPtr distanceText;
 
-	  //US Probe sector
+		//US Probe sector
 		ProbeSectorPtr mProbeSector;
-	  vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
-	  vtkActorPtr mProbeSectorActor;
+		vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
+		vtkActorPtr mProbeSectorActor;
 };
 
 

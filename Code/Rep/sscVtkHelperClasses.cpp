@@ -212,7 +212,6 @@ void CrossHair2D::setValue(const Vector3D& focalPoint, int width, int height, do
 	Vector3D p = focalPoint;
 	bordarOffset = 0.0;
 	mCursor2D->SetModelBounds ( bordarOffset, width - bordarOffset, bordarOffset, height - bordarOffset, 0.0, 0.0 );
-	//SW_LOG(" seting focal point",p[0]/2, p[1]/2 );
 	mCursor2D->SetFocalPoint ( p[0]/2, p[1]/2, 0.0 );
 	mCursor2D->SetRadius ( 5 );
 	mCursor2D->AllOff();
@@ -221,6 +220,7 @@ void CrossHair2D::setValue(const Vector3D& focalPoint, int width, int height, do
 	mCursor2D->OutlineOff();
 	actor->GetProperty()-> SetColor ( c.begin() );
 }
+
 /**special made update for crosshair in registration
  */
 void CrossHair2D::updateRegCross( const Vector3D& crossPos )
@@ -238,10 +238,7 @@ void CrossHair2D::update( const Vector3D& crossPos, const DoubleBoundingBox3D& v
 	Vector3D cp = crossPos;
 	cp[2] = 0.0; // make it fit inside the z bounds.
 
-//	int* sz = mRenderer->GetSize();
-//	std::cout << "CrossHair2D::update sz: " << sz[0] << "," << sz[1] << " , cp: " << cp << std::endl;
 	DoubleBoundingBox3D bb = vp;
-	//DoubleBoundingBox3D bb(0, sz[0], 0, sz[1], -0.5, 0.5);
 	if (!bb.contains(cp))
 	{
 		mCursor2D->AllOff();
@@ -264,6 +261,7 @@ void CrossHair2D::update( const Vector3D& crossPos, const DoubleBoundingBox3D& v
 		//mapper->Update();
 	}
 }
+
 vtkActor2DPtr  CrossHair2D::getActor()
 {
 	return actor;
@@ -292,6 +290,7 @@ void TextDisplay::setPosition( const Vector3D& pos )
 {
 	actor->SetPosition( pos[0], pos[1] );
 }
+
 void TextDisplay::setPosition( float x, float y  )
 {
 	actor->SetPosition( x, y );
@@ -302,10 +301,12 @@ void TextDisplay::updateText( const QString& text)
 	mapper->SetInput( cstring_cast(text) );
 	//mapper->Update();
 }
+
 vtkTextProperty* TextDisplay::textProperty()
 {
 	return mapper->GetTextProperty();
 }
+
 vtkActor2DPtr TextDisplay::getActor()
 {
 	return actor;
@@ -377,5 +378,3 @@ void Axes3D::setCaption(vtkCaptionActor2D* captionActor, const QString& caption,
 
 }//	namespace vm
 // --------------------------------------------------------
-
-

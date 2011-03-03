@@ -70,7 +70,6 @@ double ToolRep2D::getOffset()
  * Some old code need this in order to render in viewport coordinates.
  */
 void ToolRep2D::setViewportData(const Transform3D& vpMs, const DoubleBoundingBox3D& vp)
-//void ToolRep2D::set_vpMs(const Transform3D& vpMs)
 {
 	m_vpMs = vpMs;	
 	mBB_vp = vp;
@@ -144,7 +143,7 @@ void ToolRep2D::addRepActorsToViewRenderer(ssc::View* view)
 	createToolLine(view->getRenderer(), Vector3D(0,0,0));
 	createCrossHair(view->getRenderer() );
 	createOffsetText(view->getRenderer(), Vector3D(0,0,0));
-  view->getRenderer()->AddActor(mProbeSectorActor);
+	view->getRenderer()->AddActor(mProbeSectorActor);
 	setVisibility();
 	update();
 }
@@ -157,17 +156,19 @@ void ToolRep2D::removeRepActorsFromViewRenderer(ssc::View* view)
 	centerPoint.reset();
 	toolPoint.reset();
 	distanceText.reset();
-  view->getRenderer()->RemoveActor(mProbeSectorActor);
+	view->getRenderer()->RemoveActor(mProbeSectorActor);
 }
 
 void ToolRep2D::sliceTransformChangedSlot(Transform3D sMr)
 {
 	update();
 }
+
 void ToolRep2D::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
 {
 	update();	
 }
+
 void ToolRep2D::toolVisibleSlot(bool visible)
 {
 	setVisibility();
@@ -178,9 +179,6 @@ void ToolRep2D::update()
 {
 	if (!mSlicer->getTool())
 		return;
-	//setVisibility();
-	//Logger::log("tool.log", "<"+string_cast(__FUNCTION__)+">"+" -- again!!!");
-	//Logger::log("vm.log", "ToolRep2D::update()");
 
 	Transform3D prMt;
 	if (mSlicer->getTool())
@@ -266,6 +264,7 @@ void ToolRep2D::createCrossHair(vtkRendererPtr renderer)
 	cursor.reset( new CrossHair2D(renderer) ) ;
 	crossHairResized();
 }
+
 /**create a yellow crosshair centered at the tool offset pos. 
  * 
  */
@@ -375,7 +374,7 @@ void ToolRep2D::updateOffsetText()
 		return;
 	}
 
-	if( getOffset() > 2.0 && mUseOffsetText && showOffset())
+	if (getOffset() > 2.0 && mUseOffsetText && showOffset())
 	{
 		char buffer[100];
 		//snprintf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
@@ -389,7 +388,6 @@ void ToolRep2D::updateOffsetText()
 		distanceText->getActor()->VisibilityOff(); // doesnt work...
 		distanceText->updateText( "" ); // does work...
 	}
-
 }
 
 } // namespace vm
