@@ -12,6 +12,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QTextStream>
+#include <QSettings>
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
@@ -26,6 +27,10 @@
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"
 #include "cxStateMachineManager.h"
+
+#include "sscMesh.h"
+#include <vtkPolyData.h>
+#include <vtkPointData.h>
 
 namespace cx
 {
@@ -43,7 +48,7 @@ QString PatientData::getActivePatientFolder() const
 bool PatientData::isPatientValid() const
 {
   //ssc::messageManager()->sendDebug("PatientData::isPatientValid: "+string_cast(!mActivePatientFolder.isEmpty()));
-  return !mActivePatientFolder.isEmpty();
+  return !mActivePatientFolder.isEmpty() && (mActivePatientFolder!=this->getNullFolder());
 }
 
 void PatientData::setActivePatient(const QString& activePatientFolder)
@@ -77,9 +82,16 @@ void PatientData::clearPatient()
   //rep
   //usrec?
 
-  this->setActivePatient("");
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+
+  this->setActivePatient(this->getNullFolder());
 }
 
+QString PatientData::getNullFolder() const
+{
+  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  return patientDatafolder + "/NoPatient";
+}
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
@@ -149,8 +161,52 @@ void PatientData::savePatient()
   }
 
   ssc::toolManager()->savePositionHistory();
+
   //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...
+}
+
+vtkPolyDataPtr PatientData::mergeTransformIntoPolyData(vtkPolyDataPtr polyBase, ssc::Transform3D rMd)
+{
+    // if transform elements exists, create a copy with entire position inside the polydata:
+    if (similar(rMd, ssc::Transform3D()))
+      return polyBase;
+
+    vtkPolyDataPtr poly = vtkPolyDataPtr::New();
+    poly->DeepCopy(polyBase);
+    vtkPointsPtr points = poly->GetPoints();
+
+    for (int i=0; i<poly->GetNumberOfPoints(); ++i)
+    {
+      ssc::Vector3D p(points->GetPoint(i));
+      p = rMd.coord(p);
+      points->SetPoint(i, p.begin());
+    }
+
+    return poly;
+}
+
+void PatientData::exportPatient()
+{
+  QString targetFolder = mActivePatientFolder+"/Export/"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+
+  ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
+  for (ssc::DataManager::ImagesMap::iterator iter=images.begin(); iter!=images.end(); ++iter)
+  {
+    ssc::dataManager()->saveImage(iter->second, targetFolder);
+  }
+
+  ssc::DataManager::MeshMap meshes = ssc::dataManager()->getMeshes();
+  for (ssc::DataManager::MeshMap::iterator iter=meshes.begin(); iter!=meshes.end(); ++iter)
+  {
+    ssc::MeshPtr mesh = iter->second;
+    vtkPolyDataPtr poly = this->mergeTransformIntoPolyData(mesh->getVtkPolyData(), mesh->get_rMd());
+    // create a copy with the SAME UID as the original. Do not load this one into the datamanager!
+    mesh = ssc::dataManager()->createMesh(poly, mesh->getUid(), mesh->getName(), "Images");
+    ssc::dataManager()->saveMesh(mesh, targetFolder);
+  }
+
+  ssc::messageManager()->sendInfo("Exported patient data to " + targetFolder + ".");
 }
 
 bool PatientData::copyFile(QString source, QString dest)

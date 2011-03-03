@@ -35,16 +35,16 @@ public:
   virtual ~WorkflowState(){};
 
   virtual void onEntry(QEvent * event );
-  virtual void onExit(QEvent * event )
-  {
-    //std::cout << "Exiting "<< mName << std::endl;
-  };
+  virtual void onExit(QEvent * event );
 
   virtual QString getUid() const {return mUid;};
   virtual QString getName() const {return mName;};
 
   std::vector<WorkflowState*> getChildStates();
   QAction* createAction(QActionGroup* group);
+
+signals:
+  void aboutToExit();
 
 protected slots:
   void canEnterSlot();

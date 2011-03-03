@@ -12,6 +12,8 @@
 #include <QString>
 #include <QObject>
 #include "sscForwardDeclarations.h"
+#include "vtkForwardDeclarations.h"
+#include "sscTransform3D.h"
 
 class QDomDocument;
 //class QSettings;
@@ -42,14 +44,18 @@ public slots:
   ssc::DataPtr importData(QString fileName);
   void savePatient();///< Save all application data to XML file
   void clearPatient();
+  void exportPatient();
+
 
 signals:
   void patientChanged();
 
 private:
   //patient
+  QString getNullFolder() const;
   void setActivePatient(const QString& activePatientFolder); ///< set the activepatientfolder (absolute path)
   void createPatientFolders(QString choosenDir); ///< Create patient folders and save xml for new patient and for load patient for a directory whitout xml file.
+  vtkPolyDataPtr mergeTransformIntoPolyData(vtkPolyDataPtr poly, ssc::Transform3D rMd);
 
   //saving/loading
   void generateSaveDoc(QDomDocument& doc);

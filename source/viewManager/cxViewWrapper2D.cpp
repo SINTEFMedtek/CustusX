@@ -39,6 +39,7 @@ namespace cx
 ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
     mOrientationActionGroup(new QActionGroup(view))
 {
+//  std::cout << "ViewWrapper2D create" << std::endl;
   mView = view;
   this->connectContextMenu(mView);
 
@@ -63,6 +64,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
 
 ViewWrapper2D::~ViewWrapper2D()
 {
+//  std::cout << "ViewWrapper2D delete" << std::endl;
   if (mView)
     mView->removeReps();
 }
@@ -147,10 +149,12 @@ void ViewWrapper2D::addReps()
 
   // slice rep
 #ifdef USE_2D_GPU_RENDER
-  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
-  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
-  mMultiSliceRep->setSliceProxy(mSliceProxy);
-  mView->addRep(mMultiSliceRep);
+//  this->resetMultiSlicer(); ignore until addimage
+
+//  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
+//  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+//  mMultiSliceRep->setSliceProxy(mSliceProxy);
+//  mView->addRep(mMultiSliceRep);
 #else
   mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
   mSliceRep->setSliceProxy(mSliceProxy);
@@ -162,6 +166,23 @@ void ViewWrapper2D::addReps()
   mToolRep2D->setSliceProxy(mSliceProxy);
   mToolRep2D->setUseCrosshair(true);
   mView->addRep(mToolRep2D);
+}
+
+/**Hack: gpu slicer recreate and fill with images every time,
+ * due to internal instabilities.
+ *
+ */
+void ViewWrapper2D::resetMultiSlicer()
+{
+  if (mMultiSliceRep)
+    mView->removeRep(mMultiSliceRep);
+  mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
+  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+  mMultiSliceRep->setSliceProxy(mSliceProxy);
+  mView->addRep(mMultiSliceRep);
+  if (mViewGroup)
+    mMultiSliceRep->setImages(mViewGroup->getImages());
+  this->viewportChanged();
 }
 
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
@@ -361,7 +382,8 @@ void ViewWrapper2D::updateView()
 
   // slice rep
 #ifdef USE_2D_GPU_RENDER
-  mMultiSliceRep->setImages(images);
+  this->resetMultiSlicer();
+//  mMultiSliceRep->setImages(images);
 #else
   mSliceRep->setImage(image);
 #endif
@@ -458,7 +480,14 @@ void ViewWrapper2D::mousePressSlot(QMouseEvent* event)
 {
   if (event->buttons() & Qt::LeftButton)
   {
-    moveAxisPos(qvp2vp(event->pos()));
+    if (this->getOrientationType()==ssc::otORTHOGONAL)
+    {
+      setAxisPos(qvp2vp(event->pos()));
+    }
+    else
+    {
+      mClickPos = qvp2vp(event->pos());
+    }
   }
 }
 
@@ -470,7 +499,16 @@ void ViewWrapper2D::mouseMoveSlot(QMouseEvent* event)
 {
   if (event->buttons() & Qt::LeftButton)
   {
-    moveAxisPos(qvp2vp(event->pos()));
+    if (this->getOrientationType()==ssc::otORTHOGONAL)
+    {
+      setAxisPos(qvp2vp(event->pos()));
+    }
+    else
+    {
+      ssc::Vector3D p = qvp2vp(event->pos());
+      this->shiftAxisPos(p-mClickPos);
+      mClickPos = p;
+    }
   }
 }
 
@@ -501,9 +539,30 @@ ssc::Vector3D ViewWrapper2D::qvp2vp(QPoint pos_qvp)
 }
 
 /**Move the tool pos / axis pos to a new position given
+ * by delta movement in vp space.
+ */
+void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
+{
+  delta_vp = -delta_vp;
+  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+
+  ssc::Transform3D sMr = mSliceProxy->get_sMr();
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+  ssc::Transform3D prMt = tool->get_prMt();
+  ssc::Vector3D delta_s = get_vpMs().inv().vector(delta_vp);
+
+  ssc::Vector3D delta_pr = (rMpr.inv()*sMr.inv()).vector(delta_s);
+
+  // MD is the actual tool movement in patient space, matrix form
+  ssc::Transform3D MD = createTransformTranslate(delta_pr);
+  // set new tool position to old modified by MD:
+  tool->set_prMt(MD*prMt);
+}
+
+/**Move the tool pos / axis pos to a new position given
  * by the input click position in vp space.
  */
-void ViewWrapper2D::moveAxisPos(ssc::Vector3D click_vp)
+void ViewWrapper2D::setAxisPos(ssc::Vector3D click_vp)
 {
   ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
 

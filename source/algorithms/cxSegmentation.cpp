@@ -7,10 +7,8 @@
 namespace cx
 {
 Segmentation::Segmentation() :
-  TimedAlgorithm("segmenting", 10)
-{
-  connect(&mWatcher, SIGNAL(finished()), this, SLOT(finishedSlot()));
-}
+    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
+{}
 
 Segmentation::~Segmentation()
 {}
@@ -31,9 +29,9 @@ ssc::ImagePtr Segmentation::getOutput()
   return mOutput;
 }
 
-void Segmentation::finishedSlot()
+void Segmentation::postProcessingSlot()
 {
-  vtkImageDataPtr rawResult = mWatcher.future().result();
+  vtkImageDataPtr rawResult = this->getResult();
 
   QString uid = ssc::changeExtension(mInput->getUid(), "") + "_seg%1";
   QString name = mInput->getName()+" seg%1";
@@ -49,18 +47,9 @@ void Segmentation::finishedSlot()
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
-  this->stopTiming();
   ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
   emit finished();
-}
-
-void Segmentation::generate()
-{
-  this->startTiming();
-
-  mFutureResult = QtConcurrent::run(this, &Segmentation::calculate);
-  mWatcher.setFuture(mFutureResult);
 }
 
 vtkImageDataPtr Segmentation::calculate()
@@ -70,7 +59,6 @@ vtkImageDataPtr Segmentation::calculate()
   //Smoothing
   if(mUseSmoothing)
   {
-    //ssc::messageManager()->sendDebug("Smoothing...");
     typedef itk::SmoothingRecursiveGaussianImageFilter<itkImageType, itkImageType> smoothingFilterType;
     smoothingFilterType::Pointer smoohingFilter = smoothingFilterType::New();
     smoohingFilter->SetSigma(mSmoothingSigma);
@@ -79,12 +67,10 @@ vtkImageDataPtr Segmentation::calculate()
     itkImage = smoohingFilter->GetOutput();
   }
 
-  //Thresholding
-  //ssc::messageManager()->sendDebug("Thresholding...");
+  //Binary Thresholding
   typedef itk::BinaryThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
   thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
   thresholdFilter->SetInput(itkImage);
-  //TODO:  support non-binary images
   thresholdFilter->SetOutsideValue(0);
   thresholdFilter->SetInsideValue(1);
   thresholdFilter->SetLowerThreshold(mTheshold);
@@ -97,11 +83,11 @@ vtkImageDataPtr Segmentation::calculate()
   itkToVtkFilter->Update();
 
   vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-  //itkToVtkFilter->GetOutput()->ReleaseDataFlagOn();// Test: see if this release more memory: No change here
   rawResult->DeepCopy(itkToVtkFilter->GetOutput());
   // TODO: possible memory problem here - check debug mem system of itk/vtk
 
   return rawResult;
 }
+
 
 }//namespace cx

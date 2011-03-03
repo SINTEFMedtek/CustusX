@@ -161,12 +161,17 @@ void USAcqusitionWidget::dominantToolChangedSlot()
 //  if(!cxTool)
 //    return;
 
+  if (tool==this->getTool())
+    return;
+
   if (this->getTool() && this->getTool()->getProbe())
     disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
   connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
   this->setTool(tool);
+
+  this->probeChangedSlot();
 }
 
 void USAcqusitionWidget::reconstructFinishedSlot()

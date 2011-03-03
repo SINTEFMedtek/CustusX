@@ -211,13 +211,14 @@ public: // optional methods
   virtual QString getHelp() const;
 };
 
+typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
 class RegistrationFixedImageStringDataAdapter : public SelectImageStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new RegistrationFixedImageStringDataAdapter()); }
+  static RegistrationFixedImageStringDataAdapterPtr New() { return RegistrationFixedImageStringDataAdapterPtr(new RegistrationFixedImageStringDataAdapter()); }
   RegistrationFixedImageStringDataAdapter();
   virtual ~RegistrationFixedImageStringDataAdapter() {}
 
@@ -230,13 +231,14 @@ public: // optional methods
   virtual QString getHelp() const;
 };
 
+typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
 class RegistrationMovingImageStringDataAdapter : public SelectImageStringDataAdapterBase
 {
   Q_OBJECT
 public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new RegistrationMovingImageStringDataAdapter()); }
+  static RegistrationMovingImageStringDataAdapterPtr New() { return RegistrationMovingImageStringDataAdapterPtr(new RegistrationMovingImageStringDataAdapter()); }
   RegistrationMovingImageStringDataAdapter();
   virtual ~RegistrationMovingImageStringDataAdapter() {}
 
@@ -544,6 +546,9 @@ public: // basic methods
 private:
   ssc::DataPtr mData;
 };
+
+
+
 
 } // namespace cx
 
