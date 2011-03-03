@@ -16,7 +16,8 @@ PositionStorageReader::PositionStorageReader(QString filename) : positions(filen
   stream.setDevice(&positions);
   stream.setByteOrder(QDataStream::LittleEndian);
 
-  char header[6] = "     ";
+  char header[7];
+  memset(header, 0, sizeof(header));
   stream.readRawData(header, 6);
   mVersion = 0;
   stream >> mVersion;
@@ -28,7 +29,7 @@ PositionStorageReader::PositionStorageReader(QString filename) : positions(filen
 
   if (QString(header)!="SNWPOS" || mVersion<1)
   {
-//    std::cout << QString(header).toStdString() << "-" << int(mVersion) << std::endl;
+    //std::cout << QString(header).toStdString() << "-" << int(mVersion) << std::endl;
     std::cout << "Error in header for file [" << filename.toStdString() << "]" << std::endl;
     positions.close();
   }
