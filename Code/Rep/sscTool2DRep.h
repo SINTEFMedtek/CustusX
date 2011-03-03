@@ -14,7 +14,7 @@
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
-
+#include "sscVtkHelperClasses.h"
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 #include "sscBoundingBox3D.h"
@@ -45,18 +45,25 @@ class ToolRep2D : public ssc::RepImpl
 		void setUseToolLine(bool on);
 		void setUseOffsetText(bool on);
 		void setMergeOffsetAndToolLine(bool on);
+		void setTooltipPointColor(QColor c) { mTooltipPointColor = c; }
+		void setOffsetPointColor(QColor c) { mOffsetPointColor = c; }
+		void setTooltipLineColor(QColor c) { mTooltipLineColor = c; }
+		void setOffsetLineColor(QColor c) { mOffsetLineColor = c; }
+		void setOffsetStipplePattern(int pattern) { mStipplePattern = pattern; }
 
 	private slots:
 		void sliceTransformChangedSlot(Transform3D sMr); 
 		void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 		void toolVisibleSlot(bool visible); 
 		void update();
+
 	protected:
 		bool showProbe();
 		bool showOffset();
 
 		virtual void addRepActorsToViewRenderer(ssc::View* view);
-		virtual void removeRepActorsFromViewRenderer(ssc::View* view);		
+		virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+
 	private:
 		void setProbeSector(ssc::ProbeData data);				
 		double getOffset();
@@ -78,9 +85,14 @@ class ToolRep2D : public ssc::RepImpl
 		bool mUseCrosshair; 
 		bool mUseToolLine; 
 		bool mUseOffsetText;		
-		bool mMergeOffsetAndToolLine; ///<
+		bool mMergeOffsetAndToolLine;
+
+		RGBColor mTooltipPointColor;
+		RGBColor mOffsetPointColor;
+		RGBColor mTooltipLineColor;
+		RGBColor mOffsetLineColor;
+		int mStipplePattern;
 		
-		//double mOffset; 
 		CrossHair2DPtr cursor;
 		LineSegmentPtr center2Tool;
 		LineSegmentPtr tool2Back;

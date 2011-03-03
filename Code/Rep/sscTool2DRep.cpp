@@ -20,7 +20,6 @@
 #include "sscSliceProxy.h"
 #include "sscToolManager.h"
 #include "sscView.h"
-#include "sscVtkHelperClasses.h"
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscProbeSector.h"
@@ -30,17 +29,21 @@ namespace ssc
 
 ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
-	mBB_vp(0,1,0,1,0,1)
+	mBB_vp(0, 1, 0, 1, 0, 1),
+	mTooltipPointColor(0.96, 0.87, 0.17),
+	mOffsetPointColor(0.96, 0.87, 0.17),
+	mTooltipLineColor(0.25, 0.87, 0.16),
+	mOffsetLineColor(1.0, 0.8, 0.0),
+	mStipplePattern(0xffff)
 {
 	mUseOffset = true;
 	mUseCrosshair = false;
 	mUseToolLine = true;
 	mUseOffsetText = false;
 	mMergeOffsetAndToolLine = false;
-
-  mProbeSector.reset(new ProbeSector());
-  mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
-  mProbeSectorActor = vtkActorPtr::New();
+	mProbeSector.reset(new ProbeSector());
+	mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
+	mProbeSectorActor = vtkActorPtr::New();
 }
 
 ToolRep2D::~ToolRep2D()
@@ -192,36 +195,34 @@ void ToolRep2D::update()
 
 	// only show probe if aligned with the slice plane:
 	double dotted = dot(Vector3D(0,0,1),sMt.vector(Vector3D(1,0,0)));
-  bool aligned = similar(fabs(dotted), 1.0, 0.1);
+	bool aligned = similar(fabs(dotted), 1.0, 0.1);
+	if (this->showProbe() && aligned)
+	{
+		Transform3D T = createTransformTranslate(Vector3D(0, 0, 0.1));
 
-  //mProbeSector->setPosition(sMr*rMpr*prMt);
-//  std::cout << "(this->showProbe() && aligned)" << this->showProbe() << ", " << aligned << std::endl;
-  if (this->showProbe() && aligned)
-  {
-    Transform3D T = createTransformTranslate(Vector3D(0, 0, 0.1));
-
-    mProbeSector->setData(mSlicer->getTool()->getProbeSector());
-    Transform3D tMu = mProbeSector->get_tMu();
-    mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
-    if (mProbeSectorPolyDataMapper->GetInput())
-    {
-      mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
-    }
-    mProbeSectorActor->SetUserMatrix((T*sMt*tMu).matrix());
-    mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
-//    std::cout << "vis: " << mProbeSectorActor->GetVisibility() << std::endl;
-//    std::cout << "mSlicer->getTool()->getProbeSector()" << streamXml2String(mSlicer->getTool()->getProbeSector()) << std::endl;
-  }
-  else
-    mProbeSectorActor->SetVisibility(false);
-
+		mProbeSector->setData(mSlicer->getTool()->getProbeSector());
+		Transform3D tMu = mProbeSector->get_tMu();
+		mProbeSectorPolyDataMapper->SetInput(mProbeSector->getSectorLinesOnly());
+		if (mProbeSectorPolyDataMapper->GetInput())
+		{
+			mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
+		}
+		mProbeSectorActor->SetUserMatrix((T*sMt*tMu).matrix());
+		mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
+	}
+	else
+	{
+		mProbeSectorActor->SetVisibility(false);
+	}
 
 	Vector3D cross = vpMt.coord(getOffset() * Vector3D(0,0,1)); // zero position plus offset along z
 	Vector3D tooltip = vpMt.coord(Vector3D(0,0,0)); // the zero position
 	Vector3D toolback = vpMt.coord(Vector3D(0,0,-1000)); // a point 1m backwards in z
 
 	if (cursor)
+	{
 		cursor->update(cross, mBB_vp); ///crosshair, shows in Navigation
+	}
 	updateOffsetText();	
 	updateToolLine(cross, tooltip, toolback);
 }
@@ -244,13 +245,12 @@ void ToolRep2D::setVisibility()
 		cursor->getActor()->SetVisibility(mUseCrosshair && hasTool);
 	if (center2Tool)
 		center2Tool->getActor()->SetVisibility(showOffset());
-		//center2Tool->getActor()->SetVisibility(showOffset() && !mMergeOffsetAndToolLine);
 	if (tool2Back)
 		tool2Back->getActor()->SetVisibility(mUseToolLine && hasTool);
 	if (centerPoint)
 		centerPoint->getActor()->SetVisibility(mUseToolLine && hasTool);
-	if (toolPoint)
-		toolPoint->getActor()->SetVisibility(showOffset() && !mMergeOffsetAndToolLine);
+	if (centerPoint)
+		centerPoint->getActor()->SetVisibility(showOffset() && !mMergeOffsetAndToolLine);
 	if (distanceText)
 		distanceText->getActor()->SetVisibility(mUseOffsetText && showOffset() && !mMergeOffsetAndToolLine);
 }
@@ -285,44 +285,32 @@ void ToolRep2D::crossHairResized()
  */
 void ToolRep2D::createToolLine(vtkRendererPtr renderer, const Vector3D& centerPos )
 {
-	RGBColor toolColor(0.25,0.87,0.16);
-
-	// set stipple pattern for center2tool line if mergeOffsetandToolline
-	int stipplePattern = 0xFFFF;
-	RGBColor offsetColor(1.0,0.8,0.0);
-	if (mMergeOffsetAndToolLine)
-	{
-		//stipplePattern = 0x0F0F; // stippled line not to be used
-		offsetColor = toolColor;
-	}
-
 	// line from tooltip to offset point
-	center2Tool.reset( new LineSegment(renderer) );
-	center2Tool->setPoints( centerPos, Vector3D(0.0, 0.0, 0.0), offsetColor, stipplePattern) ;
+	center2Tool.reset(new LineSegment(renderer));
+	center2Tool->setPoints(centerPos, Vector3D(0.0, 0.0, 0.0), mOffsetLineColor, mStipplePattern);
+	center2Tool->setWidth(2);
 
 	// line from back infinity to tooltip
-	tool2Back.reset( new LineSegment(renderer) );
-	tool2Back->setPoints( Vector3D(0.0, 0.0, 0.0), Vector3D(0.0, 0.0, 0.0), toolColor );
+	tool2Back.reset(new LineSegment(renderer));
+	tool2Back->setPoints(Vector3D(0.0, 0.0, 0.0), Vector3D(0.0, 0.0, 0.0), mTooltipLineColor);
+	tool2Back->setWidth(2);
 
-	//adding dots at toolpoint
-	Vector3D dotColor(0.96,0.87,0.17);
-	centerPoint.reset( new OffsetPoint(renderer) );
-	centerPoint->setValue( centerPos,  dotColor );
-	centerPoint->setRadius ( 4 );
+	// Add dot at offset point
+	centerPoint.reset(new OffsetPoint(renderer));
+	centerPoint->setValue(centerPos, mOffsetPointColor);
+	centerPoint->setRadius(4);
+	centerPoint->getActor()->VisibilityOff();
 
-	// ? 
-	Vector3D dotColor2(0.0,0.0,1.0);
-	toolPoint.reset( new OffsetPoint(renderer) );
-	toolPoint->setValue( Vector3D(0.0,0.0,0.0), dotColor );
-	toolPoint->setRadius ( 3 );
-	toolPoint->getActor()->VisibilityOff();
+	// Add dot at tooltip point
+	toolPoint.reset(new OffsetPoint(renderer));
+	toolPoint->setValue(Vector3D(0.0, 0.0, 0.0), mTooltipPointColor);
+	toolPoint->setRadius(3);
 }
 
 /**create the offset text
  */
 void ToolRep2D::createOffsetText(vtkRendererPtr renderer, const Vector3D& pos )
 {
-	QString text;
 	Vector3D color(0.7372, 0.815, 0.6039);
 	distanceText.reset( new TextDisplay( "---", color, 18) );
 	distanceText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -340,31 +328,43 @@ void ToolRep2D::updateToolLine(const Vector3D& crossPos, const Vector3D& toolTip
 {
 	if (!center2Tool || !tool2Back || !centerPoint || !toolPoint)
 		return;
-	
-	center2Tool->updatePosition( crossPos, toolTipPos);
-	tool2Back->updatePosition( toolTipPos, toolTipBackPos );
 
-//	if (mMergeOffsetAndToolLine)
-//	{
-//		center2Tool->updatePosition( crossPos, crossPos);
-//		tool2Back->updatePosition( crossPos, toolTipBackPos );
-//	}
-
-	//points
-	centerPoint->update( crossPos );
-
-	if( getOffset() > 2.0 )
+	if (mMergeOffsetAndToolLine)	// for ACS only
 	{
-		toolPoint->getActor()->SetVisibility(!mMergeOffsetAndToolLine);
-		toolPoint->update( toolTipPos );
-		toolPoint->setRadius ( 4 );
+		// Make entire line look like an offset line, since tooltip point will become projected
+		// into the planes set by the offset position, which may be seen as navigation error.
+		center2Tool->getActor()->SetVisibility(false);
+		tool2Back->updatePosition(crossPos, toolTipBackPos);
+		if (getOffset() > 0.01)
+		{
+			toolPoint->getActor()->SetVisibility(false);
+			centerPoint->getActor()->SetVisibility(true);
+			tool2Back->setColor(mOffsetLineColor);
+			tool2Back->setPattern(mStipplePattern);
+		}
+		else
+		{
+			toolPoint->getActor()->SetVisibility(true);
+			centerPoint->getActor()->SetVisibility(false);
+			tool2Back->setColor(mTooltipLineColor);
+			tool2Back->setPattern(0xffff);
+		}
 	}
 	else
 	{
-		toolPoint->getActor()->VisibilityOff(); // doesn't work
-		toolPoint->update( toolTipPos ); // does work...
-		toolPoint->setRadius ( 3 );
+		center2Tool->updatePosition(crossPos, toolTipPos);
+		tool2Back->updatePosition(toolTipPos, toolTipBackPos);
+		if (getOffset() > 0.01)
+		{
+			centerPoint->getActor()->SetVisibility(true);
+		}
+		else
+		{
+			centerPoint->getActor()->SetVisibility(false);
+		}
 	}
+	centerPoint->update(crossPos);
+	toolPoint->update(toolTipPos);
 }
 
 void ToolRep2D::updateOffsetText()
