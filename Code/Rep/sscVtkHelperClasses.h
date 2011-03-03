@@ -5,6 +5,9 @@
 #include "sscGraphicalPrimitives.h"
 
 #include "vtkForwardDeclarations.h"
+
+#include <QColor>
+
 // --------------------------------------------------------
 namespace ssc
 {
@@ -20,9 +23,10 @@ public:
 	explicit RGBColor(const double* rgb);	
 	RGBColor(const RGBColor& t);
 	RGBColor& operator=(const RGBColor& t);
+	RGBColor(QColor c);
+	RGBColor& operator=(const QColor& c);
 	~RGBColor() {}
 };
-
 
 class OffsetPoint
 {
@@ -30,9 +34,8 @@ class OffsetPoint
 		OffsetPoint( vtkRendererPtr renderer );
 		~OffsetPoint();
 		void setRadius ( int radius );
-		void setValue ( const Vector3D& point, const Vector3D& color );
-		//void setValue ( double *xyz, uint8_t *rgb );
-		//double norm ( uint8_t rgb );
+		void setValue(Vector3D point, RGBColor color);
+		void setValue(Vector3D point, Vector3D color);
 		void update( const Vector3D& point );
 		vtkActor2DPtr getActor();
 	private:
@@ -46,36 +49,33 @@ typedef boost::shared_ptr<OffsetPoint> OffsetPointPtr;
 class LineSegment
 {
 	public:
-		LineSegment( vtkRendererPtr renderer );
+		LineSegment(vtkRendererPtr renderer);
 		~LineSegment();
-		void setPoints( const Vector3D& point1, const Vector3D& point2 , const RGBColor& color, int stipplePattern=0xFFFF);
-		void setResolution( int res );
-		void updatePosition( const Vector3D& point1, const Vector3D& point2 );
+		void setPoints(Vector3D point1, Vector3D point2, RGBColor color, int stipplePattern = 0xFFFF);
+		void setResolution(int res);
+		void updatePosition(Vector3D point1, Vector3D point2);
 		vtkActor2DPtr getActor();
+		void setColor(RGBColor color);
+		void setPattern(int stipplePattern);
+		void setWidth(float width);
 
 	private:
-// 		vtkPolyDataMapperPtr mapper;
 		vtkPolyDataMapper2DPtr mapper2d;
- 		//vtkActorPtr actor;
 		vtkActor2DPtr actor2d;
 		vtkRendererPtr mRenderer;
 		vtkLineSourcePtr source;
-
-
 };
 
 class TextDisplay
 {
 	public:
-		TextDisplay(const QString& text, const Vector3D& color, int fontsize ) ;
+		TextDisplay(const QString& text, const Vector3D& color, int fontsize);
 		~TextDisplay();
 		void setPosition( float x, float y);
 		void setPosition( const Vector3D& pos );
 		void setCentered();
 		void updateText(const QString& text );
 		vtkTextProperty* textProperty();
-		//	mThermalTextMapper->GetTextProperty()-> SetColor( 1.0, 0.8, 0.0);
-
 		vtkActor2DPtr getActor();
 	private:
 

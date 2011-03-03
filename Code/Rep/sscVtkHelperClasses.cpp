@@ -49,6 +49,20 @@ RGBColor& RGBColor::operator=(const RGBColor& t)
 	return *this;
 }
 
+RGBColor& RGBColor::operator=(const QColor& t)
+{
+	elems[0] = t.redF();
+	elems[1] = t.greenF();
+	elems[2] = t.blueF();
+	return *this;
+}
+
+RGBColor::RGBColor(QColor c)
+{
+	elems[0] = c.redF();
+	elems[1] = c.greenF();
+	elems[2] = c.blueF();
+}
 
 RGBColor::RGBColor(double r, double g, double b)
 {
@@ -87,7 +101,6 @@ OffsetPoint::OffsetPoint( vtkRendererPtr renderer )
 OffsetPoint::~OffsetPoint()
 {
 	mRenderer->RemoveActor(actor);
-
 }
 
 void OffsetPoint::setRadius(int radius)
@@ -95,30 +108,22 @@ void OffsetPoint::setRadius(int radius)
 	source->SetRadius(radius);
 }
 
-void OffsetPoint::setValue(const Vector3D& point, const Vector3D& color)
+void OffsetPoint::setValue(Vector3D point, RGBColor color)
 {
-	Vector3D p = point;
-	Vector3D c = color;
-	actor->GetProperty()->SetColor(c.begin());
-	actor->SetPosition( p.begin());
+	actor->GetProperty()->SetColor(color.begin());
+	actor->SetPosition(point.begin());
 }
 
-//void OffsetPoint::setValue(double *xyz, uint8_t *rgb)
-//{
-//	actor->GetProperty()->SetColor(norm(rgb[0]), norm(rgb[1]), norm(rgb[2]));
-//	actor->SetPosition(xyz[0], xyz[1]);
-//}
-//
-//double OffsetPoint::norm(uint8_t rgb)
-//{
-//	return (double) rgb *(1.0/255.0);
-//}
+void OffsetPoint::setValue(Vector3D point, Vector3D color)
+{
+	actor->GetProperty()->SetColor(color.begin());
+	actor->SetPosition(point.begin());
+}
 
 void OffsetPoint::update( const Vector3D& position )
 {
 	Vector3D p = position;
 	actor->SetPosition ( p.begin() );
-	//mapper->Update();
 }
 
 vtkActor2DPtr OffsetPoint::getActor()
@@ -127,59 +132,61 @@ vtkActor2DPtr OffsetPoint::getActor()
 }
 
 
-// --------------------------------------------------------
-// PICKER POINT CLASS
-// --------------------------------------------------------
-
-
-
-
 //---------------------------------------------------------//
 // LINESEGMENT CLASS
 //---------------------------------------------------------//
 
-LineSegment:: LineSegment( vtkRendererPtr renderer )
+
+LineSegment:: LineSegment(vtkRendererPtr renderer)
 {
 	mRenderer = renderer;
 	source = vtkLineSourcePtr::New();
-	mapper2d = vtkPolyDataMapper2DPtr::New() ;
-	actor2d = vtkActor2DPtr::New() ;
+	mapper2d = vtkPolyDataMapper2DPtr::New();
+	actor2d = vtkActor2DPtr::New();
 }
 
 LineSegment::~LineSegment()
 {
 	mRenderer->RemoveActor(actor2d);
 }
-void LineSegment::setPoints( const Vector3D& point1, const Vector3D& point2 , const RGBColor& color, int stipplePattern )
-{
-	Vector3D p1 = point1;
-	Vector3D p2 = point2;
-	RGBColor c = color;
-	source->SetPoint1 ( p1.begin() );
-	source->SetPoint2 ( p2.begin() );
 
-	mapper2d->SetInputConnection( source->GetOutputPort() );
-	actor2d->SetMapper (mapper2d );
-	actor2d->GetProperty()->SetColor( c.begin() );
-	actor2d->GetProperty()->SetLineStipplePattern (stipplePattern);
+void LineSegment::setPoints(Vector3D point1, Vector3D point2, RGBColor color, int stipplePattern)
+{
+	source->SetPoint1(point1.begin());
+	source->SetPoint2(point2.begin());
+	mapper2d->SetInputConnection(source->GetOutputPort());
+	actor2d->SetMapper(mapper2d);
+	actor2d->GetProperty()->SetColor(color.begin());
+	actor2d->GetProperty()->SetLineStipplePattern(stipplePattern);
 	mRenderer->AddActor(actor2d);
 }
 
-void LineSegment::setResolution( int res )
+void LineSegment::setResolution(int res)
 {
-	source->SetResolution( res );
+	source->SetResolution(res);
 }
 
-void LineSegment::updatePosition( const Vector3D& point1, const Vector3D& point2 )
+void LineSegment::setWidth(float width)
 {
-	//SW_LOG(" ");
-	Vector3D c = point1;
-	Vector3D p = point2;
-	source->SetPoint1 ( c.begin() );
-	source->SetPoint2 ( p.begin() );
-	//mapper2d->Update();
-
+	actor2d->GetProperty()->SetLineWidth(width);
 }
+
+void LineSegment::updatePosition(Vector3D point1, Vector3D point2)
+{
+	source->SetPoint1(point1.begin());
+	source->SetPoint2(point2.begin());
+}
+
+void LineSegment::setColor(RGBColor color)
+{
+	actor2d->GetProperty()->SetColor(color.begin());
+}
+
+void LineSegment::setPattern(int stipplePattern)
+{
+	actor2d->GetProperty()->SetLineStipplePattern(stipplePattern);
+}
+
 vtkActor2DPtr LineSegment::getActor()
 {
 	return actor2d;
