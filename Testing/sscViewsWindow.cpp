@@ -96,7 +96,7 @@ ssc::View* ViewsWindow::generateGPUSlice(const QString& uid, ssc::ToolPtr tool, 
   proxy->initializeFromPlane(plane, false, Vector3D(0,0,-1), false, 1, 0);
 
   ssc::Texture3DSlicerRepPtr rep = ssc::Texture3DSlicerRep::New(uid);
-  rep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+  rep->setShaderFile("/Data/Resources/Shaders/Texture3DOverlay.frag");
   rep->setImages(std::vector<ssc::ImagePtr>(1, image));
   rep->setSliceProxy(proxy);
 
