@@ -57,7 +57,8 @@ private:
   ssc::DoubleBoundingBox3D getViewport() const;
   ssc::Transform3D get_vpMs() const;
   ssc::Vector3D qvp2vp(QPoint pos_qvp);
-  void moveAxisPos(ssc::Vector3D click_vp);
+  void setAxisPos(ssc::Vector3D click_vp);
+  void shiftAxisPos(ssc::Vector3D delta_vp);
 
   ssc::ORIENTATION_TYPE getOrientationType() const;
   void changeOrientationType(ssc::ORIENTATION_TYPE type);
@@ -70,6 +71,7 @@ private:
   virtual void imageRemoved(const QString& uid);
   virtual void meshRemoved(const QString& uid);
 
+  void resetMultiSlicer();
   ssc::Texture3DSlicerRepPtr mMultiSliceRep;
 
   ssc::SliceProxyPtr mSliceProxy;
@@ -85,6 +87,7 @@ private:
   // sunchronized data
   SyncedValuePtr mZoom2D;
   SyncedValuePtr mOrientationMode;
+  ssc::Vector3D mClickPos;
 
   QActionGroup* mOrientationActionGroup;
 

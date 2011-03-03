@@ -610,8 +610,6 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
   p_thePolyData->SetPoints(l_dataPoints);
   p_thePolyData->SetVerts(l_dataCellArray);
 
-  std::cout << "DONE" << std::endl;
-
   return p_thePolyData;
 }
 

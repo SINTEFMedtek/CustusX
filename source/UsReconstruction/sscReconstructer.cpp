@@ -296,7 +296,8 @@ Transform3D Reconstructer::interpolate(const Transform3D& a,
 void Reconstructer::interpolatePositions()
 {
   //TODO: Check if the affine transforms still are affine after the linear interpolation
-  
+  int startFrames = mFileData.mFrames.size();
+
   for(unsigned i_frame = 0; i_frame < mFileData.mFrames.size();)
   {
     std::vector<TimedPosition>::iterator posIter;
@@ -319,7 +320,8 @@ void Reconstructer::interpolatePositions()
 
       double diff1 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
       double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos+1].mTime);
-      ssc::messageManager()->sendWarning("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
+//      ssc::messageManager()->sendWarning("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
+      ssc::messageManager()->sendWarning("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ QString::number(diff1,'f',1) + " or "+ QString::number(diff2,'f',1) + " Time difference is too large.");
     }
     else
     {      
@@ -333,6 +335,10 @@ void Reconstructer::interpolatePositions()
       i_frame++;// Only increment if we didn't delete the frame
     }
   }
+
+  double removed = double(startFrames - mFileData.mFrames.size())/double(startFrames);
+  if (!ssc::similar(removed, 0.0))
+    ssc::messageManager()->sendWarning("Removed " + QString::number(removed*100,'f',1) + "% of the "+qstring_cast(startFrames)+" frames.");
 }
 
 vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
@@ -646,7 +652,7 @@ void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
   mCalFilesPath = calFilesPath;
 
   // ignore if a directory is read - store folder name only
-  if (QFileInfo(fileName).isDir())
+  if (QFileInfo(fileName).suffix()!="mhd")
     return;
 
   QString mhdFileName = changeExtension(fileName, "mhd");

@@ -1,4 +1,4 @@
-#include "cxSegmentationWidget.h"
+  #include "cxSegmentationWidget.h"
 
 #include <boost/bind.hpp>
 
@@ -19,6 +19,7 @@
 #include "sscDataManager.h"
 #include "sscMessageManager.h"
 #include "sscDoubleWidgets.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxSegmentationOld.h"
@@ -27,8 +28,7 @@
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
 #include "cxDataLocations.h"
-#include "sscLabeledComboBoxWidget.h"
-
+#include "cxSeansVesselRegistrationWidget.h"
 
 //Testing
 #include "vesselReg/SeansVesselReg.hxx"
@@ -36,33 +36,35 @@
 namespace cx
 {
 ResampleWidget::ResampleWidget(QWidget* parent) :
-  WhatsThisWidget(parent)
+  WhatsThisWidget(parent),
+  mStatusLabel(new QLabel(""))
 {
   this->setObjectName("ResampleWidget");
   this->setWindowTitle("Resample");
 
   connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
+  mSelectedImage = SelectImageStringDataAdapter::New();
+  mSelectedImage->setValueName("Select input: ");
+  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
+  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
+
+  mReferenceImage = SelectImageStringDataAdapter::New();
+  mReferenceImage->setValueName("Select reference: ");
+  ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
+
+  QPushButton* resampleButton = new QPushButton("Resample", this);
+  connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
+
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
   toptopLayout->addStretch();
 
-  mSelectedImage = SelectImageStringDataAdapter::New();
-  mSelectedImage->setValueName("Select input: ");
-  connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
-  ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
-
-  mReferenceImage = SelectImageStringDataAdapter::New();
-  mReferenceImage->setValueName("Select reference: ");
-  ssc::LabeledComboBoxWidget* referenceImageComboBox = new ssc::LabeledComboBoxWidget(this, mReferenceImage);
   topLayout->addWidget(referenceImageComboBox, 1, 0);
-
-  QPushButton* resampleButton = new QPushButton("Resample", this);
-  connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
-
-  topLayout->addWidget(resampleButton, 2,0);
+  topLayout->addWidget(mStatusLabel, 2, 0);
+  topLayout->addWidget(resampleButton, 3, 0);
 
   this->adjustSizeSlot();
 }
@@ -100,6 +102,7 @@ void ResampleWidget::resampleSlot()
   double margin = 20; //mm
 
   mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
+  mStatusLabel->setText("<font color=orange> Generating resampling... Please wait!</font>\n");
 }
 
 void ResampleWidget::handleFinishedSlot()
@@ -107,6 +110,8 @@ void ResampleWidget::handleFinishedSlot()
   ssc::ImagePtr output = mResampleAlgorithm.getOutput();
   if(!output)
     return;
+
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputImageChanged(output->getUid());
 }
@@ -125,7 +130,8 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mUseSmothing(true),
   mSmoothSigma(0.5),
   mSegmentationThresholdSpinBox(new QSpinBox()),
-  mSmoothingSigmaSpinBox(new QDoubleSpinBox())
+  mSmoothingSigmaSpinBox(new QDoubleSpinBox()),
+  mStatusLabel(new QLabel(""))
 {
   this->setObjectName("SegmentationWidget");
   this->setWindowTitle("Segmentation");
@@ -141,14 +147,16 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mSelectedImage->setValueName("Select input: ");
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SIGNAL(inputImageChanged(QString)));
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
-  //connect(mSelectedImage.get(), SIGNAL(imageChanged()), this, SLOT(revertTransferFunctions()));
+
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
   topLayout->addWidget(selectImageComboBox, 0, 0);
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));
+
   QPushButton* segmentationOptionsButton = new QPushButton("Options", this);
   segmentationOptionsButton->setCheckable(true);
+
   QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
   connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
   connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
@@ -157,6 +165,7 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   topLayout->addWidget(segmentButton, 1,0);
   topLayout->addWidget(segmentationOptionsButton, 1,1);
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
+  topLayout->addWidget(mStatusLabel);
 
   this->adjustSizeSlot();
 }
@@ -200,21 +209,24 @@ void SegmentationWidget::segmentSlot()
   this->revertTransferFunctions();
 
   mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+
+  mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
 }
 
 void SegmentationWidget::handleFinishedSlot()
 {
-  //ssc::ImagePtr segmentedImage = SegmentationOld().segment(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
   ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
   if(!segmentedImage)
     return;
+
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
+
   emit outputImageChanged(segmentedImage->getUid());
 }
 
 void SegmentationWidget::toogleBinarySlot(bool on)
 {
   mBinary = on;
-  ssc::messageManager()->sendDebug("The binary checkbox is not connected to anything yet.");
 }
 
 void SegmentationWidget::revertTransferFunctions()
@@ -232,7 +244,6 @@ void SegmentationWidget::revertTransferFunctions()
 void SegmentationWidget::thresholdSlot(int value)
 {
   mSegmentationThreshold = value;
-//  ssc::messageManager()->sendDebug("Segmentation threshold: "+qstring_cast(mSegmentationThreshold));
 
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
@@ -258,14 +269,11 @@ void SegmentationWidget::toogleSmoothingSlot(bool on)
 
   mSmoothingSigmaSpinBox->setEnabled(on);
   mSmoothingSigmaLabel->setEnabled(on);
-
-//  ssc::messageManager()->sendDebug("Smoothing: "+qstring_cast(mUseSmothing));
 }
 
 void SegmentationWidget::smoothingSigmaSlot(double value)
 {
   mSmoothSigma = value;
-//  ssc::messageManager()->sendDebug("Smoothing sigma: "+qstring_cast(mSmoothSigma));
 }
 
 void SegmentationWidget::imageChangedSlot(QString uid)
@@ -295,7 +303,8 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 
   QCheckBox* binaryCheckbox = new QCheckBox();
   binaryCheckbox->setChecked(mBinary);
-  binaryCheckbox->setChecked(false);
+  binaryCheckbox->setChecked(true); // atm we only support binary thresholding
+  binaryCheckbox->setEnabled(false); //TODO enable when the segmentation routine supports other than binary thresholding
   QLabel* binaryLabel = new QLabel("Binary");
   connect(binaryCheckbox, SIGNAL(toggled(bool)), this, SLOT(toogleBinarySlot(bool)));
 
@@ -339,7 +348,8 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mSmoothing(true),
     mSurfaceThresholdSpinBox(new QSpinBox()),
     mDecimationSpinBox(new QSpinBox()),
-    mDefaultColor("red")
+    mDefaultColor("red"),
+    mStatusLabel(new QLabel(""))
 {
   this->setObjectName("SurfaceWidget");
   this->setWindowTitle("Surface");
@@ -370,6 +380,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   topLayout->addWidget(surfaceButton, 1,0);
   topLayout->addWidget(surfaceOptionsButton,1,1);
   topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
+  topLayout->addWidget(mStatusLabel);
 
   this->thresholdSlot(mSurfaceThreshold);
   this->decimationSlot(mDecimation);
@@ -400,6 +411,8 @@ void SurfaceWidget::surfaceSlot()
   double decimation = mDecimation/100;
 
   mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+
+  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
 
 void SurfaceWidget::handleFinishedSlot()
@@ -407,7 +420,9 @@ void SurfaceWidget::handleFinishedSlot()
   ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
   if(!outputMesh)
     return;
+
   outputMesh->setColor(mDefaultColor);
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
 
   emit outputMeshChanged(outputMesh->getUid());
 }
@@ -420,13 +435,11 @@ void SurfaceWidget::thresholdSlot(int value)
 void SurfaceWidget::decimationSlot(int value)
 {
   mDecimation = value;
-//  ssc::messageManager()->sendDebug("Surface, decimation: "+qstring_cast(mDecimation));
 }
 
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
-//  ssc::messageManager()->sendDebug("Surface, reduce resolution: "+qstring_cast(mReduceResolution));
 }
 
 void SurfaceWidget::smoothingSlot(bool value)
@@ -488,7 +501,8 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   WhatsThisWidget(parent),
   mFindCenterlineButton(new QPushButton("Find centerline")),
-  mDefaultColor("red")
+  mDefaultColor("red"),
+  mStatusLabel(new QLabel(""))
 {
   this->setObjectName("CenterlineWidget");
   this->setWindowTitle("Centerline");
@@ -504,6 +518,7 @@ CenterlineWidget::CenterlineWidget(QWidget* parent) :
 
   layout->addWidget(selectImageComboBox);
   layout->addWidget(mFindCenterlineButton);
+  layout->addWidget(mStatusLabel);
   layout->addStretch();
 
   connect(mFindCenterlineButton, SIGNAL(clicked()), this, SLOT(findCenterlineSlot()));
@@ -541,11 +556,12 @@ void CenterlineWidget::setDefaultColor(QColor color)
   mDefaultColor = color;
 }
 
-
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath);
+
+  mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
 }
 
 void CenterlineWidget::handleFinishedSlot()
@@ -554,23 +570,21 @@ void CenterlineWidget::handleFinishedSlot()
   if(!centerlineImage)
     return;
 
+  mStatusLabel->setText("<font color=green> Done. </font>\n");
+
   emit outputImageChanged(centerlineImage->getUid());
 }
 
 void CenterlineWidget::visualizeSlot(QString inputUid)
 {
-  std::cout << "visualizeSlot " << inputUid << std::endl;
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
 
   ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
   if(!centerlineImage)
     return;
 
-  std::cout << "centerline i bb " << centerlineImage->boundingBox() << std::endl;
-
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
-  std::cout << "centerline p bb " << ssc::DoubleBoundingBox3D(centerlinePolyData->GetBounds()) << std::endl;
 
   QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_ge%1";
   QString name = centerlineImage->getName() + " ge%1";
@@ -587,30 +601,18 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
 
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     WhatsThisWidget(parent),
-    mRegisterButton(new QPushButton("Register")),
-    //mTestButton(new QPushButton("TEST, loads two minc images into the system.")), //TESTING
-    mFixedImageLabel(new QLabel("Fixed image:")),
-    mMovingImageLabel(new QLabel("Moving image:"))
+    mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
   connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
-
-  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
 
-  layout->addWidget(mFixedImageLabel, 0, 0);
-  layout->addWidget(mMovingImageLabel, 1, 0);
-  layout->addWidget(mRegisterButton, 2, 0);
+  layout->addWidget(mSeansVesselRegsitrationWidget);
   layout->addWidget(new QLabel("Parent frame tree status:"), 3, 0);
   layout->addWidget(new FrameTreeWidget(this), 4, 0);
-
-  //TESTING
-  /*layout->addWidget(this->createHorizontalLine(), 5, 0);
-  layout->addWidget(mTestButton, 6, 0);
-  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));*/
 }
 
 RegisterI2IWidget::~RegisterI2IWidget()
@@ -626,92 +628,12 @@ QString RegisterI2IWidget::defaultWhatsThis() const
 
 void RegisterI2IWidget::fixedImageSlot(QString uid)
 {
-  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
-  if(!fixedImage)
-    return;
-  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
-  mFixedImageLabel->update();
+  mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
 }
 
 void RegisterI2IWidget::movingImageSlot(QString uid)
 {
-  ssc::DataPtr movingImage = registrationManager()->getMovingData();
-  if(!movingImage)
-    return;
-  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
-  mMovingImageLabel->update();
-}
-
-/*void RegisterI2IWidget::testSlot()
-{
-  if(!stateManager()->getPatientData()->isPatientValid())
-  {
-    ssc::messageManager()->sendWarning("Create a new patient before trying to import the minc data.");
-    return;
-  }
-
-  ssc::messageManager()->sendDebug("===============TESTING BUTTON START==============");
-
-  int lts_ratio = 80;
-  double stop_delta = 0.001;
-  double lambda = 0;
-  double sigma = 1.0;
-  bool lin_flag = 1;
-  int sample = 1;
-  int single_point_thre = 1;
-  bool verbose = 1;
-
-  SeansVesselReg* theThing = new SeansVesselReg(lts_ratio,
-        stop_delta,
-        lambda,
-        sigma,
-        lin_flag,
-        sample,
-        single_point_thre,
-        verbose);
-
-  QString sourcefile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_110555_USA_blur.mnc");
-  if(QFile::exists(sourcefile))
-    ssc::messageManager()->sendInfo(sourcefile+" exists");
-  else
-  {
-    QFile q_sourcefile(sourcefile);
-    QFileInfo info(q_sourcefile);
-    ssc::messageManager()->sendDebug(info.absoluteFilePath());
-  }
-
-  QString targetfile(cx::DataLocations::getTestDataPath()+"/Nevro/IngeridCenterline/center_dim_MRA_masked_like_110555USA.mnc");
-  if(QFile::exists(targetfile))
-    ssc::messageManager()->sendInfo(targetfile+" exsits");
-  else
-  {
-    QFile q_targetfile(targetfile);
-    QFileInfo info(q_targetfile);
-    ssc::messageManager()->sendDebug(info.absoluteFilePath());
-  }
-
-  //read minc files and add them to the datamanager
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  ssc::ImagePtr source = theThing->loadMinc(cstring_cast(QString(sourcefile)));
-  ssc::dataManager()->loadData(source);
-  ssc::dataManager()->saveImage(source, outputBasePath);
-  ssc::ImagePtr target = theThing->loadMinc(cstring_cast(QString(targetfile)));
-  ssc::dataManager()->loadData(target);
-  ssc::dataManager()->saveImage(target, outputBasePath);
-
-  vtkPolyDataPtr sourcePolyData = SeansVesselReg::extractPolyData(source, single_point_thre, 0);
-  QString uid = ssc::changeExtension(source->getUid(), "") + "_mesh%1";
-  QString name = source->getName() + " mesh %1";
-  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(sourcePolyData, uid, name, "Images");
-  ssc::dataManager()->loadData(mesh);
-  ssc::dataManager()->saveMesh(mesh, outputBasePath);
-
-  ssc::messageManager()->sendDebug("===============TESTING BUTTON END==============");
-}*/
-
-void RegisterI2IWidget::registerSlot()
-{
-  registrationManager()->doVesselRegistration();
+  mSeansVesselRegsitrationWidget->movingImageSlot(uid);
 }
 
 //------------------------------------------------------------------------------
