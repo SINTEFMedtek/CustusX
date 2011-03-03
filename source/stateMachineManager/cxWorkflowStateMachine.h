@@ -37,8 +37,11 @@ public:
 
 signals:
   void activeStateChanged();
+  void activeStateAboutToChange();
+
 private slots:
   void startedSlot();
+
 private:
   void fillMenu(QMenu* menu, WorkflowState* current);
   void fillToolbar(QToolBar* toolbar, WorkflowState* current);
