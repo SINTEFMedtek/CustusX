@@ -62,7 +62,6 @@ public:
     QDomElement desktopElement;
     if(workflowElement.namedItem("custom").isNull())
     {
-      //desktopElement = workflowElement.namedItem("default").toElement();
       return this->getDefaultDesktop(applicationName, workflowName);
     }
     else
@@ -116,9 +115,7 @@ void StateManager::destroyInstance()
 }
 
 StateManager::StateManager()
-{
-
-}
+{}
 
 StateManager::~StateManager()
 {}
@@ -127,6 +124,7 @@ WorkflowStateMachinePtr StateManager::getWorkflow()
 {
   return mWorkflowStateMachine;
 }
+
 ApplicationStateMachinePtr StateManager::getApplication()
 {
   return mApplicationStateMachine;
@@ -154,31 +152,9 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("globalPatientNumber", 1);
   this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
   this->fillDefault("Ultrasound/8bitAcquisitionData", true);
+  this->fillDefault("View3D/sphereRadius", 2.0);
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
   this->fillDefault("showSectorInRTView", true);
-
-//
-//
-//  if (!settings->contains("Automation/autoStartTracking"))
-//    settings->setValue("Automation/autoStartTracking", true);
-//  if (!settings->contains("Automation/autoStartStreaming"))
-//    settings->setValue("Automation/autoStartStreaming", true);
-//  if (!settings->contains("Automation/autoReconstruct"))
-//    settings->setValue("Automation/autoReconstruct", true);
-
-//  // Initialize settings if empty
-//  if (!settings->contains("renderingInterval"))
-//    settings->setValue("renderingInterval", 33);
-////  if (!settings->contains("shadingOn"))
-////    settings->setValue("shadingOn", true);
-//  if (!settings->contains("globalPatientDataFolder"))
-//    settings->setValue("globalPatientDataFolder", QDir::homePath()+"/Patients");
-//  if (!settings->contains("globalApplicationName"))
-//    settings->setValue("globalApplicationName", "Lab");
-//  if (!settings->contains("globalPatientNumber"))
-//    settings->setValue("globalPatientNumber", 1);
-  //if (!mSettings->contains("applicationNames"))
-  //settings->setValue("applicationNames", "Nevro,Lap,Vasc,Lung,Lab");
 }
 
 void StateManager::initialize()
@@ -217,7 +193,6 @@ ssc::ReconstructerPtr StateManager::getReconstructer()
 Desktop StateManager::getActiveDesktop()
 {
   ApplicationsParser parser;
-  //std::cout << "Getting desktop for state: " << mWorkflowStateMachine->getActiveUidState().toStdString() << std::endl;
   return parser.getDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
 }
 
@@ -235,7 +210,6 @@ void StateManager::resetDesktop()
 
 void StateManager::addRecordSession(RecordSessionPtr session)
 {
-  //ssc::messageManager()->sendDebug("Added session with description "+session->getDescription());
   mRecordSessions.push_back(session);
   emit recordedSessionsChanged();
 }

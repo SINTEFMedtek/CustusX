@@ -25,6 +25,11 @@ void WorkflowState::onEntry(QEvent * event )
     mAction->setChecked(true);
 };
 
+void WorkflowState::onExit(QEvent * event )
+{
+  emit aboutToExit();
+};
+
 std::vector<WorkflowState*> WorkflowState::getChildStates()
 {
   QObjectList childrenList = this->children();

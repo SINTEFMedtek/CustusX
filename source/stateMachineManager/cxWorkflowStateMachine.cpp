@@ -23,6 +23,13 @@ WorkflowStateMachine::WorkflowStateMachine()
   WorkflowState* intraOpImaging = this->newState(new IntraOpImagingWorkflowState(mParentState));
   WorkflowState* postOpControll = this->newState(new PostOpControllWorkflowState(mParentState));
 
+  connect(patientData, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+  connect(registration, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+  connect(preOpPlanning, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+  connect(navigation, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+  connect(intraOpImaging, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+  connect(postOpControll, SIGNAL(aboutToExit()), this, SIGNAL(activeStateAboutToChange()));
+
   Q_UNUSED(registration);
   Q_UNUSED(preOpPlanning);
   Q_UNUSED(navigation);
@@ -91,6 +98,7 @@ void WorkflowStateMachine::fillMenu(QMenu* menu, WorkflowState* current)
 
 void WorkflowStateMachine::setActiveState(QString uid)
 {
+
   if (mStarted)
     this->postEvent(new RequestEnterStateEvent(uid));
 }

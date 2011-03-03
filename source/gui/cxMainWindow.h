@@ -64,6 +64,7 @@ protected slots:
 
   // application
   void onApplicationStateChangedSlot();
+
   //workflow
   void onWorkflowStateChangedSlot();
   void saveDesktopSlot();
@@ -95,7 +96,11 @@ protected slots:
   void toggleStreamingSlot();
   void updateStreamingActionSlot();
 
+  void shootScreen();
+  void shootWindow();
+
 private:
+  void saveScreenShot(QPixmap pixmap);
   void updateWindowTitle();
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
@@ -137,12 +142,15 @@ private:
   QAction* mDebugModeAction;
   QAction* mQuitAction;
   
+  QAction* mShootScreenAction;
+  QAction* mShootWindowAction;
+
   QAction* mNewPatientAction;///< Action for creating a new patient
   QAction* mLoadFileAction;///< Action for loading all data from file
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
+  QAction* mExportPatientAction;
 
-//  QActionGroup* mToggleWidgetActionGroup;
   QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
   QAction* mShowPointPickerAction;
 
@@ -178,9 +186,11 @@ private:
   QToolBar* mWorkflowToolBar; ///< toolbar for workflow actions
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
+  QToolBar* mScreenshotToolBar;
 
   std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
+  //widgets
   ssc::ConsoleWidget*                           mConsoleWidget;
   class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
   class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
