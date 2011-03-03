@@ -46,6 +46,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
 
   this->addAlphaPoint(this->getScalarMin(), 0);
+  this->addAlphaPoint(this->getScalarMax() * 0.1, 0);
   this->addAlphaPoint(this->getScalarMax(), 255);
   this->addColorPoint(this->getScalarMin(), Qt::black);
   this->addColorPoint(this->getScalarMax(), Qt::white);
