@@ -292,6 +292,7 @@ void RegistrationManager::doPatientRegistration()
   }
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
+  regTrans.mFixed = mFixedData->getUid();
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
@@ -344,6 +345,8 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::Transform3D delta = rMd * image->get_rMd().inv();
 
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
+  regTrans.mFixed = mFixedData->getUid();
+  regTrans.mMoving = image->getUid();
   this->updateRegistration(mLastRegistrationTime, regTrans, image, qstring_cast(fixedImage->getUid()));
 
   mLastRegistrationTime = regTrans.mTimestamp;
@@ -417,6 +420,7 @@ void RegistrationManager::doFastRegistration_Translation()
   }
 
   ssc::RegistrationTransform regTrans(rMpr_old*pr_oldMpr_new, QDateTime::currentDateTime(), "Fast_Translation");
+  regTrans.mFixed = mFixedData->getUid();
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
@@ -480,6 +484,8 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
   ssc::Transform3D delta = linearTransform.inv();
   //std::cout << "delta:\n" << delta << std::endl;
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
+  regTrans.mFixed = mFixedData->getUid();
+  regTrans.mMoving = mMovingData->getUid();
   this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
 
   ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
