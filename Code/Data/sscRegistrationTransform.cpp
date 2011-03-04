@@ -34,6 +34,11 @@ void RegistrationTransform::addXml(QDomNode& parentNode) const ///< write intern
   base.setAttribute("timestamp", mTimestamp.toString(timestampSecondsFormat()));
   base.setAttribute("type", mType);
 
+  if (!mFixed.isEmpty())
+    base.setAttribute("fixed", mFixed);
+  if (!mMoving.isEmpty())
+    base.setAttribute("moving", mFixed);
+
   base.appendChild(doc.createTextNode("\n"+qstring_cast(mValue)));
 }
 
@@ -47,6 +52,8 @@ void RegistrationTransform::parseXml(QDomNode& dataNode)///< read internal state
   mTimestamp = QDateTime::fromString(base.attribute("timestamp"), timestampSecondsFormat());
   mType = base.attribute("type");
   mValue = Transform3D::fromString(base.text());
+  mFixed = base.attribute("fixed");
+  mMoving = base.attribute("moving");
 }
 
 bool operator<(const RegistrationTransform& lhs, const RegistrationTransform& rhs)

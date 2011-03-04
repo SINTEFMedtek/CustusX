@@ -24,6 +24,9 @@ public:
   QDateTime mTimestamp; ///< time the transform was registrated.
   QString mType; ///< description of the kind if registration (manual, patient, landmark, coregistration etc)
 
+  QString mFixed;
+  QString mMoving;
+
   RegistrationTransform();
   explicit RegistrationTransform(const Transform3D& value, const QDateTime& timestamp=QDateTime(), const QString& type="");
   void addXml(QDomNode& parentNode) const; ///< write internal state to node
