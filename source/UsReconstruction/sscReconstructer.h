@@ -102,13 +102,14 @@ private:
   ImagePtr generateMask();
   ssc::Transform3D applyOutputOrientation();
   void findExtentAndOutputTransform();
+  void transformPositionsTo_prMu();
 
   Transform3D interpolate(const Transform3D& a, const Transform3D& b, double t);
   void alignTimeSeries();
   void applyTimeCalibration();
   void calibrateTimeStamps(double timeOffset, double scale);
   void interpolatePositions();
-  void calibrate(QString calFilesPath);
+//  void calibrate(QString calFilesPath);
   std::vector<ssc::Vector3D> generateInputRectangle();
   ImagePtr generateOutputVolume();
   void clearOutput();
