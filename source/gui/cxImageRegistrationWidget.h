@@ -2,6 +2,7 @@
 #define CXIMAGEREGISTRATIONWIDGET_H_
 
 #include "cxRegistrationWidget.h"
+#include "cxDataInterface.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -51,6 +52,9 @@ protected:
   virtual ssc::Transform3D getTargetTransform() const;
 
   //gui
+  RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
+  ssc::StringDataAdapterPtr mActiveImageAdapter;
+
   QPushButton* mAddLandmarkButton; ///< the Add Landmark button
   QPushButton* mEditLandmarkButton; ///< the Edit Landmark button
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
