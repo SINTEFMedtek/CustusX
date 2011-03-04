@@ -35,9 +35,8 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   //toolmanager
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
-//  connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
-//  connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
-
+  //layout
+  mVerticalLayout->addWidget(new QLabel("Landmark patient registration will move the patient into the global coordinate system (r)."));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
