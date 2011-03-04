@@ -156,7 +156,8 @@ void RegistrationHistoryWidget::reconnectSlot()
 
 bool RegistrationHistoryWidget::validRegistrationType(QString type) const
 {
-  return (type!="Set Parent Frame")&&(type!="From MHD file");
+  return true;
+//  return (type!="Set Parent Frame")&&(type!="From MHD file");
 }
 
 /** get a map of all registration times and their corresponding descriptions.
@@ -198,12 +199,16 @@ RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurr
   if (!active.isValid())
     return times.end();
 
+  TimeMap::iterator lastIter = times.end();
   for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
   {
-    if (iter->first >= active)
-      return iter;
+//    if (iter->first >= active)
+//      return iter;
+    if (active < iter->first)
+      return lastIter;
+    lastIter = iter;
   }
-  return times.end();
+  return lastIter;
 }
 
 /** return the current active time
@@ -302,9 +307,10 @@ void RegistrationHistoryWidget::rewindSlot()
   if (current==times.end())
     --current; // ignore the last entry
 
-  --current;
-  ssc::messageManager()->sendInfo("Rewind: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
-  this->setActiveTime(current->first);
+  //--current;
+  QDateTime newTime = current->first.addSecs(-1);
+  ssc::messageManager()->sendInfo("Rewind: Setting registration time to " + newTime.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+  this->setActiveTime(newTime);
 //  std::cout << "finished rewind" << std::endl;
 }
 
@@ -359,17 +365,30 @@ void RegistrationHistoryWidget::forwardSlot()
   if (current==times.end()) // already at end, ignore
     return;
   ++current;
+  if (current!=times.end())
+    ++current;
 
-  if (current==times.end() || times.rbegin()->first==current->first) // if at end or at the last position, interpret as end
+  if (current==times.end())
   {
-    ssc::messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
+    ssc::messageManager()->sendInfo("Forward: Setting registration time to current");
     this->setActiveTime(QDateTime());
   }
   else
   {
-    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
-    this->setActiveTime(current->first);
+    QDateTime newTime = current->first.addSecs(-1);
+    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + newTime.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+    this->setActiveTime(newTime);
   }
+//  if (current==times.end() || times.rbegin()->first==current->first) // if at end or at the last position, interpret as end
+//  {
+//    ssc::messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
+//    this->setActiveTime(QDateTime());
+//  }
+//  else
+//  {
+//    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
+//    this->setActiveTime(current->first);
+//  }
 }
 
 
