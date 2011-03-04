@@ -11,11 +11,12 @@
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "sscMessageManager.h"
+#include "sscDataManager.h"
+#include "sscProbeRep.h"
+#include "sscLabeledComboBoxWidget.h"
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
-#include "sscDataManager.h"
-#include "sscProbeRep.h"
 
 namespace cx
 {
@@ -31,6 +32,9 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   this->setObjectName("ImageRegistrationWidget");
   this->setWindowTitle("Image Registration");
 
+  mFixedDataAdapter = RegistrationFixedImageStringDataAdapter::New();
+  mActiveImageAdapter = ActiveImageStringDataAdapter::New();
+
   //pushbuttons
   mAddLandmarkButton->setDisabled(true);
   connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
@@ -43,6 +47,9 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   connect(mThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdChangedSlot(int)));
 
   //layout
+  mVerticalLayout->addWidget(new QLabel("Landmark image registration will move the active image to the fixed image."));
+  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
+  mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveImageAdapter));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
   mVerticalLayout->addWidget(mAddLandmarkButton);
