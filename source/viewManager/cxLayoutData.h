@@ -68,6 +68,8 @@ public:
   typedef ViewDataContainer::const_iterator const_iterator;
 
 public:
+  static LayoutData createHeader(QString uid, QString name);
+  static LayoutData create(QString uid, QString name, int rows, int cols);
   LayoutData();
   QString getUid() const { return mUid; }
   QString getName() const { return mName; }
@@ -81,6 +83,7 @@ public:
   const_iterator begin() const { return mView.begin(); }
   const_iterator end() const { return mView.end(); }
   iterator find(LayoutPosition pos);
+  bool isEmpty() const { return mSize.col==0 || mSize.row==0; }
 
   void split(iterator iter);
   void split(LayoutRegion region);

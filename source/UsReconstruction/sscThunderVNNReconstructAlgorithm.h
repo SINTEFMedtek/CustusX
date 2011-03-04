@@ -19,7 +19,7 @@ class ThunderVNNReconstructAlgorithm// : public ReconstructAlgorithm
 public:
   ThunderVNNReconstructAlgorithm(QString shaderPath);
   virtual ~ThunderVNNReconstructAlgorithm() {}
-  virtual QString getName() const { return "ThunderVNN"; }
+  virtual QString getName() const;
   virtual std::vector<DataAdapterPtr> getSettings(QDomElement root);
   virtual void reconstruct(std::vector<TimedPosition> frameInfo, 
                            ImagePtr frameData,
