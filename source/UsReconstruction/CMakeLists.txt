@@ -44,29 +44,43 @@ SET( SOURCE_FILES
 
 # =========================================================
 
+SET( sscUsReconstructionLib_LIB_FILES
+    SSC
+    cxCommon 
+    #thunder 
+    toolManager
+    ITKCommon
+    )
+
 # 
-set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
+FIND_LIBRARY(OPENCL_LIBRARIES OpenCL)
+IF( OPENCL_LIBRARIES )
+    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" ON)
+ELSEIF( OPENCL_LIBRARIES )
+    option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" OFF)
+ENDIF( OPENCL_LIBRARIES )
+            
+if (USE_US_RECONSTRUCTION_THUNDER)
+    ADD_SUBDIRECTORY(Thunder)
+    include_directories( Thunder )
+    link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
+    set( sscUsReconstructionLib_LIB_FILES thunder ${sscUsReconstructionLib_LIB_FILES} )
+    set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
+endif (USE_US_RECONSTRUCTION_THUNDER)
+
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/recConfig.h.in"
   "${CMAKE_CURRENT_BINARY_DIR}/recConfig.h" )
-
-ADD_SUBDIRECTORY(Thunder)
-
-include_directories( Thunder
-  ${CMAKE_CURRENT_BINARY_DIR}
-)
-link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
+#include_directories( Thunder
+#  ${CMAKE_CURRENT_BINARY_DIR}
+#)
+#link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
 
 # =========================================================
 # create the target
 add_library( sscUsReconstructionLib ${SOURCE_FILES} )
-target_link_libraries( sscUsReconstructionLib 
-    SSC
-    cxCommon 
-    thunder 
-    toolManager
-    #statemachineManager
-    ITKCommon)
+target_link_libraries( sscUsReconstructionLib ${sscUsReconstructionLib_LIB_FILES} )
 # =========================================================
 
 ADD_SUBDIRECTORY( testing )
