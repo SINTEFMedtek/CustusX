@@ -107,6 +107,16 @@ RegistrationHistoryWidget::RegistrationHistoryWidget(QWidget* parent) :
       "Details",
       "Show registration history",
       SLOT(showDetailsSlot()));
+  mDetailsAction->setCheckable(true);
+  mDetailsAction->setChecked(false);
+
+  mShowAllAction = createAction(topLayout,
+      ":/icons/open_icon_library/png/64x64/actions/system-run-5.png",
+      "Show All",
+      "Show all entries, including parent changes",
+      SLOT(updateSlot()));
+  mShowAllAction->setCheckable(true);
+  mShowAllAction->setChecked(false);
 
   topLayout->addStretch();
 }
@@ -156,14 +166,31 @@ void RegistrationHistoryWidget::reconnectSlot()
 
 bool RegistrationHistoryWidget::validRegistrationType(QString type) const
 {
-  return true;
-//  return (type!="Set Parent Frame")&&(type!="From MHD file");
+  return (type!="Set Parent Frame")&&(type!="From MHD file");
+}
+
+
+RegistrationHistoryWidget::TimeMap RegistrationHistoryWidget::getVisibleRegistrationTimes() const
+{
+  TimeMap input = this->getRegistrationTimes();
+
+  if (mShowAllAction->isChecked())
+    return input;
+
+  TimeMap retval;
+
+  for (TimeMap::const_iterator iter=input.begin(); iter!=input.end(); ++iter)
+  {
+    if (this->validRegistrationType(iter->second))
+      retval.insert(*iter);
+  }
+  return retval;
 }
 
 /** get a map of all registration times and their corresponding descriptions.
  * Near-simultaneous times are filtered out, keeping only the newest in the group.
  */
-std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
+std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes() const
 {
   TimeMap retval;
 
@@ -176,15 +203,19 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
     std::vector<ssc::RegistrationTransform> current = allHistories[i]->getData();
     for (unsigned j=0; j<current.size(); ++j)
     {
-      if (!this->validRegistrationType(current[j].mType))
+      if (!current[j].mTimestamp.isValid())
         continue;
+//      if (!this->validRegistrationType(current[j].mType))
+//        continue;
       retval[current[j].mTimestamp] = current[j].mType;
     }
     std::vector<ssc::ParentFrame> frames = allHistories[i]->getParentFrames();
     for (unsigned j=0; j<frames.size(); ++j)
     {
-      if (!this->validRegistrationType(frames[j].mType))
+      if (!frames[j].mTimestamp.isValid())
         continue;
+//      if (!this->validRegistrationType(frames[j].mType))
+//        continue;
       retval[frames[j].mTimestamp] = frames[j].mType;
     }
   }
@@ -192,29 +223,47 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
   return retval;
 }
 
-RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentActiveIter(TimeMap& times)
+///**Return an iterator to the first time that is at or after the current time.
+// *
+// */
+//RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentActiveIter(TimeMap& times) const
+//{
+//  QDateTime active = this->getActiveTime();
+//
+//  if (!active.isValid())
+//    return times.end();
+//
+//  for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
+//  {
+//    if (active <= iter->first)
+//      return iter;
+//  }
+//  return times.end();
+//}
+/**Return an iterator to the first time that is at or before the current time.
+ *
+ */
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentActiveIter(TimeMap& times) const
 {
   QDateTime active = this->getActiveTime();
 
   if (!active.isValid())
     return times.end();
 
-  TimeMap::iterator lastIter = times.end();
+  TimeMap::iterator last = times.end();
   for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
   {
-//    if (iter->first >= active)
-//      return iter;
     if (active < iter->first)
-      return lastIter;
-    lastIter = iter;
+      return last;
+    last = iter;
   }
-  return lastIter;
+  return last;
 }
 
 /** return the current active time
  *
  */
-QDateTime RegistrationHistoryWidget::getActiveTime()
+QDateTime RegistrationHistoryWidget::getActiveTime() const
 {
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   if (raw.empty())
@@ -225,21 +274,25 @@ QDateTime RegistrationHistoryWidget::getActiveTime()
 /**set a new active time
  *
  */
-void RegistrationHistoryWidget::setActiveTime(QDateTime active)
+bool RegistrationHistoryWidget::setActiveTime(QDateTime active)
 {
-//  ssc::messageManager()->sendInfo("setting active registration time " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
+//  std::cout << "diff: " << active.toString(ssc::timestampSecondsFormatNice()) << "  " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << std::endl;
+  if (active==this->getActiveTime())
+    return false;
+//  ssc::messageManager()->sendInfo("Setting active registration time " + active.toString(ssc::timestampSecondsFormatNice()) + ".");
 
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   for (unsigned i=0; i<raw.size(); ++i)
   {
     raw[i]->setActiveTime(active);
   }
+  return true;
 }
 
 /**collect registration histories from the tool manager (patient registration)
  * and images (image registration) and return.
  */
-std::vector<ssc::RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories()
+std::vector<ssc::RegistrationHistoryPtr> RegistrationHistoryWidget::getAllRegistrationHistories() const
 {
   std::vector<ssc::RegistrationHistoryPtr> retval;
   retval.push_back(ssc::ToolManager::getInstance()->get_rMpr_History());
@@ -287,36 +340,120 @@ std::vector<ssc::RegistrationTransform> RegistrationHistoryWidget::mergeHistory(
   return history;
 }
 
-/**Take one step back in registration time and use the previous
- * registration event instead of the current.
- */
 void RegistrationHistoryWidget::rewindSlot()
 {
+  this->rewindToPreviousVisible();
+}
 
+void RegistrationHistoryWidget::forwardSlot()
+{
+  this->forwardToNextVisible();
+}
+
+void RegistrationHistoryWidget::rewindToPreviousVisible()
+{
   TimeMap times = this->getRegistrationTimes();
+  TimeMap::iterator pos;
 
-  if (times.size()<=1)
-    return;
+  pos = this->findCurrentActiveIter(times);
+  pos = this->findCurrentVisible(times, pos);
+//  std::cout << "findCurrentVisible " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
+  pos = this->rewindToLastVisible(times, pos);
+//  std::cout << "rewindToLastVisible " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
+  pos = this->forwardTowardsNextVisible(times, pos);
+//  std::cout << "forwardTowardsNextVisible " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
 
-  // current points to the timestamp currently in use. end() is current time.
-  std::map<QDateTime,QString>::iterator current = this->findCurrentActiveIter(times);
+  this->setActiveTime(pos->first);
+}
 
-  if (current==times.begin())
-    return;
+void RegistrationHistoryWidget::forwardToNextVisible()
+{
+  TimeMap times = this->getRegistrationTimes();
+  TimeMap::iterator pos;
 
-  if (current==times.end())
-    --current; // ignore the last entry
+  pos = this->findCurrentActiveIter(times);
+//  std::cout << "findCurrentActiveIter " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
+  pos = this->findCurrentVisible(times, pos);
+//  std::cout << "findCurrentVisible " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
+  pos = this->forwardToNextVisible(times, pos);
+//  std::cout << "forwardToNextVisible " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
+  pos = this->forwardTowardsNextVisible(times, pos);
+//  std::cout << "forwardTowardsNextVisible " << pos->first.toString(ssc::timestampSecondsFormatNice()) << " " << pos->second << std::endl;
 
-  //--current;
-  QDateTime newTime = current->first.addSecs(-1);
-  ssc::messageManager()->sendInfo("Rewind: Setting registration time to " + newTime.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
-  this->setActiveTime(newTime);
-//  std::cout << "finished rewind" << std::endl;
+
+  if (pos==times.end())
+    this->setActiveTime(QDateTime());
+  else
+    this->setActiveTime(pos->first);
+}
+
+///*find current active position
+// */
+//RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::getCurrentPosition(TimeMap& times)
+//{
+//  TimeMap::iterator retval = this->findCurrentActiveIter(times);
+//  return retval;
+//}
+
+/* forward to a visible pos, if not already on one.
+ *
+ */
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::findCurrentVisible(TimeMap& times, TimeMap::iterator pos)
+{
+  if (pos==times.end())
+    --pos;
+  while (pos!=times.begin() && !this->validRegistrationType(pos->second))
+    --pos;
+  return pos;
+}
+
+/*; ///< rewind one visible step
+ *
+ */
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::rewindToLastVisible(TimeMap& times, TimeMap::iterator pos)
+{
+  if (pos!=times.begin())
+    --pos;
+  while (pos!=times.begin() && !this->validRegistrationType(pos->second))
+    --pos;
+  return pos;
+}
+
+/*; ///< forward one visible step
+ *
+ */
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::forwardToNextVisible(TimeMap& times, TimeMap::iterator pos)
+{
+  if (pos!=times.end())
+    ++pos;
+  while (pos!=times.end() && !this->validRegistrationType(pos->second))
+    ++pos;
+  return pos;
+}
+
+/* move forwards until next visible pos is reached. Return iterator just before that.
+ *
+ */
+RegistrationHistoryWidget::TimeMap::iterator RegistrationHistoryWidget::forwardTowardsNextVisible(TimeMap& times, TimeMap::iterator pos)
+{
+  TimeMap::iterator last = pos;
+  ++pos;
+  while (pos!=times.end())
+  {
+    if (this->validRegistrationType(pos->second))
+      break;
+    last = pos;
+    ++pos;
+  }
+  if (pos==times.end()) // allow forwarding to the end
+    return pos;
+  return last;
 }
 
 QString RegistrationHistoryWidget::debugDump()
 {
-  TimeMap times = this->getRegistrationTimes();
+  TimeMap times = this->getVisibleRegistrationTimes();
+//  TimeMap times = this->getRegistrationTimes();
   bool addedBreak = false;
   std::stringstream ss;
   ss << "<html>";
@@ -350,48 +487,6 @@ QString RegistrationHistoryWidget::debugDump()
   return qstring_cast(ss.str());
 }
 
-/** jump forward to one second ahead of the NEXT registration
- */
-void RegistrationHistoryWidget::forwardSlot()
-{
-  std::map<QDateTime,QString> times = this->getRegistrationTimes();
-
-  if (times.empty())
-    return;
-
-  // current points to the timestamp currently in use. end() is current time.
-  TimeMap::iterator current = this->findCurrentActiveIter(times);
-
-  if (current==times.end()) // already at end, ignore
-    return;
-  ++current;
-  if (current!=times.end())
-    ++current;
-
-  if (current==times.end())
-  {
-    ssc::messageManager()->sendInfo("Forward: Setting registration time to current");
-    this->setActiveTime(QDateTime());
-  }
-  else
-  {
-    QDateTime newTime = current->first.addSecs(-1);
-    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + newTime.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
-    this->setActiveTime(newTime);
-  }
-//  if (current==times.end() || times.rbegin()->first==current->first) // if at end or at the last position, interpret as end
-//  {
-//    ssc::messageManager()->sendInfo("Forward: Setting registration time to current, [" + times.rbegin()->second + "]");
-//    this->setActiveTime(QDateTime());
-//  }
-//  else
-//  {
-//    ssc::messageManager()->sendInfo("Forward: Setting registration time to " + current->first.toString(ssc::timestampSecondsFormatNice()) + ", [" + current->second + "]");
-//    this->setActiveTime(current->first);
-//  }
-}
-
-
 /**Use the newest available registration.
  * Negates any call to usePreviousRegistration.
  */
@@ -411,13 +506,22 @@ void RegistrationHistoryWidget::showDetailsSlot()
   mTextEdit->setVisible(!mTextEdit->isVisible());
 }
 
+
 void RegistrationHistoryWidget::updateSlot()
 {
   std::vector<ssc::RegistrationHistoryPtr> raw = getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> history = mergeHistory(raw);
 
-  TimeMap times = this->getRegistrationTimes();
-  std::map<QDateTime,QString>::iterator current = this->findCurrentActiveIter(times);
+  TimeMap times = this->getVisibleRegistrationTimes();
+//  std::cout << "active time " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << std::endl;
+  TimeMap::iterator current = this->findCurrentActiveIter(times);
+//  if (current!=times.end())
+//    std::cout << "update current " << current->first.toString(ssc::timestampSecondsFormatNice()) << " " << current->second << std::endl;
+  current = this->findCurrentVisible(times, current);
+//  if (current!=times.end())
+//    std::cout << "update current visible " << current->first.toString(ssc::timestampSecondsFormatNice()) << " " << current->second << std::endl;
+
+
   int behind = std::min<int>(distance(times.begin(), current), times.size()-1);
   int infront = times.size() - 1 - behind;
 
