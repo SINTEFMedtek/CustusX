@@ -138,7 +138,13 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   QDomNode masterFrame = forest.getNode(masterFrameUid);
   QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
   std::vector<ssc::DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
-  ssc::messageManager()->sendInfo("Update Registration using master " + masterFrameUid + " with delta matrix\n"+qstring_cast(deltaTransform.mValue));
+
+  std::stringstream ss;
+  ss << "Update Registration using " << std::endl;
+  ss << "\tFixed:\t" << masterFrameUid << std::endl;
+  ss << "\tMoving:\t" << data->getUid() << std::endl;
+  ss << "\tDelta matrix (rMd'=Delta*rMd)\n"+qstring_cast(deltaTransform.mValue) << std::endl;
+  ssc::messageManager()->sendInfo(qstring_cast(ss.str()));
 
   // update the transform on all target data:
   for (unsigned i=0; i<targetData.size(); ++i)
