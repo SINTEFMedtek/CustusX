@@ -46,13 +46,12 @@ private:
   QString  debugDump();
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
-  bool validRegistrationType(QString type) const;
 
   typedef std::map<QDateTime,QString> TimeMap;
-  TimeMap getRegistrationTimes() const;
-  QDateTime getActiveTime() const;
-  bool setActiveTime(QDateTime active);
-  TimeMap::iterator findCurrentActiveIter(TimeMap& times) const;
+  TimeMap getRegistrationTimes();
+  QDateTime getActiveTime();
+  void setActiveTime(QDateTime active);
+  TimeMap::iterator findCurrentActiveIter(TimeMap& times);
   QFrame* mGroup;
   std::vector<ssc::RegistrationHistoryPtr> mHistories;
   QAction* mRewindAction;
@@ -60,31 +59,15 @@ private:
   QAction* mForwardAction;
   QAction* mFastForwardAction;
   QAction* mDetailsAction;
-  QAction* mShowAllAction;
 
   QLabel* mBehindLabel;
   QLabel* mInFrontLabel;
   QTextEdit* mTextEdit;
 
-  TimeMap::iterator findCurrentVisible(TimeMap& times, TimeMap::iterator pos);
-  TimeMap::iterator rewindToLastVisible(TimeMap& times, TimeMap::iterator pos);
-  TimeMap::iterator forwardToNextVisible(TimeMap& times, TimeMap::iterator pos);
-  TimeMap::iterator forwardTowardsNextVisible(TimeMap& times, TimeMap::iterator pos);
-
-  void rewindToPreviousVisible();
-  void forwardToNextVisible();
-  TimeMap getVisibleRegistrationTimes() const;
-
-  std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories() const;
+  std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };
 
 }//end namespace cx
 
 #endif /* CXREGISTRATIONHISTORYWIDGET_H_ */
-
-
-
-
-
-
