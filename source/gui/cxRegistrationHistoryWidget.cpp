@@ -179,6 +179,8 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
     }
   }
 
+  retval.erase(QDateTime());
+
   return retval;
 }
 
