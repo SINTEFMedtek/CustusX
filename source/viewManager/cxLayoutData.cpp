@@ -50,6 +50,20 @@ void LayoutData::ViewData::parseXml(QDomNode node)
   mRegion.span.col = elem.attribute("colSpan").toInt();
 }
 
+LayoutData LayoutData::createHeader(QString uid, QString name)
+{
+  return create(uid,name,0,0);
+}
+
+LayoutData LayoutData::create(QString uid, QString name, int rows, int cols)
+{
+  LayoutData retval;
+  retval.resetUid(uid);
+  retval.setName(name);
+  retval.resize(rows,cols);
+  return retval;
+}
+
 
 LayoutData::LayoutData() :
   mName("unnamed")
@@ -173,6 +187,12 @@ void LayoutData::split(iterator iter)
 void LayoutData::resize(int rows, int cols)
 {
   mSize = LayoutPosition(rows,cols);
+
+  if (mSize.row==0 || mSize.col==0)
+  {
+    mView.clear();
+    return;
+  }
 
   // erase all views outside region
   // TODO: also consider nontrivial regions.

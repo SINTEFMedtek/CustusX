@@ -823,7 +823,7 @@ void MainWindow::createToolBars()
   mScreenshotToolBar = addToolBar("Screenshot");
   mScreenshotToolBar->setObjectName("ScreenshotToolBar");
   mScreenshotToolBar->addAction(mShootScreenAction);
-  mScreenshotToolBar->addAction(mShootWindowAction);
+//  mScreenshotToolBar->addAction(mShootWindowAction);
   this->registerToolBar(mScreenshotToolBar, "Toolbar");
 
   mNavigationToolBar = addToolBar("Navigation");

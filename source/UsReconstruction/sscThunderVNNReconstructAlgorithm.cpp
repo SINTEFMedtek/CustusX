@@ -9,7 +9,9 @@
 #include <QFileInfo>
 #include <vtkImageData.h>
 #include "recConfig.h"
+#ifdef USE_US_RECONSTRUCTION_THUNDER
 #include "reconstruct_vnn.h"
+#endif // USE_US_RECONSTRUCTION_THUNDER
 #include "sscImage.h"
 //#include "sscXmlOptionItem.h"
 #include "sscMessageManager.h"
@@ -22,8 +24,16 @@ ThunderVNNReconstructAlgorithm::ThunderVNNReconstructAlgorithm(QString shaderPat
   mShaderPath = shaderPath;
 }
 
+QString ThunderVNNReconstructAlgorithm::getName() const
+{
+  return "ThunderVNN";
+}
+
 std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElement root)
 {
+  std::vector<DataAdapterPtr> retval;
+
+#ifdef USE_US_RECONSTRUCTION_THUNDER
 	mProcessorOption = StringDataAdapterXml::initialize("Processor", "",
 		      "Which processor to use when reconstructing",
 		      "CPU", QString("CPU GPU").split(" "),
@@ -33,9 +43,10 @@ std::vector<DataAdapterPtr> ThunderVNNReconstructAlgorithm::getSettings(QDomElem
 		      1, ssc::DoubleRange(0.1, 10, 0.01), 0,
 		      root);
 
-	std::vector<DataAdapterPtr> retval;
 	retval.push_back(mProcessorOption);
 	retval.push_back(mDistanceOption);
+#endif
+
 	return retval;
 }
   
@@ -45,6 +56,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
                                                  ImagePtr frameMask,
                                                  QDomElement settings)
 {
+#ifdef USE_US_RECONSTRUCTION_THUNDER
   std::cout << "processor: " << mProcessorOption->getValue() << std::endl;
   std::cout << "distance: " << mDistanceOption->getValue() << std::endl;
 
@@ -99,6 +111,7 @@ void ThunderVNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> fram
   
   reconstruct_vnn(&data, path.absoluteFilePath().toStdString().c_str());
   //ssc::messageManager()->sendInfo("ThunderVNNReconstructAlgorithm::reconstruct ***success***");
+#endif // USE_US_RECONSTRUCTION_THUNDER
 }
   
   
