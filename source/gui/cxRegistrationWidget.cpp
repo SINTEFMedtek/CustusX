@@ -104,6 +104,7 @@ void RegistrationWidget::hideEvent(QHideEvent* event)
     disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
     disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
   }
+  mCurrentImage.reset();
 }
 
 void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
