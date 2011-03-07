@@ -64,28 +64,37 @@ void View3D::setCameraOffsetSlot(int offset)
 }
 void View3D::moveCameraToolStyleSlot(Transform3D prMt, double timestamp)
 {
-  ssc::Vector3D cameraPoint_t = ssc::Vector3D(0,0,-mCameraOffset); //the camerapoint in tool space
-  ssc::Transform3D cameraTransform_pr = prMt*ssc::createTransformTranslate(cameraPoint_t);
-  ssc::Vector3D cameraPoint_pr = ssc::Vector3D(cameraTransform_pr[0][3],
-      cameraTransform_pr[1][3], cameraTransform_pr[2][3]); //the camera point in patient ref space
-  ssc::Transform3DPtr rMpr = ssc::toolManager()->get_rMpr();
-  ssc::Transform3D cameraPoint_r = (*rMpr)*ssc::createTransformTranslate(cameraPoint_pr);
+//  ssc::Vector3D cameraPoint_t = ssc::Vector3D(0,0,-mCameraOffset); //the camerapoint in tool space
+//  ssc::Transform3D cameraTransform_pr = prMt*ssc::createTransformTranslate(cameraPoint_t);
+//  ssc::Vector3D cameraPoint_pr = ssc::Vector3D(cameraTransform_pr[0][3], cameraTransform_pr[1][3], cameraTransform_pr[2][3]); //the camera point in patient ref space
 
-  ssc::Transform3DPtr rMt(new ssc::Transform3D((*rMpr)*prMt));
+  ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
+//  ssc::Transform3D cameraPoint_r = rMpr*ssc::createTransformTranslate(cameraPoint_pr);
 
-  double xCameraPos = cameraPoint_r[0][3];
-  double yCameraPos = cameraPoint_r[1][3];
-  double zCameraPos = cameraPoint_r[2][3];
-  double xFocalPos = (*rMt)[0][3];
-  double yFocalPos = (*rMt)[1][3];
-  double zFocalPos = (*rMt)[2][3];
+  ssc::Transform3D rMt = rMpr * prMt;
+
+//  double xCameraPos = cameraPoint_r[0][3];
+//  double yCameraPos = cameraPoint_r[1][3];
+//  double zCameraPos = cameraPoint_r[2][3];
+//  double xFocalPos = rMt[0][3];
+//  double yFocalPos = rMt[1][3];
+//  double zFocalPos = rMt[2][3];
+
+  ssc::Vector3D camera_r = rMt.coord(ssc::Vector3D(0,0,-mCameraOffset));
+  ssc::Vector3D focus_r = rMt.coord(ssc::Vector3D(0,0,0));
+  ssc::Vector3D vup_r = rMt.vector(ssc::Vector3D(-1,0,0));
   
   //std::cout << rMt_withOffset << std::endl;
   //std::cout << (*rMt) << std::endl;
 
   vtkCamera* camera = mRenderer->GetActiveCamera();
-  camera->SetPosition(xCameraPos, yCameraPos, zCameraPos);
-  camera->SetFocalPoint(xFocalPos, yFocalPos, zFocalPos);
+  camera->SetPosition(camera_r.begin());
+  camera->SetFocalPoint(focus_r.begin());
+  camera->SetViewUp(vup_r.begin());
+
+//  camera->SetPosition(xCameraPos, yCameraPos, zCameraPos);
+//  camera->SetFocalPoint(xFocalPos, yFocalPos, zFocalPos);
+
   camera->SetClippingRange(1, 2000);
 }
 void View3D::activateCameraDefaultStyle()
