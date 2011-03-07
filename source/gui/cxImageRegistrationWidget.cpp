@@ -96,7 +96,7 @@ void ImageRegistrationWidget::registerSlot()
 
 void ImageRegistrationWidget::autoRegisterSlot(bool checked)
 {
-  DataLocations::getSettings()->value("autoLandmarkRegistration", checked);
+  DataLocations::getSettings()->setValue("autoLandmarkRegistration", checked);
   mRegisterButton->setEnabled(!checked);
 }
 
