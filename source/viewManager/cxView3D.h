@@ -45,11 +45,14 @@ public slots:
   
 protected slots:
   void moveCameraToolStyleSlot(Transform3D prMt, double timestamp); ///< receives transforms from the tool which the camera should follow
+  void dominantToolChangedSlot();
 
 protected:
   void activateCameraDefaultStyle();
   void activateCameraToolStyle(int offset=0);
-  void deactivateCameraToolStyle();
+//  void deactivateCameraToolStyle();
+  void connectTool();
+  void disconnectTool();
 
   CameraStyle mCameraStyle; ///< the current camerastyle
   int mCameraOffset; ///< the distance between the camera and focalpoint
@@ -57,3 +60,7 @@ protected:
 };
 }//namespace cx
 #endif /* CXVIEW3D2_H_ */
+
+
+
+
