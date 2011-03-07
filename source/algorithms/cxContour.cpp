@@ -54,7 +54,7 @@ void Contour::postProcessingSlot()
   mOutput = ssc::dataManager()->createMesh(cubesPolyData, uid, name, "Images");
 
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
 
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveMesh(mOutput, mOutputBasePath);
