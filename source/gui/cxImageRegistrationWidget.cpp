@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
+#include <QSettings>
 #include <QHeaderView>
 #include <QLabel>
 #include <QSlider>
@@ -17,14 +18,15 @@
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
 ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   RegistrationWidget(parent),
-  mAddLandmarkButton(new QPushButton("Add landmark", this)),
-  mEditLandmarkButton(new QPushButton("Resample landmark", this)),
-  mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
+//  mAddLandmarkButton(new QPushButton("Add landmark", this)),
+//  mEditLandmarkButton(new QPushButton("Resample landmark", this)),
+//  mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
   mThresholdLabel(new QLabel("Probing treshold:", this)),
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
@@ -36,12 +38,31 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
 
   //pushbuttons
+  mAddLandmarkButton = new QPushButton("Add", this);
+  mAddLandmarkButton->setToolTip("Add landmark");
   mAddLandmarkButton->setDisabled(true);
   connect(mAddLandmarkButton, SIGNAL(clicked()), this, SLOT(addLandmarkButtonClickedSlot()));
+
+  mEditLandmarkButton = new QPushButton("Resample", this);
+  mEditLandmarkButton->setToolTip("Resample landmark");
   mEditLandmarkButton->setDisabled(true);
   connect(mEditLandmarkButton, SIGNAL(clicked()), this, SLOT(editLandmarkButtonClickedSlot()));
+
+  mRemoveLandmarkButton = new QPushButton("Remove", this);
+  mRemoveLandmarkButton->setToolTip("Remove landmark");
   mRemoveLandmarkButton->setDisabled(true);
   connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
+
+  bool autoReg = DataLocations::getSettings()->value("autoLandmarkRegistration").toBool();
+  mRegisterButton = new QPushButton("Register", this);
+  mRegisterButton->setToolTip("Perform registration");
+  mRegisterButton->setEnabled(!autoReg);
+  connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
+
+  mAutoRegisterCheckBox = new QCheckBox("Auto", this);
+  mAutoRegisterCheckBox->setToolTip("Automatic registration whenever a landmark has changed");
+  connect(mAutoRegisterCheckBox, SIGNAL(clicked(bool)), this, SLOT(autoRegisterSlot(bool)));
+  mAutoRegisterCheckBox->setChecked(autoReg);
 
   //slider
   connect(mThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdChangedSlot(int)));
@@ -52,11 +73,31 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveImageAdapter));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
-  mVerticalLayout->addWidget(mAddLandmarkButton);
-  mVerticalLayout->addWidget(mEditLandmarkButton);
-  mVerticalLayout->addWidget(mRemoveLandmarkButton);
+
+  QHBoxLayout* landmarkButtonsLayout = new QHBoxLayout;
+  landmarkButtonsLayout->addWidget(mAddLandmarkButton);
+  landmarkButtonsLayout->addWidget(mEditLandmarkButton);
+  landmarkButtonsLayout->addWidget(mRemoveLandmarkButton);
+  mVerticalLayout->addLayout(landmarkButtonsLayout);
+
+  QHBoxLayout* regLayout = new QHBoxLayout;
+  regLayout->addWidget(mAutoRegisterCheckBox);
+  regLayout->addWidget(mRegisterButton);
+  mVerticalLayout->addLayout(regLayout);
+
   mVerticalLayout->addWidget(mThresholdLabel);
   mVerticalLayout->addWidget(mThresholdSlider);
+}
+
+void ImageRegistrationWidget::registerSlot()
+{
+  this->internalPerformRegistration(true);
+}
+
+void ImageRegistrationWidget::autoRegisterSlot(bool checked)
+{
+  DataLocations::getSettings()->value("autoLandmarkRegistration", checked);
+  mRegisterButton->setEnabled(!checked);
 }
 
 ImageRegistrationWidget::~ImageRegistrationWidget()
@@ -188,15 +229,21 @@ void ImageRegistrationWidget::thresholdChangedSlot(const int value)
 
 void ImageRegistrationWidget::performRegistration()
 {
-  if (!mCurrentImage)
-    return;
+  bool autoReg = DataLocations::getSettings()->value("autoLandmarkRegistration").toBool();
+  this->internalPerformRegistration(autoReg);
+}
 
-  //make sure the fixedData is set
-  ssc::DataPtr fixedData = registrationManager()->getFixedData();
-  if(!fixedData)
-    registrationManager()->setFixedData(mCurrentImage);
+void ImageRegistrationWidget::internalPerformRegistration(bool doIt)
+{
+  if (doIt && mCurrentImage)
+  {
+    //make sure the fixedData is set
+    ssc::DataPtr fixedData = registrationManager()->getFixedData();
+    if(!fixedData)
+      registrationManager()->setFixedData(mCurrentImage);
 
-  registrationManager()->doImageRegistration(mCurrentImage);
+    registrationManager()->doImageRegistration(mCurrentImage);
+  }
 
   this->updateAvarageAccuracyLabel();
 }
