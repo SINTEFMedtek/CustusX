@@ -155,6 +155,7 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("View3D/sphereRadius", 2.0);
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
   this->fillDefault("showSectorInRTView", true);
+  this->fillDefault("autoLandmarkRegistration", true);
 }
 
 void StateManager::initialize()
