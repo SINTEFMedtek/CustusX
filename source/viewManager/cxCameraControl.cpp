@@ -147,10 +147,14 @@ QAction* CameraControl::addStandard3DViewAction(QString caption, QString help, s
 
 vtkRendererPtr CameraControl::getRenderer() const
 {
+  if (!viewManager()->get3DView())
+    return vtkRendererPtr();
   return viewManager()->get3DView()->getRenderer();
 }
 vtkCameraPtr CameraControl::getCamera() const
 {
+  if (!this->getRenderer())
+    return vtkCameraPtr();
   return this->getRenderer()->GetActiveCamera();
 }
 
@@ -162,6 +166,8 @@ void CameraControl::setStandard3DViewActionSlot()
   ssc::Vector3D viewDirection = ssc::Vector3D::fromString(action->data().toString());
 
   vtkRendererPtr renderer = this->getRenderer();
+  if (!renderer)
+    return;
   vtkCameraPtr camera = this->getCamera();
 
   renderer->ResetCamera();

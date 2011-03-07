@@ -790,6 +790,20 @@ QString ParentFrameStringDataAdapter::convertInternal2Display(QString internal)
 //---------------------------------------------------------
 //---------------------------------------------------------
 
+
+bool SetParentFrameStringDataAdapter::setValue(const QString& value)
+{
+  if (!mData)
+    return false;
+  mData->get_rMd_History()->setParentFrame(value);
+  return true;
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 DataNameEditableStringDataAdapter::DataNameEditableStringDataAdapter()
 {
 }
