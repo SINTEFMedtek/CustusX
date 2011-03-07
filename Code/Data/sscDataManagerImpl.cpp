@@ -140,8 +140,9 @@ DataPtr MetaImageReader::load(const QString& uid, const QString& filename)
 
   ImagePtr image(new Image(uid, imageData));
 
-  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
-  image->get_rMd_History()->addRegistration(regTrans);
+//  RegistrationTransform regTrans(rMd, QFileInfo(filename).lastModified(), "From MHD file");
+//  image->get_rMd_History()->addRegistration(regTrans);
+  image->get_rMd_History()->setRegistration(rMd);
 
   //std::cout << "ImagePtr MetaImageReader::load" << std::endl << std::endl;
   return image;
@@ -480,7 +481,7 @@ void DataManagerImpl::verifyParentFrame(DataPtr data)
       max = std::max(max, parentList[1].toInt());
     }
     QString parentFrame = "frame_" + qstring_cast(max + 1);
-    data->get_rMd_History()->addParentFrame(parentFrame);
+    data->get_rMd_History()->setParentFrame(parentFrame);
   }
 }
 
@@ -675,10 +676,19 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
 
 void DataManagerImpl::loadData(QDomElement node, QString rootPath)
 {
-  QString uidNodeString = node.namedItem("uid").toElement().text();
-
-  QDomElement nameNode = node.namedItem("name").toElement();
+//  QString uidNodeString = node.namedItem("uid").toElement().text();
+//  QDomElement nameNode = node.namedItem("name").toElement();
   QDomElement filePathNode = node.namedItem("filePath").toElement();
+
+  QString uid = node.toElement().attribute("uid");
+  QString name = node.toElement().attribute("name");
+
+  // backwards compatibility 20110306CA
+  if (!node.namedItem("uid").toElement().isNull())
+    uid = node.namedItem("uid").toElement().text();
+  if (!node.namedItem("name").toElement().isNull())
+    name = node.namedItem("name").toElement().text();
+
   if (filePathNode.isNull())
   {
     messageManager()->sendWarning("Warning: DataManager::parseXml() found no filePath for data");
@@ -704,7 +714,7 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
     return;
   }
 
-  ssc::DataPtr data = this->readData(uidNodeString, path, rtAUTO);
+  ssc::DataPtr data = this->readData(uid, path, rtAUTO);
 
   if (!data)
   {
@@ -712,8 +722,8 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
     return;
   }
 
-  if (!nameNode.text().isEmpty())
-    data->setName(nameNode.text());
+  if (!name.isEmpty())
+    data->setName(name);
   data->setFilePath(relativePath.path());
   data->parseXml(node);
 

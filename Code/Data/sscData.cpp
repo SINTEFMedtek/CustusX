@@ -138,13 +138,15 @@ void Data::addXml(QDomNode& dataNode)
 
   m_rMd_History->addXml(dataNode);
 
-  QDomElement uidNode = doc.createElement("uid");
-  uidNode.appendChild(doc.createTextNode(mUid));
-  dataNode.appendChild(uidNode);
+//  QDomElement uidNode = doc.createElement("uid");
+//  uidNode.appendChild(doc.createTextNode(mUid));
+//  dataNode.appendChild(uidNode);
 
-  QDomElement nameNode = doc.createElement("name");
-  nameNode.appendChild(doc.createTextNode(mName));
-  dataNode.appendChild(nameNode);
+  dataNode.toElement().setAttribute("uid", mUid);
+  dataNode.toElement().setAttribute("name", mName);
+//  QDomElement nameNode = doc.createElement("name");
+//  nameNode.appendChild(doc.createTextNode(mName));
+//  dataNode.appendChild(nameNode);
 
   QDomElement filePathNode = doc.createElement("filePath");
   filePathNode.appendChild(doc.createTextNode(mFilePath));
@@ -160,19 +162,19 @@ void Data::parseXml(QDomNode& dataNode)
   if (dataNode.isNull())
     return;
 
-  // backward compatibility per 20101117: remove sometime in 2011
-  QString parentFrame;
-  if(!dataNode.namedItem("parentFrame").isNull())
-    parentFrame = dataNode.namedItem("parentFrame").toElement().text();
+//  // backward compatibility per 20101117: remove sometime in 2011
+//  QString parentFrame;
+//  if(!dataNode.namedItem("parentFrame").isNull())
+//    parentFrame = dataNode.namedItem("parentFrame").toElement().text();
 
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);
 
-  if (!parentFrame.isEmpty())
-  {
-    m_rMd_History->addParentFrame(parentFrame);
-//    this->setParentFrame(parentFrame);
-  }
+//  if (!parentFrame.isEmpty())
+//  {
+//    m_rMd_History->addParentFrame(parentFrame);
+////    this->setParentFrame(parentFrame);
+//  }
 }
 
 

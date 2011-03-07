@@ -70,6 +70,7 @@ public:
   void setRegistration(const Transform3D& transform);
   void updateRegistration(const QDateTime& oldTime, const RegistrationTransform& newTransform);
 
+  void setParentFrame(const QString& newParent);
   void addParentFrame(const QString& newParent);
   void addParentFrame(const ParentFrame& newParent);
   void updateParentFrame(const QDateTime& oldTime, const ParentFrame& newParent);

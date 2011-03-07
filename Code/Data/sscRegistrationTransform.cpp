@@ -209,7 +209,7 @@ void RegistrationHistory::updateRegistration(const QDateTime& oldTime, const Reg
 }
 
 /**Set a registration transform, overwriting all history.
- * Use this when registration history is not needed.
+ * Use this when registration history is not needed, or when defining a relationship for the first time.
  */
 void RegistrationHistory::setRegistration(const Transform3D& transform)
 {
@@ -217,6 +217,14 @@ void RegistrationHistory::setRegistration(const Transform3D& transform)
   this->addRegistration(RegistrationTransform(transform));
 }
 
+/**Set a parent fram, overwriting all history.
+ * Use this when registration history is not needed, or when defining a relationship for the first time.
+ */
+void RegistrationHistory::setParentFrame(const QString& newParent)
+{
+  mParentFrames.clear();
+  this->addParentFrame(ParentFrame(newParent));
+}
 
 void RegistrationHistory::addParentFrame(const QString& newParent)
 {
