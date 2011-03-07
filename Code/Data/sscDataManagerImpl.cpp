@@ -866,6 +866,7 @@ void DataManagerImpl::removeData(const QString& uid)
 
   emit dataRemoved(uid);
   emit dataLoaded(); // this should alert everybody interested in the data as a collection.
+  ssc::messageManager()->sendInfo("Removed data [" + uid + "].");
 }
 
 } // namespace ssc

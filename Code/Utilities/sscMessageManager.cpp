@@ -5,6 +5,7 @@
 #include <QString>
 #include <QMutex>
 #include <QSound>
+#include <QDir>
 #include <QTextStream>
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
@@ -195,6 +196,7 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
 
   QString filename("/ConsoleLog.txt");
   mAbsoluteLoggingFolderPath = absoluteLoggingFolderPath;
+  QDir().mkdir(absoluteLoggingFolderPath);
   QString consoleFilePath = mAbsoluteLoggingFolderPath+filename;
 
   QMutexLocker sentry(&mConsoleMutex);
@@ -202,26 +204,27 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
   {
     mConsoleFile->close();
 
-    if(QFile::exists(consoleFilePath))
-      QFile::remove(consoleFilePath);
+    // cannot delete file: this will delete previous logging of a patient that has
+    // been saved and reopened. Better to keep data in their respective folders.
 
-    if(!mConsoleFile->copy(consoleFilePath))
-    {
-      sentry.unlock();
-      ssc::messageManager()->sendWarning("Could not copy to "+consoleFilePath);
-      sentry.relock();
-    }
-
-    mConsoleFile->setFileName(consoleFilePath);
-    this->openLogging(QFile::Append);
+//    if(QFile::exists(consoleFilePath))
+//      QFile::remove(consoleFilePath);
+//
+//    if(!mConsoleFile->copy(consoleFilePath))
+//    {
+//      sentry.unlock();
+//      ssc::messageManager()->sendWarning("Could not copy to "+consoleFilePath);
+//      sentry.relock();
+//    }
 
   }
   else
   {
-    mConsoleFile->setFileName(consoleFilePath);
-    sentry.unlock();
-    this->openLogging(QFile::Truncate);
   }
+
+  mConsoleFile->setFileName(consoleFilePath);
+  sentry.unlock();
+  this->openLogging(QFile::Append);
 }
 
 void MessageManager::sendInfo(QString info)
