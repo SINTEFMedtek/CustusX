@@ -138,6 +138,11 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   vtkImageAccumulatePtr histogram = mCurrentImage->getHistogram();
 	int histogramSize = histogram->GetComponentExtent()[1] - 
                       histogram->GetComponentExtent()[0];
+	//std::cout << "histogramSize " << histogramSize << std::endl;
+  //std::cout << "min " << mCurrentImage->getMin();
+  //std::cout << " max " << mCurrentImage->getMax() << std::endl;
+  //std::cout << "hist min " << histogram->GetComponentExtent()[0];
+  //std::cout << " hist max " << histogram->GetComponentExtent()[1] << std::endl;
   
   painter.setPen(QColor(140, 140, 210));
   
@@ -153,12 +158,18 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 	//for (int i = mCurrentImage->getPosMin(); i <= mCurrentImage->getPosMax(); i++)
   for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)//TODO: replace with above line
 	{
-		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
-		y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1)) * barHeightMult;
+//		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
+    x = ((i- mCurrentImage->getMin()) * posMult); //Offset with min value
+    y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1)) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
+    {
       painter.drawLine(x + mBorder, height() - mBorder, 
 											 x + mBorder, height() - mBorder - y);
+
+      //std::cout << "x: " << x << " y: " << y <<  std::endl;
+    }
+    //std::cout << "i: " << i << " y: " << static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] << std::endl;
 	}
 
   // Go through each point and draw squares and lines

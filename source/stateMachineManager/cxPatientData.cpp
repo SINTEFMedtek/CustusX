@@ -20,6 +20,7 @@
 #include "sscToolManager.h"
 #include "sscUtilHelpers.h"
 #include "sscToolManager.h"
+#include "sscCustomMetaImage.h"
 
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -161,6 +162,16 @@ void PatientData::savePatient()
   }
 
   ssc::toolManager()->savePositionHistory();
+
+  // save position transforms into the mhd files.
+  // This hack ensures data files can be used in external programs without an explicit export.
+  ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
+  for (ssc::DataManager::ImagesMap::iterator iter=images.begin(); iter!=images.end(); ++iter)
+  {
+    //ssc::dataManager()->saveImage(iter->second, targetFolder);
+    ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(mActivePatientFolder +"/"+ iter->second->getFilePath());
+    customReader->setTransform(iter->second->get_rMd());
+  }
 
   //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...

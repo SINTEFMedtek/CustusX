@@ -43,7 +43,7 @@ void Segmentation::postProcessingSlot()
   }
 
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 

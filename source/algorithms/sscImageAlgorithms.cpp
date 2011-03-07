@@ -51,7 +51,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
   oriented->mergevtkSettingsIntosscTransform();
 //  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
   oriented->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  oriented->get_rMd_History()->addParentFrame(image->getUid());
+  oriented->get_rMd_History()->setParentFrame(image->getUid());
 
   return oriented;
 }
@@ -80,7 +80,7 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
   ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
   retval->get_rMd_History()->setRegistration(image->get_rMd());
   retval->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  retval->get_rMd_History()->addParentFrame(image->getUid());
+  retval->get_rMd_History()->setParentFrame(image->getUid());
 
   //ssc::dataManager()->loadData(retval);
   //ssc::dataManager()->saveImage(retval, outputBasePath);
@@ -125,7 +125,7 @@ ImagePtr cropImage(ImagePtr image)
   result->get_rMd_History()->setRegistration(image->get_rMd());
   result->mergevtkSettingsIntosscTransform();
   result->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  result->get_rMd_History()->addParentFrame(image->getUid());
+  result->get_rMd_History()->setParentFrame(image->getUid());
   //messageManager()->sendInfo("Created volume " + result->getName());
 
 //  dataManager()->loadData(result);

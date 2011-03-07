@@ -588,33 +588,6 @@ void ViewWrapper3D::showPointPickerProbe(bool on)
   }
 }
 
-
-//void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
-//{
-//  if (mode==ssc::rsNOT_REGISTRATED)
-//  {
-//    mView->removeRep(mPatientLandmarkRep);
-//    mView->removeRep(mImageLandmarkRep);
-//    mView->removeRep(mProbeRep);
-//
-//    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//  }
-//  if (mode==ssc::rsIMAGE_REGISTRATED)
-//  {
-//    mView->addRep(mPatientLandmarkRep);
-//    mView->addRep(mImageLandmarkRep);
-//    mView->addRep(mProbeRep);
-//
-//    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//    this->dominantToolChangedSlot();
-//  }
-//  if (mode==ssc::rsPATIENT_REGISTRATED)
-//  {
-//    mView->addRep(mPatientLandmarkRep);
-//    mView->addRep(mImageLandmarkRep);
-//  }
-//}
-
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
   mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
