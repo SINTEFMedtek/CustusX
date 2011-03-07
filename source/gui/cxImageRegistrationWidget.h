@@ -42,6 +42,9 @@ protected slots:
   virtual void cellClickedSlot(int row, int column); ///< when a landmark i selected from the table
   void thresholdChangedSlot(const int value); ///< reemits the valueChanged signal from the slider
 
+  void registerSlot();
+  void autoRegisterSlot(bool checked);
+
 protected:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
@@ -50,6 +53,7 @@ protected:
   virtual void populateTheLandmarkTableWidget(ssc::ImagePtr image); ///< populates the table widget
   QString getLandmarkName(QString uid);
   virtual ssc::Transform3D getTargetTransform() const;
+  void internalPerformRegistration(bool doIt);
 
   //gui
   RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
@@ -60,6 +64,9 @@ protected:
   QPushButton* mRemoveLandmarkButton; ///< the Remove Landmark button
   QLabel*      mThresholdLabel; ///< label for the tresholdslider
   QSlider*     mThresholdSlider; ///< slider for setting the probing treshold
+
+  QPushButton* mRegisterButton;
+  QCheckBox* mAutoRegisterCheckBox;
 
 private:
   ImageRegistrationWidget(); ///< not implemented
