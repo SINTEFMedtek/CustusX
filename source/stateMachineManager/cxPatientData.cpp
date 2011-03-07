@@ -28,6 +28,7 @@
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"
 #include "cxStateMachineManager.h"
+#include "cxToolManager.h"
 
 #include "sscMesh.h"
 #include <vtkPolyData.h>
@@ -58,8 +59,18 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
     return;
 
   mActivePatientFolder = activePatientFolder;
-  //TODO
-  //Update gui in some way to show which patient is active
+
+  QString loggingPath = this->getActivePatientFolder() + "/Logs/";
+  QDir loggingDir(loggingPath);
+  if (!loggingDir.exists())
+  {
+    loggingDir.mkdir(loggingPath);
+//    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
+  }
+  ToolManager::getInstance()->setLoggingFolder(loggingPath);
+  ssc::messageManager()->setLoggingFolder(loggingPath);
+
+  ssc::messageManager()->sendInfo("Set Active Patient: " + mActivePatientFolder);
 
   emit patientChanged();
 }
