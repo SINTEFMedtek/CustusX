@@ -47,7 +47,7 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   connect(mThresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(thresholdChangedSlot(int)));
 
   //layout
-  mVerticalLayout->addWidget(new QLabel("Landmark image registration will move the active image to the fixed image."));
+  //moved to help text   mVerticalLayout->addWidget(new QLabel("Landmark image registration will move the active image to the fixed image."));
   mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mFixedDataAdapter));
   mVerticalLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mActiveImageAdapter));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
@@ -69,6 +69,7 @@ QString ImageRegistrationWidget::defaultWhatsThis() const
       "<h3>Landmark based image registration.</h3>"
       "<p>Sample landmarks in the data set. </p>"
       "<p><i>Click the volume and either add or resample landmarks.</i></p>"
+      "<p>Landmark image registration will move the active image to the fixed image</p>"
       "</html>";
 }
 
