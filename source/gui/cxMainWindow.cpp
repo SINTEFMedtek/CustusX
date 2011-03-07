@@ -508,7 +508,6 @@ void MainWindow::newPatientSlot()
   mSettings->setValue("globalPatientNumber", ++patientNumber);
 
   stateManager()->getPatientData()->newPatient(choosenDir);
-  ssc::messageManager()->setLoggingFolder(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs");
 }
 
 void MainWindow::clearPatientSlot()
@@ -551,7 +550,7 @@ void MainWindow::updateWindowTitle()
   if(!activePatientFolder.isEmpty())
   {
     QFileInfo info(activePatientFolder);
-    patientName = info.baseName();
+    patientName = info.completeBaseName();
   }
 
   this->setWindowTitle("CustusX " + versionName + " - " + appName + " - " + patientName);
@@ -636,15 +635,6 @@ void MainWindow::patientChangedSlot()
   mReconstructionWidget->selectData(stateManager()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
   mReconstructionWidget->reconstructer()->setOutputBasePath(stateManager()->getPatientData()->getActivePatientFolder());
   mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
-
-  QString loggingPath = stateManager()->getPatientData()->getActivePatientFolder() + "/Logs/";
-  QDir loggingDir(loggingPath);
-  if (!loggingDir.exists())
-  {
-    loggingDir.mkdir(loggingPath);
-    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
-  }
-  ToolManager::getInstance()->setLoggingFolder(loggingPath);
 
   this->updateWindowTitle();
 }
