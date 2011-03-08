@@ -1,8 +1,10 @@
 #include "sscData.h"
 
 #include <QDomDocument>
+#include <QDateTime>
+#include <QRegExp>
 #include "sscRegistrationTransform.h"
-
+#include "sscTime.h"
 
 namespace ssc
 {
@@ -177,6 +179,23 @@ void Data::parseXml(QDomNode& dataNode)
 //  }
 }
 
+/**Get the time the data was created from a data source.
+ *
+ */
+QDateTime Data::getAcquisitionTime() const
+{
+  // quickie implementation: Assume uid contains time on format timestampSecondsFormat():
 
+  // retrieve timestamp as
+  QRegExp tsReg("[0-9]{8}T[0-9]{6}");
+  if (tsReg.indexIn(mUid)>0)
+  {
+    QDateTime datetime = QDateTime::fromString(tsReg.cap(0), timestampSecondsFormat());
+    return datetime;
+//    QString timestamp = datetime.toString("hh:mm");
+//    return prefix + " " + counter + " " + timestamp;
+  }
+  return QDateTime();
+}
 
 } // namespace ssc

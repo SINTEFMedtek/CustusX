@@ -11,6 +11,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
 
+class QDateTime;
 class QDomNode;
 
 namespace ssc
@@ -53,6 +54,7 @@ public:
 	virtual Transform3D get_rMd() const; ///< \return the transform M_rd from the data object's space (d) to the reference space (r).
   virtual void setShading(bool on);
   virtual bool getShading() const;
+  virtual QDateTime getAcquisitionTime() const;
 
   virtual QString getParentFrame();
 //  virtual void setParentFrame(QString uid);
