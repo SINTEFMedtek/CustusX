@@ -531,18 +531,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
-   // ssc::messageManager()->sendDebug("ToolRep3D for tool "+tool->getName()+" added to view "+mView->getName()+".");
 
-//    flytt denne koden inn i tool3d. flytt rtrep inn i ssc
-//    if (!mRTStreamRep)
-//    {
-//      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
-//      mRTStreamRep.reset(new ssc::RealTimeStreamRep("rtrep", "rtrep"));
-//    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
-//      mRTStreamRep->setTool(tool);
-//      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
-//      mView->addRep(mRTStreamRep);
-//    }
   }
 }
 
