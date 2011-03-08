@@ -104,6 +104,8 @@ CameraControl::~CameraControl()
 void CameraControl::translateByFocusTo(ssc::Vector3D p_r)
 {
   vtkCameraPtr camera = this->getCamera();
+  if (!camera)
+    return;
 
   ssc::Vector3D f(camera->GetFocalPoint());
   ssc::Vector3D p(camera->GetPosition());
