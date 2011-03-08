@@ -123,6 +123,10 @@ protected:
   void addDataAction(QString uid, QMenu* contextMenu);
 
   ViewGroupDataPtr mViewGroup;
+
+private:
+  QString mLastDataActionUid;
+
 };
 
 }//namespace cx

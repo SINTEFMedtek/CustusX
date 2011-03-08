@@ -157,6 +157,27 @@ void ViewWrapper::dataRemovedSlot(QString uid)
   this->meshRemoved(uid);
 }
 
+/**Assume T is ssc::DataPtr or a derived class.
+ *
+ * Return a vector of data sorted on acquisition time.
+ */
+template<class T>
+std::vector<T> sortOnAcquisitionTime(std::map<QString, T> input)
+{
+  typedef std::multimap<QDateTime,T> SortedMap;
+  SortedMap sorted;
+
+  for (typename std::map<QString, T>::iterator iter=input.begin(); iter!=input.end(); ++iter)
+  {
+    sorted.insert(std::make_pair(iter->second->getAcquisitionTime(), iter->second));
+  }
+
+  std::vector<T> retval;
+  for (typename SortedMap::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
+    retval.push_back(iter->second);
+  return retval;
+}
+
 void ViewWrapper::contextMenuSlot(const QPoint& point)
 {
   QWidget* sender = dynamic_cast<QWidget*>(this->sender());
@@ -164,21 +185,27 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //add actions to the actiongroups and the contextmenu
-  std::map<QString, QString>::iterator iter;
-
-  std::map<QString, QString> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
-  for(iter=imageUidsAndNames.begin(); iter != imageUidsAndNames.end(); ++iter)
+  std::vector<ssc::DataPtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getData());
+  mLastDataActionUid = "________________________";
+  for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
-    this->addDataAction(iter->first, &contextMenu);
+    this->addDataAction((*iter)->getUid(), &contextMenu);
   }
-  
-  contextMenu.addSeparator();
 
-  std::map<QString, QString> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
-  for(iter=meshUidsAndNames.begin(); iter != meshUidsAndNames.end(); ++iter)
-  {
-    this->addDataAction(iter->first, &contextMenu);
-  }
+//  std::map<QString, QString>::iterator iter;
+//  std::map<QString, QString> imageUidsAndNames = ssc::dataManager()->getImageUidsAndNames();
+//  for(iter=imageUidsAndNames.begin(); iter != imageUidsAndNames.end(); ++iter)
+//  {
+//    this->addDataAction(iter->first, &contextMenu);
+//  }
+//
+//  contextMenu.addSeparator();
+//
+//  std::map<QString, QString> meshUidsAndNames = ssc::dataManager()->getMeshUidsWithNames();
+//  for(iter=meshUidsAndNames.begin(); iter != meshUidsAndNames.end(); ++iter)
+//  {
+//    this->addDataAction(iter->first, &contextMenu);
+//  }
 
   //append specific info from derived classes
   this->appendToContextMenu(contextMenu);
@@ -191,6 +218,21 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
   ssc::DataPtr data = ssc::dataManager()->getData(uid);
 
   QAction* action = new QAction(qstring_cast(data->getName()), contextMenu);
+
+  if (boost::shared_dynamic_cast<ssc::Image>(data))
+    action->setIcon(QIcon(":/icons/volume.png"));
+  else
+    action->setIcon(QIcon(":/icons/surface.png"));
+
+  if (uid.contains(mLastDataActionUid))
+  {
+    action->setText("    " + action->text());
+  }
+  else
+  {
+    mLastDataActionUid = uid;
+  }
+
   action->setData(QVariant(qstring_cast(uid)));
   action->setCheckable(true);
   std::vector<ssc::DataPtr> allVisible = mViewGroup->getData();
