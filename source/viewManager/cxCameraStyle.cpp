@@ -100,6 +100,7 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
   ssc::Transform3D rMt = rMpr * prMt;
 
   double offset = mFollowingTool->getTooltipOffset();
+  std::cout << "offset " << offset << std::endl;
 
   ssc::Vector3D camera_r = rMt.coord(ssc::Vector3D(0,0,offset-mCameraOffset));
   ssc::Vector3D focus_r = rMt.coord(ssc::Vector3D(0,0,offset));
@@ -153,8 +154,6 @@ void CameraStyle::dominantToolChangedSlot()
   ssc::ToolPtr newTool = ssc::toolManager()->getDominantTool();
   if (newTool==mFollowingTool)
     return;
-  if (mCameraStyle!=TOOL_STYLE)
-    return;
 
   this->disconnectTool();
   this->connectTool();
@@ -162,6 +161,9 @@ void CameraStyle::dominantToolChangedSlot()
 
 void CameraStyle::connectTool()
 {
+  if (mCameraStyle!=TOOL_STYLE)
+    return;
+
   mFollowingTool = ssc::toolManager()->getDominantTool();
 
   if (mFollowingTool)
@@ -189,6 +191,9 @@ void CameraStyle::connectTool()
 
 void CameraStyle::disconnectTool()
 {
+  if (mCameraStyle!=TOOL_STYLE)
+    return;
+
   if (mFollowingTool)
   {
     disconnect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));

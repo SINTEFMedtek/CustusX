@@ -16,6 +16,7 @@
 #include "sscEnumConverter.h"
 #include "sscTool.h"
 #include "cxStateMachineManager.h"
+#include "sscImageAlgorithms.h"
 
 namespace cx
 {
@@ -152,11 +153,14 @@ SelectImageStringDataAdapterBase::SelectImageStringDataAdapterBase()
 }
 QStringList SelectImageStringDataAdapterBase::getValueRange() const
 {
-  std::vector<QString> uids = ssc::dataManager()->getImageUids();
+  std::vector<ssc::ImagePtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getImages());
+//  std::vector<QString> uids = ssc::dataManager()->getImageUids();
   QStringList retval;
   retval << "";
-  for (unsigned i=0; i<uids.size(); ++i)
-    retval << qstring_cast(uids[i]);
+//  for (unsigned i=0; i<uids.size(); ++i)
+//    retval << qstring_cast(uids[i]);
+  for (unsigned i=0; i<sorted.size(); ++i)
+    retval << sorted[i]->getUid();
   return retval;
 }
 QString SelectImageStringDataAdapterBase::convertInternal2Display(QString internal)
@@ -202,15 +206,22 @@ SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase()
 }
 QStringList SelectDataStringDataAdapterBase::getValueRange() const
 {
-  std::vector<QString> meshUids = ssc::dataManager()->getMeshUids();
-  std::vector<QString> imageUids = ssc::dataManager()->getImageUids();
+  std::vector<ssc::DataPtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getData());
   QStringList retval;
   retval << "";
-  for (unsigned i=0; i<meshUids.size(); ++i)
-    retval << qstring_cast(meshUids[i]);
-  for (unsigned i=0; i<imageUids.size(); ++i)
-    retval << qstring_cast(imageUids[i]);
+  for (unsigned i=0; i<sorted.size(); ++i)
+    retval << sorted[i]->getUid();
   return retval;
+
+//  std::vector<QString> meshUids = ssc::dataManager()->getMeshUids();
+//  std::vector<QString> imageUids = ssc::dataManager()->getImageUids();
+//  QStringList retval;
+//  retval << "";
+//  for (unsigned i=0; i<meshUids.size(); ++i)
+//    retval << qstring_cast(meshUids[i]);
+//  for (unsigned i=0; i<imageUids.size(); ++i)
+//    retval << qstring_cast(imageUids[i]);
+//  return retval;
 }
 QString SelectDataStringDataAdapterBase::convertInternal2Display(QString internal)
 {
@@ -689,12 +700,19 @@ QString SelectMeshStringDataAdapter::getHelp() const
 }
 QStringList SelectMeshStringDataAdapter::getValueRange() const
 {
-  std::vector<QString> uids = ssc::dataManager()->getMeshUids();
+  std::vector<ssc::MeshPtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getMeshes());
   QStringList retval;
   retval << "";
-  for (unsigned i=0; i<uids.size(); ++i)
-    retval << qstring_cast(uids[i]);
+  for (unsigned i=0; i<sorted.size(); ++i)
+    retval << sorted[i]->getUid();
   return retval;
+
+//  std::vector<QString> uids = ssc::dataManager()->getMeshUids();
+//  QStringList retval;
+//  retval << "";
+//  for (unsigned i=0; i<uids.size(); ++i)
+//    retval << qstring_cast(uids[i]);
+//  return retval;
 }
 QString SelectMeshStringDataAdapter::convertInternal2Display(QString internal)
 {
