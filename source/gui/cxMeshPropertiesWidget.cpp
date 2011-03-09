@@ -16,7 +16,6 @@ namespace cx
 
 MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   QWidget(parent),
-//  mMeshComboBox(new QComboBox(this)),
   mMeshPropertiesGroupBox(new QGroupBox(this))
 {
   this->setObjectName("MeshPropertiesWidget");
@@ -27,16 +26,10 @@ MeshPropertiesWidget::MeshPropertiesWidget(QWidget* parent) :
   mSelectMeshWidget = SelectMeshStringDataAdapter::New();
   mSelectMeshWidget->setValueName("Surface: ");
   connect(mSelectMeshWidget.get(), SIGNAL(meshChanged(QString)), this, SLOT(meshSelectedSlot(const QString&)));
-
-//  //combobox
-//  mMeshComboBox->setEditable(false);
-//  mMeshComboBox->setEnabled(false);
-//  connect(mMeshComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(meshSelectedSlot(const QString&)));
   
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
-//  toptopLayout->addWidget(mMeshComboBox);
   toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mSelectMeshWidget));
 
   toptopLayout->addWidget(mMeshPropertiesGroupBox);
@@ -128,48 +121,6 @@ void MeshPropertiesWidget::setColorSlotDelayed()
   }
 }
 
-//void MeshPropertiesWidget::visibilityChangedSlot(bool visible)
-//{
-//  if(visible)
-//  {
-//    connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateMeshComboBoxSlot()));
-//    this->populateMeshComboBoxSlot();
-//  }
-//  else
-//  {
-//    disconnect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateMeshComboBoxSlot()));
-//  }
-//}
-  
-//// mMeshCombobox duplicates the functionality of the combobox in the
-//// cxContectDockWidget. Should be merged with this later.
-//void MeshPropertiesWidget::populateMeshComboBoxSlot()
-//{
-//  //mMeshComboBox->blockSignals(true);
-//  mMeshComboBox->clear();
-//
-//  //get a list of meshes from the datamanager
-//  std::map<QString, ssc::MeshPtr> meshes = ssc::dataManager()->getMeshes();
-//  if(meshes.size() == 0)
-//  {
-//    mMeshComboBox->insertItem(1, QString("Import a mesh to begin..."));
-//    mMeshComboBox->setEnabled(false);
-//    return;
-//  }
-//
-//  mMeshComboBox->setEnabled(true);
-//
-//  //add these to the combobox
-//  typedef std::map<QString, ssc::MeshPtr>::iterator iterator;
-//  mMeshComboBox->insertItem(1, QString("<No mesh selected>"));
-//  int listPosition = 2;
-//  for(iterator i = meshes.begin(); i != meshes.end(); ++i)
-//  {
-//    mMeshComboBox->insertItem(listPosition, QString(i->first));
-//    listPosition++;
-//  }
-//  //mMeshComboBox->blockSignals(false);
-//}
 
 void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
 {
@@ -181,33 +132,9 @@ void MeshPropertiesWidget::meshSelectedSlot(const QString& comboBoxText)
   mMesh = mSelectMeshWidget->getMesh();
   mMeshPropertiesGroupBox->setEnabled(mMesh!=0);
 
-//  if(comboBoxText.isEmpty() || comboBoxText.endsWith("...")
-//     || comboBoxText.endsWith(">"))
-//  {
-//    mMeshPropertiesGroupBox->setEnabled(false);
-//    // Create empty current mesh
-//    mMesh.reset();
-//    return;
-//  }
-//  mMeshPropertiesGroupBox->setEnabled(true);
   if (!mMesh)
     return;
   
-//  QString meshId = comboBoxText;
-  
-//  //find the mesh
-//  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(meshId);
-//  if(!mesh)
-//  {
-//    ssc::messageManager()->sendError("Could not find the selected mesh in the DataManager: "+meshId);
-//    return;
-//  }
-//
-//  if(mMesh == mesh)
-//    return;
-  
-  //Set new current image
-//  mMesh = mesh;
   mParentFrameAdapter->setData(mMesh);
   mNameAdapter->setData(mMesh);
   mUidAdapter->setData(mMesh);
