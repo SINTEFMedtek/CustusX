@@ -9,6 +9,8 @@ class QVBoxLayout;
 class QLabel;
 class QSlider;
 
+#include "cxCameraStyle.h"
+
 namespace cx
 {
 
@@ -31,18 +33,18 @@ public:
 protected slots:
   void radioButtonToggledSlot(bool checked);
   void trackingConfiguredSlot();
-  void trackingInitializedSlot();
-  void trackingStartedSlot();
-  void trackingStoppedSlot();
+//  void trackingInitializedSlot();
+//  void trackingStartedSlot();
+//  void trackingStoppedSlot();
 
 
 protected:
   QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
 
-  //status
-  QGroupBox*    mTrackingStatusGroupBox; ///< widget for showing tracking status
-  QVBoxLayout*  mTrackingStatusGroupLayout; ///< layout for the trackingstatusgroupbox
-  QLabel*       mTrackingStatusLabel; ///< label showing tracking status
+//  //status
+//  QGroupBox*    mTrackingStatusGroupBox; ///< widget for showing tracking status
+//  QVBoxLayout*  mTrackingStatusGroupLayout; ///< layout for the trackingstatusgroupbox
+//  QLabel*       mTrackingStatusLabel; ///< label showing tracking status
 
   //camera settings
   QGroupBox*    mCameraGroupBox; ///< widget to put all camera specific settings
@@ -51,6 +53,11 @@ protected:
   QLabel*       mCameraOffsetLabel; ///< camera offset label
   QSlider*      mCameraOffsetSlider; ///< slider for adjusting the camera offset
   QVBoxLayout*  mCameraGroupLayout; ///< layout for the cameragroupbox
+
+  CameraStylePtr mCameraStyle;
+
+
+
 };
 }
 #endif /* CXNAVIGATIONWIDGET_H_ */
