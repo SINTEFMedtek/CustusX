@@ -15,28 +15,12 @@ ManualTool::ManualTool(const QString& uid, const QString& name) :
 	mOffset = 0;
 	mType = TOOL_MANUAL;
 	mVisible = false;
-	//mPolyData = ssc::DummyTool::createPolyData(140,10,10,3);
 	read3DCrossHair();
-//#if 1
-//    mType = TOOL_US_PROBE;
-//  //ssc::ProbeSector dummy(ssc::ProbeSector::tLINEAR, 100, 200, 100);
-//  ssc::ProbeData dummy(ssc::ProbeData::tSECTOR, 100, 300, M_PI_2);
-//  //ssc::ProbeSector dummy(ssc::ProbeSector::tSECTOR, 0, 200, M_PI_2);
-//
-//  dummy.mImage.mSpacing = Vector3D(0.928,0.928,1);
-//  //dummy.mImage.mSpacing = Vector3D(0.5,0.5,0);
-//  dummy.mImage.mSize = QSize(512,512);
-//  dummy.mImage.mOrigin_u = multiply_elems(Vector3D(dummy.mImage.mSize.width()/2, dummy.mImage.mSize.height()*0.8, 0), dummy.mImage.mSpacing);
-//
-//  mSector = dummy;
-//
-//#endif
 }
 
 ManualTool::~ManualTool()
 {
 }
-
 
 void ManualTool::read3DCrossHair()
 {
@@ -47,9 +31,8 @@ void ManualTool::read3DCrossHair()
 	  mCrossHair->AxesOn();
 	}
 	int s = 60;
-	//mCrossHair->SetModelBounds(-120,140,-120,140,-120,140);
 	mCrossHair->SetModelBounds(-s,s,-s,s,-s,s+mOffset);
-  mCrossHair->SetFocalPoint(0,0,mOffset);
+	mCrossHair->SetFocalPoint(0,0,mOffset);
 }
 
 //only used now by mouse or touch tool
@@ -58,13 +41,12 @@ void ManualTool::set_prMt(const Transform3D& prMt)
 {
 	QDateTime time;
 	double timestamp = (double) time.time().msec();
-  //std::cout << "manual tool set " << prMt << std::endl;
 
 	QMutexLocker locker(&mMutex);
 	m_prMt = prMt;
 	locker.unlock();
 
-	emit toolTransformAndTimestamp( prMt, timestamp );
+	emit toolTransformAndTimestamp(prMt, timestamp);
 }
 
 QString ManualTool::getGraphicsFileName() const
@@ -79,7 +61,6 @@ ssc::Tool::Type ManualTool::getType() const
 
 vtkPolyDataPtr ManualTool::getGraphicsPolyData() const
 {
-	//return mPolyData;
 	return mCrossHair->GetOutput();
 }
 
@@ -117,7 +98,6 @@ void ManualTool::setVisible(bool vis)
 	  return;
 	mVisible = vis;
 	emit toolVisible(mVisible);
-	//std::cout << "ManualTool::setVisible( " << vis << " )" << std::endl;
 }
 
 void ManualTool::setType(const Type& type)
@@ -133,15 +113,14 @@ bool ManualTool::isCalibrated() const
 
 ssc::ProbeData ManualTool::getProbeSector() const
 {
-  return mSector;
+	return mSector;
 }
 
 void ManualTool::setProbeSector(ssc::ProbeData sector)
 {
-  mSector = sector;
-  emit toolProbeSector();
+	mSector = sector;
+	emit toolProbeSector();
 }
-
 
 double ManualTool::getTimestamp() const
 {
@@ -159,25 +138,12 @@ void ManualTool::setTooltipOffset(double val)
 		return;
 	mOffset = val;
 	read3DCrossHair();
-//	mCrossHair->SetFocalPoint(0,0,mOffset);
 	emit tooltipOffset(mOffset);
 }
 
 ssc::Transform3D ManualTool::getCalibration_sMt() const
 {
-//	Transform3D Rz30 = createTransformRotateZ(M_PI/6);
-//	Transform3D Rz60 = createTransformRotateZ(2.0*M_PI/6);
-//	Transform3D Rx90 = createTransformRotateX(M_PI/2);
-//	Transform3D Ry90 = createTransformRotateY(M_PI/2);
-//	Transform3D Rz90 = createTransformRotateZ(M_PI/2);
-//	Transform3D T = createTransformTranslate(Vector3D(10,10,10));
-//	Transform3D sMt = (Rz30*Rx90*Ry90);
-//	std::cout << "sMt\n" << sMt << std::endl;
-//	return sMt*T;
-
-	//return createTransformTranslate(Vector3D(5,5,5));
 	return Transform3D();
 }
-
 
 }//end namespace
