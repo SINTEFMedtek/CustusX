@@ -11,8 +11,11 @@
 #include <map>
 #include <vector>
 #include <QDateTime>
+#include <QRegExp>
 #include "sscForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include "sscTime.h"
+#include "sscTypeConversions.h"
 
 namespace ssc
 {
@@ -21,6 +24,9 @@ ImagePtr resampleImage(ImagePtr image, const Vector3D spacing, QString uid="", Q
 ImagePtr resampleImage(ImagePtr image, Transform3D refMi);
 ImagePtr cropImage(ImagePtr image);
 
+/**
+ */
+QDateTime extractTimestamp(QString text);
 
 /**Assume T is ssc::DataPtr or a derived class.
  *
@@ -42,6 +48,35 @@ std::vector<T> sortOnAcquisitionTime(std::map<QString, T> input)
     retval.push_back(iter->second);
   return retval;
 }
+
+/**Assume T is ssc::DataPtr or a derived class.
+ *
+ * Return a vector of data sorted on acquisition time.
+ */
+template<class T>
+std::vector<T> sortOnGroupsAndAcquisitionTime(std::map<QString, T> input)
+{
+  typedef std::map<QString, T> DataMap;
+  std::map<QDateTime, DataMap> bin;
+
+  for (typename DataMap::iterator iter=input.begin(); iter!=input.end(); ++iter)
+  {
+    QDateTime binTS = extractTimestamp(iter->second->getUid());
+    bin[binTS].insert(*iter);
+  }
+
+
+  std::vector<T> retval;
+
+  for (typename std::map<QDateTime, DataMap>::iterator iter=bin.begin(); iter!=bin.end(); ++iter)
+  {
+    std::vector<T> localSorted = sortOnAcquisitionTime(iter->second);
+    std::copy(localSorted.begin(), localSorted.end(), back_inserter(retval));
+  }
+
+  return retval;
+}
+
 
 //vtkImageDataPtr CropAndClipImageTovtkImageData()
 

@@ -165,7 +165,7 @@ void ViewWrapper::contextMenuSlot(const QPoint& point)
   QMenu contextMenu(sender);
 
   //add actions to the actiongroups and the contextmenu
-  std::vector<ssc::DataPtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getData());
+  std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
   mLastDataActionUid = "________________________";
   for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
