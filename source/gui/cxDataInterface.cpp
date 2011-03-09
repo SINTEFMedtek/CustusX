@@ -153,7 +153,7 @@ SelectImageStringDataAdapterBase::SelectImageStringDataAdapterBase()
 }
 QStringList SelectImageStringDataAdapterBase::getValueRange() const
 {
-  std::vector<ssc::ImagePtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getImages());
+  std::vector<ssc::ImagePtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getImages());
 //  std::vector<QString> uids = ssc::dataManager()->getImageUids();
   QStringList retval;
   retval << "";
@@ -206,7 +206,7 @@ SelectDataStringDataAdapterBase::SelectDataStringDataAdapterBase()
 }
 QStringList SelectDataStringDataAdapterBase::getValueRange() const
 {
-  std::vector<ssc::DataPtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getData());
+  std::vector<ssc::DataPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getData());
   QStringList retval;
   retval << "";
   for (unsigned i=0; i<sorted.size(); ++i)
@@ -700,7 +700,7 @@ QString SelectMeshStringDataAdapter::getHelp() const
 }
 QStringList SelectMeshStringDataAdapter::getValueRange() const
 {
-  std::vector<ssc::MeshPtr> sorted = sortOnAcquisitionTime(ssc::dataManager()->getMeshes());
+  std::vector<ssc::MeshPtr> sorted = sortOnGroupsAndAcquisitionTime(ssc::dataManager()->getMeshes());
   QStringList retval;
   retval << "";
   for (unsigned i=0; i<sorted.size(); ++i)

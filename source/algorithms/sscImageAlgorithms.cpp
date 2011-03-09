@@ -139,5 +139,18 @@ ImagePtr cropImage(ImagePtr image)
 
 }
 
+/**
+ */
+QDateTime extractTimestamp(QString text)
+{
+  // retrieve timestamp as
+  QRegExp tsReg("[0-9]{8}T[0-9]{6}");
+  if (tsReg.indexIn(text)>0)
+  {
+    QDateTime datetime = QDateTime::fromString(tsReg.cap(0), ssc::timestampSecondsFormat());
+    return datetime;
+  }
+  return QDateTime();
+}
 
 } // namespace ssc
