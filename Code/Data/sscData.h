@@ -11,7 +11,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
 
-class QDateTime;
+#include <QDateTime>
 class QDomNode;
 
 namespace ssc
@@ -43,6 +43,7 @@ public:
 	void setUid(const QString& uid);
 	void setName(const QString& name);
 	void setFilePath(const QString& filePath);///< Set current file path to file
+	void setAcquisitionTime(QDateTime time);
 	void setRegistrationStatus(REGISTRATION_STATUS regStat);
 	//virtual void set_rMd(Transform3D rMd); ///< set the transformation from data to reference space
   virtual RegistrationHistoryPtr get_rMd_History();
@@ -75,6 +76,7 @@ protected:
 	QString mUid;
 	QString mName;
 	QString mFilePath;
+	QDateTime mAcquisitionTime;
 //	QString mParentFrame;
 
 	REGISTRATION_STATUS mRegistrationStatus;

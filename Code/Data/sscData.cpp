@@ -154,6 +154,10 @@ void Data::addXml(QDomNode& dataNode)
   filePathNode.appendChild(doc.createTextNode(mFilePath));
   dataNode.appendChild(filePathNode);
 
+  QDomElement acqTimeNode = doc.createElement("acqusitionTime");
+  acqTimeNode.appendChild(doc.createTextNode(mAcquisitionTime.toString(timestampMilliSecondsFormat())));
+  dataNode.appendChild(acqTimeNode);
+
 //  QDomElement parentFrameNode = doc.createElement("parentFrame");
 //  parentFrameNode.appendChild(doc.createTextNode(mParentFrame));
 //  dataNode.appendChild(parentFrameNode);
@@ -172,6 +176,9 @@ void Data::parseXml(QDomNode& dataNode)
   QDomNode registrationHistory = dataNode.namedItem("registrationHistory");
   m_rMd_History->parseXml(registrationHistory);
 
+  if (!dataNode.namedItem("acqusitionTime").toElement().isNull())
+    mAcquisitionTime = QDateTime::fromString(dataNode.namedItem("acqusitionTime").toElement().text(), timestampMilliSecondsFormat());
+
 //  if (!parentFrame.isEmpty())
 //  {
 //    m_rMd_History->addParentFrame(parentFrame);
@@ -184,6 +191,8 @@ void Data::parseXml(QDomNode& dataNode)
  */
 QDateTime Data::getAcquisitionTime() const
 {
+  if (!mAcquisitionTime.isNull())
+    return mAcquisitionTime;
   // quickie implementation: Assume uid contains time on format timestampSecondsFormat():
 
   // retrieve timestamp as
@@ -197,5 +206,11 @@ QDateTime Data::getAcquisitionTime() const
   }
   return QDateTime();
 }
+
+void Data::setAcquisitionTime(QDateTime time)
+{
+  mAcquisitionTime = time;
+}
+
 
 } // namespace ssc

@@ -24,6 +24,7 @@ QString timestampSecondsFormat();
  */
 QString timestampSecondsFormatNice();
 
+QString timestampMilliSecondsFormat();
 QString timestampMilliSecondsFormatNice();
 
 

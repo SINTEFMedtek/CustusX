@@ -15,6 +15,10 @@ QString timestampSecondsFormat()
 {
   return QString("yyyyMMdd'T'hhmmss");
 }
+QString timestampMilliSecondsFormat()
+{
+  return QString("yyyyMMdd'T'hhmmsszzz");
+}
 QString timestampSecondsFormatNice()
 {
   return QString("yyyy-MM-dd hh:mm:ss");

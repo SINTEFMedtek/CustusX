@@ -808,6 +808,7 @@ ImagePtr DataManagerImpl::createImage(vtkImageDataPtr data, QString uid, QString
   this->generateUidAndName(&uid, &name);
 
   ImagePtr retval = ImagePtr(new Image(uid, data, name));
+  retval->setAcquisitionTime(QDateTime::currentDateTime());
 
   QString filename = filePath + "/" + uid + ".mhd";
   retval->setFilePath(filename);
@@ -850,6 +851,7 @@ MeshPtr DataManagerImpl::createMesh(vtkPolyDataPtr data, QString uid, QString na
   this->generateUidAndName(&uid, &name);
 
   MeshPtr retval = MeshPtr(new Mesh(uid, name, data));
+  retval->setAcquisitionTime(QDateTime::currentDateTime());
 
   QString filename = filePath + "/" + uid + ".vtk";
   retval->setFilePath(filename);
