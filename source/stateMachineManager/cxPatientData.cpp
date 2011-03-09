@@ -319,16 +319,19 @@ ssc::DataPtr PatientData::importData(QString fileName)
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
   QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
-  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+//  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+  QString uid = strippedFilename+"_"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+//  std::cout << "new uid: " << uid << std::endl;
 
   if (ssc::dataManager()->getData(uid))
   {
-    ssc::messageManager()->sendWarning("Data with uid "+ uid + " already exists. Impoirt cancelled.");
+    ssc::messageManager()->sendWarning("Data with uid "+ uid + " already exists. Import cancelled.");
     return ssc::DataPtr();
   }
 
   // Read files before copy
   ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
+  data->setAcquisitionTime(QDateTime::currentDateTime());
 
   data->setShading(true);
 
