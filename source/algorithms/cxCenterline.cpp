@@ -36,7 +36,7 @@ void Centerline::postProcessingSlot()
     return;
   }
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_cl%1";
+  QString uid = mInput->getUid() + "_cl%1";
   QString name = mInput->getName()+" cl%1";
   mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
 

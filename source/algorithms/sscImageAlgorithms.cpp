@@ -42,7 +42,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
   rawResult->Update();
 //  rawResult->Print(std::cout);
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_or%1";
+  QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
   ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
   //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
@@ -74,7 +74,7 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
 
   if (uid.isEmpty())
   {
-    uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
+    uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
   ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
@@ -119,7 +119,7 @@ ImagePtr cropImage(ImagePtr image)
 
 //  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
 
-  QString uid = changeExtension(image->getUid(), "") + "_crop%1";
+  QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
   ImagePtr result = dataManager()->createImage(rawResult,uid, name);
   result->get_rMd_History()->setRegistration(image->get_rMd());
