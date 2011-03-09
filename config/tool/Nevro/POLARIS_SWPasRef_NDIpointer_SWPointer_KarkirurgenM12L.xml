@@ -11,5 +11,6 @@
 <toolfile type="polaris" reference="no">Tools/SW_Invite/01-117-0329_Planning-Navigator.xml</toolfile>
 <toolfile type="polaris" reference="no">Tools/SW_Invite/07-081-0223_New_Intraoperative-Navigator.xml</toolfile>
 <toolfile type="polaris" reference="no">../Tools/Vivid7_Karkirurgen_M12L_8700449_water.xml</toolfile>
-
+<toolfile type="polaris" reference="no">Tools/SW_Invite/04-116-0326_Large-Custom-Navigator.xml</toolfile>
+<toolfile type="polaris" reference="no">Tools/SW_Invite/05-080-0214_Small-Custom-Navigator.xml</toolfile>
 </configuration>

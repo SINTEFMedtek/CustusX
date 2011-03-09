@@ -13,6 +13,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxInteractiveClipper.h
     cxInteractiveCropper.h
     cxCameraControl.h
+    cxCameraStyle.h
 )
 
 SET ( ${LIB}_viewManager
@@ -45,6 +46,8 @@ SET ( ${LIB}_viewManager
     cxInteractiveCropper.cpp
     cxCameraControl.h
     cxCameraControl.cpp
+    cxCameraStyle.h
+    cxCameraStyle.cpp
     cxRenderTimer.h
     cxRenderTimer.cpp
     )
