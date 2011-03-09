@@ -33,7 +33,7 @@ void Segmentation::postProcessingSlot()
 {
   vtkImageDataPtr rawResult = this->getResult();
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_seg%1";
+  QString uid = mInput->getUid() + "_seg%1";
   QString name = mInput->getName()+" seg%1";
   mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
   if(!mOutput)
