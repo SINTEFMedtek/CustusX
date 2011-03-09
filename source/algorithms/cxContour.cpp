@@ -49,7 +49,7 @@ void Contour::postProcessingSlot()
     return;
   }
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_ge%1";
+  QString uid = mInput->getUid() + "_ge%1";
   QString name = mInput->getName() + " ge%1";
   mOutput = ssc::dataManager()->createMesh(cubesPolyData, uid, name, "Images");
 
