@@ -6,6 +6,7 @@
 
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
+#include "sscVtkHelperClasses.h"
 
 namespace ssc
 {
@@ -31,9 +32,14 @@ public:
 	virtual bool hasTool(ToolPtr tool) const;
 	virtual ToolPtr getTool();
 	ToolTracerPtr getTracer();
-  void setSphereRadius(double radius);
+	void setSphereRadius(double radius);
 
-  void setStayHiddenAfterVisible(bool val);
+	void setTooltipPointColor(Vector3D c) { mTooltipPointColor = c; }
+	void setOffsetPointColor(Vector3D c) { mOffsetPointColor = c; }
+	void setOffsetLineColor(Vector3D c) { mOffsetLineColor = c; }
+	void setOffsetStipplePattern(int pattern) { mStipplePattern = pattern; }
+
+	void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
 
@@ -41,7 +47,7 @@ protected:
 	ToolRep3D(const QString& uid, const QString& name="");
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
-  bool showProbe();
+	bool showProbe();
 
 private slots:
 	/**
@@ -57,7 +63,6 @@ private slots:
 	 */
 	void receiveVisible(bool visible);
 	void tooltipOffsetSlot(double val); ///< receive the virtual tool tip extension.
-//	void streamLoadedSlot();
 
 private:
 	void update();
@@ -71,7 +76,7 @@ private:
 	GraphicalPoint3DPtr mTooltipPoint;
 	GraphicalPoint3DPtr mOffsetPoint;
 	GraphicalLine3DPtr mOffsetLine;
-  bool mStayHiddenAfterVisible;
+	bool mStayHiddenAfterVisible;
 	bool mStayVisibleAfterHide;
 	bool mOffsetPointVisibleAtZeroOffset;
 	ToolTracerPtr mTracer;
@@ -80,8 +85,11 @@ private:
 	ProbeSectorPtr mProbeSector;
 	vtkPolyDataMapperPtr mProbeSectorPolyDataMapper;
 	vtkActorPtr mProbeSectorActor;
-  RealTimeStreamGraphicsPtr mRTStream;
-
+	RealTimeStreamGraphicsPtr mRTStream;
+	Vector3D mTooltipPointColor;
+	Vector3D mOffsetPointColor;
+	Vector3D mOffsetLineColor;
+	int mStipplePattern;
 };
 } // namespace ssc
 

@@ -20,7 +20,11 @@ namespace ssc
 {
 
 ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
-  RepImpl(uid, name)
+  RepImpl(uid, name),
+  mTooltipPointColor(1.0, 0.8, 0.0),
+  mOffsetPointColor(1.0, 0.8, 0.0),
+  mOffsetLineColor(1.0, 0.8, 0.0),
+  mStipplePattern(0xFFFF)
 {
   mSphereRadius = 2;
   mStayHiddenAfterVisible = false;
@@ -111,7 +115,7 @@ void ToolRep3D::setTool(ToolPtr tool)
     mToolActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
     if (mTool->getType() == Tool::TOOL_MANUAL)
     {
-      mToolActor->GetProperty()->SetColor(1.0, 0.8, 0.0);
+      mToolActor->GetProperty()->SetColor(mTooltipPointColor.begin());
     }
 
     receiveTransforms(mTool->get_prMt(), 0);
@@ -149,15 +153,15 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
 
   mOffsetPoint.reset(new GraphicalPoint3D(view->getRenderer()));
   mOffsetPoint->setRadius(mSphereRadius);
-  mOffsetPoint->setColor(Vector3D(1, 0.8, 0));
+  mOffsetPoint->setColor(mOffsetPointColor);
 
   mTooltipPoint.reset(new GraphicalPoint3D(view->getRenderer()));
   mTooltipPoint->setRadius(mSphereRadius);
-  mTooltipPoint->setColor(Vector3D(1, 0.8, 0)); //light green
-  //mTooltipPoint->setColor(Vector3D(0.25,0.87,0.16)); //light green
+  mTooltipPoint->setColor(mTooltipPointColor);
 
   mOffsetLine.reset(new GraphicalLine3D(view->getRenderer()));
-  mOffsetLine->setColor(Vector3D(1, 0.8, 0));
+  mOffsetLine->setColor(mOffsetLineColor);
+  mOffsetLine->setStipple(mStipplePattern);
 
   mTooltipPoint->getActor()->SetVisibility(false);
   mOffsetPoint->getActor()->SetVisibility(false);

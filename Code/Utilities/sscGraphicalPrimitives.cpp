@@ -13,25 +13,29 @@
 namespace ssc
 {
 
-GraphicalPoint3D::GraphicalPoint3D( vtkRendererPtr renderer )
+GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 {
 	mRenderer = renderer;
-	source = vtkSphereSourcePtr::New() ;
-	source->SetRadius( 4);
+	source = vtkSphereSourcePtr::New();
+	source->SetRadius(4);
 
-	mapper = vtkPolyDataMapperPtr::New() ;
-	mapper->SetInputConnection(source->GetOutputPort() );
+	mapper = vtkPolyDataMapperPtr::New();
+	mapper->SetInputConnection(source->GetOutputPort());
 
 	actor = vtkActorPtr::New();
 	actor->SetMapper(mapper);
 	if (mRenderer)
+	{
 		mRenderer->AddActor(actor);
+	}
 }
 
 GraphicalPoint3D::~GraphicalPoint3D()
 {
 	if (mRenderer)
+	{
 		mRenderer->RemoveActor(actor);
+	}
 }
 
 void GraphicalPoint3D::setRadius(int radius)
@@ -39,22 +43,19 @@ void GraphicalPoint3D::setRadius(int radius)
 	source->SetRadius(radius);
 }
 
-void GraphicalPoint3D::setColor(const Vector3D& color )
+void GraphicalPoint3D::setColor(Vector3D color)
 {
-	Vector3D c = color;
-	actor->GetProperty()->SetColor(c.begin());	
+	actor->GetProperty()->SetColor(color.begin());
 }
 
-void GraphicalPoint3D::setValue(const Vector3D& point)
+void GraphicalPoint3D::setValue(Vector3D point)
 {
-	Vector3D p = point;
-	actor->SetPosition(p.begin());
+	actor->SetPosition(point.begin());
 }
 
 Vector3D GraphicalPoint3D::getValue() const
 {
-	Vector3D pos (actor->GetPosition()) ;
-	return pos;
+	return Vector3D(actor->GetPosition());
 }
 
 vtkActorPtr GraphicalPoint3D::getActor()
@@ -87,18 +88,20 @@ GraphicalLine3D::~GraphicalLine3D()
 		mRenderer->RemoveActor(actor);
 }
 
-void GraphicalLine3D::setColor(const Vector3D& color)
+void GraphicalLine3D::setColor(Vector3D color)
 {
-	Vector3D c = color;
-	actor->GetProperty()->SetColor( c.begin() );
+	actor->GetProperty()->SetColor(color.begin());
 }
 
-void GraphicalLine3D::setValue( const Vector3D& point1, const Vector3D& point2 )
+void GraphicalLine3D::setValue(Vector3D point1, Vector3D point2)
 {
-	Vector3D c = point1;
-	Vector3D p = point2;
-	source->SetPoint1 ( c.begin() );
-	source->SetPoint2 ( p.begin() );
+	source->SetPoint1(point1.begin());
+	source->SetPoint2(point2.begin());
+}
+
+void GraphicalLine3D::setStipple(int stipple)
+{
+	actor->GetProperty()->SetLineStipplePattern(stipple);
 }
 
 vtkActorPtr GraphicalLine3D::getActor()
@@ -110,20 +113,13 @@ vtkActorPtr GraphicalLine3D::getActor()
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-Rect3D::Rect3D( vtkRendererPtr renderer, const Vector3D& color) //:
-//  a(renderer),
-//  b(renderer),
-//  c(renderer),
-//  d(renderer)
+Rect3D::Rect3D(vtkRendererPtr renderer, Vector3D color)
 {
   mRenderer = renderer;
-  //source = vtkLineSourcePtr::New();
-  mapper = vtkPolyDataMapperPtr::New() ;
-  actor = vtkActorPtr::New() ;
-  actor->GetProperty()->SetColor( Vector3D(color).begin() );
-
-  //mapper->SetInputConnection( source->GetOutputPort() );
-  actor->SetMapper (mapper );
+  mapper = vtkPolyDataMapperPtr::New();
+  actor = vtkActorPtr::New();
+  actor->GetProperty()->SetColor(color.begin());
+  actor->SetMapper(mapper);
   if (mRenderer)
     mRenderer->AddActor(actor);
 
@@ -135,15 +131,7 @@ Rect3D::Rect3D( vtkRendererPtr renderer, const Vector3D& color) //:
   mSide->InsertNextCell(5, cells);
 
   mPolyData->SetPoints(mPoints);
-  //mPolyData->SetPolys(mSide);
-  //mPolyData->SetLines(mSide);
-
   mapper->SetInput(mPolyData);
-
-//  a.setColor(color);
-//  b.setColor(color);
-//  c.setColor(color);
-//  d.setColor(color);
 }
 
 void Rect3D::setLine(bool on, int width)
@@ -172,7 +160,6 @@ void Rect3D::setSurface(bool on)
   }
 }
 
-
 Rect3D::~Rect3D()
 {
   if (mRenderer)
@@ -182,30 +169,16 @@ Rect3D::~Rect3D()
 void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
 {
   mPoints = vtkPointsPtr::New();
-//  mPoints->
-//  std::cout << "------------------------"<< std::endl;
-//  std::cout << M.coord(bb.corner(0,0,0)) << std::endl;
-//  std::cout << M.coord(bb.corner(0,1,0)) << std::endl;
-//  std::cout << M.coord(bb.corner(1,1,0)) << std::endl;
-//  std::cout << M.coord(bb.corner(1,0,0)) << std::endl;
-
   mPoints->InsertPoint(0, M.coord(bb.corner(0,0,0)).begin());
   mPoints->InsertPoint(1, M.coord(bb.corner(0,1,0)).begin());
   mPoints->InsertPoint(2, M.coord(bb.corner(1,1,0)).begin());
   mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
-//  mPoints->Update();
   mPolyData->SetPoints(mPoints);
   mPolyData->Update();
-
-//  a.setValue(M.coord(bb.corner(0,0,0)), M.coord(bb.corner(1,0,0)));
-//  b.setValue(M.coord(bb.corner(1,0,0)), M.coord(bb.corner(1,1,0)));
-//  c.setValue(M.coord(bb.corner(1,1,0)), M.coord(bb.corner(0,1,0)));
-//  d.setValue(M.coord(bb.corner(0,1,0)), M.coord(bb.corner(0,0,0)));
 }
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
 
 }
