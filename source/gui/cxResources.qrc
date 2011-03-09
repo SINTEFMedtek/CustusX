@@ -43,6 +43,10 @@
     <file>icons/patient_save.png</file>
     <file>icons/patient_load.png</file>
  
+ 
+    <file>icons/volume.png</file>
+    <file>icons/surface.png</file>
+
     <file>icons/screenshot-window.png</file>
     <file>icons/screenshot-screen.png</file>
  
