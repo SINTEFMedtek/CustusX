@@ -9,15 +9,17 @@
 #include "cxView3D.h"
 #include "cxViewManager.h"
 #include "sscToolManager.h"
+#include "sscDoubleWidgets.h"
+#include "cxDataInterface.h"
 
 namespace cx
 {
 NavigationWidget::NavigationWidget(QWidget* parent) :
     QWidget(parent),
     mVerticalLayout(new QVBoxLayout(this)),
-    mTrackingStatusGroupBox(new QGroupBox(tr("Tracking Status"), this)),
-    mTrackingStatusGroupLayout(new QVBoxLayout()),
-    mTrackingStatusLabel(new QLabel(tr("Configure tracker to begin..."), this)),
+//    mTrackingStatusGroupBox(new QGroupBox(tr("Tracking Status"), this)),
+//    mTrackingStatusGroupLayout(new QVBoxLayout()),
+//    mTrackingStatusLabel(new QLabel(tr("Configure tracker to begin..."), this)),
     mCameraGroupBox(new QGroupBox(tr("Camera Style"), this)),
     mDefaultCameraStyleRadioButton(new QRadioButton(tr("Default"), this)),
     mToolCameraStyleRadioButton(new QRadioButton(tr("Tool"), this)),
@@ -28,9 +30,11 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   this->setObjectName("NavigationWidget");
   this->setWindowTitle("Navigation Properties");
 
-  //tracking status
-  mTrackingStatusGroupBox->setLayout(mTrackingStatusGroupLayout);
-  mTrackingStatusGroupLayout->addWidget(mTrackingStatusLabel);
+  mCameraStyle.reset(new CameraStyle());
+
+//  //tracking status
+//  mTrackingStatusGroupBox->setLayout(mTrackingStatusGroupLayout);
+//  mTrackingStatusGroupLayout->addWidget(mTrackingStatusLabel);
 
   //camera setttings
   mCameraGroupBox->setLayout(mCameraGroupLayout);
@@ -44,10 +48,13 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
   mCameraGroupLayout->addWidget(mCameraOffsetSlider);
   mCameraGroupBox->setEnabled(false);
 
+  QWidget* toolOffsetWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset));
+
   //layout
   this->setLayout(mVerticalLayout);
-  mVerticalLayout->addWidget(mTrackingStatusGroupBox);
+//  mVerticalLayout->addWidget(mTrackingStatusGroupBox);
   mVerticalLayout->addWidget(mCameraGroupBox);
+  mVerticalLayout->addWidget(toolOffsetWidget);
   mVerticalLayout->addStretch();
 
   //connections
@@ -58,15 +65,19 @@ NavigationWidget::NavigationWidget(QWidget* parent) :
 
   connect(ssc::toolManager(), SIGNAL(configured()),
           this, SLOT(trackingConfiguredSlot()));
-  connect(ssc::toolManager(), SIGNAL(initialized()),
-          this, SLOT(trackingInitializedSlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()),
-          this, SLOT(trackingStartedSlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()),
-          this, SLOT(trackingStoppedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(initialized()),
+//          this, SLOT(trackingInitializedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(trackingStarted()),
+//          this, SLOT(trackingStartedSlot()));
+//  connect(ssc::toolManager(), SIGNAL(trackingStopped()),
+//          this, SLOT(trackingStoppedSlot()));
 }
 NavigationWidget::~NavigationWidget()
-{}
+{
+}
+
+// legg inn listen to activeLayoutChanged her.... og reset style
+
 void NavigationWidget::radioButtonToggledSlot(bool checked)
 {
   if(this->sender() == mDefaultCameraStyleRadioButton)
@@ -74,48 +85,48 @@ void NavigationWidget::radioButtonToggledSlot(bool checked)
     if(checked)
     {
       mCameraOffsetSlider->setDisabled(true);
+      mCameraStyle->setCameraStyle(CameraStyle::DEFAULT_STYLE);
 
-      View3D* view3D_1Ptr = viewManager()->get3DView();
-      view3D_1Ptr->setCameraStyle(View3D::DEFAULT_STYLE);
+//      View3D* view3D_1Ptr = viewManager()->get3DView();
+//      view3D_1Ptr->setCameraStyle(View3D::DEFAULT_STYLE);
       ssc::messageManager()->sendInfo("Default camera selected");
     }
   }
   else if(this->sender() == mToolCameraStyleRadioButton)
   {
-    View3D* view3D_1Ptr = viewManager()->get3DView();
+//    View3D* view3D_1Ptr = viewManager()->get3DView();
     if(checked)
     {
       mCameraOffsetSlider->setEnabled(true);
-      view3D_1Ptr->setCameraStyle(View3D::TOOL_STYLE, mCameraOffsetSlider->value());
-      connect(mCameraOffsetSlider, SIGNAL(valueChanged(int)),
-                 view3D_1Ptr, SLOT(setCameraOffsetSlot(int)));
+//      view3D_1Ptr->setCameraStyle(View3D::TOOL_STYLE, mCameraOffsetSlider->value());
+      mCameraStyle->setCameraStyle(CameraStyle::TOOL_STYLE, mCameraOffsetSlider->value());
+      connect(mCameraOffsetSlider, SIGNAL(valueChanged(int)), mCameraStyle.get(), SLOT(setCameraOffsetSlot(int)));
       ssc::messageManager()->sendInfo("Tool camera selected");
-    }else
+    }
+    else
     {
-      if(view3D_1Ptr)
-      {
-        disconnect(mCameraOffsetSlider, SIGNAL(valueChanged(int)),
-                   view3D_1Ptr, SLOT(setCameraOffsetSlot(int)));
-      }
+      disconnect(mCameraOffsetSlider, SIGNAL(valueChanged(int)), mCameraStyle.get(), SLOT(setCameraOffsetSlot(int)));
     }
 
   }
 }
+
 void NavigationWidget::trackingConfiguredSlot()
 {
   mCameraGroupBox->setEnabled(true);
-  mTrackingStatusLabel->setText("Configured");
+//  mTrackingStatusLabel->setText("Configured");
 }
-void NavigationWidget::trackingInitializedSlot()
-{
-  mTrackingStatusLabel->setText("Initialized");
-}
-void NavigationWidget::trackingStartedSlot()
-{
-  mTrackingStatusLabel->setText("Tracking...");
-}
-void NavigationWidget::trackingStoppedSlot()
-{
-  mTrackingStatusLabel->setText("Tracking stopped...");
-}
+//void NavigationWidget::trackingInitializedSlot()
+//{
+//  mTrackingStatusLabel->setText("Initialized");
+//}
+//void NavigationWidget::trackingStartedSlot()
+//{
+//  mTrackingStatusLabel->setText("Tracking...");
+//}
+//void NavigationWidget::trackingStoppedSlot()
+//{
+//  mTrackingStatusLabel->setText("Tracking stopped...");
+//}
+
 }
