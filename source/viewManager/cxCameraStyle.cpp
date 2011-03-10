@@ -100,7 +100,7 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
   ssc::Transform3D rMt = rMpr * prMt;
 
   double offset = mFollowingTool->getTooltipOffset();
-  std::cout << "offset " << offset << std::endl;
+//  std::cout << "offset " << offset << std::endl;
 
   ssc::Vector3D camera_r = rMt.coord(ssc::Vector3D(0,0,offset-mCameraOffset));
   ssc::Vector3D focus_r = rMt.coord(ssc::Vector3D(0,0,offset));
