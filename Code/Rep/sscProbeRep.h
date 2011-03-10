@@ -64,7 +64,7 @@ protected:
 	int                 mResolution;                      ///< used to divide the probing ray into pieces, default=1000
 	Vector3D            mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image
 	vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
-	vtkRendererPtr      mCurrentRenderer;                 ///< the renderer set to use
+//	vtkRendererPtr      mCurrentRenderer;                 ///< the renderer set to use
 	vtkSphereSourcePtr  mPickedPointSphereSource;
 	double mSphereRadius;
 	vtkEventQtSlotConnectPtr mConnections;                ///< used to sending signals and events between vtk and qt

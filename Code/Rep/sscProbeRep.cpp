@@ -36,7 +36,16 @@ ProbeRep::ProbeRep(const QString& uid, const QString& name) :
 	mPickedPointActor(NULL),
   mSphereRadius(2),
 	mConnections(vtkEventQtSlotConnectPtr::New())
-{}
+{
+  mPickedPointSphereSource = vtkSphereSourcePtr::New();
+  mPickedPointSphereSource->SetRadius(mSphereRadius);
+  vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
+  mapper->SetInputConnection(mPickedPointSphereSource->GetOutputPort());
+  mPickedPointActor = vtkActorPtr::New();
+  mPickedPointActor->SetMapper(mapper);
+  mPickedPointActor->GetProperty()->SetColor(0,0,1);
+}
+
 ProbeRep::~ProbeRep()
 {}
 QString ProbeRep::getType() const
@@ -63,26 +72,16 @@ void ProbeRep::setImage(ImagePtr image)
 {
 	if (image==mImage)
 		return;
-
-//	if (mImage)
-//	{
-//		disconnect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
-//				mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
-//	}
 	mImage = image;
-//  if (mImage)
-//  {
-//    mThreshold = (mImage->getPosMax()-mImage->getPosMin())/10;
-//    connect(this, SIGNAL(addPermanentPoint(double, double, double, unsigned int)),
-//        mImage.get(), SLOT(addLandmarkSlot(double, double, double, unsigned int)));
-//  }
 	if (mImage)
 	  mThreshold = mImage->getPosMin() + (mImage->getPosMax()-mImage->getPosMin())/10;
 }
+
 void ProbeRep::setResolution(const int resolution)
 {
 	mResolution = resolution;
 }
+
 void ProbeRep::setTool(ToolPtr tool)
 {
   if (tool==mTool)
@@ -189,8 +188,7 @@ void ProbeRep::makeLandmarkPermanent(unsigned index)
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
   //std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
-	vtkRenderWindowInteractorPtr iren =
-		vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
+	vtkRenderWindowInteractorPtr iren = vtkRenderWindowInteractor::SafeDownCast(renderWindowInteractor);
 
 	if(iren == NULL)
 		return;
@@ -200,14 +198,14 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	int pickedPoint[2]; //<x,y>
 	iren->GetEventPosition(pickedPoint); //mouse positions are measured in pixels
 
-	mCurrentRenderer = this->getRendererFromRenderWindow(*iren);
-	if(mCurrentRenderer == NULL)
+	vtkRendererPtr renderer = this->getRendererFromRenderWindow(*iren);
+	if(renderer == NULL)
 		return;
 
 //  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
   //std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
-	this->pickLandmark(clickPoint, mCurrentRenderer);
+	this->pickLandmark(clickPoint, renderer);
 }
 /**
  * @param x world coordinat, ref space
@@ -216,33 +214,8 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
-  if(mCurrentRenderer == NULL)
-    return;
-
-  if(mPickedPointActor == NULL )
-  {
-    mPickedPointSphereSource = vtkSphereSourcePtr::New();
-    mPickedPointSphereSource->SetRadius(mSphereRadius);
-    vtkPolyDataMapperPtr pickedPointMapper = vtkPolyDataMapperPtr::New();
-    pickedPointMapper->SetInputConnection(mPickedPointSphereSource->GetOutputPort());
-    mPickedPointActor = vtkActorPtr::New();
-    mPickedPointActor->SetMapper(pickedPointMapper);
-    mPickedPointActor->GetProperty()->SetColor(0,0,1);
-  }
-  if(mCurrentRenderer->HasViewProp(mPickedPointActor))
-      mCurrentRenderer->RemoveActor(mPickedPointActor);
-
   mPickedPointActor->SetPosition(x, y, z);
-  mCurrentRenderer->AddActor(mPickedPointActor);
-
-  //mCurrentRenderer->GetRenderWindow()->Render();
-
-  //update temporary point
-  mPickedPoint[0] = x;
-  mPickedPoint[1] = y;
-  mPickedPoint[2] = z;
-  //std::cout << "ProbeRep::showTemporaryPointSlot: pickpos = " << mPickedPoint << std::endl;
-//  std::cout << "ProbeRep::showTemporaryPointSlot E" << std::endl;
+  mPickedPoint = Vector3D(x,y,z);
 }
 /**
  * @param threshold sets a threshold for the probing ray
@@ -269,8 +242,9 @@ void ProbeRep::addRepActorsToViewRenderer(View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickLandmarkSlot(vtkObject*)));
- // std::cout << "ProbeRep::addRepActorsToViewRenderer"<< std::endl;
+  view->getRenderer()->AddActor(mPickedPointActor);
 }
+
 void ProbeRep::removeRepActorsFromViewRenderer(View* view)
 {
   if(view == NULL)
@@ -280,7 +254,8 @@ void ProbeRep::removeRepActorsFromViewRenderer(View* view)
                        vtkCommand::LeftButtonPressEvent,
                        this,
                        SLOT(pickLandmarkSlot(vtkObject*)));
- // std::cout << "ProbeRep::removeRepActorsFromViewRenderer"<< std::endl;
+  if (mPickedPointActor)
+    view->getRenderer()->RemoveActor(mPickedPointActor);
 }
 vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
