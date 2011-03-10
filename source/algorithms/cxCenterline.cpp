@@ -36,12 +36,12 @@ void Centerline::postProcessingSlot()
     return;
   }
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_cl%1";
+  QString uid = mInput->getUid() + "_cl%1";
   QString name = mInput->getName()+" cl%1";
   mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
 
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 

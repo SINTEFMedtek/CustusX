@@ -33,7 +33,7 @@ void Segmentation::postProcessingSlot()
 {
   vtkImageDataPtr rawResult = this->getResult();
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_seg%1";
+  QString uid = mInput->getUid() + "_seg%1";
   QString name = mInput->getName()+" seg%1";
   mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
   if(!mOutput)
@@ -43,7 +43,7 @@ void Segmentation::postProcessingSlot()
   }
 
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 

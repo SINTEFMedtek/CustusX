@@ -20,6 +20,7 @@
 #include "sscToolManager.h"
 #include "sscUtilHelpers.h"
 #include "sscToolManager.h"
+#include "sscCustomMetaImage.h"
 
 #include "cxViewManager.h"
 #include "cxRepManager.h"
@@ -27,6 +28,7 @@
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"
 #include "cxStateMachineManager.h"
+#include "cxToolManager.h"
 
 #include "sscMesh.h"
 #include <vtkPolyData.h>
@@ -57,8 +59,18 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
     return;
 
   mActivePatientFolder = activePatientFolder;
-  //TODO
-  //Update gui in some way to show which patient is active
+
+  QString loggingPath = this->getActivePatientFolder() + "/Logs/";
+  QDir loggingDir(loggingPath);
+  if (!loggingDir.exists())
+  {
+    loggingDir.mkdir(loggingPath);
+//    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
+  }
+  ToolManager::getInstance()->setLoggingFolder(loggingPath);
+  ssc::messageManager()->setLoggingFolder(loggingPath);
+
+  ssc::messageManager()->sendInfo("Set Active Patient: " + mActivePatientFolder);
 
   emit patientChanged();
 }
@@ -161,6 +173,16 @@ void PatientData::savePatient()
   }
 
   ssc::toolManager()->savePositionHistory();
+
+  // save position transforms into the mhd files.
+  // This hack ensures data files can be used in external programs without an explicit export.
+  ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
+  for (ssc::DataManager::ImagesMap::iterator iter=images.begin(); iter!=images.end(); ++iter)
+  {
+    //ssc::dataManager()->saveImage(iter->second, targetFolder);
+    ssc::CustomMetaImagePtr customReader = ssc::CustomMetaImage::create(mActivePatientFolder +"/"+ iter->second->getFilePath());
+    customReader->setTransform(iter->second->get_rMd());
+  }
 
   //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...
@@ -297,16 +319,19 @@ ssc::DataPtr PatientData::importData(QString fileName)
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
   QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
-  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+//  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
+  QString uid = strippedFilename+"_"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+//  std::cout << "new uid: " << uid << std::endl;
 
   if (ssc::dataManager()->getData(uid))
   {
-    ssc::messageManager()->sendWarning("Data with uid "+ uid + " already exists. Impoirt cancelled.");
+    ssc::messageManager()->sendWarning("Data with uid "+ uid + " already exists. Import cancelled.");
     return ssc::DataPtr();
   }
 
   // Read files before copy
   ssc::DataPtr data = ssc::dataManager()->loadData(uid, fileName, ssc::rtAUTO);
+  data->setAcquisitionTime(QDateTime::currentDateTime());
 
   data->setShading(true);
 
