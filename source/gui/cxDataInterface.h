@@ -500,9 +500,24 @@ public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
 
-private:
+protected:
   ssc::DataPtr mData;
 };
+
+typedef boost::shared_ptr<class SetParentFrameStringDataAdapter> SetParentFrameStringDataAdapterPtr;
+/** Adapter that force sets the parent frame of the given ssc::Data,
+ * i.e. overwriting history. Nice for initial definition
+ */
+class SetParentFrameStringDataAdapter : public ParentFrameStringDataAdapter
+{
+  Q_OBJECT
+public:
+  static SetParentFrameStringDataAdapterPtr New() { return SetParentFrameStringDataAdapterPtr(new SetParentFrameStringDataAdapter()); }
+  virtual ~SetParentFrameStringDataAdapter() {}
+public: // basic methods
+  virtual bool setValue(const QString& value);
+};
+
 
 typedef boost::shared_ptr<class DataNameEditableStringDataAdapter> DataNameEditableStringDataAdapterPtr;
 /** Adapter for displaying and changing name of a ssc::Data.

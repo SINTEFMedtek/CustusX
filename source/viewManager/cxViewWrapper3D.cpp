@@ -365,6 +365,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
+  DataLocations::getSettings()->setValue("showManualTool", visible);
   ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
@@ -530,18 +531,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
-   // ssc::messageManager()->sendDebug("ToolRep3D for tool "+tool->getName()+" added to view "+mView->getName()+".");
 
-//    flytt denne koden inn i tool3d. flytt rtrep inn i ssc
-//    if (!mRTStreamRep)
-//    {
-//      std::cout << "getting stream source: " << ssc::dataManager()->getStream("us_openigtlink_source") << std::endl;
-//      mRTStreamRep.reset(new ssc::RealTimeStreamRep("rtrep", "rtrep"));
-//    //  ssc::RealTimeStream2DRepPtr rtRep(new ssc::RealTimeStream2DRep("rtrep", "rtrep"));
-//      mRTStreamRep->setTool(tool);
-//      mRTStreamRep->setRealtimeStream(ssc::dataManager()->getStream("us_openigtlink_source"));
-//      mView->addRep(mRTStreamRep);
-//    }
   }
 }
 
@@ -587,33 +577,6 @@ void ViewWrapper3D::showPointPickerProbe(bool on)
     disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   }
 }
-
-
-//void ViewWrapper3D::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
-//{
-//  if (mode==ssc::rsNOT_REGISTRATED)
-//  {
-//    mView->removeRep(mPatientLandmarkRep);
-//    mView->removeRep(mImageLandmarkRep);
-//    mView->removeRep(mProbeRep);
-//
-//    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//  }
-//  if (mode==ssc::rsIMAGE_REGISTRATED)
-//  {
-//    mView->addRep(mPatientLandmarkRep);
-//    mView->addRep(mImageLandmarkRep);
-//    mView->addRep(mProbeRep);
-//
-//    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-//    this->dominantToolChangedSlot();
-//  }
-//  if (mode==ssc::rsPATIENT_REGISTRATED)
-//  {
-//    mView->addRep(mPatientLandmarkRep);
-//    mView->addRep(mImageLandmarkRep);
-//  }
-//}
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {

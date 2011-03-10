@@ -36,7 +36,7 @@ private:
   QString mFilename;
   QLabel* mUidLabel;
   QLabel* mNameLabel;
-  ParentFrameStringDataAdapterPtr mParentFrameAdapter;
+  SetParentFrameStringDataAdapterPtr mParentFrameAdapter;
   QPushButton* mImportTransformButton;
   QWidget* mParentFrameCombo;
   QPushButton* mOkButton;

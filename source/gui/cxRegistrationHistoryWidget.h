@@ -46,7 +46,6 @@ private:
   QString  debugDump();
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
-  bool validRegistrationType(QString type) const;
 
   typedef std::map<QDateTime,QString> TimeMap;
   TimeMap getRegistrationTimes();
@@ -65,11 +64,6 @@ private:
   QLabel* mInFrontLabel;
   QTextEdit* mTextEdit;
 
-  //
-//  QPushButton* mRewindButton;
-//  QPushButton* mRemoveButton;
-//  QPushButton* mForwardButton;
-//  QPushButton* mFastForwardButton;
   std::vector<ssc::RegistrationHistoryPtr> getAllRegistrationHistories();
   std::vector<ssc::RegistrationTransform> mergeHistory(const std::vector<ssc::RegistrationHistoryPtr>& allHistories);
 };

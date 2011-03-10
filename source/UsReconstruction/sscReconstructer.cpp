@@ -360,29 +360,48 @@ ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
 }
 
 /**
- * Pre:  mPos is sMpr
- * Post: mPos is uMpr
+ * Pre:  mPos is prMt
+ * Post: mPos is prMu
  */
-void Reconstructer::calibrate(QString calFilesPath)
+void Reconstructer::transformPositionsTo_prMu()
 {
-  // Calibration from tool space to localizer = sMt
-  Transform3D sMt = mFileReader->readTransformFromFile(calFilesPath+mCalFileName);
-  
   // Transform from image coordinate syst with origin in upper left corner
   // to t (tool) space. TODO check is u is ul corner or ll corner.
   ssc::Transform3D tMu = mFileData.mProbeData.get_tMu() * mFileData.mProbeData.get_uMv();
 
-  ssc::Transform3D sMu = sMt*tMu;
-  
-  //mPos is prMs
+  //mPos is prMt
   for (unsigned i = 0; i < mFileData.mPositions.size(); i++)
   {
     ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
-    ssc::Transform3D prMs = prMt * sMt.inv();
-    mFileData.mPositions[i].mPos = prMs * sMu;
+    mFileData.mPositions[i].mPos = prMt * tMu;
   }
   //mPos is prMu
 }
+
+///**
+// * Pre:  mPos is sMpr
+// * Post: mPos is uMpr
+// */
+//void Reconstructer::calibrate(QString calFilesPath)
+//{
+//  // Calibration from tool space to localizer = sMt
+//  Transform3D sMt = mFileReader->readTransformFromFile(calFilesPath+mCalFileName);
+//
+//  // Transform from image coordinate syst with origin in upper left corner
+//  // to t (tool) space. TODO check is u is ul corner or ll corner.
+//  ssc::Transform3D tMu = mFileData.mProbeData.get_tMu() * mFileData.mProbeData.get_uMv();
+//
+//  ssc::Transform3D sMu = sMt*tMu;
+//
+//  //mPos is prMs
+//  for (unsigned i = 0; i < mFileData.mPositions.size(); i++)
+//  {
+//    ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
+//    ssc::Transform3D prMs = prMt * sMt.inv();
+//    mFileData.mPositions[i].mPos = prMs * sMu;
+//  }
+//  //mPos is prMu
+//}
 
 
 /**
@@ -708,7 +727,7 @@ void Reconstructer::updateFromOriginalFileData()
   //this->calibrateTimeStamps(0.0, 1.0);
   this->applyTimeCalibration();
 
-  this->calibrate(mCalFilesPath);
+  this->transformPositionsTo_prMu();
 
   //mPos (in mPositions) is now prMu
 
