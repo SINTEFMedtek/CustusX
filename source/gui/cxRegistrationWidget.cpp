@@ -104,6 +104,7 @@ void RegistrationWidget::hideEvent(QHideEvent* event)
     disconnect(mCurrentImage.get(), SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkUpdatedSlot()));
     disconnect(mCurrentImage.get(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
   }
+  mCurrentImage.reset();
 }
 
 void RegistrationWidget::populateTheLandmarkTableWidget(ssc::ImagePtr image)
@@ -238,7 +239,7 @@ void RegistrationWidget::landmarkUpdatedSlot()
 
 void RegistrationWidget::updateAvarageAccuracyLabel()
 {
-  mAvarageAccuracyLabel->setText(tr("Avrage accuracy %1 mm").arg(this->getAvarageAccuracy()));
+  mAvarageAccuracyLabel->setText(tr("Average accuracy %1 mm").arg(this->getAvarageAccuracy()));
 }
 
 double RegistrationWidget::getAvarageAccuracy()
@@ -269,27 +270,34 @@ double RegistrationWidget::getAccuracy(QString uid)
 {
   if (!mCurrentImage)
     return 0;
-  ssc::Landmark masterLandmark = mCurrentImage->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
+
+  ssc::ImagePtr fixedData = boost::shared_dynamic_cast<ssc::Image>(registrationManager()->getFixedData());
+  if(!fixedData)
+    return 1000.0;
+
+  ssc::Landmark masterLandmark = fixedData->getLandmarks()[uid]; //TODO : sjekk ut masterimage etc etc
   ssc::Landmark targetLandmark = this->getTargetLandmarks()[uid];
   if(masterLandmark.getUid().isEmpty() || targetLandmark.getUid().isEmpty())
     return 1000.0;
 
   ssc::Vector3D p_master_master = masterLandmark.getCoord();
   ssc::Vector3D p_target_target = targetLandmark.getCoord();
-  ssc::Transform3D rMmaster = mCurrentImage->get_rMd();
+  ssc::Transform3D rMmaster = fixedData->get_rMd();
   ssc::Transform3D rMtarget = this->getTargetTransform();
 
   ssc::Vector3D p_target_r = rMtarget.coord(p_target_target);
   ssc::Vector3D p_master_r = rMmaster.coord(p_master_master);
 
-  ssc::Vector3D diff = p_target_r - p_master_r;
+  return (p_target_r - p_master_r).length();
 
-  double retval =
-      sqrt(pow(diff[0],2) +
-           pow(diff[1],2) +
-           pow(diff[2],2));
-
-  return retval;
+//  ssc::Vector3D diff = p_target_r - p_master_r;
+//
+//  double retval =
+//      sqrt(pow(diff[0],2) +
+//           pow(diff[1],2) +
+//           pow(diff[2],2));
+//
+//  return retval;
 }
 
 

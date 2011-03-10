@@ -138,7 +138,13 @@ void RegistrationManager::updateRegistration(QDateTime oldTime, ssc::Registratio
   QDomNode masterFrame = forest.getNode(masterFrameUid);
   QDomNode targetBase = forest.getOldestAncestorNotCommonToRef(target, masterFrame);
   std::vector<ssc::DataPtr> targetData = forest.getDataFromDescendantsAndSelf(targetBase);
-  ssc::messageManager()->sendInfo("Update Registration using master " + masterFrameUid + " with delta matrix\n"+qstring_cast(deltaTransform.mValue));
+
+  std::stringstream ss;
+  ss << "Update Registration using " << std::endl;
+  ss << "\tFixed:\t" << masterFrameUid << std::endl;
+  ss << "\tMoving:\t" << data->getUid() << std::endl;
+  ss << "\tDelta matrix (rMd'=Delta*rMd)\n"+qstring_cast(deltaTransform.mValue) << std::endl;
+  ssc::messageManager()->sendInfo(qstring_cast(ss.str()));
 
   // update the transform on all target data:
   for (unsigned i=0; i<targetData.size(); ++i)
@@ -292,6 +298,7 @@ void RegistrationManager::doPatientRegistration()
   }
 
   ssc::RegistrationTransform regTrans(rMpr, QDateTime::currentDateTime(), "Patient");
+  regTrans.mFixed = mFixedData->getUid();
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
@@ -344,6 +351,8 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
   ssc::Transform3D delta = rMd * image->get_rMd().inv();
 
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Image to Image");
+  regTrans.mFixed = mFixedData->getUid();
+  regTrans.mMoving = image->getUid();
   this->updateRegistration(mLastRegistrationTime, regTrans, image, qstring_cast(fixedImage->getUid()));
 
   mLastRegistrationTime = regTrans.mTimestamp;
@@ -417,6 +426,7 @@ void RegistrationManager::doFastRegistration_Translation()
   }
 
   ssc::RegistrationTransform regTrans(rMpr_old*pr_oldMpr_new, QDateTime::currentDateTime(), "Fast_Translation");
+  regTrans.mFixed = mFixedData->getUid();
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
@@ -480,6 +490,8 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
   ssc::Transform3D delta = linearTransform.inv();
   //std::cout << "delta:\n" << delta << std::endl;
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
+  regTrans.mFixed = mFixedData->getUid();
+  regTrans.mMoving = mMovingData->getUid();
   this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
 
   ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");

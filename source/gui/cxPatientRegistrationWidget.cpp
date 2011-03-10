@@ -36,7 +36,7 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
   //layout
-  mVerticalLayout->addWidget(new QLabel("Landmark patient registration will move the patient into the global coordinate system (r)."));
+//moved to help text  mVerticalLayout->addWidget(new QLabel("Landmark patient registration will move the patient into the global coordinate system (r)."));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);
@@ -56,6 +56,7 @@ QString PatientRegistrationWidget::defaultWhatsThis() const
       "<h3>Landmark based patient registration.</h3>"
       "<p>Sample points on the patient that corresponds to 3 or more landmarks already sampled in the data set. </p>"
       "<p><i>Point on the patient using a tool and click the Sample button.</i></p>"
+      "<p>Landmark patient registration will move the patient into the global coordinate system (r).</p>"
       "</html>";
 }
 

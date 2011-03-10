@@ -56,7 +56,6 @@ class ViewWrapper3D : public ViewWrapper
 public:
   ViewWrapper3D(int startIndex, ssc::View* view);
   virtual ~ViewWrapper3D();
-//  virtual void setRegistrationMode(ssc::REGISTRATION_STATUS mode);
   virtual ssc::View* getView();
   virtual double getZoom2D(){return -1.0;};
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
