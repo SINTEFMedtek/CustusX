@@ -56,6 +56,12 @@ QString DataLocations::getToolConfigFilePath()
   //std::cout << "getToolConfigFilePath: " << path.toStdString() << std::endl;
   return path;
 }
+
+QString DataLocations::getAudioConfigFilePath()
+{
+  QString path(getRootConfigPath()+"/audio/");
+  return path;
+}
   
 QString DataLocations::getShaderPath()
 {
