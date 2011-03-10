@@ -49,12 +49,12 @@ void Contour::postProcessingSlot()
     return;
   }
 
-  QString uid = ssc::changeExtension(mInput->getUid(), "") + "_ge%1";
+  QString uid = mInput->getUid() + "_ge%1";
   QString name = mInput->getName() + " ge%1";
   mOutput = ssc::dataManager()->createMesh(cubesPolyData, uid, name, "Images");
 
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-  mOutput->get_rMd_History()->addParentFrame(mInput->getUid());
+  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
 
   ssc::dataManager()->loadData(mOutput);
   ssc::dataManager()->saveMesh(mOutput, mOutputBasePath);

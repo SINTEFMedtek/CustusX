@@ -154,11 +154,6 @@ void RegistrationHistoryWidget::reconnectSlot()
   }
 }
 
-bool RegistrationHistoryWidget::validRegistrationType(QString type) const
-{
-  return (type!="Set Parent Frame")&&(type!="From MHD file");
-}
-
 /** get a map of all registration times and their corresponding descriptions.
  * Near-simultaneous times are filtered out, keeping only the newest in the group.
  */
@@ -175,18 +170,16 @@ std::map<QDateTime,QString> RegistrationHistoryWidget::getRegistrationTimes()
     std::vector<ssc::RegistrationTransform> current = allHistories[i]->getData();
     for (unsigned j=0; j<current.size(); ++j)
     {
-      if (!this->validRegistrationType(current[j].mType))
-        continue;
       retval[current[j].mTimestamp] = current[j].mType;
     }
     std::vector<ssc::ParentFrame> frames = allHistories[i]->getParentFrames();
     for (unsigned j=0; j<frames.size(); ++j)
     {
-      if (!this->validRegistrationType(frames[j].mType))
-        continue;
       retval[frames[j].mTimestamp] = frames[j].mType;
     }
   }
+
+  retval.erase(QDateTime());
 
   return retval;
 }
@@ -316,16 +309,14 @@ QString RegistrationHistoryWidget::debugDump()
   ss << "<html>";
   ss << "<p><i>";
   if (!this->getActiveTime().isValid())
-    ss << "Active time: Current";
+    ss << "Active time: Current \n";
   else
-    ss << "Active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "";
+    ss << "Active time: " << this->getActiveTime().toString(ssc::timestampSecondsFormatNice()) << "\n";
   ss << "</i></p>";
 
   ss << "<p><span style=\"color:blue\">";
   for (TimeMap::iterator iter=times.begin(); iter!=times.end(); ++iter)
   {
-    if (iter->first.isNull())
-      continue;
     if (iter->first > this->getActiveTime() && !addedBreak && this->getActiveTime().isValid())
     {
       ss << "</span> <span style=\"color:gray\">";
@@ -340,8 +331,8 @@ QString RegistrationHistoryWidget::debugDump()
   }
   ss << "</span></p>";
 
-//  std::cout << ss.str() << std::endl;
   return qstring_cast(ss.str());
+//  std::cout << ss.str() << std::endl;
 }
 
 /** jump forward to one second ahead of the NEXT registration

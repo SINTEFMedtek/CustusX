@@ -42,7 +42,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
   rawResult->Update();
 //  rawResult->Print(std::cout);
 
-  QString uid = ssc::changeExtension(image->getUid(), "") + "_or%1";
+  QString uid = image->getUid() + "_or%1";
   QString name = image->getName()+" or%1";
   ssc::ImagePtr oriented = ssc::dataManager()->createImage(rawResult, uid, name);
   //oriented->get_rMd_History()->setRegistration(reference->get_rMd());
@@ -51,7 +51,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
   oriented->mergevtkSettingsIntosscTransform();
 //  std::cout << "rMd finished oriented\n" << oriented->get_rMd() << std::endl;
   oriented->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  oriented->get_rMd_History()->addParentFrame(image->getUid());
+  oriented->get_rMd_History()->setParentFrame(image->getUid());
 
   return oriented;
 }
@@ -74,13 +74,13 @@ ImagePtr resampleImage(ssc::ImagePtr image, const Vector3D spacing, QString uid,
 
   if (uid.isEmpty())
   {
-    uid = ssc::changeExtension(image->getUid(), "") + "_res%1";
+    uid = image->getUid() + "_res%1";
     name = image->getName()+" res%1";
   }
   ssc::ImagePtr retval = ssc::dataManager()->createImage(rawResult, uid, name);
   retval->get_rMd_History()->setRegistration(image->get_rMd());
   retval->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  retval->get_rMd_History()->addParentFrame(image->getUid());
+  retval->get_rMd_History()->setParentFrame(image->getUid());
 
   //ssc::dataManager()->loadData(retval);
   //ssc::dataManager()->saveImage(retval, outputBasePath);
@@ -119,13 +119,13 @@ ImagePtr cropImage(ImagePtr image)
 
 //  vtkImageDataPtr rawResult = this->CropAndClipImageTovtkImageData();
 
-  QString uid = changeExtension(image->getUid(), "") + "_crop%1";
+  QString uid = image->getUid() + "_crop%1";
   QString name = image->getName()+" crop%1";
   ImagePtr result = dataManager()->createImage(rawResult,uid, name);
   result->get_rMd_History()->setRegistration(image->get_rMd());
   result->mergevtkSettingsIntosscTransform();
   result->resetTransferFunction(image->getTransferFunctions3D()->createCopy(), image->getLookupTable2D()->createCopy());
-  result->get_rMd_History()->addParentFrame(image->getUid());
+  result->get_rMd_History()->setParentFrame(image->getUid());
   //messageManager()->sendInfo("Created volume " + result->getName());
 
 //  dataManager()->loadData(result);
@@ -139,5 +139,18 @@ ImagePtr cropImage(ImagePtr image)
 
 }
 
+/**
+ */
+QDateTime extractTimestamp(QString text)
+{
+  // retrieve timestamp as
+  QRegExp tsReg("[0-9]{8}T[0-9]{6}");
+  if (tsReg.indexIn(text)>0)
+  {
+    QDateTime datetime = QDateTime::fromString(tsReg.cap(0), ssc::timestampSecondsFormat());
+    return datetime;
+  }
+  return QDateTime();
+}
 
 } // namespace ssc

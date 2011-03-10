@@ -82,7 +82,7 @@ void ToolManager::initializeManualTool()
     //adding a manual tool as default
     mManualTool.reset(new ManualToolAdapter("ManualTool"));
     (*mConfiguredTools)["ManualTool"] = mManualTool;
-    mManualTool->setVisible(true);
+    mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
     this->addInitializedTool("ManualTool");
   }
 
@@ -389,6 +389,7 @@ ssc::ToolPtr ToolManager::getDominantTool()
   return mDominantTool;
 }
 
+
 void ToolManager::setDominantTool(const QString& uid)
 {
   if(mDominantTool && mDominantTool->getUid() == uid)
@@ -425,7 +426,7 @@ void ToolManager::setDominantTool(const QString& uid)
       mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
 
     }
-    mManualTool->setVisible(true);
+    mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
   }
 
   mDominantTool = newTool;

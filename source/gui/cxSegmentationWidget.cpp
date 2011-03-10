@@ -586,11 +586,11 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
 
-  QString uid = ssc::changeExtension(centerlineImage->getUid(), "") + "_ge%1";
+  QString uid = centerlineImage->getUid() + "_ge%1";
   QString name = centerlineImage->getName() + " ge%1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
   mesh->setColor(mDefaultColor);
-  mesh->get_rMd_History()->addParentFrame(centerlineImage->getUid());
+  mesh->get_rMd_History()->setParentFrame(centerlineImage->getUid());
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, outputBasePath);
 
