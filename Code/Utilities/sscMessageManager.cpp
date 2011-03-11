@@ -227,24 +227,40 @@ void MessageManager::setLoggingFolder(QString absoluteLoggingFolderPath)
   this->openLogging(QFile::Append);
 }
 
+void MessageManager::setAudioSource(ssc::AudioPtr audioSource)
+{
+  mAudioSource = audioSource;
+}
+
+bool MessageManager::hasAudioSource() const
+{
+  return mAudioSource;
+}
+
 void MessageManager::sendInfo(QString info)
 {
   this->sendMessage(info, mlINFO, 1500);
 }
 
-void MessageManager::sendSuccess(QString success)
+void MessageManager::sendSuccess(QString success, bool mute)
 {
   this->sendMessage(success, mlSUCCESS, 1500);
+  if(!mute)
+    this->playSuccessSound();
 }
 
-void MessageManager::sendWarning(QString warning)
+void MessageManager::sendWarning(QString warning, bool mute)
 {
   this->sendMessage(warning, mlWARNING, 3000);
+  if(!mute)
+    this->playWarningSound();
 }
 
-void MessageManager::sendError(QString error)
+void MessageManager::sendError(QString error, bool mute)
 {
   this->sendMessage(error, mlERROR, 0);
+  if(!mute)
+    this->playErrorSound();
 }
   
 void MessageManager::sendDebug(QString debug)
@@ -273,14 +289,46 @@ void MessageManager::sendMessage(QString text, MESSAGE_LEVEL messageLevel, int t
   emit emittedMessage(message);
 }
 
-void MessageManager::sendSuccessSound()
+void MessageManager::playStartSound()
 {
-  //QSound::play("/Users/jbake/jbake/dev/CustusX3.git/config/Electro_bip.wav");
+  if(this->hasAudioSource())
+    mAudioSource->playStartSound();
 }
 
-void MessageManager::sendErrorSound()
+void MessageManager::playStopSound()
 {
-  //QSound::play("/Users/jbake/jbake/dev/CustusX3.git/config/Gromb.wav");
+  if(this->hasAudioSource())
+    mAudioSource->playStopSound();
+}
+
+void MessageManager::playCancelSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playCancelSound();
+}
+
+void MessageManager::playSuccessSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playSuccessSound();
+}
+
+void MessageManager::playWarningSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playWarningSound();
+}
+
+void MessageManager::playErrorSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playErrorSound();
+}
+
+void MessageManager::playScreenShotSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playScreenShotSound();
 }
 
 bool MessageManager::openLogging(QFile::OpenMode mode)
