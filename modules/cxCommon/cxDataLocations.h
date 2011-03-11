@@ -25,6 +25,7 @@ public:
   static QString getTestDataPath(); ///< return path to test data folder
   static QString getApplicationToolConfigPath(); ///< return path to tool config folder, based on choosen application
   static QString getToolConfigFilePath(); ///< return users path to tool config file
+  static QString getAudioConfigFilePath(); ///< return users path to audio config file
   static QString getShaderPath(); ///< return the path to installed shaders. empty string if not installed.
   static QString getAppDataPath(); ///< return path to global configuration data.
   static QSettingsPtr getSettings(); ///< return a settings object for global custusX data

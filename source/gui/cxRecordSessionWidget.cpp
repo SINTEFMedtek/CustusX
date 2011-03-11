@@ -5,7 +5,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include "sscTime.h"
-//#include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
@@ -16,7 +15,6 @@ namespace cx
 {
 RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescription) :
     QWidget(parent),
-    //mStartStopButton(new QPushButton("Start")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription)),
@@ -33,7 +31,6 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
   layout->addWidget(mDescriptionLine);
   layout->addWidget(mStartStopButton);
   layout->addWidget(mCancelButton);
-  //layout->addWidget(new ssc::LabeledComboBoxWidget(this, SelectRecordSessionStringDataAdapterPtr(new SelectRecordSessionStringDataAdapter())));
 
   mStartStopButton->setCheckable(true);
   connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
@@ -93,8 +90,8 @@ void RecordSessionWidget::cancelSlot()
   if(!this->isRecording() && !mPostProcessing)
     return;
 
-  std::cout << "cancel" << std::endl;
   this->reset();
+  ssc::messageManager()->playCancelSound();
   emit stopped();
 }
 
@@ -110,6 +107,8 @@ void RecordSessionWidget::startRecording()
   mStartStopButton->setText("Stop");
   mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
   mCancelButton->setEnabled(true);
+
+  ssc::messageManager()->playStartSound();
   emit started();
 }
 
@@ -126,6 +125,7 @@ void RecordSessionWidget::stopRecording()
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 
   this->reset();
+  ssc::messageManager()->playStopSound();
   emit stopped();
 
   emit newSession(session->getUid());
