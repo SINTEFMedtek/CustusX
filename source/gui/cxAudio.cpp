@@ -15,35 +15,32 @@ Audio::~Audio()
 
 void Audio::playStartSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"double_beep_1_(start).wav");
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Insert.wav");
 }
 
 void Audio::playStopSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"beep_1_(stop).wav");
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Remove.wav");
 }
 
 void Audio::playCancelSound()
 {
-  //TODO
-  //QSound::play(DataLocations::getAudioConfigFilePath()+"cancel_1.wav");
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Hardware Fail.wav");
 }
 
 void Audio::playSuccessSound()
 {
-  //TODO
-  //QSound::play(DataLocations::getAudioConfigFilePath()+"success_1.wav");
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Print complete.wav");
 }
 
 void Audio::playWarningSound()
 {
-  //TODO
-  //QSound::play(DataLocations::getAudioConfigFilePath()+"warning_1.wav");
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows xp Navigation.wav");
 }
 
 void Audio::playErrorSound()
 {
-  QSound::play(DataLocations::getAudioConfigFilePath()+"error_beep_1.wav");
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Critical Stop.wav");
 }
 
 void Audio::playScreenShotSound()
