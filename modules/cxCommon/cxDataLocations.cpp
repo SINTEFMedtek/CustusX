@@ -59,7 +59,8 @@ QString DataLocations::getToolConfigFilePath()
   
 QString DataLocations::getShaderPath()
 {
-  QString path(qApp->applicationDirPath()+"/../Resources/shaders");
+//  QString path(qApp->applicationDirPath()+"/../Resources/shaders");
+  QString path = getRootConfigPath()+"/shaders";
   if (QDir(path).exists())
     return path;
   return "";
