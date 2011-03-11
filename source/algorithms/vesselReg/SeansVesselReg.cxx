@@ -51,7 +51,7 @@ SeansVesselReg::SeansVesselReg(int lts_ratio, double stop_delta, double lambda, 
 SeansVesselReg::~SeansVesselReg()
 {}
 
-void SeansVesselReg::printOutResults(char* fileNamePrefix, vtkGeneralTransformPtr myConcatenation)
+void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation)
 {
 
   vtkMatrix4x4Ptr l_tempMatrix = vtkMatrix4x4Ptr::New();
@@ -71,12 +71,12 @@ void SeansVesselReg::printOutResults(char* fileNamePrefix, vtkGeneralTransformPt
   std::cout << "Filenameprefix: " << fileNamePrefix << std::endl;
 
   //std::string logsFolder = string_cast(cx::stateManager()->getPatientData()->getActivePatientFolder())+"/Logs/";
-  std::string logsFolder = "~/Patients/Logs/";
-  std::string nonLinearFile = logsFolder+fileNamePrefix;
+  //std::string logsFolder = "~/Patients/Logs/";
+  std::string nonLinearFile = fileNamePrefix.toStdString();
   nonLinearFile += "--NonLinear";
   nonLinearFile += ".txt";
 
-  std::string linearFile = logsFolder+fileNamePrefix;
+  std::string linearFile = fileNamePrefix.toStdString();
   linearFile += "--Linear";
   linearFile += ".txt";
 
@@ -349,7 +349,7 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPolyDataPtr tps
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
+bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target, QString logPath)
 {
   ssc::messageManager()->sendDebug("SOURCE: "+source->getUid());
   ssc::messageManager()->sendDebug("TARGET: "+target->getUid());
@@ -413,7 +413,7 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target)
   //Do EVERYTHING
   processAllStuff(sourcePolyData, targetPointLocator, myConcatenation);
 
-  printOutResults(cstring_cast(QString("Vessel_Based_Registration_Log_")), myConcatenation);
+  printOutResults(logPath + "/Vessel_Based_Registration_", myConcatenation);
 
   std::cout << "\n\n\nExecution time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " " << "seconds" << endl;
 
