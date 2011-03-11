@@ -398,8 +398,8 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
   QString format = ssc::timestampSecondsFormat();
   QString filename = QDateTime::currentDateTime().toString(format)+".png";
   pixmap.save(folder + "/" + filename, "png");
-  std::cout << "folder " << folder << std::endl;
   ssc::messageManager()->sendInfo("Saved screenshot to " + filename);
+  ssc::messageManager()->playScreenShotSound();
 }
 
 void MainWindow::manualToolPhysicalPropertiesSlot()
