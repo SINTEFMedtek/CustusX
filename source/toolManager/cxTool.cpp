@@ -13,8 +13,6 @@
 #include "sscProbeData.h"
 #include "cxToolManager.h"
 #include "cxProbe.h"
-//#include "cxDataLocations.h"
-//#include "cxCreateProbeDataFromConfiguration.h"
 
 namespace cx
 {
@@ -24,8 +22,6 @@ Tool::Tool(InternalStructure& internalStructure) :
   mValid(false),
   mTool(NULL),
   mToolObserver(ObserverType::New()),
-//  mTransforms(new Transform3DVector()),
-//  mTimestamps(new DoubleVector()),
   mPositionHistory(new ssc::TimedTransformMap()),
   mPolyData(NULL),
   m_prMt(new ssc::Transform3D()),
@@ -34,8 +30,6 @@ Tool::Tool(InternalStructure& internalStructure) :
   mAttachedToTracker(false),
   mTracked(false),
   mToolTipOffset(0)
-//  mProbeSector(ssc::ProbeSector()),
-//  mProbeSectorConfiguration("")
 {
   ssc::Tool::mUid = mInternalStructure.mUid;
   ssc::Tool::mName = mInternalStructure.mName;
@@ -49,20 +43,12 @@ Tool::Tool(InternalStructure& internalStructure) :
     mValid = true;
   }else
   {
-    ssc::messageManager()->sendError("Tool: "+ssc::Tool::mUid+" was created with invalid internal structure.");
+    ssc::messageManager()->sendError(ssc::Tool::mUid+" was created with invalid internal structure.");
     mValid = false;
   }
 
   mProbe = Probe::New(mInternalStructure.mInstrumentId, mInternalStructure.mInstrumentScannerId);
   connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
-//
-//  // Read ultrasoundImageConfigs.xml file
-//  QString xmlFileName = cx::DataLocations::getRootConfigPath()+QString("/tool/ProbeCalibConfigs.xml");
-//  mXml = new ProbeXmlConfigParser(xmlFileName);
-//
-//  QStringList configs = this->getUSSectorConfigList();
-//  if (!configs.isEmpty())
-//    this->setProbeSectorConfigIdString(configs[0]);
 }
 
 
