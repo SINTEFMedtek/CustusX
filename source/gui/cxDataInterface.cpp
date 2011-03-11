@@ -62,7 +62,7 @@ void DoubleDataAdapterActiveToolOffset::dominantToolChangedSlot()
 ssc::DoubleRange DoubleDataAdapterActiveToolOffset::getValueRange() const
 {
   double range = 200;
-  return ssc::DoubleRange(0,range,range/1000.0);
+  return ssc::DoubleRange(0,range,1);
 }
 
 //---------------------------------------------------------
