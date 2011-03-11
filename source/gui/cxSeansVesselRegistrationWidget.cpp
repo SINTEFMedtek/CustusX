@@ -6,8 +6,9 @@
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxRegistrationManager.h"
-
+#include "cxStateMachineManager.h"
 #include "cxTimedAlgorithm.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -85,7 +86,10 @@ void SeansVesselRegistrationWidget::registerSlot()
   int single_point_thre = 1; //TODO, add user interface
   bool verbose = 1; //TODO, add user interface
 
-  registrationManager()->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose);
+  ssc::messageManager()->sendDebug("Using lts_ratio: "+qstring_cast(lts_ratio));
+  QString logPath = stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/";
+
+  registrationManager()->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose, logPath);
 }
 
 QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
