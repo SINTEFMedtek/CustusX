@@ -436,7 +436,7 @@ void RegistrationManager::doFastRegistration_Translation()
   ssc::messageManager()->sendSuccess("Fast translation registration has been performed.");
 }
 
-void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose)
+void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose, QString logPath)
 {
 
   //Default values
@@ -472,7 +472,7 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
     return;
   }
 
-  bool success = vesselReg.doItRight(fixedData, movingData);
+  bool success = vesselReg.doItRight(fixedData, movingData, logPath);
   if(!success)
   {
     ssc::messageManager()->sendWarning("Vessel registration failed.");
