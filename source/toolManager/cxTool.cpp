@@ -254,8 +254,6 @@ void Tool::toolTransformCallback(const itk::EventObject &event)
     m_prMt = ssc::Transform3DPtr(new ssc::Transform3D(prMt));
 
     (*mPositionHistory)[timestamp] = *m_prMt;
-//    mTransforms->push_back(m_prMt);
-//    mTimestamps->push_back(timestamp);
 
 
     emit toolTransformAndTimestamp((*m_prMt), timestamp);
