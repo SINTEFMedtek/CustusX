@@ -28,6 +28,7 @@
 #include "sscSliceComputer.h"
 #include "sscGeometricRep2D.h"
 #include "sscTexture3DSlicerRep.h"
+#include "cxDataLocations.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT
   #define USE_2D_GPU_RENDER
@@ -177,7 +178,8 @@ void ViewWrapper2D::resetMultiSlicer()
   if (mMultiSliceRep)
     mView->removeRep(mMultiSliceRep);
   mMultiSliceRep = ssc::Texture3DSlicerRep::New("MultiSliceRep_"+mView->getName());
-  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+//  mMultiSliceRep->setShaderFile("/home/christiana/christiana/workspace/CustusX3/CustusX3/externals/ssc/Sandbox/Texture3DOverlay.frag");
+  mMultiSliceRep->setShaderFile(DataLocations::getShaderPath()+"/Texture3DOverlay.frag");
   mMultiSliceRep->setSliceProxy(mSliceProxy);
   mView->addRep(mMultiSliceRep);
   if (mViewGroup)
