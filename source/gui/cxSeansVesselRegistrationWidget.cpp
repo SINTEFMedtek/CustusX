@@ -16,6 +16,7 @@ namespace cx
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mLTSRatioSpinBox(new QSpinBox()),
+    mLinearCheckBox(new QCheckBox()),
     mRegisterButton(new QPushButton("Register")),
     mFixedImageLabel(new QLabel("Fixed image:")),
     mMovingImageLabel(new QLabel("Moving image:"))
@@ -25,18 +26,23 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(QWidget* parent) :
 
   connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
-  mLTSRatioSpinBox->setSingleStep(1);
-  mLTSRatioSpinBox->setValue(80);
-
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
   topLayout->addLayout(layout);
 
+  QPushButton* vesselRegOptionsButton = new QPushButton("Options", this);
+  vesselRegOptionsButton->setCheckable(true);
+
+  QGroupBox* vesselRegOptionsWidget = this->createGroupbox(this->createOptionsWidget(), "Seans vessel regsistration options");
+  connect(vesselRegOptionsButton, SIGNAL(clicked(bool)), vesselRegOptionsWidget, SLOT(setVisible(bool)));
+  //connect(vesselRegOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
+  vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
+
   layout->addWidget(mFixedImageLabel, 0, 0);
   layout->addWidget(mMovingImageLabel, 1, 0);
-  layout->addWidget(new QLabel("LTS Ratio: "), 2, 0);
-  layout->addWidget(mLTSRatioSpinBox, 2, 1);
-  layout->addWidget(mRegisterButton, 3, 0, 1, 2);
+  layout->addWidget(mRegisterButton, 2, 0);
+  layout->addWidget(vesselRegOptionsButton, 2, 1);
+  layout->addWidget(vesselRegOptionsWidget, 3, 0, 1, 2);
 }
 
 SeansVesselRegistrationWidget::~SeansVesselRegistrationWidget()
@@ -75,7 +81,7 @@ void SeansVesselRegistrationWidget::registerSlot()
   double stop_delta = 0.001; //TODO, add user interface
   double lambda = 0; //TODO, add user interface
   double sigma = 1.0; //TODO, add user interface
-  bool lin_flag = 1; //TODO, add user interface
+  bool lin_flag = mLinearCheckBox->isChecked(); //TODO, add user interface
   int sample = 1; //TODO, add user interface
   int single_point_thre = 1; //TODO, add user interface
   bool verbose = 1; //TODO, add user interface
@@ -84,6 +90,24 @@ void SeansVesselRegistrationWidget::registerSlot()
   QString logPath = stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/";
 
   registrationManager()->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose, logPath);
+}
+
+QWidget* SeansVesselRegistrationWidget::createOptionsWidget()
+{
+  QWidget* retval = new QWidget(this);
+  QGridLayout* layout = new QGridLayout(retval);
+
+  mLTSRatioSpinBox->setSingleStep(1);
+  mLTSRatioSpinBox->setValue(80);
+
+  mLinearCheckBox->setChecked(true);
+
+  layout->addWidget(new QLabel("LTS Ratio:"), 0 , 0);
+  layout->addWidget(mLTSRatioSpinBox, 0, 1);
+  layout->addWidget(new QLabel("Linear:"), 1 , 0);
+  layout->addWidget(mLinearCheckBox, 1, 1);
+
+  return retval;
 }
 
 }//namespace cx
