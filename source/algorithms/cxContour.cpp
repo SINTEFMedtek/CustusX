@@ -17,7 +17,7 @@
 namespace cx
 {
 Contour::Contour() :
-    ThreadedTimedAlgorithm<vtkPolyDataPtr>("centerline", 5)
+    ThreadedTimedAlgorithm<vtkPolyDataPtr>("surface", 5)
 {}
 
 Contour::~Contour()
