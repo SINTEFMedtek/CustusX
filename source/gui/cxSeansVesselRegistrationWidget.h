@@ -35,7 +35,10 @@ private slots:
   void registerSlot();
 
 private:
+  QWidget* createOptionsWidget();
+
   QSpinBox* mLTSRatioSpinBox;
+  QCheckBox* mLinearCheckBox;
   QPushButton* mRegisterButton;
   QLabel* mFixedImageLabel;
   QLabel* mMovingImageLabel;
