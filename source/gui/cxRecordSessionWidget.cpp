@@ -6,7 +6,6 @@
 #include <QVBoxLayout>
 #include "sscTime.h"
 #include "sscMessageManager.h"
-#include "cxAudio.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
 #include "cxStateMachineManager.h"
@@ -92,7 +91,7 @@ void RecordSessionWidget::cancelSlot()
     return;
 
   this->reset();
-  Audio::playCancelSound();
+  ssc::messageManager()->playCancelSound();
   emit stopped();
 }
 
@@ -109,7 +108,7 @@ void RecordSessionWidget::startRecording()
   mStartStopButton->setIcon(QIcon(":/icons/open_icon_library/png/64x64/actions/media-playback-stop.png"));
   mCancelButton->setEnabled(true);
 
-  Audio::playStartSound();
+  ssc::messageManager()->playStartSound();
   emit started();
 }
 
@@ -126,7 +125,7 @@ void RecordSessionWidget::stopRecording()
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 
   this->reset();
-  Audio::playStopSound();
+  ssc::messageManager()->playStopSound();
   emit stopped();
 
   emit newSession(session->getUid());

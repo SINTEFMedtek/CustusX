@@ -1,6 +1,8 @@
 #ifndef CXAUDIO_H_
 #define CXAUDIO_H_
 
+#include "sscAudio.h"
+
 namespace cx {
 /**
  * \class Audio
@@ -11,21 +13,21 @@ namespace cx {
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class Audio
+class Audio : public ssc::Audio
 {
 public:
   Audio();
   virtual ~Audio();
 
-  static void playStartSound();
-  static void playStopSound();
-  static void playCancelSound();
+  virtual void playStartSound();
+  virtual void playStopSound();
+  virtual void playCancelSound();
 
-  static void playSuccessSound();
-  static void playWarningSound();
-  static void playErrorSound();
+  virtual void playSuccessSound();
+  virtual void playWarningSound();
+  virtual void playErrorSound();
 
-  static void playScreenShotSound();
+  virtual void playScreenShotSound();
 };
 
 }//namespace cx
