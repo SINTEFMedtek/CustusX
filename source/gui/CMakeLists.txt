@@ -162,6 +162,8 @@ SET(${LIBNAME}_SRCS
     cxSoundSpeedConversionWidget.cpp
     cxSeansVesselRegistrationWidget.h
     cxSeansVesselRegistrationWidget.cpp
+    cxAudio.h
+    cxAudio.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.

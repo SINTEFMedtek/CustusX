@@ -48,6 +48,7 @@
 #include "cxRecordBaseWidget.h"
 #include "cxTrackedCenterlineWidget.h"
 #include "cxUSAcqusitionWidget.h"
+#include "cxAudio.h"
 #include "RTSource/cxRTSourceManager.h"
 
 namespace cx
@@ -67,7 +68,6 @@ MainWindow::MainWindow() :
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-//  mReconstructionWidget(new ssc::ReconstructionWidget(this, ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction"), DataLocations::getShaderPath())),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
@@ -78,6 +78,7 @@ MainWindow::MainWindow() :
   mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
 
   ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
+  ssc::messageManager()->setAudioSource(ssc::AudioPtr(new Audio()));
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
