@@ -20,12 +20,12 @@ Tracker::Tracker(InternalStructure internalStructure) :
   mInitialized(false),
   mTracking(false)
 {
-  #if defined (_WINDOWS)
+  #if defined WIN32
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber4 );
   #else
     mCommunication->SetPortNumber( igstk::SerialCommunication::PortNumber0 );
 
-  #endif //_WINDOWS
+  #endif //WIN32
 
   mCommunication->SetParity( igstk::SerialCommunication::NoParity );
   mCommunication->SetBaudRate( igstk::SerialCommunication::BaudRate115200 );

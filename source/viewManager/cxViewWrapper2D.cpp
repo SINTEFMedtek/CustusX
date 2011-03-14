@@ -30,10 +30,6 @@
 #include "sscTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
 
-#ifdef USE_GLX_SHARED_CONTEXT
-  #define USE_2D_GPU_RENDER
-#endif
-
 namespace cx
 {
 
@@ -169,6 +165,7 @@ void ViewWrapper2D::addReps()
   mView->addRep(mToolRep2D);
 }
 
+#ifdef USE_2D_GPU_RENDER
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
  *
@@ -186,6 +183,7 @@ void ViewWrapper2D::resetMultiSlicer()
     mMultiSliceRep->setImages(mViewGroup->getImages());
   this->viewportChanged();
 }
+#endif //USE_2D_GPU_RENDER
 
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
 {
