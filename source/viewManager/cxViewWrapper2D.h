@@ -16,6 +16,10 @@
 #include "sscMesh.h"
 #include "cxViewWrapper.h"
 
+#ifdef USE_GLX_SHARED_CONTEXT
+  #define USE_2D_GPU_RENDER
+#endif
+
 namespace cx
 {
 
@@ -71,8 +75,10 @@ private:
   virtual void imageRemoved(const QString& uid);
   virtual void meshRemoved(const QString& uid);
 
+#ifdef USE_2D_GPU_RENDER
   void resetMultiSlicer();
   ssc::Texture3DSlicerRepPtr mMultiSliceRep;
+#endif
 
   ssc::SliceProxyPtr mSliceProxy;
   ssc::SliceRepSWPtr mSliceRep;
