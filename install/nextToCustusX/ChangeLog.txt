@@ -1,0 +1,175 @@
+CustusX - Change Log
+
+CustusX - 3.1.2 (Released 2011-03-14) [ View Issues ]
+=====================================
+- 0000249: [Feature request] Data lists must be sorted (cas) - resolved.
+- 0000220: [Feature request] Gui for controlling parameter in vessel reg algorithm (jbake) - resolved.
+- 0000198: [Testing request] Acceptance test (jbake) - resolved.
+- 0000197: [User story] Perform an OR Procedure using centerline registration - neuro (cas) - resolved.
+- 0000178: [Feature request] Workflow states must remember desktop state. (jbake) - resolved.
+- 0000229: [Bug] Navigating by click and drag in anyplane is problematic (cas) - resolved.
+- 0000233: [Refactoring request] Binary checkbox in segmentation widget is not used (jbake) - resolved.
+- 0000234: [Bug] US Acquisition widget fails to understand it is ready if probe is held visible when tracking starts (cas) - resolved.
+- 0000236: [Feature request] Doppler recording on Vivid-7 draws a yellow box on the screen. (cas) - resolved.
+- 0000237: [Feature request] Patient name missing in gui (jbake) - resolved.
+- 0000238: [Refactoring request] Cleanup of view layouts (cas) - resolved.
+- 0000240: [Bug] US Acq widget not working before probe shown. (cas) - resolved.
+- 0000241: [Bug] vtk spheres in 3D too large. (cas) - resolved.
+- 0000242: [Bug] Crash in render() (jbake) - resolved.
+- 0000243: [Bug] 2d slice not updated when changing reg history. (cas) - resolved.
+- 0000245: [Bug] Surface properties widget shows uid (cas) - resolved.
+- 0000246: [Feature request] Snapshot button (cas) - resolved.
+- 0000248: [Feature request] Registration history: filter out parent frames. (cas) - resolved.
+- 0000250: [Feature request] Need feedback during centerline generation (jbake) - resolved.
+- 0000251: [Bug] mhd files need updates position info (cas) - resolved.
+- 0000252: [Bug] Manual tool shown after dominanttoolchange even if explicitliy hidden in 3D. (cas) - resolved.
+- 0000253: [Feature request] Landmarks used for data analysis (cas) - resolved.
+- 0000254: [Feature request] Improved user feedback in (landmark) registration (jbake) - resolved.
+- 0000255: [Feature request] More info in registration history (cas) - resolved.
+- 0000258: [Feature request] sound feedback (jbake) - resolved.
+- 0000261: [Feature request] Add an extra point to default 3D transfer function (olevs) - resolved.
+- 0000264: [Bug] ConsoleLog.txt incomplete (cas) - resolved.
+- 0000265: [Bug] "Still working on generating the centerline" appears for all algorith,s. (jbake) - resolved.
+- 0000269: [Feature request] Merge tool properties and Navigation (cas) - resolved.
+- 0000272: [Feature request] Store Vessel-vessel reg data to file (cas) - resolved.
+[30 issues]
+
+CustusX - 3.1.0 (Released 2011-02-21) [ View Issues ]
+=====================================
+- 0000189: [User story] Simple and sufficient quality US support using Vivid7 (jbake) - resolved.
+ - 0000207: [Bug] Test tracking timetagging (jbake) - resolved.
+ - 0000209: [Feature request] Enable us recordings with uncalibrated image/tracking sources (cas) - resolved.
+ - 0000208: [Feature request] Add time calibration (cas) - resolved.
+ - 0000206: [Bug] Timetagging of rt frames must be in the source. (jbake) - resolved.
+ - 0000194: [Task] Design and implement solution for effective GrabberServer. (jbake) - resolved.
+ - 0000193: [Task] Find out why grabberserver uses much CPU. (jbake) - resolved.
+ - 0000192: [Task] Test vivid7+epiphan (new) panel to find cause of diffs in images. (jbake) - resolved.
+ - 0000191: [Task] Us workflow gui improvements (cas) - resolved.
+ - 0000190: [Task] US gui improvements (cas) - resolved.
+- 0000219: [Feature request] Tools reference points directly into the point sampler (jbake) - resolved.
+- 0000205: [Feature request] Need to save 8bit data during acquisition. (cas) - resolved.
+- 0000200: [Bug] Registration history not robust (cas) - resolved.
+- 0000228: [Bug] Error message in us aacquisition when everything OK (cas) - resolved.
+- 0000199: [Refactoring request] Improve naming of mesh/countours/images etc in centerline reg (cas) - resolved.
+- 0000224: [Bug] Surface properties shows field values even if no mesh is selected (jbake) - resolved.
+- 0000223: [Bug] Import dialog don't work if the same data set (volume/mesh) is imported twice (even after the data set is deleted) (cas) - resolved.
+- 0000214: [Feature request] Change US speed. (jbake) - resolved.
+- 0000038: [Bug] Import data failure must not import data into custusX (cas) - resolved.
+- 0000221: [Feature request] Hotkeys for workflowsteps (jbake) - resolved.
+- 0000217: [Bug] Center Image/Center Tool also in 3D view (cas) - resolved.
+- 0000212: [Feature request] Add focus to 3D menu (cas) - resolved.
+- 0000211: [Feature request] 3D interaction mode (cas) - resolved.
+- 0000213: [Bug] Delete volume button doesnt work (cas) - resolved.
+- 0000215: [Bug] Remove "testimage" from rt view (cas) - resolved.
+- 0000216: [Bug] US RT 3D rep visible after tool !visible (cas) - resolved.
+- 0000218: [Bug] Probe sector has wrong scale in rt view. (cas) - resolved.
+- 0000201: [Bug] Console widget scrollbar scrolls (jbake) - resolved.
+- 0000203: [Bug] Cx3 never released it's images after writing them to disk (jbake) - resolved.
+[29 issues]
+
+CustusX - 3.0.12 alpha (Released 2010-09-22) [ View Issues ]
+============================================
+- 0000004: [Refactoring request] Regsitration Time Control Widget (cas) - resolved.
+- 0000042: [Bug] Image registration fails for several volumes. (cas) - resolved.
+- 0000046: [Feature request] New ACS layout for one active volume (jbake) - resolved.
+- 0000047: [Bug] Indicator for tool tracking status in ACS layout (jbake) - resolved.
+- 0000048: [Bug] Should have a sphere marker for tool tip in 3D window (jbake) - resolved.
+- 0000058: [Refactoring request] Remove Inria from the system (jbake) - resolved.
+- 0000064: [Refactoring request] Improve/create config folder structure (cas) - resolved.
+- 0000080: [Feature request] The viewmanager has a activeView, but it is only set when parsing and xml (jbake) - resolved.
+- 0000002: [Bug] Custom color in the transfer function widget (cas) - resolved.
+- 0000003: [Bug] ProbeRep is present in the 3D view regardless of the workflowstep (jbake) - resolved.
+- 0000005: [Bug] Save positions (jbake) - resolved.
+- 0000006: [Bug] Tool offset gui not connected correctly to dominant tool (cas) - resolved.
+- 0000007: [Refactoring request] Manual offset (for the patient registration) widget (jbake) - resolved.
+- 0000009: [Refactoring request] Statemachin for workflow control (jbake) - resolved.
+- 0000016: [Feature request] Store several coordinates and compare them (cas) - resolved.
+- 0000040: [Feature request] Move manual tool using click and move (cas) - resolved.
+- 0000050: [Feature request] Create presets for transfer functions (jbake) - resolved.
+- 0000051: [Feature request] The user should be able to save his transferfunction as a new preset. (olevs) - resolved.
+- 0000066: [Bug] We cannot open a new (clean) patient without restarting Cx3 (cas) - resolved.
+- 0000083: [Feature request] Automated installation of developer environment (cas) - resolved.
+- 0000088: [Refactoring request] Widgets are not handled uniformly (jbake) - resolved.
+- 0000092: [Refactoring request] need proper shutdown/destruction of custusx objects (cas) - resolved.
+- 0000094: [Bug] No error message when tools is missing from Tool folder. (jbake) - resolved.
+- 0000095: [Feature request] Get higher 3D resolution by using VTK 5.6 (when we get new GPUs) (cas) - resolved.
+- 0000097: [Feature request] Split Context widget into constituent parts. (jbake) - resolved.
+- 0000098: [Feature request] Add mesh functionality (olevs) - resolved.
+- 0000099: [Feature request] Place meshes correctly (cas) - resolved.
+- 0000100: [Feature request] Create first version of installer text files (olevs) - resolved.
+- 0000101: [Feature request] Ask user if folder should be converted to CX3 patient at load (olevs) - resolved.
+- 0000106: [Bug] Creating a new patient that don't end with .cx3 generates two patient folders (olevs) - resolved.
+- 0000107: [Feature request] Finish DataInterface (for DoubleDataAdapter) (cas) - resolved.
+- 0000108: [Bug] CustusX crashes if tracking is not stopped before quit (olevs) - resolved.
+- 0000124: [Feature request] The window-menu should have some headings (jbake) - resolved.
+- 0000125: [Feature request] Grouping in the Windows menu (jbake) - resolved.
+- 0000126: [Feature request] Tab list should be moved to the top. (cas) - resolved.
+- 0000127: [Refactoring request] File and Data menu, should be one menu? (jbake) - resolved.
+- 0000128: [Refactoring request] Object info in headings of widgets. (cas) - resolved.
+- 0000130: [Refactoring request] Widgets should have better names. (olevs) - resolved.
+- 0000131: [Refactoring request] Volume properties (old transferfunction widget) should have grouping (cas) - resolved.
+- 0000132: [Feature request] 6-plane cutting widget (cropping) (cas) - resolved.
+- 0000134: [Bug] ImageProperties displays wrong name (cas) - resolved.
+- 0000136: [Bug] Choice of tool config file in preferences is not remembered (cas) - resolved.
+- 0000145: [Refactoring request] Merge mesh and image (cas) - resolved.
+- 0000149: [Feature request] Preset TFs missing (olevs) - resolved.
+- 0000150: [Bug] Bugs in image registration (cas) - resolved.
+- 0000151: [Feature request] Store 3D camera view matrix. (cas) - resolved.
+- 0000154: [Bug] Emit warning when loading unsigned volume (olevs) - resolved.
+- 0000155: [Refactoring request] ConsoleWidget should use color coding and show timestamps (jbake) - resolved.
+- 0000158: [Feature request] Create coordinate system deps between data, proxy and RegistrationManager. (jbake) - resolved.
+- 0000159: [Feature request] Refactor out Manual Registration Offset to separate widget. (jbake) - resolved.
+- 0000160: [Feature request] Import data wizard (cas) - resolved.
+- 0000162: [Refactoring request] Refactor Registration Gui (jbake) - resolved.
+- 0000163: [Feature request] Gui for new registration method: Fast Registration. (jbake) - resolved.
+- 0000167: [Feature request] Integrate widget into new framework, update VesselRegistration widget GUI. (jbake) - resolved.
+- 0000168: [Feature request] Use datamanager + views for managing meshes/images. (cas) - resolved.
+- 0000171: [Feature request] Implement Ingerid center-center algorithm. Apply. Update. Finish. (cas) - resolved.
+- 0000183: [General] Export aneurysme dataset using Osirix to get Ingerid tags in mhd (cas) - resolved.
+- 0000010: [Feature request] Need easy setup of connection to position tracking system (cas) - resolved.
+- 0000029: [Feature request] Tracking without a referenceframe (jbake) - resolved.
+- 0000032: [Feature request] Thunder VNN reconstruction takes longer to perform (olevs) - resolved.
+- 0000033: [Feature request] Meshes must have color and alpha value (olevs) - resolved.
+- 0000034: [Bug] Tool view, causes problems with the tool representations (jbake) - resolved.
+- 0000043: [Bug] GPU reconstruction framework don't work on WIndows (olevs) - resolved.
+- 0000044: [Bug] CustusX should perform a re-registration when a registration marker changes active status (jbake) - resolved.
+- 0000049: [Feature request] Add layers in ACS windows (olevs) - resolved.
+- 0000052: [Feature request] Preset as seen in Osirix (vr Muscles-Bones) (jbake) - resolved.
+- 0000055: [Testing request] Need to test that Aurora patient reg. works (jbake) - resolved.
+- 0000059: [Bug] It's problematic to enter values in the input fields in reconstruction widget (cas) - resolved.
+- 0000063: [Bug] ToolManager requires toolfiles to be in both toolconfig/Tool and toolconfig/Lab (jbake) - resolved.
+- 0000070: [Testing request] Can we track with two applications connected to the tracker at the same time? (jbake) - resolved.
+- 0000072: [Testing request] Test to see if we can track with Aurora without a refrence tool set (jbake) - resolved.
+- 0000073: [Bug] ToolManager reports that it is configured even without a tracker (jbake) - resolved.
+- 0000074: [Bug] When loading a previously generated patient folder (.cx3) the slices are not visible (jbake) - resolved.
+- 0000075: [Refactoring request] Cannot remove dependency vtkInria3D from the project (olevs) - resolved.
+- 0000076: [Feature request] Integrate USacquisition module in CustusX (jbake) - resolved.
+- 0000077: [Bug] Cannot open communication with Aurora. (jbake) - resolved.
+- 0000084: [Feature request] Enable set/get/use/store us reconstruction parameters (cas) - resolved.
+- 0000087: [Bug] When switching from toolview to default, tool 3d representation woun't show (jbake) - resolved.
+- 0000113: [Bug] IGSTK log files are too large in release mode (jbake) - resolved.
+- 0000114: [Feature request] Start and stop tracking should be the same button (cas) - resolved.
+- 0000117: [Bug] The dimensions in reconstructed US volumes are not correct (olevs) - resolved.
+- 0000123: [Bug] Reconstructed US volume is incorrect when position data are missing (olevs) - resolved.
+- 0000129: [Bug] Active image is not highlighted in browserwidget. (cas) - resolved.
+- 0000135: [Bug] Showing multiple volumes in one view-group leads to problems with selecting active image by clicking on a 2D view (jbake) - resolved.
+- 0000137: [Bug] It is only possible to create two reconstructions of the same data set (olevs) - resolved.
+- 0000139: [General] Remove image data from the project (jbake) - resolved.
+- 0000140: [General] Move SSC from svn to git (jbake) - resolved.
+- 0000142: [Bug] Tool 3D Rep not visble in the 3D view (jbake) - resolved.
+- 0000161: [Feature request] Fast registration (cas) - resolved.
+- 0000166: [Feature request] User Story: Vessel Registration (jbake) - resolved.
+- 0000169: [Feature request] Finish segmentation algorithm in a separate class (test in separate widget). Create both volume and mesh. (olevs) - resolved.
+ - 0000180: [Bug] Fix color of created surfaces (always blue) (olevs) - resolved.
+- 0000170: [Feature request] Finish centerline algorithm. Visualize. (olevs) - resolved.
+- 0000172: [Feature request] Integrate algorithms onto vessel registration. (jbake) - resolved.
+- 0000173: [Bug] Average accuracy is wrong when we have a not-active landmark (jbake) - resolved.
+- 0000175: [Bug] Global shading in preferences (jbake) - resolved.
+- 0000176: [Bug] Rightclicking while waiting for importwizard (cas) - resolved.
+- 0000177: [Bug] Crash after using "Reset desktop" button (cas) - resolved.
+- 0000182: [Bug] Register the centerline with most points to centerline with least points (cas) - resolved.
+- 0000184: [Bug] Something is wrong with the centerline algo (olevs) - resolved.
+- 0000185: [Feature request] Create point-presentation of centerlines (jbake) - resolved.
+- 0000186: [Refactoring request] Minor tweaking of the registration gui (jbake) - resolved.
+- 0000146: [Feature request] Mask definition in reconstruction incomplete (cas) - resolved.
+[103 issues]
