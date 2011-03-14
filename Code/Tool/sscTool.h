@@ -133,8 +133,8 @@ public:
 
 	virtual TimedTransformMap getSessionHistory(double startTime, double stopTime){Q_UNUSED(startTime); Q_UNUSED(stopTime); return TimedTransformMap();}; ///< Get a tools transforms from within a given session
 
-#ifdef _WINDOWS
-  typedef ssc::utils::Transform3D Transform3D;
+#ifdef WIN32
+  typedef ssc::Transform3D Transform3D;
 #endif
 
 signals:

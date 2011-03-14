@@ -49,8 +49,8 @@ public:
 	Transform3D get_sMr(); ///< get slice transform, i.e. the matrix sMr transforming a point p in ref to slice space.
 	void printSelf(std::ostream & os, Indent indent);
 
-#ifdef _WINDOWS
-  typedef ssc::utils::Transform3D Transform3D;
+#ifdef WIN32
+  typedef ssc::Transform3D Transform3D;
 #endif
 
 signals:
