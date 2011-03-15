@@ -49,6 +49,7 @@ public:
 
   void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
   void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
+  double mapThroughLUT(double x, int lutSize);
 
   OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function
   ColorMapPtr getColorMap();///< \return The values of the color transfer function
@@ -74,6 +75,8 @@ private:
   double mLevel;
   double mAlpha;
  // vtkLookupTablePtr mLut;
+  double loadAttribute(QDomNode dataNode, QString name, double defVal);
+  void fillLUTFromMaps(vtkLookupTablePtr output);
 
   OpacityMapPtr mOpacityMapPtr;
   ColorMapPtr mColorMapPtr;

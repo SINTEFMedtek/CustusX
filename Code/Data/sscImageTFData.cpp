@@ -11,6 +11,7 @@
 #include <QStringList>
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkLookupTable.h>
 
 #include "sscVector3D.h"
 
@@ -90,6 +91,12 @@ void ImageTFData::addXml(QDomNode dataNode)
 
   dataNode.appendChild(alphaNode);
   dataNode.appendChild(colorNode);
+
+  QDomElement elem = dataNode.toElement();
+  elem.setAttribute("window", mWindow);
+  elem.setAttribute("level", mLevel);
+  elem.setAttribute("llr", mLLR);
+  elem.setAttribute("alpha", mAlpha);
 }
 
 void ImageTFData::parseXml(QDomNode dataNode)
@@ -140,9 +147,23 @@ void ImageTFData::parseXml(QDomNode dataNode)
     std::cout << std::endl;
   }
 
+  mWindow = this->loadAttribute(dataNode, "window", mWindow);
+  mLevel = this->loadAttribute(dataNode, "level", mLevel);
+  mLLR = this->loadAttribute(dataNode, "llr", mLLR);
+  mAlpha = this->loadAttribute(dataNode, "alpha", mAlpha);
+
 //  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
+double ImageTFData::loadAttribute(QDomNode dataNode, QString name, double defVal)
+{
+  QString text = dataNode.toElement().attribute(name);
+  bool ok;
+  double val = text.toDouble(&ok);
+  if (ok)
+    return val;
+  return defVal;
+}
 
 /**Set Low Level Reject, meaning the lowest intensity
  * value that will be visible.
@@ -273,5 +294,63 @@ void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf)
   for (IntIntMap::iterator iter = mOpacityMapPtr->begin(); iter != mOpacityMapPtr->end(); iter++)
     tf->AddPoint(iter->first, iter->second/255.0 );
 }
+
+double ImageTFData::mapThroughLUT(double x, int lutSize)
+{
+  double y = (mLLR - (mLevel - mWindow/2))/mWindow * lutSize;
+  return y;
+}
+
+/**rebuild the output lut from all inputs.
+ */
+void ImageTFData::fillLUTFromMaps(vtkLookupTablePtr output)
+{
+  double b0 = mLevel-mWindow/2.0;
+  double b1 = mLevel+mWindow/2.0;
+
+  // find LLR on the lut:
+  // We want to use the LLR on the _input_ intensity data, not on the
+  // mapped data. Thus we map the llr through the lut and insert that value
+  // into the lut.
+//  double llr = mapThroughLUT(mLLR);
+  // if LLR < minimum table range, even the first value in the LUT will climb
+  // above the llr. To avoid this, we use a hack that sets llr to at least 1.
+  // This causes all zeros to become transparent, but the alternative is worse.
+  // (what we really need is to subclass vtkLookupTable,
+  //  but it contains nonvirtual functions).
+//  llr = std::max(1.0, llr); // hack.
+
+  int N = 0;
+  if (!mColorMapPtr->empty())
+    N = mColorMapPtr->rend()->first; // largest key value in color map
+  output->Build();
+  output->SetNumberOfTableValues(N);
+  output->SetTableRange(b0,b1);
+
+  vtkColorTransferFunctionPtr colorFunc = vtkColorTransferFunctionPtr::New();
+  this->fillColorTFFromMap(colorFunc);
+  vtkPiecewiseFunctionPtr alphaFunc = vtkPiecewiseFunctionPtr::New();
+  this->fillOpacityTFFromMap(alphaFunc);
+
+  for (int i=0; i<N; ++i)
+  {
+    double rgba[4];
+    double* rgb = colorFunc->GetColor(i);
+    double a = alphaFunc->GetValue(i);
+    a = this->mapThroughLUT(a, N);
+
+//    mBaseLUT->GetTableValue(i, rgba);
+
+//    if (i >= llr)
+//      rgba[ 3 ] = 0.9999;
+//    else
+//      rgba[ 3 ] = 0.001;
+
+    output->SetTableValue(i, rgb[0], rgb[1], rgb[2], a);
+  }
+  output->Modified();
+
+}
+
 
 }
