@@ -30,19 +30,26 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
 TransferFunctionWidget::~TransferFunctionWidget()
 {}
 
+void TransferFunctionWidget::activeImageChangedSlot()
+{
+  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
+  ssc::ImageTFDataPtr tf;
+  if (image)
+    tf = image->getTransferFunctions3D()->getData();
+  else
+    image.reset();
+
+  mTransferFunctionAlphaWidget->setData(image, tf);
+  mTransferFunctionColorWidget->setData(image, tf);
+}
+
 void TransferFunctionWidget::init()
 {
 	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
 	mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),
-          mTransferFunctionAlphaWidget, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)),
-          mTransferFunctionColorWidget, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
-          mTransferFunctionAlphaWidget, SLOT(activeImageTransferFunctionsChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
-          mTransferFunctionColorWidget, SLOT(activeImageTransferFunctionsChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
   
   mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding, 
                                               QSizePolicy::MinimumExpanding);
