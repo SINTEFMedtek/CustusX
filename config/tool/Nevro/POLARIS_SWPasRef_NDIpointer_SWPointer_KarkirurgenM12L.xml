@@ -6,11 +6,11 @@
   <type>Polaris</type>
 </tracker>
 
-<toolfile type="polaris" reference="yes">../Tools/02-206-00913_SW_PasRef_01.xml</toolfile>
-<toolfile type="polaris" reference="no">../Tools/8700340.xml</toolfile>
-<toolfile type="polaris" reference="no">Tools/SW_Invite/01-117-0329_Planning-Navigator.xml</toolfile>
-<toolfile type="polaris" reference="no">Tools/SW_Invite/07-081-0223_New_Intraoperative-Navigator.xml</toolfile>
-<toolfile type="polaris" reference="no">../Tools/Vivid7_Karkirurgen_M12L_8700449_water.xml</toolfile>
-<toolfile type="polaris" reference="no">Tools/SW_Invite/04-116-0326_Large-Custom-Navigator.xml</toolfile>
-<toolfile type="polaris" reference="no">Tools/SW_Invite/05-080-0214_Small-Custom-Navigator.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Nevro/SW-Invite/SW-RefFrame-02-077-0191_POLARIS/SW-RefFrame-02-077-0191_POLARIS.xml/</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Shared/NDI-Pointer-8700340_POLARIS/NDI-Pointer-8700340_POLARIS.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Nevro/SW-Invite/SW-Planning-Navigator_01-117-0329_POLARIS/SW-Planning-Navigator_01-117-0329_POLARIS.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Nevro/SW-Invite/SW-Intraoperative-Navigator-07-081-0223_POLARIS/SW-Intraoperative-Navigator-07-081-0223_POLARIS.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Shared/M12L-Probe-8700449_Vivid7-Karkirurgen_POLARIS/M12L-Probe-8700449_Vivid7-Karkirurgen_POLARIS.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Nevro/SW-Invite/SW-Large-Custom-Navigator-04-116-0326_POLARIS/SW-Large-Custom-Navigator-04-116-0326_POLARIS.xml</toolfile>
+<toolfile type="polaris" reference="yes">../Tools/Nevro/SW-Invite/SW-Small-Custom-Navigator-05-080-0214_POLARIS/SW-Small-Custom-Navigator-05-080-0214_POLARIS.xml</toolfile>
 </configuration>
