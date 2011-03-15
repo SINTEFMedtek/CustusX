@@ -50,7 +50,7 @@ public:
 	void printSelf(std::ostream & os, Indent indent);
 
 #ifdef WIN32
-  typedef ssc::Transform3D Transform3D;
+  typedef ssc::Transform3D Transform3D; 
 #endif
 
 signals:
