@@ -11,7 +11,9 @@
 #include <QMouseEvent>
 #include "sscDataManager.h"
 #include "sscImageTF3D.h"
+#include "sscImageTFData.h"
 #include "sscMessageManager.h"
+#include "sscUtilHelpers.h"
 
 namespace cx
 {
@@ -27,20 +29,37 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
 }
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 {}
-void TransferFunctionAlphaWidget::activeImageChangedSlot()
+
+//void TransferFunctionAlphaWidget::activeImageChangedSlot()
+//{
+//  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+//  if(mCurrentImage == activeImage)
+//    return;
+//
+//  mCurrentImage = activeImage;
+//  //TODO: call update or not ???
+//  this->update();
+//
+//  if (!mCurrentImage)
+//    return;
+//  if ((mCurrentImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
+//      (activeImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
+//    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
+//}
+
+
+void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData)
 {
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  if(mCurrentImage == activeImage)
+  if(mImage == image)
     return;
 
-  mCurrentImage = activeImage;
-  //TODO: call update or not ???
+  mImage = image;
+  mImageTF = tfData;
   this->update();
 
-  if (!mCurrentImage)
-    return;
-  if ((mCurrentImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
-      (activeImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
+  if ((mImage &&
+       mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
+      (mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
     ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
 }
   
@@ -100,9 +119,9 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
     if((event->x() >= mPlotArea.left()) &&
        (event->x() <= (mPlotArea.width()+mPlotArea.left())))
     {
-      if(mCurrentImage)
+      if(mImage)
       {
-        mCurrentAlphaPoint.value = int(mCurrentImage->getRange() *
+        mCurrentAlphaPoint.value = int(mImage->getRange() *
                                        (event->x() - mPlotArea.left()) / 
                                        static_cast<double>(mPlotArea.width()) );
         // mCurrentAlphaPoint.position set at mousePressEvent() 
@@ -116,7 +135,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 {
   // Don't do anything before we have an image
 	// May also be fixed by not calling TransferFunctionAlphaWidget constructor till we have an image
-  if (!mCurrentImage)
+  if (!mImage)
     return;
   
   QWidget::paintEvent(event);
@@ -135,7 +154,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 	
   // Draw histogram
 	// with log compression
-  vtkImageAccumulatePtr histogram = mCurrentImage->getHistogram();
+  vtkImageAccumulatePtr histogram = mImage->getHistogram();
 	int histogramSize = histogram->GetComponentExtent()[1] - 
                       histogram->GetComponentExtent()[0];
 	//std::cout << "histogramSize " << histogramSize << std::endl;
@@ -156,10 +175,10 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 	
   double posMult = (width() - mBorder*2) / double(histogramSize);
 	//for (int i = mCurrentImage->getPosMin(); i <= mCurrentImage->getPosMax(); i++)
-  for (int i = mCurrentImage->getMin(); i <= mCurrentImage->getMax(); i++)//TODO: replace with above line
+  for (int i = mImage->getMin(); i <= mImage->getMax(); i++)//TODO: replace with above line
 	{
 //		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
-    x = ((i- mCurrentImage->getMin()) * posMult); //Offset with min value
+    x = ((i- mImage->getMin()) * posMult); //Offset with min value
     y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1)) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
@@ -174,10 +193,10 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 
   // Go through each point and draw squares and lines
 
-  OpacityMapPtr opacityMap = mCurrentImage->getTransferFunctions3D()->getOpacityMap();
+  ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
   QPoint lastScreenPoint;
   this->mPointRects.clear();
-  for (IntIntMap::iterator opPoint = opacityMap->begin();
+  for (ssc::IntIntMap::iterator opPoint = opacityMap->begin();
        opPoint != opacityMap->end();
        opPoint++)
   {
@@ -185,10 +204,10 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
     QPoint screenPoint = QPoint(
       static_cast<int>(mPlotArea.left() + mPlotArea.width() * 
                        opPoint->first / 
-                       static_cast<double>(mCurrentImage->getRange())),
+                       static_cast<double>(mImage->getRange())),
       static_cast<int>(mPlotArea.bottom() - mPlotArea.height() * 
                        opPoint->second / 
-                       static_cast<double>(mCurrentImage->getMaxAlphaValue())) );
+                       static_cast<double>(mImage->getMaxAlphaValue())) );
 		
 		//std::cout << "x: " << opPoint->first  << " y: " << opPoint->second << std::endl;
 		//std::cout << "Screen x: " << screenPoint.x() << " y: " << screenPoint.y() << std::endl;
@@ -241,11 +260,11 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
   AlphaPoint point;
 
   point.position = 
-    static_cast<int>( mCurrentImage->getRange() * 
+    static_cast<int>( mImage->getRange() *
                      (mCurrentClickX - mPlotArea.left()) / 
                      static_cast<double>(mPlotArea.width()) );
   point.value = 
-    static_cast<int>( mCurrentImage->getMaxAlphaValue() * 
+    static_cast<int>( mImage->getMaxAlphaValue() *
                      (mPlotArea.bottom() - mCurrentClickY) / 
                      static_cast<double>(mPlotArea.height()) );
 
@@ -254,34 +273,37 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
   else if (point.position < mCurrentImage->getPosMin())
     point.position = mCurrentImage->getPosMin();*/
   //TODO: replace code with above code
-  if (point.position > mCurrentImage->getMax())
-    point.position = mCurrentImage->getMax();
-  else if (point.position < mCurrentImage->getMin())
-    point.position = mCurrentImage->getMin();
+//  if (point.position > mImage->getMax())
+//    point.position = mImage->getMax();
+//  else if (point.position < mImage->getMin())
+//    point.position = mImage->getMin();
+//
+//  if (point.value > mImage->getMaxAlphaValue())
+//    point.value = mImage->getMaxAlphaValue();
+//  else if (point.value < 0)
+//    point.value = 0;
 
-  if (point.value > mCurrentImage->getMaxAlphaValue())
-    point.value = mCurrentImage->getMaxAlphaValue();
-  else if (point.value < 0)
-    point.value = 0;
+  point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
+  point.value = ssc::constrainValue(point.value, 0, mImage->getMaxAlphaValue());
 
   return point;
 }
 void TransferFunctionAlphaWidget::toggleCurrentPoint()
 {
-  if(!mCurrentImage)
+  if(!mImage)
     return;
   if(!isInsideCurrentPoint())
   {
     // Outside any of the rectangles
     AlphaPoint point = getCurrentAlphaPoint();
-    mCurrentImage->getTransferFunctions3D()->addAlphaPoint(point.position,point.value);
+    mImageTF->addAlphaPoint(point.position,point.value);
   }
 	// mEndPoint is set in isInsideCurrentPoint()
   else if(!mEndPoint)
   {
     // Inside one of the rectangles
     if(mCurrentAlphaPoint.isValid())
-      mCurrentImage->getTransferFunctions3D()->removeAlphaPoint(mCurrentAlphaPoint.position);
+      mImageTF->removeAlphaPoint(mCurrentAlphaPoint.position);
   }
 
   this->update();
@@ -293,23 +315,23 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint()
 
   AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint();
 
-  ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
+  //ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
   
   // Max and min points may only be moved in y direction
   /*if(mCurrentAlphaPoint.position == mCurrentImage->getPosMin() 
      || mCurrentAlphaPoint.position == mCurrentImage->getPosMax() )*/
   //TODO: Replace with above code
-  if(mCurrentAlphaPoint.position == mCurrentImage->getMin() 
-     || mCurrentAlphaPoint.position == mCurrentImage->getMax() )
+  if(mCurrentAlphaPoint.position == mImage->getMin()
+     || mCurrentAlphaPoint.position == mImage->getMax() )
   {
-    transferFunction->setAlphaValue(mCurrentAlphaPoint.position, 
+    mImageTF->setAlphaValue(mCurrentAlphaPoint.position,
                                     newAlphaPoint.value);
   }
   else
   {
-    OpacityMapPtr opacityMap = transferFunction->getOpacityMap();
-    IntIntMap::iterator prevpoint = opacityMap->find(mCurrentAlphaPoint.position);
-    IntIntMap::iterator nextpoint = opacityMap->find(mCurrentAlphaPoint.position);
+    ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
+    ssc::IntIntMap::iterator prevpoint = opacityMap->find(mCurrentAlphaPoint.position);
+    ssc::IntIntMap::iterator nextpoint = opacityMap->find(mCurrentAlphaPoint.position);
     prevpoint--;
     nextpoint++;
 
@@ -318,8 +340,8 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint()
     else if (newAlphaPoint.position >= nextpoint->first)
       newAlphaPoint.position = nextpoint->first - 1;
 
-    transferFunction->removeAlphaPoint(mCurrentAlphaPoint.position);
-    transferFunction->addAlphaPoint(newAlphaPoint.position, newAlphaPoint.value);
+    mImageTF->removeAlphaPoint(mCurrentAlphaPoint.position);
+    mImageTF->addAlphaPoint(newAlphaPoint.position, newAlphaPoint.value);
 
     mCurrentAlphaPoint = newAlphaPoint;
   }
