@@ -70,11 +70,11 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	shading.parseXml(node.getElement().namedItem("shading"));
 	image->setShading(shading);
 
-  //Make sure min and max values for transferfunctions are set
-  transferFunctions->addAlphaPoint(image->getMin(), 0);
-  transferFunctions->addAlphaPoint(image->getMax(), 0);
-  transferFunctions->addColorPoint(image->getMin(), QColor(0,0,0));
-  transferFunctions->addColorPoint(image->getMax(), QColor(0,0,0));
+//  //Make sure min and max values for transferfunctions are set
+//  transferFunctions->addAlphaPoint(image->getMin(), 0);
+//  transferFunctions->addAlphaPoint(image->getMax(), 0);
+//  transferFunctions->addColorPoint(image->getMin(), QColor(0,0,0));
+//  transferFunctions->addColorPoint(image->getMax(), QColor(0,0,0));
 }
 
 /** look for a preset with the given name. Create one if not found.
