@@ -304,7 +304,39 @@ void ImageLUT2D::parseXml(QDomNode dataNode)
   mLLR = loadAttribute(dataNode, "llr", mLLR);
   mAlpha = loadAttribute(dataNode, "alpha", mAlpha);
 
-  //TODO: missing load of BaseLut
+//  std::map<int,QColor> input;
+//  QDomNode colorNode = dataNode.namedItem("color");
+//  // Read color node if it exists
+//  if (!colorNode.isNull() && !colorNode.toElement().text().isEmpty())
+//  {
+////    mColorMapPtr->clear();
+//    QStringList colorStringList = colorNode.toElement().text().split(" ");
+//    for (int i = 0; i < colorStringList.size(); i++)
+//    {
+//      QStringList pointStringList = colorStringList[i].split("=");
+//      QStringList valueStringList = pointStringList[1].split("/");
+//      input[pointStringList[0].toInt()] =
+//                    QColor(valueStringList[0].toInt(),
+//                           valueStringList[1].toInt(),
+//                           valueStringList[2].toInt());
+//    }
+//  }
+//
+//  if (!input.empty())
+//  {
+//    mBaseLUT->Build();
+//    mBaseLUT->SetNumberOfTableValues(input.size());
+//  //  mBaseLUT->SetTableRange(b0,b1);
+//
+//    for (int i=0; i<mBaseLUT->GetNumberOfTableValues(); ++i)
+//    {
+//      double rgba[4];
+//      mBaseLUT->GetTableValue(i, rgba);
+//
+//      mBaseLUT->SetTableValue(i, rgba);
+//    }
+//    mBaseLUT->Modified();
+//  }
 
   refreshOutput();
 }

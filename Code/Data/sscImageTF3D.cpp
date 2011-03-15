@@ -23,13 +23,61 @@
 namespace ssc
 {
 
+//void ColorTF::addXml(QDomNode dataNode)
+//{
+//  QDomDocument doc = dataNode.ownerDocument();
+//
+//  QStringList pointStringList;
+////  QDomElement colorNode = doc.createElement("color");
+//  // Add color points
+//  for (ColorMap::iterator colorPoint = mColorMapPtr->begin();
+//       colorPoint != mColorMapPtr->end();
+//       colorPoint++)
+//    pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first).
+//                           arg(colorPoint->second.red()).
+//                           arg(colorPoint->second.green()).
+//                           arg(colorPoint->second.blue()));
+//  dataNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
+//}
+//
+//void ColorTF::parseXml(QDomNode dataNode)
+//{
+//  if (dataNode.isNull())
+//    return;
+//
+//  mColorMapPtr->clear();
+//  QStringList colorStringList = colorNode.toElement().text().split(" ");
+//  for (int i = 0; i < colorStringList.size(); i++)
+//  {
+//    QStringList pointStringList = colorStringList[i].split("=");
+//    QStringList valueStringList = pointStringList[1].split("/");
+//    this->addColorPoint(pointStringList[0].toInt(),
+//                  QColor(valueStringList[0].toInt(),
+//                         valueStringList[1].toInt(),
+//                         valueStringList[2].toInt()));
+//  }
+//}
+
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mOpacityTF(vtkPiecewiseFunctionPtr::New()),
 	mColorTF(vtkColorTransferFunctionPtr::New()),	
-	mBase(base),
-	mOpacityMapPtr(new IntIntMap()),
-	mColorMapPtr(new ColorMap())
+	mBase(base)//,
+//	mOpacityMapPtr(new IntIntMap()),
+//	mColorMapPtr(new ColorMap())
 {
+  mUseTFMaps = true;
+  mData.reset(new ImageTFData());
+  connect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+  connect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
+
 	double max = getScalarMax();
   //messageManager()->sendDebug("For ImageTF3D image scalar range = " + string_cast(max));
 	mLevel = max/2.0; 
@@ -45,29 +93,42 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mColorTF->AddRGBPoint(0.0, 0.0, 0.0, 0.0);
 	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
 
-  this->addAlphaPoint(this->getScalarMin(), 0);
-  this->addAlphaPoint(this->getScalarMax() * 0.1, 0);
-  this->addAlphaPoint(this->getScalarMax(), 255);
-  this->addColorPoint(this->getScalarMin(), Qt::black);
-  this->addColorPoint(this->getScalarMax(), Qt::white);
+	mData->addAlphaPoint(this->getScalarMin(), 0);
+	mData->addAlphaPoint(this->getScalarMax() * 0.1, 0);
+	mData->addAlphaPoint(this->getScalarMax(), 255);
+	mData->addColorPoint(this->getScalarMin(), Qt::black);
+	mData->addColorPoint(this->getScalarMax(), Qt::white);
 }
-	
+
+void ImageTF3D::transferFunctionsChangedSlot()
+{
+  this->refreshOpacityTF();
+  this->refreshColorTF();
+}
+
 ImageTF3DPtr ImageTF3D::createCopy()
 {
   ImageTF3DPtr retval(new ImageTF3D(mBase));
   retval->mOpacityTF->DeepCopy(mOpacityTF);
   retval->mColorTF->DeepCopy(mColorTF);
-  retval->mOpacityMapPtr.reset(new IntIntMap(*mOpacityMapPtr));
-  retval->mColorMapPtr.reset(new ColorMap(*mColorMapPtr));
+  retval->mUseTFMaps = mUseTFMaps;
+
+  disconnect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+  disconnect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
+  retval->mData = mData->createCopy();
+  connect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+  connect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
+//  retval->mOpacityMapPtr.reset(new IntIntMap(*mOpacityMapPtr));
+//  retval->mColorMapPtr.reset(new ColorMap(*mColorMapPtr));
   if (mLut)
   {
     retval->mLut = vtkLookupTablePtr::New();
     retval->mLut->DeepCopy(mLut);
   }
-  retval->mLevel = mLevel;
-  retval->mWindow = mWindow;
-  retval->mLLR = mLLR;
-  retval->mAlpha = mAlpha;
+//  retval->mLevel = mLevel;
+//  retval->mWindow = mWindow;
+//  retval->mLLR = mLLR;
+//  retval->mAlpha = mAlpha;
   return retval;
 }
 
@@ -77,21 +138,23 @@ void ImageTF3D::setVtkImageData(vtkImageDataPtr base)
 }
 void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
 {
+  mUseTFMaps = false;
 	mOpacityTF = tf;
 }
 
 vtkPiecewiseFunctionPtr ImageTF3D::getOpacityTF()
 {
-	if (mLut) // sonowand hack .. while we figure out how to really do this.... 
+	if (!mUseTFMaps) // sonowand hack .. while we figure out how to really do this....
 	{
 		refreshOpacityTF();
 		return mOpacityTF;
 	}
 	
+  OpacityMapPtr opacity = mData->getOpacityMap();
+
 	// Create vtkPiecewiseFunction from the color map
 	mOpacityTF->RemoveAllPoints();
-	for (IntIntMap::iterator iter = mOpacityMapPtr->begin();
-			 iter != mOpacityMapPtr->end(); iter++)
+	for (IntIntMap::iterator iter = opacity->begin(); iter != opacity->end(); iter++)
 		mOpacityTF->AddPoint(iter->first, iter->second/255.0 );
 	
 	return mOpacityTF;
@@ -99,6 +162,7 @@ vtkPiecewiseFunctionPtr ImageTF3D::getOpacityTF()
 
 void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
 {
+  mUseTFMaps = false;
 	mColorTF = tf;
 }
 
@@ -106,91 +170,56 @@ vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
 	//std::cout<<"ImageTF3D::getColorTF()" <<std::endl;
 	
-	if (mLut) // sonowand hack .. while we figure out how to really do this.... 
+	if (!mUseTFMaps) // sonowand hack .. while we figure out how to really do this....
 	{
 		refreshColorTF();
 		return mColorTF;
 	}
 
+  ColorMapPtr color = mData->getColorMap();
+
 	// Create vtkColorTransferFunction from the color map
 	mColorTF->RemoveAllPoints();
 	
-	for (ColorMap::iterator iter = mColorMapPtr->begin();
-			 iter != mColorMapPtr->end(); iter++)
+	for (ColorMap::iterator iter = color->begin(); iter != color->end(); iter++)
 		mColorTF->AddRGBPoint(iter->first, iter->second.red()/255.0, 
 													iter->second.green()/255.0, iter->second.blue()/255.0);
 
 	return mColorTF;
 }
 	
-/**Set Low Level Reject, meaning the lowest intensity
- * value that will be visible.
- */
 void ImageTF3D::setLLR(double val)
 {
-	if (similar(mLLR, val))
-		return;
-
-	mLLR = val;
-	refreshOpacityTF();
+  mData->setLLR(val);
 }
-
 double ImageTF3D::getLLR() const
 {
-	return mLLR;
+	return mData->getLLR();
 }
-
 void ImageTF3D::setAlpha(double val)
 {
-	if (similar(mAlpha, val))
-		return;
-
-	mAlpha = val;
-	refreshOpacityTF();
+  mData->setAlpha(val);
 }
-
 double ImageTF3D::getAlpha() const
 {
-	return mAlpha;
+	return mData->getAlpha();
 }
-
-
-/**Set Window, i.e. the size of the intensity
- * window that will be visible.
- */
 void ImageTF3D::setWindow(double val)
 {
-	val = std::max(1.0, val);
-
-	if (similar(mWindow, val))
-		return;
-	
-	mWindow = val;
-	//std::cout<<"setWindow, val: "<<val<<std::endl;
-	refreshColorTF();
+  mData->setWindow(val);
 }
-
 double ImageTF3D::getWindow() const
 {
-	return mWindow;
+	return mData->getWindow();
 }
-
-/**Set Level, i.e. the position of the intensity
- * window that will be visible.
- */
 void ImageTF3D::setLevel(double val)
 {
-	if (similar(mLevel, val))
-		return;
-	
-	//std::cout<<"setLevel, val: "<<val<<std::endl;
-	mLevel = val;
-	refreshColorTF();
+  mData->setLevel(val);
 }
 
 double ImageTF3D::getLevel() const
 {
-	return mLevel;
+	return mData->getLevel();
 }
 
 /**set a lut that is used as a basis for the color tf.
@@ -228,6 +257,9 @@ double ImageTF3D::getScalarMin() const
  */
 void ImageTF3D::refreshColorTF()
 {
+  if (mUseTFMaps)
+    return;
+
 	if (!mLut)
 	{
 		return;
@@ -237,8 +269,8 @@ void ImageTF3D::refreshColorTF()
 	// the table generation can be moved to setLut(), leaving only
 	// BuildFunctionFromTable here.
 	
-	double min = mLevel - ( mWindow / 2.0 );
-	double max = mLevel + ( mWindow / 2.0 );
+	double min = mData->getLevel() - ( mData->getWindow() / 2.0 );
+	double max = mData->getLevel() + ( mData->getWindow() / 2.0 );
 	mColorTF->RemoveAllPoints();
 	int N = mLut->GetNumberOfTableValues();
 	//std::cout << " ImageTF3D::refreshColorTF(): range = [" << min << "," << max << "],\t lvl=" << mLevel << ",\t win=" << mWindow << std::endl;
@@ -272,6 +304,9 @@ void ImageTF3D::refreshColorTF()
  */
 void ImageTF3D::refreshOpacityTF()
 {
+  if (mUseTFMaps)
+    return;
+
 	//std::cout << "ImageTF3D::refreshOpacityTF(): LLR=" << mLLR << ", Alpha=" << mAlpha << std::endl;
 
 	mOpacityTF->RemoveAllPoints();
@@ -286,59 +321,17 @@ void ImageTF3D::refreshOpacityTF()
 #endif
 #if 1 // middle way: cut at LLR, then a ramp up to alpha.
 	//double range = getScalarMax()-getScalarMin();
-	double range = mWindow;
+	double range = mData->getWindow();
 	int smooth = (int)(0.1*range);
-	mOpacityTF->AddPoint(mLLR-1, 0 );
+	mOpacityTF->AddPoint(mData->getLLR()-1, 0 );
 	//mOpacityTF->AddPoint(mLLR-1*smooth, 0 );
-	mOpacityTF->AddPoint(mLLR,          mAlpha*1/10 );
-	mOpacityTF->AddPoint(mLLR+1*smooth, mAlpha*5/10 );
-	mOpacityTF->AddPoint(mLLR+4*smooth, mAlpha );
+	mOpacityTF->AddPoint(mData->getLLR(),          mAlpha*1/10 );
+	mOpacityTF->AddPoint(mData->getLLR()+1*smooth, mAlpha*5/10 );
+	mOpacityTF->AddPoint(mData->getLLR()+4*smooth, mAlpha );
 #endif
 	mOpacityTF->Update();
 }
 
-OpacityMapPtr ImageTF3D::getOpacityMap()
-{
-	return mOpacityMapPtr;
-}
-ColorMapPtr ImageTF3D::getColorMap()
-{
-	return mColorMapPtr;
-}
-void ImageTF3D::addAlphaPoint( int alphaPosition , int alphaValue)
-{
-	mOpacityMapPtr->insert(std::pair<int, int>(alphaPosition, alphaValue));
-	emit transferFunctionsChanged();
-}
-void ImageTF3D::removeAlphaPoint(int alphaPosition)
-{
-	mOpacityMapPtr->erase(alphaPosition);
-	emit transferFunctionsChanged();
-}
-void ImageTF3D::setAlphaValue(int alphaPosition, int alphaValue)
-{
-	(*mOpacityMapPtr)[alphaPosition] = alphaValue;
-	emit transferFunctionsChanged();
-}
-int ImageTF3D::getAlphaValue(int alphaPosition)
-{
-	return (*mOpacityMapPtr)[alphaPosition];
-}
-void ImageTF3D::addColorPoint( int colorPosition , QColor colorValue)
-{
-	mColorMapPtr->insert(std::pair<int, QColor>(colorPosition, colorValue));
-	emit transferFunctionsChanged();
-}
-void ImageTF3D::removeColorPoint(int colorPosition)
-{
-	mColorMapPtr->erase(colorPosition);
-	emit transferFunctionsChanged();
-}
-void ImageTF3D::setColorValue(int colorPosition, QColor colorValue)
-{
-	(*mColorMapPtr)[colorPosition] = colorValue;
-	emit transferFunctionsChanged();
-}
 void ImageTF3D::addXml(QDomNode dataNode)
 {
   QDomDocument doc = dataNode.ownerDocument();
