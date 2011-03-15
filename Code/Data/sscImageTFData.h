@@ -11,6 +11,9 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <QObject>
+#include <QColor>
+#include "vtkForwardDeclarations.h"
+class QDomNode;
 
 namespace ssc
 {
@@ -32,6 +35,8 @@ class ImageTFData : public QObject
 public:
   ImageTFData();
   virtual ~ImageTFData();
+  ImageTFDataPtr createCopy();
+  void initialize(double scalarMax);
 
   void   setAlpha(double val);
   double getAlpha() const;
@@ -41,6 +46,9 @@ public:
   double getWindow() const;
   void   setLevel(double val);
   double getLevel() const;
+
+  void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
+  void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
 
   OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function
   ColorMapPtr getColorMap();///< \return The values of the color transfer function

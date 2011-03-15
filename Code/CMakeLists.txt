@@ -37,6 +37,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscImage.h
     Data/sscImageTF3D.h
     Data/sscImageLUT2D.h
+    Data/sscImageTFData.h
     Data/sscDataManager.h
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
@@ -245,6 +246,8 @@ SET( SSC_SOURCE_FILES
     Data/sscImageTF3D.cpp
     Data/sscImageLUT2D.cpp
     Data/sscImageLUT2D.h
+    Data/sscImageTFData.cpp
+    Data/sscImageTFData.h
     Data/sscGPUImageBuffer.cpp
     Data/sscGPUImageBuffer.h
     Data/sscMesh.h

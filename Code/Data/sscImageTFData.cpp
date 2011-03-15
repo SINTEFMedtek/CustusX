@@ -6,6 +6,13 @@
  */
 
 #include <sscImageTFData.h>
+#include <iostream>
+#include <QDomDocument>
+#include <QStringList>
+#include <vtkColorTransferFunction.h>
+#include <vtkPiecewiseFunction.h>
+
+#include "sscVector3D.h"
 
 namespace ssc
 {
@@ -14,15 +21,23 @@ ImageTFData::ImageTFData() :
   mOpacityMapPtr(new IntIntMap()),
   mColorMapPtr(new ColorMap())
 {
-  // TODO Auto-generated constructor stub
-
+  mLevel = 1.0/2.0;
+  mWindow = 1.0;
+  mLLR = 0.0;
+  mAlpha = 1.0;
 }
 
 ImageTFData::~ImageTFData()
 {
-  // TODO Auto-generated destructor stub
 }
 
+void ImageTFData::initialize(double scalarMax)
+{
+  mLevel = scalarMax/2.0;
+  mWindow = scalarMax;
+  mLLR = 0.0;
+  mAlpha = 1.0;
+}
 ImageTFDataPtr ImageTFData::createCopy()
 {
   ImageTFDataPtr retval(new ImageTFData());
@@ -242,5 +257,21 @@ void ImageTFData::setColorValue(int colorPosition, QColor colorValue)
   emit changed();
 }
 
+void ImageTFData::fillColorTFFromMap(vtkColorTransferFunctionPtr tf)
+{
+  // Create vtkColorTransferFunction from the color map
+  tf->RemoveAllPoints();
+
+  for (ColorMap::iterator iter = mColorMapPtr->begin(); iter != mColorMapPtr->end(); iter++)
+    tf->AddRGBPoint(iter->first, iter->second.red()/255.0, iter->second.green()/255.0, iter->second.blue()/255.0);
+}
+
+void ImageTFData::fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf)
+{
+  // Create vtkPiecewiseFunction from the color map
+  tf->RemoveAllPoints();
+  for (IntIntMap::iterator iter = mOpacityMapPtr->begin(); iter != mOpacityMapPtr->end(); iter++)
+    tf->AddPoint(iter->first, iter->second/255.0 );
+}
 
 }

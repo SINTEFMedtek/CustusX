@@ -19,71 +19,23 @@
 #include "sscVector3D.h"
 #include "sscMessageManager.h"
 #include "vtkForwardDeclarations.h"
+#include "sscImageTF3D.h"
 
 namespace ssc
 {
-
-//void ColorTF::addXml(QDomNode dataNode)
-//{
-//  QDomDocument doc = dataNode.ownerDocument();
-//
-//  QStringList pointStringList;
-////  QDomElement colorNode = doc.createElement("color");
-//  // Add color points
-//  for (ColorMap::iterator colorPoint = mColorMapPtr->begin();
-//       colorPoint != mColorMapPtr->end();
-//       colorPoint++)
-//    pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first).
-//                           arg(colorPoint->second.red()).
-//                           arg(colorPoint->second.green()).
-//                           arg(colorPoint->second.blue()));
-//  dataNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-//}
-//
-//void ColorTF::parseXml(QDomNode dataNode)
-//{
-//  if (dataNode.isNull())
-//    return;
-//
-//  mColorMapPtr->clear();
-//  QStringList colorStringList = colorNode.toElement().text().split(" ");
-//  for (int i = 0; i < colorStringList.size(); i++)
-//  {
-//    QStringList pointStringList = colorStringList[i].split("=");
-//    QStringList valueStringList = pointStringList[1].split("/");
-//    this->addColorPoint(pointStringList[0].toInt(),
-//                  QColor(valueStringList[0].toInt(),
-//                         valueStringList[1].toInt(),
-//                         valueStringList[2].toInt()));
-//  }
-//}
-
-
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
 
 
 ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	mOpacityTF(vtkPiecewiseFunctionPtr::New()),
 	mColorTF(vtkColorTransferFunctionPtr::New()),	
-	mBase(base)//,
-//	mOpacityMapPtr(new IntIntMap()),
-//	mColorMapPtr(new ColorMap())
+	mBase(base)
 {
-  mUseTFMaps = true;
   mData.reset(new ImageTFData());
   connect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
   connect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 
 	double max = getScalarMax();
-  //messageManager()->sendDebug("For ImageTF3D image scalar range = " + string_cast(max));
-	mLevel = max/2.0; 
-	mWindow = max;
-	mLLR = 0.0;
-	mAlpha = 1.0;
+	mData->initialize(getScalarMax());
 	
 	mColorTF->SetColorSpaceToRGB();
 	
@@ -106,29 +58,28 @@ void ImageTF3D::transferFunctionsChangedSlot()
   this->refreshColorTF();
 }
 
+ImageTFDataPtr ImageTF3D::getData()
+{
+  return mData;
+}
+
 ImageTF3DPtr ImageTF3D::createCopy()
 {
   ImageTF3DPtr retval(new ImageTF3D(mBase));
   retval->mOpacityTF->DeepCopy(mOpacityTF);
   retval->mColorTF->DeepCopy(mColorTF);
-  retval->mUseTFMaps = mUseTFMaps;
 
-  disconnect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
-  disconnect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
+  disconnect(retval->mData.get(), SIGNAL(changed()), retval.get(), SIGNAL(transferFunctionsChanged()));
+  disconnect(retval->mData.get(), SIGNAL(changed()), retval.get(), SLOT(transferFunctionsChangedSlot()));
   retval->mData = mData->createCopy();
-  connect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
-  connect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
-//  retval->mOpacityMapPtr.reset(new IntIntMap(*mOpacityMapPtr));
-//  retval->mColorMapPtr.reset(new ColorMap(*mColorMapPtr));
+  connect(retval->mData.get(), SIGNAL(changed()), retval.get(), SIGNAL(transferFunctionsChanged()));
+  connect(retval->mData.get(), SIGNAL(changed()), retval.get(), SLOT(transferFunctionsChangedSlot()));
+
   if (mLut)
   {
     retval->mLut = vtkLookupTablePtr::New();
     retval->mLut->DeepCopy(mLut);
   }
-//  retval->mLevel = mLevel;
-//  retval->mWindow = mWindow;
-//  retval->mLLR = mLLR;
-//  retval->mAlpha = mAlpha;
   return retval;
 }
 
@@ -136,56 +87,33 @@ void ImageTF3D::setVtkImageData(vtkImageDataPtr base)
 {
 	mBase = base;
 }
-void ImageTF3D::setOpacityTF(vtkPiecewiseFunctionPtr tf)
-{
-  mUseTFMaps = false;
-	mOpacityTF = tf;
-}
 
 vtkPiecewiseFunctionPtr ImageTF3D::getOpacityTF()
 {
-	if (!mUseTFMaps) // sonowand hack .. while we figure out how to really do this....
-	{
-		refreshOpacityTF();
-		return mOpacityTF;
-	}
-	
-  OpacityMapPtr opacity = mData->getOpacityMap();
-
-	// Create vtkPiecewiseFunction from the color map
-	mOpacityTF->RemoveAllPoints();
-	for (IntIntMap::iterator iter = opacity->begin(); iter != opacity->end(); iter++)
-		mOpacityTF->AddPoint(iter->first, iter->second/255.0 );
-	
-	return mOpacityTF;
-}
-
-void ImageTF3D::setColorTF(vtkColorTransferFunctionPtr tf)
-{
-  mUseTFMaps = false;
-	mColorTF = tf;
+  if (mLut) // sonowand hack .. while we figure out how to really do this....
+  {
+    this->refreshOpacityTF();
+    return mOpacityTF;
+  }
+  else
+  {
+    mData->fillOpacityTFFromMap(mOpacityTF);
+    return mOpacityTF;
+  }
 }
 
 vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 {
-	//std::cout<<"ImageTF3D::getColorTF()" <<std::endl;
-	
-	if (!mUseTFMaps) // sonowand hack .. while we figure out how to really do this....
+	if (mLut) // sonowand hack .. while we figure out how to really do this....
 	{
-		refreshColorTF();
+	  this->refreshColorTF();
 		return mColorTF;
 	}
-
-  ColorMapPtr color = mData->getColorMap();
-
-	// Create vtkColorTransferFunction from the color map
-	mColorTF->RemoveAllPoints();
-	
-	for (ColorMap::iterator iter = color->begin(); iter != color->end(); iter++)
-		mColorTF->AddRGBPoint(iter->first, iter->second.red()/255.0, 
-													iter->second.green()/255.0, iter->second.blue()/255.0);
-
-	return mColorTF;
+	else
+	{
+	  mData->fillColorTFFromMap(mColorTF);
+	  return mColorTF;
+	}
 }
 	
 void ImageTF3D::setLLR(double val)
@@ -216,7 +144,6 @@ void ImageTF3D::setLevel(double val)
 {
   mData->setLevel(val);
 }
-
 double ImageTF3D::getLevel() const
 {
 	return mData->getLevel();
@@ -228,9 +155,8 @@ void ImageTF3D::setLut(vtkLookupTablePtr lut)
 {
 	if (lut==mLut)
 		return;
-	//std::cout<<"Lut set in 3d property" <<std::endl;
 	mLut = lut;
-	refreshColorTF();
+	this->refreshColorTF();
 }
 
 vtkLookupTablePtr ImageTF3D::getLut() const
@@ -257,9 +183,6 @@ double ImageTF3D::getScalarMin() const
  */
 void ImageTF3D::refreshColorTF()
 {
-  if (mUseTFMaps)
-    return;
-
 	if (!mLut)
 	{
 		return;
@@ -304,7 +227,7 @@ void ImageTF3D::refreshColorTF()
  */
 void ImageTF3D::refreshOpacityTF()
 {
-  if (mUseTFMaps)
+  if (!mLut)
     return;
 
 	//std::cout << "ImageTF3D::refreshOpacityTF(): LLR=" << mLLR << ", Alpha=" << mAlpha << std::endl;
@@ -325,95 +248,21 @@ void ImageTF3D::refreshOpacityTF()
 	int smooth = (int)(0.1*range);
 	mOpacityTF->AddPoint(mData->getLLR()-1, 0 );
 	//mOpacityTF->AddPoint(mLLR-1*smooth, 0 );
-	mOpacityTF->AddPoint(mData->getLLR(),          mAlpha*1/10 );
-	mOpacityTF->AddPoint(mData->getLLR()+1*smooth, mAlpha*5/10 );
-	mOpacityTF->AddPoint(mData->getLLR()+4*smooth, mAlpha );
+	mOpacityTF->AddPoint(mData->getLLR(),          mData->getAlpha()*1/10 );
+	mOpacityTF->AddPoint(mData->getLLR()+1*smooth, mData->getAlpha()*5/10 );
+	mOpacityTF->AddPoint(mData->getLLR()+4*smooth, mData->getAlpha() );
 #endif
 	mOpacityTF->Update();
 }
 
 void ImageTF3D::addXml(QDomNode dataNode)
 {
-  QDomDocument doc = dataNode.ownerDocument();
-//  QDomElement transferfunctionsNode = doc.createElement("transferfunctions");
-//  parentNode.appendChild(transferfunctionsNode);
-
-  QDomElement alphaNode = doc.createElement("alpha");
-  // Use QStringList to put all points in the same string instead of storing
-  // the points as separate nodes.
-  QStringList pointStringList;
-  // Add alpha points
-  for (IntIntMap::iterator opPoint = mOpacityMapPtr->begin();
-       opPoint != mOpacityMapPtr->end();
-       opPoint++)
-    pointStringList.append(QString("%1=%2").arg(opPoint->first).
-                           arg(opPoint->second));
-  alphaNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-
-  pointStringList.clear();
-  QDomElement colorNode = doc.createElement("color");
-  // Add color points
-  for (ColorMap::iterator colorPoint = mColorMapPtr->begin();
-       colorPoint != mColorMapPtr->end();
-       colorPoint++)
-    pointStringList.append(QString("%1=%2/%3/%4").arg(colorPoint->first).
-                           arg(colorPoint->second.red()).
-                           arg(colorPoint->second.green()).
-                           arg(colorPoint->second.blue()));
-  colorNode.appendChild(doc.createTextNode(pointStringList.join(" ")));
-
-  dataNode.appendChild(alphaNode);
-  dataNode.appendChild(colorNode);
+  mData->addXml(dataNode);
 }
+
 void ImageTF3D::parseXml(QDomNode dataNode)
 {
-	if (dataNode.isNull())
-		return;
-	
-	QDomNode alphaNode = dataNode.namedItem("alpha");
-	// Read alpha node if it exists
-	if (!alphaNode.isNull() && !alphaNode.toElement().text().isEmpty())
-	{
-    QString alphaString = alphaNode.toElement().text();
-		mOpacityMapPtr->clear();
-		QStringList alphaStringList = alphaString.split(" ");
-		for (int i = 0; i < alphaStringList.size(); i++)
-		{
-			QStringList pointStringList = alphaStringList[i].split("=");
-			if (pointStringList.size()<2)
-			  continue;
-			addAlphaPoint(pointStringList[0].toInt(), pointStringList[1].toInt());
-		}
-	}
-	else
-	{
-		std::cout << "Warning: ImageTF3D::parseXml() found no alpha transferfunction";
-		std::cout << std::endl;
-	}
-	
-	QDomNode colorNode = dataNode.namedItem("color");
-	// Read color node if it exists
-	if (!colorNode.isNull() && !colorNode.toElement().text().isEmpty())
-	{
-		mColorMapPtr->clear();
-		QStringList colorStringList = colorNode.toElement().text().split(" ");
-		for (int i = 0; i < colorStringList.size(); i++)
-		{
-			QStringList pointStringList = colorStringList[i].split("=");
-			QStringList valueStringList = pointStringList[1].split("/");
-			addColorPoint(pointStringList[0].toInt(), 
-										QColor(valueStringList[0].toInt(),
-													 valueStringList[1].toInt(),
-													 valueStringList[2].toInt()));
-		}
-	}
-	else
-	{
-		std::cout << "Warning: ImageTF3D::parseXml() found no color transferfunction";
-		std::cout << std::endl;
-	}
-
-//	std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
+  mData->parseXml(dataNode);
 }
 
 }
