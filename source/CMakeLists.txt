@@ -41,7 +41,7 @@ INCLUDE(${IGSTK_USE_FILE})
 #----------
 find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 #if (SSC_FOUND)
-	include (${SSC_USE_FILE})
+    include (${SSC_USE_FILE})
 #	link_directories (${SSC_DIR}/Code)
 #endif (SSC_FOUND)
 #message(STATUS "verdi av libfolders: " ${SSC_LIBRARY_DIRS} ) 
@@ -203,9 +203,9 @@ SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CustusX description summary")# does not work..?
 set(CPACK_PACKAGE_VENDOR "Sintef")# does not work..?
 if (WIN32)
-	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons\\CustusX.png")
+    set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons\\CustusX.png")
 else (WIN32)
-	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
+    set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
 endif (WIN32)
 
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
@@ -215,13 +215,13 @@ set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}") # name of .pkg file
 if (WIN32)
-	set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc\\install_welcome.txt")
-	set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc\\install_readme.rtf")
-	set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc\\install_license.txt")
+    set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc\\install_welcome.txt")
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc\\install_readme.rtf")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc\\install_license.txt")
 else (WIN32)
-	set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-	set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-	set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+    set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
+    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
+    set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
 endif (WIN32)
 
 
