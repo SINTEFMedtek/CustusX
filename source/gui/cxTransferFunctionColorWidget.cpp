@@ -26,6 +26,8 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
   mBorder(5)
 {
   this->setObjectName("TransferFunctionColorWidget");
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
+          this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
   mCurrentPoint.reset();
   
