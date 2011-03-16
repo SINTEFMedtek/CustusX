@@ -16,7 +16,77 @@ namespace cx
 class TransferFunctionAlphaWidget;
 class TransferFunctionColorWidget;
 
-//ShadingWidget
+/** Superclass for all doubles interacting with a ImageTFData.
+ */
+class DoubleDataAdapterImageTFDataBase : public ssc::DoubleDataAdapter
+{
+  Q_OBJECT
+public:
+  DoubleDataAdapterImageTFDataBase();
+  virtual ~DoubleDataAdapterImageTFDataBase() {}
+  virtual double getValue() const;
+  virtual bool setValue(double val);
+  virtual void connectValueSignals(bool on) {}
+public:
+  void setImageTFData(ssc::ImageTFDataPtr tfData);
+protected:
+  virtual double getValueInternal() const = 0;
+  virtual void setValueInternal(double val) = 0;
+
+  ssc::ImageTFDataPtr mImageTFData;
+};
+
+/**DataInterface implementation for the tf window value
+ */
+class DoubleDataAdapterImageTFDataWindow : public DoubleDataAdapterImageTFDataBase
+{
+public:
+  virtual ~DoubleDataAdapterImageTFDataWindow() {}
+  virtual QString getValueName() const { return "Window"; }
+  virtual double getValueInternal() const;
+  virtual void setValueInternal(double val);
+  virtual ssc::DoubleRange getValueRange() const;
+};
+
+/**DataInterface implementation for the tf level value
+ */
+class DoubleDataAdapterImageTFDataLevel : public DoubleDataAdapterImageTFDataBase
+{
+  Q_OBJECT
+public:
+  virtual ~DoubleDataAdapterImageTFDataLevel() {}
+  virtual QString getValueName() const { return "Level"; }
+  virtual double getValueInternal() const;
+  virtual void setValueInternal(double val);
+  virtual ssc::DoubleRange getValueRange() const;
+};
+
+/**DataInterface implementation for the tf llr value
+ */
+class DoubleDataAdapterImageTFDataLLR : public DoubleDataAdapterImageTFDataBase
+{
+  Q_OBJECT
+public:
+  virtual ~DoubleDataAdapterImageTFDataLLR() {}
+  virtual QString getValueName() const { return "LLR"; }
+  virtual double getValueInternal() const;
+  virtual void setValueInternal(double val);
+  virtual ssc::DoubleRange getValueRange() const;
+};
+
+/**DataInterface implementation for the tf alpha value
+ */
+class DoubleDataAdapterImageTFDataAlpha : public DoubleDataAdapterImageTFDataBase
+{
+  Q_OBJECT
+public:
+  virtual ~DoubleDataAdapterImageTFDataAlpha() {}
+  virtual QString getValueName() const { return "Alpha"; }
+  virtual double getValueInternal() const;
+  virtual void setValueInternal(double val);
+  virtual ssc::DoubleRange getValueRange() const;
+};
+
 
 /*
  *
@@ -27,13 +97,12 @@ class TransferFunction3DWidget : public QWidget
 
 public:
   TransferFunction3DWidget(QWidget* parent);
-  virtual ~TransferFunction3DWidget();
+  virtual ~TransferFunction3DWidget() {}
 
 public slots:
   void activeImageChangedSlot();
 
 protected:
-  void init();
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
@@ -48,16 +117,34 @@ class TransferFunction2DWidget : public QWidget
 
 public:
   TransferFunction2DWidget(QWidget* parent);
-  virtual ~TransferFunction2DWidget();
+  virtual ~TransferFunction2DWidget() {}
 
 public slots:
   void activeImageChangedSlot();
 
 protected:
-  void init();
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
+};
+
+class TransferFunctionPresetWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  TransferFunctionPresetWidget(QWidget* parent);
+  virtual ~TransferFunctionPresetWidget() {}
+
+public slots:
+  void presetsBoxChangedSlot(const QString& presetName);
+  void resetSlot();
+  void saveSlot();
+
+protected:
+  QVBoxLayout* mLayout;
+  QComboBox* mPresetsComboBox;
+  PresetTransferFunctions3D mPresets;
 };
 
 /**
@@ -75,27 +162,13 @@ class TransferFunctionWidget : public QWidget
 
 public:
   TransferFunctionWidget(QWidget* parent);
-  virtual ~TransferFunctionWidget();
-
+  virtual ~TransferFunctionWidget() {}
 public slots:
-  void presetsBoxChangedSlot(const QString& presetName);
-  void resetSlot();
-  void saveSlot();
-//  void activeImageChangedSlot();
-
 protected:
-  void init();///< Initialize TransferFunctionWidget. Create members
-  //gui
   QVBoxLayout* mLayout;
-//  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
-//  TransferFunctionColorWidget* mTransferFunctionColorWidget;
-  QComboBox* mPresetsComboBox;
   TransferFunction3DWidget* mTF3DWidget;
   TransferFunction2DWidget* mTF2DWidget;
-
-  PresetTransferFunctions3D mPresets;
-
-//	bool mInitialized;///< Is TransferFunctionWidget initialized
+  TransferFunctionPresetWidget* mTFPresetWidget;
 };
 
 }
