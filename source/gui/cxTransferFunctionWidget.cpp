@@ -10,6 +10,7 @@
 #include "sscDataManager.h"
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
+#include "cxShadingWidget.h"
 
 //#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"
@@ -17,22 +18,154 @@
 namespace cx
 {
 
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
+{
+}
+
+void DoubleDataAdapterImageTFDataBase::setImageTFData(ssc::ImageTFDataPtr tfData)
+{
+  if (mImageTFData)
+    disconnect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+
+  mImageTFData = tfData;
+
+  if (mImageTFData)
+    connect(mImageTFData.get(), SIGNAL(changed()), this, SIGNAL(changed()));
+
+  emit changed();
+}
+
+double DoubleDataAdapterImageTFDataBase::getValue() const
+{
+  if (!mImageTFData)
+    return 0.0;
+  return this->getValueInternal();
+}
+bool DoubleDataAdapterImageTFDataBase::setValue(double val)
+{
+  if (!mImageTFData)
+    return false;
+  this->setValueInternal(val);
+  return true;
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+double DoubleDataAdapterImageTFDataWindow::getValueInternal() const
+{
+  return mImageTFData->getWindow();
+}
+void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
+{
+  mImageTFData->setWindow(val);
+}
+ssc::DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
+{
+  if (!mImageTFData)
+    return ssc::DoubleRange();
+  double range = mImageTFData->getRange();
+  return ssc::DoubleRange(1,range,range/1000.0);
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+double DoubleDataAdapterImageTFDataLevel::getValueInternal() const
+{
+  return mImageTFData->getLevel();
+}
+void DoubleDataAdapterImageTFDataLevel::setValueInternal(double val)
+{
+  mImageTFData->setLevel(val);
+}
+ssc::DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
+{
+  if (!mImageTFData)
+    return ssc::DoubleRange();
+
+  double max = mImageTFData->getMax();
+  return ssc::DoubleRange(1,max,max/1000.0);
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+double DoubleDataAdapterImageTFDataLLR::getValueInternal() const
+{
+  return mImageTFData->getLLR();
+}
+void DoubleDataAdapterImageTFDataLLR::setValueInternal(double val)
+{
+  mImageTFData->setLLR(val);
+}
+ssc::DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
+{
+  if (!mImageTFData)
+    return ssc::DoubleRange();
+
+  double max = mImageTFData->getMax();
+  return ssc::DoubleRange(1,max,max/1000.0);
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+double DoubleDataAdapterImageTFDataAlpha::getValueInternal() const
+{
+  return mImageTFData->getAlpha();
+}
+void DoubleDataAdapterImageTFDataAlpha::setValueInternal(double val)
+{
+  mImageTFData->setAlpha(val);
+}
+ssc::DoubleRange DoubleDataAdapterImageTFDataAlpha::getValueRange() const
+{
+  if (!mImageTFData)
+    return ssc::DoubleRange();
+
+  double max = mImageTFData->getAlphaMax();
+  return ssc::DoubleRange(1,max,max/1000.0);
+}
+
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   QWidget(parent),
   mLayout(new QVBoxLayout(this))
 {
   this->setObjectName("TransferFunction3DWidget");
   this->setWindowTitle("3D");
-  this->init();
-}
 
-TransferFunction3DWidget::~TransferFunction3DWidget()
-{}
+  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
+  mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
+
+  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
+  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+
+  mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
+                                              QSizePolicy::MinimumExpanding);
+  mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
+                                              QSizePolicy::Fixed);
+
+  mLayout->addWidget(mTransferFunctionAlphaWidget);
+  mLayout->addWidget(mTransferFunctionColorWidget);
+
+  this->setLayout(mLayout);
+}
 
 void TransferFunction3DWidget::activeImageChangedSlot()
 {
-//  return;
-
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   ssc::ImageTFDataPtr tf;
   if (image)
@@ -44,8 +177,17 @@ void TransferFunction3DWidget::activeImageChangedSlot()
   mTransferFunctionColorWidget->setData(image, tf);
 }
 
-void TransferFunction3DWidget::init()
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
+  QWidget(parent),
+  mLayout(new QVBoxLayout(this))
 {
+  this->setObjectName("TransferFunction2DWidget");
+  this->setWindowTitle("2D");
+
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
@@ -63,26 +205,8 @@ void TransferFunction3DWidget::init()
   this->setLayout(mLayout);
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
-  QWidget(parent),
-  mLayout(new QVBoxLayout(this))//,
-//  mInitialized(false)
-{
-  this->setObjectName("TransferFunction2DWidget");
-  this->setWindowTitle("2D");
-  this->init();
-}
-
-TransferFunction2DWidget::~TransferFunction2DWidget()
-{}
-
 void TransferFunction2DWidget::activeImageChangedSlot()
 {
-//  return;
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   ssc::ImageTFDataPtr tf;
   if (image)
@@ -94,24 +218,67 @@ void TransferFunction2DWidget::activeImageChangedSlot()
   mTransferFunctionColorWidget->setData(image, tf);
 }
 
-void TransferFunction2DWidget::init()
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
+  QWidget(parent),
+  mLayout(new QVBoxLayout(this))
 {
-  mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
-  mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
+  this->setObjectName("TransferFunctionPresetWidget");
+  this->setWindowTitle("Transfer Function Presets");
 
-  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
+  QPushButton* resetButton = new QPushButton("Reset", this);
+  connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
-  mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
-                                              QSizePolicy::MinimumExpanding);
-  mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
-                                              QSizePolicy::Fixed);
+  QPushButton* saveButton = new QPushButton("Save", this);
+  connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
 
-  mLayout->addWidget(mTransferFunctionAlphaWidget);
-  mLayout->addWidget(mTransferFunctionColorWidget);
+  mPresetsComboBox = new QComboBox(this);
+  mPresetsComboBox->addItems(mPresets.getPresetList());
+  connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
+
+  mLayout->addWidget(mPresetsComboBox);
+  //mLayout->addWidget(mInfoWidget);
+  QHBoxLayout* buttonLayout = new QHBoxLayout;
+  mLayout->addLayout(buttonLayout);
+
+  buttonLayout->addWidget(resetButton);
+  buttonLayout->addWidget(saveButton);
 
   this->setLayout(mLayout);
 }
+
+void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
+{
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+  if(activeImage)
+    mPresets.load(presetName, activeImage);
+}
+
+void TransferFunctionPresetWidget::resetSlot()
+{
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+  activeImage->resetTransferFunctions();
+}
+
+void TransferFunctionPresetWidget::saveSlot()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, "Save Preset",
+                                         "Custom Preset Name", QLineEdit::Normal,
+                                         "custom preset", &ok);
+    if (!ok || text.isEmpty())
+      return;
+
+  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+  mPresets.save(text, activeImage);
+
+  mPresetsComboBox->clear();
+  mPresetsComboBox->addItems(mPresets.getPresetList());
+}
+
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -124,97 +291,34 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
   this->setObjectName("TransferFunctionWidget");
   this->setWindowTitle("Transfer Function");
 
-  this->init();
-}
-
-TransferFunctionWidget::~TransferFunctionWidget()
-{}
-
-//void TransferFunctionWidget::activeImageChangedSlot()
-//{
-//  ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-//  ssc::ImageTFDataPtr tf;
-//  if (image)
-//    tf = image->getTransferFunctions3D()->getData();
-//  else
-//    image.reset();
-//
-//  mTransferFunctionAlphaWidget->setData(image, tf);
-//  mTransferFunctionColorWidget->setData(image, tf);
-//}
-
-void TransferFunctionWidget::init()
-{
   mTF2DWidget = new TransferFunction2DWidget(this);
   mTF3DWidget = new TransferFunction3DWidget(this);
-//
-//	mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
-//	mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
-//
-//  connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
-//  connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
-//
-//  mTransferFunctionAlphaWidget->setSizePolicy(QSizePolicy::MinimumExpanding,
-//                                              QSizePolicy::MinimumExpanding);
-//  mTransferFunctionColorWidget->setSizePolicy(QSizePolicy::Expanding,
-//                                              QSizePolicy::Fixed);
-  
-  QPushButton* resetButton = new QPushButton("Reset", this);
-  connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
+  mTFPresetWidget = new TransferFunctionPresetWidget(this);
 
-  QPushButton* saveButton = new QPushButton("Save", this);
-  connect(saveButton, SIGNAL(clicked()), this, SLOT(saveSlot()));
-  
-  mPresetsComboBox = new QComboBox(this);
-  mPresetsComboBox->addItems(mPresets.getPresetList());
-  connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
+  QTabWidget* tabWidget = new QTabWidget(this);
+  mLayout->addWidget(tabWidget);
+  tabWidget->addTab(mTF2DWidget, "Volume");
+  tabWidget->addTab(mTF3DWidget, "Slice");
+  tabWidget->addTab(new ShadingWidget(this), "Shading");
 
-  mLayout->addWidget(mTF2DWidget);
-  mLayout->addWidget(mTF3DWidget);
-  mLayout->addWidget(mPresetsComboBox);
-  //mLayout->addWidget(mInfoWidget);
-  QHBoxLayout* buttonLayout = new QHBoxLayout;
-  mLayout->addLayout(buttonLayout);
-
-  buttonLayout->addWidget(resetButton);
-  buttonLayout->addWidget(saveButton);
-
+//  mLayout->addWidget(mTF2DWidget);
+//  mLayout->addWidget(mTF3DWidget);
+  mLayout->addWidget(mTFPresetWidget);
   this->setLayout(mLayout);
-
-//  mInitialized = true;
 }
   
-void TransferFunctionWidget::presetsBoxChangedSlot(const QString& presetName)
-{
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
+//
+//QVBoxLayout* layout = new QVBoxLayout(this);
+//
+//layout->addWidget(new ActiveVolumeWidget(this));
+//
+//QTabWidget* tabWidget = new QTabWidget(this);
+//layout->addWidget(tabWidget);
+//tabWidget->addTab(new VolumeInfoWidget(this), "Info");
+//tabWidget->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
+//tabWidget->addTab(new ShadingWidget(this), "Shading");
+//tabWidget->addTab(new CroppingWidget(this), "Crop");
+//tabWidget->addTab(new ClippingWidget(this), "Clip");
 
-  if(!activeImage)
-    return;
-
-  mPresets.load(presetName, activeImage);
-}
-
-void TransferFunctionWidget::resetSlot()
-{
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  activeImage->resetTransferFunctions();
-}
-
-void TransferFunctionWidget::saveSlot()
-{
-    bool ok;
-    QString text = QInputDialog::getText(this, "Save Preset",
-                                         "Custom Preset Name", QLineEdit::Normal,
-                                         "custom preset", &ok);
-    if (!ok || text.isEmpty())
-    	return;
-
-  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-  mPresets.save(text, activeImage);
-
-  mPresetsComboBox->clear();
-  mPresetsComboBox->addItems(mPresets.getPresetList());
-
-}
 
 }//namespace cx
