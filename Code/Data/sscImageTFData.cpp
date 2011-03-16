@@ -307,6 +307,7 @@ void ImageTFData::fillLUTFromMaps(vtkLookupTablePtr output)
 {
   double b0 = mLevel-mWindow/2.0;
   double b1 = mLevel+mWindow/2.0;
+  std::cout << "ImageTFData::fillLUTFromMaps" << std::endl;
 
   // find LLR on the lut:
   // We want to use the LLR on the _input_ intensity data, not on the
@@ -320,9 +321,16 @@ void ImageTFData::fillLUTFromMaps(vtkLookupTablePtr output)
   //  but it contains nonvirtual functions).
 //  llr = std::max(1.0, llr); // hack.
 
+  std::cout << "colormap begin" << std::endl;
+  for (ColorMap::iterator iter=mColorMapPtr->begin(); iter!=mColorMapPtr->end(); ++iter)
+  {
+    std::cout << " " << iter->first << " " << iter->second.red() << " " << iter->second.green() << " " << iter->second.blue() << std::endl;
+  }
+  std::cout << "colormap end" << std::endl;
+
   int N = 0;
   if (!mColorMapPtr->empty())
-    N = mColorMapPtr->rend()->first; // largest key value in color map
+    N = mColorMapPtr->rbegin()->first; // largest key value in color map
   output->Build();
   output->SetNumberOfTableValues(N);
   output->SetTableRange(b0,b1);
@@ -337,7 +345,7 @@ void ImageTFData::fillLUTFromMaps(vtkLookupTablePtr output)
     double rgba[4];
     double* rgb = colorFunc->GetColor(i);
     double a = alphaFunc->GetValue(i);
-    a = this->mapThroughLUT(a, N);
+    //a = this->mapThroughLUT(a, N);
 
 //    mBaseLUT->GetTableValue(i, rgba);
 
@@ -345,6 +353,7 @@ void ImageTFData::fillLUTFromMaps(vtkLookupTablePtr output)
 //      rgba[ 3 ] = 0.9999;
 //    else
 //      rgba[ 3 ] = 0.001;
+    //std::cout << "" << i << " \t" <<  rgb[0] << "  " <<  rgb[1] << "  " <<  rgb[2] << "  " <<  a << std::endl;
 
     output->SetTableValue(i, rgb[0], rgb[1], rgb[2], a);
   }

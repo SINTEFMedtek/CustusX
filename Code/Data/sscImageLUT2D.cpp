@@ -21,8 +21,10 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 {
 
   mData.reset(new ImageTFData());
-//  double max = this->getScalarMax();
-  mData->initialize(this->getScalarMax());
+  double smin = mBase->GetScalarRange()[0];
+  double smax = mBase->GetScalarRange()[1];
+
+  mData->initialize(smax);
 
 	//dafault Full Range.... or level-it
 //	mLevel =  0; //getScalarMax() / 2.0;
@@ -31,8 +33,13 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 //	mLLR = 0.0;
 //	mAlpha = 1.0;
 
-  mData->setLevel(getScalarMax() * 0.15);
-  mData->setWindow(getScalarMax() * 0.5);
+  mData->setLevel(smax * 0.15);
+  mData->setWindow(smax * 0.5);
+
+  mData->addAlphaPoint(smin, 0);
+  mData->addAlphaPoint(smax, 255);
+  mData->addColorPoint(smin, Qt::black);
+  mData->addColorPoint(smax, Qt::white);
 
 	mOutputLUT = vtkLookupTablePtr::New();
 
@@ -171,6 +178,7 @@ void ImageLUT2D::refreshOutput()
 {
 //  mData->fillLUTFromLut(mOutputLUT, mBaseLUT); // sonowand way
   mData->fillLUTFromMaps(mOutputLUT); // sintef way
+  std::cout << "ImageLUT2D::refreshOutput()" << std::endl;
 
 	emit transferFunctionsChanged();
 }
