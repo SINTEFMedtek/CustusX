@@ -34,7 +34,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
   connect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
   connect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 
-	double max = getScalarMax();
+	double max = this->getScalarMax();
 	mData->initialize(getScalarMax());
 	
 	mColorTF->SetColorSpaceToRGB();

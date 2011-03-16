@@ -15,6 +15,7 @@ class QDomNode;
 #include <QColor>
 #include <QObject>
 #include "vtkForwardDeclarations.h"
+#include "sscImageTFData.h"
 
 namespace ssc
 {
@@ -32,6 +33,8 @@ public:
 	ImageLUT2D(vtkImageDataPtr base);
 	void setVtkImageData(vtkImageDataPtr base);
 	ImageLUT2DPtr createCopy();
+  ImageTFDataPtr getData();
+
 	void setBaseLookupTable(vtkLookupTablePtr lut);
 	vtkLookupTablePtr getOutputLookupTable();
 	vtkLookupTablePtr getBaseLookupTable();
@@ -52,20 +55,23 @@ public:
 signals:
 	void transferFunctionsChanged();
 
+private slots:
+  void transferFunctionsChangedSlot();
+
 private:
-	double loadAttribute(QDomNode dataNode, QString name, double defVal);
+//	double loadAttribute(QDomNode dataNode, QString name, double defVal);
 	void refreshOutput();
 //	void changeOpacity(double index, double opacity);
-	void testMap(double val);
-	double mapThroughLUT(double x);
+//	void testMap(double val);
 
 	vtkLookupTablePtr mOutputLUT; ///< the sum of all internal values
 	vtkImageDataPtr mBase; ///< image data
-	double mLLR; ///< used to modify the output
-	double mWindow; ///< used to modify the output
-	double mLevel; ///< used to modify the output
-	double mAlpha; ///< not used by output, use BlenderRep to solve this.
+//	double mLLR; ///< used to modify the output
+//	double mWindow; ///< used to modify the output
+//	double mLevel; ///< used to modify the output
+//	double mAlpha; ///< not used by output, use BlenderRep to solve this.
 	vtkLookupTablePtr mBaseLUT;	///< basis for generating the output lut
+  ImageTFDataPtr mData;
 };
 
 

@@ -19,27 +19,34 @@ namespace ssc
 ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 	mBase(base)
 {
+
+  mData.reset(new ImageTFData());
+//  double max = this->getScalarMax();
+  mData->initialize(this->getScalarMax());
+
 	//dafault Full Range.... or level-it
 //	mLevel =  0; //getScalarMax() / 2.0;
-  mLevel =  getScalarMax() / 2.0;
-	mWindow = getScalarMax();
-	mLLR = 0.0;
-	mAlpha = 1.0;
+//  mLevel =  getScalarMax() / 2.0;
+//	mWindow = getScalarMax();
+//	mLLR = 0.0;
+//	mAlpha = 1.0;
 
-  mLevel =  getScalarMax() *0.15;
-  mWindow = getScalarMax() *0.5;
-//	std::cout << "mLevel: " << mLevel << ", mWindow: " << mWindow << std::endl;
+  mData->setLevel(getScalarMax() * 0.15);
+  mData->setWindow(getScalarMax() * 0.5);
 
 	mOutputLUT = vtkLookupTablePtr::New();
 
 	//make a default system set lookuptable, grayscale...
-	vtkLookupTablePtr bwLut= vtkLookupTablePtr::New();
-	bwLut->SetTableRange (0, 1);
-	bwLut->SetSaturationRange (0, 0);
-	bwLut->SetHueRange (0, 0);
-	bwLut->SetValueRange (0, 1);
-	bwLut->Build();
-	this->setBaseLookupTable(bwLut);
+  vtkLookupTablePtr bwLut= vtkLookupTablePtr::New();
+  bwLut->SetTableRange (0, 1);
+  bwLut->SetSaturationRange (0, 0);
+  bwLut->SetHueRange (0, 0);
+  bwLut->SetValueRange (0, 1);
+  bwLut->Build();
+  this->setBaseLookupTable(bwLut);
+
+  connect(mData.get(), SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
+  connect(mData.get(), SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));
 }
 
 ImageLUT2DPtr ImageLUT2D::createCopy()
@@ -53,17 +60,35 @@ ImageLUT2DPtr ImageLUT2D::createCopy()
     retval->mBaseLUT->DeepCopy(mBaseLUT);
   }
   retval->mBase = mBase;
-  retval->mLevel = mLevel;
-  retval->mWindow = mWindow;
-  retval->mLLR = mLLR;
-  retval->mAlpha = mAlpha;
+
+  disconnect(retval->mData.get(), SIGNAL(changed()), retval.get(), SIGNAL(transferFunctionsChanged()));
+  disconnect(retval->mData.get(), SIGNAL(changed()), retval.get(), SLOT(transferFunctionsChangedSlot()));
+  retval->mData = mData->createCopy();
+  connect(retval->mData.get(), SIGNAL(changed()), retval.get(), SIGNAL(transferFunctionsChanged()));
+  connect(retval->mData.get(), SIGNAL(changed()), retval.get(), SLOT(transferFunctionsChangedSlot()));
+
+//  retval->mLevel = mLevel;
+//  retval->mWindow = mWindow;
+//  retval->mLLR = mLLR;
+//  retval->mAlpha = mAlpha;
 
   return retval;
 }
 
+ImageTFDataPtr ImageLUT2D::getData()
+{
+  return mData;
+}
+
+
 void ImageLUT2D::setVtkImageData(vtkImageDataPtr base)
 {
 	mBase = base;
+}
+
+void ImageLUT2D::transferFunctionsChangedSlot()
+{
+  this->refreshOutput();
 }
 
 /**set basic lookuptable, to be modified by level/window/llr/alpha
@@ -91,63 +116,35 @@ vtkLookupTablePtr ImageLUT2D::getBaseLookupTable()
  */
 void ImageLUT2D::setLLR(double val)
 {
-	if (similar(mLLR, val))
-		return;
-	mLLR = val;
-	refreshOutput();
+  mData->setLLR(val);
 }
-
 double ImageLUT2D::getLLR() const
 {
-	return mLLR;
+	return mData->getLLR();
 }
-
 void ImageLUT2D::setAlpha(double val)
 {
-	if (similar(mAlpha, val))
-		return;
-	mAlpha = val;
-	std::cout << "Set Alpha :" << mAlpha << std::endl;
-	refreshOutput();
+  mData->setAlpha(val);
 }
-
 double ImageLUT2D::getAlpha() const
 {
-	return mAlpha;
+	return mData->getAlpha();
 }
-
-/**Set Window, i.e. the size of the intensity
- * window that will be visible.
- */
 void ImageLUT2D::setWindow(double window)
 {
-	window = std::max(1e-5, window);
-
-	if (similar(mWindow, window))
-		return;
-	mWindow = window;
-	refreshOutput();
+  mData->setWindow(window);
 }
-
 double ImageLUT2D::getWindow() const
 {
-	return mWindow;
+	return mData->getWindow();
 }
-
-/**Set Level, i.e. the position of the intensity
- * window that will be visible.
- */
 void ImageLUT2D::setLevel(double level)
 {
-	if (similar(mLevel, level))
-		return;
-	mLevel = level;
-	refreshOutput();
+  mData->setLevel(level);
 }
-
 double ImageLUT2D::getLevel() const
 {
-	return mLevel;
+	return mData->getLevel();
 }
 
 /**Return the maximum intensity value of the underlying dataset.
@@ -158,76 +155,22 @@ double ImageLUT2D::getScalarMax() const
 	return mBase->GetScalarRange()[1];
 }
 
-void ImageLUT2D::testMap(double val)
-{
-	unsigned char* color = mOutputLUT->MapValue(val);
-	std::cout << "i=" << val << ", \t("
-		<< static_cast<int>(color[0]) << ","
-		<< static_cast<int>(color[1]) << ","
-		<< static_cast<int>(color[2]) << ","
-		<< static_cast<int>(color[3]) << ")" << std::endl;
-}
-
-double ImageLUT2D::mapThroughLUT(double x)
-{
-	double y = (mLLR - (mLevel - mWindow/2))/mWindow * mBaseLUT->GetNumberOfTableValues();
-	return y;
-}
+//void ImageLUT2D::testMap(double val)
+//{
+//	unsigned char* color = mOutputLUT->MapValue(val);
+//	std::cout << "i=" << val << ", \t("
+//		<< static_cast<int>(color[0]) << ","
+//		<< static_cast<int>(color[1]) << ","
+//		<< static_cast<int>(color[2]) << ","
+//		<< static_cast<int>(color[3]) << ")" << std::endl;
+//}
 
 /**rebuild the output lut from all inputs.
  */
 void ImageLUT2D::refreshOutput()
 {
-	double b0 = mLevel-mWindow/2.0;
-	double b1 = mLevel+mWindow/2.0;
-
-	// find LLR on the lut:
-	// We want to use the LLR on the _input_ intensity data, not on the
-	// mapped data. Thus we map the llr through the lut and insert that value
-	// into the lut.
-	double llr = mapThroughLUT(mLLR);
-	// if LLR < minimum table range, even the first value in the LUT will climb
-	// above the llr. To avoid this, we use a hack that sets llr to at least 1.
-	// This causes all zeros to become transparent, but the alternative is worse.
-	// (what we really need is to subclass vtkLookupTable,
-	//  but it contains nonvirtual functions).
-	llr = std::max(1.0, llr); // hack.
-
-	mOutputLUT->Build();
-	mOutputLUT->SetNumberOfTableValues(mBaseLUT->GetNumberOfTableValues());
-	mOutputLUT->SetTableRange(b0,b1);
-
-	for (int i=0; i<mOutputLUT->GetNumberOfTableValues(); ++i)
-	{
-		double rgba[4];
-		mBaseLUT->GetTableValue(i, rgba);
-
-		if (i >= llr)
-			rgba[ 3 ] = 0.9999;
-		else
-			rgba[ 3 ] = 0.001;
-
-		mOutputLUT->SetTableValue(i, rgba);
-	}
-	mOutputLUT->Modified();
-
-//	std::cout << "-----------------" << std::endl;
-//	for (unsigned i=0; i<256; i+=20)
-//	{
-//		testMap(i);
-//	}
-//	testMap(255);
-//	//mOutputLUT->Print(std::cout);
-//	//mOutputLUT->GetTable()->Print(std::cout);
-//	std::cout << "-----"
-//		<< "llr=" << llr
-//		<< ", LLR=" << mLLR
-//		<< ", level=" << mLevel
-//		<< ", window=" << mWindow
-//		<< ", b=[" << b0 << "," << b1 << "] "
-//		<< this
-//		<< std::endl;
-//	std::cout << "-----------------" << std::endl;
+//  mData->fillLUTFromLut(mOutputLUT, mBaseLUT); // sonowand way
+  mData->fillLUTFromMaps(mOutputLUT); // sintef way
 
 	emit transferFunctionsChanged();
 }
@@ -269,40 +212,42 @@ void ImageLUT2D::refreshOutput()
 
 void ImageLUT2D::addXml(QDomNode& dataNode)
 {
-  QDomDocument doc = dataNode.ownerDocument();
-  QDomElement elem = dataNode.toElement();
-  //QDomElement dataNode = doc.createElement("lookuptable2D");
-//  parentNode.appendChild(dataNode);
-  //std::cout << "Saving window: " << mWindow << std::endl;
-  elem.setAttribute("window", mWindow);
-  elem.setAttribute("level", mLevel);
-  elem.setAttribute("llr", mLLR);
-  elem.setAttribute("alpha", mAlpha);
-
-  //TODO: missing save of BaseLut
+  mData->addXml(dataNode);
+//  QDomDocument doc = dataNode.ownerDocument();
+//  QDomElement elem = dataNode.toElement();
+//  //QDomElement dataNode = doc.createElement("lookuptable2D");
+////  parentNode.appendChild(dataNode);
+//  //std::cout << "Saving window: " << mWindow << std::endl;
+//  elem.setAttribute("window", mWindow);
+//  elem.setAttribute("level", mLevel);
+//  elem.setAttribute("llr", mLLR);
+//  elem.setAttribute("alpha", mAlpha);
+//
+//  //TODO: missing save of BaseLut
 }
 
-double ImageLUT2D::loadAttribute(QDomNode dataNode, QString name, double defVal)
-{
-  QString text = dataNode.toElement().attribute(name);
-  bool ok;
-  double val = text.toDouble(&ok);
-  if (ok)
-    return val;
-  return defVal;
-}
+//double ImageLUT2D::loadAttribute(QDomNode dataNode, QString name, double defVal)
+//{
+//  QString text = dataNode.toElement().attribute(name);
+//  bool ok;
+//  double val = text.toDouble(&ok);
+//  if (ok)
+//    return val;
+//  return defVal;
+//}
 
 void ImageLUT2D::parseXml(QDomNode dataNode)
 {
-  if (dataNode.isNull())
-    return;
-
-  //std::cout << "Loading window (pre): " << mWindow << std::endl;
-  mWindow = loadAttribute(dataNode, "window", mWindow);
-  //std::cout << "Loading window (port): " << mWindow << std::endl;
-  mLevel = loadAttribute(dataNode, "level", mLevel);
-  mLLR = loadAttribute(dataNode, "llr", mLLR);
-  mAlpha = loadAttribute(dataNode, "alpha", mAlpha);
+  mData->parseXml(dataNode);
+//  if (dataNode.isNull())
+//    return;
+//
+//  //std::cout << "Loading window (pre): " << mWindow << std::endl;
+//  mWindow = loadAttribute(dataNode, "window", mWindow);
+//  //std::cout << "Loading window (port): " << mWindow << std::endl;
+//  mLevel = loadAttribute(dataNode, "level", mLevel);
+//  mLLR = loadAttribute(dataNode, "llr", mLLR);
+//  mAlpha = loadAttribute(dataNode, "alpha", mAlpha);
 
 //  std::map<int,QColor> input;
 //  QDomNode colorNode = dataNode.namedItem("color");

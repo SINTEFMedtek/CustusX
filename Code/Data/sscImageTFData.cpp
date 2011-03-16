@@ -352,5 +352,62 @@ void ImageTFData::fillLUTFromMaps(vtkLookupTablePtr output)
 
 }
 
+/**rebuild the output lut from all inputs.
+ */
+void ImageTFData::fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input)
+{
+  double b0 = mLevel-mWindow/2.0;
+  double b1 = mLevel+mWindow/2.0;
+
+  // find LLR on the lut:
+  // We want to use the LLR on the _input_ intensity data, not on the
+  // mapped data. Thus we map the llr through the lut and insert that value
+  // into the lut.
+  double llr = mapThroughLUT(mLLR, input->GetNumberOfTableValues());
+  // if LLR < minimum table range, even the first value in the LUT will climb
+  // above the llr. To avoid this, we use a hack that sets llr to at least 1.
+  // This causes all zeros to become transparent, but the alternative is worse.
+  // (what we really need is to subclass vtkLookupTable,
+  //  but it contains nonvirtual functions).
+  llr = std::max(1.0, llr); // hack.
+
+  output->Build();
+  output->SetNumberOfTableValues(input->GetNumberOfTableValues());
+  output->SetTableRange(b0,b1);
+
+  for (int i=0; i<output->GetNumberOfTableValues(); ++i)
+  {
+    double rgba[4];
+    input->GetTableValue(i, rgba);
+
+    if (i >= llr)
+      rgba[ 3 ] = 0.9999;
+    else
+      rgba[ 3 ] = 0.001;
+
+    output->SetTableValue(i, rgba);
+  }
+  output->Modified();
+
+//  std::cout << "-----------------" << std::endl;
+//  for (unsigned i=0; i<256; i+=20)
+//  {
+//    testMap(i);
+//  }
+//  testMap(255);
+//  //mOutputLUT->Print(std::cout);
+//  //mOutputLUT->GetTable()->Print(std::cout);
+//  std::cout << "-----"
+//    << "llr=" << llr
+//    << ", LLR=" << mLLR
+//    << ", level=" << mLevel
+//    << ", window=" << mWindow
+//    << ", b=[" << b0 << "," << b1 << "] "
+//    << this
+//    << std::endl;
+//  std::cout << "-----------------" << std::endl;
+
+}
+
 
 }
