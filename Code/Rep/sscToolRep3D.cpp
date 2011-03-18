@@ -234,8 +234,15 @@ void ToolRep3D::probeSectorChanged()
     mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
 
-    mRTStream->setTool(mTool);
-    mRTStream->setRealtimeStream(mTool->getProbe()->getRTSource());
+    if (mRTStream)
+    {
+      mRTStream->setTool(mTool);
+      ProbePtr probe = mTool->getProbe();
+      if (probe)
+      {
+	mRTStream->setRealtimeStream(probe->getRTSource());
+      }
+    }
   }
   else
   {
