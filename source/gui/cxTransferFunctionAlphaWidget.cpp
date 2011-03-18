@@ -327,7 +327,7 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint()
   if(mCurrentAlphaPoint.position == mImage->getMin()
      || mCurrentAlphaPoint.position == mImage->getMax() )
   {
-    mImageTF->setAlphaValue(mCurrentAlphaPoint.position,
+    mImageTF->addAlphaPoint(mCurrentAlphaPoint.position,
                                     newAlphaPoint.value);
   }
   else

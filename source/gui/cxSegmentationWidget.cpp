@@ -256,7 +256,7 @@ void SegmentationWidget::thresholdSlot(int value)
     mTF2D_original = image->getLookupTable2D()->createCopy();
   }
   image->resetTransferFunctions();
-  ssc::ImageTFDataPtr tf3D = image->getTransferFunctions3D()->getData();
+  ssc::ImageTFDataPtr tf3D = image->getTransferFunctions3D();
   tf3D->addAlphaPoint(value , 0);
   tf3D->addAlphaPoint(value+1, image->getMaxAlphaValue());
   tf3D->addColorPoint(value, Qt::green);
