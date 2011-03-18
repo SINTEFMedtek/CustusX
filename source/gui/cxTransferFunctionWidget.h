@@ -6,6 +6,7 @@
 #include <QDomElement>
 #include <sscImage.h>
 #include "cxPresetTransferFunctions3D.h"
+#include "sscDoubleDataAdapter.h"
 
 class QVBoxLayout;
 class QComboBox;
@@ -35,6 +36,8 @@ protected:
 
   ssc::ImageTFDataPtr mImageTFData;
 };
+typedef boost::shared_ptr<DoubleDataAdapterImageTFDataBase> DoubleDataAdapterImageTFDataBasePtr;
+
 
 /**DataInterface implementation for the tf window value
  */
@@ -106,6 +109,7 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
+  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 };
 
 /*
@@ -126,6 +130,7 @@ protected:
   QVBoxLayout* mLayout;
   TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
   TransferFunctionColorWidget* mTransferFunctionColorWidget;
+  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 };
 
 class TransferFunctionPresetWidget : public QWidget
@@ -169,6 +174,7 @@ protected:
   TransferFunction3DWidget* mTF3DWidget;
   TransferFunction2DWidget* mTF2DWidget;
   TransferFunctionPresetWidget* mTFPresetWidget;
+
 };
 
 }
