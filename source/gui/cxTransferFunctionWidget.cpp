@@ -15,6 +15,10 @@
 //#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"
 
+
+
+
+
 namespace cx
 {
 
@@ -69,7 +73,7 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
 {
   if (!mImageTFData)
     return ssc::DoubleRange();
-  double range = mImageTFData->getRange();
+  double range = mImageTFData->getScalarMax()-mImageTFData->getScalarMin();
   return ssc::DoubleRange(1,range,range/1000.0);
 }
 
@@ -89,7 +93,7 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
   if (!mImageTFData)
     return ssc::DoubleRange();
 
-  double max = mImageTFData->getMax();
+  double max = mImageTFData->getScalarMax();
   return ssc::DoubleRange(1,max,max/1000.0);
 }
 
@@ -111,7 +115,7 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
   if (!mImageTFData)
     return ssc::DoubleRange();
 
-  double max = mImageTFData->getMax();
+  double max = mImageTFData->getScalarMax();
   return ssc::DoubleRange(1,max,max/1000.0);
 }
 
@@ -132,8 +136,9 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataAlpha::getValueRange() const
   if (!mImageTFData)
     return ssc::DoubleRange();
 
-  double max = mImageTFData->getAlphaMax();
-  return ssc::DoubleRange(1,max,max/1000.0);
+//  double max = mImageTFData->getMaxAlphaValue();
+  double max = 1.0;
+  return ssc::DoubleRange(0,max,max/100.0);
 }
 
 
@@ -150,6 +155,11 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
+  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
+  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
+  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
+  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
+
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -161,6 +171,13 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
 
+  QGridLayout* gridLayout = new QGridLayout;
+  mLayout->addLayout(gridLayout);
+  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+
   this->setLayout(mLayout);
 }
 
@@ -169,12 +186,17 @@ void TransferFunction3DWidget::activeImageChangedSlot()
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   ssc::ImageTFDataPtr tf;
   if (image)
-    tf = image->getTransferFunctions3D()->getData();
+    tf = image->getTransferFunctions3D();
   else
     image.reset();
 
   mTransferFunctionAlphaWidget->setData(image, tf);
   mTransferFunctionColorWidget->setData(image, tf);
+
+  mDataWindow->setImageTFData(tf);
+  mDataLevel->setImageTFData(tf);
+  mDataAlpha->setImageTFData(tf);
+  mDataLLR->setImageTFData(tf);
 }
 
 //---------------------------------------------------------
@@ -191,6 +213,11 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
+  mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
+  mDataLevel.reset(new DoubleDataAdapterImageTFDataLevel);
+  mDataAlpha.reset(new DoubleDataAdapterImageTFDataAlpha);
+  mDataLLR.reset(new DoubleDataAdapterImageTFDataLLR);
+
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(QString)), this, SLOT(activeImageChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()), this, SLOT(activeImageChangedSlot()));
 
@@ -202,6 +229,14 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
 
+//  mLayout->addWidget(mTransferFunctionColorWidget);
+  QGridLayout* gridLayout = new QGridLayout;
+  mLayout->addLayout(gridLayout);
+  new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
+  new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
+  new ssc::SliderGroupWidget(this, mDataAlpha,  gridLayout, 2);
+  new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
+
   this->setLayout(mLayout);
 }
 
@@ -210,12 +245,17 @@ void TransferFunction2DWidget::activeImageChangedSlot()
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
   ssc::ImageTFDataPtr tf;
   if (image)
-    tf = image->getLookupTable2D()->getData();
+    tf = image->getLookupTable2D();
   else
     image.reset();
 
   mTransferFunctionAlphaWidget->setData(image, tf);
   mTransferFunctionColorWidget->setData(image, tf);
+
+  mDataWindow->setImageTFData(tf);
+  mDataLevel->setImageTFData(tf);
+  mDataAlpha->setImageTFData(tf);
+  mDataLLR->setImageTFData(tf);
 }
 
 //---------------------------------------------------------
@@ -297,8 +337,8 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
 
   QTabWidget* tabWidget = new QTabWidget(this);
   mLayout->addWidget(tabWidget);
-  tabWidget->addTab(mTF2DWidget, "Volume");
-  tabWidget->addTab(mTF3DWidget, "Slice");
+  tabWidget->addTab(mTF3DWidget, "Volume");
+  tabWidget->addTab(mTF2DWidget, "Slice");
   tabWidget->addTab(new ShadingWidget(this), "Shading");
 
 //  mLayout->addWidget(mTF2DWidget);
