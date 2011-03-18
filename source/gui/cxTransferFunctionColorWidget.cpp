@@ -320,10 +320,10 @@ void TransferFunctionColorWidget::setColorSlotDelayed()
     // Check if the point is already in the map
     ssc::ColorMap::iterator pointIterator = colorMapPtr->find(newPoint.position);
 
-    if (pointIterator != colorMapPtr->end())
-      mImageTF->setColorValue(newPoint.position, result);
-    else
-      mImageTF->addColorPoint(newPoint.position, result);
+//    if (pointIterator != colorMapPtr->end())
+//      mImageTF->setColorValue(newPoint.position, result);
+//    else
+    mImageTF->addColorPoint(newPoint.position, result);
     newPoint.value = result;
   }
   // TODO: update /render() ???

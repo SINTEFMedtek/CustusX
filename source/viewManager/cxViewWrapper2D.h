@@ -17,7 +17,7 @@
 #include "cxViewWrapper.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT
-//  #define USE_2D_GPU_RENDER
+  #define USE_2D_GPU_RENDER
 #endif
 
 namespace cx
