@@ -24,50 +24,64 @@ typedef boost::shared_ptr<ColorMap> ColorMapPtr;
 
 typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
 
-//TODO: get an overview of the ranges of the alpha and color tfs, both index range and value range.
-
 /**Data class for Transfer Function info, either 2D or 3D.
- * Used inside ImageTF3D and ImageLUT2D.
+ * Used as base for ImageTF3D and ImageLUT2D.
  */
 class ImageTFData : public QObject
 {
   Q_OBJECT
 public:
-  ImageTFData();
+  ImageTFData(vtkImageDataPtr base);
+  void setVtkImageData(vtkImageDataPtr base);
   virtual ~ImageTFData();
-  ImageTFDataPtr createCopy();
-  void initialize(double scalarMax);
 
-  void   setAlpha(double val);
+  void   setAlpha(double val); ///< range [0..1]
   double getAlpha() const;
-  void   setLLR(double val);
+  void   setLLR(double val); ///< range [scalarMin..scalarMax]
   double getLLR() const;
-  void   setWindow(double val);
+  void   setWindow(double val); ///< range [1..scalarMax-scalarMin]
   double getWindow() const;
-  void   setLevel(double val);
+  void   setLevel(double val); ///< range [scalarMin..scalarMax]
   double getLevel() const;
 
-  void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
-  void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
-  void fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input);
-  void fillLUTFromMaps(vtkLookupTablePtr output);
+  void setLut(vtkLookupTablePtr lut);
+  vtkLookupTablePtr getLut() const;
 
-  OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function
-  ColorMapPtr getColorMap();///< \return The values of the color transfer function
+  double getScalarMax() const;
+  double getScalarMin() const;///< \return Minimum intensity of underlying dataset
+  int getMaxAlphaValue() const; // dont use
+
+  OpacityMapPtr getOpacityMap();///< \return The values of the opacity transfer function. Key range [scalarMin..scalarMax], Value range [0..255].
+  ColorMapPtr getColorMap();///< \return The values of the color transfer function. Key range [scalarMin..scalarMax].
 
   void addAlphaPoint( int alphaPosition , int alphaValue);///< Add point to the opacity transfer function
   void removeAlphaPoint(int alphaPosition);///< Remove point from the opacity transfer function
-  void setAlphaValue(int alphaPosition, int alphaValue);///< Change value of an existing opacity transfer function point
-  int  getAlphaValue(int alphaPosition);///< \return Alpha value of a specified position in the opacity transfer function
   void addColorPoint( int colorPosition , QColor colorValue);///< Add point to the color transfer function
   void removeColorPoint(int colorPosition);///< Remove point from the color transfer function
-  void setColorValue(int colorPosition, QColor colorValue);///< Change value of an existing color transfer function point
 
-  void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
-  void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+  virtual void addXml(QDomNode dataNode); ///< adds xml information about the transferfunction and its variabels
+  virtual void parseXml(QDomNode dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
+
+  void fillColorTFFromMap(vtkColorTransferFunctionPtr tf);
 
 signals:
   void changed();
+
+protected:
+  virtual void colorMapChanged();
+  virtual void alphaLLRChanged() {}
+  virtual void LUTChanged() {}
+
+  void buildLUTFromColorMap();
+  void deepCopy(ImageTFData* source);
+
+  void fillOpacityTFFromMap(vtkPiecewiseFunctionPtr tf);
+  void fillLUTFromLut(vtkLookupTablePtr output, vtkLookupTablePtr input);
+
+  vtkImageDataPtr mBase;
+  OpacityMapPtr mOpacityMapPtr;
+  ColorMapPtr mColorMapPtr;
+  vtkLookupTablePtr mLut;
 
 private:
   // these values can be used instead of setting the opacity TF explicitly
@@ -75,12 +89,8 @@ private:
   double mWindow;
   double mLevel;
   double mAlpha;
- // vtkLookupTablePtr mLut;
   double loadAttribute(QDomNode dataNode, QString name, double defVal);
   double mapThroughLUT(double x, int lutSize);
-
-  OpacityMapPtr mOpacityMapPtr;
-  ColorMapPtr mColorMapPtr;
 };
 
 }

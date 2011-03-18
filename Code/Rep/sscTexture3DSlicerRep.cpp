@@ -294,6 +294,7 @@ void Texture3DSlicerRep::updateColorAttributeSlot()
 		float alpha = (float) mImages[i]->getLookupTable2D()->getAlpha();
 		mPainter->SetColorAttribute(i, window, level, llr, alpha);
 	}
+	mActor->Modified();
 }
 
 void Texture3DSlicerRep::transformChangedSlot()
