@@ -28,6 +28,12 @@ typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 
 /**Handler for the transfer functions used in 3d image volumes.
  * Used by Image.
+ *
+ * Set the basic lut using either setLut() or setColorPoint(), then modify it with window and level.
+ * Set the alpha channel using setAlphaPoint(), or override it by creating a opacity step function
+ * with LLR and Alpha.
+ *
+ * The volume rendering classes can use the data by getting OpacityTF and ColorTF.
  */
 class ImageTF3D : public ImageTFData
 {

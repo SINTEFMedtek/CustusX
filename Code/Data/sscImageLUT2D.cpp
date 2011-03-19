@@ -22,38 +22,17 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 {
   mOutputLUT = vtkLookupTablePtr::New();
 
-//  mData.reset(new ImageTFData());
   double smin = mBase->GetScalarRange()[0];
   double smax = mBase->GetScalarRange()[1];
-//  std::cout << "scalarrange " << smin << " " << smax << std::endl;
-
-	//dafault Full Range.... or level-it
-//	mLevel =  0; //getScalarMax() / 2.0;
-//  mLevel =  getScalarMax() / 2.0;
-//	mWindow = getScalarMax();
-//	mLLR = 0.0;
-//	mAlpha = 1.0;
 
   // this sets the initial opacity tf to full
   this->setAlpha(1);
   this->setLLR(smin);
   this->buildOpacityMapFromLLRAlpha();
 
-  //  this->addAlphaPoint(smin, 0);
-  //  this->addAlphaPoint(smax, 255);
-
   // this also sets the initial lut to grayscale
   this->addColorPoint(smin, Qt::black);
   this->addColorPoint(smax, Qt::white);
-
-//	//make a default system set lookuptable, grayscale...
-//  vtkLookupTablePtr bwLut= vtkLookupTablePtr::New();
-//  bwLut->SetTableRange (0, 1);
-//  bwLut->SetSaturationRange (0, 0);
-//  bwLut->SetHueRange (0, 0);
-//  bwLut->SetValueRange (0, 1);
-//  bwLut->Build();
-//  this->setBaseLookupTable(bwLut);
 
   // set values suitable for CT.
   this->setLevel(smax * 0.15);
@@ -125,7 +104,7 @@ void ImageLUT2D::refreshOutput()
 	emit transferFunctionsChanged();
 }
 
-void ImageLUT2D::addXml(QDomNode& dataNode)
+void ImageLUT2D::addXml(QDomNode dataNode)
 {
   ImageTFData::addXml(dataNode);
 }

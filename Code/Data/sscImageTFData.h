@@ -26,6 +26,26 @@ typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
 
 /**Data class for Transfer Function info, either 2D or 3D.
  * Used as base for ImageTF3D and ImageLUT2D.
+ *
+ * Alpha transfer function: Set either LLR/alpha or OpacityMap, this updates
+ * the data as shown.
+ *
+ *     set            set
+ *      |              |
+ *   LLR/alpha --> OpacityMap --> alphaTF
+ *
+ *
+ * Color transfer function: Set either ColorMap or LUT, plus the Win/Level,
+ * this updates the data as shown.
+ *
+ *     set        set
+ *      |          |
+ *   ColorMap --> LUT -------> colorTF
+ *                         |
+ *              Win/Level--|
+ *                 |
+ *                set
+ *
  */
 class ImageTFData : public QObject
 {
@@ -69,8 +89,8 @@ signals:
 
 protected:
   virtual void colorMapChanged();
-  virtual void alphaLLRChanged() {}
-  virtual void LUTChanged() {}
+  virtual void alphaLLRChanged() {} // implemented by subclass
+  virtual void LUTChanged() {} // implemented by subclass
 
   void buildLUTFromColorMap();
   void deepCopy(ImageTFData* source);
