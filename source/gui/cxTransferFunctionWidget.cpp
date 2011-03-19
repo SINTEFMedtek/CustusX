@@ -301,6 +301,7 @@ void TransferFunctionPresetWidget::resetSlot()
 {
   ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
   activeImage->resetTransferFunctions();
+  mPresetsComboBox->setCurrentIndex(0);
 }
 
 void TransferFunctionPresetWidget::saveSlot()

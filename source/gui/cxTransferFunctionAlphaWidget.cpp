@@ -52,7 +52,7 @@ TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 
 void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData)
 {
-  if(mImage == image)
+  if (( mImage == image )&&( mImageTF==tfData ))
     return;
 
   mImage = image;
