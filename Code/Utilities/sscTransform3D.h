@@ -46,7 +46,8 @@ private:
 public:
 	Transform3D();
 	explicit Transform3D(const double* data);      ///< construct a transform matrix from a c-style array of 16 numbers, vtk ordering
-  static Transform3D fromString(const QString& text, bool* ok=0); ///< construct a transform matrix from a string containing 16 whitespace-separated numbers, vtk ordering
+	QString toString();			///< Construct a single-line string representation of the matrix
+	static Transform3D fromString(const QString& text, bool* ok=0); ///< construct a transform matrix from a string containing 16 whitespace-separated numbers, vtk ordering
 	explicit Transform3D(vtkMatrix4x4* m);
 	Transform3D(const Transform3D& t);
 	Transform3D& operator=(const Transform3D& t);
