@@ -162,6 +162,7 @@ void ViewWrapper2D::addReps()
   mToolRep2D = ssc::ToolRep2D::New("Tool2D_"+mView->getName());
   mToolRep2D->setSliceProxy(mSliceProxy);
   mToolRep2D->setUseCrosshair(true);
+//  mToolRep2D->setUseToolLine(false);
   mView->addRep(mToolRep2D);
 }
 
@@ -308,6 +309,11 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 
   // do this to force sync global and local type - must think on how we want this to work
   this->changeOrientationType(getOrientationType());
+
+  bool isOblique = mSliceProxy->getComputer().getOrientationType()==ssc::otOBLIQUE;
+  mToolRep2D->setUseCrosshair(!isOblique);
+//  mToolRep2D->setUseToolLine(!isOblique);
+
 }
 
 /** get the orientation type directly from the slice proxy
