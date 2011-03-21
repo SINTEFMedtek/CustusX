@@ -2,12 +2,12 @@
 #define CXTOOLMANAGER_H_
 
 #include "sscToolManager.h"
-#include "itkCommand.h"
+//#include "itkCommand.h"
 #include "vtkSmartPointer.h"
 #include "sscManualTool.h"
 #include "sscLandmark.h"
 #include "cxTool.h"
-#include "cxTracker.h"
+//#include "cxIgstkTracker"
 #include "sscDummyTool.h"
 #include "vtkForwardDeclarations.h"
 #include "cxManualToolAdapter.h"
@@ -20,6 +20,9 @@ class QFileInfo;
 
 namespace cx
 {
+typedef boost::shared_ptr<class IgstkTrackerThread> IgstkTrackerThreadPtr;
+
+
 /**
  * \class ToolManager
  *
@@ -78,9 +81,6 @@ public:
   virtual ssc::SessionToolHistoryMap getSessionHistory(double startTime, double stopTime);
 
   void runDummyTool(ssc::DummyToolPtr tool);
-//  void setUSProbeSector(ssc::ProbeSector probeSector); ///< Set US probe sector on  the dominant tool (if it is a US probe)
-
-  TrackerPtr getTracker();
 
 public slots:
   void configure(); ///< sets up the software like the xml file suggests
@@ -91,31 +91,24 @@ public slots:
   void saveToolsSlot(); ///< saves transforms and timestamps
   void dominantCheckSlot(); ///< checks if the visible tool is going to be set as dominant tool
 
-protected slots:
-  void checkTimeoutsAndRequestTransform(); ///< checks for igstk timeouts and requests transform to the patient reference if needed
-  void trackerOpenSlot(bool);
-  void trackerInitializedSlot(bool);
+private slots:
+  void trackerConfiguredSlot(bool on);
+  void initializedSlot(bool);
   void trackerTrackingSlot(bool);
-  void toolInitialized(bool);
-  void updateReferenceTransformSlot();
+  void startTrackingAfterInitSlot();
+  void initializeAfterConfigSlot();
 
-protected:
-  typedef ssc::ToolManager::ToolMap::iterator ToolMapIter;
-
+private:
   ToolManager(); ///< use getInstance instead
   virtual ~ToolManager(); ///< destructor
 
-  void addInitializedTool(QString uid); ///< moves a tool from configuredTools to initializedTools
   void initializeManualTool();
-  void configureReferences(); ///< specifies a tools as the reference
 
   QString mConfigurationFilePath; ///< path to the configuration file
   QString mLoggingFolder; ///< path to where logging should be saved
-  QTimer* mTimer; ///< timer controlling the demand of transforms
 
-  TrackerPtr mTracker; ///< the tracker to use
-  ssc::ToolManager::ToolMapPtr mConfiguredTools; ///< all configured, but not connected, tools
-  ssc::ToolManager::ToolMapPtr mInitializedTools; ///< all initialized tools
+  ssc::ToolManager::ToolMap mTools; ///< all tools
+
   ssc::ToolPtr mDominantTool; ///< the tool with highest priority
   ssc::ToolPtr mReferenceTool; ///< the tool which is used as patient reference tool
   ManualToolAdapterPtr mManualTool; ///< a mouse-controllable virtual tool that is available even when not tracking.
@@ -126,10 +119,10 @@ protected:
   bool mInitialized; ///< whether or not the system is initialized
   bool mTracking; ///< whether or not the system is tracking
 
-  igstk::PulseGenerator::Pointer mPulseGenerator;
-
   ssc::LandmarkMap mLandmarks; ///< in space patient reference.
   double mLastLoadPositionHistory;
+
+  IgstkTrackerThreadPtr mTrackerThread;
 
 private:
   ToolManager(ToolManager const&);
