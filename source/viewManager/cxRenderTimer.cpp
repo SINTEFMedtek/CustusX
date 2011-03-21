@@ -1,4 +1,4 @@
-/*
+/**
  * cxRenderTimer.cpp
  *
  *  Created on: Oct 19, 2010
