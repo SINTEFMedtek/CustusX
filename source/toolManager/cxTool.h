@@ -4,6 +4,7 @@
 #include "sscTool.h"
 
 #include <limits.h>
+#include <QTimer>
 #include <boost/shared_ptr.hpp>
 #include <igstkPolarisTrackerTool.h>
 #include <igstkAuroraTrackerTool.h>
@@ -11,8 +12,7 @@
 #include <igstkLogger.h>
 #include <itkStdStreamLogOutput.h>
 #include "sscTransform3D.h"
-#include "cxTracker.h"
-//#include "probeXmlConfigParser.h"
+#include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
 
 class QStringList;
@@ -72,39 +72,38 @@ public:
     ssc::Tool::Type   mType;                  ///< the tools type
     QString           mName;                  ///< the tools name
     QString           mUid;                   ///< the tools unique id
-    Tracker::Type     mTrackerType;           ///< what product the tool belongs to
+    IgstkTracker::Type     mTrackerType;           ///< what product the tool belongs to
     QString           mSROMFilename;          ///< path to the tools SROM file
     unsigned int      mPortNumber;            ///< the port number the tool is connected to
     unsigned int      mChannelNumber;         ///< the channel the tool is connected to
     std::map<int, ssc::Vector3D>     mReferencePoints;        ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
     bool              mWireless;              ///< whether or not the tool is wireless
     bool              m5DOF;                  ///< whether or not the tool have 5 DOF
+    igstk::Transform  mCalibration;           ///< transform read from mCalibrationFilename
     QString           mCalibrationFilename;   ///< path to the tools calibration file
     QString           mGraphicsFileName;      ///< path to this tools graphics file
     QString           mTransformSaveFileName; ///< path to where transforms should be saved
     QString           mLoggingFolderName;     ///< path to where log should be saved
     QString           mInstrumentId;          ///< The instruments id
     QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
-//    bool              mUseAsManualTool;       ///< Use properties from this tool as input to the manual tool (debug use)
     InternalStructure() :
-      mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(Tracker::TRACKER_NONE),
+      mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(IgstkTracker::TRACKER_NONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX), mReferencePoints(),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
       mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
       mInstrumentScannerId("") {}; ///< sets up default values for all the members
   };
 
-  Tool(InternalStructure& internalStructur);   ///< constructor
-  ~Tool();                                    ///< destructor
+  Tool(IgstkToolPtr igstkTool);
+  ~Tool();
 
   virtual ssc::Tool::Type getType() const;
   virtual QString getGraphicsFileName() const;
   virtual vtkPolyDataPtr getGraphicsPolyData() const;
   virtual ssc::TimedTransformMapPtr getPositionHistory();
-//  virtual void saveTransformsAndTimestamps();
-//  virtual void setTransformSaveFile(const QString& filename);
   virtual ssc::Transform3D get_prMt() const;
   virtual bool getVisible() const;
+  virtual bool isInitialized() const;
   virtual QString getUid() const;
   virtual QString getName() const;
   virtual int getIndex() const{return 0;};
@@ -113,78 +112,58 @@ public:
   virtual double getTimestamp() const{ return 0; }; //	TODO
   virtual double getTooltipOffset() const; ///< get a virtual offset extending from the tool tip.
   virtual void setTooltipOffset(double val);///< set a virtual offset extending from the tool tip.
-  virtual void set_prMt(const ssc::Transform3D& transform);
 
   virtual bool isCalibrated() const; ///< true if calibration is different from identity
   virtual ssc::Transform3D getCalibration_sMt() const; ///< get the calibration transform from tool space to sensor space (where the spheres or similar live)
   virtual void setCalibration_sMt(ssc::Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
   QString getCalibrationFileName() const; ///< returns the path to the tools calibration file
 
-  Tracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
+  IgstkTracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
 
-//  QString getInstrumentId() const;
-//  QString getInstrumentScannerId() const;
   virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);
 
   virtual ssc::TimedTransformMap getSessionHistory(double startTime, double stopTime); ///< Get a tools transforms from within a given session
 
-  TrackerToolType* getPointer() const; ///< return a pointer to the internal tools base object
   bool isValid() const; ///< whether this tool is constructed correctly or not
 
   void addXml(QDomNode& dataNode);
   void parseXml(QDomNode& dataNode);
 
+  typedef ssc::Transform3D Transform3D;
 signals:
   void attachedToTracker(bool);
 
-protected:
-  void writeCalibrationToFile();
+private slots:
+  void toolTransformAndTimestampSlot(Transform3D matrix, double timestamp); ///< timestamp is in milliseconds
+  void calculateTpsSlot();
+  void toolVisibleSlot(bool);
 
-  typedef itk::ReceptorMemberCommand<Tool> ObserverType;
-
+private:
   Tool(){}; ///< do not use this constructor
-  void toolTransformCallback(const itk::EventObject &eventVar); ///< handles all incoming events from igstk
+  void writeCalibrationToFile();
   bool verifyInternalStructure(); ///< checks the values of the internal structure to see if they seem reasonable
   TrackerToolType* buildInternalTool(); ///< builds the igstk trackertool
   void createPolyData(); ///< creates the polydata either from file or a vtkConeSource
-  void determineToolsCalibration(); ///< reads the calibration file and saves it as igstk::Transform
-  void addLogging(TrackerToolType* trackerTool); ///< adds igstk logging to the internal igstk trackertool
-
-  void internalAttachedToTracker(bool value);
-  void internalTracked(bool value);
-  void internalConfigured(bool value);
-  void internalVisible(bool value);
 
   void printInternalStructure(); ///< FOR DEBUGGING
 
-  InternalStructure mInternalStructure;             ///< the tools internal structure
-  bool mValid;                                      ///< whether this tool is constructed correctly or not
-  TrackerToolType* mTool;                           ///< pointer to the base class of the igstk tool
-  PolarisTrackerToolType::Pointer mTempPolarisTool; ///< internal container for a temp polaris tool
-  AuroraTrackerToolType::Pointer mTempAuroraTool;   ///< internal container for a temp aurora too
-  ObserverType::Pointer mToolObserver;              ///< observer listening for igstk events
-  TransformType mCalibrationTransform;              ///< a matrix representing the tools calibration
-//  Transform3DVectorPtr mTransforms;                 ///< all transforms received by the tool
-//  DoubleVectorPtr mTimestamps;                      ///< all timestamps received by the tool
+  IgstkToolPtr mTool;
+
   ssc::TimedTransformMapPtr mPositionHistory;
   vtkPolyDataPtr mPolyData;                         ///< the polydata used to represent the tool graphically
   ssc::Transform3DPtr m_prMt;                       ///< the transform from the tool to the patient reference
-  igstk::Logger::Pointer mLogger;                   ///< logging the internal igstk behavior
-  itk::StdStreamLogOutput::Pointer mLogOutput;      ///< output to write the log to
 
+  bool mValid;                                      ///< whether this tool is constructed correctly or not
   bool mConfigured;         ///< whether or not the tool is properly configured
-  bool mVisible;            ///< whether or not the tool is visible to the tracking system
-  bool mAttachedToTracker;  ///< whether the tool is attached to a tracker or not
   bool mTracked;            ///< whether the tool is being tracked or not
 
   double mToolTipOffset; ///< distance from tool where point should be shown
 
   ProbePtr mProbe;
-//  ssc::ProbeSector mProbeSector; ///< Probe sector information
-//
-//  ProbeXmlConfigParser* mXml; ///< the xml parser for the ultrasoundImageConfigs.xml
-//  QString mProbeSectorConfiguration; ///< The probe sector configuration matching the config id in ultrasoundImageConfigs.xml
+
+  QTimer mTpsTimer;
+
 };
 typedef boost::shared_ptr<Tool> ToolPtr;
 
