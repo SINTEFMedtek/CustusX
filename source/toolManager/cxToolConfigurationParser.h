@@ -6,7 +6,7 @@
 #include <QDomDocument>
 #include "sscToolManager.h"
 #include "cxTool.h"
-#include "cxTracker.h"
+#include "cxIgstkTracker.h"
 
 namespace cx
 {
@@ -27,8 +27,11 @@ public:
   ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder = ""); ///< opens the xml file and readies it for reading
   ~ToolConfigurationParser();
 
-  TrackerPtr getTracker(); ///< return the tracker created from the xml file
-  ssc::ToolManager::ToolMapPtr getConfiguredTools(); ///< return all tools created from the xml files
+  IgstkTracker::InternalStructure getTracker(); ///< return the tracker created from the xml file
+  std::vector<IgstkTracker::InternalStructure> getTrackers(); ///< return all trackers created from the config xml file
+  std::vector<Tool::InternalStructure> getConfiguredTools(); ///< return all tools created from the config xml file
+
+  QString getUserManual() const; ///< documenting how to correctly write a tool configuration file setup
 
 private:
   QString     getLoggingFolder() const;
@@ -37,6 +40,7 @@ private:
 
   QString mConfigurationPath; ///< path to the configuration file
   QString mLoggingFolder; ///< path to where logging should be saved, default is the folder where configfile is found
+
   const QString mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
                     mToolTypeTag, mToolIdTag, mToolNameTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
@@ -44,10 +48,14 @@ private:
                     mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,
                     mToolCalibrationTag, mToolCalibrationFileTag,
                     mInstrumentTag, mInstrumentIdTag, mInstrumentScannerIdTag;
-                    ///< names of necessary tags in the configuration file
+                    ///< names of necessary tags in the configuration setup
 
   QDomDocument mConfigureDoc; ///< the config xml document
+
+  igstk::Transform readCalibrationFile(QString filename);
+
 };
+
 
 } //namespace cx
 #endif /* CXTOOLCONFIGURATIONPARSER_H_ */

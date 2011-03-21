@@ -1,5 +1,5 @@
-#ifndef CXTRACKER_H_
-#define CXTRACKER_H_
+#ifndef CXIGSTKTRACKER_H_
+#define CXIGSTKTRACKER_H_
 
 #include <QObject>
 
@@ -23,6 +23,10 @@ namespace cx
 typedef std::map<QString, ssc::ToolPtr> ToolMap;
 typedef boost::shared_ptr<ToolMap> ToolMapPtr;
 
+class IgstkTool;
+typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;
+typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
+
 /**
  * \class Tracker
  *
@@ -31,7 +35,7 @@ typedef boost::shared_ptr<ToolMap> ToolMapPtr;
  * \date Nov 7, 2008
  * \author: Janne Beate Bakeng, SINTEF
  */
-class Tracker : public QObject
+class IgstkTracker : public QObject
 {
   Q_OBJECT
 public:
@@ -78,8 +82,8 @@ public:
       mType(TRACKER_NONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
   };
 
-  Tracker(InternalStructure internalStructure);
-  ~Tracker();
+  IgstkTracker(InternalStructure internalStructure);
+  ~IgstkTracker();
 
   Type getType() const;               ///< returns the trackers type
   QString getName() const;            ///< get the trackers name
@@ -87,8 +91,8 @@ public:
   TrackerType* getPointer() const;    ///< return a pointer to the internal tracker base
   void open();                        ///< open the tracker for communication
   void close();                       ///< close the
-  void attachTools(ToolMapPtr tools); ///< attach a list of tools to the tracker hw
-  void detachTools(ToolMapPtr tools); ///< detach the list of tools from the tracker hw
+  void attachTools(std::map<QString, IgstkToolPtr> tools); ///< attach a list of tools to the tracker hw
+  void detachTools(std::map<QString, IgstkToolPtr> tools); ///< detach the list of tools from the tracker hw
   void startTracking();               ///< start tracking
   void stopTracking();                ///< stop tracking
 
@@ -100,9 +104,9 @@ signals:
   void tracking(bool);
 
 protected:
-  typedef itk::ReceptorMemberCommand<Tracker> ObserverType;
+  typedef itk::ReceptorMemberCommand<IgstkTracker> ObserverType;
 
-  Tracker(){}; ///< do not use this one
+  IgstkTracker(){}; ///< do not use this one
   void trackerTransformCallback(const itk::EventObject &eventVar); ///< callback receiving events from the observer
   void addLogging(); ///< adds logging to the internal igstk components
 
@@ -127,7 +131,8 @@ protected:
   bool mInitialized;  ///< whether or not the tracker is initialized
   bool mTracking;     ///< whether or not the tracker is tracking
 };
-typedef boost::shared_ptr<Tracker> TrackerPtr;
+typedef boost::shared_ptr<IgstkTracker> TrackerPtr;
+typedef boost::weak_ptr<IgstkTracker> TrackerWeakPtr;
 }//namespace cx
 
-#endif /* CXTRACKER_H_ */
+#endif /* CXIGSTKTRACKER_H_ */
