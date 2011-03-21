@@ -158,7 +158,10 @@ void ToolManager::configure()
   if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
   {
     if (!mConfiguredTools->empty())
+    {
       mManualTool->setBase(mConfiguredTools->begin()->second);
+      ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + mConfiguredTools->begin()->first);
+    }
   }
 
   this->configureReferences();
