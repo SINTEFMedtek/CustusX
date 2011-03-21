@@ -11,7 +11,7 @@ namespace cx
 //----------------------------------------------------------------------------------------------------------------------
 ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder) :
       mLoggingFolder(loggingFolder), mTrackerTag("tracker"),
-      mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
+      mToolfileTag("toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
       mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
       mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
