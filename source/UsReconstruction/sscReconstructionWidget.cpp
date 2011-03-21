@@ -70,6 +70,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
   //ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
   ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mOrientationAdapter);
+  ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mPresetTFAdapter);
   
   QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
   
@@ -94,6 +95,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
   outputVolLayout->addLayout(outputVolGridLayout);
   outputVolLayout->addLayout(outputVolDimLayout);
   outputVolLayout->addWidget(orientationWidget);
+  outputVolLayout->addWidget(presetTFWidget);
   outputVolLayout->addWidget(reduceWidget);
   outputVolLayout->addWidget(alignTimestampsWidget);
   outputVolLayout->addWidget(timeCalibrationWidget);
