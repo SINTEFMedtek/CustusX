@@ -28,16 +28,20 @@ public:
   CustomStatusBar(); ///< connects signals and slots
   ~CustomStatusBar(); ///< empty
 
-protected slots:
+private slots:
   void connectToToolSignals(); ///< connect to all available tools
   void disconnectFromToolSignals(); ///< disconnect from all tool
   void receiveToolVisible(bool visible); ///< updates the color label for a tool
-  void fpsSlot(int numFps); ///< Show FPS
+  void fpsSlot(int numFps); ///< Show frames per seconds
+  void tpsSlot(int numTps); ///< Show transforms per seconds
   void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
 
-protected:
+private:
+  void setToolLabelColor(QLabel* label, bool visible);
+
   std::vector<QLabel*> mToolLabels; ///< labels indicating the tools visibility
   QLabel* mFpsLabel; ///< Label for showing FPS
+  QLabel* mTpsLabel; ///< Label for showing TPS
 };
 }
 

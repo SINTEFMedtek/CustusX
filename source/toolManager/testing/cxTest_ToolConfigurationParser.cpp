@@ -25,20 +25,20 @@ void TestToolConfigurationParser::testConstructor()
 
 void TestToolConfigurationParser::testGetTracker()
 {
-  cx::TrackerPtr tracker = mConfigurationParser->getTracker();
-  CPPUNIT_ASSERT_MESSAGE("Tracker is null.", tracker);
-  CPPUNIT_ASSERT_MESSAGE("Tracker is not of type Polaris.", tracker->getType() == cx::Tracker::TRACKER_POLARIS);
+  cx::IgstkTracker::InternalStructure tracker = mConfigurationParser->getTracker();
+  //CPPUNIT_ASSERT_MESSAGE("Tracker is null.", tracker);
+  CPPUNIT_ASSERT_MESSAGE("Tracker is not of type Polaris.", tracker.mType == cx::IgstkTracker::TRACKER_POLARIS);
 }
 
 void TestToolConfigurationParser::testGetConfiguredTools()
 {
-  cx::ToolMapPtr toolmap = mConfigurationParser->getConfiguredTools();
-  CPPUNIT_ASSERT_MESSAGE("Not the right number of tools.", toolmap->size() == 2);
+  std::vector<cx::Tool::InternalStructure> tools = mConfigurationParser->getConfiguredTools();
+  CPPUNIT_ASSERT_MESSAGE("Not the right number of tools.", tools.size() == 2);
 
-  cx::ToolMap::iterator it;
-  for(it = toolmap->begin(); it != toolmap->end(); ++it)
+  std::vector<cx::Tool::InternalStructure>::iterator it;
+  for(it = tools.begin(); it != tools.end(); ++it)
   {
-    cx::ToolPtr cxTool = boost::shared_static_cast<cx::Tool>((*it).second);
-    CPPUNIT_ASSERT_MESSAGE("Found an invalid configured tool.", cxTool->isValid());
+    //cx::ToolPtr cxTool = boost::shared_static_cast<cx::Tool>((*it).second);
+    CPPUNIT_ASSERT_MESSAGE("Found an tool of type.", it->mType);
   }
 }

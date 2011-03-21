@@ -1,15 +1,15 @@
-#include "cxTracker.h"
+#include "cxIgstkTracker.h"
 
 #include "sscMessageManager.h"
 #include "cxTool.h"
 #include "sscTypeConversions.h"
-
+#include "cxIgstkTool.h"
 #include <time.h>
 
 
 namespace cx
 {
-Tracker::Tracker(InternalStructure internalStructure) :
+IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
   mInternalStructure(internalStructure),
   mValid(false),
   mUid(""),
@@ -86,36 +86,36 @@ Tracker::Tracker(InternalStructure internalStructure) :
   default:
     break;
   }
-  mTrackerObserver->SetCallbackFunction(this, &Tracker::trackerTransformCallback);
+  mTrackerObserver->SetCallbackFunction(this, &IgstkTracker::trackerTransformCallback);
   mTracker->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   mCommunication->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   this->addLogging();
 }
 
-Tracker::~Tracker()
+IgstkTracker::~IgstkTracker()
 {}
 
-Tracker::Type Tracker::getType() const
+IgstkTracker::Type IgstkTracker::getType() const
 {
   return mInternalStructure.mType;
 }
 
-QString Tracker::getName() const
+QString IgstkTracker::getName() const
 {
   return mName;
 }
 
-QString Tracker::getUid() const
+QString IgstkTracker::getUid() const
 {
   return mUid;
 }
 
-Tracker::TrackerType* Tracker::getPointer() const
+IgstkTracker::TrackerType* IgstkTracker::getPointer() const
 {
   return mTracker;
 }
 
-void Tracker::open()
+void IgstkTracker::open()
 {
   igstk::SerialCommunication::ResultType result = igstk::SerialCommunication::FAILURE;
   for(int i=0; i<5; ++i)
@@ -128,18 +128,17 @@ void Tracker::open()
   mTracker->RequestOpen();
 }
 
-void Tracker::close()
+void IgstkTracker::close()
 {
   mTracker->RequestClose();
   mCommunication->CloseCommunication();
 }
 
-void Tracker::attachTools(ToolMapPtr tools)
+void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 {
-  std::map<QString, ssc::ToolPtr> toolMap = *tools.get();
-  for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
+  for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
-    ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
+    IgstkToolPtr tool = it->second;//boost::shared_static_cast<Tool>((*it).second);
 
     if(tool && tool->getPointer())
     {
@@ -155,12 +154,11 @@ void Tracker::attachTools(ToolMapPtr tools)
   }
 }
 
-void Tracker::detachTools(ToolMapPtr tools)
+void IgstkTracker::detachTools(std::map<QString, IgstkToolPtr> tools)
 {
-  std::map<QString, ssc::ToolPtr> toolMap = *tools.get();
-  for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
+  for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
-    ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
+    IgstkToolPtr tool = it->second;//boost::shared_static_cast<Tool>((*it).second);
 
     if(tool && tool->getPointer())
     {
@@ -169,22 +167,22 @@ void Tracker::detachTools(ToolMapPtr tools)
   }
 }
 
-void Tracker::startTracking()
+void IgstkTracker::startTracking()
 {
   mTracker->RequestStartTracking();
 }
 
-void Tracker::stopTracking()
+void IgstkTracker::stopTracking()
 {
   mTracker->RequestStopTracking();
 }
 
-bool Tracker::isValid() const
+bool IgstkTracker::isValid() const
 {
   return mValid;
 }
 
-void Tracker::trackerTransformCallback(const itk::EventObject &event)
+void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 {
   //successes
   if (igstk::TrackerOpenEvent().CheckEvent(&event))
@@ -276,7 +274,7 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
   }
 }
 
-void Tracker::addLogging()
+void IgstkTracker::addLogging()
 {
   std::ofstream* loggerFile = new std::ofstream();
   QString logFile = mInternalStructure.mLoggingFolderName + "Tracker_Logging.txt";
@@ -291,7 +289,7 @@ void Tracker::addLogging()
   mCommunication->SetLogger(mTrackerLogger);
 }
 
-void Tracker::internalOpen(bool value)
+void IgstkTracker::internalOpen(bool value)
 {
   if(mOpen == value)
     return;
@@ -299,7 +297,7 @@ void Tracker::internalOpen(bool value)
   emit open(mOpen);
 }
 
-void Tracker::internalInitialized(bool value)
+void IgstkTracker::internalInitialized(bool value)
 {
   if(mInitialized == value)
     return;
@@ -307,7 +305,7 @@ void Tracker::internalInitialized(bool value)
   emit initialized(mInitialized);
 }
 
-void Tracker::internalTracking(bool value)
+void IgstkTracker::internalTracking(bool value)
 {
   if(mTracking == value)
     return;
