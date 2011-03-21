@@ -12,6 +12,7 @@
 #include "cxRecordSessionWidget.h"
 #include "cxDataLocations.h"
 #include "cxToolPropertiesWidget.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
