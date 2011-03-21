@@ -20,17 +20,23 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
   toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New()));
 
-  QVBoxLayout* winlvlLayout = new QVBoxLayout;
-  toptopLayout->addLayout(winlvlLayout);
+//  QVBoxLayout* winlvlLayout = new QVBoxLayout;
+//  toptopLayout->addLayout(winlvlLayout);
 
-  QGroupBox* group2D = new QGroupBox(this);
-  group2D->setTitle("2D properties");
-  toptopLayout->addWidget(group2D);
+//  QGroupBox* group2D = new QGroupBox(this);
+//  group2D->setTitle("2D properties");
+//  toptopLayout->addWidget(group2D);
+//
+//  QGridLayout* gridLayout = new QGridLayout(group2D);
+//
+//  mLevelWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DLevel), gridLayout, 0);
+//  mWindowWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DWindow), gridLayout, 1);
 
-  QGridLayout* gridLayout = new QGridLayout(group2D);
+  mTF2DWidget = new TransferFunction2DWidget(this);
+  mTFPresetWidget = new TransferFunctionPresetWidget(this);
 
-  mLevelWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DLevel), gridLayout, 0);
-  mWindowWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapter2DWindow), gridLayout, 1);
+  toptopLayout->addWidget(mTF2DWidget);
+  toptopLayout->addWidget(mTFPresetWidget);
 
   toptopLayout->addStretch();
 }

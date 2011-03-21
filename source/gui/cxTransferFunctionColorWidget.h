@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include <sscImage.h>
+#include "sscForwardDeclarations.h"
 
 class QRect;
 class QMenu;
@@ -24,11 +25,13 @@ class TransferFunctionColorWidget : public QWidget
   
 public:
   TransferFunctionColorWidget(QWidget* parent);
-  ~TransferFunctionColorWidget();
+  virtual ~TransferFunctionColorWidget();
   
+  void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
+
 public slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+  //void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
   
 protected slots:
@@ -73,7 +76,8 @@ protected:
   int mCurrentClickX, mCurrentClickY;///< The x coordinate currently selected with the mouse
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
   
-  ssc::ImagePtr mCurrentImage;
+  ssc::ImagePtr mImage;
+  ssc::ImageTFDataPtr mImageTF;
   
   bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles. Sets mCurrentPoint.position and mCurrentPoint.value
   void contextMenuEvent(QContextMenuEvent *event);///< Decides what happens when you rightclick in a view

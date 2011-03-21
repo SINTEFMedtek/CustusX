@@ -4,6 +4,7 @@
 #include <vector>
 #include <QtGui>
 #include "sscDoubleWidgets.h"
+#include "cxTransferFunctionWidget.h"
 
 namespace cx
 {
@@ -28,8 +29,11 @@ protected:
 private:
   ImagePropertiesWidget();
 
-  ssc::SliderGroupWidget* mLevelWidget;
-  ssc::SliderGroupWidget* mWindowWidget;
+  TransferFunction2DWidget* mTF2DWidget;
+  TransferFunctionPresetWidget* mTFPresetWidget;
+
+//  ssc::SliderGroupWidget* mLevelWidget;
+//  ssc::SliderGroupWidget* mWindowWidget;
 };
 
 }//end namespace cx
