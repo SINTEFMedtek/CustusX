@@ -151,13 +151,15 @@ void ToolManager::trackerConfiguredSlot(bool  on)
     }
   }
 
-  // debug start
+  // debug: give the manual tool properties from the first nonmanual tool. Nice for testing tools
   if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
   {
-    if (!mTools.empty())
+    for (ssc::ToolManager::ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
     {
-      mManualTool->setBase(mTools.begin()->second);
-      ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + mTools->begin()->first);
+      if (iter->second == mManualTool)
+        continue;
+      mManualTool->setBase(iter->second);
+      ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
     }
   }
   //debug stop
