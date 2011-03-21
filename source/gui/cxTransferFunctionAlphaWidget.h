@@ -5,6 +5,7 @@
 #include <QWidget>
 
 #include <sscImage.h>
+#include "sscForwardDeclarations.h"
 
 class QRect;
 
@@ -25,14 +26,16 @@ class TransferFunctionAlphaWidget : public QWidget
   
 public:
   TransferFunctionAlphaWidget(QWidget* parent);
-  ~TransferFunctionAlphaWidget();
+  virtual ~TransferFunctionAlphaWidget();
+
+  void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
 
 signals:
   void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+//  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
 
 protected:
@@ -81,7 +84,8 @@ protected:
 
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
 
-  ssc::ImagePtr mCurrentImage;
+  ssc::ImagePtr mImage;
+  ssc::ImageTFDataPtr mImageTF;
   
   virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
 };
