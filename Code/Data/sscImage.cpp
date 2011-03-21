@@ -106,29 +106,6 @@ void Image::resetTransferFunctions()
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
   
 	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)), ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
-//
-//	if(mImageTransferFunctions3D)
-//    disconnect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-//               this, SIGNAL(transferFunctionsChanged()));
-//  if(mImageLookupTable2D)
-//    disconnect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
-//               this, SIGNAL(transferFunctionsChanged()));
-//
-//  mImageTransferFunctions3D.reset(new ImageTF3D(mBaseImageData));
-//	mImageLookupTable2D.reset(new ImageLUT2D(mBaseImageData));
-//
-//	// Add initial values to the 3D transfer functions
-//	mImageTransferFunctions3D->addAlphaPoint(this->getMin(), 0);
-//	mImageTransferFunctions3D->addAlphaPoint(this->getMax(), this->getMaxAlphaValue());
-//	mImageTransferFunctions3D->addColorPoint(this->getMin(), Qt::black);
-//	mImageTransferFunctions3D->addColorPoint(this->getMax(), Qt::white);
-//
-//  connect(mImageTransferFunctions3D.get(), SIGNAL(transferFunctionsChanged()),
-//          this, SIGNAL(transferFunctionsChanged()));
-//  connect(mImageLookupTable2D.get(), SIGNAL(transferFunctionsChanged()),
-//					this, SIGNAL(transferFunctionsChanged()));
-//
-//  emit transferFunctionsChanged();
 }
 
 void Image::resetTransferFunction(ImageTF3DPtr imageTransferFunctions3D, ImageLUT2DPtr imageLookupTable2D)

@@ -102,6 +102,25 @@ vtkMatrix4x4Ptr Transform3D::matrix()
 	return mMatrix;
 }
 
+QString Transform3D::toString()
+{
+	QString retval("{");
+	for (unsigned i = 0; i < 4; ++i)
+	{
+		retval += '(';
+		for (unsigned j = 0; j < 4; ++j)
+		{
+			retval += QString::number(mMatrix->GetElement(i, j), 'f', 3);
+			if (j < 3)
+			{
+				retval += ", ";
+			}
+		}
+		retval += ')';
+	}
+	retval += '}';
+	return retval;
+}
 
 std::ostream& Transform3D::put(std::ostream& s, int indent, char newline) const
 {
@@ -231,7 +250,7 @@ Transform3D createTransformTranslate(const Vector3D& translation)
 	vtkTransformPtr transform = vtkTransformPtr::New();
 	transform->Identity();
 	transform->Translate(translation.begin());
-	return Transform3D(transform->GetMatrix());	
+	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the X-axis with an input angle.
@@ -242,7 +261,7 @@ Transform3D createTransformRotateX(const double angle)
 	vtkTransformPtr transform = vtkTransformPtr::New();
 	transform->Identity();
 	transform->RotateX(angRad);
-	return Transform3D(transform->GetMatrix());		
+	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the Y-axis with an input angle.
@@ -253,7 +272,7 @@ Transform3D createTransformRotateY(const double angle)
 	vtkTransformPtr transform = vtkTransformPtr::New();
 	transform->Identity();
 	transform->RotateY(angRad);
-	return Transform3D(transform->GetMatrix());		
+	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the Z-axis with an input angle.
@@ -264,7 +283,7 @@ Transform3D createTransformRotateZ(const double angle)
 	vtkTransformPtr transform = vtkTransformPtr::New();
 	transform->Identity();
 	transform->RotateZ(angRad);
-	return Transform3D(transform->GetMatrix());		
+	return Transform3D(transform->GetMatrix());
 }
 
 

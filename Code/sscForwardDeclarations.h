@@ -23,6 +23,7 @@ typedef boost::shared_ptr<class Data> DataPtr;
 typedef boost::shared_ptr<class Mesh> MeshPtr;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
+typedef boost::shared_ptr<class ImageTFData> ImageTFDataPtr;
 typedef boost::shared_ptr<class GPUImageDataBuffer> GPUImageDataBufferPtr;
 typedef boost::weak_ptr<class GPUImageDataBuffer> GPUImageDataBufferWeakPtr;
 typedef boost::shared_ptr<class GPUImageLutBuffer> GPUImageLutBufferPtr;
