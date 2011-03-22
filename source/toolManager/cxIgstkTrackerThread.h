@@ -41,7 +41,6 @@ signals:
   void initialized(bool on); ///< system is initialized
   void tracking(bool on);
 
-
   void requestInitialize(bool on); ///< internal signal
   void requestTrack(bool on); ///< internal signal
 
