@@ -278,6 +278,8 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
   Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
   mPlaneActor->SetUserMatrix(rMu.matrix());
+
+//  mProbeData.test();
 }
 
 void RealTimeStreamGraphics::receiveVisible(bool visible)
