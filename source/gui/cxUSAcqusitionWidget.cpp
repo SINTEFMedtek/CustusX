@@ -28,6 +28,7 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
@@ -162,8 +163,9 @@ void USAcqusitionWidget::dominantToolChangedSlot()
 //  if(!cxTool)
 //    return;
 
-  if (tool==this->getTool())
-    return;
+  // might need to just update a tool : when manual tool is impued with probe characteristics
+//  if (tool==this->getTool())
+//    return;
 
   if (this->getTool() && this->getTool()->getProbe())
     disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
