@@ -33,6 +33,7 @@ IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStruct
 
   igstk::RealTimeClock::Initialize();
 
+  //WARNING will this work when newing several pulsegenerators in different threads????
   mPulseGenerator = igstk::PulseGenerator::New();
   mPulseGenerator->RequestSetFrequency(30.0);
   mPulseGenerator->RequestStart();
@@ -40,7 +41,10 @@ IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStruct
 
 IgstkToolManager::~IgstkToolManager()
 {
-  mTracker->stopTracking();
+  this->trackSlot(false);
+  this->initializeSlot(false);
+
+  mPulseGenerator->RequestStop();
 }
 
 std::map<QString, IgstkToolPtr> IgstkToolManager::getTools()
@@ -98,11 +102,11 @@ void IgstkToolManager::trackerTrackingSlot(bool isTracking)
 
 void IgstkToolManager::initializeSlot(bool on)
 {
-  if(on)
+  if(on && !mTracker->isInitialized())
   {
     mTracker->open();
     mTracker->attachTools(mTools);
-  }else
+  }else if(!on && mTracker->isInitialized())
   {
     mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
     mTracker->close();
@@ -111,9 +115,9 @@ void IgstkToolManager::initializeSlot(bool on)
 
 void IgstkToolManager::trackSlot(bool on)
 {
-  if(on)
+  if(on && !mTracker->isTracking())
     mTracker->startTracking();
-  else
+  else if(!on && mTracker->isTracking())
     mTracker->stopTracking();
 }
 
@@ -135,11 +139,20 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 
 void IgstkToolManager::deviceInitializedSlot(bool value)
 {
-  mInitAnsweres ++;
+  if(value)
+  {
+    mInitAnsweres ++;
 
-  int numberOfDevices = mTools.size() + 1; //+1 is the tracker
+    int numberOfDevices = mTools.size() + 1; //+1 is the tracker
 
-  if(mInitAnsweres == numberOfDevices)
-    emit initialized(true);
+    if(mInitAnsweres == numberOfDevices)
+      emit initialized(true);
+  }else
+  {
+    mInitAnsweres--;
+
+    if(mInitAnsweres == 0)
+      emit initialized(false);
+  }
 }
 }
