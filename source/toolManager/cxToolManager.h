@@ -84,6 +84,7 @@ public:
 
 public slots:
   void configure(); ///< sets up the software like the xml file suggests
+  void deconfigure(); ///< deconfigures the software
   void initialize(); ///< connects to the hardware
   void uninitialize(); ///< disconnects from the hardware
   void startTracking(); ///< starts tracking
@@ -95,8 +96,11 @@ private slots:
   void trackerConfiguredSlot(bool on);
   void initializedSlot(bool);
   void trackerTrackingSlot(bool);
+
   void startTrackingAfterInitSlot();
   void initializeAfterConfigSlot();
+  void uninitializeAfterTrackingStoppedSlot();
+  void deconfigureAfterUninitializedSlot();
 
 private:
   ToolManager(); ///< use getInstance instead
