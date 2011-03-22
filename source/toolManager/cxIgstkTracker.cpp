@@ -121,7 +121,6 @@ void IgstkTracker::open()
   for(int i=0; i<5; ++i)
   {
     result = mCommunication->OpenCommunication();
-    //std::cout << "Trying to open tracker communication: "<< string_cast(result) << std::endl;
     if(result == igstk::SerialCommunication::SUCCESS)
       break;
   }
@@ -138,7 +137,7 @@ void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 {
   for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
-    IgstkToolPtr tool = it->second;//boost::shared_static_cast<Tool>((*it).second);
+    IgstkToolPtr tool = it->second;
 
     if(tool && tool->getPointer())
     {
@@ -146,7 +145,6 @@ void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
         ssc::messageManager()->sendWarning("Tracker is attaching a tool that is not of the correct type. Trackers type: "+qstring_cast(mInternalStructure.mType)+", tools tracker type: "+qstring_cast(tool->getTrackerType()));
 
       tool->getPointer()->RequestAttachToTracker(mTracker);
-      //std::cout << "Attaching tool " << tool->getUid() << "to tracker "<< mTracker->GetNameOfClass() << std::endl;
 
       if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
         mTracker->RequestSetReferenceTool(tool->getPointer());
@@ -158,7 +156,7 @@ void IgstkTracker::detachTools(std::map<QString, IgstkToolPtr> tools)
 {
   for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
-    IgstkToolPtr tool = it->second;//boost::shared_static_cast<Tool>((*it).second);
+    IgstkToolPtr tool = it->second;
 
     if(tool && tool->getPointer())
     {
@@ -182,35 +180,43 @@ bool IgstkTracker::isValid() const
   return mValid;
 }
 
+bool IgstkTracker::isInitialized() const
+{
+  return mInitialized;
+}
+
+bool IgstkTracker::isTracking() const
+{
+  return mTracking;
+}
+
 void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 {
   //successes
   if (igstk::TrackerOpenEvent().CheckEvent(&event))
   {
-    this->internalInitialized(true);
     this->internalOpen(true);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is open.");
+    this->internalInitialized(true);
   }
   else if (igstk::TrackerCloseEvent().CheckEvent(&event))
   {
-    this->internalInitialized(false);
     this->internalOpen(false);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is closed.");
+    this->internalInitialized(false);
   }
   else if (igstk::TrackerInitializeEvent().CheckEvent(&event))
   {
-    this->internalInitialized(true);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
+    //Never happens???
+    //this->internalInitialized(true);
+    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
+    ssc::messageManager()->sendWarning("This never happens for some reason...  check code");
   }
   else if (igstk::TrackerStartTrackingEvent().CheckEvent(&event))
   {
     this->internalTracking(true);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is tracking.");
   }
   else if (igstk::TrackerStopTrackingEvent().CheckEvent(&event))
   {
     this->internalTracking(false);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is stopping.");
   }
   else if (igstk::TrackerUpdateStatusEvent().CheckEvent(&event))
   {
@@ -224,7 +230,7 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   else if (igstk::CompletedEvent().CheckEvent(&event))
   {
     // this seems to appear after every transmit (several times/second)
-    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly.");
+    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly."); //SPAM
   }
   //failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
@@ -294,6 +300,8 @@ void IgstkTracker::internalOpen(bool value)
   if(mOpen == value)
     return;
   mOpen = value;
+
+  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "open" : "closed")+".");
   emit open(mOpen);
 }
 
@@ -302,6 +310,8 @@ void IgstkTracker::internalInitialized(bool value)
   if(mInitialized == value)
     return;
   mInitialized = value;
+
+  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "" : "un")+"initialized.");
   emit initialized(mInitialized);
 }
 
@@ -310,7 +320,8 @@ void IgstkTracker::internalTracking(bool value)
   if(mTracking == value)
     return;
   mTracking = value;
-  emit tracking(mTracking);
 
+  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "" : "not ")+"tracking.");
+  emit tracking(mTracking);
 }
 }//namespace cx

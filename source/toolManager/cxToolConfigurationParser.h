@@ -56,6 +56,63 @@ private:
 
 };
 
+/**
+ * \class ConfigurationFileParser
+ *
+ * \brief Class for reading the files defining a CustusX3 tool
+ *
+ * \date 21. march 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class ConfigurationFileParser
+{
+public:
+  ConfigurationFileParser(QString absoluteConfigFilePath);
+  ~ConfigurationFileParser();
+
+  std::vector<IgstkTracker::InternalStructure> getTrackers();
+
+  std::vector<QString> getToolFilePaths(); ///< absolute paths
+
+  QString getUserManual() const; ///< documenting how to correctly write a configuration
+
+private:
+  QString mConfigurationFilePath; ///< absolute path to the configuration file
+  QDomDocument mConfigureDoc; ///< the config xml document
+  const QString mTrackerTag, mTrackerTypeTag; ///< names of necessary tags in the configuration file
+};
+
+/**
+ * \class ToolFileParser
+ *
+ * \brief Class for reading the files defining a CustusX3 tool
+ *
+ * \date 21. march 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class ToolFileParser
+{
+public:
+  ToolFileParser(QString absoluteToolFilePath);
+  ~ToolFileParser();
+
+  Tool::InternalStructure getTool();
+
+  QString getUserManual() const; ///< documenting how to correctly write a tool file
+
+private:
+  igstk::Transform readCalibrationFile(QString absoluteFilePath);
+
+  QString mToolFilePath; ///< absolutepath to the tool file
+  QDomDocument mToolDoc; ///< the tool xml document
+  const QString mToolfileTag, mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag,
+                    mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
+                    mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
+                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,
+                    mToolCalibrationTag, mToolCalibrationFileTag,
+                    mInstrumentTag, mInstrumentIdTag, mInstrumentScannerIdTag;
+                    ///< names of necessary tags in the tool file
+};
 
 } //namespace cx
 #endif /* CXTOOLCONFIGURATIONPARSER_H_ */
