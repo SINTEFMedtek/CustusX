@@ -73,10 +73,12 @@ public:
 
 signals:
 	void configured(); ///< system is configured
+	void deconfigured(); ///<
 	void initialized(); ///< system is initialized
 	void uninitialized(); ///< system is uninitialized
 	void trackingStarted(); ///< system starts tracking
 	void trackingStopped(); ///< system stops tracking
+
 	void dominantToolChanged(const QString& uId); ///<signal for change of dominant tool
   void landmarkRemoved(QString uid);
   void landmarkAdded(QString uid);
