@@ -89,7 +89,6 @@ void IgstkTool::setReference(IgstkToolPtr refTool)
 
 void IgstkTool::setTracker(TrackerPtr tracker)
 {
-  std::cout << "void IgstkTool::setTracker(TrackerPtr tracker)" << std::endl;
   mTracker = tracker;
 }
 
@@ -343,7 +342,7 @@ void IgstkTool::internalAttachedToTracker(bool value)
   if(mAttachedToTracker == value)
     return;
   mAttachedToTracker = value;
-  ssc::messageManager()->sendInfo("Tool: "+mInternalStructure.mUid+" is "+ (value ? "at":"de") +"tached to the tracker.");
+  ssc::messageManager()->sendInfo("Tool: "+mInternalStructure.mUid+" is "+ (value ? "at":"de") +"tached "+(value ? "to" : "from")+" the tracker.");
   emit attachedToTracker(mAttachedToTracker);
 }
 
