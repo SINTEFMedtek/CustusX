@@ -97,6 +97,8 @@ public:
   void stopTracking();                ///< stop tracking
 
   bool isValid() const;               ///< whether this tracker is constructed correctly or not
+  bool isInitialized() const;
+  bool isTracking() const;
 
 signals:
   void initialized(bool);
@@ -114,11 +116,11 @@ protected:
   void internalInitialized(bool value);
   void internalTracking(bool value);
 
-  InternalStructure mInternalStructure; ///< the trackers type
-  bool mValid;                          ///< whether this tracker is constructed correctly or not
-  QString       mUid;               ///< the trackers unique id
-  QString       mName;              ///< the trackers name
-  TrackerType*      mTracker;           ///< pointer to the base class of the internal igstk tracker
+  InternalStructure                 mInternalStructure;     ///< the trackers type
+  bool                              mValid;                 ///< whether this tracker is constructed correctly or not
+  QString                           mUid;                   ///< the trackers unique id
+  QString                           mName;                  ///< the trackers name
+  TrackerType*                      mTracker;               ///< pointer to the base class of the internal igstk tracker
 
   PolarisTrackerType::Pointer       mTempPolarisTracker;    ///< pointer to a temp polaris tracker
   AuroraTrackerType::Pointer        mTempAuroraTracker;     ///< pointer to a temp aurora tracker
