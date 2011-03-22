@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>>Aurora</type>
+</tracker>
+
+<toolfile type="aurora" reference="no">../Tools/Lap/OL531-Probe_Hitachi_AURORA_port2</toolfile>
+
+
+
+</configuration>
