@@ -339,6 +339,7 @@ void RealTimeStreamGraphics::newDataSlot()
   }
 
   bool visible = mData->validData();
+//  std::cout << "RealTimeStreamGraphics::newDataSlot() " << this << " vis=" << visible << std::endl;
   if (mShowInToolSpace)
   {
     visible = visible && mTool && mTool->getVisible();

@@ -31,6 +31,9 @@ void RTSourceRecorder::stopRecord()
 
 void RTSourceRecorder::newFrameSlot()
 {
+  if (!mSource->validData())
+    return;
+
   double timestamp = mSource->getTimestamp();
 
   if (!mSynced)

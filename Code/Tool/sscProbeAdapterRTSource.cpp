@@ -46,13 +46,15 @@ double ProbeAdapterRTSource::getTimestamp()
 
 void ProbeAdapterRTSource::probeChangedSlot()
 {
+//  std::cout << "ProbeAdapterRTSource::probeChangedSlot() validdata: " << validData() << std::endl;
+
   ssc::Vector3D dimImage(mRedirecter->GetOutput()->GetDimensions());
   QSize dimProbe = mProbe->getData().mImage.mSize;
 
   bool nonZero = ( dimProbe.width()!=0 )&&( dimProbe.height()!=0 )&&
                  ( dimImage[0]!=0 )&&( dimImage[1]!=0 );
 
-  if (nonZero && (( dimImage[0]!=dimProbe.width() )||( dimImage[1]!=dimProbe.height() )))
+  if (this->validData() &&nonZero && (( dimImage[0]!=dimProbe.width() )||( dimImage[1]!=dimProbe.height() )))
   {
     std::stringstream ss;
     ss << "Mismatch rt stream and probe image size. "
