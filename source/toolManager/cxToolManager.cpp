@@ -128,11 +128,18 @@ void ToolManager::configure()
   connect(mTrackerThread.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
 
   //start threads
-  mTrackerThread->start();
+  if(mTrackerThread)
+    mTrackerThread->start();
 }
 
-void ToolManager::trackerConfiguredSlot(bool  on)
+void ToolManager::trackerConfiguredSlot(bool on)
 {
+  if(!on)
+    return; //do nothing if deconfigured
+
+  if(!mTrackerThread)
+    return;
+
   //new all tools
   std::map<QString, IgstkToolPtr> igstkTools = mTrackerThread->getTools();
   std::map<QString, IgstkToolPtr>::iterator it = igstkTools.begin();
@@ -146,7 +153,6 @@ void ToolManager::trackerConfiguredSlot(bool  on)
     }
     else
     {
-      std::cout << "Creation of cx::Tool fails, its not valid." << std::endl;
       ssc::messageManager()->sendWarning("Creation of the cxTool "+it->second->getUid()+" failed.");
     }
   }
@@ -171,10 +177,36 @@ void ToolManager::trackerConfiguredSlot(bool  on)
   emit configured();
 }
 
-void ToolManager::initializeAfterConfigSlot()
+void ToolManager::deconfigure()
 {
-  disconnect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
-  this->initialize();
+  if(this->isInitialized())
+  {
+    connect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
+    this->uninitialize();
+    return;
+  }
+
+  if (mTrackerThread)
+  {
+    mTrackerThread->quit();
+    mTrackerThread->wait(2000);
+    if (mTrackerThread->isRunning())
+    {
+      mTrackerThread->terminate();
+      mTrackerThread->wait(); // forever or until dead thread
+    }
+  }
+  else
+    return;
+
+  QObject::disconnect(mTrackerThread.get());
+  mTrackerThread.reset();
+
+  this->setDominantTool(this->getManualTool()->getUid());
+
+  mConfigured = false;
+  emit deconfigured();
+  ssc::messageManager()->sendInfo("ToolManager is deconfigured.");
 }
 
 void ToolManager::initialize()
@@ -196,17 +228,26 @@ void ToolManager::initialize()
   this->createSymlink(); //TODO????
   #endif
 
-  mTrackerThread->initialize(true);
+  if(mTrackerThread)
+    mTrackerThread->initialize(true);
 }
 
 void ToolManager::uninitialize()
 {
+  if(this->isTracking())
+  {
+    connect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
+    this->stopTracking();
+    return;
+  }
+
   if(!this->isInitialized())
   {
     ssc::messageManager()->sendInfo("No need to uninitialize, toolmanager is not initialized.");
     return;
   }
-  mTrackerThread->initialize(false);
+  if(mTrackerThread)
+    mTrackerThread->initialize(false);
 }
 
 #ifndef WIN32
@@ -283,12 +324,6 @@ void ToolManager::cleanupSymlink()
 }
 #endif //WIN32
 
-void ToolManager::startTrackingAfterInitSlot()
-{
-  disconnect(this, SIGNAL(initialized()), this, SLOT(startTrackingAfterInitSlot()));
-  this->startTracking();
-}
-
 void ToolManager::startTracking()
 {
   if (!this->isInitialized())
@@ -298,13 +333,13 @@ void ToolManager::startTracking()
     return;
   }
 
-
   if (!mInitialized)
   {
     ssc::messageManager()->sendWarning("Please initialize before trying to start tracking.");
     return;
   }
-  mTrackerThread->track(true);
+  if(mTrackerThread)
+    mTrackerThread->track(true);
 }
 
 void ToolManager::stopTracking()
@@ -314,7 +349,8 @@ void ToolManager::stopTracking()
     ssc::messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
     return;
   }
-  mTrackerThread->track(false);
+  if(mTrackerThread)
+    mTrackerThread->track(false);
 }
 
 void ToolManager::saveToolsSlot()
@@ -441,11 +477,13 @@ void ToolManager::setDominantTool(const QString& uid)
     mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
   }
 
-  disconnect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
+  if(mDominantTool)
+    disconnect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
   mDominantTool = newTool;
   connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
 
-  if(mDominantTool->getType()==(ssc::Tool::TOOL_MANUAL || ssc::Tool::TOOL_NONE))
+  if(mDominantTool->getType() == ssc::Tool::TOOL_MANUAL ||
+      mDominantTool->getType() == ssc::Tool::TOOL_NONE)
       emit tps(0);
 
   emit dominantToolChanged(uid);
@@ -552,7 +590,7 @@ void ToolManager::setConfigurationFile(QString configurationFile)
 {
   if(this->isConfigured())
   {
-    ssc::messageManager()->sendWarning("You already configured, to reconfigure you have to restart CustusX3.");
+    this->deconfigure();
     return;
   }
   mConfigurationFilePath = configurationFile;
@@ -591,7 +629,30 @@ void ToolManager::trackerTrackingSlot(bool value)
     ssc::messageManager()->sendSuccess("ToolManager stopped tracking.");
     emit trackingStopped();
   }
+}
 
+void ToolManager::startTrackingAfterInitSlot()
+{
+  disconnect(this, SIGNAL(initialized()), this, SLOT(startTrackingAfterInitSlot()));
+  this->startTracking();
+}
+
+void ToolManager::initializeAfterConfigSlot()
+{
+  disconnect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
+  this->initialize();
+}
+
+void ToolManager::uninitializeAfterTrackingStoppedSlot()
+{
+  disconnect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
+  this->uninitialize();
+}
+
+void ToolManager::deconfigureAfterUninitializedSlot()
+{
+  disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
+  this->deconfigure();
 }
 
 void ToolManager::dominantCheckSlot()
