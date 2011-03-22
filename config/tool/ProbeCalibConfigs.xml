@@ -469,9 +469,13 @@
             <Name>S-Video</Name>
             <DefaultConfig>Width6Depth40</DefaultConfig>
             <ImageSize>
+               <Width>800</Width>
+               <Height>600</Height>
+            </ImageSize>
+            <ImageSize__>
                <Width>768</Width>
                <Height>576</Height>
-            </ImageSize>
+            </ImageSize__>
             <HorizontalOffset>0</HorizontalOffset>
             <Config>
                <ID>Width6Depth40</ID>
