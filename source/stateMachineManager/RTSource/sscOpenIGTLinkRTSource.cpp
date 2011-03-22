@@ -51,9 +51,9 @@ OpenIGTLinkRTSource::OpenIGTLinkRTSource() :
 
   mImageImport->SetNumberOfScalarComponents(1);
   this->setEmptyImage();
-  this->setTestImage();
+//  this->setTestImage();
 
-  mTimeout = false;
+  mTimeout = true; // must start invalid
   mTimeoutTimer = new QTimer(this);
   mTimeoutTimer->setInterval(1000);
   connect( mTimeoutTimer, SIGNAL(timeout()),this, SLOT(timeout()) );
@@ -226,6 +226,7 @@ void OpenIGTLinkRTSource::disconnectServer()
   }
 
   mTimeoutTimer->stop();
+  emit newFrame(); // changed
 
 //  emit changed();
 //  emit serverStatusChanged();
@@ -366,6 +367,9 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
 
 void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)
 {
+
+//  std::cout << "void OpenIGTLinkRTSource::updateImage(igtl::ImageMessage::Pointer message)" << std::endl;
+
 #if 1 // remove to use test image
     if (!message)
     {
