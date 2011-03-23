@@ -105,19 +105,27 @@ vtkImageDataPtr ProbeSector::getMask()
 
 void ProbeSector::test()
 {
-//  Transform3D tMu = this->get_tMu();
-//  Vector3D e_x(1,0,0);
-//  Vector3D e_y(0,1,0);
-//  Vector3D e_z(0,0,1);
-//
-//  // zero = tMu * mOrigin_u
-//  std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.mImage.mOrigin_u) << ", mOrigin_u: " << mData.mImage.mOrigin_u << std::endl;
-//
-//  // e_z = tMu * -e_y
-//  std::cout << "e_z = tMu * -e_y " << tMu.vector(-e_y) <<std::endl;
-//
-//  // e_y = tMu * -e_x
-//  std::cout << "e_y = tMu * -e_x " << tMu.vector(-e_x) <<std::endl;
+  Transform3D tMu = this->get_tMu();
+  Vector3D e_x(1,0,0);
+  Vector3D e_y(0,1,0);
+  Vector3D e_z(0,0,1);
+
+  // zero = tMu * mOrigin_u
+  std::cout << "zero = tMu * mOrigin_u, zero: " << tMu.coord(mData.mImage.getOrigin_u()) << ", mOrigin_u: " << mData.mImage.getOrigin_u() << std::endl;
+
+  // e_z = tMu * -e_y
+  std::cout << "e_z = tMu * -e_y " << tMu.vector(-e_y) <<std::endl;
+
+  // e_y = tMu * -e_x
+  std::cout << "e_y = tMu * -e_x " << tMu.vector(-e_x) <<std::endl;
+
+
+  // tMu * e_x
+  std::cout << "tMu * e_x " << tMu.vector(e_x) <<std::endl;
+  // tMu * e_y
+  std::cout << "tMu * e_y " << tMu.vector(e_y) <<std::endl;
+
+
 }
 
 Transform3D ProbeSector::get_tMu() const
