@@ -27,7 +27,8 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
-  void previewFile(QString absoluteFilePath);
+public slots:
+  void previewFileSlot(QString absoluteFilePath);
 
 private:
   QTextDocument* mTextDocument;

@@ -382,7 +382,9 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
     PreferencesTab(parent),
     mFilePreviewWidget(new FilePreviewWidget(this)),
     mToolConfigWidget(new ToolConfigWidget(this))
-{}
+{
+  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+}
 
 ToolConfigTab::~ToolConfigTab()
 {}

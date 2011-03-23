@@ -32,7 +32,7 @@ QString FilePreviewWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void FilePreviewWidget::previewFile(QString absoluteFilePath)
+void FilePreviewWidget::previewFileSlot(QString absoluteFilePath)
 {
   QFile file(absoluteFilePath);
   if(!file.exists())
@@ -41,10 +41,16 @@ void FilePreviewWidget::previewFile(QString absoluteFilePath)
     return;
   }
 
+  if(!file.open(QIODevice::ReadOnly))
+  {
+    ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
+  }
   QTextStream stream(&file);
   QString text = stream.readAll();
 
   mTextDocument->setPlainText(text);
+
+  //TODO close file???
 }
 
 }//namespace cx

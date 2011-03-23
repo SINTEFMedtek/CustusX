@@ -74,8 +74,6 @@ public:
 
   std::vector<QString> getToolFilePaths(); ///< absolute paths
 
-  QString getUserManual() const; ///< documenting how to correctly write a configuration
-
 private:
   QString mConfigurationFilePath; ///< absolute path to the configuration file
   QDomDocument mConfigureDoc; ///< the config xml document
@@ -98,14 +96,13 @@ public:
 
   Tool::InternalStructure getTool();
 
-  QString getUserManual() const; ///< documenting how to correctly write a tool file
-
 private:
+  QDomNode getToolNodeList(QString toolAbsoluteFilePath);
   igstk::Transform readCalibrationFile(QString absoluteFilePath);
 
   QString mToolFilePath; ///< absolutepath to the tool file
   QDomDocument mToolDoc; ///< the tool xml document
-  const QString mToolfileTag, mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag,
+  const QString mToolfileTag, mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag, mToolClinicalAppTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
                     mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,

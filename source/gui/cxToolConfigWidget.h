@@ -7,6 +7,7 @@
 class QComboBox;
 class QDir;
 class QListWidget;
+class QListWidgetItem;
 
 namespace cx
 {
@@ -29,9 +30,14 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
+signals:
+  void toolSelected(QString absoluteFilePath);
+
 private slots:
   void applicationStateChangedSlot();
   void filterToolsSlot();
+  void configChangedSlot();
+  void toolClickedSlot(QListWidgetItem* item);
 
 private:
   void populateConfigComboBox();
