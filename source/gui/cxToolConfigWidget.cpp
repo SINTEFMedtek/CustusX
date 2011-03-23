@@ -4,8 +4,10 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QButtonGroup>
+#include <QListWidget>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscEnumConverter.h"
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxToolManager.h"
@@ -16,25 +18,44 @@ namespace cx
 ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mConfigFilesComboBox(new QComboBox()),
-    mTrackingGroup(new QGroupBox()),
-    mTrackingButtonGroup(new QButtonGroup()),
+    mTrackerGroupBox(new QGroupBox()),
+    mTrackerButtonGroup(new QButtonGroup()),
     mToolGroup(new QGroupBox()),
-    mToolFilterComboBox(new QComboBox())
+    mToolListWidget(new QListWidget()),
+    mApplicationFilterGroupBox(new QGroupBox()),
+    mApplicationFilterButtonGroup(new QButtonGroup())
 {
+  //layout
   QGridLayout* layout = new QGridLayout(this);
 
   layout->addWidget(new QLabel("Config files:"), 0, 0);
   layout->addWidget(mConfigFilesComboBox, 0, 1);
 
-  layout->addWidget(new QLabel("Application filter:"), 1, 0);
-  layout->addWidget(mToolFilterComboBox, 1, 1);
+  layout->addWidget(mApplicationFilterGroupBox, 1, 0, 1, 2);
 
-  layout->addWidget(mTrackingGroup, 2, 0, 1, 2);
+  layout->addWidget(mTrackerGroupBox, 2, 0, 1, 2);
 
+  layout->addWidget(mToolGroup, 3, 0, 1, 2);
+
+  mApplicationFilterGroupBox->setTitle("Applications");
+  QHBoxLayout* applicationlayout = new QHBoxLayout();
+  mApplicationFilterGroupBox->setLayout(applicationlayout);
+
+  mTrackerGroupBox->setTitle("Tracking systems");
+  QHBoxLayout* trackingsystemlayout = new QHBoxLayout();
+  mTrackerGroupBox->setLayout(trackingsystemlayout);
+
+  mToolGroup->setTitle("Tools");
+  QVBoxLayout* toolslayout = new QVBoxLayout();
+  mToolGroup->setLayout(toolslayout);
+  toolslayout->addWidget(mToolListWidget);
+
+  //connect
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
 
+  //populate
   this->populateConfigComboBox();
-  this->populateApplicationFilterComboBox();
+  this->populateApplicationFilter();
   this->populateTrackingSystems();
   this->populateToolList();
 }
@@ -57,6 +78,26 @@ void ToolConfigWidget::applicationStateChangedSlot()
   this->populateConfigComboBox();
 }
 
+void ToolConfigWidget::filterToolsSlot()
+{
+  QStringList applicationFilter;
+  QList<QAbstractButton*> applicationButtonList = mApplicationFilterButtonGroup->buttons();
+  foreach(QAbstractButton* button, applicationButtonList)
+  {
+    if(button->isChecked())
+      applicationFilter << button->text();
+  }
+  QStringList trackingsystemFilter;
+  QList<QAbstractButton*> trackerButtonList = mTrackerButtonGroup->buttons();
+  foreach(QAbstractButton* button, trackerButtonList)
+  {
+    if(button->isChecked())
+      trackingsystemFilter << button->text();
+  }
+
+  this->populateToolList(applicationFilter, trackingsystemFilter);
+}
+
 void ToolConfigWidget::populateConfigComboBox()
 {
   mConfigFilesComboBox->blockSignals(true);
@@ -77,27 +118,31 @@ void ToolConfigWidget::populateConfigComboBox()
   mConfigFilesComboBox->blockSignals(false);
 }
 
-void ToolConfigWidget::populateApplicationFilterComboBox()
+void ToolConfigWidget::populateApplicationFilter()
 {
-  QStringList list = stateManager()->getApplication()->getAllApplicationNames();
-  list.push_front("All");
+  QStringList applicationList = stateManager()->getApplication()->getAllApplicationNames();
 
-  mToolFilterComboBox->clear();
-  mToolFilterComboBox->addItems(list);
+  mApplicationFilterButtonGroup->setExclusive(false);
+  foreach(QString string, applicationList)
+  {
+    if(string.isEmpty())
+      continue;
 
-  int currentIndex = mToolFilterComboBox->findText(stateManager()->getApplication()->getActiveStateName());
-  mToolFilterComboBox->setCurrentIndex(currentIndex);
+    string = string.toLower();
+    string[0] = string[0].toUpper();
+
+    QCheckBox* box = new QCheckBox(string);
+    mApplicationFilterButtonGroup->addButton(box);
+    mApplicationFilterGroupBox->layout()->addWidget(box);
+    connect(box, SIGNAL(stateChanged(int)), this, SLOT(filterToolsSlot()));
+  }
 }
 
 void ToolConfigWidget::populateTrackingSystems()
 {
-  mTrackingGroup->setTitle("Tracking systems");
-  QHBoxLayout* layout = new QHBoxLayout();
-  mTrackingGroup->setLayout(layout);
-
   QStringList trackingSystemList = ToolManager::getInstance()->getSupportedTrackingSystems();
 
-  mTrackingButtonGroup->setExclusive(true);
+  mTrackerButtonGroup->setExclusive(true);
   foreach(QString string, trackingSystemList)
   {
     if(string.isEmpty())
@@ -107,24 +152,69 @@ void ToolConfigWidget::populateTrackingSystems()
     string[0] = string[0].toUpper();
 
     QCheckBox* box = new QCheckBox(string);
-    mTrackingButtonGroup->addButton(box);
-    layout->addWidget(box);
+    mTrackerButtonGroup->addButton(box);
+    mTrackerGroupBox->layout()->addWidget(box);
+    connect(box, SIGNAL(stateChanged(int)), this, SLOT(filterToolsSlot()));
   }
 }
 
-void ToolConfigWidget::populateToolList()
+void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringList trackingSystemFilter)
 {
-  mToolGroup->setTitle("Tools");
+//    std::cout << "Number of applicationFilter found: " << applicationFilter.size() << std::endl;
+//    foreach(QString string, applicationFilter)
+//    {
+//      std::cout << string_cast(string) << std::endl;
+//    }
+//    std::cout << "Number of trackingSystemFilter found: " << trackingSystemFilter.size() << std::endl;
+//    foreach(QString string, trackingSystemFilter)
+//    {
+//      std::cout << string_cast(string) << std::endl;
+//    }
+
+  mToolListWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+  mToolListWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   QDir dir(DataLocations::getToolsPath());
   QStringList toolFiles = this->getToolFiles(dir);
 
-  //debug start
-  std::cout << "Number of toolfiles found: " << toolFiles.size() << std::endl;
-  foreach(QString string, toolFiles)
+  foreach(QString toolFilePath, toolFiles)
   {
-    std::cout << string_cast(string) << std::endl;
+    //check tool agains filters
+    Tool::InternalStructure internal = this->getToolInternal(toolFilePath);
+    QString trackerName = enum2string(internal.mTrackerType);
+    if(!trackingSystemFilter.contains(trackerName, Qt::CaseInsensitive))
+      continue;
+
+    bool passedFilter = false;
+    for(std::vector<ssc::MEDICAL_DOMAIN>::iterator it = internal.mMedicalDomains.begin(); it != internal.mMedicalDomains.end(); ++it)
+    {
+      if(passedFilter)
+        break;
+
+      QString domainName = enum2string(*it);
+      if(applicationFilter.contains(domainName, Qt::CaseInsensitive))
+      {
+        passedFilter = true;
+        std::cout << "Filter passed, found: " << trackerName << " and " << domainName << std::endl;
+      }
+    }
+
+    //add tool to list if it passed the filter
+    QFile file(toolFilePath);
+    QFileInfo info(file);
+    QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
+    item->setData(Qt::ToolTipRole, info.absoluteFilePath()); //TODO Qt::UserRole???
+    mToolListWidget->addItem(item);
   }
+
+  //debug start
+//  std::cout << "Number of toolfiles found: " << toolFiles.size() << std::endl;
+//  foreach(QString string, toolFiles)
+//  {
+//    std::cout << string_cast(string) << std::endl;
+//  }
+//
+//  mToolListWidget->addItems(toolFiles);
   //debug stop
 }
 
@@ -155,10 +245,10 @@ QStringList ToolConfigWidget::getToolFiles(QDir& dir)
   }
 
 //  std::cout << "Number of toolfiles found: " << retval.size() << std::endl;
-  foreach(QString string, retval)
-  {
-    std::cout << string_cast(string) << std::endl;
-  }
+//  foreach(QString string, retval)
+//  {
+//    std::cout << string_cast(string) << std::endl;
+//  }
 
   //find dirs and recursivly check them
   dir.setFilter(QDir::AllDirs);
@@ -183,4 +273,25 @@ QStringList ToolConfigWidget::getToolFiles(QDir& dir)
 //  std::cout << "============================" << std::endl;
   return retval;
 }
+
+QList<Tool::InternalStructure> ToolConfigWidget::getToolInternals(QStringList toolAbsoluteFilePaths)
+{
+  QList<Tool::InternalStructure> retval;
+  foreach(QString toolFilePath, toolAbsoluteFilePaths)
+    retval << this->getToolInternal(toolFilePath);
+
+  return retval;
+}
+
+Tool::InternalStructure ToolConfigWidget::getToolInternal(QString toolAbsoluteFilePath)
+{
+  Tool::InternalStructure retval;
+
+  //TODO
+  //fix parser
+  //ssc::messageManager()->sendDebug("TODO: Need to parse tool file: "+toolAbsoluteFilePath);
+
+  return retval;
+}
+
 }//namespace cx

@@ -2,9 +2,11 @@
 #define CXTOOLCONFIGWIDGET_H_
 
 #include "cxWhatsThisWidget.h"
+#include "cxTool.h"
 
 class QComboBox;
 class QDir;
+class QListWidget;
 
 namespace cx
 {
@@ -29,25 +31,33 @@ public:
 
 private slots:
   void applicationStateChangedSlot();
+  void filterToolsSlot();
 
 private:
   void populateConfigComboBox();
-  void populateApplicationFilterComboBox();
+  void populateApplicationFilter();
   void populateTrackingSystems();
-  void populateToolList();
+  void populateToolList(QStringList applicationFilter = QStringList(), QStringList trackingSystemFilter = QStringList());
+
   QStringList getToolFiles(QDir& dir);
+  QList<Tool::InternalStructure> getToolInternals(QStringList toolAbsoluteFilePaths);
+  Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
   //config files
   QComboBox*      mConfigFilesComboBox;
   QString         mCurrentConfigFile;
 
   //tracking systems
-  QGroupBox*      mTrackingGroup;
-  QButtonGroup*   mTrackingButtonGroup;
+  QGroupBox*      mTrackerGroupBox;
+  QButtonGroup*   mTrackerButtonGroup;
 
   //tool files
   QGroupBox*      mToolGroup;
-  QComboBox*      mToolFilterComboBox; //filter for shown tools
+  QListWidget*    mToolListWidget;
+
+  //applications
+  QGroupBox*      mApplicationFilterGroupBox;
+  QButtonGroup*   mApplicationFilterButtonGroup;
 };
 
 }//namespace cx
