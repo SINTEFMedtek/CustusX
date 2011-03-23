@@ -253,34 +253,17 @@ void ToolPropertiesWidget::dominantToolChangedSlot()
 
   if(mActiveTool && mActiveTool->getType() == ssc::Tool::TOOL_US_PROBE)
   {
-//    if (cxTool)
-//      std::cout << "config: " << cxTool->getProbeSectorConfigurationString() << std::endl;
-//    std::cout << "width: " << mActiveTool->getProbeSector().mWidth << std::endl;
-//    std::cout << "dstart: " << mActiveTool->getProbeSector().mDepthStart<< std::endl;
-//    std::cout << "dend: " << mActiveTool->getProbeSector().mDepthEnd << std::endl;
-//    std::cout << "type: " << mActiveTool->getProbeSector().mType << std::endl;
-//    std::cout << "w: " << mActiveTool->getProbeSector().mImage.mSize.width() << std::endl;
-//    std::cout << "h: " << mActiveTool->getProbeSector().mImage.mSize.height() << std::endl;
-//    std::cout << "c: " << mActiveTool->getProbeSector().mImage.mOrigin_u << std::endl;
-//    std::cout << "s: " << mActiveTool->getProbeSector().mImage.mSpacing << std::endl;
-
-    //    this->populateUSSectorConfigBox();
-//    mUSSectorConfigLabel->show();
     mUSSectorConfigBox->show();
     mToptopLayout->update();
   }
   else
   {
-//    mUSSectorConfigBox->clear();
-//    mUSSectorConfigLabel->hide();
     mUSSectorConfigBox->hide();
     mToptopLayout->update();
   }
 
   if (mActiveTool)
     connect(mActiveTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(updateSlot()));
-//  if (cxTool)
-//    connect(cxTool.get(), SIGNAL(probeSectorConfigurationChanged()), this, SLOT(toolsSectorConfigurationChangedSlot()));
 }
 
 void ToolPropertiesWidget::referenceToolChangedSlot()
