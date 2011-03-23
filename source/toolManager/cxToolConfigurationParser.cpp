@@ -498,7 +498,7 @@ Tool::InternalStructure ToolFileParser::getTool()
       if(domain != ssc::mdCOUNT)
         internalStructure.mMedicalDomains.push_back(domain);
       else
-        ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid.");
+        ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid in tool "+mToolFilePath);
     }
 
     QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
