@@ -19,6 +19,7 @@
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
+#include "cxView3D.h"
 
 namespace cx
 {
@@ -122,16 +123,24 @@ void ImageRegistrationWidget::activeImageChangedSlot()
   {
     //set a default treshold
     mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
-    ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-    mThresholdSlider->setValue(probeRep->getThreshold());
+    ssc::ProbeRepPtr probe = this->getProbeRep();
+    if (probe)
+      mThresholdSlider->setValue(probe->getThreshold());
   }
   //enable the add point button
   mAddLandmarkButton->setEnabled(mCurrentImage!=0);
 }
 
+ssc::ProbeRepPtr ImageRegistrationWidget::getProbeRep()
+{
+  if (!viewManager()->get3DView(0,0))
+    return ssc::ProbeRepPtr();
+  return repManager()->findFirstRep<ssc::ProbeRep>(viewManager()->get3DView(0,0)->getReps());
+}
+
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 {
-  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(!probeRep)
   {
     ssc::messageManager()->sendError("Could not find a rep to add the landmark to.");
@@ -149,7 +158,7 @@ void ImageRegistrationWidget::addLandmarkButtonClickedSlot()
 
 void ImageRegistrationWidget::editLandmarkButtonClickedSlot()
 {
-  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(!probeRep)
   {
     ssc::messageManager()->sendError("Could not find a rep to edit the landmark for.");
@@ -183,8 +192,9 @@ void ImageRegistrationWidget::showEvent(QShowEvent* event)
 {
   RegistrationWidget::showEvent(event);
 
-  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-  connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
+  ssc::ProbeRepPtr probeRep = this->getProbeRep();
+  if(probeRep)
+    connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 }
 
@@ -192,8 +202,10 @@ void ImageRegistrationWidget::hideEvent(QHideEvent* event)
 {
   RegistrationWidget::hideEvent(event);
 
-  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
-  disconnect(this, SIGNAL(thresholdChanged(const int)), probeRep.get(), SLOT(setThresholdSlot(const int)));
+//  ssc::ProbeRepPtr probeRep = repManager()->getProbeRep("ProbeRep_1");
+  ssc::ProbeRepPtr probeRep = this->getProbeRep();
+  if(probeRep)
+    disconnect(this, SIGNAL(thresholdChanged(const int)), probeRep.get(), SLOT(setThresholdSlot(const int)));
   viewManager()->setRegistrationMode(ssc::rsNOT_REGISTRATED);
 }
 

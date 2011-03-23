@@ -126,7 +126,7 @@ IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
 
 void IGTLinkClient::run()
 {
- // std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
+//  std::cout << "client::run thread: " << QThread::currentThread() << std::endl;
   //std::cout << "run client thread, connecting to " << mAddress << " " << mPort << std::endl;
 
   //------------------------------------------------------------
@@ -158,7 +158,7 @@ void IGTLinkClient::run()
   this->exec();
 
   mSocket->disconnectFromHost();
-  //std::cout << "finished openIGTLink client thread" << std::endl;
+//  std::cout << "finished openIGTLink client thread" << std::endl;
   delete mSocket;
 }
 
@@ -221,7 +221,7 @@ igtl::ImageMessage::Pointer IGTLinkClient::getLastImageMessage()
 void IGTLinkClient::readyReadSlot()
 {
 
-  //std::cout << "tick " << std::endl;
+//  std::cout << "tick " << std::endl;
 
   if (!mHeadingReceived)
   {
@@ -275,6 +275,7 @@ void IGTLinkClient::readyReadSlot()
     if (success)
       mHeadingReceived = false; // restart
   }
+//  std::cout << "  tock " << std::endl;
 }
 
 bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointer& header)

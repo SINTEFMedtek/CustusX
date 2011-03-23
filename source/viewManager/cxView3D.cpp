@@ -9,7 +9,6 @@
 #include "sscImage.h"
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "sscToolManager.h"
 #include "sscToolRep3D.h"
 #include "sscTypeConversions.h"
