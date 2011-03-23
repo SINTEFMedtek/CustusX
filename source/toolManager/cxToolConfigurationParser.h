@@ -42,7 +42,7 @@ private:
   QString mLoggingFolder; ///< path to where logging should be saved, default is the folder where configfile is found
 
   const QString mTrackerTag, mTrackerTypeTag, mToolfileTag, mToolTag,
-                    mToolTypeTag, mToolIdTag, mToolNameTag,
+                    mToolTypeTag, mToolIdTag, mToolNameTag, mToolClinicalAppTag,
                     mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
                     mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,

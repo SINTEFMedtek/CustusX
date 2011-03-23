@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscEnumConverter.h"
 
 namespace cx
 {
@@ -12,7 +13,7 @@ namespace cx
 ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder) :
       mLoggingFolder(loggingFolder), mTrackerTag("tracker"),
       mToolfileTag("toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
-      mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
+      mToolClinicalAppTag("clinical_app"),mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
       mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
       mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
@@ -126,6 +127,19 @@ std::vector<Tool::InternalStructure> ToolConfigurationParser::getConfiguredTools
     QDomElement toolNameElement = toolNode.firstChildElement(mToolNameTag);
     QString toolNameText = toolNameElement.text();
     internalStructure.mName = toolNameText;
+
+    QDomElement toolClinicalAppElement = toolNode.firstChildElement(mToolClinicalAppTag);
+    QString toolClinicalAppText = toolClinicalAppElement.text();
+    QStringList applicationList = toolClinicalAppText.split(" ");
+    foreach(QString string, applicationList)
+    {
+      string = string.toLower();
+      ssc::MEDICAL_DOMAIN domain = string2enum<ssc::MEDICAL_DOMAIN>(string);
+      if(domain != ssc::mdCOUNT)
+        internalStructure.mMedicalDomains.push_back(domain);
+      else
+        ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid.");
+    }
 
     QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
     QString toolGeofileText = toolGeofileElement.text();
