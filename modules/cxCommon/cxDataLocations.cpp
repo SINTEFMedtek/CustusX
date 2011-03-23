@@ -38,7 +38,12 @@ QString DataLocations::getRootConfigPath()
     return path;
   return CX_CONFIG_ROOT;
 }
-  
+
+QString DataLocations::getToolsPath()
+{
+  QString path(getRootConfigPath()+"/tool/Tools/");
+  return path;
+}
   
 QString DataLocations::getApplicationToolConfigPath()
 {

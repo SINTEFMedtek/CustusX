@@ -1,14 +1,24 @@
 #include "cxIgstkTracker.h"
 
+#include <QStringList>
 #include "sscMessageManager.h"
-#include "cxTool.h"
 #include "sscTypeConversions.h"
+#include "sscEnumConverter.h"
+#include "cxTool.h"
 #include "cxIgstkTool.h"
 #include <time.h>
 
 
 namespace cx
 {
+QStringList IgstkTracker::getSupportedTrackingSystems()
+{
+  QStringList retval;
+  retval << enum2string(ssc::tsPOLARIS);
+  retval << enum2string(ssc::tsAURORA);
+  return retval;
+}
+
 IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
   mInternalStructure(internalStructure),
   mValid(false),
@@ -39,13 +49,13 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 
   switch (mInternalStructure.mType)
   {
-  case TRACKER_NONE:
+  case ssc::tsNONE:
     mUid = mName = "None";
     ssc::messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
     mValid = false;
     return;
     break;
-  case TRACKER_POLARIS:
+  case ssc::tsPOLARIS:
     mUid = mName = "Polaris";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
@@ -53,23 +63,24 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
     mTracker = mTempPolarisTracker.GetPointer();
     mValid = true;
     break;
-  case TRACKER_POLARIS_SPECTRA:
-    mUid = mName = "Polaris Spectra";
-    mTempPolarisTracker = PolarisTrackerType::New();
-    mTempPolarisTracker->SetCommunication(mCommunication);
-    ssc::messageManager()->sendInfo("Tracker is set to Polaris Spectra");
-    mTracker = mTempPolarisTracker.GetPointer();
-    mValid = true;
-    break;
-  case TRACKER_POLARIS_VICRA:
-    mUid = mName = "Polaris Vicra";
-    mTempPolarisTracker = PolarisTrackerType::New();
-    mTempPolarisTracker->SetCommunication(mCommunication);
-    ssc::messageManager()->sendInfo("Tracker is set to Polaris Vicra");
-    mTracker = mTempPolarisTracker.GetPointer();
-    mValid = true;
-    break;
-  case TRACKER_AURORA:
+    //There is no special handling of the tracking system if its spectra or vicra, polaris is polaris as we see it
+//  case ssc::tsPOLARIS_SPECTRA:
+//    mUid = mName = "Polaris Spectra";
+//    mTempPolarisTracker = PolarisTrackerType::New();
+//    mTempPolarisTracker->SetCommunication(mCommunication);
+//    ssc::messageManager()->sendInfo("Tracker is set to Polaris Spectra");
+//    mTracker = mTempPolarisTracker.GetPointer();
+//    mValid = true;
+//    break;
+//  case ssc::tsPOLARIS_VICRA:
+//    mUid = mName = "Polaris Vicra";
+//    mTempPolarisTracker = PolarisTrackerType::New();
+//    mTempPolarisTracker->SetCommunication(mCommunication);
+//    ssc::messageManager()->sendInfo("Tracker is set to Polaris Vicra");
+//    mTracker = mTempPolarisTracker.GetPointer();
+//    mValid = true;
+//    break;
+  case ssc::tsAURORA:
     mUid = mName = "Aurora";
     mTempAuroraTracker = AuroraTrackerType::New();
     mTempAuroraTracker->SetCommunication(mCommunication);
@@ -77,7 +88,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
     mTracker = mTempAuroraTracker.GetPointer();
     mValid = true;
     break;
-  case TRACKER_MICRON:
+  case ssc::tsMICRON:
     mUid = mName = "Micron";
     ssc::messageManager()->sendInfo("Tracker is set to Micron");
     //TODO: implement support for a micron tracker...
@@ -95,7 +106,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
 IgstkTracker::~IgstkTracker()
 {}
 
-IgstkTracker::Type IgstkTracker::getType() const
+ssc::TRACKING_SYSTEM IgstkTracker::getType() const
 {
   return mInternalStructure.mType;
 }
