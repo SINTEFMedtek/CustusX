@@ -63,23 +63,23 @@ IgstkTracker::InternalStructure ToolConfigurationParser::getTracker()
     {
       if (text.contains("spectra", Qt::CaseInsensitive))
       {
-        internalStructure.mType = IgstkTracker::TRACKER_POLARIS_SPECTRA;
+        internalStructure.mType = ssc::tsPOLARIS_SPECTRA;
       } else if (text.contains("vicra", Qt::CaseInsensitive))
       {
-        internalStructure.mType = IgstkTracker::TRACKER_POLARIS_VICRA;
+        internalStructure.mType = ssc::tsPOLARIS_VICRA;
       } else
       {
-        internalStructure.mType = IgstkTracker::TRACKER_POLARIS;
+        internalStructure.mType = ssc::tsPOLARIS;
       }
     } else if (text.contains("aurora", Qt::CaseInsensitive))
     {
-      internalStructure.mType = IgstkTracker::TRACKER_AURORA;
+      internalStructure.mType = ssc::tsAURORA;
     } else if (text.contains("micron", Qt::CaseInsensitive))
     {
-      internalStructure.mType = IgstkTracker::TRACKER_MICRON;
+      internalStructure.mType = ssc::tsMICRON;
     } else
     {
-      internalStructure.mType = IgstkTracker::TRACKER_NONE;
+      internalStructure.mType = ssc::tsNONE;
     }
     internalStructure.mLoggingFolderName = this->getLoggingFolder();
   }
@@ -159,23 +159,23 @@ std::vector<Tool::InternalStructure> ToolConfigurationParser::getConfiguredTools
     {
       if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
       {
-        internalStructure.mTrackerType = IgstkTracker::TRACKER_POLARIS_SPECTRA;
+        internalStructure.mTrackerType = ssc::tsPOLARIS_SPECTRA;
       } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
       {
-        internalStructure.mTrackerType = IgstkTracker::TRACKER_POLARIS_VICRA;
+        internalStructure.mTrackerType = ssc::tsPOLARIS_VICRA;
       } else
       {
-        internalStructure.mTrackerType = IgstkTracker::TRACKER_POLARIS;
+        internalStructure.mTrackerType = ssc::tsPOLARIS;
       }
     } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
     {
-      internalStructure.mTrackerType = IgstkTracker::TRACKER_AURORA;
+      internalStructure.mTrackerType = ssc::tsAURORA;
     } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
     {
-      internalStructure.mTrackerType = IgstkTracker::TRACKER_MICRON;
+      internalStructure.mTrackerType = ssc::tsMICRON;
     } else
     {
-      internalStructure.mTrackerType = IgstkTracker::TRACKER_NONE;
+      internalStructure.mTrackerType = ssc::tsNONE;
     }
 
     QDomElement toolSensorWirelessElement =

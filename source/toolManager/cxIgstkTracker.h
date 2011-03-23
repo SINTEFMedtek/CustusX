@@ -16,6 +16,7 @@
   #include "igstkSerialCommunicationForPosix.h"
 #endif
 #include "sscTool.h"
+#include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
@@ -39,6 +40,8 @@ class IgstkTracker : public QObject
 {
   Q_OBJECT
 public:
+  static QStringList getSupportedTrackingSystems();
+
   #ifdef WIN32
   /** The type of serial communication used on a windows platform.*/
     typedef igstk::SerialCommunicationForWindows CommunicationType;
@@ -50,7 +53,7 @@ public:
   typedef igstk::PolarisTracker PolarisTrackerType;
   typedef igstk::AuroraTracker AuroraTrackerType;
 
-  enum Type
+  /*enum Type
   {
     TRACKER_NONE,             ///< Not specified
     TRACKER_POLARIS,          ///< NDIs Polaris tracker
@@ -58,7 +61,7 @@ public:
     TRACKER_POLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
     TRACKER_AURORA,           ///< NDIs Aurora tracker
     TRACKER_MICRON            ///< Claron Technologys Micron tracker
-  };
+  };*/
 
   /*only used for documentation purposes
     TRACKER_INVALID_REQUEST,                    ///< internal state machine didn't accept the request
@@ -76,16 +79,16 @@ public:
   /**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
   {
-    Type            mType;              ///< the trackers type
+    ssc::TRACKING_SYSTEM            mType;              ///< the trackers type
     QString     mLoggingFolderName; ///< path to where log should be saved
     InternalStructure() :
-      mType(TRACKER_NONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
+      mType(ssc::tsNONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
   };
 
   IgstkTracker(InternalStructure internalStructure);
   ~IgstkTracker();
 
-  Type getType() const;               ///< returns the trackers type
+  ssc::TRACKING_SYSTEM getType() const;               ///< returns the trackers type
   QString getName() const;            ///< get the trackers name
   QString getUid() const;             ///< get the tracker unique id
   TrackerType* getPointer() const;    ///< return a pointer to the internal tracker base
