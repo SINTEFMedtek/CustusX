@@ -12,6 +12,7 @@
 #include <igstkLogger.h>
 #include <itkStdStreamLogOutput.h>
 #include "sscTransform3D.h"
+#include "sscDefinitions.h"
 #include "cxIgstkTracker.h"
 #include "vtkForwardDeclarations.h"
 
@@ -72,7 +73,7 @@ public:
     ssc::Tool::Type   mType;                  ///< the tools type
     QString           mName;                  ///< the tools name
     QString           mUid;                   ///< the tools unique id
-    IgstkTracker::Type     mTrackerType;           ///< what product the tool belongs to
+    ssc::TRACKING_SYSTEM     mTrackerType;           ///< what product the tool belongs to
     QString           mSROMFilename;          ///< path to the tools SROM file
     unsigned int      mPortNumber;            ///< the port number the tool is connected to
     unsigned int      mChannelNumber;         ///< the channel the tool is connected to
@@ -87,7 +88,7 @@ public:
     QString           mInstrumentId;          ///< The instruments id
     QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
     InternalStructure() :
-      mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(IgstkTracker::TRACKER_NONE),
+      mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(ssc::tsNONE),
       mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX), mReferencePoints(),
       mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
       mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
@@ -118,7 +119,7 @@ public:
   virtual void setCalibration_sMt(ssc::Transform3D calibration); ///< requests to use the calibration and replaces the tools calibration file
   QString getCalibrationFileName() const; ///< returns the path to the tools calibration file
 
-  IgstkTracker::Type getTrackerType(); ///< the type of tracker this tool belongs to
+  ssc::TRACKING_SYSTEM getTrackerType(); ///< the type of tracker this tool belongs to
 
   virtual std::map<int, ssc::Vector3D> getReferencePoints() const; ///< Get the optional reference points from this tool
   virtual bool hasReferencePointWithId(int id);

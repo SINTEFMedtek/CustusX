@@ -27,7 +27,7 @@ void TestToolConfigurationParser::testGetTracker()
 {
   cx::IgstkTracker::InternalStructure tracker = mConfigurationParser->getTracker();
   //CPPUNIT_ASSERT_MESSAGE("Tracker is null.", tracker);
-  CPPUNIT_ASSERT_MESSAGE("Tracker is not of type Polaris.", tracker.mType == cx::IgstkTracker::TRACKER_POLARIS);
+  CPPUNIT_ASSERT_MESSAGE("Tracker is not of type Polaris.", tracker.mType == ssc::tsPOLARIS);
 }
 
 void TestToolConfigurationParser::testGetConfiguredTools()

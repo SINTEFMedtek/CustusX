@@ -177,7 +177,7 @@ QString Tool::getCalibrationFileName() const
   return mTool->getInternalStructure().mCalibrationFilename;
 }
 
-IgstkTracker::Type Tool::getTrackerType()
+ssc::TRACKING_SYSTEM Tool::getTrackerType()
 {
   return mTool->getInternalStructure().mTrackerType;
 }
