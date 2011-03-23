@@ -1,5 +1,7 @@
 #include <cxToolConfigWidget.h>
 
+#include <QDesktopServices>
+#include <QUrl>
 #include <QDir>
 #include <QComboBox>
 #include <QCheckBox>
@@ -57,6 +59,7 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
   connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
   connect(mToolListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
+  connect(mToolListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(toolDoubleClickedSlot(QListWidgetItem*)));
 
 
   //populate
@@ -115,6 +118,13 @@ void ToolConfigWidget::toolClickedSlot(QListWidgetItem* item)
   QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
 //  std::cout << "emit toolSelected("<<absoluteFilePath<<");" << std::endl;
   emit toolSelected(absoluteFilePath);
+}
+
+void ToolConfigWidget::toolDoubleClickedSlot(QListWidgetItem* item)
+{
+  QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
+  QUrl url("file:/"+absoluteFilePath);
+  QDesktopServices::openUrl(url);
 }
 
 void ToolConfigWidget::populateConfigComboBox()
