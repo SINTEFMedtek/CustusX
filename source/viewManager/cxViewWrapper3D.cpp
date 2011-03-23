@@ -412,16 +412,11 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 
 void ViewWrapper3D::updateView()
 {
-  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-
-  //update data name text rep
-  QStringList text;
-  for (unsigned i = 0; i < images.size(); ++i)
-  {
-    text << qstring_cast(images[i]->getName());
-  }
+  QStringList text = this->getAllDataNames();
   mDataNameText->setText(0, text.join("\n"));
+  mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
 }
+
 
 void ViewWrapper3D::imageRemoved(const QString& uid)
 {
