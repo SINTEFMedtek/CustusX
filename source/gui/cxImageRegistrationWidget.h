@@ -54,6 +54,7 @@ protected:
   QString getLandmarkName(QString uid);
   virtual ssc::Transform3D getTargetTransform() const;
   void internalPerformRegistration(bool doIt);
+  ssc::ProbeRepPtr getProbeRep();
 
   //gui
   RegistrationFixedImageStringDataAdapterPtr mFixedDataAdapter;
