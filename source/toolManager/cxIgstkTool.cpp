@@ -3,7 +3,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QStringList>
-#include <QTextStream>
+//#include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
@@ -52,7 +52,7 @@ igstk::TrackerTool::Pointer IgstkTool::getPointer() const
   return mTool;
 }
 
-IgstkTracker::Type IgstkTool::getTrackerType()
+ssc::TRACKING_SYSTEM IgstkTool::getTrackerType()
 {
   return mInternalStructure.mTrackerType;
 }
@@ -240,17 +240,17 @@ bool IgstkTool::verifyInternalStructure()
     ssc::messageManager()->sendError(verificationError+" Tag <tool>::<uid> is empty. Give tool a unique id.");
     retval = false;
   }
-  if(mInternalStructure.mTrackerType == IgstkTracker::TRACKER_NONE)
+  if(mInternalStructure.mTrackerType == ssc::tsNONE)
   {
     ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<type> is invalid ["+qstring_cast(mInternalStructure.mTrackerType)+"]. Valid types: [polaris, spectra, vicra, aurora, micron (NOT SUPPORTED YET)]");
     retval = false;
   }
-  if((mInternalStructure.mTrackerType == IgstkTracker::TRACKER_AURORA) && (mInternalStructure.mPortNumber >= 4))
+  if((mInternalStructure.mTrackerType == ssc::tsAURORA) && (mInternalStructure.mPortNumber >= 4))
   {
     ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<portnumber> is invalid ["+qstring_cast(mInternalStructure.mPortNumber)+"]. Valid numbers: [0, 1, 2, 3]");
     retval = false;
   }
-  if((mInternalStructure.mTrackerType == IgstkTracker::TRACKER_AURORA) && (mInternalStructure.mChannelNumber >= 1))
+  if((mInternalStructure.mTrackerType == ssc::tsAURORA) && (mInternalStructure.mChannelNumber >= 1))
   {
     ssc::messageManager()->sendError(verificationError+" Tag <sensor>::<channelnumber> is invalid ["+qstring_cast(mInternalStructure.mChannelNumber)+"]. Valid numbers: [0, 1]");
     retval = false;
@@ -289,11 +289,11 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
 
   switch (mInternalStructure.mTrackerType)
   {
-  case IgstkTracker::TRACKER_NONE:
+  case ssc::tsNONE:
     break;
-  case IgstkTracker::TRACKER_POLARIS_SPECTRA:
-  case IgstkTracker::TRACKER_POLARIS_VICRA:
-  case IgstkTracker::TRACKER_POLARIS:
+  case ssc::tsPOLARIS_SPECTRA:
+  case ssc::tsPOLARIS_VICRA:
+  case ssc::tsPOLARIS:
     tempPolarisTool = igstk::PolarisTrackerTool::New();
     tempPolarisTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
     if(!mInternalStructure.mWireless) //we only support wireless atm
@@ -304,7 +304,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
     tempPolarisTool->SetCalibrationTransform(mInternalStructure.mCalibration);
     tool = tempPolarisTool;
     break;
-  case IgstkTracker::TRACKER_AURORA:
+  case ssc::tsAURORA:
     tempAuroraTool = igstk::AuroraTrackerTool::New();
     tempAuroraTool->AddObserver(igstk::IGSTKEvent(), mToolObserver);
     if(mInternalStructure.m5DOF)
@@ -322,7 +322,7 @@ igstk::TrackerTool::Pointer IgstkTool::buildInternalTool()
     tempAuroraTool->SetCalibrationTransform(mInternalStructure.mCalibration);
     tool = tempAuroraTool;
     break;
-  case IgstkTracker::TRACKER_MICRON:
+  case ssc::tsMICRON:
     //TODO: implement
     break;
   default:

@@ -4,7 +4,6 @@
 #include "cxWhatsThisWidget.h"
 #include "cxDataInterface.h"
 
-class QGroupBox;
 class QPushButton;
 class QVBoxLayout;
 
