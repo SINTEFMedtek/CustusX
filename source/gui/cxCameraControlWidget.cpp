@@ -25,42 +25,53 @@
 namespace cx
 {
 
-MousePadWidget::MousePadWidget(QWidget* parent, QSize minimumSize) : QFrame(parent), mFixPosX(false), mMinSize(minimumSize)
+
+
+MousePadWidgetInternal::MousePadWidgetInternal(QWidget* parent, QSize minimumSize) : QFrame(parent), mFixPosX(false), mMinSize(minimumSize)
 {
 }
 
-MousePadWidget::~MousePadWidget()
+MousePadWidgetInternal::~MousePadWidgetInternal()
 {
 }
 
-void MousePadWidget::setFixedXPos(bool on)
+void MousePadWidgetInternal::setFixedXPos(bool on)
 {
   mFixPosX = on;
   this->fixPos();
 }
+void MousePadWidgetInternal::setFixedYPos(bool on)
+{
+  mFixPosY = on;
+  this->fixPos();
+}
 
-void MousePadWidget::fixPos()
+void MousePadWidgetInternal::fixPos()
 {
   if (mFixPosX)
   {
     mLastPos.rx() = this->width()/2;
   }
+  if (mFixPosY)
+  {
+    mLastPos.ry() = this->height()/2;
+  }
 }
 
-void MousePadWidget::showEvent(QShowEvent* event)
+void MousePadWidgetInternal::showEvent(QShowEvent* event)
 {
   mLastPos = QPoint(this->width()/2, this->height()/2);
   this->fixPos();
   this->update();
 }
 
-void MousePadWidget::mousePressEvent(QMouseEvent* event)
+void MousePadWidgetInternal::mousePressEvent(QMouseEvent* event)
 {
   mLastPos = event->pos();
   this->fixPos();
   this->update();
 }
-void MousePadWidget::mouseMoveEvent(QMouseEvent* event)
+void MousePadWidgetInternal::mouseMoveEvent(QMouseEvent* event)
 {
   QPoint delta = event->pos() - mLastPos;
 
@@ -72,21 +83,21 @@ void MousePadWidget::mouseMoveEvent(QMouseEvent* event)
   this->fixPos();
   this->update();
 }
-void MousePadWidget::mouseReleaseEvent(QMouseEvent* event)
+void MousePadWidgetInternal::mouseReleaseEvent(QMouseEvent* event)
 {
   mLastPos = QPoint(this->width()/2, this->height()/2);
   this->fixPos();
   this->update();
 }
 
-void MousePadWidget::resizeEvent(QResizeEvent* event)
+void MousePadWidgetInternal::resizeEvent(QResizeEvent* event)
 {
   mLastPos = QPoint(this->width()/2, this->height()/2);
   this->fixPos();
   this->update();
 }
 
-void MousePadWidget::paintEvent(QPaintEvent *)
+void MousePadWidgetInternal::paintEvent(QPaintEvent *)
 {
     QPainter p(this);
 
@@ -118,6 +129,39 @@ void MousePadWidget::paintEvent(QPaintEvent *)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
+
+MousePadWidget::MousePadWidget(QWidget* parent, QSize minimumSize) : QFrame(parent)
+{
+  mInternal = new MousePadWidgetInternal(this, minimumSize);
+  connect(mInternal, SIGNAL(mouseMoved(QPointF)), this, SIGNAL(mouseMoved(QPointF)));
+
+  this->setFrameStyle(QFrame::Panel | QFrame::Raised);
+  this->setLineWidth(3);
+  QVBoxLayout* fLayout = new QVBoxLayout;
+  fLayout->setMargin(0);
+  this->setLayout(fLayout);
+
+//  MousePadWidget* pad = new MousePadWidget(this, minimumSize);
+//  pad->setFixedYPos(true);
+//  pad->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+//  pad->setLineWidth(3);
+  fLayout->addWidget(mInternal);
+}
+MousePadWidget::~MousePadWidget()
+{
+}
+void MousePadWidget::setFixedXPos(bool on)
+{
+  mInternal->setFixedXPos(on);
+}
+void MousePadWidget::setFixedYPos(bool on)
+{
+  mInternal->setFixedYPos(on);
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
 
 CameraControlWidget::CameraControlWidget(QWidget* parent) :
     QWidget(parent)
@@ -160,15 +204,15 @@ void CameraControlWidget::defineRotateLayout()
   group->setLayout(layout);
 
   MousePadWidget* rotateWidget = new MousePadWidget(this, mMinPadSize);
-  rotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  rotateWidget->setLineWidth(3);
+//  rotateWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+//  rotateWidget->setLineWidth(3);
   connect(rotateWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateXZSlot(QPointF)));
   layout->addWidget(rotateWidget, 4);
 
   MousePadWidget* rotateYWidget = new MousePadWidget(this, mMinBarSize);
   rotateYWidget->setFixedXPos(true);
-  rotateYWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  rotateYWidget->setLineWidth(3);
+//  rotateYWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+//  rotateYWidget->setLineWidth(3);
   connect(rotateYWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(rotateYSlot(QPointF)));
   layout->addWidget(rotateYWidget, 1);
 }
@@ -185,15 +229,15 @@ void CameraControlWidget::definePanLayout()
   group->setLayout(panLayout);
 
   MousePadWidget* panWidget = new MousePadWidget(this, mMinPadSize);
-  panWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  panWidget->setLineWidth(3);
+//  panWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+//  panWidget->setLineWidth(3);
   connect(panWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(panXZSlot(QPointF)));
   panLayout->addWidget(panWidget, 4);
 
   MousePadWidget* dollyWidget = new MousePadWidget(this, mMinBarSize);
   dollyWidget->setFixedXPos(true);
-  dollyWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-  dollyWidget->setLineWidth(3);
+//  dollyWidget->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+//  dollyWidget->setLineWidth(3);
   connect(dollyWidget, SIGNAL(mouseMoved(QPointF)), this, SLOT(dollySlot(QPointF)));
   panLayout->addWidget(dollyWidget, 1);
 }
