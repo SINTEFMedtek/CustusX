@@ -1,7 +1,6 @@
 #include "cxImageSegmentationAndCenterlineWidget.h"
 
 #include <QVBoxLayout>
-#include <QGroupBox>
 #include <QPushButton>
 #include <QFrame>
 #include "cxSegmentationWidget.h"
