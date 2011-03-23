@@ -11,6 +11,8 @@
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxToolManager.h"
+#include "cxToolConfigurationParser.h"
+#include "cxFilePreviewWidget.h"
 
 namespace cx
 {
@@ -18,6 +20,7 @@ namespace cx
 ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mConfigFilesComboBox(new QComboBox()),
+    mCurrentConfigFile("<new config>"),
     mTrackerGroupBox(new QGroupBox()),
     mTrackerButtonGroup(new QButtonGroup()),
     mToolGroup(new QGroupBox()),
@@ -52,6 +55,9 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
 
   //connect
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
+  connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
+  connect(mToolListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
+
 
   //populate
   this->populateConfigComboBox();
@@ -98,6 +104,19 @@ void ToolConfigWidget::filterToolsSlot()
   this->populateToolList(applicationFilter, trackingsystemFilter);
 }
 
+void ToolConfigWidget::configChangedSlot()
+{
+  //TODO
+  mCurrentConfigFile = mConfigFilesComboBox->currentText();
+}
+
+void ToolConfigWidget::toolClickedSlot(QListWidgetItem* item)
+{
+  QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
+//  std::cout << "emit toolSelected("<<absoluteFilePath<<");" << std::endl;
+  emit toolSelected(absoluteFilePath);
+}
+
 void ToolConfigWidget::populateConfigComboBox()
 {
   mConfigFilesComboBox->blockSignals(true);
@@ -111,6 +130,8 @@ void ToolConfigWidget::populateConfigComboBox()
   QStringList list = dir.entryList();
 
   mConfigFilesComboBox->clear();
+  mConfigFilesComboBox->addItem("<new config>");
+  //TODO rewrite, need full path in data, need to show only filename
   mConfigFilesComboBox->addItems(list);
 
   int currentIndex = mConfigFilesComboBox->findText(mCurrentConfigFile);
@@ -171,6 +192,7 @@ void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringLi
 //      std::cout << string_cast(string) << std::endl;
 //    }
 
+  mToolListWidget->clear();
   mToolListWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
   mToolListWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
@@ -195,7 +217,7 @@ void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringLi
       if(applicationFilter.contains(domainName, Qt::CaseInsensitive))
       {
         passedFilter = true;
-        std::cout << "Filter passed, found: " << trackerName << " and " << domainName << std::endl;
+        //std::cout << "Filter passed, found: " << trackerName << " and " << domainName << std::endl;
       }
     }
 
@@ -287,9 +309,8 @@ Tool::InternalStructure ToolConfigWidget::getToolInternal(QString toolAbsoluteFi
 {
   Tool::InternalStructure retval;
 
-  //TODO
-  //fix parser
-  //ssc::messageManager()->sendDebug("TODO: Need to parse tool file: "+toolAbsoluteFilePath);
+  ToolFileParser parser(toolAbsoluteFilePath);
+  retval = parser.getTool();
 
   return retval;
 }
