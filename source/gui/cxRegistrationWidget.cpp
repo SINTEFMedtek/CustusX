@@ -11,7 +11,6 @@
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "sscDataManager.h"
 #include "cxView3D.h"

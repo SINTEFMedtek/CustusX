@@ -73,6 +73,7 @@ private slots:
   void showRefToolSlot(bool checked);
   void showToolPathSlot(bool checked);
 //  void centerChangedSlot();
+  void probeRepPointPickedSlot(double x,double y,double z);
   void centerImageActionSlot();
   void centerToolActionSlot();
   void optionChangedSlot();
