@@ -377,25 +377,34 @@ void ViewWrapper2D::updateView()
   if (!images.empty())
     image = images.back(); // always show last in vector
 
-  QString text;
-
   if (image)
   {
     ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
     mSliceProxy->setDefaultCenter(c);
-    text = image->getName();
   }
 
+  QStringList text;
   // slice rep
 #ifdef USE_2D_GPU_RENDER
   this->resetMultiSlicer();
 //  mMultiSliceRep->setImages(images);
+
+  text = this->getAllDataNames();
+  mDataNameText->setText(0, text.join("\n"));
 #else
   mSliceRep->setImage(image);
+
+  // list all meshes and one image.
+  std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+  for (unsigned i = 0; i < mesh.size(); ++i)
+    text << qstring_cast(mesh[i]->getName());
+  if (image)
+    text << image->getName();
 #endif
 
   //update data name text rep
-  mDataNameText->setText(0, text);
+  mDataNameText->setText(0, text.join("\n"));
+  mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
 }
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
@@ -425,6 +434,7 @@ void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
 //  mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
 //  mSliceRep->setSliceProxy(mSliceProxy);
 //  mView->addRep(mSliceRep);
+  this->updateView();
 }
 
 void ViewWrapper2D::meshRemoved(const QString& uid)
@@ -435,6 +445,7 @@ void ViewWrapper2D::meshRemoved(const QString& uid)
   mView->removeRep(mGeometricRep[uid]);
   mGeometricRep.erase(uid);
  // std::cout << "removed mesh " << uid << std::endl;
+  this->updateView();
 }
 
 
