@@ -38,6 +38,7 @@ private slots:
   void filterToolsSlot();
   void configChangedSlot();
   void toolClickedSlot(QListWidgetItem* item);
+  void toolDoubleClickedSlot(QListWidgetItem* item);
 
 private:
   void populateConfigComboBox();
