@@ -2,13 +2,11 @@
 
 <configuration>
 
-<tracker> 
-  <type>Polaris</type>
+<tracker type="polaris"> 
+    <toolfile reference="yes">../Tools/Nevro/SW-Invite/SW-RefFrame-02-077-0191_POLARIS</toolfile>
+    <toolfile reference="no">../Tools//Shared/NDI-Pointer-8700340_POLARIS</toolfile>
+    <toolfile reference="no">../Tools/Lab/SW-Pointer-Broken-07-081-0229_POLARIS</toolfile>
+    <toolfile reference="no">../Tools/Shared/M12L-Probe-8700449_Vivid7-ISB_POLARIS</toolfile>
 </tracker>
-
-<toolfile type="polaris" reference="yes">../Tools/Nevro/SW-Invite/SW-RefFrame-02-077-0191_POLARIS</toolfile>
-<toolfile type="polaris" reference="no">../Tools//Shared/NDI-Pointer-8700340_POLARIS</toolfile>
-<toolfile type="polaris" reference="no">../Tools/Lab/SW-Pointer-Broken-07-081-0229_POLARIS</toolfile>
-<toolfile type="polaris" reference="no">../Tools/Shared/M12L-Probe-8700449_Vivid7-ISB_POLARIS</toolfile>
 
 </configuration>
