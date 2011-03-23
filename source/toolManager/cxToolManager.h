@@ -39,6 +39,8 @@ public:
   static void initializeObject();
   static ToolManager* getInstance();
 
+  QStringList getSupportedTrackingSystems();
+
   virtual bool isConfigured() const; ///< checks if the system is configured
   virtual bool isInitialized() const; ///< checks if the hardware is initialized
   virtual bool isTracking() const; ///< checks if the system is tracking

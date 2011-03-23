@@ -27,6 +27,8 @@ namespace cx
 {
 class MessageManager;
 class ViewManager;
+class FilePreviewWidget;
+class ToolConfigWidget;
 
 class PreferencesTab : public QWidget
 {
@@ -35,10 +37,13 @@ public:
   PreferencesTab(QWidget *parent = 0);
 
   virtual void init() = 0;
+
 public slots:
   virtual void saveParametersSlot() = 0;
+
 signals:
   void savedParameters();
+
 protected:
   QSettingsPtr mSettings;
   QVBoxLayout* mTopLayout;
@@ -64,9 +69,6 @@ public:
 
 public slots:
   void saveParametersSlot();
-
-//signals:
-//  void savedParameters();
   
 private slots:
   void browsePatientDataFolderSlot();
@@ -202,6 +204,32 @@ protected:
 };
 
 /**
+ * \class ToolConfigTab
+ *
+ * \brief Interface for selecting a tool configuration.
+ *
+ * \date Mar 22, 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class ToolConfigTab : public PreferencesTab
+{
+  Q_OBJECT
+
+public:
+  ToolConfigTab(QWidget* parent = 0);
+  virtual ~ToolConfigTab();
+
+  virtual void init();
+
+public slots:
+  virtual void saveParametersSlot();
+
+private:
+  FilePreviewWidget*  mFilePreviewWidget;
+  ToolConfigWidget* mToolConfigWidget;
+};
+
+/**
  * \class PreferencesDialog
  *
  * \brief Set application preferences
@@ -216,6 +244,7 @@ class PreferencesDialog : public QDialog
 public:
   PreferencesDialog(QWidget *parent = 0);
   virtual ~PreferencesDialog();
+
 private slots:
   void selectTabSlot();
 
