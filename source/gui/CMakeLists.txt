@@ -170,6 +170,7 @@ SET(${LIBNAME}_SRCS
     cxFilePreviewWidget.cpp
     cxToolConfigWidget.h
     cxToolConfigWidget.cpp
+    snwSyntaxHighlighter.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
