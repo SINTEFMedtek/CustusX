@@ -31,7 +31,12 @@ public:
 	Vector3D rotationAxis() const;
 	void setRotationAxis(const Vector3D& k);
 	void put(std::ostream& s) const;
+	void test();
 	
+	ssc::Vector3D getEulerXYZ() const;
+	void setEulerXYZ(const ssc::Vector3D& xyz);
+
+
 	Frame3D();
 	virtual ~Frame3D();
 	
