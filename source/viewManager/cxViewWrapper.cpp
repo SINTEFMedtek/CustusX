@@ -258,4 +258,19 @@ void ViewWrapper::connectContextMenu(ssc::View* view)
    connect(view, SIGNAL(customContextMenuRequested(const QPoint &)),
        this, SLOT(contextMenuSlot(const QPoint &)));
 }
+
+QStringList ViewWrapper::getAllDataNames() const
+{
+  std::vector<ssc::DataPtr> data = mViewGroup->getData();
+
+  QStringList text;
+  for (unsigned i = 0; i < data.size(); ++i)
+  {
+    text << qstring_cast(data[i]->getName());
+  }
+  std::reverse(text.begin(), text.end());
+  return text;
+}
+
+
 }//namespace cx

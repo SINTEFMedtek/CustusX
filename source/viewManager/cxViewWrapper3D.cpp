@@ -141,7 +141,12 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
-  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
+  mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
+
+//  ssc::ToolRep3DPtr toolRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
+
+//  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
+  connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
   mProbeRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
 
   // plane type text rep
@@ -154,6 +159,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
   mView->addRep(mDataNameText);
 
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
@@ -175,38 +181,15 @@ ViewWrapper3D::~ViewWrapper3D()
   }
 }
 
-//void ViewWrapper3D::test(double v)
-//{
-//  ssc::Vector3D p0(-1,-1, v);
-//  ssc::Vector3D p1( 1,-1, v);
-//  ssc::Vector3D p2(-1, 1, v);
-//  mView->getRenderer()->ViewToWorld(p0[0],p0[1],p0[2]);
-//  mView->getRenderer()->ViewToWorld(p1[0],p1[1],p1[2]);
-//  mView->getRenderer()->ViewToWorld(p2[0],p2[1],p2[2]);
-////  std::cout << "    vp_w " << vp_w << std::endl;
-//  std::cout << this << " dim " << setprecision(4) << (p1-p0).length() << " " << setprecision(4) << (p2-p0).length() << std::endl;
-////  double size = (vp_w.range()[0] + vp_w.range()[1]) / 2;
-//
-//}
-
-
-//void ViewWrapper3D::viewChanged()
-//{
-//  if (!mView || !mView->getRenderer())
-//    return;
-//  if (mView->getRenderer()->GetSize()[0]==0)
-//    return;
-//
-////  mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
-// double vp[4];
-//  mView->getRenderer()->GetViewport(vp);
-//  std::cout << "  vp  " << vp[0] <<" "<< vp[1] <<" "<<vp[2] <<" "<<vp[3] << std::endl;
-////  std::cout << "pp " << mView->getRenderer()->GetActiveCamera()->GetParallelProjection() << std::endl;;
-//
-//  this->test(-1);
-//  this->test(0);
-//  this->test(1);
-//}
+void ViewWrapper3D::probeRepPointPickedSlot(double x,double y,double z)
+{
+  //TODO check spaces....
+  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
+  ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
+  // TODO set center here will not do: must handle
+  ssc::dataManager()->setCenter(p_r);
+  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+}
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 {
@@ -411,16 +394,11 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 
 void ViewWrapper3D::updateView()
 {
-  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-
-  //update data name text rep
-  QStringList text;
-  for (unsigned i = 0; i < images.size(); ++i)
-  {
-    text << qstring_cast(images[i]->getName());
-  }
+  QStringList text = this->getAllDataNames();
   mDataNameText->setText(0, text.join("\n"));
+  mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
 }
+
 
 void ViewWrapper3D::imageRemoved(const QString& uid)
 {
