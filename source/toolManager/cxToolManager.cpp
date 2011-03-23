@@ -36,6 +36,13 @@ ToolManager* ToolManager::getInstance()
   return dynamic_cast<ToolManager*>(ssc::ToolManager::getInstance());
 }
 
+QStringList ToolManager::getSupportedTrackingSystems()
+{
+  QStringList retval;
+  retval = IgstkTracker::getSupportedTrackingSystems();
+  return retval;
+}
+
 ToolManager::ToolManager() :
   mConfigurationFilePath(""),
   mLoggingFolder(""),

@@ -42,7 +42,7 @@ public:
   QString getUid();
 
   igstk::TrackerTool::Pointer getPointer() const; ///< return a pointer to the internal tools base object
-  IgstkTracker::Type getTrackerType();
+  ssc::TRACKING_SYSTEM getTrackerType();
   ssc::Tool::Type getType() const;
 
   bool isValid() const; ///< Thread safe, volatile

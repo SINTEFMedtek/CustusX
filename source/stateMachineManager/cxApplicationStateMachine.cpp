@@ -79,51 +79,6 @@ QActionGroup* ApplicationStateMachine::getActionGroup()
   return mActionGroup;
 }
 
-//void ApplicationStateMachine::fillMenu(QMenu* menu)
-//{
-//  this->fillMenu(menu, mParentState);
-//}
-//
-//void ApplicationStateMachine::fillMenu(QMenu* menu, WorkflowState* current)
-//{
-//  std::vector<WorkflowState*> childStates = current->getChildStates();
-//
-//  if (childStates.empty())
-//  {
-//    menu->addAction(current->createAction(mActionGroup));
-//  }
-//  else // current is a node. create submenu and fill in recursively
-//  {
-//    QMenu* submenu = menu;
-//    if (current!=mParentState) // ignore creation of submenu for parent state
-//      submenu = menu->addMenu(current->getName());
-//    for (unsigned i=0; i<childStates.size(); ++i)
-//      this->fillMenu(submenu, childStates[i]);
-//  }
-//}
-
-
-//void ApplicationStateMachine::fillToolBar(QToolBar* toolbar)
-//{
-//  this->fillToolbar(toolbar, mParentState);
-//}
-//
-//void ApplicationStateMachine::fillToolbar(QToolBar* toolbar, WorkflowState* current)
-//{
-//  std::vector<WorkflowState*> childStates = current->getChildStates();
-//
-//  if (childStates.empty())
-//  {
-//    toolbar->addAction(current->createAction(mActionGroup));
-//  }
-//  else // current is a node. fill in recursively
-//  {
-//    for (unsigned i=0; i<childStates.size(); ++i)
-//      this->fillToolbar(toolbar, childStates[i]);
-//  }
-//}
-
-
 QString ApplicationStateMachine::getActiveUidState()
 {
   QSet<QAbstractState *> states = this->configuration();
@@ -144,6 +99,15 @@ QString ApplicationStateMachine::getActiveStateName()
   if (!mStates.count(uid))
     return "";
   return mStates[uid]->getName();
+}
+
+QStringList ApplicationStateMachine::getAllApplicationNames()
+{
+  QStringList retval;
+  ApplicationStateMap::iterator it = mStates.begin();
+  for(; it != mStates.end(); ++it)
+    retval << it->second->getName();
+  return retval;
 }
 
 

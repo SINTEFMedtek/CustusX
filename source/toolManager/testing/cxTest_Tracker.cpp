@@ -4,10 +4,10 @@
 
 void TestTracker::setUp()
 {
-  mValidPolarisInternal.mType = cx::IgstkTracker::TRACKER_POLARIS;
+  mValidPolarisInternal.mType = ssc::tsPOLARIS;
   mValidPolarisInternal.mLoggingFolderName = QDir::currentPath();
 
-  mValidAuroraInternal.mType = cx::IgstkTracker::TRACKER_AURORA;
+  mValidAuroraInternal.mType = ssc::tsAURORA;
   mValidAuroraInternal.mLoggingFolderName = QDir::currentPath();
 }
 
