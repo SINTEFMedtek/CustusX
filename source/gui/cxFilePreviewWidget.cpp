@@ -4,6 +4,7 @@
 #include <QTextDocument>
 #include <QTextStream>
 #include "sscMessageManager.h"
+#include "snwSyntaxHighlighter.h"
 
 namespace cx
 {
@@ -18,6 +19,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
 
   mTextEdit->setDocument(mTextDocument);
   mTextDocument->setPlainText("<tag> Test </tag>");
+  new snw::SyntaxHighlighter(mTextDocument);
 }
 
 FilePreviewWidget::~FilePreviewWidget()
