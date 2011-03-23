@@ -56,6 +56,7 @@ namespace cx
 
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
+  mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
@@ -134,15 +135,28 @@ MainWindow::MainWindow() :
   // Restore saved window states
   // Must be done after all DockWidgets are created
   if (!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
-    this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
+   // this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
+    this->showMaximized();
   //restoreState(mSettings->value("mainWindow/windowState").toByteArray());
-
+  else
   // Don't show the Widget before all elements are initialized
-  this->show();
+    this->show();
   //std::cout << "end construct main win" << std::endl;
 
   this->startupLoadPatient();
 }
+
+void MainWindow::changeEvent(QEvent * event)
+{
+  QMainWindow::changeEvent(event);
+
+  if (event->type() == QEvent::WindowStateChange)
+  {
+    if (mFullScreenAction)
+      mFullScreenAction->setChecked(this->windowState() & Qt::WindowFullScreen);
+  }
+}
+
 
 /**Parse the command line and load a patient if the switch --patient is found
  *
@@ -167,6 +181,18 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
   dockWidget->setObjectName(widget->objectName() + "DockWidget");
   dockWidget->setWidget(widget);
   this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+
+  // tabify the widget onto one of the left widgets.
+  for (std::set<QDockWidget*>::iterator iter=mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
+  {
+    if (this->dockWidgetArea(*iter)==Qt::LeftDockWidgetArea)
+    {
+//      std::cout << "tabify " << (*iter)->objectName() << "\t" << dockWidget->objectName() << std::endl;
+      this->tabifyDockWidget(*iter, dockWidget);
+      break;
+    }
+  }
+
   mDockWidgets.insert(dockWidget);
   dockWidget->setVisible(false); // default visibility
 
@@ -277,6 +303,13 @@ void MainWindow::createActions()
   mDebugModeAction->setChecked(DataManager::getInstance()->getDebugMode());
   mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
 
+  mFullScreenAction = new QAction(tr("Fullscreen"), this);
+  mFullScreenAction->setShortcut(tr("F11"));
+  mFullScreenAction->setStatusTip(tr("Toggle full screen"));
+  mFullScreenAction->setCheckable(true);
+  mFullScreenAction->setChecked(this->windowState() & Qt::WindowFullScreen);
+  connect(mFullScreenAction, SIGNAL(triggered()), this, SLOT(toggleFullScreenSlot()));
+
   mQuitAction = new QAction(tr("&Quit"), this);
   mQuitAction->setShortcut(tr("Ctrl+Q"));
   mQuitAction->setStatusTip(tr("Exit the application"));
@@ -379,6 +412,21 @@ void MainWindow::createActions()
 
   mInteractorStyleActionGroup = viewManager()->createInteractorStyleActionGroup();
 
+}
+
+void MainWindow::toggleFullScreenSlot()
+{
+  this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
+//  bool fs = this->windowState() & Qt::WindowFullScreen;
+////  bool mx = this->windowState() & Qt::WindowMaximized;
+////  std::cout << "Fullscreen pre: full=" << fs << ", max=" << mx << std::endl;
+//  if (fs)
+//    this->showNormal();
+//  else
+//    this->showFullScreen();
+////  fs = this->windowState() & Qt::WindowFullScreen;
+////  mx = this->windowState() & Qt::WindowMaximized;
+////  std::cout << "Fullscreen post: full=" << fs << ", max=" << mx << std::endl;
 }
 
 void MainWindow::shootScreen()
@@ -739,6 +787,7 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mImportDataAction);
   mFileMenu->addAction(mDeleteDataAction);
   mFileMenu->addSeparator();
+  mFileMenu->addAction(mFullScreenAction);
   mFileMenu->addAction(mDebugModeAction);
   mFileMenu->addAction(mShootScreenAction);
   mFileMenu->addAction(mShootWindowAction);
@@ -822,9 +871,12 @@ void MainWindow::createToolBars()
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
   mNavigationToolBar->addAction(mCenterToTooltipAction);
   mNavigationToolBar->addAction(mShowPointPickerAction);
-  mNavigationToolBar->addSeparator();
-  mNavigationToolBar->addActions(mInteractorStyleActionGroup->actions());
   this->registerToolBar(mNavigationToolBar, "Toolbar");
+
+  mInteractorStyleToolBar = addToolBar("InteractorStyle");
+  mInteractorStyleToolBar->setObjectName("InteractorStyleToolBar");
+  mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
+  this->registerToolBar(mInteractorStyleToolBar, "Toolbar");
 
   mWorkflowToolBar = addToolBar("Workflow");
   mWorkflowToolBar->setObjectName("WorkflowToolBar");

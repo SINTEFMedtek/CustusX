@@ -12,7 +12,6 @@
 #include "sscUtilHelpers.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "cxToolManager.h"
 #include "cxViewWrapper2D.h"
