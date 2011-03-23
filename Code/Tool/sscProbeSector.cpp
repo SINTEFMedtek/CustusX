@@ -7,9 +7,21 @@
 #include <vtkPolyData.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
-
+#include <vtkPolyLine.h>
+#include <vtkClipPolyData.h>
+#include <vtkBox.h>
+#include <vtkPlane.h>
+#include <vtkPlanes.h>
+#include <vtkCutter.h>
+//#include <vtkPolyPlane.h>
 #include "sscBoundingBox3D.h"
 #include "sscVolumeHelpers.h"
+
+
+typedef vtkSmartPointer<class vtkPlanes> vtkPlanesPtr;
+typedef vtkSmartPointer<class vtkPlane> vtkPlanePtr;
+typedef vtkSmartPointer<class vtkBox> vtkBoxPtr;
+typedef vtkSmartPointer<class vtkCutter> vtkCutterPtr;
 
 namespace ssc
 {
@@ -157,15 +169,78 @@ vtkPolyDataPtr ProbeSector::getSectorLinesOnly()
     return mPolyData;
 
   this->updateSector();
+//  return mPolyData;
 
   vtkPolyDataPtr output = vtkPolyDataPtr::New();
 
   output->SetPoints(mPolyData->GetPoints());
-//  output->GetPointData()->SetTCoords(mPolyData->GetPointData()->GetTCoords());
   output->SetLines(mPolyData->GetLines());
-//  output->SetPolys(mPolyData->GetPolys());
 //  output->SetStrips(mPolyData->GetStrips());
   return output;
+}
+
+
+vtkPolyDataPtr clipPlane(vtkPolyDataPtr input, Vector3D p, Vector3D n)
+{
+  vtkPlanePtr plane = vtkPlanePtr::New();
+  plane->SetOrigin(p.begin());
+  plane->SetNormal(n.begin());
+
+  vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
+  clipper->SetInput(input);
+  clipper->SetClipFunction(plane);
+  clipper->SetInsideOut(true);
+  clipper->Update();
+  return clipper->GetOutput();
+}
+
+vtkPolyDataPtr ProbeSector::generateClipper(vtkPolyDataPtr input)
+{
+  return input;
+
+//  vtkBoxPtr box = vtkBoxPtr::New();
+//  DoubleBoundingBox3D bb_p = mData.mImage.mClipRect_p;
+//  std::cout << "box_p: " << bb_p << std::endl;
+//  std::cout << "box_p_p0: " << bb_p.corner(0,0,0) << std::endl;
+//  std::cout << "box_p_p1: " << bb_p.corner(1,1,1) << std::endl;
+  DoubleBoundingBox3D bb = mData.mImage.getClipRect_u();
+  bb[4] = -1;
+  bb[5] = +1;
+  std::cout << "box_u: " << bb << std::endl;
+//  std::cout << "box_u_p0: " << bb.corner(0,0,0) << std::endl;
+//  std::cout << "box_u_p1: " << bb.corner(1,1,1) << std::endl;
+//  box->SetBounds(bb.begin());
+
+  vtkPlanesPtr planes = vtkPlanesPtr::New();
+  planes->SetBounds(bb.begin());
+
+  vtkPolyDataPtr retval = input;
+  retval = clipPlane(retval, bb.corner(0,0,0), Vector3D(-1, 0,0));
+  retval = clipPlane(retval, bb.corner(1,1,0), Vector3D( 1, 0,0));
+  retval = clipPlane(retval, bb.corner(0,0,0), Vector3D( 0,-1,0));
+  retval = clipPlane(retval, bb.corner(1,1,0), Vector3D( 0, 1,0));
+  return retval;
+
+//  vtkPlanePtr plane = vtkPlanePtr::New();
+//  plane->SetOrigin(bb.corner(0,0,0).begin());
+//  plane->SetNormal(ssc::Vector3D(-1,0,0).begin());
+
+//  vtkPolyLinePtr clipRect = this->createClipRectPolyLine();
+//  vtkPolyPlanePtr clipPlanes = vtkPolyPlanePtr::New();
+//  clipPlanes->SetPolyLine(clipRect);
+//  clipPlanes->Update();
+
+  vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
+  clipper->SetInput(input);
+//  clipper->SetClipFunction(box);
+  clipper->SetClipFunction(planes);
+  clipper->SetInsideOut(true);
+  clipper->Update();
+  return clipper->GetOutput();
+
+  // vtkPolyData in space u from box or corners
+  // vtkPolyPlane as extrusion of polydata
+  // vtkClipPolyData with sector and polyplane
 }
 
 void ProbeSector::updateSector()
@@ -200,6 +275,8 @@ void ProbeSector::updateSector()
   vtkCellArrayPtr sides = vtkCellArrayPtr::New();
   vtkCellArrayPtr strips = vtkCellArrayPtr::New();
   vtkCellArrayPtr polys = vtkCellArrayPtr::New();
+
+  int M = 0;
 
   if (mData.mType == ProbeData::tLINEAR)
   {
@@ -237,13 +314,14 @@ void ProbeSector::updateSector()
 //    std::cout << "c_e_local " << c_e << std::endl;
 //    std::cout << "c_e_u " << uMl.coord(c_e) << std::endl;
 
+//    int arcRes = 20;//Number of points in arc
     int arcRes = 20;//Number of points in arc
     double angleIncrement = mData.mWidth/arcRes;
     double startAngle = M_PI_2 - mData.mWidth/2.0;
     double stopAngle = M_PI_2 + mData.mWidth/2.0;
     int N = 2*(arcRes+1); // total number of points
 
-    points->Allocate(N);//TODO: Don't use the same number of points in top as in bottom?
+    points->Allocate(N+M);
     newTCoords->Allocate(2*N);
 
     for(int i = 0; i <= arcRes; i++)
@@ -252,6 +330,7 @@ void ProbeSector::updateSector()
       Vector3D startTheta = c + mData.mDepthStart * unitVector(theta);
       newTCoords->InsertNextTuple(texMl.coord(startTheta).begin());
       points->InsertNextPoint(uMl.coord(startTheta).begin());
+      //std::cout << "p_arc " << uMl.coord(startTheta) << std::endl;
     }
     for(int i = 0; i <= arcRes; i++)
     {
@@ -259,9 +338,10 @@ void ProbeSector::updateSector()
       Vector3D endTheta = c + mData.mDepthEnd * unitVector(theta);
       newTCoords->InsertNextTuple(texMl.coord(endTheta).begin());
       points->InsertNextPoint(uMl.coord(endTheta).begin());
+      //std::cout << "p_arc " << uMl.coord(endTheta) << std::endl;
     }
 
-    sides->InsertNextCell(N+1);
+    sides->InsertNextCell(N+1+M);
     for(int i = 0; i < N; i++)
       sides->InsertCellPoint(i);
     sides->InsertCellPoint(0);
@@ -279,11 +359,26 @@ void ProbeSector::updateSector()
     }
   }
 
-  mPolyData->SetPoints(points);
-  mPolyData->SetStrips(strips);
-  mPolyData->GetPointData()->SetTCoords(newTCoords);
-  mPolyData->SetLines(sides);
-  mPolyData->SetPolys(polys);
+//  DoubleBoundingBox3D bb = mData.mImage.getClipRect_u();
+//  points->InsertNextPoint(bb.corner(0,0,0).begin());
+//  sides->InsertCellPoint(points->GetNumberOfPoints()-1);
+//  points->InsertNextPoint(bb.corner(1,0,0).begin());
+//  sides->InsertCellPoint(points->GetNumberOfPoints()-1);
+//  points->InsertNextPoint(bb.corner(1,1,0).begin());
+//  sides->InsertCellPoint(points->GetNumberOfPoints()-1);
+//  points->InsertNextPoint(bb.corner(0,1,0).begin());
+//  sides->InsertCellPoint(points->GetNumberOfPoints()-1);
+//  points->InsertNextPoint(bb.corner(0,0,0).begin());
+//  sides->InsertCellPoint(points->GetNumberOfPoints()-1);
+
+  vtkPolyDataPtr polydata = vtkPolyDataPtr::New();
+  polydata->SetPoints(points);
+  polydata->SetStrips(strips);
+  polydata->GetPointData()->SetTCoords(newTCoords);
+  polydata->SetLines(sides);
+//  polydata->SetPolys(polys);
+  mPolyData = polydata;
+  mPolyData = this->generateClipper(polydata);
 }
 
 

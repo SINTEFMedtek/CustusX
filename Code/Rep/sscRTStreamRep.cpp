@@ -251,8 +251,6 @@ void RealTimeStreamGraphics::setRealtimeStream(RTSourcePtr data)
     connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 
     mDataRedirecter->SetInput(mData->getVtkImageData());
-//    mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
-//    mDataRedirecter->GetOutput();
 
     if (!mUseMask) // send data directly to texture, no mask.
     {
@@ -313,10 +311,6 @@ void RealTimeStreamGraphics::newDataSlot()
   mPlaneActor->SetVisibility(mData!=NULL);
   if (!mData)
     return;
-
-//  mDataRedirecter->SetInput(mData->getVtkImageData());
-//  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
-//  mDataRedirecter->GetOutput();
 
   mDataRedirecter->GetOutput()->Update();
 //  this->checkDataIntegrity();
