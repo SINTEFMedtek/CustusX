@@ -187,7 +187,7 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
   {
     if (this->dockWidgetArea(*iter)==Qt::LeftDockWidgetArea)
     {
-      std::cout << "tabify " << (*iter)->objectName() << "\t" << dockWidget->objectName() << std::endl;
+//      std::cout << "tabify " << (*iter)->objectName() << "\t" << dockWidget->objectName() << std::endl;
       this->tabifyDockWidget(*iter, dockWidget);
       break;
     }
