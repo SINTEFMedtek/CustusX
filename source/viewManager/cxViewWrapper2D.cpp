@@ -17,7 +17,6 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
