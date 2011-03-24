@@ -35,7 +35,7 @@ ssc::DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
 {
   ssc::Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
   ssc::Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
-  std::cout << p0 <<  " -- " << p1 << std::endl;
+//  std::cout << p0 <<  " -- " << p1 << std::endl;
   return ssc::DoubleBoundingBox3D(p0,p1);
 }
 

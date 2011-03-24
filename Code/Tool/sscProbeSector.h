@@ -41,10 +41,11 @@ public:
 private:
 //  vtkPolyLinePtr createClipRectPolyLine();
   vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
+  vtkPolyDataPtr getClipRectPolyData();
+  bool clipRectIntersectsSector() const;
 
   bool isInside(Vector3D p_u);
   vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
-	mutable Vector3D mCachedCenter_v; ///< center of beam sector for sector probes. Used in isInside()
 };
 
 } // namespace ssc
