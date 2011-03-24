@@ -39,36 +39,11 @@
 #include "sscRTSource.h"
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
+#include "sscOrientationAnnotation3DRep.h"
 
 
 namespace cx
 {
-
-//class InteractionCallback : public vtkCommand
-//{
-//  typedef boost::function<void ()> CallbackType;
-//public:
-//  InteractionCallback() {}
-//  static InteractionCallback* New() {return new InteractionCallback;}
-//  void setCallback(CallbackType f)
-//  {
-//   mCallback = f;
-//  }
-//  virtual void Execute(vtkObject* caller, unsigned long, void*)
-//  {
-//    mCallback();
-////    std::cout << "callback" << std::endl;
-//  }
-//
-//private:
-//  CallbackType mCallback;
-//};
-
-
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
-
 
 ssc::AxesRepPtr ToolAxisConnector::getAxis_t()
 {
@@ -128,7 +103,6 @@ void ToolAxisConnector::visibleSlot()
 ///--------------------------------------------------------
 
 
-
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mShowAxes = false;
@@ -164,6 +138,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
 
+  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+  mView->addRep(mAnnotationMarker);
+  mAnnotationMarker->setVisible(DataLocations::getSettings()->value("View3D/showOrientationAnnotation").toBool());
+
 //  mInteractorCallback = new InteractionCallback;
 //  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
 //  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, mInteractorCallback);
@@ -173,6 +151,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
 ViewWrapper3D::~ViewWrapper3D()
 {
+//  std::cout << "destroying " << this << " "<< mView->getUid() << std::endl;
+
   if (mView)
   {
     mView->removeReps();
@@ -223,6 +203,11 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
+  QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
+  showOrientation->setCheckable(true);
+  showOrientation->setChecked(mAnnotationMarker->getVisible());
+  connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
+
   QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
   showToolPath->setCheckable(true);
   ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
@@ -247,6 +232,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
   contextMenu.addAction(showAxesAction);
+  contextMenu.addAction(showOrientation);
   contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
   contextMenu.addAction(showRefTool);
@@ -351,6 +337,13 @@ void ViewWrapper3D::showManualToolSlot(bool visible)
   DataLocations::getSettings()->setValue("showManualTool", visible);
   ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
+
+void ViewWrapper3D::showOrientationSlot(bool visible)
+{
+  DataLocations::getSettings()->setValue("View3D/showOrientationAnnotation", visible);
+  mAnnotationMarker->setVisible(visible);
+}
+
 
 void ViewWrapper3D::resetCameraActionSlot()
 {
