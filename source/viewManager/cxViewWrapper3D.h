@@ -80,6 +80,7 @@ private slots:
   void centerImageActionSlot();
   void centerToolActionSlot();
   void optionChangedSlot();
+  void showOrientationSlot(bool visible);
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
@@ -115,7 +116,8 @@ private:
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
-  vtkOrientationMarkerWidgetPtr mAnnotationMarker;
+//  vtkOrientationMarkerWidgetPtr mAnnotationMarker;
+  ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
 
   QPointer<ssc::View> mView;
 };
