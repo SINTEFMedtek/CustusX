@@ -156,6 +156,7 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
   this->fillDefault("Ultrasound/8bitAcquisitionData", true);
   this->fillDefault("View3D/sphereRadius", 2.0);
+  this->fillDefault("View3D/showOrientationAnnotation", true);
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
   this->fillDefault("showSectorInRTView", true);
   this->fillDefault("autoLandmarkRegistration", true);
