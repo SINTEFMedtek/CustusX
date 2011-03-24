@@ -8,6 +8,7 @@ class QComboBox;
 class QDir;
 class QListWidget;
 class QListWidgetItem;
+class QLineEdit;
 
 namespace cx
 {
@@ -32,6 +33,9 @@ public:
 
   QString getSelectedFile() const;
 
+public slots:
+  void saveConfigurationSlot();
+
 signals:
   void toolSelected(QString absoluteFilePath);
 
@@ -42,10 +46,11 @@ private slots:
   void toolClickedSlot(QListWidgetItem* item);
   void toolDoubleClickedSlot(QListWidgetItem* item);
   void fileSelectedSlot(QString fileSelected);
+  void updateConfigFileLineEditSlot();
 
 private:
   void populateConfigComboBox();
-  void populateApplicationFilter();
+  void populateApplications();
   void populateTrackingSystems();
   void populateToolList(QStringList applicationFilter = QStringList(), QStringList trackingSystemFilter = QStringList(), QStringList absoluteToolFilePathsFilter = QStringList());
 
@@ -55,11 +60,17 @@ private:
   QList<Tool::InternalStructure> getToolInternals(QStringList toolAbsoluteFilePaths);
   Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
+  QString getConfigFileName();
+  QString generateConfigName();
+  QStringList getFilterFromButtonGroup(QButtonGroup* group);
+  QStringList getFilterFromToolList();
+
   QString         mCurrentlySelectedFile;
 
   //config files
   QComboBox*      mConfigFilesComboBox;
   QString         mCurrentConfigFile;
+  QLineEdit*      mConfigFileLineEdit;
 
   //tracking systems
   QGroupBox*      mTrackerGroupBox;
