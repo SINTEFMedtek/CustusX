@@ -17,14 +17,6 @@
 #include <vtkRenderer.h>
 #include <vtkInteractorObserver.h>
 
-#include <vtkOrientationMarkerWidget.h>
-#include <vtkAnnotatedCubeActor.h>
-#include <vtkProperty.h>
-#include <vtkAxesActor.h>
-#include <vtkTextProperty.h>
-#include <vtkCaptionActor2D.h>
-#include <vtkPropAssembly.h>
-
 #include "cxDataLocations.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"
@@ -47,42 +39,11 @@
 #include "sscRTSource.h"
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
-
-typedef vtkSmartPointer<vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
-typedef vtkSmartPointer<vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
-typedef vtkSmartPointer<vtkAxesActor> vtkAxesActorPtr;
-typedef vtkSmartPointer<vtkTextProperty> vtkTextPropertyPtr;
-typedef vtkSmartPointer<vtkPropAssembly> vtkPropAssemblyPtr;
+#include "sscOrientationAnnotation3DRep.h"
 
 
 namespace cx
 {
-
-//class InteractionCallback : public vtkCommand
-//{
-//  typedef boost::function<void ()> CallbackType;
-//public:
-//  InteractionCallback() {}
-//  static InteractionCallback* New() {return new InteractionCallback;}
-//  void setCallback(CallbackType f)
-//  {
-//   mCallback = f;
-//  }
-//  virtual void Execute(vtkObject* caller, unsigned long, void*)
-//  {
-//    mCallback();
-////    std::cout << "callback" << std::endl;
-//  }
-//
-//private:
-//  CallbackType mCallback;
-//};
-
-
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
-
 
 ssc::AxesRepPtr ToolAxisConnector::getAxis_t()
 {
@@ -142,7 +103,6 @@ void ToolAxisConnector::visibleSlot()
 ///--------------------------------------------------------
 
 
-
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mShowAxes = false;
@@ -178,8 +138,9 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
 
-
-  this->setOrientationAnnotation();
+  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+  mView->addRep(mAnnotationMarker);
+  mAnnotationMarker->setVisible(DataLocations::getSettings()->value("View3D/showOrientationAnnotation").toBool());
 
 //  mInteractorCallback = new InteractionCallback;
 //  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
@@ -191,7 +152,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 ViewWrapper3D::~ViewWrapper3D()
 {
 //  std::cout << "destroying " << this << " "<< mView->getUid() << std::endl;
-  mAnnotationMarker->SetInteractor(NULL);
 
   if (mView)
   {
@@ -199,98 +159,6 @@ ViewWrapper3D::~ViewWrapper3D()
 //    mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
 //    mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
   }
-}
-
-void ViewWrapper3D::setOrientationAnnotation()
-{
-//  static int count = 0;
-//  std::cout << "setting annotation for " << this << " "<< mView->getUid() << std::endl;
-
-  vtkAnnotatedCubeActorPtr cube = vtkAnnotatedCubeActorPtr::New();
-
-  cube->SetXPlusFaceText("L");
-  cube->SetXMinusFaceText("R");
-  cube->SetYPlusFaceText("P");
-  cube->SetYMinusFaceText("A");
-  cube->SetZPlusFaceText("S");
-  cube->SetZMinusFaceText("I");
-//  cube->SetXFaceTextRotation(180);
-//  cube->SetYFaceTextRotation(180);
-  cube->SetZFaceTextRotation(-90);
-  cube->SetFaceTextScale(0.65);
-
-  vtkPropertyPtr property;
-
-  ssc::Vector3D red(1,0,0);
-  ssc::Vector3D green(0,1,0);
-  ssc::Vector3D blue(0,0,1);
-
-  property = cube->GetCubeProperty();
-  property->SetColor( 0.5, 1, 1);
-  property = cube->GetTextEdgesProperty();
-  property->SetLineWidth(1);
-  property->SetDiffuse(0);
-  property->SetAmbient(1);
-  property->SetColor(0.18, 0.28, 0.23);
-
-  property = cube->GetXPlusFaceProperty();
-  property->SetColor(red.begin());
-  property->SetInterpolationToFlat();
-  property = cube->GetXMinusFaceProperty();
-  property->SetColor(red.begin());
-  property->SetInterpolationToFlat();
-
-  property = cube->GetYPlusFaceProperty();
-  property->SetColor(green.begin());
-  property->SetInterpolationToFlat();
-  property = cube->GetYMinusFaceProperty();
-  property->SetColor(green.begin());
-  property->SetInterpolationToFlat();
-
-  property = cube->GetZPlusFaceProperty();
-  property->SetColor(blue.begin());
-  property->SetInterpolationToFlat();
-  property = cube->GetZMinusFaceProperty();
-  property->SetColor(blue.begin());
-  property->SetInterpolationToFlat();
-
-
-  vtkAxesActorPtr axes = vtkAxesActorPtr::New();
-  axes->SetShaftTypeToCylinder();
-  axes->SetXAxisLabelText("x");
-  axes->SetYAxisLabelText("y");
-  axes->SetZAxisLabelText("z");
-  axes->SetTotalLength(1.5, 1.5, 1.5);
-  vtkTextPropertyPtr tprop = vtkTextPropertyPtr::New();
-  tprop->ItalicOn();
-  tprop->ShadowOn();
-  tprop->SetFontFamilyToTimes();
-  axes->GetXAxisCaptionActor2D()->SetCaptionTextProperty(tprop);
-  vtkTextPropertyPtr tprop2 = vtkTextPropertyPtr::New();
-  tprop2->ShallowCopy(tprop);
-  axes->GetYAxisCaptionActor2D()->SetCaptionTextProperty(tprop2);
-  vtkTextPropertyPtr tprop3 = vtkTextPropertyPtr::New();
-  tprop3->ShallowCopy(tprop);
-  axes->GetZAxisCaptionActor2D()->SetCaptionTextProperty(tprop3);
-
-  // Combine the two actors into one with vtkPropAssembly ...
-  vtkPropAssemblyPtr assembly = vtkPropAssemblyPtr::New();
-//  assembly->AddPart(axes);
-  assembly->AddPart(cube);
-
-
-  vtkOrientationMarkerWidgetPtr marker = vtkOrientationMarkerWidgetPtr::New();
-
-//  marker->SetOutlineColor( 0.93, 0.57, 0.13);
-  marker->SetOutlineColor( 1, 0.5, 0.5);
-  marker->SetOrientationMarker(assembly);
-  double size = 0.1;
-  marker->SetViewport( 0.0, 1.0-size, size, 1.0);
-
-  marker->SetInteractor(mView->getRenderWindow()->GetInteractor());
-  marker->SetEnabled(1);
-  marker->InteractiveOff();
-  mAnnotationMarker = marker;
 }
 
 void ViewWrapper3D::probeRepPointPickedSlot(double x,double y,double z)
@@ -335,6 +203,11 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
+  QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
+  showOrientation->setCheckable(true);
+  showOrientation->setChecked(mAnnotationMarker->getVisible());
+  connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
+
   QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
   showToolPath->setCheckable(true);
   ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
@@ -359,6 +232,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
   contextMenu.addAction(showAxesAction);
+  contextMenu.addAction(showOrientation);
   contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
   contextMenu.addAction(showRefTool);
@@ -463,6 +337,13 @@ void ViewWrapper3D::showManualToolSlot(bool visible)
   DataLocations::getSettings()->setValue("showManualTool", visible);
   ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
+
+void ViewWrapper3D::showOrientationSlot(bool visible)
+{
+  DataLocations::getSettings()->setValue("View3D/showOrientationAnnotation", visible);
+  mAnnotationMarker->setVisible(visible);
+}
+
 
 void ViewWrapper3D::resetCameraActionSlot()
 {
