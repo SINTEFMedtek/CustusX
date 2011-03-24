@@ -19,6 +19,9 @@
 #include "cxImageLandmarkRep.h"
 #include "cxPatientLandmarkRep.h"
 
+typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
+typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
+
 namespace cx
 {
 
@@ -77,6 +80,7 @@ private slots:
   void centerImageActionSlot();
   void centerToolActionSlot();
   void optionChangedSlot();
+  void showOrientationSlot(bool visible);
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
@@ -86,6 +90,7 @@ private:
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
 //  void test(double v);
+  void setOrientationAnnotation();
 
   virtual void imageAdded(ssc::ImagePtr image);
   virtual void meshAdded(ssc::MeshPtr mesh);
@@ -111,6 +116,9 @@ private:
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
+//  vtkOrientationMarkerWidgetPtr mAnnotationMarker;
+  ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
+
   QPointer<ssc::View> mView;
 };
 typedef boost::shared_ptr<ViewWrapper3D> ViewWrapper3DPtr;
