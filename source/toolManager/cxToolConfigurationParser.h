@@ -75,6 +75,7 @@ public:
   std::vector<QString> getAbsoluteToolFilePaths();
 
  static QString getTemplatesAbsoluteFilePath();
+ static void saveConfiguration();
 
 private:
    void setConfigDocument(QString configAbsoluteFilePath);

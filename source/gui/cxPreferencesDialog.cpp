@@ -404,6 +404,7 @@ void ToolConfigTab::saveParametersSlot()
 {
   //TODO
   //save things to mSettings????
+  mToolConfigWidget->saveConfigurationSlot();
 }
 //==============================================================================
 // PreferencesDialog

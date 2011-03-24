@@ -499,6 +499,11 @@ QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
   return retval;
 }
 
+void ConfigurationFileParser::saveConfiguration()
+{
+  //TODO
+}
+
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
 {
   QFile configFile(configAbsoluteFilePath);
@@ -618,28 +623,32 @@ Tool::InternalStructure ToolFileParser::getTool()
     }
     QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
     QString toolSensorTypeText = toolSensorTypeElement.text();
-    if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
-    {
-      if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
-      {
-        internalStructure.mTrackerType = ssc::tsPOLARIS_SPECTRA;
-      } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
-      {
-        internalStructure.mTrackerType = ssc::tsPOLARIS_VICRA;
-      } else
-      {
-        internalStructure.mTrackerType = ssc::tsPOLARIS;
-      }
-    } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
-    {
-      internalStructure.mTrackerType = ssc::tsAURORA;
-    } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
-    {
-      internalStructure.mTrackerType = ssc::tsMICRON;
-    } else
-    {
-      internalStructure.mTrackerType = ssc::tsNONE;
-    }
+    internalStructure.mTrackerType = string2enum<ssc::TRACKING_SYSTEM>(toolSensorTypeText);
+
+//    std::cout << "Found tracker type " << enum2string(internalStructure.mTrackerType) << " for tool " << internalStructure.mUid << std::endl;
+
+    //    if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
+//    {
+//      if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
+//      {
+//        internalStructure.mTrackerType = ssc::tsPOLARIS_SPECTRA;
+//      } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
+//      {
+//        internalStructure.mTrackerType = ssc::tsPOLARIS_VICRA;
+//      } else
+//      {
+//        internalStructure.mTrackerType = ssc::tsPOLARIS;
+//      }
+//    } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mTrackerType = ssc::tsAURORA;
+//    } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mTrackerType = ssc::tsMICRON;
+//    } else
+//    {
+//      internalStructure.mTrackerType = ssc::tsNONE;
+//    }
 
     QDomElement toolSensorWirelessElement =
         toolSensorElement.firstChildElement(mToolSensorWirelessTag);
