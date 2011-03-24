@@ -18,7 +18,9 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
   layout->addWidget(mTextEdit);
 
   mTextEdit->setDocument(mTextDocument);
-  mTextDocument->setPlainText("<tag> Test </tag>");
+  mTextEdit->setReadOnly(true);
+  mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
+
   new snw::SyntaxHighlighter(mTextDocument);
 }
 
@@ -36,23 +38,25 @@ QString FilePreviewWidget::defaultWhatsThis() const
 
 void FilePreviewWidget::previewFileSlot(QString absoluteFilePath)
 {
-  QFile file(absoluteFilePath);
-  if(!file.exists())
+  if(mCurrentFile && mCurrentFile->isOpen())
+    mCurrentFile->close();
+
+  mCurrentFile = new QFile(absoluteFilePath);
+
+  if(!mCurrentFile->exists())
   {
     ssc::messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
     return;
   }
 
-  if(!file.open(QIODevice::ReadOnly))
+  if(!mCurrentFile->open(QIODevice::ReadOnly))
   {
     ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
   }
-  QTextStream stream(&file);
+  QTextStream stream(mCurrentFile);
   QString text = stream.readAll();
 
   mTextDocument->setPlainText(text);
-
-  //TODO close file???
 }
 
 }//namespace cx

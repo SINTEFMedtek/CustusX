@@ -6,6 +6,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscEnumConverter.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
@@ -403,26 +404,121 @@ igstk::Transform ToolConfigurationParser::readCalibrationFile(QString filename)
 //----------------------------------------------------------------------------------------------------------------------
 
 ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath) :
-    mConfigurationFilePath(absoluteConfigFilePath)
-{}
+    mConfigurationFilePath(absoluteConfigFilePath),
+    mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile")
+{
+  this->setConfigDocument(mConfigurationFilePath);
+}
 
 ConfigurationFileParser::~ConfigurationFileParser()
 {}
 
+ssc::MEDICAL_DOMAIN ConfigurationFileParser::getApplicationDomain()
+{
+  ssc::MEDICAL_DOMAIN retval;
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
+  QString applicationDomain = configNode.toElement().attribute("clinical_app");
+  retval = string2enum<ssc::MEDICAL_DOMAIN>(applicationDomain);
+//  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
+
+  return retval;
+}
+
 std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTrackers()
 {
   std::vector<IgstkTracker::InternalStructure> retval;
-  //TODO
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QDomNodeList trackerNodes = mConfigureDoc.elementsByTagName(mConfigTrackerTag);
+  for(int i=0; i < trackerNodes.count(); ++i)
+  {
+    IgstkTracker::InternalStructure internalStructure;
+    QString trackerType = trackerNodes.at(i).toElement().attribute("type");
+    internalStructure.mType = string2enum<ssc::TRACKING_SYSTEM>(trackerType);
+    internalStructure.mLoggingFolderName = ""; //TODO
+
+//    std::cout << "In configfile " << mConfigurationFilePath << " found tracker type " << enum2string(internalStructure.mType) << std::endl;
+    retval.push_back(internalStructure);
+  }
   return retval;
 }
 
-std::vector<QString> ConfigurationFileParser::getToolFilePaths()
+std::vector<QString> ConfigurationFileParser::getAbsoluteToolFilePaths()
 {
   std::vector<QString> retval;
-  //TODO
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QFile configFile(mConfigurationFilePath);
+  QString configFolderAbsolutePath = QFileInfo(configFile).dir().absolutePath()+"/";
+
+  QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
+  for(int i=0; i < toolFileNodes.count(); ++i)
+  {
+    QString absoluteToolFilePath;
+
+    QString relativeToolFilePath = toolFileNodes.at(i).toElement().text();
+    if(relativeToolFilePath.isEmpty())
+      continue;
+    QFile file((configFolderAbsolutePath+"/"+relativeToolFilePath));
+    if(!file.exists())
+    {
+      ssc::messageManager()->sendError("Tool file "+file.fileName()+" in configuration "+mConfigurationFilePath+" does not exists. Skipping.");
+    }
+    QFileInfo info(file);
+    if(info.isDir())
+    {
+      QDir dir(info.absoluteFilePath());
+      QStringList filter;
+      filter << dir.dirName()+".xml";
+      QStringList filepaths = dir.entryList(filter);
+      if(!filepaths.isEmpty())
+        absoluteToolFilePath = dir.absoluteFilePath(filter[0]);
+    }
+    else
+      absoluteToolFilePath = info.absoluteFilePath();
+
+//    std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
+
+    retval.push_back(absoluteToolFilePath);
+  }
+
   return retval;
 }
 
+QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
+{
+  QString retval = DataLocations::getRootConfigPath()+"/tool/TEMPLATE_configuration.xml";
+  return retval;
+}
+
+void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
+{
+  QFile configFile(configAbsoluteFilePath);
+  if (!mConfigureDoc.setContent(&configFile))
+  {
+    ssc::messageManager()->sendError("Could not set the xml content of the config file "+configAbsoluteFilePath);
+  }
+}
+
+bool ConfigurationFileParser::isConfigFileValid()
+{
+  //there can only be one config defined in every config.xml-file, that's why we say ...item(0)
+  QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).item(0);
+  if(configNode.isNull())
+  {
+    ssc::messageManager()->sendError("Configuration file "+mConfigurationFilePath+" is does not contain the tag <"+mConfigTag+">, skipping this file.");
+    return false;
+  }
+  return true;
+}
 //----------------------------------------------------------------------------------------------------------------------
 
 ToolFileParser::ToolFileParser(QString absoluteToolFilePath) :
@@ -444,18 +540,10 @@ Tool::InternalStructure ToolFileParser::getTool()
 {
   Tool::InternalStructure retval;
 
-//    std::vector<QString> toolFolderAbsolutePaths;
-//    QList<QDomNode> toolNodeList = this->getToolNodeList(toolFolderAbsolutePaths);
   QFile toolFile(mToolFilePath);
   QString toolFolderAbsolutePath = QFileInfo(toolFile).dir().absolutePath()+"/";
-  QDomNode toolNode = this->getToolNodeList(mToolFilePath);
-
-//    std::vector<Tool::InternalStructure> tools;
-//  for (int i = 0; i < toolNode.size(); i++)
-//  {
+  QDomNode toolNode = this->getToolNode(mToolFilePath);
     Tool::InternalStructure internalStructure;
-
-    //QDomNode toolNode = toolNode.at(i);
     if (toolNode.isNull())
     {
       ssc::messageManager()->sendInfo("Could not read the <tool> tag of file: "+mToolFilePath+", this is not a tool file, skipping.");
@@ -620,26 +708,28 @@ Tool::InternalStructure ToolFileParser::getTool()
 
     internalStructure.mTransformSaveFileName = ""; //TODO
     internalStructure.mLoggingFolderName = ""; //TODO
-//      tools.push_back(internalStructure);
     retval = internalStructure;
-//  }
-//    return tools;
 
   return retval;
 }
 
-QDomNode ToolFileParser::getToolNodeList(QString toolAbsoluteFilePath)
+QDomNode ToolFileParser::getToolNode(QString toolAbsoluteFilePath)
 {
   QDomNode retval;
   QFile toolFile(toolAbsoluteFilePath);
-  QDomDocument toolDoc;
-  if (!toolDoc.setContent(&toolFile))
+  if (!mToolDoc.setContent(&toolFile))
   {
     ssc::messageManager()->sendError("Could not set the xml content of the tool file "+toolAbsoluteFilePath);
     return retval;
   }
   //there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)
-  retval = toolDoc.elementsByTagName(mToolTag).item(0);
+  retval = mToolDoc.elementsByTagName(mToolTag).item(0);
+  return retval;
+}
+
+QString ToolFileParser::getTemplatesAbsoluteFilePath()
+{
+  QString retval = DataLocations::getRootConfigPath()+"/tool/TEMPLATE_tool.xml";
   return retval;
 }
 

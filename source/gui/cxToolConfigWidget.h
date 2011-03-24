@@ -30,6 +30,8 @@ public:
 
   virtual QString defaultWhatsThis() const;
 
+  QString getSelectedFile() const;
+
 signals:
   void toolSelected(QString absoluteFilePath);
 
@@ -39,16 +41,21 @@ private slots:
   void configChangedSlot();
   void toolClickedSlot(QListWidgetItem* item);
   void toolDoubleClickedSlot(QListWidgetItem* item);
+  void fileSelectedSlot(QString fileSelected);
 
 private:
   void populateConfigComboBox();
   void populateApplicationFilter();
   void populateTrackingSystems();
-  void populateToolList(QStringList applicationFilter = QStringList(), QStringList trackingSystemFilter = QStringList());
+  void populateToolList(QStringList applicationFilter = QStringList(), QStringList trackingSystemFilter = QStringList(), QStringList absoluteToolFilePathsFilter = QStringList());
+
+  void filterButtonGroup(QButtonGroup* group, QStringList filter = QStringList());
 
   QStringList getToolFiles(QDir& dir);
   QList<Tool::InternalStructure> getToolInternals(QStringList toolAbsoluteFilePaths);
   Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
+
+  QString         mCurrentlySelectedFile;
 
   //config files
   QComboBox*      mConfigFilesComboBox;
@@ -63,8 +70,8 @@ private:
   QListWidget*    mToolListWidget;
 
   //applications
-  QGroupBox*      mApplicationFilterGroupBox;
-  QButtonGroup*   mApplicationFilterButtonGroup;
+  QGroupBox*      mApplicationGroupBox;
+  QButtonGroup*   mApplicationButtonGroup;
 };
 
 }//namespace cx
