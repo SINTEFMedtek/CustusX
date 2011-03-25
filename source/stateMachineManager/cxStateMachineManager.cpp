@@ -4,14 +4,15 @@
 #include <QByteArray>
 #include <QSettings>
 #include <QDir>
+#include "sscEnumConverter.h"
 #include "sscXmlOptionItem.h"
 #include "sscMessageManager.h"
+#include "sscReconstructer.h"
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 #include "RTSource/cxRTSourceManager.h"
-#include "sscReconstructer.h"
 
 namespace cx
 {
@@ -151,7 +152,7 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("Automation/autoReconstruct", true);
   this->fillDefault("renderingInterval", 33);
   this->fillDefault("globalPatientDataFolder", QDir::homePath()+"/Patients");
-  this->fillDefault("globalApplicationName", "Lab");
+  this->fillDefault("globalApplicationName", enum2string(ssc::mdLABORATORY));
   this->fillDefault("globalPatientNumber", 1);
   this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
   this->fillDefault("Ultrasound/8bitAcquisitionData", true);
