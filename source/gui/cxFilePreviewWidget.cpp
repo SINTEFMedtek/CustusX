@@ -51,10 +51,13 @@ QString FilePreviewWidget::defaultWhatsThis() const
 
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
-  if(mCurrentFile && mCurrentFile->isOpen())
+  if(mCurrentFile)
   {
-    this->watchFile(false);
-    mCurrentFile->close();
+    if(mCurrentFile->isOpen())
+    {
+      this->watchFile(false);
+      mCurrentFile->close();
+    }
   }
 
   mCurrentFile = new QFile(absoluteFilePath);
