@@ -3,9 +3,9 @@
 <configuration clinical_app="Laboratory">
 
 <tracker type="Polaris"> 
-    <toolfile reference="yes">../Tools/Lab/AccuracyPhantom_POLARIS</toolfile>
+    <toolfile reference="yes">../Tools/Laboratory/AccuracyPhantom_POLARIS</toolfile>
     <toolfile reference="no">../Tools/Shared/NDI-Pointer-8700340_POLARIS</toolfile>
-    <toolfile reference="no">../Tools/Lab/SW-Pointer-Broken-07-081-0229_POLARIS</toolfile>
+    <toolfile reference="no">../Tools/Laboratory/SW-Pointer-Broken-07-081-0229_POLARIS</toolfile>
     <toolfile reference="no">../Tools/Shared/L14-5-Probe-03-065-0153_Ultrasonix_POLARIS</toolfile>
 </tracker>
 
