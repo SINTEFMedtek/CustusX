@@ -156,7 +156,18 @@ void ToolConfigWidget::configChangedSlot()
       absoluteToolFilePathsFilter << absoluteToolFilePaths[i];
 //      std::cout << "added " << absoluteToolFilePaths[i] << " to tool filter..." << std::endl;
     }
+
+    mTrackerGroupBox->setEnabled(false);
+    mApplicationGroupBox->setEnabled(false);
+    mToolListWidget->setEnabled(false);
   }
+  else
+  {
+    mTrackerGroupBox->setEnabled(true);
+    mApplicationGroupBox->setEnabled(true);
+    mToolListWidget->setEnabled(true);
+  }
+
   this->filterButtonGroup(mApplicationButtonGroup, applicationFilter);
   this->filterButtonGroup(mTrackerButtonGroup, trackingsystemFilter);
   this->populateToolList(applicationFilter, trackingsystemFilter, absoluteToolFilePathsFilter);
@@ -170,10 +181,8 @@ void ToolConfigWidget::toolClickedSlot(QListWidgetItem* item)
 
 void ToolConfigWidget::toolDoubleClickedSlot(QListWidgetItem* item)
 {
-  //TODO move to filepreviewwidget???
   QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
-  QUrl url("file:/"+absoluteFilePath);
-  QDesktopServices::openUrl(url);
+  emit wantToEdit(absoluteFilePath);
 }
 
 void ToolConfigWidget::fileSelectedSlot(QString fileSelected)

@@ -384,6 +384,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
     mToolConfigWidget(new ToolConfigWidget(this))
 {
   connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
   mFilePreviewWidget->previewFileSlot(mToolConfigWidget->getSelectedFile());
 }
 
