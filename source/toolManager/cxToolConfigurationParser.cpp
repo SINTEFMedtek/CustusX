@@ -507,9 +507,16 @@ void ConfigurationFileParser::saveConfiguration()
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
 {
   QFile configFile(configAbsoluteFilePath);
-  if (!mConfigureDoc.setContent(&configFile))
+  if(!configFile.exists())
+  {
+    ssc::messageManager()->sendDebug("Configfile "+configAbsoluteFilePath+" does not exist.");
+    return;
+  }
+
+  if(!mConfigureDoc.setContent(&configFile))
   {
     ssc::messageManager()->sendError("Could not set the xml content of the config file "+configAbsoluteFilePath);
+    return;
   }
 }
 
@@ -519,7 +526,7 @@ bool ConfigurationFileParser::isConfigFileValid()
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).item(0);
   if(configNode.isNull())
   {
-    ssc::messageManager()->sendError("Configuration file "+mConfigurationFilePath+" is does not contain the tag <"+mConfigTag+">, skipping this file.");
+    //ssc::messageManager()->sendDebug("Configuration file \""+mConfigurationFilePath+"\" does not contain the tag <"+mConfigTag+">.");
     return false;
   }
   return true;
