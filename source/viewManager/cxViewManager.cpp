@@ -80,7 +80,7 @@ ViewManager::ViewManager() :
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
-  mSmartRender = mSettings->value("smartRender").toBool();
+  mSmartRender = mSettings->value("smartRender", true).toBool();
 
   mLayout->setSpacing(2);
   mLayout->setMargin(4);
