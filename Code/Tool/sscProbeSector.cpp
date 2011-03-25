@@ -54,6 +54,7 @@ ProbeSector::ProbeSector()// : mType(ProbeSector::tNONE)
 void ProbeSector::setData(ProbeData data)
 {
   mData = data;
+//  this->test();
 }
 
 /**Function object for evaluating whether a pixel is inside the
@@ -170,9 +171,9 @@ void ProbeSector::test()
 
 
   // tMu * e_x
-  std::cout << "tMu * e_x " << tMu.vector(e_x) <<std::endl;
+  std::cout << "tMu * e_x = <0,-1,0>" << tMu.vector(e_x) <<std::endl;
   // tMu * e_y
-  std::cout << "tMu * e_y " << tMu.vector(e_y) <<std::endl;
+  std::cout << "tMu * e_y = <0,0,-1> " << tMu.vector(e_y) <<std::endl;
 
 
 }
@@ -180,13 +181,25 @@ void ProbeSector::test()
 Transform3D ProbeSector::get_tMu() const
 {
   Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
-  Transform3D Rz = ssc::createTransformRotateY(-M_PI/2.0);
+  Transform3D Rz = ssc::createTransformRotateY(M_PI/2.0);
   ssc::Transform3D R = (Rx*Rz);
   ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.getOrigin_u());
 
   ssc::Transform3D tMu = R*T;
   return tMu;
 }
+
+// old byggy version with t space z-flipped 180deg.
+//Transform3D ProbeSector::get_tMu() const
+//{
+//  Transform3D Rx = ssc::createTransformRotateX(-M_PI/2.0);
+//  Transform3D Rz = ssc::createTransformRotateY(-M_PI/2.0);
+//  ssc::Transform3D R = (Rx*Rz);
+//  ssc::Transform3D T = ssc::createTransformTranslate(-mData.mImage.getOrigin_u());
+//
+//  ssc::Transform3D tMu = R*T;
+//  return tMu;
+//}
 
 Transform3D ProbeSector::get_uMv() const
 {
