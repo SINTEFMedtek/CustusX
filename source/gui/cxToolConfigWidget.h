@@ -38,6 +38,7 @@ public slots:
 
 signals:
   void toolSelected(QString absoluteFilePath);
+  void wantToEdit(QString absoluteFilePath);
 
 private slots:
   void applicationStateChangedSlot();

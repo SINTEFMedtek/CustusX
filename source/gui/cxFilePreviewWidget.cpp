@@ -2,7 +2,10 @@
 
 #include <QTextEdit>
 #include <QTextDocument>
+#include <QPushButton>
 #include <QTextStream>
+#include <QFileInfo>
+#include <QFileSystemWatcher>
 #include "sscMessageManager.h"
 #include "snwSyntaxHighlighter.h"
 
@@ -12,10 +15,20 @@ namespace cx
 FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
     WhatsThisWidget(parent),
     mTextDocument(new QTextDocument()),
-    mTextEdit(new QTextEdit())
+    mTextEdit(new QTextEdit()),
+    mEditButton(new QPushButton("Edit")),
+    mFileSystemWatcher(new QFileSystemWatcher())
 {
+  connect(mEditButton, SIGNAL(clicked()), this, SLOT(editSlot()));
+  connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));
+
+  QHBoxLayout* buttonLayout = new QHBoxLayout();
+  buttonLayout->addStretch();
+  buttonLayout->addWidget(mEditButton);
+
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mTextEdit);
+  layout->addLayout(buttonLayout);
 
   mTextEdit->setDocument(mTextDocument);
   mTextEdit->setReadOnly(true);
@@ -36,12 +49,16 @@ QString FilePreviewWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void FilePreviewWidget::previewFileSlot(QString absoluteFilePath)
+void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
   if(mCurrentFile && mCurrentFile->isOpen())
+  {
+    this->watchFile(false);
     mCurrentFile->close();
+  }
 
   mCurrentFile = new QFile(absoluteFilePath);
+  this->watchFile(true);
 
   if(!mCurrentFile->exists())
   {
@@ -57,6 +74,29 @@ void FilePreviewWidget::previewFileSlot(QString absoluteFilePath)
   QString text = stream.readAll();
 
   mTextDocument->setPlainText(text);
+}
+
+void FilePreviewWidget::editSlot()
+{
+  if(!mCurrentFile)
+    return;
+
+  QFileInfo info(*mCurrentFile);
+  QUrl url("file:/"+info.absoluteFilePath());
+  QDesktopServices::openUrl(url);
+}
+
+void FilePreviewWidget::watchFile(bool on)
+{
+  if(!mCurrentFile)
+    return;
+
+  QFileInfo info(*mCurrentFile);
+
+  if(on)
+    mFileSystemWatcher->addPath(info.absoluteFilePath());
+  else
+    mFileSystemWatcher->removePath(info.absoluteFilePath());
 }
 
 }//namespace cx

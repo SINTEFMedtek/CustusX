@@ -5,6 +5,8 @@
 
 class QTextDocument;
 class QTextEdit;
+class QPushButton;
+class QFileSystemWatcher;
 class QFile;
 
 namespace cx
@@ -29,12 +31,18 @@ public:
   virtual QString defaultWhatsThis() const;
 
 public slots:
-  void previewFileSlot(QString absoluteFilePath);
+  void previewFileSlot(const QString& absoluteFilePath);
+  void editSlot();
 
 private:
+  void watchFile(bool on);
+
   QTextDocument* mTextDocument;
   QTextEdit*     mTextEdit;
 
+  QPushButton*   mEditButton;
+
+  QFileSystemWatcher* mFileSystemWatcher;
   QFile*         mCurrentFile;
 };
 
