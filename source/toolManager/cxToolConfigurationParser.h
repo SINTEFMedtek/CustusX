@@ -73,6 +73,7 @@ public:
   ssc::MEDICAL_DOMAIN getApplicationDomain();
   std::vector<IgstkTracker::InternalStructure> getTrackers();
   std::vector<QString> getAbsoluteToolFilePaths();
+  QString getAbsoluteReferenceFilePath();
 
  static QString getTemplatesAbsoluteFilePath();
  static void saveConfiguration();
@@ -80,6 +81,7 @@ public:
 private:
    void setConfigDocument(QString configAbsoluteFilePath);
    bool isConfigFileValid();
+   QString getAbsoluteToolFilePath(QDomElement toolfileelement);
 
   QString mConfigurationFilePath; ///< absolute path to the configuration file
   QDomDocument mConfigureDoc; ///< the config xml document

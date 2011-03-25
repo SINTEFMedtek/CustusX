@@ -456,40 +456,36 @@ std::vector<QString> ConfigurationFileParser::getAbsoluteToolFilePaths()
   if(!this->isConfigFileValid())
     return retval;
 
+  QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
+  for(int i=0; i < toolFileNodes.count(); ++i)
+  {
+    QString absoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
+    if(absoluteToolFilePath.isEmpty())
+      continue;
+
+    retval.push_back(absoluteToolFilePath);
+  }
+
+  return retval;
+}
+
+QString ConfigurationFileParser::getAbsoluteReferenceFilePath()
+{
+  QString retval;
+
+  if(!this->isConfigFileValid())
+    return retval;
+
   QFile configFile(mConfigurationFilePath);
   QString configFolderAbsolutePath = QFileInfo(configFile).dir().absolutePath()+"/";
 
   QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
   for(int i=0; i < toolFileNodes.count(); ++i)
   {
-    QString absoluteToolFilePath;
-
-    QString relativeToolFilePath = toolFileNodes.at(i).toElement().text();
-    if(relativeToolFilePath.isEmpty())
-      continue;
-    QFile file((configFolderAbsolutePath+"/"+relativeToolFilePath));
-    if(!file.exists())
-    {
-      ssc::messageManager()->sendError("Tool file "+file.fileName()+" in configuration "+mConfigurationFilePath+" does not exists. Skipping.");
-    }
-    QFileInfo info(file);
-    if(info.isDir())
-    {
-      QDir dir(info.absoluteFilePath());
-      QStringList filter;
-      filter << dir.dirName()+".xml";
-      QStringList filepaths = dir.entryList(filter);
-      if(!filepaths.isEmpty())
-        absoluteToolFilePath = dir.absoluteFilePath(filter[0]);
-    }
-    else
-      absoluteToolFilePath = info.absoluteFilePath();
-
-//    std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
-
-    retval.push_back(absoluteToolFilePath);
+    QString reference = toolFileNodes.at(i).toElement().attribute("reference");
+    if(reference.contains("yes", Qt::CaseInsensitive))
+      retval = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
   }
-
   return retval;
 }
 
@@ -530,6 +526,41 @@ bool ConfigurationFileParser::isConfigFileValid()
     return false;
   }
   return true;
+}
+
+QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileelement)
+{
+  QString absoluteToolFilePath;
+
+  QFile configFile(mConfigurationFilePath);
+  QDir configDir = QFileInfo(configFile).dir();
+
+  QString relativeToolFilePath = toolfileelement.text();
+  if(relativeToolFilePath.isEmpty())
+    return absoluteToolFilePath;
+
+  configDir.cd(relativeToolFilePath);
+//  QFile file((configDir.absolutePath()+"/"+relativeToolFilePath));
+  QFile file(configDir.absolutePath());
+  if(!file.exists())
+  {
+    ssc::messageManager()->sendError("Tool file "+file.fileName()+" in configuration "+mConfigurationFilePath+" does not exists. Skipping.");
+  }
+  QFileInfo info(file);
+  if(info.isDir())
+  {
+    QDir dir(info.absoluteFilePath());
+    QStringList filter;
+    filter << dir.dirName()+".xml";
+    QStringList filepaths = dir.entryList(filter);
+    if(!filepaths.isEmpty())
+      absoluteToolFilePath = dir.absoluteFilePath(filter[0]);
+  }
+  else
+    absoluteToolFilePath = info.absoluteFilePath();
+
+//  std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
+  return absoluteToolFilePath;
 }
 //----------------------------------------------------------------------------------------------------------------------
 

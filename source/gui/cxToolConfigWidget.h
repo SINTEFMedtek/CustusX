@@ -47,13 +47,17 @@ private slots:
   void toolClickedSlot(QListWidgetItem* item);
   void toolDoubleClickedSlot(QListWidgetItem* item);
   void fileSelectedSlot(QString fileSelected);
-  void updateConfigFileLineEditSlot();
+  void toolSelectionChangedSlot();
 
 private:
   void populateConfigComboBox();
   void populateApplications();
   void populateTrackingSystems();
   void populateToolList(QStringList applicationFilter = QStringList(), QStringList trackingSystemFilter = QStringList(), QStringList absoluteToolFilePathsFilter = QStringList());
+  void populateReferenceComboBox();
+
+  int addConfigurationToComboBox(QString displayName, QString absoluteFilePath);
+  int addRefrenceSuggestion(QString absoluteRefereneFilePath);
 
   void filterButtonGroup(QButtonGroup* group, QStringList filter = QStringList());
 
@@ -64,7 +68,7 @@ private:
   QString getConfigFileName();
   QString generateConfigName();
   QStringList getFilterFromButtonGroup(QButtonGroup* group);
-  QStringList getFilterFromToolList();
+  QStringList getSelectedToolsFromToolList();
 
   QString         mCurrentlySelectedFile;
 
@@ -80,6 +84,7 @@ private:
   //tool files
   QGroupBox*      mToolGroup;
   QListWidget*    mToolListWidget;
+  QComboBox*      mSelectedReferenceComboBox;
 
   //applications
   QGroupBox*      mApplicationGroupBox;
