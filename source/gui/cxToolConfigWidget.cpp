@@ -29,6 +29,7 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
     mTrackerButtonGroup(new QButtonGroup()),
     mToolGroup(new QGroupBox()),
     mToolListWidget(new QListWidget()),
+    mSelectedReferenceComboBox(new QComboBox()),
     mApplicationGroupBox(new QGroupBox()),
     mApplicationButtonGroup(new QButtonGroup())
 {
@@ -61,13 +62,18 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
   QVBoxLayout* toolslayout = new QVBoxLayout();
   mToolGroup->setLayout(toolslayout);
   toolslayout->addWidget(mToolListWidget);
+  QGridLayout* refrenceLayout = new QGridLayout();
+  refrenceLayout->addWidget(new QLabel("Selected reference: "), 0, 0);
+  refrenceLayout->addWidget(mSelectedReferenceComboBox, 0, 1, 1, 2);
+  toolslayout->addWidget(mToolListWidget);
+  toolslayout->addLayout(refrenceLayout);
 
   //connect
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
   connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
   connect(mToolListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
   connect(mToolListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(toolDoubleClickedSlot(QListWidgetItem*)));
-  connect(mToolListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(updateConfigFileLineEditSlot()));
+  connect(mToolListWidget, SIGNAL(itemSelectionChanged()), this, SLOT(toolSelectionChangedSlot()));
   connect(this, SIGNAL(toolSelected(QString)), this, SLOT(fileSelectedSlot(QString)));
 
   //populate
@@ -75,7 +81,6 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
   this->populateApplications();
   this->populateTrackingSystems();
   this->populateToolList();
-
 }
 
 ToolConfigWidget::~ToolConfigWidget()
@@ -129,7 +134,7 @@ void ToolConfigWidget::configChangedSlot()
 {
   mCurrentConfigFile = mConfigFilesComboBox->currentText();
 
-  QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex()).toString();
+  QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
   emit toolSelected(absoluteConfigFilePath);
 
   //update the filters to match the selected configuration file
@@ -160,17 +165,20 @@ void ToolConfigWidget::configChangedSlot()
     mTrackerGroupBox->setEnabled(false);
     mApplicationGroupBox->setEnabled(false);
     mToolListWidget->setEnabled(false);
+    mSelectedReferenceComboBox->setEnabled(false);
   }
   else
   {
     mTrackerGroupBox->setEnabled(true);
     mApplicationGroupBox->setEnabled(true);
     mToolListWidget->setEnabled(true);
+    mSelectedReferenceComboBox->setEnabled(true);
   }
 
   this->filterButtonGroup(mApplicationButtonGroup, applicationFilter);
   this->filterButtonGroup(mTrackerButtonGroup, trackingsystemFilter);
   this->populateToolList(applicationFilter, trackingsystemFilter, absoluteToolFilePathsFilter);
+  this->populateReferenceComboBox();
 }
 
 void ToolConfigWidget::toolClickedSlot(QListWidgetItem* item)
@@ -190,7 +198,7 @@ void ToolConfigWidget::fileSelectedSlot(QString fileSelected)
   mCurrentlySelectedFile = fileSelected;
 }
 
-void ToolConfigWidget::updateConfigFileLineEditSlot()
+void ToolConfigWidget::toolSelectionChangedSlot()
 {
   //update the config file path
   if(mConfigFilesComboBox->currentText() == "<new config>")
@@ -199,11 +207,13 @@ void ToolConfigWidget::updateConfigFileLineEditSlot()
     mConfigFileLineEdit->setReadOnly(true);
 
   mConfigFileLineEdit->setText(this->getConfigFileName());
+
+  //update the refrence suggestion
+  this->populateReferenceComboBox();
 }
 
 void ToolConfigWidget::populateConfigComboBox()
 {
-//  mConfigFilesComboBox->blockSignals(true);
   QDir dir(DataLocations::getApplicationToolConfigPath());
   dir.setFilter(QDir::Files);
 
@@ -211,19 +221,18 @@ void ToolConfigWidget::populateConfigComboBox()
   nameFilters << "*.xml";
   dir.setNameFilters(nameFilters);
 
-  mConfigFilesComboBox->clear();
-  mConfigFilesComboBox->addItem("<new config>", QVariant(ConfigurationFileParser::getTemplatesAbsoluteFilePath()));
+  this->addConfigurationToComboBox("<new config>", ConfigurationFileParser::getTemplatesAbsoluteFilePath());
+
   QStringList configlist = dir.entryList();
   foreach(QString filename, configlist)
   {
     QFile file(dir.absolutePath()+"/"+filename);
     QFileInfo info(file);
-    mConfigFilesComboBox->addItem(filename, QVariant(info.absoluteFilePath()));
+    this->addConfigurationToComboBox(filename, info.absoluteFilePath());
   }
 
   int currentIndex = mConfigFilesComboBox->findText(mCurrentConfigFile);
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
-//  mConfigFilesComboBox->blockSignals(false);
 }
 
 void ToolConfigWidget::populateApplications()
@@ -244,7 +253,7 @@ void ToolConfigWidget::populateApplications()
     mApplicationGroupBox->layout()->addWidget(box);
 
     connect(box, SIGNAL(stateChanged(int)), this, SLOT(filterToolsSlot()));
-    connect(box, SIGNAL(stateChanged(int)), this, SLOT(updateConfigFileLineEditSlot()));
+    connect(box, SIGNAL(stateChanged(int)), this, SLOT(toolSelectionChangedSlot()));
   }
 }
 
@@ -265,22 +274,22 @@ void ToolConfigWidget::populateTrackingSystems()
     mTrackerButtonGroup->addButton(box);
     mTrackerGroupBox->layout()->addWidget(box);
     connect(box, SIGNAL(stateChanged(int)), this, SLOT(filterToolsSlot()));
-    connect(box, SIGNAL(stateChanged(int)), this, SLOT(updateConfigFileLineEditSlot()));
+    connect(box, SIGNAL(stateChanged(int)), this, SLOT(toolSelectionChangedSlot()));
   }
 }
 
 void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringList trackingSystemFilter, QStringList absoluteToolFilePathsFilter)
 {
-    std::cout << "Number of applicationFilter found: " << applicationFilter.size() << std::endl;
-    foreach(QString string, applicationFilter)
-    {
-      std::cout << string_cast(string) << std::endl;
-    }
-    std::cout << "Number of trackingSystemFilter found: " << trackingSystemFilter.size() << std::endl;
-    foreach(QString string, trackingSystemFilter)
-    {
-      std::cout << string_cast(string) << std::endl;
-    }
+//  std::cout << "Number of applicationFilter found: " << applicationFilter.size() << std::endl;
+//  foreach(QString string, applicationFilter)
+//  {
+//    std::cout << string_cast(string) << std::endl;
+//  }
+//  std::cout << "Number of trackingSystemFilter found: " << trackingSystemFilter.size() << std::endl;
+//  foreach(QString string, trackingSystemFilter)
+//  {
+//    std::cout << string_cast(string) << std::endl;
+//  }
 
   mToolListWidget->clear();
   mToolListWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -337,6 +346,64 @@ void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringLi
 //
 //  mToolListWidget->addItems(toolFiles);
   //debug stop
+}
+
+void ToolConfigWidget::populateReferenceComboBox()
+{
+  mSelectedReferenceComboBox->clear();
+
+  int currentIndex = 0;
+  if(mCurrentConfigFile == "<new config>")
+  {
+    QStringList selectedTools = this->getSelectedToolsFromToolList();
+    foreach(QString string, selectedTools)
+    {
+      Tool::InternalStructure internal = getToolInternal(string);
+      if(internal.mType == ssc::Tool::TOOL_REFERENCE)
+      {
+        currentIndex = this->addRefrenceSuggestion(string);
+      }
+    }
+  }
+  else
+  {
+    QString configAbsoluteFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+    ConfigurationFileParser parser(configAbsoluteFilePath);
+    QString reference = parser.getAbsoluteReferenceFilePath();
+//    std::cout << "Added reference: " << reference << std::endl;
+    if(reference.isEmpty())
+    {
+      ssc::messageManager()->sendDebug("Could not determine the reference for configfile: "+configAbsoluteFilePath);
+      return;
+    }
+
+    currentIndex = this->addRefrenceSuggestion(reference);
+  }
+  mSelectedReferenceComboBox->setCurrentIndex(currentIndex);
+}
+
+int ToolConfigWidget::addConfigurationToComboBox(QString displayName, QString absoluteFilePath)
+{
+  mConfigFilesComboBox->addItem(displayName);
+  int index = mConfigFilesComboBox->findText(displayName);
+  mConfigFilesComboBox->setItemData(index, absoluteFilePath, Qt::ToolTipRole);
+
+  return index;
+}
+
+int ToolConfigWidget::addRefrenceSuggestion(QString absoluteRefereneFilePath)
+{
+  int index;
+
+  QFile file(absoluteRefereneFilePath);
+  QFileInfo info(file);
+
+  mSelectedReferenceComboBox->addItem(info.dir().dirName());
+  //    std::cout << "Added reference: " << info.dir().dirName() << std::endl;
+  index = mSelectedReferenceComboBox->findText(info.dir().dirName());
+  mSelectedReferenceComboBox->setItemData(index, info.absoluteFilePath(), Qt::ToolTipRole);
+
+  return index;
 }
 
 void ToolConfigWidget::filterButtonGroup(QButtonGroup* group, QStringList filter)
@@ -438,7 +505,7 @@ QString ToolConfigWidget::getConfigFileName()
   if(mConfigFilesComboBox->currentText() == "<new config>")
     retval = this->generateConfigName();
   else
-    retval = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex()).toString();
+    retval = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
   return retval;
 }
@@ -449,7 +516,7 @@ QString ToolConfigWidget::generateConfigName()
 
   QStringList applicationFilter = this->getFilterFromButtonGroup(mApplicationButtonGroup);
   QStringList trackingsystemFilter = this->getFilterFromButtonGroup(mTrackerButtonGroup);
-  QStringList absoluteToolFilePathsFilter = this->getFilterFromToolList();
+  QStringList absoluteToolFilePathsFilter = this->getSelectedToolsFromToolList();
 
   QString absoluteDirPath;
   QString trackingSystems;
@@ -488,7 +555,7 @@ QStringList ToolConfigWidget::getFilterFromButtonGroup(QButtonGroup* group)
   return retval;
 }
 
-QStringList ToolConfigWidget::getFilterFromToolList()
+QStringList ToolConfigWidget::getSelectedToolsFromToolList()
 {
   QStringList retval;
 
