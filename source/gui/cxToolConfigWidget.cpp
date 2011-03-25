@@ -145,8 +145,9 @@ void ToolConfigWidget::configChangedSlot()
   {
     ConfigurationFileParser parser(absoluteConfigFilePath);
     //block signals???
-    ssc::MEDICAL_DOMAIN domain = parser.getApplicationDomain();
-    applicationFilter << enum2string(domain);
+    std::vector<ssc::MEDICAL_DOMAIN> domains = parser.getApplicationDomains();
+    for(unsigned i=0; i< domains.size(); ++i)
+      applicationFilter << enum2string(domains[i]);
 
     std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
     for(unsigned i=0; i<trackers.size(); ++i)
