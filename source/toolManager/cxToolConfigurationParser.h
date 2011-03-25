@@ -70,7 +70,7 @@ public:
   ConfigurationFileParser(QString absoluteConfigFilePath);
   ~ConfigurationFileParser();
 
-  ssc::MEDICAL_DOMAIN getApplicationDomain();
+  std::vector<ssc::MEDICAL_DOMAIN> getApplicationDomains();
   std::vector<IgstkTracker::InternalStructure> getTrackers();
   std::vector<QString> getAbsoluteToolFilePaths();
   QString getAbsoluteReferenceFilePath();

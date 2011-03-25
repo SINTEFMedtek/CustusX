@@ -413,16 +413,20 @@ ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath)
 ConfigurationFileParser::~ConfigurationFileParser()
 {}
 
-ssc::MEDICAL_DOMAIN ConfigurationFileParser::getApplicationDomain()
+std::vector<ssc::MEDICAL_DOMAIN> ConfigurationFileParser::getApplicationDomains()
 {
-  ssc::MEDICAL_DOMAIN retval;
+  std::vector<ssc::MEDICAL_DOMAIN> retval;
 
   if(!this->isConfigFileValid())
     return retval;
 
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
   QString applicationDomain = configNode.toElement().attribute("clinical_app");
-  retval = string2enum<ssc::MEDICAL_DOMAIN>(applicationDomain);
+  QStringList domains = applicationDomain.split(" ");
+  foreach(QString domain, domains)
+  {
+    retval.push_back(string2enum<ssc::MEDICAL_DOMAIN>(domain));
+  }
 //  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
 
   return retval;
