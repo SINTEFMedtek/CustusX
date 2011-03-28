@@ -5,6 +5,7 @@
 
 class QTextDocument;
 class QTextEdit;
+class QFile;
 
 namespace cx
 {
@@ -33,6 +34,8 @@ public slots:
 private:
   QTextDocument* mTextDocument;
   QTextEdit*     mTextEdit;
+
+  QFile*         mCurrentFile;
 };
 
 }

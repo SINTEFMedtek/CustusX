@@ -384,6 +384,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
     mToolConfigWidget(new ToolConfigWidget(this))
 {
   connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+  mFilePreviewWidget->previewFileSlot(mToolConfigWidget->getSelectedFile());
 }
 
 ToolConfigTab::~ToolConfigTab()
@@ -403,6 +404,7 @@ void ToolConfigTab::saveParametersSlot()
 {
   //TODO
   //save things to mSettings????
+  mToolConfigWidget->saveConfigurationSlot();
 }
 //==============================================================================
 // PreferencesDialog

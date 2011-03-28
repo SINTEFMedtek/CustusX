@@ -92,12 +92,12 @@ public:
   virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdNEUROLOGY; }
 };
 
-class LaparascopyApplicationState : public ApplicationState
+class LaparoscopyApplicationState : public ApplicationState
 {
   Q_OBJECT
 public:
-  LaparascopyApplicationState(QState* parent) : ApplicationState(parent, "Lap", "Laparascopy") {}
-  virtual ~LaparascopyApplicationState() {}
+  LaparoscopyApplicationState(QState* parent) : ApplicationState(parent, "Lap", "Laparoscopy") {}
+  virtual ~LaparoscopyApplicationState() {}
   virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLAPAROSCOPY; }
 };
 

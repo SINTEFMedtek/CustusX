@@ -80,7 +80,7 @@ public:
   struct InternalStructure
   {
     ssc::TRACKING_SYSTEM            mType;              ///< the trackers type
-    QString     mLoggingFolderName; ///< path to where log should be saved
+    QString                         mLoggingFolderName; ///< path to where log should be saved
     InternalStructure() :
       mType(ssc::tsNONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
   };
