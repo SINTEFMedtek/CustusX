@@ -59,6 +59,7 @@ public:
 
   virtual QString getParentFrame();
 //  virtual void setParentFrame(QString uid);
+  virtual DoubleBoundingBox3D boundingBox() const = 0;
 
 	void connectToRep(const RepWeakPtr& rep); ///< called by Rep when connecting to an Image
 	void disconnectFromRep(const RepWeakPtr& rep); ///< called by Rep when disconnecting from an Image
