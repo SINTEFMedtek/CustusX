@@ -70,14 +70,20 @@ public:
   ConfigurationFileParser(QString absoluteConfigFilePath);
   ~ConfigurationFileParser();
 
+  ssc::MEDICAL_DOMAIN getApplicationDomain();
   std::vector<IgstkTracker::InternalStructure> getTrackers();
+  std::vector<QString> getAbsoluteToolFilePaths();
 
-  std::vector<QString> getToolFilePaths(); ///< absolute paths
+ static QString getTemplatesAbsoluteFilePath();
+ static void saveConfiguration();
 
 private:
+   void setConfigDocument(QString configAbsoluteFilePath);
+   bool isConfigFileValid();
+
   QString mConfigurationFilePath; ///< absolute path to the configuration file
   QDomDocument mConfigureDoc; ///< the config xml document
-  const QString mTrackerTag, mTrackerTypeTag; ///< names of necessary tags in the configuration file
+  const QString mConfigTag, mConfigTrackerTag, mConfigTrackerToolFile; ///< names of necessary tags in the configuration file
 };
 
 /**
@@ -96,8 +102,10 @@ public:
 
   Tool::InternalStructure getTool();
 
+  static QString getTemplatesAbsoluteFilePath();
+
 private:
-  QDomNode getToolNodeList(QString toolAbsoluteFilePath);
+  QDomNode getToolNode(QString toolAbsoluteFilePath);
   igstk::Transform readCalibrationFile(QString absoluteFilePath);
 
   QString mToolFilePath; ///< absolutepath to the tool file
