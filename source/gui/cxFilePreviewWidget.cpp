@@ -41,7 +41,7 @@ void FilePreviewWidget::previewFileSlot(QString absoluteFilePath)
   if(mCurrentFile && mCurrentFile->isOpen())
     mCurrentFile->close();
 
-  mCurrentFile = new QFile(absoluteFilePath);
+  mCurrentFile.reset(new QFile(absoluteFilePath));
 
   if(!mCurrentFile->exists())
   {
@@ -53,7 +53,7 @@ void FilePreviewWidget::previewFileSlot(QString absoluteFilePath)
   {
     ssc::messageManager()->sendWarning("Could not open file "+absoluteFilePath);
   }
-  QTextStream stream(mCurrentFile);
+  QTextStream stream(mCurrentFile.get());
   QString text = stream.readAll();
 
   mTextDocument->setPlainText(text);
