@@ -55,6 +55,8 @@
   //width and height of the incoming image
   int width = CVPixelBufferGetWidth(videoFrame);
   int height = CVPixelBufferGetHeight(videoFrame);  
+  NSLog(@"PixelBufferWidth : %d",CVPixelBufferGetWidth(videoFrame));
+  NSLog(@"PixelBufferHeight : %d",CVPixelBufferGetHeight(videoFrame));
   
   //finding the timetag of the image
   QTTime  timetag = [sampleBuffer presentationTime]; //presentationTime seems to be relative to a (unknown) time, probably something driver specific which we cannot controll via QtKit
@@ -121,7 +123,8 @@ Grabber::Grabber()
 
 MacGrabber::MacGrabber() :
   Grabber(),
-  mObjectiveC(new ObjectiveC)
+  mObjectiveC(new ObjectiveC),
+  mSuperVideo(false)
 {
   //allocate memory
   mObjectiveC->mPool = [[NSAutoreleasePool alloc] init];
@@ -221,6 +224,7 @@ bool MacGrabber::findConnectedDevice()
       {
         mObjectiveC->mSelectedDevice = captureDevice;
         found = true;
+        mSuperVideo = true;
       }
   }
   return found;
@@ -277,11 +281,23 @@ void MacGrabber::setupGrabbing()
   //catch the frames and transmitt them using a signal
   mObjectiveC->mCaptureDecompressedVideoOutput = [[QTCaptureDecompressedVideoOutput alloc] init];
   
-  NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                             [NSNumber numberWithDouble:800.0], (id)kCVPixelBufferWidthKey,
-                             [NSNumber numberWithDouble:600.0], (id)kCVPixelBufferHeightKey,
-                             [NSNumber numberWithUnsignedInt:k32ARGBPixelFormat], (id)kCVPixelBufferPixelFormatTypeKey,
-                             nil];
+  NSDictionary* attributes;
+  if(mSuperVideo)
+  {
+    attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSNumber numberWithDouble:768.0], (id)kCVPixelBufferWidthKey,
+                               [NSNumber numberWithDouble:576.0], (id)kCVPixelBufferHeightKey,
+                               [NSNumber numberWithUnsignedInt:k32ARGBPixelFormat], (id)kCVPixelBufferPixelFormatTypeKey,
+                               nil];
+    NSLog(@"Set pixel format to 768, 576");
+  }else
+  {
+    attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                               [NSNumber numberWithDouble:800.0], (id)kCVPixelBufferWidthKey,
+                               [NSNumber numberWithDouble:600.0], (id)kCVPixelBufferHeightKey,
+                               [NSNumber numberWithUnsignedInt:k32ARGBPixelFormat], (id)kCVPixelBufferPixelFormatTypeKey,
+                               nil];
+  }
   [mObjectiveC->mCaptureDecompressedVideoOutput setPixelBufferAttributes:attributes];
 
   NSError* error;
