@@ -248,7 +248,7 @@ void ViewWrapper::dataActionSlot()
 
   if (firstData)
   {
-    Navigation().centerToGlobalImageCenter(); // reset center for convenience
+    Navigation().centerToGlobalDataCenter(); // reset center for convenience
     mViewGroup->requestInitialize();
   }
 }

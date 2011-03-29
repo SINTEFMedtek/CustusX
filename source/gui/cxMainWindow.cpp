@@ -488,7 +488,21 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
-  Navigation().centerToImage(ssc::dataManager()->getActiveImage());
+  if (ssc::dataManager()->getActiveImage())
+  {
+    std::cout << "center active image" << std::endl;
+    Navigation().centerToData(ssc::dataManager()->getActiveImage());
+  }
+  else if (!viewManager()->getViewGroups().empty())
+  {
+    std::cout << "center first view group" << std::endl;
+    Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+  }
+  else
+  {
+    std::cout << "center global" << std::endl;
+    Navigation().centerToGlobalDataCenter();
+  }
 }
 
 void MainWindow::centerToTooltipSlot()

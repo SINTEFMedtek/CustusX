@@ -2,7 +2,7 @@
 #define CXFILEPREVIEWWIDGET_H_
 
 #include "cxWhatsThisWidget.h"
-
+#include "boost/shared_ptr.hpp"
 class QTextDocument;
 class QTextEdit;
 class QPushButton;
@@ -43,7 +43,7 @@ private:
   QPushButton*   mEditButton;
 
   QFileSystemWatcher* mFileSystemWatcher;
-  QFile*         mCurrentFile;
+  boost::shared_ptr<QFile>  mCurrentFile;
 };
 
 }

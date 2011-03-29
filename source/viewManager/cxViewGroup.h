@@ -21,15 +21,15 @@ namespace cx
 class Navigation
 {
 public:
-  void centerToImage(ssc::ImagePtr image);
-  void centerToView(const std::vector<ssc::ImagePtr>& images);
-  void centerToGlobalImageCenter();
+  void centerToData(ssc::DataPtr image);
+  void centerToView(const std::vector<ssc::DataPtr>& images);
+  void centerToGlobalDataCenter();
   void centerToTooltip();
 
 private:
-  ssc::Vector3D findImageCenter(ssc::ImagePtr image);
-  ssc::Vector3D findViewCenter(const std::vector<ssc::ImagePtr>& images);
-  ssc::Vector3D findGlobalImageCenter();
+  ssc::Vector3D findViewCenter(const std::vector<ssc::DataPtr>& images);
+  ssc::Vector3D findGlobalDataCenter();
+  ssc::Vector3D findDataCenter(std::vector<ssc::DataPtr> data);
 
   void centerManualTool(ssc::Vector3D& p_r);
 
