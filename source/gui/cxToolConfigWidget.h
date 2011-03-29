@@ -3,6 +3,7 @@
 
 #include "cxWhatsThisWidget.h"
 #include "cxTool.h"
+#include "cxToolConfigurationParser.h"
 
 class QComboBox;
 class QDir;
@@ -65,10 +66,14 @@ private:
   QList<Tool::InternalStructure> getToolInternals(QStringList toolAbsoluteFilePaths);
   Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
+  ConfigurationFileParser::Configuration getCurrentConfiguration();
+
   QString getConfigFileName();
   QString generateConfigName();
   QStringList getFilterFromButtonGroup(QButtonGroup* group);
   QStringList getSelectedToolsFromToolList();
+
+  ssc::TRACKING_SYSTEM getSelectedTrackingSystem();
 
   QString         mCurrentlySelectedFile;
 

@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
+#include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscEnumConverter.h"
@@ -413,20 +414,16 @@ ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath)
 ConfigurationFileParser::~ConfigurationFileParser()
 {}
 
-std::vector<ssc::MEDICAL_DOMAIN> ConfigurationFileParser::getApplicationDomains()
+ssc::MEDICAL_DOMAIN ConfigurationFileParser::getApplicationDomain()
 {
-  std::vector<ssc::MEDICAL_DOMAIN> retval;
+  ssc::MEDICAL_DOMAIN retval;
 
   if(!this->isConfigFileValid())
     return retval;
 
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
   QString applicationDomain = configNode.toElement().attribute("clinical_app");
-  QStringList domains = applicationDomain.split(" ");
-  foreach(QString domain, domains)
-  {
-    retval.push_back(string2enum<ssc::MEDICAL_DOMAIN>(domain));
-  }
+  retval = string2enum<ssc::MEDICAL_DOMAIN>(applicationDomain);
 //  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
 
   return retval;
@@ -488,7 +485,10 @@ QString ConfigurationFileParser::getAbsoluteReferenceFilePath()
   {
     QString reference = toolFileNodes.at(i).toElement().attribute("reference");
     if(reference.contains("yes", Qt::CaseInsensitive))
+    {
+//      std::cout << "Found yes..." << std::endl;
       retval = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
+    }
   }
   return retval;
 }
@@ -499,9 +499,44 @@ QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
   return retval;
 }
 
-void ConfigurationFileParser::saveConfiguration()
+void ConfigurationFileParser::saveConfiguration(Configuration& config)
 {
-  //TODO
+  QDomDocument doc;
+  doc.appendChild(doc.createProcessingInstruction("xml version =", "\"1.0\""));
+
+  QDomElement configNode = doc.createElement("configuration");
+  configNode.setAttribute("clinical_app", enum2string(config.mClinical_app));
+
+  TrackersAndToolsMap::iterator it1 = config.mTrackersAndTools.begin();
+  for(; it1 != config.mTrackersAndTools.end(); ++it1)
+  {
+    QDomElement trackerTagNode = doc.createElement("tracker");
+    trackerTagNode.setAttribute("type", enum2string(it1->first));
+
+    ToolFilesAndReferenceVector::iterator it2 = it1->second.begin();
+    for(; it2 != it1->second.end(); ++it2)
+    {
+      QDomElement toolFileNode = doc.createElement("toolfile");
+      toolFileNode.appendChild(doc.createTextNode(it2->first));
+      toolFileNode.setAttribute("reference", (it2->second ? "yes" : "no"));
+      trackerTagNode.appendChild(toolFileNode);
+    }
+    configNode.appendChild(trackerTagNode);
+  }
+
+  doc.appendChild(configNode);
+
+  //TODO save to filepath
+//  QString configPath = DataLocations::getRootConfigPath()+"/tool/"+enum2string(config.mClinical_app)+"/";
+  QFile file(config.mFileName);
+  if(!file.open(QIODevice::WriteOnly))
+  {
+    ssc::messageManager()->sendWarning("Could not open file "+file.fileName()+", aborting writing of config.");
+    return;
+  }
+  QTextStream stream(&file);
+  doc.save(stream, 4);
+  std::cout << "File written... I hope." << std::endl;
 }
 
 void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
@@ -543,7 +578,15 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
   if(relativeToolFilePath.isEmpty())
     return absoluteToolFilePath;
 
-  configDir.cd(relativeToolFilePath);
+  QString toolFolder;
+  QFileInfo toolInfo(relativeToolFilePath);
+  if(toolInfo.isDir())
+    toolFolder = relativeToolFilePath;
+  else
+    toolFolder = toolInfo.path();
+
+  configDir.cd(toolFolder);
+//  configDir.cd(relativeToolFilePath);
 //  QFile file((configDir.absolutePath()+"/"+relativeToolFilePath));
   QFile file(configDir.absolutePath());
   if(!file.exists())
@@ -553,6 +596,7 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
   QFileInfo info(file);
   if(info.isDir())
   {
+//    std::cout << "IS DIR: " << absoluteToolFilePath << std::endl;
     QDir dir(info.absoluteFilePath());
     QStringList filter;
     filter << dir.dirName()+".xml";
@@ -561,7 +605,10 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
       absoluteToolFilePath = dir.absoluteFilePath(filter[0]);
   }
   else
+  {
     absoluteToolFilePath = info.absoluteFilePath();
+//    std::cout << "IS FILE: "<< absoluteToolFilePath << std::endl;
+  }
 
 //  std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
   return absoluteToolFilePath;
