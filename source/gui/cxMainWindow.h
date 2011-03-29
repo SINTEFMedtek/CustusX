@@ -10,7 +10,6 @@
 class QAction;
 class QMenu;
 class QActionGroup;
-class QDomDocument;
 typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace ssc
