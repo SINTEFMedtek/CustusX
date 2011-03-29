@@ -352,8 +352,12 @@ void ViewWrapper3D::resetCameraActionSlot()
 
 void ViewWrapper3D::centerImageActionSlot()
 {
-  Navigation().centerToImage(ssc::dataManager()->getActiveImage());
+  if (ssc::dataManager()->getActiveImage())
+    Navigation().centerToData(ssc::dataManager()->getActiveImage());
+  else
+    Navigation().centerToView(mViewGroup->getData());
 }
+
 void ViewWrapper3D::centerToolActionSlot()
 {
   Navigation().centerToTooltip();
