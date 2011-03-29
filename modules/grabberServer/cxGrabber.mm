@@ -55,8 +55,8 @@
   //width and height of the incoming image
   int width = CVPixelBufferGetWidth(videoFrame);
   int height = CVPixelBufferGetHeight(videoFrame);  
-  NSLog(@"PixelBufferWidth : %d",CVPixelBufferGetWidth(videoFrame));
-  NSLog(@"PixelBufferHeight : %d",CVPixelBufferGetHeight(videoFrame));
+  //NSLog(@"PixelBufferWidth : %d",CVPixelBufferGetWidth(videoFrame));
+  //NSLog(@"PixelBufferHeight : %d",CVPixelBufferGetHeight(videoFrame));
   
   //finding the timetag of the image
   QTTime  timetag = [sampleBuffer presentationTime]; //presentationTime seems to be relative to a (unknown) time, probably something driver specific which we cannot controll via QtKit
@@ -289,7 +289,7 @@ void MacGrabber::setupGrabbing()
                                [NSNumber numberWithDouble:576.0], (id)kCVPixelBufferHeightKey,
                                [NSNumber numberWithUnsignedInt:k32ARGBPixelFormat], (id)kCVPixelBufferPixelFormatTypeKey,
                                nil];
-    NSLog(@"Set pixel format to 768, 576");
+    //NSLog(@"Set pixel format to 768, 576");
   }else
   {
     attributes = [NSDictionary dictionaryWithObjectsAndKeys:
