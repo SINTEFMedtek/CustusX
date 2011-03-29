@@ -14,7 +14,7 @@
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxToolManager.h"
-#include "cxToolConfigurationParser.h"
+//#include "cxToolConfigurationParser.h"
 #include "cxFilePreviewWidget.h"
 
 namespace cx
@@ -102,7 +102,11 @@ QString ToolConfigWidget::getSelectedFile() const
 
 void ToolConfigWidget::saveConfigurationSlot()
 {
-  ConfigurationFileParser::saveConfiguration();
+  if(mCurrentConfigFile != "<new config>")
+    return;
+
+  ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
+  ConfigurationFileParser::saveConfiguration(config);
 }
 
 void ToolConfigWidget::applicationStateChangedSlot()
@@ -145,9 +149,8 @@ void ToolConfigWidget::configChangedSlot()
   {
     ConfigurationFileParser parser(absoluteConfigFilePath);
     //block signals???
-    std::vector<ssc::MEDICAL_DOMAIN> domains = parser.getApplicationDomains();
-    for(unsigned i=0; i< domains.size(); ++i)
-      applicationFilter << enum2string(domains[i]);
+    ssc::MEDICAL_DOMAIN domain = parser.getApplicationDomain();
+    applicationFilter << enum2string(domain);
 
     std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
     for(unsigned i=0; i<trackers.size(); ++i)
@@ -499,12 +502,52 @@ Tool::InternalStructure ToolConfigWidget::getToolInternal(QString toolAbsoluteFi
   return retval;
 }
 
+ConfigurationFileParser::Configuration ToolConfigWidget::getCurrentConfiguration()
+{
+  //TODO
+  //only supports one tracker atm
+
+  ConfigurationFileParser::Configuration retval;
+  retval.mFileName = this->getConfigFileName();
+  retval.mClinical_app = string2enum<ssc::MEDICAL_DOMAIN>(stateManager()->getApplication()->getActiveStateName());
+
+  QStringList selectedTools = this->getSelectedToolsFromToolList();
+  QString referencePath = mSelectedReferenceComboBox->itemData(mSelectedReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
+
+  ssc::TRACKING_SYSTEM selectedTracker = this->getSelectedTrackingSystem();
+  ConfigurationFileParser::ToolFilesAndReferenceVector toolfilesAndRefVector;
+  QFile configFile(retval.mFileName);
+  QFileInfo info(configFile);
+  QDir dir = info.dir();
+  foreach(QString absoluteToolPath, selectedTools)
+  {
+    QString relativeToolFilePath = dir.relativeFilePath(absoluteToolPath);
+//    std::cout << "Relative tool file path: " << relativeToolFilePath << std::endl;
+
+    ConfigurationFileParser::ToolFileAndReference tool;
+    tool.first = relativeToolFilePath;
+
+//    std::cout << "====" << std::endl;
+//    std::cout << "absoluteToolPath " << absoluteToolPath << std::endl;
+//    std::cout << "referencePath " << referencePath << std::endl;
+    tool.second = absoluteToolPath == referencePath;
+    toolfilesAndRefVector.push_back(tool);
+  }
+
+  retval.mTrackersAndTools[selectedTracker] = toolfilesAndRefVector;
+
+  return retval;
+}
+
 QString ToolConfigWidget::getConfigFileName()
 {
   QString retval;
 
   if(mConfigFilesComboBox->currentText() == "<new config>")
+  {
+    //TODO use the user supplied name if any...
     retval = this->generateConfigName();
+  }
   else
     retval = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
 
@@ -565,6 +608,14 @@ QStringList ToolConfigWidget::getSelectedToolsFromToolList()
   {
     retval << item->data(Qt::ToolTipRole).toString();
   }
+
+  return retval;
+}
+
+ssc::TRACKING_SYSTEM ToolConfigWidget::getSelectedTrackingSystem()
+{
+  ssc::TRACKING_SYSTEM retval;
+  retval = string2enum<ssc::TRACKING_SYSTEM>(mTrackerButtonGroup->checkedButton()->text());
 
   return retval;
 }
