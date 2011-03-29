@@ -55,20 +55,46 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 
 void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 {
+  ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
+  ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
 	ssc::XmlOptionFile node = this->getPresetNode(name);
 
-	image->getTransferFunctions3D()->parseXml(node.getElement().namedItem("transferfunctions"));
-	image->getLookupTable2D()->parseXml(node.getElement().namedItem("lookuptable2D"));
+	transferFunctions->parseXml(node.getElement().namedItem("transferfunctions"));
+	LUT2D->parseXml(node.getElement().namedItem("lookuptable2D"));
 
 	ssc::Image::ShadingStruct shading = image->getShading();
 	shading.parseXml(node.getElement().namedItem("shading"));
 	image->setShading(shading);
 
-//  //Make sure min and max values for transferfunctions are set
-//  transferFunctions->addAlphaPoint(image->getMin(), 0);
-//  transferFunctions->addAlphaPoint(image->getMax(), 255);
-//  transferFunctions->addColorPoint(image->getMin(), QColor(0,0,0));
-//  transferFunctions->addColorPoint(image->getMax(), QColor(1,1,1));
+  //Make sure min and max values for transferfunctions are set
+	//The optimal solution may be to interpolate/extrapolate the max (min) values from the existing values
+	//However, as most presets usually have all the top values set to white the error of the simpler code below is usually small
+  ssc::OpacityMapPtr opacityMap = transferFunctions->getOpacityMap();
+  ssc::ColorMapPtr colorMap = transferFunctions->getColorMap();
+  if (opacityMap->find(image->getMin()) == opacityMap->end())
+  {
+    transferFunctions->addAlphaPoint(image->getMin(), 0);
+    LUT2D->addAlphaPoint(image->getMin(), 0);
+  }
+  if (opacityMap->find(image->getMax()) == opacityMap->end())
+  {
+    ssc::IntIntMap::iterator opPoint = opacityMap->end();
+    opPoint--;
+    transferFunctions->addAlphaPoint(image->getMax(), opPoint->second);// Use value of current max element
+    LUT2D->addAlphaPoint(image->getMax(), opPoint->second);
+  }
+  if (colorMap->find(image->getMin()) == colorMap->end())
+  {
+    transferFunctions->addColorPoint(image->getMin(), QColor(0,0,0));
+    LUT2D->addColorPoint(image->getMin(), QColor(0,0,0));
+  }
+  if (colorMap->find(image->getMax()) == colorMap->end())
+  {
+    ssc::ColorMap::iterator colorPoint = colorMap->end();
+    colorPoint--;
+    transferFunctions->addColorPoint(image->getMax(), colorPoint->second);//Use value of currect max element
+    LUT2D->addColorPoint(image->getMax(), colorPoint->second);
+  }
 }
 
 /** look for a preset with the given name. Create one if not found.
