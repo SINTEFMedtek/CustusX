@@ -1,6 +1,8 @@
 #ifndef CXTOOLCONFIGURATIONPARSER_H_
 #define CXTOOLCONFIGURATIONPARSER_H_
 
+#include <utility>
+#include <map>
 #include <vector>
 #include <QString>
 #include <QDomDocument>
@@ -67,16 +69,30 @@ private:
 class ConfigurationFileParser
 {
 public:
+  typedef std::pair<QString, bool> ToolFileAndReference;
+  typedef std::vector<ToolFileAndReference> ToolFilesAndReferenceVector;
+  typedef std::map<ssc::TRACKING_SYSTEM,  ToolFilesAndReferenceVector> TrackersAndToolsMap;
+  struct Configuration
+  {
+    QString             mFileName;
+    ssc::MEDICAL_DOMAIN mClinical_app;
+    TrackersAndToolsMap mTrackersAndTools;
+    Configuration() :
+      mClinical_app(ssc::mdCOUNT)
+    {};
+  };
+
+public:
   ConfigurationFileParser(QString absoluteConfigFilePath);
   ~ConfigurationFileParser();
 
-  std::vector<ssc::MEDICAL_DOMAIN> getApplicationDomains();
+  ssc::MEDICAL_DOMAIN getApplicationDomain();
   std::vector<IgstkTracker::InternalStructure> getTrackers();
   std::vector<QString> getAbsoluteToolFilePaths();
   QString getAbsoluteReferenceFilePath();
 
  static QString getTemplatesAbsoluteFilePath();
- static void saveConfiguration();
+ static void saveConfiguration(Configuration& config);
 
 private:
    void setConfigDocument(QString configAbsoluteFilePath);
