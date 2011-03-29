@@ -265,7 +265,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
   switch (mMedicalDomain)
   {
   case mdLAPAROSCOPY:
-  case mdCARDIOLOGY:
+  case mdENDOVASCULAR:
     return this->generateBasisVectorsRadiology();
   case mdLABORATORY:
   case mdNEUROLOGY:

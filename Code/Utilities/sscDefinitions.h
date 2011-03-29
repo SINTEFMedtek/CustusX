@@ -35,7 +35,7 @@ namespace ssc
 	  mdLABORATORY,
 	  mdNEUROLOGY,
 	  mdLAPAROSCOPY,
-	  mdCARDIOLOGY,
+	  mdENDOVASCULAR,
 	  mdCOUNT
 	};
 
