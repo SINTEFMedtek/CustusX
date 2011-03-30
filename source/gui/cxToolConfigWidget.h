@@ -62,7 +62,7 @@ private:
 
   void filterButtonGroup(QButtonGroup* group, QStringList filter = QStringList());
 
-  QStringList getToolFiles(QDir& dir);
+  QStringList getToolFiles(QDir& dir); ///< get all tool files in dir and all subdirs
   QList<Tool::InternalStructure> getToolInternals(QStringList toolAbsoluteFilePaths);
   Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 

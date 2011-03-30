@@ -65,7 +65,7 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 
   if(!mCurrentFile->exists())
   {
-    ssc::messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
+//    ssc::messageManager()->sendDebug("File "+absoluteFilePath+" does not exist.");
     return;
   }
 

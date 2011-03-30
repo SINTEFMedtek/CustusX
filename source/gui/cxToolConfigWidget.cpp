@@ -14,9 +14,10 @@
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxToolManager.h"
-//#include "cxToolConfigurationParser.h"
 #include "cxFilePreviewWidget.h"
 
+//testing
+#include "cxToolFilterWidget.h"
 namespace cx
 {
 
@@ -49,6 +50,10 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
   hlayout->addWidget(new QLabel("Config file: "));
   hlayout->addWidget(mConfigFileLineEdit);
   layout->addLayout(hlayout, 4, 0, 1, 2);
+
+  //testing
+  layout->addWidget(new ToolFilterGroupBox(this), 5, 0, 1, 2);
+  //testing
 
   mApplicationGroupBox->setTitle("Applications");
   QHBoxLayout* applicationlayout = new QHBoxLayout();
@@ -163,7 +168,7 @@ void ToolConfigWidget::configChangedSlot()
     for(unsigned i=0; i<absoluteToolFilePaths.size(); ++i)
     {
       absoluteToolFilePathsFilter << absoluteToolFilePaths[i];
-//      std::cout << "added " << absoluteToolFilePaths[i] << " to tool filter..." << std::endl;
+      std::cout << "added " << absoluteToolFilePaths[i] << " to tool filter..." << std::endl;
     }
 
     mTrackerGroupBox->setEnabled(false);
@@ -330,7 +335,7 @@ void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringLi
     if(!absoluteToolFilePathsFilter.isEmpty() && !absoluteToolFilePathsFilter.contains(toolFilePath))
       continue;
 
-//    std::cout << "toolFilePath: " << toolFilePath << std::endl;
+    std::cout << "toolFilePath: " << toolFilePath << std::endl;
 
     QFile file(toolFilePath);
     QFileInfo info(file);
@@ -473,7 +478,7 @@ QStringList ToolConfigWidget::getToolFiles(QDir& dir)
       continue;
     if(dir.cd(dirString))
     {
-      //std::cout << "After cd: " << dir.absolutePath() << std::endl;
+//      std::cout << "After cd: " << dir.absolutePath() << std::endl;
       retval << this->getToolFiles(dir);
       dir.cdUp();
     }
