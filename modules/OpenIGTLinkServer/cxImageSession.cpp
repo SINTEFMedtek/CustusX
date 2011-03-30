@@ -127,6 +127,7 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 
   int fsize = imgMsg->GetImageSize();
   int frame = (staticCounter++) % image->GetDimensions()[2];
+  std::cout << "emitting frame " << frame << ", image size=" << fsize << ", comp="<< image->GetNumberOfScalarComponents() << ", scalarType="<< scalarType << ", dim=("<< image->GetDimensions()[0] << ", "<< image->GetDimensions()[1] << ")" << std::endl;
   memcpy(imgMsg->GetScalarPointer(), image->GetScalarPointer(0,0,frame), fsize); // not sure if we need to copy
 
   //------------------------------------------------------------
@@ -164,24 +165,7 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
     mImageFileDir(imageFileDir)
 {
   mImageData = loadImage(mImageFileDir);
-  mImageData = convertToTestColorImage(mImageData);
-
-/*
-  vtkMetaImageWriter* writer = vtkMetaImageWriter::New();
-  writer->SetInput(mImageData);
-  writer->SetFileName(   "/Users/christiana/christiana/workspace/test.mhd");
-//  writer->SetRAWFileName("/Users/christiana/christiana/workspace/test.raw");
-//  writer->Update();
-  writer->SetCompression(false);
-  writer->Write();
-  std::cout << "finished write mhd file" << std::endl;
-
-
-  vtkMetaImageReader* reader = vtkMetaImageReader::New();
-  reader->SetFileName("/Users/christiana/christiana/workspace/test.mhd");
-  reader->Update();
-  mImageData = reader->GetOutput();
-*/
+ // mImageData = convertToTestColorImage(mImageData);
 
   mTimer = new QTimer(this);
   connect(mTimer, SIGNAL(timeout()), this, SLOT(tick())); // this signal will be executed in the thread of THIS, i.e. the main thread.
@@ -191,7 +175,7 @@ ImageSender::ImageSender(QTcpSocket* socket, QString imageFileDir, QObject* pare
 
 void ImageSender::tick()
 {
-  std::cout << "tick" << std::endl;
+//  std::cout << "tick" << std::endl;
   igtl::ImageMessage::Pointer imgMsg = getVtkImageMessage(mImageData);
 
   //------------------------------------------------------------

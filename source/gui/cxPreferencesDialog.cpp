@@ -1,19 +1,24 @@
 
 #include <QtGui>
 
+#include <iostream>
 #include "sscMessageManager.h"
+#include "sscDoubleWidgets.h"
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
-#include <iostream>
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
-#include "sscDoubleWidgets.h"
+#include "cxFilePreviewWidget.h"
+#include "cxToolConfigWidget.h"
 
 namespace cx
 {
 
+//==============================================================================
+// PreferencesTab
+//------------------------------------------------------------------------------
 
 PreferencesTab::PreferencesTab(QWidget *parent) :
     QWidget(parent),
@@ -21,25 +26,19 @@ PreferencesTab::PreferencesTab(QWidget *parent) :
 {
   mTopLayout = new QVBoxLayout;
 
-//  QHBoxLayout* htopLayout = new QHBoxLayout;
-//  htopLayout->addLayout(mTopLayout);
-//  htopLayout->setMargin(0);
-//  htopLayout->addStretch();
-
   QVBoxLayout* vtopLayout = new QVBoxLayout;
-//  vtopLayout->addLayout(htopLayout);
   vtopLayout->addLayout(mTopLayout);
   vtopLayout->setMargin(0);
   vtopLayout->addStretch();
   this->setLayout(vtopLayout);
 }
-
-
+//==============================================================================
+// FoldersTab
+//------------------------------------------------------------------------------
 
 FoldersTab::FoldersTab(QWidget *parent) :
     PreferencesTab(parent)
-{
-}
+{}
 
 void FoldersTab::init()
 {
@@ -57,35 +56,20 @@ void FoldersTab::init()
   connect(browsePatientFolderAction, SIGNAL(triggered()), this, SLOT(browsePatientDataFolderSlot()));
   QToolButton* browsePatientFolderButton = new QToolButton(this);
   browsePatientFolderButton->setDefaultAction(browsePatientFolderAction);
-
-//  QPushButton* patientDataFolderButton = new QPushButton(tr("B&rowse..."));
-//  patientDataFolderButton->setIcon(QIcon(":/icons/open.png"));
-//  patientDataFolderButton->set
-//  connect( patientDataFolderButton,
-//          SIGNAL(clicked()),
-//          this,
-//          SLOT(browsePatientDataFolderSlot()) );
   
   QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
   mToolConfigFilesComboBox = new QComboBox;
-  connect( mToolConfigFilesComboBox, 
-          SIGNAL(currentIndexChanged(const QString &)),
-          this, 
-          SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
+  connect( mToolConfigFilesComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
   
   // Choose application name
   QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
-  connect(mChooseApplicationComboBox,
-          SIGNAL(currentIndexChanged(int)),
-          this,
-          SLOT(currenApplicationChangedSlot(int)));
+  connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currenApplicationChangedSlot(int)));
   mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
   applicationStateChangedSlot();
   
   // Layout
-//  QVBoxLayout* toptopLayout = new QVBoxLayout;
 
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addWidget(patientDataFolderLabel, 0, 0);
@@ -98,12 +82,7 @@ void FoldersTab::init()
   mainLayout->addWidget(toolConfigFilesLabel, 9, 0);
   mainLayout->addWidget(mToolConfigFilesComboBox, 9, 1);
  
-//  mainLayout->addStretch();
   mTopLayout->addLayout(mainLayout);
-
-//  toptopLayout->addLayout(mainLayout);
-//  toptopLayout->addStretch();
-//  this->setLayout(toptopLayout);
 }
 
 FoldersTab::~FoldersTab()
@@ -224,15 +203,8 @@ void PerformanceTab::init()
   mRenderingIntervalSpinBox->setMinimum(16);
   mRenderingIntervalSpinBox->setMaximum(1000);
   mRenderingIntervalSpinBox->setValue(renderingInterval);
-  connect(mRenderingIntervalSpinBox,
-          SIGNAL(valueChanged(int)),
-          this,
-          SLOT(renderingIntervalSlot(int)));
+  connect(mRenderingIntervalSpinBox, SIGNAL(valueChanged(int)), this, SLOT(renderingIntervalSlot(int)));
   
-//  QString renderingRateString = "";
-//  QString num;
-//  num.setNum(1000.0/renderingInterval);
-//  renderingRateString = renderingRateString+num+" fps";
   mRenderingRateLabel = new QLabel("");
   this->renderingIntervalSlot(renderingInterval);
 
@@ -260,16 +232,9 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mSmartRenderCheckBox, 2, 0);
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
 
-//  QVBoxLayout* toptopLayout = new QVBoxLayout;
-//  toptopLayout->addLayout(mMainLayout);
-//  toptopLayout->addStretch();
-//  this->setLayout(toptopLayout);
   mTopLayout->addLayout(mMainLayout);
 
-  connect(this,
-          SIGNAL(renderingIntervalChanged(int)),
-          viewManager(),
-          SLOT(renderingIntervalChangedSlot(int)));
+  connect(this, SIGNAL(renderingIntervalChanged(int)), viewManager(), SLOT(renderingIntervalChangedSlot(int)));
 }
 
 void PerformanceTab::renderingIntervalSlot(int interval)
@@ -298,8 +263,7 @@ void PerformanceTab::saveParametersSlot()
 //------------------------------------------------------------------------------
 View3DTab::View3DTab(QWidget *parent) :
     PreferencesTab(parent)
-{
-}
+{}
 
 void View3DTab::init()
 {
@@ -317,7 +281,7 @@ void View3DTab::init()
   QHBoxLayout* toptopLayout = new QHBoxLayout;
   toptopLayout->addLayout(mMainLayout);
   toptopLayout->addStretch();
-//  this->setLayout(toptopLayout);
+
   mTopLayout->addLayout(toptopLayout);
 
 }
@@ -334,15 +298,12 @@ void View3DTab::setBackgroundColorSlot()
   mSettings->setValue("backgroundColor", result);
 }
 
-// --------------------------------------------------------
-
 //==============================================================================
 // AutomationTab
 //------------------------------------------------------------------------------
 AutomationTab::AutomationTab(QWidget *parent) :
     PreferencesTab(parent)
-{
-}
+{}
 
 void AutomationTab::init()
 {
@@ -363,9 +324,7 @@ void AutomationTab::init()
   mMainLayout->addWidget(mAutoStartTrackingCheckBox);
   mMainLayout->addWidget(mAutoStartStreamingCheckBox);
   mMainLayout->addWidget(mAutoReconstructCheckBox);
-//  mMainLayout->addStretch();
 
-//  this->setLayout(mMainLayout);
   mTopLayout->addLayout(mMainLayout);
 
 }
@@ -377,14 +336,12 @@ void AutomationTab::saveParametersSlot()
   mSettings->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
 }
 
-
 //==============================================================================
 // UltrasoundTab
 //------------------------------------------------------------------------------
 UltrasoundTab::UltrasoundTab(QWidget *parent) :
     PreferencesTab(parent)
-{
-}
+{}
 
 void UltrasoundTab::init()
 {
@@ -407,7 +364,6 @@ void UltrasoundTab::init()
   toplayout->addWidget(m24bitRadioButton);
   toplayout->addWidget(m8bitRadioButton);
 
-//  toplayout->addStretch();
   mTopLayout->addLayout(toplayout);
 
 }
@@ -418,10 +374,42 @@ void UltrasoundTab::saveParametersSlot()
   DataLocations::getSettings()->setValue("Ultrasound/8bitAcquisitionData", m8bitRadioButton->isChecked());
 }
 
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
+//==============================================================================
+// ToolConfigTab
+//------------------------------------------------------------------------------
 
+ToolConfigTab::ToolConfigTab(QWidget* parent) :
+    PreferencesTab(parent),
+    mFilePreviewWidget(new FilePreviewWidget(this)),
+    mToolConfigWidget(new ToolConfigWidget(this))
+{
+  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
+  mFilePreviewWidget->previewFileSlot(mToolConfigWidget->getSelectedFile());
+}
+
+ToolConfigTab::~ToolConfigTab()
+{}
+
+void ToolConfigTab::init()
+{
+  //layout
+  QGridLayout* layout = new QGridLayout;
+  mTopLayout->addLayout(layout);
+
+  layout->addWidget(mToolConfigWidget, 0, 0);
+  layout->addWidget(mFilePreviewWidget, 0, 1);
+}
+
+void ToolConfigTab::saveParametersSlot()
+{
+  //TODO
+  //save things to mSettings????
+  mToolConfigWidget->saveConfigurationSlot();
+}
+//==============================================================================
+// PreferencesDialog
+//------------------------------------------------------------------------------
 
 PreferencesDialog::PreferencesDialog(QWidget *parent) :
   QDialog(parent)
@@ -439,6 +427,7 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   this->addTab(new View3DTab, tr("View 3D"));
   this->addTab(new AutomationTab, tr("Automation"));
   this->addTab(new UltrasoundTab, tr("Ultrasound"));
+  this->addTab(new ToolConfigTab, tr("Tool Configuration"));
 
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
@@ -460,9 +449,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
   tabWidget->setCurrentIndex(0);
 
-//  this->resize(700, 300);
   buttonBox->button(QDialogButtonBox::Ok)->setFocus();
 }
+
+PreferencesDialog::~PreferencesDialog()
+{}
 
 void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
 {
@@ -478,7 +469,6 @@ void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
   QToolButton* button = new QToolButton(this);
 
   button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-//  button->setDown(true);
 
   button->setDefaultAction(action);
   mToolBar->addWidget(button);
@@ -494,8 +484,5 @@ void PreferencesDialog::selectTabSlot()
   int val = action->data().toInt();
   tabWidget->setCurrentIndex(val);
 }
-
-PreferencesDialog::~PreferencesDialog()
-{}
 
 }//namespace cx

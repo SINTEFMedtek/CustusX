@@ -38,6 +38,7 @@ RTSourceManager::RTSourceManager()
   //connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
 
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(connectSourceToTool()));
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
 }
 
@@ -280,7 +281,7 @@ void RTSourceManager::connectSourceToTool()
     }
     probeInterface->setRTSource(mRTSource);
     ssc::toolManager()->setDominantTool(mProbe->getUid());
-//    std::cout << "RTSourceManager::connectSourceToTool() " << probeInterface->getRealTimeStreamSource()->getName() << " completed" << std::endl;
+//    std::cout << "RTSourceManager::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getRTSource()->getName() << " completed" << std::endl;
   }
 }
 

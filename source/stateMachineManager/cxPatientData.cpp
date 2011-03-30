@@ -23,7 +23,6 @@
 #include "sscCustomMetaImage.h"
 
 #include "cxViewManager.h"
-#include "cxRepManager.h"
 #include "cxFileCopied.h"
 #include "cxDataLocations.h"
 #include "cxRegistrationManager.h"

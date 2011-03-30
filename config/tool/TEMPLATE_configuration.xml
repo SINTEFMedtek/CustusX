@@ -1,0 +1,17 @@
+<!-- THIS IS A TEMPLATE EXPLANING HOW TO WRITE A CONFIGURATION FILE -->
+
+<?xml version="1.0"?>
+
+<!-- This file is used for specifying a configuration that tells Cx3 how to set up tracking. -->
+<configuration clinical_app= <!-- [Laboratory, Neurology, Laparoscopy] --> >
+
+<!-- There can be [1, n] tracker tags in each configuration. -->
+<tracker type= <!-- [polaris, aurora] --> >
+ 
+    <!-- There can be [0, n] toolfile tags in each configuration. -->
+    <toolfile reference= <!-- [yes, no] --> > <!--[relative path to reference tool file] --> </toolfile>
+    <toolfile reference= <!-- [yes, no] --> > <!-- [relative path to tool file] --> </toolfile>
+
+</tracker>
+
+</configuration>
