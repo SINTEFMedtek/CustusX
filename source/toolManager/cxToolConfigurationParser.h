@@ -74,9 +74,9 @@ public:
   typedef std::map<ssc::TRACKING_SYSTEM,  ToolFilesAndReferenceVector> TrackersAndToolsMap;
   struct Configuration
   {
-    QString             mFileName;
-    ssc::MEDICAL_DOMAIN mClinical_app;
-    TrackersAndToolsMap mTrackersAndTools;
+    QString             mFileName; ///< absolute path and filename for the new config file
+    ssc::MEDICAL_DOMAIN mClinical_app; ///< the medical domain this config is made for
+    TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools that should be used in the config
     Configuration() :
       mClinical_app(ssc::mdCOUNT)
     {};
@@ -97,7 +97,7 @@ public:
 private:
    void setConfigDocument(QString configAbsoluteFilePath);
    bool isConfigFileValid();
-   QString getAbsoluteToolFilePath(QDomElement toolfileelement);
+   QString getAbsoluteToolFilePath(QDomElement toolfileelement); ///< get the absolute toolfile path for a toolfile element containg a relative toolfile path
 
   QString mConfigurationFilePath; ///< absolute path to the configuration file
   QDomDocument mConfigureDoc; ///< the config xml document
