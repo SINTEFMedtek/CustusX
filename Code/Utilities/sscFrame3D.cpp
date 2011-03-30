@@ -7,9 +7,90 @@
 namespace ssc
 {
 
-//namespace utils
-//{
-//// --------------------------------------------------------
+
+DecomposedTransform3D::DecomposedTransform3D()
+{
+  mAngle = Vector3D(0,0,0);
+  mPos = Vector3D(0,0,0);
+}
+
+DecomposedTransform3D::DecomposedTransform3D(Transform3D m)
+{
+  ssc::Frame3D frame = Frame3D::create(m);
+  mAngle = frame.getEulerXYZ();
+  mPos = frame.mPos;
+  frame.mPos = Vector3D(0,0,0);
+  m_R = frame.transform();
+}
+
+void DecomposedTransform3D::reset(Transform3D m)
+{
+  DecomposedTransform3D input(m);
+
+  bool eqPos = similar(input.mPos, mPos);
+  if (!eqPos)
+  {
+    mPos = input.mPos;
+//    std::cout << "reset set pos " << mPos << std::endl;
+  }
+
+  input.mPos = mPos;
+  bool eqRot = similar(input.getMatrix(), this->getMatrix());
+  // only reset angles if the input rotation matrix is different from the current.
+  if (!eqRot)
+  {
+    mAngle = input.mAngle;
+    m_R = input.m_R;
+//    std::cout << "reset set rot " << mAngle << std::endl;
+  }
+}
+
+void DecomposedTransform3D::setAngles(Vector3D xyz)
+{
+//  std::cout << "setAngles " << xyz << std::endl;
+
+  if (!similar(xyz[0], mAngle[0]))
+  {
+    m_R = m_R * createTransformRotateX(xyz[0]-mAngle[0]);
+    mAngle[0] = xyz[0];
+  }
+  if (!similar(xyz[1], mAngle[1]))
+  {
+    m_R = m_R * createTransformRotateY(xyz[1]-mAngle[1]);
+    mAngle[1] = xyz[1];
+  }
+  if (!similar(xyz[2], mAngle[2]))
+  {
+    m_R = m_R * createTransformRotateZ(xyz[2]-mAngle[2]);
+    mAngle[2] = xyz[2];
+  }
+}
+
+void DecomposedTransform3D::setPosition(Vector3D pos)
+{
+//  std::cout << "setPosition " << pos << std::endl;
+  mPos = pos;
+}
+
+Vector3D DecomposedTransform3D::getAngles() const
+{
+  return mAngle;
+}
+
+Vector3D DecomposedTransform3D::getPosition() const
+{
+  return mPos;
+}
+
+Transform3D DecomposedTransform3D::getMatrix() const
+{
+  return createTransformTranslate(mPos) * m_R;
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
 
 //TODO: are vtk col or row order? must do the same here.
 typedef cml::vector< double, cml::fixed<3> > cml_vector_3;
@@ -65,6 +146,7 @@ cml_matrix_4x4 convertToCml(const Transform3D& T)
 }
 
 static cml::EulerOrder mEulerOrder = cml::euler_order_xyz;
+//static cml::EulerOrder mEulerOrder = cml::euler_order_zyx;
 
 void cml_test(const Transform3D& T)
 {
@@ -82,10 +164,14 @@ void cml_test(const Transform3D& T)
 
 ssc::Vector3D Frame3D::getEulerXYZ() const
 {
-  cml_matrix_4x4 m = convertToCml(this->transform());
-
   cml_quaternion_type q;
-  cml::quaternion_rotation_matrix(q,m);
+  cml_vector_3 axis(rotationAxis()[0], rotationAxis()[1], rotationAxis()[2]);
+  cml::quaternion_rotation_axis_angle(q, axis, mPhi);
+
+//  cml_matrix_4x4 m = convertToCml(this->transform());
+//
+//  cml_quaternion_type q;
+//  cml::quaternion_rotation_matrix(q,m);
   ssc::Vector3D retval;
 
   cml::quaternion_to_euler(q, retval[0], retval[1], retval[2], mEulerOrder);
@@ -100,6 +186,12 @@ ssc::Vector3D Frame3D::getEulerXYZ() const
 void Frame3D::setEulerXYZ(const ssc::Vector3D& xyz)
 {
   cml_quaternion_type q;
+
+//  ssc::Vector3D a = xyz;
+//  cml::quaternion_rotation_world_y(q, 0.0);
+//  cml::quaternion_rotate_about_world_x(q, a[0]);
+//  cml::quaternion_rotate_about_world_y(q, a[1]);
+//  cml::quaternion_rotate_about_world_z(q, a[2]);
 
   cml::quaternion_rotation_euler(q,xyz[0],xyz[1],xyz[2],mEulerOrder);
 
@@ -126,6 +218,21 @@ void testProps(const Transform3D& T)
 
 void Frame3D::test()
 {
+  cml_quaternion_type q;
+  ssc::Vector3D a(30,40,50);
+  a = a*M_PI/180;
+  cml::quaternion_rotation_world_y(q, 0.0);
+  cml::quaternion_rotate_about_world_x(q, a[0]);
+  cml::quaternion_rotate_about_world_y(q, a[1]);
+  cml::quaternion_rotate_about_world_z(q, a[2]);
+
+  cml::quaternion_to_euler(q, a[0], a[1], a[2], cml::euler_order_xyz);
+  a = a/M_PI*180;
+  std::cout << "test angles xyz: " << a << std::endl;
+  cml::quaternion_to_euler(q, a[0], a[1], a[2], cml::euler_order_zyx);
+  a = a/M_PI*180;
+  std::cout << "test angles zyx: " << a << std::endl;
+
   Transform3D M1;
 
   testProps(M1);
