@@ -1,0 +1,58 @@
+<!-- THIS IS A TEMPLATE EXPLANING HOW TO WRITE A TOOL FILE-->
+
+<?xml version="1.0"?>
+
+
+<!-- Tool -->
+<!-- A tool is defined a tracking sensor attached to a instrument. -->
+<!-- There can be [1, 1] tool tags in each tool file. -->
+<tool>
+  <type> <!-- --> </type>
+  <id>AccuracyPhantom.rom</id>
+  <name>Phantom Reference</name>
+  <description>Phantom Reference</description>
+  <manufacturer>Unknown</manufacturer>
+  <clinical_app>Laboratory</clinical_app>
+  <geo_file>AccuracyPhantom.stl</geo_file>
+  <pic_file></pic_file>
+  <doc_file></doc_file>  
+
+  <!-- Instrument -->
+  <instrument>
+    <type></type>
+    <id></id>
+    <name></name>
+    <manufacturer></manufacturer>
+    <description></description>
+  </instrument>
+
+  <!-- Sensor -->
+  <sensor>
+    <type>Polaris</type>
+    <id>AccuracyPhantom.rom</id>
+    <name>AccuracyPhantom.rom</name>
+    <wireless>yes</wireless>
+    <DOF></DOF>
+    <portnumber></portnumber>
+    <channelnumber></channelnumber>
+    <reference_point id="1">134.25 134.25 99.50</reference_point>
+    <manufacturer>NDI</manufacturer>
+    <description></description>
+    <rom_file>AccuracyPhantom.rom</rom_file>
+  </sensor>
+
+  <!-- Calibration -->
+  <calibration>
+    <cal_file></cal_file>
+    <date>
+      <yyyy></yyyy>
+      <mm></mm>
+      <dd></dd>
+    </date>
+    <time>
+      <hh></hh>
+      <mm></mm>
+      <ss></ss>
+    </time>
+  </calibration>
+</tool>

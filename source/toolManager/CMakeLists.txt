@@ -4,8 +4,11 @@ SET( CX_QT_MOC_HEADER_FILES
     cxToolManager.h
     cxProbe.h
     cxTool.h
-    cxTracker.h
+    cxIgstkTracker.h
     cxManualToolAdapter.h
+    cxIgstkTool.h
+    cxIgstkToolManager.h
+    cxIgstkTrackerThread.h
 )
 
 SET ( ${LIB}_toolManager
@@ -18,10 +21,16 @@ SET ( ${LIB}_toolManager
     cxTool.cpp
     cxManualToolAdapter.h
     cxManualToolAdapter.cpp
-    cxTracker.h
-    cxTracker.cpp
+    cxIgstkTracker.h
+    cxIgstkTracker.cpp
     cxToolConfigurationParser.h
     cxToolConfigurationParser.cpp
+    cxIgstkTool.h
+    cxIgstkTool.cpp
+    cxIgstkToolManager.h
+    cxIgstkToolManager.cpp
+    cxIgstkTrackerThread.h
+    cxIgstkTrackerThread.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
