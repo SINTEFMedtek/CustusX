@@ -52,6 +52,9 @@ SET(cxProject_MOC_HDRS
   cxSeansVesselRegistrationWidget.h
   cxFilePreviewWidget.h
   cxToolConfigWidget.h
+  cxToolFilterWidget.h
+  cxSelectionGroupBox.h
+  cxToolListWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -171,6 +174,12 @@ SET(${LIBNAME}_SRCS
     cxToolConfigWidget.h
     cxToolConfigWidget.cpp
     snwSyntaxHighlighter.cpp
+    cxToolFilterWidget.h
+    cxToolFilterWidget.cpp
+    cxSelectionGroupBox.h
+    cxSelectionGroupBox.cpp
+    cxToolListWidget.h
+    cxToolListWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
