@@ -12,7 +12,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 #include "sscStringDataAdapter.h"
-#include "cxAffineMatrixWidget.h"
+#include "cxTransform3DWidget.h"
 
 class QCheckBox;
 class QGroupBox;
@@ -119,7 +119,7 @@ private:
 
   QVBoxLayout* mToptopLayout;
   QGroupBox* mManualGroup;
-  AffineMatrixWidget* mManualToolWidget;
+  Transform3DWidget* mManualToolWidget;
 
   ssc::SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
