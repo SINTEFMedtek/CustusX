@@ -33,7 +33,7 @@ public:
 	void addXml(QDomNode& dataNode); ///< adds xml information about the image and its variabels
 	virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
   
-  
+	virtual DoubleBoundingBox3D boundingBox() const;
   void setColor(const QColor& color);///< Set the color of the mesh
   QColor getColor();///< Get the color of the mesh (Values are range 0 - 255)
   

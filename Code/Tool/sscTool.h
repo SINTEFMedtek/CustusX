@@ -49,10 +49,6 @@ signals:
   void sectorChanged();
 };
 
-
-
-
-
 /**Interface to a tool,
  * i.e. a pointer, US probe or similar.
  *
@@ -111,8 +107,10 @@ public:
 //	 */
 //	virtual void setTransformSaveFile(const QString& filename) = 0;
 	virtual Transform3D get_prMt() const = 0; ///< \return transform from tool to patient ref space
-	//virtual void set_prMt(const Transform3D& transform) = 0; ///< \return transform from tool to patient ref space
+
 	virtual bool getVisible() const = 0; ///< \return the visibility status of the tool
+	virtual bool isInitialized() const {return true;}
+
 	virtual QString getUid() const = 0; ///< \return an unique id for this instance
 	virtual QString getName() const = 0; ///< \return a descriptive name for this instance
 	//virtual int getIndex() const = 0;///<return a index ivar due to a list..
@@ -142,6 +140,7 @@ signals:
 	void toolVisible(bool visible);
 	void tooltipOffset(double offset);
 	void toolProbeSector();
+	void tps(int);
 
 protected:
 	QString mUid;

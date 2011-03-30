@@ -35,7 +35,7 @@ namespace ssc
 	  mdLABORATORY,
 	  mdNEUROLOGY,
 	  mdLAPAROSCOPY,
-	  mdCARDIOLOGY,
+	  mdENDOVASCULAR,
 	  mdCOUNT
 	};
 
@@ -60,6 +60,27 @@ namespace ssc
 	  csSENSOR, ///< a tools sensor space (s)
 	  csCOUNT
 	};
+
+	enum TRACKING_SYSTEM
+	{
+    tsNONE,             ///< Not specified
+    tsPOLARIS,          ///< NDIs Polaris tracker
+    tsPOLARIS_SPECTRA,  ///< NDIs Polaris Spectra tracker
+    tsPOLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
+    tsAURORA,           ///< NDIs Aurora tracker
+    tsMICRON,           ///< Claron Technologys Micron tracker
+    tsCOUNT
+	};
+
+	/*enum TOOL_TYPE
+	{
+    ttNONE,
+    ttREFERENCE,  ///< references
+    ttMANUAL,     ///< representation of a mouse/keyboard-controlled virtual tool
+    ttPOINTER,    ///< pointers
+    ttUSPROBE,    ///< ultrasound probe
+    ttCOUNT
+	};*/
 } //namespace end
 
 //#include "sscDefinitionStrings.h"

@@ -1,6 +1,7 @@
 #include "sscProbeData.h"
 #include <QDomNode>
 #include "sscTypeConversions.h"
+#include <iostream>
 
 namespace ssc
 {
@@ -15,11 +16,27 @@ ProbeData::ProbeData(TYPE type, double depthStart, double depthEnd, double width
 {
 }
 
-Vector3D ProbeData::ProbeImageData::getOrigin_u() const
+Vector3D ProbeData::ProbeImageData::transform_p_to_u(const Vector3D& q_p) const
 {
-  ssc::Vector3D c(mOrigin_p[0], double(mSize.height()) - mOrigin_p[1] - 1, 0);
+  ssc::Vector3D c(q_p[0], double(mSize.height()) - q_p[1] - 1, 0);
   c = multiply_elems(c, mSpacing);
   return c;
+}
+
+Vector3D ProbeData::ProbeImageData::getOrigin_u() const
+{
+  return this->transform_p_to_u(mOrigin_p);
+//  ssc::Vector3D c(mOrigin_p[0], double(mSize.height()) - mOrigin_p[1] - 1, 0);
+//  c = multiply_elems(c, mSpacing);
+//  return c;
+}
+
+ssc::DoubleBoundingBox3D ProbeData::ProbeImageData::getClipRect_u() const
+{
+  ssc::Vector3D p0 = transform_p_to_u(mClipRect_p.corner(0,0,0));
+  ssc::Vector3D p1 = transform_p_to_u(mClipRect_p.corner(1,1,1));
+//  std::cout << p0 <<  " -- " << p1 << std::endl;
+  return ssc::DoubleBoundingBox3D(p0,p1);
 }
 
 void ProbeData::addXml(QDomNode& dataNode) const

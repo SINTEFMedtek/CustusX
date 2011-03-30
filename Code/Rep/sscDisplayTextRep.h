@@ -19,6 +19,7 @@ public:
 	void addText(const Vector3D& color, const QString& text, const Vector3D& pos);
 	void setText(unsigned i, const QString& text);
 	void setColor(const Vector3D& color );
+	void setFontSize(int size);
 	virtual ~DisplayTextRep();
 protected:
 	DisplayTextRep(const QString& uid, const QString& name);

@@ -5,6 +5,7 @@
 #include "vtkSmartPointer.h"
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 typedef vtkSmartPointer<class vtkPolyData> vtkPolyDataPtr;
+typedef vtkSmartPointer<class vtkPolyLine> vtkPolyLinePtr;
 #include "sscTransform3D.h"
 
 #include <boost/shared_ptr.hpp>
@@ -38,9 +39,13 @@ public:
   void test();
 
 private:
+//  vtkPolyLinePtr createClipRectPolyLine();
+  vtkPolyDataPtr generateClipper(vtkPolyDataPtr input);
+  vtkPolyDataPtr getClipRectPolyData();
+  bool clipRectIntersectsSector() const;
+
   bool isInside(Vector3D p_u);
   vtkPolyDataPtr mPolyData; ///< polydata representation of the probe, in space u
-	mutable Vector3D mCachedCenter_v; ///< center of beam sector for sector probes. Used in isInside()
 };
 
 } // namespace ssc

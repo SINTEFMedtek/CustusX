@@ -83,6 +83,15 @@ void DisplayTextRep::setColor(const Vector3D& color )
 	
 }
 
+void DisplayTextRep::setFontSize(int size)
+{
+  for(unsigned i =0; i<mDisplayText.size(); ++i)
+  {
+    mDisplayText.at(i)->textProperty()->SetFontSize(size) ;
+  }
+}
+
+
 
 
 //-----------------------------------------------------------------------

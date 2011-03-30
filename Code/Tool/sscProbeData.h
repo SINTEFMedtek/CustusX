@@ -4,6 +4,7 @@
 #include <QSize>
 class QDomNode;
 #include "sscVector3D.h"
+#include "sscBoundingBox3D.h"
 
 namespace ssc
 {
@@ -66,9 +67,12 @@ public:
   {
 //    ssc::Vector3D mOrigin_u; ///< probe origin in image space u. (lower-left corner origin)
     ssc::Vector3D getOrigin_u() const; ///< probe origin in image space u. (lower-left corner origin)
+    ssc::DoubleBoundingBox3D getClipRect_u() const; ///< probe origin in image space u. (lower-left corner origin)
     ssc::Vector3D mOrigin_p; ///< probe origin in pixel space p. (upper-left corner origin)
     ssc::Vector3D mSpacing;
+    ssc::DoubleBoundingBox3D mClipRect_p; ///< sector clipping rect, in addition to the standard sector definition. The probe sector is the intersection of the sector definition and the clip rect.
     QSize mSize;
+    Vector3D transform_p_to_u(const Vector3D& q_p) const;
   };
 
   enum TYPE { tNONE=0,   ///< undefined

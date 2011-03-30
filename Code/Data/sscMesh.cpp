@@ -1,3 +1,4 @@
+
 #include "sscMesh.h"
 
 #include <vtkPolyData.h>
@@ -6,6 +7,7 @@
 #include "sscRep.h"
 #include "sscTypeConversions.h"
 #include "sscRegistrationTransform.h"
+#include "sscBoundingBox3D.h"
 
 namespace ssc
 {
@@ -125,5 +127,13 @@ QColor Mesh::getColor()
 {
   return mColor;
 }
-  
+
+DoubleBoundingBox3D Mesh::boundingBox() const
+{
+  mVtkPolyData->UpdateInformation();
+  DoubleBoundingBox3D bounds(mVtkPolyData->GetBounds());
+  return bounds;
+}
+
+
 } // namespace ssc

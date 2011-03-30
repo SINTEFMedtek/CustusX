@@ -201,12 +201,13 @@ void RealTimeStreamGraphics::setLookupTable()
   // and inputs [1, -> > is mapped to larger values, not transparent.
   // In order to create a window-level function, manually build a table.
 
-  int N = 1400;
+//  int N = 256;
+//  int N = 1400;
   //make a default system set lookuptable, grayscale...
   vtkLookupTablePtr lut = vtkLookupTablePtr::New();
-  lut->SetNumberOfTableValues(N);
+  lut->SetNumberOfTableValues(1000); // large enough to give resolution even for ct images.
   //lut->SetTableRange (0, 1024); // the window of the input
-  lut->SetTableRange (0, N-1); // the window of the input
+  lut->SetTableRange (0, 255); // the window of the input - must be reset according to data
   lut->SetSaturationRange (0, 0);
   lut->SetHueRange (0, 0);
   lut->SetValueRange (0, 1);
@@ -251,8 +252,6 @@ void RealTimeStreamGraphics::setRealtimeStream(RTSourcePtr data)
     connect(mData.get(), SIGNAL(newFrame()), this, SLOT(newDataSlot()));
 
     mDataRedirecter->SetInput(mData->getVtkImageData());
-//    mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
-//    mDataRedirecter->GetOutput();
 
     if (!mUseMask) // send data directly to texture, no mask.
     {
@@ -278,6 +277,8 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
   Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
   mPlaneActor->SetUserMatrix(rMu.matrix());
+
+//  mProbeData.test();
 }
 
 void RealTimeStreamGraphics::receiveVisible(bool visible)
@@ -312,20 +313,35 @@ void RealTimeStreamGraphics::newDataSlot()
   if (!mData)
     return;
 
-//  mDataRedirecter->SetInput(mData->getVtkImageData());
-//  mDataRedirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
-//  mDataRedirecter->GetOutput();
-
   mDataRedirecter->GetOutput()->Update();
 //  this->checkDataIntegrity();
 
   // apply a lut only if the input data is monochrome
   int numComp = mDataRedirecter->GetOutput()->GetNumberOfScalarComponents();
   bool is8bit = mDataRedirecter->GetOutput()->GetScalarType()==VTK_UNSIGNED_CHAR;
-  if (numComp==1 && !is8bit)
+//  if (numComp==1 && !is8bit)
+  if (numComp==1)
+  {
+    double srange[2];
+    if (is8bit)
+    {
+      srange[0] = 0;
+      srange[1] = 255;
+    }
+    else
+    {
+      mDataRedirecter->GetOutput()->GetScalarRange(srange);
+    }
+
+//    std::cout << "srange " << srange[0] << " " << srange[1] << std::endl;
+    mTexture->GetLookupTable()->SetRange(srange[0], srange[1]);
     mTexture->MapColorScalarsThroughLookupTableOn();
+  }
   else
+  {
     mTexture->MapColorScalarsThroughLookupTableOff();
+  }
+
 
   // set the planesource where we have no probedata.
   DoubleBoundingBox3D bounds(mDataRedirecter->GetOutput()->GetBounds());
@@ -339,6 +355,7 @@ void RealTimeStreamGraphics::newDataSlot()
   }
 
   bool visible = mData->validData();
+//  std::cout << "RealTimeStreamGraphics::newDataSlot() " << this << " vis=" << visible << std::endl;
   if (mShowInToolSpace)
   {
     visible = visible && mTool && mTool->getVisible();

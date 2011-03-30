@@ -57,8 +57,6 @@ public:
   virtual RegistrationHistoryPtr get_rMpr_History() { return RegistrationHistoryPtr(); } ///< interface to rMpr history.
   virtual ToolPtr getReferenceTool() const = 0; ///< tool used as patient reference
 
-  /** write to file all recorded transforms and timestamps */
-	//virtual void saveTransformsAndTimestamps(QString filePathAndName = "") = 0; replaced with load/save position history
   virtual void savePositionHistory() {}
   virtual void loadPositionHistory() {}
 
@@ -75,14 +73,17 @@ public:
 
 signals:
 	void configured(); ///< system is configured
+	void deconfigured(); ///<
 	void initialized(); ///< system is initialized
 	void uninitialized(); ///< system is uninitialized
 	void trackingStarted(); ///< system starts tracking
 	void trackingStopped(); ///< system stops tracking
+
 	void dominantToolChanged(const QString& uId); ///<signal for change of dominant tool
   void landmarkRemoved(QString uid);
   void landmarkAdded(QString uid);
   void rMprChanged(); ///< emitted when the transformation between patient reference and (data) reference is set
+  void tps(int); ///< the dominant tools tps
 
 protected:
 	ToolManager() {} ///< Empty on purpose
@@ -93,9 +94,6 @@ protected:
 
 /**Shortcut for accessing the toolmanager instance.*/
 ToolManager* toolManager();
-
-//M_r_tool = toolManager->get_M_ref_pat() * currentTool->get_M_pat_tool();
-//rMt = toolManager->get_rMp() * currentTool->get_pMt();
 
 } //namespace ssc
 #endif /* SSCTOOLMANAGER_H_ */

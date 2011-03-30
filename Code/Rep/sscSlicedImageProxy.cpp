@@ -79,9 +79,9 @@ void SlicedImageProxy::setSliceProxy(SliceProxyPtr slicer)
 void SlicedImageProxy::transferFunctionsChangedSlot()
 {
   // needed for view::render() to work properly
-  mWindowLevel->Modified();
   mRedirecter->Modified();
   mRedirecter->Update();
+  mWindowLevel->SetLookupTable(mImage->getLookupTable2D()->getOutputLookupTable());
 }
 
 void SlicedImageProxy::setImage(ImagePtr image)

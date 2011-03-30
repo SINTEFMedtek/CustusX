@@ -60,7 +60,7 @@ public:
 	ImageLUT2DPtr getLookupTable2D();
 
 	void printLandmarks(); //TODO: JUST FOR TESTING
-	DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
+	virtual DoubleBoundingBox3D boundingBox() const; ///< bounding box in image space
 	vtkImageAccumulatePtr getHistogram();///< \return The histogram for the image
 	int getMax();///< \return Max alpha position in the histogram = max key value in map. Use getPosMax() instead to allow for signed volumes.
 	int getMin();///< \return Min alpha position in the histogram = min key value in map Use getPosMin() instead to allow for signed volumes.
