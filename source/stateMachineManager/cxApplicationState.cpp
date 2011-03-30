@@ -15,11 +15,7 @@
 #include <QString>
 #include <QAction>
 #include "sscTypeConversions.h"
-//#include "sscDataManager.h"
 #include "cxRequestEnterStateTransition.h"
-//#include "cxStateMachineManager.h"
-//#include "cxPatientData.h"
-//#include "cxViewManager.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "cxStateMachineManager.h"
@@ -54,7 +50,6 @@ void ApplicationState::onEntry(QEvent * event )
 void ApplicationState::onExit(QEvent * event )
 {
   mActive = false;
-  //std::cout << "Exiting application "<< mName << std::endl;
 };
 
 QString ApplicationState::getUid() const
@@ -89,7 +84,6 @@ QAction* ApplicationState::createAction(QActionGroup* group)
   mAction->setCheckable(true);
   mAction->setChecked(mActive);
   mAction->setData(QVariant(this->getUid()));
-  //this->canEnterSlot();
 
   connect(mAction, SIGNAL(triggered()), this, SLOT(setActionSlot()));
 

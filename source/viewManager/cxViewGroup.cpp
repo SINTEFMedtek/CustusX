@@ -12,7 +12,6 @@
 #include "sscUtilHelpers.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "cxToolManager.h"
 #include "cxViewWrapper2D.h"
@@ -24,30 +23,30 @@ namespace cx
 
 /**Place the global center to the center of the image.
  */
-void Navigation::centerToImage(ssc::ImagePtr image)
+void Navigation::centerToData(ssc::DataPtr image)
 {
   if(!image)
     return;
-  ssc::Vector3D p_r = this->findImageCenter(image);
+  ssc::Vector3D p_r = image->get_rMd().coord(image->boundingBox().center());
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
-
   CameraControl().translateByFocusTo(p_r);
-
   this->centerManualTool(p_r);
 }
 
 /**Place the global center to the mean center of
  * all the images in a view(wrapper).
  */
-void Navigation::centerToView(const std::vector<ssc::ImagePtr>& images)
+void Navigation::centerToView(const std::vector<ssc::DataPtr>& images)
 {
   ssc::Vector3D p_r = findViewCenter(images);
+  std::cout << "center ToView: " << images.size() << " - " << p_r << std::endl;
+
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
-
+  CameraControl().translateByFocusTo(p_r);
   this->centerManualTool(p_r);
 //  std::cout << "Centered to view." << std::endl;
 }
@@ -55,13 +54,16 @@ void Navigation::centerToView(const std::vector<ssc::ImagePtr>& images)
 /**Place the global center to the mean center of
  * all the loaded images.
  */
-void Navigation::centerToGlobalImageCenter()
+void Navigation::centerToGlobalDataCenter()
 {
-  ssc::Vector3D p_r = this->findGlobalImageCenter();
+  if (ssc::dataManager()->getData().empty())
+    return;
+
+  ssc::Vector3D p_r = this->findGlobalDataCenter();
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
-
+  CameraControl().translateByFocusTo(p_r);
   this->centerManualTool(p_r);
 //  std::cout << "Centered to all images." << std::endl;
 }
@@ -77,82 +79,64 @@ void Navigation::centerToTooltip()
 
   // set center to calculated position
   ssc::dataManager()->setCenter(p_r);
-
   CameraControl().translateByFocusTo(p_r);
 }
-/**Find the center of the images, defined as the center
- * of the smallest bounding box enclosing the images.
- */
-ssc::Vector3D Navigation::findImageCenter(ssc::ImagePtr image)
-{
-  if(!image)
-    return ssc::Vector3D();
-  std::vector<ssc::Vector3D> corners_r;
-  ssc::Transform3D rMd = image->get_rMd();
-  ssc::DoubleBoundingBox3D bb = image->boundingBox();
 
-  corners_r.push_back(rMd.coord(bb.corner(0,0,0)));
-  corners_r.push_back(rMd.coord(bb.corner(0,0,1)));
-  corners_r.push_back(rMd.coord(bb.corner(0,1,0)));
-  corners_r.push_back(rMd.coord(bb.corner(0,1,1)));
-  corners_r.push_back(rMd.coord(bb.corner(1,0,0)));
-  corners_r.push_back(rMd.coord(bb.corner(1,0,1)));
-  corners_r.push_back(rMd.coord(bb.corner(1,1,0)));
-  corners_r.push_back(rMd.coord(bb.corner(1,1,1)));
-
-  ssc::Vector3D p_min = corners_r[0];
-  ssc::Vector3D p_max = corners_r[0];
-
-  for (unsigned i=0; i<corners_r.size(); ++i)
-  {
-    for (unsigned j=0; j<3; ++j)
-    {
-      p_min[j] = std::min(p_min[j], corners_r[i][j]);
-      p_max[j] = std::max(p_max[j], corners_r[i][j]);
-    }
-  }
-
-  ssc::Vector3D center_r = (p_min+p_max)/2.0;
-
-  return center_r;
-}
 /**Find the center of all images in the view(wrapper), defined as the mean of
  * all the images center.
  */
-ssc::Vector3D Navigation::findViewCenter(const std::vector<ssc::ImagePtr>& images)
+ssc::Vector3D Navigation::findViewCenter(const std::vector<ssc::DataPtr>& images)
 {
-  ssc::Vector3D center_r;
-  //std::vector<ssc::ImagePtr> images = viewWrapper->getImages();
-  std::vector<ssc::ImagePtr>::const_iterator iter;
-
-  for (iter=images.begin(); iter!=images.end(); ++iter)
-  {
-    center_r += this->findImageCenter(*iter);
-  }
-  center_r = center_r/images.size();
-
-  return center_r;
+  return this->findDataCenter(images);
 }
 
 /**Find the center of all images, defined as the mean of
  * all the images center.
  */
-ssc::Vector3D Navigation::findGlobalImageCenter()
+ssc::Vector3D Navigation::findGlobalDataCenter()
 {
-  ssc::Vector3D p_r(0,0,0);
-  if (ssc::dataManager()->getImages().empty())
-    return p_r;
+  ssc::DataManager::DataMap images = ssc::dataManager()->getData();
+  if (images.empty())
+    return ssc::Vector3D(0,0,0);
 
-  ssc::DataManager::ImagesMap images = ssc::dataManager()->getImages();
-  ssc::DataManager::ImagesMap::iterator iter;
+  ssc::DataManager::DataMap::iterator iter;
+  std::vector<ssc::DataPtr> dataVector;
 
   for (iter=images.begin(); iter!=images.end(); ++iter)
   {
-    p_r += this->findImageCenter(iter->second);
+    dataVector.push_back(iter->second);
   }
-  p_r = p_r/images.size();
+  std::cout << "findGlobalDataCenter() " << dataVector.size() << std::endl;
+  return findDataCenter(dataVector);
+}
 
-  return p_r;
+/**Find the center of the images, defined as the center
+ * of the smallest bounding box enclosing the images.
+ */
+ssc::Vector3D Navigation::findDataCenter(std::vector<ssc::DataPtr> data)
+{
+  if(data.empty())
+    return ssc::Vector3D(0,0,0);
+
+  std::vector<ssc::Vector3D> corners_r;
+
+  for (unsigned i=0; i<data.size(); ++i)
+  {
+    ssc::Transform3D rMd = data[i]->get_rMd();
+    ssc::DoubleBoundingBox3D bb = data[i]->boundingBox();
+
+    corners_r.push_back(rMd.coord(bb.corner(0,0,0)));
+    corners_r.push_back(rMd.coord(bb.corner(0,0,1)));
+    corners_r.push_back(rMd.coord(bb.corner(0,1,0)));
+    corners_r.push_back(rMd.coord(bb.corner(0,1,1)));
+    corners_r.push_back(rMd.coord(bb.corner(1,0,0)));
+    corners_r.push_back(rMd.coord(bb.corner(1,0,1)));
+    corners_r.push_back(rMd.coord(bb.corner(1,1,0)));
+    corners_r.push_back(rMd.coord(bb.corner(1,1,1)));
+  }
+
+  ssc::DoubleBoundingBox3D bb_sigma = ssc::DoubleBoundingBox3D::fromCloud(corners_r);
+  return bb_sigma.center();
 }
 
 void Navigation::centerManualTool(ssc::Vector3D& p_r)

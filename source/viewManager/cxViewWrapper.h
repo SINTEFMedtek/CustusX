@@ -74,6 +74,7 @@ signals:
   void dataRemoved(QString uid);
   void initialized();
   void optionsChanged();
+
 private:
   std::vector<ssc::DataPtr> mData;
   CameraDataPtr mCamera3D;
@@ -121,6 +122,7 @@ protected:
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
   void addDataAction(QString uid, QMenu* contextMenu);
+  QStringList getAllDataNames() const;
 
   ViewGroupDataPtr mViewGroup;
 

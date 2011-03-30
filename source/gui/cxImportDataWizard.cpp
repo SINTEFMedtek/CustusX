@@ -1,10 +1,12 @@
 #include "cxImportDataWizard.h"
 
+#include <cmath>
 #include <QFileDialog>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <Qt>
+#include <QCheckBox>
 #include <QTimer>
 #include "sscLabeledComboBoxWidget.h"
 #include "sscMessageManager.h"
@@ -37,11 +39,17 @@ ImportDataWizard::ImportDataWizard(QString filename, QWidget* parent) :
   mParentFrameCombo = new ssc::LabeledComboBoxWidget(this, mParentFrameAdapter);
   layout->addWidget(mParentFrameCombo);
 
-  mImportTransformButton = new QPushButton("Import Transform from Parent", this);
-  mImportTransformButton->setToolTip("Replace data transform with that of the parent data.");
+  mNiftiFormatCheckBox = new QCheckBox("Use NIfTI-1/ITK-Snap axis definition", this);
+  mNiftiFormatCheckBox->setToolTip("Use X=Left->Right Y=Posterior->Anterior Z=Inferior->Superior, as in ITK-Snap.");
+  mNiftiFormatCheckBox->setChecked(false);
+  mNiftiFormatCheckBox->setEnabled(false);
+  mTransformFromParentFrameCheckBox = new QCheckBox("Import transform from Parent", this);
+  mTransformFromParentFrameCheckBox->setToolTip("Replace data transform with that of the parent data.");
+  mTransformFromParentFrameCheckBox->setChecked(false);
+  layout->addWidget(mNiftiFormatCheckBox);
+  layout->addWidget(mTransformFromParentFrameCheckBox);
+
   connect(mParentFrameAdapter.get(), SIGNAL(changed()), this, SLOT(updateImportTransformButton()));
-  connect(mImportTransformButton, SIGNAL(clicked()), this, SLOT(importTransformSlot()));
-  layout->addWidget(mImportTransformButton);
   this->updateImportTransformButton();
 
   QHBoxLayout* buttons = new QHBoxLayout;
@@ -50,7 +58,9 @@ ImportDataWizard::ImportDataWizard(QString filename, QWidget* parent) :
   buttons->addStretch();
   buttons->addWidget(mOkButton);
   connect(mOkButton, SIGNAL(clicked()), this, SLOT(accept()));
+  connect(this, SIGNAL(accepted()), this, SLOT(acceptedSlot()));
   mOkButton->setDefault(true);
+  mOkButton->setFocus();
 
   ssc::messageManager()->sendInfo("Importing data...");
 }
@@ -84,6 +94,10 @@ void ImportDataWizard::importDataSlot()
   this->setInitialGuessForParentFrame();
   mParentFrameAdapter->setData(mData);
   mParentFrameCombo->setEnabled(ssc::dataManager()->getData().size()>1);
+
+  // enable nifti imiport only for meshes. (as this is the only case we have seen)
+  mNiftiFormatCheckBox->setEnabled(ssc::dataManager()->getMesh(mData->getUid())!=0);
+
 }
 
 
@@ -116,12 +130,41 @@ void ImportDataWizard::updateImportTransformButton()
 {
   ssc::DataPtr parent = ssc::dataManager()->getData(mParentFrameAdapter->getValue());
   bool enabled = bool(parent);
-
-  mImportTransformButton->setEnabled(enabled);
+  mTransformFromParentFrameCheckBox->setEnabled(enabled);
 }
 
-void ImportDataWizard::importTransformSlot()
+void ImportDataWizard::acceptedSlot()
 {
+  this->importParentTransform();
+  this->convertFromNifti1Coordinates();
+}
+
+/** According to
+ * http://www.itksnap.org/pmwiki/pmwiki.php?n=Documentation.ReleaseNotesVersion20 (search NIFTI)
+ * http://niftilib.sourceforge.net/ (FAQ item 14)
+ *
+ * ITK-Snap uses NIfTI coordinates, which have reversed signs on the x and y axis, relative to the DICOM spec.
+ * Solve by rotating Z 180 deg.
+ */
+void ImportDataWizard::convertFromNifti1Coordinates()
+{
+  if (!mNiftiFormatCheckBox->isChecked())
+    return;
+  if(!mData)
+    return;
+  ssc::Transform3D rMd = mData->get_rMd();
+  rMd = rMd * ssc::createTransformRotateZ(M_PI);
+  mData->get_rMd_History()->setRegistration(rMd);
+  ssc::messageManager()->sendInfo("Nifti import: rotated input data " + mData->getName() + " 180* around Z-axis.");
+}
+
+/** Apply the transform from the parent frame to the imported data.
+ *
+ */
+void ImportDataWizard::importParentTransform()
+{
+  if (!mTransformFromParentFrameCheckBox->isChecked())
+    return;
   if(!mData)
     return;
   ssc::DataPtr parent = ssc::dataManager()->getData(mData->getParentFrame());

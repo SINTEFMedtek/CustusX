@@ -8,7 +8,6 @@
 #include "sscDataManager.h"
 #include "sscToolManager.h"
 #include "cxViewManager.h"
-#include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
 
