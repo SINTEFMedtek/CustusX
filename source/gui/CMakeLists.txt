@@ -50,7 +50,7 @@ SET(cxProject_MOC_HDRS
   cxUSAcqusitionWidget.h
   cxSoundSpeedConversionWidget.h
   cxSeansVesselRegistrationWidget.h
-  cxAffineMatrixWidget.h
+  cxTransform3DWidget.h
   cxFilePreviewWidget.h
   cxToolConfigWidget.h
 )
@@ -167,8 +167,8 @@ SET(${LIBNAME}_SRCS
     cxSeansVesselRegistrationWidget.cpp
     cxAudio.h
     cxAudio.cpp
-    cxAffineMatrixWidget.h
-    cxAffineMatrixWidget.cpp
+    cxTransform3DWidget.h
+    cxTransform3DWidget.cpp
     cxFilePreviewWidget.h
     cxFilePreviewWidget.cpp
     cxToolConfigWidget.h

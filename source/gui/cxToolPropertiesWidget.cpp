@@ -195,7 +195,8 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   mToptopLayout->addWidget(manualGroup);
   QVBoxLayout* manualGroupLayout = new QVBoxLayout;
   manualGroup->setLayout(manualGroupLayout);
-  mManualToolWidget = new AffineMatrixWidget(manualGroup);
+  manualGroupLayout->setMargin(0);
+  mManualToolWidget = new Transform3DWidget(manualGroup);
   manualGroupLayout->addWidget(mManualToolWidget);
   connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(manualToolChanged()));
   connect(ToolManager::getInstance()->getManualTool().get(), SIGNAL(toolVisible(bool)), this, SLOT(manualToolChanged()));
@@ -257,6 +258,7 @@ ToolPropertiesWidget::~ToolPropertiesWidget()
 void ToolPropertiesWidget::manualToolChanged()
 {
   mManualGroup->setVisible(ToolManager::getInstance()->getManualTool()->getVisible());
+//  mManualToolWidget->setMatrix(ToolManager::getInstance()->getManualTool()->get_prMt());
   mManualToolWidget->setMatrix(ToolManager::getInstance()->getManualTool()->get_prMt());
 }
 
