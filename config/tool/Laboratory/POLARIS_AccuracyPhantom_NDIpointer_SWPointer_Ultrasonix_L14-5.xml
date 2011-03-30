@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<toolfile type="polaris" reference="yes">../Tools/Lab/AccuracyPhantom_POLARIS</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Shared/NDI-Pointer-8700340_POLARIS</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Lab/SW-Pointer-Broken-07-081-0229_POLARIS</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Shared/L14-5-Probe-03-065-0153_Ultrasonix_POLARIS</toolfile>
+
+</configuration>

@@ -35,7 +35,6 @@
 #include "sscMesh.h"
 #include "sscGeometricRep.h"
 #include "sscDataManager.h"
-#include "cxRepManager.h"
 #include "cxViewManager.h"
 #include "cxView3D.h"
 

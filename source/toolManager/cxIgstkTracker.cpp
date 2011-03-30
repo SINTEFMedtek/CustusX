@@ -1,15 +1,25 @@
-#include "cxTracker.h"
+#include "cxIgstkTracker.h"
 
+#include <QStringList>
 #include "sscMessageManager.h"
-#include "cxTool.h"
 #include "sscTypeConversions.h"
-
+#include "sscEnumConverter.h"
+#include "cxTool.h"
+#include "cxIgstkTool.h"
 #include <time.h>
 
 
 namespace cx
 {
-Tracker::Tracker(InternalStructure internalStructure) :
+QStringList IgstkTracker::getSupportedTrackingSystems()
+{
+  QStringList retval;
+  retval << enum2string(ssc::tsPOLARIS);
+  retval << enum2string(ssc::tsAURORA);
+  return retval;
+}
+
+IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
   mInternalStructure(internalStructure),
   mValid(false),
   mUid(""),
@@ -39,13 +49,13 @@ Tracker::Tracker(InternalStructure internalStructure) :
 
   switch (mInternalStructure.mType)
   {
-  case TRACKER_NONE:
+  case ssc::tsNONE:
     mUid = mName = "None";
     ssc::messageManager()->sendError("Tracker is of type TRACKER_NONE, this means it's not valid.");
     mValid = false;
     return;
     break;
-  case TRACKER_POLARIS:
+  case ssc::tsPOLARIS:
     mUid = mName = "Polaris";
     mTempPolarisTracker = PolarisTrackerType::New();
     mTempPolarisTracker->SetCommunication(mCommunication);
@@ -53,23 +63,24 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mTracker = mTempPolarisTracker.GetPointer();
     mValid = true;
     break;
-  case TRACKER_POLARIS_SPECTRA:
-    mUid = mName = "Polaris Spectra";
-    mTempPolarisTracker = PolarisTrackerType::New();
-    mTempPolarisTracker->SetCommunication(mCommunication);
-    ssc::messageManager()->sendInfo("Tracker is set to Polaris Spectra");
-    mTracker = mTempPolarisTracker.GetPointer();
-    mValid = true;
-    break;
-  case TRACKER_POLARIS_VICRA:
-    mUid = mName = "Polaris Vicra";
-    mTempPolarisTracker = PolarisTrackerType::New();
-    mTempPolarisTracker->SetCommunication(mCommunication);
-    ssc::messageManager()->sendInfo("Tracker is set to Polaris Vicra");
-    mTracker = mTempPolarisTracker.GetPointer();
-    mValid = true;
-    break;
-  case TRACKER_AURORA:
+    //There is no special handling of the tracking system if its spectra or vicra, polaris is polaris as we see it
+//  case ssc::tsPOLARIS_SPECTRA:
+//    mUid = mName = "Polaris Spectra";
+//    mTempPolarisTracker = PolarisTrackerType::New();
+//    mTempPolarisTracker->SetCommunication(mCommunication);
+//    ssc::messageManager()->sendInfo("Tracker is set to Polaris Spectra");
+//    mTracker = mTempPolarisTracker.GetPointer();
+//    mValid = true;
+//    break;
+//  case ssc::tsPOLARIS_VICRA:
+//    mUid = mName = "Polaris Vicra";
+//    mTempPolarisTracker = PolarisTrackerType::New();
+//    mTempPolarisTracker->SetCommunication(mCommunication);
+//    ssc::messageManager()->sendInfo("Tracker is set to Polaris Vicra");
+//    mTracker = mTempPolarisTracker.GetPointer();
+//    mValid = true;
+//    break;
+  case ssc::tsAURORA:
     mUid = mName = "Aurora";
     mTempAuroraTracker = AuroraTrackerType::New();
     mTempAuroraTracker->SetCommunication(mCommunication);
@@ -77,7 +88,7 @@ Tracker::Tracker(InternalStructure internalStructure) :
     mTracker = mTempAuroraTracker.GetPointer();
     mValid = true;
     break;
-  case TRACKER_MICRON:
+  case ssc::tsMICRON:
     mUid = mName = "Micron";
     ssc::messageManager()->sendInfo("Tracker is set to Micron");
     //TODO: implement support for a micron tracker...
@@ -86,60 +97,58 @@ Tracker::Tracker(InternalStructure internalStructure) :
   default:
     break;
   }
-  mTrackerObserver->SetCallbackFunction(this, &Tracker::trackerTransformCallback);
+  mTrackerObserver->SetCallbackFunction(this, &IgstkTracker::trackerTransformCallback);
   mTracker->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   mCommunication->AddObserver(igstk::IGSTKEvent(), mTrackerObserver);
   this->addLogging();
 }
 
-Tracker::~Tracker()
+IgstkTracker::~IgstkTracker()
 {}
 
-Tracker::Type Tracker::getType() const
+ssc::TRACKING_SYSTEM IgstkTracker::getType() const
 {
   return mInternalStructure.mType;
 }
 
-QString Tracker::getName() const
+QString IgstkTracker::getName() const
 {
   return mName;
 }
 
-QString Tracker::getUid() const
+QString IgstkTracker::getUid() const
 {
   return mUid;
 }
 
-Tracker::TrackerType* Tracker::getPointer() const
+IgstkTracker::TrackerType* IgstkTracker::getPointer() const
 {
   return mTracker;
 }
 
-void Tracker::open()
+void IgstkTracker::open()
 {
   igstk::SerialCommunication::ResultType result = igstk::SerialCommunication::FAILURE;
   for(int i=0; i<5; ++i)
   {
     result = mCommunication->OpenCommunication();
-    //std::cout << "Trying to open tracker communication: "<< string_cast(result) << std::endl;
     if(result == igstk::SerialCommunication::SUCCESS)
       break;
   }
   mTracker->RequestOpen();
 }
 
-void Tracker::close()
+void IgstkTracker::close()
 {
   mTracker->RequestClose();
   mCommunication->CloseCommunication();
 }
 
-void Tracker::attachTools(ToolMapPtr tools)
+void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 {
-  std::map<QString, ssc::ToolPtr> toolMap = *tools.get();
-  for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
+  for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
-    ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
+    IgstkToolPtr tool = it->second;
 
     if(tool && tool->getPointer())
     {
@@ -147,7 +156,6 @@ void Tracker::attachTools(ToolMapPtr tools)
         ssc::messageManager()->sendWarning("Tracker is attaching a tool that is not of the correct type. Trackers type: "+qstring_cast(mInternalStructure.mType)+", tools tracker type: "+qstring_cast(tool->getTrackerType()));
 
       tool->getPointer()->RequestAttachToTracker(mTracker);
-      //std::cout << "Attaching tool " << tool->getUid() << "to tracker "<< mTracker->GetNameOfClass() << std::endl;
 
       if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
         mTracker->RequestSetReferenceTool(tool->getPointer());
@@ -155,12 +163,11 @@ void Tracker::attachTools(ToolMapPtr tools)
   }
 }
 
-void Tracker::detachTools(ToolMapPtr tools)
+void IgstkTracker::detachTools(std::map<QString, IgstkToolPtr> tools)
 {
-  std::map<QString, ssc::ToolPtr> toolMap = *tools.get();
-  for(ToolMap::iterator it = toolMap.begin(); it != toolMap.end(); ++it )
+  for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
-    ToolPtr tool = boost::shared_static_cast<Tool>((*it).second);
+    IgstkToolPtr tool = it->second;
 
     if(tool && tool->getPointer())
     {
@@ -169,50 +176,58 @@ void Tracker::detachTools(ToolMapPtr tools)
   }
 }
 
-void Tracker::startTracking()
+void IgstkTracker::startTracking()
 {
   mTracker->RequestStartTracking();
 }
 
-void Tracker::stopTracking()
+void IgstkTracker::stopTracking()
 {
   mTracker->RequestStopTracking();
 }
 
-bool Tracker::isValid() const
+bool IgstkTracker::isValid() const
 {
   return mValid;
 }
 
-void Tracker::trackerTransformCallback(const itk::EventObject &event)
+bool IgstkTracker::isInitialized() const
+{
+  return mInitialized;
+}
+
+bool IgstkTracker::isTracking() const
+{
+  return mTracking;
+}
+
+void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
 {
   //successes
   if (igstk::TrackerOpenEvent().CheckEvent(&event))
   {
-    this->internalInitialized(true);
     this->internalOpen(true);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is open.");
+    this->internalInitialized(true);
   }
   else if (igstk::TrackerCloseEvent().CheckEvent(&event))
   {
-    this->internalInitialized(false);
     this->internalOpen(false);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is closed.");
+    this->internalInitialized(false);
   }
   else if (igstk::TrackerInitializeEvent().CheckEvent(&event))
   {
-    this->internalInitialized(true);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
+    //Never happens???
+    //this->internalInitialized(true);
+    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
+    ssc::messageManager()->sendWarning("This never happens for some reason...  check code");
   }
   else if (igstk::TrackerStartTrackingEvent().CheckEvent(&event))
   {
     this->internalTracking(true);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is tracking.");
   }
   else if (igstk::TrackerStopTrackingEvent().CheckEvent(&event))
   {
     this->internalTracking(false);
-    ssc::messageManager()->sendInfo("Tracker: "+mUid+" is stopping.");
   }
   else if (igstk::TrackerUpdateStatusEvent().CheckEvent(&event))
   {
@@ -226,7 +241,7 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
   else if (igstk::CompletedEvent().CheckEvent(&event))
   {
     // this seems to appear after every transmit (several times/second)
-    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly.");
+    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly."); //SPAM
   }
   //failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
@@ -276,7 +291,7 @@ void Tracker::trackerTransformCallback(const itk::EventObject &event)
   }
 }
 
-void Tracker::addLogging()
+void IgstkTracker::addLogging()
 {
   std::ofstream* loggerFile = new std::ofstream();
   QString logFile = mInternalStructure.mLoggingFolderName + "Tracker_Logging.txt";
@@ -291,28 +306,33 @@ void Tracker::addLogging()
   mCommunication->SetLogger(mTrackerLogger);
 }
 
-void Tracker::internalOpen(bool value)
+void IgstkTracker::internalOpen(bool value)
 {
   if(mOpen == value)
     return;
   mOpen = value;
+
+  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "open" : "closed")+".");
   emit open(mOpen);
 }
 
-void Tracker::internalInitialized(bool value)
+void IgstkTracker::internalInitialized(bool value)
 {
   if(mInitialized == value)
     return;
   mInitialized = value;
+
+  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "" : "un")+"initialized.");
   emit initialized(mInitialized);
 }
 
-void Tracker::internalTracking(bool value)
+void IgstkTracker::internalTracking(bool value)
 {
   if(mTracking == value)
     return;
   mTracking = value;
-  emit tracking(mTracking);
 
+  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "" : "not ")+"tracking.");
+  emit tracking(mTracking);
 }
 }//namespace cx

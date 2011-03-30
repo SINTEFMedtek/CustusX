@@ -1,5 +1,5 @@
-#ifndef CXTRACKER_H_
-#define CXTRACKER_H_
+#ifndef CXIGSTKTRACKER_H_
+#define CXIGSTKTRACKER_H_
 
 #include <QObject>
 
@@ -16,12 +16,17 @@
   #include "igstkSerialCommunicationForPosix.h"
 #endif
 #include "sscTool.h"
+#include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
 
 namespace cx
 {
 typedef std::map<QString, ssc::ToolPtr> ToolMap;
 typedef boost::shared_ptr<ToolMap> ToolMapPtr;
+
+class IgstkTool;
+typedef boost::shared_ptr<IgstkTool> IgstkToolPtr;
+typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 
 /**
  * \class Tracker
@@ -31,10 +36,12 @@ typedef boost::shared_ptr<ToolMap> ToolMapPtr;
  * \date Nov 7, 2008
  * \author: Janne Beate Bakeng, SINTEF
  */
-class Tracker : public QObject
+class IgstkTracker : public QObject
 {
   Q_OBJECT
 public:
+  static QStringList getSupportedTrackingSystems();
+
   #ifdef WIN32
   /** The type of serial communication used on a windows platform.*/
     typedef igstk::SerialCommunicationForWindows CommunicationType;
@@ -46,7 +53,7 @@ public:
   typedef igstk::PolarisTracker PolarisTrackerType;
   typedef igstk::AuroraTracker AuroraTrackerType;
 
-  enum Type
+  /*enum Type
   {
     TRACKER_NONE,             ///< Not specified
     TRACKER_POLARIS,          ///< NDIs Polaris tracker
@@ -54,7 +61,7 @@ public:
     TRACKER_POLARIS_VICRA,    ///< NDIs Polaris Vicra tracker
     TRACKER_AURORA,           ///< NDIs Aurora tracker
     TRACKER_MICRON            ///< Claron Technologys Micron tracker
-  };
+  };*/
 
   /*only used for documentation purposes
     TRACKER_INVALID_REQUEST,                    ///< internal state machine didn't accept the request
@@ -72,27 +79,29 @@ public:
   /**A trackers internal structure \warning make sure you set all the members to an appropriate value.*/
   struct InternalStructure
   {
-    Type            mType;              ///< the trackers type
-    QString     mLoggingFolderName; ///< path to where log should be saved
+    ssc::TRACKING_SYSTEM            mType;              ///< the trackers type
+    QString                         mLoggingFolderName; ///< path to where log should be saved
     InternalStructure() :
-      mType(TRACKER_NONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
+      mType(ssc::tsNONE), mLoggingFolderName("") {}; ///< set default values for the internal structure
   };
 
-  Tracker(InternalStructure internalStructure);
-  ~Tracker();
+  IgstkTracker(InternalStructure internalStructure);
+  ~IgstkTracker();
 
-  Type getType() const;               ///< returns the trackers type
+  ssc::TRACKING_SYSTEM getType() const;               ///< returns the trackers type
   QString getName() const;            ///< get the trackers name
   QString getUid() const;             ///< get the tracker unique id
   TrackerType* getPointer() const;    ///< return a pointer to the internal tracker base
   void open();                        ///< open the tracker for communication
   void close();                       ///< close the
-  void attachTools(ToolMapPtr tools); ///< attach a list of tools to the tracker hw
-  void detachTools(ToolMapPtr tools); ///< detach the list of tools from the tracker hw
+  void attachTools(std::map<QString, IgstkToolPtr> tools); ///< attach a list of tools to the tracker hw
+  void detachTools(std::map<QString, IgstkToolPtr> tools); ///< detach the list of tools from the tracker hw
   void startTracking();               ///< start tracking
   void stopTracking();                ///< stop tracking
 
   bool isValid() const;               ///< whether this tracker is constructed correctly or not
+  bool isInitialized() const;
+  bool isTracking() const;
 
 signals:
   void initialized(bool);
@@ -100,9 +109,9 @@ signals:
   void tracking(bool);
 
 protected:
-  typedef itk::ReceptorMemberCommand<Tracker> ObserverType;
+  typedef itk::ReceptorMemberCommand<IgstkTracker> ObserverType;
 
-  Tracker(){}; ///< do not use this one
+  IgstkTracker(){}; ///< do not use this one
   void trackerTransformCallback(const itk::EventObject &eventVar); ///< callback receiving events from the observer
   void addLogging(); ///< adds logging to the internal igstk components
 
@@ -110,11 +119,11 @@ protected:
   void internalInitialized(bool value);
   void internalTracking(bool value);
 
-  InternalStructure mInternalStructure; ///< the trackers type
-  bool mValid;                          ///< whether this tracker is constructed correctly or not
-  QString       mUid;               ///< the trackers unique id
-  QString       mName;              ///< the trackers name
-  TrackerType*      mTracker;           ///< pointer to the base class of the internal igstk tracker
+  InternalStructure                 mInternalStructure;     ///< the trackers type
+  bool                              mValid;                 ///< whether this tracker is constructed correctly or not
+  QString                           mUid;                   ///< the trackers unique id
+  QString                           mName;                  ///< the trackers name
+  TrackerType*                      mTracker;               ///< pointer to the base class of the internal igstk tracker
 
   PolarisTrackerType::Pointer       mTempPolarisTracker;    ///< pointer to a temp polaris tracker
   AuroraTrackerType::Pointer        mTempAuroraTracker;     ///< pointer to a temp aurora tracker
@@ -127,7 +136,8 @@ protected:
   bool mInitialized;  ///< whether or not the tracker is initialized
   bool mTracking;     ///< whether or not the tracker is tracking
 };
-typedef boost::shared_ptr<Tracker> TrackerPtr;
+typedef boost::shared_ptr<IgstkTracker> TrackerPtr;
+typedef boost::weak_ptr<IgstkTracker> TrackerWeakPtr;
 }//namespace cx
 
-#endif /* CXTRACKER_H_ */
+#endif /* CXIGSTKTRACKER_H_ */

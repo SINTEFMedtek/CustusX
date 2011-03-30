@@ -5,14 +5,16 @@
 #include <QFileInfo>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "sscEnumConverter.h"
+#include "cxDataLocations.h"
 
 namespace cx
 {
+//----------------------------------------------------------------------------------------------------------------------
 ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder) :
       mLoggingFolder(loggingFolder), mTrackerTag("tracker"),
-      mTrackerTypeTag("type"), mToolfileTag("toolfile"), mToolTag("tool"),
-      mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
-      mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
+      mToolfileTag("toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
+      mToolClinicalAppTag("clinical_app"),mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
       mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
       mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
       mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
@@ -43,12 +45,11 @@ ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QSt
 ToolConfigurationParser::~ToolConfigurationParser()
 {}
 
-TrackerPtr ToolConfigurationParser::getTracker()
+IgstkTracker::InternalStructure ToolConfigurationParser::getTracker()
 {
   QList<QDomNode> trackerNodeList = this->getTrackerNodeList();
 
-  std::vector<TrackerPtr> trackers;
-  Tracker::InternalStructure internalStructure;
+  IgstkTracker::InternalStructure internalStructure;
   for (int i = 0; i < trackerNodeList.count(); i++)
   {
     QString iString = "" + i;
@@ -64,47 +65,35 @@ TrackerPtr ToolConfigurationParser::getTracker()
     {
       if (text.contains("spectra", Qt::CaseInsensitive))
       {
-        internalStructure.mType = Tracker::TRACKER_POLARIS_SPECTRA;
+        internalStructure.mType = ssc::tsPOLARIS_SPECTRA;
       } else if (text.contains("vicra", Qt::CaseInsensitive))
       {
-        internalStructure.mType = Tracker::TRACKER_POLARIS_VICRA;
+        internalStructure.mType = ssc::tsPOLARIS_VICRA;
       } else
       {
-        internalStructure.mType = Tracker::TRACKER_POLARIS;
+        internalStructure.mType = ssc::tsPOLARIS;
       }
     } else if (text.contains("aurora", Qt::CaseInsensitive))
     {
-      internalStructure.mType = Tracker::TRACKER_AURORA;
+      internalStructure.mType = ssc::tsAURORA;
     } else if (text.contains("micron", Qt::CaseInsensitive))
     {
-      internalStructure.mType = Tracker::TRACKER_MICRON;
+      internalStructure.mType = ssc::tsMICRON;
     } else
     {
-      internalStructure.mType = Tracker::TRACKER_NONE;
+      internalStructure.mType = ssc::tsNONE;
     }
     internalStructure.mLoggingFolderName = this->getLoggingFolder();
-
-    TrackerPtr tracker(new Tracker(internalStructure));
-    if(tracker->isValid())
-      trackers.push_back(tracker);
   }
-
-  if (trackers.empty())
-  {
-    internalStructure.mType = Tracker::TRACKER_NONE;
-    internalStructure.mLoggingFolderName = this->getLoggingFolder();
-    trackers.push_back(TrackerPtr(new Tracker(internalStructure)));
-  }
-
-  return trackers.at(0);
+  return internalStructure;
 }
 
-ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
+std::vector<Tool::InternalStructure> ToolConfigurationParser::getConfiguredTools()
 {
   std::vector<QString> toolFolderAbsolutePaths;
   QList<QDomNode> toolNodeList = this->getToolNodeList(toolFolderAbsolutePaths);
 
-  ssc::ToolManager::ToolMapPtr tools(new ssc::ToolManager::ToolMap());
+  std::vector<Tool::InternalStructure> tools;
   for (int i = 0; i < toolNodeList.size(); i++)
   {
     Tool::InternalStructure internalStructure;
@@ -140,13 +129,26 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     QString toolNameText = toolNameElement.text();
     internalStructure.mName = toolNameText;
 
+    QDomElement toolClinicalAppElement = toolNode.firstChildElement(mToolClinicalAppTag);
+    QString toolClinicalAppText = toolClinicalAppElement.text();
+    QStringList applicationList = toolClinicalAppText.split(" ");
+    foreach(QString string, applicationList)
+    {
+      if(string.isEmpty())
+        continue;
+      string = string.toLower();
+      ssc::MEDICAL_DOMAIN domain = string2enum<ssc::MEDICAL_DOMAIN>(string);
+      if(domain != ssc::mdCOUNT)
+        internalStructure.mMedicalDomains.push_back(domain);
+      else
+        ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid.");
+    }
+
     QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
     QString toolGeofileText = toolGeofileElement.text();
     if (!toolGeofileText.isEmpty())
-      //toolGeofileText = QString(mConfigurationPath.c_str()) + toolGeofileText;
       toolGeofileText = toolFolderAbsolutePaths.at(i) + toolGeofileText;
     internalStructure.mGraphicsFileName = toolGeofileText;
-
     QDomElement toolInstrumentElement = toolNode.firstChildElement(mInstrumentTag);
     if (toolInstrumentElement.isNull())
     {
@@ -175,23 +177,23 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     {
       if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
       {
-        internalStructure.mTrackerType = Tracker::TRACKER_POLARIS_SPECTRA;
+        internalStructure.mTrackerType = ssc::tsPOLARIS_SPECTRA;
       } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
       {
-        internalStructure.mTrackerType = Tracker::TRACKER_POLARIS_VICRA;
+        internalStructure.mTrackerType = ssc::tsPOLARIS_VICRA;
       } else
       {
-        internalStructure.mTrackerType = Tracker::TRACKER_POLARIS;
+        internalStructure.mTrackerType = ssc::tsPOLARIS;
       }
     } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
     {
-      internalStructure.mTrackerType = Tracker::TRACKER_AURORA;
+      internalStructure.mTrackerType = ssc::tsAURORA;
     } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
     {
-      internalStructure.mTrackerType = Tracker::TRACKER_MICRON;
+      internalStructure.mTrackerType = ssc::tsMICRON;
     } else
     {
-      internalStructure.mTrackerType = Tracker::TRACKER_NONE;
+      internalStructure.mTrackerType = ssc::tsNONE;
     }
 
     QDomElement toolSensorWirelessElement =
@@ -220,7 +222,6 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
     internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
 
     QDomNodeList toolSensorReferencePointList = toolSensorElement.elementsByTagName(mToolSensorReferencePointTag);
-    //std::cout << "Found " << string_cast(toolSensorReferencePointList.count()) << " reference points." << std::endl;
     for (int j = 0; j < toolSensorReferencePointList.count(); j++)
     {
       QDomNode node = toolSensorReferencePointList.item(j);
@@ -238,9 +239,7 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
       }
       QString toolSensorReferencePointText = node.toElement().text();
       ssc::Vector3D vector = ssc::Vector3D::fromString(toolSensorReferencePointText);
-      //std::cout << "Tool: "<< internalStructure.mName <<": Reference point with id "<<id<<" has coords " << string_cast(vector) << std::endl;
       internalStructure.mReferencePoints[id] = vector;
-      //std::cout << "map size: " << string_cast(internalStructure.mReferencePoints.size()) << std::endl;
     }
 
     QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
@@ -256,27 +255,25 @@ ssc::ToolManager::ToolMapPtr ToolConfigurationParser::getConfiguredTools()
           "Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
       continue;
     }
-    QDomElement toolCalibrationFileElement =
-        toolCalibrationElement.firstChildElement(mToolCalibrationFileTag);
+    QDomElement toolCalibrationFileElement = toolCalibrationElement.firstChildElement(mToolCalibrationFileTag);
     QString toolCalibrationFileText = toolCalibrationFileElement.text();
     if (!toolCalibrationFileText.isEmpty())
       toolCalibrationFileText = toolFolderAbsolutePaths.at(i) + toolCalibrationFileText;
     internalStructure.mCalibrationFilename = toolCalibrationFileText;
+    internalStructure.mCalibration = this->readCalibrationFile(internalStructure.mCalibrationFilename);
 
     internalStructure.mTransformSaveFileName = mLoggingFolder;
     internalStructure.mLoggingFolderName = mLoggingFolder;
-
-    Tool* cxTool = new Tool(internalStructure);
-    if(cxTool->isValid())
-    {
-      ssc::ToolPtr tool(cxTool);
-      (*tools)[tool->getUid()] = tool;
-    } else
-    {
-     ssc::messageManager()->sendWarning("Tool: "+internalStructure.mUid+" is not valid.");
-    }
+    tools.push_back(internalStructure);
   }
   return tools;
+}
+
+QString ToolConfigurationParser::getUserManual() const
+{
+  QString retval;
+
+  return retval;
 }
 
 QString ToolConfigurationParser::getLoggingFolder() const
@@ -306,16 +303,23 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
   QDomNodeList toolFileList = mConfigureDoc.elementsByTagName(mToolfileTag);
   for (int i = 0; i < toolFileList.count(); i++)
   {
-    const QString toolFilename = toolFileList.item(i).firstChild().nodeValue();
+    QString toolFilename = toolFileList.item(i).firstChild().nodeValue();
+
+    //check if path is file or folder
+    QString filepath = mConfigurationPath+toolFilename; //absolute path to tool file or folder
+    QFileInfo toolFileInfo(filepath);
+    if(toolFileInfo.isDir())
+    {
+      QString name = toolFileInfo.fileName();
+      filepath += "/"+name.append(".xml");
+    }
+
     if(toolFilename.isEmpty())
     {
       ssc::messageManager()->sendError("A toolfile tag in the config xml file is not correctly formated. Skipping it.");
       continue;
     }
 
-    QDir dir(mConfigurationPath);
-
-    const QString filepath = dir.absoluteFilePath(toolFilename);
     QFile toolFile(filepath);
     if (!toolFile.exists())
     {
@@ -336,5 +340,510 @@ QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& t
   }
   return toolNodeList;
 }
+
+igstk::Transform ToolConfigurationParser::readCalibrationFile(QString filename)
+{
+  igstk::Transform retval;
+
+  itk::Matrix<double, 3, 3> calMatrix;
+  itk::Versor<double> rotation;
+  itk::Vector<double, 3> translation;
+
+  /* File must be in the form
+   * rot_00 rot_01 rot_02 trans_0
+   * rot_10 rot_11 rot_12 trans_1
+   * rot_20 rot_21 rot_22 trans_2
+   */
+  std::ifstream inputStream;
+  inputStream.open(cstring_cast(filename));
+  if(inputStream.is_open())
+  {
+    std::string line;
+    int lineNumber = 0;
+    while(!inputStream.eof() && lineNumber<3)
+    {
+      getline(inputStream, line);
+
+      for(int i = 0; i<4; i++)
+      {
+        //Tolerating more than one blank space between numbers
+        while(line.find(" ") == 0)
+        {
+          line.erase(0,1);
+        }
+        std::string::size_type pos = line.find(" ");
+        std::string str;
+        if(pos != std::string::npos)
+        {
+          str = line.substr(0, pos);
+        }
+        else
+        {
+          str = line;
+        }
+        double d = atof(str.c_str());
+        if(i<3)
+        {
+          calMatrix(lineNumber, i) = d;
+        }
+        if(i == 3)
+        {
+          translation.SetElement(lineNumber, d);
+        }
+        line.erase(0, pos);
+      }
+      lineNumber++;
+    }
+    rotation.Set(calMatrix);
+    retval.SetTranslationAndRotation(translation, rotation, 1.0, igstk::TimeStamp::GetLongestPossibleTime());
+  }
+  inputStream.close();
+  return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+
+ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath) :
+    mConfigurationFilePath(absoluteConfigFilePath),
+    mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile")
+{
+  this->setConfigDocument(mConfigurationFilePath);
+}
+
+ConfigurationFileParser::~ConfigurationFileParser()
+{}
+
+std::vector<ssc::MEDICAL_DOMAIN> ConfigurationFileParser::getApplicationDomains()
+{
+  std::vector<ssc::MEDICAL_DOMAIN> retval;
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
+  QString applicationDomain = configNode.toElement().attribute("clinical_app");
+  QStringList domains = applicationDomain.split(" ");
+  foreach(QString domain, domains)
+  {
+    retval.push_back(string2enum<ssc::MEDICAL_DOMAIN>(domain));
+  }
+//  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
+
+  return retval;
+}
+
+std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTrackers()
+{
+  std::vector<IgstkTracker::InternalStructure> retval;
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QDomNodeList trackerNodes = mConfigureDoc.elementsByTagName(mConfigTrackerTag);
+  for(int i=0; i < trackerNodes.count(); ++i)
+  {
+    IgstkTracker::InternalStructure internalStructure;
+    QString trackerType = trackerNodes.at(i).toElement().attribute("type");
+    internalStructure.mType = string2enum<ssc::TRACKING_SYSTEM>(trackerType);
+    internalStructure.mLoggingFolderName = ""; //TODO
+
+//    std::cout << "In configfile " << mConfigurationFilePath << " found tracker type " << enum2string(internalStructure.mType) << std::endl;
+    retval.push_back(internalStructure);
+  }
+  return retval;
+}
+
+std::vector<QString> ConfigurationFileParser::getAbsoluteToolFilePaths()
+{
+  std::vector<QString> retval;
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
+  for(int i=0; i < toolFileNodes.count(); ++i)
+  {
+    QString absoluteToolFilePath = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
+    if(absoluteToolFilePath.isEmpty())
+      continue;
+
+    retval.push_back(absoluteToolFilePath);
+  }
+
+  return retval;
+}
+
+QString ConfigurationFileParser::getAbsoluteReferenceFilePath()
+{
+  QString retval;
+
+  if(!this->isConfigFileValid())
+    return retval;
+
+  QFile configFile(mConfigurationFilePath);
+  QString configFolderAbsolutePath = QFileInfo(configFile).dir().absolutePath()+"/";
+
+  QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
+  for(int i=0; i < toolFileNodes.count(); ++i)
+  {
+    QString reference = toolFileNodes.at(i).toElement().attribute("reference");
+    if(reference.contains("yes", Qt::CaseInsensitive))
+      retval = this->getAbsoluteToolFilePath(toolFileNodes.at(i).toElement());
+  }
+  return retval;
+}
+
+QString ConfigurationFileParser::getTemplatesAbsoluteFilePath()
+{
+  QString retval = DataLocations::getRootConfigPath()+"/tool/TEMPLATE_configuration.xml";
+  return retval;
+}
+
+void ConfigurationFileParser::saveConfiguration()
+{
+  //TODO
+}
+
+void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
+{
+  QFile configFile(configAbsoluteFilePath);
+  if(!configFile.exists())
+  {
+    ssc::messageManager()->sendDebug("Configfile "+configAbsoluteFilePath+" does not exist.");
+    return;
+  }
+
+  if(!mConfigureDoc.setContent(&configFile))
+  {
+    ssc::messageManager()->sendError("Could not set the xml content of the config file "+configAbsoluteFilePath);
+    return;
+  }
+}
+
+bool ConfigurationFileParser::isConfigFileValid()
+{
+  //there can only be one config defined in every config.xml-file, that's why we say ...item(0)
+  QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).item(0);
+  if(configNode.isNull())
+  {
+    //ssc::messageManager()->sendDebug("Configuration file \""+mConfigurationFilePath+"\" does not contain the tag <"+mConfigTag+">.");
+    return false;
+  }
+  return true;
+}
+
+QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileelement)
+{
+  QString absoluteToolFilePath;
+
+  QFile configFile(mConfigurationFilePath);
+  QDir configDir = QFileInfo(configFile).dir();
+
+  QString relativeToolFilePath = toolfileelement.text();
+  if(relativeToolFilePath.isEmpty())
+    return absoluteToolFilePath;
+
+  configDir.cd(relativeToolFilePath);
+//  QFile file((configDir.absolutePath()+"/"+relativeToolFilePath));
+  QFile file(configDir.absolutePath());
+  if(!file.exists())
+  {
+    ssc::messageManager()->sendError("Tool file "+file.fileName()+" in configuration "+mConfigurationFilePath+" does not exists. Skipping.");
+  }
+  QFileInfo info(file);
+  if(info.isDir())
+  {
+    QDir dir(info.absoluteFilePath());
+    QStringList filter;
+    filter << dir.dirName()+".xml";
+    QStringList filepaths = dir.entryList(filter);
+    if(!filepaths.isEmpty())
+      absoluteToolFilePath = dir.absoluteFilePath(filter[0]);
+  }
+  else
+    absoluteToolFilePath = info.absoluteFilePath();
+
+//  std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
+  return absoluteToolFilePath;
+}
+//----------------------------------------------------------------------------------------------------------------------
+
+ToolFileParser::ToolFileParser(QString absoluteToolFilePath) :
+    mToolFilePath(absoluteToolFilePath),
+    mToolfileTag("toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
+    mToolClinicalAppTag("clinical_app"),mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
+    mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
+    mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
+    mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
+    mToolSensorRomFileTag("rom_file"), mToolCalibrationTag("calibration"),
+    mToolCalibrationFileTag("cal_file"),
+    mInstrumentTag("instrument"), mInstrumentIdTag("id"), mInstrumentScannerIdTag("scannerid")
+{}
+
+ToolFileParser::~ToolFileParser()
+{}
+
+Tool::InternalStructure ToolFileParser::getTool()
+{
+  Tool::InternalStructure retval;
+
+  QFile toolFile(mToolFilePath);
+  QString toolFolderAbsolutePath = QFileInfo(toolFile).dir().absolutePath()+"/";
+  QDomNode toolNode = this->getToolNode(mToolFilePath);
+    Tool::InternalStructure internalStructure;
+    if (toolNode.isNull())
+    {
+      ssc::messageManager()->sendInfo("Could not read the <tool> tag of file: "+mToolFilePath+", this is not a tool file, skipping.");
+      return retval;
+    }
+
+    QDomElement toolTypeElement = toolNode.firstChildElement(mToolTypeTag);
+    QString toolTypeText = toolTypeElement.text();
+    if (toolTypeText.contains("reference", Qt::CaseInsensitive))
+    {
+      internalStructure.mType = ssc::Tool::TOOL_REFERENCE;
+    } else if (toolTypeText.contains("pointer", Qt::CaseInsensitive))
+    {
+      internalStructure.mType = ssc::Tool::TOOL_POINTER;
+    } else if (toolTypeText.contains("usprobe", Qt::CaseInsensitive))
+    {
+      internalStructure.mType = ssc::Tool::TOOL_US_PROBE;
+    } else
+    {
+      internalStructure.mType = ssc::Tool::TOOL_NONE;
+    }
+
+    QDomElement toolIdElement = toolNode.firstChildElement(mToolIdTag);
+    QString toolIdText = toolIdElement.text();
+    internalStructure.mUid = toolIdText;
+
+    QDomElement toolNameElement = toolNode.firstChildElement(mToolNameTag);
+    QString toolNameText = toolNameElement.text();
+    internalStructure.mName = toolNameText;
+
+    QDomElement toolClinicalAppElement = toolNode.firstChildElement(mToolClinicalAppTag);
+    QString toolClinicalAppText = toolClinicalAppElement.text();
+    QStringList applicationList = toolClinicalAppText.split(" ");
+    foreach(QString string, applicationList)
+    {
+      if(string.isEmpty())
+        continue;
+      string = string.toLower();
+      ssc::MEDICAL_DOMAIN domain = string2enum<ssc::MEDICAL_DOMAIN>(string);
+      if(domain != ssc::mdCOUNT)
+        internalStructure.mMedicalDomains.push_back(domain);
+      else
+        ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid in tool "+mToolFilePath);
+    }
+
+    QDomElement toolGeofileElement = toolNode.firstChildElement(mToolGeoFileTag);
+    QString toolGeofileText = toolGeofileElement.text();
+    if (!toolGeofileText.isEmpty())
+      toolGeofileText = toolFolderAbsolutePath + toolGeofileText;
+    internalStructure.mGraphicsFileName = toolGeofileText;
+    QDomElement toolInstrumentElement = toolNode.firstChildElement(mInstrumentTag);
+    if (toolInstrumentElement.isNull())
+    {
+      ssc::messageManager()->sendError("Could not find the <instrument> tag under the <tool> tag. Aborting this tool.");
+      return retval;
+    }
+    QDomElement toolInstrumentIdElement =
+        toolInstrumentElement.firstChildElement(mInstrumentIdTag);
+    QString toolInstrumentIdText = toolInstrumentIdElement.text();
+    internalStructure.mInstrumentId = toolInstrumentIdText;
+
+    QDomElement toolInstrumentScannerIdElement =
+        toolInstrumentElement.firstChildElement(mInstrumentScannerIdTag);
+    QString toolInstrumentScannerIdText = toolInstrumentScannerIdElement.text();
+    internalStructure.mInstrumentScannerId = toolInstrumentScannerIdText;
+
+    QDomElement toolSensorElement = toolNode.firstChildElement(mToolSensorTag);
+    if (toolSensorElement.isNull())
+    {
+      ssc::messageManager()->sendError("Could not find the <sensor> tag under the <tool> tag. Aborting this tool.");
+      return retval;
+    }
+    QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
+    QString toolSensorTypeText = toolSensorTypeElement.text();
+    internalStructure.mTrackerType = string2enum<ssc::TRACKING_SYSTEM>(toolSensorTypeText);
+
+//    std::cout << "Found tracker type " << enum2string(internalStructure.mTrackerType) << " for tool " << internalStructure.mUid << std::endl;
+
+    //    if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
+//    {
+//      if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
+//      {
+//        internalStructure.mTrackerType = ssc::tsPOLARIS_SPECTRA;
+//      } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
+//      {
+//        internalStructure.mTrackerType = ssc::tsPOLARIS_VICRA;
+//      } else
+//      {
+//        internalStructure.mTrackerType = ssc::tsPOLARIS;
+//      }
+//    } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mTrackerType = ssc::tsAURORA;
+//    } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
+//    {
+//      internalStructure.mTrackerType = ssc::tsMICRON;
+//    } else
+//    {
+//      internalStructure.mTrackerType = ssc::tsNONE;
+//    }
+
+    QDomElement toolSensorWirelessElement =
+        toolSensorElement.firstChildElement(mToolSensorWirelessTag);
+    QString toolSensorWirelessText = toolSensorWirelessElement.text();
+    if (toolSensorWirelessText.contains("yes", Qt::CaseInsensitive))
+      internalStructure.mWireless = true;
+    else if (toolSensorWirelessText.contains("no", Qt::CaseInsensitive))
+      internalStructure.mWireless = false;
+
+    QDomElement toolSensorDOFElement = toolSensorElement.firstChildElement(mToolSensorDOFTag);
+    QString toolSensorDOFText = toolSensorDOFElement.text();
+    if (toolSensorDOFText.contains("5", Qt::CaseInsensitive))
+      internalStructure.m5DOF = true;
+    else if (toolSensorDOFText.contains("6", Qt::CaseInsensitive))
+      internalStructure.m5DOF = false;
+
+    QDomElement toolSensorPortnumberElement =
+        toolSensorElement.firstChildElement(mToolSensorPortnumberTag);
+    QString toolSensorPortnumberText = toolSensorPortnumberElement.text();
+    internalStructure.mPortNumber = toolSensorPortnumberText.toInt();
+
+    QDomElement toolSensorChannelnumberElement =
+        toolSensorElement.firstChildElement(mToolSensorChannelnumberTag);
+    QString toolSensorChannelnumberText = toolSensorChannelnumberElement.text();
+    internalStructure.mChannelNumber = toolSensorChannelnumberText.toInt();
+
+    QDomNodeList toolSensorReferencePointList = toolSensorElement.elementsByTagName(mToolSensorReferencePointTag);
+    for (int j = 0; j < toolSensorReferencePointList.count(); j++)
+    {
+      QDomNode node = toolSensorReferencePointList.item(j);
+      if(!node.hasAttributes())
+      {
+        ssc::messageManager()->sendWarning("Found reference point without id attribute. Skipping.");
+        continue;
+      }
+      bool ok;
+      int id = node.toElement().attribute("id").toInt(&ok);
+      if(!ok)
+      {
+        ssc::messageManager()->sendWarning("Attribute id of a reference point was not an int. Skipping.");
+        continue;
+      }
+      QString toolSensorReferencePointText = node.toElement().text();
+      ssc::Vector3D vector = ssc::Vector3D::fromString(toolSensorReferencePointText);
+      internalStructure.mReferencePoints[id] = vector;
+    }
+
+    QDomElement toolSensorRomFileElement = toolSensorElement.firstChildElement(mToolSensorRomFileTag);
+    QString toolSensorRomFileText = toolSensorRomFileElement.text();
+    if (!toolSensorRomFileText.isEmpty())
+      toolSensorRomFileText = toolFolderAbsolutePath + toolSensorRomFileText;
+    internalStructure.mSROMFilename = toolSensorRomFileText;
+
+    QDomElement toolCalibrationElement = toolNode.firstChildElement(mToolCalibrationTag);
+    if (toolCalibrationElement.isNull())
+    {
+      ssc::messageManager()->sendError("Could not find the <calibration> tag under the <tool> tag. Aborting this tool.");
+      return retval;
+    }
+    QDomElement toolCalibrationFileElement = toolCalibrationElement.firstChildElement(mToolCalibrationFileTag);
+    QString toolCalibrationFileText = toolCalibrationFileElement.text();
+    if (!toolCalibrationFileText.isEmpty())
+      toolCalibrationFileText = toolFolderAbsolutePath + toolCalibrationFileText;
+    internalStructure.mCalibrationFilename = toolCalibrationFileText;
+    internalStructure.mCalibration = this->readCalibrationFile(internalStructure.mCalibrationFilename);
+
+    internalStructure.mTransformSaveFileName = ""; //TODO
+    internalStructure.mLoggingFolderName = ""; //TODO
+    retval = internalStructure;
+
+  return retval;
+}
+
+QDomNode ToolFileParser::getToolNode(QString toolAbsoluteFilePath)
+{
+  QDomNode retval;
+  QFile toolFile(toolAbsoluteFilePath);
+  if (!mToolDoc.setContent(&toolFile))
+  {
+    ssc::messageManager()->sendError("Could not set the xml content of the tool file "+toolAbsoluteFilePath);
+    return retval;
+  }
+  //there can only be one tool defined in every tool.xml-file, that's why we say ...item(0)
+  retval = mToolDoc.elementsByTagName(mToolTag).item(0);
+  return retval;
+}
+
+QString ToolFileParser::getTemplatesAbsoluteFilePath()
+{
+  QString retval = DataLocations::getRootConfigPath()+"/tool/TEMPLATE_tool.xml";
+  return retval;
+}
+
+igstk::Transform ToolFileParser::readCalibrationFile(QString absoluteFilePath)
+{
+  igstk::Transform retval;
+
+  itk::Matrix<double, 3, 3> calMatrix;
+  itk::Versor<double> rotation;
+  itk::Vector<double, 3> translation;
+
+  /* File must be in the form
+   * rot_00 rot_01 rot_02 trans_0
+   * rot_10 rot_11 rot_12 trans_1
+   * rot_20 rot_21 rot_22 trans_2
+   */
+  std::ifstream inputStream;
+  inputStream.open(cstring_cast(absoluteFilePath));
+  if(inputStream.is_open())
+  {
+    std::string line;
+    int lineNumber = 0;
+    while(!inputStream.eof() && lineNumber<3)
+    {
+      getline(inputStream, line);
+
+      for(int i = 0; i<4; i++)
+      {
+        //Tolerating more than one blank space between numbers
+        while(line.find(" ") == 0)
+        {
+          line.erase(0,1);
+        }
+        std::string::size_type pos = line.find(" ");
+        std::string str;
+        if(pos != std::string::npos)
+        {
+          str = line.substr(0, pos);
+        }
+        else
+        {
+          str = line;
+        }
+        double d = atof(str.c_str());
+        if(i<3)
+        {
+          calMatrix(lineNumber, i) = d;
+        }
+        if(i == 3)
+        {
+          translation.SetElement(lineNumber, d);
+        }
+        line.erase(0, pos);
+      }
+      lineNumber++;
+    }
+    rotation.Set(calMatrix);
+    retval.SetTranslationAndRotation(translation, rotation, 1.0, igstk::TimeStamp::GetLongestPossibleTime());
+  }
+  inputStream.close();
+  return retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 
 } //namespace cx

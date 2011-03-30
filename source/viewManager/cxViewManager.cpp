@@ -21,7 +21,6 @@
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
 #include "sscXmlOptionItem.h"
-#include "cxRepManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxViewGroup.h"
@@ -81,14 +80,15 @@ ViewManager::ViewManager() :
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
-  mSmartRender = mSettings->value("smartRender").toBool();
+  mSmartRender = mSettings->value("smartRender", true).toBool();
 
   mLayout->setSpacing(2);
   mLayout->setMargin(4);
   mMainWindowsCentralWidget->setLayout(mLayout);
 
+  const unsigned VIEW_GROUP_COUNT = 5; // set this to enough
   // initialize view groups:
-  for (unsigned i=0; i<3; ++i)
+  for (unsigned i=0; i<VIEW_GROUP_COUNT; ++i)
   {
     mViewGroups.push_back(ViewGroupPtr(new ViewGroup()));
   }
