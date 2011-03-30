@@ -109,8 +109,17 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
     ${SSC_SOURCE_DIR}/Code/Widgets/
+    ${SSC_SOURCE_DIR}/Code/3rdParty/
+    ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
     ${SSC_BINARY_DIR}
     ) 
+
+#find_package( CML REQUIRED )
+#find_package (CML PATHS "cml-1_0_2" REQUIRED)
+#include (${CML_USE_FILE})
+#include_directories(${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2)
+#message(STATUS "cml dir : " ${SSC_SOURCE_DIR}/Code/cml-1_0_2)
+
 
 set(SSC_LIBRARY_DIRS 
     )    
@@ -315,11 +324,6 @@ endif(WIN32)
 # boost
 find_package( Boost REQUIRED )
 
-#find_package( CML REQUIRED )
-#find_package (CML PATHS "cml-1_0_2" REQUIRED)
-#include (${CML_USE_FILE})
-include_directories(${SSC_SOURCE_DIR}/Code/cml-1_0_2)
-#message(STATUS "cml dir : " ${SSC_SOURCE_DIR}/Code/cml-1_0_2)
 
 # =========================================================
 # vtk
