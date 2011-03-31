@@ -28,6 +28,8 @@ public:
 
 signals:
   void toolSelected(QString absoluteFilePath);
+  void userChangedList(); ///< emitted whenever the user changes the list
+  void listSizeChanged(); ///< emitted whenever the count changes
 
 protected:
   void populate(QStringList toolsAbsoluteFilePath);
@@ -66,8 +68,11 @@ public:
   ConfigToolListWidget(QWidget* parent = NULL);
   virtual ~ConfigToolListWidget();
 
+  virtual void dropEvent(QDropEvent* event);
+  QStringList getTools(); ///< get absolute file path to all tools currently in the list
+
 public slots:
-  void configSlot();
+  void configSlot(QStringList toolsAbsoluteFilePath);
 };
 
 } //namespace cx
