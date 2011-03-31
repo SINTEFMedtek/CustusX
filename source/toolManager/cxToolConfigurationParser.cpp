@@ -447,6 +447,10 @@ std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTracker
 //    std::cout << "In configfile " << mConfigurationFilePath << " found tracker type " << enum2string(internalStructure.mType) << std::endl;
     retval.push_back(internalStructure);
   }
+
+  if(retval.size()>1)
+    ssc::messageManager()->sendError("Config file "+mConfigurationFilePath+" has a invalid number of tracking systems, we only support 1 tracking system atm!");
+
   return retval;
 }
 
@@ -609,7 +613,7 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
 //    std::cout << "IS FILE: "<< absoluteToolFilePath << std::endl;
   }
 
-  std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
+//  std::cout << "Found toolfile " << absoluteToolFilePath << std::endl;
   return absoluteToolFilePath;
 }
 //----------------------------------------------------------------------------------------------------------------------

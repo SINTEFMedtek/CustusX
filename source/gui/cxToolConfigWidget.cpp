@@ -18,6 +18,7 @@
 
 //testing
 #include "cxToolFilterWidget.h"
+#include "cxToolConfigureWidget.h"
 namespace cx
 {
 
@@ -52,7 +53,8 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
   layout->addLayout(hlayout, 4, 0, 1, 2);
 
   //testing
-  layout->addWidget(new ToolFilterGroupBox(this), 5, 0, 1, 2);
+  layout->addWidget(new ToolConfigureGroupBox(ssc::mdLABORATORY, this), 5, 0, 1, 2);
+  layout->addWidget(new ToolFilterGroupBox(this), 6, 0, 1, 2);
   //testing
 
   mApplicationGroupBox->setTitle("Applications");
