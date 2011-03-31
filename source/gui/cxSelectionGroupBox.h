@@ -25,12 +25,17 @@ public:
   virtual ~SelectionGroupBox();
 
   virtual QStringList getSelected(); ///< get a list of selected button text
+  virtual void setSelected(QStringList selectedlist); ///< set the selected buttons
+
+  void setEnabledButtons(bool value); ///< enables or disables all buttons
 
 signals:
   void selectionChanged(); ///< emitted when the selection of application changed
+  void userClicked(); ///< emitted when a user has clicked a button inside the groupbox
 
 private:
   void populate(bool exclusive); ///< Populates the group box
+  void filter(QStringList filter); ///< Selects the buttons with text matching the incoming list
 
   QStringList     mSelectionList;
   QButtonGroup*   mButtonGroup;

@@ -34,6 +34,7 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
     item->setData(Qt::ToolTipRole, info.absoluteFilePath());
     this->addItem(item);
   }
+  emit listSizeChanged();
 }
 
 Tool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFilePath)
@@ -170,14 +171,43 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
 {
-  this->setDragDropMode(QAbstractItemView::DropOnly); //TODO ?????
-  this->setDragEnabled(false); //TODO????
+  //TODO how to delete items from the list
+  this->setDefaultDropAction(Qt::CopyAction);
+  this->setDragDropMode(QAbstractItemView::DropOnly);
+//  this->setDragDropOverwriteMode(true);
+//  this->setDragEnabled(false);
 }
 
 ConfigToolListWidget::~ConfigToolListWidget()
 {}
 
-void ConfigToolListWidget::configSlot()
-{}
+void ConfigToolListWidget::dropEvent(QDropEvent* event)
+{
+  QListWidget::dropEvent(event);
+
+  //TODO should prevent duplication of items... reimplement the drop slot???
+  std::cout << "something was dropped..." << std::endl;
+
+  emit userChangedList();
+  emit listSizeChanged();
+}
+
+QStringList ConfigToolListWidget::getTools()
+{
+  QStringList retval;
+
+  for(int i=0; i < this->count(); ++i)
+  {
+    QListWidgetItem* item = this->item(i);
+    retval << item->data(Qt::ToolTipRole).toString();
+  }
+
+  return retval;
+}
+
+void ConfigToolListWidget::configSlot(QStringList toolsAbsoluteFilePath)
+{
+  this->populate(toolsAbsoluteFilePath);
+}
 
 } //namespace cx
