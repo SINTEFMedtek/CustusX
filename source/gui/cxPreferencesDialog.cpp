@@ -4,6 +4,7 @@
 #include <iostream>
 #include "sscMessageManager.h"
 #include "sscDoubleWidgets.h"
+#include "sscEnumConverter.h"
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
@@ -11,7 +12,9 @@
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxFilePreviewWidget.h"
-#include "cxToolConfigWidget.h"
+//#include "cxToolConfigWidget.h"
+#include "cxToolConfigureWidget.h"
+#include "cxToolFilterWidget.h"
 
 namespace cx
 {
@@ -380,12 +383,16 @@ void UltrasoundTab::saveParametersSlot()
 
 ToolConfigTab::ToolConfigTab(QWidget* parent) :
     PreferencesTab(parent),
-    mFilePreviewWidget(new FilePreviewWidget(this)),
-    mToolConfigWidget(new ToolConfigWidget(this))
+    mFilePreviewWidget(new FilePreviewWidget(this))
+//    mToolConfigWidget(new ToolConfigWidget(this))
 {
-  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
-  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
-  mFilePreviewWidget->previewFileSlot(mToolConfigWidget->getSelectedFile());
+    mToolConfigureGroupBox = new ToolConfigureGroupBox(string2enum<ssc::MEDICAL_DOMAIN>(stateManager()->getApplication()->getActiveStateName()), this);
+    mToolFilterGroupBox  = new ToolFilterGroupBox(this);
+
+    //  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+//  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
+  connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+  connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 }
 
 ToolConfigTab::~ToolConfigTab()
@@ -397,15 +404,18 @@ void ToolConfigTab::init()
   QGridLayout* layout = new QGridLayout;
   mTopLayout->addLayout(layout);
 
-  layout->addWidget(mToolConfigWidget, 0, 0);
-  layout->addWidget(mFilePreviewWidget, 0, 1);
+//  layout->addWidget(mToolConfigWidget, 0, 0);
+  layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
+  layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
+  layout->addWidget(mFilePreviewWidget, 1, 0, 1, 2);
 }
 
 void ToolConfigTab::saveParametersSlot()
 {
   //TODO
   //save things to mSettings????
-  mToolConfigWidget->saveConfigurationSlot();
+//  mToolConfigWidget->saveConfigurationSlot();
+  mToolConfigureGroupBox->requestSaveConfigurationSlot();
 }
 //==============================================================================
 // PreferencesDialog

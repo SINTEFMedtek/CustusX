@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 class QButtonGroup;
+class QHBoxLayout;
 
 namespace cx
 {
@@ -36,6 +37,8 @@ signals:
 private:
   void populate(bool exclusive); ///< Populates the group box
   void filter(QStringList filter); ///< Selects the buttons with text matching the incoming list
+
+  QHBoxLayout* mLayout;
 
   QStringList     mSelectionList;
   QButtonGroup*   mButtonGroup;
