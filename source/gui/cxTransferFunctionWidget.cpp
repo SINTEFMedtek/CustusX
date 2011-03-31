@@ -211,6 +211,7 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   this->setWindowTitle("2D");
 
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
+  mTransferFunctionAlphaWidget->setReadOnly(true);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
   mDataWindow.reset(new DoubleDataAdapterImageTFDataWindow);
