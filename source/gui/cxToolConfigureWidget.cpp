@@ -40,7 +40,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, 
   QGridLayout* layout = new QGridLayout(this);
   layout->addWidget(new QLabel("Selected config: "), 0, 0, 1, 1);
   layout->addWidget(mConfigFilesComboBox, 0, 1, 1, 1);
-  layout->addWidget(new QLabel("Path: "), 1, 0, 1, 1);
+  layout->addWidget(new QLabel("Save path: "), 1, 0, 1, 1);
   layout->addWidget(mConfigFilePathLineEdit, 1, 1, 1, 1);
   layout->addWidget(mApplicationGroupBox, 2, 0, 1, 2);
   layout->addWidget(mTrackingSystemGroupBox, 3, 0, 1, 2);
@@ -82,8 +82,8 @@ void ToolConfigureGroupBox::configChangedSlot()
   QStringList selectedApplications;
   QStringList selectedTrackingSystems;
   QStringList selectedTools;
-
   QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+
   if(!mConfigFilesComboBox->currentText().contains("<new config>"))
   {
     ConfigurationFileParser parser(absoluteConfigFilePath);
@@ -142,7 +142,7 @@ void ToolConfigureGroupBox::populateConfigurations()
   dir.setNameFilters(nameFilters);
 
   QString newConfig("<new config>");
-  int index = this->addConfigurationToComboBox(newConfig, ConfigurationFileParser::getTemplatesAbsoluteFilePath());
+  int index = this->addConfigurationToComboBox(newConfig, this->generateConfigName());
 
   QStringList configlist = dir.entryList();
   foreach(QString filename, configlist)
@@ -170,6 +170,9 @@ void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
 {
   box->setItemData(index, edited, sEdited);
 //  std::cout << "Config file " << box->itemText(index) << " now is set as " << (edited ? "" : "un") << "edited." << std::endl;
+
+  if(edited) //suggest new name
+    mConfigFilePathLineEdit->setText(this->generateConfigName());
 }
 
 ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
@@ -203,6 +206,40 @@ ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfigur
   }
 
   retval.mTrackersAndTools[selectedTracker] = toolfilesAndRefVector;
+
+  return retval;
+}
+
+QString ToolConfigureGroupBox::generateConfigName()
+{
+
+  QString retval;
+
+  QStringList applicationFilter = mApplicationGroupBox->getSelected();
+  QStringList trackingsystemFilter = mTrackingSystemGroupBox->getSelected();
+  QStringList absoluteToolFilePathsFilter = mToolListWidget->getTools();
+
+  QString absoluteDirPath;
+  QString trackingSystems;
+  QString tools;
+
+  absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one domain
+
+  foreach(QString string, trackingsystemFilter)
+  {
+    trackingSystems.append(string+"_");
+  }
+
+  foreach(QString string, absoluteToolFilePathsFilter)
+  {
+    QFile file(string);
+    QFileInfo info(file);
+    trackingSystems.append(info.baseName()+"_");
+  }
+  if(retval.endsWith("_", Qt::CaseInsensitive))
+    retval.remove(retval.size()-2, 1);
+
+  retval = absoluteDirPath+trackingSystems+tools+".xml";
 
   return retval;
 }
