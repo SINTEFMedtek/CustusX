@@ -98,6 +98,15 @@ public:
   virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLAPAROSCOPY; }
 };
 
+class EndovascularApplicationState : public ApplicationState
+{
+  Q_OBJECT
+public:
+  EndovascularApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdENDOVASCULAR), enum2string(ssc::mdENDOVASCULAR)) {}
+  virtual ~EndovascularApplicationState() {}
+  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdENDOVASCULAR; }
+};
+
 } // namespace cx
 
 
