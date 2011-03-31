@@ -117,7 +117,7 @@ private:
 	bool loadMetaData();
 	bool loadVolumeData();
 	boost::array<int,3> stringList2IntArray3(QStringList raw) const;
-	SNW2VolumeMetaData rawLoadMetaData() const;
+	bool rawLoadMetaData(SNW2VolumeMetaData &data) const;
 	bool rawLoadVtkImageData();
 	bool rawLoadLut(const QString& filename, vtkLookupTablePtr lut) const;
 	
