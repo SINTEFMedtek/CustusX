@@ -34,6 +34,20 @@ QStringList SelectionGroupBox::getSelected()
   return retval;
 }
 
+void SelectionGroupBox::setSelected(QStringList selectedlist)
+{
+  this->filter(selectedlist);
+}
+
+void SelectionGroupBox::setEnabledButtons(bool value)
+{
+  QList<QAbstractButton*> applicationButtonList = mButtonGroup->buttons();
+  foreach(QAbstractButton* button, applicationButtonList)
+  {
+    button->setEnabled(value);
+  }
+}
+
 void SelectionGroupBox::populate(bool exclusive)
 {
   mButtonGroup->setExclusive(exclusive);
@@ -51,7 +65,22 @@ void SelectionGroupBox::populate(bool exclusive)
 
     //need to tell the outside world that the state of a button changed
     connect(box, SIGNAL(stateChanged(int)), this, SIGNAL(selectionChanged()));
+    connect(box, SIGNAL(clicked(bool)), this, SIGNAL(userClicked()));
   }
+}
+
+void SelectionGroupBox::filter(QStringList filter)
+{
+  bool exclusive = mButtonGroup->exclusive();
+
+  mButtonGroup->setExclusive(false);
+  QList<QAbstractButton*> applicationButtonList = mButtonGroup->buttons();
+  foreach(QAbstractButton* button, applicationButtonList)
+  {
+    bool on = filter.contains(button->text(), Qt::CaseInsensitive);
+    button->setChecked(on);
+  }
+  mButtonGroup->setExclusive(exclusive);
 }
 }//namespace cx
 
