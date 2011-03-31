@@ -13,7 +13,7 @@ SelectionGroupBox::SelectionGroupBox(QString title, QStringList selectionList, b
     mSelectionList(selectionList),
     mButtonGroup(new QButtonGroup(parent))
 {
-  QHBoxLayout* layout = new QHBoxLayout(this);
+  mLayout = new QHBoxLayout(this);
   this->setTitle(title);
 
   this->populate(exclusive);
@@ -61,12 +61,13 @@ void SelectionGroupBox::populate(bool exclusive)
 
     QCheckBox* box = new QCheckBox(string);
     mButtonGroup->addButton(box);
-    this->layout()->addWidget(box);
+    mLayout->addWidget(box);
 
     //need to tell the outside world that the state of a button changed
     connect(box, SIGNAL(stateChanged(int)), this, SIGNAL(selectionChanged()));
     connect(box, SIGNAL(clicked(bool)), this, SIGNAL(userClicked()));
   }
+  mLayout->addStretch();
 }
 
 void SelectionGroupBox::filter(QStringList filter)

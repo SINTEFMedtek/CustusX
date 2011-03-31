@@ -28,6 +28,9 @@ public:
   ToolFilterGroupBox(QWidget* parent = NULL);
   virtual ~ToolFilterGroupBox();
 
+signals:
+  void toolSelected(QString absoluteFilePath);
+
 private slots:
   void filterSlot();
 

@@ -18,6 +18,7 @@ ToolFilterGroupBox::ToolFilterGroupBox(QWidget* parent) :
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateManager()->getApplication()->getAllApplicationNames(), false, NULL);
   mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new FilteringToolListWidget(NULL);
+  connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
   QGridLayout* layout = new QGridLayout(this);
   layout->addWidget(mApplicationGroupBox);

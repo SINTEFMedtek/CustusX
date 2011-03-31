@@ -2,6 +2,8 @@
 
 #include <QListWidgetItem>
 #include <QDir>
+#include <QDropEvent>
+#include <QMimeData>
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 #include "cxDataLocations.h"
@@ -184,6 +186,21 @@ ConfigToolListWidget::~ConfigToolListWidget()
 void ConfigToolListWidget::dropEvent(QDropEvent* event)
 {
   QListWidget::dropEvent(event);
+
+//  QString string = event->mimeData()->formats().join(" ");
+//  std::cout << "Formats " << string << std::endl;
+//  std::cout << "Text " << event->mimeData()->text() << std::endl;
+//  std::cout << "Data " << event->mimeData()->data("application/x-qabstractitemmodeldatalist").data() << std::endl;
+
+//  const QMimeData* incomingMime = event->mimeData();
+//  for(int i=0; i < this->count(); ++i)
+//  {
+//    QListWidgetItem* item = this->item(i);
+//    const QMimeData* mime = this->mimeData(item);
+//    if(mime == incomingMime)
+//      std::cout << "Found mime!!!!" << std::endl;
+//  }
+
 
   //TODO should prevent duplication of items... reimplement the drop slot???
   std::cout << "something was dropped..." << std::endl;
