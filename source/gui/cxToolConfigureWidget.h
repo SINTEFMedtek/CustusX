@@ -43,6 +43,7 @@ private slots:
   void configEditedSlot();
   void toolsChangedSlot();
   void filterToolsSlot();
+  void pathEditedSlot();
 
 private:
   enum state ///< state of a configuration file indicating whether or not its edited
@@ -55,6 +56,8 @@ private:
   void setState(QComboBox* box, int index, bool edited); ///< sets the state of a configuration file to be either edited or not, decides whether to save or not
   ConfigurationFileParser::Configuration getCurrentConfiguration();
   QString generateConfigName(); ///< generates a name based on the current configuration
+
+  void setState(QLineEdit* line, bool userEdited);
 
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
