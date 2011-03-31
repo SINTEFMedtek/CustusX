@@ -32,6 +32,9 @@ public:
   ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, QWidget* parent = NULL);
   virtual ~ToolConfigureGroupBox();
 
+signals:
+  void toolSelected(QString absoluteFilePath);
+
 public slots:
   void requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
 
