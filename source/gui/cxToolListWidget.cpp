@@ -210,4 +210,22 @@ void ConfigToolListWidget::configSlot(QStringList toolsAbsoluteFilePath)
   this->populate(toolsAbsoluteFilePath);
 }
 
+void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
+{
+  for(int i=0; i < this->count(); ++i)
+  {
+    QListWidgetItem* item = this->item(i);
+    QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
+    ToolFileParser parser(absoluteFilePath);
+    QBrush brush = item->foreground();
+    QString toolTrackingSystem = enum2string(parser.getTool().mTrackerType);
+    if(!trackingsystemFilter.contains(toolTrackingSystem, Qt::CaseInsensitive))
+      brush.setColor(Qt::red);
+    else
+      brush.setColor(Qt::black);
+
+    item->setForeground(brush);
+  }
+}
+
 } //namespace cx
