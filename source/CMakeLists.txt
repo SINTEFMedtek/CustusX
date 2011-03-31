@@ -151,7 +151,12 @@ SET(CONFIG_DIR bin)
 SET(SYMLINK_DIR bin)
 if(APPLE)
     SET(SYMLINK_DIR /Library/CustusX)
+else(APPLE)
+    # Applies to Linux. We should really have chosen /var/tmp/CustusX or similar here, but this causes lots of ifdefs.
+    # Change for both unixlike platform at some time instead.
+    SET(SYMLINK_DIR /Library/CustusX)
 endif(APPLE)
+
   
 SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}")
 IF(APPLE)
@@ -260,11 +265,11 @@ if (BUILD_SHARED_LIBS)
     # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
     # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
     # over.
-    install(CODE "
-        include(BundleUtilities)
-    #    fixup_bundle(\"${APPS}\" \"${BUNDLE_LIBS}\" \"${BUNDLE_DIRS}\")
-        fixup_bundle(\"${APPS}\" \"\" \"${BUNDLE_DIRS}\")
-        " COMPONENT Runtime)
+    #install(CODE "
+    #    include(BundleUtilities)
+    ##    fixup_bundle(\"${APPS}\" \"${BUNDLE_LIBS}\" \"${BUNDLE_DIRS}\")
+    #    fixup_bundle(\"${APPS}\" \"\" \"${BUNDLE_DIRS}\")
+    #    " COMPONENT Runtime)
     #FIXUP_BUNDLE(<app> <libs> <dirs>)
     #message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
 endif (BUILD_SHARED_LIBS)
