@@ -29,6 +29,7 @@ public:
   virtual ~TransferFunctionAlphaWidget();
 
   void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
+  void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
 
 signals:
   void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
@@ -87,6 +88,8 @@ protected:
   ssc::ImagePtr mImage;
   ssc::ImageTFDataPtr mImageTF;
   
+  bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
+
   virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
 };
 }
