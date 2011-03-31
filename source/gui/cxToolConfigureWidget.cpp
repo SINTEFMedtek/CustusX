@@ -51,6 +51,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, 
   //changes due to programming actions
   connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
   connect(mToolListWidget, SIGNAL(listSizeChanged()), this, SLOT(toolsChangedSlot()));
+  connect(mTrackingSystemGroupBox, SIGNAL(selectionChanged()), this, SLOT(filterToolsSlot()));
 
   //changes due to user actions
   connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
@@ -121,6 +122,13 @@ void ToolConfigureGroupBox::configEditedSlot()
 void ToolConfigureGroupBox::toolsChangedSlot()
 {
   this->populateReference();
+  this->filterToolsSlot();
+}
+
+void ToolConfigureGroupBox::filterToolsSlot()
+{
+  QStringList trackingsystemFilter = mTrackingSystemGroupBox->getSelected();
+  mToolListWidget->filterSlot(trackingsystemFilter);
 }
 
 void ToolConfigureGroupBox::populateConfigurations()

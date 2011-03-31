@@ -39,6 +39,7 @@ private slots:
   void configChangedSlot();
   void configEditedSlot();
   void toolsChangedSlot();
+  void filterToolsSlot();
 
 private:
   enum state ///< state of a configuration file indicating whether or not its edited
