@@ -50,13 +50,14 @@ private:
     sEdited = Qt::UserRole
   };
 
-  void populateConfigurations();
-  int addConfigurationToComboBox(QString displayName, QString absoluteFilePath, bool edited = false);
-  void setState(QComboBox* box, int index, bool edited);
+  void populateConfigurations(); ///< populates the combobox with all config files from the current application domain
+  int addConfigurationToComboBox(QString displayName, QString absoluteFilePath, bool edited = false); ///< adds a new configuration file item to the combobox
+  void setState(QComboBox* box, int index, bool edited); ///< sets the state of a configuration file to be either edited or not, decides whether to save or not
   ConfigurationFileParser::Configuration getCurrentConfiguration();
+  QString generateConfigName(); ///< generates a name based on the current configuration
 
-  void populateReference();
-  int addRefrenceToComboBox(QString absoluteRefereneFilePath);
+  void populateReference(); ///< populates the ref combobox
+  int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
 
   ssc::MEDICAL_DOMAIN       mMedicalDomain;
 
