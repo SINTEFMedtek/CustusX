@@ -28,7 +28,9 @@ namespace cx
 class MessageManager;
 class ViewManager;
 class FilePreviewWidget;
-class ToolConfigWidget;
+//class ToolConfigWidget;
+class ToolFilterGroupBox;
+class ToolConfigureGroupBox;
 
 class PreferencesTab : public QWidget
 {
@@ -226,7 +228,9 @@ public slots:
 
 private:
   FilePreviewWidget*  mFilePreviewWidget;
-  ToolConfigWidget* mToolConfigWidget;
+//  ToolConfigWidget* mToolConfigWidget;
+  ToolConfigureGroupBox* mToolConfigureGroupBox;
+  ToolFilterGroupBox*    mToolFilterGroupBox;
 };
 
 /**
