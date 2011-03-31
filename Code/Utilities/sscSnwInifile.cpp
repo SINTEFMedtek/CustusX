@@ -19,6 +19,10 @@ SonowandInifile::SonowandInifile(QString filename, CHECK_TYPE checkType) :
 	{
 		mCheckSuccess = CheckMD5(fileName().toAscii().constData());
 	}
+	else if (mCheckType == CHECK_MD5)
+	{
+		mCheckSuccess = false;
+	}
 }
 
 SonowandInifile::~SonowandInifile()
