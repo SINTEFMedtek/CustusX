@@ -82,6 +82,7 @@ vtkColorTransferFunctionPtr ImageTF3D::getColorTF()
 void ImageTF3D::LUTChanged()
 {
   this->refreshColorTF();
+  emit transferFunctionsChanged();
 }
 
 /**update the color TF according to the
