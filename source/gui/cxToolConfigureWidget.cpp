@@ -24,6 +24,8 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, 
     mConfigFilePathLineEdit(new QLineEdit()),
     mReferenceComboBox(new QComboBox())
 {
+  Q_PROPERTY("userEdited")
+
   this->setTitle("Tool configurations for "+enum2string(mMedicalDomain));
 
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateManager()->getApplication()->getAllApplicationNames(), true, NULL);
@@ -55,6 +57,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, 
   connect(mToolListWidget, SIGNAL(toolSelected(QString)), this, SIGNAL(toolSelected(QString)));
 
   //changes due to user actions
+  connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(pathEditedSlot()));
   connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
   connect(mApplicationGroupBox, SIGNAL(userClicked()), this, SLOT(configEditedSlot()));
   connect(mTrackingSystemGroupBox, SIGNAL(userClicked()), this, SLOT(configEditedSlot()));
@@ -110,6 +113,7 @@ void ToolConfigureGroupBox::configChangedSlot()
   }
 
   mConfigFilePathLineEdit->setText(absoluteConfigFilePath);
+  this->setState(mConfigFilePathLineEdit, false);
   mApplicationGroupBox->setSelected(selectedApplications);
   mTrackingSystemGroupBox->setSelected(selectedTrackingSystems);
   mToolListWidget->configSlot(selectedTools);
@@ -130,6 +134,11 @@ void ToolConfigureGroupBox::filterToolsSlot()
 {
   QStringList trackingsystemFilter = mTrackingSystemGroupBox->getSelected();
   mToolListWidget->filterSlot(trackingsystemFilter);
+}
+
+void ToolConfigureGroupBox::pathEditedSlot()
+{
+  this->setState(mConfigFilePathLineEdit, true);
 }
 
 void ToolConfigureGroupBox::populateConfigurations()
@@ -171,7 +180,7 @@ void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
   box->setItemData(index, edited, sEdited);
 //  std::cout << "Config file " << box->itemText(index) << " now is set as " << (edited ? "" : "un") << "edited." << std::endl;
 
-  if(edited) //suggest new name
+  if(edited && !mConfigFilePathLineEdit->property("userEdited").toBool())
     mConfigFilePathLineEdit->setText(this->generateConfigName());
 }
 
@@ -242,6 +251,13 @@ QString ToolConfigureGroupBox::generateConfigName()
   retval = absoluteDirPath+trackingSystems+tools+".xml";
 
   return retval;
+}
+
+
+void ToolConfigureGroupBox::setState(QLineEdit* line, bool userEdited)
+{
+  QVariant value(userEdited);
+  mConfigFilePathLineEdit->setProperty("userEdited", value);
 }
 
 void ToolConfigureGroupBox::populateReference()
