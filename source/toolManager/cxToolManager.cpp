@@ -280,6 +280,7 @@ void ToolManager::createSymlink()
   QStringList filters;
   // cu* applies to Mac, ttyUSB applies to Linux
   filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "ttyUSB*" ; //NOTE: only works with current hardware using aurora or polaris.
+//  filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "serial/by-id/usb-NDI*" ; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
 
   if (files.empty())
@@ -293,9 +294,15 @@ void ToolManager::createSymlink()
   }
 
   QString device = devDir.filePath(files[0]);
+//  QString device = "/dev/serial/by-id/usb-NDI_NDI_Host_USB_Converter-if00-port0";
 
   QFile(linkfile).remove();
   QFile devFile(device);
+  QFileInfo devFileInfo(device);
+  if (!devFileInfo.isWritable())
+  {
+    ssc::messageManager()->sendError(QString("Device %1 is not writable. Connection will fail.").arg(device));
+  }
   // this call only succeeds if Custus is run as root.
   bool val = devFile.link(linkfile);
   if (!val)
