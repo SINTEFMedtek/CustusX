@@ -51,7 +51,7 @@ SET(cxProject_MOC_HDRS
   cxSoundSpeedConversionWidget.h
   cxSeansVesselRegistrationWidget.h
   cxFilePreviewWidget.h
-  cxToolConfigWidget.h
+  #cxToolConfigWidget.h
   cxToolFilterWidget.h
   cxSelectionGroupBox.h
   cxToolListWidget.h
@@ -172,8 +172,8 @@ SET(${LIBNAME}_SRCS
     cxAudio.cpp
     cxFilePreviewWidget.h
     cxFilePreviewWidget.cpp
-    cxToolConfigWidget.h
-    cxToolConfigWidget.cpp
+    #cxToolConfigWidget.h
+    #cxToolConfigWidget.cpp
     snwSyntaxHighlighter.cpp
     cxToolFilterWidget.h
     cxToolFilterWidget.cpp
