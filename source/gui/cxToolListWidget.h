@@ -72,7 +72,8 @@ public:
   QStringList getTools(); ///< get absolute file path to all tools currently in the list
 
 public slots:
-  void configSlot(QStringList toolsAbsoluteFilePath);
+  void configSlot(QStringList toolsAbsoluteFilePath); ///< adds all input tools to the list
+  void filterSlot(QStringList trackingsystemFilter); ///< filters the tools on tracking system
 };
 
 } //namespace cx
