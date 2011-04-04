@@ -515,17 +515,35 @@ void ConfigurationFileParser::saveConfiguration(Configuration& config)
   TrackersAndToolsMap::iterator it1 = config.mTrackersAndTools.begin();
   for(; it1 != config.mTrackersAndTools.end(); ++it1)
   {
+    QString trackerType = enum2string(it1->first);
     QDomElement trackerTagNode = doc.createElement("tracker");
-    trackerTagNode.setAttribute("type", enum2string(it1->first));
+    trackerTagNode.setAttribute("type", trackerType);
 
     ToolFilesAndReferenceVector::iterator it2 = it1->second.begin();
     for(; it2 != it1->second.end(); ++it2)
     {
+      QString relativeToolFilePath = it2->first;
+//      std::cout << "relativeToolFilePath" << relativeToolFilePath << std::endl;
+
+      QFileInfo configFileInfo(config.mFileName);
+      const QDir configDir(configFileInfo.absolutePath());
+
+      QFileInfo toolFileInfo(configDir, relativeToolFilePath);
+      const QDir toolFileDir(toolFileInfo.absolutePath());
+
+      QString absoluteToolFilePath = toolFileDir.absoluteFilePath(toolFileInfo.fileName());
+//      std::cout << "absoluteToolFilePath " << absoluteToolFilePath << std::endl;
+      ToolFileParser toolparser(absoluteToolFilePath);
+      QString toolTrackerType = enum2string(toolparser.getTool().mTrackerType);
+//      std::cout << "toolTrackerType " << toolTrackerType << " trackerType " << trackerType << std::endl;
+      if(!trackerType.contains(enum2string(toolparser.getTool().mTrackerType), Qt::CaseInsensitive))
+      {
+        ssc::messageManager()->sendWarning("When saving configuration, skipping tool "+relativeToolFilePath+" of type "+toolTrackerType+" because tracker is set to "+trackerType);
+        continue;
+      }
+
       QDomElement toolFileNode = doc.createElement("toolfile");
-      QFileInfo info(it2->first);
-      QDir configDir(config.mFileName);
-//      std::cout << "Absolute config dir: " << configDir.absolutePath() << std::endl;
-      toolFileNode.appendChild(doc.createTextNode(info.isDir() ? it2->first : configDir.relativeFilePath(info.filePath())));
+      toolFileNode.appendChild(doc.createTextNode(toolFileInfo.isDir() ? it2->first : configDir.relativeFilePath(toolFileInfo.filePath())));
       toolFileNode.setAttribute("reference", (it2->second ? "yes" : "no"));
       trackerTagNode.appendChild(toolFileNode);
     }
