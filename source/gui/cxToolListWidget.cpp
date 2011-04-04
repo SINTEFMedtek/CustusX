@@ -176,8 +176,8 @@ ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
   //TODO how to delete items from the list
   this->setDefaultDropAction(Qt::CopyAction);
   this->setDragDropMode(QAbstractItemView::DropOnly);
-//  this->setDragDropOverwriteMode(true);
-//  this->setDragEnabled(false);
+
+  connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(deleteItemSlot(QListWidgetItem*)));
 }
 
 ConfigToolListWidget::~ConfigToolListWidget()
@@ -228,6 +228,13 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
 
     item->setForeground(brush);
   }
+}
+
+void ConfigToolListWidget::deleteItemSlot(QListWidgetItem* item)
+{
+  delete item;
+  emit userChangedList();
+  emit listSizeChanged();
 }
 
 } //namespace cx

@@ -74,6 +74,9 @@ public:
 public slots:
   void configSlot(QStringList toolsAbsoluteFilePath); ///< adds all input tools to the list
   void filterSlot(QStringList trackingsystemFilter); ///< filters the tools on tracking system
+
+private slots:
+  void deleteItemSlot(QListWidgetItem* item);
 };
 
 } //namespace cx
