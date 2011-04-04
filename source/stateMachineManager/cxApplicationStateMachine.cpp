@@ -26,11 +26,13 @@ ApplicationStateMachine::ApplicationStateMachine()
   ApplicationState* laboratory = this->newState(new LaboratoryApplicationState(mParentState));
   ApplicationState* neurology = this->newState(new NeurologyApplicationState(mParentState));
   ApplicationState* Laparoscopy = this->newState(new LaparoscopyApplicationState(mParentState));
-  ApplicationState* lung = this->newState(new LungApplicationState(mParentState));
+  ApplicationState* lung = this->newState(new BronchoscopyApplicationState(mParentState));
+  ApplicationState* endovascular = this->newState(new EndovascularApplicationState(mParentState));
 
   Q_UNUSED(neurology);
   Q_UNUSED(Laparoscopy);
   Q_UNUSED(lung);
+  Q_UNUSED(endovascular);
 
   //set initial state on all levels
   this->setInitialState(mParentState);
