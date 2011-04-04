@@ -148,14 +148,14 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
 
     //check applications
     bool passedApplicationFilter = false;
-    std::vector<ssc::MEDICAL_DOMAIN>::iterator it = internal.mMedicalDomains.begin();
-    while(it != internal.mMedicalDomains.end() && !passedApplicationFilter)
+    std::vector<ssc::CLINICAL_APPLICATION>::iterator it = internal.mClinicalApplications.begin();
+    while(it != internal.mClinicalApplications.end() && !passedApplicationFilter)
     {
-      QString domainName = enum2string(*it);
-      if(applicationsFilter.contains(domainName, Qt::CaseInsensitive))
+      QString applicationName = enum2string(*it);
+      if(applicationsFilter.contains(applicationName, Qt::CaseInsensitive))
       {
         passedApplicationFilter = true;
-  //        std::cout << "Filter passed, found: " << trackerName << " and " << domainName << std::endl;
+  //        std::cout << "Filter passed, found: " << trackerName << " and " << applicationName << std::endl;
       }
       ++it;
     }

@@ -386,10 +386,13 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
     mFilePreviewWidget(new FilePreviewWidget(this))
 //    mToolConfigWidget(new ToolConfigWidget(this))
 {
-    mToolConfigureGroupBox = new ToolConfigureGroupBox(string2enum<ssc::MEDICAL_DOMAIN>(stateManager()->getApplication()->getActiveStateName()), this);
-    mToolFilterGroupBox  = new ToolFilterGroupBox(this);
+  mToolConfigureGroupBox = new ToolConfigureGroupBox(/*string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()), */this);
+  mToolConfigureGroupBox->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()));
+  mToolFilterGroupBox  = new ToolFilterGroupBox(this);
 
-    //  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
+
+  //  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 //  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
