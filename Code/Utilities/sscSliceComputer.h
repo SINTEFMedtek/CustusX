@@ -70,10 +70,10 @@ public:
 	void setToolOffset(double val); 
 	void setToolViewOffset(bool use, double viewportHeight, double viewOffset);
 	void setToolViewportHeight(double viewportHeight);
-	void setMedicalDomain(MEDICAL_DOMAIN domain);
+	void setClinicalApplication(CLINICAL_APPLICATION application);
 	SlicePlane getPlane() const;	
 
-	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, MEDICAL_DOMAIN domain);
+	void initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application);
 	void switchOrientationMode(ORIENTATION_TYPE type);
 	ORIENTATION_TYPE getOrientationType() const;
 	PLANE_TYPE getPlaneType() const;
@@ -89,7 +89,7 @@ private:
 	std::pair<Vector3D,Vector3D> generateBasisVectorsRadiology() const;
 
 private:
-	MEDICAL_DOMAIN mMedicalDomain;
+	CLINICAL_APPLICATION mClinicalApplication;
 	ORIENTATION_TYPE mOrientType;
 	PLANE_TYPE mPlaneType;
 	FOLLOW_TYPE mFollowType;

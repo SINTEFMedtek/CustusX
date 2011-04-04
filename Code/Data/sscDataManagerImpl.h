@@ -153,8 +153,8 @@ public:
   virtual void addXml(QDomNode& parentNode); ///< adds xml information about the datamanger and its variabels
   virtual void parseXml(QDomNode& datamangerNode, QString absolutePath = QString());///< Use a XML node to load data. \param datamangerNode A XML data representation of the DataManager. \param absolutePath Absolute path to the data elements. Used together with the relative paths stored in the filePath elements.
 
-  virtual MEDICAL_DOMAIN getMedicalDomain() const;
-  virtual void setMedicalDomain(MEDICAL_DOMAIN domain);
+  virtual CLINICAL_APPLICATION getClinicalApplication() const;
+  virtual void setClinicalApplication(CLINICAL_APPLICATION application);
   virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath);
   virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath);
 
@@ -167,7 +167,7 @@ protected:
   std::map<QString, RTSourcePtr> mStreams;
   DataMap mData;
   Vector3D mCenter;
-  MEDICAL_DOMAIN mMedicalDomain;
+  CLINICAL_APPLICATION mClinicalApplication;
   std::map<READER_TYPE, DataReaderPtr> mDataReaders;
 
   //state

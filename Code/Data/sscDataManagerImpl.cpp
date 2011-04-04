@@ -193,8 +193,8 @@ void DataManagerImpl::initialize()
 
 DataManagerImpl::DataManagerImpl()
 {
-  mMedicalDomain = mdLABORATORY;
-  //  mMedicalDomain = mdLAPAROSCOPY;
+  mClinicalApplication = mdLABORATORY;
+  //  mClinicalApplication = mdLAPAROSCOPY;
   mDataReaders[rtMETAIMAGE].reset(new MetaImageReader());
   mDataReaders[rtMINCIMAGE].reset(new MincImageReader());
   mDataReaders[rtPOLYDATA].reset(new PolyDataMeshReader());
@@ -212,7 +212,7 @@ void DataManagerImpl::clear()
 {
   mData.clear();
   mCenter = ssc::Vector3D(0, 0, 0);
-  //mMedicalDomain = mdLABORATORY; must be set explicitly
+  //mClinicalApplication = mdLABORATORY; must be set explicitly
   //mMeshes.clear();
   mActiveImage.reset();
   mLandmarkProperties.clear();
@@ -221,7 +221,7 @@ void DataManagerImpl::clear()
   emit activeImageChanged("");
   emit activeImageTransferFunctionsChanged();
   emit landmarkPropertiesChanged();
-  //emit medicalDomainChanged();
+  //emit clinicalApplicationChanged();
   emit dataLoaded();
 }
 
@@ -766,17 +766,17 @@ void DataManagerImpl::transferFunctionsChangedSlot()
   emit activeImageTransferFunctionsChanged();
 }
 
-MEDICAL_DOMAIN DataManagerImpl::getMedicalDomain() const
+CLINICAL_APPLICATION DataManagerImpl::getClinicalApplication() const
 {
-  return mMedicalDomain;
+  return mClinicalApplication;
 }
 
-void DataManagerImpl::setMedicalDomain(MEDICAL_DOMAIN domain)
+void DataManagerImpl::setClinicalApplication(CLINICAL_APPLICATION application)
 {
-  if (mMedicalDomain==domain)
+  if (mClinicalApplication==application)
     return;
-  mMedicalDomain = domain;
-  emit medicalDomainChanged();
+  mClinicalApplication = application;
+  emit clinicalApplicationChanged();
 }
 
 int DataManagerImpl::findUniqueUidNumber(QString uidBase) const

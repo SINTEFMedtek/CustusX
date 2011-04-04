@@ -43,7 +43,7 @@ OrientationAnnotationRep::OrientationAnnotationRep( const QString& uid, const QS
 RepImpl(uid, name)
 {
   mPlane = ptCOUNT;
-  connect(dataManager(), SIGNAL(medicalDomainChanged()), this, SLOT(medicalDomainChangedSlot()));
+  connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 }
 
 OrientationAnnotationRepPtr OrientationAnnotationRep::New(const QString& uid,const QString& name)
@@ -58,14 +58,14 @@ OrientationAnnotationRep::~OrientationAnnotationRep()
 
 }
 
-void OrientationAnnotationRep::medicalDomainChangedSlot()
+void OrientationAnnotationRep::clinicalApplicationChangedSlot()
 {
   this->setPlaneType(mPlane);
 }
 
 void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
 {
-  switch (dataManager()->getMedicalDomain())
+  switch (dataManager()->getClinicalApplication())
   {
   case mdLAPAROSCOPY:
   case mdCARDIOLOGY:

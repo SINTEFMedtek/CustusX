@@ -59,12 +59,13 @@ signals:
 	void toolVisible(bool visible); ///< forwarding of visible in tool
 	
 private slots:
-  void medicalDomainChangedSlot();
+  void clinicalApplicationChangedSlot();
 	void tooltipOffsetSlot(double val);
 	void toolTransformAndTimestampSlot(Transform3D prMt, double timestamp); 
 	void toolVisibleSlot(bool visible); 
 	void centerChangedSlot();
 	void changed();
+
 private:
 	Transform3D getSyntheticToolPos(const Vector3D& center) const;
 	ToolPtr mTool;

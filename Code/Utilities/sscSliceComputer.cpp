@@ -26,7 +26,7 @@ bool similar(const SlicePlane& a, const SlicePlane& b)
 /**Initialize the computer with reasonable defaults.
  */
 SliceComputer::SliceComputer() :
-  mMedicalDomain(mdLABORATORY),
+  mClinicalApplication(mdLABORATORY),
 	mOrientType(otORTHOGONAL),
 	mPlaneType(ptAXIAL),
 	mFollowType(ftFIXED_CENTER),
@@ -46,10 +46,10 @@ SliceComputer::~SliceComputer()
 
 /**Group the typical plane definition uses together.
  */
-void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, MEDICAL_DOMAIN domain)
+void SliceComputer::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset, CLINICAL_APPLICATION application)
 {
   setPlaneType(plane);
-  mMedicalDomain = domain;
+  mClinicalApplication = application;
 
   if (plane == ptSAGITTAL || plane == ptCORONAL || plane == ptAXIAL )
   {
@@ -100,12 +100,12 @@ void SliceComputer::switchOrientationMode(ORIENTATION_TYPE type)
     }
   }
 
-  initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mMedicalDomain);
+  initializeFromPlane(newType, mUseGravity, mGravityDirection, mUseViewOffset, mViewportHeight, mViewOffset, mClinicalApplication);
 }
 
-void SliceComputer::setMedicalDomain(MEDICAL_DOMAIN domain)
+void SliceComputer::setClinicalApplication(CLINICAL_APPLICATION application)
 {
-  mMedicalDomain = domain;
+  mClinicalApplication = application;
 }
 
 ORIENTATION_TYPE SliceComputer::getOrientationType() const
@@ -262,7 +262,7 @@ SlicePlane SliceComputer::applyViewOffset(const SlicePlane& base) const
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
 {
-  switch (mMedicalDomain)
+  switch (mClinicalApplication)
   {
   case mdLAPAROSCOPY:
   case mdCARDIOLOGY:
@@ -274,7 +274,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectors() const
   }
 }
 
-/** definitions of planes for the neurology domain
+/** definitions of planes for the neurology application
  *
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() const
@@ -292,7 +292,7 @@ std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsNeurology() cons
   }
 }
 
-/** definitions of planes for the radiology domain
+/** definitions of planes for the radiology application
  *
  */
 std::pair<Vector3D,Vector3D> SliceComputer::generateBasisVectorsRadiology() const

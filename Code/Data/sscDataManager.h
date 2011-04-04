@@ -102,8 +102,8 @@ public:
   virtual void setLandmarkName(QString uid, QString name) {}
   virtual void setLandmarkActive(QString uid, bool active) {}
   virtual LandmarkPropertyMap getLandmarkProperties() const { return LandmarkPropertyMap(); }
-  virtual MEDICAL_DOMAIN getMedicalDomain() const { return mdLABORATORY; }
-  virtual void setMedicalDomain(MEDICAL_DOMAIN domain) {}
+  virtual CLINICAL_APPLICATION getClinicalApplication() const { return mdLABORATORY; }
+  virtual void setClinicalApplication(CLINICAL_APPLICATION application) {}
   virtual void clear() {}; ///< remove all stuff from manager
   virtual ImagePtr createImage(vtkImageDataPtr data, QString uidBase, QString nameBase, QString filePath="Images") { return ImagePtr(); }
   virtual MeshPtr createMesh(vtkPolyDataPtr data, QString uidBase, QString nameBase, QString filePath) { return MeshPtr(); }
@@ -122,7 +122,7 @@ signals:
 	void activeImageTransferFunctionsChanged(); ///< emitted when the transfer functions in active image is changed
 	//void activeMeshChanged(const QString& uId); ///< emitted when the active mesh is changed
 	void landmarkPropertiesChanged(); ///< emitted when global info about a landmark changed
-	void medicalDomainChanged();
+	void clinicalApplicationChanged();
 	void streamLoaded();
 
 protected:

@@ -19,7 +19,7 @@ public:
 	
 	void setPlaneType( PLANE_TYPE type);
 private slots:
-  void medicalDomainChangedSlot();
+  void clinicalApplicationChangedSlot();
 protected:
 	OrientationAnnotationRep(const QString& uid, const QString& name);
 	virtual void addRepActorsToViewRenderer(ssc::View* view);

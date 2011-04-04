@@ -27,10 +27,10 @@ namespace ssc
 		ftFIXED_CENTER, ///< center is set.
 		ftCOUNT
 	};
-	/**Determines the medical domain where the application is to be used.
-	 * Use this to adapt components to that domain« terminology/habits.
+	/**Determines the clinical application where the system is to be used.
+	 * Use this to adapt components to that clinical application« terminology/habits.
 	 */
-	enum MEDICAL_DOMAIN
+	enum CLINICAL_APPLICATION
 	{
 	  mdLABORATORY,
 	  mdNEUROLOGY,

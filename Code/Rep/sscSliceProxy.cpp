@@ -25,10 +25,10 @@ SliceProxy::SliceProxy() :
     mCutplane(new SliceComputer())
 {
 	connect(ssc::DataManager::getInstance(), SIGNAL(centerChanged()),this, SLOT(centerChangedSlot()) ) ;
-	connect(dataManager(), SIGNAL(medicalDomainChanged()), this, SLOT(medicalDomainChangedSlot()));
+	connect(dataManager(), SIGNAL(clinicalApplicationChanged()), this, SLOT(clinicalApplicationChangedSlot()));
 	//TODO connect to toolmanager rMpr changed
 	mDefaultCenter = ssc::DataManager::getInstance()->getCenter();
-	centerChangedSlot();
+	this->centerChangedSlot();
 }
 
 SliceProxy::~SliceProxy()
@@ -59,8 +59,8 @@ void SliceProxy::setTool(ToolPtr tool)
 		tooltipOffsetSlot(mTool->getTooltipOffset());
 	}	
 	
-	centerChangedSlot(); // force center update for tool==0
-	changed();	
+	this->centerChangedSlot(); // force center update for tool==0
+	this->changed();
 }
 
 void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestamp)
@@ -73,13 +73,13 @@ void SliceProxy::toolTransformAndTimestampSlot(Transform3D prMt, double timestam
 //    return;
 //	}
 	mCutplane->setToolPosition(rMt);
-	changed();
+	this->changed();
 }
 
 void SliceProxy::tooltipOffsetSlot(double val)
 {
 	mCutplane->setToolOffset(val);
-	changed();
+	this->changed();
 }
 
 void SliceProxy::toolVisibleSlot(bool visible)
@@ -99,7 +99,7 @@ Transform3D SliceProxy::getSyntheticToolPos(const Vector3D& center) const
 void SliceProxy::setDefaultCenter(const Vector3D& c)
 {
 	mDefaultCenter = c;	
-	centerChangedSlot();
+	this->centerChangedSlot();
 }
 
 void SliceProxy::centerChangedSlot()
@@ -123,9 +123,9 @@ void SliceProxy::centerChangedSlot()
 	changed();
 }
 
-void SliceProxy::medicalDomainChangedSlot()
+void SliceProxy::clinicalApplicationChangedSlot()
 {
-  mCutplane->setMedicalDomain(dataManager()->getMedicalDomain());
+  mCutplane->setClinicalApplication(dataManager()->getClinicalApplication());
   changed();
 }
 
@@ -133,7 +133,7 @@ void SliceProxy::medicalDomainChangedSlot()
  */
 void SliceProxy::initializeFromPlane(PLANE_TYPE plane, bool useGravity, const Vector3D& gravityDir, bool useViewOffset, double viewportHeight, double toolViewOffset)
 {
-  mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getMedicalDomain());
+  mCutplane->initializeFromPlane(plane, useGravity, gravityDir, useViewOffset, viewportHeight, toolViewOffset, dataManager()->getClinicalApplication());
   changed();
 //	setPlane(plane);
 //	//Logger::log("vm.log"," set plane to proxy ");
