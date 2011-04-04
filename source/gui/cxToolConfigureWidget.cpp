@@ -84,10 +84,6 @@ void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION
   mClinicalApplication = clinicalApplication;
   this->setTitle("Tool configurations for "+enum2string(mClinicalApplication));
 
-  QStringList selected;
-  selected << enum2string(clinicalApplication);
-  mApplicationGroupBox->setSelected(selected);
-
   this->populateConfigurations();
 }
 
@@ -97,6 +93,7 @@ void ToolConfigureGroupBox::configChangedSlot()
   QStringList selectedTrackingSystems;
   QStringList selectedTools;
   QString absoluteConfigFilePath = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+  bool suggestDefaultNames;
 
   if(!mConfigFilesComboBox->currentText().contains("<new config>"))
   {
@@ -116,15 +113,18 @@ void ToolConfigureGroupBox::configChangedSlot()
     {
       selectedTools << tools[i];
     }
+    suggestDefaultNames = false;
   }
   else
   {
     selectedApplications << enum2string(mClinicalApplication); // just want a default
     selectedTrackingSystems << enum2string(ssc::tsPOLARIS); //just want a default
+    suggestDefaultNames = true;
   }
 
+//  std::cout << "absoluteConfigFilePath" << absoluteConfigFilePath << std::endl;
   mConfigFilePathLineEdit->setText(absoluteConfigFilePath);
-  this->setState(mConfigFilePathLineEdit, false);
+  this->setState(mConfigFilePathLineEdit, !suggestDefaultNames);
   mApplicationGroupBox->setSelected(selectedApplications);
   mTrackingSystemGroupBox->setSelected(selectedTrackingSystems);
   mToolListWidget->configSlot(selectedTools);
@@ -194,7 +194,10 @@ void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
 //  std::cout << "Config file " << box->itemText(index) << " now is set as " << (edited ? "" : "un") << "edited." << std::endl;
 
   if(edited && !mConfigFilePathLineEdit->property("userEdited").toBool())
+//  {
+//    std::cout << "Generating name..." << std::endl;
     mConfigFilePathLineEdit->setText(this->generateConfigName());
+//  }
 }
 
 ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
@@ -234,7 +237,6 @@ ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfigur
 
 QString ToolConfigureGroupBox::generateConfigName()
 {
-
   QString retval;
 
   QStringList applicationFilter = mApplicationGroupBox->getSelected();
@@ -269,6 +271,7 @@ QString ToolConfigureGroupBox::generateConfigName()
 
 void ToolConfigureGroupBox::setState(QLineEdit* line, bool userEdited)
 {
+//  std::cout << "line set to " << (userEdited ? "edited (should not generate new names from now)" : "not editet (generate from now)") << std::endl;
   QVariant value(userEdited);
   mConfigFilePathLineEdit->setProperty("userEdited", value);
 }
