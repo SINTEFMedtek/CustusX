@@ -68,6 +68,7 @@ void OrientationAnnotationRep::setPlaneType(PLANE_TYPE type)
   switch (dataManager()->getClinicalApplication())
   {
   case mdLAPAROSCOPY:
+  case mdBRONCHOSCOPY:
   case mdENDOVASCULAR:
   {
     this->setPlaneTypeRadiology(type);

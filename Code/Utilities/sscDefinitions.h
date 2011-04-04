@@ -36,6 +36,7 @@ namespace ssc
 	  mdNEUROLOGY,
 	  mdLAPAROSCOPY,
 	  mdENDOVASCULAR,
+	  mdBRONCHOSCOPY,
 	  mdCOUNT
 	};
 
