@@ -2,6 +2,7 @@
 #define CXTOOLFILTERWIDGET_H_
 
 #include <QGroupBox>
+#include "sscDefinitions.h"
 
 class QComboBox;
 class QButtonGroup;
@@ -30,6 +31,10 @@ public:
 
 signals:
   void toolSelected(QString absoluteFilePath);
+
+public slots:
+  void setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication);
+  void setTrackingSystemSlot(ssc::TRACKING_SYSTEM trackingSystem);
 
 private slots:
   void filterSlot();

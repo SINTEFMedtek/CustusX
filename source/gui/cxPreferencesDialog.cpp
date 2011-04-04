@@ -68,7 +68,7 @@ void FoldersTab::init()
   QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
-  connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currenApplicationChangedSlot(int)));
+  connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentApplicationChangedSlot(int)));
   mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
   applicationStateChangedSlot();
   
@@ -163,7 +163,7 @@ void FoldersTab::applicationStateChangedSlot()
     mToolConfigFilesComboBox->setCurrentIndex(0);
 }
   
-void FoldersTab::currenApplicationChangedSlot(int index)
+void FoldersTab::currentApplicationChangedSlot(int index)
 {
   QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
   if (index<0 || index>=actions.size())
@@ -384,10 +384,8 @@ void UltrasoundTab::saveParametersSlot()
 ToolConfigTab::ToolConfigTab(QWidget* parent) :
     PreferencesTab(parent),
     mFilePreviewWidget(new FilePreviewWidget(this))
-//    mToolConfigWidget(new ToolConfigWidget(this))
 {
-  mToolConfigureGroupBox = new ToolConfigureGroupBox(/*string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()), */this);
-  mToolConfigureGroupBox->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()));
+  mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
@@ -396,6 +394,8 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
 //  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
+
+  this->applicationChangedSlot();
 }
 
 ToolConfigTab::~ToolConfigTab()
@@ -407,7 +407,6 @@ void ToolConfigTab::init()
   QGridLayout* layout = new QGridLayout;
   mTopLayout->addLayout(layout);
 
-//  layout->addWidget(mToolConfigWidget, 0, 0);
   layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
   layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
   layout->addWidget(mFilePreviewWidget, 1, 0, 1, 2);
@@ -417,9 +416,17 @@ void ToolConfigTab::saveParametersSlot()
 {
   //TODO
   //save things to mSettings????
-//  mToolConfigWidget->saveConfigurationSlot();
   mToolConfigureGroupBox->requestSaveConfigurationSlot();
 }
+
+void ToolConfigTab::applicationChangedSlot()
+{
+  ssc::CLINICAL_APPLICATION clinicalApplication = string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName());
+  mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
+  mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
+  mToolFilterGroupBox->setTrackingSystemSlot(ssc::tsPOLARIS);
+}
+
 //==============================================================================
 // PreferencesDialog
 //------------------------------------------------------------------------------

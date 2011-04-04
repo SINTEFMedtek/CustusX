@@ -26,12 +26,12 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
 {
   Q_PROPERTY("userEdited")
 
-  this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()));
-
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateManager()->getApplication()->getAllApplicationNames(), true, NULL);
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
+
+  this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()));
 
   QGroupBox* toolGroupBox = new QGroupBox();
   toolGroupBox->setTitle("Tools");
@@ -83,6 +83,11 @@ void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION
 {
   mClinicalApplication = clinicalApplication;
   this->setTitle("Tool configurations for "+enum2string(mClinicalApplication));
+
+  QStringList selected;
+  selected << enum2string(clinicalApplication);
+  mApplicationGroupBox->setSelected(selected);
+
   this->populateConfigurations();
 }
 
@@ -294,7 +299,7 @@ void ToolConfigureGroupBox::populateReference()
 //    std::cout << "Added reference: " << reference << std::endl;
     if(reference.isEmpty())
     {
-      ssc::messageManager()->sendDebug("Could not determine the reference for configfile: "+configAbsoluteFilePath);
+//      ssc::messageManager()->sendDebug("Could not determine the reference for configfile: "+configAbsoluteFilePath);
       return;
     }
 
