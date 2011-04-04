@@ -75,7 +75,7 @@ public:
   struct Configuration
   {
     QString             mFileName; ///< absolute path and filename for the new config file
-    ssc::MEDICAL_DOMAIN mClinical_app; ///< the medical domain this config is made for
+    ssc::CLINICAL_APPLICATION mClinical_app; ///< the clinical application this config is made for
     TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
     Configuration() :
       mClinical_app(ssc::mdCOUNT)
@@ -86,7 +86,7 @@ public:
   ConfigurationFileParser(QString absoluteConfigFilePath);
   ~ConfigurationFileParser();
 
-  ssc::MEDICAL_DOMAIN getApplicationDomain();
+  ssc::CLINICAL_APPLICATION getApplicationapplication();
   std::vector<IgstkTracker::InternalStructure> getTrackers();
   std::vector<QString> getAbsoluteToolFilePaths();
   QString getAbsoluteReferenceFilePath();

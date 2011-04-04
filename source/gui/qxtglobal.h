@@ -133,8 +133,8 @@ QXT_CORE_EXPORT const char* qxtVersion();
 ** This file is derived from code bearing the following notice:
 ** The sole author of this file, Adam Higerd, has explicitly disclaimed all
 ** copyright interest and protection for the content within. This file has
-** been placed in the public domain according to United States copyright
-** statute and case law. In jurisdictions where this public domain dedication
+** been placed in the public application according to United States copyright
+** statute and case law. In jurisdictions where this public application dedication
 ** is not legally recognized, anyone who receives a copy of this file is
 ** permitted to use, modify, duplicate, and redistribute this file, in whole
 ** or in part, with no restrictions or conditions. In these jurisdictions,

@@ -17,19 +17,19 @@
 namespace cx
 {
 
-ToolConfigureGroupBox::ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, QWidget* parent) :
+ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
     QGroupBox(parent),
-    mMedicalDomain(medicalDomain),
+    mClinicalApplication(ssc::mdCOUNT),
     mConfigFilesComboBox(new QComboBox()),
     mConfigFilePathLineEdit(new QLineEdit()),
     mReferenceComboBox(new QComboBox())
 {
   Q_PROPERTY("userEdited")
 
-  this->setTitle("Tool configurations for "+enum2string(mMedicalDomain));
+  this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()));
 
   mApplicationGroupBox = new SelectionGroupBox("Applications", stateManager()->getApplication()->getAllApplicationNames(), true, NULL);
-  mApplicationGroupBox->setEnabledButtons(false); //< application domain is determined by the application state chosen elsewhere in the system
+  mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
@@ -79,6 +79,12 @@ void ToolConfigureGroupBox::requestSaveConfigurationSlot()
   ConfigurationFileParser::saveConfiguration(config);
 }
 
+void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication)
+{
+  mClinicalApplication = clinicalApplication;
+  this->setTitle("Tool configurations for "+enum2string(mClinicalApplication));
+  this->populateConfigurations();
+}
 
 void ToolConfigureGroupBox::configChangedSlot()
 {
@@ -91,8 +97,8 @@ void ToolConfigureGroupBox::configChangedSlot()
   {
     ConfigurationFileParser parser(absoluteConfigFilePath);
 
-    ssc::MEDICAL_DOMAIN domain = parser.getApplicationDomain();
-    selectedApplications << enum2string(domain);
+    ssc::CLINICAL_APPLICATION application = parser.getApplicationapplication();
+    selectedApplications << enum2string(application);
 
     std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
     for(unsigned i=0; i<trackers.size(); ++i)
@@ -108,7 +114,7 @@ void ToolConfigureGroupBox::configChangedSlot()
   }
   else
   {
-    selectedApplications << enum2string(mMedicalDomain); // just want a default
+    selectedApplications << enum2string(mClinicalApplication); // just want a default
     selectedTrackingSystems << enum2string(ssc::tsPOLARIS); //just want a default
   }
 
@@ -143,7 +149,9 @@ void ToolConfigureGroupBox::pathEditedSlot()
 
 void ToolConfigureGroupBox::populateConfigurations()
 {
-  QDir dir(DataLocations::getRootConfigPath()+"/tool/"+enum2string(mMedicalDomain));
+  mConfigFilesComboBox->clear();
+
+  QDir dir(DataLocations::getRootConfigPath()+"/tool/"+enum2string(mClinicalApplication));
   dir.setFilter(QDir::Files);
 
   QStringList nameFilters;
@@ -188,7 +196,7 @@ ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfigur
 {
   ConfigurationFileParser::Configuration retval;
   retval.mFileName = mConfigFilePathLineEdit->text();
-  retval.mClinical_app = string2enum<ssc::MEDICAL_DOMAIN>(mApplicationGroupBox->getSelected()[0]);
+  retval.mClinical_app = string2enum<ssc::CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
 
   QStringList selectedTools = mToolListWidget->getTools();
   QString referencePath = mReferenceComboBox->itemData(mReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
@@ -232,7 +240,7 @@ QString ToolConfigureGroupBox::generateConfigName()
   QString trackingSystems;
   QString tools;
 
-  absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one domain
+  absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one application
 
   foreach(QString string, trackingsystemFilter)
   {
