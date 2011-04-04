@@ -38,7 +38,7 @@ SNW_DEFINE_ENUM_STRING_CONVERTERS_BEGIN(ssc, CLINICAL_APPLICATION, mdCOUNT)
   "Laboratory",
   "Neurology",
   "Laparoscopy",
-  "Cardiology"
+  "Endovascular"
 }
 SNW_DEFINE_ENUM_STRING_CONVERTERS_END(ssc, CLINICAL_APPLICATION, mdCOUNT)
 
