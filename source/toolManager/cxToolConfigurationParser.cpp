@@ -138,9 +138,9 @@ std::vector<Tool::InternalStructure> ToolConfigurationParser::getConfiguredTools
       if(string.isEmpty())
         continue;
       string = string.toLower();
-      ssc::MEDICAL_DOMAIN domain = string2enum<ssc::MEDICAL_DOMAIN>(string);
-      if(domain != ssc::mdCOUNT)
-        internalStructure.mMedicalDomains.push_back(domain);
+      ssc::CLINICAL_APPLICATION application = string2enum<ssc::CLINICAL_APPLICATION>(string);
+      if(application != ssc::mdCOUNT)
+        internalStructure.mClinicalApplications.push_back(application);
       else
         ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid.");
     }
@@ -414,16 +414,16 @@ ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath)
 ConfigurationFileParser::~ConfigurationFileParser()
 {}
 
-ssc::MEDICAL_DOMAIN ConfigurationFileParser::getApplicationDomain()
+ssc::CLINICAL_APPLICATION ConfigurationFileParser::getApplicationapplication()
 {
-  ssc::MEDICAL_DOMAIN retval;
+  ssc::CLINICAL_APPLICATION retval;
 
   if(!this->isConfigFileValid())
     return retval;
 
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
-  QString applicationDomain = configNode.toElement().attribute("clinical_app");
-  retval = string2enum<ssc::MEDICAL_DOMAIN>(applicationDomain);
+  QString applicationapplication = configNode.toElement().attribute("clinical_app");
+  retval = string2enum<ssc::CLINICAL_APPLICATION>(applicationapplication);
 //  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
 
   return retval;
@@ -697,9 +697,9 @@ Tool::InternalStructure ToolFileParser::getTool()
       if(string.isEmpty())
         continue;
       string = string.toLower();
-      ssc::MEDICAL_DOMAIN domain = string2enum<ssc::MEDICAL_DOMAIN>(string);
-      if(domain != ssc::mdCOUNT)
-        internalStructure.mMedicalDomains.push_back(domain);
+      ssc::CLINICAL_APPLICATION application = string2enum<ssc::CLINICAL_APPLICATION>(string);
+      if(application != ssc::mdCOUNT)
+        internalStructure.mClinicalApplications.push_back(application);
       else
         ssc::messageManager()->sendWarning("Did not understand the tag <clinical_app>, "+string+" is invalid in tool "+mToolFilePath);
     }

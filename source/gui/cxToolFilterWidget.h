@@ -14,7 +14,7 @@ class FilteringToolListWidget;
 /**
  * ToolFilterWidget
  *
- * \brief Widget for easily filtering tools based on medical domain and  tracking system.
+ * \brief Widget for easily filtering tools based on clinical application and  tracking system.
  *
  * \date Mar 30, 2011
  * \author Janne Beate Bakeng, SINTEF

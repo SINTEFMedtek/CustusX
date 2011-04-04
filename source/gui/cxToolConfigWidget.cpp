@@ -156,8 +156,8 @@ void ToolConfigWidget::configChangedSlot()
   {
     ConfigurationFileParser parser(absoluteConfigFilePath);
     //block signals???
-    ssc::MEDICAL_DOMAIN domain = parser.getApplicationDomain();
-    applicationFilter << enum2string(domain);
+    ssc::CLINICAL_APPLICATION application = parser.getApplicationapplication();
+    applicationFilter << enum2string(application);
 
     std::vector<IgstkTracker::InternalStructure> trackers = parser.getTrackers();
     for(unsigned i=0; i<trackers.size(); ++i)
@@ -319,14 +319,14 @@ void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringLi
       continue;
 
     bool passedApplicationFilter = false;
-    std::vector<ssc::MEDICAL_DOMAIN>::iterator it = internal.mMedicalDomains.begin();
-    while(it != internal.mMedicalDomains.end() && !passedApplicationFilter)
+    std::vector<ssc::CLINICAL_APPLICATION>::iterator it = internal.mClinicalApplications.begin();
+    while(it != internal.mClinicalApplications.end() && !passedApplicationFilter)
     {
-      QString domainName = enum2string(*it);
-      if(applicationFilter.contains(domainName, Qt::CaseInsensitive))
+      QString applicationName = enum2string(*it);
+      if(applicationFilter.contains(applicationName, Qt::CaseInsensitive))
       {
         passedApplicationFilter = true;
-//        std::cout << "Filter passed, found: " << trackerName << " and " << domainName << std::endl;
+//        std::cout << "Filter passed, found: " << trackerName << " and " << applicationName << std::endl;
       }
       ++it;
     }
@@ -516,7 +516,7 @@ ConfigurationFileParser::Configuration ToolConfigWidget::getCurrentConfiguration
 
   ConfigurationFileParser::Configuration retval;
   retval.mFileName = this->getConfigFileName();
-  retval.mClinical_app = string2enum<ssc::MEDICAL_DOMAIN>(stateManager()->getApplication()->getActiveStateName());
+  retval.mClinical_app = string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName());
 
   QStringList selectedTools = this->getSelectedToolsFromToolList();
   QString referencePath = mSelectedReferenceComboBox->itemData(mSelectedReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
@@ -573,7 +573,7 @@ QString ToolConfigWidget::generateConfigName()
   QString trackingSystems;
   QString tools;
 
-  absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one domain
+  absoluteDirPath = DataLocations::getRootConfigPath()+"/tool/"+((applicationFilter.size() >= 1) ? applicationFilter[0]+"/" : "")+""; //a config can only belong to one application
 
   foreach(QString string, trackingsystemFilter)
   {
