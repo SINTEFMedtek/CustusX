@@ -29,7 +29,7 @@ class ToolConfigureGroupBox : public QGroupBox
   Q_OBJECT
 
 public:
-  ToolConfigureGroupBox(ssc::MEDICAL_DOMAIN medicalDomain, QWidget* parent = NULL);
+  ToolConfigureGroupBox(QWidget* parent = NULL);
   virtual ~ToolConfigureGroupBox();
 
 signals:
@@ -37,6 +37,7 @@ signals:
 
 public slots:
   void requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
+  void setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication);
 
 private slots:
   void configChangedSlot();
@@ -51,7 +52,7 @@ private:
     sEdited = Qt::UserRole
   };
 
-  void populateConfigurations(); ///< populates the combobox with all config files from the current application domain
+  void populateConfigurations(); ///< populates the combobox with all config files from the current application application
   int addConfigurationToComboBox(QString displayName, QString absoluteFilePath, bool edited = false); ///< adds a new configuration file item to the combobox
   void setState(QComboBox* box, int index, bool edited); ///< sets the state of a configuration file to be either edited or not, decides whether to save or not
   ConfigurationFileParser::Configuration getCurrentConfiguration();
@@ -62,7 +63,7 @@ private:
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
 
-  ssc::MEDICAL_DOMAIN       mMedicalDomain;
+  ssc::CLINICAL_APPLICATION       mClinicalApplication;
 
   QComboBox*                mConfigFilesComboBox;
   QLineEdit*                mConfigFilePathLineEdit;
