@@ -210,7 +210,7 @@ ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfigur
 //    std::cout << "====" << std::endl;
 //    std::cout << "absoluteToolPath " << absoluteToolPath << std::endl;
 //    std::cout << "referencePath " << referencePath << std::endl;
-    tool.second = absoluteToolPath == referencePath;
+    tool.second = (absoluteToolPath == referencePath);
     toolfilesAndRefVector.push_back(tool);
   }
 
