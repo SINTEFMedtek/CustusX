@@ -384,7 +384,7 @@ void ToolConfigWidget::populateReferenceComboBox()
 //    std::cout << "Added reference: " << reference << std::endl;
     if(reference.isEmpty())
     {
-      ssc::messageManager()->sendDebug("Could not determine the reference for configfile: "+configAbsoluteFilePath);
+//      ssc::messageManager()->sendDebug("Could not determine the reference for configfile: "+configAbsoluteFilePath);
       return;
     }
 
