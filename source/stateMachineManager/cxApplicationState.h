@@ -69,16 +69,14 @@ public:
   virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLABORATORY; }
 };
 
-//==============================HACK==============================
-class LungApplicationState : public ApplicationState
+class BronchoscopyApplicationState : public ApplicationState
 {
   Q_OBJECT
 public:
-  LungApplicationState(QState* parent) : ApplicationState(parent, "Lung", "Lung") {} //TODO
-  virtual ~LungApplicationState(){};
-  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLABORATORY; }
+  BronchoscopyApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdBRONCHOSCOPY), enum2string(ssc::mdBRONCHOSCOPY)) {}
+  virtual ~BronchoscopyApplicationState(){};
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdBRONCHOSCOPY; }
 };
-//==============================HACK==============================
 
 class NeurologyApplicationState : public ApplicationState
 {
@@ -96,6 +94,15 @@ public:
   LaparoscopyApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdLAPAROSCOPY), enum2string(ssc::mdLAPAROSCOPY)) {}
   virtual ~LaparoscopyApplicationState() {}
   virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLAPAROSCOPY; }
+};
+
+class EndovascularApplicationState : public ApplicationState
+{
+  Q_OBJECT
+public:
+  EndovascularApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdENDOVASCULAR), enum2string(ssc::mdENDOVASCULAR)) {}
+  virtual ~EndovascularApplicationState() {}
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdENDOVASCULAR; }
 };
 
 } // namespace cx
