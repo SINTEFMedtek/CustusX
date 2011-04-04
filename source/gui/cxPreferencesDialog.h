@@ -76,7 +76,7 @@ private slots:
   void browsePatientDataFolderSlot();
 
   void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
-  void currenApplicationChangedSlot(int index);
+  void currentApplicationChangedSlot(int index);
   void applicationStateChangedSlot();
 
 private:
@@ -226,9 +226,11 @@ public:
 public slots:
   virtual void saveParametersSlot();
 
+private slots:
+  void applicationChangedSlot();
+
 private:
   FilePreviewWidget*  mFilePreviewWidget;
-//  ToolConfigWidget* mToolConfigWidget;
   ToolConfigureGroupBox* mToolConfigureGroupBox;
   ToolFilterGroupBox*    mToolFilterGroupBox;
 };

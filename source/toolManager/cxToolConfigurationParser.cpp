@@ -569,7 +569,7 @@ void ConfigurationFileParser::setConfigDocument(QString configAbsoluteFilePath)
   QFile configFile(configAbsoluteFilePath);
   if(!configFile.exists())
   {
-    ssc::messageManager()->sendDebug("Configfile "+configAbsoluteFilePath+" does not exist.");
+//    ssc::messageManager()->sendDebug("Configfile "+configAbsoluteFilePath+" does not exist.");
     return;
   }
 
