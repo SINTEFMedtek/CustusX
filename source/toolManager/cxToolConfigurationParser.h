@@ -76,7 +76,7 @@ public:
   {
     QString             mFileName; ///< absolute path and filename for the new config file
     ssc::MEDICAL_DOMAIN mClinical_app; ///< the medical domain this config is made for
-    TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools that should be used in the config
+    TrackersAndToolsMap mTrackersAndTools; ///< the trackers and tools (relative path) that should be used in the config
     Configuration() :
       mClinical_app(ssc::mdCOUNT)
     {};
