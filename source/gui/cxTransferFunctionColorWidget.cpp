@@ -14,6 +14,7 @@
 #include "sscImageTF3D.h"
 #include "sscImageTFData.h"
 #include "sscUtilHelpers.h"
+#include "sscImageLUT2D.h"
 
 namespace cx
 {
@@ -108,6 +109,18 @@ void TransferFunctionColorWidget::mouseMoveEvent(QMouseEvent* event)
     this->moveCurrentPoint();
   }
 }
+
+void TransferFunctionColorWidget::calculateColorTFBoundaries(int &areaLeft, int &areaRight, int &areaWidth)
+{
+
+  double min = mImageTF->getLevel() - ( mImageTF->getWindow() / 2.0 );
+  double max = mImageTF->getLevel() + ( mImageTF->getWindow() / 2.0 );
+
+  areaLeft  = mPlotArea.left()  + (min * mPlotArea.width() / mImage->getRange());
+  areaRight = mPlotArea.left()  + (max * mPlotArea.width() / mImage->getRange());
+  areaWidth = areaRight - areaLeft;
+}
+
 void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 {
 	// Don't do anything before we have an image
@@ -132,16 +145,44 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
   vtkColorTransferFunctionPtr trFunc = vtkColorTransferFunctionPtr::New();
 	mImageTF->fillColorTFFromMap(trFunc);
 
-  for (int x = mPlotArea.left(); x <= mPlotArea.right(); ++x)
+	//Use window/level to find new left and right values
+	int areaLeft, areaRight, areaWidth;
+	this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
+
+  for (int x = areaLeft; x <= areaRight; ++x)
   {
     int point = static_cast<int>(0.5 + (mImage->getRange() - 1) *
-                                 (x - mPlotArea.left() ) /
-                                 static_cast<double>(mPlotArea.width()-1));
+                                 (x - areaLeft ) /
+                                 //static_cast<double>(mPlotArea.width()-1));
+                                 static_cast<double>(areaWidth-1));
     //QColor color = transferFunction->getInterpolatedColorValue(point);
 		double* rgb = trFunc->GetColor(point);
     painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
     painter.drawLine(x, mPlotArea.top(), x, mPlotArea.bottom());
   }
+  //Fill the rest of the color transfer function are with either max or min color
+  int areaHeight = mPlotArea.bottom() - mPlotArea.top();
+  int halfAreaTop = mPlotArea.top() + areaHeight / 4;
+  int halfAreaBottom = mPlotArea.bottom() - areaHeight / 4;
+  if (areaLeft > mPlotArea.left())
+  {
+    for (int x = mPlotArea.left(); x < areaLeft; x++)
+    {
+      double* rgb = trFunc->GetColor(0);
+      painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
+      painter.drawLine(x, halfAreaTop, x, halfAreaBottom);
+    }
+  }
+  if (areaRight < mPlotArea.right())
+   {
+     for (int x = areaRight; x < mPlotArea.right(); x++)
+     {
+       double* rgb = trFunc->GetColor(mImage->getRange());
+       painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
+       painter.drawLine(x, halfAreaTop, x, halfAreaBottom);
+     }
+   }
+
 
   // Go through each point and draw squares
 
@@ -154,7 +195,7 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
   {
     // Get the screen (plot) position of this point
     QPoint screenPoint = QPoint(
-      static_cast<int>(mPlotArea.left() + mPlotArea.width() *
+      static_cast<int>(areaLeft + areaWidth *
                        colorPoint->first /
                        static_cast<double>(mImage->getRange())),
                        mPlotArea.bottom());
@@ -244,10 +285,12 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
 {
   ColorPoint point;
 
+  int areaLeft, areaRight, areaWidth;
+  this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
   point.position =
     static_cast<int>( mImage->getRange() *
-                     (mCurrentClickX - mPlotArea.left()) /
-                     static_cast<double>(mPlotArea.width()) );
+                     (mCurrentClickX - areaLeft) /
+                     static_cast<double>(areaWidth) );
 
 //  if (point.position > mImage->getMax())
 //    point.position = mImage->getMax();

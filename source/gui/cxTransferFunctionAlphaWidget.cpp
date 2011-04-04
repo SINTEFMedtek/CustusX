@@ -22,7 +22,8 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
 	mEndPoint(false),
   mCurrentClickX(INT_MIN),
   mCurrentClickY(INT_MIN),
-  mBorder(5)
+  mBorder(5),
+  mReadOnly(false)
 {
   this->setObjectName("TransferFunctionAlphaWidget");
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
@@ -64,7 +65,12 @@ void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataP
       (mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
     ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
 }
-  
+
+void TransferFunctionAlphaWidget::setReadOnly(bool readOnly)
+{
+  mReadOnly = readOnly;
+}
+
 void TransferFunctionAlphaWidget::activeImageTransferFunctionsChangedSlot()
 {
   this->update();
@@ -80,6 +86,8 @@ void TransferFunctionAlphaWidget::leaveEvent(QEvent* event)
 }
 void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
 {
+  if(mReadOnly)
+    return;
   QWidget::mousePressEvent(event);
   mCurrentClickX = event->x();
   mCurrentClickY = event->y();
@@ -95,6 +103,8 @@ void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
 }
 void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
 {
+  if(mReadOnly)
+    return;
   QWidget::mouseReleaseEvent(event);
 
   //we no longer need these values
@@ -105,6 +115,8 @@ void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
 }
 void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
 {
+  if(mReadOnly)
+    return;
   QWidget::mouseMoveEvent(event);
 
   if(event->buttons() == Qt::LeftButton)
@@ -351,4 +363,5 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint()
 	// Update GUI while moving point
 	this->update();
 }
+
 }//namespace cx
