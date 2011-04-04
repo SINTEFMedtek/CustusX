@@ -290,8 +290,13 @@ void ToolConfigureGroupBox::populateReference()
       Tool::InternalStructure internal = parser.getTool();
       if(internal.mType == ssc::Tool::TOOL_REFERENCE)
       {
+//        std::cout << "Found reference when making new config: " << string << std::endl;
         currentIndex = this->addRefrenceToComboBox(string);
       }
+//      else
+//      {
+//        std::cout << string << " is not a refrence." << std::endl;
+//      }
     }
   }
   else
