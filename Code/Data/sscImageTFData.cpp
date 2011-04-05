@@ -29,7 +29,7 @@ ImageTFData::ImageTFData(vtkImageDataPtr base) :
   mWindow = max-min;
   mLevel = min + mWindow/2.0;
   // set llr/alpha with full transmission
-  mLLR = 0.0;
+  mLLR = min;
   mAlpha = 1.0;
 }
 
@@ -424,7 +424,7 @@ void ImageTFData::buildLUTFromColorMap()
 
   int N = 0;
   if (!mColorMapPtr->empty())
-    N = mColorMapPtr->rbegin()->first; // largest key value in color map
+    N = mColorMapPtr->rbegin()->first - mColorMapPtr->begin()->first; // largest key value in color map
   mLut = vtkLookupTablePtr::New(); // must reset in order to get the gpu buffering to reload
   mLut->Build();
   mLut->SetNumberOfTableValues(N);
@@ -435,7 +435,7 @@ void ImageTFData::buildLUTFromColorMap()
 
   for (int i=0; i<N; ++i)
   {
-    double* rgb = colorFunc->GetColor(i);
+    double* rgb = colorFunc->GetColor(i+mColorMapPtr->begin()->first);
     mLut->SetTableValue(i, rgb[0], rgb[1], rgb[2], 1);
   }
   mLut->Modified();

@@ -104,7 +104,7 @@ void Image::resetTransferFunctions()
   
   //mBaseImageData->Update();
 	mBaseImageData->GetScalarRange();	// this line updates some internal vtk value, and (on fedora) removes 4.5s in the second render().
-  
+
 	this->resetTransferFunction(ImageTF3DPtr(new ImageTF3D(mBaseImageData)), ImageLUT2DPtr(new ImageLUT2D(mBaseImageData)));
 }
 
@@ -279,7 +279,7 @@ vtkImageAccumulatePtr Image::getHistogram()
 		mHistogramPtr->SetInput(mBaseImageData);
 		mHistogramPtr->IgnoreZeroOn(); // required for Sonowand CT volumes, where data are placed between 31K and 35K.
 		// Set up only a 1D histogram for now, so y and z values are set to 0
-		mHistogramPtr->SetComponentExtent(this->getMin(), this->getMax(),0,0,0,0);
+		mHistogramPtr->SetComponentExtent(0, this->getRange(),0,0,0,0);
 		mHistogramPtr->SetComponentOrigin(this->getMin(), 0, 0);
 		mHistogramPtr->SetComponentSpacing(1, 0, 0);
 	}
