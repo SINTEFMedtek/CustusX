@@ -76,7 +76,12 @@ public slots:
   void filterSlot(QStringList trackingsystemFilter); ///< filters the tools on tracking system
 
 private slots:
+  void deleteSlot();
   void deleteItemSlot(QListWidgetItem* item);
+  void contextMenuSlot(const QPoint & point);
+
+private:
+  QListWidgetItem* mItemToDelete;
 };
 
 } //namespace cx
