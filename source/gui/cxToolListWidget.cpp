@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QDropEvent>
 #include <QMimeData>
+#include <QAction>
+#include <QMenu>
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
 #include "cxDataLocations.h"
@@ -173,11 +175,14 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
 {
-  //TODO how to delete items from the list
+//  qRegisterMetaType<QListWidgetItem*>("QListWidgetItem*");
+  this->setContextMenuPolicy(Qt::CustomContextMenu);
+
   this->setDefaultDropAction(Qt::CopyAction);
   this->setDragDropMode(QAbstractItemView::DropOnly);
 
-  connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(deleteItemSlot(QListWidgetItem*)));
+//  connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(deleteItemSlot(QListWidgetItem*)));
+  connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
 }
 
 ConfigToolListWidget::~ConfigToolListWidget()
@@ -188,7 +193,7 @@ void ConfigToolListWidget::dropEvent(QDropEvent* event)
   QListWidget::dropEvent(event);
 
   //TODO should prevent duplication of items... reimplement the drop slot???
-  std::cout << "something was dropped..." << std::endl;
+//  std::cout << "something was dropped..." << std::endl;
 
   emit userChangedList();
   emit listSizeChanged();
@@ -230,6 +235,16 @@ void ConfigToolListWidget::filterSlot(QStringList trackingsystemFilter)
   }
 }
 
+void ConfigToolListWidget::deleteSlot()
+{
+  if(!mItemToDelete)
+  {
+    ssc::messageManager()->sendDebug("Found no item to delete...");
+    return;
+  }
+  this->deleteItemSlot(mItemToDelete);
+}
+
 void ConfigToolListWidget::deleteItemSlot(QListWidgetItem* item)
 {
   delete item;
@@ -237,4 +252,24 @@ void ConfigToolListWidget::deleteItemSlot(QListWidgetItem* item)
   emit listSizeChanged();
 }
 
+void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
+{
+  QWidget* sender = dynamic_cast<QWidget*>(this->sender());
+  QPoint pointGlobal = sender->mapToGlobal(point);
+  QMenu contextMenu(sender);
+
+  QAction* action = new QAction("Remove", &contextMenu);
+
+  QListWidgetItem* item = this->itemAt(point);
+  if(!item)
+  {
+    ssc::messageManager()->sendDebug("Found no item to delete...");
+  }
+  mItemToDelete = item;
+
+  connect(action, SIGNAL(triggered()), this, SLOT(deleteSlot()));
+  contextMenu.addAction(action);
+
+  contextMenu.exec(pointGlobal);
+}
 } //namespace cx
