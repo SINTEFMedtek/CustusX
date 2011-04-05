@@ -129,12 +129,13 @@ private:
 
   QString mToolFilePath; ///< absolutepath to the tool file
   QDomDocument mToolDoc; ///< the tool xml document
-  const QString mToolfileTag, mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag, mToolClinicalAppTag,
-                    mToolGeoFileTag, mToolSensorTag, mToolSensorTypeTag,
+  const QString mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag, mToolDescriptionTag, mToolManufacturerTag, mToolClinicalAppTag,
+                    mToolGeoFileTag, mToolPicFileTag, mToolDocFileTag,
+                    mToolInstrumentTag, mToolInstrumentTypeTag, mToolInstrumentIdTag, mToolInstrumentNameTag, mToolInstrumentManufacturerTag, mToolInstrumentScannerIdTag, mToolInstrumentDescriptionTag,
+                    mToolSensorTag, mToolSensorTypeTag, mToolSensorIdTag, mToolSensorNameTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
-                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag ,mToolSensorRomFileTag,
-                    mToolCalibrationTag, mToolCalibrationFileTag,
-                    mInstrumentTag, mInstrumentIdTag, mInstrumentScannerIdTag;
+                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag, mToolSensorManufacturerTag, mToolSensorDescriptionTag, mToolSensorRomFileTag,
+                    mToolCalibrationTag, mToolCalibrationFileTag;
                     ///< names of necessary tags in the tool file
 };
 
