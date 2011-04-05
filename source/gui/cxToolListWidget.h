@@ -33,6 +33,7 @@ signals:
 
 protected:
   void populate(QStringList toolsAbsoluteFilePath);
+  void addTool(QString absoluteFilePath);
 
   Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
@@ -53,9 +54,15 @@ public:
 public slots:
   void filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter);
 
+protected:
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void startDrag();
+
 private:
   QStringList getAbsoluteFilePathToAllTools(QDir dir); ///< get absolute file path to all tool.xml files in folder dir and all subfolders
   QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter, QStringList trackingsystemsFilter); ///<
+  QPoint startPos;
 };
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -79,6 +86,10 @@ private slots:
   void deleteSlot();
   void deleteItemSlot(QListWidgetItem* item);
   void contextMenuSlot(const QPoint & point);
+
+protected:
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event);
 
 private:
   QListWidgetItem* mItemToDelete;
