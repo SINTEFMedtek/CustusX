@@ -70,18 +70,16 @@ protected:
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
 
-  bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles
-  AlphaPoint getCurrentAlphaPoint();///< Get aplha point based on mCurrentClickX and mCurrentClickY
-  void toggleCurrentPoint();///< Turn a transfer function point on or off (depending on it is on or not)
-  void moveCurrentAlphaPoint();///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
+  bool isInsideCurrentPoint(int mouseX, int mouseY);///< Checks if a screen coordinate is inside any of the point rectangles
+  AlphaPoint getCurrentAlphaPoint(int mouseX, int mouseY);///< Get aplha point based on mCurrentClickX and mCurrentClickY
+  void toggleCurrentPoint(int mouseX, int mouseY);///< Turn a transfer function point on or off (depending on it is on or not)
+  void moveCurrentAlphaPoint(int mouseX, int mouseY);///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
 
   QRect mFullArea; ///< The full widget area.
   QRect mPlotArea; ///< The plot area.
   std::map<int, QRect> mPointRects; ///< Cache with all point rectangles.
   AlphaPoint mCurrentAlphaPoint;///< The current alpha point
 	bool mEndPoint;///< Current alpha point is an endpoint
-
-  int mCurrentClickX, mCurrentClickY;///< The x, y coordinate currently selected with the mouse
 
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
 
