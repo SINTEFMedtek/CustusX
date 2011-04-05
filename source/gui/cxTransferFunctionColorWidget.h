@@ -94,6 +94,8 @@ protected:
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   
   virtual QSize sizeHint () const { return QSize(100, 30);};///< Define a recommended size
+
+  void calculateColorTFBoundaries(int &areaLeft, int &areaRight, int &areaWidth);///< Calculate color transfer function boundaries for GUI, based on window and level
 };
 }
 #endif /* CXTRANSFERFUNCTIONCOLORWIDGET_H_ */

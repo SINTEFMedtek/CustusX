@@ -6,7 +6,7 @@
   <type>>Aurora</type>
 </tracker>
 
-<toolfile type="aurora" reference="yes">../Tools/Aurora_registration_frame_port1.xml</toolfile>
-<toolfile type="aurora" reference="no">../Tools/AuroraPointer_port2.xml</toolfile>
+<toolfile type="aurora" reference="yes">../Tools/Shared/Reference-Plate_AURORA_port1/Reference-Plate_AURORA_port1.xml</toolfile>
+<toolfile type="aurora" reference="no">../Tools/Shared/Pointer_AURORA_port2/Pointer_AURORA_port2.xml</toolfile>
 
 </configuration>
