@@ -20,8 +20,6 @@ namespace cx
 TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
   QWidget(parent),
 	mEndPoint(false),
-  mCurrentClickX(INT_MIN),
-  mCurrentClickY(INT_MIN),
   mBorder(5),
   mReadOnly(false)
 {
@@ -60,10 +58,10 @@ void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataP
   mImageTF = tfData;
   this->update();
 
-  if ((mImage &&
-       mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
-      (mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
-    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
+//  if ((mImage &&
+//       mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
+//      (mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
+//    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
 }
 
 void TransferFunctionAlphaWidget::setReadOnly(bool readOnly)
@@ -89,16 +87,14 @@ void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
   if(mReadOnly)
     return;
   QWidget::mousePressEvent(event);
-  mCurrentClickX = event->x();
-  mCurrentClickY = event->y();
 
   if(event->button() == Qt::LeftButton)
   {
-    this->isInsideCurrentPoint();
+    this->isInsideCurrentPoint(event->x(), event->y());
   }
   else if(event->button() == Qt::RightButton)
   {
-    this->toggleCurrentPoint();
+    this->toggleCurrentPoint(event->x(), event->y());
   }
 }
 void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
@@ -115,16 +111,18 @@ void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
 }
 void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
 {
-  if(mReadOnly)
+  if (!mImage)
+    return;
+
+  AlphaPoint point = this->getCurrentAlphaPoint(event->x(), event->y());
+  this->setToolTip(QString("(%1, %2)").arg(point.position).arg(point.value / 255.0, 0, 'f', 2));
+  if(mReadOnly) //Only show tool tip if readOnly
     return;
   QWidget::mouseMoveEvent(event);
 
   if(event->buttons() == Qt::LeftButton)
   {
-    // Update current screen point for use in moveCurrentAlphaPoint
-    mCurrentClickX = event->x();
-    mCurrentClickY = event->y();
-    this->moveCurrentAlphaPoint();
+    this->moveCurrentAlphaPoint(event->x(), event->y());
   }
   // Mouse is only moved inside the widget.
   // Emit value for possible use by info widget
@@ -135,12 +133,12 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
     {
       if(mImage)
       {
-        mCurrentAlphaPoint.value = int(mImage->getRange() *
+        mCurrentAlphaPoint.position = int(mImage->getMin() + mImage->getRange() *
                                        (event->x() - mPlotArea.left()) / 
                                        static_cast<double>(mPlotArea.width()) );
         // mCurrentAlphaPoint.position set at mousePressEvent() 
         // (with isInsideCurrentPoint())
-        emit positionChanged(mCurrentAlphaPoint.value);
+        emit positionChanged(mCurrentAlphaPoint.position);
       }
     }
   }
@@ -172,11 +170,6 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   vtkImageAccumulatePtr histogram = mImage->getHistogram();
 	int histogramSize = histogram->GetComponentExtent()[1] - 
                       histogram->GetComponentExtent()[0];
-	//std::cout << "histogramSize " << histogramSize << std::endl;
-  //std::cout << "min " << mCurrentImage->getMin();
-  //std::cout << " max " << mCurrentImage->getMax() << std::endl;
-  //std::cout << "hist min " << histogram->GetComponentExtent()[0];
-  //std::cout << " hist max " << histogram->GetComponentExtent()[1] << std::endl;
   
   painter.setPen(QColor(140, 140, 210));
   
@@ -194,7 +187,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 	{
 //		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
     x = ((i- mImage->getMin()) * posMult); //Offset with min value
-    y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i]+1)) * barHeightMult;
+    y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i - mImage->getMin()]+1)) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
     {
@@ -203,12 +196,13 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 
       //std::cout << "x: " << x << " y: " << y <<  std::endl;
     }
-    //std::cout << "i: " << i << " y: " << static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] << std::endl;
+    //std::cout << "i: " << i << " y: " << static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i- mImage->getMin()] << std::endl;
 	}
 
   // Go through each point and draw squares and lines
 
   ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
+
   QPoint lastScreenPoint;
   this->mPointRects.clear();
   for (ssc::IntIntMap::iterator opPoint = opacityMap->begin();
@@ -218,7 +212,7 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
     // Get the screen (plot) position of this point
     QPoint screenPoint = QPoint(
       static_cast<int>(mPlotArea.left() + mPlotArea.width() * 
-                       opPoint->first / 
+                       (opPoint->first - mImage->getMin()) /
                        static_cast<double>(mImage->getRange())),
       static_cast<int>(mPlotArea.bottom() - mPlotArea.height() * 
                        opPoint->second / 
@@ -253,13 +247,13 @@ void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
   this->mPlotArea = QRect(mBorder, mBorder, 
                           width() - mBorder*2, height() - mBorder*2);
 }
-bool TransferFunctionAlphaWidget::isInsideCurrentPoint()
+bool TransferFunctionAlphaWidget::isInsideCurrentPoint(int mouseX, int mouseY)
 {
 	mEndPoint = false;
   std::map<int, QRect>::iterator it = mPointRects.begin();
   for(;it != mPointRects.end(); ++it)
   {
-    if (it->second.contains(mCurrentClickX, mCurrentClickY))
+    if (it->second.contains(mouseX, mouseY))
     {
       mCurrentAlphaPoint.position = it->first;
 			if (it == mPointRects.begin() || it == --mPointRects.end())
@@ -270,47 +264,32 @@ bool TransferFunctionAlphaWidget::isInsideCurrentPoint()
   mCurrentAlphaPoint.reset();
   return false;
 }
-TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentAlphaPoint()
+TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentAlphaPoint(int mouseX, int mouseY)
 {
   AlphaPoint point;
 
   point.position = 
-    static_cast<int>( mImage->getRange() *
-                     (mCurrentClickX - mPlotArea.left()) / 
-                     static_cast<double>(mPlotArea.width()) );
+    static_cast<int>(mImage->getMin() + ( mImage->getRange() *
+                     (mouseX - mPlotArea.left()) /
+                     static_cast<double>(mPlotArea.width()) ));
   point.value = 
     static_cast<int>( mImage->getMaxAlphaValue() *
-                     (mPlotArea.bottom() - mCurrentClickY) / 
+                     (mPlotArea.bottom() - mouseY) /
                      static_cast<double>(mPlotArea.height()) );
-
-  /*if (point.position > mCurrentImage->getPosMax())
-    point.position = mCurrentImage->getPosMax();
-  else if (point.position < mCurrentImage->getPosMin())
-    point.position = mCurrentImage->getPosMin();*/
-  //TODO: replace code with above code
-//  if (point.position > mImage->getMax())
-//    point.position = mImage->getMax();
-//  else if (point.position < mImage->getMin())
-//    point.position = mImage->getMin();
-//
-//  if (point.value > mImage->getMaxAlphaValue())
-//    point.value = mImage->getMaxAlphaValue();
-//  else if (point.value < 0)
-//    point.value = 0;
 
   point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
   point.value = ssc::constrainValue(point.value, 0, mImage->getMaxAlphaValue());
 
   return point;
 }
-void TransferFunctionAlphaWidget::toggleCurrentPoint()
+void TransferFunctionAlphaWidget::toggleCurrentPoint(int mouseX, int mouseY)
 {
   if(!mImage)
     return;
-  if(!isInsideCurrentPoint())
+  if(!isInsideCurrentPoint(mouseX, mouseY))
   {
     // Outside any of the rectangles
-    AlphaPoint point = getCurrentAlphaPoint();
+    AlphaPoint point = getCurrentAlphaPoint(mouseX, mouseY);
     mImageTF->addAlphaPoint(point.position,point.value);
   }
 	// mEndPoint is set in isInsideCurrentPoint()
@@ -323,19 +302,16 @@ void TransferFunctionAlphaWidget::toggleCurrentPoint()
 
   this->update();
 }
-void TransferFunctionAlphaWidget::moveCurrentAlphaPoint()
+void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
 {
   if(!mCurrentAlphaPoint.isValid())
     return;
 
-  AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint();
+  AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(mouseX, mouseY);
 
   //ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
   
   // Max and min points may only be moved in y direction
-  /*if(mCurrentAlphaPoint.position == mCurrentImage->getPosMin() 
-     || mCurrentAlphaPoint.position == mCurrentImage->getPosMax() )*/
-  //TODO: Replace with above code
   if(mCurrentAlphaPoint.position == mImage->getMin()
      || mCurrentAlphaPoint.position == mImage->getMax() )
   {
