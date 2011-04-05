@@ -53,6 +53,12 @@ std::map<QString, IgstkToolPtr> IgstkToolManager::getTools()
   return mTools;
 }
 
+IgstkToolPtr IgstkToolManager::getRefereceTool()
+{
+  QMutexLocker sentry(&mReferenceMutex);
+  return mReferenceTool;
+}
+
 void IgstkToolManager::setReference()
 {
   std::map<QString, IgstkToolPtr>::iterator it;
