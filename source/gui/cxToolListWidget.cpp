@@ -32,12 +32,23 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
 
   foreach(QString tool, toolsAbsoluteFilePath)
   {
-    QFile file(tool);
-    QFileInfo info(file);
-    QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
-    item->setData(Qt::ToolTipRole, info.absoluteFilePath());
-    this->addItem(item);
+    this->addTool(tool);
+//    QFile file(tool);
+//    QFileInfo info(file);
+//    QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
+//    item->setData(Qt::ToolTipRole, info.absoluteFilePath());
+//    this->addItem(item);
   }
+  emit listSizeChanged();
+}
+
+void ToolListWidget::addTool(QString absoluteFilePath)
+{
+  QFile file(absoluteFilePath);
+  QFileInfo info(file);
+  QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
+  item->setData(Qt::ToolTipRole, info.absoluteFilePath());
+  this->addItem(item);
   emit listSizeChanged();
 }
 
@@ -57,7 +68,11 @@ void ToolListWidget::toolClickedSlot(QListWidgetItem* item)
   emit toolSelected(absoluteFilePath);
 }
 
+
 //---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
 
 FilteringToolListWidget::FilteringToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -68,6 +83,39 @@ FilteringToolListWidget::FilteringToolListWidget(QWidget* parent) :
 
 FilteringToolListWidget::~FilteringToolListWidget()
 {}
+
+void FilteringToolListWidget::mousePressEvent(QMouseEvent *event)
+{
+  if (event->button() == Qt::LeftButton)
+    startPos = event->pos();
+  QListWidget::mousePressEvent(event);
+}
+
+void FilteringToolListWidget::mouseMoveEvent(QMouseEvent *event)
+{
+  if (event->buttons() & Qt::LeftButton)
+  {
+    int distance = (event->pos() - startPos).manhattanLength();
+    if (distance >= 10)
+      this->startDrag();
+  }
+}
+
+
+void FilteringToolListWidget::startDrag()
+{
+  QListWidgetItem *item = currentItem();
+  if (item)
+  {
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setText(item->data(Qt::ToolTipRole).toString());
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(mimeData);
+
+    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
+      delete item;
+  }
+}
 
 void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter)
 {
@@ -170,7 +218,14 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
 
   return retval;
 }
+
+
+
 //---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
+
 
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -178,6 +233,8 @@ ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
 //  qRegisterMetaType<QListWidgetItem*>("QListWidgetItem*");
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
+  this->viewport()->setAcceptDrops(true);
+  this->setDropIndicatorShown(true);
   this->setDefaultDropAction(Qt::CopyAction);
   this->setDragDropMode(QAbstractItemView::DropOnly);
 
@@ -188,16 +245,47 @@ ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
 ConfigToolListWidget::~ConfigToolListWidget()
 {}
 
-void ConfigToolListWidget::dropEvent(QDropEvent* event)
+void ConfigToolListWidget::dragEnterEvent(QDragEnterEvent *event)
 {
-  QListWidget::dropEvent(event);
+  QStringList all = this->getTools();
+  if (all.contains(event->mimeData()->text()))
+    event->ignore();
+  else
+    event->accept();
+}
 
-  //TODO should prevent duplication of items... reimplement the drop slot???
-//  std::cout << "something was dropped..." << std::endl;
+void ConfigToolListWidget::dragMoveEvent(QDragMoveEvent *event)
+{
+  event->setDropAction(Qt::MoveAction);
+//  event->accept();
+  QStringList all = this->getTools();
+  if (all.contains(event->mimeData()->text()))
+    event->ignore();
+  else
+    event->accept();
+}
 
+void ConfigToolListWidget::dropEvent(QDropEvent *event)
+{
+//  std:: cout << "received dropEvent: " << event->mimeData()->text() << std::endl;
+  this->addTool(event->mimeData()->text());
+//  addItem(event->mimeData()->text());
+  event->setDropAction(Qt::MoveAction);
+  event->accept();
   emit userChangedList();
   emit listSizeChanged();
 }
+
+//void ConfigToolListWidget::dropEvent(QDropEvent* event)
+//{
+//  QListWidget::dropEvent(event);
+//
+//  //TODO should prevent duplication of items... reimplement the drop slot???
+////  std::cout << "something was dropped..." << std::endl;
+//
+//  emit userChangedList();
+//  emit listSizeChanged();
+//}
 
 QStringList ConfigToolListWidget::getTools()
 {
