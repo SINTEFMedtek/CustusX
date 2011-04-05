@@ -113,8 +113,8 @@ void TransferFunctionColorWidget::mouseMoveEvent(QMouseEvent* event)
 void TransferFunctionColorWidget::calculateColorTFBoundaries(int &areaLeft, int &areaRight, int &areaWidth)
 {
 
-  double min = mImageTF->getLevel() - ( mImageTF->getWindow() / 2.0 );
-  double max = mImageTF->getLevel() + ( mImageTF->getWindow() / 2.0 );
+  double min = mImageTF->getLevel() - ( mImageTF->getWindow() / 2.0 ) - mImage->getMin();
+  double max = mImageTF->getLevel() + ( mImageTF->getWindow() / 2.0 ) - mImage->getMin();
 
   areaLeft  = mPlotArea.left()  + (min * mPlotArea.width() / mImage->getRange());
   areaRight = mPlotArea.left()  + (max * mPlotArea.width() / mImage->getRange());
@@ -151,16 +151,16 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 
   for (int x = areaLeft; x <= areaRight; ++x)
   {
-    int point = static_cast<int>(0.5 + (mImage->getRange() - 1) *
-                                 (x - areaLeft ) /
-                                 //static_cast<double>(mPlotArea.width()-1));
+    int point = static_cast<int>(0.5 + mImage->getMin() + (mImage->getRange() - 1) *
+                                 (x - areaLeft) /
                                  static_cast<double>(areaWidth-1));
+
     //QColor color = transferFunction->getInterpolatedColorValue(point);
 		double* rgb = trFunc->GetColor(point);
     painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
     painter.drawLine(x, mPlotArea.top(), x, mPlotArea.bottom());
   }
-  //Fill the rest of the color transfer function are with either max or min color
+  //Fill the rest of the color transfer function with either max or min color
   int areaHeight = mPlotArea.bottom() - mPlotArea.top();
   int halfAreaTop = mPlotArea.top() + areaHeight / 4;
   int halfAreaBottom = mPlotArea.bottom() - areaHeight / 4;
@@ -168,7 +168,7 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
   {
     for (int x = mPlotArea.left(); x < areaLeft; x++)
     {
-      double* rgb = trFunc->GetColor(0);
+      double* rgb = trFunc->GetColor(mImage->getMin());
       painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
       painter.drawLine(x, halfAreaTop, x, halfAreaBottom);
     }
@@ -177,12 +177,11 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
    {
      for (int x = areaRight; x < mPlotArea.right(); x++)
      {
-       double* rgb = trFunc->GetColor(mImage->getRange());
+       double* rgb = trFunc->GetColor(mImage->getMax());
        painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
        painter.drawLine(x, halfAreaTop, x, halfAreaBottom);
      }
    }
-
 
   // Go through each point and draw squares
 
@@ -196,7 +195,7 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
     // Get the screen (plot) position of this point
     QPoint screenPoint = QPoint(
       static_cast<int>(areaLeft + areaWidth *
-                       colorPoint->first /
+                       (colorPoint->first - mImage->getMin()) /
                        static_cast<double>(mImage->getRange())),
                        mPlotArea.bottom());
 
@@ -288,14 +287,10 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
   int areaLeft, areaRight, areaWidth;
   this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
   point.position =
-    static_cast<int>( mImage->getRange() *
+    static_cast<int>(mImage->getMin() + ( mImage->getRange() *
                      (mCurrentClickX - areaLeft) /
-                     static_cast<double>(areaWidth) );
+                     static_cast<double>(areaWidth) ));
 
-//  if (point.position > mImage->getMax())
-//    point.position = mImage->getMax();
-//  else if (point.position < mCurrentImage->getMin())
-//    point.position = mCurrentImage->getMin();
   point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
 
 	// Use vtkColorTransferFunction for interpolation
