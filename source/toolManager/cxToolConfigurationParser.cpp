@@ -406,7 +406,8 @@ igstk::Transform ToolConfigurationParser::readCalibrationFile(QString filename)
 
 ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath) :
     mConfigurationFilePath(absoluteConfigFilePath),
-    mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile")
+    mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile"),
+    mTypeAttribute("type"), mClinicalAppAttribute("clinical_app"), mReferenceAttribute("reference")
 {
   this->setConfigDocument(mConfigurationFilePath);
 }
@@ -422,7 +423,7 @@ ssc::CLINICAL_APPLICATION ConfigurationFileParser::getApplicationapplication()
     return retval;
 
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
-  QString applicationapplication = configNode.toElement().attribute("clinical_app");
+  QString applicationapplication = configNode.toElement().attribute(mClinicalAppAttribute);
   retval = string2enum<ssc::CLINICAL_APPLICATION>(applicationapplication);
 //  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
 
@@ -440,7 +441,7 @@ std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTracker
   for(int i=0; i < trackerNodes.count(); ++i)
   {
     IgstkTracker::InternalStructure internalStructure;
-    QString trackerType = trackerNodes.at(i).toElement().attribute("type");
+    QString trackerType = trackerNodes.at(i).toElement().attribute(mTypeAttribute);
     internalStructure.mType = string2enum<ssc::TRACKING_SYSTEM>(trackerType);
     internalStructure.mLoggingFolderName = ""; //TODO
 
@@ -488,7 +489,7 @@ QString ConfigurationFileParser::getAbsoluteReferenceFilePath()
   QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
   for(int i=0; i < toolFileNodes.count(); ++i)
   {
-    QString reference = toolFileNodes.at(i).toElement().attribute("reference");
+    QString reference = toolFileNodes.at(i).toElement().attribute(mReferenceAttribute);
     if(reference.contains("yes", Qt::CaseInsensitive))
     {
 //      std::cout << "Found yes..." << std::endl;
