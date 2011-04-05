@@ -87,7 +87,7 @@ void IgstkToolManager::createTools(std::vector<Tool::InternalStructure> toolStru
       connect(igstkTool.get(), SIGNAL(attachedToTracker(bool)), this, SLOT(deviceInitializedSlot(bool)));
     } else
     {
-     ssc::messageManager()->sendWarning("Tool: "+toolStructures[i].mUid+" is not valid.");
+     ssc::messageManager()->sendWarning(toolStructures[i].mUid+" is not valid.");
     }
   }
 }
