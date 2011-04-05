@@ -1,13 +1,102 @@
 #include "sscFrame3D.h"
 #include <math.h>
 #include "sscUtilHelpers.h"
+
+#include "cml/cml.h"
 // --------------------------------------------------------
 namespace ssc
 {
 
-//namespace utils
-//{
-//// --------------------------------------------------------
+
+DecomposedTransform3D::DecomposedTransform3D()
+{
+  mAngle = Vector3D(0,0,0);
+  mPos = Vector3D(0,0,0);
+}
+
+DecomposedTransform3D::DecomposedTransform3D(Transform3D m)
+{
+  ssc::Frame3D frame = Frame3D::create(m);
+  mAngle = frame.getEulerXYZ();
+  mPos = frame.mPos;
+  frame.mPos = Vector3D(0,0,0);
+  m_R = frame.transform();
+}
+
+void DecomposedTransform3D::reset(Transform3D m)
+{
+  DecomposedTransform3D input(m);
+
+  bool eqPos = similar(input.mPos, mPos);
+  if (!eqPos)
+  {
+    mPos = input.mPos;
+//    std::cout << "reset set pos " << mPos << std::endl;
+  }
+
+  input.mPos = mPos;
+  bool eqRot = similar(input.getMatrix(), this->getMatrix());
+  // only reset angles if the input rotation matrix is different from the current.
+  if (!eqRot)
+  {
+    mAngle = input.mAngle;
+    m_R = input.m_R;
+//    std::cout << "reset set rot " << mAngle << std::endl;
+  }
+}
+
+void DecomposedTransform3D::setAngles(Vector3D xyz)
+{
+//  std::cout << "setAngles " << xyz << std::endl;
+
+  if (!similar(xyz[0], mAngle[0]))
+  {
+    m_R = m_R * createTransformRotateX(xyz[0]-mAngle[0]);
+    mAngle[0] = xyz[0];
+  }
+  if (!similar(xyz[1], mAngle[1]))
+  {
+    m_R = m_R * createTransformRotateY(xyz[1]-mAngle[1]);
+    mAngle[1] = xyz[1];
+  }
+  if (!similar(xyz[2], mAngle[2]))
+  {
+    m_R = m_R * createTransformRotateZ(xyz[2]-mAngle[2]);
+    mAngle[2] = xyz[2];
+  }
+}
+
+void DecomposedTransform3D::setPosition(Vector3D pos)
+{
+//  std::cout << "setPosition " << pos << std::endl;
+  mPos = pos;
+}
+
+Vector3D DecomposedTransform3D::getAngles() const
+{
+  return mAngle;
+}
+
+Vector3D DecomposedTransform3D::getPosition() const
+{
+  return mPos;
+}
+
+Transform3D DecomposedTransform3D::getMatrix() const
+{
+  return createTransformTranslate(mPos) * m_R;
+}
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
+//TODO: are vtk col or row order? must do the same here.
+typedef cml::vector< double, cml::fixed<3> > cml_vector_3;
+typedef cml::matrix<double, cml::fixed<3,3>, cml::col_basis> cml_matrix_3x3;
+typedef cml::matrix<double, cml::fixed<4,4>, cml::col_basis> cml_matrix_4x4;
+typedef cml::quaternion<double, cml::fixed<>, cml::scalar_first> cml_quaternion_type;
 
 
 Frame3D::Frame3D()
@@ -46,6 +135,109 @@ double safe_sqrt(double x)
 //}
 
 } // namespace unnamed
+
+cml_matrix_4x4 convertToCml(const Transform3D& T)
+{
+  cml_matrix_4x4 m;
+  for (int r=0; r<4; ++r)
+    for (int c=0; c<4; ++c)
+      m(r,c) = T[r][c];
+  return m;
+}
+
+static cml::EulerOrder mEulerOrder = cml::euler_order_xyz;
+//static cml::EulerOrder mEulerOrder = cml::euler_order_zyx;
+
+void cml_test(const Transform3D& T)
+{
+  cml_matrix_4x4 m = convertToCml(T);
+
+  cml_quaternion_type q;
+  cml::quaternion_rotation_matrix(q,m);
+
+  cml_vector_3 axis;
+  double angle;
+  cml::quaternion_to_axis_angle(q, axis, angle);
+
+  std::cout << "cml aa: " << axis[0] << " " << axis[1] << " " << axis[2] << " " << angle << std::endl;
+}
+
+ssc::Vector3D Frame3D::getEulerXYZ() const
+{
+  cml_quaternion_type q;
+  cml_vector_3 axis(rotationAxis()[0], rotationAxis()[1], rotationAxis()[2]);
+  cml::quaternion_rotation_axis_angle(q, axis, mPhi);
+
+//  cml_matrix_4x4 m = convertToCml(this->transform());
+//
+//  cml_quaternion_type q;
+//  cml::quaternion_rotation_matrix(q,m);
+  ssc::Vector3D retval;
+
+  cml::quaternion_to_euler(q, retval[0], retval[1], retval[2], mEulerOrder);
+
+//  std::cout << "Frame3D::getEulerXYZ qua: " << q[0] << " " << q[1] << " " << q[2] << " " << q[3] << std::endl;
+//  std::cout << "Frame3D::getEulerXYZ axi: " << this->rotationAxis() << " " << mPhi << std::endl;
+//  std::cout << "Frame3D::getEulerXYZ xyz: " << retval << std::endl;
+
+  return retval;
+}
+
+void Frame3D::setEulerXYZ(const ssc::Vector3D& xyz)
+{
+  cml_quaternion_type q;
+
+//  ssc::Vector3D a = xyz;
+//  cml::quaternion_rotation_world_y(q, 0.0);
+//  cml::quaternion_rotate_about_world_x(q, a[0]);
+//  cml::quaternion_rotate_about_world_y(q, a[1]);
+//  cml::quaternion_rotate_about_world_z(q, a[2]);
+
+  cml::quaternion_rotation_euler(q,xyz[0],xyz[1],xyz[2],mEulerOrder);
+
+  cml_vector_3 axis;
+  double angle;
+  cml::quaternion_to_axis_angle(q, axis, angle);
+
+//  std::cout << "Frame3D::setEulerXYZ xyz: " << xyz << std::endl;
+//  std::cout << "Frame3D::setEulerXYZ qua: " << q[0] << " " << q[1] << " " << q[2] << " " << q[3] << std::endl;
+//  std::cout << "Frame3D::setEulerXYZ axi: " << axis[0] << " " << axis[1] << " " << axis[2] << " " << angle << std::endl;
+
+  mPhi = angle;
+  this->setRotationAxis(ssc::Vector3D(axis[0],axis[1],axis[2]));
+}
+
+void testProps(const Transform3D& T)
+{
+  Frame3D f = Frame3D::create(T);
+  std::cout << "T: " << std::endl << T << std::endl;
+  ssc::Vector3D k = f.rotationAxis();
+  std::cout << "frame aa: " << k[0] << " " << k[1] << " " << k[2] << " " << f.mPhi << std::endl;
+  cml_test(T);
+}
+
+void Frame3D::test()
+{
+  cml_quaternion_type q;
+  ssc::Vector3D a(30,40,50);
+  a = a*M_PI/180;
+  cml::quaternion_rotation_world_y(q, 0.0);
+  cml::quaternion_rotate_about_world_x(q, a[0]);
+  cml::quaternion_rotate_about_world_y(q, a[1]);
+  cml::quaternion_rotate_about_world_z(q, a[2]);
+
+  cml::quaternion_to_euler(q, a[0], a[1], a[2], cml::euler_order_xyz);
+  a = a/M_PI*180;
+  std::cout << "test angles xyz: " << a << std::endl;
+  cml::quaternion_to_euler(q, a[0], a[1], a[2], cml::euler_order_zyx);
+  a = a/M_PI*180;
+  std::cout << "test angles zyx: " << a << std::endl;
+
+  Transform3D M1;
+
+  testProps(M1);
+  testProps(createTransformRotateX(M_PI/3)*createTransformRotateY(M_PI/5));
+}
 
 //
 // Convert from a rotation matrix T to Frame.
