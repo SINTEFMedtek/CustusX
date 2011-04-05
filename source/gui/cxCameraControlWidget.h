@@ -22,16 +22,17 @@ namespace cx
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /**
- * A touchpad-friendly area  for performing 2D scroll operations.
+ * Internal class for the MousePadWidget
  */
-class MousePadWidget : public QFrame
+class MousePadWidgetInternal : public QFrame
 {
   Q_OBJECT
 
 public:
-  MousePadWidget(QWidget* parent, QSize minimumSize);
-  virtual ~MousePadWidget();
+  MousePadWidgetInternal(QWidget* parent, QSize minimumSize);
+  virtual ~MousePadWidgetInternal();
   void setFixedXPos(bool on);
+  void setFixedYPos(bool on);
   virtual QSize minimumSizeHint() const { return mMinSize; }
 signals:
   void mouseMoved(QPointF deltaN);
@@ -46,8 +47,28 @@ protected:
 private:
   QPoint mLastPos;
   bool mFixPosX;
+  bool mFixPosY;
   QSize mMinSize;
   void fixPos();
+};
+
+/**
+ * A touchpad-friendly area  for performing 1D/2D scroll operations.
+ */
+class MousePadWidget : public QFrame
+{
+  Q_OBJECT
+
+public:
+  MousePadWidget(QWidget* parent, QSize minimumSize);
+  virtual ~MousePadWidget();
+  void setFixedXPos(bool on);
+  void setFixedYPos(bool on);
+signals:
+  void mouseMoved(QPointF deltaN);
+protected:
+private:
+  class MousePadWidgetInternal* mInternal;
 };
 
 /** Widget for controlling the camera in the 3D view.
