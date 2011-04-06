@@ -74,23 +74,18 @@ public slots:
 private slots:
   void browsePatientDataFolderSlot();
 
-//  void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
   void currentApplicationChangedSlot(int index);
   void applicationStateChangedSlot();
 
 private:
-//  void setToolConfigComboBox();
   void setApplicationComboBox();
 
   QComboBox* mPatientDataFolderComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
-//  QComboBox* mToolConfigFilesComboBox;
   QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
-//  QString mCurrentToolConfigFile;
-
 };
 
 /**
@@ -260,8 +255,6 @@ protected:
   QToolBar* mToolBar;
   QDialogButtonBox *buttonBox;
 };
-
-
 
 }//namespace cx
 
