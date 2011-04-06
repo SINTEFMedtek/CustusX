@@ -59,16 +59,11 @@ void GeneralTab::init()
   QToolButton* browsePatientFolderButton = new QToolButton(this);
   browsePatientFolderButton->setDefaultAction(browsePatientFolderAction);
   
-//  QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
-//  mToolConfigFilesComboBox = new QComboBox;
-//  connect( mToolConfigFilesComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
-  
   // Choose application name
   QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
   connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentApplicationChangedSlot(int)));
-//  mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
   this->applicationStateChangedSlot();
   
   // Layout
@@ -79,9 +74,6 @@ void GeneralTab::init()
   
   mainLayout->addWidget(chooseApplicationLabel, 8, 0);
   mainLayout->addWidget(mChooseApplicationComboBox, 8, 1);
-  
-//  mainLayout->addWidget(toolConfigFilesLabel, 9, 0);
-//  mainLayout->addWidget(mToolConfigFilesComboBox, 9, 1);
  
   mTopLayout->addLayout(mainLayout);
 }
@@ -100,31 +92,6 @@ void GeneralTab::browsePatientDataFolderSlot()
     mPatientDataFolderComboBox->setCurrentIndex( mPatientDataFolderComboBox->currentIndex() + 1 );
   }
 }
-
-//void GeneralTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
-//{
-//  mCurrentToolConfigFile = newToolConfigFile;
-//}
-
-//void GeneralTab::setToolConfigComboBox()
-//{
-//  mToolConfigFilesComboBox->blockSignals(true);
-//	QDir dir(DataLocations::getApplicationToolConfigPath());
-//    dir.setFilter(QDir::Files);
-//
-//    QStringList nameFilters;
-//    nameFilters << "*.xml";
-//    dir.setNameFilters(nameFilters);
-//
-//    QStringList list = dir.entryList();
-//
-//    mToolConfigFilesComboBox->clear();
-//    mToolConfigFilesComboBox->addItems( list );
-//
-//    int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
-//    mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
-//    mToolConfigFilesComboBox->blockSignals(false);
-//}
 
 void GeneralTab::setApplicationComboBox()
 {
@@ -153,12 +120,6 @@ void GeneralTab::applicationStateChangedSlot()
 
   mChooseApplicationComboBox->blockSignals(false);
 
-//  this->setToolConfigComboBox();
-
-  // this hack ensures that the tool folder is reinitialized when changing application.
-  // TODO: move to application state
-//  if (mToolConfigFilesComboBox->currentIndex()<0)
-//    mToolConfigFilesComboBox->setCurrentIndex(0);
 }
   
 void GeneralTab::currentApplicationChangedSlot(int index)
@@ -174,13 +135,7 @@ void GeneralTab::saveParametersSlot()
   // currentPatientDataFolder
   mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
-  // currentToolConfigFile
-//  mSettings->setValue("toolConfigFile", mCurrentToolConfigFile);
-  
   mSettings->sync();
-
-  // update toolmanager config file
-//  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   emit savedParameters();
 }
@@ -446,8 +401,8 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
   this->addTab(new GeneralTab, tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
-  this->addTab(new VisualizationTab, tr("Visualization"));
   this->addTab(new AutomationTab, tr("Automation"));
+  this->addTab(new VisualizationTab, tr("Visualization"));
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
 
