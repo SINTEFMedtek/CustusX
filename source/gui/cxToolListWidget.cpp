@@ -13,6 +13,7 @@
 
 namespace cx
 {
+//---------------------------------------------------------------------------------------------------------------------
 
 ToolListWidget::ToolListWidget(QWidget* parent) :
     QListWidget(parent)
@@ -33,11 +34,6 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
   foreach(QString tool, toolsAbsoluteFilePath)
   {
     this->addTool(tool);
-//    QFile file(tool);
-//    QFileInfo info(file);
-//    QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
-//    item->setData(Qt::ToolTipRole, info.absoluteFilePath());
-//    this->addItem(item);
   }
   emit listSizeChanged();
 }
@@ -68,11 +64,7 @@ void ToolListWidget::toolClickedSlot(QListWidgetItem* item)
   emit toolSelected(absoluteFilePath);
 }
 
-
 //---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-
 
 FilteringToolListWidget::FilteringToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -218,13 +210,7 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
   return retval;
 }
 
-
-
 //---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-
-
 
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -346,4 +332,6 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 
   contextMenu.exec(pointGlobal);
 }
+
+//---------------------------------------------------------------------------------------------------------------------
 } //namespace cx
