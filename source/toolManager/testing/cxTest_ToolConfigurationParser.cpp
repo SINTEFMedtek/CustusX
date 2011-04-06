@@ -1,5 +1,6 @@
 #include "cxTest_ToolConfigurationParser.h"
 
+/*
 #include "cxDataLocations.h"
 #include "cxToolConfigurationParser.h"
 #include <QFile>
@@ -42,3 +43,4 @@ void TestToolConfigurationParser::testGetConfiguredTools()
     CPPUNIT_ASSERT_MESSAGE("Found an tool of type.", it->mType);
   }
 }
+*/

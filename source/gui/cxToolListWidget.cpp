@@ -13,11 +13,13 @@
 
 namespace cx
 {
+//---------------------------------------------------------------------------------------------------------------------
 
 ToolListWidget::ToolListWidget(QWidget* parent) :
     QListWidget(parent)
 {
-  connect(this, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
+  connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChangedSlot()));
+//  connect(this, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolSelectedSlot(QListWidgetItem*)));
 
   this->setSelectionBehavior(QAbstractItemView::SelectItems);
   this->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -33,11 +35,6 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
   foreach(QString tool, toolsAbsoluteFilePath)
   {
     this->addTool(tool);
-//    QFile file(tool);
-//    QFileInfo info(file);
-//    QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
-//    item->setData(Qt::ToolTipRole, info.absoluteFilePath());
-//    this->addItem(item);
   }
   emit listSizeChanged();
 }
@@ -62,17 +59,19 @@ Tool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFile
   return retval;
 }
 
-void ToolListWidget::toolClickedSlot(QListWidgetItem* item)
+void ToolListWidget::selectionChangedSlot()
+{
+  QListWidgetItem* selectedItem = this->currentItem();
+  this->toolSelectedSlot(selectedItem);
+}
+
+void ToolListWidget::toolSelectedSlot(QListWidgetItem* item)
 {
   QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
   emit toolSelected(absoluteFilePath);
 }
 
-
 //---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-
 
 FilteringToolListWidget::FilteringToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -218,13 +217,7 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
   return retval;
 }
 
-
-
 //---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-
-
 
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -346,4 +339,6 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 
   contextMenu.exec(pointGlobal);
 }
+
+//---------------------------------------------------------------------------------------------------------------------
 } //namespace cx
