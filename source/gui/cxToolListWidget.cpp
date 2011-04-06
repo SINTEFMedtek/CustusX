@@ -18,7 +18,8 @@ namespace cx
 ToolListWidget::ToolListWidget(QWidget* parent) :
     QListWidget(parent)
 {
-  connect(this, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
+  connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChangedSlot()));
+//  connect(this, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolSelectedSlot(QListWidgetItem*)));
 
   this->setSelectionBehavior(QAbstractItemView::SelectItems);
   this->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -58,7 +59,13 @@ Tool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFile
   return retval;
 }
 
-void ToolListWidget::toolClickedSlot(QListWidgetItem* item)
+void ToolListWidget::selectionChangedSlot()
+{
+  QListWidgetItem* selectedItem = this->currentItem();
+  this->toolSelectedSlot(selectedItem);
+}
+
+void ToolListWidget::toolSelectedSlot(QListWidgetItem* item)
 {
   QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
   emit toolSelected(absoluteFilePath);
