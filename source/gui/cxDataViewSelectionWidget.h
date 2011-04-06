@@ -1,0 +1,128 @@
+/*
+ * sscDataViewSelectionWidget.h
+ *
+ *  Created on: Apr 5, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXDATAVIEWSELECTIONWIDGET_H_
+#define CXDATAVIEWSELECTIONWIDGET_H_
+
+#include <QListWidget>
+#include "cxViewWrapper.h"
+
+namespace cx
+{
+
+/**
+ * Base class for displaying ssc::Data items.
+ */
+
+class DataListWidget : public QListWidget
+{
+  Q_OBJECT
+
+public:
+  DataListWidget(QWidget* parent = NULL);
+  virtual ~DataListWidget();
+
+signals:
+  void dataSelected(QString uid);
+  void userChangedList(); ///< emitted whenever the user changes the list
+  void listSizeChanged(); ///< emitted whenever the count changes
+
+protected:
+  void populate(QStringList dataUids);
+//  void populateData(QString uid);
+  void populateData(QString uid, bool indent=false);
+
+//  Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
+
+private slots:
+  void dataClickedSlot(QListWidgetItem* item);
+};
+
+//---------------------------------------------------------------------------------------------------------------------
+
+class AllDataListWidget : public DataListWidget
+{
+  Q_OBJECT
+
+public:
+  AllDataListWidget(QWidget* parent = NULL);
+  virtual ~AllDataListWidget();
+
+
+public slots:
+//  void filterSlot(QStringList applicationsFilter, QStringList trackingsystemsFilter);
+
+protected:
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void startDrag();
+
+private slots:
+  void populateAllDataList();
+
+private:
+//  QStringList getAbsoluteFilePathToAllTools(QDir dir); ///< get absolute file path to all tool.xml files in folder dir and all subfolders
+//  QStringList filter(QStringList toolsToFilter, QStringList applicationsFilter, QStringList trackingsystemsFilter); ///<
+  QPoint startPos;
+};
+
+//---------------------------------------------------------------------------------------------------------------------
+
+class SelectedDataListWidget : public DataListWidget
+{
+  Q_OBJECT
+
+public:
+  SelectedDataListWidget(QWidget* parent = NULL);
+  virtual ~SelectedDataListWidget();
+  void setViewGroupData(ViewGroupDataPtr viewGroupData);
+
+  virtual void dropEvent(QDropEvent* event);
+  QStringList getData(); ///< get absolute file path to all tools currently in the list
+
+public slots:
+//  void configSlot(QStringList toolsAbsoluteFilePath); ///< adds all input tools to the list
+//  void filterSlot(QStringList trackingsystemFilter); ///< filters the tools on tracking system
+  void populateList();
+
+private slots:
+  void deleteSlot();
+  void deleteItemSlot(QListWidgetItem* item);
+  void contextMenuSlot(const QPoint & point);
+
+protected:
+  void dragEnterEvent(QDragEnterEvent *event);
+  void dragMoveEvent(QDragMoveEvent *event);
+
+private:
+  QListWidgetItem* mItemToDelete;
+  ViewGroupDataPtr mViewGroupData;
+
+};
+
+/**Widget for selecting which data items to show in a given view group,
+ * and how to order them.
+ *
+ */
+class DataViewSelectionWidget : public QWidget
+{
+  Q_OBJECT
+public:
+  DataViewSelectionWidget(QWidget* parent = NULL);
+  virtual ~DataViewSelectionWidget();
+
+private slots:
+//  void populateAllDataList();
+
+private:
+  SelectedDataListWidget* mSelectedDataListWidget;
+  AllDataListWidget* mAllDataListWidget;
+};
+
+}
+
+#endif /* CXDATAVIEWSELECTIONWIDGET_H_ */
