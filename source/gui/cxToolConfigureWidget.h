@@ -32,6 +32,8 @@ public:
   ToolConfigureGroupBox(QWidget* parent = NULL);
   virtual ~ToolConfigureGroupBox();
 
+  QString getCurrenctlySelectedConfiguration() const;
+
 signals:
   void toolSelected(QString absoluteFilePath);
 

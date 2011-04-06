@@ -70,6 +70,13 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
 ToolConfigureGroupBox::~ToolConfigureGroupBox()
 {}
 
+QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
+{
+  QString retval;
+  retval = mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), Qt::ToolTipRole).toString();
+  return retval;
+}
+
 void ToolConfigureGroupBox::requestSaveConfigurationSlot()
 {
   if(!mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), sEdited).toBool())
