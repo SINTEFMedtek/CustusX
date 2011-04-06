@@ -204,9 +204,11 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
   else
     action->setIcon(QIcon(":/icons/surface.png"));
 
+//  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
   if (uid.contains(mLastDataActionUid))
   {
     action->setText("    " + action->text());
+//    std::cout << "indenting " << action->text() << std::endl;
   }
   else
   {
