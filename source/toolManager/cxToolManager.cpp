@@ -149,12 +149,17 @@ void ToolManager::trackerConfiguredSlot(bool on)
 
   //new all tools
   std::map<QString, IgstkToolPtr> igstkTools = mTrackerThread->getTools();
+  IgstkToolPtr reference = mTrackerThread->getRefereceTool();
   std::map<QString, IgstkToolPtr>::iterator it = igstkTools.begin();
   for(;it != igstkTools.end(); ++it)
   {
-    ToolPtr tool(new Tool(it->second));
+    IgstkToolPtr igstkTool = it->second;
+    ToolPtr tool(new Tool(igstkTool));
     if(tool->isValid())
     {
+      if(igstkTool == reference)
+        mReferenceTool = tool;
+
       mTools[it->first] = tool;
       connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }

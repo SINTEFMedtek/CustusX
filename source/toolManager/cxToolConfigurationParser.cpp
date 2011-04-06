@@ -406,7 +406,8 @@ igstk::Transform ToolConfigurationParser::readCalibrationFile(QString filename)
 
 ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath) :
     mConfigurationFilePath(absoluteConfigFilePath),
-    mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile")
+    mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile"),
+    mTypeAttribute("type"), mClinicalAppAttribute("clinical_app"), mReferenceAttribute("reference")
 {
   this->setConfigDocument(mConfigurationFilePath);
 }
@@ -422,7 +423,7 @@ ssc::CLINICAL_APPLICATION ConfigurationFileParser::getApplicationapplication()
     return retval;
 
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
-  QString applicationapplication = configNode.toElement().attribute("clinical_app");
+  QString applicationapplication = configNode.toElement().attribute(mClinicalAppAttribute);
   retval = string2enum<ssc::CLINICAL_APPLICATION>(applicationapplication);
 //  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
 
@@ -440,7 +441,7 @@ std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTracker
   for(int i=0; i < trackerNodes.count(); ++i)
   {
     IgstkTracker::InternalStructure internalStructure;
-    QString trackerType = trackerNodes.at(i).toElement().attribute("type");
+    QString trackerType = trackerNodes.at(i).toElement().attribute(mTypeAttribute);
     internalStructure.mType = string2enum<ssc::TRACKING_SYSTEM>(trackerType);
     internalStructure.mLoggingFolderName = ""; //TODO
 
@@ -488,7 +489,7 @@ QString ConfigurationFileParser::getAbsoluteReferenceFilePath()
   QDomNodeList toolFileNodes = mConfigureDoc.elementsByTagName(mConfigTrackerToolFile);
   for(int i=0; i < toolFileNodes.count(); ++i)
   {
-    QString reference = toolFileNodes.at(i).toElement().attribute("reference");
+    QString reference = toolFileNodes.at(i).toElement().attribute(mReferenceAttribute);
     if(reference.contains("yes", Qt::CaseInsensitive))
     {
 //      std::cout << "Found yes..." << std::endl;
@@ -638,14 +639,13 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
 
 ToolFileParser::ToolFileParser(QString absoluteToolFilePath) :
     mToolFilePath(absoluteToolFilePath),
-    mToolfileTag("toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
-    mToolClinicalAppTag("clinical_app"),mToolGeoFileTag("geo_file"), mToolSensorTag("sensor"),
-    mToolSensorTypeTag("type"), mToolSensorWirelessTag("wireless"),
-    mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"),
-    mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
-    mToolSensorRomFileTag("rom_file"), mToolCalibrationTag("calibration"),
-    mToolCalibrationFileTag("cal_file"),
-    mInstrumentTag("instrument"), mInstrumentIdTag("id"), mInstrumentScannerIdTag("scannerid")
+    mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"), mToolDescriptionTag("description"), mToolManufacturerTag("manufacturer"),
+    mToolClinicalAppTag("clinical_app"),mToolGeoFileTag("geo_file"), mToolPicFileTag("pic_file"), mToolDocFileTag("doc_file"),
+    mToolInstrumentTag("instrument"), mToolInstrumentTypeTag("type"), mToolInstrumentIdTag("id"), mToolInstrumentNameTag("name"), mToolInstrumentManufacturerTag("manufacturer"), mToolInstrumentScannerIdTag("scannerid"), mToolInstrumentDescriptionTag("description"),
+    mToolSensorTag("sensor"), mToolSensorTypeTag("type"), mToolSensorIdTag("id"), mToolSensorNameTag("name"), mToolSensorWirelessTag("wireless"),
+    mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"), mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
+    mToolSensorManufacturerTag("manufacturer"), mToolSensorDescriptionTag("description"),  mToolSensorRomFileTag("rom_file"),
+    mToolCalibrationTag("calibration"), mToolCalibrationFileTag("cal_file")
 {}
 
 ToolFileParser::~ToolFileParser()
@@ -709,19 +709,19 @@ Tool::InternalStructure ToolFileParser::getTool()
     if (!toolGeofileText.isEmpty())
       toolGeofileText = toolFolderAbsolutePath + toolGeofileText;
     internalStructure.mGraphicsFileName = toolGeofileText;
-    QDomElement toolInstrumentElement = toolNode.firstChildElement(mInstrumentTag);
+    QDomElement toolInstrumentElement = toolNode.firstChildElement(mToolInstrumentTag);
     if (toolInstrumentElement.isNull())
     {
       ssc::messageManager()->sendError("Could not find the <instrument> tag under the <tool> tag. Aborting this tool.");
       return retval;
     }
     QDomElement toolInstrumentIdElement =
-        toolInstrumentElement.firstChildElement(mInstrumentIdTag);
+        toolInstrumentElement.firstChildElement(mToolInstrumentIdTag);
     QString toolInstrumentIdText = toolInstrumentIdElement.text();
     internalStructure.mInstrumentId = toolInstrumentIdText;
 
     QDomElement toolInstrumentScannerIdElement =
-        toolInstrumentElement.firstChildElement(mInstrumentScannerIdTag);
+        toolInstrumentElement.firstChildElement(mToolInstrumentScannerIdTag);
     QString toolInstrumentScannerIdText = toolInstrumentScannerIdElement.text();
     internalStructure.mInstrumentScannerId = toolInstrumentScannerIdText;
 
@@ -734,31 +734,6 @@ Tool::InternalStructure ToolFileParser::getTool()
     QDomElement toolSensorTypeElement = toolSensorElement.firstChildElement(mToolSensorTypeTag);
     QString toolSensorTypeText = toolSensorTypeElement.text();
     internalStructure.mTrackerType = string2enum<ssc::TRACKING_SYSTEM>(toolSensorTypeText);
-
-//    std::cout << "Found tracker type " << enum2string(internalStructure.mTrackerType) << " for tool " << internalStructure.mUid << std::endl;
-
-    //    if (toolSensorTypeText.contains("polaris", Qt::CaseInsensitive))
-//    {
-//      if (toolSensorTypeText.contains("spectra", Qt::CaseInsensitive))
-//      {
-//        internalStructure.mTrackerType = ssc::tsPOLARIS_SPECTRA;
-//      } else if (toolSensorTypeText.contains("vicra", Qt::CaseInsensitive))
-//      {
-//        internalStructure.mTrackerType = ssc::tsPOLARIS_VICRA;
-//      } else
-//      {
-//        internalStructure.mTrackerType = ssc::tsPOLARIS;
-//      }
-//    } else if (toolSensorTypeText.contains("aurora", Qt::CaseInsensitive))
-//    {
-//      internalStructure.mTrackerType = ssc::tsAURORA;
-//    } else if (toolSensorTypeText.contains("micron", Qt::CaseInsensitive))
-//    {
-//      internalStructure.mTrackerType = ssc::tsMICRON;
-//    } else
-//    {
-//      internalStructure.mTrackerType = ssc::tsNONE;
-//    }
 
     QDomElement toolSensorWirelessElement =
         toolSensorElement.firstChildElement(mToolSensorWirelessTag);

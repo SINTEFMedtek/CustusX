@@ -39,6 +39,7 @@ public:
   virtual ~IgstkToolManager();
 
   std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe
+  IgstkToolPtr getRefereceTool(); ///< ThreadSafe
 
 signals:
   void initialized(bool on); ///< trackers and tools are initialized
@@ -62,6 +63,7 @@ private:
   QMutex mToolMutex; ///< protects mTools
   std::map<QString, IgstkToolPtr> mTools;
   int mInitAnsweres; ///< keeps track of how many tools and trackers have gotten an answer from the hardware
+  QMutex mReferenceMutex; ///< protects mReferenceTool
   IgstkToolPtr mReferenceTool;
 
   QTimer* mTimer; ///< timer controlling the demand of transforms
