@@ -421,7 +421,7 @@ ConfigurationFileParser::~ConfigurationFileParser()
 
 ssc::CLINICAL_APPLICATION ConfigurationFileParser::getApplicationapplication()
 {
-  ssc::CLINICAL_APPLICATION retval;
+  ssc::CLINICAL_APPLICATION retval = ssc::mdCOUNT;
 
   if(!this->isConfigFileValid())
     return retval;
