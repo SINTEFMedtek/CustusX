@@ -11,6 +11,7 @@
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
 #include "cxShadingWidget.h"
+#include "cxDataViewSelectionWidget.h"
 
 //#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"
@@ -343,6 +344,7 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
   tabWidget->addTab(mTF3DWidget, "Volume");
   tabWidget->addTab(mTF2DWidget, "Slice");
   tabWidget->addTab(new ShadingWidget(this), "Shading");
+  tabWidget->addTab(new DataViewSelectionWidget(this), "Overlay");
 
 //  mLayout->addWidget(mTF2DWidget);
 //  mLayout->addWidget(mTF3DWidget);
