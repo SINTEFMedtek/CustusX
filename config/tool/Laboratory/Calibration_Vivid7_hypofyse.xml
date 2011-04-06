@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<toolfile type="polaris" reference="yes">../Tools/ProbeCalibrationArm.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Vivid7_Karkirurgen_hypofyse_8700449_calibration.xml</toolfile>
+
+</configuration>

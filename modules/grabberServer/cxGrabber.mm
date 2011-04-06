@@ -209,6 +209,13 @@ bool MacGrabber::findConnectedDevice()
         mObjectiveC->mSelectedDevice = captureDevice;
         found = true;
       }
+      //even newer VGA grabber (Epiphan)
+      compareResult = [grabberName localizedCompare:@"D4U24942"];
+      if (compareResult == NSOrderedSame)
+      {
+		  mObjectiveC->mSelectedDevice = captureDevice;
+		  found = true;
+      }
       
       //old VGA grabber (Epiphan)
       compareResult = [grabberName localizedCompare:@"V2U10443"];

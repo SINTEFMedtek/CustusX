@@ -35,6 +35,7 @@ public:
   void track(bool on); ///< tracking on or off. Threadsafe.
 
   std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe.
+  IgstkToolPtr getRefereceTool(); ///< ThreadSafe
 
 signals:
   void configured(bool on);

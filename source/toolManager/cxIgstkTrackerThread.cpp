@@ -21,6 +21,11 @@ std::map<QString, IgstkToolPtr> IgstkTrackerThread::getTools()
   return mManager->getTools();
 }
 
+IgstkToolPtr IgstkTrackerThread::getRefereceTool()
+{
+  return mManager->getRefereceTool();
+}
+
 void IgstkTrackerThread::initialize(bool on)
 {
   emit requestInitialize(on);
