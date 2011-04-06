@@ -23,7 +23,7 @@ namespace cx
  * \date 15. juni 2010
  * \author: Janne Beate Bakeng
  */
-class ToolConfigurationParser
+/*class ToolConfigurationParser
 {
 public:
   ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder = ""); ///< opens the xml file and readies it for reading
@@ -56,7 +56,7 @@ private:
 
   igstk::Transform readCalibrationFile(QString filename);
 
-};
+};*/
 
 /**
  * \class ConfigurationFileParser
@@ -83,7 +83,7 @@ public:
   };
 
 public:
-  ConfigurationFileParser(QString absoluteConfigFilePath);
+  ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder = "");
   ~ConfigurationFileParser();
 
   ssc::CLINICAL_APPLICATION getApplicationapplication();
@@ -100,6 +100,8 @@ private:
    QString getAbsoluteToolFilePath(QDomElement toolfileelement); ///< get the absolute toolfile path for a toolfile element containg a relative toolfile path
 
   QString mConfigurationFilePath; ///< absolute path to the configuration file
+  QString mLoggingFolder; ///< absolutepath to the logging folder
+
   QDomDocument mConfigureDoc; ///< the config xml document
   const QString mConfigTag, mConfigTrackerTag, mConfigTrackerToolFile; ///< names of necessary tags in the configuration file
   const QString mTypeAttribute, mClinicalAppAttribute, mReferenceAttribute; ///< names of necessary attributes in the configuration file
@@ -116,7 +118,7 @@ private:
 class ToolFileParser
 {
 public:
-  ToolFileParser(QString absoluteToolFilePath);
+  ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");
   ~ToolFileParser();
 
   Tool::InternalStructure getTool();
@@ -128,14 +130,17 @@ private:
   igstk::Transform readCalibrationFile(QString absoluteFilePath);
 
   QString mToolFilePath; ///< absolutepath to the tool file
+  QString mLoggingFolder; ///< absolutepath to the logging folder
+
   QDomDocument mToolDoc; ///< the tool xml document
-  const QString mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag, mToolDescriptionTag, mToolManufacturerTag, mToolClinicalAppTag,
-                    mToolGeoFileTag, mToolPicFileTag, mToolDocFileTag,
-                    mToolInstrumentTag, mToolInstrumentTypeTag, mToolInstrumentIdTag, mToolInstrumentNameTag, mToolInstrumentManufacturerTag, mToolInstrumentScannerIdTag, mToolInstrumentDescriptionTag,
+  const QString mToolTag, mToolTypeTag, mToolIdTag, mToolNameTag, mToolDescriptionTag, mToolManufacturerTag,
+                    mToolClinicalAppTag, mToolGeoFileTag, mToolPicFileTag, mToolDocFileTag,
+                    mToolInstrumentTag, mToolInstrumentTypeTag, mToolInstrumentIdTag, mToolInstrumentNameTag,
+                    mToolInstrumentManufacturerTag, mToolInstrumentScannerIdTag, mToolInstrumentDescriptionTag,
                     mToolSensorTag, mToolSensorTypeTag, mToolSensorIdTag, mToolSensorNameTag,
                     mToolSensorWirelessTag, mToolSensorDOFTag, mToolSensorPortnumberTag,
-                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag, mToolSensorManufacturerTag, mToolSensorDescriptionTag, mToolSensorRomFileTag,
-                    mToolCalibrationTag, mToolCalibrationFileTag;
+                    mToolSensorChannelnumberTag, mToolSensorReferencePointTag, mToolSensorManufacturerTag,
+                    mToolSensorDescriptionTag, mToolSensorRomFileTag, mToolCalibrationTag, mToolCalibrationFileTag;
                     ///< names of necessary tags in the tool file
 };
 

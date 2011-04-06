@@ -12,7 +12,6 @@
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxFilePreviewWidget.h"
-//#include "cxToolConfigWidget.h"
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 
