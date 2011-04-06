@@ -396,12 +396,52 @@ protected:
       event->setDropAction(Qt::MoveAction);
     }
 
+    if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+    {
+      QByteArray itemData = event->mimeData()->data("application/x-qabstractitemmodeldatalist");
+      QDataStream stream(&itemData, QIODevice::ReadOnly);
+      int r, c;
+      QMap<int, QVariant> v;
+      stream >> r >> c >> v;
+      std::cout << "var: " << r << " " << c << " " << v.size() << std::endl;
+      if (!v.empty())
+      {
+        std::cout << "v: " << " " << v.begin()->typeName() << " " << v.begin()->toString() << std::endl;
+      }
+    }
+
+
   //  std:: cout << "received dropEvent: " << event->mimeData()->text() << std::endl;
 //    this->populateData(event->mimeData()->text(), false, pos);
 //    event->setDropAction(Qt::MoveAction);
 //    event->accept();
     QListWidget::dropEvent(event);
   }
+
+
+//  void dropEvent(QGraphicsSceneDragDropEvent* event)
+//  {
+//    if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+//    {
+//      QTreeWidget *tree = dynamic_cast<QTreeWidget *> (event->source());
+//
+//      QByteArray itemData = event->mimeData()->data("application/x-qabstractitemmodeldatalist");
+//      QDataStream stream(&itemData, QIODevice::ReadOnly);
+//
+//      int r, c;
+//      QMap<int, QVariant> v;
+//      stream >> r >> c >> v;
+//
+//      QTreeWidgetItem *item = tree->topLevelItem(r);
+//
+//      if (item)
+//      {
+//        itemDropped(item);
+//      }
+//    }
+//
+//  }
+
 //  bool SelectedDataListWidget::dropMimeData(int index, const QMimeData* data, Qt::DropAction action)
 //  {
 //    std::cout << "hit" << std::endl;
@@ -442,8 +482,8 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
   // AbstractItemView::DropIndicatorPosition
   layout->addWidget(mSelectedDataListWidget);
   layout->addWidget(mAllDataListWidget);
-//  layout->addWidget(test);
-//  layout->addWidget(abra);
+  layout->addWidget(test);
+  layout->addWidget(abra);
 
   if (!viewManager()->getViewGroups().empty())
     mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
