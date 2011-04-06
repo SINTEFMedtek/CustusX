@@ -35,7 +35,7 @@ PreferencesTab::PreferencesTab(QWidget *parent) :
   this->setLayout(vtopLayout);
 }
 //==============================================================================
-// FoldersTab
+// GeneralTab
 //------------------------------------------------------------------------------
 
 GeneralTab::GeneralTab(QWidget *parent) :
@@ -59,17 +59,17 @@ void GeneralTab::init()
   QToolButton* browsePatientFolderButton = new QToolButton(this);
   browsePatientFolderButton->setDefaultAction(browsePatientFolderAction);
   
-  QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
-  mToolConfigFilesComboBox = new QComboBox;
-  connect( mToolConfigFilesComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
+//  QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
+//  mToolConfigFilesComboBox = new QComboBox;
+//  connect( mToolConfigFilesComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
   
   // Choose application name
   QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
   connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentApplicationChangedSlot(int)));
-  mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
-  applicationStateChangedSlot();
+//  mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
+  this->applicationStateChangedSlot();
   
   // Layout
   QGridLayout *mainLayout = new QGridLayout;
@@ -80,8 +80,8 @@ void GeneralTab::init()
   mainLayout->addWidget(chooseApplicationLabel, 8, 0);
   mainLayout->addWidget(mChooseApplicationComboBox, 8, 1);
   
-  mainLayout->addWidget(toolConfigFilesLabel, 9, 0);
-  mainLayout->addWidget(mToolConfigFilesComboBox, 9, 1);
+//  mainLayout->addWidget(toolConfigFilesLabel, 9, 0);
+//  mainLayout->addWidget(mToolConfigFilesComboBox, 9, 1);
  
   mTopLayout->addLayout(mainLayout);
 }
@@ -101,30 +101,30 @@ void GeneralTab::browsePatientDataFolderSlot()
   }
 }
 
-void GeneralTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
-{
-  mCurrentToolConfigFile = newToolConfigFile;
-}
+//void GeneralTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
+//{
+//  mCurrentToolConfigFile = newToolConfigFile;
+//}
 
-void GeneralTab::setToolConfigComboBox()
-{
-  mToolConfigFilesComboBox->blockSignals(true);
-	QDir dir(DataLocations::getApplicationToolConfigPath());
-    dir.setFilter(QDir::Files);
-
-    QStringList nameFilters;
-    nameFilters << "*.xml";
-    dir.setNameFilters(nameFilters);
-
-    QStringList list = dir.entryList();
-
-    mToolConfigFilesComboBox->clear();
-    mToolConfigFilesComboBox->addItems( list );
-
-    int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
-    mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
-    mToolConfigFilesComboBox->blockSignals(false);
-}
+//void GeneralTab::setToolConfigComboBox()
+//{
+//  mToolConfigFilesComboBox->blockSignals(true);
+//	QDir dir(DataLocations::getApplicationToolConfigPath());
+//    dir.setFilter(QDir::Files);
+//
+//    QStringList nameFilters;
+//    nameFilters << "*.xml";
+//    dir.setNameFilters(nameFilters);
+//
+//    QStringList list = dir.entryList();
+//
+//    mToolConfigFilesComboBox->clear();
+//    mToolConfigFilesComboBox->addItems( list );
+//
+//    int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
+//    mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
+//    mToolConfigFilesComboBox->blockSignals(false);
+//}
 
 void GeneralTab::setApplicationComboBox()
 {
@@ -153,12 +153,12 @@ void GeneralTab::applicationStateChangedSlot()
 
   mChooseApplicationComboBox->blockSignals(false);
 
-  this->setToolConfigComboBox();
+//  this->setToolConfigComboBox();
 
   // this hack ensures that the tool folder is reinitialized when changing application.
   // TODO: move to application state
-  if (mToolConfigFilesComboBox->currentIndex()<0)
-    mToolConfigFilesComboBox->setCurrentIndex(0);
+//  if (mToolConfigFilesComboBox->currentIndex()<0)
+//    mToolConfigFilesComboBox->setCurrentIndex(0);
 }
   
 void GeneralTab::currentApplicationChangedSlot(int index)
@@ -175,12 +175,12 @@ void GeneralTab::saveParametersSlot()
   mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
   // currentToolConfigFile
-  mSettings->setValue("toolConfigFile", mCurrentToolConfigFile);
+//  mSettings->setValue("toolConfigFile", mCurrentToolConfigFile);
   
   mSettings->sync();
 
   // update toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
+//  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   emit savedParameters();
 }
@@ -388,8 +388,6 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
 
-  //  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
-//  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 
@@ -412,9 +410,15 @@ void ToolConfigTab::init()
 
 void ToolConfigTab::saveParametersSlot()
 {
-  //TODO
-  //save things to mSettings????
   mToolConfigureGroupBox->requestSaveConfigurationSlot();
+
+  // currentToolConfigFile
+  mSettings->setValue("toolConfigFile", mToolConfigureGroupBox->getCurrenctlySelectedConfiguration());
+
+  mSettings->sync();
+
+  // update toolmanager config file
+  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 void ToolConfigTab::applicationChangedSlot()
