@@ -53,6 +53,12 @@ std::map<QString, IgstkToolPtr> IgstkToolManager::getTools()
   return mTools;
 }
 
+IgstkToolPtr IgstkToolManager::getRefereceTool()
+{
+  QMutexLocker sentry(&mReferenceMutex);
+  return mReferenceTool;
+}
+
 void IgstkToolManager::setReference()
 {
   std::map<QString, IgstkToolPtr>::iterator it;
@@ -87,7 +93,7 @@ void IgstkToolManager::createTools(std::vector<Tool::InternalStructure> toolStru
       connect(igstkTool.get(), SIGNAL(attachedToTracker(bool)), this, SLOT(deviceInitializedSlot(bool)));
     } else
     {
-     ssc::messageManager()->sendWarning("Tool: "+toolStructures[i].mUid+" is not valid.");
+     ssc::messageManager()->sendWarning(toolStructures[i].mUid+" is not valid.");
     }
   }
 }
