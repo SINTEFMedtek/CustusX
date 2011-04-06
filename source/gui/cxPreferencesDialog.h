@@ -74,22 +74,22 @@ public slots:
 private slots:
   void browsePatientDataFolderSlot();
 
-  void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
+//  void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
   void currentApplicationChangedSlot(int index);
   void applicationStateChangedSlot();
 
 private:
-  void setToolConfigComboBox();
+//  void setToolConfigComboBox();
   void setApplicationComboBox();
 
   QComboBox* mPatientDataFolderComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
-  QComboBox* mToolConfigFilesComboBox;
+//  QComboBox* mToolConfigFilesComboBox;
   QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
-  QString mCurrentToolConfigFile;
+//  QString mCurrentToolConfigFile;
 
 };
 
@@ -177,7 +177,7 @@ protected:
 };
 
 /**
- * \class UltrasoundTab
+ * \class VideoTab
  *
  * \brief Various parameters related to ultrasound acquisition and reconstruction.
  *
