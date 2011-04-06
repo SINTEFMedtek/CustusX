@@ -34,7 +34,7 @@ signals:
 protected:
   void populate(QStringList dataUids);
 //  void populateData(QString uid);
-  void populateData(QString uid, bool indent=false);
+  void populateData(QString uid, bool indent=false, QListWidgetItem* after = NULL);
 
 //  Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
@@ -97,11 +97,16 @@ private slots:
 protected:
   void dragEnterEvent(QDragEnterEvent *event);
   void dragMoveEvent(QDragMoveEvent *event);
+  bool dropMimeData(int index, const QMimeData* data, Qt::DropAction action);
+
+  void mousePressEvent(QMouseEvent *event);
+  void mouseMoveEvent(QMouseEvent *event);
+  void startDrag();
 
 private:
   QListWidgetItem* mItemToDelete;
   ViewGroupDataPtr mViewGroupData;
-
+  QPoint startPos;
 };
 
 /**Widget for selecting which data items to show in a given view group,
