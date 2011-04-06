@@ -9,12 +9,12 @@
 
 namespace cx
 {
-class ToolConfigurationParser;
+//class ToolConfigurationParser;
 }
-
+/*
 /**Unit tests that show the properties of the cxToolConfigurationParser class
  */
-class TestToolConfigurationParser: public CppUnit::TestFixture
+/*class TestToolConfigurationParser: public CppUnit::TestFixture
 {
 public:
   void setUp();
@@ -36,6 +36,7 @@ private:
   QString mXmlFilePath;
 
 };
-CPPUNIT_TEST_SUITE_REGISTRATION( TestToolConfigurationParser );
+*/
+//CPPUNIT_TEST_SUITE_REGISTRATION( TestToolConfigurationParser );
 
 #endif /*CXTEST_TOOLCONFIGURATIONPARSER_H_*/
