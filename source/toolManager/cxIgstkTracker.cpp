@@ -84,7 +84,7 @@ IgstkTracker::IgstkTracker(InternalStructure internalStructure) :
     mUid = mName = "Aurora";
     mTempAuroraTracker = AuroraTrackerType::New();
     mTempAuroraTracker->SetCommunication(mCommunication);
-    ssc::messageManager()->sendInfo("Tracker: Aurora");
+    ssc::messageManager()->sendInfo("Tracker is set to Aurora");
     mTracker = mTempAuroraTracker.GetPointer();
     mValid = true;
     break;
@@ -218,7 +218,7 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   {
     //Never happens???
     //this->internalInitialized(true);
-    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" is initialized.");
+    //ssc::messageManager()->sendInfo(mUid+" is initialized.");
     ssc::messageManager()->sendWarning("This never happens for some reason...  check code");
   }
   else if (igstk::TrackerStartTrackingEvent().CheckEvent(&event))
@@ -231,63 +231,63 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   }
   else if (igstk::TrackerUpdateStatusEvent().CheckEvent(&event))
   {
-    //ssc::messageManager()->sendDebug("Tracker: "+mUid+" is updated."); //SPAM!
+    //ssc::messageManager()->sendDebug(mUid+" is updated."); //SPAM!
   }
   else if (igstk::TrackerToolTransformUpdateEvent().CheckEvent(&event))
   {
-    //ssc::messageManager()->sendDebug("Tracker: "+mUid+" has updated a transform."); //SPAM
+    //ssc::messageManager()->sendDebug(mUid+" has updated a transform."); //SPAM
   }
   //communication success
   else if (igstk::CompletedEvent().CheckEvent(&event))
   {
     // this seems to appear after every transmit (several times/second)
-    //ssc::messageManager()->sendInfo("Tracker: "+mUid+" set up communication correctly."); //SPAM
+    //ssc::messageManager()->sendInfo(mUid+" set up communication correctly."); //SPAM
   }
   //failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendWarning("Tracker: "+mUid+" received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
+    ssc::messageManager()->sendWarning(mUid+" received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
   }
   else if (igstk::TrackerOpenErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not open.");
+    ssc::messageManager()->sendError(mUid+" could not open.");
   }
   else if (igstk::TrackerCloseErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not close.");
+    ssc::messageManager()->sendError(mUid+" could not close.");
   }
   else if (igstk::TrackerInitializeErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not initialize.");
+    ssc::messageManager()->sendError(mUid+" could not initialize.");
   }
   else if (igstk::TrackerStartTrackingErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not start tracking.");
+    ssc::messageManager()->sendError(mUid+" could not start tracking.");
   }
   else if (igstk::TrackerStopTrackingErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not stop tracking.");
+    ssc::messageManager()->sendError(mUid+" could not stop tracking.");
   }
   else if (igstk::TrackerUpdateStatusErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not update.");
+    ssc::messageManager()->sendError(mUid+" could not update.");
   }
   //communication failure
   else if (igstk::InputOutputErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" cannot communicate with input/output.");
+    ssc::messageManager()->sendError(mUid+" cannot communicate with input/output.");
   }
   else if (igstk::InputOutputTimeoutEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" input/output communication timed out.");
+    ssc::messageManager()->sendError(mUid+" input/output communication timed out.");
   }
   else if (igstk::OpenPortErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not open communication with tracker.");
+    ssc::messageManager()->sendError(mUid+" could not open communication with tracker.");
   }
   else if (igstk::ClosePortErrorEvent().CheckEvent(&event))
   {
-    ssc::messageManager()->sendError("Tracker: "+mUid+" could not close communication with tracker.");
+    ssc::messageManager()->sendError(mUid+" could not close communication with tracker.");
   }
 }
 
@@ -312,7 +312,7 @@ void IgstkTracker::internalOpen(bool value)
     return;
   mOpen = value;
 
-  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "open" : "closed")+".");
+  ssc::messageManager()->sendInfo(mUid+" is "+(value ? "open" : "closed")+".");
   emit open(mOpen);
 }
 
@@ -322,7 +322,7 @@ void IgstkTracker::internalInitialized(bool value)
     return;
   mInitialized = value;
 
-  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "" : "un")+"initialized.");
+  ssc::messageManager()->sendInfo(mUid+" is "+(value ? "" : "un")+"initialized.");
   emit initialized(mInitialized);
 }
 
@@ -332,7 +332,7 @@ void IgstkTracker::internalTracking(bool value)
     return;
   mTracking = value;
 
-  ssc::messageManager()->sendInfo("Tracker: "+mUid+" is "+(value ? "" : "not ")+"tracking.");
+  ssc::messageManager()->sendInfo(mUid+" is "+(value ? "" : "not ")+"tracking.");
   emit tracking(mTracking);
 }
 }//namespace cx

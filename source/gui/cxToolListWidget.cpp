@@ -112,8 +112,7 @@ void FilteringToolListWidget::startDrag()
     QDrag *drag = new QDrag(this);
     drag->setMimeData(mimeData);
 
-    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
-      delete item;
+    drag->start(Qt::MoveAction);
   }
 }
 
@@ -230,7 +229,6 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
 {
-//  qRegisterMetaType<QListWidgetItem*>("QListWidgetItem*");
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
   this->viewport()->setAcceptDrops(true);
@@ -238,7 +236,6 @@ ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
   this->setDefaultDropAction(Qt::CopyAction);
   this->setDragDropMode(QAbstractItemView::DropOnly);
 
-//  connect(this, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(deleteItemSlot(QListWidgetItem*)));
   connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
 }
 
@@ -275,17 +272,6 @@ void ConfigToolListWidget::dropEvent(QDropEvent *event)
   emit userChangedList();
   emit listSizeChanged();
 }
-
-//void ConfigToolListWidget::dropEvent(QDropEvent* event)
-//{
-//  QListWidget::dropEvent(event);
-//
-//  //TODO should prevent duplication of items... reimplement the drop slot???
-////  std::cout << "something was dropped..." << std::endl;
-//
-//  emit userChangedList();
-//  emit listSizeChanged();
-//}
 
 QStringList ConfigToolListWidget::getTools()
 {
