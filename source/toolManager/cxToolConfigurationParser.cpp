@@ -12,6 +12,7 @@
 namespace cx
 {
 //----------------------------------------------------------------------------------------------------------------------
+/*
 ToolConfigurationParser::ToolConfigurationParser(QString& configXmlFilePath, QString loggingFolder) :
       mLoggingFolder(loggingFolder), mTrackerTag("tracker"),
       mToolfileTag("toolfile"), mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"),
@@ -292,11 +293,13 @@ QList<QDomNode> ToolConfigurationParser::getTrackerNodeList()
     trackerNodeList.push_back(mConfigureDoc.elementsByTagName(mTrackerTag).item(i));
   return trackerNodeList;
 }
+*/
 
 /**
  * @param toolFolderAbsolutePaths[out] send in a vector to get the tool.xml files absolute folder path
  * @return the tool node
  */
+/*
 QList<QDomNode> ToolConfigurationParser::getToolNodeList(std::vector<QString>& toolFolderAbsolutePaths)
 {
   QList<QDomNode> toolNodeList;
@@ -350,11 +353,11 @@ igstk::Transform ToolConfigurationParser::readCalibrationFile(QString filename)
   itk::Versor<double> rotation;
   itk::Vector<double, 3> translation;
 
-  /* File must be in the form
-   * rot_00 rot_01 rot_02 trans_0
-   * rot_10 rot_11 rot_12 trans_1
-   * rot_20 rot_21 rot_22 trans_2
-   */
+//   * File must be in the form
+//   * rot_00 rot_01 rot_02 trans_0
+//   * rot_10 rot_11 rot_12 trans_1
+//   * rot_20 rot_21 rot_22 trans_2
+
   std::ifstream inputStream;
   inputStream.open(cstring_cast(filename));
   if(inputStream.is_open())
@@ -401,11 +404,12 @@ igstk::Transform ToolConfigurationParser::readCalibrationFile(QString filename)
   inputStream.close();
   return retval;
 }
+*/
 
 //----------------------------------------------------------------------------------------------------------------------
 
-ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath) :
-    mConfigurationFilePath(absoluteConfigFilePath),
+ConfigurationFileParser::ConfigurationFileParser(QString absoluteConfigFilePath, QString loggingFolder) :
+    mConfigurationFilePath(absoluteConfigFilePath), mLoggingFolder(loggingFolder),
     mConfigTag("configuration"), mConfigTrackerTag("tracker"), mConfigTrackerToolFile("toolfile"),
     mTypeAttribute("type"), mClinicalAppAttribute("clinical_app"), mReferenceAttribute("reference")
 {
@@ -425,7 +429,6 @@ ssc::CLINICAL_APPLICATION ConfigurationFileParser::getApplicationapplication()
   QDomNode configNode = mConfigureDoc.elementsByTagName(mConfigTag).at(0);
   QString applicationapplication = configNode.toElement().attribute(mClinicalAppAttribute);
   retval = string2enum<ssc::CLINICAL_APPLICATION>(applicationapplication);
-//  std::cout << "In configfile " << mConfigurationFilePath << " found clinical application " << enum2string(retval) << std::endl;
 
   return retval;
 }
@@ -443,7 +446,7 @@ std::vector<IgstkTracker::InternalStructure> ConfigurationFileParser::getTracker
     IgstkTracker::InternalStructure internalStructure;
     QString trackerType = trackerNodes.at(i).toElement().attribute(mTypeAttribute);
     internalStructure.mType = string2enum<ssc::TRACKING_SYSTEM>(trackerType);
-    internalStructure.mLoggingFolderName = ""; //TODO
+    internalStructure.mLoggingFolderName = mLoggingFolder;
 
 //    std::cout << "In configfile " << mConfigurationFilePath << " found tracker type " << enum2string(internalStructure.mType) << std::endl;
     retval.push_back(internalStructure);
@@ -637,11 +640,12 @@ QString ConfigurationFileParser::getAbsoluteToolFilePath(QDomElement toolfileele
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-ToolFileParser::ToolFileParser(QString absoluteToolFilePath) :
-    mToolFilePath(absoluteToolFilePath),
+ToolFileParser::ToolFileParser(QString absoluteToolFilePath, QString loggingFolder) :
+    mToolFilePath(absoluteToolFilePath), mLoggingFolder(loggingFolder),
     mToolTag("tool"), mToolTypeTag("type"), mToolIdTag("id"), mToolNameTag("name"), mToolDescriptionTag("description"), mToolManufacturerTag("manufacturer"),
     mToolClinicalAppTag("clinical_app"),mToolGeoFileTag("geo_file"), mToolPicFileTag("pic_file"), mToolDocFileTag("doc_file"),
-    mToolInstrumentTag("instrument"), mToolInstrumentTypeTag("type"), mToolInstrumentIdTag("id"), mToolInstrumentNameTag("name"), mToolInstrumentManufacturerTag("manufacturer"), mToolInstrumentScannerIdTag("scannerid"), mToolInstrumentDescriptionTag("description"),
+    mToolInstrumentTag("instrument"), mToolInstrumentTypeTag("type"), mToolInstrumentIdTag("id"), mToolInstrumentNameTag("name"),
+    mToolInstrumentManufacturerTag("manufacturer"), mToolInstrumentScannerIdTag("scannerid"), mToolInstrumentDescriptionTag("description"),
     mToolSensorTag("sensor"), mToolSensorTypeTag("type"), mToolSensorIdTag("id"), mToolSensorNameTag("name"), mToolSensorWirelessTag("wireless"),
     mToolSensorDOFTag("DOF"), mToolSensorPortnumberTag("portnumber"), mToolSensorChannelnumberTag("channelnumber"), mToolSensorReferencePointTag("reference_point"),
     mToolSensorManufacturerTag("manufacturer"), mToolSensorDescriptionTag("description"),  mToolSensorRomFileTag("rom_file"),
@@ -800,8 +804,8 @@ Tool::InternalStructure ToolFileParser::getTool()
     internalStructure.mCalibrationFilename = toolCalibrationFileText;
     internalStructure.mCalibration = this->readCalibrationFile(internalStructure.mCalibrationFilename);
 
-    internalStructure.mTransformSaveFileName = ""; //TODO
-    internalStructure.mLoggingFolderName = ""; //TODO
+    internalStructure.mTransformSaveFileName = mLoggingFolder;
+    internalStructure.mLoggingFolderName = mLoggingFolder;
     retval = internalStructure;
 
   return retval;
