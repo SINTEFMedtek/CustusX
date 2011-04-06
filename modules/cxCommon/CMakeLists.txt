@@ -21,6 +21,7 @@ include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(${LIBNAME}_MOC_HDRS
   UsConfigGui.h
+  cxSettings.h
 )
 
 # SSC
@@ -48,6 +49,8 @@ add_library(cxCommon
     cxCreateProbeDataFromConfiguration.cpp
     UsConfigGui.h
     UsConfigGui.cpp
+    cxSettings.h
+    cxSettings.cpp
     ${${LIBNAME}_MOC_SRCS}
     )
     
