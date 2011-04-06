@@ -28,7 +28,6 @@ namespace cx
 class MessageManager;
 class ViewManager;
 class FilePreviewWidget;
-//class ToolConfigWidget;
 class ToolFilterGroupBox;
 class ToolConfigureGroupBox;
 
@@ -52,21 +51,21 @@ protected:
 };
 
 /**
- * \class FoldersTab
+ * \class GeneralTab
  *
- * \brief Configure default folder in preferences dialog
+ * \brief Tab for general settings in the system
  *
  * \date Jan 25, 2010
  * \author Frank Lindseth, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class FoldersTab : public PreferencesTab
+class GeneralTab : public PreferencesTab
 {
   Q_OBJECT
 
 public:
-  FoldersTab(QWidget *parent = 0);
-  virtual ~FoldersTab();
+  GeneralTab(QWidget *parent = 0);
+  virtual ~GeneralTab();
   void init();
 
 public slots:
@@ -90,7 +89,6 @@ private:
   QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
-  
   QString mCurrentToolConfigFile;
 
 };
@@ -131,11 +129,11 @@ private slots:
   void renderingIntervalSlot(int interval);
 };
 
-class View3DTab : public PreferencesTab
+class VisualizationTab : public PreferencesTab
 {
     Q_OBJECT
 public:
-  View3DTab(QWidget *parent = 0);
+  VisualizationTab(QWidget *parent = 0);
   void init();
 
   public slots:
@@ -186,12 +184,12 @@ protected:
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class UltrasoundTab : public PreferencesTab
+class VideoTab : public PreferencesTab
 {
   Q_OBJECT
 
 public:
-  UltrasoundTab(QWidget *parent = 0);
+  VideoTab(QWidget *parent = 0);
   void init();
 
 public slots:
