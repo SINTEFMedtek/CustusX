@@ -18,34 +18,38 @@ SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr 
   mData = dataInterface;
   connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
 
-  QHBoxLayout* topLayout = new QHBoxLayout;
-  topLayout->setMargin(0);
-  this->setLayout(topLayout);
-
   mLabel = new QLabel(this);
   mLabel->setText(mData->getValueName());
-  topLayout->addWidget(mLabel);
 
   mEdit = new ssc::DoubleLineEdit(this);
-  topLayout->addWidget(mEdit);
 //  connect(mEdit, SIGNAL(textEdited(const QString&)), this, SLOT(textEditedSlot()));
   connect(mEdit, SIGNAL(editingFinished()), this, SLOT(textEditedSlot()));
 
   mSlider = new ssc::DoubleSlider(this);
   mSlider->setOrientation(Qt::Horizontal);
   //mSlider->setDoubleRange(mData->getValueRange());
-  topLayout->addWidget(mSlider);
   connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
 
 
   if (gridLayout) // add to input gridlayout
   {
-    gridLayout->addWidget(mLabel,  row, 0);
+    //Since SliderGroupWidget (this) is a widget we need to add this.
+    //If not we will get an invisible widget on top of all the other widgets of the parent
+    QHBoxLayout* hackLayout = new QHBoxLayout;
+    hackLayout->setMargin(0);
+    hackLayout->setSpacing(0);
+    hackLayout->addWidget(mLabel);
+    hackLayout->addWidget(this);
+    gridLayout->addLayout(hackLayout,  row, 0);
     gridLayout->addWidget(mEdit,   row, 1);
     gridLayout->addWidget(mSlider, row, 2);
   }
   else // add directly to this
   {
+    QHBoxLayout* topLayout = new QHBoxLayout;
+    topLayout->setMargin(0);
+    this->setLayout(topLayout);
+
     topLayout->addWidget(mLabel);
     topLayout->addWidget(mEdit);
     topLayout->addWidget(mSlider);
