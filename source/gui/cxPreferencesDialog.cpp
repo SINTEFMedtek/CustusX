@@ -361,6 +361,8 @@ void ToolConfigTab::init()
   layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
   layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
   layout->addWidget(mFilePreviewWidget, 1, 0, 1, 2);
+
+  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
 
 void ToolConfigTab::saveParametersSlot()
@@ -368,7 +370,9 @@ void ToolConfigTab::saveParametersSlot()
   mToolConfigureGroupBox->requestSaveConfigurationSlot();
 
   // currentToolConfigFile
-  mSettings->setValue("toolConfigFile", mToolConfigureGroupBox->getCurrenctlySelectedConfiguration());
+  QFile configFile(mToolConfigureGroupBox->getCurrenctlySelectedConfiguration());
+  QFileInfo info(configFile);
+  mSettings->setValue("toolConfigFile", info.fileName());
 
   mSettings->sync();
 
