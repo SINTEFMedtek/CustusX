@@ -124,12 +124,24 @@ void ToolManager::configure()
   }
 
   //parse
-  ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath, mLoggingFolder);
+  ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
+
+  std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
+  IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
+
+  std::vector<Tool::InternalStructure> toolStructures;
+  std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
+  for(std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
+  {
+    ToolFileParser toolParser(*it);
+    Tool::InternalStructure internalTool = toolParser.getTool();
+    toolStructures.push_back(internalTool);
+    std::cout << "internalTool.mName " << internalTool.mName << std::endl;
+  }
 
   //new thread
-  IgstkTracker::InternalStructure trackerStructure = toolConfigurationParser.getTracker();
-  std::vector<Tool::InternalStructure> toolStructures = toolConfigurationParser.getConfiguredTools();
   mTrackerThread.reset(new IgstkTrackerThread(trackerStructure, toolStructures));
+
   connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
   connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
   connect(mTrackerThread.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
@@ -607,10 +619,13 @@ void ToolManager::loadPositionHistory()
 
 void ToolManager::setConfigurationFile(QString configurationFile)
 {
+  if(configurationFile == mConfigurationFilePath)
+    return;
+
   if(this->isConfigured())
   {
     this->deconfigure();
-    return;
+//    return;
   }
   mConfigurationFilePath = configurationFile;
 }
