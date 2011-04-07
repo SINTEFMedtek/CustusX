@@ -38,7 +38,8 @@ protected:
   Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
 private slots:
-  void toolClickedSlot(QListWidgetItem* item);
+  void selectionChangedSlot();
+  void toolSelectedSlot(QListWidgetItem* item);
 };
 
 //---------------------------------------------------------------------------------------------------------------------
