@@ -1,11 +1,13 @@
 #ifndef CXSETTINGS_H_
 #define CXSETTINGS_H_
 
+#include "boost/shared_ptr.hpp"
 #include <QObject>
 #include <QSettings>
 
 namespace cx
 {
+typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 /**
  * Settings
@@ -27,13 +29,16 @@ public:
   QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
   void sync();
 
+signals:
+  void changedValueFor(QString key);
+
 private:
   Settings();
   virtual ~Settings();
 
   void initialize();
 
-  QSettings mSetting;
+  QSettingsPtr mSettings;
 
   static Settings* mInstance; ///< The only instance of this class that can exist.
 };

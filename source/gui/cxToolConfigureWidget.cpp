@@ -70,6 +70,12 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
 ToolConfigureGroupBox::~ToolConfigureGroupBox()
 {}
 
+void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsoluteFilePath)
+{
+  int currentIndex = mConfigFilesComboBox->findData(configAbsoluteFilePath, Qt::ToolTipRole);
+  mConfigFilesComboBox->setCurrentIndex(currentIndex);
+}
+
 QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
 {
   QString retval;
