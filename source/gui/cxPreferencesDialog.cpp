@@ -344,6 +344,8 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
 
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 
@@ -368,17 +370,18 @@ void ToolConfigTab::init()
 
 void ToolConfigTab::saveParametersSlot()
 {
-  mToolConfigureGroupBox->requestSaveConfigurationSlot();
+  QString newConfigFile = mToolConfigureGroupBox->requestSaveConfigurationSlot();
+
+  if(newConfigFile.isEmpty())
+    newConfigFile = mToolConfigureGroupBox->getCurrenctlySelectedConfiguration();
 
   // currentToolConfigFile
-  QFile configFile(mToolConfigureGroupBox->getCurrenctlySelectedConfiguration());
+  QFile configFile(newConfigFile);
   QFileInfo info(configFile);
+  if(!configFile.exists())
+    return;
+
   settings()->setValue("toolConfigFile", info.fileName());
-
-  settings()->sync();
-
-  // update toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 void ToolConfigTab::applicationChangedSlot()
@@ -387,6 +390,14 @@ void ToolConfigTab::applicationChangedSlot()
   mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setTrackingSystemSlot(ssc::tsPOLARIS);
+}
+
+void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
+{
+  if(key != "toolConfigFile")
+    return;
+
+  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
 
 //==============================================================================
