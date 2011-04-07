@@ -7,11 +7,9 @@
 namespace cx
 {
 
-FastImageRegistrationWidget::FastImageRegistrationWidget(QWidget* parent) :
-    ImageRegistrationWidget(parent)
+FastImageRegistrationWidget::FastImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+    ImageRegistrationWidget(parent, objectName, windowTitle)
 {
-  this->setObjectName("FastImageRegistrationWidget");
-  this->setWindowTitle("Fast Image Registration");
 }
 
 FastImageRegistrationWidget::~FastImageRegistrationWidget()
@@ -39,10 +37,8 @@ void FastImageRegistrationWidget::performRegistration()
 }
 //------------------------------------------------------------------------------
 PlateImageRegistrationWidget::PlateImageRegistrationWidget(QWidget* parent) :
-    FastImageRegistrationWidget(parent)
+    FastImageRegistrationWidget(parent, "PlateImageRegistrationWidget", "Plate Image Registration")
 {
-  this->setObjectName("PlateImageRegistrationWidget");
-  this->setWindowTitle("Plate Image Registration");
 }
 
 PlateImageRegistrationWidget::~PlateImageRegistrationWidget()

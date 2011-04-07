@@ -36,12 +36,9 @@
 namespace cx
 {
 ResampleWidget::ResampleWidget(QWidget* parent) :
-  WhatsThisWidget(parent),
+  WhatsThisWidget(parent, "ResampleWidget", "Resample"),
   mStatusLabel(new QLabel(""))
 {
-  this->setObjectName("ResampleWidget");
-  this->setWindowTitle("Resample");
-
   connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
@@ -65,8 +62,6 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
   topLayout->addWidget(referenceImageComboBox, 1, 0);
   topLayout->addWidget(mStatusLabel, 2, 0);
   topLayout->addWidget(resampleButton, 3, 0);
-
-  this->adjustSizeSlot();
 }
 
 ResampleWidget::~ResampleWidget()
@@ -124,7 +119,7 @@ QWidget* ResampleWidget::createOptionsWidget()
 //------------------------------------------------------------------------------
 
 SegmentationWidget::SegmentationWidget(QWidget* parent) :
-  WhatsThisWidget(parent),
+  WhatsThisWidget(parent, "SegmentationWidget", "Segmentation"),
   mSegmentationThreshold(100),
   mBinary(false),
   mUseSmothing(true),
@@ -133,9 +128,6 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   mSmoothingSigmaSpinBox(new QDoubleSpinBox()),
   mStatusLabel(new QLabel(""))
 {
-  this->setObjectName("SegmentationWidget");
-  this->setWindowTitle("Segmentation");
-
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
@@ -166,8 +158,6 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   topLayout->addWidget(segmentationOptionsButton, 1,1);
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
   topLayout->addWidget(mStatusLabel);
-
-  this->adjustSizeSlot();
 }
 
 SegmentationWidget::~SegmentationWidget()
@@ -341,7 +331,7 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 //------------------------------------------------------------------------------
 
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "SurfaceWidget", "Surface"),
     mSurfaceThreshold(100),
     mDecimation(80),
     mReduceResolution(false),
@@ -351,9 +341,6 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
     mDefaultColor("red"),
     mStatusLabel(new QLabel(""))
 {
-  this->setObjectName("SurfaceWidget");
-  this->setWindowTitle("Surface");
-
   connect(&mContourAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -499,14 +486,11 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 //------------------------------------------------------------------------------
 
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
-  WhatsThisWidget(parent),
+  WhatsThisWidget(parent, "CenterlineWidget", "CenterlineWidget"),
   mFindCenterlineButton(new QPushButton("Find centerline")),
   mDefaultColor("red"),
   mStatusLabel(new QLabel(""))
 {
-  this->setObjectName("CenterlineWidget");
-  this->setWindowTitle("Centerline");
-
   connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
 
   QVBoxLayout* layout = new QVBoxLayout(this);
@@ -600,7 +584,7 @@ void CenterlineWidget::visualizeSlot(QString inputUid)
 //------------------------------------------------------------------------------
 
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "RegisterI2IWidget", "Register Image2Image"),
     mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));

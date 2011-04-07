@@ -323,7 +323,6 @@ void TransferFunctionPresetWidget::saveSlot()
   mPresetsComboBox->addItems(mPresets.getPresetList());
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -358,6 +357,5 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
 
   this->setLayout(mLayout);
 }
-
 
 }//namespace cx

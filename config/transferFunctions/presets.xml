@@ -1,58 +1,58 @@
 <!DOCTYPE PresetTransferFunctions3D>
 <root>
-	<Preset name="CT Abdomen">
+	<Preset name="signed CT Abdomen">
 		<transferfunctions>
-		    <alpha>0=0 690=0 1069=0 1206=138 1342=255 2528=255</alpha>
-		    <color>0=0/0/0 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		    <alpha>-1024=0 -334=0 45=0 182=138 318=255 1504=255</alpha>
+		    <color>-1024=0/0/0 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="CT Bone">
+	<Preset name="signed CT Bone">
 		<transferfunctions>
-		    <alpha>0=0 690=0 1144=0 1254=255 2528=255</alpha>
-		    <color>0=0/0/0 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		    <alpha>-1024=0 -334=0 120=0 230=255 1504=255</alpha>
+		    <color>-1024=0/0/0 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="CT Lung + bone">
+	<Preset name="signed CT Lung + bone">
 		<transferfunctions>
-		    <alpha>0=128 552=0 1159=0 1254=255 2528=255</alpha>
-		    <color>0=102/192/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		    <alpha>-1024=128 -472=0 135=0 230=255 1504=255</alpha>
+		    <color>-1024=102/192/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="CT Lung">
+	<Preset name="signed CT Lung">
 		<transferfunctions>
-		    <alpha>0=70 552=70 2528=0</alpha>
-		    <color>0=102/192/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		    <alpha>-1024=70 -472=70 1504=0</alpha>
+		    <color>-1024=102/192/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="CT Aorta">
+	<Preset name="signed CT Aorta">
 		<transferfunctions>
-		    <alpha>0=0 300=0 1106=1 1201=85 1390=1 1473=2 2528=0</alpha>
-		    <color>0=144/203/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		    <alpha>-1024=0 -724=0 82=1 177=85 543=1 449=2 1504=0</alpha>
+		    <color>-1024=144/203/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="CT Lung + aorta">
+	<Preset name="signed CT Lung + aorta">
 		<transferfunctions>
-		    <alpha>0=30 300=0 1106=1 1228=156 1232=189 1390=1 1473=2 2528=0</alpha>
-		    <color>0=144/203/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		    <alpha>-1024=30 -724=0 82=1 204=156 208=189 366=1 449=2 1504=0</alpha>
+		    <color>-1024=144/203/255 109=255/0/0 144=255/154/73 392=255/255/255 1504=0/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="CT Airways">
+	<Preset name="signed CT Airways">
 		<transferfunctions>
-		    <alpha>0=0 362=0 698=147 926=0 4095=0</alpha>
-		    <color>0=0/0/0 1960=0/255/255 2725=255/0/0 4095=255/0/0</color>
+		    <alpha>-1024=0 -662=0 -326=147 -98=0 3071=0</alpha>
+		    <color>-1024=0/0/0 936=0/255/255 1701=255/0/0 3071=255/0/0</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
 	</Preset>
-	<Preset name="Soft Tissue CT - Standard">
+	<Preset name="signed Soft Tissue CT - Standard">
 		<transferfunctions>
-		    <alpha>1024=0 1226=7 1428=34 1573=174</alpha>
-		    <color>1036=0/0/0 1226=255/0/0 1428=255/255/0 1573=255/255/255</color>
+		    <alpha>0=0 202=7 404=34 549=174</alpha>
+		    <color>12=0/0/0 202=255/0/0 404=255/255/0 549=255/255/255</color>
 		</transferfunctions>
 	    <shading on="1" ambient="0.15" diffuse="0.90" specular="0.30" specularPower="15.0"/>
 	</Preset>
@@ -85,6 +85,63 @@
 			<color>0=0/0/0 255=255/255/255</color>
 		</lookuptable2D>
 		<shading ambient="0.2" diffuse="0.9" specular="0.3" on="0" specularPower="15"/>
+	</Preset>
+	
+	<Preset name="unsigned CT Abdomen">
+		<transferfunctions>
+		    <alpha>0=0 690=0 1069=0 1206=138 1342=255 2528=255</alpha>
+		    <color>0=0/0/0 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned CT Bone">
+		<transferfunctions>
+		    <alpha>0=0 690=0 1144=0 1254=255 2528=255</alpha>
+		    <color>0=0/0/0 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned CT Lung + bone">
+		<transferfunctions>
+		    <alpha>0=128 552=0 1159=0 1254=255 2528=255</alpha>
+		    <color>0=102/192/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned CT Lung">
+		<transferfunctions>
+		    <alpha>0=70 552=70 2528=0</alpha>
+		    <color>0=102/192/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned CT Aorta">
+		<transferfunctions>
+		    <alpha>0=0 300=0 1106=1 1201=85 1390=1 1473=2 2528=0</alpha>
+		    <color>0=144/203/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned CT Lung + aorta">
+		<transferfunctions>
+		    <alpha>0=30 300=0 1106=1 1228=156 1232=189 1390=1 1473=2 2528=0</alpha>
+		    <color>0=144/203/255 1133=255/0/0 1168=255/154/73 1416=255/255/255 2528=0/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned CT Airways">
+		<transferfunctions>
+		    <alpha>0=0 362=0 698=147 926=0 4095=0</alpha>
+		    <color>0=0/0/0 1960=0/255/255 2725=255/0/0 4095=255/0/0</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.2" diffuse="0.54" specular="0.72" specularPower="15.0"/>
+	</Preset>
+	<Preset name="unsigned Soft Tissue CT - Standard">
+		<transferfunctions>
+		    <alpha>1024=0 1226=7 1428=34 1573=174</alpha>
+		    <color>1036=0/0/0 1226=255/0/0 1428=255/255/0 1573=255/255/255</color>
+		</transferfunctions>
+	    <shading on="1" ambient="0.15" diffuse="0.90" specular="0.30" specularPower="15.0"/>
 	</Preset>
 	
 </root>
