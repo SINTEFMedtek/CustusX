@@ -126,9 +126,6 @@ MainWindow::MainWindow() :
 
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-  // initialize toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
-
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   this->layoutChangedSlot();
 

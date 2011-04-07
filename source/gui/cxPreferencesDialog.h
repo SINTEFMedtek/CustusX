@@ -218,6 +218,7 @@ public slots:
 
 private slots:
   void applicationChangedSlot();
+  void globalConfigurationFileChangedSlot(QString key);
 
 private:
   FilePreviewWidget*  mFilePreviewWidget;
