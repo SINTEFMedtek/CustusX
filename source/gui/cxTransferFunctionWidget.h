@@ -170,10 +170,10 @@ public:
   virtual ~TransferFunctionWidget() {}
 public slots:
 protected:
-  QVBoxLayout* mLayout;
-  TransferFunction3DWidget* mTF3DWidget;
-  TransferFunction2DWidget* mTF2DWidget;
-  TransferFunctionPresetWidget* mTFPresetWidget;
+//  QVBoxLayout* mLayout;
+//  TransferFunction3DWidget* mTF3DWidget;
+//  TransferFunction2DWidget* mTF2DWidget;
+//  TransferFunctionPresetWidget* mTFPresetWidget;
 
 };
 
