@@ -20,6 +20,7 @@
 #include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
+#include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 
 namespace cx
@@ -53,8 +54,13 @@ ToolManager::ToolManager() :
   m_rMpr_History.reset(new ssc::RegistrationHistory());
   connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+
   this->initializeManualTool();
   this->setDominantTool("ManualTool");
+
+  // initialize config file
+  this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 ToolManager::~ToolManager()
@@ -622,11 +628,10 @@ void ToolManager::setConfigurationFile(QString configurationFile)
     return;
 
   if(this->isConfigured())
-  {
     this->deconfigure();
-//    return;
-  }
+
   mConfigurationFilePath = configurationFile;
+  std::cout << "Toolmanager set new config file to be " << mConfigurationFilePath << std::endl;
 }
 
 void ToolManager::setLoggingFolder(QString loggingFolder)
@@ -686,6 +691,16 @@ void ToolManager::deconfigureAfterUninitializedSlot()
 {
   disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
   this->deconfigure();
+}
+
+void ToolManager::globalConfigurationFileChangedSlot(QString key)
+{
+  if(key != "toolConfigFile")
+    return;
+
+  std::cout << "void ToolManager::globalConfigurationFileChangedSlot(QString "<< key << ")" << std::endl;
+
+  this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 void ToolManager::dominantCheckSlot()

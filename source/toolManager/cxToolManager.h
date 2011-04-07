@@ -67,7 +67,6 @@ public:
   virtual void savePositionHistory();
   virtual void loadPositionHistory();
 
-  void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
   void setLoggingFolder(QString loggingFolder); ///<\param loggingFolder path to the folder where logs should be saved
 
   void addXml(QDomNode& parentNode); ///< write internal state to node
@@ -103,12 +102,14 @@ private slots:
   void initializeAfterConfigSlot();
   void uninitializeAfterTrackingStoppedSlot();
   void deconfigureAfterUninitializedSlot();
+  void globalConfigurationFileChangedSlot(QString key);
 
 private:
   ToolManager(); ///< use getInstance instead
   virtual ~ToolManager(); ///< destructor
 
   void initializeManualTool();
+  void setConfigurationFile(QString configurationFile); ///< Sets the configuration file to use, must be located in the resourcefolder \param configurationFile path to the configuration file to use
 
   QString mConfigurationFilePath; ///< path to the configuration file
   QString mLoggingFolder; ///< path to where logging should be saved
