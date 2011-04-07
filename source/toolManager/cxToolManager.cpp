@@ -138,10 +138,9 @@ void ToolManager::configure()
   std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
   for(std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
   {
-    ToolFileParser toolParser(*it);
+    ToolFileParser toolParser(*it, mLoggingFolder);
     Tool::InternalStructure internalTool = toolParser.getTool();
     toolStructures.push_back(internalTool);
-    std::cout << "internalTool.mName " << internalTool.mName << std::endl;
   }
 
   //new thread
@@ -635,6 +634,12 @@ void ToolManager::setConfigurationFile(QString configurationFile)
 
 void ToolManager::setLoggingFolder(QString loggingFolder)
 {
+  if(mLoggingFolder == loggingFolder)
+    return;
+
+  if(this->isConfigured())
+    this->deconfigure();
+
   mLoggingFolder = loggingFolder;
 }
 
