@@ -9,8 +9,7 @@
 #include <QAbstractTransition>
 #include <QMenu>
 #include <QToolBar>
-#include <QSettings>
-#include <cxDataLocations.h>
+#include "cxSettings.h"
 #include "cxApplicationState.h"
 #include "cxRequestEnterStateTransition.h"
 
@@ -37,8 +36,7 @@ ApplicationStateMachine::ApplicationStateMachine()
   //set initial state on all levels
   this->setInitialState(mParentState);
 
-  QSettingsPtr settings = DataLocations::getSettings();
-  QString initState = settings->value("globalApplicationName").toString();
+  QString initState = settings()->value("globalApplicationName").toString();
   if (mStates.count(initState))
     mParentState->setInitialState(mStates[initState]);
   else
@@ -64,8 +62,7 @@ ApplicationStateMachine::~ApplicationStateMachine()
 
 void ApplicationStateMachine::activeStateChangedSlot()
 {
-  QSettingsPtr settings = DataLocations::getSettings();
-  settings->setValue("globalApplicationName", this->getActiveUidState());
+  settings()->setValue("globalApplicationName", this->getActiveUidState());
 }
 
 QActionGroup* ApplicationStateMachine::getActionGroup()

@@ -3,11 +3,11 @@
 #include <iostream>
 #include <QGridLayout>
 #include <QComboBox>
-#include <QSettings>
 #include <QLabel>
 #include <QFile>
 #include <QFileInfo>
 #include "cxDataLocations.h"
+#include "cxSettings.h"
 
 UsConfigGui::UsConfigGui(QWidget* parent) :
   QWidget(parent),
@@ -15,8 +15,7 @@ UsConfigGui::UsConfigGui(QWidget* parent) :
   mScannerBox(new QComboBox(this)),
   mProbeBox(new QComboBox(this)),
   mRtSourceBox(new QComboBox(this)),
-  mConfigIdBox(new QComboBox(this)),
-  mSettings(new QSettings())
+  mConfigIdBox(new QComboBox(this))
 {
   
   this->setObjectName("ProbePropertiesWidget");
@@ -26,14 +25,14 @@ UsConfigGui::UsConfigGui(QWidget* parent) :
   mXml = new ProbeXmlConfigParser(mXmlFileName);
 
   // Initialize settings if empty
-  if (!mSettings->contains("Scanner"))
-    mSettings->setValue("Scanner", "Select scanner...");
-  if (!mSettings->contains("Probe"))
-    mSettings->setValue("Probe", "Select probe...");
-  if (!mSettings->contains("RTSource"))
-    mSettings->setValue("RTSource", "Select realtime source...");
-  if (!mSettings->contains("ConfigId"))
-    mSettings->setValue("ConfigId", "Select configuration...");
+  if (!cx::settings()->contains("Scanner"))
+    cx::settings()->setValue("Scanner", "Select scanner...");
+  if (!cx::settings()->contains("Probe"))
+    cx::settings()->setValue("Probe", "Select probe...");
+  if (!cx::settings()->contains("RTSource"))
+    cx::settings()->setValue("RTSource", "Select realtime source...");
+  if (!cx::settings()->contains("ConfigId"))
+    cx::settings()->setValue("ConfigId", "Select configuration...");
 
   QLabel* scannerLabel = new QLabel("Scanner:", this);
   QLabel* probeLabel = new QLabel("Probe:", this);
@@ -64,10 +63,10 @@ UsConfigGui::~UsConfigGui()
 
 void UsConfigGui::initComboBoxes()
 {
-  this->populateScannerBox(mSettings->value("Scanner").toString());
-  this->populateProbeBox(mSettings->value("Probe").toString());
-  this->populateRtSourceBox(mSettings->value("RTSource").toString());
-  this->populateConfigIdBox(mSettings->value("ConfigId").toString());
+  this->populateScannerBox(cx::settings()->value("Scanner").toString());
+  this->populateProbeBox(cx::settings()->value("Probe").toString());
+  this->populateRtSourceBox(cx::settings()->value("RTSource").toString());
+  this->populateConfigIdBox(cx::settings()->value("ConfigId").toString());
 }
 
 void UsConfigGui::populateScannerBox(const QString& tryToSelect)
@@ -117,18 +116,18 @@ void UsConfigGui::populateConfigIdBox(const QString& tryToSelect)
 void UsConfigGui::scannerChanged(const QString& scanner)
 {
   this->populateProbeBox("");
-  this->populateRtSourceBox(mSettings->value("RTSource").toString());
+  this->populateRtSourceBox(cx::settings()->value("RTSource").toString());
   this->populateConfigIdBox("");
   
-  mSettings->setValue("Scanner", mScannerBox->currentText());
+  cx::settings()->setValue("Scanner", mScannerBox->currentText());
 }
 
 void UsConfigGui::probeChanged(const QString& probe)
 {
-  this->populateRtSourceBox(mSettings->value("RTSource").toString());
+  this->populateRtSourceBox(cx::settings()->value("RTSource").toString());
   this->populateConfigIdBox("");
   
-  mSettings->setValue("Probe", mProbeBox->currentText());
+  cx::settings()->setValue("Probe", mProbeBox->currentText());
   
   emit probeSelected(probe);
 }
@@ -138,7 +137,7 @@ void UsConfigGui::rtSourceChanged(const QString& rtsource)
   //std::cout << "UsConfigGui::rtSourceChanged " << rtsource.toStdString().c_str() << std::endl;
   this->populateConfigIdBox("");
   
-  mSettings->setValue("RTSource", mRtSourceBox->currentText());
+  cx::settings()->setValue("RTSource", mRtSourceBox->currentText());
 }
 
 void UsConfigGui::RTsourceDetected(const QString& source)
@@ -148,20 +147,20 @@ void UsConfigGui::RTsourceDetected(const QString& source)
   if ( (source.compare(QString("VGA")) == 0) || (source.compare(QString("VGA_DVI"))) == 0)  
   {
     mRtSourceBox->setCurrentIndex(mRtSourceBox->findText("VGA"));
-    //mSettings->setValue("RTSource", QString("VGA"));
+    //cx::settings()->setValue("RTSource", QString("VGA"));
     
   } else {
     mRtSourceBox->setCurrentIndex(mRtSourceBox->findText("SVHS"));
-    //mSettings->setValue("RTSource", QString("SVHS"));
+    //cx::settings()->setValue("RTSource", QString("SVHS"));
   }
 
-  mSettings->setValue("RTSource", mRtSourceBox->currentText());
+  cx::settings()->setValue("RTSource", mRtSourceBox->currentText());
   this->populateConfigIdBox("");
 }
 
 void UsConfigGui::configIdChanged(const QString& configId)
 {
-  mSettings->setValue("ConfigId", mConfigIdBox->currentText());
+  cx::settings()->setValue("ConfigId", mConfigIdBox->currentText());
   emit configurationChanged();
   //std::cout << "emit configurationChanged(); SHOULD DRAW NOW!!!" << std::endl;
 }
