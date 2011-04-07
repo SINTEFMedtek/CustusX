@@ -9,7 +9,6 @@
 //#include <QGridLayout>
 //#include <QWidget>
 //#include <QTimer>
-//#include <QSettings>
 //#include <QTime>
 //#include <QAction>
 //#include <vtkRenderWindow.h>

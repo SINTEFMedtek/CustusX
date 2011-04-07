@@ -3,7 +3,6 @@
 #include <QGridLayout>
 #include <QWidget>
 #include <QTimer>
-#include <QSettings>
 #include <QTime>
 #include <QAction>
 #include <vtkRenderWindow.h>
@@ -21,6 +20,10 @@
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
 #include "sscXmlOptionItem.h"
+#include "sscDataManager.h"
+#include "sscToolManager.h"
+#include "sscSlicePlanes3DRep.h"
+#include "sscSliceProxy.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
 #include "cxViewGroup.h"
@@ -28,11 +31,8 @@
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
 #include "cxViewWrapperRTStream.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
+#include "cxSettings.h"
 #include "cxDataLocations.h"
-#include "sscSlicePlanes3DRep.h"
-#include "sscSliceProxy.h"
 #include "cxInteractiveCropper.h"
 #include "cxRenderTimer.h"
 #include "vtkForwardDeclarations.h"
@@ -66,9 +66,6 @@ ViewManager::ViewManager() :
   mLayout(new QGridLayout()),
   mMainWindowsCentralWidget(new QWidget()),
   mRenderingTimer(new QTimer(this)),
-  mSettings(DataLocations::getSettings()),
-//  mRenderingTime(new QTime()),
-//  mNumberOfRenderings(0),
   mGlobal2DZoom(true),
   mGlobalObliqueOrientation(false),
   mViewCache2D(mMainWindowsCentralWidget,"View2D"),
@@ -80,7 +77,7 @@ ViewManager::ViewManager() :
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
-  mSmartRender = mSettings->value("smartRender", true).toBool();
+  mSmartRender = settings()->value("smartRender", true).toBool();
 
   mLayout->setSpacing(2);
   mLayout->setMargin(4);
@@ -103,7 +100,7 @@ ViewManager::ViewManager() :
   // set start layout
   this->setActiveLayout("LAYOUT_ORTHOGONAL_3DACS_x1");
 
-  int interval = mSettings->value("renderingInterval").toInt();
+  int interval = settings()->value("renderingInterval").toInt();
   if (interval==0)
 	  interval = 30;
   mRenderingTimer->start(interval);
@@ -133,7 +130,7 @@ bool ViewManager::getSmartRender() const
 void ViewManager::setSmartRender(bool on)
 {
   mSmartRender = on;
-  mSettings->setValue("smartRender", mSmartRender);
+  settings()->setValue("smartRender", mSmartRender);
 }
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
@@ -422,7 +419,7 @@ void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion r
 void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
   View2D* view = mViewCache2D.retrieveView();
-  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  QColor background = settings()->value("backgroundColor").value<QColor>();
   view->setBackgoundColor(background);
   ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
   wrapper->initializePlane(plane);
@@ -432,7 +429,7 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
   View3D* view = mViewCache3D.retrieveView();
-  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  QColor background = settings()->value("backgroundColor").value<QColor>();
   view->setBackgoundColor(background);
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
   if (group==0)
@@ -447,7 +444,7 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
   ssc::View* view = mViewCacheRT.retrieveView();
-  QColor background = mSettings->value("backgroundColor").value<QColor>();
+  QColor background = settings()->value("backgroundColor").value<QColor>();
   view->setBackgoundColor(background);
   ViewWrapperRTStreamPtr wrapper(new ViewWrapperRTStream(view));
   this->activateView(wrapper, group, region);

@@ -45,6 +45,16 @@ QVariant Settings::value(const QString& key, const QVariant& defaultValue) const
   return mSettings->value(key, defaultValue);
 }
 
+bool Settings::contains(const QString& key) const
+{
+  return mSettings->contains(key);
+}
+
+QString Settings::fileName() const
+{
+  return mSettings->fileName();
+}
+
 void Settings::sync()
 {
   mSettings->sync();
