@@ -90,13 +90,19 @@ QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
   return retval;
 }
 
-void ToolConfigureGroupBox::requestSaveConfigurationSlot()
+QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 {
+  QString retval;
+
   if(!mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), sEdited).toBool())
-    return;
+    return retval;
 
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);
+
+  retval = config.mFileName;
+
+  return retval;
 }
 
 void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication)
