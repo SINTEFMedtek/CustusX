@@ -22,15 +22,11 @@
 
 namespace cx
 {
-ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
-  RegistrationWidget(parent),
+ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  RegistrationWidget(parent, objectName, windowTitle),
   mThresholdLabel(new QLabel("Probing treshold:", this)),
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
-  //widget
-  this->setObjectName("ImageRegistrationWidget");
-  this->setWindowTitle("Image Registration");
-
   mFixedDataAdapter = RegistrationFixedImageStringDataAdapter::New();
   mActiveImageAdapter = ActiveImageStringDataAdapter::New();
 

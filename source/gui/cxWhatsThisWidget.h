@@ -24,9 +24,13 @@ class WhatsThisWidget : public QWidget
   Q_OBJECT
 
 public:
-  WhatsThisWidget(QWidget* parent) :
-    QWidget(parent)
-  {};
+  WhatsThisWidget(QWidget* parent, QString objectName, QString windowTitle) :
+    QWidget(parent), mObjectName(objectName),mWindowTitle(windowTitle)
+  {
+    this->setObjectName(mObjectName);
+    this->setWindowTitle(mWindowTitle);
+  };
+
   virtual ~WhatsThisWidget(){};
   virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
 
@@ -79,6 +83,17 @@ public slots:
     this->parentWidget()->adjustSize();
     this->adjustSize();
   }
+
+protected:
+  virtual void showEvent(QShowEvent* event)
+  {
+    this->setWhatsThis(this->defaultWhatsThis());
+    QWidget::showEvent(event);
+  }
+
+private:
+  QString mObjectName;
+  QString mWindowTitle;
 };
 }
 #endif /* CXWHATSTHISWIDGET_H_ */
