@@ -39,6 +39,12 @@ public:
   virtual void setOrientationMode(SyncedValuePtr value);
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
 
+#ifdef USE_2D_GPU_RENDER
+  static bool overlayIsEnabled() { return true;}
+#else
+  static bool overlayIsEnabled() { return false;}
+#endif
+
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
   void viewportChanged();
