@@ -6,13 +6,11 @@
  */
 #include "cxPatientData.h"
 
-//#include <QtGui>
 #include <QDomDocument>
 #include <QFile>
 #include <QDir>
 #include <QTimer>
 #include <QTextStream>
-#include <QSettings>
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
@@ -21,23 +19,22 @@
 #include "sscUtilHelpers.h"
 #include "sscToolManager.h"
 #include "sscCustomMetaImage.h"
+#include "sscMesh.h"
 
 #include "cxViewManager.h"
 #include "cxFileCopied.h"
-#include "cxDataLocations.h"
+#include "cxSettings.h"
 #include "cxRegistrationManager.h"
 #include "cxStateMachineManager.h"
 #include "cxToolManager.h"
 
-#include "sscMesh.h"
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 
 namespace cx
 {
 
-PatientData::PatientData() :
-    mSettings(DataLocations::getSettings())
+PatientData::PatientData()
 {
 }
 
@@ -93,14 +90,14 @@ void PatientData::clearPatient()
   //rep
   //usrec?
 
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
 
   this->setActivePatient(this->getNullFolder());
 }
 
 QString PatientData::getNullFolder() const
 {
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
   return patientDatafolder + "/NoPatient";
 }
 //void PatientData::loadPatientFileSlot()
@@ -302,7 +299,7 @@ ssc::DataPtr PatientData::importData(QString fileName)
 
 //  QString fileName = QFileDialog::getOpenFileName( this,
 //                                  QString(tr("Select data file")),
-//                                  mSettings->value("globalPatientDataFolder").toString(),
+//                                  settings()->value("globalPatientDataFolder").toString(),
 //                                  tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
   if(fileName.isEmpty())
   {

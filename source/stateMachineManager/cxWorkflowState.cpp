@@ -1,17 +1,9 @@
-/*
- * cxWorkflowState.cpp
- *
- *  Created on: Jan 25, 2011
- *      Author: christiana
- */
-
 #include "cxWorkflowState.h"
 #include "RTSource/cxRTSourceManager.h"
 #include "sscDataManager.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
-//#include "cxViewManager.h"
-#include "cxDataLocations.h"
+#include "cxSettings.h"
 #include "sscToolManager.h"
 
 namespace cx
@@ -72,9 +64,9 @@ void WorkflowState::setActionSlot()
 
 void WorkflowState::autoStartHardware()
 {
-  if (DataLocations::getSettings()->value("Automation/autoStartTracking").toBool())
+  if (settings()->value("Automation/autoStartTracking").toBool())
     ssc::toolManager()->startTracking();
-  if (DataLocations::getSettings()->value("Automation/autoStartStreaming").toBool())
+  if (settings()->value("Automation/autoStartStreaming").toBool())
     stateManager()->getRTSourceManager()->launchAndConnectServer();
 }
 
