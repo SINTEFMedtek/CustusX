@@ -12,7 +12,6 @@
 #include "cxDataLocations.h"
 #include "cxStateMachineManager.h"
 #include "cxFilePreviewWidget.h"
-//#include "cxToolConfigWidget.h"
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
 
@@ -36,14 +35,14 @@ PreferencesTab::PreferencesTab(QWidget *parent) :
   this->setLayout(vtopLayout);
 }
 //==============================================================================
-// FoldersTab
+// GeneralTab
 //------------------------------------------------------------------------------
 
-FoldersTab::FoldersTab(QWidget *parent) :
+GeneralTab::GeneralTab(QWidget *parent) :
     PreferencesTab(parent)
 {}
 
-void FoldersTab::init()
+void GeneralTab::init()
 {
   mGlobalPatientDataFolder = mSettings->value("globalPatientDataFolder").toString();
 
@@ -60,20 +59,14 @@ void FoldersTab::init()
   QToolButton* browsePatientFolderButton = new QToolButton(this);
   browsePatientFolderButton->setDefaultAction(browsePatientFolderAction);
   
-  QLabel *toolConfigFilesLabel = new QLabel(tr("Tool configuration files:"));
-  mToolConfigFilesComboBox = new QComboBox;
-  connect( mToolConfigFilesComboBox, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(currentToolConfigFilesIndexChangedSlot(const QString &)) );
-  
   // Choose application name
   QLabel* chooseApplicationLabel = new QLabel(tr("Choose application:"));
   mChooseApplicationComboBox = new QComboBox();
   setApplicationComboBox();
   connect(mChooseApplicationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentApplicationChangedSlot(int)));
-  mCurrentToolConfigFile = mSettings->value("toolConfigFile").toString();
-  applicationStateChangedSlot();
+  this->applicationStateChangedSlot();
   
   // Layout
-
   QGridLayout *mainLayout = new QGridLayout;
   mainLayout->addWidget(patientDataFolderLabel, 0, 0);
   mainLayout->addWidget(mPatientDataFolderComboBox, 0, 1);
@@ -81,17 +74,14 @@ void FoldersTab::init()
   
   mainLayout->addWidget(chooseApplicationLabel, 8, 0);
   mainLayout->addWidget(mChooseApplicationComboBox, 8, 1);
-  
-  mainLayout->addWidget(toolConfigFilesLabel, 9, 0);
-  mainLayout->addWidget(mToolConfigFilesComboBox, 9, 1);
  
   mTopLayout->addLayout(mainLayout);
 }
 
-FoldersTab::~FoldersTab()
+GeneralTab::~GeneralTab()
 {}
 
-void FoldersTab::browsePatientDataFolderSlot()
+void GeneralTab::browsePatientDataFolderSlot()
 {
   mGlobalPatientDataFolder = QFileDialog::getExistingDirectory(this, 
                                                      tr("Find Patient Data Folder"), 
@@ -103,32 +93,7 @@ void FoldersTab::browsePatientDataFolderSlot()
   }
 }
 
-void FoldersTab::currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile)
-{
-  mCurrentToolConfigFile = newToolConfigFile;
-}
-
-void FoldersTab::setToolConfigComboBox()
-{
-  mToolConfigFilesComboBox->blockSignals(true);
-	QDir dir(DataLocations::getApplicationToolConfigPath());
-    dir.setFilter(QDir::Files);
-
-    QStringList nameFilters;
-    nameFilters << "*.xml";
-    dir.setNameFilters(nameFilters);
-
-    QStringList list = dir.entryList();
-
-    mToolConfigFilesComboBox->clear();
-    mToolConfigFilesComboBox->addItems( list );
-
-    int currentIndex = mToolConfigFilesComboBox->findText( mCurrentToolConfigFile );
-    mToolConfigFilesComboBox->setCurrentIndex( currentIndex );
-    mToolConfigFilesComboBox->blockSignals(false);
-}
-
-void FoldersTab::setApplicationComboBox()
+void GeneralTab::setApplicationComboBox()
 {
   mChooseApplicationComboBox->blockSignals(true);
   mChooseApplicationComboBox->clear();
@@ -143,7 +108,7 @@ void FoldersTab::setApplicationComboBox()
   mChooseApplicationComboBox->blockSignals(false);
 }
 
-void FoldersTab::applicationStateChangedSlot()
+void GeneralTab::applicationStateChangedSlot()
 {
   mChooseApplicationComboBox->blockSignals(true);
   QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
@@ -155,15 +120,9 @@ void FoldersTab::applicationStateChangedSlot()
 
   mChooseApplicationComboBox->blockSignals(false);
 
-  this->setToolConfigComboBox();
-
-  // this hack ensures that the tool folder is reinitialized when changing application.
-  // TODO: move to application state
-  if (mToolConfigFilesComboBox->currentIndex()<0)
-    mToolConfigFilesComboBox->setCurrentIndex(0);
 }
   
-void FoldersTab::currentApplicationChangedSlot(int index)
+void GeneralTab::currentApplicationChangedSlot(int index)
 {
   QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
   if (index<0 || index>=actions.size())
@@ -171,18 +130,12 @@ void FoldersTab::currentApplicationChangedSlot(int index)
   actions[index]->trigger();
 }
   
-void FoldersTab::saveParametersSlot()
+void GeneralTab::saveParametersSlot()
 {
   // currentPatientDataFolder
   mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
-  // currentToolConfigFile
-  mSettings->setValue("toolConfigFile", mCurrentToolConfigFile);
-  
   mSettings->sync();
-
-  // update toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 
   emit savedParameters();
 }
@@ -264,11 +217,11 @@ void PerformanceTab::saveParametersSlot()
 //==============================================================================
 // View3DTab
 //------------------------------------------------------------------------------
-View3DTab::View3DTab(QWidget *parent) :
+VisualizationTab::VisualizationTab(QWidget *parent) :
     PreferencesTab(parent)
 {}
 
-void View3DTab::init()
+void VisualizationTab::init()
 {
   double sphereRadius = DataLocations::getSettings()->value("View3D/sphereRadius").toDouble();
   mSphereRadius = ssc::DoubleDataAdapterXml::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, ssc::DoubleRange(0.1,10,0.1), 1, QDomNode());
@@ -289,12 +242,12 @@ void View3DTab::init()
 
 }
 
-void View3DTab::saveParametersSlot()
+void VisualizationTab::saveParametersSlot()
 {
   mSettings->setValue("View3D/sphereRadius", mSphereRadius->getValue());
 }
 
-void View3DTab::setBackgroundColorSlot()
+void VisualizationTab::setBackgroundColorSlot()
 {
   QColor orgval = mSettings->value("backgroundColor").value<QColor>();
   QColor result = QColorDialog::getColor( orgval, this);
@@ -342,11 +295,11 @@ void AutomationTab::saveParametersSlot()
 //==============================================================================
 // UltrasoundTab
 //------------------------------------------------------------------------------
-UltrasoundTab::UltrasoundTab(QWidget *parent) :
+VideoTab::VideoTab(QWidget *parent) :
     PreferencesTab(parent)
 {}
 
-void UltrasoundTab::init()
+void VideoTab::init()
 {
   QVBoxLayout* toplayout = new QVBoxLayout;
   QHBoxLayout* acqNameLayout = new QHBoxLayout;
@@ -371,7 +324,7 @@ void UltrasoundTab::init()
 
 }
 
-void UltrasoundTab::saveParametersSlot()
+void VideoTab::saveParametersSlot()
 {
   mSettings->setValue("Ultrasound/acquisitionName", mAcquisitionNameLineEdit->text());
   DataLocations::getSettings()->setValue("Ultrasound/8bitAcquisitionData", m8bitRadioButton->isChecked());
@@ -390,8 +343,6 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
 
-  //  connect(mToolConfigWidget, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
-//  connect(mToolConfigWidget, SIGNAL(wantToEdit(QString)), mFilePreviewWidget, SLOT(editSlot()));
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
 
@@ -414,9 +365,15 @@ void ToolConfigTab::init()
 
 void ToolConfigTab::saveParametersSlot()
 {
-  //TODO
-  //save things to mSettings????
   mToolConfigureGroupBox->requestSaveConfigurationSlot();
+
+  // currentToolConfigFile
+  mSettings->setValue("toolConfigFile", mToolConfigureGroupBox->getCurrenctlySelectedConfiguration());
+
+  mSettings->sync();
+
+  // update toolmanager config file
+  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 void ToolConfigTab::applicationChangedSlot()
@@ -442,11 +399,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
   buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
-  this->addTab(new FoldersTab, tr("Folders"));
+  this->addTab(new GeneralTab, tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
-  this->addTab(new View3DTab, tr("View 3D"));
   this->addTab(new AutomationTab, tr("Automation"));
-  this->addTab(new UltrasoundTab, tr("Ultrasound"));
+  this->addTab(new VisualizationTab, tr("Visualization"));
+  this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
 
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
