@@ -2,7 +2,7 @@
 #define CXPREFERANCESDIALOG_H_
 
 #include <QDialog>
-#include "boost/shared_ptr.hpp"
+//#include "boost/shared_ptr.hpp"
 #include "sscDoubleDataAdapterXml.h"
 
 class QTabWidget;
@@ -13,7 +13,6 @@ class QDialogButtonBox;
 class QLabel;
 class QComboBox;
 class QPushButton;
-class QSettings;
 class QSpinBox;
 class QCheckBox;
 class QRadioButton;
@@ -21,7 +20,6 @@ class QGridLayout;
 class QVBoxLayout;
 class QLineEdit;
 class QActionGroup;
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
@@ -46,7 +44,6 @@ signals:
   void savedParameters();
 
 protected:
-  QSettingsPtr mSettings;
   QVBoxLayout* mTopLayout;
 };
 

@@ -17,17 +17,17 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "cxDataLocations.h"
 #include "sscDataManager.h"
-#include "cxViewManager.h"
-#include "cxToolManager.h"
-#include "cxViewGroup.h"
 #include "sscDefinitionStrings.h"
 #include "sscSlicePlanes3DRep.h"
 #include "sscDefinitionStrings.h"
 #include "sscSliceComputer.h"
 #include "sscGeometricRep2D.h"
 #include "sscRTStreamRep.h"
+#include "cxSettings.h"
+#include "cxViewManager.h"
+#include "cxToolManager.h"
+#include "cxViewGroup.h"
 #include "cxStateMachineManager.h"
 
 namespace cx
@@ -78,7 +78,7 @@ void ViewWrapperRTStream::appendToContextMenu(QMenu& contextMenu)
 void ViewWrapperRTStream::showSectorActionSlot(bool checked)
 {
   mStreamRep->setShowSector(checked);
-  DataLocations::getSettings()->setValue("showSectorInRTView", checked);
+  settings()->setValue("showSectorInRTView", checked);
 }
 
 /** Setup connections to stream. Called when a stream is loaded into the datamanager, or if a probe is initialized
@@ -135,7 +135,7 @@ void ViewWrapperRTStream::setupRep(ssc::RTSourcePtr source, ssc::ToolPtr tool)
   mStreamRep->setRealtimeStream(mSource);
   mStreamRep->setTool(tool);
   mDataNameText->setText(0, "initialized");
-  mStreamRep->setShowSector(DataLocations::getSettings()->value("showSectorInRTView").toBool());
+  mStreamRep->setShowSector(settings()->value("showSectorInRTView").toBool());
 
   //ssc::messageManager()->sendInfo("Setup rt rep with source="+source->getName()+" and tool="+(tool?tool->getName():"none"));
 }

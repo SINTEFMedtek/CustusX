@@ -3,14 +3,14 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QSettings>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageLuminance.h>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
+#include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "cxDataLocations.h"
+#include "cxSettings.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -167,7 +167,7 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   vtkImageAppendPtr filter = vtkImageAppendPtr::New();
   filter->SetAppendAxis(2); // append along z-axis
 
-  bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
+  bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
   int i=0;
   for(ssc::RTSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)

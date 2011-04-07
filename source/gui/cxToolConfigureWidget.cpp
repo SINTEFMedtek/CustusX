@@ -73,6 +73,8 @@ ToolConfigureGroupBox::~ToolConfigureGroupBox()
 void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsoluteFilePath)
 {
   int currentIndex = mConfigFilesComboBox->findData(configAbsoluteFilePath, Qt::ToolTipRole);
+  if(currentIndex < 0)
+    currentIndex = 0;
   mConfigFilesComboBox->setCurrentIndex(currentIndex);
 }
 
