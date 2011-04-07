@@ -9,7 +9,6 @@
 
 #include <QString>
 #include "boost/shared_ptr.hpp"
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
@@ -29,7 +28,6 @@ public:
   static QString getAudioConfigFilePath(); ///< return users path to audio config file
   static QString getShaderPath(); ///< return the path to installed shaders. empty string if not installed.
   static QString getAppDataPath(); ///< return path to global configuration data.
-  static QSettingsPtr getSettings(); ///< return a settings object for global custusX data
   static QString getXmlSettingsFile(); ///< return a filename for a xml file containing global custusX data (equal to settings above)
 };
 

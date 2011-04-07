@@ -10,17 +10,18 @@
 
 #include "vtkRenderWindow.h"
 
-#include "cxDataLocations.h"
-#include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscRTStreamRep.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
+#include "sscToolManager.h"
+#include "cxSettings.h"
+#include "cxDataLocations.h"
+#include "cxDataInterface.h"
 #include "cxProbe.h"
 #include "probeXmlConfigParser.h"
-#include "sscToolManager.h"
 
 namespace cx
 {
@@ -52,12 +53,12 @@ RTSourceManager::~RTSourceManager()
 
 void RTSourceManager::setLocalServerCommandLine(QString commandline)
 {
-  DataLocations::getSettings()->setValue("IGTLink/localServer", commandline);
+  settings()->setValue("IGTLink/localServer", commandline);
 }
 
 QString RTSourceManager::getLocalServerCommandLine()
 {
-  QString cmd = DataLocations::getSettings()->value("IGTLink/localServer").toString();
+  QString cmd = settings()->value("IGTLink/localServer").toString();
   if (cmd.isEmpty())
     cmd = "GrabberServer.app --auto";
   return cmd;
@@ -65,12 +66,12 @@ QString RTSourceManager::getLocalServerCommandLine()
 
 void RTSourceManager::setPort(int port)
 {
-  DataLocations::getSettings()->setValue("IGTLink/port", port);
+  settings()->setValue("IGTLink/port", port);
 }
 
 int RTSourceManager::getPort()
 {
-  QVariant var = DataLocations::getSettings()->value("IGTLink/port");
+  QVariant var = settings()->value("IGTLink/port");
   if (var.canConvert<int>())
     return var.toInt();
   return 18333;
@@ -78,12 +79,12 @@ int RTSourceManager::getPort()
 
 void RTSourceManager::setUseLocalServer(bool use)
 {
-  DataLocations::getSettings()->setValue("IGTLink/useLocalServer", use);
+  settings()->setValue("IGTLink/useLocalServer", use);
 }
 
 bool RTSourceManager::getUseLocalServer()
 {
-  QVariant var = DataLocations::getSettings()->value("IGTLink/useLocalServer");
+  QVariant var = settings()->value("IGTLink/useLocalServer");
   if (var.canConvert<bool>())
     return var.toBool();
   return true;
@@ -94,7 +95,7 @@ bool RTSourceManager::getUseLocalServer()
  */
 QStringList RTSourceManager::getHostHistory()
 {
-  QStringList hostHistory = DataLocations::getSettings()->value("IGTLink/hostHistory").toStringList();
+  QStringList hostHistory = settings()->value("IGTLink/hostHistory").toStringList();
   if (hostHistory.isEmpty())
     hostHistory << "Localhost";
   return hostHistory;
@@ -115,7 +116,7 @@ void RTSourceManager::setHost(QString host)
   while (history.size()>5)
     history.removeLast();
 
-  DataLocations::getSettings()->setValue("IGTLink/hostHistory", history);
+  settings()->setValue("IGTLink/hostHistory", history);
 }
 
 
