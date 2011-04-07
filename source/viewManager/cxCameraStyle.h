@@ -45,7 +45,6 @@ public:
   CameraStyle();
 
   void setCameraStyle(Style style, int offset=-1); ///< lets the user select where the camera, offset only used by TOOL_STYLE
-//  Style getCameraStyle
 
 public slots:
   void setCameraOffsetSlot(int offset); ///< sets the camera offset
@@ -63,14 +62,12 @@ protected:
 
   void activateCameraDefaultStyle();
   void activateCameraToolStyle(int offset=0);
-//  void deactivateCameraToolStyle();
   void connectTool();
   void disconnectTool();
 
   Style mCameraStyle; ///< the current camerastyle
   int mCameraOffset; ///< the distance between the camera and focalpoint
   ssc::ToolPtr mFollowingTool; ///< the tool the camera is following
-//  ssc::View3D* mView;
 };
 
 }//namespace cx

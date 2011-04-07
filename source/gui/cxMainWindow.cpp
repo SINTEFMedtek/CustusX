@@ -60,10 +60,10 @@ MainWindow::MainWindow() :
   mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
-  mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
-  mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
-  mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
-  mCalibrationMethodsWidget(new CalibrationMethodsWidget("CalibrationMethodsWidget", "Calibration Methods", this)),
+  mRegsitrationMethodsWidget(new RegistrationMethodsWidget(this, "RegistrationMethodsWidget", "Registration Methods")),
+  mSegmentationMethodsWidget(new SegmentationMethodsWidget(this, "SegmentationMethodsWidget", "Segmentation Methods")),
+  mVisualizationMethodsWidget(new VisualizationMethodsWidget(this, "VisualizationMethodsWidget", "Visualization Methods")),
+  mCalibrationMethodsWidget(new CalibrationMethodsWidget(this, "CalibrationMethodsWidget", "Calibration Methods")),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
@@ -907,7 +907,6 @@ void MainWindow::createToolBars()
 
    QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
-   camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
    this->registerToolBar(camera3DViewToolBar, "Toolbar");
 }
@@ -925,23 +924,23 @@ void MainWindow::createStatusBar()
 void MainWindow::populateRegistrationMethodsWidget()
 {
   //landmark
-  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
-  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
-  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
+  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(mRegsitrationMethodsWidget, "LandmarkRegistrationWidget", "Landmark Registrations");
+  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget, "ImageRegistrationWidget", "Image Registration");
+  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget, "PatientRegistrationWidget", "Patient Registration");
   landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
   landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
 
   //fast
-  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
+  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(mRegsitrationMethodsWidget, "FastRegistrationWidget", "Fast Registrations");
   FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
+  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
   FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
   fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
   fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
   fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient");
 
   //vessel based image to image
-  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
+  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(mRegsitrationMethodsWidget, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
   FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
   MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
@@ -953,7 +952,7 @@ void MainWindow::populateRegistrationMethodsWidget()
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
 
   //plate
-  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget("PlateRegistrationWidget", "Plate", mRegsitrationMethodsWidget);
+  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(mRegsitrationMethodsWidget, "PlateRegistrationWidget", "Plate");
   PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
   PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
