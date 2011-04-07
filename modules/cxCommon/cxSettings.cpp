@@ -37,7 +37,7 @@ void Settings::setValue(const QString& key, const QVariant& value)
   mSettings->setValue(key, value);
   this->sync();
 
-  emit changedValueFor(key);
+  emit valueChangedFor(key);
 }
 
 QVariant Settings::value(const QString& key, const QVariant& defaultValue) const
