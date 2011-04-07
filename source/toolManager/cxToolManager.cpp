@@ -2,7 +2,6 @@
 
 #include "cxToolManager.h"
 
-#include <QSettings>
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -20,6 +19,7 @@
 #include "cxToolConfigurationParser.h"
 #include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
+#include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
 
@@ -54,8 +54,13 @@ ToolManager::ToolManager() :
   m_rMpr_History.reset(new ssc::RegistrationHistory());
   connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+
   this->initializeManualTool();
   this->setDominantTool("ManualTool");
+
+  // initialize config file
+  this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 ToolManager::~ToolManager()
@@ -92,7 +97,7 @@ void ToolManager::initializeManualTool()
     //adding a manual tool as default
     mManualTool.reset(new ManualToolAdapter("ManualTool"));
     mTools["ManualTool"] = mManualTool;
-    mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
+    mManualTool->setVisible(settings()->value("showManualTool").toBool());
     connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   }
 
@@ -182,7 +187,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
   }
 
   // debug: give the manual tool properties from the first nonmanual tool. Nice for testing tools
-  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
+  if (settings()->value("giveManualToolPhysicalProperties").toBool())
   {
     for (ssc::ToolManager::ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
     {
@@ -505,7 +510,7 @@ void ToolManager::setDominantTool(const QString& uid)
       mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
 
     }
-    mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
+    mManualTool->setVisible(settings()->value("showManualTool").toBool());
   }
 
   if(mDominantTool)
@@ -623,10 +628,8 @@ void ToolManager::setConfigurationFile(QString configurationFile)
     return;
 
   if(this->isConfigured())
-  {
     this->deconfigure();
-//    return;
-  }
+
   mConfigurationFilePath = configurationFile;
 }
 
@@ -687,6 +690,14 @@ void ToolManager::deconfigureAfterUninitializedSlot()
 {
   disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
   this->deconfigure();
+}
+
+void ToolManager::globalConfigurationFileChangedSlot(QString key)
+{
+  if(key != "toolConfigFile")
+    return;
+
+  this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 void ToolManager::dominantCheckSlot()

@@ -15,6 +15,7 @@
 #include <QDropEvent>
 #include <QMimeData>
 #include <QAction>
+#include <QLabel>
 #include <QMenu>
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
@@ -35,6 +36,8 @@ DataListWidget::DataListWidget(QWidget* parent) :
 
   this->setSelectionBehavior(QAbstractItemView::SelectItems);
   this->setSelectionMode(QAbstractItemView::SingleSelection);
+
+  connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(itemSelectionChangedSlot()));
 }
 
 DataListWidget::~DataListWidget()
@@ -49,6 +52,17 @@ void DataListWidget::populate(QStringList dataUids)
     this->populateData(data);
   }
   emit listSizeChanged();
+}
+
+void DataListWidget::itemSelectionChangedSlot()
+{
+  QList<QListWidgetItem*> items = this->selectedItems();
+  if (items.empty())
+    return;
+  ssc::ImagePtr image = ssc::dataManager()->getImage(items[0]->data(Qt::UserRole).toString());
+  if (image)
+    ssc::dataManager()->setActiveImage(image);
+
 }
 
 void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* after)
@@ -80,15 +94,17 @@ void DataListWidget::populateData(QString uid, bool indent, QListWidgetItem* aft
     this->addItem(item);
   }
 
+  item->setToolTip(item->text());
+
   emit listSizeChanged();
 }
 
 
-void DataListWidget::dataClickedSlot(QListWidgetItem* item)
-{
-  QString uid = item->data(Qt::UserRole).toString();
-  emit dataSelected(uid);
-}
+//void DataListWidget::dataClickedSlot(QListWidgetItem* item)
+//{
+//  QString uid = item->data(Qt::UserRole).toString();
+//  emit dataSelected(uid);
+//}
 
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -99,8 +115,11 @@ void DataListWidget::dataClickedSlot(QListWidgetItem* item)
 AllDataListWidget::AllDataListWidget(QWidget* parent) :
     DataListWidget(parent)
 {
-  this->setDragDropMode(QAbstractItemView::DragOnly);
+//  this->setDragDropMode(QAbstractItemView::DragOnly);
+//  this->setDragEnabled(true);
+  this->setDropIndicatorShown(false);
   this->setDragEnabled(true);
+//  this->setAcceptDrops(true); // if we want to back-drag items (for deletion)
 
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(populateAllDataList()));
   connect(ssc::dataManager(), SIGNAL(dataRemoved(QString)), this, SLOT(populateAllDataList()));
@@ -111,37 +130,38 @@ AllDataListWidget::~AllDataListWidget()
 
 void AllDataListWidget::mousePressEvent(QMouseEvent *event)
 {
-  if (event->button() == Qt::LeftButton)
-    startPos = event->pos();
+//  if (event->button() == Qt::LeftButton)
+//    startPos = event->pos();
   QListWidget::mousePressEvent(event);
 }
 
 void AllDataListWidget::mouseMoveEvent(QMouseEvent *event)
 {
-  if (event->buttons() & Qt::LeftButton)
-  {
-    int distance = (event->pos() - startPos).manhattanLength();
-    if (distance >= 10)
-      this->startDrag();
-  }
+  QListWidget::mouseMoveEvent(event);
+//  if (event->buttons() & Qt::LeftButton)
+//  {
+//    int distance = (event->pos() - startPos).manhattanLength();
+//    if (distance >= 10)
+//      this->startDrag();
+//  }
 }
 
-void AllDataListWidget::startDrag()
-{
-  QListWidgetItem *item = currentItem();
-  if (item)
-  {
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setText(item->data(Qt::UserRole).toString());
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-
-    drag->start(Qt::CopyAction);
-
-//    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
-//      delete item;
-  }
-}
+//void AllDataListWidget::startDrag()
+//{
+//  QListWidgetItem *item = currentItem();
+//  if (item)
+//  {
+//    QMimeData *mimeData = new QMimeData;
+//    mimeData->setText(item->data(Qt::UserRole).toString());
+//    QDrag *drag = new QDrag(this);
+//    drag->setMimeData(mimeData);
+//
+//    drag->start(Qt::CopyAction);
+//
+////    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
+////      delete item;
+//  }
+//}
 
 
 void AllDataListWidget::populateAllDataList()
@@ -182,110 +202,135 @@ SelectedDataListWidget::SelectedDataListWidget(QWidget* parent) :
 {
   this->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  this->viewport()->setAcceptDrops(true);
-  this->setAcceptDrops(true);
   this->setDropIndicatorShown(true);
-  this->setDefaultDropAction(Qt::CopyAction);
-//  this->setDragDropMode(QAbstractItemView::DropOnly | QAbstractItemView::InternalMove);
-  this->setDragDropMode(QAbstractItemView::DragDrop);
+  this->setDragEnabled(true);
+  this->setAcceptDrops(true);
+  this->viewport()->setAcceptDrops(true);
+  this->setDragDropOverwriteMode(true);
 
+//  this->viewport()->setAcceptDrops(true);
+//  this->setAcceptDrops(true);
+//  this->setDropIndicatorShown(true);
+//  this->setDefaultDropAction(Qt::CopyAction);
+//  this->setDragDropMode(QAbstractItemView::DragDrop);
+
+  connect(this, SIGNAL(userChangedList()), this, SLOT(userChangedListSlot()));
   connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(contextMenuSlot(const QPoint &)));
+
+//  if (!viewManager()->getViewGroups().empty())
+//    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
+  //nt ViewManager::getActiveViewGroup() const
+  //void DataViewSelectionWidget::activeViewChanged
 }
+
 
 SelectedDataListWidget::~SelectedDataListWidget()
 {}
 
-void SelectedDataListWidget::mousePressEvent(QMouseEvent *event)
-{
-  if (event->button() == Qt::LeftButton)
-    startPos = event->pos();
-  QListWidget::mousePressEvent(event);
-}
 
-void SelectedDataListWidget::mouseMoveEvent(QMouseEvent *event)
+
+void SelectedDataListWidget::userChangedListSlot()
 {
-  if (event->buttons() & Qt::LeftButton)
+  QStringList data = this->getData();
+  std::reverse(data.begin(), data.end());
+
+  mViewGroupData->clearData();
+  for (int i=0; i<data.size(); ++i)
   {
-    int distance = (event->pos() - startPos).manhattanLength();
-    if (distance >= 10)
-      this->startDrag();
+    ssc::DataPtr current = ssc::dataManager()->getData(data[i]);
+    if (!current)
+      continue;
+    mViewGroupData->addData(current);
   }
 }
 
-void SelectedDataListWidget::startDrag()
+void SelectedDataListWidget::keyPressEvent(QKeyEvent* event)
 {
-  QListWidgetItem *item = currentItem();
-  if (item)
+  if (event->matches(QKeySequence::Delete) || event->matches(QKeySequence::Back))
   {
-    QMimeData *mimeData = new QMimeData;
-    mimeData->setText(item->data(Qt::UserRole).toString());
-    QDrag *drag = new QDrag(this);
-    drag->setMimeData(mimeData);
-
-//    drag->start(Qt::MoveAction);
-
-    if (drag->start(Qt::MoveAction) == Qt::MoveAction)
-    {
-     std::cout << "removing dragged item " << item->text() << std::endl;
-      delete item;
-    }
+    QList<QListWidgetItem*> items = this->selectedItems();
+    for (int i=0; i<items.size(); ++i)
+      delete items[i];
+    emit userChangedList();
+    emit listSizeChanged();
   }
 }
 
-void SelectedDataListWidget::dragEnterEvent(QDragEnterEvent *event)
+/**convert from the internal qt mime format used in the convenience views (QListWidget etc)
+ * to a QMap with one entry for each QListItem::data() entry.
+ *
+ */
+QMap<int, QVariant> SelectedDataListWidget::convertFromCustomQtMimeFormat(const QMimeData* mimeData) const
 {
-  if (event->source()==this)
-  {
-    event->accept();
-    return;
-  }
+  QMap<int, QVariant> v;
+  if (!mimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
+    return v;
 
-  QStringList all = this->getData();
-  if (all.contains(event->mimeData()->text()))
-    event->ignore();
-  else
-    event->accept();
-}
-
-void SelectedDataListWidget::dragMoveEvent(QDragMoveEvent *event)
-{
-  DataListWidget::dragMoveEvent(event);
-  event->setDropAction(Qt::MoveAction);
-  if (event->source()==this)
-  {
-    event->accept();
-//    std::cout << "from this" << std::endl;
-    return;
-  }
-
-  //  event->accept();
-  QStringList all = this->getData();
-  if (all.contains(event->mimeData()->text()))
-    event->ignore();
-  else
-    event->accept();
-}
-
-
-bool SelectedDataListWidget::dropMimeData(int index, const QMimeData* data, Qt::DropAction action)
-{
-  std::cout << "hit" << std::endl;
-  return false;
+  QByteArray itemData = mimeData->data("application/x-qabstractitemmodeldatalist");
+  QDataStream stream(&itemData, QIODevice::ReadOnly);
+  int r, c;
+//  QMap<int, QVariant> v;
+  stream >> r >> c >> v;
+//  std::cout << "var: " << r << " " << c << " " << v.size() << std::endl;
+//  if (!v.empty())
+//  {
+//    QString uid = v[Qt::UserRole].toString();
+//    std::cout << "v: " << " " << v.begin()->typeName() << " " << v.begin()->toString() << " uid= " << uid << std::endl;
+//
+////      newUid = v.begin()->toString();
+////    newUid = uid;
+//  }
+  return v;
 }
 
 void SelectedDataListWidget::dropEvent(QDropEvent *event)
 {
-  QListWidgetItem* pos = NULL;
-
   if (event->source()==this)
   {
-    pos = this->itemAt(event->pos());
+    std::cout << "drop this: " << event->mimeData()->formats().join(",") << std::endl;
+    event->setDropAction(Qt::MoveAction);
+  }
+
+  QString sourceUid;
+  QMap<int, QVariant> sourceData = this->convertFromCustomQtMimeFormat(event->mimeData());
+  if (sourceData.contains(Qt::UserRole))
+    sourceUid = sourceData[Qt::UserRole].toString();
+
+//  if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
+//  {
+//    QByteArray itemData = event->mimeData()->data("application/x-qabstractitemmodeldatalist");
+//    QDataStream stream(&itemData, QIODevice::ReadOnly);
+//    int r, c;
+//    QMap<int, QVariant> v;
+//    stream >> r >> c >> v;
+//    std::cout << "var: " << r << " " << c << " " << v.size() << std::endl;
+//    if (!v.empty())
+//    {
+//      QString uid = v[Qt::UserRole].toString();
+//      std::cout << "v: " << " " << v.begin()->typeName() << " " << v.begin()->toString() << " uid= " << uid << std::endl;
+//
+////      newUid = v.begin()->toString();
+//      newUid = uid;
+//    }
+//  }
+
+  QListWidgetItem* itemToDelete = 0;
+  for(int i=0; i < this->count(); ++i)
+  {
+    QListWidgetItem* item = this->item(i);
+    if (item->data(Qt::UserRole)==sourceUid)
+      itemToDelete = item;
   }
 
 //  std:: cout << "received dropEvent: " << event->mimeData()->text() << std::endl;
-  this->populateData(event->mimeData()->text(), false, pos);
-  event->setDropAction(Qt::MoveAction);
-  event->accept();
+//    this->populateData(event->mimeData()->text(), false, pos);
+//    event->setDropAction(Qt::MoveAction);
+//    event->accept();
+//  std::cout << "dropaction " << event->dropAction() << std::endl;
+  QListWidget::dropEvent(event);
+  if (event->source()!=this) // remove old item if new if moved in from external source
+    delete itemToDelete;
+
   emit userChangedList();
   emit listSizeChanged();
 }
@@ -346,6 +391,7 @@ void SelectedDataListWidget::populateList()
   this->clear();
 
   std::vector<ssc::DataPtr> sorted = mViewGroupData->getData();
+  std::reverse(sorted.begin(), sorted.end());
   for (std::vector<ssc::DataPtr>::iterator iter=sorted.begin(); iter!=sorted.end(); ++iter)
   {
     QString uid = (*iter)->getUid();
@@ -372,6 +418,8 @@ void SelectedDataListWidget::setViewGroupData(ViewGroupDataPtr viewGroupData)
     connect(mViewGroupData.get(), SIGNAL(dataAdded(QString)), this, SLOT(populateList()));
     connect(mViewGroupData.get(), SIGNAL(dataRemoved(QString)), this, SLOT(populateList()));
   }
+
+  this->populateList();
 }
 
 
@@ -396,6 +444,7 @@ protected:
       event->setDropAction(Qt::MoveAction);
     }
 
+    QString newUid;
     if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
     {
       QByteArray itemData = event->mimeData()->data("application/x-qabstractitemmodeldatalist");
@@ -407,46 +456,42 @@ protected:
       if (!v.empty())
       {
         std::cout << "v: " << " " << v.begin()->typeName() << " " << v.begin()->toString() << std::endl;
+        newUid = v.begin()->toString();
       }
     }
 
+    QListWidgetItem* itemToDelete = 0;
+    for(int i=0; i < this->count(); ++i)
+    {
+      QListWidgetItem* item = this->item(i);
+      if (item->text()==newUid)
+        itemToDelete = item;
+    }
 
   //  std:: cout << "received dropEvent: " << event->mimeData()->text() << std::endl;
 //    this->populateData(event->mimeData()->text(), false, pos);
 //    event->setDropAction(Qt::MoveAction);
 //    event->accept();
+    std::cout << "dropaction " << event->dropAction() << std::endl;
     QListWidget::dropEvent(event);
+    if (event->source()!=this) // remove old item if new if moved in from external source
+      delete itemToDelete;
   }
 
+};
 
-//  void dropEvent(QGraphicsSceneDragDropEvent* event)
-//  {
-//    if (event->mimeData()->hasFormat("application/x-qabstractitemmodeldatalist"))
-//    {
-//      QTreeWidget *tree = dynamic_cast<QTreeWidget *> (event->source());
-//
-//      QByteArray itemData = event->mimeData()->data("application/x-qabstractitemmodeldatalist");
-//      QDataStream stream(&itemData, QIODevice::ReadOnly);
-//
-//      int r, c;
-//      QMap<int, QVariant> v;
-//      stream >> r >> c >> v;
-//
-//      QTreeWidgetItem *item = tree->topLevelItem(r);
-//
-//      if (item)
-//      {
-//        itemDropped(item);
-//      }
-//    }
-//
-//  }
-
-//  bool SelectedDataListWidget::dropMimeData(int index, const QMimeData* data, Qt::DropAction action)
-//  {
-//    std::cout << "hit" << std::endl;
-//    return false;
-//  }
+class TestClass : public QListWidget
+{
+public:
+  TestClass(QWidget* parent) : QListWidget(parent) {}
+protected:
+  void dropEvent(QDropEvent *event)
+  {
+    // ignore drop
+    event->setDropAction(Qt::MoveAction);
+    event->acceptProposedAction();
+//    QListWidget::dropEvent(event);
+  }
 
 };
 
@@ -457,7 +502,8 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
 
   mSelectedDataListWidget = new SelectedDataListWidget(this);
   mAllDataListWidget = new AllDataListWidget(this);
-  QListWidget* test = new QListWidget(this);
+#if 0
+  TestClass* test = new TestClass(this);
   test->addItem("test1");
   test->addItem("test2");
   test->addItem("test3");
@@ -465,7 +511,7 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
   //test->setDragDropMode(QAbstractItemView::InternalMove);
   test->setDropIndicatorShown(false);
   test->setDragEnabled(true);
-//  test->setAcceptDrops(true);
+  test->setAcceptDrops(true);
 
   AbraClass* abra = new AbraClass(this);
   abra->addItem("abra1");
@@ -479,17 +525,43 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
   abra->viewport()->setAcceptDrops(true);
   abra->setDragDropOverwriteMode(true);
 
-  // AbstractItemView::DropIndicatorPosition
-  layout->addWidget(mSelectedDataListWidget);
-  layout->addWidget(mAllDataListWidget);
   layout->addWidget(test);
   layout->addWidget(abra);
+#endif
 
-  if (!viewManager()->getViewGroups().empty())
-    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
+  QVBoxLayout* selLayout = new QVBoxLayout;
+  mVisibleLabel = new QLabel("Visible", this);
+  selLayout->addWidget(mVisibleLabel);
+  selLayout->addWidget(mSelectedDataListWidget);
+  layout->addLayout(selLayout);
+
+  QVBoxLayout* allLayout = new QVBoxLayout;
+  allLayout->addWidget(new QLabel("All"));
+  allLayout->addWidget(mAllDataListWidget);
+  layout->addLayout(allLayout);
+
+//  layout->addLayout(selLayout);
+//  layout->addLayout(allLayout);
+
+  connect(viewManager(), SIGNAL(activeViewChanged()), this, SLOT(viewGroupChangedSlot()));
+  this->viewGroupChangedSlot();
+//  if (!viewManager()->getViewGroups().empty())
+//    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[0]->getData());
+//  //nt ViewManager::getActiveViewGroup() const
+//  //void DataViewSelectionWidget::activeViewChanged
 }
 
-//void DataViewSelectionWidget::activeViewChanged
+void DataViewSelectionWidget::viewGroupChangedSlot()
+{
+  int vg = viewManager()->getActiveViewGroup();
+
+  if (( vg>=0 )&&( vg<int(viewManager()->getViewGroups().size()) ))
+  {
+    mSelectedDataListWidget->setViewGroupData(viewManager()->getViewGroups()[vg]->getData());
+  }
+
+  mVisibleLabel->setText("Visible in group "+qstring_cast(vg));
+}
 
 
 DataViewSelectionWidget::~DataViewSelectionWidget()

@@ -3,7 +3,7 @@
 #include "itkImageFileReader.h"
 #include "sscTypeConversions.h"
 #include "vtkMetaImageWriter.h"
-#include "cxDataLocations.h"
+#include "cxSettings.h"
 #include "sscUtilHelpers.h"
 
 namespace cx
@@ -49,7 +49,7 @@ itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImageViaFile(ssc::Image
     return itkImageType::ConstPointer();
   }
 
-  QString tempFolder = DataLocations::getSettings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
+  QString tempFolder = settings()->value("globalPatientDataFolder").toString() + "/NoPatient/temp/";
   QDir().mkpath(tempFolder);
 
   // write to disk

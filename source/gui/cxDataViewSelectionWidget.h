@@ -10,6 +10,7 @@
 
 #include <QListWidget>
 #include "cxViewWrapper.h"
+class QLabel;
 
 namespace cx
 {
@@ -27,7 +28,7 @@ public:
   virtual ~DataListWidget();
 
 signals:
-  void dataSelected(QString uid);
+//  void dataSelected(QString uid);
   void userChangedList(); ///< emitted whenever the user changes the list
   void listSizeChanged(); ///< emitted whenever the count changes
 
@@ -39,7 +40,8 @@ protected:
 //  Tool::InternalStructure getToolInternal(QString toolAbsoluteFilePath);
 
 private slots:
-  void dataClickedSlot(QListWidgetItem* item);
+//  void dataClickedSlot(QListWidgetItem* item);
+  void itemSelectionChangedSlot();
 };
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -59,7 +61,7 @@ public slots:
 protected:
   void mousePressEvent(QMouseEvent *event);
   void mouseMoveEvent(QMouseEvent *event);
-  void startDrag();
+//  void startDrag();
 
 private slots:
   void populateAllDataList();
@@ -88,20 +90,24 @@ public slots:
 //  void configSlot(QStringList toolsAbsoluteFilePath); ///< adds all input tools to the list
 //  void filterSlot(QStringList trackingsystemFilter); ///< filters the tools on tracking system
   void populateList();
+  void userChangedListSlot();
 
 private slots:
   void deleteSlot();
   void deleteItemSlot(QListWidgetItem* item);
   void contextMenuSlot(const QPoint & point);
+  void keyPressEvent(QKeyEvent* event);
 
 protected:
-  void dragEnterEvent(QDragEnterEvent *event);
-  void dragMoveEvent(QDragMoveEvent *event);
-  bool dropMimeData(int index, const QMimeData* data, Qt::DropAction action);
+  QMap<int, QVariant> convertFromCustomQtMimeFormat(const QMimeData* mimeData) const;
 
-  void mousePressEvent(QMouseEvent *event);
-  void mouseMoveEvent(QMouseEvent *event);
-  void startDrag();
+//  void dragEnterEvent(QDragEnterEvent *event);
+//  void dragMoveEvent(QDragMoveEvent *event);
+//  bool dropMimeData(int index, const QMimeData* data, Qt::DropAction action);
+
+//  void mousePressEvent(QMouseEvent *event);
+//  void mouseMoveEvent(QMouseEvent *event);
+//  void startDrag();
 
 private:
   QListWidgetItem* mItemToDelete;
@@ -122,10 +128,12 @@ public:
 
 private slots:
 //  void populateAllDataList();
+  void viewGroupChangedSlot();
 
 private:
   SelectedDataListWidget* mSelectedDataListWidget;
   AllDataListWidget* mAllDataListWidget;
+  QLabel* mVisibleLabel;
 };
 
 }
