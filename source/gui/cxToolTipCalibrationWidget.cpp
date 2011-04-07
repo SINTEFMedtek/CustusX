@@ -19,13 +19,10 @@
 namespace cx
 {
 ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
-  WhatsThisWidget(parent),
+  WhatsThisWidget(parent, "ToolTipCalibrationWidget", "ToolTip Calibration"),
   mCalibrationWidget(new ToolTipCalibrateWidget(this)),
   mSampleWidget(new ToolTipSampleWidget(this))
 {
-  this->setObjectName("ToolTipCalibrationWidget");
-  this->setWindowTitle("Tool Tip");
-
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
 
@@ -67,16 +64,13 @@ void ToolTipCalibrationWidget::hideEvent(QHideEvent* event)
 }
 //------------------------------------------------------------------------------
 ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
     mTestButton(new QPushButton("Test calibration")),
     mCalibrationLabel(new QLabel("Calibration: \n")),
     mDeltaLabel(new QLabel("Delta:"))
 {
-  this->setObjectName("ToolTipCalibrateWidget");
-  this->setWindowTitle("Tool Tip Calibration");
-
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
   mTools = SelectToolStringDataAdapter::New();
@@ -194,15 +188,12 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 }
   //------------------------------------------------------------------------------
 ToolTipSampleWidget::ToolTipSampleWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
     mSaveFileButton(new QPushButton("Save to...")),
     mTruncateFile(false)
 {
-  this->setObjectName("ToolTipSampleWidget");
-  this->setWindowTitle("Tool Tip Sampling");
-
   QVBoxLayout* toplayout = new QVBoxLayout(this);
 
   mCoordinateSystems = SelectCoordinateSystemStringDataAdapter::New();

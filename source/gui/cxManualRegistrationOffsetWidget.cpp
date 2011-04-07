@@ -13,7 +13,7 @@
 namespace cx
 {
 ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "ManualRegistrationOffsetWidget", "Manual Registration Offset"),
     mVerticalLayout(new QVBoxLayout(this)),
     mOffsetLabel(new QLabel(QString("Manual offset:"), this)),
     mOffsetsGridLayout(new QGridLayout()),
@@ -31,9 +31,6 @@ ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) 
     mMaxValue(200),
     mDefaultValue(0)
 {
-  this->setObjectName("ManualRegistrationOffsetWidget");
-  this->setWindowTitle("Manual Registration Offset");
-
   mResetOffsetButton->setDisabled(true);
   connect(mResetOffsetButton, SIGNAL(clicked()), this, SLOT(resetOffsetSlot()));
 
