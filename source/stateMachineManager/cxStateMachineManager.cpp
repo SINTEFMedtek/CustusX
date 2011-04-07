@@ -2,12 +2,12 @@
 
 #include <iostream>
 #include <QByteArray>
-#include <QSettings>
 #include <QDir>
 #include "sscEnumConverter.h"
 #include "sscXmlOptionItem.h"
 #include "sscMessageManager.h"
 #include "sscReconstructer.h"
+#include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxPatientData.h"
 #include "cxWorkflowStateMachine.h"
@@ -137,12 +137,11 @@ ApplicationStateMachinePtr StateManager::getApplication()
 template<class T>
 void StateManager::fillDefault(QString name, T value)
 {
-  QSettingsPtr settings = DataLocations::getSettings();
-  if (!settings->contains(name))
-    settings->setValue(name, value);
+  if (!settings()->contains(name))
+    settings()->setValue(name, value);
 }
 
-/**Enter all default QSettings here.
+/**Enter all default Settings here.
  *
  */
 void StateManager::fillDefaultSettings()
