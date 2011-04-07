@@ -15,7 +15,6 @@
 #include <qspinbox.h>
 #include <qlabel.h>
 #include <iostream>
-#include <QSettings>
 
 UsConfig::UsConfig(QWidget* parent) :
   QWidget(parent),
@@ -37,7 +36,6 @@ UsConfig::UsConfig(QWidget* parent) :
   mBottomEdge(0),
   mPixelWidth(0),
   mPixelHeight(0),
-  mSettings(new QSettings())
 {
   // Initialize settings if empty
   if (!mSettings->contains("Scanner"))

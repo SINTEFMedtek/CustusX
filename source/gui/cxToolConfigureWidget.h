@@ -32,13 +32,14 @@ public:
   ToolConfigureGroupBox(QWidget* parent = NULL);
   virtual ~ToolConfigureGroupBox();
 
+  void setCurrentlySelectedCofiguration(QString configAbsoluteFilePath);
   QString getCurrenctlySelectedConfiguration() const;
 
 signals:
   void toolSelected(QString absoluteFilePath);
 
 public slots:
-  void requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
+  QString requestSaveConfigurationSlot(); ///< will save the currently selected configuration if its been edited
   void setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication);
 
 private slots:

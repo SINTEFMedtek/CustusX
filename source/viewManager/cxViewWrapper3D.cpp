@@ -5,7 +5,6 @@
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
 
-#include <QSettings>
 #include <QAction>
 #include <QMenu>
 
@@ -17,7 +16,6 @@
 #include <vtkRenderer.h>
 #include <vtkInteractorObserver.h>
 
-#include "cxDataLocations.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
@@ -25,9 +23,7 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "cxToolManager.h"
 #include "sscSlicePlanes3DRep.h"
-#include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscProbeRep.h"
@@ -35,11 +31,14 @@
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
-#include "cxCameraControl.h"
 #include "sscRTSource.h"
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
 #include "sscOrientationAnnotation3DRep.h"
+#include "cxSettings.h"
+#include "cxToolManager.h"
+#include "cxRepManager.h"
+#include "cxCameraControl.h"
 
 
 namespace cx
@@ -121,7 +120,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
 //  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
   connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
-  mProbeRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
+  mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -140,7 +139,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
   mView->addRep(mAnnotationMarker);
-  mAnnotationMarker->setVisible(DataLocations::getSettings()->value("View3D/showOrientationAnnotation").toBool());
+  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
 //  mInteractorCallback = new InteractionCallback;
 //  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
@@ -264,8 +263,8 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
     activeRep3D->getTracer()->start();
   }
 
-  DataLocations::getSettings()->setValue("showToolPath", checked);
-//  showToolPath->setChecked(DataLocations::getSettings()->value("showToolPath"));
+  settings()->setValue("showToolPath", checked);
+//  showToolPath->setChecked(settings()->value("showToolPath"));
 //  ssc::toolManager()->getDominantTool()->setShowPath(checked);
 }
 
@@ -334,13 +333,13 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
-  DataLocations::getSettings()->setValue("showManualTool", visible);
+  settings()->setValue("showManualTool", visible);
   ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
 {
-  DataLocations::getSettings()->setValue("View3D/showOrientationAnnotation", visible);
+  settings()->setValue("View3D/showOrientationAnnotation", visible);
   mAnnotationMarker->setVisible(visible);
 }
 
@@ -366,7 +365,7 @@ void ViewWrapper3D::centerToolActionSlot()
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
 {
   mSlicePlanes3DRep->getProxy()->setVisible(checked);
-  DataLocations::getSettings()->setValue("showSlicePlanes", checked);
+  settings()->setValue("showSlicePlanes", checked);
 }
 void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 {
@@ -488,7 +487,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(!toolRep)
     {
       toolRep = ssc::ToolRep3D::New(tool->getUid()+"_rep3d_"+this->mView->getUid());
-      if (DataLocations::getSettings()->value("showToolPath").toBool())
+      if (settings()->value("showToolPath").toBool())
         toolRep->getTracer()->start();
     }
 
@@ -501,7 +500,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
 
-    toolRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
@@ -557,7 +556,7 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
   mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
   mSlicePlanes3DRep->setProxy(proxy);
-  bool show = DataLocations::getSettings()->value("showSlicePlanes").toBool();
+  bool show = settings()->value("showSlicePlanes").toBool();
   mSlicePlanes3DRep->getProxy()->setVisible(show); // init with default value
 
   mView->addRep(mSlicePlanes3DRep);

@@ -10,7 +10,6 @@
 class QAction;
 class QMenu;
 class QActionGroup;
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace ssc
 {
@@ -215,7 +214,6 @@ private:
   class ControlPanel*                           mControlPanel;
 
   //Preferences
-  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   CameraControlPtr mCameraControl;
   std::set<QDockWidget*> mDockWidgets;
 };
