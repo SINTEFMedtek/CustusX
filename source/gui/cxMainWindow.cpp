@@ -907,7 +907,6 @@ void MainWindow::createToolBars()
 
    QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
-   camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
    this->registerToolBar(camera3DViewToolBar, "Toolbar");
 }
@@ -926,15 +925,15 @@ void MainWindow::populateRegistrationMethodsWidget()
 {
   //landmark
   LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(mRegsitrationMethodsWidget, "LandmarkRegistrationWidget", "Landmark Registrations");
-  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
-  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
+  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget, "ImageRegistrationWidget", "Image Registration");
+  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget, "PatientRegistrationWidget", "Patient Registration");
   landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
   landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
 
   //fast
   FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(mRegsitrationMethodsWidget, "FastRegistrationWidget", "Fast Registrations");
   FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
+  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
   FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
   fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
   fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
