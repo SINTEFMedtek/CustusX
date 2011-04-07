@@ -13,11 +13,12 @@
 
 namespace cx
 {
+//---------------------------------------------------------------------------------------------------------------------
 
 ToolListWidget::ToolListWidget(QWidget* parent) :
     QListWidget(parent)
 {
-  connect(this, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
+  connect(this, SIGNAL(itemSelectionChanged()), this, SLOT(selectionChangedSlot()));
 
   this->setSelectionBehavior(QAbstractItemView::SelectItems);
   this->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -33,11 +34,6 @@ void ToolListWidget::populate(QStringList toolsAbsoluteFilePath)
   foreach(QString tool, toolsAbsoluteFilePath)
   {
     this->addTool(tool);
-//    QFile file(tool);
-//    QFileInfo info(file);
-//    QListWidgetItem* item = new QListWidgetItem(/*QIcon, */info.dir().dirName());
-//    item->setData(Qt::ToolTipRole, info.absoluteFilePath());
-//    this->addItem(item);
   }
   emit listSizeChanged();
 }
@@ -62,17 +58,19 @@ Tool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFile
   return retval;
 }
 
-void ToolListWidget::toolClickedSlot(QListWidgetItem* item)
+void ToolListWidget::selectionChangedSlot()
+{
+  QListWidgetItem* selectedItem = this->currentItem();
+  this->toolSelectedSlot(selectedItem);
+}
+
+void ToolListWidget::toolSelectedSlot(QListWidgetItem* item)
 {
   QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
   emit toolSelected(absoluteFilePath);
 }
 
-
 //---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-
 
 FilteringToolListWidget::FilteringToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -101,7 +99,6 @@ void FilteringToolListWidget::mouseMoveEvent(QMouseEvent *event)
   }
 }
 
-
 void FilteringToolListWidget::startDrag()
 {
   QListWidgetItem *item = currentItem();
@@ -127,7 +124,6 @@ void FilteringToolListWidget::filterSlot(QStringList applicationsFilter, QString
 
 QStringList FilteringToolListWidget::getAbsoluteFilePathToAllTools(QDir dir)
 {
-  //  std::cout << "============================" << std::endl;
     QStringList retval;
 
     if(!dir.exists())
@@ -135,7 +131,6 @@ QStringList FilteringToolListWidget::getAbsoluteFilePathToAllTools(QDir dir)
       ssc::messageManager()->sendError("Dir "+dir.absolutePath()+" does not exits.");
       return retval;
     }
-  //  std::cout << "Dir: " << dir.absolutePath() << std::endl;
 
     //find xml files add and return
     dir.setFilter(QDir::Files);
@@ -151,33 +146,21 @@ QStringList FilteringToolListWidget::getAbsoluteFilePathToAllTools(QDir dir)
       retval << info.absoluteFilePath();
     }
 
-  //  std::cout << "Number of toolfiles found: " << retval.size() << std::endl;
-  //  foreach(QString string, retval)
-  //  {
-  //    std::cout << string_cast(string) << std::endl;
-  //  }
-
     //find dirs and recursivly check them
     dir.setFilter(QDir::AllDirs);
 
-    //std::cout << "Dir filters: " << dir.filter() << std::endl;
-
     QStringList subdirs = dir.entryList();
-  //  std::cout << "Nr of subdirs found: " << subdirs.size() << std::endl;
-
     foreach(QString dirString, subdirs)
     {
       if(dirString == "." || dirString == "..")
         continue;
       if(dir.cd(dirString))
       {
-  //      std::cout << "After cd: " << dir.absolutePath() << std::endl;
         retval << this->getAbsoluteFilePathToAllTools(dir);
         dir.cdUp();
       }
 
     }
-  //  std::cout << "============================" << std::endl;
     return retval;
 }
 
@@ -204,7 +187,6 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
       if(applicationsFilter.contains(applicationName, Qt::CaseInsensitive))
       {
         passedApplicationFilter = true;
-  //        std::cout << "Filter passed, found: " << trackerName << " and " << applicationName << std::endl;
       }
       ++it;
     }
@@ -218,13 +200,7 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
   return retval;
 }
 
-
-
 //---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-//---------------------------------------------------------------------------------------------------------------------
-
-
 
 ConfigToolListWidget::ConfigToolListWidget(QWidget* parent) :
     ToolListWidget(parent)
@@ -346,4 +322,6 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
 
   contextMenu.exec(pointGlobal);
 }
+
+//---------------------------------------------------------------------------------------------------------------------
 } //namespace cx
