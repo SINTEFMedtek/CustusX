@@ -19,7 +19,7 @@
 namespace cx
 {
 ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "ToolTipCalibrationWidget", "ToolTip Calibration"),
+  WhatsThisWidget(parent, "ToolTipCalibrationWidget", "Tool Tip Calibration"),
   mCalibrationWidget(new ToolTipCalibrateWidget(this)),
   mSampleWidget(new ToolTipSampleWidget(this))
 {
@@ -53,15 +53,6 @@ QString ToolTipCalibrationWidget::defaultWhatsThis() const
     "</html>";
 }
 
-void ToolTipCalibrationWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void ToolTipCalibrationWidget::hideEvent(QHideEvent* event)
-{
-  QWidget::hideEvent(event);
-}
 //------------------------------------------------------------------------------
 ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
     WhatsThisWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
@@ -105,16 +96,6 @@ QString ToolTipCalibrateWidget::defaultWhatsThis() const
       "<p><i>Calibrates a tool by sampling it when pointing at a known point on another frame.</i></br>"
       "By using the test button you can test your calibration by pointing at a known reference point.</br></p>"
       "</html>";
-}
-
-void ToolTipCalibrateWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void ToolTipCalibrateWidget::hideEvent(QHideEvent* event)
-{
-  QWidget::hideEvent(event);
 }
 
 void ToolTipCalibrateWidget::calibrateSlot()
@@ -232,16 +213,6 @@ QString ToolTipSampleWidget::defaultWhatsThis() const
      "<h3>Tool tip sampling.</h3>"
      "<p>You can sample the dominant(active) tools tooltip in any coordinate system and get the results written to file.</p>"
      "</html>";
-}
-
-void ToolTipSampleWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void ToolTipSampleWidget::hideEvent(QHideEvent* event)
-{
-  QWidget::hideEvent(event);
 }
 
 void ToolTipSampleWidget::saveFileSlot()
