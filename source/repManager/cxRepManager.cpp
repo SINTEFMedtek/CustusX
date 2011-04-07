@@ -12,9 +12,7 @@
 #include "sscGeometricRep.h"
 #include "sscProgressiveLODVolumetricRep.h"
 #include "cxTool.h"
-//#include "cxImageLandmarkRep.h"
-#include "cxDataLocations.h"
-#include <QSettings>
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -89,11 +87,11 @@ ssc::VolumetricRepPtr RepManager::getVolumetricRep(ssc::ImagePtr image)
     ssc::VolumetricRepPtr rep = ssc::VolumetricRep::New(uid, uid);
 
     bool ok = true;
-    double maxRenderSize = DataLocations::getSettings()->value("maxRenderSize").toDouble(&ok);
+    double maxRenderSize = settings()->value("maxRenderSize").toDouble(&ok);
     if (!ok)
       maxRenderSize = 10 * pow(10.0,6);
 
-    bool useGPURender = DataLocations::getSettings()->value("useGPUVolumeRayCastMapper").toBool();
+    bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
     if (useGPURender)
     	rep->setUseGPUVolumeRayCastMapper();
     else

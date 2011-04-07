@@ -49,6 +49,7 @@
 #include "cxTrackedCenterlineWidget.h"
 #include "cxUSAcqusitionWidget.h"
 #include "cxAudio.h"
+#include "cxSettings.h"
 #include "RTSource/cxRTSourceManager.h"
 
 namespace cx
@@ -73,8 +74,7 @@ MainWindow::MainWindow() :
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
-  mControlPanel(NULL),
-  mSettings(DataLocations::getSettings())
+  mControlPanel(NULL)
 {
   mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
 
@@ -134,10 +134,10 @@ MainWindow::MainWindow() :
 
   // Restore saved window states
   // Must be done after all DockWidgets are created
-  if (!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
+  if (!restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
    // this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
     this->showMaximized();
-  //restoreState(mSettings->value("mainWindow/windowState").toByteArray());
+  //restoreState(settings()->value("mainWindow/windowState").toByteArray());
   else
   // Don't show the Widget before all elements are initialized
     this->show();
@@ -366,7 +366,7 @@ void MainWindow::createActions()
   connect(mManualToolPhysicalProperties, SIGNAL(triggered()), this, SLOT(manualToolPhysicalPropertiesSlot()));
   this->updateManualToolPhysicalProperties();
 
-//  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
+//  if (settings()->value("giveManualToolPhysicalProperties").toBool())
 
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   mStartStreamingAction->setShortcut(tr("Ctrl+V"));
@@ -452,11 +452,11 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 
 void MainWindow::manualToolPhysicalPropertiesSlot()
 {
-  DataLocations::getSettings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalProperties->isChecked());
+  settings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalProperties->isChecked());
 }
 void MainWindow::updateManualToolPhysicalProperties()
 {
-  bool set = DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool();
+  bool set = settings()->value("giveManualToolPhysicalProperties").toBool();
   mManualToolPhysicalProperties->setChecked(set);
 }
 
@@ -547,10 +547,10 @@ void MainWindow::toggleTrackingSlot()
 
 void MainWindow::newPatientSlot()
 {
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
   QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
-  name += mSettings->value("globalApplicationName").toString() + "_";
-  name += mSettings->value("globalPatientNumber").toString() + ".cx3";
+  name += settings()->value("globalApplicationName").toString() + "_";
+  name += settings()->value("globalPatientNumber").toString() + ".cx3";
 
   // Create folders
   if (!QDir().exists(patientDatafolder))
@@ -567,8 +567,8 @@ void MainWindow::newPatientSlot()
     choosenDir += QString(".cx3");
 
   // Update global patient number
-  int patientNumber = mSettings->value("globalPatientNumber").toInt();
-  mSettings->setValue("globalPatientNumber", ++patientNumber);
+  int patientNumber = settings()->value("globalPatientNumber").toInt();
+  settings()->setValue("globalPatientNumber", ++patientNumber);
 
   stateManager()->getPatientData()->newPatient(choosenDir);
 }
@@ -657,7 +657,7 @@ void MainWindow::showControlPanelActionSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
   // Create folder
   if (!QDir().exists(patientDatafolder))
   {
@@ -680,7 +680,7 @@ void MainWindow::importDataSlot()
   this->savePatientFileSlot();
 
   //ssc::messageManager()->sendInfo("Importing data...");
-  QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")), mSettings->value(
+  QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")), settings()->value(
       "globalPatientDataFolder").toString(), tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
   if (fileName.isEmpty())
   {
@@ -1018,53 +1018,6 @@ void MainWindow::deleteDataSlot()
   ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
 }
 
-//void MainWindow::loadPatientRegistrationSlot()
-//{
-//  /*Expecting a file that looks like this
-//   *00 01 02 03
-//   *10 11 12 13
-//   *20 21 22 23
-//   *30 31 32 33
-//   */
-//
-//  QString registrationFilePath = QFileDialog::getOpenFileName(this,
-//      tr("Select patient registration file (*.txt)"),
-//      mSettings->value("globalPatientDataFolder").toString(),
-//      tr("Patient registration files (*.txt)"));
-//
-//  //Check that the file can be open and read
-//  QFile registrationFile(registrationFilePath);
-//  if(!registrationFile.open(QIODevice::ReadOnly))
-//  {
-//    ssc::messageManager()->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
-//    return;
-//  }else
-//  {
-//    vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
-//    //read the content, 4x4 matrix
-//    QTextStream inStream(&registrationFile);
-//    for(int i=0; i<4; i++)
-//    {
-//      QString line = inStream.readLine();
-//      std::cout << line.toStdString() << std::endl;
-//      QStringList list = line.split(" ", QString::SkipEmptyParts);
-//      if(list.size() != 4)
-//      {
-//        ssc::messageManager()->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
-//        return;
-//      }
-//      matrix->SetElement(i,0,list[0].toDouble());
-//      matrix->SetElement(i,1,list[1].toDouble());
-//      matrix->SetElement(i,2,list[2].toDouble());
-//      matrix->SetElement(i,3,list[3].toDouble());
-//    }
-//    //set the toolmanageres matrix
-//    ssc::Transform3D patientRegistration = ssc::Transform3D(matrix);
-//    registrationManager()->setManualPatientRegistration(patientRegistration);
-//    //std::cout << (*patientRegistration.get()) << std::endl;
-//    ssc::messageManager()->sendInfo("New patient registration is set.");
-//  }
-//}
 
 void MainWindow::configureSlot()
 {
@@ -1073,9 +1026,9 @@ void MainWindow::configureSlot()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-  mSettings->setValue("mainWindow/geometry", saveGeometry());
-  mSettings->setValue("mainWindow/windowState", saveState());
-  mSettings->sync();
+  settings()->setValue("mainWindow/geometry", saveGeometry());
+  settings()->setValue("mainWindow/windowState", saveState());
+  settings()->sync();
   ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
 
   if (ssc::toolManager()->isTracking())

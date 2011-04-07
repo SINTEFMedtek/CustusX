@@ -9,8 +9,8 @@
 #include <iostream>
 #include <QApplication>
 #include <QDir>
-#include <QSettings>
 #include "cxConfig.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -48,7 +48,7 @@ QString DataLocations::getToolsPath()
 QString DataLocations::getApplicationToolConfigPath()
 {
   QString path(getRootConfigPath()+"/tool/" +
-               getSettings()->value("globalApplicationName").toString());
+               settings()->value("globalApplicationName").toString());
   //std::cout << "getApplicationToolConfigPath: " << path.toStdString() << std::endl;
   return path;
 }
@@ -56,8 +56,8 @@ QString DataLocations::getApplicationToolConfigPath()
 QString DataLocations::getToolConfigFilePath()
 {
   QString path(getRootConfigPath()+"/tool/" +
-               getSettings()->value("globalApplicationName").toString() + "/" +
-               getSettings()->value("toolConfigFile").toString());
+               settings()->value("globalApplicationName").toString() + "/" +
+               settings()->value("toolConfigFile").toString());
   //std::cout << "getToolConfigFilePath: " << path.toStdString() << std::endl;
   return path;
 }
@@ -88,18 +88,6 @@ QString DataLocations::getAppDataPath()
   return path;
 }
 
-/** return a settings object for global custusX data
- *
- *  The settings object is currently stored in the default location for the OS.
- */
-QSettingsPtr DataLocations::getSettings()
-{
-  return QSettingsPtr(new QSettings());
-
-  //QString path = getAppDataPath();
-  //return QSettingsPtr(new QSettings(path+"/custus.ini", QSettings::IniFormat));
-}
-
 namespace
 {
 QString changeExtension(QString name, QString ext)
@@ -112,7 +100,7 @@ QString changeExtension(QString name, QString ext)
 
 QString DataLocations::getXmlSettingsFile()
 {
-  return changeExtension(getSettings()->fileName(), "xml");
+  return changeExtension(settings()->fileName(), "xml");
 //  return getAppDataPath() + "/CustusX.xml";
 }
 

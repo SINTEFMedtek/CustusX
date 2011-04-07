@@ -27,6 +27,10 @@ public:
 
   void setValue(const QString& key, const QVariant& value);
   QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
+
+  bool contains(const QString& key) const;
+  QString fileName() const;
+
   void sync();
 
 signals:

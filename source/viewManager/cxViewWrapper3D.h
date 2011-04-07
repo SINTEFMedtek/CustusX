@@ -43,11 +43,7 @@ private:
 
 	ssc::AxesRepPtr mAxis_t; ///< axis of the tool space
 	ssc::AxesRepPtr mAxis_s; /// axis of the tool sensor space
-	//New(const QString& uid);
 };
-
-
-
 
 /** Wrapper for a View3D.
  *  Handles the connections between specific reps and the view.
@@ -75,7 +71,6 @@ private slots:
   void activeImageChangedSlot();
   void showRefToolSlot(bool checked);
   void showToolPathSlot(bool checked);
-//  void centerChangedSlot();
   void probeRepPointPickedSlot(double x,double y,double z);
   void centerImageActionSlot();
   void centerToolActionSlot();
@@ -85,11 +80,9 @@ private slots:
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void updateView();
-//  void viewChanged();
 
   void showLandmarks(bool on);
   void showPointPickerProbe(bool on);
-//  void test(double v);
   void setOrientationAnnotation();
 
   virtual void imageAdded(ssc::ImagePtr image);
@@ -106,17 +99,14 @@ private:
   GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
-//  std::map<QString, ssc::ToolRep3DPtr> mToolReps;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;
   ssc::AxesRepPtr mRefSpaceAxisRep;
   std::map<QString, ssc::AxesRepPtr> mDataSpaceAxisRep;
-//  ssc::RealTimeStreamRepPtr mRTStreamRep;
   vtkSmartPointer<class InteractionCallback> mInteractorCallback;
 
   bool mShowAxes; ///< show 3D axes reps for all tools and ref space
 
   ssc::SlicePlanes3DRepPtr mSlicePlanes3DRep;
-//  vtkOrientationMarkerWidgetPtr mAnnotationMarker;
   ssc::OrientationAnnotation3DRepPtr mAnnotationMarker;
 
   QPointer<ssc::View> mView;
