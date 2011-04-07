@@ -13,7 +13,7 @@
 namespace cx
 {
 FastOrientationRegistrationWidget::FastOrientationRegistrationWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "FastOrientationRegistrationWidget", "Fast Orientation Registration"),
     mSetOrientationButton(new QPushButton("Define Orientation")),
     mInvertButton(new QCheckBox("Back face"))
 {
