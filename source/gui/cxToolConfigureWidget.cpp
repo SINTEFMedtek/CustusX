@@ -75,6 +75,14 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
 ToolConfigureGroupBox::~ToolConfigureGroupBox()
 {}
 
+void ToolConfigureGroupBox::setCurrentlySelectedCofiguration(QString configAbsoluteFilePath)
+{
+  int currentIndex = mConfigFilesComboBox->findData(configAbsoluteFilePath, Qt::ToolTipRole);
+  if(currentIndex < 0)
+    currentIndex = 0;
+  mConfigFilesComboBox->setCurrentIndex(currentIndex);
+}
+
 QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
 {
   QString retval;
@@ -82,13 +90,19 @@ QString ToolConfigureGroupBox::getCurrenctlySelectedConfiguration() const
   return retval;
 }
 
-void ToolConfigureGroupBox::requestSaveConfigurationSlot()
+QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 {
+  QString retval;
+
   if(!mConfigFilesComboBox->itemData(mConfigFilesComboBox->currentIndex(), sEdited).toBool())
-    return;
+    return retval;
 
   ConfigurationFileParser::Configuration config = this->getCurrentConfiguration();
   ConfigurationFileParser::saveConfiguration(config);
+
+  retval = config.mFileName;
+
+  return retval;
 }
 
 void ToolConfigureGroupBox::setClinicalApplicationSlot(ssc::CLINICAL_APPLICATION clinicalApplication)

@@ -66,6 +66,9 @@ void ToolListWidget::selectionChangedSlot()
 
 void ToolListWidget::toolSelectedSlot(QListWidgetItem* item)
 {
+  if(!item)
+    return;
+
   QString absoluteFilePath = item->data(Qt::ToolTipRole).toString();
   emit toolSelected(absoluteFilePath);
 }
@@ -314,6 +317,7 @@ void ConfigToolListWidget::contextMenuSlot(const QPoint& point)
   if(!item)
   {
     ssc::messageManager()->sendDebug("Found no item to delete...");
+    return;
   }
   mItemToDelete = item;
 

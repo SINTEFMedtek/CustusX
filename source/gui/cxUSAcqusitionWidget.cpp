@@ -1,7 +1,6 @@
 #include "cxUSAcqusitionWidget.h"
 
 #include <QtGui>
-#include <QSettings>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
 #include "sscToolManager.h"
@@ -10,7 +9,7 @@
 #include "cxStateMachineManager.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
-#include "cxDataLocations.h"
+#include "cxSettings.h"
 #include "cxToolPropertiesWidget.h"
 #include "sscTypeConversions.h"
 
@@ -18,7 +17,7 @@ namespace cx
 {
 
 USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString())
+    TrackedRecordWidget(parent, settings()->value("Ultrasound/acquisitionName").toString())
 {
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
@@ -141,7 +140,7 @@ void USAcqusitionWidget::fileMakerWriteFinished()
 
   mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
 
-  if (DataLocations::getSettings()->value("Automation/autoReconstruct").toBool())
+  if (settings()->value("Automation/autoReconstruct").toBool())
   {
     mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
     connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
@@ -185,7 +184,7 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 
 void USAcqusitionWidget::startedSlot()
 {
-  mRecordSessionWidget->setDescription(DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString());
+  mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
   mRTRecorder->startRecord();
 }
 

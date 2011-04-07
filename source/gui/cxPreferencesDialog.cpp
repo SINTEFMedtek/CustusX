@@ -5,6 +5,7 @@
 #include "sscMessageManager.h"
 #include "sscDoubleWidgets.h"
 #include "sscEnumConverter.h"
+#include "cxSettings.h"
 #include "cxPreferencesDialog.h"
 #include "cxViewManager.h"
 #include "cxDataLocations.h"
@@ -23,8 +24,8 @@ namespace cx
 //------------------------------------------------------------------------------
 
 PreferencesTab::PreferencesTab(QWidget *parent) :
-    QWidget(parent),
-    mSettings(DataLocations::getSettings())
+    QWidget(parent)
+    //settings()(settings())
 {
   mTopLayout = new QVBoxLayout;
 
@@ -44,7 +45,7 @@ GeneralTab::GeneralTab(QWidget *parent) :
 
 void GeneralTab::init()
 {
-  mGlobalPatientDataFolder = mSettings->value("globalPatientDataFolder").toString();
+  mGlobalPatientDataFolder = settings()->value("globalPatientDataFolder").toString();
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
 
@@ -133,9 +134,9 @@ void GeneralTab::currentApplicationChangedSlot(int index)
 void GeneralTab::saveParametersSlot()
 {
   // currentPatientDataFolder
-  mSettings->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
+  settings()->setValue("globalPatientDataFolder", mGlobalPatientDataFolder);
   
-  mSettings->sync();
+  settings()->sync();
 
   emit savedParameters();
 }
@@ -150,7 +151,7 @@ PerformanceTab::PerformanceTab(QWidget *parent) :
 
 void PerformanceTab::init()
 {
-  int renderingInterval = mSettings->value("renderingInterval").toInt();
+  int renderingInterval = settings()->value("renderingInterval").toInt();
   
   QLabel* renderingIntervalLabel = new QLabel(tr("Rendering interval"));
   
@@ -166,7 +167,7 @@ void PerformanceTab::init()
 
   double Mb = pow(10.0,6);
   bool ok = true;
-  double maxRenderSize = mSettings->value("maxRenderSize").toDouble(&ok);
+  double maxRenderSize = settings()->value("maxRenderSize").toDouble(&ok);
   if (!ok)
     maxRenderSize = 10 * Mb;
   mMaxRenderSize = ssc::DoubleDataAdapterXml::initialize("MaxRenderSize", "Max Render Size (Mb)", "Maximum size of volumes used in volume rendering. Applies to new volumes.", maxRenderSize, ssc::DoubleRange(1*Mb,300*Mb,1*Mb), 0, QDomNode());
@@ -175,7 +176,7 @@ void PerformanceTab::init()
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
   mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
 
-  bool useGPURender = mSettings->value("useGPUVolumeRayCastMapper").toBool();
+  bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
   mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
   mGPURenderCheckBox->setChecked(useGPURender);
 
@@ -200,16 +201,16 @@ void PerformanceTab::renderingIntervalSlot(int interval)
 
 void PerformanceTab::saveParametersSlot()
 {
-  int renderingInterval = mSettings->value("renderingInterval").toInt();
+  int renderingInterval = settings()->value("renderingInterval").toInt();
   
   if(renderingInterval != mRenderingIntervalSpinBox->value())
   {
-    mSettings->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
+    settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
     emit renderingIntervalChanged(mRenderingIntervalSpinBox->value());
   }
 
-  mSettings->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
-  mSettings->setValue("maxRenderSize", mMaxRenderSize->getValue());
+  settings()->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
+  settings()->setValue("maxRenderSize", mMaxRenderSize->getValue());
 
   viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
 }
@@ -223,7 +224,7 @@ VisualizationTab::VisualizationTab(QWidget *parent) :
 
 void VisualizationTab::init()
 {
-  double sphereRadius = DataLocations::getSettings()->value("View3D/sphereRadius").toDouble();
+  double sphereRadius = settings()->value("View3D/sphereRadius").toDouble();
   mSphereRadius = ssc::DoubleDataAdapterXml::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, ssc::DoubleRange(0.1,10,0.1), 1, QDomNode());
 
   QPushButton* backgroundColorButton = new QPushButton("Background Color", this);
@@ -244,14 +245,14 @@ void VisualizationTab::init()
 
 void VisualizationTab::saveParametersSlot()
 {
-  mSettings->setValue("View3D/sphereRadius", mSphereRadius->getValue());
+  settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot()
 {
-  QColor orgval = mSettings->value("backgroundColor").value<QColor>();
+  QColor orgval = settings()->value("backgroundColor").value<QColor>();
   QColor result = QColorDialog::getColor( orgval, this);
-  mSettings->setValue("backgroundColor", result);
+  settings()->setValue("backgroundColor", result);
 }
 
 //==============================================================================
@@ -263,15 +264,15 @@ AutomationTab::AutomationTab(QWidget *parent) :
 
 void AutomationTab::init()
 {
-  bool autoStartTracking = mSettings->value("Automation/autoStartTracking").toBool();
+  bool autoStartTracking = settings()->value("Automation/autoStartTracking").toBool();
   mAutoStartTrackingCheckBox = new QCheckBox("Auto Start Tracking");
   mAutoStartTrackingCheckBox->setChecked(autoStartTracking);
 
-  bool autoStartStreaming = mSettings->value("Automation/autoStartStreaming").toBool();
+  bool autoStartStreaming = settings()->value("Automation/autoStartStreaming").toBool();
   mAutoStartStreamingCheckBox = new QCheckBox("Auto Start Streaming");
   mAutoStartStreamingCheckBox->setChecked(autoStartStreaming);
 
-  bool autoReconstruct = mSettings->value("Automation/autoReconstruct").toBool();
+  bool autoReconstruct = settings()->value("Automation/autoReconstruct").toBool();
   mAutoReconstructCheckBox = new QCheckBox("Auto Reconstruct");
   mAutoReconstructCheckBox->setChecked(autoReconstruct);
 
@@ -287,9 +288,9 @@ void AutomationTab::init()
 
 void AutomationTab::saveParametersSlot()
 {
-  mSettings->setValue("Automation/autoStartTracking", mAutoStartTrackingCheckBox->isChecked());
-  mSettings->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
-  mSettings->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
+  settings()->setValue("Automation/autoStartTracking", mAutoStartTrackingCheckBox->isChecked());
+  settings()->setValue("Automation/autoStartStreaming", mAutoStartStreamingCheckBox->isChecked());
+  settings()->setValue("Automation/autoReconstruct", mAutoReconstructCheckBox->isChecked());
 }
 
 //==============================================================================
@@ -306,10 +307,10 @@ void VideoTab::init()
   toplayout->addLayout(acqNameLayout);
 
   acqNameLayout->addWidget(new QLabel("Description"));
-  mAcquisitionNameLineEdit = new QLineEdit(mSettings->value("Ultrasound/acquisitionName").toString());
+  mAcquisitionNameLineEdit = new QLineEdit(settings()->value("Ultrasound/acquisitionName").toString());
   acqNameLayout->addWidget(mAcquisitionNameLineEdit);
 
-  bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
+  bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
   m24bitRadioButton = new QRadioButton("Save acquisition as 24bit", this);
   m24bitRadioButton->setChecked(!bw);
@@ -326,8 +327,8 @@ void VideoTab::init()
 
 void VideoTab::saveParametersSlot()
 {
-  mSettings->setValue("Ultrasound/acquisitionName", mAcquisitionNameLineEdit->text());
-  DataLocations::getSettings()->setValue("Ultrasound/8bitAcquisitionData", m8bitRadioButton->isChecked());
+  settings()->setValue("Ultrasound/acquisitionName", mAcquisitionNameLineEdit->text());
+  settings()->setValue("Ultrasound/8bitAcquisitionData", m8bitRadioButton->isChecked());
 }
 
 //==============================================================================
@@ -342,6 +343,8 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
 
   connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
+
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
   connect(mToolConfigureGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
   connect(mToolFilterGroupBox, SIGNAL(toolSelected(QString)), mFilePreviewWidget, SLOT(previewFileSlot(QString)));
@@ -361,19 +364,24 @@ void ToolConfigTab::init()
   layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
   layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
   layout->addWidget(mFilePreviewWidget, 1, 0, 1, 2);
+
+  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
 
 void ToolConfigTab::saveParametersSlot()
 {
-  mToolConfigureGroupBox->requestSaveConfigurationSlot();
+  QString newConfigFile = mToolConfigureGroupBox->requestSaveConfigurationSlot();
+
+  if(newConfigFile.isEmpty())
+    newConfigFile = mToolConfigureGroupBox->getCurrenctlySelectedConfiguration();
 
   // currentToolConfigFile
-  mSettings->setValue("toolConfigFile", mToolConfigureGroupBox->getCurrenctlySelectedConfiguration());
+  QFile configFile(newConfigFile);
+  QFileInfo info(configFile);
+  if(!configFile.exists())
+    return;
 
-  mSettings->sync();
-
-  // update toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
+  settings()->setValue("toolConfigFile", info.fileName());
 }
 
 void ToolConfigTab::applicationChangedSlot()
@@ -382,6 +390,14 @@ void ToolConfigTab::applicationChangedSlot()
   mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setTrackingSystemSlot(ssc::tsPOLARIS);
+}
+
+void ToolConfigTab::globalConfigurationFileChangedSlot(QString key)
+{
+  if(key != "toolConfigFile")
+    return;
+
+  mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
 
 //==============================================================================
