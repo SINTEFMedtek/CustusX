@@ -75,6 +75,7 @@ public:
   void setActiveLayout(const QString& uid); ///< change the layout
 
   ViewWrapperPtr getActiveView() const; ///< returns the active view
+  int getActiveViewGroup() const;
   //void setActiveView(ViewWrapperPtr view); ///< change the active view
   void setActiveView(QString viewUid); ///< convenient function for setting the active view
 

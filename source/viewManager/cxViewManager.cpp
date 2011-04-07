@@ -188,6 +188,20 @@ void ViewManager::setActiveView(QString viewUid)
 //  ssc::messageManager()->sendInfo("Active view set to ["+mActiveView + "]");
 }
 
+int ViewManager::getActiveViewGroup() const
+{
+  int retval = -1;
+
+  for(unsigned i=0; i<mViewGroups.size(); ++i)
+  {
+    ViewWrapperPtr viewWrapper = mViewGroups[i]->getViewWrapperFromViewUid(mActiveView);
+    if(viewWrapper)
+      retval = i;
+  }
+
+  return retval;
+}
+
 void ViewManager::syncOrientationMode(SyncedValuePtr val)
 {
   for(unsigned i=0; i<mViewGroups.size(); ++i)
