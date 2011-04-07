@@ -7,14 +7,10 @@
 namespace cx
 {
 //------------------------------------------------------------------------------
-TabbedWidget::TabbedWidget(QString objectName, QString windowTitle, QWidget* parent) :
-    WhatsThisWidget(parent),
+TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTitle) :
+    WhatsThisWidget(parent, objectName, windowTitle),
     mTabWidget(new QTabWidget(this))
 {
-  this->setObjectName(objectName);
-  this->setWindowTitle(windowTitle);
-  this->setWhatsThis(this->defaultWhatsThis());
-
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->addWidget(mTabWidget);
   layout->setMargin(2); // lots of tabbed widgets in layers use up the desktop. Must reduce.
@@ -41,10 +37,9 @@ QString TabbedWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-RegistrationMethodsWidget::RegistrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+RegistrationMethodsWidget::RegistrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString RegistrationMethodsWidget::defaultWhatsThis() const
@@ -57,10 +52,9 @@ QString RegistrationMethodsWidget::defaultWhatsThis() const
 }
 
 //------------------------------------------------------------------------------
-SegmentationMethodsWidget::SegmentationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+SegmentationMethodsWidget::SegmentationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString SegmentationMethodsWidget::defaultWhatsThis() const
@@ -72,10 +66,9 @@ QString SegmentationMethodsWidget::defaultWhatsThis() const
       "</html>";
 }
 //------------------------------------------------------------------------------
-VisualizationMethodsWidget::VisualizationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+VisualizationMethodsWidget::VisualizationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString VisualizationMethodsWidget::defaultWhatsThis() const
@@ -87,10 +80,9 @@ QString VisualizationMethodsWidget::defaultWhatsThis() const
       "</html>";
 }
 //------------------------------------------------------------------------------
-CalibrationMethodsWidget::CalibrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+CalibrationMethodsWidget::CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString CalibrationMethodsWidget::defaultWhatsThis() const
@@ -103,10 +95,9 @@ QString CalibrationMethodsWidget::defaultWhatsThis() const
 }
 //------------------------------------------------------------------------------
 
-LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+LandmarkRegistrationsWidget::LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString LandmarkRegistrationsWidget::defaultWhatsThis() const
@@ -120,10 +111,9 @@ QString LandmarkRegistrationsWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-FastRegistrationsWidget::FastRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+FastRegistrationsWidget::FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString FastRegistrationsWidget::defaultWhatsThis() const
@@ -137,10 +127,9 @@ QString FastRegistrationsWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+Image2ImageRegistrationWidget::Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString Image2ImageRegistrationWidget::defaultWhatsThis() const
@@ -154,10 +143,9 @@ QString Image2ImageRegistrationWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 
-Image2PlateRegistrationWidget::Image2PlateRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent) :
-  TabbedWidget(objectName, windowTitle, parent)
+Image2PlateRegistrationWidget::Image2PlateRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  TabbedWidget(parent, objectName, windowTitle)
 {
-  this->setWhatsThis(this->defaultWhatsThis());
 }
 
 QString Image2PlateRegistrationWidget::defaultWhatsThis() const
