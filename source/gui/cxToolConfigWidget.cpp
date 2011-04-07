@@ -35,6 +35,9 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
     mApplicationGroupBox(new QGroupBox()),
     mApplicationButtonGroup(new QButtonGroup())
 {
+  this->setObjectName("ToolConfigWidget");
+  this->setWindowTitle("Tool Configuration");
+
   //layout
   QGridLayout* layout = new QGridLayout(this);
 

@@ -12,13 +12,10 @@
 namespace cx
 {
 PlateRegistrationWidget::PlateRegistrationWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "PlateRegistrationWidget", "Plate Registration"),
     mPlateRegistrationButton(new QPushButton("Load registration points", this)),
     mReferenceToolInfoLabel(new QLabel("", this))
 {
-  this->setObjectName("PlateRegistrationWidget");
-  this->setWindowTitle("Fast Image Registration");
-
   connect(mPlateRegistrationButton, SIGNAL(clicked()), this, SLOT(plateRegistrationSlot()));
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(internalUpdate()));
 

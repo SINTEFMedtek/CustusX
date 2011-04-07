@@ -10,8 +10,8 @@
 namespace cx
 {
 //------------------------------------------------------------------------------
-ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidget* parent) :
-    WhatsThisWidget(parent)
+ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle) :
+    WhatsThisWidget(parent, objectName, objectName)
 {
   mLayout = new QVBoxLayout(this);
   mResampleWidget =  new ResampleWidget(this);
@@ -88,7 +88,7 @@ void ImageSegmentationAndCenterlineWidget::centerlineOutputArrived(QString uid)
 //------------------------------------------------------------------------------
 
 FixedImage2ImageWidget::FixedImage2ImageWidget(QWidget* parent) :
-    ImageSegmentationAndCenterlineWidget(parent)
+    ImageSegmentationAndCenterlineWidget(parent, "FixedImage2ImageWidget", "Fixed Image2Image")
 {
   mOutput = RegistrationFixedImageStringDataAdapter::New();
   mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
@@ -113,7 +113,7 @@ QString FixedImage2ImageWidget::defaultWhatsThis() const
 //------------------------------------------------------------------------------
 
 MovingImage2ImageWidget::MovingImage2ImageWidget(QWidget* parent) :
-    ImageSegmentationAndCenterlineWidget(parent)
+    ImageSegmentationAndCenterlineWidget(parent, "MovingImage2ImageWidget", "Moving Image2Image")
 {
   mOutput = RegistrationMovingImageStringDataAdapter::New();
   mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
