@@ -25,6 +25,7 @@ public:
   static Settings* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
 
+  //forwarding functions from QSettings
   void setValue(const QString& key, const QVariant& value);
   QVariant value(const QString& key, const QVariant& defaultValue = QVariant()) const;
 
@@ -33,8 +34,10 @@ public:
 
   void sync();
 
+  //additional functionality
+
 signals:
-  void changedValueFor(QString key);
+  void valueChangedFor(QString key);
 
 private:
   Settings();
