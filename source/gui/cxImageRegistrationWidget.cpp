@@ -5,7 +5,6 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
-#include <QSettings>
 #include <QHeaderView>
 #include <QLabel>
 #include <QSlider>
@@ -18,16 +17,13 @@
 #include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "cxViewManager.h"
-#include "cxDataLocations.h"
+#include "cxSettings.h"
 #include "cxView3D.h"
 
 namespace cx
 {
 ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   RegistrationWidget(parent),
-//  mAddLandmarkButton(new QPushButton("Add landmark", this)),
-//  mEditLandmarkButton(new QPushButton("Resample landmark", this)),
-//  mRemoveLandmarkButton(new QPushButton("Remove landmark", this)),
   mThresholdLabel(new QLabel("Probing treshold:", this)),
   mThresholdSlider(new QSlider(Qt::Horizontal, this))
 {
@@ -54,7 +50,7 @@ ImageRegistrationWidget::ImageRegistrationWidget(QWidget* parent) :
   mRemoveLandmarkButton->setDisabled(true);
   connect(mRemoveLandmarkButton, SIGNAL(clicked()), this, SLOT(removeLandmarkButtonClickedSlot()));
 
-  bool autoReg = DataLocations::getSettings()->value("autoLandmarkRegistration").toBool();
+  bool autoReg = settings()->value("autoLandmarkRegistration").toBool();
   mRegisterButton = new QPushButton("Register", this);
   mRegisterButton->setToolTip("Perform registration");
   mRegisterButton->setEnabled(!autoReg);
@@ -97,7 +93,7 @@ void ImageRegistrationWidget::registerSlot()
 
 void ImageRegistrationWidget::autoRegisterSlot(bool checked)
 {
-  DataLocations::getSettings()->setValue("autoLandmarkRegistration", checked);
+  settings()->setValue("autoLandmarkRegistration", checked);
   mRegisterButton->setEnabled(!checked);
 }
 
@@ -241,7 +237,7 @@ void ImageRegistrationWidget::thresholdChangedSlot(const int value)
 
 void ImageRegistrationWidget::performRegistration()
 {
-  bool autoReg = DataLocations::getSettings()->value("autoLandmarkRegistration").toBool();
+  bool autoReg = settings()->value("autoLandmarkRegistration").toBool();
   this->internalPerformRegistration(autoReg);
 }
 
