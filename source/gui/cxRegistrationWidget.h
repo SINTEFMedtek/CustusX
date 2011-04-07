@@ -35,7 +35,7 @@ class RegistrationWidget : public WhatsThisWidget
   Q_OBJECT
 
 public:
-  RegistrationWidget(QWidget* parent);
+  RegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~RegistrationWidget();
 
   virtual QString defaultWhatsThis() const;

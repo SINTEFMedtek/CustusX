@@ -1,7 +1,7 @@
 #ifndef CXVOLUMEPROPERTIESWIDGET_H_
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
-#include <QWidget>
+#include "cxWhatsThisWidget.h"
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 
@@ -13,18 +13,20 @@ namespace cx
  * \date Aug 20, 2010
  * \author christiana
  */
-class ActiveVolumeWidget : public QWidget
+class ActiveVolumeWidget : public WhatsThisWidget
 {
   Q_OBJECT
 public:
   ActiveVolumeWidget(QWidget* parent);
   ~ActiveVolumeWidget() {}
+
+  virtual QString defaultWhatsThis() const;
 };
 
 /**Widget for displaying various volume information.
  * Part of the VolumePropertiesWidget.
  */
-class VolumeInfoWidget : public QWidget
+class VolumeInfoWidget : public WhatsThisWidget
 {
   Q_OBJECT
 
@@ -32,25 +34,13 @@ public:
   VolumeInfoWidget(QWidget* parent);
   virtual ~VolumeInfoWidget();
 
-signals:
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void updateSlot();
-//  void setColorSlot();
-//  void setColorSlotDelayed();
-//  void visibilityChangedSlot(bool visible);
-//  void populateMeshComboBoxSlot();
-//  void meshSelectedSlot(const QString& comboBoxText);
-//  void importTransformSlot();
   void deleteDataSlot();
 
-protected:
-  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
-  virtual void hideEvent(QCloseEvent* event); ///<disconnects stuff
-
 private:
-//  ssc::MeshPtr mMesh;
-//  QComboBox* mMeshComboBox; ///< combobox for selecting mesh
   ParentFrameStringDataAdapterPtr mParentFrameAdapter;
   DataNameEditableStringDataAdapterPtr mNameAdapter;
   DataUidEditableStringDataAdapterPtr mUidAdapter;
@@ -62,12 +52,14 @@ private:
  * \date Aug 20, 2010
  * \author christiana
  */
-class VolumePropertiesWidget : public QWidget
+class VolumePropertiesWidget : public WhatsThisWidget
 {
   Q_OBJECT
 public:
   VolumePropertiesWidget(QWidget* parent);
+  virtual ~VolumePropertiesWidget(){};
 
+  virtual QString defaultWhatsThis() const;
 };
 
 }//namespace cx

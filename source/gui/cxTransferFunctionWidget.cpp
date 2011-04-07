@@ -323,7 +323,6 @@ void TransferFunctionPresetWidget::saveSlot()
   mPresetsComboBox->addItems(mPresets.getPresetList());
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -346,24 +345,8 @@ TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
   tabWidget->addTab(new ShadingWidget(this), "Shading");
   tabWidget->addTab(new DataViewSelectionWidget(this), "Overlay");
 
-//  mLayout->addWidget(mTF2DWidget);
-//  mLayout->addWidget(mTF3DWidget);
   mLayout->addWidget(mTFPresetWidget);
   this->setLayout(mLayout);
 }
-  
-//
-//QVBoxLayout* layout = new QVBoxLayout(this);
-//
-//layout->addWidget(new ActiveVolumeWidget(this));
-//
-//QTabWidget* tabWidget = new QTabWidget(this);
-//layout->addWidget(tabWidget);
-//tabWidget->addTab(new VolumeInfoWidget(this), "Info");
-//tabWidget->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
-//tabWidget->addTab(new ShadingWidget(this), "Shading");
-//tabWidget->addTab(new CroppingWidget(this), "Crop");
-//tabWidget->addTab(new ClippingWidget(this), "Clip");
-
 
 }//namespace cx

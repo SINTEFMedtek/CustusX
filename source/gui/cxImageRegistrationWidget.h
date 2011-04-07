@@ -27,7 +27,7 @@ class ImageRegistrationWidget : public RegistrationWidget
 
 public:
 
-  ImageRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
+  ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
   virtual ~ImageRegistrationWidget(); ///< empty
   virtual QString defaultWhatsThis() const;
 
