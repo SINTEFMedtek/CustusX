@@ -329,41 +329,35 @@ void TransferFunctionPresetWidget::saveSlot()
 //---------------------------------------------------------
 
 TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
-  QWidget(parent),
-  mLayout(new QVBoxLayout(this))
+  QWidget(parent)
+//  mLayout(new QVBoxLayout(this))
 {
   this->setObjectName("TransferFunctionWidget");
   this->setWindowTitle("Transfer Function");
 
-  mTF2DWidget = new TransferFunction2DWidget(this);
-  mTF3DWidget = new TransferFunction3DWidget(this);
-  mTFPresetWidget = new TransferFunctionPresetWidget(this);
+  QVBoxLayout* mLayout = new QVBoxLayout(this);
 
-  QTabWidget* tabWidget = new QTabWidget(this);
-  mLayout->addWidget(tabWidget);
-  tabWidget->addTab(mTF3DWidget, "Volume");
-  tabWidget->addTab(mTF2DWidget, "Slice");
-  tabWidget->addTab(new ShadingWidget(this), "Shading");
-  tabWidget->addTab(new DataViewSelectionWidget(this), "Overlay");
+  mLayout->setMargin(0);
+  mLayout->addWidget(new TransferFunction3DWidget(this));
+  mLayout->addWidget(new TransferFunctionPresetWidget(this));
 
-//  mLayout->addWidget(mTF2DWidget);
-//  mLayout->addWidget(mTF3DWidget);
-  mLayout->addWidget(mTFPresetWidget);
+//  TransferFunction2DWidget* mTF2DWidget = new TransferFunction2DWidget(this);
+//  TransferFunction3DWidget* mTF3DWidget = new TransferFunction3DWidget(this);
+//  TransferFunctionPresetWidget* mTFPresetWidget = new TransferFunctionPresetWidget(this);
+//
+//  QTabWidget* tabWidget = new QTabWidget(this);
+//  mLayout->addWidget(tabWidget);
+//  tabWidget->addTab(mTF3DWidget, "Volume");
+//  tabWidget->addTab(mTF2DWidget, "Slice");
+//  tabWidget->addTab(new ShadingWidget(this), "Shading");
+//  tabWidget->addTab(new DataViewSelectionWidget(this), "Overlay");
+//
+////  mLayout->addWidget(mTF2DWidget);
+////  mLayout->addWidget(mTF3DWidget);
+//  mLayout->addWidget(mTFPresetWidget);
+
   this->setLayout(mLayout);
 }
-  
-//
-//QVBoxLayout* layout = new QVBoxLayout(this);
-//
-//layout->addWidget(new ActiveVolumeWidget(this));
-//
-//QTabWidget* tabWidget = new QTabWidget(this);
-//layout->addWidget(tabWidget);
-//tabWidget->addTab(new VolumeInfoWidget(this), "Info");
-//tabWidget->addTab(new TransferFunctionWidget(this), QString("Transfer Functions"));
-//tabWidget->addTab(new ShadingWidget(this), "Shading");
-//tabWidget->addTab(new CroppingWidget(this), "Crop");
-//tabWidget->addTab(new ClippingWidget(this), "Clip");
 
 
 }//namespace cx

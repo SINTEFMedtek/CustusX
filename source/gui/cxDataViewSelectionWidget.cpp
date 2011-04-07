@@ -554,6 +554,8 @@ DataViewSelectionWidget::DataViewSelectionWidget(QWidget* parent)
 void DataViewSelectionWidget::viewGroupChangedSlot()
 {
   int vg = viewManager()->getActiveViewGroup();
+  if (vg<0)
+    vg = 0;
 
   if (( vg>=0 )&&( vg<int(viewManager()->getViewGroups().size()) ))
   {
