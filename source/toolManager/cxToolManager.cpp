@@ -631,7 +631,6 @@ void ToolManager::setConfigurationFile(QString configurationFile)
     this->deconfigure();
 
   mConfigurationFilePath = configurationFile;
-  std::cout << "Toolmanager set new config file to be " << mConfigurationFilePath << std::endl;
 }
 
 void ToolManager::setLoggingFolder(QString loggingFolder)
@@ -697,8 +696,6 @@ void ToolManager::globalConfigurationFileChangedSlot(QString key)
 {
   if(key != "toolConfigFile")
     return;
-
-  std::cout << "void ToolManager::globalConfigurationFileChangedSlot(QString "<< key << ")" << std::endl;
 
   this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
