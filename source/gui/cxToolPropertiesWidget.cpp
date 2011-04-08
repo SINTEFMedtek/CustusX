@@ -225,7 +225,7 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
   QGridLayout* gridLayout = new QGridLayout;
   activeGroupLayout->addLayout(gridLayout);
 
-  mToolOffsetWidget = new ssc::SliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
+  new ssc::SpinBoxAndSliderGroupWidget(this, ssc::DoubleDataAdapterPtr(new DoubleDataAdapterActiveToolOffset), gridLayout, 0);
 
   mToptopLayout->addStretch();
 
