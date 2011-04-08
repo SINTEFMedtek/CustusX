@@ -135,15 +135,18 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 {
   mPulseGenerator->CheckTimeouts();
 
-  if (!mReferenceTool) // no need to request extra transforms from tools to the tracker, its already done
-    return;
+//  if (!mReferenceTool) // no need to request extra transforms from tools to the tracker, its already done
+//    return;
 
   std::map<QString, IgstkToolPtr>::iterator it = mTools.begin();
   for(;it != mTools.end();++it)
   {
-    if(!mReferenceTool || !it->second)
+    if(!it->second)
       continue;
-    it->second->getPointer()->RequestComputeTransformTo(mReferenceTool->getPointer());
+    if(mReferenceTool)
+      it->second->getPointer()->RequestComputeTransformTo(mReferenceTool->getPointer());
+    else
+      it->second->getPointer()->RequestComputeTransformTo(mTracker->getPointer());
   }
 }
 
