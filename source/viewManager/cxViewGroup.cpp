@@ -106,7 +106,7 @@ ssc::Vector3D Navigation::findGlobalDataCenter()
   {
     dataVector.push_back(iter->second);
   }
-  std::cout << "findGlobalDataCenter() " << dataVector.size() << std::endl;
+//  std::cout << "findGlobalDataCenter() " << dataVector.size() << std::endl;
   return findDataCenter(dataVector);
 }
 
