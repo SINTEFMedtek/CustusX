@@ -108,7 +108,9 @@ void IgstkTool::toolTransformCallback(const itk::EventObject &event)
     if(!transform.IsValidNow())
     {
       //What to do? this happens alot, dunno why. Ignore? Seems to work ok.
-      //TODO CA20100901: Probable cause: we work on the main (render) thread. This causes several hundred ms lag. Move IGSTK+Toolmanager internals to separate thread.
+      //CA20100901: Probable cause: we work on the main (render) thread. This causes several hundred ms lag. Move IGSTK+Toolmanager internals to separate thread.
+      //TODO need to find out why this happens, we get duplicate transforms, it seems, this is not good
+      //return;
     }
     if (!mVisible)
       return; // quickfix replacement for IsValidNow()
