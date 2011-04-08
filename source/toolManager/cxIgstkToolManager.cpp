@@ -21,7 +21,7 @@ IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStruct
 
   this->createTracker(trackerStructure);
   this->createTools(toolStructures);
-  this->setReference();
+  this->setReferenceAndTrackerOnTools();
 
   connect(mTracker.get(), SIGNAL(tracking(bool)), this, SIGNAL(tracking(bool)));
 
@@ -59,7 +59,7 @@ IgstkToolPtr IgstkToolManager::getRefereceTool()
   return mReferenceTool;
 }
 
-void IgstkToolManager::setReference()
+void IgstkToolManager::setReferenceAndTrackerOnTools()
 {
   std::map<QString, IgstkToolPtr>::iterator it;
   for(it = mTools.begin(); it != mTools.end(); ++it)
@@ -69,7 +69,11 @@ void IgstkToolManager::setReference()
   }
 
   for(it = mTools.begin(); it != mTools.end(); ++it)
+  {
     it->second->setReference(mReferenceTool);
+    if(mTracker)
+      it->second->setTracker(mTracker);
+  }
 }
 
 void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStructure)
