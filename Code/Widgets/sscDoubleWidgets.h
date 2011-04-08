@@ -98,22 +98,52 @@ public:
 /**Composite widget for scalar data manipulation.
  * Consists of <namelabel, valueedit, slider>.
  * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ *
+ * Before use: enable the widgets you need, then add either to Own layout, in case you wish to
+ * use the widget normally, or add to grid, in case you wish to integrate the elements into a
+ * larger grid.
  */
-class SliderGroupWidget : public QWidget
+class ScalarInteractionWidget : public QWidget
+{
+  Q_OBJECT
+public:
+//  ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
+  ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr);
+
+  void enableSlider();
+  void enableEdit();
+  void enableSpinBox();
+
+  void addToOwnLayout();
+  void addToGridLayout(QGridLayout* gridLayout=0, int row=0);
+
+protected slots:
+  void dataChanged();
+private slots:
+  void textEditedSlot();
+  void doubleValueChanged(double val);
+//  void doubleValueChanged(double val);
+
+private:
+  void enableLabel();
+
+  DoubleSlider* mSlider;
+  QDoubleSpinBox* mSpinBox;
+  QLabel* mLabel;
+  DoubleLineEdit* mEdit;
+  DoubleDataAdapterPtr mData;
+};
+
+
+/**Composite widget for scalar data manipulation.
+ * Consists of <namelabel, valueedit, slider>.
+ * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ */
+class SliderGroupWidget : public ScalarInteractionWidget
 {
   Q_OBJECT
 public:
   SliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
-private slots:
-  void dataChanged();
-  void textEditedSlot();
-  void doubleValueChanged(double val);
-
-private:
-  DoubleSlider* mSlider;
-  QLabel* mLabel;
-  DoubleLineEdit* mEdit;
-  DoubleDataAdapterPtr mData;
 };
 
 /**Composite widget for scalar data manipulation.
@@ -122,19 +152,24 @@ private:
  *
  * Uses a QDoubleSpinBox instead of a slider - this gives a more compact widget.
  */
-class SpinBoxGroupWidget : public QWidget
+class SpinBoxGroupWidget : public ScalarInteractionWidget
 {
   Q_OBJECT
 public:
   SpinBoxGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
-private slots:
-  void dataChanged();
-  void doubleValueChanged(double val);
+};
 
-private:
-  QDoubleSpinBox* mSpinBox;
-  QLabel* mLabel;
-  DoubleDataAdapterPtr mData;
+/**Composite widget for scalar data manipulation.
+ * Consists of <namelabel, valueedit, slider>.
+ * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ *
+ * Uses both a slider and a spin box
+ */
+class SpinBoxAndSliderGroupWidget : public ScalarInteractionWidget
+{
+  Q_OBJECT
+public:
+  SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
 };
 
 } //namespace ssc
