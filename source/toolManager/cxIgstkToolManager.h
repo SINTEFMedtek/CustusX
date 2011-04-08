@@ -57,7 +57,7 @@ private slots:
 private:
   void createTracker(IgstkTracker::InternalStructure trackerStructure);
   void createTools(std::vector<Tool::InternalStructure> toolStructures);
-    void setReference();
+  void setReferenceAndTrackerOnTools();
 
   TrackerPtr mTracker;
   QMutex mToolMutex; ///< protects mTools
