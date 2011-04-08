@@ -121,7 +121,7 @@ private:
   QGroupBox* mManualGroup;
   Transform3DWidget* mManualToolWidget;
 
-  ssc::SliderGroupWidget* mToolOffsetWidget;
+//  ssc::SliderGroupWidget* mToolOffsetWidget;
   QLabel* mActiveToolVisibleLabel;
   QLabel* mToolNameLabel;
   QLabel* mReferenceStatusLabel;
