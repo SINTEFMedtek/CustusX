@@ -258,8 +258,9 @@ ToolPropertiesWidget::~ToolPropertiesWidget()
 void ToolPropertiesWidget::manualToolChanged()
 {
   mManualGroup->setVisible(ToolManager::getInstance()->getManualTool()->getVisible());
-//  mManualToolWidget->setMatrix(ToolManager::getInstance()->getManualTool()->get_prMt());
+  mManualToolWidget->blockSignals(true);
   mManualToolWidget->setMatrix(ToolManager::getInstance()->getManualTool()->get_prMt());
+  mManualToolWidget->blockSignals(false);
 }
 
 void ToolPropertiesWidget::manualToolWidgetChanged()
