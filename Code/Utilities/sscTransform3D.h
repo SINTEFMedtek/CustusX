@@ -1,6 +1,7 @@
 #ifndef SSCTRANSFORM3D_H_
 #define SSCTRANSFORM3D_H_
 
+#include "boost/array.hpp"
 #include <boost/shared_ptr.hpp>
 #include <QString>
 #include "vtkForwardDeclarations.h"
