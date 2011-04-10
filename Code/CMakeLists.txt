@@ -413,6 +413,7 @@ QT4_ADD_RESOURCES( GENERATED_RESOURCES ${SSC_QT_RESOURCE_FILES} )
 FIND_PATH(SSC_DATA_ROOT sscData.readme 
   ${SSC_SOURCE_DIR}/Data
   $ENV{SSC_DATA_ROOT})
+  message(status ${SSC_DATA_ROOT} "  --" ${SSC_SOURCE_DIR})
   
 #set(SSC_THUNDER_KERNEL_PATH ${SSC_SOURCE_DIR}/../../source/UsReconstruction/Thunder)
 
