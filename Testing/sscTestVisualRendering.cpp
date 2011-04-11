@@ -46,8 +46,8 @@ void TestVisualRendering::setUp()
 	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	//	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
 	//	image.push_back("Fantomer/Kaisa/MetaImage/Kaisa.mhd");
-	image.push_back("MetaImage/20070309T105136_MRT1.mhd");
-	image.push_back("MetaImage/20070309T102309_MRA.mhd");
+	image.push_back("Person5/person5_t2_byte.mhd");
+	image.push_back("Person5/person5_mra_byte.mhd");
 }
 
 void TestVisualRendering::tearDown()
