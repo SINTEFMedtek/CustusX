@@ -171,6 +171,7 @@ class SpinBoxAndSliderGroupWidget : public ScalarInteractionWidget
 public:
   SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
 };
+typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
 
 } //namespace ssc
 

@@ -66,7 +66,7 @@ public:
 	int getMin();///< \return Min alpha position in the histogram = min key value in map Use getPosMin() instead to allow for signed volumes.
 	int getPosMax();///< \return Max alpha position modified by getMin(). For use with signed volumes.
 	int getPosMin();///< \return Min alpha position set to zero.
-	int getRange();///< For convenience: getMax() – getMin()
+	int getRange();///< For convenience: getMax() - getMin()
 	int getMaxAlphaValue();///<Max alpha value (probably 255)
   virtual void setShadingOn(bool on);
   virtual bool getShadingOn() const;

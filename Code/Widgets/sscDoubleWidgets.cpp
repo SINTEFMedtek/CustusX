@@ -32,6 +32,7 @@ void ScalarInteractionWidget::enableLabel()
 void ScalarInteractionWidget::enableSlider()
 {
   mSlider = new ssc::DoubleSlider(this);
+  mSlider->setMinimumWidth(50);
   mSlider->setOrientation(Qt::Horizontal);
   connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
 }
