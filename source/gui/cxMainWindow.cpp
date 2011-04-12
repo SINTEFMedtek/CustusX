@@ -599,11 +599,7 @@ void MainWindow::updateWindowTitle()
   if (stateManager()->getApplication())
     appName = stateManager()->getApplication()->getActiveStateName();
 
-  QString versionName;
-#ifdef VERSION_NUMBER_VERBOSE
-  versionName = QString("%1").arg(VERSION_NUMBER_VERBOSE);
-#else
-#endif
+  QString versionName = stateManager()->getVersionName();
 
   QString activePatientFolder = stateManager()->getPatientData()->getActivePatientFolder();
   QString patientName;
