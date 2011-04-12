@@ -145,8 +145,8 @@ void CustomMetaImage::setTransform(const Transform3D M)
 
   int dim = 3; // hardcoded - will fail for 2d images
   std::stringstream tmList;
-  for (unsigned c=0; c<dim; ++c)
-    for (unsigned r=0; r<dim; ++r)
+  for (int c=0; c<dim; ++c)
+    for (int r=0; r<dim; ++r)
       tmList << " " << M[r][c];
 //  tmList <<" " << M[0][0] <<" "<< M[1][0] <<" "<<  M[2][0];
 //  tmList <<" " << M[0][1] <<" "<< M[1][1] <<" "<<  M[2][1];
@@ -154,7 +154,7 @@ void CustomMetaImage::setTransform(const Transform3D M)
   data.push_back(QString("TransformMatrix =" + qstring_cast(tmList.str())));
 
   std::stringstream posList;
-  for (unsigned r=0; r<dim; ++r)
+  for (int r=0; r<dim; ++r)
     posList << " " << M[r][3];
 //  posList << M[0][3] <<" "<< M[1][3] <<" "<<  M[2][3];
   data.push_back(QString("Offset = " + qstring_cast(posList.str())));
