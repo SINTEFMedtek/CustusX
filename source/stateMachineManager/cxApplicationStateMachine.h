@@ -30,11 +30,11 @@ public:
   virtual ~ApplicationStateMachine();
 
   QActionGroup* getActionGroup();
-//  void fillMenu(QMenu* menu);
-//  void fillToolBar(QToolBar* toolbar);
 
   QString getActiveUidState();
   QString getActiveStateName();
+
+  QStringList getAllApplicationNames();
 
 signals:
   void activeStateChanged();
@@ -43,10 +43,6 @@ private slots:
   void activeStateChangedSlot();
 
 private:
-//  void fillMenu(QMenu* menu, WorkflowState* current);
-//  void fillToolbar(QToolBar* toolbar, WorkflowState* current);
-
-
   QAction* addAction(QString stateUid, QActionGroup* group);
   ApplicationState* newState(ApplicationState* state);
 

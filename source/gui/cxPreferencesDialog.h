@@ -2,7 +2,7 @@
 #define CXPREFERANCESDIALOG_H_
 
 #include <QDialog>
-#include "boost/shared_ptr.hpp"
+//#include "boost/shared_ptr.hpp"
 #include "sscDoubleDataAdapterXml.h"
 
 class QTabWidget;
@@ -13,7 +13,6 @@ class QDialogButtonBox;
 class QLabel;
 class QComboBox;
 class QPushButton;
-class QSettings;
 class QSpinBox;
 class QCheckBox;
 class QRadioButton;
@@ -21,12 +20,14 @@ class QGridLayout;
 class QVBoxLayout;
 class QLineEdit;
 class QActionGroup;
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
 class MessageManager;
 class ViewManager;
+class FilePreviewWidget;
+class ToolFilterGroupBox;
+class ToolConfigureGroupBox;
 
 class PreferencesTab : public QWidget
 {
@@ -35,60 +36,53 @@ public:
   PreferencesTab(QWidget *parent = 0);
 
   virtual void init() = 0;
+
 public slots:
   virtual void saveParametersSlot() = 0;
+
 signals:
   void savedParameters();
+
 protected:
-  QSettingsPtr mSettings;
   QVBoxLayout* mTopLayout;
 };
 
 /**
- * \class FoldersTab
+ * \class GeneralTab
  *
- * \brief Configure default folder in preferences dialog
+ * \brief Tab for general settings in the system
  *
  * \date Jan 25, 2010
  * \author Frank Lindseth, SINTEF
  * \author Ole Vegard Solberg, SINTEF
  */
-class FoldersTab : public PreferencesTab
+class GeneralTab : public PreferencesTab
 {
   Q_OBJECT
 
 public:
-  FoldersTab(QWidget *parent = 0);
-  virtual ~FoldersTab();
+  GeneralTab(QWidget *parent = 0);
+  virtual ~GeneralTab();
   void init();
 
 public slots:
   void saveParametersSlot();
-
-//signals:
-//  void savedParameters();
   
 private slots:
   void browsePatientDataFolderSlot();
 
-  void currentToolConfigFilesIndexChangedSlot(const QString & newToolConfigFile);
-  void currenApplicationChangedSlot(int index);
+  void currentApplicationChangedSlot(int index);
   void applicationStateChangedSlot();
 
 private:
-  void setToolConfigComboBox();
   void setApplicationComboBox();
 
   QComboBox* mPatientDataFolderComboBox;
 
   QComboBox* mToolConfigFolderComboBox;
-  QComboBox* mToolConfigFilesComboBox;
   QComboBox* mChooseApplicationComboBox;
 
   QString mGlobalPatientDataFolder;
-  
-  QString mCurrentToolConfigFile;
-
 };
 
 /**
@@ -127,11 +121,11 @@ private slots:
   void renderingIntervalSlot(int interval);
 };
 
-class View3DTab : public PreferencesTab
+class VisualizationTab : public PreferencesTab
 {
     Q_OBJECT
 public:
-  View3DTab(QWidget *parent = 0);
+  VisualizationTab(QWidget *parent = 0);
   void init();
 
   public slots:
@@ -175,19 +169,19 @@ protected:
 };
 
 /**
- * \class UltrasoundTab
+ * \class VideoTab
  *
  * \brief Various parameters related to ultrasound acquisition and reconstruction.
  *
  * \date Jan 27, 2011
  * \author Christian Askeland, SINTEF
  */
-class UltrasoundTab : public PreferencesTab
+class VideoTab : public PreferencesTab
 {
   Q_OBJECT
 
 public:
-  UltrasoundTab(QWidget *parent = 0);
+  VideoTab(QWidget *parent = 0);
   void init();
 
 public slots:
@@ -199,6 +193,37 @@ protected:
 
   QRadioButton* m24bitRadioButton;
   QRadioButton* m8bitRadioButton;
+};
+
+/**
+ * \class ToolConfigTab
+ *
+ * \brief Interface for selecting a tool configuration.
+ *
+ * \date Mar 22, 2011
+ * \author Janne Beate Bakeng, SINTEF
+ */
+class ToolConfigTab : public PreferencesTab
+{
+  Q_OBJECT
+
+public:
+  ToolConfigTab(QWidget* parent = 0);
+  virtual ~ToolConfigTab();
+
+  virtual void init();
+
+public slots:
+  virtual void saveParametersSlot();
+
+private slots:
+  void applicationChangedSlot();
+  void globalConfigurationFileChangedSlot(QString key);
+
+private:
+  FilePreviewWidget*  mFilePreviewWidget;
+  ToolConfigureGroupBox* mToolConfigureGroupBox;
+  ToolFilterGroupBox*    mToolFilterGroupBox;
 };
 
 /**
@@ -216,6 +241,7 @@ class PreferencesDialog : public QDialog
 public:
   PreferencesDialog(QWidget *parent = 0);
   virtual ~PreferencesDialog();
+
 private slots:
   void selectTabSlot();
 
@@ -227,8 +253,6 @@ protected:
   QToolBar* mToolBar;
   QDialogButtonBox *buttonBox;
 };
-
-
 
 }//namespace cx
 

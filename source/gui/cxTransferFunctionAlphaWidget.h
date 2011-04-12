@@ -5,6 +5,7 @@
 #include <QWidget>
 
 #include <sscImage.h>
+#include "sscForwardDeclarations.h"
 
 class QRect;
 
@@ -25,14 +26,17 @@ class TransferFunctionAlphaWidget : public QWidget
   
 public:
   TransferFunctionAlphaWidget(QWidget* parent);
-  ~TransferFunctionAlphaWidget();
+  virtual ~TransferFunctionAlphaWidget();
+
+  void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
+  void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
 
 signals:
   void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
   //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
+//  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
 
 protected:
@@ -66,10 +70,10 @@ protected:
   virtual void paintEvent(QPaintEvent* event); ///< Reimplemented from superclass. Paints the transferfunction GUI
   virtual void resizeEvent(QResizeEvent* evt);///< Reimplemented from superclass
 
-  bool isInsideCurrentPoint();///< Checks if a screen coordinate is inside any of the point rectangles
-  AlphaPoint getCurrentAlphaPoint();///< Get aplha point based on mCurrentClickX and mCurrentClickY
-  void toggleCurrentPoint();///< Turn a transfer function point on or off (depending on it is on or not)
-  void moveCurrentAlphaPoint();///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
+  bool isInsideCurrentPoint(int mouseX, int mouseY);///< Checks if a screen coordinate is inside any of the point rectangles
+  AlphaPoint getCurrentAlphaPoint(int mouseX, int mouseY);///< Get aplha point based on mCurrentClickX and mCurrentClickY
+  void toggleCurrentPoint(int mouseX, int mouseY);///< Turn a transfer function point on or off (depending on it is on or not)
+  void moveCurrentAlphaPoint(int mouseX, int mouseY);///< Move the currently selected point to the selected screen coordinate (mCurrentClickX and mCurrentClickY)
 
   QRect mFullArea; ///< The full widget area.
   QRect mPlotArea; ///< The plot area.
@@ -77,12 +81,13 @@ protected:
   AlphaPoint mCurrentAlphaPoint;///< The current alpha point
 	bool mEndPoint;///< Current alpha point is an endpoint
 
-  int mCurrentClickX, mCurrentClickY;///< The x, y coordinate currently selected with the mouse
-
   int mBorder;///< The size of the border around the transferfunction. The size of the rectangles are mBorder * 2
 
-  ssc::ImagePtr mCurrentImage;
+  ssc::ImagePtr mImage;
+  ssc::ImageTFDataPtr mImageTF;
   
+  bool mReadOnly;///< Is class readOnly? Eg no mouse interaction possible
+
   virtual QSize sizeHint () const { return QSize(200, 100);};///< Define a recommended size
 };
 }

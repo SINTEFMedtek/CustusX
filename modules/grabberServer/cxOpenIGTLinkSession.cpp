@@ -26,7 +26,7 @@ void OpenIGTLinkSession::run()
 
   OpenIGTLinkSender* sender = new OpenIGTLinkSender(mSocket);
   connect(this, SIGNAL(frame(Frame&)), sender, SLOT(receiveFrameSlot(Frame&)), Qt::DirectConnection);
-  connect(sender, SIGNAL(queueSize(int)), this, SIGNAL(queueSize(int)));
+  connect(sender, SIGNAL(queueInfo(int, int)), this, SIGNAL(queueInfo(int, int)));
 
   this->exec();
 
@@ -39,9 +39,12 @@ void OpenIGTLinkSession::run()
 
 OpenIGTLinkSender::OpenIGTLinkSender(QTcpSocket* socket, QObject* parent) :
     QObject(parent),
-    mSocket(socket)
+    mSocket(socket),
+    mMaxqueueInfo(20),
+    mMaxBufferSize(19200000), //800(width)*600(height)*4(bytes)*10(images)
+    mDroppedImages(0)
 {
-  connect(this, SIGNAL(imageOnQueue()), this, SLOT(sendOpenIGTLinkImageSlot()), Qt::QueuedConnection);
+  connect(this, SIGNAL(imageOnQueue(int)), this, SLOT(sendOpenIGTLinkImageSlot(int)), Qt::QueuedConnection);
   connect(mSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(errorSlot(QAbstractSocket::SocketError)), Qt::DirectConnection);
 }
 
@@ -51,6 +54,8 @@ OpenIGTLinkSender::~OpenIGTLinkSender()
 void OpenIGTLinkSender::receiveFrameSlot(Frame& frame)
 {
   IGTLinkImageMessage::Pointer imgMsg = convertFrame(frame);
+//  std::cout << "Socket bytesToWrite: " << mSocket->bytesToWrite() << std::endl;
+//  std::cout << "Socket readBufferSize: " << mSocket->readBufferSize() << std::endl;
   this->addImageToQueue(imgMsg);
 }
 
@@ -90,12 +95,19 @@ IGTLinkImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
   return retval;
 }
 
-void OpenIGTLinkSender::sendOpenIGTLinkImageSlot()
+void OpenIGTLinkSender::sendOpenIGTLinkImageSlot(int sendNumberOfImages)
 {
-  //igtl::ImageMessage::Pointer message = this->getLastImageMessageFromQueue();
-  IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
-  message->Pack();
-  mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+  if(mSocket->bytesToWrite() > mMaxBufferSize)
+    return;
+
+  for(int i=0; i<sendNumberOfImages; ++i)
+  {
+    IGTLinkImageMessage::Pointer message = this->getLastImageMessageFromQueue();
+    if(!message)
+      break;
+    message->Pack();
+    mSocket->write(reinterpret_cast<const char*>(message->GetPackPointer()), message->GetPackSize());
+  }
 }
 
 /** Add the message to a thread-safe queue
@@ -103,10 +115,18 @@ void OpenIGTLinkSender::sendOpenIGTLinkImageSlot()
 void OpenIGTLinkSender::addImageToQueue(IGTLinkImageMessage::Pointer imgMsg)
 {
   QMutexLocker sentry(&mImageMutex);
+  if(mMutexedImageMessageQueue.size() > mMaxqueueInfo)
+  {
+    mMutexedImageMessageQueue.pop_front();
+    mDroppedImages++;
+  }
+
   mMutexedImageMessageQueue.push_back(imgMsg);
+  int size = mMutexedImageMessageQueue.size();
   sentry.unlock();
-  emit queueSize(mMutexedImageMessageQueue.size());
-  emit imageOnQueue(); // emit signal outside lock, catch possibly in another thread
+
+  emit queueInfo(size, mDroppedImages);
+  emit imageOnQueue(size); // emit signal outside lock, catch possibly in another thread
 }
 
 /** Threadsafe retrieval of last image message.

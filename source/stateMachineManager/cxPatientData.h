@@ -16,8 +16,6 @@
 #include "sscTransform3D.h"
 
 class QDomDocument;
-//class QSettings;
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace cx
 {
@@ -66,9 +64,6 @@ private:
 
   //Patient
   QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
-  //Preferences
-  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
-
 };
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;

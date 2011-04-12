@@ -49,6 +49,7 @@
 #include "cxTrackedCenterlineWidget.h"
 #include "cxUSAcqusitionWidget.h"
 #include "cxAudio.h"
+#include "cxSettings.h"
 #include "RTSource/cxRTSourceManager.h"
 
 namespace cx
@@ -56,12 +57,13 @@ namespace cx
 
 MainWindow::MainWindow() :
   mCentralWidget(new QWidget(this)),
+  mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
-  mRegsitrationMethodsWidget(new RegistrationMethodsWidget("RegistrationMethodsWidget", "Registration Methods", this)),
-  mSegmentationMethodsWidget(new SegmentationMethodsWidget("SegmentationMethodsWidget", "Segmentation Methods", this)),
-  mVisualizationMethodsWidget(new VisualizationMethodsWidget("VisualizationMethodsWidget", "Visualization Methods", this)),
-  mCalibrationMethodsWidget(new CalibrationMethodsWidget("CalibrationMethodsWidget", "Calibration Methods", this)),
+  mRegsitrationMethodsWidget(new RegistrationMethodsWidget(this, "RegistrationMethodsWidget", "Registration Methods")),
+  mSegmentationMethodsWidget(new SegmentationMethodsWidget(this, "SegmentationMethodsWidget", "Segmentation Methods")),
+  mVisualizationMethodsWidget(new VisualizationMethodsWidget(this, "VisualizationMethodsWidget", "Visualization Methods")),
+  mCalibrationMethodsWidget(new CalibrationMethodsWidget(this, "CalibrationMethodsWidget", "Calibration Methods")),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
@@ -72,8 +74,7 @@ MainWindow::MainWindow() :
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new CustomStatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
-  mControlPanel(NULL),
-  mSettings(DataLocations::getSettings())
+  mControlPanel(NULL)
 {
   mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
 
@@ -125,24 +126,34 @@ MainWindow::MainWindow() :
 
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-  // initialize toolmanager config file
-  ToolManager::getInstance()->setConfigurationFile(DataLocations::getToolConfigFilePath());
-
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   this->layoutChangedSlot();
 
   // Restore saved window states
   // Must be done after all DockWidgets are created
-  if (!restoreGeometry(mSettings->value("mainWindow/geometry").toByteArray()))
-    this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
-  //restoreState(mSettings->value("mainWindow/windowState").toByteArray());
-
+  if (!restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
+   // this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
+    this->showMaximized();
+  //restoreState(settings()->value("mainWindow/windowState").toByteArray());
+  else
   // Don't show the Widget before all elements are initialized
-  this->show();
+    this->show();
   //std::cout << "end construct main win" << std::endl;
 
   this->startupLoadPatient();
 }
+
+void MainWindow::changeEvent(QEvent * event)
+{
+  QMainWindow::changeEvent(event);
+
+  if (event->type() == QEvent::WindowStateChange)
+  {
+    if (mFullScreenAction)
+      mFullScreenAction->setChecked(this->windowState() & Qt::WindowFullScreen);
+  }
+}
+
 
 /**Parse the command line and load a patient if the switch --patient is found
  *
@@ -167,6 +178,18 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
   dockWidget->setObjectName(widget->objectName() + "DockWidget");
   dockWidget->setWidget(widget);
   this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+
+  // tabify the widget onto one of the left widgets.
+  for (std::set<QDockWidget*>::iterator iter=mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
+  {
+    if (this->dockWidgetArea(*iter)==Qt::LeftDockWidgetArea)
+    {
+//      std::cout << "tabify " << (*iter)->objectName() << "\t" << dockWidget->objectName() << std::endl;
+      this->tabifyDockWidget(*iter, dockWidget);
+      break;
+    }
+  }
+
   mDockWidgets.insert(dockWidget);
   dockWidget->setVisible(false); // default visibility
 
@@ -277,6 +300,13 @@ void MainWindow::createActions()
   mDebugModeAction->setChecked(DataManager::getInstance()->getDebugMode());
   mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
 
+  mFullScreenAction = new QAction(tr("Fullscreen"), this);
+  mFullScreenAction->setShortcut(tr("F11"));
+  mFullScreenAction->setStatusTip(tr("Toggle full screen"));
+  mFullScreenAction->setCheckable(true);
+  mFullScreenAction->setChecked(this->windowState() & Qt::WindowFullScreen);
+  connect(mFullScreenAction, SIGNAL(triggered()), this, SLOT(toggleFullScreenSlot()));
+
   mQuitAction = new QAction(tr("&Quit"), this);
   mQuitAction->setShortcut(tr("Ctrl+Q"));
   mQuitAction->setStatusTip(tr("Exit the application"));
@@ -333,7 +363,7 @@ void MainWindow::createActions()
   connect(mManualToolPhysicalProperties, SIGNAL(triggered()), this, SLOT(manualToolPhysicalPropertiesSlot()));
   this->updateManualToolPhysicalProperties();
 
-//  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
+//  if (settings()->value("giveManualToolPhysicalProperties").toBool())
 
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   mStartStreamingAction->setShortcut(tr("Ctrl+V"));
@@ -381,6 +411,21 @@ void MainWindow::createActions()
 
 }
 
+void MainWindow::toggleFullScreenSlot()
+{
+  this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
+//  bool fs = this->windowState() & Qt::WindowFullScreen;
+////  bool mx = this->windowState() & Qt::WindowMaximized;
+////  std::cout << "Fullscreen pre: full=" << fs << ", max=" << mx << std::endl;
+//  if (fs)
+//    this->showNormal();
+//  else
+//    this->showFullScreen();
+////  fs = this->windowState() & Qt::WindowFullScreen;
+////  mx = this->windowState() & Qt::WindowMaximized;
+////  std::cout << "Fullscreen post: full=" << fs << ", max=" << mx << std::endl;
+}
+
 void MainWindow::shootScreen()
 {
   this->saveScreenShot(QPixmap::grabWindow(QApplication::desktop()->winId()));
@@ -404,11 +449,11 @@ void MainWindow::saveScreenShot(QPixmap pixmap)
 
 void MainWindow::manualToolPhysicalPropertiesSlot()
 {
-  DataLocations::getSettings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalProperties->isChecked());
+  settings()->setValue("giveManualToolPhysicalProperties", mManualToolPhysicalProperties->isChecked());
 }
 void MainWindow::updateManualToolPhysicalProperties()
 {
-  bool set = DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool();
+  bool set = settings()->value("giveManualToolPhysicalProperties").toBool();
   mManualToolPhysicalProperties->setChecked(set);
 }
 
@@ -440,7 +485,21 @@ void MainWindow::updateStreamingActionSlot()
 
 void MainWindow::centerToImageCenterSlot()
 {
-  Navigation().centerToImage(ssc::dataManager()->getActiveImage());
+  if (ssc::dataManager()->getActiveImage())
+  {
+    std::cout << "center active image" << std::endl;
+    Navigation().centerToData(ssc::dataManager()->getActiveImage());
+  }
+  else if (!viewManager()->getViewGroups().empty())
+  {
+    std::cout << "center first view group" << std::endl;
+    Navigation().centerToView(viewManager()->getViewGroups()[0]->getData()->getData());
+  }
+  else
+  {
+    std::cout << "center global" << std::endl;
+    Navigation().centerToGlobalDataCenter();
+  }
 }
 
 void MainWindow::centerToTooltipSlot()
@@ -485,10 +544,10 @@ void MainWindow::toggleTrackingSlot()
 
 void MainWindow::newPatientSlot()
 {
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
   QString name = QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat()) + "_";
-  name += mSettings->value("globalApplicationName").toString() + "_";
-  name += mSettings->value("globalPatientNumber").toString() + ".cx3";
+  name += settings()->value("globalApplicationName").toString() + "_";
+  name += settings()->value("globalPatientNumber").toString() + ".cx3";
 
   // Create folders
   if (!QDir().exists(patientDatafolder))
@@ -505,8 +564,8 @@ void MainWindow::newPatientSlot()
     choosenDir += QString(".cx3");
 
   // Update global patient number
-  int patientNumber = mSettings->value("globalPatientNumber").toInt();
-  mSettings->setValue("globalPatientNumber", ++patientNumber);
+  int patientNumber = settings()->value("globalPatientNumber").toInt();
+  settings()->setValue("globalPatientNumber", ++patientNumber);
 
   stateManager()->getPatientData()->newPatient(choosenDir);
 }
@@ -595,7 +654,7 @@ void MainWindow::showControlPanelActionSlot()
 
 void MainWindow::loadPatientFileSlot()
 {
-  QString patientDatafolder = mSettings->value("globalPatientDataFolder").toString();
+  QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
   // Create folder
   if (!QDir().exists(patientDatafolder))
   {
@@ -618,7 +677,7 @@ void MainWindow::importDataSlot()
   this->savePatientFileSlot();
 
   //ssc::messageManager()->sendInfo("Importing data...");
-  QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")), mSettings->value(
+  QString fileName = QFileDialog::getOpenFileName(this, QString(tr("Select data file for import")), settings()->value(
       "globalPatientDataFolder").toString(), tr("Image/Mesh (*.mhd *.mha *.stl *.vtk *.mnc)"));
   if (fileName.isEmpty())
   {
@@ -739,6 +798,7 @@ void MainWindow::createMenus()
   mFileMenu->addAction(mImportDataAction);
   mFileMenu->addAction(mDeleteDataAction);
   mFileMenu->addSeparator();
+  mFileMenu->addAction(mFullScreenAction);
   mFileMenu->addAction(mDebugModeAction);
   mFileMenu->addAction(mShootScreenAction);
   mFileMenu->addAction(mShootWindowAction);
@@ -822,9 +882,12 @@ void MainWindow::createToolBars()
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
   mNavigationToolBar->addAction(mCenterToTooltipAction);
   mNavigationToolBar->addAction(mShowPointPickerAction);
-  mNavigationToolBar->addSeparator();
-  mNavigationToolBar->addActions(mInteractorStyleActionGroup->actions());
   this->registerToolBar(mNavigationToolBar, "Toolbar");
+
+  mInteractorStyleToolBar = addToolBar("InteractorStyle");
+  mInteractorStyleToolBar->setObjectName("InteractorStyleToolBar");
+  mInteractorStyleToolBar->addActions(mInteractorStyleActionGroup->actions());
+  this->registerToolBar(mInteractorStyleToolBar, "Toolbar");
 
   mWorkflowToolBar = addToolBar("Workflow");
   mWorkflowToolBar->setObjectName("WorkflowToolBar");
@@ -844,7 +907,6 @@ void MainWindow::createToolBars()
 
    QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
    camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
-   camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
    camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
    this->registerToolBar(camera3DViewToolBar, "Toolbar");
 }
@@ -862,23 +924,23 @@ void MainWindow::createStatusBar()
 void MainWindow::populateRegistrationMethodsWidget()
 {
   //landmark
-  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget("LandmarkRegistrationWidget", "Landmark Registrations", mRegsitrationMethodsWidget);
-  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget);
-  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget);
+  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(mRegsitrationMethodsWidget, "LandmarkRegistrationWidget", "Landmark Registrations");
+  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget, "ImageRegistrationWidget", "Image Registration");
+  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget, "PatientRegistrationWidget", "Patient Registration");
   landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
   landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
 
   //fast
-  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget("FastRegistrationWidget", "Fast Registrations", mRegsitrationMethodsWidget);
+  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(mRegsitrationMethodsWidget, "FastRegistrationWidget", "Fast Registrations");
   FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget);
+  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
   FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
   fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
   fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
   fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient");
 
   //vessel based image to image
-  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget("Image2ImageRegistrationWidget", "Image 2 Image Registration", mRegsitrationMethodsWidget);
+  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(mRegsitrationMethodsWidget, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
   FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
   MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
@@ -890,7 +952,7 @@ void MainWindow::populateRegistrationMethodsWidget()
   ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
 
   //plate
-  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget("PlateRegistrationWidget", "Plate", mRegsitrationMethodsWidget);
+  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(mRegsitrationMethodsWidget, "PlateRegistrationWidget", "Plate");
   PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
   PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
   imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
@@ -952,53 +1014,6 @@ void MainWindow::deleteDataSlot()
   ssc::dataManager()->removeData(ssc::dataManager()->getActiveImage()->getUid());
 }
 
-//void MainWindow::loadPatientRegistrationSlot()
-//{
-//  /*Expecting a file that looks like this
-//   *00 01 02 03
-//   *10 11 12 13
-//   *20 21 22 23
-//   *30 31 32 33
-//   */
-//
-//  QString registrationFilePath = QFileDialog::getOpenFileName(this,
-//      tr("Select patient registration file (*.txt)"),
-//      mSettings->value("globalPatientDataFolder").toString(),
-//      tr("Patient registration files (*.txt)"));
-//
-//  //Check that the file can be open and read
-//  QFile registrationFile(registrationFilePath);
-//  if(!registrationFile.open(QIODevice::ReadOnly))
-//  {
-//    ssc::messageManager()->sendWarning("Could not open "+registrationFilePath.toStdString()+".");
-//    return;
-//  }else
-//  {
-//    vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
-//    //read the content, 4x4 matrix
-//    QTextStream inStream(&registrationFile);
-//    for(int i=0; i<4; i++)
-//    {
-//      QString line = inStream.readLine();
-//      std::cout << line.toStdString() << std::endl;
-//      QStringList list = line.split(" ", QString::SkipEmptyParts);
-//      if(list.size() != 4)
-//      {
-//        ssc::messageManager()->sendError(""+registrationFilePath.toStdString()+" is not correctly formated");
-//        return;
-//      }
-//      matrix->SetElement(i,0,list[0].toDouble());
-//      matrix->SetElement(i,1,list[1].toDouble());
-//      matrix->SetElement(i,2,list[2].toDouble());
-//      matrix->SetElement(i,3,list[3].toDouble());
-//    }
-//    //set the toolmanageres matrix
-//    ssc::Transform3D patientRegistration = ssc::Transform3D(matrix);
-//    registrationManager()->setManualPatientRegistration(patientRegistration);
-//    //std::cout << (*patientRegistration.get()) << std::endl;
-//    ssc::messageManager()->sendInfo("New patient registration is set.");
-//  }
-//}
 
 void MainWindow::configureSlot()
 {
@@ -1007,9 +1022,9 @@ void MainWindow::configureSlot()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-  mSettings->setValue("mainWindow/geometry", saveGeometry());
-  mSettings->setValue("mainWindow/windowState", saveState());
-  mSettings->sync();
+  settings()->setValue("mainWindow/geometry", saveGeometry());
+  settings()->setValue("mainWindow/windowState", saveState());
+  settings()->sync();
   ssc::messageManager()->sendInfo("Closing: Save geometry and window state");
 
   if (ssc::toolManager()->isTracking())

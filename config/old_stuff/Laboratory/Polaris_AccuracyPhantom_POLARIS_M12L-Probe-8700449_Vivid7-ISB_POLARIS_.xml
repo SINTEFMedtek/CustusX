@@ -1,0 +1,7 @@
+<?xml version = "1.0"?>
+<configuration clinical_app="Laboratory">
+    <tracker type="polaris">
+        <toolfile reference="yes">../Tools/Laboratory/AccuracyPhantom_POLARIS/AccuracyPhantom_POLARIS.xml</toolfile>
+        <toolfile reference="no">../Tools/Shared/M12L-Probe-8700449_Vivid7-ISB_POLARIS/M12L-Probe-8700449_Vivid7-ISB_POLARIS.xml</toolfile>
+    </tracker>
+</configuration>

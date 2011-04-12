@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>>Aurora</type>
+</tracker>
+
+<toolfile type="aurora" reference="yes">../Tools/Lab/AccuracyPhantom_AURORA_port1/Aurora_AccuracyPhantom_port1.xml</toolfile>
+<toolfile type="aurora" reference="no">../Tools/Lap/OL531-Probe_Hitachi_AURORA_port2/OL531-Probe_Hitachi_AURORA_port2.xml</toolfile>
+<toolfile type="aurora" reference="no">../Tools/Shared/Pointer2_AURORA_port3/Pointer2_AURORA_port3.xml</toolfile>
+
+</configuration>

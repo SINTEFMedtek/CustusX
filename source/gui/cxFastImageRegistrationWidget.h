@@ -17,7 +17,7 @@ namespace cx
 class FastImageRegistrationWidget : public ImageRegistrationWidget
 {
 public:
-  FastImageRegistrationWidget(QWidget* parent);
+  FastImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
  virtual ~FastImageRegistrationWidget();
  virtual QString defaultWhatsThis() const;
 

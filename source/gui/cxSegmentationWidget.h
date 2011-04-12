@@ -5,6 +5,8 @@
 #include <QtGui>
 #include <QString>
 #include "sscForwardDeclarations.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscDoubleWidgets.h"
 #include "cxWhatsThisWidget.h"
 #include "cxCenterline.h"
 #include "cxResample.h"
@@ -86,9 +88,8 @@ protected:
 private slots:
   void segmentSlot();
   void toogleBinarySlot(bool on);
-  void thresholdSlot(int value);
+  void thresholdSlot();
   void toogleSmoothingSlot(bool on);
-  void smoothingSigmaSlot(double value);
   void imageChangedSlot(QString uid);
   void revertTransferFunctions();
   void handleFinishedSlot();
@@ -99,13 +100,12 @@ private:
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
-  int mSegmentationThreshold; ///< the threshold value used when segmenting
   bool mBinary; ///< whether or not the segmentation should create a binary volume
   bool mUseSmothing; ///< whether or not the volume should be smoothed
-  double mSmoothSigma; ///< the value used for smoothing (if enabled)
 
-  QSpinBox* mSegmentationThresholdSpinBox;
-  QDoubleSpinBox* mSmoothingSigmaSpinBox;
+  ssc::DoubleDataAdapterXmlPtr mSegmentationThresholdAdapter;
+  ssc::DoubleDataAdapterXmlPtr mSmoothingSigmaAdapter;
+  ssc::SpinBoxAndSliderGroupWidgetPtr mSmoothingSigmaWidget;
   QLabel* mSmoothingSigmaLabel;
   QLabel* mStatusLabel;
 
@@ -143,8 +143,6 @@ signals:
 
 private slots:
   void surfaceSlot();
-  void thresholdSlot(int value);
-  void decimationSlot(int value);
   void reduceResolutionSlot(bool value);
   void smoothingSlot(bool value);
   void imageChangedSlot(QString uid);
@@ -155,12 +153,10 @@ private:
   QWidget* createSurfaceOptionsWidget();
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
-  int mSurfaceThreshold; ///< the threshold value used when contouring
-  int mDecimation;
   bool mReduceResolution;
   bool mSmoothing;
-  QSpinBox* mSurfaceThresholdSpinBox;
-  QSpinBox* mDecimationSpinBox;
+  ssc::DoubleDataAdapterXmlPtr mSurfaceThresholdAdapter;
+  ssc::DoubleDataAdapterXmlPtr mDecimationAdapter;
   QColor mDefaultColor;
   QLabel* mStatusLabel;
 

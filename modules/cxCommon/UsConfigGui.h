@@ -6,7 +6,6 @@
 
 class QGridLayout;
 class QComboBox;
-class QSettings;
 /**
  * \class UsConfigGui.h
  *
@@ -42,7 +41,7 @@ protected slots:
   void configIdChanged(const QString& configId); ///< reacts when the user selected a new configid from a combobox
 
 protected:
-  void initComboBoxes(); ///< initializes the comboboxs, tries to use values saved in QSettings
+  void initComboBoxes(); ///< initializes the comboboxs, tries to use values saved in Settings
   void populateScannerBox(const QString& tryToSelect); ///< fills the scanner combobox and tries to set a specific item as selected
   void populateProbeBox(const QString& tryToSelect); ///< fills the probe combobox and tries to set a specific item as selected
   void populateRtSourceBox(const QString& tryToSelect); ///< fills the rtsource combobox and tries to set a specific item as selected
@@ -57,8 +56,6 @@ protected:
   QComboBox*            mProbeBox; ///< List of probes
   QComboBox*            mRtSourceBox; ///< List of video grabber sources
   QComboBox*            mConfigIdBox; ///< List of probe config parameters
-
-  QSettings*            mSettings; ///< Settings that should be saved from session to session
 };
 
 #endif /* USCONFIGGUI_H_ */

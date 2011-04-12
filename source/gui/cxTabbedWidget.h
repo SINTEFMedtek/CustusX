@@ -20,7 +20,7 @@ namespace cx
 class TabbedWidget : public WhatsThisWidget
 {
 public:
-  TabbedWidget(QString objectName, QString windowTitle, QWidget* parent);
+  TabbedWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~TabbedWidget();
 
   void addTab(WhatsThisWidget* newTab, QString newTabName);
@@ -36,7 +36,7 @@ private:
 class RegistrationMethodsWidget : public TabbedWidget
 {
 public:
-  RegistrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  RegistrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~RegistrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -44,7 +44,7 @@ public:
 class SegmentationMethodsWidget : public TabbedWidget
 {
 public:
-  SegmentationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  SegmentationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~SegmentationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -52,7 +52,7 @@ public:
 class VisualizationMethodsWidget : public TabbedWidget
 {
 public:
-  VisualizationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  VisualizationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~VisualizationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -60,7 +60,7 @@ public:
 class CalibrationMethodsWidget : public TabbedWidget
 {
 public:
-  CalibrationMethodsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~CalibrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -68,7 +68,7 @@ public:
 class LandmarkRegistrationsWidget : public TabbedWidget
 {
 public:
-  LandmarkRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  LandmarkRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~LandmarkRegistrationsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -76,7 +76,7 @@ public:
 class FastRegistrationsWidget : public TabbedWidget
 {
 public:
-  FastRegistrationsWidget(QString objectName, QString windowTitle, QWidget* parent);
+  FastRegistrationsWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~FastRegistrationsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -84,7 +84,7 @@ public:
 class Image2ImageRegistrationWidget : public TabbedWidget
 {
 public:
-  Image2ImageRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent);
+  Image2ImageRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~Image2ImageRegistrationWidget(){};
   virtual QString defaultWhatsThis() const;
 };
@@ -92,7 +92,7 @@ public:
 class Image2PlateRegistrationWidget : public TabbedWidget
 {
 public:
-  Image2PlateRegistrationWidget(QString objectName, QString windowTitle, QWidget* parent);
+  Image2PlateRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~Image2PlateRegistrationWidget(){};
   virtual QString defaultWhatsThis() const;
 };

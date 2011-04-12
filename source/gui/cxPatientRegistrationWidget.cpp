@@ -20,14 +20,10 @@
 
 namespace cx
 {
-PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
-  RegistrationWidget(parent),
+PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  RegistrationWidget(parent, objectName, windowTitle),
   mToolSampleButton(new QPushButton("Sample Tool", this))
 {
-  //Dock widget
-  this->setObjectName("PatientRegistrationWidget");
-  this->setWindowTitle("Patient Registration");
-
   //buttons
   mToolSampleButton->setDisabled(true);
   connect(mToolSampleButton, SIGNAL(clicked()), this, SLOT(toolSampleButtonClickedSlot()));
@@ -36,7 +32,6 @@ PatientRegistrationWidget::PatientRegistrationWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot(const QString&)));
 
   //layout
-//moved to help text  mVerticalLayout->addWidget(new QLabel("Landmark patient registration will move the patient into the global coordinate system (r)."));
   mVerticalLayout->addWidget(mLandmarkTableWidget);
   mVerticalLayout->addWidget(mToolSampleButton);
   mVerticalLayout->addWidget(mAvarageAccuracyLabel);

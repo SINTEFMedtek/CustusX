@@ -3,14 +3,14 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QSettings>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageLuminance.h>
-#include "sscTypeConversions.h"
-#include "sscMessageManager.h"
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
+#include "sscTypeConversions.h"
+#include "sscMessageManager.h"
 #include "cxDataLocations.h"
+#include "cxSettings.h"
 
 typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
@@ -167,7 +167,7 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   vtkImageAppendPtr filter = vtkImageAppendPtr::New();
   filter->SetAppendAxis(2); // append along z-axis
 
-  bool bw = DataLocations::getSettings()->value("Ultrasound/8bitAcquisitionData").toBool();
+  bool bw = settings()->value("Ultrasound/8bitAcquisitionData").toBool();
 
   int i=0;
   for(ssc::RTSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
@@ -196,19 +196,7 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
 void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
   QString mhdFilename = this->getMhdFilename(reconstructionFolder);
-//  QString mhdFilename = reconstructionFolder+"/"+mSessionDescription->getDescription()+".mhd";
-
   vtkImageDataPtr usData = this->mergeFrames();
-//  std::cout << "write " << ssc::DoubleBoundingBox3D(usData->GetExtent()) << std::endl;
-
-//  if(mTool)
-//  {
-//    vtkImageChangeInformationPtr redirecter = vtkImageChangeInformationPtr::New();
-//    redirecter->SetInput(usData);
-//    redirecter->SetOutputSpacing(mTool->getProbeSector().mImage.mSpacing.begin());
-//    usData = redirecter->GetOutput();
-//    usData->Update();
-//  }
 
 
   //std::cout << "start write mhd file " << mhdFilename << std::endl;

@@ -10,8 +10,6 @@
 class QAction;
 class QMenu;
 class QActionGroup;
-class QDomDocument;
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
 
 namespace ssc
 {
@@ -44,16 +42,17 @@ public:
 
   virtual QMenu* createPopupMenu();
 
-signals:
-  void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
+//signals:
+//  void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
 
 protected slots:
   void patientChangedSlot();
   //application menu
   void aboutSlot();
   void preferencesSlot();
-  void quitSlot(); ///< TODO
-  
+  void quitSlot();
+  void toggleFullScreenSlot();
+
   // File menu
   void newPatientSlot(); ///< Create new patient with directory structure
   void loadPatientFileSlot();///< Load all application data from XML file
@@ -99,6 +98,9 @@ protected slots:
   void shootScreen();
   void shootWindow();
 
+protected:
+  void changeEvent(QEvent * event);
+
 private:
   void saveScreenShot(QPixmap pixmap);
   void updateWindowTitle();
@@ -140,6 +142,7 @@ private:
   QAction* mAboutAction;
   QAction* mPreferencesAction;
   QAction* mDebugModeAction;
+  QAction* mFullScreenAction;
   QAction* mQuitAction;
   
   QAction* mShootScreenAction;
@@ -183,6 +186,7 @@ private:
   QToolBar* mDataToolBar; ///< toolbar for data actions
   QToolBar* mToolToolBar; ///< toolbar for tracking system actions
   QToolBar* mNavigationToolBar; ///< toolbar for navigation actions
+  QToolBar* mInteractorStyleToolBar; ///< toolbar for camera interaction styles
   QToolBar* mWorkflowToolBar; ///< toolbar for workflow actions
   QToolBar* mDesktopToolBar; ///< toolbar for desktop actions
   QToolBar* mHelpToolBar; ///< toolbar for entering help mode
@@ -210,7 +214,6 @@ private:
   class ControlPanel*                           mControlPanel;
 
   //Preferences
-  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   CameraControlPtr mCameraControl;
   std::set<QDockWidget*> mDockWidgets;
 };
