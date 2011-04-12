@@ -95,7 +95,8 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
     return ssc::DoubleRange();
 
   double max = mImageTFData->getScalarMax();
-  return ssc::DoubleRange(1,max,max/1000.0);
+  double min = mImageTFData->getScalarMin();
+  return ssc::DoubleRange(min,max,1);
 }
 
 
