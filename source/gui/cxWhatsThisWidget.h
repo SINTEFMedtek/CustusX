@@ -13,7 +13,7 @@ namespace cx
 /**
  * \class WhatsThisWidget
  *
- * \brief Interface for QWidget which forces the user to write a whats this message.
+ * \brief Interface for QWidget which handles widgets uniformly for the system.
  *
  * \date 28. sep. 2010
  * \author: Janne Beate Bakeng
