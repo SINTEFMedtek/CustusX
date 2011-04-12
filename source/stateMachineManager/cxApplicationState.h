@@ -14,14 +14,11 @@
 #include <QStateMachine>
 #include <QString>
 #include <QAction>
+#include "sscEnumConverter.h"
 #include "sscTypeConversions.h"
-//#include "sscDataManager.h"
-#include "cxRequestEnterStateTransition.h"
-//#include "cxStateMachineManager.h"
-//#include "cxPatientData.h"
-//#include "cxViewManager.h"
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
+#include "cxRequestEnterStateTransition.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 
@@ -42,7 +39,7 @@ public:
   virtual QString getName() const;
   std::vector<ApplicationState*> getChildStates();
   QAction* createAction(QActionGroup* group);
-  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const = 0;
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const = 0;
 protected slots:
   void setActionSlot();
 protected:
@@ -60,45 +57,52 @@ public:
   virtual void onEntry(QEvent * event ) {}
   virtual void onExit(QEvent * event ) {}
   virtual ~ParentApplicationState(){};
-  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdCOUNT; }
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdCOUNT; }
 };
 
 class LaboratoryApplicationState : public ApplicationState
 {
   Q_OBJECT
 public:
-  LaboratoryApplicationState(QState* parent) : ApplicationState(parent, "Lab", "Laboratory") {}
+  LaboratoryApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdLABORATORY), enum2string(ssc::mdLABORATORY)) {}
   virtual ~LaboratoryApplicationState(){};
-  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLABORATORY; }
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLABORATORY; }
 };
 
-//HACK
-class LungApplicationState : public ApplicationState
+class BronchoscopyApplicationState : public ApplicationState
 {
   Q_OBJECT
 public:
-  LungApplicationState(QState* parent) : ApplicationState(parent, "Lung", "Lung") {}
-  virtual ~LungApplicationState(){};
-  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLABORATORY; }
+  BronchoscopyApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdBRONCHOSCOPY), enum2string(ssc::mdBRONCHOSCOPY)) {}
+  virtual ~BronchoscopyApplicationState(){};
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdBRONCHOSCOPY; }
 };
-//HACK
 
 class NeurologyApplicationState : public ApplicationState
 {
   Q_OBJECT
 public:
-  NeurologyApplicationState(QState* parent) : ApplicationState(parent, "Nevro", "Neurology") {}
+  NeurologyApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdNEUROLOGY), enum2string(ssc::mdNEUROLOGY)) {}
   virtual ~NeurologyApplicationState() {}
-  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdNEUROLOGY; }
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdNEUROLOGY; }
 };
 
-class LaparascopyApplicationState : public ApplicationState
+class LaparoscopyApplicationState : public ApplicationState
 {
   Q_OBJECT
 public:
-  LaparascopyApplicationState(QState* parent) : ApplicationState(parent, "Lap", "Laparascopy") {}
-  virtual ~LaparascopyApplicationState() {}
-  virtual ssc::MEDICAL_DOMAIN getMedicalDomain() const { return ssc::mdLAPAROSCOPY; }
+  LaparoscopyApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdLAPAROSCOPY), enum2string(ssc::mdLAPAROSCOPY)) {}
+  virtual ~LaparoscopyApplicationState() {}
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdLAPAROSCOPY; }
+};
+
+class EndovascularApplicationState : public ApplicationState
+{
+  Q_OBJECT
+public:
+  EndovascularApplicationState(QState* parent) : ApplicationState(parent, enum2string(ssc::mdENDOVASCULAR), enum2string(ssc::mdENDOVASCULAR)) {}
+  virtual ~EndovascularApplicationState() {}
+  virtual ssc::CLINICAL_APPLICATION getClinicalApplication() const { return ssc::mdENDOVASCULAR; }
 };
 
 } // namespace cx

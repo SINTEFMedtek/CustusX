@@ -1,0 +1,1 @@
+Folder for adding configurations distributed witg CustusX3

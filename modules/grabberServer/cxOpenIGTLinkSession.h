@@ -30,7 +30,7 @@ public:
 
 signals:
   void frame(Frame& frame); ///< Emitted whenever the session receives a new frame
-  void queueSize(int); ///< Emitted whenever the queue size changes
+  void queueInfo(int size, int dropped); ///< Emitted whenever the queue size changes
 
 protected:
   virtual void run(); ///< Creates and connects to a socket and the OpenIGTLinkSender that sends frames to the socket.
@@ -62,12 +62,12 @@ public:
 
 public slots:
   void receiveFrameSlot(Frame& frame); ///< The slot that receives the incoming frame. It is converted and added to internal threadsafe queue.
-  void sendOpenIGTLinkImageSlot(); ///< Gets the oldest frame from the internal queue and sends it to the socket.
+  void sendOpenIGTLinkImageSlot(int sendNumberOfImages); ///< Gets the oldest frame from the internal queue and sends it to the socket.
   void errorSlot(QAbstractSocket::SocketError); ///< Slot for receiving error messages from the socket.
 
 signals:
-  void imageOnQueue(); ///< Emitted when there is a new igtl::ImageMessage is in the message queue
-  void queueSize(int); ///< Emitted whenever the queue size changes
+  void imageOnQueue(int); ///< Emitted when there is a new igtl::ImageMessage is in the message queue
+  void queueInfo(int size, int dropped); ///< Emitted whenever the queue size changes
 
 private:
   //igtl::ImageMessage::Pointer convertFrame(Frame& frame); ///< Converst the frame into a OpenIGTLink ImageMessage
@@ -80,8 +80,11 @@ private:
   QTcpSocket* mSocket; ///< The socket to send messages to.
 
   QMutex mImageMutex; ///< A lock for making the class threadsafe
-  //std::list<igtl::ImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
+  int mMaxqueueInfo;
+  int mMaxBufferSize;
   std::list<IGTLinkImageMessage::Pointer> mMutexedImageMessageQueue; ///< A threasafe internal queue
+
+  int mDroppedImages;
 
 };
 

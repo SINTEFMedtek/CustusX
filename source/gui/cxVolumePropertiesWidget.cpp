@@ -21,32 +21,33 @@ namespace cx
 /// -------------------------------------------------------
 
 ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
-  QWidget(parent)
+  WhatsThisWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
-  this->setObjectName("ActiveVolumeWidget");
   layout->setMargin(0);
 
   ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New());
   layout->addWidget(combo);
 }
 
+QString ActiveVolumeWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Active volume</h3>"
+      "<p>Displays the currently selected active volume.</p>"
+      "<p><i>Use the list to change the active volume.</i></p>"
+      "</html>";
+}
 
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 /// -------------------------------------------------------
-
 
 VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
-  QWidget(parent)
+  WhatsThisWidget(parent, "VolumeInfoWidget", "Volume Info")
 {
-  this->setObjectName("VolumeInfoWidget");
-  this->setWindowTitle("Info");
-
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
-  //toptopLayout->setMargin(0);
-
 
   QGridLayout* gridLayout = new QGridLayout;
   toptopLayout->addLayout(gridLayout);
@@ -80,6 +81,15 @@ VolumeInfoWidget::~VolumeInfoWidget()
 {
 }
 
+QString VolumeInfoWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Volume information</h3>"
+      "<p>Displays information about a selected volume.</p>"
+      "<p><i></i></p>"
+      "</html>";
+}
+
 void VolumeInfoWidget::deleteDataSlot()
 {
   if (!ssc::dataManager()->getActiveImage())
@@ -94,28 +104,13 @@ void VolumeInfoWidget::updateSlot()
   mNameAdapter->setData(ssc::dataManager()->getActiveImage());
   mUidAdapter->setData(ssc::dataManager()->getActiveImage());
 }
-
-void VolumeInfoWidget::showEvent(QShowEvent* event)
-{
-  QWidget::showEvent(event);
-}
-
-void VolumeInfoWidget::hideEvent(QCloseEvent* event)
-{
-  QWidget::closeEvent(event);
-}
-
-
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 /// -------------------------------------------------------
 
-
-VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) : QWidget(parent)
+VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
+    WhatsThisWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
-  this->setObjectName("VolumePropertiesWidget");
-  this->setWindowTitle("Volume Properties");
-
   QVBoxLayout* layout = new QVBoxLayout(this);
 
   layout->addWidget(new ActiveVolumeWidget(this));
@@ -127,6 +122,15 @@ VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) : QWidget(parent
   tabWidget->addTab(new ShadingWidget(this), "Shading");
   tabWidget->addTab(new CroppingWidget(this), "Crop");
   tabWidget->addTab(new ClippingWidget(this), "Clip");
+}
+
+QString VolumePropertiesWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Volume properties</h3>"
+      "<p>Displays and adjusts information about a selected volume.</p>"
+      "<p><i>Click the tabs to see what properties can be changed.</i></p>"
+      "</html>";
 }
 
 }

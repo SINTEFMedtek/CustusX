@@ -13,3 +13,4 @@ Build_Eclipse_NMake/
 CustusX3.git.cpp
 source/gui/icons/open_icon_library/png/64x64/.DS_Store
 *.DS_Store
+Build_nmake64

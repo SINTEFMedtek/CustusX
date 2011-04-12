@@ -4,7 +4,6 @@
 #include "cxWhatsThisWidget.h"
 #include "cxDataInterface.h"
 
-class QGroupBox;
 class QPushButton;
 class QVBoxLayout;
 
@@ -24,7 +23,7 @@ class ImageSegmentationAndCenterlineWidget : public WhatsThisWidget
   Q_OBJECT
 
 public:
-  ImageSegmentationAndCenterlineWidget(QWidget* parent);
+  ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~ImageSegmentationAndCenterlineWidget();
   virtual QString defaultWhatsThis() const = 0;
 

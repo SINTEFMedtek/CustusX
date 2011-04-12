@@ -26,13 +26,14 @@ public:
   void handleArguments(QStringList& arguments);
 
 private slots:
-  void queueSizeSlot(int queueSize);
+  void queueInfoSlot(int queueInfo, int imagesDropped);
 
 private:
   GrabberServerWidget* mGrabberServerWidget;
   ssc::ConsoleWidget*   mConsoleWidget;
 
-  QLabel* mQueueSizeLabel;
+  QLabel* mQueueInfoLabel;
+  QLabel* mImagesDroppedLabel;
 };
 
 }

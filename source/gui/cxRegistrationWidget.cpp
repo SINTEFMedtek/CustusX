@@ -11,7 +11,6 @@
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "cxRegistrationManager.h"
 #include "sscDataManager.h"
 #include "cxView3D.h"
@@ -22,16 +21,12 @@
 
 namespace cx
 {
-RegistrationWidget::RegistrationWidget(QWidget* parent) :
-  WhatsThisWidget(parent),
+RegistrationWidget::RegistrationWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  WhatsThisWidget(parent, objectName, windowTitle),
   mVerticalLayout(new QVBoxLayout(this)),
   mLandmarkTableWidget(new QTableWidget(this)),
   mAvarageAccuracyLabel(new QLabel(QString(" "), this))
 {
-  //widget
-  this->setObjectName("RegistrationWidget");
-  this->setWindowTitle("Registration");
-
   //table widget
   connect(mLandmarkTableWidget, SIGNAL(cellClicked(int, int)), this, SLOT(cellClickedSlot(int, int)));
   connect(mLandmarkTableWidget, SIGNAL(cellChanged(int,int)), this, SLOT(cellChangedSlot(int,int)));
@@ -41,6 +36,15 @@ RegistrationWidget::RegistrationWidget(QWidget* parent) :
 
 RegistrationWidget::~RegistrationWidget()
 {
+}
+
+QString RegistrationWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Registration.</h3>"
+      "<p>Interface for registrating.</p>"
+      "<p><i></i></p>"
+      "</html>";
 }
 
 void RegistrationWidget::activeImageChangedSlot()

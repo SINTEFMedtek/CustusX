@@ -1,7 +1,6 @@
 #include "cxUSAcqusitionWidget.h"
 
 #include <QtGui>
-#include <QSettings>
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
 #include "sscToolManager.h"
@@ -10,14 +9,15 @@
 #include "cxStateMachineManager.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
-#include "cxDataLocations.h"
+#include "cxSettings.h"
 #include "cxToolPropertiesWidget.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
 
 USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString())
+    TrackedRecordWidget(parent, settings()->value("Ultrasound/acquisitionName").toString())
 {
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
@@ -27,6 +27,7 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
@@ -139,7 +140,7 @@ void USAcqusitionWidget::fileMakerWriteFinished()
 
   mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
 
-  if (DataLocations::getSettings()->value("Automation/autoReconstruct").toBool())
+  if (settings()->value("Automation/autoReconstruct").toBool())
   {
     mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
     connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
@@ -161,8 +162,9 @@ void USAcqusitionWidget::dominantToolChangedSlot()
 //  if(!cxTool)
 //    return;
 
-  if (tool==this->getTool())
-    return;
+  // might need to just update a tool : when manual tool is impued with probe characteristics
+//  if (tool==this->getTool())
+//    return;
 
   if (this->getTool() && this->getTool()->getProbe())
     disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
@@ -182,7 +184,7 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 
 void USAcqusitionWidget::startedSlot()
 {
-  mRecordSessionWidget->setDescription(DataLocations::getSettings()->value("Ultrasound/acquisitionName").toString());
+  mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
   mRTRecorder->startRecord();
 }
 

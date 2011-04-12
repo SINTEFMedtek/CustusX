@@ -2,6 +2,7 @@ SET (LIB repManager)
 
 SET( CX_QT_MOC_HEADER_FILES
     cxLandmarkRep.h
+    sscOrientationAnnotation3DRep.h
     cxRepManager.h
 )
 
@@ -12,6 +13,8 @@ SET ( ${LIB}_repManager
     cxImageLandmarkRep.cpp
     cxPatientLandmarkRep.h
     cxPatientLandmarkRep.cpp
+    sscOrientationAnnotation3DRep.h
+    sscOrientationAnnotation3DRep.cpp
     cxRepManager.h
     cxRepManager.cpp
 )

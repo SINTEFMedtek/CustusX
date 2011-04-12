@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>>Aurora</type>
+</tracker>
+
+<toolfile type="aurora" reference="yes">../Tools/AuroraReference_port1.xml</toolfile>
+<toolfile type="aurora" reference="no">../Tools/Aurora_Hypofyseprobe_port2.xml</toolfile>
+
+</configuration>

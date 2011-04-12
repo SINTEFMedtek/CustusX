@@ -1,7 +1,7 @@
 #ifndef CXNAVIGATIONWIDGET_H_
 #define CXNAVIGATIONWIDGET_H_
 
-#include <QWidget>
+#include "cxWhatsThisWidget.h"
 
 class QGroupBox;
 class QRadioButton;
@@ -15,36 +15,29 @@ namespace cx
 {
 
 /**
- * \class cxNavigationWidget.h
+ * \class NavigationWidget
  *
- * \brief
+ * \brief Widget for controlling camera follow style.
  *
  * \date 22. feb. 2010
- * \author: jbake
+ * \author: Janne Beate Bakeng, SINTEF
  */
-class NavigationWidget : public QWidget
+class NavigationWidget : public WhatsThisWidget
 {
   Q_OBJECT
 
 public:
-  NavigationWidget(QWidget* parent); ///<
-  ~NavigationWidget(); ///< empty
+  NavigationWidget(QWidget* parent);
+  ~NavigationWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void radioButtonToggledSlot(bool checked);
   void trackingConfiguredSlot();
-//  void trackingInitializedSlot();
-//  void trackingStartedSlot();
-//  void trackingStoppedSlot();
-
 
 protected:
   QVBoxLayout*  mVerticalLayout; ///< vertical layout is used
-
-//  //status
-//  QGroupBox*    mTrackingStatusGroupBox; ///< widget for showing tracking status
-//  QVBoxLayout*  mTrackingStatusGroupLayout; ///< layout for the trackingstatusgroupbox
-//  QLabel*       mTrackingStatusLabel; ///< label showing tracking status
 
   //camera settings
   QGroupBox*    mCameraGroupBox; ///< widget to put all camera specific settings
@@ -55,9 +48,6 @@ protected:
   QVBoxLayout*  mCameraGroupLayout; ///< layout for the cameragroupbox
 
   CameraStylePtr mCameraStyle;
-
-
-
 };
 }
 #endif /* CXNAVIGATIONWIDGET_H_ */

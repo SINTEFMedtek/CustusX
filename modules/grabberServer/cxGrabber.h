@@ -103,6 +103,7 @@ private:
   */
   class ObjectiveC;
   ObjectiveC* mObjectiveC;
+  bool mSuperVideo;
 };
 
 typedef boost::shared_ptr<class Grabber> GrabberPtr;

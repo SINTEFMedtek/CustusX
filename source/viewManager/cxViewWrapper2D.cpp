@@ -17,7 +17,6 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
@@ -29,10 +28,6 @@
 #include "sscGeometricRep2D.h"
 #include "sscTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
-
-#ifdef USE_GLX_SHARED_CONTEXT
-  #define USE_2D_GPU_RENDER
-#endif
 
 namespace cx
 {
@@ -166,9 +161,11 @@ void ViewWrapper2D::addReps()
   mToolRep2D = ssc::ToolRep2D::New("Tool2D_"+mView->getName());
   mToolRep2D->setSliceProxy(mSliceProxy);
   mToolRep2D->setUseCrosshair(true);
+//  mToolRep2D->setUseToolLine(false);
   mView->addRep(mToolRep2D);
 }
 
+#ifdef USE_2D_GPU_RENDER
 /**Hack: gpu slicer recreate and fill with images every time,
  * due to internal instabilities.
  *
@@ -186,6 +183,7 @@ void ViewWrapper2D::resetMultiSlicer()
     mMultiSliceRep->setImages(mViewGroup->getImages());
   this->viewportChanged();
 }
+#endif //USE_2D_GPU_RENDER
 
 ssc::Vector3D ViewWrapper2D::viewToDisplay(ssc::Vector3D p_v) const
 {
@@ -310,6 +308,11 @@ void ViewWrapper2D::initializePlane(ssc::PLANE_TYPE plane)
 
   // do this to force sync global and local type - must think on how we want this to work
   this->changeOrientationType(getOrientationType());
+
+  bool isOblique = mSliceProxy->getComputer().getOrientationType()==ssc::otOBLIQUE;
+  mToolRep2D->setUseCrosshair(!isOblique);
+//  mToolRep2D->setUseToolLine(!isOblique);
+
 }
 
 /** get the orientation type directly from the slice proxy
@@ -373,25 +376,34 @@ void ViewWrapper2D::updateView()
   if (!images.empty())
     image = images.back(); // always show last in vector
 
-  QString text;
-
   if (image)
   {
     ssc::Vector3D c = image->get_rMd().coord(image->boundingBox().center());
     mSliceProxy->setDefaultCenter(c);
-    text = image->getName();
   }
 
+  QStringList text;
   // slice rep
 #ifdef USE_2D_GPU_RENDER
   this->resetMultiSlicer();
 //  mMultiSliceRep->setImages(images);
+
+  text = this->getAllDataNames();
+  mDataNameText->setText(0, text.join("\n"));
 #else
   mSliceRep->setImage(image);
+
+  // list all meshes and one image.
+  std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
+  for (unsigned i = 0; i < mesh.size(); ++i)
+    text << qstring_cast(mesh[i]->getName());
+  if (image)
+    text << image->getName();
 #endif
 
   //update data name text rep
-  mDataNameText->setText(0, text);
+  mDataNameText->setText(0, text.join("\n"));
+  mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
 }
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
@@ -421,6 +433,7 @@ void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
 //  mSliceRep = ssc::SliceRepSW::New("SliceRep_"+mView->getName());
 //  mSliceRep->setSliceProxy(mSliceProxy);
 //  mView->addRep(mSliceRep);
+  this->updateView();
 }
 
 void ViewWrapper2D::meshRemoved(const QString& uid)
@@ -431,6 +444,7 @@ void ViewWrapper2D::meshRemoved(const QString& uid)
   mView->removeRep(mGeometricRep[uid]);
   mGeometricRep.erase(uid);
  // std::cout << "removed mesh " << uid << std::endl;
+  this->updateView();
 }
 
 

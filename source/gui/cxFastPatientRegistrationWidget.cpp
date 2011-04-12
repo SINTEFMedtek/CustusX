@@ -6,10 +6,8 @@
 namespace cx
 {
 FastPatientRegistrationWidget::FastPatientRegistrationWidget(QWidget* parent) :
-    PatientRegistrationWidget(parent)
+    PatientRegistrationWidget(parent, "FastPatientRegistrationWidget", "Fast Patient Registration")
 {
-  this->setObjectName("FastPatientRegistrationWidget");
-  this->setWindowTitle("Fast Patient Registration");
 }
 
 FastPatientRegistrationWidget::~FastPatientRegistrationWidget()

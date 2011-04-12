@@ -17,7 +17,6 @@ class QDomDocument;
 class QGridLayout;
 class QDomNode;
 class QString;
-class QSettings;
 
 class UsConfig : public QWidget
 {
@@ -88,7 +87,5 @@ protected:
   int mBottomEdge;///< Selecetd BottomEdge
   double mPixelWidth;///< Selected Pixel width
   double mPixelHeight;///< Selected Pixel height
-
-  QSettings* mSettings; ///< Settings that should be saved from session to session
 };
 #endif //USCONFIG_H_

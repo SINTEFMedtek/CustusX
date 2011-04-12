@@ -25,7 +25,7 @@
 #include "cxCreateProbeDataFromConfiguration.h"
 #include "sscVolumeHelpers.h"
 #include "cxUsReconstructionFileReader.h"
-
+#include "cxPresetTransferFunctions3D.h"
 #include "cxToolManager.h"
 #include "sscManualTool.h"
 
@@ -56,6 +56,16 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
 
   connect(mOrientationAdapter.get(), SIGNAL(valueWasSet()),   this,                      SLOT(setSettings()));
   connect(this,                      SIGNAL(paramsChanged()), mOrientationAdapter.get(), SIGNAL(changed()));
+
+  cx::PresetTransferFunctions3D presets;
+  mPresetTFAdapter = StringDataAdapterXml::initialize("Preset", "",
+      "Preset transfer function to apply to the reconstructed volume",
+      "US B-Mode",
+      presets.getPresetList(),
+      mSettings.getElement());
+
+  connect(mPresetTFAdapter.get(), SIGNAL(valueWasSet()),   this,                      SLOT(setSettings()));
+  connect(this,                      SIGNAL(paramsChanged()), mPresetTFAdapter.get(), SIGNAL(changed()));
 
   
   
@@ -636,6 +646,9 @@ ImagePtr Reconstructer::generateOutputVolume()
 
   ImagePtr image = dataManager()->createImage(data, uid + "_%1", name + " %1", filePath);
   image->get_rMd_History()->setRegistration(mOutputVolumeParams.m_rMd);
+
+  cx::PresetTransferFunctions3D presets;
+  presets.load(mPresetTFAdapter->getValue(), image);
 
   return image;
 }

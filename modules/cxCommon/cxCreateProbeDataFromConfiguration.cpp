@@ -20,6 +20,8 @@ ssc::ProbeData createProbeDataFromConfiguration(ProbeXmlConfigParser::Configurat
   imageData.mSpacing = ssc::Vector3D(config.mPixelWidth, config.mPixelHeight, 1);
   imageData.mSize = QSize(config.mImageWidth, config.mImageHeight);
   imageData.mOrigin_p = ssc::Vector3D(config.mOriginCol, config.mOriginRow, 0);
+  imageData.mClipRect_p = ssc::DoubleBoundingBox3D(config.mLeftEdge,config.mRightEdge,config.mTopEdge,config.mBottomEdge,0,0);
+
   // find the origin in a mm-based, lower-left-corner coord space:
 //  ssc::Vector3D c(config.mOriginCol, config.mImageHeight - config.mOriginRow - 1, 0);
 //  c = multiply_elems(c, imageData.mSpacing);

@@ -5,6 +5,7 @@
 #include "cxDataInterface.h"
 class QPushButton;
 class QLabel;
+class QCheckBox;
 
 namespace cx
 {
@@ -20,16 +21,15 @@ class ImportDataWizard : public QDialog
 {
   Q_OBJECT
 public:
-//  ImportDataWizard(ssc::DataPtr data, QWidget* parent=NULL);
   ImportDataWizard(QString filename, QWidget* parent=NULL);
-  ~ImportDataWizard();
+  virtual ~ImportDataWizard();
 
 public:
   void showEvent(QShowEvent* event);
 private slots:
   void updateImportTransformButton();
-  void importTransformSlot();
   void importDataSlot();
+  void acceptedSlot();
 private:
   void setInitialGuessForParentFrame();
   ssc::DataPtr mData;
@@ -37,10 +37,14 @@ private:
   QLabel* mUidLabel;
   QLabel* mNameLabel;
   SetParentFrameStringDataAdapterPtr mParentFrameAdapter;
-  QPushButton* mImportTransformButton;
   QWidget* mParentFrameCombo;
   QPushButton* mOkButton;
+  QCheckBox* mNiftiFormatCheckBox;
+  QCheckBox* mTransformFromParentFrameCheckBox;
 
+  void convertFromNifti1Coordinates();
+  void importParentTransform();
 };
 }//namespace cx
+
 #endif /* CXIMPORTDATAWIZARD_H_ */
