@@ -42,7 +42,7 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 
-  bool useMask = true; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
+  bool useMask = false; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
   mRTStream.reset(new RealTimeStreamGraphics(useMask));
 
   mTracer.reset(new ToolTracer());
