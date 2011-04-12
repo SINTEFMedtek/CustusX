@@ -21,6 +21,7 @@ include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
 
 SET(${LIBNAME}_MOC_HDRS
   UsConfigGui.h
+  cxSettings.h
 )
 
 # SSC
@@ -34,6 +35,11 @@ ELSE(WIN32)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
 ENDIF(WIN32)
 
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (WIN32)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(WIN32)
+
 add_library(cxCommon
     cxDataLocations.cpp
     cxDataLocations.h
@@ -43,6 +49,8 @@ add_library(cxCommon
     cxCreateProbeDataFromConfiguration.cpp
     UsConfigGui.h
     UsConfigGui.cpp
+    cxSettings.h
+    cxSettings.cpp
     ${${LIBNAME}_MOC_SRCS}
     )
     

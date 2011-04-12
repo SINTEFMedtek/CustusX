@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>>Aurora</type>
+</tracker>
+
+<toolfile type="aurora" reference="yes">../Tools/AuroraReference.xml</toolfile>
+<toolfile type="aurora" reference="no">../Tools/AuroraPointer.xml</toolfile>
+
+</configuration>

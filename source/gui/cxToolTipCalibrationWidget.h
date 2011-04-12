@@ -6,8 +6,6 @@
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 
-class QShowEvent;
-class QHideEvent;
 class QPushButton;
 class QGroupBox;
 class QLineEdit;
@@ -31,10 +29,6 @@ public:
   ~ToolTipCalibrationWidget();
   virtual QString defaultWhatsThis() const;
 
-protected:
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
-
 private:
   class ToolTipCalibrateWidget* mCalibrationWidget;
   class ToolTipSampleWidget*      mSampleWidget;
@@ -51,10 +45,6 @@ public:
   ToolTipCalibrateWidget(QWidget* parent);
   ~ToolTipCalibrateWidget();
   virtual QString defaultWhatsThis() const;
-
-protected:
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
 
 private slots:
   void calibrateSlot();
@@ -84,10 +74,6 @@ public:
   ToolTipSampleWidget(QWidget* parent);
   ~ToolTipSampleWidget();
   virtual QString defaultWhatsThis() const;
-
-protected:
-  virtual void showEvent(QShowEvent* event);
-  virtual void hideEvent(QHideEvent* event);
 
 private slots:
   void saveFileSlot();

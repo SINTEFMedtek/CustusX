@@ -66,7 +66,7 @@ public:
   virtual ~MacGrabberServerWidget(){};
 
 signals:
-  void queueSize(int);
+  void queueInfo(int size, int dropped);
 
 protected:
   virtual void connectGrabberServer(); ///< Connects to a MacGrabberServer

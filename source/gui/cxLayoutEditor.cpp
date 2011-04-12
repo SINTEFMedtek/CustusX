@@ -11,6 +11,7 @@
 #include "sscTypeConversions.h"
 #include "sscDefinitionStrings.h"
 #include "sscUtilHelpers.h"
+#include "cxViewManager.h"
 
 namespace cx
 {
@@ -101,8 +102,9 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
   menu.addSeparator();
 
   // actions for view group
+  int viewGroupCount = viewManager()->getViewGroups().size();
   QActionGroup* groupActions = new QActionGroup(this);
-  for (int i=0; i<3; ++i)
+  for (int i=0; i<viewGroupCount; ++i)
   {
     QAction* action = new QAction(QString("Group %1").arg(i), groupActions);
     action->setData(QVariant(i));

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<toolfile type="polaris" reference="yes">../Tools/ProbeCalibrationArm.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Ultrasonix_L14-5_03-065-0153_calibration.xml</toolfile>
+
+</configuration>

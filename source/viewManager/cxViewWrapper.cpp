@@ -204,9 +204,11 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
   else
     action->setIcon(QIcon(":/icons/surface.png"));
 
+//  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;
   if (uid.contains(mLastDataActionUid))
   {
     action->setText("    " + action->text());
+//    std::cout << "indenting " << action->text() << std::endl;
   }
   else
   {
@@ -248,7 +250,7 @@ void ViewWrapper::dataActionSlot()
 
   if (firstData)
   {
-    Navigation().centerToGlobalImageCenter(); // reset center for convenience
+    Navigation().centerToGlobalDataCenter(); // reset center for convenience
     mViewGroup->requestInitialize();
   }
 }
@@ -258,4 +260,19 @@ void ViewWrapper::connectContextMenu(ssc::View* view)
    connect(view, SIGNAL(customContextMenuRequested(const QPoint &)),
        this, SLOT(contextMenuSlot(const QPoint &)));
 }
+
+QStringList ViewWrapper::getAllDataNames() const
+{
+  std::vector<ssc::DataPtr> data = mViewGroup->getData();
+
+  QStringList text;
+  for (unsigned i = 0; i < data.size(); ++i)
+  {
+    text << qstring_cast(data[i]->getName());
+  }
+  std::reverse(text.begin(), text.end());
+  return text;
+}
+
+
 }//namespace cx

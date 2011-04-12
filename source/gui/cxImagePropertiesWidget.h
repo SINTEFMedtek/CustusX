@@ -4,9 +4,51 @@
 #include <vector>
 #include <QtGui>
 #include "sscDoubleWidgets.h"
+#include "cxTransferFunctionWidget.h"
 
 namespace cx
 {
+
+/*
+ *
+ */
+class TransferFunction2DColorWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  TransferFunction2DColorWidget(QWidget* parent);
+  virtual ~TransferFunction2DColorWidget() {}
+
+public slots:
+  void activeImageChangedSlot();
+
+protected:
+  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
+  TransferFunctionColorWidget* mTransferFunctionColorWidget;
+  DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataLevel;
+};
+
+/*
+ *
+ */
+class TransferFunction2DOpacityWidget : public QWidget
+{
+  Q_OBJECT
+
+public:
+  TransferFunction2DOpacityWidget(QWidget* parent);
+  virtual ~TransferFunction2DOpacityWidget() {}
+
+public slots:
+  void activeImageChangedSlot();
+
+protected:
+  TransferFunctionAlphaWidget* mTransferFunctionAlphaWidget;
+  DoubleDataAdapterImageTFDataBasePtr mDataAlpha, mDataLLR;
+};
+
+
 /**
  * \class ImagePropertiesWidget
  *
@@ -28,8 +70,11 @@ protected:
 private:
   ImagePropertiesWidget();
 
-  ssc::SliderGroupWidget* mLevelWidget;
-  ssc::SliderGroupWidget* mWindowWidget;
+//  TransferFunction2DWidget* mTF2DWidget;
+//  TransferFunctionPresetWidget* mTFPresetWidget;
+
+//  ssc::SliderGroupWidget* mLevelWidget;
+//  ssc::SliderGroupWidget* mWindowWidget;
 };
 
 }//end namespace cx

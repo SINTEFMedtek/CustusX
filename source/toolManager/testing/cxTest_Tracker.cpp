@@ -4,10 +4,10 @@
 
 void TestTracker::setUp()
 {
-  mValidPolarisInternal.mType = cx::Tracker::TRACKER_POLARIS;
+  mValidPolarisInternal.mType = ssc::tsPOLARIS;
   mValidPolarisInternal.mLoggingFolderName = QDir::currentPath();
 
-  mValidAuroraInternal.mType = cx::Tracker::TRACKER_AURORA;
+  mValidAuroraInternal.mType = ssc::tsAURORA;
   mValidAuroraInternal.mLoggingFolderName = QDir::currentPath();
 }
 
@@ -17,13 +17,13 @@ void TestTracker::tearDown()
 
 void TestTracker::testConstructor()
 {
-  cx::Tracker::InternalStructure defaultInternalStructure;
-  cx::Tracker trackerWithDefaultInternalStructure(defaultInternalStructure);
+  cx::IgstkTracker::InternalStructure defaultInternalStructure;
+  cx::IgstkTracker trackerWithDefaultInternalStructure(defaultInternalStructure);
   CPPUNIT_ASSERT_MESSAGE("Tracker with default internal is valid when it shouldn't be.", !trackerWithDefaultInternalStructure.isValid());
 
-  cx::Tracker polarisTrackerWithValidInternal(mValidPolarisInternal);
+  cx::IgstkTracker polarisTrackerWithValidInternal(mValidPolarisInternal);
   CPPUNIT_ASSERT_MESSAGE("Polaris tracker is not valid.", polarisTrackerWithValidInternal.isValid());
 
-  cx::Tracker auroraTrackerWithValidInternal(mValidAuroraInternal);
+  cx::IgstkTracker auroraTrackerWithValidInternal(mValidAuroraInternal);
   CPPUNIT_ASSERT_MESSAGE("Aurora tracker is not valid.", auroraTrackerWithValidInternal.isValid());
 }
