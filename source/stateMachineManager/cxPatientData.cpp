@@ -415,7 +415,7 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
   doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 
   QDomElement versionName = doc.createElement("version_name");
-  versionName.appendChild(doc.createTextNode(stateManager()->getVersionNumber()));
+  versionName.appendChild(doc.createTextNode(stateManager()->getVersionName()));
   doc.appendChild(versionName);
 
   QDomElement patientNode = doc.createElement("patient");

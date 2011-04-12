@@ -124,7 +124,7 @@ StateManager::StateManager()
 StateManager::~StateManager()
 {}
 
-QString StateManager::getVersionNumber()
+QString StateManager::getVersionName()
 {
   QString versionName;
 #ifdef VERSION_NUMBER_VERBOSE
