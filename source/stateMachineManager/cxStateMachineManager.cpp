@@ -124,6 +124,16 @@ StateManager::StateManager()
 StateManager::~StateManager()
 {}
 
+QString StateManager::getVersionNumber()
+{
+  QString versionName;
+#ifdef VERSION_NUMBER_VERBOSE
+  versionName = QString("%1").arg(VERSION_NUMBER_VERBOSE);
+#else
+#endif
+  return versionName;
+}
+
 WorkflowStateMachinePtr StateManager::getWorkflow()
 {
   return mWorkflowStateMachine;
