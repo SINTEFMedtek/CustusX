@@ -33,7 +33,7 @@ public:
 
 signals:
   void ready(bool ready); ///< Emitted when the grabberserver is fully set up
-  void queueSize(int); ///< Emitted whenever the queue size changes
+  void queueInfo(int size, int dropped); ///< Emitted whenever the queue size changes
 
 protected slots:
   void readySlot(); ///< Determines when the grabberserver is fully set up

@@ -11,12 +11,13 @@ namespace cx
 MainWindow::MainWindow(QStringList arguments) :
   QMainWindow(0),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
-  mQueueSizeLabel(new QLabel("Queue size: 0"))
+  mQueueInfoLabel(new QLabel("Queue size: 0")),
+  mImagesDroppedLabel(new QLabel("Images dropped: 0"))
 {
   this->setCentralWidget(new QWidget());
   mGrabberServerWidget = new MacGrabberServerWidget(this->centralWidget());
   this->setCentralWidget(mGrabberServerWidget);
-  connect(mGrabberServerWidget, SIGNAL(queueSize(int)), this, SLOT(queueSizeSlot(int)));
+  connect(mGrabberServerWidget, SIGNAL(queueInfo(int, int)), this, SLOT(queueInfoSlot(int, int)));
   
   QDockWidget* consoleDockWidget = new QDockWidget(mConsoleWidget->windowTitle(), this);
   consoleDockWidget->setObjectName(mConsoleWidget->objectName() + "DockWidget");
@@ -25,7 +26,8 @@ MainWindow::MainWindow(QStringList arguments) :
   consoleDockWidget->setVisible(true); // default visibility
 
   this->setMinimumSize(800,600);
-  this->statusBar()->addPermanentWidget(mQueueSizeLabel);
+  this->statusBar()->addPermanentWidget(mQueueInfoLabel);
+  this->statusBar()->addPermanentWidget(mImagesDroppedLabel);
 
   this->handleArguments(arguments);
 }
@@ -41,8 +43,9 @@ void MainWindow::handleArguments(QStringList& arguments)
   }
 }
 
-void MainWindow::queueSizeSlot(int queueSize)
+void MainWindow::queueInfoSlot(int queueInfo, int imagesDropped)
 {
-  mQueueSizeLabel->setText("Queue size: "+qstring_cast(queueSize));
+  mQueueInfoLabel->setText("Queue size: "+qstring_cast(queueInfo));
+  mImagesDroppedLabel->setText("Images dropped: "+qstring_cast(imagesDropped));
 }
 }//namespace cx
