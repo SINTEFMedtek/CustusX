@@ -35,7 +35,7 @@ class PatientRegistrationWidget : public RegistrationWidget
   Q_OBJECT
 
 public:
-  PatientRegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
+  PatientRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle); ///< sets up layout and connects signals and slots
   virtual ~PatientRegistrationWidget(); ///< empty
   virtual QString defaultWhatsThis() const;
 

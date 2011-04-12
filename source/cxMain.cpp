@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   cx::MainWindow::initialize();
 
   cx::MainWindow* mainWin = new cx::MainWindow;
-  mainWin->show();
+  //mainWin->show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   mainWin->activateWindow();
 #endif

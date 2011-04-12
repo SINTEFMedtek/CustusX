@@ -14,7 +14,7 @@ namespace cx
 {
 
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(QWidget* parent) :
-    WhatsThisWidget(parent),
+    WhatsThisWidget(parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
     mLTSRatioSpinBox(new QSpinBox()),
     mLinearCheckBox(new QCheckBox()),
     mRegisterButton(new QPushButton("Register")),

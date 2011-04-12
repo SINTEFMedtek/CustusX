@@ -5,7 +5,6 @@
 #include "boost/bind.hpp"
 #include "boost/function.hpp"
 
-#include <QSettings>
 #include <QAction>
 #include <QMenu>
 
@@ -17,7 +16,6 @@
 #include <vtkRenderer.h>
 #include <vtkInteractorObserver.h>
 
-#include "cxDataLocations.h"
 #include "sscView.h"
 #include "sscSliceProxy.h"
 #include "sscSlicerRepSW.h"
@@ -25,9 +23,7 @@
 #include "sscOrientationAnnotationRep.h"
 #include "sscDisplayTextRep.h"
 #include "sscMessageManager.h"
-#include "cxToolManager.h"
 #include "sscSlicePlanes3DRep.h"
-#include "cxRepManager.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
 #include "sscProbeRep.h"
@@ -35,40 +31,18 @@
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
-#include "cxCameraControl.h"
 #include "sscRTSource.h"
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
+#include "sscOrientationAnnotation3DRep.h"
+#include "cxSettings.h"
+#include "cxToolManager.h"
+#include "cxRepManager.h"
+#include "cxCameraControl.h"
 
 
 namespace cx
 {
-
-//class InteractionCallback : public vtkCommand
-//{
-//  typedef boost::function<void ()> CallbackType;
-//public:
-//  InteractionCallback() {}
-//  static InteractionCallback* New() {return new InteractionCallback;}
-//  void setCallback(CallbackType f)
-//  {
-//   mCallback = f;
-//  }
-//  virtual void Execute(vtkObject* caller, unsigned long, void*)
-//  {
-//    mCallback();
-////    std::cout << "callback" << std::endl;
-//  }
-//
-//private:
-//  CallbackType mCallback;
-//};
-
-
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
-
 
 ssc::AxesRepPtr ToolAxisConnector::getAxis_t()
 {
@@ -128,7 +102,6 @@ void ToolAxisConnector::visibleSlot()
 ///--------------------------------------------------------
 
 
-
 ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 {
   mShowAxes = false;
@@ -141,8 +114,13 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
-  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
-  mProbeRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
+  mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
+
+//  ssc::ToolRep3DPtr toolRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
+
+//  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
+  connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
+  mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -154,9 +132,14 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mDataNameText->addText(ssc::Vector3D(0,1,0), "not initialized", ssc::Vector3D(0.02, 0.02, 0.0));
   mView->addRep(mDataNameText);
 
+  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(toolsAvailableSlot()));
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(toolsAvailableSlot()));
   connect(ssc::dataManager(), SIGNAL(activeImageChanged(const QString&)), this, SLOT(activeImageChangedSlot()));
   this->toolsAvailableSlot();
+
+  mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
+  mView->addRep(mAnnotationMarker);
+  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
 //  mInteractorCallback = new InteractionCallback;
 //  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
@@ -167,6 +150,8 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
 ViewWrapper3D::~ViewWrapper3D()
 {
+//  std::cout << "destroying " << this << " "<< mView->getUid() << std::endl;
+
   if (mView)
   {
     mView->removeReps();
@@ -175,38 +160,15 @@ ViewWrapper3D::~ViewWrapper3D()
   }
 }
 
-//void ViewWrapper3D::test(double v)
-//{
-//  ssc::Vector3D p0(-1,-1, v);
-//  ssc::Vector3D p1( 1,-1, v);
-//  ssc::Vector3D p2(-1, 1, v);
-//  mView->getRenderer()->ViewToWorld(p0[0],p0[1],p0[2]);
-//  mView->getRenderer()->ViewToWorld(p1[0],p1[1],p1[2]);
-//  mView->getRenderer()->ViewToWorld(p2[0],p2[1],p2[2]);
-////  std::cout << "    vp_w " << vp_w << std::endl;
-//  std::cout << this << " dim " << setprecision(4) << (p1-p0).length() << " " << setprecision(4) << (p2-p0).length() << std::endl;
-////  double size = (vp_w.range()[0] + vp_w.range()[1]) / 2;
-//
-//}
-
-
-//void ViewWrapper3D::viewChanged()
-//{
-//  if (!mView || !mView->getRenderer())
-//    return;
-//  if (mView->getRenderer()->GetSize()[0]==0)
-//    return;
-//
-////  mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
-// double vp[4];
-//  mView->getRenderer()->GetViewport(vp);
-//  std::cout << "  vp  " << vp[0] <<" "<< vp[1] <<" "<<vp[2] <<" "<<vp[3] << std::endl;
-////  std::cout << "pp " << mView->getRenderer()->GetActiveCamera()->GetParallelProjection() << std::endl;;
-//
-//  this->test(-1);
-//  this->test(0);
-//  this->test(1);
-//}
+void ViewWrapper3D::probeRepPointPickedSlot(double x,double y,double z)
+{
+  //TODO check spaces....
+  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
+  ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
+  // TODO set center here will not do: must handle
+  ssc::dataManager()->setCenter(p_r);
+  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+}
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 {
@@ -240,6 +202,11 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   showManualTool->setChecked(ToolManager::getInstance()->getManualTool()->getVisible());
   connect(showManualTool, SIGNAL(triggered(bool)), this, SLOT(showManualToolSlot(bool)));
 
+  QAction* showOrientation = new QAction("Show Orientation", &contextMenu);
+  showOrientation->setCheckable(true);
+  showOrientation->setChecked(mAnnotationMarker->getVisible());
+  connect(showOrientation, SIGNAL(triggered(bool)), this, SLOT(showOrientationSlot(bool)));
+
   QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
   showToolPath->setCheckable(true);
   ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
@@ -264,6 +231,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addAction(centerImageAction);
   contextMenu.addAction(centerToolAction);
   contextMenu.addAction(showAxesAction);
+  contextMenu.addAction(showOrientation);
   contextMenu.addSeparator();
   contextMenu.addAction(showManualTool);
   contextMenu.addAction(showRefTool);
@@ -295,8 +263,8 @@ void ViewWrapper3D::showToolPathSlot(bool checked)
     activeRep3D->getTracer()->start();
   }
 
-  DataLocations::getSettings()->setValue("showToolPath", checked);
-//  showToolPath->setChecked(DataLocations::getSettings()->value("showToolPath"));
+  settings()->setValue("showToolPath", checked);
+//  showToolPath->setChecked(settings()->value("showToolPath"));
 //  ssc::toolManager()->getDominantTool()->setShowPath(checked);
 }
 
@@ -365,9 +333,16 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 
 void ViewWrapper3D::showManualToolSlot(bool visible)
 {
-  DataLocations::getSettings()->setValue("showManualTool", visible);
+  settings()->setValue("showManualTool", visible);
   ToolManager::getInstance()->getManualTool()->setVisible(visible);
 }
+
+void ViewWrapper3D::showOrientationSlot(bool visible)
+{
+  settings()->setValue("View3D/showOrientationAnnotation", visible);
+  mAnnotationMarker->setVisible(visible);
+}
+
 
 void ViewWrapper3D::resetCameraActionSlot()
 {
@@ -376,8 +351,12 @@ void ViewWrapper3D::resetCameraActionSlot()
 
 void ViewWrapper3D::centerImageActionSlot()
 {
-  Navigation().centerToImage(ssc::dataManager()->getActiveImage());
+  if (ssc::dataManager()->getActiveImage())
+    Navigation().centerToData(ssc::dataManager()->getActiveImage());
+  else
+    Navigation().centerToView(mViewGroup->getData());
 }
+
 void ViewWrapper3D::centerToolActionSlot()
 {
   Navigation().centerToTooltip();
@@ -386,7 +365,7 @@ void ViewWrapper3D::centerToolActionSlot()
 void ViewWrapper3D::showSlicePlanesActionSlot(bool checked)
 {
   mSlicePlanes3DRep->getProxy()->setVisible(checked);
-  DataLocations::getSettings()->setValue("showSlicePlanes", checked);
+  settings()->setValue("showSlicePlanes", checked);
 }
 void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
 {
@@ -411,16 +390,11 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 
 void ViewWrapper3D::updateView()
 {
-  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
-
-  //update data name text rep
-  QStringList text;
-  for (unsigned i = 0; i < images.size(); ++i)
-  {
-    text << qstring_cast(images[i]->getName());
-  }
+  QStringList text = this->getAllDataNames();
   mDataNameText->setText(0, text.join("\n"));
+  mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
 }
+
 
 void ViewWrapper3D::imageRemoved(const QString& uid)
 {
@@ -513,7 +487,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(!toolRep)
     {
       toolRep = ssc::ToolRep3D::New(tool->getUid()+"_rep3d_"+this->mView->getUid());
-      if (DataLocations::getSettings()->value("showToolPath").toBool())
+      if (settings()->value("showToolPath").toBool())
         toolRep->getTracer()->start();
     }
 
@@ -526,7 +500,7 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
 
-    toolRep->setSphereRadius(DataLocations::getSettings()->value("View3D/sphereRadius").toDouble());
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
 
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
@@ -582,7 +556,7 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 {
   mSlicePlanes3DRep = ssc::SlicePlanes3DRep::New("uid");
   mSlicePlanes3DRep->setProxy(proxy);
-  bool show = DataLocations::getSettings()->value("showSlicePlanes").toBool();
+  bool show = settings()->value("showSlicePlanes").toBool();
   mSlicePlanes3DRep->getProxy()->setVisible(show); // init with default value
 
   mView->addRep(mSlicePlanes3DRep);

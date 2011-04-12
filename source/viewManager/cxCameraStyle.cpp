@@ -1,10 +1,3 @@
-/*
- * cxCameraStyle.cpp
- *
- *  Created on: Mar 9, 2011
- *      Author: dev
- */
-
 #include "cxCameraStyle.h"
 
 #include "cxView3D.h"
@@ -26,17 +19,14 @@
 namespace cx
 {
 
-/**
- */
 CameraStyle::CameraStyle() :
   mCameraStyle(DEFAULT_STYLE),
   mCameraOffset(-1)
 {
-//  mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(viewChangedSlot()));
 
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-  dominantToolChangedSlot();
+  this->dominantToolChangedSlot();
 }
 
 View3D* CameraStyle::getView() const
@@ -69,8 +59,6 @@ vtkCameraPtr CameraStyle::getCamera() const
 
 void CameraStyle::setCameraStyle(Style style, int offset)
 {
-//  ssc::messageManager()->sendDebug("View3D is trying to set the camerastyle.");
-
   if(mCameraStyle == style)
     return;
 
@@ -100,7 +88,6 @@ void CameraStyle::moveCameraToolStyleSlot(ssc::Transform3D prMt, double timestam
   ssc::Transform3D rMt = rMpr * prMt;
 
   double offset = mFollowingTool->getTooltipOffset();
-//  std::cout << "offset " << offset << std::endl;
 
   ssc::Vector3D camera_r = rMt.coord(ssc::Vector3D(0,0,offset-mCameraOffset));
   ssc::Vector3D focus_r = rMt.coord(ssc::Vector3D(0,0,offset));
@@ -132,10 +119,6 @@ void CameraStyle::activateCameraDefaultStyle()
   if (!this->getRenderer())
     return;
 
-  // removed: this swap confuses surgeon.
-  //this->getRenderer()->ResetCamera();
-  //this->getCamera()->SetClippingRange(1, 2000);
-
   mCameraStyle = DEFAULT_STYLE;
 
   ssc::messageManager()->sendInfo("Default camera style activated.");
@@ -166,28 +149,25 @@ void CameraStyle::connectTool()
 
   mFollowingTool = ssc::toolManager()->getDominantTool();
 
-  if (mFollowingTool)
-  {
-    if (!this->getView())
-      return;
-    //Need the toolrep to get the direction the camera should point in
-    ssc::ToolRep3DPtr rep = this->getToolRep();
+  if(!mFollowingTool)
+    return;
 
-    if(!rep)
-    {
-      return; //cannot set the camera to follow a tool if that tool dose not have a rep
-    }
+  if (!this->getView())
+    return;
 
-    connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+  //Need the toolrep to get the direction the camera should point in
+  ssc::ToolRep3DPtr rep = this->getToolRep();
 
-    rep->setOffsetPointVisibleAtZeroOffset(true);
-    rep->setStayHiddenAfterVisible(true);
+  if(!rep)
+    return; //cannot set the camera to follow a tool if that tool does not have a rep
 
-    ssc::messageManager()->sendInfo("Tool camera style: Following tool with uid: "+mFollowingTool->getUid());
-  }
+  connect(mFollowingTool.get(), SIGNAL(toolTransformAndTimestamp(Transform3D, double)), this, SLOT(moveCameraToolStyleSlot(Transform3D, double)));
+
+  rep->setOffsetPointVisibleAtZeroOffset(true);
+  rep->setStayHiddenAfterVisible(true);
+
+  ssc::messageManager()->sendInfo("Camera is following "+mFollowingTool->getName());
 }
-
-
 
 void CameraStyle::disconnectTool()
 {

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<configuration>
+
+<tracker> 
+  <type>Polaris</type>
+</tracker>
+
+<toolfile type="polaris" reference="yes">../Tools/ProbeCalibrationArm.xml</toolfile>
+<toolfile type="polaris" reference="no">../Tools/Hitachi_OL531_8700339_calibration.xml</toolfile>
+
+</configuration>

@@ -53,6 +53,7 @@ public:
   XmlOptionFile getSettings() const { return mSettings; }
 
   StringDataAdapterXmlPtr mOrientationAdapter;
+  StringDataAdapterXmlPtr mPresetTFAdapter;
   StringDataAdapterXmlPtr mAlgorithmAdapter;
   std::vector<DataAdapterPtr> mAlgoOptions;
   StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction

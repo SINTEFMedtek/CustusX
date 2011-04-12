@@ -2,7 +2,6 @@
 
 #include "cxToolManager.h"
 
-#include <QSettings>
 #include <QTimer>
 #include <QDir>
 #include <QList>
@@ -16,11 +15,13 @@
 #include "sscPositionStorageFile.h"
 #include "sscTime.h"
 #include "cxTool.h"
-#include "cxTracker.h"
+#include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
 #include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
+#include "cxSettings.h"
 #include "cxDataLocations.h"
+#include "cxIgstkTrackerThread.h"
 
 namespace cx
 {
@@ -35,40 +36,54 @@ ToolManager* ToolManager::getInstance()
   return dynamic_cast<ToolManager*>(ssc::ToolManager::getInstance());
 }
 
-ToolManager::ToolManager() :
-  mConfigurationFilePath(""), mLoggingFolder(""), mTracker(TrackerPtr()), mConfiguredTools(
-      new ssc::ToolManager::ToolMap), mInitializedTools(new ssc::ToolManager::ToolMap), mDominantTool(ssc::ToolPtr()),
-      mReferenceTool(ssc::ToolPtr()), mConfigured(false), mInitialized(false), mTracking(false), mPulseGenerator(
-          igstk::PulseGenerator::New()), mLastLoadPositionHistory(0)
+QStringList ToolManager::getSupportedTrackingSystems()
 {
-  mTimer = new QTimer(this);
-  connect(mTimer, SIGNAL(timeout()), this, SLOT(checkTimeoutsAndRequestTransform()));
+  QStringList retval;
+  retval = IgstkTracker::getSupportedTrackingSystems();
+  return retval;
+}
 
+ToolManager::ToolManager() :
+  mConfigurationFilePath(""),
+  mLoggingFolder(""),
+  mConfigured(false),
+  mInitialized(false),
+  mTracking(false),
+  mLastLoadPositionHistory(0)
+{
   m_rMpr_History.reset(new ssc::RegistrationHistory());
   connect(m_rMpr_History.get(), SIGNAL(currentChanged()), this, SIGNAL(rMprChanged()));
 
-  igstk::RealTimeClock::Initialize();
-
-  mPulseGenerator->RequestSetFrequency(30.0);
-  mPulseGenerator->RequestStart();
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
   this->initializeManualTool();
   this->setDominantTool("ManualTool");
+
+  // initialize config file
+  this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 ToolManager::~ToolManager()
 {
-  if(this->isTracking())
-    this->stopTracking();
+  if (mTrackerThread)
+  {
+    mTrackerThread->quit();
+    mTrackerThread->wait(2000);
+    if (mTrackerThread->isRunning())
+    {
+      mTrackerThread->terminate();
+      mTrackerThread->wait(); // forever or until dead thread
+    }
+  }
 }
 
 void ToolManager::runDummyTool(ssc::DummyToolPtr tool)
 {
   ssc::messageManager()->sendInfo("Running dummy tool "+tool->getUid());
 
-  (*mConfiguredTools)[tool->getUid()] = tool;
+  mTools[tool->getUid()] = tool;
   tool->setVisible(true);
-  this->addInitializedTool(tool->getUid());
+  connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   tool->startTracking();
   this->setDominantTool(tool->getUid());
 
@@ -81,9 +96,9 @@ void ToolManager::initializeManualTool()
   {
     //adding a manual tool as default
     mManualTool.reset(new ManualToolAdapter("ManualTool"));
-    (*mConfiguredTools)["ManualTool"] = mManualTool;
-    mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
-    this->addInitializedTool("ManualTool");
+    mTools["ManualTool"] = mManualTool;
+    mManualTool->setVisible(settings()->value("showManualTool").toBool());
+    connect(mManualTool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
   }
 
   ssc::Transform3D prMt =
@@ -91,23 +106,6 @@ void ToolManager::initializeManualTool()
       ssc::createTransformRotateY(M_PI) *
       ssc::createTransformRotateZ(M_PI_2);
   mManualTool->set_prMt(prMt);
-}
-
-void ToolManager::configureReferences()
-{
-  ToolMapIter iter = mConfiguredTools->begin();
-  while (iter != mConfiguredTools->end())
-  {
-    ssc::ToolPtr tool = (*iter).second;
-    if (tool->getType() == ssc::Tool::TOOL_REFERENCE)
-    {
-      mReferenceTool = tool;
-      connect(this, SIGNAL(rMprChanged()), this, SLOT(updateReferenceTransformSlot()));
-      ssc::messageManager()->sendInfo("Reference set to be "+mReferenceTool->getName());
-      return;
-    }
-    iter++;
-  }
 }
 
 bool ToolManager::isConfigured() const
@@ -124,44 +122,81 @@ bool ToolManager::isTracking() const
 }
 void ToolManager::configure()
 {
-  // << "Inside configure" << std::endl;
   if(mConfigurationFilePath.isEmpty() || !QFile::exists(mConfigurationFilePath))
   {
     ssc::messageManager()->sendWarning("Configuration file is not valid, could not configure the toolmanager.");
     return;
   }
 
-  ToolConfigurationParser toolConfigurationParser(mConfigurationFilePath, mLoggingFolder);
-  mTracker = toolConfigurationParser.getTracker();
-  if(!mTracker->isValid())
+  //parse
+  ConfigurationFileParser configParser(mConfigurationFilePath, mLoggingFolder);
+
+  std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
+  IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
+
+  std::vector<Tool::InternalStructure> toolStructures;
+  std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
+  for(std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
   {
-    ssc::messageManager()->sendWarning("Could not configure the toolmanager, tracker is invalid.");
+    ToolFileParser toolParser(*it, mLoggingFolder);
+    Tool::InternalStructure internalTool = toolParser.getTool();
+    toolStructures.push_back(internalTool);
+  }
+
+  //new thread
+  mTrackerThread.reset(new IgstkTrackerThread(trackerStructure, toolStructures));
+
+  connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
+  connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
+  connect(mTrackerThread.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
+
+  //start threads
+  if(mTrackerThread)
+    mTrackerThread->start();
+}
+
+void ToolManager::trackerConfiguredSlot(bool on)
+{
+  if(!on)
+    return; //do nothing if deconfigured
+
+  if(!mTrackerThread)
     return;
-  }else
-  {
-    connect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(trackerOpenSlot(bool)));
-    connect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(trackerInitializedSlot(bool)));
-    connect(mTracker.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
-  }
-  mConfiguredTools = toolConfigurationParser.getConfiguredTools();
-  //std::cout << "Found " << mConfiguredTools->size() << " configured tools." << std::endl;
 
-  ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->begin();
-  while(it != mConfiguredTools->end())
+  //new all tools
+  std::map<QString, IgstkToolPtr> igstkTools = mTrackerThread->getTools();
+  IgstkToolPtr reference = mTrackerThread->getRefereceTool();
+  std::map<QString, IgstkToolPtr>::iterator it = igstkTools.begin();
+  for(;it != igstkTools.end(); ++it)
   {
-    //std::cout << "Tool: " << it->first << std::endl;
-    connect(((*it).second).get(), SIGNAL(attachedToTracker(bool)), this, SLOT(toolInitialized(bool)));
-    it++;
+    IgstkToolPtr igstkTool = it->second;
+    ToolPtr tool(new Tool(igstkTool));
+    if(tool->isValid())
+    {
+      if(igstkTool == reference)
+        mReferenceTool = tool;
+
+      mTools[it->first] = tool;
+      connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+    }
+    else
+    {
+      ssc::messageManager()->sendWarning("Creation of the cxTool "+it->second->getUid()+" failed.");
+    }
   }
 
-  // debug
-  if (DataLocations::getSettings()->value("giveManualToolPhysicalProperties").toBool())
+  // debug: give the manual tool properties from the first nonmanual tool. Nice for testing tools
+  if (settings()->value("giveManualToolPhysicalProperties").toBool())
   {
-    if (!mConfiguredTools->empty())
-      mManualTool->setBase(mConfiguredTools->begin()->second);
+    for (ssc::ToolManager::ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
+    {
+      if (iter->second == mManualTool)
+        continue;
+      mManualTool->setBase(iter->second);
+      ssc::messageManager()->sendInfo("Manual tool imbued with properties from " + iter->first);
+    }
   }
-
-  this->configureReferences();
+  //debug stop
 
   this->setDominantTool(this->getManualTool()->getUid());
 
@@ -169,35 +204,81 @@ void ToolManager::configure()
   ssc::messageManager()->sendSuccess("ToolManager is configured.");
   emit configured();
 }
+
+void ToolManager::deconfigure()
+{
+  if(this->isInitialized())
+  {
+    connect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
+    this->uninitialize();
+    return;
+  }
+
+  if (mTrackerThread)
+  {
+    mTrackerThread->quit();
+    mTrackerThread->wait(2000);
+    if (mTrackerThread->isRunning())
+    {
+      mTrackerThread->terminate();
+      mTrackerThread->wait(); // forever or until dead thread
+    }
+  }
+  else
+    return;
+
+  QObject::disconnect(mTrackerThread.get());
+  mTrackerThread.reset();
+
+  this->setDominantTool(this->getManualTool()->getUid());
+
+  mConfigured = false;
+  emit deconfigured();
+  ssc::messageManager()->sendInfo("ToolManager is deconfigured.");
+}
+
 void ToolManager::initialize()
 {
   if (!this->isConfigured())
+  {
+    connect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
     this->configure();
+    return;
+  }
 
-  if (!mConfigured)
+  if (!this->isConfigured())
   {
     ssc::messageManager()->sendWarning("Please configure before trying to initialize.");
     return;
   }
-  #ifndef _WINDOWS
-  this->createSymlink();
+
+  #ifndef WIN32
+  this->createSymlink(); //TODO????
   #endif
-  mTracker->open();
-  mTracker->attachTools(mConfiguredTools);
+
+  if(mTrackerThread)
+    mTrackerThread->initialize(true);
 }
 
 void ToolManager::uninitialize()
 {
+  if(this->isTracking())
+  {
+    connect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
+    this->stopTracking();
+    return;
+  }
+
   if(!this->isInitialized())
   {
     ssc::messageManager()->sendInfo("No need to uninitialize, toolmanager is not initialized.");
     return;
   }
-  mTracker->detachTools(mConfiguredTools); //not sure we have to detach all tools before we close, read NDI manual
-  mTracker->close();
+  if(mTrackerThread)
+    mTrackerThread->initialize(false);
 }
 
-#ifndef _WINDOWS
+#ifndef WIN32
 /** Assume that IGSTK requires the file /Library/CustusX/igstk.links/cu.CustusX.dev0
  *  as a rep for the HW connection. Also assume that directory is created with full
  *  read/write access (by installer or similar).
@@ -220,7 +301,7 @@ void ToolManager::createSymlink()
   QStringList filters;
   // cu* applies to Mac, ttyUSB applies to Linux
   filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "ttyUSB*" ; //NOTE: only works with current hardware using aurora or polaris.
-  //filters << "cu.usbserial*" << "cu.USA19H*"; //NOTE: only works with current hardware using aurora or polaris.
+//  filters << "cu.usbserial*" << "cu.KeySerial*" << "serial" << "serial/by-id/usb-NDI*" ; //NOTE: only works with current hardware using aurora or polaris.
   QStringList files = devDir.entryList(filters, QDir::System);
 
   if (files.empty())
@@ -234,9 +315,15 @@ void ToolManager::createSymlink()
   }
 
   QString device = devDir.filePath(files[0]);
+//  QString device = "/dev/serial/by-id/usb-NDI_NDI_Host_USB_Converter-if00-port0";
 
   QFile(linkfile).remove();
   QFile devFile(device);
+  QFileInfo devFileInfo(device);
+  if (!devFileInfo.isWritable())
+  {
+    ssc::messageManager()->sendError(QString("Device %1 is not writable. Connection will fail.").arg(device));
+  }
   // this call only succeeds if Custus is run as root.
   bool val = devFile.link(linkfile);
   if (!val)
@@ -257,7 +344,6 @@ void ToolManager::createSymlink()
 QFileInfo ToolManager::getSymlink() const
 {
   QString name("/Library/CustusX/igstk.links");
-//  QDir linkDir("/Library/CustusX/igstk.links");
   QDir linkDir(name);
   QDir::root().mkdir(name); // only works if run with sudo
   QString linkFile = linkDir.path() + "/cu.CustusX.dev0";
@@ -271,20 +357,26 @@ void ToolManager::cleanupSymlink()
   ssc::messageManager()->sendInfo("Cleaning up symlinks.");
   QFile(this->getSymlink().absoluteFilePath()).remove();
 }
-#endif //_WINDOWS
+#endif //WIN32
 
 void ToolManager::startTracking()
 {
   if (!this->isInitialized())
+  {
+    connect(this, SIGNAL(initialized()), this, SLOT(startTrackingAfterInitSlot()));
     this->initialize();
+    return;
+  }
 
   if (!mInitialized)
   {
     ssc::messageManager()->sendWarning("Please initialize before trying to start tracking.");
     return;
   }
-  mTracker->startTracking();
+  if(mTrackerThread)
+    mTrackerThread->track(true);
 }
+
 void ToolManager::stopTracking()
 {
   if (!mTracking)
@@ -292,8 +384,10 @@ void ToolManager::stopTracking()
     ssc::messageManager()->sendWarning("Please start tracking before trying to stop tracking.");
     return;
   }
-  mTracker->stopTracking();
+  if(mTrackerThread)
+    mTrackerThread->track(false);
 }
+
 void ToolManager::saveToolsSlot()
 {
   this->savePositionHistory();
@@ -343,52 +437,51 @@ ssc::SessionToolHistoryMap ToolManager::getSessionHistory(double startTime, doub
   return retval;
 }
 
-TrackerPtr ToolManager::getTracker()
-{
-  return mTracker;
-}
 
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
-  return mConfiguredTools;
+  ssc::ToolManager::ToolMap retval;
+  ssc::ToolManager::ToolMap::iterator it = mTools.begin();
+  for(; it != mTools.end(); ++it)
+  {
+    if(!it->second->isInitialized())
+      retval[it->first] = it->second;
+  }
+
+  return ssc::ToolManager::ToolMapPtr(new ssc::ToolManager::ToolMap(retval));
 }
 
 ssc::ToolManager::ToolMapPtr ToolManager::getInitializedTools()
 {
-  return mInitializedTools;
+  ssc::ToolManager::ToolMap retval;
+  ssc::ToolManager::ToolMap::iterator it = mTools.begin();
+  for(; it != mTools.end(); ++it)
+  {
+    if(it->second->isInitialized())
+      retval[it->first] = it->second;
+  }
+  return ssc::ToolManager::ToolMapPtr(new ssc::ToolManager::ToolMap(retval));
 }
 
 ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 {
-  ssc::ToolManager::ToolMapPtr allTools(new ToolMap);
-  allTools->insert(mConfiguredTools->begin(), mConfiguredTools->end());
-  allTools->insert(mInitializedTools->begin(), mInitializedTools->end());
-
-  return allTools;
+  return ssc::ToolManager::ToolMapPtr(new ssc::ToolManager::ToolMap(mTools));
 }
 
 ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
-  ToolMapIter itInit = mInitializedTools->find(uid);
-  ToolMapIter itConf = mConfiguredTools->find(uid);
-  if (itInit != mInitializedTools->end())
-  {
-    return ((*itInit).second);
-  } else if (itConf != mConfiguredTools->end())
-  {
-    return ((*itConf).second);
-  }
-  else
-  {
-    return boost::shared_ptr<ssc::Tool>();
-  }
+  ssc::ToolPtr retval;
+  ssc::ToolManager::ToolMap::iterator it = mTools.find(uid);
+  if (it != mTools.end())
+    retval = it->second;
+
+  return retval;
 }
 
 ssc::ToolPtr ToolManager::getDominantTool()
 {
   return mDominantTool;
 }
-
 
 void ToolManager::setDominantTool(const QString& uid)
 {
@@ -405,17 +498,7 @@ void ToolManager::setDominantTool(const QString& uid)
   }
 
   ssc::ToolPtr newTool;
-
-  ToolMapIter iter = mConfiguredTools->find(uid);
-  if (iter != mConfiguredTools->end())
-  {
-    newTool = iter->second;
-  }
-  ToolMapIter it = mInitializedTools->find(uid);
-  if (it != mInitializedTools->end())
-  {
-    newTool = it->second;
-  }
+  newTool = this->getTool(uid);
 
   // special case for manual tool
   if(newTool && newTool->getType() == ssc::Tool::TOOL_MANUAL && mManualTool)
@@ -426,10 +509,18 @@ void ToolManager::setDominantTool(const QString& uid)
       mManualTool->setTooltipOffset(mDominantTool->getTooltipOffset());
 
     }
-    mManualTool->setVisible(DataLocations::getSettings()->value("showManualTool").toBool());
+    mManualTool->setVisible(settings()->value("showManualTool").toBool());
   }
 
+  if(mDominantTool)
+    disconnect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
   mDominantTool = newTool;
+  connect(mDominantTool.get(), SIGNAL(tps(int)), this, SIGNAL(tps(int)));
+
+  if(mDominantTool->getType() == ssc::Tool::TOOL_MANUAL ||
+      mDominantTool->getType() == ssc::Tool::TOOL_NONE)
+      emit tps(0);
+
   emit dominantToolChanged(uid);
 }
 
@@ -437,54 +528,32 @@ std::map<QString, QString> ToolManager::getToolUidsAndNames() const
 {
   std::map<QString, QString> uidsAndNames;
 
-  ToolMapIter it = mInitializedTools->begin();
-  while (it != mInitializedTools->end())
-  {
-    uidsAndNames[((*it).second)->getUid()] = ((*it).second)->getName();
-    it++;
-  }
-  ToolMapIter iter = mConfiguredTools->begin();
-  while (iter != mConfiguredTools->end())
-  {
-    uidsAndNames[((*iter).second)->getUid()] = ((*iter).second)->getName();
-    iter++;
-  }
+  ssc::ToolManager::ToolMap::const_iterator it = mTools.begin();
+  for(;it != mTools.end(); ++it)
+    uidsAndNames[it->second->getUid()] = it->second->getName();
+
   return uidsAndNames;
 }
 
 std::vector<QString> ToolManager::getToolNames() const
 {
   std::vector<QString> names;
-  ToolMapIter it = mInitializedTools->begin();
-  while (it != mInitializedTools->end())
-  {
-    names.push_back(((*it).second)->getName());
-    it++;
-  }
-  ToolMapIter iter = mConfiguredTools->begin();
-  while (iter != mConfiguredTools->end())
-  {
-    names.push_back(((*iter).second)->getName());
-    iter++;
-  }
+
+  ssc::ToolManager::ToolMap::const_iterator it = mTools.begin();
+  for(;it != mTools.end(); ++it)
+    names.push_back(it->second->getName());
+
   return names;
 }
 
 std::vector<QString> ToolManager::getToolUids() const
 {
   std::vector<QString> uids;
-  ToolMapIter it = mInitializedTools->begin();
-  while (it != mInitializedTools->end())
-  {
-    uids.push_back(((*it).second)->getUid());
-    it++;
-  }
-  ToolMapIter iter = mConfiguredTools->begin();
-  while (iter != mConfiguredTools->end())
-  {
-    uids.push_back(((*iter).second)->getUid());
-    iter++;
-  }
+
+  ssc::ToolManager::ToolMap::const_iterator it = mTools.begin();
+  for(;it != mTools.end(); ++it)
+    uids.push_back(it->second->getUid());
+
   return uids;
 }
 
@@ -503,18 +572,16 @@ ssc::ToolPtr ToolManager::getReferenceTool() const
   return mReferenceTool;
 }
 
-
-
 void ToolManager::savePositionHistory()
 {
   QString filename = mLoggingFolder + "/toolpositions.snwpos";
 
   ssc::PositionStorageWriter writer(filename);
 
-  ToolMapIter it = mInitializedTools->begin();
-  while (it != mInitializedTools->end())
+  ssc::ToolManager::ToolMap::iterator it = mTools.begin();
+  for(;it != mTools.end(); ++it)
   {
-    ssc::ToolPtr current = (it++)->second;
+    ssc::ToolPtr current = it->second;
     ssc::TimedTransformMapPtr data = current->getPositionHistory();
 
     if (!data)
@@ -523,12 +590,7 @@ void ToolManager::savePositionHistory()
     // save only data acquired after mLastLoadPositionHistory:
     ssc::TimedTransformMap::iterator iter = data->lower_bound(mLastLoadPositionHistory);
     for (; iter!=data->end(); ++iter)
-    {
       writer.write(iter->second, (iter->first), current->getUid());
-    }
-
-//    ((*it).second)->saveTransformsAndTimestamps();
-//    it++;
   }
 
   mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
@@ -559,67 +621,29 @@ void ToolManager::loadPositionHistory()
   mLastLoadPositionHistory = ssc::getMilliSecondsSinceEpoch();
 }
 
-
 void ToolManager::setConfigurationFile(QString configurationFile)
 {
-  if(this->isConfigured())
-  {
-    ssc::messageManager()->sendWarning("You already configured, to reconfigure you have to restart CustusX3.");
+  if(configurationFile == mConfigurationFilePath)
     return;
-  }
+
+  if(this->isConfigured())
+    this->deconfigure();
+
   mConfigurationFilePath = configurationFile;
 }
 
 void ToolManager::setLoggingFolder(QString loggingFolder)
 {
+  if(mLoggingFolder == loggingFolder)
+    return;
+
+  if(this->isConfigured())
+    this->deconfigure();
+
   mLoggingFolder = loggingFolder;
 }
 
-void ToolManager::addInitializedTool(QString uid)
-{  
-  ssc::ToolManager::ToolMap::iterator it = mConfiguredTools->find(uid);  
-  if (it == mConfiguredTools->end() || !it->second)
-  {
-    ssc::messageManager()->sendWarning("Tool with id " + uid
-        + " was not found to be configured "
-          ", thus could not add is as a connected tool.");
-    return;
-  }
-  (*mInitializedTools)[it->first] = it->second;
-  ssc::ToolPtr tool = it->second;
-
-  //connect visible/hidden signal to domiantCheck
-  connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
-  
-  mConfiguredTools->erase(it);
-}
-
-void ToolManager::checkTimeoutsAndRequestTransform()
-{
-  mPulseGenerator->CheckTimeouts();
-
-  if (!mReferenceTool) // no need to request extra transforms from tools to the tracker, its already done
-    return;
-
-  ToolPtr refTool = boost::shared_dynamic_cast<Tool>(mReferenceTool);
-  ToolMap::iterator it = mInitializedTools->begin();
-  for(;it != mInitializedTools->end();++it)
-  {
-    ToolPtr connectedTool = boost::shared_dynamic_cast<Tool>(it->second);
-    if(!refTool || !connectedTool)
-      continue;
-    connectedTool->getPointer()->RequestComputeTransformTo(refTool->getPointer());
-  }
-}
-
-void ToolManager::trackerOpenSlot(bool)
-{
-  //TODO
-  //ToolManager does not care about this at the moment,
-  //but maybe it should?
-}
-
-void ToolManager::trackerInitializedSlot(bool value)
+void ToolManager::initializedSlot(bool value)
 {
   mInitialized = value;
   if(mInitialized)
@@ -630,7 +654,7 @@ void ToolManager::trackerInitializedSlot(bool value)
   else
   {
     ssc::messageManager()->sendInfo("ToolManager is uninitialized.");
-    emit uninitialize();
+    emit uninitialized();
   }
 }
 
@@ -640,42 +664,55 @@ void ToolManager::trackerTrackingSlot(bool value)
   if(mTracking)
   {
     ssc::messageManager()->sendSuccess("ToolManager started tracking.");
-    mTimer->start(33);
     emit trackingStarted();
   }
   else
   {
     ssc::messageManager()->sendSuccess("ToolManager stopped tracking.");
-    mTimer->stop();
     emit trackingStopped();
   }
-
 }
 
-void ToolManager::toolInitialized(bool value)
+void ToolManager::startTrackingAfterInitSlot()
 {
-  Tool* tool = static_cast<Tool*>(this->sender());
-  if(tool)
-    this->addInitializedTool(tool->getUid());
-  else
-    ssc::messageManager()->sendWarning("Casting to tool failed... Contact programmer.");
+  disconnect(this, SIGNAL(initialized()), this, SLOT(startTrackingAfterInitSlot()));
+  this->startTracking();
 }
 
-void ToolManager::updateReferenceTransformSlot()
+void ToolManager::initializeAfterConfigSlot()
 {
-  ToolPtr refTool = boost::shared_dynamic_cast<Tool>(mReferenceTool);
-  if(!refTool)
+  disconnect(this, SIGNAL(configured()), this, SLOT(initializeAfterConfigSlot()));
+  this->initialize();
+}
+
+void ToolManager::uninitializeAfterTrackingStoppedSlot()
+{
+  disconnect(this, SIGNAL(trackingStopped()), this, SLOT(uninitializeAfterTrackingStoppedSlot()));
+  this->uninitialize();
+}
+
+void ToolManager::deconfigureAfterUninitializedSlot()
+{
+  disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
+  this->deconfigure();
+}
+
+void ToolManager::globalConfigurationFileChangedSlot(QString key)
+{
+  if(key != "toolConfigFile")
     return;
-  refTool->set_prMt(refTool->get_prMt());
+
+  this->setConfigurationFile(DataLocations::getToolConfigFilePath());
 }
 
 void ToolManager::dominantCheckSlot()
 {
   //make a sorted vector of all visible tools
   std::vector<ssc::ToolPtr> visibleTools;
-  for(ToolMap::iterator it = mInitializedTools->begin();
-      it != mInitializedTools->end(); ++it)
+  ToolMap::iterator it = mTools.begin();
+  for(;it != mTools.end(); ++it)
   {
+    //TODO need to check if init???
     if(it->second->getVisible())
       visibleTools.push_back(it->second);
     else if(it->second->getType() == ssc::Tool::TOOL_MANUAL)
@@ -724,7 +761,7 @@ void ToolManager::addXml(QDomNode& parentNode)
 
   //Tools
   QDomElement toolsNode = doc.createElement("tools");
-  ssc::ToolManager::ToolMapPtr tools = getTools();
+  ssc::ToolManager::ToolMapPtr tools = this->getTools();
   ssc::ToolManager::ToolMap::iterator toolIt = tools->begin();
   for(; toolIt != tools->end(); toolIt++)
   {
@@ -767,7 +804,7 @@ void ToolManager::parseXml(QDomNode& dataNode)
   }
 
   //Tools
-  ssc::ToolManager::ToolMapPtr tools = getTools();
+  ssc::ToolManager::ToolMapPtr tools = this->getTools();
   QDomNode toolssNode = dataNode.namedItem("tools");
   QDomElement toolNode = toolssNode.firstChildElement("tool");
   for (; !toolNode.isNull(); toolNode = toolNode.nextSiblingElement("tool"))

@@ -35,8 +35,10 @@ class RegistrationWidget : public WhatsThisWidget
   Q_OBJECT
 
 public:
-  RegistrationWidget(QWidget* parent); ///< sets up layout and connects signals and slots
-  virtual ~RegistrationWidget(); ///< empty
+  RegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~RegistrationWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   virtual void activeImageChangedSlot(); ///< listens to the datamanager for when the active image is changed

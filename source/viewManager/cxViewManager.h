@@ -7,22 +7,17 @@
 #include "sscImage.h"
 #include "sscDefinitions.h"
 #include "cxForwardDeclarations.h"
-//#include "sscEnumConverter.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
 #include "cxTreeModelItem.h"
 #include "cxInteractiveClipper.h"
-//#include "cxInteractiveCropper.h"
 
 class QActionGroup;
 class QAction;
 class QGridLayout;
 class QWidget;
 class QTimer;
-class QSettings;
 class QTime;
-typedef boost::shared_ptr<class QSettings> QSettingsPtr;
-
 
 namespace cx
 {
@@ -75,6 +70,7 @@ public:
   void setActiveLayout(const QString& uid); ///< change the layout
 
   ViewWrapperPtr getActiveView() const; ///< returns the active view
+  int getActiveViewGroup() const;
   //void setActiveView(ViewWrapperPtr view); ///< change the active view
   void setActiveView(QString viewUid); ///< convenient function for setting the active view
 
@@ -101,9 +97,7 @@ signals:
   void activeViewChanged(); ///< emitted when the active view changes
 
 public slots:
-  //void deleteImageSlot(ssc::ImagePtr image); ///< Removes deleted image
   void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
-//  void shadingChangedSlot(bool shadingOn); ///< Turns shading on/off in the 3D scene
 
 protected slots:
   void renderAllViewsSlot(); ///< renders all views
@@ -125,14 +119,10 @@ protected:
   void setStretchFactors(LayoutRegion region, int stretchFactor);
 
   void deactivateCurrentLayout();
-  //void activateLayout(const QString& toType);
   void activateView(ViewWrapperPtr wrapper, int group, LayoutRegion region);
   void activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region);
   void activate3DView(int group, LayoutRegion region);
   void activateRTStreamView(int group, LayoutRegion region);
-//  void activate2DView(int group, int index, ssc::PLANE_TYPE plane, LayoutRegion region);
-//  void activate3DView(int group, int index, LayoutRegion region);
-  //void deactivateView(ssc::View* view);
   void addDefaultLayouts();
   unsigned findLayoutData(const QString uid) const;
   void addDefaultLayout(LayoutData data);
@@ -153,23 +143,12 @@ protected:
   QWidget*        mMainWindowsCentralWidget;  ///< should not be used after stealCentralWidget has been called, because then MainWindow owns it!!!
 
   QString mActiveView;                    ///< the active view
-//  ViewWrapperPtr   mActiveView;            ///< the active view
-//  const int     MAX_3DVIEWS;            ///< constant defining the max number of 3D views available
-//  const int     MAX_2DVIEWS;            ///< constant defining the max number of 2D views available
-//  std::vector<QString> mView3DNames;///< the name of all the 3D views
-//  std::vector<QString> mView2DNames;///< the name of all the 2D views
-//  View2DMap     mView2DMap;             ///< a map of all the 3D views
-//  View3DMap     mView3DMap;             ///< a map of all the 2D views
   ViewMap       mViewMap;               ///< a map of all the views
 
   QTimer*       mRenderingTimer;  ///< timer that drives rendering
   QDateTime mLastFullRender;
 
-//  bool mShadingOn; ///< Use shading for rendering?
-  QSettingsPtr mSettings; ///< Object for storing all program/user specific settings
   RenderTimerPtr mRenderTimer;
-//  QTime* mRenderingTime; ///< Time object used to calculate number of renderings per second (FPS)
-//  int mNumberOfRenderings; ///< Variable used to calculate FPS
 
   std::vector<ViewGroupPtr> mViewGroups;
 
