@@ -295,10 +295,10 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
       0.5, ssc::DoubleRange(0, 10, 0.1), 1);
 
   layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSegmentationThresholdAdapter));
-  QHBoxLayout* binaryLayout = new QHBoxLayout(retval);
+  QHBoxLayout* binaryLayout = new QHBoxLayout();
   binaryLayout->addWidget(binaryCheckbox);
   binaryLayout->addWidget(binaryLabel);
-  QHBoxLayout* smoothingLayout = new QHBoxLayout(retval);
+  QHBoxLayout* smoothingLayout = new QHBoxLayout();
   smoothingLayout->addWidget(smoothingCheckBox);
   smoothingLayout->addWidget(smoothingLabel);
   layout->addLayout(binaryLayout);
