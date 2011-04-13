@@ -118,7 +118,11 @@ void ImageRegistrationWidget::activeImageChangedSlot()
     ssc::ProbeRepPtr probe = this->getProbeRep();
     if (probe)
       mThresholdSlider->setValue(probe->getThreshold());
+
+    if(!registrationManager()->getFixedData())
+      registrationManager()->setFixedData(mCurrentImage);
   }
+
   //enable the add point button
   mAddLandmarkButton->setEnabled(mCurrentImage!=0);
 }

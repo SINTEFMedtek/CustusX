@@ -157,7 +157,11 @@ ssc::Transform3D PatientRegistrationWidget::getTargetTransform() const
 
 void PatientRegistrationWidget::performRegistration()
 {
+  if(!registrationManager()->getFixedData())
+    registrationManager()->setFixedData(mCurrentImage);
+
   registrationManager()->doPatientRegistration();
+
   this->updateAvarageAccuracyLabel();
 }
 
