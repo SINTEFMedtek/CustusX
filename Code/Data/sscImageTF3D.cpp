@@ -37,6 +37,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 
   double smin = mBase->GetScalarRange()[0];
   double smax = mBase->GetScalarRange()[1];
+  double srange = smax - smin;
 
 //  double max = this->getScalarMax();
 //	mOpacityTF->AddPoint(0.0, 0.0);
@@ -45,7 +46,7 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 //	mColorTF->AddRGBPoint(max, 1.0, 1.0, 1.0);
 
 	this->addAlphaPoint(smin, 0);
-	this->addAlphaPoint(smax * 0.1, 0);
+	this->addAlphaPoint(srange * 0.1 + smin, 0);
 	this->addAlphaPoint(smax, 255);
 
 	this->addColorPoint(smin, Qt::black);
