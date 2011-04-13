@@ -9,7 +9,7 @@
 #include <QFileInfo>
 #include "recConfig.h"
 #include "sscMessageManager.h"
-//#include "utils/sscReconstructHelper.h"Ý
+//#include "utils/sscReconstructHelper.h"ï¿½
 #include "sscTypeConversions.h"
 #include "sscVolumeHelpers.h"
 
@@ -70,7 +70,7 @@ void PNNReconstructAlgorithm::reconstruct(std::vector<TimedPosition> frameInfo,
   
   int* inputDims = frameData->getDimensions();
   
-  ssc::Vector3D targetDims(target->GetDimensions());
+  Eigen::Array3i targetDims(target->GetDimensions());
   ssc::Vector3D targetSpacing(target->GetSpacing());
   
   //Create temporary volume
@@ -146,9 +146,9 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
   vtkImageDataPtr output = outputData->getBaseVtkImageData();
   
   //int* inputDims = input->GetDimensions();
-  int* outputDims = output->GetDimensions();
+  Eigen::Array3i outputDims(output->GetDimensions());
   
-  ssc::Vector3D inputDims(input->GetDimensions());
+  Eigen::Array3i inputDims(input->GetDimensions());
   //ssc::Vector3D outputDims(output->GetDimensions());
   
   
@@ -210,7 +210,7 @@ void PNNReconstructAlgorithm::interpolate(ImagePtr inputData,
                   + j*outputDims[0] 
                   + k*outputDims[0]*outputDims[1];
                   
-                  if (validVoxel(x+i, y+j, z+k, outputDims)
+                  if (validVoxel(x+i, y+j, z+k, outputDims.data())
                       && inputPointer[localIndex] > 0.1)
                   {
                     tempVal += inputPointer[localIndex];

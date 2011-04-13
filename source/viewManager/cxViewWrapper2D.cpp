@@ -570,7 +570,7 @@ void ViewWrapper2D::shiftAxisPos(ssc::Vector3D delta_vp)
   ssc::Vector3D delta_pr = (rMpr.inv()*sMr.inv()).vector(delta_s);
 
   // MD is the actual tool movement in patient space, matrix form
-  ssc::Transform3D MD = createTransformTranslate(delta_pr);
+  ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 }
@@ -600,7 +600,7 @@ void ViewWrapper2D::setAxisPos(ssc::Vector3D click_vp)
   ssc::Vector3D delta_pr = (rMpr.inv()*sMr.inv()).vector(delta_s);
 
   // MD is the actual tool movement in patient space, matrix form
-  ssc::Transform3D MD = createTransformTranslate(delta_pr);
+  ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 }
