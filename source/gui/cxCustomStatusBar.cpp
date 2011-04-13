@@ -80,7 +80,6 @@ void CustomStatusBar::receiveToolVisible()
 
 void CustomStatusBar::receiveToolDominant()
 {
-  std::cout << "CustomStatusBar::receiveToolDominant()" << std::endl;
   ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
   ssc::ToolManager::ToolMap::iterator it = initializedTools->begin();
   for(;it != initializedTools->end(); ++it)
@@ -113,7 +112,7 @@ void CustomStatusBar::setToolLabelColor(QLabel* label, bool visible, bool domina
   if(visible)
   {
     if (dominant)
-      color = QString("QLabel { background-color: lightgreen }");
+      color = QString("QLabel { background-color: lime }");
     else
       color = QString("QLabel { background-color: green }");
   }

@@ -43,12 +43,12 @@ Tool::Tool(IgstkToolPtr igstkTool) :
   mProbe = Probe::New(mTool->getInternalStructure().mInstrumentId, mTool->getInternalStructure().mInstrumentScannerId);
   connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 
-  // debug code, used for fixing the rotation z-bug:
-  ssc::Transform3D sMt;
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
-  std::cout << "sMt for tool " << this->getUid() << "\n" << sMt << std::endl;
-  std::cout << "sMt*Rz180 for tool " << this->getUid() << "\n" << sMt*ssc::createTransformRotateZ(M_PI) << std::endl;
-  // end debug
+//  // debug code, used for fixing the rotation z-bug:
+//  ssc::Transform3D sMt;
+//  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
+//  std::cout << "sMt for tool " << this->getUid() << "\n" << sMt << std::endl;
+//  std::cout << "sMt*Rz180 for tool " << this->getUid() << "\n" << sMt*ssc::createTransformRotateZ(M_PI) << std::endl;
+//  // end debug
 
 }
 
