@@ -191,18 +191,20 @@ ImagePtr Reconstructer::createMaskFromConfigParams()
   vtkImageDataPtr mask = mOriginalFileData.mProbeData.getMask();
   ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
 
-  ssc::Vector3D usDim(mOriginalFileData.mUsRaw->getDimensions());
+  Eigen::Array3i usDim(mOriginalFileData.mUsRaw->getDimensions());
+  Eigen::Array3i maskDim(mask->GetDimensions());
   usDim[2] = 1;
   ssc::Vector3D usSpacing(mOriginalFileData.mUsRaw->getSpacing());
 
   // checking
   bool spacingOK = similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
-  bool dimOK = similar(usDim, ssc::Vector3D(mask->GetDimensions()));
+  bool dimOK = similar(usDim, Eigen::Array3i(mask->GetDimensions()));
+
   if (!dimOK || !spacingOK)
   {
     ssc::messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
     if (!dimOK)
-      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetDimensions())));
+      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(Eigen::Array3i(mask->GetDimensions())));
     if (!spacingOK)
       ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
   }
@@ -211,7 +213,7 @@ ImagePtr Reconstructer::createMaskFromConfigParams()
   
 ImagePtr Reconstructer::generateMask()
 {  
-  ssc::Vector3D dim(mOriginalFileData.mUsRaw->getDimensions());
+  Eigen::Array3i dim(mOriginalFileData.mUsRaw->getDimensions());
   dim[2] = 1;
   ssc::Vector3D spacing(mOriginalFileData.mUsRaw->getSpacing());
   
@@ -543,7 +545,7 @@ void Reconstructer::findExtentAndOutputTransform()
   // Calculate optimal output image spacing and dimensions based on US frame spacing
   double inputSpacing = std::min(mFileData.mUsRaw->getSpacing()[0],
       mFileData.mUsRaw->getSpacing()[1]);
-  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mFileData.mUsRaw->getDimensions()));
+  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, Eigen::Array3i(mFileData.mUsRaw->getDimensions()));
 
   if (ssc::ToolManager::getInstance())
     mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
@@ -629,7 +631,7 @@ bool Reconstructer::validInputData() const
  */
 ImagePtr Reconstructer::generateOutputVolume()
 {
-  ssc::Vector3D dim = mOutputVolumeParams.getDim();
+  Eigen::Array3i dim = mOutputVolumeParams.getDim();
   ssc::Vector3D spacing = ssc::Vector3D(1,1,1) * mOutputVolumeParams.getSpacing();
   
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);

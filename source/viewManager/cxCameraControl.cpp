@@ -179,10 +179,10 @@ void CameraControl::setStandard3DViewActionSlot()
   ssc::Vector3D vup(0,0,1);
   //ssc::Vector3D dir = (focus-direction).normal();
 
-  ssc::Vector3D left = cross(vup, viewDirection);
+  ssc::Vector3D left = ssc::cross(vup, viewDirection);
   if (ssc::similar(left.length(), 0.0))
     left = ssc::Vector3D(1,0,0);
-  vup = cross(viewDirection, left).normal();
+  vup = ssc::cross(viewDirection, left).normal();
 
   camera->SetPosition(pos.begin());
   camera->SetViewUp(vup.begin());

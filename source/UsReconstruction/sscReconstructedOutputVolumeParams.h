@@ -29,7 +29,7 @@ public:
   // constants, set only based on input data
   ssc::DoubleBoundingBox3D mExtent;
   double mInputSpacing;
-  ssc::Vector3D mInputDim;
+  Eigen::Array3i mInputDim;
   ssc::Transform3D m_rMd; ///< transform from output data space to global ref space r
 
   OutputVolumeParams() :
@@ -43,7 +43,7 @@ public:
   }
   /** Initialize the volue parameters with sensible defaults.
    */
-  OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing, ssc::Vector3D inputDim) :
+  OutputVolumeParams(ssc::DoubleBoundingBox3D extent, double inputSpacing, Eigen::Array3i inputDim) :
     mExtent(extent),
     mInputSpacing(inputSpacing),
     mInputDim(inputDim),
@@ -64,8 +64,10 @@ public:
   void setSpacing(double spacing)
   {
     mSpacing = spacing;
-    mDim = mExtent.range() / mSpacing;
-    this->roundDim();
+    ssc::Vector3D v = mExtent.range() / mSpacing;
+    mDim << ::ceil(v[0]), ::ceil(v[1]), ::ceil(v[2]);
+//    mDim = (mExtent.range() / mSpacing).array().ceil();
+//    this->roundDim();
   }
   double getSpacing() const
   {
@@ -77,7 +79,7 @@ public:
   {
     setSpacing(mExtent.range()[index] / val);
    }
-  ssc::Vector3D getDim() const
+  Eigen::Array3i getDim() const
   {
     return mDim;
   }
@@ -108,14 +110,14 @@ public:
 private:
   // controllable data, set only using the setters
   unsigned long mMaxVolumeSize;
-  ssc::Vector3D mDim;
+  Eigen::Array3i mDim;
   double mSpacing;
 
-  void roundDim()
-  {
-    for (int i=0; i<3; ++i)
-      mDim[i] = ::ceil(mDim[i]);
-  }
+//  void roundDim()
+//  {
+//    for (int i=0; i<3; ++i)
+//      mDim[i] = ::ceil(mDim[i]);
+//  }
 };
 
 } // namespace ssc

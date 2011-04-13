@@ -19,7 +19,7 @@ std::vector<Planes> generate_planes(std::vector<TimedPosition> frameInfo,
                                          ImagePtr frameData)
 {
   vtkImageDataPtr input = frameData->getBaseVtkImageData();
-  ssc::Vector3D dims(input->GetDimensions());
+  Eigen::Array3i dims(input->GetDimensions());
   ssc::Vector3D spacing(input->GetSpacing());
   
   
