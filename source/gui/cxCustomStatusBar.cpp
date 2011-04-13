@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QString>
 #include "sscToolManager.h"
+#include "cxToolManager.h"
 #include <QHBoxLayout>
 #include "sscMessageManager.h"
 #include "cxViewManager.h"
@@ -39,6 +40,8 @@ void CustomStatusBar::connectToToolSignals()
   {
     ssc::ToolPtr tool = it->second;
     if(tool->getType() == ssc::Tool::TOOL_MANUAL)
+      continue;
+    if(tool == ToolManager::getInstance()->getManualTool())
       continue;
     connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(receiveToolVisible()));
 
@@ -77,7 +80,14 @@ void CustomStatusBar::receiveToolVisible()
 
 void CustomStatusBar::receiveToolDominant()
 {
-  this->colorTool(ssc::toolManager()->getDominantTool().get());
+  std::cout << "CustomStatusBar::receiveToolDominant()" << std::endl;
+  ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
+  ssc::ToolManager::ToolMap::iterator it = initializedTools->begin();
+  for(;it != initializedTools->end(); ++it)
+  {
+    ssc::ToolPtr tool = it->second;
+    this->colorTool(tool.get());
+  }
 }
 
 void CustomStatusBar::colorTool(ssc::Tool* tool)
