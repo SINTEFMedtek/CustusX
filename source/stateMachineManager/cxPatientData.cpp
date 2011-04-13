@@ -414,11 +414,13 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
 {
   doc.appendChild(doc.createProcessingInstruction("xml version =", "'1.0'"));
 
+  QDomElement patientNode = doc.createElement("patient");
+
+  // note: all nodes must be below <patient>. XML requires only one root node per file.
   QDomElement versionName = doc.createElement("version_name");
   versionName.appendChild(doc.createTextNode(stateManager()->getVersionName()));
-  doc.appendChild(versionName);
+  patientNode.appendChild(versionName);
 
-  QDomElement patientNode = doc.createElement("patient");
   QDomElement activePatientNode = doc.createElement("active_patient");
   activePatientNode.appendChild(doc.createTextNode(mActivePatientFolder.toStdString().c_str()));
   patientNode.appendChild(activePatientNode);
