@@ -87,12 +87,6 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscHelperWidgets.h
     Utilities/sscMessageManager.h
     )
-if (USE_GLX_SHARED_CONTEXT)
-    SET( SSC_QT_MOC_HEADER_FILES
-        ${SSC_QT_MOC_HEADER_FILES}
-        vtkMods/sscSNWQVTKWidget.h
-        )
-endif (USE_GLX_SHARED_CONTEXT)    
 
 SET( SSC_HEADER_FILES
     ${SSC_QT_MOC_HEADER_FILES}
@@ -100,7 +94,9 @@ SET( SSC_HEADER_FILES
     sscRepImpl.h 
     sscVolumeRep.h
     )
-
+if (USE_GLX_SHARED_CONTEXT)
+    SET(SSC_HEADER_FILES ${SSC_HEADER_FILES} vtkMods/sscSNWQVTKWidget.h)
+endif (USE_GLX_SHARED_CONTEXT)
 
 set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/  
