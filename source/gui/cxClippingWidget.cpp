@@ -46,7 +46,7 @@ QStringList ClipPlaneStringDataAdapter::getValueRange() const
 {
   std::vector<ssc::PLANE_TYPE> planes = mInteractiveClipper->getAvailableSlicePlanes();
   QStringList retval;
-  retval << "";
+  //retval << ""; // removed this. No idea why we need an empty entry.
   for (unsigned i=0; i<planes.size(); ++i)
     retval << qstring_cast(planes[i]);
   return retval;
