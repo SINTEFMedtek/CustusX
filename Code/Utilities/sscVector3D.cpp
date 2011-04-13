@@ -186,6 +186,13 @@ Vector3D ceil(const Vector3D& a)
 
 // --------------------------------------------------------
 //} // namespace utils
+
+
+bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b)
+{
+  return (b-a).abs().maxCoeff() < 10E-6;;
+}
+
 } // namespace ssc
 // --------------------------------------------------------
 

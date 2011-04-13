@@ -65,6 +65,12 @@ Vector3D ceil(const Vector3D& a);
 //// --------------------------------------------------------
 ////} // namespace utils
 ////using namespace utils;
+
+
+bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b);  ///< check for equality with a tolerance: |b-a|<tol
+
+
+
 } // namespace ssc
 // --------------------------------------------------------
 

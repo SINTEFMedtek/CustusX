@@ -17,7 +17,7 @@ namespace ssc
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-vtkImageDataPtr generateVtkImageData(Vector3D dim,
+vtkImageDataPtr generateVtkImageData(Eigen::Array3i dim,
                                      Vector3D spacing,
                                      const unsigned char initValue)
 {

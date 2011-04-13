@@ -19,4 +19,13 @@ const Scalar* begin() const
   return this->data();
 }
 
+Scalar* end()
+{
+  return this->data() + this->size();
+}
+
+const Scalar* end() const
+{
+  return this->data() + this->size();
+}
 
