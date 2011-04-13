@@ -119,20 +119,20 @@ void UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFol
   for(; it != mTrackerRecordedData.end(); ++it)
   {
     ssc::Transform3D transform = it->second;
-    stream << transform[0][0] << " ";
-    stream << transform[0][1] << " ";
-    stream << transform[0][2] << " ";
-    stream << transform[0][3];
+    stream << transform(0,0) << " ";
+    stream << transform(0,1) << " ";
+    stream << transform(0,2) << " ";
+    stream << transform(0,3);
     stream << endl;
-    stream << transform[1][0] << " ";
-    stream << transform[1][1] << " ";
-    stream << transform[1][2] << " ";
-    stream << transform[1][3];
+    stream << transform(1,0) << " ";
+    stream << transform(1,1) << " ";
+    stream << transform(1,2) << " ";
+    stream << transform(1,3);
     stream << endl;
-    stream << transform[2][0] << " ";
-    stream << transform[2][1] << " ";
-    stream << transform[2][2] << " ";
-    stream << transform[2][3];
+    stream << transform(2,0) << " ";
+    stream << transform(2,1) << " ";
+    stream << transform(2,2) << " ";
+    stream << transform(2,3);
     stream << endl;
   }
   file.close();

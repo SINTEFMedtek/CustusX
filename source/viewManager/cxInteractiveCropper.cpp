@@ -245,7 +245,7 @@ void InteractiveCropper::setBoxWidgetSize(const ssc::DoubleBoundingBox3D& bb_d)
   M = rMd * M;
 
   vtkTransformPtr transform = vtkTransformPtr::New();
-  transform->SetMatrix(M.matrix());
+  transform->SetMatrix(M.getVtkMatrix());
   mBoxWidget->SetTransform(transform);
 }
 
