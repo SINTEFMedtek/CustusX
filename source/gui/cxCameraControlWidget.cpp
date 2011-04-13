@@ -278,7 +278,7 @@ void CameraControlWidget::panXZSlot(QPointF delta)
   ssc::Vector3D focus(camera->GetFocalPoint());
   ssc::Vector3D vup(camera->GetViewUp());
 
-  ssc::Vector3D e_x = cross(focus-position, vup).normal();
+  ssc::Vector3D e_x = ssc::cross(focus-position, vup).normal();
   ssc::Vector3D e_y = vup.normal();
 
   ssc::DoubleBoundingBox3D bb(viewManager()->get3DView()->getRenderer()->ComputeVisiblePropBounds());
