@@ -228,7 +228,7 @@ void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
   Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
   Transform3D rMt = (*rMprPtr)*prMt;
-  this->showTemporaryPointSlot(rMt[0][3], rMt[1][3], rMt[2][3]);
+  this->showTemporaryPointSlot(rMt(0,3), rMt(1,3), rMt(2,3));
 }
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {

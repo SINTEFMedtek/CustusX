@@ -37,10 +37,10 @@ void TestUtilityClasses::testTransform3DAccess()
 		for (unsigned j=0; j<4; ++j)
 		{
 			double val = i*4+j;
-			t[i][j] = val;
+			t(i,j) = val;
 			//ct[i][j] = val; // does not compile: ok
 			//double temp = ct[i][j];  // does compile: ok
-			CPPUNIT_ASSERT(similar(val, t[i][j]));
+			CPPUNIT_ASSERT(similar(val, t(i,j)));
 		}
 	}
 }

@@ -359,7 +359,7 @@ void Axes3D::setPosition(const Transform3D& pos)
  	//axes->SetScale(Vector3D(scale,scale,scale).begin());
  	Transform3D S = createTransformScale(Vector3D(scale,scale,scale));
 
- 	mAxes->SetUserMatrix((S*pos).matrix());
+ 	mAxes->SetUserMatrix((S*pos).getVtkMatrix());
 }
 
 Axes3D::~Axes3D()

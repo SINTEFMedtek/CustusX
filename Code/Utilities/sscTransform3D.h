@@ -6,6 +6,9 @@
 #include "vtkForwardDeclarations.h"
 #include "sscVector3D.h"
 
+// define to remove methods not compatible with the eigen library
+#define PREPARE_EIGEN_SUPPORT
+
 // --------------------------------------------------------
 namespace ssc
 {
@@ -49,6 +52,7 @@ public:
 	QString toString();			///< Construct a single-line string representation of the matrix
 	static Transform3D fromString(const QString& text, bool* ok=0); ///< construct a transform matrix from a string containing 16 whitespace-separated numbers, vtk ordering
 	explicit Transform3D(vtkMatrix4x4* m);
+	static Transform3D fromVtkMatrix(vtkMatrix4x4Ptr m);
 	Transform3D(const Transform3D& t);
 	Transform3D& operator=(const Transform3D& t);
 	virtual ~Transform3D();
@@ -61,11 +65,19 @@ public:
 	std::ostream& put(std::ostream& s, int indent=0, char newline='\n') const;
 	boost::array<double, 16> flatten() const;      ///< return matrix as a flat array, vtk ordering
 
+#ifndef PREPARE_EIGEN_SUPPORT
 	RowProxy operator[](unsigned row);
 	const RowProxy operator[](unsigned row) const;
+#endif
 
+	ElementProxy operator()(unsigned row, unsigned col);
+  const ElementProxy operator()(unsigned row, unsigned col) const;
+
+  vtkMatrix4x4Ptr getVtkMatrix() const;
+#ifndef PREPARE_EIGEN_SUPPORT
 	vtkMatrix4x4Ptr matrix();
 	vtkMatrix4x4Ptr matrix() const;
+#endif
 
 private:
 	vtkMatrix4x4Ptr mMatrix;

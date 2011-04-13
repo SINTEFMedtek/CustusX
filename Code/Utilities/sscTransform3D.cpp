@@ -28,6 +28,13 @@ Transform3D::Transform3D(vtkMatrix4x4* m)
 	mMatrix = vtkMatrix4x4Ptr(m);
 }
 
+Transform3D Transform3D::fromVtkMatrix(vtkMatrix4x4Ptr m)
+{
+  Transform3D retval;
+  retval.mMatrix->DeepCopy(m);
+  return retval;
+}
+
 Transform3D Transform3D::fromString(const QString& text, bool* _ok)
 {
   bool okval = false; // if input _ok is null, we still need a flag
@@ -90,6 +97,8 @@ Transform3D::~Transform3D()
 //	return getColumnVector(3);
 //}
 
+#ifndef PREPARE_EIGEN_SUPPORT
+
 /**hack. fix soooon.
  */
 vtkMatrix4x4Ptr Transform3D::matrix() const
@@ -101,6 +110,7 @@ vtkMatrix4x4Ptr Transform3D::matrix()
 {
 	return mMatrix;
 }
+#endif
 
 QString Transform3D::toString()
 {
@@ -211,15 +221,24 @@ Transform3D operator*(const Transform3D& lhs, const Transform3D& rhs)
 
 bool similar(const Transform3D& a, const Transform3D& b, double tol)
 {
-	vtkMatrix4x4Ptr m = a.matrix();
-	vtkMatrix4x4Ptr n = b.matrix();
-	for (int i=0; i<4; ++i)
-		for (int j=0; j<4; ++j)
-			if (!similar(m->GetElement(i,j), n->GetElement(i,j), tol))
-			{
-				return false;
-			}
-	return true;
+  boost::array<double, 16> m = a.flatten();
+  boost::array<double, 16> n = b.flatten();
+  for (int j=0; j<16; ++j)
+    if (!similar(n[j], m[j], tol))
+    {
+      return false;
+    }
+return true;
+
+//	vtkMatrix4x4Ptr m = a.matrix();
+//	vtkMatrix4x4Ptr n = b.matrix();
+//	for (int i=0; i<4; ++i)
+//		for (int j=0; j<4; ++j)
+//			if (!similar(m->GetElement(i,j), n->GetElement(i,j), tol))
+//			{
+//				return false;
+//			}
+//	return true;
 }
 // --------------------------------------------------------
 
@@ -370,6 +389,8 @@ const Transform3D::ElementProxy Transform3D::RowProxy::operator[](unsigned col) 
 	return ElementProxy(mMatrix, mRow, col);
 }
 
+#ifndef PREPARE_EIGEN_SUPPORT
+
 Transform3D::RowProxy Transform3D::operator[](unsigned row) 
 {
 	return RowProxy(mMatrix, row);
@@ -377,6 +398,24 @@ Transform3D::RowProxy Transform3D::operator[](unsigned row)
 const Transform3D::RowProxy Transform3D::operator[](unsigned row) const
 {
 	return RowProxy(mMatrix, row);
+}
+#endif
+
+Transform3D::ElementProxy Transform3D::operator()(unsigned row, unsigned col)
+{
+  return ElementProxy(mMatrix, row, col);
+}
+
+const Transform3D::ElementProxy Transform3D::operator()(unsigned row, unsigned col) const
+{
+  return ElementProxy(mMatrix, row, col);
+}
+
+vtkMatrix4x4Ptr Transform3D::getVtkMatrix() const
+{
+  vtkMatrix4x4Ptr retval = vtkMatrix4x4Ptr::New();
+  retval->DeepCopy(mMatrix);
+  return retval;
 }
 
 

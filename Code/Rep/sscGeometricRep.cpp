@@ -98,7 +98,7 @@ void GeometricRep::transformChangedSlot()
 //  std::cout << "mesh history ptr: " << mMesh->get_rMd_History().get() << std::endl;
 //  std::cout << mMesh->get_rMd() << std::endl;
 
-  mActor->SetUserMatrix(mMesh->get_rMd().matrix());
+  mActor->SetUserMatrix(mMesh->get_rMd().getVtkMatrix());
 }
 
   

@@ -160,7 +160,7 @@ void Image::transformChangedSlot()
 	if (mReferenceImageData)
 	{
 		Transform3D rMd = get_rMd();
-		mOrientatorMatrix->DeepCopy(rMd.inv().matrix());
+		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
 		mReferenceImageData->Update();		
 	}
   //std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;

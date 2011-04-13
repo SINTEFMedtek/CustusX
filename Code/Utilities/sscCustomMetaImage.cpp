@@ -83,9 +83,9 @@ Transform3D CustomMetaImage::readTransform()
   // add rotational part
   for (unsigned i = 0; i < 3; ++i)
   {
-    rMd[i][0] = e_x[i];
-    rMd[i][1] = e_y[i];
-    rMd[i][2] = e_z[i];
+    rMd(i,0) = e_x[i];
+    rMd(i,1) = e_y[i];
+    rMd(i,2) = e_z[i];
   }
 
 //  // Special Ingerid Reinertsen fix: Position is stored as p_d instead of p_r: convert here
@@ -96,9 +96,9 @@ Transform3D CustomMetaImage::readTransform()
 //  }
 
   // add translational part
-  rMd[0][3] = p_r[0];
-  rMd[1][3] = p_r[1];
-  rMd[2][3] = p_r[2];
+  rMd(0,3) = p_r[0];
+  rMd(1,3) = p_r[1];
+  rMd(2,3) = p_r[2];
 
 //  //load the image from file
 //  vtkMetaImageReaderPtr reader = vtkMetaImageReaderPtr::New();
@@ -147,7 +147,7 @@ void CustomMetaImage::setTransform(const Transform3D M)
   std::stringstream tmList;
   for (int c=0; c<dim; ++c)
     for (int r=0; r<dim; ++r)
-      tmList << " " << M[r][c];
+      tmList << " " << M(r,c);
 //  tmList <<" " << M[0][0] <<" "<< M[1][0] <<" "<<  M[2][0];
 //  tmList <<" " << M[0][1] <<" "<< M[1][1] <<" "<<  M[2][1];
 //  tmList <<" " << M[0][2] <<" "<< M[1][2] <<" "<<  M[2][2];
@@ -155,7 +155,7 @@ void CustomMetaImage::setTransform(const Transform3D M)
 
   std::stringstream posList;
   for (int r=0; r<dim; ++r)
-    posList << " " << M[r][3];
+    posList << " " << M(r,3);
 //  posList << M[0][3] <<" "<< M[1][3] <<" "<<  M[2][3];
   data.push_back(QString("Offset = " + qstring_cast(posList.str())));
 

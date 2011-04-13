@@ -163,7 +163,7 @@ void SlicedImageProxy::update()
 	Transform3D M = iMr*rMs;
 //	std::cout << "iMs, "<< mSlicer->getName() <<"\n" << M << std::endl;
 
-	mMatrixAxes->DeepCopy(M.matrix());
+	mMatrixAxes->DeepCopy(M.getVtkMatrix());
 
 	/*lock-out render time*/
 	/* this will probably update the pipe*/

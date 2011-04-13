@@ -154,7 +154,7 @@ void GeometricRep2D::transformChangedSlot()
   mCutPoly->SetLines(mStripper->GetOutput()->GetLines());
   //mCutPoly->Print(std::cout);
 
-  mActor->SetUserMatrix(dMs.inv().matrix());
+  mActor->SetUserMatrix(dMs.inv().getVtkMatrix());
 }
 
 //---------------------------------------------------------

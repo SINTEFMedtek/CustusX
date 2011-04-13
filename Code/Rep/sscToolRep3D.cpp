@@ -189,7 +189,7 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
   Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D rMt = (*rMprPtr) * prMt;
-  mToolActor->SetUserMatrix(rMt.matrix());
+  mToolActor->SetUserMatrix(rMt.getVtkMatrix());
   this->update();
 }
 
@@ -205,7 +205,7 @@ void ToolRep3D::update()
   if (this->showProbe())
   {
     Transform3D tMu = mProbeSector->get_tMu();
-    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
+    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
   }
   else
@@ -232,7 +232,7 @@ void ToolRep3D::probeSectorChanged()
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
-    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
+    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
 
     if (mRTStream)

@@ -261,7 +261,7 @@ void VolumetricRep::transformChangedSlot()
 	{
 		return;
 	}
-	mVolume->SetUserMatrix(mImage->get_rMd().matrix());
+	mVolume->SetUserMatrix(mImage->get_rMd().getVtkMatrix());
 }
 
 void VolumetricRep::transferFunctionsChangedSlot()
