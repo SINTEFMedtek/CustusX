@@ -360,6 +360,7 @@ void MainWindow::createActions()
   mManualToolPhysicalProperties = new QAction(tr("Debug manual tool"), mToolsActionGroup);
   mManualToolPhysicalProperties->setToolTip("give manual tool the properties of the first physical tool");
   mManualToolPhysicalProperties->setCheckable(true);
+  mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
   connect(mManualToolPhysicalProperties, SIGNAL(triggered()), this, SLOT(manualToolPhysicalPropertiesSlot()));
   this->updateManualToolPhysicalProperties();
 
