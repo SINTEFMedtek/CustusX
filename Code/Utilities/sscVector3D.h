@@ -5,6 +5,7 @@
 class QString;
 #include <QStringList>
 
+// http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "sscPlainObjectEigenAddons.h"
 #define EIGEN_MATRIXBASE_PLUGIN "sscMatrixBaseEigenAddons.h"
 
@@ -20,7 +21,8 @@ namespace ssc
 
 bool similar(double a, double b, double tol=1.0E-6);    ///< check for equality with a tolerance: |b-a|<tol
 
-/**Use math library Eigen for the the ssc type Vector3D
+/**Use math library Eigen for the the ssc type Vector3D,
+ * extended using the Eigen plugin system.
  *
  */
 typedef Eigen::Vector3d Vector3D;
