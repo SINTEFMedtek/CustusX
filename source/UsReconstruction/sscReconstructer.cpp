@@ -293,7 +293,7 @@ Transform3D Reconstructer::interpolate(const Transform3D& a,
   Transform3D c;
   for (int i = 0; i < 4; i++)
     for (int j= 0; j < 4; j++)
-      c[i][j] = (1-t)*a[i][j] + t*b[i][j];
+      c(i,j) = (1-t)*a(i,j) + t*b(i,j);
   return c;
 }
   
@@ -362,7 +362,7 @@ vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
   vnl_matrix_double dst(4,4);
   for (int i=0; i<4; ++i)
     for (int j=0; j<4; ++j)
-      dst[i][j] = src[i][j];
+      dst[i][j] = src(i,j);
   return dst;
 }
 
@@ -371,7 +371,7 @@ ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
   ssc::Transform3D dst;
   for (int i=0; i<4; ++i)
     for (int j=0; j<4; ++j)
-      dst[i][j] = src[i][j];
+      dst(i,j) = src[i][j];
   return dst;
 }
 

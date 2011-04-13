@@ -487,7 +487,7 @@ vtkPolyDataPtr SeansVesselReg::extractPolyData(ssc::ImagePtr image, int p_neighb
 
   //set the transform
   vtkTransformPtr l_dataTransform = vtkTransformPtr::New();
-  l_dataTransform->SetMatrix(image->get_rMd().matrix());
+  l_dataTransform->SetMatrix(image->get_rMd().getVtkMatrix());
 
   int l_startPosX, l_startPosY, l_startPosZ; //Beginings of neighborhood offsets
   int l_stopPosX, l_stopPosY, l_stopPosZ; //Ends of neighborhood offsets
