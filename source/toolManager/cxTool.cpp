@@ -153,16 +153,20 @@ void Tool::createPolyData()
 bool Tool::isCalibrated() const
 {
   ssc::Transform3D identity;
-  ssc::Transform3D sMt;
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
+//  ssc::Transform3D sMt;
+  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
 
   return !ssc::similar(sMt, identity);
 }
 
 ssc::Transform3D Tool::getCalibration_sMt() const
 {
-  ssc::Transform3D sMt;
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
+//  ssc::Transform3D sMt;
+  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
 
   return sMt;
 }
@@ -170,11 +174,13 @@ ssc::Transform3D Tool::getCalibration_sMt() const
 void Tool::setCalibration_sMt(ssc::Transform3D calibration)
 {
   //apply the calibration
-  mTool->getInternalStructure().mCalibration.ImportTransform(*calibration.matrix());
+  mTool->getInternalStructure().mCalibration.ImportTransform(*calibration.getVtkMatrix());
   mTool->setCalibrationTransform(mTool->getInternalStructure().mCalibration);
 
-  ssc::Transform3D sMt;
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
+//  ssc::Transform3D sMt;
+  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
   ssc::messageManager()->sendInfo("Set "+mName+"s calibration to \n"+qstring_cast(sMt));
 
   //write to file
@@ -294,8 +300,10 @@ void Tool::writeCalibrationToFile()
     calibrationFileName.append(".cal");
     calibrationFile.setFileName(calibrationFileName);
   }
-  ssc::Transform3D sMt;
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
+//  ssc::Transform3D sMt;
+  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
 
   if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {

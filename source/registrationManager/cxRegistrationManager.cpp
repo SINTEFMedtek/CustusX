@@ -256,7 +256,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 
   ssc::Transform3D tar_M_src(landmarktransform->GetMatrix());
 
-  if (QString::number(tar_M_src[0][0])=="nan") // harry but quick way to check badness of transform...
+  if (QString::number(tar_M_src(0,0))=="nan") // harry but quick way to check badness of transform...
   {
     return ssc::Transform3D();
   }
