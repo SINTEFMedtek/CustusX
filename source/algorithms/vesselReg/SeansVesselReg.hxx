@@ -24,7 +24,7 @@ public:
   SeansVesselReg(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose);
   ~SeansVesselReg();
 
-  bool doItRight(ssc::ImagePtr source, ssc::ImagePtr target, QString logPath);
+  bool doItRight(ssc::DataPtr source, ssc::DataPtr target, QString logPath);
   ssc::Transform3D getLinearTransform();
 //  ssc::Transform3D getNonLinearTransform();
   ssc::ImagePtr loadMinc(char* source_file);
@@ -45,6 +45,7 @@ protected:
   void printOutResults(QString fileNamePrefix, vtkGeneralTransformPtr myConcatenation);
   vtkAbstractTransformPtr linearRegistration(vtkPointsPtr sortedSourcePoints, vtkPointsPtr sortedTargetPoints, int numPoints/*, vtkAbstractTransform** myCurrentTransform*/);
   vtkAbstractTransformPtr nonLinearRegistration(vtkPolyDataPtr tpsSourcePolyData, vtkPolyDataPtr tpsTargetPolyData, int numPoints);
+  vtkPolyDataPtr convertToPolyData(ssc::DataPtr data);
 
   int mt_ltsRatio;
   double mt_distanceDeltaStopThreshold;
