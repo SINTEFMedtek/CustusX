@@ -88,7 +88,8 @@ public:
   void playWarningSound(); ///< automatically called by sendWarning if not muted
   void playErrorSound(); ///< automatically called by sendError if not muted
 
-  void playScreenShotSound();
+  void playScreenShotSound(); ///< plays a sound signaling that a screen shot has been taken
+  void playSampleSound(); ///< plays a sound signaling that something has been sampled
 
 signals:
   void emittedMessage(Message message); ///< The signal the user should listen to!

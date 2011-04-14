@@ -331,6 +331,12 @@ void MessageManager::playScreenShotSound()
     mAudioSource->playScreenShotSound();
 }
 
+void MessageManager::playSampleSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playSampleSound();
+}
+
 bool MessageManager::openLogging(QFile::OpenMode mode)
 {
   QMutexLocker sentry(&mConsoleMutex);
