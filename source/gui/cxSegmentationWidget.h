@@ -183,7 +183,7 @@ public:
 
 public slots:
   void setImageInputSlot(QString value);
-  void visualizeSlot(QString uid);
+//  void visualizeSlot(QString uid);
 
 signals:
 void inputImageChanged(QString uid);
@@ -200,7 +200,7 @@ private slots:
 private:
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   QPushButton* mFindCenterlineButton;///<Button for finding centerline in a segment
-  QColor mDefaultColor;
+//  QColor mDefaultColor;
   QLabel* mStatusLabel;
 
   Centerline  mCenterlineAlgorithm;

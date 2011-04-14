@@ -30,8 +30,6 @@
 #include "cxDataLocations.h"
 #include "cxSeansVesselRegistrationWidget.h"
 
-//Testing
-#include "vesselReg/SeansVesselReg.hxx"
 
 namespace cx
 {
@@ -453,7 +451,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   WhatsThisWidget(parent, "CenterlineWidget", "CenterlineWidget"),
   mFindCenterlineButton(new QPushButton("Find centerline")),
-  mDefaultColor("red"),
+//  mDefaultColor("red"),
   mStatusLabel(new QLabel(""))
 {
   connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
@@ -502,7 +500,8 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
 
 void CenterlineWidget::setDefaultColor(QColor color)
 {
-  mDefaultColor = color;
+  mCenterlineAlgorithm.setDefaultColor(color);
+//  mDefaultColor = color;
 }
 
 void CenterlineWidget::findCenterlineSlot()
@@ -515,7 +514,7 @@ void CenterlineWidget::findCenterlineSlot()
 
 void CenterlineWidget::handleFinishedSlot()
 {
-  ssc::ImagePtr centerlineImage = mCenterlineAlgorithm.getOutput();
+  ssc::DataPtr centerlineImage = mCenterlineAlgorithm.getOutput();
   if(!centerlineImage)
     return;
 
@@ -524,27 +523,27 @@ void CenterlineWidget::handleFinishedSlot()
   emit outputImageChanged(centerlineImage->getUid());
 }
 
-void CenterlineWidget::visualizeSlot(QString inputUid)
-{
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-
-  ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
-  if(!centerlineImage)
-    return;
-
-  //automatically generate a mesh from the centerline
-  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
-
-  QString uid = centerlineImage->getUid() + "_ge%1";
-  QString name = centerlineImage->getName() + " ge%1";
-  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
-  mesh->setColor(mDefaultColor);
-  mesh->get_rMd_History()->setParentFrame(centerlineImage->getUid());
-  ssc::dataManager()->loadData(mesh);
-  ssc::dataManager()->saveMesh(mesh, outputBasePath);
-
-  emit outputImageChanged(centerlineImage->getUid());
-}
+//void CenterlineWidget::visualizeSlot(QString inputUid)
+//{
+//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+//
+//  ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
+//  if(!centerlineImage)
+//    return;
+//
+//  //automatically generate a mesh from the centerline
+//  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
+//
+//  QString uid = centerlineImage->getUid() + "_ge%1";
+//  QString name = centerlineImage->getName() + " ge%1";
+//  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+//  mesh->setColor(mDefaultColor);
+//  mesh->get_rMd_History()->setParentFrame(centerlineImage->getUid());
+//  ssc::dataManager()->loadData(mesh);
+//  ssc::dataManager()->saveMesh(mesh, outputBasePath);
+//
+//  emit outputImageChanged(centerlineImage->getUid());
+//}
 
 //------------------------------------------------------------------------------
 

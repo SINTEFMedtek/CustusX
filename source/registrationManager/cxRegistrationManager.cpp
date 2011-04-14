@@ -458,21 +458,21 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
         single_point_thre,
         verbose);
 
-  ssc::ImagePtr fixedData = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
-  ssc::ImagePtr movingData = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
+//  ssc::ImagePtr fixedData = boost::dynamic_pointer_cast<ssc::Image>(mFixedData);
+//  ssc::ImagePtr movingData = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
+//
+//  if(!fixedData)
+//  {
+//    ssc::messageManager()->sendError("Could not cast fixeddata to image.");
+//    return;
+//  }
+//  if(!movingData)
+//  {
+//    ssc::messageManager()->sendError("Could not cast moving data to image.");
+//    return;
+//  }
 
-  if(!fixedData)
-  {
-    ssc::messageManager()->sendError("Could not cast fixeddata to image.");
-    return;
-  }
-  if(!movingData)
-  {
-    ssc::messageManager()->sendError("Could not cast moving data to image.");
-    return;
-  }
-
-  bool success = vesselReg.doItRight(fixedData, movingData, logPath);
+  bool success = vesselReg.doItRight(mFixedData, mMovingData, logPath);
   if(!success)
   {
     ssc::messageManager()->sendWarning("Vessel registration failed.");
@@ -492,7 +492,7 @@ void RegistrationManager::doVesselRegistration(int lts_ratio, double stop_delta,
   ssc::RegistrationTransform regTrans(delta, QDateTime::currentDateTime(), "Vessel based");
   regTrans.mFixed = mFixedData->getUid();
   regTrans.mMoving = mMovingData->getUid();
-  this->updateRegistration(mLastRegistrationTime, regTrans, movingData, qstring_cast(fixedData->getUid()));
+  this->updateRegistration(mLastRegistrationTime, regTrans, mMovingData, qstring_cast(mFixedData->getUid()));
 
   ssc::messageManager()->sendSuccess("Vessel based registration has been performed.");
 
