@@ -114,7 +114,7 @@ void ImageRegistrationWidget::activeImageChangedSlot()
   if(mCurrentImage)
   {
     //set a default treshold
-    mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
+    mThresholdSlider->setRange(mCurrentImage->getMin(), mCurrentImage->getMax());
     ssc::ProbeRepPtr probe = this->getProbeRep();
     if (probe)
       mThresholdSlider->setValue(probe->getThreshold());
