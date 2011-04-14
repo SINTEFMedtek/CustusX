@@ -301,14 +301,6 @@ int Image::getMin()
 	//return (*iter).first;
 	return (int)mImageTransferFunctions3D->getScalarMin();
 }
-int Image::getPosMax()
-{
-	return (int)mImageTransferFunctions3D->getScalarMax() - getMin();
-}
-int Image::getPosMin()
-{
-	return 0;
-}
   
 int Image::getRange()
 {

@@ -3,7 +3,8 @@
 
 #include "boost/shared_ptr.hpp"
 
-namespace ssc {
+namespace ssc
+{
 /**
  * \class Audio
  *
@@ -28,6 +29,7 @@ public:
   virtual void playErrorSound() = 0;
 
   virtual void playScreenShotSound() = 0;
+  virtual void playSampleSound() = 0;
 };
 
 typedef boost::shared_ptr<Audio> AudioPtr;
