@@ -48,4 +48,9 @@ void Audio::playScreenShotSound()
   QSound::play(DataLocations::getAudioConfigFilePath()+"camera_shutter.wav");
 }
 
+void Audio::playSampleSound()
+{
+  QSound::play(DataLocations::getAudioConfigFilePath()+"Vista_Sound_Pack/Windows XP Information Bar.wav");
+}
+
 }//namespace cx
