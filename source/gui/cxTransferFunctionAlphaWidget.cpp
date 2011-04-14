@@ -182,10 +182,8 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 	// / double(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
 	
   double posMult = (width() - mBorder*2) / double(histogramSize);
-	//for (int i = mCurrentImage->getPosMin(); i <= mCurrentImage->getPosMax(); i++)
-  for (int i = mImage->getMin(); i <= mImage->getMax(); i++)//TODO: replace with above line
+  for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
 	{
-//		x = (i * posMult);// - mCurrentImage->getPosMin(); //Offset with min value
     x = ((i- mImage->getMin()) * posMult); //Offset with min value
     y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i - mImage->getMin()]+1)) * barHeightMult;
 		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
