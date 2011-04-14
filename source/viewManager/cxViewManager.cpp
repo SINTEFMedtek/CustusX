@@ -583,7 +583,7 @@ Us Acq
     this->addDefaultLayout(layout);
   }
   {
-    LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x3", "3D ACS x3", 3, 3);
+    LayoutData layout = LayoutData::create("LAYOUT_ORTHOGONAL_3DACS_x3", "ACS x3", 3, 3);
     layout.setView(0, ssc::ptAXIAL,    LayoutRegion(0, 0));
     layout.setView(0, ssc::ptCORONAL,  LayoutRegion(1, 0));
     layout.setView(0, ssc::ptSAGITTAL, LayoutRegion(2, 0));
