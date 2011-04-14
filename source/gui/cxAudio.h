@@ -28,6 +28,7 @@ public:
   virtual void playErrorSound();
 
   virtual void playScreenShotSound();
+  virtual void playSampleSound();
 };
 
 }//namespace cx
