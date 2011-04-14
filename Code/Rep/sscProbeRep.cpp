@@ -74,7 +74,7 @@ void ProbeRep::setImage(ImagePtr image)
 		return;
 	mImage = image;
 	if (mImage)
-	  mThreshold = mImage->getPosMin() + (mImage->getPosMax()-mImage->getPosMin())/10;
+	  mThreshold = mImage->getMin() + (mImage->getMax()-mImage->getMin())/10;
 }
 
 void ProbeRep::setResolution(const int resolution)
