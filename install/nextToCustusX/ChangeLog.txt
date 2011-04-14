@@ -2,6 +2,40 @@ CustusX - Change Log
 
 CustusX - 3.1.4 (Released 2011-04-14) [ View Issues ]
 =====================================
+- 0000010: [Feature request] Need easy setup of connection to position tracking system (cas) - resolved.
+- 0000029: [Feature request] Tracking without a referenceframe (jbake) - resolved.
+- 0000063: [Bug] ToolManager requires toolfiles to be in both toolconfig/Tool and toolconfig/Lab (jbake) - resolved.
+- 0000073: [Bug] ToolManager reports that it is configured even without a tracker (jbake) - resolved.
+- 0000077: [Bug] Cannot open communication with Aurora. (jbake) - resolved.
+- 0000094: [Bug] No error message when tools is missing from Tool folder. (jbake) - resolved.
+- 0000196: [Task] Design and implement solution for GrabberServer crash. (jbake) - resolved.
+- 0000195: [Task] Find out why GrabberServer slows+crashes. (jbake) - resolved.
+- 0000164: [Feature request] Optionally show unconnected tools (cas) - resolved.
+- 0000263: [Refactoring request] Transfer functions must handle signed volumes (olevs) - resolved.
+- 0000267: [Bug] add stl models to Neuro tool setup (cas) - resolved.
+- 0000275: [Bug] Grabber freeze must stop streaming (cas) - resolved.
+- 0000276: [Feature request] Orientation display in 3D (cas) - resolved.
+- 0000277: [Feature request] Display surfaces text in views. (cas) - resolved.
+- 0000294: [Feature request] Need more than 3 view groups (cas) - resolved.
+- 0000295: [Bug] Center image is unstable (cas) - resolved.
+- 0000299: [Feature request] Should be able to reconfigure tracking without restarting Cx3 (jbake) - resolved.
+- 0000300: [Feature request] We want to be able to dynamically select and save tool configurations (jbake) - resolved.
+- 0000301: [Bug] Tool axis Y-flipped (cas) - resolved.
+- 0000303: [Bug] S-video converted to 800x600 in GrabberServer (jbake) - resolved.
+- 0000304: [Bug] Show reference tool disabled (jbake) - resolved.
+- 0000310: [Bug] When in the preference menu any click to the Ok button will deconfigure the tracker (jbake) - resolved.
+- 0000311: [Bug] When reconfiguring the old tools still show up on the statusbar (jbake) - resolved.
+- 0000313: [Refactoring request] We need to know when values in QSetting is changed (jbake) - resolved.
+- 0000314: [Bug] ToolList should react to item selected, not just itemClicked (jbake) - resolved.
+- 0000317: [Bug] US acq without reference frame crashes or results in errors (jbake) - resolved.
+- 0000319: [Bug] ClipWidgets combobox contains a blank listing (cas) - resolved.
+- 0000325: [Bug] Color transfer function problems (olevs) - resolved.
+- 0000326: [Feature request] We should have versionname in custusxdoc.xml (jbake) - resolved.
+- 0000328: [Bug] version_name in custusdic.xml invalidates file. (cas) - resolved.
+- 0000329: [Feature request] display dominant tool in gui (cas) - resolved.
+- 0000332: [Bug] The layout 3D ACS x3 don't have 3D (cas) - resolved.
+- 0000334: [Bug] The transfer function reset button don't take signed volumes into accout (olevs) - resolved.
+- 0000335: [Bug] Sonowand reference frame contains no ref. points (cas) - resolved.
 - 0000222: [Refactoring request] Move requesting transforms for tools into separat thread (jbake) - resolved.
 - 0000227: [Bug] It's not possible to get .stl models from ITK-Snap at the correct position (cas) - resolved.
 - 0000198: [Testing request] Acceptance test (jbake) - resolved.
@@ -31,7 +65,7 @@ CustusX - 3.1.4 (Released 2011-04-14) [ View Issues ]
 - 0000308: [Feature request] Create transfer function presets for signed CT volumes (olevs) - resolved.
 - 0000309: [Bug] Points tend to stick in upper left cornet of the opacity transfer function (olevs) - resolved.
 - 0000324: [Bug] nonautomatic registration buggy (cas) - resolved.
-[30 issues]
+[64 issues]
 
 CustusX - 3.1.2 (Released 2011-03-14) [ View Issues ]
 =====================================
