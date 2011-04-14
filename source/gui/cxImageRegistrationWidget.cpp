@@ -114,7 +114,7 @@ void ImageRegistrationWidget::activeImageChangedSlot()
   if(mCurrentImage)
   {
     //set a default treshold
-    mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
+    mThresholdSlider->setRange(mCurrentImage->getMin(), mCurrentImage->getMax());
     ssc::ProbeRepPtr probe = this->getProbeRep();
     if (probe)
       mThresholdSlider->setValue(probe->getThreshold());
@@ -186,7 +186,9 @@ void ImageRegistrationWidget::showEvent(QShowEvent* event)
 
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(probeRep)
+  {
     connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
+  }
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 }
 
