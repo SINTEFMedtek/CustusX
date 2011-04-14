@@ -1,5 +1,38 @@
 CustusX - Change Log
 
+CustusX - 3.1.4 (Released 2011-04-14) [ View Issues ]
+=====================================
+- 0000222: [Refactoring request] Move requesting transforms for tools into separat thread (jbake) - resolved.
+- 0000227: [Bug] It's not possible to get .stl models from ITK-Snap at the correct position (cas) - resolved.
+- 0000198: [Testing request] Acceptance test (jbake) - resolved.
+- 0000197: [User story] Perform an OR Procedure using centerline registration - neuro (cas) - resolved.
+- 0000226: [Bug] Problem with Surface generation/Segmentation from binary volumes (olevs) - resolved.
+- 0000225: [Bug] Transfer functions don't work for binary volumes (olevs) - resolved.
+- 0000234: [Bug] US Acquisition widget fails to understand it is ready if probe is held visible when tracking starts (cas) - resolved.
+- 0000235: [Bug] Tracking log files end up in the wrong folder (jbake) - resolved.
+- 0000238: [Refactoring request] Cleanup of view layouts (cas) - resolved.
+- 0000241: [Bug] vtk spheres in 3D too large. (cas) - resolved.
+- 0000244: [Feature request] Toolbars appear to the left, this causes chaos (cas) - resolved.
+- 0000247: [Feature request] Default transfer functions in us generation. (cas) - resolved.
+- 0000248: [Feature request] Registration history: filter out parent frames. (cas) - resolved.
+- 0000251: [Bug] mhd files need updates position info (cas) - resolved.
+- 0000252: [Bug] Manual tool shown after dominanttoolchange even if explicitliy hidden in 3D. (cas) - resolved.
+- 0000253: [Feature request] Landmarks used for data analysis (cas) - resolved.
+- 0000255: [Feature request] More info in registration history (cas) - resolved.
+- 0000258: [Feature request] sound feedback (jbake) - resolved.
+- 0000270: [Bug] Improved 2D window/level defaults for US+Angio (cas) - resolved.
+- 0000273: [Feature request] Vascular interventions should be implemented as an application domain (gat) - resolved.
+- 0000274: [Bug] Remove crosshair in anyplanes (cas) - resolved.
+- 0000286: [Bug] Probe sector must use clip rect (cas) - resolved.
+- 0000287: [Refactoring request] Tool files cleanup (jbake) - resolved.
+- 0000288: [Refactoring request] V2V reg must accept mesh in addition to volumes (cas) - resolved.
+- 0000305: [Bug] New epiphan grabber not recoglized by grabberServer (jbake) - resolved.
+- 0000306: [Bug] Lung is a hack (jbake) - resolved.
+- 0000308: [Feature request] Create transfer function presets for signed CT volumes (olevs) - resolved.
+- 0000309: [Bug] Points tend to stick in upper left cornet of the opacity transfer function (olevs) - resolved.
+- 0000324: [Bug] nonautomatic registration buggy (cas) - resolved.
+[30 issues]
+
 CustusX - 3.1.2 (Released 2011-03-14) [ View Issues ]
 =====================================
 - 0000249: [Feature request] Data lists must be sorted (cas) - resolved.
