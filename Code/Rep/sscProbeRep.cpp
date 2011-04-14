@@ -363,14 +363,16 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 	vtkDataSetAttributesPtr dataSetAttribute = vtkDataSetAttributesPtr::New();
 	dataSetAttribute = (vtkDataSetAttributes*)(probeFilterMapper->GetInput()->GetPointData());
 
-	double value = -1;
-	int i;
-	for (i=0; i<dataSetAttribute->GetScalars()->GetNumberOfTuples(); i++)
-	{
-		dataSetAttribute->GetScalars()->GetTuple(i, &value);
-		if (value > mThreshold)
-			break;
-	}
+  double value = -1000000;
+  int i;
+  for (i=0; i<dataSetAttribute->GetScalars()->GetNumberOfTuples(); i++)
+  {
+    dataSetAttribute->GetScalars()->GetTuple(i, &value);
+    //The VTK structure is padded with zeroes
+    //Ugly fix for signed: Ignore 0
+    if ((value != 0) && (value > mThreshold))
+      break;
+  }
 	if (i==dataSetAttribute->GetScalars()->GetNumberOfTuples())
 		return false;
 
