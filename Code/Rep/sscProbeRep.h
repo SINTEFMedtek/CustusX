@@ -33,6 +33,8 @@ public:
 	void setResolution(const int resolution); ///< sets the resolution of the probing ray
   void setTool(ToolPtr tool); ///< set the tool to listen to
 
+  void setEnabled(bool on);
+
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
 	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
 	Vector3D getPosition() const;
@@ -57,7 +59,12 @@ protected:
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
 	bool intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection); ///< Find the intersection between the probe line and the image.
 	bool snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint); ///< if there is a landmark close by, use that instead
+	void connectInteractor();
+	void disconnectInteractor();
 
+	View* mView;
+	bool mEnabled;
+	bool mConnected;
 	ImagePtr            mImage;                           ///< the image to pick points from
   ToolPtr             mTool;                            ///< the connected tool
 	int                 mThreshold;                       ///< used to picked the point together with the probefilter, default=25
