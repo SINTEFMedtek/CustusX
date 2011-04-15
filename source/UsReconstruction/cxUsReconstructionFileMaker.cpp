@@ -36,7 +36,6 @@ UsReconstructionFileMaker::~UsReconstructionFileMaker()
 
 QString UsReconstructionFileMaker::write()
 {
-//  std::cout << "UsReconstructionFileMaker::write() start" << std::endl;
   QString reconstructionFolder = this->makeFolder(mActivepatientPath, mSessionDescription);
 
   this->writeTrackerTimestamps(reconstructionFolder);
@@ -46,7 +45,8 @@ QString UsReconstructionFileMaker::write()
   this->writeUSImages(reconstructionFolder, calibrationFile);
   this->copyProbeCalibConfigsXml(reconstructionFolder);
 
-//  std::cout << "UsReconstructionFileMaker::write() stop" << std::endl;
+  this->report();
+
   return reconstructionFolder;
 }
 
@@ -67,11 +67,12 @@ QString UsReconstructionFileMaker::makeFolder(QString patientFolder, QString ses
   int i=1;
   while(!this->createSubfolder(newPathName))
   {
-    //newPathName = newPathName.append("_").append(QString::number(i++));
     newPathName = subfolderAbsolutePath+"_"+QString::number(i++);
   }
   patientDir.cd(newPathName);
-  return  retval = patientDir.absolutePath();;
+
+  retval = patientDir.absolutePath();
+  return retval;
 }
 
 bool UsReconstructionFileMaker::createSubfolder(QString subfolderAbsolutePath)
@@ -82,17 +83,19 @@ bool UsReconstructionFileMaker::createSubfolder(QString subfolderAbsolutePath)
 
   dir.mkpath(subfolderAbsolutePath);
   dir.cd(subfolderAbsolutePath);
-  ssc::messageManager()->sendInfo("Made reconstruction folder: "+dir.absolutePath());
+  mReport << "Made reconstruction folder: "+dir.absolutePath();
   return true;
 }
 
-void UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder)
+bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFolder)
 {
+  bool success = false;
+
   QFile file(reconstructionFolder+"/"+mSessionDescription+".tts");
   if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+file.fileName());
-    return;
+    return success;
   }
   QTextStream stream(&file);
 
@@ -103,15 +106,22 @@ void UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFol
     stream << endl;
   }
   file.close();
+  success = true;
+
+  QFileInfo info(file);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mTrackerRecordedData.size())+" tracking timestamps.";
+
+  return success;
 }
 
-void UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder)
+bool UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFolder)
 {
+  bool success = false;
   QFile file(reconstructionFolder+"/"+mSessionDescription+".tp");
   if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+file.fileName());
-    return;
+    return success;
   }
   QTextStream stream(&file);
 
@@ -136,15 +146,23 @@ void UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFol
     stream << endl;
   }
   file.close();
+  success = true;
+
+  QFileInfo info(file);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mTrackerRecordedData.size())+" tracking transforms.";
+
+  return success;
 }
 
-void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
+bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
 {
+  bool success = false;
+
   QFile file(reconstructionFolder+"/"+mSessionDescription+".fts");
   if(!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
     ssc::messageManager()->sendError("Cannot open "+file.fileName());
-    return;
+    return success;
   }
   QTextStream stream(&file);
 
@@ -155,6 +173,12 @@ void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
     stream << endl;
   }
   file.close();
+  success = true;
+
+  QFileInfo info(file);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mStreamRecordedData.size())+" frame timestamps.";
+
+  return success;
 }
 
 /** Merge all us frames into one vtkImageData
@@ -162,8 +186,6 @@ void UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
  */
 vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
 {
-//  std::cout << "UsReconstructionFileMaker::mergeFrames() start " << std::endl;
-
   vtkImageAppendPtr filter = vtkImageAppendPtr::New();
   filter->SetAppendAxis(2); // append along z-axis
 
@@ -172,11 +194,9 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   int i=0;
   for(ssc::RTSourceRecorder::DataType::iterator it = mStreamRecordedData.begin(); it != mStreamRecordedData.end(); ++it)
   {
-//    std::cout << "one frame" << std::endl;
     vtkImageDataPtr input = it->second;
     if (bw)
     {
-//      std::cout << "one frame bw" << std::endl;
       if (it->second->GetNumberOfScalarComponents()>2) // color
       {
         vtkSmartPointer<vtkImageLuminance> luminance = vtkSmartPointer<vtkImageLuminance>::New();
@@ -189,35 +209,28 @@ vtkImageDataPtr UsReconstructionFileMaker::mergeFrames()
   }
 
   filter->Update();
-//  std::cout << "UsReconstructionFileMaker::mergeFrames() stop " << std::endl;
   return filter->GetOutput();
 }
 
-void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
+bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
 {
+  bool success = false;
+
   QString mhdFilename = this->getMhdFilename(reconstructionFolder);
   vtkImageDataPtr usData = this->mergeFrames();
 
-
-  //std::cout << "start write mhd file " << mhdFilename << std::endl;
-  // write file to disk
   vtkMetaImageWriterPtr writer = vtkMetaImageWriterPtr::New();
   writer->SetInput(usData);
   writer->SetFileName(cstring_cast(mhdFilename));
   writer->SetCompression(false);
-//  std::cout << "UsReconstructionFileMaker::writeUSImages start write" << std::endl;
   writer->Write();
-//  std::cout << "UsReconstructionFileMaker::writeUSImages stop write" << std::endl;
-  //std::cout << "finished write mhd file " << mhdFilename << std::endl;
-  writer = NULL; // ensure file is closed (might not be necessary)
 
   //mhd - custom fields
-  //--------------------------------------------------------------------------------------------------------------------
   QFile mhdFile(mhdFilename);
   if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Append))
   {
     ssc::messageManager()->sendError("Cannot open "+mhdFile.fileName());
-    return;
+    return success;
   }
   QTextStream mhdStream(&mhdFile);
   if (mTool)
@@ -225,8 +238,19 @@ void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
     mhdStream << "ConfigurationID = " << mTool->getProbe()->getConfigurationPath() << '\n';
     mhdStream << "ProbeCalibration = " << calibrationFile << '\n';
   }
-  //--------------------------------------------------------------------------------------------------------------------
   mhdFile.close();
+  success = true;
+
+  QFileInfo mhdInfo(mhdFile);
+  mReport << mhdInfo.fileName()+", "+qstring_cast(mhdInfo.size())+" bytes";
+
+  QString rawFileName = mhdFilename.replace(QString(".mhd"), QString(".raw"));
+  QFile rawFile(rawFileName);
+  QFileInfo info(rawFile);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mStreamRecordedData.size())+" frames.";
+
+  writer = NULL; // ensure file is closed (might not be necessary)
+  return success;
 
 }
 
@@ -263,100 +287,12 @@ void UsReconstructionFileMaker::copyProbeCalibConfigsXml(QString reconstructionF
   }
 }
 
-
-/*void UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QString calibrationFile)
+void UsReconstructionFileMaker::report()
 {
-  //std::cout << "UsReconstructionFileMaker::writeUSImages sta" << std::endl;
-
-  QFile mhdFile(reconstructionFolder+"/"+mSessionDescription->getDescription()+".mhd");
-  QFile rawFile(reconstructionFolder+"/"+mSessionDescription->getDescription()+".raw");
-  if(!mhdFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  foreach(QString string, mReport)
   {
-    ssc::messageManager()->sendError("Cannot open "+mhdFile.fileName());
-    return;
+    ssc::messageManager()->sendSuccess(string, true);
   }
-  if(!rawFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-  {
-    ssc::messageManager()->sendError("Cannot open "+rawFile.fileName());
-    return;
-  }
-
-  //mhd
-  //--------------------------------------------------------------------------------------------------------------------
-  QTextStream mhdStream(&mhdFile);
-
-  ssc::RealTimeStreamSourceRecorder::DataType::iterator it = mStreamRecordedData.begin();
-  if(it == mStreamRecordedData.end())
-  {
-    //no data to write, what to do?
-    return;
-  }
-  vtkImageDataPtr image = it->second;
-
-  int scalarComponents = image->GetNumberOfScalarComponents();
-  int* frameDims = image->GetDimensions();
-  int frameCount = mStreamRecordedData.size();
-  int scalarType = image->GetScalarType();
-  double* spacing = image->GetSpacing();
-  QFileInfo rawInfo(rawFile);
-
-
-  mhdStream << "NDims = 3" << '\n';
-
-  mhdStream << "DimSize = ";
-  mhdStream << frameDims[0] << " ";
-  mhdStream << frameDims[1] << " ";
-  mhdStream << frameCount;
-  mhdStream << '\n';
-
-  if(scalarType == VTK_UNSIGNED_CHAR && scalarComponents == 1)
-    mhdStream << "ElementType = MET_UCHAR" << '\n'; //8 bit gray
-  if(scalarType == VTK_UNSIGNED_CHAR  && scalarComponents == 4)
-    mhdStream << "ElementType = MET_UINT" << '\n'; //32 bit RGBA
-  if(scalarType == VTK_SHORT)
-    mhdStream << "ElementType = MET_SHORT" << '\n';
-  if(scalarType == VTK_UNSIGNED_SHORT)
-    mhdStream << "ElementType = MET_USHORT" << '\n';
-  if(scalarType == VTK_FLOAT)
-    mhdStream << "ElementType = MET_FLOAT" << '\n';
-  if(scalarType == VTK_DOUBLE)
-    mhdStream << "ElementType = MET_DOUBLE" << '\n';
-
-  mhdStream << "ElementSpacing = " << spacing[0] << " " << spacing[1] << " " << spacing[2]<< '\n';
-
-  mhdStream << "ElementByteOrderMSB = false" << '\n';
-
-  mhdStream << "ElementDataFile = " << rawInfo.fileName() <<   '\n';
-
-  if (mTool)
-  {
-    mhdStream << "ConfigurationID = " << mTool->getConfigurationString() << '\n';
-    mhdStream << "ProbeCalibration = " << mTool->getCalibrationFileName() << '\n';
-  }
-  //--------------------------------------------------------------------------------------------------------------------
-  mhdFile.close();
-
-  //raw
-  //--------------------------------------------------------------------------------------------------------------------
-  QDataStream rawStream(&rawFile);
-
-  std::cout << "UsReconstructionFileMaker::writeUSImages " << rawFile.fileName() << std::endl;
-
-  unsigned int nBytes = (frameDims[0]*frameDims[1])*scalarComponents;
-  if(image->GetScalarSize() != 8)
-    ssc::messageManager()->sendError("One scalar is not 8 bit, something is wrong!!!");
-  ssc::messageManager()->sendDebug("image->GetScalarSize(): "+qstring_cast(image->GetScalarSize()));
-
-  it = mStreamRecordedData.begin();
-  for(; it != mStreamRecordedData.end(); ++it)
-  {
-    image = it->second;
-    const char* pointer = static_cast<const char*>(image->GetScalarPointer());
-    rawStream.writeBytes(pointer, nBytes);
-  }
-  //--------------------------------------------------------------------------------------------------------------------
-  rawFile.close();
-}*/
-
+}
 
 }//namespace cx
