@@ -2,7 +2,6 @@
 #define CXPREFERANCESDIALOG_H_
 
 #include <QDialog>
-//#include "boost/shared_ptr.hpp"
 #include "sscDoubleDataAdapterXml.h"
 
 class QTabWidget;
@@ -242,16 +241,20 @@ public:
   PreferencesDialog(QWidget *parent = 0);
   virtual ~PreferencesDialog();
 
+signals:
+  void applied();
+
 private slots:
   void selectTabSlot();
+  void applySlot();
 
 protected:
   void addTab(PreferencesTab* widget, QString name);
 
   QActionGroup* mActionGroup;
-  QStackedWidget* tabWidget;
+  QStackedWidget* mTabWidget;
   QToolBar* mToolBar;
-  QDialogButtonBox *buttonBox;
+  QDialogButtonBox *mButtonBox;
 };
 
 }//namespace cx
