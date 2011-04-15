@@ -36,8 +36,9 @@ RTSourceManager::RTSourceManager()
 
   mRTSource.reset(new ssc::OpenIGTLinkRTSource());
   ssc::dataManager()->loadStream(mRTSource);
-  //connect(mRTSource.get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
+  connect(getRTSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
+  connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int))); // thread-bridging connection
 
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(connectSourceToTool()));
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
