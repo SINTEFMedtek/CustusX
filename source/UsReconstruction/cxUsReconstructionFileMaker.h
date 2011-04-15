@@ -3,11 +3,13 @@
 
 #include <QFile>
 #include <QString>
+#include <QStringList>
 #include <QTextStream>
 #include "boost/shared_ptr.hpp"
 #include "sscRTSourceRecorder.h"
-//#include "cxRecordSession.h"
 #include "cxTool.h"
+
+class QDir;
 
 namespace cx
 {
@@ -37,20 +39,22 @@ private:
   bool createSubfolder(QString subfolderAbsolutePath);
   vtkImageDataPtr mergeFrames();
 
-  void writeTrackerTimestamps(QString reconstructionFolder);
-  void writeTrackerTransforms(QString reconstructionFolder);
-  void writeUSTimestamps(QString reconstructionFolder);
-  void writeUSImages(QString reconstructionFolder, QString calibrationFile);
+  bool writeTrackerTimestamps(QString reconstructionFolder);
+  bool writeTrackerTransforms(QString reconstructionFolder);
+  bool writeUSTimestamps(QString reconstructionFolder);
+  bool writeUSImages(QString reconstructionFolder, QString calibrationFile);
   QString copyCalibrationFile(QString reconstructionFolder);
   void copyProbeCalibConfigsXml(QString reconstructionFolder);
 
+  void report();
+
   ssc::TimedTransformMap mTrackerRecordedData;
   ssc::RTSourceRecorder::DataType mStreamRecordedData;
-  //RecordSessionPtr mSession;
   QString mSessionDescription;
   QString mActivepatientPath;
   ssc::ToolPtr mTool;
 
+  QStringList mReport;
 };
 
 typedef boost::shared_ptr<UsReconstructionFileMaker> UsReconstructionFileMakerPtr;
