@@ -109,7 +109,7 @@ bool UsReconstructionFileMaker::writeTrackerTimestamps(QString reconstructionFol
   success = true;
 
   QFileInfo info(file);
-  mReport << info.fileName()+", "+info.size()+" bytes, "+mTrackerRecordedData.size()+" tracking timestamps.";
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mTrackerRecordedData.size())+" tracking timestamps.";
 
   return success;
 }
@@ -149,7 +149,7 @@ bool UsReconstructionFileMaker::writeTrackerTransforms(QString reconstructionFol
   success = true;
 
   QFileInfo info(file);
-  mReport << info.fileName()+", "+info.size()+" bytes, "+mTrackerRecordedData.size()+" tracking transforms.";
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mTrackerRecordedData.size())+" tracking transforms.";
 
   return success;
 }
@@ -176,7 +176,7 @@ bool UsReconstructionFileMaker::writeUSTimestamps(QString reconstructionFolder)
   success = true;
 
   QFileInfo info(file);
-  mReport << info.fileName()+", "+info.size()+" bytes, "+mStreamRecordedData.size()+" frame timestamps.";
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mStreamRecordedData.size())+" frame timestamps.";
 
   return success;
 }
@@ -224,7 +224,6 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   writer->SetFileName(cstring_cast(mhdFilename));
   writer->SetCompression(false);
   writer->Write();
-  writer = NULL; // ensure file is closed (might not be necessary)
 
   //mhd - custom fields
   QFile mhdFile(mhdFilename);
@@ -243,12 +242,14 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
   success = true;
 
   QFileInfo mhdInfo(mhdFile);
-  mReport << mhdInfo.fileName()+", "+mhdInfo.size()+" bytes";
+  mReport << mhdInfo.fileName()+", "+qstring_cast(mhdInfo.size())+" bytes";
 
-  QFile usFile(writer->GetFileName());
-  QFileInfo info(usFile);
-  mReport << info.fileName()+", "+info.size()+" bytes, "+mStreamRecordedData.size()+" frames.";
+  QString rawFileName = mhdFilename.replace(QString(".mhd"), QString(".raw"));
+  QFile rawFile(rawFileName);
+  QFileInfo info(rawFile);
+  mReport << info.fileName()+", "+qstring_cast(info.size())+" bytes, "+qstring_cast(mStreamRecordedData.size())+" frames.";
 
+  writer = NULL; // ensure file is closed (might not be necessary)
   return success;
 
 }
@@ -290,7 +291,7 @@ void UsReconstructionFileMaker::report()
 {
   foreach(QString string, mReport)
   {
-    ssc::messageManager()->sendInfo(string);
+    ssc::messageManager()->sendSuccess(string, true);
   }
 }
 
