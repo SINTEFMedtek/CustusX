@@ -157,15 +157,6 @@ void USAcqusitionWidget::dominantToolChangedSlot()
   if(!probe)
     return;
 
-  // REmoved: cannot rely on just one specialization: makes testing impossible.
-//  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(tool);
-//  if(!cxTool)
-//    return;
-
-  // might need to just update a tool : when manual tool is impued with probe characteristics
-//  if (tool==this->getTool())
-//    return;
-
   if (this->getTool() && this->getTool()->getProbe())
     disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
 
@@ -186,6 +177,7 @@ void USAcqusitionWidget::startedSlot()
 {
   mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
   mRTRecorder->startRecord();
+  ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
 void USAcqusitionWidget::stoppedSlot()
@@ -199,5 +191,6 @@ void USAcqusitionWidget::stoppedSlot()
   }
 
   mRTRecorder->stopRecord();
+  ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
 }
 }//namespace cx

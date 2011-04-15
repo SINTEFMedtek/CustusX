@@ -102,6 +102,8 @@ QString ToolConfigureGroupBox::requestSaveConfigurationSlot()
 
   retval = config.mFileName;
 
+  this->populateConfigurations();
+
   return retval;
 }
 
