@@ -121,6 +121,20 @@ void TransferFunctionColorWidget::calculateColorTFBoundaries(int &areaLeft, int 
   areaWidth = areaRight - areaLeft;
 }
 
+int TransferFunctionColorWidget::calculateXPositionInTrFunc(int screenX)
+{
+  int areaLeft, areaRight, areaWidth;
+  this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
+  int retval =
+//    static_cast<int>(0.5 + mImage->getMin() + ( mImage->getRange() -1) *
+//                     (screenX - areaLeft) /
+//                     static_cast<double>(areaWidth-1) );
+  static_cast<int>( mImage->getMin() + ( mImage->getRange() ) *
+                   (screenX - areaLeft) /
+                   static_cast<double>(areaWidth-1) );
+  return retval;
+}
+
 void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 {
 	// Don't do anything before we have an image
@@ -151,9 +165,7 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 
   for (int x = areaLeft; x <= areaRight; ++x)
   {
-    int point = static_cast<int>(0.5 + mImage->getMin() + (mImage->getRange() - 1) *
-                                 (x - areaLeft) /
-                                 static_cast<double>(areaWidth-1));
+    int point = calculateXPositionInTrFunc(x);
 
     //QColor color = transferFunction->getInterpolatedColorValue(point);
 		double* rgb = trFunc->GetColor(point);
@@ -283,14 +295,7 @@ void TransferFunctionColorWidget::contextMenuEvent(QContextMenuEvent *event)
 TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentColorPoint()
 {
   ColorPoint point;
-
-  int areaLeft, areaRight, areaWidth;
-  this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
-  point.position =
-    static_cast<int>(mImage->getMin() + ( mImage->getRange() *
-                     (mCurrentClickX - areaLeft) /
-                     static_cast<double>(areaWidth) ));
-
+  point.position = calculateXPositionInTrFunc(mCurrentClickX);
   point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
 
 	// Use vtkColorTransferFunction for interpolation
