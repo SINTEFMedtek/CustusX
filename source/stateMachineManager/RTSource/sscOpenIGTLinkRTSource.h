@@ -52,8 +52,8 @@ public:
   double getTimestampCalibration() { return mTimestampCalibration; }
   void setSoundSpeedCompensation(double gamma); ///< gamma is the correction factor for the distance along the sound direction
 
-//signals:
-//  void serverStatusChanged();
+signals:
+  void fps(int fps);
 
 public:
   void updateImage(igtl::ImageMessage::Pointer message); // called by receiving thread when new data arrives.
@@ -75,7 +75,6 @@ private:
   boost::array<unsigned char, 100> mZero;
   vtkImageImportPtr mImageImport;
   vtkImageDataPtr mFilter_ARGB_RGBA;
-//  QDateTime mTimestamp;
   vtkImageAlgorithmPtr mRedirecter;
   igtl::ImageMessage::Pointer mImageMessage;
   IGTLinkClientPtr mClient;
