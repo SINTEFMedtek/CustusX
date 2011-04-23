@@ -93,9 +93,10 @@ QString OpenIGTLinkRTSource::getName()
   return mDeviceName;
 }
 
-void OpenIGTLinkRTSource::fpsSlot(double fps)
+void OpenIGTLinkRTSource::fpsSlot(double fpsNumber)
 {
-  mFPS = fps;
+  mFPS = fpsNumber;
+  emit fps(fpsNumber);
 }
 
 QString OpenIGTLinkRTSource::getInfoString() const

@@ -24,7 +24,8 @@ public:
   virtual ~Centerline();
 
   void setInput(ssc::ImagePtr inputImage, QString outputBasePath);
-  ssc::ImagePtr getOutput();
+  ssc::DataPtr getOutput();
+  void setDefaultColor(QColor color);
 
 private slots:
   virtual void postProcessingSlot();
@@ -34,7 +35,8 @@ private:
 
   QString       mOutputBasePath;
   ssc::ImagePtr mInput;
-  ssc::ImagePtr mOutput;
+  ssc::DataPtr mOutput;
+  QColor mDefaultColor;
 };
 
 }//namespace cx
