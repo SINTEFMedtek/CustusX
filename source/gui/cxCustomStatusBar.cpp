@@ -2,10 +2,12 @@
 
 #include <QLabel>
 #include <QString>
-#include "sscToolManager.h"
-#include "cxToolManager.h"
 #include <QHBoxLayout>
+#include "sscToolManager.h"
 #include "sscMessageManager.h"
+#include "cxStateMachineManager.h"
+#include "RTSource/cxRTSourceManager.h"
+#include "cxToolManager.h"
 #include "cxViewManager.h"
 #include <QPixmap>
 #include <QMetaObject>
@@ -13,7 +15,8 @@
 namespace cx
 {
 CustomStatusBar::CustomStatusBar() :
-  mFpsLabel(new QLabel()),
+  mRenderingFpsLabel(new QLabel()),
+  mGrabbingInfoLabel(new QLabel()),
   mTpsLabel(new QLabel())
 {
   connect(ssc::messageManager(), SIGNAL(emittedMessage(Message)), this, SLOT(showMessageSlot(Message)));
@@ -22,9 +25,13 @@ CustomStatusBar::CustomStatusBar() :
   connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(disconnectFromToolSignals()));
   connect(ssc::toolManager(), SIGNAL(tps(int)), this, SLOT(tpsSlot(int)));
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(receiveToolDominant()));
-  connect(viewManager(), SIGNAL(fps(int)),this, SLOT(fpsSlot(int)));
+
+  connect(viewManager(), SIGNAL(fps(int)),this, SLOT(renderingFpsSlot(int)));
   
-  this->addPermanentWidget(mFpsLabel);
+  connect(stateManager()->getRTSourceManager().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+  connect(stateManager()->getRTSourceManager().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+
+  this->addPermanentWidget(mRenderingFpsLabel);
 }
 
 CustomStatusBar::~CustomStatusBar()
@@ -122,16 +129,31 @@ void CustomStatusBar::setToolLabelColor(QLabel* label, bool visible, bool domina
   label->setStyleSheet(color);
 }
 
-void CustomStatusBar::fpsSlot(int numFps)
+void CustomStatusBar::renderingFpsSlot(int numFps)
 {
   QString fpsString = "FPS: "+QString::number(numFps);
-  mFpsLabel->setText(fpsString);
+  mRenderingFpsLabel->setText(fpsString);
 }
 
 void CustomStatusBar::tpsSlot(int numTps)
 {
   QString tpsString = "TPS: "+QString::number(numTps);
   mTpsLabel->setText(tpsString);
+}
+
+void CustomStatusBar::grabbingFpsSlot(int numFps)
+{
+  ssc::OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getRTSource();
+  QString infoString = grabber->getName()+"-FPS: "+QString::number(numFps);
+  mGrabbingInfoLabel->setText(infoString);
+}
+
+void CustomStatusBar::grabberConnectedSlot(bool connected)
+{
+  if(connected)
+    this->addPermanentWidget(mGrabbingInfoLabel);
+  else
+    this->removeWidget(mGrabbingInfoLabel);
 }
 
 void CustomStatusBar::showMessageSlot(Message message)
