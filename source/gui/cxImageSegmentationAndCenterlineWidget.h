@@ -47,7 +47,7 @@ protected:
   SelectImageStringDataAdapterPtr mResampleOutput;
   SelectImageStringDataAdapterPtr mSegmentationOutput;
   SelectMeshStringDataAdapterPtr mSurfaceOutput;
-  SelectImageStringDataAdapterPtr mCenterlineOutput;
+  SelectDataStringDataAdapterPtr mCenterlineOutput;
 };
 
 class FixedImage2ImageWidget : public ImageSegmentationAndCenterlineWidget

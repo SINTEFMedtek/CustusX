@@ -30,7 +30,7 @@
 #include "vtkPointData.h"
 #include "vtkLandmarkTransform.h"
 #include "vtkFloatArray.h"
-
+#include "sscMesh.h"
 
 namespace cx
 {
@@ -349,7 +349,26 @@ vtkAbstractTransformPtr SeansVesselReg::nonLinearRegistration(vtkPolyDataPtr tps
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target, QString logPath)
+vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
+{
+  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(data);
+  ssc::MeshPtr mesh = boost::dynamic_pointer_cast<ssc::Mesh>(data);
+
+  if (image)
+  {
+    //Grab the information from the files of target then
+    //filter out points not fit for the threshold
+    return this->extractPolyData(image, mt_singlePointThreshold, 0);
+  }
+  else if (mesh)
+  {
+    return mesh->getVtkPolyData();
+  }
+
+  return vtkPolyDataPtr();
+}
+
+bool SeansVesselReg::doItRight(ssc::DataPtr source, ssc::DataPtr target, QString logPath)
 {
   ssc::messageManager()->sendDebug("SOURCE: "+source->getUid());
   ssc::messageManager()->sendDebug("TARGET: "+target->getUid());
@@ -363,9 +382,13 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target, QStri
 
   time_t sec1 = clock();//time(NULL);
 
-  //Grab the information from the files of target then
-  //filter out points not fit for the threshold
-  vtkPolyDataPtr targetPolyData = this->extractPolyData(target, mt_singlePointThreshold, 0);
+//  ssc::ImagePtr movingData = boost::dynamic_pointer_cast<ssc::Image>(mMovingData);
+
+  vtkPolyDataPtr targetPolyData = this->convertToPolyData(target);
+
+//  //Grab the information from the files of target then
+//  //filter out points not fit for the threshold
+//  vtkPolyDataPtr targetPolyData = this->extractPolyData(target, mt_singlePointThreshold, 0);
 
   // use the bounding box of target to clip the source data.
   targetPolyData->GetPoints()->ComputeBounds();
@@ -378,7 +401,8 @@ bool SeansVesselReg::doItRight(ssc::ImagePtr source, ssc::ImagePtr target, QStri
   targetBounds[4] -= searchAround;
   targetBounds[5] += searchAround;
 
-  vtkPolyDataPtr sourcePolyData = this->extractPolyData(source, mt_singlePointThreshold, targetBounds);
+  vtkPolyDataPtr sourcePolyData = this->convertToPolyData(source);
+//  vtkPolyDataPtr sourcePolyData = this->extractPolyData(source, mt_singlePointThreshold, targetBounds);
 
   std::cout << "\nPreprocess time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " seconds\n" << endl;
 

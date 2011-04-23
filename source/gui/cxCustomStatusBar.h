@@ -34,7 +34,9 @@ private slots:
   void disconnectFromToolSignals(); ///< disconnect from all tool
   void receiveToolVisible(); ///< updates the color label for a tool
   void receiveToolDominant(); ///< updates the color label for a tool
-  void fpsSlot(int numFps); ///< Show frames per seconds
+  void renderingFpsSlot(int numFps); ///< Show rendered frames per seconds
+  void grabbingFpsSlot(int numFps); ///< Show grabbed frames per seconds
+  void grabberConnectedSlot(bool connected);
   void tpsSlot(int numTps); ///< Show transforms per seconds
   void showMessageSlot(Message message); ///< prints the incomming message to the statusbar
 
@@ -43,7 +45,8 @@ private:
   void setToolLabelColor(QLabel* label, bool visible, bool dominant);
 
   std::vector<QLabel*> mToolLabels; ///< labels indicating the tools visibility
-  QLabel* mFpsLabel; ///< Label for showing FPS
+  QLabel* mRenderingFpsLabel; ///< Label for showing rendering FPS
+  QLabel* mGrabbingInfoLabel; ///< Label for showing info about the grabber
   QLabel* mTpsLabel; ///< Label for showing TPS
 };
 }
