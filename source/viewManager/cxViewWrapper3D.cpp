@@ -121,6 +121,10 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 //  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
   connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
   mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+  mProbeRep->setEnabled(false);
+  mView->addRep(mProbeRep);
+  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+  this->dominantToolChangedSlot();
 
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");
@@ -140,23 +144,13 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
   mView->addRep(mAnnotationMarker);
   mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
-
-//  mInteractorCallback = new InteractionCallback;
-//  mInteractorCallback->setCallback(boost::bind(&ViewWrapper3D::viewChanged, this));
-//  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::InteractionEvent, mInteractorCallback);
-//  mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->AddObserver(vtkCommand::EndInteractionEvent, mInteractorCallback);
-//  mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
 }
 
 ViewWrapper3D::~ViewWrapper3D()
 {
-//  std::cout << "destroying " << this << " "<< mView->getUid() << std::endl;
-
   if (mView)
   {
     mView->removeReps();
-//    mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
-//    mView->getRenderWindow()->GetInteractor()->GetInteractorStyle()->RemoveObserver(mInteractorCallback);
   }
 }
 
@@ -248,6 +242,8 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
   connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
   connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
   mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
+  this->optionChangedSlot();
+
 }
 
 void ViewWrapper3D::showToolPathSlot(bool checked)
@@ -513,6 +509,7 @@ void ViewWrapper3D::optionChangedSlot()
 {
   ViewGroupData::Options options = mViewGroup->getOptions();
 
+
   this->showLandmarks(options.mShowLandmarks);
   this->showPointPickerProbe(options.mShowPointPickerProbe);
 }
@@ -536,20 +533,23 @@ void ViewWrapper3D::showLandmarks(bool on)
 
 void ViewWrapper3D::showPointPickerProbe(bool on)
 {
-  if (mProbeRep->isConnectedToView(mView) == on)
-    return;
+//  if (mProbeRep->isConnectedToView(mView) == on)
+//    return;
 
-  if (on)
-  {
-    mView->addRep(mProbeRep);
-    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-    this->dominantToolChangedSlot();
-  }
-  else
-  {
-    mView->removeRep(mProbeRep);
-    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-  }
+  mProbeRep->setEnabled(on);
+
+//  if (on)
+//  {
+//    mProbeRep->setEnabled(true);
+//    mView->addRep(mProbeRep);
+//    connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+//    this->dominantToolChangedSlot();
+//  }
+//  else
+//  {
+//    mView->removeRep(mProbeRep);
+//    disconnect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
+//  }
 }
 
 void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)

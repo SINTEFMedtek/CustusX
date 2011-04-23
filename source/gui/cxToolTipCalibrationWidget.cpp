@@ -257,6 +257,7 @@ void ToolTipSampleWidget::sampleSlot()
   streamer << sampledPoint;
   streamer << endl;
 
+  ssc::messageManager()->playSampleSound();
   ssc::messageManager()->sendInfo("Sampled point in "+qstring_cast(to.mId)+" ("+to.mRefObject+") space, result: "+sampledPoint);
 }
 

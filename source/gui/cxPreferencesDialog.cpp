@@ -411,9 +411,9 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   mActionGroup->setExclusive(true);
   mToolBar =  new QToolBar;
   mToolBar->setOrientation(Qt::Vertical);
-  tabWidget = new QStackedWidget;
+  mTabWidget = new QStackedWidget;
 
-  buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Apply | QDialogButtonBox::Cancel);
 
   this->addTab(new GeneralTab, tr("General"));
   this->addTab(new PerformanceTab, tr("Performance"));
@@ -422,8 +422,11 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
   this->addTab(new VideoTab, tr("Video"));
   this->addTab(new ToolConfigTab, tr("Tool Configuration"));
 
-  connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-  connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  QPushButton* applyButton = mButtonBox->button(QDialogButtonBox::Apply);
+
+  connect(mButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
+  connect(mButtonBox, SIGNAL(accepted()), this, SLOT(accept()));
+  connect(applyButton, SIGNAL(clicked()), this, SLOT(applySlot()));
 
   QVBoxLayout *mainLayout = new QVBoxLayout;
   QHBoxLayout *tabLayout = new QHBoxLayout;
@@ -435,28 +438,43 @@ PreferencesDialog::PreferencesDialog(QWidget *parent) :
 
   tabLayout->addWidget(mToolBar);
   tabLayout->addWidget(frame);
-  frame->layout()->addWidget(tabWidget);
+  frame->layout()->addWidget(mTabWidget);
   mainLayout->addLayout(tabLayout);
-  mainLayout->addWidget(buttonBox);
+  mainLayout->addWidget(mButtonBox);
   setLayout(mainLayout);
 
-  tabWidget->setCurrentIndex(0);
+  mTabWidget->setCurrentIndex(0);
 
-  buttonBox->button(QDialogButtonBox::Ok)->setFocus();
+  mButtonBox->button(QDialogButtonBox::Ok)->setFocus();
 }
 
 PreferencesDialog::~PreferencesDialog()
 {}
 
+void PreferencesDialog::selectTabSlot()
+{
+  QAction* action = dynamic_cast<QAction*>(sender());
+  if (!action)
+    return;
+  int val = action->data().toInt();
+  mTabWidget->setCurrentIndex(val);
+}
+
+void PreferencesDialog::applySlot()
+{
+  emit applied();
+}
+
 void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
 {
   widget->init();
-  connect(buttonBox, SIGNAL(accepted()), widget, SLOT(saveParametersSlot()));
+  connect(mButtonBox, SIGNAL(accepted()), widget, SLOT(saveParametersSlot()));
+  connect(this, SIGNAL(applied()), widget, SLOT(saveParametersSlot()));
 
   QAction* action = new QAction(name, mActionGroup);
-  action->setData(tabWidget->count());
+  action->setData(mTabWidget->count());
   action->setCheckable(true);
-  if (!tabWidget->count())
+  if (!mTabWidget->count())
     action->setChecked(true);
   connect(action, SIGNAL(triggered()), this, SLOT(selectTabSlot()));
   QToolButton* button = new QToolButton(this);
@@ -466,16 +484,7 @@ void PreferencesDialog::addTab(PreferencesTab* widget, QString name)
   button->setDefaultAction(action);
   mToolBar->addWidget(button);
 
-  tabWidget->addWidget(widget);
-}
-
-void PreferencesDialog::selectTabSlot()
-{
-  QAction* action = dynamic_cast<QAction*>(sender());
-  if (!action)
-    return;
-  int val = action->data().toInt();
-  tabWidget->setCurrentIndex(val);
+  mTabWidget->addWidget(widget);
 }
 
 }//namespace cx

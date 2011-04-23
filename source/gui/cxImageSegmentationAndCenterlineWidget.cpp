@@ -6,6 +6,7 @@
 #include "cxSegmentationWidget.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -33,9 +34,9 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   //TODO connect to view!
   //connect(surfaceOutput.get(), SIGNAL(meshChanged(QString)), this, SLOT(meshChanged(QString)));
 
-  mCenterlineOutput = SelectImageStringDataAdapter::New();
+  mCenterlineOutput = SelectDataStringDataAdapter::New();
   mCenterlineOutput->setValueName("Output: ");
-  connect(mCenterlineOutput.get(), SIGNAL(imageChanged(QString)), this, SLOT(setImageSlot(QString)));
+  connect(mCenterlineOutput.get(), SIGNAL(dataChanged(QString)), this, SLOT(setImageSlot(QString)));
 
   mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mResampleWidget, new ssc::LabeledComboBoxWidget(this, mResampleOutput), "Resample"));
@@ -60,8 +61,9 @@ void ImageSegmentationAndCenterlineWidget::setImageSlot(QString uid)
 {
   if(!mOutput)
     return;
+  std::cout << "ImageSegmentationAndCenterlineWidget::setImageSlot " << uid << std::endl;
 
-  mCenterlineWidget->visualizeSlot(uid);
+//  mCenterlineWidget->visualizeSlot(uid);
   mOutput->setValue(uid);
 }
 
