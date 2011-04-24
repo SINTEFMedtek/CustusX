@@ -51,6 +51,10 @@ public:
   ssc::OpenIGTLinkRTSourcePtr getRTSource() { return mRTSource; }
   ssc::ToolPtr getStreamingProbe();
 
+signals:
+  void fps(int fps);
+  void connected(bool on);
+
 public slots:
   void connectServer();
 

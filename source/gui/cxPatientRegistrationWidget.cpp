@@ -90,6 +90,7 @@ void PatientRegistrationWidget::toolSampleButtonClickedSlot()
     mActiveLandmark = ssc::dataManager()->getLandmarkProperties().begin()->first;
 
   ssc::toolManager()->setLandmark(ssc::Landmark(mActiveLandmark, p_pr));
+  ssc::messageManager()->playSampleSound();
 
   this->nextRow();
 }
@@ -110,9 +111,9 @@ void PatientRegistrationWidget::dominantToolChangedSlot(const QString& uid)
     connect(mToolToSample.get(), SIGNAL(toolVisible(bool)), this, SLOT(toolVisibleSlot(bool)));
 
   //update button
-  mToolSampleButton->setText("Sample ("+qstring_cast(mToolToSample->getName())+")");
+  mToolSampleButton->setText("Sample "+qstring_cast(mToolToSample->getName()));
   connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), this, SLOT(enableToolSampleButton()));
-  enableToolSampleButton();
+  this->enableToolSampleButton();
 }
 
 
@@ -157,7 +158,11 @@ ssc::Transform3D PatientRegistrationWidget::getTargetTransform() const
 
 void PatientRegistrationWidget::performRegistration()
 {
+  if(!registrationManager()->getFixedData())
+    registrationManager()->setFixedData(mCurrentImage);
+
   registrationManager()->doPatientRegistration();
+
   this->updateAvarageAccuracyLabel();
 }
 

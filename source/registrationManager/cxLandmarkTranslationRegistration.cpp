@@ -233,7 +233,7 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
 
   mResult = ssc::Transform3D();
   for (unsigned i=0; i<transform->GetNumberOfParameters(); ++i)
-    mResult[i][3] = transform->GetParameters()[i];
+    mResult(i,3) = transform->GetParameters()[i];
 
   //std::cout << "Solution = " << transform->GetParameters() << "\n" << mResult << std::endl;
   //std::cout << "Solution = " << registration->GetLastTransformParameters() << std::endl;

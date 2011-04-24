@@ -368,7 +368,9 @@ QString RegistrationFixedImageStringDataAdapter::getValueName() const
 
 bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ImagePtr newImage = ssc::dataManager()->getImage(value);
+  std::cout << "RegistrationFixedImageStringDataAdapter::setImageSlot " << value << std::endl;
+
+  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
   if (newImage==registrationManager()->getFixedData())
     return false;
   registrationManager()->setFixedData(newImage);
@@ -376,14 +378,14 @@ bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
 }
 QString RegistrationFixedImageStringDataAdapter::getValue() const
 {
-  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(registrationManager()->getFixedData());
+  ssc::DataPtr image = registrationManager()->getFixedData();
   if (!image)
     return "";
   return qstring_cast(image->getUid());
 }
 QString RegistrationFixedImageStringDataAdapter::getHelp() const
 {
-  return "Select the fixed registration volume";
+  return "Select the fixed registration data";
 }
 
 //---------------------------------------------------------
@@ -400,7 +402,7 @@ QString RegistrationMovingImageStringDataAdapter::getValueName() const
 }
 bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
 {
-  ssc::ImagePtr newImage = ssc::dataManager()->getImage(value);
+  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
   if (newImage==registrationManager()->getMovingData())
     return false;
   registrationManager()->setMovingData(newImage);
@@ -408,14 +410,14 @@ bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
 }
 QString RegistrationMovingImageStringDataAdapter::getValue() const
 {
-  ssc::ImagePtr image = boost::dynamic_pointer_cast<ssc::Image>(registrationManager()->getMovingData());
+  ssc::DataPtr image = registrationManager()->getMovingData();
   if (!image)
     return "";
   return qstring_cast(image->getUid());
 }
 QString RegistrationMovingImageStringDataAdapter::getHelp() const
 {
-  return "Select the moving registration volume";
+  return "Select the moving registration data";
 }
 
 
@@ -636,12 +638,17 @@ void SelectRecordSessionStringDataAdapter::setDefaultSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-SelectDataStringDataAdapter::SelectDataStringDataAdapter()
+SelectDataStringDataAdapter::SelectDataStringDataAdapter() :
+    mValueName("Select data")
 {
+}
+void SelectDataStringDataAdapter::setValueName(const QString name)
+{
+  mValueName = name;
 }
 QString SelectDataStringDataAdapter::getValueName() const
 {
-  return "Select data";
+  return mValueName;
 }
 bool SelectDataStringDataAdapter::setValue(const QString& value)
 {
@@ -653,6 +660,7 @@ bool SelectDataStringDataAdapter::setValue(const QString& value)
 
   mData = temp;
   emit changed();
+  emit dataChanged(value);
   return true;
 }
 QString SelectDataStringDataAdapter::getValue() const
