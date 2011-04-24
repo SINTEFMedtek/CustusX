@@ -128,9 +128,9 @@ void ManualRegistrationOffsetWidget::setOffsetSlot(int value)
   mResetOffsetButton->setEnabled(true);
 
   ssc::Transform3D offset;
-  offset[0][3] = mXOffsetSlider->value();
-  offset[1][3] = mYOffsetSlider->value();
-  offset[2][3] = mZOffsetSlider->value();
+  offset(0,3) = mXOffsetSlider->value();
+  offset(1,3) = mYOffsetSlider->value();
+  offset(2,3) = mZOffsetSlider->value();
   registrationManager()->setManualPatientRegistrationOffsetSlot(offset);
 }
 

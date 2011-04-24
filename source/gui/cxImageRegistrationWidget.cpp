@@ -114,11 +114,15 @@ void ImageRegistrationWidget::activeImageChangedSlot()
   if(mCurrentImage)
   {
     //set a default treshold
-    mThresholdSlider->setRange(mCurrentImage->getPosMin(), mCurrentImage->getPosMax());
+    mThresholdSlider->setRange(mCurrentImage->getMin(), mCurrentImage->getMax());
     ssc::ProbeRepPtr probe = this->getProbeRep();
     if (probe)
       mThresholdSlider->setValue(probe->getThreshold());
+
+    if(!registrationManager()->getFixedData())
+      registrationManager()->setFixedData(mCurrentImage);
   }
+
   //enable the add point button
   mAddLandmarkButton->setEnabled(mCurrentImage!=0);
 }
@@ -127,6 +131,7 @@ ssc::ProbeRepPtr ImageRegistrationWidget::getProbeRep()
 {
   if (!viewManager()->get3DView(0,0))
     return ssc::ProbeRepPtr();
+
   return repManager()->findFirstRep<ssc::ProbeRep>(viewManager()->get3DView(0,0)->getReps());
 }
 
@@ -186,7 +191,10 @@ void ImageRegistrationWidget::showEvent(QShowEvent* event)
 
   ssc::ProbeRepPtr probeRep = this->getProbeRep();
   if(probeRep)
+  {
     connect(this, SIGNAL(thresholdChanged(int)), probeRep.get(), SLOT(setThresholdSlot(int)));
+  }
+
   viewManager()->setRegistrationMode(ssc::rsIMAGE_REGISTRATED);
 }
 

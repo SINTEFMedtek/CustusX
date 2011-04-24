@@ -45,17 +45,17 @@ protected:
     int position;
     QColor value;
     ColorPoint() :
-    position(-1),
+    position(-1000000),
     value(255, 255, 255)
     {}
     void reset()
     {
-      position = -1;
+      position = -1000000;
       value = QColor(255, 255, 255);
     }
     bool isValid()
     {
-      if(position != -1)
+      if(position != -1000000)
         return true;
       return false;
     }
@@ -96,6 +96,7 @@ protected:
   virtual QSize sizeHint () const { return QSize(100, 30);};///< Define a recommended size
 
   void calculateColorTFBoundaries(int &areaLeft, int &areaRight, int &areaWidth);///< Calculate color transfer function boundaries for GUI, based on window and level
+  int calculateXPositionInTrFunc(int screenX);///< Calculate the correct position within the color transfer function, based on a screen x coordinate
 };
 }
 #endif /* CXTRANSFERFUNCTIONCOLORWIDGET_H_ */

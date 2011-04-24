@@ -201,7 +201,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
   this->setDominantTool(this->getManualTool()->getUid());
 
   mConfigured = true;
-  ssc::messageManager()->sendSuccess("ToolManager is configured.");
+  ssc::messageManager()->sendSuccess("ToolManager is configured.", true);
   emit configured();
 }
 
@@ -648,7 +648,7 @@ void ToolManager::initializedSlot(bool value)
   mInitialized = value;
   if(mInitialized)
   {
-    ssc::messageManager()->sendSuccess("ToolManager is initialized.");
+    ssc::messageManager()->sendSuccess("ToolManager is initialized.", true);
     emit initialized();
   }
   else
