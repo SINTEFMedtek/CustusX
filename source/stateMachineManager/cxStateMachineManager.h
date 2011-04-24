@@ -43,6 +43,8 @@ public:
   static StateManager* getInstance(); ///< returns the only instance of this class
   static void destroyInstance();     ///< destroys the only instance of this class
 
+  QString getVersionName();
+
   WorkflowStateMachinePtr getWorkflow();
   ApplicationStateMachinePtr getApplication();
   PatientDataPtr getPatientData();

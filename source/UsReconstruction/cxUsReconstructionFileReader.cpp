@@ -243,7 +243,7 @@ void UsReconstructionFileReader::readPositionFile(QString posFile, bool alsoRead
                                          + " from file: "
                                          + posFile
                                          + "values: "
-                                         + qstring_cast(position.mPos[0][0]));
+                                         + qstring_cast(position.mPos(0,0)));
       return;
     }
     timedPos->at(i) = position;
@@ -315,7 +315,7 @@ ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileN
     ssc::messageManager()->sendWarning("Can't read calibration from file: "
                                        + fileName
                                        + "values: "
-                                       + qstring_cast(retval[0][0]));
+                                       + qstring_cast(retval(0,0)));
     return retval;
   }
   return retval;

@@ -135,6 +135,8 @@ public: // basic methods
 public: // optional methods
   virtual QStringList getValueRange() const;
   virtual QString convertInternal2Display(QString internal);
+
+
 };
 typedef boost::shared_ptr<class SelectDataStringDataAdapterBase> SelectDataStringDataAdapterBasePtr;
 
@@ -214,7 +216,7 @@ public: // optional methods
 typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class RegistrationFixedImageStringDataAdapter : public SelectImageStringDataAdapterBase
+class RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -234,7 +236,7 @@ public: // optional methods
 typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
 /** Adapter that connects to the fixed image in the registration manager.
  */
-class RegistrationMovingImageStringDataAdapter : public SelectImageStringDataAdapterBase
+class RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
 {
   Q_OBJECT
 public:
@@ -438,9 +440,15 @@ public: // optional methods
 
 public: // interface extension
   ssc::DataPtr getData() const;
+  void setValueName(const QString name);
 
 private:
   ssc::DataPtr mData;
+  QString mValueName;
+
+  signals:
+    void dataChanged(QString);
+
 };
 
 typedef boost::shared_ptr<class SelectMeshStringDataAdapter> SelectMeshStringDataAdapterPtr;

@@ -295,7 +295,7 @@ Transform3D Reconstructer::interpolate(const Transform3D& a,
   Transform3D c;
   for (int i = 0; i < 4; i++)
     for (int j= 0; j < 4; j++)
-      c[i][j] = (1-t)*a[i][j] + t*b[i][j];
+      c(i,j) = (1-t)*a(i,j) + t*b(i,j);
   return c;
 }
   
@@ -332,8 +332,8 @@ void Reconstructer::interpolatePositions()
 
       double diff1 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos].mTime);
       double diff2 = fabs(mFileData.mFrames[i_frame].mTime - mFileData.mPositions[i_pos+1].mTime);
-//      ssc::messageManager()->sendWarning("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
-      ssc::messageManager()->sendWarning("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ QString::number(diff1,'f',1) + " or "+ QString::number(diff2,'f',1) + " Time difference is too large.");
+//      ssc::messageManager()->sendInfo("Time difference is too large. Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ qstring_cast(diff1) + " or "+ qstring_cast(diff2));
+      ssc::messageManager()->sendInfo("Removed input frame: " + qstring_cast(i_frame) + ", difference is: "+ QString::number(diff1,'f',1) + " or "+ QString::number(diff2,'f',1) + " Time difference is too large.");
     }
     else
     {      
@@ -350,7 +350,13 @@ void Reconstructer::interpolatePositions()
 
   double removed = double(startFrames - mFileData.mFrames.size())/double(startFrames);
   if (!ssc::similar(removed, 0.0))
-    ssc::messageManager()->sendWarning("Removed " + QString::number(removed*100,'f',1) + "% of the "+qstring_cast(startFrames)+" frames.");
+  {
+    double percent = removed*100;
+    if(percent > 1)
+      ssc::messageManager()->sendWarning("Removed " + QString::number(percent,'f',1) + "% of the "+qstring_cast(startFrames)+" frames.");
+    else
+      ssc::messageManager()->sendInfo("Removed " + QString::number(percent,'f',1) + "% of the "+qstring_cast(startFrames)+" frames.");
+  }
 }
 
 vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
@@ -358,7 +364,7 @@ vnl_matrix_double convertSSC2VNL(const ssc::Transform3D& src)
   vnl_matrix_double dst(4,4);
   for (int i=0; i<4; ++i)
     for (int j=0; j<4; ++j)
-      dst[i][j] = src[i][j];
+      dst[i][j] = src(i,j);
   return dst;
 }
 
@@ -367,7 +373,7 @@ ssc::Transform3D convertVNL2SSC(const vnl_matrix_double& src)
   ssc::Transform3D dst;
   for (int i=0; i<4; ++i)
     for (int j=0; j<4; ++j)
-      dst[i][j] = src[i][j];
+      dst(i,j) = src[i][j];
   return dst;
 }
 
