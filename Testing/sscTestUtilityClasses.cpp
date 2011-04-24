@@ -107,3 +107,20 @@ void TestUtilityClasses::testFrame()
 	SINGLE_TEST_FRAME( createTransformRotateZ(M_PI)*createTransformTranslate(Vector3D(3,4,5)) );
 }
 
+void TestUtilityClasses::testVector3D()
+{
+  Vector3D a(1,2,3);
+  Vector3D b(4,5,6);
+  Vector3D e_x(1,0,0);
+  Vector3D e_y(0,1,0);
+  Vector3D e_z(0,0,1);
+
+  CPPUNIT_ASSERT( similar(a,a) );
+  CPPUNIT_ASSERT( !similar(a,b) );
+
+  CPPUNIT_ASSERT( similar( cross(e_x,e_y), e_z ) );
+  CPPUNIT_ASSERT( similar( dot(e_x,e_y), 0 ) );
+  CPPUNIT_ASSERT( similar( dot(e_x,e_x), 1 ) );
+
+  CPPUNIT_ASSERT( a[0]==1 && a[1]==2 && a[2]==3 );
+}

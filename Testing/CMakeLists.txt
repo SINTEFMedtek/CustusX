@@ -90,6 +90,7 @@ ENDIF(CPPUNIT_INCLUDE_DIR)
         sscTestVisualRendering.cpp
         sscTestUtilityClasses.cpp
         sscTestTransform3D.cpp
+        sscTestBoundingBox3D.cpp
         ${SSC_TEST_SOURCE_FILES}
         )
         

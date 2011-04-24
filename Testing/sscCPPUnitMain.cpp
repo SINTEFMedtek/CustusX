@@ -15,6 +15,7 @@
 #include "sscTestVisualRendering.h"
 //#include "sscTestSpaceOrganizer.h"
 #include "sscTestTransform3D.h"
+#include "sscTestBoundingBox3D.h"
 
 #endif
 
@@ -49,7 +50,8 @@ int main(int argc, char **argv)
 //                                       "visual",
 //                                        &TestVisualRendering::test_ACS_3Volumes_GPU ) );
 //	runner.addTest(TestSpaceOrganizer::suite());
-  runner.addTest(TestTransform3D::suite());
+//  runner.addTest(TestTransform3D::suite());
+  runner.addTest(TestBoundingBox3D::suite());
 #endif
 	
 	
