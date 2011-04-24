@@ -35,7 +35,7 @@ ssc::ImagePtr resampleImage(ssc::ImagePtr image, ssc::Transform3D qMd)
   orientator->SetInput(image->getBaseVtkImageData());
   orientator->SetInterpolationModeToLinear();
   orientator->SetOutputDimensionality(3);
-  orientator->SetResliceAxes(qMd.inv().matrix());
+  orientator->SetResliceAxes(qMd.inv().getVtkMatrix());
   orientator->AutoCropOutputOn();
   vtkImageDataPtr rawResult = orientator->GetOutput();
 

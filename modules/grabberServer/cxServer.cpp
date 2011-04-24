@@ -75,7 +75,7 @@ void OpenIGTLinkServer::incomingConnection(int socketDescriptor)
   OpenIGTLinkSession* session = new OpenIGTLinkSession(socketDescriptor);
   connect(session, SIGNAL(finished()), session, SLOT(deleteLater()));
   connect(this, SIGNAL(frame(Frame&)), session, SIGNAL(frame(Frame&)), Qt::DirectConnection);
-  connect(session, SIGNAL(queueSize(int)), this, SIGNAL(queueSize(int)));
+  connect(session, SIGNAL(queueInfo(int, int)), this, SIGNAL(queueInfo(int, int)));
   session->start();
 }
 

@@ -30,8 +30,6 @@
 #include "cxDataLocations.h"
 #include "cxSeansVesselRegistrationWidget.h"
 
-//Testing
-#include "vesselReg/SeansVesselReg.hxx"
 
 namespace cx
 {
@@ -120,12 +118,8 @@ QWidget* ResampleWidget::createOptionsWidget()
 
 SegmentationWidget::SegmentationWidget(QWidget* parent) :
   WhatsThisWidget(parent, "SegmentationWidget", "Segmentation"),
-  mSegmentationThreshold(100),
   mBinary(false),
-  mUseSmothing(true),
-  mSmoothSigma(0.5),
-  mSegmentationThresholdSpinBox(new QSpinBox()),
-  mSmoothingSigmaSpinBox(new QDoubleSpinBox()),
+  mUseSmothing(false),
   mStatusLabel(new QLabel(""))
 {
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -198,7 +192,7 @@ void SegmentationWidget::segmentSlot()
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   this->revertTransferFunctions();
 
-  mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThreshold, mUseSmothing, mSmoothSigma);
+  mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThresholdAdapter->getValue(), mUseSmothing, mSmoothingSigmaAdapter->getValue());
 
   mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
 }
@@ -231,10 +225,8 @@ void SegmentationWidget::revertTransferFunctions()
   mModifiedImage.reset();
 }
 
-void SegmentationWidget::thresholdSlot(int value)
+void SegmentationWidget::thresholdSlot()
 {
-  mSegmentationThreshold = value;
-
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
     return;
@@ -247,23 +239,16 @@ void SegmentationWidget::thresholdSlot(int value)
   }
   image->resetTransferFunctions();
   ssc::ImageTFDataPtr tf3D = image->getTransferFunctions3D();
-  tf3D->addAlphaPoint(value , 0);
-  tf3D->addAlphaPoint(value+1, image->getMaxAlphaValue());
-  tf3D->addColorPoint(value, Qt::green);
+  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue() , 0);
+  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue()+1, image->getMaxAlphaValue());
+  tf3D->addColorPoint(mSegmentationThresholdAdapter->getValue(), Qt::green);
   tf3D->addColorPoint(image->getMax(), Qt::green);
 }
 
 void SegmentationWidget::toogleSmoothingSlot(bool on)
 {
   mUseSmothing = on;
-
-  mSmoothingSigmaSpinBox->setEnabled(on);
-  mSmoothingSigmaLabel->setEnabled(on);
-}
-
-void SegmentationWidget::smoothingSigmaSlot(double value)
-{
-  mSmoothSigma = value;
+  mSmoothingSigmaWidget->setEnabled(on);
 }
 
 void SegmentationWidget::imageChangedSlot(QString uid)
@@ -272,8 +257,8 @@ void SegmentationWidget::imageChangedSlot(QString uid)
 
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
-    return;
-  mSegmentationThresholdSpinBox->setRange(image->getMin(), image->getMax());
+
+  mSegmentationThresholdAdapter->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
 
   QString imageName = image->getName();
   if(imageName.contains("us", Qt::CaseInsensitive)) //assume the image is ultrasound
@@ -284,12 +269,12 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
 
-  QGridLayout* layout = new QGridLayout(retval);
+  QVBoxLayout* layout = new QVBoxLayout(retval);
 
-  mSegmentationThresholdSpinBox->setSingleStep(1);
-  mSegmentationThresholdSpinBox->setValue(mSegmentationThreshold);
-  QLabel* thresholdLabel = new QLabel("Threshold");
-  connect(mSegmentationThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(thresholdSlot(int)));
+  mSegmentationThresholdAdapter = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+      "Values from this threshold and above will be included",
+      100.0, ssc::DoubleRange(-1000, 1000, 1), 0);
+  connect(mSegmentationThresholdAdapter.get(), SIGNAL(valueWasSet()),this, SLOT(thresholdSlot()));
 
   QCheckBox* binaryCheckbox = new QCheckBox();
   binaryCheckbox->setChecked(mBinary);
@@ -300,31 +285,30 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 
   QCheckBox* smoothingCheckBox = new QCheckBox();
   smoothingCheckBox->setChecked(mUseSmothing);
-  smoothingCheckBox->setChecked(false);
   QLabel* smoothingLabel = new QLabel("Smoothing");
   connect(smoothingCheckBox, SIGNAL(toggled(bool)), this, SLOT(toogleSmoothingSlot(bool)));
 
-  mSmoothingSigmaSpinBox->setRange(0,10);
-  mSmoothingSigmaSpinBox->setSingleStep(0.1);
-  mSmoothingSigmaSpinBox->setValue(mSmoothSigma);
-  mSmoothingSigmaSpinBox->setEnabled(smoothingCheckBox->isChecked());
-  mSmoothingSigmaLabel = new QLabel("Smoothing sigma");
-  mSmoothingSigmaLabel->setEnabled(smoothingCheckBox->isChecked());
-  connect(mSmoothingSigmaSpinBox, SIGNAL(valueChanged(double)), this, SLOT(smoothingSigmaSlot(double)));
+  mSmoothingSigmaAdapter = ssc::DoubleDataAdapterXml::initialize("Smoothing sigma", "",
+      "Used for smoothing the segmented volume",
+      0.5, ssc::DoubleRange(0, 10, 0.1), 1);
 
-  layout->addWidget(mSegmentationThresholdSpinBox,      0, 0);
-  layout->addWidget(thresholdLabel,                     0, 1);
-  layout->addWidget(binaryCheckbox,                     1, 0);
-  layout->addWidget(binaryLabel,                        1, 1);
-  layout->addWidget(smoothingCheckBox,                  2, 0);
-  layout->addWidget(smoothingLabel,                     2, 1);
-  layout->addWidget(mSmoothingSigmaSpinBox,             3, 0);
-  layout->addWidget(mSmoothingSigmaLabel,               3, 1);
+  layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSegmentationThresholdAdapter));
+  QHBoxLayout* binaryLayout = new QHBoxLayout();
+  binaryLayout->addWidget(binaryCheckbox);
+  binaryLayout->addWidget(binaryLabel);
+  QHBoxLayout* smoothingLayout = new QHBoxLayout();
+  smoothingLayout->addWidget(smoothingCheckBox);
+  smoothingLayout->addWidget(smoothingLabel);
+  layout->addLayout(binaryLayout);
+  layout->addLayout(smoothingLayout);
+
+  mSmoothingSigmaWidget = ssc::SpinBoxAndSliderGroupWidgetPtr(new ssc::SpinBoxAndSliderGroupWidget(this, mSmoothingSigmaAdapter));
+  mSmoothingSigmaWidget->setEnabled(smoothingCheckBox->isChecked());
+  layout->addWidget(mSmoothingSigmaWidget.get());
 
   this->toogleBinarySlot(mBinary);
-  this->thresholdSlot(mSegmentationThreshold);
+  this->thresholdSlot();
   this->toogleSmoothingSlot(mUseSmothing);
-  this->smoothingSigmaSlot(mSmoothSigma);
 
   return retval;
 }
@@ -332,12 +316,8 @@ QWidget* SegmentationWidget::createSegmentationOptionsWidget()
 
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
     WhatsThisWidget(parent, "SurfaceWidget", "Surface"),
-    mSurfaceThreshold(100),
-    mDecimation(80),
     mReduceResolution(false),
     mSmoothing(true),
-    mSurfaceThresholdSpinBox(new QSpinBox()),
-    mDecimationSpinBox(new QSpinBox()),
     mDefaultColor("red"),
     mStatusLabel(new QLabel(""))
 {
@@ -369,8 +349,7 @@ SurfaceWidget::SurfaceWidget(QWidget* parent) :
   topLayout->addWidget(surfaceOptionsWidget, 2, 0, 1, 2);
   topLayout->addWidget(mStatusLabel);
 
-  this->thresholdSlot(mSurfaceThreshold);
-  this->decimationSlot(mDecimation);
+  this->adjustSizeSlot();
   this->reduceResolutionSlot(mReduceResolution);
   this->smoothingSlot(mSmoothing);
 }
@@ -394,10 +373,9 @@ void SurfaceWidget::setImageInputSlot(QString value)
 void SurfaceWidget::surfaceSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  double decimation = mDecimationAdapter->getValue()/100;
 
-  double decimation = mDecimation/100;
-
-  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThreshold, decimation, mReduceResolution, mSmoothing);
+  mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(), decimation, mReduceResolution, mSmoothing);
 
   mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
 }
@@ -414,16 +392,6 @@ void SurfaceWidget::handleFinishedSlot()
   emit outputMeshChanged(outputMesh->getUid());
 }
 
-void SurfaceWidget::thresholdSlot(int value)
-{
-  mSurfaceThreshold = value;
-}
-
-void SurfaceWidget::decimationSlot(int value)
-{
-  mDecimation = value;
-}
-
 void SurfaceWidget::reduceResolutionSlot(bool value)
 {
   mReduceResolution = value;
@@ -438,7 +406,8 @@ void SurfaceWidget::imageChangedSlot(QString uid)
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
     return;
-  mSurfaceThresholdSpinBox->setRange(image->getMin(), image->getMax());
+  mSurfaceThresholdAdapter->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+  mSurfaceThresholdAdapter->setValue(image->getRange() / 2 + image->getMin());
 }
 void SurfaceWidget::setDefaultColor(QColor color)
 {
@@ -448,18 +417,14 @@ void SurfaceWidget::setDefaultColor(QColor color)
 QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
-  QGridLayout* layout = new QGridLayout(retval);
+  QVBoxLayout* layout = new QVBoxLayout(retval);
 
-  mSurfaceThresholdSpinBox->setSingleStep(1);
-  mSurfaceThresholdSpinBox->setValue(mSurfaceThreshold);
-  QLabel* thresholdLabel = new QLabel("Threshold");
-  connect(mSurfaceThresholdSpinBox, SIGNAL(valueChanged(int)), this, SLOT(thresholdSlot(int)));
-
-  mDecimationSpinBox->setRange(0,100);
-  mDecimationSpinBox->setSingleStep(5);
-  mDecimationSpinBox->setValue(mDecimation);
-  QLabel* decimationLabel = new QLabel("Decimation %");
-  connect(mDecimationSpinBox, SIGNAL(valueChanged(int)), this, SLOT(decimationSlot(int)));
+  mSurfaceThresholdAdapter = ssc::DoubleDataAdapterXml::initialize("Threshold", "",
+      "Values from this threshold and above will be included",
+      100.0, ssc::DoubleRange(-1000, 1000, 1), 0);
+  mDecimationAdapter = ssc::DoubleDataAdapterXml::initialize("Decimation %", "",
+      "Reduce number of triangles in output surface",
+      80.0, ssc::DoubleRange(0, 100, 1), 0);
 
   QCheckBox* reduceResolutionCheckBox = new QCheckBox("Reduce input volumes resolution");
   reduceResolutionCheckBox->setChecked(mReduceResolution);
@@ -472,14 +437,12 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
   QLabel* inputLabel = new QLabel("Input:");
   QLabel* outputLabel = new QLabel("Output:");
 
-  layout->addWidget(inputLabel,                     0, 0, 1, 2);
-  layout->addWidget(mSurfaceThresholdSpinBox,       1, 0);
-  layout->addWidget(thresholdLabel,                 1, 1);
-  layout->addWidget(reduceResolutionCheckBox,       2, 0);
-  layout->addWidget(outputLabel,                    3, 0, 1, 2);
-  layout->addWidget(mDecimationSpinBox,             4, 0);
-  layout->addWidget(decimationLabel,                4, 1);
-  layout->addWidget(smoothingCheckBox,              5, 0);
+  layout->addWidget(inputLabel);
+  layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mSurfaceThresholdAdapter));
+  layout->addWidget(reduceResolutionCheckBox);
+  layout->addWidget(outputLabel);
+  layout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mDecimationAdapter));
+  layout->addWidget(smoothingCheckBox);
 
   return retval;
 }
@@ -488,7 +451,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
   WhatsThisWidget(parent, "CenterlineWidget", "CenterlineWidget"),
   mFindCenterlineButton(new QPushButton("Find centerline")),
-  mDefaultColor("red"),
+//  mDefaultColor("red"),
   mStatusLabel(new QLabel(""))
 {
   connect(&mCenterlineAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
@@ -537,7 +500,8 @@ void CenterlineWidget::hideEvent(QCloseEvent* event)
 
 void CenterlineWidget::setDefaultColor(QColor color)
 {
-  mDefaultColor = color;
+  mCenterlineAlgorithm.setDefaultColor(color);
+//  mDefaultColor = color;
 }
 
 void CenterlineWidget::findCenterlineSlot()
@@ -550,7 +514,7 @@ void CenterlineWidget::findCenterlineSlot()
 
 void CenterlineWidget::handleFinishedSlot()
 {
-  ssc::ImagePtr centerlineImage = mCenterlineAlgorithm.getOutput();
+  ssc::DataPtr centerlineImage = mCenterlineAlgorithm.getOutput();
   if(!centerlineImage)
     return;
 
@@ -559,27 +523,27 @@ void CenterlineWidget::handleFinishedSlot()
   emit outputImageChanged(centerlineImage->getUid());
 }
 
-void CenterlineWidget::visualizeSlot(QString inputUid)
-{
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-
-  ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
-  if(!centerlineImage)
-    return;
-
-  //automatically generate a mesh from the centerline
-  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
-
-  QString uid = centerlineImage->getUid() + "_ge%1";
-  QString name = centerlineImage->getName() + " ge%1";
-  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
-  mesh->setColor(mDefaultColor);
-  mesh->get_rMd_History()->setParentFrame(centerlineImage->getUid());
-  ssc::dataManager()->loadData(mesh);
-  ssc::dataManager()->saveMesh(mesh, outputBasePath);
-
-  emit outputImageChanged(centerlineImage->getUid());
-}
+//void CenterlineWidget::visualizeSlot(QString inputUid)
+//{
+//  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+//
+//  ssc::ImagePtr centerlineImage = ssc::dataManager()->getImage(inputUid);
+//  if(!centerlineImage)
+//    return;
+//
+//  //automatically generate a mesh from the centerline
+//  vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(centerlineImage, 1, 0);
+//
+//  QString uid = centerlineImage->getUid() + "_ge%1";
+//  QString name = centerlineImage->getName() + " ge%1";
+//  ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
+//  mesh->setColor(mDefaultColor);
+//  mesh->get_rMd_History()->setParentFrame(centerlineImage->getUid());
+//  ssc::dataManager()->loadData(mesh);
+//  ssc::dataManager()->saveMesh(mesh, outputBasePath);
+//
+//  emit outputImageChanged(centerlineImage->getUid());
+//}
 
 //------------------------------------------------------------------------------
 
