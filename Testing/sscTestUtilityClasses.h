@@ -30,5 +30,4 @@ private:
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestUtilityClasses );
 
-
 #endif /*SSCTESTUTILITYCLASSES_H_*/

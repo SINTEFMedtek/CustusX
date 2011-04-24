@@ -112,25 +112,25 @@ vtkMatrix4x4Ptr Transform3D::matrix()
 }
 #endif
 
-QString Transform3D::toString()
-{
-	QString retval("{");
-	for (unsigned i = 0; i < 4; ++i)
-	{
-		retval += '(';
-		for (unsigned j = 0; j < 4; ++j)
-		{
-			retval += QString::number(mMatrix->GetElement(i, j), 'f', 3);
-			if (j < 3)
-			{
-				retval += ", ";
-			}
-		}
-		retval += ')';
-	}
-	retval += '}';
-	return retval;
-}
+//QString Transform3D::toString()
+//{
+//	QString retval("{");
+//	for (unsigned i = 0; i < 4; ++i)
+//	{
+//		retval += '(';
+//		for (unsigned j = 0; j < 4; ++j)
+//		{
+//			retval += QString::number(mMatrix->GetElement(i, j), 'f', 3);
+//			if (j < 3)
+//			{
+//				retval += ", ";
+//			}
+//		}
+//		retval += ')';
+//	}
+//	retval += '}';
+//	return retval;
+//}
 
 std::ostream& Transform3D::put(std::ostream& s, int indent, char newline) const
 {
@@ -190,7 +190,7 @@ Vector3D Transform3D::unitVector(const Vector3D& v) const
 {
 	double pt[4] = {v[0],v[1],v[2],0};
 	mMatrix->MultiplyPoint(pt,pt);
-	return Vector3D(pt);		
+	return Vector3D(pt).normal();
 }
 
 Vector3D Transform3D::coord(const Vector3D& v) const
