@@ -42,7 +42,7 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   mProbeSectorPolyDataMapper = vtkPolyDataMapperPtr::New();
   mProbeSectorActor = vtkActorPtr::New();
 
-  bool useMask = true; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
+  bool useMask = false; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
   mRTStream.reset(new RealTimeStreamGraphics(useMask));
 
   mTracer.reset(new ToolTracer());
@@ -189,7 +189,7 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 {
   Transform3DPtr rMprPtr = ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D rMt = (*rMprPtr) * prMt;
-  mToolActor->SetUserMatrix(rMt.matrix());
+  mToolActor->SetUserMatrix(rMt.getVtkMatrix());
   this->update();
 }
 
@@ -205,7 +205,7 @@ void ToolRep3D::update()
   if (this->showProbe())
   {
     Transform3D tMu = mProbeSector->get_tMu();
-    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
+    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
   }
   else
@@ -232,7 +232,7 @@ void ToolRep3D::probeSectorChanged()
     {
       mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
     }
-    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).matrix());
+    mProbeSectorActor->SetUserMatrix((rMpr * prMt * tMu).getVtkMatrix());
     mProbeSectorActor->SetVisibility(mTool->getVisible());
 
     if (mRTStream)

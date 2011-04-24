@@ -78,6 +78,12 @@ DoubleRange DoubleDataAdapterXml::getValueRange() const
 	return mRange;
 }
 
+void DoubleDataAdapterXml::setValueRange(DoubleRange range)
+{
+  mRange = range;
+  emit changed();
+}
+
 int DoubleDataAdapterXml::getValueDecimals() const
 {
 	return mDecimals;

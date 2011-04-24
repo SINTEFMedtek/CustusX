@@ -276,7 +276,7 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
   Transform3D tMu = mProbeData.get_tMu();
   Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
-  mPlaneActor->SetUserMatrix(rMu.matrix());
+  mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
 
 //  mProbeData.test();
 }

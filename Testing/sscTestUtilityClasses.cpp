@@ -37,10 +37,10 @@ void TestUtilityClasses::testTransform3DAccess()
 		for (unsigned j=0; j<4; ++j)
 		{
 			double val = i*4+j;
-			t[i][j] = val;
+			t(i,j) = val;
 			//ct[i][j] = val; // does not compile: ok
 			//double temp = ct[i][j];  // does compile: ok
-			CPPUNIT_ASSERT(similar(val, t[i][j]));
+			CPPUNIT_ASSERT(similar(val, t(i,j)));
 		}
 	}
 }
@@ -105,4 +105,22 @@ void TestUtilityClasses::testFrame()
 	SINGLE_TEST_FRAME( createTransformRotateX(M_PI)*createTransformTranslate(Vector3D(3,4,5)) );
 	SINGLE_TEST_FRAME( createTransformRotateY(M_PI)*createTransformTranslate(Vector3D(3,4,5)) );
 	SINGLE_TEST_FRAME( createTransformRotateZ(M_PI)*createTransformTranslate(Vector3D(3,4,5)) );
+}
+
+void TestUtilityClasses::testVector3D()
+{
+  Vector3D a(1,2,3);
+  Vector3D b(4,5,6);
+  Vector3D e_x(1,0,0);
+  Vector3D e_y(0,1,0);
+  Vector3D e_z(0,0,1);
+
+  CPPUNIT_ASSERT( similar(a,a) );
+  CPPUNIT_ASSERT( !similar(a,b) );
+
+  CPPUNIT_ASSERT( similar( cross(e_x,e_y), e_z ) );
+  CPPUNIT_ASSERT( similar( dot(e_x,e_y), 0 ) );
+  CPPUNIT_ASSERT( similar( dot(e_x,e_x), 1 ) );
+
+  CPPUNIT_ASSERT( a[0]==1 && a[1]==2 && a[2]==3 );
 }

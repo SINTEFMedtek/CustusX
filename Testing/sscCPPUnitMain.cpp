@@ -14,6 +14,9 @@
 #include "sscTestSliceComputer.h"
 #include "sscTestVisualRendering.h"
 //#include "sscTestSpaceOrganizer.h"
+#include "sscTestTransform3D.h"
+#include "sscTestBoundingBox3D.h"
+
 #endif
 
 //#include "SonoWand.h"
@@ -43,10 +46,12 @@ int main(int argc, char **argv)
 //  runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
 //                                       "visual",
 //                                        &TestVisualRendering::test_ACS_3Volumes ) );
-  runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
-                                       "visual",
-                                        &TestVisualRendering::test_ACS_3Volumes_GPU ) );
+//  runner.addTest( new CppUnit::TestCaller<TestVisualRendering>(
+//                                       "visual",
+//                                        &TestVisualRendering::test_ACS_3Volumes_GPU ) );
 //	runner.addTest(TestSpaceOrganizer::suite());
+//  runner.addTest(TestTransform3D::suite());
+  runner.addTest(TestBoundingBox3D::suite());
 #endif
 	
 	

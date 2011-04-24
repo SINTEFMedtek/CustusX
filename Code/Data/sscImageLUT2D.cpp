@@ -24,6 +24,7 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
 
   double smin = mBase->GetScalarRange()[0];
   double smax = mBase->GetScalarRange()[1];
+  double srange = smax - smin;
 
   // this sets the initial opacity tf to full
   this->setAlpha(1);
@@ -35,8 +36,8 @@ ImageLUT2D::ImageLUT2D(vtkImageDataPtr base) :
   this->addColorPoint(smax, Qt::white);
 
   // set values suitable for CT.
-  this->setLevel(smax * 0.15);
-  this->setWindow(smax * 0.5);
+  this->setLevel(srange * 0.15 - smin);
+  this->setWindow(srange * 0.5 - smin);
 
   connect(this, SIGNAL(changed()), this, SIGNAL(transferFunctionsChanged()));
   connect(this, SIGNAL(changed()), this, SLOT(transferFunctionsChangedSlot()));

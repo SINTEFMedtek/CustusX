@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-  boost::uint64_t tsModifier;
+  boost::uint64_t tsModifier = 0;
   if (reader.version() == 1)
   {
     QDateTime startTime = QDateTime::fromString(startTS, EVENT_DATE_FORMAT);

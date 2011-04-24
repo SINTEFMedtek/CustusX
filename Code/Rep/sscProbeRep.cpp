@@ -37,6 +37,9 @@ ProbeRep::ProbeRep(const QString& uid, const QString& name) :
   mSphereRadius(2),
 	mConnections(vtkEventQtSlotConnectPtr::New())
 {
+  mView = NULL;
+  mEnabled = false;
+  mConnected = false;
   mPickedPointSphereSource = vtkSphereSourcePtr::New();
   mPickedPointSphereSource->SetRadius(mSphereRadius);
   vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
@@ -44,6 +47,7 @@ ProbeRep::ProbeRep(const QString& uid, const QString& name) :
   mPickedPointActor = vtkActorPtr::New();
   mPickedPointActor->SetMapper(mapper);
   mPickedPointActor->GetProperty()->SetColor(0,0,1);
+  mPickedPointActor->SetVisibility(false);
 }
 
 ProbeRep::~ProbeRep()
@@ -74,7 +78,7 @@ void ProbeRep::setImage(ImagePtr image)
 		return;
 	mImage = image;
 	if (mImage)
-	  mThreshold = mImage->getPosMin() + (mImage->getPosMax()-mImage->getPosMin())/10;
+	  mThreshold = mImage->getMin() + (mImage->getMax()-mImage->getMin())/10;
 }
 
 void ProbeRep::setResolution(const int resolution)
@@ -228,8 +232,58 @@ void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
   Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
   Transform3D rMt = (*rMprPtr)*prMt;
-  this->showTemporaryPointSlot(rMt[0][3], rMt[1][3], rMt[2][3]);
+  this->showTemporaryPointSlot(rMt(0,3), rMt(1,3), rMt(2,3));
 }
+
+void ProbeRep::setEnabled(bool on)
+{
+//  std::cout << "ProbeRep::setEnabled " << on << std::endl;
+
+  if (mEnabled==on)
+    return;
+
+  mEnabled = on;
+
+  if (mEnabled)
+  {
+    this->connectInteractor();
+    mPickedPointActor->SetVisibility(true);
+  }
+  else
+  {
+    this->disconnectInteractor();
+    mPickedPointActor->SetVisibility(false);
+  }
+}
+
+
+void ProbeRep::connectInteractor()
+{
+  if (!mView)
+    return;
+  if (mConnected)
+    return;
+  mConnections->Connect(mView->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::LeftButtonPressEvent,
+                       this,
+                       SLOT(pickLandmarkSlot(vtkObject*)));
+  mConnected = true;
+}
+
+void ProbeRep::disconnectInteractor()
+{
+  if (!mView)
+    return;
+  if (!mConnected)
+    return;
+  mConnections->Disconnect(mView->GetRenderWindow()->GetInteractor(),
+                       vtkCommand::LeftButtonPressEvent,
+                       this,
+                       SLOT(pickLandmarkSlot(vtkObject*)));
+  mConnected = false;
+}
+
+
 void ProbeRep::addRepActorsToViewRenderer(View* view)
 {
   if(view == NULL)
@@ -238,11 +292,14 @@ void ProbeRep::addRepActorsToViewRenderer(View* view)
     return;
   }
 
-  mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::LeftButtonPressEvent,
-                       this,
-                       SLOT(pickLandmarkSlot(vtkObject*)));
+  if (mEnabled)
+    this->connectInteractor();
+//  mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
+//                       vtkCommand::LeftButtonPressEvent,
+//                       this,
+//                       SLOT(pickLandmarkSlot(vtkObject*)));
   view->getRenderer()->AddActor(mPickedPointActor);
+  mView = view;
 }
 
 void ProbeRep::removeRepActorsFromViewRenderer(View* view)
@@ -250,12 +307,15 @@ void ProbeRep::removeRepActorsFromViewRenderer(View* view)
   if(view == NULL)
     return;
 
-  mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
-                       vtkCommand::LeftButtonPressEvent,
-                       this,
-                       SLOT(pickLandmarkSlot(vtkObject*)));
+  this->disconnectInteractor();
+
+//  mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
+//                       vtkCommand::LeftButtonPressEvent,
+//                       this,
+//                       SLOT(pickLandmarkSlot(vtkObject*)));
   if (mPickedPointActor)
     view->getRenderer()->RemoveActor(mPickedPointActor);
+  mView = NULL;
 }
 vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
@@ -303,14 +363,16 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 	vtkDataSetAttributesPtr dataSetAttribute = vtkDataSetAttributesPtr::New();
 	dataSetAttribute = (vtkDataSetAttributes*)(probeFilterMapper->GetInput()->GetPointData());
 
-	double value = -1;
-	int i;
-	for (i=0; i<dataSetAttribute->GetScalars()->GetNumberOfTuples(); i++)
-	{
-		dataSetAttribute->GetScalars()->GetTuple(i, &value);
-		if (value > mThreshold)
-			break;
-	}
+  double value = -1000000;
+  int i;
+  for (i=0; i<dataSetAttribute->GetScalars()->GetNumberOfTuples(); i++)
+  {
+    dataSetAttribute->GetScalars()->GetTuple(i, &value);
+    //The VTK structure is padded with zeroes
+    //Ugly fix for signed: Ignore 0
+    if ((value != 0) && (value > mThreshold))
+      break;
+  }
 	if (i==dataSetAttribute->GetScalars()->GetNumberOfTuples())
 		return false;
 

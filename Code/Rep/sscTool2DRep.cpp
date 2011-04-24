@@ -207,7 +207,7 @@ void ToolRep2D::update()
 		{
 			mProbeSectorActor->SetMapper(mProbeSectorPolyDataMapper);
 		}
-		mProbeSectorActor->SetUserMatrix((T*sMt*tMu).matrix());
+		mProbeSectorActor->SetUserMatrix((T*sMt*tMu).getVtkMatrix());
 		mProbeSectorActor->SetVisibility(mSlicer->getTool()->getVisible());
 	}
 	else

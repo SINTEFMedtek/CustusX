@@ -6,6 +6,7 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "sscTransform3D.h"
+
 using ssc::Transform3D;
 using ssc::Vector3D;
 
@@ -18,17 +19,18 @@ public:
 	void tearDown();
 	void testTransform3DAccess();
 	void testFrame();
-	
+	void testVector3D();
+
 public:
 	CPPUNIT_TEST_SUITE( TestUtilityClasses );
 		CPPUNIT_TEST( testTransform3DAccess );					
-		CPPUNIT_TEST( testFrame );					
+    CPPUNIT_TEST( testVector3D );
+		CPPUNIT_TEST( testFrame );
 	CPPUNIT_TEST_SUITE_END();
 private:
 	void singleTestFrameRotationAxis(const Vector3D& k);
 	void singleTestFrame(const Transform3D& transform);
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestUtilityClasses );
-
 
 #endif /*SSCTESTUTILITYCLASSES_H_*/

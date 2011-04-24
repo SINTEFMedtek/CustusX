@@ -73,7 +73,7 @@ class MyStreamBuf: public std::basic_streambuf<char, std::char_traits<char> >
 {
 public:
   MyStreamBuf(MESSAGE_LEVEL level) :
-    mOrig(NULL), mEnabledRedirect(true), mMessageLevel(level)
+    mEnabledRedirect(true), mOrig(NULL), mMessageLevel(level)
   {
   }
   void setOriginal(std::streambuf* orig)
@@ -153,10 +153,10 @@ MessageManager* messageManager() { return MessageManager::getInstance(); }
 
 
 MessageManager::MessageManager() :
+    mConsoleMutex(QMutex::Recursive),
     mAbsoluteLoggingFolderPath(""),
     mConsoleFile(new QFile(mAbsoluteLoggingFolderPath, this)),
-    mConsoleStream(new QTextStream()),
-    mConsoleMutex(QMutex::Recursive)
+    mConsoleStream(new QTextStream())
 {
   typedef ssc::Message Message;
   qRegisterMetaType<Message>("Message");
@@ -329,6 +329,12 @@ void MessageManager::playScreenShotSound()
 {
   if(this->hasAudioSource())
     mAudioSource->playScreenShotSound();
+}
+
+void MessageManager::playSampleSound()
+{
+  if(this->hasAudioSource())
+    mAudioSource->playSampleSound();
 }
 
 bool MessageManager::openLogging(QFile::OpenMode mode)

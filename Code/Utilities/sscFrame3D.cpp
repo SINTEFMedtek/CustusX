@@ -141,7 +141,7 @@ cml_matrix_4x4 convertToCml(const Transform3D& T)
   cml_matrix_4x4 m;
   for (int r=0; r<4; ++r)
     for (int c=0; c<4; ++c)
-      m(r,c) = T[r][c];
+      m(r,c) = T(r,c);
   return m;
 }
 
@@ -252,7 +252,7 @@ Frame3D Frame3D::create(const Transform3D& T)
 
 	Frame3D retVal;
 
-	double Arg = (T[0][0]+T[1][1]+T[2][2]-1.0)/2.0;
+	double Arg = (T(0,0)+T(1,1)+T(2,2)-1.0)/2.0;
 	Arg = constrainValue(Arg, -1.0, 1.0);
 	retVal.mPhi = acos(Arg);
 
@@ -260,28 +260,28 @@ Frame3D Frame3D::create(const Transform3D& T)
 
 	if (fabs(sin(retVal.mPhi)) >= MY_SMALL_LIMIT) // Phi != M_PI * n
 	{
-		K[0] = T[2][1]-T[1][2];
-		K[1] = T[0][2]-T[2][0];
-		K[2] = T[1][0]-T[0][1];
+		K[0] = T(2,1)-T(1,2);
+		K[1] = T(0,2)-T(2,0);
+		K[2] = T(1,0)-T(0,1);
 		K /= 2.0*sin(retVal.mPhi);
 	}
 	else if (similar(cos(retVal.mPhi), -1.0)) // Phi == M_PI + 2*M_PI*n
 	{ // Evaluate the diagonal of eq. 2.80, insert cos(M_PI)=-1
-		K[0] = safe_sqrt((T[0][0] + 1.0) / 2.0);
-		K[1] = safe_sqrt((T[1][1] + 1.0) / 2.0);
-		K[2] = safe_sqrt((T[2][2] + 1.0) / 2.0);
+		K[0] = safe_sqrt((T(0,0) + 1.0) / 2.0);
+		K[1] = safe_sqrt((T(1,1) + 1.0) / 2.0);
+		K[2] = safe_sqrt((T(2,2) + 1.0) / 2.0);
 
 		// evaluate off-diagonal elements and extract the sign relations.
-		if (!similar(T[0][1], 0.0))
-			K[1] *= sign(T[0][1]);
-		if (!similar(T[0][2], 0.0))
-			K[2] *= sign(T[0][2]);
-		if (!similar(T[1][2], 0.0))
-			K[2] *= sign(T[1][2]);
+		if (!similar(T(0,1), 0.0))
+			K[1] *= sign(T(0,1));
+		if (!similar(T(0,2), 0.0))
+			K[2] *= sign(T(0,2));
+		if (!similar(T(1,2), 0.0))
+			K[2] *= sign(T(1,2));
 	}
 
 	retVal.setRotationAxis(K);
-	retVal.mPos = Vector3D(T[0][3], T[1][3], T[2][3]);
+	retVal.mPos = Vector3D(T(0,3), T(1,3), T(2,3));
 
 	return retVal;
 }
@@ -292,9 +292,9 @@ Transform3D Frame3D::transform() const
 	Transform3D RK = generateRotationMatrix();
 
 	// apply translation
-	RK[0][3] = mPos[0];
-	RK[1][3] = mPos[1];
-	RK[2][3] = mPos[2];
+	RK(0,3) = mPos[0];
+	RK(1,3) = mPos[1];
+	RK(2,3) = mPos[2];
 
 	return RK;
 }
@@ -328,17 +328,17 @@ Transform3D Frame3D::generateRotationMatrix() const
 	double cf = cos(mPhi);
 	double vf = 1.0-cos(mPhi);
 
-	RK[0][0] = kx*kx*vf + cf;
-	RK[1][0] = kx*ky*vf + kz*sf;
-	RK[2][0] = kz*kx*vf - ky*sf;
+	RK(0,0) = kx*kx*vf + cf;
+	RK(1,0) = kx*ky*vf + kz*sf;
+	RK(2,0) = kz*kx*vf - ky*sf;
 
-	RK[0][1] = kx*ky*vf - kz*sf;
-	RK[1][1] = ky*ky*vf + cf;
-	RK[2][1] = ky*kz*vf + kx*sf;
+	RK(0,1) = kx*ky*vf - kz*sf;
+	RK(1,1) = ky*ky*vf + cf;
+	RK(2,1) = ky*kz*vf + kx*sf;
 
-	RK[0][2] = kz*kx*vf + ky*sf;
-	RK[1][2] = ky*kz*vf - kx*sf;
-	RK[2][2] = kz*kz*vf + cf;
+	RK(0,2) = kz*kx*vf + ky*sf;
+	RK(1,2) = ky*kz*vf - kx*sf;
+	RK(2,2) = kz*kz*vf + cf;
 	
 	return RK;
 }

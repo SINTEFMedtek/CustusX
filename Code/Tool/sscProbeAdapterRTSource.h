@@ -38,7 +38,7 @@ public:
   virtual void start() { mBase->start(); }
   virtual void stop() { mBase->stop(); }
 
-  virtual bool validData() const { return mBase->validData(); };
+  virtual bool validData() const { return mBase->validData(); }
   virtual bool isConnected() const { return mBase->isConnected(); }
   virtual bool isStreaming() const { return mBase->isStreaming(); }
 

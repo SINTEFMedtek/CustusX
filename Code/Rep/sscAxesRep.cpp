@@ -82,7 +82,7 @@ void AxesRep::setAxisLength(double length)
  */
 void AxesRep::setTransform(Transform3D rMt)
 {
-	mAssembly->SetUserMatrix(rMt.matrix());
+	mAssembly->SetUserMatrix(rMt.getVtkMatrix());
 
 	for (unsigned i=0; i<mCaption.size(); ++i)
 	{

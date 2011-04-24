@@ -47,6 +47,7 @@ public: // inherited interface
   virtual double getValue() const; ///< get the data value.
   virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
   virtual DoubleRange getValueRange() const; /// range of value. Use if data is constrained to a set.
+  virtual void setValueRange(DoubleRange range);
   virtual int getValueDecimals() const; ///< number of relevant decimals in value
   virtual double convertInternal2Display(double internal) { return mFactor*internal; } ///< conversion from internal value to display value (for example between 0..1 and percent)
   virtual double convertDisplay2Internal(double display) { return display/mFactor; } ///< conversion from internal value to display value

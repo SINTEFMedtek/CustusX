@@ -215,7 +215,7 @@ void SlicePlanes3DRep::changedSlot()
 
 	 	if (data.mText)
 	 	{
-	 		data.mText->SetUserMatrix((rMs*T).matrix());
+	 		data.mText->SetUserMatrix((rMs*T).getVtkMatrix());
 	 	}
 		
 		if (data.mPoint)

@@ -60,7 +60,7 @@ std::ostream& TransformTest::put(std::ostream& s, ssc::Transform3D M, char newli
 		ss << ind;
 		for (unsigned j=0; j<4; ++j)
 		{
-			ss << setw(10) << M.matrix()->GetElement(i,j) << " ";
+			ss << setw(10) << M(i,j) << " ";
 		}
 		if (i!=3)
 		{

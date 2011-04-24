@@ -16,7 +16,7 @@ namespace ssc
 
 ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface) :
     QWidget(parent),
-    mLabel(NULL), mEdit(NULL), mSlider(NULL), mSpinBox(NULL)
+    mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL)
 {
   mData = dataInterface;
   connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
@@ -32,6 +32,7 @@ void ScalarInteractionWidget::enableLabel()
 void ScalarInteractionWidget::enableSlider()
 {
   mSlider = new ssc::DoubleSlider(this);
+  mSlider->setMinimumWidth(50);
   mSlider->setOrientation(Qt::Horizontal);
   connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
 }

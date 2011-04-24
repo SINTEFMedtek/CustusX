@@ -160,7 +160,7 @@ void Image::transformChangedSlot()
 	if (mReferenceImageData)
 	{
 		Transform3D rMd = get_rMd();
-		mOrientatorMatrix->DeepCopy(rMd.inv().matrix());
+		mOrientatorMatrix->DeepCopy(rMd.inv().getVtkMatrix());
 		mReferenceImageData->Update();		
 	}
   //std::cout << "Image::transformChangedSlot()\n" << rMd << std::endl;
@@ -300,14 +300,6 @@ int Image::getMin()
 	//IntIntMap::iterator iter = this->getHistogram()->begin();
 	//return (*iter).first;
 	return (int)mImageTransferFunctions3D->getScalarMin();
-}
-int Image::getPosMax()
-{
-	return (int)mImageTransferFunctions3D->getScalarMax() - getMin();
-}
-int Image::getPosMin()
-{
-	return 0;
 }
   
 int Image::getRange()

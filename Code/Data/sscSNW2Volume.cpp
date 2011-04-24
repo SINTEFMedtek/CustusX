@@ -32,6 +32,7 @@ Vector3D stringList2Vector3D(QStringList raw)
 	}
 	return retval;
 }
+
 SNW2VolumeMetaData::DateTime SNW2VolumeMetaData::DateTime::fromDateAndTime(QString date, QString time)
 {
 	DateTime retval;
@@ -39,6 +40,7 @@ SNW2VolumeMetaData::DateTime SNW2VolumeMetaData::DateTime::fromDateAndTime(QStri
 	retval.mTime = time;
 	return retval;
 }
+
 SNW2VolumeMetaData::DateTime SNW2VolumeMetaData::DateTime::fromTimestamp(QString ts)
 {
 	DateTime retval;
@@ -50,18 +52,22 @@ SNW2VolumeMetaData::DateTime SNW2VolumeMetaData::DateTime::fromTimestamp(QString
 	}
 	return retval;
 }
+
 QString SNW2VolumeMetaData::DateTime::timestamp() const 
 { 
 	if (mDate.isEmpty())
 		return "";
 	return createTimestamp(robustReadTime());
 }
+
 QString SNW2VolumeMetaData::DateTime::time() const { return mTime; }
 QString SNW2VolumeMetaData::DateTime::date() const { return mDate; }
+
 bool SNW2VolumeMetaData::DateTime::isValid() const 
 {
 	return robustReadTime().isValid();
 }
+
 /** defines the format Sonowand uses as its timestamp format  
  *  - in conjunction with QString.
  */
@@ -69,18 +75,22 @@ QString SNW2VolumeMetaData::DateTime::timestampFormat() const
 {
 	return QString(timestampSecondsFormat());
 }
+
 QDateTime SNW2VolumeMetaData::DateTime::convertTimestamp2QDateTime(const QString& timestamp) const ///< converter for the custom sonowand timestamp format
 {
     return QDateTime::fromString(timestamp, timestampFormat());		
 }
+
 QString SNW2VolumeMetaData::DateTime::createTimestamp(const QDateTime& datetime) const ///< converter for the custom sonowand timestamp format
 {
 	return datetime.toString(timestampFormat());
 }
+
 QDateTime SNW2VolumeMetaData::DateTime::robustReadTime() const
 {
 	return robustReadTime(mDate+"T"+mTime);
 }
+
 /**read a date time on the format yyyyMMdd'T'hhmm.zzzzzz,
  * but with 0-6 z's.
  */
@@ -97,7 +107,6 @@ QDateTime SNW2VolumeMetaData::DateTime::robustReadTime(QString rawDateTime) cons
 	return retval;
 }
 
-
 SNW2VolumeMetaData::SNW2VolumeMetaData()
 {
 	Volume.mWindowCenter = -1.0;
@@ -107,11 +116,9 @@ SNW2VolumeMetaData::SNW2VolumeMetaData()
 	Volume.mLastPixel = -1;
 }
 
-
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
-
 
 /**Factory function
  */
@@ -142,7 +149,6 @@ SNW2VolumePtr SNW2Volume::create(const QString& filePath, const SNW2VolumeMetaDa
 	retval->mImage = ssc::ImagePtr(new ssc::Image("series_"+retval->uid(), retval->mImageData));
 	
 	return retval;
-	
 }
 
 void SNW2Volume::writeStatus(const QString& text) const
@@ -177,7 +183,6 @@ SNW2Volume::SNW2Volume(const QString& filePath)
 
 SNW2Volume::~SNW2Volume()
 {
-
 }
 
 QString SNW2Volume::rawDataFileName() const
@@ -195,7 +200,6 @@ QString SNW2Volume::iniFileName() const
 	return filePath() + ".ini";
 }
 
-
 void SNW2Volume::save() const
 {
 	rawSaveMetaData(iniFileName(), mMetaData);
@@ -208,7 +212,6 @@ QStringList SNW2Volume::streamable2QStringList(const T& val) const
 {
 	return qstring_cast(val).split(' ', QString::SkipEmptyParts);
 }
-
 
 boost::array<int,3> SNW2Volume::stringList2IntArray3(QStringList raw) const
 {
@@ -236,7 +239,10 @@ bool SNW2Volume::loadMetaData()
 		return true;
 	}
 
-	mMetaData = rawLoadMetaData();
+	if (!rawLoadMetaData(mMetaData))
+	{
+		return false;	// load or validation failed
+	}
 
 	if (!mMetaData.mConversionTime.isValid()) // load failed?
 	{
@@ -246,20 +252,17 @@ bool SNW2Volume::loadMetaData()
 	return true;
 }
 
-SNW2VolumeMetaData SNW2Volume::rawLoadMetaData() const
+bool SNW2Volume::rawLoadMetaData(SNW2VolumeMetaData &data) const
 {
-	SNW2VolumeMetaData data;
-
 	SonowandInifile file(iniFileName());
 
 	if (!file.checkOK())
 	{
-		writeStatus("metadata bad ini checksum");
-		return data;
+		writeStatus("metadata bad ini checksum for " + file.fileName());
+		return false;
 	}
 
-	data.mConversionTime =  SNW2VolumeMetaData::DateTime::fromDateAndTime(file.value("Info/ConversionDate").toString(), file.value("Info/ConversionTime").toString());
-
+	data.mConversionTime = SNW2VolumeMetaData::DateTime::fromDateAndTime(file.value("Info/ConversionDate").toString(), file.value("Info/ConversionTime").toString());
 	data.mModality = file.value("Info/Modality").toString();
 	data.mModalityType = file.value("Info/ModalityType").toString();
 	data.mIntraoperative = file.value("Info/Intraoperative").toBool();
@@ -275,7 +278,6 @@ SNW2VolumeMetaData SNW2Volume::rawLoadMetaData() const
 	}
 
 	data.mAcquisitionTime =  SNW2VolumeMetaData::DateTime::fromDateAndTime(file.value("Acquisition/Date").toString(), file.value("Acquisition/Time").toString());
-
 	data.DICOM.mFrameOfReferenceUID = file.value("DICOM/FrameOfReferenceUid").toString();
 
 	QStringList orientation = file.value("DICOM/ImageOrientationPatient").toStringList();
@@ -312,7 +314,8 @@ SNW2VolumeMetaData SNW2Volume::rawLoadMetaData() const
 	}
 	if (data.Volume.mDim[0] <= 0 || data.Volume.mDim[1] <= 0 || data.Volume.mDim[2] <= 0)
 	{
-		writeStatus("metadata bad size");	// TODO, we really need to return a more serious error here
+		writeStatus("metadata bad size for " + file.fileName());
+		return false;
 	}
 	data.Volume.mWindowCenter = file.value("Data/WindowCenter", mMetaData.Volume.mWindowCenter).toDouble();
 	data.Volume.mWindowWidth = file.value("Data/WindowWidth", mMetaData.Volume.mWindowWidth).toDouble();
@@ -327,7 +330,7 @@ SNW2VolumeMetaData SNW2Volume::rawLoadMetaData() const
 	data.Lut.mStart = file.value("Lut/Start").toInt();
 	data.Lut.mType = file.value("Lut/Type").toString();
 
-	return data;
+	return true;
 }
 
 bool SNW2Volume::loadVolumeData()
@@ -681,4 +684,3 @@ void SNW2Volume::ensureCenterWindowValid(double* windowPtr, double* levelPtr, do
 
 
 } // namespace ssc
-
