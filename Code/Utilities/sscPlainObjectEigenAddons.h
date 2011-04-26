@@ -29,3 +29,4 @@ const Scalar* end() const
   return this->data() + this->size();
 }
 
+

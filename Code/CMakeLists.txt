@@ -423,9 +423,9 @@ configure_file(
 # =========================================================
 
 set( SSC_GENERATED_SOURCE_FILES
+	${SSC_SOURCE_FILES} 
 	${UI_HEADER_FILES} 
 	${MOC_HEADER_FILES} 
-	${SSC_SOURCE_FILES} 
 	${GENERATED_RESOURCES} )
 
 set( SSC_GENERATED_LIBRARIES

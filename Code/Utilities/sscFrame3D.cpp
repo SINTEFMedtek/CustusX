@@ -207,6 +207,8 @@ void Frame3D::setEulerXYZ(const ssc::Vector3D& xyz)
   this->setRotationAxis(ssc::Vector3D(axis[0],axis[1],axis[2]));
 }
 
+//std::ostream& operator<<(std::ostream& s, const Transform3D& t);
+
 void testProps(const Transform3D& T)
 {
   Frame3D f = Frame3D::create(T);

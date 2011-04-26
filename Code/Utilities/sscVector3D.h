@@ -1,13 +1,16 @@
 #ifndef SSCVECTOR3D_H_
 #define SSCVECTOR3D_H_
 
-//#include "boost/array.hpp"
+#include "boost/array.hpp"
 class QString;
 #include <QStringList>
+#include <vtkSmartPointer.h>
+typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "sscPlainObjectEigenAddons.h"
 #define EIGEN_MATRIXBASE_PLUGIN "sscMatrixBaseEigenAddons.h"
+#define EIGEN_TRANSFORM_PLUGIN "sscTransformEigenAddons.h"
 
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Geometry>
