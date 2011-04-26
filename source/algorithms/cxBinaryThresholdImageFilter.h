@@ -1,25 +1,25 @@
-#ifndef CXSEGMENTATION_H_
-#define CXSEGMENTATION_H_
+#ifndef CXSBINARYTHRESHOLDIMAGEFILTER_H_
+#define CXSBINARYTHRESHOLDIMAGEFILTER_H_
 
 #include "cxTimedAlgorithm.h"
 
 namespace cx
 {
 /**
- * \class Segmentation
+ * \class BinaryThresholdImageFilter
  *
- * \brief Threaded segmentation.
+ * \brief Threaded BinaryThresholdImageFilter.
  *
  * \date Feb 16, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class Segmentation : public ThreadedTimedAlgorithm<vtkImageDataPtr>
+class BinaryThresholdImageFilter : public ThreadedTimedAlgorithm<vtkImageDataPtr>
 {
   Q_OBJECT
 
 public:
-  Segmentation();
-  virtual ~Segmentation();
+  BinaryThresholdImageFilter();
+  virtual ~BinaryThresholdImageFilter();
 
   void setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing=true, double smoothSigma=0.5);
   ssc::ImagePtr getOutput();
@@ -38,4 +38,4 @@ private:
   double        mSmoothingSigma;
 };
 }//namespace cx
-#endif /* CXSEGMENTATION_H_ */
+#endif /* CXSBINARYTHRESHOLDIMAGEFILTER_H_ */

@@ -1,4 +1,4 @@
-#include "cxSegmentation.h"
+#include "cxBinaryThresholdImageFilter.h"
 
 #include "sscDataManager.h"
 #include "sscUtilHelpers.h"
@@ -6,14 +6,14 @@
 
 namespace cx
 {
-Segmentation::Segmentation() :
+BinaryThresholdImageFilter::BinaryThresholdImageFilter() :
     ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
 {}
 
-Segmentation::~Segmentation()
+BinaryThresholdImageFilter::~BinaryThresholdImageFilter()
 {}
 
-void Segmentation::setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing, double smoothSigma)
+void BinaryThresholdImageFilter::setInput(ssc::ImagePtr image, QString outputBasePath, int threshold, bool useSmoothing, double smoothSigma)
 {
   mInput = image;
   mOutputBasePath = outputBasePath;
@@ -24,12 +24,12 @@ void Segmentation::setInput(ssc::ImagePtr image, QString outputBasePath, int thr
   this->generate();
 }
 
-ssc::ImagePtr Segmentation::getOutput()
+ssc::ImagePtr BinaryThresholdImageFilter::getOutput()
 {
   return mOutput;
 }
 
-void Segmentation::postProcessingSlot()
+void BinaryThresholdImageFilter::postProcessingSlot()
 {
   vtkImageDataPtr rawResult = this->getResult();
 
@@ -52,7 +52,7 @@ void Segmentation::postProcessingSlot()
   emit finished();
 }
 
-vtkImageDataPtr Segmentation::calculate()
+vtkImageDataPtr BinaryThresholdImageFilter::calculate()
 {
   itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(mInput);
 

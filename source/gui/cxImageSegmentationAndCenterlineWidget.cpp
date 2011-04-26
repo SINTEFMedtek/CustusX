@@ -3,7 +3,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QFrame>
-#include "cxSegmentationWidget.h"
+#include "cxBinaryThresholdImageFilterWidget.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
@@ -16,7 +16,7 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
 {
   mLayout = new QVBoxLayout(this);
   mResampleWidget =  new ResampleWidget(this);
-  mSegmentationWidget = new SegmentationWidget(this);
+  mSegmentationWidget = new BinaryThresholdImageFilterWidget(this);
   mSurfaceWidget = new SurfaceWidget(this);
   mCenterlineWidget =  new CenterlineWidget(this);
 
