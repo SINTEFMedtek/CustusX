@@ -4,7 +4,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxTimedAlgorithm.h
     cxCenterline.h
     cxResample.h
-    cxSegmentation.h
+    cxBinaryThresholdImageFilter.h
     cxContour.h
 )
 
@@ -28,8 +28,8 @@ SET ( ${LIB}_algorithms
     cxCenterline.cpp
     cxResample.h
     cxResample.cpp
-    cxSegmentation.h
-    cxSegmentation.cpp
+    cxBinaryThresholdImageFilter.h
+    cxBinaryThresholdImageFilter.cpp
     cxContour.h
     cxContour.cpp
 )

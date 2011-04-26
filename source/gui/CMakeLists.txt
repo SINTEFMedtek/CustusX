@@ -37,7 +37,7 @@ SET(cxProject_MOC_HDRS
   cxImportDataWizard.h
   cxFastOrientationRegistrationWidget.h
   cxCameraControlWidget.h
-  cxSegmentationWidget.h
+  cxBinaryThresholdImageFilterWidget.h
   cxToolTipCalibrationWidget.h
   cxImageSegmentationAndCenterlineWidget.h
   cxWhatsThisWidget.h
@@ -144,13 +144,11 @@ SET(${LIBNAME}_SRCS
     cxFastOrientationRegistrationWidget.cpp
     cxImageSegmentationAndCenterlineWidget.h
     cxImageSegmentationAndCenterlineWidget.cpp
-    cxSegmentationWidget.h
-    cxSegmentationWidget.cpp
+    cxBinaryThresholdImageFilterWidget.h
+    cxBinaryThresholdImageFilterWidget.cpp
     cxWhatsThisWidget.h
     cxCameraControlWidget.cpp
     cxCameraControlWidget.h    
-    cxSegmentationWidget.cpp
-    cxSegmentationWidget.h
     cxIGTLinkWidget.h
     cxIGTLinkWidget.cpp
     cxToolTipCalibrationWidget.h

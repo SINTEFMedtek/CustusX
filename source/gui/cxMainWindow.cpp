@@ -21,6 +21,7 @@
 #include "cxImageSegmentationAndCenterlineWidget.h"
 #include "cxFastPatientRegistrationWidget.h"
 #include "cxFastOrientationRegistrationWidget.h"
+#include "cxConnectedThresholdImageFilterWidget.h"
 #include "cxToolPropertiesWidget.h"
 #include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
@@ -39,7 +40,7 @@
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
-#include "cxSegmentationWidget.h"
+#include "cxBinaryThresholdImageFilterWidget.h"
 #include "cxPlateRegistrationWidget.h"
 #include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
@@ -964,9 +965,11 @@ void MainWindow::populateRegistrationMethodsWidget()
 
 void MainWindow::populateSegmentationMethodsWidget()
 {
-  SegmentationWidget* segmentationWidget = new SegmentationWidget(mSegmentationMethodsWidget);
-
+  BinaryThresholdImageFilterWidget* segmentationWidget = new BinaryThresholdImageFilterWidget(mSegmentationMethodsWidget);
   mSegmentationMethodsWidget->addTab(segmentationWidget, "Threshold");
+
+  ConnectedThresholdImageFilterWidget* connectedThresholdImageFilterWidget = new ConnectedThresholdImageFilterWidget(mSegmentationMethodsWidget);
+  mSegmentationMethodsWidget->addTab(connectedThresholdImageFilterWidget, "Connected Threshold Image Filter");
 }
 
 void MainWindow::populateVisualizationMethodsWidget()
