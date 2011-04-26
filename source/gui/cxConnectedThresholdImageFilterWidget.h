@@ -1,8 +1,8 @@
 #ifndef CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 #define CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 
-
 #include "cxWhatsThisWidget.h"
+#include "cxConnectedThresholdImageFilter.h"
 
 namespace cx
 {
@@ -17,11 +17,25 @@ namespace cx
  */
 class ConnectedThresholdImageFilterWidget : public WhatsThisWidget
 {
+  Q_OBJECT
+
 public:
   ConnectedThresholdImageFilterWidget(QWidget* parent);
   virtual ~ConnectedThresholdImageFilterWidget();
 
   virtual QString defaultWhatsThis() const;
+
+private slots:
+  void handleFinishedSlot();
+  void segmentSlot();
+
+private:
+  ConnectedThresholdImageFilterWidget();
+  QWidget* createSegmentationOptionsWidget();
+
+  QLabel* mStatusLabel;
+
+  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
 };
 
 }

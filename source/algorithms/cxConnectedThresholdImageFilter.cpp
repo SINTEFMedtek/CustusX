@@ -14,7 +14,6 @@ namespace cx
 ConnectedThresholdImageFilter::ConnectedThresholdImageFilter() :
     ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
 {
-
 }
 
 ConnectedThresholdImageFilter::~ConnectedThresholdImageFilter()
@@ -41,10 +40,14 @@ ssc::ImagePtr ConnectedThresholdImageFilter::getOutput()
 
 void ConnectedThresholdImageFilter::postProcessingSlot()
 {
+  //get the result from the thread
   vtkImageDataPtr rawResult = this->getResult();
 
+  //generate a new name and unique id for the newly created object
   QString uid = mInput->getUid() + "_seg%1";
   QString name = mInput->getName()+" seg%1";
+
+  //create a ssc::Image
   mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
   if(!mOutput)
   {
@@ -52,13 +55,20 @@ void ConnectedThresholdImageFilter::postProcessingSlot()
     return;
   }
 
+  //update the ssc::Images registration history
   mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
   mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
+
+  //load the image into CustusX for visualization
   ssc::dataManager()->loadData(mOutput);
+
+  //save the data to file
   ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
 
+  //let the user know you are finished
   ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
 
+  //let the system know you're finished
   emit finished();
 }
 
