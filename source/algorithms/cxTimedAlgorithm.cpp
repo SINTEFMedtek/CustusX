@@ -153,7 +153,7 @@ T ThreadedTimedAlgorithm<T>::getResult()
 
 template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
 template class ThreadedTimedAlgorithm<ssc::ImagePtr>; //resample
-//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //segmentation
+//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
 template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
 
 
