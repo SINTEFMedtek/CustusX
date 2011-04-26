@@ -144,7 +144,6 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
 
   QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
   connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
-  connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
   segmentationOptionsWidget->setVisible(segmentationOptionsButton->isChecked());
 
   topLayout->addWidget(segmentButton, 1,0);
