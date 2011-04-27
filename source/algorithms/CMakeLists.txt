@@ -13,8 +13,6 @@ SET ( ${LIB}_algorithms
     ItkVtkGlue/itkImageToVTKImageFilter.txx
     ItkVtkGlue/itkVTKImageToImageFilter.h
     ItkVtkGlue/itkVTKImageToImageFilter.txx 
-    #cxSegmentationOld.h
-    #cxSegmentationOld.cpp
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
