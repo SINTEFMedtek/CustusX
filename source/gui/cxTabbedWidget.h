@@ -33,38 +33,6 @@ private:
   TabbedWidget();
 };
 //------------------------------------------------------------------------------
-class RegistrationMethodsWidget : public TabbedWidget
-{
-public:
-  RegistrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~RegistrationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
-class SegmentationMethodsWidget : public TabbedWidget
-{
-public:
-  SegmentationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~SegmentationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
-class VisualizationMethodsWidget : public TabbedWidget
-{
-public:
-  VisualizationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~VisualizationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
-class CalibrationMethodsWidget : public TabbedWidget
-{
-public:
-  CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~CalibrationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
 class LandmarkRegistrationsWidget : public TabbedWidget
 {
 public:
@@ -94,6 +62,38 @@ class Image2PlateRegistrationWidget : public TabbedWidget
 public:
   Image2PlateRegistrationWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~Image2PlateRegistrationWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+class RegistrationMethodsWidget : public TabbedWidget
+{
+public:
+  RegistrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~RegistrationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+class SegmentationMethodsWidget : public TabbedWidget
+{
+public:
+  SegmentationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~SegmentationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+class VisualizationMethodsWidget : public TabbedWidget
+{
+public:
+  VisualizationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~VisualizationMethodsWidget(){};
+  virtual QString defaultWhatsThis() const;
+};
+//------------------------------------------------------------------------------
+class CalibrationMethodsWidget : public TabbedWidget
+{
+public:
+  CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
+  virtual ~CalibrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };
 //------------------------------------------------------------------------------
