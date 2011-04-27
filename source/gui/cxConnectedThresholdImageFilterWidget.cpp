@@ -65,13 +65,13 @@ void ConnectedThresholdImageFilterWidget::segmentSlot()
 
   //TODO hack
   ssc::ImagePtr selectedImage = ssc::dataManager()->getActiveImage();
-  float lowerThreshold = 300.0;
-  float upperThreshold = 1000.0;
-  int replaceValue = 1;
+  float lowerThreshold = 50.0;
+  float upperThreshold = 647.0;
+  int replaceValue = 150;
   itkImageType::IndexType seed;
-  seed[0] = 100;
-  seed[1] = 100;
-  seed[2] = 100;
+  seed[0] = 88;
+  seed[1] = 134;
+  seed[2] = 14;
   //hack
 
   mConnectedThresholdImageFilter.setInput(selectedImage, outputBasePath, lowerThreshold, upperThreshold, replaceValue, seed);
