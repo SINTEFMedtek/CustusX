@@ -37,6 +37,7 @@ class ImageLUT2D : public ImageTFData
 public:
 	ImageLUT2D(vtkImageDataPtr base);
 	ImageLUT2DPtr createCopy();
+	void setFullRangeWinLevel(); ///< Set winlevel spanning the entire range
 
 	void setBaseLookupTable(vtkLookupTablePtr lut); //</ backwards compatibility: prefer setLut()
 	vtkLookupTablePtr getOutputLookupTable();
