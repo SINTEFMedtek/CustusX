@@ -20,22 +20,22 @@ class ConnectedThresholdImageFilterWidget : public WhatsThisWidget
   Q_OBJECT
 
 public:
-  ConnectedThresholdImageFilterWidget(QWidget* parent);
+  ConnectedThresholdImageFilterWidget(QWidget* parent = 0);
   virtual ~ConnectedThresholdImageFilterWidget();
 
   virtual QString defaultWhatsThis() const;
-//
-//private slots:
-//  void handleFinishedSlot();
-//  void segmentSlot();
-//
-//private:
-//  ConnectedThresholdImageFilterWidget();
-//  QWidget* createSegmentationOptionsWidget();
-//
-//  QLabel* mStatusLabel;
-//
-//  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
+
+private slots:
+  void handleFinishedSlot();
+  void segmentSlot();
+
+private:
+  ConnectedThresholdImageFilterWidget();
+  QWidget* createSegmentationOptionsWidget();
+
+  QLabel* mStatusLabel;
+
+  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
 };
 
 }
