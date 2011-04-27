@@ -54,16 +54,13 @@ void ConnectedThresholdImageFilterWidget::handleFinishedSlot()
     return;
 
   mStatusLabel->setText("<font color=green> Done. </font>\n");
-
-//  emit outputImageChanged(segmentedImage->getUid());
 }
 
 void ConnectedThresholdImageFilterWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-//  this->revertTransferFunctions();
 
-  //TODO hack
+  //TODO add user interface
   ssc::ImagePtr selectedImage = ssc::dataManager()->getActiveImage();
   float lowerThreshold = 50.0;
   float upperThreshold = 647.0;
