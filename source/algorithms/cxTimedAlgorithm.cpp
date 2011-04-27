@@ -11,7 +11,9 @@ namespace cx
 //---------------------------------------------------------------------------------------------------------------------
 itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr image)
 {
+  //HACK
   return AlgorithmHelper::getITKfromSSCImageViaFile(image);
+
 //  if(!image)
 //  {
 //    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
