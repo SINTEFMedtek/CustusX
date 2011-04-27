@@ -22,7 +22,6 @@
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
 #include "cxVolumePropertiesWidget.h"
-#include "cxSegmentationOld.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
