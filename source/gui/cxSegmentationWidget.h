@@ -86,6 +86,7 @@ protected:
   virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
 
 private slots:
+  void removeIfNotVisible(); ///<Remove segmentation preview coloring if widget is not visible
   void segmentSlot();
   void toogleBinarySlot(bool on);
   void thresholdSlot();
@@ -112,6 +113,8 @@ private:
   ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
   ssc::ImageTF3DPtr mTF3D_original; ///< original TF of modified image.
   ssc::ImageLUT2DPtr mTF2D_original; ///< original TF of modified image.
+  bool mShadingOn_original; ///< Was shading originally enabled in image
+  QTimer *mRemoveTimer;///< Timer for removing segmentation preview coloring if widget is not visible
 
   Segmentation mSegmentationAlgorithm;
 };
