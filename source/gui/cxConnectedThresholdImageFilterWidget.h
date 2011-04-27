@@ -24,18 +24,18 @@ public:
   virtual ~ConnectedThresholdImageFilterWidget();
 
   virtual QString defaultWhatsThis() const;
-
-private slots:
-  void handleFinishedSlot();
-  void segmentSlot();
-
-private:
-  ConnectedThresholdImageFilterWidget();
-  QWidget* createSegmentationOptionsWidget();
-
-  QLabel* mStatusLabel;
-
-  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
+//
+//private slots:
+//  void handleFinishedSlot();
+//  void segmentSlot();
+//
+//private:
+//  ConnectedThresholdImageFilterWidget();
+//  QWidget* createSegmentationOptionsWidget();
+//
+//  QLabel* mStatusLabel;
+//
+//  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
 };
 
 }
