@@ -52,13 +52,12 @@ SET(cxProject_MOC_HDRS
   cxSeansVesselRegistrationWidget.h
   cxTransform3DWidget.h
   cxFilePreviewWidget.h
-  #cxToolConfigWidget.h
   cxToolFilterWidget.h
   cxSelectionGroupBox.h
   cxToolListWidget.h
   cxToolConfigureWidget.h
   cxDataViewSelectionWidget.h
-  cxConnectedThresholdImageFilterWidget.h
+  #<1>cxConnectedThresholdImageFilterWidget.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -105,8 +104,6 @@ SET(${LIBNAME}_SRCS
     cxTransferFunctionColorWidget.cpp
     cxPreferencesDialog.h
     cxPreferencesDialog.cpp
-    #cxShiftCorrectionWidget.h
-    #cxShiftCorrectionWidget.cpp
     cxRegistrationHistoryWidget.h
     cxRegistrationHistoryWidget.cpp
     cxImagePropertiesWidget.h
@@ -175,8 +172,6 @@ SET(${LIBNAME}_SRCS
     cxTransform3DWidget.cpp
     cxFilePreviewWidget.h
     cxFilePreviewWidget.cpp
-    #cxToolConfigWidget.h
-    #cxToolConfigWidget.cpp
     snwSyntaxHighlighter.cpp
     cxToolFilterWidget.h
     cxToolFilterWidget.cpp
@@ -188,8 +183,8 @@ SET(${LIBNAME}_SRCS
     cxToolConfigureWidget.cpp
     cxDataViewSelectionWidget.h
     cxDataViewSelectionWidget.cpp
-    cxConnectedThresholdImageFilterWidget.h
-    cxConnectedThresholdImageFilterWidget.cpp
+    #<1>cxConnectedThresholdImageFilterWidget.h
+    #<1>cxConnectedThresholdImageFilterWidget.cpp
     ${cxProject_RCC_SRCS} )
 
 # Use the include path and library for Qt that is used by VTK.
