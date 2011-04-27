@@ -13,16 +13,9 @@
 #include "cxCustomStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
-#include "cxManualRegistrationOffsetWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
-#include "cxImageRegistrationWidget.h"
-#include "cxFastImageRegistrationWidget.h"
-#include "cxImageSegmentationAndCenterlineWidget.h"
-#include "cxFastPatientRegistrationWidget.h"
-#include "cxFastOrientationRegistrationWidget.h"
 #include "cxToolPropertiesWidget.h"
-#include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
 #include "cxViewGroup.h"
@@ -39,9 +32,6 @@
 #include "cxFrameTreeWidget.h"
 #include "cxImportDataWizard.h"
 #include "cxCameraControlWidget.h"
-#include "cxSegmentationWidget.h"
-#include "cxPlateRegistrationWidget.h"
-#include "cxToolTipCalibrationWidget.h"
 #include "cxCameraControl.h"
 #include "cxControlPanel.h"
 #include "cxIGTLinkWidget.h"
@@ -91,11 +81,6 @@ MainWindow::MainWindow() :
   this->updateWindowTitle();
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-
-  this->populateRegistrationMethodsWidget();
-  this->populateSegmentationMethodsWidget();
-  this->populateVisualizationMethodsWidget();
-  this->populateCalibrationMethodsWidget();
 
   this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
   this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
@@ -916,71 +901,6 @@ void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 void MainWindow::createStatusBar()
 {
   this->setStatusBar(mCustomStatusBar);
-}
-
-void MainWindow::populateRegistrationMethodsWidget()
-{
-  //landmark
-  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(mRegsitrationMethodsWidget, "LandmarkRegistrationWidget", "Landmark Registrations");
-  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget, "ImageRegistrationWidget", "Image Registration");
-  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget, "PatientRegistrationWidget", "Patient Registration");
-  landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
-  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
-
-  //fast
-  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(mRegsitrationMethodsWidget, "FastRegistrationWidget", "Fast Registrations");
-  FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
-  FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
-  fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
-  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient");
-
-  //vessel based image to image
-  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(mRegsitrationMethodsWidget, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
-  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
-
-  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
-  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed"); //should be application specific
-  image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
-
-  //manual offset
-  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
-
-  //plate
-  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(mRegsitrationMethodsWidget, "PlateRegistrationWidget", "Plate");
-  PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
-  PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
-  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
-  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
-
-  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
-  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
-  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
-  mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
-  mRegsitrationMethodsWidget->addTab(imageAndPlateRegistrationWidget, "Plate");
-}
-
-void MainWindow::populateSegmentationMethodsWidget()
-{
-  SegmentationWidget* segmentationWidget = new SegmentationWidget(mSegmentationMethodsWidget);
-
-  mSegmentationMethodsWidget->addTab(segmentationWidget, "Threshold");
-}
-
-void MainWindow::populateVisualizationMethodsWidget()
-{
-  SurfaceWidget* surfaceWidget = new SurfaceWidget(mVisualizationMethodsWidget);
-
-  mVisualizationMethodsWidget->addTab(surfaceWidget, "Surface");
-}
-
-void MainWindow::populateCalibrationMethodsWidget()
-{
-  ToolTipCalibrationWidget* toolTipCalibrationWidget = new ToolTipCalibrationWidget(mCalibrationMethodsWidget);
-
-  mCalibrationMethodsWidget->addTab(toolTipCalibrationWidget, "Tool Tip");
 }
 
 void MainWindow::aboutSlot()

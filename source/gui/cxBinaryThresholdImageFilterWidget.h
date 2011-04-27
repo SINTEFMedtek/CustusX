@@ -1,5 +1,5 @@
-#ifndef CXSEGMENTATIONWIDGET_H_
-#define CXSEGMENTATIONWIDGET_H_
+#ifndef CXSBINARYTHRESHOLDIMAGEFILTERWIDGET_H_
+#define CXSBINARYTHRESHOLDIMAGEFILTERWIDGET_H_
 
 #include <vector>
 #include <QtGui>
@@ -10,7 +10,7 @@
 #include "cxWhatsThisWidget.h"
 #include "cxCenterline.h"
 #include "cxResample.h"
-#include "cxSegmentation.h"
+#include "cxBinaryThresholdImageFilter.h"
 #include "cxContour.h"
 
 class QGroupBox;
@@ -57,21 +57,21 @@ private:
 
 
 /**
- * \class SegmentationWidget
+ * \class BinaryThresholdImageFilterWidget
  *
  * \brief Widget for segmenting out parts of volumes using a threshold.
  *
  * \date 12. okt. 2010
- * \author: Janne Beate Bakeng
+ * \author: Janne Beate Bakeng, SINTEF
  * \author: Christian Askeland, SINTEF
  */
-class SegmentationWidget : public WhatsThisWidget
+class BinaryThresholdImageFilterWidget : public WhatsThisWidget
 {
   Q_OBJECT
 
 public:
-  SegmentationWidget(QWidget* parent);
-  virtual ~SegmentationWidget();
+  BinaryThresholdImageFilterWidget(QWidget* parent);
+  virtual ~BinaryThresholdImageFilterWidget();
   virtual QString defaultWhatsThis() const;
 
 signals:
@@ -96,7 +96,7 @@ private slots:
   void handleFinishedSlot();
 
 private:
-  SegmentationWidget();
+  BinaryThresholdImageFilterWidget();
   QWidget* createSegmentationOptionsWidget();
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
@@ -116,7 +116,7 @@ private:
   bool mShadingOn_original; ///< Was shading originally enabled in image
   QTimer *mRemoveTimer;///< Timer for removing segmentation preview coloring if widget is not visible
 
-  Segmentation mSegmentationAlgorithm;
+  BinaryThresholdImageFilter mSegmentationAlgorithm;
 };
 
 /**
@@ -238,4 +238,4 @@ private:
 
 }//namespace cx
 
-#endif /* CXSEGMENTATIONWIDGET_H_ */
+#endif /* CXSBINARYTHRESHOLDIMAGEFILTERWIDGET_H_ */
