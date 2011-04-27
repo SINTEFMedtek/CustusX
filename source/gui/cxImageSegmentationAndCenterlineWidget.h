@@ -40,7 +40,7 @@ private slots:
 
 protected:
   class ResampleWidget*     mResampleWidget;
-  class SegmentationWidget* mSegmentationWidget;
+  class BinaryThresholdImageFilterWidget* mSegmentationWidget;
   class SurfaceWidget*      mSurfaceWidget;
   class CenterlineWidget*   mCenterlineWidget;
 
