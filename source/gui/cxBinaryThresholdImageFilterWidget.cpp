@@ -1,4 +1,4 @@
-  #include "cxSegmentationWidget.h"
+  #include "cxBinaryThresholdImageFilterWidget.h"
 
 #include <boost/bind.hpp>
 
@@ -115,8 +115,8 @@ QWidget* ResampleWidget::createOptionsWidget()
 }
 //------------------------------------------------------------------------------
 
-SegmentationWidget::SegmentationWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "SegmentationWidget", "Segmentation"),
+BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* parent) :
+  WhatsThisWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
   mBinary(false),
   mUseSmothing(false),
   mStatusLabel(new QLabel(""))
@@ -144,7 +144,6 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
 
   QGroupBox* segmentationOptionsWidget = this->createGroupbox(this->createSegmentationOptionsWidget(), "Segmentation options");
   connect(segmentationOptionsButton, SIGNAL(clicked(bool)), segmentationOptionsWidget, SLOT(setVisible(bool)));
-  connect(segmentationOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
   segmentationOptionsWidget->setVisible(segmentationOptionsButton->isChecked());
 
   topLayout->addWidget(segmentButton, 1,0);
@@ -157,19 +156,19 @@ SegmentationWidget::SegmentationWidget(QWidget* parent) :
   connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(removeIfNotVisible()));
 }
 
-SegmentationWidget::~SegmentationWidget()
+BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
 {
 }
 
-QString SegmentationWidget::defaultWhatsThis() const
+QString BinaryThresholdImageFilterWidget::defaultWhatsThis() const
 {
   return "<html>"
-    "<h3>Segmentation.</h3>"
+    "<h3>Binary Threshold Image Filter.</h3>"
     "<p><i>Segment out areas from the selected image using a threshold.</i></p>"
     "</html>";
 }
 
-void SegmentationWidget::showEvent(QShowEvent* event)
+void BinaryThresholdImageFilterWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
 
@@ -179,13 +178,13 @@ void SegmentationWidget::showEvent(QShowEvent* event)
   }
 }
 
-void SegmentationWidget::hideEvent(QHideEvent* event)
+void BinaryThresholdImageFilterWidget::hideEvent(QHideEvent* event)
 {
   QWidget::hideEvent(event);
   this->revertTransferFunctions();
 }
 
-void SegmentationWidget::removeIfNotVisible()
+void BinaryThresholdImageFilterWidget::removeIfNotVisible()
 {
   //Revert to original transfer functions when the widget is no longer visible
   if(this->visibleRegion().isEmpty())
@@ -195,12 +194,12 @@ void SegmentationWidget::removeIfNotVisible()
   }
 }
 
-void SegmentationWidget::setImageInputSlot(QString value)
+void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 {
   mSelectedImage->setValue(value);
 }
 
-void SegmentationWidget::segmentSlot()
+void BinaryThresholdImageFilterWidget::segmentSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
   this->revertTransferFunctions();
@@ -210,7 +209,7 @@ void SegmentationWidget::segmentSlot()
   mStatusLabel->setText("<font color=orange> Generating segmentation... Please wait!</font>\n");
 }
 
-void SegmentationWidget::handleFinishedSlot()
+void BinaryThresholdImageFilterWidget::handleFinishedSlot()
 {
   ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
   if(!segmentedImage)
@@ -221,12 +220,12 @@ void SegmentationWidget::handleFinishedSlot()
   emit outputImageChanged(segmentedImage->getUid());
 }
 
-void SegmentationWidget::toogleBinarySlot(bool on)
+void BinaryThresholdImageFilterWidget::toogleBinarySlot(bool on)
 {
   mBinary = on;
 }
 
-void SegmentationWidget::revertTransferFunctions()
+void BinaryThresholdImageFilterWidget::revertTransferFunctions()
 {
   if (!mModifiedImage)
     return;
@@ -239,7 +238,7 @@ void SegmentationWidget::revertTransferFunctions()
   mModifiedImage.reset();
 }
 
-void SegmentationWidget::thresholdSlot()
+void BinaryThresholdImageFilterWidget::thresholdSlot()
 {
   ssc::ImagePtr image = mSelectedImage->getImage();
   if(!image)
@@ -271,13 +270,13 @@ void SegmentationWidget::thresholdSlot()
   mRemoveTimer->start(1000);
 }
 
-void SegmentationWidget::toogleSmoothingSlot(bool on)
+void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
 {
   mUseSmothing = on;
   mSmoothingSigmaWidget->setEnabled(on);
 }
 
-void SegmentationWidget::imageChangedSlot(QString uid)
+void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
 {
   this->revertTransferFunctions();
 
@@ -291,7 +290,7 @@ void SegmentationWidget::imageChangedSlot(QString uid)
     this->toogleSmoothingSlot(true);
 }
 
-QWidget* SegmentationWidget::createSegmentationOptionsWidget()
+QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
 {
   QWidget* retval = new QWidget(this);
 
