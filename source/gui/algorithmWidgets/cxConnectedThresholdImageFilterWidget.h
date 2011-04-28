@@ -1,46 +1,44 @@
 #ifndef CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 #define CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 
-//<1>
-//#include "cxWhatsThisWidget.h"
-//<7>
-//#include "cxConnectedThresholdImageFilter.h"
+#include "cxWhatsThisWidget.h"
+#include "cxConnectedThresholdImageFilter.h"
 
 namespace cx
 {
 
 /**
- * ConnectedThresholdImageFilterWidget
+ * \class ConnectedThresholdImageFilterWidget
  *
- * \brief
+ * \brief Widget for controlling the connected threshold image filter, a region
+ * growing filter.
+ *
+ * \warning Class used in course, not tested nor fully implemented.
  *
  * \date Apr 26, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ConnectedThresholdImageFilterWidget //<1>: public WhatsThisWidget
+class ConnectedThresholdImageFilterWidget : public WhatsThisWidget
 {
-//<1>
-//  Q_OBJECT
+  Q_OBJECT
 
 public:
   ConnectedThresholdImageFilterWidget(QWidget* parent = 0);
   virtual ~ConnectedThresholdImageFilterWidget();
 
-//<1>
-//  virtual QString defaultWhatsThis() const;
+  virtual QString defaultWhatsThis() const;
 
-//<7>
-//private slots:
-//  void handleFinishedSlot();
-//  void segmentSlot();
-//
-//private:
-//  ConnectedThresholdImageFilterWidget();
-//  QWidget* createSegmentationOptionsWidget();
-//
-//  QLabel* mStatusLabel;
-//
-//  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
+private slots:
+  void handleFinishedSlot();
+  void segmentSlot();
+
+private:
+  ConnectedThresholdImageFilterWidget();
+  QWidget* createSegmentationOptionsWidget();
+
+  QLabel* mStatusLabel;
+
+  ConnectedThresholdImageFilter mConnectedThresholdImageFilter;
 };
 
 }
