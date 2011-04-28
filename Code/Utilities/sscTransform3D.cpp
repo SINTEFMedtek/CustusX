@@ -25,7 +25,10 @@ Transform3D::Transform3D(const double* data)
 
 Transform3D::Transform3D(vtkMatrix4x4* m)
 {
-	mMatrix = vtkMatrix4x4Ptr(m);
+  mMatrix = vtkMatrix4x4Ptr::New();
+//	mMatrix = vtkMatrix4x4Ptr(m);
+  if (m)
+    mMatrix->DeepCopy(m);
 }
 
 Transform3D Transform3D::fromVtkMatrix(vtkMatrix4x4Ptr m)
