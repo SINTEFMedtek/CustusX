@@ -150,6 +150,10 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   topLayout->addWidget(segmentationOptionsButton, 1,1);
   topLayout->addWidget(segmentationOptionsWidget, 2, 0, 1, 2);
   topLayout->addWidget(mStatusLabel);
+
+  //Timer for removing segmentation preview coloring if widget is not visible
+  mRemoveTimer = new QTimer(this);
+  connect(mRemoveTimer, SIGNAL(timeout()), this, SLOT(removeIfNotVisible()));
 }
 
 BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
@@ -178,6 +182,16 @@ void BinaryThresholdImageFilterWidget::hideEvent(QHideEvent* event)
 {
   QWidget::hideEvent(event);
   this->revertTransferFunctions();
+}
+
+void BinaryThresholdImageFilterWidget::removeIfNotVisible()
+{
+  //Revert to original transfer functions when the widget is no longer visible
+  if(this->visibleRegion().isEmpty())
+  {
+    mRemoveTimer->stop();
+    this->revertTransferFunctions();
+  }
 }
 
 void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
@@ -217,6 +231,7 @@ void BinaryThresholdImageFilterWidget::revertTransferFunctions()
     return;
 
   mModifiedImage->resetTransferFunction(mTF3D_original, mTF2D_original);
+  mModifiedImage->setShadingOn(mShadingOn_original);
 
   mTF3D_original.reset();
   mTF2D_original.reset();
@@ -234,13 +249,25 @@ void BinaryThresholdImageFilterWidget::thresholdSlot()
     mModifiedImage = image;
     mTF3D_original = image->getTransferFunctions3D()->createCopy();
     mTF2D_original = image->getLookupTable2D()->createCopy();
+    mShadingOn_original = image->getShadingOn();
   }
   image->resetTransferFunctions();
-  ssc::ImageTFDataPtr tf3D = image->getTransferFunctions3D();
-  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue() , 0);
-  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue()+1, image->getMaxAlphaValue());
+  ssc::ImageTF3DPtr tf3D = image->getTransferFunctions3D();
+  tf3D->removeInitAlphaPoint();
+  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue()-1 , 0);
+  tf3D->addAlphaPoint(mSegmentationThresholdAdapter->getValue(), image->getMaxAlphaValue());
   tf3D->addColorPoint(mSegmentationThresholdAdapter->getValue(), Qt::green);
   tf3D->addColorPoint(image->getMax(), Qt::green);
+  image->setShadingOn(true);
+
+  ssc::ImageLUT2DPtr lut2D = image->getLookupTable2D();
+  lut2D->setFullRangeWinLevel();
+  lut2D->addColorPoint(mSegmentationThresholdAdapter->getValue(), Qt::green);
+  lut2D->addColorPoint(image->getMax(), Qt::green);
+  lut2D->setLLR(mSegmentationThresholdAdapter->getValue());
+
+  //Start timer that reverts transfer functions when widget is no longer visible
+  mRemoveTimer->start(1000);
 }
 
 void BinaryThresholdImageFilterWidget::toogleSmoothingSlot(bool on)
@@ -255,7 +282,7 @@ void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
 
   ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
   if(!image)
-
+    return;
   mSegmentationThresholdAdapter->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
 
   QString imageName = image->getName();

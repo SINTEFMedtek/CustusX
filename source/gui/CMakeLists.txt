@@ -8,6 +8,7 @@ SET(cxProject_MOC_HDRS
     #----------------------
     algorithmWidgets/cxBinaryThresholdImageFilterWidget.h
     algorithmWidgets/cxToolTipCalibrationWidget.h
+    algorithmWidgets/cxConnectedThresholdImageFilterWidget.h
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxShadingParamsInterfaces.h
@@ -69,6 +70,7 @@ SET(cxProject_MOC_HDRS
     #----------------------
     ../ThirdParty/qxt/qxtspanslider_p.h
     ../ThirdParty/qxt/qxtspanslider.h
+
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -90,6 +92,8 @@ SET(${LIBNAME}_SRCS
     algorithmWidgets/cxBinaryThresholdImageFilterWidget.cpp
     algorithmWidgets/cxToolTipCalibrationWidget.h
     algorithmWidgets/cxToolTipCalibrationWidget.cpp
+    algorithmWidgets/cxConnectedThresholdImageFilterWidget.h
+    algorithmWidgets/cxConnectedThresholdImageFilterWidget.cpp
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxDataInterface.cpp
