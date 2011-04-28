@@ -5,7 +5,7 @@
 
 #include <libQtSignalAdapters/Qt2Func.h>
 
-using namespace std;
+//using namespace std;
 
 namespace QtSignalAdapters
 {
@@ -18,7 +18,7 @@ namespace QtSignalAdapters
 */
 template <typename SIGNATURE>
 int checkConnection(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	QByteArray norm = QMetaObject::normalizedSignature(signal+1);
 
@@ -38,7 +38,7 @@ int checkConnection(QObject* qobject, const char* signal,
 		return -1;
 	}
 
-	int arity = function_traits<SIGNATURE>::arity;
+	int arity = boost::function_traits<SIGNATURE>::arity;
 	QMetaMethod qmm = qobject->metaObject()->method(signalId);
 	QList<QByteArray> pn = qmm.parameterNames();
 
@@ -59,7 +59,7 @@ int checkConnection(QObject* qobject, const char* signal,
 */
 template <typename SIGNATURE>
 QtConn* connect0(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal,func);
 
@@ -76,7 +76,7 @@ QtConn* connect0(QObject* qobject, const char* signal,
 */
 template <typename SIGNATURE>
 QtConn* connect1(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal,func);
 
@@ -94,7 +94,7 @@ QtConn* connect1(QObject* qobject, const char* signal,
 */
 template <typename SIGNATURE>
 QtConn* connect2(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 
@@ -113,7 +113,7 @@ QtConn* connect2(QObject* qobject, const char* signal,
 */
 template <typename SIGNATURE>
 QtConn* connect3(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 
@@ -132,7 +132,7 @@ QtConn* connect3(QObject* qobject, const char* signal,
 */
 template <typename SIGNATURE>
 QtConn* connect4(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 
@@ -150,7 +150,7 @@ QtConn* connect4(QObject* qobject, const char* signal,
 */
 template <typename SIGNATURE>
 QtConn* connect5(QObject* qobject, const char* signal,
-	const function<SIGNATURE>& func)
+	const boost::function<SIGNATURE>& func)
 {
 	int signalId = checkConnection(qobject, signal, func);
 

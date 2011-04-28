@@ -10,7 +10,7 @@
 
 #include <libQtSignalAdapters/QtConnDefault.h>
 
-using namespace boost;
+//using namespace boost;
 
 namespace QtSignalAdapters
 {
@@ -22,8 +22,8 @@ template<typename SIGNATURE>
 class Qt2FuncSlot1
 {
 public:
-	typedef function<SIGNATURE> FuncType;
-	typedef typename function_traits<SIGNATURE>::arg1_type ParmType;
+	typedef boost::function<SIGNATURE> FuncType;
+	typedef typename boost::function_traits<SIGNATURE>::arg1_type ParmType;
 	
 	Qt2FuncSlot1(const FuncType& func) :
 		func_(func)
@@ -48,8 +48,8 @@ template<typename SIGNATURE>
 class Qt2Func1 : public QObject, public QtConnDefault
 {
 public:
-	typedef function<SIGNATURE> FuncType;
-	typedef typename function_traits<SIGNATURE>::arg1_type ParmType;
+	typedef boost::function<SIGNATURE> FuncType;
+	typedef typename boost::function_traits<SIGNATURE>::arg1_type ParmType;
 
 	Qt2Func1(QObject* qobject, int signalIdx, const FuncType& func,
 			bool initiallyConnected=true) :
