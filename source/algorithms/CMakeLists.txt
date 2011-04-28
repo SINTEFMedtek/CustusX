@@ -6,7 +6,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxResample.h
     cxBinaryThresholdImageFilter.h
     cxContour.h
-    #<4>cxConnectedThresholdImageFilter.h
+    cxConnectedThresholdImageFilter.h
 )
 
 SET ( ${LIB}_algorithms
@@ -33,8 +33,8 @@ SET ( ${LIB}_algorithms
     cxBinaryThresholdImageFilter.cpp
     cxContour.h
     cxContour.cpp
-    #<4>cxConnectedThresholdImageFilter.h
-    #<4>cxConnectedThresholdImageFilter.cpp
+    cxConnectedThresholdImageFilter.h
+    cxConnectedThresholdImageFilter.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

@@ -1,20 +1,18 @@
 #include "cxConnectedThresholdImageFilter.h"
 
-//<5>
-//#include "itkConnectedThresholdImageFilter.h"
-//#include "sscMessageManager.h"
-//#include "sscTypeConversions.h"
+#include "itkConnectedThresholdImageFilter.h"
+#include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
-//<6>
-//#include "sscDataManager.h"
-//#include "sscRegistrationTransform.h"
+#include "sscDataManager.h"
+#include "sscRegistrationTransform.h"
 
 
 namespace cx
 {
 
-ConnectedThresholdImageFilter::ConnectedThresholdImageFilter() /*<4>:
-    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)*/
+ConnectedThresholdImageFilter::ConnectedThresholdImageFilter() :
+    ThreadedTimedAlgorithm<vtkImageDataPtr>("segmenting", 10)
 {
 }
 
@@ -22,63 +20,59 @@ ConnectedThresholdImageFilter::~ConnectedThresholdImageFilter()
 {
 }
 
-//<5>
-//void ConnectedThresholdImageFilter::setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed)
-//{
-//  mInput = image;
-//  mOutputBasePath = outputBasePath;
-//
-//  mLowerThreshold = lowerThreshold;
-//  mUpperTheshold = upperThreshold;
-//  mReplaceValue = replaceValue;
-//  mSeed = seed;
-//
-//  this->generate();
-//}
-//
-//ssc::ImagePtr ConnectedThresholdImageFilter::getOutput()
-//{
-//  return mOutput;
-//}
-
-//<4>
-/*void ConnectedThresholdImageFilter::postProcessingSlot()
+void ConnectedThresholdImageFilter::setInput(ssc::ImagePtr image, QString outputBasePath, float lowerThreshold, float upperThreshold, int replaceValue, itkImageType::IndexType seed)
 {
-//<6>
-//  //get the result from the thread
-//  vtkImageDataPtr rawResult = this->getResult();
-//
-//  //generate a new name and unique id for the newly created object
-//  QString uid = mInput->getUid() + "_seg%1";
-//  QString name = mInput->getName()+" seg%1";
-//
-//  //create a ssc::Image
-//  mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
-//  if(!mOutput)
-//  {
-//    ssc::messageManager()->sendError("Segmentation failed.");
-//    return;
-//  }
-//
-//  //update the ssc::Images registration history
-//  mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
-//  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
-//
-//  //load the image into CustusX for visualization
-//  ssc::dataManager()->loadData(mOutput);
-//
-//  //save the data to file
-//  ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
-//
-//  //let the user know you are finished
-//  ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
-//
-//  //let the system know you're finished
-//  emit finished();
-}*/
+  mInput = image;
+  mOutputBasePath = outputBasePath;
 
-//<4>
-/*vtkImageDataPtr ConnectedThresholdImageFilter::calculate()
+  mLowerThreshold = lowerThreshold;
+  mUpperTheshold = upperThreshold;
+  mReplaceValue = replaceValue;
+  mSeed = seed;
+
+  this->generate();
+}
+
+ssc::ImagePtr ConnectedThresholdImageFilter::getOutput()
+{
+  return mOutput;
+}
+
+void ConnectedThresholdImageFilter::postProcessingSlot()
+{
+  //get the result from the thread
+  vtkImageDataPtr rawResult = this->getResult();
+
+  //generate a new name and unique id for the newly created object
+  QString uid = mInput->getUid() + "_seg%1";
+  QString name = mInput->getName()+" seg%1";
+
+  //create a ssc::Image
+  mOutput = ssc::dataManager()->createImage(rawResult,uid, name);
+  if(!mOutput)
+  {
+    ssc::messageManager()->sendError("Segmentation failed.");
+    return;
+  }
+
+  //update the ssc::Images registration history
+  mOutput->get_rMd_History()->setRegistration(mInput->get_rMd());
+  mOutput->get_rMd_History()->setParentFrame(mInput->getUid());
+
+  //load the image into CustusX for visualization
+  ssc::dataManager()->loadData(mOutput);
+
+  //save the data to file
+  ssc::dataManager()->saveImage(mOutput, mOutputBasePath);
+
+  //let the user know you are finished
+  ssc::messageManager()->sendSuccess("Done segmenting: \"" + mOutput->getName()+"\"");
+
+  //let the system know you're finished
+  emit finished();
+}
+
+vtkImageDataPtr ConnectedThresholdImageFilter::calculate()
 {
   //Connected Thresholding
 
@@ -110,44 +104,43 @@ ConnectedThresholdImageFilter::~ConnectedThresholdImageFilter()
   //  to be segmented and each selected point is passed as a seed to this
   //  filter.
 
-//<5>
-//  itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(mInput);
-//
-//  typedef itk::ConnectedThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
-//  thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
-//  thresholdFilter->SetInput(itkImage);
-//
-//  //set thresholds
-//  thresholdFilter->SetLower(mLowerThreshold);
-//  thresholdFilter->SetUpper(mUpperTheshold);
-//  thresholdFilter->SetReplaceValue(mReplaceValue);
-//
-//  //set seeds
-//  thresholdFilter->SetSeed(mSeed);
-//
-//  //calculate
-//  try
-//  {
-//    thresholdFilter->Update();
-//  }
-//  catch( itk::ExceptionObject & excep )
-//  {
-//    ssc::messageManager()->sendError("Error when setting seed for Connected Threshold Image Filter:");
-//    ssc::messageManager()->sendError(qstring_cast(excep.GetDescription()), true);
-//  }
-//
-//  itkImage = thresholdFilter->GetOutput();
-//
-//  //Convert ITK to VTK
-//  itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
-//  itkToVtkFilter->SetInput(itkImage);
-//  itkToVtkFilter->Update();
-//
-//  vtkImageDataPtr rawResult = vtkImageDataPtr::New();
-//  rawResult->DeepCopy(itkToVtkFilter->GetOutput());
-//  // TODO: possible memory problem here - check debug mem system of itk/vtk
-//
-//  return rawResult;
-}*/
+  itkImageType::ConstPointer itkImage = AlgorithmHelper::getITKfromSSCImage(mInput);
+
+  typedef itk::ConnectedThresholdImageFilter<itkImageType, itkImageType> thresholdFilterType;
+  thresholdFilterType::Pointer thresholdFilter = thresholdFilterType::New();
+  thresholdFilter->SetInput(itkImage);
+
+  //set thresholds
+  thresholdFilter->SetLower(mLowerThreshold);
+  thresholdFilter->SetUpper(mUpperTheshold);
+  thresholdFilter->SetReplaceValue(mReplaceValue);
+
+  //set seeds
+  thresholdFilter->SetSeed(mSeed);
+
+  //calculate
+  try
+  {
+    thresholdFilter->Update();
+  }
+  catch( itk::ExceptionObject & excep )
+  {
+    ssc::messageManager()->sendError("Error when setting seed for Connected Threshold Image Filter:");
+    ssc::messageManager()->sendError(qstring_cast(excep.GetDescription()), true);
+  }
+
+  itkImage = thresholdFilter->GetOutput();
+
+  //Convert ITK to VTK
+  itkToVtkFilterType::Pointer itkToVtkFilter = itkToVtkFilterType::New();
+  itkToVtkFilter->SetInput(itkImage);
+  itkToVtkFilter->Update();
+
+  vtkImageDataPtr rawResult = vtkImageDataPtr::New();
+  rawResult->DeepCopy(itkToVtkFilter->GetOutput());
+  // TODO: possible memory problem here - check debug mem system of itk/vtk
+
+  return rawResult;
+}
 
 }

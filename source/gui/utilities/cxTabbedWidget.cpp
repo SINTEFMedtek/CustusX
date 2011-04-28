@@ -5,8 +5,7 @@
 #include <QVBoxLayout>
 
 //segmentation
-//<2>
-//#include "cxConnectedThresholdImageFilterWidget.h"
+#include "cxConnectedThresholdImageFilterWidget.h"
 #include "cxBinaryThresholdImageFilterWidget.h"
 
 //registration
@@ -178,7 +177,8 @@ SegmentationMethodsWidget::SegmentationMethodsWidget(QWidget* parent, QString ob
   TabbedWidget(parent, objectName, windowTitle)
 {
   this->addTab(new BinaryThresholdImageFilterWidget(this), "Binary Threshold");
-//<2>
+
+  //TODO finish widget before using it
 //  this->addTab(new ConnectedThresholdImageFilterWidget(this), "Connected Threshold");
 }
 
