@@ -7,7 +7,7 @@
 #include "sscForwardDeclarations.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxCenterline.h"
 #include "cxResample.h"
 #include "cxBinaryThresholdImageFilter.h"

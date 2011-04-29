@@ -1,5 +1,10 @@
 SET(LIBNAME gui)
 
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (WIN32)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(WIN32)
+
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
 ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
