@@ -21,7 +21,7 @@ namespace cx
 {
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 
-class ResampleWidget : public WhatsThisWidget
+class ResampleWidget : public BaseWidget
 {
   Q_OBJECT
 

@@ -13,7 +13,7 @@ namespace cx
  * \date Aug 20, 2010
  * \author christiana
  */
-class ActiveVolumeWidget : public cxBaseWidget
+class ActiveVolumeWidget : public BaseWidget
 {
   Q_OBJECT
 public:
@@ -26,7 +26,7 @@ public:
 /**Widget for displaying various volume information.
  * Part of the VolumePropertiesWidget.
  */
-class VolumeInfoWidget : public cxBaseWidget
+class VolumeInfoWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -52,7 +52,7 @@ private:
  * \date Aug 20, 2010
  * \author christiana
  */
-class VolumePropertiesWidget : public cxBaseWidget
+class VolumePropertiesWidget : public BaseWidget
 {
   Q_OBJECT
 public:

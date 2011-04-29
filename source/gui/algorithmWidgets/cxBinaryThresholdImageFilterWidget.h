@@ -23,7 +23,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \author: Janne Beate Bakeng, SINTEF
  * \author: Christian Askeland, SINTEF
  */
-class BinaryThresholdImageFilterWidget : public cxBaseWidget
+class BinaryThresholdImageFilterWidget : public BaseWidget
 {
   Q_OBJECT
 

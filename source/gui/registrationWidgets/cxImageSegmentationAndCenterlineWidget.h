@@ -21,7 +21,7 @@ namespace cx
  * \date 12. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class ImageSegmentationAndCenterlineWidget : public cxBaseWidget
+class ImageSegmentationAndCenterlineWidget : public BaseWidget
 {
   Q_OBJECT
 

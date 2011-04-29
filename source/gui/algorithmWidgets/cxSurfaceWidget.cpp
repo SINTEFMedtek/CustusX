@@ -20,7 +20,7 @@ namespace cx
 {
 
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "SurfaceWidget", "Surface"),
+    BaseWidget(parent, "SurfaceWidget", "Surface"),
     mReduceResolution(false),
     mSmoothing(true),
     mDefaultColor("red"),

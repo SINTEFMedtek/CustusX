@@ -13,7 +13,7 @@
 namespace cx
 {
 BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* parent) :
-  cxBaseWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
+  BaseWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
   mBinary(false),
   mUseSmothing(false),
   mStatusLabel(new QLabel(""))

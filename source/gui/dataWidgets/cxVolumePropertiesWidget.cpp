@@ -21,7 +21,7 @@ namespace cx
 /// -------------------------------------------------------
 
 ActiveVolumeWidget::ActiveVolumeWidget(QWidget* parent) :
-  cxBaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
+  BaseWidget(parent, "ActiveVolumeWidget", "Active Volume")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setMargin(0);
@@ -44,7 +44,7 @@ QString ActiveVolumeWidget::defaultWhatsThis() const
 /// -------------------------------------------------------
 
 VolumeInfoWidget::VolumeInfoWidget(QWidget* parent) :
-  cxBaseWidget(parent, "VolumeInfoWidget", "Volume Info")
+  BaseWidget(parent, "VolumeInfoWidget", "Volume Info")
 {
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -109,7 +109,7 @@ void VolumeInfoWidget::updateSlot()
 /// -------------------------------------------------------
 
 VolumePropertiesWidget::VolumePropertiesWidget(QWidget* parent) :
-    cxBaseWidget(parent, "VolumePropertiesWidget", "Volume Properties")
+    BaseWidget(parent, "VolumePropertiesWidget", "Volume Properties")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
 
