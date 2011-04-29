@@ -15,7 +15,7 @@
 namespace cx
 {
 NavigationWidget::NavigationWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "NavigationWidget", "Navigation Properties"),
+    BaseWidget(parent, "NavigationWidget", "Navigation Properties"),
     mVerticalLayout(new QVBoxLayout(this)),
     mCameraGroupBox(new QGroupBox(tr("Camera Style"), this)),
     mDefaultCameraStyleRadioButton(new QRadioButton(tr("Default"), this)),

@@ -20,7 +20,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class FilePreviewWidget : public WhatsThisWidget
+class FilePreviewWidget : public BaseWidget
 {
   Q_OBJECT
 

@@ -204,9 +204,9 @@ private:
   ssc::ReconstructionWidget*                    mReconstructionWidget;
   class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*                 mVolumePropertiesWidget;
-  class CustomStatusBar*                        mCustomStatusBar;
+  class StatusBar*                        mCustomStatusBar;
   class FrameTreeWidget*                        mFrameTreeWidget;
-  class ControlPanel*                           mControlPanel;
+  class SecondaryMainWindow*                           mControlPanel;
 
   //Preferences
   CameraControlPtr mCameraControl;

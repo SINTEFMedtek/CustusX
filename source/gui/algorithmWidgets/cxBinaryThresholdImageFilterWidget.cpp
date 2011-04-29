@@ -14,9 +14,8 @@
 
 namespace cx
 {
-
 BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
+  BaseWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
   mBinary(false),
   mUseSmothing(false),
   mDefaultColor("red"),
@@ -283,10 +282,6 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
 
   return retval;
 }
-//------------------------------------------------------------------------------
-
-
-
 //------------------------------------------------------------------------------
 
 }//namespace cx

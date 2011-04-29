@@ -24,7 +24,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \author: Janne Beate Bakeng, SINTEF
  * \author: Christian Askeland, SINTEF
  */
-class BinaryThresholdImageFilterWidget : public WhatsThisWidget
+class BinaryThresholdImageFilterWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -83,11 +83,6 @@ private:
   BinaryThresholdImageFilter mSegmentationAlgorithm;
   Contour mContourAlgorithm;
 };
-
-
-
-
-
 
 }//namespace cx
 
