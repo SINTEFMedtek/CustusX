@@ -10,7 +10,7 @@
 #include "cxRepManager.h"
 #include "cxToolManager.h"
 #include "cxRegistrationManager.h"
-#include "cxCustomStatusBar.h"
+#include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
 #include "cxNavigationWidget.h"
@@ -27,13 +27,13 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
-#include "cxLayoutEditor.h"
+#include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
-#include "cxImportDataWizard.h"
-#include "cxCameraControlWidget.h"
+#include "cxImportDataDialog.h"
+#include "cxTrackPadWidget.h"
 #include "cxCameraControl.h"
-#include "cxControlPanel.h"
+#include "cxSecondaryMainWindow.h"
 #include "cxIGTLinkWidget.h"
 #include "cxRecordBaseWidget.h"
 #include "cxTrackedCenterlineWidget.h"
@@ -62,7 +62,7 @@ MainWindow::MainWindow() :
   mPointSamplingWidget(new PointSamplingWidget(this)),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
-  mCustomStatusBar(new CustomStatusBar()),
+  mCustomStatusBar(new StatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
   mControlPanel(NULL)
 {
@@ -89,7 +89,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
   this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
-  this->addAsDockWidget(new CameraControlWidget(this), "Utility");
+  this->addAsDockWidget(new TrackPadWidget(this), "Utility");
   this->addAsDockWidget(mToolPropertiesWidget, "Properties");
   this->addAsDockWidget(mPointSamplingWidget, "Utility");
   this->addAsDockWidget(mReconstructionWidget, "Algorithms");
@@ -629,7 +629,7 @@ void MainWindow::resetDesktopSlot()
 void MainWindow::showControlPanelActionSlot()
 {
   if (!mControlPanel)
-    mControlPanel = new ControlPanel(this);
+    mControlPanel = new SecondaryMainWindow(this);
   mControlPanel->show();
 }
 
@@ -667,7 +667,7 @@ void MainWindow::importDataSlot()
     return;
   }
 
-  ImportDataWizard* wizard = new ImportDataWizard(fileName, this);
+  ImportDataDialog* wizard = new ImportDataDialog(fileName, this);
   wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction
                   //with the system
 }
@@ -706,7 +706,7 @@ LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
   QVBoxLayout* layout = new QVBoxLayout(dialog.get());
   layout->setMargin(0);
 
-  LayoutEditor* editor = new LayoutEditor(dialog.get());
+  LayoutEditorWidget* editor = new LayoutEditorWidget(dialog.get());
 
   LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
 

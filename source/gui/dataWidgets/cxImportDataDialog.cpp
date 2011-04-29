@@ -1,4 +1,4 @@
-#include "cxImportDataWizard.h"
+#include "cxImportDataDialog.h"
 
 #include <cmath>
 #include <QFileDialog>
@@ -20,7 +20,7 @@
 namespace cx
 {
 
-ImportDataWizard::ImportDataWizard(QString filename, QWidget* parent) :
+ImportDataDialog::ImportDataDialog(QString filename, QWidget* parent) :
     QDialog(parent),
     mFilename(filename)
 {
@@ -65,18 +65,18 @@ ImportDataWizard::ImportDataWizard(QString filename, QWidget* parent) :
   ssc::messageManager()->sendInfo("Importing data...");
 }
 
-ImportDataWizard::~ImportDataWizard()
+ImportDataDialog::~ImportDataDialog()
 {
 }
 
-void ImportDataWizard::showEvent(QShowEvent* event)
+void ImportDataDialog::showEvent(QShowEvent* event)
 {
   // the import operation takes up to a few seconds. Call it AFTER the dialog is up and running its own message loop,
   // this avoids all problems related to modal vs right-click in the main window.
   QTimer::singleShot(0, this, SLOT(importDataSlot()));
 }
 
-void ImportDataWizard::importDataSlot()
+void ImportDataDialog::importDataSlot()
 {
   mData = stateManager()->getPatientData()->importData(mFilename);
 
@@ -104,7 +104,7 @@ void ImportDataWizard::importDataSlot()
 /** Use heuristics to guess a parent frame,
  *  based on similarities in name.
  */
-void ImportDataWizard::setInitialGuessForParentFrame()
+void ImportDataDialog::setInitialGuessForParentFrame()
 {
   if(!mData)
     return;
@@ -126,14 +126,14 @@ void ImportDataWizard::setInitialGuessForParentFrame()
 
 }
 
-void ImportDataWizard::updateImportTransformButton()
+void ImportDataDialog::updateImportTransformButton()
 {
   ssc::DataPtr parent = ssc::dataManager()->getData(mParentFrameAdapter->getValue());
   bool enabled = bool(parent);
   mTransformFromParentFrameCheckBox->setEnabled(enabled);
 }
 
-void ImportDataWizard::acceptedSlot()
+void ImportDataDialog::acceptedSlot()
 {
   this->importParentTransform();
   this->convertFromNifti1Coordinates();
@@ -146,7 +146,7 @@ void ImportDataWizard::acceptedSlot()
  * ITK-Snap uses NIfTI coordinates, which have reversed signs on the x and y axis, relative to the DICOM spec.
  * Solve by rotating Z 180 deg.
  */
-void ImportDataWizard::convertFromNifti1Coordinates()
+void ImportDataDialog::convertFromNifti1Coordinates()
 {
   if (!mNiftiFormatCheckBox->isChecked())
     return;
@@ -161,7 +161,7 @@ void ImportDataWizard::convertFromNifti1Coordinates()
 /** Apply the transform from the parent frame to the imported data.
  *
  */
-void ImportDataWizard::importParentTransform()
+void ImportDataDialog::importParentTransform()
 {
   if (!mTransformFromParentFrameCheckBox->isChecked())
     return;
