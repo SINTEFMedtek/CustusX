@@ -17,6 +17,7 @@
 #include "cxImageSegmentationAndCenterlineWidget.h"
 #include "cxPlateRegistrationWidget.h"
 #include "cxManualRegistrationOffsetWidget.h"
+#include "cxRegisterI2IWidget.h"
 
 //calibration
 #include "cxToolTipCalibrationWidget.h"

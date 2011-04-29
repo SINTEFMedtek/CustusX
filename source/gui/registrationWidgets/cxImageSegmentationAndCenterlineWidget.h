@@ -3,6 +3,9 @@
 
 #include "cxBaseWidget.h"
 #include "cxDataInterface.h"
+#include "cxSurfaceWidget.h"
+#include "cxResampleWidget.h"
+#include "cxCenterlineWidget.h"
 
 class QPushButton;
 class QVBoxLayout;
@@ -35,18 +38,18 @@ private slots:
   void setImageSlot(QString uid);
   void resampleOutputArrived(QString uid);
   void segmentationOutputArrived(QString uid);
-  void surfaceOutputArrived(QString uid);
+//  void surfaceOutputArrived(QString uid);
   void centerlineOutputArrived(QString uid);
 
 protected:
   class ResampleWidget*     mResampleWidget;
   class BinaryThresholdImageFilterWidget* mSegmentationWidget;
-  class SurfaceWidget*      mSurfaceWidget;
+//  class SurfaceWidget*      mSurfaceWidget;
   class CenterlineWidget*   mCenterlineWidget;
 
   SelectImageStringDataAdapterPtr mResampleOutput;
   SelectImageStringDataAdapterPtr mSegmentationOutput;
-  SelectMeshStringDataAdapterPtr mSurfaceOutput;
+//  SelectMeshStringDataAdapterPtr mSurfaceOutput;
   SelectDataStringDataAdapterPtr mCenterlineOutput;
 };
 
