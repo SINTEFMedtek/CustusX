@@ -19,7 +19,7 @@
 namespace cx
 {
 ToolTipCalibrationWidget::ToolTipCalibrationWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "ToolTipCalibrationWidget", "Tool Tip Calibration"),
+  BaseWidget(parent, "ToolTipCalibrationWidget", "Tool Tip Calibration"),
   mCalibrationWidget(new ToolTipCalibrateWidget(this)),
   mSampleWidget(new ToolTipSampleWidget(this))
 {
@@ -55,7 +55,7 @@ QString ToolTipCalibrationWidget::defaultWhatsThis() const
 
 //------------------------------------------------------------------------------
 ToolTipCalibrateWidget::ToolTipCalibrateWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
+    BaseWidget(parent, "ToolTipCalibrateWidget", "ToolTip Calibrate"),
     mCalibrateButton(new QPushButton("Calibrate")),
     mReferencePointLabel(new QLabel("Ref. point:")),
     mTestButton(new QPushButton("Test calibration")),
@@ -169,7 +169,7 @@ void ToolTipCalibrateWidget::toolSelectedSlot()
 }
   //------------------------------------------------------------------------------
 ToolTipSampleWidget::ToolTipSampleWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
+    BaseWidget(parent, "ToolTipSampleWidget", "ToolTip Sample"),
     mSampleButton(new QPushButton("Sample")),
     mSaveToFileNameLabel(new QLabel("<font color=red> No file selected </font>")),
     mSaveFileButton(new QPushButton("Save to...")),

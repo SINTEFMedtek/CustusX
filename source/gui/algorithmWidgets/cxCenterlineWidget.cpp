@@ -17,7 +17,7 @@ namespace cx
 {
 
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "CenterlineWidget", "CenterlineWidget"),
+  BaseWidget(parent, "CenterlineWidget", "CenterlineWidget"),
   mFindCenterlineButton(new QPushButton("Find centerline")),
 //  mDefaultColor("red"),
   mStatusLabel(new QLabel(""))

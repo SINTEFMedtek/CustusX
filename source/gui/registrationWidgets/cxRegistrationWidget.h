@@ -30,7 +30,7 @@ namespace cx
  * \class RegistrationWidget
  * Superclass for Image Registration and Patient Registration
  */
-class RegistrationWidget : public WhatsThisWidget
+class RegistrationWidget : public BaseWidget
 {
   Q_OBJECT
 
