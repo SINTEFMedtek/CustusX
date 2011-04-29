@@ -46,6 +46,7 @@ SET(cxProject_MOC_HDRS
     preferencesWidgets/cxToolListWidget.h
     preferencesWidgets/cxToolConfigureWidget.h
     preferencesWidgets/cxLayoutEditorWidget.h
+    preferencesWidgets/cxLayoutEditorTab.h
     #----------------------
     recordingWidgets/cxRecordSessionWidget.h
     recordingWidgets/cxRecordBaseWidget.h
@@ -163,6 +164,8 @@ SET(${LIBNAME}_SRCS
     preferencesWidgets/cxToolConfigureWidget.cpp
     preferencesWidgets/cxLayoutEditorWidget.h
     preferencesWidgets/cxLayoutEditorWidget.cpp
+    preferencesWidgets/cxLayoutEditorTab.h
+    preferencesWidgets/cxLayoutEditorTab.cpp
     #----------------------    
     recordingWidgets/cxRecordSessionWidget.h
     recordingWidgets/cxRecordSessionWidget.cpp
