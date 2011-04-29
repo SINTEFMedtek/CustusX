@@ -1,5 +1,5 @@
-#ifndef CXWHATSTHISWIDGET_H_
-#define CXWHATSTHISWIDGET_H_
+#ifndef CXBASEWIDGET_H_
+#define CXBASEWIDGET_H_
 
 #include <QWidget>
 #include <QTabWidget>
@@ -96,4 +96,4 @@ private:
   QString mWindowTitle;
 };
 }
-#endif /* CXWHATSTHISWIDGET_H_ */
+#endif /* CXBASEWIDGET_H_ */
