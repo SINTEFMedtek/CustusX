@@ -20,7 +20,7 @@ namespace cx
  * \date 3. nov. 2010
  * \author: Janne Beate Bakeng, SINTEF
  */
-class ToolTipCalibrationWidget : public cxBaseWidget
+class ToolTipCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -37,7 +37,7 @@ private:
 /**
  * Class that handles the tooltip calibration.
  */
-class ToolTipCalibrateWidget : public cxBaseWidget
+class ToolTipCalibrateWidget : public BaseWidget
 {
   Q_OBJECT
 
@@ -66,7 +66,7 @@ private:
 /**
  * Class that handles the tooltip calibration.
  */
-class ToolTipSampleWidget : public cxBaseWidget
+class ToolTipSampleWidget : public BaseWidget
 {
   Q_OBJECT
 

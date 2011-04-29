@@ -25,7 +25,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \date 12. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class CenterlineWidget : public WhatsThisWidget
+class CenterlineWidget : public BaseWidget
 {
   Q_OBJECT
 
