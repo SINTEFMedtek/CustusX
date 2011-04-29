@@ -30,7 +30,7 @@ class SeansVesselRegistrationWidget;
  * \date 13. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class RegisterI2IWidget : public WhatsThisWidget
+class RegisterI2IWidget : public BaseWidget
 {
   Q_OBJECT
 

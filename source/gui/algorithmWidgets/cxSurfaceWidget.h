@@ -26,7 +26,7 @@ typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringD
  * \date 14. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class SurfaceWidget : public WhatsThisWidget
+class SurfaceWidget : public BaseWidget
 {
   Q_OBJECT
 
