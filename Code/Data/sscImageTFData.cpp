@@ -184,12 +184,79 @@ void ImageTFData::parseXml(QDomNode dataNode)
     std::cout << std::endl;
   }
 
+  //Repair TF's if faulty
+  this->fixTransferFunctions();
+
   mWindow = this->loadAttribute(dataNode, "window", mWindow);
   mLevel = this->loadAttribute(dataNode, "level", mLevel);
   mLLR = this->loadAttribute(dataNode, "llr", mLLR);
   mAlpha = this->loadAttribute(dataNode, "alpha", mAlpha);
 
 //  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
+}
+
+void ImageTFData::fixTransferFunctions(/*ssc::ImageTFDataPtr trFunc, ssc::ImagePtr image*/)
+{
+  //Make sure min and max values for transferfunctions are set
+
+  ssc::OpacityMapPtr opacityMap = this->getOpacityMap();
+  ssc::ColorMapPtr colorMap = this->getColorMap();
+
+  vtkColorTransferFunctionPtr interpolatedTrFunc = vtkColorTransferFunctionPtr::New();
+  this->fillColorTFFromMap(interpolatedTrFunc);
+
+  if (opacityMap->find(this->getScalarMin()) == opacityMap->end())
+  {
+    this->addAlphaPoint(this->getScalarMin(), 0);
+  }
+  if (opacityMap->find(this->getScalarMax()) == opacityMap->end())
+  {
+    //The optimal solution may be to interpolate/extrapolate the max (min) values from the existing values
+    //However, as most presets usually have all the top values set to white the error of the simpler code below is usually small
+    ssc::IntIntMap::iterator opPoint = opacityMap->end();
+    opPoint--;
+    this->addAlphaPoint(this->getScalarMax(), opPoint->second);// Use value of current max element
+  }
+  if (colorMap->find(this->getScalarMin()) == colorMap->end())
+  {
+    this->addColorPoint(this->getScalarMin(), QColor(0,0,0));
+  }
+  if (colorMap->find(this->getScalarMax()) == colorMap->end())
+  {
+    //Interpolate to get correct color
+    double* rgb = interpolatedTrFunc->GetColor(this->getScalarMax());
+    QColor newColor = QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255));
+    this->addColorPoint(this->getScalarMax(), newColor);
+  }
+
+  //Remove transfer function points outside range
+  ssc::IntIntMap::iterator opIt = this->getOpacityMap()->begin();
+  while (opIt != this->getOpacityMap()->end())
+  {
+    int delPoint = 1000000;
+    if(opIt->first < this->getScalarMin())
+      delPoint = opIt->first;
+    else if (opIt->first > this->getScalarMax())
+      delPoint = opIt->first;
+    opIt++;
+
+    if (delPoint != 1000000)
+      this->removeAlphaPoint(delPoint);
+  }
+
+  ssc::ColorMap::iterator it = this->getColorMap()->begin();
+   while (it != this->getColorMap()->end())
+   {
+     int delPoint = 1000000;
+     if(it->first < this->getScalarMin())
+       delPoint = it->first;
+     else if (it->first > this->getScalarMax())
+       delPoint = it->first;
+     it++;
+
+     if (delPoint != 1000000)
+       this->removeColorPoint(delPoint);
+   }
 }
 
 double ImageTFData::loadAttribute(QDomNode dataNode, QString name, double defVal)
