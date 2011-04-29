@@ -9,6 +9,9 @@ SET(cxProject_MOC_HDRS
     algorithmWidgets/cxBinaryThresholdImageFilterWidget.h
     algorithmWidgets/cxToolTipCalibrationWidget.h
     algorithmWidgets/cxConnectedThresholdImageFilterWidget.h
+    algorithmWidgets/cxSurfaceWidget.h
+    algorithmWidgets/cxCenterlineWidget.h
+    algorithmWidgets/cxResampleWidget.h
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxShadingParamsInterfaces.h
@@ -54,6 +57,7 @@ SET(cxProject_MOC_HDRS
     registrationWidgets/cxImageSegmentationAndCenterlineWidget.h
     registrationWidgets/cxPlateRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.h
+    registrationWidgets/cxRegisterI2IWidget.h
     #----------------------
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
@@ -94,6 +98,13 @@ SET(${LIBNAME}_SRCS
     algorithmWidgets/cxToolTipCalibrationWidget.cpp
     algorithmWidgets/cxConnectedThresholdImageFilterWidget.h
     algorithmWidgets/cxConnectedThresholdImageFilterWidget.cpp
+    algorithmWidgets/cxSurfaceWidget.cpp
+    algorithmWidgets/cxSurfaceWidget.h
+    algorithmWidgets/cxCenterlineWidget.cpp
+    algorithmWidgets/cxCenterlineWidget.h
+    algorithmWidgets/cxResampleWidget.cpp
+    algorithmWidgets/cxResampleWidget.h
+    
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxDataInterface.cpp
@@ -181,6 +192,8 @@ SET(${LIBNAME}_SRCS
     registrationWidgets/cxPlateRegistrationWidget.cpp
     registrationWidgets/cxSeansVesselRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.cpp
+    registrationWidgets/cxRegisterI2IWidget.h
+    registrationWidgets/cxRegisterI2IWidget.cpp    
     #----------------------    
     streamingWidgets/cxIGTLinkWidget.h
     streamingWidgets/cxIGTLinkWidget.cpp

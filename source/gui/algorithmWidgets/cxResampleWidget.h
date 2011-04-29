@@ -1,0 +1,59 @@
+/*
+ * cxResampleWidget.h
+ *
+ *  Created on: Apr 29, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXRESAMPLEWIDGET_H_
+#define CXRESAMPLEWIDGET_H_
+
+#include <vector>
+#include <QtGui>
+#include <QString>
+
+#include "sscForwardDeclarations.h"
+#include "cxWhatsThisWidget.h"
+#include "cxResample.h"
+
+
+namespace cx
+{
+typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
+
+class ResampleWidget : public WhatsThisWidget
+{
+  Q_OBJECT
+
+public:
+  ResampleWidget(QWidget* parent);
+  virtual ~ResampleWidget();
+  virtual QString defaultWhatsThis() const;
+
+signals:
+  void inputImageChanged(QString uid);
+  void outputImageChanged(QString uid);
+
+protected:
+  virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
+  virtual void hideEvent(QHideEvent* event); ///<disconnects stuff
+
+private slots:
+  void resampleSlot();
+  void handleFinishedSlot();
+
+private:
+  ResampleWidget();
+  QWidget* createOptionsWidget();
+
+  SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
+  SelectImageStringDataAdapterPtr mReferenceImage; ///< holds the currently reference, resample to this volume.
+
+  Resample mResampleAlgorithm;
+
+  QLabel* mStatusLabel;
+};
+
+}
+
+#endif /* CXRESAMPLEWIDGET_H_ */
