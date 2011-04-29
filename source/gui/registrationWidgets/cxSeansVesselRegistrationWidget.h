@@ -19,7 +19,7 @@ namespace cx
  * \author Janne Beate Bakeng, SINTEF
  */
 
-class SeansVesselRegistrationWidget : public WhatsThisWidget
+class SeansVesselRegistrationWidget : public cxBaseWidget
 {
   Q_OBJECT
 public:

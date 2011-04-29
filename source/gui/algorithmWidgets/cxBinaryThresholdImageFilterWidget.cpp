@@ -33,7 +33,7 @@
 namespace cx
 {
 ResampleWidget::ResampleWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "ResampleWidget", "Resample"),
+  cxBaseWidget(parent, "ResampleWidget", "Resample"),
   mStatusLabel(new QLabel(""))
 {
   connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
@@ -116,7 +116,7 @@ QWidget* ResampleWidget::createOptionsWidget()
 //------------------------------------------------------------------------------
 
 BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
+  cxBaseWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
   mBinary(false),
   mUseSmothing(false),
   mStatusLabel(new QLabel(""))
@@ -340,7 +340,7 @@ QWidget* BinaryThresholdImageFilterWidget::createSegmentationOptionsWidget()
 //------------------------------------------------------------------------------
 
 SurfaceWidget::SurfaceWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "SurfaceWidget", "Surface"),
+    cxBaseWidget(parent, "SurfaceWidget", "Surface"),
     mReduceResolution(false),
     mSmoothing(true),
     mDefaultColor("red"),
@@ -474,7 +474,7 @@ QWidget* SurfaceWidget::createSurfaceOptionsWidget()
 //------------------------------------------------------------------------------
 
 CenterlineWidget::CenterlineWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "CenterlineWidget", "CenterlineWidget"),
+  cxBaseWidget(parent, "CenterlineWidget", "CenterlineWidget"),
   mFindCenterlineButton(new QPushButton("Find centerline")),
 //  mDefaultColor("red"),
   mStatusLabel(new QLabel(""))
@@ -573,7 +573,7 @@ void CenterlineWidget::handleFinishedSlot()
 //------------------------------------------------------------------------------
 
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "RegisterI2IWidget", "Register Image2Image"),
+    cxBaseWidget(parent, "RegisterI2IWidget", "Register Image2Image"),
     mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));

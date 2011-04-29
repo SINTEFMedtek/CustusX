@@ -22,7 +22,7 @@ namespace cx
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 class SeansVesselRegistrationWidget;
 
-class ResampleWidget : public WhatsThisWidget
+class ResampleWidget : public cxBaseWidget
 {
   Q_OBJECT
 
@@ -65,7 +65,7 @@ private:
  * \author: Janne Beate Bakeng, SINTEF
  * \author: Christian Askeland, SINTEF
  */
-class BinaryThresholdImageFilterWidget : public WhatsThisWidget
+class BinaryThresholdImageFilterWidget : public cxBaseWidget
 {
   Q_OBJECT
 
@@ -127,7 +127,7 @@ private:
  * \date 14. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class SurfaceWidget : public WhatsThisWidget
+class SurfaceWidget : public cxBaseWidget
 {
   Q_OBJECT
 
@@ -174,7 +174,7 @@ private:
  * \date 12. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class CenterlineWidget : public WhatsThisWidget
+class CenterlineWidget : public cxBaseWidget
 {
   Q_OBJECT
 
@@ -217,7 +217,7 @@ private:
  * \date 13. okt. 2010
  * \author: Janne Beate Bakeng
  */
-class RegisterI2IWidget : public WhatsThisWidget
+class RegisterI2IWidget : public cxBaseWidget
 {
   Q_OBJECT
 
