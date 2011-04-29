@@ -15,7 +15,7 @@
 #include "sscVolumetricRep.h"
 #include "sscLandmark.h"
 #include "sscTransform3D.h"
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 
 class QVBoxLayout;
 class QComboBox;

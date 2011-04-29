@@ -12,7 +12,7 @@
 #include <QtGui>
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxBinaryThresholdImageFilter.h"
 
 

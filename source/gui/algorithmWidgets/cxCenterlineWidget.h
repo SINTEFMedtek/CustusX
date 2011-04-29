@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <QtGui>
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxCenterline.h"
 
 namespace cx

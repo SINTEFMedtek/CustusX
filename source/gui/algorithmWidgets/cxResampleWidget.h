@@ -13,7 +13,7 @@
 #include <QString>
 
 #include "sscForwardDeclarations.h"
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxResample.h"
 
 

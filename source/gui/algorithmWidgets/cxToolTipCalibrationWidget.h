@@ -1,7 +1,7 @@
 #ifndef CXTOOLTIPCALIBRATIONWIDGET_H_
 #define CXTOOLTIPCALIBRATIONWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "sscCoordinateSystemHelpers.h"
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
