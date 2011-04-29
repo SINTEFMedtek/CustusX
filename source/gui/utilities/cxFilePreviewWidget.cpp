@@ -13,7 +13,7 @@ namespace cx
 {
 
 FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
-    cxBaseWidget(parent, "FilePreviewWidget", "File Preview"),
+    BaseWidget(parent, "FilePreviewWidget", "File Preview"),
     mTextDocument(new QTextDocument()),
     mTextEdit(new QTextEdit()),
     mEditButton(new QPushButton("Edit")),

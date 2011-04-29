@@ -21,7 +21,7 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class ManualRegistrationOffsetWidget : public cxBaseWidget
+class ManualRegistrationOffsetWidget : public BaseWidget
 {
   Q_OBJECT
 

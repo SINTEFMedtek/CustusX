@@ -13,7 +13,7 @@
 namespace cx
 {
 ManualRegistrationOffsetWidget::ManualRegistrationOffsetWidget(QWidget* parent) :
-    cxBaseWidget(parent, "ManualRegistrationOffsetWidget", "Manual Registration Offset"),
+    BaseWidget(parent, "ManualRegistrationOffsetWidget", "Manual Registration Offset"),
     mVerticalLayout(new QVBoxLayout(this)),
     mOffsetLabel(new QLabel(QString("Manual offset:"), this)),
     mOffsetsGridLayout(new QGridLayout()),

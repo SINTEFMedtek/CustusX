@@ -18,7 +18,7 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class FastOrientationRegistrationWidget : public cxBaseWidget
+class FastOrientationRegistrationWidget : public BaseWidget
 {
   Q_OBJECT
 

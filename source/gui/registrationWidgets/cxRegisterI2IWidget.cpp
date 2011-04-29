@@ -41,7 +41,7 @@ namespace cx
 
 
 RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "RegisterI2IWidget", "Register Image2Image"),
+    BaseWidget(parent, "RegisterI2IWidget", "Register Image2Image"),
     mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
 {
   connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));

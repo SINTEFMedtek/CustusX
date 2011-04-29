@@ -22,7 +22,7 @@ namespace cx
  * \date 22. feb. 2010
  * \author: Janne Beate Bakeng, SINTEF
  */
-class NavigationWidget : public cxBaseWidget
+class NavigationWidget : public BaseWidget
 {
   Q_OBJECT
 
