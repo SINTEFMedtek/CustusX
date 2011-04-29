@@ -1,12 +1,5 @@
-/*
- * cxCameraControlWidget.h
- *
- *  Created on: Oct 7, 2010
- *      Author: christiana
- */
-
-#ifndef CXCAMERACONTROLWIDGET_H_
-#define CXCAMERACONTROLWIDGET_H_
+#ifndef CXTRACKPADWIDGET_H_
+#define CXTRACKPADWIDGET_H_
 
 #include <vector>
 #include <QtGui>
@@ -71,17 +64,24 @@ private:
   class MousePadWidgetInternal* mInternal;
 };
 
-/** Widget for controlling the camera in the 3D view.
+/**
+ * \class TrackPadWidget
+ *
+ * \brief Widget for controlling the camera in the 3D view.
  *  This widget is designed for use on a touchpad device.
  *  Example is to use iPad/iPhone as a secondary screen with this widget on.
+ *
+ * \date Oct 7, 2010
+ * \author Christian Askeland, SINTEF
  */
-class CameraControlWidget : public QWidget
+
+class TrackPadWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  CameraControlWidget(QWidget* parent);
-  virtual ~CameraControlWidget();
+  TrackPadWidget(QWidget* parent);
+  virtual ~TrackPadWidget();
 
 signals:
 
@@ -112,4 +112,4 @@ private:
 
 
 
-#endif /* CXCAMERACONTROLWIDGET_H_ */
+#endif /* CXTRACKPADWIDGET_H_ */

@@ -1,31 +1,31 @@
 /*
- * cxControlPanel.cpp
+ * cxSecondaryMainWindow.cpp
  *
  *  Created on: Oct 18, 2010
  *      Author: christiana
  */
-#include "cxControlPanel.h"
+#include "cxSecondaryMainWindow.h"
 
-#include "cxCameraControlWidget.h"
+#include "cxTrackPadWidget.h"
 
 
 namespace cx
 {
 
-ControlPanel::ControlPanel(QWidget* parent) : QMainWindow(parent)
+SecondaryMainWindow::SecondaryMainWindow(QWidget* parent) : QMainWindow(parent)
 {
   this->setWindowTitle("Control Panel");
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-  this->addAsDockWidget(new CameraControlWidget(this), true);
+  this->addAsDockWidget(new TrackPadWidget(this), true);
 }
 
-ControlPanel::~ControlPanel()
+SecondaryMainWindow::~SecondaryMainWindow()
 {
 
 }
 
-void ControlPanel::addAsDockWidget(QWidget* widget, bool visible)
+void SecondaryMainWindow::addAsDockWidget(QWidget* widget, bool visible)
 {
 //  if (!mToggleWidgetActionGroup)
 //  {

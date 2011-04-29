@@ -1,4 +1,4 @@
-#include "cxCustomStatusBar.h"
+#include "cxStatusBar.h"
 
 #include <QLabel>
 #include <QString>
@@ -14,7 +14,7 @@
 
 namespace cx
 {
-CustomStatusBar::CustomStatusBar() :
+StatusBar::StatusBar() :
   mRenderingFpsLabel(new QLabel()),
   mGrabbingInfoLabel(new QLabel()),
   mTpsLabel(new QLabel())
@@ -34,10 +34,10 @@ CustomStatusBar::CustomStatusBar() :
   this->addPermanentWidget(mRenderingFpsLabel);
 }
 
-CustomStatusBar::~CustomStatusBar()
+StatusBar::~StatusBar()
 {}
 
-void CustomStatusBar::connectToToolSignals()
+void StatusBar::connectToToolSignals()
 {
   this->addPermanentWidget(mTpsLabel);
 
@@ -61,7 +61,7 @@ void CustomStatusBar::connectToToolSignals()
   }
 }
 
-void CustomStatusBar::disconnectFromToolSignals()
+void StatusBar::disconnectFromToolSignals()
 {
   this->removeWidget(mTpsLabel);
   ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
@@ -79,13 +79,13 @@ void CustomStatusBar::disconnectFromToolSignals()
   mToolLabels.clear();
 }
 
-void CustomStatusBar::receiveToolVisible()
+void StatusBar::receiveToolVisible()
 {
   ssc::Tool* tool = dynamic_cast<ssc::Tool*>(this->sender());
   this->colorTool(tool);
 }
 
-void CustomStatusBar::receiveToolDominant()
+void StatusBar::receiveToolDominant()
 {
   ssc::ToolManager::ToolMapPtr initializedTools = ssc::toolManager()->getInitializedTools();
   ssc::ToolManager::ToolMap::iterator it = initializedTools->begin();
@@ -96,7 +96,7 @@ void CustomStatusBar::receiveToolDominant()
   }
 }
 
-void CustomStatusBar::colorTool(ssc::Tool* tool)
+void StatusBar::colorTool(ssc::Tool* tool)
 {
   if(!tool)
   {
@@ -113,7 +113,7 @@ void CustomStatusBar::colorTool(ssc::Tool* tool)
   }
 }
 
-void CustomStatusBar::setToolLabelColor(QLabel* label, bool visible, bool dominant)
+void StatusBar::setToolLabelColor(QLabel* label, bool visible, bool dominant)
 {
   QString color;
   if(visible)
@@ -129,26 +129,26 @@ void CustomStatusBar::setToolLabelColor(QLabel* label, bool visible, bool domina
   label->setStyleSheet(color);
 }
 
-void CustomStatusBar::renderingFpsSlot(int numFps)
+void StatusBar::renderingFpsSlot(int numFps)
 {
   QString fpsString = "FPS: "+QString::number(numFps);
   mRenderingFpsLabel->setText(fpsString);
 }
 
-void CustomStatusBar::tpsSlot(int numTps)
+void StatusBar::tpsSlot(int numTps)
 {
   QString tpsString = "TPS: "+QString::number(numTps);
   mTpsLabel->setText(tpsString);
 }
 
-void CustomStatusBar::grabbingFpsSlot(int numFps)
+void StatusBar::grabbingFpsSlot(int numFps)
 {
   ssc::OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getRTSource();
   QString infoString = grabber->getName()+"-FPS: "+QString::number(numFps);
   mGrabbingInfoLabel->setText(infoString);
 }
 
-void CustomStatusBar::grabberConnectedSlot(bool connected)
+void StatusBar::grabberConnectedSlot(bool connected)
 {
   if(connected)
     this->addPermanentWidget(mGrabbingInfoLabel);
@@ -156,7 +156,7 @@ void CustomStatusBar::grabberConnectedSlot(bool connected)
     this->removeWidget(mGrabbingInfoLabel);
 }
 
-void CustomStatusBar::showMessageSlot(Message message)
+void StatusBar::showMessageSlot(Message message)
 {
   this->showMessage(message.getPrintableMessage(), message.getTimeout());
 }
