@@ -12,7 +12,7 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    WhatsThisWidget(parent, objectName, objectName)
+    cxBaseWidget(parent, objectName, objectName)
 {
   mLayout = new QVBoxLayout(this);
   mResampleWidget =  new ResampleWidget(this);

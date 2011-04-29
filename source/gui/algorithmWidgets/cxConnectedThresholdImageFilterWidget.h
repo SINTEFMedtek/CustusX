@@ -18,7 +18,7 @@ namespace cx
  * \date Apr 26, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class ConnectedThresholdImageFilterWidget : public WhatsThisWidget
+class ConnectedThresholdImageFilterWidget : public cxBaseWidget
 {
   Q_OBJECT
 

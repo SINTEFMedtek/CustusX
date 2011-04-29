@@ -12,7 +12,7 @@
 namespace cx
 {
 PlateRegistrationWidget::PlateRegistrationWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "PlateRegistrationWidget", "Plate Registration"),
+    cxBaseWidget(parent, "PlateRegistrationWidget", "Plate Registration"),
     mPlateRegistrationButton(new QPushButton("Load registration points", this)),
     mReferenceToolInfoLabel(new QLabel("", this))
 {
@@ -43,7 +43,7 @@ QString PlateRegistrationWidget::defaultWhatsThis() const
 
 void PlateRegistrationWidget::showEvent(QShowEvent* event)
 {
-  WhatsThisWidget::showEvent(event);
+  cxBaseWidget::showEvent(event);
   connect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
   connect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
@@ -52,7 +52,7 @@ void PlateRegistrationWidget::showEvent(QShowEvent* event)
 
 void PlateRegistrationWidget::hideEvent(QHideEvent* event)
 {
-  WhatsThisWidget::hideEvent(event);
+  cxBaseWidget::hideEvent(event);
   disconnect(ssc::toolManager(), SIGNAL(landmarkAdded(QString)),   this, SLOT(landmarkUpdatedSlot()));
   disconnect(ssc::toolManager(), SIGNAL(landmarkRemoved(QString)), this, SLOT(landmarkUpdatedSlot()));
 
