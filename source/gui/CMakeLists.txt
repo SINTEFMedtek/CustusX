@@ -60,7 +60,7 @@ SET(cxProject_MOC_HDRS
     toolWidgets/cxToolPropertiesWidget.h
     #----------------------
     utilities/cxDoubleSpanSlider.h
-    utilities/cxWhatsThisWidget.h
+    utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
     utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
@@ -192,7 +192,7 @@ SET(${LIBNAME}_SRCS
     utilities/cxDoubleSpanSlider.cpp
     utilities/cxTabbedWidget.h
     utilities/cxTabbedWidget.cpp
-    utilities/cxWhatsThisWidget.h
+    utilities/cxBaseWidget.h
     utilities/cxAudio.h
     utilities/cxAudio.cpp
     utilities/cxTransform3DWidget.h
