@@ -17,13 +17,13 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class TabbedWidget : public WhatsThisWidget
+class TabbedWidget : public cxBaseWidget
 {
 public:
   TabbedWidget(QWidget* parent, QString objectName, QString windowTitle);
   virtual ~TabbedWidget();
 
-  void addTab(WhatsThisWidget* newTab, QString newTabName);
+  void addTab(cxBaseWidget* newTab, QString newTabName);
   virtual QString defaultWhatsThis() const;
 
 protected:

@@ -11,7 +11,7 @@
 namespace cx
 {
 /**
- * \class WhatsThisWidget
+ * \class cxBaseWidget
  *
  * \brief Interface for QWidget which handles widgets uniformly for the system.
  *
@@ -19,19 +19,19 @@ namespace cx
  * \author: Janne Beate Bakeng
  */
 
-class WhatsThisWidget : public QWidget
+class cxBaseWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-  WhatsThisWidget(QWidget* parent, QString objectName, QString windowTitle) :
+  cxBaseWidget(QWidget* parent, QString objectName, QString windowTitle) :
     QWidget(parent), mObjectName(objectName),mWindowTitle(windowTitle)
   {
     this->setObjectName(mObjectName);
     this->setWindowTitle(mWindowTitle);
   };
 
-  virtual ~WhatsThisWidget(){};
+  virtual ~cxBaseWidget(){};
   virtual QString defaultWhatsThis() const = 0; ///< Returns a short description of what this widget will do for you.
 
   QWidget* createMethodWidget(QWidget* inputWidget, QWidget* outputWidget, QString methodname, bool inputChecked = false, bool outputVisible = true)
