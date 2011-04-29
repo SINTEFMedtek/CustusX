@@ -25,7 +25,7 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    WhatsThisWidget(parent, objectName, windowTitle),
+    cxBaseWidget(parent, objectName, windowTitle),
     mTabWidget(new QTabWidget(this))
 {
 
@@ -37,7 +37,7 @@ TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTi
 TabbedWidget::~TabbedWidget()
 {}
 
-void TabbedWidget::addTab(WhatsThisWidget* newTab, QString newTabName)
+void TabbedWidget::addTab(cxBaseWidget* newTab, QString newTabName)
 {
   int index = mTabWidget->addTab(newTab, newTabName);
   mTabWidget->setTabWhatsThis(index, newTab->defaultWhatsThis());
