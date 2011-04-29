@@ -1,7 +1,7 @@
 #ifndef CXMANUALREGISTRATIONOFFSETWIDGET_H_
 #define CXMANUALREGISTRATIONOFFSETWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 
 class QLabel;
 class QGridLayout;

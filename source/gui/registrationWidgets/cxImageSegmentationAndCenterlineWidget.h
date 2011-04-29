@@ -1,7 +1,7 @@
 #ifndef CXIMAGESEGMENTATIONANDCENTERLINEWIDGET_H_
 #define CXIMAGESEGMENTATIONANDCENTERLINEWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxDataInterface.h"
 #include "cxSurfaceWidget.h"
 #include "cxResampleWidget.h"

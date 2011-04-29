@@ -11,7 +11,7 @@
 #include <vector>
 #include <QtGui>
 #include "sscDoubleDataAdapterXml.h"
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxContour.h"
 
 namespace cx

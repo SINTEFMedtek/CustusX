@@ -1,7 +1,7 @@
 #ifndef CXNAVIGATIONWIDGET_H_
 #define CXNAVIGATIONWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 
 class QGroupBox;
 class QRadioButton;
