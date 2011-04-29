@@ -1,11 +1,11 @@
 /*
- * cxCameraControlWidget.cpp
+ * cxTrackPadWidget.cpp
  *
  *  Created on: Oct 7, 2010
  *      Author: christiana
  */
 
-#include "cxCameraControlWidget.h"
+#include "cxTrackPadWidget.h"
 
 #include <QVBoxLayout>
 #include <QScrollBar>
@@ -163,10 +163,10 @@ void MousePadWidget::setFixedYPos(bool on)
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-CameraControlWidget::CameraControlWidget(QWidget* parent) :
+TrackPadWidget::TrackPadWidget(QWidget* parent) :
     QWidget(parent)
 {
-  this->setObjectName("CameraControlWidget");
+  this->setObjectName("TrackPadWidget");
   this->setWindowTitle("Camera Control");
 
   mCameraControl.reset(new CameraControl());
@@ -183,7 +183,7 @@ CameraControlWidget::CameraControlWidget(QWidget* parent) :
   this->defineRotateLayout();
 }
 
-void CameraControlWidget::createStandard3DViewActions()
+void TrackPadWidget::createStandard3DViewActions()
 {
   QActionGroup* group = mCameraControl->createStandard3DViewActions();
 
@@ -193,7 +193,7 @@ void CameraControlWidget::createStandard3DViewActions()
   toolBar->addSeparator();
 }
 
-void CameraControlWidget::defineRotateLayout()
+void TrackPadWidget::defineRotateLayout()
 {
   QGroupBox* group = new QGroupBox("rotate", this);
   group->setFlat(true);
@@ -218,7 +218,7 @@ void CameraControlWidget::defineRotateLayout()
 }
 
 
-void CameraControlWidget::definePanLayout()
+void TrackPadWidget::definePanLayout()
 {
   QGroupBox* group = new QGroupBox("pan", this);
   group->setFlat(true);
@@ -242,12 +242,12 @@ void CameraControlWidget::definePanLayout()
   panLayout->addWidget(dollyWidget, 1);
 }
 
-vtkCameraPtr CameraControlWidget::getCamera() const
+vtkCameraPtr TrackPadWidget::getCamera() const
 {
   return viewManager()->get3DView()->getRenderer()->GetActiveCamera();
 }
 
-void CameraControlWidget::rotateYSlot(QPointF delta)
+void TrackPadWidget::rotateYSlot(QPointF delta)
 {
   double scale = 180;
   double factor = scale * delta.y();
@@ -255,7 +255,7 @@ void CameraControlWidget::rotateYSlot(QPointF delta)
   this->getCamera()->Roll(factor);
 }
 
-void CameraControlWidget::rotateXZSlot(QPointF delta)
+void TrackPadWidget::rotateXZSlot(QPointF delta)
 {
   vtkCameraPtr camera = this->getCamera();
   double scale = 180;
@@ -264,14 +264,14 @@ void CameraControlWidget::rotateXZSlot(QPointF delta)
   camera->Elevation(scale * delta.y());
 }
 
-void CameraControlWidget::dollySlot(QPointF delta)
+void TrackPadWidget::dollySlot(QPointF delta)
 {
   double factor = 1 + delta.y();
   this->getCamera()->Dolly(factor);
   viewManager()->get3DView()->getRenderer()->ResetCameraClippingRange();
 }
 
-void CameraControlWidget::panXZSlot(QPointF delta)
+void TrackPadWidget::panXZSlot(QPointF delta)
 {
   vtkCameraPtr camera = this->getCamera();
   ssc::Vector3D position(camera->GetPosition());
@@ -294,16 +294,16 @@ void CameraControlWidget::panXZSlot(QPointF delta)
   camera->SetFocalPoint(focus.begin());
 }
 
-CameraControlWidget::~CameraControlWidget()
+TrackPadWidget::~TrackPadWidget()
 {
 }
 
-void CameraControlWidget::showEvent(QShowEvent* event)
+void TrackPadWidget::showEvent(QShowEvent* event)
 {
   QWidget::showEvent(event);
 }
 
-void CameraControlWidget::hideEvent(QCloseEvent* event)
+void TrackPadWidget::hideEvent(QCloseEvent* event)
 {
   QWidget::closeEvent(event);
 }

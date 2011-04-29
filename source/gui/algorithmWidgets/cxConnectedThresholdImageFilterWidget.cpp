@@ -8,7 +8,7 @@ namespace cx
 {
 
 ConnectedThresholdImageFilterWidget::ConnectedThresholdImageFilterWidget(QWidget* parent) :
-    WhatsThisWidget(parent, "ConnectedThresholdImageFilterWidget", "Connected Threshold Image Filter"),
+    BaseWidget(parent, "ConnectedThresholdImageFilterWidget", "Connected Threshold Image Filter"),
     mStatusLabel(new QLabel(""))
 {
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);

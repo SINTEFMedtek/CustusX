@@ -18,7 +18,7 @@ namespace cx
 {
 
 ResampleWidget::ResampleWidget(QWidget* parent) :
-  WhatsThisWidget(parent, "ResampleWidget", "Resample"),
+  BaseWidget(parent, "ResampleWidget", "Resample"),
   mStatusLabel(new QLabel(""))
 {
   connect(&mResampleAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
