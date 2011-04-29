@@ -1,5 +1,5 @@
-#ifndef CXIMPORTDATAWIZARD_H_
-#define CXIMPORTDATAWIZARD_H_
+#ifndef CXIMPORTDATADIALOG_H_
+#define CXIMPORTDATADIALOG_H_
 
 #include <QDialog>
 #include "cxDataInterface.h"
@@ -10,19 +10,19 @@ class QCheckBox;
 namespace cx
 {
 /**
- * \class ImportDataWizard
+ * \class ImportDataDialog
  *
  *\brief
  *
  * \date Sep 24, 2010
  *\author christiana
  */
-class ImportDataWizard : public QDialog
+class ImportDataDialog : public QDialog
 {
   Q_OBJECT
 public:
-  ImportDataWizard(QString filename, QWidget* parent=NULL);
-  virtual ~ImportDataWizard();
+  ImportDataDialog(QString filename, QWidget* parent=NULL);
+  virtual ~ImportDataDialog();
 
 public:
   void showEvent(QShowEvent* event);
@@ -47,4 +47,4 @@ private:
 };
 }//namespace cx
 
-#endif /* CXIMPORTDATAWIZARD_H_ */
+#endif /* CXIMPORTDATADIALOG_H_ */

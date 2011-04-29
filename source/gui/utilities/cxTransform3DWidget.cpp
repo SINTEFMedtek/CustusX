@@ -17,7 +17,7 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
 #include <cmath>
-#include "cxCameraControlWidget.h"
+#include "cxTrackPadWidget.h"
 
 #include "boost/bind.hpp"
 #include "libQtSignalAdapters/Qt2Func.h"
