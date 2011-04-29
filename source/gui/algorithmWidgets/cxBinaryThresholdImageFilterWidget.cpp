@@ -1,34 +1,16 @@
   #include "cxBinaryThresholdImageFilterWidget.h"
 
-//#include <boost/bind.hpp>
-//
-//#include <QTreeWidget>
-//#include <QTreeWidgetItem>
-//#include <QStringList>
-//#include <QGridLayout>
-//#include <QCheckBox>
-//
-//#include <vtkPolyData.h>
-//
-//#include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
-//#include "sscMesh.h"
 #include "sscDataManager.h"
-//#include "sscMessageManager.h"
-//#include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
-//#include "cxDataInterface.h"
-//#include "cxVolumePropertiesWidget.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
-//#include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
-//#include "cxDataLocations.h"
-//#include "cxSeansVesselRegistrationWidget.h"
-
+#include "cxContour.h"
+#include "sscMesh.h"
 
 namespace cx
 {
@@ -37,6 +19,7 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   WhatsThisWidget(parent, "BinaryThresholdImageFilterWidget", "Binary Threshold Image Filter"),
   mBinary(false),
   mUseSmothing(false),
+  mDefaultColor("red"),
   mStatusLabel(new QLabel(""))
 {
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
@@ -45,6 +28,7 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   toptopLayout->addStretch();
 
   connect(&mSegmentationAlgorithm, SIGNAL(finished()), this, SLOT(handleFinishedSlot()));
+  connect(&mContourAlgorithm, SIGNAL(finished()), this, SLOT(handleContourFinishedSlot()));
 
   mSelectedImage = SelectImageStringDataAdapter::New();
   mSelectedImage->setValueName("Select input: ");
@@ -76,6 +60,11 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
 
 BinaryThresholdImageFilterWidget::~BinaryThresholdImageFilterWidget()
 {
+}
+
+void BinaryThresholdImageFilterWidget::setDefaultColor(QColor color)
+{
+  mDefaultColor = color;
 }
 
 QString BinaryThresholdImageFilterWidget::defaultWhatsThis() const
@@ -132,6 +121,45 @@ void BinaryThresholdImageFilterWidget::handleFinishedSlot()
   ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
   if(!segmentedImage)
     return;
+
+  this->generateSurface();
+//  mStatusLabel->setText("<font color=green> Done. </font>\n");
+//  emit outputImageChanged(segmentedImage->getUid());
+}
+
+void BinaryThresholdImageFilterWidget::generateSurface()
+{
+  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
+  if(!segmentedImage)
+    return;
+
+  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  double decimation = 0.8;
+  double threshold = 1;/// because the segmented image is 0..1
+  bool reduceResolution = false;
+  bool smoothing = true;
+
+  mContourAlgorithm.setInput(segmentedImage, outputBasePath, threshold, decimation, reduceResolution, smoothing);
+//  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
+//  if(outputMesh)
+//  {
+//    outputMesh->setColor(mDefaultColor);
+//  }
+
+  mStatusLabel->setText("<font color=orange> Generating contour... Please wait!</font>\n");
+}
+
+void BinaryThresholdImageFilterWidget::handleContourFinishedSlot()
+{
+  ssc::ImagePtr segmentedImage = mSegmentationAlgorithm.getOutput();
+  if(!segmentedImage)
+    return;
+
+  ssc::MeshPtr outputMesh = mContourAlgorithm.getOutput();
+  if(outputMesh)
+  {
+    outputMesh->setColor(mDefaultColor);
+  }
 
   mStatusLabel->setText("<font color=green> Done. </font>\n");
 
