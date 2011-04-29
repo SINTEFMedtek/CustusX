@@ -2,7 +2,7 @@
 #define CXTABBEDWIDGET_H_
 
 #include <QString>
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 
 class QTabWidget;
 
