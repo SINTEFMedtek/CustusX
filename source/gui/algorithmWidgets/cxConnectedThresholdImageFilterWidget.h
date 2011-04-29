@@ -1,7 +1,7 @@
 #ifndef CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 #define CXCONNECTEDTHRESHOLDIMAGEFILTERWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "cxConnectedThresholdImageFilter.h"
 
 namespace cx
@@ -33,7 +33,6 @@ private slots:
   void segmentSlot();
 
 private:
-  ConnectedThresholdImageFilterWidget();
   QWidget* createSegmentationOptionsWidget();
 
   QLabel* mStatusLabel;

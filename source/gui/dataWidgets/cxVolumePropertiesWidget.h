@@ -1,7 +1,7 @@
 #ifndef CXVOLUMEPROPERTIESWIDGET_H_
 #define CXVOLUMEPROPERTIESWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "sscForwardDeclarations.h"
 #include "cxDataInterface.h"
 
