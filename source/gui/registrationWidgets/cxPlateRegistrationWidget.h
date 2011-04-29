@@ -1,7 +1,7 @@
 #ifndef CXPLATEREGISTRATIONWIDGET_H_
 #define CXPLATEREGISTRATIONWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 
 class QPushButton;
 class QLabel;

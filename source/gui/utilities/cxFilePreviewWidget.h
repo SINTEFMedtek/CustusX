@@ -1,7 +1,7 @@
 #ifndef CXFILEPREVIEWWIDGET_H_
 #define CXFILEPREVIEWWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 #include "boost/shared_ptr.hpp"
 class QTextDocument;
 class QTextEdit;
