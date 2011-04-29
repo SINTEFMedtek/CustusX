@@ -1,7 +1,7 @@
 #ifndef CXSEANSVESSELREGISTRATIONWIDGET_H_
 #define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
-#include "cxWhatsThisWidget.h"
+#include "cxBaseWidget.h"
 
 class QSpinBox;
 class QPushButton;

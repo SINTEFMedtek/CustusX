@@ -1,5 +1,10 @@
 SET(LIBNAME gui)
 
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (WIN32)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(WIN32)
+
 # Make VERSION_NUMBER available for c++ files in gui folder
 ADD_DEFINITIONS(-DVERSION_NUMBER="${VERSION_NUMBER}")
 ADD_DEFINITIONS(-DVERSION_NUMBER_VERBOSE="${VERSION_NUMBER_VERBOSE}")
@@ -64,7 +69,7 @@ SET(cxProject_MOC_HDRS
     toolWidgets/cxToolPropertiesWidget.h
     #----------------------
     utilities/cxDoubleSpanSlider.h
-    utilities/cxWhatsThisWidget.h
+    utilities/cxBaseWidget.h
     utilities/cxTransform3DWidget.h
     utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
@@ -205,7 +210,7 @@ SET(${LIBNAME}_SRCS
     utilities/cxDoubleSpanSlider.cpp
     utilities/cxTabbedWidget.h
     utilities/cxTabbedWidget.cpp
-    utilities/cxWhatsThisWidget.h
+    utilities/cxBaseWidget.h
     utilities/cxAudio.h
     utilities/cxAudio.cpp
     utilities/cxTransform3DWidget.h
