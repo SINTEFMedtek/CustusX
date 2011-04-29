@@ -1,12 +1,12 @@
 /*
- * cxLayoutEditor.h
+ * cxLayoutEditorWidget.h
  *
  *  Created on: Jul 27, 2010
  *      Author: christiana
  */
 
-#ifndef CXLAYOUTEDITOR_H_
-#define CXLAYOUTEDITOR_H_
+#ifndef CXLAYOUTEDITORWIDGET_H_
+#define CXLAYOUTEDITORWIDGET_H_
 
 
 #include <map>
@@ -40,7 +40,7 @@ public:
 };
 
 
-class LayoutEditor : public QWidget
+class LayoutEditorWidget : public QWidget
 {
   Q_OBJECT
 public:
@@ -50,7 +50,7 @@ public:
     QLabel* mLabel;
   };
 
-  LayoutEditor(QWidget* parent);
+  LayoutEditorWidget(QWidget* parent);
   void setLayoutData(const LayoutData& data);
   LayoutData getLayoutData() const;
 
@@ -102,4 +102,4 @@ private:
 
 } // namespace cx
 
-#endif /* CXLAYOUTEDITOR_H_ */
+#endif /* CXLAYOUTEDITORWIDGET_H_ */
