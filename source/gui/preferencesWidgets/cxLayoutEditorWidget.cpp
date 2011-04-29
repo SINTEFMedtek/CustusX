@@ -1,11 +1,11 @@
 /*
- * cxLayoutEditor.cpp
+ * cxLayoutEditorWidget.cpp
  *
  *  Created on: Jul 27, 2010
  *      Author: christiana
  */
 
-#include "cxLayoutEditor.h"
+#include "cxLayoutEditorWidget.h"
 #include <iostream>
 #include <QtGui>
 #include "sscTypeConversions.h"
@@ -17,7 +17,7 @@ namespace cx
 {
 
 
-LayoutEditor::LayoutEditor(QWidget* parent) :
+LayoutEditorWidget::LayoutEditorWidget(QWidget* parent) :
   QWidget(parent)
 {
   mTopLayout = new QVBoxLayout(this);
@@ -65,23 +65,23 @@ LayoutEditor::LayoutEditor(QWidget* parent) :
   this->updateGrid();
 }
 
-void LayoutEditor::setLayoutData(const LayoutData& data)
+void LayoutEditorWidget::setLayoutData(const LayoutData& data)
 {
   mViewData = data;
   this->updateGrid();
 }
 
-LayoutData LayoutEditor::getLayoutData() const
+LayoutData LayoutEditorWidget::getLayoutData() const
 {
   return mViewData;
 }
 
-void LayoutEditor::nameChanged()
+void LayoutEditorWidget::nameChanged()
 {
   mViewData.setName(mNameEdit->text());
 }
 
-void LayoutEditor::contextMenuSlot(const QPoint& point)
+void LayoutEditorWidget::contextMenuSlot(const QPoint& point)
 {
   //QWidget* sender = dynamic_cast<QWidget*>(this->sender());
   QPoint pointGlobal = this->mapToGlobal(point);
@@ -152,19 +152,19 @@ void LayoutEditor::contextMenuSlot(const QPoint& point)
   menu.exec(pointGlobal);
 }
 
-void LayoutEditor::splitActionSlot()
+void LayoutEditorWidget::splitActionSlot()
 {
   mViewData.split(mSelection);
   this->updateGrid();
 }
 
-void LayoutEditor::mergeActionSlot()
+void LayoutEditorWidget::mergeActionSlot()
 {
   mViewData.merge(mSelection);
   this->updateGrid();
 }
 
-void LayoutEditor::groupActionSlot()
+void LayoutEditorWidget::groupActionSlot()
 {
   QAction* sender = dynamic_cast<QAction*>(this->sender());
   if (!sender)
@@ -178,7 +178,7 @@ void LayoutEditor::groupActionSlot()
   this->updateGrid();
 }
 
-void LayoutEditor::typeActionSlot()
+void LayoutEditorWidget::typeActionSlot()
 {
   QAction* sender = dynamic_cast<QAction*>(this->sender());
   if (!sender)
@@ -199,12 +199,12 @@ void LayoutEditor::typeActionSlot()
   this->updateGrid();
 }
 
-void LayoutEditor::mouseMoveEvent(QMouseEvent* event)
+void LayoutEditorWidget::mouseMoveEvent(QMouseEvent* event)
 {
   this->updateSelection(event->pos());
 }
 
-void LayoutEditor::updateSelection(QPoint pos)
+void LayoutEditorWidget::updateSelection(QPoint pos)
 {
   LayoutData::ViewData start = this->getViewData(mClickPos);
   LayoutData::ViewData stop = this->getViewData(pos);
@@ -215,7 +215,7 @@ void LayoutEditor::updateSelection(QPoint pos)
 /* Return a set of unique iterators into the layout data,
  * representing the selected region.
  */
-std::set<LayoutData::iterator> LayoutEditor::getSelectedViews()
+std::set<LayoutData::iterator> LayoutEditorWidget::getSelectedViews()
 {
   std::set<LayoutData::iterator> retval;
   for (int r=mSelection.pos.row; r<mSelection.pos.row+mSelection.span.row; ++r)
@@ -224,7 +224,7 @@ std::set<LayoutData::iterator> LayoutEditor::getSelectedViews()
   return retval;
 }
 
-void LayoutEditor::mousePressEvent(QMouseEvent* event)
+void LayoutEditorWidget::mousePressEvent(QMouseEvent* event)
 {
   mClickPos = event->pos();
 
@@ -244,7 +244,7 @@ void LayoutEditor::mousePressEvent(QMouseEvent* event)
   }
 }
 
-void LayoutEditor::colorRegion(LayoutRegion region, QString selectColor, QString backColor)
+void LayoutEditorWidget::colorRegion(LayoutRegion region, QString selectColor, QString backColor)
 {
   for (LayoutData::iterator iter=mViewData.begin(); iter!=mViewData.end(); ++iter)
   {
@@ -263,7 +263,7 @@ void LayoutEditor::colorRegion(LayoutRegion region, QString selectColor, QString
 /** Find view data for the frame under point pt
  *
  */
-LayoutData::ViewData LayoutEditor::getViewData(QPoint pt)
+LayoutData::ViewData LayoutEditorWidget::getViewData(QPoint pt)
 {
   for (LayoutData::iterator iter=mViewData.begin(); iter!=mViewData.end(); ++iter)
   {
@@ -280,13 +280,13 @@ LayoutData::ViewData LayoutEditor::getViewData(QPoint pt)
 /**called when row/column text boxes changed. Update model.
  *
  */
-void LayoutEditor::rowsColumnsChangedSlot()
+void LayoutEditorWidget::rowsColumnsChangedSlot()
 {
   mViewData.resize(mRowsEdit->value(), mColsEdit->value());
   this->updateGrid();
 }
 
-QString LayoutEditor::getViewName(LayoutData::ViewData data) const
+QString LayoutEditorWidget::getViewName(LayoutData::ViewData data) const
 {
   for (unsigned i=0; i<mViewNames.size(); ++i)
   {
@@ -300,7 +300,7 @@ QString LayoutEditor::getViewName(LayoutData::ViewData data) const
  * according to the contents of mViewData.
  *
  */
-void LayoutEditor::updateGrid()
+void LayoutEditorWidget::updateGrid()
 {
   //std::cout << "pre update:" << streamXml2String(mViewData) << std::endl;
 
@@ -356,12 +356,12 @@ void LayoutEditor::updateGrid()
 
 }
 
-//void LayoutEditor::setNiceSize()
+//void LayoutEditorWidget::setNiceSize()
 //{
 //  //this->resize(400,700);
 //}
 
-void LayoutEditor::clearDisplay()
+void LayoutEditorWidget::clearDisplay()
 {
   for (unsigned r = 0; r < mViewDataCache.size(); ++r)
   {
@@ -372,7 +372,7 @@ void LayoutEditor::clearDisplay()
   }
 }
 
-void LayoutEditor::initCache()
+void LayoutEditorWidget::initCache()
 {
   int maxRows = 10;
   int maxCols = 10;

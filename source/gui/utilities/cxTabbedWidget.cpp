@@ -17,6 +17,7 @@
 #include "cxImageSegmentationAndCenterlineWidget.h"
 #include "cxPlateRegistrationWidget.h"
 #include "cxManualRegistrationOffsetWidget.h"
+#include "cxRegisterI2IWidget.h"
 
 //calibration
 #include "cxToolTipCalibrationWidget.h"
@@ -25,7 +26,7 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    WhatsThisWidget(parent, objectName, windowTitle),
+    BaseWidget(parent, objectName, windowTitle),
     mTabWidget(new QTabWidget(this))
 {
 
@@ -37,7 +38,7 @@ TabbedWidget::TabbedWidget(QWidget* parent, QString objectName, QString windowTi
 TabbedWidget::~TabbedWidget()
 {}
 
-void TabbedWidget::addTab(WhatsThisWidget* newTab, QString newTabName)
+void TabbedWidget::addTab(BaseWidget* newTab, QString newTabName)
 {
   int index = mTabWidget->addTab(newTab, newTabName);
   mTabWidget->setTabWhatsThis(index, newTab->defaultWhatsThis());

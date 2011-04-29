@@ -14,6 +14,9 @@ SET(cxProject_MOC_HDRS
     algorithmWidgets/cxBinaryThresholdImageFilterWidget.h
     algorithmWidgets/cxToolTipCalibrationWidget.h
     algorithmWidgets/cxConnectedThresholdImageFilterWidget.h
+    algorithmWidgets/cxSurfaceWidget.h
+    algorithmWidgets/cxCenterlineWidget.h
+    algorithmWidgets/cxResampleWidget.h
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxShadingParamsInterfaces.h
@@ -24,25 +27,25 @@ SET(cxProject_MOC_HDRS
     dataWidgets/cxClippingWidget.h 
     dataWidgets/cxImagePropertiesWidget.h
     dataWidgets/cxMeshPropertiesWidget.h
-    dataWidgets/cxImportDataWizard.h
+    dataWidgets/cxImportDataDialog.h
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxTransferFunctionWidget.h
     dataWidgets/cxTransferFunctionAlphaWidget.h
     dataWidgets/cxTransferFunctionColorWidget.h
     #----------------------
-    infoWidgets/cxCustomStatusBar.h
+    infoWidgets/cxStatusBar.h
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxFrameTreeWidget.h
     #----------------------
     navigationWidgets/cxNavigationWidget.h
-    navigationWidgets/cxCameraControlWidget.h
+    navigationWidgets/cxTrackPadWidget.h
     #----------------------
     preferencesWidgets/cxPreferencesDialog.h
     preferencesWidgets/cxToolFilterWidget.h
     preferencesWidgets/cxToolListWidget.h
     preferencesWidgets/cxToolConfigureWidget.h
-    preferencesWidgets/cxLayoutEditor.h
+    preferencesWidgets/cxLayoutEditorWidget.h
     #----------------------
     recordingWidgets/cxRecordSessionWidget.h
     recordingWidgets/cxRecordBaseWidget.h
@@ -59,6 +62,7 @@ SET(cxProject_MOC_HDRS
     registrationWidgets/cxImageSegmentationAndCenterlineWidget.h
     registrationWidgets/cxPlateRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.h
+    registrationWidgets/cxRegisterI2IWidget.h
     #----------------------
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
@@ -71,7 +75,7 @@ SET(cxProject_MOC_HDRS
     utilities/cxSelectionGroupBox.h
     #----------------------    
     cxMainWindow.h
-    cxControlPanel.h
+    cxSecondaryMainWindow.h
     #----------------------
     ../ThirdParty/qxt/qxtspanslider_p.h
     ../ThirdParty/qxt/qxtspanslider.h
@@ -99,6 +103,13 @@ SET(${LIBNAME}_SRCS
     algorithmWidgets/cxToolTipCalibrationWidget.cpp
     algorithmWidgets/cxConnectedThresholdImageFilterWidget.h
     algorithmWidgets/cxConnectedThresholdImageFilterWidget.cpp
+    algorithmWidgets/cxSurfaceWidget.cpp
+    algorithmWidgets/cxSurfaceWidget.h
+    algorithmWidgets/cxCenterlineWidget.cpp
+    algorithmWidgets/cxCenterlineWidget.h
+    algorithmWidgets/cxResampleWidget.cpp
+    algorithmWidgets/cxResampleWidget.h
+    
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxDataInterface.cpp
@@ -123,8 +134,8 @@ SET(${LIBNAME}_SRCS
     dataWidgets/cxImagePropertiesWidget.cpp
     dataWidgets/cxMeshPropertiesWidget.h
     dataWidgets/cxMeshPropertiesWidget.cpp
-    dataWidgets/cxImportDataWizard.h
-    dataWidgets/cxImportDataWizard.cpp
+    dataWidgets/cxImportDataDialog.h
+    dataWidgets/cxImportDataDialog.cpp
     dataWidgets/cxDataViewSelectionWidget.h
     dataWidgets/cxDataViewSelectionWidget.cpp
     #----------------------
@@ -134,13 +145,13 @@ SET(${LIBNAME}_SRCS
     infoWidgets/cxFrameTreeWidget.cpp
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxPointSamplingWidget.cpp
-    infoWidgets/cxCustomStatusBar.h
-    infoWidgets/cxCustomStatusBar.cpp    
+    infoWidgets/cxStatusBar.h
+    infoWidgets/cxStatusBar.cpp    
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxNavigationWidget.cpp
-    navigationWidgets/cxCameraControlWidget.cpp
-    navigationWidgets/cxCameraControlWidget.h  
+    navigationWidgets/cxTrackPadWidget.cpp
+    navigationWidgets/cxTrackPadWidget.h  
     #----------------------
     preferencesWidgets/cxPreferencesDialog.h
     preferencesWidgets/cxPreferencesDialog.cpp
@@ -150,8 +161,8 @@ SET(${LIBNAME}_SRCS
     preferencesWidgets/cxToolListWidget.cpp
     preferencesWidgets/cxToolConfigureWidget.h
     preferencesWidgets/cxToolConfigureWidget.cpp
-    preferencesWidgets/cxLayoutEditor.h
-    preferencesWidgets/cxLayoutEditor.cpp
+    preferencesWidgets/cxLayoutEditorWidget.h
+    preferencesWidgets/cxLayoutEditorWidget.cpp
     #----------------------    
     recordingWidgets/cxRecordSessionWidget.h
     recordingWidgets/cxRecordSessionWidget.cpp
@@ -186,6 +197,8 @@ SET(${LIBNAME}_SRCS
     registrationWidgets/cxPlateRegistrationWidget.cpp
     registrationWidgets/cxSeansVesselRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.cpp
+    registrationWidgets/cxRegisterI2IWidget.h
+    registrationWidgets/cxRegisterI2IWidget.cpp    
     #----------------------    
     streamingWidgets/cxIGTLinkWidget.h
     streamingWidgets/cxIGTLinkWidget.cpp
@@ -210,8 +223,8 @@ SET(${LIBNAME}_SRCS
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 
-    cxControlPanel.h
-    cxControlPanel.cpp
+    cxSecondaryMainWindow.h
+    cxSecondaryMainWindow.cpp
     #----------------------    
     ../ThirdParty/qxt/qxtspanslider_p.h
     ../ThirdParty/qxt/qxtspanslider.h

@@ -1,5 +1,5 @@
-#ifndef CXCustomStatusBar_H_
-#define CXCustomStatusBar_H_
+#ifndef CXSTATUSBAR_H_
+#define CXSTATUSBAR_H_
 
 #include <QStatusBar>
 #include <map>
@@ -12,22 +12,22 @@ class QPixmap;
 namespace cx
 {
 /**
- * \class CustomStatusBar
+ * \class StatusBar
  *
  * \brief Statusbar with extended functionality.
  *
  * \date Jan 21, 2009
  * \author Janne Beate Bakeng, SINTEF
  */
-class CustomStatusBar: public QStatusBar
+class StatusBar: public QStatusBar
 {
   Q_OBJECT
 
   typedef ssc::Message Message;
 
 public:
-  CustomStatusBar(); ///< connects signals and slots
-  ~CustomStatusBar(); ///< empty
+  StatusBar(); ///< connects signals and slots
+  ~StatusBar(); ///< empty
 
 private slots:
   void connectToToolSignals(); ///< connect to all available tools
@@ -51,4 +51,4 @@ private:
 };
 }
 
-#endif /* CXCustomStatusBar_H_ */
+#endif /* CXSTATUSBAR_H_ */
