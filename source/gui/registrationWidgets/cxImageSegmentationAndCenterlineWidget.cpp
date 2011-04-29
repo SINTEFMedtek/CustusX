@@ -97,7 +97,7 @@ FixedImage2ImageWidget::FixedImage2ImageWidget(QWidget* parent) :
   mLayout->addStretch();
 
   mCenterlineWidget->setDefaultColor(QColor("green"));
-//  mSurfaceWidget->setDefaultColor(QColor("green"));
+  mSegmentationWidget->setDefaultColor(QColor("green"));
 };
 
 FixedImage2ImageWidget::~FixedImage2ImageWidget()
@@ -122,7 +122,7 @@ MovingImage2ImageWidget::MovingImage2ImageWidget(QWidget* parent) :
   mLayout->addStretch();
 
   mCenterlineWidget->setDefaultColor(QColor("blue"));
-//  mSurfaceWidget->setDefaultColor(QColor("blue"));
+  mSegmentationWidget->setDefaultColor(QColor("blue"));
 };
 
 MovingImage2ImageWidget::~MovingImage2ImageWidget()
