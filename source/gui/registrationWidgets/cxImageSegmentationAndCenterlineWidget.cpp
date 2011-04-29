@@ -12,12 +12,12 @@ namespace cx
 {
 //------------------------------------------------------------------------------
 ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    WhatsThisWidget(parent, objectName, objectName)
+    BaseWidget(parent, objectName, objectName)
 {
   mLayout = new QVBoxLayout(this);
   mResampleWidget =  new ResampleWidget(this);
   mSegmentationWidget = new BinaryThresholdImageFilterWidget(this);
-  mSurfaceWidget = new SurfaceWidget(this);
+//  mSurfaceWidget = new SurfaceWidget(this);
   mCenterlineWidget =  new CenterlineWidget(this);
 
   mResampleOutput = SelectImageStringDataAdapter::New();
@@ -27,10 +27,10 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mSegmentationOutput = SelectImageStringDataAdapter::New();
   mSegmentationOutput->setValueName("Output: ");
   connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mCenterlineWidget, SLOT(setImageInputSlot(QString)));
-  connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mSurfaceWidget, SLOT(setImageInputSlot(QString)));
+//  connect(mSegmentationOutput.get(), SIGNAL(imageChanged(QString)), mSurfaceWidget, SLOT(setImageInputSlot(QString)));
 
-  mSurfaceOutput = SelectMeshStringDataAdapter::New();
-  mSurfaceOutput->setValueName("Output: ");
+//  mSurfaceOutput = SelectMeshStringDataAdapter::New();
+//  mSurfaceOutput->setValueName("Output: ");
   //TODO connect to view!
   //connect(surfaceOutput.get(), SIGNAL(meshChanged(QString)), this, SLOT(meshChanged(QString)));
 
@@ -43,14 +43,14 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mSegmentationWidget, new ssc::LabeledComboBoxWidget(this, mSegmentationOutput), "Segmentation"));
   mLayout->addWidget(this->createHorizontalLine());
-  mLayout->addWidget(this->createMethodWidget(mSurfaceWidget, new ssc::LabeledComboBoxWidget(this, mSurfaceOutput), "Surface"));
-  mLayout->addWidget(this->createHorizontalLine());
+//  mLayout->addWidget(this->createMethodWidget(mSurfaceWidget, new ssc::LabeledComboBoxWidget(this, mSurfaceOutput), "Surface"));
+//  mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, mCenterlineOutput), "Centerline"));
   mLayout->addWidget(this->createHorizontalLine());
 
   connect(mResampleWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(resampleOutputArrived(QString)));
   connect(mSegmentationWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(segmentationOutputArrived(QString)));
-  connect(mSurfaceWidget, SIGNAL(outputMeshChanged(QString)), this, SLOT(surfaceOutputArrived(QString)));
+//  connect(mSurfaceWidget, SIGNAL(outputMeshChanged(QString)), this, SLOT(surfaceOutputArrived(QString)));
   connect(mCenterlineWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(centerlineOutputArrived(QString)));
 }
 
@@ -77,10 +77,10 @@ void ImageSegmentationAndCenterlineWidget::segmentationOutputArrived(QString uid
   mSegmentationOutput->setValue(uid);
 }
 
-void ImageSegmentationAndCenterlineWidget::surfaceOutputArrived(QString uid)
-{
-  mSurfaceOutput->setValue(uid);
-}
+//void ImageSegmentationAndCenterlineWidget::surfaceOutputArrived(QString uid)
+//{
+//  mSurfaceOutput->setValue(uid);
+//}
 
 void ImageSegmentationAndCenterlineWidget::centerlineOutputArrived(QString uid)
 {
@@ -97,7 +97,7 @@ FixedImage2ImageWidget::FixedImage2ImageWidget(QWidget* parent) :
   mLayout->addStretch();
 
   mCenterlineWidget->setDefaultColor(QColor("green"));
-  mSurfaceWidget->setDefaultColor(QColor("green"));
+  mSegmentationWidget->setDefaultColor(QColor("green"));
 };
 
 FixedImage2ImageWidget::~FixedImage2ImageWidget()
@@ -122,7 +122,7 @@ MovingImage2ImageWidget::MovingImage2ImageWidget(QWidget* parent) :
   mLayout->addStretch();
 
   mCenterlineWidget->setDefaultColor(QColor("blue"));
-  mSurfaceWidget->setDefaultColor(QColor("blue"));
+  mSegmentationWidget->setDefaultColor(QColor("blue"));
 };
 
 MovingImage2ImageWidget::~MovingImage2ImageWidget()

@@ -17,7 +17,7 @@ namespace cx
  * \date 10. nov. 2010
  * \author: Janne Beate Bakeng, SINTEF
  */
-class PlateRegistrationWidget : public WhatsThisWidget
+class PlateRegistrationWidget : public BaseWidget
 {
   Q_OBJECT
 public:
