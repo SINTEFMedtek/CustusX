@@ -9,20 +9,23 @@
 #include "cxStateMachineManager.h"
 #include "cxTimedAlgorithm.h"
 #include "cxPatientData.h"
+#include "sscLabeledComboBoxWidget.h"
+#include "cxDataInterface.h"
 
 namespace cx
 {
+
 
 SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(QWidget* parent) :
     BaseWidget(parent, "SeansVesselRegistrationWidget", "Seans Vessel Registration"),
     mLTSRatioSpinBox(new QSpinBox()),
     mLinearCheckBox(new QCheckBox()),
-    mRegisterButton(new QPushButton("Register")),
-    mFixedImageLabel(new QLabel("Fixed image:")),
-    mMovingImageLabel(new QLabel("Moving image:"))
+    mRegisterButton(new QPushButton("Register"))
+//    mFixedImageLabel(new QLabel("Fixed image:")),
+//    mMovingImageLabel(new QLabel("Moving image:"))
 {
-  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
-  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
+//  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
+//  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
 
   connect(mRegisterButton, SIGNAL(clicked()), this, SLOT(registerSlot()));
 
@@ -38,8 +41,17 @@ SeansVesselRegistrationWidget::SeansVesselRegistrationWidget(QWidget* parent) :
   //connect(vesselRegOptionsButton, SIGNAL(clicked()), this, SLOT(adjustSizeSlot()));
   vesselRegOptionsWidget->setVisible(vesselRegOptionsButton->isChecked());
 
-  layout->addWidget(mFixedImageLabel, 0, 0);
-  layout->addWidget(mMovingImageLabel, 1, 0);
+  QGridLayout* entryLayout = new QGridLayout;
+  entryLayout->setColumnStretch(1,1);
+
+  mFixedImage = RegistrationFixedImageStringDataAdapter::New();
+  new ssc::LabeledComboBoxWidget(this, mFixedImage, entryLayout, 0);
+  mMovingImage = RegistrationMovingImageStringDataAdapter::New();
+  new ssc::LabeledComboBoxWidget(this, mMovingImage, entryLayout, 1);
+
+  layout->addLayout(entryLayout, 0, 0, 2, 2);
+//  layout->addWidget(fixedWidget, 0, 0, 1, 2);
+//  layout->addWidget(movingWidget, 1, 0, 1, 2);
   layout->addWidget(mRegisterButton, 2, 0);
   layout->addWidget(vesselRegOptionsButton, 2, 1);
   layout->addWidget(vesselRegOptionsWidget, 3, 0, 1, 2);
@@ -57,23 +69,23 @@ QString SeansVesselRegistrationWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void SeansVesselRegistrationWidget::fixedImageSlot(QString uid)
-{
-  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
-  if(!fixedImage)
-    return;
-  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
-  mFixedImageLabel->update();
-}
-
-void SeansVesselRegistrationWidget::movingImageSlot(QString uid)
-{
-  ssc::DataPtr movingImage = registrationManager()->getMovingData();
-  if(!movingImage)
-    return;
-  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
-  mMovingImageLabel->update();
-}
+//void SeansVesselRegistrationWidget::fixedImageSlot(QString uid)
+//{
+//  ssc::DataPtr fixedImage = registrationManager()->getFixedData();
+//  if(!fixedImage)
+//    return;
+//  mFixedImageLabel->setText(qstring_cast("Fixed data: <b>"+fixedImage->getName()+"</b>"));
+//  mFixedImageLabel->update();
+//}
+//
+//void SeansVesselRegistrationWidget::movingImageSlot(QString uid)
+//{
+//  ssc::DataPtr movingImage = registrationManager()->getMovingData();
+//  if(!movingImage)
+//    return;
+//  mMovingImageLabel->setText(qstring_cast("Moving data: <b>"+movingImage->getName()+"</b>"));
+//  mMovingImageLabel->update();
+//}
 
 void SeansVesselRegistrationWidget::registerSlot()
 {

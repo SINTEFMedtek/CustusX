@@ -7,33 +7,16 @@
 
 #include <cxRegisterI2IWidget.h>
 
-//#include <boost/bind.hpp>
-//
-//#include <QTreeWidget>
-//#include <QTreeWidgetItem>
-//#include <QStringList>
-//#include <QGridLayout>
-//#include <QCheckBox>
-//
-//#include <vtkPolyData.h>
-//
-//#include "sscUtilHelpers.h"
 #include "sscImageTF3D.h"
 #include "sscImageLUT2D.h"
 #include "sscTypeConversions.h"
 #include "sscImage.h"
-//#include "sscMesh.h"
 #include "sscDataManager.h"
-//#include "sscMessageManager.h"
-//#include "sscDoubleWidgets.h"
 #include "sscLabeledComboBoxWidget.h"
-//#include "cxDataInterface.h"
-//#include "cxVolumePropertiesWidget.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxFrameTreeWidget.h"
 #include "cxDataInterface.h"
-//#include "cxDataLocations.h"
 #include "cxSeansVesselRegistrationWidget.h"
 
 namespace cx
@@ -44,8 +27,8 @@ RegisterI2IWidget::RegisterI2IWidget(QWidget* parent) :
     BaseWidget(parent, "RegisterI2IWidget", "Register Image2Image"),
     mSeansVesselRegsitrationWidget(new SeansVesselRegistrationWidget(this))
 {
-  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
-  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
+//  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SLOT(fixedImageSlot(QString)));
+//  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SLOT(movingImageSlot(QString)));
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
   QGridLayout* layout = new QGridLayout();
@@ -66,15 +49,15 @@ QString RegisterI2IWidget::defaultWhatsThis() const
       "<p><i>Press the button to perform vessel based registration between image 1 and image 2s centerlines.</i></p>"
       "</html>";
 }
-
-void RegisterI2IWidget::fixedImageSlot(QString uid)
-{
-  mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
-}
-
-void RegisterI2IWidget::movingImageSlot(QString uid)
-{
-  mSeansVesselRegsitrationWidget->movingImageSlot(uid);
-}
+//
+//void RegisterI2IWidget::fixedImageSlot(QString uid)
+//{
+//  mSeansVesselRegsitrationWidget->fixedImageSlot(uid);
+//}
+//
+//void RegisterI2IWidget::movingImageSlot(QString uid)
+//{
+//  mSeansVesselRegsitrationWidget->movingImageSlot(uid);
+//}
 
 }

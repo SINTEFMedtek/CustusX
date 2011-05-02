@@ -51,6 +51,7 @@ QString CenterlineWidget::defaultWhatsThis() const
     "</html>";
 }
 
+
 void CenterlineWidget::setImageInputSlot(QString value)
 {
   mSelectedImage->setValue(value);
