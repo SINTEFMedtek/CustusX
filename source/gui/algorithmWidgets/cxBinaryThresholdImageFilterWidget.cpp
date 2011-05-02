@@ -35,7 +35,7 @@ BinaryThresholdImageFilterWidget::BinaryThresholdImageFilterWidget(QWidget* pare
   connect(mSelectedImage.get(), SIGNAL(imageChanged(QString)), this, SLOT(imageChangedSlot(QString)));
 
   ssc::LabeledComboBoxWidget* selectImageComboBox = new ssc::LabeledComboBoxWidget(this, mSelectedImage);
-  topLayout->addWidget(selectImageComboBox, 0, 0);
+  topLayout->addWidget(selectImageComboBox, 0, 0, 1, 2);
 
   QPushButton* segmentButton = new QPushButton("Segment", this);
   connect(segmentButton, SIGNAL(clicked()), this, SLOT(segmentSlot()));

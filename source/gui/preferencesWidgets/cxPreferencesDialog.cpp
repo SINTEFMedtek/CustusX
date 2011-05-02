@@ -15,6 +15,7 @@
 #include "cxFilePreviewWidget.h"
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
+#include "cxColorSelectButton.h"
 
 namespace cx
 {
@@ -218,6 +219,12 @@ void PerformanceTab::saveParametersSlot()
 //==============================================================================
 // View3DTab
 //------------------------------------------------------------------------------
+
+
+//------------------------------------------------------------------------------
+
+
+
 VisualizationTab::VisualizationTab(QWidget *parent) :
     PreferencesTab(parent)
 {}
@@ -227,8 +234,13 @@ void VisualizationTab::init()
   double sphereRadius = settings()->value("View3D/sphereRadius").toDouble();
   mSphereRadius = ssc::DoubleDataAdapterXml::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, ssc::DoubleRange(0.1,10,0.1), 1, QDomNode());
 
-  QPushButton* backgroundColorButton = new QPushButton("Background Color", this);
-  connect(backgroundColorButton, SIGNAL(clicked()), this, SLOT(setBackgroundColorSlot()));
+  ColorSelectButton* backgroundColorButton = new ColorSelectButton("Background Color");
+  backgroundColorButton->setColor(settings()->value("backgroundColor").value<QColor>());
+
+//  QPushButton* backgroundColorButton = new QPushButton("Background Color", this);
+//  connect(backgroundColorButton, SIGNAL(clicked()), this, SLOT(setBackgroundColorSlot()));
+  connect(backgroundColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setBackgroundColorSlot(QColor)));
+
 
   //Layout
   mMainLayout = new QGridLayout;
@@ -248,12 +260,17 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
 }
 
-void VisualizationTab::setBackgroundColorSlot()
+void VisualizationTab::setBackgroundColorSlot(QColor color)
 {
-  QColor orgval = settings()->value("backgroundColor").value<QColor>();
-  QColor result = QColorDialog::getColor( orgval, this);
-  settings()->setValue("backgroundColor", result);
+  settings()->setValue("backgroundColor", color);
 }
+
+//void VisualizationTab::setBackgroundColorSlot()
+//{
+//  QColor orgval = settings()->value("backgroundColor").value<QColor>();
+//  QColor result = QColorDialog::getColor( orgval, this);
+//  settings()->setValue("backgroundColor", result);
+//}
 
 //==============================================================================
 // AutomationTab
