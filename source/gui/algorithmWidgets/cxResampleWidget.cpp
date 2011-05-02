@@ -13,6 +13,8 @@
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxDataInterface.h"
+#include "sscDoubleDataAdapterXml.h"
+#include "sscDoubleWidgets.h"
 
 namespace cx
 {
@@ -35,6 +37,11 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
   QPushButton* resampleButton = new QPushButton("Resample", this);
   connect(resampleButton, SIGNAL(clicked()), this, SLOT(resampleSlot()));
 
+  mMargin = ssc::DoubleDataAdapterXml::initialize("Margin", "",
+                                                 "mm Margin added to ref image bounding box",
+                                                  5.0, ssc::DoubleRange(0, 50, 1), 1);
+//  margin->setInternal2Display(double factor);
+  ;
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   QGridLayout* topLayout = new QGridLayout();
   toptopLayout->addLayout(topLayout);
@@ -42,8 +49,9 @@ ResampleWidget::ResampleWidget(QWidget* parent) :
 
   topLayout->addWidget(selectImageComboBox, 0, 0);
   topLayout->addWidget(referenceImageComboBox, 1, 0);
-  topLayout->addWidget(mStatusLabel, 2, 0);
-  topLayout->addWidget(resampleButton, 3, 0);
+  topLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mMargin), 2, 0);
+  topLayout->addWidget(mStatusLabel, 3, 0);
+  topLayout->addWidget(resampleButton, 4, 0);
 }
 
 ResampleWidget::~ResampleWidget()
@@ -76,7 +84,7 @@ void ResampleWidget::hideEvent(QHideEvent* event)
 void ResampleWidget::resampleSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  double margin = 20; //mm
+  double margin = mMargin->getValue();
 
   mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);
   mStatusLabel->setText("<font color=orange> Generating resampling... Please wait!</font>\n");
