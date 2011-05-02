@@ -74,6 +74,7 @@ SET(cxProject_MOC_HDRS
     utilities/cxTransform3DWidget.h
     utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
+    utilities/cxColorSelectButton.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -223,6 +224,9 @@ SET(${LIBNAME}_SRCS
     utilities/snwSyntaxHighlighter.cpp
     utilities/cxSelectionGroupBox.h
     utilities/cxSelectionGroupBox.cpp
+    utilities/cxColorSelectButton.h
+    utilities/cxColorSelectButton.cpp
+    
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 
