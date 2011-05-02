@@ -2,6 +2,10 @@
 #define cxLayoutEditorTab_h__
 
 #include "cxPreferencesDialog.h"
+#include "cxLayoutEditorWidget.h"
+
+class QLabel;
+class QComboBox;
 
 namespace cx
 {
@@ -16,10 +20,27 @@ namespace cx
 class LayoutEditorTab : public PreferencesTab
 {
   Q_OBJECT
+
 public:
-  LayoutEditorTab();
+  LayoutEditorTab(QWidget* parent = 0);
   virtual ~LayoutEditorTab();
+  
+  virtual void init();
+
+public slots:
+  virtual void saveParametersSlot();
+
+private slots:
+  void layoutToEditChangedSlot(const QString& uid);
+
+private:
+  void populateEditableLayouts(QString selectedLayoutUid);
+
+  LayoutEditorWidget* mLayoutEditorWidget;
+  QLabel*             mLayoutLabel;
+  QComboBox*          mLayoutList;
 };
 
 }//namespace cx
 #endif // cxLayoutEditorTab_h__
+
