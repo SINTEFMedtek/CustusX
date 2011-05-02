@@ -15,7 +15,7 @@
 #include "sscForwardDeclarations.h"
 #include "cxBaseWidget.h"
 #include "cxResample.h"
-
+#include "sscDoubleDataAdapterXml.h"
 
 namespace cx
 {
@@ -48,7 +48,7 @@ private:
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
   SelectImageStringDataAdapterPtr mReferenceImage; ///< holds the currently reference, resample to this volume.
-
+  ssc::DoubleDataAdapterXmlPtr mMargin;
   Resample mResampleAlgorithm;
 
   QLabel* mStatusLabel;

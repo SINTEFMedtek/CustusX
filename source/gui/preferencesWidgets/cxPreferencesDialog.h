@@ -137,7 +137,8 @@ protected:
   ssc::DoubleDataAdapterXmlPtr mSphereRadius;
 
 private slots:
-  void setBackgroundColorSlot();
+  void setBackgroundColorSlot(QColor color);
+//  void setBackgroundColorSlot();
 };
 
 /**
