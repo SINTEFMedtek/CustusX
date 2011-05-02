@@ -64,6 +64,7 @@ SET(cxProject_MOC_HDRS
     registrationWidgets/cxPlateRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.h
     registrationWidgets/cxRegisterI2IWidget.h
+    registrationWidgets/cxRegistrationMethodsWidget.h
     #----------------------
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
@@ -74,6 +75,7 @@ SET(cxProject_MOC_HDRS
     utilities/cxTransform3DWidget.h
     utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
+    utilities/cxColorSelectButton.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -202,6 +204,8 @@ SET(${LIBNAME}_SRCS
     registrationWidgets/cxSeansVesselRegistrationWidget.cpp
     registrationWidgets/cxRegisterI2IWidget.h
     registrationWidgets/cxRegisterI2IWidget.cpp    
+    registrationWidgets/cxRegistrationMethodsWidget.h
+    registrationWidgets/cxRegistrationMethodsWidget.cpp
     #----------------------    
     streamingWidgets/cxIGTLinkWidget.h
     streamingWidgets/cxIGTLinkWidget.cpp
@@ -223,6 +227,9 @@ SET(${LIBNAME}_SRCS
     utilities/snwSyntaxHighlighter.cpp
     utilities/cxSelectionGroupBox.h
     utilities/cxSelectionGroupBox.cpp
+    utilities/cxColorSelectButton.h
+    utilities/cxColorSelectButton.cpp
+    
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 

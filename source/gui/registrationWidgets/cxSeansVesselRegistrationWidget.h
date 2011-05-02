@@ -2,6 +2,7 @@
 #define CXSEANSVESSELREGISTRATIONWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include "sscStringDataAdapter.h"
 
 class QSpinBox;
 class QPushButton;
@@ -28,8 +29,8 @@ public:
   virtual QString defaultWhatsThis() const;
 
 public slots:
-  void fixedImageSlot(QString uid);
-  void movingImageSlot(QString uid);
+//  void fixedImageSlot(QString uid);
+//  void movingImageSlot(QString uid);
 
 private slots:
   void registerSlot();
@@ -40,8 +41,11 @@ private:
   QSpinBox* mLTSRatioSpinBox;
   QCheckBox* mLinearCheckBox;
   QPushButton* mRegisterButton;
-  QLabel* mFixedImageLabel;
-  QLabel* mMovingImageLabel;
+//  QLabel* mFixedImageLabel;
+//  QLabel* mMovingImageLabel;
+
+  ssc::StringDataAdapterPtr mFixedImage;
+  ssc::StringDataAdapterPtr mMovingImage;
 };
 
 }//namespace cx
