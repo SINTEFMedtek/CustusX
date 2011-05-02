@@ -63,6 +63,7 @@ SET(cxProject_MOC_HDRS
     registrationWidgets/cxPlateRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.h
     registrationWidgets/cxRegisterI2IWidget.h
+    registrationWidgets/cxRegistrationMethodsWidget.h
     #----------------------
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
@@ -199,6 +200,8 @@ SET(${LIBNAME}_SRCS
     registrationWidgets/cxSeansVesselRegistrationWidget.cpp
     registrationWidgets/cxRegisterI2IWidget.h
     registrationWidgets/cxRegisterI2IWidget.cpp    
+    registrationWidgets/cxRegistrationMethodsWidget.h
+    registrationWidgets/cxRegistrationMethodsWidget.cpp
     #----------------------    
     streamingWidgets/cxIGTLinkWidget.h
     streamingWidgets/cxIGTLinkWidget.cpp
