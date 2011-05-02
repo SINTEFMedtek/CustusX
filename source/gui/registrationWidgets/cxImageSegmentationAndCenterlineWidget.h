@@ -26,9 +26,10 @@ class ImageSegmentationAndCenterlineWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle);
+//  ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle);
+  ImageSegmentationAndCenterlineWidget(QWidget* parent);
   virtual ~ImageSegmentationAndCenterlineWidget();
-  virtual QString defaultWhatsThis() const = 0;
+  virtual QString defaultWhatsThis() const;
 
 protected:
   QVBoxLayout* mLayout;
@@ -53,25 +54,25 @@ protected:
   SelectDataStringDataAdapterPtr mCenterlineOutput;
 };
 
-class FixedImage2ImageWidget : public ImageSegmentationAndCenterlineWidget
-{
-public:
-  FixedImage2ImageWidget(QWidget* parent);
-  virtual ~FixedImage2ImageWidget();
-  virtual QString defaultWhatsThis() const;
-
-private:
-};
-
-class MovingImage2ImageWidget : public ImageSegmentationAndCenterlineWidget
-{
-public:
-  MovingImage2ImageWidget(QWidget* parent);
-  virtual ~MovingImage2ImageWidget();
-  virtual QString defaultWhatsThis() const;
-
-private:
-};
+//class FixedImage2ImageWidget : public ImageSegmentationAndCenterlineWidget
+//{
+//public:
+//  FixedImage2ImageWidget(QWidget* parent);
+//  virtual ~FixedImage2ImageWidget();
+//  virtual QString defaultWhatsThis() const;
+//
+//private:
+//};
+//
+//class MovingImage2ImageWidget : public ImageSegmentationAndCenterlineWidget
+//{
+//public:
+//  MovingImage2ImageWidget(QWidget* parent);
+//  virtual ~MovingImage2ImageWidget();
+//  virtual QString defaultWhatsThis() const;
+//
+//private:
+//};
 
 }//namespace cx
 #endif /* CXIMAGESEGMENTATIONANDCENTERLINEWIDGET_H_ */
