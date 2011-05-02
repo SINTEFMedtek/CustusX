@@ -63,8 +63,8 @@ public: // optional methods
 
   //  virtual void connectValueSignals(bool on) = 0; ///< set object to emit changed() when applicable
 
-signals:
-  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+//signals:
+//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
 typedef boost::shared_ptr<StringDataAdapter> StringDataAdapterPtr;
 
