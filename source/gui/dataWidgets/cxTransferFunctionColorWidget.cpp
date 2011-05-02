@@ -15,6 +15,7 @@
 #include "sscImageTFData.h"
 #include "sscUtilHelpers.h"
 #include "sscImageLUT2D.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -118,6 +119,12 @@ void TransferFunctionColorWidget::calculateColorTFBoundaries(int &areaLeft, int 
 
   areaLeft  = mPlotArea.left()  + (min * mPlotArea.width() / mImage->getRange());
   areaRight = mPlotArea.left()  + (max * mPlotArea.width() / mImage->getRange());
+  if(mImage->getRange() == 0) // Fix division by zero problem
+  {
+    areaLeft = mPlotArea.left();
+    areaRight = mPlotArea.right();
+    //ssc::messageManager()->sendWarning("Volume only have one value");
+  }
   areaWidth = areaRight - areaLeft;
 }
 

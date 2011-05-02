@@ -28,7 +28,6 @@ public:
 
   void save(QString name, ssc::ImagePtr image);
   void load(QString name, ssc::ImagePtr image);
-  void fixTransferFunctions(ssc::ImageTFDataPtr trFunc, ssc::ImagePtr image); ///< Modify transfer function preset so it matches current image
 
   QStringList getPresetList(); ///< returns a list of the preset names
   //ssc::Image::ShadingStruct getShadingPresets(const QString& presetName);///< Returns a struct with specific shading presets
