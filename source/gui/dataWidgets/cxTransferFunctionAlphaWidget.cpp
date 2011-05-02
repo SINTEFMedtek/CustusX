@@ -167,7 +167,6 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   // Draw histogram
 	// with log compression
 
-  std::cout << "get histogram " << std::endl;
   vtkImageAccumulatePtr histogram = mImage->getHistogram();
 	int histogramSize = histogram->GetComponentExtent()[1] - 
                       histogram->GetComponentExtent()[0];
