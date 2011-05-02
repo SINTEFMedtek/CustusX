@@ -140,11 +140,14 @@ RegistrationMethodsWidget::RegistrationMethodsWidget(QWidget* parent, QString ob
 
   //vessel based image to image
   Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(this, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
-  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
+//  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
+//  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
 
-  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
-  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed"); //should be application specific
+  ImageSegmentationAndCenterlineWidget* prepareRegistrationWidget = new ImageSegmentationAndCenterlineWidget(image2imageWidget);
+
+
+//  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
+  image2imageWidget->addTab(prepareRegistrationWidget, "Prepare"); //should be application specific
   image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
 
   //manual offset
