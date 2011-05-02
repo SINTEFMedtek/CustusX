@@ -6,8 +6,9 @@
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
 #include "cxBaseWidget.h"
-#include "cxCenterline.h"
-#include "cxResample.h"
+//#include "cxCenterline.h"
+//#include "cxResample.h"
+#include "cxContour.h"
 #include "cxBinaryThresholdImageFilter.h"
 
 namespace cx
@@ -31,6 +32,7 @@ public:
   BinaryThresholdImageFilterWidget(QWidget* parent);
   virtual ~BinaryThresholdImageFilterWidget();
   virtual QString defaultWhatsThis() const;
+  void setDefaultColor(QColor color);
 
 signals:
   void inputImageChanged(QString uid);
@@ -52,10 +54,13 @@ private slots:
   void imageChangedSlot(QString uid);
   void revertTransferFunctions();
   void handleFinishedSlot();
+  void handleContourFinishedSlot();
 
 private:
   BinaryThresholdImageFilterWidget();
   QWidget* createSegmentationOptionsWidget();
+
+  void generateSurface();
 
   SelectImageStringDataAdapterPtr mSelectedImage; ///< holds the currently selected image (use setValue/getValue)
 
@@ -66,6 +71,7 @@ private:
   ssc::DoubleDataAdapterXmlPtr mSmoothingSigmaAdapter;
   ssc::SpinBoxAndSliderGroupWidgetPtr mSmoothingSigmaWidget;
   QLabel* mSmoothingSigmaLabel;
+  QColor mDefaultColor;
   QLabel* mStatusLabel;
 
   ssc::ImagePtr mModifiedImage; ///< image that have its TF changed temporarily
@@ -75,6 +81,7 @@ private:
   QTimer *mRemoveTimer;///< Timer for removing segmentation preview coloring if widget is not visible
 
   BinaryThresholdImageFilter mSegmentationAlgorithm;
+  Contour mContourAlgorithm;
 };
 
 }//namespace cx
