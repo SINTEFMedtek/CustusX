@@ -6,6 +6,7 @@
 
 class QLabel;
 class QComboBox;
+class QPushButton;
 
 namespace cx
 {
@@ -32,13 +33,17 @@ public slots:
 
 private slots:
   void layoutToEditChangedSlot(const QString& uid);
+  void deleteCustomLayoutSlot();
 
 private:
   void populateEditableLayouts(QString selectedLayoutUid);
 
+  void addCustomLayoutToDisplayList( QString displayName, QString uid );
+
   LayoutEditorWidget* mLayoutEditorWidget;
   QLabel*             mLayoutLabel;
   QComboBox*          mLayoutList;
+  QPushButton*        mDeleteButton;
 };
 
 }//namespace cx

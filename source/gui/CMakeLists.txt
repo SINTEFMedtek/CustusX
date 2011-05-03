@@ -64,7 +64,7 @@ SET(cxProject_MOC_HDRS
     registrationWidgets/cxPlateRegistrationWidget.h
     registrationWidgets/cxSeansVesselRegistrationWidget.h
     registrationWidgets/cxRegisterI2IWidget.h
-    registrationWidgets/cxRegistrationMethodsWidget.h
+    #registrationWidgets/cxRegistrationMethodsWidget.h
     #----------------------
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
