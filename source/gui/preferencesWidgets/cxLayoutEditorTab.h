@@ -34,16 +34,18 @@ public slots:
 private slots:
   void layoutToEditChangedSlot(const QString& uid);
   void deleteCustomLayoutSlot();
+  void saveLayoutSlot();
 
 private:
   void populateEditableLayouts(QString selectedLayoutUid);
-
   void addCustomLayoutToDisplayList( QString displayName, QString uid );
+  void setToActiveLayout();
 
   LayoutEditorWidget* mLayoutEditorWidget;
   QLabel*             mLayoutLabel;
   QComboBox*          mLayoutList;
   QPushButton*        mDeleteButton;
+  QPushButton*        mSaveLayoutButton;
 };
 
 }//namespace cx
