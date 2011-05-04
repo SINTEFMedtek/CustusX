@@ -34,29 +34,6 @@ private:
 };
 //------------------------------------------------------------------------------
 
-class SegmentationMethodsWidget : public TabbedWidget
-{
-public:
-  SegmentationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~SegmentationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
-class VisualizationMethodsWidget : public TabbedWidget
-{
-public:
-  VisualizationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~VisualizationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
-class CalibrationMethodsWidget : public TabbedWidget
-{
-public:
-  CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
-  virtual ~CalibrationMethodsWidget(){};
-  virtual QString defaultWhatsThis() const;
-};
-//------------------------------------------------------------------------------
+
 }
 #endif /* CXTABBEDWIDGET_H_ */

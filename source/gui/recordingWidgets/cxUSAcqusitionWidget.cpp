@@ -10,8 +10,9 @@
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
-#include "cxToolPropertiesWidget.h"
+//#include "cxToolPropertiesWidget.h"
 #include "sscTypeConversions.h"
+#include "cxToolDataAdapters.h"
 
 namespace cx
 {

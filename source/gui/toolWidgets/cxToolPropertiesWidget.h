@@ -21,66 +21,7 @@ class UsConfigGui;
 
 namespace cx
 {
-typedef boost::shared_ptr<class Tool> ToolPtr;
 
-/** Adapter that connects to the current active tool.
- */
-class ActiveToolStringDataAdapter : public ssc::StringDataAdapter
-{
-  Q_OBJECT
-public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolStringDataAdapter()); }
-  ActiveToolStringDataAdapter();
-  virtual ~ActiveToolStringDataAdapter() {}
-  
-public: // basic methods
-  virtual QString getValueName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-  
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-};
-/** Widget that contains a select active tool combo box.
- */
-class ActiveToolWidget : public QWidget
-{
-  Q_OBJECT
-public:
-  ActiveToolWidget(QWidget* parent);
-  virtual ~ActiveToolWidget() {}
-};
-
-/** Adapter that connects to the current active tool.
- */
-class ActiveToolConfigurationStringDataAdapter : public ssc::StringDataAdapter
-{
-  Q_OBJECT
-public:
-  static ssc::StringDataAdapterPtr New() { return ssc::StringDataAdapterPtr(new ActiveToolConfigurationStringDataAdapter()); }
-  ActiveToolConfigurationStringDataAdapter();
-  virtual ~ActiveToolConfigurationStringDataAdapter() {}
-
-public: // basic methods
-  virtual QString getValueName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-  
-public: // optional methods
-  virtual QString getHelp() const;
-  virtual QStringList getValueRange() const;
-  virtual QString convertInternal2Display(QString internal);
-
-private slots:
-  void dominantToolChanged();
-private:
-  ToolPtr mTool;
-};
-
-
-  
 /**
  * \class ToolPropertiesWidget
  *
