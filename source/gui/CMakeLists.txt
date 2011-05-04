@@ -20,6 +20,7 @@ SET(cxProject_MOC_HDRS
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxShadingParamsInterfaces.h
+    dataAdapters/cxToolDataAdapters.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxShadingWidget.h
@@ -69,6 +70,7 @@ SET(cxProject_MOC_HDRS
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
     toolWidgets/cxToolPropertiesWidget.h
+    toolWidgets/cxActiveToolWidget.h
     #----------------------
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
@@ -112,12 +114,13 @@ SET(${LIBNAME}_SRCS
     algorithmWidgets/cxCenterlineWidget.h
     algorithmWidgets/cxResampleWidget.cpp
     algorithmWidgets/cxResampleWidget.h
-    
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxDataInterface.cpp
     dataAdapters/cxShadingParamsInterfaces.h
     dataAdapters/cxShadingParamsInterfaces.cpp
+    dataAdapters/cxToolDataAdapters.h
+    dataAdapters/cxToolDataAdapters.cpp
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp
@@ -212,6 +215,8 @@ SET(${LIBNAME}_SRCS
     #----------------------    
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxToolPropertiesWidget.cpp
+    toolWidgets/cxActiveToolWidget.h
+    toolWidgets/cxActiveToolWidget.cpp
     #----------------------    
     utilities/cxDoubleSpanSlider.h
     utilities/cxDoubleSpanSlider.cpp
