@@ -41,6 +41,7 @@
 #include "cxAudio.h"
 #include "cxSettings.h"
 #include "RTSource/cxRTSourceManager.h"
+#include "cxRegistrationMethodsWidget.h"
 
 namespace cx
 {

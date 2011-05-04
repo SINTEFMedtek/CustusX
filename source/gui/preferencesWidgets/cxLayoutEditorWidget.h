@@ -64,12 +64,6 @@ private slots:
   void nameChanged();
 
 private:
-  QBoxLayout* mTopLayout;
-  QBoxLayout* mRCLayout;
-  QGridLayout* mLayout;
-  QSpinBox* mRowsEdit;
-  QSpinBox* mColsEdit;
-  QLineEdit* mNameEdit;
   void initCache();
   void clearDisplay();
   void updateGrid();
@@ -77,6 +71,13 @@ private:
   void colorRegion(LayoutRegion region, QString selectColor, QString backColor);
   std::set<LayoutData::iterator> getSelectedViews();
   void updateSelection(QPoint pos);
+
+  QBoxLayout* mTopLayout;
+  QBoxLayout* mRCLayout;
+  QGridLayout* mLayout;
+  QSpinBox* mRowsEdit;
+  QSpinBox* mColsEdit;
+  QLineEdit* mNameEdit;
 
   std::vector<std::vector<GridElement> > mViewDataCache; ///< 10x10 grid of all available views
   LayoutData mViewData; ///< RxC grid of currently used views.
