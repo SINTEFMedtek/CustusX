@@ -23,6 +23,15 @@
 
 using namespace ssc;
 
+void TestTransform3D::testDefaultTransform()
+{
+  Transform3D M;
+  Vector3D v(0,0,0);
+  Vector3D w(1,1,1);
+
+  CPPUNIT_ASSERT( similar(M.coord(v), v) );
+  CPPUNIT_ASSERT( similar(M.coord(w), w) );
+}
 
 void TestTransform3D::testElementAccess()
 {

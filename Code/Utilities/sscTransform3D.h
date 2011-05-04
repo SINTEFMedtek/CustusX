@@ -6,11 +6,14 @@
 #include <QString>
 #include "vtkForwardDeclarations.h"
 #include "sscVector3D.h"
+#include "vtkMatrix4x4.h"
+#include <vector>
+#include "sscTypeConversions.h"
 
-namespace Eigen
-{
-  std::ostream& operator<<(std::ostream& s, const Affine3d& t);
-}
+//namespace Eigen
+//{
+//  std::ostream& operator<<(std::ostream& s, const Affine3d& t);
+//}
 
 namespace Eigen
 {
@@ -65,6 +68,12 @@ Transform< _Scalar, _Dim, _Mode, _Options >::Transform(vtkMatrix4x4* m)
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
+Transform< _Scalar, _Dim, _Mode, _Options >::Transform(double* raw)
+{
+  std::copy(raw, raw+16, this->data());
+}
+
+template<typename _Scalar, int _Dim, int _Mode, int _Options>
 vtkMatrix4x4Ptr Transform< _Scalar, _Dim, _Mode, _Options >::getVtkMatrix() const
 {
   vtkMatrix4x4Ptr m = vtkMatrix4x4Ptr::New();
@@ -74,6 +83,32 @@ vtkMatrix4x4Ptr Transform< _Scalar, _Dim, _Mode, _Options >::getVtkMatrix() cons
       m->SetElement(r,c, (*this)(r,c));;
 
   return m;
+}
+
+template<typename _Scalar, int _Dim, int _Mode, int _Options>
+std::ostream& Transform< _Scalar, _Dim, _Mode, _Options >::put(std::ostream& s, int indent, char newline) const
+{
+    QString ind(indent, ' ');
+
+    std::ostringstream ss; // avoid changing state of input stream
+    ss << setprecision(3) << std::fixed;
+
+    for (unsigned i=0; i<4; ++i)
+    {
+      ss << ind;
+      for (unsigned j=0; j<4; ++j)
+      {
+        ss << setw(10) << (*this)(i,j) << " ";
+      }
+      if (i!=3)
+      {
+        ss << newline;
+      }
+    }
+
+    s << ss.str();
+
+    return s;
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
@@ -88,9 +123,21 @@ Transform< _Scalar, _Dim, _Mode, _Options > Transform< _Scalar, _Dim, _Mode, _Op
   if (raw.size()!=16)
     *ok = false;
   if (!ok)
-    return Transform3D();
-  return Transform3D((double*)&(*raw.begin()));
+    return Transform< _Scalar, _Dim, _Mode, _Options >();
+  Transform< _Scalar, _Dim, _Mode, _Options > retval;
+  double* test = retval.data();
+  std::copy(raw.begin(), raw.end(), retval.data());
+//  return Transform< _Scalar, _Dim, _Mode, _Options >((double*)&(*raw.begin()));
+  return retval;
 }
+
+template<typename _Scalar, int _Dim, int _Mode, int _Options>
+Transform< _Scalar, _Dim, _Mode, _Options > Transform< _Scalar, _Dim, _Mode, _Options >::fromVtkMatrix(vtkMatrix4x4Ptr m)
+{
+  return Transform< _Scalar, _Dim, _Mode, _Options >(m.GetPointer());
+}
+
+
 //std::ostream& put(std::ostream& s, int indent=0, char newline='\n') const;
 //static Transform fromString(const QString& text, bool* ok=0); ///< construct a transform matrix from a string containing 16 whitespace-separated numbers, vtk ordering
 

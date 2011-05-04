@@ -8,6 +8,12 @@
 #include "sscBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
 
+namespace Eigen
+{
+
+//template class ThreadedTimedAlgorithm<vtkImageDataPtr>;
+
+}
 
 
 // --------------------------------------------------------
