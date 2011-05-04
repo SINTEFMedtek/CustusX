@@ -845,7 +845,7 @@ void ViewManager::setLayoutActionSlot()
 bool ViewManager::isCustomLayout(const QString& uid) const
 {
   bool isLayout = false;
-  for (int i=0; i<mLayouts.size();++i)
+  for (unsigned i=0; i<mLayouts.size();++i)
   {
     if(uid == mLayouts[i].getUid())
     {
