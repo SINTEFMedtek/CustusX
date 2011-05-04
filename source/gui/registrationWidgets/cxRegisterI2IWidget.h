@@ -39,9 +39,9 @@ public:
   ~RegisterI2IWidget();
   virtual QString defaultWhatsThis() const;
 
-public slots:
-  void fixedImageSlot(QString uid);
-  void movingImageSlot(QString uid);
+//public slots:
+//  void fixedImageSlot(QString uid);
+//  void movingImageSlot(QString uid);
 
 private:
   RegisterI2IWidget();
