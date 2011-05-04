@@ -195,7 +195,7 @@ void ImageTFData::parseXml(QDomNode dataNode)
 //  std::cout << "void ImageTF3D::parseXml(QDomNode dataNode)" << std::endl;
 }
 
-void ImageTFData::fixTransferFunctions(/*ssc::ImageTFDataPtr trFunc, ssc::ImagePtr image*/)
+void ImageTFData::fixTransferFunctions()
 {
   //Make sure min and max values for transferfunctions are set
 
@@ -492,10 +492,11 @@ void ImageTFData::buildLUTFromColorMap()
   int N = 0;
   if (!mColorMapPtr->empty())
     N = mColorMapPtr->rbegin()->first - mColorMapPtr->begin()->first; // largest key value in color map
+  N += 1;//Because in the range 0 - 255 we have 256 values
   mLut = vtkLookupTablePtr::New(); // must reset in order to get the gpu buffering to reload
   mLut->Build();
   mLut->SetNumberOfTableValues(N);
-  mLut->SetTableRange(0,N);
+  mLut->SetTableRange(0,N-1);
 
   vtkColorTransferFunctionPtr colorFunc = vtkColorTransferFunctionPtr::New();
   this->fillColorTFFromMap(colorFunc);
