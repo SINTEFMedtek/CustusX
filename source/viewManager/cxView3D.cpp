@@ -6,6 +6,7 @@
 #include <QContextMenuEvent>
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
+#include "vtkRenderWindow.h"
 #include "sscImage.h"
 #include "sscVolumetricRep.h"
 #include "sscMessageManager.h"
@@ -29,6 +30,10 @@ View3D::View3D(const QString& uid, const QString& name, QWidget *parent, Qt::WFl
   mName = name;
   this->setContextMenuPolicy(Qt::CustomContextMenu);
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
+
+  mRenderWindow->StereoCapableWindowOn();
+  mRenderWindow->SetStereoTypeToCrystalEyes();
+  //mRenderWindow->SetStereoTypeToInterlaced();
 }
 
 View3D::~View3D()
