@@ -7,12 +7,15 @@
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "sscTypeConversions.h"
+#include "cxColorSelectButton.h"
+#include "sscDataManager.h"
+#include "sscMesh.h"
 
 namespace cx
 {
 //------------------------------------------------------------------------------
-ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidget* parent, QString objectName, QString windowTitle) :
-    BaseWidget(parent, objectName, objectName)
+ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidget* parent) :
+    BaseWidget(parent, "ImageSegmentationAndCenterlineWidget", "ImageSegmentationAndCenterlineWidget")
 {
   mLayout = new QVBoxLayout(this);
   mResampleWidget =  new ResampleWidget(this);
@@ -38,6 +41,22 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
   mCenterlineOutput->setValueName("Output: ");
   connect(mCenterlineOutput.get(), SIGNAL(dataChanged(QString)), this, SLOT(setImageSlot(QString)));
 
+  this->setColorSlot(QColor("green"));
+
+  ColorSelectButton* colorButton = new ColorSelectButton("Color");
+  colorButton->setColor(QColor("green"));
+  connect(colorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setColorSlot(QColor)));
+  QPushButton* fixedButton = new QPushButton("Set as Fixed");
+  connect(fixedButton, SIGNAL(clicked()), this, SLOT(toFixedSlot()));
+  QPushButton* movingButton = new QPushButton("Set as Moving");
+  connect(movingButton, SIGNAL(clicked()), this, SLOT(toMovingSlot()));
+
+  QLayout* buttonsLayout = new QHBoxLayout;
+  buttonsLayout->addWidget(colorButton);
+  buttonsLayout->addWidget(fixedButton);
+  buttonsLayout->addWidget(movingButton);
+
+
   mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mResampleWidget, new ssc::LabeledComboBoxWidget(this, mResampleOutput), "Resample"));
   mLayout->addWidget(this->createHorizontalLine());
@@ -47,24 +66,61 @@ ImageSegmentationAndCenterlineWidget::ImageSegmentationAndCenterlineWidget(QWidg
 //  mLayout->addWidget(this->createHorizontalLine());
   mLayout->addWidget(this->createMethodWidget(mCenterlineWidget, new ssc::LabeledComboBoxWidget(this, mCenterlineOutput), "Centerline"));
   mLayout->addWidget(this->createHorizontalLine());
+  mLayout->addLayout(buttonsLayout);
+  mLayout->addStretch();
 
   connect(mResampleWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(resampleOutputArrived(QString)));
   connect(mSegmentationWidget, SIGNAL(outputImageChanged(QString)), this , SLOT(segmentationOutputArrived(QString)));
 //  connect(mSurfaceWidget, SIGNAL(outputMeshChanged(QString)), this, SLOT(surfaceOutputArrived(QString)));
   connect(mCenterlineWidget, SIGNAL(outputImageChanged(QString)), this, SLOT(centerlineOutputArrived(QString)));
+
+}
+
+void ImageSegmentationAndCenterlineWidget::setColorSlot(QColor color)
+{
+  mCenterlineWidget->setDefaultColor(color);
+  mSegmentationWidget->setDefaultColor(color);
+
+  ssc::MeshPtr mesh;
+
+  mesh = ssc::dataManager()->getMesh(mCenterlineOutput->getValue());
+  if (mesh)
+    mesh->setColor(color);
+  mesh = ssc::dataManager()->getMesh(mSegmentationOutput->getValue());
+  if (mesh)
+    mesh->setColor(color);
+}
+
+void ImageSegmentationAndCenterlineWidget::toMovingSlot()
+{
+  ssc::DataPtr data = ssc::dataManager()->getData(mCenterlineOutput->getValue());
+  if (data)
+    registrationManager()->setMovingData(data);
+}
+
+void ImageSegmentationAndCenterlineWidget::toFixedSlot()
+{
+  ssc::DataPtr data = ssc::dataManager()->getData(mCenterlineOutput->getValue());
+  if (data)
+    registrationManager()->setFixedData(data);
 }
 
 ImageSegmentationAndCenterlineWidget::~ImageSegmentationAndCenterlineWidget()
 {}
 
+QString ImageSegmentationAndCenterlineWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Segmentation and centerline extraction for the i2i registration.</h3>"
+      "<p><i>Segment out blood vessels from the selected image, then extract the centerline."
+      "When finished, set the result as moving or fixed data in the registration tab.</i></p>"
+      "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
+      "</html>";
+}
+
+
 void ImageSegmentationAndCenterlineWidget::setImageSlot(QString uid)
 {
-  if(!mOutput)
-    return;
-  std::cout << "ImageSegmentationAndCenterlineWidget::setImageSlot " << uid << std::endl;
-
-//  mCenterlineWidget->visualizeSlot(uid);
-  mOutput->setValue(uid);
 }
 
 void ImageSegmentationAndCenterlineWidget::resampleOutputArrived(QString uid)
@@ -77,65 +133,13 @@ void ImageSegmentationAndCenterlineWidget::segmentationOutputArrived(QString uid
   mSegmentationOutput->setValue(uid);
 }
 
-//void ImageSegmentationAndCenterlineWidget::surfaceOutputArrived(QString uid)
-//{
-//  mSurfaceOutput->setValue(uid);
-//}
+
 
 void ImageSegmentationAndCenterlineWidget::centerlineOutputArrived(QString uid)
 {
   mCenterlineOutput->setValue(uid);
 }
 
-//------------------------------------------------------------------------------
-
-FixedImage2ImageWidget::FixedImage2ImageWidget(QWidget* parent) :
-    ImageSegmentationAndCenterlineWidget(parent, "FixedImage2ImageWidget", "Fixed Image2Image")
-{
-  mOutput = RegistrationFixedImageStringDataAdapter::New();
-  mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
-  mLayout->addStretch();
-
-  mCenterlineWidget->setDefaultColor(QColor("green"));
-  mSegmentationWidget->setDefaultColor(QColor("green"));
-};
-
-FixedImage2ImageWidget::~FixedImage2ImageWidget()
-{}
-
-QString FixedImage2ImageWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Segmentation and centerline extraction for the fixed image.</h3>"
-      "<p><i>Segment out blood vessels from the selected image, then extract the centerline.</i></p>"
-      "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
-      "</html>";
-}
-
-//------------------------------------------------------------------------------
-
-MovingImage2ImageWidget::MovingImage2ImageWidget(QWidget* parent) :
-    ImageSegmentationAndCenterlineWidget(parent, "MovingImage2ImageWidget", "Moving Image2Image")
-{
-  mOutput = RegistrationMovingImageStringDataAdapter::New();
-  mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, mOutput));
-  mLayout->addStretch();
-
-  mCenterlineWidget->setDefaultColor(QColor("blue"));
-  mSegmentationWidget->setDefaultColor(QColor("blue"));
-};
-
-MovingImage2ImageWidget::~MovingImage2ImageWidget()
-{}
-
-QString MovingImage2ImageWidget::defaultWhatsThis() const
-{
-  return "<html>"
-      "<h3>Segmentation and centerline extraction for the moving image.</h3>"
-      "<p><i>Segment out blood vessels from the selected image, then extract the centerline.</i></p>"
-      "<p><b>Tip:</b> The centerline extraction can take a <b>long</b> time.</p>"
-      "</html>";
-}
 
 //------------------------------------------------------------------------------
 }//namespace cx
