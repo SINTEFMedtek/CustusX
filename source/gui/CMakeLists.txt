@@ -17,9 +17,16 @@ SET(cxProject_MOC_HDRS
     algorithmWidgets/cxSurfaceWidget.h
     algorithmWidgets/cxCenterlineWidget.h
     algorithmWidgets/cxResampleWidget.h
+    algorithmWidgets/cxToolTipSampleWidget.h
+    algorithmWidgets/cxToolManualCalibrationWidget.h
+    algorithmWidgets/cxTemporalCalibrationWidget.h
+#    algorithmWidgets/cxCalibrationMethodsWidget.h
+#    algorithmWidgets/cxVisualizationMethodsWidget.h
+#    algorithmWidgets/cxSegmentationMethodsWidget.h
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxShadingParamsInterfaces.h
+    dataAdapters/cxToolDataAdapters.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxShadingWidget.h
@@ -69,6 +76,7 @@ SET(cxProject_MOC_HDRS
     streamingWidgets/cxIGTLinkWidget.h
     #----------------------
     toolWidgets/cxToolPropertiesWidget.h
+    toolWidgets/cxActiveToolWidget.h
     #----------------------
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
@@ -112,12 +120,25 @@ SET(${LIBNAME}_SRCS
     algorithmWidgets/cxCenterlineWidget.h
     algorithmWidgets/cxResampleWidget.cpp
     algorithmWidgets/cxResampleWidget.h
-    
+    algorithmWidgets/cxToolTipSampleWidget.h
+    algorithmWidgets/cxToolTipSampleWidget.cpp
+    algorithmWidgets/cxToolManualCalibrationWidget.h
+    algorithmWidgets/cxToolManualCalibrationWidget.cpp
+    algorithmWidgets/cxTemporalCalibrationWidget.h
+    algorithmWidgets/cxTemporalCalibrationWidget.cpp
+    algorithmWidgets/cxCalibrationMethodsWidget.h
+    algorithmWidgets/cxCalibrationMethodsWidget.cpp
+    algorithmWidgets/cxVisualizationMethodsWidget.h
+    algorithmWidgets/cxVisualizationMethodsWidget.cpp
+    algorithmWidgets/cxSegmentationMethodsWidget.h
+    algorithmWidgets/cxSegmentationMethodsWidget.cpp
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxDataInterface.cpp
     dataAdapters/cxShadingParamsInterfaces.h
     dataAdapters/cxShadingParamsInterfaces.cpp
+    dataAdapters/cxToolDataAdapters.h
+    dataAdapters/cxToolDataAdapters.cpp
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp
@@ -212,6 +233,8 @@ SET(${LIBNAME}_SRCS
     #----------------------    
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxToolPropertiesWidget.cpp
+    toolWidgets/cxActiveToolWidget.h
+    toolWidgets/cxActiveToolWidget.cpp
     #----------------------    
     utilities/cxDoubleSpanSlider.h
     utilities/cxDoubleSpanSlider.cpp
