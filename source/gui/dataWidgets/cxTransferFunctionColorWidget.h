@@ -61,7 +61,6 @@ protected:
     }
   }; ///< Internal placeholder for a color point
   
-  QMenu* mRightClickMenu;///< Context menu for right clicking
   QAction* mCustomColorAction;///< Action for choosing custom color
   QAction* mRemoveColorAction;///< Action for removing a color
       
