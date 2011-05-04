@@ -56,7 +56,7 @@ void LayoutEditorTab::populateEditableLayouts(QString selectedLayoutUid)
   this->addCustomLayoutToDisplayList(newName, newUid);
 
   std::vector<QString> layoutUids = viewManager()->getAvailableLayouts();
-  for(int i=0; i<layoutUids.size();++i)
+  for(unsigned i=0; i<layoutUids.size();++i)
   {
     QString uid = layoutUids[i];
     if(viewManager()->isCustomLayout(uid))
