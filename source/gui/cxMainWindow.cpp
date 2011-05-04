@@ -42,6 +42,9 @@
 #include "cxSettings.h"
 #include "RTSource/cxRTSourceManager.h"
 #include "cxRegistrationMethodsWidget.h"
+#include "cxVisualizationMethodsWidget.h"
+#include "cxSegmentationMethodsWidget.h"
+#include "cxCalibrationMethodsWidget.h"
 
 namespace cx
 {
