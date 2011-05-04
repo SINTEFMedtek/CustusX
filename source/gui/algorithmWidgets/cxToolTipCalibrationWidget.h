@@ -12,27 +12,27 @@ class QLineEdit;
 
 namespace cx
 {
-/**
- * \class ToolTipCalibrationWidget
- *
- * \brief
- *
- * \date 3. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
- */
-class ToolTipCalibrationWidget : public BaseWidget
-{
-  Q_OBJECT
-
-public:
-  ToolTipCalibrationWidget(QWidget* parent);
-  ~ToolTipCalibrationWidget();
-  virtual QString defaultWhatsThis() const;
-
-private:
-  class ToolTipCalibrateWidget* mCalibrationWidget;
-  class ToolTipSampleWidget*      mSampleWidget;
-};
+///**
+// * \class ToolTipCalibrationWidget
+// *
+// * \brief
+// *
+// * \date 3. nov. 2010
+// * \author: Janne Beate Bakeng, SINTEF
+// */
+//class ToolTipCalibrationWidget : public BaseWidget
+//{
+//  Q_OBJECT
+//
+//public:
+//  ToolTipCalibrationWidget(QWidget* parent);
+//  ~ToolTipCalibrationWidget();
+//  virtual QString defaultWhatsThis() const;
+//
+//private:
+//  class ToolTipCalibrateWidget* mCalibrationWidget;
+//  class ToolTipSampleWidget*      mSampleWidget;
+//};
 
 /**
  * Class that handles the tooltip calibration.
@@ -63,37 +63,6 @@ private:
   ssc::LabeledComboBoxWidget* mToolComboBox;
 };
 
-/**
- * Class that handles the tooltip calibration.
- */
-class ToolTipSampleWidget : public BaseWidget
-{
-  Q_OBJECT
-
-public:
-  ToolTipSampleWidget(QWidget* parent);
-  ~ToolTipSampleWidget();
-  virtual QString defaultWhatsThis() const;
-
-private slots:
-  void saveFileSlot();
-  void sampleSlot();
-  void coordinateSystemChanged();
-
-private:
-  ssc::CoordinateSystem getSelectedCoordinateSystem();
-
-  QPushButton* mSampleButton;
-  QLabel*      mSaveToFileNameLabel;
-  QPushButton* mSaveFileButton;
-  SelectCoordinateSystemStringDataAdapterPtr mCoordinateSystems;
-  SelectToolStringDataAdapterPtr mTools;
-  SelectDataStringDataAdapterPtr mData;
-  ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
-  ssc::LabeledComboBoxWidget* mToolComboBox;
-  ssc::LabeledComboBoxWidget* mDataComboBox;
-  bool mTruncateFile;
-};
 
 /**
  * Class that calibrates the tool using a reference point in ref.
