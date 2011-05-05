@@ -26,7 +26,7 @@ namespace cx
 
 //----------------------------------------------------------------------------------------------------------------------
 RecordBaseWidget::RecordBaseWidget(QWidget* parent, QString description):
-    QWidget(parent),
+    BaseWidget(parent, "RecordBaseWidget", "Record Base"),
     mLayout(new QVBoxLayout(this)),
     mRecordSessionWidget(new RecordSessionWidget(this, description)),
     mInfoLabel(new QLabel("Will never be ready... Derive from this class!"))
