@@ -20,6 +20,7 @@ class TrackedCenterlineWidget : public TrackedRecordWidget
 public:
   TrackedCenterlineWidget(QWidget* parent);
   virtual ~TrackedCenterlineWidget();
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void checkIfReadySlot();

@@ -2,6 +2,7 @@
 #define CXRECORDBASEWIDGET_H_
 
 #include <QWidget>
+#include "cxBaseWidget.h"
 #include "sscTool.h"
 #include "cxDataInterface.h"
 #include "sscRTSourceRecorder.h"
@@ -27,7 +28,7 @@ class RecordSessionWidget;
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class RecordBaseWidget : public QWidget
+class RecordBaseWidget : public BaseWidget
 {
   Q_OBJECT
 
