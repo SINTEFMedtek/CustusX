@@ -57,6 +57,9 @@ void PresetTransferFunctions3D::save(QString name, ssc::ImagePtr image)
 
 void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 {
+  //Make sure transfer functions are reset in case something is missing from the preset
+  image->resetTransferFunctions();
+
   ssc::ImageTF3DPtr transferFunctions = image->getTransferFunctions3D();
   ssc::ImageLUT2DPtr LUT2D = image->getLookupTable2D();
 	ssc::XmlOptionFile node = this->getPresetNode(name);
@@ -68,6 +71,7 @@ void PresetTransferFunctions3D::load(QString name, ssc::ImagePtr image)
 	shading.parseXml(node.getElement().namedItem("shading"));
 	image->setShading(shading);
 
+	//Make sure the preset transfer functions work correctly
 	transferFunctions->fixTransferFunctions();
 	LUT2D->fixTransferFunctions();
 }
