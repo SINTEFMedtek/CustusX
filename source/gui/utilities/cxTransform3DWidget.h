@@ -36,6 +36,7 @@ public:
 
   void setMatrix(const ssc::Transform3D& M);
   ssc::Transform3D getMatrix() const;
+  void setEditable(bool edit);
 
 signals:
   void changed();
@@ -53,7 +54,6 @@ private:
   void addTranslationControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void rotateSlot(QPointF delta, int index);
   void translateSlot(QPointF delta, int index);
-  void setEditable(bool edit);
 
   MatrixTextEdit* mTextEdit;
   boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mAngleAdapter;

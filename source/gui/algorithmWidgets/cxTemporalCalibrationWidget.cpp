@@ -1,4 +1,12 @@
-#include "cxUSAcqusitionWidget.h"
+/*
+ * cxTemporalCalibrationWidget.cpp
+ *
+ *  Created on: May 4, 2011
+ *      Author: christiana
+ */
+
+#include <cxTemporalCalibrationWidget.h>
+
 
 #include <QtGui>
 #include <QVBoxLayout>
@@ -9,20 +17,23 @@
 #include "sscTypeConversions.h"
 #include "cxPatientData.h"
 #include "cxStateMachineManager.h"
-#include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
 #include "cxDoubleDataAdapterTemporalCalibration.h"
 
+#include "vtkImageCorrelation.h"
+typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
+
 namespace cx
 {
 
-USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, settings()->value("Ultrasound/acquisitionName").toString())
+
+TemporalCalibrationWidget::TemporalCalibrationWidget(QWidget* parent) :
+    TrackedRecordWidget(parent, "temporal_cal")
 {
-  this->setObjectName("USAcqusitionWidget");
-  this->setWindowTitle("US Acquisition");
+  this->setObjectName("TemporalCalibrationWidget");
+  this->setWindowTitle("Temporal Calibration");
 
   mRecordSessionWidget->setDescriptionVisibility(false);
 
@@ -34,33 +45,25 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
   connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
 
-  //for testing sound speed converting - BEGIN
-  SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), soundSpeedWidget, SLOT(setToolSlot(const QString&)));
-  //for testing sound speed converting - END
-
   RecordBaseWidget::mLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
   mLayout->addStretch();
-  mLayout->addWidget(soundSpeedWidget);
-  RecordBaseWidget::mLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
 
   this->probeChangedSlot();
   this->checkIfReadySlot();
 }
 
-USAcqusitionWidget::~USAcqusitionWidget()
+TemporalCalibrationWidget::~TemporalCalibrationWidget()
 {}
 
-
-QString USAcqusitionWidget::defaultWhatsThis() const
+QString TemporalCalibrationWidget::defaultWhatsThis() const
 {
   return "<html>"
-      "<h3>US Acquisition.</h3>"
-      "<p><i>Record and reconstruct US data.</i></br>"
+      "<h3>Temporal Calibration.</h3>"
+      "<p><i>Calibrate the time shift between the tracking system and the video acquisition source.</i></br>"
       "</html>";
 }
 
-void USAcqusitionWidget::checkIfReadySlot()
+void TemporalCalibrationWidget::checkIfReadySlot()
 {
   bool tracking = ssc::toolManager()->isTracking();
   bool streaming = mRTSource && mRTSource->isStreaming();
@@ -90,7 +93,7 @@ void USAcqusitionWidget::checkIfReadySlot()
   emit ready(streaming && mRTRecorder);
 }
 
-void USAcqusitionWidget::probeChangedSlot()
+void TemporalCalibrationWidget::probeChangedSlot()
 {
   ssc::ToolPtr tool = this->getTool();
   if(!tool)
@@ -114,7 +117,7 @@ void USAcqusitionWidget::probeChangedSlot()
   this->checkIfReadySlot();
 }
 
-ssc::TimedTransformMap USAcqusitionWidget::getRecording(RecordSessionPtr session)
+ssc::TimedTransformMap TemporalCalibrationWidget::getRecording(RecordSessionPtr session)
 {
   ssc::TimedTransformMap retval;
 
@@ -125,9 +128,11 @@ ssc::TimedTransformMap USAcqusitionWidget::getRecording(RecordSessionPtr session
   return retval;
 }
 
-void USAcqusitionWidget::postProcessingSlot(QString sessionId)
+
+void TemporalCalibrationWidget::postProcessingSlot(QString sessionId)
 {
   //get session data
+  mLastSession = sessionId;
   RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
   ssc::RTSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
 
@@ -144,23 +149,66 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
   mFileMakerFutureWatcher.setFuture(mFileMakerFuture);
 }
 
-void USAcqusitionWidget::fileMakerWriteFinished()
+void TemporalCalibrationWidget::fileMakerWriteFinished()
 {
   QString targetFolder = mFileMakerFutureWatcher.future().result();
-  stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
+  //stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
 
   mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
 
-  if (settings()->value("Automation/autoReconstruct").toBool())
+  RecordSessionPtr session = stateManager()->getRecordSession(mLastSession);
+  ssc::RTSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
+  ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
+  if(trackerRecordedData.empty())
   {
-    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
-    connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
-    mThreadedReconstructer->start();
-    mRecordSessionWidget->startPostProcessing("Reconstructing");
+    ssc::messageManager()->sendError("Could not find any tracking data from session "+mLastSession+". Ignoring.");
+    return;
   }
+  ssc::ToolPtr probe = this->getTool();
+
+  this->computeTemporalCalibration(streamRecordedData, trackerRecordedData, probe);
+
+//
+//
+//
+//  if (settings()->value("Automation/autoReconstruct").toBool())
+//  {
+//    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
+//    connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
+//    mThreadedReconstructer->start();
+//    mRecordSessionWidget->startPostProcessing("Reconstructing");
+//  }
 }
 
-void USAcqusitionWidget::dominantToolChangedSlot()
+void TemporalCalibrationWidget::computeTemporalCalibration(ssc::RTSourceRecorder::DataType volumes, ssc::TimedTransformMap tracking, ssc::ToolPtr probe)
+{
+  // - use correlation or convolution to find shifts between volumes
+  // - compute the component of the shift in e_z in t space, s(t)
+  // - compute tracking data along e_z in t space, q(t).
+  // - use correlation to find shift between the two sequences.
+  // - the shift is the difference between frame timestamps and tracking timestamps -> temporal calibration.
+  // - add this as a delta to the current cal.
+  ssc::RTSourceRecorder::DataType corrTemp;
+  ssc::RTSourceRecorder::DataType::iterator i = volumes.begin();
+  ssc::RTSourceRecorder::DataType::iterator j = i;
+  ++j;
+  for ( ; j!=volumes.end(); ++j, ++i)
+  {
+    vtkImageCorrelationPtr correlator = vtkImageCorrelationPtr::New();
+    correlator->SetInput1(i->second);
+    correlator->SetInput2(j->second);
+    correlator->Update();
+    vtkImageDataPtr result = correlator->GetOutput();
+    corrTemp[j->first] = result;
+  }
+
+  mFileMaker.reset(new UsReconstructionFileMaker(tracking, corrTemp, "corr_test", stateManager()->getPatientData()->getActivePatientFolder(), probe));
+  mFileMaker->write();
+  std::cout << "completed write of correlation results" << std::endl;
+}
+
+
+void TemporalCalibrationWidget::dominantToolChangedSlot()
 {
   ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
 
@@ -178,30 +226,33 @@ void USAcqusitionWidget::dominantToolChangedSlot()
   this->probeChangedSlot();
 }
 
-void USAcqusitionWidget::reconstructFinishedSlot()
+void TemporalCalibrationWidget::reconstructFinishedSlot()
 {
   mRecordSessionWidget->stopPostProcessing();
-  mThreadedReconstructer.reset();
+//  mThreadedReconstructer.reset();
 }
 
-void USAcqusitionWidget::startedSlot()
+void TemporalCalibrationWidget::startedSlot()
 {
-  mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
+  mRecordSessionWidget->setDescription("temporal_cal");
   mRTRecorder->startRecord();
   ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
-void USAcqusitionWidget::stoppedSlot()
+void TemporalCalibrationWidget::stoppedSlot()
 {
-  if (mThreadedReconstructer)
-  {
-    mThreadedReconstructer->terminate();
-    mThreadedReconstructer->wait();
-    stateManager()->getReconstructer()->selectData(stateManager()->getReconstructer()->getSelectedData());
-    // TODO perform cleanup of all resources connected to this recording.
-  }
+//  if (mThreadedReconstructer)
+//  {
+//    mThreadedReconstructer->terminate();
+//    mThreadedReconstructer->wait();
+//    stateManager()->getReconstructer()->selectData(stateManager()->getReconstructer()->getSelectedData());
+//    // TODO perform cleanup of all resources connected to this recording.
+//  }
 
   mRTRecorder->stopRecord();
   ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
 }
+
 }//namespace cx
+
+
