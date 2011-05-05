@@ -34,6 +34,14 @@ TrackedCenterlineWidget::TrackedCenterlineWidget(QWidget* parent) :
 TrackedCenterlineWidget::~TrackedCenterlineWidget()
 {}
 
+QString TrackedCenterlineWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Tracked Centerline.</h3>"
+      "<p><i>Record the tool movement as a centerline.</i></br>"
+      "</html>";
+}
+
 void TrackedCenterlineWidget::checkIfReadySlot()
 {
   if(ssc::toolManager()->isTracking())

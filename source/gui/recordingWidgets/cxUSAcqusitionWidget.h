@@ -22,6 +22,7 @@ class USAcqusitionWidget : public TrackedRecordWidget
 public:
   USAcqusitionWidget(QWidget* parent);
   virtual ~USAcqusitionWidget();
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void checkIfReadySlot();
