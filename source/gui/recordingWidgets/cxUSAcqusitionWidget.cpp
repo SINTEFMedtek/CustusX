@@ -13,6 +13,7 @@
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
+#include "cxDoubleDataAdapterTemporalCalibration.h"
 
 namespace cx
 {
