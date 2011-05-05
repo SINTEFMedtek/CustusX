@@ -1,5 +1,14 @@
-#ifndef CXUSACQUSITIONWIDGET_H_
-#define CXUSACQUSITIONWIDGET_H_
+/*
+ * cxTemporalCalibrationWidget.h
+ *
+ *  Created on: May 4, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXTEMPORALCALIBRATIONWIDGET_H_
+#define CXTEMPORALCALIBRATIONWIDGET_H_
+
+#include "cxBaseWidget.h"
 
 #include "cxRecordBaseWidget.h"
 
@@ -8,20 +17,16 @@
 
 namespace cx
 {
-/**
- * USAcqusitionWidget
- *
- * \brief
- *
- * \date Dec 9, 2010
- * \author Janne Beate Bakeng, SINTEF
+
+/** GUI for performing temporal calibration
  */
-class USAcqusitionWidget : public TrackedRecordWidget
+class TemporalCalibrationWidget : public TrackedRecordWidget
 {
   Q_OBJECT
 public:
-  USAcqusitionWidget(QWidget* parent);
-  virtual ~USAcqusitionWidget();
+  TemporalCalibrationWidget(QWidget* parent);
+  virtual ~TemporalCalibrationWidget();
+
   virtual QString defaultWhatsThis() const;
 
 protected slots:
@@ -37,17 +42,23 @@ private slots:
   void dominantToolChangedSlot();
 
 private:
+  void computeTemporalCalibration(ssc::RTSourceRecorder::DataType volumes, ssc::TimedTransformMap tracking, ssc::ToolPtr probe);
+
   virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
 
   SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
   ssc::RTSourcePtr mRTSource;
   ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
-  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
+//  ssc::ThreadedReconstructerPtr mThreadedReconstructer;
 
   QFuture<QString> mFileMakerFuture;
   QFutureWatcher<QString> mFileMakerFutureWatcher;
   UsReconstructionFileMakerPtr mFileMaker;
-};
-}//namespace cx
 
-#endif /* CXUSACQUSITIONWIDGET_H_ */
+  QString mLastSession;
+};
+
+
+}
+
+#endif /* CXTEMPORALCALIBRATIONWIDGET_H_ */
