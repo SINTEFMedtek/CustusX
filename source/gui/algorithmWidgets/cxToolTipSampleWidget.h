@@ -1,0 +1,58 @@
+/*
+ * cxToolTipSampleWidget.h
+ *
+ *  Created on: May 4, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXTOOLTIPSAMPLEWIDGET_H_
+#define CXTOOLTIPSAMPLEWIDGET_H_
+
+#include "cxBaseWidget.h"
+#include "sscCoordinateSystemHelpers.h"
+#include "sscForwardDeclarations.h"
+#include "cxDataInterface.h"
+
+class QPushButton;
+class QGroupBox;
+class QLineEdit;
+
+namespace cx
+{
+
+/**
+ * Class for sampling points in a chosable coordinate system and then saving them to file.
+ */
+class ToolTipSampleWidget : public BaseWidget
+{
+  Q_OBJECT
+
+public:
+  ToolTipSampleWidget(QWidget* parent);
+  ~ToolTipSampleWidget();
+  virtual QString defaultWhatsThis() const;
+
+private slots:
+  void saveFileSlot();
+  void sampleSlot();
+  void coordinateSystemChanged();
+
+private:
+  ssc::CoordinateSystem getSelectedCoordinateSystem();
+
+  QPushButton* mSampleButton;
+  QLabel*      mSaveToFileNameLabel;
+  QPushButton* mSaveFileButton;
+  SelectCoordinateSystemStringDataAdapterPtr mCoordinateSystems;
+  SelectToolStringDataAdapterPtr mTools;
+  SelectDataStringDataAdapterPtr mData;
+  ssc::LabeledComboBoxWidget* mCoordinateSystemComboBox;
+  ssc::LabeledComboBoxWidget* mToolComboBox;
+  ssc::LabeledComboBoxWidget* mDataComboBox;
+  bool mTruncateFile;
+};
+
+
+}
+
+#endif /* CXTOOLTIPSAMPLEWIDGET_H_ */

@@ -2,6 +2,7 @@
 #define CXRECORDBASEWIDGET_H_
 
 #include <QWidget>
+#include "cxBaseWidget.h"
 #include "sscTool.h"
 #include "cxDataInterface.h"
 #include "sscRTSourceRecorder.h"
@@ -16,27 +17,7 @@ class QPushButton;
 namespace cx
 {
 
-/** Interface to the tool offset of the dominant tool
- */
-class DoubleDataAdapterTimeCalibration : public ssc::DoubleDataAdapter
-{
-  Q_OBJECT
-public:
-  static ssc::DoubleDataAdapterPtr New();
-  DoubleDataAdapterTimeCalibration();
-  virtual ~DoubleDataAdapterTimeCalibration() {}
-  virtual QString getValueName() const { return "Temporal Calibration"; }
-  virtual double getValue() const;
-  virtual QString getHelp() const;
-  virtual bool setValue(double val);
-  ssc::DoubleRange getValueRange() const;
 
-private slots:
-  void dominantToolChanged();
-
-private:
-  ssc::ToolPtr mTool;
-};
 
 class RecordSessionWidget;
 /**
@@ -47,7 +28,7 @@ class RecordSessionWidget;
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class RecordBaseWidget : public QWidget
+class RecordBaseWidget : public BaseWidget
 {
   Q_OBJECT
 

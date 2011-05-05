@@ -17,10 +17,17 @@ SET(cxProject_MOC_HDRS
     algorithmWidgets/cxSurfaceWidget.h
     algorithmWidgets/cxCenterlineWidget.h
     algorithmWidgets/cxResampleWidget.h
+    algorithmWidgets/cxToolTipSampleWidget.h
+    algorithmWidgets/cxToolManualCalibrationWidget.h
+    algorithmWidgets/cxTemporalCalibrationWidget.h
+#    algorithmWidgets/cxCalibrationMethodsWidget.h
+#    algorithmWidgets/cxVisualizationMethodsWidget.h
+#    algorithmWidgets/cxSegmentationMethodsWidget.h
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxShadingParamsInterfaces.h
     dataAdapters/cxToolDataAdapters.h
+    dataAdapters/cxDoubleDataAdapterTemporalCalibration.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxShadingWidget.h
@@ -114,6 +121,18 @@ SET(${LIBNAME}_SRCS
     algorithmWidgets/cxCenterlineWidget.h
     algorithmWidgets/cxResampleWidget.cpp
     algorithmWidgets/cxResampleWidget.h
+    algorithmWidgets/cxToolTipSampleWidget.h
+    algorithmWidgets/cxToolTipSampleWidget.cpp
+    algorithmWidgets/cxToolManualCalibrationWidget.h
+    algorithmWidgets/cxToolManualCalibrationWidget.cpp
+    algorithmWidgets/cxTemporalCalibrationWidget.h
+    algorithmWidgets/cxTemporalCalibrationWidget.cpp
+    algorithmWidgets/cxCalibrationMethodsWidget.h
+    algorithmWidgets/cxCalibrationMethodsWidget.cpp
+    algorithmWidgets/cxVisualizationMethodsWidget.h
+    algorithmWidgets/cxVisualizationMethodsWidget.cpp
+    algorithmWidgets/cxSegmentationMethodsWidget.h
+    algorithmWidgets/cxSegmentationMethodsWidget.cpp
     #----------------------
     dataAdapters/cxDataInterface.h
     dataAdapters/cxDataInterface.cpp
@@ -121,6 +140,8 @@ SET(${LIBNAME}_SRCS
     dataAdapters/cxShadingParamsInterfaces.cpp
     dataAdapters/cxToolDataAdapters.h
     dataAdapters/cxToolDataAdapters.cpp
+    dataAdapters/cxDoubleDataAdapterTemporalCalibration.h
+    dataAdapters/cxDoubleDataAdapterTemporalCalibration.cpp    
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp

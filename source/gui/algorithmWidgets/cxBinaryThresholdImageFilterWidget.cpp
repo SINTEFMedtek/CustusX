@@ -229,6 +229,8 @@ void BinaryThresholdImageFilterWidget::imageChangedSlot(QString uid)
   if(!image)
     return;
   mSegmentationThresholdAdapter->setValueRange(ssc::DoubleRange(image->getMin(), image->getMax(), 1));
+  int initValue = image->getMin() + ((image->getMax() - image->getMin()) / 10);
+  mSegmentationThresholdAdapter->setValue(initValue);
 
   QString imageName = image->getName();
   if(imageName.contains("us", Qt::CaseInsensitive)) //assume the image is ultrasound
