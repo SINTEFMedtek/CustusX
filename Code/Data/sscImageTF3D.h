@@ -41,6 +41,7 @@ class ImageTF3D : public ImageTFData
 public:
 	ImageTF3D(vtkImageDataPtr base);
 
+	void removeInitAlphaPoint();///< Remove the initial point set at 10%. Used when we need a "clean" transfer function.
 	ImageTF3DPtr createCopy();
 
 	vtkPiecewiseFunctionPtr getOpacityTF();

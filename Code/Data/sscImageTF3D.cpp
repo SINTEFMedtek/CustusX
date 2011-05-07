@@ -53,6 +53,14 @@ ImageTF3D::ImageTF3D(vtkImageDataPtr base) :
 	this->addColorPoint(smax, Qt::white);
 }
 
+void ImageTF3D::removeInitAlphaPoint()
+{
+  double smin = mBase->GetScalarRange()[0];
+  double smax = mBase->GetScalarRange()[1];
+  double srange = smax - smin;
+  this->removeAlphaPoint(srange * 0.1 + smin);
+}
+
 void ImageTF3D::transferFunctionsChangedSlot()
 {
   this->refreshOpacityTF();

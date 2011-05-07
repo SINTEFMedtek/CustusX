@@ -10,7 +10,7 @@
 
 #include <libQtSignalAdapters/QtConnDefault.h>
 
-using namespace boost;
+//using namespace boost;
 
 namespace QtSignalAdapters
 {
@@ -22,12 +22,12 @@ template<typename SIGNATURE>
 class Qt2FuncSlot5
 {
 public:
-	typedef function<SIGNATURE> FuncType;
-	typedef typename function_traits<SIGNATURE>::arg1_type ParmType1;
-	typedef typename function_traits<SIGNATURE>::arg2_type ParmType2;
-	typedef typename function_traits<SIGNATURE>::arg3_type ParmType3;
-	typedef typename function_traits<SIGNATURE>::arg4_type ParmType4;
-	typedef typename function_traits<SIGNATURE>::arg5_type ParmType5;
+	typedef boost::function<SIGNATURE> FuncType;
+	typedef typename boost::function_traits<SIGNATURE>::arg1_type ParmType1;
+	typedef typename boost::function_traits<SIGNATURE>::arg2_type ParmType2;
+	typedef typename boost::function_traits<SIGNATURE>::arg3_type ParmType3;
+	typedef typename boost::function_traits<SIGNATURE>::arg4_type ParmType4;
+	typedef typename boost::function_traits<SIGNATURE>::arg5_type ParmType5;
 	
 	Qt2FuncSlot5(const FuncType& func) :
 		func_(func)
@@ -57,8 +57,8 @@ template<typename SIGNATURE>
 class Qt2Func5 : public QObject, public QtConnDefault
 {
 public:
-	typedef function<SIGNATURE> FuncType;
-	typedef typename function_traits<SIGNATURE>::arg1_type ParmType;
+	typedef boost::function<SIGNATURE> FuncType;
+	typedef typename boost::function_traits<SIGNATURE>::arg1_type ParmType;
 
 	Qt2Func5(QObject* qobject, int signalIdx, const FuncType& func,
 			bool initiallyConnected=true) :

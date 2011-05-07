@@ -53,6 +53,15 @@ ImageLUT2DPtr ImageLUT2D::createCopy()
   return retval;
 }
 
+void ImageLUT2D::setFullRangeWinLevel()
+{
+  double smin = mBase->GetScalarRange()[0];
+  double smax = mBase->GetScalarRange()[1];
+  double srange = smax - smin;
+  this->setWindow(srange);
+  this->setLevel(smin + srange/2.0);
+}
+
 void ImageLUT2D::transferFunctionsChangedSlot()
 {
   this->refreshOutput();

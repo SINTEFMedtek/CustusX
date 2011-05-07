@@ -40,9 +40,15 @@ boost::array<double, 16> flatten(const Eigen::Affine3d* self)
 
 void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m)
 {
+  if (!m)
+    return;
   for (int r=0; r<4; ++r)
     for (int c=0; c<4; ++c)
       (*self)(r,c) = m->GetElement(r,c);
+//  mMatrix = vtkMatrix4x4Ptr::New();
+////	mMatrix = vtkMatrix4x4Ptr(m);
+//  if (m)
+//    mMatrix->DeepCopy(m);
 }
 
 /**fill the transform with raw data in vtk / row-major ordering form.

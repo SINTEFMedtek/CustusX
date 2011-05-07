@@ -29,8 +29,8 @@ public: // optional methods
   virtual QString getHelp() const { return QString(); } ///< return a descriptive help string for the data, used for example as a tool tip.
   //virtual void connectValueSignals(bool on) {} ///< set object to emit changed() when applicable
 
-signals:
-  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+//signals:
+//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
 typedef boost::shared_ptr<BoolDataAdapter> BoolDataAdapterPtr;
 

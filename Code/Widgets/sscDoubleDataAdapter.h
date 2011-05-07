@@ -68,8 +68,8 @@ public: // optional methods
   //virtual double legendStep() const {return 0.2;} ///< step between each pos on the legend
   //virtual void connectValueSignals(bool on) {} ///< set object to emit changed() when applicable
 
-  signals:
-  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
+//  signals:
+//  void changed(); ///< emit when the underlying data value is changed: The user interface will be updated.
 };
 typedef boost::shared_ptr<DoubleDataAdapter> DoubleDataAdapterPtr;
 
