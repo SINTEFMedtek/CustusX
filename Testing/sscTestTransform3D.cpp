@@ -35,13 +35,16 @@ void TestTransform3D::testDefaultTransform()
 
 void TestTransform3D::testElementAccess()
 {
-  double data[16] = {1, 0, 0, 3,
+  double data[16] = {1, 0, 0, M_PI,
                      0, 1, 0, 4,
                      0, 0, 1, 5,
                      0, 0, 0, 1 };
   Transform3D M(data);
 
-  CPPUNIT_ASSERT( M(0,0)==1.0 ); CPPUNIT_ASSERT( M(0,1)==0.0 ); CPPUNIT_ASSERT( M(0,2)==0.0 ); CPPUNIT_ASSERT( M(0,3)==3.0 );
+//  std::cout << "M:\n" << M << std::endl;
+//  std::cout << "M.matrix():\n" << M.matrix() << std::endl;
+
+  CPPUNIT_ASSERT( M(0,0)==1.0 ); CPPUNIT_ASSERT( M(0,1)==0.0 ); CPPUNIT_ASSERT( M(0,2)==0.0 ); CPPUNIT_ASSERT( M(0,3)==M_PI );
   CPPUNIT_ASSERT( M(1,0)==0.0 ); CPPUNIT_ASSERT( M(1,1)==1.0 ); CPPUNIT_ASSERT( M(1,2)==0.0 ); CPPUNIT_ASSERT( M(1,3)==4.0 );
   CPPUNIT_ASSERT( M(2,0)==0.0 ); CPPUNIT_ASSERT( M(2,1)==0.0 ); CPPUNIT_ASSERT( M(2,2)==1.0 ); CPPUNIT_ASSERT( M(2,3)==5.0 );
   CPPUNIT_ASSERT( M(3,0)==0.0 ); CPPUNIT_ASSERT( M(3,1)==0.0 ); CPPUNIT_ASSERT( M(3,2)==0.0 ); CPPUNIT_ASSERT( M(3,3)==1.0 );
@@ -155,6 +158,14 @@ void TestTransform3D::testDoTransform()
   CPPUNIT_ASSERT( similar(T.vector(e_z), e_z) );
   CPPUNIT_ASSERT( similar(R.vector(e_z), e_z_rotx90) );
   CPPUNIT_ASSERT( similar(M.vector(e_z), e_z_rotx90) );
+
+//  std::cout << "(S*T).unitVector(e_z) " << (S*T).unitVector(e_z) << std::endl;
+//  std::cout << "e_z " << e_z << std::endl;
+//  std::cout << "T " << T << std::endl;
+//  std::cout << "S " << S << std::endl;
+//  std::cout << "S*T " << S*T << std::endl;
+//  std::cout << "similar((S*R).unitVector(e_z) " << (S*R).unitVector(e_z) << std::endl;
+//  std::cout << "e_z_rotx90 " << e_z_rotx90 << std::endl;
 
   // transformation of free vectors [x y z 0] homogenous, but force |n|=1
   CPPUNIT_ASSERT( similar((S*T).unitVector(e_z), e_z) );

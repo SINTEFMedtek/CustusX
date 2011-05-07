@@ -7,6 +7,7 @@ class QString;
 #include <vtkSmartPointer.h>
 typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 
+//#define EIGEN_DEFAULT_TO_ROW_MAJOR
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "sscPlainObjectEigenAddons.h"
 #define EIGEN_MATRIXBASE_PLUGIN "sscMatrixBaseEigenAddons.h"

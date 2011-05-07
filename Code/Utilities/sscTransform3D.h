@@ -15,6 +15,18 @@
 //  std::ostream& operator<<(std::ostream& s, const Affine3d& t);
 //}
 
+namespace ssc_transform3D_internal
+{
+
+boost::array<double, 16> flatten(const Eigen::Affine3d* self);
+void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m);
+void fill(Eigen::Affine3d* self, const double* raw);
+vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self);
+std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline);
+Eigen::Affine3d fromString(const QString& text, bool* _ok);
+
+}
+
 namespace Eigen
 {
 
@@ -54,87 +66,45 @@ Transform< _Scalar, _Dim, _Mode, _Options > Transform< _Scalar, _Dim, _Mode, _Op
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 boost::array<double, 16> Transform< _Scalar, _Dim, _Mode, _Options >::flatten() const
 {
-  boost::array<double, 16> retval;
-  std::copy(this->data(), this->data()+16, retval.begin());
-  return retval;
+  return ssc_transform3D_internal::flatten(this);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform< _Scalar, _Dim, _Mode, _Options >::Transform(vtkMatrix4x4* m)
 {
-  for (int r=0; r<4; ++r)
-    for (int c=0; c<4; ++c)
-      (*this)(r,c) = m->GetElement(r,c);
+  ssc_transform3D_internal::fill(this, m);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform< _Scalar, _Dim, _Mode, _Options >::Transform(double* raw)
 {
-  std::copy(raw, raw+16, this->data());
+  ssc_transform3D_internal::fill(this, raw);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 vtkMatrix4x4Ptr Transform< _Scalar, _Dim, _Mode, _Options >::getVtkMatrix() const
 {
-  vtkMatrix4x4Ptr m = vtkMatrix4x4Ptr::New();
-
-  for (int r=0; r<4; ++r)
-    for (int c=0; c<4; ++c)
-      m->SetElement(r,c, (*this)(r,c));;
-
-  return m;
+  return ssc_transform3D_internal::getVtkMatrix(this);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 std::ostream& Transform< _Scalar, _Dim, _Mode, _Options >::put(std::ostream& s, int indent, char newline) const
 {
-    QString ind(indent, ' ');
-
-    std::ostringstream ss; // avoid changing state of input stream
-    ss << setprecision(3) << std::fixed;
-
-    for (unsigned i=0; i<4; ++i)
-    {
-      ss << ind;
-      for (unsigned j=0; j<4; ++j)
-      {
-        ss << setw(10) << (*this)(i,j) << " ";
-      }
-      if (i!=3)
-      {
-        ss << newline;
-      }
-    }
-
-    s << ss.str();
-
-    return s;
+  return ssc_transform3D_internal::put(this, s, indent, newline);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform< _Scalar, _Dim, _Mode, _Options > Transform< _Scalar, _Dim, _Mode, _Options >::fromString(const QString& text, bool* _ok)
 {
-  bool okval = false; // if input _ok is null, we still need a flag
-  bool* ok = &okval;
-  if (_ok)
-    ok = _ok;
-
-  std::vector<double> raw = convertQString2DoubleVector(text, ok);
-  if (raw.size()!=16)
-    *ok = false;
-  if (!ok)
-    return Transform< _Scalar, _Dim, _Mode, _Options >();
-  Transform< _Scalar, _Dim, _Mode, _Options > retval;
-  double* test = retval.data();
-  std::copy(raw.begin(), raw.end(), retval.data());
-//  return Transform< _Scalar, _Dim, _Mode, _Options >((double*)&(*raw.begin()));
-  return retval;
+  return ssc_transform3D_internal::fromString(text, _ok);
 }
 
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 Transform< _Scalar, _Dim, _Mode, _Options > Transform< _Scalar, _Dim, _Mode, _Options >::fromVtkMatrix(vtkMatrix4x4Ptr m)
 {
-  return Transform< _Scalar, _Dim, _Mode, _Options >(m.GetPointer());
+  Transform< _Scalar, _Dim, _Mode, _Options > retval;
+  ssc_transform3D_internal::fill(&retval, m);
+  return retval;
 }
 
 

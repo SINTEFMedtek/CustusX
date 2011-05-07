@@ -16,9 +16,108 @@ namespace Eigen
 }
 
 
+
+
 // --------------------------------------------------------
+namespace ssc_transform3D_internal
+{
+
+/**provide an array of the transform indices, vtk / row-major ordering
+ *
+ */
+boost::array<double, 16> flatten(const Eigen::Affine3d* self)
+{
+  boost::array<double, 16> retval;
+  boost::array<double, 16>::iterator raw = retval.begin();
+//  std::copy(self->data(), self->data()+16, retval.begin());
+
+  for (int r=0; r<4; ++r)
+    for (int c=0; c<4; ++c)
+      *raw++ = (*self)(r,c);
+
+  return retval;
+}
+
+void fill(Eigen::Affine3d* self, vtkMatrix4x4Ptr m)
+{
+  for (int r=0; r<4; ++r)
+    for (int c=0; c<4; ++c)
+      (*self)(r,c) = m->GetElement(r,c);
+}
+
+/**fill the transform with raw data in vtk / row-major ordering form.
+ *
+ */
+void fill(Eigen::Affine3d* self, const double* raw)
+{
+  for (int r=0; r<4; ++r)
+    for (int c=0; c<4; ++c)
+      (*self)(r,c) = *raw++;
+
+//  std::copy(raw, raw+16, self->data());
+}
+
+vtkMatrix4x4Ptr getVtkMatrix(const Eigen::Affine3d* self)
+{
+  vtkMatrix4x4Ptr m = vtkMatrix4x4Ptr::New();
+
+  for (int r=0; r<4; ++r)
+    for (int c=0; c<4; ++c)
+      m->SetElement(r,c, (*self)(r,c));;
+
+  return m;
+}
+
+std::ostream& put(const Eigen::Affine3d* self, std::ostream& s, int indent, char newline)
+{
+    QString ind(indent, ' ');
+
+    std::ostringstream ss; // avoid changing state of input stream
+    ss << setprecision(3) << std::fixed;
+
+    for (unsigned i=0; i<4; ++i)
+    {
+      ss << ind;
+      for (unsigned j=0; j<4; ++j)
+      {
+        ss << setw(10) << (*self)(i,j) << " ";
+      }
+      if (i!=3)
+      {
+        ss << newline;
+      }
+    }
+
+    s << ss.str();
+
+    return s;
+}
+
+Eigen::Affine3d fromString(const QString& text, bool* _ok)
+{
+  bool okval = false; // if input _ok is null, we still need a flag
+  bool* ok = &okval;
+  if (_ok)
+    ok = _ok;
+
+  std::vector<double> raw = convertQString2DoubleVector(text, ok);
+  if (raw.size()!=16)
+    *ok = false;
+  if (!ok)
+    return Eigen::Affine3d();
+
+  Eigen::Affine3d retval;
+  fill(&retval, &*raw.begin());
+//  std::copy(raw.begin(), raw.end(), retval.data());
+  return retval;
+}
+
+
+} // namespace ssc_transform3D_internal
+
 namespace ssc
 {
+
 //namespace utils
 //{
 // --------------------------------------------------------
@@ -262,21 +361,21 @@ DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& b
 
 /**Create a transform representing a scale in x,y,z
  */
-Transform3D createTransformScale(const Vector3D& scale_)
+Transform3D createTransformScale(const Vector3D& scale)
 {
-  Transform3D retval;
-  retval.scale(scale_);
-  return retval;
+//  Transform3D retval;
+//  retval.scale(scale_);
+//  return retval;
 
   //  Transform<float,3,Affine> t = Translation3f(p) * AngleAxisf(a,axis) * Scaling3f(s);
 
 //  Transform3D M = Eigen::Scaling<float>(scale_.cast<float>());
 //  return M;
 
-//	vtkTransformPtr transform = vtkTransformPtr::New();
-//	transform->Identity();
-//	transform->Scale(scale.begin());
-//	return Transform3D(transform->GetMatrix());
+	vtkTransformPtr transform = vtkTransformPtr::New();
+	transform->Identity();
+	transform->Scale(scale.begin());
+	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a translation
