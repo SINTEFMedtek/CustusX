@@ -231,7 +231,7 @@ bool LandmarkTranslation::registerPoints(PointSetType::Pointer fixedPointSet, Po
     }
 
 
-  mResult = ssc::Transform3D();
+  mResult = ssc::Transform3D::Identity();
   for (unsigned i=0; i<transform->GetNumberOfParameters(); ++i)
     mResult(i,3) = transform->GetParameters()[i];
 
@@ -257,7 +257,7 @@ ssc::Transform3D LandmarkTranslationRegistration::registerPoints(std::vector<ssc
   {
     std::cout << "Different sizes in ref and target: aborting registration." << std::endl;
     *ok = false;
-    return ssc::Transform3D();
+    return ssc::Transform3D::Identity();
   }
 
   // ad-hoc solution for one and two points: itk doesn't handle this for some reason.
