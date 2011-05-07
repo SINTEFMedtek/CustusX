@@ -11,7 +11,7 @@ namespace cx
 {
 //class ToolConfigurationParser;
 }
-/*
+
 /**Unit tests that show the properties of the cxToolConfigurationParser class
  */
 /*class TestToolConfigurationParser: public CppUnit::TestFixture

@@ -10,6 +10,7 @@
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "cxBrowserWidget.h"
+#include "sscImage.h"
 
 namespace cx
 {

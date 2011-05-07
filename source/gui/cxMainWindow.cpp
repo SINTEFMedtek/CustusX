@@ -10,19 +10,12 @@
 #include "cxRepManager.h"
 #include "cxToolManager.h"
 #include "cxRegistrationManager.h"
-#include "cxCustomStatusBar.h"
+#include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
-#include "cxManualRegistrationOffsetWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
-#include "cxImageRegistrationWidget.h"
-#include "cxFastImageRegistrationWidget.h"
-#include "cxImageSegmentationAndCenterlineWidget.h"
-#include "cxFastPatientRegistrationWidget.h"
-#include "cxFastOrientationRegistrationWidget.h"
 #include "cxToolPropertiesWidget.h"
-#include "cxPatientRegistrationWidget.h"
 #include "cxView3D.h"
 #include "cxView2D.h"
 #include "cxViewGroup.h"
@@ -34,16 +27,13 @@
 #include "cxRegistrationHistoryWidget.h"
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
-#include "cxLayoutEditor.h"
+#include "cxLayoutEditorWidget.h"
 #include "cxFrameForest.h"
 #include "cxFrameTreeWidget.h"
-#include "cxImportDataWizard.h"
-#include "cxCameraControlWidget.h"
-#include "cxSegmentationWidget.h"
-#include "cxPlateRegistrationWidget.h"
-#include "cxToolTipCalibrationWidget.h"
+#include "cxImportDataDialog.h"
+#include "cxTrackPadWidget.h"
 #include "cxCameraControl.h"
-#include "cxControlPanel.h"
+#include "cxSecondaryMainWindow.h"
 #include "cxIGTLinkWidget.h"
 #include "cxRecordBaseWidget.h"
 #include "cxTrackedCenterlineWidget.h"
@@ -51,6 +41,10 @@
 #include "cxAudio.h"
 #include "cxSettings.h"
 #include "RTSource/cxRTSourceManager.h"
+#include "cxRegistrationMethodsWidget.h"
+#include "cxVisualizationMethodsWidget.h"
+#include "cxSegmentationMethodsWidget.h"
+#include "cxCalibrationMethodsWidget.h"
 
 namespace cx
 {
@@ -72,7 +66,7 @@ MainWindow::MainWindow() :
   mPointSamplingWidget(new PointSamplingWidget(this)),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
-  mCustomStatusBar(new CustomStatusBar()),
+  mCustomStatusBar(new StatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
   mControlPanel(NULL)
 {
@@ -92,11 +86,6 @@ MainWindow::MainWindow() :
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
 
-  this->populateRegistrationMethodsWidget();
-  this->populateSegmentationMethodsWidget();
-  this->populateVisualizationMethodsWidget();
-  this->populateCalibrationMethodsWidget();
-
   this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
   this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
@@ -104,7 +93,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
   this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
-  this->addAsDockWidget(new CameraControlWidget(this), "Utility");
+  this->addAsDockWidget(new TrackPadWidget(this), "Utility");
   this->addAsDockWidget(mToolPropertiesWidget, "Properties");
   this->addAsDockWidget(mPointSamplingWidget, "Utility");
   this->addAsDockWidget(mReconstructionWidget, "Algorithms");
@@ -644,7 +633,7 @@ void MainWindow::resetDesktopSlot()
 void MainWindow::showControlPanelActionSlot()
 {
   if (!mControlPanel)
-    mControlPanel = new ControlPanel(this);
+    mControlPanel = new SecondaryMainWindow(this);
   mControlPanel->show();
 }
 
@@ -682,7 +671,7 @@ void MainWindow::importDataSlot()
     return;
   }
 
-  ImportDataWizard* wizard = new ImportDataWizard(fileName, this);
+  ImportDataDialog* wizard = new ImportDataDialog(fileName, this);
   wizard->exec(); //calling exec() makes the wizard dialog modal which prevents other user interaction
                   //with the system
 }
@@ -721,7 +710,7 @@ LayoutData MainWindow::executeLayoutEditorDialog(QString title, bool createNew)
   QVBoxLayout* layout = new QVBoxLayout(dialog.get());
   layout->setMargin(0);
 
-  LayoutEditor* editor = new LayoutEditor(dialog.get());
+  LayoutEditorWidget* editor = new LayoutEditorWidget(dialog.get());
 
   LayoutData data = viewManager()->getLayoutData(viewManager()->getActiveLayout());
 
@@ -916,71 +905,6 @@ void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 void MainWindow::createStatusBar()
 {
   this->setStatusBar(mCustomStatusBar);
-}
-
-void MainWindow::populateRegistrationMethodsWidget()
-{
-  //landmark
-  LandmarkRegistrationsWidget* landmarkRegistrationsWidget = new LandmarkRegistrationsWidget(mRegsitrationMethodsWidget, "LandmarkRegistrationWidget", "Landmark Registrations");
-  ImageRegistrationWidget* imageRegistrationWidget = new ImageRegistrationWidget(landmarkRegistrationsWidget, "ImageRegistrationWidget", "Image Registration");
-  PatientRegistrationWidget* patientRegistrationWidget = new PatientRegistrationWidget(landmarkRegistrationsWidget, "PatientRegistrationWidget", "Patient Registration");
-  landmarkRegistrationsWidget->addTab(imageRegistrationWidget, "Image");
-  landmarkRegistrationsWidget->addTab(patientRegistrationWidget, "Patient");
-
-  //fast
-  FastRegistrationsWidget* fastRegistrationsWidget = new FastRegistrationsWidget(mRegsitrationMethodsWidget, "FastRegistrationWidget", "Fast Registrations");
-  FastOrientationRegistrationWidget* fastOrientationRegistrationWidget = new FastOrientationRegistrationWidget(fastRegistrationsWidget);
-  FastImageRegistrationWidget* fastImageRegistrationWidget = new FastImageRegistrationWidget(fastRegistrationsWidget, "FastImageRegistrationWidget", "Fast Image Registration");
-  FastPatientRegistrationWidget* fastPatientRegistrationWidget = new FastPatientRegistrationWidget(fastRegistrationsWidget);
-  fastRegistrationsWidget->addTab(fastOrientationRegistrationWidget, "Orientation");
-  fastRegistrationsWidget->addTab(fastImageRegistrationWidget, "Image");
-  fastRegistrationsWidget->addTab(fastPatientRegistrationWidget, "Patient");
-
-  //vessel based image to image
-  Image2ImageRegistrationWidget* image2imageWidget = new Image2ImageRegistrationWidget(mRegsitrationMethodsWidget, "Image2ImageRegistrationWidget", "Image 2 Image Registration");
-  FixedImage2ImageWidget* fixedRegistrationWidget = new FixedImage2ImageWidget(image2imageWidget);
-  MovingImage2ImageWidget* movingRegistrationWidget = new MovingImage2ImageWidget(image2imageWidget);
-
-  image2imageWidget->addTab(movingRegistrationWidget, "Moving"); //should be application specific
-  image2imageWidget->addTab(fixedRegistrationWidget, "Fixed"); //should be application specific
-  image2imageWidget->addTab(new RegisterI2IWidget(image2imageWidget),"Register");
-
-  //manual offset
-  ManualRegistrationOffsetWidget* landmarkManualRegistrationOffsetWidget = new ManualRegistrationOffsetWidget(mRegsitrationMethodsWidget);
-
-  //plate
-  Image2PlateRegistrationWidget* imageAndPlateRegistrationWidget = new Image2PlateRegistrationWidget(mRegsitrationMethodsWidget, "PlateRegistrationWidget", "Plate");
-  PlateImageRegistrationWidget* platesImageRegistrationWidget = new PlateImageRegistrationWidget(imageAndPlateRegistrationWidget);
-  PlateRegistrationWidget* plateRegistrationWidget = new PlateRegistrationWidget(imageAndPlateRegistrationWidget);
-  imageAndPlateRegistrationWidget->addTab(plateRegistrationWidget, "Plate");
-  imageAndPlateRegistrationWidget->addTab(platesImageRegistrationWidget, "Image");
-
-  mRegsitrationMethodsWidget->addTab(landmarkRegistrationsWidget, "Landmark");
-  mRegsitrationMethodsWidget->addTab(fastRegistrationsWidget, "Fast");
-  mRegsitrationMethodsWidget->addTab(landmarkManualRegistrationOffsetWidget, "Manual");
-  mRegsitrationMethodsWidget->addTab(image2imageWidget, "Image2Image");
-  mRegsitrationMethodsWidget->addTab(imageAndPlateRegistrationWidget, "Plate");
-}
-
-void MainWindow::populateSegmentationMethodsWidget()
-{
-  SegmentationWidget* segmentationWidget = new SegmentationWidget(mSegmentationMethodsWidget);
-
-  mSegmentationMethodsWidget->addTab(segmentationWidget, "Threshold");
-}
-
-void MainWindow::populateVisualizationMethodsWidget()
-{
-  SurfaceWidget* surfaceWidget = new SurfaceWidget(mVisualizationMethodsWidget);
-
-  mVisualizationMethodsWidget->addTab(surfaceWidget, "Surface");
-}
-
-void MainWindow::populateCalibrationMethodsWidget()
-{
-  ToolTipCalibrationWidget* toolTipCalibrationWidget = new ToolTipCalibrationWidget(mCalibrationMethodsWidget);
-
-  mCalibrationMethodsWidget->addTab(toolTipCalibrationWidget, "Tool Tip");
 }
 
 void MainWindow::aboutSlot()
