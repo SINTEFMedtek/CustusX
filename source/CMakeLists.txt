@@ -80,6 +80,8 @@ INCLUDE_DIRECTORIES(
     ${SUB_FOLDERS}
     /usr/local/include
     ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    gui/infoWidgets # hack
+    gui/dataAdapters
     )
     
 

@@ -109,11 +109,6 @@ private:
   void createToolBars(); ///< creates and adds toolbars for convenience
   void createStatusBar();  ///<
 
-  void populateRegistrationMethodsWidget(); ///< fill the registration methods widget with all available registration methods
-  void populateSegmentationMethodsWidget();
-  void populateVisualizationMethodsWidget();
-  void populateCalibrationMethodsWidget();
-
   void addAsDockWidget(QWidget* widget, QString groupname = "");
   void registerToolBar(QToolBar* toolbar, QString groupname="");
   void addToWidgetGroupMap(QAction* action, QString groupname);
@@ -209,9 +204,9 @@ private:
   ssc::ReconstructionWidget*                    mReconstructionWidget;
   class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*                 mVolumePropertiesWidget;
-  class CustomStatusBar*                        mCustomStatusBar;
+  class StatusBar*                        mCustomStatusBar;
   class FrameTreeWidget*                        mFrameTreeWidget;
-  class ControlPanel*                           mControlPanel;
+  class SecondaryMainWindow*                           mControlPanel;
 
   //Preferences
   CameraControlPtr mCameraControl;
