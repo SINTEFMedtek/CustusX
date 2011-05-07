@@ -11,7 +11,9 @@ namespace cx
 //---------------------------------------------------------------------------------------------------------------------
 itkImageType::ConstPointer AlgorithmHelper::getITKfromSSCImage(ssc::ImagePtr image)
 {
+  //HACK
   return AlgorithmHelper::getITKfromSSCImageViaFile(image);
+
 //  if(!image)
 //  {
 //    std::cout << "getITKfromSSCImage(): NO image!!!" << std::endl;
@@ -153,7 +155,7 @@ T ThreadedTimedAlgorithm<T>::getResult()
 
 template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //centerline
 template class ThreadedTimedAlgorithm<ssc::ImagePtr>; //resample
-//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //segmentation
+//template class ThreadedTimedAlgorithm<vtkImageDataPtr>; //BinaryThresholdImageFilter
 template class ThreadedTimedAlgorithm<vtkPolyDataPtr>; //contour
 
 
