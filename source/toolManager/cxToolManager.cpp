@@ -602,7 +602,7 @@ void ToolManager::loadPositionHistory()
 
   ssc::PositionStorageReader reader(filename);
 
-  ssc::Transform3D matrix;
+  ssc::Transform3D matrix = ssc::Transform3D::Identity();
   double timestamp;
   QString toolUid;
 
@@ -779,7 +779,7 @@ void ToolManager::addXml(QDomNode& parentNode)
 void ToolManager::clear()
 {
   m_rMpr_History->clear();
-  mManualTool->set_prMt(ssc::Transform3D());
+  mManualTool->set_prMt(ssc::Transform3D::Identity());
   mLandmarks.clear();
 }
 

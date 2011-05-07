@@ -482,7 +482,7 @@ ssc::Transform3D Reconstructer::applyOutputOrientation()
 {
 //  QString newOrient = mSettings.getStringOption("Orientation").getValue();
   QString newOrient = mOrientationAdapter->getValue();
-  ssc::Transform3D prMdd;
+  ssc::Transform3D prMdd = Transform3D::Identity();
 
   if (newOrient=="PatientReference")
   {
