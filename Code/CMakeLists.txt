@@ -104,6 +104,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Rep/
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
+    ${SSC_SOURCE_DIR}/Code/Math/
     ${SSC_SOURCE_DIR}/Code/Widgets/
     ${SSC_SOURCE_DIR}/Code/3rdParty/
     ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
@@ -136,17 +137,21 @@ endif(WIN32)
 SET( SSC_SOURCE_FILES
     sscForwardDeclarations.h
     vtkForwardDeclarations.h
+
+    Math/sscBoundingBox3D.cpp
+    Math/sscBoundingBox3D.h
+    Math/sscVector3D.cpp
+    Math/sscVector3D.h
+    Math/sscTransform3D.cpp 
+    Math/sscTransform3D.h
+    Math/sscFrame3D.cpp
+    Math/sscFrame3D.h
+
     Utilities/sscAudio.h
     Utilities/sscCoordinateSystemHelpers.h
     Utilities/sscCoordinateSystemHelpers.cpp
-    Utilities/sscBoundingBox3D.cpp
-    Utilities/sscBoundingBox3D.h
-    Utilities/sscVector3D.cpp
-    Utilities/sscVector3D.h
     Utilities/sscMeshHelpers.cpp
     Utilities/sscMeshHelpers.h
-    Utilities/sscTransform3D.cpp 
-    Utilities/sscTransform3D.h
     Utilities/sscSliceComputer.cpp 
     Utilities/sscSliceComputer.h
     Utilities/sscIndent.cpp
@@ -155,8 +160,6 @@ SET( SSC_SOURCE_FILES
     Utilities/sscAcceptanceBoxWidget.h
     Utilities/sscGraphicalPrimitives.cpp
     Utilities/sscGraphicalPrimitives.h
-    Utilities/sscFrame3D.cpp
-    Utilities/sscFrame3D.h
     Utilities/sscUtilHelpers.cpp
     Utilities/sscUtilHelpers.h
     Utilities/sscPositionStorageFile.cpp

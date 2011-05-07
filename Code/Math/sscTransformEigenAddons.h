@@ -20,22 +20,3 @@ std::ostream& put(std::ostream& s, int indent=0, char newline='\n') const;
 static Transform fromString(const QString& text, bool* ok=0); ///< construct a transform matrix from a string containing 16 whitespace-separated numbers, vtk ordering
 static Transform fromVtkMatrix(vtkMatrix4x4Ptr m);
 
-//Vector3d vector(const Vector3d& v) const      ///< transform a free vector [x,y,z,0]
-//{
-//  return this->linear() * v;
-//}
-//
-//Vector3d unitVector(const Vector3d& v) const  ///< transform a unit vector [x,y,z,0], force |v|=1 after transform.
-//{
-//  return (this->linear() * v).normal();
-//}
-//
-//Vector3d coord(const Vector3d& v) const       ///< transform a coordinate [x,y,z,1].
-//{
-//  return (*this) * v;
-//}
-//
-//Transform inv() const                       ///< return an inverted transform M^-1
-//{
-//  return this->inverse();
-//}
