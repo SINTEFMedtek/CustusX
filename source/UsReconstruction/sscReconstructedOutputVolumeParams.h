@@ -36,6 +36,7 @@ public:
     mExtent(0,0,0,0,0,0),
     mInputSpacing(0),
     mInputDim(0,0,0),
+    m_rMd(Transform3D::Identity()),
     mMaxVolumeSize(0),
     mDim(0,0,0),
     mSpacing(0)
