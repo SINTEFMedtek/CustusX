@@ -296,7 +296,7 @@ bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ssc::ImagePtr
  */
 ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName)
 {
-  ssc::Transform3D retval;
+  ssc::Transform3D retval = ssc::Transform3D::Identity();
   QFile file(fileName);
   if(!file.open(QIODevice::ReadOnly))
   {
