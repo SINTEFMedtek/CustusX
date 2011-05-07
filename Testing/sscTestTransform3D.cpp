@@ -25,7 +25,7 @@ using namespace ssc;
 
 void TestTransform3D::testDefaultTransform()
 {
-  Transform3D M;
+  Transform3D M = Transform3D::Identity();
   Vector3D v(0,0,0);
   Vector3D w(1,1,1);
 

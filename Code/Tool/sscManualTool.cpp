@@ -12,6 +12,7 @@ namespace ssc
 ManualTool::ManualTool(const QString& uid, const QString& name) :
     Tool(uid,name), mMutex(QMutex::Recursive)
 {
+  m_prMt = Transform3D::Identity();
 	mOffset = 0;
 	mType = TOOL_MANUAL;
 	mVisible = false;
@@ -143,7 +144,7 @@ void ManualTool::setTooltipOffset(double val)
 
 ssc::Transform3D ManualTool::getCalibration_sMt() const
 {
-	return Transform3D();
+	return Transform3D::Identity();
 }
 
 }//end namespace

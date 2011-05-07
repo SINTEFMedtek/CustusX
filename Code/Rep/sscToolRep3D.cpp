@@ -195,7 +195,7 @@ void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
 
 void ToolRep3D::update()
 {
-  Transform3D prMt;
+  Transform3D prMt = Transform3D::Identity();
   if (mTool)
   {
     prMt = mTool->get_prMt();

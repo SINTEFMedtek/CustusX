@@ -19,7 +19,8 @@ namespace ssc
 {
 
 CrossHairRep2D::CrossHairRep2D(const QString& uid, const QString& name) :
-	RepImpl(uid, name)
+	RepImpl(uid, name),
+	m_vpMs(Transform3D::Identity())
 {
 }
 

@@ -15,7 +15,7 @@ ToolManager* DummyToolManager::getInstance()
 }
 DummyToolManager::DummyToolManager() :
 	mDummyTools(new DummyToolMap),
-	m_rMpr(new Transform3D()),
+	m_rMpr(new Transform3D(Transform3D::Identity())),
 	mConfigured(false),
 	mInitialized(false),
 	mIsTracking(false)

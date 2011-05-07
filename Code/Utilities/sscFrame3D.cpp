@@ -10,6 +10,7 @@ namespace ssc
 
 DecomposedTransform3D::DecomposedTransform3D()
 {
+  m_R = Transform3D::Identity();
   mAngle = Vector3D(0,0,0);
   mPos = Vector3D(0,0,0);
 }
@@ -235,7 +236,7 @@ void Frame3D::test()
   a = a/M_PI*180;
   std::cout << "test angles zyx: " << a << std::endl;
 
-  Transform3D M1;
+  Transform3D M1 = Transform3D::Identity();
 
   testProps(M1);
   testProps(createTransformRotateX(M_PI/3)*createTransformRotateY(M_PI/5));
@@ -320,7 +321,7 @@ void Frame3D::setRotationAxis(const Vector3D& k)
 // used by both CGFrame and CGRotationAxis
 Transform3D Frame3D::generateRotationMatrix() const
 {
-	Transform3D RK;
+	Transform3D RK = Transform3D::Identity();
 	
 	Vector3D k = rotationAxis();
 	double kx = k[0];

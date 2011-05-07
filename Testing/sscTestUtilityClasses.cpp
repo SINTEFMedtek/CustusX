@@ -91,7 +91,7 @@ void TestUtilityClasses::testFrame()
 	singleTestFrameRotationAxis((ssc::createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
 	singleTestFrameRotationAxis((ssc::createTransformRotateZ(M_PI/4)*ssc::createTransformRotateY(M_PI/4)).vector(Vector3D(1,0,0)));
 	
-	SINGLE_TEST_FRAME( Transform3D() );
+	SINGLE_TEST_FRAME( Transform3D::Identity() );
 	SINGLE_TEST_FRAME( createTransformTranslate(Vector3D(1,0,0)) );
 	SINGLE_TEST_FRAME( createTransformTranslate(Vector3D(4,3,2)) );
 	SINGLE_TEST_FRAME( ssc::createTransformRotateX(M_PI_2) );
