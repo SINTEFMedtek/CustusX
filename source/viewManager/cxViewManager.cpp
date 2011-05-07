@@ -844,7 +844,23 @@ void ViewManager::setLayoutActionSlot()
 
 bool ViewManager::isCustomLayout(const QString& uid) const
 {
-  return !std::count(mDefaultLayouts.begin(), mDefaultLayouts.end(), uid);
+  bool isLayout = false;
+  for (unsigned i=0; i<mLayouts.size();++i)
+  {
+    if(uid == mLayouts[i].getUid())
+    {
+      isLayout = true;
+      break;
+    }
+  }
+
+  bool isDefaultLayout = std::count(mDefaultLayouts.begin(), mDefaultLayouts.end(), uid);
+
+  bool retval = false;
+  if(isLayout && !isDefaultLayout)
+    retval = true;
+
+  return retval;
 }
 
 void ViewManager::loadGlobalSettings()

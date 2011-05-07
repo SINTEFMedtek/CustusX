@@ -4,8 +4,9 @@ SET( CX_QT_MOC_HEADER_FILES
     cxTimedAlgorithm.h
     cxCenterline.h
     cxResample.h
-    cxSegmentation.h
+    cxBinaryThresholdImageFilter.h
     cxContour.h
+    cxConnectedThresholdImageFilter.h
 )
 
 SET ( ${LIB}_algorithms
@@ -13,8 +14,6 @@ SET ( ${LIB}_algorithms
     ItkVtkGlue/itkImageToVTKImageFilter.txx
     ItkVtkGlue/itkVTKImageToImageFilter.h
     ItkVtkGlue/itkVTKImageToImageFilter.txx 
-    #cxSegmentationOld.h
-    #cxSegmentationOld.cpp
     vesselReg/SeansVesselReg.cxx
     vesselReg/SeansVesselReg.hxx
     vesselReg/HackTPSTransform.hxx
@@ -30,10 +29,12 @@ SET ( ${LIB}_algorithms
     cxCenterline.cpp
     cxResample.h
     cxResample.cpp
-    cxSegmentation.h
-    cxSegmentation.cpp
+    cxBinaryThresholdImageFilter.h
+    cxBinaryThresholdImageFilter.cpp
     cxContour.h
     cxContour.cpp
+    cxConnectedThresholdImageFilter.h
+    cxConnectedThresholdImageFilter.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

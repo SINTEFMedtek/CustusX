@@ -60,7 +60,7 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
   QDir loggingDir(loggingPath);
   if (!loggingDir.exists())
   {
-    loggingDir.mkdir(loggingPath);
+    loggingDir.mkpath(loggingPath);
 //    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
   }
   ToolManager::getInstance()->setLoggingFolder(loggingPath);
