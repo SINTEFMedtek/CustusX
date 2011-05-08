@@ -50,6 +50,9 @@ void TestUtilityClasses::singleTestFrame(const Transform3D& transform)
 	Frame3D frame = Frame3D::create(transform);
 	Transform3D restored = frame.transform();
 	
+	boost::array<double, 6> rep = frame.getCompactAxisAngleRep();
+	Transform3D restored_rep = Frame3D::fromCompactAxisAngleRep(rep).transform();
+
 	if (!similar(transform, restored))
 	{
 		std::cout << "--------------------------------------" << std::endl;
@@ -72,6 +75,7 @@ void TestUtilityClasses::singleTestFrame(const Transform3D& transform)
 	}
 	
 	CPPUNIT_ASSERT(similar(transform, restored));
+  CPPUNIT_ASSERT(similar(transform, restored_rep));
 }
 
 void TestUtilityClasses::singleTestFrameRotationAxis(const Vector3D& k)

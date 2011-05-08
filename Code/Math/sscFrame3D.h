@@ -56,20 +56,25 @@ public:
 	void put(std::ostream& s) const;
 	void test();
 	
+	boost::array<double, 6> getCompactAxisAngleRep() const;
+  static Frame3D fromCompactAxisAngleRep(const boost::array<double, 6>& rep);
+
 	ssc::Vector3D getEulerXYZ() const;
 	void setEulerXYZ(const ssc::Vector3D& xyz);
-
 
 	Frame3D();
 	virtual ~Frame3D();
 	
-    double mThetaXY; // angle of axis from x in xy plane
-    double mThetaZ;  // angle of axis from xy-plane toward z-axis. (thetaZ=0 -> we are in xy-plane)
-    double mPhi;     // rotation around axis.
-    Vector3D mPos;   // translation
+	Eigen::AngleAxisd mAngleAxis; ///< angle-axis representation of rotation
+	Vector3D mPos; ///< position
+
+//    double mThetaXY; // angle of axis from x in xy plane
+//    double mThetaZ;  // angle of axis from xy-plane toward z-axis. (thetaZ=0 -> we are in xy-plane)
+//    double mPhi;     // rotation around axis.
+//    Vector3D mPos;   // translation
 	
 private:
-	Transform3D generateRotationMatrix() const;
+//	Transform3D generateRotationMatrix() const;
 };
 
 std::ostream& operator<<(std::ostream& s, const Frame3D& t);

@@ -167,6 +167,16 @@ Vector3D unitVector(double thetaXY, double thetaZ)
   return e;
 }
 
+double getThetaXY(Vector3D k)
+{
+  return atan2(k[1], k[0]);
+}
+
+double getThetaZ(Vector3D k)
+{
+  return atan2(k[2], sqrt(k[0]*k[0]+k[1]*k[1]));
+}
+
 Vector3D round(const Vector3D& a)
 {
   Vector3D retval;

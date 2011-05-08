@@ -24,7 +24,10 @@ Vector3D divide_elems(const Vector3D& a, const Vector3D& b);            ///< per
 Vector3D cross(const Vector3D& a, const Vector3D& b);                   ///< compute cross product of a and b.
 double dot(const Vector3D& a, const Vector3D& b);                       ///< compute inner product (or dot product) of a and b.
 bool similar(const Vector3D& a, const Vector3D& b, double tol=1.0E-6);  ///< check for equality with a tolerance: |b-a|<tol
-Vector3D unitVector(double thetaXY, double thetaZ=0.0);                     ///< compute a unit vector given angles xy in the xy plane and z meaning the elevation from the xy plane.
+Vector3D unitVector(double thetaXY, double thetaZ=0.0);                 ///< compute a unit vector given angles xy in the xy plane and z meaning the elevation from the xy plane.
+double getThetaXY(Vector3D v);                                          ///< get thetaXY, meaning the angle of v projected onto the xy plane
+double getThetaZ(Vector3D v);                                           ///< get thetaZ, z meaning the elevation from the xy plane
+
 Vector3D round(const Vector3D& a);
 Vector3D ceil(const Vector3D& a);
 
