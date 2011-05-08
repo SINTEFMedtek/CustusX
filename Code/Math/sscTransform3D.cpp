@@ -142,64 +142,77 @@ DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& b
 
 /**Create a transform representing a scale in x,y,z
  */
-Transform3D createTransformScale(const Vector3D& scale)
+Transform3D createTransformScale(const Vector3D& scale_)
 {
-//  Transform3D retval;
-//  retval.scale(scale_);
-//  return retval;
-
-  //  Transform<float,3,Affine> t = Translation3f(p) * AngleAxisf(a,axis) * Scaling3f(s);
-
-//  Transform3D M = Eigen::Scaling<float>(scale_.cast<float>());
-//  return M;
-
-	vtkTransformPtr transform = vtkTransformPtr::New();
-	transform->Identity();
-	transform->Scale(scale.begin());
-	return Transform3D(transform->GetMatrix());
+  Transform3D retval =  Transform3D::Identity();
+  retval.scale(scale_);
+  return retval;
+//
+//  //  Transform<float,3,Affine> t = Translation3f(p) * AngleAxisf(a,axis) * Scaling3f(s);
+//
+////  Transform3D M = Eigen::Scaling<float>(scale_.cast<float>());
+////  return M;
+//
+//	vtkTransformPtr transform = vtkTransformPtr::New();
+//	transform->Identity();
+//	transform->Scale(scale.begin());
+//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a translation
  */
 Transform3D createTransformTranslate(const Vector3D& translation)
 {
-	vtkTransformPtr transform = vtkTransformPtr::New();
-	transform->Identity();
-	transform->Translate(translation.begin());
-	return Transform3D(transform->GetMatrix());
+  Transform3D retval =  Transform3D::Identity();
+  retval.translate(translation);
+  return retval;
+//
+//  vtkTransformPtr transform = vtkTransformPtr::New();
+//	transform->Identity();
+//	transform->Translate(translation.begin());
+//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the X-axis with an input angle.
  */
 Transform3D createTransformRotateX(const double angle)
 {
-	double angRad = angle/M_PI*180.0;
-	vtkTransformPtr transform = vtkTransformPtr::New();
-	transform->Identity();
-	transform->RotateX(angRad);
-	return Transform3D(transform->GetMatrix());
+  Transform3D retval =  Transform3D::Identity();
+  retval.rotate(Eigen::AngleAxisd(angle, Vector3D::UnitX()));
+  return retval;
+//	double angRad = angle/M_PI*180.0;
+//	vtkTransformPtr transform = vtkTransformPtr::New();
+//	transform->Identity();
+//	transform->RotateX(angRad);
+//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the Y-axis with an input angle.
  */
 Transform3D createTransformRotateY(const double angle)
 {
-	double angRad = angle/M_PI*180.0;
-	vtkTransformPtr transform = vtkTransformPtr::New();
-	transform->Identity();
-	transform->RotateY(angRad);
-	return Transform3D(transform->GetMatrix());
+  Transform3D retval =  Transform3D::Identity();
+  retval.rotate(Eigen::AngleAxisd(angle, Vector3D::UnitY()));
+  return retval;
+//	double angRad = angle/M_PI*180.0;
+//	vtkTransformPtr transform = vtkTransformPtr::New();
+//	transform->Identity();
+//	transform->RotateY(angRad);
+//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the Z-axis with an input angle.
  */
 Transform3D createTransformRotateZ(const double angle)
 {
-	double angRad = angle/M_PI*180.0;
-	vtkTransformPtr transform = vtkTransformPtr::New();
-	transform->Identity();
-	transform->RotateZ(angRad);
-	return Transform3D(transform->GetMatrix());
+  Transform3D retval =  Transform3D::Identity();
+  retval.rotate(Eigen::AngleAxisd(angle, Vector3D::UnitZ()));
+  return retval;
+//	double angRad = angle/M_PI*180.0;
+//	vtkTransformPtr transform = vtkTransformPtr::New();
+//	transform->Identity();
+//	transform->RotateZ(angRad);
+//	return Transform3D(transform->GetMatrix());
 }
 
 
@@ -238,18 +251,26 @@ Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const Double
  */
 Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center)
 {
-	Vector3D kvec = cross(ivec,jvec);
-	// set all column vectors
-	vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
-	matrix->Identity();
-	for (unsigned i=0; i<3; ++i)
-	{
-		matrix->SetElement(i, 0, ivec[i]);
-		matrix->SetElement(i, 1, jvec[i]);
-		matrix->SetElement(i, 2, kvec[i]);
-		matrix->SetElement(i, 3, center[i]);
-	}
-	return Transform3D(matrix);
+//	Vector3D kvec = cross(ivec,jvec);
+
+	Transform3D t = Transform3D::Identity();
+	t.matrix().col(0).head(3) = ivec;
+  t.matrix().col(1).head(3) = jvec;
+  t.matrix().col(2).head(3) = cross(ivec,jvec);
+  t.matrix().col(3).head(3) = center;
+
+//	// set all column vectors
+//	vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
+//	matrix->Identity();
+//	for (unsigned i=0; i<3; ++i)
+//	{
+//		matrix->SetElement(i, 0, ivec[i]);
+//		matrix->SetElement(i, 1, jvec[i]);
+//		matrix->SetElement(i, 2, kvec[i]);
+//		matrix->SetElement(i, 3, center[i]);
+//	}
+//	return Transform3D(matrix);
+  return t;
 }
 
 } // namespace ssc
