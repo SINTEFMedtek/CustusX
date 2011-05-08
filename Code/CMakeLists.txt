@@ -107,7 +107,7 @@ set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/Math/
     ${SSC_SOURCE_DIR}/Code/Widgets/
     ${SSC_SOURCE_DIR}/Code/3rdParty/
-    ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
+#    ${SSC_SOURCE_DIR}/Code/3rdParty/cml-1_0_2
     ${SSC_BINARY_DIR}
     ) 
 
