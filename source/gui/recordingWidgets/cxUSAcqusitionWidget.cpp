@@ -13,6 +13,7 @@
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
 #include "cxToolDataAdapters.h"
+#include "cxDoubleDataAdapterTemporalCalibration.h"
 
 namespace cx
 {
@@ -49,6 +50,15 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
 
 USAcqusitionWidget::~USAcqusitionWidget()
 {}
+
+
+QString USAcqusitionWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>US Acquisition.</h3>"
+      "<p><i>Record and reconstruct US data.</i></br>"
+      "</html>";
+}
 
 void USAcqusitionWidget::checkIfReadySlot()
 {
