@@ -27,6 +27,14 @@ namespace cx
 
 typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
+ enum STEREOTYPE
+{
+  stFRAME_SEQUENTIAL,
+  stINTERLACED,
+  stDRESDEN,
+  stRED_BLUE
+};
+
 class ToolAxisConnector : public QObject
 {
 	Q_OBJECT
@@ -59,6 +67,7 @@ public:
   virtual double getZoom2D(){return -1.0;};
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy);
   virtual void setViewGroup(ViewGroupDataPtr group);
+  void setStereoType(int type);
 
 private slots:
   void dominantToolChangedSlot(); ///< makes sure the reps are connected to the right tool
@@ -76,6 +85,8 @@ private slots:
   void centerToolActionSlot();
   void optionChangedSlot();
   void showOrientationSlot(bool visible);
+  void globalConfigurationFileChangedSlot(QString key);
+  void setStereoEyeAngle(double angle);
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);
