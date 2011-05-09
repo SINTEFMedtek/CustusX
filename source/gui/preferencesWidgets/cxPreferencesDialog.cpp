@@ -1,7 +1,10 @@
 
 #include <QtGui>
+#include <QAction>
 
 #include <iostream>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 #include "sscMessageManager.h"
 #include "sscDoubleWidgets.h"
 #include "sscEnumConverter.h"
@@ -17,6 +20,7 @@
 #include "cxToolFilterWidget.h"
 #include "cxColorSelectButton.h"
 #include "cxLayoutEditorTab.h"
+#include "cxViewWrapper3D.h"
 
 namespace cx
 {
@@ -227,7 +231,7 @@ void PerformanceTab::saveParametersSlot()
 
 
 VisualizationTab::VisualizationTab(QWidget *parent) :
-    PreferencesTab(parent)
+    PreferencesTab(parent), mStereoTypeActionGroup(NULL)
 {}
 
 void VisualizationTab::init()
@@ -243,17 +247,94 @@ void VisualizationTab::init()
   connect(backgroundColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setBackgroundColorSlot(QColor)));
 
 
+  //Stereoscopic visualization (3D view)
+  QGroupBox* stereoGroupBox = new QGroupBox("Stereoscopic visualization");
+  mStereoTypeComboBox = new QComboBox();
+  connect(mStereoTypeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(stereoTypeChangedSlot(int)));
+  this->initStereoTypeComboBox();
+  double eyeAngle = settings()->value("View3D/eyeAngle").toDouble();
+  mEyeAngleAdapter = ssc::DoubleDataAdapterXml::initialize("Eye angle (degrees)", "",
+      "Separation between eyes in degrees",
+      eyeAngle, ssc::DoubleRange(0, 10, 0.1), 1);
+  connect(mEyeAngleAdapter.get(), SIGNAL(valueWasSet()), this, SLOT(eyeAngleSlot()));
+
+  QVBoxLayout* stereoLayout = new QVBoxLayout();
+  stereoLayout->addWidget(mStereoTypeComboBox);
+  stereoLayout->addWidget(new ssc::SpinBoxAndSliderGroupWidget(this, mEyeAngleAdapter));
+  stereoGroupBox->setLayout(stereoLayout);
+
   //Layout
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(backgroundColorButton, 0, 0);
   mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mSphereRadius));
+
+  mMainLayout->addWidget(stereoGroupBox);
 
   QHBoxLayout* toptopLayout = new QHBoxLayout;
   toptopLayout->addLayout(mMainLayout);
   toptopLayout->addStretch();
 
   mTopLayout->addLayout(toptopLayout);
+}
 
+void VisualizationTab::initStereoTypeComboBox()
+{
+  if (mStereoTypeActionGroup)
+    return;
+  //Insert all actions into an action group
+  mStereoTypeActionGroup = new QActionGroup(this);
+
+  QAction* stereoFrameSequentialAction = new QAction("Frame-sequential", mStereoTypeActionGroup);
+  QAction* stereoInterlacedAction = new QAction("Interlaced", mStereoTypeActionGroup);
+  QAction* stereoDresdenAction = new QAction("Dresden", mStereoTypeActionGroup);
+  QAction* stereoRedBlueAction = new QAction("Red/Blue", mStereoTypeActionGroup);
+  stereoFrameSequentialAction->setData(QVariant(stFRAME_SEQUENTIAL));
+  stereoInterlacedAction->setData(QVariant(stINTERLACED));
+  stereoDresdenAction->setData(QVariant(stDRESDEN));
+  stereoRedBlueAction->setData(QVariant(stRED_BLUE));
+
+  connect(stereoFrameSequentialAction, SIGNAL(triggered()), this, SLOT(stereoFrameSequentialSlot()));
+  connect(stereoInterlacedAction, SIGNAL(triggered()), this, SLOT(stereoInterlacedSlot()));
+  connect(stereoDresdenAction, SIGNAL(triggered()), this, SLOT(stereoDresdenSlot()));
+  connect(stereoRedBlueAction, SIGNAL(triggered()), this, SLOT(stereoRedBlueSlot()));
+
+  mStereoTypeComboBox->blockSignals(true);
+  mStereoTypeComboBox->insertItem(stFRAME_SEQUENTIAL, stereoFrameSequentialAction->text(), stereoFrameSequentialAction->data());
+  mStereoTypeComboBox->insertItem(stINTERLACED, stereoInterlacedAction->text(), stereoInterlacedAction->data());
+  mStereoTypeComboBox->insertItem(stDRESDEN, stereoDresdenAction->text(), stereoDresdenAction->data());
+  mStereoTypeComboBox->insertItem(stRED_BLUE, stereoRedBlueAction->text(), stereoRedBlueAction->data());
+  mStereoTypeComboBox->blockSignals(false);
+
+  int stereoType = settings()->value("View3D/stereoType").toInt();
+  mStereoTypeComboBox->setCurrentIndex(stereoType);
+}
+void VisualizationTab::stereoTypeChangedSlot(int index)
+{
+  QList<QAction*> actions = mStereoTypeActionGroup->actions();
+  if (index<0 || index>=actions.size())
+    return;
+  actions[index]->trigger();
+}
+void VisualizationTab::stereoFrameSequentialSlot()
+{
+  settings()->setValue("View3D/stereoType", stFRAME_SEQUENTIAL);
+}
+void VisualizationTab::stereoInterlacedSlot()
+{
+  settings()->setValue("View3D/stereoType", stINTERLACED);
+}
+void VisualizationTab::stereoDresdenSlot()
+{
+  settings()->setValue("View3D/stereoType", stDRESDEN);
+}
+void VisualizationTab::stereoRedBlueSlot()
+{
+  settings()->setValue("View3D/stereoType", stRED_BLUE);
+}
+
+void VisualizationTab::eyeAngleSlot()
+{
+  settings()->setValue("View3D/eyeAngle", mEyeAngleAdapter->getValue());
 }
 
 void VisualizationTab::saveParametersSlot()
