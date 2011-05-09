@@ -85,6 +85,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscLabeledLineEditWidget.h
     Widgets/sscCheckBoxWidget.h
     Widgets/sscHelperWidgets.h
+    Widgets/sscFileSelectWidget.h
     Utilities/sscMessageManager.h
     )
 
@@ -306,6 +307,8 @@ SET( SSC_SOURCE_FILES
     Widgets/sscXmlOptionItem.cpp
     Widgets/sscConsoleWidget.h
     Widgets/sscConsoleWidget.cpp
+    Widgets/sscFileSelectWidget.h
+    Widgets/sscFileSelectWidget.cpp
 	) 
 
 # =========================================================
