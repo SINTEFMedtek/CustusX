@@ -31,14 +31,10 @@ View3D::View3D(const QString& uid, const QString& name, QWidget *parent, Qt::WFl
   this->setContextMenuPolicy(Qt::CustomContextMenu);
   mRenderer->GetActiveCamera()->SetClippingRange(1, 2000);
 
-  mRenderWindow->StereoCapableWindowOn();
-  mRenderWindow->SetStereoTypeToCrystalEyes();
-  //mRenderWindow->SetStereoTypeToInterlaced();
 }
 
 View3D::~View3D()
 {
 }
-
 
 }//namespace cx
