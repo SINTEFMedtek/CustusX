@@ -136,8 +136,22 @@ protected:
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mSphereRadius;
 
+  //Stereo
+  QComboBox* mStereoTypeComboBox;
+  ssc::DoubleDataAdapterXmlPtr mEyeAngleAdapter;
+  QActionGroup* mStereoTypeActionGroup;
+  void initStereoTypeComboBox();
+
 private slots:
   void setBackgroundColorSlot(QColor color);
+  //Stereo
+  void stereoTypeChangedSlot(int index);
+  void stereoFrameSequentialSlot();
+  void stereoInterlacedSlot();
+  void stereoDresdenSlot();
+  void stereoRedBlueSlot();
+  void eyeAngleSlot();
+
 //  void setBackgroundColorSlot();
 };
 
