@@ -13,7 +13,7 @@ find_package(Qt4 REQUIRED)
 IF(QT_USE_FILE)
   INCLUDE(${QT_USE_FILE})
 ELSE(QT_USE_FILE)
-  SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
+  SET(QT_LIBRARIES  ${QT_QT_LIBRARY})
 ENDIF(QT_USE_FILE)
 
 # VTK
@@ -137,20 +137,22 @@ SET(BUNDLE_NAME CustusX)
 #--------------------------------------------------------------------------------
 # Install the application, on Apple, the bundle is at the root of the
 # install tree, and on other platforms it'll go into the bin directory.
-install(TARGETS CustusX #DESTINATION .
-    BUNDLE DESTINATION ${INSTALL_FOLDER_NAME} #COMPONENT Runtime
-    RUNTIME DESTINATION bin #COMPONENT Runtime
-    #COMPONENT application # crashes in installer
+install(TARGETS CustusX
+    BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
+    RUNTIME DESTINATION bin
     )
     
     # taken from http://www.itk.org/Wiki/BundleUtilitiesExample
+
+include (InstallRequiredSystemLibraries)
+
 #--------------------------------------------------------------------------------
 # Now the installation stuff below
 #--------------------------------------------------------------------------------
-#SET(plugin_dest_dir bin)
 SET(RESOURCES_DIR bin)
 SET(CONFIG_DIR bin)
 SET(SYMLINK_DIR bin)
+
 if(APPLE)
     SET(SYMLINK_DIR /Library/CustusX)
 else(APPLE)
@@ -159,30 +161,29 @@ else(APPLE)
     SET(SYMLINK_DIR /Library/CustusX)
 endif(APPLE)
 
-  
 SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}")
 IF(APPLE)
-  #SET(plugin_dest_dir ${BUNDLE_NAME}.app/Contents/MacOS)
   SET(RESOURCES_DIR ${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app/Contents/Resources)
-  #SET(CONFIG_DIR ${BUNDLE_NAME}.app/Contents/config)
   SET(CONFIG_DIR ${INSTALL_FOLDER_NAME}/config)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app")
 ENDIF(APPLE)
 IF(WIN32)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}.exe")
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
 ENDIF(WIN32)
 
 # install configuration files to config folder
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}" 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
-    ) # COMPONENT config)
+    )
+
 # install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl DESTINATION ${RESOURCES_DIR}/shaders/ 
-    ) # COMPONENT config)
+install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl 
+        DESTINATION ${RESOURCES_DIR}/shaders/ 
+    )
+
 # install folder for storage of igstk<->CustusX symlinks
 install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLINK_DIR} 
-    #USE_SOURCE_PERMISSIONS
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -192,28 +193,24 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLI
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
         WORLD_READ WORLD_EXECUTE WORLD_WRITE
     PATTERN ".svn" EXCLUDE
-    ) # COMPONENT config)
+    )
+
 # Install all files in install/nextToCustusX direcly into the CustusX folder.
 # Use this to add additional stuff to the installation.
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ DESTINATION ${INSTALL_FOLDER_NAME} 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
+    DESTINATION ${INSTALL_FOLDER_NAME} 
     USE_SOURCE_PERMISSIONS
     PATTERN ".svn" EXCLUDE
     PATTERN "readme.txt" EXCLUDE
     ) 
 
-#set(CPACK_SET_DESTDIR ON)
-#set(CPACK__PACKAGE_NAME "CustusX")
-SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
-#SET(CPACK_SET_DESTDIR "ON")
-#message(STATUS "DESTDIR:  " $ENV{DESTDIR})
+#SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
 
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "CustusX description summary")# does not work..?
-set(CPACK_PACKAGE_VENDOR "Sintef")# does not work..?
-if (WIN32)
-    set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons\\CustusX.png")
-else (WIN32)
-    set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
-endif (WIN32)
+#if (WIN32)
+    #set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")
+#else (WIN32)
+    #set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
+#endif (WIN32)
 
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
@@ -221,69 +218,25 @@ set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
 set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}") # name of .pkg file
-if (WIN32)
-    set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc\\install_welcome.txt")
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc\\install_readme.rtf")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc\\install_license.txt")
-else (WIN32)
-    set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-    set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
-endif (WIN32)
+#if (WIN32)
+    #set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc\\install_welcome.txt")
+    #set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc\\install_readme.rtf")
+    #set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc\\install_license.txt")
+#else (WIN32)
+    #set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
+    #set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
+    #set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
+#endif (WIN32)
 
+#set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
-#set(CPACK_PACKAGE_EXECUTABLES "CustusX" "CustusX_navn")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
-if (APPLE)
-    set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
-    option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
-    option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
-    option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
-    option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
-    option (CPACK_SOURCE_TZ "Enable to build TZ source packages" OFF)
-endif(APPLE)
+SET(LIBS ${QT_LIBRARY_DIR})
+SET(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
 
-# special handling of shared libraries: must copy them into the bundle
-if (BUILD_SHARED_LIBS)
-    message("bygger shared libs")
-    #--------------------------------------------------------------------------------
-    # Use BundleUtilities to get all other dependencies for the application to work.
-    # It takes a bundle or executable along with possible plugins and inspects it
-    # for dependencies.  If they are not system dependencies, they are copied.
-    #message(STATUS "APPS: " ${CMAKE_INSTALL_PREFIX}/${BUNDLE_NAME}.app)
-    # directories to look for dependencies
-    SET(BUNDLE_DIRS 
-        ${SSC_DIR}/Code 
-        ${LIB_DIRECTORIES}
-        ${QT_LIBRARY_DIRS})
-    #foreach (ITER ${LIB_DIRECTORIES})
-    #    SET(BUNDLE_DIRS ${CMAKE_CURRENT_BINARY_DIR}/${ITER} ${BUNDLE_DIRS})    
-    #endforeach (ITER ${LIB_DIRECTORIES})
-    
-    set(BUNDLE_LIBS )
-    
-    # Now the work of copying dependencies into the bundle/package
-    # The quotes are escaped and variables to use at install time have their $ escaped
-    # An alternative is the do a configure_file() on a script and use install(SCRIPT  ...).
-    # Note that the image plugins depend on QtSvg and QtXml, and it got those copied
-    # over.
-    #install(CODE "
-    #    include(BundleUtilities)
-    ##    fixup_bundle(\"${APPS}\" \"${BUNDLE_LIBS}\" \"${BUNDLE_DIRS}\")
-    #    fixup_bundle(\"${APPS}\" \"\" \"${BUNDLE_DIRS}\")
-    #    " COMPONENT Runtime)
-    #FIXUP_BUNDLE(<app> <libs> <dirs>)
-    #message(STATUS "BUNDLE_DIRS: "  ${BUNDLE_DIRS})
-endif (BUILD_SHARED_LIBS)
+INSTALL(CODE "
+   include(BundleUtilities)
+   fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") ")
 
-# To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X
-# where CPackConfig.cmake is created by including CPack
-# And then there's ways to customize this as well
-#set(CPACK_BINARY_DRAGNDROP ON)
 include(CPack)
-
-# dette krasjer installeren...
-#cpack_add_component(application)
-#cpack_add_component(config DISPLAY_NAME "Configuration files" DESCRIPTION "Detaljert beskrivelse")
     
 add_subdirectory(testing)      
