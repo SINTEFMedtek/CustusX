@@ -5,6 +5,7 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
+#include <QHeaderView>
 
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
@@ -21,6 +22,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   QWidget(parent),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
+  mActiveLandmark(""),
   mAddButton(new QPushButton("Add", this)),
   mEditButton(new QPushButton("Resample", this)),
   mRemoveButton(new QPushButton("Remove", this)),
@@ -56,6 +58,9 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mLoadReferencePointsButton);
 }
 
+PointSamplingWidget::~PointSamplingWidget()
+{}
+
 void PointSamplingWidget::itemSelectionChanged()
 {
   //std::cout << "pling" << std::endl;
@@ -73,10 +78,6 @@ void PointSamplingWidget::itemSelectionChanged()
   }
 
   enablebuttons();
-}
-
-PointSamplingWidget::~PointSamplingWidget()
-{
 }
 
 void PointSamplingWidget::showEvent(QShowEvent* event)
@@ -106,7 +107,10 @@ void PointSamplingWidget::updateSlot()
   mTable->setColumnCount(3);
   QStringList headerItems(QStringList() << "Name" << "Coordinates(r)" << "Delta (mm)");
   mTable->setHorizontalHeaderLabels(headerItems);
+#ifndef WIN32
+  //for some reason this line of code makes the program crash in release mode on windows, not in debugmode tho
   mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+#endif
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   for (unsigned i = 0; i < mSamples.size(); ++i)
@@ -282,6 +286,5 @@ void PointSamplingWidget::loadReferencePointsSlot()
     this->addPoint(P_ref);
   }
 }
-
 
 }//end namespace cx
