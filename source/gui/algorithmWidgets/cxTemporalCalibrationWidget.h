@@ -35,6 +35,8 @@ private slots:
   void selectData(QString filename);
   void calibrateSlot();
 
+protected:
+  void showEvent(QShowEvent* event);
 private:
   ssc::FileSelectWidget* mFileSelectWidget;
   TemporalCalibrationPtr mAlgorithm;
