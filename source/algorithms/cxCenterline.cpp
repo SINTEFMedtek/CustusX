@@ -22,12 +22,19 @@ void Centerline::setDefaultColor(QColor color)
   mDefaultColor = color;
 }
 
-void Centerline::setInput(ssc::ImagePtr inputImage, QString outputBasePath)
+bool Centerline::setInput(ssc::ImagePtr inputImage, QString outputBasePath)
 {
   mInput = inputImage;
   mOutputBasePath = outputBasePath;
 
+  if (mInput->getMax() != 1 || mInput->getMin() != 0)
+  {
+    ssc::messageManager()->sendError("Centerline algorithm requires binary volume as input");
+    return false;
+  }
+
   this->generate();
+  return true;
 }
 
 ssc::DataPtr Centerline::getOutput()
