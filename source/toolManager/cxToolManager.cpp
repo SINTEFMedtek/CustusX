@@ -180,7 +180,7 @@ void ToolManager::trackerConfiguredSlot(bool on)
 
       mTools[it->first] = tool;
       // Automatic selection of dominant tool for other applications than ENDOVASCULAR
-      if(stateManager()->getApplication()->getActiveStateName() != enum2string(ssc::mdENDOVASCULAR))
+//      if(stateManager()->getApplication()->getActiveStateName() != enum2string(ssc::mdENDOVASCULAR))
         connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }
     else
