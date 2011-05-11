@@ -7,6 +7,8 @@
 
 #include <sscFileSelectWidget.h>
 #include <QtGui>
+#include "sscTypeConversions.h"
+#include <iostream>
 
 namespace ssc
 {
@@ -36,13 +38,17 @@ QString FileSelectWidget::getFilename() const
 void FileSelectWidget::setFilename(QString name)
 {
   mFilename = name;
+//  QString temp = QFileInfo(mFilename).dir().absolutePath();
+//  std::cout << "isdir " << QFileInfo(mFilename).isDir() << std::endl;
+//  std::cout << "FileSelectWidget::setFilename name" << mFilename << '\n' << QFileInfo(mFilename).dir().absolutePath() << std::endl;
 
   if (QFileInfo(mFilename).isDir())
   {
     mRootPath = QFileInfo(mFilename).dir().absolutePath();
+//    std::cout << "FileSelectWidget::setFilename root" << mRootPath << std::endl;
   }
 
-  this->updateComboBox();
+  this->refresh();
 }
 
 void FileSelectWidget::setNameFilter(QStringList filter)
@@ -53,7 +59,8 @@ void FileSelectWidget::setNameFilter(QStringList filter)
 void FileSelectWidget::setPath(QString path)
 {
   mRootPath = path;
-  this->updateComboBox();
+  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
+  this->refresh();
 }
 
 void FileSelectWidget::selectData()
@@ -67,6 +74,9 @@ void FileSelectWidget::selectData()
     return;
 
   mFilename = filename;
+  std::cout << this << " selectData " << mFilename << std::endl;
+
+  this->refresh();
   emit fileSelected(mFilename);
 }
 
@@ -92,6 +102,12 @@ QStringList FileSelectWidget::getAllFiles(QString folder)
   return retval;
 }
 
+void FileSelectWidget::refresh()
+{
+  this->updateComboBox();
+}
+
+
 void FileSelectWidget::updateComboBox()
 {
   mDataComboBox->blockSignals(true);
@@ -101,6 +117,7 @@ void FileSelectWidget::updateComboBox()
 
   for (int i=0; i<files.size(); ++i)
   {
+    std::cout << this << " add basic " << files[i] << std::endl;
     mDataComboBox->addItem(QFileInfo(files[i]).fileName(), files[i]);
   }
   mDataComboBox->setCurrentIndex(-1);
@@ -108,6 +125,13 @@ void FileSelectWidget::updateComboBox()
   {
     if (mDataComboBox->itemData(i)==mFilename)
       mDataComboBox->setCurrentIndex(i);
+  }
+
+  if (!mFilename.isEmpty() && mDataComboBox->currentIndex()<0 && !files.contains(mFilename))
+  {
+    std::cout << this << " add extra " << mFilename << std::endl;
+    mDataComboBox->addItem(QFileInfo(mFilename).fileName(), mFilename);
+    mDataComboBox->setCurrentIndex(mDataComboBox->count()-1);
   }
 
   mDataComboBox->setToolTip(mFilename);

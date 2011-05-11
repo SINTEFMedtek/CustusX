@@ -38,15 +38,18 @@ public:
   void setNameFilter(QStringList filter);
   void setPath(QString path);
 
+public slots:
+  void refresh();
+
 signals:
   void fileSelected(QString name);
 
 private slots:
   void selectData();
   void currentDataComboIndexChanged(int);
+  void updateComboBox();
 
 private:
-  void updateComboBox();
   QStringList getAllFiles(QString folder);
 
   QComboBox* mDataComboBox;
