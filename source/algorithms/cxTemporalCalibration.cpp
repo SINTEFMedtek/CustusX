@@ -133,6 +133,9 @@ void TemporalCalibration::selectData(QString filename)
   mFilename = filename;
   mFileData = FileData();
 
+  if (!QFileInfo(filename).exists())
+    return;
+
   UsReconstructionFileReader fileReader;
   QString mhdFileName = ssc::changeExtension(filename, "mhd");
 
@@ -148,7 +151,7 @@ void TemporalCalibration::selectData(QString filename)
   mFileData.mFrames = fileReader.readFrameTimestamps(filename);
   mFileData.mPositions = fileReader.readPositions(filename);
 
-  ssc::messageManager()->sendInfo("successfully loaded data from " + filename);
+  ssc::messageManager()->sendInfo("Temporal Calibration: Successfully loaded data from " + filename);
 }
 
 void TemporalCalibration::setDebugFile(QString filename)

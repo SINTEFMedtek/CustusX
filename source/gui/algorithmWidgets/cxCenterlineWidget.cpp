@@ -76,9 +76,15 @@ void CenterlineWidget::setDefaultColor(QColor color)
 void CenterlineWidget::findCenterlineSlot()
 {
   QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
-  mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath);
-
-  mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
+  if(mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath))
+  {
+    //Only print text if the input is in the correct format
+    mStatusLabel->setText("<font color=orange> Generating centerline... Please wait!</font>\n");
+  }
+  else
+  {
+    mStatusLabel->setText("<font color=red> Incorrect input</font>\n");
+  }
 }
 
 void CenterlineWidget::handleFinishedSlot()

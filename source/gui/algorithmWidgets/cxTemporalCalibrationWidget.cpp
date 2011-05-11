@@ -78,13 +78,22 @@ QString TemporalCalibrationWidget::defaultWhatsThis() const
       "</html>";
 }
 
+void TemporalCalibrationWidget::showEvent(QShowEvent* event)
+{
+  mFileSelectWidget->refresh();
+}
+
 void TemporalCalibrationWidget::patientChangedSlot()
 {
-  mFileSelectWidget->setFilename(stateManager()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
+//  std::cout << "TemporalCalibrationWidget::patientChangedSlot() "  << std::endl;
+  QString filename = stateManager()->getPatientData()->getActivePatientFolder() + "/US_Acq/";
+  mFileSelectWidget->setPath(filename);
+//  this->selectData(filename);
 }
 
 void TemporalCalibrationWidget::selectData(QString filename)
 {
+//  std::cout << "TemporalCalibrationWidget::selectData " << filename << std::endl;
   mAlgorithm->selectData(filename);
   mResult->setText("");
 }
@@ -100,6 +109,7 @@ void TemporalCalibrationWidget::calibrateSlot()
     mAlgorithm->setDebugFile("");
 
   double shift = mAlgorithm->calibrate();
+  ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
   mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
 }
 
