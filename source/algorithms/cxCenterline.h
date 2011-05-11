@@ -23,7 +23,7 @@ public:
   Centerline();
   virtual ~Centerline();
 
-  void setInput(ssc::ImagePtr inputImage, QString outputBasePath);
+  bool setInput(ssc::ImagePtr inputImage, QString outputBasePath);
   ssc::DataPtr getOutput();
   void setDefaultColor(QColor color);
 
