@@ -12,7 +12,6 @@
 #include <QVBoxLayout>
 #include "boost/bind.hpp"
 #include "sscToolManager.h"
-#include <vtkDoubleArray.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkPointData.h>
 #include <vtkImageData.h>
@@ -26,51 +25,27 @@
 #include "sscVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
-typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
+
 #include "sscMessageManager.h"
 #include "sscTime.h"
+#include <vtkImageMask.h>
+typedef vtkSmartPointer<vtkImageMask> vtkImageMaskPtr;
 
 namespace cx
 {
 
 typedef unsigned char uchar; // for removing eclipse warnings
 
-vtkImageDataPtr generateVtkImageDataDouble(ssc::Vector3D dim,
-    ssc::Vector3D spacing,
-    double initValue)
-{
-  vtkImageDataPtr data = vtkImageDataPtr::New();
-  data->SetSpacing(spacing[0], spacing[1], spacing[2]);
-  data->SetExtent(0, dim[0]-1, 0, dim[1]-1, 0, dim[2]-1);
-  data->SetScalarTypeToDouble();
-  data->SetNumberOfScalarComponents(1);
 
-  int scalarSize = dim[0]*dim[1]*dim[2];
-
-  double *rawchars = (double*)malloc((scalarSize+1)*8);
-  std::fill(rawchars,rawchars+scalarSize, initValue);
-
-  vtkDoubleArrayPtr array = vtkDoubleArrayPtr::New();
-  array->SetNumberOfComponents(1);
-  //TODO: Whithout the +1 the volume is black
-  array->SetArray(rawchars, scalarSize+1, 0); // take ownership
-  data->GetPointData()->SetScalars(array);
-
-  // A trick to get a full LUT in ssc::Image (automatic LUT generation)
-  // Can't seem to fix this by calling Image::resetTransferFunctions() after volume is modified
-  rawchars[0] = 255;
-  data->GetScalarRange();// Update internal data in vtkImageData. Seems like it is not possible to update this data after the volume has been changed.
-  rawchars[0] = 0;
-
-
-  return data;
-}
 
 /**
  * Found this on
  * http://paulbourke.net/miscellaneous/correlate/
  * Slightly modified.
  *
+ * x: first input series, size n
+ * y: second input series, size n
+ * corr: correlation result, size maxdelay*2 (zero shif is found at corr[maxdelay]
  */
 void correlate(double* x, double* y, double* corr, int maxdelay, int n)
 {
@@ -128,19 +103,21 @@ void correlate(double* x, double* y, double* corr, int maxdelay, int n)
 
 }
 
+TemporalCalibration::TemporalCalibration()
+{
+	mAddRawToDebug = true;
+}
+
 void TemporalCalibration::selectData(QString filename)
 {
   mFilename = filename;
-  mFileData = FileData();
+  mFileData = UsReconstructionFileReader::FileData();
 
   if (!QFileInfo(filename).exists())
     return;
 
   UsReconstructionFileReader fileReader;
-  QString mhdFileName = ssc::changeExtension(filename, "mhd");
-
-  //Read US images
-  mFileData.mUsRaw = fileReader.readUsDataFile(mhdFileName);
+  mFileData = fileReader.readAllFiles(filename);
 
   if (!mFileData.mUsRaw)
   {
@@ -148,25 +125,25 @@ void TemporalCalibration::selectData(QString filename)
     return;
   }
 
-  mFileData.mFrames = fileReader.readFrameTimestamps(filename);
-  mFileData.mPositions = fileReader.readPositions(filename);
-
   ssc::messageManager()->sendInfo("Temporal Calibration: Successfully loaded data from " + filename);
 }
 
-void TemporalCalibration::setDebugFile(QString filename)
+void TemporalCalibration::setDebugFolder(QString filename)
 {
-  mDebugFile = filename;
+	mDebugFolder = filename;
 }
 
 void TemporalCalibration::saveDebugFile()
 {
-  if (mDebugFile.isEmpty())
+  if (mDebugFolder.isEmpty())
     return;
+
+  QString dbFilename = mDebugFolder +"/"+ QFileInfo(mFilename).baseName() + "_temporal_calib.txt";
 //  std::stringstream mDebugStream;
 //  QString fullname = QFileInfo(mFilename).dir().absolutePath()+"/"+mDebugFile;
 //  QString fullname = "/home/christiana/christiana/"+mDebugFile;
-  QFile file(mDebugFile);
+  QFile file(dbFilename);
+  file.remove();
 
   if (!file.open(QIODevice::ReadWrite))
   {
@@ -212,7 +189,7 @@ double TemporalCalibration::calibrate()
   std::vector<double> trackingMovement = this->computeTrackingMovement();
 
   // set a resolution, resample both tracking and frames to that
-  double resolution = 10; // ms
+  double resolution = 5; // ms
 
   double offset = mFileData.mFrames.front().mTime - mFileData.mPositions.front().mTime;
   std::vector<double> frameMovementRegular = this->resample(frameMovement, mFileData.mFrames, resolution);
@@ -304,21 +281,37 @@ std::vector<double> TemporalCalibration::computeTrackingMovement()
   ssc::Vector3D e_z(0,0,1);
   ssc::Vector3D origin(0,0,0);
   double zero = 0;
+  ssc::Transform3D prM0t = mFileData.mPositions[0].mPos;
+  ssc::Vector3D ez_pr = prM0t.vector(e_z);
 
   for (unsigned i=0; i<mFileData.mPositions.size(); ++i)
   {
     ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
     ssc::Vector3D p_pr = prMt.coord(origin);
 
-//    std::cout << i << "\t" << p_pr << std::endl;
-
-    ssc::Vector3D ez_pr = prMt.vector(e_z);
     double val = dot(ez_pr, p_pr);
 
     if (retval.empty())
       zero = val;
 
     retval.push_back(val-zero);
+//    if (i<50)
+//    	std::cout << i << "\t" << p_pr <<  "\t"  <<ez_pr << "\t" << val << "\t" << val-zero << std::endl;
+  }
+
+  if (mAddRawToDebug)
+  {
+		mDebugStream << "=======================================" << std::endl;
+		mDebugStream << "tracking raw data:" << std::endl;
+		mDebugStream << std::endl;
+		mDebugStream << "timestamp" << "\t" << "pos" << std::endl;
+		for (unsigned x = 0; x < mFileData.mPositions.size(); ++x)
+		{
+			mDebugStream << mFileData.mPositions[x].mTime << "\t" << retval[x] << std::endl;
+		}
+		mDebugStream << std::endl;
+		mDebugStream << "=======================================" << std::endl;
+//		std::cout << mDebugStream.str() << std::endl;
   }
 
   return retval;
@@ -331,31 +324,47 @@ std::vector<double> TemporalCalibration::computeProbeMovement()
 {
   int N_frames = mFileData.mUsRaw->getDimensions()[2];
 
-//  std::cout << "max correlation for each frame:" << std::endl;
   std::vector<double> retval;
+
+  double maxSingleStep = 5; // assume max 5mm movement per frame
+  double currentMaxShift = 5;
+  double lastVal = 0;
 
   for (int i=0; i<N_frames; ++i)
   {
-    double val = this->findCorrelation(mFileData.mUsRaw, 0, i, 1000);
-//    std::cout << i << "\t" << val << std::endl;
+    double val = this->findCorrelation(mFileData.mUsRaw, 0, i, maxSingleStep, lastVal);
+    currentMaxShift =  fabs(val) + maxSingleStep;
+    lastVal = val;
     retval.push_back(val);
   }
 
-//  int N_frames = mFileData.mUsRaw->getDimensions()[2];
-//
-//  //for (int frame=0; frame<N_frames; ++frame)
-//  for (int frame=0; frame<2; ++frame)
-//  {
-//    vtkImageDataPtr line = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame);
-//  }
-//  return TimeSeriesType();
+  if (mAddRawToDebug)
+  {
+		mDebugStream << "=======================================" << std::endl;
+		mDebugStream << "frames raw data:" << std::endl;
+		mDebugStream << std::endl;
+		mDebugStream << "timestamp" << "\t" << "shift" << std::endl;
+		for (int x = 0; x < N_frames; ++x)
+		{
+			mDebugStream << mFileData.mFrames[x].mTime << "\t" << retval[x] << std::endl;
+		}
+		mDebugStream << std::endl;
+		mDebugStream << "=======================================" << std::endl;
+  }
+
   return retval;
 }
 
-double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_a, int frame_b, int maxShift)
+double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal)
 {
+	int maxShift_pix = maxShift / mFileData.mUsRaw->getSpacing()[1];
+	int lastVal_pix = lastVal / mFileData.mUsRaw->getSpacing()[1];
+
 //  int N_frames = mFileData.mUsRaw->getDimensions()[2];
-  int line_index_x = mFileData.mUsRaw->getDimensions()[0]/2;
+//  int line_index_x = mFileData.mUsRaw->getDimensions()[0]/2;
+  int line_index_x = mFileData.mProbeData.mData.mImage.mOrigin_p[0];
+
+  int dimY = mFileData.mUsRaw->getDimensions()[1];
 
 //  std::vector<double>
   vtkImageDataPtr line1 = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame_a);
@@ -370,29 +379,50 @@ double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_
 //  std::cout << "got a result with dim " << ssc::Vector3D(result->GetDimensions()) << std::endl;
 
 //  int N = result->GetDimensions()[0];
-  int N = line1->GetDimensions()[0];
+//  int N = dimY;
+//  N = maxShift_pix*2; //result vector allocate space on both sides of zero
+  int N = 2*dimY; //result vector allocate space on both sides of zero
+//  N = 2*N; /// use double the space in order to accept more movement than half the interval.
   std::vector<double> result(N, 0);
   double* line_a = static_cast<double*>(line1->GetScalarPointer());
   double* line_b = static_cast<double*>(line2->GetScalarPointer());
-//  double* line_c = static_cast<double*>(result->GetScalarPointer());
   double* line_c = &*result.begin();
 
-  correlate(line_a, line_b, line_c, N/2, N);
+  correlate(line_a, line_b, line_c, N/2, dimY);
 
-//  for (int x=0; x<N; ++x)
-//  {
-//    std::cout << line_a[x] << "\t" << line_b[x] << "\t" << line_c[x] << std::endl;
-//  }
+  // use the last found hit as a seed for looking for a local maximum
+  int lastTop = N/2 - lastVal_pix;
+  std::pair<int,int> range(lastTop - maxShift_pix, lastTop+maxShift_pix);
+  range.first = std::max(0, range.first);
+  range.second = std::min(N, range.second);
 
-//  //for (int frame=0; frame<N_frames; ++frame)
-//  for (int frame=0; frame<2; ++frame)
-//  {
-//    vtkImageDataPtr line = this->extractLine_y(mFileData.mUsRaw, line_index_x, frame);
-//  }
-  int top = std::distance(result.begin(), std::max_element(result.begin(), result.end()));
-//  top = top - N_2;
+  // look for a max in the vicinity of the last hit
+  int top = std::distance(result.begin(), std::max_element(result.begin()+range.first, result.begin()+range.second));
+
   double hit = (N/2-top) * mFileData.mUsRaw->getSpacing()[1]; // convert to downwards movement in mm.
-//  return 0;
+
+//  std::cout << "frame_b=" << frame_b << " N=" << N << " lasttop=" << lastTop << " r0=" << range.first << " r1=" << range.second << " top=" << top << " hit=" << hit<< std::endl;
+//
+//  if (frame_b==46)
+//  {
+//		mDebugStream << "=======================================" << std::endl;
+//		mDebugStream << "frame correlation raw data:" << std::endl;
+//		mDebugStream << std::endl;
+//		mDebugStream << "A=" << frame_a << "\t" << "B=" << frame_b << "\t" << "result (size=" << N << ")" << std::endl;
+//		for (int x = 0; x < dimY; ++x)
+//		{
+//			mDebugStream << line_a[x] << "\t" << line_b[x];
+//			if (int(x)<N)
+//				mDebugStream << "\t" << result[x];
+//			mDebugStream << std::endl;
+//		}
+//		mDebugStream << "top: " << top << std::endl;
+//		mDebugStream << "hit: " << hit << std::endl;
+//		std::cout << "hit: " << hit << std::endl;
+//		mDebugStream << std::endl;
+//		mDebugStream << "=======================================" << std::endl;
+//  }
+
   return hit;
 }
 
@@ -401,87 +431,38 @@ double TemporalCalibration::findCorrelation(ssc::USFrameDataPtr data, int frame_
  */
 vtkImageDataPtr TemporalCalibration::extractLine_y(ssc::USFrameDataPtr data, int line_index_x, int frame)
 {
-//  std::cout << "extract pre" << std::endl;
-//  vtkImageDataPtr retval = vtkImageDataPtr::New();
-//  int N = data->getDimensions()[1];
   int dimX = data->getDimensions()[0];
   int dimY = data->getDimensions()[1];
 
   vtkImageDataPtr retval = generateVtkImageDataDouble(ssc::Vector3D(dimY, 1, 1), ssc::Vector3D(1,1,1), 1);
 
-  uchar* source = data->getFrame(frame);
+  /// convert one frame to a vtkImageData: base
+  uchar* raw_source = data->getFrame(frame);
+  vtkImageDataPtr base = generateVtkImageData(ssc::Vector3D(dimX, dimY, 1), ssc::Vector3D(1,1,1), 0);
+  uchar* base_ptr = static_cast<uchar*>(base->GetScalarPointer());
+  std::copy(raw_source, raw_source+dimX*dimY, base_ptr);
 
-//  int* dim(retval->GetDimensions());
+  // run the base frame through the mask. Result is source.
+  vtkImageMaskPtr maskFilter = vtkImageMaskPtr::New();
+  maskFilter->SetMaskInput(mFileData.mMask->getBaseVtkImageData());
+  maskFilter->SetImageInput(base);
+  maskFilter->SetMaskedOutputValue(0.0);
+  maskFilter->Update();
+  uchar* source = static_cast<uchar*>(maskFilter->GetOutput()->GetScalarPointer());
+
   double* dest = static_cast<double*>(retval->GetScalarPointer());
 
 //  std::cout << "extract begin" << std::endl;
-
   for (int y=0; y<dimY; ++y)
   {
     dest[y] = source[y*dimX + line_index_x];
 //    std::cout << (int)dest[y] << std::endl;
   }
-
 //  std::cout << "extract end" << std::endl;
 
   return retval;
 }
 
-
-//void TemporalCalibration::computeTemporalCalibration(ssc::RTSourceRecorder::DataType volumes, ssc::TimedTransformMap tracking, ssc::ToolPtr probe)
-//{
-//
-//  ssc::RTSourceRecorder::DataType corrTemp;
-//  ssc::RTSourceRecorder::DataType::iterator i = volumes.begin();
-//  ssc::RTSourceRecorder::DataType::iterator j = i;
-//  ++j;
-//  for ( ; j!=volumes.end(); ++j, ++i)
-//  {
-//    vtkImageCorrelationPtr correlator = vtkImageCorrelationPtr::New();
-//    correlator->SetInput1(i->second);
-//    correlator->SetInput2(j->second);
-//    correlator->Update();
-//    vtkImageDataPtr result = correlator->GetOutput();
-//    corrTemp[j->first] = result;
-//  }
-//
-////  mFileMaker.reset(new UsReconstructionFileMaker(tracking, corrTemp, "corr_test", stateManager()->getPatientData()->getActivePatientFolder(), probe));
-////  mFileMaker->write();
-////  std::cout << "completed write of correlation results" << std::endl;
-//}
-
-///**Called when data is loaded into reconstructer.
-// *
-// */
-//void ReconstructionWidget::inputDataSelected(QString mhdFileName)
-//{
-//  if(mReconstructer->getSelectedData().isEmpty())
-//  {
-//    return;
-//  }
-//
-//  mFileSelectWidget->setFilename(mhdFileName);
-//}
-
-//void TemporalCalibrationWidget::fileMakerWriteFinished()
-//{
-//  QString targetFolder = mFileMakerFutureWatcher.future().result();
-//  //stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
-//
-//  mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
-//
-//  RecordSessionPtr session = stateManager()->getRecordSession(mLastSession);
-//  ssc::RTSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
-//  ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
-//  if(trackerRecordedData.empty())
-//  {
-//    ssc::messageManager()->sendError("Could not find any tracking data from session "+mLastSession+". Ignoring.");
-//    return;
-//  }
-//  ssc::ToolPtr probe = this->getTool();
-//
-//  this->computeTemporalCalibration(streamRecordedData, trackerRecordedData, probe);
-//}
 
 
 
