@@ -373,14 +373,9 @@ void ToolRep2D::updateOffsetText()
 	{
 		return;
 	}
-
 	if (getOffset() > 2.0 && mUseOffsetText && showOffset())
 	{
-		char buffer[100];
-		//snprintf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
-		printf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
-		QString text = buffer;
-		distanceText->updateText( text );
+		distanceText->updateText("Offset: " + QString::number(getOffset(), 'g', 3) + " mm");
 		distanceText->getActor()->VisibilityOn();
 	}
 	else
