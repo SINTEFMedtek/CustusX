@@ -59,7 +59,7 @@ void FileSelectWidget::setNameFilter(QStringList filter)
 void FileSelectWidget::setPath(QString path)
 {
   mRootPath = path;
-  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
+//  std::cout << "FileSelectWidget::setPath root" << mRootPath << std::endl;
   this->refresh();
 }
 
@@ -74,7 +74,7 @@ void FileSelectWidget::selectData()
     return;
 
   mFilename = filename;
-  std::cout << this << " selectData " << mFilename << std::endl;
+//  std::cout << this << " selectData " << mFilename << std::endl;
 
   this->refresh();
   emit fileSelected(mFilename);
@@ -117,7 +117,6 @@ void FileSelectWidget::updateComboBox()
 
   for (int i=0; i<files.size(); ++i)
   {
-    std::cout << this << " add basic " << files[i] << std::endl;
     mDataComboBox->addItem(QFileInfo(files[i]).fileName(), files[i]);
   }
   mDataComboBox->setCurrentIndex(-1);
@@ -129,7 +128,6 @@ void FileSelectWidget::updateComboBox()
 
   if (!mFilename.isEmpty() && mDataComboBox->currentIndex()<0 && !files.contains(mFilename))
   {
-    std::cout << this << " add extra " << mFilename << std::endl;
     mDataComboBox->addItem(QFileInfo(mFilename).fileName(), mFilename);
     mDataComboBox->setCurrentIndex(mDataComboBox->count()-1);
   }
