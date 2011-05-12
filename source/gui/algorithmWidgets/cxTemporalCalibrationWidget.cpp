@@ -104,9 +104,9 @@ void TemporalCalibrationWidget::selectData(QString filename)
 void TemporalCalibrationWidget::calibrateSlot()
 {
   if (mVerbose->isChecked())
-    mAlgorithm->setDebugFile(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/temporal_calib.txt");
+    mAlgorithm->setDebugFolder(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/");
   else
-    mAlgorithm->setDebugFile("");
+    mAlgorithm->setDebugFolder("");
 
   double shift = mAlgorithm->calibrate();
   ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));

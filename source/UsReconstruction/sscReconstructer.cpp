@@ -148,8 +148,8 @@ void Reconstructer::setSettings()
 
 void Reconstructer::clearAll()
 {
-  mFileData = FileData();
-  mOriginalFileData = FileData();
+  mFileData = cx::UsReconstructionFileReader::FileData();
+  mOriginalFileData = cx::UsReconstructionFileReader::FileData();
   mOutputVolumeParams = OutputVolumeParams();
   this->clearOutput();
 }
@@ -186,40 +186,6 @@ bool within(int x, int min, int max)
   return (x>=min) && (x<=max);
 }
 
-ImagePtr Reconstructer::createMaskFromConfigParams()
-{
-  vtkImageDataPtr mask = mOriginalFileData.mProbeData.getMask();
-  ImagePtr image = ImagePtr(new Image("mask", mask, "mask")) ;
-
-  ssc::Vector3D usDim(mOriginalFileData.mUsRaw->getDimensions());
-  usDim[2] = 1;
-  ssc::Vector3D usSpacing(mOriginalFileData.mUsRaw->getSpacing());
-
-  // checking
-  bool spacingOK = similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
-  bool dimOK = similar(usDim, ssc::Vector3D(mask->GetDimensions()));
-  if (!dimOK || !spacingOK)
-  {
-    ssc::messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
-    if (!dimOK)
-      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetDimensions())));
-    if (!spacingOK)
-      ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
-  }
-  return image;
-}
-  
-ImagePtr Reconstructer::generateMask()
-{  
-  ssc::Vector3D dim(mOriginalFileData.mUsRaw->getDimensions());
-  dim[2] = 1;
-  ssc::Vector3D spacing(mOriginalFileData.mUsRaw->getSpacing());
-  
-  vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 255);
-    
-  ImagePtr image = ImagePtr(new Image("mask", data, "mask")) ;
-  return image;
-}
   
 /**
  * Apply time calibration function y = ax + b, where
@@ -667,13 +633,6 @@ void Reconstructer::selectData(QString filename, QString calFilesPath)
     return;
   }
 
-  if (calFilesPath.isEmpty())
-  {
-    QStringList list = filename.split("/");
-    list[list.size()-1] = "";
-    calFilesPath = list.join("/")+"/";
-  }
-
   this->clearAll();
   this->readCoreFiles(filename, calFilesPath);
   this->updateFromOriginalFileData();
@@ -689,39 +648,44 @@ void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
 
+  cx::UsReconstructionFileReader::FileData temp = mFileReader->readAllFiles(fileName, calFilesPath);
+  if (!temp.mUsRaw)
+  	return;
   // ignore if a directory is read - store folder name only
-  if (QFileInfo(fileName).suffix()!="mhd")
-    return;
+//  if (QFileInfo(fileName).suffix()!="mhd")
+//    return;
+//
+  mOriginalFileData = temp;
 
-  QString mhdFileName = changeExtension(fileName, "mhd");
-
-  if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
-  {
-    // There may not be any files here due to the automatic calling of the function
-    ssc::messageManager()->sendWarning("File not found: "+changeExtension(fileName, "mhd")+", reconstruct load failed");
-    return;
-  }
-
-  //Read US images
-  mOriginalFileData.mUsRaw = mFileReader->readUsDataFile(mhdFileName);
-
-  QStringList probeConfigPath;
-  mFileReader->readCustomMhdTags(mhdFileName, &probeConfigPath, &mCalFileName);
-  ProbeXmlConfigParser::Configuration configuration = mFileReader->readProbeConfiguration(mCalFilesPath, probeConfigPath);
-  ProbeData probeData = createProbeDataFromConfiguration(configuration);
-  // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
-  probeData.mImage.mSpacing = Vector3D(mOriginalFileData.mUsRaw->getSpacing());
-  mOriginalFileData.mProbeData.setData(probeData);
-
-  mOriginalFileData.mFrames = mFileReader->readFrameTimestamps(fileName);
-  mOriginalFileData.mPositions = mFileReader->readPositions(fileName);
-
-  //mPos is now prMs
-  mOriginalFileData.mMask = this->generateMask();
-  if (!mFileReader->readMaskFile(fileName, mOriginalFileData.mMask))
-  {
-    mOriginalFileData.mMask = this->createMaskFromConfigParams();
-  }
+//  QString mhdFileName = changeExtension(fileName, "mhd");
+//
+//  if (!QFileInfo(changeExtension(fileName, "mhd")).exists())
+//  {
+//    // There may not be any files here due to the automatic calling of the function
+//    ssc::messageManager()->sendWarning("File not found: "+changeExtension(fileName, "mhd")+", reconstruct load failed");
+//    return;
+//  }
+//
+//  //Read US images
+//  mOriginalFileData.mUsRaw = mFileReader->readUsDataFile(mhdFileName);
+//
+//  QStringList probeConfigPath;
+//  mFileReader->readCustomMhdTags(mhdFileName, &probeConfigPath, &mCalFileName);
+//  ProbeXmlConfigParser::Configuration configuration = mFileReader->readProbeConfiguration(mCalFilesPath, probeConfigPath);
+//  ProbeData probeData = createProbeDataFromConfiguration(configuration);
+//  // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
+//  probeData.mImage.mSpacing = Vector3D(mOriginalFileData.mUsRaw->getSpacing());
+//  mOriginalFileData.mProbeData.setData(probeData);
+//
+//  mOriginalFileData.mFrames = mFileReader->readFrameTimestamps(fileName);
+//  mOriginalFileData.mPositions = mFileReader->readPositions(fileName);
+//
+//  //mPos is now prMs
+//  mOriginalFileData.mMask = this->generateMask();
+//  if (!mFileReader->readMaskFile(fileName, mOriginalFileData.mMask))
+//  {
+//    mOriginalFileData.mMask = this->createMaskFromConfigParams();
+//  }
 
 }
 
