@@ -169,6 +169,7 @@ IF(APPLE)
 ENDIF(APPLE)
 IF(WIN32)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
+  SET(CONFIG_DIR ${INSTALL_FOLDER_NAME}/config)
 ENDIF(WIN32)
 
 # install configuration files to config folder
