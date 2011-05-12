@@ -81,8 +81,8 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
   connect(mAlignTimestamps.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
   
 
-  mTimeCalibration = DoubleDataAdapterXml::initialize("Time Calibration", "",
-                                                 "Set an offset in the frame timestamps",
+  mTimeCalibration = DoubleDataAdapterXml::initialize("Extra Temporal Calib", "",
+                                                 "Set an offset in the frame timestamps, in addition to the one used in acquisition",
                                                   0.0, DoubleRange(-1000, 1000, 10), 0,
                                                   mSettings.getElement());
   connect(mTimeCalibration.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
@@ -486,6 +486,8 @@ ssc::Transform3D Reconstructer::applyOutputOrientation()
  */
 void Reconstructer::findExtentAndOutputTransform()
 {
+	if (mFileData.mFrames.empty())
+		return;
   // A first guess for d'Mu with correct orientation
   ssc::Transform3D prMdd = this->applyOutputOrientation();
   //mFrames[i].mPos = d'Mu, d' = only rotation
@@ -721,6 +723,9 @@ void Reconstructer::updateFromOriginalFileData()
     ssc::messageManager()->sendError("Invalid reconstruct input.");
     return;
   }
+
+  if (mFileData.mFrames.empty()) // if all positions are filtered out
+    return;
 
   this->findExtentAndOutputTransform();
 //  mOutput = this->generateOutputVolume();
