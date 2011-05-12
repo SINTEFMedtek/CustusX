@@ -36,23 +36,17 @@ public:
   RecordBaseWidget(QWidget* parent, QString description = "Record Session");
   virtual ~RecordBaseWidget();
 
-signals:
-  void ready(bool ready);//emitted when the the prerequisits for recording is met
-
 protected slots:
-  virtual void checkIfReadySlot() = 0;
+
   virtual void postProcessingSlot(QString sessionId) = 0;
   virtual void startedSlot() = 0;
   virtual void stoppedSlot() = 0;
 
 protected:
-  void setWhatsMissingInfo(QString info);
 
   QVBoxLayout* mLayout;
   RecordSessionWidget* mRecordSessionWidget;
 
-private:
-  QLabel* mInfoLabel;
 };
 
 /**

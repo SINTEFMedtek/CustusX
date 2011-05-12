@@ -36,6 +36,9 @@ signals:
   void stopped();
   void newSession(QString);
 
+public slots:
+	void setReady(bool val, QString text);
+
 protected:
   void changeEvent(QEvent* event);
 
@@ -50,6 +53,7 @@ private:
 
   void reset();
 
+  QLabel* mInfoLabel;
   QPushButton* mStartStopButton;
   QPushButton* mCancelButton;
   QLabel* mDescriptionLabel;
