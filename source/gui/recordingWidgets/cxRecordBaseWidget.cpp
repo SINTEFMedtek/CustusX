@@ -22,35 +22,27 @@
 namespace cx
 {
 
-
-
-//----------------------------------------------------------------------------------------------------------------------
 RecordBaseWidget::RecordBaseWidget(QWidget* parent, QString description):
     BaseWidget(parent, "RecordBaseWidget", "Record Base"),
     mLayout(new QVBoxLayout(this)),
-    mRecordSessionWidget(new RecordSessionWidget(this, description)),
-    mInfoLabel(new QLabel("Will never be ready... Derive from this class!"))
+    mRecordSessionWidget(new RecordSessionWidget(this, description))
 {
   this->setObjectName("RecordBaseWidget");
   this->setWindowTitle("Record Base");
 
-  connect(this, SIGNAL(ready(bool)), mRecordSessionWidget, SLOT(setEnabled(bool)));
   connect(mRecordSessionWidget, SIGNAL(newSession(QString)), this, SLOT(postProcessingSlot(QString)));
   connect(mRecordSessionWidget, SIGNAL(started()), this, SLOT(startedSlot()));
   connect(mRecordSessionWidget, SIGNAL(stopped()), this, SLOT(stoppedSlot()));
 
-  mLayout->addWidget(mInfoLabel);
   mLayout->addWidget(mRecordSessionWidget);
 }
 
 RecordBaseWidget::~RecordBaseWidget()
 {}
 
-void RecordBaseWidget::setWhatsMissingInfo(QString info)
-{
-  mInfoLabel->setText(info);
-}
-//----------------------------------------------------------------------------------------------------------------------
+////----------------------------------------------------------------------------------------------------------------------
+////----------------------------------------------------------------------------------------------------------------------
+////----------------------------------------------------------------------------------------------------------------------
 
 TrackedRecordWidget::TrackedRecordWidget(QWidget* parent, QString description) :
   RecordBaseWidget(parent, description)

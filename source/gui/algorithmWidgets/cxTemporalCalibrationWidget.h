@@ -15,6 +15,7 @@
 #include "sscFileSelectWidget.h"
 #include "cxUsReconstructionFileReader.h"
 #include <cxTemporalCalibration.h>
+#include "cxUSAcqusitionWidget.h"
 
 namespace cx
 {
@@ -38,10 +39,14 @@ private slots:
 protected:
   void showEvent(QShowEvent* event);
 private:
-  ssc::FileSelectWidget* mFileSelectWidget;
+  USAcquisitionPtr mAcquisition;
   TemporalCalibrationPtr mAlgorithm;
+
+  ssc::FileSelectWidget* mFileSelectWidget;
   QLineEdit* mResult;
   QCheckBox* mVerbose;
+  RecordSessionWidget* mRecordSessionWidget;
+  QLabel* mInfoLabel;
 };
 
 

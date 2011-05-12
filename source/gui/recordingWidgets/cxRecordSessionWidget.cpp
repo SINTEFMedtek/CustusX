@@ -15,6 +15,7 @@ namespace cx
 {
 RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescription) :
     QWidget(parent),
+    mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
     mDescriptionLine(new QLineEdit(defaultDescription)),
@@ -27,6 +28,7 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   mDescriptionLabel = new QLabel("Description:");
+  layout->addWidget(mInfoLabel);
   layout->addWidget(mDescriptionLabel);
   layout->addWidget(mDescriptionLine);
   layout->addWidget(mStartStopButton);
@@ -36,6 +38,12 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
   connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
   connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
   mCancelButton->setEnabled(false);
+}
+
+void RecordSessionWidget::setReady(bool val, QString text)
+{
+  this->setEnabled(val);
+  mInfoLabel->setText(text);
 }
 
 void RecordSessionWidget::setDescriptionVisibility(bool value)
