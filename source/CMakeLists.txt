@@ -119,12 +119,7 @@ IF(APPLE)
   SET(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")
   ADD_EXECUTABLE(CustusX MACOSX_BUNDLE ${SOURCES} )
 ELSE(APPLE)
-  IF (WIN32)
-    ADD_EXECUTABLE(CustusX ${SOURCES} )
-  ELSE (WIN32)
-    #LINUX
-    ADD_EXECUTABLE(CustusX ${SOURCES} )
-  ENDIF (WIN32)
+  ADD_EXECUTABLE(CustusX ${SOURCES} )
 ENDIF(APPLE)
 
 #----------
@@ -132,23 +127,25 @@ ENDIF(APPLE)
 TARGET_LINK_LIBRARIES( CustusX gui cxCommon )
 
 
+#--------------------------------------------------------------------------------
+# Now the installation/bundle stuff below
+#--------------------------------------------------------------------------------
+# See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
+#
+# On Apple, the bundle is at the root of the
+# install tree, and on other platforms it'll go into the bin directory.
+
 SET(BUNDLE_NAME CustusX)
 
-#--------------------------------------------------------------------------------
-# Install the application, on Apple, the bundle is at the root of the
-# install tree, and on other platforms it'll go into the bin directory.
 install(TARGETS CustusX
     BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
     RUNTIME DESTINATION bin
     )
-    
-    # taken from http://www.itk.org/Wiki/BundleUtilitiesExample
 
-include (InstallRequiredSystemLibraries)
+if(WIN32)
+  include (InstallRequiredSystemLibraries)
+endif(WIN32)
 
-#--------------------------------------------------------------------------------
-# Now the installation stuff below
-#--------------------------------------------------------------------------------
 SET(RESOURCES_DIR bin)
 SET(CONFIG_DIR bin)
 SET(SYMLINK_DIR bin)
@@ -162,14 +159,16 @@ else(APPLE)
 endif(APPLE)
 
 SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}")
+
 IF(APPLE)
   SET(RESOURCES_DIR ${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app/Contents/Resources)
   SET(CONFIG_DIR ${INSTALL_FOLDER_NAME}/config)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app")
 ENDIF(APPLE)
+
 IF(WIN32)
   SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
-  SET(CONFIG_DIR ${INSTALL_FOLDER_NAME}/config)
+  SET(CONFIG_DIR bin/config/)
 ENDIF(WIN32)
 
 # install configuration files to config folder
@@ -198,45 +197,57 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLI
 
 # Install all files in install/nextToCustusX direcly into the CustusX folder.
 # Use this to add additional stuff to the installation.
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
-    DESTINATION ${INSTALL_FOLDER_NAME} 
-    USE_SOURCE_PERMISSIONS
-    PATTERN ".svn" EXCLUDE
-    PATTERN "readme.txt" EXCLUDE
-    ) 
-
-#SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
-
-#if (WIN32)
-    #set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")
-#else (WIN32)
-    #set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/source/gui/icons/CustusX.png")# does not work..?
-#endif (WIN32)
+if(WIN32)
+  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
+      DESTINATION .
+      USE_SOURCE_PERMISSIONS
+      PATTERN ".svn" EXCLUDE
+      PATTERN "readme.txt" EXCLUDE
+      PATTERN "GrabberServer.app" EXCLUDE # we don't want mac applications installed on windows
+      PATTERN "ultrasoundVideo.app" EXCLUDE # we don't want mac applications installed on windows
+      )
+else(WIN32)
+  install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
+      DESTINATION ${INSTALL_FOLDER_NAME} 
+      USE_SOURCE_PERMISSIONS
+      PATTERN ".svn" EXCLUDE
+      PATTERN "readme.txt" EXCLUDE
+      )
+endif(WIN32)
 
 set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
 set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
 set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
 
-set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}") # name of .pkg file
-#if (WIN32)
-    #set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc\\install_welcome.txt")
-    #set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc\\install_readme.rtf")
-    #set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc\\install_license.txt")
-#else (WIN32)
-    #set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-    #set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-    #set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
-#endif (WIN32)
+set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}")
+set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
+set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
+set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
 
-#set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
+if (WIN32)
+else (WIN32)
+    SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
+    set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
+endif (WIN32)
 
-SET(LIBS ${QT_LIBRARY_DIR})
-SET(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
+if (APPLE)
+    set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
+    option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
+    option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
+    option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
+    option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
+    option (CPACK_SOURCE_TZ "Enable to build TZ source packages" OFF)
+endif(APPLE)
 
-INSTALL(CODE "
-   include(BundleUtilities)
-   fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") ")
+if (WIN32)
+  SET(LIBS ${QT_LIBRARY_DIR})
+  SET(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
+
+  INSTALL(CODE "
+     include(BundleUtilities)
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") ")
+endif (WIN32)
 
 include(CPack)
     
