@@ -33,19 +33,35 @@ typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 namespace cx
 {
 
-
 typedef unsigned char uchar;
 
 
 TemporalCalibrationWidget::TemporalCalibrationWidget(QWidget* parent) :
-    BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration")
+    BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
+    mRecordSessionWidget(new RecordSessionWidget(this, "temporal_calib")),
+		mInfoLabel(new QLabel(""))
 {
   mAlgorithm.reset(new TemporalCalibration);
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
+  mAcquisition.reset(new USAcquisition());
+  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
+  connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
+  mAcquisition->checkIfReadySlot();
+
+  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
+  connect(mRecordSessionWidget, SIGNAL(started()), mAcquisition.get(), SLOT(startRecord()));
+  connect(mRecordSessionWidget, SIGNAL(stopped()), mAcquisition.get(), SLOT(stopRecord()));
+  mRecordSessionWidget->setDescriptionVisibility(false);
+
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
+  topLayout->addWidget(mInfoLabel);
+  topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
+  topLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
+
+  topLayout->addWidget(this->createHorizontalLine());
 
   mFileSelectWidget = new ssc::FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
@@ -112,8 +128,6 @@ void TemporalCalibrationWidget::calibrateSlot()
   ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
   mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
 }
-
-
 
 
 }//namespace cx
