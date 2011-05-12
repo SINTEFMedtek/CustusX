@@ -32,15 +32,14 @@ typedef std::map<double,double> TimeSeriesType;
 class TemporalCalibration
 {
 public:
-
+	TemporalCalibration();
   void selectData(QString filename);
-  void setDebugFile(QString filename);
+  void setDebugFolder(QString path);
   double calibrate();
 
 private:
-//  void computeTemporalCalibration(ssc::RTSourceRecorder::DataType volumes, ssc::TimedTransformMap tracking, ssc::ToolPtr probe);
   vtkImageDataPtr extractLine_y(ssc::USFrameDataPtr data, int line_index_x, int frame);
-  double findCorrelation(ssc::USFrameDataPtr data, int frame_a, int frame_b, int maxShift);
+  double findCorrelation(ssc::USFrameDataPtr data, int frame_a, int frame_b, double maxShift, double lastVal);
   std::vector<double> computeProbeMovement();
   std::vector<double> resample(std::vector<double> shift, std::vector<ssc::TimedPosition> time, double resolution);
   std::vector<double> computeTrackingMovement();
@@ -48,16 +47,11 @@ private:
 
   void saveDebugFile();
 
-  struct FileData
-  {
-    ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-    std::vector<ssc::TimedPosition> mFrames;
-    std::vector<ssc::TimedPosition> mPositions;
-  };
-  FileData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
-  QString mDebugFile;
+  UsReconstructionFileReader::FileData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+  QString mDebugFolder;
   QString mFilename;
   std::stringstream mDebugStream;
+  bool mAddRawToDebug;
 
 };
 
