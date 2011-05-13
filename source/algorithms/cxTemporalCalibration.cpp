@@ -195,7 +195,8 @@ double TemporalCalibration::calibrate()
   std::vector<double> frameMovementRegular = this->resample(frameMovement, mFileData.mFrames, resolution);
   std::vector<double> trackingMovementRegular = this->resample(trackingMovement, mFileData.mPositions, resolution);
 
-  double shift = this->findCorrelationShift(frameMovementRegular, trackingMovementRegular, resolution);
+//  double shift = this->findCorrelationShift(frameMovementRegular, trackingMovementRegular, resolution);
+  double shift = this->findLSShift(frameMovementRegular, trackingMovementRegular, resolution);
 
   double totalShift = offset + shift;
 
@@ -209,12 +210,91 @@ double TemporalCalibration::calibrate()
   return totalShift;
 }
 
+/** shift tracking data with the input shift, then compute RMS value of function
+ *
+ */
+double TemporalCalibration::findLeastSquares(std::vector<double> frames, std::vector<double> tracking, int shift) const
+{
+	int r0 = 0;
+	int r1 = frames.size();
+
+	r0 = std::max<int>(r0, - shift);
+	r1 = std::min<int>(r1, tracking.size() - shift);
+//	std::cout << "range " << r0 << " " << r1 << " shift="<< shift << std::endl;
+
+	double value = 0;
+
+	for (int i=r0; i<r1; ++i)
+	{
+		double core = pow(frames[i] - tracking[i+shift], 2.0);
+		value += core;
+	}
+	value /= (r1-r0);
+	value = sqrt(value);
+	return value;
+}
+
 /** Find the correlation shift between the regularly spaces series frames and tracking,
  *  with a spacing of resolution.
  *
  *  the returned shift is shift frames-tracking: frame = tracking + shift.
  */
-double TemporalCalibration::findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution)
+double TemporalCalibration::findLSShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const
+{
+	double maxShift = 1000;
+  int N = std::min(tracking.size(), frames.size());
+  N = std::min<int>(N, 2*maxShift/resolution); // constrain search to 1 second in each direction
+  std::vector<double> result(N, 0);
+  int W = N/2;
+
+//	std::cout << "0 " << this->findLeastSquares(frames, tracking, 0) << std::endl;
+//	std::cout << "1 " << this->findLeastSquares(frames, tracking, 100) << std::endl;
+//	std::cout << "2 " << this->findLeastSquares(frames, tracking, 200) << std::endl;
+//	std::cout << "3 " << this->findLeastSquares(frames, tracking, 300) << std::endl;
+
+  for (int i=-W; i<W; ++i)
+  {
+  	double rms = this->findLeastSquares(frames, tracking, i);
+  	result[i+W] = rms;
+  }
+
+  int top = std::distance(result.begin(), std::min_element(result.begin(), result.end()));
+  double shift = (W-top) * resolution; // convert to shift in ms.
+
+//
+//  correlate(&*frames.begin(), &*tracking.begin(), &*result.begin(), N / 2, N);
+//
+//  int top = std::distance(result.begin(), std::max_element(result.begin(), result.end()));
+//  double shift = (N/2-top) * resolution; // convert to shift in ms.
+
+  mDebugStream << "=======================================" << std::endl;
+  mDebugStream << "tracking vs frames fit using least squares:" << std::endl;
+  mDebugStream << "Temporal resolution " << resolution << " ms" << std::endl;
+  mDebugStream << "Max shift " << maxShift << " ms" << std::endl;
+  mDebugStream << "#frames=" << frames.size() << ", #tracks=" << tracking.size() << std::endl;
+  mDebugStream << std::endl;
+  mDebugStream << "Frame pos" << "\t" << "Track pos" << "\t" << "RMS(center=" << W << ")"	<< std::endl;
+  for (int x = 0; x < std::min<int>(tracking.size(), frames.size()); ++x)
+  {
+    mDebugStream << frames[x] << "\t" << tracking[x];
+    if (x<N)
+    	mDebugStream << "\t" << result[x];
+  	mDebugStream << std::endl;
+  }
+
+  mDebugStream << std::endl;
+  mDebugStream << "minimal index: " << top << ", = shift in ms: " << shift << std::endl;
+  mDebugStream << "=======================================" << std::endl;
+
+  return shift; // shift frames-tracking: frame = tracking + shift
+}
+
+/** Find the correlation shift between the regularly spaces series frames and tracking,
+ *  with a spacing of resolution.
+ *
+ *  the returned shift is shift frames-tracking: frame = tracking + shift.
+ */
+double TemporalCalibration::findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const
 {
   int N = std::min(tracking.size(), frames.size());
   std::vector<double> result(N, 0);
