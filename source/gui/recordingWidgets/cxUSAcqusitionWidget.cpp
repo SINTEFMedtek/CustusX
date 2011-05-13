@@ -18,21 +18,28 @@
 namespace cx
 {
 
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+//---------------------------------------------------------
+//---------------------------------------------------------
+//---------------------------------------------------------
+
+
 USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, settings()->value("Ultrasound/acquisitionName").toString())
+		RecordBaseWidget(parent, settings()->value("Ultrasound/acquisitionName").toString())
 {
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
 
-  mRecordSessionWidget->setDescriptionVisibility(false);
+  mAcquisition.reset(new USAcquisition());
+  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
+//  connect(mAcquisition.get(), SIGNAL(ready(bool)), this, SIGNAL(ready(bool)));
+  connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
 
-  connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStopped()), this, SLOT(checkIfReadySlot()));
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(dominantToolChangedSlot()));
-  connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(dominantToolChangedSlot()));
-  connect(ssc::toolManager(), SIGNAL(dominantToolChanged(const QString&)), this, SLOT(dominantToolChangedSlot()));
-  connect(this, SIGNAL(toolChanged()), this, SLOT(probeChangedSlot()));
+  mRecordSessionWidget->setDescriptionVisibility(false);
 
   //for testing sound speed converting - BEGIN
   SoundSpeedConverterWidget* soundSpeedWidget = new SoundSpeedConverterWidget(this);
@@ -44,13 +51,11 @@ USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
   mLayout->addWidget(soundSpeedWidget);
   RecordBaseWidget::mLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
 
-  this->probeChangedSlot();
-  this->checkIfReadySlot();
+  mAcquisition->checkIfReadySlot();
 }
 
 USAcqusitionWidget::~USAcqusitionWidget()
 {}
-
 
 QString USAcqusitionWidget::defaultWhatsThis() const
 {
@@ -60,96 +65,14 @@ QString USAcqusitionWidget::defaultWhatsThis() const
       "</html>";
 }
 
-void USAcqusitionWidget::checkIfReadySlot()
-{
-  bool tracking = ssc::toolManager()->isTracking();
-  bool streaming = mRTSource && mRTSource->isStreaming();
-
-  if(tracking && streaming && mRTRecorder)
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font><br>");
-  else
-  {
-    QString whatsMissing("");
-    if(!tracking)
-      whatsMissing.append("<font color=red>Need to start tracking.</font><br>");
-    if(mRTSource)
-    {
-      if(!streaming)
-        whatsMissing.append("<font color=red>Need to start streaming.</font><br>");
-    }else
-    {
-      whatsMissing.append("<font color=red>Need to get a stream.</font><br>");
-    }
-    if(!mRTRecorder)
-       whatsMissing.append("<font color=red>Need connect to a recorder.</font><br>");
-
-    RecordBaseWidget::setWhatsMissingInfo(whatsMissing);
-  }
-
-  // do not require tracking to be present in order to perform an acquisition.
-  emit ready(streaming && mRTRecorder);
-}
-
-void USAcqusitionWidget::probeChangedSlot()
-{
-  ssc::ToolPtr tool = this->getTool();
-  if(!tool)
-    return;
-
-  ssc::ProbePtr probe = tool->getProbe();
-  if(!probe)
-    return;
-
-  if(mRTSource)
-  {
-    disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-  }
-  mRTSource = probe->getRTSource();
-
-  if(mRTSource)
-  {
-    connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-    mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
-  }
-  this->checkIfReadySlot();
-}
-
-ssc::TimedTransformMap USAcqusitionWidget::getRecording(RecordSessionPtr session)
-{
-  ssc::TimedTransformMap retval;
-
-  ssc::ToolPtr tool = this->getTool();
-  if(tool)
-    retval = tool->getSessionHistory(session->getStartTime(), session->getStopTime());
-
-  return retval;
-}
-
 void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 {
-  //get session data
-  RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
-  ssc::RTSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
-
-  ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
-  if(trackerRecordedData.empty())
-  {
-    ssc::messageManager()->sendError("Could not find any tracking data from session "+sessionId+". Volume data only will be written.");
-  }
-
-  ssc::ToolPtr probe = this->getTool();
-  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe));
-
-  mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
-  mFileMakerFutureWatcher.setFuture(mFileMakerFuture);
+	mAcquisition->saveSession(sessionId);
 }
 
-void USAcqusitionWidget::fileMakerWriteFinished()
+void USAcqusitionWidget::saveDataCompletedSlot(QString mhdFilename)
 {
-  QString targetFolder = mFileMakerFutureWatcher.future().result();
-  stateManager()->getReconstructer()->selectData(mFileMaker->getMhdFilename(targetFolder));
-
-  mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
+  stateManager()->getReconstructer()->selectData(mhdFilename);
 
   if (settings()->value("Automation/autoReconstruct").toBool())
   {
@@ -160,24 +83,6 @@ void USAcqusitionWidget::fileMakerWriteFinished()
   }
 }
 
-void USAcqusitionWidget::dominantToolChangedSlot()
-{
-  ssc::ToolPtr tool = ssc::toolManager()->getDominantTool();
-
-  ssc::ProbePtr probe = tool->getProbe();
-  if(!probe)
-    return;
-
-  if (this->getTool() && this->getTool()->getProbe())
-    disconnect(this->getTool()->getProbe().get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-
-  connect(probe.get(), SIGNAL(sectorChanged()), this, SLOT(probeChangedSlot()));
-
-  this->setTool(tool);
-
-  this->probeChangedSlot();
-}
-
 void USAcqusitionWidget::reconstructFinishedSlot()
 {
   mRecordSessionWidget->stopPostProcessing();
@@ -186,9 +91,8 @@ void USAcqusitionWidget::reconstructFinishedSlot()
 
 void USAcqusitionWidget::startedSlot()
 {
+	mAcquisition->startRecord();
   mRecordSessionWidget->setDescription(settings()->value("Ultrasound/acquisitionName").toString());
-  mRTRecorder->startRecord();
-  ssc::messageManager()->sendSuccess("Ultrasound acquisition started.", true);
 }
 
 void USAcqusitionWidget::stoppedSlot()
@@ -201,7 +105,6 @@ void USAcqusitionWidget::stoppedSlot()
     // TODO perform cleanup of all resources connected to this recording.
   }
 
-  mRTRecorder->stopRecord();
-  ssc::messageManager()->sendSuccess("Ultrasound acquisition stopped.", true);
+	mAcquisition->stopRecord();
 }
 }//namespace cx

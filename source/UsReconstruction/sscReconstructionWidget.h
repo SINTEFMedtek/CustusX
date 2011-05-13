@@ -10,10 +10,10 @@
 
 #include <QtGui>
 #include "sscReconstructer.h"
-//#include "sscAbstractInterface.h"
 #include "sscDoubleWidgets.h"
 #include "sscXmlOptionItem.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "sscFileSelectWidget.h"
 
 namespace ssc
 {
@@ -25,13 +25,11 @@ class ReconstructionWidget : public QWidget
 public:
   ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer);
   ReconstructerPtr reconstructer() {  return mReconstructer; }
-  void selectData(QString inputfile);
 
 public slots:
+  void selectData(QString inputfile);
   void reconstruct();
-  void selectData();
   void reload();
-  void currentDataComboIndexChanged(const QString& text);
   void paramsChangedSlot();
 private slots:
   void inputDataSelected(QString mhdFileName);
@@ -39,11 +37,9 @@ private slots:
 private:
   ReconstructerPtr mReconstructer;
   
-  QComboBox* mDataComboBox;
-  QToolButton* mSelectDataButton;
+  FileSelectWidget* mFileSelectWidget;
   QPushButton* mReconstructButton;
   QPushButton* mReloadButton;
-  QAction* mSelectDataAction;
   QLineEdit* mExtentLineEdit;
   QLineEdit* mInputSpacingLineEdit;
   ssc::SpinBoxGroupWidget* mMaxVolSizeWidget;
@@ -51,17 +47,13 @@ private:
   ssc::SpinBoxGroupWidget* mDimXWidget;
   ssc::SpinBoxGroupWidget* mDimYWidget;
   ssc::SpinBoxGroupWidget* mDimZWidget;
-//  ssc::CheckBoxWidget* mAlignTimestampsWidget;
-//  ssc::SpinBoxGroupWidget* mTimeCalibrationWidget;
   
   QGroupBox* mAlgorithmGroup;
   QGridLayout* mAlgoLayout;
   std::vector<QWidget*> mAlgoWidgets;
   
-  //    ssc::StringDataAdapterPtr generateStringDataAdapter(QString uid);
   QString getCurrentPath();
   void updateComboBox();
-  void setInputFile(const QString& inputFile);
   void repopulateAlgorithmGroup();
 };
 

@@ -13,6 +13,7 @@
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 #include "RTSource/cxRTSourceManager.h"
+#include "cxViewWrapper3D.h"
 
 namespace cx
 {
@@ -170,6 +171,8 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
   this->fillDefault("showSectorInRTView", true);
   this->fillDefault("autoLandmarkRegistration", true);
+  this->fillDefault("View3D/stereoType", stINTERLACED);
+  this->fillDefault("View3D/eyeAngle", 4.0);
 }
 
 void StateManager::initialize()

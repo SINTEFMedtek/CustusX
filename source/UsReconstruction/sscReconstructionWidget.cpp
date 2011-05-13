@@ -6,15 +6,10 @@
 #include "sscReconstructOutputValueParamsInterfaces.h"
 #include "sscMessageManager.h"
 #include "sscHelperWidgets.h"
+#include "sscTypeConversions.h"
 
 namespace ssc 
 {
-
-
-// --------------------------------------------------------
-// --------------------------------------------------------
-// --------------------------------------------------------
-
 
 ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr reconstructer):
   QWidget(parent),
@@ -27,15 +22,8 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
-  QHBoxLayout* dataLayout = new QHBoxLayout;
-  mDataComboBox = new QComboBox(this);
-  connect(mDataComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(currentDataComboIndexChanged(const QString&)));
-  //this->updateComboBox();
-
-  mSelectDataAction = new QAction(QIcon(":/icons/open.png"), tr("&Select data"), this);
-  connect(mSelectDataAction, SIGNAL(triggered()), this, SLOT(selectData()));
-  mSelectDataButton = new QToolButton(this);
-  mSelectDataButton->setDefaultAction(mSelectDataAction);
+  mFileSelectWidget = new FileSelectWidget(this);
+  connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
 
   QHBoxLayout* extentLayout = new QHBoxLayout;
   mExtentLineEdit = new QLineEdit(this);
@@ -49,8 +37,6 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
   inputSpacingLayout->addWidget(new QLabel("Input Spacing(mm)", this));
   inputSpacingLayout->addWidget(mInputSpacingLineEdit);
 
-//  mReloadButton = new QPushButton("Reload", this);
-//  connect(mReloadButton, SIGNAL(clicked()), this, SLOT(reload()));
   mReconstructButton = new QPushButton("Reconstruct", this);
   connect(mReconstructButton, SIGNAL(clicked()), this, SLOT(reconstruct()));
 
@@ -68,13 +54,11 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
   outputVolDimLayout->addWidget(mDimYWidget);
   outputVolDimLayout->addWidget(mDimZWidget);
 
-  //ssc::StringDataAdapterPtr orientation = this->generateStringDataAdapter("Orientation");
   ssc::LabeledComboBoxWidget* orientationWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mOrientationAdapter);
   ssc::LabeledComboBoxWidget* presetTFWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mPresetTFAdapter);
   
   QWidget* reduceWidget = ssc::createDataWidget(this, mReconstructer->mMaskReduce);
   
-  //ssc::StringDataAdapterPtr algorithm = this->generateStringDataAdapter("Algorithm");
   ssc::LabeledComboBoxWidget* algorithmWidget = new ssc::LabeledComboBoxWidget(this, mReconstructer->mAlgorithmAdapter);
 
   QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->mAlignTimestamps);
@@ -83,12 +67,9 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
   mAlgorithmGroup = new QGroupBox("Algorithm", this);
   mAlgoLayout = new QGridLayout(mAlgorithmGroup);
-  repopulateAlgorithmGroup();
+  this->repopulateAlgorithmGroup();
 
-  topLayout->addLayout(dataLayout);
-  dataLayout->addWidget(mDataComboBox);
-  dataLayout->addWidget(mSelectDataButton);
-  //topLayout->addWidget(mReloadButton);
+  topLayout->addWidget(mFileSelectWidget);
   topLayout->addLayout(inputSpacingLayout);
   topLayout->addWidget(outputVolGroup);
   outputVolLayout->addLayout(extentLayout);
@@ -138,12 +119,6 @@ void ReconstructionWidget::repopulateAlgorithmGroup()
 	}
 }
 
-void ReconstructionWidget::currentDataComboIndexChanged(const QString& text)
-{
-  QDir dir = QFileInfo(mReconstructer->getSelectedData()).dir();
-  this->selectData(dir.filePath(text));
-}
-
 QString ReconstructionWidget::getCurrentPath()
 {
   return QFileInfo(mReconstructer->getSelectedData()).dir().absolutePath();
@@ -154,34 +129,6 @@ void ReconstructionWidget::reconstruct()
   ssc::messageManager()->sendInfo("Reconstructing...");
   qApp->processEvents();
   mReconstructer->reconstruct();
-}
-
-void ReconstructionWidget::updateComboBox()
-{
-  QString inputfile = mReconstructer->getSelectedData();
-  mDataComboBox->blockSignals(true);
-  mDataComboBox->clear();
-
-  QDir dir = QFileInfo(inputfile).dir();
-  QStringList nameFilters;
-  nameFilters << "*.mhd";
-  QStringList files = dir.entryList(nameFilters, QDir::Files);
-
-  for (int i=0; i<files.size(); ++i)
-  {
-    mDataComboBox->addItem(files[i]);
-  }
-  mDataComboBox->setCurrentIndex(-1);
-  for (int i=0; i<files.size(); ++i)
-  {
-    if (files[i]==QFileInfo(inputfile).fileName())
-      mDataComboBox->setCurrentIndex(i);
-  }
-
-  mDataComboBox->setToolTip(inputfile);
-
-  mDataComboBox->blockSignals(false);
-
 }
 
 void ReconstructionWidget::reload()
@@ -199,8 +146,7 @@ void ReconstructionWidget::inputDataSelected(QString mhdFileName)
     return;
   }
 
-  this->updateComboBox();
-  mDataComboBox->setToolTip(mReconstructer->getSelectedData());
+  mFileSelectWidget->setFilename(mhdFileName);
 }
 
 
@@ -212,7 +158,6 @@ void ReconstructionWidget::selectData(QString filename)
     return;
   }
 
-//  mInputFile = filename;
   mReconstructer->selectData(filename);
 }
 
@@ -229,15 +174,6 @@ void ReconstructionWidget::paramsChangedSlot()
     mExtentLineEdit->setText(extText);
 
     mInputSpacingLineEdit->setText(QString("%1").arg(mReconstructer->getOutputVolumeParams().mInputSpacing,0,'f',4));
-}
-
-void ReconstructionWidget::selectData()
-{
-  QString filename = QFileDialog::getOpenFileName( this,
-                                  QString(tr("Select data file")),
-                                  getCurrentPath(),
-                                  tr("USAcq (*.mhd)"));
-  this->selectData(filename);
 }
   
 }//namespace

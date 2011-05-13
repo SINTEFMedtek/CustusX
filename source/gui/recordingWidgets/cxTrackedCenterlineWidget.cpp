@@ -13,6 +13,7 @@
 #include "cxStateMachineManager.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
+#include "cxRecordSessionWidget.h"
 
 namespace cx
 {
@@ -46,13 +47,11 @@ void TrackedCenterlineWidget::checkIfReadySlot()
 {
   if(ssc::toolManager()->isTracking())
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=green>Ready to record!</font>\n");
-    emit ready(true);
+    mRecordSessionWidget->setReady(true, "<font color=green>Ready to record!</font>\n");
   }
   else
   {
-    RecordBaseWidget::setWhatsMissingInfo("<font color=red>Need to start tracking.</font>\n");
-    emit ready(false);
+    mRecordSessionWidget->setReady(false, "<font color=red>Need to start tracking.</font>\n");
   }
 }
 
@@ -80,7 +79,7 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
   //extract the centerline
   QString savepath = stateManager()->getPatientData()->getActivePatientFolder();
   mCenterlineAlgorithm.setInput(image_d, savepath);
-  this->setWhatsMissingInfo("<font color=orange>Generating centerline... Please wait!</font>\n");
+  mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }
 
 void TrackedCenterlineWidget::centerlineFinishedSlot()
