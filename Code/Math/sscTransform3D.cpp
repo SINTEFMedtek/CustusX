@@ -103,7 +103,7 @@ Eigen::Affine3d fromString(const QString& text, bool* _ok)
   std::vector<double> raw = convertQString2DoubleVector(text, ok);
   if (raw.size()!=16)
     *ok = false;
-  if (!ok)
+  if (!*ok)
     return Eigen::Affine3d();
 
   Eigen::Affine3d retval;

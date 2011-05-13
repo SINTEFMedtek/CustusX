@@ -341,7 +341,6 @@ bool SNW2Volume::loadVolumeData()
 	}
 
 	bool success = true;
-	QTime pre = QTime::currentTime();
 	if (mMetaData.Lut.mType!="None")
 	{
 		success = success && CheckMD5(cstring_cast(rawLutFileName()));
@@ -351,8 +350,6 @@ bool SNW2Volume::loadVolumeData()
 			return false;
 		}
 	}
-	//writeStatus("checksumming lut["+uid()+"], time="+qstring_cast(pre.msecsTo(QTime::currentTime()))+"ms");
-
 	mImageData = vtkImageDataPtr::New();
 	mImage = ssc::ImagePtr(new ssc::Image("series_"+uid(), mImageData));
 	mLut = vtkLookupTablePtr::New();

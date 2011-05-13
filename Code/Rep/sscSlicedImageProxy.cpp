@@ -57,7 +57,7 @@ vtkImageDataPtr SlicedImageProxy::createDummyImageData()
   dummyImageData->SetNumberOfScalarComponents(1);
   dummyImageData->AllocateScalars();
   unsigned char* dataPtr = static_cast<unsigned char*>(dummyImageData->GetScalarPointer());
-  dataPtr = 0;//Set voxel to black
+  *dataPtr = 0;	// Set voxel to black
   return dummyImageData;
 }
 
