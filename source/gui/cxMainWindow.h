@@ -107,7 +107,6 @@ private:
   void createActions(); ///< creates and connects (gui-)actions
   void createMenus(); ///< creates and add (gui-)menues
   void createToolBars(); ///< creates and adds toolbars for convenience
-  void createStatusBar();  ///<
 
   void addAsDockWidget(QWidget* widget, QString groupname = "");
   void registerToolBar(QToolBar* toolbar, QString groupname="");
@@ -120,7 +119,7 @@ private:
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
 
   //gui
-  QWidget* mCentralWidget; ///< central widget used for views
+  //QWidget* mCentralWidget; ///< central widget used for views, not used
 
   //menus
   QMenu* mCustusXMenu;    ///< Application menu
@@ -130,8 +129,6 @@ private:
   QMenu* mLayoutMenu;     ///< menu for changing view layouts
   QMenu* mNavigationMenu; ///< menu for navigation and interaction
   QMenu* mHelpMenu;
-
-  QAction* mShowControlPanelAction;
 
   //actions and actiongroups
   QAction* mAboutAction;
@@ -148,6 +145,7 @@ private:
   QAction* mSaveFileAction;///< Action for saving all data to file
   QAction* mClearPatientAction;
   QAction* mExportPatientAction;
+  QAction* mShowControlPanelAction;
 
   QActionGroup* mStandard3DViewActions; ///< actions for setting camera in fixed direction.
   QAction* mShowPointPickerAction;
@@ -204,9 +202,9 @@ private:
   ssc::ReconstructionWidget*                    mReconstructionWidget;
   class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*                 mVolumePropertiesWidget;
-  class StatusBar*                        mCustomStatusBar;
+  class StatusBar*                              mCustomStatusBar;
   class FrameTreeWidget*                        mFrameTreeWidget;
-  class SecondaryMainWindow*                           mControlPanel;
+  class SecondaryMainWindow*                    mControlPanel;
 
   //Preferences
   CameraControlPtr mCameraControl;
