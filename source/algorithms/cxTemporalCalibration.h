@@ -43,17 +43,20 @@ private:
   std::vector<double> computeProbeMovement();
   std::vector<double> resample(std::vector<double> shift, std::vector<ssc::TimedPosition> time, double resolution);
   std::vector<double> computeTrackingMovement();
-  double findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution);
+  double findCorrelationShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const;
+  double findLeastSquares(std::vector<double> frames, std::vector<double> tracking, int shift) const;
+  double findLSShift(std::vector<double> frames, std::vector<double> tracking, double resolution) const;
 
   void saveDebugFile();
 
   UsReconstructionFileReader::FileData mFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
   QString mDebugFolder;
   QString mFilename;
-  std::stringstream mDebugStream;
+  mutable std::stringstream mDebugStream;
   bool mAddRawToDebug;
 
 };
+
 
 typedef boost::shared_ptr<TemporalCalibration> TemporalCalibrationPtr;
 
