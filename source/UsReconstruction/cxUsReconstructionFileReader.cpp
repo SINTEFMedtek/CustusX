@@ -16,6 +16,8 @@
 #include <vtkImageData.h>
 #include "sscImage.h"
 #include "sscUtilHelpers.h"
+#include "cxCreateProbeDataFromConfiguration.h"
+#include "sscVolumeHelpers.h"
 
 namespace cx
 {
@@ -23,6 +25,100 @@ namespace cx
 UsReconstructionFileReader::UsReconstructionFileReader()
 {
 
+}
+
+/** Read all data from the files and return as a FileData object.
+ *
+ * NOTE: The mFrames var will not be initialized with transforms,
+ * they must be generated explicitly.
+ *
+ * the mMask var is filled with data from ProbeData, or from file if present.
+ *
+ */
+UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath)
+{
+  if (calFilesPath.isEmpty())
+  {
+    QStringList list = fileName.split("/");
+    list[list.size()-1] = "";
+    calFilesPath = list.join("/")+"/";
+  }
+
+//  mFilename = fileName;
+//  mCalFilesPath = calFilesPath;
+  FileData retval;
+
+  // ignore if a directory is read - store folder name only
+  if (QFileInfo(fileName).suffix()!="mhd")
+    return retval;
+
+  QString mhdFileName = ssc::changeExtension(fileName, "mhd");
+
+  if (!QFileInfo(ssc::changeExtension(fileName, "mhd")).exists())
+  {
+    // There may not be any files here due to the automatic calling of the function
+    ssc::messageManager()->sendWarning("File not found: "+ssc::changeExtension(fileName, "mhd")+", reconstruct load failed");
+    return retval;
+  }
+
+  //Read US images
+  retval.mUsRaw = this->readUsDataFile(mhdFileName);
+
+  QString caliFilename;
+  QStringList probeConfigPath;
+  this->readCustomMhdTags(mhdFileName, &probeConfigPath, &caliFilename);
+  ProbeXmlConfigParser::Configuration configuration = this->readProbeConfiguration(calFilesPath, probeConfigPath);
+  ssc::ProbeData probeData = createProbeDataFromConfiguration(configuration);
+  // override spacing with spacing from image file. This is because the raw spacing from probe calib might have been changed by changing the sound speed.
+  probeData.mImage.mSpacing = ssc::Vector3D(retval.mUsRaw->getSpacing());
+  retval.mProbeData.setData(probeData);
+
+  retval.mFrames = this->readFrameTimestamps(fileName);
+  retval.mPositions = this->readPositions(fileName);
+
+  //mPos is now prMs
+  retval.mMask = this->generateMask(retval);
+  if (!this->readMaskFile(fileName, retval.mMask))
+  {
+  	retval.mMask = this->createMaskFromConfigParams(retval);
+  }
+
+  return retval;
+}
+
+ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData data)
+{
+  vtkImageDataPtr mask = data.mProbeData.getMask();
+  ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
+
+  ssc::Vector3D usDim(data.mUsRaw->getDimensions());
+  usDim[2] = 1;
+  ssc::Vector3D usSpacing(data.mUsRaw->getSpacing());
+
+  // checking
+  bool spacingOK = similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
+  bool dimOK = similar(usDim, ssc::Vector3D(mask->GetDimensions()));
+  if (!dimOK || !spacingOK)
+  {
+    ssc::messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
+    if (!dimOK)
+      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetDimensions())));
+    if (!spacingOK)
+      ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
+  }
+  return image;
+}
+
+ssc::ImagePtr UsReconstructionFileReader::generateMask(FileData data)
+{
+  ssc::Vector3D dim(data.mUsRaw->getDimensions());
+  dim[2] = 1;
+  ssc::Vector3D spacing(data.mUsRaw->getSpacing());
+
+  vtkImageDataPtr raw = ssc::generateVtkImageData(dim, spacing, 255);
+
+  ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", raw, "mask")) ;
+  return image;
 }
 
 void UsReconstructionFileReader::readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName)
@@ -77,7 +173,7 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
   if (probeConfigPath.size()!=4)
     return ProbeXmlConfigParser::Configuration();
   //Assumes ProbeCalibConfigs.xml file and calfiles have the same path
-  ssc::messageManager()->sendInfo("Use mCalFilesPath: " + calFilesPath);
+//  ssc::messageManager()->sendInfo("Use mCalFilesPath: " + calFilesPath);
   QString xmlPath = calFilesPath+"ProbeCalibConfigs.xml";
   ProbeXmlConfigParser* xmlConfigParser = new ProbeXmlConfigParser(xmlPath);
 

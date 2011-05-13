@@ -14,6 +14,7 @@
 #include "sscTypeConversions.h"
 #include "sscPositionStorageFile.h"
 #include "sscTime.h"
+#include "sscEnumConverter.h"
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
@@ -22,6 +23,7 @@
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
+#include "cxStateMachineManager.h"
 
 namespace cx
 {
@@ -177,7 +179,9 @@ void ToolManager::trackerConfiguredSlot(bool on)
         mReferenceTool = tool;
 
       mTools[it->first] = tool;
-      connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
+      // Automatic selection of dominant tool for other applications than ENDOVASCULAR
+//      if(stateManager()->getApplication()->getActiveStateName() != enum2string(ssc::mdENDOVASCULAR))
+        connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }
     else
     {
