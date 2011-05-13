@@ -58,12 +58,18 @@ MainWindow::MainWindow() :
   mSegmentationMethodsWidget(new SegmentationMethodsWidget(this, "SegmentationMethodsWidget", "Segmentation Methods")),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget(this, "VisualizationMethodsWidget", "Visualization Methods")),
   mCalibrationMethodsWidget(new CalibrationMethodsWidget(this, "CalibrationMethodsWidget", "Calibration Methods")),
-  //mBrowserWidget(new BrowserWidget(this)),
+#ifndef WIN32
+  //this widget crashes cx3 on windows in release mode
+  mBrowserWidget(new BrowserWidget(this)),
+#endif
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
+#ifndef WIN32
+  //this widget crashes cx3 on windows in release mode
   mPointSamplingWidget(new PointSamplingWidget(this)),
+#endif
   mReconstructionWidget(NULL),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
@@ -94,13 +100,16 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
   this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
-  //this->addAsDockWidget(mBrowserWidget, "Browsing");
+#ifndef WIN32
+  //These widgets are know to crash cx3 on windows in release mode
+  this->addAsDockWidget(mBrowserWidget, "Browsing");
+  this->addAsDockWidget(mPointSamplingWidget, "Utility");
+#endif
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
   this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
   this->addAsDockWidget(new TrackPadWidget(this), "Utility");
   this->addAsDockWidget(mToolPropertiesWidget, "Properties");
-  //this->addAsDockWidget(mPointSamplingWidget, "Utility");
   this->addAsDockWidget(mReconstructionWidget, "Algorithms");
   this->addAsDockWidget(mRegistrationHistoryWidget, "Browsing");
   this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
