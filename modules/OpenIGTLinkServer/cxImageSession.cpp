@@ -144,8 +144,8 @@ igtl::ImageMessage::Pointer getVtkImageMessage(vtkImageData* image)
 // Function to generate random matrix.
 void GetRandomTestMatrix(igtl::Matrix4x4& matrix)
 {
-  float position[3];
-  float orientation[4];
+  //float position[3];
+  //float orientation[4];
 
   matrix[0][0] = 1.0;  matrix[1][0] = 0.0;  matrix[2][0] = 0.0; matrix[3][0] = 0.0;
   matrix[0][1] = 0.0;  matrix[1][1] = -1.0;  matrix[2][1] = 0.0; matrix[3][1] = 0.0;

@@ -68,7 +68,7 @@ bool DoubleDataAdapterTimeCalibration::setValue(double val)
 
 ssc::DoubleRange DoubleDataAdapterTimeCalibration::getValueRange() const
 {
-  return ssc::DoubleRange(-1000,1000,1);
+  return ssc::DoubleRange(-50000,50000,1);
 }
 
 }
