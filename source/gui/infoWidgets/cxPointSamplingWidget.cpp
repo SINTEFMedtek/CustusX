@@ -107,10 +107,7 @@ void PointSamplingWidget::updateSlot()
   mTable->setColumnCount(3);
   QStringList headerItems(QStringList() << "Name" << "Coordinates(r)" << "Delta (mm)");
   mTable->setHorizontalHeaderLabels(headerItems);
-#ifndef WIN32
-  //for some reason this line of code makes the program crash in release mode on windows, not in debugmode tho
   mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
   mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
   for (unsigned i = 0; i < mSamples.size(); ++i)
