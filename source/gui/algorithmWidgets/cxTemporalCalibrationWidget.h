@@ -15,11 +15,13 @@
 #include "sscFileSelectWidget.h"
 #include "cxUsReconstructionFileReader.h"
 #include <cxTemporalCalibration.h>
+#include "cxUSAcqusitionWidget.h"
 
 namespace cx
 {
 
 /** GUI for performing temporal calibration
+ *
  */
 class TemporalCalibrationWidget : public BaseWidget
 {
@@ -38,10 +40,14 @@ private slots:
 protected:
   void showEvent(QShowEvent* event);
 private:
-  ssc::FileSelectWidget* mFileSelectWidget;
+  USAcquisitionPtr mAcquisition;
   TemporalCalibrationPtr mAlgorithm;
+
+  ssc::FileSelectWidget* mFileSelectWidget;
   QLineEdit* mResult;
   QCheckBox* mVerbose;
+  RecordSessionWidget* mRecordSessionWidget;
+  QLabel* mInfoLabel;
 };
 
 

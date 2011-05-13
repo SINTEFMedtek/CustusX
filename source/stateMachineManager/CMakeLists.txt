@@ -15,6 +15,7 @@ SET( CX_QT_MOC_HEADER_FILES
     RTSource/cxRTSourceManager.h
     RTSource/sscOpenIGTLinkClient.h
     RTSource/sscOpenIGTLinkRTSource.h
+    cxUSAcquisition.h
 )
 
 SET ( ${LIB}_statemachineManager
@@ -40,6 +41,8 @@ SET ( ${LIB}_statemachineManager
     RTSource/sscOpenIGTLinkClient.cpp
     RTSource/sscOpenIGTLinkRTSource.h
     RTSource/sscOpenIGTLinkRTSource.cpp    
+    cxUSAcquisition.h
+    cxUSAcquisition.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
