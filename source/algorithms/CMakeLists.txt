@@ -35,9 +35,13 @@ SET ( ${LIB}_algorithms
     cxContour.cpp
     cxConnectedThresholdImageFilter.h
     cxConnectedThresholdImageFilter.cpp
+    cxTemporalCalibration.h
+    cxTemporalCalibration.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_algorithms} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} dataManager ITKIO ITKCommon ITKBasicFilters) 
+target_link_libraries(${LIB} dataManager sscUsReconstructionLib ITKIO ITKCommon ITKBasicFilters) 
+
+add_subdirectory( testing )

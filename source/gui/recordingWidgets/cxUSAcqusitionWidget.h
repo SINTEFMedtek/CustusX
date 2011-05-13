@@ -2,12 +2,12 @@
 #define CXUSACQUSITIONWIDGET_H_
 
 #include "cxRecordBaseWidget.h"
-
-#include <QFuture>
-#include <QFutureWatcher>
+#include "cxUSAcquisition.h"
 
 namespace cx
 {
+
+
 /**
  * USAcqusitionWidget
  *
@@ -16,7 +16,7 @@ namespace cx
  * \date Dec 9, 2010
  * \author Janne Beate Bakeng, SINTEF
  */
-class USAcqusitionWidget : public TrackedRecordWidget
+class USAcqusitionWidget : public RecordBaseWidget
 {
   Q_OBJECT
 public:
@@ -25,29 +25,21 @@ public:
   virtual QString defaultWhatsThis() const;
 
 protected slots:
-  void checkIfReadySlot();
+
   void postProcessingSlot(QString sessionId);
   void startedSlot();
   void stoppedSlot();
 
 private slots:
-  void probeChangedSlot();
   void reconstructFinishedSlot();
-  void fileMakerWriteFinished();
-  void dominantToolChangedSlot();
+  void saveDataCompletedSlot(QString mhdFilename);
 
 private:
-  virtual ssc::TimedTransformMap getRecording(RecordSessionPtr session);
-
-  SelectRTSourceStringDataAdapterPtr mRTSourceDataAdapter;
-  ssc::RTSourcePtr mRTSource;
-  ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
+  USAcquisitionPtr mAcquisition;
   ssc::ThreadedReconstructerPtr mThreadedReconstructer;
-
-  QFuture<QString> mFileMakerFuture;
-  QFutureWatcher<QString> mFileMakerFutureWatcher;
-  UsReconstructionFileMakerPtr mFileMaker;
 };
+
+
 }//namespace cx
 
 #endif /* CXUSACQUSITIONWIDGET_H_ */
