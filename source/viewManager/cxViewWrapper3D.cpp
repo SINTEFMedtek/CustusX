@@ -144,6 +144,14 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
   mView->addRep(mAnnotationMarker);
   mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
+
+  //Stereo
+  mView->getRenderWindow()->StereoCapableWindowOn();
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
+  //Init 3D stereo from settings
+  this->setStereoType(settings()->value("View3D/stereoType").toInt());
+  this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
+
 }
 
 ViewWrapper3D::~ViewWrapper3D()
@@ -242,6 +250,8 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
   connect(group.get(), SIGNAL(initialized()), this, SLOT(resetCameraActionSlot()));
   connect(group.get(), SIGNAL(optionsChanged()), this, SLOT(optionChangedSlot()));
   mView->getRenderer()->SetActiveCamera(mViewGroup->getCamera3D()->getCamera());
+  // Set eye angle after camera change. Maybe create a cameraChangedSlot instead
+  this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
   this->optionChangedSlot();
 
 }
@@ -343,6 +353,8 @@ void ViewWrapper3D::showOrientationSlot(bool visible)
 void ViewWrapper3D::resetCameraActionSlot()
 {
   mView->getRenderer()->ResetCamera();
+  //Update eye angle after camera is reset
+  this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 }
 
 void ViewWrapper3D::centerImageActionSlot()
@@ -561,5 +573,42 @@ void ViewWrapper3D::setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy)
 
   mView->addRep(mSlicePlanes3DRep);
 }
+
+void ViewWrapper3D::setStereoType(int /*STEREOTYPE*/ type)
+{
+  switch(type) //STEREOTYPE
+      {
+      case stFRAME_SEQUENTIAL:
+        mView->getRenderWindow()->SetStereoTypeToCrystalEyes();
+        break;
+      case stINTERLACED:
+        mView->getRenderWindow()->SetStereoTypeToInterlaced();
+        break;
+      case stDRESDEN:
+        mView->getRenderWindow()->SetStereoTypeToDresden();
+        break;
+      case stRED_BLUE:
+        mView->getRenderWindow()->SetStereoTypeToRedBlue();
+        break;
+      }
+}
+
+void ViewWrapper3D::globalConfigurationFileChangedSlot(QString key)
+{
+  if(key == "View3D/stereoType")
+  {
+    this->setStereoType(settings()->value("View3D/stereoType").toInt());
+  }
+  else if(key == "View3D/eyeAngle")
+  {
+    this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
+  }
+}
+
+void ViewWrapper3D::setStereoEyeAngle(double angle)
+{
+  mView->getRenderer()->GetActiveCamera()->SetEyeAngle(angle);
+}
+
 //------------------------------------------------------------------------------
 }

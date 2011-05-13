@@ -50,7 +50,7 @@ namespace cx
 {
 
 MainWindow::MainWindow() :
-  mCentralWidget(new QWidget(this)),
+  //mCentralWidget(new QWidget(this)),
   mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
@@ -58,12 +58,19 @@ MainWindow::MainWindow() :
   mSegmentationMethodsWidget(new SegmentationMethodsWidget(this, "SegmentationMethodsWidget", "Segmentation Methods")),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget(this, "VisualizationMethodsWidget", "Visualization Methods")),
   mCalibrationMethodsWidget(new CalibrationMethodsWidget(this, "CalibrationMethodsWidget", "Calibration Methods")),
+#ifndef WIN32
+  //this widget crashes cx3 on windows in release mode
   mBrowserWidget(new BrowserWidget(this)),
+#endif
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
+#ifndef WIN32
+  //this widget crashes cx3 on windows in release mode
   mPointSamplingWidget(new PointSamplingWidget(this)),
+#endif
+  mReconstructionWidget(NULL),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new StatusBar()),
@@ -71,6 +78,12 @@ MainWindow::MainWindow() :
   mControlPanel(NULL)
 {
   mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
+  mCameraControl.reset(new CameraControl(this));
+
+  this->createActions();
+  this->createMenus();
+  this->createToolBars();
+  this->setStatusBar(mCustomStatusBar);
 
   ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
   ssc::messageManager()->setAudioSource(ssc::AudioPtr(new Audio()));
@@ -79,23 +92,24 @@ MainWindow::MainWindow() :
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
   connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
 
-  mCameraControl.reset(new CameraControl());
-
   mLayoutActionGroup = NULL;
   this->updateWindowTitle();
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
-
+  
   this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
   this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
+#ifndef WIN32
+  //These widgets are know to crash cx3 on windows in release mode
   this->addAsDockWidget(mBrowserWidget, "Browsing");
+  this->addAsDockWidget(mPointSamplingWidget, "Utility");
+#endif
   this->addAsDockWidget(mImagePropertiesWidget, "Properties");
   this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
   this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
   this->addAsDockWidget(new TrackPadWidget(this), "Utility");
   this->addAsDockWidget(mToolPropertiesWidget, "Properties");
-  this->addAsDockWidget(mPointSamplingWidget, "Utility");
   this->addAsDockWidget(mReconstructionWidget, "Algorithms");
   this->addAsDockWidget(mRegistrationHistoryWidget, "Browsing");
   this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
@@ -105,11 +119,6 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mNavigationWidget, "Properties");
   this->addAsDockWidget(mConsoleWidget, "Utility");
   this->addAsDockWidget(mFrameTreeWidget, "Browsing");
-
-  this->createActions();
-  this->createToolBars();
-  this->createMenus();
-  this->createStatusBar();
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
 
@@ -165,8 +174,9 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
 {
   QDockWidget* dockWidget = new QDockWidget(widget->windowTitle(), this);
   dockWidget->setObjectName(widget->objectName() + "DockWidget");
-  dockWidget->setWidget(widget);
-  this->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+  dockWidget->setWidget(widget); 
+  
+  QMainWindow::addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
   // tabify the widget onto one of the left widgets.
   for (std::set<QDockWidget*>::iterator iter=mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
@@ -398,7 +408,6 @@ void MainWindow::createActions()
   connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
 
   mInteractorStyleActionGroup = viewManager()->createInteractorStyleActionGroup();
-
 }
 
 void MainWindow::toggleFullScreenSlot()
@@ -690,7 +699,8 @@ void MainWindow::patientChangedSlot()
 void MainWindow::layoutChangedSlot()
 {
   // reset list of available layouts
-  delete mLayoutActionGroup;
+  //if(mLayoutActionGroup)
+    delete mLayoutActionGroup;
   mLayoutActionGroup = viewManager()->createLayoutActionGroup();
 
   mLayoutMenu->addActions(mLayoutActionGroup->actions());
@@ -857,12 +867,6 @@ void MainWindow::createToolBars()
   mToolToolBar->addAction(mStartStreamingAction);
   this->registerToolBar(mToolToolBar, "Toolbar");
 
-  mScreenshotToolBar = addToolBar("Screenshot");
-  mScreenshotToolBar->setObjectName("ScreenshotToolBar");
-  mScreenshotToolBar->addAction(mShootScreenAction);
-//  mScreenshotToolBar->addAction(mShootWindowAction);
-  this->registerToolBar(mScreenshotToolBar, "Toolbar");
-
   mNavigationToolBar = addToolBar("Navigation");
   mNavigationToolBar->setObjectName("NavigationToolBar");
   mNavigationToolBar->addAction(mCenterToImageCenterAction);
@@ -891,20 +895,21 @@ void MainWindow::createToolBars()
   mHelpToolBar->addAction(QWhatsThis::createAction());
   this->registerToolBar(mHelpToolBar, "Toolbar");
 
-   QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
-   camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
-   camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
-   this->registerToolBar(camera3DViewToolBar, "Toolbar");
+  mScreenshotToolBar = addToolBar("Screenshot");
+  mScreenshotToolBar->setObjectName("ScreenshotToolBar");
+  mScreenshotToolBar->addAction(mShootScreenAction);
+  //  mScreenshotToolBar->addAction(mShootWindowAction);
+  this->registerToolBar(mScreenshotToolBar, "Toolbar");
+
+  QToolBar* camera3DViewToolBar = addToolBar("Camera 3D Views");
+  camera3DViewToolBar->setObjectName("Camera3DViewToolBar");
+  camera3DViewToolBar->addActions(mStandard3DViewActions->actions());
+  this->registerToolBar(camera3DViewToolBar, "Toolbar");
 }
 
 void MainWindow::registerToolBar(QToolBar* toolbar, QString groupname)
 {
   this->addToWidgetGroupMap(toolbar->toggleViewAction(), groupname);
-}
-
-void MainWindow::createStatusBar()
-{
-  this->setStatusBar(mCustomStatusBar);
 }
 
 void MainWindow::aboutSlot()

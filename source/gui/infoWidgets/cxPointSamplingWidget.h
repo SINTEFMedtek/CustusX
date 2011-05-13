@@ -64,8 +64,8 @@ protected:
   QPushButton* mRemoveButton; ///< the Remove Landmark button
   QPushButton* mLoadReferencePointsButton; ///< button for loading a reference tools reference points
 
-private:
-  PointSamplingWidget();
+//private:
+//  PointSamplingWidget();
 
 };
 
