@@ -14,6 +14,9 @@
 #include "sscImage.h"
 #include "sscUSFrameData.h"
 #include "probeXmlConfigParser.h"
+//#include "sscTool.h"
+#include "sscProbeSector.h"
+#include "sscForwardDeclarations.h"
 
 namespace cx
 {
@@ -21,7 +24,20 @@ namespace cx
 class UsReconstructionFileReader
 {
 public:
+
+	struct FileData
+	{
+		ssc::USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+	  std::vector<ssc::TimedPosition> mFrames;
+	  std::vector<ssc::TimedPosition> mPositions;
+	  ssc::ImagePtr mMask;///< Clipping mask for the input data
+	  ssc::ProbeSector mProbeData;
+	};
+
+public:
   UsReconstructionFileReader();
+
+  FileData readAllFiles(QString fileName, QString calFilesPath="");
 
   ssc::Transform3D readTransformFromFile(QString fileName);
   bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
@@ -36,6 +52,9 @@ public:
 private:
   void readPositionFile(QString posFile, bool alsoReadTimestamps, std::vector<ssc::TimedPosition>* timedPos);
   void readTimeStampsFile(QString fileName, std::vector<ssc::TimedPosition>* timedPos);
+
+  ssc::ImagePtr createMaskFromConfigParams(FileData data);
+  ssc::ImagePtr generateMask(FileData data);
 };
 
 typedef boost::shared_ptr<UsReconstructionFileReader> UsReconstructionFileReaderPtr;
