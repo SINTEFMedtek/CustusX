@@ -74,22 +74,22 @@ signals:
   void reconstructFinished();
 
 private:
-  struct FileData
-  {
-    USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
-    std::vector<TimedPosition> mFrames;
-    std::vector<TimedPosition> mPositions;
-    ImagePtr mMask;///< Clipping mask for the input data
-    ssc::ProbeSector mProbeData;
-  };
-  FileData mFileData;
-  FileData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
+//  struct FileData
+//  {
+//    USFrameDataPtr mUsRaw;///<All imported US data frames with pointers to each frame
+//    std::vector<TimedPosition> mFrames;
+//    std::vector<TimedPosition> mPositions;
+//    ImagePtr mMask;///< Clipping mask for the input data
+//    ssc::ProbeSector mProbeData;
+//  };
+  cx::UsReconstructionFileReader::FileData mFileData;
+  cx::UsReconstructionFileReader::FileData mOriginalFileData; ///< original version of loaded data. Use as basis when recalculating due to changed params.
 
   cx::UsReconstructionFileReaderPtr mFileReader;
   OutputVolumeParams mOutputVolumeParams;
   ReconstructAlgorithmPtr mAlgorithm;
   XmlOptionFile mSettings;
-  QString mCalFileName; ///< Name of calibration file
+//  QString mCalFileName; ///< Name of calibration file
   QString mCalFilesPath; ///< Path to calibration files
   QString mFilename; ///< filename used for current data read
   ImagePtr mOutput;///< Output image from reconstruction
@@ -99,8 +99,8 @@ private:
   double mMaxTimeDiff; ///< The largest allowed time deviation for the positions used in the frame interpolations
 
   void readCoreFiles(QString fileName, QString calFilesPath);
-  ImagePtr createMaskFromConfigParams();
-  ImagePtr generateMask();
+//  ImagePtr createMaskFromConfigParams();
+//  ImagePtr generateMask();
   ssc::Transform3D applyOutputOrientation();
   void findExtentAndOutputTransform();
   void transformPositionsTo_prMu();
