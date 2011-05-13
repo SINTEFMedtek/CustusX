@@ -33,20 +33,38 @@ typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 namespace cx
 {
 
-
 typedef unsigned char uchar;
 
 
 TemporalCalibrationWidget::TemporalCalibrationWidget(QWidget* parent) :
-    BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration")
+    BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
+    mRecordSessionWidget(new RecordSessionWidget(this, "temporal_calib")),
+		mInfoLabel(new QLabel(""))
 {
   mAlgorithm.reset(new TemporalCalibration);
   connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
+  mAcquisition.reset(new USAcquisition());
+  connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
+  connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
+  mAcquisition->checkIfReadySlot();
+
+  connect(mRecordSessionWidget, SIGNAL(newSession(QString)), mAcquisition.get(), SLOT(saveSession(QString)));
+  connect(mRecordSessionWidget, SIGNAL(started()), mAcquisition.get(), SLOT(startRecord()));
+  connect(mRecordSessionWidget, SIGNAL(stopped()), mAcquisition.get(), SLOT(stopRecord()));
+  mRecordSessionWidget->setDescriptionVisibility(false);
+
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
+  // add recording widgets
+  topLayout->addWidget(mInfoLabel);
+  topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
+  topLayout->addWidget(new ssc::SpinBoxGroupWidget(this, DoubleDataAdapterTimeCalibration::New()));
 
+  topLayout->addWidget(this->createHorizontalLine());
+
+  // add calibration widgets
   mFileSelectWidget = new ssc::FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
   topLayout->addWidget(mFileSelectWidget);
@@ -95,6 +113,7 @@ void TemporalCalibrationWidget::selectData(QString filename)
 {
 //  std::cout << "TemporalCalibrationWidget::selectData " << filename << std::endl;
   mAlgorithm->selectData(filename);
+  mFileSelectWidget->setFilename(filename);
   mResult->setText("");
 }
 
@@ -104,16 +123,14 @@ void TemporalCalibrationWidget::selectData(QString filename)
 void TemporalCalibrationWidget::calibrateSlot()
 {
   if (mVerbose->isChecked())
-    mAlgorithm->setDebugFile(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/temporal_calib.txt");
+    mAlgorithm->setDebugFolder(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/");
   else
-    mAlgorithm->setDebugFile("");
+    mAlgorithm->setDebugFolder("");
 
   double shift = mAlgorithm->calibrate();
   ssc::messageManager()->sendSuccess(QString("Completed temporal calibration, found shift %1 ms").arg(shift,0,'f',0));
   mResult->setText(QString("Shift = %1 ms").arg(shift, 0, 'f', 0));
 }
-
-
 
 
 }//namespace cx
