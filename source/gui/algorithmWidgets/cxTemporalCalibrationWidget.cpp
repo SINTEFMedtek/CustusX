@@ -56,6 +56,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(QWidget* parent) :
 
   QVBoxLayout* topLayout = new QVBoxLayout(this);
 
+  // add recording widgets
   topLayout->addWidget(mInfoLabel);
   topLayout->addWidget(mRecordSessionWidget);
   topLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveToolConfigurationStringDataAdapter::New()));
@@ -63,6 +64,7 @@ TemporalCalibrationWidget::TemporalCalibrationWidget(QWidget* parent) :
 
   topLayout->addWidget(this->createHorizontalLine());
 
+  // add calibration widgets
   mFileSelectWidget = new ssc::FileSelectWidget(this);
   connect(mFileSelectWidget, SIGNAL(fileSelected(QString)), this, SLOT(selectData(QString)));
   topLayout->addWidget(mFileSelectWidget);
@@ -111,6 +113,7 @@ void TemporalCalibrationWidget::selectData(QString filename)
 {
 //  std::cout << "TemporalCalibrationWidget::selectData " << filename << std::endl;
   mAlgorithm->selectData(filename);
+  mFileSelectWidget->setFilename(filename);
   mResult->setText("");
 }
 
