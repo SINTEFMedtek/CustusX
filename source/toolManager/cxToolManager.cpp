@@ -51,6 +51,7 @@ ToolManager::ToolManager() :
   mConfigured(false),
   mInitialized(false),
   mTracking(false),
+  mDominantToolCheckActive(true),
   mLastLoadPositionHistory(0)
 {
   m_rMpr_History.reset(new ssc::RegistrationHistory());
@@ -179,8 +180,8 @@ void ToolManager::trackerConfiguredSlot(bool on)
         mReferenceTool = tool;
 
       mTools[it->first] = tool;
-      // Automatic selection of dominant tool for other applications than ENDOVASCULAR
-//      if(stateManager()->getApplication()->getActiveStateName() != enum2string(ssc::mdENDOVASCULAR))
+      // Automatic selection of dominant tool if check is active (Application state other than ENDOVASCULAR)
+      if(mDominantToolCheckActive)
         connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }
     else
@@ -526,6 +527,16 @@ void ToolManager::setDominantTool(const QString& uid)
       emit tps(0);
 
   emit dominantToolChanged(uid);
+}
+
+void ToolManager::setClinicalApplication(ssc::CLINICAL_APPLICATION application)
+{
+  mApplication = application;
+
+  if(mApplication == ssc::mdENDOVASCULAR)
+    mDominantToolCheckActive = false;
+  else 
+    mDominantToolCheckActive = true;
 }
 
 std::map<QString, QString> ToolManager::getToolUidsAndNames() const
