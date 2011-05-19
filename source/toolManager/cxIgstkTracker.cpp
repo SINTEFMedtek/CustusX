@@ -275,7 +275,9 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   //communication failure
   else if (igstk::InputOutputErrorEvent().CheckEvent(&event))
   {
+    //this happens when you pull out the cable while tracking
     ssc::messageManager()->sendError(mUid+" cannot communicate with input/output.");
+    this->shutdown();
   }
   else if (igstk::InputOutputTimeoutEvent().CheckEvent(&event))
   {
@@ -335,4 +337,13 @@ void IgstkTracker::internalTracking(bool value)
   ssc::messageManager()->sendInfo(mUid+" is "+(value ? "" : "not ")+"tracking.");
   emit tracking(mTracking);
 }
+
+void IgstkTracker::shutdown()
+{
+  this->close();
+  this->internalTracking(false);
+  this->internalInitialized(false);
+  this->internalOpen(false);
+}
+
 }//namespace cx
