@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QDateTime>
 #include <QStringList>
+#include <QTextStream>
 //#include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
@@ -10,7 +11,79 @@
 namespace cx
 {
 
-IgstkTool::IgstkTool(Tool::InternalStructure internalStructure) :
+
+
+ssc::Transform3D IgstkTool::InternalStructure::getCalibrationAsSSC() const
+{
+	vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+	mCalibration.ExportTransform(*(M.GetPointer()));
+	ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+	return sMt;
+}
+
+void IgstkTool::InternalStructure::setCalibration(const ssc::Transform3D& cal)
+{
+  mCalibration.ImportTransform(*cal.getVtkMatrix());
+}
+
+void IgstkTool::InternalStructure::saveCalibrationToFile()
+{
+  QFile calibrationFile;
+  if(!mCalibrationFilename.isEmpty() && QFile::exists(mCalibrationFilename))
+  {
+    //Calibration file exists, overwrite
+    calibrationFile.setFileName(mCalibrationFilename);
+  }
+  else
+  {
+    //Make a new file, use rom file name as base name
+    QString calibrationFileName = mSROMFilename.remove(".rom", Qt::CaseInsensitive);
+    calibrationFileName.append(".cal");
+    calibrationFile.setFileName(calibrationFileName);
+  }
+//  ssc::Transform3D sMt;
+//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+//  mCalibration.ExportTransform(*(M.GetPointer()));
+//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+  ssc::Transform3D sMt = this->getCalibrationAsSSC();
+
+  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+  {
+    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
+    return;
+  }
+
+  QTextStream streamer(&calibrationFile);
+  streamer << qstring_cast(sMt);
+  streamer << endl;
+
+  calibrationFile.close();
+
+  ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
+}
+
+void IgstkTool::updateCalibration(const ssc::Transform3D& cal)
+{
+  //apply the calibration
+  mInternalStructure.mCalibration.ImportTransform(*cal.getVtkMatrix());
+  this->setCalibrationTransform(mInternalStructure.mCalibration);
+
+  ssc::Transform3D sMt = mInternalStructure.getCalibrationAsSSC();
+  ssc::messageManager()->sendInfo("Set "+mInternalStructure.mName+"s calibration to \n"+qstring_cast(sMt));
+
+  //write to file
+  mInternalStructure.saveCalibrationToFile();
+}
+
+
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+
+IgstkTool::IgstkTool(IgstkTool::InternalStructure internalStructure) :
     mToolObserver(itk::ReceptorMemberCommand<IgstkTool>::New()),
     mValid(false),
     mVisible(false),
@@ -37,7 +110,7 @@ IgstkTool::IgstkTool(Tool::InternalStructure internalStructure) :
 IgstkTool::~IgstkTool()
 {}
 
-Tool::InternalStructure IgstkTool::getInternalStructure()
+IgstkTool::InternalStructure IgstkTool::getInternalStructure()
 {
   return mInternalStructure;
 }
