@@ -315,7 +315,7 @@ void ToolConfigWidget::populateToolList(QStringList applicationFilter, QStringLi
   foreach(QString toolFilePath, toolFiles)
   {
 
-    Tool::InternalStructure internal = this->getToolInternal(toolFilePath);
+  	IgstkTool::InternalStructure internal = this->getToolInternal(toolFilePath);
 
     QString trackerName = enum2string(internal.mTrackerType);
     if(!trackingSystemFilter.contains(trackerName, Qt::CaseInsensitive))
@@ -372,7 +372,7 @@ void ToolConfigWidget::populateReferenceComboBox()
     QStringList selectedTools = this->getSelectedToolsFromToolList();
     foreach(QString string, selectedTools)
     {
-      Tool::InternalStructure internal = getToolInternal(string);
+    	IgstkTool::InternalStructure internal = getToolInternal(string);
       if(internal.mType == ssc::Tool::TOOL_REFERENCE)
       {
         currentIndex = this->addRefrenceSuggestion(string);
@@ -493,7 +493,7 @@ QStringList ToolConfigWidget::getToolFiles(QDir& dir)
   return retval;
 }
 
-QList<Tool::InternalStructure> ToolConfigWidget::getToolInternals(QStringList toolAbsoluteFilePaths)
+QList<IgstkTool::InternalStructure> ToolConfigWidget::getToolInternals(QStringList toolAbsoluteFilePaths)
 {
   QList<Tool::InternalStructure> retval;
   foreach(QString toolFilePath, toolAbsoluteFilePaths)
@@ -502,7 +502,7 @@ QList<Tool::InternalStructure> ToolConfigWidget::getToolInternals(QStringList to
   return retval;
 }
 
-Tool::InternalStructure ToolConfigWidget::getToolInternal(QString toolAbsoluteFilePath)
+IgstkTool::InternalStructure ToolConfigWidget::getToolInternal(QString toolAbsoluteFilePath)
 {
   Tool::InternalStructure retval;
 

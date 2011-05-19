@@ -353,7 +353,7 @@ void ToolConfigureGroupBox::populateReference()
     foreach(QString string, selectedTools)
     {
       ToolFileParser parser(string);
-      Tool::InternalStructure internal = parser.getTool();
+      IgstkTool::InternalStructure internal = parser.getTool();
       if(internal.mType == ssc::Tool::TOOL_REFERENCE)
       {
 //        std::cout << "Found reference when making new config: " << string << std::endl;
