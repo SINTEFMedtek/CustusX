@@ -4,7 +4,7 @@
  * \brief
  *
  * \date Mar 17, 2011
- * \author jbake
+ * \author Janne Beate Bakeng, SINTEF
  */
 
 #include <cxIgstkToolManager.h>
@@ -14,13 +14,13 @@
 namespace cx
 {
 
-IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures) :
+IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure) :
     mInitAnsweres(0)
 {
   mTimer = 0;
 
   this->createTracker(trackerStructure);
-  this->createTools(toolStructures);
+  this->createTools(toolStructures, referenceToolStructure);
   this->setReferenceAndTrackerOnTools();
 
   connect(mTracker.get(), SIGNAL(tracking(bool)), this, SIGNAL(tracking(bool)));
@@ -61,13 +61,12 @@ IgstkToolPtr IgstkToolManager::getRefereceTool()
 
 void IgstkToolManager::setReferenceAndTrackerOnTools()
 {
-  std::map<QString, IgstkToolPtr>::iterator it;
-  for(it = mTools.begin(); it != mTools.end(); ++it)
+  if(!mReferenceTool)
   {
-    if(it->second->getType() == ssc::Tool::TOOL_REFERENCE)
-      mReferenceTool = it->second;
+    ssc::messageManager()->sendDebug("Tracking is configured without a reference tool.");
   }
 
+  std::map<QString, IgstkToolPtr>::iterator it;
   for(it = mTools.begin(); it != mTools.end(); ++it)
   {
     it->second->setReference(mReferenceTool);
@@ -85,21 +84,30 @@ void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStru
     ssc::messageManager()->sendWarning("Invalid tracker.");
 }
 
-void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> toolStructures)
+void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure)
 {
   for (unsigned i=0; i<toolStructures.size(); ++i)
   {
-    IgstkToolPtr igstkTool(new IgstkTool(toolStructures[i]));
-    if(igstkTool->isValid())
-    {
-      QMutexLocker sentry(&mToolMutex);
-      mTools[igstkTool->getUid()] = igstkTool;
-      connect(igstkTool.get(), SIGNAL(attachedToTracker(bool)), this, SLOT(deviceInitializedSlot(bool)));
-    } else
-    {
-     ssc::messageManager()->sendWarning(toolStructures[i].mUid+" is not valid.");
-    }
+    this->addIgstkTools(toolStructures[i]);
   }
+  IgstkToolPtr refTool = this->addIgstkTools(referenceToolStructure);
+  if(refTool->isValid())
+    mReferenceTool = refTool;
+}
+
+IgstkToolPtr IgstkToolManager::addIgstkTools(IgstkTool::InternalStructure& toolStructure)
+{
+  IgstkToolPtr igstkTool(new IgstkTool(toolStructure));
+  if(igstkTool->isValid())
+  {
+    QMutexLocker sentry(&mToolMutex);
+    mTools[igstkTool->getUid()] = igstkTool;
+    connect(igstkTool.get(), SIGNAL(attachedToTracker(bool)), this, SLOT(deviceInitializedSlot(bool)));
+  } else
+  {
+    ssc::messageManager()->sendWarning(toolStructure.mUid+" is not valid.");
+  }
+  return igstkTool;
 }
 
 void IgstkToolManager::trackerTrackingSlot(bool isTracking)
@@ -168,4 +176,5 @@ void IgstkToolManager::deviceInitializedSlot(bool value)
       emit initialized(false);
   }
 }
+
 }
