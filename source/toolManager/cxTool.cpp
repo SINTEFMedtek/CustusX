@@ -153,38 +153,41 @@ void Tool::createPolyData()
 bool Tool::isCalibrated() const
 {
   ssc::Transform3D identity;
-//  ssc::Transform3D sMt;
-  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+////  ssc::Transform3D sMt;
+//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
 
+  ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
   return !ssc::similar(sMt, identity);
 }
 
 ssc::Transform3D Tool::getCalibration_sMt() const
 {
-//  ssc::Transform3D sMt;
-  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+  ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
+////  ssc::Transform3D sMt;
+//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
 
   return sMt;
 }
 
 void Tool::setCalibration_sMt(ssc::Transform3D calibration)
 {
-  //apply the calibration
-  mTool->getInternalStructure().mCalibration.ImportTransform(*calibration.getVtkMatrix());
-  mTool->setCalibrationTransform(mTool->getInternalStructure().mCalibration);
-
-//  ssc::Transform3D sMt;
-  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to \n"+qstring_cast(sMt));
-
-  //write to file
-  this->writeCalibrationToFile();
+	mTool->updateCalibration(calibration);
+//  //apply the calibration
+//  mTool->getInternalStructure().mCalibration.ImportTransform(*calibration.getVtkMatrix());
+//  mTool->setCalibrationTransform(mTool->getInternalStructure().mCalibration);
+//
+////  ssc::Transform3D sMt;
+//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+//  ssc::messageManager()->sendInfo("Set "+mName+"s calibration to \n"+qstring_cast(sMt));
+//
+//  //write to file
+//  this->writeCalibrationToFile();
 }
 
 QString Tool::getCalibrationFileName() const
@@ -285,40 +288,40 @@ void Tool::toolVisibleSlot(bool on)
     mTpsTimer.stop();
 }
 
-void Tool::writeCalibrationToFile()
-{
-  QFile calibrationFile(this);
-  if(!mTool->getInternalStructure().mCalibrationFilename.isEmpty() && QFile::exists(mTool->getInternalStructure().mCalibrationFilename))
-  {
-    //Calibration file exists, overwrite
-    calibrationFile.setFileName(mTool->getInternalStructure().mCalibrationFilename);
-  }
-  else
-  {
-    //Make a new file, use rom file name as base name
-    QString calibrationFileName = mTool->getInternalStructure().mSROMFilename.remove(".rom", Qt::CaseInsensitive);
-    calibrationFileName.append(".cal");
-    calibrationFile.setFileName(calibrationFileName);
-  }
-//  ssc::Transform3D sMt;
-  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-
-  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-  {
-    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
-    return;
-  }
-
-  QTextStream streamer(&calibrationFile);
-  streamer << qstring_cast(sMt);
-  streamer << endl;
-
-  calibrationFile.close();
-
-  ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
-}
+//void Tool::writeCalibrationToFile()
+//{
+//  QFile calibrationFile(this);
+//  if(!mTool->getInternalStructure().mCalibrationFilename.isEmpty() && QFile::exists(mTool->getInternalStructure().mCalibrationFilename))
+//  {
+//    //Calibration file exists, overwrite
+//    calibrationFile.setFileName(mTool->getInternalStructure().mCalibrationFilename);
+//  }
+//  else
+//  {
+//    //Make a new file, use rom file name as base name
+//    QString calibrationFileName = mTool->getInternalStructure().mSROMFilename.remove(".rom", Qt::CaseInsensitive);
+//    calibrationFileName.append(".cal");
+//    calibrationFile.setFileName(calibrationFileName);
+//  }
+////  ssc::Transform3D sMt;
+//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
+//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
+//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
+//
+//  if(!calibrationFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+//  {
+//    ssc::messageManager()->sendError("Could not open "+mUid+"s calibrationfile: "+calibrationFile.fileName());
+//    return;
+//  }
+//
+//  QTextStream streamer(&calibrationFile);
+//  streamer << qstring_cast(sMt);
+//  streamer << endl;
+//
+//  calibrationFile.close();
+//
+//  ssc::messageManager()->sendInfo("Replaced calibration in "+calibrationFile.fileName());
+//}
 
 
 }//namespace cx
