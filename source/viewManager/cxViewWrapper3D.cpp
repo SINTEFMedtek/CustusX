@@ -89,7 +89,7 @@ void ToolAxisConnector::visibleSlot()
 {
 	mAxis_t->setVisible(mTool->getVisible());
 	mAxis_s->setVisible(mTool->getVisible());
-	if (similar(mTool->getCalibration_sMt(), ssc::Transform3D()))
+	if (ssc::similar(mTool->getCalibration_sMt(), ssc::Transform3D::Identity()))
 	{
 		mAxis_s->setVisible(false);
 	}
