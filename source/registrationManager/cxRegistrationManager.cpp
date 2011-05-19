@@ -46,6 +46,7 @@ RegistrationManager::~RegistrationManager()
  */
 void RegistrationManager::initialize()
 {
+  mPatientRegistrationOffset = ssc::Transform3D::Identity();
   mLastRegistrationTime = QDateTime::currentDateTime();
 }
 
@@ -85,7 +86,7 @@ void RegistrationManager::setManualPatientRegistration(ssc::Transform3D patientR
   ssc::toolManager()->get_rMpr_History()->addRegistration(regTrans);
 
   //if an offset existed, its no longer valid and should be removed
-  mPatientRegistrationOffset = ssc::Transform3D();
+  mPatientRegistrationOffset = ssc::Transform3D::Identity();
 
   ssc::messageManager()->sendInfo("Manual patient registration is set.");
 }
@@ -243,7 +244,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
   // too few data samples: ignore
   if (source->GetNumberOfPoints() < 3)
   {
-    return ssc::Transform3D();
+    return ssc::Transform3D::Identity();
   }
 
   vtkLandmarkTransformPtr landmarktransform = vtkLandmarkTransformPtr::New();
@@ -258,7 +259,7 @@ ssc::Transform3D RegistrationManager::performLandmarkRegistration(vtkPointsPtr s
 
   if (QString::number(tar_M_src(0,0))=="nan") // harry but quick way to check badness of transform...
   {
-    return ssc::Transform3D();
+    return ssc::Transform3D::Identity();
   }
 
   *ok = true;
@@ -302,7 +303,7 @@ void RegistrationManager::doPatientRegistration()
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
-  mPatientRegistrationOffset = ssc::Transform3D();
+  mPatientRegistrationOffset = ssc::Transform3D::Identity();
 
   emit patientRegistrationPerformed();
   ssc::messageManager()->sendSuccess("Patient registration has been performed.");
@@ -332,7 +333,7 @@ void RegistrationManager::doImageRegistration(ssc::ImagePtr image)
 
   std::vector<QString> landmarks = getUsableLandmarks(fixedLandmarks, imageLandmarks);
   vtkPointsPtr p_ref = convertTovtkPoints(landmarks, fixedLandmarks, fixedImage->get_rMd());
-  vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D());
+  vtkPointsPtr p_data = convertTovtkPoints(landmarks, imageLandmarks, ssc::Transform3D::Identity());
 
   if (landmarks.empty())
     return;
@@ -410,7 +411,7 @@ void RegistrationManager::doFastRegistration_Translation()
   ssc::Transform3D rMd = fixedImage->get_rMd();
   ssc::Transform3D rMpr_old = *ssc::toolManager()->get_rMpr();
   std::vector<ssc::Vector3D> p_pr_old = this->convertAndTransformToPoints(landmarks, fixedLandmarks, rMpr_old.inv()*rMd);
-  std::vector<ssc::Vector3D> p_pr_new = this->convertAndTransformToPoints(landmarks, toolLandmarks, ssc::Transform3D());
+  std::vector<ssc::Vector3D> p_pr_new = this->convertAndTransformToPoints(landmarks, toolLandmarks, ssc::Transform3D::Identity());
 
   // ignore if too few data.
   if (p_pr_old.size() < 1)
@@ -430,7 +431,7 @@ void RegistrationManager::doFastRegistration_Translation()
   ssc::toolManager()->get_rMpr_History()->updateRegistration(mLastRegistrationTime, regTrans);
   mLastRegistrationTime = regTrans.mTimestamp;
 
-  mPatientRegistrationOffset = ssc::Transform3D();
+  mPatientRegistrationOffset = ssc::Transform3D::Identity();
 
   //emit fastRegistrationPerformed();
   ssc::messageManager()->sendSuccess("Fast translation registration has been performed.");

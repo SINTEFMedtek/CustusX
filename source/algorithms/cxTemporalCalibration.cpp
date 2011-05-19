@@ -374,7 +374,7 @@ std::vector<double> TemporalCalibration::computeTrackingMovement()
     ssc::Transform3D prMt = mFileData.mPositions[i].mPos;
     ssc::Vector3D p_pr = prMt.coord(origin);
 
-    double val = dot(ez_pr, p_pr);
+    double val = ssc::dot(ez_pr, p_pr);
 
     if (retval.empty())
       zero = val;
@@ -519,11 +519,11 @@ vtkImageDataPtr TemporalCalibration::extractLine_y(ssc::USFrameDataPtr data, int
   int dimX = data->getDimensions()[0];
   int dimY = data->getDimensions()[1];
 
-  vtkImageDataPtr retval = generateVtkImageDataDouble(ssc::Vector3D(dimY, 1, 1), ssc::Vector3D(1,1,1), 1);
+  vtkImageDataPtr retval = ssc::generateVtkImageDataDouble(Eigen::Array3i(dimY, 1, 1), ssc::Vector3D(1,1,1), 1);
 
   /// convert one frame to a vtkImageData: base
   uchar* raw_source = data->getFrame(frame);
-  vtkImageDataPtr base = generateVtkImageData(ssc::Vector3D(dimX, dimY, 1), ssc::Vector3D(1,1,1), 0);
+  vtkImageDataPtr base = ssc::generateVtkImageData(Eigen::Array3i(dimX, dimY, 1), ssc::Vector3D(1,1,1), 0);
   uchar* base_ptr = static_cast<uchar*>(base->GetScalarPointer());
   std::copy(raw_source, raw_source+dimX*dimY, base_ptr);
 
