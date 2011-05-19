@@ -286,6 +286,7 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   else if (igstk::OpenPortErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not open communication with tracker.");
+    this->shutdown();
   }
   else if (igstk::ClosePortErrorEvent().CheckEvent(&event))
   {
