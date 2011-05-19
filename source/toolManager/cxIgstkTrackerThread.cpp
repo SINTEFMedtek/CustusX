@@ -6,10 +6,11 @@
 namespace cx
 {
 
-IgstkTrackerThread::IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure, std::vector<Tool::InternalStructure> toolStructures)
+IgstkTrackerThread::IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure)
 {
   mInitTrackerStructure = trackerStructure;
   mInitToolStructures = toolStructures;
+  mInitReferenceToolStructure = referenceToolStructure;
 }
 
 IgstkTrackerThread::~IgstkTrackerThread()
@@ -39,7 +40,7 @@ void IgstkTrackerThread::track(bool on)
 void IgstkTrackerThread::run()
 {
   // configure
-  mManager.reset(new IgstkToolManager(mInitTrackerStructure, mInitToolStructures));
+  mManager.reset(new IgstkToolManager(mInitTrackerStructure, mInitToolStructures, mInitReferenceToolStructure));
   connect(mManager.get(), SIGNAL(initialized(bool)), this, SIGNAL(initialized(bool)));
   connect(mManager.get(), SIGNAL(tracking(bool)),    this, SIGNAL(tracking(bool)));
   connect(this, SIGNAL(requestInitialize(bool)), mManager.get(), SLOT(initializeSlot(bool)));

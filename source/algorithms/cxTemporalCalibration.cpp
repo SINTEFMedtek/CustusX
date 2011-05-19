@@ -177,7 +177,12 @@ double TemporalCalibration::calibrate()
 
   if (!mFileData.mUsRaw)
   {
-    ssc::messageManager()->sendWarning("No data loaded");
+    ssc::messageManager()->sendWarning("Temporal calib: No data loaded");
+    return 0;
+  }
+  if (!mFileData.mPositions.empty())
+  {
+    ssc::messageManager()->sendWarning("Temporal calib: Missing tracking data.");
     return 0;
   }
 

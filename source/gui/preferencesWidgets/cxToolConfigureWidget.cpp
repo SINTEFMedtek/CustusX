@@ -22,6 +22,7 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
     mClinicalApplication(ssc::mdCOUNT),
     mConfigFilesComboBox(new QComboBox()),
     mConfigFilePathLineEdit(new QLineEdit()),
+    mConfigFileLineEdit(new QLineEdit()),
     mReferenceComboBox(new QComboBox())
 {
   Q_PROPERTY("userEdited")
@@ -49,11 +50,13 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   layout->addWidget(mConfigFilesComboBox, 0, 1, 1, 1);
   layout->addWidget(new QLabel("Save path: "), 1, 0, 1, 1);
   layout->addWidget(mConfigFilePathLineEdit, 1, 1, 1, 1);
-  layout->addWidget(mApplicationGroupBox, 2, 0, 1, 2);
-  layout->addWidget(mTrackingSystemGroupBox, 3, 0, 1, 2);
-  layout->addWidget(toolGroupBox, 4, 0, 1, 2);
-  layout->addWidget(new QLabel("Reference: "), 5, 0, 1, 1);
-  layout->addWidget(mReferenceComboBox, 5, 1, 1, 1);
+  layout->addWidget(new QLabel("File name: "), 2, 0, 1, 1);
+  layout->addWidget(mConfigFileLineEdit, 2, 1, 1, 1);
+  layout->addWidget(mApplicationGroupBox, 3, 0, 1, 2);
+  layout->addWidget(mTrackingSystemGroupBox, 4, 0, 1, 2);
+  layout->addWidget(toolGroupBox, 5, 0, 1, 2);
+  layout->addWidget(new QLabel("Reference: "), 6, 0, 1, 1);
+  layout->addWidget(mReferenceComboBox, 6, 1, 1, 1);
 
   //changes due to programming actions
   connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
@@ -64,6 +67,9 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   //changes due to user actions
   connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(pathEditedSlot()));
   connect(mConfigFilePathLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
+  connect(mConfigFileLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(fileNameEditedSlot()));
+  connect(mConfigFileLineEdit, SIGNAL(textEdited(const QString&)), this, SLOT(configEditedSlot()));
+  connect(mConfigFileLineEdit, SIGNAL(editingFinished()), this, SLOT(filenameDoneEditingSlot()));
   connect(mApplicationGroupBox, SIGNAL(userClicked()), this, SLOT(configEditedSlot()));
   connect(mTrackingSystemGroupBox, SIGNAL(userClicked()), this, SLOT(configEditedSlot()));
   connect(mToolListWidget, SIGNAL(userChangedList()), this, SLOT(configEditedSlot()));
@@ -151,8 +157,17 @@ void ToolConfigureGroupBox::configChangedSlot()
   }
 
 //  std::cout << "absoluteConfigFilePath" << absoluteConfigFilePath << std::endl;
-  mConfigFilePathLineEdit->setText(absoluteConfigFilePath);
+  QFile file(absoluteConfigFilePath);
+  QFileInfo info(file);
+  QString filePath = info.path();
+  QString fileName = info.fileName();
+  
+  mConfigFilePathLineEdit->setText(filePath);
   this->setState(mConfigFilePathLineEdit, !suggestDefaultNames);
+
+  mConfigFileLineEdit->setText(fileName);
+  this->setState(mConfigFileLineEdit, !suggestDefaultNames);
+
   mApplicationGroupBox->setSelected(selectedApplications);
   mTrackingSystemGroupBox->setSelected(selectedTrackingSystems);
   mToolListWidget->configSlot(selectedTools);
@@ -178,6 +193,20 @@ void ToolConfigureGroupBox::filterToolsSlot()
 void ToolConfigureGroupBox::pathEditedSlot()
 {
   this->setState(mConfigFilePathLineEdit, true);
+}
+
+void ToolConfigureGroupBox::fileNameEditedSlot()
+{
+  this->setState(mConfigFileLineEdit, true);
+}
+
+void ToolConfigureGroupBox::filenameDoneEditingSlot()
+{
+  if(mConfigFileLineEdit->text().contains(".xml", Qt::CaseInsensitive))
+    mConfigFileLineEdit->setText(mConfigFileLineEdit->text().remove(".xml"));
+
+  if(!mConfigFileLineEdit->text().endsWith(".xml", Qt::CaseInsensitive))
+    mConfigFileLineEdit->setText(mConfigFileLineEdit->text()+".xml");
 }
 
 void ToolConfigureGroupBox::populateConfigurations()
@@ -221,17 +250,26 @@ void ToolConfigureGroupBox::setState(QComboBox* box, int index, bool edited)
   box->setItemData(index, edited, sEdited);
 //  std::cout << "Config file " << box->itemText(index) << " now is set as " << (edited ? "" : "un") << "edited." << std::endl;
 
-  if(edited && !mConfigFilePathLineEdit->property("userEdited").toBool())
-//  {
+  if(edited && !mConfigFilePathLineEdit->property("userEdited").toBool() && !mConfigFileLineEdit->property("userEdited").toBool())
+  {
 //    std::cout << "Generating name..." << std::endl;
-    mConfigFilePathLineEdit->setText(this->generateConfigName());
-//  }
+    QString absoluteConfigPaht = this->generateConfigName();
+    QFile file(absoluteConfigPaht);
+    QFileInfo info(file);
+    QString filename = info.fileName();
+    QString filepath = info.path();
+
+    mConfigFilePathLineEdit->setText(filepath);
+    mConfigFileLineEdit->setText(filename);
+  }
 }
 
 ConfigurationFileParser::Configuration ToolConfigureGroupBox::getCurrentConfiguration()
 {
   ConfigurationFileParser::Configuration retval;
-  retval.mFileName = mConfigFilePathLineEdit->text();
+  QString filename = mConfigFileLineEdit->text();
+  QString filepath = mConfigFilePathLineEdit->text();
+  retval.mFileName = filepath+"/"+filename;
   retval.mClinical_app = string2enum<ssc::CLINICAL_APPLICATION>(mApplicationGroupBox->getSelected()[0]);
 
   QStringList selectedTools = mToolListWidget->getTools();
@@ -301,7 +339,7 @@ void ToolConfigureGroupBox::setState(QLineEdit* line, bool userEdited)
 {
 //  std::cout << "line set to " << (userEdited ? "edited (should not generate new names from now)" : "not editet (generate from now)") << std::endl;
   QVariant value(userEdited);
-  mConfigFilePathLineEdit->setProperty("userEdited", value);
+  line->setProperty("userEdited", value);
 }
 
 void ToolConfigureGroupBox::populateReference()
@@ -315,7 +353,7 @@ void ToolConfigureGroupBox::populateReference()
     foreach(QString string, selectedTools)
     {
       ToolFileParser parser(string);
-      Tool::InternalStructure internal = parser.getTool();
+      IgstkTool::InternalStructure internal = parser.getTool();
       if(internal.mType == ssc::Tool::TOOL_REFERENCE)
       {
 //        std::cout << "Found reference when making new config: " << string << std::endl;
@@ -357,4 +395,6 @@ int ToolConfigureGroupBox::addRefrenceToComboBox(QString absoluteRefereneFilePat
 
   return index;
 }
+
+
 }//namespace cx
