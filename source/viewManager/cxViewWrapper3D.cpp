@@ -109,8 +109,11 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->connectContextMenu(mView);
   QString index = QString::number(startIndex);
 //  connect(ssc::dataManager(), SIGNAL(centerChanged()), this, SLOT(centerChangedSlot()));
+  QColor background = settings()->value("backgroundColor").value<QColor>();
+  mView->setBackgoundColor(background);
 
   view->getRenderer()->GetActiveCamera()->SetParallelProjection(false);
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
@@ -161,6 +164,26 @@ ViewWrapper3D::~ViewWrapper3D()
     mView->removeReps();
   }
 }
+
+void ViewWrapper3D::settingsChangedSlot(QString key)
+{
+	if (key=="backgroundColor")
+	{
+	  QColor background = settings()->value("backgroundColor").value<QColor>();
+	  mView->setBackgoundColor(background);
+	}
+	if (key=="useGPUVolumeRayCastMapper" || "maxRenderSize")
+	{
+		// reload volumes from cache
+	  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
+	  for (unsigned i=0; i<images.size(); ++i)
+	  {
+	  	this->imageRemoved(images[i]->getUid());
+	  	this->imageAdded(images[i]);
+	  }
+	}
+}
+
 
 void ViewWrapper3D::probeRepPointPickedSlot(double x,double y,double z)
 {

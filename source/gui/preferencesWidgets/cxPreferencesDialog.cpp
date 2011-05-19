@@ -180,7 +180,7 @@ void PerformanceTab::init()
   mMaxRenderSize->setInternal2Display(1.0/Mb);
 
   mSmartRenderCheckBox = new QCheckBox("Smart Render");
-  mSmartRenderCheckBox->setChecked(viewManager()->getSmartRender());
+  mSmartRenderCheckBox->setChecked(settings()->value("smartRender", true).toBool());
 
   bool useGPURender = settings()->value("useGPUVolumeRayCastMapper").toBool();
   mGPURenderCheckBox = new QCheckBox("Use GPU 3D Renderer");
@@ -196,8 +196,6 @@ void PerformanceTab::init()
   mMainLayout->addWidget(mGPURenderCheckBox, 3, 0);
 
   mTopLayout->addLayout(mMainLayout);
-
-  connect(this, SIGNAL(renderingIntervalChanged(int)), viewManager(), SLOT(renderingIntervalChangedSlot(int)));
 }
 
 void PerformanceTab::renderingIntervalSlot(int interval)
@@ -207,18 +205,10 @@ void PerformanceTab::renderingIntervalSlot(int interval)
 
 void PerformanceTab::saveParametersSlot()
 {
-  int renderingInterval = settings()->value("renderingInterval").toInt();
-  
-  if(renderingInterval != mRenderingIntervalSpinBox->value())
-  {
-    settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
-    emit renderingIntervalChanged(mRenderingIntervalSpinBox->value());
-  }
-
+  settings()->setValue("renderingInterval", mRenderingIntervalSpinBox->value());
   settings()->setValue("useGPUVolumeRayCastMapper", mGPURenderCheckBox->isChecked());
   settings()->setValue("maxRenderSize", mMaxRenderSize->getValue());
-
-  viewManager()->setSmartRender(mSmartRenderCheckBox->isChecked());
+  settings()->setValue("smartRender", mSmartRenderCheckBox->isChecked());
 }
 
 //==============================================================================
@@ -242,10 +232,7 @@ void VisualizationTab::init()
   ColorSelectButton* backgroundColorButton = new ColorSelectButton("Background Color");
   backgroundColorButton->setColor(settings()->value("backgroundColor").value<QColor>());
 
-//  QPushButton* backgroundColorButton = new QPushButton("Background Color", this);
-//  connect(backgroundColorButton, SIGNAL(clicked()), this, SLOT(setBackgroundColorSlot()));
   connect(backgroundColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setBackgroundColorSlot(QColor)));
-
 
   //Stereoscopic visualization (3D view)
   QGroupBox* stereoGroupBox = new QGroupBox("Stereoscopic visualization");
@@ -346,13 +333,6 @@ void VisualizationTab::setBackgroundColorSlot(QColor color)
 {
   settings()->setValue("backgroundColor", color);
 }
-
-//void VisualizationTab::setBackgroundColorSlot()
-//{
-//  QColor orgval = settings()->value("backgroundColor").value<QColor>();
-//  QColor result = QColorDialog::getColor( orgval, this);
-//  settings()->setValue("backgroundColor", result);
-//}
 
 //==============================================================================
 // AutomationTab
