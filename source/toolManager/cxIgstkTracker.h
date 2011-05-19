@@ -119,6 +119,8 @@ protected:
   void internalInitialized(bool value);
   void internalTracking(bool value);
 
+  void shutdown(); ///< shuts down the tracker, made to be used when an unrecoverable error occures
+
   InternalStructure                 mInternalStructure;     ///< the trackers type
   bool                              mValid;                 ///< whether this tracker is constructed correctly or not
   QString                           mUid;                   ///< the trackers unique id
