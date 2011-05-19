@@ -13,7 +13,7 @@ namespace cx
 {
 
 ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
-    BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibrate")
+    BaseWidget(parent, "ToolManualCalibrationWidget", "Tool Manual Calibrate")
 {
   //layout
   QVBoxLayout* mToptopLayout = new QVBoxLayout(this);
@@ -21,6 +21,7 @@ ToolManualCalibrationWidget::ToolManualCalibrationWidget(QWidget* parent) :
 
   mToptopLayout->addWidget(new ActiveToolWidget(this));
 
+  mToptopLayout->addWidget(new QLabel("<font color=red>Caution: sMt is changed directly by this control.</font>"));
   mGroup = new QGroupBox(this);
   mGroup->setTitle("Calibration matrix sMt");
   mToptopLayout->addWidget(mGroup);

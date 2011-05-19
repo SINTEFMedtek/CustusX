@@ -28,7 +28,7 @@ class IgstkTrackerThread: public QThread
   Q_OBJECT
 
 public:
-  IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure, std::vector<Tool::InternalStructure> toolStructures);
+  IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure);
   virtual ~IgstkTrackerThread();
 
   void initialize(bool on); ///< connects to the hardware. Threadsafe.
@@ -51,7 +51,8 @@ private:
   virtual void run();
 
   IgstkTracker::InternalStructure mInitTrackerStructure;
-  std::vector<Tool::InternalStructure> mInitToolStructures;
+  std::vector<IgstkTool::InternalStructure> mInitToolStructures;
+  IgstkTool::InternalStructure mInitReferenceToolStructure;
 
   IgstkToolManagerPtr mManager;
 };
