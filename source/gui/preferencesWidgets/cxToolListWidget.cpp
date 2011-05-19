@@ -48,9 +48,9 @@ void ToolListWidget::addTool(QString absoluteFilePath)
   emit listSizeChanged();
 }
 
-Tool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFilePath)
+IgstkTool::InternalStructure ToolListWidget::getToolInternal(QString toolAbsoluteFilePath)
 {
-  Tool::InternalStructure retval;
+	IgstkTool::InternalStructure retval;
 
   ToolFileParser parser(toolAbsoluteFilePath);
   retval = parser.getTool();
@@ -174,7 +174,7 @@ QStringList FilteringToolListWidget::filter(QStringList toolsToFilter, QStringLi
   foreach(QString toolFilePath, toolsToFilter)
   {
     //get internal tool
-    Tool::InternalStructure internal = this->getToolInternal(toolFilePath);
+  	IgstkTool::InternalStructure internal = this->getToolInternal(toolFilePath);
 
     //check tracking systems
     QString trackerName = enum2string(internal.mTrackerType);
