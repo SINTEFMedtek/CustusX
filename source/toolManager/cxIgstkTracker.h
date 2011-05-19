@@ -100,6 +100,7 @@ public:
   void stopTracking();                ///< stop tracking
 
   bool isValid() const;               ///< whether this tracker is constructed correctly or not
+  bool isOpen() const;
   bool isInitialized() const;
   bool isTracking() const;
 
