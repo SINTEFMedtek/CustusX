@@ -442,7 +442,6 @@ ssc::SessionToolHistoryMap ToolManager::getSessionHistory(double startTime, doub
   return retval;
 }
 
-
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
   ssc::ToolManager::ToolMap retval;
@@ -642,7 +641,10 @@ void ToolManager::setConfigurationFile(QString configurationFile)
     return;
 
   if(this->isConfigured())
+  {
+    connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
     this->deconfigure();
+  }
 
   mConfigurationFilePath = configurationFile;
 }
@@ -653,7 +655,10 @@ void ToolManager::setLoggingFolder(QString loggingFolder)
     return;
 
   if(this->isConfigured())
+  {
+    connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
     this->deconfigure();
+  }
 
   mLoggingFolder = loggingFolder;
 }
@@ -710,6 +715,13 @@ void ToolManager::deconfigureAfterUninitializedSlot()
 {
   disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
   this->deconfigure();
+}
+
+void ToolManager::configureAfterDeconfigureSlot()
+{
+  std::cout << "void ToolManager::configureAfterDeconfigureSlot()" << std::endl;
+  disconnect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
+  this->configure();
 }
 
 void ToolManager::globalConfigurationFileChangedSlot(QString key)
