@@ -51,6 +51,7 @@ ToolManager::ToolManager() :
   mConfigured(false),
   mInitialized(false),
   mTracking(false),
+  mDominantToolCheckActive(true),
   mLastLoadPositionHistory(0)
 {
   m_rMpr_History.reset(new ssc::RegistrationHistory());
@@ -136,17 +137,22 @@ void ToolManager::configure()
   std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
   IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
-  std::vector<Tool::InternalStructure> toolStructures;
+  IgstkTool::InternalStructure referenceToolStructure;
+  std::vector<IgstkTool::InternalStructure> toolStructures;
+  QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
   std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
   for(std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
   {
     ToolFileParser toolParser(*it, mLoggingFolder);
-    Tool::InternalStructure internalTool = toolParser.getTool();
-    toolStructures.push_back(internalTool);
+    IgstkTool::InternalStructure internalTool = toolParser.getTool();
+    if((*it) == referenceToolFile)
+      referenceToolStructure = internalTool;
+    else
+      toolStructures.push_back(internalTool);
   }
 
   //new thread
-  mTrackerThread.reset(new IgstkTrackerThread(trackerStructure, toolStructures));
+  mTrackerThread.reset(new IgstkTrackerThread(trackerStructure, toolStructures, referenceToolStructure));
 
   connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
   connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
@@ -179,8 +185,8 @@ void ToolManager::trackerConfiguredSlot(bool on)
         mReferenceTool = tool;
 
       mTools[it->first] = tool;
-      // Automatic selection of dominant tool for other applications than ENDOVASCULAR
-//      if(stateManager()->getApplication()->getActiveStateName() != enum2string(ssc::mdENDOVASCULAR))
+      // Automatic selection of dominant tool if check is active (Application state other than ENDOVASCULAR)
+      if(mDominantToolCheckActive)
         connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }
     else
@@ -441,7 +447,6 @@ ssc::SessionToolHistoryMap ToolManager::getSessionHistory(double startTime, doub
   return retval;
 }
 
-
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
   ssc::ToolManager::ToolMap retval;
@@ -526,6 +531,16 @@ void ToolManager::setDominantTool(const QString& uid)
       emit tps(0);
 
   emit dominantToolChanged(uid);
+}
+
+void ToolManager::setClinicalApplication(ssc::CLINICAL_APPLICATION application)
+{
+  mApplication = application;
+
+  if(mApplication == ssc::mdENDOVASCULAR)
+    mDominantToolCheckActive = false;
+  else 
+    mDominantToolCheckActive = true;
 }
 
 std::map<QString, QString> ToolManager::getToolUidsAndNames() const
@@ -631,7 +646,10 @@ void ToolManager::setConfigurationFile(QString configurationFile)
     return;
 
   if(this->isConfigured())
+  {
+    connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
     this->deconfigure();
+  }
 
   mConfigurationFilePath = configurationFile;
 }
@@ -642,7 +660,10 @@ void ToolManager::setLoggingFolder(QString loggingFolder)
     return;
 
   if(this->isConfigured())
+  {
+    connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
     this->deconfigure();
+  }
 
   mLoggingFolder = loggingFolder;
 }
@@ -699,6 +720,13 @@ void ToolManager::deconfigureAfterUninitializedSlot()
 {
   disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
   this->deconfigure();
+}
+
+void ToolManager::configureAfterDeconfigureSlot()
+{
+  std::cout << "void ToolManager::configureAfterDeconfigureSlot()" << std::endl;
+  disconnect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
+  this->configure();
 }
 
 void ToolManager::globalConfigurationFileChangedSlot(QString key)

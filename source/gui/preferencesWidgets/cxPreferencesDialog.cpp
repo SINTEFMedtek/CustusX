@@ -456,13 +456,19 @@ ToolConfigTab::~ToolConfigTab()
 
 void ToolConfigTab::init()
 {
+  QGroupBox* filepreviewGroupBox = new QGroupBox(this);
+  filepreviewGroupBox->setTitle("Toolfile preview");
+  QVBoxLayout* filepreviewLayout = new QVBoxLayout();
+  filepreviewGroupBox->setLayout(filepreviewLayout);
+  filepreviewLayout->addWidget(mFilePreviewWidget);
+
   //layout
   QGridLayout* layout = new QGridLayout;
   mTopLayout->addLayout(layout);
 
   layout->addWidget(mToolConfigureGroupBox, 0, 0, 1, 1);
   layout->addWidget(mToolFilterGroupBox, 0, 1, 1, 1);
-  layout->addWidget(mFilePreviewWidget, 1, 0, 1, 2);
+  layout->addWidget(filepreviewGroupBox, 1, 0, 1, 2);
 
   mToolConfigureGroupBox->setCurrentlySelectedCofiguration(DataLocations::getToolConfigFilePath());
 }
