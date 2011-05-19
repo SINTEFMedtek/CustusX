@@ -35,7 +35,7 @@ class IgstkToolManager: public QObject
   Q_OBJECT
 
 public:
-  IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<Tool::InternalStructure> toolStructures);
+  IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure);
   virtual ~IgstkToolManager();
 
   std::map<QString, IgstkToolPtr> getTools(); ///< ThreadSafe
@@ -56,7 +56,8 @@ private slots:
 
 private:
   void createTracker(IgstkTracker::InternalStructure trackerStructure);
-  void createTools(std::vector<Tool::InternalStructure> toolStructures);
+  void createTools(std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure);
+  IgstkToolPtr addIgstkTools(IgstkTool::InternalStructure& toolStructure);
   void setReferenceAndTrackerOnTools();
 
   TrackerPtr mTracker;
