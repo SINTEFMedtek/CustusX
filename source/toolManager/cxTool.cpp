@@ -22,7 +22,7 @@ Tool::Tool(IgstkToolPtr igstkTool) :
   mTool(igstkTool),
   mPositionHistory(new ssc::TimedTransformMap()),
   mPolyData(NULL),
-  m_prMt(new ssc::Transform3D()),
+  m_prMt(new ssc::Transform3D(ssc::Transform3D::Identity())),
   mValid(false),
   mConfigured(false),
   mTracked(false),
@@ -44,7 +44,7 @@ Tool::Tool(IgstkToolPtr igstkTool) :
   connect(mProbe.get(), SIGNAL(sectorChanged()), this, SIGNAL(toolProbeSector()));
 
 //  // debug code, used for fixing the rotation z-bug:
-//  ssc::Transform3D sMt;
+//  ssc::Transform3D sMt = ssc::Transform3D::Identity();
 //  mTool->getInternalStructure().mCalibration.ExportTransform(*(sMt.matrix().GetPointer()));
 //  std::cout << "sMt for tool " << this->getUid() << "\n" << sMt << std::endl;
 //  std::cout << "sMt*Rz180 for tool " << this->getUid() << "\n" << sMt*ssc::createTransformRotateZ(M_PI) << std::endl;
@@ -152,12 +152,7 @@ void Tool::createPolyData()
 
 bool Tool::isCalibrated() const
 {
-  ssc::Transform3D identity;
-////  ssc::Transform3D sMt;
-//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
-
+  ssc::Transform3D identity = ssc::Transform3D::Identity();
   ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
   return !ssc::similar(sMt, identity);
 }
@@ -165,10 +160,6 @@ bool Tool::isCalibrated() const
 ssc::Transform3D Tool::getCalibration_sMt() const
 {
   ssc::Transform3D sMt = mTool->getInternalStructure().getCalibrationAsSSC();
-////  ssc::Transform3D sMt;
-//  vtkMatrix4x4Ptr M = vtkMatrix4x4Ptr::New();
-//  mTool->getInternalStructure().mCalibration.ExportTransform(*(M.GetPointer()));
-//  ssc::Transform3D sMt = ssc::Transform3D::fromVtkMatrix(M);
 
   return sMt;
 }

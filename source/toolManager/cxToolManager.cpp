@@ -137,17 +137,22 @@ void ToolManager::configure()
   std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
   IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
+  IgstkTool::InternalStructure referenceToolStructure;
   std::vector<IgstkTool::InternalStructure> toolStructures;
+  QString referenceToolFile = configParser.getAbsoluteReferenceFilePath();
   std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
   for(std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
   {
     ToolFileParser toolParser(*it, mLoggingFolder);
     IgstkTool::InternalStructure internalTool = toolParser.getTool();
-    toolStructures.push_back(internalTool);
+    if((*it) == referenceToolFile)
+      referenceToolStructure = internalTool;
+    else
+      toolStructures.push_back(internalTool);
   }
 
   //new thread
-  mTrackerThread.reset(new IgstkTrackerThread(trackerStructure, toolStructures));
+  mTrackerThread.reset(new IgstkTrackerThread(trackerStructure, toolStructures, referenceToolStructure));
 
   connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
   connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
@@ -442,7 +447,6 @@ ssc::SessionToolHistoryMap ToolManager::getSessionHistory(double startTime, doub
   return retval;
 }
 
-
 ssc::ToolManager::ToolMapPtr ToolManager::getConfiguredTools()
 {
   ssc::ToolManager::ToolMap retval;
@@ -617,7 +621,7 @@ void ToolManager::loadPositionHistory()
 
   ssc::PositionStorageReader reader(filename);
 
-  ssc::Transform3D matrix;
+  ssc::Transform3D matrix = ssc::Transform3D::Identity();
   double timestamp;
   QString toolUid;
 
@@ -642,7 +646,10 @@ void ToolManager::setConfigurationFile(QString configurationFile)
     return;
 
   if(this->isConfigured())
+  {
+    connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
     this->deconfigure();
+  }
 
   mConfigurationFilePath = configurationFile;
 }
@@ -653,7 +660,10 @@ void ToolManager::setLoggingFolder(QString loggingFolder)
     return;
 
   if(this->isConfigured())
+  {
+    connect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
     this->deconfigure();
+  }
 
   mLoggingFolder = loggingFolder;
 }
@@ -710,6 +720,13 @@ void ToolManager::deconfigureAfterUninitializedSlot()
 {
   disconnect(this, SIGNAL(uninitialized()), this, SLOT(deconfigureAfterUninitializedSlot()));
   this->deconfigure();
+}
+
+void ToolManager::configureAfterDeconfigureSlot()
+{
+  std::cout << "void ToolManager::configureAfterDeconfigureSlot()" << std::endl;
+  disconnect(this, SIGNAL(deconfigured()), this, SLOT(configureAfterDeconfigureSlot()));
+  this->configure();
 }
 
 void ToolManager::globalConfigurationFileChangedSlot(QString key)
@@ -794,7 +811,7 @@ void ToolManager::addXml(QDomNode& parentNode)
 void ToolManager::clear()
 {
   m_rMpr_History->clear();
-  mManualTool->set_prMt(ssc::Transform3D());
+  mManualTool->set_prMt(ssc::Transform3D::Identity());
   mLandmarks.clear();
 }
 

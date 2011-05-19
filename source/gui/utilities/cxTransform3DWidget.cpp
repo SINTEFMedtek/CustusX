@@ -35,7 +35,7 @@ public:
   {
 //    QRect rect2 = QFontMetrics(this->font()).boundingRect("M");
 //    std::cout << "text2" << " M" << " wh= " << rect2.width() << " " << rect2.height() << std::endl;
-    QString text = qstring_cast(ssc::Transform3D()).split("\n")[0];
+    QString text = qstring_cast(ssc::Transform3D::Identity()).split("\n")[0];
     QRect rect = QFontMetrics(this->font()).boundingRect(text);
 //    QSize sz = QFontMetrics(this->font()).size(0, qstring_cast(ssc::Transform3D()));
 //    std::cout << "sizesz " << sz.width() << " " << sz.height() << std::endl;
@@ -125,7 +125,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   this->addTranslationControls("yTranslation", "Y", 1, tLayout);
   this->addTranslationControls("zTranslation", "Z", 2, tLayout);
 
-  this->setMatrix(ssc::Transform3D());
+  this->setMatrix(ssc::Transform3D::Identity());
 
   toptopLayout->addStretch();
 

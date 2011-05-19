@@ -185,7 +185,6 @@ bool within(int x, int min, int max)
 {
   return (x>=min) && (x<=max);
 }
-
   
 /**
  * Apply time calibration function y = ax + b, where
@@ -446,7 +445,7 @@ ssc::Transform3D Reconstructer::applyOutputOrientation()
 {
 //  QString newOrient = mSettings.getStringOption("Orientation").getValue();
   QString newOrient = mOrientationAdapter->getValue();
-  ssc::Transform3D prMdd;
+  ssc::Transform3D prMdd = Transform3D::Identity();
 
   if (newOrient=="PatientReference")
   {
@@ -517,7 +516,7 @@ void Reconstructer::findExtentAndOutputTransform()
   // Calculate optimal output image spacing and dimensions based on US frame spacing
   double inputSpacing = std::min(mFileData.mUsRaw->getSpacing()[0],
       mFileData.mUsRaw->getSpacing()[1]);
-  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, ssc::Vector3D(mFileData.mUsRaw->getDimensions()));
+  mOutputVolumeParams = OutputVolumeParams(extent, inputSpacing, Eigen::Array3i(mFileData.mUsRaw->getDimensions()));
 
   if (ssc::ToolManager::getInstance())
     mOutputVolumeParams.m_rMd = (*ssc::ToolManager::getInstance()->get_rMpr()) * prMd;
@@ -603,7 +602,7 @@ bool Reconstructer::validInputData() const
  */
 ImagePtr Reconstructer::generateOutputVolume()
 {
-  ssc::Vector3D dim = mOutputVolumeParams.getDim();
+  Eigen::Array3i dim = mOutputVolumeParams.getDim();
   ssc::Vector3D spacing = ssc::Vector3D(1,1,1) * mOutputVolumeParams.getSpacing();
   
   vtkImageDataPtr data = ssc::generateVtkImageData(dim, spacing, 0);

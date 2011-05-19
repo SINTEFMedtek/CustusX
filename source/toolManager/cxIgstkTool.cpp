@@ -4,7 +4,6 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QTextStream>
-//#include <QTextStream>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 
