@@ -44,7 +44,7 @@ ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bo
 {
   //std::cout << "bounds:" << bounds_pr << std::endl;
   //std::cout << "range:" << bounds_pr.range() << std::endl;
-  ssc::Vector3D dim = ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1);
+  Eigen::Array3i dim = (ssc::ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1)).cast<int>();
 
   double maxVolumeSize = 10000000;//TODO: Set a good max value or set this as a parameter
   double size = dim[0]*dim[1]*dim[2];
@@ -52,7 +52,7 @@ ssc::ImagePtr TrackingDataToVolume::createEmptyImage(ssc::DoubleBoundingBox3D bo
   {
     ssc::messageManager()->sendWarning("Tool position volume is going to be to big, making a smaller one.");
     spacing *= pow(size / maxVolumeSize, 1.0/3);
-    dim = ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1);
+    dim = (ssc::ceil(bounds_pr.range() / spacing) + ssc::Vector3D(1,1,1)).cast<int>();
   }
 
   ssc::Vector3D spacingVector = ssc::Vector3D(1,1,1) * spacing;
@@ -77,8 +77,8 @@ void TrackingDataToVolume::insertPoints(ssc::ImagePtr image_d, std::vector<ssc::
   for(; it != points_pr.end(); ++it)
   {
     ssc::Vector3D point_d = dMpr.coord((*it));
-    ssc::Vector3D point_voxel = divide_elems(point_d, ssc::Vector3D(data_pr->GetSpacing()));
-    point_voxel = round(point_voxel);
+    ssc::Vector3D point_voxel = ssc::divide_elems(point_d, ssc::Vector3D(data_pr->GetSpacing()));
+    point_voxel = ssc::round(point_voxel);
     this->writeVoxelValuesWithPadding(point_voxel, data_pr, padding_voxels);
   }
 }

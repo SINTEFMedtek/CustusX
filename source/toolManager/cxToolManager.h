@@ -105,6 +105,7 @@ private slots:
   void initializeAfterConfigSlot();
   void uninitializeAfterTrackingStoppedSlot();
   void deconfigureAfterUninitializedSlot();
+  void configureAfterDeconfigureSlot();
   void globalConfigurationFileChangedSlot(QString key);
   
 private:

@@ -91,18 +91,18 @@ ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData da
   vtkImageDataPtr mask = data.mProbeData.getMask();
   ssc::ImagePtr image = ssc::ImagePtr(new ssc::Image("mask", mask, "mask")) ;
 
-  ssc::Vector3D usDim(data.mUsRaw->getDimensions());
+  Eigen::Array3i usDim(data.mUsRaw->getDimensions());
   usDim[2] = 1;
   ssc::Vector3D usSpacing(data.mUsRaw->getSpacing());
 
   // checking
-  bool spacingOK = similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
-  bool dimOK = similar(usDim, ssc::Vector3D(mask->GetDimensions()));
+  bool spacingOK = ssc::similar(usSpacing, ssc::Vector3D(mask->GetSpacing()), 0.001);
+  bool dimOK = ssc::similar(usDim, Eigen::Array3i(mask->GetDimensions()));
   if (!dimOK || !spacingOK)
   {
     ssc::messageManager()->sendError("Reconstruction: mismatch in mask and image dimensions/spacing: ");
     if (!dimOK)
-      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetDimensions())));
+      ssc::messageManager()->sendError("Dim: Image: "+ qstring_cast(usDim) + ", Mask: " + qstring_cast(Eigen::Array3i(mask->GetDimensions())));
     if (!spacingOK)
       ssc::messageManager()->sendError("Spacing: Image: "+ qstring_cast(usSpacing) + ", Mask: " + qstring_cast(ssc::Vector3D(mask->GetSpacing())));
   }
@@ -111,7 +111,7 @@ ssc::ImagePtr UsReconstructionFileReader::createMaskFromConfigParams(FileData da
 
 ssc::ImagePtr UsReconstructionFileReader::generateMask(FileData data)
 {
-  ssc::Vector3D dim(data.mUsRaw->getDimensions());
+  Eigen::Array3i dim(data.mUsRaw->getDimensions());
   dim[2] = 1;
   ssc::Vector3D spacing(data.mUsRaw->getSpacing());
 
@@ -392,7 +392,7 @@ bool UsReconstructionFileReader::readMaskFile(QString mhdFileName, ssc::ImagePtr
  */
 ssc::Transform3D UsReconstructionFileReader::readTransformFromFile(QString fileName)
 {
-  ssc::Transform3D retval;
+  ssc::Transform3D retval = ssc::Transform3D::Identity();
   QFile file(fileName);
   if(!file.open(QIODevice::ReadOnly))
   {
