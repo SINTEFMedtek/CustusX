@@ -191,6 +191,11 @@ bool IgstkTracker::isValid() const
   return mValid;
 }
 
+bool IgstkTracker::isOpen() const
+{
+  return mOpen;
+}
+
 bool IgstkTracker::isInitialized() const
 {
   return mInitialized;
@@ -341,7 +346,6 @@ void IgstkTracker::internalTracking(bool value)
 
 void IgstkTracker::shutdown()
 {
-  this->close();
   this->internalTracking(false);
   this->internalInitialized(false);
   this->internalOpen(false);
