@@ -5,7 +5,7 @@
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "cxTool.h"
+#include "cxIgstkTool.h"
 
 
 /**Unit tests that show the properties of the cxTracker class
@@ -23,8 +23,8 @@ CPPUNIT_TEST_SUITE( TestTool );
     CPPUNIT_TEST( testConstructor );
   CPPUNIT_TEST_SUITE_END();
 private:
-  cx::Tool::InternalStructure mValidPolarisInternal;
-  cx::Tool::InternalStructure mValidAuroraInternal;
+  cx::IgstkTool::InternalStructure mValidPolarisInternal;
+  cx::IgstkTool::InternalStructure mValidAuroraInternal;
 
 };
 CPPUNIT_TEST_SUITE_REGISTRATION( TestTool );

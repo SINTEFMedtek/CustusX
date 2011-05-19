@@ -9,6 +9,7 @@
 #include "sscToolManager.h"
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
+#include "cxIgstkTool.h"
 
 namespace cx
 {
@@ -121,7 +122,7 @@ public:
   ToolFileParser(QString absoluteToolFilePath, QString loggingFolder = "");
   ~ToolFileParser();
 
-  Tool::InternalStructure getTool();
+  IgstkTool::InternalStructure getTool();
 
   static QString getTemplatesAbsoluteFilePath();
 

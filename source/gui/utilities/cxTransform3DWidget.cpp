@@ -262,8 +262,8 @@ void Transform3DWidget::changedSlot()
 //  mFrame.mPos = t;
   mDecomposition.setPosition(t);
 
+  this->updateValues();
   emit changed();
-//  this->updateValues();
   recursive = false;
 }
 

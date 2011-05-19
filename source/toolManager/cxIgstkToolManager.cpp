@@ -14,7 +14,7 @@
 namespace cx
 {
 
-IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<Tool::InternalStructure> toolStructures) :
+IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures) :
     mInitAnsweres(0)
 {
   mTimer = 0;
@@ -85,7 +85,7 @@ void IgstkToolManager::createTracker(IgstkTracker::InternalStructure trackerStru
     ssc::messageManager()->sendWarning("Invalid tracker.");
 }
 
-void IgstkToolManager::createTools(std::vector<Tool::InternalStructure> toolStructures)
+void IgstkToolManager::createTools(std::vector<IgstkTool::InternalStructure> toolStructures)
 {
   for (unsigned i=0; i<toolStructures.size(); ++i)
   {

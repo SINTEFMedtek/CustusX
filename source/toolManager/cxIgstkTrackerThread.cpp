@@ -6,7 +6,7 @@
 namespace cx
 {
 
-IgstkTrackerThread::IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure, std::vector<Tool::InternalStructure> toolStructures)
+IgstkTrackerThread::IgstkTrackerThread(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures)
 {
   mInitTrackerStructure = trackerStructure;
   mInitToolStructures = toolStructures;
