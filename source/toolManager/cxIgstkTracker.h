@@ -100,6 +100,7 @@ public:
   void stopTracking();                ///< stop tracking
 
   bool isValid() const;               ///< whether this tracker is constructed correctly or not
+  bool isOpen() const;
   bool isInitialized() const;
   bool isTracking() const;
 
@@ -118,6 +119,8 @@ protected:
   void internalOpen(bool value);
   void internalInitialized(bool value);
   void internalTracking(bool value);
+
+  void shutdown(); ///< shuts down the tracker, made to be used when an unrecoverable error occures
 
   InternalStructure                 mInternalStructure;     ///< the trackers type
   bool                              mValid;                 ///< whether this tracker is constructed correctly or not
