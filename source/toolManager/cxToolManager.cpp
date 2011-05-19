@@ -137,12 +137,12 @@ void ToolManager::configure()
   std::vector<IgstkTracker::InternalStructure> trackers = configParser.getTrackers();
   IgstkTracker::InternalStructure trackerStructure = trackers[0]; //we only support one tracker atm
 
-  std::vector<Tool::InternalStructure> toolStructures;
+  std::vector<IgstkTool::InternalStructure> toolStructures;
   std::vector<QString> toolfiles = configParser.getAbsoluteToolFilePaths();
   for(std::vector<QString>::iterator it = toolfiles.begin(); it != toolfiles.end(); ++it)
   {
     ToolFileParser toolParser(*it, mLoggingFolder);
-    Tool::InternalStructure internalTool = toolParser.getTool();
+    IgstkTool::InternalStructure internalTool = toolParser.getTool();
     toolStructures.push_back(internalTool);
   }
 

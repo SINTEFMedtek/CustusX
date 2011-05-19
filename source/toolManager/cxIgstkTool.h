@@ -34,11 +34,46 @@ typedef boost::weak_ptr<IgstkTool> IgstkToolWeakPtr;
 class IgstkTool : public QObject
 {
   Q_OBJECT
+
 public:
-  IgstkTool(Tool::InternalStructure internalStructure);
+  /**A tools internal structure \warning make sure you set all the members to an appropriate value.*/
+  struct InternalStructure
+  {
+  	ssc::Transform3D getCalibrationAsSSC() const;
+  	void setCalibration(const ssc::Transform3D& cal);
+  	void saveCalibrationToFile();
+
+    ssc::Tool::Type   mType;                  ///< the tools type
+    QString           mName;                  ///< the tools name
+    QString           mUid;                   ///< the tools unique id
+    std::vector<ssc::CLINICAL_APPLICATION> mClinicalApplications;       ///< the tools clinical application applications
+    ssc::TRACKING_SYSTEM     mTrackerType;           ///< what product the tool belongs to
+    QString           mSROMFilename;          ///< path to the tools SROM file
+    unsigned int      mPortNumber;            ///< the port number the tool is connected to
+    unsigned int      mChannelNumber;         ///< the channel the tool is connected to
+    std::map<int, ssc::Vector3D>     mReferencePoints;        ///< optional point on the frame, specifying a known reference point, 0,0,0 is default, in sensor space
+    bool              mWireless;              ///< whether or not the tool is wireless
+    bool              m5DOF;                  ///< whether or not the tool have 5 DOF
+    igstk::Transform  mCalibration;           ///< transform read from mCalibrationFilename
+    QString           mCalibrationFilename;   ///< path to the tools calibration file
+    QString           mGraphicsFileName;      ///< path to this tools graphics file
+    QString           mTransformSaveFileName; ///< path to where transforms should be saved
+    QString           mLoggingFolderName;     ///< path to where log should be saved
+    QString           mInstrumentId;          ///< The instruments id
+    QString           mInstrumentScannerId;   ///< The id of the ultrasound scanner if the instrument is a probe
+    InternalStructure() :
+      mType(ssc::Tool::TOOL_NONE), mName(""), mUid(""), mTrackerType(ssc::tsNONE),
+      mSROMFilename(""), mPortNumber(UINT_MAX), mChannelNumber(UINT_MAX), mReferencePoints(),
+      mWireless(true), m5DOF(true), mCalibrationFilename(""), mGraphicsFileName(""),
+      mTransformSaveFileName(""), mLoggingFolderName(""), mInstrumentId(""),
+      mInstrumentScannerId("") {}; ///< sets up default values for all the members
+  };
+
+public:
+  IgstkTool(InternalStructure internalStructure);
   virtual ~IgstkTool();
 
-  Tool::InternalStructure getInternalStructure();
+  InternalStructure getInternalStructure();
   QString getUid();
 
   igstk::TrackerTool::Pointer getPointer() const; ///< return a pointer to the internal tools base object
@@ -53,6 +88,7 @@ public:
   void setReference(IgstkToolPtr);
   void setTracker(TrackerPtr tracker);
   void setCalibrationTransform(igstk::Transform calibration);
+  void updateCalibration(const ssc::Transform3D& sMt);
 
   void printInternalStructure();
 
@@ -75,7 +111,7 @@ private:
   void internalVisible(bool value);
   void addLogging(); ///< adds igstk logging to the internal igstk trackertool
 
-  Tool::InternalStructure                         mInternalStructure;   ///< the structure that defines the tool characteristics
+  InternalStructure                        			  mInternalStructure;   ///< the structure that defines the tool characteristics
   igstk::TrackerTool::Pointer                     mTool;                ///< pointer to the base class of the igstk tool
   IgstkToolWeakPtr                                mReferenceTool;       ///< the tool that is used as a reference to the tracking system
   TrackerWeakPtr                                  mTracker;             ///< the tracker this tool belongs to
