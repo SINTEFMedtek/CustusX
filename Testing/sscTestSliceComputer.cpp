@@ -104,8 +104,8 @@ void TestSliceComputer::testAnyPlanes()
 	Transform3D R = ssc::createTransformRotateY(M_PI) * ssc::createTransformRotateZ(M_PI_2);
 	Transform3D T = ssc::createTransformTranslate(c_tool);
 	Transform3D rMt = T*R;
-	CPPUNIT_ASSERT(similar(rMt.vector(Vector3D(0, 0, 1)), Vector3D(0, 0, -1))); // tip down
-	CPPUNIT_ASSERT(similar(rMt.vector(Vector3D(0, 1, 0)), Vector3D(1, 0, 0))); // leftprobe to leftpatient
+	CPPUNIT_ASSERT(ssc::similar(rMt.vector(ssc::Vector3D(0, 0, 1)), ssc::Vector3D(0, 0, -1))); // tip down
+	CPPUNIT_ASSERT(ssc::similar(rMt.vector(ssc::Vector3D(0, 1, 0)), ssc::Vector3D(1, 0, 0))); // leftprobe to leftpatient
 	slicer.setToolPosition(rMt);
 	slicer.setFixedCenter(center);
 
@@ -146,7 +146,7 @@ void TestSliceComputer::testAnyPlanes()
 	slicer.setToolViewOffset(true, 40, 0.25);
 	slicer.setPlaneType(ssc::ptANYPLANE);
 	//std::cout << "viewoffset: \n" << slicer.getPlane() << std::endl;
-	CPPUNIT_ASSERT(similar(slicer.getPlane().c, c_tool-10.0*Vector3D(0, 0, 1)));
+	CPPUNIT_ASSERT(ssc::similar(slicer.getPlane().c, c_tool-10.0*Vector3D(0, 0, 1)));
 	slicer.setToolViewOffset(false, 40, 0.25);
 
 	// perform test with gravity vector normal to any direction.

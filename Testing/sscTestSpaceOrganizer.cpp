@@ -9,7 +9,7 @@ void TestSpaceOrganizer::setUp()
 	mSession = "20081111T120000";
 	mSessionTimestamp = mSession;
 	
-	Transform3D M0 = Transform3D();
+	Transform3D M0 = Transform3D::Identity();
 	Transform3D M1 = createTransformTranslate(Vector3D(30,40,50))*createTransformRotateX(M_PI/4.0);
 	Transform3D M2 = createTransformTranslate(Vector3D(35,-20,0))*createTransformRotateY(M_PI/8.0);
 	Transform3D M3 = createTransformTranslate(Vector3D(315,-200,100))*createTransformRotateZ(-M_PI/8.0);
@@ -73,7 +73,7 @@ void TestSpaceOrganizer::testRelateToWorld()
 	// add the patient orientation, enables navigation
 	boss.addSpace(s_patient);
 	
-	CPPUNIT_ASSERT(worldTransformIs(boss, s_MR0_r,   Transform3D() )); // in its own ref space		
+	CPPUNIT_ASSERT(worldTransformIs(boss, s_MR0_r,   Transform3D::Identity() )); // in its own ref space
 	CPPUNIT_ASSERT(worldTransformIs(boss, s_patient, s_MR0_r.m_rMs.inv() * s_patient.m_rMs )); 		
 }
 
@@ -210,7 +210,7 @@ void TestSpaceOrganizer::testFirstUSThenPOThenRegister()
 //	CPPUNIT_ASSERT( boss.isUpToDate(s_MR2_nr.mUid) );
 	CPPUNIT_ASSERT( !boss.isNavigable(s_MR2_nr.mUid) ); 	
 
-	CPPUNIT_ASSERT(worldTransformIs(boss, s_MR2_nr,  Transform3D() )); 		
+	CPPUNIT_ASSERT(worldTransformIs(boss, s_MR2_nr,  Transform3D::Identity() ));
 
 	// mr reg + patient reg ->check
 	boss.addSpace(s_patient);
@@ -225,7 +225,7 @@ void TestSpaceOrganizer::testFirstUSThenPOThenRegister()
 
 	CPPUNIT_ASSERT( !boss.isNavigable(s_MR2_nr.mUid) ); 	
 	
-	CPPUNIT_ASSERT(worldTransformIs(boss, s_MR0_r,  Transform3D() )); 		
+	CPPUNIT_ASSERT(worldTransformIs(boss, s_MR0_r,  Transform3D::Identity() ));
 	CPPUNIT_ASSERT(worldTransformIs(boss, s_US0_nr,  s_MR0_r.m_rMs.inv() * s_patient.m_rMs * s_US0_nr.m_rMs )); 		
 	
 	// us reg -> check

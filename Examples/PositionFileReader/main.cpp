@@ -58,7 +58,7 @@ int main(int argc, char **argv)
   }
 
 	
-	ssc::Transform3D T;
+	ssc::Transform3D T = ssc::Transform3D::Identity();
 	double timestamp;
 	QString toolIndex;
 	

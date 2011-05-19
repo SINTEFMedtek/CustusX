@@ -2,7 +2,7 @@
 #include <QtGui>
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
-
+#include "sscVector3D.h"
 #include "vtkRenderWindow.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT

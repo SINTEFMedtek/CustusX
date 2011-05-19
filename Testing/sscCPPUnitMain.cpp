@@ -50,8 +50,8 @@ int main(int argc, char **argv)
 //                                       "visual",
 //                                        &TestVisualRendering::test_ACS_3Volumes_GPU ) );
 //	runner.addTest(TestSpaceOrganizer::suite());
-//  runner.addTest(TestTransform3D::suite());
-  runner.addTest(TestBoundingBox3D::suite());
+  runner.addTest(TestTransform3D::suite());
+//  runner.addTest(TestBoundingBox3D::suite());
 #endif
 	
 	

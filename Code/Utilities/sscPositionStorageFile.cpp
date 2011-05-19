@@ -54,14 +54,15 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, int* to
   quint8 size;
   quint64 ts;
   quint8 tool;
-  ssc::Frame3D frame;
+//  ssc::Frame3D frame;
 
   stream >> type;
   stream >> size;
   stream >> ts;
   stream >> tool;
-  stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
-  stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
+//  stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
+//  stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
+  ssc::Frame3D frame = this->frameFromStream();
 
   *matrix = frame.transform();
   *timestamp = ts;
@@ -96,13 +97,19 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
   {
     quint64 ts;
     quint8 tool;
-    ssc::Frame3D frame;
+//    ssc::Frame3D frame;
+//    double thetaXY;
+//    double thetaZ;
+//    double phi;
 
     stream >> size;
     stream >> ts;
     stream >> tool;
-    stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
-    stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
+//    stream >> thetaXY >> thetaZ >> phi;
+////    stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
+//    stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
+//    frame.mAngleAxis = Eigen::AngleAxisd(phi, unitVector(thetaXY, thetaZ));
+    ssc::Frame3D frame = this->frameFromStream();
 
     *matrix = frame.transform();
     *timestamp = ts;
@@ -112,12 +119,18 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
   else if (type==3) // position only format
   {
     quint64 ts;
-    ssc::Frame3D frame;
+//    ssc::Frame3D frame;
+//    double thetaXY;
+//    double thetaZ;
+//    double phi;
 
     stream >> size;
     stream >> ts;
-    stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
-    stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
+//    stream >> thetaXY >> thetaZ >> phi;
+    ssc::Frame3D frame = this->frameFromStream();
+//    stream >> frame.mThetaXY >> frame.mThetaZ >> frame.mPhi;
+//    stream >> frame.mPos[0] >> frame.mPos[1] >> frame.mPos[2];
+//    frame.mAngleAxis = Eigen::AngleAxisd(phi, unitVector(thetaXY, thetaZ));
 
     *matrix = frame.transform();
     *timestamp = ts;
@@ -127,6 +140,14 @@ bool PositionStorageReader::read(Transform3D* matrix, double* timestamp, QString
 
   mError = true;
   return false;
+}
+
+Frame3D PositionStorageReader::frameFromStream()
+{
+  boost::array<double, 6> rep;
+  stream >> rep[0] >> rep[1] >> rep[2] >> rep[3] >> rep[4] >> rep[5];
+  Frame3D retval = Frame3D::fromCompactAxisAngleRep(rep);
+  return retval;
 }
 
 bool PositionStorageReader::atEnd() const
@@ -178,9 +199,12 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, int to
 	stream << (quint8)(8+1+6*10);	// Size of data following this point
 	stream << (quint64)timestamp;	// Milliseconds since Epoch
 	stream << (quint8)toolIndex;	// tool index
-	stream << (double)frame.mThetaXY;
-	stream << (double)frame.mThetaZ;
-	stream << (double)frame.mPhi;
+	stream << (double)getThetaXY(frame.mAngleAxis.axis());
+  stream << (double)getThetaZ(frame.mAngleAxis.axis());
+	stream << (double)frame.mAngleAxis.angle();
+//  stream << (double)frame.mThetaXY;
+//  stream << (double)frame.mThetaZ;
+//  stream << (double)frame.mPhi;
 	stream << (double)frame.mPos[0];
 	stream << (double)frame.mPos[1];
 	stream << (double)frame.mPos[2];
@@ -200,16 +224,20 @@ void PositionStorageWriter::write(Transform3D matrix, uint64_t timestamp, QStrin
   else
   {
     ssc::Frame3D frame = ssc::Frame3D::create(matrix);
+    boost::array<double, 6> rep = frame.getCompactAxisAngleRep();
 
     stream << (quint8)3;  // Type -
     stream << (quint8)(8+6*10); // Size of data following this point
     stream << (quint64)timestamp; // Milliseconds since Epoch
-    stream << (double)frame.mThetaXY;
-    stream << (double)frame.mThetaZ;
-    stream << (double)frame.mPhi;
-    stream << (double)frame.mPos[0];
-    stream << (double)frame.mPos[1];
-    stream << (double)frame.mPos[2];
+//    stream << (double)frame.mThetaXY;
+//    stream << (double)frame.mThetaZ;
+//    stream << (double)frame.mPhi;
+    stream << rep[0];
+    stream << rep[1];
+    stream << rep[2];
+    stream << rep[3];
+    stream << rep[4];
+    stream << rep[5];
   }
 
 }

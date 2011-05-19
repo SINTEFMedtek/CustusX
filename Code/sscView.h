@@ -14,10 +14,12 @@ typedef SNWQVTKWidget ViewParent;
 typedef QVTKWidget ViewParent;
 #endif
 
+#include "sscTransform3D.h"
+
 namespace ssc
 {
   class DoubleBoundingBox3D;
-  class Transform3D;
+//  class Transform3D;
 	typedef boost::shared_ptr<class Rep> RepPtr;
 
 	/**

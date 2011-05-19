@@ -15,6 +15,7 @@ public:
 //  void setUp();
 //  void tearDown();
 
+  void testDefaultTransform();
   void testElementAccess();
   void testSimilar();
   void testTranslate();
@@ -27,6 +28,7 @@ public:
 
 public:
   CPPUNIT_TEST_SUITE( TestTransform3D );
+  CPPUNIT_TEST( testDefaultTransform);
   CPPUNIT_TEST( testElementAccess);
   CPPUNIT_TEST( testSimilar);
   CPPUNIT_TEST( testTranslate);

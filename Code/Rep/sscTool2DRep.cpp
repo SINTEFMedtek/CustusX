@@ -29,6 +29,7 @@ namespace ssc
 
 ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
+	m_vpMs(Transform3D::Identity()),
 	mBB_vp(0, 1, 0, 1, 0, 1),
 	mTooltipPointColor(0.96, 0.87, 0.17),
 	mOffsetPointColor(0.96, 0.87, 0.17),
@@ -183,7 +184,7 @@ void ToolRep2D::update()
 	if (!mSlicer->getTool())
 		return;
 
-	Transform3D prMt;
+	Transform3D prMt = Transform3D::Identity();
 	if (mSlicer->getTool())
 	{
 		prMt = mSlicer->getTool()->get_prMt();
@@ -373,14 +374,9 @@ void ToolRep2D::updateOffsetText()
 	{
 		return;
 	}
-
 	if (getOffset() > 2.0 && mUseOffsetText && showOffset())
 	{
-		char buffer[100];
-		//snprintf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
-		printf( buffer, sizeof(buffer), "Offset: %3.0f mm ", getOffset() );
-		QString text = buffer;
-		distanceText->updateText( text );
+		distanceText->updateText("Offset: " + QString::number(getOffset(), 'g', 3) + " mm");
 		distanceText->getActor()->VisibilityOn();
 	}
 	else
