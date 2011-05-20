@@ -87,6 +87,7 @@ private slots:
   void showOrientationSlot(bool visible);
   void globalConfigurationFileChangedSlot(QString key);
   void setStereoEyeAngle(double angle);
+  void settingsChangedSlot(QString key);
 
 private:
   virtual void appendToContextMenu(QMenu& contextMenu);

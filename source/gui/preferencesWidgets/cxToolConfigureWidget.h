@@ -48,6 +48,8 @@ private slots:
   void toolsChangedSlot();
   void filterToolsSlot();
   void pathEditedSlot();
+  void fileNameEditedSlot();
+  void filenameDoneEditingSlot();
 
 private:
   enum state ///< state of a configuration file indicating whether or not its edited
@@ -65,11 +67,11 @@ private:
 
   void populateReference(); ///< populates the ref combobox
   int addRefrenceToComboBox(QString absoluteRefereneFilePath); ///< adds a new tool ref file item to the combobox
-
   ssc::CLINICAL_APPLICATION       mClinicalApplication;
 
   QComboBox*                mConfigFilesComboBox;
-  QLineEdit*                mConfigFilePathLineEdit;
+  QLineEdit*                mConfigFilePathLineEdit; ///< path to the folder where the xml should be
+  QLineEdit*                mConfigFileLineEdit; ///< name of the xml file (example.xml)
   QComboBox*                mReferenceComboBox;
 
   SelectionGroupBox*        mApplicationGroupBox;

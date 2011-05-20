@@ -8,23 +8,13 @@ SET(CustusX3_VERSION_PATCH	0)
 SET(VERSION_NUMBER "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 SET(VERSION_NUMBER_VERBOSE "${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
 
-#set(CMAKE_INSTALL_RPATH .;${CMAKE_INSTALL_RPATH})
-#message(STATUS "CMAKE_INSTALL_RPATH " ${CMAKE_INSTALL_RPATH})
-
-set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
-#set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/../install_test/ )
+if (WIN32)
+else (WIN32)
+  set(CMAKE_INSTALL_PREFIX "Applications/" ) # used during package installation. Appended to some default which seems to be / , might be able to change using DESTDIR env var.
+endif (WIN32)
 
 # Set ALPHA to OFF to build release
 SET(ALPHA ON)
-
-#FIND_PACKAGE(Subversion)
-#IF(Subversion_FOUND)
-#  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} CustusX3)
-#  SET(VERSION_NUMBER_VERBOSE "${VERSION_NUMBER_VERBOSE} (${CustusX3_WC_REVISION})")
-#  IF(ALPHA)
-#    SET(VERSION_NUMBER "${VERSION_NUMBER} (${CustusX3_WC_REVISION})")
-#  ENDIF(ALPHA)
-#ENDIF(Subversion_FOUND)
   
 IF(ALPHA)
   SET(VERSION_NUMBER "${VERSION_NUMBER} alpha")
@@ -95,7 +85,6 @@ if(BUILD_GRABBER_SERVER)
 endif(BUILD_GRABBER_SERVER)
 
 enable_testing()
-#add_subdirectory(testing)
 
 
 

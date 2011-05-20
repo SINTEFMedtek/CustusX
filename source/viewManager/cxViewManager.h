@@ -85,8 +85,6 @@ public:
   InteractiveClipperPtr getClipper();
   InteractiveCropperPtr getCropper();
 
-  bool getSmartRender() const;
-  void setSmartRender(bool on);
   RenderTimerPtr getRenderTimer() { return mRenderTimer; }
 
 
@@ -97,12 +95,13 @@ signals:
   void activeViewChanged(); ///< emitted when the active view changes
 
 public slots:
-  void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
+//  void renderingIntervalChangedSlot(int interval); ///< Sets the rendering interval timer
 
 protected slots:
   void renderAllViewsSlot(); ///< renders all views
   void setLayoutActionSlot();
   void setInteractionStyleActionSlot();
+  void settingsChangedSlot(QString key);
 
 protected:
   ViewManager(); ///< create all needed views
@@ -127,6 +126,7 @@ protected:
   unsigned findLayoutData(const QString uid) const;
   void addDefaultLayout(LayoutData data);
   QAction* addLayoutAction(QString layout, QActionGroup* group);
+  void setRenderingInterval(int interval);
 
   void addInteractorStyleAction(QString caption, QActionGroup* group, QString className, QIcon icon, QString helptext);
   void loadGlobalSettings();
