@@ -59,6 +59,7 @@ public:
   StringDataAdapterXmlPtr mMaskReduce;//Reduce mask size in % in each direction
   BoolDataAdapterXmlPtr mAlignTimestamps; ///align track and frame timestamps to each other automatically
   DoubleDataAdapterXmlPtr mTimeCalibration; ///set a offset in the frame timestamps
+  BoolDataAdapterXmlPtr mAngioAdapter; ///US angio data is used as input
 
   OutputVolumeParams getOutputVolumeParams() const;
   void setOutputVolumeParams(const OutputVolumeParams& par);
