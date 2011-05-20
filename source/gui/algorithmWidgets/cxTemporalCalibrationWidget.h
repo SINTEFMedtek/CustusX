@@ -21,6 +21,7 @@ namespace cx
 {
 
 /** GUI for performing temporal calibration
+ *
  */
 class TemporalCalibrationWidget : public BaseWidget
 {

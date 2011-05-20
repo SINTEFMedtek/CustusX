@@ -2,6 +2,7 @@
 #define CXTOOLMANAGER_H_
 
 #include "sscToolManager.h"
+#include "sscDefinitions.h"
 //#include "itkCommand.h"
 #include "vtkSmartPointer.h"
 #include "sscManualTool.h"
@@ -53,6 +54,8 @@ public:
   virtual ssc::ToolPtr getDominantTool(); ///< get the dominant tool
   virtual void setDominantTool(const QString& uid); ///< can be set to either a connected or configured tool
 
+  void setClinicalApplication(ssc::CLINICAL_APPLICATION application);
+
   virtual std::map<QString, QString> getToolUidsAndNames() const; ///< both from configured and connected tools
   virtual std::vector<QString> getToolNames() const; ///< both from configured and connected tools
   virtual std::vector<QString> getToolUids() const; ///< both from configured and connected tools
@@ -102,8 +105,9 @@ private slots:
   void initializeAfterConfigSlot();
   void uninitializeAfterTrackingStoppedSlot();
   void deconfigureAfterUninitializedSlot();
+  void configureAfterDeconfigureSlot();
   void globalConfigurationFileChangedSlot(QString key);
-
+  
 private:
   ToolManager(); ///< use getInstance instead
   virtual ~ToolManager(); ///< destructor
@@ -114,6 +118,7 @@ private:
   QString mConfigurationFilePath; ///< path to the configuration file
   QString mLoggingFolder; ///< path to where logging should be saved
 
+  ssc::CLINICAL_APPLICATION mApplication; ///< Current clinical application 
   ssc::ToolManager::ToolMap mTools; ///< all tools
 
   ssc::ToolPtr mDominantTool; ///< the tool with highest priority
@@ -125,6 +130,7 @@ private:
   bool mConfigured; ///< whether or not the system is configured
   bool mInitialized; ///< whether or not the system is initialized
   bool mTracking; ///< whether or not the system is tracking
+  bool mDominantToolCheckActive; ///< Automatic selection of dominant tool
 
   ssc::LandmarkMap mLandmarks; ///< in space patient reference.
   double mLastLoadPositionHistory;

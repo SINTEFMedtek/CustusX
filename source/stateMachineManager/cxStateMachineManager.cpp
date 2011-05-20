@@ -161,6 +161,8 @@ void StateManager::fillDefaultSettings()
   this->fillDefault("Automation/autoStartStreaming", true);
   this->fillDefault("Automation/autoReconstruct", true);
   this->fillDefault("renderingInterval", 33);
+  this->fillDefault("smartRender", false);
+  this->fillDefault("backgroundColor", QColor("black"));
   this->fillDefault("globalPatientDataFolder", QDir::homePath()+"/Patients");
   this->fillDefault("globalApplicationName", enum2string(ssc::mdLABORATORY));
   this->fillDefault("globalPatientNumber", 1);

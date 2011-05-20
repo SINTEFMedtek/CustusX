@@ -33,17 +33,14 @@ public:
   QSize minimumSizeHint() const { return sizeHint(); }
   QSize sizeHint() const
   {
-//    QRect rect2 = QFontMetrics(this->font()).boundingRect("M");
-//    std::cout << "text2" << " M" << " wh= " << rect2.width() << " " << rect2.height() << std::endl;
-    QString text = qstring_cast(ssc::Transform3D()).split("\n")[0];
+  	ssc::Transform3D M = ssc::createTransformRotateX(M_PI_4) *
+  			ssc::createTransformRotateZ(M_PI_4) *
+  			ssc::createTransformTranslate(ssc::Vector3D(1,2,M_PI));
+
+  	QString text = qstring_cast(M).split("\n")[0];
     QRect rect = QFontMetrics(this->font()).boundingRect(text);
-//    QSize sz = QFontMetrics(this->font()).size(0, qstring_cast(ssc::Transform3D()));
-//    std::cout << "sizesz " << sz.width() << " " << sz.height() << std::endl;
-//    std::cout << "text" << text << " wh= " << rect.width() << " " << rect.height() << std::endl;
     QSize s(rect.width()*1.1+5, 4*rect.height()*1.1+5);
-//    std::cout << "size " << s.width() << " " << s.height() << std::endl;
     return s;
-//    return QSize(1,1);
   }
 };
 
@@ -125,7 +122,7 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   this->addTranslationControls("yTranslation", "Y", 1, tLayout);
   this->addTranslationControls("zTranslation", "Z", 2, tLayout);
 
-  this->setMatrix(ssc::Transform3D());
+  this->setMatrix(ssc::Transform3D::Identity());
 
   toptopLayout->addStretch();
 
@@ -262,8 +259,8 @@ void Transform3DWidget::changedSlot()
 //  mFrame.mPos = t;
   mDecomposition.setPosition(t);
 
+  this->updateValues();
   emit changed();
-//  this->updateValues();
   recursive = false;
 }
 

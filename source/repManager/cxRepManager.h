@@ -90,30 +90,24 @@ protected slots:
   void volumeRemovedSlot(QString uid);
 
 protected:
-//  template<class REP, class MAP>
-//  boost::shared_ptr<REP> addRep(const QString& uid, MAP* specificMap);
-//  template<class REP, class MAP>
-//  boost::shared_ptr<REP> addRep(REP* rep, MAP* specificMap);
-//  template<class REP, class MAP>
-//  boost::shared_ptr<REP> addRep(boost::shared_ptr<REP> rep, MAP* specificMap);
-//  template<class REP, class MAP>
-//  boost::shared_ptr<REP> getRep(const QString& uid, MAP* specificMap);
-
 
   static RepManager*  mTheInstance;         ///< the only instance of this class
 
   VolumetricRepMap mVolumetricRepByImageMap; ///< used for caching reps based on image content
+  bool mIsUsingGPU3DMapper;
+  double mMaxRenderSize;
 
-  RepMap              mRepMap; ///< contains all the reps in the specific maps above. Use for simplified access.
+//  RepMap              mRepMap; ///< contains all the reps in the specific maps above. Use for simplified access.
 
 private:
   RepManager(); ///< creates a pool of reps
   ~RepManager(); ///< empty
   RepManager(RepManager const&); ///< not implemented
   RepManager& operator=(RepManager const&); ///< not implemented
-
-
 };
+
 RepManager* repManager();
+
 }//namespace cx
+
 #endif /* CXREPMANAGER_H_ */
