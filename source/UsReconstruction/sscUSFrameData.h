@@ -32,7 +32,8 @@ inline bool operator<(const TimedPosition& lhs, const TimedPosition& rhs)
 class USFrameData
 {
 public:
-  explicit USFrameData(ImagePtr inputFrameData);
+  explicit USFrameData(ImagePtr inputFrameData, bool angio = false);
+  vtkImageDataPtr useAngio(ImagePtr inputFrameData);/// Use only US angio data as input. Removes grayscale from the US data and converts the remaining color to grayscale
   void removeFrame(unsigned int index);
   unsigned char* getFrame(unsigned int index);
   int* getDimensions();

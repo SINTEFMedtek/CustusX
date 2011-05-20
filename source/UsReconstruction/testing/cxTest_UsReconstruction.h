@@ -14,10 +14,12 @@ public:
 	void tearDown();
 
 	void testConstructor();
+	void testAngioReconstruction();//Test reconstruction of US angio data (#318)
 
 public:
 	CPPUNIT_TEST_SUITE( TestUsReconstruction );
 		CPPUNIT_TEST( testConstructor );
+		//CPPUNIT_TEST( testAngioReconstruction );
 	CPPUNIT_TEST_SUITE_END();
 private:
 
