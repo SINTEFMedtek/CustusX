@@ -63,6 +63,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
   QWidget* alignTimestampsWidget = ssc::createDataWidget(this, mReconstructer->mAlignTimestamps);
   QWidget* timeCalibrationWidget = ssc::createDataWidget(this, mReconstructer->mTimeCalibration);
+  QWidget* angioWidget = ssc::createDataWidget(this, mReconstructer->mAngioAdapter);
 
 
   mAlgorithmGroup = new QGroupBox("Algorithm", this);
@@ -71,6 +72,7 @@ ReconstructionWidget::ReconstructionWidget(QWidget* parent, ReconstructerPtr rec
 
   topLayout->addWidget(mFileSelectWidget);
   topLayout->addLayout(inputSpacingLayout);
+  topLayout->addWidget(angioWidget);
   topLayout->addWidget(outputVolGroup);
   outputVolLayout->addLayout(extentLayout);
   outputVolLayout->addLayout(outputVolGridLayout);
