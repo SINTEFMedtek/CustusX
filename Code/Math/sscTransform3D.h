@@ -25,7 +25,7 @@ namespace Eigen
 template<typename _Scalar, int _Dim, int _Mode, int _Options>
 std::ostream& operator<<(std::ostream& s, const Eigen::Transform< _Scalar, _Dim, _Mode, _Options >& t)
 {
-  s << t.matrix();
+  s << t.matrix().format(IOFormat()); // hack: force OK output even when the default in sscMathBase.h is Veector3D-centered.
 //  t.put(s);
   return s;
 }

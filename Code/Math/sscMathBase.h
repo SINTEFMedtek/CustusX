@@ -26,6 +26,11 @@ typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 
 // Extensions of the Eigen classes
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
+
+// important for ssc::Vector3D, our most used class. This line moves all onto one line.
+// for default operation, use std::cout << M.format(Eigen::IOFormat()) << std::endl;
+#define EIGEN_DEFAULT_IO_FORMAT Eigen::IOFormat(6, 0, " ", " ", "","","","")
+
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "sscPlainObjectEigenAddons.h"
 #define EIGEN_MATRIXBASE_PLUGIN "sscMatrixBaseEigenAddons.h"
 #define EIGEN_TRANSFORM_PLUGIN "sscTransformEigenAddons.h"

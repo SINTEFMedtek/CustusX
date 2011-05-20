@@ -31,7 +31,12 @@ void TestTransform3D::testDefaultTransform()
 
   CPPUNIT_ASSERT( similar(M.coord(v), v) );
   CPPUNIT_ASSERT( similar(M.coord(w), w) );
+
+//  std::cout << M.matrix().format(Eigen::IOFormat(6, 0, " ", " ", "","","","")) << std::endl;
+//  std::cout << M.matrix() << std::endl;
+//  std::cout << M << std::endl;
 }
+
 
 void TestTransform3D::testElementAccess()
 {
