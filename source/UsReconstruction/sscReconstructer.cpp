@@ -74,7 +74,7 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
                                                   "3", QString("0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15").split(" "),
                                                   mSettings.getElement());
   connect(mMaskReduce.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
-  
+
   mAlignTimestamps = BoolDataAdapterXml::initialize("Align timestamps", "",
                                                  "Align the first of tracker and frame timestamps, ignoring lags.",
                                                   false, mSettings.getElement());
@@ -86,6 +86,11 @@ Reconstructer::Reconstructer(XmlOptionFile settings, QString shaderPath) :
                                                   0.0, DoubleRange(-1000, 1000, 10), 0,
                                                   mSettings.getElement());
   connect(mTimeCalibration.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
+
+  mAngioAdapter = BoolDataAdapterXml::initialize("Angio data", "",
+                                                 "Ultrasound angio data is used as input",
+                                                  false, mSettings.getElement());
+  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
   mAlgorithmAdapter = StringDataAdapterXml::initialize("Algorithm", "",
       "Choose algorithm to use for reconstruction",
@@ -650,7 +655,7 @@ void Reconstructer::readCoreFiles(QString fileName, QString calFilesPath)
   mFilename = fileName;
   mCalFilesPath = calFilesPath;
 
-  cx::UsReconstructionFileReader::FileData temp = mFileReader->readAllFiles(fileName, calFilesPath);
+  cx::UsReconstructionFileReader::FileData temp = mFileReader->readAllFiles(fileName, calFilesPath, mAngioAdapter->getValue());
   if (!temp.mUsRaw)
   	return;
   // ignore if a directory is read - store folder name only
