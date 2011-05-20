@@ -78,7 +78,7 @@ Transform3D CustomMetaImage::readTransform()
 //    //std::cout << "WARNING: Loading file " + filename + ": unrecognized creator. Position/Orientation cannot be trusted" << std::endl;
 //  }
 
-  Transform3D rMd;
+  Transform3D rMd = Transform3D::Identity();
 
   // add rotational part
   for (unsigned i = 0; i < 3; ++i)

@@ -22,7 +22,7 @@ AxesRep::AxesRep(const QString& uid) :
 	setAxisLength(50);
 
 	this->setShowAxesLabels(true);
-	setTransform(Transform3D());
+	setTransform(Transform3D::Identity());
 	setFontSize(0.04);
 }
 

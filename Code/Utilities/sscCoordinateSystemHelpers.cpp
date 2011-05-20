@@ -39,7 +39,7 @@ Transform3D CoordinateSystemHelpers::get_toMfrom(CoordinateSystem from, Coordina
 
 Transform3D CoordinateSystemHelpers::get_rMfrom(CoordinateSystem from) const
 {
-  Transform3D rMfrom;
+  Transform3D rMfrom = Transform3D::Identity();
 
   switch(from.mId)
   {
@@ -127,7 +127,7 @@ ssc::CoordinateSystem CoordinateSystemHelpers::getR()
 
 Transform3D CoordinateSystemHelpers::get_rMr() const
 {
-  return Transform3D(); // ref_M_ref
+  return Transform3D::Identity(); // ref_M_ref
 }
 
 Transform3D CoordinateSystemHelpers::get_rMd(QString uid) const
@@ -137,7 +137,7 @@ Transform3D CoordinateSystemHelpers::get_rMd(QString uid) const
   if(!data)
   {
    messageManager()->sendWarning("Could not find data with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-    return Transform3D();
+    return Transform3D::Identity();
   }
   return data->get_rMd(); // ref_M_d
 }
@@ -155,7 +155,7 @@ Transform3D CoordinateSystemHelpers::get_rMt(QString uid) const
   if(!tool)
   {
    messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-   return Transform3D();
+   return Transform3D::Identity();
   }
   return this->get_rMpr() * tool->get_prMt(); // ref_M_t
 }
@@ -167,7 +167,7 @@ Transform3D CoordinateSystemHelpers::get_rMs(QString uid) const
   if(!tool)
   {
    messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
-   return Transform3D();
+   return Transform3D::Identity();
   }
 
   Transform3D tMs = tool->getCalibration_sMt().inv();

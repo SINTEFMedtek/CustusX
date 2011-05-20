@@ -2,7 +2,7 @@
 #include <QtGui>
 #include <vtkImageActor.h>
 #include <vtkImageData.h>
-
+#include "sscVector3D.h"
 #include "vtkRenderWindow.h"
 
 #ifdef USE_GLX_SHARED_CONTEXT
@@ -119,7 +119,9 @@ void View::setRep(const RepPtr& rep)
 void View::setBackgoundColor(QColor color)
 {
   mBackgroundColor = color;
-  this->clear();
+  if (mRenderer)
+  	mRenderer->SetBackground(mBackgroundColor.redF(), mBackgroundColor.greenF(), mBackgroundColor.blueF());
+//  this->clear();
 }
 
 /**clear all content of the view. This ensures that props added from

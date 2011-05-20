@@ -340,7 +340,7 @@ Axes3D::Axes3D(vtkRendererPtr renderer) : mRenderer(renderer)
  	//SW_LOG("total len %s", string_cast(Vector3D(axes->GetTotalLength())).c_str());
  	//SW_LOG("scale %s", string_cast(Vector3D(mAxes->GetScale())).c_str());
 
- 	setPosition(Transform3D());
+ 	setPosition(Transform3D::Identity());
 
  	Vector3D len(mAxes->GetNormalizedShaftLength());
  	//SW_LOG("len %s", string_cast(len).c_str());

@@ -31,6 +31,7 @@ SliceComputer::SliceComputer() :
 	mPlaneType(ptAXIAL),
 	mFollowType(ftFIXED_CENTER),
 	mFixedCenter(Vector3D(0,0,0)),
+	m_rMt(Transform3D::Identity()),
 	mToolOffset(0.0),
 	mUseGravity(false),
 	mGravityDirection(Vector3D(0,0,-1)) ,

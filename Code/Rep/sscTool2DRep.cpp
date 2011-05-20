@@ -29,6 +29,7 @@ namespace ssc
 
 ToolRep2D::ToolRep2D(const QString& uid, const QString& name) :
 	RepImpl(uid, name),
+	m_vpMs(Transform3D::Identity()),
 	mBB_vp(0, 1, 0, 1, 0, 1),
 	mTooltipPointColor(0.96, 0.87, 0.17),
 	mOffsetPointColor(0.96, 0.87, 0.17),
@@ -183,7 +184,7 @@ void ToolRep2D::update()
 	if (!mSlicer->getTool())
 		return;
 
-	Transform3D prMt;
+	Transform3D prMt = Transform3D::Identity();
 	if (mSlicer->getTool())
 	{
 		prMt = mSlicer->getTool()->get_prMt();

@@ -52,6 +52,7 @@ private:
 	QDataStream stream;
 	quint8 mVersion;
 	bool mError;
+	class Frame3D frameFromStream();
 };
 
 /** Writer class for the position file.

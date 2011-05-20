@@ -13,7 +13,7 @@ namespace ssc
 //-------  RegistrationTransform  -------------------------
 //---------------------------------------------------------
 
-RegistrationTransform::RegistrationTransform()
+RegistrationTransform::RegistrationTransform() : mValue(Transform3D::Identity())
 {
 
 }

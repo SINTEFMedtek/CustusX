@@ -13,7 +13,7 @@
 namespace ssc
 {
 vtkPolyDataPtr polydataFromTransforms(TimedTransformMap transformMap_prMt);
-void loadMeshFromToolTransforms(TimedTransformMap transforms_prMt);
+void loadMeshFromToolTransforms(ssc::TimedTransformMap transforms_prMt);
 
 }//namespace ssc
 

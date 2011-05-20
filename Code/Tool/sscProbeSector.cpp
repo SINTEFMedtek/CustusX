@@ -140,7 +140,7 @@ vtkImageDataPtr ProbeSector::getMask()
 {
   InsideMaskFunctor checkInside(mData, this->get_uMv());
   vtkImageDataPtr retval;
-  retval = generateVtkImageData(Vector3D(mData.mImage.mSize.width(),mData.mImage.mSize.height(),1), mData.mImage.mSpacing, 0);
+  retval = generateVtkImageData(Eigen::Array3i(mData.mImage.mSize.width(),mData.mImage.mSize.height(),1), mData.mImage.mSpacing, 0);
 
   int* dim(retval->GetDimensions());
   unsigned char* dataPtr = static_cast<unsigned char*>(retval->GetScalarPointer());
