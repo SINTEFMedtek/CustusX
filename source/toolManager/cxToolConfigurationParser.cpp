@@ -655,14 +655,14 @@ ToolFileParser::ToolFileParser(QString absoluteToolFilePath, QString loggingFold
 ToolFileParser::~ToolFileParser()
 {}
 
-Tool::InternalStructure ToolFileParser::getTool()
+IgstkTool::InternalStructure ToolFileParser::getTool()
 {
-  Tool::InternalStructure retval;
+	IgstkTool::InternalStructure retval;
 
   QFile toolFile(mToolFilePath);
   QString toolFolderAbsolutePath = QFileInfo(toolFile).dir().absolutePath()+"/";
   QDomNode toolNode = this->getToolNode(mToolFilePath);
-    Tool::InternalStructure internalStructure;
+  IgstkTool::InternalStructure internalStructure;
     if (toolNode.isNull())
     {
       ssc::messageManager()->sendInfo("Could not read the <tool> tag of file: "+mToolFilePath+", this is not a tool file, skipping.");

@@ -127,7 +127,7 @@ void ManualRegistrationOffsetWidget::setOffsetSlot(int value)
 {
   mResetOffsetButton->setEnabled(true);
 
-  ssc::Transform3D offset;
+  ssc::Transform3D offset = ssc::Transform3D::Identity();
   offset(0,3) = mXOffsetSlider->value();
   offset(1,3) = mYOffsetSlider->value();
   offset(2,3) = mZOffsetSlider->value();

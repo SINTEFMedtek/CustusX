@@ -187,7 +187,7 @@ void PatientData::savePatient()
 vtkPolyDataPtr PatientData::mergeTransformIntoPolyData(vtkPolyDataPtr polyBase, ssc::Transform3D rMd)
 {
     // if transform elements exists, create a copy with entire position inside the polydata:
-    if (similar(rMd, ssc::Transform3D()))
+    if (ssc::similar(rMd, ssc::Transform3D::Identity()))
       return polyBase;
 
     vtkPolyDataPtr poly = vtkPolyDataPtr::New();

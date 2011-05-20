@@ -5,6 +5,7 @@
 #include <QTreeWidgetItem>
 #include <QStringList>
 #include <QVBoxLayout>
+#include <QHeaderView>
 
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
@@ -21,6 +22,7 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   QWidget(parent),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
+  mActiveLandmark(""),
   mAddButton(new QPushButton("Add", this)),
   mEditButton(new QPushButton("Resample", this)),
   mRemoveButton(new QPushButton("Remove", this)),
@@ -56,6 +58,9 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mVerticalLayout->addWidget(mLoadReferencePointsButton);
 }
 
+PointSamplingWidget::~PointSamplingWidget()
+{}
+
 void PointSamplingWidget::itemSelectionChanged()
 {
   //std::cout << "pling" << std::endl;
@@ -73,10 +78,6 @@ void PointSamplingWidget::itemSelectionChanged()
   }
 
   enablebuttons();
-}
-
-PointSamplingWidget::~PointSamplingWidget()
-{
 }
 
 void PointSamplingWidget::showEvent(QShowEvent* event)
@@ -199,7 +200,7 @@ void PointSamplingWidget::setManualTool(const ssc::Vector3D& p_r)
   ssc::Vector3D delta_pr = rMpr.inv().vector(delta_r);
 
   // MD is the actual tool movement in patient space, matrix form
-  ssc::Transform3D MD = createTransformTranslate(delta_pr);
+  ssc::Transform3D MD = ssc::createTransformTranslate(delta_pr);
   // set new tool position to old modified by MD:
   tool->set_prMt(MD*prMt);
 }
@@ -282,6 +283,5 @@ void PointSamplingWidget::loadReferencePointsSlot()
     this->addPoint(P_ref);
   }
 }
-
 
 }//end namespace cx

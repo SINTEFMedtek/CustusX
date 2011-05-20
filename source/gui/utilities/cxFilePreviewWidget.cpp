@@ -20,6 +20,7 @@ FilePreviewWidget::FilePreviewWidget(QWidget* parent) :
     mFileSystemWatcher(new QFileSystemWatcher())
 {
   connect(mEditButton, SIGNAL(clicked()), this, SLOT(editSlot()));
+  mEditButton->setEnabled(false);
   connect(mFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(previewFileSlot(const QString&)));
 
   QHBoxLayout* buttonLayout = new QHBoxLayout();
@@ -51,6 +52,7 @@ QString FilePreviewWidget::defaultWhatsThis() const
 
 void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
 {
+  mEditButton->setEnabled(false);
   if(mCurrentFile)
   {
     if(mCurrentFile->isOpen())
@@ -77,6 +79,7 @@ void FilePreviewWidget::previewFileSlot(const QString& absoluteFilePath)
   QString text = stream.readAll();
 
   mTextDocument->setPlainText(text);
+  mEditButton->setEnabled(true);
 }
 
 void FilePreviewWidget::editSlot()
