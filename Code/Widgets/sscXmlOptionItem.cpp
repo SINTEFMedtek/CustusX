@@ -125,6 +125,8 @@ QDomElement XmlOptionItem::findElemFromUid(const QString& uid, QDomNode root) co
 
 XmlOptionFile::XmlOptionFile()
 {
+  mDocument.appendChild(mDocument.createElement("root"));
+  mCurrentElement = mDocument.documentElement();
 }
 
 XmlOptionFile::XmlOptionFile(QString filename, QString name) :
@@ -257,6 +259,9 @@ void XmlOptionFile::removeChildren()
 
 void XmlOptionFile::save()
 {
+  if(mFilename.isEmpty())
+    return; //Don't do anything if on filename isn't supplied
+
   QFile file(mFilename);
   if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
   {
@@ -267,7 +272,7 @@ void XmlOptionFile::save()
   }
   else
   {
-    ssc::messageManager()->sendError("Could not open "+file.fileName()
+    ssc::messageManager()->sendError("XmlOptionFile::save() Could not open "+file.fileName()
                                +" Error: "+file.errorString());
   }
 }
