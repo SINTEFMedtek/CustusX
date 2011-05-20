@@ -78,6 +78,7 @@ ViewManager::ViewManager() :
   this->loadGlobalSettings();
 
   mSmartRender = settings()->value("smartRender", true).toBool();
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
   mLayout->setSpacing(2);
   mLayout->setMargin(4);
@@ -100,10 +101,8 @@ ViewManager::ViewManager() :
   // set start layout
   this->setActiveLayout("LAYOUT_ORTHOGONAL_3DACS_x1");
 
-  int interval = settings()->value("renderingInterval").toInt();
-  if (interval==0)
-	  interval = 30;
-  mRenderingTimer->start(interval);
+  this->setRenderingInterval(settings()->value("renderingInterval").toInt());
+
   connect(mRenderingTimer, SIGNAL(timeout()), this, SLOT(renderAllViewsSlot()));
 
   mGlobalZoom2DVal = SyncedValue::create(1);
@@ -113,6 +112,18 @@ ViewManager::ViewManager() :
 ViewManager::~ViewManager()
 {}
 
+void ViewManager::settingsChangedSlot(QString key)
+{
+	if (key=="smartRender")
+	{
+	  mSmartRender = settings()->value("smartRender", true).toBool();
+	}
+	if (key=="renderingInterval")
+	{
+	  this->setRenderingInterval(settings()->value("renderingInterval").toInt());
+	}
+}
+
 InteractiveClipperPtr ViewManager::getClipper()
 {
   return mInteractiveClipper;
@@ -121,16 +132,6 @@ InteractiveClipperPtr ViewManager::getClipper()
 InteractiveCropperPtr ViewManager::getCropper()
 {
   return mInteractiveCropper;
-}
-
-bool ViewManager::getSmartRender() const
-{
-  return mSmartRender;
-}
-void ViewManager::setSmartRender(bool on)
-{
-  mSmartRender = on;
-  settings()->setValue("smartRender", mSmartRender);
 }
 
 void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
@@ -153,9 +154,6 @@ void ViewManager::setRegistrationMode(ssc::REGISTRATION_STATUS mode)
   }
 
   data->setOptions(options);
-//
-//  for (unsigned i=0; i<mViewGroups.size(); ++i)
-//    mViewGroups[i]->setRegistrationMode(mode);
 }
 
 QString ViewManager::getActiveLayout() const
@@ -397,9 +395,11 @@ void ViewManager::setActiveLayout(const QString& layout)
   ssc::messageManager()->sendInfo("Layout changed to "+ this->getLayoutData(mActiveLayout).getName());
 }
   
-void ViewManager::renderingIntervalChangedSlot(int interval)
+void ViewManager::setRenderingInterval(int interval)
 {
   mRenderingTimer->stop();
+  if (interval==0)
+	  interval = 30;
   mRenderingTimer->start(interval);
 }
 
@@ -433,8 +433,9 @@ void ViewManager::activateView(ViewWrapperPtr wrapper, int group, LayoutRegion r
 void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion region)
 {
   View2D* view = mViewCache2D.retrieveView();
-  QColor background = settings()->value("backgroundColor").value<QColor>();
-  view->setBackgoundColor(background);
+  // use only default color for 2d views.
+//  QColor background = settings()->value("backgroundColor").value<QColor>();
+//  view->setBackgoundColor(background);
   ViewWrapper2DPtr wrapper(new ViewWrapper2D(view));
   wrapper->initializePlane(plane);
   this->activateView(wrapper, group, region);
@@ -443,8 +444,9 @@ void ViewManager::activate2DView(int group, ssc::PLANE_TYPE plane, LayoutRegion 
 void ViewManager::activate3DView(int group, LayoutRegion region)
 {
   View3D* view = mViewCache3D.retrieveView();
-  QColor background = settings()->value("backgroundColor").value<QColor>();
-  view->setBackgoundColor(background);
+//  moved to wrapper
+//  QColor background = settings()->value("backgroundColor").value<QColor>();
+//  view->setBackgoundColor(background);
   ViewWrapper3DPtr wrapper(new ViewWrapper3D(group+1, view));
   if (group==0)
   {
@@ -458,8 +460,8 @@ void ViewManager::activate3DView(int group, LayoutRegion region)
 void ViewManager::activateRTStreamView(int group, LayoutRegion region)
 {
   ssc::View* view = mViewCacheRT.retrieveView();
-  QColor background = settings()->value("backgroundColor").value<QColor>();
-  view->setBackgoundColor(background);
+//  QColor background = settings()->value("backgroundColor").value<QColor>();
+//  view->setBackgoundColor(background);
   ViewWrapperRTStreamPtr wrapper(new ViewWrapperRTStream(view));
   this->activateView(wrapper, group, region);
 }

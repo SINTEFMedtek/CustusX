@@ -17,14 +17,14 @@ void cxTestExamples::tearDown()
  */
 void cxTestExamples::testInitialize()
 {
-	ssc::Transform3D M;
+	ssc::Transform3D M = ssc::Transform3D::Identity();
 }
 
 /** Test some properties of the identity transform
  */
 void cxTestExamples::testIdentityTransform()
 {
-	ssc::Transform3D M_identity;
+	ssc::Transform3D M_identity = ssc::Transform3D::Identity();
 
 	CPPUNIT_ASSERT(similar(M_identity, M_identity.inv()));
 

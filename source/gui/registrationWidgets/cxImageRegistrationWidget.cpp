@@ -266,7 +266,7 @@ void ImageRegistrationWidget::internalPerformRegistration(bool doIt)
 ssc::Transform3D ImageRegistrationWidget::getTargetTransform() const
 {
   if (!mCurrentImage)
-    return ssc::Transform3D();
+    return ssc::Transform3D::Identity();
   return mCurrentImage->get_rMd();
 }
 
