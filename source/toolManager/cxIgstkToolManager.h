@@ -42,7 +42,7 @@ public:
   IgstkToolPtr getRefereceTool(); ///< ThreadSafe
 
 signals:
-  void initialized(bool on); ///< trackers and tools are initialized
+  void initialized(bool on); ///< when all trackers and tools are initialized == true, else false
   void tracking(bool on);
 
 public slots:
@@ -69,6 +69,8 @@ private:
 
   QTimer* mTimer; ///< timer controlling the demand of transforms
   igstk::PulseGenerator::Pointer mPulseGenerator;
+
+  bool mInternalInitialized;
 
 };
 typedef boost::shared_ptr<IgstkToolManager> IgstkToolManagerPtr;
