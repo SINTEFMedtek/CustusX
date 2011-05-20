@@ -146,6 +146,9 @@ void IgstkTracker::close()
 
 void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 {
+  if(!this->isInitialized())
+    return;
+
   for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
     IgstkToolPtr tool = it->second;
@@ -165,6 +168,9 @@ void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
 
 void IgstkTracker::detachTools(std::map<QString, IgstkToolPtr> tools)
 {
+  if(!this->isInitialized())
+    return;
+
   for(std::map<QString, IgstkToolPtr>::iterator it = tools.begin(); it != tools.end(); ++it )
   {
     IgstkToolPtr tool = it->second;
@@ -287,6 +293,7 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   else if (igstk::InputOutputTimeoutEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" input/output communication timed out.");
+    //this->shutdown();
   }
   else if (igstk::OpenPortErrorEvent().CheckEvent(&event))
   {
@@ -296,6 +303,7 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   else if (igstk::ClosePortErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not close communication with tracker.");
+    this->shutdown();
   }
 }
 
@@ -346,9 +354,13 @@ void IgstkTracker::internalTracking(bool value)
 
 void IgstkTracker::shutdown()
 {
+  //because the tracker now is closed we don't get the callback events so we need to reset the trackers internal
+  //status manually
   this->internalTracking(false);
   this->internalInitialized(false);
   this->internalOpen(false);
+
+  this->close();
 }
 
 }//namespace cx
