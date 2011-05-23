@@ -127,7 +127,7 @@ void IgstkToolManager::initializeSlot(bool on)
     if(!mTracker->isOpen())
     {
       mTracker->open();
-      connect(mTracker, SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+      connect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
     }else
       mTracker->attachTools(mTools);
   }else
@@ -199,7 +199,7 @@ void IgstkToolManager::attachToolsWhenTrackerIsOpenSlot(bool open)
   if(!open)
     return;
 
-  disconnect(mTracker, SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+  disconnect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
   mTracker->attachTools(mTools);
 }
 
