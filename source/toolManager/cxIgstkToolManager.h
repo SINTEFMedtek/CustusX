@@ -53,6 +53,7 @@ private slots:
   void trackerTrackingSlot(bool);
   void checkTimeoutsAndRequestTransformSlot();
   void deviceInitializedSlot(bool);
+  void attachToolsWhenTrackerIsOpenSlot(bool);
 
 private:
   void createTracker(IgstkTracker::InternalStructure trackerStructure);

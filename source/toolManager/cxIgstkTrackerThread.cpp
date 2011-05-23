@@ -52,6 +52,7 @@ void IgstkTrackerThread::run()
   this->exec();
 
   // cleanup/deconfigure
+  QObject::disconnect(mManager.get());
   mManager.reset();
   emit configured(false);
 }
