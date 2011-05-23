@@ -70,7 +70,8 @@ void IgstkToolManager::setReferenceAndTrackerOnTools()
   std::map<QString, IgstkToolPtr>::iterator it;
   for(it = mTools.begin(); it != mTools.end(); ++it)
   {
-    it->second->setReference(mReferenceTool);
+    if(mReferenceTool)
+      it->second->setReference(mReferenceTool);
     if(mTracker)
       it->second->setTracker(mTracker);
   }
@@ -121,14 +122,21 @@ void IgstkToolManager::trackerTrackingSlot(bool isTracking)
 
 void IgstkToolManager::initializeSlot(bool on)
 {
-  if(on && !mTracker->isOpen())
+  if(on)
   {
-    mTracker->open();
-    mTracker->attachTools(mTools);
-  }else if(!on && mTracker->isOpen())
+    if(!mTracker->isOpen())
+    {
+      mTracker->open();
+      connect(mTracker, SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+    }else
+      mTracker->attachTools(mTools);
+  }else
   {
-    mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
-    mTracker->close();
+    if(mTracker->isOpen())
+    {
+      mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
+      mTracker->close();
+    }
   }
 }
 
@@ -144,9 +152,6 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 {
   mPulseGenerator->CheckTimeouts();
 
-//  if (!mReferenceTool) // no need to request extra transforms from tools to the tracker, its already done
-//    return;
-
   std::map<QString, IgstkToolPtr>::iterator it = mTools.begin();
   for(;it != mTools.end();++it)
   {
@@ -159,11 +164,11 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
   }
 }
 
-void IgstkToolManager::deviceInitializedSlot(bool value)
+void IgstkToolManager::deviceInitializedSlot(bool deviceInit)
 {
   int numberOfDevices = mTools.size() + 1; //+1 is the tracker
 
-  if(value)
+  if(deviceInit)
   {
     mInitAnsweres ++;
 
@@ -187,6 +192,15 @@ void IgstkToolManager::deviceInitializedSlot(bool value)
       mInternalInitialized = false;
     }
   }
+}
+
+void IgstkToolManager::attachToolsWhenTrackerIsOpenSlot(bool open)
+{
+  if(!open)
+    return;
+
+  disconnect(mTracker, SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+  mTracker->attachTools(mTools);
 }
 
 }
