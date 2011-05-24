@@ -809,6 +809,9 @@ void MainWindow::createMenus()
     QString shortcut = "Ctrl+"+QString::number(i);
     actions[i-1]->setShortcut(shortcut);
   }
+  mWorkflowMenu->addSeparator();
+  mWorkflowMenu->addAction(mSaveDesktopAction);
+  mWorkflowMenu->addAction(mResetDesktopAction);
 
   //tool
   this->menuBar()->addMenu(mToolMenu);
