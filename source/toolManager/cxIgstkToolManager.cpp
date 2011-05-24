@@ -15,7 +15,8 @@ namespace cx
 {
 
 IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStructure, std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure) :
-    mInitAnsweres(0)
+    mInitAnsweres(0),
+    mInternalInitialized(false)
 {
   mTimer = 0;
 
@@ -69,7 +70,8 @@ void IgstkToolManager::setReferenceAndTrackerOnTools()
   std::map<QString, IgstkToolPtr>::iterator it;
   for(it = mTools.begin(); it != mTools.end(); ++it)
   {
-    it->second->setReference(mReferenceTool);
+    if(mReferenceTool)
+      it->second->setReference(mReferenceTool);
     if(mTracker)
       it->second->setTracker(mTracker);
   }
@@ -120,14 +122,21 @@ void IgstkToolManager::trackerTrackingSlot(bool isTracking)
 
 void IgstkToolManager::initializeSlot(bool on)
 {
-  if(on && !mTracker->isInitialized())
+  if(on)
   {
-    mTracker->open();
-    mTracker->attachTools(mTools);
-  }else if(!on && mTracker->isOpen())
+    if(!mTracker->isOpen())
+    {
+      mTracker->open();
+      connect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+    }else
+      mTracker->attachTools(mTools);
+  }else
   {
-    mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
-    mTracker->close();
+    if(mTracker->isOpen())
+    {
+      mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
+      mTracker->close();
+    }
   }
 }
 
@@ -143,9 +152,6 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
 {
   mPulseGenerator->CheckTimeouts();
 
-//  if (!mReferenceTool) // no need to request extra transforms from tools to the tracker, its already done
-//    return;
-
   std::map<QString, IgstkToolPtr>::iterator it = mTools.begin();
   for(;it != mTools.end();++it)
   {
@@ -158,23 +164,43 @@ void IgstkToolManager::checkTimeoutsAndRequestTransformSlot()
   }
 }
 
-void IgstkToolManager::deviceInitializedSlot(bool value)
+void IgstkToolManager::deviceInitializedSlot(bool deviceInit)
 {
-  if(value)
+  int numberOfDevices = mTools.size() + 1; //+1 is the tracker
+
+  if(deviceInit)
   {
     mInitAnsweres ++;
 
-    int numberOfDevices = mTools.size() + 1; //+1 is the tracker
-
     if(mInitAnsweres == numberOfDevices)
+    {
+      mInternalInitialized = true;
       emit initialized(true);
+    }
   }else
   {
     mInitAnsweres--;
 
-    if(mInitAnsweres == 0)
-      emit initialized(false);
+    if(mInitAnsweres < numberOfDevices)
+    {
+      if(mInternalInitialized)
+      //{
+        //mInitAnsweres = 0;
+        emit initialized(false);
+      //}
+
+      mInternalInitialized = false;
+    }
   }
+}
+
+void IgstkToolManager::attachToolsWhenTrackerIsOpenSlot(bool open)
+{
+  if(!open)
+    return;
+
+  disconnect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+  mTracker->attachTools(mTools);
 }
 
 }
