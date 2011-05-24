@@ -166,10 +166,16 @@ void ToolManager::configure()
 void ToolManager::trackerConfiguredSlot(bool on)
 {
   if(!on)
-    return; //do nothing if deconfigured
+  {
+    this->deconfigure();
+    return;
+  }
 
   if(!mTrackerThread)
+  {
+    ssc::messageManager()->sendDebug("Received a configured signal in ToolManager, but we don't have a mTrackerThread, this should never happen, contact programmer.");
     return;
+  }
 
   //new all tools
   std::map<QString, IgstkToolPtr> igstkTools = mTrackerThread->getTools();
@@ -190,12 +196,10 @@ void ToolManager::trackerConfiguredSlot(bool on)
         connect(tool.get(), SIGNAL(toolVisible(bool)), this, SLOT(dominantCheckSlot()));
     }
     else
-    {
       ssc::messageManager()->sendWarning("Creation of the cxTool "+it->second->getUid()+" failed.");
-    }
   }
 
-  // debug: give the manual tool properties from the first nonmanual tool. Nice for testing tools
+  // debug: give the manual tool properties from the first non-manual tool. Nice for testing tools
   if (settings()->value("giveManualToolPhysicalProperties").toBool())
   {
     for (ssc::ToolManager::ToolMap::iterator iter=mTools.begin(); iter!=mTools.end(); ++iter)
@@ -233,12 +237,9 @@ void ToolManager::deconfigure()
       mTrackerThread->terminate();
       mTrackerThread->wait(); // forever or until dead thread
     }
+    QObject::disconnect(mTrackerThread.get());
+    mTrackerThread.reset();
   }
-  else
-    return;
-
-  QObject::disconnect(mTrackerThread.get());
-  mTrackerThread.reset();
 
   this->setDominantTool(this->getManualTool()->getUid());
 
