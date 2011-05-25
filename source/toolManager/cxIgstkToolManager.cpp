@@ -124,10 +124,10 @@ void IgstkToolManager::initializeSlot(bool on)
 {
   if(on)
   {
-    if(!mTracker->isOpen())
+    if(!mTracker->isInitialized())
     {
+      connect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(attachToolsWhenTrackerIsInitializedSlot(bool)));
       mTracker->open();
-      connect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
     }else
       mTracker->attachTools(mTools);
   }else
@@ -194,12 +194,12 @@ void IgstkToolManager::deviceInitializedSlot(bool deviceInit)
   }
 }
 
-void IgstkToolManager::attachToolsWhenTrackerIsOpenSlot(bool open)
+void IgstkToolManager::attachToolsWhenTrackerIsInitializedSlot(bool open)
 {
   if(!open)
     return;
 
-  disconnect(mTracker.get(), SIGNAL(open(bool)), this, SLOT(attachToolsWhenTrackerIsOpenSlot(bool)));
+  disconnect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(attachToolsWhenTrackerIsInitializedSlot(bool)));
   mTracker->attachTools(mTools);
 }
 
