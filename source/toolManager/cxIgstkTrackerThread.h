@@ -41,14 +41,15 @@ signals:
   void configured(bool on);
   void initialized(bool on); ///< system is initialized
   void tracking(bool on);
+  void error();
 
   void requestInitialize(bool on); ///< internal signal
   void requestTrack(bool on); ///< internal signal
 
-private slots:
-
 private:
   virtual void run();
+  void configure();
+  void deconfigure();
 
   IgstkTracker::InternalStructure mInitTrackerStructure;
   std::vector<IgstkTool::InternalStructure> mInitToolStructures;
