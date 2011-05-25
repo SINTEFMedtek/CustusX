@@ -45,6 +45,9 @@ USFrameData::USFrameData(ImagePtr inputFrameData, bool angio)
 
 vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
 {
+  // Some of the code here is borrowed from the vtk examples:
+  // http://public.kitware.com/cgi-bin/viewcvs.cgi/*checkout*/Examples/Build/vtkMy/Imaging/vtkImageFoo.cxx?root=VTK&content-type=text/plain
+
   vtkImageDataPtr inData = inputFrameData->getBaseVtkImageData();
   vtkImageDataPtr outData = inputFrameData->getGrayScaleBaseVtkImageData();
   int numComp = inData->GetNumberOfScalarComponents();
@@ -57,10 +60,13 @@ vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
 
   int* outExt = outData->GetExtent();
 
-  unsigned char *inPtr = static_cast<unsigned char*>(inData->GetScalarPointerForExtent(outExt));
-  unsigned char *outPtr = static_cast<unsigned char*>(outData->GetScalarPointerForExtent(outExt));
+//  unsigned char *inPtr = static_cast<unsigned char*>(inData->GetScalarPointerForExtent(outExt));
+//  unsigned char *outPtr = static_cast<unsigned char*>(outData->GetScalarPointerForExtent(outExt));
+  unsigned char *inPtr = static_cast<unsigned char*>(inData->GetScalarPointer());
+  unsigned char *outPtr = static_cast<unsigned char*>(outData->GetScalarPointer());
 
-  int rowLength = (outExt[1] - outExt[0]+1)*inData->GetNumberOfScalarComponents();
+//  int rowLength = (outExt[1] - outExt[0]+1)*inData->GetNumberOfScalarComponents();
+  int maxX = outExt[1] - outExt[0];
   int maxY = outExt[3] - outExt[2];
   int maxZ = outExt[5] - outExt[4];
 //  target = (unsigned long)((maxZ+1)*(maxY+1)/50.0);
@@ -69,14 +75,20 @@ vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
   // Get increments to march through data
   vtkIdType inIncX, inIncY, inIncZ;
   vtkIdType outIncX, outIncY, outIncZ;
-  inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ);
-  outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ);
+  //The following may give some values if in and out have different extent???
+  inData->GetContinuousIncrements(outExt, inIncX, inIncY, inIncZ);     //Don't work?
+  outData->GetContinuousIncrements(outExt, outIncX, outIncY, outIncZ); //Don't work?
+  std::cout << "outExt: " << outExt[0] << " " << outExt[1] << " " << outExt[2] << " " << outExt[3] << " " << outExt[4] << " " << outExt[5] << endl;
+//  std::cout << "outIncX: " << outIncX << " outIncY: " << outIncY << " outIncZ: " << outIncZ << std::endl;
+//  std::cout << "inIncX: " << inIncX << " inIncY: " << inIncY << " inIncZ: " << inIncZ << std::endl;
 
-  // Loop through ouput pixels
+  // Loop through output pixels
 
-  for (int idxZ = 0; idxZ <= maxZ; idxZ++)
+  int idxZ, idxY, idxR;
+
+  for (idxZ = 0; idxZ <= maxZ; idxZ++)
     {
-    for (int idxY = 0; /*!self->AbortExecute &&*/ idxY <= maxY; idxY++)
+    for (idxY = 0; /*!self->AbortExecute &&*/ idxY <= maxY; idxY++)
       {
 //      if (!id)
 //        {
@@ -86,22 +98,31 @@ vtkImageDataPtr USFrameData::useAngio(ImagePtr inputFrameData)
 //          }
 //        count++;
 //        }
-      for (int idxR = 0; idxR < rowLength; idxR++)
+//      for (int idxR = 0; idxR < rowLength; idxR++)
+      for (idxR = 0; idxR < maxX; idxR++)//Look at 3 scalar components at the same time (RGB)
         {
         // Pixel operation. Add foo. Dumber would be impossible.
 //        *outPtr = (OT)((float)(*inPtr) + foo);
-        if ((*inPtr) == (*(inPtr+1)) == (*(inPtr+2)))
-          *outPtr = 0;
+        if (((*inPtr) == (*(inPtr+1))) &&
+            ((*inPtr) == (*(inPtr+2))))
+        {
+          //std::cout << "idxZ: " << idxZ << " idxY: " << idxY << " idxR: " << idxR << std::endl;
+          (*outPtr) = 0;
+          (*(outPtr+1)) = 0;
+          (*(outPtr+2)) = 0;
+        }
         else
         {}//Assume the outVolume is treated with the luminance filter first
+//        outPtr++;
+//        inPtr++;
         outPtr++;
-        inPtr++;
+        inPtr += 3;
         }
-      outPtr += outIncY;
-      inPtr += inIncY;
+//      outPtr += outIncY;
+//      inPtr += inIncY;
       }
-    outPtr += outIncZ;
-    inPtr += inIncZ;
+//    outPtr += outIncZ;
+//    inPtr += inIncZ;
     }
 
   return outData;
