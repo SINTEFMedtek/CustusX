@@ -108,6 +108,7 @@ signals:
   void initialized(bool);
   void open(bool);
   void tracking(bool);
+  void error();
 
 protected:
   typedef itk::ReceptorMemberCommand<IgstkTracker> ObserverType;
@@ -119,6 +120,7 @@ protected:
   void internalOpen(bool value);
   void internalInitialized(bool value);
   void internalTracking(bool value);
+  void internalError(bool value);
 
   void shutdown(); ///< shuts down the tracker, made to be used when an unrecoverable error occures
 

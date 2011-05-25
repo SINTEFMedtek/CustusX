@@ -39,21 +39,31 @@ void IgstkTrackerThread::track(bool on)
 
 void IgstkTrackerThread::run()
 {
-  // configure
-  mManager.reset(new IgstkToolManager(mInitTrackerStructure, mInitToolStructures, mInitReferenceToolStructure));
-  connect(mManager.get(), SIGNAL(initialized(bool)), this, SIGNAL(initialized(bool)));
-  connect(mManager.get(), SIGNAL(tracking(bool)),    this, SIGNAL(tracking(bool)));
-  connect(this, SIGNAL(requestInitialize(bool)), mManager.get(), SLOT(initializeSlot(bool)));
-  connect(this, SIGNAL(requestTrack(bool)), mManager.get(), SLOT(trackSlot(bool)));
-
-  emit configured(true);
+  this->configure();
 
   // run event loop
   this->exec();
 
-  // cleanup/deconfigure
+  this->deconfigure();
+}
+
+void IgstkTrackerThread::configure()
+{
+  mManager.reset(new IgstkToolManager(mInitTrackerStructure, mInitToolStructures, mInitReferenceToolStructure));
+  connect(mManager.get(), SIGNAL(initialized(bool)), this, SIGNAL(initialized(bool)));
+  connect(mManager.get(), SIGNAL(tracking(bool)),    this, SIGNAL(tracking(bool)));
+  connect(mManager.get(), SIGNAL(error()),    this, SIGNAL(error()));
+  connect(this, SIGNAL(requestInitialize(bool)), mManager.get(), SLOT(initializeSlot(bool)));
+  connect(this, SIGNAL(requestTrack(bool)), mManager.get(), SLOT(trackSlot(bool)));
+
+  emit configured(true);
+}
+
+void IgstkTrackerThread::deconfigure()
+{
   QObject::disconnect(mManager.get());
   mManager.reset();
+
   emit configured(false);
 }
 
