@@ -1,6 +1,8 @@
 #ifndef CXFRAMETREEWIDGET_H_
 #define CXFRAMETREEWIDGET_H_
 
+#include "cxBaseWidget.h"
+
 #include <map>
 #include <string>
 #include <QWidget>
@@ -19,14 +21,16 @@ namespace cx
  *\brief Widget for displaying the FrameForest object
  *
  *\date Sep 23, 2010
- *\author: christiana
+ *\author: Christian Askeland, SINTEF
  */
-class FrameTreeWidget : public QWidget
+class FrameTreeWidget : public BaseWidget
 {
   Q_OBJECT
 public:
   FrameTreeWidget(QWidget* parent);
   ~FrameTreeWidget() {}
+
+  virtual QString defaultWhatsThis() const;
 
 private:
   QTreeWidget* mTreeWidget;
