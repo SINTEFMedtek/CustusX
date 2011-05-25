@@ -1,6 +1,8 @@
 #ifndef CXIGTLINKWIDGET_H_
 #define CXIGTLINKWIDGET_H_
 
+#include "cxBaseWidget.h"
+
 #include <vector>
 #include <QtGui>
 #include "sscDoubleWidgets.h"
@@ -15,18 +17,20 @@ typedef boost::shared_ptr<class RTSourceManager> IGTLinkConnectionPtr;
 
 /**
  * \class IGTLinkWidget
- * GUI for setup of a IGTLink connection.
+ * \brief GUI for setup of a IGTLink connection.
  *
  * \date 2010.10.27
  * \author: Christian Askeland, SINTEF
  */
-class IGTLinkWidget : public QWidget
+class IGTLinkWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   IGTLinkWidget(QWidget* parent);
   virtual ~IGTLinkWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 private slots:
   void toggleLaunchServer();

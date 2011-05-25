@@ -23,13 +23,11 @@ namespace cx
 
 
 IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
-    QWidget(parent)
+    BaseWidget(parent, "IGTLinkWidget", "IGTLink Client")
 {
   mView = NULL;
   mRenderTimer = NULL;
 
-  this->setObjectName("IGTLinkWidget");
-  this->setWindowTitle("IGTLink Client");
   this->resize(100, 600);
 
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
@@ -90,6 +88,15 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   toptopLayout->addStretch();
 
   this->dataChanged();
+}
+
+QString IGTLinkWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3><Setup IGTLink connection.</h3>"
+      "<p>Lets you set up a connection to a streaming server using IGTLink.</p>"
+      "<p><i></i></p>"
+      "</html>";
 }
 
 QProcess* IGTLinkWidget::getServer()
