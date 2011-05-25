@@ -45,6 +45,7 @@
 #include "cxVisualizationMethodsWidget.h"
 #include "cxSegmentationMethodsWidget.h"
 #include "cxCalibrationMethodsWidget.h"
+#include "cxToolManagerWidget.h"
 
 namespace cx
 {
@@ -110,6 +111,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mNavigationWidget, "Properties");
   this->addAsDockWidget(mConsoleWidget, "Utility");
   this->addAsDockWidget(mFrameTreeWidget, "Browsing");
+  this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
 
