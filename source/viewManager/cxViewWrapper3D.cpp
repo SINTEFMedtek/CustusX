@@ -149,7 +149,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
   //Stereo
-  mView->getRenderWindow()->StereoCapableWindowOn();
+//  mView->getRenderWindow()->StereoCapableWindowOn(); // Moved to cxView3D
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
   //Init 3D stereo from settings
   this->setStereoType(settings()->value("View3D/stereoType").toInt());
