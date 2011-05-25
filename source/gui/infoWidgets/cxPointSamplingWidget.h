@@ -1,11 +1,7 @@
-/*
- * cxToolWidget.h
- *
- *  Created on: Apr 22, 2010
- *      Author: christiana
- */
 #ifndef CXPOINTSAMPLINGWIDGET_H_
 #define CXPOINTSAMPLINGWIDGET_H_
+
+#include "cxBaseWidget.h"
 
 #include <vector>
 #include <QtGui>
@@ -25,13 +21,15 @@ namespace cx
  * \date 2010.05.05
  * \author: Christian Askeland, SINTEF
  */
-class PointSamplingWidget : public QWidget
+class PointSamplingWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   PointSamplingWidget(QWidget* parent);
   virtual ~PointSamplingWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 signals:
 
