@@ -1,10 +1,3 @@
-/*
- * cxActiveToolWidget.h
- *
- *  Created on: May 4, 2011
- *      Author: christiana
- */
-
 #ifndef CXACTIVETOOLWIDGET_H_
 #define CXACTIVETOOLWIDGET_H_
 
@@ -12,15 +5,22 @@
 
 namespace cx
 {
-
-/** Widget that contains a select active tool combo box.
+/**
+ * \class ActiveToolWidget
+ *
+ * \brief Widget that contains a select active tool combo box
+ *
+ * \date May 4, 2011
+ * \author Christian Askeland, SINTEF
  */
-class ActiveToolWidget : public QWidget
+class ActiveToolWidget : public BaseWidget
 {
   Q_OBJECT
 public:
   ActiveToolWidget(QWidget* parent);
   virtual ~ActiveToolWidget() {}
+
+  virtual QString defaultWhatsThis() const;
 };
 
 }
