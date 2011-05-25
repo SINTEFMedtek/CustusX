@@ -25,4 +25,13 @@ QWidget(parent)
   layout->addWidget(combo);
 }
 
+QString ActiveToolWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Select active tool.</h3>"
+      "<p>Lets you select which tool should be the active tool.</p>"
+      "<p><i></i></p>"
+      "</html>";
+}
+
 }

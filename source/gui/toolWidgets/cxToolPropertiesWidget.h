@@ -1,14 +1,9 @@
-/*
- * cxToolWidget.h
- *
- *  Created on: Apr 22, 2010
- *      Author: christiana
- */
 #ifndef CXTOOLPROPERTIESWIDGET_H_
 #define CXTOOLPROPERTIESWIDGET_H_
 
+#include "cxBaseWidget.h"
+
 #include <vector>
-//#include <QtGui>
 #include "sscForwardDeclarations.h"
 #include "sscDoubleWidgets.h"
 #include "sscStringDataAdapter.h"
@@ -28,13 +23,15 @@ namespace cx
  * \date 2010.04.22
  * \author: Christian Askeland, SINTEF
  */
-class ToolPropertiesWidget : public QWidget
+class ToolPropertiesWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   ToolPropertiesWidget(QWidget* parent);
   virtual ~ToolPropertiesWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 signals:
 
