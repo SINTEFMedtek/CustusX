@@ -1,15 +1,7 @@
-/**
- * cxIgstkToolManager.cpp
- *
- * \brief
- *
- * \date Mar 17, 2011
- * \author Janne Beate Bakeng, SINTEF
- */
-
 #include <cxIgstkToolManager.h>
 
 #include "sscMessageManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
@@ -25,6 +17,7 @@ IgstkToolManager::IgstkToolManager(IgstkTracker::InternalStructure trackerStruct
   this->setReferenceAndTrackerOnTools();
 
   connect(mTracker.get(), SIGNAL(tracking(bool)), this, SIGNAL(tracking(bool)));
+  connect(mTracker.get(), SIGNAL(error()), this, SIGNAL(error()));
 
   connect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(deviceInitializedSlot(bool)));
   connect(mTracker.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
@@ -124,19 +117,19 @@ void IgstkToolManager::initializeSlot(bool on)
 {
   if(on)
   {
-    if(!mTracker->isInitialized())
-    {
+//    if(!mTracker->isInitialized())
+//    {
       connect(mTracker.get(), SIGNAL(initialized(bool)), this, SLOT(attachToolsWhenTrackerIsInitializedSlot(bool)));
       mTracker->open();
-    }else
-      mTracker->attachTools(mTools);
+//    }else
+//      mTracker->attachTools(mTools);
   }else
   {
-    if(mTracker->isOpen())
-    {
+//    if(mTracker->isInitialized())
+//    {
       mTracker->detachTools(mTools); //not sure we have to detach all tools before we close, read NDI manual
       mTracker->close();
-    }
+//    }
   }
 }
 
@@ -184,12 +177,11 @@ void IgstkToolManager::deviceInitializedSlot(bool deviceInit)
     if(mInitAnsweres < numberOfDevices)
     {
       if(mInternalInitialized)
-      //{
-        //mInitAnsweres = 0;
+      {
+        mInitAnsweres = 0;
+        mInternalInitialized = false;
         emit initialized(false);
-      //}
-
-      mInternalInitialized = false;
+      }
     }
   }
 }
@@ -203,4 +195,14 @@ void IgstkToolManager::attachToolsWhenTrackerIsInitializedSlot(bool open)
   mTracker->attachTools(mTools);
 }
 
+void IgstkToolManager::printStatus()
+{
+  std::cout << "mInternalInitialized "<< mInternalInitialized << std::endl;
+  std::cout << "mInitAnsweres "<< mInitAnsweres << std::endl;
+  std::cout << "mTracker->isValid() "<< mTracker->isValid() << std::endl;
+  std::cout << "mTracker->isOpen() "<< mTracker->isOpen() << std::endl;
+  std::cout << "mTracker->isInitialized() "<< mTracker->isInitialized() << std::endl;
+  std::cout << "mTracker->isTracking() "<< mTracker->isTracking() << std::endl;
+  std::cout << "mTools.size() "<< string_cast(mTools.size()) << std::endl;
+}
 }

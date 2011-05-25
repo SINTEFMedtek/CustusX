@@ -128,20 +128,25 @@ IgstkTracker::TrackerType* IgstkTracker::getPointer() const
 
 void IgstkTracker::open()
 {
-  igstk::SerialCommunication::ResultType result = igstk::SerialCommunication::FAILURE;
-  for(int i=0; i<5; ++i)
-  {
-    result = mCommunication->OpenCommunication();
-    if(result == igstk::SerialCommunication::SUCCESS)
-      break;
-  }
+//  igstk::SerialCommunication::ResultType result = igstk::SerialCommunication::FAILURE;
+//  for(int i=0; i<5; ++i)
+//  {
+//    result = mCommunication->OpenCommunication();
+//    if(result == igstk::SerialCommunication::SUCCESS)
+//      break;
+//    else
+//      ssc::messageManager()->sendWarning("Could not open communication.");
+//  }
+  if(mCommunication->OpenCommunication() == false)
+    ssc::messageManager()->sendWarning("Could not open communication.");
   mTracker->RequestOpen();
 }
 
 void IgstkTracker::close()
 {
   mTracker->RequestClose();
-  mCommunication->CloseCommunication();
+  if(mCommunication->CloseCommunication() == false)
+    ssc::messageManager()->sendWarning("Could not close communication.");
 }
 
 void IgstkTracker::attachTools(std::map<QString, IgstkToolPtr> tools)
@@ -254,34 +259,46 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
     // this seems to appear after every transmit (several times/second)
     //ssc::messageManager()->sendInfo(mUid+" set up communication correctly."); //SPAM
   }
+  //coordinate system success
+  else if(igstk::CoordinateSystemSetTransformEvent().CheckEvent(&event))
+  {
+    //ssc::messageManager()->sendInfo();
+  }
   //failures
   else if (igstk::InvalidRequestErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendWarning(mUid+" received an invalid request. This means that the internal igstk tracker did not accept the request. Do not know which request.");
+    this->shutdown();
   }
   else if (igstk::TrackerOpenErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not open.");
+    //this->shutdown();
   }
   else if (igstk::TrackerCloseErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not close.");
+    //this->shutdown();
   }
   else if (igstk::TrackerInitializeErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not initialize.");
+    //this->shutdown();
   }
   else if (igstk::TrackerStartTrackingErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not start tracking.");
+    //this->shutdown();
   }
   else if (igstk::TrackerStopTrackingErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not stop tracking.");
+    //this->shutdown();
   }
   else if (igstk::TrackerUpdateStatusErrorEvent().CheckEvent(&event))
   {
     ssc::messageManager()->sendError(mUid+" could not update.");
+    //this->shutdown();
   }
   //communication failure
   else if (igstk::InputOutputErrorEvent().CheckEvent(&event))
@@ -304,6 +321,10 @@ void IgstkTracker::trackerTransformCallback(const itk::EventObject &event)
   {
     ssc::messageManager()->sendError(mUid+" could not close communication with tracker.");
     this->shutdown();
+  }
+  else
+  {
+    event.Print(std::cout);
   }
 }
 
@@ -352,15 +373,22 @@ void IgstkTracker::internalTracking(bool value)
   emit tracking(mTracking);
 }
 
+void IgstkTracker::internalError(bool value)
+{
+  ssc::messageManager()->sendWarning(mUid+" experienced a unrecoverable error, reconfiguration is required.");
+  emit error();
+}
+
 void IgstkTracker::shutdown()
 {
+  mCommunication->CloseCommunication();
+
   //because the tracker now is closed we don't get the callback events so we need to reset the trackers internal
   //status manually
   this->internalTracking(false);
   this->internalInitialized(false);
   this->internalOpen(false);
-
-  this->close();
+  this->internalError(true);
 }
 
 }//namespace cx

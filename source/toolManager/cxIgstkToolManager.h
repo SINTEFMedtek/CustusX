@@ -10,23 +10,15 @@
 #include "cxTool.h"
 #include "cxIgstkTool.h"
 
-/**
- * cxIgstkToolManager.h
- *
- * \brief
- *
- * \date Mar 17, 2011
- * \author jbake
- */
 namespace cx
 {
 
 /**
- * cxIgstkToolManager.h
+ * \class IgstkToolManager
  *
  * \brief
  *
- * \date Mar 16, 2011
+ * \date Mar 17, 2011
  * \author Janne Beate Bakeng, SINTEF
  * \author Christian Askeland, SINTEF
  */
@@ -44,6 +36,7 @@ public:
 signals:
   void initialized(bool on); ///< when all trackers and tools are initialized == true, else false
   void tracking(bool on);
+  void error();
 
 public slots:
   void initializeSlot(bool on); ///< connects to the hardware
@@ -60,6 +53,8 @@ private:
   void createTools(std::vector<IgstkTool::InternalStructure> toolStructures, IgstkTool::InternalStructure referenceToolStructure);
   IgstkToolPtr addIgstkTools(IgstkTool::InternalStructure& toolStructure);
   void setReferenceAndTrackerOnTools();
+
+  void printStatus(); ///< just for debugging
 
   TrackerPtr mTracker;
   QMutex mToolMutex; ///< protects mTools

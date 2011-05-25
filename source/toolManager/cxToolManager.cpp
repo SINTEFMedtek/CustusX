@@ -157,6 +157,7 @@ void ToolManager::configure()
   connect(mTrackerThread.get(), SIGNAL(configured(bool)), this, SLOT(trackerConfiguredSlot(bool)));
   connect(mTrackerThread.get(), SIGNAL(initialized(bool)), this, SLOT(initializedSlot(bool)));
   connect(mTrackerThread.get(), SIGNAL(tracking(bool)), this, SLOT(trackerTrackingSlot(bool)));
+  connect(mTrackerThread.get(), SIGNAL(error()), this, SLOT(deconfigure()));
 
   //start threads
   if(mTrackerThread)
@@ -269,6 +270,8 @@ void ToolManager::initialize()
 
   if(mTrackerThread)
     mTrackerThread->initialize(true);
+  else
+    ssc::messageManager()->sendError("Cannot initialize the tracking system because the tracking thread does not exist.");
 }
 
 void ToolManager::uninitialize()
