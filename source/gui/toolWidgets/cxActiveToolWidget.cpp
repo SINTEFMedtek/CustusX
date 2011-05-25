@@ -1,10 +1,3 @@
-/*
- * cxActiveToolWidget.cpp
- *
- *  Created on: May 4, 2011
- *      Author: christiana
- */
-
 #include <cxActiveToolWidget.h>
 
 #include <QVBoxLayout>
@@ -15,7 +8,7 @@ namespace cx
 {
 
 ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
-QWidget(parent)
+    BaseWidget(parent, "ActiveToolWidget", "Active Tool")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   this->setObjectName("ActiveToolWidget");
