@@ -3,6 +3,8 @@
 
 #include "cxBaseWidget.h"
 
+class QPushButton;
+
 namespace cx
 {
 
@@ -23,6 +25,25 @@ public:
   virtual ~ToolManagerWidget();
 
   virtual QString defaultWhatsThis() const;
+
+private slots:
+  void configureClickedSlot(bool);
+  void deconfigureClickedSlot(bool);
+  void initializeClickedSlot(bool);
+  void uninitializeClickedSlot(bool);
+  void startTrackingClickedSlot(bool);
+  void stopTrackingClickedSlot(bool);
+
+  void updateButtonStatusSlot(); ///< makes sure that the buttons represent the status of the toolmanager
+
+private:
+
+  QPushButton* mConfigureButton;
+  QPushButton* mDeConfigureButton;
+  QPushButton* mInitializeButton;
+  QPushButton* mUnInitializeButton;
+  QPushButton* mStartTrackingButton;
+  QPushButton* mStopTrackingButton;
 };
 
 }
