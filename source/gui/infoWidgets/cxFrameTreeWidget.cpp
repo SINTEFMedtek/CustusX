@@ -1,10 +1,3 @@
-/*
- * cxFrameTreeWidget.cpp
- *
- *  Created on: Sep 23, 2010
- *      Author: christiana
- */
-
 #include "cxFrameTreeWidget.h"
 
 #include <QVBoxLayout>
@@ -15,13 +8,10 @@
 namespace cx
 {
 
-
 FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
-  QWidget(parent)
+  BaseWidget(parent, "FrameTreeWidget", "Frame Tree")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
-  this->setObjectName("FrameTreeWidget");
-  this->setWindowTitle("Frame Tree");
 
   //layout->setMargin(0);
   mTreeWidget = new QTreeWidget(this);
@@ -30,6 +20,15 @@ FrameTreeWidget::FrameTreeWidget(QWidget* parent) :
 
   // TODO this must also listen to all changed() in all data
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataLoadedSlot()));
+}
+
+QString FrameTreeWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Frame dependencies display.</h3>"
+      "<p>Lets you look at the frame dependencies between different data.</p>"
+      "<p><i></i></p>"
+      "</html>";
 }
 
 void FrameTreeWidget::dataLoadedSlot()

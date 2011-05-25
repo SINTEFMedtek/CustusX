@@ -229,13 +229,10 @@ QModelIndex BrowserItemModel::parent(const QModelIndex& index) const
 
 
 BrowserWidget::BrowserWidget(QWidget* parent) :
-    QWidget(parent),
+    BaseWidget(parent, "BrowserWidget", "Browser"),
     //mTreeWidget(new QTreeWidget(this)),
     mVerticalLayout(new QVBoxLayout(this))
 {
-  this->setObjectName("BrowserWidget");
-  this->setWindowTitle("Browser");
-
   mModel = new BrowserItemModel(this);
   connect(mModel, SIGNAL(hasBeenReset()), this, SLOT(resetView()));
 
@@ -250,6 +247,16 @@ BrowserWidget::BrowserWidget(QWidget* parent) :
 BrowserWidget::~BrowserWidget()
 {
 }
+
+QString BrowserWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Browser</h3>"
+      "<p>Lets you browse different aspects of the system.</p>"
+      "<p><i></i></p>"
+      "</html>";
+}
+
 
 void BrowserWidget::showEvent(QShowEvent* event)
 {
