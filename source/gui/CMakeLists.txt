@@ -78,6 +78,7 @@ SET(cxProject_MOC_HDRS
     #----------------------
     toolWidgets/cxToolPropertiesWidget.h
     toolWidgets/cxActiveToolWidget.h
+    toolWidgets/cxToolManagerWidget.h
     #----------------------
     utilities/cxDoubleSpanSlider.h
     utilities/cxBaseWidget.h
@@ -238,6 +239,8 @@ SET(${LIBNAME}_SRCS
     toolWidgets/cxToolPropertiesWidget.cpp
     toolWidgets/cxActiveToolWidget.h
     toolWidgets/cxActiveToolWidget.cpp
+    toolWidgets/cxToolManagerWidget.h
+    toolWidgets/cxToolManagerWidget.cpp
     #----------------------    
     utilities/cxDoubleSpanSlider.h
     utilities/cxDoubleSpanSlider.cpp
