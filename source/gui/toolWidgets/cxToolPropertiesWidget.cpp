@@ -1,10 +1,3 @@
-/*
- * cxToolWidget.cpp
- *
- *  Created on: Apr 22, 2010
- *      Author: christiana
- */
-
 #include "cxToolPropertiesWidget.h"
 
 #include <QTreeWidget>
@@ -34,11 +27,8 @@ namespace cx
 
   
 ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
-  QWidget(parent)
+  BaseWidget(parent, "ToolPropertiesWidget", "Tool Properties")
 {
-  this->setObjectName("ToolPropertiesWidget");
-  this->setWindowTitle("Tool Properties");
-
 //  ssc::Frame3D().test();
 
   //layout
@@ -133,6 +123,15 @@ ToolPropertiesWidget::ToolPropertiesWidget(QWidget* parent) :
 
 ToolPropertiesWidget::~ToolPropertiesWidget()
 {
+}
+
+QString ToolPropertiesWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Tool Properties</h3>"
+      "<p>TODO.</p>"
+      "<p><i></i></p>"
+      "</html>";
 }
 
 void ToolPropertiesWidget::manualToolChanged()
