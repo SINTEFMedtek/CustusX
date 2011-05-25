@@ -1,7 +1,7 @@
 #ifndef CXACTIVETOOLWIDGET_H_
 #define CXACTIVETOOLWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 
 namespace cx
 {
