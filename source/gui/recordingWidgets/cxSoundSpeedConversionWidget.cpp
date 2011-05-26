@@ -13,7 +13,7 @@ namespace cx
 {
 
 SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
-    QWidget(parent),
+    BaseWidget(parent, "SoundSpeedConverterWidget", "Sound Speed Converter"),
     mScannerSoundSpeed(1540.0),
     mApplyButton(new QPushButton("Apply compensation")),
     mResetButton(new QPushButton("Reset")),
@@ -50,6 +50,15 @@ SoundSpeedConverterWidget::SoundSpeedConverterWidget(QWidget* parent) :
 
 SoundSpeedConverterWidget::~SoundSpeedConverterWidget()
 {}
+
+QString SoundSpeedConverterWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Speed of sound compensation.</h3>"
+    "<p>Calculates a factor to compensate for the difference in sound of speed which a ultrasound machine expects and the medium you are doing ultrasound on.</p>"
+    "<p><i></i></p>"
+    "</html>";
+}
 
 void SoundSpeedConverterWidget::applySoundSpeedCompensationFactorSlot()
 {

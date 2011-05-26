@@ -25,12 +25,9 @@ namespace cx
 //---------------------------------------------------------
 
 TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
-  QWidget(parent)
+  BaseWidget(parent, "TransferFunction2DColorWidget", "2D Color")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
-
-  this->setObjectName("TransferFunction2DColorWidget");
-  this->setWindowTitle("2D Color");
 
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
@@ -55,10 +52,17 @@ TransferFunction2DColorWidget::TransferFunction2DColorWidget(QWidget* parent) :
   layout->addLayout(gridLayout);
   new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
   new ssc::SliderGroupWidget(this, mDataLevel,  gridLayout, 1);
-//  mLayout->addWidget(new TransferFunctionPresetWidget(this));
-//  mLayout->addStretch();
 
   this->setLayout(layout);
+}
+
+QString TransferFunction2DColorWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>2D color transfer function.</h3>"
+    "<p>Lets you set a 2D color transfer function.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void TransferFunction2DColorWidget::activeImageChangedSlot()
@@ -82,12 +86,9 @@ void TransferFunction2DColorWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 
 TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent) :
-  QWidget(parent)
+  BaseWidget(parent, "TransferFunction2DOpacityWidget", "2D Opacity")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
-
-  this->setObjectName("TransferFunction2DOpacityWidget");
-  this->setWindowTitle("2D Opacity");
 
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
@@ -109,6 +110,15 @@ TransferFunction2DOpacityWidget::TransferFunction2DOpacityWidget(QWidget* parent
   new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(layout);
+}
+
+QString TransferFunction2DOpacityWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>2D opacity transfer function.</h3>"
+    "<p>Lets you set a 2D opacity transfer function.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void TransferFunction2DOpacityWidget::activeImageChangedSlot()
@@ -133,11 +143,8 @@ void TransferFunction2DOpacityWidget::activeImageChangedSlot()
 
 
 ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
-    QWidget(parent)
+    BaseWidget(parent, "ImagePropertiesWidget", "Slice Properties")
 {
-  this->setObjectName("ImagePropertiesWidget");
-  this->setWindowTitle("Slice Properties");
-
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
 
   toptopLayout->addWidget(new ssc::LabeledComboBoxWidget(this, ActiveImageStringDataAdapter::New()));
@@ -166,6 +173,15 @@ ImagePropertiesWidget::ImagePropertiesWidget(QWidget* parent) :
 
 ImagePropertiesWidget::~ImagePropertiesWidget()
 {}
+
+QString ImagePropertiesWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Image slice properties.</h3>"
+    "<p>Lets you set properties on a 2d image slice.</p>"
+    "<p><i></i></p>"
+    "</html>";
+}
 
 void ImagePropertiesWidget::showEvent(QShowEvent* event)
 {

@@ -1,35 +1,32 @@
-/*
- * cxCroppingWidget.h
- *
- *  Created on: Aug 20, 2010
- *      Author: christiana
- */
-
 #ifndef CXCROPPINGWIDGET_H_
 #define CXCROPPINGWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 #include "sscForwardDeclarations.h"
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
-class QCheckBox;
 #include "cxDoubleSpanSlider.h"
 
 typedef boost::shared_ptr<class InteractiveCropper> InteractiveCropperPtr;
-
+class QCheckBox;
 
 namespace cx
 {
-
-
 /**
+ * \class CroppingWidget
  *
+ * \date  Aug 20, 2010
+ * \author Christian Askeland, SINTEF
  */
-class CroppingWidget : public QWidget
+
+class CroppingWidget : public BaseWidget
 {
   Q_OBJECT
+
 public:
   CroppingWidget(QWidget* parent);
+  virtual QString defaultWhatsThis() const;
+
 private:
   InteractiveCropperPtr mInteractiveCropper;
 
