@@ -1,7 +1,7 @@
 #ifndef CXSOUNDSPEEDCONVERSIONWIDGET_H_
 #define CXSOUNDSPEEDCONVERSIONWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 #include "cxTool.h"
 
 class QPushButton;
@@ -17,13 +17,15 @@ namespace cx {
  * \date Feb 11, 2011
  * \author Janne Beate Bakeng, SINTEF
  */
-class SoundSpeedConverterWidget : public QWidget
+class SoundSpeedConverterWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   SoundSpeedConverterWidget(QWidget* parent);
   ~SoundSpeedConverterWidget();
+
+  virtual QString defaultWhatsThis() const;
 
   double getSoundSpeedCompensationFactor(); ///< calculates the sound speed conversion factor
   double getWaterSoundSpeed(); ///< the sound speed in water given a temperatur
