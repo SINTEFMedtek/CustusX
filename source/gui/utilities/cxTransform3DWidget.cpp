@@ -1,10 +1,3 @@
-/*
- * cxAffineMatrixWidget.cpp
- *
- *  Created on: Mar 19, 2011
- *      Author: christiana
- */
-
 #include <cxTransform3DWidget.h>
 
 #include <QTextEdit>
@@ -33,11 +26,11 @@ public:
   QSize minimumSizeHint() const { return sizeHint(); }
   QSize sizeHint() const
   {
-  	ssc::Transform3D M = ssc::createTransformRotateX(M_PI_4) *
-  			ssc::createTransformRotateZ(M_PI_4) *
-  			ssc::createTransformTranslate(ssc::Vector3D(1,2,M_PI));
+    ssc::Transform3D M = ssc::createTransformRotateX(M_PI_4) *
+        ssc::createTransformRotateZ(M_PI_4) *
+        ssc::createTransformTranslate(ssc::Vector3D(1,2,M_PI));
 
-  	QString text = qstring_cast(M).split("\n")[0];
+    QString text = qstring_cast(M).split("\n")[0];
     QRect rect = QFontMetrics(this->font()).boundingRect(text);
     QSize s(rect.width()*1.1+5, 4*rect.height()*1.1+5);
     return s;
@@ -52,7 +45,6 @@ QAction* Transform3DWidget::createAction(QLayout* layout, QString iconName, QStr
   action->setToolTip(tip);
   connect(action, SIGNAL(triggered()), this, slot);
   QToolButton* button = new QToolButton();
-  //button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
   button->setDefaultAction(action);
   layout->addWidget(button);
   return action;
@@ -60,26 +52,18 @@ QAction* Transform3DWidget::createAction(QLayout* layout, QString iconName, QStr
 
 
 Transform3DWidget::Transform3DWidget(QWidget* parent) :
-    QWidget(parent)
+    BaseWidget(parent, "Transform3DWidget", "Transform 3D")
 {
-//  ssc::Frame3D().test();
-
   recursive = false;
+
   //layout
   QVBoxLayout* toptopLayout = new QVBoxLayout(this);
   toptopLayout->setMargin(4);
-//  mGroup = new QFrame;
-//  QHBoxLayout* topLayout = new QHBoxLayout;
-//  toptopLayout->addWidget(mGroup);
-//  mGroup->setLayout(topLayout);
-
-
   QHBoxLayout* mLayout = new QHBoxLayout;
   mLayout->setMargin(0);
   toptopLayout->addLayout(mLayout);
 
   mTextEdit = new MatrixTextEdit;
-//  mTextEdit->setVisible(false);
   mTextEdit->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Maximum);
   mTextEdit->setLineWrapMode(QTextEdit::NoWrap);
   mTextEdit->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -96,7 +80,6 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
 
   mLayout->addStretch();
 
-//  QGroupBox* aGroupBox = new QGroupBox("Angle", this);
   aGroupBox = new QFrame(this);
   QVBoxLayout* aLayout = new QVBoxLayout;
   aGroupBox->setLayout(aLayout);
@@ -104,7 +87,6 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   aGroupBox->setLineWidth(3);
   aLayout->setMargin(4);
   toptopLayout->addWidget(aGroupBox);
-//  aGroupBox->setFlat(false);
 
   this->addAngleControls("xAngle", "X Angle", 0, aLayout);
   this->addAngleControls("yAngle", "Y Angle", 1, aLayout);
@@ -127,6 +109,15 @@ Transform3DWidget::Transform3DWidget(QWidget* parent) :
   toptopLayout->addStretch();
 
   this->setEditable(false);
+}
+
+QString Transform3DWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Transform 3D</h3>"
+    "<p>Lets you display and manipulat an affine matrix, i.e. a rotation+translation matrix.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void Transform3DWidget::textEditChangedSlot()
@@ -201,8 +192,6 @@ void Transform3DWidget::addTranslationControls(QString uid, QString name, int in
 
 void Transform3DWidget::rotateSlot(QPointF delta, int index)
 {
-//  std::cout << "AffineMatrixWidget::rotateSlot " << index << " " << delta.x() << std::endl;
-
   double scale = M_PI_2;
   double factor = scale * delta.x();
   double current = mAngleAdapter[index]->getValue();
@@ -211,20 +200,12 @@ void Transform3DWidget::rotateSlot(QPointF delta, int index)
 
 void Transform3DWidget::translateSlot(QPointF delta, int index)
 {
-//  std::cout << "AffineMatrixWidget::translateSlot " << index << " " << delta.x() << std::endl;
-
   double scale = 20;
   double factor = scale * delta.x();
   double current = mTranslationAdapter[index]->getValue();
   mTranslationAdapter[index]->setValue(current + factor);
 }
 
-/*
-connect0<void()>(pushButton, SIGNAL(clicked()),
-   boost::bind(&IceProxy::Motors::MotorControl::move, motorControlPrx_.get());
-
-connect1<void(int)>(spinBox, SIGNAL(valueChanged(int)),
-    boost::bind(&IceProxy::Motors::MotorControl::setMotorMoveCounts, motorControlPrx_.get(), _1));*/
 
 Transform3DWidget::~Transform3DWidget()
 {
@@ -233,14 +214,12 @@ Transform3DWidget::~Transform3DWidget()
 void Transform3DWidget::setMatrix(const ssc::Transform3D& M)
 {
   mDecomposition.reset(M);
-//  mFrame = ssc::Frame3D::create(M);
   this->updateValues();
 }
 
 ssc::Transform3D Transform3DWidget::getMatrix() const
 {
   return mDecomposition.getMatrix();
-//  return mFrame.transform();
 }
 
 // http://en.wikipedia.org/wiki/Rotation_matrix
@@ -252,11 +231,9 @@ void Transform3DWidget::changedSlot()
     return;
   recursive = true;
   ssc::Vector3D xyz(mAngleAdapter[0]->getValue(),mAngleAdapter[1]->getValue(),mAngleAdapter[2]->getValue());
-//  mFrame.setEulerXYZ(xyz);
   mDecomposition.setAngles(xyz);
 
   ssc::Vector3D t(mTranslationAdapter[0]->getValue(),mTranslationAdapter[1]->getValue(),mTranslationAdapter[2]->getValue());
-//  mFrame.mPos = t;
   mDecomposition.setPosition(t);
 
   this->updateValues();
@@ -264,29 +241,22 @@ void Transform3DWidget::changedSlot()
   recursive = false;
 }
 
-
-
-
 void Transform3DWidget::updateValues()
 {
   QString M = qstring_cast(this->getMatrix());
-//  std::cout << "mTextEdit " << mTextEdit << " " << t << std::endl;
   mTextEdit->blockSignals(true);
   mTextEdit->setText(M);
   mTextEdit->blockSignals(false);
 
-//  ssc::Vector3D xyz = mFrame.getEulerXYZ();
   ssc::Vector3D xyz = mDecomposition.getAngles();
 
   mAngleAdapter[0]->setValue(xyz[0]);
   mAngleAdapter[1]->setValue(xyz[1]);
   mAngleAdapter[2]->setValue(xyz[2]);
 
-//  ssc::Vector3D t = mFrame.mPos;
   ssc::Vector3D t = mDecomposition.getPosition();
   mTranslationAdapter[0]->setValue(t[0]);
   mTranslationAdapter[1]->setValue(t[1]);
   mTranslationAdapter[2]->setValue(t[2]);
 }
-
 }
