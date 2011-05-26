@@ -400,8 +400,6 @@ void MainWindow::shootWindow()
 
 void MainWindow::toggleDebugModeSlot(bool checked)
 {
-  //maybe we also should hide all widget that are debug widget?
-
   QActionGroup* debugActionGroup;
   if(mWidgetGroupsMap.find("Debugging") != mWidgetGroupsMap.end())
   {
@@ -415,6 +413,14 @@ void MainWindow::toggleDebugModeSlot(bool checked)
   foreach(action, debugActions)
   {
     action->setVisible(checked);
+    for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
+    {
+      if(action == (*iter)->toggleViewAction())
+      {
+        if(!checked)
+          (*iter)->hide();
+      }
+    }
   }
 }
 
