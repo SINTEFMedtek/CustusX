@@ -14,7 +14,7 @@
 namespace cx
 {
 RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescription) :
-    QWidget(parent),
+    BaseWidget(parent, "RecordSessionWidget", "Record Session"),
     mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
@@ -23,9 +23,6 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
     mStopTimeMSec(-1),
     mPostProcessing(false)
 {
-  this->setObjectName("RecordSessionWidget");
-  this->setWindowTitle("Record Tracking");
-
   QVBoxLayout* layout = new QVBoxLayout(this);
   mDescriptionLabel = new QLabel("Description:");
   layout->addWidget(mInfoLabel);
@@ -38,6 +35,15 @@ RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescrip
   connect(mStartStopButton, SIGNAL(clicked(bool)), this, SLOT(startStopSlot(bool)));
   connect(mCancelButton, SIGNAL(clicked(bool)), this, SLOT(cancelSlot()));
   mCancelButton->setEnabled(false);
+}
+
+QString RecordSessionWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Record session.</h3>"
+    "<p>Lets you record a session of some kind.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void RecordSessionWidget::setReady(bool val, QString text)

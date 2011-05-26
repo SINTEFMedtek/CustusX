@@ -37,7 +37,6 @@ private slots:
   void updateButtonStatusSlot(); ///< makes sure that the buttons represent the status of the toolmanager
 
 private:
-
   QPushButton* mConfigureButton;
   QPushButton* mDeConfigureButton;
   QPushButton* mInitializeButton;
