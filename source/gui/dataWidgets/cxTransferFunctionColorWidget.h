@@ -1,7 +1,7 @@
 #ifndef CXTRANSFERFUNCTIONCOLORWIDGET_H_
 #define CXTRANSFERFUNCTIONCOLORWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
@@ -19,19 +19,18 @@ namespace cx
  * \date Apr 01, 2009
  * \author: Ole Vegard Solberg, SINTEF
  */
-class TransferFunctionColorWidget : public QWidget
+class TransferFunctionColorWidget : public BaseWidget
 {
   Q_OBJECT
   
 public:
   TransferFunctionColorWidget(QWidget* parent);
   virtual ~TransferFunctionColorWidget();
+  virtual QString defaultWhatsThis() const;
   
   void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
 
 public slots:
-  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-  //void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
   
 protected slots:

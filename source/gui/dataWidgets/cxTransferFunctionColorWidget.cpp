@@ -20,14 +20,13 @@
 namespace cx
 {
 TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
-  QWidget(parent),
-	mEndPoint(false),
+  BaseWidget(parent, "TransferFunctionColorWidget", "Color Transfer Function"),
+  mEndPoint(false),
   mColorindexSelected(0),
   mCurrentClickX(INT_MIN),
   mCurrentClickY(INT_MAX),
   mBorder(5)
 {
-  this->setObjectName("TransferFunctionColorWidget");
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
           this, SLOT(activeImageTransferFunctionsChangedSlot()));
 
@@ -44,6 +43,15 @@ TransferFunctionColorWidget::TransferFunctionColorWidget(QWidget* parent) :
 TransferFunctionColorWidget::~TransferFunctionColorWidget()
 {}
 
+QString TransferFunctionColorWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Color Tranfere Function</h3>"
+    "<p>Lets you set the color part of a transfer function.</p>"
+    "<p><i></i></p>"
+    "</html>";
+}
+
 void TransferFunctionColorWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData)
 {
   if (( mImage == image )&&( mImageTF==tfData ))
@@ -53,17 +61,6 @@ void TransferFunctionColorWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataP
   mImageTF = tfData;
   this->update();
 }
-
-//void TransferFunctionColorWidget::activeImageChangedSlot()
-//{
-//  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-//  if(mCurrentImage == activeImage)
-//    return;
-//
-//  mCurrentImage = activeImage;
-//  //TODO: call update or not ???
-//  this->update();
-//}
   
 void TransferFunctionColorWidget::activeImageTransferFunctionsChangedSlot()
 {
@@ -80,12 +77,6 @@ void TransferFunctionColorWidget::mousePressEvent(QMouseEvent* event)
   {
     this->isInsideCurrentPoint();
   }
-  // contextMenuEvent() is automatically called on right click
-  /*else if(event->button() == Qt::RightButton)
-  {
-    if(this->isInsideCurrentPoint())
-      this->contextMenuEvent(event);
-  }*/
 }
 void TransferFunctionColorWidget::mouseReleaseEvent(QMouseEvent* event)
 {
@@ -123,7 +114,6 @@ void TransferFunctionColorWidget::calculateColorTFBoundaries(int &areaLeft, int 
   {
     areaLeft = mPlotArea.left();
     areaRight = mPlotArea.right();
-    //ssc::messageManager()->sendWarning("Volume only have one value");
   }
   areaWidth = areaRight - areaLeft;
 }
@@ -133,9 +123,7 @@ int TransferFunctionColorWidget::calculateXPositionInTrFunc(int screenX)
   int areaLeft, areaRight, areaWidth;
   this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
   int retval =
-//    static_cast<int>(0.5 + mImage->getMin() + ( mImage->getRange() -1) *
-//                     (screenX - areaLeft) /
-//                     static_cast<double>(areaWidth-1) );
+
   static_cast<int>( mImage->getMin() + ( mImage->getRange() ) *
                    (screenX - areaLeft) /
                    static_cast<double>(areaWidth-1) );
@@ -144,9 +132,9 @@ int TransferFunctionColorWidget::calculateXPositionInTrFunc(int screenX)
 
 void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 {
-	// Don't do anything before we have an image
-	if (!mImage)
-		return;
+  // Don't do anything before we have an image
+  if (!mImage)
+    return;
   QWidget::paintEvent(event);
 
   QPainter painter(this);
@@ -158,24 +146,21 @@ void TransferFunctionColorWidget::paintEvent(QPaintEvent* event)
 
   // Draw color-background
 
-//  ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
-
   painter.setPen(QColor(140, 140, 210));
 
-	// Use vtkColorTransferFunction for interpolation
+  // Use vtkColorTransferFunction for interpolation
   vtkColorTransferFunctionPtr trFunc = vtkColorTransferFunctionPtr::New();
-	mImageTF->fillColorTFFromMap(trFunc);
+  mImageTF->fillColorTFFromMap(trFunc);
 
-	//Use window/level to find new left and right values
-	int areaLeft, areaRight, areaWidth;
-	this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
+  //Use window/level to find new left and right values
+  int areaLeft, areaRight, areaWidth;
+  this->calculateColorTFBoundaries(areaLeft, areaRight, areaWidth);
 
   for (int x = areaLeft; x <= areaRight; ++x)
   {
     int point = calculateXPositionInTrFunc(x);
 
-    //QColor color = transferFunction->getInterpolatedColorValue(point);
-		double* rgb = trFunc->GetColor(point);
+    double* rgb = trFunc->GetColor(point);
     painter.setPen(QColor(int(rgb[0]*255), int(rgb[1]*255), int(rgb[2]*255)));
     painter.drawLine(x, mPlotArea.top(), x, mPlotArea.bottom());
   }
@@ -240,18 +225,18 @@ void TransferFunctionColorWidget::resizeEvent(QResizeEvent* evt)
 }
 bool TransferFunctionColorWidget::isInsideCurrentPoint()
 {
-	mEndPoint = false;
+  mEndPoint = false;
   std::map<int, QRect>::iterator it = mPointRects.begin();
   for(;it != mPointRects.end(); ++it)
   {
     if (it->second.contains(mCurrentClickX, mCurrentClickY))
     {
       mCurrentPoint.position = it->first;
-			if (it == mPointRects.begin() || it == --mPointRects.end())
-				mEndPoint = true;
-			ssc::ColorMapPtr colorMapPtr = mImageTF->getColorMap();
-			if (colorMapPtr->find(mCurrentPoint.position) != colorMapPtr->end())
-			  mCurrentPoint.value = colorMapPtr->find(mCurrentPoint.position)->second;
+      if (it == mPointRects.begin() || it == --mPointRects.end())
+        mEndPoint = true;
+      ssc::ColorMapPtr colorMapPtr = mImageTF->getColorMap();
+      if (colorMapPtr->find(mCurrentPoint.position) != colorMapPtr->end())
+        mCurrentPoint.value = colorMapPtr->find(mCurrentPoint.position)->second;
       return true;
     }
   }
@@ -261,8 +246,8 @@ bool TransferFunctionColorWidget::isInsideCurrentPoint()
 void TransferFunctionColorWidget::contextMenuEvent(QContextMenuEvent *event)
 {
   QMenu menu;
-	
-	//TODO: Fix crash at this position
+
+  //TODO: Fix crash at this position
   menu.addAction(mCustomColorAction);
 
   if (isInsideCurrentPoint() && !mEndPoint)
@@ -271,32 +256,6 @@ void TransferFunctionColorWidget::contextMenuEvent(QContextMenuEvent *event)
     menu.addAction(mRemoveColorAction);
   }
   menu.exec(event->globalPos());
-  
-  /*for(int i = 0; i < CustusSceneManager::instance().numColors(); i++)
-  {
-    const unsigned char* c = CustusSceneManager::instance().getColor(i).color;
-    int id = cmenu.insertItem(makeIcon(QColor(c[0], c[1], c[2])),
-                              CustusSceneManager::instance().getColor(i).name,
-                              this, SLOT(setColor(int)));
-    cmenu.setItemParameter(id, i);
-    if(colorindex_selected_ == i) cmenu.setItemChecked(id, true);
-  }
-  cmenu.insertSeparator();
-  int id = cmenu.insertItem("Custom color...", this, SLOT(setColor(int)));
-  cmenu.setItemParameter(id, CustusSceneManager::instance().numColors());
-  if(colorindex_selected_ == CustusSceneManager::instance().numColors())
-    cmenu.setItemChecked(id, true);
-  
-  popupindex_ = isInsidePoint(mCurrentClickX, mCurrentClickY);
-  if(popupindex_ != -1)
-  {
-    if((popupindex_ > 0) && (popupindex_ < transfx_->getMaxValue()))
-    {
-      cmenu.insertSeparator();
-      id = cmenu.insertItem("Remove point", this, SLOT(removePoint()));
-    }
-    cmenu.exec(mapToGlobal(QPoint(mCurrentClickX, mCurrentClickY)));
-  }*/
 }
   
 TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentColorPoint()
@@ -305,8 +264,6 @@ TransferFunctionColorWidget::ColorPoint TransferFunctionColorWidget::getCurrentC
   point.position = calculateXPositionInTrFunc(mCurrentClickX);
   point.position = ssc::constrainValue(point.position, mImage->getMin(), mImage->getMax());
 
-	// Use vtkColorTransferFunction for interpolation
-//	vtkColorTransferFunctionPtr trFunc = mImageTF->getColorTF();
   vtkColorTransferFunctionPtr trFunc = vtkColorTransferFunctionPtr::New();
   mImageTF->fillColorTFFromMap(trFunc);
 
@@ -323,9 +280,7 @@ void TransferFunctionColorWidget::moveCurrentPoint()
     return;
 
   ColorPoint newColorPoint = this->getCurrentColorPoint();
-	newColorPoint.value = mCurrentPoint.value;
-
-//  ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
+  newColorPoint.value = mCurrentPoint.value;
 
   ssc::ColorMap::iterator prevPointIterator = mImageTF->getColorMap()->find(mCurrentPoint.position);
 
@@ -358,8 +313,8 @@ void TransferFunctionColorWidget::setColorSlot()
 void TransferFunctionColorWidget::setColorSlotDelayed()
 {
    ColorPoint newPoint = mCurrentPoint;
-	if (!newPoint.isValid())
-		newPoint = getCurrentColorPoint();
+  if (!newPoint.isValid())
+    newPoint = getCurrentColorPoint();
 
   QColor result = QColorDialog::getColor( newPoint.value, this);
 
@@ -370,9 +325,6 @@ void TransferFunctionColorWidget::setColorSlotDelayed()
     // Check if the point is already in the map
     ssc::ColorMap::iterator pointIterator = colorMapPtr->find(newPoint.position);
 
-//    if (pointIterator != colorMapPtr->end())
-//      mImageTF->setColorValue(newPoint.position, result);
-//    else
     mImageTF->addColorPoint(newPoint.position, result);
     newPoint.value = result;
   }
@@ -388,6 +340,5 @@ void TransferFunctionColorWidget::removeColorSlot()
 
   // TODO: call update/render???
   this->update();
-  //GUIManager::instance().getRenderWidget()->render();
 }
 }//namespace cx
