@@ -1,7 +1,7 @@
 #ifndef CXTRANSFERFUNCTIONWIDGET_H_
 #define CXTRANSFERFUNCTIONWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 #include <QCheckBox>
 #include <QDomElement>
 #include <sscImage.h>
@@ -90,17 +90,14 @@ public:
   virtual ssc::DoubleRange getValueRange() const;
 };
 
-
-/*
- *
- */
-class TransferFunction3DWidget : public QWidget
+class TransferFunction3DWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   TransferFunction3DWidget(QWidget* parent);
   virtual ~TransferFunction3DWidget() {}
+  virtual QString defaultWhatsThis() const;
 
 public slots:
   void activeImageChangedSlot();
@@ -112,16 +109,14 @@ protected:
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 };
 
-/*
- *
- */
-class TransferFunction2DWidget : public QWidget
+class TransferFunction2DWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   TransferFunction2DWidget(QWidget* parent);
   virtual ~TransferFunction2DWidget() {}
+  virtual QString defaultWhatsThis() const;
 
 public slots:
   void activeImageChangedSlot();
@@ -133,13 +128,14 @@ protected:
   DoubleDataAdapterImageTFDataBasePtr mDataWindow, mDataAlpha, mDataLLR, mDataLevel;
 };
 
-class TransferFunctionPresetWidget : public QWidget
+class TransferFunctionPresetWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   TransferFunctionPresetWidget(QWidget* parent);
   virtual ~TransferFunctionPresetWidget() {}
+  virtual QString defaultWhatsThis() const;
 
 public slots:
   void presetsBoxChangedSlot(const QString& presetName);
@@ -161,20 +157,14 @@ protected:
  * \author: Janne Beate Bakeng, SINTEF
  * \author: Ole Vegard Solberg, SINTEF
  */
-class TransferFunctionWidget : public QWidget
+class TransferFunctionWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   TransferFunctionWidget(QWidget* parent);
   virtual ~TransferFunctionWidget() {}
-public slots:
-protected:
-//  QVBoxLayout* mLayout;
-//  TransferFunction3DWidget* mTF3DWidget;
-//  TransferFunction2DWidget* mTF2DWidget;
-//  TransferFunctionPresetWidget* mTFPresetWidget;
-
+  virtual QString defaultWhatsThis() const;
 };
 
 }
