@@ -1,10 +1,3 @@
-/*
- *  sscReconstructionWidget.h
- *
- *  Created by Ole Vegard Solberg on 5/4/10.
- *
- */
-
 #ifndef SSCRECONSTRUCTIONWIDGET_H_
 #define SSCRECONSTRUCTIONWIDGET_H_
 
@@ -18,7 +11,12 @@
 namespace ssc
 {
 
-
+/**
+*  sscReconstructionWidget.h
+*
+*  Created by Ole Vegard Solberg on 5/4/10.
+*
+*/
 class ReconstructionWidget : public QWidget
 {
   Q_OBJECT
