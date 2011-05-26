@@ -34,19 +34,17 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow(); ///< sets up the initial gui
-  ~MainWindow(); ///< empty
+  MainWindow();
+  ~MainWindow();
   
   static void initialize();
   static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
 
   virtual QMenu* createPopupMenu();
 
-//signals:
-//  void deleteCurrentImage(); ///< Sends a signal when the current image is to be deleted
-
 protected slots:
   void patientChangedSlot();
+
   //application menu
   void aboutSlot();
   void preferencesSlot();
@@ -98,6 +96,9 @@ protected slots:
   void shootScreen();
   void shootWindow();
 
+  //debug mode
+  void toggleDebugModeSlot(bool checked);
+
 protected:
   void changeEvent(QEvent * event);
 
@@ -117,9 +118,6 @@ private:
   void startupLoadPatient();
 
   void closeEvent(QCloseEvent *event);///< Save geometry and window state at close
-
-  //gui
-  //QWidget* mCentralWidget; ///< central widget used for views, not used
 
   //menus
   QMenu* mCustusXMenu;    ///< Application menu
