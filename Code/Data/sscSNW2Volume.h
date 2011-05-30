@@ -67,6 +67,7 @@ public:
 	
 	struct DICOMDataType
 	{
+		DICOMDataType() : m_imgMraw(Transform3D::Identity()) {}
 		QString mFrameOfReferenceUID;
 		Transform3D m_imgMraw; // defines the transform from raw input data space to image space.			
 		QString mSeriesID; 
