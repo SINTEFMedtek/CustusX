@@ -22,8 +22,7 @@ DummyTool::DummyTool(const QString& uid) :
 	m_prMt(Transform3D::Identity()),
 	mTransformSaveFileName("DummyToolsAreToDumbToSaveThemselves"),
 	mTimer(new QTimer()),
-	mOffset(0),
-	m_prMt(Transform3D::Identity())
+	mOffset(0)
 {
 	mUid = uid;
 	mName = uid;
