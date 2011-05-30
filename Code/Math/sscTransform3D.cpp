@@ -8,17 +8,6 @@
 #include "sscBoundingBox3D.h"
 #include "vtkForwardDeclarations.h"
 
-namespace Eigen
-{
-
-// explicit instantiation of Affine3d
-//template class Transform<double,3,Affine>; - did not work - some Transform methods are NA.
-
-}
-
-
-
-
 // --------------------------------------------------------
 namespace ssc_transform3D_internal
 {
@@ -122,11 +111,13 @@ bool similar(const Transform3D& a, const Transform3D& b, double tol)
   boost::array<double, 16> m = a.flatten();
   boost::array<double, 16> n = b.flatten();
   for (int j=0; j<16; ++j)
+  {
     if (!similar(n[j], m[j], tol))
     {
       return false;
     }
-return true;
+  }
+  return true;
 }
 // --------------------------------------------------------
 
@@ -135,9 +126,9 @@ return true;
  */
 DoubleBoundingBox3D transform(const Transform3D& m, const DoubleBoundingBox3D& bb)
 {
-	Vector3D a = m.coord(bb.bottomLeft());
-	Vector3D b = m.coord(bb.topRight());
-	return DoubleBoundingBox3D(a,b);
+  Vector3D a = m.coord(bb.bottomLeft());
+  Vector3D b = m.coord(bb.topRight());
+  return DoubleBoundingBox3D(a,b);
 }
 
 /**Create a transform representing a scale in x,y,z
@@ -147,16 +138,6 @@ Transform3D createTransformScale(const Vector3D& scale_)
   Transform3D retval =  Transform3D::Identity();
   retval.scale(scale_);
   return retval;
-//
-//  //  Transform<float,3,Affine> t = Translation3f(p) * AngleAxisf(a,axis) * Scaling3f(s);
-//
-////  Transform3D M = Eigen::Scaling<float>(scale_.cast<float>());
-////  return M;
-//
-//	vtkTransformPtr transform = vtkTransformPtr::New();
-//	transform->Identity();
-//	transform->Scale(scale.begin());
-//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a translation
@@ -166,11 +147,6 @@ Transform3D createTransformTranslate(const Vector3D& translation)
   Transform3D retval =  Transform3D::Identity();
   retval.translate(translation);
   return retval;
-//
-//  vtkTransformPtr transform = vtkTransformPtr::New();
-//	transform->Identity();
-//	transform->Translate(translation.begin());
-//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the X-axis with an input angle.
@@ -180,11 +156,6 @@ Transform3D createTransformRotateX(const double angle)
   Transform3D retval =  Transform3D::Identity();
   retval.rotate(Eigen::AngleAxisd(angle, Vector3D::UnitX()));
   return retval;
-//	double angRad = angle/M_PI*180.0;
-//	vtkTransformPtr transform = vtkTransformPtr::New();
-//	transform->Identity();
-//	transform->RotateX(angRad);
-//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the Y-axis with an input angle.
@@ -194,11 +165,6 @@ Transform3D createTransformRotateY(const double angle)
   Transform3D retval =  Transform3D::Identity();
   retval.rotate(Eigen::AngleAxisd(angle, Vector3D::UnitY()));
   return retval;
-//	double angRad = angle/M_PI*180.0;
-//	vtkTransformPtr transform = vtkTransformPtr::New();
-//	transform->Identity();
-//	transform->RotateY(angRad);
-//	return Transform3D(transform->GetMatrix());
 }
 
 /**Create a transform representing a rotation about the Z-axis with an input angle.
@@ -208,13 +174,7 @@ Transform3D createTransformRotateZ(const double angle)
   Transform3D retval =  Transform3D::Identity();
   retval.rotate(Eigen::AngleAxisd(angle, Vector3D::UnitZ()));
   return retval;
-//	double angRad = angle/M_PI*180.0;
-//	vtkTransformPtr transform = vtkTransformPtr::New();
-//	transform->Identity();
-//	transform->RotateZ(angRad);
-//	return Transform3D(transform->GetMatrix());
 }
-
 
 /**Normalize volume defined by in to volume defined by out.
  *
@@ -223,24 +183,24 @@ Transform3D createTransformRotateZ(const double angle)
  */
 Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const DoubleBoundingBox3D& out)
 {
-	//std::ostringstream stream;
-	// translate input bottomleft to origin, scale, translate back to output bottomleft.
-	Transform3D T0 = createTransformTranslate(-in.bottomLeft());
-	Vector3D inrange = in.range();
-	Vector3D outrange = out.range();
-	Vector3D scale;
-	// check for zero input dimensions
-	for (unsigned i=0; i<scale.size(); ++i)
-	{
-		if (fabs(inrange[i])<1.0E-5)
-			scale[i] = 0;
-		else
-			scale[i] = outrange[i] / inrange[i];
-	}
-	Transform3D S = createTransformScale(scale);
-	Transform3D T1 = createTransformTranslate(out.bottomLeft());
-	Transform3D M = T1*S*T0;
-	return M;
+  // translate input bottomleft to origin, scale, translate back to output bottomleft.
+  Transform3D T0 = createTransformTranslate(-in.bottomLeft());
+  Vector3D inrange = in.range();
+  Vector3D outrange = out.range();
+  Vector3D scale;
+
+  // check for zero input dimensions
+  for (unsigned i = 0; i < scale.size(); ++i)
+  {
+    if (fabs(inrange[i]) < 1.0E-5)
+      scale[i] = 0;
+    else
+      scale[i] = outrange[i] / inrange[i];
+  }
+  Transform3D S = createTransformScale(scale);
+  Transform3D T1 = createTransformTranslate(out.bottomLeft());
+  Transform3D M = T1*S*T0;
+  return M;
 }
 
 /**Create a transform to a space defined by an origin and two perpendicular unit vectors that
@@ -251,25 +211,11 @@ Transform3D createTransformNormalize(const DoubleBoundingBox3D& in, const Double
  */
 Transform3D createTransformIJC(const Vector3D& ivec, const Vector3D& jvec, const Vector3D& center)
 {
-//	Vector3D kvec = cross(ivec,jvec);
-
-	Transform3D t = Transform3D::Identity();
-	t.matrix().col(0).head(3) = ivec;
+  Transform3D t = Transform3D::Identity();
+  t.matrix().col(0).head(3) = ivec;
   t.matrix().col(1).head(3) = jvec;
   t.matrix().col(2).head(3) = cross(ivec,jvec);
   t.matrix().col(3).head(3) = center;
-
-//	// set all column vectors
-//	vtkMatrix4x4Ptr matrix = vtkMatrix4x4Ptr::New();
-//	matrix->Identity();
-//	for (unsigned i=0; i<3; ++i)
-//	{
-//		matrix->SetElement(i, 0, ivec[i]);
-//		matrix->SetElement(i, 1, jvec[i]);
-//		matrix->SetElement(i, 2, kvec[i]);
-//		matrix->SetElement(i, 3, center[i]);
-//	}
-//	return Transform3D(matrix);
   return t;
 }
 

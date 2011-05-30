@@ -12,34 +12,34 @@ namespace ssc
 // --------------------------------------------------------
 bool similar(double a, double b, double tol)
 {
-	return fabs(b-a) < tol;
+  return fabs(b - a) < tol;
 }
 
 Vector3D multiply_elems(const Vector3D& a, const Vector3D& b)
 {
   return a.array() * b.array();
 }
+
 Vector3D divide_elems(const Vector3D& a, const Vector3D& b)
 {
   return a.array() / b.array();
 }
+
 Vector3D cross(const Vector3D& a, const Vector3D& b)
 {
   return a.cross(b);
 }
+
 double dot(const Vector3D& a, const Vector3D& b)
 {
   return a.dot(b);
 }
+
 bool similar(const Vector3D& a, const Vector3D& b, double tol)
 {
-	return (b-a).length() < tol;
+  return (b-a).length() < tol;
 }
-//std::ostream& operator<<(std::ostream& s, const Vector3D& data)
-//{
-//	return stream_range(s, data.begin(), data.end());
-//}
-// --------------------------------------------------------
+
 Vector3D unitVector(double thetaXY, double thetaZ)
 {
   Vector3D e;
@@ -67,6 +67,7 @@ Vector3D round(const Vector3D& a)
 
   return retval;
 }
+
 Vector3D ceil(const Vector3D& a)
 {
   Vector3D retval;
@@ -83,5 +84,3 @@ bool similar(const Eigen::Array3i& a, const Eigen::Array3i& b)
 
 } // namespace ssc
 // --------------------------------------------------------
-
-
