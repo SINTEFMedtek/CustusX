@@ -274,11 +274,8 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
     return;
   Transform3D rMpr = *ssc::ToolManager::getInstance()->get_rMpr();
   Transform3D tMu = mProbeData.get_tMu();
-  Transform3D rMt = rMpr * prMt;
   Transform3D rMu = rMpr * prMt * tMu;
   mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
-
-//  mProbeData.test();
 }
 
 void RealTimeStreamGraphics::receiveVisible(bool visible)
