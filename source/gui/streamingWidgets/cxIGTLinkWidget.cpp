@@ -10,7 +10,7 @@
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
@@ -224,7 +224,7 @@ void IGTLinkWidget::showStream()
   mRenderTimer->setInterval(50);
   mRenderTimer->start();
 
-  ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
+  ssc::VideoFixedPlaneRepPtr rtRep(new ssc::VideoFixedPlaneRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(getRTSource());
 //  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(rtRep);

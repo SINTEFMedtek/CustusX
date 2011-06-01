@@ -10,7 +10,7 @@
 
 #include <sstream>
 #include "cxUsReconstructionFileReader.h"
-#include "sscRTSourceRecorder.h"
+#include "sscVideoRecorder.h"
 #include "sscTool.h"
 
 namespace cx
