@@ -1,4 +1,7 @@
-SET (LIB toolManager)
+###########################################################
+##               Tracking Service
+###########################################################
+
 
 SET( CX_QT_MOC_HEADER_FILES
     cxToolManager.h
@@ -11,7 +14,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxIgstkTrackerThread.h
 )
 
-SET ( ${LIB}_toolManager
+SET ( cxTrackingService_SOURCE
     ${CX_QT_MOC_HEADER_FILES}
     cxToolManager.h
     cxToolManager.cpp
@@ -35,7 +38,7 @@ SET ( ${LIB}_toolManager
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
-ADD_LIBRARY ( ${LIB} ${${LIB}_toolManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC IGSTK cxCommon)
+ADD_LIBRARY ( cxTrackingService ${cxTrackingService_SOURCE} ${MOC_HEADER_FILES})
+target_link_libraries(cxTrackingService SSC IGSTK cxCommon)
 
 ADD_SUBDIRECTORY( testing )
