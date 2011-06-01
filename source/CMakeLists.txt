@@ -53,9 +53,9 @@ set(SUB_FOLDERS
     service/video
     service/patient
     service/tracking
+    service/visualization
     logic
     gui
-    viewManager
     stateMachineManager
     registrationManager
     3DUSReconstruction
@@ -90,7 +90,6 @@ add_subdirectory(logic)
 
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)
-ADD_SUBDIRECTORY(viewManager)
 ADD_SUBDIRECTORY(stateMachineManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
