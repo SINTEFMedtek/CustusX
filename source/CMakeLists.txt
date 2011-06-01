@@ -56,7 +56,6 @@ set(SUB_FOLDERS
     logic
     gui
     viewManager
-    repManager
     stateMachineManager
     registrationManager
     3DUSReconstruction
@@ -92,7 +91,6 @@ add_subdirectory(logic)
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)
 ADD_SUBDIRECTORY(viewManager)
-ADD_SUBDIRECTORY(repManager)
 ADD_SUBDIRECTORY(stateMachineManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)

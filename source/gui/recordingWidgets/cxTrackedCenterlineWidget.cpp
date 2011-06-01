@@ -97,7 +97,7 @@ void TrackedCenterlineWidget::startedSlot()
   ssc::ToolRep3DPtr activeRep3D;
   for(; toolIt != tools->end(); ++toolIt)
   {
-    activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
+    activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
     if(!activeRep3D)
       continue;
     activeRep3D->getTracer()->clear();
@@ -115,7 +115,7 @@ void TrackedCenterlineWidget::stoppedSlot()
   ssc::ToolRep3DPtr activeRep3D;
   for(; toolIt != tools->end(); ++toolIt)
   {
-    activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
+    activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(view->getReps(), toolIt->second);
     if(!activeRep3D)
       continue;
     if (activeRep3D->getTracer()->isRunning())

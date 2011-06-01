@@ -16,14 +16,14 @@
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
 #include "cxForwardDeclarations.h"
-#include "cxImageLandmarkRep.h"
-#include "cxPatientLandmarkRep.h"
 
 typedef vtkSmartPointer<class vtkAnnotatedCubeActor> vtkAnnotatedCubeActorPtr;
 typedef vtkSmartPointer<class vtkOrientationMarkerWidget> vtkOrientationMarkerWidgetPtr;
 
 namespace cx
 {
+typedef boost::shared_ptr<class ImageLandmarkRep> ImageLandmarkRepPtr;
+typedef boost::shared_ptr<class PatientLandmarkRep> PatientLandmarkRepPtr;
 
 typedef boost::shared_ptr<class ToolAxisConnector> ToolAxisConnectorPtr;
 
