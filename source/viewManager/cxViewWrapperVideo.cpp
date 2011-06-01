@@ -1,11 +1,11 @@
 /*
- * cxViewWrapperRTStream.cpp
+ * cxViewWrapperVideo.cpp
  *
  *  Created on: Mar 24, 2010
  *      Author: christiana
  */
 
-#include "cxViewWrapperRTStream.h"
+#include "cxViewWrapperVideo.h"
 #include <vector>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -23,7 +23,7 @@
 #include "sscDefinitionStrings.h"
 #include "sscSliceComputer.h"
 #include "sscGeometricRep2D.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 #include "cxSettings.h"
 #include "cxViewManager.h"
 #include "cxToolManager.h"
@@ -33,7 +33,7 @@
 namespace cx
 {
 
-ViewWrapperRTStream::ViewWrapperRTStream(ssc::View* view)
+ViewWrapperVideo::ViewWrapperVideo(ssc::View* view)
 {
   mView = view;
   this->connectContextMenu(mView);
@@ -52,18 +52,18 @@ ViewWrapperRTStream::ViewWrapperRTStream(ssc::View* view)
   this->configureSlot();
 }
 
-ViewWrapperRTStream::~ViewWrapperRTStream()
+ViewWrapperVideo::~ViewWrapperVideo()
 {
   if (mView)
     mView->removeReps();
 }
 
-ssc::View* ViewWrapperRTStream::getView()
+ssc::View* ViewWrapperVideo::getView()
 {
   return mView;
 }
 
-void ViewWrapperRTStream::appendToContextMenu(QMenu& contextMenu)
+void ViewWrapperVideo::appendToContextMenu(QMenu& contextMenu)
 {
   QAction* showSectorAction = new QAction("Show Sector", &contextMenu);
   showSectorAction->setCheckable(true);
@@ -75,7 +75,7 @@ void ViewWrapperRTStream::appendToContextMenu(QMenu& contextMenu)
   contextMenu.addAction(showSectorAction);
 }
 
-void ViewWrapperRTStream::showSectorActionSlot(bool checked)
+void ViewWrapperVideo::showSectorActionSlot(bool checked)
 {
   mStreamRep->setShowSector(checked);
   settings()->setValue("showSectorInRTView", checked);
@@ -84,7 +84,7 @@ void ViewWrapperRTStream::showSectorActionSlot(bool checked)
 /** Setup connections to stream. Called when a stream is loaded into the datamanager, or if a probe is initialized
  *
  */
-void ViewWrapperRTStream::configureSlot()
+void ViewWrapperVideo::configureSlot()
 {
   // if datamanager stream: connect it to rep
   if (!ssc::dataManager()->getStreams().empty() && !mTool)
@@ -102,7 +102,7 @@ void ViewWrapperRTStream::configureSlot()
   this->probeChangedSlot();
 }
 
-void ViewWrapperRTStream::probeChangedSlot()
+void ViewWrapperVideo::probeChangedSlot()
 {
   if (!mTool)
     return;
@@ -111,7 +111,7 @@ void ViewWrapperRTStream::probeChangedSlot()
   this->setupRep(mTool->getProbe()->getRTSource(), mTool);
 }
 
-void ViewWrapperRTStream::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
+void ViewWrapperVideo::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
   if (mSource)
   {
@@ -128,7 +128,7 @@ void ViewWrapperRTStream::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool
 
   if (!mStreamRep)
   {
-    mStreamRep.reset(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
+    mStreamRep.reset(new ssc::VideoFixedPlaneRep("rtrep", "rtrep"));
     mView->addRep(mStreamRep);
   }
 
@@ -141,7 +141,7 @@ void ViewWrapperRTStream::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool
 }
 
 
-ssc::ToolPtr ViewWrapperRTStream::getProbe()
+ssc::ToolPtr ViewWrapperVideo::getProbe()
 {
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 
@@ -155,14 +155,14 @@ ssc::ToolPtr ViewWrapperRTStream::getProbe()
   return ssc::ToolPtr();
 }
 
-void ViewWrapperRTStream::updateSlot()
+void ViewWrapperVideo::updateSlot()
 {
   if (!mSource)
     return;
   mDataNameText->setText(0, mSource->getName());
 }
 
-void ViewWrapperRTStream::addReps()
+void ViewWrapperVideo::addReps()
 {
   // plane type text rep
   mPlaneTypeText = ssc::DisplayTextRep::New("planeTypeRep_"+mView->getName(), "");

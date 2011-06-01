@@ -97,7 +97,7 @@ void USAcquisition::probeChangedSlot()
   if(mRTSource)
   {
     connect(mRTSource.get(), SIGNAL(streaming(bool)), this, SLOT(checkIfReadySlot()));
-    mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
+    mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   }
   this->checkIfReadySlot();
 }
@@ -117,7 +117,7 @@ void USAcquisition::saveSession(QString sessionId)
 {
   //get session data
   RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
-  ssc::RTSourceRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
+  ssc::VideoRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
 
   ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
   if(trackerRecordedData.empty())
@@ -135,7 +135,7 @@ void USAcquisition::saveSession(QString sessionId)
 void USAcquisition::fileMakerWriteFinished()
 {
   QString targetFolder = mFileMakerFutureWatcher.future().result();
-  mRTRecorder.reset(new ssc::RTSourceRecorder(mRTSource));
+  mRTRecorder.reset(new ssc::VideoRecorder(mRTSource));
   emit saveDataCompleted(mFileMaker->getMhdFilename(targetFolder));
 }
 
