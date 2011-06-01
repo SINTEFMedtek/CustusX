@@ -12,7 +12,7 @@
 namespace ssc
 {
 
-RTSourceRecorder::RTSourceRecorder(RTSourcePtr source, bool sync) :
+RTSourceRecorder::RTSourceRecorder(VideoSourcePtr source, bool sync) :
     mSource(source)
 {
   mSynced = !sync;

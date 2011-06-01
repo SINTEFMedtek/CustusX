@@ -5,8 +5,8 @@
  *      Author: christiana
  */
 
-#ifndef SSCREALTIMESTREAMSOURCE_H_
-#define SSCREALTIMESTREAMSOURCE_H_
+#ifndef SSCVIDEOSOURCE_H_
+#define SSCVIDEOSOURCE_H_
 
 #include "vtkSmartPointer.h"
 #include <boost/shared_ptr.hpp>
@@ -30,11 +30,11 @@ namespace ssc
  *   timeout
  *
  */
-class RTSource : public QObject
+class VideoSource : public QObject
 {
   Q_OBJECT
 public:
-  virtual ~RTSource() {}
+  virtual ~VideoSource() {}
 
   virtual QString getUid() = 0;
   virtual QString getName() = 0;
@@ -56,9 +56,9 @@ signals:
   void connected(bool on); ///< emitted when source is connected/disconnected
   void newFrame();          ///< emitted when a new frame has arrived (getVtkImageData() returns something new). info/status/name/valid might also have changed
 };
-typedef boost::shared_ptr<RTSource> RTSourcePtr;
+typedef boost::shared_ptr<VideoSource> VideoSourcePtr;
 
 } // namespace ssc
 
 
-#endif /* SSCREALTIMESTREAMSOURCE_H_ */
+#endif /* SSCVIDEOSOURCE_H_ */

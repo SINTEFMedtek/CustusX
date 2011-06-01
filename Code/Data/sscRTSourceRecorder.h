@@ -12,7 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 #include <QDateTime>
-#include "sscRTSource.h"
+#include "sscVideoSource.h"
 #include <map>
 
 typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
@@ -33,7 +33,7 @@ class RTSourceRecorder : public QObject
 public:
   typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:
-  RTSourceRecorder(RTSourcePtr source, bool sync = true);
+  RTSourceRecorder(VideoSourcePtr source, bool sync = true);
 
   virtual void startRecord();
   virtual void stopRecord();
@@ -43,7 +43,7 @@ private slots:
   void newFrameSlot();
 private:
   DataType mData;
-  RTSourcePtr mSource;
+  VideoSourcePtr mSource;
 
   bool mSynced;
   double mSyncShift;

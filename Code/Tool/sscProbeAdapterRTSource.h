@@ -11,20 +11,20 @@
 class QString;
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
-#include "sscRTSource.h"
+#include "sscVideoSource.h"
 #include "sscTool.h"
 
 namespace ssc
 {
 
-/**RTSource that applies the parameters from a probe to the rtsource.
+/**VideoSource that applies the parameters from a probe to the rtsource.
  *
  */
-class ProbeAdapterRTSource : public ssc::RTSource
+class ProbeAdapterRTSource : public ssc::VideoSource
 {
   Q_OBJECT
 public:
-  ProbeAdapterRTSource(QString uid, ProbePtr probe, RTSourcePtr source);
+  ProbeAdapterRTSource(QString uid, ProbePtr probe, VideoSourcePtr source);
   virtual ~ProbeAdapterRTSource() {}
 
   virtual QString getUid();
@@ -47,7 +47,7 @@ private slots:
 
 private:
   QString mUid;
-  ssc::RTSourcePtr mBase;
+  ssc::VideoSourcePtr mBase;
   ssc::ProbePtr mProbe;
   vtkImageChangeInformationPtr mRedirecter;
 };

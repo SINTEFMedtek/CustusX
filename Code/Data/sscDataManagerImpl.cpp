@@ -27,7 +27,7 @@
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
 #include "sscUtilHelpers.h"
-#include "sscRTSource.h"
+#include "sscVideoSource.h"
 #include "sscCustomMetaImage.h"
 
 namespace ssc
@@ -228,11 +228,11 @@ void DataManagerImpl::clear()
 
 
 // streams
-RTSourcePtr DataManagerImpl::getStream(const QString& uid) const
+VideoSourcePtr DataManagerImpl::getStream(const QString& uid) const
 {
   if (mStreams.count(uid))
     return mStreams.find(uid)->second;
-  return RTSourcePtr();
+  return VideoSourcePtr();
 }
 
 DataManager::StreamMap DataManagerImpl::getStreams() const
@@ -240,7 +240,7 @@ DataManager::StreamMap DataManagerImpl::getStreams() const
   return mStreams;
 }
 
-void DataManagerImpl::loadStream(RTSourcePtr stream)
+void DataManagerImpl::loadStream(VideoSourcePtr stream)
 {
   if (!stream)
     return;
@@ -248,7 +248,7 @@ void DataManagerImpl::loadStream(RTSourcePtr stream)
   emit streamLoaded();
 }
 
-std::map<QString, RTSourcePtr> mStreams;
+std::map<QString, VideoSourcePtr> mStreams;
 
 
 Vector3D DataManagerImpl::getCenter() const
