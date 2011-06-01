@@ -47,6 +47,7 @@
 #include "cxCalibrationMethodsWidget.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
@@ -205,21 +206,38 @@ MainWindow::~MainWindow()
 
 void MainWindow::initialize()
 {
+	// resources layer
   ssc::MessageManager::getInstance();
 
+  // services layer
   cx::VideoService::initialize();
   cx::DataManager::initialize();
   cx::ToolManager::initializeObject();
+
+  // logic layer
+  cx::LogicManager::initialize();
+
+  // gui layer:
+  // inited by mainwindow construction in main()
 }
 
 /** deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
  */
 void MainWindow::shutdown()
 {
+	// gui layer
+	// already destroyed by mainwindow
+
+	// old stuff - high level
   StateManager::destroyInstance();
   ViewManager::destroyInstance();
   RegistrationManager::shutdown();
   RepManager::destroyInstance();
+
+  // logic layer
+  cx::LogicManager::shutdown();
+
+  // service layer
   cx::ToolManager::shutdown();
   cx::DataManager::shutdown();
   cx::VideoService::shutdown();
