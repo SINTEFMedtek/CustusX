@@ -190,7 +190,7 @@ QStringList SelectRTSourceStringDataAdapterBase::getValueRange() const
 }
 QString SelectRTSourceStringDataAdapterBase::convertInternal2Display(QString internal)
 {
-  ssc::RTSourcePtr rtSource = ssc::dataManager()->getStream(internal);
+  ssc::VideoSourcePtr rtSource = ssc::dataManager()->getStream(internal);
   if (!rtSource)
     return "<no real time source>";
   return qstring_cast(rtSource->getName());
@@ -481,7 +481,7 @@ bool SelectRTSourceStringDataAdapter::setValue(const QString& value)
   if(mRTSource)
     disconnect(mRTSource.get(), SIGNAL(streaming(bool)), this, SIGNAL(changed()));
 
-  ssc::RTSourcePtr rtSource = ssc::dataManager()->getStream(value);
+  ssc::VideoSourcePtr rtSource = ssc::dataManager()->getStream(value);
   if(!rtSource)
     return false;
 
@@ -502,7 +502,7 @@ QString SelectRTSourceStringDataAdapter::getHelp() const
 {
   return "Select a real time source";
 }
-ssc::RTSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
+ssc::VideoSourcePtr SelectRTSourceStringDataAdapter::getRTSource()
 {
   return mRTSource;
 }

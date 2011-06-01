@@ -1,5 +1,5 @@
 #include "cxWorkflowState.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "sscDataManager.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
