@@ -132,7 +132,7 @@ ssc::ProbeRepPtr ImageRegistrationWidget::getProbeRep()
   if (!viewManager()->get3DView(0,0))
     return ssc::ProbeRepPtr();
 
-  return repManager()->findFirstRep<ssc::ProbeRep>(viewManager()->get3DView(0,0)->getReps());
+  return RepManager::findFirstRep<ssc::ProbeRep>(viewManager()->get3DView(0,0)->getReps());
 }
 
 void ImageRegistrationWidget::addLandmarkButtonClickedSlot()

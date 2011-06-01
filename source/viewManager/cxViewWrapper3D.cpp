@@ -39,6 +39,8 @@
 #include "cxToolManager.h"
 #include "cxRepManager.h"
 #include "cxCameraControl.h"
+#include "cxImageLandmarkRep.h"
+#include "cxPatientLandmarkRep.h"
 
 
 namespace cx
@@ -119,9 +121,6 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
   mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
 
-//  ssc::ToolRep3DPtr toolRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
-
-//  mProbeRep = repManager()->getProbeRep("ProbeRep_"+index);
   connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
   mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
   mProbeRep->setEnabled(false);
@@ -234,7 +233,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
 
   QAction* showToolPath = new QAction("Show Tool Path", &contextMenu);
   showToolPath->setCheckable(true);
-  ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
+  ssc::ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
   showToolPath->setChecked(activeRep3D->getTracer()->isRunning());
   connect(showToolPath, SIGNAL(triggered(bool)), this, SLOT(showToolPathSlot(bool)));
 
@@ -247,7 +246,7 @@ void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
   {
     showRefTool->setText("Show "+refTool->getName());
     showRefTool->setEnabled(true);
-    showRefTool->setChecked(repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool));
+    showRefTool->setChecked(RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool));
     connect(showRefTool, SIGNAL(toggled(bool)), this, SLOT(showRefToolSlot(bool)));
   }
 
@@ -281,7 +280,7 @@ void ViewWrapper3D::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper3D::showToolPathSlot(bool checked)
 {
-  ssc::ToolRep3DPtr activeRep3D = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
+  ssc::ToolRep3DPtr activeRep3D = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), ssc::toolManager()->getDominantTool());
   if (activeRep3D->getTracer()->isRunning())
   {
     activeRep3D->getTracer()->stop();
@@ -407,7 +406,7 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 {
   if (!mVolumetricReps.count(image->getUid()))
   {
-    ssc::VolumetricRepPtr rep = repManager()->getVolumetricRep(image);
+    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
 
     mVolumetricReps[image->getUid()] = rep;
     mView->addRep(rep);
@@ -459,7 +458,7 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
   ssc::ToolPtr refTool = ssc::toolManager()->getReferenceTool();
   if(!refTool)
     return;
-  ssc::ToolRep3DPtr refRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool);
+  ssc::ToolRep3DPtr refRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), refTool);
   if(!refRep)
   {
     refRep = ssc::ToolRep3D::New(refTool->getUid()+"_rep3d_"+this->mView->getUid());
@@ -514,7 +513,7 @@ void ViewWrapper3D::toolsAvailableSlot()
     if(tool->getType() == ssc::Tool::TOOL_REFERENCE)
       continue;
 
-    ssc::ToolRep3DPtr toolRep = repManager()->findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
+    ssc::ToolRep3DPtr toolRep = RepManager::findFirstRep<ssc::ToolRep3D>(mView->getReps(), tool);
     if(!toolRep)
     {
       toolRep = ssc::ToolRep3D::New(tool->getUid()+"_rep3d_"+this->mView->getUid());

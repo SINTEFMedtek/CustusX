@@ -39,7 +39,7 @@ ssc::ToolRep3DPtr CameraStyle::getToolRep() const
   if (!this->getView())
     return ssc::ToolRep3DPtr();
 
-  ssc::ToolRep3DPtr rep = repManager()->findFirstRep<ssc::ToolRep3D>(this->getView()->getReps(), mFollowingTool);
+  ssc::ToolRep3DPtr rep = RepManager::findFirstRep<ssc::ToolRep3D>(this->getView()->getReps(), mFollowingTool);
   return rep;
 }
 

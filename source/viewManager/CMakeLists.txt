@@ -14,6 +14,9 @@ SET( CX_QT_MOC_HEADER_FILES
     cxInteractiveCropper.h
     cxCameraControl.h
     cxCameraStyle.h
+    Rep/cxLandmarkRep.h
+    Rep/sscOrientationAnnotation3DRep.h
+    cxRepManager.h
 )
 
 SET ( ${LIB}_viewManager
@@ -50,10 +53,22 @@ SET ( ${LIB}_viewManager
     cxCameraStyle.cpp
     cxRenderTimer.h
     cxRenderTimer.cpp
+    Rep/cxLandmarkRep.h
+    Rep/cxLandmarkRep.cpp
+    Rep/cxImageLandmarkRep.h
+    Rep/cxImageLandmarkRep.cpp
+    Rep/cxPatientLandmarkRep.h
+    Rep/cxPatientLandmarkRep.cpp
+    Rep/sscOrientationAnnotation3DRep.h
+    Rep/sscOrientationAnnotation3DRep.cpp
+    cxRepManager.h
+    cxRepManager.cpp
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
+include_directories(Rep)
+
 ADD_LIBRARY ( ${LIB} ${${LIB}_viewManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC repManager cxCommon cxAlgorithms OpenIGTLink)
+target_link_libraries(${LIB} SSC cxCommon cxAlgorithms OpenIGTLink)
 
