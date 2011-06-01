@@ -85,7 +85,7 @@ typedef boost::shared_ptr<class TextDisplay> TextDisplayPtr;
 typedef boost::shared_ptr<class OrientationAnnotationRep> OrientationAnnotationRepPtr;
 typedef boost::shared_ptr<class ImageTF3D> ImageTF3DPtr;
 typedef boost::shared_ptr<class ImageLUT2D> ImageLUT2DPtr;
-typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
+//typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
 typedef boost::shared_ptr<class OrientationAnnotation3DRep> OrientationAnnotation3DRepPtr;
 
 class LabeledComboBoxWidget;

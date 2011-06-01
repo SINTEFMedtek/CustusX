@@ -11,7 +11,7 @@
 #include "sscToolManager.h"
 #include "sscTool.h"
 #include "sscView.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 #include "sscTypeConversions.h"
 #include "sscDataManager.h"
 #include "sscToolTracer.h"
@@ -43,7 +43,7 @@ ToolRep3D::ToolRep3D(const QString& uid, const QString& name) :
   mProbeSectorActor = vtkActorPtr::New();
 
   bool useMask = false; // if true, use mask instead of texture to render the sector. Mask is identical to the algo used in reconstruction.
-  mRTStream.reset(new RealTimeStreamGraphics(useMask));
+  mRTStream.reset(new VideoGraphics(useMask));
 
   mTracer.reset(new ToolTracer());
 }

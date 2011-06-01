@@ -28,14 +28,14 @@ class UltrasoundSectorSource;
 namespace ssc
 {
 
-typedef boost::shared_ptr<class RealTimeStreamGraphics> RealTimeStreamGraphicsPtr;
+typedef boost::shared_ptr<class VideoGraphics> VideoGraphicsPtr;
 
-class RealTimeStreamGraphics : public QObject
+class VideoGraphics : public QObject
 {
   Q_OBJECT
 public:
-  RealTimeStreamGraphics(bool useMaskFilter=false);
-  virtual ~RealTimeStreamGraphics();
+  VideoGraphics(bool useMaskFilter=false);
+  virtual ~VideoGraphics();
 
   void setRealtimeStream(VideoSourcePtr data);
   void setTool(ToolPtr tool);
@@ -80,41 +80,41 @@ private:
 };
 
 
-typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
+//typedef boost::shared_ptr<class RealTimeStreamRep> RealTimeStreamRepPtr;
+//
+//class RealTimeStreamRep : public ssc::RepImpl
+//{
+//  Q_OBJECT
+//public:
+//  RealTimeStreamRep(const QString& uid, const QString& name="");
+//  virtual ~RealTimeStreamRep();
+//  virtual QString getType() const { return "ssc::RealTimeStreamRep"; }
+//  void setRealtimeStream(VideoSourcePtr data);
+//  void setTool(ToolPtr tool);
+//
+//protected:
+//  virtual void addRepActorsToViewRenderer(ssc::View* view);
+//  virtual void removeRepActorsFromViewRenderer(ssc::View* view);
+//private slots:
+//
+//private:
+//  VideoGraphicsPtr mRTGraphics;
+//  vtkRendererPtr mRenderer;
+//  View* mView;
+//};
 
-class RealTimeStreamRep : public ssc::RepImpl
-{
-  Q_OBJECT
-public:
-  RealTimeStreamRep(const QString& uid, const QString& name="");
-  virtual ~RealTimeStreamRep();
-  virtual QString getType() const { return "ssc::RealTimeStreamRep"; }
-  void setRealtimeStream(VideoSourcePtr data);
-  void setTool(ToolPtr tool);
-
-protected:
-  virtual void addRepActorsToViewRenderer(ssc::View* view);
-  virtual void removeRepActorsFromViewRenderer(ssc::View* view);
-private slots:
-
-private:
-  RealTimeStreamGraphicsPtr mRTGraphics;
-  vtkRendererPtr mRenderer;
-  View* mView;
-};
-
-typedef boost::shared_ptr<class RealTimeStreamFixedPlaneRep> RealTimeStreamFixedPlaneRepPtr;
+typedef boost::shared_ptr<class VideoFixedPlaneRep> VideoFixedPlaneRepPtr;
 
 /**A rep visualizing a RT stream directly into the view plane.
  * It does not follow the tool, but controls the camera in order to
  * fill the entire view.
  */
-class RealTimeStreamFixedPlaneRep : public ssc::RepImpl
+class VideoFixedPlaneRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
-  RealTimeStreamFixedPlaneRep(const QString& uid, const QString& name="");
-  virtual ~RealTimeStreamFixedPlaneRep();
+  VideoFixedPlaneRep(const QString& uid, const QString& name="");
+  virtual ~VideoFixedPlaneRep();
   virtual QString getType() const { return "ssc::RealTimeStreamFixedPlaneRep"; }
   void setRealtimeStream(VideoSourcePtr data);
   void setTool(ToolPtr tool);
@@ -132,7 +132,7 @@ private:
   void setCamera();
   void updateSector();
 
-  RealTimeStreamGraphicsPtr mRTGraphics;
+  VideoGraphicsPtr mRTGraphics;
   bool mShowSector;
 
   ToolPtr mTool;

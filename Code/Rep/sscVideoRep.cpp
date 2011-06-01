@@ -4,7 +4,7 @@
  *  Created on: Oct 31, 2010
  *      Author: christiana
  */
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 
 #include <vtkRenderer.h>
 #include <vtkActor2D.h>
@@ -38,7 +38,7 @@ namespace ssc
 {
 
 
-RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
+VideoGraphics::VideoGraphics(bool useMaskFilter) :
   mPlaneActor(vtkActorPtr::New()),
   mPlaneSource(vtkPlaneSourcePtr::New()),
   mTexture(vtkTexturePtr::New() )
@@ -88,31 +88,31 @@ RealTimeStreamGraphics::RealTimeStreamGraphics(bool useMaskFilter) :
   mPlaneActor->SetVisibility(false);
 }
 
-RealTimeStreamGraphics::~RealTimeStreamGraphics()
+VideoGraphics::~VideoGraphics()
 {
 }
 
-void RealTimeStreamGraphics::setShowInToolSpace(bool on)
+void VideoGraphics::setShowInToolSpace(bool on)
 {
   mShowInToolSpace = on;
 }
 
-vtkActorPtr RealTimeStreamGraphics::getActor()
+vtkActorPtr VideoGraphics::getActor()
 {
   return mPlaneActor;
 }
 
-ToolPtr RealTimeStreamGraphics::getTool()
+ToolPtr VideoGraphics::getTool()
 {
   return mTool;
 }
 
-ssc::ProbeSector RealTimeStreamGraphics::getProbeData()
+ssc::ProbeSector VideoGraphics::getProbeData()
 {
   return mProbeData;
 }
 
-void RealTimeStreamGraphics::setTool(ToolPtr tool)
+void VideoGraphics::setTool(ToolPtr tool)
 {
   if (tool==mTool)
     return;
@@ -145,7 +145,7 @@ void RealTimeStreamGraphics::setTool(ToolPtr tool)
  * If on, only the area inside the probe sector is shown.
  *
  */
-void RealTimeStreamGraphics::setClipToSector(bool on)
+void VideoGraphics::setClipToSector(bool on)
 {
   mClipSector = on;
   this->clipToSectorChanged();
@@ -153,7 +153,7 @@ void RealTimeStreamGraphics::setClipToSector(bool on)
 
 /**
  */
-void RealTimeStreamGraphics::clipToSectorChanged()
+void VideoGraphics::clipToSectorChanged()
 {
   if (mClipSector)
   {
@@ -175,7 +175,7 @@ void RealTimeStreamGraphics::clipToSectorChanged()
 }
 
 
-void RealTimeStreamGraphics::probeSectorChanged()
+void VideoGraphics::probeSectorChanged()
 {
   if (!mTool)
     return;
@@ -193,7 +193,7 @@ void RealTimeStreamGraphics::probeSectorChanged()
 /** Create a lut that sets zeros to transparent and applies a linear grayscale to the rest.
  *
  */
-void RealTimeStreamGraphics::setLookupTable()
+void VideoGraphics::setLookupTable()
 {
   // applies only to mask:
   // Create a lut of size at least equal to the data range. Set the tableRange[0] to zero.
@@ -237,7 +237,7 @@ void RealTimeStreamGraphics::setLookupTable()
 
 }
 
-void RealTimeStreamGraphics::setRealtimeStream(VideoSourcePtr data)
+void VideoGraphics::setRealtimeStream(VideoSourcePtr data)
 {
   if (mData)
   {
@@ -268,7 +268,7 @@ void RealTimeStreamGraphics::setRealtimeStream(VideoSourcePtr data)
   this->newDataSlot();
 }
 
-void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestamp)
+void VideoGraphics::receiveTransforms(Transform3D prMt, double timestamp)
 {
   if (!mShowInToolSpace)
     return;
@@ -278,13 +278,13 @@ void RealTimeStreamGraphics::receiveTransforms(Transform3D prMt, double timestam
   mPlaneActor->SetUserMatrix(rMu.getVtkMatrix());
 }
 
-void RealTimeStreamGraphics::receiveVisible(bool visible)
+void VideoGraphics::receiveVisible(bool visible)
 {
 
 }
 
 
-void RealTimeStreamGraphics::checkDataIntegrity()
+void VideoGraphics::checkDataIntegrity()
 {
   if (!mData || !mTool)
     return;
@@ -303,9 +303,9 @@ void RealTimeStreamGraphics::checkDataIntegrity()
 //  mDataRedirecter->GetOutput()->Print(std::cout);
 }
 
-void RealTimeStreamGraphics::newDataSlot()
+void VideoGraphics::newDataSlot()
 {
-//  std::cout << "RealTimeStreamGraphics::newDataSlot()" << std::endl;
+//  std::cout << "VideoGraphics::newDataSlot()" << std::endl;
   mPlaneActor->SetVisibility(mData!=NULL);
   if (!mData)
     return;
@@ -352,7 +352,7 @@ void RealTimeStreamGraphics::newDataSlot()
   }
 
   bool visible = mData->validData();
-//  std::cout << "RealTimeStreamGraphics::newDataSlot() " << this << " vis=" << visible << std::endl;
+//  std::cout << "VideoGraphics::newDataSlot() " << this << " vis=" << visible << std::endl;
   if (mShowInToolSpace)
   {
     visible = visible && mTool && mTool->getVisible();
@@ -373,40 +373,40 @@ void RealTimeStreamGraphics::newDataSlot()
 //---------------------------------------------------------
 //---------------------------------------------------------
 
-
-RealTimeStreamRep::RealTimeStreamRep(const QString& uid, const QString& name) :
-  ssc::RepImpl(uid, name)
-{
-    mRTGraphics.reset(new RealTimeStreamGraphics());
-}
-
-RealTimeStreamRep::~RealTimeStreamRep()
-{
-}
-
-void RealTimeStreamRep::setTool(ToolPtr tool)
-{
-  mRTGraphics->setTool(tool);
-}
-
-void RealTimeStreamRep::setRealtimeStream(VideoSourcePtr data)
-{
-  mRTGraphics->setRealtimeStream(data);
-}
-
-void RealTimeStreamRep::addRepActorsToViewRenderer(ssc::View* view)
-{
-  mView = view;
-  mRenderer = view->getRenderer();
-
-  view->getRenderer()->AddActor(mRTGraphics->getActor());
-}
-
-void RealTimeStreamRep::removeRepActorsFromViewRenderer(ssc::View* view)
-{
-  mRenderer = vtkRendererPtr();
-  view->getRenderer()->RemoveActor(mRTGraphics->getActor());
-}
+//
+//RealTimeStreamRep::RealTimeStreamRep(const QString& uid, const QString& name) :
+//  ssc::RepImpl(uid, name)
+//{
+//    mRTGraphics.reset(new VideoGraphics());
+//}
+//
+//RealTimeStreamRep::~RealTimeStreamRep()
+//{
+//}
+//
+//void RealTimeStreamRep::setTool(ToolPtr tool)
+//{
+//  mRTGraphics->setTool(tool);
+//}
+//
+//void RealTimeStreamRep::setRealtimeStream(VideoSourcePtr data)
+//{
+//  mRTGraphics->setRealtimeStream(data);
+//}
+//
+//void RealTimeStreamRep::addRepActorsToViewRenderer(ssc::View* view)
+//{
+//  mView = view;
+//  mRenderer = view->getRenderer();
+//
+//  view->getRenderer()->AddActor(mRTGraphics->getActor());
+//}
+//
+//void RealTimeStreamRep::removeRepActorsFromViewRenderer(ssc::View* view)
+//{
+//  mRenderer = vtkRendererPtr();
+//  view->getRenderer()->RemoveActor(mRTGraphics->getActor());
+//}
 
 
 
@@ -419,10 +419,10 @@ void RealTimeStreamRep::removeRepActorsFromViewRenderer(ssc::View* view)
 //---------------------------------------------------------
 
 
-RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, const QString& name) :
+VideoFixedPlaneRep::VideoFixedPlaneRep(const QString& uid, const QString& name) :
   ssc::RepImpl(uid, name)
 {
-  mRTGraphics.reset(new RealTimeStreamGraphics());
+  mRTGraphics.reset(new VideoGraphics());
   connect(mRTGraphics.get(), SIGNAL(newData()), this, SLOT(newDataSlot()));
 //  mRTGraphics->setIgnoreToolTransform(true);
   mRTGraphics->setShowInToolSpace(false);
@@ -444,22 +444,22 @@ RealTimeStreamFixedPlaneRep::RealTimeStreamFixedPlaneRep(const QString& uid, con
   mProbeSectorActor->GetProperty()->SetColor(1, 0.9, 0);
 }
 
-RealTimeStreamFixedPlaneRep::~RealTimeStreamFixedPlaneRep()
+VideoFixedPlaneRep::~VideoFixedPlaneRep()
 {
 }
 
-void RealTimeStreamFixedPlaneRep::setShowSector(bool on)
+void VideoFixedPlaneRep::setShowSector(bool on)
 {
   mShowSector = on;
   this->updateSector();
 }
 
-bool RealTimeStreamFixedPlaneRep::getShowSector() const
+bool VideoFixedPlaneRep::getShowSector() const
 {
   return mShowSector;
 }
 
-void RealTimeStreamFixedPlaneRep::updateSector()
+void VideoFixedPlaneRep::updateSector()
 {
   bool show = mTool && this->getShowSector() && mTool->getProbeSector().mType!=ssc::ProbeData::tNONE;
 
@@ -478,19 +478,19 @@ void RealTimeStreamFixedPlaneRep::updateSector()
 
 }
 
-void RealTimeStreamFixedPlaneRep::setTool(ToolPtr tool)
+void VideoFixedPlaneRep::setTool(ToolPtr tool)
 {
   mRTGraphics->setTool(tool);
   mTool = tool;
 }
 
-void RealTimeStreamFixedPlaneRep::setRealtimeStream(VideoSourcePtr data)
+void VideoFixedPlaneRep::setRealtimeStream(VideoSourcePtr data)
 {
   mRTGraphics->setRealtimeStream(data);
   mData = data;
 }
 
-void RealTimeStreamFixedPlaneRep::newDataSlot()
+void VideoFixedPlaneRep::newDataSlot()
 {
   if (!mData)
     return;
@@ -506,7 +506,7 @@ void RealTimeStreamFixedPlaneRep::newDataSlot()
  * Reason: must call setcamera after last change of size of plane actor.
  * TODO fix it.
  */
-void RealTimeStreamFixedPlaneRep::setCamera()
+void VideoFixedPlaneRep::setCamera()
 {
   if (!mRenderer)
     return;
@@ -538,7 +538,7 @@ void RealTimeStreamFixedPlaneRep::setCamera()
 }
 
 
-void RealTimeStreamFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
+void VideoFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
 {
   mView = view;
   mRenderer = view->getRenderer();
@@ -551,7 +551,7 @@ void RealTimeStreamFixedPlaneRep::addRepActorsToViewRenderer(ssc::View* view)
   //setCamera();
 }
 
-void RealTimeStreamFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
+void VideoFixedPlaneRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
   mRenderer = vtkRendererPtr();
   view->getRenderer()->RemoveActor(mRTGraphics->getActor());

@@ -1,35 +1,35 @@
 /*
- * sscRealTimeStreamSourceRecorder.cpp
+ * sscVideoRecorder.cpp
  *
  *  Created on: Dec 17, 2010
  *      Author: christiana
  */
 
-#include "sscRTSourceRecorder.h"
+#include "sscVideoRecorder.h"
 #include "vtkImageData.h"
 #include "sscTime.h"
 
 namespace ssc
 {
 
-RTSourceRecorder::RTSourceRecorder(VideoSourcePtr source, bool sync) :
+VideoRecorder::VideoRecorder(VideoSourcePtr source, bool sync) :
     mSource(source)
 {
   mSynced = !sync;
   mSyncShift = 0;
 }
 
-void RTSourceRecorder::startRecord()
+void VideoRecorder::startRecord()
 {
   connect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 }
 
-void RTSourceRecorder::stopRecord()
+void VideoRecorder::stopRecord()
 {
   disconnect(mSource.get(), SIGNAL(newFrame()), this, SLOT(newFrameSlot()));
 }
 
-void RTSourceRecorder::newFrameSlot()
+void VideoRecorder::newFrameSlot()
 {
   if (!mSource->validData())
     return;
@@ -53,11 +53,11 @@ void RTSourceRecorder::newFrameSlot()
   mData[timestamp] = frame;
 }
 
-RTSourceRecorder::DataType RTSourceRecorder::getRecording(double start, double stop)
+VideoRecorder::DataType VideoRecorder::getRecording(double start, double stop)
 {
   start -= mSyncShift;
   stop -= mSyncShift;
-  RTSourceRecorder::DataType retval = mData;
+  VideoRecorder::DataType retval = mData;
 
 //  std::cout << std::endl;
 //  RealTimeStreamSourceRecorder::DataType::iterator iter;

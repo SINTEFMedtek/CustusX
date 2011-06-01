@@ -1,12 +1,12 @@
 /*
- * sscRealTimeStreamSourceRecorder.h
+ * sscVideoRecorder.h
  *
  *  Created on: Dec 17, 2010
  *      Author: christiana
  */
 
-#ifndef SSCREALTIMESTREAMSOURCERECORDER_H_
-#define SSCREALTIMESTREAMSOURCERECORDER_H_
+#ifndef SSCVIDEORECORDER_H_
+#define SSCVIDEORECORDER_H_
 
 #include "vtkSmartPointer.h"
 #include <boost/shared_ptr.hpp>
@@ -20,20 +20,20 @@ typedef vtkSmartPointer<class vtkImageData> vtkImageDataPtr;
 namespace ssc
 {
 
-/** Recorder for a RealTimeStreamSource.
+/** Recorder for a VideoSource.
  *
  * The class has an autosync feature that is useful if the realtimestream clock
  * is unsynced with the master clock. The first received frame is used to estimate
  * a shift between the master and source clocks. This shift is then added to the input
  * times in getRecording in order to retrieve data using the source clock.
  */
-class RTSourceRecorder : public QObject
+class VideoRecorder : public QObject
 {
   Q_OBJECT
 public:
   typedef std::map<double, vtkImageDataPtr> DataType; ///<  <timestamp, frame>
 public:
-  RTSourceRecorder(VideoSourcePtr source, bool sync = true);
+  VideoRecorder(VideoSourcePtr source, bool sync = true);
 
   virtual void startRecord();
   virtual void stopRecord();
@@ -49,8 +49,8 @@ private:
   double mSyncShift;
 };
 
-typedef boost::shared_ptr<RTSourceRecorder> RealTimeStreamSourceRecorderPtr;
+typedef boost::shared_ptr<VideoRecorder> VideoRecorderPtr;
 
 }
 
-#endif /* SSCREALTIMESTREAMSOURCERECORDER_H_ */
+#endif /* SSCVIDEORECORDER_H_ */

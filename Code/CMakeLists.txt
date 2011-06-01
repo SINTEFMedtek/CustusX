@@ -42,8 +42,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Data/sscRegistrationTransform.h
     Data/sscDataManagerImpl.h
     Data/sscMesh.h
-    Data/sscVideoSource.h
-    Data/sscRTSourceRecorder.h
+    Video/sscVideoSource.h
+    Video/sscVideoRecorder.h
     Tool/sscToolManager.h
     Tool/sscTool.h 
     Tool/sscDummyTool.h
@@ -70,7 +70,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Rep/sscGeometricRep2D.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscOrientationAnnotationRep.h
-    Rep/sscRTStreamRep.h
+    Rep/sscVideoRep.h
     Rep/sscToolTracer.h
     Widgets/sscDataAdapter.h
     Widgets/sscDoubleDataAdapter.h
@@ -102,6 +102,7 @@ endif (USE_GLX_SHARED_CONTEXT)
 set( SSC_INCLUDE_DIRS
     ${SSC_SOURCE_DIR}/Code/  
     ${SSC_SOURCE_DIR}/Code/Data/
+    ${SSC_SOURCE_DIR}/Code/Video/
     ${SSC_SOURCE_DIR}/Code/Rep/
     ${SSC_SOURCE_DIR}/Code/Tool/
     ${SSC_SOURCE_DIR}/Code/Utilities/
@@ -185,8 +186,10 @@ SET( SSC_SOURCE_FILES
     Utilities/sscVolumeHelpers.cpp
     Utilities/sscCustomMetaImage.h
     Utilities/sscCustomMetaImage.cpp
+    
     sscView.cpp
     sscView.h
+    
     Rep/sscRep.h
     Rep/sscRepImpl.h
     Rep/sscRepImpl.cpp
@@ -239,12 +242,13 @@ SET( SSC_SOURCE_FILES
     Rep/sscSlicePlanes3DRep.h
     Rep/sscSlicePlaneClipper.h
     Rep/sscSlicePlaneClipper.cpp
-    Rep/sscRTStreamRep.h
-    Rep/sscRTStreamRep.cpp
+    Rep/sscVideoRep.h
+    Rep/sscVideoRep.cpp
     Rep/ultrasoundsectorsource.h
     Rep/ultrasoundsectorsource.cpp
     Rep/sscToolTracer.h
     Rep/sscToolTracer.cpp
+    
     Data/sscLandmark.h
     Data/sscLandmark.cpp
     Data/sscData.cpp
@@ -269,8 +273,11 @@ SET( SSC_SOURCE_FILES
     Data/sscSNW2Volume.h
     Data/sscRegistrationTransform.cpp
     Data/sscRegistrationTransform.h
-    Data/sscRTSourceRecorder.h
-    Data/sscRTSourceRecorder.cpp
+    
+    Video/sscVideoSource.h
+    Video/sscVideoRecorder.h
+    Video/sscVideoRecorder.cpp
+    
     Tool/sscToolManager.cpp
     Tool/sscToolManager.h
     Tool/sscTool.h 
@@ -286,6 +293,7 @@ SET( SSC_SOURCE_FILES
     Tool/sscProbeSector.cpp 
     Tool/sscProbeAdapterRTSource.h
     Tool/sscProbeAdapterRTSource.cpp
+    
     Widgets/sscDoubleRange.h
     Widgets/sscHelperWidgets.cpp
     Widgets/sscHelperWidgets.h
