@@ -15,6 +15,11 @@
 namespace cx
 {
 
+/**
+ * VideoService provides access to all video sources in the
+ * system, and connection stuff for the sources.
+ *
+ */
 class VideoService : public QObject
 {
 	Q_OBJECT
