@@ -15,7 +15,7 @@
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxStateMachineManager.h"
 
 namespace cx
@@ -104,12 +104,12 @@ QProcess* IGTLinkWidget::getServer()
   return getConnection()->getProcess();
 }
 
-ssc::OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
+OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
 {
   return getConnection()->getRTSource();
 }
 
-IGTLinkConnectionPtr IGTLinkWidget::getConnection()
+VideoConnectionPtr IGTLinkWidget::getConnection()
 {
   return stateManager()->getRTSourceManager();
 }

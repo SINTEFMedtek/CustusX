@@ -23,7 +23,7 @@ public:
   virtual ~Probe() {}
   virtual bool isValid() const;
   virtual ssc::ProbeData getData() const;
-  virtual ssc::RTSourcePtr getRTSource() const;
+  virtual ssc::VideoSourcePtr getRTSource() const;
   virtual ssc::ProbeSectorPtr getSector();
 
   virtual void addXml(QDomNode& dataNode);
@@ -39,7 +39,7 @@ public:
   virtual void setSoundSpeedCompensationFactor(double val);
 
   // non-inherited methods
-  void setRTSource(ssc::RTSourcePtr source);
+  void setRTSource(ssc::VideoSourcePtr source);
   ProbeXmlConfigParser::Configuration getConfiguration() const;
 
 private:
@@ -49,7 +49,7 @@ private:
   QString getInstrumentScannerId() const;
 
   ssc::ProbeData mData; ///< Probe sector information
-  ssc::RTSourcePtr mSource;
+  ssc::VideoSourcePtr mSource;
   ssc::ProbeWeakPtr mSelf;
 
   double mSoundSpeedCompensationFactor;

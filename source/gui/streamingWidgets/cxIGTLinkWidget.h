@@ -7,12 +7,12 @@
 #include <QtGui>
 #include "sscDoubleWidgets.h"
 #include "sscView.h"
-#include "RTSource/sscOpenIGTLinkRTSource.h"
+#include "cxOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
-typedef boost::shared_ptr<class RTSourceManager> IGTLinkConnectionPtr;
+typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 
 
 /**
@@ -49,8 +49,8 @@ private:
   void dataChanged();
   void updateHostHistory();
   QProcess* getServer();
-  ssc::OpenIGTLinkRTSourcePtr getRTSource();
-  IGTLinkConnectionPtr getConnection();
+  OpenIGTLinkRTSourcePtr getRTSource();
+  VideoConnectionPtr getConnection();
   void writeSettings();
 
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

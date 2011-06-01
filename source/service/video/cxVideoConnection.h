@@ -4,14 +4,14 @@
  *  Created on: Jan 25, 2011
  *      Author: christiana
  */
-#ifndef CXOPENIGTLINKCONNECTION_H_
-#define CXOPENIGTLINKCONNECTION_H_
+#ifndef CXVIDEOCONNECTION_H_
+#define CXVIDEOCONNECTION_H_
 
 #include <vector>
 #include <QtGui>
 //#include "sscDoubleWidgets.h"
 #include "sscView.h"
-#include "RTSource/sscOpenIGTLinkRTSource.h"
+#include "cxOpenIGTLinkRTSource.h"
 #include "cxProbe.h"
 #include "cxRenderTimer.h"
 
@@ -25,12 +25,12 @@ namespace cx
  * GUI can be found in cxIGTLinkWidget (along with some additional functionality...)
  *
  */
-class RTSourceManager : public QObject
+class VideoConnection : public QObject
 {
   Q_OBJECT
 public:
-  RTSourceManager();
-  virtual ~RTSourceManager();
+  VideoConnection();
+  virtual ~VideoConnection();
 
   void setLocalServerCommandLine(QString commandline);
   QString getLocalServerCommandLine();
@@ -48,7 +48,7 @@ public:
   void launchAndConnectServer();
 
   QProcess* getProcess() { return mServer; }
-  ssc::OpenIGTLinkRTSourcePtr getRTSource() { return mRTSource; }
+  OpenIGTLinkRTSourcePtr getRTSource() { return mRTSource; }
   ssc::ToolPtr getStreamingProbe();
 
 signals:
@@ -70,12 +70,12 @@ private:
 
   ssc::ToolPtr mProbe;
   double mSoundSpeedCompensationFactor;
-  ssc::OpenIGTLinkRTSourcePtr mRTSource;
+  OpenIGTLinkRTSourcePtr mRTSource;
   QProcess* mServer;
   int mConnectWhenLocalServerRunning;
 };
-typedef boost::shared_ptr<RTSourceManager> IGTLinkConnectionPtr;
+typedef boost::shared_ptr<VideoConnection> VideoConnectionPtr;
 
 }//end namespace cx
 
-#endif /* CXOPENIGTLINKCONNECTION_H_ */
+#endif /* CXVIDEOCONNECTION_H_ */

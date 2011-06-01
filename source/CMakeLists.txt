@@ -50,6 +50,7 @@ find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 SET(SOURCES cxMain.cpp)
 
 set(SUB_FOLDERS
+    service/video
     gui
     viewManager
     repManager
@@ -84,6 +85,8 @@ INCLUDE_DIRECTORIES(
     gui/dataAdapters
     )
     
+add_subdirectory(service)
+
 
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)

@@ -16,7 +16,6 @@ namespace ssc
 
 namespace cx
 {
-typedef boost::shared_ptr<class RTSourceManager> IGTLinkConnectionPtr;
 
 struct Desktop
 {
@@ -48,7 +47,7 @@ public:
   WorkflowStateMachinePtr getWorkflow();
   ApplicationStateMachinePtr getApplication();
   PatientDataPtr getPatientData();
-  IGTLinkConnectionPtr getRTSourceManager();
+  VideoConnectionPtr getRTSourceManager();
   ssc::ReconstructerPtr getReconstructer();
 
   Desktop getActiveDesktop();
@@ -81,7 +80,7 @@ private:
   WorkflowStateMachinePtr mWorkflowStateMachine;
   ApplicationStateMachinePtr mApplicationStateMachine;
   PatientDataPtr mPatientData;
-  IGTLinkConnectionPtr mIGTLinkConnection;
+//  VideoConnectionPtr mIGTLinkConnection;
   ssc::ReconstructerPtr mReconstructer;
 
   std::vector<RecordSessionPtr> mRecordSessions;

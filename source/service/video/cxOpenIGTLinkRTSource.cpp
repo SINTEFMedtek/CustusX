@@ -4,7 +4,7 @@
  *  Created on: Oct 31, 2010
  *      Author: christiana
  */
-#include "sscOpenIGTLinkRTSource.h"
+#include "cxOpenIGTLinkRTSource.h"
 
 #include <math.h>
 #include <vtkImageData.h>
@@ -22,7 +22,7 @@
 #include <vtkImageAppendComponents.h>
 #include <vtkImageChangeInformation.h>
 #include "sscTypeConversions.h"
-#include "sscOpenIGTLinkClient.h"
+#include "cxOpenIGTLinkClient.h"
 #include "sscMessageManager.h"
 #include "sscTime.h"
 #include "sscVector3D.h"
@@ -30,7 +30,7 @@
 typedef vtkSmartPointer<vtkDataSetMapper> vtkDataSetMapperPtr;
 typedef vtkSmartPointer<vtkImageFlip> vtkImageFlipPtr;
 
-namespace ssc
+namespace cx
 {
 
 OpenIGTLinkRTSource::OpenIGTLinkRTSource() :

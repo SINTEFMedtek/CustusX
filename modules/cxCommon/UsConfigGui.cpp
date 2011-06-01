@@ -147,11 +147,11 @@ void UsConfigGui::RTsourceDetected(const QString& source)
   if ( (source.compare(QString("VGA")) == 0) || (source.compare(QString("VGA_DVI"))) == 0)  
   {
     mRtSourceBox->setCurrentIndex(mRtSourceBox->findText("VGA"));
-    //cx::settings()->setValue("RTSource", QString("VGA"));
+    //cx::settings()->setValue("VideoSource", QString("VGA"));
     
   } else {
     mRtSourceBox->setCurrentIndex(mRtSourceBox->findText("SVHS"));
-    //cx::settings()->setValue("RTSource", QString("SVHS"));
+    //cx::settings()->setValue("VideoSource", QString("SVHS"));
   }
 
   cx::settings()->setValue("RTSource", mRtSourceBox->currentText());

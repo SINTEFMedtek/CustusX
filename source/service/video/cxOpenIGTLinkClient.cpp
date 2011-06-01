@@ -1,4 +1,4 @@
-#include "sscOpenIGTLinkClient.h"
+#include "cxOpenIGTLinkClient.h"
 
 #include "igtlOSUtil.h"
 #include "igtlMessageHeader.h"
@@ -115,7 +115,7 @@ int ReceiveStatus(igtl::ClientSocket::Pointer& socket, igtl::MessageHeader::Poin
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-namespace ssc
+namespace cx
 {
 
 IGTLinkClient::IGTLinkClient(QString address, int port, QObject* parent) :
@@ -339,4 +339,4 @@ bool IGTLinkClient::ReceiveImage(QTcpSocket* socket, igtl::MessageHeader::Pointe
 
 }
 
-}//end namespace ssc
+}//end namespace cx
