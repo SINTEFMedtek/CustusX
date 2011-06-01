@@ -47,9 +47,9 @@ SET( SOURCE_FILES
 SET( sscUsReconstructionLib_LIB_FILES
     SSC
     cxCommon 
-    dataManager
+    cxPatientService
     #thunder 
-    toolManager
+    cxTrackingService
     ITKCommon
     )
 
