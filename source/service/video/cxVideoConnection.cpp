@@ -12,16 +12,17 @@
 
 #include "sscLabeledComboBoxWidget.h"
 #include "sscRTStreamRep.h"
-#include "sscDataManager.h"
 #include "sscTypeConversions.h"
-#include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "sscToolManager.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "cxProbe.h"
 #include "probeXmlConfigParser.h"
+
+// must be removed!!!!
+#include "sscToolManager.h"
+#include "sscDataManager.h"
 
 namespace cx
 {
