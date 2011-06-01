@@ -6,7 +6,7 @@
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "cxStateMachineManager.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include <QPixmap>
@@ -143,7 +143,7 @@ void StatusBar::tpsSlot(int numTps)
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-  ssc::OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getRTSource();
+  OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getRTSource();
   QString infoString = grabber->getName()+"-FPS: "+QString::number(numFps);
   mGrabbingInfoLabel->setText(infoString);
 }

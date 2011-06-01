@@ -15,7 +15,7 @@
 #include "sscReconstructer.h"
 #include "cxRecordSessionWidget.h"
 #include "cxUsReconstructionFileMaker.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxProbe.h"
 #include "cxSoundSpeedConversionWidget.h"
 

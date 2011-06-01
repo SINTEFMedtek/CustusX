@@ -7,7 +7,7 @@
 #include "cxProbe.h"
 
 #include <QStringList>
-#include "sscRTSource.h"
+#include "sscVideoSource.h"
 #include "sscMessageManager.h"
 #include "cxDataLocations.h"
 #include "cxCreateProbeDataFromConfiguration.h"
@@ -67,7 +67,7 @@ ssc::ProbeData Probe::getData() const
   return mData;
 }
 
-ssc::RTSourcePtr Probe::getRTSource() const
+ssc::VideoSourcePtr Probe::getRTSource() const
 {
   return mSource;
 }
@@ -80,9 +80,9 @@ ProbePtr Probe::New(QString instrumentUid, QString scannerUid)
   return retval;
 }
 
-void Probe::setRTSource(ssc::RTSourcePtr source)
+void Probe::setRTSource(ssc::VideoSourcePtr source)
 {
-  ssc::RTSourcePtr adapter(new ssc::ProbeAdapterRTSource(source->getUid()+"_probe", mSelf.lock(), source));
+  ssc::VideoSourcePtr adapter(new ssc::ProbeAdapterRTSource(source->getUid()+"_probe", mSelf.lock(), source));
   mSource = adapter;
   emit sectorChanged();
 }

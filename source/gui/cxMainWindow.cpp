@@ -40,12 +40,13 @@
 #include "cxUSAcqusitionWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxRegistrationMethodsWidget.h"
 #include "cxVisualizationMethodsWidget.h"
 #include "cxSegmentationMethodsWidget.h"
 #include "cxCalibrationMethodsWidget.h"
 #include "cxToolManagerWidget.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -206,6 +207,7 @@ void MainWindow::initialize()
 {
   ssc::MessageManager::getInstance();
 
+  cx::VideoService::initialize();
   cx::DataManager::initialize();
   cx::ToolManager::initializeObject();
 }
@@ -220,6 +222,7 @@ void MainWindow::shutdown()
   RepManager::destroyInstance();
   cx::ToolManager::shutdown();
   cx::DataManager::shutdown();
+  cx::VideoService::shutdown();
 }
 
 QMenu* MainWindow::createPopupMenu()

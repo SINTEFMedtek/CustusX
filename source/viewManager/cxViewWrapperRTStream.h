@@ -48,10 +48,10 @@ private:
   virtual void appendToContextMenu(QMenu& contextMenu);
   void addReps();
   ssc::ToolPtr getProbe();
-  void setupRep(ssc::RTSourcePtr source, ssc::ToolPtr tool);
+  void setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool);
 
   ssc::RealTimeStreamFixedPlaneRepPtr mStreamRep;
-  ssc::RTSourcePtr mSource;
+  ssc::VideoSourcePtr mSource;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   QPointer<ssc::View> mView;
