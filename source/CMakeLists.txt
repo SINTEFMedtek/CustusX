@@ -51,6 +51,7 @@ SET(SOURCES cxMain.cpp)
 
 set(SUB_FOLDERS
     service/video
+    logic
     gui
     viewManager
     repManager
@@ -86,7 +87,7 @@ INCLUDE_DIRECTORIES(
     )
     
 add_subdirectory(service)
-
+add_subdirectory(logic)
 
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)
