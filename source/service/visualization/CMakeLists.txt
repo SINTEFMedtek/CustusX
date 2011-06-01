@@ -1,4 +1,4 @@
-SET (LIB viewManager)
+#SET (LIB viewManager)
 
 SET( CX_QT_MOC_HEADER_FILES
     cxView2D.h
@@ -19,7 +19,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxRepManager.h
 )
 
-SET ( ${LIB}_viewManager
+SET ( cxVisualizationService_SOURCE
     ${CX_QT_MOC_HEADER_FILES}
     cxView2D.cpp
     cxView2D.h
@@ -69,6 +69,6 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 include_directories(Rep)
 
-ADD_LIBRARY ( ${LIB} ${${LIB}_viewManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC cxCommon cxAlgorithms OpenIGTLink)
+ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
+target_link_libraries(cxVisualizationService SSC cxCommon cxAlgorithms OpenIGTLink)
 

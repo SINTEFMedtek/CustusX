@@ -26,6 +26,7 @@ target_link_libraries(cxLogicManager
     cxCommon
     cxPatientService
     cxTrackingService
+    cxVisualizationService
     )
 
 
