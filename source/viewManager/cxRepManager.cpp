@@ -95,8 +95,8 @@ void RepManager::volumeRemovedSlot(QString uid)
 }
 
 
-RepManager* repManager()
-{
-  return RepManager::getInstance();
-}
+//RepManager* repManager()
+//{
+//  return RepManager::getInstance();
+//}
 }//namespace cx

@@ -24,13 +24,13 @@ typedef std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
 
 class MessageManager;
 
-/**
+/**DEPRECATED!! will be removed shortly
+ *
+ *
  * \class RepManager
  *
- * \brief Creates a pool of reps (representations) and offers an interface to
- * access them.
- *
- * \warning ProgressiveLODVolumetricRep does not work!
+ *  - Utility functions for accessing reps,
+ *  - cache for reusing the expensive volumetric reps.
  *
  * \date Dec 10, 2008
  * \author: Janne Beate Bakeng, SINTEF
@@ -44,7 +44,7 @@ public:
   static void destroyInstance(); ///< destroy the only instance of this class
 
   template<class REP>
-  boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::ToolPtr tool)
+  static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::ToolPtr tool)
   {
     for(unsigned i=0; i<reps.size() ; ++i)
     {
@@ -58,7 +58,7 @@ public:
   }
 
   template<class REP>
-  boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::DataPtr data)
+  static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps, ssc::DataPtr data)
   {
     for(unsigned i=0; i<reps.size() ; ++i)
     {
@@ -70,7 +70,7 @@ public:
   }
 
   template<class REP>
-  boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps)
+  static boost::shared_ptr<REP> findFirstRep(std::vector<ssc::RepPtr> reps)
   {
     for(unsigned i=0; i<reps.size() ; ++i)
     {
@@ -101,12 +101,12 @@ protected:
 
 private:
   RepManager(); ///< creates a pool of reps
-  ~RepManager(); ///< empty
+  virtual ~RepManager(); ///< empty
   RepManager(RepManager const&); ///< not implemented
   RepManager& operator=(RepManager const&); ///< not implemented
 };
 
-RepManager* repManager();
+//RepManager* repManager();
 
 }//namespace cx
 
