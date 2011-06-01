@@ -51,14 +51,14 @@ SET(SOURCES cxMain.cpp)
 
 set(SUB_FOLDERS
     service/video
+    service/patient
+    service/tracking
     logic
     gui
     viewManager
     repManager
     stateMachineManager
     registrationManager
-    toolManager
-    dataManager
     3DUSReconstruction
     UsReconstruction
     algorithms
@@ -93,9 +93,7 @@ ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)
 ADD_SUBDIRECTORY(viewManager)
 ADD_SUBDIRECTORY(repManager)
-ADD_SUBDIRECTORY(toolManager)
 ADD_SUBDIRECTORY(stateMachineManager)
-ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
 ADD_SUBDIRECTORY(apps)
