@@ -11,7 +11,7 @@
 #include "vtkRenderWindow.h"
 
 #include "sscLabeledComboBoxWidget.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
 #include "cxSettings.h"

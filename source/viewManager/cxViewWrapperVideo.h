@@ -9,7 +9,7 @@
 #include "sscDefinitions.h"
 #include "sscMesh.h"
 #include "cxViewWrapper.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 
 namespace cx
 {
@@ -21,12 +21,12 @@ namespace cx
  *  whats available.
  *
  */
-class ViewWrapperRTStream : public ViewWrapper
+class ViewWrapperVideo : public ViewWrapper
 {
   Q_OBJECT
 public:
-  ViewWrapperRTStream(ssc::View* view);
-  virtual ~ViewWrapperRTStream();
+  ViewWrapperVideo(ssc::View* view);
+  virtual ~ViewWrapperVideo();
   virtual ssc::View* getView();
   virtual void setSlicePlanesProxy(ssc::SlicePlanesProxyPtr proxy) {}
 
@@ -50,14 +50,14 @@ private:
   ssc::ToolPtr getProbe();
   void setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool);
 
-  ssc::RealTimeStreamFixedPlaneRepPtr mStreamRep;
+  ssc::VideoFixedPlaneRepPtr mStreamRep;
   ssc::VideoSourcePtr mSource;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   QPointer<ssc::View> mView;
   ssc::ToolPtr mTool;
 };
-typedef boost::shared_ptr<ViewWrapperRTStream> ViewWrapperRTStreamPtr;
+typedef boost::shared_ptr<ViewWrapperVideo> ViewWrapperVideoPtr;
 
 } // namespace cx
 
