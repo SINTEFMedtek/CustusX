@@ -160,7 +160,7 @@ vtkVolumeMapperPtr InteractiveCropper::getMapper()
 {
   if (!mImage)
     return vtkVolumeMapperPtr();
-  ssc::VolumetricRepPtr volRep = repManager()->getVolumetricRep(mImage);
+  ssc::VolumetricRepPtr volRep = RepManager::getInstance()->getVolumetricRep(mImage);
 
   vtkVolumeMapperPtr mapper = dynamic_cast<vtkVolumeMapper*>(volRep->getVtkVolume()->GetMapper());
   return mapper;

@@ -109,7 +109,7 @@ void InteractiveClipper::changedSlot()
   {
     ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
     mSlicePlaneClipper->clearVolumes();
-    mSlicePlaneClipper->addVolume(repManager()->getVolumetricRep(image));
+    mSlicePlaneClipper->addVolume(RepManager::getInstance()->getVolumetricRep(image));
 
     ssc::PLANE_TYPE currentPlane = this->getPlaneType();
 
