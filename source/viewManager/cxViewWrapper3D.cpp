@@ -32,7 +32,7 @@
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
 #include "sscVideoSource.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 #include "sscToolTracer.h"
 #include "sscOrientationAnnotation3DRep.h"
 #include "cxSettings.h"

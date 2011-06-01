@@ -30,7 +30,7 @@
 #include "cxViewWrapper.h"
 #include "cxViewWrapper2D.h"
 #include "cxViewWrapper3D.h"
-#include "cxViewWrapperRTStream.h"
+#include "cxViewWrapperVideo.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxInteractiveCropper.h"
@@ -462,7 +462,7 @@ void ViewManager::activateRTStreamView(int group, LayoutRegion region)
   ssc::View* view = mViewCacheRT.retrieveView();
 //  QColor background = settings()->value("backgroundColor").value<QColor>();
 //  view->setBackgoundColor(background);
-  ViewWrapperRTStreamPtr wrapper(new ViewWrapperRTStream(view));
+  ViewWrapperVideoPtr wrapper(new ViewWrapperVideo(view));
   this->activateView(wrapper, group, region);
 }
 

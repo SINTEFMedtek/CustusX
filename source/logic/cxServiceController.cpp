@@ -16,6 +16,7 @@ namespace cx
 
 ServiceController::ServiceController()
 {
+	// test
 	ssc::toolManager();
 	ssc::dataManager();
 	videoService();
