@@ -111,7 +111,7 @@ void ViewWrapperRTStream::probeChangedSlot()
   this->setupRep(mTool->getProbe()->getRTSource(), mTool);
 }
 
-void ViewWrapperRTStream::setupRep(ssc::RTSourcePtr source, ssc::ToolPtr tool)
+void ViewWrapperRTStream::setupRep(ssc::VideoSourcePtr source, ssc::ToolPtr tool)
 {
   if (mSource)
   {

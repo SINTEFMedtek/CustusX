@@ -12,8 +12,9 @@
 #include "cxPatientData.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxViewWrapper3D.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -183,7 +184,7 @@ void StateManager::initialize()
 
   mPatientData.reset(new PatientData());
 
-  mIGTLinkConnection.reset(new RTSourceManager());
+//  mIGTLinkConnection.reset(new VideoConnection());
 
   ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
   mReconstructer.reset(new ssc::Reconstructer(xmlFile, DataLocations::getShaderPath()));
@@ -200,9 +201,10 @@ PatientDataPtr StateManager::getPatientData()
   return mPatientData;
 }
 
-IGTLinkConnectionPtr StateManager::getRTSourceManager()
+VideoConnectionPtr StateManager::getRTSourceManager()
 {
-  return mIGTLinkConnection;
+	return videoService()->getVideoConnection();
+//  return mIGTLinkConnection;
 }
 
 ssc::ReconstructerPtr StateManager::getReconstructer()

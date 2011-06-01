@@ -5,7 +5,7 @@
  *      Author: christiana
  */
 
-#include "cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include <QStringList>
 
 #include "vtkRenderWindow.h"
@@ -26,7 +26,7 @@
 namespace cx
 {
 
-RTSourceManager::RTSourceManager()
+VideoConnection::VideoConnection()
 {
   mConnectWhenLocalServerRunning = 0;
 
@@ -34,7 +34,7 @@ RTSourceManager::RTSourceManager()
   connect(mServer, SIGNAL(stateChanged(QProcess::ProcessState)), this, SLOT(serverProcessStateChanged(QProcess::ProcessState)));
   connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
 
-  mRTSource.reset(new ssc::OpenIGTLinkRTSource());
+  mRTSource.reset(new OpenIGTLinkRTSource());
   ssc::dataManager()->loadStream(mRTSource);
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
@@ -44,7 +44,7 @@ RTSourceManager::RTSourceManager()
   connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
 }
 
-RTSourceManager::~RTSourceManager()
+VideoConnection::~VideoConnection()
 {
   mRTSource->disconnectServer();
   // avoid getting crash reports: disable signal
@@ -52,12 +52,12 @@ RTSourceManager::~RTSourceManager()
   mServer->close();
 }
 
-void RTSourceManager::setLocalServerCommandLine(QString commandline)
+void VideoConnection::setLocalServerCommandLine(QString commandline)
 {
   settings()->setValue("IGTLink/localServer", commandline);
 }
 
-QString RTSourceManager::getLocalServerCommandLine()
+QString VideoConnection::getLocalServerCommandLine()
 {
   QString cmd = settings()->value("IGTLink/localServer").toString();
   if (cmd.isEmpty())
@@ -65,12 +65,12 @@ QString RTSourceManager::getLocalServerCommandLine()
   return cmd;
 }
 
-void RTSourceManager::setPort(int port)
+void VideoConnection::setPort(int port)
 {
   settings()->setValue("IGTLink/port", port);
 }
 
-int RTSourceManager::getPort()
+int VideoConnection::getPort()
 {
   QVariant var = settings()->value("IGTLink/port");
   if (var.canConvert<int>())
@@ -78,12 +78,12 @@ int RTSourceManager::getPort()
   return 18333;
 }
 
-void RTSourceManager::setUseLocalServer(bool use)
+void VideoConnection::setUseLocalServer(bool use)
 {
   settings()->setValue("IGTLink/useLocalServer", use);
 }
 
-bool RTSourceManager::getUseLocalServer()
+bool VideoConnection::getUseLocalServer()
 {
   QVariant var = settings()->value("IGTLink/useLocalServer");
   if (var.canConvert<bool>())
@@ -94,7 +94,7 @@ bool RTSourceManager::getUseLocalServer()
 /**Get list of recent hosts. The first is the current.
  *
  */
-QStringList RTSourceManager::getHostHistory()
+QStringList VideoConnection::getHostHistory()
 {
   QStringList hostHistory = settings()->value("IGTLink/hostHistory").toStringList();
   if (hostHistory.isEmpty())
@@ -102,12 +102,12 @@ QStringList RTSourceManager::getHostHistory()
   return hostHistory;
 }
 
-QString RTSourceManager::getHost()
+QString VideoConnection::getHost()
 {
   return this->getHostHistory().front(); // history will always contain elements.
 }
 
-void RTSourceManager::setHost(QString host)
+void VideoConnection::setHost(QString host)
 {
   QStringList history = this->getHostHistory();
   history.prepend(host);
@@ -121,7 +121,7 @@ void RTSourceManager::setHost(QString host)
 }
 
 
-void RTSourceManager::launchServer()
+void VideoConnection::launchServer()
 {
   //  QString program = "/Users/christiana/christiana/workspace/CustusX3/build_RelWithDebInfo/modules/OpenIGTLinkServer/cxOpenIGTLinkServer";
   //  QStringList arguments;
@@ -156,7 +156,7 @@ void RTSourceManager::launchServer()
     mServer->start(program, arguments);
 }
 
-void RTSourceManager::connectServer()
+void VideoConnection::connectServer()
 {
   if (!mRTSource->isConnected())
   {
@@ -173,7 +173,7 @@ void RTSourceManager::connectServer()
  * and the server is unconnected.
  *
  */
-void RTSourceManager::delayedAutoConnectServer()
+void VideoConnection::delayedAutoConnectServer()
 {
   if (mRTSource->isConnected())
     mConnectWhenLocalServerRunning = 0;
@@ -185,7 +185,7 @@ void RTSourceManager::delayedAutoConnectServer()
   }
 }
 
-void RTSourceManager::launchAndConnectServer()
+void VideoConnection::launchAndConnectServer()
 {
   if (this->getUseLocalServer())
   {
@@ -207,7 +207,7 @@ void RTSourceManager::launchAndConnectServer()
 
 }
 
-void RTSourceManager::serverProcessError(QProcess::ProcessError error)
+void VideoConnection::serverProcessError(QProcess::ProcessError error)
 {
   QString msg;
   msg += "RT Source server reported an error: ";
@@ -226,7 +226,7 @@ void RTSourceManager::serverProcessError(QProcess::ProcessError error)
   ssc::messageManager()->sendError(msg);
 }
 
-void RTSourceManager::serverProcessStateChanged(QProcess::ProcessState newState)
+void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
 {
   if (newState==QProcess::Running)
   {
@@ -249,7 +249,7 @@ void RTSourceManager::serverProcessStateChanged(QProcess::ProcessState newState)
  * Apply time calibration to the source.
  *
  */
-void RTSourceManager::connectSourceToTool()
+void VideoConnection::connectSourceToTool()
 {
   if (!mRTSource)
  {
@@ -283,11 +283,11 @@ void RTSourceManager::connectSourceToTool()
     }
     probeInterface->setRTSource(mRTSource);
     ssc::toolManager()->setDominantTool(mProbe->getUid());
-//    std::cout << "RTSourceManager::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getRTSource()->getName() << " completed" << std::endl;
+//    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getRTSource()->getName() << " completed" << std::endl;
   }
 }
 
-ssc::ToolPtr RTSourceManager::getStreamingProbe()
+ssc::ToolPtr VideoConnection::getStreamingProbe()
 {
   return mProbe;
 }
@@ -295,7 +295,7 @@ ssc::ToolPtr RTSourceManager::getStreamingProbe()
 /**Find a probe that can be connected to a rt source.
  *
  */
-ssc::ToolPtr RTSourceManager::findSuitableProbe()
+ssc::ToolPtr VideoConnection::findSuitableProbe()
 {
   ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
 

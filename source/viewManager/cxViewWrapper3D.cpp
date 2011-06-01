@@ -31,7 +31,7 @@
 #include "sscToolRep3D.h"
 #include "sscVolumetricRep.h"
 #include "sscTypeConversions.h"
-#include "sscRTSource.h"
+#include "sscVideoSource.h"
 #include "sscRTStreamRep.h"
 #include "sscToolTracer.h"
 #include "sscOrientationAnnotation3DRep.h"

@@ -54,7 +54,7 @@ private slots:
   ssc::ToolPtr getTool();
 
 private:
-  ssc::RTSourcePtr mRTSource;
+  ssc::VideoSourcePtr mRTSource;
   ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
   ssc::ToolPtr mTool;
 

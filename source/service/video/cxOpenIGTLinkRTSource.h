@@ -1,13 +1,13 @@
 /*
- * sscOpenIGTLinkRTSource.h
+ * cxOpenIGTLinkRTSource.h
  *
  *  Created on: Oct 31, 2010
  *      Author: christiana
  */
-#ifndef SSCOPENIGTLINKRTSOURCE_H_
-#define SSCOPENIGTLINKRTSOURCE_H_
+#ifndef CXOPENIGTLINKRTSOURCE_H_
+#define CXOPENIGTLINKRTSOURCE_H_
 
-#include "sscRTSource.h"
+#include "sscVideoSource.h"
 #include <boost/array.hpp>
 #include "igtlImageMessage.h"
 #include <vector>
@@ -15,7 +15,7 @@ class QTimer;
 typedef vtkSmartPointer<class vtkImageImport> vtkImageImportPtr;
 typedef vtkSmartPointer<class vtkImageAlgorithm> vtkImageAlgorithmPtr;
 
-namespace ssc
+namespace cx
 {
 
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
@@ -23,7 +23,7 @@ typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
 /**Synchronize data with source,
  * provide data as a vtkImageData.
  */
-class OpenIGTLinkRTSource : public RTSource
+class OpenIGTLinkRTSource : public ssc::VideoSource
 {
   Q_OBJECT
 public:
@@ -89,6 +89,6 @@ private:
 };
 typedef boost::shared_ptr<OpenIGTLinkRTSource> OpenIGTLinkRTSourcePtr;
 
-} // namespace ssc
+} // namespace cx
 
-#endif /* SSCOPENIGTLINKRTSOURCE_H_ */
+#endif /* CXOPENIGTLINKRTSOURCE_H_ */
