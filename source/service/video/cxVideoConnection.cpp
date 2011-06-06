@@ -16,13 +16,13 @@
 #include "sscMessageManager.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
-#include "cxDataInterface.h"
-#include "cxProbe.h"
-#include "probeXmlConfigParser.h"
+//#include "cxDataInterface.h"
+//#include "cxProbe.h"
+//#include "probeXmlConfigParser.h"
 
 // must be removed!!!!
-#include "sscToolManager.h"
-#include "sscDataManager.h"
+//#include "sscToolManager.h"
+//#include "sscDataManager.h"
 
 namespace cx
 {
@@ -36,13 +36,13 @@ VideoConnection::VideoConnection()
   connect(mServer, SIGNAL(error(QProcess::ProcessError)), this, SLOT(serverProcessError(QProcess::ProcessError)));
 
   mRTSource.reset(new OpenIGTLinkRTSource());
-  ssc::dataManager()->loadStream(mRTSource);
-  connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
-  connect(getRTSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
+//  ssc::dataManager()->loadStream(mRTSource);
+//  connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SLOT(connectSourceToTool()));
+  connect(getVideoSource().get(), SIGNAL(connected(bool)), this, SIGNAL(connected(bool)));
   connect(mRTSource.get(), SIGNAL(fps(int)), this, SIGNAL(fps(int))); // thread-bridging connection
 
-  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(connectSourceToTool()));
-  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
+//  connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(connectSourceToTool()));
+//  connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(connectSourceToTool()));
 }
 
 VideoConnection::~VideoConnection()
@@ -244,82 +244,83 @@ void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
   }
 }
 
-/**insert the rt source into the (first) probe tool
- * in the tool manager.
- *
- * Apply time calibration to the source.
- *
- */
-void VideoConnection::connectSourceToTool()
-{
-  if (!mRTSource)
- {
-    ssc::messageManager()->sendError("no rt source.");
-    return;
- }
-
+//
+///**insert the rt source into the (first) probe tool
+// * in the tool manager.
+// *
+// * Apply time calibration to the source.
+// *
+// */
+//void VideoConnection::connectVideoToProbe(ssc::ToolPtr probe)
+//{
+//  if (!mRTSource)
+// {
+//    ssc::messageManager()->sendError("no rt source.");
 //    return;
-  // find probe in tool manager
-  // set source in cxTool
-  // insert timecalibration using config
-  if (!mRTSource->isConnected())
-    return;
+// }
+//
+////    return;
+//  // find probe in tool manager
+//  // set source in cxTool
+//  // insert timecalibration using config
+//  if (!mRTSource->isConnected())
+//    return;
+//
+//  if (mProbe)
+//    return;
+//
+////  ssc::ToolPtr probe = this->findSuitableProbe();
+//  if (!probe)
+//    return;
+//
+//  mProbe = probe;
+//
+//  if (mProbe)
+//  {
+//    ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(mProbe->getProbe());
+//    if (!probeInterface)
+//    {
+//      ssc::messageManager()->sendError("Probe not a cx instance.");
+//      return;
+//    }
+//    probeInterface->setRTSource(mRTSource);
+////    ssc::toolManager()->setDominantTool(mProbe->getUid());
+////    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getVideoSource()->getName() << " completed" << std::endl;
+//  }
+//}
 
-  if (mProbe)
-    return;
+//ssc::ToolPtr VideoConnection::getStreamingProbe()
+//{
+//  return mProbe;
+//}
 
-  ssc::ToolPtr probe = this->findSuitableProbe();
-  if (!probe)
-    return;
-
-  mProbe = probe;
-
-  if (mProbe)
-  {
-    ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(mProbe->getProbe());
-    if (!probeInterface)
-    {
-      ssc::messageManager()->sendError("Probe not a cx instance.");
-      return;
-    }
-    probeInterface->setRTSource(mRTSource);
-    ssc::toolManager()->setDominantTool(mProbe->getUid());
-//    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getRTSource()->getName() << " completed" << std::endl;
-  }
-}
-
-ssc::ToolPtr VideoConnection::getStreamingProbe()
-{
-  return mProbe;
-}
-
-/**Find a probe that can be connected to a rt source.
- *
- */
-ssc::ToolPtr VideoConnection::findSuitableProbe()
-{
-  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
-
-  // look for visible probes
-  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
-  {
-    if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
-    {
-      return iter->second;
-    }
-  }
-
-  // pick the first probe, visible or not.
-  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
-  {
-    if (iter->second->getProbe() && iter->second->getProbe()->isValid())
-    {
-      return iter->second;
-    }
-  }
-
-  return ssc::ToolPtr();
-}
+///**Find a probe that can be connected to a rt source.
+// *
+// */
+//ssc::ToolPtr VideoConnection::findSuitableProbe()
+//{
+//  ssc::ToolManager::ToolMapPtr tools = ssc::toolManager()->getTools();
+//
+//  // look for visible probes
+//  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+//  {
+//    if (iter->second->getProbe() && iter->second->getProbe()->isValid() && iter->second->getVisible())
+//    {
+//      return iter->second;
+//    }
+//  }
+//
+//  // pick the first probe, visible or not.
+//  for (ssc::ToolManager::ToolMap::iterator iter=tools->begin(); iter!=tools->end(); ++iter)
+//  {
+//    if (iter->second->getProbe() && iter->second->getProbe()->isValid())
+//    {
+//      return iter->second;
+//    }
+//  }
+//
+//  return ssc::ToolPtr();
+//}
 
 
 }//end namespace cx
