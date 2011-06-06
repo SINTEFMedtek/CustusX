@@ -8,22 +8,22 @@
 #include <QMetaType>
 #include <QFileInfo>
 #include <vtkDoubleArray.h>
+
 #include "sscRegistrationTransform.h"
 #include "sscMessageManager.h"
-#include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscPositionStorageFile.h"
 #include "sscTime.h"
 #include "sscEnumConverter.h"
+
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
-#include "cxRecordSession.h"
+//#include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
 #include "cxIgstkTrackerThread.h"
-#include "cxStateMachineManager.h"
 
 namespace cx
 {

@@ -49,6 +49,12 @@
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
 
+#include "sscData.h"
+#include "sscConsoleWidget.h"
+#include "cxViewManager.h"
+#include "cxStateMachineManager.h"
+
+
 namespace cx
 {
 
@@ -364,7 +370,7 @@ void MainWindow::createActions()
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   mStartStreamingAction->setShortcut(tr("Ctrl+V"));
   connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-  connect(stateManager()->getRTSourceManager()->getRTSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
+  connect(stateManager()->getRTSourceManager()->getVideoSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
   this->updateStreamingActionSlot();
 
   mConfigureToolsAction->setChecked(true);
@@ -468,9 +474,9 @@ void MainWindow::updateManualToolPhysicalProperties()
 
 void MainWindow::toggleStreamingSlot()
 {
-  if (stateManager()->getRTSourceManager()->getRTSource()->isStreaming())
+  if (stateManager()->getRTSourceManager()->getVideoSource()->isStreaming())
   {
-    stateManager()->getRTSourceManager()->getRTSource()->disconnectServer();
+    stateManager()->getRTSourceManager()->getVideoSource()->disconnectServer();
   }
   else
   {
@@ -480,7 +486,7 @@ void MainWindow::toggleStreamingSlot()
 
 void MainWindow::updateStreamingActionSlot()
 {
-  if (stateManager()->getRTSourceManager()->getRTSource()->isStreaming())
+  if (stateManager()->getRTSourceManager()->getVideoSource()->isStreaming())
   {
     mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
     mStartStreamingAction->setText("Stop Streaming");

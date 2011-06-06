@@ -18,7 +18,16 @@ SET( SOURCE_FILES
     sscMainWindow.cpp
     )
 
-include_directories( ${SNW_INCLUDE_DIRS} ${SSC_BINARY_DIR} )	
+include_directories( 
+    .
+    ${SNW_INCLUDE_DIRS} 
+    ${SSC_BINARY_DIR} 
+    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    )	
+    
+    
 
 IF(NOT THUNDER_FRAMEWORK)
   QT4_ADD_RESOURCES(SOURCE_FILES ../../gui/cxResources.qrc)
