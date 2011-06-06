@@ -23,7 +23,8 @@ include_directories(
     ${SNW_INCLUDE_DIRS} 
     ${SSC_BINARY_DIR} 
     ${CustusX3_SOURCE_DIR}/source/UsReconstruction
-    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     )	
     
     

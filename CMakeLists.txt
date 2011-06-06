@@ -70,7 +70,6 @@ SET(INSTALL_FOLDER_NAME "CustusX")
 
 add_subdirectory( externals )
 ADD_SUBDIRECTORY ( doc )
-add_subdirectory( modules/cxCommon )
 add_subdirectory( modules/OpenIGTLinkServer )
 ADD_SUBDIRECTORY ( source )
 

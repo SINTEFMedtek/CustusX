@@ -12,6 +12,7 @@
 #include <QObject>
 
 #include "sscTool.h"
+#include "cxProbe.h"
 
 namespace cx
 {
@@ -34,6 +35,7 @@ private slots:
 
 private:
 	ssc::ToolPtr findSuitableProbe();
+	void connectVideoToProbe(ssc::ToolPtr probe);
 };
 
 typedef boost::shared_ptr<ServiceController> ServiceControllerPtr;
