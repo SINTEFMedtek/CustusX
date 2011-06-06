@@ -7,7 +7,7 @@
 #include <QTextStream>
 #include "boost/shared_ptr.hpp"
 #include "sscVideoRecorder.h"
-#include "cxTool.h"
+#include "sscTool.h"
 
 class QDir;
 
@@ -28,7 +28,7 @@ typedef boost::shared_ptr<QTextStream> QTextStreamPtr;
 class UsReconstructionFileMaker
 {
 public:
-  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool);
+  UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool, QString calibFilename);
   ~UsReconstructionFileMaker();
 
   QString write();
@@ -53,6 +53,7 @@ private:
   QString mSessionDescription;
   QString mActivepatientPath;
   ssc::ToolPtr mTool;
+  QString mCalibFilename;
 
   QStringList mReport;
 };
