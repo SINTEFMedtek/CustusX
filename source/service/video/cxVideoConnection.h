@@ -48,8 +48,11 @@ public:
   void launchAndConnectServer();
 
   QProcess* getProcess() { return mServer; }
-  OpenIGTLinkRTSourcePtr getRTSource() { return mRTSource; }
+  OpenIGTLinkRTSourcePtr getVideoSource() { return mRTSource; }
   ssc::ToolPtr getStreamingProbe();
+
+//public slots:
+  void connectVideoToProbe(ssc::ToolPtr tool);
 
 signals:
   void fps(int fps);
@@ -61,12 +64,12 @@ public slots:
 private slots:
   void serverProcessStateChanged(QProcess::ProcessState newState);
   void serverProcessError(QProcess::ProcessError error);
-  void connectSourceToTool();
+//  void connectSourceToTool();
 //  void probeChangedSlot();
 
 private:
   void delayedAutoConnectServer();
-  ssc::ToolPtr findSuitableProbe();
+//  ssc::ToolPtr findSuitableProbe();
 
   ssc::ToolPtr mProbe;
   double mSoundSpeedCompensationFactor;

@@ -1,15 +1,15 @@
 #ifndef CXTOOLMANAGER_H_
 #define CXTOOLMANAGER_H_
 
+#include "vtkSmartPointer.h"
+
+#include "sscDummyTool.h"
 #include "sscToolManager.h"
 #include "sscDefinitions.h"
-//#include "itkCommand.h"
-#include "vtkSmartPointer.h"
 #include "sscManualTool.h"
 #include "sscLandmark.h"
+
 #include "cxTool.h"
-//#include "cxIgstkTracker"
-#include "sscDummyTool.h"
 #include "vtkForwardDeclarations.h"
 #include "cxManualToolAdapter.h"
 

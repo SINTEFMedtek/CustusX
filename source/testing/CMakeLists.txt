@@ -11,6 +11,23 @@ endif(COMMAND cmake_policy)
 # =========================================================
 
 if (BUILD_TESTING)
+
+include_directories(
+    .
+    ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/stateMachineManager    
+    ${CustusX3_SOURCE_DIR}/source/registrationManager    
+#    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters     
+    ${CustusX3_SOURCE_DIR}/source/service/patient     
+    ${CustusX3_SOURCE_DIR}/source/service/tracking     
+    ${CustusX3_SOURCE_DIR}/source/service/visualization
+    ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX3_SOURCE_DIR}/source/logic
+    ${CustusX3_SOURCE_DIR}/source/algorithms
+    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/source/gui
+    )    
     # -----------------------------------------------
     # CppUnit test framework: Create executable testCX
     #
