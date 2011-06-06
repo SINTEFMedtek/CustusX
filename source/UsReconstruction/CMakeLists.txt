@@ -46,7 +46,9 @@ SET( SOURCE_FILES
 
 SET( sscUsReconstructionLib_LIB_FILES
     SSC
-    cxCommon 
+    cxUtilities 
+    cxSettings
+    cxUtilities
     cxPatientService
     #thunder 
     cxTrackingService
@@ -59,7 +61,8 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource
     ${CustusX3_SOURCE_DIR}/source/service/patient
     ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     )
 
 
