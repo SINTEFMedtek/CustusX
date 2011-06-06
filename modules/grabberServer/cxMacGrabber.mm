@@ -1,11 +1,11 @@
-#ifdef(APPLE)
+#ifdef APPLE
 
 #import <Foundation/NSAutoreleasePool.h>
 #import <QTKit/QTKit.h>
 
 #include "sscTime.h"
 #include "sscTypeConversions.h"
-#include "cxGrabber.h"
+#include "cxMacGrabber.h"
 #include <iostream>
 #include <QWidget>
 #include <QMacCocoaViewContainer>
@@ -113,13 +113,6 @@ public:
     //observer
     VideoObserver*                        mVideoObserver;
 };
-//==============================================================================
-
-Grabber::Grabber()
-{
-  typedef cx::Frame Frame;
-  qRegisterMetaType<Frame>("Frame");
-}
 
 //==============================================================================
 
@@ -387,4 +380,4 @@ void MacGrabber::printAvailablePixelFormats()
 }
 
 }//namespace cx
-#endif(APPLE)
+#endif
