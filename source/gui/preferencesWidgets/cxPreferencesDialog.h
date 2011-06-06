@@ -100,12 +100,8 @@ public:
   PerformanceTab(QWidget *parent = 0);
   void init();
   
-  public slots:
+public slots:
   void saveParametersSlot();
-  
-signals:
-  void renderingIntervalChanged(int);
-  void shadingChanged(bool);
 
 protected:
   QSpinBox* mRenderingIntervalSpinBox;

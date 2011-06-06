@@ -35,7 +35,7 @@ UsReconstructionFileReader::UsReconstructionFileReader()
  * the mMask var is filled with data from ProbeData, or from file if present.
  *
  */
-UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath)
+UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QString fileName, QString calFilesPath, bool angio)
 {
   if (calFilesPath.isEmpty())
   {
@@ -62,7 +62,7 @@ UsReconstructionFileReader::FileData UsReconstructionFileReader::readAllFiles(QS
   }
 
   //Read US images
-  retval.mUsRaw = this->readUsDataFile(mhdFileName);
+  retval.mUsRaw = this->readUsDataFile(mhdFileName, angio);
 
   QString caliFilename;
   QStringList probeConfigPath;
@@ -188,7 +188,7 @@ ProbeXmlConfigParser::Configuration UsReconstructionFileReader::readProbeConfigu
 }
 
 
-ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName)
+ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileName, bool angio)
 {
   //Read US images
 
@@ -210,7 +210,7 @@ ssc::USFrameDataPtr UsReconstructionFileReader::readUsDataFile(QString mhdFileNa
   ssc::ImagePtr UsRaw = boost::shared_dynamic_cast<ssc::Image>(ssc::MetaImageReader().load(fileName, mhdFileName));
   UsRaw->setFilePath(filePath);
   ssc::USFrameDataPtr retval;
-  retval.reset(new ssc::USFrameData(UsRaw));
+  retval.reset(new ssc::USFrameData(UsRaw, angio));
   return retval;
 }
 

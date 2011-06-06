@@ -40,17 +40,19 @@
 #include "cxUSAcqusitionWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxRegistrationMethodsWidget.h"
 #include "cxVisualizationMethodsWidget.h"
 #include "cxSegmentationMethodsWidget.h"
 #include "cxCalibrationMethodsWidget.h"
+#include "cxToolManagerWidget.h"
+#include "cxVideoService.h"
+#include "cxLogicManager.h"
 
 namespace cx
 {
 
 MainWindow::MainWindow() :
-  //mCentralWidget(new QWidget(this)),
   mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
@@ -110,6 +112,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mNavigationWidget, "Properties");
   this->addAsDockWidget(mConsoleWidget, "Utility");
   this->addAsDockWidget(mFrameTreeWidget, "Browsing");
+  this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
 
@@ -121,15 +124,12 @@ MainWindow::MainWindow() :
   // Restore saved window states
   // Must be done after all DockWidgets are created
   if (!restoreGeometry(settings()->value("mainWindow/geometry").toByteArray()))
-   // this->resize(QSize(1200, 1000));//Set initial size if no previous size exist
     this->showMaximized();
-  //restoreState(settings()->value("mainWindow/windowState").toByteArray());
   else
-  // Don't show the Widget before all elements are initialized
     this->show();
-  //std::cout << "end construct main win" << std::endl;
 
   this->startupLoadPatient();
+  this->toggleDebugModeSlot(mDebugModeAction->isChecked());
 }
 
 void MainWindow::changeEvent(QEvent * event)
@@ -143,9 +143,7 @@ void MainWindow::changeEvent(QEvent * event)
   }
 }
 
-
 /**Parse the command line and load a patient if the switch --patient is found
- *
  */
 void MainWindow::startupLoadPatient()
 {
@@ -174,7 +172,6 @@ void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
   {
     if (this->dockWidgetArea(*iter)==Qt::LeftDockWidgetArea)
     {
-//      std::cout << "tabify " << (*iter)->objectName() << "\t" << dockWidget->objectName() << std::endl;
       this->tabifyDockWidget(*iter, dockWidget);
       break;
     }
@@ -209,23 +206,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::initialize()
 {
+	// resources layer
   ssc::MessageManager::getInstance();
 
+  // services layer
+  cx::VideoService::initialize();
   cx::DataManager::initialize();
   cx::ToolManager::initializeObject();
+
+  // logic layer
+  cx::LogicManager::initialize();
+
+  // gui layer:
+  // inited by mainwindow construction in main()
 }
 
 /** deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
- *
  */
 void MainWindow::shutdown()
 {
+	// gui layer
+	// already destroyed by mainwindow
+
+	// old stuff - high level
   StateManager::destroyInstance();
   ViewManager::destroyInstance();
   RegistrationManager::shutdown();
   RepManager::destroyInstance();
+
+  // logic layer
+  cx::LogicManager::shutdown();
+
+  // service layer
   cx::ToolManager::shutdown();
   cx::DataManager::shutdown();
+  cx::VideoService::shutdown();
 }
 
 QMenu* MainWindow::createPopupMenu()
@@ -234,7 +249,6 @@ QMenu* MainWindow::createPopupMenu()
   std::map<QString, QActionGroup*>::iterator it = mWidgetGroupsMap.begin();
   for(; it!= mWidgetGroupsMap.end(); ++it)
   {
-//    it->first; //make some kind of header
     popupMenu->addSeparator();
     popupMenu->addActions(it->second->actions());
   }
@@ -244,26 +258,19 @@ QMenu* MainWindow::createPopupMenu()
 
 void MainWindow::createActions()
 {
-  //TODO: add shortcuts and tooltips
-
   mStandard3DViewActions = mCameraControl->createStandard3DViewActions();
 
   // File
-
   mNewPatientAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-new-8.png"), tr("&New patient"), this);
-//  mNewPatientAction->setIcon(QIcon(":/icons/patient_new.png"));
   mNewPatientAction->setShortcut(tr("Ctrl+N"));
   mNewPatientAction->setStatusTip(tr("Create a new patient file"));
   mSaveFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-save-5.png"), tr("&Save Patient"), this);
-//  mSaveFileAction->setIcon(QIcon(":/icons/patient_save.png"));
   mSaveFileAction->setShortcut(tr("Ctrl+S"));
   mSaveFileAction->setStatusTip(tr("Save patient file"));
   mLoadFileAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-open-7.png"), tr("&Load Patient"), this);
-//  mLoadFileAction->setIcon(QIcon(":/icons/patient_load.png"));
   mLoadFileAction->setShortcut(tr("Ctrl+L"));
   mLoadFileAction->setStatusTip(tr("Load patient file"));
   mClearPatientAction = new QAction(tr("&Clear Patient"), this);
-//  mClearPatientAction->setIcon(QIcon(":/icons/patient_clear.png"));
   mExportPatientAction = new QAction(tr("&Export Patient"), this);
 
   connect(mNewPatientAction, SIGNAL(triggered()), this, SLOT(newPatientSlot()));
@@ -289,6 +296,9 @@ void MainWindow::createActions()
   mDebugModeAction->setCheckable(true);
   mDebugModeAction->setChecked(DataManager::getInstance()->getDebugMode());
   mDebugModeAction->setStatusTip(tr("Set debug mode, this enables lots of weird stuff."));
+  connect(mDebugModeAction, SIGNAL(triggered(bool)), DataManager::getInstance(), SLOT(setDebugMode(bool)));
+  connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
+  connect(mDebugModeAction, SIGNAL(toggled(bool)), this, SLOT(toggleDebugModeSlot(bool)));
 
   mFullScreenAction = new QAction(tr("Fullscreen"), this);
   mFullScreenAction->setShortcut(tr("F11"));
@@ -303,8 +313,6 @@ void MainWindow::createActions()
 
   connect(mAboutAction, SIGNAL(triggered()), this, SLOT(aboutSlot()));
   connect(mPreferencesAction, SIGNAL(triggered()), this, SLOT(preferencesSlot()));
-  connect(mDebugModeAction, SIGNAL(triggered(bool)), DataManager::getInstance(), SLOT(setDebugMode(bool)));
-  connect(DataManager::getInstance(), SIGNAL(debugModeChanged(bool)), mDebugModeAction, SLOT(setChecked(bool)));
   connect(mQuitAction, SIGNAL(triggered()), this, SLOT(quitSlot()));
 
   mShootScreenAction = new QAction(tr("Shoot Screen"), this);
@@ -323,7 +331,6 @@ void MainWindow::createActions()
   mImportDataAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/document-import-2.png"), tr("&Import data"), this);
   mImportDataAction->setShortcut(tr("Ctrl+I"));
   mImportDataAction->setStatusTip(tr("Import image data"));
-//  mImportDataAction->setIcon(QIcon(":/icons/patient_import.png"));
 
   mDeleteDataAction = new QAction(tr("Delete current image"), this);
   mDeleteDataAction->setStatusTip(tr("Delete selected volume"));
@@ -353,8 +360,6 @@ void MainWindow::createActions()
   mToolsActionGroup->setExclusive(false); // must turn off to get the checkbox independent.
   connect(mManualToolPhysicalProperties, SIGNAL(triggered()), this, SLOT(manualToolPhysicalPropertiesSlot()));
   this->updateManualToolPhysicalProperties();
-
-//  if (settings()->value("giveManualToolPhysicalProperties").toBool())
 
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   mStartStreamingAction->setShortcut(tr("Ctrl+V"));
@@ -389,11 +394,9 @@ void MainWindow::createActions()
   mCenterToTooltipAction->setIcon(QIcon(":/icons/center_tool.png"));
   connect(mCenterToTooltipAction, SIGNAL(triggered()), this, SLOT(centerToTooltipSlot()));
 
-//  mSaveDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/go-down-4.png"), tr("Save desktop"), this);
   mSaveDesktopAction = new QAction(QIcon(":/icons/workflow_state_save.png"), tr("Save desktop"), this);
   mSaveDesktopAction->setToolTip("Save desktop for workflow step");
   connect(mSaveDesktopAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
-//  mResetDesktopAction = new QAction(QIcon(":/icons/open_icon_library/png/64x64/actions/edit-undo-8.png"), tr("Reset desktop"), this);
   mResetDesktopAction = new QAction(QIcon(":/icons/workflow_state_revert.png"), tr("Reset desktop"), this);
   mResetDesktopAction->setToolTip("Reset desktop for workflow step");
   connect(mResetDesktopAction, SIGNAL(triggered()), this, SLOT(resetDesktopSlot()));
@@ -404,16 +407,6 @@ void MainWindow::createActions()
 void MainWindow::toggleFullScreenSlot()
 {
   this->setWindowState(this->windowState() ^ Qt::WindowFullScreen);
-//  bool fs = this->windowState() & Qt::WindowFullScreen;
-////  bool mx = this->windowState() & Qt::WindowMaximized;
-////  std::cout << "Fullscreen pre: full=" << fs << ", max=" << mx << std::endl;
-//  if (fs)
-//    this->showNormal();
-//  else
-//    this->showFullScreen();
-////  fs = this->windowState() & Qt::WindowFullScreen;
-////  mx = this->windowState() & Qt::WindowMaximized;
-////  std::cout << "Fullscreen post: full=" << fs << ", max=" << mx << std::endl;
 }
 
 void MainWindow::shootScreen()
@@ -424,6 +417,32 @@ void MainWindow::shootScreen()
 void MainWindow::shootWindow()
 {
   this->saveScreenShot(QPixmap::grabWindow(this->winId()));
+}
+
+void MainWindow::toggleDebugModeSlot(bool checked)
+{
+  QActionGroup* debugActionGroup;
+  if(mWidgetGroupsMap.find("Debugging") != mWidgetGroupsMap.end())
+  {
+    debugActionGroup = mWidgetGroupsMap["Debugging"];
+  }
+  else
+    return;
+
+  QList<QAction*> debugActions = debugActionGroup->actions();
+  QAction* action;
+  foreach(action, debugActions)
+  {
+    action->setVisible(checked);
+    for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
+    {
+      if(action == (*iter)->toggleViewAction())
+      {
+        if(!checked)
+          (*iter)->hide();
+      }
+    }
+  }
 }
 
 void MainWindow::saveScreenShot(QPixmap pixmap)
@@ -809,6 +828,9 @@ void MainWindow::createMenus()
     QString shortcut = "Ctrl+"+QString::number(i);
     actions[i-1]->setShortcut(shortcut);
   }
+  mWorkflowMenu->addSeparator();
+  mWorkflowMenu->addAction(mSaveDesktopAction);
+  mWorkflowMenu->addAction(mResetDesktopAction);
 
   //tool
   this->menuBar()->addMenu(mToolMenu);

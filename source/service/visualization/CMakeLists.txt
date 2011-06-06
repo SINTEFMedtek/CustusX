@@ -1,0 +1,74 @@
+#SET (LIB viewManager)
+
+SET( CX_QT_MOC_HEADER_FILES
+    cxView2D.h
+    cxView3D.h
+    cxViewWrapper2D.h
+    cxViewWrapper3D.h
+    cxViewWrapperVideo.h
+    cxViewManager.h
+    cxViewWrapper.h
+    cxViewGroup.h
+    cxTreeModelItem.h
+    cxInteractiveClipper.h
+    cxInteractiveCropper.h
+    cxCameraControl.h
+    cxCameraStyle.h
+    Rep/cxLandmarkRep.h
+    Rep/sscOrientationAnnotation3DRep.h
+    cxRepManager.h
+)
+
+SET ( cxVisualizationService_SOURCE
+    ${CX_QT_MOC_HEADER_FILES}
+    cxView2D.cpp
+    cxView2D.h
+    cxView3D.cpp
+    cxView3D.h
+    cxViewWrapper2D.cpp
+    cxViewWrapper2D.h
+    cxViewWrapperVideo.cpp
+    cxViewWrapperVideo.h
+    cxViewWrapper3D.cpp
+    cxViewWrapper3D.h
+    cxViewWrapper.h
+    cxViewWrapper.cpp
+    cxViewManager.cpp
+    cxViewManager.h
+    cxViewGroup.h
+    cxViewGroup.cpp
+    cxLayoutData.h
+    cxLayoutData.cpp
+    #cxViewGroupInria.h
+    #cxViewGroupInria.cpp
+    cxTreeModelItem.h
+    cxTreeModelItem.cpp
+    cxInteractiveClipper.h
+    cxInteractiveClipper.cpp
+    cxInteractiveCropper.h
+    cxInteractiveCropper.cpp
+    cxCameraControl.h
+    cxCameraControl.cpp
+    cxCameraStyle.h
+    cxCameraStyle.cpp
+    cxRenderTimer.h
+    cxRenderTimer.cpp
+    Rep/cxLandmarkRep.h
+    Rep/cxLandmarkRep.cpp
+    Rep/cxImageLandmarkRep.h
+    Rep/cxImageLandmarkRep.cpp
+    Rep/cxPatientLandmarkRep.h
+    Rep/cxPatientLandmarkRep.cpp
+    Rep/sscOrientationAnnotation3DRep.h
+    Rep/sscOrientationAnnotation3DRep.cpp
+    cxRepManager.h
+    cxRepManager.cpp
+    )
+
+QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
+
+include_directories(Rep)
+
+ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
+target_link_libraries(cxVisualizationService SSC cxCommon cxAlgorithms)
+

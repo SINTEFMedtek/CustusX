@@ -1,10 +1,3 @@
-/*
- * cxCroppingWidget.cpp
- *
- *  Created on: Aug 20, 2010
- *      Author: christiana
- */
-
 #include "cxCroppingWidget.h"
 #include <QVBoxLayout>
 #include <QPushButton>
@@ -25,20 +18,11 @@
 
 namespace cx
 {
-
-///--------------------------------------------------------
-///--------------------------------------------------------
-///--------------------------------------------------------
-
-
-
-CroppingWidget::CroppingWidget(QWidget* parent) : QWidget(parent)
+CroppingWidget::CroppingWidget(QWidget* parent) : 
+  BaseWidget(parent, "CroppingWidget", "Crop")
 {
   mInteractiveCropper = viewManager()->getCropper();
   connect(mInteractiveCropper.get(), SIGNAL(changed()), this, SLOT(cropperChangedSlot()));
-
-  this->setObjectName("ClippingWidget");
-  this->setWindowTitle("Crop");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -46,13 +30,9 @@ CroppingWidget::CroppingWidget(QWidget* parent) : QWidget(parent)
   layout->addWidget(activeGroupBox);
   QVBoxLayout* activeLayout = new QVBoxLayout(activeGroupBox);
 
-//  mPlaneAdapter = ClipPlaneStringDataAdapter::New(mInteractiveClipper);
-//  ssc::ComboGroupWidget* combo = new ssc::ComboGroupWidget(this, mPlaneAdapter);
-
   mUseCropperCheckBox = new QCheckBox("Use Cropper");
   connect(mUseCropperCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(useCropping(bool)));
   activeLayout->addWidget(mUseCropperCheckBox);
-  //activeLayout->addWidget(combo);
   mShowBoxCheckBox = new QCheckBox("Show box (i)");
   mShowBoxCheckBox->setToolTip("Show crop box in 3D view. Press 'i' in the view to do the same.");
   connect(mShowBoxCheckBox, SIGNAL(toggled(bool)), mInteractiveCropper.get(), SLOT(showBoxWidget(bool)));
@@ -81,23 +61,18 @@ CroppingWidget::CroppingWidget(QWidget* parent) : QWidget(parent)
   connect(cropClipButton, SIGNAL(clicked()), this, SLOT(cropClipButtonClickedSlot()));
   layout->addWidget(cropClipButton);
 
-//  QxtSpanSlider* spanSlider = new QxtSpanSlider(this);
-//  spanSlider->setOrientation(Qt::Horizontal);
-//  spanSlider->setRange(-500, 500);
-//  spanSlider->setLowerValue(-200);
-//  spanSlider->setUpperValue(200);
-//  spanSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
-//  layout->addWidget(spanSlider);
-
   layout->addStretch();
-//  QPushButton* saveButton = new QPushButton("Save clip plane");
-//  saveButton->setEnabled(false);
-//  QPushButton* clearButton = new QPushButton("Clear saved planes");
-//  clearButton->setEnabled(false);
-//  activeLayout->addWidget(saveButton);
-//  layout->addWidget(clearButton);
 
   this->cropperChangedSlot();
+}
+
+QString CroppingWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Functionality for cropping a volume.</h3>"
+    "<p>Lets you crop a volume.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void CroppingWidget::boxValuesChanged()
@@ -119,13 +94,11 @@ void CroppingWidget::cropperChangedSlot()
   mZRange->blockSignals(true);
 
   ssc::DoubleBoundingBox3D range =  mInteractiveCropper->getMaxBoundingBox();
-//std::cout << "CroppingWidget::cropperChangedSlot(" << box << ")" << std::endl;
   mXRange->setRange(ssc::DoubleRange(range.begin()[0], range.begin()[1], 1));
   mYRange->setRange(ssc::DoubleRange(range.begin()[2], range.begin()[3], 1));
   mZRange->setRange(ssc::DoubleRange(range.begin()[4], range.begin()[5], 1));
 
   ssc::DoubleBoundingBox3D box =  mInteractiveCropper->getBoundingBox();
-//std::cout << "CroppingWidget::cropperChangedSlot(" << box << ")" << std::endl;
   mXRange->setValue(std::make_pair(box.begin()[0], box.begin()[1]));
   mYRange->setValue(std::make_pair(box.begin()[2], box.begin()[3]));
   mZRange->setValue(std::make_pair(box.begin()[4], box.begin()[5]));

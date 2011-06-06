@@ -5,7 +5,7 @@
 #include "cxBaseWidget.h"
 #include "sscTool.h"
 #include "cxDataInterface.h"
-#include "sscRTSourceRecorder.h"
+#include "sscVideoRecorder.h"
 #include "sscReconstructer.h"
 #include "cxUsReconstructionFileMaker.h"
 
