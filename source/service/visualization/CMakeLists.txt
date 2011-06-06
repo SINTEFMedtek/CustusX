@@ -1,4 +1,11 @@
-#SET (LIB viewManager)
+###########################################################
+##               Visualization Service
+##
+##  Dependencies:
+##     - entire service layer, resource layer
+##  TODO: find out if this is a service or part of the logic layer (because of the service layer dependencies)
+##
+###########################################################
 
 SET( CX_QT_MOC_HEADER_FILES
     cxView2D.h
