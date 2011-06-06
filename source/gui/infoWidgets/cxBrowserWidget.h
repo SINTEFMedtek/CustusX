@@ -56,6 +56,7 @@ private:
   QItemSelectionModel* mSelectionModel;
   ssc::StringDataAdapterXmlPtr mFilter;
   TreeItem* itemFromIndex(const QModelIndex& index) const;
+  void fillModelTreeFromViewManager(TreeItemPtr root);
 };
 
 /**

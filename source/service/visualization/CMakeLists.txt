@@ -16,7 +16,6 @@ SET( CX_QT_MOC_HEADER_FILES
     cxViewManager.h
     cxViewWrapper.h
     cxViewGroup.h
-    cxTreeModelItem.h
     cxInteractiveClipper.h
     cxInteractiveCropper.h
     cxCameraControl.h
@@ -46,10 +45,6 @@ SET ( cxVisualizationService_SOURCE
     cxViewGroup.cpp
     cxLayoutData.h
     cxLayoutData.cpp
-    #cxViewGroupInria.h
-    #cxViewGroupInria.cpp
-    cxTreeModelItem.h
-    cxTreeModelItem.cpp
     cxInteractiveClipper.h
     cxInteractiveClipper.cpp
     cxInteractiveCropper.h
@@ -58,8 +53,6 @@ SET ( cxVisualizationService_SOURCE
     cxCameraControl.cpp
     cxCameraStyle.h
     cxCameraStyle.cpp
-#    cxRenderTimer.h
-#    cxRenderTimer.cpp
     Rep/cxLandmarkRep.h
     Rep/cxLandmarkRep.cpp
     Rep/cxImageLandmarkRep.h
@@ -75,16 +68,11 @@ SET ( cxVisualizationService_SOURCE
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/service/patient
-    ${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/stateMachineManager
-    ${CustusX3_SOURCE_DIR}/source/algorithms
-    ${CustusX3_SOURCE_DIR}/source/gui # REMOVE
-    ${CustusX3_SOURCE_DIR}/source/gui/infoWidgets # REMOVE
-#    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    #${CustusX3_SOURCE_DIR}/resource/utilities    
+    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
+    ${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/tracking
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -92,5 +80,5 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 include_directories(Rep)
 
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxVisualizationService SSC cxSettings cxVideoService cxPatientService cxTrackingService cxAlgorithms)
+target_link_libraries(cxVisualizationService SSC cxSettings cxVideoService cxPatientService cxTrackingService cxAlgorithms_Res)
 
