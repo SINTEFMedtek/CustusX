@@ -1,4 +1,11 @@
-#SET (LIB viewManager)
+###########################################################
+##               Visualization Service
+##
+##  Dependencies:
+##     - entire service layer, resource layer
+##  TODO: find out if this is a service or part of the logic layer (because of the service layer dependencies)
+##
+###########################################################
 
 SET( CX_QT_MOC_HEADER_FILES
     cxView2D.h
@@ -63,6 +70,19 @@ SET ( cxVisualizationService_SOURCE
     Rep/sscOrientationAnnotation3DRep.cpp
     cxRepManager.h
     cxRepManager.cpp
+    )
+
+include_directories(
+    .
+    ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/source/stateMachineManager
+    ${CustusX3_SOURCE_DIR}/source/algorithms
+    ${CustusX3_SOURCE_DIR}/source/gui # REMOVE
+    ${CustusX3_SOURCE_DIR}/source/gui/infoWidgets # REMOVE
+#    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/modules/cxCommon
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )

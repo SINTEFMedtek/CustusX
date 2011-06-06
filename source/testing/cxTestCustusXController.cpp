@@ -17,6 +17,11 @@
 #include <QTimer>
 #include "sscTypeConversions.h"
 
+#include "sscData.h"
+#include "sscConsoleWidget.h"
+#include "cxViewManager.h"
+#include "cxStateMachineManager.h"
+
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
   mTestData += "Test Results:\n";
