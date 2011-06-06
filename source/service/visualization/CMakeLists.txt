@@ -72,6 +72,19 @@ SET ( cxVisualizationService_SOURCE
     cxRepManager.cpp
     )
 
+include_directories(
+    .
+    ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/source/stateMachineManager
+    ${CustusX3_SOURCE_DIR}/source/algorithms
+    ${CustusX3_SOURCE_DIR}/source/gui # REMOVE
+    ${CustusX3_SOURCE_DIR}/source/gui/infoWidgets # REMOVE
+#    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    )
+
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 include_directories(Rep)
