@@ -143,7 +143,7 @@ void StatusBar::tpsSlot(int numTps)
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-  OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getRTSource();
+  OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getVideoSource();
   QString infoString = grabber->getName()+"-FPS: "+QString::number(numFps);
   mGrabbingInfoLabel->setText(infoString);
 }

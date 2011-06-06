@@ -106,7 +106,7 @@ QProcess* IGTLinkWidget::getServer()
 
 OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
 {
-  return getConnection()->getRTSource();
+  return getConnection()->getVideoSource();
 }
 
 VideoConnectionPtr IGTLinkWidget::getConnection()
@@ -130,7 +130,7 @@ void IGTLinkWidget::dataChanged()
   mLocalServerEdit->setEnabled(getConnection()->getUseLocalServer());
   mLaunchServerButton->setEnabled(getConnection()->getUseLocalServer());
 
-  mShowStreamButton->setEnabled(getConnection()->getRTSource()->isConnected());
+  mShowStreamButton->setEnabled(getConnection()->getVideoSource()->isConnected());
 }
 
 void IGTLinkWidget::updateHostHistory()

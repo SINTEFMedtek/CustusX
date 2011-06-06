@@ -2,10 +2,13 @@
 #define CXMAINWINDOW_H_
 
 #include <QMainWindow>
-#include "sscData.h"
-#include "sscConsoleWidget.h"
-#include "cxViewManager.h"
-#include "cxStateMachineManager.h"
+//#include "sscData.h"
+//#include "sscConsoleWidget.h"
+//#include "cxViewManager.h"
+//#include "cxStateMachineManager.h"
+#include <map>
+#include <set>
+#include "boost/shared_ptr.hpp"
 
 class QAction;
 class QMenu;
@@ -14,10 +17,12 @@ class QActionGroup;
 namespace ssc
 {
   class ReconstructionWidget;
+  class ConsoleWidget;
 }
 
 namespace cx
 {
+class LayoutData;
 typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
 
 /**
@@ -35,7 +40,7 @@ class MainWindow : public QMainWindow
 
 public:
   MainWindow();
-  ~MainWindow();
+  virtual ~MainWindow();
   
   static void initialize();
   static void shutdown(); ///< deallocate all global resources. Assumes MainWindow already has been destroyed and the mainloop is exited
