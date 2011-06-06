@@ -36,7 +36,7 @@ ENDIF(APPLE)
 
 #----------
 # LINK
-TARGET_LINK_LIBRARIES( CustusX gui cxCommon )
+TARGET_LINK_LIBRARIES( CustusX gui )
 
 
 

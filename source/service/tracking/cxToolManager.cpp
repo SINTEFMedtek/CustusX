@@ -19,7 +19,7 @@
 #include "cxTool.h"
 #include "cxIgstkTracker.h"
 #include "cxToolConfigurationParser.h"
-#include "cxRecordSession.h"
+//#include "cxRecordSession.h"
 #include "cxManualToolAdapter.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
