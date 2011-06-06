@@ -49,6 +49,12 @@
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
 
+#include "sscData.h"
+#include "sscConsoleWidget.h"
+#include "cxViewManager.h"
+#include "cxStateMachineManager.h"
+
+
 namespace cx
 {
 
