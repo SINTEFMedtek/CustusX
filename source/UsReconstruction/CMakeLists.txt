@@ -53,6 +53,16 @@ SET( sscUsReconstructionLib_LIB_FILES
     ITKCommon
     )
 
+
+include_directories(
+    .
+    ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    )
+
+
 # 
 FIND_LIBRARY(OPENCL_LIBRARIES OpenCL)
 IF( OPENCL_LIBRARIES )
