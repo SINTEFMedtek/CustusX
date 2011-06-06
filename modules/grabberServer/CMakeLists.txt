@@ -55,23 +55,28 @@ include(${OpenIGTLink_USE_FILE})
 find_package (SSC PATHS "../../externals/ssc/CMake" REQUIRED)
 include (${SSC_USE_FILE})
 
-#Foundation
+# APPLE libs
 #----------
 IF(APPLE)
+
+  ##Foundation
   FIND_LIBRARY(FOUNDATION_LIBRARY Foundation)
-ENDIF(APPLE)
 
-#QtKit
-#----------
-IF(APPLE)
+  ##QtKit
   FIND_LIBRARY(QTKIT_LIBRARY QtKit)
+
+  ##Quartz
+  FIND_LIBRARY(QUARTZCORE_LIBRARY QuartzCore)
+
 ENDIF(APPLE)
 
-#Quartz
-#------
-IF(APPLE)
-  FIND_LIBRARY(QUARTZCORE_LIBRARY QuartzCore)
-ENDIF(APPLE)
+# WINDOWS libs
+#----------
+IF(WIN32)
+
+  #TODO ulterius
+
+ENDIF(WIN32)
 
 #------------------------------------------------------------------------------
 # Qt - MOC
@@ -79,18 +84,26 @@ ENDIF(APPLE)
 SET(${LIBNAME}_MOC_HDRS
     cxMainWindow.h
     cxGrabberServerWidget.h
+    cxMacGrabberServerWidget.h
+    cxWinGrabberServerWidget.h
     cxGrabber.h
+    cxMacGrabber.h
+    cxWinGrabber.h
     cxServer.h
     cxGrabberServer.h
     cxOpenIGTLinkSession.h
     cxIGTLinkImageMessage.h
+    cxWinGrabberServer.h
+    cxMacGrabberServer.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
-IF(WIN32)
-  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} ${QTUI_HEADERFILES} OPTIONS "-D_WINDOWS")
-ELSE(WIN32)
+IF(APPLE)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
+ENDIF(APPLE)
+
+IF(WIN32)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} OPTIONS "-D_WINDOWS")
 ENDIF(WIN32)
 
 #------------------------------------------------------------------------------
@@ -100,9 +113,14 @@ SET(SOURCES
     main.cpp
     cxMainWindow.cpp
     cxGrabberServerWidget.cpp
-    cxGrabber.mm
+    cxMacGrabberServerWidget.cpp
+    cxWinGrabberServerWidget.cpp
+    cxMacGrabber.mm
+    cxWinGrabber.cpp
     cxServer.cpp
     cxGrabberServer.cpp
+    cxWinGrabberServer.cpp
+    cxMacGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
     cxIGTLinkImageMessage.cpp
     ${${LIBNAME}_MOC_HDRS}
@@ -118,7 +136,13 @@ INCLUDE_DIRECTORIES(
 #------------------------------------------------------------------------------
 # Executable
 #------------------------------------------------------------------------------
-ADD_EXECUTABLE(GrabberServer MACOSX_BUNDLE ${SOURCES})
+IF(APPLE)
+  ADD_EXECUTABLE(GrabberServer MACOSX_BUNDLE ${SOURCES})
+ENDIF(APPLE)
+
+IF(WIN32)
+  ADD_EXECUTABLE(GrabberServer ${SOURCES})
+ENDIF(WIN32)
 
 #------------------------------------------------------------------------------
 # Link
