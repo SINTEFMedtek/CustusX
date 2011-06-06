@@ -1,14 +1,7 @@
-/*
- * cxClippingWidget.h
- *
- *  Created on: Aug 25, 2010
- *      Author: christiana
- */
-
 #ifndef CXCLIPPINGWIDGET_H_
 #define CXCLIPPINGWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 #include "sscForwardDeclarations.h"
 #include "sscStringDataAdapter.h"
 #include "cxViewManager.h"
@@ -40,14 +33,21 @@ public: // optional methods
 };
 
 
-/**
+/*
+ * \class ClippingWidget
  *
+ * \date Aug 25, 2010
+ * \author Christian Askeland, SINTEF
  */
-class ClippingWidget : public QWidget
+
+class ClippingWidget : public BaseWidget
 {
   Q_OBJECT
+
 public:
   ClippingWidget(QWidget* parent);
+  virtual QString defaultWhatsThis() const;
+
 private:
   InteractiveClipperPtr mInteractiveClipper;
 

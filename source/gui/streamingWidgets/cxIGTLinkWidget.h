@@ -1,32 +1,36 @@
 #ifndef CXIGTLINKWIDGET_H_
 #define CXIGTLINKWIDGET_H_
 
+#include "cxBaseWidget.h"
+
 #include <vector>
 #include <QtGui>
 #include "sscDoubleWidgets.h"
 #include "sscView.h"
-#include "RTSource/sscOpenIGTLinkRTSource.h"
+#include "cxOpenIGTLinkRTSource.h"
 #include "cxRenderTimer.h"
 namespace cx
 {
 typedef boost::shared_ptr<class IGTLinkClient> IGTLinkClientPtr;
-typedef boost::shared_ptr<class RTSourceManager> IGTLinkConnectionPtr;
+typedef boost::shared_ptr<class VideoConnection> VideoConnectionPtr;
 
 
 /**
  * \class IGTLinkWidget
- * GUI for setup of a IGTLink connection.
+ * \brief GUI for setup of a IGTLink connection.
  *
  * \date 2010.10.27
  * \author: Christian Askeland, SINTEF
  */
-class IGTLinkWidget : public QWidget
+class IGTLinkWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   IGTLinkWidget(QWidget* parent);
   virtual ~IGTLinkWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 private slots:
   void toggleLaunchServer();
@@ -45,8 +49,8 @@ private:
   void dataChanged();
   void updateHostHistory();
   QProcess* getServer();
-  ssc::OpenIGTLinkRTSourcePtr getRTSource();
-  IGTLinkConnectionPtr getConnection();
+  OpenIGTLinkRTSourcePtr getRTSource();
+  VideoConnectionPtr getConnection();
   void writeSettings();
 
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget

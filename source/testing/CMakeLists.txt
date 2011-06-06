@@ -31,7 +31,7 @@ if (BUILD_TESTING)
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(testCX cxCppUnitMain.cpp ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCX SSC gui ${CPPUNIT_LIBRARIES})
+    target_link_libraries(testCX SSC gui ${CPPUNIT_LIBRARIES}  cxVideoService)
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -44,7 +44,7 @@ if (BUILD_TESTING)
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testCX_CppUnit_CTest ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCX_CppUnit_CTest cisstTestsMain SSC gui ${CPPUNIT_LIBRARIES})
+    target_link_libraries(testCX_CppUnit_CTest cisstTestsMain SSC gui ${CPPUNIT_LIBRARIES}  cxVideoService)
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testCX_CppUnit_CTest)
     

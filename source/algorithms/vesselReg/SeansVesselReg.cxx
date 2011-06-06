@@ -15,6 +15,8 @@
 
 //#include "cxStateMachineManager.h"
 //#include "cxPatientData.h"
+#include "vtkClipPolyData.h"
+#include "vtkPlanes.h"
 
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
@@ -368,6 +370,16 @@ vtkPolyDataPtr SeansVesselReg::convertToPolyData(ssc::DataPtr data)
   return vtkPolyDataPtr();
 }
 
+void printPoly(vtkPolyDataPtr data)
+{
+  vtkPointsPtr points = data->GetPoints();
+  for (int q=0; q< points->GetNumberOfPoints(); ++q)
+  {
+  	ssc::Vector3D p(points->GetPoint(q));
+  	std::cout << q << "\t" << p[0] << " "  << p[1] << " " << p[2] << " " << std::endl;
+  }
+}
+
 bool SeansVesselReg::doItRight(ssc::DataPtr source, ssc::DataPtr target, QString logPath)
 {
   ssc::messageManager()->sendDebug("SOURCE: "+source->getUid());
@@ -402,9 +414,42 @@ bool SeansVesselReg::doItRight(ssc::DataPtr source, ssc::DataPtr target, QString
   targetBounds[5] += searchAround;
 
   vtkPolyDataPtr sourcePolyData = this->convertToPolyData(source);
-//  vtkPolyDataPtr sourcePolyData = this->extractPolyData(source, mt_singlePointThreshold, targetBounds);
+////  vtkPolyDataPtr sourcePolyData = this->extractPolyData(source, mt_singlePointThreshold, targetBounds);
+//  std::cout << "source data " << sourcePolyData->GetPoints()->GetNumberOfPoints() << std::endl;
+////  printPoly(sourcePolyData);
+//  std::cout << ssc::DoubleBoundingBox3D(sourcePolyData->GetBounds()) << std::endl;
+//  std::cout << std::endl;
 
-  std::cout << "\nPreprocess time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " seconds\n" << endl;
+  // clip the source data with a box
+  vtkPlanesPtr box = vtkPlanesPtr::New();
+//  std::cout << "bounds" << std::endl;
+  box->SetBounds(targetBounds);
+  std::cout << ssc::DoubleBoundingBox3D(targetBounds) << std::endl;
+  vtkClipPolyDataPtr clipper = vtkClipPolyDataPtr::New();
+  clipper->SetInput(sourcePolyData);
+  clipper->SetClipFunction(box);
+  clipper->SetInsideOut(true);
+  clipper->Update();
+
+  int oldSource = sourcePolyData->GetPoints()->GetNumberOfPoints();
+  int clippedSource = clipper->GetOutput()->GetPoints()->GetNumberOfPoints();
+
+  if (clippedSource < oldSource)
+  {
+  	double ratio = double(oldSource-clippedSource)/double(oldSource);
+  	std::cout << "Removed " << ratio*100 << "%" << " of the source data. Outside the target data bounds." << std::endl;
+  }
+
+  sourcePolyData = clipper->GetOutput();
+
+//  std::cout << "\nPreprocess time:" << " " << (clock() - sec1) / (double) CLOCKS_PER_SEC << " seconds\n" << endl;
+
+//  std::cout << "new source data " << sourcePolyData->GetPoints()->GetNumberOfPoints() << std::endl;
+////  printPoly(sourcePolyData);
+//  std::cout << ssc::DoubleBoundingBox3D(sourcePolyData->GetBounds()) << std::endl;
+//  std::cout << std::endl;
+//  std::cout << "target data" << std::endl;
+//  printPoly(targetPolyData);
 
   //Make sure we have stuff to work with
   if (!sourcePolyData->GetNumberOfPoints() || !targetPolyData->GetNumberOfPoints())

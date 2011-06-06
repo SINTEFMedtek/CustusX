@@ -54,8 +54,8 @@ private slots:
   ssc::ToolPtr getTool();
 
 private:
-  ssc::RTSourcePtr mRTSource;
-  ssc::RealTimeStreamSourceRecorderPtr mRTRecorder;
+  ssc::VideoSourcePtr mRTSource;
+  ssc::VideoRecorderPtr mRTRecorder;
   ssc::ToolPtr mTool;
 
   QFuture<QString> mFileMakerFuture;

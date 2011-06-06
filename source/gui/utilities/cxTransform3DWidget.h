@@ -8,31 +8,33 @@
 #ifndef CXTRANSFORM3DWIDGET_H_
 #define CXTRANSFORM3DWIDGET_H_
 
-#include <QWidget>
-class QTextEdit;
-class QVBoxLayout;
-class QAction;
-class QFrame;
+#include "cxBaseWidget.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscTransform3D.h"
 #include "sscFrame3D.h"
 
+class QTextEdit;
+class QVBoxLayout;
+class QAction;
+class QFrame;
+
 namespace cx
 {
 
-
 class MatrixTextEdit;
 
-/**Widget for displaying and manipulating an affine matrix,
+/**
+ * \brief Widget for displaying and manipulating an affine matrix,
  * i.e. a rotation+translation matrix.
  *
  */
-class Transform3DWidget : public QWidget
+class Transform3DWidget : public BaseWidget
 {
   Q_OBJECT
 public:
   Transform3DWidget(QWidget* parent = NULL);
   virtual ~Transform3DWidget();
+  virtual QString defaultWhatsThis() const;
 
   void setMatrix(const ssc::Transform3D& M);
   ssc::Transform3D getMatrix() const;
@@ -48,13 +50,12 @@ private slots:
 
 private:
   void updateValues();
-//  ssc::Transform3D mMatrix;
-  ssc::Frame3D mFrame;
   void addAngleControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void addTranslationControls(QString uid, QString name, int index, QVBoxLayout* layout);
   void rotateSlot(QPointF delta, int index);
   void translateSlot(QPointF delta, int index);
 
+  ssc::Frame3D mFrame;
   MatrixTextEdit* mTextEdit;
   boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mAngleAdapter;
   boost::array<ssc::DoubleDataAdapterXmlPtr, 3> mTranslationAdapter;

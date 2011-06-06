@@ -10,12 +10,12 @@
 #include "cxDataLocations.h"
 #include "cxDataInterface.h"
 #include "sscLabeledComboBoxWidget.h"
-#include "sscRTStreamRep.h"
+#include "sscVideoRep.h"
 #include "sscDataManager.h"
 #include "sscTypeConversions.h"
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "RTSource/cxRTSourceManager.h"
+#include "cxVideoConnection.h"
 #include "cxStateMachineManager.h"
 
 namespace cx
@@ -23,13 +23,11 @@ namespace cx
 
 
 IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
-    QWidget(parent)
+    BaseWidget(parent, "IGTLinkWidget", "IGTLink Client")
 {
   mView = NULL;
   mRenderTimer = NULL;
 
-  this->setObjectName("IGTLinkWidget");
-  this->setWindowTitle("IGTLink Client");
   this->resize(100, 600);
 
   connect(getRTSource().get(), SIGNAL(connected(bool)), this, SLOT(serverStatusChangedSlot()));
@@ -92,17 +90,26 @@ IGTLinkWidget::IGTLinkWidget(QWidget* parent) :
   this->dataChanged();
 }
 
+QString IGTLinkWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3><Setup IGTLink connection.</h3>"
+      "<p>Lets you set up a connection to a streaming server using IGTLink.</p>"
+      "<p><i></i></p>"
+      "</html>";
+}
+
 QProcess* IGTLinkWidget::getServer()
 {
   return getConnection()->getProcess();
 }
 
-ssc::OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
+OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
 {
   return getConnection()->getRTSource();
 }
 
-IGTLinkConnectionPtr IGTLinkWidget::getConnection()
+VideoConnectionPtr IGTLinkWidget::getConnection()
 {
   return stateManager()->getRTSourceManager();
 }
@@ -217,7 +224,7 @@ void IGTLinkWidget::showStream()
   mRenderTimer->setInterval(50);
   mRenderTimer->start();
 
-  ssc::RealTimeStreamFixedPlaneRepPtr rtRep(new ssc::RealTimeStreamFixedPlaneRep("rtrep", "rtrep"));
+  ssc::VideoFixedPlaneRepPtr rtRep(new ssc::VideoFixedPlaneRep("rtrep", "rtrep"));
   rtRep->setRealtimeStream(getRTSource());
 //  rtRep->setTool(ssc::toolManager()->getDominantTool());
   mView->addRep(rtRep);
