@@ -13,12 +13,7 @@
 #include "cxShadingWidget.h"
 #include "cxDataViewSelectionWidget.h"
 
-//#include "sscAbstractInterface.h"
 #include "cxShadingParamsInterfaces.h"
-
-
-
-
 
 namespace cx
 {
@@ -26,7 +21,6 @@ namespace cx
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
 
 DoubleDataAdapterImageTFDataBase::DoubleDataAdapterImageTFDataBase()
 {
@@ -51,6 +45,7 @@ double DoubleDataAdapterImageTFDataBase::getValue() const
     return 0.0;
   return this->getValueInternal();
 }
+
 bool DoubleDataAdapterImageTFDataBase::setValue(double val)
 {
   if (!mImageTFData)
@@ -66,10 +61,12 @@ double DoubleDataAdapterImageTFDataWindow::getValueInternal() const
 {
   return mImageTFData->getWindow();
 }
+
 void DoubleDataAdapterImageTFDataWindow::setValueInternal(double val)
 {
   mImageTFData->setWindow(val);
 }
+
 ssc::DoubleRange DoubleDataAdapterImageTFDataWindow::getValueRange() const
 {
   if (!mImageTFData)
@@ -85,10 +82,12 @@ double DoubleDataAdapterImageTFDataLevel::getValueInternal() const
 {
   return mImageTFData->getLevel();
 }
+
 void DoubleDataAdapterImageTFDataLevel::setValueInternal(double val)
 {
   mImageTFData->setLevel(val);
 }
+
 ssc::DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
 {
   if (!mImageTFData)
@@ -99,10 +98,8 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataLevel::getValueRange() const
   return ssc::DoubleRange(min,max,1);
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
-
 
 double DoubleDataAdapterImageTFDataLLR::getValueInternal() const
 {
@@ -122,7 +119,6 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataLLR::getValueRange() const
   return ssc::DoubleRange(min,max,(max-min)/1000.0);
 }
 
-
 //---------------------------------------------------------
 //---------------------------------------------------------
 
@@ -139,22 +135,17 @@ ssc::DoubleRange DoubleDataAdapterImageTFDataAlpha::getValueRange() const
   if (!mImageTFData)
     return ssc::DoubleRange();
 
-//  double max = mImageTFData->getMaxAlphaValue();
   double max = 1.0;
   return ssc::DoubleRange(0,max,max/100.0);
 }
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
 
 TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
-  QWidget(parent),
+  BaseWidget(parent, "TransferFunction3DWidget", "3D"),
   mLayout(new QVBoxLayout(this))
 {
-  this->setObjectName("TransferFunction3DWidget");
-  this->setWindowTitle("3D");
-
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
 
@@ -182,6 +173,15 @@ TransferFunction3DWidget::TransferFunction3DWidget(QWidget* parent) :
   new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
+}
+
+QString TransferFunction3DWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>3D Transfer Function</h3>"
+    "<p>Lets you set a transfer function on a 3D volume.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void TransferFunction3DWidget::activeImageChangedSlot()
@@ -207,12 +207,9 @@ void TransferFunction3DWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 
 TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
-  QWidget(parent),
+  BaseWidget(parent, "TransferFunction2DWidget", "2D"),
   mLayout(new QVBoxLayout(this))
 {
-  this->setObjectName("TransferFunction2DWidget");
-  this->setWindowTitle("2D");
-
   mTransferFunctionAlphaWidget = new TransferFunctionAlphaWidget(this);
   mTransferFunctionAlphaWidget->setReadOnly(true);
   mTransferFunctionColorWidget = new TransferFunctionColorWidget(this);
@@ -233,7 +230,6 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   mLayout->addWidget(mTransferFunctionAlphaWidget);
   mLayout->addWidget(mTransferFunctionColorWidget);
 
-//  mLayout->addWidget(mTransferFunctionColorWidget);
   QGridLayout* gridLayout = new QGridLayout;
   mLayout->addLayout(gridLayout);
   new ssc::SliderGroupWidget(this, mDataWindow, gridLayout, 0);
@@ -242,6 +238,15 @@ TransferFunction2DWidget::TransferFunction2DWidget(QWidget* parent) :
   new ssc::SliderGroupWidget(this, mDataLLR,    gridLayout, 3);
 
   this->setLayout(mLayout);
+}
+
+QString TransferFunction2DWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>2D Transfer Function</h3>"
+    "<p>Lets you set a transfer function on a 2D image.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void TransferFunction2DWidget::activeImageChangedSlot()
@@ -267,12 +272,9 @@ void TransferFunction2DWidget::activeImageChangedSlot()
 //---------------------------------------------------------
 
 TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
-  QWidget(parent),
+  BaseWidget(parent, "TransferFunctionPresetWidget", "Transfer Function Presets"),
   mLayout(new QVBoxLayout(this))
 {
-  this->setObjectName("TransferFunctionPresetWidget");
-  this->setWindowTitle("Transfer Function Presets");
-
   QPushButton* resetButton = new QPushButton("Reset", this);
   connect(resetButton, SIGNAL(clicked()), this, SLOT(resetSlot()));
 
@@ -284,7 +286,6 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   connect(mPresetsComboBox, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(presetsBoxChangedSlot(const QString&)));
 
   mLayout->addWidget(mPresetsComboBox);
-  //mLayout->addWidget(mInfoWidget);
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   mLayout->addLayout(buttonLayout);
 
@@ -292,6 +293,15 @@ TransferFunctionPresetWidget::TransferFunctionPresetWidget(QWidget* parent) :
   buttonLayout->addWidget(saveButton);
 
   this->setLayout(mLayout);
+}
+
+QString TransferFunctionPresetWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Transfer Function Presets</h3>"
+    "<p>Lets you select a predefined transfer function.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void TransferFunctionPresetWidget::presetsBoxChangedSlot(const QString& presetName)
@@ -329,34 +339,23 @@ void TransferFunctionPresetWidget::saveSlot()
 //---------------------------------------------------------
 
 TransferFunctionWidget::TransferFunctionWidget(QWidget* parent) :
-  QWidget(parent)
-//  mLayout(new QVBoxLayout(this))
+  BaseWidget(parent, "TransferFunctionWidget", "Transfer Function")
 {
-  this->setObjectName("TransferFunctionWidget");
-  this->setWindowTitle("Transfer Function");
-
   QVBoxLayout* mLayout = new QVBoxLayout(this);
 
   mLayout->setMargin(0);
   mLayout->addWidget(new TransferFunction3DWidget(this));
   mLayout->addWidget(new TransferFunctionPresetWidget(this));
 
-//  TransferFunction2DWidget* mTF2DWidget = new TransferFunction2DWidget(this);
-//  TransferFunction3DWidget* mTF3DWidget = new TransferFunction3DWidget(this);
-//  TransferFunctionPresetWidget* mTFPresetWidget = new TransferFunctionPresetWidget(this);
-//
-//  QTabWidget* tabWidget = new QTabWidget(this);
-//  mLayout->addWidget(tabWidget);
-//  tabWidget->addTab(mTF3DWidget, "Volume");
-//  tabWidget->addTab(mTF2DWidget, "Slice");
-//  tabWidget->addTab(new ShadingWidget(this), "Shading");
-//  tabWidget->addTab(new DataViewSelectionWidget(this), "Overlay");
-//
-////  mLayout->addWidget(mTF2DWidget);
-////  mLayout->addWidget(mTF3DWidget);
-//  mLayout->addWidget(mTFPresetWidget);
-
   this->setLayout(mLayout);
 }
 
+QString TransferFunctionWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Transfer Function.</h3>"
+    "<p>Lets you set a new or predefined transfer function on a volume.</p>"
+    "<p><i></i></p>"
+    "</html>";
+}
 }//namespace cx

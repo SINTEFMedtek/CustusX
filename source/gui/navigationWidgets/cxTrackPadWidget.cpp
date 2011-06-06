@@ -164,11 +164,8 @@ void MousePadWidget::setFixedYPos(bool on)
 ///--------------------------------------------------------
 
 TrackPadWidget::TrackPadWidget(QWidget* parent) :
-    QWidget(parent)
+    BaseWidget(parent, "TrackPadWidget", "Camera Control")
 {
-  this->setObjectName("TrackPadWidget");
-  this->setWindowTitle("Camera Control");
-
   mCameraControl.reset(new CameraControl());
 
   mMinPadSize = QSize(50,50);
@@ -181,6 +178,15 @@ TrackPadWidget::TrackPadWidget(QWidget* parent) :
   this->createStandard3DViewActions();
   this->definePanLayout();
   this->defineRotateLayout();
+}
+
+QString TrackPadWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Trackpad for touch screen devices</h3>"
+      "<p>Helps the user control the camera on a touch screen.</p>"
+      "<p><i></i></p>"
+      "</html>";
 }
 
 void TrackPadWidget::createStandard3DViewActions()

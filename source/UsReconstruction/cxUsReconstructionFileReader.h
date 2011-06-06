@@ -37,14 +37,14 @@ public:
 public:
   UsReconstructionFileReader();
 
-  FileData readAllFiles(QString fileName, QString calFilesPath="");
+  FileData readAllFiles(QString fileName, QString calFilesPath="", bool angio = false);
 
   ssc::Transform3D readTransformFromFile(QString fileName);
   bool readMaskFile(QString mhdFileName, ssc::ImagePtr mask);
 
   std::vector<ssc::TimedPosition> readFrameTimestamps(QString fileName);
   std::vector<ssc::TimedPosition> readPositions(QString fileName);
-  ssc::USFrameDataPtr readUsDataFile(QString mhdFileName);
+  ssc::USFrameDataPtr readUsDataFile(QString mhdFileName, bool angio = false);
 
   void readCustomMhdTags(QString mhdFileName, QStringList* probeConfigPath, QString* calFileName);
   ProbeXmlConfigParser::Configuration readProbeConfiguration(QString calFilesPath, QStringList probeConfigPath);

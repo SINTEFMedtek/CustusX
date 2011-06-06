@@ -56,13 +56,11 @@ QStringList ClipPlaneStringDataAdapter::getValueRange() const
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 
-ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent)
+ClippingWidget::ClippingWidget(QWidget* parent) : 
+  BaseWidget(parent, "ClippingWidget", "Clip")
 {
   mInteractiveClipper = viewManager()->getClipper();
   connect(mInteractiveClipper.get(), SIGNAL(changed()), this, SLOT(clipperChangedSlot()));
-
-  this->setObjectName("ClippingWidget");
-  this->setWindowTitle("Clip");
 
   QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -93,6 +91,15 @@ ClippingWidget::ClippingWidget(QWidget* parent) : QWidget(parent)
   layout->addStretch();
 
   this->clipperChangedSlot();
+}
+
+QString ClippingWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Functonality for clipping a volume</h3>"
+    "<p>Lets you clip in a volume.</p>"
+    "<p><i></i></p>"
+    "</html>";
 }
 
 void ClippingWidget::clipperChangedSlot()

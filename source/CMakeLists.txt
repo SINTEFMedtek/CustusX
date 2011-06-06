@@ -50,13 +50,14 @@ find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 SET(SOURCES cxMain.cpp)
 
 set(SUB_FOLDERS
+    service/video
+    service/patient
+    service/tracking
+    service/visualization
+    logic
     gui
-    viewManager
-    repManager
     stateMachineManager
     registrationManager
-    toolManager
-    dataManager
     3DUSReconstruction
     UsReconstruction
     algorithms
@@ -84,14 +85,12 @@ INCLUDE_DIRECTORIES(
     gui/dataAdapters
     )
     
+add_subdirectory(service)
+add_subdirectory(logic)
 
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)
-ADD_SUBDIRECTORY(viewManager)
-ADD_SUBDIRECTORY(repManager)
-ADD_SUBDIRECTORY(toolManager)
 ADD_SUBDIRECTORY(stateMachineManager)
-ADD_SUBDIRECTORY(dataManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
 ADD_SUBDIRECTORY(apps)

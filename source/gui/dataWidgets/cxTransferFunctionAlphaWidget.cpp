@@ -18,12 +18,11 @@
 namespace cx
 {
 TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
-  QWidget(parent),
-	mEndPoint(false),
+  BaseWidget(parent, "TransferFunctionAlphaWidget", "Alpha Transfer Function"),
+  mEndPoint(false),
   mBorder(5),
   mReadOnly(false)
 {
-  this->setObjectName("TransferFunctionAlphaWidget");
   connect(ssc::dataManager(), SIGNAL(activeImageTransferFunctionsChanged()),
           this, SLOT(activeImageTransferFunctionsChangedSlot()));
   mCurrentAlphaPoint.reset();
@@ -31,23 +30,14 @@ TransferFunctionAlphaWidget::TransferFunctionAlphaWidget(QWidget* parent) :
 TransferFunctionAlphaWidget::~TransferFunctionAlphaWidget()
 {}
 
-//void TransferFunctionAlphaWidget::activeImageChangedSlot()
-//{
-//  ssc::ImagePtr activeImage = ssc::dataManager()->getActiveImage();
-//  if(mCurrentImage == activeImage)
-//    return;
-//
-//  mCurrentImage = activeImage;
-//  //TODO: call update or not ???
-//  this->update();
-//
-//  if (!mCurrentImage)
-//    return;
-//  if ((mCurrentImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
-//      (activeImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
-//    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
-//}
-
+QString TransferFunctionAlphaWidget::defaultWhatsThis() const
+{
+  return "<html>"
+    "<h3>Alpha Transfer Function.</h3>"
+    "<p>Lets you set the alpha part of a transfer function.</p>"
+    "<p><i></i></p>"
+    "</html>";
+}
 
 void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData)
 {
@@ -57,11 +47,6 @@ void TransferFunctionAlphaWidget::setData(ssc::ImagePtr image, ssc::ImageTFDataP
   mImage = image;
   mImageTF = tfData;
   this->update();
-
-//  if ((mImage &&
-//       mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_SHORT) &&
-//      (mImage->getBaseVtkImageData()->GetScalarType() != VTK_UNSIGNED_CHAR))
-//    ssc::messageManager()->sendError("Active image is not unsigned (8 or 16 bit). Transfer functions will not work correctly!");
 }
 
 void TransferFunctionAlphaWidget::setReadOnly(bool readOnly)
@@ -78,10 +63,12 @@ void TransferFunctionAlphaWidget::enterEvent(QEvent* event)
 {
   this->setMouseTracking(true);
 }
+
 void TransferFunctionAlphaWidget::leaveEvent(QEvent* event)
 {
   this->setMouseTracking(false);
 }
+
 void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
 {
   if(mReadOnly)
@@ -97,6 +84,7 @@ void TransferFunctionAlphaWidget::mousePressEvent(QMouseEvent* event)
     this->toggleCurrentPoint(event->x(), event->y());
   }
 }
+
 void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
 {
   if(mReadOnly)
@@ -109,6 +97,7 @@ void TransferFunctionAlphaWidget::mouseReleaseEvent(QMouseEvent* event)
   //TODO do we need to render here?
   //this->update();
 }
+
 void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
 {
   if (!mImage)
@@ -136,8 +125,6 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
         mCurrentAlphaPoint.position = int(mImage->getMin() + mImage->getRange() *
                                        (event->x() - mPlotArea.left()) / 
                                        static_cast<double>(mPlotArea.width()) );
-        // mCurrentAlphaPoint.position set at mousePressEvent() 
-        // (with isInsideCurrentPoint())
         emit positionChanged(mCurrentAlphaPoint.position);
       }
     }
@@ -146,7 +133,7 @@ void TransferFunctionAlphaWidget::mouseMoveEvent(QMouseEvent* event)
 void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
 {
   // Don't do anything before we have an image
-	// May also be fixed by not calling TransferFunctionAlphaWidget constructor till we have an image
+  // May also be fixed by not calling TransferFunctionAlphaWidget constructor till we have an image
   if (!mImage)
     return;
   
@@ -163,12 +150,12 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   const QBrush backgroundBrush = QBrush(QColor(200, 200, 200));
   painter.fillRect(this->mFullArea, frameBrush);
   painter.fillRect(this->mPlotArea, backgroundBrush);
-	
+
   // Draw histogram
-	// with log compression
+  // with log compression
 
   vtkImageAccumulatePtr histogram = mImage->getHistogram();
-	int histogramSize = histogram->GetComponentExtent()[1] - 
+  int histogramSize = histogram->GetComponentExtent()[1] - 
                       histogram->GetComponentExtent()[0];
   
   painter.setPen(QColor(140, 140, 210));
@@ -178,27 +165,21 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
   int x = 0;
   int y = 0;
   double barHeightMult = (height() - mBorder*2) 
-	/ log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
-	// / double(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]);
-	
+  / log(histogram->GetOutput()->GetPointData()->GetScalars()->GetRange()[1]+1);
+  
   double posMult = (width() - mBorder*2) / double(histogramSize);
   for (int i = mImage->getMin(); i <= mImage->getMax(); i++)
-	{
+  {
     x = ((i- mImage->getMin()) * posMult); //Offset with min value
     y = log(double(static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i - mImage->getMin()]+1)) * barHeightMult;
-		//y = static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i] * barHeightMult;
     if (y > 0)
     {
       painter.drawLine(x + mBorder, height() - mBorder, 
-											 x + mBorder, height() - mBorder - y);
-
-      //std::cout << "x: " << x << " y: " << y <<  std::endl;
+                       x + mBorder, height() - mBorder - y);
     }
-    //std::cout << "i: " << i << " y: " << static_cast<int*>(histogram->GetOutput()->GetScalarPointer())[i- mImage->getMin()] << std::endl;
-	}
+  }
 
   // Go through each point and draw squares and lines
-
   ssc::OpacityMapPtr opacityMap = mImageTF->getOpacityMap();
 
   QPoint lastScreenPoint;
@@ -215,25 +196,25 @@ void TransferFunctionAlphaWidget::paintEvent(QPaintEvent* event)
       static_cast<int>(mPlotArea.bottom() - mPlotArea.height() * 
                        opPoint->second / 
                        static_cast<double>(mImage->getMaxAlphaValue())) );
-		
-		//std::cout << "x: " << opPoint->first  << " y: " << opPoint->second << std::endl;
-		//std::cout << "Screen x: " << screenPoint.x() << " y: " << screenPoint.y() << std::endl;
-		// Draw line from previous point if this is not the first point
-		if (opPoint != opacityMap->begin())
-		{
-			painter.setPen(pointLinePen);
-			painter.drawLine(lastScreenPoint, screenPoint);
-		}
-		
-		// Draw the rectangle
-		QRect pointRect(screenPoint.x() - mBorder, screenPoint.y() - mBorder, 
-										mBorder*2, mBorder*2);
-		painter.setPen(pointPen);
-		painter.drawRect(pointRect);
-		this->mPointRects[opPoint->first] = pointRect;
-		
-		// Store the point
-		lastScreenPoint = screenPoint;
+
+    //std::cout << "x: " << opPoint->first  << " y: " << opPoint->second << std::endl;
+    //std::cout << "Screen x: " << screenPoint.x() << " y: " << screenPoint.y() << std::endl;
+    // Draw line from previous point if this is not the first point
+    if (opPoint != opacityMap->begin())
+    {
+      painter.setPen(pointLinePen);
+      painter.drawLine(lastScreenPoint, screenPoint);
+    }
+
+    // Draw the rectangle
+    QRect pointRect(screenPoint.x() - mBorder, screenPoint.y() - mBorder, 
+                    mBorder*2, mBorder*2);
+    painter.setPen(pointPen);
+    painter.drawRect(pointRect);
+    this->mPointRects[opPoint->first] = pointRect;
+
+    // Store the point
+    lastScreenPoint = screenPoint;
   }
 }
 void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
@@ -245,23 +226,25 @@ void TransferFunctionAlphaWidget::resizeEvent(QResizeEvent* evt)
   this->mPlotArea = QRect(mBorder, mBorder, 
                           width() - mBorder*2, height() - mBorder*2);
 }
+
 bool TransferFunctionAlphaWidget::isInsideCurrentPoint(int mouseX, int mouseY)
 {
-	mEndPoint = false;
+  mEndPoint = false;
   std::map<int, QRect>::iterator it = mPointRects.begin();
   for(;it != mPointRects.end(); ++it)
   {
     if (it->second.contains(mouseX, mouseY))
     {
       mCurrentAlphaPoint.position = it->first;
-			if (it == mPointRects.begin() || it == --mPointRects.end())
-				mEndPoint = true;
+      if (it == mPointRects.begin() || it == --mPointRects.end())
+        mEndPoint = true;
       return true;
     }
   }
   mCurrentAlphaPoint.reset();
   return false;
 }
+
 TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentAlphaPoint(int mouseX, int mouseY)
 {
   AlphaPoint point;
@@ -280,6 +263,7 @@ TransferFunctionAlphaWidget::AlphaPoint TransferFunctionAlphaWidget::getCurrentA
 
   return point;
 }
+
 void TransferFunctionAlphaWidget::toggleCurrentPoint(int mouseX, int mouseY)
 {
   if(!mImage)
@@ -290,7 +274,7 @@ void TransferFunctionAlphaWidget::toggleCurrentPoint(int mouseX, int mouseY)
     AlphaPoint point = getCurrentAlphaPoint(mouseX, mouseY);
     mImageTF->addAlphaPoint(point.position,point.value);
   }
-	// mEndPoint is set in isInsideCurrentPoint()
+  // mEndPoint is set in isInsideCurrentPoint()
   else if(!mEndPoint)
   {
     // Inside one of the rectangles
@@ -300,6 +284,7 @@ void TransferFunctionAlphaWidget::toggleCurrentPoint(int mouseX, int mouseY)
 
   this->update();
 }
+
 void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
 {
   if(!mCurrentAlphaPoint.isValid())
@@ -307,8 +292,6 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
 
   AlphaPoint newAlphaPoint = this->getCurrentAlphaPoint(mouseX, mouseY);
 
-  //ssc::ImageTF3DPtr transferFunction = mCurrentImage->getTransferFunctions3D();
-  
   // Max and min points may only be moved in y direction
   if(mCurrentAlphaPoint.position == mImage->getMin()
      || mCurrentAlphaPoint.position == mImage->getMax() )
@@ -334,8 +317,7 @@ void TransferFunctionAlphaWidget::moveCurrentAlphaPoint(int mouseX, int mouseY)
 
     mCurrentAlphaPoint = newAlphaPoint;
   }
-	// Update GUI while moving point
-	this->update();
+  // Update GUI while moving point
+  this->update();
 }
-
 }//namespace cx

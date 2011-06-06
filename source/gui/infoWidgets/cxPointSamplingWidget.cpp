@@ -19,7 +19,7 @@ namespace cx
 {
 
 PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
-  QWidget(parent),
+  BaseWidget(parent, "PointSamplingWidget", "Point sampler/3D ruler"),
   mVerticalLayout(new QVBoxLayout(this)),
   mTable(new QTableWidget(this)),
   mActiveLandmark(""),
@@ -28,9 +28,6 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mRemoveButton(new QPushButton("Remove", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
-  this->setObjectName("PointSamplingWidget");
-  this->setWindowTitle("Point sampler/3D ruler");
-
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
 
   //table widget
@@ -60,6 +57,15 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
 
 PointSamplingWidget::~PointSamplingWidget()
 {}
+
+QString PointSamplingWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Utility for sampling points in 3D</h3>"
+      "<p>Lets you sample points in 3D and get the distance between sampled points.</p>"
+      "<p><i></i></p>"
+      "</html>";
+}
 
 void PointSamplingWidget::itemSelectionChanged()
 {

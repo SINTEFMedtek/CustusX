@@ -1,6 +1,8 @@
 #ifndef CXTRACKPADWIDGET_H_
 #define CXTRACKPADWIDGET_H_
 
+#include "cxBaseWidget.h"
+
 #include <vector>
 #include <QtGui>
 #include <QGraphicsView>
@@ -75,13 +77,15 @@ private:
  * \author Christian Askeland, SINTEF
  */
 
-class TrackPadWidget : public QWidget
+class TrackPadWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   TrackPadWidget(QWidget* parent);
   virtual ~TrackPadWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 signals:
 
