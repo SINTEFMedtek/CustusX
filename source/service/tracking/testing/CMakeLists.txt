@@ -24,7 +24,7 @@ include_directories( ${CPPUNIT_INCLUDE_DIR})
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(cxTestToolManager cxCppUnitMain.cpp ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(cxTestToolManager cxTrackingService cxCommon ${CPPUNIT_LIBRARIES})
+    target_link_libraries(cxTestToolManager cxTrackingService ${CPPUNIT_LIBRARIES})
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -36,7 +36,7 @@ include_directories( ${CPPUNIT_INCLUDE_DIR})
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testTM_CppUnit_CTest ${TM_TEST_SOURCE_FILES} )
-    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain cxTrackingService cxCommon ${CPPUNIT_LIBRARIES})
+    target_link_libraries(testTM_CppUnit_CTest cisstTestsMain cxTrackingService ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testTM_CppUnit_CTest)
     

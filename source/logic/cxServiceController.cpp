@@ -10,6 +10,7 @@
 #include "cxDataManager.h"
 #include "cxToolManager.h"
 #include "cxVideoService.h"
+#include "sscMessageManager.h"
 
 namespace cx
 {
@@ -36,10 +37,58 @@ void ServiceController::updateVideoConnections()
 {
 	ssc::ToolPtr tool = this->findSuitableProbe();
 
-	videoService()->getVideoConnection()->connectVideoToProbe(tool);
+	this->connectVideoToProbe(tool);
+
   ssc::toolManager()->setDominantTool(tool->getUid());
 }
 
+/**insert the rt source into the (first) probe tool
+ * in the tool manager.
+ *
+ * Apply time calibration to the source.
+ *
+ */
+void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
+{
+	ssc::VideoSourcePtr source = videoService()->getVideoConnection()->getVideoSource();
+  if (!source)
+ {
+    ssc::messageManager()->sendError("no rt source.");
+    return;
+ }
+
+//    return;
+  // find probe in tool manager
+  // set source in cxTool
+  // insert timecalibration using config
+  if (!source->isConnected())
+    return;
+
+//  if (mProbe)
+//    return;
+
+//  ssc::ToolPtr probe = this->findSuitableProbe();
+  if (!probe)
+    return;
+
+  if (!probe->getProbe()->getRTSource())
+  	return;
+
+//  mProbe = probe;
+
+  if (probe)
+  {
+    ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(probe->getProbe());
+    if (!probeInterface)
+    {
+      ssc::messageManager()->sendError("Probe not a cx instance.");
+      return;
+    }
+    probeInterface->setRTSource(source);
+//    ssc::toolManager()->setDominantTool(mProbe->getUid());
+//    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getVideoSource()->getName() << " completed" << std::endl;
+  }
+}
 /**Find a probe that can be connected to a rt source.
  *
  */
