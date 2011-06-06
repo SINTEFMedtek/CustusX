@@ -15,7 +15,7 @@ include_directories(
 # For Apple set the icns file containing icons
 IF(APPLE)
   # set how it shows up in the Info.plist file
-  SET(MACOSX_BUNDLE_ICON_FILE application.icns) 
+  SET(MACOSX_BUNDLE_ICON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/application.icns) 
   # set where in the bundle to put the icns file
   SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/application.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
   # include the icns file in the target
