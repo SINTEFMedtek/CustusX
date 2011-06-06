@@ -28,7 +28,7 @@
 #include "cxViewManager.h"
 #include "cxToolManager.h"
 #include "cxViewGroup.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateMachineManager.h"
 
 namespace cx
 {

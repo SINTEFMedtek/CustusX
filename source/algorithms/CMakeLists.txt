@@ -1,7 +1,6 @@
 SET (LIB cxAlgorithms)
 
 SET( CX_QT_MOC_HEADER_FILES
-    cxTimedAlgorithm.h
     cxCenterline.h
     cxResample.h
     cxBinaryThresholdImageFilter.h
@@ -10,21 +9,8 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( ${LIB}_algorithms
-    ItkVtkGlue/itkImageToVTKImageFilter.h
-    ItkVtkGlue/itkImageToVTKImageFilter.txx
-    ItkVtkGlue/itkVTKImageToImageFilter.h
-    ItkVtkGlue/itkVTKImageToImageFilter.txx 
-    vesselReg/SeansVesselReg.cxx
-    vesselReg/SeansVesselReg.hxx
-    vesselReg/HackTPSTransform.hxx
-    itkBinaryThinningImageFilter3D.h
-    itkBinaryThinningImageFilter3D.txx
-    sscImageAlgorithms.h
-    sscImageAlgorithms.cpp
     cxTrackingDataToVolume.h
     cxTrackingDataToVolume.cpp
-    cxTimedAlgorithm.h
-    cxTimedAlgorithm.cpp
     cxCenterline.h
     cxCenterline.cpp
     cxResample.h
@@ -44,15 +30,16 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource
     #${CustusX3_SOURCE_DIR}/source/service/patient
     #${CustusX3_SOURCE_DIR}/source/service/tracking
-    ${CustusX3_SOURCE_DIR}/source/stateMachineManager
+    ${CustusX3_SOURCE_DIR}/source/logic/stateMachineManager
     ${CustusX3_SOURCE_DIR}/source/UsReconstruction
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_algorithms} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} cxPatientService sscUsReconstructionLib ITKIO ITKCommon ITKBasicFilters) 
+target_link_libraries(${LIB} cxPatientService sscUsReconstructionLib cxAlgorithms_Res) 
 
 add_subdirectory( testing )

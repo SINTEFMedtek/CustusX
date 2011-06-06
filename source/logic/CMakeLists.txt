@@ -2,6 +2,7 @@
 ##               Logic Layer
 ###########################################################
 
+add_subdirectory(stateMachineManager)
 
 # definition of the cxLogicManager module:
 
