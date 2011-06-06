@@ -24,8 +24,9 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/video
     ${CustusX3_SOURCE_DIR}/source/logic
     ${CustusX3_SOURCE_DIR}/source/algorithms
-    ${CustusX3_SOURCE_DIR}/modules/cxCommon
     ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/gui
     )    
     # -----------------------------------------------

@@ -91,6 +91,7 @@ find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 #    gui # move app to other folder
 #    )
     
+ADD_SUBDIRECTORY(resource)
 add_subdirectory(service)
 add_subdirectory(logic)
 
