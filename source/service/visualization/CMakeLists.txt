@@ -58,8 +58,8 @@ SET ( cxVisualizationService_SOURCE
     cxCameraControl.cpp
     cxCameraStyle.h
     cxCameraStyle.cpp
-    cxRenderTimer.h
-    cxRenderTimer.cpp
+#    cxRenderTimer.h
+#    cxRenderTimer.cpp
     Rep/cxLandmarkRep.h
     Rep/cxLandmarkRep.cpp
     Rep/cxImageLandmarkRep.h
@@ -82,7 +82,9 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui # REMOVE
     ${CustusX3_SOURCE_DIR}/source/gui/infoWidgets # REMOVE
 #    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
-    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    #${CustusX3_SOURCE_DIR}/resource/utilities    
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
@@ -90,5 +92,5 @@ QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 include_directories(Rep)
 
 ADD_LIBRARY ( cxVisualizationService ${cxVisualizationService_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxVisualizationService SSC cxCommon cxAlgorithms)
+target_link_libraries(cxVisualizationService SSC cxSettings cxVideoService cxPatientService cxTrackingService cxAlgorithms)
 

@@ -23,7 +23,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/visualization
     ${CustusX3_SOURCE_DIR}/source/service/video
     ${CustusX3_SOURCE_DIR}/source/algorithms
-    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    ${CustusX3_SOURCE_DIR}/resource/settings
     )
     
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
