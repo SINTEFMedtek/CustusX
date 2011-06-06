@@ -9,7 +9,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxLayoutData.h"
 #include "cxViewCache.h"
-#include "cxTreeModelItem.h"
+//#include "cxTreeModelItem.h"
 #include "cxInteractiveClipper.h"
 
 class QActionGroup;
@@ -48,7 +48,7 @@ public:
   View3D* get3DView(int group=0, int index=0);
   std::vector<ViewGroupPtr> getViewGroups() { return mViewGroups; }
 
-  void fillModelTree(TreeItemPtr root);
+//  void fillModelTree(TreeItemPtr root);
 
   LayoutData getLayoutData(const QString uid) const; ///< get data for given layout
   std::vector<QString> getAvailableLayouts() const; ///< get uids of all defined layouts

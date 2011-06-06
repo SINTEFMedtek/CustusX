@@ -97,7 +97,7 @@ add_subdirectory(logic)
 
 ADD_SUBDIRECTORY(gui)
 ADD_SUBDIRECTORY(algorithms)
-ADD_SUBDIRECTORY(stateMachineManager)
+#ADD_SUBDIRECTORY(stateMachineManager)
 ADD_SUBDIRECTORY(registrationManager)
 ADD_SUBDIRECTORY(UsReconstruction)
 ADD_SUBDIRECTORY(apps)
