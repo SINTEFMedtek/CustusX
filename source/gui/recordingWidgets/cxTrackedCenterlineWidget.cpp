@@ -14,6 +14,7 @@
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
+#include "cxTool.h"
 
 namespace cx
 {

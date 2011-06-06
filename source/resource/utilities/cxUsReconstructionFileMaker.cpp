@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageLuminance.h>
+#include <vtkImageData.h>
 #include "vtkImageAppend.h"
 #include "vtkMetaImageWriter.h"
 #include "sscTypeConversions.h"
@@ -16,12 +17,13 @@ typedef vtkSmartPointer<vtkImageAppend> vtkImageAppendPtr;
 
 namespace cx
 {
-UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool) :
+UsReconstructionFileMaker::UsReconstructionFileMaker(ssc::TimedTransformMap trackerRecordedData, ssc::VideoRecorder::DataType streamRecordedData, QString sessionDescription, QString activepatientPath, ssc::ToolPtr tool, QString calibFilename) :
     mTrackerRecordedData(trackerRecordedData),
     mStreamRecordedData(streamRecordedData),
     mSessionDescription(sessionDescription),
     mActivepatientPath(activepatientPath),
-    mTool(tool)
+    mTool(tool),
+    mCalibFilename(calibFilename)
 {
   if(mTrackerRecordedData.empty())
     ssc::messageManager()->sendWarning("No tracking data for writing to reconstruction file.");
@@ -256,11 +258,12 @@ bool UsReconstructionFileMaker::writeUSImages(QString reconstructionFolder, QStr
 
 QString UsReconstructionFileMaker::copyCalibrationFile(QString reconstructionFolder)
 {
-  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mTool);
-  if (!mTool)
-    return "";
-
-  QString calibFileName = cxTool->getCalibrationFileName();
+//  ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(mTool);
+//  if (!mTool)
+//    return "";
+//
+//  QString calibFileName = cxTool->getCalibrationFileName();
+  QString calibFileName = mCalibFilename;
   QFile calibFile(calibFileName);
   QFileInfo info(calibFile);
   const QString filename = info.fileName();
