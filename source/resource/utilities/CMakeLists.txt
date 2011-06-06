@@ -1,0 +1,57 @@
+###########################################################
+##
+##               Utilities Library
+## 
+##               Resource Layer
+##
+##  Container for all shared cx resources that doesn't
+##  fit in anywhere else.
+##
+###########################################################
+
+
+SET(LIBNAME cxUtilities)
+
+# Boost
+#----------
+find_package( Boost REQUIRED )
+
+# Qt
+#----------
+set(QT_USE_QTXML TRUE)
+find_package(Qt4 REQUIRED)
+include(${QT_USE_FILE})
+
+include_directories(${Boost_INCLUDE_DIRS} ${CMAKE_CURRENT_BINARY_DIR})
+
+SET(${LIBNAME}_MOC_HDRS
+)
+
+# SSC
+#----------
+find_package (SSC PATHS ${CustusX3_SOURCE_DIR}/externals/ssc/CMake REQUIRED)
+include (${SSC_USE_FILE})
+
+IF(WIN32)
+  QT4_WRAP_CPP(cxUtilities_MOC_SRCS ${cxUtilities_MOC_HDRS} ${QTUI_HEADERFILES} OPTIONS "-D_WINDOWS")
+ELSE(WIN32)
+  QT4_WRAP_CPP(cxUtilities_MOC_SRCS ${cxUtilities_MOC_HDRS})
+ENDIF(WIN32)
+
+# _USE_MATH_DEFINES Must be defined before math.h is included
+if (WIN32)
+    add_definitions(-D_USE_MATH_DEFINES)
+endif(WIN32)
+
+add_library(cxUtilities
+    probeXmlConfigParser.h
+    probeXmlConfigParser.cpp
+    cxCreateProbeDataFromConfiguration.h
+    cxCreateProbeDataFromConfiguration.cpp
+    cxRenderTimer.h
+    cxRenderTimer.cpp
+    ${cxUtilities_MOC_SRCS}
+    )
+    
+target_link_libraries(cxUtilities SSC ${QT_LIBRARIES} )
+

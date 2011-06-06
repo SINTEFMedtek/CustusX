@@ -10,6 +10,8 @@
 #include "cxViewManager.h"
 #include "cxView2D.h"
 #include "cxView3D.h"
+#include "cxViewGroup.h"
+#include "sscRep.h"
 
 namespace cx
 {
@@ -43,6 +45,40 @@ ssc::StringDataAdapterXmlPtr BrowserItemModel::getFilter()
   return mFilter;
 }
 
+void BrowserItemModel::fillModelTreeFromViewManager(TreeItemPtr root)
+{
+  //TreeItemPtr item;
+  TreeItemPtr topItem = TreeItemImpl::create(root, "view groups", "", "");
+  std::vector<ViewGroupPtr> groups = viewManager()->getViewGroups();
+
+  for (unsigned i = 0; i < groups.size(); ++i)
+  {
+    ViewGroupPtr group = groups[i];
+    std::vector<ssc::View*> views = group->getViews();
+    if (views.empty())
+      continue;
+    TreeItemPtr groupItem = TreeItemImpl::create(topItem, "group"+qstring_cast(i), "view group", qstring_cast(i));
+    for (unsigned j=0; j<views.size(); ++j)
+    {
+      TreeItemPtr viewItem = TreeItemImpl::create(groupItem, qstring_cast(views[j]->getName()), qstring_cast(views[j]->getTypeString()), "");
+      std::vector<ssc::RepPtr> reps = views[j]->getReps();
+      for (unsigned k=0; k<reps.size(); ++k)
+      {
+        QString name = reps[k]->getName();
+        if (name.isEmpty())
+          name = reps[k]->getType();
+        TreeItemImpl::create(viewItem, qstring_cast(name), qstring_cast(reps[k]->getType()), "");
+      }
+    }
+
+    std::vector<ssc::ImagePtr> images = group->getImages();
+    for (unsigned j=0; j<images.size(); ++j)
+    {
+      TreeItemPtr imageItem = TreeItemImage::create(groupItem, images[j]->getName());
+    }
+  }
+}
+
 void BrowserItemModel::buildTree()
 {
   this->beginResetModel();
@@ -56,7 +92,7 @@ void BrowserItemModel::buildTree()
 
   if (showViews)
   {
-    viewManager()->fillModelTree(mTree);
+  	this->fillModelTreeFromViewManager(mTree);
   }
 
   if (showImages)
