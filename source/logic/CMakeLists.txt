@@ -27,7 +27,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
     ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     )
 
 
@@ -37,7 +37,6 @@ ADD_LIBRARY ( cxLogicManager ${cxLogicManager_SOURCE} ${MOC_HEADER_FILES} )
 
 target_link_libraries(cxLogicManager
     SSC
-    cxCommon
     cxPatientService
     cxTrackingService
     cxVisualizationService

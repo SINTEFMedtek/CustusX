@@ -12,7 +12,7 @@
 //#include "sscDoubleWidgets.h"
 #include "sscView.h"
 #include "cxOpenIGTLinkRTSource.h"
-#include "cxProbe.h"
+//#include "cxProbe.h"
 #include "cxRenderTimer.h"
 
 namespace cx
@@ -49,10 +49,10 @@ public:
 
   QProcess* getProcess() { return mServer; }
   OpenIGTLinkRTSourcePtr getVideoSource() { return mRTSource; }
-  ssc::ToolPtr getStreamingProbe();
+//  ssc::ToolPtr getStreamingProbe();
 
 //public slots:
-  void connectVideoToProbe(ssc::ToolPtr tool);
+//  void connectVideoToProbe(ssc::ToolPtr tool);
 
 signals:
   void fps(int fps);
@@ -71,7 +71,7 @@ private:
   void delayedAutoConnectServer();
 //  ssc::ToolPtr findSuitableProbe();
 
-  ssc::ToolPtr mProbe;
+//  ssc::ToolPtr mProbe;
   double mSoundSpeedCompensationFactor;
   OpenIGTLinkRTSourcePtr mRTSource;
   QProcess* mServer;

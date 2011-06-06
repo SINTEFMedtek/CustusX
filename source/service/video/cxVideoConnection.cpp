@@ -16,7 +16,7 @@
 #include "sscMessageManager.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 //#include "cxProbe.h"
 //#include "probeXmlConfigParser.h"
 
@@ -244,55 +244,55 @@ void VideoConnection::serverProcessStateChanged(QProcess::ProcessState newState)
   }
 }
 
-
-/**insert the rt source into the (first) probe tool
- * in the tool manager.
- *
- * Apply time calibration to the source.
- *
- */
-void VideoConnection::connectVideoToProbe(ssc::ToolPtr probe)
-{
-  if (!mRTSource)
- {
-    ssc::messageManager()->sendError("no rt source.");
-    return;
- }
-
+//
+///**insert the rt source into the (first) probe tool
+// * in the tool manager.
+// *
+// * Apply time calibration to the source.
+// *
+// */
+//void VideoConnection::connectVideoToProbe(ssc::ToolPtr probe)
+//{
+//  if (!mRTSource)
+// {
+//    ssc::messageManager()->sendError("no rt source.");
 //    return;
-  // find probe in tool manager
-  // set source in cxTool
-  // insert timecalibration using config
-  if (!mRTSource->isConnected())
-    return;
+// }
+//
+////    return;
+//  // find probe in tool manager
+//  // set source in cxTool
+//  // insert timecalibration using config
+//  if (!mRTSource->isConnected())
+//    return;
+//
+//  if (mProbe)
+//    return;
+//
+////  ssc::ToolPtr probe = this->findSuitableProbe();
+//  if (!probe)
+//    return;
+//
+//  mProbe = probe;
+//
+//  if (mProbe)
+//  {
+//    ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(mProbe->getProbe());
+//    if (!probeInterface)
+//    {
+//      ssc::messageManager()->sendError("Probe not a cx instance.");
+//      return;
+//    }
+//    probeInterface->setRTSource(mRTSource);
+////    ssc::toolManager()->setDominantTool(mProbe->getUid());
+////    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getVideoSource()->getName() << " completed" << std::endl;
+//  }
+//}
 
-  if (mProbe)
-    return;
-
-//  ssc::ToolPtr probe = this->findSuitableProbe();
-  if (!probe)
-    return;
-
-  mProbe = probe;
-
-  if (mProbe)
-  {
-    ProbePtr probeInterface = boost::shared_dynamic_cast<Probe>(mProbe->getProbe());
-    if (!probeInterface)
-    {
-      ssc::messageManager()->sendError("Probe not a cx instance.");
-      return;
-    }
-    probeInterface->setRTSource(mRTSource);
-//    ssc::toolManager()->setDominantTool(mProbe->getUid());
-//    std::cout << "VideoConnection::connectSourceToTool() " << probe->getUid() << " " << probeInterface->getVideoSource()->getName() << " completed" << std::endl;
-  }
-}
-
-ssc::ToolPtr VideoConnection::getStreamingProbe()
-{
-  return mProbe;
-}
+//ssc::ToolPtr VideoConnection::getStreamingProbe()
+//{
+//  return mProbe;
+//}
 
 ///**Find a probe that can be connected to a rt source.
 // *
