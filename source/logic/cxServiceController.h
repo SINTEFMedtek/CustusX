@@ -11,6 +11,8 @@
 #include <boost/shared_ptr.hpp>
 #include <QObject>
 
+#include "sscTool.h"
+
 namespace cx
 {
 
@@ -26,6 +28,12 @@ class ServiceController : public QObject
 public:
 	ServiceController();
 	virtual ~ServiceController();
+
+private slots:
+	void updateVideoConnections();
+
+private:
+	ssc::ToolPtr findSuitableProbe();
 };
 
 typedef boost::shared_ptr<ServiceController> ServiceControllerPtr;

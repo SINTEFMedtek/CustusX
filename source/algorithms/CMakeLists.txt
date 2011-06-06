@@ -39,6 +39,16 @@ SET ( ${LIB}_algorithms
     cxTemporalCalibration.cpp
 )
 
+include_directories(
+    .
+    ${CustusX3_SOURCE_DIR}/source/resource
+    #${CustusX3_SOURCE_DIR}/source/service/patient
+    #${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/source/stateMachineManager
+    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/modules/cxCommon
+    )
+
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_algorithms} ${MOC_HEADER_FILES})
