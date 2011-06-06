@@ -1,10 +1,3 @@
-/*
- * cxActiveToolWidget.cpp
- *
- *  Created on: May 4, 2011
- *      Author: christiana
- */
-
 #include <cxActiveToolWidget.h>
 
 #include <QVBoxLayout>
@@ -15,7 +8,7 @@ namespace cx
 {
 
 ActiveToolWidget::ActiveToolWidget(QWidget* parent) :
-QWidget(parent)
+    BaseWidget(parent, "ActiveToolWidget", "Active Tool")
 {
   QVBoxLayout* layout = new QVBoxLayout(this);
   this->setObjectName("ActiveToolWidget");
@@ -23,6 +16,15 @@ QWidget(parent)
 
   ssc::LabeledComboBoxWidget*  combo = new ssc::LabeledComboBoxWidget(this, ActiveToolStringDataAdapter::New());
   layout->addWidget(combo);
+}
+
+QString ActiveToolWidget::defaultWhatsThis() const
+{
+  return "<html>"
+      "<h3>Select active tool.</h3>"
+      "<p>Lets you select which tool should be the active tool.</p>"
+      "<p><i></i></p>"
+      "</html>";
 }
 
 }

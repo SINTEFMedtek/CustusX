@@ -1,9 +1,9 @@
 #ifndef CXTRANSFERFUNCTIONALPHAWIDGET_H_
 #define CXTRANSFERFUNCTIONALPHAWIDGET_H_
 
-#include <limits.h>
-#include <QWidget>
+#include "cxBaseWidget.h"
 
+#include <limits.h>
 #include <sscImage.h>
 #include "sscForwardDeclarations.h"
 
@@ -20,13 +20,14 @@ namespace cx
  * \author: Janne Beate Bakeng, SINTEF
  * \author: Ole Vegard Solberg, SINTEF
  */
-class TransferFunctionAlphaWidget : public QWidget
+class TransferFunctionAlphaWidget : public BaseWidget
 {    
   Q_OBJECT
   
 public:
   TransferFunctionAlphaWidget(QWidget* parent);
   virtual ~TransferFunctionAlphaWidget();
+  virtual QString defaultWhatsThis() const;
 
   void setData(ssc::ImagePtr image, ssc::ImageTFDataPtr tfData);
   void setReadOnly(bool readOnly);///< Set class readonly: Disable mouse interaction
@@ -35,8 +36,6 @@ signals:
   void positionChanged(int);///< Emits this signal whenever the mouse is moved inside the widget
   
 public slots:
-  //void currentImageChangedSlot(ssc::ImagePtr currentImage); ///< listens to the contextdockwidget for when the current image is changed
-//  void activeImageChangedSlot(); ///< listens to the contextdockwidget for when the current image is changed
   void activeImageTransferFunctionsChangedSlot(); ///< Acts when the image's transfer function is changed
 
 protected:

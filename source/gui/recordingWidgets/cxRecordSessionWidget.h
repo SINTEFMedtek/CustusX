@@ -1,7 +1,7 @@
 #ifndef CXRECORDSESSIONWIDGET_H_
 #define CXRECORDSESSIONWIDGET_H_
 
-#include <QWidget>
+#include "cxBaseWidget.h"
 
 class QPushButton;
 class QLineEdit;
@@ -10,20 +10,22 @@ class QLabel;
 namespace cx
 {
 /**
- * RecordSessionWidget
+ * \class RecordSessionWidget
  *
  * \brief
  *
  * \date Dec 8, 2010
  * \author Janne Beate Bakeng
  */
-class RecordSessionWidget : public QWidget
+class RecordSessionWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   RecordSessionWidget(QWidget* parent, QString defaultDescription = "Record Session");
   virtual ~RecordSessionWidget();
+
+  virtual QString defaultWhatsThis() const;
 
   void setDescription(QString text);
   void setDescriptionVisibility(bool value);

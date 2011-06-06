@@ -1,7 +1,8 @@
 #ifndef CXBROWSERWIDGET_H_
 #define CXBROWSERWIDGET_H_
 
-#include <QWidget>
+#include "utilities/cxBaseWidget.h"
+
 #include <QtGui>
 #include "sscImage.h"
 #include "cxTreeModelItem.h"
@@ -66,13 +67,15 @@ private:
  * \date Feb 11, 2010
  * \author: Janne Beate Bakeng, SINTEF
  */
-class BrowserWidget : public QWidget
+class BrowserWidget : public BaseWidget
 {
   Q_OBJECT
 
 public:
   BrowserWidget(QWidget* parent);
   ~BrowserWidget();
+
+  virtual QString defaultWhatsThis() const;
 
 protected slots:
   void populateTreeWidget(); ///< fills the tree

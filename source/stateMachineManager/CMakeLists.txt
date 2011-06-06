@@ -12,9 +12,9 @@ SET( CX_QT_MOC_HEADER_FILES
 	cxPatientData.h
 	cxFileCopied.h
 	cxStateMachineManager.h
-    RTSource/cxRTSourceManager.h
-    RTSource/sscOpenIGTLinkClient.h
-    RTSource/sscOpenIGTLinkRTSource.h
+#    RTSource/cxRTSourceManager.h
+#    RTSource/sscOpenIGTLinkClient.h
+#    RTSource/sscOpenIGTLinkRTSource.h
     cxUSAcquisition.h
 )
 
@@ -35,12 +35,12 @@ SET ( ${LIB}_statemachineManager
 	cxFileCopied.cpp
 	cxRecordSession.h
     cxRecordSession.cpp
-    RTSource/cxRTSourceManager.h
-    RTSource/cxRTSourceManager.cpp
-    RTSource/sscOpenIGTLinkClient.h
-    RTSource/sscOpenIGTLinkClient.cpp
-    RTSource/sscOpenIGTLinkRTSource.h
-    RTSource/sscOpenIGTLinkRTSource.cpp    
+#    RTSource/cxRTSourceManager.h
+#    RTSource/cxRTSourceManager.cpp
+#    RTSource/sscOpenIGTLinkClient.h
+#    RTSource/sscOpenIGTLinkClient.cpp
+#    RTSource/sscOpenIGTLinkRTSource.h
+#    RTSource/sscOpenIGTLinkRTSource.cpp    
     cxUSAcquisition.h
     cxUSAcquisition.cpp
 )
@@ -48,4 +48,4 @@ SET ( ${LIB}_statemachineManager
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_statemachineManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC cxCommon viewManager registrationManager sscUsReconstructionLib)
+target_link_libraries(${LIB} SSC cxCommon cxVisualizationService registrationManager sscUsReconstructionLib cxVideoService)
