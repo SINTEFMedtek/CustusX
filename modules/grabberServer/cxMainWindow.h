@@ -29,7 +29,7 @@ private slots:
   void queueInfoSlot(int queueInfo, int imagesDropped);
 
 private:
-  GrabberServerWidget* mGrabberServerWidget;
+  GrabberServerWidget*  mGrabberServerWidget;
   ssc::ConsoleWidget*   mConsoleWidget;
 
   QLabel* mQueueInfoLabel;
