@@ -8,8 +8,16 @@ if (BUILD_TESTING)
   # -----------------------------------------------
   # CppUnit test framework: Create executable testCX
   #
-  include_directories( ${CPPUNIT_INCLUDE_DIR})
-  
+  include_directories( 
+    ${CPPUNIT_INCLUDE_DIR}     
+    ../logic
+    ${CustusX3_SOURCE_DIR}/source/resource
+    ${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/tracking
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    )
+      
   # List of all test units
   QT4_WRAP_CPP( SOURCE_FILES 
    )
@@ -24,7 +32,7 @@ if (BUILD_TESTING)
   # Not part of ctest
   add_executable(cxTestUsReconstruction cxCppUnitMain.cpp ${SOURCE_FILES} )
   target_link_libraries(cxTestUsReconstruction
-    sscUsReconstructionLib 
+    cxPluginUSReconstructionLogic 
     ${CPPUNIT_LIBRARIES})
   
   # -----------------------------------------------
@@ -39,7 +47,7 @@ if (BUILD_TESTING)
   add_executable(testUsRec_CppUnit_CTest ${SOURCE_FILES} )
   target_link_libraries(testUsRec_CppUnit_CTest 
     cisstTestsMain
-    sscUsReconstructionLib
+    cxPluginUSReconstructionLogic
     ${CPPUNIT_LIBRARIES}
     ${BOOST_LIBRARIES}
 )
