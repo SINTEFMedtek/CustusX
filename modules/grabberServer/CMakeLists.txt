@@ -74,8 +74,6 @@ ENDIF(APPLE)
 #----------
 IF(WIN32)
 
-  #TODO ulterius
-
 ENDIF(WIN32)
 
 #------------------------------------------------------------------------------
@@ -129,8 +127,8 @@ SET(SOURCES
 
 INCLUDE_DIRECTORIES(
     .
-    #${Boost_INCLUDE_DIRS}    
     ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
+    ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
 )
 
 #------------------------------------------------------------------------------
@@ -144,12 +142,16 @@ IF(WIN32)
   ADD_EXECUTABLE(GrabberServer ${SOURCES})
 ENDIF(WIN32)
 
+message(STATUS ${ULTERIUS_LIBRARY})
+
 #------------------------------------------------------------------------------
 # Link
 #------------------------------------------------------------------------------
 SET ( LINK_LIBRARIES
   SSC
   OpenIGTLink
+  ${ULTERIUS_LIBRARY}
+  vtkOpenIGTUltrasound
   ${QT_LIBRARIES}
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
