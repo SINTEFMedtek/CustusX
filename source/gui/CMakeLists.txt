@@ -314,9 +314,12 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
     )
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} registrationManager sscUsReconstructionLib statemachineManager cxLogicManager)
+target_link_libraries(${LIBNAME} registrationManager cxPluginUSReconstructionGUI statemachineManager cxLogicManager)
 

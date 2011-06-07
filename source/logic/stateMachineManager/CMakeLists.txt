@@ -58,10 +58,10 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/algorithms
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
-    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( ${LIB} ${${LIB}_statemachineManager} ${MOC_HEADER_FILES})
-target_link_libraries(${LIB} SSC cxVisualizationService registrationManager sscUsReconstructionLib cxVideoService)
+target_link_libraries(${LIB} SSC cxVisualizationService registrationManager cxPluginUSReconstructionLogic cxVideoService)

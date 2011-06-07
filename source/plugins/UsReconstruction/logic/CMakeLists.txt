@@ -1,6 +1,10 @@
-# =========================================================
-# sscUsReconstruction
-# =========================================================
+###########################################################
+##               US Reconstruction Plugin Logic
+##
+##               Logic Part
+##
+###########################################################
+
 
 cmake_minimum_required( VERSION 2.4 )
 
@@ -10,8 +14,6 @@ endif(COMMAND cmake_policy)
 
 SET( MOC_HEADER_FILES
    sscReconstructer.h
-   sscReconstructionWidget.h
-  sscReconstructOutputValueParamsInterfaces.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -21,9 +23,6 @@ SET( SOURCE_FILES
   ${MOC_HEADER_FILES}
   matrixInterpolation.cpp
   sscReconstructer.cpp
-  sscReconstructionWidget.cpp
-  sscReconstructOutputValueParamsInterfaces.cpp
-  sscReconstructOutputValueParamsInterfaces.h
   sscReconstructedOutputVolumeParams.h
   sscReconstructAlgorithm.h
   sscThunderVNNReconstructAlgorithm.h
@@ -32,19 +31,11 @@ SET( SOURCE_FILES
   sscPNNReconstructAlgorithm.cpp
   utils/sscReconstructHelper.h
   utils/sscReconstructHelper.cpp
-  #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.h
-  #../../modules/ultrasoundAcquisition/source/gui/probeXmlConfigParser.cpp
-  sscUSFrameData.h
-  sscUSFrameData.cpp
-  cxUsReconstructionFileMaker.h
-  cxUsReconstructionFileMaker.cpp
-  cxUsReconstructionFileReader.h
-  cxUsReconstructionFileReader.cpp
   )
 
 # =========================================================
 
-SET( sscUsReconstructionLib_LIB_FILES
+SET( cxPluginUSReconstructionLogic_LIB_FILES
     SSC
     cxUtilities 
     cxSettings
@@ -78,7 +69,7 @@ if (USE_US_RECONSTRUCTION_THUNDER)
     ADD_SUBDIRECTORY(Thunder)
     include_directories( Thunder )
     link_directories( ${CMAKE_CURRENT_BINARY_DIR}/Thunder )
-    set( sscUsReconstructionLib_LIB_FILES thunder ${sscUsReconstructionLib_LIB_FILES} )
+    set( cxPluginUSReconstructionLogic_LIB_FILES thunder ${cxPluginUSReconstructionLogic_LIB_FILES} )
     set(THUNDER_KERNEL_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Thunder)
 endif (USE_US_RECONSTRUCTION_THUNDER)
 
@@ -93,9 +84,9 @@ include_directories( ${CMAKE_CURRENT_BINARY_DIR} )
 
 # =========================================================
 # create the target
-add_library( sscUsReconstructionLib ${SOURCE_FILES} )
-target_link_libraries( sscUsReconstructionLib ${sscUsReconstructionLib_LIB_FILES} )
+add_library( cxPluginUSReconstructionLogic ${SOURCE_FILES} )
+target_link_libraries( cxPluginUSReconstructionLogic ${cxPluginUSReconstructionLogic_LIB_FILES} )
 # =========================================================
 
-ADD_SUBDIRECTORY( testing )
+#ADD_SUBDIRECTORY( testing )
 
