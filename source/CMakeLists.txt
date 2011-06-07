@@ -91,17 +91,18 @@ find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 #    gui # move app to other folder
 #    )
     
-ADD_SUBDIRECTORY(resource)
+add_subdirectory(resource)
 add_subdirectory(service)
 add_subdirectory(logic)
 add_subdirectory(plugins)
-ADD_SUBDIRECTORY(gui)
+add_subdirectory(gui)
+add_subdirectory(ThirdParty)
 
-ADD_SUBDIRECTORY(algorithms)
+add_subdirectory(algorithms)
 #ADD_SUBDIRECTORY(stateMachineManager)
-ADD_SUBDIRECTORY(registrationManager)
+add_subdirectory(registrationManager)
 #ADD_SUBDIRECTORY(UsReconstruction)
-ADD_SUBDIRECTORY(apps)
+add_subdirectory(apps)
 #IF(APPLE) # doesnt compile on ca's linux box - ??
 #    ADD_SUBDIRECTORY(3DUSReconstruction)
 #ENDIF(APPLE)
