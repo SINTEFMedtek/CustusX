@@ -14,6 +14,7 @@
 #include "cxStateMachineManager.h"
 #include "cxSettings.h"
 #include "sscMessageManager.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -126,7 +127,13 @@ void USAcquisition::saveSession(QString sessionId)
   }
 
   ssc::ToolPtr probe = this->getTool();
-  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe));
+
+	QString calibFileName;
+	ToolPtr cxTool = boost::dynamic_pointer_cast<Tool>(probe);
+	if (cxTool)
+		calibFileName = cxTool->getCalibrationFileName();
+
+  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
   mFileMakerFutureWatcher.setFuture(mFileMakerFuture);

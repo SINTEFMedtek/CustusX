@@ -6,8 +6,8 @@
 #include "sscTool.h"
 #include "cxDataInterface.h"
 #include "sscVideoRecorder.h"
-#include "sscReconstructer.h"
-#include "cxUsReconstructionFileMaker.h"
+//#include "sscReconstructer.h"
+//#include "cxUsReconstructionFileMaker.h"
 
 class QLabel;
 class QVBoxLayout;

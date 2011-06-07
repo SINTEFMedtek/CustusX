@@ -50,8 +50,21 @@ add_library(cxUtilities
     cxCreateProbeDataFromConfiguration.cpp
     cxRenderTimer.h
     cxRenderTimer.cpp
+
+    sscUSFrameData.h
+    sscUSFrameData.cpp
+    cxUsReconstructionFileMaker.h
+    cxUsReconstructionFileMaker.cpp
+    cxUsReconstructionFileReader.h
+    cxUsReconstructionFileReader.cpp    
     ${cxUtilities_MOC_SRCS}
     )
     
-target_link_libraries(cxUtilities SSC ${QT_LIBRARIES} )
+include_directories(
+    .
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    )
+    
+    
+target_link_libraries(cxUtilities SSC ${QT_LIBRARIES} cxSettings )
 
