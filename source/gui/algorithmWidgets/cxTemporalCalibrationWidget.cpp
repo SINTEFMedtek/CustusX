@@ -26,6 +26,8 @@
 #include "sscUtilHelpers.h"
 #include "sscVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
+#include "sscMessageManager.h"
+
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
 

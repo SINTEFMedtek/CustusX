@@ -4,6 +4,11 @@
 #include "cxRecordBaseWidget.h"
 #include "cxUSAcquisition.h"
 
+namespace ssc
+{
+	typedef boost::shared_ptr<class ThreadedReconstructer> ThreadedReconstructerPtr;
+}
+
 namespace cx
 {
 
