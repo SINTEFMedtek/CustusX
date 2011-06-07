@@ -12,6 +12,8 @@
 #include "cxWinGrabber.h"
 #include "sscMessageManager.h"
 
+#include "vtkSonixVideoSource.h"
+
 //==============================================================================
 ////Class that connects to the videosignal and receives frames
 //@interface VideoObserver : NSObject {
@@ -123,6 +125,8 @@ WinGrabber::WinGrabber() :
   ////allocate memory
   //mObjectiveC->mPool = [[NSAutoreleasePool alloc] init];
   //mObjectiveC->mCaptureSession = [[QTCaptureSession alloc] init];
+
+  vtkSonixVideoSource* sonixGrabber = vtkSonixVideoSource::New();
 }
 
 WinGrabber::~WinGrabber()
