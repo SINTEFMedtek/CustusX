@@ -38,4 +38,4 @@ include_directories(
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 ADD_LIBRARY ( cxAlgorithms_Res ${cxAlgorithms_Res_SOURCE} ${MOC_HEADER_FILES})
-target_link_libraries(cxAlgorithms_Res ITKIO ITKCommon ITKBasicFilters) 
+target_link_libraries(cxAlgorithms_Res SSC cxSettings cxUtilities ITKIO ITKCommon ITKBasicFilters) 
