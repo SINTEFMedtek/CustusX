@@ -22,7 +22,7 @@ if (BUILD_TESTING)
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(testAlgorithms cxCppUnitMain.cpp ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testAlgorithms SSC cxAlgorithms sscUsReconstructionLib ${CPPUNIT_LIBRARIES})
+    target_link_libraries(testAlgorithms SSC cxAlgorithms ${CPPUNIT_LIBRARIES})
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -35,7 +35,7 @@ if (BUILD_TESTING)
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testAlgorithms_CppUnit_CTest ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testAlgorithms_CppUnit_CTest cisstTestsMain SSC cxAlgorithms sscUsReconstructionLib ${CPPUNIT_LIBRARIES})
+    target_link_libraries(testAlgorithms_CppUnit_CTest cisstTestsMain SSC cxAlgorithms ${CPPUNIT_LIBRARIES})
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testAlgorithms_CppUnit_CTest)
     

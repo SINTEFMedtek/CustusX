@@ -94,12 +94,13 @@ find_package (SSC PATHS "../externals/ssc/CMake" REQUIRED)
 ADD_SUBDIRECTORY(resource)
 add_subdirectory(service)
 add_subdirectory(logic)
-
+add_subdirectory(plugins)
 ADD_SUBDIRECTORY(gui)
+
 ADD_SUBDIRECTORY(algorithms)
-ADD_SUBDIRECTORY(stateMachineManager)
+#ADD_SUBDIRECTORY(stateMachineManager)
 ADD_SUBDIRECTORY(registrationManager)
-ADD_SUBDIRECTORY(UsReconstruction)
+#ADD_SUBDIRECTORY(UsReconstruction)
 ADD_SUBDIRECTORY(apps)
 #IF(APPLE) # doesnt compile on ca's linux box - ??
 #    ADD_SUBDIRECTORY(3DUSReconstruction)

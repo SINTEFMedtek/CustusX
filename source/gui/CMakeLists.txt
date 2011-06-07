@@ -45,6 +45,7 @@ SET(cxProject_MOC_HDRS
     infoWidgets/cxBrowserWidget.h
     infoWidgets/cxPointSamplingWidget.h
     infoWidgets/cxFrameTreeWidget.h
+    infoWidgets/cxTreeModelItem.h   
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxTrackPadWidget.h
@@ -175,6 +176,8 @@ SET(${LIBNAME}_SRCS
     infoWidgets/cxPointSamplingWidget.cpp
     infoWidgets/cxStatusBar.h
     infoWidgets/cxStatusBar.cpp    
+    infoWidgets/cxTreeModelItem.h
+    infoWidgets/cxTreeModelItem.cpp
     #----------------------
     navigationWidgets/cxNavigationWidget.h
     navigationWidgets/cxNavigationWidget.cpp
@@ -298,7 +301,7 @@ INCLUDE_DIRECTORIES(
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/stateMachineManager    
+    ${CustusX3_SOURCE_DIR}/source/logic/stateMachineManager    
     ${CustusX3_SOURCE_DIR}/source/registrationManager    
 #    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters     
     ${CustusX3_SOURCE_DIR}/source/service/patient     
@@ -309,10 +312,14 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/algorithms
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/UsReconstruction
+    
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
     )
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} registrationManager sscUsReconstructionLib statemachineManager cxLogicManager)
+target_link_libraries(${LIBNAME} registrationManager cxPluginUSReconstructionGUI statemachineManager cxLogicManager)
 
