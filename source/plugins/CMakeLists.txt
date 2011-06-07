@@ -1,8 +1,5 @@
 ###########################################################
-##               Resource Layer
+##               Plugins
 ###########################################################
 
-add_subdirectory(utilities)
-add_subdirectory(settings)
-add_subdirectory(algorithms)
-
+add_subdirectory(UsReconstruction)
