@@ -34,6 +34,7 @@ typedef vtkSmartPointer<class vtkMatrix4x4> vtkMatrix4x4Ptr;
 #define EIGEN_PLAINOBJECTBASE_PLUGIN "sscPlainObjectEigenAddons.h"
 #define EIGEN_MATRIXBASE_PLUGIN "sscMatrixBaseEigenAddons.h"
 #define EIGEN_TRANSFORM_PLUGIN "sscTransformEigenAddons.h"
+#define EIGEN_DONT_ALIGN
 
 // Eigen library
 #include <eigen3/Eigen/Core>
