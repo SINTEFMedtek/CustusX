@@ -7,6 +7,7 @@
 class QMacCocoaViewContainer;
 class NSError;
 class NSString;
+class vtkSonixVideoSource;
 
 namespace cx
 {
@@ -33,6 +34,7 @@ public:
   virtual void displayPreview(QWidget* parent);
 
   void sendFrame(Frame& frame); ///< Used by delegate that is listening to arriving frames, to send the new frame via the grabber.
+  void setIpAdress(QString ipAdress);
   //void printAvailablePixelFormats(); ///< For debugging purposes, displays a list of available pixelformats that effectivly can be delivered.
 
 private:
@@ -55,7 +57,12 @@ private:
   //ObjectiveC* mObjectiveC;
   //bool mSuperVideo;
 
-  vtkSonixVideoSource* mSonixGrabber;
+  vtkSonixVideoSource* mSonixGrabber; ///<
+  QString              mIpAdressToConnectTo; ///< 
+  int                  mBufferSize; ///< 
+  int                  mImagingMode;  ///< 0=B-MODE, 12=RF-MODE
+  int                  mAcquisitionDataType;  ///< 0x00000002=udtBPre, 0x00000004=udtBPost
+
 };
 typedef boost::shared_ptr<class WinGrabber> WinGrabberPtr;
 

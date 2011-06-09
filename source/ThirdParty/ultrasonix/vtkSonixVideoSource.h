@@ -139,7 +139,7 @@ public:
 
   // Description:
   // Give the IP address of the sonix machine
-  void SetSonixIP(char *SonixIP);
+  void SetSonixIP(const char *SonixIP);
   
   /* List of parameters which can be set or read in B-mode, other mode parameters not currently implemented*/
 
