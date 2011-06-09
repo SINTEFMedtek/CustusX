@@ -483,7 +483,7 @@ export_library_dependencies (${SSC_BINARY_DIR}/SSCLibraryDepends.cmake)
 if(APPLE)
     # do nothing
 else(APPLE)
-    install( TARGETS SSC DESTINATION lib64 )
+    #install( TARGETS SSC DESTINATION lib64 )
 endif(APPLE)
 # =========================================================
 
