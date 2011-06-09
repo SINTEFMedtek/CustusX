@@ -42,7 +42,7 @@ INCLUDE(${ITK_USE_FILE})
 #----------
 FIND_PACKAGE(IGSTK REQUIRED)
 IF(IGSTK_FOUND)
-  INCLUDE(${IGSTK_USE_FILE})
+  INCLUDE(${IGSTK_USE_FILE})    
 ENDIF(IGSTK_FOUND)
 
 # OpenIGTLink
@@ -85,14 +85,12 @@ SET(${LIBNAME}_MOC_HDRS
     cxMacGrabberServerWidget.h
     cxWinGrabberServerWidget.h
     cxGrabber.h
-    cxMacGrabber.h
     cxWinGrabber.h
     cxServer.h
     cxGrabberServer.h
     cxOpenIGTLinkSession.h
     cxIGTLinkImageMessage.h
     cxWinGrabberServer.h
-    cxMacGrabberServer.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -113,11 +111,14 @@ SET(SOURCES
     cxGrabberServerWidget.cpp
     cxMacGrabberServerWidget.cpp
     cxWinGrabberServerWidget.cpp
+    cxGrabber.cpp
+    cxMacGrabber.h
     cxMacGrabber.mm
     cxWinGrabber.cpp
     cxServer.cpp
     cxGrabberServer.cpp
     cxWinGrabberServer.cpp
+    cxMacGrabberServer.h
     cxMacGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
     cxIGTLinkImageMessage.cpp
@@ -141,8 +142,6 @@ ENDIF(APPLE)
 IF(WIN32)
   ADD_EXECUTABLE(GrabberServer ${SOURCES})
 ENDIF(WIN32)
-
-message(STATUS ${ULTERIUS_LIBRARY})
 
 #------------------------------------------------------------------------------
 # Link

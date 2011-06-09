@@ -1,4 +1,4 @@
-#ifdef APPLE
+#ifdef __APPLE__
 #ifndef CXMACGRABBER_H_
 #define CXMACGRABBER_H_
 
@@ -30,7 +30,7 @@ namespace cx
  */
 class MacGrabber : public Grabber
 {
-  Q_OBJECT
+  //Q_OBJECT
 
 public:
   MacGrabber();
@@ -57,14 +57,15 @@ private:
   void reportError(NSError* error); ///< Helper for converting NSError into own messaging system
   void reportString(NSString* string); ///< Helper for converting NSString into own messaging system
 
+  bool mSuperVideo; ///< Whether or not we are grabbing using super video or not
+
   /**Helper class for combining objective-c with c++/Qt
   *instead of using void* and reinterpret_cast
   */
   class ObjectiveC;
   ObjectiveC* mObjectiveC;
-  bool mSuperVideo;
 };
-typedef boost::shared_ptr<class MacGrabber> MacGrabberPtr;
+typedef boost::shared_ptr<MacGrabber> MacGrabberPtr;
 
 }//namespace cx
 

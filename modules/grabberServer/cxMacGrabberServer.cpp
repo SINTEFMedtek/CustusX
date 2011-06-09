@@ -1,9 +1,10 @@
-#ifdef APPLE
+#ifdef __APPLE__
 #include "cxMacGrabberServer.h"
 
 #include <QMacCocoaViewContainer>
 #include "sscMessageManager.h"
 #include "sscTypeConversions.h"
+#include "cxMacGrabber.h"
 
 namespace cx
 {
