@@ -147,20 +147,36 @@ message(STATUS ${ULTERIUS_LIBRARY})
 #------------------------------------------------------------------------------
 # Link
 #------------------------------------------------------------------------------
-SET ( LINK_LIBRARIES
-  SSC
-  OpenIGTLink
+SET ( WIN_LINK_LIBRARIES
   ${ULTERIUS_LIBRARY}
   vtkOpenIGTUltrasound
-  ${QT_LIBRARIES}
+)
+
+SET ( MAC_LINK_LIBRARIES
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
   ${QUARTZCORE_LIBRARY}
 )
 
-TARGET_LINK_LIBRARIES( GrabberServer
-  ${LINK_LIBRARIES}
+SET ( ALL_LINK_LIBRARIES
+  SSC
+  OpenIGTLink
+  ${QT_LIBRARIES}
 )
+
+IF(WIN32)
+TARGET_LINK_LIBRARIES( GrabberServer
+  ${ALL_LINK_LIBRARIES}
+  ${WIN_LINK_LIBRARIES}
+)
+ENDIF(WIN32)
+
+IF(APPLE)
+TARGET_LINK_LIBRARIES( GrabberServer
+  ${ALL_LINK_LIBRARIES}
+  ${MAC_LINK_LIBRARIES}
+)
+ENDIF(APPLE)
 
 #------------------------------------------------------------------------------
 # Install
