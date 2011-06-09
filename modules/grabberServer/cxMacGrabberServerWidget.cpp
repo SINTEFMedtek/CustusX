@@ -1,12 +1,9 @@
-#ifdef APPLE
+#ifdef __APPLE__
 #include "cxMacGrabberServerWidget.h"
 
-//#include <QLineEdit>
-//#include <QPushButton>
-//#include <QLabel>
-//#include <QVBoxLayout>
 #include <QMacCocoaViewContainer>
-//#include "sscTypeConversions.h"
+#include "cxMacGrabberServer.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
