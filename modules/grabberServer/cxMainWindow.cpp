@@ -5,7 +5,7 @@
 #include "iostream"
 #include "sscTypeConversions.h"
 
-#ifdef APPLE
+#ifdef __APPLE__
   #include "cxMacGrabberServerWidget.h"
 #endif /*APPLE*/
 #ifdef WIN32
@@ -23,7 +23,7 @@ MainWindow::MainWindow(QStringList arguments) :
 {
   this->setCentralWidget(new QWidget());
 
-#ifdef APPLE
+#ifdef __APPLE__
   mGrabberServerWidget = new MacGrabberServerWidget(this->centralWidget());
 #endif /*APPLE*/
 #ifdef WIN32
