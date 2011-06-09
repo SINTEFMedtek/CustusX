@@ -42,7 +42,7 @@ INCLUDE(${ITK_USE_FILE})
 #----------
 FIND_PACKAGE(IGSTK REQUIRED)
 IF(IGSTK_FOUND)
-  INCLUDE(${IGSTK_USE_FILE})
+  INCLUDE(${IGSTK_USE_FILE})    
 ENDIF(IGSTK_FOUND)
 
 # OpenIGTLink
@@ -85,14 +85,12 @@ SET(${LIBNAME}_MOC_HDRS
     cxMacGrabberServerWidget.h
     cxWinGrabberServerWidget.h
     cxGrabber.h
-    cxMacGrabber.h
     cxWinGrabber.h
     cxServer.h
     cxGrabberServer.h
     cxOpenIGTLinkSession.h
     cxIGTLinkImageMessage.h
     cxWinGrabberServer.h
-    cxMacGrabberServer.h
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
@@ -113,11 +111,14 @@ SET(SOURCES
     cxGrabberServerWidget.cpp
     cxMacGrabberServerWidget.cpp
     cxWinGrabberServerWidget.cpp
+    cxGrabber.cpp
+    cxMacGrabber.h
     cxMacGrabber.mm
     cxWinGrabber.cpp
     cxServer.cpp
     cxGrabberServer.cpp
     cxWinGrabberServer.cpp
+    cxMacGrabberServer.h
     cxMacGrabberServer.cpp
     cxOpenIGTLinkSession.cpp
     cxIGTLinkImageMessage.cpp
@@ -142,25 +143,39 @@ IF(WIN32)
   ADD_EXECUTABLE(GrabberServer ${SOURCES})
 ENDIF(WIN32)
 
-message(STATUS ${ULTERIUS_LIBRARY})
-
 #------------------------------------------------------------------------------
 # Link
 #------------------------------------------------------------------------------
-SET ( LINK_LIBRARIES
-  SSC
-  OpenIGTLink
+SET ( WIN_LINK_LIBRARIES
   ${ULTERIUS_LIBRARY}
   vtkOpenIGTUltrasound
-  ${QT_LIBRARIES}
+)
+
+SET ( MAC_LINK_LIBRARIES
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
   ${QUARTZCORE_LIBRARY}
 )
 
-TARGET_LINK_LIBRARIES( GrabberServer
-  ${LINK_LIBRARIES}
+SET ( ALL_LINK_LIBRARIES
+  SSC
+  OpenIGTLink
+  ${QT_LIBRARIES}
 )
+
+IF(WIN32)
+TARGET_LINK_LIBRARIES( GrabberServer
+  ${ALL_LINK_LIBRARIES}
+  ${WIN_LINK_LIBRARIES}
+)
+ENDIF(WIN32)
+
+IF(APPLE)
+TARGET_LINK_LIBRARIES( GrabberServer
+  ${ALL_LINK_LIBRARIES}
+  ${MAC_LINK_LIBRARIES}
+)
+ENDIF(APPLE)
 
 #------------------------------------------------------------------------------
 # Install

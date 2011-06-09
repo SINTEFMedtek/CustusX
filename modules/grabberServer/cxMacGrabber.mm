@@ -1,11 +1,11 @@
-#ifdef APPLE
-
+#ifdef __APPLE__
 #import <Foundation/NSAutoreleasePool.h>
 #import <QTKit/QTKit.h>
 
+#include "cxMacGrabber.h"
+
 #include "sscTime.h"
 #include "sscTypeConversions.h"
-#include "cxMacGrabber.h"
 #include <iostream>
 #include <QWidget>
 #include <QMacCocoaViewContainer>
@@ -118,8 +118,8 @@ public:
 
 MacGrabber::MacGrabber() :
   Grabber(),
-  mObjectiveC(new ObjectiveC),
-  mSuperVideo(false)
+  mSuperVideo(false),
+  mObjectiveC(new ObjectiveC)
 {
   //allocate memory
   mObjectiveC->mPool = [[NSAutoreleasePool alloc] init];
