@@ -54,6 +54,8 @@ private:
   //class ObjectiveC;
   //ObjectiveC* mObjectiveC;
   //bool mSuperVideo;
+
+  vtkSonixVideoSource* mSonixGrabber;
 };
 typedef boost::shared_ptr<class WinGrabber> WinGrabberPtr;
 
