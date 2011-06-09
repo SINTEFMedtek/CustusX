@@ -2,6 +2,10 @@
 ##               CustusX Application
 ###########################################################
 
+#------------------------------------------------------------------------------
+# Include
+#-----------------------------------------------------------------------------
+
 SET(SOURCES cxMain.cpp)
 
 include_directories(
@@ -9,9 +13,9 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/gui
     )
 
-
-
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# Set variables
+#-----------------------------------------------------------------------------
 # For Apple set the icns file containing icons
 IF(APPLE)
   # set how it shows up in the Info.plist file
@@ -34,15 +38,13 @@ ELSE(APPLE)
   ADD_EXECUTABLE(CustusX ${SOURCES} )
 ENDIF(APPLE)
 
-#----------
-# LINK
+#------------------------------------------------------------------------------
+# Linking
+#-----------------------------------------------------------------------------
 TARGET_LINK_LIBRARIES( CustusX gui )
 
-
-
-
 #--------------------------------------------------------------------------------
-# Now the installation/bundle stuff below
+# Install
 #--------------------------------------------------------------------------------
 # See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
 #
@@ -54,6 +56,7 @@ SET(BUNDLE_NAME CustusX)
 install(TARGETS CustusX
     BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
     RUNTIME DESTINATION bin
+    COMPONENT CustusX
     )
 
 if(WIN32)
@@ -100,7 +103,8 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}"
 
 # install openCL shaders into bundle
 install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
-        DESTINATION ${RESOURCES_DIR}/shaders/ 
+        DESTINATION ${RESOURCES_DIR}/shaders/
+        COMPONENT CustusX
     )
 
 # install folder for storage of igstk<->CustusX symlinks
@@ -167,5 +171,7 @@ if (WIN32)
 
   INSTALL(CODE "
      include(BundleUtilities)
-     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") ")
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     COMPONENT CustusX
+     )
 endif (WIN32)

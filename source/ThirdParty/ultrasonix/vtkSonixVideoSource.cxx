@@ -1096,7 +1096,7 @@ void vtkSonixVideoSource::DoFormatSetup()
 
 }
 
-void vtkSonixVideoSource::SetSonixIP(char *SonixIP)
+void vtkSonixVideoSource::SetSonixIP(const char *SonixIP)
 {
 	if (SonixIP)
 	  {

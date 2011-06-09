@@ -117,8 +117,12 @@ namespace cx
 //};
 //==============================================================================
 
-WinGrabber::WinGrabber(std::string ipAdress) :
-  Grabber()//,
+WinGrabber::WinGrabber() :
+  Grabber(),
+  mIpAdressToConnectTo("127.0.0.1"),
+  mBufferSize(500),
+  mImagingMode(0),
+  mAcquisitionDataType(0x00000004)
   //mObjectiveC(new ObjectiveC),
   //mSuperVideo(false)
 {
@@ -127,12 +131,11 @@ WinGrabber::WinGrabber(std::string ipAdress) :
   //mObjectiveC->mCaptureSession = [[QTCaptureSession alloc] init];
 
   mSonixGrabber = vtkSonixVideoSource::New();
-  mSonixGrabber->SetSonixIP(ipAdress.c_str());
-  mSonixGrabber->SetImagingMode(0); //0=B-MODE, 12=RF-MODE
-  mSonixGrabber->SetAcquisitionDataType(0x00000004); //0x00000002=udtBPre, 0x00000004=udtBPost
-  mSonixGrabber->SetFrameBufferSize(mBufferSize);
+  mSonixGrabber->SetSonixIP(mIpAdressToConnectTo.toStdString().c_str());
+  mSonixGrabber->SetImagingMode(mImagingMode);
+  mSonixGrabber->SetAcquisitionDataType(mAcquisitionDataType);
+  mSonixGrabber->SetFrameBufferSize(mBufferSize);  // Number of image frames in buffer
   mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
-  mSonixGrabber->SetFrameBufferSize(500); // Number of image frames in buffer
 }
 
 WinGrabber::~WinGrabber()
