@@ -1,4 +1,4 @@
-#ifdef(APPLE)
+#ifdef __APPLE__
 #ifndef CXMACGRABBERSERVER_H_
 #define CXMACGRABBERSERVER_H_
 
@@ -19,7 +19,6 @@ namespace cx
 
 class MacGrabberServer : public GrabberServer
 {
-  Q_OBJECT
 
 public:
   MacGrabberServer(QObject* parent = NULL);
@@ -29,7 +28,7 @@ protected:
   virtual void connectGrabber(); ///< Connects a MacGrabber.
   virtual void connectServer(); ///< Connects a OpenIGTLinkServer.
 };
-typedef boost::shared_ptr<class MacGrabberServer> MacGrabberServerPtr;
+typedef boost::shared_ptr<MacGrabberServer> MacGrabberServerPtr;
 }//namespace cx
 #endif /* CXMACGRABBERSERVER_H_ */
-#endif(APPLE)
+#endif /*__APPLE__*/

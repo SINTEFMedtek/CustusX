@@ -32,11 +32,7 @@ class Grabber : public QObject
   Q_OBJECT
 
 public:
-  Grabber()
-  {
-    typedef cx::Frame Frame;
-    qRegisterMetaType<Frame>("Frame");
-  }
+  Grabber();
   virtual ~Grabber(){};
   
   virtual void start(){}; ///< Start grabbing.
@@ -52,7 +48,7 @@ signals:
 protected:
 };
 
-typedef boost::shared_ptr<class Grabber> GrabberPtr;
+typedef boost::shared_ptr<Grabber> GrabberPtr;
 }//namespace cx
 
 //Declaration of a frame metatype needed to be able to send frame as a signal.
