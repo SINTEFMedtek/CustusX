@@ -117,7 +117,7 @@ namespace cx
 //};
 //==============================================================================
 
-WinGrabber::WinGrabber() :
+WinGrabber::WinGrabber(std::string ipAdress) :
   Grabber()//,
   //mObjectiveC(new ObjectiveC),
   //mSuperVideo(false)
@@ -126,12 +126,21 @@ WinGrabber::WinGrabber() :
   //mObjectiveC->mPool = [[NSAutoreleasePool alloc] init];
   //mObjectiveC->mCaptureSession = [[QTCaptureSession alloc] init];
 
-  vtkSonixVideoSource* sonixGrabber = vtkSonixVideoSource::New();
+  mSonixGrabber = vtkSonixVideoSource::New();
+  mSonixGrabber->SetSonixIP(ipAdress.c_str());
+  mSonixGrabber->SetImagingMode(0); //0=B-MODE, 12=RF-MODE
+  mSonixGrabber->SetAcquisitionDataType(0x00000004); //0x00000002=udtBPre, 0x00000004=udtBPost
+  mSonixGrabber->SetFrameBufferSize(mBufferSize);
+  mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
+  mSonixGrabber->SetFrameBufferSize(500); // Number of image frames in buffer
 }
 
 WinGrabber::~WinGrabber()
 {
   //[mObjectiveC->mPool release];
+
+  mSonixGrabber->ReleaseSystemResources();
+  mSonixGrabber->Delete();
 }
 
 void WinGrabber::start()
@@ -139,7 +148,7 @@ void WinGrabber::start()
   if(this->isGrabbing())
     return;
 
-  if(this->findConnectedDevice())
+  /*if(this->findConnectedDevice())
   {
     if(!this->openDevice())
       ssc::messageManager()->sendError("Could not open the selected device. Aborting.");
@@ -148,13 +157,16 @@ void WinGrabber::start()
   } else
   {
     ssc::messageManager()->sendError("Could not find a connected device. Aborting.");
-  }
+  }*/
+  mSonixGrabber->Record();
 }
 
 void WinGrabber::stop()
 {
   if(!this->isGrabbing())
     return;
+
+  mSonixGrabber->Stop();
 
   this->stopSession();
 }
