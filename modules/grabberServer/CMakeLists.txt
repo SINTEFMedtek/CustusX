@@ -1,3 +1,7 @@
+###########################################################
+##               GrabberServer Application
+###########################################################
+
 PROJECT(GrabberServer)
 
 cmake_minimum_required(VERSION 2.6)
@@ -180,7 +184,32 @@ ENDIF(APPLE)
 #------------------------------------------------------------------------------
 # Install
 #------------------------------------------------------------------------------
-install(TARGETS GrabberServer
-    BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
-    RUNTIME DESTINATION bin
-    )
+# See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
+
+IF(WIN32)
+
+  install(TARGETS GrabberServer
+      BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
+      RUNTIME DESTINATION bin
+      COMPONENT GrabberServer
+      )
+
+  include (InstallRequiredSystemLibraries)
+
+  set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
+  set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
+  set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
+  set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
+  set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}")
+
+  SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/GrabberServer.exe")
+  SET(LIBS ${QT_LIBRARY_DIR})
+  SET(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
+
+  INSTALL(CODE "
+     include(BundleUtilities)
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     COMPONENT GrabberServer
+     )
+
+ENDIF(WIN32)
