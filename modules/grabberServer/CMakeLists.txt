@@ -2,7 +2,7 @@
 ##               GrabberServer Application
 ###########################################################
 
-PROJECT(GrabberServer)
+project(GrabberServer)
 
 cmake_minimum_required(VERSION 2.6)
 
@@ -17,37 +17,37 @@ find_package( Boost REQUIRED )
 # Qt
 #----------
 # find and setup Qt4 for this project
-SET (QT_USE_QTXML TRUE)
-SET (QT_USE_QTNETWORK TRUE)
+set(QT_USE_QTXML TRUE)
+set(QT_USE_QTNETWORK TRUE)
 find_package(Qt4 REQUIRED)
-IF(QT_USE_FILE)
-  INCLUDE(${QT_USE_FILE})
-ELSE(QT_USE_FILE)
-  SET(QT_LIBRARIES   ${QT_QT_LIBRARY})
-ENDIF(QT_USE_FILE)
+if(QT_USE_FILE)
+  include(${QT_USE_FILE})
+else(QT_USE_FILE)
+  set(QT_LIBRARIES   ${QT_QT_LIBRARY})
+endif(QT_USE_FILE)
 
 # VTK
 #----------
-FIND_PACKAGE(VTK)
-IF(NOT VTK_DIR)
-  MESSAGE(FATAL_ERROR "Please set VTK_DIR.")
-ENDIF(NOT VTK_DIR)
-INCLUDE(${VTK_USE_FILE})
+find_package(VTK)
+if(NOT VTK_DIR)
+  message(FATAL_ERROR "Please set VTK_DIR.")
+endif(NOT VTK_DIR)
+include(${VTK_USE_FILE})
 
 # ITK
 #----------
-FIND_PACKAGE(ITK)
-IF(NOT ITK_DIR)
-  MESSAGE(FATAL_ERROR "Please set ITK_DIR.")
-ENDIF(NOT ITK_DIR)
-INCLUDE(${ITK_USE_FILE})
+find_package(ITK)
+if(NOT ITK_DIR)
+  message(FATAL_ERROR "Please set ITK_DIR.")
+endif(NOT ITK_DIR)
+include(${ITK_USE_FILE})
 
 # IGSTK
 #----------
-FIND_PACKAGE(IGSTK REQUIRED)
-IF(IGSTK_FOUND)
-  INCLUDE(${IGSTK_USE_FILE})    
-ENDIF(IGSTK_FOUND)
+find_package(IGSTK REQUIRED)
+if(IGSTK_FOUND)
+  include(${IGSTK_USE_FILE})    
+endif(IGSTK_FOUND)
 
 # OpenIGTLink
 #----------
@@ -56,34 +56,36 @@ include(${OpenIGTLink_USE_FILE})
 
 # SSC
 #----------
-find_package (SSC PATHS "../../externals/ssc/CMake" REQUIRED)
-include (${SSC_USE_FILE})
+find_package(SSC PATHS "../../externals/ssc/CMake" REQUIRED)
+include(${SSC_USE_FILE})
 
 # APPLE libs
 #----------
-IF(APPLE)
+if(APPLE)
 
   ##Foundation
-  FIND_LIBRARY(FOUNDATION_LIBRARY Foundation)
+  find_library(FOUNDATION_LIBRARY Foundation)
 
   ##QtKit
-  FIND_LIBRARY(QTKIT_LIBRARY QtKit)
+  find_library(QTKIT_LIBRARY QtKit)
 
   ##Quartz
-  FIND_LIBRARY(QUARTZCORE_LIBRARY QuartzCore)
+  find_library(QUARTZCORE_LIBRARY QuartzCore)
 
-ENDIF(APPLE)
+endif(APPLE)
 
 # WINDOWS libs
 #----------
-IF(WIN32)
+if(WIN32)
 
-ENDIF(WIN32)
+    #TODO
+    
+endif(WIN32)
 
 #------------------------------------------------------------------------------
 # Qt - MOC
 #------------------------------------------------------------------------------
-SET(${LIBNAME}_MOC_HDRS
+set(${LIBNAME}_MOC_HDRS
     cxMainWindow.h
     cxGrabberServerWidget.h
     cxMacGrabberServerWidget.h
@@ -98,18 +100,18 @@ SET(${LIBNAME}_MOC_HDRS
 )
 
 # After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
-IF(APPLE)
+if(APPLE)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
-ENDIF(APPLE)
+endif(APPLE)
 
-IF(WIN32)
+if(WIN32)
   QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} OPTIONS "-D_WINDOWS")
-ENDIF(WIN32)
+endif(WIN32)
 
 #------------------------------------------------------------------------------
 # Include
 #------------------------------------------------------------------------------
-SET(SOURCES 
+set(SOURCES 
     main.cpp
     cxMainWindow.cpp
     cxGrabberServerWidget.cpp
@@ -130,7 +132,7 @@ SET(SOURCES
     ${${LIBNAME}_MOC_SRCS}
 )
 
-INCLUDE_DIRECTORIES(
+include_directories(
     .
     ${CMAKE_CURRENT_BINARY_DIR}/gui #so that is finds the generated ui files
     ${CustusX3_SOURCE_DIR}/source/ThirdParty/ultrasonix #to find ultrasonix files
@@ -139,71 +141,103 @@ INCLUDE_DIRECTORIES(
 #------------------------------------------------------------------------------
 # Executable
 #------------------------------------------------------------------------------
-IF(APPLE)
-  ADD_EXECUTABLE(GrabberServer MACOSX_BUNDLE ${SOURCES})
-ENDIF(APPLE)
+if(APPLE)
+  add_executable(GrabberServer MACOSX_BUNDLE ${SOURCES})
+endif(APPLE)
 
-IF(WIN32)
-  ADD_EXECUTABLE(GrabberServer ${SOURCES})
-ENDIF(WIN32)
+if(WIN32)
+  add_executable(GrabberServer ${SOURCES})
+endif(WIN32)
 
 #------------------------------------------------------------------------------
 # Link
 #------------------------------------------------------------------------------
-SET ( WIN_LINK_LIBRARIES
+set( WIN_LINK_LIBRARIES
   ${ULTERIUS_LIBRARY}
   vtkOpenIGTUltrasound
 )
 
-SET ( MAC_LINK_LIBRARIES
+set( MAC_LINK_LIBRARIES
   ${FOUNDATION_LIBRARY}
   ${QTKIT_LIBRARY}
   ${QUARTZCORE_LIBRARY}
 )
 
-SET ( ALL_LINK_LIBRARIES
+set( ALL_LINK_LIBRARIES
   SSC
   OpenIGTLink
   ${QT_LIBRARIES}
 )
 
-IF(WIN32)
-TARGET_LINK_LIBRARIES( GrabberServer
-  ${ALL_LINK_LIBRARIES}
-  ${WIN_LINK_LIBRARIES}
-)
-ENDIF(WIN32)
+if(WIN32)
+    target_link_libraries( GrabberServer
+      ${ALL_LINK_LIBRARIES}
+      ${WIN_LINK_LIBRARIES}
+    )
+endif(WIN32)
 
-IF(APPLE)
-TARGET_LINK_LIBRARIES( GrabberServer
-  ${ALL_LINK_LIBRARIES}
-  ${MAC_LINK_LIBRARIES}
-)
-ENDIF(APPLE)
+if(APPLE)
+    target_link_libraries( GrabberServer
+      ${ALL_LINK_LIBRARIES}
+      ${MAC_LINK_LIBRARIES}
+    )
+endif(APPLE)
 
 #------------------------------------------------------------------------------
 # Install
 #------------------------------------------------------------------------------
+
+# Variables
+#----------
+set(GRABBERSERVER_INSTALL_FOLDER_NAME "GrabberServer") # name of folder where all executables, config etc are assembled
+if(WIN32)
+    set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/GrabberServer.exe")
+endif(WIN32)
+
+if(APPLE)
+    set(APPS ${CUSTUSX_INSTALL_FOLDER_NAME}/GrabberServer.app)
+    #set(APPS "\${CMAKE_INSTALL_PREFIX}/${GRABBERSERVER_INSTALL_FOLDER_NAME}/GrabberServer.app")
+endif(APPLE)
+
+set(LIBS ${QT_LIBRARY_DIR})
+set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
+
+
+# Install files
+#----------
+install(TARGETS GrabberServer
+  BUNDLE DESTINATION ${GRABBERSERVER_INSTALL_FOLDER_NAME}
+  RUNTIME DESTINATION bin
+  #COMPONENT GrabberServer
+  )
+
+if(WIN32)
+
+  #Installing required run time libs for Windows, msv*.dll
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+  include (InstallRequiredSystemLibraries)
+  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+      install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+        DESTINATION bin
+        PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
+        GROUP_EXECUTE WORLD_READ
+        #COMPONENT GrabberServer
+        )
+  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+  
+endif(WIN32)
+
+#------------------------------------------------------------------------------
+# Bundle utilities
+#------------------------------------------------------------------------------
 # See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
 
-IF(WIN32)
+if(WIN32)
 
-  install(TARGETS GrabberServer
-      BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
-      RUNTIME DESTINATION bin
-      COMPONENT GrabberServer
-      )
-
-  include (InstallRequiredSystemLibraries)
-
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/GrabberServer.exe")
-  SET(LIBS ${QT_LIBRARY_DIR})
-  SET(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
-
-  INSTALL(CODE "
+  install(CODE "
      include(BundleUtilities)
      fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
-     COMPONENT GrabberServer
+     #COMPONENT GrabberServer
      )
 
-ENDIF(WIN32)
+endif(WIN32)
