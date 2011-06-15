@@ -1,5 +1,38 @@
 CustusX - Change Log
 
+CustusX - 3.1.5 alpha (Released 2011-05-19) [ View Issues ]
+===========================================
+- 0000259: [User story] Pituitary gland procedure with 3D ultrasound - neuro (cas) - resolved.
+- 0000262: [Bug] Centerline algo must perform input checking. (olevs) - resolved.
+- 0000290: [Bug] Faulty handling of dominant tool (gat) - resolved.
+- 0000302: [Refactoring request] New transfer function widgets for 2D and 3D (cas) - resolved.
+- 0000316: [Bug] Problem with color transfer function for 0/1 binary volumes (olevs) - resolved.
+- 0000321: [Bug] Debug v2v reg resample box (cas) - resolved.
+- 0000322: [Bug] Improved segmentation preview (olevs) - resolved.
+- 0000323: [Refactoring request] Refactor v2v user interface (cas) - resolved.
+- 0000330: [Bug] Not all transfer function prests (re)set window/level (olevs) - resolved.
+- 0000331: [Bug] Probing threshold in registration don't support signed volumes (olevs) - resolved.
+- 0000333: [Bug] Problem to get point sampling in Landmark registration (cas) - resolved.
+- 0000336: [Bug] Point sampler slider don't work (olevs) - resolved.
+- 0000338: [Feature request] Add a apply button to the preference dialog (jbake) - resolved.
+- 0000339: [Bug] Color transfer function points may get stuck for signed volumes (olevs) - resolved.
+- 0000340: [Feature request] Want a report on which files where written after a us acq (jbake) - resolved.
+- 0000341: [Feature request] Want fps for grabbed frames on the statusbar (jbake) - resolved.
+- 0000342: [Bug] Cannot create tool configs on installed CustusX. (jbake) - resolved.
+- 0000343: [Bug] Available segmentation threshold is not based on image values (olevs) - resolved.
+- 0000344: [Bug] changed() signal is double defined (cas) - resolved.
+- 0000345: [Bug] single-value volume crashes gui (olevs) - resolved.
+- 0000346: [Feature request] Make loading transfer functions more robust (olevs) - resolved.
+- 0000347: [Bug] segmentation threshold init value is always 100 (olevs) - resolved.
+- 0000351: [Bug] Tracking config preferences file name issue (jbake) - resolved.
+- 0000354: [Feature request] Enable stereoscopic visualization (olevs) - resolved.
+- 0000358: [Bug] Some widgets makes cx3 crash in releasemode (jbake) - resolved.
+- 0000361: [Bug] Tool representation for "Reference-Plate_AURORA" is not rendered in 3D scene (gat) - resolved.
+- 0000297: [Bug] Resample image in v2v not working (cas) - resolved.
+- 0000349: [Feature request] Temporal calibration in CustusX (cas) - resolved.
+- 0000348: [Feature request] Manual tool calibration (cas) - resolved.
+[29 issues]
+
 CustusX - 3.1.4 (Released 2011-04-14) [ View Issues ]
 =====================================
 - 0000010: [Feature request] Need easy setup of connection to position tracking system (cas) - resolved.

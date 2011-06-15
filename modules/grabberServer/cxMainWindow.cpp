@@ -5,6 +5,13 @@
 #include "iostream"
 #include "sscTypeConversions.h"
 
+#ifdef __APPLE__
+  #include "cxMacGrabberServerWidget.h"
+#endif /*APPLE*/
+#ifdef WIN32
+  #include "cxWinGrabberServerWidget.h"
+#endif /*WIN32*/
+
 namespace cx
 {
 
@@ -15,7 +22,14 @@ MainWindow::MainWindow(QStringList arguments) :
   mImagesDroppedLabel(new QLabel("Images dropped: 0"))
 {
   this->setCentralWidget(new QWidget());
+
+#ifdef __APPLE__
   mGrabberServerWidget = new MacGrabberServerWidget(this->centralWidget());
+#endif /*APPLE*/
+#ifdef WIN32
+  mGrabberServerWidget = new WinGrabberServerWidget(this->centralWidget());
+#endif /*WIN32*/
+
   this->setCentralWidget(mGrabberServerWidget);
   connect(mGrabberServerWidget, SIGNAL(queueInfo(int, int)), this, SLOT(queueInfoSlot(int, int)));
   
