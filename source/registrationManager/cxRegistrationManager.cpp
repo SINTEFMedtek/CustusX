@@ -15,6 +15,8 @@
 #include "cxLandmarkTranslationRegistration.h"
 #include "cxFrameForest.h"
 #include "vesselReg/SeansVesselReg.hxx"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -48,6 +50,22 @@ void RegistrationManager::initialize()
 {
   mPatientRegistrationOffset = ssc::Transform3D::Identity();
   mLastRegistrationTime = QDateTime::currentDateTime();
+
+  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+}
+
+void RegistrationManager::duringSavePatientSlot()
+{
+	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+  this->addXml(managerNode);
+}
+
+void RegistrationManager::duringLoadPatientSlot()
+{
+	QDomElement registrationManager = patientService()->getPatientData()->getCurrentWorkingElement("managers/registrationManager");
+  this->parseXml(registrationManager);
 }
 
 void RegistrationManager::setFixedData(ssc::DataPtr fixedData)
@@ -545,7 +563,7 @@ void RegistrationManager::parseXml(QDomNode& dataNode)
 //  }
 }
 
-void RegistrationManager::clear()
+void RegistrationManager::clearSlot()
 {
   mLastRegistrationTime = QDateTime();
   this->setFixedData(ssc::DataPtr());

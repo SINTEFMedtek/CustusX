@@ -14,25 +14,60 @@
 
 #include "sscTime.h"
 #include "sscMessageManager.h"
-#include "sscDataManager.h"
-#include "sscToolManager.h"
 #include "sscUtilHelpers.h"
-#include "sscToolManager.h"
 #include "sscCustomMetaImage.h"
 #include "sscMesh.h"
 
-#include "cxViewManager.h"
 #include "cxFileCopied.h"
 #include "cxSettings.h"
-#include "cxRegistrationManager.h"
-#include "cxStateMachineManager.h"
-#include "cxToolManager.h"
 
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 
+#include "sscDataManager.h"
+#include "sscImage.h"
+#include "sscTypeConversions.h"
+//#include "sscToolManager.h"
+//#include "cxViewManager.h"
+//#include "cxToolManager.h"
+//#include "cxRegistrationManager.h"
+//#include "cxStateMachineManager.h"
+
 namespace cx
 {
+
+/**given a root node, use the /-separated path to descend
+ * into the root children recursively. Create elements if
+ * necessary.
+ *
+ */
+QDomElement getElementForced(QDomNode root, QString path)
+{
+	QStringList pathList = path.split("/");
+	QDomElement current = root.toElement();
+//	std::cout << "getElementForced " << pathList.join(" - ") << std::endl;
+
+	if (current.isNull())
+		return current;
+
+	for (int i=0; i< pathList.size(); ++i)
+	{
+		QDomElement next = current.namedItem(pathList[i]).toElement();
+//		std::cout << "  getElementForced (" << current.tagName() << ")" << pathList[i] << " " << !bool(next.isNull()) << std::endl;
+
+		if (next.isNull())
+		{
+//			std::cout << "  getElementForced - adding element " << pathList[i] << " to " << current.tagName() << std::endl;
+			next = root.ownerDocument().createElement(pathList[i]);
+			current.appendChild(next);
+		}
+
+		current = next;
+	}
+
+	return current;
+}
+
 
 PatientData::PatientData()
 {
@@ -56,15 +91,15 @@ void PatientData::setActivePatient(const QString& activePatientFolder)
 
   mActivePatientFolder = activePatientFolder;
 
-  QString loggingPath = this->getActivePatientFolder() + "/Logs/";
-  QDir loggingDir(loggingPath);
-  if (!loggingDir.exists())
-  {
-    loggingDir.mkpath(loggingPath);
-//    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
-  }
-  ToolManager::getInstance()->setLoggingFolder(loggingPath);
-  ssc::messageManager()->setLoggingFolder(loggingPath);
+//  QString loggingPath = this->getActivePatientFolder() + "/Logs/";
+//  QDir loggingDir(loggingPath);
+//  if (!loggingDir.exists())
+//  {
+//    loggingDir.mkpath(loggingPath);
+////    ssc::messageManager()->sendInfo("Made a folder for tool logging: " + loggingPath);
+//  }
+//  ToolManager::getInstance()->setLoggingFolder(loggingPath);
+//  ssc::messageManager()->setLoggingFolder(loggingPath);
 
   ssc::messageManager()->sendInfo("Set Active Patient: " + mActivePatientFolder);
 
@@ -84,15 +119,17 @@ void PatientData::newPatient(QString choosenDir)
 void PatientData::clearPatient()
 {
   ssc::dataManager()->clear();
-  ssc::toolManager()->clear();
-  viewManager()->clear();
-  registrationManager()->clear();
+//  ssc::toolManager()->clear();
+//  viewManager()->clear();
+//  registrationManager()->clear();
   //rep
   //usrec?
 
   QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
 
   this->setActivePatient(this->getNullFolder());
+
+  emit cleared();
 }
 
 QString PatientData::getNullFolder() const
@@ -100,6 +137,7 @@ QString PatientData::getNullFolder() const
   QString patientDatafolder = settings()->value("globalPatientDataFolder").toString();
   return patientDatafolder + "/NoPatient";
 }
+
 //void PatientData::loadPatientFileSlot()
 void PatientData::loadPatient(QString choosenDir)
 {
@@ -153,6 +191,8 @@ void PatientData::savePatient()
   //Gather all the information that needs to be saved
   QDomDocument doc;
   this->generateSaveDoc(doc);
+  mWorkingDocument = doc;
+  emit isSaving(); // give all listeners a chance to add to the document
 
   QFile file(mActivePatientFolder + "/custusdoc.xml");
   if(file.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -168,7 +208,7 @@ void PatientData::savePatient()
                                +" Error: "+file.errorString());
   }
 
-  ssc::toolManager()->savePositionHistory();
+//  ssc::toolManager()->savePositionHistory();
 
   // save position transforms into the mhd files.
   // This hack ensures data files can be used in external programs without an explicit export.
@@ -182,6 +222,8 @@ void PatientData::savePatient()
 
   //Write the data to file, fx modified images... etc...
   //TODO Implement when we know what we want to save here...
+
+  mWorkingDocument = QDomDocument();
 }
 
 vtkPolyDataPtr PatientData::mergeTransformIntoPolyData(vtkPolyDataPtr polyBase, ssc::Transform3D rMd)
@@ -385,6 +427,15 @@ void PatientData::createPatientFolders(QString choosenDir)
   this->savePatient();
 }
 
+QString PatientData::getVersionName()
+{
+  QString versionName;
+#ifdef VERSION_NUMBER_VERBOSE
+  versionName = QString("%1").arg(VERSION_NUMBER_VERBOSE);
+#else
+#endif
+  return versionName;
+}
 
 /**
  * Xml version 1.0: Knows about the nodes: \n
@@ -418,7 +469,7 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
 
   // note: all nodes must be below <patient>. XML requires only one root node per file.
   QDomElement versionName = doc.createElement("version_name");
-  versionName.appendChild(doc.createTextNode(stateManager()->getVersionName()));
+  versionName.appendChild(doc.createTextNode(this->getVersionName()));
   patientNode.appendChild(versionName);
 
   QDomElement activePatientNode = doc.createElement("active_patient");
@@ -430,15 +481,16 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
   patientNode.appendChild(managerNode);
 
   ssc::dataManager()->addXml(managerNode);
-  ssc::toolManager()->addXml(managerNode);
-  viewManager()->addXml(managerNode);
-  registrationManager()->addXml(managerNode);
-  stateManager()->addXml(managerNode);
+//  ssc::toolManager()->addXml(managerNode);
+//  viewManager()->addXml(managerNode);
+//  registrationManager()->addXml(managerNode);
+//  stateManager()->addXml(managerNode);
 
   //ssc::messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
 void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 {
+  mWorkingDocument = doc;
   //ssc::messageManager()->sendDebug("PatientData::readLoadDoc() called");
   //Get all the nodes
   QDomNode patientNode = doc.namedItem("patient");
@@ -460,17 +512,22 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
     ssc::dataManager()->parseXml(dataManagerNode, patientFolder);
   }
 
-  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-  ssc::toolManager()->parseXml(toolmanagerNode);
+	std::cout << "PatientData::readLoadDoc" << std::endl;
+  emit isLoading();
+//
+//  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
+//  ssc::toolManager()->parseXml(toolmanagerNode);
+//
+//  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
+//  viewManager()->parseXml(viewmanagerNode);
+//
+//  QDomNode registrationNode = managerNode.namedItem("registrationManager");
+//  registrationManager()->parseXml(registrationNode);
+//
+//  QDomNode stateManagerNode = managerNode.namedItem("stateManager");
+//  stateManager()->parseXml(stateManagerNode);
 
-  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-  viewManager()->parseXml(viewmanagerNode);
-
-  QDomNode registrationNode = managerNode.namedItem("registrationManager");
-  registrationManager()->parseXml(registrationNode);
-
-  QDomNode stateManagerNode = managerNode.namedItem("stateManager");
-  stateManager()->parseXml(stateManagerNode);
+  mWorkingDocument = QDomDocument();
 }
 
 

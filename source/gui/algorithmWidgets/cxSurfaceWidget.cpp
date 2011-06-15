@@ -15,6 +15,7 @@
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include "cxDataInterface.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -77,7 +78,7 @@ void SurfaceWidget::setImageInputSlot(QString value)
 
 void SurfaceWidget::surfaceSlot()
 {
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = mDecimationAdapter->getValue()/100;
 
   mContourAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSurfaceThresholdAdapter->getValue(), decimation, mReduceResolution, mSmoothing);

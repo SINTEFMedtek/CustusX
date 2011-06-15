@@ -5,6 +5,8 @@
 #include "cxPatientData.h"
 #include "cxSettings.h"
 #include "sscToolManager.h"
+#include "cxPatientService.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -67,7 +69,7 @@ void WorkflowState::autoStartHardware()
   if (settings()->value("Automation/autoStartTracking").toBool())
     ssc::toolManager()->startTracking();
   if (settings()->value("Automation/autoStartStreaming").toBool())
-    stateManager()->getRTSourceManager()->launchAndConnectServer();
+  	videoService()->getVideoConnection()->launchAndConnectServer();
 }
 
 
@@ -80,7 +82,7 @@ void WorkflowState::autoStartHardware()
 NavigationWorkflowState::NavigationWorkflowState(QState* parent) :
     WorkflowState(parent, "NavigationUid", "Navigation")
 {
-  connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 };
 
 void NavigationWorkflowState::onEntry(QEvent * event)
@@ -90,7 +92,7 @@ void NavigationWorkflowState::onEntry(QEvent * event)
 
 bool NavigationWorkflowState::canEnter() const
 {
-  return stateManager()->getPatientData()->isPatientValid();
+  return patientService()->getPatientData()->isPatientValid();
 }
 
 // --------------------------------------------------------
@@ -138,7 +140,7 @@ bool PreOpPlanningWorkflowState::canEnter() const
 IntraOpImagingWorkflowState::IntraOpImagingWorkflowState(QState* parent) :
   WorkflowState(parent, "IntraOpImagingUid", "Intraoperative Imaging")
 {
-  connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(canEnterSlot()));
 }
 
 void IntraOpImagingWorkflowState::onEntry(QEvent * event)
@@ -148,7 +150,7 @@ void IntraOpImagingWorkflowState::onEntry(QEvent * event)
 
 bool IntraOpImagingWorkflowState::canEnter() const
 {
-  return stateManager()->getPatientData()->isPatientValid();
+  return patientService()->getPatientData()->isPatientValid();
 }
 
 

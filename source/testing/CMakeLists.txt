@@ -28,6 +28,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     )    
     # -----------------------------------------------
     # CppUnit test framework: Create executable testCX

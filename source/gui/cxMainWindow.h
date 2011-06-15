@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include "boost/shared_ptr.hpp"
+#include "cxPluginBase.h"
 
 class QAction;
 class QMenu;
@@ -16,7 +17,7 @@ class QActionGroup;
 
 namespace ssc
 {
-  class ReconstructionWidget;
+//  class ReconstructionWidget;
   class ConsoleWidget;
 }
 
@@ -39,7 +40,7 @@ class MainWindow : public QMainWindow
   Q_OBJECT
 
 public:
-  MainWindow();
+  MainWindow(std::vector<PluginBasePtr> plugins);
   virtual ~MainWindow();
   
   static void initialize();
@@ -202,7 +203,7 @@ private:
   class ToolPropertiesWidget*                   mToolPropertiesWidget; ///< display and control of tool properties for active tool.
   class MeshPropertiesWidget*                   mMeshPropertiesWidget; ///< Display and control image properties for active mesh
   class PointSamplingWidget*                    mPointSamplingWidget;
-  ssc::ReconstructionWidget*                    mReconstructionWidget;
+//  ssc::ReconstructionWidget*                    mReconstructionWidget;
   class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
   class VolumePropertiesWidget*                 mVolumePropertiesWidget;
   class StatusBar*                              mCustomStatusBar;

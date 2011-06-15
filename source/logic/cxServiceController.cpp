@@ -11,12 +11,15 @@
 #include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "sscMessageManager.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
 
 ServiceController::ServiceController()
 {
+	std::cout << "ServiceController::ServiceController()" << std::endl;
 	// load the ever-present video stream into the patient service
   ssc::dataManager()->loadStream(videoService()->getVideoConnection()->getVideoSource());
 
@@ -24,10 +27,79 @@ ServiceController::ServiceController()
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
 	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
   connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
+
+  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearPatientSlot()));
 }
 
 ServiceController::~ServiceController()
 {
+}
+
+void ServiceController::patientChangedSlot()
+{
+	QString patientFolder = patientService()->getPatientData()->getActivePatientFolder();
+
+  QString loggingPath = patientFolder + "/Logs/";
+  QDir loggingDir(loggingPath);
+  if (!loggingDir.exists())
+  {
+    loggingDir.mkpath(loggingPath);
+  }
+  ToolManager::getInstance()->setLoggingFolder(loggingPath);
+  ssc::messageManager()->setLoggingFolder(loggingPath);
+}
+
+void ServiceController::clearPatientSlot()
+{
+//  ssc::dataManager()->clear();
+  ssc::toolManager()->clear();
+//  viewManager()->clear();
+//  registrationManager()->clear();
+}
+
+void ServiceController::duringSavePatientSlot()
+{
+//	QDomDocument doc = patientService()->getPatientData()->getCurrentWorkingDocument();
+	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+
+//  QDomNode patientNode = doc.namedItem("patient");
+//  QDomNode managerNode = patientNode.namedItem("managers");
+//  QDomElement managerNode = doc.createElement("managers");
+//  patientNode.appendChild(managerNode);
+
+//  ssc::dataManager()->addXml(managerNode);
+  ssc::toolManager()->addXml(managerNode);
+//  viewManager()->addXml(managerNode);
+//  registrationManager()->addXml(managerNode);
+//  stateManager()->addXml(managerNode);
+
+  ssc::toolManager()->savePositionHistory();
+}
+
+void ServiceController::duringLoadPatientSlot()
+{
+	std::cout << "ServiceController::duringLoadPatientSlot()" << std::endl;
+
+	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+//	QDomDocument doc = patientService()->getPatientData()->getCurrentWorkingDocument();
+//  QDomNode patientNode = doc.namedItem("patient");
+//  QDomNode managerNode = patientNode.namedItem("managers");
+
+  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
+  ssc::toolManager()->parseXml(toolmanagerNode);
+
+//  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
+//  viewManager()->parseXml(viewmanagerNode);
+
+//  QDomNode registrationNode = managerNode.namedItem("registrationManager");
+//  registrationManager()->parseXml(registrationNode);
+
+//  QDomNode stateManagerNode = managerNode.namedItem("stateManager");
+//  stateManager()->parseXml(stateManagerNode);
+
 }
 
 /**Connect a probe from Tracking Service to a video source in Video Service.

@@ -27,6 +27,8 @@
 #include "sscVolumeHelpers.h"
 #include "vtkImageCorrelation.h"
 #include "sscMessageManager.h"
+//#include "cxAcquisitionManager.h"
+#include "cxPatientService.h"
 
 typedef vtkSmartPointer<vtkImageCorrelation> vtkImageCorrelationPtr;
 typedef vtkSmartPointer<vtkDoubleArray> vtkDoubleArrayPtr;
@@ -38,15 +40,15 @@ namespace cx
 typedef unsigned char uchar;
 
 
-TemporalCalibrationWidget::TemporalCalibrationWidget(QWidget* parent) :
+TemporalCalibrationWidget::TemporalCalibrationWidget(AcquisitionDataPtr acquisitionData, QWidget* parent) :
     BaseWidget(parent, "TemporalCalibrationWidget", "Temporal Calibration"),
-    mRecordSessionWidget(new RecordSessionWidget(this, "temporal_calib")),
+    mRecordSessionWidget(new RecordSessionWidget(acquisitionData, this, "temporal_calib")),
 		mInfoLabel(new QLabel(""))
 {
   mAlgorithm.reset(new TemporalCalibration);
-  connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
-  mAcquisition.reset(new USAcquisition());
+  mAcquisition.reset(new USAcquisition(acquisitionData));
   connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
   connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(selectData(QString)));
   mAcquisition->checkIfReadySlot();
@@ -108,7 +110,7 @@ void TemporalCalibrationWidget::showEvent(QShowEvent* event)
 void TemporalCalibrationWidget::patientChangedSlot()
 {
 //  std::cout << "TemporalCalibrationWidget::patientChangedSlot() "  << std::endl;
-  QString filename = stateManager()->getPatientData()->getActivePatientFolder() + "/US_Acq/";
+  QString filename = patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/";
   mFileSelectWidget->setPath(filename);
 //  this->selectData(filename);
 }
@@ -127,7 +129,7 @@ void TemporalCalibrationWidget::selectData(QString filename)
 void TemporalCalibrationWidget::calibrateSlot()
 {
   if (mVerbose->isChecked())
-    mAlgorithm->setDebugFolder(stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/");
+    mAlgorithm->setDebugFolder(patientService()->getPatientData()->getActivePatientFolder()+"/Logs/");
   else
     mAlgorithm->setDebugFolder("");
 

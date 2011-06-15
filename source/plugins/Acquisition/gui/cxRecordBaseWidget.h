@@ -4,10 +4,12 @@
 #include <QWidget>
 #include "cxBaseWidget.h"
 #include "sscTool.h"
-#include "cxDataInterface.h"
+//#include "cxDataInterface.h"
 #include "sscVideoRecorder.h"
 //#include "sscReconstructer.h"
 //#include "cxUsReconstructionFileMaker.h"
+#include "cxRecordSession.h"
+#include "cxAcquisitionData.h"
 
 class QLabel;
 class QVBoxLayout;
@@ -33,7 +35,7 @@ class RecordBaseWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordBaseWidget(QWidget* parent, QString description = "Record Session");
+  RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description = "Record Session");
   virtual ~RecordBaseWidget();
 
 protected slots:
@@ -44,6 +46,7 @@ protected slots:
 
 protected:
 
+  AcquisitionDataPtr mPluginData;
   QVBoxLayout* mLayout;
   RecordSessionWidget* mRecordSessionWidget;
 
@@ -61,7 +64,7 @@ class TrackedRecordWidget : public RecordBaseWidget
 {
   Q_OBJECT
 public:
-  TrackedRecordWidget(QWidget* parent, QString description);
+  TrackedRecordWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description);
   virtual ~TrackedRecordWidget();
 
 signals:

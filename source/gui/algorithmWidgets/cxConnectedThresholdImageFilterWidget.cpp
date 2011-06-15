@@ -3,6 +3,7 @@
 #include "cxDataManager.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -58,7 +59,7 @@ void ConnectedThresholdImageFilterWidget::handleFinishedSlot()
 
 void ConnectedThresholdImageFilterWidget::segmentSlot()
 {
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
   //TODO add user interface
   ssc::ImagePtr selectedImage = ssc::dataManager()->getActiveImage();

@@ -15,12 +15,12 @@
 namespace cx
 {
 
-CalibrationMethodsWidget::CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle) :
+CalibrationMethodsWidget::CalibrationMethodsWidget(AcquisitionDataPtr acquisitionData, QWidget* parent, QString objectName, QString windowTitle) :
   TabbedWidget(parent, objectName, windowTitle)
 {
   this->addTab(new ToolTipCalibrateWidget(this), "Tool Tip");
   this->addTab(new ToolTipSampleWidget(this), "Sample");
-  this->addTab(new TemporalCalibrationWidget(this), "Temporal");
+  this->addTab(new TemporalCalibrationWidget(acquisitionData, this), "Temporal");
   this->addTab(new ToolManualCalibrationWidget(this), "Tool Manual");
 }
 

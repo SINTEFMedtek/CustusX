@@ -3,6 +3,7 @@
 
 #include "cxRecordBaseWidget.h"
 #include "cxCenterline.h"
+#include "cxTool.h"
 
 namespace cx
 {
@@ -18,7 +19,7 @@ class TrackedCenterlineWidget : public TrackedRecordWidget
 {
   Q_OBJECT
 public:
-  TrackedCenterlineWidget(QWidget* parent);
+  TrackedCenterlineWidget(AcquisitionDataPtr pluginData, QWidget* parent);
   virtual ~TrackedCenterlineWidget();
   virtual QString defaultWhatsThis() const;
 

@@ -57,11 +57,11 @@ SET(cxProject_MOC_HDRS
     preferencesWidgets/cxLayoutEditorWidget.h
     preferencesWidgets/cxLayoutEditorTab.h
     #----------------------
-    recordingWidgets/cxRecordSessionWidget.h
-    recordingWidgets/cxRecordBaseWidget.h
-    recordingWidgets/cxTrackedCenterlineWidget.h
-    recordingWidgets/cxUSAcqusitionWidget.h
-    recordingWidgets/cxSoundSpeedConversionWidget.h
+#    recordingWidgets/cxRecordSessionWidget.h
+#    recordingWidgets/cxRecordBaseWidget.h
+#    recordingWidgets/cxTrackedCenterlineWidget.h
+#    recordingWidgets/cxUSAcqusitionWidget.h
+#    recordingWidgets/cxSoundSpeedConversionWidget.h
     #----------------------
     registrationWidgets/cxImageRegistrationWidget.h
     registrationWidgets/cxRegistrationWidget.h
@@ -197,16 +197,16 @@ SET(${LIBNAME}_SRCS
     preferencesWidgets/cxLayoutEditorTab.h
     preferencesWidgets/cxLayoutEditorTab.cpp
     #----------------------    
-    recordingWidgets/cxRecordSessionWidget.h
-    recordingWidgets/cxRecordSessionWidget.cpp
-    recordingWidgets/cxRecordBaseWidget.h
-    recordingWidgets/cxRecordBaseWidget.cpp
-    recordingWidgets/cxTrackedCenterlineWidget.h
-    recordingWidgets/cxTrackedCenterlineWidget.cpp
-    recordingWidgets/cxUSAcqusitionWidget.h
-    recordingWidgets/cxUSAcqusitionWidget.cpp
-    recordingWidgets/cxSoundSpeedConversionWidget.h
-    recordingWidgets/cxSoundSpeedConversionWidget.cpp
+#    recordingWidgets/cxRecordSessionWidget.h
+#    recordingWidgets/cxRecordSessionWidget.cpp
+#    recordingWidgets/cxRecordBaseWidget.h
+#    recordingWidgets/cxRecordBaseWidget.cpp
+#    recordingWidgets/cxTrackedCenterlineWidget.h
+#    recordingWidgets/cxTrackedCenterlineWidget.cpp
+#    recordingWidgets/cxUSAcqusitionWidget.h
+#    recordingWidgets/cxUSAcqusitionWidget.cpp
+#    recordingWidgets/cxSoundSpeedConversionWidget.h
+#    recordingWidgets/cxSoundSpeedConversionWidget.cpp
     #----------------------    
     registrationWidgets/cxImageRegistrationWidget.h
     registrationWidgets/cxImageRegistrationWidget.cpp
@@ -315,11 +315,15 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/UsReconstruction
     
+    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
+
+    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
     )
 
 
 ADD_LIBRARY ( ${LIBNAME} ${${LIBNAME}_SRCS}  ${${LIBNAME}_MOC_SRCS} )
-target_link_libraries(${LIBNAME} registrationManager cxPluginUSReconstructionGUI statemachineManager cxLogicManager)
+target_link_libraries(${LIBNAME} registrationManager cxPluginUSReconstructionGUI cxPluginAcquisitionGUI statemachineManager cxLogicManager)
 
