@@ -2,7 +2,7 @@
 #define CXGRABBERSERVERWIDGET_H_
 
 #include <QObject>
-#include <qwidget.h>
+#include <QWidget>
 #include "cxGrabberServer.h"
 
 class QPushButton;
@@ -46,30 +46,6 @@ private:
   QWidget*              mPreviewParent; ///< Preview of grabbed stream
   QPushButton*          mStartButton; ///< The start/stop button
   QLineEdit*            mPortEdit; ///< Editable line for the port nr
-};
-
-/**
- * \class MacGrabberServerWidget
- *
- * \brief Gui for interacting with a MacGrabber and a OpenIGTLinkServer.
- *
- * \date 16. nov. 2010
- * \author: Janne Beate Bakeng, SINTEF
- */
-
-class MacGrabberServerWidget : public GrabberServerWidget
-{
-  Q_OBJECT
-
-public:
-  MacGrabberServerWidget(QWidget* parent);
-  virtual ~MacGrabberServerWidget(){};
-
-signals:
-  void queueInfo(int size, int dropped);
-
-protected:
-  virtual void connectGrabberServer(); ///< Connects to a MacGrabberServer
 };
 
 }//namespace cx

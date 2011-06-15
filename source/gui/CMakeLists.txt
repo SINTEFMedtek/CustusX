@@ -1,3 +1,7 @@
+###########################################################
+##               Gui library
+###########################################################
+
 SET(LIBNAME gui)
 
 # _USE_MATH_DEFINES Must be defined before math.h is included

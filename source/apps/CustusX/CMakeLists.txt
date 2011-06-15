@@ -2,7 +2,11 @@
 ##               CustusX Application
 ###########################################################
 
-SET(SOURCES cxMain.cpp)
+#------------------------------------------------------------------------------
+# Include
+#-----------------------------------------------------------------------------
+
+set(SOURCES cxMain.cpp)
 
 include_directories(
     .
@@ -12,84 +16,92 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
     )
 
+#------------------------------------------------------------------------------
+# Set variables
+#-----------------------------------------------------------------------------
+if(APPLE) # For Apple set the icns file containing icons
+  set_source_files_properties(${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns 
+                              PROPERTIES MACOSX_PACKAGE_LOCATION Resources)  # set where in the bundle to put the icns file
+  
+  set(MACOSX_BUNDLE_ICON_FILE ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns) # set how it shows up in the Info.plist file 
+  set(SOURCES ${SOURCES} ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns)  # include the icns file in the target
+  set(MACOSX_BUNDLE_INFO_STRING "CustusX")
+  set(MACOSX_BUNDLE_BUNDLE_NAME "CustusX")
+  set(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_NUMBER_VERBOSE}")
+  set(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_BUNDLE_VERSION}")
+  set(MACOSX_BUNDLE_LONG_VERSION_STRING "CustusX ${MACOSX_BUNDLE_BUNDLE_VERSION}")
+  set(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")
+endif(APPLE)
 
+#------------------------------------------------------------------------------
+# Executabel
+#-----------------------------------------------------------------------------
+if (APPLE)
+  add_executable(CustusX MACOSX_BUNDLE ${SOURCES} )
+else (APPLE)
+  add_executable(CustusX ${SOURCES} )
+endif (APPLE)
+
+#------------------------------------------------------------------------------
+# Linking
+#-----------------------------------------------------------------------------
+target_link_libraries( CustusX gui )
 
 #--------------------------------------------------------------------------------
-# For Apple set the icns file containing icons
-IF(APPLE)
-  # set how it shows up in the Info.plist file
-  SET(MACOSX_BUNDLE_ICON_FILE ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns) 
-  # set where in the bundle to put the icns file
-  SET_SOURCE_FILES_PROPERTIES(${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
-  # include the icns file in the target
-  SET(SOURCES ${SOURCES} ${CustusX3_SOURCE_DIR}/source/gui/icons/application.icns)
-ENDIF(APPLE)
-
-IF(APPLE)
-  SET(MACOSX_BUNDLE_INFO_STRING "CustusX")
-  SET(MACOSX_BUNDLE_BUNDLE_NAME "CustusX")
-  SET(MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION_NUMBER_VERBOSE}")
-  SET(MACOSX_BUNDLE_SHORT_VERSION_STRING "${MACOSX_BUNDLE_BUNDLE_VERSION}")
-  SET(MACOSX_BUNDLE_LONG_VERSION_STRING "CustusX ${MACOSX_BUNDLE_BUNDLE_VERSION}")
-  SET(MACOSX_BUNDLE_COPYRIGHT "Copyright SINTEF\nAll rights reserved")
-  ADD_EXECUTABLE(CustusX MACOSX_BUNDLE ${SOURCES} )
-ELSE(APPLE)
-  ADD_EXECUTABLE(CustusX ${SOURCES} )
-ENDIF(APPLE)
-
-#----------
-# LINK
-TARGET_LINK_LIBRARIES( CustusX gui )
-
-
-
-
-#--------------------------------------------------------------------------------
-# Now the installation/bundle stuff below
+# Installer
 #--------------------------------------------------------------------------------
 # See http://www.itk.org/Wiki/BundleUtilitiesExample for example on how to use bundle utilities
 #
 # On Apple, the bundle is at the root of the
 # install tree, and on other platforms it'll go into the bin directory.
 
-SET(BUNDLE_NAME CustusX)
 
+# Variables
+#----------
+set(CUSTUSX_INSTALL_FOLDER_NAME "CustusX") # name of folder where all executables, config etc are assembled
+set(RESOURCES_DIR bin)
+set(CONFIG_DIR bin)
+set(SYMLINK_DIR bin)
+
+if(APPLE)
+    set(SYMLINK_DIR /Library/CustusX)
+endif(APPLE)
+
+# Install files
+#----------
 install(TARGETS CustusX
-    BUNDLE DESTINATION ${INSTALL_FOLDER_NAME}
+    BUNDLE DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
     RUNTIME DESTINATION bin
+    #COMPONENT CustusX
     )
 
 if(WIN32)
+  #Installing required run time libs for Windows, msv*.dll
+  set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
   include (InstallRequiredSystemLibraries)
+  if(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+      install(FILES ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
+              DESTINATION bin
+              PERMISSIONS OWNER_WRITE OWNER_READ OWNER_EXECUTE GROUP_READ
+              GROUP_EXECUTE WORLD_READ
+              #COMPONENT CustusX
+    )
+  endif(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 endif(WIN32)
 
-SET(RESOURCES_DIR bin)
-SET(CONFIG_DIR bin)
-SET(SYMLINK_DIR bin)
-
 if(APPLE)
-    SET(SYMLINK_DIR /Library/CustusX)
-else(APPLE)
-    # Applies to Linux. We should really have chosen /var/tmp/CustusX or similar here, but this causes lots of ifdefs.
-    # Change for both unixlike platform at some time instead.
-    SET(SYMLINK_DIR /Library/CustusX)
+  set(RESOURCES_DIR ${CUSTUSX_INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app/Contents/Resources)
+  set(CONFIG_DIR ${CUSTUSX_INSTALL_FOLDER_NAME}/config)
 endif(APPLE)
 
-SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/bin/${BUNDLE_NAME}")
-
-IF(APPLE)
-  SET(RESOURCES_DIR ${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app/Contents/Resources)
-  SET(CONFIG_DIR ${INSTALL_FOLDER_NAME}/config)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/${INSTALL_FOLDER_NAME}/${BUNDLE_NAME}.app")
-ENDIF(APPLE)
-
-IF(WIN32)
-  SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
-  SET(CONFIG_DIR bin/config/)
-ENDIF(WIN32)
+if(WIN32)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/CustusX.exe")
+  set(CONFIG_DIR bin/config/)
+endif(WIN32)
 
 # install configuration files to config folder
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}" 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ 
+    DESTINATION ${CONFIG_DIR}
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -98,16 +110,19 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/config/ DESTINATION "${CONFIG_DIR}"
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
         WORLD_READ WORLD_EXECUTE WORLD_WRITE
+    #COMPONENT CustusX
     PATTERN ".svn" EXCLUDE
     )
 
 # install openCL shaders into bundle
-install(FILES ${CustusX3_SOURCE_DIR}/source/UsReconstruction/Thunder/kernels.ocl 
-        DESTINATION ${RESOURCES_DIR}/shaders/ 
-    )
+install(FILES ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic/Thunder/kernels.ocl 
+        DESTINATION ${CONFIG_DIR}/shaders/
+        #COMPONENT CustusX
+        )
 
 # install folder for storage of igstk<->CustusX symlinks
-install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLINK_DIR} 
+install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links 
+    DESTINATION ${SYMLINK_DIR} 
     FILE_PERMISSIONS
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
@@ -116,6 +131,7 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLI
         OWNER_READ OWNER_EXECUTE OWNER_WRITE
         GROUP_READ GROUP_EXECUTE GROUP_WRITE
         WORLD_READ WORLD_EXECUTE WORLD_WRITE
+    #COMPONENT CustusX
     PATTERN ".svn" EXCLUDE
     )
 
@@ -124,51 +140,35 @@ install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/igstk.links DESTINATION ${SYMLI
 if(WIN32)
   install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
       DESTINATION .
+      #COMPONENT CustusX
       USE_SOURCE_PERMISSIONS
       PATTERN ".svn" EXCLUDE
       PATTERN "readme.txt" EXCLUDE
       PATTERN "GrabberServer.app" EXCLUDE # we don't want mac applications installed on windows
       PATTERN "ultrasoundVideo.app" EXCLUDE # we don't want mac applications installed on windows
       )
-else(WIN32)
+endif(WIN32)
+
+if(APPLE)
   install(DIRECTORY ${CustusX3_SOURCE_DIR}/install/nextToCustusX/ 
-      DESTINATION ${INSTALL_FOLDER_NAME} 
+      DESTINATION ${CUSTUSX_INSTALL_FOLDER_NAME}
+      #COMPONENT CustusX
       USE_SOURCE_PERMISSIONS
       PATTERN ".svn" EXCLUDE
       PATTERN "readme.txt" EXCLUDE
       )
-endif(WIN32)
-
-set(CPACK_PACKAGE_VERSION ${VERSION_NUMBER_VERBOSE})
-set(CPACK_PACKAGE_VERSION_MAJOR "${CustusX3_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${CustusX3_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${CustusX3_VERSION_PATCH}")
-
-set(CPACK_PACKAGE_FILE_NAME "${BUNDLE_NAME} ${VERSION_NUMBER_VERBOSE}")
-set(CPACK_RESOURCE_FILE_WELCOME "${CustusX3_SOURCE_DIR}/install/doc/install_welcome.txt")
-set(CPACK_RESOURCE_FILE_README "${CustusX3_SOURCE_DIR}/install/doc/install_readme.rtf")
-set(CPACK_RESOURCE_FILE_LICENSE "${CustusX3_SOURCE_DIR}/install/doc/install_license.txt")
-
-if (WIN32)
-else (WIN32)
-    SET(CPACK_SET_DESTDIR "ON") # required when installing absolute paths
-    set(CPACK_PACKAGE_INSTALL_DIRECTORY "CustusX${CustusX3_VERSION_MAJOR}.${CustusX3_VERSION_MINOR}.${CustusX3_VERSION_PATCH}")
-endif (WIN32)
-
-if (APPLE)
-    set (CPACK_PACKAGING_INSTALL_PREFIX "Applications/") # guess: not used when CPACK_SET_DESTDIR is set
-    option (CPACK_BINARY_STGZ "Enable to build STGZ packages" OFF)
-    option (CPACK_BINARY_TGZ "Enable to build TGZ packages" OFF)
-    option (CPACK_SOURCE_TBZ2 "Enable to build TBZ2 source packages" OFF)
-    option (CPACK_SOURCE_TGZ "Enable to build TGZ source packages" OFF)
-    option (CPACK_SOURCE_TZ "Enable to build TZ source packages" OFF)
 endif(APPLE)
 
+#--------------------------------------------------------------------------------
+# Bundle utilities
+#--------------------------------------------------------------------------------
 if (WIN32)
-  SET(LIBS ${QT_LIBRARY_DIR})
-  SET(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
+  set(LIBS ${QT_LIBRARY_DIR})
+  set(DIRS ${QT_INCLUDES} ${QT_LIBRARY_DIRS} ${INCLUDE_DIRECTORIES})
 
-  INSTALL(CODE "
+  install(CODE "
      include(BundleUtilities)
-     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") ")
+     fixup_bundle(\"${APPS}\"   \"${LIBS}\"   \"${DIRS}\") "
+     #COMPONENT CustusX
+     )
 endif (WIN32)
