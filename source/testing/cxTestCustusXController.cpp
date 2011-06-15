@@ -21,6 +21,7 @@
 #include "sscConsoleWidget.h"
 #include "cxViewManager.h"
 #include "cxStateMachineManager.h"
+#include "cxPatientService.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
 {
@@ -37,7 +38,7 @@ void CustusXController::start()
 
   cx::MainWindow::initialize();
 
-  mMainWindow = new cx::MainWindow;
+  mMainWindow = new cx::MainWindow(std::vector<cx::PluginBasePtr>());
   mMainWindow->show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   mMainWindow->activateWindow();
@@ -56,7 +57,7 @@ void CustusXController::stop()
 
 void CustusXController::loadPatientSlot()
 {
-  cx::stateManager()->getPatientData()->loadPatient(mPatientFolder);
+  cx::patientService()->getPatientData()->loadPatient(mPatientFolder);
   cx::stateManager()->getWorkflow()->setActiveState("NavigationUid");
   mMainWindow->setGeometry( 10, 10, 1200, 800);
 

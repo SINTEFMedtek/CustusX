@@ -1,6 +1,10 @@
 ###########################################################
-##               Plugins
+##               Acquisition Plugin Tests
+##
+##               Tests
+##
 ###########################################################
 
-add_subdirectory(UsReconstruction)
-add_subdirectory(Acquisition)
+
+
+

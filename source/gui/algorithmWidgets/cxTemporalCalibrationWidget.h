@@ -9,7 +9,7 @@
 #define CXTEMPORALCALIBRATIONWIDGET_H_
 
 #include "cxBaseWidget.h"
-#include "cxRecordBaseWidget.h"
+#include "cxRecordSessionWidget.h"
 #include <QFuture>
 #include <QFutureWatcher>
 #include "sscFileSelectWidget.h"
@@ -27,7 +27,7 @@ class TemporalCalibrationWidget : public BaseWidget
 {
   Q_OBJECT
 public:
-  TemporalCalibrationWidget(QWidget* parent);
+  TemporalCalibrationWidget(AcquisitionDataPtr acquisitionData, QWidget* parent);
   virtual ~TemporalCalibrationWidget();
 
   virtual QString defaultWhatsThis() const;

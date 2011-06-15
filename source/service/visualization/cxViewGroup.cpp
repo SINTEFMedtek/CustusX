@@ -313,10 +313,13 @@ void ViewGroup::clearPatientData()
 
 void ViewGroup::parseXml(QDomNode dataNode)
 {
+	std::cout << "ViewGroup::parseXml 1" << std::endl;
   for (QDomElement elem = dataNode.firstChildElement("data"); !elem.isNull(); elem = elem.nextSiblingElement("data"))
   {
     QString uid = elem.text();
     ssc::DataPtr data = ssc::dataManager()->getData(uid);
+  	std::cout << "ViewGroup::parseXml" << std::endl;
+
     mViewGroupData->addData(data);
     if (!data)
       ssc::messageManager()->sendError("Couldn't find the data: ["+uid+"] in the datamanager.");

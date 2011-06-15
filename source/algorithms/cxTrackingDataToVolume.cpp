@@ -11,7 +11,7 @@
 #include "sscVolumeHelpers.h"
 #include "sscMessageManager.h"
 #include "cxStateMachineManager.h"
-#include "cxPatientData.h"
+//#include "cxPatientData.h"
 
 namespace cx
 {

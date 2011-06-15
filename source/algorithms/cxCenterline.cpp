@@ -6,6 +6,7 @@
 #include "sscUtilHelpers.h"
 #include "vesselReg/SeansVesselReg.hxx"
 #include "sscMesh.h"
+#include "cxPatientService.h"
 
 namespace cx
 {

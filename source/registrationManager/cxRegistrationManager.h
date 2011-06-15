@@ -51,13 +51,14 @@ public:
   void doFastRegistration_Translation(); ///< use the landmarks in master image and patient to perform a translation-only landmark registration
   void doVesselRegistration(int lts_ratio, double stop_delta, double lambda, double sigma, bool lin_flag, int sample, int single_point_thre, bool verbose, QString logPath);
 
-  //Interface for saving/loading
-  void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
-  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
-  void clear();
 
 public slots:
   void setManualPatientRegistrationOffsetSlot(ssc::Transform3D offset); ///< transform for (slightly) moving a patient registration
+
+private slots:
+  void clearSlot();
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
 
 signals:
   void patientRegistrationPerformed();
@@ -67,6 +68,10 @@ signals:
 protected:
   RegistrationManager(); ///< use getInstance instead
   ~RegistrationManager(); ///< destructor
+
+  //Interface for saving/loading
+  void addXml(QDomNode& parentNode); ///< adds xml information about the registrationmanger and its variabels
+  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the RegistrationManager.
 
   ssc::Transform3D performLandmarkRegistration(vtkPointsPtr source, vtkPointsPtr target, bool* ok) const;
   vtkPointsPtr convertTovtkPoints(const std::vector<QString>& uids, const ssc::LandmarkMap& data, ssc::Transform3D M);

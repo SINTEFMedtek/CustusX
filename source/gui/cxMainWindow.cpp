@@ -22,7 +22,7 @@
 #include "cxPreferencesDialog.h"
 #include "cxImagePropertiesWidget.h"
 #include "cxPointSamplingWidget.h"
-#include "sscReconstructionWidget.h"
+//#include "sscReconstructionWidget.h"
 #include "cxPatientData.h"
 #include "cxRegistrationHistoryWidget.h"
 #include "cxDataLocations.h"
@@ -36,8 +36,8 @@
 #include "cxSecondaryMainWindow.h"
 #include "cxIGTLinkWidget.h"
 #include "cxRecordBaseWidget.h"
-#include "cxTrackedCenterlineWidget.h"
-#include "cxUSAcqusitionWidget.h"
+//#include "cxTrackedCenterlineWidget.h"
+//#include "cxUSAcqusitionWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
 #include "cxVideoConnection.h"
@@ -53,33 +53,47 @@
 #include "sscConsoleWidget.h"
 #include "cxViewManager.h"
 #include "cxStateMachineManager.h"
+//#include "cxAcquisitionManager.h"
+#include "cxPatientService.h"
 
 
 namespace cx
 {
 
-MainWindow::MainWindow() :
+MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
   mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
   mConsoleWidget(new ssc::ConsoleWidget(this)),
   mRegsitrationMethodsWidget(new RegistrationMethodsWidget(this, "RegistrationMethodsWidget", "Registration Methods")),
   mSegmentationMethodsWidget(new SegmentationMethodsWidget(this, "SegmentationMethodsWidget", "Segmentation Methods")),
   mVisualizationMethodsWidget(new VisualizationMethodsWidget(this, "VisualizationMethodsWidget", "Visualization Methods")),
-  mCalibrationMethodsWidget(new CalibrationMethodsWidget(this, "CalibrationMethodsWidget", "Calibration Methods")),
+  mCalibrationMethodsWidget(new CalibrationMethodsWidget(AcquisitionDataPtr(), this, "CalibrationMethodsWidget", "Calibration Methods")),
   mBrowserWidget(new BrowserWidget(this)),
   mNavigationWidget(new NavigationWidget(this)),
   mImagePropertiesWidget(new ImagePropertiesWidget(this)),
   mToolPropertiesWidget(new ToolPropertiesWidget(this)),
   mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
   mPointSamplingWidget(new PointSamplingWidget(this)),
-  mReconstructionWidget(NULL),
+//  mReconstructionWidget(NULL),
   mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
   mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
   mCustomStatusBar(new StatusBar()),
   mFrameTreeWidget(new FrameTreeWidget(this)),
   mControlPanel(NULL)
 {
-  mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
+
+	// insert all widgets from all plugins
+	for (unsigned i=0; i<plugins.size(); ++i)
+	{
+		std::vector<PluginBase::PluginWidget> widgets = plugins[i]->createWidgets();
+		for (unsigned i=0; i<widgets.size(); ++i)
+		{
+		  this->addAsDockWidget(widgets[i].mWidget, widgets[i].mCategory);
+		}
+
+	}
+
+//  mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
   mCameraControl.reset(new CameraControl(this));
 
   this->createActions();
@@ -99,8 +113,9 @@ MainWindow::MainWindow() :
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
   
-  this->addAsDockWidget(new TrackedCenterlineWidget(this), "Utility");
-  this->addAsDockWidget(new USAcqusitionWidget(this), "Utility");
+//  this->addAsDockWidget(new TrackedCenterlineWidget(AcquisitionDataPtr(), this), "Utility");
+//  this->addAsDockWidget(new TrackedCenterlineWidget(stateManager()->getAcquisisitionManager()->getAcquisitionData(), this), "Utility");
+//  this->addAsDockWidget(new USAcqusitionWidget(stateManager()->getAcquisisitionManager()->getAcquisitionData(), this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
   this->addAsDockWidget(mBrowserWidget, "Browsing");
   this->addAsDockWidget(mPointSamplingWidget, "Utility");
@@ -109,7 +124,7 @@ MainWindow::MainWindow() :
   this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
   this->addAsDockWidget(new TrackPadWidget(this), "Utility");
   this->addAsDockWidget(mToolPropertiesWidget, "Properties");
-  this->addAsDockWidget(mReconstructionWidget, "Algorithms");
+//  this->addAsDockWidget(mReconstructionWidget, "Algorithms");
   this->addAsDockWidget(mRegistrationHistoryWidget, "Browsing");
   this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
   this->addAsDockWidget(mSegmentationMethodsWidget, "Algorithms");
@@ -122,7 +137,7 @@ MainWindow::MainWindow() :
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
 
-  connect(stateManager()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
 
   connect(viewManager(), SIGNAL(activeLayoutChanged()), this, SLOT(layoutChangedSlot()));
   this->layoutChangedSlot();
@@ -162,7 +177,7 @@ void MainWindow::startupLoadPatient()
 
   QString folder = QApplication::arguments()[doLoad + 1];
   std::cout << "load " << folder << std::endl;
-  stateManager()->getPatientData()->loadPatient(folder);
+  patientService()->getPatientData()->loadPatient(folder);
 }
 
 void MainWindow::addAsDockWidget(QWidget* widget, QString groupname)
@@ -283,7 +298,7 @@ void MainWindow::createActions()
   connect(mLoadFileAction, SIGNAL(triggered()), this, SLOT(loadPatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(savePatientFileSlot()));
   connect(mSaveFileAction, SIGNAL(triggered()), this, SLOT(saveDesktopSlot()));
-  connect(mExportPatientAction, SIGNAL(triggered()), stateManager()->getPatientData().get(), SLOT(exportPatient()));
+  connect(mExportPatientAction, SIGNAL(triggered()), patientService()->getPatientData().get(), SLOT(exportPatient()));
   connect(mClearPatientAction, SIGNAL(triggered()), this, SLOT(clearPatientSlot()));
 
   mShowControlPanelAction = new QAction("Show Control Panel", this);
@@ -370,7 +385,7 @@ void MainWindow::createActions()
   mStartStreamingAction = new QAction(tr("Start Streaming"), mToolsActionGroup);
   mStartStreamingAction->setShortcut(tr("Ctrl+V"));
   connect(mStartStreamingAction, SIGNAL(triggered()), this, SLOT(toggleStreamingSlot()));
-  connect(stateManager()->getRTSourceManager()->getVideoSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
+  connect(videoService()->getVideoConnection()->getVideoSource().get(), SIGNAL(streaming(bool)), this, SLOT(updateStreamingActionSlot()));
   this->updateStreamingActionSlot();
 
   mConfigureToolsAction->setChecked(true);
@@ -453,7 +468,7 @@ void MainWindow::toggleDebugModeSlot(bool checked)
 
 void MainWindow::saveScreenShot(QPixmap pixmap)
 {
-  QString folder = stateManager()->getPatientData()->getActivePatientFolder()+"/Screenshots/";
+  QString folder = patientService()->getPatientData()->getActivePatientFolder()+"/Screenshots/";
   QDir().mkpath(folder);
   QString format = ssc::timestampSecondsFormat();
   QString filename = QDateTime::currentDateTime().toString(format)+".png";
@@ -474,19 +489,19 @@ void MainWindow::updateManualToolPhysicalProperties()
 
 void MainWindow::toggleStreamingSlot()
 {
-  if (stateManager()->getRTSourceManager()->getVideoSource()->isStreaming())
+  if (videoService()->getVideoConnection()->getVideoSource()->isStreaming())
   {
-    stateManager()->getRTSourceManager()->getVideoSource()->disconnectServer();
+  	videoService()->getVideoConnection()->getVideoSource()->disconnectServer();
   }
   else
   {
-    stateManager()->getRTSourceManager()->launchAndConnectServer();
+  	videoService()->getVideoConnection()->launchAndConnectServer();
   }
 }
 
 void MainWindow::updateStreamingActionSlot()
 {
-  if (stateManager()->getRTSourceManager()->getVideoSource()->isStreaming())
+  if (videoService()->getVideoConnection()->getVideoSource()->isStreaming())
   {
     mStartStreamingAction->setIcon(QIcon(":/icons/streaming_green.png"));
     mStartStreamingAction->setText("Stop Streaming");
@@ -582,25 +597,25 @@ void MainWindow::newPatientSlot()
   int patientNumber = settings()->value("globalPatientNumber").toInt();
   settings()->setValue("globalPatientNumber", ++patientNumber);
 
-  stateManager()->getPatientData()->newPatient(choosenDir);
+  patientService()->getPatientData()->newPatient(choosenDir);
 }
 
 void MainWindow::clearPatientSlot()
 {
-  stateManager()->getPatientData()->clearPatient();
+	patientService()->getPatientData()->clearPatient();
   ssc::messageManager()->sendWarning("Cleared current patient data");
 }
 
 void MainWindow::savePatientFileSlot()
 {
-  if (stateManager()->getPatientData()->getActivePatientFolder().isEmpty())
+  if (patientService()->getPatientData()->getActivePatientFolder().isEmpty())
   {
     ssc::messageManager()->sendWarning("No patient selected, select or create patient before saving!");
     this->newPatientSlot();
     return;
   }
 
-  stateManager()->getPatientData()->savePatient();
+  patientService()->getPatientData()->savePatient();
 }
 
 void MainWindow::onApplicationStateChangedSlot()
@@ -616,7 +631,7 @@ void MainWindow::updateWindowTitle()
 
   QString versionName = stateManager()->getVersionName();
 
-  QString activePatientFolder = stateManager()->getPatientData()->getActivePatientFolder();
+  QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder();
   QString patientName;
   if(!activePatientFolder.isEmpty())
   {
@@ -678,7 +693,7 @@ void MainWindow::loadPatientFileSlot()
   if (choosenDir == QString::null)
     return; // On cancel
 
-  stateManager()->getPatientData()->loadPatient(choosenDir);
+  patientService()->getPatientData()->loadPatient(choosenDir);
 
 //  cx::FrameForest forest;
 }
@@ -703,9 +718,9 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-  mReconstructionWidget->selectData(stateManager()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
-  mReconstructionWidget->reconstructer()->setOutputBasePath(stateManager()->getPatientData()->getActivePatientFolder());
-  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
+//  mReconstructionWidget->selectData(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
+//  mReconstructionWidget->reconstructer()->setOutputBasePath(patientService()->getPatientData()->getActivePatientFolder());
+//  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
 
   this->updateWindowTitle();
 }

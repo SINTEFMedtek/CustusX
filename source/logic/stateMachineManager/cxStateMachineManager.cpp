@@ -9,12 +9,14 @@
 #include "sscReconstructer.h"
 #include "cxSettings.h"
 #include "cxDataLocations.h"
-#include "cxPatientData.h"
+//#include "cxPatientData.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
 #include "cxVideoConnection.h"
 #include "cxViewWrapper3D.h"
 #include "cxVideoService.h"
+
+//#include "cxAcquisitionManager.h"
 
 namespace cx
 {
@@ -121,7 +123,9 @@ void StateManager::destroyInstance()
 }
 
 StateManager::StateManager()
-{}
+{
+//	mAcquisitionManager = new AcquisitionManager(mReconstructer);
+}
 
 StateManager::~StateManager()
 {}
@@ -182,12 +186,12 @@ void StateManager::initialize()
 {
   this->fillDefaultSettings();
 
-  mPatientData.reset(new PatientData());
+//  mPatientData.reset(new PatientData());
 
 //  mIGTLinkConnection.reset(new VideoConnection());
 
-  ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
-  mReconstructer.reset(new ssc::Reconstructer(xmlFile, DataLocations::getShaderPath()));
+//  ssc::XmlOptionFile xmlFile = ssc::XmlOptionFile(DataLocations::getXmlSettingsFile(), "CustusX").descend("usReconstruction");
+//  mReconstructer.reset(new ssc::Reconstructer(xmlFile, DataLocations::getShaderPath()));
 
   mApplicationStateMachine.reset(new ApplicationStateMachine());
   mApplicationStateMachine->start();
@@ -196,21 +200,21 @@ void StateManager::initialize()
   mWorkflowStateMachine->start();
 }
 
-PatientDataPtr StateManager::getPatientData()
-{
-  return mPatientData;
-}
+//PatientDataPtr StateManager::getPatientData()
+//{
+//  return mPatientData;
+//}
 
-VideoConnectionPtr StateManager::getRTSourceManager()
-{
-	return videoService()->getVideoConnection();
-//  return mIGTLinkConnection;
-}
+//VideoConnectionPtr StateManager::getRTSourceManager()
+//{
+//	return videoService()->getVideoConnection();
+////  return mIGTLinkConnection;
+//}
 
-ssc::ReconstructerPtr StateManager::getReconstructer()
-{
-  return mReconstructer;
-}
+//ssc::ReconstructerPtr StateManager::getReconstructer()
+//{
+//  return mReconstructer;
+//}
 
 Desktop StateManager::getActiveDesktop()
 {
@@ -230,67 +234,78 @@ void StateManager::resetDesktop()
   parser.resetDesktop(mApplicationStateMachine->getActiveUidState(), mWorkflowStateMachine->getActiveUidState());
 }
 
-void StateManager::addRecordSession(RecordSessionPtr session)
-{
-  mRecordSessions.push_back(session);
-  emit recordedSessionsChanged();
-}
 
-void StateManager::removeRecordSession(RecordSessionPtr session)
-{
-  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
-  for(; it != mRecordSessions.end(); ++it)
-  {
-    if((*it)->getUid() == session->getUid())
-      mRecordSessions.erase(it);
-  }
-  emit recordedSessionsChanged();
-}
+//void StateManager::addXml(QDomNode& parentNode)
+//{
+//	mAcquisitionManager->addXml(parentNode);
+//}
+//
+//void StateManager::parseXml(QDomNode& dataNode)
+//{
+//	mAcquisitionManager->parseXml(dataNode);
+//}
 
-std::vector<RecordSessionPtr> StateManager::getRecordSessions()
-{
-  return mRecordSessions;
-}
-
-RecordSessionPtr StateManager::getRecordSession(QString uid)
-{
-  RecordSessionPtr retval;
-  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
-  for(; it != mRecordSessions.end(); ++it)
-  {
-    if((*it)->getUid() == uid)
-      retval = (*it);
-  }
-  return retval;
-}
-
-void StateManager::addXml(QDomNode& parentNode)
-{
-  QDomDocument doc = parentNode.ownerDocument();
-  QDomElement base = doc.createElement("stateManager");
-  parentNode.appendChild(base);
-
-  QDomElement sessionsNode = doc.createElement("recordSessions");
-  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
-  for(; it != mRecordSessions.end(); ++it)
-  {
-    QDomElement sessionNode = doc.createElement("recordSession");
-    (*it)->addXml(sessionNode);
-    sessionsNode.appendChild(sessionNode);
-  }
-  base.appendChild(sessionsNode);
-}
-
-void StateManager::parseXml(QDomNode& dataNode)
-{
-  QDomNode recordsessionsNode = dataNode.namedItem("recordSessions");
-  QDomElement recodesessionNode = recordsessionsNode.firstChildElement("recordSession");
-  for (; !recodesessionNode.isNull(); recodesessionNode = recodesessionNode.nextSiblingElement("recordSession"))
-  {
-    RecordSessionPtr session(new RecordSession(0,0,""));
-    session->parseXml(recodesessionNode);
-    this->addRecordSession(session);
-  }
-}
+//void StateManager::addRecordSession(RecordSessionPtr session)
+//{
+//  mRecordSessions.push_back(session);
+//  emit recordedSessionsChanged();
+//}
+//
+//void StateManager::removeRecordSession(RecordSessionPtr session)
+//{
+//  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
+//  for(; it != mRecordSessions.end(); ++it)
+//  {
+//    if((*it)->getUid() == session->getUid())
+//      mRecordSessions.erase(it);
+//  }
+//  emit recordedSessionsChanged();
+//}
+//
+//std::vector<RecordSessionPtr> StateManager::getRecordSessions()
+//{
+//  return mRecordSessions;
+//}
+//
+//RecordSessionPtr StateManager::getRecordSession(QString uid)
+//{
+//  RecordSessionPtr retval;
+//  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
+//  for(; it != mRecordSessions.end(); ++it)
+//  {
+//    if((*it)->getUid() == uid)
+//      retval = (*it);
+//  }
+//  return retval;
+//}
+//
+//void StateManager::addXml(QDomNode& parentNode)
+//{
+//  QDomDocument doc = parentNode.ownerDocument();
+//  QDomElement base = doc.createElement("stateManager");
+//  parentNode.appendChild(base);
+//
+//  QDomElement sessionsNode = doc.createElement("recordSessions");
+//  std::vector<RecordSessionPtr>::iterator it = mRecordSessions.begin();
+//  for(; it != mRecordSessions.end(); ++it)
+//  {
+//    QDomElement sessionNode = doc.createElement("recordSession");
+//    (*it)->addXml(sessionNode);
+//    sessionsNode.appendChild(sessionNode);
+//  }
+//  base.appendChild(sessionsNode);
+//}
+//
+//void StateManager::parseXml(QDomNode& dataNode)
+//{
+//  QDomNode recordsessionsNode = dataNode.namedItem("recordSessions");
+//  QDomElement recodesessionNode = recordsessionsNode.firstChildElement("recordSession");
+//  for (; !recodesessionNode.isNull(); recodesessionNode = recodesessionNode.nextSiblingElement("recordSession"))
+//  {
+//    RecordSessionPtr session(new RecordSession(0,0,""));
+//    session->parseXml(recodesessionNode);
+//    this->addRecordSession(session);
+//  }
+//}
 
 } //namespace cx

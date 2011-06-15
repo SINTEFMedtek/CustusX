@@ -28,7 +28,7 @@ SET ( ${LIB}_algorithms
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
-    #${CustusX3_SOURCE_DIR}/source/service/patient
+    ${CustusX3_SOURCE_DIR}/source/service/patient
     #${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/logic/stateMachineManager
 #    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
@@ -36,6 +36,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/resource/algorithms
     ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/logic
+    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/logic
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
