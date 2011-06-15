@@ -9,6 +9,7 @@
 SET( MOC_HEADER_FILES
    sscReconstructionWidget.h
    sscReconstructOutputValueParamsInterfaces.h
+   cxUsReconstructionPlugin.h
     )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${MOC_HEADER_FILES} )
@@ -19,6 +20,8 @@ SET( SOURCE_FILES
   sscReconstructionWidget.cpp
   sscReconstructOutputValueParamsInterfaces.cpp
   sscReconstructOutputValueParamsInterfaces.h
+  cxUsReconstructionPlugin.h
+  cxUsReconstructionPlugin.cpp
   )
 
 # =========================================================
@@ -30,6 +33,7 @@ include_directories(
     ${CustusX3_SOURCE_DIR}/source/service/tracking
     ${CustusX3_SOURCE_DIR}/source/resource/settings
     ${CustusX3_SOURCE_DIR}/source/resource/utilities
+    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     ../logic
     )
 

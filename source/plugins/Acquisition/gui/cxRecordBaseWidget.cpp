@@ -22,10 +22,11 @@
 namespace cx
 {
 
-RecordBaseWidget::RecordBaseWidget(QWidget* parent, QString description):
+RecordBaseWidget::RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description):
     BaseWidget(parent, "RecordBaseWidget", "Record Base"),
     mLayout(new QVBoxLayout(this)),
-    mRecordSessionWidget(new RecordSessionWidget(this, description))
+    mRecordSessionWidget(new RecordSessionWidget(pluginData, this, description)),
+    mPluginData(pluginData)
 {
   this->setObjectName("RecordBaseWidget");
   this->setWindowTitle("Record Base");
@@ -44,8 +45,8 @@ RecordBaseWidget::~RecordBaseWidget()
 ////----------------------------------------------------------------------------------------------------------------------
 ////----------------------------------------------------------------------------------------------------------------------
 
-TrackedRecordWidget::TrackedRecordWidget(QWidget* parent, QString description) :
-  RecordBaseWidget(parent, description)
+TrackedRecordWidget::TrackedRecordWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description) :
+  RecordBaseWidget(pluginData, parent, description)
 {}
 
 TrackedRecordWidget::~TrackedRecordWidget()

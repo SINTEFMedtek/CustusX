@@ -16,6 +16,7 @@
 #include "sscRegistrationTransform.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -78,7 +79,7 @@ void ImportDataDialog::showEvent(QShowEvent* event)
 
 void ImportDataDialog::importDataSlot()
 {
-  mData = stateManager()->getPatientData()->importData(mFilename);
+  mData = patientService()->getPatientData()->importData(mFilename);
 
   if (!mData)
   {

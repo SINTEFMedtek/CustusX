@@ -22,6 +22,7 @@
 #include "cxTool.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -76,8 +77,8 @@ QString ToolTipSampleWidget::defaultWhatsThis() const
 void ToolTipSampleWidget::saveFileSlot()
 {
   QString configPath = DataLocations::getRootConfigPath();
-  if(stateManager()->getPatientData()->isPatientValid())
-    configPath = stateManager()->getPatientData()->getActivePatientFolder();
+  if(patientService()->getPatientData()->isPatientValid())
+    configPath = patientService()->getPatientData()->getActivePatientFolder();
 
   QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
                              configPath+"/SampledPoints.txt",

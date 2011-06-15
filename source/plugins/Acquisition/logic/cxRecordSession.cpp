@@ -4,17 +4,18 @@
 #include <QDomElement>
 #include "sscTypeConversions.h"
 #include "sscMessageManager.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateMachineManager.h"
 #include "sscTime.h"
 
 namespace cx
 {
-RecordSession::RecordSession(double startTime, double stopTime, QString description) :
+RecordSession::RecordSession(QString uid, double startTime, double stopTime, QString description) :
     mStartTime(startTime),
     mStopTime(stopTime),
     mDescription(description)
 {
-  mUid = this->getNewUid();
+  mUid = uid;
+//  mUid = this->getNewUid();
   mDescription.append("_"+mUid+"");
 }
 
@@ -79,27 +80,29 @@ void RecordSession::parseXml(QDomNode& parentNode)
   mDescription = parentNode.namedItem("description").toElement().text();
 }
 
-QString RecordSession::getNewUid()
+//QString RecordSession::getNewUid()
+//{
+//  QString retval;
+//  int max = 0;
+//  std::vector<RecordSessionPtr> recordsessions = stateManager()->getRecordSessions();
+//  std::vector<RecordSessionPtr>::iterator iter;
+//  for (iter = recordsessions.begin(); iter != recordsessions.end(); ++iter)
+//  {
+//    QString index = (*iter)->getUid().split("_").front();
+//    max = std::max(max, index.toInt());
+//  }
+//
+////  retval = qstring_cast(max + 1);
+//  retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
+//  retval += "_" + QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
+//  return retval;
+//}
+
+
+USAcqRecordSession::USAcqRecordSession(QString uid, double startTime, double stopTime, QString description) :
+    RecordSession(uid, startTime, stopTime, description)
 {
-  QString retval;
-  int max = 0;
-  std::vector<RecordSessionPtr> recordsessions = stateManager()->getRecordSessions();
-  std::vector<RecordSessionPtr>::iterator iter;
-  for (iter = recordsessions.begin(); iter != recordsessions.end(); ++iter)
-  {
-    QString index = (*iter)->getUid().split("_").front();
-    max = std::max(max, index.toInt());
-  }
-
-//  retval = qstring_cast(max + 1);
-  retval = QString("%1").arg(max + 1, 2, 10, QChar('0'));
-  retval += "_" + QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
-  return retval;
 }
-
-USAcqRecordSession::USAcqRecordSession(double startTime, double stopTime, QString description) :
-    RecordSession(startTime, stopTime, description)
-{}
 
 USAcqRecordSession::~USAcqRecordSession()
 {}

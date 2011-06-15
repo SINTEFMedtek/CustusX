@@ -11,6 +11,7 @@
 #include "cxPatientData.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxDataInterface.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -99,7 +100,7 @@ void SeansVesselRegistrationWidget::registerSlot()
   bool verbose = 1; //TODO, add user interface
 
   ssc::messageManager()->sendDebug("Using lts_ratio: "+qstring_cast(lts_ratio));
-  QString logPath = stateManager()->getPatientData()->getActivePatientFolder()+"/Logs/";
+  QString logPath = patientService()->getPatientData()->getActivePatientFolder()+"/Logs/";
 
   registrationManager()->doVesselRegistration(lts_ratio, stop_delta, lambda, sigma, lin_flag, sample, single_point_thre, verbose, logPath);
 }

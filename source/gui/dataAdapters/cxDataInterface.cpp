@@ -17,6 +17,7 @@
 #include "sscTool.h"
 #include "cxStateMachineManager.h"
 #include "sscImageAlgorithms.h"
+#include "cxRegistrationManager.h"
 
 namespace cx
 {
@@ -257,32 +258,7 @@ QString SelectToolStringDataAdapterBase::convertInternal2Display(QString interna
   return qstring_cast(tool->getName());
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
 
-SelectRecordSessionStringDataAdapterBase::SelectRecordSessionStringDataAdapterBase()
-{
-  connect(stateManager(), SIGNAL(recordedSessionsChanged()), this, SIGNAL(changed()));
-}
-QStringList SelectRecordSessionStringDataAdapterBase::getValueRange() const
-{
-  std::vector<RecordSessionPtr> sessions =  stateManager()->getRecordSessions();
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<sessions.size(); ++i)
-    retval << qstring_cast(sessions[i]->getUid());
-  return retval;
-}
-QString SelectRecordSessionStringDataAdapterBase::convertInternal2Display(QString internal)
-{
-  RecordSessionPtr session = stateManager()->getRecordSession(internal);
-  if(!session)
-  {
-    return "<no session>";
-  }
-  return qstring_cast(session->getDescription());
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -588,51 +564,6 @@ ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
   return mTool;
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-SelectRecordSessionStringDataAdapter::SelectRecordSessionStringDataAdapter()
-{
-  connect(stateManager(), SIGNAL(recordedSessionsChanged()), this, SLOT(setDefaultSlot()));
-  this->setDefaultSlot();
-}
-QString SelectRecordSessionStringDataAdapter::getValueName() const
-{
-  return "Select a record session";
-}
-bool SelectRecordSessionStringDataAdapter::setValue(const QString& value)
-{
-  if(mRecordSession && value==mRecordSession->getUid())
-    return false;
-  RecordSessionPtr temp = stateManager()->getRecordSession(value);
-  if(!temp)
-    return false;
-
-  mRecordSession = temp;
-  emit changed();
-  return true;
-}
-QString SelectRecordSessionStringDataAdapter::getValue() const
-{
-  if(!mRecordSession)
-    return "<no session>";
-  return mRecordSession->getUid();
-}
-QString SelectRecordSessionStringDataAdapter::getHelp() const
-{
-  return "Select a session";
-}
-RecordSessionPtr SelectRecordSessionStringDataAdapter::getRecordSession()
-{
-  return mRecordSession;
-}
-void SelectRecordSessionStringDataAdapter::setDefaultSlot()
-{
-  std::vector<RecordSessionPtr> sessions = stateManager()->getRecordSessions();
-  if(sessions.size() > 0)
-    this->setValue(sessions.at(0)->getUid());
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------

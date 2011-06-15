@@ -20,6 +20,7 @@
 #include "sscDataManager.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include "cxPatientService.h"
 #include "cxToolManager.h"
 
 namespace cx
@@ -45,7 +46,7 @@ void ApplicationState::onEntry(QEvent * event )
   ssc::dataManager()->setClinicalApplication(this->getClinicalApplication());
   if (stateManager()->getWorkflow())
     stateManager()->getWorkflow()->setActiveState("PatientDataUid");
-  stateManager()->getPatientData()->clearPatient();
+  patientService()->getPatientData()->clearPatient();
   
   cx::ToolManager::getInstance()->setClinicalApplication(this->getClinicalApplication());
   
