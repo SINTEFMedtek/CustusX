@@ -4,17 +4,19 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QEvent>
 #include "sscTime.h"
 #include "sscMessageManager.h"
 #include "cxRecordSession.h"
 #include "cxToolManager.h"
-#include "cxStateMachineManager.h"
-#include "cxDataInterface.h"
+//#include "cxStateMachineManager.h"
+//#include "cxDataInterface.h"
 
 namespace cx
 {
-RecordSessionWidget::RecordSessionWidget(QWidget* parent, QString defaultDescription) :
+RecordSessionWidget::RecordSessionWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString defaultDescription) :
     BaseWidget(parent, "RecordSessionWidget", "Record Session"),
+    mPluginData(pluginData),
     mInfoLabel(new QLabel("")),
     mStartStopButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/media-record-3.png"), "Start")),
     mCancelButton(new QPushButton(QIcon(":/icons/open_icon_library/png/64x64/actions/process-stop-7.png"), "Cancel")),
@@ -133,8 +135,8 @@ void RecordSessionWidget::stopRecording()
 
   mStopTimeMSec = ssc::getMilliSecondsSinceEpoch();
 
-  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
-  stateManager()->addRecordSession(session);
+  RecordSessionPtr session = RecordSessionPtr(new RecordSession(mPluginData->getNewUid(), mStartTimeMSec, mStopTimeMSec, mDescriptionLine->text()));
+  mPluginData->addRecordSession(session);
 
   ToolManager::getInstance()->saveToolsSlot(); //asks all the tools to save their transforms and timestamps
 

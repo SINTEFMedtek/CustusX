@@ -8,7 +8,7 @@
 #include "sscDoubleWidgets.h"
 #include "sscTypeConversions.h"
 #include "cxPatientData.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateMachineManager.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"
@@ -29,13 +29,13 @@ namespace cx
 //---------------------------------------------------------
 
 
-USAcqusitionWidget::USAcqusitionWidget(QWidget* parent) :
-		RecordBaseWidget(parent, settings()->value("Ultrasound/acquisitionName").toString())
+USAcqusitionWidget::USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent) :
+		RecordBaseWidget(pluginData, parent, settings()->value("Ultrasound/acquisitionName").toString())
 {
   this->setObjectName("USAcqusitionWidget");
   this->setWindowTitle("US Acquisition");
 
-  mAcquisition.reset(new USAcquisition());
+  mAcquisition.reset(new USAcquisition(pluginData));
   connect(mAcquisition.get(), SIGNAL(ready(bool,QString)), mRecordSessionWidget, SLOT(setReady(bool,QString)));
 //  connect(mAcquisition.get(), SIGNAL(ready(bool)), this, SIGNAL(ready(bool)));
   connect(mAcquisition.get(), SIGNAL(saveDataCompleted(QString)), this, SLOT(saveDataCompletedSlot(QString)));
@@ -73,11 +73,11 @@ void USAcqusitionWidget::postProcessingSlot(QString sessionId)
 
 void USAcqusitionWidget::saveDataCompletedSlot(QString mhdFilename)
 {
-  stateManager()->getReconstructer()->selectData(mhdFilename);
+  mPluginData->getReconstructer()->selectData(mhdFilename);
 
   if (settings()->value("Automation/autoReconstruct").toBool())
   {
-    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(stateManager()->getReconstructer()));
+    mThreadedReconstructer.reset(new ssc::ThreadedReconstructer(mPluginData->getReconstructer()));
     connect(mThreadedReconstructer.get(), SIGNAL(finished()), this, SLOT(reconstructFinishedSlot()));
     mThreadedReconstructer->start();
     mRecordSessionWidget->startPostProcessing("Reconstructing");
@@ -102,7 +102,7 @@ void USAcqusitionWidget::stoppedSlot()
   {
     mThreadedReconstructer->terminate();
     mThreadedReconstructer->wait();
-    stateManager()->getReconstructer()->selectData(stateManager()->getReconstructer()->getSelectedData());
+    mPluginData->getReconstructer()->selectData(mPluginData->getReconstructer()->getSelectedData());
     // TODO perform cleanup of all resources connected to this recording.
   }
 

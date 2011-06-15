@@ -7,6 +7,9 @@ SET(SOURCES cxMain.cpp)
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
     )
 
 

@@ -17,6 +17,7 @@
 namespace cx
 {
 
+
 /**ServiceController handles all connections between the existing
  * services, in order to keep them independent of each other.
  *
@@ -32,6 +33,11 @@ public:
 
 private slots:
 	void updateVideoConnections();
+
+	void patientChangedSlot();
+	void clearPatientSlot();
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
 
 private:
 	ssc::ToolPtr findSuitableProbe();

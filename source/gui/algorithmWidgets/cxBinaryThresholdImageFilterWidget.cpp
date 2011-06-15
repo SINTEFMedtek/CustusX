@@ -11,6 +11,7 @@
 #include "cxDataInterface.h"
 #include "cxContour.h"
 #include "sscMesh.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -107,7 +108,7 @@ void BinaryThresholdImageFilterWidget::setImageInputSlot(QString value)
 
 void BinaryThresholdImageFilterWidget::segmentSlot()
 {
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   this->revertTransferFunctions();
 
   mSegmentationAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath, mSegmentationThresholdAdapter->getValue(), mUseSmothing, mSmoothingSigmaAdapter->getValue());
@@ -132,7 +133,7 @@ void BinaryThresholdImageFilterWidget::generateSurface()
   if(!segmentedImage)
     return;
 
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double decimation = 0.8;
   double threshold = 1;/// because the segmented image is 0..1
   bool reduceResolution = false;

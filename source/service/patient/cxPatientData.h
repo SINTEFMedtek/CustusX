@@ -14,11 +14,20 @@
 #include "sscForwardDeclarations.h"
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include <QDomDocument>
 
 class QDomDocument;
 
 namespace cx
 {
+
+/**given a root node, use the /-separated path to descend
+ * into the root children recursively. Create elements if
+ * necessary.
+ *
+ */
+QDomElement getElementForced(QDomNode root, QString path);
+
 
 /**Functionality for storing patient data in a folder on the disk
  * and access to these data.
@@ -36,6 +45,9 @@ public:
   QString getActivePatientFolder() const;
   bool isPatientValid() const;
 
+  QDomElement getCurrentWorkingElement(QString path) { return getElementForced(mWorkingDocument.documentElement(), path); }
+  QDomDocument getCurrentWorkingDocument() { return mWorkingDocument; } // use only during save/load.
+
 public slots:
   void newPatient(QString choosenDir);
   void loadPatient(QString chosenDir);
@@ -47,6 +59,10 @@ public slots:
 
 signals:
   void patientChanged();
+  void cleared();
+
+  void isSaving();
+  void isLoading();
 
 private:
   //patient
@@ -61,10 +77,14 @@ private:
 
   bool copyFile(QString source, QString dest);
   bool copyAllSimilarFiles(QString fileName, QString destFolder);
+  static QString getVersionName();
 
   //Patient
   QString mActivePatientFolder; ///< Folder for storing the files for the active patient. Path relative to globalPatientDataFolder.
+  QDomDocument mWorkingDocument; ///< available during load and save, used to add/extract extra info from the file.
 };
+
+
 
 typedef boost::shared_ptr<PatientData> PatientDataPtr;
 

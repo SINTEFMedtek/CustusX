@@ -10,13 +10,16 @@
 
 #include "cxTabbedWidget.h"
 
+#include "cxAcquisitionData.h"
+
 namespace cx
 {
 
 class CalibrationMethodsWidget : public TabbedWidget
 {
 public:
-  CalibrationMethodsWidget(QWidget* parent, QString objectName, QString windowTitle);
+  CalibrationMethodsWidget(AcquisitionDataPtr acquisitionData,
+  		QWidget* parent, QString objectName, QString windowTitle);
   virtual ~CalibrationMethodsWidget(){};
   virtual QString defaultWhatsThis() const;
 };

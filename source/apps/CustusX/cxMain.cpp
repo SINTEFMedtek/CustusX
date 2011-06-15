@@ -12,6 +12,9 @@
 #include "cxMainWindow.h"
 #include "sscMessageManager.h"
 
+#include "cxUsReconstructionPlugin.h"
+#include "cxAcquisitionPlugin.h"
+
 int main(int argc, char *argv[])
 {
   Q_INIT_RESOURCE(cxResources);
@@ -26,7 +29,15 @@ int main(int argc, char *argv[])
 
   cx::MainWindow::initialize();
 
-  cx::MainWindow* mainWin = new cx::MainWindow;
+	cx::UsReconstructionPluginPtr reconstructionPlugin(new cx::UsReconstructionPlugin());
+	cx::AcquisitionPluginPtr acquisitionPlugin(new cx::AcquisitionPlugin(reconstructionPlugin->getReconstructer()));
+	std::vector<cx::PluginBasePtr> plugins;
+	plugins.push_back(reconstructionPlugin);
+	plugins.push_back(   acquisitionPlugin);
+
+	cx::MainWindow* mainWin = new cx::MainWindow(plugins);
+
+
   //mainWin->show();
 #ifdef __APPLE__ // needed on mac for bringing to front: does the opposite on linux
   mainWin->activateWindow();

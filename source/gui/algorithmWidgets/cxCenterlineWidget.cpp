@@ -11,6 +11,7 @@
 #include "cxDataInterface.h"
 #include "cxStateMachineManager.h"
 #include "cxPatientData.h"
+#include "cxPatientService.h"
 
 
 namespace cx
@@ -75,7 +76,7 @@ void CenterlineWidget::setDefaultColor(QColor color)
 
 void CenterlineWidget::findCenterlineSlot()
 {
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   if(mCenterlineAlgorithm.setInput(mSelectedImage->getImage(), outputBasePath))
   {
     //Only print text if the input is in the correct format

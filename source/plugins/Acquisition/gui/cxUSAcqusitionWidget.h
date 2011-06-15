@@ -25,7 +25,7 @@ class USAcqusitionWidget : public RecordBaseWidget
 {
   Q_OBJECT
 public:
-  USAcqusitionWidget(QWidget* parent);
+  USAcqusitionWidget(AcquisitionDataPtr pluginData, QWidget* parent);
   virtual ~USAcqusitionWidget();
   virtual QString defaultWhatsThis() const;
 

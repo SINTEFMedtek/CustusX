@@ -15,6 +15,7 @@
 #include "cxDataInterface.h"
 #include "sscDoubleDataAdapterXml.h"
 #include "sscDoubleWidgets.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -83,7 +84,7 @@ void ResampleWidget::hideEvent(QHideEvent* event)
 
 void ResampleWidget::resampleSlot()
 {
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
   double margin = mMargin->getValue();
 
   mResampleAlgorithm.setInput(mSelectedImage->getImage(), mReferenceImage->getImage(), outputBasePath, margin);

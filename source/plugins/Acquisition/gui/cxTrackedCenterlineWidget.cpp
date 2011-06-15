@@ -10,16 +10,17 @@
 #include "cxView3D.h"
 #include "cxRepManager.h"
 #include "cxCenterline.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateMachineManager.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"
 #include "cxTool.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
-TrackedCenterlineWidget::TrackedCenterlineWidget(QWidget* parent) :
-    TrackedRecordWidget(parent, "Tracked centerline")
+TrackedCenterlineWidget::TrackedCenterlineWidget(AcquisitionDataPtr pluginData, QWidget* parent) :
+    TrackedRecordWidget(pluginData, parent, "Tracked centerline")
 {
   this->setObjectName("TrackedCenterlineWidget");
   this->setWindowTitle("Tracked Centerline");
@@ -58,7 +59,7 @@ void TrackedCenterlineWidget::checkIfReadySlot()
 
 void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
 {
-  RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
+  RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
 
   //get the transforms from the session
   ssc::TimedTransformMap transforms_prMt = this->getRecording(session);
@@ -78,7 +79,7 @@ void TrackedCenterlineWidget::postProcessingSlot(QString sessionId)
   ssc::ImagePtr image_d = converter.getOutput();
 
   //extract the centerline
-  QString savepath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString savepath = patientService()->getPatientData()->getActivePatientFolder();
   mCenterlineAlgorithm.setInput(image_d, savepath);
   mRecordSessionWidget->setReady(false, "<font color=orange>Generating centerline... Please wait!</font>\n");
 }

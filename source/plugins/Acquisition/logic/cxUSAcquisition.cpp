@@ -11,15 +11,16 @@
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
 #include "cxPatientData.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateMachineManager.h"
 #include "cxSettings.h"
 #include "sscMessageManager.h"
 #include "cxTool.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
 
-USAcquisition::USAcquisition(QObject* parent) : QObject(parent)
+USAcquisition::USAcquisition(AcquisitionDataPtr pluginData, QObject* parent) : QObject(parent), mPluginData(pluginData)
 {
   connect(&mFileMakerFutureWatcher, SIGNAL(finished()), this, SLOT(fileMakerWriteFinished()));
   connect(ssc::toolManager(), SIGNAL(trackingStarted()), this, SLOT(checkIfReadySlot()));
@@ -117,7 +118,7 @@ ssc::TimedTransformMap USAcquisition::getRecording(RecordSessionPtr session)
 void USAcquisition::saveSession(QString sessionId)
 {
   //get session data
-  RecordSessionPtr session = stateManager()->getRecordSession(sessionId);
+  RecordSessionPtr session = mPluginData->getRecordSession(sessionId);
   ssc::VideoRecorder::DataType streamRecordedData = mRTRecorder->getRecording(session->getStartTime(), session->getStopTime());
 
   ssc::TimedTransformMap trackerRecordedData = this->getRecording(session);
@@ -133,7 +134,7 @@ void USAcquisition::saveSession(QString sessionId)
 	if (cxTool)
 		calibFileName = cxTool->getCalibrationFileName();
 
-  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), stateManager()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
+  mFileMaker.reset(new UsReconstructionFileMaker(trackerRecordedData, streamRecordedData, session->getDescription(), patientService()->getPatientData()->getActivePatientFolder(), probe, calibFileName));
 
   mFileMakerFuture = QtConcurrent::run(boost::bind(&UsReconstructionFileMaker::write, mFileMaker));
   mFileMakerFutureWatcher.setFuture(mFileMakerFuture);

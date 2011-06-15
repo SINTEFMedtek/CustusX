@@ -12,6 +12,7 @@
 #include <QFutureWatcher>
 #include "cxUsReconstructionFileMaker.h"
 #include "cxRecordSession.h"
+#include <cxAcquisitionData.h>
 
 namespace cx
 {
@@ -32,7 +33,7 @@ class USAcquisition : public QObject
 {
 	Q_OBJECT
 public:
-	USAcquisition(QObject* parent = 0);
+	USAcquisition(AcquisitionDataPtr pluginData, QObject* parent = 0);
 	QString getWhatsMissingText() const { return mWhatsMissing; }
 
 signals:
@@ -54,6 +55,7 @@ private slots:
   ssc::ToolPtr getTool();
 
 private:
+  AcquisitionDataPtr mPluginData;
   ssc::VideoSourcePtr mRTSource;
   ssc::VideoRecorderPtr mRTRecorder;
   ssc::ToolPtr mTool;

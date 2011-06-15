@@ -10,6 +10,7 @@
 #include "cxColorSelectButton.h"
 #include "sscDataManager.h"
 #include "sscMesh.h"
+#include "cxRegistrationManager.h"
 
 namespace cx
 {

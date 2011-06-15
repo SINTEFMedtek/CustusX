@@ -2,6 +2,7 @@
 #define CXRECORDSESSIONWIDGET_H_
 
 #include "cxBaseWidget.h"
+#include "cxAcquisitionData.h"
 
 class QPushButton;
 class QLineEdit;
@@ -22,7 +23,7 @@ class RecordSessionWidget : public BaseWidget
   Q_OBJECT
 
 public:
-  RecordSessionWidget(QWidget* parent, QString defaultDescription = "Record Session");
+  RecordSessionWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString defaultDescription = "Record Session");
   virtual ~RecordSessionWidget();
 
   virtual QString defaultWhatsThis() const;
@@ -55,6 +56,7 @@ private:
 
   void reset();
 
+  AcquisitionDataPtr mPluginData;
   QLabel* mInfoLabel;
   QPushButton* mStartStopButton;
   QPushButton* mCancelButton;

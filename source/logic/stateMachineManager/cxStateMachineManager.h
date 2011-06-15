@@ -6,7 +6,7 @@
 #include "cxForwardDeclarations.h"
 #include "cxWorkflowStateMachine.h"
 #include "cxApplicationStateMachine.h"
-#include "cxRecordSession.h"
+//#include "cxRecordSession.h"
 #include <QObject>
 
 namespace ssc
@@ -16,6 +16,7 @@ namespace ssc
 
 namespace cx
 {
+class AcquisitionManager;
 
 struct Desktop
 {
@@ -46,25 +47,27 @@ public:
 
   WorkflowStateMachinePtr getWorkflow();
   ApplicationStateMachinePtr getApplication();
-  PatientDataPtr getPatientData();
-  VideoConnectionPtr getRTSourceManager();
-  ssc::ReconstructerPtr getReconstructer();
+//  PatientDataPtr getPatientData();
+//  VideoConnectionPtr getRTSourceManager();
+//  ssc::ReconstructerPtr getReconstructer();
 
   Desktop getActiveDesktop();
   void saveDesktop(Desktop desktop);
   void resetDesktop();
 
-  void addRecordSession(RecordSessionPtr session);
-  void removeRecordSession(RecordSessionPtr session);
-  std::vector<RecordSessionPtr> getRecordSessions();
-  RecordSessionPtr getRecordSession(QString uid);
+//  AcquisitionManager* getAcquisisitionManager() { return mAcquisitionManager; }
 
-  //Interface for saving/loading
-  void addXml(QDomNode& dataNode); ///< adds xml information about the StateManager and its variabels
-  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateManager.
+//  void addRecordSession(RecordSessionPtr session);
+//  void removeRecordSession(RecordSessionPtr session);
+//  std::vector<RecordSessionPtr> getRecordSessions();
+//  RecordSessionPtr getRecordSession(QString uid);
 
-signals:
-  void  recordedSessionsChanged();
+//  //Interface for saving/loading
+//  void addXml(QDomNode& dataNode); ///< adds xml information about the StateManager and its variabels
+//  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateManager.
+
+//signals:
+//  void  recordedSessionsChanged();
 
 private:
   StateManager();
@@ -79,11 +82,12 @@ private:
 
   WorkflowStateMachinePtr mWorkflowStateMachine;
   ApplicationStateMachinePtr mApplicationStateMachine;
-  PatientDataPtr mPatientData;
+//  PatientDataPtr mPatientData;
 //  VideoConnectionPtr mIGTLinkConnection;
-  ssc::ReconstructerPtr mReconstructer;
+//  ssc::ReconstructerPtr mReconstructer;
+//  AcquisitionManager* mAcquisitionManager;
 
-  std::vector<RecordSessionPtr> mRecordSessions;
+//  std::vector<RecordSessionPtr> mRecordSessions;
 };
 StateManager* stateManager();
 }

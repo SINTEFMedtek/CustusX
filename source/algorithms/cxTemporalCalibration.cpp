@@ -16,7 +16,7 @@
 #include <vtkPointData.h>
 #include <vtkImageData.h>
 #include "sscTypeConversions.h"
-#include "cxPatientData.h"
+//#include "cxPatientData.h"
 #include "cxStateMachineManager.h"
 #include "cxSettings.h"
 //#include "cxToolDataAdapters.h"

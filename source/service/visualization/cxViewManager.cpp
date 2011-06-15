@@ -36,6 +36,8 @@
 #include "cxInteractiveCropper.h"
 #include "cxRenderTimer.h"
 #include "vtkForwardDeclarations.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
@@ -74,6 +76,10 @@ ViewManager::ViewManager() :
 {
   mRenderTimer.reset(new RenderTimer);
 
+  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearSlot()));
+
   this->addDefaultLayouts();
   this->loadGlobalSettings();
 
@@ -111,6 +117,19 @@ ViewManager::ViewManager() :
 
 ViewManager::~ViewManager()
 {}
+
+void ViewManager::duringSavePatientSlot()
+{
+	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+  this->addXml(managerNode);
+}
+
+void ViewManager::duringLoadPatientSlot()
+{
+	QDomElement viewmanagerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers/viewManager");
+  this->parseXml(viewmanagerNode);
+}
+
 
 void ViewManager::settingsChangedSlot(QString key)
 {
@@ -305,7 +324,7 @@ void ViewManager::parseXml(QDomNode viewmanagerNode)
   this->setActiveView(activeViewString);
 }
 
-void ViewManager::clear()
+void ViewManager::clearSlot()
 {
   for (unsigned i=0; i<mViewGroups.size(); ++i)
   {
@@ -359,7 +378,6 @@ void ViewManager::setActiveLayout(const QString& layout)
 {
   if(mActiveLayout==layout)
     return;
-//  std::cout << "set active layout " <<layout << std::endl;
 
   LayoutData next = this->getLayoutData(layout);
   if (next.getUid().isEmpty())
