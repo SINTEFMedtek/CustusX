@@ -5,7 +5,7 @@
 #include <QHBoxLayout>
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateService.h"
 #include "cxVideoConnection.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"

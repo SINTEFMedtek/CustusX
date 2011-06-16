@@ -197,45 +197,6 @@ public: // optional methods
   virtual QString getHelp() const;
 };
 
-typedef boost::shared_ptr<class RegistrationFixedImageStringDataAdapter> RegistrationFixedImageStringDataAdapterPtr;
-/** Adapter that connects to the fixed image in the registration manager.
- */
-class RegistrationFixedImageStringDataAdapter : public SelectDataStringDataAdapterBase
-{
-  Q_OBJECT
-public:
-  static RegistrationFixedImageStringDataAdapterPtr New() { return RegistrationFixedImageStringDataAdapterPtr(new RegistrationFixedImageStringDataAdapter()); }
-  RegistrationFixedImageStringDataAdapter();
-  virtual ~RegistrationFixedImageStringDataAdapter() {}
-
-public: // basic methods
-  virtual QString getValueName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-};
-
-typedef boost::shared_ptr<class RegistrationMovingImageStringDataAdapter> RegistrationMovingImageStringDataAdapterPtr;
-/** Adapter that connects to the fixed image in the registration manager.
- */
-class RegistrationMovingImageStringDataAdapter : public SelectDataStringDataAdapterBase
-{
-  Q_OBJECT
-public:
-  static RegistrationMovingImageStringDataAdapterPtr New() { return RegistrationMovingImageStringDataAdapterPtr(new RegistrationMovingImageStringDataAdapter()); }
-  RegistrationMovingImageStringDataAdapter();
-  virtual ~RegistrationMovingImageStringDataAdapter() {}
-
-public: // basic methods
-  virtual QString getValueName() const;
-  virtual bool setValue(const QString& value);
-  virtual QString getValue() const;
-
-public: // optional methods
-  virtual QString getHelp() const;
-};
 
 typedef boost::shared_ptr<class SelectImageStringDataAdapter> SelectImageStringDataAdapterPtr;
 /** Adapter that selects and stores an image.

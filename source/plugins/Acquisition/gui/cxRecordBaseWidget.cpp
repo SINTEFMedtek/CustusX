@@ -24,9 +24,9 @@ namespace cx
 
 RecordBaseWidget::RecordBaseWidget(AcquisitionDataPtr pluginData, QWidget* parent, QString description):
     BaseWidget(parent, "RecordBaseWidget", "Record Base"),
+    mPluginData(pluginData),
     mLayout(new QVBoxLayout(this)),
-    mRecordSessionWidget(new RecordSessionWidget(pluginData, this, description)),
-    mPluginData(pluginData)
+    mRecordSessionWidget(new RecordSessionWidget(pluginData, this, description))
 {
   this->setObjectName("RecordBaseWidget");
   this->setWindowTitle("Record Base");

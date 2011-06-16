@@ -8,7 +8,6 @@
 #include "sscDoubleWidgets.h"
 #include "sscTypeConversions.h"
 #include "cxPatientData.h"
-//#include "cxStateMachineManager.h"
 #include "cxSoundSpeedConversionWidget.h"
 #include "cxRecordSessionWidget.h"
 #include "cxSettings.h"

@@ -11,7 +11,6 @@
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
 #include "cxPatientData.h"
-//#include "cxStateMachineManager.h"
 #include "cxSettings.h"
 #include "sscMessageManager.h"
 #include "cxTool.h"
