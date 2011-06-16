@@ -83,7 +83,8 @@ void ServiceController::updateVideoConnections()
 
 	this->connectVideoToProbe(tool);
 
-  ssc::toolManager()->setDominantTool(tool->getUid());
+	if (tool)
+		ssc::toolManager()->setDominantTool(tool->getUid());
 }
 
 /**insert the rt source into the (first) probe tool
