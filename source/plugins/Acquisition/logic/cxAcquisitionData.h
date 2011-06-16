@@ -41,8 +41,8 @@ public:
   ssc::ReconstructerPtr getReconstructer() { return mReconstructer; };
 
   //Interface for saving/loading
-  void addXml(QDomNode& dataNode); ///< adds xml information about the StateManager and its variabels
-  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateManager.
+  void addXml(QDomNode& dataNode); ///< adds xml information about the StateService and its variabels
+  void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of the StateService.
 
 signals:
   void  recordedSessionsChanged();
