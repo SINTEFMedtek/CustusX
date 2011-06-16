@@ -14,7 +14,7 @@
 #include "sscData.h"
 #include "sscDataManager.h"
 #include "sscRegistrationTransform.h"
-#include "cxStateMachineManager.h"
+#include "cxStateService.h"
 #include "cxPatientData.h"
 #include "cxPatientService.h"
 

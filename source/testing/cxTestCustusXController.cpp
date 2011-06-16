@@ -20,7 +20,7 @@
 #include "sscData.h"
 #include "sscConsoleWidget.h"
 #include "cxViewManager.h"
-#include "cxStateMachineManager.h"
+#include "cxStateService.h"
 #include "cxPatientService.h"
 
 CustusXController::CustusXController(QObject* parent) : QObject(parent)
@@ -58,7 +58,7 @@ void CustusXController::stop()
 void CustusXController::loadPatientSlot()
 {
   cx::patientService()->getPatientData()->loadPatient(mPatientFolder);
-  cx::stateManager()->getWorkflow()->setActiveState("NavigationUid");
+  cx::stateService()->getWorkflow()->setActiveState("NavigationUid");
   mMainWindow->setGeometry( 10, 10, 1200, 800);
 
   if (!ssc::DataManager::getInstance()->getImages().size())

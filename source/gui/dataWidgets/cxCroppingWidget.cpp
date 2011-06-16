@@ -11,7 +11,6 @@
 #include "sscMessageManager.h"
 #include "sscRegistrationTransform.h"
 #include "cxInteractiveCropper.h"
-#include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include <vtkImageData.h>
 #include "sscImageAlgorithms.h"

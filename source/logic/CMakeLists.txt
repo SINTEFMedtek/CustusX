@@ -2,8 +2,6 @@
 ##               Logic Layer
 ###########################################################
 
-add_subdirectory(stateMachineManager)
-
 # definition of the cxLogicManager module:
 
 SET( CX_QT_MOC_HEADER_FILES
@@ -21,14 +19,12 @@ SET (cxLogicManager_SOURCE
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/resource
-#    ${CustusX3_SOURCE_DIR}/source/stateMachineManager    
-#    ${CustusX3_SOURCE_DIR}/source/registrationManager    
-#    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters     
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
+
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
     ${CustusX3_SOURCE_DIR}/source/service/video
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     )
 
 

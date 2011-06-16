@@ -9,22 +9,17 @@
 #include "cxViewManager.h"
 #include "cxRepManager.h"
 #include "cxToolManager.h"
-#include "cxRegistrationManager.h"
 #include "cxStatusBar.h"
 #include "cxVolumePropertiesWidget.h"
 #include "cxBrowserWidget.h"
 #include "cxNavigationWidget.h"
 #include "cxTabbedWidget.h"
 #include "cxToolPropertiesWidget.h"
-#include "cxView3D.h"
-#include "cxView2D.h"
 #include "cxViewGroup.h"
 #include "cxPreferencesDialog.h"
 #include "cxImagePropertiesWidget.h"
 #include "cxPointSamplingWidget.h"
-//#include "sscReconstructionWidget.h"
 #include "cxPatientData.h"
-#include "cxRegistrationHistoryWidget.h"
 #include "cxDataLocations.h"
 #include "cxMeshPropertiesWidget.h"
 #include "cxLayoutEditorWidget.h"
@@ -35,16 +30,9 @@
 #include "cxCameraControl.h"
 #include "cxSecondaryMainWindow.h"
 #include "cxIGTLinkWidget.h"
-#include "cxRecordBaseWidget.h"
-//#include "cxTrackedCenterlineWidget.h"
-//#include "cxUSAcqusitionWidget.h"
 #include "cxAudio.h"
 #include "cxSettings.h"
 #include "cxVideoConnection.h"
-#include "cxRegistrationMethodsWidget.h"
-#include "cxVisualizationMethodsWidget.h"
-#include "cxSegmentationMethodsWidget.h"
-#include "cxCalibrationMethodsWidget.h"
 #include "cxToolManagerWidget.h"
 #include "cxVideoService.h"
 #include "cxLogicManager.h"
@@ -52,8 +40,7 @@
 #include "sscData.h"
 #include "sscConsoleWidget.h"
 #include "cxViewManager.h"
-#include "cxStateMachineManager.h"
-//#include "cxAcquisitionManager.h"
+#include "cxStateService.h"
 #include "cxPatientService.h"
 
 
@@ -63,22 +50,6 @@ namespace cx
 MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
   mFullScreenAction(NULL),
   mStandard3DViewActions(NULL),
-  mConsoleWidget(new ssc::ConsoleWidget(this)),
-  mRegsitrationMethodsWidget(new RegistrationMethodsWidget(this, "RegistrationMethodsWidget", "Registration Methods")),
-  mSegmentationMethodsWidget(new SegmentationMethodsWidget(this, "SegmentationMethodsWidget", "Segmentation Methods")),
-  mVisualizationMethodsWidget(new VisualizationMethodsWidget(this, "VisualizationMethodsWidget", "Visualization Methods")),
-  mCalibrationMethodsWidget(new CalibrationMethodsWidget(AcquisitionDataPtr(), this, "CalibrationMethodsWidget", "Calibration Methods")),
-  mBrowserWidget(new BrowserWidget(this)),
-  mNavigationWidget(new NavigationWidget(this)),
-  mImagePropertiesWidget(new ImagePropertiesWidget(this)),
-  mToolPropertiesWidget(new ToolPropertiesWidget(this)),
-  mMeshPropertiesWidget(new MeshPropertiesWidget(this)),
-  mPointSamplingWidget(new PointSamplingWidget(this)),
-//  mReconstructionWidget(NULL),
-  mRegistrationHistoryWidget(new RegistrationHistoryWidget(this)),
-  mVolumePropertiesWidget(new VolumePropertiesWidget(this)),
-  mCustomStatusBar(new StatusBar()),
-  mFrameTreeWidget(new FrameTreeWidget(this)),
   mControlPanel(NULL)
 {
 
@@ -93,46 +64,36 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
 
 	}
 
-//  mReconstructionWidget = new ssc::ReconstructionWidget(this, stateManager()->getReconstructer());
   mCameraControl.reset(new CameraControl(this));
 
   this->createActions();
   this->createMenus();
   this->createToolBars();
-  this->setStatusBar(mCustomStatusBar);
+  this->setStatusBar(new StatusBar());
 
   ssc::messageManager()->setLoggingFolder(DataLocations::getRootConfigPath());
   ssc::messageManager()->setAudioSource(ssc::AudioPtr(new Audio()));
 
-  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
-  connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
-  connect(stateManager()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
+  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(onApplicationStateChangedSlot()));
+  connect(stateService()->getWorkflow().get(), SIGNAL(activeStateChanged()), this, SLOT(onWorkflowStateChangedSlot()));
+  connect(stateService()->getWorkflow().get(), SIGNAL(activeStateAboutToChange()), this, SLOT(saveDesktopSlot()));
 
   mLayoutActionGroup = NULL;
   this->updateWindowTitle();
 
   this->setTabPosition(Qt::AllDockWidgetAreas, QTabWidget::North);
   
-//  this->addAsDockWidget(new TrackedCenterlineWidget(AcquisitionDataPtr(), this), "Utility");
-//  this->addAsDockWidget(new TrackedCenterlineWidget(stateManager()->getAcquisisitionManager()->getAcquisitionData(), this), "Utility");
-//  this->addAsDockWidget(new USAcqusitionWidget(stateManager()->getAcquisisitionManager()->getAcquisitionData(), this), "Utility");
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
-  this->addAsDockWidget(mBrowserWidget, "Browsing");
-  this->addAsDockWidget(mPointSamplingWidget, "Utility");
-  this->addAsDockWidget(mImagePropertiesWidget, "Properties");
-  this->addAsDockWidget(mVolumePropertiesWidget, "Properties");
-  this->addAsDockWidget(mMeshPropertiesWidget, "Properties");
+  this->addAsDockWidget(new BrowserWidget(this), "Browsing");
+  this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
+  this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
+  this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
+  this->addAsDockWidget(new MeshPropertiesWidget(this), "Properties");
   this->addAsDockWidget(new TrackPadWidget(this), "Utility");
-  this->addAsDockWidget(mToolPropertiesWidget, "Properties");
-//  this->addAsDockWidget(mReconstructionWidget, "Algorithms");
-  this->addAsDockWidget(mRegistrationHistoryWidget, "Browsing");
-  this->addAsDockWidget(mRegsitrationMethodsWidget, "Algorithms");
-  this->addAsDockWidget(mSegmentationMethodsWidget, "Algorithms");
-  this->addAsDockWidget(mVisualizationMethodsWidget, "Algorithms");
-  this->addAsDockWidget(mCalibrationMethodsWidget, "Algorithms");
-  this->addAsDockWidget(mNavigationWidget, "Properties");
-  this->addAsDockWidget(mConsoleWidget, "Utility");
-  this->addAsDockWidget(mFrameTreeWidget, "Browsing");
+  this->addAsDockWidget(new ToolPropertiesWidget(this), "Properties");
+  this->addAsDockWidget(new NavigationWidget(this), "Properties");
+  this->addAsDockWidget(new ssc::ConsoleWidget(this), "Utility");
+  this->addAsDockWidget(new FrameTreeWidget(this), "Browsing");
   this->addAsDockWidget(new ToolManagerWidget(this), "Debugging");
 
   this->setCentralWidget(viewManager()->stealCentralWidget());
@@ -250,9 +211,9 @@ void MainWindow::shutdown()
 	// already destroyed by mainwindow
 
 	// old stuff - high level
-  StateManager::destroyInstance();
+  StateService::destroyInstance();
   ViewManager::destroyInstance();
-  RegistrationManager::shutdown();
+//  RegistrationManager::shutdown();
   RepManager::destroyInstance();
 
   // logic layer
@@ -626,10 +587,10 @@ void MainWindow::onApplicationStateChangedSlot()
 void MainWindow::updateWindowTitle()
 {
   QString appName;
-  if (stateManager()->getApplication())
-    appName = stateManager()->getApplication()->getActiveStateName();
+  if (stateService()->getApplication())
+    appName = stateService()->getApplication()->getActiveStateName();
 
-  QString versionName = stateManager()->getVersionName();
+  QString versionName = stateService()->getVersionName();
 
   QString activePatientFolder = patientService()->getPatientData()->getActivePatientFolder();
   QString patientName;
@@ -644,7 +605,7 @@ void MainWindow::updateWindowTitle()
 
 void MainWindow::onWorkflowStateChangedSlot()
 {
-  Desktop desktop = stateManager()->getActiveDesktop();
+  Desktop desktop = stateService()->getActiveDesktop();
 
   for (std::set<QDockWidget*>::iterator iter = mDockWidgets.begin(); iter!=mDockWidgets.end(); ++iter)
   {
@@ -661,12 +622,12 @@ void MainWindow::saveDesktopSlot()
   Desktop desktop;
   desktop.mMainWindowState = this->saveState();
   desktop.mLayoutUid = viewManager()->getActiveLayout();
-  stateManager()->saveDesktop(desktop);
+  stateService()->saveDesktop(desktop);
 }
 
 void MainWindow::resetDesktopSlot()
 {
-  stateManager()->resetDesktop();
+  stateService()->resetDesktop();
   this->onWorkflowStateChangedSlot();
 }
 
@@ -718,10 +679,6 @@ void MainWindow::importDataSlot()
 
 void MainWindow::patientChangedSlot()
 {
-//  mReconstructionWidget->selectData(patientService()->getPatientData()->getActivePatientFolder() + "/US_Acq/");
-//  mReconstructionWidget->reconstructer()->setOutputBasePath(patientService()->getPatientData()->getActivePatientFolder());
-//  mReconstructionWidget->reconstructer()->setOutputRelativePath("Images");
-
   this->updateWindowTitle();
 }
 
@@ -841,7 +798,7 @@ void MainWindow::createMenus()
 
   //workflow
   this->menuBar()->addMenu(mWorkflowMenu);
-  stateManager()->getWorkflow()->fillMenu(mWorkflowMenu);
+  stateService()->getWorkflow()->fillMenu(mWorkflowMenu);
 
   QList<QAction *> actions = mWorkflowMenu->actions();
   for(int i=1; i <= actions.size(); ++i)
@@ -915,7 +872,7 @@ void MainWindow::createToolBars()
 
   mWorkflowToolBar = addToolBar("Workflow");
   mWorkflowToolBar->setObjectName("WorkflowToolBar");
-  stateManager()->getWorkflow()->fillToolBar(mWorkflowToolBar);
+  stateService()->getWorkflow()->fillToolBar(mWorkflowToolBar);
   this->registerToolBar(mWorkflowToolBar, "Toolbar");
 
   mDesktopToolBar = addToolBar("Desktop");
