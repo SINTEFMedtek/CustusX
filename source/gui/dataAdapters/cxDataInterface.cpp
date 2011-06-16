@@ -15,9 +15,8 @@
 #include "sscDefinitionStrings.h"
 #include "sscEnumConverter.h"
 #include "sscTool.h"
-#include "cxStateMachineManager.h"
 #include "sscImageAlgorithms.h"
-#include "cxRegistrationManager.h"
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
@@ -332,70 +331,6 @@ QString ActiveImageStringDataAdapter::getHelp() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter()
-{
-  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
-}
-QString RegistrationFixedImageStringDataAdapter::getValueName() const
-{
-  return "Fixed Volume";
-}
-
-bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
-{
-  std::cout << "RegistrationFixedImageStringDataAdapter::setImageSlot " << value << std::endl;
-
-  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
-  if (newImage==registrationManager()->getFixedData())
-    return false;
-  registrationManager()->setFixedData(newImage);
-  return true;
-}
-QString RegistrationFixedImageStringDataAdapter::getValue() const
-{
-  ssc::DataPtr image = registrationManager()->getFixedData();
-  if (!image)
-    return "";
-  return qstring_cast(image->getUid());
-}
-QString RegistrationFixedImageStringDataAdapter::getHelp() const
-{
-  return "Select the fixed registration data";
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter()
-{
-  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
-}
-QString RegistrationMovingImageStringDataAdapter::getValueName() const
-{
-  return "Moving Volume";
-}
-bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
-{
-  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
-  if (newImage==registrationManager()->getMovingData())
-    return false;
-  registrationManager()->setMovingData(newImage);
-  return true;
-}
-QString RegistrationMovingImageStringDataAdapter::getValue() const
-{
-  ssc::DataPtr image = registrationManager()->getMovingData();
-  if (!image)
-    return "";
-  return qstring_cast(image->getUid());
-}
-QString RegistrationMovingImageStringDataAdapter::getHelp() const
-{
-  return "Select the moving registration data";
-}
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------

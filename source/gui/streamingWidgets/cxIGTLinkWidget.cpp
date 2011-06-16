@@ -16,7 +16,7 @@
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "cxVideoConnection.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateService.h"
 #include "cxVideoService.h"
 
 namespace cx

@@ -14,7 +14,7 @@
 #include "cxDataLocations.h"
 #include "cxToolManager.h"
 #include "cxDataLocations.h"
-#include "cxStateMachineManager.h"
+#include "cxStateService.h"
 #include "cxFilePreviewWidget.h"
 #include "cxToolConfigureWidget.h"
 #include "cxToolFilterWidget.h"
@@ -53,7 +53,7 @@ void GeneralTab::init()
 {
   mGlobalPatientDataFolder = settings()->value("globalPatientDataFolder").toString();
 
-  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
+  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
 
   // patientDataFolder
   QLabel* patientDataFolderLabel = new QLabel(tr("Patient data folder:"));
@@ -104,7 +104,7 @@ void GeneralTab::setApplicationComboBox()
 {
   mChooseApplicationComboBox->blockSignals(true);
   mChooseApplicationComboBox->clear();
-  QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
+  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
   for (int i=0; i<actions.size(); ++i)
   {
     mChooseApplicationComboBox->insertItem(i, QIcon(), actions[i]->text(), actions[i]->data());
@@ -118,7 +118,7 @@ void GeneralTab::setApplicationComboBox()
 void GeneralTab::applicationStateChangedSlot()
 {
   mChooseApplicationComboBox->blockSignals(true);
-  QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
+  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
   for (int i=0; i<actions.size(); ++i)
   {
     if (actions[i]->isChecked())
@@ -131,7 +131,7 @@ void GeneralTab::applicationStateChangedSlot()
   
 void GeneralTab::currentApplicationChangedSlot(int index)
 {
-  QList<QAction*> actions = stateManager()->getApplication()->getActionGroup()->actions();
+  QList<QAction*> actions = stateService()->getApplication()->getActionGroup()->actions();
   if (index<0 || index>=actions.size())
     return;
   actions[index]->trigger();
@@ -421,7 +421,7 @@ ToolConfigTab::ToolConfigTab(QWidget* parent) :
   mToolConfigureGroupBox = new ToolConfigureGroupBox(this);
   mToolFilterGroupBox  = new ToolFilterGroupBox(this);
 
-  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
+  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationChangedSlot()));
 
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(globalConfigurationFileChangedSlot(QString)));
 
@@ -471,7 +471,7 @@ void ToolConfigTab::saveParametersSlot()
 
 void ToolConfigTab::applicationChangedSlot()
 {
-  ssc::CLINICAL_APPLICATION clinicalApplication = string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName());
+  ssc::CLINICAL_APPLICATION clinicalApplication = string2enum<ssc::CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName());
   mToolConfigureGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setClinicalApplicationSlot(clinicalApplication);
   mToolFilterGroupBox->setTrackingSystemSlot(ssc::tsPOLARIS);

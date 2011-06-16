@@ -55,9 +55,6 @@ add_subdirectory(logic)
 add_subdirectory(plugins)
 add_subdirectory(gui)
 add_subdirectory(ThirdParty)
-
-add_subdirectory(algorithms)
-add_subdirectory(registrationManager)
 add_subdirectory(apps)
 
 #------------------------------------------------------------------------------

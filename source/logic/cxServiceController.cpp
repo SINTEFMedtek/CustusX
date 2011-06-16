@@ -54,52 +54,24 @@ void ServiceController::patientChangedSlot()
 
 void ServiceController::clearPatientSlot()
 {
-//  ssc::dataManager()->clear();
   ssc::toolManager()->clear();
-//  viewManager()->clear();
-//  registrationManager()->clear();
 }
 
 void ServiceController::duringSavePatientSlot()
 {
-//	QDomDocument doc = patientService()->getPatientData()->getCurrentWorkingDocument();
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
 
-//  QDomNode patientNode = doc.namedItem("patient");
-//  QDomNode managerNode = patientNode.namedItem("managers");
-//  QDomElement managerNode = doc.createElement("managers");
-//  patientNode.appendChild(managerNode);
-
-//  ssc::dataManager()->addXml(managerNode);
   ssc::toolManager()->addXml(managerNode);
-//  viewManager()->addXml(managerNode);
-//  registrationManager()->addXml(managerNode);
-//  stateManager()->addXml(managerNode);
 
   ssc::toolManager()->savePositionHistory();
 }
 
 void ServiceController::duringLoadPatientSlot()
 {
-	std::cout << "ServiceController::duringLoadPatientSlot()" << std::endl;
-
 	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
-//	QDomDocument doc = patientService()->getPatientData()->getCurrentWorkingDocument();
-//  QDomNode patientNode = doc.namedItem("patient");
-//  QDomNode managerNode = patientNode.namedItem("managers");
 
   QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
   ssc::toolManager()->parseXml(toolmanagerNode);
-
-//  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-//  viewManager()->parseXml(viewmanagerNode);
-
-//  QDomNode registrationNode = managerNode.namedItem("registrationManager");
-//  registrationManager()->parseXml(registrationNode);
-
-//  QDomNode stateManagerNode = managerNode.namedItem("stateManager");
-//  stateManager()->parseXml(stateManagerNode);
-
 }
 
 /**Connect a probe from Tracking Service to a video source in Video Service.
@@ -129,7 +101,6 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
     return;
  }
 
-//    return;
   // find probe in tool manager
   // set source in cxTool
   // insert timecalibration using config

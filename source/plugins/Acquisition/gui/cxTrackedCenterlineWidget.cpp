@@ -10,7 +10,7 @@
 #include "cxView3D.h"
 #include "cxRepManager.h"
 #include "cxCenterline.h"
-//#include "cxStateMachineManager.h"
+//#include "cxStateService.h"
 #include "cxTrackingDataToVolume.h"
 #include "cxPatientData.h"
 #include "cxRecordSessionWidget.h"

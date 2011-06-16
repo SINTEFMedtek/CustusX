@@ -14,19 +14,17 @@ if (BUILD_TESTING)
 
 include_directories(
     .
+    ${CustusX3_SOURCE_DIR}/source/resource/settings
+    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/resource
-    ${CustusX3_SOURCE_DIR}/source/logic/stateMachineManager    
-    ${CustusX3_SOURCE_DIR}/source/registrationManager    
-#    ${CustusX3_SOURCE_DIR}/source/gui/dataAdapters     
+
     ${CustusX3_SOURCE_DIR}/source/service/patient     
     ${CustusX3_SOURCE_DIR}/source/service/tracking     
     ${CustusX3_SOURCE_DIR}/source/service/visualization
     ${CustusX3_SOURCE_DIR}/source/service/video
+    ${CustusX3_SOURCE_DIR}/source/service/state
+
     ${CustusX3_SOURCE_DIR}/source/logic
-    ${CustusX3_SOURCE_DIR}/source/algorithms
-    ${CustusX3_SOURCE_DIR}/source/UsReconstruction
-    ${CustusX3_SOURCE_DIR}/source/resource/settings
-    ${CustusX3_SOURCE_DIR}/source/resource/utilities
     ${CustusX3_SOURCE_DIR}/source/gui
     ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
     )    
@@ -50,7 +48,7 @@ include_directories(
     # A CppUnit executable included for debugging purposes.
     # Not part of ctest
     add_executable(testCX cxCppUnitMain.cpp ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCX SSC gui ${CPPUNIT_LIBRARIES}  cxVideoService)
+    target_link_libraries(testCX SSC cxGui ${CPPUNIT_LIBRARIES}  cxVideoService)
     
     # -----------------------------------------------
     # -- CppUnit - CTest integration. ---------------
@@ -63,7 +61,7 @@ include_directories(
     
     # Link all CppUnit tests to the cisstTestsMain library
     add_executable(testCX_CppUnit_CTest ${CX_TEST_SOURCE_FILES} )
-    target_link_libraries(testCX_CppUnit_CTest cisstTestsMain SSC gui ${CPPUNIT_LIBRARIES}  cxVideoService)
+    target_link_libraries(testCX_CppUnit_CTest cisstTestsMain SSC cxGui ${CPPUNIT_LIBRARIES}  cxVideoService cxStateService)
     # Generate a CTest list of tests
     CISST_ADD_TESTS(testCX_CppUnit_CTest)
     

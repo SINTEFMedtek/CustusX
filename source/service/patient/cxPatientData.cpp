@@ -27,11 +27,6 @@
 #include "sscDataManager.h"
 #include "sscImage.h"
 #include "sscTypeConversions.h"
-//#include "sscToolManager.h"
-//#include "cxViewManager.h"
-//#include "cxToolManager.h"
-//#include "cxRegistrationManager.h"
-//#include "cxStateMachineManager.h"
 
 namespace cx
 {
@@ -289,11 +284,6 @@ bool PatientData::copyFile(QString source, QString dest)
   {
     //messageMan()->sendInfo("File copied to new location: "+pathToNewFile.toStdString());
   }
-//  else
-//  {
-//    ssc::messageManager()->sendError("First copy failed!");
-//    return false;
-//  }
   if(!toFile.flush())
   {
     ssc::messageManager()->sendWarning("Failed to copy file: "+source);
@@ -321,7 +311,6 @@ bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder)
   QStringList filter;
   filter << QFileInfo(fileName).completeBaseName() + ".*";
   QStringList sourceFiles = sourceFolder.entryList(filter, QDir::Files);
-//  std::cout << "found files: " << sourceFiles.join(" ") << std::endl;;
 
   for (int i=0; i<sourceFiles.size(); ++i)
   {
@@ -336,13 +325,6 @@ bool PatientData::copyAllSimilarFiles(QString fileName, QString destFolder)
 
 ssc::DataPtr PatientData::importData(QString fileName)
 {
-  //ssc::messageManager()->sendDebug("PatientData::importData() called");
-//  this->savePatientFileSlot();
-
-//  QString fileName = QFileDialog::getOpenFileName( this,
-//                                  QString(tr("Select data file")),
-//                                  settings()->value("globalPatientDataFolder").toString(),
-//                                  tr("Image/Mesh (*.mhd *.mha *.stl *.vtk)"));
   if(fileName.isEmpty())
   {
     ssc::messageManager()->sendInfo("Import canceled");
@@ -350,16 +332,13 @@ ssc::DataPtr PatientData::importData(QString fileName)
   }
   
   QString patientsImageFolder = mActivePatientFolder+"/Images/";
-//  QString patientsSurfaceFolder = mActivePatientFolder+"/Surfaces/";
 
   QFileInfo fileInfo(fileName);
   QString fileType = fileInfo.suffix();
   QString pathToNewFile = patientsImageFolder+fileInfo.fileName();
   QFile fromFile(fileName);
   QString strippedFilename = ssc::changeExtension(fileInfo.fileName(), "");
-//  QString uid = strippedFilename+"_"+fileInfo.created().toString(ssc::timestampSecondsFormat());
   QString uid = strippedFilename+"_"+QDateTime::currentDateTime().toString(ssc::timestampSecondsFormat());
-//  std::cout << "new uid: " << uid << std::endl;
 
   if (ssc::dataManager()->getData(uid))
   {
@@ -481,32 +460,18 @@ void PatientData::generateSaveDoc(QDomDocument& doc)
   patientNode.appendChild(managerNode);
 
   ssc::dataManager()->addXml(managerNode);
-//  ssc::toolManager()->addXml(managerNode);
-//  viewManager()->addXml(managerNode);
-//  registrationManager()->addXml(managerNode);
-//  stateManager()->addXml(managerNode);
-
-  //ssc::messageManager()->sendInfo("Xml file ready to be written to disk.");
 }
+
 void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 {
   mWorkingDocument = doc;
-  //ssc::messageManager()->sendDebug("PatientData::readLoadDoc() called");
   //Get all the nodes
   QDomNode patientNode = doc.namedItem("patient");
   QDomNode managerNode = patientNode.namedItem("managers");
 
   //Evaluate the xml nodes and load what's needed
   QDomNode dataManagerNode = managerNode.namedItem("datamanager");
-  /*if(!patientNode.isNull())
-  {
-    QDomElement activePatientNode = patientNode.namedItem("active_patient").toElement();
-    if(!activePatientNode.isNull())
-    {
-      ssc::messageManager()->sendDebugs("Active patient node is"
-                                +mActivePatientFolder.toStdString());
-    }
-  }*/
+
   if (!dataManagerNode.isNull())
   {
     ssc::dataManager()->parseXml(dataManagerNode, patientFolder);
@@ -514,18 +479,6 @@ void PatientData::readLoadDoc(QDomDocument& doc, QString patientFolder)
 
 	std::cout << "PatientData::readLoadDoc" << std::endl;
   emit isLoading();
-//
-//  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
-//  ssc::toolManager()->parseXml(toolmanagerNode);
-//
-//  QDomNode viewmanagerNode = managerNode.namedItem("viewManager");
-//  viewManager()->parseXml(viewmanagerNode);
-//
-//  QDomNode registrationNode = managerNode.namedItem("registrationManager");
-//  registrationManager()->parseXml(registrationNode);
-//
-//  QDomNode stateManagerNode = managerNode.namedItem("stateManager");
-//  stateManager()->parseXml(stateManagerNode);
 
   mWorkingDocument = QDomDocument();
 }
