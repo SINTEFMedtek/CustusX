@@ -15,8 +15,8 @@
 #include "sscDefinitionStrings.h"
 #include "sscEnumConverter.h"
 #include "sscTool.h"
-#include "cxStateMachineManager.h"
 #include "sscImageAlgorithms.h"
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
@@ -257,32 +257,7 @@ QString SelectToolStringDataAdapterBase::convertInternal2Display(QString interna
   return qstring_cast(tool->getName());
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
 
-SelectRecordSessionStringDataAdapterBase::SelectRecordSessionStringDataAdapterBase()
-{
-  connect(stateManager(), SIGNAL(recordedSessionsChanged()), this, SIGNAL(changed()));
-}
-QStringList SelectRecordSessionStringDataAdapterBase::getValueRange() const
-{
-  std::vector<RecordSessionPtr> sessions =  stateManager()->getRecordSessions();
-  QStringList retval;
-  retval << "";
-  for (unsigned i=0; i<sessions.size(); ++i)
-    retval << qstring_cast(sessions[i]->getUid());
-  return retval;
-}
-QString SelectRecordSessionStringDataAdapterBase::convertInternal2Display(QString internal)
-{
-  RecordSessionPtr session = stateManager()->getRecordSession(internal);
-  if(!session)
-  {
-    return "<no session>";
-  }
-  return qstring_cast(session->getDescription());
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -356,70 +331,6 @@ QString ActiveImageStringDataAdapter::getHelp() const
 //---------------------------------------------------------
 //---------------------------------------------------------
 //---------------------------------------------------------
-
-RegistrationFixedImageStringDataAdapter::RegistrationFixedImageStringDataAdapter()
-{
-  connect(registrationManager(), SIGNAL(fixedDataChanged(QString)), this, SIGNAL(changed()));
-}
-QString RegistrationFixedImageStringDataAdapter::getValueName() const
-{
-  return "Fixed Volume";
-}
-
-bool RegistrationFixedImageStringDataAdapter::setValue(const QString& value)
-{
-  std::cout << "RegistrationFixedImageStringDataAdapter::setImageSlot " << value << std::endl;
-
-  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
-  if (newImage==registrationManager()->getFixedData())
-    return false;
-  registrationManager()->setFixedData(newImage);
-  return true;
-}
-QString RegistrationFixedImageStringDataAdapter::getValue() const
-{
-  ssc::DataPtr image = registrationManager()->getFixedData();
-  if (!image)
-    return "";
-  return qstring_cast(image->getUid());
-}
-QString RegistrationFixedImageStringDataAdapter::getHelp() const
-{
-  return "Select the fixed registration data";
-}
-
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-RegistrationMovingImageStringDataAdapter::RegistrationMovingImageStringDataAdapter()
-{
-  connect(registrationManager(), SIGNAL(movingDataChanged(QString)), this, SIGNAL(changed()));
-}
-QString RegistrationMovingImageStringDataAdapter::getValueName() const
-{
-  return "Moving Volume";
-}
-bool RegistrationMovingImageStringDataAdapter::setValue(const QString& value)
-{
-  ssc::DataPtr newImage = ssc::dataManager()->getData(value);
-  if (newImage==registrationManager()->getMovingData())
-    return false;
-  registrationManager()->setMovingData(newImage);
-  return true;
-}
-QString RegistrationMovingImageStringDataAdapter::getValue() const
-{
-  ssc::DataPtr image = registrationManager()->getMovingData();
-  if (!image)
-    return "";
-  return qstring_cast(image->getUid());
-}
-QString RegistrationMovingImageStringDataAdapter::getHelp() const
-{
-  return "Select the moving registration data";
-}
-
 
 //---------------------------------------------------------
 //---------------------------------------------------------
@@ -588,51 +499,6 @@ ssc::ToolPtr SelectToolStringDataAdapter::getTool() const
   return mTool;
 }
 
-//---------------------------------------------------------
-//---------------------------------------------------------
-//---------------------------------------------------------
-
-SelectRecordSessionStringDataAdapter::SelectRecordSessionStringDataAdapter()
-{
-  connect(stateManager(), SIGNAL(recordedSessionsChanged()), this, SLOT(setDefaultSlot()));
-  this->setDefaultSlot();
-}
-QString SelectRecordSessionStringDataAdapter::getValueName() const
-{
-  return "Select a record session";
-}
-bool SelectRecordSessionStringDataAdapter::setValue(const QString& value)
-{
-  if(mRecordSession && value==mRecordSession->getUid())
-    return false;
-  RecordSessionPtr temp = stateManager()->getRecordSession(value);
-  if(!temp)
-    return false;
-
-  mRecordSession = temp;
-  emit changed();
-  return true;
-}
-QString SelectRecordSessionStringDataAdapter::getValue() const
-{
-  if(!mRecordSession)
-    return "<no session>";
-  return mRecordSession->getUid();
-}
-QString SelectRecordSessionStringDataAdapter::getHelp() const
-{
-  return "Select a session";
-}
-RecordSessionPtr SelectRecordSessionStringDataAdapter::getRecordSession()
-{
-  return mRecordSession;
-}
-void SelectRecordSessionStringDataAdapter::setDefaultSlot()
-{
-  std::vector<RecordSessionPtr> sessions = stateManager()->getRecordSessions();
-  if(sessions.size() > 0)
-    this->setValue(sessions.at(0)->getUid());
-}
 
 //---------------------------------------------------------
 //---------------------------------------------------------

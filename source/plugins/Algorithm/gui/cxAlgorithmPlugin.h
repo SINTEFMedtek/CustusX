@@ -1,0 +1,39 @@
+/*
+ * cxAlgorithmPlugin.h
+ *
+ *  Created on: Jun 15, 2011
+ *      Author: christiana
+ */
+
+#ifndef CXALGORITHMPLUGIN_H_
+#define CXALGORITHMPLUGIN_H_
+
+#include "cxPluginBase.h"
+
+namespace cx
+{
+typedef boost::shared_ptr<class AlgorithmPlugin> AlgorithmPluginPtr;
+
+/**Rewrite to be a descendant of PluginBase, with generic API for creating plugins...
+ *
+ */
+class AlgorithmPlugin : public PluginBase
+{
+	Q_OBJECT
+public:
+	AlgorithmPlugin();
+	virtual ~AlgorithmPlugin();
+
+//  AcquisitionDataPtr getAcquisitionData() { return mAcquisitionData; }
+	virtual std::vector<PluginWidget> createWidgets() const;
+
+signals:
+
+private slots:
+
+private:
+};
+
+}
+
+#endif /* CXALGORITHMPLUGIN_H_ */

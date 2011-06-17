@@ -11,10 +11,10 @@
 #include "sscMessageManager.h"
 #include "sscRegistrationTransform.h"
 #include "cxInteractiveCropper.h"
-#include "cxStateMachineManager.h"
 #include "cxPatientData.h"
 #include <vtkImageData.h>
 #include "sscImageAlgorithms.h"
+#include "cxPatientService.h"
 
 namespace cx
 {
@@ -111,7 +111,7 @@ void CroppingWidget::cropperChangedSlot()
 ssc::ImagePtr CroppingWidget::cropClipButtonClickedSlot()
 {
   ssc::ImagePtr image = ssc::dataManager()->getActiveImage();
-  QString outputBasePath = stateManager()->getPatientData()->getActivePatientFolder();
+  QString outputBasePath = patientService()->getPatientData()->getActivePatientFolder();
 
   ssc::ImagePtr retval = cropImage(image);
   ssc::dataManager()->loadData(retval);

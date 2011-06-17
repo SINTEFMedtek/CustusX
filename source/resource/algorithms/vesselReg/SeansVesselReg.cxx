@@ -72,7 +72,7 @@ void SeansVesselReg::printOutResults(QString fileNamePrefix, vtkGeneralTransform
   }
   std::cout << "Filenameprefix: " << fileNamePrefix << std::endl;
 
-  //std::string logsFolder = string_cast(cx::stateManager()->getPatientData()->getActivePatientFolder())+"/Logs/";
+  //std::string logsFolder = string_cast(cx::stateService()->getPatientData()->getActivePatientFolder())+"/Logs/";
   //std::string logsFolder = "~/Patients/Logs/";
   std::string nonLinearFile = fileNamePrefix.toStdString();
   nonLinearFile += "--NonLinear";
