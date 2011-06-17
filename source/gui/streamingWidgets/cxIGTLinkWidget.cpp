@@ -16,7 +16,8 @@
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
 #include "cxVideoConnection.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateService.h"
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -111,7 +112,7 @@ OpenIGTLinkRTSourcePtr IGTLinkWidget::getRTSource()
 
 VideoConnectionPtr IGTLinkWidget::getConnection()
 {
-  return stateManager()->getRTSourceManager();
+  return videoService()->getVideoConnection();
 }
 
 IGTLinkWidget::~IGTLinkWidget()

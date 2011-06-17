@@ -12,7 +12,7 @@
 #include "sscTypeConversions.h"
 #include "sscEnumConverter.h"
 #include "cxDataLocations.h"
-#include "cxStateMachineManager.h"
+#include "cxStateService.h"
 #include "cxToolManager.h"
 #include "cxFilePreviewWidget.h"
 
@@ -79,7 +79,7 @@ ToolConfigWidget::ToolConfigWidget(QWidget* parent) :
   toolslayout->addLayout(refrenceLayout);
 
   //connect
-  connect(stateManager()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
+  connect(stateService()->getApplication().get(), SIGNAL(activeStateChanged()), this, SLOT(applicationStateChangedSlot()));
   connect(mConfigFilesComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(configChangedSlot()));
   connect(mToolListWidget, SIGNAL(itemClicked(QListWidgetItem*)), this, SLOT(toolClickedSlot(QListWidgetItem*)));
   connect(mToolListWidget, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(toolDoubleClickedSlot(QListWidgetItem*)));
@@ -251,7 +251,7 @@ void ToolConfigWidget::populateConfigComboBox()
 
 void ToolConfigWidget::populateApplications()
 {
-  QStringList applicationList = stateManager()->getApplication()->getAllApplicationNames();
+  QStringList applicationList = stateService()->getApplication()->getAllApplicationNames();
 
   mApplicationButtonGroup->setExclusive(false);
   foreach(QString string, applicationList)
@@ -519,7 +519,7 @@ ConfigurationFileParser::Configuration ToolConfigWidget::getCurrentConfiguration
 
   ConfigurationFileParser::Configuration retval;
   retval.mFileName = this->getConfigFileName();
-  retval.mClinical_app = string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName());
+  retval.mClinical_app = string2enum<ssc::CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName());
 
   QStringList selectedTools = this->getSelectedToolsFromToolList();
   QString referencePath = mSelectedReferenceComboBox->itemData(mSelectedReferenceComboBox->currentIndex(), Qt::ToolTipRole).toString();
