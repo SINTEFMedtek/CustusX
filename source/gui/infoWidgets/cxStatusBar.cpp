@@ -5,12 +5,13 @@
 #include <QHBoxLayout>
 #include "sscToolManager.h"
 #include "sscMessageManager.h"
-#include "cxStateMachineManager.h"
+//#include "cxStateService.h"
 #include "cxVideoConnection.h"
 #include "cxToolManager.h"
 #include "cxViewManager.h"
 #include <QPixmap>
 #include <QMetaObject>
+#include "cxVideoService.h"
 
 namespace cx
 {
@@ -28,8 +29,8 @@ StatusBar::StatusBar() :
 
   connect(viewManager(), SIGNAL(fps(int)),this, SLOT(renderingFpsSlot(int)));
   
-  connect(stateManager()->getRTSourceManager().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
-  connect(stateManager()->getRTSourceManager().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
+  connect(videoService()->getVideoConnection().get(), SIGNAL(fps(int)), this, SLOT(grabbingFpsSlot(int)));
+  connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(grabberConnectedSlot(bool)));
 
   this->addPermanentWidget(mRenderingFpsLabel);
 }
@@ -143,7 +144,7 @@ void StatusBar::tpsSlot(int numTps)
 
 void StatusBar::grabbingFpsSlot(int numFps)
 {
-  OpenIGTLinkRTSourcePtr grabber = stateManager()->getRTSourceManager()->getVideoSource();
+  OpenIGTLinkRTSourcePtr grabber = videoService()->getVideoConnection()->getVideoSource();
   QString infoString = grabber->getName()+"-FPS: "+QString::number(numFps);
   mGrabbingInfoLabel->setText(infoString);
 }

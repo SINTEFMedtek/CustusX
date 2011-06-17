@@ -2,13 +2,10 @@
 #define CXMAINWINDOW_H_
 
 #include <QMainWindow>
-//#include "sscData.h"
-//#include "sscConsoleWidget.h"
-//#include "cxViewManager.h"
-//#include "cxStateMachineManager.h"
 #include <map>
 #include <set>
 #include "boost/shared_ptr.hpp"
+#include "cxPluginBase.h"
 
 class QAction;
 class QMenu;
@@ -16,7 +13,6 @@ class QActionGroup;
 
 namespace ssc
 {
-  class ReconstructionWidget;
   class ConsoleWidget;
 }
 
@@ -33,13 +29,14 @@ typedef boost::shared_ptr<class CameraControl> CameraControlPtr;
  * \date Jan 20, 2009
  * \author Janne Beate Bakeng, SINTEF
  * \author Ole Vegard Solberg, SINTEF
+ * \author Christian Askeland, SINTEF
  */
 class MainWindow : public QMainWindow
 {
   Q_OBJECT
 
 public:
-  MainWindow();
+  MainWindow(std::vector<PluginBasePtr> plugins);
   virtual ~MainWindow();
   
   static void initialize();
@@ -191,22 +188,6 @@ private:
   std::map<QString, QActionGroup*> mWidgetGroupsMap; ///< map containing groups
 
   //widgets
-  ssc::ConsoleWidget*                           mConsoleWidget;
-  class RegistrationMethodsWidget*              mRegsitrationMethodsWidget; ///< container widget for all registrations
-  class SegmentationMethodsWidget*              mSegmentationMethodsWidget; ///< container widget for all segmentation methods
-  class VisualizationMethodsWidget*             mVisualizationMethodsWidget; ///< container widget for all visualization methods/filters
-  class CalibrationMethodsWidget*               mCalibrationMethodsWidget; ///< container widget for all calibration methods
-  class BrowserWidget*                          mBrowserWidget; ///< contains tree structure with the images, meshes and tools
-  class NavigationWidget*                       mNavigationWidget; ///< contains settings for navigating
-  class ImagePropertiesWidget*                  mImagePropertiesWidget; ///< display and control of image properties for active image.
-  class ToolPropertiesWidget*                   mToolPropertiesWidget; ///< display and control of tool properties for active tool.
-  class MeshPropertiesWidget*                   mMeshPropertiesWidget; ///< Display and control image properties for active mesh
-  class PointSamplingWidget*                    mPointSamplingWidget;
-  ssc::ReconstructionWidget*                    mReconstructionWidget;
-  class RegistrationHistoryWidget*              mRegistrationHistoryWidget; ///< look back in registration history.
-  class VolumePropertiesWidget*                 mVolumePropertiesWidget;
-  class StatusBar*                              mCustomStatusBar;
-  class FrameTreeWidget*                        mFrameTreeWidget;
   class SecondaryMainWindow*                    mControlPanel;
 
   //Preferences

@@ -8,7 +8,7 @@
 #include <QLineEdit>
 #include "sscEnumConverter.h"
 #include "sscMessageManager.h"
-#include "cxStateMachineManager.h"
+#include "cxStateService.h"
 #include "cxToolManager.h"
 #include "cxSelectionGroupBox.h"
 #include "cxToolListWidget.h"
@@ -31,13 +31,13 @@ ToolConfigureGroupBox::ToolConfigureGroupBox(QWidget* parent) :
   //mConfigFilesComboBox->setMinimumSize(200, 0);
   //mConfigFilesComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-  mApplicationGroupBox = new SelectionGroupBox("Applications", stateManager()->getApplication()->getAllApplicationNames(), true, NULL);
+  mApplicationGroupBox = new SelectionGroupBox("Applications", stateService()->getApplication()->getAllApplicationNames(), true, NULL);
   mApplicationGroupBox->setEnabledButtons(false); //< application application is determined by the application state chosen elsewhere in the system
   mApplicationGroupBox->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding);
   mTrackingSystemGroupBox = new SelectionGroupBox("Tracking systems", ToolManager::getInstance()->getSupportedTrackingSystems(), true, NULL);
   mToolListWidget = new ConfigToolListWidget(NULL);
 
-  this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateManager()->getApplication()->getActiveStateName()));
+  this->setClinicalApplicationSlot(string2enum<ssc::CLINICAL_APPLICATION>(stateService()->getApplication()->getActiveStateName()));
 
   QGroupBox* toolGroupBox = new QGroupBox();
   toolGroupBox->setTitle("Tools");
