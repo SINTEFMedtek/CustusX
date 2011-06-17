@@ -13,15 +13,10 @@ SonowandInifile::SonowandInifile(QString filename, CHECK_TYPE checkType) :
 	mCheckSuccess(true),
 	mModified(false)
 {
-	QString md5file = filename + ".md5";
-	
-	if (mCheckType==CHECK_MD5 && QFileInfo(filename).exists() && QFileInfo(md5file).exists())
+	if (mCheckType == CHECK_MD5)
 	{
-		mCheckSuccess = CheckMD5(fileName().toAscii().constData());
-	}
-	else if (mCheckType == CHECK_MD5)
-	{
-		mCheckSuccess = false;
+		QString md5file = filename + ".md5";
+		mCheckSuccess = !QFile::exists(filename) || !!QFile::exists(md5file) || CheckMD5(fileName().toAscii().constData());
 	}
 }
 
@@ -61,8 +56,10 @@ void SonowandInifile::setValue( const QString & key, const QVariant& value)
 
 void SonowandInifile::writeChecksum()
 {
-	if (mCheckType==CHECK_MD5 && mModified && mCheckSuccess)
+	if (mCheckType == CHECK_MD5 && mModified && mCheckSuccess)
+	{
 		GenerateMD5(fileName().toAscii().constData());
+	}
 }
 
 SonowandUTF8Inifile::SonowandUTF8Inifile(QString filename, CHECK_TYPE checkType) : 
