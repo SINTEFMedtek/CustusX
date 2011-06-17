@@ -11,12 +11,15 @@
 #include "cxToolManager.h"
 #include "cxVideoService.h"
 #include "sscMessageManager.h"
+#include "cxPatientService.h"
+#include "cxPatientData.h"
 
 namespace cx
 {
 
 ServiceController::ServiceController()
 {
+	std::cout << "ServiceController::ServiceController()" << std::endl;
 	// load the ever-present video stream into the patient service
   ssc::dataManager()->loadStream(videoService()->getVideoConnection()->getVideoSource());
 
@@ -24,10 +27,51 @@ ServiceController::ServiceController()
 	connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateVideoConnections()));
 	connect(ssc::toolManager(), SIGNAL(initialized()), this, SLOT(updateVideoConnections()));
   connect(videoService()->getVideoConnection().get(), SIGNAL(connected(bool)), this, SLOT(updateVideoConnections()));
+
+  connect(patientService()->getPatientData().get(), SIGNAL(isSaving()), this, SLOT(duringSavePatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(isLoading()), this, SLOT(duringLoadPatientSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(patientChanged()), this, SLOT(patientChangedSlot()));
+  connect(patientService()->getPatientData().get(), SIGNAL(cleared()), this, SLOT(clearPatientSlot()));
 }
 
 ServiceController::~ServiceController()
 {
+}
+
+void ServiceController::patientChangedSlot()
+{
+	QString patientFolder = patientService()->getPatientData()->getActivePatientFolder();
+
+  QString loggingPath = patientFolder + "/Logs/";
+  QDir loggingDir(loggingPath);
+  if (!loggingDir.exists())
+  {
+    loggingDir.mkpath(loggingPath);
+  }
+  ToolManager::getInstance()->setLoggingFolder(loggingPath);
+  ssc::messageManager()->setLoggingFolder(loggingPath);
+}
+
+void ServiceController::clearPatientSlot()
+{
+  ssc::toolManager()->clear();
+}
+
+void ServiceController::duringSavePatientSlot()
+{
+	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+
+  ssc::toolManager()->addXml(managerNode);
+
+  ssc::toolManager()->savePositionHistory();
+}
+
+void ServiceController::duringLoadPatientSlot()
+{
+	QDomElement managerNode = patientService()->getPatientData()->getCurrentWorkingElement("managers");
+
+  QDomNode toolmanagerNode = managerNode.namedItem("toolManager");
+  ssc::toolManager()->parseXml(toolmanagerNode);
 }
 
 /**Connect a probe from Tracking Service to a video source in Video Service.
@@ -39,7 +83,8 @@ void ServiceController::updateVideoConnections()
 
 	this->connectVideoToProbe(tool);
 
-  ssc::toolManager()->setDominantTool(tool->getUid());
+	if (tool)
+		ssc::toolManager()->setDominantTool(tool->getUid());
 }
 
 /**insert the rt source into the (first) probe tool
@@ -57,7 +102,6 @@ void ServiceController::connectVideoToProbe(ssc::ToolPtr probe)
     return;
  }
 
-//    return;
   // find probe in tool manager
   // set source in cxTool
   // insert timecalibration using config

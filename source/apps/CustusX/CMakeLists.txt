@@ -11,6 +11,12 @@ set(SOURCES cxMain.cpp)
 include_directories(
     .
     ${CustusX3_SOURCE_DIR}/source/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/PluginBase
+    ${CustusX3_SOURCE_DIR}/source/plugins/UsReconstruction/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/Acquisition/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/Calibration/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/Algorithm/gui
+    ${CustusX3_SOURCE_DIR}/source/plugins/Registration/gui
     )
 
 #------------------------------------------------------------------------------
@@ -42,7 +48,14 @@ endif (APPLE)
 #------------------------------------------------------------------------------
 # Linking
 #-----------------------------------------------------------------------------
-target_link_libraries( CustusX gui )
+target_link_libraries( CustusX 
+    cxGui 
+    cxPluginCalibrationGUI 
+    cxPluginAlgorithmGUI 
+    cxPluginRegistrationGUI
+    cxPluginUSReconstructionGUI 
+    cxPluginAcquisitionGUI
+    )
 
 #--------------------------------------------------------------------------------
 # Installer

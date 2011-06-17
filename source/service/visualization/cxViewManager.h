@@ -77,11 +77,6 @@ public:
   void setGlobal2DZoom(bool global); ///< enable/disable global 2d zooming
   bool getGlobal2DZoom(); ///< find out if global 2D zooming is enable
 
-  //Interface for saving/loading
-  void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
-  void parseXml(QDomNode viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
-  void clear();
-
   InteractiveClipperPtr getClipper();
   InteractiveCropperPtr getCropper();
 
@@ -103,9 +98,17 @@ protected slots:
   void setInteractionStyleActionSlot();
   void settingsChangedSlot(QString key);
 
+  void clearSlot();
+	void duringSavePatientSlot();
+	void duringLoadPatientSlot();
+
 protected:
   ViewManager(); ///< create all needed views
   virtual ~ViewManager();
+
+  //Interface for saving/loading
+  void addXml(QDomNode& parentNode); ///< adds xml information about the viewmanager and its variables
+  void parseXml(QDomNode viewmanagerNode);///< Use a XML node to load data. \param viewmanagerNode A XML data representation of the ViewManager
 
   View2DMap* get2DViews(); ///< returns all possible 2D views
   View3DMap* get3DViews(); ///< returns all possible 3D views
