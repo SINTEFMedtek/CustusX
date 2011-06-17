@@ -71,6 +71,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 class uDataDesc;
 class ulterius;
+class cx::Frame;
 
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSource;
 
@@ -84,7 +85,12 @@ public:
 
 class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource
 {
+  Q_OBJECT
 public:
+
+  signals:
+  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is awailable
+
   //static vtkSonixVideoSource *New();
   vtkTypeRevisionMacro(vtkSonixVideoSource,vtkVideoSource);
   void PrintSelf(ostream& os, vtkIndent indent);   
