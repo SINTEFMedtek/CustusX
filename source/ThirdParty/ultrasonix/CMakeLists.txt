@@ -2,10 +2,28 @@
 # Source files
 #
 
+#------------------------------------------------------------------------------
+# Qt - MOC
+#------------------------------------------------------------------------------
+set(${LIBNAME}_MOC_HDRS
+    SonixHelper.h
+)
+
+# After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
+if(APPLE)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
+endif(APPLE)
+
+if(WIN32)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} OPTIONS "-D_WINDOWS")
+endif(WIN32)
+
 SET (Ultrasound_SRCS
   vtkSonixVideoSource.h
   vtkSonixVideoSource.cxx
   vtkUltrasoundWin32Header.h
+  ${${LIBNAME}_MOC_HDRS}
+  ${${LIBNAME}_MOC_SRCS}
 )
 
 #
@@ -21,7 +39,7 @@ SET (Ultrasound_LIBS
 SET (ULTERIUS_ROOT "C:/Ulterius")
 FIND_PATH(ULTERIUS_INCLUDE_DIR "ulterius.h" "${ULTERIUS_ROOT}/inc")
 FIND_LIBRARY(ULTERIUS_LIBRARY ulterius "${ULTERIUS_ROOT}/lib")
-INCLUDE_DIRECTORIES(${ULTERIUS_INCLUDE_DIR})
+INCLUDE_DIRECTORIES(${ULTERIUS_INCLUDE_DIR} ${CustusX3_SOURCE_DIR}/modules/grabberServer)
 SET (Ultrasound_LIBS ${Ultrasound_LIBS} ${ULTERIUS_LIBRARY})
 
 
@@ -30,7 +48,7 @@ SET (Ultrasound_LIBS ${Ultrasound_LIBS} ${ULTERIUS_LIBRARY})
 
 # Create the vtkOpenIGTUltrasound C++ library
 ADD_LIBRARY (vtkOpenIGTUltrasound ${Ultrasound_SRCS})
-TARGET_LINK_LIBRARIES(vtkOpenIGTUltrasound vtkCommon vtkHybrid vtkParallel
+TARGET_LINK_LIBRARIES(vtkOpenIGTUltrasound vtkCommon vtkHybrid vtkParallel GrabberServer
                       ${Ultrasound_LIBS})
 
 # Create the vtkOpenIGTUltrasound Tcl library

@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QMacCocoaViewContainer>
 
+#include "igtlImageMessage.h"
 #include "sscMessageManager.h"
 
 //==============================================================================
@@ -74,9 +75,10 @@
   frame.mTimestamp = ssc::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
   frame.mWidth = width;
   frame.mHeight = height;
-  frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));
+  //frame.mPixelFormat = static_cast<int>(CVPixelBufferGetPixelFormatType(videoFrame));
+  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;
   //ssc::messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
-  frame.mFirstPixel = reinterpret_cast<char*>(CVPixelBufferGetBaseAddress(videoFrame));
+  frame.mFirstPixel = reinterpret_cast<unsigned char*>(CVPixelBufferGetBaseAddress(videoFrame));
   
   mGrabber->sendFrame(frame); //results in a memcpy of the frame
   

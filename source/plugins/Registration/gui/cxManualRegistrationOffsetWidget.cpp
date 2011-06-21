@@ -136,7 +136,7 @@ void ManualRegistrationOffsetWidget::setOffsetSlot(int value)
 
 void ManualRegistrationOffsetWidget::activateManualRegistrationFieldSlot()
 {
-  this->setEnabled(!ssc::similar(*ssc::toolManager()->get_rMpr(), ssc::Transform3D()));
+  this->setEnabled(!ssc::similar(*ssc::toolManager()->get_rMpr(), ssc::Transform3D::Identity()));
 }
 
 
