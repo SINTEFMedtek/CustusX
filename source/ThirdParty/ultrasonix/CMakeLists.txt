@@ -2,6 +2,22 @@
 # Source files
 #
 
+#------------------------------------------------------------------------------
+# Qt - MOC
+#------------------------------------------------------------------------------
+set(${LIBNAME}_MOC_HDRS
+    vtkSonixVideoSource.h
+)
+
+# After this call, cxProject_MOC_SRCS = moc_Class1.cxx moc_Class2.cxx ...
+if(APPLE)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS})
+endif(APPLE)
+
+if(WIN32)
+  QT4_WRAP_CPP(${LIBNAME}_MOC_SRCS ${${LIBNAME}_MOC_HDRS} OPTIONS "-D_WINDOWS")
+endif(WIN32)
+
 SET (Ultrasound_SRCS
   vtkSonixVideoSource.h
   vtkSonixVideoSource.cxx
