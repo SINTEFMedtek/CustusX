@@ -66,7 +66,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkUltrasoundWin32Header.h"
 #include "vtkVideoSource.h"
-#include <QObject>
+#include "SonixHelper.h"
 
 //BTX
 
@@ -222,6 +222,8 @@ protected:
   // For internal use only
   void LocalInternalGrab(void * data, int type, int sz, bool cine, int frmnum);
   
+  SonixHelper *mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
+
 
 private:
  
