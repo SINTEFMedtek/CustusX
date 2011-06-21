@@ -66,13 +66,16 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkUltrasoundWin32Header.h"
 #include "vtkVideoSource.h"
+#include <QObject>
 
 //BTX
 
 class uDataDesc;
 class ulterius;
-class cx::Frame;
-
+namespace cx
+{
+class Frame;
+}
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSource;
 
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSourceCleanup
@@ -89,7 +92,7 @@ class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource
 public:
 
   signals:
-  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is awailable
+  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
   //static vtkSonixVideoSource *New();
   vtkTypeRevisionMacro(vtkSonixVideoSource,vtkVideoSource);
