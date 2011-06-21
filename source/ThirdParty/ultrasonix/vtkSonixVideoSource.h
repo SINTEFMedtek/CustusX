@@ -66,12 +66,16 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkUltrasoundWin32Header.h"
 #include "vtkVideoSource.h"
+#include "SonixHelper.h"
 
 //BTX
 
 class uDataDesc;
 class ulterius;
-
+namespace cx
+{
+class Frame;
+}
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSource;
 
 class VTK_ULTRASOUND_EXPORT vtkSonixVideoSourceCleanup
@@ -82,9 +86,11 @@ public:
 };
 //ETX
 
-class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource
+class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource //, public QObject
 {
+  //Q_OBJECT
 public:
+
   //static vtkSonixVideoSource *New();
   vtkTypeRevisionMacro(vtkSonixVideoSource,vtkVideoSource);
   void PrintSelf(ostream& os, vtkIndent indent);   
@@ -187,6 +193,9 @@ public:
   //Description:
   // Request data method override
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  
+  //signals:
+  //void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
 protected:
   vtkSonixVideoSource();
@@ -213,6 +222,8 @@ protected:
   // For internal use only
   void LocalInternalGrab(void * data, int type, int sz, bool cine, int frmnum);
   
+  SonixHelper *mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
+
 
 private:
  
