@@ -156,6 +156,8 @@ vtkSonixVideoSource::vtkSonixVideoSource()
   this->FrameBufferBitsPerPixel = 8;
   this->FlipFrames = 1;
   this->FrameBufferRowAlignment = 1;  
+
+  this->mSonixHelper = new SonixHelper;
 }
 
 //----------------------------------------------------------------------------
@@ -387,6 +389,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
 //  emit newFrame(frame);
+  this->mSonixHelper->emitFrame(frame);
 
   this->FrameBufferMutex->Unlock();
 }
