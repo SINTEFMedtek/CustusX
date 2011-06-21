@@ -91,9 +91,6 @@ class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource
   Q_OBJECT
 public:
 
-  signals:
-  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
-
   //static vtkSonixVideoSource *New();
   vtkTypeRevisionMacro(vtkSonixVideoSource,vtkVideoSource);
   void PrintSelf(ostream& os, vtkIndent indent);   
@@ -196,6 +193,9 @@ public:
   //Description:
   // Request data method override
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
+  
+  signals:
+  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
 protected:
   vtkSonixVideoSource();
