@@ -22,6 +22,8 @@ SET (Ultrasound_SRCS
   vtkSonixVideoSource.h
   vtkSonixVideoSource.cxx
   vtkUltrasoundWin32Header.h
+  ${${LIBNAME}_MOC_HDRS}
+  ${${LIBNAME}_MOC_SRCS}
 )
 
 #
