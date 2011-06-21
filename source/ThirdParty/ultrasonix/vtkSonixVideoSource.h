@@ -86,9 +86,9 @@ public:
 };
 //ETX
 
-class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource
+class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource //, public QObject
 {
-  Q_OBJECT
+  //Q_OBJECT
 public:
 
   //static vtkSonixVideoSource *New();
@@ -194,8 +194,8 @@ public:
   // Request data method override
   int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   
-  signals:
-  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
+  //signals:
+  //void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
 protected:
   vtkSonixVideoSource();
