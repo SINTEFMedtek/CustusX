@@ -51,6 +51,10 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
+#include "sscTime.h"
+#include "cxGrabber.h"
+#include <igtlImageMessage.h>
+
 // because of warnings in windows header push and pop the warning level
 #ifdef _MSC_VER
 #pragma warning (push, 3)
@@ -152,6 +156,8 @@ vtkSonixVideoSource::vtkSonixVideoSource()
   this->FrameBufferBitsPerPixel = 8;
   this->FlipFrames = 1;
   this->FrameBufferRowAlignment = 1;  
+
+  this->mSonixHelper = new SonixHelper;
 }
 
 //----------------------------------------------------------------------------
@@ -357,13 +363,33 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
 	  {
 	  while (--rows >= 0)
 	    {
-		memcpy(frameBufferPtr,deviceDataPtr,outBytesPerRow);
-		frameBufferPtr += outBytesPerRow;
-		deviceDataPtr += inBytesPerRow;
+	    memcpy(frameBufferPtr,deviceDataPtr,outBytesPerRow);
+	    frameBufferPtr += outBytesPerRow;
+	    deviceDataPtr += inBytesPerRow;
 		}
 	  }
  
   this->Modified();
+
+  //TODO: Move the following into a publishFrame() function
+  //this->publishFrame();
+
+//  boost::shared_ptr<unsigned char> dataPtr(new char[dataSize]);
+//  memcpy(dataPtr, frameBufferPtr, dataSize);
+//  emit newFrame(dataPtr);
+  ////
+
+  Frame frame;
+  frame.mTimestamp = ssc::getMilliSecondsSinceEpoch()/1000; //resmapling the timestamp because we cannot find convert the original timestamp into epoch time
+  frame.mWidth = outBytesPerRow;
+  frame.mHeight = rows;
+  //TODO: Create an enum value that identifies the pixel format
+  // Must also be implementd in cxMacGrabber.mm captureOutput() and the different formats handed by
+  // OpenIGTLinkSender::convertFrame() and by the OpenIGTLink client
+  frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
+  frame.mFirstPixel = frameBufferPtr;
+//  emit newFrame(frame);
+  this->mSonixHelper->emitFrame(frame);
 
   this->FrameBufferMutex->Unlock();
 }

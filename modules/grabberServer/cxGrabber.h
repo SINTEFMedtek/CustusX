@@ -14,7 +14,7 @@ public:
   int mWidth; ///< Width in pixels
   int mHeight; ///< Height in pixels
   int mPixelFormat; ///< Pixel format in OSType (FourCC)
-  char* mFirstPixel; ///< Pointer to first pixel in frame
+  unsigned char* mFirstPixel; ///< Pointer to first pixel in frame
 };
 
 /**

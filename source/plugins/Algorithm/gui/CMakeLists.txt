@@ -60,5 +60,5 @@ include_directories(
 # =========================================================
 # create the target
 add_library( cxPluginAlgorithmGUI ${SOURCE_FILES} )
-target_link_libraries( cxPluginAlgorithmGUI cxPluginAlgorithmLogic )
+target_link_libraries( cxPluginAlgorithmGUI cxPluginAlgorithmLogic cxGui)
 # =========================================================
