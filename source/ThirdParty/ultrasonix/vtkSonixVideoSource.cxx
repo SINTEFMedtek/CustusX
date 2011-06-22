@@ -157,7 +157,8 @@ vtkSonixVideoSource::vtkSonixVideoSource()
   this->FlipFrames = 1;
   this->FrameBufferRowAlignment = 1;  
 
-  this->mSonixHelper = new SonixHelper;
+//  this->mSonixHelper = new SonixHelper;
+  this->mSonixHelper = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -167,6 +168,10 @@ vtkSonixVideoSource::~vtkSonixVideoSource()
   delete this->ult;
 }
 
+void vtkSonixVideoSource::setSonixHelper(SonixHelper* sonixHelper)
+{
+  this->mSonixHelper = sonixHelper;
+}
 
 // Up the reference count so it behaves like New
 vtkSonixVideoSource* vtkSonixVideoSource::New()
@@ -389,7 +394,8 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
 //  emit newFrame(frame);
-  this->mSonixHelper->emitFrame(frame);
+  if (this->mSonixHelper)
+    this->mSonixHelper->emitFrame(frame);
 
   this->FrameBufferMutex->Unlock();
 }
