@@ -21,7 +21,7 @@ public:
   void frame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
 public:
-  void emitFrame(cx::Frame newFrame) {emit frame;};
+  void emitFrame(cx::Frame newFrame) {emit frame(newFrame);};
 };
 
 #endif //SONIXHELPER_H_
