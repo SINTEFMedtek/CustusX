@@ -197,6 +197,8 @@ public:
   //signals:
   //void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
+void setSonixHelper(SonixHelper* sonixHelper);
+
 protected:
   vtkSonixVideoSource();
   ~vtkSonixVideoSource();
