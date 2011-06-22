@@ -3,6 +3,7 @@
 #define CXWINGRABBER_H_
 
 #include "cxGrabber.h"
+#include "SonixHelper.h"
 
 class QMacCocoaViewContainer;
 class NSError;
