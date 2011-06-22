@@ -8,6 +8,9 @@
 #ifndef CXIMAGESENDEROPENCV_H_
 #define CXIMAGESENDEROPENCV_H_
 
+#ifdef USE_OpenCV
+
+
 #include "boost/shared_ptr.hpp"
 #include <QTcpSocket>
 class QTimer;
@@ -48,5 +51,7 @@ private slots:
 };
 
 }
+
+#endif // USE_OpenCV
 
 #endif /* CXIMAGESENDEROPENCV_H_ */

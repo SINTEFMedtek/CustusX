@@ -6,9 +6,18 @@ find_package( Boost REQUIRED )
 
 # openCV
 #----------
-find_package( OpenCV REQUIRED )
+find_package( OpenCV QUIET)
 #INCLUDE(${OpenCV_USE_FILE})
 
+IF( OpenCV_FOUND )
+    option(USE_OpenCV "use OpenCV" ON)
+ELSEIF( OpenCV_FOUND )
+    option(USE_OpenCV "use OpenCV" OFF)
+ENDIF( OpenCV_FOUND )
+
+if (USE_OpenCV)
+  ADD_DEFINITIONS(-DUSE_OpenCV="${USE_OpenCV}")
+endif(USE_OpenCV)
 
 # VTK
 #----------
