@@ -13,7 +13,9 @@ WinGrabberServer::WinGrabberServer(QObject* parent) :
 {
   this->connectGrabber();
   this->connectServer();
-  connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
+  //connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
+  SonixHelper* sonixHelper = reinterpret_cast<WinGrabber>(mGrabber).getSonixHelper();
+  connect(sonixHelper, SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
 }
 
 WinGrabberServer::~WinGrabberServer()

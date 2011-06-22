@@ -37,6 +37,8 @@ public:
   void setIpAdress(QString ipAdress);
   //void printAvailablePixelFormats(); ///< For debugging purposes, displays a list of available pixelformats that effectivly can be delivered.
 
+  SonixHelper* getSonixHelper();
+
 private:
   bool findConnectedDevice(); ///< Searches for connected devices and connects when it finds a supported device. (The last it finds)
   bool openDevice(); ///< Tries to open the selected device for grabbing.
@@ -62,6 +64,8 @@ private:
   int                  mBufferSize; ///< 
   int                  mImagingMode;  ///< 0=B-MODE, 12=RF-MODE
   int                  mAcquisitionDataType;  ///< 0x00000002=udtBPre, 0x00000004=udtBPost
+
+  SonixHelper *mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
 
 };
 typedef boost::shared_ptr<class WinGrabber> WinGrabberPtr;

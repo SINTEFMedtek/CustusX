@@ -18,10 +18,10 @@ class SonixHelper : public QObject
 
 public:
   signals:
-  void newFrame(cx::Frame newFrame); ///< Emitted when a new frame is available
+  void frame(cx::Frame newFrame); ///< Emitted when a new frame is available
 
 public:
-  void emitFrame(cx::Frame newFrame) {emit newFrame;};
+  void emitFrame(cx::Frame newFrame) {emit frame;};
 };
 
 #endif //SONIXHELPER_H_
