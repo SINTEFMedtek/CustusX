@@ -61,7 +61,7 @@ include_directories(
 FIND_LIBRARY(OPENCL_LIBRARIES OpenCL)
 IF( OPENCL_LIBRARIES )
     option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" ON)
-ELSEIF( OPENCL_LIBRARIES )
+ELSE( OPENCL_LIBRARIES )
     option(USE_US_RECONSTRUCTION_THUNDER "use us reconstruction library Thunder" OFF)
 ENDIF( OPENCL_LIBRARIES )
             
