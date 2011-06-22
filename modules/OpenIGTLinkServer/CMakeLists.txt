@@ -6,12 +6,15 @@ find_package( Boost REQUIRED )
 
 # openCV
 #----------
-find_package( OpenCV QUIET)
-#INCLUDE(${OpenCV_USE_FILE})
+if (USE_OpenCV)
+    find_package( OpenCV REQUIRED)
+else (USE_OpenCV)
+    find_package( OpenCV QUIET)
+endif (USE_OpenCV)
 
 IF( OpenCV_FOUND )
     option(USE_OpenCV "use OpenCV" ON)
-ELSEIF( OpenCV_FOUND )
+ELSE( OpenCV_FOUND )
     option(USE_OpenCV "use OpenCV" OFF)
 ENDIF( OpenCV_FOUND )
 
