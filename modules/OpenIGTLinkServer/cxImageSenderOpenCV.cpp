@@ -8,6 +8,7 @@
 #include "cxImageSenderOpenCV.h"
 
 #include <QTimer>
+#include <QTime>
 #include <QHostAddress>
 #include "igtlOSUtil.h"
 #include "igtlImageMessage.h"
@@ -103,12 +104,14 @@ void ImageSenderOpenCV::dumpProperty(int val, QString name)
 void ImageSenderOpenCV::tick()
 {
 //  std::cout << "tick" << std::endl;
+//  QTime start = QTime::currentTime();
   igtl::ImageMessage::Pointer imgMsg = this->getImageMessage();
 
   //------------------------------------------------------------
   // Pack (serialize) and send
   imgMsg->Pack();
   mSocket->write(reinterpret_cast<const char*>(imgMsg->GetPackPointer()), imgMsg->GetPackSize());
+//  std::cout << "tick " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 }
 
 igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
@@ -116,10 +119,13 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   if (!mVideoCapture.isOpened())
     return igtl::ImageMessage::Pointer();
 
+//  QTime start = QTime::currentTime();
+
   cv::Mat frame;
   mVideoCapture >> frame;
-  std::cout << "HW=("<< frame.rows << "," << frame.cols << ")" << std::endl;
-  std::cout << "Ch,D=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
+//  std::cout << "grab " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+
+//  std::cout << "WH=("<< frame.cols << "," << frame.rows << ")" << ", Channels,Depth=("<< frame.channels() << "," << frame.depth() << ")" << std::endl;
 
   if (!frame.isContinuous())
   {
@@ -139,7 +145,7 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   if (frame.channels()==3 || frame.channels()==4)
   {
       scalarType = igtl::ImageMessage::TYPE_UINT32;// scalar type
-      std::cout << "creating uint32" << std::endl;
+//      std::cout << "creating uint32" << std::endl;
   }
   else if (frame.channels()==1)
   {
@@ -170,25 +176,44 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   imgMsg->AllocateScalars();
 
   unsigned char* destPtr = reinterpret_cast<unsigned char*>(imgMsg->GetScalarPointer());
+  uchar* src = frame.data;
+//  std::cout << "pre copy " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
+  int N = size[0]*size[1];
 
   if (frame.channels()>=3)
   {
-    cv::MatConstIterator_<cv::Vec3b> src = frame.begin<cv::Vec3b>();
-
-    for (; src!=frame.end<cv::Vec3b>(); ++src)
+    for (int i=0; i<N; ++i)
     {
-      // get data in BGR --- ??
-      *destPtr++ = 255;
-      *destPtr++ = (*src)[2];
-      *destPtr++ = (*src)[1];
-      *destPtr++ = (*src)[0];
+        *destPtr++ = 255;
+        *destPtr++ = src[2];
+        *destPtr++ = src[1];
+        *destPtr++ = src[0];
+        src+=3;
     }
+
+
+//    cv::MatConstIterator_<cv::Vec3b> src = frame.begin<cv::Vec3b>();
+//
+//    for (; src!=frame.end<cv::Vec3b>(); ++src)
+//    {
+//      // get data in BGR --- ??
+//      *destPtr++ = 255;
+//      *destPtr++ = (*src)[2];
+//      *destPtr++ = (*src)[1];
+//      *destPtr++ = (*src)[0];
+//    }
   }
+//  std::cout << "post copy " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
   if (frame.channels()==1)
   { // BW camera
-    cv::MatConstIterator_<unsigned char> src = frame.begin<unsigned char>();
-    for (; src!=frame.end<unsigned char>(); ++src)
-      *destPtr++ = *src;
+    for (int i=0; i<N; ++i)
+    {
+        *destPtr++ = *src++;
+    }
+
+//    cv::MatConstIterator_<unsigned char> src = frame.begin<unsigned char>();
+//    for (; src!=frame.end<unsigned char>(); ++src)
+//      *destPtr++ = *src;
   }
 
 
@@ -198,6 +223,8 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
   igtl::Matrix4x4 matrix;
   GetRandomTestMatrix(matrix);
   imgMsg->SetMatrix(matrix);
+
+//  std::cout << "grab+process " << start.msecsTo(QTime::currentTime()) << " ms" << std::endl;
 
   return imgMsg;
 }
