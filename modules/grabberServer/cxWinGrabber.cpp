@@ -136,6 +136,10 @@ WinGrabber::WinGrabber() :
   mSonixGrabber->SetAcquisitionDataType(mAcquisitionDataType);
   mSonixGrabber->SetFrameBufferSize(mBufferSize);  // Number of image frames in buffer
   mSonixGrabber->Initialize(); // Run initialize to set spacing and offset
+
+
+  this->mSonixHelper = new SonixHelper;
+  mSonixGrabber->setSonixHelper(this->mSonixHelper);
 }
 
 WinGrabber::~WinGrabber()
@@ -144,6 +148,11 @@ WinGrabber::~WinGrabber()
 
   mSonixGrabber->ReleaseSystemResources();
   mSonixGrabber->Delete();
+}
+
+SonixHelper* WinGrabber::getSonixHelper()
+{
+  return this->mSonixHelper;
 }
 
 void WinGrabber::start()
