@@ -7,6 +7,8 @@
 
 #include "cxImageSenderOpenCV.h"
 
+#ifdef USE_OpenCV
+
 #include <QTimer>
 #include <QTime>
 #include <QHostAddress>
@@ -234,3 +236,6 @@ igtl::ImageMessage::Pointer ImageSenderOpenCV::getImageMessage()
 //------------------------------------------------------------
 
 }
+
+#endif // USE_OpenCV
+

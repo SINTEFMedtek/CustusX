@@ -55,9 +55,11 @@ void ImageSession::run()
   mSocket->setSocketDescriptor(mSocketDescriptor);
   QString clientName = mSocket->localAddress().toString();
   std::cout << "Connected to " << clientName.toStdString() << ". Session started." << std::endl;
-//  ImageSender* sender = new ImageSender(mSocket, mImageFileDir);
+#ifdef USE_OpenCV
   ImageSenderOpenCV* sender = new ImageSenderOpenCV(mSocket, mImageFileDir);
-
+#else
+  ImageSender* sender = new ImageSender(mSocket, mImageFileDir);
+#endif
   // socket should now be connected....?
 
   this->exec();
