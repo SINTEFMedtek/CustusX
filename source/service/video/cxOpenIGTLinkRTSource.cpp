@@ -319,11 +319,12 @@ void OpenIGTLinkRTSource::updateImageImportFromIGTMessage(igtl::ImageMessage::Po
     mImageImport->SetDataScalarTypeToShort();
     break;
   case igtl::ImageMessage::TYPE_UINT16:
-    //std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
+//    std::cout << "SetDataScalarTypeToUnsignedShort." << std::endl;
     mImageImport->SetDataScalarTypeToUnsignedShort();
     break;
   case igtl::ImageMessage::TYPE_INT32:
   case igtl::ImageMessage::TYPE_UINT32:
+//    std::cout << "SetDataScalarTypeTo4channel." << std::endl;
     // assume RGBA unsigned colors
     mImageImport->SetNumberOfScalarComponents(4);
 //    mImageImport->SetDataScalarTypeToInt();
