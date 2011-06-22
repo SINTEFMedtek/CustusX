@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 2.6)
 #----------
 find_package( Boost REQUIRED )
 
+# openCV
+#----------
+find_package( OpenCV REQUIRED )
+#INCLUDE(${OpenCV_USE_FILE})
+
 
 # VTK
 #----------
@@ -35,21 +40,30 @@ SET ( LINK_LIBRARIES
 SET( CX_QT_MOC_HEADER_FILES
     cxImageServer.h
     cxImageSession.h
+    cxImageSenderFile.h
+    cxImageSenderOpenCV.h
 )
 
 include_directories(${Boost_INCLUDE_DIRS})
+#link_directories(${Boost_INCLUDE_DIRS})
 
 SET ( cxOpenIGTLinkServer_FILES
     cxImageServer.h
     cxImageServer.cpp
     cxImageSession.h
     cxImageSession.cpp 
+    cxImageSenderFile.h
+    cxImageSenderFile.cpp
+    cxImageSenderOpenCV.h
+    cxImageSenderOpenCV.cpp
 )
 
 QT4_WRAP_CPP( MOC_HEADER_FILES ${CX_QT_MOC_HEADER_FILES} )
 
 add_executable( cxOpenIGTLinkServer main.cpp ${cxOpenIGTLinkServer_FILES} ${MOC_HEADER_FILES} )
-target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}     vtkIO 
+target_link_libraries(cxOpenIGTLinkServer  ${LINK_LIBRARIES}     
+    ${OpenCV_LIBS}
+    vtkIO 
     vtkRendering 
     vtkImaging 
     vtkCommon 
