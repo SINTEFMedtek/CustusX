@@ -5,6 +5,8 @@
 #include <QObject>
 #include "cxGrabber.h"
 
+typedef cx::Frame Frame;
+
 /**
  * \class SonixHelper
  * \brief Support Qt support for vtkSonixVideoSource
@@ -18,10 +20,10 @@ class SonixHelper : public QObject
 
 public:
   signals:
-  void frame(cx::Frame newFrame); ///< Emitted when a new frame is available
+  void frame(Frame& newFrame); ///< Emitted when a new frame is available
 
 public:
-  void emitFrame(cx::Frame newFrame) {emit frame(newFrame);};
+  void emitFrame(Frame& newFrame) {emit frame(newFrame);};
 };
 
 #endif //SONIXHELPER_H_
