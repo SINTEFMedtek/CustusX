@@ -140,6 +140,7 @@ WinGrabber::WinGrabber() :
 
   this->mSonixHelper = new SonixHelper;
   mSonixGrabber->setSonixHelper(this->mSonixHelper);
+  connect(mSonixHelper, SIGNAL(frame(Frame&)), this, SIGNAL(frame(Frame&)), Qt::DirectConnection);
 }
 
 WinGrabber::~WinGrabber()
