@@ -58,8 +58,10 @@ POSSIBILITY OF SUCH DAMAGE.
 // .SECTION See Also
 // vtkWin32VideoSource vtkMILVideoSource
 
-
-
+/**************************************************************************************
+ Some modifications to this code have been performed by SINTEF (Ole Vegard Solberg)
+ in order to make it function for our purposes
+***************************************************************************************/
 
 #ifndef __vtkSonixVideoSource_h
 #define __vtkSonixVideoSource_h
@@ -85,6 +87,7 @@ public:
   ~vtkSonixVideoSourceCleanup();
 };
 //ETX
+
 
 class VTK_EXPORT vtkSonixVideoSource : public vtkVideoSource //, public QObject
 {
