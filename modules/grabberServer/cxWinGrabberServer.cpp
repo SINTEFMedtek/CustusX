@@ -13,6 +13,7 @@ WinGrabberServer::WinGrabberServer(QObject* parent) :
 {
   this->connectGrabber();
   this->connectServer();
+  connect(mGrabber.get(), SIGNAL(frame(Frame&)), mServer.get(), SIGNAL(frame(Frame&)), Qt::DirectConnection);
 }
 
 WinGrabberServer::~WinGrabberServer()
