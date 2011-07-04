@@ -173,6 +173,7 @@ void StateService::fillDefaultSettings()
   this->fillDefault("autoLandmarkRegistration", true);
   this->fillDefault("View3D/stereoType", stINTERLACED);
   this->fillDefault("View3D/eyeAngle", 4.0);
+  this->fillDefault("View/showDataText", true);
 }
 
 void StateService::initialize()
