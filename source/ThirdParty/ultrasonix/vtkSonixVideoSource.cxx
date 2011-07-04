@@ -497,7 +497,7 @@ void vtkSonixVideoSource::Initialize()
 
 
   // 6) set parameters, currently: frequency, frame rate, depth
-  if (!this->ult->setParamValue(VARID_FREQ, Frequency))
+  /*if (!this->ult->setParamValue(VARID_FREQ, Frequency))
     {
 	char *err = new char[256];  
 	int sz = 256;
@@ -525,7 +525,7 @@ void vtkSonixVideoSource::Initialize()
     vtkErrorMacro(<< "Initialize: couldn't set desired depth (" << err << ")");
     this->ReleaseSystemResources();
     return;
-    }
+    }*/
 
   // 7) set callback for receiving new frames
   this->ult->setCallback(vtkSonixVideoSourceNewFrameCallback);
