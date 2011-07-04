@@ -28,6 +28,7 @@
 #include "sscGeometricRep2D.h"
 #include "sscTexture3DSlicerRep.h"
 #include "cxDataLocations.h"
+#include "cxSettings.h"
 
 namespace cx
 {
@@ -44,6 +45,7 @@ ViewWrapper2D::ViewWrapper2D(ssc::View* view) :
   mView->getRenderer()->GetActiveCamera()->SetParallelProjection(true);
   double clipDepth = 1.0; // 1mm depth, i.e. all 3D props rendered outside this range is not shown.
   mView->getRenderer()->GetActiveCamera()->SetClippingRange(-clipDepth/2.0, clipDepth/2.0);
+  connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
   addReps();
 
@@ -163,6 +165,18 @@ void ViewWrapper2D::addReps()
   mToolRep2D->setUseCrosshair(true);
 //  mToolRep2D->setUseToolLine(false);
   mView->addRep(mToolRep2D);
+}
+
+void ViewWrapper2D::settingsChangedSlot(QString key)
+{
+	if (key=="View/showDataText")
+	{
+	  this->updateView();
+	}
+	if (key=="View/showOrientationAnnotation")
+	{
+	  this->updateView();
+	}
 }
 
 #ifdef USE_2D_GPU_RENDER
@@ -382,28 +396,36 @@ void ViewWrapper2D::updateView()
     mSliceProxy->setDefaultCenter(c);
   }
 
-  QStringList text;
+  QString text;
   // slice rep
 #ifdef USE_2D_GPU_RENDER
   this->resetMultiSlicer();
 //  mMultiSliceRep->setImages(images);
 
-  text = this->getAllDataNames();
-  mDataNameText->setText(0, text.join("\n"));
+  text = this->getAllDataNames().join("\n");
+//  mDataNameText->setText(0, text.join("\n"));
 #else
+  QString textList;
   mSliceRep->setImage(image);
 
   // list all meshes and one image.
   std::vector<ssc::MeshPtr> mesh = mViewGroup->getMeshes();
   for (unsigned i = 0; i < mesh.size(); ++i)
-    text << qstring_cast(mesh[i]->getName());
+  	textList << qstring_cast(mesh[i]->getName());
   if (image)
-    text << image->getName();
+  	textList << image->getName();
+  text = textList.join("\n");
 #endif
 
+  bool show = settings()->value("View/showDataText").value<bool>();
+  if (!show)
+  	text = QString();
+
   //update data name text rep
-  mDataNameText->setText(0, text.join("\n"));
+  mDataNameText->setText(0, text);
   mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
+
+  mOrientationAnnotationRep->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }
 
 void ViewWrapper2D::imageRemoved(const QString& uid)
