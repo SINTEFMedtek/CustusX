@@ -145,7 +145,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
 
   mAnnotationMarker = ssc::OrientationAnnotation3DRep::New("annotation_"+mView->getName(), "");
   mView->addRep(mAnnotationMarker);
-  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
+//  mAnnotationMarker->setVisible(settings()->value("View3D/showOrientationAnnotation").toBool());
 
   //Stereo
 //  mView->getRenderWindow()->StereoCapableWindowOn(); // Moved to cxView3D
@@ -154,6 +154,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   this->setStereoType(settings()->value("View3D/stereoType").toInt());
   this->setStereoEyeAngle(settings()->value("View3D/eyeAngle").toDouble());
 
+  this->updateView();
 }
 
 ViewWrapper3D::~ViewWrapper3D()
@@ -180,6 +181,10 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	  	this->imageRemoved(images[i]->getUid());
 	  	this->imageAdded(images[i]);
 	  }
+	}
+	if (key=="View/showDataText")
+	{
+	  this->updateView();
 	}
 }
 
@@ -367,8 +372,9 @@ void ViewWrapper3D::showManualToolSlot(bool visible)
 
 void ViewWrapper3D::showOrientationSlot(bool visible)
 {
-  settings()->setValue("View3D/showOrientationAnnotation", visible);
-  mAnnotationMarker->setVisible(visible);
+  settings()->setValue("View/showOrientationAnnotation", visible);
+//  mAnnotationMarker->setVisible(visible);
+  this->updateView();
 }
 
 
@@ -420,9 +426,16 @@ void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
 
 void ViewWrapper3D::updateView()
 {
-  QStringList text = this->getAllDataNames();
-  mDataNameText->setText(0, text.join("\n"));
+  QString text;
+  bool show = settings()->value("View/showDataText").value<bool>();
+
+//  QStringList text = this->getAllDataNames();
+  if (show)
+  	text = this->getAllDataNames().join("\n");
+  mDataNameText->setText(0, text);
   mDataNameText->setFontSize(std::max(12, 22-2*text.size()));
+
+  mAnnotationMarker->setVisible(settings()->value("View/showOrientationAnnotation").value<bool>());
 }
 
 

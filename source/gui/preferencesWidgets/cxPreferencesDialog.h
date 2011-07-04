@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "sscDoubleDataAdapterXml.h"
+#include "sscBoolDataAdapterXml.h"
 
 class QTabWidget;
 class QToolBox;
@@ -131,6 +132,7 @@ signals:
 protected:
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mSphereRadius;
+  ssc::BoolDataAdapterXmlPtr mShowDataText;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;
