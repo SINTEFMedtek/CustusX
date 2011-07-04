@@ -385,6 +385,15 @@ DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READE
 
 void DataManagerImpl::loadData(DataPtr data)
 {
+	if (data->getUid().contains('%'))
+	{
+		QString uid = data->getUid();
+		QString name = data->getName();
+	  this->generateUidAndName(&uid, &name);
+	  data->setName(name);
+	  data->setUid(uid);
+	}
+
   if (data)
   {
     this->verifyParentFrame(data);

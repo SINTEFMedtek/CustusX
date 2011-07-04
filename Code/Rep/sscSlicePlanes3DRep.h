@@ -53,6 +53,8 @@ public:
 	void setDrawPlanes(bool on);
 	bool getDrawPlanes() const;
 	PropertiesType& getProperties() { return mProperties; } // use this to set properties BEFORE attaching reps/calling setviewportdata()
+
+	void connectTo3D(bool on);
 		
 signals:
 	void changed();
@@ -61,6 +63,7 @@ private:
 	bool mVisible;
   bool mDrawPlane; ///< turn opaque plane drawing on/off
 	DataMap mData;
+	bool mConnectedTo3D;
 //	std::vector<Vector3D> mColors;
 };
 typedef boost::shared_ptr<class SlicePlanesProxy> SlicePlanesProxyPtr;

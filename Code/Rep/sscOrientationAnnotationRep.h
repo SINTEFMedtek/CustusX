@@ -18,6 +18,7 @@ public:
 	virtual QString getType() const { return "vm::OrientationAnnotationRep"; };
 	
 	void setPlaneType( PLANE_TYPE type);
+	void setVisible(bool visible);
 private slots:
   void clinicalApplicationChangedSlot();
 protected:
@@ -36,10 +37,10 @@ protected:
 	QString mSouthAnnotation;
 	QString mEastAnnotation;
 	QString mWestAnnotation;
-	ssc::TextDisplayPtr mNorth;
-	ssc::TextDisplayPtr mSouth;
-	ssc::TextDisplayPtr mWest;
-	ssc::TextDisplayPtr mEast;
+//	ssc::TextDisplayPtr mNorth;
+//	ssc::TextDisplayPtr mSouth;
+//	ssc::TextDisplayPtr mWest;
+//	ssc::TextDisplayPtr mEast;
 };
 
 

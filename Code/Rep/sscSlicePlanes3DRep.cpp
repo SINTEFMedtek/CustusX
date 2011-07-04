@@ -16,6 +16,7 @@ namespace ssc
 
 SlicePlanesProxy::SlicePlanesProxy()
 {
+	mConnectedTo3D = false;
   mVisible = true;
   mDrawPlane = false;
 
@@ -49,6 +50,11 @@ SlicePlanesProxy::SlicePlanesProxy()
 //  mProperties.mDrawPlane = false;
 }
 
+void SlicePlanesProxy::connectTo3D(bool on)
+{
+	mConnectedTo3D = on;
+}
+
 void SlicePlanesProxy::clearViewports()
 {
   mData.clear();
@@ -62,7 +68,7 @@ void SlicePlanesProxy::setVisible(bool visible)
 
 bool SlicePlanesProxy::getVisible() const
 {
-  return mVisible;
+  return mVisible && mConnectedTo3D;
 }
 
 void SlicePlanesProxy::setDrawPlanes(bool on)
@@ -127,6 +133,8 @@ SlicePlanes3DRep::SlicePlanes3DRep(const QString& uid, const QString& name) :
 
 SlicePlanes3DRep::~SlicePlanes3DRep()
 {
+	if (mProxy)
+		mProxy->connectTo3D(false);
 }
 
 void SlicePlanes3DRep::addRepActorsToViewRenderer(ssc::View* view)
@@ -255,6 +263,7 @@ void SlicePlanes3DRep::changedSlot()
 void SlicePlanes3DRep::setProxy(SlicePlanesProxyPtr proxy)
 {
 	mProxy = proxy;
+	mProxy->connectTo3D(true);
 	connect(mProxy.get(), SIGNAL(changed()), this, SLOT(changedSlot()));	
 	changedSlot();
 }
@@ -289,6 +298,7 @@ void SlicePlanes3DMarkerIn2DRep::addRepActorsToViewRenderer(ssc::View* view)
 	mText->setPosition(baseData.mPointPos_normvp);
 	mText->getActor()->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
 	view->getRenderer()->AddActor2D(mText->getActor());
+	this->changedSlot();
 }
 
 void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::View* view)
@@ -300,7 +310,11 @@ void SlicePlanes3DMarkerIn2DRep::removeRepActorsFromViewRenderer(ssc::View* view
 void SlicePlanes3DMarkerIn2DRep::changedSlot()
 {
   if (mText)
-    mText->getActor()->SetVisibility(mProxy->getVisible());
+  {
+    mText->getActor()->SetVisibility(mProxy->getVisible() && mProxy->getData().count(mType));
+//    std::cout << "SlicePlanes3DMarkerIn2DRep::changedSlot() " << this << " " << mProxy.get() << " - " << mProxy->getVisible() << " " << mProxy->getData().count(mType) << std::endl;
+  }
+
 }
 
 void SlicePlanes3DMarkerIn2DRep::setProxy(PLANE_TYPE type, SlicePlanesProxyPtr proxy)

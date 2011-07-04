@@ -58,6 +58,12 @@ OrientationAnnotationRep::~OrientationAnnotationRep()
 
 }
 
+void OrientationAnnotationRep::setVisible(bool visible)
+{
+	mOrientation->SetVisibility(visible);
+}
+
+
 void OrientationAnnotationRep::clinicalApplicationChangedSlot()
 {
   this->setPlaneType(mPlane);
