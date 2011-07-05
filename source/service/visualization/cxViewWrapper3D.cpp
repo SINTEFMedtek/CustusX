@@ -41,6 +41,8 @@
 #include "cxCameraControl.h"
 #include "cxImageLandmarkRep.h"
 #include "cxPatientLandmarkRep.h"
+#include "cxPointMetricRep.h"
+#include "cxDistanceMetricRep.h"
 
 
 namespace cx
@@ -178,8 +180,8 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	  std::vector<ssc::ImagePtr> images = mViewGroup->getImages();
 	  for (unsigned i=0; i<images.size(); ++i)
 	  {
-	  	this->imageRemoved(images[i]->getUid());
-	  	this->imageAdded(images[i]);
+	  	this->dataRemoved(images[i]->getUid());
+	  	this->dataAdded(images[i]);
 	  }
 	}
 	if (key=="View/showDataText")
@@ -408,21 +410,80 @@ void ViewWrapper3D::fillSlicePlanesActionSlot(bool checked)
   mSlicePlanes3DRep->getProxy()->setDrawPlanes(checked);
 }
 
-void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
-{
-  if (!mVolumetricReps.count(image->getUid()))
-  {
-    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
+//void ViewWrapper3D::imageAdded(ssc::ImagePtr image)
+//{
+//  if (!mVolumetricReps.count(image->getUid()))
+//  {
+//    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(image);
+//
+//    mVolumetricReps[image->getUid()] = rep;
+//    mView->addRep(rep);
+//  }
+//
+//  this->activeImageChangedSlot();
+//
+//  updateView();
+//
+//}
 
-    mVolumetricReps[image->getUid()] = rep;
+void ViewWrapper3D::dataAdded(ssc::DataPtr data)
+{
+  if (!mDataReps.count(data->getUid()))
+  {
+    ssc::RepPtr rep = this->createDataRep3D(data);
+    mDataReps[data->getUid()] = rep;
     mView->addRep(rep);
   }
 
   this->activeImageChangedSlot();
-
-  updateView();
-
+  this->updateView();
 }
+
+void ViewWrapper3D::dataRemoved(const QString& uid)
+{
+  if (!mDataReps.count(uid))
+    return;
+
+  mView->removeRep(mDataReps[uid]);
+  mDataReps.erase(uid);
+
+  this->activeImageChangedSlot();
+  this->updateView();
+}
+
+
+/**Construct a 3D standard rep for a given data.
+ *
+ */
+ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
+{
+  if (boost::shared_dynamic_cast<ssc::Image>(data))
+  {
+    ssc::VolumetricRepPtr rep = RepManager::getInstance()->getVolumetricRep(boost::shared_dynamic_cast<ssc::Image>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+  {
+    ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom3D_rep");
+    rep->setMesh(boost::shared_dynamic_cast<ssc::Mesh>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<PointMetric>(data))
+  {
+    PointMetricRepPtr rep = PointMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<DistanceMetric>(data))
+  {
+  	DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
+    return rep;
+  }
+
+  return ssc::RepPtr();
+}
+
 
 void ViewWrapper3D::updateView()
 {
@@ -439,19 +500,19 @@ void ViewWrapper3D::updateView()
 }
 
 
-void ViewWrapper3D::imageRemoved(const QString& uid)
-{
-  if (!mVolumetricReps.count(uid))
-    return;
-
-  //ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
-  mView->removeRep(mVolumetricReps[uid]);
-  mVolumetricReps.erase(uid);
-
-  this->activeImageChangedSlot();
-
-  this->updateView();
-}
+//void ViewWrapper3D::imageRemoved(const QString& uid)
+//{
+//  if (!mVolumetricReps.count(uid))
+//    return;
+//
+//  //ssc::messageManager()->sendDebug("Remove image from view group 3d: "+uid);
+//  mView->removeRep(mVolumetricReps[uid]);
+//  mVolumetricReps.erase(uid);
+//
+//  this->activeImageChangedSlot();
+//
+//  this->updateView();
+//}
 
 void ViewWrapper3D::activeImageChangedSlot()
 {
@@ -484,26 +545,26 @@ void ViewWrapper3D::showRefToolSlot(bool checked)
     mView->removeRep(refRep);
 }
 
-void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
-{
-  ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom_rep");
-  rep->setMesh(data);
-  mGeometricReps[data->getUid()] = rep;
-  mView->addRep(rep);
-  this->updateView();
+//void ViewWrapper3D::meshAdded(ssc::MeshPtr data)
+//{
+//  ssc::GeometricRepPtr rep = ssc::GeometricRep::New(data->getUid()+"_geom_rep");
+//  rep->setMesh(data);
+//  mGeometricReps[data->getUid()] = rep;
+//  mView->addRep(rep);
+//  this->updateView();
+//
+//}
 
-}
-
-void ViewWrapper3D::meshRemoved(const QString& uid)
-{
-  if (!mGeometricReps.count(uid))
-    return;
-
-  mView->removeRep(mGeometricReps[uid]);
-  mGeometricReps.erase(uid);
-  this->updateView();
-}
-  
+//void ViewWrapper3D::meshRemoved(const QString& uid)
+//{
+//  if (!mGeometricReps.count(uid))
+//    return;
+//
+//  mView->removeRep(mGeometricReps[uid]);
+//  mGeometricReps.erase(uid);
+//  this->updateView();
+//}
+//
 ssc::View* ViewWrapper3D::getView()
 {
   return mView;

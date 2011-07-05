@@ -97,18 +97,24 @@ private:
   void showPointPickerProbe(bool on);
   void setOrientationAnnotation();
 
-  virtual void imageAdded(ssc::ImagePtr image);
-  virtual void meshAdded(ssc::MeshPtr mesh);
-  virtual void imageRemoved(const QString& uid);
-  virtual void meshRemoved(const QString& uid);
+  ssc::RepPtr createDataRep3D(ssc::DataPtr data);
+  virtual void dataAdded(ssc::DataPtr data);
+  virtual void dataRemoved(const QString& uid);
 
-  typedef  std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
-  typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
-  VolumetricRepMap mVolumetricReps;
+//  virtual void imageAdded(ssc::ImagePtr image);
+//  virtual void meshAdded(ssc::MeshPtr mesh);
+//  virtual void imageRemoved(const QString& uid);
+//  virtual void meshRemoved(const QString& uid);
+
+  typedef  std::map<QString, ssc::RepPtr> RepMap;
+//  typedef  std::map<QString, ssc::VolumetricRepPtr> VolumetricRepMap;
+//  typedef  std::map<QString, ssc::GeometricRepPtr> GeometricRepMap;
+  RepMap mDataReps;
+//  VolumetricRepMap mVolumetricReps;
   ImageLandmarkRepPtr mImageLandmarkRep;
   PatientLandmarkRepPtr mPatientLandmarkRep;
   ssc::ProbeRepPtr mProbeRep;
-  GeometricRepMap mGeometricReps;
+//  GeometricRepMap mGeometricReps;
   ssc::DisplayTextRepPtr mPlaneTypeText;
   ssc::DisplayTextRepPtr mDataNameText;
   std::map<QString, ToolAxisConnectorPtr> mToolAxis;

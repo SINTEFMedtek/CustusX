@@ -144,18 +144,21 @@ void ViewWrapper::setViewGroup(ViewGroupDataPtr group)
 
 void ViewWrapper::dataAddedSlot(QString uid)
 {
-  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
-  if (image)
-    this->imageAdded(image);
-  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(uid);
-  if (mesh)
-    this->meshAdded(mesh);
+//  ssc::ImagePtr image = ssc::dataManager()->getImage(uid);
+//  if (image)
+//    this->imageAdded(image);
+//  ssc::MeshPtr mesh = ssc::dataManager()->getMesh(uid);
+//  if (mesh)
+//    this->meshAdded(mesh);
+
+  this->dataAdded(ssc::dataManager()->getData(uid));
 }
 
 void ViewWrapper::dataRemovedSlot(QString uid)
 {
-  this->imageRemoved(uid);
-  this->meshRemoved(uid);
+  this->dataRemoved(uid);
+//  this->imageRemoved(uid);
+//  this->meshRemoved(uid);
 }
 
 void ViewWrapper::contextMenuSlot(const QPoint& point)
@@ -201,7 +204,7 @@ void ViewWrapper::addDataAction(QString uid, QMenu* contextMenu)
 
   if (boost::shared_dynamic_cast<ssc::Image>(data))
     action->setIcon(QIcon(":/icons/volume.png"));
-  else
+  else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
     action->setIcon(QIcon(":/icons/surface.png"));
 
 //  std::cout << "base " << mLastDataActionUid << "  " << uid << std::endl;

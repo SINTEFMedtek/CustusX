@@ -20,6 +20,7 @@ typedef boost::shared_ptr<class DistanceMetric> DistanceMetricPtr;
  */
 class DistanceMetric : public ssc::Data
 {
+	Q_OBJECT
 public:
 	DistanceMetric(const QString& uid, const QString& name);
 	virtual ~DistanceMetric();

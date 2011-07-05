@@ -114,10 +114,13 @@ protected slots:
   void dataRemovedSlot(QString uid);
 
 protected:
-  virtual void imageAdded(ssc::ImagePtr image) = 0;
-  virtual void meshAdded(ssc::MeshPtr mesh) = 0;
-  virtual void imageRemoved(const QString& uid) = 0;
-  virtual void meshRemoved(const QString& uid) = 0;
+//  virtual void imageAdded(ssc::ImagePtr image) = 0;
+//  virtual void meshAdded(ssc::MeshPtr mesh) = 0;
+//  virtual void imageRemoved(const QString& uid) = 0;
+//  virtual void meshRemoved(const QString& uid) = 0;
+
+  virtual void dataAdded(ssc::DataPtr data) = 0;
+  virtual void dataRemoved(const QString& uid) = 0;
 
   void connectContextMenu(ssc::View* view);
   virtual void appendToContextMenu(QMenu& contextMenu) = 0;
