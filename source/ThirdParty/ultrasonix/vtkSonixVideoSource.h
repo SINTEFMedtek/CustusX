@@ -229,6 +229,9 @@ protected:
   
   SonixHelper *mSonixHelper; ///< Support Qt functionality to vtkSonixVideoSource
 
+  int lastFrameNum;
+  int totalMissedFrames;
+
 
 private:
  
