@@ -14,6 +14,10 @@ SET( CX_QT_MOC_HEADER_FILES
 )
 
 SET ( cxPatientService_SOURCE
+    cxPointMetric.h
+    cxPointMetric.cpp
+    cxDistanceMetric.h
+    cxDistanceMetric.cpp
 	cxDataManager.h
 	cxDataManager.cpp
 	cxPresetTransferFunctions3D.h
