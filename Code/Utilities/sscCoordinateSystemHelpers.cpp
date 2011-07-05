@@ -4,9 +4,61 @@
 #include "sscMessageManager.h"
 #include "sscDataManager.h"
 #include "sscData.h"
+#include "sscDefinitionStrings.h"
 
 namespace ssc
 {
+
+QString CoordinateSystem::toString() const
+{
+	return enum2string(mId) + "/" + mRefObject;
+}
+
+CoordinateSystem CoordinateSystem::fromString(QString text)
+{
+	QStringList raw = text.split("/");
+	CoordinateSystem retval;
+	if (raw.size()<2)
+		return retval;
+	retval.mId = string2enum<COORDINATE_SYSTEM>(raw[0]);
+	retval.mRefObject = raw[1];
+	return retval;
+}
+
+// --------------------------------------------------------
+
+std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
+{
+	std::vector<CoordinateSystem> retval;
+	retval.push_back(CoordinateSystem(csREF));
+	retval.push_back(CoordinateSystem(csPATIENTREF));
+
+	std::set<QString> dataSpaces;
+	std::map<QString, DataPtr> data = dataManager()->getData();
+	for (std::map<QString, DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
+	{
+		dataSpaces.insert(iter->second->getUid());
+		dataSpaces.insert(iter->second->getParentFrame());
+	}
+	dataSpaces.erase("");
+	for (std::set<QString>::iterator iter=dataSpaces.begin(); iter!=dataSpaces.end(); ++iter)
+	{
+		retval.push_back(CoordinateSystem(csDATA, *iter));
+	}
+
+	std::map<QString, ToolPtr> tools = *toolManager()->getTools();
+	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	{
+		retval.push_back(CoordinateSystem(csTOOL, iter->first));
+	}
+	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
+	{
+		retval.push_back(CoordinateSystem(csSENSOR, iter->first));
+	}
+
+	return retval;
+}
+
 Vector3D CoordinateSystemHelpers::getDominantToolTipPoint(CoordinateSystem to, bool useOffset)
 {
   ToolPtr tool = ssc::toolManager()->getDominantTool();

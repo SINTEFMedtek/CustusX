@@ -4,6 +4,7 @@
 #include "sscTransform3D.h"
 #include "sscDefinitions.h"
 #include "sscForwardDeclarations.h"
+#include <vector>
 
 namespace ssc
 {
@@ -13,6 +14,9 @@ struct CoordinateSystem
 	explicit CoordinateSystem(COORDINATE_SYSTEM id, QString ref="") : mId(id), mRefObject(ref) {}
   COORDINATE_SYSTEM mId; ///< the type of coordinate system
   QString           mRefObject; ///< for tool, sensor and data we need a object uid to define the coordinate system
+
+  QString toString() const;
+  static CoordinateSystem fromString(QString text);
 };
 typedef CoordinateSystem Space;
 
@@ -38,6 +42,8 @@ public:
   static ssc::CoordinateSystem getD(ssc::DataPtr data);///<datas coordinate system
   static ssc::CoordinateSystem getPr(); ///<patient references coordinate system
   static ssc::CoordinateSystem getR(); ///<data references coordinate system
+
+  static std::vector<CoordinateSystem> getAvailableSpaces();
 
 private:
   Transform3D get_rMfrom(CoordinateSystem from) const; ///< ref_M_from
