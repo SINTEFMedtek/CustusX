@@ -22,6 +22,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxCameraStyle.h
     Rep/cxLandmarkRep.h
     Rep/sscOrientationAnnotation3DRep.h
+    Rep/cxPointMetricRep.h
+    Rep/cxDistanceMetricRep.h
     cxRepManager.h
 )
 
@@ -61,6 +63,10 @@ SET ( cxVisualizationService_SOURCE
     Rep/cxPatientLandmarkRep.cpp
     Rep/sscOrientationAnnotation3DRep.h
     Rep/sscOrientationAnnotation3DRep.cpp
+    Rep/cxPointMetricRep.h
+    Rep/cxPointMetricRep.cpp
+    Rep/cxDistanceMetricRep.h
+    Rep/cxDistanceMetricRep.cpp
     cxRepManager.h
     cxRepManager.cpp
     )

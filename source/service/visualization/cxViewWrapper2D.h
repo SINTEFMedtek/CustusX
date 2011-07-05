@@ -81,6 +81,9 @@ private:
   virtual void imageRemoved(const QString& uid);
   virtual void meshRemoved(const QString& uid);
 
+  virtual void dataAdded(ssc::DataPtr data);
+  virtual void dataRemoved(const QString& uid);
+
 #ifdef USE_2D_GPU_RENDER
   void resetMultiSlicer();
   ssc::Texture3DSlicerRepPtr mMultiSliceRep;
