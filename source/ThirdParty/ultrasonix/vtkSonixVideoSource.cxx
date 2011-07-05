@@ -159,6 +159,8 @@ vtkSonixVideoSource::vtkSonixVideoSource()
 
 //  this->mSonixHelper = new SonixHelper;
   this->mSonixHelper = NULL;
+  lastFrameNum = 0;
+  totalMissedFrames = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -264,6 +266,19 @@ bool vtkSonixVideoSource::vtkSonixVideoSourceNewFrameCallback(void * data, int t
 // vtkVideoSource framebuffer (don't do the unpacking yet)
 void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, bool cine, int frmnum)
 {
+	int missedFrames = frmnum - lastFrameNum +1;
+	if (missedFrames < 0)
+		{
+			std::cout << "Missed frames:    " << missedFrames << " " << std::endl;
+			//totalMissedFrames =+ missedFrames;
+			//std::cout << "Total missed frames: " << totalMissedFrames << std::endl;
+		}
+	else
+		{
+			std::cout << "No missed frames" << std::endl;
+		}
+
+
 	//to do
 	// 1) Do frame buffer indices maintenance
 	// 2) Do time stamping
@@ -322,6 +337,7 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
     {
 	// error: data being acquired is not the same as requested
 	// do what?
+		std::cout << "Error incorrect data type" << std::endl;
     }
 
   	
@@ -421,6 +437,7 @@ void vtkSonixVideoSource::Initialize()
   // 1) connect to sonix machine.
   if(!this->ult->connect(this->SonixHostIP))
     {
+	std::cout << "Try to connect to: " << this->SonixHostIP << std::endl;
 	char *err = new char[256]; 
 	int sz = 256;
 	this->ult->getLastError(err,sz);
@@ -1133,6 +1150,7 @@ void vtkSonixVideoSource::SetSonixIP(const char *SonixIP)
 	if (SonixIP)
 	  {
 	  this->SonixHostIP = new char[256];
-	  sprintf(this->SonixHostIP, "%s", SonixIP);	  
+	  sprintf(this->SonixHostIP, "%s", SonixIP);
+	  std::cout << "Set SonixHostIP: " << SonixIP << std::endl;
 	  }
 }
