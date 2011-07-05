@@ -42,6 +42,7 @@
 #include "cxViewManager.h"
 #include "cxStateService.h"
 #include "cxPatientService.h"
+#include "cxMetricWidget.h"
 
 
 namespace cx
@@ -86,6 +87,7 @@ MainWindow::MainWindow(std::vector<PluginBasePtr> plugins) :
   this->addAsDockWidget(new IGTLinkWidget(this), "Utility");
   this->addAsDockWidget(new BrowserWidget(this), "Browsing");
   this->addAsDockWidget(new PointSamplingWidget(this), "Utility");
+  this->addAsDockWidget(new MetricWidget(this), "Utility");
   this->addAsDockWidget(new ImagePropertiesWidget(this), "Properties");
   this->addAsDockWidget(new VolumePropertiesWidget(this), "Properties");
   this->addAsDockWidget(new MeshPropertiesWidget(this), "Properties");

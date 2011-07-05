@@ -433,6 +433,24 @@ void ViewWrapper2D::imageRemoved(const QString& uid)
   updateView();
 }
 
+void ViewWrapper2D::dataAdded(ssc::DataPtr data)
+{
+  if (boost::shared_dynamic_cast<ssc::Image>(data))
+  {
+  	this->imageAdded(boost::shared_dynamic_cast<ssc::Image>(data));
+  }
+  else if (boost::shared_dynamic_cast<ssc::Mesh>(data))
+  {
+  	this->meshAdded(boost::shared_dynamic_cast<ssc::Mesh>(data));
+  }
+}
+
+void ViewWrapper2D::dataRemoved(const QString& uid)
+{
+	this->imageRemoved(uid);
+	this->meshRemoved(uid);
+}
+
 void ViewWrapper2D::meshAdded(ssc::MeshPtr mesh)
 {
 //  std::map<QString, ssc::GeometricRep2DPtr> mGeometricRep;
