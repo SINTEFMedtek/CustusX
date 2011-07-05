@@ -405,7 +405,7 @@ void ViewWrapper2D::updateView()
   text = this->getAllDataNames().join("\n");
 //  mDataNameText->setText(0, text.join("\n"));
 #else
-  QString textList;
+  QStringList textList;
   mSliceRep->setImage(image);
 
   // list all meshes and one image.

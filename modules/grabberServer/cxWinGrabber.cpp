@@ -120,6 +120,7 @@ namespace cx
 WinGrabber::WinGrabber() :
   Grabber(),
   mIpAdressToConnectTo("127.0.0.1"),
+  //mIpAdressToConnectTo("169.254.200.200"),
   mBufferSize(500),
   mImagingMode(0),
   mAcquisitionDataType(0x00000004)
