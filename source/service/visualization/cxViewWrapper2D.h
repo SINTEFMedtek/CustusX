@@ -55,7 +55,7 @@ private slots:
   void orientationActionSlot();
   void global2DZoomActionSlot();
   void orientationModeChanged();
-
+  void settingsChangedSlot(QString key);
 
 private:
   virtual void setZoomFactor2D(double zoomFactor);
