@@ -21,6 +21,7 @@
 #include "cxColorSelectButton.h"
 #include "cxLayoutEditorTab.h"
 #include "cxViewWrapper3D.h"
+#include "sscHelperWidgets.h"
 
 namespace cx
 {
@@ -234,6 +235,14 @@ void VisualizationTab::init()
 
   connect(backgroundColorButton, SIGNAL(colorChanged(QColor)), this, SLOT(setBackgroundColorSlot(QColor)));
 
+  bool showDataText = settings()->value("View/showDataText").value<bool>();
+  mShowDataText = ssc::BoolDataAdapterXml::initialize("Show Data Text", "",
+                                                 "Show the name of each data set in the views.",
+                                                 showDataText);
+//  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
+
+
+
   //Stereoscopic visualization (3D view)
   QGroupBox* stereoGroupBox = new QGroupBox("Stereoscopic visualization");
   mStereoTypeComboBox = new QComboBox();
@@ -254,6 +263,7 @@ void VisualizationTab::init()
   mMainLayout = new QGridLayout;
   mMainLayout->addWidget(backgroundColorButton, 0, 0);
   mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mSphereRadius));
+  mMainLayout->addWidget(ssc::createDataWidget(this, mShowDataText));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -327,6 +337,7 @@ void VisualizationTab::eyeAngleSlot()
 void VisualizationTab::saveParametersSlot()
 {
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
+  settings()->setValue("View/showDataText", mShowDataText->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)

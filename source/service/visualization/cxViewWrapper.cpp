@@ -263,6 +263,8 @@ void ViewWrapper::connectContextMenu(ssc::View* view)
 
 QStringList ViewWrapper::getAllDataNames() const
 {
+	if (!mViewGroup)
+		return QStringList();
   std::vector<ssc::DataPtr> data = mViewGroup->getData();
 
   QStringList text;
