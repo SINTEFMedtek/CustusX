@@ -22,6 +22,7 @@ typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
  */
 class PointMetric : public ssc::Data
 {
+	Q_OBJECT
 public:
 	PointMetric(const QString& uid, const QString& name="");
 	virtual ~PointMetric();
