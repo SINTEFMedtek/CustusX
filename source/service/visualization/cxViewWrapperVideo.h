@@ -38,10 +38,8 @@ private slots:
   void configureSlot();
 
 protected:
-  virtual void imageAdded(ssc::ImagePtr image) {}
-  virtual void meshAdded(ssc::MeshPtr mesh) {}
-  virtual void imageRemoved(const QString& uid) {}
-  virtual void meshRemoved(const QString& uid) {}
+  virtual void dataAdded(ssc::DataPtr data) {}
+  virtual void dataRemoved(const QString& uid) {}
 
 private:
   void loadStream();
