@@ -22,7 +22,13 @@ DistanceMetric::~DistanceMetric()
 
 void DistanceMetric::setPoint(int index, PointMetricPtr p)
 {
+	if (mPoint[index])
+		disconnect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
+
 	mPoint[index] = p;
+
+	if (mPoint[index])
+		connect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
 }
 
 PointMetricPtr DistanceMetric::getPoint(int index)

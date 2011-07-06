@@ -11,6 +11,8 @@ SET( CX_QT_MOC_HEADER_FILES
     cxPatientData.h
     cxPatientService.h
 	cxDataManager.h
+    cxPointMetric.h
+    cxDistanceMetric.h
 )
 
 SET ( cxPatientService_SOURCE
