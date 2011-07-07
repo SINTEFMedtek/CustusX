@@ -79,6 +79,12 @@
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT32;
   //ssc::messageManager()->sendDebug("Pixel format: "+qstring_cast(frame.mPixelFormat));
   frame.mFirstPixel = reinterpret_cast<unsigned char*>(CVPixelBufferGetBaseAddress(videoFrame));
+	
+  //Just initialize these with dummy values
+  frame.mSpacing[0] = 1;
+  frame.mSpacing[1] = 1;
+  frame.mOrigin[0] = 0;
+  frame.mOrigin[1] = 0;
   
   mGrabber->sendFrame(frame); //results in a memcpy of the frame
   
