@@ -409,6 +409,12 @@ void vtkSonixVideoSource::LocalInternalGrab(void* dataPtr, int type, int sz, boo
   // OpenIGTLinkSender::convertFrame() and by the OpenIGTLink client
   frame.mPixelFormat = igtl::ImageMessage::TYPE_UINT8;//Find correct value. TYPE_UINT8 = 3 in igtlImageMessage.h
   frame.mFirstPixel = frameBufferPtr;
+
+  frame.mSpacing[0] = this->DataSpacing[0];
+  frame.mSpacing[1] = this->DataSpacing[1];
+  frame.mOrigin[0] = this->DataOrigin[0];
+  frame.mOrigin[1] = this->DataOrigin[1];
+
 //  emit newFrame(frame);
   if (this->mSonixHelper)
     this->mSonixHelper->emitFrame(frame);
