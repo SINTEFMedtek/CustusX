@@ -69,7 +69,9 @@ IGTLinkImageMessage::Pointer OpenIGTLinkSender::convertFrame(Frame& frame)
 
   // Create a new IMAGE type message
   retval->SetDimensions(size);
-  retval->SetSpacing(1,1,1); // TODO
+  //retval->SetSpacing(1,1,1); // TODO
+  retval->SetSpacing(frame.mSpacing[0], frame.mSpacing[1],1);// Testcode
+  //std::cout << "Frame spacing: " << frame.mSpacing[0] << " " << frame.mSpacing[1] << std::endl;
   //retval->SetScalarType(igtl::ImageMessage::TYPE_UINT32);
   retval->SetScalarType(frame.mPixelFormat); //Use frame.mPixelFormat directly
   retval->SetDeviceName("GrabberServer"); // TODO write something useful here
