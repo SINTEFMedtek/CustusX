@@ -86,6 +86,8 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscCheckBoxWidget.h
     Widgets/sscHelperWidgets.h
     Widgets/sscFileSelectWidget.h
+    Widgets/sscVector3DDataAdapter.h
+    Widgets/sscVector3DDataAdapterXml.h
     Utilities/sscMessageManager.h
     )
 
@@ -320,6 +322,9 @@ SET( SSC_SOURCE_FILES
     Widgets/sscConsoleWidget.cpp
     Widgets/sscFileSelectWidget.h
     Widgets/sscFileSelectWidget.cpp
+    Widgets/sscVector3DDataAdapter.h
+    Widgets/sscVector3DDataAdapterXml.h
+    Widgets/sscVector3DDataAdapterXml.cpp
 	) 
 
 # =========================================================

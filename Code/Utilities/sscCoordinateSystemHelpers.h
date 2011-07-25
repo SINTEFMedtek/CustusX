@@ -17,7 +17,9 @@ struct CoordinateSystem
 
   QString toString() const;
   static CoordinateSystem fromString(QString text);
+
 };
+bool operator==(const CoordinateSystem& lhs, const CoordinateSystem& rhs);
 typedef CoordinateSystem Space;
 
 /**
