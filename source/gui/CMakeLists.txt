@@ -18,6 +18,7 @@ SET(cxGui_MOC_HDRS
     dataAdapters/cxShadingParamsInterfaces.h
     dataAdapters/cxToolDataAdapters.h
     dataAdapters/cxDoubleDataAdapterTemporalCalibration.h
+    dataAdapters/cxVector3DComponentDataAdapter.h
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxShadingWidget.h
@@ -60,6 +61,7 @@ SET(cxGui_MOC_HDRS
     utilities/cxFilePreviewWidget.h
     utilities/cxSelectionGroupBox.h
     utilities/cxColorSelectButton.h
+    utilities/cxVector3DWidget.h
     #----------------------    
     cxMainWindow.h
     cxSecondaryMainWindow.h
@@ -92,6 +94,8 @@ SET(cxGui_SRCS
     dataAdapters/cxToolDataAdapters.cpp
     dataAdapters/cxDoubleDataAdapterTemporalCalibration.h
     dataAdapters/cxDoubleDataAdapterTemporalCalibration.cpp    
+    dataAdapters/cxVector3DComponentDataAdapter.h
+    dataAdapters/cxVector3DComponentDataAdapter.cpp
     #----------------------
     dataWidgets/cxVolumePropertiesWidget.h
     dataWidgets/cxVolumePropertiesWidget.cpp
@@ -173,7 +177,8 @@ SET(cxGui_SRCS
     utilities/cxSelectionGroupBox.cpp
     utilities/cxColorSelectButton.h
     utilities/cxColorSelectButton.cpp
-    
+    utilities/cxVector3DWidget.h
+    utilities/cxVector3DWidget.cpp    
     #----------------------    
     cxMainWindow.h
     cxMainWindow.cpp 

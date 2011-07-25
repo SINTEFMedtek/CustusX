@@ -17,6 +17,7 @@
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
 #include "sscStringDataAdapterXml.h"
+#include "sscVector3DDataAdapterXml.h"
 
 class QVBoxLayout;
 class QTableWidget;
@@ -50,10 +51,13 @@ public:
 	virtual QString getType() const;
 private slots:
 	void moveToToolPosition();
-	void frameSelected(QString id);
+	void frameSelected();
+	void coordinateChanged();
+	void dataChangedSlot();
 private:
 	PointMetricPtr mData;
 	ssc::StringDataAdapterXmlPtr mFrameSelector;
+  ssc::Vector3DDataAdapterXmlPtr mCoordinate;
 };
 
 class DistanceMetricWrapper : public MetricBase
@@ -97,7 +101,7 @@ protected slots:
   void addPointButtonClickedSlot();
   void addDistanceButtonClickedSlot();
 
-protected:
+private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
   void setManualTool(const ssc::Vector3D& p_r);
@@ -105,13 +109,13 @@ protected:
   void enablebuttons();
   PointMetricPtr addPoint(ssc::Vector3D point, ssc::CoordinateSystem frame=ssc::CoordinateSystem(ssc::csREF));
   MetricBasePtr createMetricWrapper(ssc::DataPtr data);
+  std::vector<MetricBasePtr> createMetricWrappers();
 
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mTable; ///< the table widget presenting the landmarks
 //  typedef std::vector<ssc::Landmark> LandmarkVector;
 //  LandmarkVector mSamples;
   QString mActiveLandmark; ///< uid of surrently selected landmark.
-
 
   std::vector<MetricBasePtr> mMetrics;
 
