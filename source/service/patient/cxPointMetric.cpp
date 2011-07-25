@@ -26,6 +26,9 @@ PointMetric::~PointMetric()
 
 void PointMetric::setCoordinate(const ssc::Vector3D& p)
 {
+	if (p==mCoordinate)
+		return;
+
 	mCoordinate = p;
 	emit transformChanged();
 }
@@ -38,6 +41,9 @@ ssc::Vector3D PointMetric::getCoordinate() const
 
 void PointMetric::setFrame(ssc::CoordinateSystem space)
 {
+	if (space==mFrame)
+		return;
+
 	mFrame = space;
 
 	//TODO connect to the owner of space - data or tool or whatever
