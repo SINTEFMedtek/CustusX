@@ -24,12 +24,14 @@
 #include "cxDistanceMetric.h"
 #include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
+#include "cxVector3DWidget.h"
 
 namespace cx
 {
 
 PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
 {
+	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
 }
 
 QWidget* PointMetricWrapper::createWidget()
@@ -37,7 +39,7 @@ QWidget* PointMetricWrapper::createWidget()
 	QWidget* widget = new QWidget;
 	QHBoxLayout* topLayout = new QHBoxLayout(widget);
 
-	QString value;
+	QString value;// = qstring_cast(mData->getFrame());
 	std::vector<ssc::CoordinateSystem> spaces = ssc::SpaceHelpers::getAvailableSpaces();
 	QStringList range;
 	for (unsigned i=0; i<spaces.size(); ++i)
@@ -51,9 +53,23 @@ QWidget* PointMetricWrapper::createWidget()
       QDomNode());
 	topLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mFrameSelector));
 
+	mCoordinate = ssc::Vector3DDataAdapterXml::initialize("selectCoordinate",
+			"Coord",
+			"Coordinate values.",
+      ssc::Vector3D(0,0,0),
+      ssc::DoubleRange(-1000,1000,0.1),
+      1,
+      QDomNode());
+	topLayout->addWidget(new Vector3DWidget(widget, mCoordinate));
+
 	QPushButton* sampleButton = new QPushButton("Sample");
 	sampleButton->setToolTip("Set the position equal to the current tool tip position.");
 	topLayout->addWidget(sampleButton);
+
+	connect(mFrameSelector.get(), SIGNAL(valueWasSet()), this, SLOT(frameSelected()));
+	connect(mCoordinate.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
+	connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
+	this->dataChangedSlot();
 
 	return widget;
 }
@@ -62,12 +78,16 @@ QString PointMetricWrapper::getValue() const
 {
 	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getFrame(), ssc::CoordinateSystem(ssc::csREF));
 	ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
-	return "pt_r="+qstring_cast(p0_r);
+//	return "pt_r="+qstring_cast(p0_r);
+	int w=3;
+	return QString("p_r=%1 %2 %3").arg(p0_r[0], w, 'f', 1).arg(p0_r[1], w, 'f', 1).arg(p0_r[2], w, 'f', 1);
 }
+
 ssc::DataPtr PointMetricWrapper::getData() const
 {
 	return mData;
 }
+
 QString PointMetricWrapper::getType() const
 {
 	return "point";
@@ -75,12 +95,28 @@ QString PointMetricWrapper::getType() const
 
 void PointMetricWrapper::moveToToolPosition()
 {
-
+  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getFrame(), true);
+  mData->setCoordinate(p);
 }
 
-void PointMetricWrapper::frameSelected(QString id)
+void PointMetricWrapper::frameSelected()
 {
+	ssc::CoordinateSystem frame = ssc::CoordinateSystem::fromString(mFrameSelector->getValue());
+	if (frame.mId==ssc::csCOUNT)
+		return;
+	std::cout << "selected frame " << frame.toString() << std::endl;
+	mData->setFrame(frame);
+}
 
+void PointMetricWrapper::coordinateChanged()
+{
+	mData->setCoordinate(mCoordinate->getValue());
+}
+
+void PointMetricWrapper::dataChangedSlot()
+{
+	QString frameString = mData->getFrame().toString();
+	mFrameSelector->setValue(frameString);
 }
 
 //---------------------------------------------------------
@@ -100,7 +136,8 @@ QWidget* DistanceMetricWrapper::createWidget()
 
 QString DistanceMetricWrapper::getValue() const
 {
-	return "d= "+qstring_cast(mData->getDistance())+" mm";
+	return QString("d=%1 mm").arg(mData->getDistance(), 5, 'f', 1);
+//			"d= "+ QString::frommData->getDistance())+" mm";
 }
 ssc::DataPtr DistanceMetricWrapper::getData() const
 {
@@ -255,64 +292,107 @@ MetricBasePtr MetricWidget::createMetricWrapper(ssc::DataPtr data)
 	return MetricBasePtr();
 }
 
-void MetricWidget::updateSlot()
+/** create new metric wrappers for all metrics in PaSM
+ *
+ */
+std::vector<MetricBasePtr> MetricWidget::createMetricWrappers()
 {
-  mTable->blockSignals(true);
-  mTable->clear();
-
-  while (mEditWidgets->count())
-  {
-  	mEditWidgets->removeWidget(mEditWidgets->widget(0));
-  }
-
-  for (unsigned i=0; i<mMetrics.size(); ++i)
-  {
-  	disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
-  }
-
-  mMetrics.clear();
+	std::vector<MetricBasePtr> retval;
   std::map<QString, ssc::DataPtr> all = ssc::dataManager()->getData();
   for (std::map<QString, ssc::DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
   {
   	MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
   	if (wrapper)
   	{
-  		mMetrics.push_back(wrapper);
-  		connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
-  		mEditWidgets->addWidget(wrapper->createWidget());
+  		retval.push_back(wrapper);
+  	}
+  }
+  return retval;
+}
+
+/**update contents of table.
+ * rebuild table only if necessary
+ *
+ */
+void MetricWidget::updateSlot()
+{
+  mTable->blockSignals(true);
+
+  std::vector<MetricBasePtr> newMetrics = this->createMetricWrappers();
+
+  bool rebuild = newMetrics.size()!=mMetrics.size();
+
+  // check if we need to rebuild the table from scratch:
+  if (!rebuild)
+  {
+  	for (unsigned i=0; i<mMetrics.size(); ++i)
+  	{
+  		rebuild = rebuild || mMetrics[i]->getData()!=newMetrics[i]->getData();
   	}
   }
 
-  mEditWidgets->setCurrentIndex(-1);
+  // rebuild all:
+  if (rebuild)
+  {
+    mTable->clear();
 
-  //ready the table widget
-  mTable->setRowCount(mMetrics.size());
-  mTable->setColumnCount(4);
-  QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
-  mTable->setHorizontalHeaderLabels(headerItems);
-  mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-  mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    while (mEditWidgets->count())
+    {
+    	mEditWidgets->removeWidget(mEditWidgets->widget(0));
+    }
 
+    for (unsigned i=0; i<mMetrics.size(); ++i)
+    {
+    	disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+    }
+
+    mMetrics = newMetrics;
+
+    for (unsigned i=0; i<mMetrics.size(); ++i)
+    {
+    	MetricBasePtr wrapper = mMetrics[i];
+  		connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+  		mEditWidgets->addWidget(wrapper->createWidget());
+    }
+
+    mEditWidgets->setCurrentIndex(-1);
+
+    //ready the table widget
+    mTable->setRowCount(mMetrics.size());
+    mTable->setColumnCount(4);
+    QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
+    mTable->setHorizontalHeaderLabels(headerItems);
+    mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+    mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    for (unsigned i = 0; i < mMetrics.size(); ++i)
+    {
+    	MetricBasePtr current = mMetrics[i];
+
+      for (unsigned j = 0; j < 4; ++j)
+      {
+      	QTableWidgetItem* item = new QTableWidgetItem("empty");
+        item->setData(Qt::UserRole, current->getData()->getUid());
+        mTable->setItem(i, j, item);
+      }
+    }
+  }
+
+  // update contents:
   for (unsigned i = 0; i < mMetrics.size(); ++i)
   {
   	MetricBasePtr current = mMetrics[i];
-    std::vector<QTableWidgetItem*> items(4); // name,val,args,type
 
-    items[0] = new QTableWidgetItem(current->getData()->getName());
-    items[1] = new QTableWidgetItem(current->getValue());
-    items[2] = new QTableWidgetItem("args");
-    items[3] = new QTableWidgetItem(current->getType());
-
-    for (unsigned j = 0; j < items.size(); ++j)
-    {
-      items[j]->setData(Qt::UserRole, current->getData()->getUid());
-      mTable->setItem(i, j, items[j]);
-    }
+  	mTable->item(i,0)->setText(current->getData()->getName());
+    mTable->item(i,1)->setText(current->getValue());
+    mTable->item(i,2)->setText("args");
+    mTable->item(i,3)->setText(current->getType());
 
     //highlight selected row
     if (current->getData()->getUid() == mActiveLandmark)
     {
-      mTable->setCurrentItem(items[1]);
+      mTable->setCurrentCell(i,1);
+      mEditWidgets->setCurrentIndex(i);
     }
   }
 
@@ -320,6 +400,73 @@ void MetricWidget::updateSlot()
 
   this->enablebuttons();
 }
+
+
+//void MetricWidget::updateSlot()
+//{
+//  mTable->blockSignals(true);
+//  mTable->clear();
+//
+//  while (mEditWidgets->count())
+//  {
+//  	mEditWidgets->removeWidget(mEditWidgets->widget(0));
+//  }
+//
+//  for (unsigned i=0; i<mMetrics.size(); ++i)
+//  {
+//  	disconnect(mMetrics[i]->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+//  }
+//
+//  mMetrics.clear();
+//  std::map<QString, ssc::DataPtr> all = ssc::dataManager()->getData();
+//  for (std::map<QString, ssc::DataPtr>::iterator iter=all.begin(); iter!=all.end(); ++iter)
+//  {
+//  	MetricBasePtr wrapper = this->createMetricWrapper(iter->second);
+//  	if (wrapper)
+//  	{
+//  		mMetrics.push_back(wrapper);
+//  		connect(wrapper->getData().get(), SIGNAL(transformChanged()), this, SLOT(updateSlot()));
+//  		mEditWidgets->addWidget(wrapper->createWidget());
+//  	}
+//  }
+//
+//  mEditWidgets->setCurrentIndex(-1);
+//
+//  //ready the table widget
+//  mTable->setRowCount(mMetrics.size());
+//  mTable->setColumnCount(4);
+//  QStringList headerItems(QStringList() << "Name" << "Value" << "Arguments" << "Type");
+//  mTable->setHorizontalHeaderLabels(headerItems);
+//  mTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+//  mTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+//
+//  for (unsigned i = 0; i < mMetrics.size(); ++i)
+//  {
+//  	MetricBasePtr current = mMetrics[i];
+//    std::vector<QTableWidgetItem*> items(4); // name,val,args,type
+//
+//    items[0] = new QTableWidgetItem(current->getData()->getName());
+//    items[1] = new QTableWidgetItem(current->getValue());
+//    items[2] = new QTableWidgetItem("args");
+//    items[3] = new QTableWidgetItem(current->getType());
+//
+//    for (unsigned j = 0; j < items.size(); ++j)
+//    {
+//      items[j]->setData(Qt::UserRole, current->getData()->getUid());
+//      mTable->setItem(i, j, items[j]);
+//    }
+//
+//    //highlight selected row
+//    if (current->getData()->getUid() == mActiveLandmark)
+//    {
+//      mTable->setCurrentItem(items[1]);
+//    }
+//  }
+//
+//  mTable->blockSignals(false);
+//
+//  this->enablebuttons();
+//}
 
 void MetricWidget::enablebuttons()
 {
@@ -370,7 +517,10 @@ void MetricWidget::setManualTool(const ssc::Vector3D& p_r)
 
 void MetricWidget::addPointButtonClickedSlot()
 {
-	this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csPATIENTREF, ""));
+  ssc::CoordinateSystem ref = ssc::SpaceHelpers::getR();
+  ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
+
+	this->addPoint(p_ref, ref);
 }
 
 void MetricWidget::addDistanceButtonClickedSlot()
@@ -384,6 +534,7 @@ void MetricWidget::addDistanceButtonClickedSlot()
 
   while (points.size()>2)
   	points.erase(points.begin());
+
 
   while (points.size()<2)
   {
