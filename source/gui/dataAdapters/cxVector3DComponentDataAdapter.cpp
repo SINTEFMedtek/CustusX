@@ -25,7 +25,7 @@ bool Vector3DComponentDataAdapter::setValue(double value)
 {
 	ssc::Vector3D vec = mBase->getValue();
 	vec[mIndex] = value;
-	std::cout << "set val for comp " << "  " << value << "  " << mIndex << std::endl;
+//	std::cout << "set val for comp " << "  " << value << "  " << mIndex << std::endl;
 	return mBase->setValue(vec);
 }
 

@@ -36,6 +36,7 @@ public:
 	virtual QWidget* createWidget() = 0;
 	virtual QString getValue() const = 0;
 	virtual ssc::DataPtr getData() const = 0;
+	virtual QString getArguments() const = 0;
 	virtual QString getType() const = 0;
 };
 
@@ -48,6 +49,7 @@ public:
 	virtual QWidget* createWidget();
 	virtual QString getValue() const;
 	virtual ssc::DataPtr getData() const;
+  virtual QString getArguments() const;
 	virtual QString getType() const;
 private slots:
 	void moveToToolPosition();
@@ -69,9 +71,18 @@ public:
 	virtual QWidget* createWidget();
 	virtual QString getValue() const;
 	virtual ssc::DataPtr getData() const;
+  virtual QString getArguments() const;
 	virtual QString getType() const;
+
+private slots:
+	void pointSelected();
+	void dataChangedSlot();
+
 private:
 	DistanceMetricPtr mData;
+  ssc::StringDataAdapterXmlPtr mP0Selector;
+  ssc::StringDataAdapterXmlPtr mP1Selector;
+  void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
 };
 
 
@@ -92,14 +103,15 @@ protected slots:
 	void itemSelectionChanged();
 
 //  void addButtonClickedSlot();
-  void editButtonClickedSlot();
+//  void editButtonClickedSlot();
   void removeButtonClickedSlot();
-  void gotoButtonClickedSlot();
+//  void gotoButtonClickedSlot();
   void loadReferencePointsSlot();
-  void testSlot();
+//  void testSlot();
 
   void addPointButtonClickedSlot();
   void addDistanceButtonClickedSlot();
+  void cellChangedSlot(int row, int col);
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
@@ -122,9 +134,9 @@ private:
   QPushButton* mAddPointButton;
   QPushButton* mAddDistButton;
 //  QPushButton* mAddButton; ///< the Add Landmark button
-  QPushButton* mEditButton; ///< the Edit Landmark button
+//  QPushButton* mEditButton; ///< the Edit Landmark button
   QPushButton* mRemoveButton; ///< the Remove Landmark button
-  QPushButton* mTestButton;
+//  QPushButton* mTestButton;
   QPushButton* mLoadReferencePointsButton; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;
 };
