@@ -65,6 +65,10 @@ private:
   QFrame* tGroupBox;
   ssc::DecomposedTransform3D mDecomposition;
 
+//  //  Vector3DWidget(QWidget* parent, ssc::Vector3DDataAdapterPtr data)
+//    Vector3DDataAdapterPtr mAngleAdapter;
+//    Vector3DDataAdapterPtr mTranslationAdapter;
+
   template<class T>
   QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
 };

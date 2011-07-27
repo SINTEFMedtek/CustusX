@@ -9,9 +9,16 @@
 #include "sscBoundingBox3D.h"
 #include "sscTool.h"
 #include "sscToolManager.h"
+#include "sscTypeConversions.h"
 
 namespace cx
 {
+
+ssc::DataPtr PointMetricReader::load(const QString& uid, const QString& filename)
+{
+  return ssc::DataPtr(new PointMetric(uid,filename));
+}
+
 
 PointMetric::PointMetric(const QString& uid, const QString& name) :
 	Data(uid, name)
@@ -62,17 +69,27 @@ ssc::CoordinateSystem PointMetric::getFrame() const
 
 void PointMetric::addXml(QDomNode& dataNode)
 {
+  Data::addXml(dataNode);
 
+  dataNode.toElement().setAttribute("frame", mFrame.toString());
+  dataNode.toElement().setAttribute("coord", qstring_cast(mCoordinate));
 }
 
 void PointMetric::parseXml(QDomNode& dataNode)
 {
+  Data::parseXml(dataNode);
 
+  mFrame = ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("frame", mFrame.toString()));
+  mCoordinate = ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate)));
 }
 
 ssc::DoubleBoundingBox3D PointMetric::boundingBox() const
 {
-	return ssc::DoubleBoundingBox3D(mCoordinate, mCoordinate);
+  // convert both inputs to r space
+  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+  ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
+
+  return ssc::DoubleBoundingBox3D(p0_r, p0_r);
 }
 
 

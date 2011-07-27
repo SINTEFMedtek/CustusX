@@ -11,6 +11,10 @@
 #include <sscRepImpl.h>
 #include "sscGraphicalPrimitives.h"
 #include "cxDistanceMetric.h"
+#include "vtkForwardDeclarations.h"
+
+#include "vtkTextActor.h"
+typedef vtkSmartPointer<vtkTextActor> vtkTextActorPtr;
 
 namespace cx
 {
@@ -30,6 +34,8 @@ public:
 	void setDistanceMetric(DistanceMetricPtr point);
 	virtual QString getType() const { return "cx::DistanceMetricRep"; }
 
+	void scaleText();
+
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
@@ -44,6 +50,13 @@ private:
   ssc::GraphicalLine3DPtr mGraphicalLine;
   DistanceMetricPtr mDistanceMetric;
 	ssc::View* mView;
+	ssc::Vector3D mColor;
+  typedef vtkSmartPointer<class DistanceMetricCallback> DistanceMetricCallbackPtr;
+  DistanceMetricCallbackPtr mDistanceMetricCallback;
+
+//	vtkTextActorPtr mTextActor;
+	vtkVectorTextPtr mText;
+	vtkFollowerPtr mFollower;
 };
 
 

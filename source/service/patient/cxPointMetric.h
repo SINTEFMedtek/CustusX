@@ -10,11 +10,22 @@
 
 #include "sscData.h"
 #include "sscCoordinateSystemHelpers.h"
+#include "sscDataManagerImpl.h"
 
 namespace cx
 {
 typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
 
+class PointMetricReader: public ssc::DataReader
+{
+public:
+  virtual ~PointMetricReader() {}
+  virtual bool canLoad(const QString& type, const QString& filename)
+  {
+    return type=="pointMetric";
+  }
+  virtual ssc::DataPtr load(const QString& uid, const QString& filename);
+};
 
 /**Data class that represents a single point.
  * The point is attached to a specific coordinate system / frame.
@@ -31,6 +42,7 @@ public:
 	ssc::Vector3D getCoordinate() const;
 	void setFrame(ssc::CoordinateSystem space); // use parentframe from ssc::Data
 	ssc::CoordinateSystem getFrame() const; // use parentframe from ssc::Data
+	virtual QString getType() const { return "pointMetric"; }
 
   virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
   virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
