@@ -43,6 +43,8 @@
 #include "cxPatientLandmarkRep.h"
 #include "cxPointMetricRep.h"
 #include "cxDistanceMetricRep.h"
+#include "cxAngleMetricRep.h"
+#include "cxPlaneMetricRep.h"
 
 
 namespace cx
@@ -431,6 +433,8 @@ void ViewWrapper3D::dataAdded(ssc::DataPtr data)
   if (!mDataReps.count(data->getUid()))
   {
     ssc::RepPtr rep = this->createDataRep3D(data);
+    if (!rep)
+      return;
     mDataReps[data->getUid()] = rep;
     mView->addRep(rep);
   }
@@ -479,6 +483,19 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   {
   	DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid()+"_3D_rep");
     rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<AngleMetric>(data))
+  {
+    AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
+    return rep;
+  }
+  else if (boost::shared_dynamic_cast<PlaneMetric>(data))
+  {
+    PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+    rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
     return rep;
   }
 
