@@ -130,6 +130,8 @@ void DistanceMetricRep::changedSlot()
   mText->SetText(cstring_cast(text));
   ssc::Vector3D p_mean = (p0_r+p1_r)/2;
   mFollower->SetPosition(p_mean.begin());
+
+  this->scaleText();
 }
 
 /**Note: Internal method!

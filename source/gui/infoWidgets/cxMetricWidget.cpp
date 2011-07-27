@@ -31,6 +31,7 @@ namespace cx
 
 PointMetricWrapper::PointMetricWrapper(PointMetricPtr data) : mData(data)
 {
+  mInternalUpdate = false;
 	connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
@@ -117,6 +118,8 @@ void PointMetricWrapper::moveToToolPosition()
 
 void PointMetricWrapper::frameSelected()
 {
+  if (mInternalUpdate)
+    return;
 	ssc::CoordinateSystem frame = ssc::CoordinateSystem::fromString(mFrameSelector->getValue());
 	if (frame.mId==ssc::csCOUNT)
 		return;
@@ -126,14 +129,18 @@ void PointMetricWrapper::frameSelected()
 
 void PointMetricWrapper::coordinateChanged()
 {
+  if (mInternalUpdate)
+    return;
 	mData->setCoordinate(mCoordinate->getValue());
 }
 
 void PointMetricWrapper::dataChangedSlot()
 {
+  mInternalUpdate = true;
 //  std::cout << mData->getUid() <<" frame: " << frameString << " coord: " << mData->getCoordinate() << std::endl;
 	mFrameSelector->setValue(mData->getFrame().toString());
 	mCoordinate->setValue(mData->getCoordinate());
+  mInternalUpdate = false;
 }
 
 //---------------------------------------------------------
@@ -143,6 +150,7 @@ void PointMetricWrapper::dataChangedSlot()
 
 PlaneMetricWrapper::PlaneMetricWrapper(PlaneMetricPtr data) : mData(data)
 {
+  mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
@@ -240,6 +248,8 @@ void PlaneMetricWrapper::moveToToolPosition()
 
 void PlaneMetricWrapper::frameSelected()
 {
+  if (mInternalUpdate)
+    return;
   ssc::CoordinateSystem frame = ssc::CoordinateSystem::fromString(mFrameSelector->getValue());
   if (frame.mId==ssc::csCOUNT)
     return;
@@ -248,15 +258,19 @@ void PlaneMetricWrapper::frameSelected()
 
 void PlaneMetricWrapper::coordinateChanged()
 {
+  if (mInternalUpdate)
+    return;
   mData->setCoordinate(mCoordinate->getValue());
   mData->setNormal(mNormal->getValue());
 }
 
 void PlaneMetricWrapper::dataChangedSlot()
 {
+  mInternalUpdate = true;
   mFrameSelector->setValue(mData->getFrame().toString());
   mCoordinate->setValue(mData->getCoordinate());
   mNormal->setValue(mData->getNormal());
+  mInternalUpdate = false;
 }
 
 //---------------------------------------------------------
@@ -265,6 +279,7 @@ void PlaneMetricWrapper::dataChangedSlot()
 
 DistanceMetricWrapper::DistanceMetricWrapper(DistanceMetricPtr data) : mData(data)
 {
+  mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
@@ -338,6 +353,8 @@ QString DistanceMetricWrapper::getArguments() const
 
 void DistanceMetricWrapper::pointSelected()
 {
+  if (mInternalUpdate)
+    return;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
     PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
@@ -347,11 +364,13 @@ void DistanceMetricWrapper::pointSelected()
 
 void DistanceMetricWrapper::dataChangedSlot()
 {
+  mInternalUpdate = true;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
     if (mData->getPoint(i))
       mPSelector[i]->setValue(mData->getPoint(i)->getUid());
   }
+  mInternalUpdate = false;
 }
 
 
@@ -366,6 +385,7 @@ void DistanceMetricWrapper::dataChangedSlot()
 
 AngleMetricWrapper::AngleMetricWrapper(AngleMetricPtr data) : mData(data)
 {
+  mInternalUpdate = false;
   connect(mData.get(), SIGNAL(transformChanged()), this, SLOT(dataChangedSlot()));
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
@@ -443,20 +463,26 @@ QString AngleMetricWrapper::getArguments() const
 
 void AngleMetricWrapper::pointSelected()
 {
+  if (mInternalUpdate)
+    return;
+//  std::cout << "AngleMetricWrapper::pointSelected()"<< std::endl;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
     PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
+//    std::cout << "    " << i << ", set: " << (p?p->getUid():"NULL") << ", old: "<< (mData->getPoint(i)?mData->getPoint(i)->getUid():"NULL") << std::endl;
     mData->setPoint(i, p);
   }
 }
 
 void AngleMetricWrapper::dataChangedSlot()
 {
+  mInternalUpdate = true;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
     if (mData->getPoint(i))
       mPSelector[i]->setValue(mData->getPoint(i)->getUid());
   }
+  mInternalUpdate = false;
 }
 
 
@@ -483,9 +509,6 @@ MetricWidget::MetricWidget(QWidget* parent) :
 
   this->setLayout(mVerticalLayout);
 
-//  connect(mAddPointButton, SIGNAL(clicked()), this, SLOT(addPointButtonClickedSlot()));
-//  connect(mAddDistButton, SIGNAL(clicked()), this, SLOT(addDistanceButtonClickedSlot()));
-
   mEditWidgets = new QStackedWidget;
 
   mRemoveButton->setDisabled(true);
@@ -504,8 +527,6 @@ MetricWidget::MetricWidget(QWidget* parent) :
   this->createAction(buttonLayout, "", "New Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(buttonLayout, "", "New Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
 
-//  buttonLayout->addWidget(mAddPointButton);
-//  buttonLayout->addWidget(mAddDistButton);
   buttonLayout->addWidget(mRemoveButton);
   mVerticalLayout->addWidget(mLoadReferencePointsButton);
 }
@@ -539,7 +560,6 @@ void MetricWidget::cellChangedSlot(int row, int col)
 {
   if (col==0) // data name changed
   {
-    std::cout << "cellChangedSlot" << std::endl;
     QTableWidgetItem* item = mTable->item(row,col);
     ssc::DataPtr data = ssc::dataManager()->getData(item->data(Qt::UserRole).toString());
     if (data)

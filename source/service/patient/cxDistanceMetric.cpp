@@ -55,20 +55,23 @@ void DistanceMetric::addXml(QDomNode& dataNode)
 {
   Data::addXml(dataNode);
 
-  if (mPoint[0])
-    dataNode.toElement().setAttribute("from", mPoint[0]->getUid());
-  if (mPoint[1])
-    dataNode.toElement().setAttribute("to", mPoint[1]->getUid());
+  for (unsigned i=0; i<mPoint.size(); ++i)
+  {
+    if (mPoint[i])
+      dataNode.toElement().setAttribute(QString("p%1").arg(i), mPoint[i]->getUid());
+  }
 }
 
 void DistanceMetric::parseXml(QDomNode& dataNode)
 {
   Data::parseXml(dataNode);
 
-  QString uid0 = dataNode.toElement().attribute("from", "");
-  mPoint[0] = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid0));
-  QString uid1 = dataNode.toElement().attribute("to", "");
-  mPoint[1] = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid1));
+  for (unsigned i=0; i<mPoint.size(); ++i)
+  {
+    QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
+    PointMetricPtr pt = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
+    this->setPoint(i, pt);
+  }
 }
 
 double DistanceMetric::getDistance() const
