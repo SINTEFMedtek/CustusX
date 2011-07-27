@@ -18,6 +18,7 @@
 
 #include "sscDoubleRange.h"
 #include "sscDoubleDataAdapter.h"
+#include "sscMousePadWidget.h"
 
 namespace ssc
 {
@@ -110,12 +111,15 @@ public:
 //  ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
   ScalarInteractionWidget(QWidget* parent, DoubleDataAdapterPtr);
 
+  void enableLabel();
   void enableSlider();
   void enableEdit();
   void enableSpinBox();
+  void enableInfiniteSlider();
 
   void addToOwnLayout();
   void addToGridLayout(QGridLayout* gridLayout=0, int row=0);
+  void build(QGridLayout* gridLayout=0, int row=0);
 
 protected slots:
   void dataChanged();
@@ -123,14 +127,15 @@ private slots:
   void textEditedSlot();
   void doubleValueChanged(double val);
 //  void doubleValueChanged(double val);
+  void infiniteSliderMouseMoved(QPointF delta);
 
 private:
-  void enableLabel();
 
   DoubleSlider* mSlider;
   QDoubleSpinBox* mSpinBox;
   QLabel* mLabel;
   DoubleLineEdit* mEdit;
+  MousePadWidget* mInfiniteSlider;
   DoubleDataAdapterPtr mData;
 };
 
@@ -172,6 +177,21 @@ public:
   SpinBoxAndSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
 };
 typedef boost::shared_ptr<SpinBoxAndSliderGroupWidget> SpinBoxAndSliderGroupWidgetPtr;
+
+
+/**Composite widget for scalar data manipulation.
+ * Consists of <namelabel, valueedit, slider>.
+ * Insert a subclass of ssc::DoubDoubleDataAdapter order to connect to data.
+ *
+ * This slider is custom-made and infinitely long.
+ */
+class SpinBoxInfiniteSliderGroupWidget : public ScalarInteractionWidget
+{
+  Q_OBJECT
+public:
+  SpinBoxInfiniteSliderGroupWidget(QWidget* parent, DoubleDataAdapterPtr, QGridLayout* gridLayout=0, int row=0);
+};
+
 
 } //namespace ssc
 

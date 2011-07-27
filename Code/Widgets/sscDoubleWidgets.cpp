@@ -16,12 +16,10 @@ namespace ssc
 
 ScalarInteractionWidget::ScalarInteractionWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface) :
     QWidget(parent),
-    mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL)
+    mSlider(NULL), mSpinBox(NULL), mLabel(NULL), mEdit(NULL), mInfiniteSlider(NULL)
 {
   mData = dataInterface;
   connect(mData.get(), SIGNAL(changed()), this, SLOT(dataChanged()));
-
-  this->enableLabel();
 }
 
 void ScalarInteractionWidget::enableLabel()
@@ -36,6 +34,23 @@ void ScalarInteractionWidget::enableSlider()
   mSlider->setOrientation(Qt::Horizontal);
   connect(mSlider, SIGNAL(doubleValueChanged(double)), this, SLOT(doubleValueChanged(double)));
 }
+void ScalarInteractionWidget::enableInfiniteSlider()
+{
+  QSize minBarSize = QSize(20,20);
+  mInfiniteSlider = new MousePadWidget(this, minBarSize);
+  mInfiniteSlider->setFixedYPos(true);
+  connect(mInfiniteSlider, SIGNAL(mouseMoved(QPointF)), this, SLOT(infiniteSliderMouseMoved(QPointF)));
+}
+
+void ScalarInteractionWidget::infiniteSliderMouseMoved(QPointF delta)
+{
+  double scale = mData->getValueRange().range()/2.0;
+//  double scale = M_PI_2;
+  double factor = scale * delta.x();
+  double current = mData->getValue();
+  mData->setValue(current + factor);
+}
+
 void ScalarInteractionWidget::enableEdit()
 {
   mEdit = new ssc::DoubleLineEdit(this);
@@ -64,6 +79,8 @@ void ScalarInteractionWidget::addToOwnLayout()
     topLayout->addWidget(mSpinBox, 0);
   if (mSlider)
     topLayout->addWidget(mSlider, 1);
+  if (mInfiniteSlider)
+    topLayout->addWidget(mInfiniteSlider, 1);
 }
 
 /**Layout all widgets into the input grid, including this.
@@ -78,7 +95,8 @@ void ScalarInteractionWidget::addToGridLayout(QGridLayout* gridLayout, int row)
   hackLayout->setSpacing(0);
 
   int col=0;
-  hackLayout->addWidget(mLabel);
+  if (mLabel)
+    hackLayout->addWidget(mLabel);
   hackLayout->addWidget(this);
   gridLayout->addLayout(hackLayout,  row, col++);
 
@@ -91,6 +109,21 @@ void ScalarInteractionWidget::addToGridLayout(QGridLayout* gridLayout, int row)
     gridLayout->setColumnStretch(col,1);
     gridLayout->addWidget(mSlider, row, col++);
   }
+  if (mInfiniteSlider)
+  {
+    gridLayout->setColumnStretch(col,1);
+    gridLayout->addWidget(mInfiniteSlider, row, col++);
+  }
+}
+
+void ScalarInteractionWidget::build(QGridLayout* gridLayout, int row)
+{
+  if (gridLayout)
+    this->addToGridLayout(gridLayout, row);
+  else
+    this->addToOwnLayout();
+
+  dataChanged();
 }
 
 void ScalarInteractionWidget::doubleValueChanged(double val)
@@ -191,16 +224,12 @@ QSize DoubleLineEdit::minimumSizeHint() const
 SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     ScalarInteractionWidget(parent, dataInterface)
 {
+  this->enableLabel();
   this->enableSlider();
   this->enableEdit();
 //  this->enableSpinBox(true);
 
-  if (gridLayout)
-    this->addToGridLayout(gridLayout, row);
-  else
-    this->addToOwnLayout();
-
-  dataChanged();
+  this->build(gridLayout, row);
 }
 
 // --------------------------------------------------------
@@ -209,14 +238,10 @@ SliderGroupWidget::SliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr 
 SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     ScalarInteractionWidget(parent, dataInterface)
 {
+  this->enableLabel();
   this->enableSpinBox();
 
-  if (gridLayout)
-    this->addToGridLayout(gridLayout, row);
-  else
-    this->addToOwnLayout();
-
-  dataChanged();
+  this->build(gridLayout, row);
 }
 
 // --------------------------------------------------------
@@ -224,15 +249,23 @@ SpinBoxGroupWidget::SpinBoxGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPt
 SpinBoxAndSliderGroupWidget::SpinBoxAndSliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
     ScalarInteractionWidget(parent, dataInterface)
 {
+  this->enableLabel();
   this->enableSpinBox();
   this->enableSlider();
 
-  if (gridLayout)
-    this->addToGridLayout(gridLayout, row);
-  else
-    this->addToOwnLayout();
+  this->build(gridLayout, row);
+}
 
-  dataChanged();
+// --------------------------------------------------------
+
+SpinBoxInfiniteSliderGroupWidget::SpinBoxInfiniteSliderGroupWidget(QWidget* parent, ssc::DoubleDataAdapterPtr dataInterface, QGridLayout* gridLayout, int row) :
+    ScalarInteractionWidget(parent, dataInterface)
+{
+  this->enableLabel();
+  this->enableSpinBox();
+  this->enableInfiniteSlider();
+
+  this->build(gridLayout, row);
 }
 
 } // namespace ssc

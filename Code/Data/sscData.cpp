@@ -146,6 +146,7 @@ void Data::addXml(QDomNode& dataNode)
 
   dataNode.toElement().setAttribute("uid", mUid);
   dataNode.toElement().setAttribute("name", mName);
+  dataNode.toElement().setAttribute("type", this->getType());
 //  QDomElement nameNode = doc.createElement("name");
 //  nameNode.appendChild(doc.createTextNode(mName));
 //  dataNode.appendChild(nameNode);

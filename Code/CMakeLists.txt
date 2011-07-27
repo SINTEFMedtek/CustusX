@@ -88,6 +88,7 @@ SET( SSC_QT_MOC_HEADER_FILES
     Widgets/sscFileSelectWidget.h
     Widgets/sscVector3DDataAdapter.h
     Widgets/sscVector3DDataAdapterXml.h
+    Widgets/sscMousePadWidget.h
     Utilities/sscMessageManager.h
     )
 
@@ -325,6 +326,8 @@ SET( SSC_SOURCE_FILES
     Widgets/sscVector3DDataAdapter.h
     Widgets/sscVector3DDataAdapterXml.h
     Widgets/sscVector3DDataAdapterXml.cpp
+    Widgets/sscMousePadWidget.h
+    Widgets/sscMousePadWidget.cpp
 	) 
 
 # =========================================================

@@ -44,6 +44,8 @@ public: // inherited interface
   virtual QString getValue() const; ///< get the data value.
   virtual QString getHelp() const; ///< return a descriptive help string for the data, used for example as a tool tip.
   virtual QStringList getValueRange() const; /// range of value. Use if data is constrained to a set.
+  virtual QString convertInternal2Display(QString internal);  ///< conversion from internal value to display value
+  virtual void setDisplayNames(std::map<QString,QString> names);
 
 public:
   QString getUid() const;
@@ -58,7 +60,10 @@ private:
   QString mValue;
   QStringList mRange;
   XmlOptionItem mStore;
+  std::map<QString,QString> mDisplayNames;
 };
+
+
 
 // --------------------------------------------------------
 // --------------------------------------------------------

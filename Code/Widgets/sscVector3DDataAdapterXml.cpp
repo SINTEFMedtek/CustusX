@@ -75,7 +75,7 @@ bool Vector3DDataAdapterXml::setValue(const Vector3D& val)
 	if (val==mValue)
 		return false;
 
-	std::cout << "set val " << "  " << val << "  " << std::endl;
+//	std::cout << "set val " << "  " << val << "  " << std::endl;
 
 
 	mValue = val;

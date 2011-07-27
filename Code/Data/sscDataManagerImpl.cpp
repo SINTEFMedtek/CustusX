@@ -195,10 +195,10 @@ DataManagerImpl::DataManagerImpl()
 {
   mClinicalApplication = mdLABORATORY;
   //  mClinicalApplication = mdLAPAROSCOPY;
-  mDataReaders[rtMETAIMAGE].reset(new MetaImageReader());
-  mDataReaders[rtMINCIMAGE].reset(new MincImageReader());
-  mDataReaders[rtPOLYDATA].reset(new PolyDataMeshReader());
-  mDataReaders[rtSTL].reset(new StlMeshReader());
+  mDataReaders.insert(DataReaderPtr(new MetaImageReader()));
+  mDataReaders.insert(DataReaderPtr(new MincImageReader()));
+  mDataReaders.insert(DataReaderPtr(new PolyDataMeshReader()));
+  mDataReaders.insert(DataReaderPtr(new StlMeshReader()));
   //	mCenter = Vector3D(0,0,0);
   //	mActiveImage.reset();
   this->clear();
@@ -331,15 +331,15 @@ void DataManagerImpl::setLandmarkActive(QString uid, bool active)
   emit landmarkPropertiesChanged();
 }
 
-ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename, READER_TYPE type)
+ImagePtr DataManagerImpl::loadImage(const QString& uid, const QString& filename, READER_TYPE notused)
 {
-  this->loadData(uid,filename,type);
+  this->loadData(uid,filename, notused);
   return this->getImage(uid);
 }
 
-DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READER_TYPE type)
+DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READER_TYPE notused)
 {
-  DataPtr data = this->readData(uid,path,type);
+  DataPtr data = this->readData(uid,path,"unknown");
   this->loadData(data);
   return data;
 }
@@ -347,33 +347,30 @@ DataPtr DataManagerImpl::loadData(const QString& uid, const QString& path, READE
 /** Read a data set and return it. Do NOT add it to the datamanager.
  *  Internal method: used by loadData family.
  */
-DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READER_TYPE type)
+DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, const QString& type)
 {
   QFileInfo fileInfo(qstring_cast(path));
 
   if (mData.count(uid)) // dont load same image twice
   {
     return mData[uid];
-    //std::cout << "WARNING: Data with uid: " + uid + " already exists, abort loading.";
   }
 
-  if (type == rtAUTO)
+  DataPtr current;
+
+  for (DataReadersType::iterator iter=mDataReaders.begin(); iter!=mDataReaders.end(); ++iter)
   {
-    QString fileType = fileInfo.suffix();
-    type = this->getReaderType(fileType);
+    if (!(*iter)->canLoad(type, path))
+      continue;
+    current = (*iter)->load(uid, path);
+    break;
   }
-
-  if (!mDataReaders.count(type))
-  {
-    std::cout << "no reader found for file type " << path << ", " << uid << std::endl;
-    return DataPtr();
-  }
-
-  // identify type
-  DataPtr current = mDataReaders[type]->load(uid, path);
 
   if (!current)
+  {
+    std::cout << "failed to create data object: " << path << ", " << uid << ", " << type << std::endl;
     return DataPtr();
+  }
 
   current->setName(changeExtension(fileInfo.fileName(), ""));
   //data->setFilePath(relativePath.path().toStdString());
@@ -381,7 +378,6 @@ DataPtr DataManagerImpl::readData(const QString& uid, const QString& path, READE
 //  this->loadData(current);
   return current;
 }
-
 
 void DataManagerImpl::loadData(DataPtr data)
 {
@@ -401,13 +397,6 @@ void DataManagerImpl::loadData(DataPtr data)
     emit dataLoaded();
   }
 }
-
-//void DataManagerImpl::saveData(DataPtr data, const QString& basePath)
-//{
-//  ImagePtr image = boost::shared_dynamic_cast<Image>(data);
-//  if (image)
-//    this->saveImage(image, basePath);
-//}
 
 void DataManagerImpl::saveImage(ImagePtr image, const QString& basePath)
 {
@@ -647,13 +636,24 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
   }
 
   // All images must be created from the DataManager, so the image nodes are parsed here
+  std::map<DataPtr, QDomNode> datanodes;
+
   QDomNode child = dataManagerNode.firstChild();
   for ( ; !child.isNull(); child = child.nextSibling())
   {
     if (child.nodeName() == "data")
     {
-      this->loadData(child.toElement(), rootPath);
+      DataPtr data = this->loadData(child.toElement(), rootPath);
+      datanodes[data] = child.toElement();
     }
+  }
+
+  // parse xml data separately: we want to first load all data
+  // because there might be interdependencies (cx::DistanceMetric)
+  for (std::map<DataPtr, QDomNode>::iterator iter=datanodes.begin(); iter!=datanodes.end(); ++iter)
+  {
+    iter->first->parseXml(iter->second);
+    emit dataLoaded();
   }
 
   //we need to make sure all images are loaded before we try to set an active image
@@ -683,7 +683,7 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
   }
 }
 
-void DataManagerImpl::loadData(QDomElement node, QString rootPath)
+DataPtr DataManagerImpl::loadData(QDomElement node, QString rootPath)
 {
 //  QString uidNodeString = node.namedItem("uid").toElement().text();
 //  QDomElement nameNode = node.namedItem("name").toElement();
@@ -691,6 +691,7 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
 
   QString uid = node.toElement().attribute("uid");
   QString name = node.toElement().attribute("name");
+  QString type = node.toElement().attribute("type");
 
   // backwards compatibility 20110306CA
   if (!node.namedItem("uid").toElement().isNull())
@@ -701,7 +702,7 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
   if (filePathNode.isNull())
   {
     messageManager()->sendWarning("Warning: DataManager::parseXml() found no filePath for data");
-    return;
+    return DataPtr();
   }
 
   QString path = filePathNode.text();
@@ -720,45 +721,47 @@ void DataManagerImpl::loadData(QDomElement node, QString rootPath)
   if (path.isEmpty())
   {
     messageManager()->sendWarning("Warning: DataManager::parseXml() empty filePath for data");
-    return;
+    return DataPtr();
   }
 
-  ssc::DataPtr data = this->readData(uid, path, rtAUTO);
+  ssc::DataPtr data = this->readData(uid, path, type);
 
   if (!data)
   {
     messageManager()->sendWarning("Unknown file: " + path);
-    return;
+    return DataPtr();
   }
 
   if (!name.isEmpty())
     data->setName(name);
   data->setFilePath(relativePath.path());
-  data->parseXml(node);
+//  data->parseXml(node);
 
   this->loadData(data);
-}
 
-READER_TYPE DataManagerImpl::getReaderType(QString fileType)
-{
-  if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
-  {
-    return ssc::rtMETAIMAGE;
-  }
-  else if (fileType.compare("mnc", Qt::CaseInsensitive) == 0)
-  {
-    return ssc::rtMINCIMAGE;
-  }
-  else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
-  {
-    return ssc::rtSTL;
-  }
-  else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
-  {
-    return ssc::rtPOLYDATA;
-  }
-  return ssc::rtCOUNT;
+  return data;
 }
+//
+//READER_TYPE DataManagerImpl::getReaderType(QString fileType)
+//{
+//  if (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0)
+//  {
+//    return ssc::rtMETAIMAGE;
+//  }
+//  else if (fileType.compare("mnc", Qt::CaseInsensitive) == 0)
+//  {
+//    return ssc::rtMINCIMAGE;
+//  }
+//  else if (fileType.compare("stl", Qt::CaseInsensitive) == 0)
+//  {
+//    return ssc::rtSTL;
+//  }
+//  else if (fileType.compare("vtk", Qt::CaseInsensitive) == 0)
+//  {
+//    return ssc::rtPOLYDATA;
+//  }
+//  return ssc::rtCOUNT;
+//}
 
 void DataManagerImpl::vtkImageDataChangedSlot()
 {

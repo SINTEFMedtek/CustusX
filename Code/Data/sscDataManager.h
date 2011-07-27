@@ -75,7 +75,7 @@ public:
 
 	// meshes
   virtual void saveMesh(MeshPtr mesh, const QString& basePath) = 0; ///< Save mesh to file
-	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE meshType) = 0;
+	virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE notused) = 0;
 	virtual MeshPtr getMesh(const QString& uid) const = 0;
 	virtual std::map<QString, MeshPtr> getMeshes() const = 0;
 
@@ -85,7 +85,7 @@ public:
 
 	// data
   virtual void loadData(DataPtr data) = 0;
-  virtual DataPtr loadData(const QString& uid, const QString& path, READER_TYPE type) = 0;
+  virtual DataPtr loadData(const QString& uid, const QString& path, READER_TYPE notused) = 0;
   virtual std::map<QString, DataPtr> getData() const = 0;
   virtual DataPtr getData(const QString& uid) const = 0;
 

@@ -56,6 +56,7 @@ public:
   virtual void setShading(bool on);
   virtual bool getShading() const;
   virtual QDateTime getAcquisitionTime() const;
+  virtual QString getType() const { return "unknown"; }
 
   virtual QString getParentFrame();
 //  virtual void setParentFrame(QString uid);

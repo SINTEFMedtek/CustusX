@@ -70,6 +70,20 @@ QStringList StringDataAdapterXml::getValueRange() const
 	return mRange;
 }
 
+/**If a mapping from internal name to display name has been set, use it.
+ * Otherwise return the input.
+ */
+QString StringDataAdapterXml::convertInternal2Display(QString internal)
+{
+  if (mDisplayNames.count(internal))
+    return mDisplayNames[internal];
+  return internal;
+}
+
+void StringDataAdapterXml::setDisplayNames(std::map<QString,QString> names)
+{
+  mDisplayNames = names;
+}
 
 
 } // namespace ssc

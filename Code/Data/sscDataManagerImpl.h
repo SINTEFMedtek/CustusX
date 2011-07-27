@@ -3,11 +3,13 @@
 #define SSCDATAMANAGERIMPL_H_
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include "sscImage.h"
 #include "sscMesh.h"
 #include "sscDataManager.h"
+#include <QFileInfo>
 
 class QDomElement;
 
@@ -20,7 +22,7 @@ public:
   virtual ~DataReader()
   {
   }
-  virtual bool canLoad(const QString& filename) = 0;
+  virtual bool canLoad(const QString& type, const QString& filename) = 0;
   virtual DataPtr load(const QString& uid, const QString& filename) = 0;
 };
 typedef boost::shared_ptr<DataReader> DataReaderPtr;
@@ -31,9 +33,10 @@ public:
   virtual ~MetaImageReader()
   {
   }
-  virtual bool canLoad(const QString& filename)
+  virtual bool canLoad(const QString& type, const QString& filename)
   {
-    return true;
+    QString fileType = QFileInfo(filename).suffix();
+    return (fileType.compare("mhd", Qt::CaseInsensitive) == 0 || fileType.compare("mha", Qt::CaseInsensitive) == 0);
   }
   virtual DataPtr load(const QString& uid, const QString& filename);
 };
@@ -44,9 +47,10 @@ public:
   virtual ~MincImageReader()
   {
   }
-  virtual bool canLoad(const QString& filename)
+  virtual bool canLoad(const QString& type, const QString& filename)
   {
-    return true;
+    QString fileType = QFileInfo(filename).suffix();
+    return (fileType.compare("mnc", Qt::CaseInsensitive) == 0);
   }
   virtual DataPtr load(const QString& uid, const QString& filename);
 };
@@ -68,9 +72,10 @@ public:
   virtual ~PolyDataMeshReader()
   {
   }
-  virtual bool canLoad(const QString& filename)
+  virtual bool canLoad(const QString& type, const QString& filename)
   {
-    return true;
+    QString fileType = QFileInfo(filename).suffix();
+    return (fileType.compare("vtk", Qt::CaseInsensitive) == 0);
   }
   virtual DataPtr load(const QString& uid, const QString& filename);
 };
@@ -81,9 +86,10 @@ public:
   virtual ~StlMeshReader()
   {
   }
-  virtual bool canLoad(const QString& filename)
+  virtual bool canLoad(const QString& type, const QString& filename)
   {
-    return true;
+    QString fileType = QFileInfo(filename).suffix();
+    return (fileType.compare("stl", Qt::CaseInsensitive) == 0);
   }
   virtual DataPtr load(const QString& uid, const QString& filename);
 };
@@ -168,16 +174,17 @@ protected:
   DataMap mData;
   Vector3D mCenter;
   CLINICAL_APPLICATION mClinicalApplication;
-  std::map<READER_TYPE, DataReaderPtr> mDataReaders;
+  typedef std::set<DataReaderPtr> DataReadersType;
+  DataReadersType mDataReaders;
 
   //state
   ImagePtr mActiveImage;
   //MeshPtr mActiveMesh;
-  virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE type);
-  virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE meshType);
-  READER_TYPE getReaderType(QString fileType);
-  void loadData(QDomElement node, QString rootPath);
-  DataPtr readData(const QString& uid, const QString& path, READER_TYPE type);
+  virtual ImagePtr loadImage(const QString& uid, const QString& filename, READER_TYPE notused);
+  virtual MeshPtr loadMesh(const QString& uid, const QString& fileName, READER_TYPE notused);
+//  READER_TYPE getReaderType(QString fileType);
+  DataPtr loadData(QDomElement node, QString rootPath);
+  DataPtr readData(const QString& uid, const QString& path, const QString& type);
   int findUniqueUidNumber(QString uidBase) const;
   void generateUidAndName(QString* _uid, QString* _name);
 
