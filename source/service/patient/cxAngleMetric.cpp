@@ -37,12 +37,16 @@ void AngleMetric::setPoint(int index, PointMetricPtr p)
     return;
 
   if (mPoint[index])
+  {
     disconnect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
+  }
 
   mPoint[index] = p;
 
   if (mPoint[index])
+  {
     connect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
+  }
 
   emit transformChanged();
 }
@@ -70,7 +74,9 @@ void AngleMetric::parseXml(QDomNode& dataNode)
   for (unsigned i=0; i<mPoint.size(); ++i)
   {
     QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-    mPoint[i] = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
+    PointMetricPtr pt = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
+//    mPoint[i] = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
+    this->setPoint(i, pt);
   }
 }
 
@@ -100,6 +106,7 @@ double AngleMetric::getAngle() const
   ssc::Vector3D b = (p_r[3]-p_r[2]).normalized();
 
   double angle = acos(ssc::dot(a,b)/a.length()/b.length());
+//  emit transformChanged();
   return angle;
 }
 
@@ -113,6 +120,11 @@ ssc::DoubleBoundingBox3D AngleMetric::boundingBox() const
   }
 
   return ssc::DoubleBoundingBox3D::fromCloud(p_r);
+}
+
+void AngleMetric::transformChangedSlot()
+{
+//  std::cout << "AngleMetric::transformChangedSlot()" << std::endl;
 }
 
 }

@@ -62,6 +62,7 @@ private:
 	PointMetricPtr mData;
 	ssc::StringDataAdapterXmlPtr mFrameSelector;
   ssc::Vector3DDataAdapterXmlPtr mCoordinate;
+  bool mInternalUpdate;
 };
 
 class PlaneMetricWrapper : public MetricBase
@@ -85,6 +86,7 @@ private:
   ssc::StringDataAdapterXmlPtr mFrameSelector;
   ssc::Vector3DDataAdapterXmlPtr mCoordinate;
   ssc::Vector3DDataAdapterXmlPtr mNormal;
+  bool mInternalUpdate;
 };
 
 class DistanceMetricWrapper : public MetricBase
@@ -107,6 +109,7 @@ private:
 	DistanceMetricPtr mData;
   std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
   void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
+  bool mInternalUpdate;
 };
 
 class AngleMetricWrapper : public MetricBase
@@ -129,6 +132,7 @@ private:
   AngleMetricPtr mData;
   std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
   void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
+  bool mInternalUpdate;
 };
 
 
@@ -175,8 +179,6 @@ private:
 
   std::vector<MetricBasePtr> mMetrics;
 
-//  QPushButton* mAddPointButton;
-//  QPushButton* mAddDistButton;
   QPushButton* mRemoveButton; ///< the Remove Landmark button
   QPushButton* mLoadReferencePointsButton; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;

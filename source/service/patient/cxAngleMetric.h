@@ -54,6 +54,8 @@ public:
   virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
   virtual ssc::DoubleBoundingBox3D boundingBox() const;
   virtual QString getType() const { return "angleMetric"; }
+private slots:
+  void transformChangedSlot();
 
 private:
   boost::array<PointMetricPtr,4> mPoint;
