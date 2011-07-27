@@ -24,6 +24,8 @@ SET( CX_QT_MOC_HEADER_FILES
     Rep/sscOrientationAnnotation3DRep.h
     Rep/cxPointMetricRep.h
     Rep/cxDistanceMetricRep.h
+    Rep/cxAngleMetricRep.h
+    Rep/cxPlaneMetricRep.h
     cxRepManager.h
 )
 
@@ -67,6 +69,10 @@ SET ( cxVisualizationService_SOURCE
     Rep/cxPointMetricRep.cpp
     Rep/cxDistanceMetricRep.h
     Rep/cxDistanceMetricRep.cpp
+    Rep/cxAngleMetricRep.h
+    Rep/cxAngleMetricRep.cpp
+    Rep/cxPlaneMetricRep.h
+    Rep/cxPlaneMetricRep.cpp
     cxRepManager.h
     cxRepManager.cpp
     )

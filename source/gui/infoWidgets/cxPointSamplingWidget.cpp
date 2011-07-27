@@ -14,8 +14,6 @@
 #include "cxViewManager.h"
 #include "cxViewGroup.h"
 #include "cxViewWrapper.h"
-#include "cxPointMetric.h"
-#include "cxDistanceMetric.h"
 #include "sscDataManager.h"
 
 namespace cx
@@ -29,7 +27,6 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   mAddButton(new QPushButton("Add", this)),
   mEditButton(new QPushButton("Resample", this)),
   mRemoveButton(new QPushButton("Remove", this)),
-  mTestButton(new QPushButton("Test", this)),
   mLoadReferencePointsButton(new QPushButton("Load reference points", this))
 {
   connect(ssc::toolManager(), SIGNAL(configured()), this, SLOT(updateSlot()));
@@ -45,7 +42,6 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   connect(mEditButton, SIGNAL(clicked()), this, SLOT(editButtonClickedSlot()));
   mRemoveButton->setDisabled(true);
   connect(mRemoveButton, SIGNAL(clicked()), this, SLOT(removeButtonClickedSlot()));
-  connect(mTestButton, SIGNAL(clicked()), this, SLOT(testSlot()));
   connect(mLoadReferencePointsButton, SIGNAL(clicked()), this, SLOT(loadReferencePointsSlot()));
 
   //layout
@@ -57,7 +53,6 @@ PointSamplingWidget::PointSamplingWidget(QWidget* parent) :
   buttonLayout->addWidget(mAddButton);
   buttonLayout->addWidget(mEditButton);
   buttonLayout->addWidget(mRemoveButton);
-  buttonLayout->addWidget(mTestButton);
   mVerticalLayout->addWidget(mLoadReferencePointsButton);
 }
 
@@ -72,27 +67,6 @@ QString PointSamplingWidget::defaultWhatsThis() const
       "<p><i></i></p>"
       "</html>";
 }
-
-void PointSamplingWidget::testSlot()
-{
-	PointMetricPtr p0(new PointMetric("point%1","point%1"));
-	p0->setFrame(ssc::CoordinateSystem(ssc::csPATIENTREF, ""));
-	p0->setCoordinate(ssc::Vector3D(0,0,0));
-	ssc::dataManager()->loadData(p0);
-
-	PointMetricPtr p1(new PointMetric("point%1","point%1"));
-	p1->setFrame(ssc::CoordinateSystem(ssc::csTOOL, "ManualTool"));
-	p1->setCoordinate(ssc::Vector3D(0,0,0));
-	ssc::dataManager()->loadData(p1);
-
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
-	d0->setPoint(0, p0);
-	d0->setPoint(1, p1);
-	ssc::dataManager()->loadData(d0);
-
-	d0->getDistance();
-}
-
 
 void PointSamplingWidget::itemSelectionChanged()
 {

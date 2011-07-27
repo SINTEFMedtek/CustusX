@@ -23,12 +23,10 @@ ssc::DataPtr PointMetricReader::load(const QString& uid, const QString& filename
 PointMetric::PointMetric(const QString& uid, const QString& name) :
 	Data(uid, name)
 {
-	// TODO Auto-generated constructor stub
 }
 
 PointMetric::~PointMetric()
 {
-	// TODO Auto-generated destructor stub
 }
 
 void PointMetric::setCoordinate(const ssc::Vector3D& p)
