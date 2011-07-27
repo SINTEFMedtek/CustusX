@@ -5,6 +5,8 @@
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
 
+typedef vtkSmartPointer<class vtkArcSource> vtkArcSourcePtr;
+
 namespace ssc
 {
 
@@ -47,6 +49,26 @@ class GraphicalLine3D
 		vtkLineSourcePtr source;
 };
 typedef boost::shared_ptr<GraphicalLine3D> GraphicalLine3DPtr;
+
+/** Helper for rendering a line in 3D
+ */
+class GraphicalArc3D
+{
+  public:
+  GraphicalArc3D(vtkRendererPtr renderer = vtkRendererPtr());
+    ~GraphicalArc3D();
+    void setColor(Vector3D color);
+    void setValue(Vector3D point1, Vector3D point2, Vector3D center);
+    void setStipple(int stipple);
+    vtkActorPtr getActor();
+
+  private:
+    vtkPolyDataMapperPtr mapper;
+    vtkActorPtr actor;
+    vtkRendererPtr mRenderer;
+    vtkArcSourcePtr source;
+};
+typedef boost::shared_ptr<GraphicalArc3D> GraphicalArc3DPtr;
 
 class Rect3D
 {

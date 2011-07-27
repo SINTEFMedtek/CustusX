@@ -2,6 +2,7 @@
 
 #include <vtkSphereSource.h>
 #include <vtkLineSource.h>
+#include <vtkArcSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkCellArray.h>
@@ -18,6 +19,12 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 	mRenderer = renderer;
 	source = vtkSphereSourcePtr::New();
 	source->SetRadius(4);
+//  default:
+//  source->SetThetaResolution(8);
+//  source->SetPhiResolution(8);
+	// 24*16 = 384, 8*8=64, 16*12=192
+	source->SetThetaResolution(16);
+  source->SetPhiResolution(12);
 
 	mapper = vtkPolyDataMapperPtr::New();
 	mapper->SetInputConnection(source->GetOutputPort());
@@ -107,6 +114,57 @@ void GraphicalLine3D::setStipple(int stipple)
 vtkActorPtr GraphicalLine3D::getActor()
 {
 	return actor;
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+GraphicalArc3D::GraphicalArc3D( vtkRendererPtr renderer)
+{
+  mRenderer = renderer;
+  source = vtkArcSourcePtr::New();
+  source->SetResolution(20);
+  mapper = vtkPolyDataMapperPtr::New() ;
+  actor = vtkActorPtr::New() ;
+
+  mapper->SetInputConnection( source->GetOutputPort() );
+  actor->SetMapper (mapper );
+  if (mRenderer)
+    mRenderer->AddActor(actor);
+}
+
+GraphicalArc3D::~GraphicalArc3D()
+{
+  if (mRenderer)
+    mRenderer->RemoveActor(actor);
+}
+
+void GraphicalArc3D::setColor(Vector3D color)
+{
+  actor->GetProperty()->SetColor(color.begin());
+}
+
+void GraphicalArc3D::setValue(Vector3D point1, Vector3D point2, Vector3D center)
+{
+  source->SetPoint1(point1.begin());
+  source->SetPoint2(point2.begin());
+  source->SetCenter(center.begin());
+}
+
+void GraphicalArc3D::setStipple(int stipple)
+{
+  actor->GetProperty()->SetLineStipplePattern(stipple);
+}
+
+vtkActorPtr GraphicalArc3D::getActor()
+{
+  return actor;
 }
 
 ///--------------------------------------------------------
