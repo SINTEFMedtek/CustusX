@@ -28,6 +28,7 @@ public:
   virtual ~PointMetricRep() {}
 
 	void setPointMetric(PointMetricPtr point);
+	void setSphereRadius(double radius);
 	virtual QString getType() const { return "cx::PointMetricRep"; }
 
 protected:
@@ -44,6 +45,7 @@ private:
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
   PointMetricPtr mPointMetric;
 	ssc::View* mView;
+	double mSphereRadius;
 };
 
 }

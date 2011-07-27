@@ -20,7 +20,8 @@ PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
 
 PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
 		RepImpl(uid,name),
-		mView(NULL)
+		mView(NULL),
+		mSphereRadius(1)
 {
 }
 
@@ -52,6 +53,12 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	mGraphicalPoint.reset();
 }
 
+void PointMetricRep::setSphereRadius(double radius)
+{
+  mSphereRadius = radius;
+  this->changedSlot();
+}
+
 void PointMetricRep::changedSlot()
 {
 	if (!mGraphicalPoint && mView && mPointMetric)
@@ -64,7 +71,7 @@ void PointMetricRep::changedSlot()
 	ssc::Vector3D p0_r = rM0.coord(mPointMetric->getCoordinate());
 
 	mGraphicalPoint->setValue(p0_r);
-	mGraphicalPoint->setRadius(3);
+	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->setColor(ssc::Vector3D(1,0,0));
 }
 

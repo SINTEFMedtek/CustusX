@@ -10,7 +10,7 @@
 
 #include "sscVector3D.h"
 #include <QWidget>
-class QVBoxLayout;
+class QBoxLayout;
 #include "sscVector3DDataAdapter.h"
 #include "sscDoubleDataAdapterXml.h"
 
@@ -29,12 +29,13 @@ public:
   Vector3DWidget(QWidget* parent, ssc::Vector3DDataAdapterPtr data);
   virtual ~Vector3DWidget() {}
 
-private slots:
-//  void changedSlot();
-//  void dataChangedSlot();
+  static Vector3DWidget* createSmallHorizontal(QWidget* parent, ssc::Vector3DDataAdapterPtr data);
+  static Vector3DWidget* createVerticalWithSliders(QWidget* parent, ssc::Vector3DDataAdapterPtr data);
 
 private:
-  void addControlsForIndex(QString name, QString help, int index, QVBoxLayout* layout);
+//  void addControlsForIndex(QString name, QString help, int index, QVBoxLayout* layout);
+  void addSliderControlsForIndex(QString name, QString help, int index, QBoxLayout* layout);
+  void addSmallControlsForIndex(QString name, QString help, int index, QBoxLayout* layout);
 
   ssc::Vector3DDataAdapterPtr mData;
   boost::array<ssc::DoubleDataAdapterPtr, 3> mDoubleAdapter;
