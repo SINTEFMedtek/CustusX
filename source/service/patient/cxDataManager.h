@@ -3,8 +3,6 @@
 
 #include <sscDataManagerImpl.h>
 #include <QDomNode>
-#include "cxPointMetric.h"
-#include "cxDistanceMetric.h"
 
 class QDomDocument;
 

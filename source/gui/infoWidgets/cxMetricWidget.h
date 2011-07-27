@@ -16,6 +16,8 @@
 #include "sscLandmark.h"
 #include "cxPointMetric.h"
 #include "cxDistanceMetric.h"
+#include "cxAngleMetric.h"
+#include "cxPlaneMetric.h"
 #include "sscStringDataAdapterXml.h"
 #include "sscVector3DDataAdapterXml.h"
 
@@ -62,6 +64,29 @@ private:
   ssc::Vector3DDataAdapterXmlPtr mCoordinate;
 };
 
+class PlaneMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit PlaneMetricWrapper(PlaneMetricPtr data);
+  virtual ~PlaneMetricWrapper() {}
+  virtual QWidget* createWidget();
+  virtual QString getValue() const;
+  virtual ssc::DataPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+private slots:
+  void moveToToolPosition();
+  void frameSelected();
+  void coordinateChanged();
+  void dataChangedSlot();
+private:
+  PlaneMetricPtr mData;
+  ssc::StringDataAdapterXmlPtr mFrameSelector;
+  ssc::Vector3DDataAdapterXmlPtr mCoordinate;
+  ssc::Vector3DDataAdapterXmlPtr mNormal;
+};
+
 class DistanceMetricWrapper : public MetricBase
 {
 	Q_OBJECT
@@ -80,8 +105,29 @@ private slots:
 
 private:
 	DistanceMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mP0Selector;
-  ssc::StringDataAdapterXmlPtr mP1Selector;
+  std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
+  void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
+};
+
+class AngleMetricWrapper : public MetricBase
+{
+  Q_OBJECT
+public:
+  explicit AngleMetricWrapper(AngleMetricPtr data);
+  virtual ~AngleMetricWrapper() {}
+  virtual QWidget* createWidget();
+  virtual QString getValue() const;
+  virtual ssc::DataPtr getData() const;
+  virtual QString getArguments() const;
+  virtual QString getType() const;
+
+private slots:
+  void pointSelected();
+  void dataChangedSlot();
+
+private:
+  AngleMetricPtr mData;
+  std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
   void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
 };
 
@@ -102,41 +148,36 @@ protected slots:
 	void updateSlot();
 	void itemSelectionChanged();
 
-//  void addButtonClickedSlot();
-//  void editButtonClickedSlot();
   void removeButtonClickedSlot();
-//  void gotoButtonClickedSlot();
   void loadReferencePointsSlot();
-//  void testSlot();
 
   void addPointButtonClickedSlot();
+  void addPlaneButtonClickedSlot();
+  void addAngleButtonClickedSlot();
   void addDistanceButtonClickedSlot();
   void cellChangedSlot(int row, int col);
 
 private:
   virtual void showEvent(QShowEvent* event); ///<updates internal info before showing the widget
   virtual void hideEvent(QHideEvent* event);
-  void setManualTool(const ssc::Vector3D& p_r);
   ssc::Vector3D getSample() const;
   void enablebuttons();
   PointMetricPtr addPoint(ssc::Vector3D point, ssc::CoordinateSystem frame=ssc::CoordinateSystem(ssc::csREF));
   MetricBasePtr createMetricWrapper(ssc::DataPtr data);
   std::vector<MetricBasePtr> createMetricWrappers();
 
+  template<class T>
+  QAction* createAction(QLayout* layout, QString iconName, QString text, QString tip, T slot);
+
   QVBoxLayout* mVerticalLayout; ///< vertical layout is used
   QTableWidget* mTable; ///< the table widget presenting the landmarks
-//  typedef std::vector<ssc::Landmark> LandmarkVector;
-//  LandmarkVector mSamples;
   QString mActiveLandmark; ///< uid of surrently selected landmark.
 
   std::vector<MetricBasePtr> mMetrics;
 
-  QPushButton* mAddPointButton;
-  QPushButton* mAddDistButton;
-//  QPushButton* mAddButton; ///< the Add Landmark button
-//  QPushButton* mEditButton; ///< the Edit Landmark button
+//  QPushButton* mAddPointButton;
+//  QPushButton* mAddDistButton;
   QPushButton* mRemoveButton; ///< the Remove Landmark button
-//  QPushButton* mTestButton;
   QPushButton* mLoadReferencePointsButton; ///< button for loading a reference tools reference points
   QStackedWidget* mEditWidgets;
 };

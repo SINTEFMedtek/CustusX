@@ -1,6 +1,11 @@
 #include <QDomDocument>
 #include "cxDataManager.h"
 
+#include "cxPointMetric.h"
+#include "cxDistanceMetric.h"
+#include "cxPlaneMetric.h"
+#include "cxAngleMetric.h"
+
 namespace cx
 {
 
@@ -11,6 +16,8 @@ void DataManager::initialize()
   // extra cx data types
   getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new PointMetricReader()));
   getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new DistanceMetricReader()));
+  getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new PlaneMetricReader()));
+  getInstance()->mDataReaders.insert(ssc::DataReaderPtr(new AngleMetricReader()));
 }
 
 DataManager* DataManager::getInstance()
