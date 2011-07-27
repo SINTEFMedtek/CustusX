@@ -38,7 +38,7 @@ GraphicalPoint3D::~GraphicalPoint3D()
 	}
 }
 
-void GraphicalPoint3D::setRadius(int radius)
+void GraphicalPoint3D::setRadius(double radius)
 {
 	source->SetRadius(radius);
 }

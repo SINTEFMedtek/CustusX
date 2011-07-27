@@ -653,8 +653,8 @@ void DataManagerImpl::parseXml(QDomNode& dataManagerNode, QString rootPath)
   for (std::map<DataPtr, QDomNode>::iterator iter=datanodes.begin(); iter!=datanodes.end(); ++iter)
   {
     iter->first->parseXml(iter->second);
-    emit dataLoaded();
   }
+  emit dataLoaded();
 
   //we need to make sure all images are loaded before we try to set an active image
   child = dataManagerNode.firstChild();

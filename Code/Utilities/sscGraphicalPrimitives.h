@@ -15,7 +15,7 @@ class GraphicalPoint3D
 	public:
 		GraphicalPoint3D(vtkRendererPtr renderer = vtkRendererPtr());
 		~GraphicalPoint3D();
-		void setRadius(int radius);
+		void setRadius(double radius);
 		void setColor(Vector3D color);
 		void setValue(Vector3D point);
 		Vector3D getValue() const;

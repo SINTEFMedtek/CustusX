@@ -72,11 +72,10 @@ Vector3D Vector3DDataAdapterXml::getValue() const
 
 bool Vector3DDataAdapterXml::setValue(const Vector3D& val)
 {
-	if (val==mValue)
+	if (ssc::similar(val,mValue))
 		return false;
 
-//	std::cout << "set val " << "  " << val << "  " << std::endl;
-
+//	std::cout << "set val " << "  " << val << "  , org=" << mValue << std::endl;
 
 	mValue = val;
 	mStore.writeValue(qstring_cast(val));
