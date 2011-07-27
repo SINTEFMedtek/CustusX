@@ -471,6 +471,7 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   else if (boost::shared_dynamic_cast<PointMetric>(data))
   {
     PointMetricRepPtr rep = PointMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
     rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
     return rep;
   }
