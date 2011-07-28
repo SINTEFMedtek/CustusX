@@ -34,8 +34,6 @@ public:
   void setMetric(AngleMetricPtr point);
   virtual QString getType() const { return "cx::AngleMetricRep"; }
 
-  void scaleText();
-
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
@@ -50,15 +48,10 @@ private:
   ssc::GraphicalLine3DPtr mLine0;
   ssc::GraphicalLine3DPtr mLine1;
   ssc::GraphicalArc3DPtr mArc;
+  ssc::FollowerText3DPtr mText;
   AngleMetricPtr mMetric;
   ssc::View* mView;
   ssc::Vector3D mColor;
-  typedef vtkSmartPointer<class AngleMetricCallback> AngleMetricCallbackPtr;
-  AngleMetricCallbackPtr mMetricCallback;
-
-//  vtkTextActorPtr mTextActor;
-  vtkVectorTextPtr mText;
-  vtkFollowerPtr mFollower;
 };
 
 
