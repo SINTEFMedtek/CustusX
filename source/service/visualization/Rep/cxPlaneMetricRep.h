@@ -43,9 +43,11 @@ private:
   PlaneMetricRep(); ///< not implemented
 
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
+  ssc::GraphicalArrow3DPtr mNormal;
   PlaneMetricPtr mMetric;
   ssc::View* mView;
   double mSphereRadius;
+  ssc::Vector3D mColor;
 };
 
 }
