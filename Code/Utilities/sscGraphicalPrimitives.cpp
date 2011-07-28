@@ -8,7 +8,11 @@
 #include <vtkCellArray.h>
 #include <vtkProperty.h>
 #include <vtkRenderer.h>
-
+#include <vtkCommand.h>
+#include <vtkFollower.h>
+#include <vtkVectorText.h>
+#include <vtkCamera.h>
+#include "sscTypeConversions.h"
 #include "sscBoundingBox3D.h"
 
 namespace ssc
@@ -233,6 +237,148 @@ void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
   mPoints->InsertPoint(3, M.coord(bb.corner(1,0,0)).begin());
   mPolyData->SetPoints(mPoints);
   mPolyData->Update();
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+//namespace // unnamed
+//{
+
+	class FollowerText3DCallback : public vtkCommand
+	{
+	public:
+		FollowerText3DCallback() {}
+		static FollowerText3DCallback* New() {return new FollowerText3DCallback;}
+		void SetBase(FollowerText3D* rep) {mBase = rep;}
+		virtual void Execute(vtkObject* caller, unsigned long, void*)
+		{
+			if (mBase)
+				mBase->scaleText();
+		}
+		FollowerText3D* mBase;
+	};
+
+//}
+
+FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
+{
+  mRenderer = renderer;
+  if (!mRenderer)
+  	return;
+
+  mText = vtkVectorText::New();
+  vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
+  mapper->SetInput(mText->GetOutput());
+  mFollower = vtkFollower::New();
+  mFollower->SetMapper(mapper);
+  mFollower->SetCamera(mRenderer->GetActiveCamera());
+  ssc::Vector3D mTextScale(2,2,2);
+  mFollower->SetScale(mTextScale.begin());
+
+  mRenderer->AddActor(mFollower);
+  this->setSizeInNormalizedViewport(true, 0.025);
+}
+
+FollowerText3D::~FollowerText3D()
+{
+  if (mRenderer)
+    mRenderer->RemoveActor(mFollower);
+
+  this->setSizeInNormalizedViewport(false,1);
+}
+
+void FollowerText3D::setSize(double val)
+{
+	mSize = val;
+	this->scaleText();
+}
+
+void FollowerText3D::setSizeInNormalizedViewport(bool on, double size)
+{
+	if (on)
+	{
+		// turn on observer
+		if (!mMetricCallback)
+		{
+		  mMetricCallback = FollowerText3DCallbackPtr::New();
+		  mMetricCallback->SetBase(this);
+		//  mView->getRenderer()->GetActiveCamera()->AddObserver(vtkCommand::ModifiedEvent, DistanceMetricCallback::New());
+		  mRenderer->AddObserver(vtkCommand::ModifiedEvent, mMetricCallback);
+		  mRenderer->AddObserver(vtkCommand::ActiveCameraEvent, mMetricCallback);
+		  mRenderer->AddObserver(vtkCommand::ResetCameraEvent, mMetricCallback);
+		}
+	}
+	else
+	{
+		// turn off observer
+	  if (mMetricCallback)
+	  {
+	    mMetricCallback->SetBase(NULL);
+	    mRenderer->RemoveObserver(mMetricCallback);
+	  }
+	}
+
+	this->setSize(size);
+}
+
+void FollowerText3D::setColor(Vector3D color)
+{
+	mFollower->GetProperty()->SetColor(color.begin());
+}
+
+void FollowerText3D::setText(QString text)
+{
+  mText->SetText(cstring_cast(text));
+}
+
+void FollowerText3D::setPosition(ssc::Vector3D pos)
+{
+  mFollower->SetPosition(pos.begin());
+}
+
+vtkFollowerPtr FollowerText3D::getActor()
+{
+  return mFollower;
+}
+
+/**Note: Internal method!
+ *
+ * Scale the text to be a constant fraction of the viewport height
+ * Called from a vtk camera observer
+ *
+ */
+void FollowerText3D::scaleText()
+{
+	if (!mMetricCallback)
+	{
+    mFollower->SetScale(ssc::Vector3D(mSize,mSize,mSize).begin());
+		return;
+	}
+
+//  double targetSize = 0.025;// relative to vp height
+
+  //  use the focal point and focal point + vup.
+  //  Transform both to view space and remove z-coord.
+  //  The distance between then in the view plane can
+  //  be used to rescale the text.
+  vtkCameraPtr camera = mRenderer->GetActiveCamera();
+  ssc::Vector3D p_f(camera->GetFocalPoint());
+  ssc::Vector3D vup(camera->GetViewUp());
+  ssc::Vector3D p_fup = p_f+vup;
+  mRenderer->WorldToView(p_f[0],p_f[1],p_f[2]);
+  mRenderer->WorldToView(p_fup[0],p_fup[1],p_fup[2]);
+  p_f[2] = 0;
+  p_fup[2] = 0;
+  double size = (p_f - p_fup).length()/2;
+  double scale = mSize/size;
+//  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
+  ssc::Vector3D mTextScale(scale,scale,scale);
+  if (mFollower)
+    mFollower->SetScale(mTextScale.begin());
+
+//	std::cout << "FollowerText3D::scaleText() " << scale << " " << size << std::endl;
 }
 
 ///--------------------------------------------------------

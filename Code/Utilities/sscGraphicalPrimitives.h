@@ -89,6 +89,36 @@ private:
 };
 typedef boost::shared_ptr<class Rect3D> Rect3DPtr;
 
+/** Helper for rendering 3D text that faces the camera and
+ *  has a constant viewed size.
+ */
+class FollowerText3D
+{
+  public:
+	FollowerText3D(vtkRendererPtr renderer = vtkRendererPtr());
+    ~FollowerText3D();
+    void setColor(Vector3D color);
+    void setText(QString text);
+    void setPosition(ssc::Vector3D pos);
+
+    void setSize(double val);
+    void setSizeInNormalizedViewport(bool on, double size);
+    vtkFollowerPtr getActor();
+
+    void scaleText(); ///< internal method
+
+  private:
+    vtkVectorTextPtr mText;
+    vtkFollowerPtr mFollower;
+    vtkRendererPtr mRenderer;
+    double mSize;
+
+    typedef vtkSmartPointer<class FollowerText3DCallback> FollowerText3DCallbackPtr;
+    FollowerText3DCallbackPtr mMetricCallback;
+};
+typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
+
+
 }
 
 #endif /*SSCGRAPHICALPRIMITIVES_H_*/
