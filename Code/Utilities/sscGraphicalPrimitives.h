@@ -6,6 +6,7 @@
 #include "sscTransform3D.h"
 
 typedef vtkSmartPointer<class vtkArcSource> vtkArcSourcePtr;
+typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
 
 namespace ssc
 {
@@ -69,6 +70,24 @@ class GraphicalArc3D
     vtkArcSourcePtr source;
 };
 typedef boost::shared_ptr<GraphicalArc3D> GraphicalArc3DPtr;
+
+/** Helper for rendering an arrow in 3D
+ */
+class GraphicalArrow3D
+{
+  public:
+	GraphicalArrow3D(vtkRendererPtr renderer = vtkRendererPtr());
+    ~GraphicalArrow3D();
+    void setColor(Vector3D color);
+    void setValue(Vector3D base, Vector3D normal, double length);
+
+  private:
+    vtkPolyDataMapperPtr mapper;
+    vtkActorPtr actor;
+    vtkRendererPtr mRenderer;
+    vtkArrowSourcePtr source;
+};
+typedef boost::shared_ptr<GraphicalArrow3D> GraphicalArrow3DPtr;
 
 class Rect3D
 {

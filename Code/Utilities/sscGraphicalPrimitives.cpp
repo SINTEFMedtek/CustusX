@@ -14,6 +14,8 @@
 #include <vtkCamera.h>
 #include "sscTypeConversions.h"
 #include "sscBoundingBox3D.h"
+#include "vtkArrowSource.h"
+#include "vtkMatrix4x4.h"
 
 namespace ssc
 {
@@ -174,6 +176,61 @@ vtkActorPtr GraphicalArc3D::getActor()
 ///--------------------------------------------------------
 ///--------------------------------------------------------
 ///--------------------------------------------------------
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+GraphicalArrow3D::GraphicalArrow3D( vtkRendererPtr renderer)
+{
+  mRenderer = renderer;
+  source = vtkArrowSourcePtr::New();
+  source->SetTipResolution(24);
+  source->SetShaftResolution(24);
+  mapper = vtkPolyDataMapperPtr::New() ;
+  actor = vtkActorPtr::New() ;
+
+  mapper->SetInputConnection( source->GetOutputPort() );
+  actor->SetMapper (mapper );
+  if (mRenderer)
+    mRenderer->AddActor(actor);
+}
+
+GraphicalArrow3D::~GraphicalArrow3D()
+{
+  if (mRenderer)
+    mRenderer->RemoveActor(actor);
+}
+
+void GraphicalArrow3D::setColor(Vector3D color)
+{
+  actor->GetProperty()->SetColor(color.begin());
+}
+
+void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
+{
+	// find an arbitrary vector k perpendicular to normal:
+	Vector3D k = cross(Vector3D(1,0,0), normal);
+	if (similar(k, Vector3D(0,0,0)))
+		k = cross(Vector3D(0,1,0), normal);
+	k = k.normalized();
+	Transform3D M =  createTransformIJC(normal, k, base);
+
+//	std::cout << "GraphicalArrow3D::setValue  " << base << " - " << normal << std::endl;
+	Transform3D S = createTransformScale(ssc::Vector3D(length,1,1));
+	M =  M * S;
+	// let arrow shape increase slowly with length:
+	source->SetTipLength(0.35/sqrt(length));
+	source->SetTipRadius(0.1*sqrt(length));
+	source->SetShaftRadius(0.03*sqrt(length));
+	actor->SetUserMatrix(M.getVtkMatrix());
+}
+
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
 
 Rect3D::Rect3D(vtkRendererPtr renderer, Vector3D color)
 {
