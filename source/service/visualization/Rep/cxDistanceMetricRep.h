@@ -34,8 +34,6 @@ public:
 	void setDistanceMetric(DistanceMetricPtr point);
 	virtual QString getType() const { return "cx::DistanceMetricRep"; }
 
-	void scaleText();
-
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
@@ -48,15 +46,10 @@ private:
 	DistanceMetricRep(); ///< not implemented
 
   ssc::GraphicalLine3DPtr mGraphicalLine;
-  DistanceMetricPtr mDistanceMetric;
+  ssc::FollowerText3DPtr mText;
+  DistanceMetricPtr mMetric;
 	ssc::View* mView;
 	ssc::Vector3D mColor;
-  typedef vtkSmartPointer<class DistanceMetricCallback> DistanceMetricCallbackPtr;
-  DistanceMetricCallbackPtr mDistanceMetricCallback;
-
-//	vtkTextActorPtr mTextActor;
-	vtkVectorTextPtr mText;
-	vtkFollowerPtr mFollower;
 };
 
 
