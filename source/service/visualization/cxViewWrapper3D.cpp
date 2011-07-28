@@ -622,7 +622,8 @@ void ViewWrapper3D::toolsAvailableSlot()
 
 //    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
 
-    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()/2); // use half the set size
+    toolRep->setSphereRadiusInNormalizedViewport(true);
 
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
