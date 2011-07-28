@@ -345,9 +345,11 @@ QString DistanceMetricWrapper::getType() const
 
 QString DistanceMetricWrapper::getArguments() const
 {
-  return ((mData->getPoint(0)) ? mData->getPoint(0)->getName() : QString("*"))
-      + QString("-")
-      + ((mData->getPoint(1)) ? mData->getPoint(1)->getName() : QString("*"));
+	QStringList data;
+	for (unsigned i=0; i<2; ++i)
+		data << (mData->getPoint(i) ? mData->getPoint(i)->getName() : QString("*"));
+	return data.join("-");
+
 }
 
 
@@ -454,10 +456,10 @@ QString AngleMetricWrapper::getType() const
 
 QString AngleMetricWrapper::getArguments() const
 {
-  return "";
-//  return ((mData->getPoint(0)) ? mData->getPoint(0)->getName() : QString("*"))
-//      + QString("-")
-//      + ((mData->getPoint(1)) ? mData->getPoint(1)->getName() : QString("*"));
+	QStringList data;
+	for (unsigned i=0; i<4; ++i)
+		data << (mData->getPoint(i) ? mData->getPoint(i)->getName() : QString("*"));
+	return data.join("-");
 }
 
 
