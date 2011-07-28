@@ -4,6 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include "vtkForwardDeclarations.h"
 #include "sscTransform3D.h"
+#include "sscViewportListener.h"
 
 typedef vtkSmartPointer<class vtkArcSource> vtkArcSourcePtr;
 typedef vtkSmartPointer<class vtkArrowSource> vtkArrowSourcePtr;
@@ -132,8 +133,7 @@ class FollowerText3D
     vtkRendererPtr mRenderer;
     double mSize;
 
-    typedef vtkSmartPointer<class FollowerText3DCallback> FollowerText3DCallbackPtr;
-    FollowerText3DCallbackPtr mMetricCallback;
+    ssc::ViewportListenerPtr mViewportListener;
 };
 typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
 

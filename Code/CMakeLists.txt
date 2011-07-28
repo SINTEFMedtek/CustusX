@@ -189,6 +189,8 @@ SET( SSC_SOURCE_FILES
     Utilities/sscVolumeHelpers.cpp
     Utilities/sscCustomMetaImage.h
     Utilities/sscCustomMetaImage.cpp
+    Utilities/sscViewportListener.h
+    Utilities/sscViewportListener.cpp
     
     sscView.cpp
     sscView.h
