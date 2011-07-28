@@ -88,8 +88,6 @@ void ViewportListener::callback()
  */
 double ViewportListener::getVpnZoom()
 {
-//  double targetSize = 0.025;// relative to vp height
-
   //  use the focal point and focal point + vup.
   //  Transform both to view space and remove z-coord.
   //  The distance between then in the view plane can

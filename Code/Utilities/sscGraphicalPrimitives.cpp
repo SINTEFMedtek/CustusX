@@ -222,9 +222,12 @@ void GraphicalArrow3D::setValue(Vector3D base, Vector3D normal, double length)
 	Transform3D S = createTransformScale(ssc::Vector3D(length,1,1));
 	M =  M * S;
 	// let arrow shape increase slowly with length:
-	source->SetTipLength(0.35/sqrt(length));
-	source->SetTipRadius(0.1*sqrt(length));
-	source->SetShaftRadius(0.03*sqrt(length));
+//	source->SetTipLength(0.35/sqrt(length));
+//	source->SetTipRadius(0.1*sqrt(length));
+//	source->SetShaftRadius(0.03*sqrt(length));
+  source->SetTipLength(0.35);
+  source->SetTipRadius(0.1*(length));
+  source->SetShaftRadius(0.03*(length));
 	actor->SetUserMatrix(M.getVtkMatrix());
 }
 

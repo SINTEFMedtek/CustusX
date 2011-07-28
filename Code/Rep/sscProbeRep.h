@@ -5,6 +5,9 @@
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
 
+#include "sscGraphicalPrimitives.h"
+#include "sscViewportListener.h"
+
 namespace ssc
 {
 typedef boost::shared_ptr<class ProbeRep> ProbeRepPtr;
@@ -58,9 +61,9 @@ protected:
 	virtual void removeRepActorsFromViewRenderer(View* view); ///< disconnects from the renderwindowinteractor
 	vtkRendererPtr getRendererFromRenderWindow(vtkRenderWindowInteractor& iren); ///< tries to get a renderer from the given renderwindowinteractor
 	bool intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection); ///< Find the intersection between the probe line and the image.
-	bool snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint); ///< if there is a landmark close by, use that instead
 	void connectInteractor();
 	void disconnectInteractor();
+	void scaleSphere();
 
 	View* mView;
 	bool mEnabled;
@@ -70,11 +73,11 @@ protected:
 	int                 mThreshold;                       ///< used to picked the point together with the probefilter, default=25
 	int                 mResolution;                      ///< used to divide the probing ray into pieces, default=1000
 	Vector3D            mPickedPoint;                     ///< the last point that was successfully sampled from intersection with an image
-	vtkActorPtr         mPickedPointActor;                ///< the actor showing the last successfully sampled point
-//	vtkRendererPtr      mCurrentRenderer;                 ///< the renderer set to use
-	vtkSphereSourcePtr  mPickedPointSphereSource;
 	double mSphereRadius;
 	vtkEventQtSlotConnectPtr mConnections;                ///< used to sending signals and events between vtk and qt
+
+  ssc::GraphicalPoint3DPtr mGraphicalPoint;
+  ssc::ViewportListenerPtr mViewportListener;
 };
 
 typedef boost::shared_ptr<ProbeRep> ProbeRepPtr;

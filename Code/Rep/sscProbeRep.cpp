@@ -1,5 +1,6 @@
 #include "sscProbeRep.h"
 
+#include "boost/bind.hpp"
 #include <vtkActor.h>
 #include <vtkCamera.h>
 #include <vtkRenderer.h>
@@ -33,21 +34,25 @@ ProbeRep::ProbeRep(const QString& uid, const QString& name) :
 	mThreshold(25),
 	mResolution(1000),
 	mPickedPoint(),
-	mPickedPointActor(NULL),
   mSphereRadius(2),
 	mConnections(vtkEventQtSlotConnectPtr::New())
 {
+  mViewportListener.reset(new ssc::ViewportListener);
+  mViewportListener->setCallback(boost::bind(&ProbeRep::scaleSphere, this));
+
   mView = NULL;
   mEnabled = false;
   mConnected = false;
-  mPickedPointSphereSource = vtkSphereSourcePtr::New();
-  mPickedPointSphereSource->SetRadius(mSphereRadius);
-  vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
-  mapper->SetInputConnection(mPickedPointSphereSource->GetOutputPort());
-  mPickedPointActor = vtkActorPtr::New();
-  mPickedPointActor->SetMapper(mapper);
-  mPickedPointActor->GetProperty()->SetColor(0,0,1);
-  mPickedPointActor->SetVisibility(false);
+}
+
+void ProbeRep::scaleSphere()
+{
+  if (!mGraphicalPoint)
+    return;
+
+  double size = mViewportListener->getVpnZoom();
+  double sphereSize = mSphereRadius/100/size;
+  mGraphicalPoint->setRadius(sphereSize);
 }
 
 ProbeRep::~ProbeRep()
@@ -68,8 +73,8 @@ ImagePtr ProbeRep::getImage()
 void ProbeRep::setSphereRadius(double radius)
 {
   mSphereRadius = radius;
-  if (mPickedPointSphereSource)
-    mPickedPointSphereSource->SetRadius(mSphereRadius);
+  if (mGraphicalPoint)
+    mGraphicalPoint->setRadius(mSphereRadius);
 }
 
 void ProbeRep::setImage(ImagePtr image)
@@ -164,21 +169,13 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	  return intersection;
 	}
 
-	//TODO: we need to know the result of this outside this function, so we know
-	//if the point should be made permanent or not
-	//bool snapped = snapToExistingPoints(p0, p1, intersection);
-
-	//set the last point picked
-	//moved to showTemporaryPointSlot(..)
-	/*mPickedPoint = intersection;
-	emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);*/
-
 	//Make an sphere actor to show where the calculated point is
 	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
   
   emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
 	return intersection;
 }
+
 /**
  * \param[in] index the index you want to give the landmark
  */
@@ -189,6 +186,7 @@ void ProbeRep::makeLandmarkPermanent(unsigned index)
 						   mPickedPoint[2],
 						   index);
 }
+
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
   //std::cout << "ProbeRep::pickLandmarkSlot" << std::endl;
@@ -206,11 +204,10 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	if(renderer == NULL)
 		return;
 
-//  std::cout << "ProbeRep::pickLandmarkSlot-2" << std::endl;
 	Vector3D clickPoint(pickedPoint[0], pickedPoint[1], 0);
-  //std::cout << "ProbeRep::pickLandmarkSlot: screenpos = " << clickPoint << std::endl;
 	this->pickLandmark(clickPoint, renderer);
 }
+
 /**
  * @param x world coordinat, ref space
  * @param y world coordinat, ref space
@@ -218,9 +215,11 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
  */
 void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
 {
-  mPickedPointActor->SetPosition(x, y, z);
   mPickedPoint = Vector3D(x,y,z);
+  if (mGraphicalPoint)
+    mGraphicalPoint->setValue(mPickedPoint);
 }
+
 /**
  * @param threshold sets a threshold for the probing ray
  */
@@ -228,6 +227,7 @@ void ProbeRep::setThresholdSlot(const int threshold)
 {
   mThreshold = threshold;
 }
+
 void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
   Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
@@ -247,12 +247,14 @@ void ProbeRep::setEnabled(bool on)
   if (mEnabled)
   {
     this->connectInteractor();
-    mPickedPointActor->SetVisibility(true);
+    if (mGraphicalPoint)
+      mGraphicalPoint->getActor()->SetVisibility(true);
   }
   else
   {
     this->disconnectInteractor();
-    mPickedPointActor->SetVisibility(false);
+    if (mGraphicalPoint)
+      mGraphicalPoint->getActor()->SetVisibility(false);
   }
 }
 
@@ -294,12 +296,16 @@ void ProbeRep::addRepActorsToViewRenderer(View* view)
 
   if (mEnabled)
     this->connectInteractor();
-//  mConnections->Connect(view->GetRenderWindow()->GetInteractor(),
-//                       vtkCommand::LeftButtonPressEvent,
-//                       this,
-//                       SLOT(pickLandmarkSlot(vtkObject*)));
-  view->getRenderer()->AddActor(mPickedPointActor);
+
   mView = view;
+
+  mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
+  mGraphicalPoint->setColor(ssc::Vector3D(0,0,1));
+  mGraphicalPoint->setRadius(mSphereRadius);
+  mGraphicalPoint->getActor()->SetVisibility(false);
+
+  mViewportListener->startListen(mView->getRenderer());
+  this->scaleSphere();
 }
 
 void ProbeRep::removeRepActorsFromViewRenderer(View* view)
@@ -308,15 +314,11 @@ void ProbeRep::removeRepActorsFromViewRenderer(View* view)
     return;
 
   this->disconnectInteractor();
-
-//  mConnections->Disconnect(view->GetRenderWindow()->GetInteractor(),
-//                       vtkCommand::LeftButtonPressEvent,
-//                       this,
-//                       SLOT(pickLandmarkSlot(vtkObject*)));
-  if (mPickedPointActor)
-    view->getRenderer()->RemoveActor(mPickedPointActor);
+  mViewportListener->stopListen();
+  mGraphicalPoint.reset();
   mView = NULL;
 }
+
 vtkRendererPtr ProbeRep::getRendererFromRenderWindow(vtkRenderWindowInteractor& iren)
 {
 	vtkRendererPtr renderer = NULL;
@@ -380,36 +382,6 @@ bool ProbeRep::intersectData(Vector3D p0, Vector3D p1, Vector3D& intersection)
 	retval = dMr.inv().coord(retval);
 	intersection = retval;
 	return true;
-}
-/**
- * \warning NOT IMPLEMENTED!!!
- * \param[in] p0 start point for the probe line
- * \param[in] p1 end point for the probe line
- * \param[in/out] bestPoint send in the point from the intersection, get out an
- * existing point if one is close by
- * \return whether or not the incoming bestPoint was replaced
- */
-bool ProbeRep::snapToExistingPoint(const Vector3D& p0, const Vector3D& p1, Vector3D& bestPoint)
-{
-	return false;
-//	Vector3D tangent = (p1-p0).normal(); //ray tangent
-//	vtkDoubleArrayPtr existingLandmarks = mImage->getLandmarks();
-//
-//	for(int i=0; i<= existingLandmarks->GetNumberOfTuples()-1; i++)
-//	{
-//		//distance from p0 to the currently best point
-//		double distanceStartPointToBestPoint = dot((bestPoint-p0), tangent);
-//
-//		//distance from p0 to this existing landmark
-//		double* landmark = existingLandmarks->GetTuple(i);
-//		Vector3D existingLandmark(landmark[0], landmark[1], landmark[3]);
-//		double distanceStartPointToExistingPoint = dot((existingLandmark-p0), tangent);
-//
-//		//TODO continue implementing
-//		//incoming point projected onto ray
-//		//Vector3D
-//	}
-//
 }
 
 Vector3D ProbeRep::getPosition() const

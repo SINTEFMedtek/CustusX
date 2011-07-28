@@ -1,5 +1,6 @@
 #include "sscToolRep3D.h"
 
+#include "boost/bind.hpp"
 #include <vtkActor.h>
 #include <vtkProperty.h>
 #include <vtkPolyDataMapper.h>
@@ -145,6 +146,26 @@ void ToolRep3D::setSphereRadius(double radius)
     mTooltipPoint->setRadius(mSphereRadius);
 }
 
+void ToolRep3D::setSphereRadiusInNormalizedViewport(bool on)
+{
+  if (mSphereRadiusInNormalizedViewport == on)
+    return;
+
+  mSphereRadiusInNormalizedViewport = on;
+
+  if (on)
+  {
+    mViewportListener.reset(new ssc::ViewportListener);
+    mViewportListener->setCallback(boost::bind(&ToolRep3D::scaleSpheres, this));
+//    if (mView)
+//      mViewportListener->startListen(mView->getRenderer());
+  }
+  else
+  {
+    mViewportListener.reset();
+  }
+}
+
 void ToolRep3D::addRepActorsToViewRenderer(View* view)
 {
   view->getRenderer()->AddActor(mTracer->getActor());
@@ -168,6 +189,9 @@ void ToolRep3D::addRepActorsToViewRenderer(View* view)
   mOffsetPoint->getActor()->SetVisibility(false);
   mOffsetLine->getActor()->SetVisibility(false);
 
+  if (mViewportListener)
+    mViewportListener->startListen(view->getRenderer());
+
   if (mRTStream)
     view->getRenderer()->AddActor(mRTStream->getActor());
 }
@@ -183,6 +207,31 @@ void ToolRep3D::removeRepActorsFromViewRenderer(View* view)
   mTooltipPoint.reset(new GraphicalPoint3D());
   mOffsetPoint.reset(new GraphicalPoint3D());
   mOffsetLine.reset(new GraphicalLine3D());
+
+  if (mViewportListener)
+    mViewportListener->stopListen();
+}
+
+/**Note: Internal method!
+ *
+ * Scale the text to be a constant fraction of the viewport height
+ * Called from a vtk camera observer
+ *
+ */
+void ToolRep3D::scaleSpheres()
+{
+  if (!mViewportListener)
+    return;
+  if (!mViewportListener->isListening())
+    return;
+
+  double size = mViewportListener->getVpnZoom();
+  double sphereSize = mSphereRadius/100/size;
+
+  if (mOffsetPoint)
+    mOffsetPoint->setRadius(sphereSize);
+  if (mTooltipPoint)
+    mTooltipPoint->setRadius(sphereSize);
 }
 
 void ToolRep3D::receiveTransforms(Transform3D prMt, double timestamp)
@@ -279,6 +328,8 @@ void ToolRep3D::updateOffsetGraphics()
   mOffsetPoint->setValue(p1);
   mOffsetLine->setValue(p0, p1);
   mTooltipPoint->setValue(Vector3D(p0));
+
+  this->scaleSpheres();
 }
 
 void ToolRep3D::receiveVisible(bool visible)

@@ -7,6 +7,7 @@
 #include "vtkForwardDeclarations.h"
 #include "sscForwardDeclarations.h"
 #include "sscVtkHelperClasses.h"
+#include "sscViewportListener.h"
 
 namespace ssc
 {
@@ -42,6 +43,7 @@ public:
 	void setStayHiddenAfterVisible(bool val);
 	void setStayVisibleAfterHide(bool val); ///< if true, tool is still rendered as visible after visibility status is hidden.
 	void setOffsetPointVisibleAtZeroOffset(bool val); ///< if true the sphere is visible even when the offset is zero
+  void setSphereRadiusInNormalizedViewport(bool on);
 
 protected:
 	ToolRep3D(const QString& uid, const QString& name="");
@@ -67,6 +69,7 @@ private slots:
 private:
 	void update();
 	void updateOffsetGraphics();
+	void scaleSpheres();
 
   double mSphereRadius;
 	ToolPtr mTool;
@@ -79,7 +82,9 @@ private:
 	bool mStayHiddenAfterVisible;
 	bool mStayVisibleAfterHide;
 	bool mOffsetPointVisibleAtZeroOffset;
+	bool mSphereRadiusInNormalizedViewport;
 	ToolTracerPtr mTracer;
+  ssc::ViewportListenerPtr mViewportListener;
 
 	//US Probe sector
 	ProbeSectorPtr mProbeSector;
