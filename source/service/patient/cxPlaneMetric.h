@@ -16,6 +16,7 @@
 namespace cx
 {
 typedef boost::shared_ptr<class PlaneMetric> PlaneMetricPtr;
+typedef Eigen::Hyperplane<double,3> Plane3D;
 
 class PlaneMetricReader: public ssc::DataReader
 {
@@ -48,6 +49,8 @@ public:
   void setFrame(ssc::CoordinateSystem space); // use parentframe from ssc::Data
   ssc::CoordinateSystem getFrame() const; // use parentframe from ssc::Data
   virtual QString getType() const { return "planeMetric"; }
+
+  Plane3D getRefPlane() const;
 
   virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
   virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.

@@ -11,6 +11,7 @@
 #include <sscRepImpl.h>
 #include "sscGraphicalPrimitives.h"
 #include "cxPlaneMetric.h"
+#include "sscViewportListener.h"
 
 namespace cx
 {
@@ -42,12 +43,16 @@ private:
   PlaneMetricRep(const QString& uid, const QString& name="");
   PlaneMetricRep(); ///< not implemented
 
+  double getVpnZoom();
+  void scaleText();
+
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
   ssc::GraphicalArrow3DPtr mNormal;
   PlaneMetricPtr mMetric;
   ssc::View* mView;
   double mSphereRadius;
   ssc::Vector3D mColor;
+  ssc::ViewportListenerPtr mViewportListener;
 };
 
 }

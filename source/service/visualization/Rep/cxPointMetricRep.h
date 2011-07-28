@@ -11,6 +11,7 @@
 #include <sscRepImpl.h>
 #include "sscGraphicalPrimitives.h"
 #include "cxPointMetric.h"
+#include "sscViewportListener.h"
 
 namespace cx
 {
@@ -42,10 +43,12 @@ private:
   PointMetricRep(const QString& uid, const QString& name="");
   PointMetricRep(); ///< not implemented
 
+  void scaleText();
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
   PointMetricPtr mPointMetric;
 	ssc::View* mView;
 	double mSphereRadius;
+  ssc::ViewportListenerPtr mViewportListener;
 };
 
 }
