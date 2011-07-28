@@ -90,5 +90,13 @@ ssc::DoubleBoundingBox3D PointMetric::boundingBox() const
   return ssc::DoubleBoundingBox3D(p0_r, p0_r);
 }
 
+/** Utility function: return the coordinate the the reference space.
+ *
+ */
+ssc::Vector3D PointMetric::getRefCoord() const
+{
+	ssc::Transform3D rM1 = ssc::SpaceHelpers::get_toMfrom(this->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+	return rM1.coord(this->getCoordinate());
+}
 
 }

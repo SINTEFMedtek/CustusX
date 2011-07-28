@@ -31,39 +31,66 @@ AngleMetric::~AngleMetric()
 {
 }
 
-void AngleMetric::setPoint(int index, PointMetricPtr p)
+void AngleMetric::setArgument(int index, ssc::DataPtr p)
 {
-  if (mPoint[index]==p)
+  if (mArgument[index]==p)
     return;
 
-  if (mPoint[index])
-  {
-    disconnect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-  }
+	if (mArgument[index])
+		disconnect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
 
-  mPoint[index] = p;
+	mArgument[index] = p;
 
-  if (mPoint[index])
-  {
-    connect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
-  }
+	if (mArgument[index])
+		connect(mArgument[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
 
   emit transformChanged();
 }
 
-PointMetricPtr AngleMetric::getPoint(int index)
+ssc::DataPtr AngleMetric::getArgument(int index)
 {
-  return mPoint[index];
+	return mArgument[index];
 }
+
+bool AngleMetric::validArgument(ssc::DataPtr p) const
+{
+	return p->getType()=="pointMetric";// || p->getType()=="planeMetric";
+}
+
+
+//void AngleMetric::setPoint(int index, PointMetricPtr p)
+//{
+//  if (mPoint[index]==p)
+//    return;
+//
+//  if (mPoint[index])
+//  {
+//    disconnect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
+//  }
+//
+//  mPoint[index] = p;
+//
+//  if (mPoint[index])
+//  {
+//    connect(mPoint[index].get(), SIGNAL(transformChanged()), this, SIGNAL(transformChanged()));
+//  }
+//
+//  emit transformChanged();
+//}
+//
+//PointMetricPtr AngleMetric::getPoint(int index)
+//{
+//  return mPoint[index];
+//}
 
 void AngleMetric::addXml(QDomNode& dataNode)
 {
   Data::addXml(dataNode);
 
-  for (unsigned i=0; i<mPoint.size(); ++i)
+  for (unsigned i=0; i<mArgument.size(); ++i)
   {
-    if (mPoint[i])
-      dataNode.toElement().setAttribute(QString("p%1").arg(i), mPoint[i]->getUid());
+    if (mArgument[i])
+      dataNode.toElement().setAttribute(QString("p%1").arg(i), mArgument[i]->getUid());
   }
 }
 
@@ -71,60 +98,52 @@ void AngleMetric::parseXml(QDomNode& dataNode)
 {
   Data::parseXml(dataNode);
 
-  for (unsigned i=0; i<mPoint.size(); ++i)
+  for (unsigned i=0; i<mArgument.size(); ++i)
   {
     QString uid = dataNode.toElement().attribute(QString("p%1").arg(i), "");
-    PointMetricPtr pt = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
-//    mPoint[i] = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(uid));
-    this->setPoint(i, pt);
+    this->setArgument(i, ssc::dataManager()->getData(uid));
   }
 }
 
 bool AngleMetric::isValid() const
 {
-  for (unsigned i=0; i<mPoint.size(); ++i)
+	return !this->getEndpoints().empty();
+}
+
+unsigned AngleMetric::getArgumentCount() const
+{
+	return mArgument.size();
+}
+
+std::vector<ssc::Vector3D> AngleMetric::getEndpoints() const
+{
+  std::vector<ssc::Vector3D> p(this->getArgumentCount());
+  for (unsigned i=0; i<p.size(); ++i)
   {
-    if (!mPoint[i])
-      return false;
+  	if (!mArgument[i])
+  		return std::vector<ssc::Vector3D>();
+    p[i] = boost::shared_dynamic_cast<PointMetric>(mArgument[i])->getRefCoord();
   }
-  return true;
+  return p;
 }
 
 double AngleMetric::getAngle() const
 {
-  if (!this->isValid())
-    return -1;
+  std::vector<ssc::Vector3D> p = this->getEndpoints();
 
-  std::vector<ssc::Vector3D> p_r(4);
-  for (unsigned i=0; i<4; ++i)
-  {
-    ssc::Transform3D rMi = ssc::SpaceHelpers::get_toMfrom(mPoint[i]->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-    p_r[i] = rMi.coord(mPoint[i]->getCoordinate());
-  }
+  if (p.empty())
+  	return -1;
 
-  ssc::Vector3D a = (p_r[0]-p_r[1]).normalized();
-  ssc::Vector3D b = (p_r[3]-p_r[2]).normalized();
+  ssc::Vector3D a = (p[0]-p[1]).normalized();
+  ssc::Vector3D b = (p[3]-p[2]).normalized();
 
   double angle = acos(ssc::dot(a,b)/a.length()/b.length());
-//  emit transformChanged();
   return angle;
 }
 
 ssc::DoubleBoundingBox3D AngleMetric::boundingBox() const
 {
-  std::vector<ssc::Vector3D> p_r(4);
-  for (unsigned i=0; i<4; ++i)
-  {
-    ssc::Transform3D rMi = ssc::SpaceHelpers::get_toMfrom(mPoint[i]->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-    p_r[i] = rMi.coord(mPoint[i]->getCoordinate());
-  }
-
-  return ssc::DoubleBoundingBox3D::fromCloud(p_r);
-}
-
-void AngleMetric::transformChangedSlot()
-{
-//  std::cout << "AngleMetric::transformChangedSlot()" << std::endl;
+  return ssc::DoubleBoundingBox3D::fromCloud(this->getEndpoints());
 }
 
 }

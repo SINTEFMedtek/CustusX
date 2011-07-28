@@ -7,7 +7,7 @@
 
 #include <cxPointMetricRep.h>
 #include "sscView.h"
-
+#include "boost/bind.hpp"
 
 namespace cx
 {
@@ -23,6 +23,8 @@ PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
 		mView(NULL),
 		mSphereRadius(1)
 {
+  mViewportListener.reset(new ssc::ViewportListener);
+	mViewportListener->setCallback(boost::bind(&PointMetricRep::scaleText, this));
 }
 
 
@@ -44,6 +46,7 @@ void PointMetricRep::addRepActorsToViewRenderer(ssc::View* view)
 {
 	mView = view;
 	mGraphicalPoint.reset();
+	mViewportListener->startListen(mView->getRenderer());
 	this->changedSlot();
 }
 
@@ -51,6 +54,7 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	mView = NULL;
 	mGraphicalPoint.reset();
+	mViewportListener->stopListen();
 }
 
 void PointMetricRep::setSphereRadius(double radius)
@@ -75,5 +79,20 @@ void PointMetricRep::changedSlot()
 	mGraphicalPoint->setColor(ssc::Vector3D(1,0,0));
 }
 
+/**Note: Internal method!
+ *
+ * Scale the text to be a constant fraction of the viewport height
+ * Called from a vtk camera observer
+ *
+ */
+void PointMetricRep::scaleText()
+{
+  if (!mGraphicalPoint)
+    return;
+
+	double size = mViewportListener->getVpnZoom();
+  double sphereSize = 0.005/size;
+  mGraphicalPoint->setRadius(sphereSize);
+}
 
 }

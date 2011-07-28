@@ -27,6 +27,7 @@ public:
   virtual ssc::DataPtr load(const QString& uid, const QString& filename);
 };
 
+
 /**Data class that represents a single point.
  * The point is attached to a specific coordinate system / frame.
  *
@@ -43,6 +44,7 @@ public:
 	void setFrame(ssc::CoordinateSystem space); // use parentframe from ssc::Data
 	ssc::CoordinateSystem getFrame() const; // use parentframe from ssc::Data
 	virtual QString getType() const { return "pointMetric"; }
+	ssc::Vector3D getRefCoord() const;
 
   virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
   virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.

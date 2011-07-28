@@ -11,6 +11,7 @@
 #include "sscTool.h"
 #include "sscToolManager.h"
 #include "sscTypeConversions.h"
+//#include ""
 
 namespace cx
 {
@@ -28,6 +29,15 @@ PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
 
 PlaneMetric::~PlaneMetric()
 {
+}
+
+Plane3D PlaneMetric::getRefPlane() const
+{
+	ssc::Transform3D rM1 = ssc::SpaceHelpers::get_toMfrom(this->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+	ssc::Vector3D p = rM1.coord(this->getCoordinate());
+	ssc::Vector3D n = rM1.vector(this->getNormal()).normalized();
+
+	return Eigen::Hyperplane<double,3>(n,p);
 }
 
 void PlaneMetric::setCoordinate(const ssc::Vector3D& p)

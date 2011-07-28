@@ -45,20 +45,21 @@ public:
   virtual ~AngleMetric();
 
   double getAngle() const;
+	std::vector<ssc::Vector3D> getEndpoints() const;
 
-  void setPoint(int index, PointMetricPtr p);
-  PointMetricPtr getPoint(int index);
+	unsigned getArgumentCount() const;
+	void setArgument(int index, ssc::DataPtr p);
+	ssc::DataPtr getArgument(int index);
+	bool validArgument(ssc::DataPtr p) const;
   bool isValid() const;
 
   virtual void addXml(QDomNode& dataNode); ///< adds xml information about the data and its variabels
   virtual void parseXml(QDomNode& dataNode);///< Use a XML node to load data. \param dataNode A XML data representation of this object.
   virtual ssc::DoubleBoundingBox3D boundingBox() const;
   virtual QString getType() const { return "angleMetric"; }
-private slots:
-  void transformChangedSlot();
 
 private:
-  boost::array<PointMetricPtr,4> mPoint;
+  boost::array<ssc::DataPtr,4> mArgument;
 };
 
 }
