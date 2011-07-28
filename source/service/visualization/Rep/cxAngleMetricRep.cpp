@@ -90,12 +90,7 @@ void AngleMetricRep::changedSlot()
   if (!mLine0)
   	return;
 
-  std::vector<ssc::Vector3D> p(4);
-  for (unsigned i=0; i<4; ++i)
-  {
-    ssc::Transform3D rMi = ssc::SpaceHelpers::get_toMfrom(mMetric->getPoint(i)->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-    p[i] = rMi.coord(mMetric->getPoint(i)->getCoordinate());
-  }
+  std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
 
   mLine0->setColor(mColor);
   mLine1->setColor(mColor);
@@ -117,7 +112,6 @@ void AngleMetricRep::changedSlot()
   ssc::Vector3D a_text = (a_center + a_start + a_end)/3;
 
   QString text = QString("%1*").arg(mMetric->getAngle()/M_PI*180, 0, 'f', 1);
-//  ssc::Vector3D p_mean = (p[0]+p[1]+p[2]+p[3])/4;
   mText->setColor(mColor);
   mText->setText(text);
   mText->setPosition(a_text);

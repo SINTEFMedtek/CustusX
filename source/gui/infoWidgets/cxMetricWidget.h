@@ -108,7 +108,7 @@ private slots:
 private:
 	DistanceMetricPtr mData;
   std::vector<ssc::StringDataAdapterXmlPtr> mPSelector;
-  void getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap);
+  void getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap);
   bool mInternalUpdate;
 };
 
