@@ -318,7 +318,7 @@ QWidget* DistanceMetricWrapper::createWidget()
     mPSelector[i] = ssc::StringDataAdapterXml::initialize(QString("p%1").arg(i),
         QString("p%1").arg(i),
         QString("line endpoint %1").arg(i),
-        mData->getPoint(i)->getUid(),
+        mData->getPoint(i) ? mData->getPoint(i)->getUid() : "",
         range,
         QDomNode());
     mPSelector[i]->setDisplayNames(names);
