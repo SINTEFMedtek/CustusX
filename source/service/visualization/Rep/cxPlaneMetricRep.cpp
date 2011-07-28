@@ -81,15 +81,15 @@ void PlaneMetricRep::changedSlot()
   if (!mGraphicalPoint)
     return;
 
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-  ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
-  ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
+//  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+//  ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
+//  ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
 
-  mGraphicalPoint->setValue(p0_r);
-  mGraphicalPoint->setRadius(mSphereRadius);
+//  mGraphicalPoint->setValue(p0_r);
+//  mGraphicalPoint->setRadius(mSphereRadius);
   mGraphicalPoint->setColor(mColor);
   mNormal->setColor(mColor);
-  mNormal->setValue(p0_r, n_r, 10);
+//  mNormal->setValue(p0_r, n_r, 10);
 
   this->scaleText();
 }
@@ -109,15 +109,17 @@ void PlaneMetricRep::scaleText()
   ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
   ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
 
-	double size = mViewportListener->getVpnZoom();
-	double mSize = 0.07; // ratio of vp height
-  double scale = mSize/size;
+  double size = mViewportListener->getVpnZoom();
+  double sphereSize = mSphereRadius/100/size;
+//  double mSize = mSphereRadius/100/size*10;
+//	double mSize = 0.07; // ratio of vp height
+//  double scale = mSize/size;
 //  std::cout << "s= " << size << "  ,scale= " << scale << std::endl;
 
-  mNormal->setValue(p0_r, n_r, scale);
+  mGraphicalPoint->setValue(p0_r);
+  mNormal->setValue(p0_r, n_r, sphereSize*10);
 
-
-  double sphereSize = 0.005/size;
+//  double sphereSize = 0.007/size;
   mGraphicalPoint->setRadius(sphereSize);
 }
 

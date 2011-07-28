@@ -77,6 +77,7 @@ void PointMetricRep::changedSlot()
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mSphereRadius);
 	mGraphicalPoint->setColor(ssc::Vector3D(1,0,0));
+	this->scaleText();
 }
 
 /**Note: Internal method!
@@ -91,7 +92,8 @@ void PointMetricRep::scaleText()
     return;
 
 	double size = mViewportListener->getVpnZoom();
-  double sphereSize = 0.005/size;
+//  double sphereSize = 0.007/size;
+  double sphereSize = mSphereRadius/100/size;
   mGraphicalPoint->setRadius(sphereSize);
 }
 
