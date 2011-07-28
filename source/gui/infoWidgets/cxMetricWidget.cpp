@@ -284,12 +284,13 @@ DistanceMetricWrapper::DistanceMetricWrapper(DistanceMetricPtr data) : mData(dat
   connect(ssc::dataManager(), SIGNAL(dataLoaded()), this, SLOT(dataChangedSlot()));
 }
 
-void DistanceMetricWrapper::getPointMetrics(QStringList* uid, std::map<QString,QString>* namemap)
+void DistanceMetricWrapper::getAvailableArgumentMetrics(QStringList* uid, std::map<QString,QString>* namemap)
 {
   std::map<QString, ssc::DataPtr> data = ssc::dataManager()->getData();
   for (std::map<QString, ssc::DataPtr>::iterator iter=data.begin(); iter!=data.end(); ++iter)
   {
-    if (boost::shared_dynamic_cast<PointMetric>(iter->second))
+  	if (mData->validArgument(iter->second))
+//    if (boost::shared_dynamic_cast<PointMetric>(iter->second))
     {
       *uid << iter->first;
       (*namemap)[iter->first] = iter->second->getName();
@@ -310,15 +311,15 @@ QWidget* DistanceMetricWrapper::createWidget()
   QString value;// = qstring_cast(mData->getFrame());
   QStringList range;
   std::map<QString,QString> names;
-  this->getPointMetrics(&range, &names);
+  this->getAvailableArgumentMetrics(&range, &names);
 
-  mPSelector.resize(2);
+  mPSelector.resize(mData->getArgumentCount());
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
     mPSelector[i] = ssc::StringDataAdapterXml::initialize(QString("p%1").arg(i),
         QString("p%1").arg(i),
         QString("line endpoint %1").arg(i),
-        mData->getPoint(i) ? mData->getPoint(i)->getUid() : "",
+        mData->getArgument(i) ? mData->getArgument(i)->getUid() : "",
         range,
         QDomNode());
     mPSelector[i]->setDisplayNames(names);
@@ -346,8 +347,8 @@ QString DistanceMetricWrapper::getType() const
 QString DistanceMetricWrapper::getArguments() const
 {
 	QStringList data;
-	for (unsigned i=0; i<2; ++i)
-		data << (mData->getPoint(i) ? mData->getPoint(i)->getName() : QString("*"));
+	for (unsigned i=0; i<mData->getArgumentCount(); ++i)
+		data << (mData->getArgument(i) ? mData->getArgument(i)->getName() : QString("*"));
 	return data.join("-");
 
 }
@@ -359,8 +360,10 @@ void DistanceMetricWrapper::pointSelected()
     return;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
-    mData->setPoint(i, p);
+  	ssc::DataPtr arg = ssc::dataManager()->getData(mPSelector[i]->getValue());
+//    PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>();
+		if (mData->validArgument(arg))
+			mData->setArgument(i, arg);
   }
 }
 
@@ -369,8 +372,8 @@ void DistanceMetricWrapper::dataChangedSlot()
   mInternalUpdate = true;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    if (mData->getPoint(i))
-      mPSelector[i]->setValue(mData->getPoint(i)->getUid());
+    if (mData->getArgument(i))
+      mPSelector[i]->setValue(mData->getArgument(i)->getUid());
   }
   mInternalUpdate = false;
 }
@@ -427,7 +430,7 @@ QWidget* AngleMetricWrapper::createWidget()
     mPSelector[i] = ssc::StringDataAdapterXml::initialize(QString("p%1").arg(i),
         QString("p%1").arg(i),
         QString("p%1").arg(i),
-        mData->getPoint(i) ? mData->getPoint(i)->getUid() : "",
+        mData->getArgument(i) ? mData->getArgument(i)->getUid() : "",
         range,
         QDomNode());
     mPSelector[i]->setDisplayNames(names);
@@ -458,7 +461,7 @@ QString AngleMetricWrapper::getArguments() const
 {
 	QStringList data;
 	for (unsigned i=0; i<4; ++i)
-		data << (mData->getPoint(i) ? mData->getPoint(i)->getName() : QString("*"));
+		data << (mData->getArgument(i) ? mData->getArgument(i)->getName() : QString("*"));
 	return data.join("-");
 }
 
@@ -472,7 +475,7 @@ void AngleMetricWrapper::pointSelected()
   {
     PointMetricPtr p = boost::shared_dynamic_cast<PointMetric>(ssc::dataManager()->getData(mPSelector[i]->getValue()));
 //    std::cout << "    " << i << ", set: " << (p?p->getUid():"NULL") << ", old: "<< (mData->getPoint(i)?mData->getPoint(i)->getUid():"NULL") << std::endl;
-    mData->setPoint(i, p);
+    mData->setArgument(i, p);
   }
 }
 
@@ -481,8 +484,8 @@ void AngleMetricWrapper::dataChangedSlot()
   mInternalUpdate = true;
   for (unsigned i=0; i<mPSelector.size(); ++i)
   {
-    if (mData->getPoint(i))
-      mPSelector[i]->setValue(mData->getPoint(i)->getUid());
+    if (mData->getArgument(i))
+      mPSelector[i]->setValue(mData->getArgument(i)->getUid());
   }
   mInternalUpdate = false;
 }
@@ -814,25 +817,28 @@ void MetricWidget::addPlaneButtonClickedSlot()
 
 void MetricWidget::addDistanceButtonClickedSlot()
 {
+	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<PointMetricPtr> points;
+  std::vector<ssc::DataPtr> args;
 
   for (unsigned i=0; i<mMetrics.size(); ++i)
-  	if (mMetrics[i]->getType()=="point")
-  		points.push_back(boost::shared_dynamic_cast<PointMetric>(mMetrics[i]->getData()));
-
-  while (points.size()>2)
-  	points.erase(points.begin());
-
-  while (points.size()<2)
   {
-  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
-  	points.push_back(p0);
+  	if (d0->validArgument(mMetrics[i]->getData()))
+  		args.push_back(mMetrics[i]->getData());
   }
 
-	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
-	d0->setPoint(0, points[0]);
-	d0->setPoint(1, points[1]);
+  while (args.size() > d0->getArgumentCount())
+  	args.erase(args.begin());
+
+  while (args.size() < d0->getArgumentCount())
+  {
+  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
+  	args.push_back(p0);
+  }
+
+  for (unsigned i=0; i<args.size(); ++i)
+    d0->setArgument(i, args[i]);
+
 	ssc::dataManager()->loadData(d0);
 
 	viewManager()->getViewGroups()[0]->getData()->addData(d0);
@@ -840,25 +846,27 @@ void MetricWidget::addDistanceButtonClickedSlot()
 
 void MetricWidget::addAngleButtonClickedSlot()
 {
-  // first try to reuse existing points as distance arguments, otherwise create new ones.
-  std::vector<PointMetricPtr> points;
+  AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
+	// first try to reuse existing points as distance arguments, otherwise create new ones.
+  std::vector<ssc::DataPtr> args;
 
   for (unsigned i=0; i<mMetrics.size(); ++i)
-    if (mMetrics[i]->getType()=="point")
-      points.push_back(boost::shared_dynamic_cast<PointMetric>(mMetrics[i]->getData()));
-
-  while (points.size()>4)
-    points.erase(points.begin());
-
-  while (points.size()<4)
   {
-    PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
-    points.push_back(p0);
+  	if (d0->validArgument(mMetrics[i]->getData()))
+  		args.push_back(mMetrics[i]->getData());
   }
 
-  AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
-  for (unsigned i=0; i<points.size(); ++i)
-    d0->setPoint(i, points[i]);
+  while (args.size() > d0->getArgumentCount())
+  	args.erase(args.begin());
+
+  while (args.size() < d0->getArgumentCount())
+  {
+  	PointMetricPtr p0 = this->addPoint(ssc::Vector3D(0,0,0), ssc::CoordinateSystem(ssc::csREF, ""));
+  	args.push_back(p0);
+  }
+
+  for (unsigned i=0; i<args.size(); ++i)
+    d0->setArgument(i, args[i]);
   ssc::dataManager()->loadData(d0);
 
   viewManager()->getViewGroups()[0]->getData()->addData(d0);

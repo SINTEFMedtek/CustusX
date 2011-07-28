@@ -67,8 +67,9 @@ void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 
 void DistanceMetricRep::changedSlot()
 {
-  if (!mMetric->getPoint(0) || !mMetric->getPoint(1))
-    return;
+	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
+	if (p.size()!=2)
+		return;
 
   if (!mGraphicalLine && mView && mMetric)
   {
@@ -78,13 +79,6 @@ void DistanceMetricRep::changedSlot()
 
 	if (!mGraphicalLine)
 		return;
-
-  std::vector<ssc::Vector3D> p(2);
-  for (unsigned i=0; i<p.size(); ++i)
-  {
-    ssc::Transform3D rMi = ssc::SpaceHelpers::get_toMfrom(mMetric->getPoint(i)->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-    p[i] = rMi.coord(mMetric->getPoint(i)->getCoordinate());
-  }
 
 	mGraphicalLine->setColor(mColor);
 	mGraphicalLine->setValue(p[0], p[1]);
