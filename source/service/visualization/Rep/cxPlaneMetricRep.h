@@ -30,6 +30,7 @@ public:
 
   void setMetric(PlaneMetricPtr point);
   void setSphereRadius(double radius);
+  void setShowLabel(bool on);
   virtual QString getType() const { return "cx::PlaneMetricRep"; }
 
 protected:
@@ -47,12 +48,14 @@ private:
   void scaleText();
 
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
+  ssc::FollowerText3DPtr mText;
   ssc::GraphicalArrow3DPtr mNormal;
   PlaneMetricPtr mMetric;
   ssc::View* mView;
   double mSphereRadius;
   ssc::Vector3D mColor;
   ssc::ViewportListenerPtr mViewportListener;
+  bool mShowLabel;
 };
 
 }

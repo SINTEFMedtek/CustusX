@@ -33,6 +33,7 @@ public:
 
 	void setDistanceMetric(DistanceMetricPtr point);
 	virtual QString getType() const { return "cx::DistanceMetricRep"; }
+  void setShowLabel(bool on);
 
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -50,6 +51,7 @@ private:
   DistanceMetricPtr mMetric;
 	ssc::View* mView;
 	ssc::Vector3D mColor;
+  bool mShowLabel;
 };
 
 
