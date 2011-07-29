@@ -66,13 +66,13 @@ ToolAxisConnector::ToolAxisConnector(ssc::ToolPtr tool)
 	mAxis_s = ssc::AxesRep::New(tool->getUid()+"_axis_s");
 	mAxis_t = ssc::AxesRep::New(tool->getUid()+"_axis_t");
 
-	mAxis_t->setAxisLength(40);
+	mAxis_t->setAxisLength(0.08);
 	mAxis_t->setShowAxesLabels(false);
 	//mAxis_t->setCaption(tool->getName()+"_t", ssc::Vector3D(1,1,0.7));
 	mAxis_t->setCaption("t", ssc::Vector3D(0.7,1,0.7));
 	mAxis_t->setFontSize(0.03);
 
-	mAxis_s->setAxisLength(30);
+	mAxis_s->setAxisLength(0.05);
 	mAxis_s->setShowAxesLabels(false);
 	mAxis_s->setCaption("s", ssc::Vector3D(1,1,0));
 	mAxis_s->setFontSize(0.03);
@@ -320,6 +320,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 			  mRefSpaceAxisRep = ssc::AxesRep::New("refspace_axis");
 			  mRefSpaceAxisRep->setCaption("ref", ssc::Vector3D(1,0,0));
 			  mRefSpaceAxisRep->setFontSize(0.03);
+			  mRefSpaceAxisRep->setAxisLength(0.12);
 
 			  mView->addRep(mRefSpaceAxisRep);
 		}
@@ -331,6 +332,7 @@ void ViewWrapper3D::showAxesActionSlot(bool checked)
 	    ssc::AxesRepPtr rep = ssc::AxesRep::New(data[i]->getName()+"_axis");
       rep->setCaption(data[i]->getName(), ssc::Vector3D(1,0,0));
       rep->setFontSize(0.03);
+      rep->setAxisLength(0.08);
       rep->setTransform(data[i]->get_rMd());
       mDataSpaceAxisRep[data[i]->getUid()] = rep;
       mView->addRep(rep);
@@ -613,22 +615,12 @@ void ViewWrapper3D::toolsAvailableSlot()
         toolRep->getTracer()->start();
     }
 
-//    QString uid = tool->getUid()+"_rep3d_"+this->mView->getUid();
-//    if (!mToolReps.count(uid))
-//    {
-//      mToolReps[uid] = repManager()->getDynamicToolRep3DRep(uid);
-//    }
-//    ssc::ToolRep3DPtr toolRep = mToolReps[uid];
-
-//    std::cout << "setting 3D tool rep for " << iter->second->getName() << std::endl;
-
-    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()/2); // use half the set size
+    toolRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble()*2/3); // use fraction of set size
     toolRep->setSphereRadiusInNormalizedViewport(true);
 
     toolRep->setTool(tool);
     toolRep->setOffsetPointVisibleAtZeroOffset(true);
     mView->addRep(toolRep);
-
   }
 }
 
