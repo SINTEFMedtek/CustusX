@@ -33,6 +33,7 @@ public:
 
   void setMetric(AngleMetricPtr point);
   virtual QString getType() const { return "cx::AngleMetricRep"; }
+  void setShowLabel(bool on);
 
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
@@ -52,6 +53,7 @@ private:
   AngleMetricPtr mMetric;
   ssc::View* mView;
   ssc::Vector3D mColor;
+  bool mShowLabel;
 };
 
 

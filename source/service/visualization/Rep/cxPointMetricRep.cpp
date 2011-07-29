@@ -21,22 +21,29 @@ PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
 PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
 		RepImpl(uid,name),
 		mView(NULL),
-		mSphereRadius(1)
+		mSphereRadius(1),
+		mShowLabel(false),
+		mColor(ssc::Vector3D(1,0,0))
 {
   mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PointMetricRep::scaleText, this));
 }
 
+void PointMetricRep::setShowLabel(bool on)
+{
+  mShowLabel = on;
+  this->changedSlot();
+}
 
 void PointMetricRep::setPointMetric(PointMetricPtr point)
 {
-	if (mPointMetric)
-		disconnect(mPointMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+	if (mMetric)
+		disconnect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
 
-	mPointMetric = point;
+	mMetric = point;
 
-	if (mPointMetric)
-		connect(mPointMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
+	if (mMetric)
+		connect(mMetric.get(), SIGNAL(transformChanged()), this, SLOT(changedSlot()));
 
 	mGraphicalPoint.reset();
 	this->changedSlot();
@@ -46,6 +53,7 @@ void PointMetricRep::addRepActorsToViewRenderer(ssc::View* view)
 {
 	mView = view;
 	mGraphicalPoint.reset();
+	mText.reset();
 	mViewportListener->startListen(mView->getRenderer());
 	this->changedSlot();
 }
@@ -54,6 +62,7 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 {
 	mView = NULL;
 	mGraphicalPoint.reset();
+  mText.reset();
 	mViewportListener->stopListen();
 }
 
@@ -65,19 +74,35 @@ void PointMetricRep::setSphereRadius(double radius)
 
 void PointMetricRep::changedSlot()
 {
-	if (!mGraphicalPoint && mView && mPointMetric)
+  if (!mMetric)
+    return;
+
+	if (!mGraphicalPoint && mView && mMetric)
 		mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
 
 	if (!mGraphicalPoint)
 		return;
 
-	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mPointMetric->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-	ssc::Vector3D p0_r = rM0.coord(mPointMetric->getCoordinate());
+	ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+	ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
 
 	mGraphicalPoint->setValue(p0_r);
 	mGraphicalPoint->setRadius(mSphereRadius);
-	mGraphicalPoint->setColor(ssc::Vector3D(1,0,0));
-	this->scaleText();
+	mGraphicalPoint->setColor(mColor);
+
+  if (!mShowLabel)
+    mText.reset();
+  if (!mText && mShowLabel)
+    mText.reset(new ssc::FollowerText3D(mView->getRenderer()));
+  if (mText)
+  {
+    mText->setColor(mColor);
+    mText->setText(mMetric->getName());
+    mText->setPosition(p0_r);
+    mText->setSizeInNormalizedViewport(true, 0.025);
+  }
+
+  this->scaleText();
 }
 
 /**Note: Internal method!

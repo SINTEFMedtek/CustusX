@@ -29,10 +29,16 @@ DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& n
 DistanceMetricRep::DistanceMetricRep(const QString& uid, const QString& name) :
 		ssc::RepImpl(uid,name),
 		mView(NULL),
-		mColor(1,0,0)
+		mColor(1,0,0),
+		mShowLabel(false)
 {
 }
 
+void DistanceMetricRep::setShowLabel(bool on)
+{
+  mShowLabel = on;
+  this->changedSlot();
+}
 
 void DistanceMetricRep::setDistanceMetric(DistanceMetricPtr point)
 {
@@ -67,6 +73,9 @@ void DistanceMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 
 void DistanceMetricRep::changedSlot()
 {
+  if (!mMetric)
+    return;
+
 	std::vector<ssc::Vector3D> p = mMetric->getEndpoints();
 	if (p.size()!=2)
 		return;
@@ -85,6 +94,8 @@ void DistanceMetricRep::changedSlot()
 	mGraphicalLine->setStipple(0xF0FF);
 
 	QString text = QString("%1 mm").arg(mMetric->getDistance(), 0, 'f', 1);
+  if (mShowLabel)
+    text = mMetric->getName() + " = " + text;
 	ssc::Vector3D p_mean = (p[0]+p[1])/2;
 
   mText->setColor(mColor);

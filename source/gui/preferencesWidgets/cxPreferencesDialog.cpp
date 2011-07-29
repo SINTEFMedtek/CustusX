@@ -239,6 +239,10 @@ void VisualizationTab::init()
   mShowDataText = ssc::BoolDataAdapterXml::initialize("Show Data Text", "",
                                                  "Show the name of each data set in the views.",
                                                  showDataText);
+  bool showLabels = settings()->value("View/showLabels").value<bool>();
+  mShowLabels = ssc::BoolDataAdapterXml::initialize("Show Labels", "",
+                                                 "Attach name labels to entities in the views.",
+                                                 showLabels);
 //  connect(mAngioAdapter.get(), SIGNAL(valueWasSet()),   this, SLOT(setSettings()));
 
 
@@ -264,6 +268,7 @@ void VisualizationTab::init()
   mMainLayout->addWidget(backgroundColorButton, 0, 0);
   mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(ssc::createDataWidget(this, mShowDataText));
+  mMainLayout->addWidget(ssc::createDataWidget(this, mShowLabels));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -338,6 +343,7 @@ void VisualizationTab::saveParametersSlot()
 {
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
+  settings()->setValue("View/showLabels", mShowLabels->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)
