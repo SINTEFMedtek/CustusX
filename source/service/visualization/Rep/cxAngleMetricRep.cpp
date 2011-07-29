@@ -34,6 +34,11 @@ AngleMetricRep::AngleMetricRep(const QString& uid, const QString& name) :
 {
 }
 
+void AngleMetricRep::setShowLabel(bool on)
+{
+  mShowLabel = on;
+  this->changedSlot();
+}
 
 void AngleMetricRep::setMetric(AngleMetricPtr point)
 {
@@ -76,7 +81,7 @@ void AngleMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 
 void AngleMetricRep::changedSlot()
 {
-  if (!mMetric->isValid())
+  if (!mMetric || !mMetric->isValid())
     return;
 
   if (!mLine0 && !mLine1 && mView && mMetric)
@@ -112,6 +117,8 @@ void AngleMetricRep::changedSlot()
   ssc::Vector3D a_text = (a_center + a_start + a_end)/3;
 
   QString text = QString("%1*").arg(mMetric->getAngle()/M_PI*180, 0, 'f', 1);
+  if (mShowLabel)
+    text = mMetric->getName() + " = " + text;
   mText->setColor(mColor);
   mText->setText(text);
   mText->setPosition(a_text);

@@ -133,6 +133,7 @@ protected:
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mSphereRadius;
   ssc::BoolDataAdapterXmlPtr mShowDataText;
+  ssc::BoolDataAdapterXmlPtr mShowLabels;
 
   //Stereo
   QComboBox* mStereoTypeComboBox;
