@@ -6,6 +6,7 @@
 #include <map>
 #include <sscImage.h>
 #include "vtkForwardDeclarations.h"
+#include "sscGraphicalPrimitives.h"
 
 namespace ssc
 {
@@ -28,22 +29,22 @@ class LandmarkRep : public ssc::RepImpl
 {
   Q_OBJECT
 public:
-  // Fix for Windows
-  struct RGB_
-  {
-    int R;
-    int G;
-    int B;
-    RGB_() : R(0), G(255), B(0)
-    {};
-  }; ///< struct representing a rgb color
+//  // Fix for Windows
+//  struct RGB_
+//  {
+//    int R;
+//    int G;
+//    int B;
+//    RGB_() : R(0), G(255), B(0)
+//    {};
+//  }; ///< struct representing a rgb color
 
   //static LandmarkRepPtr New(const QString& uid, const QString& name=""); ///constructor
   virtual ~LandmarkRep();
 
   virtual QString getType() const = 0;
 
-  void setColor(RGB_ color); ///< sets the reps color
+  void setColor(ssc::Vector3D color); ///< sets the reps color
   void setTextScale(int x, int y,int z); ///< default is (20,20,20)
   void showLandmarks(bool on); ///< turn on or off showing landmarks
   //TODO remove
@@ -69,13 +70,20 @@ protected slots:
 
 protected:
   QString         mType;          ///< description of this reps type
-  RGB_            mColor;         ///< the color of the landmark actors
+  ssc::Vector3D   mColor;         ///< the color of the landmark actors
   //ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
   bool            mShowLandmarks; ///< whether or not the actors should be showed in (all) views
   int             mTextScale[3];  ///< the textscale
 
-  std::map<QString, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
-  std::map<QString, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
+  struct LandmarkGraphics
+  {
+    ssc::GraphicalPoint3DPtr mPoint;
+    ssc::FollowerText3DPtr mText;
+  };
+  typedef std::map<QString, LandmarkGraphics> LandmarkGraphicsMapType;
+  LandmarkGraphicsMapType mGraphics;
+//  std::map<QString, vtkActorPtr>                mSkinPointActors;   ///< list of actors used to show where the point is on the skin
+//  std::map<QString, vtkVectorTextFollowerPair>  mTextFollowerActors; ///< list of numberactors with the text representing the number for easy updating
 
 private:
   LandmarkRep(); ///< not implemented
