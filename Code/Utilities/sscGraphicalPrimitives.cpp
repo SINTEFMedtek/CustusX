@@ -47,16 +47,23 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 
 GraphicalPoint3D::~GraphicalPoint3D()
 {
-	if (mRenderer)
-	{
-		mRenderer->RemoveActor(actor);
-	}
+	this->setRenderer(NULL);
+//	if (mRenderer)
+//	{
+//		mRenderer->RemoveActor(actor);
+//	}
 }
 
 void GraphicalPoint3D::setRenderer(vtkRendererPtr renderer)
 {
-  mRenderer = renderer;
-  if (mRenderer)
+	if (mRenderer)
+	{
+		mRenderer->RemoveActor(actor);
+	}
+
+	mRenderer = renderer;
+
+	if (mRenderer)
   {
     mRenderer->AddActor(actor);
   }
@@ -337,7 +344,14 @@ FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 
 void FollowerText3D::setRenderer(vtkRendererPtr renderer)
 {
+	if (mRenderer)
+	{
+		mRenderer->RemoveActor(mFollower);
+    mViewportListener->stopListen();
+	}
+
   mRenderer = renderer;
+
   if (mRenderer)
   {
     mRenderer->AddActor(mFollower);
