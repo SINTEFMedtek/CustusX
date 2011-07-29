@@ -70,8 +70,9 @@ void PatientLandmarkRep::clearAll()
     this->landmarkRemovedSlot(it->first);
   }
 
-  mSkinPointActors.clear();
-  mTextFollowerActors.clear();
+//  mSkinPointActors.clear();
+//  mTextFollowerActors.clear();
+  mGraphics.clear();
 }
 
 void PatientLandmarkRep::addAll()
@@ -89,8 +90,12 @@ void PatientLandmarkRep::setPosition(ssc::Vector3D coord, QString uid)
 {
   ssc::Vector3D numberPosition = coord;
 
-  mTextFollowerActors[uid].second->SetPosition(numberPosition.begin());
-  mSkinPointActors[uid]->SetPosition(coord.begin());
+
+  mGraphics[uid].mPoint->setValue(coord);
+  mGraphics[uid].mText->setPosition(numberPosition);
+
+//  mTextFollowerActors[uid].second->SetPosition(coord.begin());
+//  mSkinPointActors[uid]->SetPosition(coord.begin());
 }
 
 }//namespace cx

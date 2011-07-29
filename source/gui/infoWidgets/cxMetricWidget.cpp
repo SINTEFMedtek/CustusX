@@ -25,6 +25,7 @@
 #include "sscDataManager.h"
 #include "sscLabeledComboBoxWidget.h"
 #include "cxVector3DWidget.h"
+#include "sscRegistrationTransform.h"
 
 namespace cx
 {
@@ -784,6 +785,7 @@ void MetricWidget::enablebuttons()
 PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem frame)
 {
 	PointMetricPtr p1(new PointMetric("point%1","point%1"));
+  p1->get_rMd_History()->setParentFrame("reference");
 	p1->setFrame(frame);
 	p1->setCoordinate(point);
 	ssc::dataManager()->loadData(p1);
@@ -807,6 +809,7 @@ void MetricWidget::addPlaneButtonClickedSlot()
   ssc::Vector3D p_ref = ssc::SpaceHelpers::getDominantToolTipPoint(ref, true);
 
   PlaneMetricPtr p1(new PlaneMetric("plane%1","plane%1"));
+  p1->get_rMd_History()->setParentFrame("reference");
   p1->setFrame(ref);
   p1->setCoordinate(p_ref);
   p1->setNormal(ssc::Vector3D(1,0,0));
@@ -818,6 +821,7 @@ void MetricWidget::addPlaneButtonClickedSlot()
 void MetricWidget::addDistanceButtonClickedSlot()
 {
 	DistanceMetricPtr d0(new DistanceMetric("distance%1","distance%1"));
+  d0->get_rMd_History()->setParentFrame("reference");
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
   std::vector<ssc::DataPtr> args;
 
@@ -847,6 +851,7 @@ void MetricWidget::addDistanceButtonClickedSlot()
 void MetricWidget::addAngleButtonClickedSlot()
 {
   AngleMetricPtr d0(new AngleMetric("angle%1","angle%1"));
+  d0->get_rMd_History()->setParentFrame("reference");
 	// first try to reuse existing points as distance arguments, otherwise create new ones.
   std::vector<ssc::DataPtr> args;
 
