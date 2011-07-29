@@ -4,6 +4,7 @@
 
 namespace cx
 {
+
 ImageLandmarkRepPtr ImageLandmarkRep::New(const QString& uid, const QString& name)
 {
   ImageLandmarkRepPtr retval(new ImageLandmarkRep(uid, name));
@@ -90,8 +91,7 @@ void ImageLandmarkRep::clearAll()
     this->landmarkRemovedSlot(it->first);
   }
 
-  mSkinPointActors.clear();
-  mTextFollowerActors.clear();
+  mGraphics.clear();
 }
 
 void ImageLandmarkRep::addAll()
@@ -107,14 +107,12 @@ void ImageLandmarkRep::addAll()
 void ImageLandmarkRep::setPosition(ssc::Vector3D coord, QString uid)
 {
   ssc::Vector3D imageCenter = mImage->get_rMd().coord(mImage->boundingBox().center());
-//  vtkImageDataPtr imageData = mImage->getRefVtkImageData();
-//  ssc::Vector3D imageCenter(imageData->GetCenter());
   ssc::Vector3D centerToSkinVector = (coord - imageCenter).normal();
 
   ssc::Vector3D numberPosition = coord + 10.0*centerToSkinVector;
 
-  mTextFollowerActors[uid].second->SetPosition(numberPosition.begin());
-  mSkinPointActors[uid]->SetPosition(coord.begin());
+  mGraphics[uid].mPoint->setValue(coord);
+  mGraphics[uid].mText->setPosition(numberPosition);
 }
 
 }//namespace cx
