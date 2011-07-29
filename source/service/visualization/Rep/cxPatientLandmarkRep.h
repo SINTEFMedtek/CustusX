@@ -23,15 +23,15 @@ public:
 
   virtual QString getType() const;
 
-public slots:
-  virtual void landmarkAddedSlot(QString );
-  virtual void transformChangedSlot();
+  void setImage(ssc::ImagePtr image); ///< set the master image
 
 protected:
   PatientLandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
-  virtual void clearAll();
   virtual void addAll();
-  virtual void setPosition(ssc::Vector3D coord, QString uid);
+  virtual void setPosition(QString uid);
+
+  ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
+
 };
 
 }//namespace cx

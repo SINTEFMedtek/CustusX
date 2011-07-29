@@ -27,15 +27,10 @@ public:
   void setImage(ssc::ImagePtr image); ///< sets the image data should be retrieved from
   ssc::ImagePtr getImage() const; ///< returns a pointer to the image being used
 
-public slots:
-  virtual void landmarkAddedSlot(QString );
-  virtual void transformChangedSlot();
-
 protected:
   ImageLandmarkRep(const QString& uid, const QString& name=""); ///< sets default text scaling to 20
-  virtual void clearAll();
   virtual void addAll();
-  virtual void setPosition(ssc::Vector3D coord, QString uid);
+  virtual void setPosition(QString uid);
 
   ssc::ImagePtr   mImage;         ///< the image which this rep is linked to
 };

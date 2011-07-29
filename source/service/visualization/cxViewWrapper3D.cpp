@@ -549,6 +549,7 @@ void ViewWrapper3D::activeImageChangedSlot()
 
   mProbeRep->setImage(image);
   mImageLandmarkRep->setImage(image);
+  mPatientLandmarkRep->setImage(image);
 }
 
 void ViewWrapper3D::showRefToolSlot(bool checked)
