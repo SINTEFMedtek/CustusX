@@ -25,12 +25,18 @@ PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
     RepImpl(uid,name),
     mView(NULL),
     mSphereRadius(1),
-    mColor(1,0,0)
+    mColor(1,0,0),
+    mShowLabel(false)
 {
   mViewportListener.reset(new ssc::ViewportListener);
 	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::scaleText, this));
 }
 
+void PlaneMetricRep::setShowLabel(bool on)
+{
+  mShowLabel = on;
+  this->changedSlot();
+}
 
 void PlaneMetricRep::setMetric(PlaneMetricPtr point)
 {
@@ -72,6 +78,9 @@ void PlaneMetricRep::setSphereRadius(double radius)
 
 void PlaneMetricRep::changedSlot()
 {
+  if (!mMetric)
+    return;
+
   if (!mGraphicalPoint && mView && mMetric)
   {
     mGraphicalPoint.reset(new ssc::GraphicalPoint3D(mView->getRenderer()));
@@ -121,6 +130,18 @@ void PlaneMetricRep::scaleText()
 
 //  double sphereSize = 0.007/size;
   mGraphicalPoint->setRadius(sphereSize);
+
+  if (!mShowLabel)
+    mText.reset();
+  if (!mText && mShowLabel)
+    mText.reset(new ssc::FollowerText3D(mView->getRenderer()));
+  if (mText)
+  {
+    mText->setColor(mColor);
+    mText->setText(mMetric->getName());
+    mText->setPosition(p0_r);
+    mText->setSizeInNormalizedViewport(true, 0.025);
+  }
 }
 
 }

@@ -478,24 +478,28 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   {
     PointMetricRepPtr rep = PointMetricRep::New(data->getUid()+"_3D_rep");
     rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<DistanceMetric>(data))
   {
   	DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<AngleMetric>(data))
   {
     AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<PlaneMetric>(data))
   {
     PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid()+"_3D_rep");
+    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
     rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
     return rep;
