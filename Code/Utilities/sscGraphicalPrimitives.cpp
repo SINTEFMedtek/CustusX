@@ -23,7 +23,7 @@ namespace ssc
 
 GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 {
-	mRenderer = renderer;
+//	mRenderer = renderer;
 	source = vtkSphereSourcePtr::New();
 	source->SetRadius(4);
 //  default:
@@ -38,10 +38,11 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 
 	actor = vtkActorPtr::New();
 	actor->SetMapper(mapper);
-	if (mRenderer)
-	{
-		mRenderer->AddActor(actor);
-	}
+//	if (mRenderer)
+//	{
+//		mRenderer->AddActor(actor);
+//	}
+	this->setRenderer(renderer);
 }
 
 GraphicalPoint3D::~GraphicalPoint3D()
@@ -50,6 +51,15 @@ GraphicalPoint3D::~GraphicalPoint3D()
 	{
 		mRenderer->RemoveActor(actor);
 	}
+}
+
+void GraphicalPoint3D::setRenderer(vtkRendererPtr renderer)
+{
+  mRenderer = renderer;
+  if (mRenderer)
+  {
+    mRenderer->AddActor(actor);
+  }
 }
 
 void GraphicalPoint3D::setRadius(double radius)
@@ -307,24 +317,34 @@ void Rect3D::updatePosition(const DoubleBoundingBox3D bb, const Transform3D& M)
 
 FollowerText3D::FollowerText3D( vtkRendererPtr renderer)
 {
-  mRenderer = renderer;
-  if (!mRenderer)
-  	return;
-
-  mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&FollowerText3D::scaleText, this));
+//  mRenderer = renderer;
+//  if (!mRenderer)
+//  	return;
 
   mText = vtkVectorText::New();
   vtkPolyDataMapperPtr mapper = vtkPolyDataMapperPtr::New();
   mapper->SetInput(mText->GetOutput());
   mFollower = vtkFollower::New();
   mFollower->SetMapper(mapper);
-  mFollower->SetCamera(mRenderer->GetActiveCamera());
+//  mFollower->SetCamera(mRenderer->GetActiveCamera());
   ssc::Vector3D mTextScale(2,2,2);
   mFollower->SetScale(mTextScale.begin());
 
-  mRenderer->AddActor(mFollower);
   this->setSizeInNormalizedViewport(true, 0.025);
+//  mRenderer->AddActor(mFollower);
+  this->setRenderer(renderer);
+}
+
+void FollowerText3D::setRenderer(vtkRendererPtr renderer)
+{
+  mRenderer = renderer;
+  if (mRenderer)
+  {
+    mRenderer->AddActor(mFollower);
+    mFollower->SetCamera(mRenderer->GetActiveCamera());
+    if (mViewportListener)
+      mViewportListener->startListen(mRenderer);
+  }
 }
 
 FollowerText3D::~FollowerText3D()
@@ -343,11 +363,15 @@ void FollowerText3D::setSizeInNormalizedViewport(bool on, double size)
 {
 	if (on)
 	{
-		mViewportListener->startListen(mRenderer);
+	  if (!mViewportListener)
+	  {
+      mViewportListener.reset(new ssc::ViewportListener);
+      mViewportListener->setCallback(boost::bind(&FollowerText3D::scaleText, this));
+	  }
 	}
 	else
 	{
-		mViewportListener->stopListen();
+    mViewportListener.reset();
 	}
 
 	this->setSize(size);
@@ -381,7 +405,7 @@ vtkFollowerPtr FollowerText3D::getActor()
  */
 void FollowerText3D::scaleText()
 {
-	if (!mViewportListener->isListening())
+	if (!mViewportListener || !mViewportListener->isListening())
 	{
     mFollower->SetScale(ssc::Vector3D(mSize,mSize,mSize).begin());
 		return;

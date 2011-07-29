@@ -18,6 +18,7 @@ class GraphicalPoint3D
 {
 	public:
 		GraphicalPoint3D(vtkRendererPtr renderer = vtkRendererPtr());
+    void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 		~GraphicalPoint3D();
 		void setRadius(double radius);
 		void setColor(Vector3D color);
@@ -116,6 +117,8 @@ class FollowerText3D
 {
   public:
 	FollowerText3D(vtkRendererPtr renderer = vtkRendererPtr());
+  void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+
     ~FollowerText3D();
     void setColor(Vector3D color);
     void setText(QString text);

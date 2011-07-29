@@ -1,5 +1,6 @@
 #include "sscAxesRep.h"
 
+#include "boost/bind.hpp"
 #include <vtkAxesActor.h>
 #include <vtkRenderer.h>
 #include <vtkMatrix4x4.h>
@@ -16,14 +17,29 @@ namespace ssc
 AxesRep::AxesRep(const QString& uid) :
 	RepImpl(uid)
 {
-	mAssembly = vtkAssemblyPtr::New();
+  mViewportListener.reset(new ssc::ViewportListener);
+  mViewportListener->setCallback(boost::bind(&AxesRep::rescale, this));
+
+  mAssembly = vtkAssemblyPtr::New();
 	mActor = vtkAxesActorPtr::New();
 	mAssembly->AddPart(mActor);
-	setAxisLength(50);
+	this->setAxisLength(0.2);
 
 	this->setShowAxesLabels(true);
 	setTransform(Transform3D::Identity());
 	setFontSize(0.04);
+
+}
+
+void AxesRep::rescale()
+{
+  if (!mViewportListener->isListening())
+    return;
+  double size = mViewportListener->getVpnZoom();
+  double axisSize = mSize/size;
+
+  mActor->SetTotalLength( axisSize, axisSize, axisSize );
+  setTransform(Transform3D(mAssembly->GetUserMatrix()));
 }
 
 void AxesRep::setVisible(bool on)
@@ -73,8 +89,9 @@ void AxesRep::setFontSize(double size)
 void AxesRep::setAxisLength(double length)
 {
 	mSize = length;
-	mActor->SetTotalLength( mSize, mSize, mSize );
-	setTransform(Transform3D(mAssembly->GetUserMatrix()));
+	this->rescale();
+//	mActor->SetTotalLength( mSize, mSize, mSize );
+//	setTransform(Transform3D(mAssembly->GetUserMatrix()));
 }
 
 /**Set the position of the axis.
@@ -86,7 +103,12 @@ void AxesRep::setTransform(Transform3D rMt)
 
 	for (unsigned i=0; i<mCaption.size(); ++i)
 	{
-		Vector3D pos = rMt.coord(mSize*mCaptionPos[i]);
+	  if (!mViewportListener->isListening())
+	    continue;
+	  double size = mViewportListener->getVpnZoom();
+	  double axisSize = mSize/size;
+
+		Vector3D pos = rMt.coord(axisSize*mCaptionPos[i]);
 		mCaption[i]->SetAttachmentPoint(pos.begin());
 	}
 }
@@ -120,6 +142,8 @@ void AxesRep::addRepActorsToViewRenderer(View* view)
 	view->getRenderer()->AddActor(mAssembly);
 	for (unsigned i=0; i<mCaption.size(); ++i)
 		view->getRenderer()->AddActor(mCaption[i]);
+  mViewportListener->startListen(view->getRenderer());
+  this->rescale();
 }
 
 void AxesRep::removeRepActorsFromViewRenderer(View* view)
@@ -127,6 +151,7 @@ void AxesRep::removeRepActorsFromViewRenderer(View* view)
 	view->getRenderer()->RemoveActor(mAssembly);
 	for (unsigned i=0; i<mCaption.size(); ++i)
 		view->getRenderer()->RemoveActor(mCaption[i]);
+  mViewportListener->stopListen();
 }
 
 } // namespace ssc

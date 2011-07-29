@@ -5,6 +5,7 @@
 #include "sscRepImpl.h"
 #include "sscTransform3D.h"
 #include "vtkForwardDeclarations.h"
+#include "sscGraphicalPrimitives.h"
 
 namespace ssc
 {
@@ -34,12 +35,14 @@ protected:
 	virtual void addRepActorsToViewRenderer(View* view);
 	virtual void removeRepActorsFromViewRenderer(View* view);
 	void addCaption(const QString& label, Vector3D pos, Vector3D color);
+	void rescale();
 	vtkAxesActorPtr mActor;
 	vtkAssemblyPtr mAssembly;
 	std::vector<vtkCaptionActor2DPtr> mCaption;
 	std::vector<Vector3D> mCaptionPos;
 	double mSize;
 	double mFontSize;
+  ssc::ViewportListenerPtr mViewportListener;
 
 };
 
