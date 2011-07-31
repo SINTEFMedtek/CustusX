@@ -53,6 +53,10 @@ std::vector<CoordinateSystem> CoordinateSystemHelpers::getAvailableSpaces()
 		retval.push_back(CoordinateSystem(csDATA, *iter));
 	}
 
+	// alias for the currently active tool:
+  retval.push_back(CoordinateSystem(csTOOL, "active"));
+  retval.push_back(CoordinateSystem(csSENSOR, "active"));
+
 	std::map<QString, ToolPtr> tools = *toolManager()->getTools();
 	for (std::map<QString, ToolPtr>::iterator iter=tools.begin(); iter!=tools.end(); ++iter)
 	{
@@ -211,6 +215,9 @@ Transform3D CoordinateSystemHelpers::get_rMt(QString uid) const
 {
   ToolPtr tool = toolManager()->getTool(uid);
 
+  if (!tool && uid=="active")
+    tool = toolManager()->getDominantTool();
+
   if(!tool)
   {
    messageManager()->sendWarning("Could not find tool with uid: "+uid+". Can not find transform to unknown coordinate system, returning identity!");
@@ -222,6 +229,9 @@ Transform3D CoordinateSystemHelpers::get_rMt(QString uid) const
 Transform3D CoordinateSystemHelpers::get_rMs(QString uid) const
 {
   ToolPtr tool = toolManager()->getTool(uid);
+
+  if (!tool && uid=="active")
+    tool = toolManager()->getDominantTool();
 
   if(!tool)
   {

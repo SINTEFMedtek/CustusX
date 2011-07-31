@@ -39,13 +39,13 @@ public:
   void setEnabled(bool on);
 
 	Vector3D pickLandmark(const Vector3D& clickPosition, vtkRendererPtr renderer); ///< When you don't use the renderwindowinteractor
-	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
+//	void makeLandmarkPermanent(unsigned int index); ///< sends out a signal to the image to make the picked landmark permanent
 	Vector3D getPosition() const;
 	void setSphereRadius(double radius);
 
 signals:
-	void addPermanentPoint(double x, double y, double z, unsigned int); ///< signal requesting this point be made permanent
-	void pointPicked(double x, double y, double z); /// the rep sends out a signal when the user picks a point on it
+//	void addPermanentPoint(double x, double y, double z, unsigned int); ///< signal requesting this point be made permanent
+	void pointPicked(ssc::Vector3D p_r); /// the rep sends out a signal when the user picks a point on it
 
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor

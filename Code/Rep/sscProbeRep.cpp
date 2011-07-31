@@ -172,20 +172,20 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	//Make an sphere actor to show where the calculated point is
 	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
   
-  emit pointPicked(mPickedPoint[0], mPickedPoint[1], mPickedPoint[2]);
+  emit pointPicked(mPickedPoint);
 	return intersection;
 }
 
-/**
- * \param[in] index the index you want to give the landmark
- */
-void ProbeRep::makeLandmarkPermanent(unsigned index)
-{
-	emit addPermanentPoint(mPickedPoint[0],
-						   mPickedPoint[1],
-						   mPickedPoint[2],
-						   index);
-}
+///**
+// * \param[in] index the index you want to give the landmark
+// */
+//void ProbeRep::makeLandmarkPermanent(unsigned index)
+//{
+//	emit addPermanentPoint(mPickedPoint[0],
+//						   mPickedPoint[1],
+//						   mPickedPoint[2],
+//						   index);
+//}
 
 void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 {
