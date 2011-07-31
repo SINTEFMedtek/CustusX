@@ -166,7 +166,8 @@ void StateService::fillDefaultSettings()
   this->fillDefault("globalPatientNumber", 1);
   this->fillDefault("Ultrasound/acquisitionName", "US-Acq");
   this->fillDefault("Ultrasound/8bitAcquisitionData", true);
-  this->fillDefault("View3D/sphereRadius", 2.0);
+  this->fillDefault("View3D/sphereRadius", 1.0);
+  this->fillDefault("View3D/labelSize", 2.5);
   this->fillDefault("View3D/showOrientationAnnotation", true);
   this->fillDefault("IGTLink/localServer", "GrabberServer.app --auto");
   this->fillDefault("showSectorInRTView", true);

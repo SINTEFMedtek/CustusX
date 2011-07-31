@@ -483,6 +483,9 @@ ssc::ToolManager::ToolMapPtr ToolManager::getTools()
 
 ssc::ToolPtr ToolManager::getTool(const QString& uid)
 {
+  if (uid=="active")
+    return this->getDominantTool();
+
   ssc::ToolPtr retval;
   ssc::ToolManager::ToolMap::iterator it = mTools.find(uid);
   if (it != mTools.end())

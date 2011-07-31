@@ -78,7 +78,9 @@ void PatientLandmarkRep::setPosition(QString uid)
   ssc::Vector3D p_r = ToolManager::getInstance()->get_rMpr()->coord(landmark_pr.getCoord());// p_r = point in ref space
 
   mGraphics[uid].mPoint->setValue(p_r);
-  mGraphics[uid].mText->setPosition(p_r);
+
+  if (mGraphics[uid].mText)
+    mGraphics[uid].mText->setPosition(p_r);
 
   if (mImage && mGraphics[uid].mLine)
   {

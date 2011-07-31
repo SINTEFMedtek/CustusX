@@ -45,7 +45,7 @@
 #include "cxDistanceMetricRep.h"
 #include "cxAngleMetricRep.h"
 #include "cxPlaneMetricRep.h"
-
+#include "cxDataMetricRep.h"
 
 namespace cx
 {
@@ -125,7 +125,7 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
   mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
 
-  connect(mProbeRep.get(), SIGNAL(pointPicked(double,double,double)),this, SLOT(probeRepPointPickedSlot(double,double,double)));
+  connect(mProbeRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(probeRepPointPickedSlot(ssc::Vector3D)));
   mProbeRep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
   mProbeRep->setEnabled(false);
   mView->addRep(mProbeRep);
@@ -190,17 +190,29 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 	{
 	  this->updateView();
 	}
+  if (key=="View3D/sphereRadius" || key=="View3D/labelSize" || key=="View/showLabels")
+  {
+    for (RepMap::iterator iter=mDataReps.begin(); iter!=mDataReps.end(); ++iter)
+    {
+      this->readDataRepSettings(iter->second);
+    }
+  }
 }
 
 
-void ViewWrapper3D::probeRepPointPickedSlot(double x,double y,double z)
+void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
 {
-  //TODO check spaces....
-  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
+//  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
   ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
+
+  // set the picked point as offset tip
+  ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
+  ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0,0,tool->getTooltipOffset()));
+  p_r += offset;
+
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);
-  ToolManager::getInstance()->getManualTool()->set_prMt(ssc::createTransformTranslate(p_pr));
+  tool->set_prMt(ssc::createTransformTranslate(p_pr));
 }
 
 void ViewWrapper3D::appendToContextMenu(QMenu& contextMenu)
@@ -477,35 +489,51 @@ ssc::RepPtr ViewWrapper3D::createDataRep3D(ssc::DataPtr data)
   else if (boost::shared_dynamic_cast<PointMetric>(data))
   {
     PointMetricRepPtr rep = PointMetricRep::New(data->getUid()+"_3D_rep");
-    rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
-    rep->setShowLabel(settings()->value("View/showLabels").toBool());
+    this->readDataRepSettings(rep);
     rep->setPointMetric(boost::shared_dynamic_cast<PointMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<DistanceMetric>(data))
   {
   	DistanceMetricRepPtr rep = DistanceMetricRep::New(data->getUid()+"_3D_rep");
-    rep->setShowLabel(settings()->value("View/showLabels").toBool());
+    this->readDataRepSettings(rep);
+//    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setDistanceMetric(boost::shared_dynamic_cast<DistanceMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<AngleMetric>(data))
   {
     AngleMetricRepPtr rep = AngleMetricRep::New(data->getUid()+"_3D_rep");
-    rep->setShowLabel(settings()->value("View/showLabels").toBool());
+    this->readDataRepSettings(rep);
+//    rep->setShowLabel(settings()->value("View/showLabels").toBool());
     rep->setMetric(boost::shared_dynamic_cast<AngleMetric>(data));
     return rep;
   }
   else if (boost::shared_dynamic_cast<PlaneMetric>(data))
   {
     PlaneMetricRepPtr rep = PlaneMetricRep::New(data->getUid()+"_3D_rep");
-    rep->setShowLabel(settings()->value("View/showLabels").toBool());
-    rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
+    this->readDataRepSettings(rep);
+//    rep->setShowLabel(settings()->value("View/showLabels").toBool());
+//    rep->setSphereRadius(settings()->value("View3D/sphereRadius").toDouble());
     rep->setMetric(boost::shared_dynamic_cast<PlaneMetric>(data));
     return rep;
   }
 
   return ssc::RepPtr();
+}
+
+/**helper. Read settings common for all data metric reps.
+ *
+ */
+void ViewWrapper3D::readDataRepSettings(ssc::RepPtr rep)
+{
+  cx::DataMetricRepPtr val = boost::shared_dynamic_cast<DataMetricRep>(rep);
+  if (!val)
+    return;
+
+  val->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  val->setShowLabel(settings()->value("View/showLabels").toBool());
+  val->setLabelSize(settings()->value("View3D/labelSize").toDouble());
 }
 
 
