@@ -28,16 +28,9 @@ AngleMetricRepPtr AngleMetricRep::New(const QString& uid, const QString& name)
 }
 
 AngleMetricRep::AngleMetricRep(const QString& uid, const QString& name) :
-    ssc::RepImpl(uid,name),
-    mView(NULL),
-    mColor(1,0,0)
+    DataMetricRep(uid,name),
+    mView(NULL)
 {
-}
-
-void AngleMetricRep::setShowLabel(bool on)
-{
-  mShowLabel = on;
-  this->changedSlot();
 }
 
 void AngleMetricRep::setMetric(AngleMetricPtr point)
@@ -122,7 +115,7 @@ void AngleMetricRep::changedSlot()
   mText->setColor(mColor);
   mText->setText(text);
   mText->setPosition(a_text);
-  mText->setSizeInNormalizedViewport(true, 0.025);
+  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
 }
 
 

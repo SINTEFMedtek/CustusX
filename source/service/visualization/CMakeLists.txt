@@ -20,6 +20,7 @@ SET( CX_QT_MOC_HEADER_FILES
     cxInteractiveCropper.h
     cxCameraControl.h
     cxCameraStyle.h
+    Rep/cxDataMetricRep.h
     Rep/cxLandmarkRep.h
     Rep/sscOrientationAnnotation3DRep.h
     Rep/cxPointMetricRep.h
@@ -57,6 +58,8 @@ SET ( cxVisualizationService_SOURCE
     cxCameraControl.cpp
     cxCameraStyle.h
     cxCameraStyle.cpp
+    Rep/cxDataMetricRep.h
+    Rep/cxDataMetricRep.cpp
     Rep/cxLandmarkRep.h
     Rep/cxLandmarkRep.cpp
     Rep/cxImageLandmarkRep.h

@@ -8,7 +8,7 @@
 #ifndef CXPOINTMETRICREP_H_
 #define CXPOINTMETRICREP_H_
 
-#include <sscRepImpl.h>
+#include "cxDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
 #include "cxPointMetric.h"
 #include "sscViewportListener.h"
@@ -21,7 +21,7 @@ typedef boost::shared_ptr<class PointMetricRep> PointMetricRepPtr;
 /**Rep for visualizing a PointMetric.
  *
  */
-class PointMetricRep : public ssc::RepImpl
+class PointMetricRep : public DataMetricRep
 {
 	Q_OBJECT
 public:
@@ -29,30 +29,26 @@ public:
   virtual ~PointMetricRep() {}
 
 	void setPointMetric(PointMetricPtr point);
-	void setSphereRadius(double radius);
-	void setShowLabel(bool on);
 	virtual QString getType() const { return "cx::PointMetricRep"; }
 
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
+  virtual void rescale();
+
 protected slots:
-	void changedSlot();
+	virtual void changedSlot();
 
 private:
   PointMetricRep(const QString& uid, const QString& name="");
   PointMetricRep(); ///< not implemented
 
-  void scaleText();
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
   ssc::FollowerText3DPtr mText;
   PointMetricPtr mMetric;
 	ssc::View* mView;
-	double mSphereRadius;
   ssc::ViewportListenerPtr mViewportListener;
-  bool mShowLabel;
-  ssc::Vector3D mColor;
 };
 
 }

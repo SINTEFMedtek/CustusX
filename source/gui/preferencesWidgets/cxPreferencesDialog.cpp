@@ -230,6 +230,9 @@ void VisualizationTab::init()
   double sphereRadius = settings()->value("View3D/sphereRadius").toDouble();
   mSphereRadius = ssc::DoubleDataAdapterXml::initialize("SphereRadius", "Sphere Radius", "Radius of sphere markers in the 3D scene.", sphereRadius, ssc::DoubleRange(0.1,10,0.1), 1, QDomNode());
 
+  double labelSize = settings()->value("View3D/labelSize").toDouble();
+  mLabelSize = ssc::DoubleDataAdapterXml::initialize("LabelSize", "Label Size", "Size of text labels in the 3D scene.", labelSize, ssc::DoubleRange(0.1,100,0.1), 1, QDomNode());
+
   ColorSelectButton* backgroundColorButton = new ColorSelectButton("Background Color");
   backgroundColorButton->setColor(settings()->value("backgroundColor").value<QColor>());
 
@@ -269,6 +272,7 @@ void VisualizationTab::init()
   mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mSphereRadius));
   mMainLayout->addWidget(ssc::createDataWidget(this, mShowDataText));
   mMainLayout->addWidget(ssc::createDataWidget(this, mShowLabels));
+  mMainLayout->addWidget(new ssc::SpinBoxGroupWidget(this, mLabelSize));
 
   mMainLayout->addWidget(stereoGroupBox);
 
@@ -344,6 +348,7 @@ void VisualizationTab::saveParametersSlot()
   settings()->setValue("View3D/sphereRadius", mSphereRadius->getValue());
   settings()->setValue("View/showDataText", mShowDataText->getValue());
   settings()->setValue("View/showLabels", mShowLabels->getValue());
+  settings()->setValue("View3D/labelSize", mLabelSize->getValue());
 }
 
 void VisualizationTab::setBackgroundColorSlot(QColor color)
