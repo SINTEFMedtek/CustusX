@@ -19,21 +19,21 @@ PointMetricRepPtr PointMetricRep::New(const QString& uid, const QString& name)
 }
 
 PointMetricRep::PointMetricRep(const QString& uid, const QString& name) :
-		RepImpl(uid,name),
-		mView(NULL),
-		mSphereRadius(1),
-		mShowLabel(false),
-		mColor(ssc::Vector3D(1,0,0))
+		DataMetricRep(uid,name),
+		mView(NULL)
+//		mSphereRadius(1),
+//		mShowLabel(false),
+//		mColor(ssc::Vector3D(1,0,0))
 {
   mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&PointMetricRep::scaleText, this));
+	mViewportListener->setCallback(boost::bind(&PointMetricRep::rescale, this));
 }
 
-void PointMetricRep::setShowLabel(bool on)
-{
-  mShowLabel = on;
-  this->changedSlot();
-}
+//void PointMetricRep::setShowLabel(bool on)
+//{
+//  mShowLabel = on;
+//  this->changedSlot();
+//}
 
 void PointMetricRep::setPointMetric(PointMetricPtr point)
 {
@@ -66,11 +66,11 @@ void PointMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	mViewportListener->stopListen();
 }
 
-void PointMetricRep::setSphereRadius(double radius)
-{
-  mSphereRadius = radius;
-  this->changedSlot();
-}
+//void PointMetricRep::setSphereRadius(double radius)
+//{
+//  mSphereRadius = radius;
+//  this->changedSlot();
+//}
 
 void PointMetricRep::changedSlot()
 {
@@ -87,7 +87,7 @@ void PointMetricRep::changedSlot()
 	ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
 
 	mGraphicalPoint->setValue(p0_r);
-	mGraphicalPoint->setRadius(mSphereRadius);
+	mGraphicalPoint->setRadius(mGraphicsSize);
 	mGraphicalPoint->setColor(mColor);
 
   if (!mShowLabel)
@@ -99,10 +99,10 @@ void PointMetricRep::changedSlot()
     mText->setColor(mColor);
     mText->setText(mMetric->getName());
     mText->setPosition(p0_r);
-    mText->setSizeInNormalizedViewport(true, 0.025);
+    mText->setSizeInNormalizedViewport(true, mLabelSize/100);
   }
 
-  this->scaleText();
+  this->rescale();
 }
 
 /**Note: Internal method!
@@ -111,14 +111,14 @@ void PointMetricRep::changedSlot()
  * Called from a vtk camera observer
  *
  */
-void PointMetricRep::scaleText()
+void PointMetricRep::rescale()
 {
   if (!mGraphicalPoint)
     return;
 
 	double size = mViewportListener->getVpnZoom();
 //  double sphereSize = 0.007/size;
-  double sphereSize = mSphereRadius/100/size;
+  double sphereSize = mGraphicsSize/100/size;
   mGraphicalPoint->setRadius(sphereSize);
 }
 

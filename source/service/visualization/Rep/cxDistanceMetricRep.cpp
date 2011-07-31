@@ -27,17 +27,9 @@ DistanceMetricRepPtr DistanceMetricRep::New(const QString& uid, const QString& n
 }
 
 DistanceMetricRep::DistanceMetricRep(const QString& uid, const QString& name) :
-		ssc::RepImpl(uid,name),
-		mView(NULL),
-		mColor(1,0,0),
-		mShowLabel(false)
+    DataMetricRep(uid,name),
+		mView(NULL)
 {
-}
-
-void DistanceMetricRep::setShowLabel(bool on)
-{
-  mShowLabel = on;
-  this->changedSlot();
 }
 
 void DistanceMetricRep::setDistanceMetric(DistanceMetricPtr point)
@@ -101,7 +93,7 @@ void DistanceMetricRep::changedSlot()
   mText->setColor(mColor);
   mText->setText(text);
   mText->setPosition(p_mean);
-  mText->setSizeInNormalizedViewport(true, 0.025);
+  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
 }
 
 }

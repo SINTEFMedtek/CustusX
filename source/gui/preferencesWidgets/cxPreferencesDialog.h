@@ -132,6 +132,7 @@ signals:
 protected:
   QGridLayout *mMainLayout;
   ssc::DoubleDataAdapterXmlPtr mSphereRadius;
+  ssc::DoubleDataAdapterXmlPtr mLabelSize;
   ssc::BoolDataAdapterXmlPtr mShowDataText;
   ssc::BoolDataAdapterXmlPtr mShowLabels;
 

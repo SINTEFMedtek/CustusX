@@ -8,7 +8,7 @@
 #ifndef CXANGLEMETRICREP_H_
 #define CXANGLEMETRICREP_H_
 
-#include <sscRepImpl.h>
+#include "cxDataMetricRep.h"
 #include "sscGraphicalPrimitives.h"
 #include "cxAngleMetric.h"
 #include "vtkForwardDeclarations.h"
@@ -24,7 +24,7 @@ typedef boost::shared_ptr<class AngleMetricRep> AngleMetricRepPtr;
 /**Rep for visualizing a DistanceMetric.
  *
  */
-class AngleMetricRep : public ssc::RepImpl
+class AngleMetricRep : public DataMetricRep
 {
   Q_OBJECT
 public:
@@ -33,14 +33,14 @@ public:
 
   void setMetric(AngleMetricPtr point);
   virtual QString getType() const { return "cx::AngleMetricRep"; }
-  void setShowLabel(bool on);
+//  void setShowLabel(bool on);
 
 protected:
   virtual void addRepActorsToViewRenderer(ssc::View* view);
   virtual void removeRepActorsFromViewRenderer(ssc::View* view);
 
 protected slots:
-  void changedSlot();
+  virtual void changedSlot();
 
 private:
   AngleMetricRep(const QString& uid, const QString& name="");
@@ -52,8 +52,8 @@ private:
   ssc::FollowerText3DPtr mText;
   AngleMetricPtr mMetric;
   ssc::View* mView;
-  ssc::Vector3D mColor;
-  bool mShowLabel;
+//  ssc::Vector3D mColor;
+//  bool mShowLabel;
 };
 
 

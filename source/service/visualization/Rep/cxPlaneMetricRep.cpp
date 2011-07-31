@@ -22,20 +22,11 @@ PlaneMetricRepPtr PlaneMetricRep::New(const QString& uid, const QString& name)
 }
 
 PlaneMetricRep::PlaneMetricRep(const QString& uid, const QString& name) :
-    RepImpl(uid,name),
-    mView(NULL),
-    mSphereRadius(1),
-    mColor(1,0,0),
-    mShowLabel(false)
+    DataMetricRep(uid,name),
+    mView(NULL)
 {
   mViewportListener.reset(new ssc::ViewportListener);
-	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::scaleText, this));
-}
-
-void PlaneMetricRep::setShowLabel(bool on)
-{
-  mShowLabel = on;
-  this->changedSlot();
+	mViewportListener->setCallback(boost::bind(&PlaneMetricRep::rescale, this));
 }
 
 void PlaneMetricRep::setMetric(PlaneMetricPtr point)
@@ -70,12 +61,6 @@ void PlaneMetricRep::removeRepActorsFromViewRenderer(ssc::View* view)
 	mViewportListener->stopListen();
 }
 
-void PlaneMetricRep::setSphereRadius(double radius)
-{
-  mSphereRadius = radius;
-  this->changedSlot();
-}
-
 void PlaneMetricRep::changedSlot()
 {
   if (!mMetric)
@@ -90,17 +75,10 @@ void PlaneMetricRep::changedSlot()
   if (!mGraphicalPoint)
     return;
 
-//  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-//  ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
-//  ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
-
-//  mGraphicalPoint->setValue(p0_r);
-//  mGraphicalPoint->setRadius(mSphereRadius);
   mGraphicalPoint->setColor(mColor);
   mNormal->setColor(mColor);
-//  mNormal->setValue(p0_r, n_r, 10);
 
-  this->scaleText();
+  this->rescale();
 }
 
 /**Note: Internal method!
@@ -109,7 +87,7 @@ void PlaneMetricRep::changedSlot()
  * Called from a vtk camera observer
  *
  */
-void PlaneMetricRep::scaleText()
+void PlaneMetricRep::rescale()
 {
   if (!mGraphicalPoint)
     return;
@@ -119,7 +97,7 @@ void PlaneMetricRep::scaleText()
   ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
 
   double size = mViewportListener->getVpnZoom();
-  double sphereSize = mSphereRadius/100/size;
+  double sphereSize = mGraphicsSize/100/size;
 //  double mSize = mSphereRadius/100/size*10;
 //	double mSize = 0.07; // ratio of vp height
 //  double scale = mSize/size;
@@ -140,7 +118,7 @@ void PlaneMetricRep::scaleText()
     mText->setColor(mColor);
     mText->setText(mMetric->getName());
     mText->setPosition(p0_r);
-    mText->setSizeInNormalizedViewport(true, 0.025);
+    mText->setSizeInNormalizedViewport(true, mLabelSize/100);
   }
 }
 
