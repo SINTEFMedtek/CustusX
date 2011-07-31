@@ -14,6 +14,30 @@
 
 namespace cx
 {
+
+/**Class that listens to changes in a coordinate system,
+ * and emits a signal if that system changes.
+ */
+class CoordinateSystemListener : public QObject
+{
+  Q_OBJECT
+
+public:
+  CoordinateSystemListener(ssc::CoordinateSystem space = ssc::CoordinateSystem());
+  virtual ~CoordinateSystemListener();
+  void setSpace(ssc::CoordinateSystem space);
+  ssc::CoordinateSystem getSpace() const;
+signals:
+  void changed();
+private slots:
+  void reconnect();
+private:
+  void doConnect();
+  void doDisconnect();
+  ssc::CoordinateSystem mSpace;
+};
+typedef boost::shared_ptr<CoordinateSystemListener> CoordinateSystemListenerPtr;
+
 typedef boost::shared_ptr<class PointMetric> PointMetricPtr;
 
 class PointMetricReader: public ssc::DataReader
@@ -57,6 +81,7 @@ public:
 private:
   ssc::Vector3D mCoordinate;
   ssc::CoordinateSystem mFrame;
+  CoordinateSystemListenerPtr mFrameListener;
 };
 
 }
