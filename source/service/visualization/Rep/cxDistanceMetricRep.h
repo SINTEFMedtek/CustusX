@@ -46,7 +46,7 @@ private:
 	DistanceMetricRep(); ///< not implemented
 
   ssc::GraphicalLine3DPtr mGraphicalLine;
-  ssc::FollowerText3DPtr mText;
+  ssc::CaptionText3DPtr mText;
   DistanceMetricPtr mMetric;
 	ssc::View* mView;
 };

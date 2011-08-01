@@ -126,8 +126,8 @@ ssc::DataPtr PointMetricReader::load(const QString& uid, const QString& filename
 PointMetric::PointMetric(const QString& uid, const QString& name) :
 	Data(uid, name)
 {
-  mFrameListener.reset(new CoordinateSystemListener);
-  connect(mFrameListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
+  mSpaceListener.reset(new CoordinateSystemListener);
+  connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));
 }
 
 PointMetric::~PointMetric()
@@ -149,32 +149,25 @@ ssc::Vector3D PointMetric::getCoordinate() const
 }
 
 
-void PointMetric::setFrame(ssc::CoordinateSystem space)
+void PointMetric::setSpace(ssc::CoordinateSystem space)
 {
-	if (space==mFrame)
+	if (space==mSpace)
 		return;
 
-	mFrame = space;
-	mFrameListener->setSpace(space);
-//	//TODO connect to the owner of space - data or tool or whatever
-//	if (mFrame.mId==ssc::csTOOL)
-//	{
-//		connect(ssc::toolManager()->getTool(mFrame.mRefObject).get(), SIGNAL(toolTransformAndTimestamp(Transform3D,double)), this, SIGNAL(transformChanged()));
-//	}
-
-//	emit transformChanged();
+	mSpace = space;
+	mSpaceListener->setSpace(space);
 }
 
-ssc::CoordinateSystem PointMetric::getFrame() const
+ssc::CoordinateSystem PointMetric::getSpace() const
 {
-	return mFrame;
+	return mSpace;
 }
 
 void PointMetric::addXml(QDomNode& dataNode)
 {
   Data::addXml(dataNode);
 
-  dataNode.toElement().setAttribute("frame", mFrame.toString());
+  dataNode.toElement().setAttribute("space", mSpace.toString());
   dataNode.toElement().setAttribute("coord", qstring_cast(mCoordinate));
 }
 
@@ -182,14 +175,14 @@ void PointMetric::parseXml(QDomNode& dataNode)
 {
   Data::parseXml(dataNode);
 
-  this->setFrame(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("frame", mFrame.toString())));
+  this->setSpace(ssc::CoordinateSystem::fromString(dataNode.toElement().attribute("space", mSpace.toString())));
   this->setCoordinate(ssc::Vector3D::fromString(dataNode.toElement().attribute("coord", qstring_cast(mCoordinate))));
 }
 
 ssc::DoubleBoundingBox3D PointMetric::boundingBox() const
 {
   // convert both inputs to r space
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
   ssc::Vector3D p0_r = rM0.coord(this->getCoordinate());
 
   return ssc::DoubleBoundingBox3D(p0_r, p0_r);
@@ -200,7 +193,7 @@ ssc::DoubleBoundingBox3D PointMetric::boundingBox() const
  */
 ssc::Vector3D PointMetric::getRefCoord() const
 {
-	ssc::Transform3D rM1 = ssc::SpaceHelpers::get_toMfrom(this->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+	ssc::Transform3D rM1 = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), ssc::CoordinateSystem(ssc::csREF));
 	return rM1.coord(this->getCoordinate());
 }
 

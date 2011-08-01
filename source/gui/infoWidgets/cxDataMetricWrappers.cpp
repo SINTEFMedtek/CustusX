@@ -52,13 +52,13 @@ QWidget* PointMetricWrapper::createWidget()
   for (unsigned i=0; i<spaces.size(); ++i)
     range << spaces[i].toString();
 
-  mFrameSelector = ssc::StringDataAdapterXml::initialize("selectFrame",
-      "Frame",
+  mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+      "Space",
       "Select coordinate system to store position in.",
       value,
       range,
       QDomNode());
-  hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mFrameSelector));
+  hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
 
   mCoordinate = ssc::Vector3DDataAdapterXml::initialize("selectCoordinate",
       "Coord",
@@ -74,7 +74,7 @@ QWidget* PointMetricWrapper::createWidget()
   sampleButton->setToolTip("Set the position equal to the current tool tip position.");
   hLayout->addWidget(sampleButton);
 
-  connect(mFrameSelector.get(), SIGNAL(valueWasSet()), this, SLOT(frameSelected()));
+  connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
   connect(mCoordinate.get(), SIGNAL(valueWasSet()), this, SLOT(coordinateChanged()));
   connect(sampleButton, SIGNAL(clicked()), this, SLOT(moveToToolPosition()));
   this->dataChangedSlot();
@@ -84,7 +84,7 @@ QWidget* PointMetricWrapper::createWidget()
 
 QString PointMetricWrapper::getValue() const
 {
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getSpace(), ssc::CoordinateSystem(ssc::csREF));
   ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
 //  return "pt_r="+qstring_cast(p0_r);
   int w=3;
@@ -106,26 +106,28 @@ QString PointMetricWrapper::getArguments() const
   ssc::Vector3D p = mData->getCoordinate();
   int w=1;
   QString coord = QString("(%1 %2 %3)").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
+  if (mData->getSpace().mId==ssc::csREF)
+  	coord = ""; // ignore display of coord if in ref space
 
-  return mData->getFrame().toString() + " " + coord;
+  return mData->getSpace().toString() + " " + coord;
 }
 
 
 void PointMetricWrapper::moveToToolPosition()
 {
-  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getFrame(), true);
+  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
   mData->setCoordinate(p);
 }
 
-void PointMetricWrapper::frameSelected()
+void PointMetricWrapper::spaceSelected()
 {
   if (mInternalUpdate)
     return;
-  ssc::CoordinateSystem frame = ssc::CoordinateSystem::fromString(mFrameSelector->getValue());
-  if (frame.mId==ssc::csCOUNT)
+  ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+  if (space.mId==ssc::csCOUNT)
     return;
 //  std::cout << "selected frame " << frame.toString() << std::endl;
-  mData->setFrame(frame);
+  mData->setSpace(space);
 }
 
 void PointMetricWrapper::coordinateChanged()
@@ -139,7 +141,7 @@ void PointMetricWrapper::dataChangedSlot()
 {
   mInternalUpdate = true;
 //  std::cout << mData->getUid() <<" frame: " << frameString << " coord: " << mData->getCoordinate() << std::endl;
-  mFrameSelector->setValue(mData->getFrame().toString());
+  mSpaceSelector->setValue(mData->getSpace().toString());
   mCoordinate->setValue(mData->getCoordinate());
   mInternalUpdate = false;
 }
@@ -171,14 +173,14 @@ QWidget* PlaneMetricWrapper::createWidget()
   for (unsigned i=0; i<spaces.size(); ++i)
     range << spaces[i].toString();
 
-  mFrameSelector = ssc::StringDataAdapterXml::initialize("selectFrame",
-      "Frame",
+  mSpaceSelector = ssc::StringDataAdapterXml::initialize("selectSpace",
+      "Space",
       "Select coordinate system to store position in.",
       value,
       range,
       QDomNode());
-  hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mFrameSelector));
-  connect(mFrameSelector.get(), SIGNAL(valueWasSet()), this, SLOT(frameSelected()));
+  hLayout->addWidget(new ssc::LabeledComboBoxWidget(widget, mSpaceSelector));
+  connect(mSpaceSelector.get(), SIGNAL(valueWasSet()), this, SLOT(spaceSelected()));
 
   mCoordinate = ssc::Vector3DDataAdapterXml::initialize("selectCoordinate",
       "Coord",
@@ -213,11 +215,6 @@ QWidget* PlaneMetricWrapper::createWidget()
 QString PlaneMetricWrapper::getValue() const
 {
   return "NA";
-//  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mData->getFrame(), ssc::CoordinateSystem(ssc::csREF));
-//  ssc::Vector3D p0_r = rM0.coord(mData->getCoordinate());
-////  return "pt_r="+qstring_cast(p0_r);
-//  int w=3;
-//  return QString("p_r=%1 %2 %3").arg(p0_r[0], w, 'f', 1).arg(p0_r[1], w, 'f', 1).arg(p0_r[2], w, 'f', 1);
 }
 
 ssc::DataPtr PlaneMetricWrapper::getData() const
@@ -232,29 +229,24 @@ QString PlaneMetricWrapper::getType() const
 
 QString PlaneMetricWrapper::getArguments() const
 {
-  return "";
-//  ssc::Vector3D p = mData->getCoordinate();
-//  int w=1;
-//  QString coord = QString("(%1 %2 %3)").arg(p[0], w, 'f', 1).arg(p[1], w, 'f', 1).arg(p[2], w, 'f', 1);
-//
-//  return mData->getFrame().toString() + " " + coord;
+  return mData->getSpace().toString();
 }
 
 
 void PlaneMetricWrapper::moveToToolPosition()
 {
-  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getFrame(), true);
+  ssc::Vector3D p = ssc::SpaceHelpers::getDominantToolTipPoint(mData->getSpace(), true);
   mData->setCoordinate(p);
 }
 
-void PlaneMetricWrapper::frameSelected()
+void PlaneMetricWrapper::spaceSelected()
 {
   if (mInternalUpdate)
     return;
-  ssc::CoordinateSystem frame = ssc::CoordinateSystem::fromString(mFrameSelector->getValue());
-  if (frame.mId==ssc::csCOUNT)
+  ssc::CoordinateSystem space = ssc::CoordinateSystem::fromString(mSpaceSelector->getValue());
+  if (space.mId==ssc::csCOUNT)
     return;
-  mData->setFrame(frame);
+  mData->setSpace(space);
 }
 
 void PlaneMetricWrapper::coordinateChanged()
@@ -268,7 +260,7 @@ void PlaneMetricWrapper::coordinateChanged()
 void PlaneMetricWrapper::dataChangedSlot()
 {
   mInternalUpdate = true;
-  mFrameSelector->setValue(mData->getFrame().toString());
+  mSpaceSelector->setValue(mData->getSpace().toString());
   mCoordinate->setValue(mData->getCoordinate());
   mNormal->setValue(mData->getNormal());
   mInternalUpdate = false;

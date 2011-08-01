@@ -46,8 +46,8 @@ public:
   ssc::Vector3D getCoordinate() const;
   void setNormal(const ssc::Vector3D& p);
   ssc::Vector3D getNormal() const;
-  void setFrame(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-  ssc::CoordinateSystem getFrame() const; // use parentframe from ssc::Data
+  void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
+  ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
   virtual QString getType() const { return "planeMetric"; }
 
   Plane3D getRefPlane() const;
@@ -59,7 +59,7 @@ public:
 private:
   ssc::Vector3D mCoordinate;
   ssc::Vector3D mNormal;
-  ssc::CoordinateSystem mFrame;
+  ssc::CoordinateSystem mSpace;
 };
 
 }
