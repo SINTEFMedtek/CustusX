@@ -140,6 +140,35 @@ class FollowerText3D
 };
 typedef boost::shared_ptr<FollowerText3D> FollowerText3DPtr;
 
+/** Helper for rendering 3D text that faces the camera and
+ *  has a constant viewed size, always on top.
+ */
+class CaptionText3D
+{
+public:
+	CaptionText3D(vtkRendererPtr renderer = vtkRendererPtr());
+	void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
+
+	~CaptionText3D();
+	void setColor(Vector3D color);
+	void setText(QString text);
+	void setPosition(ssc::Vector3D pos);
+
+	void setSize(double val);
+	//    void setSizeInNormalizedViewport(bool on, double size);
+	vtkCaptionActor2DPtr getActor();
+
+	//    void scaleText(); ///< internal method
+
+private:
+	vtkCaptionActor2DPtr mText;
+	//    vtkFollowerPtr mFollower;
+	vtkRendererPtr mRenderer;
+	double mSize;
+
+	//    ssc::ViewportListenerPtr mViewportListener;
+};
+typedef boost::shared_ptr<CaptionText3D> CaptionText3DPtr;
 
 }
 

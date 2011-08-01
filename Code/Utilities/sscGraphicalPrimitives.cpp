@@ -17,6 +17,8 @@
 #include "sscBoundingBox3D.h"
 #include "vtkArrowSource.h"
 #include "vtkMatrix4x4.h"
+#include "vtkCaptionActor2D.h"
+#include "vtkTextProperty.h"
 
 namespace ssc
 {
@@ -434,6 +436,85 @@ void FollowerText3D::scaleText()
     mFollower->SetScale(mTextScale.begin());
 }
 
+///--------------------------------------------------------
+///--------------------------------------------------------
+///--------------------------------------------------------
+
+
+CaptionText3D::CaptionText3D( vtkRendererPtr renderer)
+{
+	mText = vtkCaptionActor2DPtr::New();
+	mText->BorderOff();
+	mText->LeaderOff();
+
+	mText->GetCaptionTextProperty()->BoldOff();
+	mText->GetCaptionTextProperty()->ItalicOff();
+	mText->GetCaptionTextProperty()->ShadowOff();
+	mText->SetWidth(10);
+	mText->SetHeight(0.03);
+
+//	mText->GetPositionCoordinate()->SetCoordinateSystemToWorld();
+
+//	ssc::Vector3D mTextScale(2,2,2);
+//  mFollower->SetScale(mTextScale.begin());
+//
+//  this->setSizeInNormalizedViewport(true, 0.025);
+////  mRenderer->AddActor(mFollower);
+  this->setRenderer(renderer);
+}
+
+void CaptionText3D::setRenderer(vtkRendererPtr renderer)
+{
+	if (mRenderer)
+	{
+		mRenderer->RemoveActor(mText);
+	}
+
+  mRenderer = renderer;
+
+  if (mRenderer)
+  {
+    mRenderer->AddActor(mText);
+  }
+}
+
+CaptionText3D::~CaptionText3D()
+{
+  if (mRenderer)
+    mRenderer->RemoveActor(mText);
+}
+
+void CaptionText3D::setSize(double val)
+{
+//	std::cout << "setsize=" << val << std::endl;
+	mSize = val;
+//	mText->SetHeight(mSize*3);
+	mText->SetHeight(mSize);
+//	this->scaleText();
+//	std::cout << "s=" << val << ",  w,h=" << mText->GetWidth() << "," << mText->GetHeight() << std::endl;
+}
+
+void CaptionText3D::setColor(Vector3D color)
+{
+	mText->GetCaptionTextProperty()->SetColor(color.begin());
+}
+
+void CaptionText3D::setText(QString text)
+{
+  mText->SetCaption(cstring_cast(text));
+}
+
+void CaptionText3D::setPosition(ssc::Vector3D pos)
+{
+//	std::cout << "setting pos " << pos << std::endl;
+//	mText->SetPosition(pos.begin());
+	mText->SetAttachmentPoint(pos.begin());
+}
+
+vtkCaptionActor2DPtr CaptionText3D::getActor()
+{
+  return mText;
+}
 
 ///--------------------------------------------------------
 ///--------------------------------------------------------

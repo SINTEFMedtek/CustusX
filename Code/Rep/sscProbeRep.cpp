@@ -169,9 +169,14 @@ Vector3D ProbeRep::pickLandmark(const Vector3D& clickPosition, vtkRendererPtr re
 	  return intersection;
 	}
 
-	//Make an sphere actor to show where the calculated point is
-	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
+//	//Make an sphere actor to show where the calculated point is
+//	this->showTemporaryPointSlot(intersection[0], intersection[1], intersection[2]);
   
+  mPickedPoint = intersection;
+  if (mGraphicalPoint)
+    mGraphicalPoint->setValue(mPickedPoint);
+
+
   emit pointPicked(mPickedPoint);
 	return intersection;
 }
@@ -208,17 +213,17 @@ void ProbeRep::pickLandmarkSlot(vtkObject* renderWindowInteractor)
 	this->pickLandmark(clickPoint, renderer);
 }
 
-/**
- * @param x world coordinat, ref space
- * @param y world coordinat, ref space
- * @param z world coordinat, ref space
- */
-void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
-{
-  mPickedPoint = Vector3D(x,y,z);
-  if (mGraphicalPoint)
-    mGraphicalPoint->setValue(mPickedPoint);
-}
+///**
+// * @param x world coordinat, ref space
+// * @param y world coordinat, ref space
+// * @param z world coordinat, ref space
+// */
+//void ProbeRep::showTemporaryPointSlot(double x, double y, double z)
+//{
+//  mPickedPoint = Vector3D(x,y,z);
+//  if (mGraphicalPoint)
+//    mGraphicalPoint->setValue(mPickedPoint);
+//}
 
 /**
  * @param threshold sets a threshold for the probing ray
@@ -230,9 +235,16 @@ void ProbeRep::setThresholdSlot(const int threshold)
 
 void ProbeRep::receiveTransforms(Transform3D prMt, double timestamp)
 {
-  Transform3DPtr rMprPtr = ToolManager::getInstance()->get_rMpr();
-  Transform3D rMt = (*rMprPtr)*prMt;
-  this->showTemporaryPointSlot(rMt(0,3), rMt(1,3), rMt(2,3));
+  Transform3D rMpr = *ToolManager::getInstance()->get_rMpr();
+  Transform3D rMt = rMpr*prMt;
+  Vector3D p_r = rMt.coord(ssc::Vector3D(0,0,mTool->getTooltipOffset()));
+
+//  this->showTemporaryPointSlot(rMt(0,3), rMt(1,3), rMt(2,3));
+
+  mPickedPoint = p_r;
+  if (mGraphicalPoint)
+    mGraphicalPoint->setValue(mPickedPoint);
+
 }
 
 void ProbeRep::setEnabled(bool on)

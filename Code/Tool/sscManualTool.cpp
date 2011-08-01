@@ -34,6 +34,7 @@ void ManualTool::read3DCrossHair()
 	int s = 60;
 	mCrossHair->SetModelBounds(-s,s,-s,s,-s,s+mOffset);
 	mCrossHair->SetFocalPoint(0,0,mOffset);
+	mCrossHair->Modified();
 }
 
 //only used now by mouse or touch tool

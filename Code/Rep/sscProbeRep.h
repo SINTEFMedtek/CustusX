@@ -49,7 +49,7 @@ signals:
 
 public slots:
 	void pickLandmarkSlot(vtkObject* renderWindowInteractor); ///< When you use the renderwindowinteractor
-	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
+//	void showTemporaryPointSlot(double x, double y, double z); ///< shows a temp actor at a given position
 	void setThresholdSlot(const int threshold); ///< sets the threshold for picking the point on the volumes surface
   
 protected slots:
