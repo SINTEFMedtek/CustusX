@@ -53,12 +53,12 @@ public:
   virtual QString getType() const;
 private slots:
   void moveToToolPosition();
-  void frameSelected();
+  void spaceSelected();
   void coordinateChanged();
   void dataChangedSlot();
 private:
   PointMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mFrameSelector;
+  ssc::StringDataAdapterXmlPtr mSpaceSelector;
   ssc::Vector3DDataAdapterXmlPtr mCoordinate;
   bool mInternalUpdate;
 };
@@ -76,12 +76,12 @@ public:
   virtual QString getType() const;
 private slots:
   void moveToToolPosition();
-  void frameSelected();
+  void spaceSelected();
   void coordinateChanged();
   void dataChangedSlot();
 private:
   PlaneMetricPtr mData;
-  ssc::StringDataAdapterXmlPtr mFrameSelector;
+  ssc::StringDataAdapterXmlPtr mSpaceSelector;
   ssc::Vector3DDataAdapterXmlPtr mCoordinate;
   ssc::Vector3DDataAdapterXmlPtr mNormal;
   bool mInternalUpdate;
