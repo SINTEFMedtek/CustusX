@@ -82,7 +82,7 @@ void AngleMetricRep::changedSlot()
     mLine0.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
     mLine1.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
     mArc.reset(new ssc::GraphicalArc3D(mView->getRenderer()));
-    mText.reset(new ssc::FollowerText3D(mView->getRenderer()));
+    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
   }
 
   if (!mLine0)
@@ -115,7 +115,7 @@ void AngleMetricRep::changedSlot()
   mText->setColor(mColor);
   mText->setText(text);
   mText->setPosition(a_text);
-  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
+  mText->setSize(mLabelSize/100);
 }
 
 

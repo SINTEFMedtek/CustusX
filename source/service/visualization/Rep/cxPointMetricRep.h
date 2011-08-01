@@ -45,9 +45,9 @@ private:
   PointMetricRep(); ///< not implemented
 
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
-  ssc::FollowerText3DPtr mText;
+  ssc::CaptionText3DPtr mText;
   PointMetricPtr mMetric;
-	ssc::View* mView;
+  ssc::View* mView;
   ssc::ViewportListenerPtr mViewportListener;
 };
 

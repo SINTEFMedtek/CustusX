@@ -49,7 +49,7 @@ private:
   ssc::GraphicalLine3DPtr mLine0;
   ssc::GraphicalLine3DPtr mLine1;
   ssc::GraphicalArc3DPtr mArc;
-  ssc::FollowerText3DPtr mText;
+  ssc::CaptionText3DPtr mText;
   AngleMetricPtr mMetric;
   ssc::View* mView;
 //  ssc::Vector3D mColor;
