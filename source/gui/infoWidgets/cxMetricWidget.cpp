@@ -54,10 +54,10 @@ MetricWidget::MetricWidget(QWidget* parent) :
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   QActionGroup* group = new QActionGroup(this);
-  this->createAction(group, "", "Pt", "Create a new Point Metric",      SLOT(addPointButtonClickedSlot()));
-  this->createAction(group, "", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
-  this->createAction(group, "", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
-  this->createAction(group, "", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_point.png", "Pt", "Create a new Point Metric",      SLOT(addPointButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_distance.png", "Dist", "Create a new Distance Metric", SLOT(addDistanceButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
+  this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
   this->createAction(group, "", "", "", NULL)->setSeparator(true);
   mRemoveAction = this->createAction(group, "", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
   mRemoveAction->setDisabled(true);
