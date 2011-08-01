@@ -19,7 +19,6 @@ namespace cx
 
 ServiceController::ServiceController()
 {
-	std::cout << "ServiceController::ServiceController()" << std::endl;
 	// load the ever-present video stream into the patient service
   ssc::dataManager()->loadStream(videoService()->getVideoConnection()->getVideoSource());
 

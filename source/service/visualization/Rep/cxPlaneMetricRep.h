@@ -46,7 +46,7 @@ private:
   void rescale();
 
   ssc::GraphicalPoint3DPtr mGraphicalPoint;
-  ssc::FollowerText3DPtr mText;
+  ssc::CaptionText3DPtr mText;
   ssc::GraphicalArrow3DPtr mNormal;
   PlaneMetricPtr mMetric;
   ssc::View* mView;

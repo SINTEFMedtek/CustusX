@@ -65,8 +65,8 @@ public:
 
 	void setCoordinate(const ssc::Vector3D& p);
 	ssc::Vector3D getCoordinate() const;
-	void setFrame(ssc::CoordinateSystem space); // use parentframe from ssc::Data
-	ssc::CoordinateSystem getFrame() const; // use parentframe from ssc::Data
+	void setSpace(ssc::CoordinateSystem space); // use parentframe from ssc::Data
+	ssc::CoordinateSystem getSpace() const; // use parentframe from ssc::Data
 	virtual QString getType() const { return "pointMetric"; }
 	ssc::Vector3D getRefCoord() const;
 
@@ -80,8 +80,8 @@ public:
 
 private:
   ssc::Vector3D mCoordinate;
-  ssc::CoordinateSystem mFrame;
-  CoordinateSystemListenerPtr mFrameListener;
+  ssc::CoordinateSystem mSpace;
+  CoordinateSystemListenerPtr mSpaceListener;
 };
 
 }

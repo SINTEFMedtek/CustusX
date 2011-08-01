@@ -202,13 +202,17 @@ void ViewWrapper3D::settingsChangedSlot(QString key)
 
 void ViewWrapper3D::probeRepPointPickedSlot(ssc::Vector3D p_r)
 {
+	ssc::Transform3D rMpr = *ssc::toolManager()->get_rMpr();
 //  ssc::Vector3D p_r(x,y,z); // assume p is in r ...?
-  ssc::Vector3D p_pr = ssc::toolManager()->get_rMpr()->inv().coord(p_r);
+  ssc::Vector3D p_pr = rMpr.inv().coord(p_r);
 
   // set the picked point as offset tip
   ssc::ManualToolPtr tool = ToolManager::getInstance()->getManualTool();
   ssc::Vector3D offset = tool->get_prMt().vector(ssc::Vector3D(0,0,tool->getTooltipOffset()));
-  p_r += offset;
+  p_pr -= offset;
+  p_r = rMpr.coord(p_pr);
+
+//	std::cout << "ViewWrapper3D::probeRepPointPickedSlot " << p_r << p_r<< std::endl;
 
   // TODO set center here will not do: must handle
   ssc::dataManager()->setCenter(p_r);

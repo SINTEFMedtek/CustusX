@@ -92,7 +92,7 @@ void PlaneMetricRep::rescale()
   if (!mGraphicalPoint)
     return;
 
-  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getFrame(), ssc::CoordinateSystem(ssc::csREF));
+  ssc::Transform3D rM0 = ssc::SpaceHelpers::get_toMfrom(mMetric->getSpace(), ssc::CoordinateSystem(ssc::csREF));
   ssc::Vector3D p0_r = rM0.coord(mMetric->getCoordinate());
   ssc::Vector3D n_r = rM0.vector(mMetric->getNormal());
 
@@ -112,13 +112,13 @@ void PlaneMetricRep::rescale()
   if (!mShowLabel)
     mText.reset();
   if (!mText && mShowLabel)
-    mText.reset(new ssc::FollowerText3D(mView->getRenderer()));
+    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
   if (mText)
   {
     mText->setColor(mColor);
     mText->setText(mMetric->getName());
     mText->setPosition(p0_r);
-    mText->setSizeInNormalizedViewport(true, mLabelSize/100);
+    mText->setSize(mLabelSize/100);
   }
 }
 

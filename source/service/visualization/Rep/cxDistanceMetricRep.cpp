@@ -75,7 +75,7 @@ void DistanceMetricRep::changedSlot()
   if (!mGraphicalLine && mView && mMetric)
   {
 		mGraphicalLine.reset(new ssc::GraphicalLine3D(mView->getRenderer()));
-    mText.reset(new ssc::FollowerText3D(mView->getRenderer()));
+    mText.reset(new ssc::CaptionText3D(mView->getRenderer()));
   }
 
 	if (!mGraphicalLine)
@@ -93,7 +93,8 @@ void DistanceMetricRep::changedSlot()
   mText->setColor(mColor);
   mText->setText(text);
   mText->setPosition(p_mean);
-  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
+  mText->setSize(mLabelSize/100);
+//  mText->setSizeInNormalizedViewport(true, mLabelSize/100);
 }
 
 }
