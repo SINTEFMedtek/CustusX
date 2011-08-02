@@ -17,9 +17,9 @@ PatientLandmarkRep::PatientLandmarkRep(const QString& uid, const QString& name) 
   LandmarkRep(uid, name)
 {
   mType = "cxPatientLandmarkRep";
-  this->setColor(ssc::Vector3D(0,0.8,0.6));
+  this->setColor(ssc::Vector3D(0,0.6,0.8));
   this->setShowLabel(false);
-  this->setShowLine(false);
+  this->setShowLine(true);
 
   ToolManager* toolmanager = ToolManager::getInstance();
   connect(toolmanager, SIGNAL(landmarkAdded(QString)), this, SLOT(landmarkAddedSlot(QString)));
@@ -87,6 +87,7 @@ void PatientLandmarkRep::setPosition(QString uid)
     ssc::Landmark landmark = mImage->getLandmarks()[uid];
     ssc::Vector3D img_r = mImage->get_rMd().coord(landmark.getCoord()); // p_r = point in ref space
     mGraphics[uid].mLine->setValue(p_r, img_r);
+    std::cout << "set line:" << p_r << "  to  " << img_r << std::endl;
   }
 
 }

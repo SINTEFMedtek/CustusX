@@ -50,6 +50,8 @@ void LandmarkRep::showLandmarks(bool on)
     iter->second.mPoint->getActor()->SetVisibility(on);
     if (iter->second.mText)
     	iter->second.mText->getActor()->SetVisibility(on);
+    if (iter->second.mLine)
+      iter->second.mLine->getActor()->SetVisibility(on);
   }
   mShowLandmarks = on;
 }
@@ -86,6 +88,8 @@ void LandmarkRep::addRepActorsToViewRenderer(ssc::View* view)
     iter->second.mPoint->setRenderer(view->getRenderer());
     if (iter->second.mText)
     	iter->second.mText->setRenderer(view->getRenderer());
+    if (iter->second.mLine)
+      iter->second.mLine->setRenderer(view->getRenderer());
   }
 }
 
@@ -96,6 +100,8 @@ void LandmarkRep::removeRepActorsFromViewRenderer(ssc::View* view)
     iter->second.mPoint->setRenderer(NULL);
     if (iter->second.mText)
     	iter->second.mText->setRenderer(NULL);
+    if (iter->second.mLine)
+      iter->second.mLine->setRenderer(NULL);
   }
 }
 
@@ -129,6 +135,8 @@ void LandmarkRep::addPoint(QString uid)
   {
     current.mLine.reset(new ssc::GraphicalLine3D(renderer));
     current.mLine->setColor(mColor);
+//    current.mLine->setColor(ssc::Vector3D(1,0,0));
+    current.mLine->setStipple(0x0F0F);
 //    current.mLine->setRadius(2);
   }
 
@@ -145,8 +153,11 @@ void LandmarkRep::internalUpdate()
     QString uid = iter->first;
     QString name = props[uid].getName();
     iter->second.mPoint->setColor(mColor);
-    iter->second.mText->setColor(mColor);
-    iter->second.mText->setText(name);
+    if (iter->second.mText)
+    {
+      iter->second.mText->setColor(mColor);
+      iter->second.mText->setText(name);
+    }
   }
 }
 
