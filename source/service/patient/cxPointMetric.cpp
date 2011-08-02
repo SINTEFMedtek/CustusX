@@ -124,7 +124,7 @@ ssc::DataPtr PointMetricReader::load(const QString& uid, const QString& filename
 
 
 PointMetric::PointMetric(const QString& uid, const QString& name) :
-	Data(uid, name)
+		DataMetric(uid, name)
 {
   mSpaceListener.reset(new CoordinateSystemListener);
   connect(mSpaceListener.get(), SIGNAL(changed()), this, SIGNAL(transformChanged()));

@@ -23,7 +23,7 @@ ssc::DataPtr AngleMetricReader::load(const QString& uid, const QString& filename
 
 
 AngleMetric::AngleMetric(const QString& uid, const QString& name) :
-      ssc::Data(uid, name)
+      DataMetric(uid, name)
 {
 }
 
