@@ -296,7 +296,7 @@ void MetricWidget::enablebuttons()
   mLoadReferencePointsAction->setEnabled(ssc::toolManager()->getReferenceTool());
 }
 
-PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem space)
+PointMetricPtr MetricWidget::addPoint(ssc::Vector3D point, ssc::CoordinateSystem space, QString name)
 {
 	PointMetricPtr p1(new PointMetric("point%1","point%1"));
   p1->get_rMd_History()->setParentSpace("reference");
@@ -492,7 +492,8 @@ void MetricWidget::loadReferencePointsSlot()
   for(; it != referencePoints_s.end(); ++it)
   {
     ssc::Vector3D P_ref = ssc::CoordinateSystemHelpers::get_toMfrom(sensor, ref).coord(it->second);
-    this->addPoint(P_ref);
+//    this->addPoint(P_ref);
+    this->addPoint(P_ref, ssc::CoordinateSystem(ssc::csREF), "ref%1");
   }
 }
 

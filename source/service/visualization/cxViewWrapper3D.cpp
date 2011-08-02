@@ -122,7 +122,13 @@ ViewWrapper3D::ViewWrapper3D(int startIndex, ssc::View* view)
   connect(settings(), SIGNAL(valueChangedFor(QString)), this, SLOT(settingsChangedSlot(QString)));
 
   mImageLandmarkRep = ImageLandmarkRep::New("ImageLandmarkRep_"+index);
+  mImageLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  mImageLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
   mPatientLandmarkRep = PatientLandmarkRep::New("PatientLandmarkRep_"+index);
+  mPatientLandmarkRep->setGraphicsSize(settings()->value("View3D/sphereRadius").toDouble());
+  mPatientLandmarkRep->setLabelSize(settings()->value("View3D/labelSize").toDouble());
+
   mProbeRep = ssc::ProbeRep::New("ProbeRep_"+index, "ProbeRep_"+index);
 
   connect(mProbeRep.get(), SIGNAL(pointPicked(ssc::Vector3D)),this, SLOT(probeRepPointPickedSlot(ssc::Vector3D)));
