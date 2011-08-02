@@ -59,9 +59,9 @@ MetricWidget::MetricWidget(QWidget* parent) :
   this->createAction(group, ":/icons/metric_angle.png", "Angle", "Create a new Angle Metric",   SLOT(addAngleButtonClickedSlot()));
   this->createAction(group, ":/icons/metric_plane.png", "Plane", "Create a new Plane Metric",   SLOT(addPlaneButtonClickedSlot()));
   this->createAction(group, "", "", "", NULL)->setSeparator(true);
-  mRemoveAction = this->createAction(group, "", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
+  mRemoveAction = this->createAction(group, ":/icons/metric_remove.png", "Remove", "Remove currently selected metric",   SLOT(removeButtonClickedSlot()));
   mRemoveAction->setDisabled(true);
-  mLoadReferencePointsAction = this->createAction(group, "", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
+  mLoadReferencePointsAction = this->createAction(group, ":/icons/metric_reference.png", "Import", "Import reference points from reference tool", SLOT(loadReferencePointsSlot()));
   mLoadReferencePointsAction->setDisabled(true);
 
   QToolBar* toolBar = new QToolBar("actions", this);
