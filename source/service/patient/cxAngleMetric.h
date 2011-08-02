@@ -8,7 +8,7 @@
 #ifndef CXANGLEMETRIC_H_
 #define CXANGLEMETRIC_H_
 
-#include "sscData.h"
+#include "cxDataMetric.h"
 #include "cxPointMetric.h"
 #include "sscDataManagerImpl.h"
 
@@ -37,7 +37,7 @@ public:
  * .ie. ABBC.
  *
  */
-class AngleMetric : public ssc::Data
+class AngleMetric : public DataMetric
 {
   Q_OBJECT
 public:

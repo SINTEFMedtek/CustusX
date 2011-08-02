@@ -8,7 +8,7 @@
 #ifndef CXDISTANCEMETRIC_H_
 #define CXDISTANCEMETRIC_H_
 
-#include "sscData.h"
+#include "cxDataMetric.h"
 #include "sscDataManagerImpl.h"
 
 namespace cx
@@ -31,7 +31,7 @@ public:
  * or a point and a plane
  *
  */
-class DistanceMetric : public ssc::Data
+class DistanceMetric : public DataMetric
 {
 	Q_OBJECT
 public:

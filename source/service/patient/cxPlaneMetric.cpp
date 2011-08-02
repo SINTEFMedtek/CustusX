@@ -23,7 +23,7 @@ ssc::DataPtr PlaneMetricReader::load(const QString& uid, const QString& filename
 
 
 PlaneMetric::PlaneMetric(const QString& uid, const QString& name) :
-  Data(uid, name)
+		DataMetric(uid, name)
 {
 }
 
