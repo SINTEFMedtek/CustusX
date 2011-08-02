@@ -154,6 +154,10 @@ void PointMetric::setSpace(ssc::CoordinateSystem space)
 	if (space==mSpace)
 		return;
 
+	// keep the absolute position (in ref) constant when changing space.
+	ssc::Transform3D new_M_old = ssc::SpaceHelpers::get_toMfrom(this->getSpace(), space);
+	mCoordinate = new_M_old.coord(mCoordinate);
+
 	mSpace = space;
 	mSpaceListener->setSpace(space);
 }
