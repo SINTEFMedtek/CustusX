@@ -40,20 +40,13 @@ GraphicalPoint3D::GraphicalPoint3D(vtkRendererPtr renderer)
 
 	actor = vtkActorPtr::New();
 	actor->SetMapper(mapper);
-//	if (mRenderer)
-//	{
-//		mRenderer->AddActor(actor);
-//	}
+
 	this->setRenderer(renderer);
 }
 
 GraphicalPoint3D::~GraphicalPoint3D()
 {
 	this->setRenderer(NULL);
-//	if (mRenderer)
-//	{
-//		mRenderer->RemoveActor(actor);
-//	}
 }
 
 void GraphicalPoint3D::setRenderer(vtkRendererPtr renderer)
@@ -111,14 +104,27 @@ GraphicalLine3D::GraphicalLine3D( vtkRendererPtr renderer)
 	
 	mapper->SetInputConnection( source->GetOutputPort() );
 	actor->SetMapper (mapper );
-	if (mRenderer)
-		mRenderer->AddActor(actor);	
+  this->setRenderer(renderer);
 }
 
 GraphicalLine3D::~GraphicalLine3D()
 {
-	if (mRenderer)
-		mRenderer->RemoveActor(actor);
+  this->setRenderer(NULL);
+}
+
+void GraphicalLine3D::setRenderer(vtkRendererPtr renderer)
+{
+  if (mRenderer)
+  {
+    mRenderer->RemoveActor(actor);
+  }
+
+  mRenderer = renderer;
+
+  if (mRenderer)
+  {
+    mRenderer->AddActor(actor);
+  }
 }
 
 void GraphicalLine3D::setColor(Vector3D color)

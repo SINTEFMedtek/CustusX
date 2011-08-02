@@ -39,6 +39,7 @@ class GraphicalLine3D
 {
 	public:
 		GraphicalLine3D(vtkRendererPtr renderer = vtkRendererPtr());
+    void setRenderer(vtkRendererPtr renderer = vtkRendererPtr());
 		~GraphicalLine3D();
 		void setColor(Vector3D color);
 		void setValue(Vector3D point1, Vector3D point2);
