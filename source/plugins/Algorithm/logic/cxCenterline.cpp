@@ -55,7 +55,7 @@ void Centerline::postProcessingSlot()
   ssc::ImagePtr outImage = ssc::dataManager()->createImage(rawResult,mInput->getUid() + "_cl_temp%1", mInput->getName()+" cl_temp%1");
 
   outImage->get_rMd_History()->setRegistration(mInput->get_rMd());
-  outImage->get_rMd_History()->setParentFrame(mInput->getUid());
+  outImage->get_rMd_History()->setParentSpace(mInput->getUid());
 
   //automatically generate a mesh from the centerline
   vtkPolyDataPtr centerlinePolyData = SeansVesselReg::extractPolyData(outImage, 1, 0);
@@ -64,7 +64,7 @@ void Centerline::postProcessingSlot()
   QString name = mInput->getName()+" cl%1";
   ssc::MeshPtr mesh = ssc::dataManager()->createMesh(centerlinePolyData, uid, name, "Images");
   mesh->setColor(mDefaultColor);
-  mesh->get_rMd_History()->setParentFrame(mInput->getUid());
+  mesh->get_rMd_History()->setParentSpace(mInput->getUid());
   ssc::dataManager()->loadData(mesh);
   ssc::dataManager()->saveMesh(mesh, mOutputBasePath);
   mOutput = mesh;
